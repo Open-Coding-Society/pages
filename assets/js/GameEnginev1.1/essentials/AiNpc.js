@@ -77,10 +77,7 @@ class AiNpc {
         inputField.placeholder = `Ask about ${spriteData.expertise}...`;
         Object.assign(inputField.style, {
             padding: '8px 12px',
-            borderRadius: '5px',
-            border: '2px solid #4a86e8',
-            backgroundColor: '#16213e',
-            color: '#fff'
+            borderRadius: '5px'
         });
 
         const buttonRow = document.createElement('div');
@@ -91,8 +88,6 @@ class AiNpc {
         historyBtn.textContent = '📋 History';
         Object.assign(historyBtn.style, {
             padding: '8px 15px',
-            background: '#666',
-            color: 'white',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer',
@@ -103,10 +98,7 @@ class AiNpc {
         Object.assign(responseArea.style, {
             minHeight: '40px',
             padding: '10px',
-            backgroundColor: '#16213e',
             borderRadius: '5px',
-            borderLeft: '3px solid #4a86e8',
-            color: '#4a86e8',
             fontStyle: 'italic',
             display: 'none'
         });
@@ -272,29 +264,25 @@ class AiNpc {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            background: '#1a1a2e',
-            border: '2px solid #4a86e8',
             borderRadius: '10px',
             padding: '20px',
             maxWidth: '500px',
             maxHeight: '600px',
             overflowY: 'auto',
-            zIndex: '10001',
-            color: '#fff'
+            zIndex: '10001'
         });
 
         const title = document.createElement('h3');
         title.textContent = 'Chat History';
-        title.style.color = '#4a86e8';
         modal.appendChild(title);
 
         spriteData.chatHistory.forEach(msg => {
             const div = document.createElement('div');
+            div.className = msg.role === 'user' ? 'user-message' : 'ai-message';
             Object.assign(div.style, {
                 marginBottom: '8px',
                 padding: '8px',
-                borderRadius: '5px',
-                background: msg.role === 'user' ? '#4a86e8' : '#16213e'
+                borderRadius: '5px'
             });
             div.textContent = msg.message;
             modal.appendChild(div);
@@ -306,8 +294,6 @@ class AiNpc {
             width: '100%',
             marginTop: '10px',
             padding: '8px',
-            background: '#4a86e8',
-            color: 'white',
             border: 'none',
             borderRadius: '5px',
             cursor: 'pointer'

@@ -91,24 +91,6 @@ createDialogueBox() {
     const styleSheet = document.createElement('style');
     styleSheet.id = 'dialogue-animations-' + this.safeId;
     styleSheet.textContent = `
-      @keyframes glow-pulse-${this.safeId} {
-        0%, 100% {
-          box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), inset 0 0 20px rgba(0, 255, 255, 0.2);
-        }
-        50% {
-          box-shadow: 0 0 30px rgba(0, 255, 255, 0.9), inset 0 0 30px rgba(0, 255, 255, 0.3);
-        }
-      }
-    
-      @keyframes text-glow-${this.safeId} {
-        0%, 100% {
-          text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(74, 134, 232, 0.3);
-        }
-        50% {
-          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(74, 134, 232, 0.6);
-        }
-      }
-    
       @keyframes char-pop-${this.safeId} {
         0% {
           opacity: 0;
@@ -121,10 +103,6 @@ createDialogueBox() {
           opacity: 1;
           transform: scale(1) translateY(0);
         }
-      }
-    
-      .dialogue-text-animated-${this.safeId} {
-        animation: text-glow-${this.safeId} 2s ease-in-out infinite;
       }
     
       .dialogue-char-${this.safeId} {
@@ -145,15 +123,11 @@ createDialogueBox() {
     transform: "translateX(-50%)",
     padding: "20px",
     maxWidth: "80%",
-    background: "rgba(0, 0, 0, 0.85)",
-    color: "#00FFFF",
     fontFamily: "'Press Start 2P', cursive, monospace",
     fontSize: "14px",
     textAlign: "center",
-    border: "2px solid #4a86e8",
     borderRadius: "12px",
     zIndex: "9999",
-    animation: `glow-pulse-${this.safeId} 2s ease-in-out infinite`,
     display: "none"
   });
 
@@ -181,7 +155,6 @@ createDialogueBox() {
   speakerName.id = "dialogue-speaker-" + this.safeId;
   Object.assign(speakerName.style, {
     fontWeight: "bold",
-    color: "#4a86e8",
     marginBottom: "10px",
     fontSize: "16px"
   });
@@ -207,8 +180,6 @@ createDialogueBox() {
   Object.assign(this.closeBtn.style, {
     marginTop: "15px",
     padding: "10px 20px",
-    background: "#4a86e8",
-    color: "#fff",
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
@@ -275,9 +246,6 @@ typewriteText(element, text, speed = this.typewriterSpeed) {
   
       charIndex++;
       this.typewriterTimeoutId = setTimeout(typeNextChar, speed);
-    } else {
-      // Add glow animation to the complete text
-      element.classList.add(`dialogue-text-animated-${this.safeId}`);
     }
   };
    typeNextChar();
@@ -310,11 +278,9 @@ showDialogue(message, speaker = "", avatarSrc = null) {
   }
    // Apply typewriter effect or set text directly
   if (this.enableTypewriter) {
-    this.dialogueText.classList.remove(`dialogue-text-animated-${this.safeId}`);
     this.typewriteText(this.dialogueText, message, this.typewriterSpeed);
   } else {
     this.dialogueText.textContent = message;
-    this.dialogueText.classList.add(`dialogue-text-animated-${this.safeId}`);
   }
    // Show the dialogue box
   this.dialogueBox.style.display = "block";
@@ -421,9 +387,8 @@ addButtons(buttons) {
       
         const btn = document.createElement('button');
         btn.textContent = button.text;
+        btn.className = button.primary ? 'primary-button' : 'secondary-button';
         btn.style.padding = '8px 15px';
-        btn.style.background = button.primary ? '#4a86e8' : '#666';
-        btn.style.color = 'white';
         btn.style.border = 'none';
         btn.style.borderRadius = '5px';
         btn.style.cursor = 'pointer';
