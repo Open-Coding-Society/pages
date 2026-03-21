@@ -176,6 +176,7 @@ createDialogueBox() {
 
   // Create close button
   this.closeBtn = document.createElement("button");
+  this.closeBtn.id = "dialogue-close-btn-" + this.safeId;
   this.closeBtn.innerText = "Close";
   Object.assign(this.closeBtn.style, {
     marginTop: "15px",
@@ -354,23 +355,14 @@ showDialogue(message, speaker = "", avatarSrc = null, spriteData = null) {
 
 
 
-// Show a random dialogue from the dialogues array
+// Show the next dialogue from the dialogues array (cycles through sequentially)
 showRandomDialogue(speaker = "", avatarSrc = null, spriteData = null) {
   if (this.dialogues.length === 0) return;
-   // Pick a random index that's different from the last one
-  let randomIndex;
-  if (this.dialogues.length > 1) {
-    do {
-      randomIndex = Math.floor(Math.random() * this.dialogues.length);
-    } while (randomIndex === this.lastShownIndex);
-  } else {
-    randomIndex = 0; // Only one dialogue available
-  }
-   // Store the current index to avoid repetition next time
-  this.lastShownIndex = randomIndex;
+   // Increment to next dialogue, wrapping around to 0 when reaching the end
+  this.lastShownIndex = (this.lastShownIndex + 1) % this.dialogues.length;
    // Show the dialogue
-  const randomDialogue = this.dialogues[randomIndex];
-  return this.showDialogue(randomDialogue, speaker, avatarSrc, spriteData);
+  const dialogue = this.dialogues[this.lastShownIndex];
+  return this.showDialogue(dialogue, speaker, avatarSrc, spriteData);
 }
 
 

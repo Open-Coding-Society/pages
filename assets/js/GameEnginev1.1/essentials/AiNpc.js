@@ -137,10 +137,17 @@ class AiNpc {
     static attachToDialogue(dialogueSystem, container) {
         const dialogueBox = document.getElementById('custom-dialogue-box-' + dialogueSystem.safeId);
         if (dialogueBox) {
-            const closeBtn = dialogueBox.querySelector('button');
-            closeBtn
-                ? dialogueBox.insertBefore(container, closeBtn)
-                : dialogueBox.appendChild(container);
+            // Remove any existing AI NPC containers first
+            const existingContainers = dialogueBox.querySelectorAll('.ai-npc-container');
+            existingContainers.forEach(existing => existing.remove());
+            
+            // Find the close button using its specific ID
+            const closeBtn = document.getElementById('dialogue-close-btn-' + dialogueSystem.safeId);
+            if (closeBtn && closeBtn.parentNode === dialogueBox) {
+                dialogueBox.insertBefore(container, closeBtn);
+            } else {
+                dialogueBox.appendChild(container);
+            }
         }
     }
 

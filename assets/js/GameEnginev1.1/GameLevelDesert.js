@@ -828,10 +828,10 @@ class GameLevelDesert {
       chatHistory: [],                   // Conversation memory
       dialogues: [                       // Random greetings
           "Ask me anything about history!",
-          "I have knowledge about history...",
-          "Want to learn about history?",
-          "I'm an expert in history!",
-          "Curious about history? Talk to me!"
+          "I have a depth of knowledge in history...",
+          "Do you want to learn about history?",
+          "Try out chat session on history!",
+          "Are you curious about history? Talk to me!"
       ],
       knowledgeBase: {                   // Context hints for AI
           history: [
