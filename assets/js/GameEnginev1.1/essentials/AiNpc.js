@@ -3,6 +3,7 @@
  */
 
 import DialogueSystem from './DialogueSystem.js';
+import { pythonURI, fetchOptions } from '../../api/config.js';
 
 class AINpc {
   constructor(config) {
@@ -162,9 +163,9 @@ class AINpc {
             // Create a unique session ID for this NPC conversation
             const sessionId = `player-${config.id}`;
 
-            const pythonURL = this.pythonURI + '/api/ainpc/prompt';
+            const pythonURL = pythonURI + '/api/ainpc/prompt';
             const response = await fetch(pythonURL, {
-              ...this.fetchOptions,
+              ...fetchOptions,
               method: 'POST',
               body: JSON.stringify({
                 prompt: userMessage,
