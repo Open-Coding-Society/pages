@@ -118,10 +118,10 @@ export default class Leaderboard {
         this.parentId = options.parentId || null;
         // Default: visible unless explicitly requested hidden via options.initiallyHidden === true
         this.initiallyHidden = options.initiallyHidden === true;
-        this.isOpen = !this.initiallyHidden;
+        this.isOpen = false; // Always start collapsed
         this.mounted = false;
-        this.mode = null; // 'dynamic' or 'elementary'
-        this.showingTypeSelection = true;
+        this.mode = 'dynamic'; // Default to dynamic leaderboard
+        this.showingTypeSelection = false;
         this.elementaryEntries = []; // Store elementary entries locally
 
         // Flag whether a backend URI is available; allow UI to mount even when
@@ -163,17 +163,19 @@ export default class Leaderboard {
             <div class="leaderboard-header" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:6px;">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <button id="back-btn" class="back-btn" style="display:none;">← Back</button>
+                        <button id="back-btn" class="back-btn" style="display:none;" aria-label="Go back" title="Go back">←</button>
                         <span id="leaderboard-title" style="font-size:20px;font-weight:800;">Leaderboard</span>
                     </div>
                     <div style="display:flex;flex-direction:column;gap:4px;">
                         <span id="leaderboard-current-score" style="font-size:14px;font-weight:700;color:#ffffff;">Score: 0</span>
-                        <span id="leaderboard-preview" style="font-size:13px;color:#cfcfcf;display:none;">Collapse to choose a leaderboard</span>
+                        <span id="leaderboard-preview" style="font-size:13px;color:#cfcfcf;display:none;">
+                          <span id="leaderboard-coins-preview">Coins Collected: 0</span> | <span id="leaderboard-highscore-preview">High Score: 0</span>
+                        </span>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <button id="leaderboard-save-score" class="action-btn submit-btn" style="padding:8px 12px;font-size:12px;">Save Score</button>
-                    <button id="toggle-leaderboard" class="toggle-btn" aria-label="Toggle leaderboard">+</button>
+                    <button id="leaderboard-save-score" class="save-score-btn" aria-label="Save score" title="Save score">💾</button>
+                    <button id="toggle-leaderboard" class="toggle-btn" aria-label="Toggle leaderboard" title="Toggle leaderboard">+</button>
                 </div>
             </div>
             <div class="leaderboard-content hidden" id="leaderboard-content" style="padding:12px 16px;">
@@ -215,7 +217,8 @@ export default class Leaderboard {
             .getElementById('leaderboard-save-score')
             .addEventListener('click', (e) => this.handleSaveScoreFromLeaderboard(e.currentTarget));
 
-        this.showTypeSelection();
+        // Default to dynamic leaderboard mode
+        this.setupDynamicMode();
     }
 
     _getActiveGameEnv() {
@@ -269,6 +272,10 @@ export default class Leaderboard {
         this.isOpen = !this.isOpen;
         content.classList.toggle('hidden', !this.isOpen);
         btn.textContent = this.isOpen ? '−' : '+';
+
+        // Always hide back button when collapsed
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) backBtn.style.display = (this.isOpen && !this.showingTypeSelection) ? 'inline-block' : 'none';
 
         if (preview && title) {
             if (this.isOpen) {
@@ -324,12 +331,18 @@ export default class Leaderboard {
             this.mode = 'dynamic';
             this.showingTypeSelection = false;
             this.setupDynamicMode();
+            // Show back button only in open mode
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) backBtn.style.display = (this.isOpen) ? 'inline-block' : 'none';
         });
 
         document.getElementById('elementary-btn').addEventListener('click', () => {
             this.mode = 'elementary';
             this.showingTypeSelection = false;
             this.setupElementaryMode();
+            // Show back button only in open mode
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) backBtn.style.display = (this.isOpen) ? 'inline-block' : 'none';
         });
     }
 
@@ -345,20 +358,20 @@ export default class Leaderboard {
 
         list.innerHTML = '<p class="loading">Loading dynamic leaderboard…</p>';
         
-        // Show back button
+        // Show back button only if open
         const backBtn = document.getElementById('back-btn');
-        if (backBtn) backBtn.style.display = 'inline-block';
-        
+        if (backBtn) backBtn.style.display = (this.isOpen) ? 'inline-block' : 'none';
+
         // Start auto-updating
         this.fetchLeaderboard();
         this.refreshInterval = setInterval(() => this.fetchLeaderboard(), 30000);
     }
 
     setupElementaryMode() {
-        // Show back button
+        // Show back button only if open
         const backBtn = document.getElementById('back-btn');
-        if (backBtn) backBtn.style.display = 'inline-block';
-        
+        if (backBtn) backBtn.style.display = (this.isOpen) ? 'inline-block' : 'none';
+
         // Fetch existing data from backend
         this.fetchElementaryLeaderboard().then(() => {
             this.showElementaryForm();

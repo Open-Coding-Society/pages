@@ -369,7 +369,7 @@ export default class GameEnvScore {
      * Uses API chaining pattern for clean sequential operations
      */
     saveScore(buttonEl) {
-        if (!buttonEl) return;
+        if (!buttonEl) return Promise.reject(new Error('No button element provided'));
         buttonEl.disabled = true;
         const prevText = buttonEl.innerText;
         buttonEl.innerText = 'Saving...';
@@ -378,27 +378,29 @@ export default class GameEnvScore {
         const currentScore = this.gameEnv.stats[cv] || 0;
         console.log(`${this.classId}: ${cv} = ${currentScore}`, this.gameEnv.stats);
 
-        // Attempt server save using API chaining pattern
-        if (javaURI) {
-            this._saveStatsToServer()
-                .then(resp => {
-                    console.log(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_SUCCESS.message, resp);
-                    // alert(this.ERROR_HANDLERS.SAVE_SUCCESS.userMessage);
-                })
-                .catch(e => {
-                    console.error(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_FAILED.message, e);
-                    // Error messages are already set in _saveStatsToServer()
-                    alert(e.message || this.ERROR_HANDLERS.DEFAULT.userMessage);
-                })
-                .finally(() => {
-                    buttonEl.disabled = false;
-                    buttonEl.innerText = prevText;
-                });
-        } else {
+        // If backend not configured, return rejected promise
+        if (!javaURI) {
             console.warn(`${this.classId}:`, this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.message);
             alert(this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.userMessage);
             buttonEl.disabled = false;
             buttonEl.innerText = prevText;
+            return Promise.reject(new Error(this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.message));
         }
+
+        // Return the promise chain so it can be used by callers
+        return this._saveStatsToServer()
+            .then(resp => {
+                console.log(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_SUCCESS.message, resp);
+                return resp; // Return the response for chaining
+            })
+            .catch(e => {
+                console.error(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_FAILED.message, e);
+                alert(e.message || this.ERROR_HANDLERS.DEFAULT.userMessage);
+                throw e; // Re-throw so callers can handle it
+            })
+            .finally(() => {
+                buttonEl.disabled = false;
+                buttonEl.innerText = prevText;
+            });
     }
 }
