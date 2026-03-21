@@ -62,7 +62,15 @@ class AiNpc {
 
         const inputField = document.createElement('textarea');
         inputField.className = 'ai-npc-input';
-        inputField.placeholder = `Ask about ${spriteData.expertise}...`;
+        
+        // Use a random question from knowledgeBase as placeholder hint, or fall back to generic
+        let placeholder = `Ask about ${spriteData.expertise}...`;
+        const topics = spriteData.knowledgeBase?.[spriteData.expertise] || [];
+        if (topics.length > 0) {
+            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+            placeholder = randomTopic.question;
+        }
+        inputField.placeholder = placeholder;
         inputField.rows = 2;
 
         const buttonRow = document.createElement('div');
