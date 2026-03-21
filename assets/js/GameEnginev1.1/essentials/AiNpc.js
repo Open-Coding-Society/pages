@@ -7,6 +7,7 @@
  * USAGE:
  * - Call AiNpc.showInteraction(npcInstance) in your NPC's interact() method
  * - Requires spriteData properties: expertise, chatHistory, dialogues, knowledgeBase
+ * - DialogueSystem cycles through dialogues array sequentially on each interaction
  * 
  * BACKEND API:
  * - POST /api/ainpc/prompt   - Send message to NPC, get response
@@ -21,7 +22,8 @@ import { pythonURI, fetchOptions } from '../../api/config.js';
 class AiNpc {
     /**
      * Main entry point - Shows full AI interaction dialog for an NPC
-     * @param {Object} npcInstance - The NPC instance (with this.spriteData, this.dialogueSystem)
+     * Creates DialogueSystem with NPC's dialogues and uses cycling behavior
+     * @param {Object} npcInstance - The NPC instance (with this.spriteData, this.gameControl)
      */
     static showInteraction(npcInstance) {
         const npc = npcInstance;
@@ -32,32 +34,21 @@ class AiNpc {
             npc.dialogueSystem.closeDialogue();
         }
 
-        // Initialize DialogueSystem if needed
+        // Initialize DialogueSystem if needed with NPC's dialogues
         if (!npc.dialogueSystem) {
-            npc.dialogueSystem = new DialogueSystem();
+            npc.dialogueSystem = new DialogueSystem({
+                dialogues: data.dialogues || [data.greeting || "Hello!"],
+                gameControl: npc.gameControl
+            });
         }
 
-        // Show random greeting
-        const message = AiNpc.getRandomGreeting(data);
-        npc.dialogueSystem.showDialogue(message, data.id, data.src, data);
+        // Use DialogueSystem's cycling showRandomDialogue method
+        npc.dialogueSystem.showRandomDialogue(data.id, data.src, data);
 
         // Create and attach AI chat UI
         const ui = AiNpc.createChatUI(data);
         AiNpc.attachEventHandlers(npc, data, ui);
         AiNpc.attachToDialogue(npc.dialogueSystem, ui.container);
-    }
-
-    /**
-     * Get a random greeting from dialogues array
-     * @param {Object} spriteData - The NPC sprite data
-     * @returns {string} Random greeting message
-     */
-    static getRandomGreeting(spriteData) {
-        if (!spriteData.dialogues || spriteData.dialogues.length === 0) {
-            return spriteData.greeting || "Hello!";
-        }
-        const randomIndex = Math.floor(Math.random() * spriteData.dialogues.length);
-        return spriteData.dialogues[randomIndex];
     }
 
     /**

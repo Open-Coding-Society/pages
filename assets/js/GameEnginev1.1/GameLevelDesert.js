@@ -830,7 +830,7 @@ class GameLevelDesert {
           "Ask me anything about history!",
           "I have a depth of knowledge in history...",
           "Do you want to learn about history?",
-          "Try out chat session on history!",
+          "Try out my chat session featureon history!",
           "Are you curious about history? Talk to me!"
       ],
       knowledgeBase: {                   // Context hints for AI
