@@ -9,8 +9,8 @@ import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
-import AINpc from './essentials/AiNpc.js'
 import Coin from './Coin.js';
+import { pythonURI, fetchOptions } from '../api/config.js';
 
 // Import Background for PlatformerMini
 import Background from './essentials/Background.js';
@@ -835,25 +835,18 @@ class GameLevelDesert {
 
 
   // ===== CUSTOM AI NPCs =====
-  const historianNpc = new AINpc({
-      id: "ProfessorHistory", 
-      greeting: "Hello! I'm an expert in history!",
-      expertise: "history",
-      sprite: path + "/images/gamify/historyProf.png",
-      spriteWidth: 559,
-      spriteHeight: 263,
-      scaleFactor: 0.5,
-      animationRate: 10,
-      randomPosition: false,  // ← Change this to false
-      posX: width * 0.53,      // ← Add specific X position (center)
-      posY: height * 0.28,
-      gameEnv: gameEnv,
-
-
-      // Sprite sheet layout
+  const sprite_src_historian = path + "/images/gamify/historyProf.png";
+  const sprite_greet_historian = "Hello! I'm an expert in history!";
+  const sprite_data_historian = {
+      id: "ProfessorHistory",
+      greeting: sprite_greet_historian,
+      src: sprite_src_historian,
+      SCALE_FACTOR: 5,
+      ANIMATION_RATE: 10,
+      pixels: { height: 263, width: 559 },
+      INIT_POSITION: { x: width * 0.53, y: height * 0.28 },
       orientation: { rows: 4, columns: 9 },
-
-
+      
       // LOCK: use ONLY the 4th row (index 3) for every direction/state
       down:      { row: 3, start: 0, columns: 9 },
       up:        { row: 3, start: 0, columns: 9 },
@@ -863,34 +856,247 @@ class GameLevelDesert {
       downRight: { row: 3, start: 0, columns: 9 },
       upLeft:    { row: 3, start: 0, columns: 9 },
       upRight:   { row: 3, start: 0, columns: 9 },
+      
       hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
-
-
+      
+      // AI-specific properties
+      expertise: "history",
+      chatHistory: [],
+      dialogues: [
+          "Ask me anything about history!",
+          "I have knowledge about history...",
+          "Want to learn about history?",
+          "I'm an expert in history!",
+          "Curious about history? Talk to me!"
+      ],
       knowledgeBase: {
           history: [
-          {
-              question: "What is ancient Egypt?",
-              answer:
-              "Ancient Egypt was one of the world's greatest civilizations, lasting over 3000 years! It had pyramids, pharaohs, and the mighty Nile River."
-          },
-          {
-              question: "Tell me about the Renaissance",
-              answer:
-              "The Renaissance was a period of great cultural and artistic change in Europe, starting in Italy around the 14th century. Artists like Leonardo da Vinci and Michelangelo created amazing works!"
-          },
-          {
-              question: "When was the Industrial Revolution?",
-              answer:
-              "The Industrial Revolution took place from the late 1700s to the 1800s. It changed how people worked, moving from farms to factories and inventing new machines!"
-          },
-          {
-              question: "Who was Napoleon?",
-              answer:
-              "Napoleon Bonaparte was a French military leader who became Emperor. He conquered much of Europe but was eventually defeated and exiled."
-          }
+              {
+                  question: "What is ancient Egypt?",
+                  answer: "Ancient Egypt was one of the world's greatest civilizations, lasting over 3000 years! It had pyramids, pharaohs, and the mighty Nile River."
+              },
+              {
+                  question: "Tell me about the Renaissance",
+                  answer: "The Renaissance was a period of great cultural and artistic change in Europe, starting in Italy around the 14th century. Artists like Leonardo da Vinci and Michelangelo created amazing works!"
+              },
+              {
+                  question: "When was the Industrial Revolution?",
+                  answer: "The Industrial Revolution took place from the late 1700s to the 1800s. It changed how people worked, moving from farms to factories and inventing new machines!"
+              },
+              {
+                  question: "Who was Napoleon?",
+                  answer: "Napoleon Bonaparte was a French military leader who became Emperor. He conquered much of Europe but was eventually defeated and exiled."
+              }
           ]
+      },
+      
+      reaction: function() {
+          if (this.dialogueSystem) {
+              this.showReactionDialogue();
+          } else {
+              console.log(sprite_greet_historian);
+          }
+      },
+      
+      interact: function() {
+          if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+              this.dialogueSystem.closeDialogue();
+          }
+
+          if (!this.dialogueSystem) {
+              this.dialogueSystem = new DialogueSystem();
+          }
+
+          let message = sprite_greet_historian;
+          if (this.spriteData.dialogues && this.spriteData.dialogues.length > 0) {
+              const randomIndex = Math.floor(Math.random() * this.spriteData.dialogues.length);
+              message = this.spriteData.dialogues[randomIndex];
+          }
+
+          this.dialogueSystem.showDialogue(message, this.spriteData.id, this.spriteData.src);
+
+          // UI Elements
+          const buttonContainer = document.createElement('div');
+          buttonContainer.style.display = 'flex';
+          buttonContainer.style.flexDirection = 'column';
+          buttonContainer.style.gap = '10px';
+          buttonContainer.style.marginTop = '15px';
+
+          const inputField = document.createElement('input');
+          inputField.type = 'text';
+          inputField.placeholder = `Ask about ${this.spriteData.expertise}...`;
+          inputField.style.padding = '8px 12px';
+          inputField.style.borderRadius = '5px';
+          inputField.style.border = '2px solid #4a86e8';
+          inputField.style.backgroundColor = '#16213e';
+          inputField.style.color = '#fff';
+
+          const buttonRow = document.createElement('div');
+          buttonRow.style.display = 'flex';
+          buttonRow.style.gap = '10px';
+
+          const historyBtn = document.createElement('button');
+          historyBtn.textContent = '📋 History';
+          historyBtn.style.padding = '8px 15px';
+          historyBtn.style.background = '#666';
+          historyBtn.style.color = 'white';
+          historyBtn.style.border = 'none';
+          historyBtn.style.borderRadius = '5px';
+          historyBtn.style.cursor = 'pointer';
+          historyBtn.style.flex = '1';
+
+          const responseArea = document.createElement('div');
+          responseArea.style.minHeight = '40px';
+          responseArea.style.padding = '10px';
+          responseArea.style.backgroundColor = '#16213e';
+          responseArea.style.borderRadius = '5px';
+          responseArea.style.borderLeft = '3px solid #4a86e8';
+          responseArea.style.color = '#4a86e8';
+          responseArea.style.fontStyle = 'italic';
+          responseArea.style.display = 'none';
+
+          const typewriterEffect = (text, element, speed = 30) => {
+              element.textContent = '';
+              element.style.display = 'block';
+              let index = 0;
+              const type = () => {
+                  if (index < text.length) {
+                      element.textContent += text.charAt(index++);
+                      setTimeout(type, speed);
+                  }
+              };
+              type();
+          };
+
+          // Backend call to Flask /api/ainpc/prompt
+          const sendMessage = async () => {
+              const userMessage = inputField.value.trim();
+              if (!userMessage) return;
+
+              this.spriteData.chatHistory.push({ role: 'user', message: userMessage });
+              inputField.value = '';
+              responseArea.textContent = 'Thinking...';
+              responseArea.style.display = 'block';
+
+              try {
+                  let knowledgeContext = '';
+                  const topics = this.spriteData.knowledgeBase?.[this.spriteData.expertise] || [];
+
+                  if (topics.length > 0) {
+                      knowledgeContext = 'Here are some example topics I can help with:\n';
+                      topics.slice(0, 3).forEach(t => {
+                          knowledgeContext += `- ${t.question}\n`;
+                      });
+                      knowledgeContext += '\n';
+                  }
+
+                  // Create a unique session ID for this NPC conversation
+                  const sessionId = `player-${this.spriteData.id}`;
+
+                  const pythonURL = pythonURI + '/api/ainpc/prompt';
+                  const response = await fetch(pythonURL, {
+                      ...fetchOptions,
+                      method: 'POST',
+                      body: JSON.stringify({
+                          prompt: userMessage,
+                          session_id: sessionId,
+                          npc_type: this.spriteData.expertise,
+                          expertise: this.spriteData.expertise,
+                          knowledgeContext: knowledgeContext
+                      })
+                  });
+
+                  const data = await response.json();
+
+                  if (data.status === 'error') {
+                      typewriterEffect(
+                          data.message || "I'm having trouble thinking right now.",
+                          responseArea
+                      );
+                      return;
+                  }
+
+                  const aiResponse = data?.response || "I'm not sure how to answer that yet.";
+
+                  this.spriteData.chatHistory.push({ role: 'ai', message: aiResponse });
+
+                  typewriterEffect(aiResponse, responseArea);
+              } catch (err) {
+                  console.error('Frontend error:', err);
+                  typewriterEffect(
+                      "I'm having trouble reaching my brain right now.",
+                      responseArea
+                  );
+              }
+          };
+
+          historyBtn.onclick = () => this.showChatHistory();
+
+          inputField.onkeypress = e => {
+              e.stopPropagation();
+              if (e.key === 'Enter') {
+                  e.preventDefault();
+                  sendMessage();
+              }
+          };
+
+          buttonRow.appendChild(historyBtn);
+          buttonContainer.appendChild(inputField);
+          buttonContainer.appendChild(buttonRow);
+          buttonContainer.appendChild(responseArea);
+
+          const dialogueBox = document.getElementById('custom-dialogue-box-' + this.dialogueSystem.id);
+
+          if (dialogueBox) {
+              const closeBtn = dialogueBox.querySelector('button');
+              closeBtn
+                  ? dialogueBox.insertBefore(buttonContainer, closeBtn)
+                  : dialogueBox.appendChild(buttonContainer);
+          }
+      },
+      
+      showChatHistory: function() {
+          const modal = document.createElement('div');
+          modal.style.position = 'fixed';
+          modal.style.top = '50%';
+          modal.style.left = '50%';
+          modal.style.transform = 'translate(-50%, -50%)';
+          modal.style.background = '#1a1a2e';
+          modal.style.border = '2px solid #4a86e8';
+          modal.style.borderRadius = '10px';
+          modal.style.padding = '20px';
+          modal.style.maxWidth = '500px';
+          modal.style.maxHeight = '600px';
+          modal.style.overflowY = 'auto';
+          modal.style.zIndex = '10001';
+          modal.style.color = '#fff';
+
+          const title = document.createElement('h3');
+          title.textContent = 'Chat History';
+          title.style.color = '#4a86e8';
+
+          modal.appendChild(title);
+
+          this.spriteData.chatHistory.forEach(msg => {
+              const div = document.createElement('div');
+              div.style.marginBottom = '8px';
+              div.style.padding = '8px';
+              div.style.borderRadius = '5px';
+              div.style.background = msg.role === 'user' ? '#4a86e8' : '#16213e';
+              div.textContent = msg.message;
+              modal.appendChild(div);
+          });
+
+          const close = document.createElement('button');
+          close.textContent = 'Close';
+          close.style.width = '100%';
+          close.style.marginTop = '10px';
+          close.onclick = () => modal.remove();
+
+          modal.appendChild(close);
+          document.body.appendChild(modal);
       }
-      }).getData();
+  };
 
 
 // List of objects defnitions for this level
@@ -907,7 +1113,7 @@ class GameLevelDesert {
      { class: Npc, data: sprite_data_minesweeper },
      { class: Npc, data: sprite_data_chickenj },
      { class: Npc, data: sprite_data_endportal },
-     { class: Npc, data: historianNpc },
+     { class: Npc, data: sprite_data_historian },
    ];
 
    // Platformer Mini Game Class
