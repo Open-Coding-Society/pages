@@ -164,4 +164,9 @@
 <script>
   var SITE_BASEURL = '{{ site.baseurl }}';
 </script>
+<!-- SRP Modules: loaded in dependency order -->
+<script src="{{ site.baseurl }}/assets/js/calendar/CalendarData.js"></script>
+<script src="{{ site.baseurl }}/assets/js/calendar/EventBuilder.js"></script>
+<script src="{{ site.baseurl }}/assets/js/calendar/CalendarApi.js"></script>
+<script src="{{ site.baseurl }}/assets/js/calendar/CalendarUI.js"></script>
 <script src="{{ site.baseurl }}/assets/js/calendar/calendar.js"></script>
