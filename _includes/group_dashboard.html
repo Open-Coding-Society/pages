@@ -195,6 +195,47 @@
           <!-- Populated by JavaScript -->
         </div>
       </div>
+    <!-- Relationship Graph Section -->
+    <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
+      <div class="p-4 border-b border-neutral-700">
+        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+          Relationship Graph & Recommended Friends
+        </h2>
+      </div>
+      
+      <div class="p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Force Directed Graph Container -->
+        <div class="lg:col-span-2 relative bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden" style="min-height: 400px;" id="relationshipGraphContainer">
+          <!-- Graph populated by D3.js -->
+          <div id="relationshipGraphEmptyState" class="absolute inset-0 flex items-center justify-center text-gray-400">
+            Mapping user connections...
+          </div>
+          <!-- Zoom Controls -->
+          <div class="absolute bottom-4 right-4 flex flex-col gap-2">
+            <button id="graphZoomInButton" class="p-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded shadow transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            </button>
+            <button id="graphZoomOutButton" class="p-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded shadow transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+            </button>
+            <button id="graphResetButton" class="p-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded shadow transition-colors" title="Reset view">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Friend Recommendations List -->
+        <div class="bg-neutral-700/50 border border-neutral-600 rounded-lg p-4 flex flex-col h-full max-h-[400px]">
+          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Recommended Friends</h3>
+          <p class="text-xs text-gray-500 mb-4">Users you share multiple groups with but haven't actively messaged recently.</p>
+          <div id="recommendedFriendsList" class="flex-1 overflow-y-auto space-y-3 pr-2">
+            <div class="text-center text-gray-500 text-sm py-8">Analyzing connections...</div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -431,6 +472,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
