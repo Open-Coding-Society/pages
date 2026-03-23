@@ -82,7 +82,7 @@
  * this.gameEnv.stats.coinsCollected++;
  */
 
-import { javaURI, fetchOptions } from '/assets/js/api/config.js';
+import { javaURI, fetchOptions } from '../../api/config.js';
 
 export default class GameEnvScore {
     constructor(gameEnv) {
