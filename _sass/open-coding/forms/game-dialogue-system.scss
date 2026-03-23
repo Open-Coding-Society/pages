@@ -89,13 +89,11 @@
  * Main text area for dialogue messages
  */
 [id^="dialogue-text-"] {
-  margin-bottom: 15px;
   line-height: 1.5;
   min-height: 40px;
   color: var(--pref-text-color, #FFF);
   
   @media (max-width: 768px) {
-    margin-bottom: 12px;
     min-height: 30px;
   }
 }
@@ -107,13 +105,13 @@
 [id^="custom-dialogue-box-"] button {
   @include text-button;
   
-  margin-top: 15px;
+  margin-top: 10px;
   padding: 10px 20px;
   font-family: 'Press Start 2P', cursive, monospace;
   font-size: 12px;
   
   @media (max-width: 768px) {
-    margin-top: 12px;
+    margin-top: 8px;
     padding: 8px 16px;
     font-size: 11px;
   }
@@ -207,9 +205,6 @@
 .ai-npc-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-  padding-top: 15px;
   border-top: 1px solid var(--ui-border, rgba(255, 255, 255, 0.1));
 }
 
