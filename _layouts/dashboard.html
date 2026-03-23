@@ -45,224 +45,12 @@ active_tab: dashboard
                         <p id="admin-eval-status" class="text-sm mt-3"></p>
                     </div>
                 </div>
-                <script type="module">
-                import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-                // --- UI Elements ---
-                const peopleList = document.getElementById('admin-people-list');
-                const loadingEl = document.getElementById('admin-people-loading');
-                const modal = document.getElementById('admin-eval-modal');
-                const modalTitle = document.getElementById('admin-eval-modal-title');
-                const modalClose = document.getElementById('admin-eval-modal-close');
-                const evalForm = document.getElementById('admin-eval-form');
-                const updateBtn = document.getElementById('admin-eval-update-btn');
-                const statusEl = document.getElementById('admin-eval-status');
-                let people = [];     
-                // --- Slider fields and labels ---
-                const sliderFields = [
-                    { key: "attendance", label: "Attendance" },
-                    { key: "work_habits", label: "Work Habits" },
-                    { key: "behavior", label: "Behavior" },
-                    { key: "timeliness", label: "Timeliness" },
-                    { key: "tech_sense", label: "Tech Sense" },
-                    { key: "tech_talk", label: "Tech Talk" },
-                    { key: "tech_growth", label: "Tech Growth" },
-                    { key: "advocacy", label: "Advocacy" },
-                    { key: "communication", label: "Communication" },
-                    { key: "integrity", label: "Integrity" },
-                    { key: "organization", label: "Organization" }
-                ];
-
-                let currentPerson = null;
-                let hasExistingEval = false; // Track if evaluation exists
-
-                // --- Fetch and render people ---
-                async function fetchPeople() {
-                    loadingEl.textContent = "Loading users...";
-                    try {
-                        const response = await fetch(`${javaURI}/api/people`, fetchOptions);
-                        if (!response.ok) throw new Error("Failed to fetch people");
-                        const data = await response.json();
-                        people = data.map(person => ({
-                            id: person.id,
-                            name: person.name,
-                            email: person.email,
-                            uid: person.uid,
-                            sid: person.sid
-                        }));
-                        peopleList.innerHTML = '';
-                        people.forEach(person => {
-                            const card = document.createElement('div');
-                            card.className = 'cursor-pointer border border-neutral-700 bg-neutral-800 rounded-xl p-5 shadow hover:border-blue-500 transition';
-                            card.innerHTML = `
-                                <div class="font-semibold text-lg mb-1">${person.name || 'No Name'}</div>
-                                <div class="text-sm text-neutral-400 mb-1">UID: <span class="font-mono">${person.uid}</span></div>
-                                <div class="text-xs text-neutral-500">ID: ${person.id}</div>
-                            `;
-                            card.addEventListener('click', () => openEvalModal(person));
-                            peopleList.appendChild(card);
-                        });
-                    } catch (e) {
-                        console.error(e);
-                        peopleList.innerHTML = '<p class="col-span-full text-red-500">Error loading users.</p>';
-                    }
-                }
-
-                // --- Modal logic ---
-                async function openEvalModal(person) {
-                    currentPerson = person;
-                    hasExistingEval = false;
-                    modalTitle.innerHTML = `Evaluate: ${person.name} <span class="text-sm text-neutral-400 font-normal">(UID: ${person.uid})</span>`;
-
-                    // Try to fetch existing admin evaluation
-                    let evalData = null;
-                    try {
-                        const res = await fetch(`${javaURI}/api/admin-evaluation/get/${person.id}`, fetchOptions);
-                        if (res.ok) {
-                            const json = await res.json();
-                            if (json && typeof json === 'object' && json.evaluation) {
-                                evalData = json.evaluation;
-                                hasExistingEval = true;
-                            }
-                        }
-                    } catch (e) {
-                        evalData = null;
-                    }
-
-                    // Try to fetch student self-evaluation
-                    let studentEvalData = null;
-                    try {
-                        const res = await fetch(`${javaURI}/api/student-evaluation/get/${person.id}`, fetchOptions);
-                        if (res.ok) {
-                            const json = await res.json();
-                            studentEvalData = json.evaluation || json;
-                        }
-                    } catch (e) {
-                        console.error("Error fetching student eval", e);
-                    }
-
-                    if (!studentEvalData) {
-                        modalTitle.innerHTML += `<br><span class="text-xs text-yellow-500 font-normal">Student has not self-evaluated yet.</span>`;
-                    } else {
-                        modalTitle.innerHTML += `<br><span class="text-xs text-green-400 font-normal">Student self-evaluation loaded.</span>`;
-                    }
-
-                    // Map API keys to slider keys
-                    const apiToSliderKey = {
-                        attendance: "attendance",
-                        workHabits: "work_habits",
-                        behavior: "behavior",
-                        timeliness: "timeliness",
-                        techSense: "tech_sense",
-                        techTalk: "tech_talk",
-                        techGrowth: "tech_growth",
-                        advocacy: "advocacy",
-                        communication: "communication",
-                        integrity: "integrity",
-                        organization: "organization"
-                    };
-
-                    evalForm.innerHTML = sliderFields.map(f => {
-                        // Admin Value
-                        let val = 4;
-                        if (evalData) {
-                            // Use camelCase for API, snake_case for slider
-                            const apiKey = Object.keys(apiToSliderKey).find(
-                                k => apiToSliderKey[k] === f.key
-                            );
-                            if (apiKey && typeof evalData[apiKey] !== "undefined" && evalData[apiKey] !== null) {
-                                val = evalData[apiKey];
-                            }
-                        }
-
-                        // Student Value
-                        let studentVal = "N/A";
-                        if (studentEvalData) {
-                            const apiKey = Object.keys(apiToSliderKey).find(
-                                k => apiToSliderKey[k] === f.key
-                            );
-                            // Check camelCase then snake_case
-                            if (apiKey && typeof studentEvalData[apiKey] !== "undefined" && studentEvalData[apiKey] !== null) {
-                                studentVal = studentEvalData[apiKey];
-                            } else if (typeof studentEvalData[f.key] !== "undefined" && studentEvalData[f.key] !== null) {
-                                studentVal = studentEvalData[f.key];
-                            }
-                        }
-
-                        return `
-                            <div class="bg-neutral-800/50 p-3 rounded border border-neutral-700">
-                                <div class="flex justify-between items-center mb-2">
-                                    <label for="admin-slider-${f.key}" class="text-sm text-neutral-300 font-medium">${f.label}</label>
-                                    <span class="text-xs text-neutral-400">Student: <span class="${studentVal !== 'N/A' ? 'text-blue-300 font-bold' : 'text-neutral-500'}">${studentVal}</span></span>
-                                </div>
-                                <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="${val}" class="w-full accent-blue-600" />
-                                <div class="text-right mt-1">
-                                    <span class="text-xs text-neutral-400">Admin: <span id="admin-val-${f.key}" class="font-bold text-white">${val}</span></span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                    // Live update slider values
-                    sliderFields.forEach(f => {
-                        const slider = document.getElementById(`admin-slider-${f.key}`);
-                        const label = document.getElementById(`admin-val-${f.key}`);
-                        slider.addEventListener('input', () => { label.textContent = slider.value; });
-                    });
-                    statusEl.textContent = '';
-                    modal.classList.remove('hidden');
-                }
-
-                function closeEvalModal() {
-                    modal.classList.add('hidden');
-                    currentPerson = null;
-                }
-
-                modalClose.onclick = closeEvalModal;
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) closeEvalModal();
-                });
-
-                // --- Update handler ---
-                updateBtn.onclick = async () => {
-                    if (!currentPerson) return;
-                    updateBtn.disabled = true;
-                    statusEl.textContent = 'Updating...';
-                    // Collect slider values
-                    const body = { "user_id": currentPerson.id };
-                    sliderFields.forEach(f => {
-                        body[f.key] = Number(document.getElementById(`admin-slider-${f.key}`).value);
-                    });
-                    try {
-                        let res;
-                        if (hasExistingEval) {
-                            // Use PUT to update
-                            res = await fetch(`${javaURI}/api/admin-evaluation/update/${currentPerson.id}`, {
-                                ...fetchOptions,
-                                method: 'PUT',
-                                body: JSON.stringify(body)
-                            });
-                        } else {
-                            // Use POST to create
-                            res = await fetch(`${javaURI}/api/admin-evaluation/post`, {
-                                ...fetchOptions,
-                                method: 'POST',
-                                body: JSON.stringify(body)
-                            });
-                        }
-                        if (!res.ok) throw new Error('Failed to update');
-                        statusEl.textContent = '✅ Updated successfully!';
-                        hasExistingEval = true; // Now we have data
-                    } catch (e) {
-                        statusEl.textContent = '❌ Error updating.';
-                    }
-                    updateBtn.disabled = false;
-                };
-
-                // --- Initial load ---
-                // Expose fetchPeople globally so it can be called after admin check
-                window.adminFetchPeople = fetchPeople;
-                </script>
+                <!--
+                    Admin Evaluation logic is defined in the script at the bottom
+                    of this file (see "Admin Evaluation Module"). It exposes
+                    window.adminFetchPeople(), which the DOMContentLoaded handler
+                    calls after confirming the user is an admin.
+                -->
                 </div>
             </div>
 
@@ -477,732 +265,10 @@ active_tab: dashboard
 
                 <script type="module">
                 import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+                import { initializePreferences } from '{{ site.baseurl }}/assets/js/pages/dashboard/preferences.js';
 
-                (function () {
-                    // Site Default uses the website's native CSS colors (from user-colors.scss)
-                    const SITE_DEFAULT = {
-                        bg: '#121212',      // From user-colors.scss $background
-                        text: '#F0F0F0',    // From root-color-map.scss $text
-                        font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-                        size: 14,
-                        accent: '#4CAFEF'   // From root-color-map.scss $accent
-                    };
-                    
-                    const PRESETS = window.SitePreferences?.PRESETS || {
-                        'Site Default': SITE_DEFAULT,
-                        'Midnight': { bg: '#0b1220', text: '#e6eef8', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#3b82f6' },
-                        'Light': { bg: '#ffffff', text: '#0f172a', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#2563eb' },
-                        'Green': { bg: '#154734', text: '#e6f6ef', font: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial", size: 14, accent: '#10b981' },
-                        'Sepia': { bg: '#f4ecd8', text: '#3b2f2f', font: "Georgia, 'Times New Roman', Times, serif", size: 14, accent: '#b45309' },
-                        'Cyberpunk': { bg: '#0a0a0f', text: '#f0f0f0', font: "'Source Code Pro', monospace", size: 14, accent: '#f72585' },
-                        'Ocean': { bg: '#0c1929', text: '#e0f2fe', font: "'Open Sans', Arial, sans-serif", size: 15, accent: '#06b6d4' }
-                    };
-
-                    const MAX_CUSTOM = 10;
-                    const localStorageKey = 'sitePreferences'; // Fallback for guests
-                    const localThemesKey = 'siteThemes'; // Fallback for guests
-                    
-                    // Track if user is logged in and if preferences exist in backend
-                    let isLoggedIn = false;
-                    let backendPrefsExist = false;
-                    let cachedPrefs = null;
-
-                    // Convert frontend prefs format to backend format
-                    function toBackendFormat(prefs) {
-                        return {
-                            backgroundColor: prefs.bg,
-                            textColor: prefs.text,
-                            fontFamily: prefs.font,
-                            fontSize: prefs.size,
-                            accentColor: prefs.accent,
-                            selectionColor: prefs.selectionColor || '#3b82f6',
-                            buttonStyle: prefs.buttonStyle || 'rounded',
-                            language: prefs.language || '',
-                            ttsVoice: prefs.ttsVoice || '',
-                            ttsRate: prefs.ttsRate || 1.0,
-                            ttsPitch: prefs.ttsPitch || 1.0,
-                            ttsVolume: prefs.ttsVolume || 1.0,
-                            customThemes: JSON.stringify(prefs.customThemes || {})
-                        };
-                    }
-
-                    // Convert backend format to frontend prefs format
-                    function toFrontendFormat(backendPrefs) {
-                        // If backend prefs are empty/null, return null
-                        if (!backendPrefs) return null;
-                        
-                        // Check if this has actual values (not just default/empty object)
-                        const hasBg = backendPrefs.backgroundColor && backendPrefs.backgroundColor !== '';
-                        const hasText = backendPrefs.textColor && backendPrefs.textColor !== '';
-                        
-                        // If no actual colors are set, return null to fall back to defaults
-                        if (!hasBg && !hasText) return null;
-                        
-                        let customThemes = {};
-                        try {
-                            customThemes = backendPrefs.customThemes ? JSON.parse(backendPrefs.customThemes) : {};
-                        } catch (e) { customThemes = {}; }
-                        
-                        // Use Site Default for any missing values
-                        const defaults = SITE_DEFAULT;
-                        
-                        return {
-                            bg: backendPrefs.backgroundColor || defaults.bg,
-                            text: backendPrefs.textColor || defaults.text,
-                            font: backendPrefs.fontFamily || defaults.font,
-                            size: backendPrefs.fontSize || defaults.size,
-                            accent: backendPrefs.accentColor || defaults.accent,
-                            selectionColor: backendPrefs.selectionColor || defaults.accent,
-                            buttonStyle: backendPrefs.buttonStyle || 'rounded',
-                            language: backendPrefs.language || '',
-                            ttsVoice: backendPrefs.ttsVoice || '',
-                            ttsRate: backendPrefs.ttsRate || 1.0,
-                            ttsPitch: backendPrefs.ttsPitch || 1.0,
-                            ttsVolume: backendPrefs.ttsVolume || 1.0,
-                            customThemes: customThemes
-                        };
-                    }
-
-                    function applyPreferences(prefs) {
-                        if (window.SitePreferences && typeof window.SitePreferences.applyPreferences === 'function') {
-                            window.SitePreferences.applyPreferences(prefs);
-                        }
-                    }
-
-                    // Fetch preferences from backend API
-                    async function fetchPreferencesFromBackend() {
-                        try {
-                            const res = await fetch(`${javaURI}/api/user/preferences`, fetchOptions ); 
-                            
-                            if (res.status === 401) {
-                                // Not logged in
-                                isLoggedIn = false;
-                                return null;
-                            }
-                            
-                            if (res.ok) {
-                                isLoggedIn = true;
-                                const data = await res.json();
-                                if (data && data.id) {
-                                    // User has saved preferences in backend
-                                    backendPrefsExist = true;
-                                    return toFrontendFormat(data);
-                                } else {
-                                    // No saved preferences in backend - return null to use defaults
-                                    backendPrefsExist = false;
-                                    return null;
-                                }
-                            }
-                            return null;
-                        } catch (e) {
-                            console.error('fetchPreferencesFromBackend error', e);
-                            isLoggedIn = false;
-                            return null;
-                        }
-                    }
-
-                    // Save preferences to backend API
-                    async function savePreferencesToBackend(prefs) {
-                        try {
-                            const backendData = toBackendFormat(prefs);
-                            const method = backendPrefsExist ? 'PUT' : 'POST';
-                            
-                            const res = await fetch(`${javaURI}/api/user/preferences`, {
-                                ...fetchOptions,
-                                method: method,
-                                body: JSON.stringify(backendData)
-                            });
-                            
-                            if (res.ok) {
-                                backendPrefsExist = true;
-                                return true;
-                            }
-                            return false;
-                        } catch (e) {
-                            console.error('savePreferencesToBackend error', e);
-                            return false;
-                        }
-                    }
-
-                    // Delete preferences from backend
-                    async function deletePreferencesFromBackend() {
-                        try {
-                            const res = await fetch(`${javaURI}/api/user/preferences`, {
-                                ...fetchOptions,
-                                method: 'DELETE'
-                            });
-                            if (res.ok) {
-                                backendPrefsExist = false;
-                                return true;
-                            }
-                            return false;
-                        } catch (e) {
-                            console.error('deletePreferencesFromBackend error', e);
-                            return false;
-                        }
-                    }
-
-                    // Check if user is logged in by calling an auth endpoint
-                    async function checkLoginStatus() {
-                        try {
-                            // Try to get user info - if this succeeds, user is logged in
-                            const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
-                            
-                            if (res.ok) {
-                                isLoggedIn = true;
-                                return true;
-                            } else {
-                                isLoggedIn = false;
-                                return false;
-                            }
-                        } catch (e) {
-                            console.log('Login check failed, assuming guest user');
-                            isLoggedIn = false;
-                            return false;
-                        }
-                    }
-
-                    // Load preferences - checks login first, then tries backend, falls back to localStorage
-                    async function loadPreferences() {
-                        try {
-                            // Check if user explicitly reset preferences - if so, don't load anything
-                            const wasReset = localStorage.getItem('preferencesReset');
-                            if (wasReset === 'true') {
-                                // Clear the flag - it's only for one page load cycle
-                                localStorage.removeItem('preferencesReset');
-                                // Return null to use site defaults
-                                return null;
-                            }
-                            
-                            // First check if user is logged in
-                            const loggedIn = await checkLoginStatus();
-                            
-                            // Only try backend if logged in
-                            if (loggedIn) {
-                                const backendPrefs = await fetchPreferencesFromBackend();
-                                if (backendPrefs) {
-                                    cachedPrefs = backendPrefs;
-                                    applyPreferences(backendPrefs);
-                                    // Sync backend prefs to localStorage so other pages use the same settings
-                                    localStorage.setItem(localStorageKey, JSON.stringify(backendPrefs));
-                                    return backendPrefs;
-                                }
-                            }
-                            
-                            // Fallback to localStorage for guests or if backend fails
-                            const raw = localStorage.getItem(localStorageKey);
-                            if (raw) {
-                                const prefs = JSON.parse(raw);
-                                cachedPrefs = prefs;
-                                applyPreferences(prefs);
-                                return prefs;
-                            }
-                            
-                            return null;
-                        } catch (e) { 
-                            console.error('loadPreferences error', e); 
-                            return null; 
-                        }
-                    }
-
-                    // Save preferences - saves to backend if logged in, otherwise localStorage
-                    async function savePreferences(prefs) {
-                        try {
-                            cachedPrefs = prefs;
-                            applyPreferences(prefs);
-                            populateForm(prefs);
-                            
-                            // Clear the reset flag since user is now saving new preferences
-                            localStorage.removeItem('preferencesReset');
-                            
-                            // Always save to localStorage so other pages can use the updated preferences
-                            localStorage.setItem(localStorageKey, JSON.stringify(prefs));
-                            
-                            if (isLoggedIn) {
-                                const success = await savePreferencesToBackend(prefs);
-                                if (!success) {
-                                    showStatus('Saved locally (backend unavailable)');
-                                    return;
-                                }
-                            }
-                        } catch (e) { 
-                            console.error('savePreferences error', e); 
-                            // Fallback to localStorage on any error
-                            localStorage.setItem(localStorageKey, JSON.stringify(prefs));
-                        }
-                    }
-
-                    // Load custom themes
-                    function loadThemes() {
-                        if (cachedPrefs && cachedPrefs.customThemes) {
-                            return cachedPrefs.customThemes;
-                        }
-                        try {
-                            const raw = localStorage.getItem(localThemesKey);
-                            return raw ? JSON.parse(raw) : {};
-                        } catch (e) { 
-                            console.error('loadThemes error', e); 
-                            return {}; 
-                        }
-                    }
-
-                    // Save custom themes - embedded in preferences
-                    async function saveThemes(themesObj) {
-                        try {
-                            const current = cachedPrefs || await loadPreferences() || { ...SITE_DEFAULT };
-                            current.customThemes = themesObj;
-                            await savePreferences(current);
-                            
-                            // Also save to localStorage as backup
-                            localStorage.setItem(localThemesKey, JSON.stringify(themesObj));
-                        } catch(e) {
-                            console.error('saveThemes error', e);
-                            // Fallback to localStorage
-                            localStorage.setItem(localThemesKey, JSON.stringify(themesObj));
-                        }    
-                    }
-
-                    function renderPresets(){
-                        const container = document.getElementById('preset-themes');
-                        if (!container) return;
-                        container.innerHTML = '';
-                        Object.keys(PRESETS).forEach(name => {
-                            const p = PRESETS[name];
-                            const btn = document.createElement('button');
-                            btn.className = 'px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm flex items-center gap-2';
-                            btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${p.accent}"></span> ${name}`;
-                            btn.addEventListener('click', async () => {
-                                // Get current language from form (most up-to-date) or cached prefs
-                                const currentLang = document.getElementById('pref-language')?.value || cachedPrefs?.language || '';
-                                const currentTTS = {
-                                    ttsVoice: cachedPrefs?.ttsVoice || '',
-                                    ttsRate: cachedPrefs?.ttsRate || 1.0,
-                                    ttsPitch: cachedPrefs?.ttsPitch || 1.0,
-                                    ttsVolume: cachedPrefs?.ttsVolume || 1.0
-                                };
-                                await savePreferences({ 
-                                    ...p, 
-                                    language: currentLang,
-                                    ...currentTTS,
-                                    customThemes: loadThemes() 
-                                });
-                                showStatus('Applied: ' + name + ' - Reloading...');
-                                
-                                // Clean reload to ensure theme and translation apply correctly
-                                setTimeout(() => cleanReload(), 200);
-                            });
-                            container.appendChild(btn);
-                        });
-                    }
-
-                    function renderCustomThemes(){
-                        const container = document.getElementById('custom-themes');
-                        if (!container) return;
-                        container.innerHTML = '';
-                        const themes = loadThemes();
-                        const keys = Object.keys(themes);
-                        if (!keys.length) {
-                            container.innerHTML = '<p class="text-neutral-500 text-sm">No custom themes yet</p>';
-                            return;
-                        }
-                        keys.forEach(name => {
-                            const theme = themes[name];
-                            const wrap = document.createElement('div');
-                            wrap.className = 'flex gap-2';
-                            const btn = document.createElement('button');
-                            btn.className = 'flex-1 px-3 py-2 rounded bg-neutral-700 hover:bg-neutral-600 text-white text-sm text-left flex items-center gap-2';
-                            btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${theme.accent || '#3b82f6'}"></span> ${name}`;
-                            btn.addEventListener('click', async () => { 
-                                // Get current language from form (most up-to-date) or cached prefs
-                                const currentLang = document.getElementById('pref-language')?.value || cachedPrefs?.language || '';
-                                const currentTTS = {
-                                    ttsVoice: cachedPrefs?.ttsVoice || '',
-                                    ttsRate: cachedPrefs?.ttsRate || 1.0,
-                                    ttsPitch: cachedPrefs?.ttsPitch || 1.0,
-                                    ttsVolume: cachedPrefs?.ttsVolume || 1.0
-                                };
-                                await savePreferences({ 
-                                    ...theme, 
-                                    language: currentLang,
-                                    ...currentTTS,
-                                    customThemes: loadThemes() 
-                                }); 
-                                showStatus('Applied: ' + name + ' - Reloading...');
-                                
-                                // Clean reload to ensure theme and translation apply correctly
-                                setTimeout(() => cleanReload(), 200);
-                            });
-                            const del = document.createElement('button');
-                            del.className = 'px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs';
-                            del.textContent = 'X';
-                            del.title = 'Delete';
-                            del.addEventListener('click', async () => { await deleteTheme(name); });
-                            wrap.appendChild(btn);
-                            wrap.appendChild(del);
-                            container.appendChild(wrap);
-                        });
-                    }
-
-                    async function saveThemeAs(name){
-                        if (!name) { showStatus('Enter a theme name'); return; }
-                        const themes = loadThemes();
-                        if (Object.keys(themes).length >= MAX_CUSTOM && !themes[name]) { showStatus('Max themes reached'); return; }
-                        themes[name] = currentFormValues();
-                        await saveThemes(themes);
-                        renderCustomThemes();
-                        showStatus('Saved: ' + name);
-                        document.getElementById('new-theme-name').value = '';
-                    }
-
-                    async function deleteTheme(name){
-                        const themes = loadThemes();
-                        if (themes[name]) delete themes[name];
-                        await saveThemes(themes);
-                        renderCustomThemes();
-                        showStatus('Deleted: ' + name);
-                    }
-
-                    function currentFormValues(){
-                        return {
-                            bg: document.getElementById('pref-bg-color').value,
-                            text: document.getElementById('pref-text-color').value,
-                            font: document.getElementById('pref-font-family').value,
-                            size: Number(document.getElementById('pref-font-size').value),
-                            accent: document.getElementById('pref-accent-color').value,
-                            language: document.getElementById('pref-language').value,
-                            ttsVoice: document.getElementById('pref-tts-voice').value,
-                            ttsRate: Number(document.getElementById('pref-tts-rate').value),
-                            ttsPitch: Number(document.getElementById('pref-tts-pitch').value),
-                            ttsVolume: Number(document.getElementById('pref-tts-volume').value),
-                            selectionColor: document.getElementById('pref-selection-color').value,
-                            buttonStyle: document.getElementById('pref-button-style').value,
-                            customThemes: loadThemes()
-                        };
-                    }
-
-                    function populateForm(prefs){
-                        if (!prefs) return;
-                        const d = SITE_DEFAULT;
-                        document.getElementById('pref-bg-color').value = prefs.bg || d.bg;
-                        document.getElementById('pref-text-color').value = prefs.text || d.text;
-                        document.getElementById('pref-font-family').value = prefs.font || d.font;
-                        document.getElementById('pref-font-size').value = prefs.size || d.size;
-                        document.getElementById('font-size-label').textContent = prefs.size || d.size;
-                        document.getElementById('pref-accent-color').value = prefs.accent || d.accent;
-                        document.getElementById('pref-language').value = prefs.language || '';
-                        
-                        // TTS settings
-                        if (prefs.ttsVoice) document.getElementById('pref-tts-voice').value = prefs.ttsVoice;
-                        document.getElementById('pref-tts-rate').value = prefs.ttsRate || 1;
-                        document.getElementById('tts-rate-label').textContent = prefs.ttsRate || 1.0;
-                        document.getElementById('pref-tts-pitch').value = prefs.ttsPitch || 1;
-                        document.getElementById('tts-pitch-label').textContent = prefs.ttsPitch || 1.0;
-                        document.getElementById('pref-tts-volume').value = prefs.ttsVolume || 1;
-                        document.getElementById('tts-volume-label').textContent = Math.round((prefs.ttsVolume || 1) * 100);
-                        
-                        // Styling settings
-                        document.getElementById('pref-selection-color').value = prefs.selectionColor || '#3b82f6';
-                        document.getElementById('pref-button-style').value = prefs.buttonStyle || 'rounded';
-                    }
-
-                    function showStatus(msg){
-                        const el = document.getElementById('preferences-status');
-                        if (!el) return;
-                        el.textContent = msg;
-                        setTimeout(()=> el.textContent = '', 2500);
-                    }
-
-                    async function saveSectionPrefs(section){
-                        const current = cachedPrefs || await loadPreferences() || { ...SITE_DEFAULT };
-                        const form = currentFormValues();
-                        
-                        if (section === 'text') {
-                            current.font = form.font;
-                            current.size = form.size;
-                            current.text = form.text;
-                        } else if (section === 'colors') {
-                            current.bg = form.bg;
-                            current.accent = form.accent;
-                            current.selectionColor = form.selectionColor;
-                            current.buttonStyle = form.buttonStyle;
-                        } else if (section === 'tts') {
-                            current.ttsVoice = form.ttsVoice;
-                            current.ttsRate = form.ttsRate;
-                            current.ttsPitch = form.ttsPitch;
-                            current.ttsVolume = form.ttsVolume;
-                        }
-                        
-                        current.customThemes = loadThemes();
-                        await savePreferences(current);
-                        showStatus('Saved ' + section);
-                    }
-
-                    // Initialize TTS voices dropdown
-                    async function populateTTSVoices() {
-                        const select = document.getElementById('pref-tts-voice');
-                        if (!select) return;
-                        
-                        const voices = speechSynthesis.getVoices();
-                        select.innerHTML = '';
-                        
-                        if (voices.length === 0) {
-                            select.innerHTML = '<option value="">No voices available</option>';
-                            return;
-                        }
-                        
-                        // Add default option
-                        const defaultOpt = document.createElement('option');
-                        defaultOpt.value = '';
-                        defaultOpt.textContent = 'Default Voice';
-                        select.appendChild(defaultOpt);
-                        
-                        // Group voices by language
-                        const voicesByLang = {};
-                        voices.forEach(voice => {
-                            const lang = voice.lang.split('-')[0];
-                            if (!voicesByLang[lang]) voicesByLang[lang] = [];
-                            voicesByLang[lang].push(voice);
-                        });
-                        
-                        // Add English voices first, then others
-                        const langs = Object.keys(voicesByLang).sort((a, b) => {
-                            if (a === 'en') return -1;
-                            if (b === 'en') return 1;
-                            return a.localeCompare(b);
-                        });
-                        
-                        langs.forEach(lang => {
-                            const group = document.createElement('optgroup');
-                            group.label = lang.toUpperCase();
-                            voicesByLang[lang].forEach(voice => {
-                                const opt = document.createElement('option');
-                                opt.value = voice.name;
-                                opt.textContent = `${voice.name} (${voice.lang})`;
-                                group.appendChild(opt);
-                            });
-                            select.appendChild(group);
-                        });
-                        
-                        // Restore saved voice
-                        if (cachedPrefs && cachedPrefs.ttsVoice) {
-                            select.value = cachedPrefs.ttsVoice;
-                        }
-                    }
-                    
-                    // Test TTS function
-                    function testTTS() {
-                        if (!('speechSynthesis' in window)) {
-                            showStatus('Text-to-speech not supported');
-                            return;
-                        }
-                        
-                        // Cancel any ongoing speech
-                        speechSynthesis.cancel();
-                        
-                        const text = document.getElementById('tts-test-text').value || 'Hello, this is a test.';
-                        const utterance = new SpeechSynthesisUtterance(text);
-                        
-                        const voiceName = document.getElementById('pref-tts-voice').value;
-                        if (voiceName) {
-                            const voices = speechSynthesis.getVoices();
-                            const voice = voices.find(v => v.name === voiceName);
-                            if (voice) utterance.voice = voice;
-                        }
-                        
-                        utterance.rate = Number(document.getElementById('pref-tts-rate').value) || 1;
-                        utterance.pitch = Number(document.getElementById('pref-tts-pitch').value) || 1;
-                        utterance.volume = Number(document.getElementById('pref-tts-volume').value) || 1;
-                        
-                        speechSynthesis.speak(utterance);
-                    }
-
-                    // Helper function to clear Google Translate cookies
-                    function clearAllTranslationCookies() {
-                        const domain = window.location.hostname;
-                        // Clear all possible googtrans cookie variations
-                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
-                        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain}`;
-                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost';
-                        document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
-                        // Also try to set empty value
-                        document.cookie = 'googtrans=/en/en; path=/;';
-                        document.cookie = `googtrans=/en/en; path=/; domain=${domain}`;
-                        document.cookie = `googtrans=/en/en; path=/; domain=.${domain}`;
-                        
-                        // Remove Google Translate elements if present
-                        const gtFrame = document.querySelector('.goog-te-banner-frame');
-                        if (gtFrame) gtFrame.remove();
-                        const gtMenu = document.querySelector('.goog-te-menu-frame');
-                        if (gtMenu) gtMenu.remove();
-                        
-                        // Reset body to remove Google Translate modifications
-                        document.body.style.top = '';
-                        document.body.classList.remove('translated-ltr', 'translated-rtl');
-                    }
-
-                    // Clean reload that clears translation state first
-                    function cleanReload() {
-                        // Clear translation cookies before reload for faster language switching
-                        clearAllTranslationCookies();
-                        // Use location.href assignment for a cleaner reload that respects new cookies
-                        window.location.href = window.location.href.split('#')[0];
-                    }
-
-                    // Initialize on DOM ready
-                    document.addEventListener('DOMContentLoaded', async function (){
-                        // Load preferences from backend (or localStorage fallback)
-                        const saved = await loadPreferences();
-                        
-                        renderPresets();
-                        renderCustomThemes();
-                        
-                        // Initialize TTS voices
-                        if ('speechSynthesis' in window) {
-                            populateTTSVoices();
-                            speechSynthesis.onvoiceschanged = populateTTSVoices;
-                        }
-
-                        if (saved) {
-                            populateForm(saved);
-                        } else {
-                            // No saved preferences - populate form with Site Default values
-                            // but don't apply them (let site's natural CSS show through)
-                            populateForm(SITE_DEFAULT);
-                        }
-                        
-                        // Show login status hint
-                        if (isLoggedIn) {
-                            if (saved) {
-                                showStatus('Preferences synced from your account');
-                            } else {
-                                showStatus('No saved preferences found - using defaults');
-                            }
-                        }
-
-                        document.getElementById('pref-font-size').addEventListener('input', function(e){
-                            document.getElementById('font-size-label').textContent = e.target.value;
-                        });
-                        
-                        // TTS slider labels
-                        document.getElementById('pref-tts-rate').addEventListener('input', function(e){
-                            document.getElementById('tts-rate-label').textContent = e.target.value;
-                        });
-                        document.getElementById('pref-tts-pitch').addEventListener('input', function(e){
-                            document.getElementById('tts-pitch-label').textContent = e.target.value;
-                        });
-                        document.getElementById('pref-tts-volume').addEventListener('input', function(e){
-                            document.getElementById('tts-volume-label').textContent = Math.round(e.target.value * 100);
-                        });
-                        
-                        // TTS test button
-                        document.getElementById('tts-test-btn').addEventListener('click', testTTS);
-
-                        document.querySelectorAll('.save-section-btn').forEach(btn => {
-                            btn.addEventListener('click', async function() {
-                                await saveSectionPrefs(this.dataset.section);
-                                showStatus('Saved! Reloading...');
-                                // Clean reload to ensure styles and translation apply correctly
-                                setTimeout(() => cleanReload(), 200);
-                            });
-                        });
-
-                        document.getElementById('save-preferences').addEventListener('click', async function(){
-                            const formValues = currentFormValues();
-                            await savePreferences(formValues);
-                            showStatus('Preferences saved! Reloading...');
-                            // Clean reload to ensure styles and translation apply correctly
-                            setTimeout(() => cleanReload(), 200);
-                        });
-
-                        document.getElementById('restore-styles').addEventListener('click', async function(){
-                            // Delete from backend if logged in
-                            if (isLoggedIn) {
-                                const deleted = await deletePreferencesFromBackend();
-                                if (!deleted) {
-                                    showStatus('Failed to delete from server, trying again...');
-                                    await deletePreferencesFromBackend();
-                                }
-                            }
-                            
-                            // Clear localStorage and set a flag to indicate user wants site defaults
-                            localStorage.removeItem(localStorageKey);
-                            localStorage.removeItem(localThemesKey);
-                            localStorage.setItem('preferencesReset', 'true');
-                            cachedPrefs = null;
-                            backendPrefsExist = false;
-                            
-                            // Reset to site's natural CSS by removing all user theme overrides
-                            if (window.SitePreferences && typeof window.SitePreferences.resetPreferences === 'function') {
-                                window.SitePreferences.resetPreferences();
-                            }
-                            
-                            // Populate form with Site Default values
-                            populateForm(SITE_DEFAULT);
-                            
-                            // Reset language translation
-                            document.getElementById('pref-language').value = '';
-                            
-                            showStatus('Preferences reset! Reloading...');
-                            
-                            // Use cleanReload for faster/cleaner reset
-                            setTimeout(() => cleanReload(), 300);
-                        });
-
-                        document.getElementById('save-theme-btn').addEventListener('click', async function(){
-                            await saveThemeAs(document.getElementById('new-theme-name').value.trim());
-                        });
-                        
-                        document.getElementById('new-theme-name').addEventListener('keypress', async function(e){
-                            if (e.key === 'Enter') await saveThemeAs(this.value.trim());
-                        });
-                        
-                        // Live preview for selection color and button style
-                        ['pref-selection-color', 'pref-button-style'].forEach(id => {
-                            const el = document.getElementById(id);
-                            if (el) {
-                                const applyLivePreview = function() {
-                                    // Only apply live preview if we have existing preferences
-                                    // Don't create new preferences with Midnight fallback
-                                    const stored = localStorage.getItem(localStorageKey);
-                                    if (!stored && !cachedPrefs) return; // No preferences, don't apply anything
-                                    
-                                    const current = cachedPrefs || (stored ? JSON.parse(stored) : null);
-                                    if (!current) return;
-                                    
-                                    const form = currentFormValues();
-                                    current.selectionColor = form.selectionColor;
-                                    current.buttonStyle = form.buttonStyle;
-                                    applyPreferences(current);
-                                };
-                                el.addEventListener('change', applyLivePreview);
-                                el.addEventListener('input', applyLivePreview);
-                            }
-                        });
-                    });
-
-                    // Expose loadPreferences globally for other scripts
-                    window.loadPreferences = loadPreferences;
-                    window.checkLoginStatus = checkLoginStatus;
-                    
-                    // Initial load from localStorage only (no backend call yet)
-                    // Full loadPreferences() with backend check will be called on DOMContentLoaded
-                    try { 
-                        // Check if user explicitly reset preferences
-                        const wasReset = localStorage.getItem('preferencesReset');
-                        if (wasReset !== 'true') {
-                            const raw = localStorage.getItem(localStorageKey);
-                            if (raw) {
-                                const prefs = JSON.parse(raw);
-                                cachedPrefs = prefs;
-                                applyPreferences(prefs);
-                            }
-                        }
-                        // If reset flag is set or no localStorage, don't apply anything - let site defaults show
-                    } catch(e) { 
-                        console.error('Initial localStorage load error', e);
-                    }
-                })();
+                // Initialize the preferences module with API configuration
+                initializePreferences(javaURI, fetchOptions);
                 </script>
 
         </div>
@@ -1544,4 +610,259 @@ active_tab: dashboard
     });
 
   })();
+</script>
+
+<!-- ============================================================
+     Admin Evaluation Module
+     ============================================================
+     Moved out of the admin HTML section for readability.
+     The HTML structure (cards container, modal, sliders) lives
+     above in #admin-only.  This script wires up all behaviour
+     and exposes window.adminFetchPeople() so the DOMContentLoaded
+     handler can trigger it once admin status is confirmed.
+     ============================================================ -->
+<script type="module">
+import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+(function () {
+    // ── DOM references ──────────────────────────────────────────
+    // Grab every element the evaluation feature needs.
+    const peopleList = document.getElementById('admin-people-list');
+    const loadingEl  = document.getElementById('admin-people-loading');
+    const modal      = document.getElementById('admin-eval-modal');
+    const modalTitle = document.getElementById('admin-eval-modal-title');
+    const modalClose = document.getElementById('admin-eval-modal-close');
+    const evalForm   = document.getElementById('admin-eval-form');
+    const updateBtn  = document.getElementById('admin-eval-update-btn');
+    const statusEl   = document.getElementById('admin-eval-status');
+
+    // ── State ───────────────────────────────────────────────────
+    let people = [];            // All fetched people
+    let currentPerson = null;   // Person whose modal is open
+    let hasExistingEval = false; // Whether an admin eval already exists for currentPerson
+
+    // ── Slider field definitions ────────────────────────────────
+    // Each object maps a snake_case key (used on sliders) to a
+    // human-readable label shown in the modal.
+    const sliderFields = [
+        { key: "attendance",    label: "Attendance" },
+        { key: "work_habits",   label: "Work Habits" },
+        { key: "behavior",      label: "Behavior" },
+        { key: "timeliness",    label: "Timeliness" },
+        { key: "tech_sense",    label: "Tech Sense" },
+        { key: "tech_talk",     label: "Tech Talk" },
+        { key: "tech_growth",   label: "Tech Growth" },
+        { key: "advocacy",      label: "Advocacy" },
+        { key: "communication", label: "Communication" },
+        { key: "integrity",     label: "Integrity" },
+        { key: "organization",  label: "Organization" }
+    ];
+
+    // ── API key mapping ─────────────────────────────────────────
+    // The backend uses camelCase; the sliders use snake_case.
+    // This map lets us translate between the two.
+    const apiToSliderKey = {
+        attendance:    "attendance",
+        workHabits:    "work_habits",
+        behavior:      "behavior",
+        timeliness:    "timeliness",
+        techSense:     "tech_sense",
+        techTalk:      "tech_talk",
+        techGrowth:    "tech_growth",
+        advocacy:      "advocacy",
+        communication: "communication",
+        integrity:     "integrity",
+        organization:  "organization"
+    };
+
+    // ── generatePeopleCards ─────────────────────────────────────
+    // Builds a clickable card for every person and appends it to
+    // the #admin-people-list container.  Each card opens the
+    // evaluation modal on click.
+    function generatePeopleCards() {
+        peopleList.innerHTML = '';
+        people.forEach(person => {
+            const card = document.createElement('div');
+            card.className = 'cursor-pointer border border-neutral-700 bg-neutral-800 rounded-xl p-5 shadow hover:border-blue-500 transition';
+            card.innerHTML = `
+                <div class="font-semibold text-lg mb-1">${person.name || 'No Name'}</div>
+                <div class="text-sm text-neutral-400 mb-1">UID: <span class="font-mono">${person.uid}</span></div>
+                <div class="text-xs text-neutral-500">ID: ${person.id}</div>
+            `;
+            card.addEventListener('click', () => openEvalModal(person));
+            peopleList.appendChild(card);
+        });
+    }
+
+    // ── fetchPeople ─────────────────────────────────────────────
+    // Fetches the full people list from the backend, stores it in
+    // the local `people` array, then calls generatePeopleCards()
+    // to render them into the DOM.
+    async function fetchPeople() {
+        loadingEl.textContent = "Loading users...";
+        try {
+            const response = await fetch(`${javaURI}/api/people`, fetchOptions);
+            if (!response.ok) throw new Error("Failed to fetch people");
+            const data = await response.json();
+
+            // Keep only the fields we need
+            people = data.map(person => ({
+                id: person.id,
+                name: person.name,
+                email: person.email,
+                uid: person.uid,
+                sid: person.sid
+            }));
+
+            // Render the cards into the grid
+            generatePeopleCards();
+        } catch (e) {
+            console.error(e);
+            peopleList.innerHTML = '<p class="col-span-full text-red-500">Error loading users.</p>';
+        }
+    }
+
+    // ── openEvalModal ───────────────────────────────────────────
+    // Opens the evaluation modal for a given person.  Fetches both
+    // the existing admin evaluation and the student self-evaluation
+    // from the backend, then renders sliders pre-filled with those
+    // values.
+    async function openEvalModal(person) {
+        currentPerson = person;
+        hasExistingEval = false;
+        modalTitle.innerHTML = `Evaluate: ${person.name} <span class="text-sm text-neutral-400 font-normal">(UID: ${person.uid})</span>`;
+
+        // --- Fetch existing admin evaluation (if any) ---
+        let evalData = null;
+        try {
+            const res = await fetch(`${javaURI}/api/admin-evaluation/get/${person.id}`, fetchOptions);
+            if (res.ok) {
+                const json = await res.json();
+                if (json && typeof json === 'object' && json.evaluation) {
+                    evalData = json.evaluation;
+                    hasExistingEval = true;
+                }
+            }
+        } catch (e) {
+            evalData = null;
+        }
+
+        // --- Fetch student self-evaluation (if any) ---
+        let studentEvalData = null;
+        try {
+            const res = await fetch(`${javaURI}/api/student-evaluation/get/${person.id}`, fetchOptions);
+            if (res.ok) {
+                const json = await res.json();
+                studentEvalData = json.evaluation || json;
+            }
+        } catch (e) {
+            console.error("Error fetching student eval", e);
+        }
+
+        // Show a small status line under the title
+        if (!studentEvalData) {
+            modalTitle.innerHTML += `<br><span class="text-xs text-yellow-500 font-normal">Student has not self-evaluated yet.</span>`;
+        } else {
+            modalTitle.innerHTML += `<br><span class="text-xs text-green-400 font-normal">Student self-evaluation loaded.</span>`;
+        }
+
+        // --- Build slider HTML for every evaluation field ---
+        evalForm.innerHTML = sliderFields.map(f => {
+            // Resolve the admin value (default 4 if no prior eval)
+            let val = 4;
+            if (evalData) {
+                const apiKey = Object.keys(apiToSliderKey).find(k => apiToSliderKey[k] === f.key);
+                if (apiKey && evalData[apiKey] != null) val = evalData[apiKey];
+            }
+
+            // Resolve the student self-eval value (or "N/A")
+            let studentVal = "N/A";
+            if (studentEvalData) {
+                const apiKey = Object.keys(apiToSliderKey).find(k => apiToSliderKey[k] === f.key);
+                if (apiKey && studentEvalData[apiKey] != null) {
+                    studentVal = studentEvalData[apiKey];
+                } else if (studentEvalData[f.key] != null) {
+                    studentVal = studentEvalData[f.key];
+                }
+            }
+
+            return `
+                <div class="bg-neutral-800/50 p-3 rounded border border-neutral-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <label for="admin-slider-${f.key}" class="text-sm text-neutral-300 font-medium">${f.label}</label>
+                        <span class="text-xs text-neutral-400">Student: <span class="${studentVal !== 'N/A' ? 'text-blue-300 font-bold' : 'text-neutral-500'}">${studentVal}</span></span>
+                    </div>
+                    <input type="range" id="admin-slider-${f.key}" name="${f.key}" min="1" max="5" value="${val}" class="w-full accent-blue-600" />
+                    <div class="text-right mt-1">
+                        <span class="text-xs text-neutral-400">Admin: <span id="admin-val-${f.key}" class="font-bold text-white">${val}</span></span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Wire live-updating value labels on each slider
+        sliderFields.forEach(f => {
+            const slider = document.getElementById(`admin-slider-${f.key}`);
+            const label  = document.getElementById(`admin-val-${f.key}`);
+            slider.addEventListener('input', () => { label.textContent = slider.value; });
+        });
+
+        statusEl.textContent = '';
+        modal.classList.remove('hidden');
+    }
+
+    // ── closeEvalModal ──────────────────────────────────────────
+    // Hides the modal and clears the current-person reference.
+    function closeEvalModal() {
+        modal.classList.add('hidden');
+        currentPerson = null;
+    }
+
+    // Close on × button or clicking outside the modal card
+    modalClose.onclick = closeEvalModal;
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeEvalModal();
+    });
+
+    // ── Update handler ──────────────────────────────────────────
+    // Collects slider values and sends them to the backend.
+    // Uses PUT if an evaluation already exists, POST otherwise.
+    updateBtn.onclick = async () => {
+        if (!currentPerson) return;
+        updateBtn.disabled = true;
+        statusEl.textContent = 'Updating...';
+
+        // Build the request body from current slider positions
+        const body = { "user_id": currentPerson.id };
+        sliderFields.forEach(f => {
+            body[f.key] = Number(document.getElementById(`admin-slider-${f.key}`).value);
+        });
+
+        try {
+            // Choose POST (create) or PUT (update) based on prior state
+            const endpoint = hasExistingEval
+                ? `${javaURI}/api/admin-evaluation/update/${currentPerson.id}`
+                : `${javaURI}/api/admin-evaluation/post`;
+            const method = hasExistingEval ? 'PUT' : 'POST';
+
+            const res = await fetch(endpoint, {
+                ...fetchOptions,
+                method,
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error('Failed to update');
+
+            statusEl.textContent = '✅ Updated successfully!';
+            hasExistingEval = true; // Future saves should PUT
+        } catch (e) {
+            statusEl.textContent = '❌ Error updating.';
+        }
+        updateBtn.disabled = false;
+    };
+
+    // ── Expose globally ─────────────────────────────────────────
+    // The DOMContentLoaded handler in the dashboard init script
+    // calls window.adminFetchPeople() after confirming admin role.
+    window.adminFetchPeople = fetchPeople;
+})();
 </script>
