@@ -1,0 +1,394 @@
+// ===========================
+// Game Dialogue System Styles
+// ===========================
+// Styles for DialogueSystem.js NPC conversations
+// Uses standard mixins for consistent styling with other game UI
+
+@import "../mixins/buttons";
+@import "../mixins/panel";
+@import "../mixins/modals";
+@import "../mixins/forms";
+
+/**
+ * Dialogue Box Container
+ * Main dialogue box shown at bottom of screen for NPC conversations
+ */
+[id^="custom-dialogue-box-"] {
+  // Fixed positioning at bottom center
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  // Sizing
+  padding: 20px;
+  max-width: 80%;
+  
+  // Appearance using theme variables
+  background: var(--panel, rgba(0, 0, 0, 0.85));
+  border: 2px solid var(--pref-accent-color, #4a86e8);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  
+  // Typography
+  font-family: 'Press Start 2P', cursive, monospace;
+  font-size: 14px;
+  text-align: center;
+  color: var(--pref-text-color, #FFF);
+  
+  // Z-index and display
+  z-index: 9999;
+  display: none; // Hidden by default
+
+  @media (max-width: 768px) {
+    max-width: 90%;
+    padding: 16px;
+    font-size: 12px;
+    bottom: 60px;
+  }
+}
+
+/**
+ * Avatar Container
+ * Character portrait shown in dialogue
+ */
+[id^="dialogue-avatar-"] {
+  width: 50px;
+  height: 50px;
+  margin-right: 15px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: none; // Hidden by default
+  
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+}
+
+/**
+ * Speaker Name
+ * Character name displayed above dialogue text
+ */
+[id^="dialogue-speaker-"] {
+  font-weight: bold;
+  color: var(--pref-accent-color, #4a86e8);
+  margin-bottom: 10px;
+  font-size: 16px;
+  
+  @media (max-width: 768px) {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+}
+
+/**
+ * Dialogue Text Content
+ * Main text area for dialogue messages
+ */
+[id^="dialogue-text-"] {
+  line-height: 1.5;
+  min-height: 40px;
+  color: var(--pref-text-color, #FFF);
+  
+  @media (max-width: 768px) {
+    min-height: 30px;
+  }
+}
+
+/**
+ * Close Button
+ * Uses text-button mixin for consistency
+ */
+[id^="custom-dialogue-box-"] button {
+  @include text-button;
+  
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-family: 'Press Start 2P', cursive, monospace;
+  font-size: 12px;
+  
+  @media (max-width: 768px) {
+    margin-top: 8px;
+    padding: 8px 16px;
+    font-size: 11px;
+  }
+}
+
+/**
+ * Primary and Secondary Buttons
+ * Added by addButtons() method
+ */
+.primary-button {
+  @include text-button;
+  background: var(--pref-accent-color, #3b82f6);
+  color: var(--pref-bg-color, #FFF);
+  border-color: var(--pref-accent-color, #3b82f6);
+  
+  &:hover {
+    opacity: 0.9;
+    background: var(--pref-accent-color, #3b82f6);
+  }
+}
+
+.secondary-button {
+  @include text-button;
+  background: var(--panel-mid, #666);
+  color: var(--pref-text-color, #FFF);
+  
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+/**
+ * User/AI Message Classes
+ * Used in AiNpc.js chat history
+ */
+.user-message {
+  background: linear-gradient(
+    135deg, 
+    var(--pref-accent-color, rgba(74, 134, 232, 0.4)) 0%, 
+    var(--pref-accent-color, rgba(74, 134, 232, 0.2)) 100%
+  );
+  border-left: 4px solid var(--pref-accent-color, #4a86e8);
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  
+  &::before {
+    content: '👤';
+    position: absolute;
+    left: -25px;
+    top: 8px;
+    font-size: 16px;
+  }
+}
+
+.ai-message {
+  background: linear-gradient(
+    135deg, 
+    var(--panel, rgba(22, 33, 62, 0.6)) 0%, 
+    var(--panel-mid, rgba(22, 33, 62, 0.4)) 100%
+  );
+  border-left: 4px solid var(--ui-border, #555);
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  
+  &::before {
+    content: '🤖';
+    position: absolute;
+    left: -25px;
+    top: 8px;
+    font-size: 16px;
+  }
+}
+
+/**
+ * ===========================
+ * AI NPC Interaction Styles
+ * ===========================
+ * Chat UI elements appended to dialogue boxes
+ */
+
+/**
+ * AI NPC Container
+ * Main container for input, buttons, and response area
+ */
+.ai-npc-container {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--ui-border, rgba(255, 255, 255, 0.1));
+}
+
+/**
+ * AI NPC Input Field
+ * Textarea for multi-line user messages with wrapping
+ */
+.ai-npc-input {
+  @include text-button;
+  height: auto;
+  min-height: 50px;
+  max-height: 120px;
+  padding: 10px 12px;
+  font-family: var(--pref-font-family, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  resize: vertical;
+  overflow-y: auto;
+  
+  // Visual enhancements
+  background: var(--panel, rgba(0, 0, 0, 0.4));
+  border: 2px solid var(--ui-border, #444);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  
+  &::placeholder {
+    opacity: 0.6;
+    font-style: italic;
+  }
+  
+  &:focus {
+    border-color: var(--pref-accent-color, #4a86e8);
+    box-shadow: 0 0 0 2px rgba(74, 134, 232, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    background: var(--panel-mid, rgba(0, 0, 0, 0.5));
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+    font-size: 13px;
+    min-height: 44px;
+  }
+}
+
+/**
+ * AI NPC Button Row
+ * Container for history and send buttons
+ */
+.ai-npc-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: stretch;
+  
+  // Add hint text above button row (appears below input field)
+  &::before {
+    content: 'Press Enter to send, Shift+Enter for new line';
+    display: block;
+    font-size: 10px;
+    opacity: 0.5;
+    text-align: center;
+    font-style: italic;
+    width: 100%;
+    order: -1;
+    margin-bottom: -5px;
+  }
+}
+
+/**
+ * AI NPC History Button
+ * Button to show chat history modal
+ */
+.ai-npc-history-btn {
+  @include text-button;
+  flex: 1;
+  font-size: 13px;
+  background: var(--panel-mid, rgba(0, 0, 0, 0.3));
+  
+  &:hover {
+    background: var(--pref-accent-color, #4a86e8);
+    color: var(--pref-bg-color, #FFF);
+    transform: scale(1.02);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+}
+
+/**
+ * AI NPC Response Area
+ * Area displaying AI responses with typewriter effect
+ */
+.ai-npc-response-area {
+  min-height: 40px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 4px solid var(--pref-accent-color, #4a86e8);
+  background: linear-gradient(
+    135deg, 
+    var(--panel, rgba(0, 0, 0, 0.4)) 0%, 
+    var(--panel-mid, rgba(0, 0, 0, 0.3)) 100%
+  );
+  color: var(--pref-text-color, #FFF);
+  font-style: italic;
+  line-height: 1.5;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  
+  // Visual indicator for thinking/typing
+  &:empty::before {
+    content: '💭';
+    opacity: 0.3;
+    margin-right: 8px;
+  }
+  
+  @media (max-width: 768px) {
+    min-height: 30px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+/**
+ * AI NPC Modal
+ * Chat history modal overlay
+ */
+.ai-npc-modal {
+  @include modal-container(300px, 500px, 20px);
+  
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 600px;
+  overflow-y: auto;
+  z-index: 10001;
+  
+  // Add padding for message icons
+  padding-left: 40px;
+  padding-right: 20px;
+  
+  @media (max-width: 768px) {
+    max-width: 90%;
+    max-height: 80vh;
+    padding-left: 35px;
+  }
+}
+
+/**
+ * AI NPC Modal Title
+ * Title for chat history modal
+ */
+.ai-npc-modal-title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--pref-accent-color, #4a86e8);
+  text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+}
+
+/**
+ * AI NPC Close Button
+ * Close button for chat history modal
+ */
+.ai-npc-close-btn {
+  @include text-button;
+  width: 100%;
+  margin-top: 10px;
+  background: var(--pref-accent-color, #3b82f6);
+  color: var(--pref-bg-color, #FFF);
+  border-color: var(--pref-accent-color, #3b82f6);
+  
+  &:hover {
+    opacity: 0.9;
+    background: var(--pref-accent-color, #3b82f6);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
+}

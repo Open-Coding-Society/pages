@@ -158,7 +158,7 @@ class Npc extends Character {
             console.log("Greeting set to false!")
             return;
         }
-        this.dialogueSystem.showDialogue(greeting, npcName, npcAvatar);
+        this.dialogueSystem.showDialogue(greeting, npcName, npcAvatar, this.spriteData);
     }
     
     // Method for showing random interaction dialogue
@@ -170,7 +170,7 @@ class Npc extends Character {
         const npcAvatar = this.spriteData?.src || null;
         
         // Show random dialogue
-        this.dialogueSystem.showRandomDialogue(npcName, npcAvatar);
+        this.dialogueSystem.showRandomDialogue(npcName, npcAvatar, this.spriteData);
     }
 
     // Clean up event listeners when NPC is destroyed

@@ -1,0 +1,70 @@
+{% assign data = site.data.pvo_infographic %}
+
+<div class="pv-infograph">
+  <!-- Header Section -->
+  <div class="pv-header">
+    <div class="pv-badge">Nonprofit Website Analysis & Redesign Strategy</div>
+    <h1 class="pv-title">{{ data.Title }}</h1>
+    <p class="pv-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="pv-card">
+    <div class="pv-card-grid">
+      
+      <!-- Left: Image & Status -->
+      <div class="pv-visual">
+        <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-image">
+          <div class="pv-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+        <div class="pv-status">{{ topic.status }}</div>
+        <div class="pv-team">
+          <span class="pv-team-label">Project Leads</span>
+          <span class="pv-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="pv-content">
+        <h2 class="pv-project-title">{{ topic.title }}</h2>
+        <p class="pv-subtitle">{{ topic.subtitle }}</p>
+        
+        <div class="pv-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="pv-keypoint">
+            <span class="pv-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="pv-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="pv-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="pv-details">
+        <h3 class="pv-section-title">About</h3>
+        <p class="pv-about">{{ topic.description }}</p>
+        
+        <h3 class="pv-section-title">Impact</h3>
+        <div class="pv-impact-list">
+          {% for item in topic.impact %}
+          <div class="pv-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+       <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
