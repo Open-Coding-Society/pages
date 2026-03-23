@@ -142,19 +142,29 @@ export default class Leaderboard {
     mount() {
         if (this.mounted) return;
 
-        // CRITICAL: Always append to body and use fixed positioning
-        // This ensures the leaderboard is not affected by game container position changes
-        const appendTarget = document.body;
+        // Mount inside provided parent when available; fallback to body.
+        const appendTarget = (this.parentId && document.getElementById(this.parentId)) || document.body;
         
         const container = document.createElement('div');
         container.id = 'leaderboard-container';
-        
-        // CRITICAL: Always use fixed positioning to avoid game container position affecting it
-        container.style.position = 'fixed';
-        container.style.top = '80px';
-        container.style.left = '20px';
-        container.style.right = 'auto';
-        container.style.zIndex = '1000';
+
+        // Keep the widget inside the game container when embedded.
+        if (appendTarget !== document.body) {
+            if (!appendTarget.style.position || appendTarget.style.position === 'static') {
+                appendTarget.style.position = 'relative';
+            }
+            container.style.position = 'absolute';
+            container.style.top = '12px';
+            container.style.left = '12px';
+            container.style.right = 'auto';
+            container.style.zIndex = '30';
+        } else {
+            container.style.position = 'fixed';
+            container.style.top = '80px';
+            container.style.left = '20px';
+            container.style.right = 'auto';
+            container.style.zIndex = '1000';
+        }
         
         // Add the widget class for styling
         container.className = 'leaderboard-widget' + (this.initiallyHidden ? ' initially-hidden' : '');

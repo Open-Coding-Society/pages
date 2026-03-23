@@ -70,14 +70,7 @@ class GameCore {
         this._adjustGameContainerPosition();
     }
 
-    // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
-    // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
-    // Immediately create and show the leaderboard so it's loaded in (doesn't shift canvas because it's fixed)
-    try {
-        this._handleToggleLeaderboard();
-    } catch (e) {
-        console.warn('Auto-show leaderboard failed (non-fatal):', e);
-    }
+    // Leaderboard is loaded on-demand when user clicks "Toggle Leaderboard".
     }
 
     async _initializeGameControlAsync(gameLevelClasses) {
@@ -101,13 +94,7 @@ class GameCore {
                 this._adjustGameContainerPosition();
             }
 
-            // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
-            // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
-            try {
-                this._handleToggleLeaderboard();
-            } catch (e) {
-                console.warn('Auto-show leaderboard failed (non-fatal):', e);
-            }
+            // Leaderboard is loaded on-demand when user clicks "Toggle Leaderboard".
         } catch (err) {
             console.error('Failed to initialize GameControl:', err);
         }
@@ -452,13 +439,6 @@ class GameCore {
             if (leaderboardContainer.style.display === 'none' || leaderboardContainer.classList.contains('initially-hidden')) {
                 leaderboardContainer.style.display = 'block';
                 leaderboardContainer.classList.remove('initially-hidden');
-                
-                // CRITICAL: Always use fixed positioning to avoid being affected by game container
-                    leaderboardContainer.style.position = 'fixed';
-                    leaderboardContainer.style.top = '80px';
-                    leaderboardContainer.style.left = '20px';
-                    leaderboardContainer.style.right = 'auto';
-                    leaderboardContainer.style.zIndex = '1000';
             } else {
                 leaderboardContainer.style.display = 'none';
             }
@@ -488,19 +468,7 @@ class GameCore {
                         console.warn('Failed to sync active ScoreManager after leaderboard creation:', err);
                     });
 
-                    // Force positioning after creation - use fixed positioning
-                    setTimeout(() => {
-                        const container = document.getElementById('leaderboard-container');
-                        if (container) {
-                            container.style.position = 'fixed';
-                            container.style.top = '80px';
-                            container.style.left = '20px';
-                            container.style.right = 'auto';
-                            container.style.zIndex = '1000';
-                        }
-                    }, 100);
-
-                    console.log('Leaderboard created and shown with fixed positioning');
+                    console.log('Leaderboard created and shown');
                 })
                 .catch(err => {
                     console.warn('Failed to create leaderboard:', err);
