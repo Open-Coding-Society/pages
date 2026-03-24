@@ -283,8 +283,8 @@ active_tab: dashboard
     </div>
 </div>
 
-<!-- FontAwesome for icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<!-- FontAwesome loaded via CDN (free solid/regular/brands) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <!-- Required plugins -->
 <script src="https://cdn.jsdelivr.net/npm/preline/dist/index.js"></script>
@@ -331,13 +331,19 @@ active_tab: dashboard
         try {
             const userRes = await fetch(`${javaURI}/api/user/info`, fetchOptions);
             if (userRes.ok) {
-                const user = await userRes.json();
-                const isAdmin = user?.role === "admin";
-                if (isAdmin) {
-                    document.getElementById("admin-only").style.display = "block";
-                    // Trigger admin evaluation fetch
-                    if (window.adminFetchPeople && typeof window.adminFetchPeople === 'function') {
-                        window.adminFetchPeople();
+                // Guard: make sure the response is actually JSON before parsing
+                const contentType = userRes.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    console.warn('Admin check: expected JSON but got', contentType);
+                } else {
+                    const user = await userRes.json();
+                    const isAdmin = user?.role === "admin";
+                    if (isAdmin) {
+                        document.getElementById("admin-only").style.display = "block";
+                        // Trigger admin evaluation fetch
+                        if (window.adminFetchPeople && typeof window.adminFetchPeople === 'function') {
+                            window.adminFetchPeople();
+                        }
                     }
                 }
             }
@@ -355,7 +361,7 @@ active_tab: dashboard
 </script>
 
 <script type="module">
-  import { javaURI, fetchOptions } from '../../assets/js/api/config.js';
+  import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
   (function () {
 
     // UI elements
