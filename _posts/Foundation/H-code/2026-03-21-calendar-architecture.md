@@ -220,7 +220,7 @@ const ERROR_TYPES = Object.freeze({
 ## File Locations
 
 ```
-assets/js/calendar/
+assets/js/pages/calendar/
 ├── CalendarData.js        # School calendar data + date utilities
 ├── EventBuilder.js        # Event construction + iCal export
 ├── CalendarApi.js         # Backend API + error types

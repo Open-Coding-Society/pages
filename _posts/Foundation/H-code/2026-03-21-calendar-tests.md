@@ -151,14 +151,14 @@ This page loads all five **Calendar SRP modules** and runs the comprehensive tes
 </script>
 
 <!-- Load SRP modules in dependency order -->
-<script src="{{ site.baseurl }}/assets/js/calendar/CalendarData.js"></script>
-<script src="{{ site.baseurl }}/assets/js/calendar/EventBuilder.js"></script>
-<script src="{{ site.baseurl }}/assets/js/calendar/CalendarApi.js"></script>
-<script src="{{ site.baseurl }}/assets/js/calendar/CalendarUI.js"></script>
-<script src="{{ site.baseurl }}/assets/js/calendar/calendar.js"></script>
+<script src="{{ site.baseurl }}/assets/js/pages/calendar/CalendarData.js"></script>
+<script src="{{ site.baseurl }}/assets/js/pages/calendar/EventBuilder.js"></script>
+<script src="{{ site.baseurl }}/assets/js/pages/calendar/CalendarApi.js"></script>
+<script src="{{ site.baseurl }}/assets/js/pages/calendar/CalendarUI.js"></script>
+<script src="{{ site.baseurl }}/assets/js/pages/calendar/calendar.js"></script>
 
 <!-- Load test suite -->
-<script src="{{ site.baseurl }}/assets/js/calendar/CalendarTests.js"></script>
+<script src="{{ site.baseurl }}/assets/js/pages/calendar/CalendarTests.js"></script>
 
 <script>
   /**
