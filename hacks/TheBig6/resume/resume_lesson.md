@@ -239,7 +239,6 @@ date: 2025-12-01
     <div class="flex-row-gap">
       <span id="stepIndicator" style="color:var(--muted); font-size:12px;">Step 1 / 6</span>
       <button id="nextBtn">Next →</button>
-      <a id="nextModuleBtnNav" class="hidden" href="#">Next Module →</a>
     </div>
   </div>
 
