@@ -230,6 +230,14 @@
           <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
             <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
             <div id="slashCommandList">
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3"
+                onclick="selectSlashCommand('/calendar')">
+                <span class="text-lg">📅</span>
+                <div>
+                  <div class="text-white text-sm font-medium">/calendar</div>
+                  <div class="text-gray-400 text-xs">Add event: create a task in the calendar</div>
+                </div>
+              </div>
               <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
                 <span class="text-lg">👤</span>
                 <div>
@@ -287,6 +295,79 @@
           <p class="text-xs text-gray-400 mt-2">Uploads are shared with all group members.</p>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar Event Modal -->
+<div id="calendarEventModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="calendarModalController.close()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-md mx-4 flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <h3 class="text-xl font-semibold text-white">Add Calendar Event</h3>
+      <button onclick="calendarModalController.close()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-4 space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Title</label>
+        <input id="calEventTitle" type="text" placeholder="Event Title"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Date</label>
+          <input id="calEventDate" type="date"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Period</label>
+          <input id="calEventPeriod" type="text" placeholder="e.g. CSA"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Description</label>
+        <textarea id="calEventDesc" rows="3" placeholder="Optional description..."
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      </div>
+
+      <!-- Priority -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Priority</label>
+        <select id="calEventPriority"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="P2" selected>P2 (Normal)</option>
+          <option value="P0">P0 (Highest)</option>
+          <option value="P1">P1 (High)</option>
+          <option value="P3">P3 (Low)</option>
+        </select>
+      </div>
+
+      <div id="calEventStatus" class="text-sm mt-2"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+      <button onclick="calendarModalController.close()"
+        class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+        Cancel
+      </button>
+      <button id="calEventSubmitBtn" onclick="calendarModalController.submit()"
+        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center">
+        Create Event
+      </button>
     </div>
   </div>
 </div>
@@ -891,6 +972,13 @@
         popup.classList.add('hidden');
       }
     } else if (event.key === 'Enter') {
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput.value.trim().toLowerCase() === '/calendar') {
+         event.preventDefault();
+         chatInput.value = '';
+         calendarModalController.open();
+         return;
+      }
       window.sendChatMessage();
     }
   }
@@ -907,6 +995,13 @@
   }
 
   function selectSlashCommand(command) {
+    if (command === '/calendar') {
+      document.getElementById('slashCommandPopup').classList.add('hidden');
+      document.getElementById('chatInput').value = '';
+      calendarModalController.open();
+      return;
+    }
+
     const input = document.getElementById('chatInput');
     const popup = document.getElementById('slashCommandPopup');
 
@@ -926,6 +1021,96 @@
       input.classList.remove('has-command');
     }
   }
+
+  /* ================================
+     CALENDAR EVENT MODAL (SRP)
+  ================================ */
+  const calendarModalController = {
+    open: function() {
+      document.getElementById('calendarEventModal').classList.remove('hidden');
+      document.getElementById('calEventTitle').focus();
+      document.getElementById('calEventPeriod').value = '';
+      document.getElementById('calEventStatus').textContent = '';
+      document.getElementById('calEventStatus').className = 'text-sm mt-2';
+    },
+    close: function() {
+      document.getElementById('calendarEventModal').classList.add('hidden');
+      this.reset();
+    },
+    reset: function() {
+      document.getElementById('calEventTitle').value = '';
+      document.getElementById('calEventDate').value = '';
+      document.getElementById('calEventPeriod').value = '';
+      document.getElementById('calEventDesc').value = '';
+      document.getElementById('calEventPriority').value = 'P2';
+      document.getElementById('calEventStatus').textContent = '';
+      document.getElementById('calEventSubmitBtn').disabled = false;
+      document.getElementById('calEventSubmitBtn').innerHTML = 'Create Event';
+    },
+    setStatus: function(msg, isError = false) {
+      const statusEl = document.getElementById('calEventStatus');
+      statusEl.textContent = msg;
+      statusEl.className = 'text-sm mt-2 ' + (isError ? 'text-red-400' : 'text-green-400');
+    },
+    submit: async function() {
+      const titleInput = document.getElementById('calEventTitle').value.trim();
+      const dateInput = document.getElementById('calEventDate').value;
+      const periodInput = document.getElementById('calEventPeriod').value.trim();
+      const descInput = document.getElementById('calEventDesc').value.trim();
+      const priorityInput = document.getElementById('calEventPriority').value;
+
+      if (!titleInput || !dateInput) {
+        this.setStatus('Title and Date are required.', true);
+        return;
+      }
+
+      const btn = document.getElementById('calEventSubmitBtn');
+      btn.disabled = true;
+      // spinner
+      btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Creating...';
+      
+      let emoji = '📅';
+      const eventPayload = {
+        title: `[${priorityInput}] ${emoji} ${titleInput}`,
+        description: descInput,
+        date: dateInput,
+        period: periodInput,
+        priority: priorityInput
+      };
+
+      try {
+        const res = await fetch(`${javaURI}/api/calendar/add_event`, {
+          ...fetchOptions,
+          method: 'POST',
+          body: JSON.stringify(eventPayload)
+        });
+
+        if (res.status === 401 || res.status === 403 || (res.redirected && res.url.includes('/login'))) {
+          this.setStatus('Session expired. Please log in again.', true);
+          btn.disabled = false;
+          btn.innerHTML = 'Create Event';
+          return;
+        }
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Server returned an error');
+        }
+
+        this.setStatus('Event created successfully!');
+        setTimeout(() => {
+          this.close();
+        }, 1000);
+      } catch (err) {
+        console.error('Failed to create calendar event:', err);
+        this.setStatus(`Error: ${err.message}`, true);
+        btn.disabled = false;
+        btn.innerHTML = 'Create Event';
+      }
+    }
+  };
+  
+  window.calendarModalController = calendarModalController;
 
   window.handleChatInputChange = handleChatInputChange;
   window.handleChatInputKeydown = handleChatInputKeydown;
