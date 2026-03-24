@@ -739,6 +739,7 @@ comments: false
       let loadingCount = 0;  // Track concurrent loading operations
       let isAdmin = false;   // Track if current user is an admin
       let selectedUsersForGroup = {}; // Track multi-select members per group
+      let collapsedGroups = {}; // Track collapsed/expanded state per group id
       let isSearchMode = false;  // Track if we're in search mode to disable collapse
 
       // Chat state
