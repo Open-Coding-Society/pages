@@ -1,13 +1,13 @@
 /**
  * Global site-wide theme preferences — SRP + Class-based architecture.
  *
- * Classes (Single Responsibility each):
+ * Classes use standard get/set naming where applicable:
  *   ColorUtils        – Pure color math (hex→rgb, luminance, adjust)
  *   CSSInjector       – Builds and injects the override <style> block
  *   ThemeEngine        – Reads prefs → sets CSS custom properties + injects overrides
  *   LanguageManager    – Google Translate integration
- *   TTSManager         – Text-to-Speech wrapper
- *   PreferencesStore   – localStorage read / write
+ *   TTSManager         – TTS wrapper: get() settings, speak(), stop()
+ *   PreferencesStore   – localStorage: get() reads stored prefs
  *   SitePreferences    – Orchestrator: wires everything together, exposes public API
  */
 (function () {
@@ -512,9 +512,9 @@
   // RESPONSIBILITY: Text-to-Speech wrapper
   // ============================================
   class TTSManager {
-    /** Read TTS settings from stored preferences */
-    static getSettings() {
-      const prefs = PreferencesStore.load() || {};
+    /** Get TTS settings from stored preferences */
+    static get() {
+      const prefs = PreferencesStore.get() || {};
       return {
         voice: prefs.ttsVoice || '',
         rate: parseFloat(prefs.ttsRate) || 1,
@@ -531,7 +531,7 @@
       }
       speechSynthesis.cancel();
 
-      const settings = TTSManager.getSettings();
+      const settings = TTSManager.get();
       const utterance = new SpeechSynthesisUtterance(text);
 
       const voiceName = options.voice || settings.voice;
@@ -573,8 +573,8 @@
   class PreferencesStore {
     static KEY = 'sitePreferences';
 
-    /** Load preferences from localStorage (returns object or null) */
-    static load() {
+    /** Get preferences from localStorage (returns object or null) */
+    static get() {
       try {
         const raw = window.localStorage.getItem(PreferencesStore.KEY);
         if (!raw) return null;
@@ -596,7 +596,7 @@
     const wasReset = window.localStorage.getItem('preferencesReset');
     if (wasReset === 'true') return;
 
-    const prefs = PreferencesStore.load();
+    const prefs = PreferencesStore.get();
     if (prefs) ThemeEngine.apply(prefs);
   }
 
@@ -612,7 +612,7 @@
     speakSelection: () => TTSManager.speakSelection(),
     stopSpeaking: () => TTSManager.stop(),
     isSpeaking: () => TTSManager.isSpeaking(),
-    getTTSSettings: () => TTSManager.getSettings(),
+    getTTSSettings: () => TTSManager.get(),
   };
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
