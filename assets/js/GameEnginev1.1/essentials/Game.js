@@ -448,31 +448,43 @@ class GameCore {
             console.log('Leaderboard container not found, creating new...');
             
             const ctrlForLeaderboard = this.getActiveControl();
-            import(`${this.path}/assets/js/GameEnginev1.1/essentials/Leaderboard.js`)
-                .then(mod => {
-                    // Determine parent - use gameContainer if available
-                    let parentId = 'gameContainer';
-                    if (typeof this.gameContainer === 'string') {
-                        parentId = this.gameContainer;
-                    } else if (this.gameContainer instanceof HTMLElement) {
-                        parentId = this.gameContainer.id || 'gameContainer';
-                    }
 
-                    this.leaderboardInstance = new mod.default(ctrlForLeaderboard || this.gameControl, { 
-                        gameName: 'AdventureGame',
-                        parentId: parentId,
-                        initiallyHidden: false
-                    });
+            const instantiateLeaderboard = (LeaderboardClass) => {
+                const leaderboardOptions = {
+                    gameName: 'AdventureGame',
+                    // Default to body/fixed overlay so leaderboard never shifts game layout.
+                    // Can still be overridden per page via environment.leaderboardOptions.parentId.
+                    parentId: null,
+                    initiallyHidden: false,
+                    ...(this.environment.leaderboardOptions || {})
+                };
 
-                    this._ensureActiveScoreManager().catch(err => {
-                        console.warn('Failed to sync active ScoreManager after leaderboard creation:', err);
-                    });
+                this.leaderboardInstance = new LeaderboardClass(
+                    ctrlForLeaderboard || this.gameControl,
+                    leaderboardOptions
+                );
 
-                    console.log('Leaderboard created and shown');
-                })
-                .catch(err => {
-                    console.warn('Failed to create leaderboard:', err);
+                this._ensureActiveScoreManager().catch(err => {
+                    console.warn('Failed to sync active ScoreManager after leaderboard creation:', err);
                 });
+
+                console.log('Leaderboard created and shown');
+            };
+
+            const EnvLeaderboardClass = this.environment.leaderboardClass;
+            if (EnvLeaderboardClass) {
+                try {
+                    instantiateLeaderboard(EnvLeaderboardClass);
+                } catch (err) {
+                    console.warn('Failed to create leaderboard from environment class:', err);
+                }
+            } else {
+                import(`${this.path}/assets/js/GameEnginev1.1/essentials/Leaderboard.js`)
+                    .then(mod => instantiateLeaderboard(mod.default || mod))
+                    .catch(err => {
+                        console.warn('Failed to create leaderboard:', err);
+                    });
+            }
         }
     }
 
