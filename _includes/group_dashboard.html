@@ -438,6 +438,18 @@
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  const chatSocketPort = 8589;
+
+  function buildChatSocketEndpoint() {
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    const port = String(chatSocketPort);
+    const isDefaultHttp = protocol === 'http:' && port === '80';
+    const isDefaultHttps = protocol === 'https:' && port === '443';
+    const authority = (isDefaultHttp || isDefaultHttps) ? hostname : `${hostname}:${port}`;
+    return `${protocol}//${authority}/ws-chat`;
+  }
+
   // Chat state
   const dashboardGroupId = "{{ include.groupId | default: '' }}";
   let activeChatGroupId = dashboardGroupId ? Number(dashboardGroupId) : null;
@@ -455,7 +467,9 @@
     typingStopTimer: null,
     typingUsers: new Set(),
     participants: [],
-    seenEventKeys: new Set()
+    seenEventKeys: new Set(),
+    connectPromise: null,
+    allowReconnect: false
   };
   let currentUser = null;
   let currentUserDisplayName = 'You';
@@ -772,39 +786,59 @@
   }
 
   function ensureConnected() {
-    if (groupChatState.connected || groupChatState.connecting) return;
+    if (groupChatState.connected) {
+      return Promise.resolve(true);
+    }
+    if (groupChatState.connecting && groupChatState.connectPromise) {
+      return groupChatState.connectPromise;
+    }
     if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
       console.error('SockJS/STOMP dependencies are not available');
       setConnectionStatus('Unavailable', 'disconnected');
-      return;
+      return Promise.resolve(false);
     }
 
     groupChatState.connecting = true;
     setConnectionStatus('Connecting', 'connecting');
 
-    const socket = new SockJS(`${javaURI}/ws-chat`);
+    const socket = new SockJS(buildChatSocketEndpoint());
     const client = Stomp.over(socket);
     client.debug = null;
 
     groupChatState.socket = socket;
     groupChatState.stompClient = client;
 
-    socket.onclose = () => {
-      if (groupChatState.connected || groupChatState.connecting) {
-        handleDisconnect();
-      }
-    };
+    groupChatState.connectPromise = new Promise((resolve) => {
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        groupChatState.connectPromise = null;
+        resolve(ok);
+      };
 
-    client.connect({}, () => {
-      groupChatState.connected = true;
-      groupChatState.connecting = false;
-      setConnectionStatus('Connected', 'connected');
-      startHeartbeat();
-      subscribeToActiveGroup();
-    }, (err) => {
-      console.error('WebSocket connection failed', err);
-      handleDisconnect();
+      socket.onclose = () => {
+        if (groupChatState.connected || groupChatState.connecting) {
+          handleDisconnect();
+        }
+        finish(false);
+      };
+
+      client.connect({}, () => {
+        groupChatState.connected = true;
+        groupChatState.connecting = false;
+        setConnectionStatus('Connected', 'connected');
+        startHeartbeat();
+        subscribeToActiveGroup();
+        finish(true);
+      }, (err) => {
+        console.error('WebSocket connection failed', err);
+        handleDisconnect();
+        finish(false);
+      });
     });
+
+    return groupChatState.connectPromise;
   }
 
   function handleDisconnect() {
@@ -822,13 +856,16 @@
     groupChatState.stompClient = null;
     groupChatState.socket = null;
     setConnectionStatus('Disconnected', 'disconnected');
-    scheduleReconnect();
+    if (groupChatState.allowReconnect) {
+      scheduleReconnect();
+    }
   }
 
   function scheduleReconnect() {
     if (groupChatState.reconnectTimer) return;
     groupChatState.reconnectTimer = window.setTimeout(() => {
       groupChatState.reconnectTimer = null;
+      if (!groupChatState.allowReconnect) return;
       ensureConnected();
     }, groupChatState.reconnectDelayMs);
   }
@@ -980,8 +1017,6 @@
 
     if (!text && !image) return;
 
-    if (!text && !image) return;
-
     const sent = sendGroupEvent('sendMessage', {
       message: text,
       image: image,
@@ -995,12 +1030,17 @@
     sendGroupEvent('typingStop', {}, true);
   };
 
-  function startChatPolling() {
-    ensureConnected();
-    subscribeToActiveGroup();
+  async function startChatPolling() {
+    groupChatState.allowReconnect = true;
+    if (groupChatState.connected) {
+      subscribeToActiveGroup();
+      return;
+    }
+    await ensureConnected();
   }
 
   function stopChatPolling() {
+    groupChatState.allowReconnect = false;
     stopHeartbeat();
     if (groupChatState.subscription) {
       try {
@@ -1177,8 +1217,8 @@
   }
 
   window.openGroupChatFromDashboard = async function () {
-    const groupName = document.getElementById('dashboardGroupName').textContent || 'Group';
-    const groupMeta = document.getElementById('dashboardGroupMeta').textContent || '';
+    const groupName = document.getElementById('dashboardGroupName')?.textContent || 'Group';
+    const groupMeta = document.getElementById('dashboardGroupMeta')?.textContent || '';
 
     activeChatGroupName = groupName;
 
@@ -1201,7 +1241,7 @@
       await resolveActiveGroupId(groupName);
       await fetchChatMessages();
       await fetchSharedFiles();
-      startChatPolling();
+      await startChatPolling();
     } catch (err) {
       console.error('Failed to open chat', err);
     }
