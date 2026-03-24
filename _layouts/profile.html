@@ -1579,7 +1579,7 @@ active_tab: profile
         captureBtn.disabled = true;
 
         try {
-            // 1. Register with Flask (for real-time recognition)
+            // 1. Get embedding from Flask (to verify face detection)
             const flaskResp = await fetch(`${pythonURI}/api/face/register`, {
                 ...fetchOptions,
                 method: 'POST',
@@ -1589,9 +1589,15 @@ active_tab: profile
                 })
             });
 
-            if (!flaskResp.ok) throw new Error("Flask registration failed");
+            if (!flaskResp.ok) {
+                const errorData = await flaskResp.json();
+                throw new Error(errorData.message || "Face analysis failed. Please ensure your face is clearly visible and well-lit.");
+            }
 
-            // 2. Persist in Spring (for long-term storage)
+            status.textContent = "Face verified! Saving to profile...";
+            status.className = "text-blue-500 font-bold mt-2";
+
+            // 2. Persist base64 image in Spring (Centralized Storage)
             const springResp = await fetch(`${javaURI}/api/person/update`, {
                 ...fetchOptions,
                 method: 'POST',
@@ -1600,11 +1606,12 @@ active_tab: profile
                 })
             });
 
-            if (!springResp.ok) throw new Error("Spring persistence failed");
+            if (!springResp.ok) throw new Error("Database update failed. Please try again.");
 
             status.textContent = "Registration successful!";
+            status.className = "text-green-500 font-bold mt-2";
             updateRegistrationStatus(true);
-            setTimeout(closeScanner, 1500);
+            setTimeout(closeScanner, 2000);
 
             if (window.showToast) {
                 showToast({
@@ -1614,8 +1621,8 @@ active_tab: profile
                 });
             }
         } catch (err) {
-            console.error(err);
-            status.textContent = "Registration failed. Try again.";
+            console.error("Registration error:", err);
+            status.textContent = "Error: " + err.message;
         } finally {
             captureBtn.disabled = false;
         }

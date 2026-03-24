@@ -54,6 +54,11 @@ permalink: /student/bathroom_pass
                         
                         <!-- Scanning Line -->
                         <div id="scanLine" class="hidden absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent shadow-[0_0_20px_rgba(99,102,241,0.5)] z-10"></div>
+                        
+                        <!-- Scan Status -->
+                        <div id="scanStatus" class="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-black/50 backdrop-blur-sm text-[10px] font-bold text-white uppercase tracking-widest hidden">
+                            Scanning...
+                        </div>
                     </div>
 
                     <!-- Idle Overlay -->
@@ -136,7 +141,7 @@ permalink: /student/bathroom_pass
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { showToast } from "{{site.baseurl}}/assets/js/aesthetihawk/shared/toastHandler.js";
 
-    const TEACHER_EMAIL = "tjmckeo@gmail.com";
+    const TEACHER_EMAIL = "jmort1021@gmail.com"; 
     let scanStream = null;
     let identifiedPerson = null;
     let isProcessing = false;
@@ -160,6 +165,13 @@ permalink: /student/bathroom_pass
 
     async function startIdentificationLoop() {
         if (!scanStream || isProcessing) return;
+        isProcessing = true;
+        
+        const status = document.getElementById('scanStatus');
+        if (status) {
+            status.textContent = "Analyzing...";
+            status.classList.remove('hidden');
+        }
         
         const video = document.getElementById('scanVideo');
         const canvas = document.getElementById('scanCanvas');
@@ -184,13 +196,32 @@ permalink: /student/bathroom_pass
             const result = await resp.json();
             
             if (result.match) {
+                if (status) status.classList.add('hidden');
                 showIdentification(result.name);
             } else {
-                setTimeout(startIdentificationLoop, 1000);
+                if (status) {
+                    status.textContent = result.message || "No Match";
+                    status.classList.remove('text-white');
+                    status.classList.add('text-red-400');
+                }
+                setTimeout(() => {
+                    isProcessing = false;
+                    if (status) {
+                        status.classList.add('hidden');
+                        status.classList.remove('text-red-400');
+                        status.classList.add('text-white');
+                    }
+                    startIdentificationLoop();
+                }, 2000);
             }
         } catch (err) {
             console.error(err);
-            setTimeout(startIdentificationLoop, 3000);
+            if (status) status.textContent = "Error";
+            setTimeout(() => {
+                isProcessing = false;
+                if (status) status.classList.add('hidden');
+                startIdentificationLoop();
+            }, 3000);
         }
     }
 
@@ -198,12 +229,27 @@ permalink: /student/bathroom_pass
         identifiedPerson = name;
         document.getElementById('idName').textContent = name;
         document.getElementById('idInitials').textContent = name.substring(0, 2).toUpperCase();
+        
+        // Find if user is already in queue
+        const list = document.getElementById('queueList');
+        const isInQueue = Array.from(list.querySelectorAll('h4')).some(h4 => h4.textContent === name);
+        
+        const confirmBtn = document.querySelector('#idOverlay button[onclick="confirmIdentity()"]');
+        if (isInQueue) {
+            confirmBtn.textContent = "Check In";
+            confirmBtn.className = "flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all";
+        } else {
+            confirmBtn.textContent = "Check Out";
+            confirmBtn.className = "flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all";
+        }
+
         document.getElementById('idOverlay').classList.remove('hidden');
         document.getElementById('scanLine').classList.add('hidden');
     }
 
     function resetId() {
         identifiedPerson = null;
+        isProcessing = false;
         document.getElementById('idOverlay').classList.add('hidden');
         document.getElementById('scanLine').classList.remove('hidden');
         startIdentificationLoop();
@@ -251,10 +297,18 @@ permalink: /student/bathroom_pass
     async function refreshQueue() {
         try {
             const resp = await fetch(`${javaURI}/api/bathroom/queue/${TEACHER_EMAIL}`, fetchOptions);
+            if (!resp.ok) {
+                if (resp.status === 404) {
+                    // Queue doesn't exist yet, handle gracefully
+                    updateQueueUI({ away: 0, maxOccupancy: 1, peopleQueue: "" });
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${resp.status}`);
+            }
             const data = await resp.json();
             updateQueueUI(data);
         } catch (err) {
-            console.error(err);
+            console.error("Refresh Queue Error:", err);
         }
     }
 
