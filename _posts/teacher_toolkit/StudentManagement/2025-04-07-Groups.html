@@ -134,6 +134,21 @@ comments: false
         </button>
       </div>
 
+      <!-- Groups List -->
+      <div id="groupsContainer" class="space-y-3 mb-6">
+        <!-- Groups will be injected here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-12 text-gray-400 mb-6">
+        <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+          </path>
+        </svg>
+        <p class="text-lg">No groups found</p>
+      </div>
+
       <!-- Add Group Section -->
       <div id="addGroupSection" class="mb-6 bg-neutral-700 border-2 border-dashed border-neutral-600 rounded-lg p-6">
         <div id="addGroupCollapsed" class="cursor-pointer" onclick="toggleAddGroup()">
@@ -650,7 +665,7 @@ comments: false
       let loadingCount = 0;  // Track concurrent loading operations
       let isAdmin = false;   // Track if current user is an admin
       let selectedUsersForGroup = {}; // Track multi-select members per group
-      let collapsedGroups = {}; // Track collapsed state per group ID
+      let isSearchMode = false;  // Track if we're in search mode to disable collapse
 
       // Chat state
       let activeChatGroupId = null;
@@ -689,6 +704,7 @@ comments: false
       // Search groups using API with chaining for better performance
       window.searchGroups = function () {
         const searchTerm = document.getElementById("searchInput").value.trim();
+        isSearchMode = !!searchTerm;
         const url = searchTerm
           ? `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`
           : `${javaURI}/api/groups`;
@@ -1112,13 +1128,14 @@ comments: false
           const el = document.createElement("div");
           el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
 
-          const isCollapsed = collapsedGroups[group.id] !== false;
+          const isCollapsed = isSearchMode ? false : (collapsedGroups[group.id] !== false);
 
           el.innerHTML = `
       <!-- Header -->
       <div class="flex justify-between items-start">
         <div class="flex items-center gap-2">
           <!-- Toggle visibility button -->
+          ${!isSearchMode ? `
           <button
             class="w-8 h-8 flex items-center justify-center rounded bg-neutral-600 hover:bg-neutral-500 text-gray-300 hover:text-white transition-colors"
             title="${isCollapsed ? 'Show' : 'Hide'} member details"
@@ -1134,6 +1151,7 @@ comments: false
               </svg>
             `}
           </button>
+          ` : ''}
           <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
             <h4 class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">${group.name}</h4>
             <p class="text-sm text-gray-400">
