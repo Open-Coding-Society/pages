@@ -88,41 +88,6 @@ permalink: /student/bathroom_pass
                         </div>
                     </div>
                 </div>
-
-                <!-- Admin & Calibration Controls -->
-                <div class="mt-8 flex flex-wrap gap-4">
-                    <div class="flex-1 min-w-[200px] bg-neutral-900/50 p-4 rounded-2xl border border-neutral-800">
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-[10px] uppercase tracking-widest text-neutral-500 font-black">Matching Threshold</label>
-                            <span id="thresholdValue" class="text-xs font-bold text-indigo-400">0.40</span>
-                        </div>
-                        <input type="range" id="thresholdLimit" min="0.1" max="0.9" step="0.01" value="0.40" 
-                               class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-                               oninput="document.getElementById('thresholdValue').textContent = this.value">
-                        <p class="text-[9px] text-neutral-600 mt-2 italic">Lower = Stricter, Higher = More Lenient</p>
-                    </div>
-                <!-- Emergency Manual Entry -->
-                <div class="mt-8 bg-neutral-900/50 backdrop-blur-xl p-6 rounded-3xl border border-neutral-800 shadow-2xl">
-                    <h3 class="text-sm font-black text-white uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                        Manual Override
-                    </h3>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <div class="flex-1 relative">
-                            <input type="text" id="emergencyName" placeholder="Enter student name..." 
-                                   class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/20 transition-all text-sm">
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="emergencyCheckIn()" class="flex-1 sm:flex-none px-6 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-xl font-bold text-xs transition-all border border-indigo-500/20 uppercase tracking-widest">
-                                Check In
-                            </button>
-                            <button onclick="emergencyCheckOut()" class="flex-1 sm:flex-none px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-bold text-xs transition-all border border-red-500/20 uppercase tracking-widest">
-                                Check Out
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-[9px] text-neutral-600 mt-3 italic">Use only if facial recognition is unavailable or failing.</p>
-                </div>
             </div>
         </div>
 
@@ -146,6 +111,41 @@ permalink: /student/bathroom_pass
                             <svg class="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
                         </div>
                         <p class="text-neutral-500 font-medium">Queue is currently empty</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM ROW: Controls and Manual Override -->
+        <div class="lg:col-span-12 space-y-8 mt-4">
+            <!-- Matching Threshold -->
+            <div class="bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800 shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-black text-white uppercase tracking-widest">Matching Threshold</h3>
+                    <span id="thresholdValue" class="text-xs font-bold text-indigo-400">0.40</span>
+                </div>
+                <input type="range" id="thresholdLimit" min="0.1" max="0.9" step="0.01" value="0.40" 
+                       class="w-full h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                       oninput="document.getElementById('thresholdValue').textContent = this.value">
+                <p class="text-[10px] text-neutral-500 mt-2 italic">Lower = Stricter, Higher = More Lenient</p>
+            </div>
+
+            <!-- Manual Override -->
+            <div class="bg-neutral-900/50 backdrop-blur-xl p-8 rounded-3xl border border-neutral-800 shadow-2xl">
+                <h3 class="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Manual Override
+                </h3>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="emergencyName" placeholder="Enter student name manually..." 
+                           class="flex-1 bg-neutral-950 border border-neutral-800 rounded-2xl px-6 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium">
+                    <div class="flex gap-3">
+                        <button onclick="emergencyCheckIn()" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
+                            Check In
+                        </button>
+                        <button onclick="emergencyCheckOut()" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
+                            Check Out
+                        </button>
                     </div>
                 </div>
             </div>
