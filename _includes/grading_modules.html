@@ -45,7 +45,6 @@ window.PageFeatures.grading_modules = true;
     background: var(--muted, #f5f5f5);
   }
 
-  /* Action buttons inside table */
   .grading-table td button {
     display: inline-block !important;
     visibility: visible !important;
@@ -64,7 +63,6 @@ window.PageFeatures.grading_modules = true;
     background: var(--muted, #f0f0f0);
   }
 
-  /* Forms */
   #grade-create-form input,
   #grade-edit-form input {
     display: block;
@@ -83,7 +81,6 @@ window.PageFeatures.grading_modules = true;
     color: var(--muted-foreground, #888);
   }
 
-  /* Buttons */
   .btn-primary {
     background: var(--primary, #2563eb);
     color: var(--primary-foreground, #fff);
@@ -95,9 +92,7 @@ window.PageFeatures.grading_modules = true;
     margin-right: 0.5rem;
   }
 
-  .btn-primary:hover {
-    opacity: 0.9;
-  }
+  .btn-primary:hover { opacity: 0.9; }
 
   .btn-secondary {
     background: var(--muted, #e5e7eb);
@@ -109,11 +104,8 @@ window.PageFeatures.grading_modules = true;
     font-size: 0.9rem;
   }
 
-  .btn-secondary:hover {
-    opacity: 0.85;
-  }
+  .btn-secondary:hover { opacity: 0.85; }
 
-  /* Dropdown */
   .grading-dropdown {
     position: relative;
     display: inline-block;
@@ -146,9 +138,7 @@ window.PageFeatures.grading_modules = true;
     overflow: hidden;
   }
 
-  .grading-dropdown-content.show {
-    display: block;
-  }
+  .grading-dropdown-content.show { display: block; }
 
   .grading-dropdown-item {
     display: block;
@@ -162,18 +152,14 @@ window.PageFeatures.grading_modules = true;
     font-size: 0.875rem;
   }
 
-  .grading-dropdown-item:hover {
-    background: var(--muted, #f5f5f5);
-  }
+  .grading-dropdown-item:hover { background: var(--muted, #f5f5f5); }
 
-  /* Status */
   #grading-status {
     margin-top: 0.75rem;
     font-size: 0.875rem;
     min-height: 1.2em;
   }
 
-  /* Modals */
   .grading-modal-backdrop {
     display: none;
     position: fixed;
@@ -185,9 +171,7 @@ window.PageFeatures.grading_modules = true;
     justify-content: center;
   }
 
-  .grading-modal-backdrop.show {
-    display: flex;
-  }
+  .grading-modal-backdrop.show { display: flex; }
 
   .grading-modal-box {
     background: var(--background, #fff);
@@ -246,7 +230,6 @@ window.PageFeatures.grading_modules = true;
 <div id="grading-module-widget">
   <div id="grading-module" class="grading-module-panel" style="display:none;">
     <h2>Grades Admin</h2>
-
     <section>
       <form id="grade-create-form">
         <input name="uid" placeholder="Student UID" required />
@@ -278,7 +261,6 @@ window.PageFeatures.grading_modules = true;
         <button type="button" id="grade-edit-cancel" class="btn-secondary">Cancel</button>
       </form>
     </section>
-
     <div id="grading-status"></div>
   </div>
 </div>
@@ -328,7 +310,7 @@ window.PageFeatures.grading_modules = true;
 
   if (!window.PageFeatures?.grading_modules) return;
 
-  const API_BASE = 'http://localhost:4500/api';
+  const API_BASE = 'http://localhost:8585/api';
   const ENDPOINTS = { grades: `${API_BASE}/grades` };
 
   let gradesCache = [];
@@ -356,9 +338,80 @@ window.PageFeatures.grading_modules = true;
   function showModal(id) { document.getElementById(id)?.classList.add('show'); }
   function hideModal(id) { document.getElementById(id)?.classList.remove('show'); }
 
-  /* ===================== MICROBLOG DROPDOWN ===================== */
+  /* ===================== HELPERS ===================== */
+  function getCurrentUid() {
+    const user = window.currentUser || window.App?.user || window.user || {};
+    return user.uid || user.username || user.email || '';
+  }
+
+  function isAdminUser() {
+    const user = window.currentUser || window.App?.user || window.user || {};
+    const roles = user.roles || [];
+    return user.uid === 'toby' || roles.includes('admin') || roles.includes('ADMIN');
+  }
+
+  function toggleModule() {
+    const el = document.getElementById('grading-module');
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function setStatus(msg, err = false) {
+    const statusEl = document.getElementById('grading-status');
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.style.color = err
+      ? 'var(--destructive, #dc2626)'
+      : 'var(--success, #16a34a)';
+  }
+
+  function getFormData(form) {
+    const f = new FormData(form);
+    return {
+      uid:             f.get('uid')?.trim() || getCurrentUid(),
+      assignment:      f.get('assignment')?.trim(),
+      score:           parseFloat(f.get('score')),
+      teacherComments: f.get('teacherComments')?.trim(),
+      submission:      f.get('submission')?.trim()
+    };
+  }
+
+  /* ===================== RENDER ===================== */
+  async function loadGrades() {
+    try {
+      gradesCache = await GradeAPI.getAll();
+      renderTable();
+    } catch (e) {
+      setStatus('Failed to load grades: ' + e.message, true);
+    }
+  }
+
+  function renderTable() {
+    const tableBody = document.querySelector('#grades-table tbody');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+    gradesCache.forEach(g => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${g.id}</td>
+        <td>${g.uid}</td>
+        <td>${g.assignment}</td>
+        <td>${g.score ?? ''}</td>
+        <td>${g.teacherComments ?? ''}</td>
+        <td>${g.submission ?? ''}</td>
+        <td>
+          <button data-action="edit"   data-id="${g.id}">Edit</button>
+          <button data-action="submit" data-id="${g.id}">Submit</button>
+          <button data-action="delete" data-id="${g.id}">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  /* ===================== ALL WIRING INSIDE DOMContentLoaded ===================== */
   document.addEventListener('DOMContentLoaded', () => {
 
+    /* --- Dropdown injection --- */
     const microblogHeader = document.querySelector('.microblog-panel-header');
     const insertTarget = microblogHeader || document.body;
 
@@ -383,7 +436,7 @@ window.PageFeatures.grading_modules = true;
       insertTarget.insertAdjacentHTML('afterbegin', dropdownHTML);
     }
 
-    // Toggle dropdown
+    /* --- Dropdown toggle --- */
     document.getElementById('grading-dropdown-toggle')?.addEventListener('click', (e) => {
       e.stopPropagation();
       document.getElementById('grading-dropdown-menu')?.classList.toggle('show');
@@ -395,15 +448,15 @@ window.PageFeatures.grading_modules = true;
       }
     });
 
-    // Open admin panel — loads grades only when opened, no init ping
+    /* --- Admin panel open --- */
     document.getElementById('open-grades-admin')?.addEventListener('click', () => {
       if (!isAdminUser()) { setStatus('Access denied: admin user required', true); return; }
       document.getElementById('grading-dropdown-menu')?.classList.remove('show');
       toggleModule();
-      loadGrades();
+      loadGrades(); // ← only fires when admin clicks, never on page load
     });
 
-    // ===================== SUBMIT CURRENT PAGE =====================
+    /* --- Submit current page --- */
     document.getElementById('submit-current-page')?.addEventListener('click', () => {
       document.getElementById('grading-dropdown-menu')?.classList.remove('show');
 
@@ -421,12 +474,14 @@ window.PageFeatures.grading_modules = true;
       window._pendingGradePayload = {
         uid, assignment: filename, score: 0.0,
         teacherComments: 'Auto-submitted from student page',
-        submission: submissionUrl, submittedAt: new Date().toISOString()
+        submission: submissionUrl,
+        submittedAt: new Date().toISOString()
       };
 
       showModal('grade-confirm-modal');
     });
 
+    /* --- Confirm modal --- */
     document.getElementById('confirm-cancel-btn')?.addEventListener('click', () => {
       hideModal('grade-confirm-modal');
       window._pendingGradePayload = null;
@@ -441,7 +496,6 @@ window.PageFeatures.grading_modules = true;
         await GradeAPI.create(payload);
         setStatus('Progress submitted successfully');
         alert('Progress submitted successfully!');
-        loadGrades();
       } catch (err) {
         document.getElementById('manual-error-msg').textContent =
           `Could not reach backend: "${err?.message || 'fetch failed'}". Fill in manually and retry.`;
@@ -453,6 +507,7 @@ window.PageFeatures.grading_modules = true;
       }
     });
 
+    /* --- Manual fallback modal --- */
     document.getElementById('manual-cancel-btn')?.addEventListener('click', () => hideModal('grade-manual-modal'));
 
     document.getElementById('manual-send-btn')?.addEventListener('click', async () => {
@@ -461,184 +516,117 @@ window.PageFeatures.grading_modules = true;
       const submission = document.getElementById('manual-submission').value.trim();
       const comments   = document.getElementById('manual-comments').value.trim();
 
-      if (!uid)        { alert('UID is required.');              return; }
-      if (!assignment) { alert('Assignment is required.');       return; }
-      if (!submission) { alert('Submission URL is required.');   return; }
+      if (!uid)        { alert('UID is required.');            return; }
+      if (!assignment) { alert('Assignment is required.');     return; }
+      if (!submission) { alert('Submission URL is required.'); return; }
 
       try {
-        await GradeAPI.create({ uid, assignment, score: 0.0,
+        await GradeAPI.create({
+          uid, assignment, score: 0.0,
           teacherComments: comments || 'Manually submitted',
-          submission, submittedAt: new Date().toISOString() });
+          submission, submittedAt: new Date().toISOString()
+        });
         hideModal('grade-manual-modal');
         setStatus('Progress submitted successfully');
         alert('Progress submitted successfully!');
-        loadGrades();
       } catch (err) {
         document.getElementById('manual-error-msg').textContent =
           `Still failing: ${err?.message || 'unknown error'}. Check your network or backend.`;
       }
     });
-  });
 
-  /* ===================== HELPERS ===================== */
-  function getCurrentUid() {
-    const user = window.currentUser || window.App?.user || window.user || {};
-    return user.uid || user.username || user.email || '';
-  }
-
-  function isAdminUser() {
-    const user = window.currentUser || window.App?.user || window.user || {};
-    const roles = user.roles || [];
-    return user.uid === 'toby' || roles.includes('admin') || roles.includes('ADMIN');
-  }
-
-  function toggleModule() {
-    const el = document.getElementById('grading-module');
-    el.style.display = el.style.display === 'block' ? 'none' : 'block';
-  }
-
-  /* ===================== DOM ===================== */
-  const tableBody = document.querySelector('#grades-table tbody');
-  const createForm = document.getElementById('grade-create-form');
-  const editForm   = document.getElementById('grade-edit-form');
-  const statusEl   = document.getElementById('grading-status');
-
-  function setStatus(msg, err = false) {
-    statusEl.textContent = msg;
-    statusEl.style.color = err
-      ? 'var(--destructive, #dc2626)'
-      : 'var(--success, #16a34a)';
-  }
-
-  function getFormData(form) {
-    const f = new FormData(form);
-    return {
-      uid:            f.get('uid')?.trim() || getCurrentUid(),
-      assignment:     f.get('assignment')?.trim(),
-      score:          parseFloat(f.get('score')),
-      teacherComments: f.get('teacherComments')?.trim(),
-      submission:     f.get('submission')?.trim()
-    };
-  }
-
-  /* ===================== RENDER ===================== */
-  async function loadGrades() {
-    try {
-      gradesCache = await GradeAPI.getAll();
-      renderTable();
-    } catch (e) {
-      setStatus('Failed to load grades: ' + e.message, true);
-    }
-  }
-
-  function renderTable() {
-    tableBody.innerHTML = '';
-    gradesCache.forEach(g => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${g.id}</td>
-        <td>${g.uid}</td>
-        <td>${g.assignment}</td>
-        <td>${g.score ?? ''}</td>
-        <td>${g.teacherComments ?? ''}</td>
-        <td>${g.submission ?? ''}</td>
-        <td>
-          <button data-action="edit"   data-id="${g.id}">Edit</button>
-          <button data-action="submit" data-id="${g.id}">Submit</button>
-          <button data-action="delete" data-id="${g.id}">Delete</button>
-        </td>
-      `;
-      tableBody.appendChild(row);
-    });
-  }
-
-  /* ===================== CRUD ===================== */
-  createForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!isAdminUser()) { setStatus('Access denied: admin user required', true); return; }
-    try {
-      await GradeAPI.create(getFormData(createForm));
-      createForm.reset();
-      setStatus('Created');
-      loadGrades();
-    } catch (e) { setStatus(e.message, true); }
-  });
-
-  editForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!isAdminUser()) { setStatus('Access denied: admin user required', true); return; }
-    const id = new FormData(editForm).get('id');
-    try {
-      await GradeAPI.update(id, getFormData(editForm));
-      editForm.reset();
-      editForm.style.display = 'none';
-      setStatus('Updated');
-      loadGrades();
-    } catch (e) { setStatus(e.message, true); }
-  });
-
-  document.getElementById('grade-edit-cancel').onclick = () => { editForm.style.display = 'none'; };
-
-  tableBody.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const id = btn.dataset.id;
-
-    if (btn.dataset.action === 'delete') {
-      if (!confirm('Delete?')) return;
-      await GradeAPI.delete(id);
-      loadGrades();
-      return;
-    }
-
-    if (btn.dataset.action === 'submit') {
-      const g = gradesCache.find(x => x.id == id);
-      if (!g) return;
-      let submissionText = prompt('Submission text or URL:', g.submission || '');
-      if (submissionText === null) return;
-      if (!submissionText.trim()) {
-        submissionText = prompt('Please enter a non-empty submission URL/text:', '');
-        if (submissionText === null || !submissionText.trim()) {
-          setStatus('Submission required', true);
-          alert('Submission cancelled: value required.');
-          return;
-        }
-      }
-      const payload = {
-        uid: g.uid || getCurrentUid() || prompt('Enter UID:', ''),
-        assignment: g.assignment || prompt('Enter assignment URL:', ''),
-        score: g.score || 0.0,
-        teacherComments: g.teacherComments || '',
-        submission: submissionText.trim(),
-        submittedAt: new Date().toISOString()
-      };
+    /* --- Create form --- */
+    document.getElementById('grade-create-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!isAdminUser()) { setStatus('Access denied: admin user required', true); return; }
       try {
-        await GradeAPI.submit(id, payload);
-        setStatus('Submission updated');
-        alert('Submission updated successfully!');
+        await GradeAPI.create(getFormData(e.target));
+        e.target.reset();
+        setStatus('Created');
         loadGrades();
-      } catch (err) {
-        setStatus(err?.message || 'Submit failed', true);
-        alert('Submission failed: ' + (err?.message || 'unknown error'));
+      } catch (err) { setStatus(err.message, true); }
+    });
+
+    /* --- Edit form --- */
+    document.getElementById('grade-edit-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!isAdminUser()) { setStatus('Access denied: admin user required', true); return; }
+      const id = new FormData(e.target).get('id');
+      try {
+        await GradeAPI.update(id, getFormData(e.target));
+        e.target.reset();
+        e.target.style.display = 'none';
+        setStatus('Updated');
+        loadGrades();
+      } catch (err) { setStatus(err.message, true); }
+    });
+
+    document.getElementById('grade-edit-cancel')?.addEventListener('click', () => {
+      document.getElementById('grade-edit-form').style.display = 'none';
+    });
+
+    /* --- Table action delegation --- */
+    document.querySelector('#grades-table tbody')?.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const id = btn.dataset.id;
+
+      if (btn.dataset.action === 'delete') {
+        if (!confirm('Delete?')) return;
+        try {
+          await GradeAPI.delete(id);
+          loadGrades();
+        } catch (err) { setStatus(err.message, true); }
+        return;
       }
-      return;
-    }
 
-    if (btn.dataset.action === 'edit') {
-      const g = gradesCache.find(x => x.id == id);
-      if (!g) return;
-      Object.entries(g).forEach(([k, v]) => {
-        const input = editForm.querySelector(`[name="${k}"]`);
-        if (input) input.value = v ?? '';
-      });
-      editForm.style.display = 'block';
-    }
+      if (btn.dataset.action === 'submit') {
+        const g = gradesCache.find(x => x.id == id);
+        if (!g) return;
+        let submissionText = prompt('Submission text or URL:', g.submission || '');
+        if (submissionText === null) return;
+        if (!submissionText.trim()) {
+          submissionText = prompt('Please enter a non-empty submission URL/text:', '');
+          if (submissionText === null || !submissionText.trim()) {
+            setStatus('Submission required', true);
+            alert('Submission cancelled: value required.');
+            return;
+          }
+        }
+        const payload = {
+          uid:             g.uid || getCurrentUid(),
+          assignment:      g.assignment,
+          score:           g.score || 0.0,
+          teacherComments: g.teacherComments || '',
+          submission:      submissionText.trim(),
+          submittedAt:     new Date().toISOString()
+        };
+        try {
+          await GradeAPI.submit(id, payload);
+          setStatus('Submission updated');
+          alert('Submission updated successfully!');
+          loadGrades();
+        } catch (err) {
+          setStatus(err?.message || 'Submit failed', true);
+          alert('Submission failed: ' + (err?.message || 'unknown error'));
+        }
+        return;
+      }
+
+      if (btn.dataset.action === 'edit') {
+        const g = gradesCache.find(x => x.id == id);
+        if (!g) return;
+        const editForm = document.getElementById('grade-edit-form');
+        Object.entries(g).forEach(([k, v]) => {
+          const input = editForm.querySelector(`[name="${k}"]`);
+          if (input) input.value = v ?? '';
+        });
+        editForm.style.display = 'block';
+      }
+    });
+
+    /* ---- NO automatic backend call here — nothing fires on page load ---- */
   });
-
-  /* ===================== INIT =====================
-     No backend ping on page load — grades only load
-     when admin explicitly opens the panel.
-  ====================================================*/
 
 })();
 </script>
