@@ -101,6 +101,27 @@ permalink: /student/bathroom_pass
                                oninput="document.getElementById('thresholdValue').textContent = this.value">
                         <p class="text-[9px] text-neutral-600 mt-2 italic">Lower = Stricter, Higher = More Lenient</p>
                     </div>
+                <!-- Emergency Manual Entry -->
+                <div class="mt-8 bg-neutral-900/50 backdrop-blur-xl p-6 rounded-3xl border border-neutral-800 shadow-2xl">
+                    <h3 class="text-sm font-black text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Manual Override
+                    </h3>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex-1 relative">
+                            <input type="text" id="emergencyName" placeholder="Enter student name..." 
+                                   class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-3 text-white placeholder-neutral-600 focus:outline-none focus:border-red-500/50 focus:ring-1 focus:ring-red-500/20 transition-all text-sm">
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="emergencyCheckIn()" class="flex-1 sm:flex-none px-6 py-3 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-xl font-bold text-xs transition-all border border-indigo-500/20 uppercase tracking-widest">
+                                Check In
+                            </button>
+                            <button onclick="emergencyCheckOut()" class="flex-1 sm:flex-none px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-bold text-xs transition-all border border-red-500/20 uppercase tracking-widest">
+                                Check Out
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-[9px] text-neutral-600 mt-3 italic">Use only if facial recognition is unavailable or failing.</p>
                 </div>
             </div>
         </div>
@@ -391,11 +412,78 @@ permalink: /student/bathroom_pass
         }
     }
 
+    async function emergencyCheckIn() {
+        const nameInput = document.getElementById('emergencyName');
+        const name = nameInput.value.trim();
+        
+        if (!name) {
+            showToast({ message: "Please enter a name", duration: 3000 });
+            return;
+        }
+
+        const queueUrl = `${javaURI}/api/bathroom/add`;
+        try {
+            const resp = await fetch(queueUrl, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    teacherEmail: currentUserEmail,
+                    studentName: name
+                })
+            });
+            
+            if (resp.ok) {
+                showToast({ message: `Checked in: ${name}`, duration: 3000 });
+                nameInput.value = '';
+                refreshQueue();
+            } else {
+                const data = await resp.json();
+                showToast({ message: `Error: ${data.message || 'Check-in failed'}`, duration: 5000, style: { background: "#ef4444" }});
+            }
+        } catch (err) {
+            showToast({ message: "Server connection failed", duration: 5000, style: { background: "#ef4444" }});
+        }
+    }
+
+    async function emergencyCheckOut() {
+        const nameInput = document.getElementById('emergencyName');
+        const name = nameInput.value.trim();
+        
+        if (!name) {
+            showToast({ message: "Please enter a name", duration: 3000 });
+            return;
+        }
+
+        try {
+            const resp = await fetch(`${javaURI}/api/bathroom/remove`, {
+                ...fetchOptions,
+                method: 'DELETE',
+                body: JSON.stringify({
+                    teacherEmail: currentUserEmail,
+                    studentName: name
+                })
+            });
+            
+            if (resp.ok) {
+                showToast({ message: `Checked out: ${name}`, duration: 3000 });
+                nameInput.value = '';
+                refreshQueue();
+            } else {
+                const data = await resp.json();
+                showToast({ message: `Error: ${data.message || 'Check-out failed'}`, duration: 5000, style: { background: "#ef4444" }});
+            }
+        } catch (err) {
+            showToast({ message: "Server connection failed", duration: 5000, style: { background: "#ef4444" }});
+        }
+    }
+
     // Export to window
     window.startScanning = startScanning;
     window.confirmIdentity = confirmIdentity;
     window.resetId = resetId;
     window.returnFromBathroom = returnFromBathroom;
+    window.emergencyCheckIn = emergencyCheckIn;
+    window.emergencyCheckOut = emergencyCheckOut;
 
     // Polling for queue updates
     initializeCurrentUser();
