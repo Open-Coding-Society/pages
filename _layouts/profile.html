@@ -1579,19 +1579,7 @@ active_tab: profile
         captureBtn.disabled = true;
 
         try {
-            // 1. Register with Flask (for real-time recognition)
-            const flaskResp = await fetch(`${pythonURI}/api/face/register`, {
-                ...fetchOptions,
-                method: 'POST',
-                body: JSON.stringify({
-                    label: window.currentUid,
-                    image: base64Image
-                })
-            });
-
-            if (!flaskResp.ok) throw new Error("Flask registration failed");
-
-            // 2. Persist in Spring (for long-term storage)
+            // Persist in Spring (used for bathroom pass identification)
             const springResp = await fetch(`${javaURI}/api/person/update`, {
                 ...fetchOptions,
                 method: 'POST',
@@ -1599,6 +1587,7 @@ active_tab: profile
                     faceData: base64Image
                 })
             });
+
 
             if (!springResp.ok) throw new Error("Spring persistence failed");
 

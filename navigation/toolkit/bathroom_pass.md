@@ -136,10 +136,36 @@ permalink: /student/bathroom_pass
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { showToast } from "{{site.baseurl}}/assets/js/aesthetihawk/shared/toastHandler.js";
 
-    const TEACHER_EMAIL = "tjmckeo@gmail.com";
+    let currentUserEmail = null;
     let scanStream = null;
     let identifiedPerson = null;
     let isProcessing = false;
+
+    // Fetch current user email on load
+    async function initializeCurrentUser() {
+        try {
+            const resp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            if (resp.ok) {
+                const user = await resp.json();
+                currentUserEmail = user.email;
+                console.log("Current user email:", currentUserEmail);
+            } else {
+                console.error("Failed to fetch user - status:", resp.status);
+                showToast({ 
+                    message: "Failed to load user info. Make sure you're logged in.", 
+                    duration: 5000,
+                    style: { background: "#ef4444" }
+                });
+            }
+        } catch (err) {
+            console.error("Failed to fetch current user:", err);
+            showToast({ 
+                message: "Connection error. Check your network.", 
+                duration: 5000,
+                style: { background: "#ef4444" }
+            });
+        }
+    }
 
     async function startScanning() {
         const video = document.getElementById('scanVideo');
@@ -172,16 +198,40 @@ permalink: /student/bathroom_pass
         
         const threshold = document.getElementById('thresholdLimit').value;
         
+        // Get JWT token from cookies (Spring token for backend calls)
+        const jwtToken = document.cookie.split(';').find(c => c.trim().startsWith('jwt_java_spring='))?.split('=')[1];
+        
         try {
-            const resp = await fetch(`${pythonURI}/api/face/identify`, {
+            const resp = await fetch(`${javaURI}/api/person/identify`, {
                 ...fetchOptions,
                 method: 'POST',
+                headers: {
+                    ...fetchOptions.headers,
+                    ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
+                },
                 body: JSON.stringify({ 
                     image: base64Image,
                     threshold: threshold
                 })
             });
-            const result = await resp.json();
+
+            if (!resp.ok) {
+                console.error(`Face identify API returned ${resp.status}:`, resp.statusText);
+                const errorText = await resp.text();
+                console.error("Error response:", errorText);
+                setTimeout(startIdentificationLoop, 3000);
+                return;
+            }
+
+            let result;
+            try {
+                result = await resp.json();
+            } catch (parseErr) {
+                console.error("Failed to parse API response as JSON:", parseErr);
+                setTimeout(startIdentificationLoop, 3000);
+                return;
+            }
+            console.log("Identify result:", result);
             
             if (result.match) {
                 showIdentification(result.name);
@@ -189,7 +239,7 @@ permalink: /student/bathroom_pass
                 setTimeout(startIdentificationLoop, 1000);
             }
         } catch (err) {
-            console.error(err);
+            console.error("Identification error:", err);
             setTimeout(startIdentificationLoop, 3000);
         }
     }
@@ -220,7 +270,7 @@ permalink: /student/bathroom_pass
                 ...fetchOptions,
                 method: 'POST',
                 body: JSON.stringify({
-                    teacherEmail: TEACHER_EMAIL,
+                    teacherEmail: currentUserEmail,
                     studentName: identifiedPerson
                 })
             });
@@ -249,8 +299,9 @@ permalink: /student/bathroom_pass
     }
 
     async function refreshQueue() {
+        if (!currentUserEmail) return;
         try {
-            const resp = await fetch(`${javaURI}/api/bathroom/queue/${TEACHER_EMAIL}`, fetchOptions);
+            const resp = await fetch(`${javaURI}/api/bathroom/queue/${currentUserEmail}`, fetchOptions);
             const data = await resp.json();
             updateQueueUI(data);
         } catch (err) {
@@ -326,7 +377,7 @@ permalink: /student/bathroom_pass
                 ...fetchOptions,
                 method: 'DELETE',
                 body: JSON.stringify({
-                    teacherEmail: TEACHER_EMAIL,
+                    teacherEmail: currentUserEmail,
                     studentName: name
                 })
             });
@@ -347,6 +398,7 @@ permalink: /student/bathroom_pass
     window.returnFromBathroom = returnFromBathroom;
 
     // Polling for queue updates
+    initializeCurrentUser();
     setInterval(refreshQueue, 5000);
     document.addEventListener('DOMContentLoaded', refreshQueue);
 </script>
