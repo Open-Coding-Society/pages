@@ -449,13 +449,12 @@
   const chatSocketPort = 8589;
 
   function buildChatSocketEndpoint() {
-    const protocol = window.location.protocol;
-    const hostname = window.location.hostname;
-    const port = String(chatSocketPort);
-    const isDefaultHttp = protocol === 'http:' && port === '80';
-    const isDefaultHttps = protocol === 'https:' && port === '443';
-    const authority = (isDefaultHttp || isDefaultHttps) ? hostname : `${hostname}:${port}`;
-    return `${protocol}//${authority}/ws-chat`;
+    // JUST FOR TESTING, needs to be replaced in config.js for a more permanent implementation
+    const uri = new URL(javaURI);
+    if (uri.hostname === 'localhost' || uri.hostname === '127.0.0.1') {
+        return `${uri.protocol}//${uri.hostname}:${chatSocketPort}/ws-chat`;
+    }
+    return javaURI + '/ws-chat';
   }
 
   // Chat state
