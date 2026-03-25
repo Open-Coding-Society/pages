@@ -160,6 +160,7 @@ This is a safe environment where you can practice basic commands.
 * `touch <file>` → create a file
 * `cat <file>` → view file contents
 * `git clone <url>` → mock clone a repo
+* `clear` → clear terminal output
 * `pwd` → show current path
 * `help` → show commands
 
@@ -269,7 +270,7 @@ document.getElementById("commandInput").addEventListener("keydown", function(e) 
     print(`> ${input}`);
 
     if (input === "help") {
-      print("Commands: ls, cd <folder>, cd .., mkdir <folder>, touch <file>, cat <file>, git clone <url>, pwd, help");
+      print("Commands: ls, cd <folder>, cd .., mkdir <folder>, touch <file>, cat <file>, git clone <url>, clear, pwd, help");
     }
 
     else if (input === "ls") {
@@ -319,6 +320,11 @@ document.getElementById("commandInput").addEventListener("keydown", function(e) 
     else if (input.startsWith("git clone ")) {
       const url = input.split(" ").slice(2).join(" ").trim();
       print(mockClone(url));
+    }
+
+    else if (input === "clear") {
+      const terminal = document.getElementById("terminal");
+      terminal.innerHTML = "";
     }
 
     else if (input === "pwd") {
