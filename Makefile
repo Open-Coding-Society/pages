@@ -6,7 +6,8 @@ PYTHON := venv/bin/python3
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
 
-NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
+NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb' -not -name '* *')
+NOTEBOOK_FILES_WITH_SPACES := $(shell find _notebooks -name '*.ipynb' -name '* *')
 DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
 default: serve-current
@@ -146,6 +147,10 @@ clean-courses:
 
 # Notebook and DOCX conversion
 convert: $(MARKDOWN_FILES) convert-docx
+	@if [ -n "$(NOTEBOOK_FILES_WITH_SPACES)" ]; then \
+		echo "⚠ Skipping notebook files with spaces in filename (unsupported by make dependency parsing):"; \
+		find _notebooks -name '*.ipynb' -name '* *' -print | sed 's/^/  - /'; \
+	fi
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
 	@$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"

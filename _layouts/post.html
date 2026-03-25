@@ -282,6 +282,71 @@ Check if this is a course lesson and determine which course context to use
   </div>
 </div>
 
+<style>
+  .lesson-content-inner {
+    position: relative;
+    transition: filter 0.35s ease, transform 0.35s ease;
+  }
+
+  .lesson-content-inner.burning {
+    animation: lesson-burndown 1.1s ease forwards;
+  }
+
+  .lesson-content-inner.burned-down {
+    filter: grayscale(0.95) sepia(0.3) brightness(0.82) contrast(1.08);
+  }
+
+  .lesson-content-inner.burned-down::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 42px;
+    border-radius: 0 0 10px 10px;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 8% 8%, rgba(255, 255, 255, 0.18) 0, rgba(255, 255, 255, 0) 58%),
+      radial-gradient(circle at 26% 56%, rgba(245, 245, 245, 0.16) 0, rgba(245, 245, 245, 0) 42%),
+      radial-gradient(circle at 62% 38%, rgba(225, 225, 225, 0.14) 0, rgba(225, 225, 225, 0) 48%),
+      radial-gradient(circle at 86% 70%, rgba(205, 205, 205, 0.12) 0, rgba(205, 205, 205, 0) 52%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(43, 43, 43, 0.86) 72%, rgba(36, 36, 36, 0.93) 100%);
+  }
+
+  .lesson-item.is-burned .lesson-title::after {
+    content: ' · ashes';
+    font-size: 0.72rem;
+    color: #8f8f8f;
+  }
+
+  @keyframes lesson-burndown {
+    0% {
+      transform: scale(1);
+      filter: brightness(1);
+    }
+
+    45% {
+      transform: scale(0.995);
+      filter: brightness(0.68) sepia(0.22);
+    }
+
+    100% {
+      transform: scale(1);
+      filter: grayscale(0.95) sepia(0.3) brightness(0.82) contrast(1.08);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lesson-content-inner {
+      transition: none;
+    }
+
+    .lesson-content-inner.burning {
+      animation: none;
+    }
+  }
+</style>
+
 <script type="module">
   import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
@@ -291,8 +356,98 @@ Check if this is a course lesson and determine which course context to use
   const pageTitle = "{{ page.title }}";
 
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
+  const STORAGE_KEY_PREFIX = `${STORAGE_KEY}-`;
   // Use consistent lesson ID format (URL path without baseurl)
   const currentLessonId = '{{ page.url }}';
+
+  const CompletionStore = {
+    activeKey: STORAGE_KEY,
+    initialized: false,
+
+    loadRaw(key) {
+      try {
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : {};
+      } catch (e) {
+        return {};
+      }
+    },
+
+    saveRaw(key, data) {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {
+        console.error('Error saving completion data:', e);
+      }
+    },
+
+    async init() {
+      if (this.initialized) return;
+
+      try {
+        const uid = await getUid();
+        if (uid) {
+          this.activeKey = `${STORAGE_KEY_PREFIX}${uid}`;
+          const scopedData = this.loadRaw(this.activeKey);
+          const hasScopedData = Object.keys(scopedData).length > 0;
+
+          if (!hasScopedData) {
+            const legacyData = this.loadRaw(STORAGE_KEY);
+            if (Object.keys(legacyData).length > 0) {
+              this.saveRaw(this.activeKey, legacyData);
+            }
+          }
+        }
+      } catch (e) {
+        this.activeKey = STORAGE_KEY;
+      }
+
+      this.initialized = true;
+    },
+
+    load() {
+      return this.loadRaw(this.activeKey);
+    },
+
+    save(data) {
+      this.saveRaw(this.activeKey, data);
+    },
+
+    toggle(lessonId) {
+      const completionData = this.load();
+      const isCompleted = completionData[lessonId] || false;
+      completionData[lessonId] = !isCompleted;
+      this.save(completionData);
+      return !isCompleted;
+    }
+  };
+
+  const BurndownEffects = {
+    async applyForCurrentLesson(isCompleted, animate = false) {
+      const lessonContainer = document.querySelector('.lesson-content-inner');
+      if (!lessonContainer) return;
+
+      if (!isCompleted) {
+        lessonContainer.classList.remove('burning', 'burned-down');
+        return;
+      }
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!animate || prefersReducedMotion) {
+        lessonContainer.classList.remove('burning');
+        lessonContainer.classList.add('burned-down');
+        return;
+      }
+
+      lessonContainer.classList.remove('burned-down');
+      lessonContainer.classList.add('burning');
+
+      await new Promise(resolve => window.setTimeout(resolve, 1120));
+      lessonContainer.classList.remove('burning');
+      lessonContainer.classList.add('burned-down');
+    }
+  };
 
   // Toggle sprint expansion
   window.toggleSprint = function (sprintId) {
@@ -312,36 +467,26 @@ Check if this is a course lesson and determine which course context to use
 
   // Load completion data
   function loadCompletionData() {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {};
-    } catch (e) {
-      return {};
-    }
+    return CompletionStore.load();
   }
 
   // Save completion data
   function saveCompletionData(data) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (e) {
-      console.error('Error saving completion data:', e);
-    }
+    CompletionStore.save(data);
   }
 
   // Toggle lesson completion
-  window.toggleComplete = function () {
-    const completionData = loadCompletionData();
-    const isCompleted = completionData[currentLessonId] || false;
-    completionData[currentLessonId] = !isCompleted;
-    saveCompletionData(completionData);
+  window.toggleComplete = async function () {
+    await CompletionStore.init();
+    const isCompleted = CompletionStore.toggle(currentLessonId);
 
     updateCompleteButton();
     updateUI();
+    await BurndownEffects.applyForCurrentLesson(isCompleted, true);
 
     // Trigger cross-view sync by dispatching a custom event
     window.dispatchEvent(new CustomEvent('completionChanged', {
-      detail: { itemId: currentLessonId, completed: !isCompleted }
+      detail: { itemId: currentLessonId, completed: isCompleted }
     }));
   }
 
@@ -389,12 +534,16 @@ Check if this is a course lesson and determine which course context to use
       if (completionData[lessonId]) {
         icon.classList.remove('fa-circle', 'incomplete');
         icon.classList.add('fa-circle-check', 'completed');
+        item.classList.add('is-burned');
         completed++;
       } else {
         icon.classList.remove('fa-circle-check', 'completed');
         icon.classList.add('fa-circle', 'incomplete');
+        item.classList.remove('is-burned');
       }
     });
+
+    BurndownEffects.applyForCurrentLesson(!!completionData[currentLessonId], false);
 
     // Update progress bar
     if (document.getElementById('sidebar-progress')) {
@@ -460,7 +609,11 @@ Check if this is a course lesson and determine which course context to use
 
   // Listen for storage changes from other tabs/windows (cross-tab sync)
   window.addEventListener('storage', function (e) {
-    if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
+    const isCompletionKey = e.key === STORAGE_KEY
+      || e.key === CompletionStore.activeKey
+      || (typeof e.key === 'string' && e.key.startsWith(STORAGE_KEY_PREFIX));
+
+    if (isCompletionKey && document.querySelector('.lesson-player')) {
       updateCompleteButton();
       updateUI();
     }
@@ -638,11 +791,13 @@ Check if this is a course lesson and determine which course context to use
   });
 
   // Auto-expand current sprint
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', async function () {
     // Only initialize lesson player mode if we're in a lesson player
     if (document.querySelector('.lesson-player')) {
       initLessonPlayer();
     }
+
+    await CompletionStore.init();
 
     const activeLesson = document.querySelector('.lesson-item.active');
     if (activeLesson) {
