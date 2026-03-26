@@ -9,7 +9,8 @@ comments: false
 <div class="min-h-screen bg-neutral-900 py-10">
   <div class="max-w-6xl mx-auto px-4">
     <!-- Subtle Loading Indicator - inline badge style -->
-    <div id="loadingOverlay" class="hidden fixed bottom-4 right-4 z-40 bg-neutral-800/90 backdrop-blur-sm border border-neutral-700 rounded-full px-3 py-1.5 flex items-center gap-2 shadow-md text-xs">
+    <div id="loadingOverlay"
+      class="hidden fixed bottom-4 right-4 z-40 bg-neutral-800/90 backdrop-blur-sm border border-neutral-700 rounded-full px-3 py-1.5 flex items-center gap-2 shadow-md text-xs">
       <div class="loading-spinner"></div>
       <span id="loadingText" class="text-gray-400">Loading...</span>
     </div>
@@ -133,6 +134,21 @@ comments: false
         </button>
       </div>
 
+      <!-- Groups List -->
+      <div id="groupsContainer" class="space-y-3 mb-6">
+        <!-- Groups will be injected here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-12 text-gray-400 mb-6">
+        <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+          </path>
+        </svg>
+        <p class="text-lg">No groups found</p>
+      </div>
+
       <!-- Add Group Section -->
       <div id="addGroupSection" class="mb-6 bg-neutral-700 border-2 border-dashed border-neutral-600 rounded-lg p-6">
         <div id="addGroupCollapsed" class="cursor-pointer" onclick="toggleAddGroup()">
@@ -200,29 +216,33 @@ comments: false
         </div>
       </div>
 
-    <div class="mb-6 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-2 border-indigo-500/50 rounded-lg p-6">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+      <div
+        class="mb-6 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-2 border-indigo-500/50 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
+                </path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">AI-Powered Group Formation</h3>
+              <p class="text-sm text-gray-400">Create balanced groups based on student personas and team compatibility
+              </p>
+            </div>
+          </div>
+          <button onclick="openSmartGroupFormation()"
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
+              </path>
             </svg>
-          </div>
-          <div>
-            <h3 class="text-xl font-semibold text-white">AI-Powered Group Formation</h3>
-            <p class="text-sm text-gray-400">Create balanced groups based on student personas and team compatibility</p>
-          </div>
+            Form Smart Groups
+          </button>
         </div>
-        <button 
-          onclick="openSmartGroupFormation()"
-          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-          Form Smart Groups
-        </button>
       </div>
-    </div>
 
       <!-- Groups List -->
       <div id="groupsContainer" class="space-y-3">
@@ -264,11 +284,9 @@ comments: false
 
     <!-- Tabs -->
     <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-700">
-      <button id="chatTabButton"
-        class="px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white"
+      <button id="chatTabButton" class="px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white"
         onclick="showChatTab()">Chat</button>
-      <button id="filesTabButton"
-        class="px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700"
+      <button id="filesTabButton" class="px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700"
         onclick="showFilesTab()">Shared Files</button>
     </div>
 
@@ -283,17 +301,20 @@ comments: false
         <!-- Message Input Area -->
         <div class="p-4 border-t border-neutral-700 relative">
           <!-- Slash Command Popup -->
-          <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+          <div id="slashCommandPopup"
+            class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
             <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
             <div id="slashCommandList">
-              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3"
+                onclick="selectSlashCommand('/calendar')">
                 <span class="text-lg">📅</span>
                 <div>
                   <div class="text-white text-sm font-medium">/calendar</div>
-                  <div class="text-gray-400 text-xs">Add event: /calendar YYYY-MM-DD [HH:MM] Title | optional description</div>
+                  <div class="text-gray-400 text-xs">Add event: create a task in the calendar</div>
                 </div>
               </div>
-              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3"
+                onclick="selectSlashCommand('/adduser')">
                 <span class="text-lg">👤</span>
                 <div>
                   <div class="text-white text-sm font-medium">/adduser</div>
@@ -305,29 +326,26 @@ comments: false
 
           <div id="imageMessageBox" class="mt-4 mb-4"></div>
           <div class="flex items-center gap-2">
-            <input
-              type="text"
-              id="chatInput"
-              placeholder="Message #group-name"
+            <input type="text" id="chatInput" placeholder="Message #group-name"
               class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-              onkeydown="handleChatInputKeydown(event)"
-              oninput="handleChatInputChange(event)"
-            />
-            <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="handleChatImageSelected(event)" />
+              onkeydown="handleChatInputKeydown(event)" oninput="handleChatInputChange(event)" />
+            <input id="chatImageInput" type="file" accept="image/*" class="hidden"
+              onchange="handleChatImageSelected(event)" />
             <button
               class="w-12 h-12 flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors"
-              title="Attach image"
-              onclick="triggerChatImagePicker()">
+              title="Attach image" onclick="triggerChatImagePicker()">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9a4 4 0 10-5.657-5.657L6.343 9.343a6 6 0 108.485 8.485L20 12"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9a4 4 0 10-5.657-5.657L6.343 9.343a6 6 0 108.485 8.485L20 12">
+                </path>
               </svg>
             </button>
             <button
               class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
-              title="Send message"
-              onclick="sendChatMessage()">
+              title="Send message" onclick="sendChatMessage()">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
               </svg>
             </button>
           </div>
@@ -343,8 +361,7 @@ comments: false
           <div class="flex items-center gap-2">
             <input id="sharedFileInput" type="file"
               class="flex-1 px-3 py-2 bg-neutral-700 text-white placeholder-gray-500 rounded-lg border border-neutral-600" />
-            <button
-              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+            <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
               onclick="uploadSharedFile()">Upload</button>
           </div>
           <p class="text-xs text-gray-400 mt-2">Uploads are shared with all group members.</p>
@@ -353,511 +370,534 @@ comments: false
     </div>
   </div>
 </div>
-  <!-- Smart Group Formation Modal -->
-  <div id="smartGroupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-    <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeSmartGroupModal()"></div>
-  
-    <!-- Modal Content -->
-    <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
-      <!-- Header -->
-      <div class="flex items-center justify-between p-6 border-b border-neutral-700">
-        <div>
-          <h3 class="text-2xl font-semibold text-white">AI-Powered Group Formation</h3>
-          <p class="text-sm text-gray-400 mt-1">Create balanced groups using persona compatibility</p>
-        </div>
-        <button onclick="closeSmartGroupModal()" class="text-gray-400 hover:text-white transition-colors">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-  
-      <!-- Form -->
-      <div class="p-6 space-y-6">
-        <!-- Period Selection -->
-        <div>
-          <label class="block text-sm font-medium text-gray-200 mb-2">Select Period</label>
-          <select id="smartGroupPeriod" 
-            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">Choose a period...</option>
-            <option value="1">Period 1</option>
-            <option value="2">Period 2</option>
-            <option value="3">Period 3</option>
-            <option value="4">Period 4</option>
-            <option value="5">Period 5</option>
-          </select>
-        </div>
-  
-        <!-- Class Selection -->
-        <div>
-          <label class="block text-sm font-medium text-gray-200 mb-2">Select Class</label>
-          <select id="smartGroupClass"
-            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">Choose a class...</option>
-            <option value="CSSE">CSSE</option>
-            <option value="CSP">CSP</option>
-            <option value="CSA">CSA</option>
-          </select>
-        </div>
-  
-        <!-- Group Size -->
-        <div>
-          <label class="block text-sm font-medium text-gray-200 mb-2">Group Size</label>
-          <input type="number" id="smartGroupSize" value="4" min="2" max="10"
-            class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <p class="text-xs text-gray-400 mt-1">Recommended: 3-5 students per group</p>
-        </div>
-  
-        <!-- Group Name Prefix -->
-        <div>
-          <label class="block text-sm font-medium text-gray-200 mb-2">Group Name Prefix (Optional)</label>
-          <input type="text" id="smartGroupPrefix" placeholder="e.g., 'Team', 'Squad', 'Group'"
-            class="w-full px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
-        </div>
-  
-        <!-- Prior Experiences Toggle -->
-        <div class="bg-neutral-700/60 border border-neutral-600 rounded-lg p-4">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <label class="block text-sm font-semibold text-gray-100">
-                Would you like to incorporate your prior experiences?
-              </label>
-              <p class="text-xs text-gray-400 mt-1">
-                If yes, we’ll use your past group outcomes (ratings + persona mix) to bias future team formation.
-              </p>
-            </div>
-
-            <label class="inline-flex items-center cursor-pointer select-none">
-              <input id="usePriorExpToggle" type="checkbox" class="sr-only" onchange="togglePriorExperience()" />
-              <div class="w-11 h-6 bg-neutral-600 rounded-full relative transition-colors">
-                <div id="usePriorExpKnob"
-                    class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"></div>
-              </div>
-            </label>
-          </div>
-
-          <!-- Prior Experience Form (hidden until toggle on) -->
-          <div id="priorExperienceForm" class="hidden mt-4 space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-200 mb-2">How many members were in your previous group?</label>
-                <input id="priorGroupSize" type="number" min="2" max="10" value="4"
-                  class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-              </div>
-
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
-                  <input id="priorStudentRating" type="number" min="1" max="5" value="4"
-                    class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
-                  <input id="priorTeacherRating" type="number" min="1" max="5" value="4"
-                    class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-200 mb-2">
-                Personas of members in that group (select all that applied)
-              </label>
-              <div id="priorPersonaChoices" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
-              <p class="text-xs text-gray-400 mt-2">
-                Tip: choose the persona mix that best matches the group you’re describing.
-              </p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-200 mb-2">One-line note (optional)</label>
-              <input id="priorNote" type="text" maxlength="160"
-                placeholder="e.g., Great role balance, clear communication"
-                class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            </div>
-
-            <div class="flex items-center justify-between">
-              <p class="text-xs text-gray-400">
-                We’ll also include any saved group feedback already stored locally on this device.
-              </p>
-              <button type="button"
-                class="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-gray-200 rounded-lg text-xs border border-neutral-600"
-                onclick="previewPriorFeedbackCount()">
-                Preview stored feedback
-              </button>
-            </div>
-
-            <div id="priorFeedbackStatus" class="text-xs text-gray-300"></div>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
-          <button onclick="closeSmartGroupModal()"
-            class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
-            Cancel
-          </button>
-          <button onclick="generateSmartGroups()"
-            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-            Generate Groups
-          </button>
-        </div>
-      </div>
-  
-<!-- Results Section (hidden initially) -->
-<div id="smartGroupResults" class="hidden border-t border-neutral-700 bg-neutral-900/50">
-  <!-- Staging toolbar -->
-  <div class="flex items-center justify-between px-6 pt-5 pb-3">
-    <div>
-      <h4 class="text-lg font-semibold text-white">Staging Area</h4>
-      <p class="text-xs text-gray-400 mt-0.5">Lock groups you're happy with · Drag students between groups · Regenerate the rest</p>
-    </div>
-    <div class="flex gap-2">
-      <button onclick="regenerateUnlocked()"
-        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors font-medium flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-        </svg>
-        Regenerate Unlocked
-      </button>
-      <button onclick="saveSmartGroups()"
-        class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg transition-colors font-semibold">
-        Save All Groups
-      </button>
-      <button onclick="closeSmartGroupModal()"
-        class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white text-sm rounded-lg transition-colors">
-        Discard
-      </button>
-    </div>
-  </div>
-
-  <!-- Method badge -->
-  <div id="stagingMethodBadge" class="px-6 pb-3"></div>
-
-  <!-- Groups grid -->
-  <div id="smartGroupResultsContent" class="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-    <!-- Group cards injected here -->
-  </div>
-</div>  
-
-<!-- Feedback Modal -->
-<div id="feedbackModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+<!-- Smart Group Formation Modal -->
+<div id="smartGroupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
   <!-- Backdrop -->
-  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeFeedbackModal()"></div>
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeSmartGroupModal()"></div>
 
   <!-- Modal Content -->
-  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col">
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
     <!-- Header -->
-    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+    <div class="flex items-center justify-between p-6 border-b border-neutral-700">
       <div>
-        <h3 id="feedbackModalTitle" class="text-xl font-semibold text-white">Group Feedback</h3>
-        <p id="feedbackModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+        <h3 class="text-2xl font-semibold text-white">AI-Powered Group Formation</h3>
+        <p class="text-sm text-gray-400 mt-1">Create balanced groups using persona compatibility</p>
       </div>
-      <button type="button" onclick="closeFeedbackModal()" class="text-gray-400 hover:text-white transition-colors">
+      <button onclick="closeSmartGroupModal()" class="text-gray-400 hover:text-white transition-colors">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
     </div>
 
-    <!-- Body -->
-    <div class="p-4 space-y-4">
-      <!-- Course Category (CSA/CSP/CSSE) -->
+    <!-- Form -->
+    <div class="p-6 space-y-6">
+      <!-- Period Selection -->
       <div>
-        <label class="block text-sm font-medium text-gray-200 mb-2">Course Category</label>
-        <select id="fbCourse"
-          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option value="CSA">CSA</option>
-          <option value="CSP">CSP</option>
-          <option value="CSSE">CSSE</option>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Select Period</label>
+        <select id="smartGroupPeriod"
+          class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">Choose a period...</option>
+          <option value="1">Period 1</option>
+          <option value="2">Period 2</option>
+          <option value="3">Period 3</option>
+          <option value="4">Period 4</option>
+          <option value="5">Period 5</option>
         </select>
       </div>
 
-      <!-- Student feedback -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
-          <input id="fbStudentRating" type="number" min="1" max="5" value="4"
-            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <p class="text-xs text-gray-400 mt-1">How well did the group work together?</p>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
-          <input id="fbTeacherRating" type="number" min="1" max="5" value="4"
-            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <p class="text-xs text-gray-400 mt-1">Teacher assessment of effectiveness.</p>
-        </div>
-      </div>
-
-      <!-- One-line explanation -->
+      <!-- Class Selection -->
       <div>
-        <label class="block text-sm font-medium text-gray-200 mb-2">One-line explanation</label>
-        <input id="fbNote" type="text" maxlength="160"
-          placeholder="e.g., Clear roles + everyone contributed"
-          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <label class="block text-sm font-medium text-gray-200 mb-2">Select Class</label>
+        <select id="smartGroupClass"
+          class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">Choose a class...</option>
+          <option value="CSSE">CSSE</option>
+          <option value="CSP">CSP</option>
+          <option value="CSA">CSA</option>
+        </select>
       </div>
 
-      <!-- Status -->
-      <div id="fbStatus" class="text-sm text-gray-300"></div>
+      <!-- Group Size -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Group Size</label>
+        <input type="number" id="smartGroupSize" value="4" min="2" max="10"
+          class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p class="text-xs text-gray-400 mt-1">Recommended: 3-5 students per group</p>
+      </div>
+
+      <!-- Group Name Prefix -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Group Name Prefix (Optional)</label>
+        <input type="text" id="smartGroupPrefix" placeholder="e.g., 'Team', 'Squad', 'Group'"
+          class="w-full px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
+      </div>
+
+      <!-- Prior Experiences Toggle -->
+      <div class="bg-neutral-700/60 border border-neutral-600 rounded-lg p-4">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-100">
+              Would you like to incorporate your prior experiences?
+            </label>
+            <p class="text-xs text-gray-400 mt-1">
+              If yes, we’ll use your past group outcomes (ratings + persona mix) to bias future team formation.
+            </p>
+          </div>
+
+          <label class="inline-flex items-center cursor-pointer select-none">
+            <input id="usePriorExpToggle" type="checkbox" class="sr-only" onchange="togglePriorExperience()" />
+            <div class="w-11 h-6 bg-neutral-600 rounded-full relative transition-colors">
+              <div id="usePriorExpKnob"
+                class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"></div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Prior Experience Form (hidden until toggle on) -->
+        <div id="priorExperienceForm" class="hidden mt-4 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">How many members were in your previous
+                group?</label>
+              <input id="priorGroupSize" type="number" min="2" max="10" value="4"
+                class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+                <input id="priorStudentRating" type="number" min="1" max="5" value="4"
+                  class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+                <input id="priorTeacherRating" type="number" min="1" max="5" value="4"
+                  class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">
+              Personas of members in that group (select all that applied)
+            </label>
+            <div id="priorPersonaChoices" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+            <p class="text-xs text-gray-400 mt-2">
+              Tip: choose the persona mix that best matches the group you’re describing.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">One-line note (optional)</label>
+            <input id="priorNote" type="text" maxlength="160"
+              placeholder="e.g., Great role balance, clear communication"
+              class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400">
+              We’ll also include any saved group feedback already stored locally on this device.
+            </p>
+            <button type="button"
+              class="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-gray-200 rounded-lg text-xs border border-neutral-600"
+              onclick="previewPriorFeedbackCount()">
+              Preview stored feedback
+            </button>
+          </div>
+
+          <div id="priorFeedbackStatus" class="text-xs text-gray-300"></div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
+        <button onclick="closeSmartGroupModal()"
+          class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+          Cancel
+        </button>
+        <button onclick="generateSmartGroups()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Generate Groups
+        </button>
+      </div>
     </div>
 
-    <!-- Footer -->
-    <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
-      <button type="button" onclick="closeFeedbackModal()"
-        class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
-        Cancel
-      </button>
-      <button type="button" onclick="submitGroupFeedback()"
-        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
-        Submit Feedback
-      </button>
+    <!-- Results Section (hidden initially) -->
+    <div id="smartGroupResults" class="hidden border-t border-neutral-700 bg-neutral-900/50">
+      <!-- Staging toolbar -->
+      <div class="flex items-center justify-between px-6 pt-5 pb-3">
+        <div>
+          <h4 class="text-lg font-semibold text-white">Staging Area</h4>
+          <p class="text-xs text-gray-400 mt-0.5">Lock groups you're happy with · Drag students between groups ·
+            Regenerate the rest</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="regenerateUnlocked()"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors font-medium flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+              </path>
+            </svg>
+            Regenerate Unlocked
+          </button>
+          <button onclick="saveSmartGroups()"
+            class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg transition-colors font-semibold">
+            Save All Groups
+          </button>
+          <button onclick="closeSmartGroupModal()"
+            class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white text-sm rounded-lg transition-colors">
+            Discard
+          </button>
+        </div>
+      </div>
+
+      <!-- Method badge -->
+      <div id="stagingMethodBadge" class="px-6 pb-3"></div>
+
+      <!-- Groups grid -->
+      <div id="smartGroupResultsContent" class="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        <!-- Group cards injected here -->
+      </div>
     </div>
   </div>
 </div>
 
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeFeedbackModal()"></div>
+
+      <!-- Modal Content -->
+      <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+          <div>
+            <h3 id="feedbackModalTitle" class="text-xl font-semibold text-white">Group Feedback</h3>
+            <p id="feedbackModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+          </div>
+          <button type="button" onclick="closeFeedbackModal()" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-4 space-y-4">
+          <!-- Course Category (CSA/CSP/CSSE) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Course Category</label>
+            <select id="fbCourse"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="CSA">CSA</option>
+              <option value="CSP">CSP</option>
+              <option value="CSSE">CSSE</option>
+            </select>
+          </div>
+
+          <!-- Student feedback -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+              <input id="fbStudentRating" type="number" min="1" max="5" value="4"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              <p class="text-xs text-gray-400 mt-1">How well did the group work together?</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+              <input id="fbTeacherRating" type="number" min="1" max="5" value="4"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              <p class="text-xs text-gray-400 mt-1">Teacher assessment of effectiveness.</p>
+            </div>
+          </div>
+
+          <!-- One-line explanation -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">One-line explanation</label>
+            <input id="fbNote" type="text" maxlength="160" placeholder="e.g., Clear roles + everyone contributed"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Status -->
+          <div id="fbStatus" class="text-sm text-gray-300"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+          <button type="button" onclick="closeFeedbackModal()"
+            class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button type="button" onclick="submitGroupFeedback()"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
+            Submit Feedback
+          </button>
+        </div>
+      </div>
+    </div>
 
 
-<!-- Chat JS moved to module script below -->
 
-<style>
-  .loading-spinner {
-    width: 12px;
-    height: 12px;
-    border: 1.5px solid #6b7280;
-    border-top-color: #818cf8;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+    <!-- Calendar Event Modal -->
+    <div id="calendarEventModal" class="hidden fixed inset-0 flex items-center justify-center" style="z-index: 60;">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black bg-opacity-75" onclick="calendarModalController.close()"></div>
 
-  /* Chat Modal Scrollbar Styling */
-  #chatMessages::-webkit-scrollbar {
-    width: 8px;
-  }
+      <!-- Modal Content -->
+      <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-md mx-4 flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+          <h3 class="text-xl font-semibold text-white">Add Calendar Event</h3>
+          <button onclick="calendarModalController.close()" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
 
-  #chatMessages::-webkit-scrollbar-track {
-    background: #262626;
-    border-radius: 4px;
-  }
+        <!-- Body -->
+        <div class="p-4 space-y-4">
+          <!-- Linked Group Indicator -->
+          <div id="calEventGroupContainer" class="hidden mb-4 p-3 bg-indigo-900/30 border border-indigo-500/30 rounded-lg flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span class="text-sm text-indigo-200">Linking to group: <strong id="calEventGroupName" class="text-white"></strong></span>
+          </div>
 
-  #chatMessages::-webkit-scrollbar-thumb {
-    background: #525252;
-    border-radius: 4px;
-  }
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Title</label>
+            <input id="calEventTitle" type="text" placeholder="Event Title"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
 
-  #chatMessages::-webkit-scrollbar-thumb:hover {
-    background: #737373;
-  }
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Date</label>
+              <input id="calEventDate" type="date"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Period</label>
+              <input id="calEventPeriod" type="text" placeholder="e.g. CSA"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+          </div>
 
-  /* Prevent body scroll when modal is open */
-  body.modal-open {
-    overflow: hidden;
-  }
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Description</label>
+            <textarea id="calEventDesc" rows="3" placeholder="Optional description..."
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          </div>
 
-  /* Slash command input styling */
-  #chatInput.has-command {
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(64, 64, 64, 1) 30%);
-    border: 1px solid rgba(99, 102, 241, 0.5);
-  }
+          <!-- Priority -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Priority</label>
+            <select id="calEventPriority"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="P2" selected>P2 (Normal)</option>
+              <option value="P0">P0 (Highest)</option>
+              <option value="P1">P1 (High)</option>
+              <option value="P3">P3 (Low)</option>
+            </select>
+          </div>
 
-  /* Slash command popup animation */
-  #slashCommandPopup {
-    animation: slideUp 0.15s ease-out;
-  }
+          <div id="calEventStatus" class="text-sm mt-2"></div>
+        </div>
 
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .staging-group.drag-over {
-    border-color: #6366f1 !important;
-    background-color: rgba(99, 102, 241, 0.08) !important;
-  }
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+          <button onclick="calendarModalController.close()"
+            class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button id="calEventSubmitBtn" onclick="calendarModalController.submit()"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center">
+            Create Event
+          </button>
+        </div>
+      </div>
+    </div>
 
-  .staging-member:active {
-    transform: scale(0.97);
-  }
-</style>
+    <!-- Chat JS moved to module script below -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
-<script type="module">
-/* ================================
-   CONFIG
-================================ */
-import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    <script type="module">
+      /* ================================
+         CONFIG
+      ================================ */
+      import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-/* ================================
-   STATE
-================================ */
-let allGroups = [];
-let peopleCache = [];  // Cache people to avoid repeated API calls
-let activePeriods = [];
-let activeClasses = [];
-let loadingCount = 0;  // Track concurrent loading operations
-let isAdmin = false;   // Track if current user is an admin
-let selectedUsersForGroup = {}; // Track multi-select members per group
-let collapsedGroups = {}; // Track collapsed state per group ID
+      /* ================================
+         STATE
+      ================================ */
+      let allGroups = [];
+      let peopleCache = [];  // Cache people to avoid repeated API calls
+      let activePeriods = [];
+      let activeClasses = [];
+      let loadingCount = 0;  // Track concurrent loading operations
+      let isAdmin = false;   // Track if current user is an admin
+      let selectedUsersForGroup = {}; // Track multi-select members per group
+      let collapsedGroups = {}; // Track collapsed/expanded state per group id
+      let isSearchMode = false;  // Track if we're in search mode to disable collapse
 
-// Chat state
-let activeChatGroupId = null;
-let activeChatGroupName = '';
-let stompClient = null;
-let currentUser = null;
-let currentUserDisplayName = 'You';
-let pendingChatImageBase64 = null;
-let pendingChatImageMime = 'image/png';
-let renderedChatMessageKeys = new Set();
+      // Chat state
+      let activeChatGroupId = null;
+      let activeChatGroupName = '';
+      let stompClient = null;
+      let currentUser = null;
+      let currentUserDisplayName = 'You';
+      let pendingChatImageBase64 = null;
+      let pendingChatImageMime = 'image/png';
+      let renderedChatMessageKeys = new Set();
 
-/* ================================
-   LOADING HELPERS
-================================ */
-function showLoading(message = "Loading...") {
-  loadingCount++;
-  document.getElementById("loadingText").textContent = message;
-  document.getElementById("loadingOverlay").classList.remove("hidden");
-}
+      /* ================================
+         LOADING HELPERS
+      ================================ */
+      function showLoading(message = "Loading...") {
+        loadingCount++;
+        document.getElementById("loadingText").textContent = message;
+        document.getElementById("loadingOverlay").classList.remove("hidden");
+      }
 
-function hideLoading() {
-  loadingCount = Math.max(0, loadingCount - 1);
-  if (loadingCount === 0) {
-    document.getElementById("loadingOverlay").classList.add("hidden");
-  }
-}
+      function hideLoading() {
+        loadingCount = Math.max(0, loadingCount - 1);
+        if (loadingCount === 0) {
+          document.getElementById("loadingOverlay").classList.add("hidden");
+        }
+      }
 
-/* ================================
-   INIT
-================================ */
-document.addEventListener("DOMContentLoaded", () => {
-  initializeData();
-  initializeChatUser();
-});
+      /* ================================
+         INIT
+      ================================ */
+      document.addEventListener("DOMContentLoaded", () => {
+        initializeData();
+        initializeChatUser();
+      });
 
-// Search groups using API with chaining for better performance
-window.searchGroups = function () {
-  const searchTerm = document.getElementById("searchInput").value.trim();
-  const url = searchTerm 
-    ? `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`
-    : `${javaURI}/api/groups`;
-  
-  showLoading("Searching...");
-  
-  fetch(url, fetchOptions)
-    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
-    .then(data => {
-      allGroups = data;
-      renderGroups();
-    })
-    .catch(err => console.error("Search failed", err))
-    .finally(() => hideLoading());
-}
+      // Search groups using API with chaining for better performance
+      window.searchGroups = function () {
+        const searchTerm = document.getElementById("searchInput").value.trim();
+        isSearchMode = !!searchTerm;
+        const url = searchTerm
+          ? `${javaURI}/api/groups/search?name=${encodeURIComponent(searchTerm)}`
+          : `${javaURI}/api/groups`;
 
-// Load groups, people, and admin status in parallel on page load with chaining
-function initializeData() {
-  showLoading("Loading groups...");
-  
-  Promise.all([
-    fetch(`${javaURI}/api/groups`, fetchOptions)
-      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups"))),
-    fetch(`${javaURI}/api/people`, fetchOptions)
-      .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people"))),
-    fetch(`${pythonURI}/api/id`, fetchOptions)
-      .then(res => res.ok ? res.json() : null)
-      .catch(() => null)  // Don't fail if user check fails
-  ])
-    .then(([groups, people, user]) => {
-      allGroups = groups;
-      peopleCache = people;
-      isAdmin = user && user.role === "Admin";
-      renderGroups();
-    })
-    .catch(err => console.error("Failed to initialize data", err))
-    .finally(() => hideLoading());
-}
+        showLoading("Searching...");
 
-window.parseUIDs = function (raw) {
-  return raw
-    .split("\n")
-    .map(u => u.trim())
-    .filter(Boolean);
-}
+        fetch(url, fetchOptions)
+          .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+          .then(data => {
+            allGroups = data;
+            renderGroups();
+          })
+          .catch(err => console.error("Search failed", err))
+          .finally(() => hideLoading());
+      }
 
-// Synchronous lookup from cache - no API call needed
-window.getPersonIdFromUID = function (uid) {
-  const match = peopleCache.find(p => p.uid === uid);
-  if (!match) {
-    throw new Error(`UID not found: ${uid}`);
-  }
-  return match.id;
-};
+      // Load groups, people, and admin status in parallel on page load with chaining
+      function initializeData() {
+        showLoading("Loading groups...");
 
-// Get person object from cache by ID
-window.getPersonById = function (personId) {
-  return peopleCache.find(p => p.id === personId);
-};
+        Promise.all([
+          fetch(`${javaURI}/api/groups`, fetchOptions)
+            .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups"))),
+          fetch(`${javaURI}/api/people`, fetchOptions)
+            .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load people"))),
+          fetch(`${pythonURI}/api/id`, fetchOptions)
+            .then(res => res.ok ? res.json() : null)
+            .catch(() => null)  // Don't fail if user check fails
+        ])
+          .then(([groups, people, user]) => {
+            allGroups = groups;
+            peopleCache = people;
+            currentUser = user; // Set global currentUser
+            isAdmin = user && user.role === "Admin";
+            renderGroups();
+          })
+          .catch(err => console.error("Failed to initialize data", err))
+          .finally(() => hideLoading());
+      }
 
-// Helpers for multi-select state per group
-function getSelectedUsers(groupId) {
-  return selectedUsersForGroup[groupId] || [];
-}
+      window.parseUIDs = function (raw) {
+        return raw
+          .split("\n")
+          .map(u => u.trim())
+          .filter(Boolean);
+      }
 
-function setSelectedUsers(groupId, users) {
-  selectedUsersForGroup[groupId] = users;
-  updateAddSelectedButton(groupId);
-  updateSearchResultsSelection(groupId);
-}
+      // Synchronous lookup from cache - no API call needed
+      window.getPersonIdFromUID = function (uid) {
+        const match = peopleCache.find(p => p.uid === uid);
+        if (!match) {
+          throw new Error(`UID not found: ${uid}`);
+        }
+        return match.id;
+      };
 
-// Search for users by name or GitHub ID with chaining
-window.searchPeopleForGroup = function (groupId) {
-  const searchInput = document.getElementById(`member-search-${groupId}`);
-  const query = searchInput.value.trim();
-  
-  if (!query) {
-    alert("Please enter a search term");
-    return;
-  }
-  
-  showLoading("Searching users...");
-  
-  fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions)
-    .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
-    .then(results => displaySearchResults(groupId, results))
-    .catch(err => {
-      console.error("User search failed", err);
-      alert("Failed to search users");
-    })
-    .finally(() => hideLoading());
-}
+      // Get person object from cache by ID
+      window.getPersonById = function (personId) {
+        return peopleCache.find(p => p.id === personId);
+      };
 
-// Display search results in dropdown
-window.displaySearchResults = function (groupId, results) {
-  const dropdown = document.getElementById(`search-results-${groupId}`);
-  const selected = getSelectedUsers(groupId).map(u => u.id);
-  
-  if (!results || results.length === 0) {
-    dropdown.innerHTML = `
+      // Helpers for multi-select state per group
+      function getSelectedUsers(groupId) {
+        return selectedUsersForGroup[groupId] || [];
+      }
+
+      function setSelectedUsers(groupId, users) {
+        selectedUsersForGroup[groupId] = users;
+        updateAddSelectedButton(groupId);
+        updateSearchResultsSelection(groupId);
+      }
+
+      // Search for users by name or GitHub ID with chaining
+      window.searchPeopleForGroup = function (groupId) {
+        const searchInput = document.getElementById(`member-search-${groupId}`);
+        const query = searchInput.value.trim();
+
+        if (!query) {
+          alert("Please enter a search term");
+          return;
+        }
+
+        showLoading("Searching users...");
+
+        fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions)
+          .then(res => res.ok ? res.json() : Promise.reject(new Error("Search failed")))
+          .then(results => displaySearchResults(groupId, results))
+          .catch(err => {
+            console.error("User search failed", err);
+            alert("Failed to search users");
+          })
+          .finally(() => hideLoading());
+      }
+
+      // Display search results in dropdown
+      window.displaySearchResults = function (groupId, results) {
+        const dropdown = document.getElementById(`search-results-${groupId}`);
+        const selected = getSelectedUsers(groupId).map(u => u.id);
+
+        if (!results || results.length === 0) {
+          dropdown.innerHTML = `
       <div class="p-3 text-gray-400 text-sm text-center">No users found</div>
     `;
-    dropdown.classList.remove("hidden");
-    return;
-  }
-  
-  dropdown.innerHTML = results.map(person => {
-    const isSelected = selected.includes(person.id);
-    return `
+          dropdown.classList.remove("hidden");
+          return;
+        }
+
+        dropdown.innerHTML = results.map(person => {
+          const isSelected = selected.includes(person.id);
+          return `
       <div 
         class="px-3 py-2 ${isSelected ? "bg-neutral-600 border border-neutral-500" : "hover:bg-neutral-600"} cursor-pointer flex items-center justify-between text-sm"
         data-person-id="${person.id}"
@@ -869,315 +909,316 @@ window.displaySearchResults = function (groupId, results) {
         <span class="text-xs ${isSelected ? "text-green-400" : "text-gray-500"}">${isSelected ? "Selected" : "Tap to select"}</span>
       </div>
     `;
-  }).join("");
-  
-  dropdown.classList.remove("hidden");
-}
+        }).join("");
 
-// Toggle user selection from search results
-window.toggleUserSelectionFromResult = function (groupId, personId, uid, name) {
-  const current = getSelectedUsers(groupId);
-  const exists = current.find(u => u.id === personId);
-  const updated = exists
-    ? current.filter(u => u.id !== personId)
-    : [...current, { id: personId, uid, name }];
-  setSelectedUsers(groupId, updated);
-}
-
-// Clear selected users for a group
-window.clearSearchSelection = function (groupId) {
-  setSelectedUsers(groupId, []);
-  const searchInput = document.getElementById(`member-search-${groupId}`);
-  if (searchInput) searchInput.value = "";
-  const dropdown = document.getElementById(`search-results-${groupId}`);
-  if (dropdown) dropdown.classList.add("hidden");
-}
-
-// Add all selected members to group with chaining
-window.addSelectedMembersToGroup = async function (groupId) {
-  const selected = getSelectedUsers(groupId);
-  
-  if (!selected.length) {
-    alert("Please select at least one user");
-    return;
-  }
-  
-  showLoading("Adding members...");
-  const successes = [];
-  const failures = [];
-
-  for (const person of selected) {
-    try {
-      const res = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, { ...fetchOptions, method: "POST" });
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("ADD MEMBER ERROR:", text);
-        failures.push(person);
-        continue;
+        dropdown.classList.remove("hidden");
       }
-      successes.push(person);
-    } catch (err) {
-      console.error("ADD MEMBER ERROR:", err);
-      failures.push(person);
-    }
-  }
 
-  const group = allGroups.find(g => g.id === groupId);
-  if (group) {
-    if (!group.members) group.members = [];
-    successes.forEach(person => {
-      if (!group.members.find(m => m.id === person.id)) {
-        group.members.push({ id: person.id, name: person.name, uid: person.uid });
+      // Toggle user selection from search results
+      window.toggleUserSelectionFromResult = function (groupId, personId, uid, name) {
+        const current = getSelectedUsers(groupId);
+        const exists = current.find(u => u.id === personId);
+        const updated = exists
+          ? current.filter(u => u.id !== personId)
+          : [...current, { id: personId, uid, name }];
+        setSelectedUsers(groupId, updated);
       }
-    });
-  }
 
-  setSelectedUsers(groupId, []);
-  renderGroups();
-  if (failures.length) {
-    alert(`Added ${successes.length} member(s). ${failures.length} failed. Is the user already a member of the group? Check console for details.`);
-  }
-  hideLoading();
-}
-
-// Add member to group with chaining - updates local state instead of refetching
-window.addMemberToGroup = function (groupId, uid) {
-  showLoading("Adding member...");
-  
-  const personId = getPersonIdFromUID(uid);
-  const person = getPersonById(personId);
-  
-  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "POST" })
-    .then(res => {
-      if (!res.ok) {
-        return res.text().then(text => {
-          console.error("ADD MEMBER ERROR:", text);
-          return Promise.reject(new Error("Failed to add member"));
-        });
+      // Clear selected users for a group
+      window.clearSearchSelection = function (groupId) {
+        setSelectedUsers(groupId, []);
+        const searchInput = document.getElementById(`member-search-${groupId}`);
+        if (searchInput) searchInput.value = "";
+        const dropdown = document.getElementById(`search-results-${groupId}`);
+        if (dropdown) dropdown.classList.add("hidden");
       }
-      return res;
-    })
-    .then(() => {
-      // Update local state instead of refetching all groups
-      const group = allGroups.find(g => g.id === groupId);
-      if (group) {
-        if (!group.members) group.members = [];
-        // Only add if not already present
-        if (!group.members.find(m => m.id === personId)) {
-          group.members.push({ id: personId, name: person?.name || uid, uid: uid });
+
+      // Add all selected members to group with chaining
+      window.addSelectedMembersToGroup = async function (groupId) {
+        const selected = getSelectedUsers(groupId);
+
+        if (!selected.length) {
+          alert("Please select at least one user");
+          return;
+        }
+
+        showLoading("Adding members...");
+        const successes = [];
+        const failures = [];
+
+        for (const person of selected) {
+          try {
+            const res = await fetch(`${javaURI}/api/groups/${groupId}/members/${person.id}`, { ...fetchOptions, method: "POST" });
+            if (!res.ok) {
+              const text = await res.text();
+              console.error("ADD MEMBER ERROR:", text);
+              failures.push(person);
+              continue;
+            }
+            successes.push(person);
+          } catch (err) {
+            console.error("ADD MEMBER ERROR:", err);
+            failures.push(person);
+          }
+        }
+
+        const group = allGroups.find(g => g.id === groupId);
+        if (group) {
+          if (!group.members) group.members = [];
+          successes.forEach(person => {
+            if (!group.members.find(m => m.id === person.id)) {
+              group.members.push({ id: person.id, name: person.name, uid: person.uid });
+            }
+          });
+        }
+
+        setSelectedUsers(groupId, []);
+        renderGroups();
+        if (failures.length) {
+          alert(`Added ${successes.length} member(s). ${failures.length} failed. Is the user already a member of the group? Check console for details.`);
+        }
+        hideLoading();
+      }
+
+      // Add member to group with chaining - updates local state instead of refetching
+      window.addMemberToGroup = function (groupId, uid) {
+        showLoading("Adding member...");
+
+        const personId = getPersonIdFromUID(uid);
+        const person = getPersonById(personId);
+
+        fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "POST" })
+          .then(res => {
+            if (!res.ok) {
+              return res.text().then(text => {
+                console.error("ADD MEMBER ERROR:", text);
+                return Promise.reject(new Error("Failed to add member"));
+              });
+            }
+            return res;
+          })
+          .then(() => {
+            // Update local state instead of refetching all groups
+            const group = allGroups.find(g => g.id === groupId);
+            if (group) {
+              if (!group.members) group.members = [];
+              // Only add if not already present
+              if (!group.members.find(m => m.id === personId)) {
+                group.members.push({ id: personId, name: person?.name || uid, uid: uid });
+              }
+            }
+            renderGroups();
+          })
+          .catch(err => alert(err.message))
+          .finally(() => hideLoading());
+      }
+
+      // Remove member from group with chaining - updates local state instead of refetching
+      window.removeMemberFromGroup = function (groupId, personId) {
+        showLoading("Removing member...");
+
+        fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "DELETE" })
+          .then(res => res.ok ? res : Promise.reject(new Error("Failed to remove member")))
+          .then(() => {
+            // Update local state instead of refetching all groups
+            const group = allGroups.find(g => g.id === groupId);
+            if (group && group.members) {
+              group.members = group.members.filter(m => m.id !== personId);
+            }
+            renderGroups();
+          })
+          .catch(err => alert(err.message))
+          .finally(() => hideLoading());
+      }
+
+      // Open group chat modal
+      window.openGroupChat = async function (groupId, groupName) {
+        const group = allGroups.find(g => g.id === groupId);
+        if (!group) {
+          alert(`Group not found`);
+          return;
+        }
+
+        activeChatGroupId = groupId;
+        activeChatGroupName = groupName;
+
+        const memberCount = (group.members || []).length;
+
+        // Update modal header
+        document.getElementById('chatModalTitle').textContent = groupName;
+        document.getElementById('chatModalSubtitle').textContent =
+          `Period ${group.period} · ${group.course} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+
+        // Update input placeholder
+        const chatInput = document.getElementById('chatInput');
+        const groupNameFormatted = groupName.toLowerCase().replace(/\s+/g, '-');
+        chatInput.placeholder = `Message #${groupNameFormatted}`;
+
+        // Show modal and prevent body scroll
+        document.getElementById('chatModal').classList.remove('hidden');
+        document.body.classList.add('modal-open');
+
+        showChatTab();
+        clearChatImagePreview();
+
+        try {
+          await fetchChatMessages();
+          await fetchSharedFiles();
+          startChatPolling();
+        } catch (err) {
+          console.error('Failed to open chat', err);
         }
       }
-      renderGroups();
-    })
-    .catch(err => alert(err.message))
-    .finally(() => hideLoading());
-}
 
-// Remove member from group with chaining - updates local state instead of refetching
-window.removeMemberFromGroup = function (groupId, personId) {
-  showLoading("Removing member...");
-  
-  fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, { ...fetchOptions, method: "DELETE" })
-    .then(res => res.ok ? res : Promise.reject(new Error("Failed to remove member")))
-    .then(() => {
-      // Update local state instead of refetching all groups
-      const group = allGroups.find(g => g.id === groupId);
-      if (group && group.members) {
-        group.members = group.members.filter(m => m.id !== personId);
+      // Close group chat modal
+      window.closeGroupChat = function () {
+        document.getElementById('chatModal').classList.add('hidden');
+        document.body.classList.remove('modal-open');
+        stopChatPolling();
+        activeChatGroupId = null;
+        activeChatGroupName = '';
+        clearChatImagePreview();
       }
-      renderGroups();
-    })
-    .catch(err => alert(err.message))
-    .finally(() => hideLoading());
-}
 
-// Open group chat modal
-window.openGroupChat = async function (groupId, groupName) {
-  const group = allGroups.find(g => g.id === groupId);
-  if (!group) {
-    alert(`Group not found`);
-    return;
-  }
+      // Delete group with chaining - updates local state instead of refetching
+      window.deleteGroup = function (groupId) {
+        const confirmed = confirm(
+          "Are you sure you want to delete this group?\n\nThis action cannot be undone."
+        );
 
-  activeChatGroupId = groupId;
-  activeChatGroupName = groupName;
+        if (!confirmed) return;
 
-  const memberCount = (group.members || []).length;
+        showLoading("Deleting group...");
 
-  // Update modal header
-  document.getElementById('chatModalTitle').textContent = groupName;
-  document.getElementById('chatModalSubtitle').textContent =
-    `Period ${group.period} · ${group.course} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+        fetch(`${javaURI}/api/groups/${groupId}`, { ...fetchOptions, method: "DELETE" })
+          .then(res => {
+            if (!res.ok) {
+              return res.text().then(text => {
+                console.error("DELETE GROUP ERROR:", text);
+                alert("Failed to delete group");
+                return Promise.reject(new Error("Failed to delete group"));
+              });
+            }
+            return res;
+          })
+          .then(() => {
+            // Update local state instead of refetching all groups
+            allGroups = allGroups.filter(g => g.id !== groupId);
+            renderGroups();
+          })
+          .catch(err => console.error(err))
+          .finally(() => hideLoading());
+      };
 
-  // Update input placeholder
-  const chatInput = document.getElementById('chatInput');
-  const groupNameFormatted = groupName.toLowerCase().replace(/\s+/g, '-');
-  chatInput.placeholder = `Message #${groupNameFormatted}`;
+      // Navigate to group dashboard page
+      window.navigateToGroupDashboard = function (groupName) {
+        // Convert group name to URL-friendly format
+        const urlFriendlyName = encodeURIComponent(groupName.toLowerCase().replace(/\s+/g, '-'));
+        window.location.href = `{{ site.baseurl }}/student/groups/dashboard?group=${urlFriendlyName}`;
+      };
 
-  // Show modal and prevent body scroll
-  document.getElementById('chatModal').classList.remove('hidden');
-  document.body.classList.add('modal-open');
+      /* ================================
+         API CALLS
+      ================================ */
+      // Manual refresh function with chaining - only call when absolutely needed
+      window.loadGroups = function () {
+        fetch(`${javaURI}/api/groups`, fetchOptions)
+          .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups")))
+          .then(data => {
+            allGroups = data;
+            renderGroups();
+          })
+          .catch(err => console.error("Failed to load groups", err));
+      }
 
-  showChatTab();
-  clearChatImagePreview();
+      // Refresh people cache with chaining if needed (e.g., new user registered)
+      window.refreshPeopleCache = function () {
+        fetch(`${javaURI}/api/people`, fetchOptions)
+          .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to refresh people")))
+          .then(data => { peopleCache = data; })
+          .catch(err => console.error("Failed to refresh people cache", err));
+      }
 
-  try {
-    await fetchChatMessages();
-    await fetchSharedFiles();
-    startChatPolling();
-  } catch (err) {
-    console.error('Failed to open chat', err);
-  }
-}
+      // Create new group with chaining (single API call)
+      window.saveNewGroup = function () {
+        const name = document.getElementById("newGroupName").value.trim();
+        const period = document.getElementById("newGroupPeriod").value;
+        const course = document.getElementById("newGroupClass").value;
 
-// Close group chat modal
-window.closeGroupChat = function () {
-  document.getElementById('chatModal').classList.add('hidden');
-  document.body.classList.remove('modal-open');
-  stopChatPolling();
-  activeChatGroupId = null;
-  activeChatGroupName = '';
-  clearChatImagePreview();
-}
+        console.log("Submit button clicked! Group Name:", name, "Period:", period, "Course:", course);
 
-// Delete group with chaining - updates local state instead of refetching
-window.deleteGroup = function (groupId) {
-  const confirmed = confirm(
-    "Are you sure you want to delete this group?\n\nThis action cannot be undone."
-  );
+        if (!name || !period || !course) {
+          alert("Please fill all required fields.");
+          return;
+        }
 
-  if (!confirmed) return;
+        showLoading("Creating group...");
 
-  showLoading("Deleting group...");
-  
-  fetch(`${javaURI}/api/groups/${groupId}`, { ...fetchOptions, method: "DELETE" })
-    .then(res => {
-      if (!res.ok) {
-        return res.text().then(text => {
-          console.error("DELETE GROUP ERROR:", text);
-          alert("Failed to delete group");
-          return Promise.reject(new Error("Failed to delete group"));
+        fetch(`${javaURI}/api/groups`, {
+          ...fetchOptions,
+          method: "POST",
+          body: JSON.stringify({ name, period: String(period), course })
+        })
+          .then(res => {
+            if (!res.ok) {
+              return res.text().then(text => {
+                console.error("GROUP CREATION ERROR:", text);
+                return Promise.reject(new Error("Group creation failed"));
+              });
+            }
+            return res.json();
+          })
+          .then(newGroup => {
+            newGroup.members = [];
+            // Update local state instead of refetching
+            allGroups.push(newGroup);
+            cancelAddGroup();
+            renderGroups();
+          })
+          .catch(err => {
+            console.error(err);
+            alert(err.message);
+          })
+          .finally(() => hideLoading());
+      };
+
+
+
+      /* ================================
+         RENDERING
+      ================================ */
+      window.renderGroups = function () {
+        const container = document.getElementById("groupsContainer");
+        const empty = document.getElementById("emptyState");
+
+        container.innerHTML = "";
+
+        // Only filter by period/class (search is handled by API)
+        const filtered = allGroups.filter(g => {
+          if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
+          if (activeClasses.length && !activeClasses.includes(g.course)) return false;
+          return true;
         });
-      }
-      return res;
-    })
-    .then(() => {
-      // Update local state instead of refetching all groups
-      allGroups = allGroups.filter(g => g.id !== groupId);
-      renderGroups();
-    })
-    .catch(err => console.error(err))
-    .finally(() => hideLoading());
-};
 
-// Navigate to group dashboard page
-window.navigateToGroupDashboard = function (groupName) {
-  // Convert group name to URL-friendly format
-  const urlFriendlyName = encodeURIComponent(groupName.toLowerCase().replace(/\s+/g, '-'));
-  window.location.href = `{{ site.baseurl }}/student/groups/dashboard?group=${urlFriendlyName}`;
-};
+        if (!filtered.length) {
+          empty.classList.remove("hidden");
+          return;
+        }
 
-/* ================================
-   API CALLS
-================================ */
-// Manual refresh function with chaining - only call when absolutely needed
-window.loadGroups = function () {
-  fetch(`${javaURI}/api/groups`, fetchOptions)
-    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to load groups")))
-    .then(data => {
-      allGroups = data;
-      renderGroups();
-    })
-    .catch(err => console.error("Failed to load groups", err));
-}
+        empty.classList.add("hidden");
 
-// Refresh people cache with chaining if needed (e.g., new user registered)
-window.refreshPeopleCache = function () {
-  fetch(`${javaURI}/api/people`, fetchOptions)
-    .then(res => res.ok ? res.json() : Promise.reject(new Error("Failed to refresh people")))
-    .then(data => { peopleCache = data; })
-    .catch(err => console.error("Failed to refresh people cache", err));
-}
+        filtered.forEach(group => {
+          const el = document.createElement("div");
+          el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
 
-// Create new group with chaining (single API call)
-window.saveNewGroup = function () {
-  const name = document.getElementById("newGroupName").value.trim();
-  const period = document.getElementById("newGroupPeriod").value;
-  const course = document.getElementById("newGroupClass").value;
+          const isCollapsed = isSearchMode ? false : (collapsedGroups[group.id] !== false);
 
-  console.log("Submit button clicked! Group Name:", name, "Period:", period, "Course:", course);
-
-  if (!name || !period || !course) {
-    alert("Please fill all required fields.");
-    return;
-  }
-
-  showLoading("Creating group...");
-  
-  fetch(`${javaURI}/api/groups`, {
-    ...fetchOptions,
-    method: "POST",
-    body: JSON.stringify({ name, period: String(period), course })
-  })
-    .then(res => {
-      if (!res.ok) {
-        return res.text().then(text => {
-          console.error("GROUP CREATION ERROR:", text);
-          return Promise.reject(new Error("Group creation failed"));
-        });
-      }
-      return res.json();
-    })
-    .then(newGroup => {
-      newGroup.members = [];
-      // Update local state instead of refetching
-      allGroups.push(newGroup);
-      cancelAddGroup();
-      renderGroups();
-    })
-    .catch(err => {
-      console.error(err);
-      alert(err.message);
-    })
-    .finally(() => hideLoading());
-};
-
-
-
-/* ================================
-   RENDERING
-================================ */
-window.renderGroups = function () {
-  const container = document.getElementById("groupsContainer");
-  const empty = document.getElementById("emptyState");
-
-  container.innerHTML = "";
-
-  // Only filter by period/class (search is handled by API)
-  const filtered = allGroups.filter(g => {
-    if (activePeriods.length && !activePeriods.includes(String(g.period))) return false;
-    if (activeClasses.length && !activeClasses.includes(g.course)) return false;
-    return true;
-  });
-
-  if (!filtered.length) {
-    empty.classList.remove("hidden");
-    return;
-  }
-
-  empty.classList.add("hidden");
-
-  filtered.forEach(group => {
-    const el = document.createElement("div");
-    el.className = "bg-neutral-700 rounded-lg p-4 border border-neutral-600";
-
-    const isCollapsed = collapsedGroups[group.id] !== false;
-
-    el.innerHTML = `
+          el.innerHTML = `
       <!-- Header -->
       <div class="flex justify-between items-start">
         <div class="flex items-center gap-2">
           <!-- Toggle visibility button -->
+          ${!isSearchMode ? `
           <button
             class="w-8 h-8 flex items-center justify-center rounded bg-neutral-600 hover:bg-neutral-500 text-gray-300 hover:text-white transition-colors"
             title="${isCollapsed ? 'Show' : 'Hide'} member details"
@@ -1193,20 +1234,40 @@ window.renderGroups = function () {
               </svg>
             `}
           </button>
+          ` : ''}
           <div class="cursor-pointer hover:opacity-80 transition-opacity" onclick="navigateToGroupDashboard('${group.name.replace(/'/g, "\\'")}')">
             <h4 class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">${group.name}</h4>
             <p class="text-sm text-gray-400">
               Period ${group.period} · ${group.course}${isCollapsed ? ` · ${((members) => {
-                if (!members.length) return 'No members';
-                const shown = members.slice(0, 3).map(m => m.name).join(', ');
-                return members.length > 3 ? shown + ` +${members.length - 3} more` : shown;
-              })(group.members || [])}` : ''}
+              if (!members.length) return 'No members';
+              const shown = members.slice(0, 3).map(m => m.name).join(', ');
+              return members.length > 3 ? shown + ` +${members.length - 3} more` : shown;
+            })(group.members || [])}` : ''}
             </p>
           </div>
         </div>
 
         <!-- Action buttons -->
         <div class="flex gap-2">
+          <!-- Join/Add button (Added per user request) -->
+          ${(() => {
+              const isMember = group.members?.some(m => m.uid === currentUser?.uid);
+              if (!isMember && currentUser?.uid) {
+                return `
+                <button
+                  class="w-auto px-3 flex items-center justify-center rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors gap-1"
+                  title="Join this group"
+                  onclick="addMemberToGroup(${group.id}, '${currentUser.uid}')">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                  Add to Group
+                </button>
+              `;
+              }
+              return '';
+            })()}
+
           <!-- Dashboard button -->
           <button
             class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-indigo-600 text-gray-300 hover:text-white transition-colors"
@@ -1297,506 +1358,506 @@ window.renderGroups = function () {
       </div>
       ` : ''}
     `;
-    container.appendChild(el);
-    updateAddSelectedButton(group.id);
-  });
-}
+          container.appendChild(el);
+          updateAddSelectedButton(group.id);
+        });
+      }
 
-// Update add button label/state based on selection count
-function updateAddSelectedButton(groupId) {
-  const btn = document.getElementById(`add-selected-btn-${groupId}`);
-  if (!btn) return;
-  const count = getSelectedUsers(groupId).length;
-  btn.textContent = count ? `Add Selected (${count})` : "Add Selected";
-  btn.disabled = count === 0;
-}
+      // Update add button label/state based on selection count
+      function updateAddSelectedButton(groupId) {
+        const btn = document.getElementById(`add-selected-btn-${groupId}`);
+        if (!btn) return;
+        const count = getSelectedUsers(groupId).length;
+        btn.textContent = count ? `Add Selected (${count})` : "Add Selected";
+        btn.disabled = count === 0;
+      }
 
-// Highlight selected rows in search dropdown after rerender
-function updateSearchResultsSelection(groupId) {
-  const dropdown = document.getElementById(`search-results-${groupId}`);
-  if (!dropdown) return;
-  const selectedIds = getSelectedUsers(groupId).map(u => u.id);
-  dropdown.querySelectorAll("[data-person-id]").forEach(item => {
-    const id = Number(item.dataset.personId);
-    const isSelected = selectedIds.includes(id);
-    item.classList.toggle("bg-neutral-600", isSelected);
-    item.classList.toggle("border", isSelected);
-  });
-}
+      // Highlight selected rows in search dropdown after rerender
+      function updateSearchResultsSelection(groupId) {
+        const dropdown = document.getElementById(`search-results-${groupId}`);
+        if (!dropdown) return;
+        const selectedIds = getSelectedUsers(groupId).map(u => u.id);
+        dropdown.querySelectorAll("[data-person-id]").forEach(item => {
+          const id = Number(item.dataset.personId);
+          const isSelected = selectedIds.includes(id);
+          item.classList.toggle("bg-neutral-600", isSelected);
+          item.classList.toggle("border", isSelected);
+        });
+      }
 
-/* ================================
-   ADD GROUP TOGGLE
-================================ */
-window.toggleAddGroup = function () {
-  document.getElementById("addGroupExpanded").classList.toggle("hidden");
-  document.getElementById("addGroupChevron").classList.toggle("rotate-180");
-}
+      /* ================================
+         ADD GROUP TOGGLE
+      ================================ */
+      window.toggleAddGroup = function () {
+        document.getElementById("addGroupExpanded").classList.toggle("hidden");
+        document.getElementById("addGroupChevron").classList.toggle("rotate-180");
+      }
 
-// Toggle visibility of group member details
-window.toggleGroupDetails = function (groupId) {
-  collapsedGroups[groupId] = collapsedGroups[groupId] === false ? true : false;
-  renderGroups();
-}
+      // Toggle visibility of group member details
+      window.toggleGroupDetails = function (groupId) {
+        collapsedGroups[groupId] = collapsedGroups[groupId] === false ? true : false;
+        renderGroups();
+      }
 
-window.cancelAddGroup = function () {
-  document.getElementById("addGroupExpanded").classList.add("hidden");
-  document.getElementById("newGroupName").value = "";
-  document.getElementById("newGroupPeriod").value = "";
-  document.getElementById("newGroupClass").value = "";
-}
+      window.cancelAddGroup = function () {
+        document.getElementById("addGroupExpanded").classList.add("hidden");
+        document.getElementById("newGroupName").value = "";
+        document.getElementById("newGroupPeriod").value = "";
+        document.getElementById("newGroupClass").value = "";
+      }
 
-/* ================================
-   PRIOR EXPERIENCE (Smart Groups)
-================================ */
+      /* ================================
+         PRIOR EXPERIENCE (Smart Groups)
+      ================================ */
 
-const PERSONA_OPTIONS = [
-  "Technologist","Scrummer", "Planner", "Closer"
-];
+      const PERSONA_OPTIONS = [
+        "Technologist", "Scrummer", "Planner", "Closer"
+      ];
 
-function renderPriorPersonaChoices() {
-  const wrap = document.getElementById("priorPersonaChoices");
-  if (!wrap) return;
+      function renderPriorPersonaChoices() {
+        const wrap = document.getElementById("priorPersonaChoices");
+        if (!wrap) return;
 
-  wrap.innerHTML = PERSONA_OPTIONS.map(p => `
+        wrap.innerHTML = PERSONA_OPTIONS.map(p => `
     <label class="flex items-center gap-2 px-3 py-2 bg-neutral-800 border border-neutral-600 rounded-lg cursor-pointer hover:bg-neutral-700">
       <input type="checkbox" class="accent-indigo-500 prior-persona-checkbox" value="${p}">
       <span class="text-sm text-gray-200">${p}</span>
     </label>
   `).join("");
-}
-
-window.togglePriorExperience = function () {
-  const toggle = document.getElementById("usePriorExpToggle");
-  const knob = document.getElementById("usePriorExpKnob");
-  const form = document.getElementById("priorExperienceForm");
-
-  if (!toggle || !knob || !form) return;
-
-  const on = toggle.checked;
-  form.classList.toggle("hidden", !on);
-
-  // tiny visual toggle effect
-  knob.style.transform = on ? "translateX(20px)" : "translateX(0px)";
-  toggle.parentElement.querySelector("div").style.backgroundColor = on ? "#4f46e5" : "#525252";
-
-  if (on) renderPriorPersonaChoices();
-};
-
-window.previewPriorFeedbackCount = function () {
-  const status = document.getElementById("priorFeedbackStatus");
-  if (!status) return;
-
-  const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
-  status.textContent = `Stored feedback rows on this device: ${stored.length}`;
-};
-
-// Builds one feedback row from the inline “prior experiences” form
-function readInlinePriorExperienceRow() {
-  const enabled = document.getElementById("usePriorExpToggle")?.checked;
-  if (!enabled) return null;
-
-  const prevSize = parseInt(document.getElementById("priorGroupSize")?.value || "0", 10);
-  const studentRating = parseInt(document.getElementById("priorStudentRating")?.value || "0", 10);
-  const teacherRating = parseInt(document.getElementById("priorTeacherRating")?.value || "0", 10);
-  const note = (document.getElementById("priorNote")?.value || "").trim();
-
-  if (!(prevSize >= 2 && prevSize <= 10)) throw new Error("Prior group size must be 2–10.");
-  if (!(studentRating >= 1 && studentRating <= 5)) throw new Error("Prior student rating must be 1–5.");
-  if (!(teacherRating >= 1 && teacherRating <= 5)) throw new Error("Prior teacher rating must be 1–5.");
-
-  const personas = [...document.querySelectorAll(".prior-persona-checkbox:checked")].map(cb => cb.value);
-  if (!personas.length) throw new Error("Select at least 1 persona for the prior group.");
-
-  return {
-    ts: Date.now(),
-    source: "inline_prior_experience",
-    prev_group_size: prevSize,
-    personas: personas,
-    student_rating_1to5: studentRating,
-    teacher_rating_1to5: teacherRating,
-    note
-  };
-}
-
-// Collects feedback rows that will be sent to Flask:
-// - localStorage saved feedback (your existing modal submissions)
-// - + the inline prior experience row (if enabled)
-function collectFeedbackRowsForTraining() {
-  const toggleOn = document.getElementById("usePriorExpToggle")?.checked;
-  if (!toggleOn) return [];
-
-  const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
-  const normalizedStored = stored.map(r => ({
-    ts: r.ts,
-    source: "stored_group_feedback",
-    prev_group_size: (r.members?.length ? r.members.length : null),
-    // if you later add personas snapshot to stored feedback, include it here:
-    personas: r.personas || null,
-    student_rating_1to5: r.student_rating_1to5,
-    teacher_rating_1to5: r.teacher_rating_1to5,
-    note: r.note
-  }));
-
-  const inlineRow = readInlinePriorExperienceRow(); // can throw
-  return inlineRow ? [...normalizedStored, inlineRow] : normalizedStored;
-}
-
-/* ================================
-   FILTERS
-================================ */
-window.toggleDropdown = function (type) {
-  document.getElementById(type + "Dropdown").classList.toggle("hidden");
-}
-
-window.clearAllFilters = function () {
-  activePeriods = [];
-  activeClasses = [];
-  document.querySelectorAll(".period-checkbox,.class-checkbox").forEach(cb => cb.checked = false);
-  document.getElementById("periodAllCheckbox").checked = true;
-  document.getElementById("classAllCheckbox").checked = true;
-  document.getElementById("periodFilterLabel").textContent = "All Periods";
-  document.getElementById("classFilterLabel").textContent = "All Classes";
-  document.getElementById("searchInput").value = "";
-  searchGroups();  // Reload all groups
-}
-
-window.onPeriodCheckboxChange = function (cb) {
-  activePeriods = [...document.querySelectorAll(".period-checkbox:checked")].map(c => c.value);
-  document.getElementById("periodAllCheckbox").checked = !activePeriods.length;
-  document.getElementById("periodFilterLabel").textContent =
-    activePeriods.length ? `Periods: ${activePeriods.join(", ")}` : "All Periods";
-  renderGroups();
-}
-
-window.onClassCheckboxChange = function (cb) {
-  activeClasses = [...document.querySelectorAll(".class-checkbox:checked")].map(c => c.value);
-  document.getElementById("classAllCheckbox").checked = !activeClasses.length;
-  document.getElementById("classFilterLabel").textContent =
-    activeClasses.length ? `Classes: ${activeClasses.join(", ")}` : "All Classes";
-  renderGroups();
-}
-
-window.onPeriodAllChange = function (cb) {
-  if (cb.checked) {
-    document.querySelectorAll(".period-checkbox").forEach(c => c.checked = false);
-    activePeriods = [];
-    renderGroups();
-  }
-}
-
-window.onClassAllChange = function (cb) {
-  if (cb.checked) {
-    document.querySelectorAll(".class-checkbox").forEach(c => c.checked = false);
-    activeClasses = [];
-    renderGroups();
-  }
-}
-
-/* ================================
-   SMART GROUP FORMATION (SRP VERSION)
-================================ */
-let generatedGroups = []; // Store generated groups before saving
-
-function readSmartGroupForm() {
-  return {
-    period: document.getElementById('smartGroupPeriod').value,
-    course: document.getElementById('smartGroupClass').value,
-    groupSize: parseInt(document.getElementById('smartGroupSize').value, 10),
-    prefix: document.getElementById('smartGroupPrefix').value.trim() || 'Team'
-  };
-}
-
-function validateSmartGroupForm({ period, course, groupSize }) {
-  if (!period || !course) {
-    throw new Error('Please select both period and class');
-  }
-
-  if (groupSize < 2 || groupSize > 10) {
-    throw new Error('Group size must be between 2 and 10');
-  }
-}
-
-function resetSmartGroupForm() {
-  document.getElementById('smartGroupPeriod').value = '';
-  document.getElementById('smartGroupClass').value = '';
-  document.getElementById('smartGroupSize').value = '4';
-  document.getElementById('smartGroupPrefix').value = '';
-  generatedGroups = [];
-  lockedGroups = new Set();
-}
-
-function openSmartGroupModalUI() {
-  document.getElementById('smartGroupModal').classList.remove('hidden');
-  document.getElementById('smartGroupResults').classList.add('hidden');
-  document.body.classList.add('modal-open');
-}
-
-function closeSmartGroupModalUI() {
-  document.getElementById('smartGroupModal').classList.add('hidden');
-  document.body.classList.remove('modal-open');
-}
-
-function getStudentsInSelectedClass(period, course) {
-  const groupsInPeriod = allGroups.filter(g =>
-    String(g.period) === String(period) && g.course === course
-  );
-
-  const seenIds = new Set();
-  const studentsInClass = [];
-
-  groupsInPeriod.forEach(group => {
-    (group.members || []).forEach(member => {
-      if (!seenIds.has(member.id)) {
-        seenIds.add(member.id);
-        studentsInClass.push(member);
       }
-    });
-  });
 
-  return studentsInClass;
-}
+      window.togglePriorExperience = function () {
+        const toggle = document.getElementById("usePriorExpToggle");
+        const knob = document.getElementById("usePriorExpKnob");
+        const form = document.getElementById("priorExperienceForm");
 
-function validateEnoughStudents(students, groupSize, period, course) {
-  if (students.length < groupSize) {
-    throw new Error(
-      `Not enough students in Period ${period} ${course}. Found ${students.length}, need at least ${groupSize}.`
-    );
-  }
-}
+        if (!toggle || !knob || !form) return;
 
-function buildUserUids(students) {
-  return students.map(student => student.uid);
-}
+        const on = toggle.checked;
+        form.classList.toggle("hidden", !on);
 
-async function evaluatePersonaCoverage(user_uids, groupSize, totalStudents) {
-  try {
-    const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify({ user_uids })
-    });
+        // tiny visual toggle effect
+        knob.style.transform = on ? "translateX(20px)" : "translateX(0px)";
+        toggle.parentElement.querySelector("div").style.backgroundColor = on ? "#4f46e5" : "#525252";
 
-    if (!checkResp.ok) {
-      return { studentsWithPersonas: 0, useAI: false };
-    }
+        if (on) renderPriorPersonaChoices();
+      };
 
-    const checkResult = await checkResp.json();
-    const studentsWithPersonas = checkResult.members.filter(
-      m => m.personas && m.personas.length > 0
-    ).length;
+      window.previewPriorFeedbackCount = function () {
+        const status = document.getElementById("priorFeedbackStatus");
+        if (!status) return;
 
-    const minRequired = Math.max(groupSize * 2, Math.ceil(totalStudents * 0.5));
-    const useAI = studentsWithPersonas >= minRequired;
+        const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
+        status.textContent = `Stored feedback rows on this device: ${stored.length}`;
+      };
 
-    return { studentsWithPersonas, useAI };
-  } catch (err) {
-    console.log('⚠️ Persona check failed, falling back to random:', err);
-    return { studentsWithPersonas: 0, useAI: false };
-  }
-}
+      // Builds one feedback row from the inline “prior experiences” form
+      function readInlinePriorExperienceRow() {
+        const enabled = document.getElementById("usePriorExpToggle")?.checked;
+        if (!enabled) return null;
 
-async function requestAIGroups(user_uids, groupSize, feedbackRows) {
-  const response = await fetch(`${pythonURI}/api/persona/form-groups`, {
-    ...fetchOptions,
-    method: 'POST',
-    body: JSON.stringify({
-      user_uids,
-      group_size: groupSize,
-      incorporate_prior_experiences: feedbackRows.length > 0,
-      feedback_rows: feedbackRows
-    })
-  });
+        const prevSize = parseInt(document.getElementById("priorGroupSize")?.value || "0", 10);
+        const studentRating = parseInt(document.getElementById("priorStudentRating")?.value || "0", 10);
+        const teacherRating = parseInt(document.getElementById("priorTeacherRating")?.value || "0", 10);
+        const note = (document.getElementById("priorNote")?.value || "").trim();
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to form groups');
-  }
+        if (!(prevSize >= 2 && prevSize <= 10)) throw new Error("Prior group size must be 2–10.");
+        if (!(studentRating >= 1 && studentRating <= 5)) throw new Error("Prior student rating must be 1–5.");
+        if (!(teacherRating >= 1 && teacherRating <= 5)) throw new Error("Prior teacher rating must be 1–5.");
 
-  return response.json();
-}
+        const personas = [...document.querySelectorAll(".prior-persona-checkbox:checked")].map(cb => cb.value);
+        if (!personas.length) throw new Error("Select at least 1 persona for the prior group.");
 
-function buildRandomGroups(students, groupSize) {
-  const shuffled = [...students].sort(() => Math.random() - 0.5);
-  const randomGroups = [];
+        return {
+          ts: Date.now(),
+          source: "inline_prior_experience",
+          prev_group_size: prevSize,
+          personas: personas,
+          student_rating_1to5: studentRating,
+          teacher_rating_1to5: teacherRating,
+          note
+        };
+      }
 
-  for (let i = 0; i < shuffled.length; i += groupSize) {
-    const groupMembers = shuffled.slice(i, i + groupSize);
-    randomGroups.push({
-      user_uids: groupMembers.map(p => p.uid),
-      team_score: null
-    });
-  }
+      // Collects feedback rows that will be sent to Flask:
+      // - localStorage saved feedback (your existing modal submissions)
+      // - + the inline prior experience row (if enabled)
+      function collectFeedbackRowsForTraining() {
+        const toggleOn = document.getElementById("usePriorExpToggle")?.checked;
+        if (!toggleOn) return [];
 
-  return {
-    groups: randomGroups,
-    average_score: null,
-    method: 'random'
-  };
-}
+        const stored = (typeof getFeedbackStore === "function") ? getFeedbackStore() : [];
+        const normalizedStored = stored.map(r => ({
+          ts: r.ts,
+          source: "stored_group_feedback",
+          prev_group_size: (r.members?.length ? r.members.length : null),
+          // if you later add personas snapshot to stored feedback, include it here:
+          personas: r.personas || null,
+          student_rating_1to5: r.student_rating_1to5,
+          teacher_rating_1to5: r.teacher_rating_1to5,
+          note: r.note
+        }));
 
-function getMethodBadgeHTML(useAI) {
-  return useAI
-    ? '<span class="inline-flex px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
-    : '<span class="inline-flex px-3 py-1 bg-neutral-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
-}
+        const inlineRow = readInlinePriorExperienceRow(); // can throw
+        return inlineRow ? [...normalizedStored, inlineRow] : normalizedStored;
+      }
 
-function convertResultToGeneratedGroups(result, students, period, course, prefix) {
-  return result.groups.map((group, index) => {
-    const letter = String.fromCharCode(65 + index);
-    const members = group.user_uids.map(uid => {
-      const person = students.find(p => p.uid === uid);
-      return { id: person?.id, uid, name: person?.name || uid };
-    });
+      /* ================================
+         FILTERS
+      ================================ */
+      window.toggleDropdown = function (type) {
+        document.getElementById(type + "Dropdown").classList.toggle("hidden");
+      }
 
-    return {
-      name: `${prefix} ${letter}`,
-      period,
-      course,
-      team_score: group.team_score,
-      memberIds: members.map(m => m.id),
-      members
-    };
-  });
-}
+      window.clearAllFilters = function () {
+        activePeriods = [];
+        activeClasses = [];
+        document.querySelectorAll(".period-checkbox,.class-checkbox").forEach(cb => cb.checked = false);
+        document.getElementById("periodAllCheckbox").checked = true;
+        document.getElementById("classAllCheckbox").checked = true;
+        document.getElementById("periodFilterLabel").textContent = "All Periods";
+        document.getElementById("classFilterLabel").textContent = "All Classes";
+        document.getElementById("searchInput").value = "";
+        searchGroups();  // Reload all groups
+      }
 
-function renderSmartGroupMethodBadge(useAI) {
-  document.getElementById('stagingMethodBadge').innerHTML = getMethodBadgeHTML(useAI);
-}
+      window.onPeriodCheckboxChange = function (cb) {
+        activePeriods = [...document.querySelectorAll(".period-checkbox:checked")].map(c => c.value);
+        document.getElementById("periodAllCheckbox").checked = !activePeriods.length;
+        document.getElementById("periodFilterLabel").textContent =
+          activePeriods.length ? `Periods: ${activePeriods.join(", ")}` : "All Periods";
+        renderGroups();
+      }
 
-function showSmartGroupResults() {
-  document.getElementById('smartGroupResults').classList.remove('hidden');
-  document.getElementById('smartGroupResults').scrollIntoView({
-    behavior: 'smooth',
-    block: 'nearest'
-  });
-}
+      window.onClassCheckboxChange = function (cb) {
+        activeClasses = [...document.querySelectorAll(".class-checkbox:checked")].map(c => c.value);
+        document.getElementById("classAllCheckbox").checked = !activeClasses.length;
+        document.getElementById("classFilterLabel").textContent =
+          activeClasses.length ? `Classes: ${activeClasses.join(", ")}` : "All Classes";
+        renderGroups();
+      }
 
-function applySmartGroupResults(result, config, students, useAI) {
-  lockedGroups = new Set();
+      window.onPeriodAllChange = function (cb) {
+        if (cb.checked) {
+          document.querySelectorAll(".period-checkbox").forEach(c => c.checked = false);
+          activePeriods = [];
+          renderGroups();
+        }
+      }
 
-  generatedGroups = convertResultToGeneratedGroups(
-    result,
-    students,
-    config.period,
-    config.course,
-    config.prefix
-  );
+      window.onClassAllChange = function (cb) {
+        if (cb.checked) {
+          document.querySelectorAll(".class-checkbox").forEach(c => c.checked = false);
+          activeClasses = [];
+          renderGroups();
+        }
+      }
 
-  renderSmartGroupMethodBadge(useAI);
-  renderStagingGroups();
-  showSmartGroupResults();
-}
+      /* ================================
+         SMART GROUP FORMATION (SRP VERSION)
+      ================================ */
+      let generatedGroups = []; // Store generated groups before saving
 
-async function buildSmartGroupResult(students, config, useAI) {
-  if (!useAI) {
-    console.log('🎲 Using random grouping');
-    showLoading('Creating random groups...');
-    return buildRandomGroups(students, config.groupSize);
-  }
+      function readSmartGroupForm() {
+        return {
+          period: document.getElementById('smartGroupPeriod').value,
+          course: document.getElementById('smartGroupClass').value,
+          groupSize: parseInt(document.getElementById('smartGroupSize').value, 10),
+          prefix: document.getElementById('smartGroupPrefix').value.trim() || 'Team'
+        };
+      }
 
-  console.log('✨ Using AI grouping');
-  showLoading('Using AI to create optimal groups...');
+      function validateSmartGroupForm({ period, course, groupSize }) {
+        if (!period || !course) {
+          throw new Error('Please select both period and class');
+        }
 
-  let feedbackRows = [];
-  try {
-    feedbackRows = collectFeedbackRowsForTraining();
-  } catch (e) {
-    throw new Error(`Prior experience input error: ${e.message}`);
-  }
+        if (groupSize < 2 || groupSize > 10) {
+          throw new Error('Group size must be between 2 and 10');
+        }
+      }
 
-  return requestAIGroups(
-    buildUserUids(students),
-    config.groupSize,
-    feedbackRows
-  );
-}
+      function resetSmartGroupForm() {
+        document.getElementById('smartGroupPeriod').value = '';
+        document.getElementById('smartGroupClass').value = '';
+        document.getElementById('smartGroupSize').value = '4';
+        document.getElementById('smartGroupPrefix').value = '';
+        generatedGroups = [];
+        lockedGroups = new Set();
+      }
 
-window.openSmartGroupFormation = function () {
-  openSmartGroupModalUI();
-};
+      function openSmartGroupModalUI() {
+        document.getElementById('smartGroupModal').classList.remove('hidden');
+        document.getElementById('smartGroupResults').classList.add('hidden');
+        document.body.classList.add('modal-open');
+      }
 
-window.closeSmartGroupModal = function () {
-  closeSmartGroupModalUI();
-  resetSmartGroupForm();
-};
+      function closeSmartGroupModalUI() {
+        document.getElementById('smartGroupModal').classList.add('hidden');
+        document.body.classList.remove('modal-open');
+      }
 
-window.generateSmartGroups = async function () {
-  showLoading('Finding students and analyzing personas...');
+      function getStudentsInSelectedClass(period, course) {
+        const groupsInPeriod = allGroups.filter(g =>
+          String(g.period) === String(period) && g.course === course
+        );
 
-  try {
-    const config = readSmartGroupForm();
-    validateSmartGroupForm(config);
+        const seenIds = new Set();
+        const studentsInClass = [];
 
-    const students = getStudentsInSelectedClass(config.period, config.course);
-    validateEnoughStudents(students, config.groupSize, config.period, config.course);
+        groupsInPeriod.forEach(group => {
+          (group.members || []).forEach(member => {
+            if (!seenIds.has(member.id)) {
+              seenIds.add(member.id);
+              studentsInClass.push(member);
+            }
+          });
+        });
 
-    const user_uids = buildUserUids(students);
-    const { studentsWithPersonas, useAI } = await evaluatePersonaCoverage(
-      user_uids,
-      config.groupSize,
-      students.length
-    );
+        return studentsInClass;
+      }
 
-    console.log(`Students with personas: ${studentsWithPersonas}`);
-    const result = await buildSmartGroupResult(students, config, useAI);
+      function validateEnoughStudents(students, groupSize, period, course) {
+        if (students.length < groupSize) {
+          throw new Error(
+            `Not enough students in Period ${period} ${course}. Found ${students.length}, need at least ${groupSize}.`
+          );
+        }
+      }
 
-    applySmartGroupResults(result, config, students, useAI);
-  } catch (error) {
-    console.error('❌ Error generating groups:', error);
-    alert(error.message || 'Failed to generate groups');
-  } finally {
-    hideLoading();
-  }
-};
+      function buildUserUids(students) {
+        return students.map(student => student.uid);
+      }
 
-/* ================================
-   STAGING STATE
-================================ */
-let lockedGroups = new Set(); // indices of locked groups
-let dragSrc = null; // { groupIndex, memberIndex }
+      async function evaluatePersonaCoverage(user_uids, groupSize, totalStudents) {
+        try {
+          const checkResp = await fetch(`${pythonURI}/api/persona/evaluate-group`, {
+            ...fetchOptions,
+            method: 'POST',
+            body: JSON.stringify({ user_uids })
+          });
 
-window.displaySmartGroupResults = function(result, period, course, allPeople, useAI = true) {
-  const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
-  lockedGroups = new Set();
+          if (!checkResp.ok) {
+            return { studentsWithPersonas: 0, useAI: false };
+          }
 
-  // Build groups with member details
-  generatedGroups = result.groups.map((group, index) => {
-    const letter = String.fromCharCode(65 + index);
-    const members = group.user_uids.map(uid => {
-      const person = allPeople.find(p => p.uid === uid);
-      return { id: person?.id, uid, name: person?.name || uid };
-    });
-    return {
-      name: `${prefix} ${letter}`,
-      period, course,
-      team_score: group.team_score,
-      memberIds: members.map(m => m.id),
-      members
-    };
-  });
+          const checkResult = await checkResp.json();
+          const studentsWithPersonas = checkResult.members.filter(
+            m => m.personas && m.personas.length > 0
+          ).length;
 
-  // Method badge
-  const methodBadge = useAI
-    ? '<span class="inline-flex px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
-    : '<span class="inline-flex px-3 py-1 bg-neutral-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
-  document.getElementById('stagingMethodBadge').innerHTML = methodBadge;
+          const minRequired = Math.max(groupSize * 2, Math.ceil(totalStudents * 0.5));
+          const useAI = studentsWithPersonas >= minRequired;
 
-  renderStagingGroups();
+          return { studentsWithPersonas, useAI };
+        } catch (err) {
+          console.log('⚠️ Persona check failed, falling back to random:', err);
+          return { studentsWithPersonas: 0, useAI: false };
+        }
+      }
 
-  document.getElementById('smartGroupResults').classList.remove('hidden');
-  document.getElementById('smartGroupResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
+      async function requestAIGroups(user_uids, groupSize, feedbackRows) {
+        const response = await fetch(`${pythonURI}/api/persona/form-groups`, {
+          ...fetchOptions,
+          method: 'POST',
+          body: JSON.stringify({
+            user_uids,
+            group_size: groupSize,
+            incorporate_prior_experiences: feedbackRows.length > 0,
+            feedback_rows: feedbackRows
+          })
+        });
 
-function renderStagingGroups() {
-  const container = document.getElementById('smartGroupResultsContent');
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to form groups');
+        }
 
-  container.innerHTML = generatedGroups.map((group, gi) => {
-    const locked = lockedGroups.has(gi);
-    const scoreHtml = group.team_score !== null
-      ? `<span class="text-xs font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">${group.team_score.toFixed(1)}</span>`
-      : `<span class="text-xs text-gray-500">Random</span>`;
+        return response.json();
+      }
 
-    const membersHtml = group.members.map((m, mi) => `
+      function buildRandomGroups(students, groupSize) {
+        const shuffled = [...students].sort(() => Math.random() - 0.5);
+        const randomGroups = [];
+
+        for (let i = 0; i < shuffled.length; i += groupSize) {
+          const groupMembers = shuffled.slice(i, i + groupSize);
+          randomGroups.push({
+            user_uids: groupMembers.map(p => p.uid),
+            team_score: null
+          });
+        }
+
+        return {
+          groups: randomGroups,
+          average_score: null,
+          method: 'random'
+        };
+      }
+
+      function getMethodBadgeHTML(useAI) {
+        return useAI
+          ? '<span class="inline-flex px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
+          : '<span class="inline-flex px-3 py-1 bg-neutral-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
+      }
+
+      function convertResultToGeneratedGroups(result, students, period, course, prefix) {
+        return result.groups.map((group, index) => {
+          const letter = String.fromCharCode(65 + index);
+          const members = group.user_uids.map(uid => {
+            const person = students.find(p => p.uid === uid);
+            return { id: person?.id, uid, name: person?.name || uid };
+          });
+
+          return {
+            name: `${prefix} ${letter}`,
+            period,
+            course,
+            team_score: group.team_score,
+            memberIds: members.map(m => m.id),
+            members
+          };
+        });
+      }
+
+      function renderSmartGroupMethodBadge(useAI) {
+        document.getElementById('stagingMethodBadge').innerHTML = getMethodBadgeHTML(useAI);
+      }
+
+      function showSmartGroupResults() {
+        document.getElementById('smartGroupResults').classList.remove('hidden');
+        document.getElementById('smartGroupResults').scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      }
+
+      function applySmartGroupResults(result, config, students, useAI) {
+        lockedGroups = new Set();
+
+        generatedGroups = convertResultToGeneratedGroups(
+          result,
+          students,
+          config.period,
+          config.course,
+          config.prefix
+        );
+
+        renderSmartGroupMethodBadge(useAI);
+        renderStagingGroups();
+        showSmartGroupResults();
+      }
+
+      async function buildSmartGroupResult(students, config, useAI) {
+        if (!useAI) {
+          console.log('🎲 Using random grouping');
+          showLoading('Creating random groups...');
+          return buildRandomGroups(students, config.groupSize);
+        }
+
+        console.log('✨ Using AI grouping');
+        showLoading('Using AI to create optimal groups...');
+
+        let feedbackRows = [];
+        try {
+          feedbackRows = collectFeedbackRowsForTraining();
+        } catch (e) {
+          throw new Error(`Prior experience input error: ${e.message}`);
+        }
+
+        return requestAIGroups(
+          buildUserUids(students),
+          config.groupSize,
+          feedbackRows
+        );
+      }
+
+      window.openSmartGroupFormation = function () {
+        openSmartGroupModalUI();
+      };
+
+      window.closeSmartGroupModal = function () {
+        closeSmartGroupModalUI();
+        resetSmartGroupForm();
+      };
+
+      window.generateSmartGroups = async function () {
+        showLoading('Finding students and analyzing personas...');
+
+        try {
+          const config = readSmartGroupForm();
+          validateSmartGroupForm(config);
+
+          const students = getStudentsInSelectedClass(config.period, config.course);
+          validateEnoughStudents(students, config.groupSize, config.period, config.course);
+
+          const user_uids = buildUserUids(students);
+          const { studentsWithPersonas, useAI } = await evaluatePersonaCoverage(
+            user_uids,
+            config.groupSize,
+            students.length
+          );
+
+          console.log(`Students with personas: ${studentsWithPersonas}`);
+          const result = await buildSmartGroupResult(students, config, useAI);
+
+          applySmartGroupResults(result, config, students, useAI);
+        } catch (error) {
+          console.error('❌ Error generating groups:', error);
+          alert(error.message || 'Failed to generate groups');
+        } finally {
+          hideLoading();
+        }
+      };
+
+      /* ================================
+         STAGING STATE
+      ================================ */
+      let lockedGroups = new Set(); // indices of locked groups
+      let dragSrc = null; // { groupIndex, memberIndex }
+
+      window.displaySmartGroupResults = function (result, period, course, allPeople, useAI = true) {
+        const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
+        lockedGroups = new Set();
+
+        // Build groups with member details
+        generatedGroups = result.groups.map((group, index) => {
+          const letter = String.fromCharCode(65 + index);
+          const members = group.user_uids.map(uid => {
+            const person = allPeople.find(p => p.uid === uid);
+            return { id: person?.id, uid, name: person?.name || uid };
+          });
+          return {
+            name: `${prefix} ${letter}`,
+            period, course,
+            team_score: group.team_score,
+            memberIds: members.map(m => m.id),
+            members
+          };
+        });
+
+        // Method badge
+        const methodBadge = useAI
+          ? '<span class="inline-flex px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">✨ AI-Optimized</span>'
+          : '<span class="inline-flex px-3 py-1 bg-neutral-600 text-white text-xs font-semibold rounded-full">🎲 Random Assignment</span>';
+        document.getElementById('stagingMethodBadge').innerHTML = methodBadge;
+
+        renderStagingGroups();
+
+        document.getElementById('smartGroupResults').classList.remove('hidden');
+        document.getElementById('smartGroupResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function renderStagingGroups() {
+        const container = document.getElementById('smartGroupResultsContent');
+
+        container.innerHTML = generatedGroups.map((group, gi) => {
+          const locked = lockedGroups.has(gi);
+          const scoreHtml = group.team_score !== null
+            ? `<span class="text-xs font-semibold ${group.team_score >= 70 ? 'text-green-400' : group.team_score >= 60 ? 'text-yellow-400' : 'text-orange-400'}">${group.team_score.toFixed(1)}</span>`
+            : `<span class="text-xs text-gray-500">Random</span>`;
+
+          const membersHtml = group.members.map((m, mi) => `
       <div
         class="staging-member flex items-center gap-2 px-2 py-1.5 bg-neutral-700 hover:bg-neutral-600 rounded-lg cursor-grab active:cursor-grabbing transition-colors text-xs"
         draggable="true"
@@ -1812,7 +1873,7 @@ function renderStagingGroups() {
       </div>
     `).join('');
 
-    return `
+          return `
       <div
         class="staging-group rounded-xl border-2 ${locked ? 'border-green-500/60 bg-green-950/20' : 'border-neutral-600 bg-neutral-800'} transition-all duration-200 flex flex-col"
         data-group="${gi}"
@@ -1852,854 +1913,873 @@ function renderStagingGroups() {
         </div>
       </div>
     `;
-  }).join('');
-}
-
-/* ================================
-   DRAG AND DROP
-================================ */
-window.onDragStart = function(e, groupIndex, memberIndex) {
-  dragSrc = { groupIndex, memberIndex };
-  e.dataTransfer.effectAllowed = 'move';
-  e.target.classList.add('opacity-40');
-
-  // Show drop hints on all other groups
-  document.querySelectorAll('.staging-group').forEach((card, i) => {
-    if (i !== groupIndex) {
-      card.querySelector('.drop-hint')?.classList.remove('hidden');
-    }
-  });
-}
-
-window.onDragEnd = function(e) {
-  e.target.classList.remove('opacity-40');
-  document.querySelectorAll('.drop-hint').forEach(h => h.classList.add('hidden'));
-  document.querySelectorAll('.staging-group').forEach(c => c.classList.remove('drag-over'));
-}
-
-window.onDragOver = function(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  e.currentTarget.classList.add('drag-over');
-}
-
-window.onDragLeave = function(e) {
-  e.currentTarget.classList.remove('drag-over');
-}
-
-window.onDrop = function(e, targetGroupIndex) {
-  e.preventDefault();
-  e.currentTarget.classList.remove('drag-over');
-
-  if (dragSrc === null) return;
-  if (dragSrc.groupIndex === targetGroupIndex) return;
-
-  const { groupIndex: srcGi, memberIndex: srcMi } = dragSrc;
-
-  // Move the member
-  const member = generatedGroups[srcGi].members[srcMi];
-  generatedGroups[srcGi].members.splice(srcMi, 1);
-  generatedGroups[srcGi].memberIds = generatedGroups[srcGi].members.map(m => m.id);
-  generatedGroups[targetGroupIndex].members.push(member);
-  generatedGroups[targetGroupIndex].memberIds = generatedGroups[targetGroupIndex].members.map(m => m.id);
-
-  // Auto-unlock source group if it was locked
-  if (lockedGroups.has(srcGi)) {
-    lockedGroups.delete(srcGi);
-  }
-
-  dragSrc = null;
-  renderStagingGroups();
-}
-
-/* ================================
-   LOCK TOGGLE
-================================ */
-window.toggleLock = function(groupIndex) {
-  if (lockedGroups.has(groupIndex)) {
-    lockedGroups.delete(groupIndex);
-  } else {
-    lockedGroups.add(groupIndex);
-  }
-  renderStagingGroups();
-}
-
-/* ================================
-   REGENERATE UNLOCKED
-================================ */
-window.regenerateUnlocked = async function() {
-  const unlockedIndices = generatedGroups
-    .map((_, i) => i)
-    .filter(i => !lockedGroups.has(i));
-
-  if (unlockedIndices.length === 0) {
-    alert('All groups are locked. Unlock at least one group to regenerate.');
-    return;
-  }
-
-  // Collect students from unlocked groups only
-  const unlockedStudents = [];
-  const seenIds = new Set();
-  unlockedIndices.forEach(i => {
-    generatedGroups[i].members.forEach(m => {
-      if (!seenIds.has(m.id)) {
-        seenIds.add(m.id);
-        unlockedStudents.push(m);
+        }).join('');
       }
-    });
-  });
 
-  const groupSize = parseInt(document.getElementById('smartGroupSize').value);
-  const period = document.getElementById('smartGroupPeriod').value;
-  const course = document.getElementById('smartGroupClass').value;
+      /* ================================
+         DRAG AND DROP
+      ================================ */
+      window.onDragStart = function (e, groupIndex, memberIndex) {
+        dragSrc = { groupIndex, memberIndex };
+        e.dataTransfer.effectAllowed = 'move';
+        e.target.classList.add('opacity-40');
 
-  showLoading('Regenerating unlocked groups...');
-
-  try {
-    const user_uids = unlockedStudents.map(s => s.uid);
-
-    // Try AI, fall back to random
-    let newGroups = [];
-    try {
-      const resp = await fetch(`${pythonURI}/api/persona/form-groups`, {
-        ...fetchOptions,
-        method: 'POST',
-        body: JSON.stringify({ user_uids, group_size: groupSize })
-      });
-      if (resp.ok) {
-        const result = await resp.json();
-        const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
-        newGroups = result.groups.map(g => {
-          const members = g.user_uids.map(uid => unlockedStudents.find(s => s.uid === uid)).filter(Boolean);
-          return { members, memberIds: members.map(m => m.id), team_score: g.team_score };
-        });
-      } else {
-        throw new Error('AI failed');
-      }
-    } catch {
-      // Random fallback
-      const shuffled = [...unlockedStudents].sort(() => Math.random() - 0.5);
-      for (let i = 0; i < shuffled.length; i += groupSize) {
-        const members = shuffled.slice(i, i + groupSize);
-        newGroups.push({ members, memberIds: members.map(m => m.id), team_score: null });
-      }
-    }
-
-    // Replace unlocked groups with new ones, keeping names and period/course
-    let newGroupIdx = 0;
-    unlockedIndices.forEach(i => {
-      if (newGroupIdx < newGroups.length) {
-        generatedGroups[i].members = newGroups[newGroupIdx].members;
-        generatedGroups[i].memberIds = newGroups[newGroupIdx].memberIds;
-        generatedGroups[i].team_score = newGroups[newGroupIdx].team_score;
-        newGroupIdx++;
-      } else {
-        // No more new groups - empty this slot
-        generatedGroups[i].members = [];
-        generatedGroups[i].memberIds = [];
-      }
-    });
-
-    // Remove empty groups
-    generatedGroups = generatedGroups.filter(g => g.members.length > 0);
-
-    renderStagingGroups();
-  } catch (err) {
-    console.error('Regeneration failed:', err);
-    alert('Failed to regenerate groups');
-  } finally {
-    hideLoading();
-  }
-}
-
-/* ================================
-   SAVE
-================================ */
-window.saveSmartGroups = async function() {
-  if (!generatedGroups.length) {
-    alert('No groups to save');
-    return;
-  }
-
-  showLoading(`Creating ${generatedGroups.length} groups...`);
-  const createdGroups = [];
-  const failedGroups = [];
-
-  try {
-    for (let i = 0; i < generatedGroups.length; i++) {
-      const group = generatedGroups[i];
-      showLoading(`Creating group ${i + 1} of ${generatedGroups.length}...`);
-
-      try {
-        const createResp = await fetch(`${javaURI}/api/groups`, {
-          ...fetchOptions,
-          method: 'POST',
-          body: JSON.stringify({ name: group.name, period: group.period, course: group.course })
-        });
-
-        if (!createResp.ok) {
-          failedGroups.push(group.name);
-          continue;
-        }
-
-        const createdGroup = await createResp.json();
-
-        for (const memberId of group.memberIds) {
-          if (!memberId) continue;
-          try {
-            await fetch(`${javaURI}/api/groups/${createdGroup.id}/members/${memberId}`, {
-              ...fetchOptions, method: 'POST'
-            });
-          } catch (err) {
-            console.error(`Failed to add member ${memberId}`, err);
+        // Show drop hints on all other groups
+        document.querySelectorAll('.staging-group').forEach((card, i) => {
+          if (i !== groupIndex) {
+            card.querySelector('.drop-hint')?.classList.remove('hidden');
           }
-        }
-
-        createdGroups.push(createdGroup);
-      } catch (err) {
-        failedGroups.push(group.name);
+        });
       }
-    }
 
-    allGroups.push(...createdGroups);
+      window.onDragEnd = function (e) {
+        e.target.classList.remove('opacity-40');
+        document.querySelectorAll('.drop-hint').forEach(h => h.classList.add('hidden'));
+        document.querySelectorAll('.staging-group').forEach(c => c.classList.remove('drag-over'));
+      }
 
-    if (failedGroups.length === 0) {
-      alert(`✅ Successfully created all ${createdGroups.length} groups!`);
-    } else {
-      alert(`⚠️ Created ${createdGroups.length} groups. ${failedGroups.length} failed.`);
-    }
+      window.onDragOver = function (e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        e.currentTarget.classList.add('drag-over');
+      }
 
-    closeSmartGroupModal();
-    renderGroups();
-  } catch (err) {
-    alert(`Failed to save groups: ${err.message}`);
-  } finally {
-    hideLoading();
-  }
-}
+      window.onDragLeave = function (e) {
+        e.currentTarget.classList.remove('drag-over');
+      }
 
-  // ================================
-  // CHAT FUNCTIONALITY
-  // ================================
-  const slashCommands = ['/calendar', '/adduser'];
-  let selectedCommandIndex = 0;
+      window.onDrop = function (e, targetGroupIndex) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
 
-  async function initializeChatUser() {
-    try {
-      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
-      if (!res.ok) return;
-      const user = await res.json();
-      currentUser = user || null;
-      currentUserDisplayName = user?.name || user?.uid || user?.github || 'You';
-    } catch (err) {
-      console.warn('User lookup failed', err);
-    }
-  }
+        if (dragSrc === null) return;
+        if (dragSrc.groupIndex === targetGroupIndex) return;
 
-  function formatTimestamp(isoString) {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toLocaleString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
-    });
-  }
+        const { groupIndex: srcGi, memberIndex: srcMi } = dragSrc;
 
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result.split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
+        // Move the member
+        const member = generatedGroups[srcGi].members[srcMi];
+        generatedGroups[srcGi].members.splice(srcMi, 1);
+        generatedGroups[srcGi].memberIds = generatedGroups[srcGi].members.map(m => m.id);
+        generatedGroups[targetGroupIndex].members.push(member);
+        generatedGroups[targetGroupIndex].memberIds = generatedGroups[targetGroupIndex].members.map(m => m.id);
 
-  function setChatImagePreview(base64, mimeType = 'image/png') {
-    pendingChatImageBase64 = base64;
-    pendingChatImageMime = mimeType;
-    const messageBox = document.getElementById('imageMessageBox');
-    messageBox.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = `data:${mimeType};base64,${base64}`;
-    img.alt = 'Selected image';
-    img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-    messageBox.appendChild(img);
-  }
-
-  function clearChatImagePreview() {
-    pendingChatImageBase64 = null;
-    pendingChatImageMime = 'image/png';
-    const messageBox = document.getElementById('imageMessageBox');
-    messageBox.innerHTML = '';
-  }
-
-  window.triggerChatImagePicker = function () {
-    const input = document.getElementById('chatImageInput');
-    if (input) input.click();
-  };
-
-  window.handleChatImageSelected = async function (event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try {
-      const base64 = await fileToBase64(file);
-      setChatImagePreview(base64, file.type || 'image/png');
-    } catch (err) {
-      console.error('Failed to read image', err);
-    }
-  };
-
-  window.handlePastedChatImage = async function (event) {
-    const items = (event.clipboardData || window.clipboardData)?.items || [];
-    const imageItem = Array.from(items).find(item => item.type.startsWith('image/'));
-    if (!imageItem) return;
-    const imageFile = imageItem.getAsFile();
-    if (!imageFile) return;
-    try {
-      const base64 = await fileToBase64(imageFile);
-      setChatImagePreview(base64, imageFile.type || 'image/png');
-    } catch (err) {
-      console.error('Image paste failed', err);
-    }
-  };
-
-  function getChatMessageKey(msg) {
-    return JSON.stringify([
-      msg?.name || '',
-      msg?.date || '',
-      msg?.message || '',
-      msg?.image || ''
-    ]);
-  }
-
-  function getChatImageSrc(image) {
-    if (!image) return null;
-    if (/^(data:|https?:\/\/|\/)/i.test(image)) return image;
-    return `data:image/png;base64,${image}`;
-  }
-
-  function appendSingleMessage(msg) {
-    const chatMessages = document.getElementById('chatMessages');
-    let emptyState = document.getElementById('chatEmptyState');
-    const messageKey = getChatMessageKey(msg);
-
-    if (!chatMessages || renderedChatMessageKeys.has(messageKey)) {
-      return;
-    }
-
-    if (!emptyState) {
-      emptyState = document.createElement('div');
-      emptyState.id = 'chatEmptyState';
-      emptyState.className = 'text-center text-gray-500 text-sm py-6';
-      emptyState.textContent = 'No messages yet.';
-    }
-
-    emptyState.classList.add('hidden');
-
-    const wrapper = document.createElement('div');
-
-    const header = document.createElement('div');
-    header.className = 'flex items-baseline gap-2 mb-1';
-
-    const nameEl = document.createElement('span');
-    nameEl.className = 'text-white font-semibold text-sm';
-    nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
-
-    const timeEl = document.createElement('span');
-    timeEl.className = 'text-gray-500 text-xs';
-    timeEl.textContent = formatTimestamp(msg.date);
-
-    header.appendChild(nameEl);
-    header.appendChild(timeEl);
-    wrapper.appendChild(header);
-
-    if (msg.message) {
-      const textEl = document.createElement('p');
-      textEl.className = 'text-gray-200 text-sm';
-      textEl.textContent = msg.message;
-      wrapper.appendChild(textEl);
-    }
-
-    if (msg.image) {
-      const img = document.createElement('img');
-      img.src = getChatImageSrc(msg.image);
-      img.alt = 'Shared image';
-      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-      wrapper.appendChild(img);
-    }
-
-    chatMessages.appendChild(wrapper);
-    renderedChatMessageKeys.add(messageKey);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  function renderChatMessages(messages) {
-    const chatMessages = document.getElementById('chatMessages');
-    let emptyState = document.getElementById('chatEmptyState');
-    chatMessages.innerHTML = '';
-    renderedChatMessageKeys = new Set();
-
-    if (!emptyState) {
-      emptyState = document.createElement('div');
-      emptyState.id = 'chatEmptyState';
-      emptyState.className = 'text-center text-gray-500 text-sm py-6';
-      emptyState.textContent = 'No messages yet.';
-    }
-
-    if (!messages || messages.length === 0) {
-      chatMessages.appendChild(emptyState);
-      emptyState.classList.remove('hidden');
-      return;
-    }
-
-    messages.forEach(appendSingleMessage);
-  }
-
-  async function fetchChatMessages() {
-    if (!activeChatGroupId) return;
-    try {
-      const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, fetchOptions);
-      if (!res.ok) throw new Error('Failed to load chat messages');
-      const messages = await res.json();
-      renderChatMessages(messages);
-    } catch (err) {
-      console.error('Chat fetch failed', err);
-    }
-  }
-
-  // helpers that mimic calendar page so slash-command code can call them
-  function handleAuthError(response) {
-    if (!response) return false;
-    if (response.status === 401 || response.status === 403) {
-      console.warn('Auth error', response.status);
-      alert('Please log in to perform this action.');
-      return true;
-    }
-    return false;
-  }
-  function handleFetchError(error) {
-    if (error instanceof TypeError && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
-      console.warn('Network/CORS error', error);
-      alert('Network error or session expired.');
-      return true;
-    }
-    return false;
-  }
-
-  // helper to parse and trigger calendar API when user types a slash command
-  function handleCalendarSlashCommand(rawText) {
-    // expected format: /calendar YYYY-MM-DD [HH:MM] Event title [| description]
-    const regex = /^\/calendar\s+(\d{4}-\d{2}-\d{2})(?:\s+(\d{1,2}:\d{2}))?\s+([^|]+)(?:\|(.+))?/i;
-    const m = rawText.match(regex);
-    if (!m) return false;
-    const dateStr = m[1];
-    const timeStr = m[2];
-    let title = m[3].trim();
-    const description = m[4] ? m[4].trim() : '';
-    if (timeStr) title = title + ` @ ${timeStr}`;
-
-    // derive period from group if possible (needed for backend validation)
-    let derivedPeriod = '';
-    if (activeChatGroupName && Array.isArray(allGroups)) {
-      const matched = allGroups.find(g => g.name === activeChatGroupName);
-      if (matched && matched.course) derivedPeriod = matched.course.toUpperCase();
-    }
-
-    if (!activeChatGroupName) {
-      alert('Open the group chat first; events must be tied to a group.');
-      return false;
-    }
-
-    // embed priority prefix like calendar page does
-    let titleToSave = title;
-    if (!/^\[P[0-3]\]/.test(titleToSave)) {
-      titleToSave = `[P2] ${titleToSave}`;
-    }
-
-    const currentUserName = (window.user && window.user.name) ? window.user.name : '';
-
-    const eventPayload = {
-      title: titleToSave,
-      description,
-      date: dateStr,
-      priority: 'P2',
-      groupName: activeChatGroupName,
-      period: derivedPeriod,
-      type: 'event',
-      individual: ''
-    };
-    console.log('calendar command payload', eventPayload);
-
-    // use the older '/add' endpoint in case migrations differ
-    fetch(`${javaURI}/api/calendar/add`, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify(eventPayload)
-    })
-      .then(res => {
-        if (handleAuthError(res)) {
-          return null;
+        // Auto-unlock source group if it was locked
+        if (lockedGroups.has(srcGi)) {
+          lockedGroups.delete(srcGi);
         }
-        if (!res.ok) {
-          return res.text().then(t => {
-            throw new Error(`Calendar API error ${res.status}: ${t}`);
+
+        dragSrc = null;
+        renderStagingGroups();
+      }
+
+      /* ================================
+         LOCK TOGGLE
+      ================================ */
+      window.toggleLock = function (groupIndex) {
+        if (lockedGroups.has(groupIndex)) {
+          lockedGroups.delete(groupIndex);
+        } else {
+          lockedGroups.add(groupIndex);
+        }
+        renderStagingGroups();
+      }
+
+      /* ================================
+         REGENERATE UNLOCKED
+      ================================ */
+      window.regenerateUnlocked = async function () {
+        const unlockedIndices = generatedGroups
+          .map((_, i) => i)
+          .filter(i => !lockedGroups.has(i));
+
+        if (unlockedIndices.length === 0) {
+          alert('All groups are locked. Unlock at least one group to regenerate.');
+          return;
+        }
+
+        // Collect students from unlocked groups only
+        const unlockedStudents = [];
+        const seenIds = new Set();
+        unlockedIndices.forEach(i => {
+          generatedGroups[i].members.forEach(m => {
+            if (!seenIds.has(m.id)) {
+              seenIds.add(m.id);
+              unlockedStudents.push(m);
+            }
           });
-        }
-        return res.json();
-      })
-      .then(data => {
-        if (data) {
-          alert('Calendar event created successfully');
-        }
-      })
-      .catch(err => {
-        if (!handleFetchError(err)) {
-          console.error('Calendar command failed', err);
-        }
-        alert('Failed to create calendar event');
-      });
+        });
 
-    return true;
-  }
+        const groupSize = parseInt(document.getElementById('smartGroupSize').value);
+        const period = document.getElementById('smartGroupPeriod').value;
+        const course = document.getElementById('smartGroupClass').value;
 
-  window.sendChatMessage = async function () {
-    if (!activeChatGroupId) {
-      console.warn('Chat group not resolved yet');
-      return;
-    }
-    const chatInput = document.getElementById('chatInput');
-    const text = chatInput.value.trim();
-    const image = pendingChatImageBase64 || null;
+        showLoading('Regenerating unlocked groups...');
 
-    // intercept calendar slash command and try to handle it; if handled, don't send as chat
-    if (text.toLowerCase().startsWith('/calendar')) {
-      const handled = handleCalendarSlashCommand(text);
-      if (handled) {
+        try {
+          const user_uids = unlockedStudents.map(s => s.uid);
+
+          // Try AI, fall back to random
+          let newGroups = [];
+          try {
+            const resp = await fetch(`${pythonURI}/api/persona/form-groups`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({ user_uids, group_size: groupSize })
+            });
+            if (resp.ok) {
+              const result = await resp.json();
+              const prefix = document.getElementById('smartGroupPrefix').value.trim() || 'Team';
+              newGroups = result.groups.map(g => {
+                const members = g.user_uids.map(uid => unlockedStudents.find(s => s.uid === uid)).filter(Boolean);
+                return { members, memberIds: members.map(m => m.id), team_score: g.team_score };
+              });
+            } else {
+              throw new Error('AI failed');
+            }
+          } catch {
+            // Random fallback
+            const shuffled = [...unlockedStudents].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < shuffled.length; i += groupSize) {
+              const members = shuffled.slice(i, i + groupSize);
+              newGroups.push({ members, memberIds: members.map(m => m.id), team_score: null });
+            }
+          }
+
+          // Replace unlocked groups with new ones, keeping names and period/course
+          let newGroupIdx = 0;
+          unlockedIndices.forEach(i => {
+            if (newGroupIdx < newGroups.length) {
+              generatedGroups[i].members = newGroups[newGroupIdx].members;
+              generatedGroups[i].memberIds = newGroups[newGroupIdx].memberIds;
+              generatedGroups[i].team_score = newGroups[newGroupIdx].team_score;
+              newGroupIdx++;
+            } else {
+              // No more new groups - empty this slot
+              generatedGroups[i].members = [];
+              generatedGroups[i].memberIds = [];
+            }
+          });
+
+          // Remove empty groups
+          generatedGroups = generatedGroups.filter(g => g.members.length > 0);
+
+          renderStagingGroups();
+        } catch (err) {
+          console.error('Regeneration failed:', err);
+          alert('Failed to regenerate groups');
+        } finally {
+          hideLoading();
+        }
+      }
+
+      /* ================================
+         SAVE
+      ================================ */
+      window.saveSmartGroups = async function () {
+        if (!generatedGroups.length) {
+          alert('No groups to save');
+          return;
+        }
+
+        showLoading(`Creating ${generatedGroups.length} groups...`);
+        const createdGroups = [];
+        const failedGroups = [];
+
+        try {
+          for (let i = 0; i < generatedGroups.length; i++) {
+            const group = generatedGroups[i];
+            showLoading(`Creating group ${i + 1} of ${generatedGroups.length}...`);
+
+            try {
+              const createResp = await fetch(`${javaURI}/api/groups`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({ name: group.name, period: group.period, course: group.course })
+              });
+
+              if (!createResp.ok) {
+                failedGroups.push(group.name);
+                continue;
+              }
+
+              const createdGroup = await createResp.json();
+
+              for (const memberId of group.memberIds) {
+                if (!memberId) continue;
+                try {
+                  await fetch(`${javaURI}/api/groups/${createdGroup.id}/members/${memberId}`, {
+                    ...fetchOptions, method: 'POST'
+                  });
+                } catch (err) {
+                  console.error(`Failed to add member ${memberId}`, err);
+                }
+              }
+
+              createdGroups.push(createdGroup);
+            } catch (err) {
+              failedGroups.push(group.name);
+            }
+          }
+
+          allGroups.push(...createdGroups);
+
+          if (failedGroups.length === 0) {
+            alert(`✅ Successfully created all ${createdGroups.length} groups!`);
+          } else {
+            alert(`⚠️ Created ${createdGroups.length} groups. ${failedGroups.length} failed.`);
+          }
+
+          closeSmartGroupModal();
+          renderGroups();
+        } catch (err) {
+          alert(`Failed to save groups: ${err.message}`);
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // ================================
+      // CHAT FUNCTIONALITY
+      // ================================
+      const slashCommands = ['/calendar', '/adduser'];
+      let selectedCommandIndex = 0;
+
+      async function initializeChatUser() {
+        try {
+          const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+          if (!res.ok) return;
+          const user = await res.json();
+          currentUser = user || null;
+          currentUserDisplayName = user?.name || user?.uid || user?.github || 'You';
+        } catch (err) {
+          console.warn('User lookup failed', err);
+        }
+      }
+
+      function formatTimestamp(isoString) {
+        if (!isoString) return '';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toLocaleString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit'
+        });
+      }
+
+      function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = reader.result.split(',')[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function setChatImagePreview(base64, mimeType = 'image/png') {
+        pendingChatImageBase64 = base64;
+        pendingChatImageMime = mimeType;
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = `data:${mimeType};base64,${base64}`;
+        img.alt = 'Selected image';
+        img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+        messageBox.appendChild(img);
+      }
+
+      function clearChatImagePreview() {
+        pendingChatImageBase64 = null;
+        pendingChatImageMime = 'image/png';
+        const messageBox = document.getElementById('imageMessageBox');
+        messageBox.innerHTML = '';
+      }
+
+      window.triggerChatImagePicker = function () {
+        const input = document.getElementById('chatImageInput');
+        if (input) input.click();
+      };
+
+      window.handleChatImageSelected = async function (event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+          const base64 = await fileToBase64(file);
+          setChatImagePreview(base64, file.type || 'image/png');
+        } catch (err) {
+          console.error('Failed to read image', err);
+        }
+      };
+
+      window.handlePastedChatImage = async function (event) {
+        const items = (event.clipboardData || window.clipboardData)?.items || [];
+        const imageItem = Array.from(items).find(item => item.type.startsWith('image/'));
+        if (!imageItem) return;
+        const imageFile = imageItem.getAsFile();
+        if (!imageFile) return;
+        try {
+          const base64 = await fileToBase64(imageFile);
+          setChatImagePreview(base64, imageFile.type || 'image/png');
+        } catch (err) {
+          console.error('Image paste failed', err);
+        }
+      };
+
+      function getChatMessageKey(msg) {
+        return JSON.stringify([
+          msg?.name || '',
+          msg?.date || '',
+          msg?.message || '',
+          msg?.image || ''
+        ]);
+      }
+
+      function getChatImageSrc(image) {
+        if (!image) return null;
+        if (/^(data:|https?:\/\/|\/)/i.test(image)) return image;
+        return `data:image/png;base64,${image}`;
+      }
+
+      function appendSingleMessage(msg) {
+        const chatMessages = document.getElementById('chatMessages');
+        let emptyState = document.getElementById('chatEmptyState');
+        const messageKey = getChatMessageKey(msg);
+
+        if (!chatMessages || renderedChatMessageKeys.has(messageKey)) {
+          return;
+        }
+
+        if (!emptyState) {
+          emptyState = document.createElement('div');
+          emptyState.id = 'chatEmptyState';
+          emptyState.className = 'text-center text-gray-500 text-sm py-6';
+          emptyState.textContent = 'No messages yet.';
+        }
+
+        emptyState.classList.add('hidden');
+
+        const wrapper = document.createElement('div');
+
+        const header = document.createElement('div');
+        header.className = 'flex items-baseline gap-2 mb-1';
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'text-white font-semibold text-sm';
+        nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
+
+        const timeEl = document.createElement('span');
+        timeEl.className = 'text-gray-500 text-xs';
+        timeEl.textContent = formatTimestamp(msg.date);
+
+        header.appendChild(nameEl);
+        header.appendChild(timeEl);
+        wrapper.appendChild(header);
+
+        if (msg.message) {
+          const textEl = document.createElement('p');
+          textEl.className = 'text-gray-200 text-sm';
+          textEl.textContent = msg.message;
+          wrapper.appendChild(textEl);
+        }
+
+        if (msg.image) {
+          const img = document.createElement('img');
+          img.src = getChatImageSrc(msg.image);
+          img.alt = 'Shared image';
+          img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+          wrapper.appendChild(img);
+        }
+
+        chatMessages.appendChild(wrapper);
+        renderedChatMessageKeys.add(messageKey);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function renderChatMessages(messages) {
+        const chatMessages = document.getElementById('chatMessages');
+        let emptyState = document.getElementById('chatEmptyState');
+        chatMessages.innerHTML = '';
+        renderedChatMessageKeys = new Set();
+
+        if (!emptyState) {
+          emptyState = document.createElement('div');
+          emptyState.id = 'chatEmptyState';
+          emptyState.className = 'text-center text-gray-500 text-sm py-6';
+          emptyState.textContent = 'No messages yet.';
+        }
+
+        if (!messages || messages.length === 0) {
+          chatMessages.appendChild(emptyState);
+          emptyState.classList.remove('hidden');
+          return;
+        }
+
+        messages.forEach(appendSingleMessage);
+      }
+
+      async function fetchChatMessages() {
+        if (!activeChatGroupId) return;
+        try {
+          const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, fetchOptions);
+          if (!res.ok) throw new Error('Failed to load chat messages');
+          const messages = await res.json();
+          renderChatMessages(messages);
+        } catch (err) {
+          console.error('Chat fetch failed', err);
+        }
+      }
+
+      window.sendChatMessage = async function () {
+        if (!activeChatGroupId) {
+          console.warn('Chat group not resolved yet');
+          return;
+        }
+        const chatInput = document.getElementById('chatInput');
+        const text = chatInput.value.trim();
+        const image = pendingChatImageBase64 || null;
+
+        if (!text && !image) return;
+
+        const payload = {
+          name: currentUserDisplayName,
+          message: text,
+          date: new Date().toISOString(),
+          image: image
+        };
+
+        // Clear UI immediately for responsive UX; rendering is handled by WebSocket broadcast.
         chatInput.value = '';
         clearChatImagePreview();
-        return;
-      } else {
-        // user typed /calendar but parsing failed
-        alert('Command format: /calendar YYYY-MM-DD [HH:MM] Title | optional description');
-        return;
-      }
-    }
 
-    if (!text && !image) return;
-
-    const payload = {
-      name: currentUserDisplayName,
-      message: text,
-      date: new Date().toISOString(),
-      image: image
-    };
-
-    try {
-      const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, {
-        ...fetchOptions,
-        method: 'POST',
-        headers: {
-          ...(fetchOptions.headers || {}),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Failed to send message');
-      const messages = await res.json();
-      renderChatMessages(messages);
-      chatInput.value = '';
-      clearChatImagePreview();
-    } catch (err) {
-      console.error('Send message failed', err);
-    }
-  };
-
-  function startChatPolling() {
-    if (!activeChatGroupId) return;
-
-    if (stompClient) {
-      stopChatPolling();
-    }
-
-    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
-      console.error('SockJS/STOMP dependencies are not available');
-      return;
-    }
-
-    const socket = new SockJS(`${javaURI}/ws-chat`);
-    stompClient = Stomp.over(socket);
-    stompClient.debug = null;
-
-    stompClient.connect({}, () => {
-      if (!stompClient || !activeChatGroupId) return;
-
-      stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (message) => {
         try {
-          const payload = JSON.parse(message.body);
-          appendSingleMessage(payload);
+          const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, {
+            ...fetchOptions,
+            method: 'POST',
+            headers: {
+              ...(fetchOptions.headers || {}),
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) throw new Error('Failed to send message');
         } catch (err) {
-          console.error('Failed to parse incoming chat message', err);
+          console.error('Send message failed', err);
         }
-      });
-    }, (err) => {
-      console.error('WebSocket connection failed', err);
-    });
-  }
+      };
 
-  function stopChatPolling() {
-    if (stompClient) {
-      const clientToDisconnect = stompClient;
-      stompClient = null;
-      clientToDisconnect.disconnect(() => {});
-    }
-  }
+      function startChatPolling() {
+        if (!activeChatGroupId) return;
 
-  function downloadBase64File(filename, base64Data) {
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+        if (stompClient) {
+          stopChatPolling();
+        }
 
-  function isImageFile(filename) {
-    return /\.(png|jpe?g|gif)$/i.test(filename || '');
-  }
+        if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+          console.error('SockJS/STOMP dependencies are not available');
+          return;
+        }
 
-  function getImageMimeType(filename) {
-    if (/\.jpe?g$/i.test(filename)) return 'image/jpeg';
-    if (/\.gif$/i.test(filename)) return 'image/gif';
-    return 'image/png';
-  }
+        console.log(`Attempting WebSocket connection to ${javaURI}/ws-chat`);
+        const socket = new SockJS(`${javaURI}/ws-chat`);
+        stompClient = Stomp.over(socket);
+        stompClient.debug = console.log;
 
-  function renderSharedFiles(files) {
-    const list = document.getElementById('sharedFilesList');
-    let emptyState = document.getElementById('filesEmptyState');
-    list.innerHTML = '';
+        stompClient.connect({}, () => {
+          if (!stompClient || !activeChatGroupId) return;
 
-    if (!emptyState) {
-      emptyState = document.createElement('div');
-      emptyState.id = 'filesEmptyState';
-      emptyState.className = 'text-center text-gray-500 text-sm py-6';
-      emptyState.textContent = 'No files uploaded yet.';
-    }
+          console.log('WebSocket Connected Successfully!');
+          const topic = `/topic/group/${activeChatGroupId}`;
+          console.log(`Subscribing to topic: ${topic}`);
 
-    if (!files || files.length === 0) {
-      list.appendChild(emptyState);
-      emptyState.classList.remove('hidden');
-      return;
-    }
-
-    emptyState.classList.add('hidden');
-    files.forEach(file => {
-      const card = document.createElement('div');
-      card.className = 'bg-neutral-700 border border-neutral-600 rounded-lg p-3 flex items-center gap-3';
-
-      if (isImageFile(file.filename)) {
-        const img = document.createElement('img');
-        const mime = getImageMimeType(file.filename);
-        img.src = `data:${mime};base64,${file.base64Data}`;
-        img.alt = file.filename;
-        img.className = 'w-12 h-12 object-cover rounded-md border border-neutral-600';
-        card.appendChild(img);
-      } else {
-        const icon = document.createElement('div');
-        icon.className = 'w-12 h-12 flex items-center justify-center bg-neutral-800 rounded-md text-gray-400 text-sm';
-        icon.textContent = 'FILE';
-        card.appendChild(icon);
+          stompClient.subscribe(topic, (message) => {
+            try {
+              console.log('Incoming WebSocket payload:', message.body);
+              const payload = JSON.parse(message.body);
+              appendSingleMessage(payload);
+            } catch (err) {
+              console.error('Failed to parse incoming chat message', err);
+            }
+          });
+        }, (err) => {
+          console.error('WebSocket connection failed', err);
+        });
       }
 
-      const info = document.createElement('div');
-      info.className = 'flex-1';
-      const nameEl = document.createElement('div');
-      nameEl.className = 'text-white text-sm font-medium';
-      nameEl.textContent = file.filename;
-      info.appendChild(nameEl);
-      card.appendChild(info);
+      function stopChatPolling() {
+        if (stompClient) {
+          const clientToDisconnect = stompClient;
+          stompClient = null;
+          clientToDisconnect.disconnect(() => { });
+        }
+      }
 
-      const downloadBtn = document.createElement('button');
-      downloadBtn.className = 'px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg';
-      downloadBtn.textContent = 'Download';
-      downloadBtn.addEventListener('click', () => downloadBase64File(file.filename, file.base64Data));
-      card.appendChild(downloadBtn);
+      function downloadBase64File(filename, base64Data) {
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
 
-      list.appendChild(card);
-    });
-  }
+      function isImageFile(filename) {
+        return /\.(png|jpe?g|gif)$/i.test(filename || '');
+      }
 
-  async function fetchSharedFiles() {
-    if (!activeChatGroupId) return;
-    try {
-      const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, fetchOptions);
-      if (!res.ok) throw new Error('Failed to load shared files');
-      const files = await res.json();
-      renderSharedFiles(files);
-    } catch (err) {
-      console.error('Shared files fetch failed', err);
-    }
-  }
+      function getImageMimeType(filename) {
+        if (/\.jpe?g$/i.test(filename)) return 'image/jpeg';
+        if (/\.gif$/i.test(filename)) return 'image/gif';
+        return 'image/png';
+      }
 
-  window.uploadSharedFile = async function () {
-    if (!activeChatGroupId) return;
-    const input = document.getElementById('sharedFileInput');
-    const file = input.files?.[0];
-    if (!file) return;
+      function renderSharedFiles(files) {
+        const list = document.getElementById('sharedFilesList');
+        let emptyState = document.getElementById('filesEmptyState');
+        list.innerHTML = '';
 
-    try {
-      const base64Data = await fileToBase64(file);
-      const payload = { filename: file.name, base64Data };
+        if (!emptyState) {
+          emptyState = document.createElement('div');
+          emptyState.id = 'filesEmptyState';
+          emptyState.className = 'text-center text-gray-500 text-sm py-6';
+          emptyState.textContent = 'No files uploaded yet.';
+        }
 
-      const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, {
-        ...fetchOptions,
-        method: 'POST',
-        headers: {
-          ...(fetchOptions.headers || {}),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+        if (!files || files.length === 0) {
+          list.appendChild(emptyState);
+          emptyState.classList.remove('hidden');
+          return;
+        }
 
-      if (!res.ok) throw new Error('Failed to upload file');
-      input.value = '';
-      await fetchSharedFiles();
-    } catch (err) {
-      console.error('Upload failed', err);
-    }
-  };
+        emptyState.classList.add('hidden');
+        files.forEach(file => {
+          const card = document.createElement('div');
+          card.className = 'bg-neutral-700 border border-neutral-600 rounded-lg p-3 flex items-center gap-3';
 
-  window.showChatTab = function () {
-    document.getElementById('chatPanel').classList.remove('hidden');
-    document.getElementById('filesPanel').classList.add('hidden');
-    document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
-    document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
-  };
+          if (isImageFile(file.filename)) {
+            const img = document.createElement('img');
+            const mime = getImageMimeType(file.filename);
+            img.src = `data:${mime};base64,${file.base64Data}`;
+            img.alt = file.filename;
+            img.className = 'w-12 h-12 object-cover rounded-md border border-neutral-600';
+            card.appendChild(img);
+          } else {
+            const icon = document.createElement('div');
+            icon.className = 'w-12 h-12 flex items-center justify-center bg-neutral-800 rounded-md text-gray-400 text-sm';
+            icon.textContent = 'FILE';
+            card.appendChild(icon);
+          }
 
-  window.showFilesTab = function () {
-    document.getElementById('filesPanel').classList.remove('hidden');
-    document.getElementById('chatPanel').classList.add('hidden');
-    document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
-    document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
-    fetchSharedFiles();
-  };
+          const info = document.createElement('div');
+          info.className = 'flex-1';
+          const nameEl = document.createElement('div');
+          nameEl.className = 'text-white text-sm font-medium';
+          nameEl.textContent = file.filename;
+          info.appendChild(nameEl);
+          card.appendChild(info);
 
-  function handleChatInputChange(event) {
-    const input = event.target;
-    const value = input.value;
-    const popup = document.getElementById('slashCommandPopup');
+          const downloadBtn = document.createElement('button');
+          downloadBtn.className = 'px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg';
+          downloadBtn.textContent = 'Download';
+          downloadBtn.addEventListener('click', () => downloadBase64File(file.filename, file.base64Data));
+          card.appendChild(downloadBtn);
 
-    if (value.startsWith('/') && !value.includes(' ')) {
-      const filter = value.toLowerCase();
-      const items = document.querySelectorAll('.slash-command-item');
-      let visibleCount = 0;
+          list.appendChild(card);
+        });
+      }
 
-      items.forEach(item => {
-        const command = item.querySelector('.text-white').textContent.toLowerCase();
-        if (command.startsWith(filter)) {
-          item.classList.remove('hidden');
-          visibleCount++;
+      async function fetchSharedFiles() {
+        if (!activeChatGroupId) return;
+        try {
+          const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, fetchOptions);
+          if (!res.ok) throw new Error('Failed to load shared files');
+          const files = await res.json();
+          renderSharedFiles(files);
+        } catch (err) {
+          console.error('Shared files fetch failed', err);
+        }
+      }
+
+      window.uploadSharedFile = async function () {
+        if (!activeChatGroupId) return;
+        const input = document.getElementById('sharedFileInput');
+        const file = input.files?.[0];
+        if (!file) return;
+
+        try {
+          const base64Data = await fileToBase64(file);
+          const payload = { filename: file.name, base64Data };
+
+          const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, {
+            ...fetchOptions,
+            method: 'POST',
+            headers: {
+              ...(fetchOptions.headers || {}),
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) throw new Error('Failed to upload file');
+          input.value = '';
+          await fetchSharedFiles();
+        } catch (err) {
+          console.error('Upload failed', err);
+        }
+      };
+
+      window.showChatTab = function () {
+        document.getElementById('chatPanel').classList.remove('hidden');
+        document.getElementById('filesPanel').classList.add('hidden');
+        document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
+        document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
+      };
+
+      window.showFilesTab = function () {
+        document.getElementById('filesPanel').classList.remove('hidden');
+        document.getElementById('chatPanel').classList.add('hidden');
+        document.getElementById('filesTabButton').className = 'px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white';
+        document.getElementById('chatTabButton').className = 'px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700';
+        fetchSharedFiles();
+      };
+
+      function handleChatInputChange(event) {
+        const input = event.target;
+        const value = input.value;
+        const popup = document.getElementById('slashCommandPopup');
+
+        if (value.startsWith('/') && !value.includes(' ')) {
+          const filter = value.toLowerCase();
+          const items = document.querySelectorAll('.slash-command-item');
+          let visibleCount = 0;
+
+          items.forEach(item => {
+            const command = item.querySelector('.text-white').textContent.toLowerCase();
+            if (command.startsWith(filter)) {
+              item.classList.remove('hidden');
+              visibleCount++;
+            } else {
+              item.classList.add('hidden');
+            }
+          });
+
+          if (visibleCount > 0) {
+            popup.classList.remove('hidden');
+            selectedCommandIndex = 0;
+            updateCommandSelection();
+          } else {
+            popup.classList.add('hidden');
+          }
         } else {
-          item.classList.add('hidden');
+          popup.classList.add('hidden');
+        }
+      }
+
+      function handleChatInputKeydown(event) {
+        const popup = document.getElementById('slashCommandPopup');
+        const isPopupVisible = !popup.classList.contains('hidden');
+
+        if (isPopupVisible) {
+          const visibleItems = Array.from(document.querySelectorAll('.slash-command-item:not(.hidden)'));
+
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            selectedCommandIndex = Math.min(selectedCommandIndex + 1, visibleItems.length - 1);
+            updateCommandSelection();
+          } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            selectedCommandIndex = Math.max(selectedCommandIndex - 1, 0);
+            updateCommandSelection();
+          } else if (event.key === 'Enter' || event.key === 'Tab') {
+            event.preventDefault();
+            const selectedItem = visibleItems[selectedCommandIndex];
+            if (selectedItem) {
+              const command = selectedItem.querySelector('.text-white').textContent;
+              selectSlashCommand(command);
+            }
+          } else if (event.key === 'Escape') {
+            popup.classList.add('hidden');
+          }
+        } else if (event.key === 'Enter') {
+          const chatInput = document.getElementById('chatInput');
+          if (chatInput.value.trim().toLowerCase() === '/calendar') {
+             event.preventDefault();
+             chatInput.value = '';
+             calendarModalController.open();
+             return;
+          }
+          window.sendChatMessage();
+        }
+      }
+
+      function updateCommandSelection() {
+        const items = document.querySelectorAll('.slash-command-item:not(.hidden)');
+        items.forEach((item, index) => {
+          if (index === selectedCommandIndex) {
+            item.classList.add('bg-neutral-600');
+          } else {
+            item.classList.remove('bg-neutral-600');
+          }
+        });
+      }
+
+      function selectSlashCommand(command) {
+        if (command === '/calendar') {
+          document.getElementById('slashCommandPopup').classList.add('hidden');
+          document.getElementById('chatInput').value = '';
+          calendarModalController.open();
+          return;
+        }
+
+        const input = document.getElementById('chatInput');
+        const popup = document.getElementById('slashCommandPopup');
+
+        input.value = command + ' ';
+        popup.classList.add('hidden');
+        input.focus();
+        highlightCommand(input);
+      }
+
+      function highlightCommand(input) {
+        const value = input.value;
+        const commandMatch = value.match(/^\/\w+/);
+
+        if (commandMatch) {
+          input.classList.add('has-command');
+        } else {
+          input.classList.remove('has-command');
+        }
+      }
+
+      /* ================================
+         CALENDAR EVENT MODAL (SRP)
+      ================================ */
+      const calendarModalController = {
+        open: function() {
+          document.getElementById('calendarEventModal').classList.remove('hidden');
+          document.getElementById('calEventTitle').focus();
+          document.getElementById('calEventPeriod').value = '';
+          document.getElementById('calEventStatus').textContent = '';
+          document.getElementById('calEventStatus').className = 'text-sm mt-2';
+          
+          const groupContainer = document.getElementById('calEventGroupContainer');
+          const groupNameEl = document.getElementById('calEventGroupName');
+          if (typeof activeChatGroupName !== 'undefined' && activeChatGroupName) {
+            if (groupNameEl) groupNameEl.textContent = activeChatGroupName;
+            if (groupContainer) groupContainer.classList.remove('hidden');
+          } else {
+            if (groupContainer) groupContainer.classList.add('hidden');
+          }
+        },
+        close: function() {
+          document.getElementById('calendarEventModal').classList.add('hidden');
+          this.reset();
+        },
+        reset: function() {
+          document.getElementById('calEventTitle').value = '';
+          document.getElementById('calEventDate').value = '';
+          document.getElementById('calEventPeriod').value = '';
+          document.getElementById('calEventDesc').value = '';
+          document.getElementById('calEventPriority').value = 'P2';
+          document.getElementById('calEventStatus').textContent = '';
+          document.getElementById('calEventSubmitBtn').disabled = false;
+          document.getElementById('calEventSubmitBtn').innerHTML = 'Create Event';
+        },
+        setStatus: function(msg, isError = false) {
+          const statusEl = document.getElementById('calEventStatus');
+          statusEl.textContent = msg;
+          statusEl.className = 'text-sm mt-2 ' + (isError ? 'text-red-400' : 'text-green-400');
+        },
+        submit: async function() {
+          const titleInput = document.getElementById('calEventTitle').value.trim();
+          const dateInput = document.getElementById('calEventDate').value;
+          const periodInput = document.getElementById('calEventPeriod').value.trim();
+          const descInput = document.getElementById('calEventDesc').value.trim();
+          const priorityInput = document.getElementById('calEventPriority').value;
+
+          if (!titleInput || !dateInput) {
+            this.setStatus('Title and Date are required.', true);
+            return;
+          }
+
+          const btn = document.getElementById('calEventSubmitBtn');
+          btn.disabled = true;
+          // spinner
+          btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Creating...';
+          
+          let emoji = '📅';
+          let finalTitle = `[${priorityInput}] ${emoji} ${titleInput}`;
+          if (typeof activeChatGroupName !== 'undefined' && activeChatGroupName) {
+            finalTitle += ` (${activeChatGroupName})`;
+          }
+
+          const eventPayload = {
+            title: finalTitle,
+            description: descInput,
+            date: dateInput,
+            period: periodInput,
+            priority: priorityInput
+          };
+
+          if (typeof activeChatGroupId !== 'undefined' && activeChatGroupId) {
+            eventPayload.groupId = activeChatGroupId;
+          }
+
+          try {
+            const res = await fetch(`${javaURI}/api/calendar/add_event`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify(eventPayload)
+            });
+
+            if (res.status === 401 || res.status === 403 || (res.redirected && res.url.includes('/login'))) {
+              this.setStatus('Session expired. Please log in again.', true);
+              btn.disabled = false;
+              btn.innerHTML = 'Create Event';
+              return;
+            }
+
+            if (!res.ok) {
+              const errData = await res.json().catch(() => ({}));
+              throw new Error(errData.message || 'Server returned an error');
+            }
+
+            this.setStatus('Event created successfully!');
+            setTimeout(() => {
+              this.close();
+            }, 1000);
+          } catch (err) {
+            console.error('Failed to create calendar event:', err);
+            this.setStatus(`Error: ${err.message}`, true);
+            btn.disabled = false;
+            btn.innerHTML = 'Create Event';
+          }
+        }
+      };
+      
+      window.calendarModalController = calendarModalController;
+
+      window.handleChatInputChange = handleChatInputChange;
+      window.handleChatInputKeydown = handleChatInputKeydown;
+      window.selectSlashCommand = selectSlashCommand;
+      window.downloadBase64File = downloadBase64File;
+
+      document.addEventListener('paste', function (event) {
+        if (document.getElementById('chatModal').classList.contains('hidden')) return;
+        if (typeof window.handlePastedChatImage === 'function') {
+          window.handlePastedChatImage(event);
         }
       });
-
-      if (visibleCount > 0) {
-        popup.classList.remove('hidden');
-        selectedCommandIndex = 0;
-        updateCommandSelection();
-      } else {
-        popup.classList.add('hidden');
-      }
-    } else {
-      popup.classList.add('hidden');
-    }
-  }
-
-  function handleChatInputKeydown(event) {
-    const popup = document.getElementById('slashCommandPopup');
-    const isPopupVisible = !popup.classList.contains('hidden');
-
-    if (isPopupVisible) {
-      const visibleItems = Array.from(document.querySelectorAll('.slash-command-item:not(.hidden)'));
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        selectedCommandIndex = Math.min(selectedCommandIndex + 1, visibleItems.length - 1);
-        updateCommandSelection();
-      } else if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        selectedCommandIndex = Math.max(selectedCommandIndex - 1, 0);
-        updateCommandSelection();
-      } else if (event.key === 'Enter' || event.key === 'Tab') {
-        event.preventDefault();
-        const selectedItem = visibleItems[selectedCommandIndex];
-        if (selectedItem) {
-          const command = selectedItem.querySelector('.text-white').textContent;
-          selectSlashCommand(command);
-        }
-      } else if (event.key === 'Escape') {
-        popup.classList.add('hidden');
-      }
-    } else if (event.key === 'Enter') {
-      window.sendChatMessage();
-    }
-  }
-
-  function updateCommandSelection() {
-    const items = document.querySelectorAll('.slash-command-item:not(.hidden)');
-    items.forEach((item, index) => {
-      if (index === selectedCommandIndex) {
-        item.classList.add('bg-neutral-600');
-      } else {
-        item.classList.remove('bg-neutral-600');
-      }
-    });
-  }
-
-  function selectSlashCommand(command) {
-    const input = document.getElementById('chatInput');
-    const popup = document.getElementById('slashCommandPopup');
-
-    input.value = command + ' ';
-    popup.classList.add('hidden');
-    input.focus();
-    highlightCommand(input);
-  }
-
-  function highlightCommand(input) {
-    const value = input.value;
-    const commandMatch = value.match(/^\/\w+/);
-
-    if (commandMatch) {
-      input.classList.add('has-command');
-    } else {
-      input.classList.remove('has-command');
-    }
-  }
-
-  window.handleChatInputChange = handleChatInputChange;
-  window.handleChatInputKeydown = handleChatInputKeydown;
-  window.selectSlashCommand = selectSlashCommand;
-  window.downloadBase64File = downloadBase64File;
-
-  document.addEventListener('paste', function(event) {
-    if (document.getElementById('chatModal').classList.contains('hidden')) return;
-    if (typeof window.handlePastedChatImage === 'function') {
-      window.handlePastedChatImage(event);
-    }
-  });
-</script>
+    </script>
