@@ -23,6 +23,15 @@ links:
       - View your grades for all assignments
     icon: images/toolkit-nav-buttons/submissions.png
 
+  - id: bathroom_pass
+    href: student/bathroom_pass
+    label: Bathroom Pass
+    description:
+      - Scan your face to enter the bathroom queue
+      - Real-time occupancy tracking and threshold management
+      - Integrated facial recognition for quick access
+    icon: images/toolkit-nav-buttons/bathroom.png
+
   - id: bathroom
     href: student/hallpass
     label: Bathroom System

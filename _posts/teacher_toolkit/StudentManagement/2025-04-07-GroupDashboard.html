@@ -14,7 +14,7 @@ comments: false
 {% include group_dashboard.html %}
 
 <script type="module">
-  import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
   // ---------------------------------------------
   // CONFIG: Constants + error catalog
@@ -500,6 +500,293 @@ comments: false
   }
 
   // ---------------------------------------------
+  // RELATIONSHIP GRAPH LOGIC (SRP conformant)
+  // ---------------------------------------------
+  
+  function calculateFriendshipScore(memberA, memberB, analyticsA, analyticsB) {
+    if (!analyticsA || !analyticsB) return 0;
+    
+    // Find shared groups
+    const groupsA = analyticsA.groupAnalytics || [];
+    const groupsB = analyticsB.groupAnalytics || [];
+    
+    let sharedGroupsCount = 0;
+    let interactionScore = 0;
+    
+    const groupsBMap = new Map(groupsB.map(g => [g.groupId, g]));
+    
+    for (const gA of groupsA) {
+      const gB = groupsBMap.get(gA.groupId);
+      if (gB) {
+        sharedGroupsCount++;
+        // interaction is based on active messaging in shared groups
+        const msgA = gA.messagesSent || 0;
+        const msgB = gB.messagesSent || 0;
+        interactionScore += Math.min(msgA, msgB) * 0.5;
+      }
+    }
+    
+    if (sharedGroupsCount === 0) return 0;
+    return (sharedGroupsCount * 10) + interactionScore;
+  }
+
+  function getColorForNode(id) {
+    const colors = ['#4f46e5', '#9333ea', '#ea580c', '#0d9488', '#db2777', '#2563eb', '#16a34a', '#dc2626', '#ca8a04'];
+    return colors[id % colors.length];
+  }
+
+  function buildRelationshipGraphData(membersWithAnalytics) {
+    const nodes = [];
+    const edges = [];
+    
+    // Build Nodes
+    membersWithAnalytics.forEach(({member, analytics}) => {
+      nodes.push({
+        id: member.id,
+        label: member.name || member.uid,
+        groupCount: analytics?.groupAnalytics?.length || 0,
+        color: getColorForNode(member.id),
+        value: (analytics?.groupAnalytics?.reduce((acc, g) => acc + (g.messagesSent || 0), 0) || 0) + 1
+      });
+    });
+    
+    // Build Edges
+    for (let i = 0; i < membersWithAnalytics.length; i++) {
+      for (let j = i + 1; j < membersWithAnalytics.length; j++) {
+        const memberA = membersWithAnalytics[i];
+        const memberB = membersWithAnalytics[j];
+        
+        const score = calculateFriendshipScore(memberA.member, memberB.member, memberA.analytics, memberB.analytics);
+        
+        if (score > 0) {
+          edges.push({
+            source: memberA.member.id,
+            target: memberB.member.id,
+            weight: score
+          });
+        }
+      }
+    }
+    
+    return { nodes, edges };
+  }
+
+  function renderRelationshipGraph(nodes, edges) {
+    if (typeof d3 === 'undefined') {
+      console.warn('D3.js library not loaded');
+      return;
+    }
+    
+    const container = document.getElementById('relationshipGraphContainer');
+    const width = container.clientWidth || 800;
+    const height = container.clientHeight || 400;
+    
+    // Clear previous SVG
+    d3.select('#relationshipGraphContainer svg').remove();
+    
+    const svg = d3.select('#relationshipGraphContainer')
+      .append('svg')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox', [0, 0, width, height]);
+      
+    const g = svg.append('g');
+    
+    // Add Zoom
+    const zoom = d3.zoom()
+      .scaleExtent([0.1, 4])
+      .on('zoom', (event) => {
+        g.attr('transform', event.transform);
+      });
+      
+    svg.call(zoom);
+    
+    // Zoom controls
+    document.getElementById('graphZoomInButton').onclick = () => svg.transition().call(zoom.scaleBy, 1.2);
+    document.getElementById('graphZoomOutButton').onclick = () => svg.transition().call(zoom.scaleBy, 0.8);
+    document.getElementById('graphResetButton').onclick = () => svg.transition().call(zoom.transform, d3.zoomIdentity);
+
+    if (nodes.length === 0) return;
+
+    const graphSimulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(edges).id(d => d.id).distance(150))
+        .force("charge", d3.forceManyBody().strength(-400))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(d => Math.sqrt(d.value) * 3 + 20));
+
+    const link = g.append("g")
+        .attr("stroke", "#525252")
+        .attr("stroke-opacity", 0.6)
+      .selectAll("line")
+      .data(edges)
+      .join("line")
+        .attr("stroke-width", d => Math.min(Math.sqrt(d.weight), 8));
+
+    const drag = simulation => {
+      function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+      }
+      function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+      function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+      }
+      return d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended);
+    };
+
+    const node = g.append("g")
+        .attr("stroke", "#262626")
+        .attr("stroke-width", 1.5)
+      .selectAll("circle")
+      .data(nodes)
+      .join("circle")
+        .attr("r", d => Math.min(Math.max(Math.sqrt(d.value) * 3 + 8, 12), 30))
+        .attr("fill", d => d.color)
+        .call(drag(graphSimulation));
+
+    node.append("title")
+        .text(d => `${d.label}\nShared Groups: ${d.groupCount}\nActivity Score: ${Math.round(d.value)}`);
+
+    const label = g.append("g")
+      .selectAll("text")
+      .data(nodes)
+      .join("text")
+        .attr("class", "text-[10px] fill-gray-300 font-medium pointer-events-none")
+        .attr("dx", 15)
+        .attr("dy", ".35em")
+        .text(d => d.label);
+
+    graphSimulation.on("tick", () => {
+      link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+      node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+          
+      label
+          .attr("x", d => d.x)
+          .attr("y", d => d.y);
+    });
+  }
+
+  function generateAndRenderRecommendations(currentUserId, nodes, edges) {
+    const listContainer = document.getElementById('recommendedFriendsList');
+    
+    // Find edges connected to current user
+    const userEdges = edges.filter(e => {
+        const sourceId = typeof e.source === 'object' ? e.source.id : e.source;
+        const targetId = typeof e.target === 'object' ? e.target.id : e.target;
+        return sourceId === currentUserId || targetId === currentUserId;
+    });
+    
+    if (userEdges.length === 0) {
+      listContainer.innerHTML = '<div class="text-center text-gray-500 text-sm py-8">Join more groups or interact more to get recommendations!</div>';
+      return;
+    }
+    
+    // Sort edges by weight descending
+    userEdges.sort((a, b) => b.weight - a.weight);
+    
+    // Take top 5
+    const topEdges = userEdges.slice(0, 5);
+    
+    listContainer.innerHTML = topEdges.map(e => {
+      const sourceId = typeof e.source === 'object' ? e.source.id : e.source;
+      const targetId = typeof e.target === 'object' ? e.target.id : e.target;
+      
+      const friendId = sourceId === currentUserId ? targetId : sourceId;
+      const friendNode = nodes.find(n => n.id === friendId);
+      
+      if (!friendNode) return '';
+      
+      const initials = getInitials(friendNode.label);
+      const colorClass = getAvatarColor(friendNode.id);
+      
+      return `
+        <div class="flex items-center gap-3 p-2 hover:bg-neutral-600/50 rounded-lg transition-colors border border-transparent hover:border-neutral-600">
+          <div class="w-10 h-10 ${colorClass} rounded-full flex items-center justify-center text-white text-sm font-medium shrink-0 shadow-inner">
+            ${initials}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-medium truncate">${friendNode.label}</p>
+            <p class="text-gray-400 text-xs truncate">Connection Score: ${Math.round(e.weight)}</p>
+          </div>
+          <button class="px-3 py-1 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white rounded text-xs font-medium transition-colors" title="Start Chat">
+            Connect
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function getCurrentUserId() {
+    try {
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (res.ok) {
+        const user = await res.json();
+        return user.id;
+      }
+    } catch (e) {
+      console.warn('Could not fetch current user ID for graph recommendations');
+    }
+    return null;
+  }
+
+  async function loadRelationshipGraph(group) {
+    if (!group || !group.members || group.members.length === 0) {
+      document.getElementById('relationshipGraphEmptyState').textContent = 'No grouping data to display.';
+      return;
+    }
+    
+    try {
+      const membersWithAnalytics = [];
+      const batchSize = 10; // Batch requests to prevent rate limiting
+      
+      for (let i = 0; i < group.members.length; i += batchSize) {
+        const batch = group.members.slice(i, i + batchSize);
+        const batchResults = await Promise.all(batch.map(async (member) => {
+          try {
+            const rawAnalytics = await fetchGroupChatAnalytics(member.id);
+            return { member, analytics: rawAnalytics };
+          } catch (e) {
+             return { member, analytics: null };
+          }
+        }));
+        membersWithAnalytics.push(...batchResults);
+      }
+      
+      const graphData = buildRelationshipGraphData(membersWithAnalytics.filter(m => m.analytics));
+      
+      document.getElementById('relationshipGraphEmptyState').classList.add('hidden');
+      renderRelationshipGraph(graphData.nodes, graphData.edges);
+      
+      const currentUserId = await getCurrentUserId();
+      // If we could determine the current user, generate recommendations specifically for them
+      // Alternatively, just pick the first member if we are debugging/testing
+      const referenceId = currentUserId || group.members[0].id;
+      
+      generateAndRenderRecommendations(referenceId, graphData.nodes, graphData.edges);
+      
+    } catch (err) {
+      console.error('Error loading relationship graph', err);
+      document.getElementById('relationshipGraphEmptyState').textContent = 'Failed to load user connections.';
+    }
+  }
+
+  // ---------------------------------------------
   // PAGE INITIALIZATION / ORCHESTRATOR
   // ---------------------------------------------
   
@@ -573,8 +860,12 @@ comments: false
         return;
       }
 
-      // Step 8: Load summary stats and member analytics in parallel
-      await Promise.all([loadDashboardSummaryStats(group), loadMemberAnalyticsPage(1)]);
+      // Step 8: Load summary stats, member analytics, and relationship graph in parallel
+      await Promise.all([
+         loadDashboardSummaryStats(group), 
+         loadMemberAnalyticsPage(1),
+         loadRelationshipGraph(group)
+      ]);
 
       // Step 9: Store group data globally for other dashboard components
       window.currentDashboardGroupId = group.id;

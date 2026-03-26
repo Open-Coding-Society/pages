@@ -158,9 +158,9 @@
     // we might not have module support directly unless type="module".
     // Alternatively, we can assume pythonURI is available globally if defined elsewhere or hardcode/detect it.
     // For now, let's try to detect it or use a fallback.
-    const pythonURI = location.hostname === "localhost" || location.hostname === "127.0.0.1"
-        ? "http://localhost:8587"
-        : "https://flask.opencodingsociety.com";
+    const javaURI = location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://localhost:8585"
+        : "https://spring.opencodingsociety.com";
 
     async function toggleWebcam() {
         if (!webcamContainer.classList.contains('hidden')) {
@@ -215,11 +215,10 @@
         statusDiv.innerText = "Identifying...";
 
         try {
-            const response = await fetch(`${pythonURI}/api/identify`, {
+            const response = await fetch(`${javaURI}/api/person/identify`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    // Add credentials if needed
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ image: base64Data })
             });
