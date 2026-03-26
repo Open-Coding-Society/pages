@@ -4,8 +4,9 @@ Description: "Binary Beasts capstone track for powaynec.com, focused on turning 
 
 Topics:
   - title: "Poway Neighborhood Emergency Corps"
-    image: "capstone/powaynec.png"
+    image: "images/powayNEC.jpg"
     link: "https://powaynec.com/"
+    project_link: "https://beasts.opencodingsociety.com"
     alt: "Poway NEC website preview"
     keyPoints:
       - "Idea 1: Add a clickable neighborhood map so residents can identify their Neighborhood Emergency Coordinator without emailing PNEC."
@@ -31,6 +32,6 @@ Topics:
       - "Shared outcome: stronger neighborhood-level visibility supports faster coordination before and during local emergencies."
     status: "In Development"
     team:
-      - "Aneesh"
-      - "Ethan"
-      - "Samarth"
+      - "Aneesh Deevi"
+      - "Ethan Patel"
+      - "Samarth Vaka"
