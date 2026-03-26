@@ -142,6 +142,8 @@ const overflowCountEl = document.getElementById('overflowCount');
 const meterFillEl = document.getElementById('meterFill');
 const tipTextEl = document.getElementById('tipText');
 const pushBtn = document.getElementById('pushBtn');
+const clickerStage = document.getElementById('clickerStage');
+const burstLayer = document.getElementById('burstLayer');
 const aiTutorBtn = document.getElementById('aiTutorBtn');
 const leaderboardToggleBtn = document.getElementById('leaderboardToggleBtn');
 const upgradeList = document.getElementById('upgradeList');
@@ -331,6 +333,51 @@ function render() {
   renderUpgrades();
 }
 
+function triggerButtonImpact() {
+  pushBtn.classList.remove('impact');
+  clickerStage.classList.remove('stage-shake');
+
+  // Force reflow so repeated clicks retrigger CSS animations.
+  void pushBtn.offsetWidth;
+
+  pushBtn.classList.add('impact');
+  clickerStage.classList.add('stage-shake');
+
+  window.setTimeout(() => pushBtn.classList.remove('impact'), 140);
+  window.setTimeout(() => clickerStage.classList.remove('stage-shake'), 240);
+}
+
+function spawnBurstSprites(event) {
+  if (!burstLayer || !clickerStage) {
+    return;
+  }
+
+  const stageRect = clickerStage.getBoundingClientRect();
+  const centerX = event?.clientX ? event.clientX - stageRect.left : stageRect.width / 2;
+  const centerY = event?.clientY ? event.clientY - stageRect.top : stageRect.height / 2;
+  const particleCount = 9;
+
+  for (let i = 0; i < particleCount; i += 1) {
+    const chip = document.createElement('div');
+    chip.className = 'burst-chip';
+
+    const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.35;
+    const distance = 88 + Math.random() * 136;
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance;
+    const rotation = -35 + Math.random() * 70;
+
+    chip.style.setProperty('--x', `${centerX}px`);
+    chip.style.setProperty('--y', `${centerY}px`);
+    chip.style.setProperty('--dx', `${dx}px`);
+    chip.style.setProperty('--dy', `${dy}px`);
+    chip.style.setProperty('--r', `${rotation}deg`);
+
+    burstLayer.appendChild(chip);
+    window.setTimeout(() => chip.remove(), 700);
+  }
+}
+
 tabMainUpgrades.addEventListener('click', () => {
   state.activeUpgradeTab = 'main';
   render();
@@ -341,7 +388,10 @@ tabMultiplierUpgrades.addEventListener('click', () => {
   render();
 });
 
-pushBtn.addEventListener('click', () => {
+pushBtn.addEventListener('click', (event) => {
+  triggerButtonImpact();
+  spawnBurstSprites(event);
+
   state.stackDepth += state.pushPower;
   tipTextEl.textContent = `Pushed ${state.pushPower} frame(s). A call adds frames to the stack.`;
   maybeOverflow();
