@@ -2,6 +2,7 @@ import { AiNpc, Leaderboard } from '/assets/js/GameEnginev1.1/essentials/Imports
 
 const state = {
   points: 0,
+  maxKnowledgePoints: 0,
   stackDepth: 0,
   maxDepth: 32,
   overflowCount: 0,
@@ -215,6 +216,8 @@ function maybeOverflow() {
     return;
   }
 
+  state.maxKnowledgePoints = Math.max(state.maxKnowledgePoints, state.points);
+
   state.overflowCount += 1;
   const penalty = Math.floor(state.points * state.overflowPenaltyRatio);
   state.points = Math.max(0, state.points - penalty);
@@ -271,6 +274,8 @@ function renderUpgradeTabs() {
 }
 
 function render() {
+  state.maxKnowledgePoints = Math.max(state.maxKnowledgePoints, state.points);
+
   pointsEl.textContent = String(state.points);
   stackDepthEl.textContent = String(state.stackDepth);
   maxDepthEl.textContent = String(state.maxDepth);
@@ -278,6 +283,8 @@ function render() {
 
   const fill = Math.min(100, (state.stackDepth / state.maxDepth) * 100);
   meterFillEl.style.width = `${fill}%`;
+
+  updateLeaderboardKnowledgePreview();
 
   renderUpgradeTabs();
   renderUpgrades();
@@ -310,6 +317,18 @@ const setLeaderboardButtonLabel = () => {
   leaderboardToggleBtn.textContent = isVisible ? 'Hide Leaderboard' : 'Show Leaderboard';
 };
 
+const updateLeaderboardKnowledgePreview = () => {
+  const currentScoreEl = document.getElementById('leaderboard-current-score');
+  if (currentScoreEl) {
+    currentScoreEl.textContent = `Knowledge Points: ${state.maxKnowledgePoints.toLocaleString()}`;
+  }
+
+  const previewEl = document.getElementById('leaderboard-preview');
+  if (previewEl) {
+    previewEl.textContent = `Knowledge Points: ${state.maxKnowledgePoints.toLocaleString()}`;
+  }
+};
+
 const wireLeaderboardSaveButton = () => {
   const originalSaveBtn = document.getElementById('leaderboard-save-score');
   if (!originalSaveBtn || originalSaveBtn.dataset.stackClickerBound === 'true') {
@@ -333,8 +352,8 @@ const wireLeaderboardSaveButton = () => {
     saveBtn.disabled = true;
 
     try {
-      await leaderboard.submitScore(username, state.points, 'StackClicker');
-      addLog(`Leaderboard updated: ${username} saved ${state.points} points.`);
+      await leaderboard.submitScore(username, state.maxKnowledgePoints, 'StackClicker');
+      addLog(`Leaderboard updated: ${username} saved ${state.maxKnowledgePoints} knowledge points.`);
     } catch (error) {
       console.error('Failed to save leaderboard score:', error);
       addLog('Could not save score to leaderboard. Try again.');
