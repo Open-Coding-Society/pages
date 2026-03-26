@@ -129,6 +129,23 @@ h2 {
   cursor: pointer;
 }
 
+.ai-btn {
+  width: 100%;
+  margin-top: 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.75rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  background: #f6f2ea;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.ai-btn:hover {
+  background: #efe7d9;
+}
+
 .push-btn:active {
   transform: translateY(1px);
 }

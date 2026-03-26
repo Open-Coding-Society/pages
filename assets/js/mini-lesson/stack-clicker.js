@@ -1,3 +1,5 @@
+import { AiNpc } from '/assets/js/GameEnginev1.1/essentials/Imports.js';
+
 const state = {
   points: 0,
   stackDepth: 0,
@@ -139,10 +141,49 @@ const overflowCountEl = document.getElementById('overflowCount');
 const meterFillEl = document.getElementById('meterFill');
 const tipTextEl = document.getElementById('tipText');
 const pushBtn = document.getElementById('pushBtn');
+const aiTutorBtn = document.getElementById('aiTutorBtn');
 const upgradeList = document.getElementById('upgradeList');
 const tabMainUpgrades = document.getElementById('tabMainUpgrades');
 const tabMultiplierUpgrades = document.getElementById('tabMultiplierUpgrades');
 const logList = document.getElementById('logList');
+
+const rpnWizard = {
+  id: 'RPN Wizard',
+  greeting: "Hey! I'm your RPN helper. Ask me about stacks, tokenizing, postfix notation, or overflow.",
+  expertise: 'rpn',
+  chatHistory: [],
+  dialogues: [
+    'Ask me how infix expressions are converted to postfix with Shunting Yard.',
+    'Want to trace an RPN expression step by step with a stack?',
+    'Try asking how stack overflow happens and how to reduce it.'
+  ],
+  knowledgeBase: {
+    rpn: [
+      {
+        question: 'What is Reverse Polish Notation?',
+        answer: 'RPN is postfix notation where operators come after operands, like 3 4 +.'
+      },
+      {
+        question: 'How do you evaluate RPN?',
+        answer: 'Read left to right: push numbers onto a stack, then pop operands when an operator appears, compute, and push the result.'
+      },
+      {
+        question: 'How does this game model stacks?',
+        answer: 'Push adds call frames, processing returns frames in LIFO order, and overflow happens when depth exceeds max capacity.'
+      }
+    ]
+  },
+  reaction: function() {
+    if (this.dialogueSystem) {
+      this.showReactionDialogue();
+    } else {
+      console.log(this.greeting);
+    }
+  },
+  interact: function() {
+    AiNpc.showInteraction(this);
+  }
+};
 
 function scaledGain(base, multiplier) {
   return Math.max(1, Math.floor(base * multiplier));
@@ -249,6 +290,10 @@ pushBtn.addEventListener('click', () => {
   tipTextEl.textContent = `Pushed ${state.pushPower} frame(s). A call adds frames to the stack.`;
   maybeOverflow();
   render();
+});
+
+aiTutorBtn.addEventListener('click', () => {
+  AiNpc.showInteraction(rpnWizard);
 });
 
 setInterval(() => {
