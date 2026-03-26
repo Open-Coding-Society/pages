@@ -147,9 +147,10 @@ const tabMainUpgrades = document.getElementById('tabMainUpgrades');
 const tabMultiplierUpgrades = document.getElementById('tabMultiplierUpgrades');
 const logList = document.getElementById('logList');
 
-const rpnWizard = {
-  id: 'RPN Wizard',
-  greeting: "Hey! I'm your RPN helper. Ask me about stacks, tokenizing, postfix notation, or overflow.",
+const rpnBox = {
+  id: 'Stacky Box',
+  src: '/images/boxSprite.png',
+  greeting: "Hey! I'm Stacky Box. Ask me about stacks, tokenizing, postfix notation, or overflow.",
   expertise: 'rpn',
   chatHistory: [],
   dialogues: [
@@ -184,6 +185,8 @@ const rpnWizard = {
     AiNpc.showInteraction(this);
   }
 };
+
+rpnBox.spriteData = rpnBox;
 
 function scaledGain(base, multiplier) {
   return Math.max(1, Math.floor(base * multiplier));
@@ -293,7 +296,7 @@ pushBtn.addEventListener('click', () => {
 });
 
 aiTutorBtn.addEventListener('click', () => {
-  AiNpc.showInteraction(rpnWizard);
+  AiNpc.showInteraction(rpnBox);
 });
 
 setInterval(() => {
