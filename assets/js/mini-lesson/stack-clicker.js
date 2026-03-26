@@ -148,7 +148,45 @@ const upgradeList = document.getElementById('upgradeList');
 const tabMainUpgrades = document.getElementById('tabMainUpgrades');
 const tabMultiplierUpgrades = document.getElementById('tabMultiplierUpgrades');
 const logList = document.getElementById('logList');
-const leaderboard = new Leaderboard(null, {
+const scoreGameEnv = {
+  stats: {
+    knowledgePoints: 0,
+    levelsCompleted: 0,
+    sessionTime: 0,
+    totalPowerUps: 0
+  },
+  scoreConfig: {
+    counterVar: 'knowledgePoints',
+    counterLabel: 'Knowledge Points',
+    scoreVar: 'knowledgePoints'
+  },
+  game: {
+    gameName: 'StackClicker'
+  },
+  initScoreManager() {
+    if (this.scoreManager) {
+      return Promise.resolve(this.scoreManager);
+    }
+    return import('/assets/js/GameEnginev1.1/essentials/GameEnvScore.js').then((module) => {
+      const GameEnvScore = module.default || module;
+      this.scoreManager = new GameEnvScore(this);
+      return this.scoreManager;
+    });
+  }
+};
+
+const leaderboardControlBridge = {
+  currentLevel: {
+    gameEnv: scoreGameEnv
+  },
+  gameEnv: scoreGameEnv
+};
+
+leaderboardControlBridge.game = {
+  getActiveControl: () => leaderboardControlBridge
+};
+
+const leaderboard = new Leaderboard(leaderboardControlBridge, {
   gameName: 'StackClicker',
   initiallyHidden: true
 });
@@ -275,6 +313,9 @@ function renderUpgradeTabs() {
 
 function render() {
   state.maxKnowledgePoints = Math.max(state.maxKnowledgePoints, state.points);
+  scoreGameEnv.stats.knowledgePoints = state.maxKnowledgePoints;
+  scoreGameEnv.stats.levelsCompleted = state.overflowCount;
+  scoreGameEnv.stats.totalPowerUps = upgrades.reduce((sum, upgrade) => sum + upgrade.purchases, 0);
 
   pointsEl.textContent = String(state.points);
   stackDepthEl.textContent = String(state.stackDepth);
@@ -329,38 +370,16 @@ const updateLeaderboardKnowledgePreview = () => {
   }
 };
 
-const wireLeaderboardSaveButton = () => {
-  const originalSaveBtn = document.getElementById('leaderboard-save-score');
-  if (!originalSaveBtn || originalSaveBtn.dataset.stackClickerBound === 'true') {
+const pinLeaderboardToTopCorner = () => {
+  const container = document.getElementById('leaderboard-container');
+  if (!container) {
     return;
   }
 
-  const saveBtn = originalSaveBtn.cloneNode(true);
-  saveBtn.dataset.stackClickerBound = 'true';
-  originalSaveBtn.replaceWith(saveBtn);
-
-  saveBtn.addEventListener('click', async () => {
-    const previousName = localStorage.getItem('stackClickerPlayerName') || '';
-    const entered = window.prompt('Enter your name to save this score:', previousName || 'Player');
-    const username = entered?.trim();
-
-    if (!username) {
-      return;
-    }
-
-    localStorage.setItem('stackClickerPlayerName', username);
-    saveBtn.disabled = true;
-
-    try {
-      await leaderboard.submitScore(username, state.maxKnowledgePoints, 'StackClicker');
-      addLog(`Leaderboard updated: ${username} saved ${state.maxKnowledgePoints} knowledge points.`);
-    } catch (error) {
-      console.error('Failed to save leaderboard score:', error);
-      addLog('Could not save score to leaderboard. Try again.');
-    } finally {
-      saveBtn.disabled = false;
-    }
-  });
+  container.style.top = '12px';
+  container.style.left = '12px';
+  container.style.right = 'auto';
+  container.style.zIndex = '1000';
 };
 
 aiTutorBtn.addEventListener('click', () => {
@@ -377,11 +396,13 @@ aiTutorBtn.addEventListener('click', () => {
 
 leaderboardToggleBtn.addEventListener('click', () => {
   leaderboard.toggleVisibility();
+  pinLeaderboardToTopCorner();
   setLeaderboardButtonLabel();
 });
 
 setInterval(() => {
   let tip = '';
+  scoreGameEnv.stats.sessionTime += state.tickMs;
 
   if (state.autoPushPerFrame > 0) {
     state.stackDepth += state.autoPushPerFrame;
@@ -409,7 +430,7 @@ setInterval(() => {
 }, state.tickMs);
 
 addLog('Welcome. Click Push Function Call to grow the stack and earn points as frames return.');
-wireLeaderboardSaveButton();
+setTimeout(pinLeaderboardToTopCorner, 0);
 setAiTutorButtonLabel();
 setLeaderboardButtonLabel();
 render();
