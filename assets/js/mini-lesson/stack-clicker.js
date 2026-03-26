@@ -1,4 +1,4 @@
-import { AiNpc } from '/assets/js/GameEnginev1.1/essentials/Imports.js';
+import { AiNpc, Leaderboard } from '/assets/js/GameEnginev1.1/essentials/Imports.js';
 
 const state = {
   points: 0,
@@ -142,10 +142,15 @@ const meterFillEl = document.getElementById('meterFill');
 const tipTextEl = document.getElementById('tipText');
 const pushBtn = document.getElementById('pushBtn');
 const aiTutorBtn = document.getElementById('aiTutorBtn');
+const leaderboardToggleBtn = document.getElementById('leaderboardToggleBtn');
 const upgradeList = document.getElementById('upgradeList');
 const tabMainUpgrades = document.getElementById('tabMainUpgrades');
 const tabMultiplierUpgrades = document.getElementById('tabMultiplierUpgrades');
 const logList = document.getElementById('logList');
+const leaderboard = new Leaderboard(null, {
+  gameName: 'StackClicker',
+  initiallyHidden: true
+});
 
 const rpnBox = {
   id: 'Stacky Box',
@@ -300,6 +305,45 @@ const setAiTutorButtonLabel = () => {
   aiTutorBtn.textContent = isOpen ? 'Hide Stacky Box' : 'Ask Stacky Box';
 };
 
+const setLeaderboardButtonLabel = () => {
+  const isVisible = Boolean(leaderboard?.isVisible?.());
+  leaderboardToggleBtn.textContent = isVisible ? 'Hide Leaderboard' : 'Show Leaderboard';
+};
+
+const wireLeaderboardSaveButton = () => {
+  const originalSaveBtn = document.getElementById('leaderboard-save-score');
+  if (!originalSaveBtn || originalSaveBtn.dataset.stackClickerBound === 'true') {
+    return;
+  }
+
+  const saveBtn = originalSaveBtn.cloneNode(true);
+  saveBtn.dataset.stackClickerBound = 'true';
+  originalSaveBtn.replaceWith(saveBtn);
+
+  saveBtn.addEventListener('click', async () => {
+    const previousName = localStorage.getItem('stackClickerPlayerName') || '';
+    const entered = window.prompt('Enter your name to save this score:', previousName || 'Player');
+    const username = entered?.trim();
+
+    if (!username) {
+      return;
+    }
+
+    localStorage.setItem('stackClickerPlayerName', username);
+    saveBtn.disabled = true;
+
+    try {
+      await leaderboard.submitScore(username, state.points, 'StackClicker');
+      addLog(`Leaderboard updated: ${username} saved ${state.points} points.`);
+    } catch (error) {
+      console.error('Failed to save leaderboard score:', error);
+      addLog('Could not save score to leaderboard. Try again.');
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+};
+
 aiTutorBtn.addEventListener('click', () => {
   const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
   if (isOpen) {
@@ -310,6 +354,11 @@ aiTutorBtn.addEventListener('click', () => {
 
   AiNpc.showInteraction(rpnBox);
   setAiTutorButtonLabel();
+});
+
+leaderboardToggleBtn.addEventListener('click', () => {
+  leaderboard.toggleVisibility();
+  setLeaderboardButtonLabel();
 });
 
 setInterval(() => {
@@ -341,5 +390,7 @@ setInterval(() => {
 }, state.tickMs);
 
 addLog('Welcome. Click Push Function Call to grow the stack and earn points as frames return.');
+wireLeaderboardSaveButton();
 setAiTutorButtonLabel();
+setLeaderboardButtonLabel();
 render();
