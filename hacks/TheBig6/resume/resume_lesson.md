@@ -101,7 +101,7 @@ date: 2025-12-01
   <div class="header">
     <h1>Resume — All-in-One</h1>
     <p>Short, interactive steps. Autosaves locally.</p>
-    <a href="../" class="back-btn">← Back</a>
+    <a href="../" class="button back-btn">← Back</a>
   </div>
 
   <div class="progress-bar-container">

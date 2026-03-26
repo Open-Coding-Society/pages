@@ -257,7 +257,7 @@ date: 2025-12-02
     <div class="badge">Module 2 · Encrypters Team</div>
     <h1>Backend Development</h1>
     <p>Servers, databases, frameworks, APIs — everything that runs behind what users see.</p>
-    <a href="../" class="back-btn">← Back to Big Six</a>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
   <!-- Progress dots — rendered by JS -->
