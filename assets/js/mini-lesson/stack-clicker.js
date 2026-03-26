@@ -295,8 +295,21 @@ pushBtn.addEventListener('click', () => {
   render();
 });
 
+const setAiTutorButtonLabel = () => {
+  const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
+  aiTutorBtn.textContent = isOpen ? 'Hide Stacky Box' : 'Ask Stacky Box';
+};
+
 aiTutorBtn.addEventListener('click', () => {
+  const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
+  if (isOpen) {
+    rpnBox.dialogueSystem.closeDialogue();
+    setAiTutorButtonLabel();
+    return;
+  }
+
   AiNpc.showInteraction(rpnBox);
+  setAiTutorButtonLabel();
 });
 
 setInterval(() => {
@@ -328,4 +341,5 @@ setInterval(() => {
 }, state.tickMs);
 
 addLog('Welcome. Click Push Function Call to grow the stack and earn points as frames return.');
+setAiTutorButtonLabel();
 render();
