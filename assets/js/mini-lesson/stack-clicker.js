@@ -18,6 +18,113 @@ const state = {
   tickMs: 450
 };
 
+const parentCanvasCleanup = [];
+
+function suppressParentRunnerCanvasIfPresent() {
+  try {
+    if (window.parent === window || !window.parent?.document) {
+      return;
+    }
+
+    const parentDoc = window.parent.document;
+    const iframeEl = Array.from(parentDoc.querySelectorAll('iframe')).find((frame) => {
+      try {
+        return frame.contentWindow === window;
+      } catch (_) {
+        return false;
+      }
+    });
+
+    if (!iframeEl) {
+      return;
+    }
+
+    const iframePrevious = {
+      position: iframeEl.style.position,
+      zIndex: iframeEl.style.zIndex,
+      display: iframeEl.style.display,
+      width: iframeEl.style.width,
+      height: iframeEl.style.height,
+      background: iframeEl.style.background
+    };
+
+    iframeEl.style.position = 'relative';
+    iframeEl.style.zIndex = '1000';
+    iframeEl.style.display = 'block';
+    iframeEl.style.width = '100%';
+    iframeEl.style.height = '100%';
+    iframeEl.style.background = '#ffffff';
+
+    parentCanvasCleanup.push(() => {
+      iframeEl.style.position = iframePrevious.position;
+      iframeEl.style.zIndex = iframePrevious.zIndex;
+      iframeEl.style.display = iframePrevious.display;
+      iframeEl.style.width = iframePrevious.width;
+      iframeEl.style.height = iframePrevious.height;
+      iframeEl.style.background = iframePrevious.background;
+    });
+
+    const frameWrapper = iframeEl.parentElement;
+    if (frameWrapper) {
+      const wrapperPrevious = {
+        position: frameWrapper.style.position,
+        zIndex: frameWrapper.style.zIndex,
+        overflow: frameWrapper.style.overflow
+      };
+      frameWrapper.style.position = 'relative';
+      frameWrapper.style.zIndex = '1000';
+      frameWrapper.style.overflow = 'hidden';
+      parentCanvasCleanup.push(() => {
+        frameWrapper.style.position = wrapperPrevious.position;
+        frameWrapper.style.zIndex = wrapperPrevious.zIndex;
+        frameWrapper.style.overflow = wrapperPrevious.overflow;
+      });
+
+      const runnerContainer = frameWrapper.closest('.gameContainer');
+      if (runnerContainer) {
+        const canvases = runnerContainer.querySelectorAll('canvas');
+        canvases.forEach((node) => {
+          if (!(node instanceof window.parent.HTMLElement)) {
+            return;
+          }
+          const previous = {
+            opacity: node.style.opacity,
+            pointerEvents: node.style.pointerEvents,
+            zIndex: node.style.zIndex,
+            visibility: node.style.visibility,
+            display: node.style.display
+          };
+
+          node.style.opacity = '0';
+          node.style.pointerEvents = 'none';
+          node.style.zIndex = '0';
+          node.style.visibility = 'hidden';
+          node.style.display = 'none';
+
+          parentCanvasCleanup.push(() => {
+            node.style.opacity = previous.opacity;
+            node.style.pointerEvents = previous.pointerEvents;
+            node.style.zIndex = previous.zIndex;
+            node.style.visibility = previous.visibility;
+            node.style.display = previous.display;
+          });
+        });
+      }
+    }
+  } catch (_) {
+  }
+}
+
+function restoreParentRunnerCanvas() {
+  while (parentCanvasCleanup.length > 0) {
+    const restore = parentCanvasCleanup.pop();
+    try {
+      restore();
+    } catch (_) {
+    }
+  }
+}
+
 const upgrades = [
   {
     id: 'frames101',
@@ -94,114 +201,13 @@ const upgrades = [
     baseCost: 110,
     purchases: 0,
     apply() {
-      state.upgradeMultipliers.processRate += 0.25;
-    }
-  },
-  {
-    id: 'eventLoopThreads',
-    category: 'multiplier',
-    name: 'Event Loop Threads',
-    description: 'Boost Background Calls strength by +25%.',
-    baseCost: 130,
-    purchases: 0,
-    apply() {
-      state.upgradeMultipliers.autoPushPerFrame += 0.25;
-    }
-  },
-  {
-    id: 'allocatorPattern',
-    category: 'multiplier',
-    name: 'Allocator Pattern',
-    description: 'Boost Guard Clauses strength by +25%.',
-    baseCost: 150,
-    purchases: 0,
-    apply() {
-      state.upgradeMultipliers.maxDepth += 0.25;
-    }
-  },
-  {
-    id: 'riskModeling',
-    category: 'multiplier',
-    name: 'Risk Modeling',
-    description: 'Boost Recursion Profiler strength by +25%.',
-    baseCost: 175,
-    purchases: 0,
-    apply() {
-      state.upgradeMultipliers.overflowReduction += 0.25;
-    }
-  }
-];
-
-const pointsEl = document.getElementById('points');
-const stackDepthEl = document.getElementById('stackDepth');
-const maxDepthEl = document.getElementById('maxDepth');
-const overflowCountEl = document.getElementById('overflowCount');
-const meterFillEl = document.getElementById('meterFill');
-const tipTextEl = document.getElementById('tipText');
-const pushBtn = document.getElementById('pushBtn');
-const upgradeList = document.getElementById('upgradeList');
-const tabMainUpgrades = document.getElementById('tabMainUpgrades');
-const tabMultiplierUpgrades = document.getElementById('tabMultiplierUpgrades');
-const logList = document.getElementById('logList');
-
-function scaledGain(base, multiplier) {
-  return Math.max(1, Math.floor(base * multiplier));
-}
-
-function addLog(text) {
-  const li = document.createElement('li');
-  li.textContent = text;
-  logList.prepend(li);
-  if (logList.children.length > 18) {
-    logList.removeChild(logList.lastChild);
-  }
-}
-
-function upgradeCost(upgrade) {
-  return Math.floor(upgrade.baseCost * Math.pow(1.45, upgrade.purchases));
-}
-
-function maybeOverflow() {
-  if (state.stackDepth <= state.maxDepth) {
-    return;
-  }
-
-  state.overflowCount += 1;
-  const penalty = Math.floor(state.points * state.overflowPenaltyRatio);
-  state.points = Math.max(0, state.points - penalty);
-  state.stackDepth = Math.floor(state.maxDepth * 0.45);
-
-  tipTextEl.textContent = 'Overflow! Too many calls were pushed before enough frames returned.';
-  addLog('Stack Overflow: stack exceeded capacity, points were lost due to crash recovery.');
-}
-
-function renderUpgrades() {
-  upgradeList.innerHTML = '';
-
-  const visibleUpgrades = upgrades.filter((upgrade) => upgrade.category === state.activeUpgradeTab);
-
-  for (const upgrade of visibleUpgrades) {
-    const cost = upgradeCost(upgrade);
-    const card = document.createElement('article');
-    card.className = 'upgrade';
-
-    const title = document.createElement('h3');
-    title.textContent = `${upgrade.name} (Lv ${upgrade.purchases})`;
-
-    const desc = document.createElement('p');
-    desc.textContent = upgrade.description;
-
-    const btn = document.createElement('button');
-    btn.textContent = `Buy - ${cost} points`;
-    btn.disabled = state.points < cost;
-
-    btn.addEventListener('click', () => {
-      if (state.points < cost) {
+      function suppressParentRunnerCanvasIfPresent() {
         return;
       }
 
-      state.points -= cost;
-      upgrade.purchases += 1;
+      function restoreParentRunnerCanvas() {
+        return;
+      }
       upgrade.apply();
       addLog(`Upgrade purchased: ${upgrade.name}.`);
       render();
@@ -281,4 +287,6 @@ setInterval(() => {
 }, state.tickMs);
 
 addLog('Welcome. Click Push Function Call to grow the stack and earn points as frames return.');
+suppressParentRunnerCanvasIfPresent();
+window.addEventListener('beforeunload', restoreParentRunnerCanvas);
 render();
