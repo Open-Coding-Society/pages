@@ -290,9 +290,18 @@ class Character extends GameObject {
      * Applies transformations like rotation, mirroring, and spinning.
      */
     applyTransformations(directionData) {
-        if (directionData.rotate || directionData.mirror || directionData.spin) {
+        if (directionData.rotate || directionData.mirror || directionData.spin || directionData.wiggle) {
             // Translate to the center of the sprite
             this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+
+            // Apply wiggle (oscillate ±10 degrees if enabled)
+            if (directionData.wiggle) {
+                // Use frameCounter for smooth oscillation
+                const maxAngle = Math.PI / 18; // 10 degrees in radians
+                const speed = (typeof directionData.wiggle === 'number') ? directionData.wiggle : 0.15; // allow custom speed
+                const angle = Math.sin((this.frameCounter || 0) * speed) * maxAngle;
+                this.ctx.rotate(angle);
+            }
 
             // Apply rotation
             if (directionData.rotate) {

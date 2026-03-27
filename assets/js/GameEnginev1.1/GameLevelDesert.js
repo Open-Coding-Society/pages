@@ -302,7 +302,7 @@ class GameLevelDesert {
         pixels: {width: 150, height: 255},
         INIT_POSITION: { x: 0.67, y: 0.1 },  // 67% from left, 10% from top
         orientation: {rows: 1, columns: 1 },
-        down: {row: 0, start: 0, columns: 1 },
+        down: {row: 0, start: 0, columns: 1, wiggle: 0.10 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         dialogues: [
             "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
@@ -364,7 +364,7 @@ class GameLevelDesert {
         pixels: {height: 441, width: 339},
         INIT_POSITION: { x: 0.75, y: 0.6 },  // 75% from left, 60% from top
         orientation: {rows: 1, columns: 1},
-        down: {row: 0, start: 0, columns: 1 },
+        down: {row: 0, start: 0, columns: 1, wiggle: 0.01 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         // Add dialogues array for random messages
         dialogues: [
