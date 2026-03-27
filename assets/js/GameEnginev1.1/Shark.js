@@ -4,11 +4,6 @@ import Player from './essentials/Player.js';
 class Shark extends Enemy {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
-        
-        // Initialize movement properties from sprite data
-        this.speed = this.spriteData.speed || 1;
-        this.moveDirection = this.spriteData.direction || { x: 1, y: 1 };  // Renamed to avoid conflict
-        this.walkingArea = this.spriteData.walkingArea || null;
     }
 
     // No need to override update or patrol logic; handled by Npc now

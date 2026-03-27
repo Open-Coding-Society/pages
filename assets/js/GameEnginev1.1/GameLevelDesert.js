@@ -300,10 +300,21 @@ class GameLevelDesert {
         SCALE_FACTOR: 9,
         ANIMATION_RATE: 100,
         pixels: {width: 150, height: 255},
-        INIT_POSITION: { x: 0.67, y: 0.1 },  // 67% from left, 10% from top
         orientation: {rows: 1, columns: 1 },
+        INIT_POSITION: { x: 0.67, y: 0.1 },  // 67% from left, 10% from top
+        walkingArea: {
+            xMin: (width * 0.67), //left boundary
+            xMax: (width * 0.77), //right boundary 
+            yMin: (height * 0.1), //top boundary 
+            yMax: (height * 0.2) //bottom boundary
+         },
+        speed: 0.5,
         down: {row: 0, start: 0, columns: 1, wiggle: 0.10 },
+        left: { row: 0, start: 0, columns: 1, wiggle: 0.10 },
+        right: { row: 0, start: 0, columns: 1, wiggle: 0.10, mirror: true },
+        up: { row: 0, start: 0, columns: 1, wiggle: 0.10 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        
         dialogues: [
             "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
             "GRRRRRRRR!!",

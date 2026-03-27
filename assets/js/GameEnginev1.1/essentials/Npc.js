@@ -13,17 +13,21 @@ class Npc extends Character {
         this.handleKeyDownBound = this.handleKeyDown.bind(this);
         this.handleKeyUpBound = this.handleKeyUp.bind(this);
         this.bindInteractKeyListeners();
-        
+
+        // --- Patrol/Movement properties from data ---
+        this.walkingArea = data?.walkingArea || null;
+        this.speed = data?.speed || 1;
+        this.moveDirection = data?.moveDirection || { x: 1, y: 1 };
+
         // IMPORTANT: Create a unique ID for each NPC to avoid conflicts
         // Sanitize id to remove/replace spaces (spaces are not valid in DOM tokens)
         const sanitizedId = (data?.id || "").replace(/\s+/g, "_");
         this.uniqueId = sanitizedId + "_" + Math.random().toString(36).substr(2, 9);
-        
+
         // IMPORTANT: Create a local dialogue system for this NPC specifically
         if (data?.dialogues) {
             this.dialogueSystem = new DialogueSystem({
                 dialogues: data.dialogues,
-                
                 id: this.uniqueId
             });
         } else {
@@ -39,7 +43,7 @@ class Npc extends Character {
                 id: this.uniqueId
             });
         }
-        
+
         // Register with game control for cleanup during transitions
         if (gameEnv && gameEnv.gameControl) {
             gameEnv.gameControl.registerInteractionHandler(this);
