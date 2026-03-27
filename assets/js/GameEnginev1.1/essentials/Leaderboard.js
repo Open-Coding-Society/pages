@@ -116,19 +116,58 @@ export default class Leaderboard {
         this.gameControl = gameControl;
         this.gameName = options.gameName || 'Global';
         this.parentId = options.parentId || null;
-        // Default: visible unless explicitly requested hidden via options.initiallyHidden === true
-        this.initiallyHidden = options.initiallyHidden === true;
+        // Modular visibility options (backward compatible):
+        // - initiallyHidden: boolean (legacy)
+        // - initiallyVisible: boolean
+        // - initialVisibility: 'on' | 'off' | 'visible' | 'hidden'
+        const visibilityOption = typeof options.initialVisibility === 'string'
+            ? options.initialVisibility.toLowerCase()
+            : null;
+
+        if (typeof options.initiallyHidden === 'boolean') {
+            this.initiallyHidden = options.initiallyHidden;
+        } else if (typeof options.initiallyVisible === 'boolean') {
+            this.initiallyHidden = !options.initiallyVisible;
+        } else if (visibilityOption === 'on' || visibilityOption === 'visible') {
+            this.initiallyHidden = false;
+        } else {
+            this.initiallyHidden = true;
+        }
         this.isOpen = false; // Always start collapsed
         this.mounted = false;
         this.mode = 'dynamic'; // Default to dynamic leaderboard
         this.showingTypeSelection = false;
         this.elementaryEntries = []; // Store elementary entries locally
+        this.isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+        // By default, avoid backend delete on localhost to prevent noisy network/login redirect errors.
+        // Can be overridden with options.syncElementaryDeleteWithBackend.
+        this.syncElementaryDeleteWithBackend = typeof options.syncElementaryDeleteWithBackend === 'boolean'
+            ? options.syncElementaryDeleteWithBackend
+            : !this.isLocalhost;
+        this.deletedElementaryIdsStorageKey = `elementary_deleted_ids_${this.gameName}`;
+        this.deletedElementaryIds = new Set(
+            JSON.parse(localStorage.getItem(this.deletedElementaryIdsStorageKey) || '[]')
+                .map((v) => String(v))
+        );
 
         // Flag whether a backend URI is available; allow UI to mount even when
         // backend is unreachable so leaderboard can operate in offline/local mode.
         this.hasBackend = Boolean(javaURI);
 
         this.init();
+    }
+
+    _rememberLocalDelete(id) {
+        this.deletedElementaryIds.add(String(id));
+        localStorage.setItem(
+            this.deletedElementaryIdsStorageKey,
+            JSON.stringify([...this.deletedElementaryIds])
+        );
+    }
+
+    _applyDeletedElementaryFilter(entries = []) {
+        if (!this.deletedElementaryIds.size) return entries;
+        return entries.filter((entry) => !this.deletedElementaryIds.has(String(entry.id)));
     }
 
     init() {
@@ -142,19 +181,29 @@ export default class Leaderboard {
     mount() {
         if (this.mounted) return;
 
-        // CRITICAL: Always append to body and use fixed positioning
-        // This ensures the leaderboard is not affected by game container position changes
-        const appendTarget = document.body;
+        // Mount inside provided parent when available; fallback to body.
+        const appendTarget = (this.parentId && document.getElementById(this.parentId)) || document.body;
+        const canUseAbsoluteInParent = appendTarget !== document.body
+            && window.getComputedStyle(appendTarget).position !== 'static';
         
         const container = document.createElement('div');
         container.id = 'leaderboard-container';
-        
-        // CRITICAL: Always use fixed positioning to avoid game container position affecting it
-        container.style.position = 'fixed';
-        container.style.top = '80px';
-        container.style.left = '20px';
-        container.style.right = 'auto';
-        container.style.zIndex = '1000';
+
+        // Only anchor inside parent when parent is already positioned.
+        // Never mutate parent positioning because it can shift the game canvas/layout.
+        if (canUseAbsoluteInParent) {
+            container.style.position = 'absolute';
+            container.style.top = '12px';
+            container.style.left = '12px';
+            container.style.right = 'auto';
+            container.style.zIndex = '30';
+        } else {
+            container.style.position = 'fixed';
+            container.style.top = '80px';
+            container.style.left = '20px';
+            container.style.right = 'auto';
+            container.style.zIndex = '1000';
+        }
         
         // Add the widget class for styling
         container.className = 'leaderboard-widget' + (this.initiallyHidden ? ' initially-hidden' : '');
@@ -183,7 +232,7 @@ export default class Leaderboard {
             </div>
         `;
 
-        appendTarget.appendChild(container);
+        (canUseAbsoluteInParent ? appendTarget : document.body).appendChild(container);
         // Apply initial open/closed state immediately to avoid needing a separate preload
         const contentEl = container.querySelector('#leaderboard-content');
         const toggleBtn = container.querySelector('#toggle-leaderboard');
@@ -516,13 +565,31 @@ export default class Leaderboard {
         console.log('=== DELETE SCORE ===');
         console.log('Deleting ID:', id);
 
-        // If backend unavailable, delete from localStorage
-        if (!this.hasBackend) {
+        const deleteLocal = () => {
             const storageKey = `elementary_leaderboard_${this.gameName}`;
             const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            const filtered = stored.filter(e => e.id !== id);
+            const filtered = stored.filter(e => String(e.id) !== String(id));
             localStorage.setItem(storageKey, JSON.stringify(filtered));
-            this.fetchElementaryLeaderboard();
+            this._rememberLocalDelete(id);
+            this.elementaryEntries = this._applyDeletedElementaryFilter(this.elementaryEntries);
+            this.displayElementaryLeaderboard();
+        };
+
+        // If backend unavailable, delete from localStorage
+        if (!this.hasBackend) {
+            deleteLocal();
+            return;
+        }
+
+        // Local/offline entries should never call backend delete.
+        if (String(id).startsWith('local-')) {
+            deleteLocal();
+            return;
+        }
+
+        // Local-first mode: skip remote delete entirely.
+        if (!this.syncElementaryDeleteWithBackend) {
+            deleteLocal();
             return;
         }
 
@@ -538,6 +605,9 @@ export default class Leaderboard {
             }
         )
             .then(res => {
+                if (res.redirected && res.url && res.url.includes('/login')) {
+                    throw new Error('AUTH_REDIRECT');
+                }
                 if (!res.ok) {
                     return res.text().then(errorText => {
                         console.error('Delete failed:', res.status, errorText);
@@ -550,6 +620,12 @@ export default class Leaderboard {
             })
             .catch(error => {
                 console.error('Error deleting score:', error);
+                // If backend delete fails (localhost down, auth redirect, CORS),
+                // keep elementary mode usable by removing local/offline copy.
+                if (error.message === 'AUTH_REDIRECT' || error.message.includes('Failed to fetch')) {
+                    deleteLocal();
+                    return;
+                }
                 alert(`Failed to delete score: ${error.message}`);
             });
     }
@@ -561,7 +637,7 @@ export default class Leaderboard {
         if (!this.hasBackend) {
             const storageKey = `elementary_leaderboard_${this.gameName}`;
             const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            this.elementaryEntries = stored
+            this.elementaryEntries = this._applyDeletedElementaryFilter(stored
                 .map(event => ({
                     id: event.id,
                     user: event.payload?.user || 'Anonymous',
@@ -569,7 +645,7 @@ export default class Leaderboard {
                     gameName: event.payload?.gameName || this.gameName,
                     timestamp: event.timestamp
                 }))
-                .sort((a, b) => b.score - a.score);
+                .sort((a, b) => b.score - a.score));
 
             this.displayElementaryLeaderboard();
             return Promise.resolve();
@@ -589,7 +665,7 @@ export default class Leaderboard {
                 
                 // Transform backend data to frontend format
                 // Backend returns AlgorithmicEvent with payload field
-                this.elementaryEntries = data
+                this.elementaryEntries = this._applyDeletedElementaryFilter(data
                     .map(event => ({
                         id: event.id,
                         user: event.payload?.user || 'Anonymous',
@@ -597,7 +673,7 @@ export default class Leaderboard {
                         gameName: event.payload?.gameName || this.gameName,
                         timestamp: event.timestamp
                     }))
-                    .sort((a, b) => b.score - a.score); // Sort by score descending
+                    .sort((a, b) => b.score - a.score)); // Sort by score descending
                 
                 console.log('Transformed elementaryEntries:', this.elementaryEntries);
                 
@@ -617,7 +693,7 @@ export default class Leaderboard {
                 // Fallback to local data if fetch fails
                 const storageKey = `elementary_leaderboard_${this.gameName}`;
                 const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                this.elementaryEntries = stored
+                this.elementaryEntries = this._applyDeletedElementaryFilter(stored
                     .map(event => ({
                         id: event.id,
                         user: event.payload?.user || 'Anonymous',
@@ -625,7 +701,7 @@ export default class Leaderboard {
                         gameName: event.payload?.gameName || this.gameName,
                         timestamp: event.timestamp
                     }))
-                    .sort((a, b) => b.score - a.score);
+                    .sort((a, b) => b.score - a.score));
                 this.displayElementaryLeaderboard();
             });
     }
