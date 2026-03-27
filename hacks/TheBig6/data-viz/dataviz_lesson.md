@@ -445,39 +445,29 @@ Page&lt;Company&gt; page = repo.findAll(paging);
 </div>
 
 <script type="module">
-// ============================================================
-//  ORCHESTRATOR — dataviz_lesson.md
-//  Imports all SRP modules and calls their init functions.
-//  No logic lives here — everything is in assets/js/bigsix/dataviz/
-//
-//  Navigation uses data-step + addEventListener (not onclick
-//  attributes) so there are zero window global or timing issues.
-// ============================================================
-
-import { CONFIG }           from '{{ site.baseurl }}/assets/js/bigsix/dataviz/data.js';
+import { CONFIG }           from '/assets/js/bigsix/dataviz/data.js';
 import { initNavigation,
-         showStep }         from '{{ site.baseurl }}/assets/js/bigsix/dataviz/navigation.js';
+         showStep }         from '/assets/js/bigsix/dataviz/navigation.js';
 import { persist,
-         restore }          from '{{ site.baseurl }}/assets/js/bigsix/dataviz/persistence.js';
-import { initApiSimulator } from '{{ site.baseurl }}/assets/js/bigsix/dataviz/api-simulator.js';
-import { initQueryBuilder } from '{{ site.baseurl }}/assets/js/bigsix/dataviz/query-builder.js';
-import { initPagination }   from '{{ site.baseurl }}/assets/js/bigsix/dataviz/pagination.js';
-import { initScenarioQuiz } from '{{ site.baseurl }}/assets/js/bigsix/dataviz/scenario-quiz.js';
-import { initChecklist }    from '{{ site.baseurl }}/assets/js/bigsix/dataviz/checklist.js';
+         restore }          from '/assets/js/bigsix/dataviz/persistence.js';
+import { initApiSimulator } from '/assets/js/bigsix/dataviz/api-simulator.js';
+import { initQueryBuilder } from '/assets/js/bigsix/dataviz/query-builder.js';
+import { initPagination }   from '/assets/js/bigsix/dataviz/pagination.js';
+import { initScenarioQuiz } from '/assets/js/bigsix/dataviz/scenario-quiz.js';
+import { initChecklist }    from '/assets/js/bigsix/dataviz/checklist.js';
 
-// Shared db so query-builder and API simulator use the same data
 const db        = JSON.parse(JSON.stringify(CONFIG.DEFAULT_DB));
 let   _nextId   = CONFIG.DEFAULT_DB.length + 1;
 const getNextId = () => _nextId++;
 
 document.addEventListener('DOMContentLoaded', () => {
-  initNavigation(persist);                   // auto-detect steps, wire buttons, save on change
-  restore(showStep);                         // jump to saved step after nav is ready
-  initApiSimulator(CONFIG);                  // Step 1 — mock REST API
-  initQueryBuilder(CONFIG, db, getNextId);   // Steps 2 & 3 — kata, builder, filters
-  initPagination(CONFIG.PAGINATION_SAMPLE);  // Step 4 — pagination demo
-  initScenarioQuiz(CONFIG);                  // Step 5 — scenario + quiz
-  initChecklist(CONFIG.CHECKLIST);           // Step 6 — checklist + export
+  initNavigation(persist);
+  restore(showStep);
+  initApiSimulator(CONFIG);
+  initQueryBuilder(CONFIG, db, getNextId);
+  initPagination(CONFIG.PAGINATION_SAMPLE);
+  initScenarioQuiz(CONFIG);
+  initChecklist(CONFIG.CHECKLIST);
 });
 </script>
 
