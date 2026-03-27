@@ -47,15 +47,52 @@ class Npc extends Character {
     }
 
     update() {
+        // General patrol logic for any NPC with walkingArea
+        if (this.walkingArea) {
+            this.patrol();
+        }
         this.draw();
         // Check if player is still in collision - add null checks
         const players = this.gameEnv.gameObjects.filter(
             obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
         );
-        
         // Reset interaction state if player moved away
         if (players.length === 0 && this.isInteracting) {
             this.isInteracting = false;
+        }
+    }
+
+    /**
+     * General patrol movement within defined walking area (bouncing behavior)
+     */
+    patrol() {
+        // Use moveDirection and speed, defaulting if not set
+        if (!this.moveDirection) this.moveDirection = { x: 1, y: 1 };
+        if (!this.speed) this.speed = 1;
+        // Update position based on direction and speed
+        this.position.x += this.moveDirection.x * this.speed;
+        this.position.y += this.moveDirection.y * this.speed;
+
+        // Bounce off left/right boundaries and update sprite direction
+        if (this.position.x <= this.walkingArea.xMin) {
+            this.position.x = this.walkingArea.xMin;
+            this.moveDirection.x = 1;  // Move right
+            this.direction = 'right';  // Update sprite orientation
+        }
+        if (this.position.x + this.width >= this.walkingArea.xMax) {
+            this.position.x = this.walkingArea.xMax - this.width;
+            this.moveDirection.x = -1;  // Move left
+            this.direction = 'left';  // Update sprite orientation
+        }
+
+        // Bounce off top/bottom boundaries
+        if (this.position.y <= this.walkingArea.yMin) {
+            this.position.y = this.walkingArea.yMin;
+            this.moveDirection.y = 1;  // Move down
+        }
+        if (this.position.y + this.height >= this.walkingArea.yMax) {
+            this.position.y = this.walkingArea.yMax - this.height;
+            this.moveDirection.y = -1;  // Move up
         }
     }
 
