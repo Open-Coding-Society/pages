@@ -156,6 +156,7 @@ permalink: /student/bathroom_pass
 <script type="module">
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { showToast } from "{{site.baseurl}}/assets/js/aesthetihawk/shared/toastHandler.js";
+    import * as BathroomAPI from '{{site.baseurl}}/assets/js/api/bathroom.js';
 
     let currentUserEmail = null;
     let scanStream = null;
@@ -164,24 +165,15 @@ permalink: /student/bathroom_pass
 
     // Fetch current user email on load
     async function initializeCurrentUser() {
-        try {
-            const resp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
-            if (resp.ok) {
-                const user = await resp.json();
-                currentUserEmail = user.email;
-                console.log("Current user email:", currentUserEmail);
-            } else {
-                console.error("Failed to fetch user - status:", resp.status);
-                showToast({ 
-                    message: "Failed to load user info. Make sure you're logged in.", 
-                    duration: 5000,
-                    style: { background: "#ef4444" }
-                });
-            }
-        } catch (err) {
-            console.error("Failed to fetch current user:", err);
+        const result = await BathroomAPI.getCurrentUser();
+        if (result.success) {
+            currentUserEmail = result.data.email;
+            console.log("Current user email:", currentUserEmail);
+            refreshQueue();
+        } else {
+            console.error("Failed to fetch user:", result.error);
             showToast({ 
-                message: "Connection error. Check your network.", 
+                message: "Failed to load user info. Make sure you're logged in.", 
                 duration: 5000,
                 style: { background: "#ef4444" }
             });
@@ -216,51 +208,19 @@ permalink: /student/bathroom_pass
         canvas.getContext('2d').drawImage(video, 0, 0);
         
         const base64Image = canvas.toDataURL('image/jpeg').split(',')[1];
-        
         const threshold = document.getElementById('thresholdLimit').value;
         
-        // Get JWT token from cookies (Spring token for backend calls)
-        const jwtToken = document.cookie.split(';').find(c => c.trim().startsWith('jwt_java_spring='))?.split('=')[1];
+        const result = await BathroomAPI.identifyFace(base64Image, threshold);
         
-        try {
-            const resp = await fetch(`${javaURI}/api/person/identify`, {
-                ...fetchOptions,
-                method: 'POST',
-                headers: {
-                    ...fetchOptions.headers,
-                    ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
-                },
-                body: JSON.stringify({ 
-                    image: base64Image,
-                    threshold: threshold
-                })
-            });
-
-            if (!resp.ok) {
-                console.error(`Face identify API returned ${resp.status}:`, resp.statusText);
-                const errorText = await resp.text();
-                console.error("Error response:", errorText);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-
-            let result;
-            try {
-                result = await resp.json();
-            } catch (parseErr) {
-                console.error("Failed to parse API response as JSON:", parseErr);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-            console.log("Identify result:", result);
-            
-            if (result.match) {
-                showIdentification(result.name);
+        if (result.success) {
+            console.log("Identify result:", result.data);
+            if (result.data.match) {
+                showIdentification(result.data.name);
             } else {
                 setTimeout(startIdentificationLoop, 1000);
             }
-        } catch (err) {
-            console.error("Identification error:", err);
+        } else {
+            console.error("Face identify API error:", result.error);
             setTimeout(startIdentificationLoop, 3000);
         }
     }
@@ -284,35 +244,16 @@ permalink: /student/bathroom_pass
         if (!identifiedPerson) return;
         
         console.log("Confirming identity for:", identifiedPerson);
-        const queueUrl = `${javaURI}/api/bathroom/add`;
+        const result = await BathroomAPI.addToQueue(currentUserEmail, identifiedPerson);
         
-        try {
-            const resp = await fetch(queueUrl, {
-                ...fetchOptions,
-                method: 'POST',
-                body: JSON.stringify({
-                    teacherEmail: currentUserEmail,
-                    studentName: identifiedPerson
-                })
-            });
-            
-            if (resp.ok) {
-                showToast({ message: "Successfully added to queue!", duration: 3000 });
-                resetId();
-                refreshQueue();
-            } else {
-                const data = await resp.json();
-                console.error("Queue add failed:", data);
-                showToast({ 
-                    message: `Error: ${data.message || 'Could not add to queue'}`, 
-                    duration: 5000,
-                    style: { background: "#ef4444" }
-                });
-            }
-        } catch (err) {
-            console.error("Confirm error:", err);
+        if (result.success) {
+            showToast({ message: "Successfully added to queue!", duration: 3000 });
+            resetId();
+            refreshQueue();
+        } else {
+            console.error("Queue add failed:", result.error);
             showToast({ 
-                message: "Network error. Is the Spring backend running?", 
+                message: `Error: ${result.error || 'Could not add to queue'}`, 
                 duration: 5000,
                 style: { background: "#ef4444" }
             });
@@ -321,12 +262,11 @@ permalink: /student/bathroom_pass
 
     async function refreshQueue() {
         if (!currentUserEmail) return;
-        try {
-            const resp = await fetch(`${javaURI}/api/bathroom/queue/${currentUserEmail}`, fetchOptions);
-            const data = await resp.json();
-            updateQueueUI(data);
-        } catch (err) {
-            console.error(err);
+        const result = await BathroomAPI.getQueue(currentUserEmail);
+        if (result.success) {
+            updateQueueUI(result.data);
+        } else {
+            console.error("Refresh queue error:", result.error);
         }
     }
 
@@ -393,22 +333,12 @@ permalink: /student/bathroom_pass
     }
 
     async function returnFromBathroom(name) {
-        try {
-            const resp = await fetch(`${javaURI}/api/bathroom/remove`, {
-                ...fetchOptions,
-                method: 'DELETE',
-                body: JSON.stringify({
-                    teacherEmail: currentUserEmail,
-                    studentName: name
-                })
-            });
-            
-            if (resp.ok) {
-                showToast({ message: "Welcome back!", duration: 3000 });
-                refreshQueue();
-            }
-        } catch (err) {
-            console.error(err);
+        const result = await BathroomAPI.removeFromQueue(currentUserEmail, name);
+        if (result.success) {
+            showToast({ message: "Welcome back!", duration: 3000 });
+            refreshQueue();
+        } else {
+            console.error("Remove from queue failed:", result.error);
         }
     }
 
@@ -421,27 +351,13 @@ permalink: /student/bathroom_pass
             return;
         }
 
-        const queueUrl = `${javaURI}/api/bathroom/add`;
-        try {
-            const resp = await fetch(queueUrl, {
-                ...fetchOptions,
-                method: 'POST',
-                body: JSON.stringify({
-                    teacherEmail: currentUserEmail,
-                    studentName: name
-                })
-            });
-            
-            if (resp.ok) {
-                showToast({ message: `Checked in: ${name}`, duration: 3000 });
-                nameInput.value = '';
-                refreshQueue();
-            } else {
-                const data = await resp.json();
-                showToast({ message: `Error: ${data.message || 'Check-in failed'}`, duration: 5000, style: { background: "#ef4444" }});
-            }
-        } catch (err) {
-            showToast({ message: "Server connection failed", duration: 5000, style: { background: "#ef4444" }});
+        const result = await BathroomAPI.addToQueue(currentUserEmail, name);
+        if (result.success) {
+            showToast({ message: `Checked in: ${name}`, duration: 3000 });
+            nameInput.value = '';
+            refreshQueue();
+        } else {
+            showToast({ message: `Error: ${result.error || 'Check-in failed'}`, duration: 5000, style: { background: "#ef4444" }});
         }
     }
 
@@ -454,26 +370,13 @@ permalink: /student/bathroom_pass
             return;
         }
 
-        try {
-            const resp = await fetch(`${javaURI}/api/bathroom/remove`, {
-                ...fetchOptions,
-                method: 'DELETE',
-                body: JSON.stringify({
-                    teacherEmail: currentUserEmail,
-                    studentName: name
-                })
-            });
-            
-            if (resp.ok) {
-                showToast({ message: `Checked out: ${name}`, duration: 3000 });
-                nameInput.value = '';
-                refreshQueue();
-            } else {
-                const data = await resp.json();
-                showToast({ message: `Error: ${data.message || 'Check-out failed'}`, duration: 5000, style: { background: "#ef4444" }});
-            }
-        } catch (err) {
-            showToast({ message: "Server connection failed", duration: 5000, style: { background: "#ef4444" }});
+        const result = await BathroomAPI.removeFromQueue(currentUserEmail, name);
+        if (result.success) {
+            showToast({ message: `Checked out: ${name}`, duration: 3000 });
+            nameInput.value = '';
+            refreshQueue();
+        } else {
+            showToast({ message: `Error: ${result.error || 'Check-out failed'}`, duration: 5000, style: { background: "#ef4444" }});
         }
     }
 
@@ -485,8 +388,7 @@ permalink: /student/bathroom_pass
     window.emergencyCheckIn = emergencyCheckIn;
     window.emergencyCheckOut = emergencyCheckOut;
 
-    // Polling for queue updates
+    // Initialization
     initializeCurrentUser();
     setInterval(refreshQueue, 5000);
-    document.addEventListener('DOMContentLoaded', refreshQueue);
 </script>
