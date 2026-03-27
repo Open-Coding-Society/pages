@@ -181,6 +181,7 @@ const tabMultiplierUpgrades = document.getElementById('tabMultiplierUpgrades');
 const logList = document.getElementById('logList');
 const activeBurstParticles = [];
 let burstRafId = null;
+const EMBED_MESSAGE_SOURCE = 'stack-clicker-mini-lesson';
 const scoreGameEnv = {
   stats: {
     knowledgePoints: 0,
@@ -505,6 +506,24 @@ function stepBurstParticles(timestamp) {
   stepBurstParticles.lastTs = 0;
 }
 
+function postControlStateToParent() {
+  if (window.parent === window) {
+    return;
+  }
+
+  window.parent.postMessage(
+    {
+      source: EMBED_MESSAGE_SOURCE,
+      type: 'stack-clicker:controls-state',
+      leaderboardLabel: leaderboardToggleBtn?.textContent || 'Show Leaderboard',
+      aiLabel: aiTutorBtn?.textContent || 'Ask Stacky Box',
+      leaderboardVisible: Boolean(leaderboard?.isVisible?.()),
+      aiVisible: Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.())
+    },
+    '*'
+  );
+}
+
 tabMainUpgrades.addEventListener('click', () => {
   state.activeUpgradeTab = 'main';
   render();
@@ -528,11 +547,13 @@ pushBtn.addEventListener('click', (event) => {
 const setAiTutorButtonLabel = () => {
   const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
   aiTutorBtn.textContent = isOpen ? 'Hide Stacky Box' : 'Ask Stacky Box';
+  postControlStateToParent();
 };
 
 const setLeaderboardButtonLabel = () => {
   const isVisible = Boolean(leaderboard?.isVisible?.());
   leaderboardToggleBtn.textContent = isVisible ? 'Hide Leaderboard' : 'Show Leaderboard';
+  postControlStateToParent();
 };
 
 const updateLeaderboardKnowledgePreview = () => {
@@ -611,7 +632,7 @@ const pinLeaderboardToTopCorner = () => {
   container.style.zIndex = '1000';
 };
 
-aiTutorBtn.addEventListener('click', () => {
+const toggleAiTutor = () => {
   const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
   if (isOpen) {
     rpnBox.dialogueSystem.closeDialogue();
@@ -621,9 +642,9 @@ aiTutorBtn.addEventListener('click', () => {
 
   AiNpc.showInteraction(rpnBox);
   setAiTutorButtonLabel();
-});
+};
 
-leaderboardToggleBtn.addEventListener('click', () => {
+const toggleLeaderboard = () => {
   const wasVisible = Boolean(leaderboard?.isVisible?.());
   leaderboard.toggleVisibility();
   pinLeaderboardToTopCorner();
@@ -640,6 +661,31 @@ leaderboardToggleBtn.addEventListener('click', () => {
   }
 
   setLeaderboardButtonLabel();
+};
+
+aiTutorBtn.addEventListener('click', toggleAiTutor);
+leaderboardToggleBtn.addEventListener('click', toggleLeaderboard);
+
+window.addEventListener('message', (event) => {
+  const data = event?.data;
+  if (!data || data.source !== 'stack-clicker-embed') {
+    return;
+  }
+
+  if (data.type === 'stack-clicker:toggle-ai') {
+    toggleAiTutor();
+    return;
+  }
+
+  if (data.type === 'stack-clicker:toggle-leaderboard') {
+    toggleLeaderboard();
+    return;
+  }
+
+  if (data.type === 'stack-clicker:get-controls-state') {
+    setAiTutorButtonLabel();
+    setLeaderboardButtonLabel();
+  }
 });
 
 setInterval(() => {
@@ -715,4 +761,5 @@ setTimeout(() => {
 }, 0);
 setAiTutorButtonLabel();
 setLeaderboardButtonLabel();
+postControlStateToParent();
 render();
