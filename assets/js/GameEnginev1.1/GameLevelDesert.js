@@ -481,7 +481,7 @@ class GameLevelDesert {
        pixels: {height: 600, width: 600},
        INIT_POSITION: { x: 0.10, y: 0.53 },  // 33% from left, 33% from top
        orientation: {rows: 1, columns: 1},
-       down: {row: 0, start: 0, columns: 1, wiggle: { angle: 3, speed: 0.03 } },
+       down: {row: 0, start: 0, columns: 1, wiggle: { angle: Math.PI, speed: 0.03 } }, // 180 degree wiggle for crypto coin
        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
        // Add dialogues array for random messages
        dialogues: [
