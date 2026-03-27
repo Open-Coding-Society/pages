@@ -409,6 +409,7 @@ function render() {
 
   renderUpgradeTabs();
   renderUpgrades();
+  postControlStateToParent();
 }
 
 function triggerButtonImpact() {
@@ -518,7 +519,11 @@ function postControlStateToParent() {
       leaderboardLabel: leaderboardToggleBtn?.textContent || 'Show Leaderboard',
       aiLabel: aiTutorBtn?.textContent || 'Ask Stacky Box',
       leaderboardVisible: Boolean(leaderboard?.isVisible?.()),
-      aiVisible: Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.())
+      aiVisible: Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.()),
+      points: state.points,
+      stackDepth: state.stackDepth,
+      maxDepth: state.maxDepth,
+      overflowCount: state.overflowCount
     },
     '*'
   );
