@@ -396,10 +396,10 @@ function render() {
   scoreGameEnv.stats.levelsCompleted = state.overflowCount;
   scoreGameEnv.stats.totalPowerUps = upgrades.reduce((sum, upgrade) => sum + upgrade.purchases, 0);
 
-  pointsEl.textContent = String(state.points);
-  stackDepthEl.textContent = String(state.stackDepth);
-  maxDepthEl.textContent = String(state.maxDepth);
-  overflowCountEl.textContent = String(state.overflowCount);
+  if (pointsEl) pointsEl.textContent = String(state.points);
+  if (stackDepthEl) stackDepthEl.textContent = String(state.stackDepth);
+  if (maxDepthEl) maxDepthEl.textContent = String(state.maxDepth);
+  if (overflowCountEl) overflowCountEl.textContent = String(state.overflowCount);
 
   const fill = Math.min(100, (state.stackDepth / state.maxDepth) * 100);
   meterFillEl.style.width = `${fill}%`;
@@ -551,13 +551,17 @@ pushBtn.addEventListener('click', (event) => {
 
 const setAiTutorButtonLabel = () => {
   const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
-  aiTutorBtn.textContent = isOpen ? 'Hide Stacky Box' : 'Ask Stacky Box';
+  if (aiTutorBtn) {
+    aiTutorBtn.textContent = isOpen ? 'Hide Stacky Box' : 'Ask Stacky Box';
+  }
   postControlStateToParent();
 };
 
 const setLeaderboardButtonLabel = () => {
   const isVisible = Boolean(leaderboard?.isVisible?.());
-  leaderboardToggleBtn.textContent = isVisible ? 'Hide Leaderboard' : 'Show Leaderboard';
+  if (leaderboardToggleBtn) {
+    leaderboardToggleBtn.textContent = isVisible ? 'Hide Leaderboard' : 'Show Leaderboard';
+  }
   postControlStateToParent();
 };
 
@@ -668,8 +672,12 @@ const toggleLeaderboard = () => {
   setLeaderboardButtonLabel();
 };
 
-aiTutorBtn.addEventListener('click', toggleAiTutor);
-leaderboardToggleBtn.addEventListener('click', toggleLeaderboard);
+if (aiTutorBtn) {
+  aiTutorBtn.addEventListener('click', toggleAiTutor);
+}
+if (leaderboardToggleBtn) {
+  leaderboardToggleBtn.addEventListener('click', toggleLeaderboard);
+}
 
 window.addEventListener('message', (event) => {
   const data = event?.data;
