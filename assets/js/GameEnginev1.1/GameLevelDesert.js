@@ -300,10 +300,21 @@ class GameLevelDesert {
         SCALE_FACTOR: 9,
         ANIMATION_RATE: 100,
         pixels: {width: 150, height: 255},
-        INIT_POSITION: { x: 0.67, y: 0.1 },  // 67% from left, 10% from top
         orientation: {rows: 1, columns: 1 },
-        down: {row: 0, start: 0, columns: 1 },
+        INIT_POSITION: { x: 0.67, y: 0.1 },  // 67% from left, 10% from top
+        walkingArea: {
+            xMin: (width * 0.67), //left boundary
+            xMax: (width * 0.77), //right boundary 
+            yMin: (height * 0.1), //top boundary 
+            yMax: (height * 0.2) //bottom boundary
+         },
+        speed: 0.5,
+        down: {row: 0, start: 0, columns: 1, wiggle: 0.10 },
+        left: { row: 0, start: 0, columns: 1, wiggle: 0.10 },
+        right: { row: 0, start: 0, columns: 1, wiggle: 0.10, mirror: true },
+        up: { row: 0, start: 0, columns: 1, wiggle: 0.10 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+        
         dialogues: [
             "BAWK BAWK BAWK BAWK BAWK?!?!?!?",
             "GRRRRRRRR!!",
@@ -364,7 +375,7 @@ class GameLevelDesert {
         pixels: {height: 441, width: 339},
         INIT_POSITION: { x: 0.75, y: 0.6 },  // 75% from left, 60% from top
         orientation: {rows: 1, columns: 1},
-        down: {row: 0, start: 0, columns: 1 },
+        down: {row: 0, start: 0, columns: 1, wiggle: { angle: 0.05, speed: 0.03 } },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
         // Add dialogues array for random messages
         dialogues: [
@@ -479,9 +490,9 @@ class GameLevelDesert {
        SCALE_FACTOR: 10,
        ANIMATION_RATE: 50,
        pixels: {height: 600, width: 600},
-       INIT_POSITION: { x: 0.33, y: 0.33 },  // 33% from left, 33% from top
+       INIT_POSITION: { x: 0.10, y: 0.53 },  // 33% from left, 33% from top
        orientation: {rows: 1, columns: 1},
-       down: {row: 0, start: 0, columns: 1 },
+       down: {row: 0, start: 0, columns: 1, wiggle: { angle: Math.PI, speed: 0.03 } }, // 180 degree wiggle for crypto coin
        hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
        // Add dialogues array for random messages
        dialogues: [
