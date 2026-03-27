@@ -20,6 +20,16 @@
         </button>
       </div>
 
+      <div class="meter-wrap" id="meterWrap">
+        <p class="label">Stack Fill</p>
+        <div class="meter-shell">
+          <div class="meter">
+            <div class="meter-fill" id="meterFill"></div>
+          </div>
+          <div class="steam-layer" id="steamLayer" aria-hidden="true"></div>
+        </div>
+      </div>
+
       <div class="stats">
         <div class="stat-card">
           <p class="label">Knowledge Points</p>
@@ -41,13 +51,6 @@
 
       <button id="aiTutorBtn" class="ai-btn" type="button">Ask Stacky Box (AI companion)</button>
       <button id="leaderboardToggleBtn" class="ai-btn" type="button">Show Leaderboard</button>
-
-      <div class="meter-wrap">
-        <p class="label">Stack Fill</p>
-        <div class="meter">
-          <div class="meter-fill" id="meterFill"></div>
-        </div>
-      </div>
 
       <p class="tip" id="tipText">Tip: Each click simulates pushing function frames onto the call stack.</p>
     </section>
