@@ -17,8 +17,18 @@ permalink: /gamify/adventureGamev1-1
     import GameLevelDesert from "{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelDesert.js";
     import GameLevelEnd from "{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelEnd.js";
     import GameLevelOverworld from "{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelOverworld.js";
-    import Leaderboard from "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/Leaderboard.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    // One-word switch: change only this word to swap leaderboard variants.
+    // Options: 'python' | 'java'
+    const leaderboardVariant = 'java';
+    const leaderboardModuleByVariant = {
+        python: "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/leaderboard_python.js",
+        java: "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/leaderboard_java.js"
+    };
+    const leaderboardModulePath = leaderboardModuleByVariant[leaderboardVariant] || leaderboardModuleByVariant.python;
+    const leaderboardModule = await import(leaderboardModulePath);
+    const Leaderboard = leaderboardModule.default || leaderboardModule;
 
     const gameLevelClasses = [ GameLevelDesert, GameLevelWater, GameLevelEnd, GameLevelOverworld ];
 
@@ -34,7 +44,9 @@ permalink: /gamify/adventureGamev1-1
         leaderboardClass: Leaderboard,
         leaderboardOptions: {
             // Change to 'on' to show leaderboard by default.
-            initialVisibility: 'off'
+            initialVisibility: 'off',
+            // Keep backend in sync with the selected variant.
+            backend: leaderboardVariant
         }
 
     }
