@@ -2,16 +2,17 @@
 //  persistence.js — Single Responsibility: localStorage state
 //  Path: assets/js/bigsix/dataviz/persistence.js
 //
-//  Saves and restores current step + notes across page reloads.
-//  Storage key is derived from the page URL automatically so
-//  it never collides with other lessons.
+//  FIX SUMMARY:
+//    restore() now passes silent=true to showStep so that
+//    jumping to a saved step does NOT immediately re-persist
+//    step 0 on top of the saved value.
+//    (navigation.js showStep now accepts an optional silent arg)
 //
 //  EXPORTS:
 //    persist()
 //    restore(showStep)
 // ============================================================
 
-// Derive key from last path segment e.g. "dataviz_lesson"
 const STORAGE_KEY = 'bigsix_' + location.pathname
   .replace(/\/+$/, '')
   .split('/')
@@ -33,8 +34,6 @@ function writeStorage(data) {
 
 // ============================================================
 //  EXPORT — persist
-//  Saves the current step and notes textarea value.
-//  Called by navigation.js on every step change.
 // ============================================================
 export function persist() {
   writeStorage({
@@ -46,19 +45,17 @@ export function persist() {
 
 // ============================================================
 //  EXPORT — restore
-//  Reads saved state and applies it on page load.
-//  Must be called AFTER initNavigation() so STEPS is populated.
-//
-//  @param {Function} showStep — from navigation.js
+//  Passes silent=true so jumping to the saved step does not
+//  immediately overwrite localStorage with step 0.
 // ============================================================
 export function restore(showStep) {
   const saved = readStorage();
   if (!saved) return;
 
-  // Restore notes textarea if present
   const notes = document.getElementById('notes');
   if (notes && saved.notes) notes.value = saved.notes;
 
-  // Jump to the saved step
-  if (typeof saved.step === 'number') showStep(saved.step);
+  // silent=true — this is a restore, not a user navigation,
+  // so we must not persist step 0 over the saved value.
+  if (typeof saved.step === 'number') showStep(saved.step, true);
 }
