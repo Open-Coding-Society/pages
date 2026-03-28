@@ -1,27 +1,69 @@
 // CanvasClickHandler: enables click-to-interact for all game objects
 class CanvasClickHandler {
-    constructor(gameEnv, gameCanvas) {
+    constructor(gameEnv, gameContainer) {
         this.gameEnv = gameEnv;
-        this.gameCanvas = gameCanvas;
+        this.gameContainer = gameContainer;
         this._boundClick = this.handleCanvasClick.bind(this);
+        console.log('[CanvasClickHandler] constructor:', {
+            gameEnv: !!gameEnv,
+            gameContainer: gameContainer,
+            containerId: gameContainer && gameContainer.id
+        });
     }
 
     bindInteractKeyListeners() {
-        this.gameCanvas.addEventListener('click', this._boundClick);
+        if (!this.gameContainer) {
+            console.warn('[CanvasClickHandler] No gameContainer to bind click listener');
+            return;
+        }
+        this.gameContainer.addEventListener('click', this._boundClick);
+        console.log('[CanvasClickHandler] Click listener bound to', this.gameContainer, 'id:', this.gameContainer.id);
         // Optionally add touch support here
     }
 
     removeInteractKeyListeners() {
-        this.gameCanvas.removeEventListener('click', this._boundClick);
+        this.gameContainer.removeEventListener('click', this._boundClick);
         // Optionally remove touch support here
     }
 
     handleCanvasClick(event) {
-        const rect = this.gameCanvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+        // Find the topmost canvas under the click point
+        const containerRect = this.gameContainer.getBoundingClientRect();
+        const x = event.clientX - containerRect.left;
+        const y = event.clientY - containerRect.top;
+        // Get all canvases in the container, in DOM order (last is topmost)
+        const canvases = Array.from(this.gameContainer.querySelectorAll('canvas'));
+        let clickedCanvas = null;
+        for (let i = canvases.length - 1; i >= 0; i--) {
+            const canvas = canvases[i];
+            const rect = canvas.getBoundingClientRect();
+            const cx = event.clientX - rect.left;
+            const cy = event.clientY - rect.top;
+            if (
+                cx >= 0 && cy >= 0 &&
+                cx <= rect.width && cy <= rect.height &&
+                canvas.style.display !== 'none' &&
+                canvas.style.visibility !== 'hidden' &&
+                canvas.style.opacity !== '0'
+            ) {
+                clickedCanvas = canvas;
+                break;
+            }
+        }
+        console.log('[CanvasClickHandler] handleCanvasClick fired', {
+            event,
+            container: this.gameContainer,
+            clickedCanvas: clickedCanvas && clickedCanvas.id,
+            x, y
+        });
+        if (!clickedCanvas) return;
+        // Optionally, you can filter which canvases are interactive here
+        // For now, we use the coordinates relative to the topmost canvas
+        const rect = clickedCanvas.getBoundingClientRect();
+        const relX = event.clientX - rect.left;
+        const relY = event.clientY - rect.top;
         for (const obj of this.gameEnv.gameObjects) {
-            if (typeof obj.isPointInside === 'function' && obj.isPointInside(x, y)) {
+            if (typeof obj.isPointInside === 'function' && obj.isPointInside(relX, relY)) {
                 if (typeof obj.handleClick === 'function') obj.handleClick();
             }
         }
@@ -76,8 +118,8 @@ class GameControl {
      * Set up canvas click handler for object interaction
      */
     setupCanvasClickHandler() {
-        if (this.gameEnv && this.gameCanvas) {
-            this._canvasClickHandler = new CanvasClickHandler(this.gameEnv, this.gameCanvas);
+        if (this.gameEnv && this.gameContainer) {
+            this._canvasClickHandler = new CanvasClickHandler(this.gameEnv, this.gameContainer);
             this._canvasClickHandler.bindInteractKeyListeners();
             this.registerInteractionHandler(this._canvasClickHandler);
         }
@@ -225,6 +267,15 @@ class GameControl {
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
+
+        // Set gameEnv after level is created (if not already set by GameLevel)
+        if (this.currentLevel && this.currentLevel.gameEnv) {
+            this.gameEnv = this.currentLevel.gameEnv;
+        }
+
+        // Now that gameEnv is set, set up the canvas click handler
+        this.setupCanvasClickHandler();
+
         // Only start the game loop if it's not already running to avoid duplicate loops
         if (!this._loopRunning) {
             this.gameLoop();
