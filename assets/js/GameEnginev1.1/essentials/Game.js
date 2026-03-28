@@ -479,11 +479,7 @@ class GameCore {
                     console.warn('Failed to create leaderboard from environment class:', err);
                 }
             } else {
-                import(`${this.path}/assets/js/GameEnginev1.1/essentials/Leaderboard.js`)
-                    .then(mod => instantiateLeaderboard(mod.default || mod))
-                    .catch(err => {
-                        console.warn('Failed to create leaderboard:', err);
-                    });
+                console.warn('No leaderboardClass provided in environment; skipping leaderboard creation.');
             }
         }
     }
