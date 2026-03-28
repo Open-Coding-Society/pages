@@ -83,7 +83,7 @@ class GameLevelDesert {
        SCALE_FACTOR: 8,
        ANIMATION_RATE: 50,
        pixels: {height: 128, width: 128},
-       INIT_POSITION: { x: 0.35, y: 0.7 },
+       INIT_POSITION: { x: 0.6, y: 0.8 },
        orientation: {rows: 1, columns: 1 },
        down: {row: 0, start: 0, columns: 1, wiggle: 0.10 },
        hitbox: { widthPercentage: 0.15, heightPercentage: 0.15 },
