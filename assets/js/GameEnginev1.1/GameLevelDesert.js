@@ -77,6 +77,7 @@ class GameLevelDesert {
    const sprite_src_clicker = path + "/images/gamify/box-button.png";
    const sprite_data_clicker = {
        id: 'Clicker Box',
+       //updateDOM: 'clicker-box', // optional to see updates from DOM on page
        greeting: "Click or collide with me to earn points!",
        src: sprite_src_clicker,
        SCALE_FACTOR: 8,

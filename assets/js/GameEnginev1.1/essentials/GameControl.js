@@ -1,3 +1,32 @@
+// CanvasClickHandler: enables click-to-interact for all game objects
+class CanvasClickHandler {
+    constructor(gameEnv, gameCanvas) {
+        this.gameEnv = gameEnv;
+        this.gameCanvas = gameCanvas;
+        this._boundClick = this.handleCanvasClick.bind(this);
+    }
+
+    bindInteractKeyListeners() {
+        this.gameCanvas.addEventListener('click', this._boundClick);
+        // Optionally add touch support here
+    }
+
+    removeInteractKeyListeners() {
+        this.gameCanvas.removeEventListener('click', this._boundClick);
+        // Optionally remove touch support here
+    }
+
+    handleCanvasClick(event) {
+        const rect = this.gameCanvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        for (const obj of this.gameEnv.gameObjects) {
+            if (typeof obj.isPointInside === 'function' && obj.isPointInside(x, y)) {
+                if (typeof obj.handleClick === 'function') obj.handleClick();
+            }
+        }
+    }
+}
 // GameControl.js with improved level transition handling
 import GameLevel from "./GameLevel.js";
 
@@ -43,6 +72,17 @@ class GameControl {
         this._loopRunning = false;
     }
 
+    /**
+     * Set up canvas click handler for object interaction
+     */
+    setupCanvasClickHandler() {
+        if (this.gameEnv && this.gameCanvas) {
+            this._canvasClickHandler = new CanvasClickHandler(this.gameEnv, this.gameCanvas);
+            this._canvasClickHandler.bindInteractKeyListeners();
+            this.registerInteractionHandler(this._canvasClickHandler);
+        }
+    }
+
     
     start() {
         // If this is a nested control (game-in-game), hide/disable the parent
@@ -69,6 +109,7 @@ class GameControl {
         } catch (e) {}
 
         this.addExitKeyListener();
+        this.setupCanvasClickHandler();
         this.transitionToLevel();
     }
 
