@@ -142,10 +142,6 @@ class GameObject {
         const py = this.position?.y ?? this.INIT_POSITION?.y ?? 0;
         let width = this.pixels?.width || (this.hitbox?.widthPercentage ? this.hitbox.widthPercentage * (this.gameEnv?.innerWidth || 1) : 32);
         let height = this.pixels?.height || (this.hitbox?.heightPercentage ? this.hitbox.heightPercentage * (this.gameEnv?.innerHeight || 1) : 32);
-        if (this.SCALE_FACTOR) {
-            width = width / this.SCALE_FACTOR;
-            height = height / this.SCALE_FACTOR;
-        }
         return (x >= px && x <= px + width && y >= py && y <= py + height);
     }
 

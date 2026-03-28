@@ -57,15 +57,10 @@ class CanvasClickHandler {
             x, y
         });
         if (!clickedCanvas) return;
-        // Optionally, you can filter which canvases are interactive here
-        // For now, we use the coordinates relative to the topmost canvas
-        const rect = clickedCanvas.getBoundingClientRect();
-        const relX = event.clientX - rect.left;
-        const relY = event.clientY - rect.top;
-        for (const obj of this.gameEnv.gameObjects) {
-            if (typeof obj.isPointInside === 'function' && obj.isPointInside(relX, relY)) {
-                if (typeof obj.handleClick === 'function') obj.handleClick();
-            }
+        // Find the game object whose canvas id matches
+        const obj = this.gameEnv.gameObjects.find(o => o.canvas && o.canvas.id === clickedCanvas.id);
+        if (obj && typeof obj.handleClick === 'function') {
+            obj.handleClick(event);
         }
     }
 }

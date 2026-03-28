@@ -87,21 +87,10 @@ class GameLevelDesert {
        orientation: {rows: 1, columns: 1 },
        down: {row: 0, start: 0, columns: 1, wiggle: 0.10 },
        hitbox: { widthPercentage: 0.15, heightPercentage: 0.15 },
-       state: {
-           clicks: 0,
-           points: 0
+       interact: function(clicks) {
+           // Update DOM element
+           console.log('Clicker clicked, total clicks:', this.clcks);
        },
-       interact: function() {
-           this.state.clicks += 1;
-           this.state.points += 1;
-           if (this.react) this.react('click');
-       },
-       react: function(type) {
-           if (type === 'click') {
-               const pointsEl = document.getElementById('clicker-points');
-               if (pointsEl) pointsEl.textContent = this.state.points;
-           }
-       }
    };
 
 
