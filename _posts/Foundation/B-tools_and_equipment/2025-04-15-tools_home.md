@@ -29,7 +29,3 @@ canonical_id: tool-setup
 <h2> Setup Modules </h2>
 
 {%- include tailwind/infograph.html -%}
-
-<h2> Track Progress </h2>
-
-{%- include tailwind/questions.html -%}
