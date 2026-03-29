@@ -14,15 +14,14 @@ sticky_rank: 1
 canonical_id: tool-setup
 ---
 
-<h2> Track, Communicate, Share </h2>
+<h2> Tools and Equipment Setup </h2>
 
-Development is about "failing fast".
+**CLICK THE IMAGES TO CONTINUE TO THE SPECIFIC SECTIONS**
 
 <div class="my-4">
  <ul class="list-disc list-inside space-y-1">
-  <li>Use Microblog on this page to get community help on tools.</li>
   <li>Tracking progress is essential, start an Issue!</li>
-  <li>Skipping steps will NOT work!</li>
+  <li>Don't skip steps! That will lead to problems down the road.</li>
  </ul>
 </div>
 
