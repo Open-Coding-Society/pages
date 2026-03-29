@@ -20,8 +20,8 @@ canonical_id: tool-setup
 
 <div class="my-4">
  <ul class="list-disc list-inside space-y-1">
-  <li>Tracking progress is essential, start an Issue!</li>
-  <li>Don't skip steps! That will lead to problems down the road.</li>
+  <li>Tracking your progress and documenting your steps is important for learning and for debugging if something goes wrong.</li>
+  <li>In this case, we track our progress with Github issues. If you don't what issues are, <a target="_blank" href="https://docs.github.com/en/issues/tracking-your-work-with-issues/learning-about-issues/about-issues">learn here</a>.</li>
  </ul>
 </div>
 
