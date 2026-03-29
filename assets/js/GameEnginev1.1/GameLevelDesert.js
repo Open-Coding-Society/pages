@@ -15,6 +15,7 @@ import { pythonURI, fetchOptions } from '../api/config.js';
 
 // Import PlatformerMini (game-in-game)
 import PlatformerMini from './PlatformerMini.js';
+import Clicker from './essentials/Clicker.js';
 
 class GameLevelDesert {
  constructor(gameEnv) {
@@ -70,6 +71,28 @@ class GameLevelDesert {
        zIndex: 12,
        value: 1
    };
+
+
+       // Clicker box-button object literal
+   const sprite_src_clicker = path + "/images/gamify/box-button.png";
+   const sprite_data_clicker = {
+       id: 'Clicker Box',
+       //updateDOM: 'clicker-box', // optional to see updates from DOM on page
+       greeting: "Click or collide with me to earn points!",
+       src: sprite_src_clicker,
+       SCALE_FACTOR: 8,
+       ANIMATION_RATE: 50,
+       pixels: {height: 128, width: 128},
+       INIT_POSITION: { x: 0.6, y: 0.8 },
+       orientation: {rows: 1, columns: 1 },
+       down: {row: 0, start: 0, columns: 1, wiggle: 0.10 },
+       hitbox: { widthPercentage: 0.15, heightPercentage: 0.15 },
+       interact: function(clicks) {
+           // Update DOM element
+           console.log('Clicker clicked, total clicks:', this.clcks);
+       },
+   };
+
 
    
    // NPC data for Tux
@@ -663,7 +686,6 @@ class GameLevelDesert {
        }
    };
 
-
   const sprite_src_r2d2 = path + "/images/gamify/r2_idle.png";
   const sprite_greet_r2d2 = "Hi I am R2D2. Leave this planet and help defend the rebel base on Hoth!";
   const sprite_data_r2d2 = {
@@ -913,20 +935,21 @@ class GameLevelDesert {
 
 
 // List of objects defnitions for this level
-   this.classes = [
-     { class: GamEnvBackground, data: image_data_desert },
-     { class: Player, data: sprite_data_chillguy },
-     { class: Coin, data: sprite_data_coin },
-     { class: Npc, data: sprite_data_tux },
-     { class: Npc, data: sprite_data_octocat },
-     { class: Npc, data: sprite_data_robot },
-     { class: Npc, data: sprite_data_r2d2 },
-     { class: Npc, data: sprite_data_stocks },
-     { class: Npc, data: sprite_data_crypto },
-     { class: Npc, data: sprite_data_chickenj },
-     { class: Npc, data: sprite_data_endportal },
-     { class: Npc, data: sprite_data_historian },
-   ];
+     this.classes = [
+         { class: GamEnvBackground, data: image_data_desert },
+         { class: Player, data: sprite_data_chillguy },
+         { class: Coin, data: sprite_data_coin },
+         { class: Clicker, data: sprite_data_clicker },
+         { class: Npc, data: sprite_data_tux },
+         { class: Npc, data: sprite_data_octocat },
+         { class: Npc, data: sprite_data_robot },
+         { class: Npc, data: sprite_data_r2d2 },
+         { class: Npc, data: sprite_data_stocks },
+         { class: Npc, data: sprite_data_crypto },
+         { class: Npc, data: sprite_data_chickenj },
+         { class: Npc, data: sprite_data_endportal },
+         { class: Npc, data: sprite_data_historian },
+     ];
 
  }
 
