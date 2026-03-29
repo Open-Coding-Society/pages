@@ -63,7 +63,7 @@ flowchart TD
 
 ### WSL common commands
 
-- `wsl --help`, `wsl -l -o`, `wsl -l -v`, `wsl --shutdown`, `wsl --uregister`
+- `wsl --help`, `wsl -l -o`, `wsl -l -v`, `wsl --shutdown`, `wsl --unregister`
 
 ### WSL install
 
@@ -73,7 +73,7 @@ flowchart TD
    wsl --install -d Ubuntu-24.04
    ```
 
-2. Setup a username and password when prompted. On password you will be typing but will not see respones.
+2. Setup a username and password when prompted. On password you will be typing but will not see responses.
 
 3. At the conclusion of the install you will receive a WSL Ubuntu prompt.  For now we will exit WSL.
 
