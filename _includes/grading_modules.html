@@ -1,28 +1,33 @@
 <script>
-window.PageFeatures = window.PageFeatures || {};
-window.PageFeatures.grading_modules = true;
+  window.PageFeatures = window.PageFeatures || {};
+  window.PageFeatures.grading_modules = true;
 </script>
 
-<link rel="stylesheet" href="grading-module.css" />
-
-<!-- SUBMISSION BOX (clean separate box at the very bottom) -->
-<div class="assignment-action-module grading-submission-module bottom-action-module">
-  <input type="url" id="student-submission-url" placeholder="Paste Gist or Page URL..." />
-  <button id="submit-assignment-btn" class="btn-primary">Commit</button>
-  <button id="open-grades-admin" class="btn-secondary" style="display:none;">Grades Admin</button>
+<!-- ═══════════════════════════════════════════════════════════════════
+     PIXEL SUBMIT WIDGET
+════════════════════════════════════════════════════════════════════ -->
+<div class="grading-submission-module">
+  {% include gist-export-button.html %}
 </div>
 
-<!-- ADMIN PANEL (hidden until admin clicks) -->
+<!-- Hidden admin button (shown by JS for admins only) -->
+<button id="open-grades-admin" class="btn-secondary" style="display:none;margin:0 auto 1rem;">
+  Grades Admin
+</button>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     ADMIN PANEL (hidden until admin clicks)
+════════════════════════════════════════════════════════════════════ -->
 <div id="grading-module-widget">
   <div id="grading-module" class="grading-module-panel" style="display:none;">
     <h2>Grades Admin</h2>
     <section>
       <form id="grade-create-form">
-        <input name="uid" placeholder="Student UID" required />
-        <input name="assignment" placeholder="Assignment" required />
-        <input type="number" name="score" step="0.01" placeholder="Score" required />
-        <input name="teacherComments" placeholder="Teacher comments" />
-        <input name="submission" placeholder="Submission (text, URL, comments)" />
+        <input name="uid"                                   placeholder="Student UID"                          required />
+        <input name="assignment"                            placeholder="Assignment"                           required />
+        <input type="number" name="score" step="0.01"      placeholder="Score"                                required />
+        <input name="teacherComments"                       placeholder="Teacher comments" />
+        <input name="submission"                            placeholder="Submission (text, URL, comments)" />
         <button type="submit" class="btn-primary">Submit Grade</button>
       </form>
       <table id="grades-table" class="grading-table">
@@ -34,10 +39,10 @@ window.PageFeatures.grading_modules = true;
         </thead>
         <tbody></tbody>
       </table>
-      <form id="grade-edit-form" style="display:none; margin-top:1rem;">
+      <form id="grade-edit-form" style="display:none;margin-top:1rem;">
         <input type="hidden" name="id" />
-        <input name="uid" readonly />
-        <input name="assignment" required />
+        <input name="uid"              readonly />
+        <input name="assignment"       required />
         <input type="number" name="score" step="0.01" required />
         <input name="teacherComments" />
         <input name="submission" />
@@ -49,229 +54,23 @@ window.PageFeatures.grading_modules = true;
   </div>
 </div>
 
-<!-- CONFIRMATION MODAL -->
-<div id="grade-confirm-modal" class="grading-modal-backdrop">
-  <div class="grading-modal-box">
-    <h3>Confirm Submission</h3>
-    <p><strong>UID:</strong> <span id="confirm-uid"></span></p>
-    <p><strong>Assignment:</strong> <span id="confirm-assignment"></span></p>
-    <p><strong>Submission URL:</strong> <span id="confirm-submission"></span></p>
-    <p><strong>Comments:</strong> <span id="confirm-comments"></span></p>
-    <div class="grading-modal-actions">
-      <button id="confirm-cancel-btn" class="btn-secondary">Cancel</button>
-      <button id="confirm-send-btn" class="btn-primary">Send</button>
-    </div>
-  </div>
-</div>
-
-<!-- MANUAL FALLBACK MODAL -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MANUAL FALLBACK MODAL
+     Opened automatically by the pixel widget if the API is unreachable
+════════════════════════════════════════════════════════════════════ -->
 <div id="grade-manual-modal" class="grading-modal-backdrop">
   <div class="grading-modal-box">
-    <h3>⚠️ Submit Failed — Enter Manually</h3>
+    <h3>Submit Failed — Enter Manually</h3>
     <p class="grading-modal-error" id="manual-error-msg"></p>
-    <label>UID <input id="manual-uid" placeholder="Your UID / username" /></label>
-    <label>Assignment <input id="manual-assignment" placeholder="e.g. homework1.html" /></label>
+    <label>UID            <input id="manual-uid"        placeholder="Your UID / username" /></label>
+    <label>Assignment     <input id="manual-assignment" placeholder="e.g. homework1.html" /></label>
     <label>Submission URL <input id="manual-submission" placeholder="https://yoursite.com/page" /></label>
-    <label>Comments <input id="manual-comments" placeholder="Optional notes" /></label>
+    <label>Comments       <input id="manual-comments"   placeholder="Optional notes" /></label>
     <div class="grading-modal-actions">
       <button id="manual-cancel-btn" class="btn-secondary">Cancel</button>
-      <button id="manual-send-btn" class="btn-primary">Submit</button>
+      <button id="manual-send-btn"   class="btn-primary">Submit</button>
     </div>
   </div>
 </div>
 
-<script>
-(function () {
-  if (!window.PageFeatures?.grading_modules) return;
-
-  const API_BASE = 'http://localhost:8585/api';
-  const ENDPOINTS = { grades: `${API_BASE}/grades` };
-  let gradesCache = [];
-
-  async function apiRequest(url, options = {}) {
-    const res = await fetch(url, {
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json', 'X-Origin': 'client' },
-      ...options
-    });
-    if (!res.ok) throw new Error('API request failed');
-    return res.status === 204 ? null : res.json();
-  }
-
-  const GradeAPI = {
-    getAll: () => apiRequest(ENDPOINTS.grades),
-    create: (data) => apiRequest(ENDPOINTS.grades, { method: 'POST', body: JSON.stringify(data) }),
-    update: (id, data) => apiRequest(`${ENDPOINTS.grades}/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-    delete: (id) => apiRequest(`${ENDPOINTS.grades}/${id}`, { method: 'DELETE' })
-  };
-
-  function showModal(id) { document.getElementById(id)?.classList.add('show'); }
-  function hideModal(id) { document.getElementById(id)?.classList.remove('show'); }
-
-  function getCurrentUid() {
-    const user = window.currentUser || window.App?.user || window.user || {};
-    return user.uid || user.username || user.email || '';
-  }
-
-  function isAdminUser() {
-    const user = window.currentUser || window.App?.user || window.user || {};
-    const roles = user.roles || [];
-    return user.uid === 'toby' || roles.includes('admin') || roles.includes('ADMIN');
-  }
-
-  function setStatus(msg, err = false) {
-    const statusEl = document.getElementById('grading-status');
-    if (!statusEl) return;
-    statusEl.textContent = msg;
-    statusEl.style.color = err ? 'var(--destructive, #dc2626)' : 'var(--success, #16a34a)';
-  }
-
-  async function loadGrades() {
-    try {
-      gradesCache = await GradeAPI.getAll();
-      const tableBody = document.querySelector('#grades-table tbody');
-      if (!tableBody) return;
-      tableBody.innerHTML = '';
-      gradesCache.forEach(g => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${g.id}</td><td>${g.uid}</td><td>${g.assignment}</td>
-          <td>${g.score ?? ''}</td><td>${g.teacherComments ?? ''}</td>
-          <td>${g.submission ?? ''}</td>
-          <td>
-            <button data-action="edit" data-id="${g.id}">Edit</button>
-            <button data-action="delete" data-id="${g.id}">Delete</button>
-          </td>`;
-        tableBody.appendChild(row);
-      });
-    } catch (e) {
-      setStatus('Failed to load grades: ' + e.message, true);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Show admin button only for admins
-    if (isAdminUser()) {
-      document.getElementById('open-grades-admin').style.display = 'inline-block';
-    }
-
-    // Open Grades Admin panel
-    document.getElementById('open-grades-admin')?.addEventListener('click', () => {
-      if (!isAdminUser()) return;
-      const el = document.getElementById('grading-module');
-      el.style.display = el.style.display === 'block' ? 'none' : 'block';
-      if (el.style.display === 'block') loadGrades();
-    });
-
-    // Student Submit Flow (the button in the bottom box)
-    document.getElementById('submit-assignment-btn')?.addEventListener('click', () => {
-      const pathname = window.location.pathname;
-      const filename = pathname.split('/').pop() || pathname;
-      const inputUrl = document.getElementById('student-submission-url')?.value.trim();
-      const submissionUrl = inputUrl || window.location.href;
-      const uid = getCurrentUid();
-
-      document.getElementById('confirm-uid').textContent = uid || '(not detected)';
-      document.getElementById('confirm-assignment').textContent = filename;
-      document.getElementById('confirm-submission').textContent = submissionUrl;
-      document.getElementById('confirm-comments').textContent = 'Submitted from student page';
-
-      window._pendingGradePayload = {
-        uid, assignment: filename, score: 0.0,
-        teacherComments: 'Submitted from student page',
-        submission: submissionUrl,
-        submittedAt: new Date().toISOString()
-      };
-      showModal('grade-confirm-modal');
-    });
-
-    // Confirm Modal
-    document.getElementById('confirm-cancel-btn')?.addEventListener('click', () => {
-      hideModal('grade-confirm-modal');
-      window._pendingGradePayload = null;
-    });
-
-    document.getElementById('confirm-send-btn')?.addEventListener('click', async () => {
-      const payload = window._pendingGradePayload;
-      if (!payload) return;
-      hideModal('grade-confirm-modal');
-
-      try {
-        await GradeAPI.create(payload);
-        setStatus('Progress submitted successfully');
-        alert('Progress submitted successfully!');
-      } catch (err) {
-        document.getElementById('manual-error-msg').textContent = `Could not reach backend: "${err?.message || 'fetch failed'}". Fill in manually and retry.`;
-        document.getElementById('manual-uid').value = payload.uid || '';
-        document.getElementById('manual-assignment').value = payload.assignment || '';
-        document.getElementById('manual-submission').value = payload.submission || '';
-        document.getElementById('manual-comments').value = payload.teacherComments || '';
-        showModal('grade-manual-modal');
-      }
-    });
-
-    // Manual Fallback Modal
-    document.getElementById('manual-cancel-btn')?.addEventListener('click', () => hideModal('grade-manual-modal'));
-
-    document.getElementById('manual-send-btn')?.addEventListener('click', async () => {
-      const uid = document.getElementById('manual-uid').value.trim();
-      const assignment = document.getElementById('manual-assignment').value.trim();
-      const submission = document.getElementById('manual-submission').value.trim();
-      if (!uid || !assignment || !submission) { alert('UID, Assignment, and Submission are required.'); return; }
-
-      try {
-        await GradeAPI.create({
-          uid, assignment, score: 0.0,
-          teacherComments: document.getElementById('manual-comments').value.trim() || 'Manually submitted',
-          submission, submittedAt: new Date().toISOString()
-        });
-        hideModal('grade-manual-modal');
-        alert('Progress submitted successfully!');
-      } catch (err) {
-        document.getElementById('manual-error-msg').textContent = `Still failing: ${err?.message || 'unknown error'}`;
-      }
-    });
-
-    // Admin create/edit forms (unchanged)
-    const getFormData = (f) => ({
-      uid: new FormData(f).get('uid')?.trim() || getCurrentUid(),
-      assignment: new FormData(f).get('assignment')?.trim(),
-      score: parseFloat(new FormData(f).get('score')),
-      teacherComments: new FormData(f).get('teacherComments')?.trim(),
-      submission: new FormData(f).get('submission')?.trim()
-    });
-
-    document.getElementById('grade-create-form')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      try { await GradeAPI.create(getFormData(e.target)); e.target.reset(); loadGrades(); } 
-      catch (err) { setStatus(err.message, true); }
-    });
-
-    document.getElementById('grade-edit-form')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      try { await GradeAPI.update(new FormData(e.target).get('id'), getFormData(e.target)); 
-            e.target.reset(); e.target.style.display = 'none'; loadGrades(); } 
-      catch (err) { setStatus(err.message, true); }
-    });
-
-    document.getElementById('grade-edit-cancel')?.addEventListener('click', () => {
-      document.getElementById('grade-edit-form').style.display = 'none';
-    });
-
-    document.querySelector('#grades-table tbody')?.addEventListener('click', async (e) => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-      const id = btn.dataset.id;
-      if (btn.dataset.action === 'delete') {
-        if (confirm('Delete?')) { await GradeAPI.delete(id); loadGrades(); }
-      }
-      if (btn.dataset.action === 'edit') {
-        const g = gradesCache.find(x => x.id == id);
-        const form = document.getElementById('grade-edit-form');
-        Object.entries(g).forEach(([k, v]) => { const i = form.querySelector(`[name="${k}"]`); if(i) i.value = v ?? ''; });
-        form.style.display = 'block';
-      }
-    });
-  });
-})();
-</script>
+<script src="{{ '/assets/js/grading-module.js' | relative_url }}" defer></script>
