@@ -1,0 +1,58 @@
+<!-- ASSIGNMENT SUBMISSION FORM -->
+{% comment %}
+  Displays when page.assignment is true
+  Includes both link and file submission options
+{% endcomment %}
+
+<div class="assignment-submission">
+  <h3>
+    <i class="fas fa-upload assignment-submission-icon"></i>
+    Submit Assignment
+  </h3>
+
+  <div class="submission-options">
+    <button class="submission-tab" onclick="switchSubmissionType('link')" type="button">
+      <i class="fas fa-link"></i> Link Submission
+    </button>
+    <button class="submission-tab" onclick="switchSubmissionType('file')" type="button">
+      <i class="fas fa-file-upload"></i> File Upload
+    </button>
+  </div>
+
+  <!-- Link Submission Form -->
+  <form class="submission-form" id="link-form">
+    <div class="form-group">
+      <label for="submission-link">Submission Link</label>
+      <input type="url" id="submission-link" placeholder="https://..." required>
+    </div>
+    <div class="form-group">
+      <label for="link-description">Description</label>
+      <textarea id="link-description" placeholder="Describe what you're submitting..." required></textarea>
+    </div>
+    <button type="submit" class="submit-btn">
+      <i class="fas fa-check"></i>
+      Submit Link
+    </button>
+  </form>
+
+  <!-- File Upload Form -->
+  <form class="submission-form hidden" id="file-form">
+    <div class="form-group">
+      <label for="submission-file">Upload File</label>
+      <div class="file-input-wrapper">
+        <input type="file" id="submission-file" required>
+        <span class="file-name">No file selected</span>
+        <span class="file-size"></span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="file-description">Description</label>
+      <textarea id="file-description" placeholder="Describe what you're submitting..." required></textarea>
+    </div>
+    <div id="file-list" class="file-list"></div>
+    <button type="submit" class="submit-btn">
+      <i class="fas fa-check"></i>
+      Submit File
+    </button>
+  </form>
+</div>

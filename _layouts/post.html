@@ -40,99 +40,12 @@ Check if this is a course lesson and determine which course context to use
 
 <div class="lesson-player">
   <!-- LEFT SIDEBAR -->
-  <div class="lesson-sidebar">
-    <div class="sidebar-header">
-      {% if current_course == 'csp' %}
-      <h2>Computer Science Principles</h2>
-      {% elsif current_course == 'csa' %}
-      <h2>Computer Science A</h2>
-      {% elsif current_course == 'csse' %}
-      <h2>Computer Science & Software Engineering</h2>
-      {% elsif current_course == 'cwgu' %}
-      <h2>WGU Applied Computer Science</h2>
-      {% endif %}
-
-      <div class="course-progress-section">
-        <div class="progress-label">
-          <span>Course Progress</span>
-          <span id="progress-count">0/0</span>
-        </div>
-        <div class="progress-bar-sidebar">
-          <div class="progress-bar-sidebar-fill" id="sidebar-progress" style="width: 0%"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sprint-nav">
-      {% assign courseData = site.data[current_course] %}
-      {% for i in (1..9) %}
-      {% assign sprintKey = "Sprint" | append: i %}
-      {% assign sprint = courseData[sprintKey] %}
-
-      {% if sprint %}
-      <div class="sprint-section">
-        <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')">
-          <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
-          <div class="sprint-info">
-            <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
-            <div class="sprint-weeks">Weeks {{ sprint.start }}-{{ sprint.end }}</div>
-          </div>
-        </button>
-
-        <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
-          {% for week in (sprint.start..sprint.end) %}
-          {% for post in posts %}
-          {% if post.courses[current_course] %}
-          {% comment %}Include all files with courses frontmatter (including converted notebook markdown files){%
-          endcomment %}
-          {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
-          {% assign course_count = 0 %}
-          {% for course in post.courses %}
-          {% assign course_count = course_count | plus: 1 %}
-          {% endfor %}
-          {% if course_count == 1 %}
-          {% assign postWeek = post.courses[current_course].week | plus: 0 %}
-          {% if postWeek == week %}
-          <a href="{{ site.baseurl }}{{ post.url }}" class="lesson-item {% if page.url == post.url %}active{% endif %}"
-            data-lesson-id="{{ post.url }}">
-            <i class="fas fa-circle lesson-status-icon incomplete"></i>
-            <span class="lesson-title">{{ post.title }}</span>
-          </a>
-          {% endif %}
-          {% endif %}
-          {% endif %}
-          {% endfor %}
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-      {% endfor %}
-    </div>
-  </div>
+  {% include lesson-sidebar-nav.html %}
 
   <!-- MAIN CONTENT -->
   <div class="lesson-main">
     <!-- Top Bar -->
-    <div class="topbar-lesson">
-      <div class="topbar-left">
-        <div class="breadcrumbs">
-          <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}">
-            <i class="fas fa-home"></i>
-          </a>
-          <i class="fas fa-chevron-right"></i>
-          <span>Week {{ current_week }}</span>
-          <i class="fas fa-chevron-right"></i>
-          <span class="current">{{ page.title }}</span>
-          <button id="topbar-complete-btn" onclick="toggleComplete()">
-            <i class="fas fa-circle" id="complete-icon-topbar"></i>
-            <span id="complete-text-topbar">Burndown</span>
-          </button>
-        </div>
-      </div>
-      <div class="topbar-progress">
-        <div class="topbar-progress-fill" id="lesson-progress"></div>
-      </div>
-    </div>
+    {% include lesson-topbar.html %}
 
     <!-- Lesson Content -->
     <div class="lesson-content">
@@ -167,63 +80,7 @@ Check if this is a course lesson and determine which course context to use
           {% endif %}
 
           {% if page.assignment %}
-          <div class="assignment-submission">
-            <h3>
-              <i class="fas fa-upload assignment-submission-icon"></i>
-              Submit Assignment
-            </h3>
-
-            <div class="submission-options">
-              <button class="submission-tab" onclick="switchSubmissionType('link')">
-                <i class="fas fa-link"></i> Link Submission
-              </button>
-              <button class="submission-tab" onclick="switchSubmissionType('file')">
-                <i class="fas fa-file-upload"></i> File Upload
-              </button>
-            </div>
-
-            <!-- Link Submission Form -->
-            <form class="submission-form" id="link-form">
-              <div class="form-group">
-                <label for="submission-link">Submission Link</label>
-                <input type="url" id="submission-link" placeholder="https://..." required>
-              </div>
-              <div class="form-group">
-                <label for="link-description">Description</label>
-                <textarea id="link-description" placeholder="Describe what you're submitting..." required></textarea>
-              </div>
-              <button type="submit" class="submit-btn">
-                <i class="fas fa-check"></i>
-                Submit Link
-              </button>
-            </form>
-
-            <!-- File Upload Form -->
-            <form class="submission-form" id="file-form">
-              <div class="form-group">
-                <label>Upload Files</label>
-                <div class="file-upload-area" id="file-upload-area">
-                  <input type="file" id="file-input" multiple style="display: none;">
-                  <div class="file-upload-icon">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                  </div>
-                  <div class="file-upload-text">Click to upload or drag and drop</div>
-                  <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
-                </div>
-                <div class="file-list" id="file-list"></div>
-              </div>
-              <div class="form-group">
-                <label for="file-notes">Notes (Optional)</label>
-                <textarea id="file-notes" placeholder="Add any additional comments..."></textarea>
-              </div>
-              <button type="submit" class="submit-btn" id="file-submit-btn" disabled>
-                <i class="fas fa-check"></i>
-                Submit Files
-              </button>
-            </form>
-
-            <div class="submission-status" id="submission-status"></div>
-          </div>
+          {% include lesson-submission-form.html %}
           {% endif %}
         </div>
 
@@ -261,66 +118,56 @@ Check if this is a course lesson and determine which course context to use
 </script>
 {% endif %}
 
-<!-- Floating hamburger menu (mobile only) -->
-<button class="floating-menu-btn" id="floating-menu-btn" style="display: none;">
-  <i class="fas fa-bars"></i>
-</button>
-
-<!-- Timeline modal overlay -->
-<div class="timeline-modal-overlay" id="timeline-modal-overlay"></div>
-
-<!-- Timeline modal (mobile only) -->
-<div class="timeline-modal" id="timeline-modal">
-  <div class="timeline-modal-header">
-    <h3>Course Timeline</h3>
-    <button class="timeline-close-btn" id="timeline-close-btn">
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
-  <div class="timeline-modal-content" id="timeline-modal-content">
-    <!-- Sprint cards will be populated by JavaScript -->
-  </div>
-</div>
+<!-- Modals for lesson player -->
+{% include lesson-modals.html %}
 
 <script type="module">
-  import { pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
 
-  // Course is now determined by the specific file being viewed
-  const CURRENT_COURSE = '{{ current_course }}';
-  const currentWeek = '{{ current_week }}';
-  const pageTitle = "{{ page.title }}";
+  /**
+   * ============================================
+   * CONFIGURATION & CONSTANTS
+   * ============================================
+   */
+  const COURSE = '{{ current_course }}';
+  const WEEK = '{{ current_week }}';
+  const PAGE_TITLE = "{{ page.title }}";
+  const CURRENT_LESSON_ID = '{{ page.url }}';
+  const STORAGE_KEY = `${COURSE}-lesson-completion`;
+  const STATUS_AUTO_HIDE_MS = 5000;
+  const FILE_SIZE_LIMIT_MB = 10;
 
-  const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
-  // Use consistent lesson ID format (URL path without baseurl)
-  const currentLessonId = '{{ page.url }}';
-
-  // Toggle sprint expansion
+  /**
+   * ============================================
+   * SPRINT NAVIGATION: Toggle sprint visibility
+   * ============================================
+   */
   window.toggleSprint = function (sprintId) {
     const lessons = document.getElementById(`sprint-${sprintId}-lessons`);
     const chevron = document.getElementById(`chevron-${sprintId}`);
+    if (!lessons || !chevron) return;
 
-    if (lessons.style.display === 'none') {
-      lessons.style.display = 'block';
-      chevron.classList.remove('fa-chevron-right');
-      chevron.classList.add('fa-chevron-down');
-    } else {
-      lessons.style.display = 'none';
-      chevron.classList.remove('fa-chevron-down');
-      chevron.classList.add('fa-chevron-right');
-    }
-  }
+    const isHidden = lessons.style.display === 'none';
+    lessons.style.display = isHidden ? 'block' : 'none';
+    chevron.classList.toggle('fa-chevron-right', !isHidden);
+    chevron.classList.toggle('fa-chevron-down', isHidden);
+  };
 
-  // Load completion data
-  function loadCompletionData() {
+  /**
+   * ============================================
+   * COMPLETION DATA LAYER: LocalStorage operations
+   * ============================================
+   */
+  function getCompletionData() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       return stored ? JSON.parse(stored) : {};
     } catch (e) {
+      console.error('Error reading completion data:', e);
       return {};
     }
   }
 
-  // Save completion data
   function saveCompletionData(data) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -329,255 +176,212 @@ Check if this is a course lesson and determine which course context to use
     }
   }
 
-  // Toggle lesson completion
+  /**
+   * ============================================
+   * COMPLETION TOGGLING: Toggle lesson status
+   * ============================================
+   */
   window.toggleComplete = function () {
-    const completionData = loadCompletionData();
-    const isCompleted = completionData[currentLessonId] || false;
-    completionData[currentLessonId] = !isCompleted;
+    const completionData = getCompletionData();
+    const isCompleted = completionData[CURRENT_LESSON_ID] || false;
+    completionData[CURRENT_LESSON_ID] = !isCompleted;
     saveCompletionData(completionData);
 
-    updateCompleteButton();
-    updateUI();
-
-    // Trigger cross-view sync by dispatching a custom event
+    syncCompletionUI();
     window.dispatchEvent(new CustomEvent('completionChanged', {
-      detail: { itemId: currentLessonId, completed: !isCompleted }
+      detail: { itemId: CURRENT_LESSON_ID, completed: !isCompleted }
     }));
-  }
+  };
 
-  // Update the complete button state
-  function updateCompleteButton() {
-    const completionData = loadCompletionData();
-    const isCompleted = completionData[currentLessonId] || false;
-
-    // Helper to update specific button elements
-    const updateBtnElements = (iconId, textId) => {
-        const icon = document.getElementById(iconId);
-        const text = document.getElementById(textId);
-        
-        if (icon && text) {
-            if (isCompleted) {
-                icon.classList.remove('fa-circle');
-                icon.classList.add('fa-circle-check');
-                text.textContent = 'Completed';
-            } else {
-                icon.classList.remove('fa-circle-check');
-                icon.classList.add('fa-circle');
-                text.textContent = 'Burndown';
-            }
-        }
+  /**
+   * ============================================
+   * UI UPDATES: Individual responsibility functions
+   * ============================================
+   */
+  function updateCompleteButton(isCompleted) {
+    const updateButton = (iconId, textId) => {
+      const icon = document.getElementById(iconId);
+      const text = document.getElementById(textId);
+      if (!icon || !text) return;
+      
+      icon.classList.toggle('fa-circle', !isCompleted);
+      icon.classList.toggle('fa-circle-check', isCompleted);
+      text.textContent = isCompleted ? 'Completed' : 'Burndown';
     };
-
-    // Update bottom button (legacy/mobile if kept)
-    updateBtnElements('complete-icon', 'complete-text');
     
-    // Update topbar button
-    updateBtnElements('complete-icon-topbar', 'complete-text-topbar');
+    updateButton('complete-icon', 'complete-text');
+    updateButton('complete-icon-topbar', 'complete-text-topbar');
   }
-  // Update UI based on completion data
-  function updateUI() {
-    const completionData = loadCompletionData();
-    const lessonItems = document.querySelectorAll('.lesson-item');
 
-    let total = lessonItems.length;
+  function updateLessonItems(completionData) {
     let completed = 0;
-
+    const lessonItems = document.querySelectorAll('.lesson-item');
+    
     lessonItems.forEach(item => {
       const lessonId = item.dataset.lessonId;
       const icon = item.querySelector('.lesson-status-icon');
-
-      if (completionData[lessonId]) {
-        icon.classList.remove('fa-circle', 'incomplete');
-        icon.classList.add('fa-circle-check', 'completed');
-        completed++;
-      } else {
-        icon.classList.remove('fa-circle-check', 'completed');
-        icon.classList.add('fa-circle', 'incomplete');
+      const isCompleted = completionData[lessonId] || false;
+      
+      if (icon) {
+        icon.classList.toggle('fa-circle', !isCompleted);
+        icon.classList.toggle('fa-circle-check', isCompleted);
+        icon.classList.toggle('incomplete', !isCompleted);
+        icon.classList.toggle('completed', isCompleted);
       }
+      
+      if (isCompleted) completed++;
     });
+    
+    return { total: lessonItems.length, completed };
+  }
 
-    // Update progress bar
-    if (document.getElementById('sidebar-progress')) {
-      const progress = total > 0 ? (completed / total) * 100 : 0;
-      document.getElementById('sidebar-progress').style.width = `${progress}%`;
-      document.getElementById('progress-count').textContent = `${completed}/${total}`;
+  function updateProgressBars(completionData) {
+    const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
+    const stats = updateLessonItems(completionData);
+    
+    const sidebarProgress = document.getElementById('sidebar-progress');
+    if (sidebarProgress) {
+      const sidebarPercent = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
+      sidebarProgress.style.width = `${sidebarPercent}%`;
     }
-
-    // Update lesson progress bar (based on current position in course)
-    const lessonArray = Array.from(lessonItems);
-    const currentIndex = lessonArray.findIndex(item => item.classList.contains('active'));
-    if (document.getElementById('lesson-progress')) {
-      const lessonProgress = total > 0 ? ((currentIndex + 1) / total) * 100 : 0;
-      document.getElementById('lesson-progress').style.width = `${lessonProgress}%`;
+    
+    const progressCount = document.getElementById('progress-count');
+    if (progressCount) {
+      progressCount.textContent = `${stats.completed}/${stats.total}`;
+    }
+    
+    const lessonProgress = document.getElementById('lesson-progress');
+    if (lessonProgress) {
+      const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
+      const lessonPercent = stats.total > 0 ? ((currentIndex + 1) / stats.total) * 100 : 0;
+      lessonProgress.style.width = `${lessonPercent}%`;
     }
   }
 
+  function syncCompletionUI() {
+    const completionData = getCompletionData();
+    const isCompleted = completionData[CURRENT_LESSON_ID] || false;
+    updateCompleteButton(isCompleted);
+    updateProgressBars(completionData);
+  }
+
+  /**
+   * ============================================
+   * LESSON NAVIGATION: Move between lessons
+   * ============================================
+   */
   window.prevLesson = function () {
     const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
     const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
-
     if (currentIndex > 0) {
       window.location.href = lessonItems[currentIndex - 1].href;
     } else {
       alert('You are on the first lesson!');
     }
-  }
+  };
 
-  // Next lesson navigation
   window.nextLesson = function () {
     const lessonItems = Array.from(document.querySelectorAll('.lesson-item'));
     const currentIndex = lessonItems.findIndex(item => item.classList.contains('active'));
-
     if (currentIndex >= 0 && currentIndex < lessonItems.length - 1) {
       window.location.href = lessonItems[currentIndex + 1].href;
     } else {
       alert('You\'ve reached the last lesson!');
     }
-  }
+  };
 
-  // Hide site header and apply lesson player styling
+  /**
+   * ============================================
+   * INITIALIZATION: Player setup
+   * ============================================
+   */
   function initLessonPlayer() {
-    // Apply minimal body styles for lesson player (keep header visible)
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-  }
-
-  // Sync completion data when window gains focus or becomes visible (when switching between views)
-  window.addEventListener('focus', function () {
     if (document.querySelector('.lesson-player')) {
-      updateCompleteButton();
-      updateUI();
-    }
-  });
-
-  // Also sync when page becomes visible (handles tab switching)
-  document.addEventListener('visibilitychange', function () {
-    if (!document.hidden && document.querySelector('.lesson-player')) {
-      updateCompleteButton();
-      updateUI();
-    }
-  });
-
-  // Listen for storage changes from other tabs/windows (cross-tab sync)
-  window.addEventListener('storage', function (e) {
-    if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
-      updateCompleteButton();
-      updateUI();
-    }
-  });
-
-  // Listen for completion changes from other views (same-window sync)
-  window.addEventListener('completionChanged', function (e) {
-    if (document.querySelector('.lesson-player')) {
-      updateCompleteButton();
-      updateUI();
-    }
-  });
-
-  // Mobile floating menu functionality
-  function initMobileEnhancements() {
-    const floatingBtn = document.getElementById('floating-menu-btn');
-    const timelineModal = document.getElementById('timeline-modal');
-    const overlay = document.getElementById('timeline-modal-overlay');
-    const closeBtn = document.getElementById('timeline-close-btn');
-    const modalContent = document.getElementById('timeline-modal-content');
-
-    if (window.innerWidth <= 768) {
-      // Show floating button on mobile
-      if (floatingBtn) floatingBtn.style.display = 'flex';
-
-      // Populate timeline modal
-      populateTimelineModal();
-
-      // Open timeline modal
-      function openTimelineModal() {
-        timelineModal.classList.add('open');
-        overlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
-      }
-
-      // Close timeline modal
-      function closeTimelineModal() {
-        timelineModal.classList.remove('open');
-        overlay.classList.remove('open');
-        document.body.style.overflow = '';
-      }
-
-      // Event listeners
-      if (floatingBtn) floatingBtn.addEventListener('click', openTimelineModal);
-      if (closeBtn) closeBtn.addEventListener('click', closeTimelineModal);
-      if (overlay) overlay.addEventListener('click', closeTimelineModal);
-
-      // Close on escape key
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && timelineModal && timelineModal.classList.contains('open')) {
-          closeTimelineModal();
-        }
-      });
-
-      // Close when lesson is selected
-      if (modalContent) {
-        modalContent.addEventListener('click', function (e) {
-          if (e.target.closest('.modal-lesson-item')) {
-            closeTimelineModal();
-          }
-        });
-      }
-
-    } else {
-      // Desktop - hide floating button
-      if (floatingBtn) floatingBtn.style.display = 'none';
+      document.body.style.margin = '0';
+      document.body.style.padding = '0';
     }
   }
 
-  // Populate timeline modal by reading all lesson items and grouping by sprint
-  function populateTimelineModal() {
-    const modalContent = document.getElementById('timeline-modal-content');
-    const completionData = loadCompletionData();
+  function expandCurrentSprint() {
+    const activeLesson = document.querySelector('.lesson-item.active');
+    if (!activeLesson) return;
+    
+    const sprintSection = activeLesson.closest('.sprint-section');
+    if (sprintSection) {
+      const sprintToggle = sprintSection.querySelector('.sprint-toggle');
+      if (sprintToggle) sprintToggle.click();
+    }
+  }
 
-    if (!modalContent) return;
+  /**
+   * ============================================
+   * CROSS-TAB SYNC: Listen for changes
+   * ============================================
+   */
+  function setupSyncListeners() {
+    window.addEventListener('focus', () => {
+      if (document.querySelector('.lesson-player')) syncCompletionUI();
+    });
 
-    modalContent.innerHTML = '';
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && document.querySelector('.lesson-player')) syncCompletionUI();
+    });
 
-    // Get ALL lesson items from the sidebar (including hidden/collapsed ones)
-    const allLessonItems = document.querySelectorAll('.lesson-item');
-    const sprintGroups = {};
-
-    // Group lessons by their parent sprint
-    allLessonItems.forEach(item => {
-      const lessonId = item.dataset.lessonId;
-      const lessonTitle = item.querySelector('.lesson-title').textContent;
-      const isCompleted = completionData[lessonId] || false;
-      const isActive = item.classList.contains('active');
-
-      // Find the sprint this lesson belongs to
-      const sprintSection = item.closest('.sprint-section');
-      if (sprintSection) {
-        const sprintTitle = sprintSection.querySelector('.sprint-title').textContent;
-
-        if (!sprintGroups[sprintTitle]) {
-          sprintGroups[sprintTitle] = [];
-        }
-
-        sprintGroups[sprintTitle].push({
-          id: lessonId,
-          title: lessonTitle,
-          url: item.href,
-          completed: isCompleted,
-          active: isActive
-        });
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY && document.querySelector('.lesson-player')) {
+        syncCompletionUI();
       }
     });
 
-    // Create sprint cards for each group
-    Object.keys(sprintGroups).forEach(sprintTitle => {
-      const lessons = sprintGroups[sprintTitle];
+    window.addEventListener('completionChanged', () => {
+      if (document.querySelector('.lesson-player')) syncCompletionUI();
+    });
+  }
+
+  /**
+   * ============================================
+   * TIMELINE MODAL: Mobile navigation
+   * ============================================
+   */
+  function buildTimelineModal() {
+    const completionData = getCompletionData();
+    const lessonItems = document.querySelectorAll('.lesson-item');
+    const sprintGroups = {};
+
+    lessonItems.forEach(item => {
+      const sprintSection = item.closest('.sprint-section');
+      if (!sprintSection) return;
+      
+      const sprintTitle = sprintSection.querySelector('.sprint-title').textContent;
+      if (!sprintGroups[sprintTitle]) sprintGroups[sprintTitle] = [];
+      
+      sprintGroups[sprintTitle].push({
+        id: item.dataset.lessonId,
+        title: item.querySelector('.lesson-title').textContent,
+        url: item.href,
+        completed: completionData[item.dataset.lessonId] || false,
+        active: item.classList.contains('active')
+      });
+    });
+
+    return sprintGroups;
+  }
+
+  function renderTimelineModal(sprintGroups) {
+    const modalContent = document.getElementById('timeline-modal-content');
+    if (!modalContent) return;
+
+    modalContent.innerHTML = Object.entries(sprintGroups).map(([sprintTitle, lessons]) => {
       const sprintId = sprintTitle.replace(/\s+/g, '-').toLowerCase();
-
-      const sprintCard = document.createElement('div');
-      sprintCard.className = 'modal-sprint-card';
-
-      sprintCard.innerHTML = `
+      const lessonHTML = lessons.map(lesson => `
+        <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
+          <i class="fas ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
+          <span class="modal-lesson-title">${lesson.title}</span>
+        </a>
+      `).join('');
+      
+      return `
+        <div class="modal-sprint-card">
           <div class="modal-sprint-header">
             <h3 class="modal-sprint-title">${sprintTitle}</h3>
             <button class="modal-sprint-toggle" onclick="toggleModalSprint('${sprintId}')">
@@ -585,105 +389,125 @@ Check if this is a course lesson and determine which course context to use
             </button>
           </div>
           <div class="modal-lessons" id="modal-${sprintId}">
-            ${lessons.map(lesson => `
-              <a href="${lesson.url}" class="modal-lesson-item ${lesson.active ? 'active' : ''}">
-                <i class="fas ${lesson.completed ? 'fa-circle-check' : 'fa-circle'} modal-lesson-status ${lesson.completed ? 'completed' : 'incomplete'}"></i>
-                <span class="modal-lesson-title">${lesson.title}</span>
-              </a>
-            `).join('')}
+            ${lessonHTML}
           </div>
-        `;
+        </div>
+      `;
+    }).join('');
 
-      modalContent.appendChild(sprintCard);
-
-      // Auto-expand sprint with active lesson
-      const hasActiveLesson = lessons.some(lesson => lesson.active);
-      if (hasActiveLesson) {
-        setTimeout(() => {
-          const lessonsContainer = document.getElementById(`modal-${sprintId}`);
-          if (lessonsContainer) {
-            lessonsContainer.classList.add('expanded');
-            const toggleBtn = sprintCard.querySelector('.modal-sprint-toggle i');
-            if (toggleBtn) {
-              toggleBtn.classList.remove('fa-chevron-down');
-              toggleBtn.classList.add('fa-chevron-up');
-            }
-          }
-        }, 0);
-      }
-    });
+    // Auto-expand active sprint
+    const sprintGroups_arr = Object.values(sprintGroups);
+    const activeSprintIndex = sprintGroups_arr.findIndex(lessons => 
+      lessons.some(l => l.active)
+    );
+    
+    if (activeSprintIndex !== -1) {
+      const activeSprintTitle = Object.keys(sprintGroups)[activeSprintIndex];
+      const sprintId = activeSprintTitle.replace(/\s+/g, '-').toLowerCase();
+      setTimeout(() => {
+        window.toggleModalSprint(sprintId);
+      }, 0);
+    }
   }
 
-  // Toggle sprint expansion in modal
   window.toggleModalSprint = function (sprintId) {
     const lessonsContainer = document.getElementById(`modal-${sprintId}`);
     const toggleBtn = document.querySelector(`[onclick="toggleModalSprint('${sprintId}')"] i`);
+    if (!lessonsContainer || !toggleBtn) return;
 
-    if (lessonsContainer && toggleBtn) {
-      lessonsContainer.classList.toggle('expanded');
+    lessonsContainer.classList.toggle('expanded');
+    toggleBtn.classList.toggle('fa-chevron-down', !lessonsContainer.classList.contains('expanded'));
+    toggleBtn.classList.toggle('fa-chevron-up', lessonsContainer.classList.contains('expanded'));
+  };
 
-      if (lessonsContainer.classList.contains('expanded')) {
-        toggleBtn.classList.remove('fa-chevron-down');
-        toggleBtn.classList.add('fa-chevron-up');
-      } else {
-        toggleBtn.classList.remove('fa-chevron-up');
-        toggleBtn.classList.add('fa-chevron-down');
-      }
+  function setupMobileModal() {
+    const floatingBtn = document.getElementById('floating-menu-btn');
+    const timelineModal = document.getElementById('timeline-modal');
+    const overlay = document.getElementById('timeline-modal-overlay');
+    const closeBtn = document.getElementById('timeline-close-btn');
+    const modalContent = document.getElementById('timeline-modal-content');
+
+    if (window.innerWidth > 768) {
+      if (floatingBtn) floatingBtn.style.display = 'none';
+      return;
+    }
+
+    if (floatingBtn) floatingBtn.style.display = 'flex';
+
+    const sprintGroups = buildTimelineModal();
+    renderTimelineModal(sprintGroups);
+
+    const openModal = () => {
+      timelineModal.classList.add('open');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeModal = () => {
+      timelineModal.classList.remove('open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    };
+
+    if (floatingBtn) floatingBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (overlay) overlay.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && timelineModal.classList.contains('open')) closeModal();
+    });
+
+    if (modalContent) {
+      modalContent.addEventListener('click', (e) => {
+        if (e.target.closest('.modal-lesson-item')) closeModal();
+      });
     }
   }
 
-  // Handle window resize
-  window.addEventListener('resize', function () {
-    initMobileEnhancements();
-  });
-
-  // Auto-expand current sprint
-  document.addEventListener('DOMContentLoaded', function () {
-    // Only initialize lesson player mode if we're in a lesson player
-    if (document.querySelector('.lesson-player')) {
-      initLessonPlayer();
-    }
-
-    const activeLesson = document.querySelector('.lesson-item.active');
-    if (activeLesson) {
-      const sprintSection = activeLesson.closest('.sprint-section');
-      if (sprintSection) {
-        const sprintToggle = sprintSection.querySelector('.sprint-toggle');
-        if (sprintToggle) {
-          sprintToggle.click();
-        }
-      }
-    }
-
-    updateCompleteButton();
-    updateUI();
-    initMobileEnhancements();
-  });
-
-  // --- Assignment Submission Logic ---
-
-  // NOTE: This getUid function is duplicated from admin_foundation.html logic
-  async function getUid() {
+  /**
+   * ============================================
+   * ASSIGNMENT SUBMISSION: API operations
+   * ============================================
+   */
+  async function fetchUserUID() {
     try {
       const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
-
       if (res.ok) {
         const data = await res.json();
-        // The previous code returned role, but here we need uid. 
-        // Assuming /api/id returns { uid: "...", role: "..." }
-        const uid = data.uid;
-        return uid;
-      } else {
-        console.log(`Request failed with status ${res.status}`);
-        return null;
+        return data.uid;
       }
+      return null;
     } catch (err) {
-      console.log(`Error: ${err}`);
+      console.error('Error fetching UID:', err);
       return null;
     }
   }
 
-  const fileToBase64 = (file) => {
+  async function submitAssignmentToBackend(submissionData) {
+    try {
+      const uid = await fetchUserUID();
+      if (!uid) throw new Error('Authentication failed');
+
+      const payload = { uid, title: PAGE_TITLE, class: COURSE, ...submissionData };
+      const res = await fetch(`${javaURI}/api/grades`, {
+        ...fetchOptions,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      return res.ok;
+    } catch (err) {
+      console.error('Error submitting assignment:', err);
+      return false;
+    }
+  }
+
+  /**
+   * ============================================
+   * FILE HANDLING: File operations
+   * ============================================
+   */
+  function fileToBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -696,178 +520,121 @@ Check if this is a course lesson and determine which course context to use
       };
       reader.onerror = error => reject(error);
     });
-  };
-
-  async function submitAssignment(submissionData) {
-    try {
-      const uid = await getUid();
-      if (!uid) {
-        showStatus('error', 'Authentication failed. Please log in.');
-        return false;
-      }
-
-      const payload = {
-        uid: uid,
-        title: pageTitle,
-        class: CURRENT_COURSE,
-        ...submissionData
-      };
-
-      const res = await fetch(`${javaURI}/api/grades`, {
-        ...fetchOptions,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok) {
-        return true;
-      } else {
-        console.error('Submission failed', res);
-        return false;
-      }
-
-    } catch (err) {
-      console.error('Error submitting assignment:', err);
-      return false;
-    }
   }
 
-  // Helper for status display (moved to global scope for module access or re-use)
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  /**
+   * ============================================
+   * STATUS MESSAGES: Display feedback
+   * ============================================
+   */
   function showStatus(type, message) {
     const status = document.getElementById('submission-status');
     if (!status) return;
-
     status.className = `submission-status ${type}`;
     status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
-
     status.style.display = 'block';
     setTimeout(() => {
       status.style.display = 'none';
-    }, 5000);
+    }, STATUS_AUTO_HIDE_MS);
   }
 
-  // Assignment submission handlers
-  if (document.getElementById('link-form')) {
-    // Submission type switching
-    window.switchSubmissionType = function (type) {
-      // Update tabs
-      document.querySelectorAll('.submission-tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
-      const clickedTab = event.target.closest('.submission-tab');
-      if (clickedTab) clickedTab.classList.add('active');
+  /**
+   * ============================================
+   * SUBMISSION STORAGE: Local persistence
+   * ============================================
+   */
+  function saveSubmissionLocally(type, data) {
+    const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
+    const lessonId = window.location.pathname;
+    if (!submissions[lessonId]) submissions[lessonId] = [];
+    submissions[lessonId].push({ type, data, timestamp: new Date().toISOString() });
+    localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+  }
 
-      // Update forms
-      document.querySelectorAll('.submission-form').forEach(form => {
-        form.classList.remove('active');
-      });
-      document.getElementById(`${type}-form`).classList.add('active');
+  /**
+   * ============================================
+   * SUBMISSION UI: Tab switching & file display
+   * ============================================
+   */
+  window.switchSubmissionType = function (type) {
+    document.querySelectorAll('.submission-tab').forEach(tab => tab.classList.remove('active'));
+    event.target.closest('.submission-tab').classList.add('active');
+    
+    document.querySelectorAll('.submission-form').forEach(form => form.classList.remove('active'));
+    document.getElementById(`${type}-form`).classList.add('active');
+    
+    const status = document.getElementById('submission-status');
+    if (status) status.style.display = 'none';
+  };
 
-      // Clear status
-      const status = document.getElementById('submission-status');
-      if (status) status.style.display = 'none';
-    }
+  window.removeFile = function (index) {
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    if (!fileInput || !fileList) return;
+    
+    const dt = new DataTransfer();
+    Array.from(fileInput.files).forEach((file, i) => {
+      if (i !== index) dt.items.add(file);
+    });
+    fileInput.files = dt.files;
+    updateFileListDisplay();
+  };
 
-    // File upload handling
-    const fileUploadArea = document.getElementById('file-upload-area');
+  /**
+   * ============================================
+   * FILE DISPLAY: Render file list
+   * ============================================
+   */
+  function updateFileListDisplay() {
     const fileInput = document.getElementById('file-input');
     const fileList = document.getElementById('file-list');
     const fileSubmitBtn = document.getElementById('file-submit-btn');
-    let selectedFiles = [];
+    
+    if (!fileList) return;
+    
+    fileList.innerHTML = Array.from(fileInput.files).map((file, index) => `
+      <div class="file-item">
+        <div class="file-info">
+          <i class="fas fa-file"></i>
+          <div>
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${formatFileSize(file.size)}</div>
+          </div>
+        </div>
+        <button type="button" class="remove-file" onclick="removeFile(${index})">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `).join('');
+    
+    if (fileSubmitBtn) fileSubmitBtn.disabled = fileInput.files.length === 0;
+  }
 
-    if (fileUploadArea) {
-      fileUploadArea.addEventListener('click', () => fileInput.click());
-
-      fileUploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        fileUploadArea.classList.add('dragover');
-      });
-
-      fileUploadArea.addEventListener('dragleave', () => {
-        fileUploadArea.classList.remove('dragover');
-      });
-
-      fileUploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        fileUploadArea.classList.remove('dragover');
-        handleFiles(e.dataTransfer.files);
-      });
-
-      fileInput.addEventListener('change', (e) => {
-        handleFiles(e.target.files);
-      });
-    }
-
-    function handleFiles(files) {
-      Array.from(files).forEach(file => {
-        if (file.size > 10 * 1024 * 1024) {
-          showStatus('error', `File ${file.name} is too large (max 10MB)`);
-          return;
-        }
-        selectedFiles.push(file);
-      });
-      updateFileList();
-    }
-
-    function updateFileList() {
-      if (!fileList) return;
-      fileList.innerHTML = '';
-      selectedFiles.forEach((file, index) => {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-            <div class="file-info">
-              <i class="fas fa-file"></i>
-              <div>
-                <div class="file-name">${file.name}</div>
-                <div class="file-size">${formatFileSize(file.size)}</div>
-              </div>
-            </div>
-            <button type="button" class="remove-file" onclick="removeFile(${index})">
-              <i class="fas fa-times"></i>
-            </button>
-          `;
-        fileList.appendChild(fileItem);
-      });
-      if (fileSubmitBtn) fileSubmitBtn.disabled = selectedFiles.length === 0;
-    }
-
-    window.removeFile = function (index) {
-      selectedFiles.splice(index, 1);
-      updateFileList();
-    }
-
-    function formatFileSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-    }
-
-    // Form submission
+  /**
+   * ============================================
+   * FORM SUBMISSION: Handle submissions
+   * ============================================
+   */
+  function setupSubmissionForms() {
     const linkForm = document.getElementById('link-form');
     if (linkForm) {
       linkForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         const link = document.getElementById('submission-link').value;
         const description = document.getElementById('link-description').value;
-
-        // Prepare payload for link submission
-        const submissionData = {
-          notes: description,
-          link: link
-          // uploads is empty or undefined
-        };
-
-        const success = await submitAssignment(submissionData);
-
+        
+        const success = await submitAssignmentToBackend({ notes: description, link });
         if (success) {
-          saveSubmission('link', { link, description }); // Keeping local save for backup/reference if needed
-          showStatus('success', 'Link submitted successfully to server!');
+          saveSubmissionLocally('link', { link, description });
+          showStatus('success', 'Link submitted successfully!');
           this.reset();
         } else {
           showStatus('error', 'Failed to submit link. Please try again.');
@@ -879,64 +646,80 @@ Check if this is a course lesson and determine which course context to use
     if (fileForm) {
       fileForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+        const fileInput = document.getElementById('file-input');
         const notes = document.getElementById('file-notes').value;
-
-        // Convert files to base64
+        
         const uploads = [];
-        for (const file of selectedFiles) {
+        for (const file of fileInput.files) {
+          if (file.size > FILE_SIZE_LIMIT_MB * 1024 * 1024) {
+            showStatus('error', `File ${file.name} is too large (max ${FILE_SIZE_LIMIT_MB}MB)`);
+            return;
+          }
           try {
-            const base64Content = await fileToBase64(file);
-            uploads.push({
-              file: base64Content,
-              filename: file.name
-            });
+            const base64 = await fileToBase64(file);
+            uploads.push({ file: base64, filename: file.name });
           } catch (err) {
-            console.error("Error encoding file:", file.name, err);
             showStatus('error', `Error reading file ${file.name}`);
             return;
           }
         }
-
-        // Prepare payload for file submission
-        const submissionData = {
-          notes: notes,
-          uploads: uploads
-          // link is empty or undefined
-        };
-
-        const success = await submitAssignment(submissionData);
-
+        
+        const success = await submitAssignmentToBackend({ notes, uploads });
         if (success) {
-          const fileNames = selectedFiles.map(f => f.name);
-          saveSubmission('file', { files: fileNames, notes });
-
-          showStatus('success', `${selectedFiles.length} file(s) submitted successfully to server!`);
-          selectedFiles = [];
-          updateFileList();
+          saveSubmissionLocally('file', { files: Array.from(fileInput.files).map(f => f.name), notes });
+          showStatus('success', `${fileInput.files.length} file(s) submitted successfully!`);
+          fileInput.value = '';
+          updateFileListDisplay();
           this.reset();
         } else {
           showStatus('error', 'Failed to submit files. Please try again.');
         }
       });
     }
+  }
 
-    function saveSubmission(type, data) {
-      const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
-      const lessonId = window.location.pathname;
-
-      if (!submissions[lessonId]) {
-        submissions[lessonId] = [];
-      }
-
-      submissions[lessonId].push({
-        type,
-        data,
-        timestamp: new Date().toISOString()
+  /**
+   * ============================================
+   * MASTER INITIALIZATION
+   * ============================================
+   */
+  function initializePage() {
+    // Lesson player setup
+    initLessonPlayer();
+    expandCurrentSprint();
+    syncCompletionUI();
+    setupSyncListeners();
+    
+    // Mobile enhancements
+    setupMobileModal();
+    window.addEventListener('resize', () => setupMobileModal());
+    
+    // Assignment submission
+    setupSubmissionForms();
+    
+    // File upload handling
+    const fileUploadArea = document.getElementById('file-upload-area');
+    const fileInput = document.getElementById('file-input');
+    if (fileUploadArea && fileInput) {
+      fileUploadArea.addEventListener('click', () => fileInput.click());
+      fileUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
       });
-
-      localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+      fileUploadArea.addEventListener('dragleave', () => {
+        fileUploadArea.classList.remove('dragover');
+      });
+      fileUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        updateFileListDisplay();
+      });
+      fileInput.addEventListener('change', () => updateFileListDisplay());
     }
   }
+
+  document.addEventListener('DOMContentLoaded', initializePage);
 </script>
 
 {% else %}

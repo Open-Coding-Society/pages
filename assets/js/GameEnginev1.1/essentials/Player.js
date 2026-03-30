@@ -26,6 +26,9 @@ class Player extends Character {
         this.touchOptions.id = `touch-controls-${this.id}`;
         this.touchOptions.mapping = this.keypress;
         this.pressedKeys = {}; // active keys array
+        // Store bound handlers for add/remove
+        this._boundHandleKeyDown = this.handleKeyDown.bind(this);
+        this._boundHandleKeyUp = this.handleKeyUp.bind(this);
         this.bindMovementKeyListners();
         this.gravity = data.GRAVITY || false;
         this.acceleration = 0.001;
@@ -42,8 +45,9 @@ class Player extends Character {
      * The .bind(this) method ensures that 'this' refers to the object object.
      */
     bindMovementKeyListners() {
-        addEventListener('keydown', this.handleKeyDown.bind(this));
-        addEventListener('keyup', this.handleKeyUp.bind(this));
+        // Use stored bound handlers for add/remove
+        window.addEventListener('keydown', this._boundHandleKeyDown);
+        window.addEventListener('keyup', this._boundHandleKeyUp);
     }
 
     handleKeyDown({ keyCode }) {
@@ -230,6 +234,9 @@ class Player extends Character {
      * Clean up resources when player is destroyed
      */
     destroy() {
+        // Remove key event listeners
+        window.removeEventListener('keydown', this._boundHandleKeyDown);
+        window.removeEventListener('keyup', this._boundHandleKeyUp);
         if (this.touchControls) {
             this.touchControls.destroy();
         }

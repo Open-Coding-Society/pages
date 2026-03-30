@@ -1,0 +1,78 @@
+<!-- WEEK CARD - Contains all items for a single week -->
+{% comment %}
+  Expects:
+    - index: week number
+    - unitKey: sprint key (e.g., "Sprint1")
+    - entries: array of "title||url||type" strings
+    - totalItems: number of items in week
+    - page: page object with course
+    - posts: all posts/pages
+{% endcomment %}
+
+{% if entries.size > 0 %}
+<div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}" data-assignments="{{ assignmentTitles | escape }}" data-lessons="{{ lessonTitles | escape }}" data-entries="{{ allEntries | escape }}">
+  <div class="week-content-wrapper">
+    <div class="week-indicator">
+      <div class="week-circle">W{{ index }}</div>
+      <div class="week-connector"></div>
+    </div>
+
+    <div class="week-main-content">
+      <div class="week-header">
+        <div class="week-title-group">
+          <h3 data-week-title>Week {{ index }}</h3>
+        </div>
+        <div class="week-actions">
+          <div class="completion-badge">
+            <span class="completion-count">{{ completedItems }}/{{ totalItems }}</span>
+            <span class="completion-label">Complete</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        {% if totalItems > 0 %}
+          {% assign progress = completedItems | times: 100 | divided_by: totalItems %}
+        {% else %}
+          {% assign progress = 0 %}
+        {% endif %}
+        <div class="progress-bar-fill" data-progress="{{ progress }}" style="width: {{ progress }}%;"></div>
+      </div>
+
+      <!-- Learning Goals Row -->
+      <div class="week-skills-row" data-week-skills></div>
+
+      <!-- Items Grid -->
+      <div class="items-grid">
+        {% for entry in entries %}
+          {% assign parts = entry | split: "||" %}
+          {% if parts[2] == "assignment" %}
+            {% assign isAssignment = true %}
+            {% assign itemType = "assignment" %}
+          {% else %}
+            {% assign isAssignment = false %}
+            {% assign itemType = "lesson" %}
+          {% endif %}
+          {% include sprint-item-card.html parts=parts itemType=itemType isAssignment=isAssignment %}
+        {% endfor %}
+      </div>
+
+      <!-- Assignment Due Count -->
+      {% assign assignmentCount = 0 %}
+      {% for entry in entries %}
+        {% assign parts = entry | split: "||" %}
+        {% if parts[2] == "assignment" %}
+          {% assign assignmentCount = assignmentCount | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+
+      {% if assignmentCount > 0 %}
+      <div class="assignment-due">
+        <i class="fas fa-calendar"></i>
+        <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
