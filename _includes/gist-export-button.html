@@ -10,7 +10,7 @@
   data-gist-token="{{ site.gist_token | default: '' }}"
   data-gist-description="Exported AP CSA FRQs / Challenges from Open Coding Society"
 >
-  Export All Solutions to Gist
+  Export All Solutions
 </button>
 
 <style>
@@ -143,7 +143,7 @@ ${code}`;
         const url = data.html_url;
 
         await navigator.clipboard.writeText(url);
-        alert(`Gist created!\nURL copied:\n${url}\n\n(${Object.keys(files).length} files)`);
+        alert(`Homework created and URL copied!\nPaste the URL and commit!`);
         console.log('Gist URL:', url);
       } catch (err) {
         console.error('Failed:', err);
