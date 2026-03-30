@@ -62,7 +62,7 @@
   if (!container) return;
   
   const hideEdit = {{ include.hide_edit | default: 'false' }};
-  const defaultCode = `{{ include.code }}`.trim();
+  const defaultCode = {{ include.code | jsonify }}.trim();
   const editorHeight = "{{ include.height }}";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
   const storageKey = container.dataset.storageKey;

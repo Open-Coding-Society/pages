@@ -30,7 +30,7 @@ constructor(options = {}) {
   this.enableTypewriter = options.enableTypewriter !== undefined ? options.enableTypewriter : true;
   this.typewriterTimeoutId = null;
    // Voice synthesis options - DEFAULT ENABLED
-  this.enableVoice = options.enableVoice !== undefined ? options.enableVoice : true;
+  this.enableVoice = options.enableVoice !== undefined ? options.enableVoice : false;
   this.voiceRate = options.voiceRate !== undefined ? options.voiceRate : 0.9;
   this.voicePitch = options.voicePitch !== undefined ? options.voicePitch : 1.0;
   this.voiceVolume = options.voiceVolume !== undefined ? options.voiceVolume : 1.0;
