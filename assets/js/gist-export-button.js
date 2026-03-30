@@ -6,7 +6,7 @@
   const widget     = document.getElementById('pixel-submit-widget');
   const exportBtn  = document.getElementById('psw-export-btn');
   const commitBtn  = document.getElementById('psw-commit-btn');
-  const urlInput   = document.getElementById('psw-url-input');
+  let gistUrl = '';
   const dlgIcon    = document.getElementById('psw-dialog-icon');
   const dlgText    = document.getElementById('psw-dialog-text');
   const scrollCvs  = document.getElementById('psw-scroll-canvas');
@@ -147,7 +147,7 @@
         drawScroll(0);
         drawQuill(18, 19, t);
       } else if (scrollPhase === 'writing') {
-        const progress = Math.min(1, t / 80);
+        const progress = Math.min(1, t / 160);
         drawScroll(progress);
         const lineIdx = Math.min(5, Math.floor(progress * 6));
         const tipXs = [18, 14, 20, 12, 16, 10];
@@ -347,11 +347,23 @@
     exportBtn.classList.add('done');
     exportBtn.disabled = true;
     commitBtn.disabled = false;
-    typeDialog('✦ Scroll complete! Ready for delivery.');
+    typeDialog('✦ Scroll complete and URL copied! Commit to deliver the quest.');
   }
 
   function startExport() {
     if (scrollPhase !== 'idle') return;
+
+    const containers = document.querySelectorAll('.code-runner-container');
+    const unsaved = [...containers].filter(c => {
+      const key = c.dataset.storageKey;
+      return !key || localStorage.getItem(key) === null;
+    });
+
+    if (unsaved.length) {
+      typeDialog(`⚠ Please save your code first using the 💾 button in each runner.`);
+      return;
+    }
+
     scrollPhase = 'writing';
     exportBtn.disabled = true;
     exportBtn.textContent = 'Writing...';
@@ -359,7 +371,7 @@
 
     if (gistToken) {
       (async () => {
-        await new Promise(r => setTimeout(r, 2800));
+        await new Promise(r => setTimeout(r, 5500));
         const containers = document.querySelectorAll('.code-runner-container');
         if (!containers.length) return;
         const files = {};
@@ -371,9 +383,8 @@
           const langSelect = container.querySelector('.languageSelect');
           const lang = langSelect?.value || 'java';
           const ext = { python: 'py', java: 'java', javascript: 'js' }[lang] || 'txt';
-          const cmWrapper = container.querySelector('.CodeMirror');
-          if (!cmWrapper?.CodeMirror) return;
-          const code = cmWrapper.CodeMirror.getValue().trim();
+          const storageKey = container.dataset.storageKey;
+          const code = (storageKey ? localStorage.getItem(storageKey) : null)?.trim();
           if (!code) return;
           const content = `Question: ${challengeTitle}\n${challengeDesc}\n\nAnswer (runner: ${runnerId}):\n\n${code}`;
           const safeId = runnerId.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
@@ -398,9 +409,8 @@
           if (!res.ok) throw new Error(`API ${res.status}`);
           const data = await res.json();
           const url = data.html_url;
-          await navigator.clipboard.writeText(url);
-          urlInput.value = url;
-          typeDialog('✦ Gist created! URL copied & pasted below.', true);
+        gistUrl = url;
+        await navigator.clipboard.writeText(url);
         } catch (e) {
           console.error('Gist export failed:', e);
         }
@@ -427,7 +437,7 @@
 
         const pathname = window.location.pathname;
         const filename = pathname.split('/').pop() || pathname;
-        const submissionUrl = urlInput.value.trim() || window.location.href;
+        const submissionUrl = gistUrl.trim() || window.location.href;
         const uid = (window.currentUser || window.App?.user || window.user || {}).uid || '';
 
         const payload = {
