@@ -1,0 +1,608 @@
+{% assign terminal_id = include.id | default: 'terminal-simulator-game' %}
+{% assign input_id = terminal_id | append: '-input' %}
+
+<style>
+  .terminal-game {
+    position: relative;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(40, 60, 35, 0.35), transparent 55%),
+      linear-gradient(180deg, #08120a 0%, #040904 100%);
+    color: #d9ffd8;
+    border: 1px solid #2f5b2f;
+    border-radius: 10px;
+    padding: 12px;
+    height: 300px;
+    overflow-y: auto;
+    font-family: "Cascadia Mono", "Fira Code", "Consolas", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    box-shadow: 0 0 0 1px rgba(25, 55, 26, 0.55) inset, 0 10px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .terminal-game::before {
+    content: "MISSION TERMINAL";
+    position: sticky;
+    top: -12px;
+    display: block;
+    margin: -12px -12px 10px;
+    padding: 8px 12px;
+    background: linear-gradient(90deg, #153a16 0%, #0f2b10 100%);
+    border-bottom: 1px solid #2f5b2f;
+    color: #9cff9a;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 700;
+    z-index: 2;
+  }
+
+  .terminal-game .line {
+    margin: 0 0 4px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .terminal-game .line-welcome {
+    color: #9cff9a;
+  }
+
+  .terminal-game .line-command {
+    color: #f2fff2;
+  }
+
+  .terminal-game .line-system {
+    color: #8ff0ff;
+  }
+
+  .terminal-game .line-success {
+    color: #89ff89;
+  }
+
+  .terminal-game .line-warning {
+    color: #ffd57a;
+  }
+
+  .terminal-game .line-error {
+    color: #ff8f8f;
+  }
+
+  .terminal-game .prompt-user {
+    color: #7df77d;
+  }
+
+  .terminal-game .prompt-zone {
+    color: #8ff0ff;
+  }
+
+  .terminal-game .prompt-command {
+    color: #ffffff;
+  }
+
+  .terminal-game-input {
+    width: 100%;
+    margin-top: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid #2f5b2f;
+    background: #09160b;
+    color: #f1fff1;
+    font-family: "Cascadia Mono", "Fira Code", "Consolas", monospace;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .terminal-game-input:focus {
+    border-color: #5fbf5f;
+    box-shadow: 0 0 0 2px rgba(95, 191, 95, 0.2);
+  }
+</style>
+
+<div id="{{ terminal_id }}" class="terminal-game"></div>
+<input id="{{ input_id }}" class="terminal-game-input" placeholder="Type a command (help)" />
+
+<script>
+(function () {
+  const terminal = document.getElementById("{{ terminal_id }}");
+  const input = document.getElementById("{{ input_id }}");
+
+  if (!terminal || !input) {
+    return;
+  }
+
+  const MESSAGES = {
+    MKDIR_USAGE: "Usage: mkdir <folder>",
+    MKDIR_EXISTS: (name) => "mkdir: cannot create directory '" + name + "': File exists",
+    TOUCH_USAGE: "Usage: touch <file>",
+    CAT_USAGE: "Usage: cat <file>",
+    CAT_NOTFOUND: (file) => "cat: " + file + ": No such file",
+    ECHO_USAGE: "Usage: echo <text> > <file> or echo <text> >> <file>",
+    ECHO_ISDIR: (name) => name + ": Is a directory",
+    CD_USAGE: "Usage: cd <folder> or cd ..",
+    CD_NOTFOUND: "Directory not found",
+    UNKNOWN_CMD: "Unknown command. Type 'help'."
+  };
+
+  const state = {
+    player: {
+      rank: 1,
+      xp: 0,
+      credits: 0
+    },
+    path: ["home"],
+    fs: {
+      "/home": {
+        type: "dir",
+        children: {
+          documents: {
+            type: "dir",
+            children: {
+              "welcome.txt": { type: "file", content: "Welcome operative. Your mission begins in the terminal." }
+            }
+          },
+          downloads: {
+            type: "dir",
+            children: {
+              "sample.log": { type: "file", content: "download complete" }
+            }
+          }
+        }
+      }
+    },
+    missions: [
+      {
+        id: 1,
+        title: "Locate your current directory",
+        objective: "Use 'pwd' to print your current working directory.",
+        hint: "Type pwd and press Enter.",
+        xp: 10,
+        credits: 5,
+        done: false,
+        validate: ({ command }) => command === "pwd"
+      },
+      {
+        id: 2,
+        title: "Scan the safehouse",
+        objective: "Use 'ls' to list folders in your current directory.",
+        hint: "Type ls.",
+        xp: 10,
+        credits: 5,
+        done: false,
+        validate: ({ command }) => command === "ls"
+      },
+      {
+        id: 3,
+        title: "Create project workspace",
+        objective: "Create a folder named 'projects' with mkdir.",
+        hint: "Type mkdir projects.",
+        xp: 15,
+        credits: 8,
+        done: false,
+        validate: ({ command, currentNode }) => command === "mkdir projects" && Boolean(currentNode && currentNode.children.projects)
+      },
+      {
+        id: 4,
+        title: "Enter project workspace",
+        objective: "Move into 'projects' using cd.",
+        hint: "Type cd projects.",
+        xp: 15,
+        credits: 8,
+        done: false,
+        validate: ({ command, pathString }) => command === "cd projects" && pathString === "/home/projects"
+      },
+      {
+        id: 5,
+        title: "Create a mission file",
+        objective: "Create notes.txt using touch.",
+        hint: "Type touch notes.txt.",
+        xp: 15,
+        credits: 10,
+        done: false,
+        validate: ({ command, currentNode }) => command === "touch notes.txt" && Boolean(currentNode && currentNode.children["notes.txt"])
+      },
+      {
+        id: 6,
+        title: "Write to a file",
+        objective: "Use echo with > to write text into notes.txt.",
+        hint: "Example: echo \"terminal mastery\" > notes.txt",
+        xp: 20,
+        credits: 12,
+        done: false,
+        validate: ({ command, currentNode }) => {
+          if (!command.startsWith("echo ") || command.indexOf("> notes.txt") === -1) {
+            return false;
+          }
+          const file = currentNode && currentNode.children ? currentNode.children["notes.txt"] : null;
+          return Boolean(file && file.type === "file" && file.content);
+        }
+      },
+      {
+        id: 7,
+        title: "Read your file",
+        objective: "Display the contents of notes.txt with cat.",
+        hint: "Type cat notes.txt.",
+        xp: 20,
+        credits: 12,
+        done: false,
+        validate: ({ command }) => command === "cat notes.txt"
+      },
+      {
+        id: 8,
+        title: "Return to home",
+        objective: "Move up one level using cd ..",
+        hint: "Type cd ..",
+        xp: 15,
+        credits: 10,
+        done: false,
+        validate: ({ command, pathString }) => command === "cd .." && pathString === "/home"
+      }
+    ]
+  };
+
+  function getCurrentDirectoryPath() {
+    return "/" + state.path.join("/");
+  }
+
+  function getPromptPath() {
+    return getCurrentDirectoryPath().replace("/home", "~");
+  }
+
+  function getCurrentNode() {
+    let currentNode = state.fs["/home"];
+    for (let index = 1; index < state.path.length; index += 1) {
+      const segment = state.path[index];
+      if (!currentNode || !currentNode.children) {
+        return null;
+      }
+      currentNode = currentNode.children[segment];
+      if (!currentNode) {
+        return null;
+      }
+    }
+    return currentNode;
+  }
+
+  function activeMission() {
+    for (const mission of state.missions) {
+      if (!mission.done) {
+        return mission;
+      }
+    }
+    return null;
+  }
+
+  function updateRankIfNeeded() {
+    const nextThreshold = state.player.rank * 40;
+    if (state.player.xp >= nextThreshold) {
+      state.player.xp -= nextThreshold;
+      state.player.rank += 1;
+      print("Rank up! You are now Operator Rank " + state.player.rank + ".", "success");
+    }
+  }
+
+  function completeMission(mission) {
+    mission.done = true;
+    state.player.xp += mission.xp;
+    state.player.credits += mission.credits;
+    print("Mission " + mission.id + " complete: " + mission.title, "success");
+    print("Rewards: +" + mission.xp + " XP, +" + mission.credits + " credits", "success");
+    updateRankIfNeeded();
+
+    const next = activeMission();
+    if (next) {
+      print("Next mission: " + next.objective, "system");
+    } else {
+      print("Campaign complete. You practiced core terminal navigation and file commands.", "success");
+    }
+  }
+
+  function print(text, role) {
+    const line = document.createElement("p");
+    line.className = "line line-" + (role || "system");
+    line.textContent = text;
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function printCommandLine(command) {
+    const line = document.createElement("p");
+    line.className = "line line-command";
+
+    const user = document.createElement("span");
+    user.className = "prompt-user";
+    user.textContent = "player@academy";
+
+    const zone = document.createElement("span");
+    zone.className = "prompt-zone";
+    zone.textContent = ":" + getPromptPath();
+
+    const symbol = document.createElement("span");
+    symbol.textContent = "$ ";
+
+    const typed = document.createElement("span");
+    typed.className = "prompt-command";
+    typed.textContent = command;
+
+    line.appendChild(user);
+    line.appendChild(zone);
+    line.appendChild(symbol);
+    line.appendChild(typed);
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function statusText() {
+    const doneCount = state.missions.filter((mission) => mission.done).length;
+    const current = activeMission();
+    const currentObjective = current ? current.objective : "All missions complete";
+    return [
+      "Rank " + state.player.rank + " | XP " + state.player.xp + " | Credits " + state.player.credits,
+      "Directory: " + getCurrentDirectoryPath(),
+      "Missions complete: " + doneCount + "/" + state.missions.length,
+      "Current objective: " + currentObjective
+    ].join("\n");
+  }
+
+  function progressText() {
+    const lines = [];
+    for (const mission of state.missions) {
+      lines.push((mission.done ? "[x] " : "[ ] ") + mission.id + ". " + mission.title);
+    }
+    return lines.join("\n");
+  }
+
+  function missionText() {
+    const mission = activeMission();
+    if (!mission) {
+      return "No active mission. Training complete.";
+    }
+    return [
+      "Mission " + mission.id + ": " + mission.title,
+      mission.objective
+    ].join("\n");
+  }
+
+  function hintText() {
+    const mission = activeMission();
+    if (!mission) {
+      return "No hint needed. You completed all missions.";
+    }
+    return "Hint: " + mission.hint;
+  }
+
+  function createDirectory(name) {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !name) {
+      return MESSAGES.MKDIR_USAGE;
+    }
+    if (currentNode.children[name]) {
+      return MESSAGES.MKDIR_EXISTS(name);
+    }
+    currentNode.children[name] = { type: "dir", children: {} };
+    return null;
+  }
+
+  function createFile(name) {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !name) {
+      return MESSAGES.TOUCH_USAGE;
+    }
+    if (!currentNode.children[name]) {
+      currentNode.children[name] = { type: "file", content: "" };
+    }
+    return null;
+  }
+
+  function readFile(fileName) {
+    if (!fileName) {
+      return MESSAGES.CAT_USAGE;
+    }
+    const currentNode = getCurrentNode();
+    if (!currentNode || !currentNode.children) {
+      return MESSAGES.CAT_NOTFOUND(fileName);
+    }
+    const target = currentNode.children[fileName];
+    if (!target || target.type !== "file") {
+      return MESSAGES.CAT_NOTFOUND(fileName);
+    }
+    return target.content || "";
+  }
+
+  function writeFile(name, text, shouldAppend) {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !name) {
+      return MESSAGES.ECHO_USAGE;
+    }
+    if (!currentNode.children[name]) {
+      currentNode.children[name] = { type: "file", content: "" };
+    }
+    if (currentNode.children[name].type !== "file") {
+      return MESSAGES.ECHO_ISDIR(name);
+    }
+    if (shouldAppend) {
+      currentNode.children[name].content = (currentNode.children[name].content || "") + text;
+    } else {
+      currentNode.children[name].content = text;
+    }
+    return null;
+  }
+
+  function echoToFile(expression) {
+    const match = expression.match(/^(.+?)\s*(>>|>)\s*(\S+)$/);
+    if (!match) {
+      return MESSAGES.ECHO_USAGE;
+    }
+
+    let text = match[1].trim();
+    if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+      text = text.slice(1, -1);
+    }
+    return writeFile(match[3], text, match[2] === ">>");
+  }
+
+  function changeDirectory(argument) {
+    if (!argument) {
+      return MESSAGES.CD_USAGE;
+    }
+
+    if (argument === "..") {
+      if (state.path.length > 1) {
+        state.path.pop();
+      }
+      return null;
+    }
+
+    const currentNode = getCurrentNode();
+    if (!currentNode || !currentNode.children[argument] || currentNode.children[argument].type !== "dir") {
+      return MESSAGES.CD_NOTFOUND;
+    }
+
+    state.path.push(argument);
+    return null;
+  }
+
+  function helpText() {
+    return [
+      "Commands:",
+      "Learning game: mission, hint, progress, status, reset",
+      "Terminal commands: ls, pwd, cd <folder>, cd .., mkdir <folder>, touch <file>, cat <file>",
+      "File writing: echo <text> > <file>, echo <text> >> <file>",
+      "Utility: clear, help"
+    ].join("\n");
+  }
+
+  function resetProgress() {
+    for (const mission of state.missions) {
+      mission.done = false;
+    }
+    state.player.rank = 1;
+    state.player.xp = 0;
+    state.player.credits = 0;
+    state.path = ["home"];
+    state.fs["/home"].children.projects = undefined;
+    delete state.fs["/home"].children.projects;
+    return "Training progress reset. Type 'mission' to begin again.";
+  }
+
+  function runCommand(rawCommand) {
+    const command = rawCommand.trim().toLowerCase();
+    if (!command) {
+      return null;
+    }
+
+    if (command === "help") {
+      return helpText();
+    }
+    if (command === "mission") {
+      return missionText();
+    }
+    if (command === "hint") {
+      return hintText();
+    }
+    if (command === "progress") {
+      return progressText();
+    }
+    if (command === "status") {
+      return statusText();
+    }
+    if (command === "clear") {
+      terminal.innerHTML = "";
+      return null;
+    }
+    if (command === "reset") {
+      return resetProgress();
+    }
+
+    if (command === "ls") {
+      const currentNode = getCurrentNode();
+      if (!currentNode || !currentNode.children) {
+        return "Empty";
+      }
+      const names = Object.keys(currentNode.children).filter((name) => currentNode.children[name]);
+      return names.length ? names.join("  ") : "Empty";
+    }
+    if (command === "pwd") {
+      return getCurrentDirectoryPath();
+    }
+    if (command.startsWith("cd ")) {
+      return changeDirectory(command.slice(3).trim());
+    }
+    if (command.startsWith("mkdir ")) {
+      return createDirectory(command.slice(6).trim());
+    }
+    if (command.startsWith("touch ")) {
+      return createFile(command.slice(6).trim());
+    }
+    if (command.startsWith("cat ")) {
+      return readFile(command.slice(4).trim());
+    }
+    if (command.startsWith("echo ")) {
+      return echoToFile(command.slice(5).trim());
+    }
+
+    return MESSAGES.UNKNOWN_CMD;
+  }
+
+  function checkMissionCompletion(rawCommand) {
+    const mission = activeMission();
+    if (!mission) {
+      return;
+    }
+
+    const context = {
+      command: rawCommand.trim().toLowerCase(),
+      pathString: getCurrentDirectoryPath(),
+      currentNode: getCurrentNode()
+    };
+
+    if (mission.validate(context)) {
+      completeMission(mission);
+    }
+  }
+
+  print("Boot sequence complete. Welcome, operative.", "welcome");
+  print("This game teaches real terminal skills through missions.", "system");
+  print("Type 'mission' for your objective, 'hint' if stuck, and 'help' for command list.", "system");
+
+  input.addEventListener("keydown", function (event) {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    const command = event.target.value.trim();
+    printCommandLine(command);
+
+    const result = runCommand(command);
+    checkMissionCompletion(command);
+
+    if (result) {
+      const lines = String(result).split("\n");
+      for (const line of lines) {
+        const lower = line.toLowerCase();
+        let role = "system";
+        if (
+          lower.indexOf("unknown") !== -1 ||
+          lower.indexOf("cannot") !== -1 ||
+          lower.indexOf("not found") !== -1 ||
+          lower.indexOf("usage:") !== -1 ||
+          lower.indexOf("no such file") !== -1
+        ) {
+          role = "error";
+        }
+        if (
+          lower.indexOf("mission") !== -1 ||
+          lower.indexOf("complete") !== -1 ||
+          lower.indexOf("rewards") !== -1 ||
+          lower.indexOf("rank up") !== -1
+        ) {
+          role = "success";
+        }
+        if (lower.indexOf("hint") !== -1 || lower.indexOf("objective") !== -1 || lower.indexOf("training") !== -1) {
+          role = role === "success" ? "success" : "warning";
+        }
+        print(line, role);
+      }
+    }
+
+    event.target.value = "";
+  });
+})();
+</script>

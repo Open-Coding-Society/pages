@@ -70,14 +70,7 @@ class GameCore {
         this._adjustGameContainerPosition();
     }
 
-    // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
-    // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
-    // Immediately create and show the leaderboard so it's loaded in (doesn't shift canvas because it's fixed)
-    try {
-        this._handleToggleLeaderboard();
-    } catch (e) {
-        console.warn('Auto-show leaderboard failed (non-fatal):', e);
-    }
+    // Leaderboard is loaded on-demand when user clicks "Toggle Leaderboard".
     }
 
     async _initializeGameControlAsync(gameLevelClasses) {
@@ -101,13 +94,7 @@ class GameCore {
                 this._adjustGameContainerPosition();
             }
 
-            // Note: Leaderboard is NOT auto-loaded here to avoid shifting the canvas
-            // It will be loaded when user clicks "Toggle Leaderboard" in the pause menu
-            try {
-                this._handleToggleLeaderboard();
-            } catch (e) {
-                console.warn('Auto-show leaderboard failed (non-fatal):', e);
-            }
+            // Leaderboard is loaded on-demand when user clicks "Toggle Leaderboard".
         } catch (err) {
             console.error('Failed to initialize GameControl:', err);
         }
@@ -452,13 +439,6 @@ class GameCore {
             if (leaderboardContainer.style.display === 'none' || leaderboardContainer.classList.contains('initially-hidden')) {
                 leaderboardContainer.style.display = 'block';
                 leaderboardContainer.classList.remove('initially-hidden');
-                
-                // CRITICAL: Always use fixed positioning to avoid being affected by game container
-                    leaderboardContainer.style.position = 'fixed';
-                    leaderboardContainer.style.top = '80px';
-                    leaderboardContainer.style.left = '20px';
-                    leaderboardContainer.style.right = 'auto';
-                    leaderboardContainer.style.zIndex = '1000';
             } else {
                 leaderboardContainer.style.display = 'none';
             }
@@ -468,43 +448,43 @@ class GameCore {
             console.log('Leaderboard container not found, creating new...');
             
             const ctrlForLeaderboard = this.getActiveControl();
-            import(`${this.path}/assets/js/GameEnginev1.1/essentials/Leaderboard.js`)
-                .then(mod => {
-                    // Determine parent - use gameContainer if available
-                    let parentId = 'gameContainer';
-                    if (typeof this.gameContainer === 'string') {
-                        parentId = this.gameContainer;
-                    } else if (this.gameContainer instanceof HTMLElement) {
-                        parentId = this.gameContainer.id || 'gameContainer';
-                    }
 
-                    this.leaderboardInstance = new mod.default(ctrlForLeaderboard || this.gameControl, { 
-                        gameName: 'AdventureGame',
-                        parentId: parentId,
-                        initiallyHidden: false
-                    });
+            const instantiateLeaderboard = (LeaderboardClass) => {
+                const leaderboardOptions = {
+                    gameName: 'AdventureGame',
+                    // Default to body/fixed overlay so leaderboard never shifts game layout.
+                    // Can still be overridden per page via environment.leaderboardOptions.parentId.
+                    parentId: null,
+                    initiallyHidden: false,
+                    ...(this.environment.leaderboardOptions || {})
+                };
 
-                    this._ensureActiveScoreManager().catch(err => {
-                        console.warn('Failed to sync active ScoreManager after leaderboard creation:', err);
-                    });
+                this.leaderboardInstance = new LeaderboardClass(
+                    ctrlForLeaderboard || this.gameControl,
+                    leaderboardOptions
+                );
 
-                    // Force positioning after creation - use fixed positioning
-                    setTimeout(() => {
-                        const container = document.getElementById('leaderboard-container');
-                        if (container) {
-                            container.style.position = 'fixed';
-                            container.style.top = '80px';
-                            container.style.left = '20px';
-                            container.style.right = 'auto';
-                            container.style.zIndex = '1000';
-                        }
-                    }, 100);
-
-                    console.log('Leaderboard created and shown with fixed positioning');
-                })
-                .catch(err => {
-                    console.warn('Failed to create leaderboard:', err);
+                this._ensureActiveScoreManager().catch(err => {
+                    console.warn('Failed to sync active ScoreManager after leaderboard creation:', err);
                 });
+
+                console.log('Leaderboard created and shown');
+            };
+
+            const EnvLeaderboardClass = this.environment.leaderboardClass;
+            if (EnvLeaderboardClass) {
+                try {
+                    instantiateLeaderboard(EnvLeaderboardClass);
+                } catch (err) {
+                    console.warn('Failed to create leaderboard from environment class:', err);
+                }
+            } else {
+                import(`${this.path}/assets/js/GameEnginev1.1/essentials/Leaderboard.js`)
+                    .then(mod => instantiateLeaderboard(mod.default || mod))
+                    .catch(err => {
+                        console.warn('Failed to create leaderboard:', err);
+                    });
+            }
         }
     }
 

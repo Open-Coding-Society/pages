@@ -17,7 +17,7 @@ import Transform from './Transform.js';
  * @method handleReaction - Handles player reaction / state updates to the collision.
  */
 class GameObject {
-    
+ 
     constructor(gameEnv = null) {
         if (new.target === GameObject) {
             throw new TypeError("Cannot construct GameObject instances directly");
@@ -128,6 +128,28 @@ class GameObject {
      */
     destroy() {
         throw new Error("Method 'destroy()' must be implemented.");
+    }
+
+    /**
+     * Check if a point (canvas/game coordinates) is inside this object's hitbox.
+     * @param {number} x - X coordinate (canvas/game space)
+     * @param {number} y - Y coordinate (canvas/game space)
+     * @returns {boolean} True if point is inside hitbox
+     */
+    isPointInside(x, y) {
+        // Use this.position, this.pixels, this.hitbox, etc.
+        const px = this.position?.x ?? this.INIT_POSITION?.x ?? 0;
+        const py = this.position?.y ?? this.INIT_POSITION?.y ?? 0;
+        let width = this.pixels?.width || (this.hitbox?.widthPercentage ? this.hitbox.widthPercentage * (this.gameEnv?.innerWidth || 1) : 32);
+        let height = this.pixels?.height || (this.hitbox?.heightPercentage ? this.hitbox.heightPercentage * (this.gameEnv?.innerHeight || 1) : 32);
+        return (x >= px && x <= px + width && y >= py && y <= py + height);
+    }
+
+    /**
+     * Handle click/touch interaction. Override in subclasses for custom behavior.
+     */
+    handleClick() {
+        // Default: do nothing. Subclasses can override for interactivity.
     }
 
     /** Collision checks
