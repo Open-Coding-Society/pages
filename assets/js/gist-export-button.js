@@ -20,8 +20,6 @@
   let carrierPhase = 'idle';   // idle | pickingUp | running | delivered
   let exported     = false;
 
-  const gistToken = widget.dataset.gistToken?.trim() || '';
-
   /* ─────────────────────────────────────────────────────
      PIXEL HELPER
   ───────────────────────────────────────────────────── */
@@ -350,7 +348,7 @@
     typeDialog('✦ Scroll complete and URL copied! Commit to deliver the quest.');
   }
 
-  function startExport() {
+  async function startExport() {
     if (scrollPhase !== 'idle') return;
 
     const containers = document.querySelectorAll('.code-runner-container');
@@ -369,53 +367,64 @@
     exportBtn.textContent = 'Writing...';
     typeDialog('Inscribing your solutions onto the scroll...');
 
-    if (gistToken) {
-      (async () => {
-        await new Promise(r => setTimeout(r, 5500));
-        const containers = document.querySelectorAll('.code-runner-container');
-        if (!containers.length) return;
-        const files = {};
-        containers.forEach((container, index) => {
-          const runnerId = container.dataset.runnerId || `runner_${index + 1}`;
-          const challengeBox = container.querySelector('.challenge-box');
-          const challengeTitle = challengeBox?.querySelector('h3')?.textContent.trim() || `Part ${index + 1}`;
-          const challengeDesc  = challengeBox?.querySelector('p')?.textContent.trim() || '';
-          const langSelect = container.querySelector('.languageSelect');
-          const lang = langSelect?.value || 'java';
-          const ext = { python: 'py', java: 'java', javascript: 'js' }[lang] || 'txt';
-          const storageKey = container.dataset.storageKey;
-          const code = (storageKey ? localStorage.getItem(storageKey) : null)?.trim();
-          if (!code) return;
-          const content = `Question: ${challengeTitle}\n${challengeDesc}\n\nAnswer (runner: ${runnerId}):\n\n${code}`;
-          const safeId = runnerId.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-          files[`${safeId}.${ext}`] = { content };
+    (async () => {
+      await new Promise(r => setTimeout(r, 5500));
+
+      const files = {};
+      containers.forEach((container, index) => {
+        const runnerId = container.dataset.runnerId || `runner_${index + 1}`;
+        const challengeBox = container.querySelector('.challenge-box');
+        const challengeTitle = challengeBox?.querySelector('h3')?.textContent.trim() || `Part ${index + 1}`;
+        const challengeDesc  = challengeBox?.querySelector('p')?.textContent.trim() || '';
+        const langSelect = container.querySelector('.languageSelect');
+        const lang = langSelect?.value || 'java';
+        const ext = { python: 'py', java: 'java', javascript: 'js' }[lang] || 'txt';
+
+        const storageKey = container.dataset.storageKey;
+        const code = storageKey ? localStorage.getItem(storageKey)?.trim() : null;
+        if (!code) return;
+
+        const content = `Question: ${challengeTitle}\n${challengeDesc}\n\nAnswer (runner: ${runnerId}):\n\n${code}`;
+        const safeId = runnerId.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+        files[`${safeId}.${ext}`] = { content };
+      });
+
+      if (!Object.keys(files).length) return;
+
+      try {
+        const res = await fetch('http://localhost:8585/api/grades/create-gist', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-Origin': 'client' 
+          },
+          body: JSON.stringify({
+            files,
+            description: widget.dataset.gistDescription || 'Exported from Open Coding Society'
+          })
         });
-        if (!Object.keys(files).length) return;
-        try {
-          const res = await fetch('https://api.github.com/gists', {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/vnd.github+json',
-              'Authorization': `Bearer ${gistToken}`,
-              'X-GitHub-Api-Version': '2022-11-28',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              description: widget.dataset.gistDescription || 'Exported from Open Coding Society',
-              public: true,
-              files,
-            }),
-          });
-          if (!res.ok) throw new Error(`API ${res.status}`);
-          const data = await res.json();
-          const url = data.html_url;
+
+        if (!res.ok) throw new Error('Gist creation failed');
+
+        const { url } = await res.json();
         gistUrl = url;
         await navigator.clipboard.writeText(url);
-        } catch (e) {
-          console.error('Gist export failed:', e);
-        }
-      })();
-    }
+
+        exported = true;
+        exportBtn.textContent = '✓ EXPORTED';
+        exportBtn.classList.add('done');
+        exportBtn.disabled = true;
+        commitBtn.disabled = false;
+        typeDialog('✦ Scroll complete and URL copied! Commit to deliver the quest.');
+
+      } catch (e) {
+        console.error(e);
+        typeDialog('⚠ Failed to create gist. Try again or contact teacher.');
+        exportBtn.disabled = false;
+        exportBtn.textContent = '✦ EXPORT';
+      }
+    })();
   }
 
   async function startCommit() {
@@ -474,11 +483,6 @@
   ───────────────────────────────────────────────────── */
   exportBtn.addEventListener('click', startExport);
   commitBtn.addEventListener('click', startCommit);
-
-  if (!gistToken) {
-    exportBtn.textContent = 'TOKEN MISSING';
-    exportBtn.disabled = true;
-  }
 
   runScrollLoop();
   runCarrierLoop();
