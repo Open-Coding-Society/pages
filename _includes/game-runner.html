@@ -46,7 +46,12 @@
 
   <div class="output-container">
     <div class="control-panel">
-      <span class="game-status">Game Status: <span class="status-text">Not Started</span></span>
+      <span class="game-status">Game Status: 
+        <span class="status-text">Not Started</span> 
+      </span>
+      <span class="game-status"> 
+        <span id="{{ include.runner_id }}-metric"></span>
+      </span>
     </div>
     <div class="game-output" id="game-output-{{ include.runner_id }}">
       <div id="game-container-{{ include.runner_id }}" class="gameContainer">
