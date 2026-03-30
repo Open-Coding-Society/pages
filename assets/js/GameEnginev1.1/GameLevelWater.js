@@ -98,17 +98,17 @@ class GameLevelWater {
         pixels: {height: 225, width: 225},
         INIT_POSITION: { x: 100, y: 100},
         orientation: {rows: 1, columns: 1 },
-        down: {row: 0, start: 0, columns: 1 },
-        right: {row: 0, start: 0, columns: 1},
-        left: {row: 0, start: 0, columns: 1, mirror: true }, // mirror is used to flip the sprite
+        down: {row: 0, start: 0, columns: 1, wiggle: 0.005 },
+        right: {row: 0, start: 0, columns: 1, wiggle: 0.005 },
+        left: {row: 0, start: 0, columns: 1, wiggle: 0.005, mirror: true }, // mirror is used to flip the sprite
         hitbox: { widthPercentage: 0.25, heightPercentage: 0.55
          },
           //walking area creates the box where the Shark can walk in 
         walkingArea: {
-            xMin: (width * 1/5), //left boundary
-            xMax: (width * 4/5), //right boundary 
-            yMin: height / 4, //top boundary 
-            yMax: (height * 3 / 5) //bottom boundary
+            xMin: 0, //left boundary
+            xMax: width, //right boundary 
+            yMin: (height * .25), //top boundary 
+            yMax: (height * .55) //bottom boundary
          },
         speed: 0.5,
         direction: { x: 1, y: 1 },
@@ -162,7 +162,18 @@ const sprite_src_puffer = path + "/images/gamify/water/puffer.png";
       INIT_POSITION: { x: width / 2, y: height / 2 },
       orientation: { rows: 1, columns: 2 },
       down: { row: 0, start: 0, columns: 2 },
+      right: {row: 0, start: 0, columns: 2, wiggle: 0.005 },
+      left: {row: 0, start: 0, columns: 2, wiggle: 0.005, mirror: true }, // mirror is used to flip the sprite
+      walkingArea: {
+          xMin: 0, //left boundary
+          xMax: width, //right boundary 
+          yMin: (height * .65), //top boundary 
+          yMax: (height * .65) //bottom boundary
+       },
+      speed: 0.3,
+      direction: { x: 1, y: 1 },
       hitbox: { widthPercentage: 0.25, heightPercentage: 0.55 }
+ 
     };
 
     this.classes = [      

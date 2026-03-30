@@ -8,16 +8,17 @@
  * - Preset and custom themes
  * - Backend API synchronization
  * 
- * Classes (Single Responsibility each):
+ * Classes use standard get/set naming where applicable:
  *   PreferencesConfig    – Shared constants & defaults
- *   FormatConverter      – frontend ↔ backend format conversion
- *   PreferencesAPI       – All fetch() calls to the backend
- *   PreferencesStore     – localStorage + caching layer
- *   FormManager          – Read / populate the HTML form
- *   ThemeRenderer        – Render preset & custom theme buttons
- *   TTSPanel             – TTS voice dropdown & test button
+ *   FormatConverter      – frontend ↔ backend format conversion (toBackend / toFrontend)
+ *   PreferencesAPI       – Backend fetch: get(), set(), delete(), checkLogin()
+ *   PreferencesStore     – Cache layer: get(), set(), getThemes(), setThemes(), apply()
+ *   FormManager          – HTML form: get() reads inputs, set() populates inputs
+ *   ThemeRenderer        – Preset/custom buttons: setPresets(), setCustom(), set(name)
+ *   TTSPanel             – Voice list: set() populates, test() speaks sample
  *   TranslationHelper    – Cookie cleanup & clean reload
- *   StatusDisplay        – Flash status messages
+ *   StatusDisplay        – Flash messages: set(msg)
+ *   SectionSaver         – Section-level save: set(section)
  *   PreferencesController – Orchestrator: wires everything, handles events
  */
 
@@ -118,7 +119,7 @@ export class PreferencesAPI {
     }
 
     /** Check login by hitting the person endpoint */
-    static async checkLoginStatus() {
+    static async checkLogin() {
         try {
             const res = await fetch(`${PreferencesAPI.javaURI}/api/person/get`, PreferencesAPI.fetchOptions);
             PreferencesAPI.isLoggedIn = res.ok;
@@ -131,7 +132,7 @@ export class PreferencesAPI {
     }
 
     /** Fetch preferences from backend (returns frontend-format or null) */
-    static async fetchPreferences() {
+    static async get() {
         try {
             const res = await fetch(`${PreferencesAPI.javaURI}/api/user/preferences`, PreferencesAPI.fetchOptions);
 
@@ -158,7 +159,7 @@ export class PreferencesAPI {
     }
 
     /** Save (POST or PUT) preferences to backend */
-    static async savePreferences(prefs) {
+    static async set(prefs) {
         try {
             const method = PreferencesAPI.backendPrefsExist ? 'PUT' : 'POST';
             const res = await fetch(`${PreferencesAPI.javaURI}/api/user/preferences`, {
@@ -175,7 +176,7 @@ export class PreferencesAPI {
     }
 
     /** Delete preferences from backend */
-    static async deletePreferences() {
+    static async delete() {
         try {
             const res = await fetch(`${PreferencesAPI.javaURI}/api/user/preferences`, {
                 ...PreferencesAPI.fetchOptions,
@@ -197,7 +198,7 @@ export class PreferencesStore {
     static cachedPrefs = null;
 
     /** Apply prefs via the global SitePreferences engine */
-    static applyToPage(prefs) {
+    static apply(prefs) {
         if (window.SitePreferences?.applyPreferences) {
             window.SitePreferences.applyPreferences(prefs);
         }
@@ -207,7 +208,7 @@ export class PreferencesStore {
      * Load preferences: reset-flag → backend → localStorage → null.
      * Also applies them to the page and syncs localStorage.
      */
-    static async load() {
+    static async get() {
         try {
             const wasReset = localStorage.getItem('preferencesReset');
             if (wasReset === 'true') {
@@ -215,12 +216,12 @@ export class PreferencesStore {
                 return null;
             }
 
-            const loggedIn = await PreferencesAPI.checkLoginStatus();
+            const loggedIn = await PreferencesAPI.checkLogin();
             if (loggedIn) {
-                const backendPrefs = await PreferencesAPI.fetchPreferences();
+                const backendPrefs = await PreferencesAPI.get();
                 if (backendPrefs) {
                     PreferencesStore.cachedPrefs = backendPrefs;
-                    PreferencesStore.applyToPage(backendPrefs);
+                    PreferencesStore.apply(backendPrefs);
                     localStorage.setItem(PreferencesConfig.LOCAL_STORAGE_KEY, JSON.stringify(backendPrefs));
                     return backendPrefs;
                 }
@@ -230,7 +231,7 @@ export class PreferencesStore {
             if (raw) {
                 const prefs = JSON.parse(raw);
                 PreferencesStore.cachedPrefs = prefs;
-                PreferencesStore.applyToPage(prefs);
+                PreferencesStore.apply(prefs);
                 return prefs;
             }
             return null;
@@ -241,18 +242,18 @@ export class PreferencesStore {
     }
 
     /** Save prefs to cache + localStorage + backend (if logged in) */
-    static async save(prefs) {
+    static async set(prefs) {
         try {
             PreferencesStore.cachedPrefs = prefs;
-            PreferencesStore.applyToPage(prefs);
-            FormManager.populate(prefs);
+            PreferencesStore.apply(prefs);
+            FormManager.set(prefs);
 
             localStorage.removeItem('preferencesReset');
             localStorage.setItem(PreferencesConfig.LOCAL_STORAGE_KEY, JSON.stringify(prefs));
 
             if (PreferencesAPI.isLoggedIn) {
-                const ok = await PreferencesAPI.savePreferences(prefs);
-                if (!ok) StatusDisplay.show('Saved locally (backend unavailable)');
+                const ok = await PreferencesAPI.set(prefs);
+                if (!ok) StatusDisplay.set('Saved locally (backend unavailable)');
             }
         } catch (e) {
             console.error('savePreferences error', e);
@@ -261,7 +262,7 @@ export class PreferencesStore {
     }
 
     /** Load custom themes from cache or localStorage */
-    static loadThemes() {
+    static getThemes() {
         if (PreferencesStore.cachedPrefs?.customThemes) {
             return PreferencesStore.cachedPrefs.customThemes;
         }
@@ -272,13 +273,13 @@ export class PreferencesStore {
     }
 
     /** Save custom themes (embedded in the preferences object) */
-    static async saveThemes(themesObj) {
+    static async setThemes(themesObj) {
         try {
             const current = PreferencesStore.cachedPrefs
-                || await PreferencesStore.load()
+                || await PreferencesStore.get()
                 || { ...PreferencesConfig.SITE_DEFAULT };
             current.customThemes = themesObj;
-            await PreferencesStore.save(current);
+            await PreferencesStore.set(current);
             localStorage.setItem(PreferencesConfig.LOCAL_THEMES_KEY, JSON.stringify(themesObj));
         } catch (e) {
             console.error('saveThemes error', e);
@@ -292,7 +293,7 @@ export class PreferencesStore {
 // ============================================
 export class FormManager {
     /** Read every form input into a prefs object */
-    static readValues() {
+    static get() {
         return {
             bg: document.getElementById('pref-bg-color').value,
             text: document.getElementById('pref-text-color').value,
@@ -306,12 +307,12 @@ export class FormManager {
             ttsVolume: Number(document.getElementById('pref-tts-volume').value),
             selectionColor: document.getElementById('pref-selection-color').value,
             buttonStyle: document.getElementById('pref-button-style').value,
-            customThemes: PreferencesStore.loadThemes()
+            customThemes: PreferencesStore.getThemes()
         };
     }
 
     /** Push a prefs object into every form input */
-    static populate(prefs) {
+    static set(prefs) {
         if (!prefs) return;
         const d = PreferencesConfig.SITE_DEFAULT;
         document.getElementById('pref-bg-color').value = prefs.bg || d.bg;
@@ -339,7 +340,7 @@ export class FormManager {
 // RESPONSIBILITY: Flash a status message
 // ============================================
 export class StatusDisplay {
-    static show(msg) {
+    static set(msg) {
         const el = document.getElementById('preferences-status');
         if (!el) return;
         el.textContent = msg;
@@ -352,7 +353,7 @@ export class StatusDisplay {
 // ============================================
 export class ThemeRenderer {
     /** Build preset theme buttons in #preset-themes */
-    static renderPresets() {
+    static setPresets() {
         const container = document.getElementById('preset-themes');
         if (!container) return;
         container.innerHTML = '';
@@ -370,13 +371,13 @@ export class ThemeRenderer {
                     ttsPitch: PreferencesStore.cachedPrefs?.ttsPitch || 1.0,
                     ttsVolume: PreferencesStore.cachedPrefs?.ttsVolume || 1.0
                 };
-                await PreferencesStore.save({
+                await PreferencesStore.set({
                     ...p,
                     language: currentLang,
                     ...currentTTS,
-                    customThemes: PreferencesStore.loadThemes()
+                    customThemes: PreferencesStore.getThemes()
                 });
-                StatusDisplay.show('Applied: ' + name + ' - Reloading...');
+                StatusDisplay.set('Applied: ' + name + ' - Reloading...');
                 setTimeout(() => TranslationHelper.cleanReload(), 200);
             });
             container.appendChild(btn);
@@ -384,12 +385,12 @@ export class ThemeRenderer {
     }
 
     /** Build custom theme buttons in #custom-themes */
-    static renderCustom() {
+    static setCustom() {
         const container = document.getElementById('custom-themes');
         if (!container) return;
         container.innerHTML = '';
 
-        const themes = PreferencesStore.loadThemes();
+        const themes = PreferencesStore.getThemes();
         const keys = Object.keys(themes);
         if (!keys.length) {
             container.innerHTML = '<p class="text-neutral-500 text-sm">No custom themes yet</p>';
@@ -412,13 +413,13 @@ export class ThemeRenderer {
                     ttsPitch: PreferencesStore.cachedPrefs?.ttsPitch || 1.0,
                     ttsVolume: PreferencesStore.cachedPrefs?.ttsVolume || 1.0
                 };
-                await PreferencesStore.save({
+                await PreferencesStore.set({
                     ...theme,
                     language: currentLang,
                     ...currentTTS,
-                    customThemes: PreferencesStore.loadThemes()
+                    customThemes: PreferencesStore.getThemes()
                 });
-                StatusDisplay.show('Applied: ' + name + ' - Reloading...');
+                StatusDisplay.set('Applied: ' + name + ' - Reloading...');
                 setTimeout(() => TranslationHelper.cleanReload(), 200);
             });
 
@@ -427,11 +428,11 @@ export class ThemeRenderer {
             del.textContent = 'X';
             del.title = 'Delete';
             del.addEventListener('click', async () => {
-                const t = PreferencesStore.loadThemes();
+                const t = PreferencesStore.getThemes();
                 if (t[name]) delete t[name];
-                await PreferencesStore.saveThemes(t);
-                ThemeRenderer.renderCustom();
-                StatusDisplay.show('Deleted: ' + name);
+                await PreferencesStore.setThemes(t);
+                ThemeRenderer.setCustom();
+                StatusDisplay.set('Deleted: ' + name);
             });
 
             wrap.appendChild(btn);
@@ -441,17 +442,17 @@ export class ThemeRenderer {
     }
 
     /** Save current form values as a named custom theme */
-    static async saveThemeAs(name) {
-        if (!name) { StatusDisplay.show('Enter a theme name'); return; }
-        const themes = PreferencesStore.loadThemes();
+    static async set(name) {
+        if (!name) { StatusDisplay.set('Enter a theme name'); return; }
+        const themes = PreferencesStore.getThemes();
         if (Object.keys(themes).length >= PreferencesConfig.MAX_CUSTOM && !themes[name]) {
-            StatusDisplay.show('Max themes reached');
+            StatusDisplay.set('Max themes reached');
             return;
         }
-        themes[name] = FormManager.readValues();
-        await PreferencesStore.saveThemes(themes);
-        ThemeRenderer.renderCustom();
-        StatusDisplay.show('Saved: ' + name);
+        themes[name] = FormManager.get();
+        await PreferencesStore.setThemes(themes);
+        ThemeRenderer.setCustom();
+        StatusDisplay.set('Saved: ' + name);
         document.getElementById('new-theme-name').value = '';
     }
 }
@@ -461,7 +462,7 @@ export class ThemeRenderer {
 // ============================================
 export class TTSPanel {
     /** Populate the voice <select> with available browser voices */
-    static populateVoices() {
+    static set() {
         const select = document.getElementById('pref-tts-voice');
         if (!select) return;
 
@@ -507,7 +508,7 @@ export class TTSPanel {
     /** Speak the test-text input using current form TTS settings */
     static test() {
         if (!('speechSynthesis' in window)) {
-            StatusDisplay.show('Text-to-speech not supported');
+            StatusDisplay.set('Text-to-speech not supported');
             return;
         }
         speechSynthesis.cancel();
@@ -566,11 +567,11 @@ export class TranslationHelper {
 // ============================================
 export class SectionSaver {
     /** Merge a section's form values into the current prefs and save */
-    static async save(section) {
+    static async set(section) {
         const current = PreferencesStore.cachedPrefs
-            || await PreferencesStore.load()
+            || await PreferencesStore.get()
             || { ...PreferencesConfig.SITE_DEFAULT };
-        const form = FormManager.readValues();
+        const form = FormManager.get();
 
         if (section === 'text') {
             current.font = form.font;
@@ -588,9 +589,9 @@ export class SectionSaver {
             current.ttsVolume = form.ttsVolume;
         }
 
-        current.customThemes = PreferencesStore.loadThemes();
-        await PreferencesStore.save(current);
-        StatusDisplay.show('Saved ' + section);
+        current.customThemes = PreferencesStore.getThemes();
+        await PreferencesStore.set(current);
+        StatusDisplay.set('Saved ' + section);
     }
 }
 
@@ -601,24 +602,24 @@ export class PreferencesController {
     /** Main initialisation — called on DOMContentLoaded */
     static async init() {
         // Step 1: Load & apply saved preferences
-        const saved = await PreferencesStore.load();
+        const saved = await PreferencesStore.get();
 
         // Step 2: Render theme buttons
-        ThemeRenderer.renderPresets();
-        ThemeRenderer.renderCustom();
+        ThemeRenderer.setPresets();
+        ThemeRenderer.setCustom();
 
         // Step 3: Initialise TTS voice list
         if ('speechSynthesis' in window) {
-            TTSPanel.populateVoices();
-            speechSynthesis.onvoiceschanged = TTSPanel.populateVoices;
+            TTSPanel.set();
+            speechSynthesis.onvoiceschanged = TTSPanel.set;
         }
 
-        // Step 4: Populate form
-        FormManager.populate(saved || PreferencesConfig.SITE_DEFAULT);
+        // Step 4: Set form values from saved prefs (or defaults)
+        FormManager.set(saved || PreferencesConfig.SITE_DEFAULT);
 
         // Step 5: Login status hint
         if (PreferencesAPI.isLoggedIn) {
-            StatusDisplay.show(saved ? 'Preferences synced from your account' : 'No saved preferences found - using defaults');
+            StatusDisplay.set(saved ? 'Preferences synced from your account' : 'No saved preferences found - using defaults');
         }
 
         // Step 6: Wire up all event listeners
@@ -651,26 +652,26 @@ export class PreferencesController {
         // Section save buttons
         document.querySelectorAll('.save-section-btn').forEach(btn => {
             btn.addEventListener('click', async function () {
-                await SectionSaver.save(this.dataset.section);
-                StatusDisplay.show('Saved! Reloading...');
+                await SectionSaver.set(this.dataset.section);
+                StatusDisplay.set('Saved! Reloading...');
                 setTimeout(() => TranslationHelper.cleanReload(), 200);
             });
         });
 
         // Save All
         document.getElementById('save-preferences').addEventListener('click', async () => {
-            await PreferencesStore.save(FormManager.readValues());
-            StatusDisplay.show('Preferences saved! Reloading...');
+            await PreferencesStore.set(FormManager.get());
+            StatusDisplay.set('Preferences saved! Reloading...');
             setTimeout(() => TranslationHelper.cleanReload(), 200);
         });
 
         // Reset
         document.getElementById('restore-styles').addEventListener('click', async () => {
             if (PreferencesAPI.isLoggedIn) {
-                const deleted = await PreferencesAPI.deletePreferences();
+                const deleted = await PreferencesAPI.delete();
                 if (!deleted) {
-                    StatusDisplay.show('Failed to delete from server, trying again...');
-                    await PreferencesAPI.deletePreferences();
+                    StatusDisplay.set('Failed to delete from server, trying again...');
+                    await PreferencesAPI.delete();
                 }
             }
 
@@ -684,19 +685,19 @@ export class PreferencesController {
                 window.SitePreferences.resetPreferences();
             }
 
-            FormManager.populate(PreferencesConfig.SITE_DEFAULT);
+            FormManager.set(PreferencesConfig.SITE_DEFAULT);
             document.getElementById('pref-language').value = '';
 
-            StatusDisplay.show('Preferences reset! Reloading...');
+            StatusDisplay.set('Preferences reset! Reloading...');
             setTimeout(() => TranslationHelper.cleanReload(), 300);
         });
 
         // Custom theme save / enter-key
         document.getElementById('save-theme-btn').addEventListener('click', async () => {
-            await ThemeRenderer.saveThemeAs(document.getElementById('new-theme-name').value.trim());
+            await ThemeRenderer.set(document.getElementById('new-theme-name').value.trim());
         });
         document.getElementById('new-theme-name').addEventListener('keypress', async e => {
-            if (e.key === 'Enter') await ThemeRenderer.saveThemeAs(e.target.value.trim());
+            if (e.key === 'Enter') await ThemeRenderer.set(e.target.value.trim());
         });
     }
 
@@ -710,10 +711,10 @@ export class PreferencesController {
                 if (!stored && !PreferencesStore.cachedPrefs) return;
                 const current = PreferencesStore.cachedPrefs || (stored ? JSON.parse(stored) : null);
                 if (!current) return;
-                const form = FormManager.readValues();
+                const form = FormManager.get();
                 current.selectionColor = form.selectionColor;
                 current.buttonStyle = form.buttonStyle;
-                PreferencesStore.applyToPage(current);
+                PreferencesStore.apply(current);
             };
             el.addEventListener('change', handler);
             el.addEventListener('input', handler);
@@ -732,8 +733,8 @@ export function initializePreferences(javaURI, fetchOptions) {
     document.addEventListener('DOMContentLoaded', () => PreferencesController.init());
 
     // Expose global functions for compatibility
-    window.loadPreferences = () => PreferencesStore.load();
-    window.checkLoginStatus = () => PreferencesAPI.checkLoginStatus();
+    window.loadPreferences = () => PreferencesStore.get();
+    window.checkLoginStatus = () => PreferencesAPI.checkLogin();
 
     // Early localStorage flash (before DOMContentLoaded)
     try {
@@ -743,7 +744,7 @@ export function initializePreferences(javaURI, fetchOptions) {
             if (raw) {
                 const prefs = JSON.parse(raw);
                 PreferencesStore.cachedPrefs = prefs;
-                PreferencesStore.applyToPage(prefs);
+                PreferencesStore.apply(prefs);
             }
         }
     } catch (e) {
