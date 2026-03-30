@@ -1091,11 +1091,23 @@ layout: post
    */
   function wireViewCertificateButton() {
     document.addEventListener('click', function(e) {
+      // ── Certificate icon button on each sprint card ──────────────────
+      const certBtn = e.target.closest('.sprint-btn.certificate');
+      if (certBtn) {
+        const sprintKey  = certBtn.dataset.sprint;
+        const startWeek  = parseInt(certBtn.dataset.start);
+        const endWeek    = parseInt(certBtn.dataset.end);
+        if (sprintKey && !isNaN(startWeek) && !isNaN(endWeek)) {
+          openProgressionModal(sprintKey, startWeek, endWeek);
+        }
+        return;
+      }
+
+      // ── "View Your Certificate" button (injected dynamically) ────────
       if (e.target && e.target.id === 'view-certificate-btn') {
-        console.log('Certificate button clicked!');
-        const sprintKey = e.target.dataset.sprint;
-        const startWeek = parseInt(e.target.dataset.start);
-        const endWeek = parseInt(e.target.dataset.end);
+        const sprintKey  = e.target.dataset.sprint;
+        const startWeek  = parseInt(e.target.dataset.start);
+        const endWeek    = parseInt(e.target.dataset.end);
 
         closeProgressionModal();
 
