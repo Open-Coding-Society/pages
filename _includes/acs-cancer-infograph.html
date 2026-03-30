@@ -11,13 +11,17 @@
 
 
  <!-- Project Cards -->
- {% for topic in data.Topics %}
+{% for topic in data.Topics %}
+{% assign topic_href = topic.link %}
+{% unless topic.link contains '://' %}
+  {% assign topic_href = site.baseurl | append: topic.link %}
+{% endunless %}
  <div class="wp-card">
    <div class="wp-card-grid">
     
      <!-- Left: Image & Status -->
      <div class="wp-visual">
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
+      <a href="{{ topic_href }}" class="wp-image-link">
          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
          <div class="wp-overlay">
            <span>View Project</span>
@@ -67,7 +71,7 @@
        </div>
 
 
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
+      <a href="{{ topic_href }}" class="wp-btn">Learn More</a>
      </div>
 
 
