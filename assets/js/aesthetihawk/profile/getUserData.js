@@ -17,29 +17,22 @@ export async function getUserData() {
     // get the flask data (READ OPERATION)
     try {
         const response = await fetch(pythonURL, fetchOptions);
-        const contentType = response.headers.get("content-type");
-
         if (response.ok) {
-            if (contentType && contentType.includes("application/json")) {
-                const data = await response.json();
-                // set the data from Flask backend
-                name = data.name;
-                uid = data.uid;
-                email = data.email;
-                sid = data.sid;
-                kasmServerNeeded = data.kasm_server_needed;
-                pfp = data.pfp;
-                school = data.school;
-            } else {
-                console.error('Expected JSON response but received:', contentType);
-            }
+            const data = await response.json();
+
+            // set the data from Flask backend
+            name = data.name;
+            uid = data.uid;
+            email = data.email;
+            sid = data.sid;
+            kasmServerNeeded = data.kasm_server_needed;
+            pfp = data.pfp;
+            school = data.school;
         } else {
-            console.error('Error fetching data:', response.status);
-            const errorText = await response.text();
-            console.error('Response body:', errorText.substring(0, 200));
+            console.error('error fetching data:', response.status);
         }
     } catch (error) {
-        console.error('Network or parsing error:', error.message);
+        console.error('error fetching data:', error.message);
     }
 
     // return all data in an array
