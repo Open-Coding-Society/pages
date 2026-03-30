@@ -1,74 +1,71 @@
 {% assign data = site.data.pirna_capstone_infograph %}
 
-<div class="pirna-infograph">
-  <!-- Header Section -->
-  <div class="pirna-header">
+<div class="pirna-infograph-simple" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+  
+  <!-- Header: Logo, Badge, and DBR Image -->
+  <div style="text-align: center;">
     {% if data.Logo %}
-    <img src="{{ site.baseurl }}/images/{{ data.Logo }}" alt="Project Logo" class="pirna-logo">
+    <img src="{{ site.baseurl }}/images/{{ data.Logo }}" alt="Project Logo" style="max-width: 250px; margin-bottom: 1rem;">
     {% endif %}
-    <div class="pirna-badge">Design-Based
-      Research Capstone</div>
-    <h1 class="pirna-title">{{ data.Title }}</h1>
-    <p class="pirna-description">{{ data.Description }}</p>
+
+    <div style="margin-bottom: 1rem;">
+      <strong>Design-Based Research Capstone</strong>
+    </div>
+
+    {% for topic in data.Topics %}
+      {% if forloop.first %}
+      <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" style="max-width: 100%; border-radius: 8px; margin-top: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      {% endif %}
+    {% endfor %}
+
+    <h1 style="margin-top: 2rem;">{{ data.Title }}</h1>
+    <p style="font-size: 1.1em; opacity: 0.9;">{{ data.Description }}</p>
   </div>
 
-  <!-- Project Cards -->
+  <!-- Content Topics Stacked Laterally -->
   {% for topic in data.Topics %}
-  <div class="pirna-card">
-    <div class="pirna-card-grid">
+  
+  <!-- Former Second Column Formatted Laterally -->
+  <div style="padding-bottom: 1.5rem; border-bottom: 1px solid rgba(128, 128, 128, 0.3);">
+    <h2 style="margin-top: 0;">{{ topic.title }}</h2>
+    <p style="font-size: 1.2em; opacity: 0.8;"><em>{{ topic.subtitle }}</em></p>
 
-      <!-- Left: Image & Status -->
-      <div class="pirna-visual">
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="pirna-image-link">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pirna-image">
-          <div class="pirna-overlay">
-            <span>View Project</span>
-          </div>
-        </a>
-        <div class="pirna-status">{{ topic.status }}</div>
-        <div class="pirna-team">
-          <span class="pirna-team-label">Project Leads</span>
-          <span class="pirna-team-name">{{ topic.team | join: ", " }}</span>
-        </div>
-      </div>
+    <p style="margin-bottom: 1.5rem;">
+      <span style="opacity: 0.8;">Status:</span> <strong>{{ topic.status }}</strong><br>
+      <span style="opacity: 0.8;">Project Leads:</span> <strong>{{ topic.team | join: ", " }}</strong>
+    </p>
 
-      <!-- Center: Key Points -->
-      <div class="pirna-content">
-        <h2 class="pirna-project-title">{{ topic.title }}</h2>
-        <p class="pirna-subtitle">{{ topic.subtitle }}</p>
+    <h3 style="margin-bottom: 0.5rem;">Key Concepts</h3>
+    <ul style="margin-bottom: 1.5rem;">
+      {% for point in topic.keyPoints %}
+      <li style="margin-bottom: 0.5rem;">{{ point }}</li>
+      {% endfor %}
+    </ul>
 
-        <div class="pirna-keypoints">
-          {% for point in topic.keyPoints %}
-          <div class="pirna-keypoint">
-            <span class="pirna-check">✓</span>
-            <span>{{ point }}</span>
-          </div>
-          {% endfor %}
-        </div>
-
-        <div class="pirna-tech-stack">
-          {% for tech in topic.tech %}
-          <span class="pirna-tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Right: Description & Impact -->
-      <div class="pirna-details">
-        <h3 class="pirna-section-title">About</h3>
-        <p class="pirna-about">{{ topic.description }}</p>
-
-        <h3 class="pirna-section-title">Impact</h3>
-        <div class="pirna-impact-list">
-          {% for item in topic.impact %}
-          <div class="pirna-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
-
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="pirna-btn">Learn More</a>
-      </div>
-
+    <div>
+      <strong style="display: block; margin-bottom: 0.5rem;">Tech Stack:</strong>
+      {% for tech in topic.tech %}
+      <span style="display: inline-block; padding: 4px 10px; margin: 0 6px 6px 0; border-radius: 6px; border: 1px solid rgba(128,128,128,0.5); font-size: 0.9em;">{{ tech }}</span>
+      {% endfor %}
     </div>
   </div>
+
+  <!-- Former Third Column Formatted Laterally -->
+  <div>
+    <h3 style="margin-top: 0; margin-bottom: 0.5rem;">About</h3>
+    <p style="margin-bottom: 1.5rem; line-height: 1.6;">{{ topic.description }}</p>
+
+    <h3 style="margin-bottom: 0.5rem;">Impact</h3>
+    <ul style="margin-bottom: 2rem;">
+      {% for item in topic.impact %}
+      <li style="margin-bottom: 0.5rem;">{{ item }}</li>
+      {% endfor %}
+    </ul>
+
+    <div style="margin-top: 2rem; text-align: center;">
+      <a href="{{ site.baseurl }}{{ topic.link }}" style="display: inline-block; padding: 12px 24px; text-decoration: none; border: 2px solid currentColor; border-radius: 8px; font-weight: bold; transition: opacity 0.2s;">View Project Features</a>
+    </div>
+  </div>
+
   {% endfor %}
 </div>
