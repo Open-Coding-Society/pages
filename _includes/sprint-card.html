@@ -15,16 +15,9 @@
 {% endcomment %}
 
 <div class="sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
-  <div class="sprint-header">
-    <div class="sprint-info">
-      <p class="sprint-meta">{{ unitKey }}</p>
-      <h2 class="sprint-title">{{ unitData.title }}</h2>
-      {% if unitData.description %}
-        <p class="sprint-meta">{{ unitData.description }}</p>
-      {% endif %}
-    </div>
-
-    <div class="sprint-controls">
+  <div class="sprint-header" style="display: flex; flex-direction: column; gap: 12px;">
+    <!-- Controls positioned at top right -->
+    <div class="sprint-controls" style="display: flex; gap: 8px; align-items: center; justify-content: flex-end;">
       <!-- Sprint Calendar Sync -->
       <div class="sprint-date-control">
         <button class="sprint-btn date-toggle" type="button" data-sprint="{{ unitKey }}" title="Sync Sprint to Calendar">
@@ -72,6 +65,15 @@
       <button class="sprint-btn certificate" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" title="Progress & Certificates">
         <i class="fas fa-certificate"></i>
       </button>
+    </div>
+
+    <!-- Full-width sprint info section below buttons -->
+    <div class="sprint-info-full" style="width: 100%;">
+      <p class="sprint-meta">{{ unitKey }}</p>
+      <h2 class="sprint-title">{{ unitData.title }}</h2>
+      {% if unitData.description %}
+        <p class="sprint-meta">{{ unitData.description }}</p>
+      {% endif %}
     </div>
   </div>
 
