@@ -13,15 +13,18 @@
  <!-- Project Cards -->
 {% for topic in data.Topics %}
 {% assign topic_href = topic.link %}
+{% assign is_external = false %}
 {% unless topic.link contains '://' %}
   {% assign topic_href = site.baseurl | append: topic.link %}
+{% else %}
+  {% assign is_external = true %}
 {% endunless %}
  <div class="wp-card">
    <div class="wp-card-grid">
     
      <!-- Left: Image & Status -->
      <div class="wp-visual">
-      <a href="{{ topic_href }}" class="wp-image-link">
+      <a href="{{ topic_href }}" class="wp-image-link"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>
          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
          <div class="wp-overlay">
            <span>View Project</span>
@@ -39,6 +42,7 @@
      <div class="wp-content">
        <h2 class="wp-project-title">{{ topic.title }}</h2>
        <p class="wp-subtitle">{{ topic.subtitle }}</p>
+       <a href="{{ topic_href }}" class="wp-btn"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>Open Feature</a>
       
        <div class="wp-keypoints">
          {% for point in topic.keyPoints %}
@@ -71,7 +75,7 @@
        </div>
 
 
-      <a href="{{ topic_href }}" class="wp-btn">Learn More</a>
+      <a href="{{ topic_href }}" class="wp-btn"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>Learn More</a>
      </div>
 
 
