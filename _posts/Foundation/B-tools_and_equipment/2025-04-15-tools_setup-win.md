@@ -142,3 +142,202 @@ cd opencs/student
 source venv/bin/activate
 code .
 ```
+
+---
+
+## 💻 Interactive Terminal Practice
+
+Now that you’ve learned about Windows tools and file systems, try using a simulated terminal.
+
+This is a safe environment where you can practice basic commands.
+
+### 🧠 Try these commands:
+
+* `ls` → list files/folders
+* `cd <folder>` → move into a folder
+* `cd ..` → go back
+* `mkdir <folder>` → create a folder
+* `touch <file>` → create a file
+* `cat <file>` → view file contents
+* `git clone <url>` → mock clone a repo
+* `clear` → clear terminal output
+* `pwd` → show current path
+* `help` → show commands
+
+---
+
+### ▶️ Terminal:
+
+<div id="terminal" style="background:#111; color:#00ff90; padding:12px; font-family:monospace; border-radius:8px; height:250px; overflow-y:auto;">
+  <p>> Welcome! Type <b>help</b> to begin.</p>
+</div>
+
+<input id="commandInput" placeholder="Enter command..." style="width:100%; padding:8px; margin-top:8px; font-family:monospace;" />
+
+<script>
+let path = ["home"];
+
+const fileSystem = {
+  "/home": {
+    type: "dir",
+    children: {
+      documents: {
+        type: "dir",
+        children: {
+          "notes.txt": { type: "file", content: "Remember to run ./scripts/activate.sh" }
+        }
+      },
+      downloads: {
+        type: "dir",
+        children: {
+          "image.png": { type: "file", content: "<binary file>" }
+        }
+      }
+    }
+  }
+};
+
+function currentPathString() {
+  return "/" + path.join("/");
+}
+
+function getCurrentNode() {
+  let node = fileSystem["/home"];
+  for (let i = 1; i < path.length; i++) {
+    node = node.children[path[i]];
+    if (!node || node.type !== "dir") {
+      return null;
+    }
+  }
+  return node;
+}
+
+function listCurrentDir() {
+  const node = getCurrentNode();
+  if (!node) return [];
+  return Object.keys(node.children);
+}
+
+function createDirectory(name) {
+  const node = getCurrentNode();
+  if (!node || !name) return "Usage: mkdir <folder>";
+  if (node.children[name]) return `mkdir: cannot create directory '${name}': File exists`;
+  node.children[name] = { type: "dir", children: {} };
+  return null;
+}
+
+function createFile(name, content = "") {
+  const node = getCurrentNode();
+  if (!node || !name) return "Usage: touch <file>";
+  if (!node.children[name]) {
+    node.children[name] = { type: "file", content };
+  }
+  return null;
+}
+
+function mockClone(url) {
+  if (!url) return "Usage: git clone <url>";
+  const repoPart = url.split("/").pop() || "repository";
+  const repoName = repoPart.replace(/\.git$/, "") || "repository";
+  const node = getCurrentNode();
+  if (!node || node.children[repoName]) {
+    return `fatal: destination path '${repoName}' already exists and is not an empty directory.`;
+  }
+  node.children[repoName] = {
+    type: "dir",
+    children: {
+      README: { type: "file", content: `# ${repoName}\nMock repository created in simulator.` },
+      scripts: {
+        type: "dir",
+        children: {
+          "activate.sh": { type: "file", content: "echo Activating environment..." }
+        }
+      }
+    }
+  };
+  return `Cloning into '${repoName}'...\nremote: Simulated clone complete.`;
+}
+
+function print(text) {
+  const terminal = document.getElementById("terminal");
+  terminal.innerHTML += `<p>${text}</p>`;
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+document.getElementById("commandInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    const input = e.target.value.trim();
+    print(`> ${input}`);
+
+    if (input === "help") {
+      print("Commands: ls, cd <folder>, cd .., mkdir <folder>, touch <file>, cat <file>, git clone <url>, clear, pwd, help");
+    }
+
+    else if (input === "ls") {
+      const entries = listCurrentDir();
+      print(entries.length ? entries.join("  ") : "Empty");
+    }
+
+    else if (input.startsWith("cd ")) {
+      const dir = input.split(" ")[1];
+
+      if (dir === "..") {
+        if (path.length > 1) path.pop();
+      }
+      else {
+        const node = getCurrentNode();
+        if (node?.children[dir]?.type === "dir") {
+        path.push(dir);
+        } else {
+          print("Directory not found");
+        }
+      }
+    }
+
+    else if (input.startsWith("mkdir ")) {
+      const dirName = input.split(" ").slice(1).join(" ").trim();
+      const error = createDirectory(dirName);
+      if (error) print(error);
+    }
+
+    else if (input.startsWith("touch ")) {
+      const fileName = input.split(" ").slice(1).join(" ").trim();
+      const error = createFile(fileName);
+      if (error) print(error);
+    }
+
+    else if (input.startsWith("cat ")) {
+      const fileName = input.split(" ").slice(1).join(" ").trim();
+      const node = getCurrentNode();
+      const target = node?.children[fileName];
+      if (target?.type === "file") {
+        print(target.content || "");
+      } else {
+        print(`cat: ${fileName}: No such file`);
+      }
+    }
+
+    else if (input.startsWith("git clone ")) {
+      const url = input.split(" ").slice(2).join(" ").trim();
+      print(mockClone(url));
+    }
+
+    else if (input === "clear") {
+      const terminal = document.getElementById("terminal");
+      terminal.innerHTML = "";
+    }
+
+    else if (input === "pwd") {
+      print(currentPathString());
+    }
+
+    else {
+      print("Unknown command (type 'help')");
+    }
+
+    e.target.value = "";
+  }
+});
+</script>
+
+---

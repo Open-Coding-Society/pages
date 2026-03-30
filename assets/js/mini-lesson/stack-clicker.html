@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stack Clicker Mini Lesson</title>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body class="stack-clicker-page">
+  <main class="app">
+    <section class="panel hero">
+      <h1>Stack Clicker</h1>
+      <p class="subtitle">Learn stack behavior by building and draining call frames.</p>
+
+      <div class="stats">
+        <div class="stat-card">
+          <p class="label">Knowledge Points</p>
+          <p class="value" id="points">0</p>
+        </div>
+        <div class="stat-card">
+          <p class="label">Current Stack Depth</p>
+          <p class="value" id="stackDepth">0</p>
+        </div>
+        <div class="stat-card">
+          <p class="label">Stack Capacity</p>
+          <p class="value" id="maxDepth">32</p>
+        </div>
+        <div class="stat-card warn">
+          <p class="label">Stack Overflow Count</p>
+          <p class="value" id="overflowCount">0</p>
+        </div>
+      </div>
+
+      <button id="pushBtn" class="push-btn">Push Function Call</button>
+
+      <button id="aiTutorBtn" class="ai-btn" type="button">Ask Stacky Box (AI companion)</button>
+      <button id="leaderboardToggleBtn" class="ai-btn" type="button">Show Leaderboard</button>
+
+      <div class="meter-wrap">
+        <p class="label">Stack Fill</p>
+        <div class="meter">
+          <div class="meter-fill" id="meterFill"></div>
+        </div>
+      </div>
+
+      <p class="tip" id="tipText">Tip: Each click simulates pushing function frames onto the call stack.</p>
+    </section>
+
+    <section class="panel upgrades">
+      <h2>Upgrades</h2>
+      <div class="upgrade-tabs" role="tablist" aria-label="Upgrade categories">
+        <button type="button" id="tabMainUpgrades" class="upgrade-tab active" role="tab" aria-selected="true" aria-controls="upgradeList">Main Stack</button>
+        <button type="button" id="tabMultiplierUpgrades" class="upgrade-tab" role="tab" aria-selected="false" aria-controls="upgradeList">Multipliers</button>
+      </div>
+      <div id="upgradeList" class="upgrade-list"></div>
+    </section>
+
+    <section class="panel lesson-log">
+      <h2>Lesson Log</h2>
+      <ul id="logList"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="./stack-clicker.js"></script>
+</body>
+</html>
