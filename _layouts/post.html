@@ -40,99 +40,12 @@ Check if this is a course lesson and determine which course context to use
 
 <div class="lesson-player">
   <!-- LEFT SIDEBAR -->
-  <div class="lesson-sidebar">
-    <div class="sidebar-header">
-      {% if current_course == 'csp' %}
-      <h2>Computer Science Principles</h2>
-      {% elsif current_course == 'csa' %}
-      <h2>Computer Science A</h2>
-      {% elsif current_course == 'csse' %}
-      <h2>Computer Science & Software Engineering</h2>
-      {% elsif current_course == 'cwgu' %}
-      <h2>WGU Applied Computer Science</h2>
-      {% endif %}
-
-      <div class="course-progress-section">
-        <div class="progress-label">
-          <span>Course Progress</span>
-          <span id="progress-count">0/0</span>
-        </div>
-        <div class="progress-bar-sidebar">
-          <div class="progress-bar-sidebar-fill" id="sidebar-progress" style="width: 0%"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sprint-nav">
-      {% assign courseData = site.data[current_course] %}
-      {% for i in (1..9) %}
-      {% assign sprintKey = "Sprint" | append: i %}
-      {% assign sprint = courseData[sprintKey] %}
-
-      {% if sprint %}
-      <div class="sprint-section">
-        <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')">
-          <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
-          <div class="sprint-info">
-            <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
-            <div class="sprint-weeks">Weeks {{ sprint.start }}-{{ sprint.end }}</div>
-          </div>
-        </button>
-
-        <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
-          {% for week in (sprint.start..sprint.end) %}
-          {% for post in posts %}
-          {% if post.courses[current_course] %}
-          {% comment %}Include all files with courses frontmatter (including converted notebook markdown files){%
-          endcomment %}
-          {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
-          {% assign course_count = 0 %}
-          {% for course in post.courses %}
-          {% assign course_count = course_count | plus: 1 %}
-          {% endfor %}
-          {% if course_count == 1 %}
-          {% assign postWeek = post.courses[current_course].week | plus: 0 %}
-          {% if postWeek == week %}
-          <a href="{{ site.baseurl }}{{ post.url }}" class="lesson-item {% if page.url == post.url %}active{% endif %}"
-            data-lesson-id="{{ post.url }}">
-            <i class="fas fa-circle lesson-status-icon incomplete"></i>
-            <span class="lesson-title">{{ post.title }}</span>
-          </a>
-          {% endif %}
-          {% endif %}
-          {% endif %}
-          {% endfor %}
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-      {% endfor %}
-    </div>
-  </div>
+  {% include lesson-sidebar-nav.html %}
 
   <!-- MAIN CONTENT -->
   <div class="lesson-main">
     <!-- Top Bar -->
-    <div class="topbar-lesson">
-      <div class="topbar-left">
-        <div class="breadcrumbs">
-          <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}">
-            <i class="fas fa-home"></i>
-          </a>
-          <i class="fas fa-chevron-right"></i>
-          <span>Week {{ current_week }}</span>
-          <i class="fas fa-chevron-right"></i>
-          <span class="current">{{ page.title }}</span>
-          <button id="topbar-complete-btn" onclick="toggleComplete()">
-            <i class="fas fa-circle" id="complete-icon-topbar"></i>
-            <span id="complete-text-topbar">Burndown</span>
-          </button>
-        </div>
-      </div>
-      <div class="topbar-progress">
-        <div class="topbar-progress-fill" id="lesson-progress"></div>
-      </div>
-    </div>
+    {% include lesson-topbar.html %}
 
     <!-- Lesson Content -->
     <div class="lesson-content">
@@ -167,63 +80,7 @@ Check if this is a course lesson and determine which course context to use
           {% endif %}
 
           {% if page.assignment %}
-          <div class="assignment-submission">
-            <h3>
-              <i class="fas fa-upload assignment-submission-icon"></i>
-              Submit Assignment
-            </h3>
-
-            <div class="submission-options">
-              <button class="submission-tab" onclick="switchSubmissionType('link')">
-                <i class="fas fa-link"></i> Link Submission
-              </button>
-              <button class="submission-tab" onclick="switchSubmissionType('file')">
-                <i class="fas fa-file-upload"></i> File Upload
-              </button>
-            </div>
-
-            <!-- Link Submission Form -->
-            <form class="submission-form" id="link-form">
-              <div class="form-group">
-                <label for="submission-link">Submission Link</label>
-                <input type="url" id="submission-link" placeholder="https://..." required>
-              </div>
-              <div class="form-group">
-                <label for="link-description">Description</label>
-                <textarea id="link-description" placeholder="Describe what you're submitting..." required></textarea>
-              </div>
-              <button type="submit" class="submit-btn">
-                <i class="fas fa-check"></i>
-                Submit Link
-              </button>
-            </form>
-
-            <!-- File Upload Form -->
-            <form class="submission-form" id="file-form">
-              <div class="form-group">
-                <label>Upload Files</label>
-                <div class="file-upload-area" id="file-upload-area">
-                  <input type="file" id="file-input" multiple style="display: none;">
-                  <div class="file-upload-icon">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                  </div>
-                  <div class="file-upload-text">Click to upload or drag and drop</div>
-                  <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
-                </div>
-                <div class="file-list" id="file-list"></div>
-              </div>
-              <div class="form-group">
-                <label for="file-notes">Notes (Optional)</label>
-                <textarea id="file-notes" placeholder="Add any additional comments..."></textarea>
-              </div>
-              <button type="submit" class="submit-btn" id="file-submit-btn" disabled>
-                <i class="fas fa-check"></i>
-                Submit Files
-              </button>
-            </form>
-
-            <div class="submission-status" id="submission-status"></div>
-          </div>
+          {% include lesson-submission-form.html %}
           {% endif %}
         </div>
 
@@ -261,26 +118,8 @@ Check if this is a course lesson and determine which course context to use
 </script>
 {% endif %}
 
-<!-- Floating hamburger menu (mobile only) -->
-<button class="floating-menu-btn" id="floating-menu-btn" style="display: none;">
-  <i class="fas fa-bars"></i>
-</button>
-
-<!-- Timeline modal overlay -->
-<div class="timeline-modal-overlay" id="timeline-modal-overlay"></div>
-
-<!-- Timeline modal (mobile only) -->
-<div class="timeline-modal" id="timeline-modal">
-  <div class="timeline-modal-header">
-    <h3>Course Timeline</h3>
-    <button class="timeline-close-btn" id="timeline-close-btn">
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
-  <div class="timeline-modal-content" id="timeline-modal-content">
-    <!-- Sprint cards will be populated by JavaScript -->
-  </div>
-</div>
+<!-- Modals for lesson player -->
+{% include lesson-modals.html %}
 
 <script type="module">
   import { pythonURI, fetchOptions, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
