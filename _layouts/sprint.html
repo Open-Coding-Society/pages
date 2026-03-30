@@ -97,6 +97,9 @@ layout: post
     }
   }
 
+  // Alias for backwards compatibility with any inline callers
+  const loadCompletionData = getCompletionData;
+
   function saveCompletionData(data) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -178,6 +181,10 @@ layout: post
     });
   }
 
+  // Alias so both names work (refactored code uses updateWeekProgressBars,
+  // original sync helpers call updateProgressBars)
+  const updateProgressBars = updateWeekProgressBars;
+
   /**
    * ============================================
    * COMPLETION TOGGLE: Single responsibility
@@ -204,6 +211,24 @@ layout: post
     } catch (error) {
       console.error('Error toggling completion:', error);
     }
+  }
+
+  /**
+   * ============================================
+   * COMPLETION INITIALIZATION: Apply saved states
+   * ============================================
+   */
+  function initializeCompletion() {
+    const completionData = getCompletionData();
+    const itemCards = document.querySelectorAll('.item-card');
+    
+    itemCards.forEach(card => {
+      const itemId = card.dataset.itemId;
+      const isCompleted = completionData[itemId] || false;
+      updateItemUI(card, isCompleted);
+    });
+    
+    updateWeekProgressBars();
   }
 
   /**
@@ -263,6 +288,7 @@ layout: post
    * ============================================
    */
   function applySprintFilters(sprintKey, filterType) {
+    if (!sprintKey || !filterType) return;
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
     if (!sprintCard) return;
     
@@ -307,6 +333,14 @@ layout: post
    * SPRINT COLLAPSE/EXPAND: Toggle sprint state
    * ============================================
    */
+  function toggleSprint(card, control) {
+    const isCollapsed = card.classList.toggle('collapsed');
+    if (control) {
+      control.setAttribute('aria-expanded', (!isCollapsed).toString());
+      control.querySelector('.sprint-toggle-icon').textContent = isCollapsed ? '▸' : '▾';
+    }
+  }
+
   function attachSprintToggleListeners() {
     document.querySelectorAll('.sprint-card').forEach(card => {
       const toggleBtn = card.querySelector('.sprint-toggle-btn');
@@ -326,17 +360,9 @@ layout: post
     });
   }
 
-  function toggleSprint(card, control) {
-    const isCollapsed = card.classList.toggle('collapsed');
-    if (control) {
-      control.setAttribute('aria-expanded', (!isCollapsed).toString());
-      control.querySelector('.sprint-toggle-icon').textContent = isCollapsed ? '▸' : '▾';
-    }
-  }
-
   /**
    * ============================================
-   * PROGRESS BARS: Initialize from data
+   * PROGRESS BARS: Initialize from data attributes
    * ============================================
    */
   function initializeProgressBars() {
@@ -484,13 +510,16 @@ layout: post
     }));
   }
 
-  // Open progression modal for entire sprint
+  /**
+   * ============================================
+   * PROGRESSION MODAL: Open for entire sprint
+   * ============================================
+   */
   function openProgressionModal(sprintKey, startWeek, endWeek) {
     console.log('Opening progression modal for sprint:', sprintKey, 'weeks', startWeek, '-', endWeek);
     
-    currentModalWeekNumber = null; // Not using this for sprint-level
+    currentModalWeekNumber = null;
     
-    // Get sprint card and title
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
     if (!sprintCard) {
       console.log('Sprint card not found');
@@ -498,19 +527,15 @@ layout: post
     }
     
     const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
-    const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
     
-    // Set sprint title and subtitle
     document.getElementById('modal-sprint-title').textContent = sprintTitle;
     document.getElementById('modal-sprint-subtitle').textContent = `${sprintKey} (Weeks ${startWeek}-${endWeek})`;
 
-    // Populate task list with all weeks in sprint
     const taskList = document.getElementById('task-list');
     taskList.innerHTML = '';
     
     let globalTaskIndex = 0;
     
-    // Iterate through all weeks in the sprint
     for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
       const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
         extractWeekNumber(card) === weekNum
@@ -518,14 +543,12 @@ layout: post
       
       if (!weekCard) continue;
       
-      // Add week header in task list
       const weekHeader = document.createElement('div');
       weekHeader.className = 'progression-week-header';
       const weekTitle = weekCard.querySelector('[data-week-title]')?.textContent || `Week ${weekNum}`;
       weekHeader.textContent = weekTitle;
       taskList.appendChild(weekHeader);
       
-      // Add tasks for this week
       const itemCards = weekCard.querySelectorAll('.item-card');
       itemCards.forEach((card) => {
         const title = card.querySelector('.item-title').textContent;
@@ -538,7 +561,6 @@ layout: post
           <span class="task-number">#${globalTaskIndex + 1}</span>
         `;
 
-        // Add change listener
         const checkbox = taskDiv.querySelector('input[type="checkbox"]');
         checkbox.addEventListener('change', function() {
           const toggleBtn = card.querySelector('.completion-toggle');
@@ -557,16 +579,13 @@ layout: post
     updateModalProgress();
     updateCertificateStatusForSprint(sprintKey, startWeek, endWeek);
 
-    // Show modal
     document.getElementById('progression-modal').style.display = 'block';
   }
 
-  // Close progression modal
   function closeProgressionModal() {
     document.getElementById('progression-modal').style.display = 'none';
   }
 
-  // Update modal progress
   function updateModalProgress() {
     const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
     const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked');
@@ -574,7 +593,11 @@ layout: post
     document.getElementById('modal-progress-fill').style.width = `${progress}%`;
   }
 
-  // Update certificate status
+  /**
+   * ============================================
+   * CERTIFICATE STATUS: Update in progression modal
+   * ============================================
+   */
   function updateCertificateStatus() {
     const availableCertificates = getAvailableCertificates(currentModalWeekNumber);
     const certificateStatus = document.getElementById('certificate-status');
@@ -590,7 +613,6 @@ layout: post
     }
   }
   
-  // Update certificate status for entire sprint
   function updateCertificateStatusForSprint(sprintKey, startWeek, endWeek) {
     const certificateStatus = document.getElementById('certificate-status');
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
@@ -600,7 +622,6 @@ layout: post
       return;
     }
     
-    // Check if ALL tasks in the sprint are complete
     let totalTasks = 0;
     let completedTasks = 0;
     
@@ -728,61 +749,155 @@ layout: post
 
   /**
    * ============================================
-   * MODAL MANAGEMENT: Show/hide modals
+   * CERTIFICATE LIST MODAL: Open for a sprint
    * ============================================
    */
-  function showProgressionModal() {
-    document.getElementById('progression-modal').style.display = 'block';
+  async function openCertificateListModal(sprintKey, startWeek, endWeek) {
+    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
+    if (!sprintCard) {
+      console.error('Sprint card not found');
+      return;
+    }
+    
+    const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
+    const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
+    
+    let totalTasks = 0;
+    let completedTasks = 0;
+    const formative = [];
+    const summative = [];
+    const allGoals = [];
+    
+    for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
+      const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
+        extractWeekNumber(card) === weekNum
+      );
+      
+      if (weekCard) {
+        const itemCards = weekCard.querySelectorAll('.item-card');
+        totalTasks += itemCards.length;
+        itemCards.forEach(card => {
+          if (card.classList.contains('completed')) {
+            completedTasks++;
+          }
+          const taskTitle = card.querySelector('.item-title')?.textContent.trim();
+          const itemType = card.dataset.type;
+          
+          if (taskTitle) {
+            if (itemType === 'lesson') {
+              if (!formative.includes(taskTitle)) formative.push(taskTitle);
+            } else {
+              if (!summative.includes(taskTitle)) summative.push(taskTitle);
+            }
+            if (!allGoals.includes(taskTitle)) allGoals.push(taskTitle);
+          }
+        });
+      }
+    }
+    
+    const isSprintComplete = totalTasks > 0 && completedTasks === totalTasks;
+    
+    if (!isSprintComplete) {
+      alert('Please complete all tasks in this sprint to unlock the certificate.');
+      return;
+    }
+
+    const viewBtn = document.getElementById('view-certificate-btn');
+    const originalText = viewBtn ? viewBtn.textContent : 'View Your Certificate';
+    if (viewBtn) {
+      viewBtn.disabled = true;
+      viewBtn.innerHTML = '<span class="cert-spinner"></span> Verifying...';
+      viewBtn.classList.add('cert-btn-loading');
+    }
+
+    const result = await requestCertificate(sprintKey, formative, summative);
+    
+    if (viewBtn) {
+      viewBtn.disabled = false;
+      viewBtn.innerHTML = originalText;
+      viewBtn.classList.remove('cert-btn-loading');
+    }
+
+    switch (result.status) {
+      case 'INCOMPLETE':
+        showCertificateNotification('warning', 'Missing Grades', `You are missing grades for: ${result.missingAssignments.join(', ')}`);
+        return;
+      case 'NOT_QUALIFIED':
+        showCertificateNotification('error', 'Score Below Minimum', `Your average score (${result.averageScore}%) is below the required ${result.requiredMinimum}%. Keep working to improve!`);
+        return;
+      case 'ALREADY_EARNED':
+        console.log(`User already has ${result.existingType} certificate.`);
+        break;
+      case 'UPGRADED':
+        showCertificateNotification('success', 'Certificate Upgraded!', `Congratulations! You improved to ${result.averageScore}% and earned an EXCELLENCE certificate!`);
+        break;
+      case 'AWARDED':
+        const awardType = result.certificateType === 'EXCELLENCE' ? 'Excellence' : 'Completion';
+        showCertificateNotification('success', `${awardType} Certificate Earned!`, `Your average score: ${result.averageScore}%`);
+        break;
+      case 'ERROR':
+        showCertificateNotification('error', 'Connection Error', result.message || 'Unable to verify certificate. Please try again.');
+        return;
+      default:
+        console.log('Unexpected status:', result.status);
+    }
+
+    const backendCertType = result.status === 'ALREADY_EARNED' ? result.existingType : result.certificateType;
+    const certTypeLabel = backendCertType === 'EXCELLENCE' ? 'Excellence' : 'Completion';
+    const displayTheme = `${sprintTitle} (${certTypeLabel})`;
+    
+    const certificateProfile = {
+      sprintKey: sprintKey,
+      theme: displayTheme,
+      displayName: displayTheme,
+      courseName: COURSE_LABELS[CURRENT_COURSE] || CURRENT_COURSE,
+      goal: `${certTypeLabel} in ${sprintTitle}`,
+      goals: allGoals.slice(0, 6), 
+      weekRange: `Weeks ${startWeek}-${endWeek}`,
+      description: sprintDescription,
+      averageScore: result.averageScore || result.score,
+      certType: backendCertType
+    };
+    
+    openCertificateModal(certificateProfile);
   }
 
-  function hideProgressionModal() {
-    document.getElementById('progression-modal').style.display = 'none';
-  }
+  /**
+   * ============================================
+   * CERTIFICATE LIST MODAL: Legacy week-level
+   * ============================================
+   */
+  function openCertificateListModalForWeek(weekNumber) {
+    document.getElementById('list-modal-sprint-title').textContent = `Week ${weekNumber}`;
+    const certificateList = document.getElementById('certificate-list');
+    certificateList.innerHTML = '';
 
-  function showCertificateModal() {
-    document.getElementById('certificate-modal').style.display = 'block';
-  }
+    const availableCertificates = getAvailableCertificates(weekNumber);
 
-  function hideCertificateModal() {
-    document.getElementById('certificate-modal').style.display = 'none';
-  }
+    if (availableCertificates.length === 0) {
+      certificateList.innerHTML = '<p style="color: #666; text-align: center;">No certificates available yet</p>';
+    } else {
+      availableCertificates.forEach(profile => {
+        const button = document.createElement('button');
+        button.textContent = `${profile.displayName}`;
+        button.addEventListener('click', () => {
+          openCertificateModal(profile);
+        });
+        certificateList.appendChild(button);
+      });
+    }
 
-  function showCertificateListModal() {
     document.getElementById('certificate-list-modal').style.display = 'block';
   }
 
-  function hideCertificateListModal() {
-    document.getElementById('certificate-list-modal').style.display = 'none';
-  }
-
-  function showHelpModal() {
-    document.getElementById('help-modal').style.display = 'block';
-  }
-
-  function hideHelpModal() {
-    document.getElementById('help-modal').style.display = 'none';
-  }
-
   /**
    * ============================================
-   * PROGRESSION MODAL: Update progress display
+   * CERTIFICATE MODAL: Render and display
    * ============================================
    */
-  function updateModalProgress() {
-    const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
-    const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked');
-    const progress = checkboxes.length > 0 ? (checked.length / checkboxes.length) * 100 : 0;
-    document.getElementById('modal-progress-fill').style.width = `${progress}%`;
-  }
-
-  /**
-   * ============================================
-   * CERTIFICATE DISPLAY: Render certificate info
-   * ============================================
-   */
-  function displayCertificateInfo(profile) {
+  function openCertificateModal(profile) {
     activeCertificateProfile = profile;
-    
+
     document.getElementById('certificate-week-theme').textContent = profile.theme;
     document.getElementById('certificate-course-name').textContent = profile.courseName;
 
@@ -824,11 +939,22 @@ layout: post
       goalTag.textContent = goal;
       goalsContainer.appendChild(goalTag);
     });
+
+    document.getElementById('certificate-list-modal').style.display = 'none';
+    document.getElementById('certificate-modal').style.display = 'block';
+  }
+
+  function closeCertificateModal() {
+    document.getElementById('certificate-modal').style.display = 'none';
+  }
+
+  function closeCertificateListModal() {
+    document.getElementById('certificate-list-modal').style.display = 'none';
   }
 
   /**
    * ============================================
-   * CERTIFICATE EXPORT: Download/Print/Share
+   * CERTIFICATE EXPORT: Download / Print / Share
    * ============================================
    */
   function downloadCertificate() {
@@ -915,9 +1041,73 @@ layout: post
     }
   }
 
+  // Called by inline onclick="openHelpModal(...)" in sprint-card.html
   function openHelpModal(sprintKey, helpUrl) {
     loadHelpContent(helpUrl);
-    showHelpModal();
+    document.getElementById('help-modal').style.display = 'block';
+  }
+
+  function closeHelpModal() {
+    document.getElementById('help-modal').style.display = 'none';
+  }
+
+  /**
+   * ============================================
+   * MODAL CLOSE WIRING: Id-based buttons from
+   * sprint-modals.html (close-* ids)
+   * ============================================
+   */
+  function wireModalCloseButtons() {
+    const closeMap = {
+      'close-progression-modal':    closeProgressionModal,
+      'close-certificate-list-modal': closeCertificateListModal,
+      'close-certificate-modal':    closeCertificateModal,
+      'close-help-modal':           closeHelpModal,
+    };
+
+    Object.entries(closeMap).forEach(([id, fn]) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', fn);
+    });
+
+    // Certificate action buttons
+    const downloadBtn = document.getElementById('download-certificate-btn');
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadCertificate);
+
+    const printBtn = document.getElementById('print-certificate-btn');
+    if (printBtn) printBtn.addEventListener('click', printCertificate);
+
+    const linkedinBtn = document.getElementById('linkedin-share-btn');
+    if (linkedinBtn) linkedinBtn.addEventListener('click', shareOnLinkedIn);
+  }
+
+  /**
+   * ============================================
+   * VIEW CERTIFICATE BUTTON: Delegated listener
+   * The button is injected dynamically by
+   * updateCertificateStatusForSprint so we need
+   * event delegation on the document.
+   * ============================================
+   */
+  function wireViewCertificateButton() {
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'view-certificate-btn') {
+        console.log('Certificate button clicked!');
+        const sprintKey = e.target.dataset.sprint;
+        const startWeek = parseInt(e.target.dataset.start);
+        const endWeek = parseInt(e.target.dataset.end);
+
+        closeProgressionModal();
+
+        if (sprintKey && !isNaN(startWeek) && !isNaN(endWeek)) {
+          openCertificateListModal(sprintKey, startWeek, endWeek);
+        } else if (currentModalWeekNumber) {
+          openCertificateListModalForWeek(currentModalWeekNumber);
+        } else {
+          console.error('No sprint data or week number available');
+        }
+      }
+    });
   }
 
   /**
@@ -925,61 +1115,39 @@ layout: post
    * SYNCHRONIZATION: Cross-tab & event listeners
    * ============================================
    */
+  function updateAllCompletionStates() {
+    const completionData = getCompletionData();
+    const itemCards = document.querySelectorAll('.item-card');
+    
+    itemCards.forEach(card => {
+      const itemId = card.dataset.itemId;
+      const isCompleted = completionData[itemId] || false;
+      updateItemUI(card, isCompleted);
+    });
+
+    updateWeekProgressBars();
+  }
+
   function setupSyncListeners() {
-    // Cross-tab synchronization via storage events
-    window.addEventListener('storage', (event) => {
-      if (event.key === STORAGE_KEY) {
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
         updateAllCompletionStates();
-      }
-      if (event.key === ITEM_PRIORITY_KEY) {
-        location.reload();
       }
     });
 
-    // Same-window completion broadcast
-    document.addEventListener('completionChanged', () => {
+    window.addEventListener('completionChanged', () => {
       updateAllCompletionStates();
     });
 
-    // Visibility change detection
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        const current = JSON.stringify(getCompletionData());
-        if (stored !== current) {
-          updateAllCompletionStates();
-        }
-      }
-    });
-
-    // Focus detection for same window
-    window.addEventListener('focus', () => {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      const current = JSON.stringify(getCompletionData());
-      if (stored !== current) {
         updateAllCompletionStates();
       }
     });
-  }
 
-  function updateAllCompletionStates() {
-    const completionData = getCompletionData();
-    
-    document.querySelectorAll('[data-sprint-key][data-item-id]').forEach(item => {
-      const sprintKey = item.dataset.sprintKey;
-      const itemId = item.dataset.itemId;
-      const isCompleted = completionData[sprintKey]?.[itemId];
-      
-      const checkbox = item.querySelector('input[type="checkbox"]');
-      if (checkbox) {
-        checkbox.checked = isCompleted;
-      }
-      
-      item.classList.toggle('completed', isCompleted);
-      updateItemUI(item);
+    window.addEventListener('focus', () => {
+      updateAllCompletionStates();
     });
-
-    updateProgressBars();
   }
 
   /**
@@ -988,122 +1156,30 @@ layout: post
    * ============================================
    */
   function initMobileEnhancements() {
-    // Auto-collapse sections on mobile
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) {
-      document.querySelectorAll('.sprint-section').forEach(section => {
-        section.classList.add('collapsed');
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll('.sprint-card:not(.collapsed)').forEach(card => {
+        card.classList.add('collapsed');
+      });
+
+      document.querySelectorAll('.progression-btn').forEach(btn => {
+        btn.style.minHeight = '44px';
+      });
+
+      document.querySelectorAll('.close-btn').forEach(btn => {
+        btn.style.minWidth = '44px';
+        btn.style.minHeight = '44px';
+        btn.style.display = 'flex';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
       });
     }
 
-    // Handle orientation changes
     window.addEventListener('orientationchange', () => {
       setTimeout(() => {
-        updateProgressBars();
-      }, 300);
+        updateWeekProgressBars();
+        initMobileEnhancements();
+      }, 100);
     });
-
-    // Ensure touch targets are at least 44x44px
-    document.querySelectorAll('button, [role="button"], input[type="checkbox"]').forEach(element => {
-      const rect = element.getBoundingClientRect();
-      if (rect.width < 44 || rect.height < 44) {
-        element.style.padding = '12px';
-        element.style.minWidth = '44px';
-        element.style.minHeight = '44px';
-      }
-    });
-  }
-
-  /**
-   * ============================================
-   * INITIALIZATION ORCHESTRATORS
-   * ============================================
-   */
-  function initializeHelpButtons() {
-    document.querySelectorAll('[data-help-url]').forEach(button => {
-      button.addEventListener('click', () => {
-        const helpUrl = button.dataset.helpUrl;
-        const sprintKey = button.closest('[data-sprint-key]')?.dataset.sprintKey;
-        openHelpModal(sprintKey, helpUrl);
-      });
-    });
-
-    // Help modal close handlers
-    const helpModal = document.getElementById('help-modal');
-    if (helpModal) {
-      helpModal.querySelector('.modal-close')?.addEventListener('click', hideHelpModal);
-      helpModal.querySelector('.modal-overlay')?.addEventListener('click', hideHelpModal);
-    }
-  }
-
-  function initializeProgressionModal() {
-    const progressionModal = document.getElementById('progression-modal');
-    if (!progressionModal) return;
-
-    progressionModal.querySelector('.modal-close')?.addEventListener('click', hideProgressionModal);
-    progressionModal.querySelector('.modal-overlay')?.addEventListener('click', hideProgressionModal);
-  }
-
-  function initializeCertificateModals() {
-    const certModal = document.getElementById('certificate-modal');
-    const certListModal = document.getElementById('certificate-list-modal');
-
-    if (certModal) {
-      certModal.querySelector('.modal-close')?.addEventListener('click', hideCertificateModal);
-      certModal.querySelector('.modal-overlay')?.addEventListener('click', hideCertificateModal);
-      certModal.querySelector('.btn-download-cert')?.addEventListener('click', downloadCertificate);
-      certModal.querySelector('.btn-print-cert')?.addEventListener('click', printCertificate);
-      certModal.querySelector('.btn-share-linkedin')?.addEventListener('click', shareOnLinkedIn);
-    }
-
-    if (certListModal) {
-      certListModal.querySelector('.modal-close')?.addEventListener('click', hideCertificateListModal);
-      certListModal.querySelector('.modal-overlay')?.addEventListener('click', hideCertificateListModal);
-    }
-  }
-
-  function initializeCertificateButtons() {
-    document.querySelectorAll('[data-sprint-key]').forEach(sprintElement => {
-      const requestBtn = sprintElement.querySelector('.btn-request-certificate');
-      if (requestBtn) {
-        requestBtn.addEventListener('click', () => {
-          const sprintKey = sprintElement.dataset.sprintKey;
-          requestCertificateForSprint(sprintKey);
-        });
-      }
-    });
-  }
-
-  async function requestCertificateForSprint(sprintKey) {
-    try {
-      const sprintElement = document.querySelector(`[data-sprint-key="${sprintKey}"]`);
-      const profile = buildCertificateProfile(sprintKey);
-      
-      const response = await requestCertificate(
-        sprintKey,
-        profile.formativeScore || 0,
-        profile.summativeScore || 0
-      );
-
-      if (response.status === 'AWARDED' || response.status === 'UPGRADED') {
-        displayCertificateInfo(response.certificateData || profile);
-        showCertificateModal();
-        showCertificateNotification('success', 'Certificate Earned!', 'Congratulations on earning your certificate!');
-      } else if (response.status === 'INCOMPLETE') {
-        showCertificateNotification('warning', 'Not Ready Yet', 'Please complete all assignments first.');
-      } else if (response.status === 'NOT_QUALIFIED') {
-        showCertificateNotification('warning', 'Score Below Threshold', 'You need a higher score to earn this certificate.');
-      } else if (response.status === 'ALREADY_EARNED') {
-        displayCertificateInfo(response.certificateData || profile);
-        showCertificateModal();
-        showCertificateNotification('info', 'Already Earned', 'You have already earned this certificate.');
-      } else {
-        showCertificateNotification('error', 'Error', response.message || 'Failed to request certificate.');
-      }
-    } catch (error) {
-      console.error('Error requesting certificate:', error);
-      showCertificateNotification('error', 'Error', 'An error occurred while requesting the certificate.');
-    }
   }
 
   /**
@@ -1111,48 +1187,49 @@ layout: post
    * PAGE INITIALIZATION
    * ============================================
    */
-  function initializeSprintPage() {
-    try {
-      // Initialize all systems in correct order
-      initializeSkillLibrary();
-      initializeProgressBars();
-      initMobileEnhancements();
-
-      // Attach all event listeners
-      attachCompletionToggleListeners();
-      attachPriorityListeners();
-      attachFilterListeners();
-      attachSprintToggleListeners();
-
-      // Initialize modals and help
-      initializeHelpButtons();
-      initializeProgressionModal();
-      initializeCertificateModals();
-      initializeCertificateButtons();
-
-      // Setup cross-tab sync
-      setupSyncListeners();
-
-      // Render goal previews
-      renderWeekGoalPreviews();
-
-      // Initial UI update
-      updateProgressBars();
-      applySprintFilters();
-
-      console.log('Sprint page initialized successfully');
-    } catch (error) {
-      console.error('Error initializing sprint page:', error);
-    }
-  }
-
-  /**
-   * ============================================
-   * STARTUP: DOMContentLoaded listener
-   * ============================================
-   */
   document.addEventListener('DOMContentLoaded', () => {
-    initializeSprintPage();
+    // Data
+    initializeSkillLibrary();
+
+    // UI state
+    initializeProgressBars();
+    initializeCompletion();
+
+    // Event listeners
+    attachCompletionToggleListeners();
+    attachPriorityListeners();
+    attachFilterListeners();
+    attachSprintToggleListeners();
+
+    // Modal wiring
+    wireModalCloseButtons();
+    wireViewCertificateButton();
+
+    // Help buttons (data-help-url driven, for any non-inline callers)
+    document.querySelectorAll('[data-help-url]').forEach(button => {
+      button.addEventListener('click', () => {
+        const helpUrl = button.dataset.helpUrl;
+        const sprintKey = button.dataset.sprint || 
+          button.closest('[data-sprint]')?.dataset.sprint;
+        openHelpModal(sprintKey, helpUrl);
+      });
+    });
+
+    // Cross-tab sync
+    setupSyncListeners();
+
+    // Rendering
+    renderWeekGoalPreviews();
+
+    // Mobile
+    initMobileEnhancements();
+
+    // Calendar (defined in calendar.html include)
+    if (typeof initializeSprintDates === 'function') {
+      initializeSprintDates();
+    }
+
+    console.log('Sprint page initialized successfully');
   });
 
 </script>
