@@ -14,15 +14,14 @@ sticky_rank: 1
 canonical_id: tool-setup
 ---
 
-<h2> Track, Communicate, Share </h2>
+<h2> Tools and Equipment Setup </h2>
 
-Development is about "failing fast".
+**CLICK THE IMAGES TO CONTINUE TO THE SPECIFIC SECTIONS**
 
 <div class="my-4">
  <ul class="list-disc list-inside space-y-1">
-  <li>Use Microblog on this page to get community help on tools.</li>
-  <li>Tracking progress is essential, start an Issue!</li>
-  <li>Skipping steps will NOT work!</li>
+  <li>Tracking your progress and documenting your steps is important for learning and for debugging if something goes wrong.</li>
+  <li>In this case, we track our progress with Github issues. If you don't what issues are, <a target="_blank" href="https://docs.github.com/en/issues/tracking-your-work-with-issues/learning-about-issues/about-issues">learn here</a>.</li>
  </ul>
 </div>
 
@@ -30,7 +29,3 @@ Development is about "failing fast".
 <h2> Setup Modules </h2>
 
 {%- include tailwind/infograph.html -%}
-
-<h2> Track Progress </h2>
-
-{%- include tailwind/questions.html -%}
