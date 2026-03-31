@@ -1,59 +1,65 @@
 {% assign data = site.data.acs-cancer-infograph %}
 
 <style>
-.acs-feature-btns {
-  display: flex;
-  flex-wrap: wrap;
+.acs-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  justify-content: center;
   margin: 1.5rem 0 2rem 0;
 }
-.acs-feature-btns a {
+
+.acs-feature-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: left;
+}
+
+.acs-feature-title {
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.acs-feature-desc {
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.acs-feature-btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0.85rem 2rem !important;
+  padding: 0.65rem 1rem !important;
   background: #1a73e8 !important;
   border: none !important;
-  border-radius: 12px !important;
+  border-radius: 10px !important;
   color: #ffffff !important;
   font-weight: 700 !important;
-  font-size: 1rem !important;
+  font-size: 0.9rem !important;
   text-decoration: none !important;
   cursor: pointer !important;
   transition: background 0.2s ease, transform 0.2s ease !important;
-  min-width: 220px;
 }
-.acs-feature-btns a:hover {
+
+.acs-feature-btn:hover {
   background: #1558b0 !important;
   transform: translateY(-2px) !important;
   color: #ffffff !important;
   text-decoration: none !important;
 }
-.wp-infograph .wp-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0.75rem 1.5rem !important;
-  margin-top: 1rem !important;
-  background: linear-gradient(135deg, #e8614a, #5dcfcf) !important;
-  border: none !important;
-  border-radius: 999px !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  font-size: 1rem !important;
-  text-decoration: none !important;
-  text-align: center !important;
-  cursor: pointer !important;
-  transition: opacity 0.2s ease, transform 0.2s ease !important;
-}
-.wp-infograph .wp-btn:hover {
-  opacity: 0.85 !important;
-  transform: translateY(-2px) !important;
-  color: #ffffff !important;
-  text-decoration: none !important;
+
+@media (max-width: 1024px) {
+  .acs-feature-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
+
 
 <div class="wp-infograph">
  <!-- Header Section -->
@@ -61,31 +67,34 @@
    <div class="wp-badge">Design-Based Research Capstone</div>
    <h1 class="wp-title">{{ data.Title }}</h1>
    <p class="wp-description">{{ data.Description }}</p>
-
-   <!-- Feature Buttons -->
-   <div class="acs-feature-btns">
-     <a href="https://acs.opencodingsociety.com/" target="_blank" rel="noopener noreferrer">🗺️ ACS Cancer Body Map</a>
-     <a href="https://acs.opencodingsociety.com/cancerrisk" target="_blank" rel="noopener noreferrer">🧮 Cancer Risk Calculator</a>
-     <a href="https://acs.opencodingsociety.com/cyclegame/" target="_blank" rel="noopener noreferrer">🔬 Cell Cycle Game</a>
+   <div class="acs-feature-grid">
+     <div class="acs-feature-card">
+       <h3 class="acs-feature-title">Cell Cycle &amp; Cancer Lab</h3>
+       <p class="acs-feature-desc">An interactive simulation that teaches how the cell cycle works and breaks down in cancer with phase checkpoints, gene toggles, and live mutation tracking.</p>
+       <a href="https://acs.opencodingsociety.com/cyclegame/" target="_blank" rel="noopener noreferrer" class="acs-feature-btn">Open Cell Cycle Lab</a>
+     </div>
+     <div class="acs-feature-card">
+       <h3 class="acs-feature-title">ML Cancer Risk Calculator</h3>
+       <p class="acs-feature-desc">Enter age, lifestyle, and medical history to receive a personalized risk score with relative risk, lifetime estimates, key factors, and AI follow-up support.</p>
+       <a href="https://acs.opencodingsociety.com/cancerrisk" target="_blank" rel="noopener noreferrer" class="acs-feature-btn">Open Risk Calculator</a>
+     </div>
+     <div class="acs-feature-card">
+       <h3 class="acs-feature-title">ACS Cancer Body Map Chat</h3>
+       <p class="acs-feature-desc">Explore an interactive body map that connects cancer types to anatomical regions with symptoms, risk factors, resources, and plain-English AI assistance.</p>
+       <a href="https://acs.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" class="acs-feature-btn">Open Body Map Chat</a>
+     </div>
    </div>
  </div>
 
 
  <!-- Project Cards -->
-{% for topic in data.Topics %}
-{% assign topic_href = topic.link %}
-{% assign is_external = false %}
-{% unless topic.link contains '://' %}
-  {% assign topic_href = site.baseurl | append: topic.link %}
-{% else %}
-  {% assign is_external = true %}
-{% endunless %}
+ {% for topic in data.Topics %}
  <div class="wp-card">
    <div class="wp-card-grid">
     
      <!-- Left: Image & Status -->
      <div class="wp-visual">
-      <a href="{{ topic_href }}" class="wp-image-link"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>
+       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
          <div class="wp-overlay">
            <span>View Project</span>
@@ -103,7 +112,6 @@
      <div class="wp-content">
        <h2 class="wp-project-title">{{ topic.title }}</h2>
        <p class="wp-subtitle">{{ topic.subtitle }}</p>
-       <a href="{{ topic_href }}" class="wp-btn"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>Open Feature</a>
       
        <div class="wp-keypoints">
          {% for point in topic.keyPoints %}
@@ -136,7 +144,7 @@
        </div>
 
 
-      <a href="{{ topic_href }}" class="wp-btn"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>Learn More</a>
+       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
      </div>
 
 
