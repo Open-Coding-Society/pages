@@ -82,7 +82,7 @@
  * this.gameEnv.stats.coinsCollected++;
  */
 
-import { javaURI, fetchOptions } from '/assets/js/api/config.js';
+import { javaURI, fetchOptions } from '../../api/config.js';
 
 export default class GameEnvScore {
     constructor(gameEnv) {
@@ -137,53 +137,18 @@ export default class GameEnvScore {
      * Create the score counter UI element
      */
     _createScoreCounter() {
-        // Clean up any existing score counters (from previous instances)
+        // Remove any legacy fixed score counter overlays from previous versions
         const existingCounters = document.querySelectorAll('.pause-score-counter');
         existingCounters.forEach(counter => {
             if (counter.parentNode) {
                 counter.parentNode.removeChild(counter);
             }
         });
-        
-        const parent = this.gameEnv.gameContainer || document.getElementById('gameContainer') || document.body;
 
-        const scoreCounter = document.createElement('div');
-        scoreCounter.className = 'pause-score-counter';
-        scoreCounter.style.position = 'fixed';
-        scoreCounter.style.top = '80px';
-        scoreCounter.style.left = '10px';
-        scoreCounter.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        scoreCounter.style.color = '#fff';
-        scoreCounter.style.padding = '10px 15px';
-        scoreCounter.style.borderRadius = '5px';
-        scoreCounter.style.fontSize = '16px';
-        scoreCounter.style.fontWeight = 'bold';
-        scoreCounter.style.zIndex = '9998';
-        scoreCounter.style.minWidth = '150px';
-        scoreCounter.style.textAlign = 'center';
-        scoreCounter.style.display = 'none';
-        
-        const scoreLabel = document.createElement('div');
-        scoreLabel.style.fontSize = '12px';
-        scoreLabel.style.color = '#aaa';
-        scoreLabel.style.marginBottom = '5px';
-        const labelText = this._getCounterLabel();
-        scoreLabel.innerText = labelText;
-        
-        const scoreValue = document.createElement('div');
-        scoreValue.className = 'pause-score-value';
-        scoreValue.style.fontSize = '24px';
-        scoreValue.innerText = '0';
-        
-        scoreCounter.appendChild(scoreLabel);
-        scoreCounter.appendChild(scoreValue);
-        parent.appendChild(scoreCounter);
-        
-        this._scoreValue = scoreValue;
-        this._scoreLabel = scoreLabel;
-        this._scoreCounter = scoreCounter;
-        
-        console.log(`${this.classId}: Score counter created and appended to`, parent.tagName || parent.id || 'unknown parent');
+        this._scoreCounter = null;
+        this._scoreValue = null;
+        this._scoreLabel = null;
+        this._currentValue = 0;
     }
 
     /**
@@ -215,13 +180,15 @@ export default class GameEnvScore {
      * Toggle visibility of the score counter
      */
     toggleScoreDisplay() {
-        if (!this._scoreCounter) {
-            console.error(`${this.classId}:`, this.ERROR_HANDLERS.SCORE_COUNTER_NOT_FOUND.message);
-            return;
+        this.isVisible = true;
+        const leaderboardScore = document.getElementById('leaderboard-current-score');
+        if (leaderboardScore) {
+            const labelText = this._getCounterLabel();
+            leaderboardScore.style.display = 'inline';
+            leaderboardScore.textContent = `${labelText}: ${Number(this._currentValue || 0).toLocaleString()}`;
         }
-        this.isVisible = !this.isVisible;
-        this._scoreCounter.style.display = this.isVisible ? 'block' : 'none';
-        console.log(`${this.classId}: Score counter toggled to`, this.isVisible ? 'visible' : 'hidden');
+
+        console.log(`${this.classId}: Leaderboard score text synced with leaderboard visibility`);
     }
 
     /**
@@ -235,8 +202,13 @@ export default class GameEnvScore {
      * Update the score counter display
      */
     updateScoreDisplay(value) {
-        if (this._scoreValue) {
-            this._scoreValue.innerText = String(value || 0);
+        this._currentValue = Number(value || 0);
+
+        const leaderboardScore = document.getElementById('leaderboard-current-score');
+        if (leaderboardScore) {
+            const labelText = this._getCounterLabel();
+            leaderboardScore.style.display = 'inline';
+            leaderboardScore.textContent = `${labelText}: ${this._currentValue.toLocaleString()}`;
         }
     }
 
@@ -397,7 +369,7 @@ export default class GameEnvScore {
      * Uses API chaining pattern for clean sequential operations
      */
     saveScore(buttonEl) {
-        if (!buttonEl) return;
+        if (!buttonEl) return Promise.reject(new Error('No button element provided'));
         buttonEl.disabled = true;
         const prevText = buttonEl.innerText;
         buttonEl.innerText = 'Saving...';
@@ -406,27 +378,29 @@ export default class GameEnvScore {
         const currentScore = this.gameEnv.stats[cv] || 0;
         console.log(`${this.classId}: ${cv} = ${currentScore}`, this.gameEnv.stats);
 
-        // Attempt server save using API chaining pattern
-        if (javaURI) {
-            this._saveStatsToServer()
-                .then(resp => {
-                    console.log(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_SUCCESS.message, resp);
-                    // alert(this.ERROR_HANDLERS.SAVE_SUCCESS.userMessage);
-                })
-                .catch(e => {
-                    console.error(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_FAILED.message, e);
-                    // Error messages are already set in _saveStatsToServer()
-                    alert(e.message || this.ERROR_HANDLERS.DEFAULT.userMessage);
-                })
-                .finally(() => {
-                    buttonEl.disabled = false;
-                    buttonEl.innerText = prevText;
-                });
-        } else {
+        // If backend not configured, return rejected promise
+        if (!javaURI) {
             console.warn(`${this.classId}:`, this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.message);
             alert(this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.userMessage);
             buttonEl.disabled = false;
             buttonEl.innerText = prevText;
+            return Promise.reject(new Error(this.ERROR_HANDLERS.BACKEND_NOT_CONFIGURED.message));
         }
+
+        // Return the promise chain so it can be used by callers
+        return this._saveStatsToServer()
+            .then(resp => {
+                console.log(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_SUCCESS.message, resp);
+                return resp; // Return the response for chaining
+            })
+            .catch(e => {
+                console.error(`${this.classId}:`, this.ERROR_HANDLERS.SAVE_FAILED.message, e);
+                alert(e.message || this.ERROR_HANDLERS.DEFAULT.userMessage);
+                throw e; // Re-throw so callers can handle it
+            })
+            .finally(() => {
+                buttonEl.disabled = false;
+                buttonEl.innerText = prevText;
+            });
     }
 }

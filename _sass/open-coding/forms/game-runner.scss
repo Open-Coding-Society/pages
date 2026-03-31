@@ -12,8 +12,6 @@
   // Game output area - contained canvas for educational use
   .game-output {
     // Layout & Dimensions
-    min-height: 400px;
-    max-height: 600px;
     overflow: hidden;
     position: relative;
     
@@ -37,8 +35,6 @@
       // Only style the main canvas, not character canvases
       > canvas#gameCanvas {
         display: block;
-        width: 100% !important;
-        height: 580px !important;
         border: none;
         background: transparent;
       }

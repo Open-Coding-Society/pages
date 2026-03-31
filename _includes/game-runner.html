@@ -13,7 +13,7 @@
       <button class="stopBtn" title="Stop Game">■ Stop</button>
       <select class="engineVersionSelect" title="Select Game Engine Version">
         <option value="GameEnginev1">Engine v1</option>
-        <option value="GameEnginev1.1">Engine v1.1</option>
+        <option value="GameEnginev1.1" selected>Engine v1.1</option>
       </select>
       <select class="levelSelect" title="Select Level">
         <option value="">Select Level...</option>
@@ -36,7 +36,7 @@
     <button class="stopBtn" title="Stop Game">■ Stop</button>
     <select class="engineVersionSelect" title="Select Game Engine Version">
       <option value="GameEnginev1">Engine v1</option>
-      <option value="GameEnginev1.1">Engine v1.1</option>
+      <option value="GameEnginev1.1" selected>Engine v1.1</option>
     </select>
     <select class="levelSelect" title="Select Level">
       <option value="">Select Level...</option>
@@ -46,7 +46,12 @@
 
   <div class="output-container">
     <div class="control-panel">
-      <span class="game-status">Game Status: <span class="status-text">Not Started</span></span>
+      <span class="game-status">Game Status: 
+        <span class="status-text">Not Started</span> 
+      </span>
+      <span class="game-status"> 
+        <span id="{{ include.runner_id }}-metric"></span>
+      </span>
     </div>
     <div class="game-output" id="game-output-{{ include.runner_id }}">
       <div id="game-container-{{ include.runner_id }}" class="gameContainer">

@@ -534,6 +534,10 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     options = runner_data.get('options', {})
                     if options.get('hide_edit'):
                         result.append('   hide_edit="true"')
+                    if options.get('width'):
+                        result.append(f'   width="{options["width"]}"')
+                    if options.get('height'):
+                        result.append(f'   height="{options["height"]}"')   
                     
                     result.append('%}')                
                     result.append('')
