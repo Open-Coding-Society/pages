@@ -17,13 +17,14 @@
 <div class="sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
   <div class="sprint-header" style="display: flex; flex-direction: column; gap: 12px;">
     <div class="sprint-controls" style="display: flex; gap: 8px; align-items: center; justify-content: space-between; width: 100%;">
+      <!-- Sprint Label and Weeks Toggle on the left -->
       <div style="display: flex; gap: 8px; align-items: center;">
-        <!-- Sprint Label and Weeks Toggle on the left -->
         <p style="margin: 0;">{{ unitKey }}</p>
         <button class="sprint-toggle-btn" type="button" aria-expanded="false">
           <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
         </button>
       </div>
+      <!-- Divider between left and right controls -->
       <div style="display: flex; gap: 8px; align-items: center;">
         <!-- Sprint Calendar Sync -->
         <div class="sprint-date-control">
