@@ -1,6 +1,7 @@
 ---
 toc: True
 layout: post
+codemirror: true
 data: flask
 title: Flask and Backend UIs
 description: A Holistic Overview of Flask and Backend Operations
@@ -181,352 +182,357 @@ Try adding your own API route — maybe for notes, assignments, or anything else
 
 ---
 
-## Flask Survival Sprint
+## Flask Knowledge Check (UI Runner)
 
-Quick challenge to prove you understand Flask backend basics:
-
-R2D2 just intercepted corrupted API traffic from the backend control room. The system is seconds away from failing route checks.
-Only one person can stabilize it in time: you.
-Rush to R2D2, answer the Flask quiz correctly, and restore the server before the timer expires.
-
-- Move with WASD or arrow keys.
-- Walk to the Quiz Gatekeeper and press e.
-- Answer Flask/API questions fast.
-- Wrong answer or timeout ends the run.
-
-{% capture flask_survival_challenge %}
-Flask Survival Sprint
-
-Reach the gatekeeper and press e to start.
-You have 35 seconds total to clear the quiz.
-Any wrong answer or timeout = eliminated.
+{% capture challenge_flask_ui %}
+Build a Flask Incident Simulator in outputElement.
+1) Start with a mission briefing.
+2) Respond to backend incidents that keep growing.
+3) Track timer, system integrity, threat level, and streak.
+4) Each correct action adds a brand-new incident.
+5) Wrong actions hurt integrity and can trigger failure.
 {% endcapture %}
 
-{% capture flask_survival_code %}
-import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+{% capture code_flask_ui %}
+outputElement.innerHTML = '';
 
-class FlaskSurvivalSprint {
-   constructor(gameEnv) {
-      const width = gameEnv.innerWidth;
-      const height = gameEnv.innerHeight;
-      const path = gameEnv.path;
+const seedIncidents = [
+  {
+    q: 'Incident 1: New users cannot register. Which endpoint signature should exist?',
+    options: ['@app.route("/register", methods=["POST"])', '@app.register("/register")', '@route.post("/register")'],
+    answer: 0,
+    success: 'Registration route restored.',
+    fail: 'Clients still get 404 on register.'
+  },
+  {
+    q: 'Incident 2: API key leaked in logs. Best immediate fix?',
+    options: ['Move secrets to environment variables', 'Commit a new key directly to code', 'Print all headers for debugging'],
+    answer: 0,
+    success: 'Secrets moved out of source.',
+    fail: 'Sensitive data exposure risk increased.'
+  },
+  {
+    q: 'Incident 3: POST /user creates records but returns 200. Better status code?',
+    options: ['404', '201', '500'],
+    answer: 1,
+    success: 'Client contract now matches REST conventions.',
+    fail: 'Clients cannot reliably detect creation events.'
+  },
+  {
+    q: 'Incident 4: Handler crashes on JSON parsing. Which Flask attribute helps?',
+    options: ['request.payload', 'request.json', 'flask.requestBody'],
+    answer: 1,
+    success: 'Request body parsing stabilized.',
+    fail: 'Malformed request handling remains broken.'
+  },
+  {
+    q: 'Incident 5: Protected route is open to everyone. What should you add?',
+    options: ['Authentication/authorization checks', 'More print statements', 'A random sleep timer'],
+    answer: 0,
+    success: 'Access controls enforced.',
+    fail: 'Unauthorized access continues.'
+  }
+];
 
-      const sprint = {
-         started: false,
-         completed: false,
-         startAt: 0,
-         timeLimitMs: 35000
-      };
-      let storySeen = false;
+const bonusIncidentTemplates = [
+  {
+    q: 'Incident X: Endpoint allows any origin. Best mitigation?',
+    options: ['Configure CORS safely for trusted origins', 'Disable browser security', 'Expose wildcard plus credentials everywhere'],
+    answer: 0,
+    success: 'Cross-origin policy tightened.',
+    fail: 'Cross-origin attack surface widened.'
+  },
+  {
+    q: 'Incident X: Login endpoint is brute-forced. Best immediate defense?',
+    options: ['Rate limit and lockout strategy', 'Return stack traces for each attempt', 'Allow unlimited retries'],
+    answer: 0,
+    success: 'Abuse rate dropped under control.',
+    fail: 'Credential stuffing pressure increased.'
+  },
+  {
+    q: 'Incident X: Health checks pass but DB is timing out. Better response?',
+    options: ['Add retries with timeout and fallback handling', 'Ignore all DB errors', 'Restart client each query'],
+    answer: 0,
+    success: 'Database recovery behavior improved.',
+    fail: 'Timeout storms continue.'
+  },
+  {
+    q: 'Incident X: Clients send invalid payloads repeatedly. Best API hardening?',
+    options: ['Validate schema and return clear 4xx errors', 'Auto-correct unknown fields silently', 'Accept all payloads and hope downstream handles it'],
+    answer: 0,
+    success: 'Input validation now blocks bad payloads.',
+    fail: 'Invalid data keeps polluting requests.'
+  }
+];
 
-      const rounds = [
-         {
-                question: '1) In Flask, which decorator defines a route?',
-                options: ['A) @app.route()', 'B) @flask.path()', 'C) @request.route()', 'D) @endpoint()'],
-            answer: 'A',
-            reason: 'Flask endpoints are defined with @app.route().' 
-         },
-         {
-                question: '2) Which method is typically used to create a new resource?',
-                options: ['A) GET', 'B) POST', 'C) DELETE', 'D) PATCH'],
-            answer: 'B',
-            reason: 'POST is used to create server resources.'
-         },
-         {
-                question: '3) A successful creation often returns which status code?',
-                options: ['A) 200', 'B) 204', 'C) 201', 'D) 404'],
-            answer: 'C',
-            reason: '201 Created is the common response for successful creation.'
-         },
-         {
-                question: '4) How do you usually access JSON body data in Flask?',
-                options: ['A) request.body', 'B) request.payload', 'C) request.json', 'D) flask.json()'],
-            answer: 'C',
-            reason: 'request.json is commonly used to parse JSON payloads.'
-         },
-         {
-                question: '5) Which status code usually means endpoint/resource not found?',
-                options: ['A) 401', 'B) 403', 'C) 404', 'D) 500'],
-            answer: 'C',
-            reason: '404 Not Found means the route or resource does not exist.'
-         }
-      ];
+let incidents = [];
 
-         function ensureQuizStyles() {
-            if (document.getElementById('flask-sprint-quiz-style')) return;
-            const style = document.createElement('style');
-            style.id = 'flask-sprint-quiz-style';
-            style.textContent = [
-               '.flask-quiz-overlay { position: absolute; inset: 0; background: rgba(8,12,22,0.8); z-index: 30; display: flex; align-items: center; justify-content: center; padding: 16px; }',
-               '.flask-quiz-card { width: min(560px, 96%); background: #0f172a; border: 2px solid #60a5fa; border-radius: 12px; color: #f8fafc; padding: 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); }',
-               '.flask-quiz-card h4 { margin: 0 0 6px 0; color: #93c5fd; }',
-               '.flask-quiz-time { margin: 0 0 10px 0; color: #fde68a; font-weight: 700; }',
-               '.flask-quiz-q { margin: 0 0 10px 0; font-size: 1rem; }',
-               '.flask-quiz-options { display: grid; gap: 8px; }',
-               '.flask-quiz-option { border: 1px solid #334155; border-radius: 8px; background: #1e293b; color: #f8fafc; padding: 10px; text-align: left; cursor: pointer; }',
-               '.flask-quiz-option:hover { background: #334155; border-color: #60a5fa; }',
-               '.flask-quiz-note { margin-top: 12px; color: #cbd5e1; font-size: 0.9rem; }',
-               '.flask-quiz-action { margin-top: 12px; border: none; border-radius: 8px; background: #2563eb; color: #fff; padding: 9px 12px; cursor: pointer; font-weight: 700; }',
-               '.flask-quiz-action:hover { background: #1d4ed8; }',
-               '.flask-fail-flash { position: absolute; inset: 0; z-index: 80; pointer-events: none; background: #fff; animation: flaskFailFlash 520ms ease-out forwards; }',
-               '@keyframes flaskFailFlash { 0% { opacity: 0; filter: brightness(1); } 20% { opacity: 1; filter: brightness(4); } 100% { opacity: 0; filter: brightness(1); } }'
-            ].join('');
-            document.head.appendChild(style);
-         }
+const totalMs = 45000;
+let index = 0;
+let endTime = 0;
+let timer = null;
+let integrity = 100;
+let threat = 20;
+let score = 0;
+let streak = 0;
+let resolved = 0;
 
-         function getQuizHost() {
-            const output = document.querySelector('#game-runner-flask-survival-sprint .game-output');
-            if (output) {
-               output.style.position = 'relative';
-               return output;
-            }
-            return document.body;
-         }
+const panel = document.createElement('div');
+panel.style.maxWidth = '760px';
+panel.style.margin = '0 auto';
+panel.style.padding = '1rem';
+panel.style.border = '1px solid #475569';
+panel.style.borderRadius = '10px';
+panel.style.background = '#0f172a';
+panel.style.color = '#e2e8f0';
 
-         function showRoundModal(round, remainingSec) {
-            ensureQuizStyles();
-            return new Promise((resolve) => {
-               const host = getQuizHost();
-               const overlay = document.createElement('div');
-               overlay.className = 'flask-quiz-overlay';
-               let settled = false;
+const title = document.createElement('h4');
+title.textContent = 'Flask Incident Simulator';
+panel.appendChild(title);
 
-               const card = document.createElement('div');
-               card.className = 'flask-quiz-card';
-               card.innerHTML = '<h4>Flask Survival Sprint</h4>' +
-                  '<p class="flask-quiz-time">Time left: ' + remainingSec + 's</p>' +
-                  '<p class="flask-quiz-q">' + round.question + '</p>';
-               const timeLabel = card.querySelector('.flask-quiz-time');
+const intro = document.createElement('p');
+intro.textContent = 'Backend alerts are firing. Resolve incidents before threat reaches critical.';
+panel.appendChild(intro);
 
-               const timer = setInterval(() => {
-                  remainingSec -= 1;
-                  if (timeLabel) timeLabel.textContent = 'Time left: ' + Math.max(remainingSec, 0) + 's';
-                  if (remainingSec <= 0 && !settled) {
-                     settled = true;
-                     clearInterval(timer);
-                     overlay.remove();
-                     resolve(null);
-                  }
-               }, 1000);
+const startBtn = document.createElement('button');
+startBtn.textContent = 'Begin Incident Run';
+startBtn.style.padding = '0.5rem 0.75rem';
+startBtn.style.borderRadius = '8px';
+startBtn.style.border = '1px solid #2563eb';
+startBtn.style.background = '#2563eb';
+startBtn.style.color = '#f8fafc';
+startBtn.style.cursor = 'pointer';
+panel.appendChild(startBtn);
 
-               const options = document.createElement('div');
-               options.className = 'flask-quiz-options';
+const questionEl = document.createElement('p');
+questionEl.style.marginTop = '0.9rem';
+questionEl.style.fontWeight = '700';
 
-               ['A', 'B', 'C', 'D'].forEach((letter, idx) => {
-                  const button = document.createElement('button');
-                  button.className = 'flask-quiz-option';
-                  button.textContent = round.options[idx];
-                  button.addEventListener('click', () => {
-                     if (settled) return;
-                     settled = true;
-                     clearInterval(timer);
-                     overlay.remove();
-                     resolve(letter);
-                  });
-                  options.appendChild(button);
-               });
+const optionsWrap = document.createElement('div');
 
-               const note = document.createElement('p');
-               note.className = 'flask-quiz-note';
-               note.textContent = 'Click an answer. Close or refresh counts as a failed run.';
+const dashboard = document.createElement('div');
+dashboard.style.display = 'grid';
+dashboard.style.gridTemplateColumns = 'repeat(2, minmax(140px, 1fr))';
+dashboard.style.gap = '0.45rem';
+dashboard.style.marginTop = '0.7rem';
 
-               card.appendChild(options);
-               card.appendChild(note);
-               overlay.appendChild(card);
-               host.appendChild(overlay);
-            });
-         }
+const timerEl = document.createElement('p');
+const integrityEl = document.createElement('p');
+const threatEl = document.createElement('p');
+const streakEl = document.createElement('p');
 
-         function showMessageModal(title, message, onClose) {
-            ensureQuizStyles();
-            const host = getQuizHost();
-            const overlay = document.createElement('div');
-            overlay.className = 'flask-quiz-overlay';
-            const card = document.createElement('div');
-            card.className = 'flask-quiz-card';
-            card.innerHTML = '<h4>' + title + '</h4><p class="flask-quiz-q">' + message + '</p>';
-            const btn = document.createElement('button');
-            btn.className = 'flask-quiz-action';
-            btn.textContent = 'Continue';
-            btn.addEventListener('click', () => {
-               overlay.remove();
-               if (onClose) onClose();
-            });
-            card.appendChild(btn);
-            overlay.appendChild(card);
-            host.appendChild(overlay);
-         }
+[timerEl, integrityEl, threatEl, streakEl].forEach((el) => {
+  el.style.margin = '0';
+  el.style.padding = '0.35rem 0.45rem';
+  el.style.border = '1px solid #334155';
+  el.style.borderRadius = '8px';
+  el.style.background = '#111827';
+});
 
-         function showStoryModal(onStart) {
-            ensureQuizStyles();
-            const host = getQuizHost();
-            const overlay = document.createElement('div');
-            overlay.className = 'flask-quiz-overlay';
-            const card = document.createElement('div');
-            card.className = 'flask-quiz-card';
-            card.innerHTML =
-               '<h4>Mission Briefing</h4>' +
-               '<p class="flask-quiz-q">R2D2 intercepted corrupted backend traffic. Flask route checks are failing and the API gateway is collapsing.</p>' +
-               '<p class="flask-quiz-q">You have one shot to stabilize the system by clearing this sprint quiz before lockout.</p>';
-            const btn = document.createElement('button');
-            btn.className = 'flask-quiz-action';
-            btn.textContent = 'Start Quiz';
-            btn.addEventListener('click', () => {
-               overlay.remove();
-               if (onStart) onStart();
-            });
-            card.appendChild(btn);
-            overlay.appendChild(card);
-            host.appendChild(overlay);
-         }
+dashboard.appendChild(timerEl);
+dashboard.appendChild(integrityEl);
+dashboard.appendChild(threatEl);
+dashboard.appendChild(streakEl);
 
-      function stopActiveGame() {
-         const stopBtn = document.querySelector('.game-runner-container .stopBtn:not([disabled])');
-         if (stopBtn) stopBtn.click();
-      }
+const meterWrap = document.createElement('div');
+meterWrap.style.marginTop = '0.7rem';
 
-      function eliminate(message) {
-         showMessageModal('ELIMINATED', message + ' Try again.', stopActiveGame);
-      }
+const meterLabel = document.createElement('p');
+meterLabel.textContent = 'Threat Meter';
+meterLabel.style.margin = '0 0 0.25rem 0';
+meterWrap.appendChild(meterLabel);
 
-      function flashFailAndStop() {
-         const host = getQuizHost();
-         const flash = document.createElement('div');
-         flash.className = 'flask-fail-flash';
-         host.appendChild(flash);
-         setTimeout(() => {
-            if (flash.parentNode) flash.remove();
-            stopActiveGame();
-         }, 540);
-      }
+const meterTrack = document.createElement('div');
+meterTrack.style.height = '10px';
+meterTrack.style.borderRadius = '999px';
+meterTrack.style.background = '#1f2937';
 
-      async function runSprintQuiz() {
-         if (!storySeen) {
-            showStoryModal(async () => {
-               storySeen = true;
-               await runSprintQuiz();
-            });
-            return;
-         }
+const meterBar = document.createElement('div');
+meterBar.style.height = '10px';
+meterBar.style.width = '0%';
+meterBar.style.borderRadius = '999px';
+meterBar.style.background = '#f59e0b';
+meterTrack.appendChild(meterBar);
+meterWrap.appendChild(meterTrack);
 
-         if (sprint.completed) {
-            showMessageModal('Already Cleared', 'You already survived this sprint.');
-            return;
-         }
+const logTitle = document.createElement('p');
+logTitle.textContent = 'Ops Log';
+logTitle.style.margin = '0.8rem 0 0.3rem 0';
+logTitle.style.fontWeight = '700';
 
-         if (!sprint.started) {
-            sprint.started = true;
-            sprint.startAt = Date.now();
-         }
+const logEl = document.createElement('div');
+logEl.style.padding = '0.5rem';
+logEl.style.border = '1px solid #334155';
+logEl.style.borderRadius = '8px';
+logEl.style.background = '#020617';
+logEl.style.fontFamily = 'monospace';
+logEl.style.fontSize = '0.9rem';
+logEl.style.maxHeight = '120px';
+logEl.style.overflowY = 'auto';
 
-         for (let i = 0; i < rounds.length; i++) {
-            const elapsed = Date.now() - sprint.startAt;
-            const remainingMs = sprint.timeLimitMs - elapsed;
-            if (remainingMs <= 0) {
-               eliminate('Time expired.');
-               return;
-            }
+const statusEl = document.createElement('p');
+statusEl.style.marginTop = '0.8rem';
+statusEl.style.fontWeight = '700';
 
-            const remainingSec = Math.ceil(remainingMs / 1000);
-            const round = rounds[i];
-            const input = await showRoundModal(round, remainingSec);
+panel.appendChild(dashboard);
+panel.appendChild(questionEl);
+panel.appendChild(optionsWrap);
+panel.appendChild(meterWrap);
+panel.appendChild(logTitle);
+panel.appendChild(logEl);
+panel.appendChild(statusEl);
 
-            if (input === null) {
-               eliminate('Time expired.');
-               return;
-            }
+outputElement.appendChild(panel);
 
-            if (Date.now() - sprint.startAt > sprint.timeLimitMs) {
-               eliminate('Too slow.');
-               return;
-            }
-
-            const answer = String(input || '').trim().toUpperCase();
-            if (answer !== round.answer) {
-               const metric = document.querySelector('[id$="-metric"]');
-               if (metric) metric.textContent = 'Eliminated on Q' + (i + 1);
-               flashFailAndStop();
-               return;
-            }
-         }
-
-         sprint.completed = true;
-         const metric = document.querySelector('[id$="-metric"]');
-         if (metric) metric.textContent = 'Flask Sprint Cleared';
-         showMessageModal('ACCESS GRANTED', 'You cleared the Flask Survival Sprint.');
-      }
-
-      const bgData = {
-         name: 'flask_sprint_bg',
-         greeting: 'Reach the gatekeeper and clear the Flask quiz.',
-         src: path + '/images/gamify/nightowl-background.png',
-         pixels: { height: 580, width: 1038 }
-      };
-
-      const playerData = {
-         id: 'Backend Runner',
-         greeting: 'I am ready to prove my Flask skills.',
-         src: path + '/images/gamify/chillguy.png',
-         SCALE_FACTOR: 5,
-         STEP_FACTOR: 1000,
-         ANIMATION_RATE: 50,
-         INIT_POSITION: { x: 40, y: height - (height / 5) },
-         pixels: { height: 384, width: 512 },
-         orientation: { rows: 3, columns: 4 },
-         down: { row: 0, start: 0, columns: 3 },
-         downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
-         downLeft: { row: 2, start: 0, columns: 3, rotate: -Math.PI / 16 },
-         left: { row: 2, start: 0, columns: 3 },
-         right: { row: 1, start: 0, columns: 3 },
-         up: { row: 3, start: 0, columns: 3 },
-         upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI / 16 },
-         upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
-         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-         keypress: { up: 87, left: 65, down: 83, right: 68 }
-      };
-
-      const gatekeeperData = {
-         id: 'Flask Gatekeeper',
-         greeting: 'Press e to begin your 35-second Flask sprint.',
-         src: path + '/images/gamify/r2_idle.png',
-         SCALE_FACTOR: 8,
-         ANIMATION_RATE: 100,
-         pixels: { width: 505, height: 223 },
-         INIT_POSITION: { x: width * 0.4, y: height * 0.72 },
-         orientation: { rows: 1, columns: 3 },
-         down: { row: 0, start: 0, columns: 3 },
-         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-         interact: function() { runSprintQuiz(); },
-         reaction: function() {
-            if (this.dialogueSystem) this.showReactionDialogue();
-         },
-         dialogues: [
-            'One sprint. No retries in this run.',
-            'Wrong answer or timeout eliminates you.',
-            'Press e when ready.'
-         ]
-      };
-
-      this.classes = [
-         { class: GameEnvBackground, data: bgData },
-         { class: Player, data: playerData },
-         { class: Npc, data: gatekeeperData }
-      ];
-   }
+function log(message) {
+  const row = document.createElement('div');
+  row.textContent = message;
+  logEl.prepend(row);
 }
 
-export const gameLevelClasses = [FlaskSurvivalSprint];
-export { GameControl };
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function updateHUD() {
+  const left = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+  timerEl.textContent = 'Time: ' + left + 's';
+  timerEl.style.color = left <= 10 ? '#fca5a5' : '#fde68a';
+  integrityEl.textContent = 'Integrity: ' + integrity;
+  threatEl.textContent = 'Threat: ' + threat;
+  streakEl.textContent = 'Streak: ' + streak + ' | Score: ' + score + ' | Cleared: ' + resolved;
+  meterBar.style.width = clamp(threat, 0, 100) + '%';
+  meterBar.style.background = threat >= 75 ? '#ef4444' : threat >= 45 ? '#f59e0b' : '#22c55e';
+}
+
+function cloneIncident(incident, n) {
+  return {
+    q: incident.q.replace('Incident X', 'Incident ' + n),
+    options: incident.options.slice(),
+    answer: incident.answer,
+    success: incident.success,
+    fail: incident.fail
+  };
+}
+
+function addBonusIncident() {
+  const template = bonusIncidentTemplates[Math.floor(Math.random() * bonusIncidentTemplates.length)];
+  incidents.push(cloneIncident(template, incidents.length + 1));
+}
+
+function finish(message, success) {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+  questionEl.textContent = '';
+  optionsWrap.innerHTML = '';
+  statusEl.textContent = message;
+  statusEl.style.color = success ? '#22c55e' : '#ef4444';
+  startBtn.textContent = 'Run Again';
+  startBtn.style.display = 'inline-block';
+  updateHUD();
+}
+
+function checkFailState() {
+  if (Date.now() >= endTime) {
+    finish('Shift complete: You held the system with score ' + score + ' after clearing ' + resolved + ' incidents.', true);
+    return true;
+  }
+  if (integrity <= 0) {
+    finish('Mission failed: System integrity collapsed.', false);
+    return true;
+  }
+  if (threat >= 100) {
+    finish('Mission failed: Threat reached critical level.', false);
+    return true;
+  }
+  return false;
+}
+
+function renderIncident() {
+  if (index >= incidents.length) addBonusIncident();
+  if (checkFailState()) {
+    return;
+  }
+
+  const current = incidents[index];
+  questionEl.textContent = current.q;
+  optionsWrap.innerHTML = '';
+
+  current.options.forEach((optionText, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = optionText;
+    btn.style.margin = '0.25rem 0.35rem 0.25rem 0';
+    btn.style.padding = '0.45rem 0.7rem';
+    btn.style.borderRadius = '8px';
+    btn.style.border = '1px solid #475569';
+    btn.style.background = '#1e293b';
+    btn.style.color = '#f8fafc';
+    btn.style.cursor = 'pointer';
+    btn.onclick = () => {
+      if (i !== current.answer) {
+        integrity = clamp(integrity - 25, 0, 100);
+        threat = clamp(threat + 30, 0, 100);
+        streak = 0;
+        score = Math.max(0, score - 5);
+        log('ALERT: ' + current.fail);
+        updateHUD();
+        if (checkFailState()) return;
+        index += 1;
+        renderIncident();
+        return;
+      }
+      resolved += 1;
+      addBonusIncident();
+      const timeBonus = streak >= 1 ? 3000 : 0;
+      streak += 1;
+      score += 20 + streak * 2;
+      threat = clamp(threat - 18, 0, 100);
+      integrity = clamp(integrity + 6, 0, 100);
+      if (timeBonus > 0) {
+        endTime += timeBonus;
+        log('BONUS: Combo streak added +3s response time.');
+      }
+      log('OK: ' + current.success);
+      updateHUD();
+      index += 1;
+      renderIncident();
+    };
+    optionsWrap.appendChild(btn);
+  });
+}
+
+function updateTimer() {
+  updateHUD();
+  checkFailState();
+}
+
+startBtn.onclick = () => {
+  index = 0;
+  incidents = seedIncidents.map((incident, i) => cloneIncident(incident, i + 1));
+  integrity = 100;
+  threat = 20;
+  score = 0;
+  streak = 0;
+  resolved = 0;
+  endTime = Date.now() + totalMs;
+  statusEl.textContent = '';
+  logEl.innerHTML = '';
+  log('SYS: Incident run started.');
+  startBtn.style.display = 'none';
+  updateHUD();
+  renderIncident();
+  timer = setInterval(updateTimer, 1000);
+};
 {% endcapture %}
 
-{% include game-runner.html
-    runner_id="flask-survival-sprint"
-    challenge=flask_survival_challenge
-    code=flask_survival_code
-    hide_edit="true"
+{% include ui-runner.html
+   runner_id="flask_ui_check"
+   challenge=challenge_flask_ui
+   code=code_flask_ui
+   height="320px"
+  output_height="420px"
 %}
 
 ---
