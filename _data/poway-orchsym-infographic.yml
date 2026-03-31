@@ -1,87 +1,91 @@
-# Poway Symphony Orchestra Capstone Infographic
-Badge: "Design-Based Research Capstone"
-Title: "Poway Symphony Orchestra - Expanding Community Through Music"
-Description: "A design-research capstone that transforms the digital presence of a community orchestra through a modern, accessible, and user-centered website experience."
+title: "Poway Symphony Orchestra - Expanding Community Through Music"
+badge: "Design-Based Research Capstone"
 
-Topics:
-  - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
-    image: "pso_logo.png"
-    link: "https://wi-fighters-csp.github.io/wi-pages/capstone/powayorchestra/"
-    alt: "Poway Symphony Orchestra website homepage redesign"
-    buttonLabel: "View Live Deployment"
+description: >
+  This project redesigns the orchestra’s website to make it easier to use,
+  more engaging, and more visually appealing. It focuses on helping users
+  quickly find information, explore musicians, and feel more connected to the orchestra.
 
-    keyPoints:
-      - "Fully deployed live website demonstrating a complete redesign (PRIMARY REQUIREMENT)"
-      - "Strong first impression through modern layout, visuals, and clear messaging"
-      - "Simplified navigation to help users quickly find concerts, tickets, and donation options"
-      - "User-centered design based on accessibility and usability research"
-      - "Responsive design that works seamlessly across phones, tablets, and desktops"
-      - "Improved engagement through visuals, featured musicians, and storytelling"
-      - "Clear call-to-actions that guide users to attend, support, and explore"
-      - "Professional digital presence that builds trust and credibility for the orchestra"
+project:
+  name: "Poway Symphony Orchestra - Connecting Community Through Live Music"
+  link: "https://wi-fighters-csp.github.io/wi-pages/capstone/powayorchestra/"
+  buttonLabel: "View Live Site"
+  alt: "Redesigned Poway Symphony Orchestra website"
 
-    subtitle: "Research, Design Iteration, and User Testing"
+  overview: >
+    We rebuilt the website with a cleaner layout, clearer navigation, and more
+    interactive features. The goal was to help users easily find concerts,
+    learn about musicians, and take action like attending or donating.
 
-    description: "The Poway Symphony Orchestra is a community-based ensemble dedicated to bringing live orchestral music to local audiences. This capstone project reimagines the orchestra’s website as a modern digital experience that is easy to navigate, visually engaging, and accessible to a wide range of users. The project focuses on solving real usability issues such as unclear navigation, lack of engagement, and limited accessibility. Through research, prototyping, and iterative design, the final product creates a more welcoming and intuitive experience that helps users discover concerts, connect with musicians, and support the organization. This project demonstrates how thoughtful web design can strengthen community connection and expand audience reach."
+  keyFeatures:
+    - "Musician cards that show each member’s name, instrument, and image"
+    - "Clickable instrument feature where users can hear what each instrument sounds like"
+    - "Simplified navigation so users can quickly find concerts, tickets, and donations"
+    - "Clear buttons like ‘Buy Tickets’ and ‘Donate’ to guide users"
+    - "Layout that adjusts to phones, tablets, and computers"
+    - "Better spacing and organization to make content easier to read"
+    - "Stronger visuals with images and highlighted sections"
 
-    wowFactors:
-      - "Transforms a basic informational site into an engaging digital experience"
-      - "Creates an emotional connection through storytelling and visuals"
-      - "Reduces friction in key actions like attending events and donating"
-      - "Balances professional design with accessibility for all age groups"
-      - "Shows how design directly impacts real-world community engagement"
+  interactiveElements:
+    - title: "Musician Profiles"
+      description: "Users can scroll through cards to explore orchestra members"
 
-    customerPitch:
-      - "For community members: easily discover concerts and feel connected to the orchestra"
-      - "For donors: simple and clear pathway to support the organization"
-      - "For musicians: stronger representation and visibility online"
-      - "For the organization: a professional platform that increases outreach and credibility"
+    - title: "Instrument Audio"
+      description: "Clicking an instrument plays a sound to make the site more interactive"
 
-    researchInsights:
-      - "Users struggled to find concert and event information quickly"
-      - "Older audiences needed simpler navigation and clearer layout"
-      - "Previous design lacked visual engagement and storytelling"
-      - "Users preferred clear buttons and guided actions over dense text"
+    - title: "Easy Navigation"
+      description: "Clear sections help users move through the site without confusion"
 
-    improvementsMade:
-      - "Reorganized navigation for faster access to key pages"
-      - "Added visual hierarchy to highlight important information"
-      - "Improved readability with spacing, contrast, and layout"
-      - "Integrated responsive design for mobile usability"
-      - "Introduced stronger call-to-action elements"
+  problemsSolved:
+    - "Users had trouble finding concert information → we simplified the menu"
+    - "The old site felt plain → we added visuals and interactive features"
+    - "Text was crowded → we improved spacing and layout"
+    - "Hard to use on phones → we made the site work on all screen sizes"
 
-    futurePlans:
-      - "Add real-time concert ticket integration"
-      - "Expand media section with videos and performance highlights"
-      - "Implement user analytics to track engagement"
-      - "Continue accessibility improvements based on user feedback"
-      - "Add interactive features such as event reminders or newsletters"
+  improvementsMade:
+    - "Organized content into clear sections"
+    - "Used cards to break information into smaller, easier parts"
+    - "Added interactive sound features"
+    - "Made text easier to read with better spacing"
 
-    tech:
-      - "HTML"
-      - "CSS"
-      - "JavaScript"
-      - "Responsive Web Design"
-      - "UX/UI Design"
-      - "WCAG Accessibility Standards"
-      - "Figma (Design + Prototyping)"
-      - "User Research and Testing"
-      - "Content Strategy"
-      - "Iteration and Feedback Cycles"
+  wowFactors:
+    - "Turns a basic website into an interactive experience"
+    - "Lets users hear instruments directly on the site"
+    - "Makes it easier for users to take action like attending events"
+    - "Feels more modern and engaging for all age groups"
 
-    impact:
-      - "Stronger first impression for new visitors"
-      - "Increased engagement with concert and event pages"
-      - "Reduced confusion when navigating the site"
-      - "Improved accessibility for diverse user groups"
-      - "Higher likelihood of users attending events or donating"
-      - "Better representation of the orchestra’s identity and mission"
+  customerPitch:
+    - "Community members can easily find concerts and feel connected"
+    - "Donors have a clear and simple way to support the orchestra"
+    - "Musicians are better represented through profile cards"
+    - "The organization gains a more professional online presence"
 
-    status: "Research and Testing Phase (Deployed Prototype Complete)"
+  futurePlans:
+    - "Add ticket purchasing directly on the site"
+    - "Include videos of performances"
+    - "Track how users interact with the site"
+    - "Add reminders and newsletter sign-ups"
+    - "Continue improving accessibility"
 
-    team:
-      - "Wi-Fighters"
-      - "Meryl"
-      - "Kailyn"
-      - "Hope"
-      - "Laya"
+  tech:
+    - "HTML"
+    - "CSS"
+    - "JavaScript"
+    - "Responsive design"
+    - "Figma for design and planning"
+    - "User research and testing"
+
+  impact:
+    - "Users can find information faster"
+    - "The site is more engaging and interactive"
+    - "Better experience on all devices"
+    - "More users are likely to attend concerts or donate"
+
+status: "Research and Testing Phase (Deployed Prototype Complete)"
+
+team:
+  - "Wi-Fighters"
+  - "Meryl"
+  - "Kailyn"
+  - "Hope"
+  - "Laya"
