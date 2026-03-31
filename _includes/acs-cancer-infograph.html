@@ -1,6 +1,35 @@
 {% assign data = site.data.acs-cancer-infograph %}
 
 <style>
+.acs-feature-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1.5rem 0 2rem 0;
+}
+.acs-feature-btns a {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.85rem 2rem !important;
+  background: #1a73e8 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease, transform 0.2s ease !important;
+  min-width: 220px;
+}
+.acs-feature-btns a:hover {
+  background: #1558b0 !important;
+  transform: translateY(-2px) !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+}
 .wp-infograph .wp-btn {
   display: inline-flex !important;
   align-items: center !important;
@@ -32,6 +61,13 @@
    <div class="wp-badge">Design-Based Research Capstone</div>
    <h1 class="wp-title">{{ data.Title }}</h1>
    <p class="wp-description">{{ data.Description }}</p>
+
+   <!-- Feature Buttons -->
+   <div class="acs-feature-btns">
+     <a href="https://acs.opencodingsociety.com/" target="_blank" rel="noopener noreferrer">🗺️ ACS Cancer Body Map</a>
+     <a href="https://acs.opencodingsociety.com/cancerrisk" target="_blank" rel="noopener noreferrer">🧮 Cancer Risk Calculator</a>
+     <a href="https://acs.opencodingsociety.com/cyclegame/" target="_blank" rel="noopener noreferrer">🔬 Cell Cycle Game</a>
+   </div>
  </div>
 
 
