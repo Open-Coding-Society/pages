@@ -17,6 +17,7 @@
 <div class="sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
   <div class="sprint-header" style="display: flex; flex-direction: column; gap: 12px;">
     <div class="sprint-controls" style="display: flex; gap: 8px; align-items: center; justify-content: space-between; width: 100%;">
+      
       <!-- Sprint Label and Weeks Toggle on the left -->
       <div style="display: flex; gap: 8px; align-items: center;">
         <p style="margin: 0;">{{ unitKey }}</p>
@@ -24,6 +25,7 @@
           <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
         </button>
       </div>
+
       <!-- Divider between left and right controls -->
       <div style="display: flex; gap: 8px; align-items: center;">
         <!-- Sprint Calendar Sync -->
@@ -56,21 +58,18 @@
             <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
           </div>
         </div>
-
- 
-
         <!-- Help Button -->
         {% if helpUrl %}
         <button class="sprint-btn help" type="button" data-sprint="{{ unitKey }}" data-help-url="{{ helpUrl }}" title="Help & Navigation Guide">
           <i class="fas fa-question"></i>
         </button>
         {% endif %}
-
         <!-- Certificate Button -->
         <button class="sprint-btn certificate" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" title="Progress & Certificates">
           <i class="fas fa-certificate"></i>
         </button>
       </div>
+      <!-- End of right controls -->
     </div>
 
     <!-- Full-width sprint info section below buttons -->
@@ -80,6 +79,8 @@
         <p class="sprint-meta">{{ unitData.description }}</p>
       {% endif %}
     </div>
+
+    <!-- End of Sprint Header-->
   </div>
 
   <!-- Weeks Container -->
