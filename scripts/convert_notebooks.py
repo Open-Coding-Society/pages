@@ -43,10 +43,52 @@ class CodeRunner:
     code: str
     custom_cell_id: str
 
+    @staticmethod
+    def extract_challenge(cell_source: str, language: str) -> Optional[str]:
+        if language not in CODE_RUNNER_PATTERNS:
+            return None
+
+        pattern = CODE_RUNNER_PATTERNS[language]
+        for line in cell_source.split('\n'):
+            match = re.match(pattern, line.strip(), re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        return None
+
+    @staticmethod
+    def clean_code(cell_source: str, language: str) -> str:
+        lines = cell_source.split('\n')
+        cleaned_lines = []
+
+        pattern = CODE_RUNNER_PATTERNS.get(language)
+        last_content_index = -1
+        if language == 'java':
+            for i in range(len(lines) - 1, -1, -1):
+                if lines[i].strip():
+                    last_content_index = i
+                    break
+
+        for i, line in enumerate(lines):
+            if language == 'javascript' and i == 0 and line.strip().startswith('%%js'):
+                continue
+            if line.strip().startswith('%%'):
+                continue
+            if pattern and re.match(pattern, line.strip(), re.IGNORECASE):
+                continue
+            if language == 'java' and i == last_content_index:
+                if re.match(r'^\w+\.main\s*\(\s*null\s*\)\s*;?\s*$', line.strip()):
+                    continue
+            cleaned_lines.append(line)
+
+        result = '\n'.join(cleaned_lines).rstrip()
+        while result.startswith('\n'):
+            result = result[1:]
+        return result
+
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["CodeRunner"]:
         language = detect_cell_language(cell)
-        challenge = extract_code_runner_metadata(cell.source, language)
+        challenge = cls.extract_challenge(cell.source, language)
         if not challenge:
             return None
 
@@ -54,7 +96,7 @@ class CodeRunner:
             challenge=challenge,
             language=language,
             runner_id=generate_runner_id(permalink, runner_index),
-            code=clean_code_for_runner(cell.source, language),
+            code=cls.clean_code(cell.source, language),
             custom_cell_id=get_custom_cell_id(cell),
         )
 
@@ -105,13 +147,58 @@ class UiRunner:
     script: str
     custom_cell_id: str
 
+    @staticmethod
+    def extract_description(cell_source: str) -> Optional[str]:
+        for line in cell_source.split('\n'):
+            match = re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+        return None
+
+    @staticmethod
+    def clean_html_and_script(cell_source: str, runner_index: int) -> tuple[str, str]:
+        lines = cell_source.split('\n')
+        in_script = False
+        html_lines = []
+        script_lines = []
+
+        for line in lines:
+            if line.strip().startswith('%%html'):
+                continue
+            if re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE):
+                continue
+            if '<script>' in line:
+                in_script = True
+                continue
+            if '</script>' in line:
+                in_script = False
+                continue
+
+            if in_script:
+                script_lines.append(line)
+            else:
+                html_lines.append(line)
+
+        html_str = '\n'.join(html_lines)
+        script_str = '\n'.join(script_lines)
+
+        unique_suffix = f"-ui{runner_index}"
+        ids_found = re.findall(r'id="([^"]+)"', html_str)
+        for old_id in ids_found:
+            new_id = old_id + unique_suffix
+            html_str = html_str.replace(f'id="{old_id}"', f'id="{new_id}"')
+            script_str = script_str.replace(f"getElementById('{old_id}')", f"getElementById('{new_id}')")
+            script_str = script_str.replace(f'getElementById("{old_id}")', f'getElementById("{new_id}")')
+
+        return html_str, script_str
+
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["UiRunner"]:
-        description = extract_ui_runner_metadata(cell.source)
+        description = cls.extract_description(cell.source)
         if not description:
             return None
 
-        html_content, script_content = clean_html_for_runner(cell.source, runner_index)
+        html_content, script_content = cls.clean_html_and_script(cell.source, runner_index)
         return cls(
             description=description,
             runner_id=generate_runner_id(permalink, runner_index),
@@ -155,13 +242,60 @@ class GameRunner:
     options: dict[str, Any]
     custom_cell_id: str
 
+    @staticmethod
+    def extract_challenge_and_options(cell_source: str) -> Optional[tuple[str, dict[str, Any]]]:
+        for line in cell_source.split('\n'):
+            match = re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
+            if not match:
+                continue
+
+            content = match.group(1).strip()
+            if '|' not in content:
+                return (content, {})
+
+            challenge, options_str = content.split('|', 1)
+            options: dict[str, Any] = {}
+            for option in options_str.strip().split(','):
+                if ':' not in option:
+                    continue
+                key, value = option.split(':', 1)
+                key = key.strip()
+                value = value.strip().lower()
+                if value == 'true':
+                    options[key] = True
+                elif value == 'false':
+                    options[key] = False
+                else:
+                    options[key] = value
+
+            return (challenge.strip(), options)
+
+        return None
+
+    @staticmethod
+    def clean_code(cell_source: str) -> str:
+        cleaned_lines = []
+        for i, line in enumerate(cell_source.split('\n')):
+            if i == 0 and line.strip().startswith('%%js'):
+                continue
+            if line.strip().startswith('%%'):
+                continue
+            if re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE):
+                continue
+            cleaned_lines.append(line)
+
+        result = '\n'.join(cleaned_lines).rstrip()
+        while result.startswith('\n'):
+            result = result[1:]
+        return result
+
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["GameRunner"]:
         source = cell.get('source', '')
         if not source.strip().startswith('%%js'):
             return None
 
-        result = extract_game_runner_metadata(source)
+        result = cls.extract_challenge_and_options(source)
         if not result:
             return None
 
@@ -169,7 +303,7 @@ class GameRunner:
         return cls(
             challenge=challenge,
             runner_id=generate_runner_id(permalink, runner_index),
-            code=clean_game_code(source),
+            code=cls.clean_code(source),
             options=options,
             custom_cell_id=get_custom_cell_id(cell),
         )
@@ -282,67 +416,6 @@ def fix_js_code_blocks(markdown):
     return markdown
 
 
-def extract_code_runner_metadata(cell_source, language):
-    """Extract CODE_RUNNER challenge from cell comments"""
-    if language not in CODE_RUNNER_PATTERNS:
-        return None
-    
-    pattern = CODE_RUNNER_PATTERNS[language]
-    lines = cell_source.split('\n')
-    
-    for line in lines:
-        match = re.match(pattern, line.strip(), re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
-    
-    return None
-
-
-def clean_code_for_runner(cell_source, language):
-    """Remove magic commands, CODE_RUNNER comments, and language-specific artifacts from code"""
-    lines = cell_source.split('\n')
-    cleaned_lines = []
-    
-    # Pattern for CODE_RUNNER comments
-    if language in CODE_RUNNER_PATTERNS:
-        pattern = CODE_RUNNER_PATTERNS[language]
-    else:
-        pattern = None
-    
-    # Find index of last non-whitespace line for Java .main(null) removal
-    last_content_index = -1
-    if language == 'java':
-        for i in range(len(lines) - 1, -1, -1):
-            if lines[i].strip():
-                last_content_index = i
-                break
-    
-    for i, line in enumerate(lines):
-        # Skip %%js magic command (JavaScript first line)
-        if language == 'javascript' and i == 0 and line.strip().startswith('%%js'):
-            continue
-        # Skip any other magic commands
-        if line.strip().startswith('%%'):
-            continue
-        # Skip CODE_RUNNER comment lines
-        if pattern and re.match(pattern, line.strip(), re.IGNORECASE):
-            continue
-        # Skip Java .main(null) call (last non-whitespace line)
-        if language == 'java' and i == last_content_index:
-            if re.match(r'^\w+\.main\s*\(\s*null\s*\)\s*;?\s*$', line.strip()):
-                continue
-        cleaned_lines.append(line)
-    
-    # Join lines and strip trailing whitespace
-    result = '\n'.join(cleaned_lines).rstrip()
-    
-    # Remove leading empty lines
-    while result.startswith('\n'):
-        result = result[1:]
-    
-    return result
-
-
 def generate_runner_id(permalink, index):
     """Generate runner_id from permalink"""
     # Convert /javascript/json/lesson to javascript-json-lesson-0
@@ -382,17 +455,17 @@ def classify_custom_cell_type(cell) -> Optional[str]:
     """Classify a notebook cell as code/ui/game custom type, or None."""
     if cell.cell_type == 'code':
         source = cell.get('source', '')
-        if source.strip().startswith('%%js') and extract_game_runner_metadata(source):
+        if source.strip().startswith('%%js') and GameRunner.extract_challenge_and_options(source):
             return 'game_runner'
 
         language = detect_cell_language(cell)
-        if extract_code_runner_metadata(source, language):
+        if CodeRunner.extract_challenge(source, language):
             return 'code_runner'
 
-        if source.strip().startswith('%%html') and extract_ui_runner_metadata(source):
+        if source.strip().startswith('%%html') and UiRunner.extract_description(source):
             return 'ui_runner'
 
-    if cell.cell_type == 'raw' and extract_ui_runner_metadata(cell.get('source', '')):
+    if cell.cell_type == 'raw' and UiRunner.extract_description(cell.get('source', '')):
         return 'ui_runner'
 
     return None
@@ -451,134 +524,6 @@ def process_code_runner_cells(notebook, permalink):
     
     notebook.cells = processed_cells
     return notebook
-
-
-def extract_ui_runner_metadata(cell_source):
-    """Extract UI_RUNNER description from HTML cell comments"""
-    lines = cell_source.split('\n')
-    
-    for line in lines:
-        match = re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
-    
-    return None
-
-
-def extract_game_runner_metadata(cell_source):
-    """Extract GAME_RUNNER challenge and options from JavaScript cell comments
-    
-    Format: // GAME_RUNNER: challenge text | hide_edit: true
-    Returns: (challenge, options_dict)
-    """
-    lines = cell_source.split('\n')
-    
-    for line in lines:
-        match = re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
-        if match:
-            content = match.group(1).strip()
-            
-            # Parse options after pipe separator
-            if '|' in content:
-                parts = content.split('|', 1)
-                challenge = parts[0].strip()
-                options_str = parts[1].strip()
-                
-                # Parse options (format: key: value, key2: value2)
-                options = {}
-                for option in options_str.split(','):
-                    if ':' in option:
-                        key, value = option.split(':', 1)
-                        key = key.strip()
-                        value = value.strip().lower()
-                        # Convert string booleans to actual booleans
-                        if value == 'true':
-                            options[key] = True
-                        elif value == 'false':
-                            options[key] = False
-                        else:
-                            options[key] = value
-                
-                return (challenge, options)
-            else:
-                return (content, {})
-    
-    return None
-
-
-def clean_game_code(cell_source):
-    """Remove magic commands and GAME_RUNNER comments from game code"""
-    lines = cell_source.split('\n')
-    cleaned_lines = []
-    
-    for i, line in enumerate(lines):
-        # Skip %%js magic command (JavaScript first line)
-        if i == 0 and line.strip().startswith('%%js'):
-            continue
-        # Skip any other magic commands
-        if line.strip().startswith('%%'):
-            continue
-        # Skip GAME_RUNNER comment lines
-        if re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE):
-            continue
-        cleaned_lines.append(line)
-    
-    # Join lines and strip trailing whitespace
-    result = '\n'.join(cleaned_lines).rstrip()
-    
-    # Remove leading empty lines
-    while result.startswith('\n'):
-        result = result[1:]
-    
-    return result
-
-
-def clean_html_for_runner(cell_source, runner_index):
-    """Clean HTML cell and make IDs unique"""
-    lines = cell_source.split('\n')
-    cleaned_lines = []
-    in_script = False
-    html_lines = []
-    script_lines = []
-    
-    for line in lines:
-        # Skip %%html magic command
-        if line.strip().startswith('%%html'):
-            continue
-        # Skip UI_RUNNER comment
-        if re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE):
-            continue
-        # Track script sections
-        if '<script>' in line:
-            in_script = True
-            continue
-        elif '</script>' in line:
-            in_script = False
-            continue
-        
-        if in_script:
-            script_lines.append(line)
-        else:
-            html_lines.append(line)
-    
-    html_str = '\n'.join(html_lines)
-    script_str = '\n'.join(script_lines)
-    
-    # Make IDs unique by adding suffix
-    unique_suffix = f"-ui{runner_index}"
-    
-    # Find and replace all id attributes
-    id_pattern = r'id="([^"]+)"'
-    ids_found = re.findall(id_pattern, html_str)
-    
-    for old_id in ids_found:
-        new_id = old_id + unique_suffix
-        html_str = html_str.replace(f'id="{old_id}"', f'id="{new_id}"')
-        # Update getElementById references in JavaScript
-        script_str = script_str.replace(f"getElementById('{old_id}')", f"getElementById('{new_id}')")
-        script_str = script_str.replace(f'getElementById("{old_id}")', f'getElementById("{new_id}")')
-    
-    return html_str, script_str
 
 
 def process_ui_runner_cells(notebook, permalink):
