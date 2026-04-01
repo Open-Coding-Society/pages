@@ -41,6 +41,7 @@ class CodeRunner:
     language: str
     runner_id: str
     code: str
+    custom_cell_id: str
 
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["CodeRunner"]:
@@ -54,6 +55,7 @@ class CodeRunner:
             language=language,
             runner_id=generate_runner_id(permalink, runner_index),
             code=clean_code_for_runner(cell.source, language),
+            custom_cell_id=get_custom_cell_id(cell),
         )
 
     def to_metadata(self) -> dict[str, Any]:
@@ -66,6 +68,7 @@ class CodeRunner:
             language=metadata['language'],
             runner_id=metadata['runner_id'],
             code=metadata['code'],
+            custom_cell_id=metadata.get('custom_cell_id', ''),
         )
 
     def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
@@ -100,6 +103,7 @@ class UiRunner:
     runner_id: str
     html: str
     script: str
+    custom_cell_id: str
 
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["UiRunner"]:
@@ -113,6 +117,7 @@ class UiRunner:
             runner_id=generate_runner_id(permalink, runner_index),
             html=html_content,
             script=script_content,
+            custom_cell_id=get_custom_cell_id(cell),
         )
 
     def to_metadata(self) -> dict[str, Any]:
@@ -125,6 +130,7 @@ class UiRunner:
             runner_id=metadata['runner_id'],
             html=metadata['html'],
             script=metadata['script'],
+            custom_cell_id=metadata.get('custom_cell_id', ''),
         )
 
     def rendered_markup_lines(self) -> list[str]:
@@ -147,6 +153,7 @@ class GameRunner:
     runner_id: str
     code: str
     options: dict[str, Any]
+    custom_cell_id: str
 
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["GameRunner"]:
@@ -164,6 +171,7 @@ class GameRunner:
             runner_id=generate_runner_id(permalink, runner_index),
             code=clean_game_code(source),
             options=options,
+            custom_cell_id=get_custom_cell_id(cell),
         )
 
     def to_metadata(self) -> dict[str, Any]:
@@ -176,6 +184,7 @@ class GameRunner:
             runner_id=metadata['runner_id'],
             code=metadata['code'],
             options=metadata.get('options', {}),
+            custom_cell_id=metadata.get('custom_cell_id', ''),
         )
 
     def liquid_lines(self, code_runner_count: int) -> list[str]:
@@ -362,6 +371,62 @@ def detect_cell_language(cell):
     
     # Default to python
     return 'python'
+
+
+def get_custom_cell_id(cell) -> str:
+    """Get the precomputed custom cell ID from metadata."""
+    return cell.get('metadata', {}).get('custom_cell', {}).get('id', '')
+
+
+def classify_custom_cell_type(cell) -> Optional[str]:
+    """Classify a notebook cell as code/ui/game custom type, or None."""
+    if cell.cell_type == 'code':
+        source = cell.get('source', '')
+        if source.strip().startswith('%%js') and extract_game_runner_metadata(source):
+            return 'game_runner'
+
+        language = detect_cell_language(cell)
+        if extract_code_runner_metadata(source, language):
+            return 'code_runner'
+
+        if source.strip().startswith('%%html') and extract_ui_runner_metadata(source):
+            return 'ui_runner'
+
+    if cell.cell_type == 'raw' and extract_ui_runner_metadata(cell.get('source', '')):
+        return 'ui_runner'
+
+    return None
+
+
+def generate_custom_cell_id(permalink: str, cell_index: int, custom_type: str) -> str:
+    """Generate a stable cross-runner custom cell identifier."""
+    clean_permalink = permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
+    return f"{clean_permalink}-cell{cell_index}-{custom_type}"
+
+
+def assign_custom_cell_ids(notebook, permalink):
+    """Annotate each custom cell with a stable ID and type metadata."""
+    for cell_index, cell in enumerate(notebook.cells):
+        custom_type = classify_custom_cell_type(cell)
+        if not custom_type:
+            continue
+
+        cell.setdefault('metadata', {})
+        cell['metadata']['custom_cell'] = {
+            'id': generate_custom_cell_id(permalink, cell_index, custom_type),
+            'type': custom_type,
+            'cell_index': cell_index,
+        }
+    return notebook
+
+
+def process_custom_cells(notebook, permalink):
+    """Main custom-cell orchestration pipeline for ID assignment and runner extraction."""
+    notebook = assign_custom_cell_ids(notebook, permalink)
+    notebook = process_code_runner_cells(notebook, permalink)
+    notebook = process_ui_runner_cells(notebook, permalink)
+    notebook = process_game_runner_cells(notebook, permalink)
+    return notebook
 
 
 def process_code_runner_cells(notebook, permalink):
@@ -694,15 +759,9 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         permalink = front_matter.get('permalink', '')
         
         notebook.cells.pop(0)
-        
-        # Process code runner cells before conversion
-        notebook = process_code_runner_cells(notebook, permalink)
-        
-        # Process ui runner cells before conversion
-        notebook = process_ui_runner_cells(notebook, permalink)
-        
-        # Process game runner cells before conversion
-        notebook = process_game_runner_cells(notebook, permalink)
+
+        # Process custom cells (ID assignment + CODE/UI/GAME runner extraction)
+        notebook = process_custom_cells(notebook, permalink)
         
         process_mermaid_cells(notebook)
         exporter = MarkdownExporter()
