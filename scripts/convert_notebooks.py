@@ -204,15 +204,46 @@ class UiRunner:
     runner_id: str
     html: str
     script: str
+    options: dict[str, Any]
     custom_cell_id: str
 
     @staticmethod
-    def extract_description(cell_source: str) -> Optional[str]:
-        """Extract the UI_RUNNER description directive from the cell source."""
+    def extract_description_and_options(cell_source: str) -> Optional[tuple[str, dict[str, Any]]]:
+        """Parse UI_RUNNER description text and optional key/value options."""
         for line in cell_source.split('\n'):
             match = re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
-            if match:
-                return match.group(1).strip()
+            if not match:
+                continue
+
+            content = match.group(1).strip()
+            if '|' not in content:
+                return (content, {})
+
+            description, options_str = content.split('|', 1)
+            options: dict[str, Any] = {}
+            for option in options_str.strip().split(','):
+                if ':' not in option:
+                    continue
+                key, value = option.split(':', 1)
+                key = key.strip()
+                value = value.strip().lower()
+                if value == 'true':
+                    options[key] = True
+                elif value == 'false':
+                    options[key] = False
+                else:
+                    options[key] = value
+
+            return (description.strip(), options)
+
+        return None
+
+    @staticmethod
+    def extract_description(cell_source: str) -> Optional[str]:
+        """Extract only the UI_RUNNER description directive from the cell source."""
+        parsed = UiRunner.extract_description_and_options(cell_source)
+        if parsed:
+            return parsed[0]
         return None
 
     @staticmethod
@@ -256,9 +287,11 @@ class UiRunner:
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["UiRunner"]:
         """Build a UiRunner instance when the cell includes a UI_RUNNER directive."""
-        description = cls.extract_description(cell.source)
-        if not description:
+        parsed = cls.extract_description_and_options(cell.source)
+        if not parsed:
             return None
+
+        description, options = parsed
 
         html_content, script_content = cls.clean_html_and_script(cell.source, runner_index)
         return cls(
@@ -266,6 +299,7 @@ class UiRunner:
             runner_id=generate_runner_id(permalink, runner_index),
             html=html_content,
             script=script_content,
+            options=options,
             custom_cell_id=get_custom_cell_id(cell),
         )
 
@@ -281,6 +315,7 @@ class UiRunner:
             runner_id=metadata['runner_id'],
             html=metadata['html'],
             script=metadata['script'],
+            options=metadata.get('options', {}),
             custom_cell_id=metadata.get('custom_cell_id', ''),
         )
 
@@ -677,6 +712,8 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     
     lines = markdown.split('\n')
     result = []
+    panel_runners: dict[str, dict[str, Any]] = {}
+    panel_order: list[str] = []
     in_code_block = False
     code_block_content = []
     code_cell_count = 0
@@ -686,6 +723,104 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     ui_runner_depth = 0
     
     i = 0
+
+    def parse_ratio_parts(ratio: str) -> tuple[str, str]:
+        ratio_str = (ratio or '').strip()
+        parts = ratio_str.split('-')
+        if len(parts) != 2:
+            return ('1fr', '1fr')
+
+        left_raw = parts[0].strip()
+        right_raw = parts[1].strip()
+
+        if left_raw.isdigit() and right_raw.isdigit():
+            return (f'{left_raw}%', f'{right_raw}%')
+
+        left = left_raw if left_raw else '1fr'
+        right = right_raw if right_raw else '1fr'
+        return (left, right)
+
+    def panel_config(options: dict[str, Any], default_slot: str) -> Optional[dict[str, str]]:
+        panel_id = str(options.get('panel') or options.get('container_panel') or '').strip()
+        if not panel_id:
+            return None
+
+        slot = str(options.get('slot', default_slot)).strip().lower()
+        if slot not in ('left', 'right'):
+            slot = default_slot
+
+        layout = str(options.get('layout', 'row')).strip().lower()
+        if layout not in ('row', 'column'):
+            layout = 'row'
+
+        ratio = str(options.get('ratio', '50-50')).strip()
+        gap = str(options.get('gap', '1rem')).strip()
+        left_width, right_width = parse_ratio_parts(ratio)
+
+        return {
+            'panel_id': panel_id,
+            'slot': slot,
+            'layout': layout,
+            'gap': gap,
+            'left_width': left_width,
+            'right_width': right_width,
+        }
+
+    def panel_capture_name(panel_id: str, slot: str) -> str:
+        safe_id = re.sub(r'[^a-zA-Z0-9_]', '_', panel_id)
+        return f'container_panel_{safe_id}_{slot}'
+
+    def panel_include_lines(panel_id: str, panel_data: dict[str, Any]) -> list[str]:
+        left_capture = panel_capture_name(panel_id, 'left')
+        right_capture = panel_capture_name(panel_id, 'right')
+        return [
+            '',
+            '{% capture ' + left_capture + ' %}',
+            *panel_data['left'],
+            '{% endcapture %}',
+            '',
+            '{% capture ' + right_capture + ' %}',
+            *panel_data['right'],
+            '{% endcapture %}',
+            '',
+            '{% include container-panel.html',
+            '   panel_id="' + panel_id + '"',
+            '   layout="' + panel_data['layout'] + '"',
+            '   gap="' + panel_data['gap'] + '"',
+            '   left_width="' + panel_data['left_width'] + '"',
+            '   right_width="' + panel_data['right_width'] + '"',
+            '   left=' + left_capture,
+            '   right=' + right_capture,
+            '%}',
+            '',
+        ]
+
+    def queue_panel_runner(config: dict[str, str], lines_to_queue: list[str]) -> list[str]:
+        panel_id = config['panel_id']
+        panel = panel_runners.setdefault(panel_id, {
+            'layout': config['layout'],
+            'gap': config['gap'],
+            'left_width': config['left_width'],
+            'right_width': config['right_width'],
+            'left': None,
+            'right': None,
+        })
+        if panel_id not in panel_order:
+            panel_order.append(panel_id)
+
+        panel['layout'] = config['layout']
+        panel['gap'] = config['gap']
+        panel['left_width'] = config['left_width']
+        panel['right_width'] = config['right_width']
+        panel[config['slot']] = lines_to_queue
+
+        if panel['left'] is not None and panel['right'] is not None:
+            emitted = panel_include_lines(panel_id, panel)
+            panel_runners.pop(panel_id, None)
+            return emitted
+
+        return []
+
     while i < len(lines):
         line = lines[i]
         
@@ -703,7 +838,12 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                         # Inject the processed UI runner
                         ui_cell = ui_runner_cells[ui_runner_count]
                         ui_runner = UiRunner.from_metadata(ui_cell['metadata']['ui_runner'])
-                        result.extend(ui_runner.rendered_markup_lines())
+                        ui_runner_lines = ui_runner.rendered_markup_lines()
+                        config = panel_config(ui_runner.options, 'left')
+                        if config:
+                            result.extend(queue_panel_runner(config, ui_runner_lines))
+                        else:
+                            result.extend(ui_runner_lines)
                         
                         ui_runner_count += 1
         
@@ -740,10 +880,24 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     code_fence_lines = code_fence.to_markdown_lines() if code_fence else code_block_content
                     result.extend(code_runner.liquid_lines(code_fence_lines, code_runner_count))
                     code_runner_count += 1
+                # Add ui-runner if metadata exists
+                elif code_cell and 'ui_runner' in code_cell.get('metadata', {}):
+                    ui_runner = UiRunner.from_metadata(code_cell['metadata']['ui_runner'])
+                    ui_runner_lines = ui_runner.rendered_markup_lines()
+                    config = panel_config(ui_runner.options, 'left')
+                    if config:
+                        result.extend(queue_panel_runner(config, ui_runner_lines))
+                    else:
+                        result.extend(ui_runner_lines)
                 # Add game-runner if metadata exists
                 elif code_cell and 'game_runner' in code_cell.get('metadata', {}):
                     game_runner = GameRunner.from_metadata(code_cell['metadata']['game_runner'])
-                    result.extend(game_runner.liquid_lines(code_runner_count))
+                    game_lines = game_runner.liquid_lines(code_runner_count)
+                    config = panel_config(game_runner.options, 'right')
+                    if config:
+                        result.extend(queue_panel_runner(config, game_lines))
+                    else:
+                        result.extend(game_lines)
                     code_runner_count += 1
                 else:
                     # Regular code block without code-runner
@@ -755,6 +909,16 @@ def inject_code_runners(markdown, notebook, front_matter=None):
             result.append(line)
         
         i += 1
+
+    # Flush unmatched panel items in case only one side is provided.
+    for panel_id in panel_order:
+        panel = panel_runners.get(panel_id)
+        if not panel:
+            continue
+        if panel.get('left'):
+            result.extend(panel['left'])
+        if panel.get('right'):
+            result.extend(panel['right'])
     
     # If challenge_submit is enabled, add lesson submit button at the end
     if challenge_submit_enabled:

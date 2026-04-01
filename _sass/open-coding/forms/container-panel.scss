@@ -1,0 +1,37 @@
+/**
+ * Container Panel Styles
+ * Composes UI Runner and Game Runner panels in row/column layouts.
+ */
+
+.container-panel {
+  display: grid;
+  gap: var(--cp-gap, 1rem);
+  margin: 1rem 0;
+  align-items: start;
+
+  &.container-panel--row {
+    grid-template-columns: var(--cp-left, 1fr) var(--cp-right, 1fr);
+  }
+
+  &.container-panel--column {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--cp-left, auto) var(--cp-right, auto);
+  }
+
+  .container-panel__item {
+    min-width: 0;
+  }
+
+  .container-panel__item > .game-runner-container,
+  .container-panel__item > .ui-runner,
+  .container-panel__item > .ui-runner-container {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .container-panel.container-panel--row {
+    grid-template-columns: 1fr;
+  }
+}
