@@ -12,124 +12,111 @@ author: "Curators Team"
 date: 2025-12-02
 ---
 
-<!-- ============================================================
-     STYLESHEET — All colors are CSS custom properties (variables)
-     so the entire theme can be changed from one place (:root {}).
-     ============================================================ -->
 <style>
-  /* ---- Design tokens: change these to retheme the whole page ---- */
-  :root {
-    --bg:      #0a0e27;
-    --panel:   #0f1729;
+  /*
+   * Colors from system SASS (_sass/minima/lessonbase.scss → :root).
+   * Edit lessonbase.scss to change colors — not this file.
+   */
+  .page-content {
+    --bg:      var(--bg-1);
+    --panel:   var(--panel);
     --border:  rgba(255,255,255,0.08);
-    --text:    #e6eef8;
-    --muted:   #9aa6bf;
-    --accent:  #7c3aed;
-    --accent2: #9f7aea;
-    --success: #22c55e;
-    --danger:  #ef4444;
+    --txt:     var(--text);
+    --muted:   var(--text-muted);
+    --ac:      var(--accent);
+    --ac2:     var(--accent);
+    --ok:      var(--green);
+    --err:     var(--red);
+    --code-bg: var(--bg-0);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
-
   .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 40px; }
   .header    { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; color: var(--txt); }
   .header p  { color: var(--muted); font-size: 14px; }
 
   .progress-bar           { display: flex; gap: 8px; margin: 20px 0; align-items: center; }
   .progress-bar .step     { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer; transition: 0.2s; }
-  .progress-bar .step.active { background: var(--accent); height: 6px; }
+  .progress-bar .step.active { background: var(--ac); height: 6px; }
 
   .section        { display: none; }
   .section.active { display: block; }
 
   .card    { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  .card h2 { margin-bottom: 12px; font-size: 20px; color: #a6c9ff; }
+  .card h2 { margin-bottom: 12px; font-size: 20px; color: var(--ac2); }
 
-  .nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
-  button            { appearance: none; border: 1px solid var(--border); background: var(--accent); color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
-  button:hover      { background: #6d28d9; transform: translateY(-1px); }
-  button.secondary  { background: #334155; color: #fff; }
-  button.secondary:hover { background: #1e293b; }
+  .nav-buttons      { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
+  button            { appearance: none; border: 1px solid var(--border); background: var(--ac); color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
+  button:hover      { background: var(--accent-700); transform: translateY(-1px); }
+  button.secondary  { background: var(--bg-3); color: var(--txt); }
+  button.secondary:hover { background: var(--surface); }
   button:disabled   { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-  .metrics-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
-  .metric-card   { background: #051226; border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .metric-title  { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .metric-value  { font-size: 32px; font-weight: 800; color: var(--accent); margin: 8px 0 4px; }
-  .metric-subtitle { font-size: 12px; color: var(--muted); }
+  .metrics-grid   { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .metric-card    { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .metric-title   { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .metric-value   { font-size: 32px; font-weight: 800; color: var(--ac); margin: 8px 0 4px; }
+  .metric-subtitle{ font-size: 12px; color: var(--muted); }
 
-  .toolbar       { display: flex; align-items: center; justify-content: space-between; background: #051226; border: 1px solid var(--border); border-radius: 8px 8px 0 0; padding: 12px 16px; }
-  .toolbar-title { font-weight: 700; color: var(--accent); }
-  .download-btn  { background: var(--accent); }
+  .toolbar        { display: flex; align-items: center; justify-content: space-between; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px 8px 0 0; padding: 12px 16px; }
+  .toolbar-title  { font-weight: 700; color: var(--ac); }
+  .download-btn   { background: var(--ac); }
 
-  .table-container { background: #051226; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow-x: auto; }
+  .table-container { background: var(--code-bg); border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow-x: auto; }
   table            { width: 100%; border-collapse: collapse; font-size: 14px; }
-  thead            { border-bottom: 2px solid var(--accent); }
-  th               { padding: 10px 16px; text-align: left; color: var(--accent); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; user-select: none; }
-  th:hover         { background: rgba(124,58,237,0.1); }
-  th[data-sort]::after     { content: " ↕"; font-size: 10px; opacity: 0.5; }
+  thead            { border-bottom: 2px solid var(--ac); }
+  th               { padding: 10px 16px; text-align: left; color: var(--ac); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; user-select: none; }
+  th:hover         { background: rgba(76,175,239,0.1); }
+  th[data-sort]::after      { content: " ↕"; font-size: 10px; opacity: 0.5; }
   th[data-sort="asc"]::after  { content: " ↑"; opacity: 1; }
   th[data-sort="desc"]::after { content: " ↓"; opacity: 1; }
-  td               { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  td               { padding: 10px 16px; border-bottom: 1px solid var(--border); color: var(--txt); }
   tr:last-child td { border-bottom: none; }
   tr:hover td      { background: rgba(255,255,255,0.03); }
-  .student-name    { font-weight: 600; color: var(--accent); }
-  td.center        { text-align: center; }
+  .student-name   { font-weight: 600; color: var(--ac); }
+  td.center       { text-align: center; }
 
   .bar-wrap  { display: flex; align-items: center; gap: 8px; }
   .bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; }
-  .bar-fill  { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%); transition: width 0.4s ease; }
+  .bar-fill  { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--ac), var(--ac2)); transition: width 0.4s ease; }
   .bar-label { font-size: 12px; min-width: 36px; text-align: right; }
 
-  .detail-row    { border-top: 1px solid var(--accent); background: rgba(124,58,237,0.05); }
-  .detail-header { font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .detail-row    { border-top: 1px solid var(--ac); background: rgba(76,175,239,0.05); }
+  .detail-header { font-weight: 700; color: var(--ac); margin-bottom: 8px; }
   .modules-list  { display: flex; flex-wrap: wrap; gap: 8px; }
-  .module-chip   { background: rgba(124,58,237,0.15); border: 1px solid var(--accent); border-radius: 20px; padding: 4px 12px; font-size: 12px; }
+  .module-chip   { background: rgba(76,175,239,0.15); border: 1px solid var(--ac); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--txt); }
 
-  .cert-card   { background: #051226; border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; }
-  .cert-badge  { display: inline-block; background: var(--success); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-bottom: 12px; }
-  .cert-title  { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+  .cert-card   { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; }
+  .cert-badge  { display: inline-block; background: var(--ok); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-bottom: 12px; }
+  .cert-title  { font-size: 20px; font-weight: 800; color: var(--ac); margin-bottom: 4px; }
   .cert-org    { font-size: 13px; color: var(--muted); }
   .cert-date   { font-size: 12px; color: var(--muted); margin: 8px 0 16px; }
-  .cert-actions { display: flex; gap: 10px; }
+  .cert-actions{ display: flex; gap: 10px; }
   .btn-share   { background: #0077b5; }
   .btn-share:hover { background: #005f91; }
 
-  .frq-box      { border: 1px solid #2c2c2e; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; background: #1c1c1e; color: #e5e5ea; font-weight: 300; }
-  .frq-box textarea { width: 100%; border-radius: 6px; border: 1px solid #3a3a3c; padding: 0.5rem; margin-top: 0.5rem; background: #2c2c2e; color: #f2f2f7; resize: vertical; }
+  .frq-box      { border: 1px solid var(--border); padding: 1rem; border-radius: 8px; margin: 1.5rem 0; background: var(--bg-3); color: var(--txt); font-weight: 300; }
+  .frq-box textarea { width: 100%; border-radius: 6px; border: 1px solid var(--border); padding: 0.5rem; margin-top: 0.5rem; background: var(--surface); color: var(--txt); resize: vertical; }
   #frq-feedback { margin-top: 12px; line-height: 1.6; }
 
   .loading { color: var(--muted); font-style: italic; padding: 20px 0; }
 </style>
 
-<!-- ============================================================
-     HTML STRUCTURE
-     The page is split into three section divs (#step1-3).
-     JavaScript (navigation.js) shows only the active one.
-     ============================================================ -->
 <div class="container page-content">
-
   <div class="header">
     <h1>Analytics — All-in-One</h1>
     <p>Interactive lesson covering the admin dashboard, certificates, and mastery questions.</p>
     <a href="../" class="button back-btn">Back</a>
   </div>
 
-  <!-- Progress bar — rendered dynamically by navigation.js -->
   <div class="progress-bar" id="progressBar"></div>
 
-  <!-- ======================================================
-       STEP 1 — Admin Analytics Dashboard
-       Data fetched and rendered by analytics.js
-       ====================================================== -->
+  <!-- STEP 1 -->
   <div class="section active" id="step1">
     <div class="card">
       <h2>1 — Admin Analytics Dashboard</h2>
       <p>This dashboard provides a comprehensive overview of student performance. View real-time metrics, sort the interactive gradebook, and expand any row to see per-module progress.</p>
-
       <div class="metrics-grid">
         <div class="metric-card">
           <div class="metric-title">Class Average</div>
@@ -147,12 +134,10 @@ date: 2025-12-02
           <div class="metric-subtitle" id="top-scorer">—</div>
         </div>
       </div>
-
       <div class="toolbar">
         <span class="toolbar-title">Class Gradebook</span>
         <button class="download-btn" id="exportBtn">Export Report</button>
       </div>
-
       <div class="table-container">
         <table id="gradebook">
           <thead>
@@ -170,10 +155,7 @@ date: 2025-12-02
     </div>
   </div>
 
-  <!-- ======================================================
-       STEP 2 — Certificates & Badges
-       Handled by certificates.js
-       ====================================================== -->
+  <!-- STEP 2 -->
   <div class="section" id="step2">
     <div class="card">
       <h2>2 — Certificates and Badges</h2>
@@ -192,10 +174,7 @@ date: 2025-12-02
     </div>
   </div>
 
-  <!-- ======================================================
-       STEP 3 — Free Response Question
-       Handled by frq.js
-       ====================================================== -->
+  <!-- STEP 3 -->
   <div class="section" id="step3">
     <div class="card">
       <h2>3 — Free Response Question</h2>
@@ -212,7 +191,6 @@ date: 2025-12-02
     </div>
   </div>
 
-  <!-- Prev / Next navigation — wired by navigation.js -->
   <div class="nav-buttons">
     <button id="prevBtn" class="secondary">← Previous</button>
     <div style="display:flex; gap:8px; align-items:center;">
@@ -220,68 +198,38 @@ date: 2025-12-02
       <button id="nextBtn">Next →</button>
     </div>
   </div>
+</div>
 
-</div><!-- /.container -->
-
-<!-- ============================================================
-     MAIN SCRIPT — ORCHESTRATOR
-     This block does ONE thing: import the SRP modules and call
-     their init functions in the correct order on DOMContentLoaded.
-     No logic lives here — it all lives in assets/js/bigsix/analytics/
-     ============================================================ -->
 <script type="module">
+import { javaURI, pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import { restore, persist }         from '/assets/js/bigsix/persistence.js';
+import { initNavigation, showStep } from '/assets/js/bigsix/navigation.js';
+import { loadAnalytics }            from '/assets/js/bigsix/analytics/analytics.js';
+import { initCerts }                from '/assets/js/bigsix/analytics/certificates.js';
+import { initFRQ }                  from '/assets/js/bigsix/analytics/frq.js';
 
-// ── Shared API config ─────────────────────────────────────────
-import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-// ── SRP modules — each owns exactly one responsibility ────────
-import { restore, persist }          from '{{ site.baseurl }}/assets/js/bigsix/persistence.js';
-import { initNavigation, showStep }  from '{{ site.baseurl }}/assets/js/bigsix/navigation.js';
-import { loadAnalytics }             from '{{ site.baseurl }}/assets/js/bigsix/analytics/analytics.js';
-import { initCerts }                 from '{{ site.baseurl }}/assets/js/bigsix/analytics/certificates.js';
-import { initFRQ }                   from '{{ site.baseurl }}/assets/js/bigsix/analytics/frq.js';
-
-// ── Boot ──────────────────────────────────────────────────────
-// Order matters:
-//   1. restore() first so saved step + FRQ draft are applied before
-//      navigation renders the progress bar
-//   2. initNavigation() sets up prev/next and renders the initial step
-//   3. data modules load async after UI is ready
 document.addEventListener('DOMContentLoaded', () => {
-  restore(showStep);                       // load saved step + FRQ draft
-  initNavigation(showStep, persist);       // wire prev/next + progress bar
-  loadAnalytics(javaURI, fetchOptions);   // fetch students → render dashboard
-  initCerts(pythonURI, fetchOptions);     // wire cert download + LinkedIn
-  initFRQ(javaURI);                       // wire grade button
+  restore(showStep);
+  initNavigation(showStep, persist);
+  loadAnalytics(javaURI, fetchOptions);
+  initCerts(pythonURI, fetchOptions);
+  initFRQ(javaURI);
 });
-
 </script>
 
-<!-- ============================================================
-     BACK BUTTON HANDLER
-     Kept as a plain (non-module) script so it runs independently
-     without needing any imports.
-     ============================================================ -->
 <script>
-(function () {
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('a.back-btn').forEach(function (a) {
-      a.addEventListener('click', function (e) {
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('a.back-btn').forEach(function(a){
+      a.addEventListener('click', function(e){
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
-        try {
-          if (document.referrer && new URL(document.referrer).origin === location.origin) {
-            history.back();
-            return;
-          }
-        } catch (err) {}
-        const parts = location.pathname.replace(/\/$/, '').split('/');
-        if (parts.length > 1) { parts.pop(); window.location.href = parts.join('/') + '/'; }
-        else { window.location.href = '/'; }
+        try { if (document.referrer && new URL(document.referrer).origin === location.origin) { history.back(); return; } } catch(err) {}
+        var p = location.pathname.replace(/\/$/, '').split('/');
+        if (p.length > 1) { p.pop(); window.location.href = p.join('/') + '/'; } else { window.location.href = '/'; }
       });
     });
   });
 })();
 </script>
-
 <script src="/assets/js/lesson-completion-bigsix.js"></script>

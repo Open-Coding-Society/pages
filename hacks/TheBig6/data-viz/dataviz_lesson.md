@@ -13,154 +13,120 @@ date: 2025-12-02
 ---
 
 <style>
-  /* ============================================================
-     DESIGN TOKENS — change here to retheme the whole page
-     ============================================================ */
-  :root {
-    --bg:       #0a0e27;
-    --panel:    #0f1729;
-    --panel-2:  #1a2540;
+  /*
+   * Colors from system SASS (_sass/minima/lessonbase.scss → :root).
+   * Edit lessonbase.scss to change colors — not this file.
+   */
+  .page-content {
+    --bg:       var(--bg-1);
+    --panel:    var(--panel);
+    --panel-2:  var(--bg-3);
     --border:   rgba(255,255,255,0.08);
-    --text:     #e6eef8;
-    --muted:    #9aa6bf;
-    --accent:   #7c3aed;
-    --accent2:  #a78bfa;
-    --success:  #22c55e;
-    --danger:   #ef4444;
-    --good-bg:  rgba(34,197,94,0.12);
-    --bad-bg:   rgba(239,68,68,0.12);
-    --hover-bg: rgba(124,58,237,0.1);
-    --sel-bg:   rgba(124,58,237,0.2);
+    --txt:      var(--text);
+    --muted:    var(--text-muted);
+    --ac:       var(--accent);
+    --ac2:      var(--accent);
+    --ok:       var(--green);
+    --ok-bg:    var(--green-bg);
+    --err:      var(--red);
+    --err-bg:   var(--warn-bg);
+    --hover-bg: rgba(76,175,239,0.1);
+    --sel-bg:   rgba(76,175,239,0.2);
+    --code-bg:  var(--bg-0);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
-
   .container { max-width: 1020px; margin: 0 auto; padding: 28px 18px 48px; }
   .header    { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; background: linear-gradient(90deg,#a78bfa,#60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; color: var(--txt); }
   .header p  { color: var(--muted); font-size: 14px; }
 
-  /* Progress bar */
   .progress-bar       { display: flex; gap: 6px; margin: 20px 0; align-items: center; }
   .progress-bar .step { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; cursor: pointer; transition: all 0.25s; }
-  .progress-bar .step.active { background: var(--accent); height: 6px; box-shadow: 0 0 8px rgba(124,58,237,0.5); }
-  .progress-bar .step:hover  { background: var(--accent2); }
+  .progress-bar .step.active { background: var(--ac); height: 6px; box-shadow: 0 0 8px rgba(76,175,239,0.5); }
+  .progress-bar .step:hover  { background: var(--ac2); }
 
-  /* Sections */
   .section        { display: none; animation: fadeIn 0.25s ease; }
   .section.active { display: block; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
-  /* Cards */
   .card    { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 16px; }
-  .card h2 { font-size: 19px; color: #a6c9ff; margin-bottom: 10px; }
-  .card h3 { font-size: 15px; color: #a6c9ff; margin: 16px 0 8px; }
+  .card h2 { font-size: 19px; color: var(--ac2); margin-bottom: 10px; }
+  .card h3 { font-size: 15px; color: var(--ac2); margin: 16px 0 8px; }
 
-  /* Grid */
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 740px) { .grid { grid-template-columns: 1fr; } }
 
-  /* Inputs */
   label { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 10px 0 4px; }
-  input, textarea, select {
-    background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px;
-    padding: 9px 12px; color: var(--text); font-size: 13px; width: 100%; transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,58,237,0.2); }
+  input, textarea, select { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; color: var(--txt); font-size: 13px; width: 100%; transition: border-color 0.2s, box-shadow 0.2s; }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--ac); box-shadow: 0 0 0 3px rgba(76,175,239,0.2); }
   textarea { resize: vertical; font-family: 'Courier New', monospace; }
 
-  /* Buttons */
-  button {
-    appearance: none; border: none; background: var(--accent); color: #fff;
-    padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: 13px;
-    font-weight: 600; transition: all 0.2s; letter-spacing: 0.02em;
-  }
-  button:hover    { background: #6d28d9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.35); }
+  button { appearance: none; border: none; background: var(--ac); color: #fff; padding: 9px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  button:hover    { background: var(--accent-700); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(76,175,239,0.35); }
   button:active   { transform: translateY(0); }
   button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
   button.secondary { background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); }
-  button.secondary:hover { background: #253352; color: var(--text); box-shadow: none; }
-  button.danger   { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
-  button.danger:hover { background: rgba(239,68,68,0.25); box-shadow: none; }
+  button.secondary:hover { background: var(--surface); color: var(--txt); box-shadow: none; }
+  button.danger   { background: var(--err-bg); border: 1px solid var(--err); color: var(--err); }
+  button.danger:hover { background: rgba(229,62,62,0.25); box-shadow: none; }
 
-  /* Tab nav */
   .tab-nav { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 16px; }
   .tab-nav button { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-  .tab-nav button.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 12px rgba(124,58,237,0.4); }
-  .tab-nav button:hover:not(.active) { background: var(--hover-bg); color: var(--text); border-color: var(--accent); box-shadow: none; transform: none; }
+  .tab-nav button.active { background: var(--ac); color: #fff; border-color: var(--ac); box-shadow: 0 0 12px rgba(76,175,239,0.4); }
+  .tab-nav button:hover:not(.active) { background: var(--hover-bg); color: var(--txt); border-color: var(--ac); box-shadow: none; transform: none; }
 
-  /* Preview / code boxes */
-  .preview-box {
-    background: #060d1f; border: 1px solid var(--border); border-radius: 10px;
-    padding: 14px; min-height: 80px; overflow: auto; white-space: pre-wrap;
-    word-break: break-word; font-family: 'Courier New', monospace; font-size: 12px;
-    color: #c4d4f0; line-height: 1.7;
-  }
+  .preview-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; min-height: 80px; overflow: auto; white-space: pre-wrap; word-break: break-word; font-family: 'Courier New', monospace; font-size: 12px; color: var(--txt); line-height: 1.7; }
 
-  /* Block description */
-  .block-desc {
-    background: linear-gradient(90deg,rgba(96,165,250,0.08),rgba(167,139,250,0.08));
-    border-left: 3px solid var(--accent); padding: 10px 14px;
-    border-radius: 0 8px 8px 0; color: var(--muted); font-size: 13px; margin-bottom: 16px;
-  }
-  .block-desc strong { color: var(--text); }
+  .block-desc { background: rgba(76,175,239,0.06); border-left: 3px solid var(--ac); padding: 10px 14px; border-radius: 0 8px 8px 0; color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+  .block-desc strong { color: var(--txt); }
 
-  /* Status badge */
   .status-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; margin-left: 8px; }
-  .status-2xx { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
-  .status-4xx { background: rgba(239,68,68,0.15);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+  .status-2xx { background: var(--ok-bg);  color: var(--ok);  border: 1px solid var(--ok); }
+  .status-4xx { background: var(--err-bg); color: var(--err); border: 1px solid var(--err); }
 
-  /* Company cards */
   .company-card { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin: 6px 0; background: var(--panel-2); transition: border-color 0.2s; }
-  .company-card:hover { border-color: rgba(124,58,237,0.4); }
-  .company-card strong { color: #a6c9ff; font-size: 14px; }
-  .pill  { display: inline-block; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4); color: var(--accent2); border-radius: 12px; padding: 1px 8px; font-size: 11px; margin: 2px 2px 0 0; }
+  .company-card:hover { border-color: rgba(76,175,239,0.4); }
+  .company-card strong { color: var(--ac2); font-size: 14px; }
+  .pill  { display: inline-block; background: rgba(76,175,239,0.15); border: 1px solid rgba(76,175,239,0.4); color: var(--ac2); border-radius: 12px; padding: 1px 8px; font-size: 11px; margin: 2px 2px 0 0; }
   .badge { display: inline-block; background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); border-radius: 6px; padding: 1px 8px; font-size: 11px; margin-left: 6px; }
 
-  /* Quiz */
-  .quiz-question-text { font-weight: 700; font-size: 14px; margin: 16px 0 8px; color: var(--text); }
-  .opt { display: flex; align-items: center; gap: 10px; padding: 10px 14px; margin: 5px 0; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--panel-2); color: var(--text); font-size: 13px; transition: all 0.2s; user-select: none; }
-  .opt:hover  { background: var(--hover-bg); border-color: var(--accent); }
-  .opt.sel    { background: var(--sel-bg);   border-color: var(--accent); }
-  .opt.good   { background: var(--good-bg);  border-color: rgba(34,197,94,0.5); color: #86efac; }
-  .opt.bad    { background: var(--bad-bg);   border-color: rgba(239,68,68,0.5);  color: #fca5a5; }
-  .radio-dot  { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--muted); flex-shrink: 0; transition: all 0.2s; }
-  .opt.sel  .radio-dot { background: var(--accent); border-color: var(--accent); }
-  .opt.good .radio-dot { background: var(--success); border-color: var(--success); }
-  .opt.bad  .radio-dot { background: var(--danger);  border-color: var(--danger); }
+  .quiz-question-text { font-weight: 700; font-size: 14px; margin: 16px 0 8px; color: var(--txt); }
+  .opt { display: flex; align-items: center; gap: 10px; padding: 10px 14px; margin: 5px 0; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--panel-2); color: var(--txt); font-size: 13px; transition: all 0.2s; user-select: none; }
+  .opt:hover { background: var(--hover-bg); border-color: var(--ac); }
+  .opt.sel  { background: var(--sel-bg);  border-color: var(--ac); }
+  .opt.good { background: var(--ok-bg);   border-color: var(--ok);  color: var(--ok); }
+  .opt.bad  { background: var(--err-bg);  border-color: var(--err); color: var(--err); }
+  .radio-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--muted); flex-shrink: 0; transition: all 0.2s; }
+  .opt.sel  .radio-dot { background: var(--ac);  border-color: var(--ac); }
+  .opt.good .radio-dot { background: var(--ok);  border-color: var(--ok); }
+  .opt.bad  .radio-dot { background: var(--err); border-color: var(--err); }
 
-  /* Recap */
   .recap { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); }
   .recap-block { border: 1px solid var(--border); border-radius: 12px; background: var(--panel-2); padding: 14px; }
-  .recap-title { font-weight: 800; color: var(--accent2); margin-bottom: 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .recap-title { font-weight: 800; color: var(--ac2); margin-bottom: 10px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
   .recap-row   { display: grid; grid-template-columns: max-content 1fr; gap: 10px; margin-bottom: 6px; align-items: start; }
   .recap-key   { color: var(--muted); font-size: 12px; }
-  .recap-val code { background: rgba(124,58,237,0.15); color: var(--accent2); border-radius: 5px; padding: 1px 6px; font-size: 11px; font-family: 'Courier New',monospace; }
+  .recap-val code { background: rgba(76,175,239,0.15); color: var(--ac2); border-radius: 5px; padding: 1px 6px; font-size: 11px; font-family: 'Courier New',monospace; }
 
-  /* Checklist */
-  .checklist-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 5px 0; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 13px; }
-  .checklist-item:hover { border-color: rgba(124,58,237,0.4); }
-  .checklist-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
-  .checklist-item.checked { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.3); color: #86efac; }
+  .checklist-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 5px 0; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 13px; color: var(--txt); }
+  .checklist-item:hover { border-color: rgba(76,175,239,0.4); }
+  .checklist-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--ac); cursor: pointer; flex-shrink: 0; }
+  .checklist-item.checked { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
 
-  /* Nav */
   .nav-buttons { display: flex; gap: 12px; margin-top: 28px; justify-content: space-between; align-items: center; }
-
-  /* Misc */
   .hidden  { display: none; }
   .note    { font-size: 12px; color: var(--muted); }
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  details summary { cursor: pointer; color: var(--accent2); font-size: 12px; margin-top: 8px; }
+  details summary { cursor: pointer; color: var(--ac2); font-size: 12px; margin-top: 8px; }
   details p { margin-top: 6px; font-size: 12px; color: var(--muted); }
-  code { background: rgba(124,58,237,0.15); color: var(--accent2); border-radius: 4px; padding: 1px 5px; font-family: 'Courier New',monospace; font-size: 12px; }
+  code { background: rgba(76,175,239,0.15); color: var(--ac2); border-radius: 4px; padding: 1px 5px; font-family: 'Courier New',monospace; font-size: 12px; }
   .filter-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-  .filter-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; }
-  .filter-label { font-size: 13px; color: var(--text); text-transform: none; letter-spacing: 0; margin: 0; }
+  .filter-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--ac); flex-shrink: 0; }
+  .filter-label { font-size: 13px; color: var(--txt); text-transform: none; letter-spacing: 0; margin: 0; }
 </style>
 
 <div class="container page-content">
-
   <div class="header">
     <h1>Data Visualization — All-in-One</h1>
     <p>Interactive lessons: REST APIs, Spring Boot CRUD, search, filtering, pagination, and data queries.</p>
@@ -169,7 +135,7 @@ date: 2025-12-02
 
   <div class="progress-bar" id="progressBar"></div>
 
-  <!-- STEP 1: API Simulator -->
+  <!-- STEP 1 -->
   <div class="section active" id="step1">
     <div class="card">
       <h2>1 — REST APIs &amp; CRUD with Mock Database</h2>
@@ -184,7 +150,7 @@ date: 2025-12-02
       <div class="grid">
         <div>
           <label>Endpoint</label>
-          <input id="ep" readonly style="color:var(--accent2);font-family:'Courier New',monospace;" value="POST /api/companies"/>
+          <input id="ep" readonly style="color:var(--ac2);font-family:'Courier New',monospace;" value="POST /api/companies"/>
           <div id="pidWrap" class="hidden">
             <label>Path ID</label>
             <input id="pid" type="number" min="1" placeholder="e.g. 1"/>
@@ -215,7 +181,7 @@ date: 2025-12-02
     </div>
   </div>
 
-  <!-- STEP 2: Query Kata & Builder -->
+  <!-- STEP 2 -->
   <div class="section" id="step2">
     <div class="card">
       <h2>2 — Query Methods &amp; Company Builder</h2>
@@ -227,26 +193,16 @@ date: 2025-12-02
           <input id="kataIn" placeholder="List&lt;Company&gt; findBy..."/>
           <div class="btn-row"><button id="kataBtn">Check Answer</button></div>
           <div id="kataMsg" style="margin-top:10px;font-size:13px;padding:8px 12px;border-radius:8px;min-height:20px;"></div>
-          <details>
-            <summary>Show Hint</summary>
-            <p>Use Spring Data naming: <code>findBy&lt;Field&gt;GreaterThan(param)</code></p>
-          </details>
+          <details><summary>Show Hint</summary><p>Use Spring Data naming: <code>findBy&lt;Field&gt;GreaterThan(param)</code></p></details>
         </div>
         <div>
           <h3>Company Builder</h3>
-          <label>Company Name</label>
-          <input id="bName" placeholder="e.g. TechCorp"/>
+          <label>Company Name</label><input id="bName" placeholder="e.g. TechCorp"/>
           <label>Industry</label>
-          <select id="bInd">
-            <option>Software</option><option>AI</option>
-            <option>Healthcare</option><option>Finance</option><option>Cybersecurity</option>
-          </select>
-          <label>Location</label>
-          <input id="bLoc" placeholder="e.g. San Diego"/>
-          <label>Size (employees)</label>
-          <input id="bSize" type="number" placeholder="e.g. 150" min="1"/>
-          <label>Skills (comma separated)</label>
-          <input id="bSkills" placeholder="e.g. Java, Spring, AWS"/>
+          <select id="bInd"><option>Software</option><option>AI</option><option>Healthcare</option><option>Finance</option><option>Cybersecurity</option></select>
+          <label>Location</label><input id="bLoc" placeholder="e.g. San Diego"/>
+          <label>Size (employees)</label><input id="bSize" type="number" placeholder="e.g. 150" min="1"/>
+          <label>Skills (comma separated)</label><input id="bSkills" placeholder="e.g. Java, Spring, AWS"/>
           <div class="btn-row">
             <button class="secondary" id="cheatBtn">🎲 Random Fill</button>
             <button id="builderBtn">+ Add Company</button>
@@ -257,7 +213,7 @@ date: 2025-12-02
     </div>
   </div>
 
-  <!-- STEP 3: Search & Filtering -->
+  <!-- STEP 3 -->
   <div class="section" id="step3">
     <div class="card">
       <h2>3 — Search &amp; Data Filtering</h2>
@@ -265,32 +221,15 @@ date: 2025-12-02
       <h3>Query Builder</h3>
       <div class="grid">
         <div class="card">
-          <div class="filter-row">
-            <input type="checkbox" id="qLoc"/>
-            <label class="filter-label">Filter by Location</label>
-          </div>
+          <div class="filter-row"><input type="checkbox" id="qLoc"/><label class="filter-label">Filter by Location</label></div>
           <input id="vLoc" placeholder="e.g. San Diego" disabled/>
-          <div class="filter-row" style="margin-top:10px;">
-            <input type="checkbox" id="qInd"/>
-            <label class="filter-label">Filter by Industry</label>
-          </div>
-          <select id="vInd" disabled>
-            <option>Software</option><option>AI</option>
-            <option>Healthcare</option><option>Finance</option>
-          </select>
-          <div class="filter-row" style="margin-top:10px;">
-            <input type="checkbox" id="qSize"/>
-            <label class="filter-label">Min Size</label>
-          </div>
+          <div class="filter-row" style="margin-top:10px;"><input type="checkbox" id="qInd"/><label class="filter-label">Filter by Industry</label></div>
+          <select id="vInd" disabled><option>Software</option><option>AI</option><option>Healthcare</option><option>Finance</option></select>
+          <div class="filter-row" style="margin-top:10px;"><input type="checkbox" id="qSize"/><label class="filter-label">Min Size</label></div>
           <input id="vSize" type="number" placeholder="e.g. 100" disabled/>
-          <div class="filter-row" style="margin-top:10px;">
-            <input type="checkbox" id="qSkill"/>
-            <label class="filter-label">Require Skill</label>
-          </div>
+          <div class="filter-row" style="margin-top:10px;"><input type="checkbox" id="qSkill"/><label class="filter-label">Require Skill</label></div>
           <input id="vSkill" placeholder="e.g. Java" disabled/>
-          <div class="btn-row" style="margin-top:14px;">
-            <button id="buildQueryBtn">Build Query</button>
-          </div>
+          <div class="btn-row" style="margin-top:14px;"><button id="buildQueryBtn">Build Query</button></div>
         </div>
         <div class="card">
           <label>JPQL Generated</label>
@@ -324,31 +263,20 @@ date: 2025-12-02
     </div>
   </div>
 
-  <!-- STEP 4: Pagination -->
+  <!-- STEP 4 -->
   <div class="section" id="step4">
     <div class="card">
       <h2>4 — Pagination &amp; Sorting</h2>
       <p class="block-desc"><strong>What this shows:</strong> See how Pageable works with sorting, limiting, and page navigation.</p>
       <div class="grid">
         <div class="card">
-          <label>Page (0-indexed)</label>
-          <input id="pg" type="number" min="0" value="0"/>
-          <label>Items per page</label>
-          <input id="sz" type="number" min="1" value="4"/>
+          <label>Page (0-indexed)</label><input id="pg" type="number" min="0" value="0"/>
+          <label>Items per page</label><input id="sz" type="number" min="1" value="4"/>
           <label>Sort by field</label>
-          <select id="sortField">
-            <option value="id">id</option>
-            <option value="name">name</option>
-            <option value="size">size</option>
-          </select>
+          <select id="sortField"><option value="id">id</option><option value="name">name</option><option value="size">size</option></select>
           <label>Sort direction</label>
-          <select id="sortDir">
-            <option value="asc">Ascending ↑</option>
-            <option value="desc">Descending ↓</option>
-          </select>
-          <div class="btn-row" style="margin-top:14px;">
-            <button id="pagingBtn">Apply Pagination</button>
-          </div>
+          <select id="sortDir"><option value="asc">Ascending ↑</option><option value="desc">Descending ↓</option></select>
+          <div class="btn-row" style="margin-top:14px;"><button id="pagingBtn">Apply Pagination</button></div>
           <div id="pageNav" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;"></div>
         </div>
         <div class="card">
@@ -362,20 +290,11 @@ Page&lt;Company&gt; findAll(Pageable pageable);
 
 // Service usage
 Pageable paging = PageRequest.of(0, 10, Sort.by("size").descending());
-Page&lt;Company&gt; page = repo.findAll(paging);
-
-// Response shape
-{
-  "content": [...],
-  "totalElements": 50,
-  "totalPages": 5,
-  "currentPage": 0,
-  "size": 10
-}</pre>
+Page&lt;Company&gt; page = repo.findAll(paging);</pre>
     </div>
   </div>
 
-  <!-- STEP 5: Scenario & Quiz -->
+  <!-- STEP 5 -->
   <div class="section" id="step5">
     <div class="card">
       <h2>5 — Scenario Checker &amp; Quick Quiz</h2>
@@ -394,9 +313,7 @@ Page&lt;Company&gt; page = repo.findAll(paging);
             <option>Derived Query</option><option>JPQL</option>
             <option>Specifications</option><option>Pageable</option><option>DTO Projection</option>
           </select>
-          <div class="btn-row" style="margin-top:14px;">
-            <button id="scenarioBtn">Check Approach</button>
-          </div>
+          <div class="btn-row" style="margin-top:14px;"><button id="scenarioBtn">Check Approach</button></div>
         </div>
         <div class="card">
           <pre id="scenarioOut" class="preview-box" style="min-height:100px;">Select a scenario and approach, then click Check.</pre>
@@ -407,12 +324,12 @@ Page&lt;Company&gt; page = repo.findAll(paging);
       <div class="btn-row" style="margin-top:14px;align-items:center;">
         <button id="gradeBtn">Grade Quiz</button>
         <button class="secondary" id="resetQuizBtn">Reset Quiz</button>
-        <span id="qScore" style="font-size:14px;color:var(--text);margin-left:4px;"></span>
+        <span id="qScore" style="font-size:14px;color:var(--txt);margin-left:4px;"></span>
       </div>
     </div>
   </div>
 
-  <!-- STEP 6: Checklist & Export -->
+  <!-- STEP 6 -->
   <div class="section" id="step6">
     <div class="card">
       <h2>6 — Completion Checklist &amp; Export</h2>
@@ -421,9 +338,7 @@ Page&lt;Company&gt; page = repo.findAll(paging);
         <div class="card">
           <h3>Self-Assessment</h3>
           <div id="checklistItems"></div>
-          <div class="btn-row" style="margin-top:16px;">
-            <button id="exportBtn">Export Progress</button>
-          </div>
+          <div class="btn-row" style="margin-top:16px;"><button id="exportBtn">Export Progress</button></div>
         </div>
         <div class="card">
           <h3>Notes</h3>
@@ -441,7 +356,6 @@ Page&lt;Company&gt; page = repo.findAll(paging);
       <button id="nextBtn">Next →</button>
     </div>
   </div>
-
 </div>
 
 <script type="module">
