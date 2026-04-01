@@ -38,21 +38,26 @@
   <!-- File Upload Form -->
   <form class="submission-form hidden" id="file-form">
     <div class="form-group">
-      <label for="submission-file">Upload File</label>
-      <div class="file-input-wrapper">
-        <input type="file" id="submission-file" required>
-        <span class="file-name">No file selected</span>
-        <span class="file-size"></span>
+      <label>Upload Files</label>
+      <div class="file-upload-area" id="file-upload-area">
+        <input type="file" id="file-input" multiple style="display: none;">
+        <div class="file-upload-icon">
+          <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <div class="file-upload-text">Click to upload or drag and drop</div>
+        <div class="file-upload-hint">PDF, ZIP, images, or documents (Max 10MB per file)</div>
       </div>
+      <div class="file-list" id="file-list"></div>
     </div>
     <div class="form-group">
-      <label for="file-description">Description</label>
-      <textarea id="file-description" placeholder="Describe what you're submitting..." required></textarea>
+      <label for="file-notes">Notes (Optional)</label>
+      <textarea id="file-notes" placeholder="Add any additional comments..."></textarea>
     </div>
-    <div id="file-list" class="file-list"></div>
-    <button type="submit" class="submit-btn">
+    <button type="submit" class="submit-btn" id="file-submit-btn" disabled>
       <i class="fas fa-check"></i>
-      Submit File
+      Submit Files
     </button>
   </form>
+
+  <div class="submission-status" id="submission-status"></div>
 </div>
