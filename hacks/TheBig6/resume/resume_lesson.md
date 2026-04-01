@@ -258,7 +258,7 @@ window.__ResumeNav = new Navigator({
     const lastStep = document.querySelectorAll('.section').length - 1;
     if (nextBtn) nextBtn.style.display = step === lastStep ? 'none' : '';
     document.getElementById('nextModuleBtnNav')?.classList.toggle('hidden', step !== lastStep);
-    if (step === 4 && window.Resume) window.Resume.updatePreview(window.__resumeState);
+    if (step === 4 && window.Resume) new Resume.ResumePreview(window.__resumeState).update();
   },
 });
 </script>
@@ -307,11 +307,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const aboutEl = $('aboutPrompt');
   if (aboutEl) aboutEl.value = state.about || '';
 
-  Resume.initSkills(state);
-  Resume.initExperiences(state);
-  Resume.initPreview(state);
-  Resume.initLinkedIn(state);
-  Resume.initInterview();
+  new Resume.SkillsManager(state).init();
+  new Resume.ExperienceManager(state).init();
+  new Resume.ResumePreview(state).init();
+  new Resume.LinkedInBuilder(state).init();
+  new Resume.InterviewRecorder().init();
 
   const savedChar = localStorage.getItem('selectedCharacter');
   if (savedChar) {

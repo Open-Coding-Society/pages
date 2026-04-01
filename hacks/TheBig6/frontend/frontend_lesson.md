@@ -459,24 +459,24 @@ $radius: 12px;
 </div>
 
 <script type="module">
-import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
-import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
-import { initMarkdown }             from '/assets/js/bigsix/frontend/markdown.js';
-import { initCssPlayground }        from '/assets/js/bigsix/frontend/css-playground.js';
-import { initTailwind }             from '/assets/js/bigsix/frontend/tailwind.js';
-import { initJsPlayground }         from '/assets/js/bigsix/frontend/javascript-playground.js';
-import { initSandbox }              from '/assets/js/bigsix/frontend/sandbox.js';
+import { Navigator }      from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence }    from '/assets/js/bigsix/shared/persistence.js';
+import { MarkdownEditor } from '/assets/js/bigsix/frontend/markdown.js';
+import { CssPlayground }  from '/assets/js/bigsix/frontend/css-playground.js';
+import { TailwindPreview } from '/assets/js/bigsix/frontend/tailwind.js';
+import { JsPlayground }   from '/assets/js/bigsix/frontend/javascript-playground.js';
+import { Sandbox }        from '/assets/js/bigsix/frontend/sandbox.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const nav   = new Navigator();
   const store = new Persistence();
   nav.init(() => store.persist());
   store.restore((n, s) => nav.showStep(n, s));
-  initMarkdown();
-  initCssPlayground();
-  initTailwind();
-  initJsPlayground();
-  initSandbox();
+  new MarkdownEditor().init();
+  new CssPlayground().init();
+  new TailwindPreview().init();
+  new JsPlayground().init();
+  new Sandbox().init();
 });
 </script>
 

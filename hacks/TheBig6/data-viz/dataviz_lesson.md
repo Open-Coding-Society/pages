@@ -359,14 +359,14 @@ Page&lt;Company&gt; page = repo.findAll(paging);</pre>
 </div>
 
 <script type="module">
-import { CONFIG }           from '/assets/js/bigsix/dataviz/data.js';
-import { Navigator }        from '/assets/js/bigsix/shared/navigation.js';
-import { Persistence }      from '/assets/js/bigsix/shared/persistence.js';
-import { initApiSimulator } from '/assets/js/bigsix/dataviz/api-simulator.js';
-import { initQueryBuilder } from '/assets/js/bigsix/dataviz/query-builder.js';
-import { initPagination }   from '/assets/js/bigsix/dataviz/pagination.js';
-import { initScenarioQuiz } from '/assets/js/bigsix/dataviz/scenario-quiz.js';
-import { initChecklist }    from '/assets/js/bigsix/dataviz/checklist.js';
+import { CONFIG }        from '/assets/js/bigsix/dataviz/data.js';
+import { Navigator }     from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence }   from '/assets/js/bigsix/shared/persistence.js';
+import { ApiSimulator }  from '/assets/js/bigsix/dataviz/api-simulator.js';
+import { QueryBuilder }  from '/assets/js/bigsix/dataviz/query-builder.js';
+import { Pagination }    from '/assets/js/bigsix/dataviz/pagination.js';
+import { ScenarioQuiz }  from '/assets/js/bigsix/dataviz/scenario-quiz.js';
+import { Checklist }     from '/assets/js/bigsix/dataviz/checklist.js';
 
 const db        = JSON.parse(JSON.stringify(CONFIG.DEFAULT_DB));
 let   _nextId   = CONFIG.DEFAULT_DB.length + 1;
@@ -377,11 +377,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const store = new Persistence(null, { fields: ['notes'] });
   nav.init(() => store.persist());
   store.restore((n, s) => nav.showStep(n, s));
-  initApiSimulator(CONFIG);
-  initQueryBuilder(CONFIG, db, getNextId);
-  initPagination(CONFIG.PAGINATION_SAMPLE);
-  initScenarioQuiz(CONFIG);
-  initChecklist(CONFIG.CHECKLIST);
+  new ApiSimulator(CONFIG).init();
+  new QueryBuilder(CONFIG, db, getNextId).init();
+  new Pagination(CONFIG.PAGINATION_SAMPLE).init();
+  new ScenarioQuiz(CONFIG).init();
+  new Checklist(CONFIG.CHECKLIST).init();
 });
 </script>
 

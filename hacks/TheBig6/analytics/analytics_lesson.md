@@ -204,18 +204,18 @@ date: 2025-12-02
 import { javaURI, pythonURI, fetchOptions } from '/assets/js/api/config.js';
 import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
 import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
-import { loadAnalytics }            from '/assets/js/bigsix/analytics/analytics.js';
-import { initCerts }                from '/assets/js/bigsix/analytics/certificates.js';
-import { initFRQ }                  from '/assets/js/bigsix/analytics/frq.js';
+import { AnalyticsDashboard } from '/assets/js/bigsix/analytics/analytics.js';
+import { CertificatePanel }   from '/assets/js/bigsix/analytics/certificates.js';
+import { FrqGrader }          from '/assets/js/bigsix/analytics/frq.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const nav   = new Navigator();
   const store = new Persistence('analytics_combined_v1', { fields: ['frq-answer'] });
   nav.init(() => store.persist());
   store.restore((n, s) => nav.showStep(n, s));
-  loadAnalytics(javaURI, fetchOptions);
-  initCerts(pythonURI, fetchOptions);
-  initFRQ(javaURI);
+  new AnalyticsDashboard(javaURI, fetchOptions).init();
+  new CertificatePanel(pythonURI, fetchOptions).init();
+  new FrqGrader(javaURI).init();
 });
 </script>
 

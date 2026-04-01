@@ -167,7 +167,7 @@ date: 2025-12-02
         <p>Paste your weak bullet point and we'll generate 3 STAR versions!</p>
         <label>Your Current Bullet:</label>
         <textarea id="weak-bullet" placeholder="e.g., 'Worked on website development'" rows="3"></textarea>
-        <button class="action-button" onclick="generateVersions()">✦ Transform to STAR Format</button>
+        <button class="action-button" data-action="generate-versions">✦ Transform to STAR Format</button>
         <div id="versions-container" style="display:none; margin-top:16px;">
           <div class="version-card"><h4>Version 1 — Conservative</h4><p id="version-conservative"></p></div>
           <div class="version-card"><h4>Version 2 — Balanced</h4><p id="version-balanced"></p></div>
@@ -192,7 +192,7 @@ date: 2025-12-02
         </select>
         <label>Your Answer:</label>
         <textarea id="interview-answer" placeholder="Type your answer here..." rows="6"></textarea>
-        <button class="action-button" onclick="analyzeInterview()">🔍 Analyze My Answer</button>
+        <button class="action-button" data-action="analyze-interview">🔍 Analyze My Answer</button>
         <div class="analysis-result" id="analysis-result">
           <h4>Analysis Results</h4>
           <div id="analysis-content"></div>
@@ -210,7 +210,7 @@ date: 2025-12-02
         <p>Click each scenario card to sort it — confirm if it's a <strong style="color:var(--ok);">good</strong> or <strong style="color:var(--err);">bad</strong> use of AI.</p>
         <p>Score: <span id="game-score">0/6</span> correct</p>
         <div id="scenarios-container"></div>
-        <button class="action-button" onclick="resetGame()" style="margin-top:16px;">↺ Reset Game</button>
+        <button class="action-button" onclick="resetGame()" style="margin-top:16px;" data-action="reset-game">↺ Reset Game</button>
       </div>
     </div>
   </div>
@@ -225,9 +225,11 @@ date: 2025-12-02
 </div>
 
 <script type="module">
-  import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
-  import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
-  import { initSorter }  from '/assets/js/bigsix/ai/sorter.js';
+  import { Navigator }        from '/assets/js/bigsix/shared/navigation.js';
+  import { Persistence }      from '/assets/js/bigsix/shared/persistence.js';
+  import { SorterGame }        from '/assets/js/bigsix/ai/sorter.js';
+  import { InterviewAnalyzer } from '/assets/js/bigsix/ai/interview.js';
+  import { ResumeGenerator }   from '/assets/js/bigsix/ai/resume.js';
 
   function markLessonComplete() {
     const key = 'bigsix:ai_lesson:lesson:5';
@@ -235,15 +237,15 @@ date: 2025-12-02
       localStorage.setItem(key, 'done');
     }
   }
-  import '/assets/js/bigsix/ai/resume.js';
-  import '/assets/js/bigsix/ai/interview.js';
 
   document.addEventListener('DOMContentLoaded', () => {
     const nav   = new Navigator({ onComplete: markLessonComplete });
     const store = new Persistence('ai_combined_v1', { fields: ['weak-bullet', 'interview-answer'] });
     nav.init(() => store.persist());
     store.restore((n, s) => nav.showStep(n, s));
-    initSorter();
+    new SorterGame().init();
+    new InterviewAnalyzer().init();
+    new ResumeGenerator().init();
   });
 </script>
 

@@ -416,23 +416,23 @@ SECRET = <span class="st">"your-secret-key"</span>
 </div>
 
 <script type="module">
-import { CONFIG }         from '/assets/js/bigsix/backend/data.js';
-import { Navigator }      from '/assets/js/bigsix/shared/navigation.js';
-import { Persistence }    from '/assets/js/bigsix/shared/persistence.js';
-import { initQuizzes }    from '/assets/js/bigsix/backend/quiz.js';
-import { initVocab }      from '/assets/js/bigsix/backend/vocab.js';
-import { initFrqs }       from '/assets/js/bigsix/backend/frq.js';
-import { initApiTester }  from '/assets/js/bigsix/backend/api-tester.js';
+import { CONFIG }      from '/assets/js/bigsix/backend/data.js';
+import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
+import { Quiz }        from '/assets/js/bigsix/backend/quiz.js';
+import { Vocab }       from '/assets/js/bigsix/backend/vocab.js';
+import { Frq }         from '/assets/js/bigsix/backend/frq.js';
+import { ApiTester }   from '/assets/js/bigsix/backend/api-tester.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const nav   = new Navigator({ progressStyle: 'dots', labels: CONFIG.STEP_LABELS });
   const store = new Persistence();
   nav.init(() => store.persist());
   store.restore((n, s) => nav.showStep(n, s));
-  initQuizzes(CONFIG.QUIZZES);
-  initVocab(CONFIG.VOCAB);
-  initFrqs(CONFIG.FRQS);
-  initApiTester(CONFIG);
+  new Quiz(CONFIG.QUIZZES).init();
+  new Vocab(CONFIG.VOCAB).init();
+  new Frq(CONFIG.FRQS).init();
+  new ApiTester(CONFIG).init();
 });
 </script>
 
