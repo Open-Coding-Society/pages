@@ -11,6 +11,12 @@ class GameLevel {
   }
 
   /** Spawning Object Literals to Class */
+  /**
+   * Normalize a class entry into object descriptor format.
+   * Supports object syntax and tuple syntax: [Class, data, spawn].
+   * @param {*} entry class descriptor from level definition
+   * @returns {{class: *, data: Object, spawn: Object|null}}
+   */
   normalizeClassDescriptor(entry) {
     // Backward compatible: support both object descriptors and tuple style [Class, data, spawn].
     if (Array.isArray(entry)) {
@@ -23,6 +29,11 @@ class GameLevel {
     return entry || {}
   }
 
+  /**
+   * Deep-clone data while preserving function references.
+   * @param {*} data base object data for a game object
+   * @returns {*} cloned data
+   */
   cloneData(data) {
     const cloneValue = (value, seen = new WeakMap()) => {
       if (value === null || typeof value !== 'object') {
@@ -58,6 +69,13 @@ class GameLevel {
     return cloneValue(data || {})
   }
 
+  /**
+   * Generate a random number inside [min, max] from a range tuple.
+   * Returns fallback if range is invalid.
+   * @param {Array<number>} range [min, max]
+   * @param {*} fallback value to use when range is invalid
+   * @returns {*}
+   */
   randomInRange(range, fallback) {
     if (!Array.isArray(range) || range.length !== 2) {
       return fallback
@@ -72,6 +90,12 @@ class GameLevel {
     return low + Math.random() * (high - low)
   }
 
+  /**
+   * Pick a random value from an array, or fallback when empty.
+   * @param {Array<*>} values candidate values
+   * @param {*} fallback value to use when array is empty
+   * @returns {*}
+   */
   pickOne(values, fallback) {
     if (!Array.isArray(values) || values.length === 0) {
       return fallback
@@ -80,6 +104,13 @@ class GameLevel {
     return values[index]
   }
 
+  /**
+   * Apply spawn configuration to a data object to produce one instance variant.
+   * Supports numeric ranges and pickOne value lists.
+   * @param {Object} data base game object data
+   * @param {Object} spawn spawn settings
+   * @returns {Object} spawned variant data
+   */
   applySpawnConfig(data, spawn) {
     const out = this.cloneData(data || {})
     const ranges = (spawn && spawn.ranges) || {}
@@ -103,6 +134,12 @@ class GameLevel {
     return out
   }
 
+  /**
+   * Expand one descriptor into one or many concrete descriptors.
+   * When spawn.count > 1, each instance gets its own cloned/configured data.
+   * @param {Object|Array} descriptor class descriptor
+   * @returns {Array<Object>} concrete descriptor list
+   */
   expandDescriptor(descriptor) {
     const normalized = this.normalizeClassDescriptor(descriptor)
     if (!normalized.data) normalized.data = {}
@@ -111,6 +148,7 @@ class GameLevel {
     const rawCount = Number(spawn.count)
     const count = Number.isFinite(rawCount) ? Math.max(1, Math.floor(rawCount)) : 1
 
+    // Fast path keeps legacy behavior unchanged for single-instance entries.
     if (count === 1) {
       return [normalized]
     }
@@ -124,8 +162,7 @@ class GameLevel {
     }
     return expanded
   }
-
-  /* End Spawning */
+  /** End Spawning */
 
   create(GameLevelClass) {
     this.continue = true
