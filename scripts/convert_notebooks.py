@@ -426,6 +426,8 @@ class GameRunner:
             lines.append(f'   width="{self.options["width"]}"')
         if self.options.get('height'):
             lines.append(f'   height="{self.options["height"]}"')
+        if self.options.get('editor_height'):
+            lines.append(f'   editor_height="{self.options["editor_height"]}"')
 
         lines.extend(['%}', ''])
         return lines
