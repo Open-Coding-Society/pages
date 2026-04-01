@@ -35,6 +35,54 @@ UI_RUNNER_PATTERN = r'^<!--\s*UI_RUNNER:\s*(.+)\s*-->$'
 GAME_RUNNER_PATTERN = r'^//\s*GAME_RUNNER:\s*(.+)$'
 
 
+########################################
+### Section for Core Helper Functions ###
+########################################
+
+def ensure_directory_exists(path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+
+def generate_runner_id(permalink, index):
+    """Generate runner_id from permalink"""
+    # Convert /javascript/json/lesson to javascript-json-lesson-0
+    clean_permalink = permalink.strip('/').replace('/', '-')
+    return f"{clean_permalink}-{index}"
+
+
+def detect_cell_language(cell):
+    """Detect the programming language of a code cell"""
+    source = cell.get('source', '')
+    lines = source.split('\n')
+
+    # JavaScript: first line is %%js magic command
+    if lines and lines[0].strip().startswith('%%js'):
+        return 'javascript'
+
+    # Java: last non-whitespace line matches ClassName.main(null);
+    # Find last non-empty line
+    last_line = ''
+    for line in reversed(lines):
+        if line.strip():
+            last_line = line.strip()
+            break
+    if re.match(r'^\w+\.main\s*\(\s*null\s*\)\s*;?\s*$', last_line):
+        return 'java'
+
+    # Default to python
+    return 'python'
+
+
+def get_custom_cell_id(cell) -> str:
+    """Get the precomputed custom cell ID from metadata."""
+    return cell.get('metadata', {}).get('custom_cell', {}).get('id', '')
+
+
+################################
+### Section for Object Models ###
+################################
+
+
 @dataclass
 class CodeRunner:
     challenge: str
@@ -402,9 +450,9 @@ class MermaidGraph:
                 image_path = self.convert_to_image(mermaid_code)
                 if image_path:
                     cell.source = f"![Mermaid Diagram](../../../../{image_path})"
-    
+ 
 ########################################
-### Section for Procedural functions ###
+### Section for Helper Functions     ###
 ########################################
 
 def error_cleanup(notebook_file):
@@ -437,10 +485,6 @@ def get_relative_output_path(notebook_file):
     return os.path.join(destination_directory, markdown_filename)
 
 
-def ensure_directory_exists(path):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-
-
 def fix_js_code_blocks(markdown):
     # This regex finds ```python blocks starting with %%js and replaces with ```javascript
     # but keeps the %%js line for developers to see
@@ -450,41 +494,6 @@ def fix_js_code_blocks(markdown):
     pattern2 = re.compile(r"```python\r?\n%%js\r?\n", re.MULTILINE)
     markdown = pattern2.sub("```javascript\n%%js\n", markdown)
     return markdown
-
-
-def generate_runner_id(permalink, index):
-    """Generate runner_id from permalink"""
-    # Convert /javascript/json/lesson to javascript-json-lesson-0
-    clean_permalink = permalink.strip('/').replace('/', '-')
-    return f"{clean_permalink}-{index}"
-
-
-def detect_cell_language(cell):
-    """Detect the programming language of a code cell"""
-    source = cell.get('source', '')
-    lines = source.split('\n')
-    
-    # JavaScript: first line is %%js magic command
-    if lines and lines[0].strip().startswith('%%js'):
-        return 'javascript'
-    
-    # Java: last non-whitespace line matches ClassName.main(null);
-    # Find last non-empty line
-    last_line = ''
-    for line in reversed(lines):
-        if line.strip():
-            last_line = line.strip()
-            break
-    if re.match(r'^\w+\.main\s*\(\s*null\s*\)\s*;?\s*$', last_line):
-        return 'java'
-    
-    # Default to python
-    return 'python'
-
-
-def get_custom_cell_id(cell) -> str:
-    """Get the precomputed custom cell ID from metadata."""
-    return cell.get('metadata', {}).get('custom_cell', {}).get('id', '')
 
 
 def classify_custom_cell_type(cell) -> Optional[str]:
@@ -527,6 +536,11 @@ def assign_custom_cell_ids(notebook, permalink):
             'cell_index': cell_index,
         }
     return notebook
+
+
+########################################
+### Section for Orchestrators        ###
+########################################
 
 
 def process_custom_cells(notebook, permalink):
