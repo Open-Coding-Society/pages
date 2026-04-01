@@ -225,20 +225,25 @@ date: 2025-12-02
 </div>
 
 <script type="module">
-  import { showStep }     from '/assets/js/bigsix/ai/navigation.js';
-  import { restoreState } from '/assets/js/bigsix/ai/persistence.js';
-  import { initSorter }   from '/assets/js/bigsix/ai/sorter.js';
+  import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
+  import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
+  import { initSorter }  from '/assets/js/bigsix/ai/sorter.js';
+
+  function markLessonComplete() {
+    const key = 'bigsix:ai_lesson:lesson:5';
+    if (localStorage.getItem(key) !== 'done') {
+      localStorage.setItem(key, 'done');
+    }
+  }
   import '/assets/js/bigsix/ai/resume.js';
   import '/assets/js/bigsix/ai/interview.js';
 
   document.addEventListener('DOMContentLoaded', () => {
-    const saved = restoreState();
-    const weakBulletEl      = document.getElementById('weak-bullet');
-    const interviewAnswerEl = document.getElementById('interview-answer');
-    if (weakBulletEl      && saved.weakBullet)      weakBulletEl.value      = saved.weakBullet;
-    if (interviewAnswerEl && saved.interviewAnswer) interviewAnswerEl.value = saved.interviewAnswer;
+    const nav   = new Navigator({ onComplete: markLessonComplete });
+    const store = new Persistence('ai_combined_v1', { fields: ['weak-bullet', 'interview-answer'] });
+    nav.init(() => store.persist());
+    store.restore((n, s) => nav.showStep(n, s));
     initSorter();
-    showStep(saved.step || 0);
   });
 </script>
 

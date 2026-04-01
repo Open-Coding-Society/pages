@@ -249,6 +249,20 @@ date: 2025-12-01
 <script src="/assets/js/bigsix/resume/linkedin.js"></script>
 <script src="/assets/js/bigsix/resume/interview.js"></script>
 
+<script type="module">
+import { Navigator } from '/assets/js/bigsix/shared/navigation.js';
+window.__ResumeNav = new Navigator({
+  progressStyle: 'fill',
+  onStep: (step) => {
+    const nextBtn = document.getElementById('nextBtn');
+    const lastStep = document.querySelectorAll('.section').length - 1;
+    if (nextBtn) nextBtn.style.display = step === lastStep ? 'none' : '';
+    document.getElementById('nextModuleBtnNav')?.classList.toggle('hidden', step !== lastStep);
+    if (step === 4 && window.Resume) window.Resume.updatePreview(window.__resumeState);
+  },
+});
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const $ = id => document.getElementById(id);
@@ -263,23 +277,10 @@ document.addEventListener('DOMContentLoaded', () => {
     about:       '',
   };
 
-  function showStep(i) {
-    const steps = Array.from(document.querySelectorAll('section[data-step]'));
-    state.step  = Math.max(0, Math.min(steps.length - 1, i));
-    steps.forEach((el, idx) => { el.classList.toggle('active', idx === state.step); el.classList.remove('hidden'); });
-    const pct = ((state.step + 1) / steps.length) * 100;
-    $('progressBar').style.width   = pct + '%';
-    $('progressLabel').textContent = `Step ${state.step + 1} / ${steps.length}`;
-    $('stepIndicator').textContent = `Step ${state.step + 1} / ${steps.length}`;
-    $('prevBtn').disabled          = state.step === 0;
-    $('nextBtn').style.display     = state.step === steps.length - 1 ? 'none' : '';
-    $('nextModuleBtnNav')?.classList.toggle('hidden', state.step !== steps.length - 1);
-    Resume.persist(state);
-    if (state.step === 4) Resume.updatePreview(state);
-  }
+  window.__resumeState = state;
 
-  $('prevBtn').addEventListener('click', () => showStep(state.step - 1));
-  $('nextBtn').addEventListener('click', () => showStep(state.step + 1));
+  // Wire navigation using shared Navigator — persist uses Resume.persist(state)
+  __ResumeNav.init(() => Resume.persist(state));
 
   const saved = Resume.restore();
   if (saved) {
@@ -318,7 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (src) { $('floating-source').src = src; $('floating-sprite').style.display = 'block'; $('floating-sprite').play().catch(() => {}); }
   }
 
-  showStep(saved?.step || 0);
+  // Restore saved step — silent=true so we don't re-persist step 0 over the saved value
+  __ResumeNav.showStep(saved?.step || 0, true);
 });
 </script>
 

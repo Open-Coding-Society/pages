@@ -417,18 +417,18 @@ SECRET = <span class="st">"your-secret-key"</span>
 
 <script type="module">
 import { CONFIG }         from '/assets/js/bigsix/backend/data.js';
-import { showStep,
-         initNavigation } from '/assets/js/bigsix/backend/navigation.js';
-import { persist,
-         restore }        from '/assets/js/bigsix/backend/persistence.js';
+import { Navigator }      from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence }    from '/assets/js/bigsix/shared/persistence.js';
 import { initQuizzes }    from '/assets/js/bigsix/backend/quiz.js';
 import { initVocab }      from '/assets/js/bigsix/backend/vocab.js';
 import { initFrqs }       from '/assets/js/bigsix/backend/frq.js';
 import { initApiTester }  from '/assets/js/bigsix/backend/api-tester.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  initNavigation(CONFIG.STEP_LABELS, persist);
-  restore(showStep);
+  const nav   = new Navigator({ progressStyle: 'dots', labels: CONFIG.STEP_LABELS });
+  const store = new Persistence();
+  nav.init(() => store.persist());
+  store.restore((n, s) => nav.showStep(n, s));
   initQuizzes(CONFIG.QUIZZES);
   initVocab(CONFIG.VOCAB);
   initFrqs(CONFIG.FRQS);

@@ -360,10 +360,8 @@ Page&lt;Company&gt; page = repo.findAll(paging);</pre>
 
 <script type="module">
 import { CONFIG }           from '/assets/js/bigsix/dataviz/data.js';
-import { initNavigation,
-         showStep }         from '/assets/js/bigsix/dataviz/navigation.js';
-import { persist,
-         restore }          from '/assets/js/bigsix/dataviz/persistence.js';
+import { Navigator }        from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence }      from '/assets/js/bigsix/shared/persistence.js';
 import { initApiSimulator } from '/assets/js/bigsix/dataviz/api-simulator.js';
 import { initQueryBuilder } from '/assets/js/bigsix/dataviz/query-builder.js';
 import { initPagination }   from '/assets/js/bigsix/dataviz/pagination.js';
@@ -375,8 +373,10 @@ let   _nextId   = CONFIG.DEFAULT_DB.length + 1;
 const getNextId = () => _nextId++;
 
 document.addEventListener('DOMContentLoaded', () => {
-  initNavigation(persist);
-  restore(showStep);
+  const nav   = new Navigator();
+  const store = new Persistence(null, { fields: ['notes'] });
+  nav.init(() => store.persist());
+  store.restore((n, s) => nav.showStep(n, s));
   initApiSimulator(CONFIG);
   initQueryBuilder(CONFIG, db, getNextId);
   initPagination(CONFIG.PAGINATION_SAMPLE);

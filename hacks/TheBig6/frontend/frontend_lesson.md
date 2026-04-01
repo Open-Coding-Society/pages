@@ -459,8 +459,8 @@ $radius: 12px;
 </div>
 
 <script type="module">
-import { restore, persist }         from '/assets/js/bigsix/frontend/persistence.js';
-import { initNavigation, showStep } from '/assets/js/bigsix/frontend/navigation.js';
+import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
 import { initMarkdown }             from '/assets/js/bigsix/frontend/markdown.js';
 import { initCssPlayground }        from '/assets/js/bigsix/frontend/css-playground.js';
 import { initTailwind }             from '/assets/js/bigsix/frontend/tailwind.js';
@@ -468,8 +468,10 @@ import { initJsPlayground }         from '/assets/js/bigsix/frontend/javascript-
 import { initSandbox }              from '/assets/js/bigsix/frontend/sandbox.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  initNavigation();
-  restore(showStep);
+  const nav   = new Navigator();
+  const store = new Persistence();
+  nav.init(() => store.persist());
+  store.restore((n, s) => nav.showStep(n, s));
   initMarkdown();
   initCssPlayground();
   initTailwind();
