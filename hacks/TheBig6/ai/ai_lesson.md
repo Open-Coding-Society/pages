@@ -133,7 +133,7 @@ date: 2025-12-02
     <div class="badge">Module 5 · Thinkers Team</div>
     <h1>AI Development</h1>
     <p>Prompt engineering, resume transformation, interview coaching, and AI use case classification — all interactive.</p>
-    <a href="../" class="back-btn">← Back to Big Six</a>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
   <div class="progress-track">

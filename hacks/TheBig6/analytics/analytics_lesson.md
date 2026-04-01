@@ -131,7 +131,7 @@ date: 2025-12-02
     <div class="badge">Module 6 · Curators Team</div>
     <h1>Analytics</h1>
     <p>Admin dashboard, student gradebook, certificates, and AI-graded mastery questions.</p>
-    <a href="../" class="back-btn">← Back to Big Six</a>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
   <div class="progress-track">

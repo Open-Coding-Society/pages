@@ -193,7 +193,7 @@ date: 2025-12-02
     <div class="badge">Applicators · Lesson 3</div>
     <h1>Data Visualization</h1>
     <p>Interactive lessons: REST APIs, Spring Boot CRUD, search, filtering, pagination, and data queries.</p>
-    <a href="../" class="back-btn">← Back to Big Six</a>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
   <div class="progress-track">

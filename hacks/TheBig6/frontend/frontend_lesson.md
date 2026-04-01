@@ -164,7 +164,7 @@ date: 2025-12-02
     <div class="badge">Creators · Lesson 1</div>
     <h1>Frontend Development</h1>
     <p>Interactive lessons: Markdown → HTML, CSS styling, Tailwind + Sass, JavaScript, and a live code sandbox.</p>
-    <a href="../" class="back-btn">← Back to Big Six</a>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
   <div class="progress-track">

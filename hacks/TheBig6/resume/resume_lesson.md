@@ -129,7 +129,7 @@ date: 2025-12-01
     <div class="badge">Grinders · Lesson 4</div>
     <h1>Resume — All-in-One</h1>
     <p>Short, interactive steps. Build your resume, export PDF, and practice interviews.</p>
-    <a href="../" class="back-btn">← Back to Big Six</a>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
   <div class="progress-track">
