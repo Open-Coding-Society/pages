@@ -59,6 +59,40 @@ class CodeRunner:
     def to_metadata(self) -> dict[str, Any]:
         return asdict(self)
 
+    @classmethod
+    def from_metadata(cls, metadata: dict[str, Any]) -> "CodeRunner":
+        return cls(
+            challenge=metadata['challenge'],
+            language=metadata['language'],
+            runner_id=metadata['runner_id'],
+            code=metadata['code'],
+        )
+
+    def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
+        return [
+            '',
+            '{% capture challenge' + str(code_runner_count) + ' %}',
+            self.challenge,
+            '{% endcapture %}',
+            '',
+            '{% capture code' + str(code_runner_count) + ' %}',
+            self.code,
+            '{% endcapture %}',
+            '',
+            '{% capture source' + str(code_runner_count) + ' %}',
+            *code_fence_lines,
+            '{% endcapture %}',
+            '',
+            '{% include code-runner.html',
+            '   runner_id="' + self.runner_id + '"',
+            '   language="' + self.language + '"',
+            '   challenge=challenge' + str(code_runner_count),
+            '   code=code' + str(code_runner_count),
+            '   source=source' + str(code_runner_count),
+            '%}',
+            '',
+        ]
+
 
 @dataclass
 class UiRunner:
@@ -83,6 +117,28 @@ class UiRunner:
 
     def to_metadata(self) -> dict[str, Any]:
         return asdict(self)
+
+    @classmethod
+    def from_metadata(cls, metadata: dict[str, Any]) -> "UiRunner":
+        return cls(
+            description=metadata['description'],
+            runner_id=metadata['runner_id'],
+            html=metadata['html'],
+            script=metadata['script'],
+        )
+
+    def rendered_markup_lines(self) -> list[str]:
+        return [
+            '<div class="ui-runner">',
+            self.html,
+            '<script>',
+            '(function() {',
+            self.script,
+            '})();',
+            '</script>',
+            '</div>',
+            '',
+        ]
 
 
 @dataclass
@@ -113,6 +169,42 @@ class GameRunner:
     def to_metadata(self) -> dict[str, Any]:
         return asdict(self)
 
+    @classmethod
+    def from_metadata(cls, metadata: dict[str, Any]) -> "GameRunner":
+        return cls(
+            challenge=metadata['challenge'],
+            runner_id=metadata['runner_id'],
+            code=metadata['code'],
+            options=metadata.get('options', {}),
+        )
+
+    def liquid_lines(self, code_runner_count: int) -> list[str]:
+        lines = [
+            '',
+            '{% capture challenge' + str(code_runner_count) + ' %}',
+            self.challenge,
+            '{% endcapture %}',
+            '',
+            '{% capture code' + str(code_runner_count) + ' %}',
+            self.code,
+            '{% endcapture %}',
+            '',
+            '{% include game-runner.html',
+            '   runner_id="' + self.runner_id + '"',
+            '   challenge=challenge' + str(code_runner_count),
+            '   code=code' + str(code_runner_count),
+        ]
+
+        if self.options.get('hide_edit'):
+            lines.append('   hide_edit="true"')
+        if self.options.get('width'):
+            lines.append(f'   width="{self.options["width"]}"')
+        if self.options.get('height'):
+            lines.append(f'   height="{self.options["height"]}"')
+
+        lines.extend(['%}', ''])
+        return lines
+
 
 @dataclass
 class CodeFence:
@@ -131,6 +223,10 @@ class CodeFence:
 
     def to_markdown_lines(self) -> list[str]:
         return [self.opening_fence, *self.body_lines, self.closing_fence]
+    
+########################################
+### Section for Procedural functions ###
+########################################
 
 def error_cleanup(notebook_file):
     destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
@@ -480,69 +576,6 @@ def _extract_ui_runner_cells_and_ids(notebook):
     return ui_runner_cells, ui_runner_ids
 
 
-def _append_ui_runner_markup(result, runner_data):
-    result.append('<div class="ui-runner">')
-    result.append(runner_data['html'])
-    result.append('<script>')
-    result.append('(function() {')
-    result.append(runner_data['script'])
-    result.append('})();')
-    result.append('</script>')
-    result.append('</div>')
-    result.append('')
-
-
-def _append_code_runner_liquid(result, runner_data, code_fence_lines, code_runner_count):
-    result.append('')
-    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
-    result.append(runner_data['challenge'])
-    result.append('{% endcapture %}')
-    result.append('')
-    result.append('{% capture code' + str(code_runner_count) + ' %}')
-    result.append(runner_data['code'])
-    result.append('{% endcapture %}')
-    result.append('')
-    result.append('{% capture source' + str(code_runner_count) + ' %}')
-    result.extend(code_fence_lines)
-    result.append('{% endcapture %}')
-    result.append('')
-    result.append('{% include code-runner.html')
-    result.append('   runner_id="' + runner_data['runner_id'] + '"')
-    result.append('   language="' + runner_data['language'] + '"')
-    result.append('   challenge=challenge' + str(code_runner_count))
-    result.append('   code=code' + str(code_runner_count))
-    result.append('   source=source' + str(code_runner_count))
-    result.append('%}')
-    result.append('')
-
-
-def _append_game_runner_liquid(result, runner_data, code_runner_count):
-    result.append('')
-    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
-    result.append(runner_data['challenge'])
-    result.append('{% endcapture %}')
-    result.append('')
-    result.append('{% capture code' + str(code_runner_count) + ' %}')
-    result.append(runner_data['code'])
-    result.append('{% endcapture %}')
-    result.append('')
-    result.append('{% include game-runner.html')
-    result.append('   runner_id="' + runner_data['runner_id'] + '"')
-    result.append('   challenge=challenge' + str(code_runner_count))
-    result.append('   code=code' + str(code_runner_count))
-
-    options = runner_data.get('options', {})
-    if options.get('hide_edit'):
-        result.append('   hide_edit="true"')
-    if options.get('width'):
-        result.append(f'   width="{options["width"]}"')
-    if options.get('height'):
-        result.append(f'   height="{options["height"]}"')
-
-    result.append('%}')
-    result.append('')
-
-
 def inject_code_runners(markdown, notebook, front_matter=None):
     """Inject code-runner includes after code blocks with metadata
     
@@ -586,8 +619,8 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                         
                         # Inject the processed UI runner
                         ui_cell = ui_runner_cells[ui_runner_count]
-                        runner_data = ui_cell['metadata']['ui_runner']
-                        _append_ui_runner_markup(result, runner_data)
+                        ui_runner = UiRunner.from_metadata(ui_cell['metadata']['ui_runner'])
+                        result.extend(ui_runner.rendered_markup_lines())
                         
                         ui_runner_count += 1
         
@@ -619,15 +652,15 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                 
                 # Add code-runner if metadata exists
                 if code_cell and 'code_runner' in code_cell.get('metadata', {}):
-                    runner_data = code_cell['metadata']['code_runner']
+                    code_runner = CodeRunner.from_metadata(code_cell['metadata']['code_runner'])
                     code_fence = CodeFence.from_markdown_lines(code_block_content)
                     code_fence_lines = code_fence.to_markdown_lines() if code_fence else code_block_content
-                    _append_code_runner_liquid(result, runner_data, code_fence_lines, code_runner_count)
+                    result.extend(code_runner.liquid_lines(code_fence_lines, code_runner_count))
                     code_runner_count += 1
                 # Add game-runner if metadata exists
                 elif code_cell and 'game_runner' in code_cell.get('metadata', {}):
-                    runner_data = code_cell['metadata']['game_runner']
-                    _append_game_runner_liquid(result, runner_data, code_runner_count)
+                    game_runner = GameRunner.from_metadata(code_cell['metadata']['game_runner'])
+                    result.extend(game_runner.liquid_lines(code_runner_count))
                     code_runner_count += 1
                 else:
                     # Regular code block without code-runner
