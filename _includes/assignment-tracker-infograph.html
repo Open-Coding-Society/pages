@@ -1,30 +1,29 @@
-{% assign data = site.data.slack_messaging_infograph %}
+{% assign data = site.data.assignment_tracker_infograph %}
 
 <div class="dd-infograph">
   <!-- Header Section -->
   <div class="dd-header">
-    <div class="dd-badge">Design-Based Research Capstone</div>
+    <div class="dd-badge">OCS Gradebook System</div>
     <h1 class="dd-title">{{ data.Title }}</h1>
     <p class="dd-description">{{ data.Description }}</p>
   </div>
 
-  <!-- Project Cards -->
-  {% for topic in data.Topics %}
+  <!-- Feature Cards -->
+  {% for topic in data.Features %}
   <div class="dd-card">
     <div class="dd-card-grid">
 
-      <!-- Left: Image & Status -->
+      <!-- Left: Status -->
       <div class="dd-visual">
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="dd-image-link">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dd-image">
-          <div class="dd-overlay">
-            <span>View Project</span>
-          </div>
-        </a>
+        <div class="dd-feature-icon">
+          <svg class="dd-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            {{ topic.icon }}
+          </svg>
+        </div>
         <div class="dd-status">{{ topic.status }}</div>
         <div class="dd-team">
-          <span class="dd-team-label">Project Leads</span>
-          <span class="dd-team-name">{{ topic.team | join: ", " }}</span>
+          <span class="dd-team-label">Endpoints</span>
+          <span class="dd-team-name">{{ topic.endpoints | join: " / " }}</span>
         </div>
       </div>
 
@@ -54,14 +53,14 @@
         <h3 class="dd-section-title">About</h3>
         <p class="dd-about">{{ topic.description }}</p>
 
-        <h3 class="dd-section-title">Impact</h3>
+        <h3 class="dd-section-title">Security</h3>
         <div class="dd-impact-list">
-          {% for item in topic.impact %}
+          {% for item in topic.security %}
           <div class="dd-impact-item">{{ item }}</div>
           {% endfor %}
         </div>
 
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="dd-btn">Learn More</a>
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dd-btn">View in Dashboard</a>
       </div>
 
     </div>
