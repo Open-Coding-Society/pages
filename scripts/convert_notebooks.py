@@ -247,8 +247,12 @@ class UiRunner:
         return None
 
     @staticmethod
-    def clean_html_and_script(cell_source: str, runner_index: int) -> tuple[str, str]:
-        """Split HTML/script content and namespace element IDs for safe reuse."""
+    def clean_html_and_script(
+        cell_source: str,
+        runner_index: int,
+        namespace_ids: bool = False,
+    ) -> tuple[str, str]:
+        """Split HTML/script content and optionally namespace element IDs."""
         lines = cell_source.split('\n')
         in_script = False
         html_lines = []
@@ -274,13 +278,14 @@ class UiRunner:
         html_str = '\n'.join(html_lines)
         script_str = '\n'.join(script_lines)
 
-        unique_suffix = f"-ui{runner_index}"
-        ids_found = re.findall(r'id="([^"]+)"', html_str)
-        for old_id in ids_found:
-            new_id = old_id + unique_suffix
-            html_str = html_str.replace(f'id="{old_id}"', f'id="{new_id}"')
-            script_str = script_str.replace(f"getElementById('{old_id}')", f"getElementById('{new_id}')")
-            script_str = script_str.replace(f'getElementById("{old_id}")', f'getElementById("{new_id}")')
+        if namespace_ids:
+            unique_suffix = f"-ui{runner_index}"
+            ids_found = re.findall(r'id="([^"]+)"', html_str)
+            for old_id in ids_found:
+                new_id = old_id + unique_suffix
+                html_str = html_str.replace(f'id="{old_id}"', f'id="{new_id}"')
+                script_str = script_str.replace(f"getElementById('{old_id}')", f"getElementById('{new_id}')")
+                script_str = script_str.replace(f'getElementById("{old_id}")', f'getElementById("{new_id}")')
 
         return html_str, script_str
 
@@ -293,7 +298,12 @@ class UiRunner:
 
         description, options = parsed
 
-        html_content, script_content = cls.clean_html_and_script(cell.source, runner_index)
+        namespace_ids = bool(options.get('namespace_ids', False))
+        html_content, script_content = cls.clean_html_and_script(
+            cell.source,
+            runner_index,
+            namespace_ids=namespace_ids,
+        )
         return cls(
             description=description,
             runner_id=generate_runner_id(permalink, runner_index),
