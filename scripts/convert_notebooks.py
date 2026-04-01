@@ -42,6 +42,23 @@ class CodeRunner:
     runner_id: str
     code: str
 
+    @classmethod
+    def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["CodeRunner"]:
+        language = detect_cell_language(cell)
+        challenge = extract_code_runner_metadata(cell.source, language)
+        if not challenge:
+            return None
+
+        return cls(
+            challenge=challenge,
+            language=language,
+            runner_id=generate_runner_id(permalink, runner_index),
+            code=clean_code_for_runner(cell.source, language),
+        )
+
+    def to_metadata(self) -> dict[str, Any]:
+        return asdict(self)
+
 
 @dataclass
 class UiRunner:
@@ -50,6 +67,23 @@ class UiRunner:
     html: str
     script: str
 
+    @classmethod
+    def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["UiRunner"]:
+        description = extract_ui_runner_metadata(cell.source)
+        if not description:
+            return None
+
+        html_content, script_content = clean_html_for_runner(cell.source, runner_index)
+        return cls(
+            description=description,
+            runner_id=generate_runner_id(permalink, runner_index),
+            html=html_content,
+            script=script_content,
+        )
+
+    def to_metadata(self) -> dict[str, Any]:
+        return asdict(self)
+
 
 @dataclass
 class GameRunner:
@@ -57,6 +91,27 @@ class GameRunner:
     runner_id: str
     code: str
     options: dict[str, Any]
+
+    @classmethod
+    def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["GameRunner"]:
+        source = cell.get('source', '')
+        if not source.strip().startswith('%%js'):
+            return None
+
+        result = extract_game_runner_metadata(source)
+        if not result:
+            return None
+
+        challenge, options = result
+        return cls(
+            challenge=challenge,
+            runner_id=generate_runner_id(permalink, runner_index),
+            code=clean_game_code(source),
+            options=options,
+        )
+
+    def to_metadata(self) -> dict[str, Any]:
+        return asdict(self)
 
 
 @dataclass
@@ -213,21 +268,6 @@ def detect_cell_language(cell):
     return 'python'
 
 
-def build_code_runner(cell, permalink, runner_index):
-    """Create a CodeRunner object for a cell if metadata exists"""
-    language = detect_cell_language(cell)
-    challenge = extract_code_runner_metadata(cell.source, language)
-    if not challenge:
-        return None
-
-    return CodeRunner(
-        challenge=challenge,
-        language=language,
-        runner_id=generate_runner_id(permalink, runner_index),
-        code=clean_code_for_runner(cell.source, language),
-    )
-
-
 def process_code_runner_cells(notebook, permalink):
     """Process notebook cells and add code-runner metadata"""
     runner_index = 0
@@ -235,11 +275,11 @@ def process_code_runner_cells(notebook, permalink):
     
     for cell in notebook.cells:
         if cell.cell_type == 'code':
-            runner = build_code_runner(cell, permalink, runner_index)
+            runner = CodeRunner.from_cell(cell, permalink, runner_index)
 
             if runner:
                 # Store metadata for later use
-                cell['metadata']['code_runner'] = asdict(runner)
+                cell['metadata']['code_runner'] = runner.to_metadata()
                 runner_index += 1
                 
                 # Clear outputs for cells with code-runner (outputs are redundant)
@@ -380,21 +420,6 @@ def clean_html_for_runner(cell_source, runner_index):
     return html_str, script_str
 
 
-def build_ui_runner(cell, permalink, runner_index):
-    """Create a UiRunner object for a cell if metadata exists"""
-    description = extract_ui_runner_metadata(cell.source)
-    if not description:
-        return None
-
-    html_content, script_content = clean_html_for_runner(cell.source, runner_index)
-    return UiRunner(
-        description=description,
-        runner_id=generate_runner_id(permalink, runner_index),
-        html=html_content,
-        script=script_content,
-    )
-
-
 def process_ui_runner_cells(notebook, permalink):
     """Process notebook cells and add ui-runner metadata"""
     runner_index = 0
@@ -402,11 +427,11 @@ def process_ui_runner_cells(notebook, permalink):
     
     for cell in notebook.cells:
         if cell.cell_type == 'raw' or (cell.cell_type == 'code' and cell.source.strip().startswith('%%html')):
-            runner = build_ui_runner(cell, permalink, runner_index)
+            runner = UiRunner.from_cell(cell, permalink, runner_index)
 
             if runner:
                 # Store metadata for later use
-                cell['metadata']['ui_runner'] = asdict(runner)
+                cell['metadata']['ui_runner'] = runner.to_metadata()
                 runner_index += 1
         
         processed_cells.append(cell)
@@ -422,11 +447,11 @@ def process_game_runner_cells(notebook, permalink):
     
     for cell in notebook.cells:
         if cell.cell_type == 'code':
-            runner = build_game_runner(cell, permalink, runner_index)
+            runner = GameRunner.from_cell(cell, permalink, runner_index)
 
             if runner:
                 # Store metadata for later use
-                cell['metadata']['game_runner'] = asdict(runner)
+                cell['metadata']['game_runner'] = runner.to_metadata()
                 runner_index += 1
 
                 # Clear outputs for cells with game-runner (outputs are redundant)
@@ -437,25 +462,6 @@ def process_game_runner_cells(notebook, permalink):
     
     notebook.cells = processed_cells
     return notebook
-
-
-def build_game_runner(cell, permalink, runner_index):
-    """Create a GameRunner object for a cell if metadata exists"""
-    source = cell.get('source', '')
-    if not source.strip().startswith('%%js'):
-        return None
-
-    result = extract_game_runner_metadata(source)
-    if not result:
-        return None
-
-    challenge, options = result
-    return GameRunner(
-        challenge=challenge,
-        runner_id=generate_runner_id(permalink, runner_index),
-        code=clean_game_code(source),
-        options=options,
-    )
 
 
 def _build_lesson_key(front_matter):
