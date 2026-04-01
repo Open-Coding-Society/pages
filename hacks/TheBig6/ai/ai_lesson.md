@@ -13,102 +13,119 @@ date: 2025-12-02
 ---
 
 <style>
-  /*
-   * Colors from system SASS (_sass/minima/lessonbase.scss → :root).
-   * Edit lessonbase.scss to change colors — not this file.
-   */
   .page-content {
-    --bg:           var(--bg-1);
-    --panel:        var(--panel);
-    --border:       rgba(255,255,255,0.08);
-    --txt:          var(--text);
-    --muted:        var(--text-muted);
-    --ac:           var(--accent);
-    --ac-soft:      rgba(76,175,239,0.15);
-    --ac-border:    rgba(76,175,239,0.4);
-    --blue:         var(--blue1);
-    --blue-bg:      rgba(0,122,255,0.08);
-    --blue-border:  rgba(0,122,255,0.25);
-    --ok:           var(--green);
-    --ok-bg:        var(--green-bg);
-    --err:          var(--red);
-    --err-bg:       var(--warn-bg);
-    --hover-bg:     rgba(76,175,239,0.1);
-    --sel-bg:       rgba(76,175,239,0.2);
+    --bg:       var(--bg-1);
+    --panel:    var(--panel);
+    --panel-2:  var(--bg-3);
+    --panel-3:  var(--surface);
+    --border:   rgba(255,255,255,0.08);
+    --border-b: rgba(255,255,255,0.14);
+    --border-ac:rgba(76,175,239,0.4);
+    --txt:      var(--text);
+    --muted:    var(--text-muted);
+    --ac:       var(--accent);
+    --ac2:      var(--accent);
+    --ok:       var(--green);
+    --ok-bg:    var(--green-bg);
+    --err:      var(--red);
+    --err-bg:   var(--warn-bg);
+    --code-bg:  var(--bg-0);
+    --hover-bg: rgba(76,175,239,0.1);
   }
 
-  * { box-sizing: border-box; }
-  .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 40px; }
-  .header { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px; color: var(--txt); }
-  .header p  { color: var(--muted); font-size: 14px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 28px 16px 64px; }
 
-  .progress-bar { display: flex; gap: 8px; margin: 20px 0; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
-  .progress-bar .step { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer; transition: 0.2s; }
+  .lesson-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac2); margin-bottom: 10px; }
+  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 8px var(--ac); display: inline-block; }
+  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--txt); }
+  .lesson-header p  { color: var(--muted); font-size: 14px; }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
+  .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
+
+  .progress-bar { display: flex; gap: 6px; margin: 20px 0 28px; align-items: center; }
+  .progress-bar .step { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; cursor: pointer; transition: 0.2s; }
   .progress-bar .step.active { background: var(--ac); height: 6px; }
-  #stepIndicator { color: var(--muted); font-size: 12px; align-self: center; }
+  .progress-bar .step:hover  { background: var(--border-ac); }
 
   .section        { display: none; }
-  .section.active { display: block; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-  .card    { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  .card h2 { margin-top: 0; font-size: 20px; color: var(--blue); }
-  .card h3 { margin-top: 16px; font-size: 16px; color: var(--blue); }
-  .card p, .card li { color: var(--txt); font-size: 14px; }
-  .card ul, .card ol { padding-left: 20px; }
-  .card li { margin-bottom: 6px; }
-  .card strong { color: var(--blue); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--ac), var(--ac2)); opacity: 0.6; }
+  .card h2 { font-size: 20px; font-weight: 800; color: var(--txt); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .card h2 .step-num { width: 28px; height: 28px; border-radius: 8px; background: var(--ac); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card h3 { font-size: 15px; color: var(--ac2); margin: 20px 0 8px; }
+  .block-desc { background: rgba(76,175,239,0.06); border-left: 3px solid var(--ac); padding: 12px 16px; border-radius: 0 8px 8px 0; color: var(--txt); font-size: 14px; margin: 0 0 20px; line-height: 1.7; }
 
-  .nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin-bottom: 20px; }
+  .concept-tile { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; transition: border-color 0.2s, transform 0.2s; }
+  .concept-tile:hover { border-color: var(--border-ac); transform: translateY(-2px); }
+  .concept-tile .tile-icon  { font-size: 22px; margin-bottom: 6px; }
+  .concept-tile .tile-title { font-size: 13px; font-weight: 700; color: var(--ac2); margin-bottom: 4px; }
+  .concept-tile .tile-body  { font-size: 12px; color: var(--muted); line-height: 1.55; }
 
-  button { appearance: none; border: 1px solid var(--border); background: var(--panel); color: var(--txt); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: background 0.15s, border-color 0.15s, transform 0.1s; }
-  button:hover { background: var(--hover-bg); border-color: var(--ac-border); }
-  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  button.primary { background: var(--ac); border-color: var(--ac-border); color: #fff; }
-  button.primary:hover { background: var(--accent-700); }
-  button.secondary { background: var(--bg-3); border-color: var(--border); }
+  /* Tool panel — interactive area */
+  .tool-panel { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; }
+  .tool-panel h3 { font-size: 15px; font-weight: 700; color: var(--ac2); margin: 0 0 6px; }
+  .tool-panel p  { font-size: 13px; color: var(--muted); margin: 0 0 14px; line-height: 1.6; }
+  label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; margin-top: 12px; }
 
-  input, textarea, select { background: var(--bg-0); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--txt); font-size: 14px; width: 100%; margin-bottom: 8px; }
-  input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 8px rgba(76,175,239,0.3); }
-  select option { background: var(--panel); color: var(--txt); }
+  /* Split view for input/output */
+  .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .split-view { grid-template-columns: 1fr; } }
 
-  .back-btn { display: inline-block; margin-top: 8px; padding: 5px 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 13px; text-decoration: none; }
-  .back-btn:hover { border-color: var(--ac-border); color: var(--txt); }
+  /* AI response output */
+  .ai-output { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 14px; }
+  .ai-output-header { background: var(--panel-2); border-bottom: 1px solid var(--border); padding: 7px 14px; font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .ai-output-header::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #28c840; box-shadow: 0 0 6px #28c840; }
+  .ai-output-body { padding: 14px; font-size: 13px; color: var(--txt); line-height: 1.7; min-height: 80px; }
 
-  .tool-panel { background: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 12px; padding: 20px; margin: 16px 0; }
-  .tool-panel h3 { color: var(--blue); font-size: 18px; margin-top: 0; margin-bottom: 8px; }
-  .tool-panel p  { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
-  .tool-panel label { display: block; font-size: 13px; font-weight: 600; color: var(--blue); margin-top: 14px; margin-bottom: 4px; }
+  textarea, input { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); font-size: 13px; padding: 10px 12px; width: 100%; font-family: inherit; resize: vertical; }
+  textarea:focus, input:focus { outline: none; border-color: var(--ac); box-shadow: 0 0 0 2px rgba(76,175,239,0.15); }
+  select { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); padding: 8px 12px; font-size: 13px; cursor: pointer; width: 100%; }
+  select:focus { outline: none; box-shadow: 0 0 0 2px rgba(76,175,239,0.3); }
 
-  .version-card    { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin: 10px 0; }
-  .version-card h4 { color: var(--blue); font-size: 14px; margin: 0 0 8px; }
-  .version-card p  { color: var(--txt); font-size: 13px; margin: 0; line-height: 1.6; white-space: pre-wrap; }
+  button { appearance: none; border: 1px solid var(--border); background: var(--ac); color: #fff; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  button:hover { background: var(--accent-700); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(76,175,239,0.3); }
+  button:active { transform: translateY(0); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  button.secondary { background: var(--panel-2); color: var(--txt); }
+  button.secondary:hover { background: var(--panel-3); box-shadow: none; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+  .action-button { margin-top: 10px; }
 
-  .analysis-result    { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin: 14px 0; display: none; white-space: pre-wrap; }
-  .analysis-result h4 { color: var(--teal); font-size: 14px; margin: 0 0 12px; }
+  /* Sorter game */
+  .sorter-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin: 8px 0; cursor: pointer; transition: all 0.2s; font-size: 13px; color: var(--txt); line-height: 1.5; }
+  .sorter-card:hover { border-color: var(--border-ac); transform: translateY(-1px); }
+  .sorter-card.correct { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+  .sorter-card.wrong   { border-color: var(--err); background: var(--err-bg); color: var(--err); }
 
-  .scenario-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin: 8px 0; cursor: pointer; font-size: 13px; color: var(--txt); user-select: none; transition: background 0.15s, border-color 0.15s, transform 0.1s; }
-  .scenario-card:hover    { background: var(--hover-bg); border-color: var(--ac-border); transform: translateY(-2px); }
-  .scenario-card.correct  { background: var(--ok-bg);  border-color: var(--ok);  color: var(--ok); }
-  .scenario-card.incorrect{ background: var(--err-bg); border-color: var(--err); color: var(--err); }
+  /* Analysis result */
+  .analysis-result { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 14px; display: none; }
+  .analysis-result.show { display: block; }
+  .analysis-result h4 { font-size: 14px; font-weight: 700; color: var(--ac2); margin-bottom: 10px; }
 
-  .action-button { background: var(--ac); border: 1px solid var(--ac-border); border-radius: 8px; color: #fff; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.1s; margin: 8px 4px 4px 0; }
-  .action-button:hover { background: var(--accent-700); transform: translateY(-1px); }
+  /* Version cards */
+  .version-card { background: var(--panel-3); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 8px 0; }
+  .version-card h4 { font-size: 12px; font-weight: 700; color: var(--ac); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .version-card p  { font-size: 13px; color: var(--txt); line-height: 1.6; margin: 0; }
 
-  #game-score { color: var(--blue); font-weight: 700; }
-  .flex-row   { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tip { font-size: 12px; color: var(--muted); padding: 8px 14px; background: var(--panel-2); border-radius: 6px; border-left: 2px solid var(--ac); line-height: 1.5; margin-top: 14px; }
+  .tip::before { content: '💡 '; }
 
-  .ai-loading  { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; padding: 12px 0; }
-  .ai-spinner  { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--ac); animation: spin 0.7s linear infinite; flex-shrink: 0; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .ai-error { background: var(--err-bg); border: 1px solid var(--err); border-radius: 8px; padding: 10px 14px; color: var(--err); font-size: 13px; margin-top: 8px; }
+  .nav-buttons { display: flex; gap: 12px; margin-top: 28px; justify-content: space-between; align-items: center; }
+  #stepIndicator { font-size: 12px; color: var(--muted); }
 </style>
 
 <div class="container page-content">
-  <div class="header">
-    <h1>AI Development — All-in-One</h1>
-    <p>A multi-step interactive lesson on using AI for prompt engineering, coding, and professional development.</p>
-    <a href="../" class="button back-btn">← Back</a>
+  <div class="lesson-header">
+    <div class="badge">Module 5 · Thinkers Team</div>
+    <h1>AI Development</h1>
+    <p>Prompt engineering, resume transformation, interview coaching, and AI use case classification — all interactive.</p>
+    <a href="../" class="back-btn">← Back to Big Six</a>
   </div>
 
   <div class="progress-bar" id="progressBar"></div>
@@ -116,52 +133,70 @@ date: 2025-12-02
   <!-- Step 1: Prompt Engineering -->
   <div class="section active" id="step1">
     <div class="card">
-      <h2>1 — Prompt Engineering</h2>
-      <p>Mastering the art of communication with AI is the first step. A great prompt includes four key ingredients: Context, Problem, What You've Tried, and What You Need.</p>
-      <ul>
-        <li><strong>The Prompt Formula</strong>:
-          <ol>
-            <li><strong>Context</strong>: What are you working with? (e.g., Python, Flask, a specific library)</li>
-            <li><strong>Problem</strong>: What is the specific issue? (e.g., "I'm getting a 404 error")</li>
-            <li><strong>What You've Tried</strong>: Show your work. (e.g., "I've checked the routes and tested with Postman")</li>
-            <li><strong>What You Need</strong>: What is your desired outcome? (e.g., "I need a checklist of likely causes")</li>
+      <h2><span class="step-num">1</span> Prompt Engineering</h2>
+      <div class="block-desc">Mastering the art of communication with AI is the first step. A great prompt includes four key ingredients: Context, Problem, What You've Tried, and What You Need.</div>
+
+      <div class="concept-grid">
+        <div class="concept-tile"><div class="tile-icon">🧠</div><div class="tile-title">LLMs</div><div class="tile-body">Large Language Models predict the next token based on patterns in training data.</div></div>
+        <div class="concept-tile"><div class="tile-icon">✍️</div><div class="tile-title">Prompt Engineering</div><div class="tile-body">The art of writing inputs that reliably produce useful AI outputs.</div></div>
+        <div class="concept-tile"><div class="tile-icon">🔗</div><div class="tile-title">API Integration</div><div class="tile-body">Call Gemini, GPT, or Claude from your backend to add AI features.</div></div>
+        <div class="concept-tile"><div class="tile-icon">⚡</div><div class="tile-title">Use Cases</div><div class="tile-body">Summarization, classification, generation, code review, and more.</div></div>
+      </div>
+
+      <ul style="padding-left:20px; color:var(--txt); font-size:14px;">
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">The Prompt Formula</strong>:
+          <ol style="padding-left:18px; margin-top:6px;">
+            <li style="margin-bottom:4px;"><strong style="color:var(--ac2);">Context</strong>: What are you working with? (e.g., Python, Flask, a specific library)</li>
+            <li style="margin-bottom:4px;"><strong style="color:var(--ac2);">Problem</strong>: What is the specific issue? (e.g., "I'm getting a 404 error")</li>
+            <li style="margin-bottom:4px;"><strong style="color:var(--ac2);">What You've Tried</strong>: Show your work. (e.g., "I've checked the routes and tested with Postman")</li>
+            <li style="margin-bottom:4px;"><strong style="color:var(--ac2);">What You Need</strong>: What is your desired outcome? (e.g., "I need a checklist of likely causes")</li>
           </ol>
         </li>
-        <li><strong>Iterate, Don't Quit</strong>: The first response from an AI is rarely perfect. Refine your prompt based on the AI's output. Winners iterate 3–5 times.</li>
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">Iterate, Don't Quit</strong>: The first response from an AI is rarely perfect. Refine your prompt based on the AI's output. Winners iterate 3–5 times.</li>
       </ul>
+
+      <div class="tip">Start every prompt with a role: "You are a senior Python engineer." It anchors the AI's response style and expertise level.</div>
     </div>
   </div>
 
   <!-- Step 2: Coding with AI -->
   <div class="section" id="step2">
     <div class="card">
-      <h2>2 — Coding with AI</h2>
-      <p>When it comes to generating code, specificity is everything.</p>
-      <ul>
-        <li><strong>The SPEC Framework</strong>: Specific, Platform, Examples, and Constraints.</li>
-        <li><strong>4-Step Debugging Template</strong>: Problem, Expected vs. Actual, Minimal Code, and What You Tried.</li>
-        <li><strong>The 5 Security Non-Negotiables</strong>: SQL Injection, Hardcoded Secrets, Input Validation, XSS, and Authentication/Authorization.</li>
+      <h2><span class="step-num">2</span> Coding with AI</h2>
+      <div class="block-desc">When it comes to generating code, specificity is everything. The right framework turns a vague request into a precise, actionable prompt.</div>
+
+      <ul style="padding-left:20px; color:var(--txt); font-size:14px;">
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">The SPEC Framework</strong>: Specific, Platform, Examples, and Constraints.</li>
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">4-Step Debugging Template</strong>: Problem, Expected vs. Actual, Minimal Code, and What You Tried.</li>
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">The 5 Security Non-Negotiables</strong>: SQL Injection, Hardcoded Secrets, Input Validation, XSS, and Authentication/Authorization.</li>
       </ul>
+
+      <div class="tip">Always ask the AI to explain its code. If it can't, the code probably isn't doing what you think.</div>
     </div>
   </div>
 
   <!-- Step 3: Professional Applications -->
   <div class="section" id="step3">
     <div class="card">
-      <h2>3 — Professional Applications</h2>
-      <p>Leverage AI to accelerate your career, but know its limits.</p>
-      <ul>
-        <li><strong>Resume Transformation with STAR</strong>: Turn weak resume points into compelling, quantified achievements.</li>
-        <li><strong>Interview Preparation</strong>: Practice answering crucial questions about failure, project architecture, and your interest in the company.</li>
-        <li><strong>Know When to Use AI</strong>: Great for summarizing and brainstorming, bad for highly specialized or sensitive topics.</li>
+      <h2><span class="step-num">3</span> Professional Applications</h2>
+      <div class="block-desc">Leverage AI to accelerate your career, but know its limits. AI shines at structuring and drafting — your experience and authenticity make it real.</div>
+
+      <ul style="padding-left:20px; color:var(--txt); font-size:14px;">
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">Resume Transformation with STAR</strong>: Turn weak resume points into compelling, quantified achievements.</li>
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">Interview Preparation</strong>: Practice answering crucial questions about failure, project architecture, and your interest in the company.</li>
+        <li style="margin-bottom:6px;"><strong style="color:var(--ac2);">Know When to Use AI</strong>: Great for summarizing and brainstorming, bad for highly specialized or sensitive topics.</li>
       </ul>
+
+      <div class="tip">Never submit AI-generated content verbatim. Edit it to reflect your voice and verify every factual claim.</div>
     </div>
   </div>
 
   <!-- Step 4: Resume Transformer -->
   <div class="section" id="step4">
     <div class="card">
-      <h2>4 — Interactive: Resume Transformer</h2>
+      <h2><span class="step-num">4</span> Interactive: Resume Transformer</h2>
+      <div class="block-desc">Paste a weak bullet point and generate three STAR-formatted versions — conservative, balanced, and bold — to see how framing changes impact.</div>
+
       <div class="tool-panel">
         <h3>Resume Bullet Transformer</h3>
         <p>Paste your weak bullet point and we'll generate 3 STAR versions!</p>
@@ -174,13 +209,17 @@ date: 2025-12-02
           <div class="version-card"><h4>Version 3 — Bold</h4><p id="version-bold"></p></div>
         </div>
       </div>
+
+      <div class="tip">The STAR method: Situation, Task, Action, Result. Lead with action verbs and end with a measurable outcome.</div>
     </div>
   </div>
 
   <!-- Step 5: Interview Analyzer -->
   <div class="section" id="step5">
     <div class="card">
-      <h2>5 — Interactive: Interview Analyzer</h2>
+      <h2><span class="step-num">5</span> Interactive: Interview Analyzer</h2>
+      <div class="block-desc">Practice answering common interview questions and get instant AI feedback on structure, specificity, and how well your answer addresses the question.</div>
+
       <div class="tool-panel">
         <h3>Mock Interview Analyzer</h3>
         <p>Type your answer to one of the questions below (250 words max).</p>
@@ -198,13 +237,17 @@ date: 2025-12-02
           <div id="analysis-content"></div>
         </div>
       </div>
+
+      <div class="tip">Use the STAR format for behavioral questions. Keep your answer under 2 minutes when spoken aloud — about 250–300 words.</div>
     </div>
   </div>
 
   <!-- Step 6: AI Use Case Sorter -->
   <div class="section" id="step6">
     <div class="card">
-      <h2>6 — Interactive: AI Use Case Sorter</h2>
+      <h2><span class="step-num">6</span> Interactive: AI Use Case Sorter</h2>
+      <div class="block-desc">Not every task is a good fit for AI. Test your instincts by sorting real-world scenarios — click each card to reveal whether it's a smart or poor use of AI.</div>
+
       <div class="tool-panel">
         <h3>Use Case Sorter Game</h3>
         <p>Click each scenario card to sort it — confirm if it's a <strong style="color:var(--ok);">good</strong> or <strong style="color:var(--err);">bad</strong> use of AI.</p>
@@ -212,14 +255,16 @@ date: 2025-12-02
         <div id="scenarios-container"></div>
         <button class="action-button" onclick="resetGame()" style="margin-top:16px;" data-action="reset-game">↺ Reset Game</button>
       </div>
+
+      <div class="tip">AI works best when tasks are well-defined, repeatable, and don't require real-time or highly sensitive data.</div>
     </div>
   </div>
 
   <div class="nav-buttons">
     <button id="prevBtn" onclick="prevStep()" class="secondary">← Previous</button>
-    <div class="flex-row">
+    <div style="display:flex; gap:12px; align-items:center;">
       <span id="stepIndicator">Step 1 / 6</span>
-      <button id="nextBtn" onclick="nextStep()" class="primary">Next →</button>
+      <button id="nextBtn" onclick="nextStep()">Next →</button>
     </div>
   </div>
 </div>
