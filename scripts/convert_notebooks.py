@@ -8,6 +8,8 @@ import sys
 import subprocess
 from hashlib import sha256
 import concurrent.futures, traceback, re
+from dataclasses import dataclass, asdict
+from typing import Any
 
 if __name__ == "__main__":
     from progress_bar import ProgressBar
@@ -31,6 +33,30 @@ UI_RUNNER_PATTERN = r'^<!--\s*UI_RUNNER:\s*(.+)\s*-->$'
 
 # GAME_RUNNER pattern for GameEngine cells (JavaScript only)
 GAME_RUNNER_PATTERN = r'^//\s*GAME_RUNNER:\s*(.+)$'
+
+
+@dataclass
+class CodeRunner:
+    challenge: str
+    language: str
+    runner_id: str
+    code: str
+
+
+@dataclass
+class UiRunner:
+    description: str
+    runner_id: str
+    html: str
+    script: str
+
+
+@dataclass
+class GameRunner:
+    challenge: str
+    runner_id: str
+    code: str
+    options: dict[str, Any]
 
 def error_cleanup(notebook_file):
     destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
@@ -168,6 +194,21 @@ def detect_cell_language(cell):
     return 'python'
 
 
+def build_code_runner(cell, permalink, runner_index):
+    """Create a CodeRunner object for a cell if metadata exists"""
+    language = detect_cell_language(cell)
+    challenge = extract_code_runner_metadata(cell.source, language)
+    if not challenge:
+        return None
+
+    return CodeRunner(
+        challenge=challenge,
+        language=language,
+        runner_id=generate_runner_id(permalink, runner_index),
+        code=clean_code_for_runner(cell.source, language),
+    )
+
+
 def process_code_runner_cells(notebook, permalink):
     """Process notebook cells and add code-runner metadata"""
     runner_index = 0
@@ -175,17 +216,11 @@ def process_code_runner_cells(notebook, permalink):
     
     for cell in notebook.cells:
         if cell.cell_type == 'code':
-            language = detect_cell_language(cell)
-            challenge = extract_code_runner_metadata(cell.source, language)
-            
-            if challenge:
+            runner = build_code_runner(cell, permalink, runner_index)
+
+            if runner:
                 # Store metadata for later use
-                cell['metadata']['code_runner'] = {
-                    'challenge': challenge,
-                    'language': language,
-                    'runner_id': generate_runner_id(permalink, runner_index),
-                    'code': clean_code_for_runner(cell.source, language)
-                }
+                cell['metadata']['code_runner'] = asdict(runner)
                 runner_index += 1
                 
                 # Clear outputs for cells with code-runner (outputs are redundant)
@@ -326,6 +361,21 @@ def clean_html_for_runner(cell_source, runner_index):
     return html_str, script_str
 
 
+def build_ui_runner(cell, permalink, runner_index):
+    """Create a UiRunner object for a cell if metadata exists"""
+    description = extract_ui_runner_metadata(cell.source)
+    if not description:
+        return None
+
+    html_content, script_content = clean_html_for_runner(cell.source, runner_index)
+    return UiRunner(
+        description=description,
+        runner_id=generate_runner_id(permalink, runner_index),
+        html=html_content,
+        script=script_content,
+    )
+
+
 def process_ui_runner_cells(notebook, permalink):
     """Process notebook cells and add ui-runner metadata"""
     runner_index = 0
@@ -333,18 +383,11 @@ def process_ui_runner_cells(notebook, permalink):
     
     for cell in notebook.cells:
         if cell.cell_type == 'raw' or (cell.cell_type == 'code' and cell.source.strip().startswith('%%html')):
-            description = extract_ui_runner_metadata(cell.source)
-            
-            if description:
-                html_content, script_content = clean_html_for_runner(cell.source, runner_index)
-                
+            runner = build_ui_runner(cell, permalink, runner_index)
+
+            if runner:
                 # Store metadata for later use
-                cell['metadata']['ui_runner'] = {
-                    'description': description,
-                    'runner_id': generate_runner_id(permalink, runner_index),
-                    'html': html_content,
-                    'script': script_content
-                }
+                cell['metadata']['ui_runner'] = asdict(runner)
                 runner_index += 1
         
         processed_cells.append(cell)
@@ -360,31 +403,119 @@ def process_game_runner_cells(notebook, permalink):
     
     for cell in notebook.cells:
         if cell.cell_type == 'code':
-            # Check if it's a JavaScript cell with GAME_RUNNER
-            source = cell.get('source', '')
-            if source.strip().startswith('%%js'):
-                result = extract_game_runner_metadata(source)
-                
-                if result:
-                    challenge, options = result
-                    
-                    # Store metadata for later use
-                    cell['metadata']['game_runner'] = {
-                        'challenge': challenge,
-                        'runner_id': generate_runner_id(permalink, runner_index),
-                        'code': clean_game_code(source),
-                        'options': options
-                    }
-                    runner_index += 1
-                    
-                    # Clear outputs for cells with game-runner (outputs are redundant)
-                    cell['outputs'] = []
-                    cell['execution_count'] = None
+            runner = build_game_runner(cell, permalink, runner_index)
+
+            if runner:
+                # Store metadata for later use
+                cell['metadata']['game_runner'] = asdict(runner)
+                runner_index += 1
+
+                # Clear outputs for cells with game-runner (outputs are redundant)
+                cell['outputs'] = []
+                cell['execution_count'] = None
         
         processed_cells.append(cell)
     
     notebook.cells = processed_cells
     return notebook
+
+
+def build_game_runner(cell, permalink, runner_index):
+    """Create a GameRunner object for a cell if metadata exists"""
+    source = cell.get('source', '')
+    if not source.strip().startswith('%%js'):
+        return None
+
+    result = extract_game_runner_metadata(source)
+    if not result:
+        return None
+
+    challenge, options = result
+    return GameRunner(
+        challenge=challenge,
+        runner_id=generate_runner_id(permalink, runner_index),
+        code=clean_game_code(source),
+        options=options,
+    )
+
+
+def _build_lesson_key(front_matter):
+    permalink = front_matter.get('permalink', '')
+    return permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
+
+
+def _extract_ui_runner_cells_and_ids(notebook):
+    """Collect UI runner cells and source IDs used for output detection"""
+    ui_runner_cells = [c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]
+    ui_runner_ids = []
+    for ui_cell in ui_runner_cells:
+        source = ui_cell.get('source', '')
+        ids = re.findall(r'id="([^"]+)"', source)
+        ui_runner_ids.append(ids)
+    return ui_runner_cells, ui_runner_ids
+
+
+def _append_ui_runner_markup(result, runner_data):
+    result.append('<div class="ui-runner">')
+    result.append(runner_data['html'])
+    result.append('<script>')
+    result.append('(function() {')
+    result.append(runner_data['script'])
+    result.append('})();')
+    result.append('</script>')
+    result.append('</div>')
+    result.append('')
+
+
+def _append_code_runner_liquid(result, runner_data, code_block_content, code_runner_count):
+    result.append('')
+    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
+    result.append(runner_data['challenge'])
+    result.append('{% endcapture %}')
+    result.append('')
+    result.append('{% capture code' + str(code_runner_count) + ' %}')
+    result.append(runner_data['code'])
+    result.append('{% endcapture %}')
+    result.append('')
+    result.append('{% capture source' + str(code_runner_count) + ' %}')
+    result.extend(code_block_content)
+    result.append('{% endcapture %}')
+    result.append('')
+    result.append('{% include code-runner.html')
+    result.append('   runner_id="' + runner_data['runner_id'] + '"')
+    result.append('   language="' + runner_data['language'] + '"')
+    result.append('   challenge=challenge' + str(code_runner_count))
+    result.append('   code=code' + str(code_runner_count))
+    result.append('   source=source' + str(code_runner_count))
+    result.append('%}')
+    result.append('')
+
+
+def _append_game_runner_liquid(result, runner_data, code_runner_count):
+    result.append('')
+    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
+    result.append(runner_data['challenge'])
+    result.append('{% endcapture %}')
+    result.append('')
+    result.append('{% capture code' + str(code_runner_count) + ' %}')
+    result.append(runner_data['code'])
+    result.append('{% endcapture %}')
+    result.append('')
+    result.append('{% include game-runner.html')
+    result.append('   runner_id="' + runner_data['runner_id'] + '"')
+    result.append('   challenge=challenge' + str(code_runner_count))
+    result.append('   code=code' + str(code_runner_count))
+
+    options = runner_data.get('options', {})
+    if options.get('hide_edit'):
+        result.append('   hide_edit="true"')
+    if options.get('width'):
+        result.append(f'   width="{options["width"]}"')
+    if options.get('height'):
+        result.append(f'   height="{options["height"]}"')
+
+    result.append('%}')
+    result.append('')
 
 
 def inject_code_runners(markdown, notebook, front_matter=None):
@@ -398,18 +529,10 @@ def inject_code_runners(markdown, notebook, front_matter=None):
         front_matter = {}
     
     challenge_submit_enabled = front_matter.get('challenge_submit', False)
-    permalink = front_matter.get('permalink', '')
-    # Generate lesson_key from permalink (e.g., "/csa/frqs/2019/3" -> "csa-frqs-2019-3")
-    lesson_key = permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
-    
-    # Build list of UI runner cells with their IDs for detection
-    ui_runner_cells = [c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]
-    ui_runner_ids = []
-    for ui_cell in ui_runner_cells:
-        # Extract original IDs from the cell source to help detect its output
-        source = ui_cell.get('source', '')
-        ids = re.findall(r'id="([^"]+)"', source)
-        ui_runner_ids.append(ids)
+    lesson_key = _build_lesson_key(front_matter)
+
+    ui_runner_cells, ui_runner_ids = _extract_ui_runner_cells_and_ids(notebook)
+    code_cells = [cell for cell in notebook.cells if cell.cell_type == 'code']
     
     lines = markdown.split('\n')
     result = []
@@ -439,16 +562,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                         # Inject the processed UI runner
                         ui_cell = ui_runner_cells[ui_runner_count]
                         runner_data = ui_cell['metadata']['ui_runner']
-                        
-                        result.append('<div class="ui-runner">')
-                        result.append(runner_data['html'])
-                        result.append('<script>')
-                        result.append('(function() {')
-                        result.append(runner_data['script'])
-                        result.append('})();')
-                        result.append('</script>')
-                        result.append('</div>')
-                        result.append('')
+                        _append_ui_runner_markup(result, runner_data)
                         
                         ui_runner_count += 1
         
@@ -474,73 +588,19 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                 code_block_content.append(line)
                 
                 # Check if this corresponds to a code cell with runner metadata
-                code_cell = None
-                current_code_cell = 0
-                for cell in notebook.cells:
-                    if cell.cell_type == 'code':
-                        if current_code_cell == code_cell_count:
-                            code_cell = cell
-                            break
-                        current_code_cell += 1
+                code_cell = code_cells[code_cell_count] if code_cell_count < len(code_cells) else None
                 
                 code_cell_count += 1
                 
                 # Add code-runner if metadata exists
                 if code_cell and 'code_runner' in code_cell.get('metadata', {}):
                     runner_data = code_cell['metadata']['code_runner']
-                    result.append('')
-                    # Add liquid captures and code-runner include
-                    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
-                    result.append(runner_data['challenge'])
-                    result.append('{% endcapture %}')
-                    result.append('')
-                    result.append('{% capture code' + str(code_runner_count) + ' %}')
-                    result.append(runner_data['code'])
-                    result.append('{% endcapture %}')
-                    result.append('')
-                    result.append('{% capture source' + str(code_runner_count) + ' %}')
-                    # Add the source code block content (already formatted markdown)
-                    result.extend(code_block_content)
-                    result.append('{% endcapture %}')
-                    result.append('')
-                    result.append('{% include code-runner.html')
-                    result.append('   runner_id="' + runner_data['runner_id'] + '"')
-                    result.append('   language="' + runner_data['language'] + '"')
-                    result.append('   challenge=challenge' + str(code_runner_count))
-                    result.append('   code=code' + str(code_runner_count))
-                    result.append('   source=source' + str(code_runner_count))
-                    result.append('%}')                
-                    result.append('')
+                    _append_code_runner_liquid(result, runner_data, code_block_content, code_runner_count)
                     code_runner_count += 1
                 # Add game-runner if metadata exists
                 elif code_cell and 'game_runner' in code_cell.get('metadata', {}):
                     runner_data = code_cell['metadata']['game_runner']
-                    result.append('')
-                    # Add liquid captures and game-runner include
-                    result.append('{% capture challenge' + str(code_runner_count) + ' %}')
-                    result.append(runner_data['challenge'])
-                    result.append('{% endcapture %}')
-                    result.append('')
-                    result.append('{% capture code' + str(code_runner_count) + ' %}')
-                    result.append(runner_data['code'])
-                    result.append('{% endcapture %}')
-                    result.append('')
-                    result.append('{% include game-runner.html')
-                    result.append('   runner_id="' + runner_data['runner_id'] + '"')
-                    result.append('   challenge=challenge' + str(code_runner_count))
-                    result.append('   code=code' + str(code_runner_count))
-                    
-                    # Add optional parameters
-                    options = runner_data.get('options', {})
-                    if options.get('hide_edit'):
-                        result.append('   hide_edit="true"')
-                    if options.get('width'):
-                        result.append(f'   width="{options["width"]}"')
-                    if options.get('height'):
-                        result.append(f'   height="{options["height"]}"')   
-                    
-                    result.append('%}')                
-                    result.append('')
+                    _append_game_runner_liquid(result, runner_data, code_runner_count)
                     code_runner_count += 1
                 else:
                     # Regular code block without code-runner
