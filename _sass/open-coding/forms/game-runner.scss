@@ -8,6 +8,8 @@
 
 .game-runner-container {
   @include runner-base;
+  width: var(--gr-panel-width, 100%);
+  max-width: 100%;
 
   // Game output area - contained canvas for educational use
   .game-output {
@@ -25,7 +27,7 @@
     // Game container styling
     .gameContainer {
       width: 100%;
-      height: 580px;
+      height: var(--gr-canvas-height, 580px);
       position: relative;
       overflow: hidden;
       display: flex;
