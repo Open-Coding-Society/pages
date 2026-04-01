@@ -204,19 +204,9 @@ date: 2025-12-02
     </div>
 
     <div id="dialogueActions">
-      <button class="d-btn d-btn-primary"    id="btnQuiz"    style="display:none">📝 Take Quiz</button>
-      <button class="d-btn d-btn-primary"    id="btnWizLesson" style="display:none">📚 Choose Lesson</button>
-      <button class="d-btn d-btn-secondary"  id="btnClose">Close</button>
+      <button class="d-btn d-btn-primary"   id="btnQuiz" style="display:none">📝 Take Quiz</button>
+      <button class="d-btn d-btn-secondary" id="btnClose">Close</button>
     </div>
-  </div>
-
-  <!-- ── Wizard lesson picker (shown inside dialogue area) ──────── -->
-  <div id="wizardPicker" style="display:none;position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
-    width:92%;max-width:700px;background:rgba(10,14,39,0.97);border:1.5px solid rgba(245,158,11,0.55);
-    border-radius:14px;padding:16px 20px 14px;z-index:11;animation:fadeUp 0.2s ease;">
-    <button class="close-x" id="closeWizardPicker" style="position:absolute;top:10px;right:12px;">✕</button>
-    <h4 style="color:#f59e0b;font-size:13px;font-weight:700;margin-bottom:10px;">🧙 Choose a lesson to review:</h4>
-    <div id="wizardLessonBtns" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
   </div>
 
   <!-- ── Quiz modal ──────────────────────────────────────────────── -->
@@ -296,7 +286,7 @@ const LESSONS = [
   },
   {
     id: 'dataviz', label: 'Data Viz', emoji: '📊', color: '#f59e0b', x: 0.36,
-    desc: 'Data Visualization involves REST APIs, Spring Boot, CRUD, search, filtering, and pagination. The "Applicators" team uses JPA repositories, @RestController endpoints, and search parameters to present data clearly.',
+    desc: 'Data Visualization is about turning raw data into meaningful charts, tables, and dashboards. The "Applicators" team builds Spring Boot REST endpoints with JPA so the frontend can fetch, filter, sort, and paginate records — making data actually readable.',
     quiz: [
       { q: 'What does CRUD stand for?',
         opts: ['Create Read Update Delete','Copy Run Undo Deploy','Code Run Update Debug','Connect Read Use Destroy'], ans: 0,
@@ -331,9 +321,9 @@ const LESSONS = [
       { q: 'What are the 4 ingredients of a great AI prompt?',
         opts: ['Code, Test, Deploy, Review','Context, Problem, Tried, Need','Title, Body, Footer, Style','Input, Output, Model, Token'], ans: 1,
         exp: 'Great prompts: Context (what you\'re using), Problem (the issue), What You\'ve Tried, and What You Need.' },
-      { q: 'What is a SQL Injection attack?',
-        opts: ['Encrypting SQL queries','Injecting malicious SQL into input fields','Backing up a database','Adding a new SQL column'], ans: 1,
-        exp: 'SQL Injection inserts malicious SQL via user input to manipulate or expose database data.' },
+      { q: 'Which framework is used by the "Thinkers" team to interact with Gemini?',
+        opts: ['TensorFlow','PyTorch','Gemini API / Google AI SDK','OpenCV'], ans: 2,
+        exp: 'The Thinkers team uses the Gemini API (Google AI SDK) to build AI-powered features into the Big Six project.' },
       { q: 'AI is best used for which task?',
         opts: ['Performing surgery','Medical diagnosis','Brainstorming and summarizing','Replacing all human judgment'], ans: 2,
         exp: 'AI excels at summarizing, brainstorming, code generation, and iteration — not replacing specialized expertise.' },
@@ -349,9 +339,9 @@ const LESSONS = [
       { q: 'Which format is best for sharing a certificate digitally?',
         opts: ['.txt file','.docx file','High-quality image download','Handwritten scan'], ans: 2,
         exp: 'Certificates are best as downloadable high-quality images or shared via LinkedIn integration.' },
-      { q: 'What does a STAR-format resume bullet provide?',
-        opts: ['A story with measurable results','A list of job duties','A paragraph of soft skills','A copy of the job posting'], ans: 0,
-        exp: 'STAR bullets: Situation → Task → Action → Result, with quantified outcomes wherever possible.' },
+      { q: 'What does the "Curators" analytics dashboard primarily track?',
+        opts: ['Git commits per day','Student performance metrics like modules completed and scores','Server uptime','CSS color themes'], ans: 1,
+        exp: 'The Curators build dashboards that track student progress, class averages, lesson completions, and top performers.' },
     ]
   },
 ];
@@ -376,7 +366,6 @@ const player = { x: 40, y: 0, vx: 0, vy: 0, size: 22 };
 /* ── UI state ───────────────────────────────────────────────── */
 let dialogueOpen   = false;
 let quizOpen       = false;
-let wizPickerOpen  = false;
 let currentNPC     = null;    // { type: 'lesson'|'wizard', data: ... }
 let selectedAns    = {};      // { questionIndex: optionIndex }
 let graded         = false;
@@ -536,7 +525,7 @@ function drawPlayer() {
 
 function drawProximityHint() {
   const near = getNearbyNPC();
-  if (!near || dialogueOpen || quizOpen || wizPickerOpen) return;
+  if (!near || dialogueOpen || quizOpen) return;
 
   const w = W(), h = H();
   const nx = near.type === 'lesson' ? w * near.data.x : w * WIZARD.x;
@@ -571,7 +560,7 @@ function getNearbyNPC() {
    INTERACTION HANDLER
    ═══════════════════════════════════════════════════════════ */
 function handleInteract() {
-  if (quizOpen || wizPickerOpen) { closeAll(); return; }
+  if (quizOpen) { closeAll(); return; }
   if (dialogueOpen) { closeDialogue(); return; }
 
   const near = getNearbyNPC();
@@ -590,12 +579,10 @@ function openDialogue(npc) {
   const textEl  = document.getElementById('npcText');
   const dots    = document.getElementById('typingDots');
   const btnQuiz = document.getElementById('btnQuiz');
-  const btnWiz  = document.getElementById('btnWizLesson');
 
   nameEl.textContent = '';
   textEl.textContent = '';
   btnQuiz.style.display = 'none';
-  btnWiz.style.display  = 'none';
   el.style.display = 'block';
 
   if (npc.type === 'lesson') {
@@ -605,30 +592,35 @@ function openDialogue(npc) {
       btnQuiz.style.display = 'inline-block';
     });
   } else {
-    /* Wizard — AI-powered greeting + persistent chat */
+    /* Wizard — pure AI chatbot, no quiz picker */
     document.getElementById('wizardChat').style.display = 'block';
     document.getElementById('wizardChatHistory').innerHTML = '';
     nameEl.textContent = `${WIZARD.emoji} ${WIZARD.label}`;
     dots.style.display = 'flex';
-    callGemini('Give me a short in-character wizard greeting and ask which Big Six topic the student wants help with.')
+    callGemini('Give a short in-character wizard greeting and invite the student to ask anything about the Big Six lessons.')
       .then(reply => {
         dots.style.display = 'none';
-        typeText(textEl, reply, () => { btnWiz.style.display = 'inline-block'; });
+        typeText(textEl, reply);
+        setTimeout(() => document.getElementById('wizardInput').focus(), 100);
       })
       .catch(() => {
         dots.style.display = 'none';
         const fallback = WIZARD.dialogues[Math.floor(Math.random() * WIZARD.dialogues.length)];
-        typeText(textEl, fallback, () => { btnWiz.style.display = 'inline-block'; });
+        typeText(textEl, fallback);
+        setTimeout(() => document.getElementById('wizardInput').focus(), 100);
       });
   }
 }
 
-/* Typewriter effect for dialogue text */
+/* Typewriter effect — token cancels any in-progress animation */
+let typewriterToken = 0;
 function typeText(el, text, onDone) {
+  const myToken = ++typewriterToken;
   el.textContent = '';
   let i = 0;
   const speed = 18;
   function tick() {
+    if (typewriterToken !== myToken) return; // cancelled by newer call
     if (i < text.length) {
       el.textContent += text[i++];
       setTimeout(tick, speed);
@@ -642,43 +634,6 @@ function typeText(el, text, onDone) {
 function closeDialogue() {
   dialogueOpen = false;
   document.getElementById('dialogue').style.display = 'none';
-}
-
-/* ═══════════════════════════════════════════════════════════
-   WIZARD LESSON PICKER
-   ═══════════════════════════════════════════════════════════ */
-function openWizardPicker() {
-  closeDialogue();
-  wizPickerOpen = true;
-
-  const picker = document.getElementById('wizardPicker');
-  const btnsEl = document.getElementById('wizardLessonBtns');
-  btnsEl.innerHTML = '';
-
-  LESSONS.forEach(l => {
-    const btn = document.createElement('button');
-    btn.style.cssText = `
-      padding: 7px 14px; border-radius: 8px; border: 1.5px solid ${l.color}55;
-      background: ${l.color}1a; color: ${l.color}; font-size: 12px;
-      font-weight: 600; cursor: pointer; transition: all 0.15s;
-    `;
-    btn.textContent = `${l.emoji} ${l.label}`;
-    btn.onmouseover = () => { btn.style.background = l.color + '33'; btn.style.borderColor = l.color; };
-    btn.onmouseout  = () => { btn.style.background = l.color + '1a'; btn.style.borderColor = l.color + '55'; };
-    btn.onclick = () => {
-      closeWizardPicker();
-      currentNPC = { type: 'lesson', data: l };
-      openQuiz(l);
-    };
-    btnsEl.appendChild(btn);
-  });
-
-  picker.style.display = 'block';
-}
-
-function closeWizardPicker() {
-  wizPickerOpen = false;
-  document.getElementById('wizardPicker').style.display = 'none';
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -823,7 +778,6 @@ function retryQuiz() {
 
 function closeAll() {
   closeDialogue();
-  closeWizardPicker();
   quizOpen = false;
   document.getElementById('quizModal').style.display = 'none';
 }
@@ -905,7 +859,6 @@ document.getElementById('btnQuiz').addEventListener('click', () => {
   if (currentNPC && currentNPC.type === 'lesson') openQuiz(currentNPC.data);
 });
 
-document.getElementById('btnWizLesson').addEventListener('click', openWizardPicker);
 document.getElementById('btnWizSend').addEventListener('click', sendWizardMessage);
 document.getElementById('wizardInput').addEventListener('keydown', e => {
   e.stopPropagation();
@@ -914,8 +867,6 @@ document.getElementById('wizardInput').addEventListener('keydown', e => {
 ['keyup', 'keypress'].forEach(t =>
   document.getElementById('wizardInput').addEventListener(t, e => e.stopPropagation())
 );
-
-document.getElementById('closeWizardPicker').addEventListener('click', closeWizardPicker);
 
 document.getElementById('btnCloseQuiz').addEventListener('click', () => {
   quizOpen = false;
@@ -935,7 +886,7 @@ function loop(ts) {
   lastTs = ts;
 
   /* Player movement — blocked while UI is open */
-  if (!dialogueOpen && !quizOpen && !wizPickerOpen) {
+  if (!dialogueOpen && !quizOpen) {
     const moving = keys['a'] || keys['A'] || keys['ArrowLeft'] ||
                    keys['d'] || keys['D'] || keys['ArrowRight'];
 
