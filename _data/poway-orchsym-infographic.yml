@@ -1,85 +1,84 @@
-title: "Poway Symphony Orchestra - Expanding Community Through Music"
-badge: "Design-Based Research Capstone"
+Title: "Poway Symphony Orchestra - Expanding Community Through Music"
+Badge: "Design-Based Research Capstone"
 
-description: >
+Description: >
   This project redesigns the orchestra’s website to make it easier to use,
   more engaging, and more visually appealing. It focuses on helping users
   quickly find information, explore musicians, and feel more connected to the orchestra.
 
-project:
-  name: "Poway Symphony Orchestra - Connecting Community Through Live Music"
-  link: "https://wi-fighters-csp.github.io/wi-pages/capstone/powayorchestra/"
-  buttonLabel: "View Live Site"
-  alt: "Redesigned Poway Symphony Orchestra website"
+Topics:
+  - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
+    subtitle: "Redesigned Website Experience"
+    link: "https://wi-fighters-csp.github.io/wi-pages/capstone/powayorchestra/"
+    buttonLabel: "View Live Site"
 
-  overview: >
-    We rebuilt the website with a cleaner layout, clearer navigation, and more
-    interactive features. The goal was to help users easily find concerts,
-    learn about musicians, and take action like attending or donating.
+    description: >
+      We rebuilt the website with a cleaner layout, clearer navigation, and more
+      interactive features. The goal was to help users easily find concerts,
+      learn about musicians, and take action like attending or donating.
 
-  keyFeatures:
-    - "Musician cards that show each member’s name, instrument, and image"
-    - "Clickable instrument feature where users can hear what each instrument sounds like"
-    - "Simplified navigation so users can quickly find concerts, tickets, and donations"
-    - "Clear buttons like ‘Buy Tickets’ and ‘Donate’ to guide users"
-    - "Layout that adjusts to phones, tablets, and computers"
-    - "Better spacing and organization to make content easier to read"
-    - "Stronger visuals with images and highlighted sections"
+    keyPoints:
+      - "Musician cards that show each member’s name, instrument, and image"
+      - "Clickable instrument feature where users can hear what each instrument sounds like"
+      - "Simplified navigation so users can quickly find concerts, tickets, and donations"
+      - "Clear buttons like ‘Buy Tickets’ and ‘Donate’ to guide users"
+      - "Layout that adjusts to phones, tablets, and computers"
+      - "Better spacing and organization to make content easier to read"
+      - "Stronger visuals with images and highlighted sections"
 
-  interactiveElements:
-    - title: "Musician Profiles"
-      description: "Users can scroll through cards to explore orchestra members"
+    tech:
+      - "HTML"
+      - "CSS"
+      - "JavaScript"
+      - "Responsive design"
+      - "Figma for design and planning"
+      - "User research and testing"
 
-    - title: "Instrument Audio"
-      description: "Clicking an instrument plays a sound to make the site more interactive"
+    impact:
+      - "Users can find information faster"
+      - "The site is more engaging and interactive"
+      - "Better experience on all devices"
+      - "More users are likely to attend concerts or donate"
 
-    - title: "Easy Navigation"
-      description: "Clear sections help users move through the site without confusion"
+    # EXTRA DATA (kept from your original YAML)
+    interactiveElements:
+      - title: "Musician Profiles"
+        description: "Users can scroll through cards to explore orchestra members"
+      - title: "Instrument Audio"
+        description: "Clicking an instrument plays a sound to make the site more interactive"
+      - title: "Easy Navigation"
+        description: "Clear sections help users move through the site without confusion"
 
-  problemsSolved:
-    - "Users had trouble finding concert information → we simplified the menu"
-    - "The old site felt plain → we added visuals and interactive features"
-    - "Text was crowded → we improved spacing and layout"
-    - "Hard to use on phones → we made the site work on all screen sizes"
+    problemsSolved:
+      - "Users had trouble finding concert information → we simplified the menu"
+      - "The old site felt plain → we added visuals and interactive features"
+      - "Text was crowded → we improved spacing and layout"
+      - "Hard to use on phones → we made the site work on all screen sizes"
 
-  improvementsMade:
-    - "Organized content into clear sections"
-    - "Used cards to break information into smaller, easier parts"
-    - "Added interactive sound features"
-    - "Made text easier to read with better spacing"
+    improvementsMade:
+      - "Organized content into clear sections"
+      - "Used cards to break information into smaller, easier parts"
+      - "Added interactive sound features"
+      - "Made text easier to read with better spacing"
 
-  wowFactors:
-    - "Turns a basic website into an interactive experience"
-    - "Lets users hear instruments directly on the site"
-    - "Makes it easier for users to take action like attending events"
-    - "Feels more modern and engaging for all age groups"
+    wowFactors:
+      - "Turns a basic website into an interactive experience"
+      - "Lets users hear instruments directly on the site"
+      - "Makes it easier for users to take action like attending events"
+      - "Feels more modern and engaging for all age groups"
 
-  customerPitch:
-    - "Community members can easily find concerts and feel connected"
-    - "Donors have a clear and simple way to support the orchestra"
-    - "Musicians are better represented through profile cards"
-    - "The organization gains a more professional online presence"
+    customerPitch:
+      - "Community members can easily find concerts and feel connected"
+      - "Donors have a clear and simple way to support the orchestra"
+      - "Musicians are better represented through profile cards"
+      - "The organization gains a more professional online presence"
 
-  futurePlans:
-    - "Add ticket purchasing directly on the site"
-    - "Include videos of performances"
-    - "Track how users interact with the site"
-    - "Add reminders and newsletter sign-ups"
-    - "Continue improving accessibility"
-
-  tech:
-    - "HTML"
-    - "CSS"
-    - "JavaScript"
-    - "Responsive design"
-    - "Figma for design and planning"
-    - "User research and testing"
-
-  impact:
-    - "Users can find information faster"
-    - "The site is more engaging and interactive"
-    - "Better experience on all devices"
-    - "More users are likely to attend concerts or donate"
+    futurePlans:
+      - "Add ticket purchasing directly on the site"
+      - "Include videos of performances"
+      - "Track how users interact with the site"
+      - "Add reminders and newsletter sign-ups"
+      - "Continue improving accessibility"
 
 status: "Research and Testing Phase (Deployed Prototype Complete)"
 
