@@ -281,6 +281,17 @@ class UiRunner:
             '',
         ]
 
+    @staticmethod
+    def collect_cells_and_source_ids(notebook):
+        """Collect UI runner cells and source IDs used for output detection."""
+        ui_runner_cells = [c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]
+        ui_runner_ids = []
+        for ui_cell in ui_runner_cells:
+            source = ui_cell.get('source', '')
+            ids = re.findall(r'id="([^"]+)"', source)
+            ui_runner_ids.append(ids)
+        return ui_runner_cells, ui_runner_ids
+
 
 @dataclass
 class GameRunner:
@@ -538,6 +549,11 @@ def assign_custom_cell_ids(notebook, permalink):
     return notebook
 
 
+def _build_lesson_key(front_matter):
+    permalink = front_matter.get('permalink', '')
+    return permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
+
+
 ########################################
 ### Section for Orchestrators        ###
 ########################################
@@ -620,22 +636,6 @@ def process_game_runner_cells(notebook, permalink):
     return notebook
 
 
-def _build_lesson_key(front_matter):
-    permalink = front_matter.get('permalink', '')
-    return permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
-
-
-def _extract_ui_runner_cells_and_ids(notebook):
-    """Collect UI runner cells and source IDs used for output detection"""
-    ui_runner_cells = [c for c in notebook.cells if 'ui_runner' in c.get('metadata', {})]
-    ui_runner_ids = []
-    for ui_cell in ui_runner_cells:
-        source = ui_cell.get('source', '')
-        ids = re.findall(r'id="([^"]+)"', source)
-        ui_runner_ids.append(ids)
-    return ui_runner_cells, ui_runner_ids
-
-
 def inject_code_runners(markdown, notebook, front_matter=None):
     """Inject code-runner includes after code blocks with metadata
     
@@ -649,7 +649,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     challenge_submit_enabled = front_matter.get('challenge_submit', False)
     lesson_key = _build_lesson_key(front_matter)
 
-    ui_runner_cells, ui_runner_ids = _extract_ui_runner_cells_and_ids(notebook)
+    ui_runner_cells, ui_runner_ids = UiRunner.collect_cells_and_source_ids(notebook)
     code_cells = [cell for cell in notebook.cells if cell.cell_type == 'code']
     
     lines = markdown.split('\n')
