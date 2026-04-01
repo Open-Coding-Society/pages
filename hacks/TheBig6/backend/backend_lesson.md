@@ -17,7 +17,7 @@ date: 2025-12-02
    * Colors come from the system SASS (_sass/minima/lessonbase.scss).
    * lessonbase.scss compiles those $variables into :root custom properties
    * which are already on the page. We just alias them here for readability.
-   * To change a color, edit lessonbase.scss — NOT this file.
+   * To change a color, edit lessonbase.scss — NOT this file.p
    */
   .page-content {
     --bg:          var(--bg-1);

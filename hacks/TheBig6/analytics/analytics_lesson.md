@@ -44,10 +44,18 @@ date: 2025-12-02
   .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
   .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
 
-  .progress-bar { display: flex; gap: 6px; margin: 20px 0 28px; align-items: center; }
-  .progress-bar .step { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; cursor: pointer; transition: 0.2s; }
-  .progress-bar .step.active { background: var(--ac); height: 6px; }
-  .progress-bar .step:hover  { background: var(--border-ac); }
+  .progress-track { margin: 20px 0 28px; }
+  .progress-steps { display: flex; }
+  .progress-step { flex: 1; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-b); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
+  .progress-step.active .step-dot { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: 0 0 12px rgba(76,175,239,0.5); }
+  .progress-step.done   .step-dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .progress-step .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; white-space: nowrap; }
+  .progress-step.active .step-label { color: var(--ac2); }
+  .progress-step.done   .step-label { color: var(--ok); }
+  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-b); }
+  .progress-step:first-child::before { display: none; }
+  .progress-step.done::before { background: var(--ok); }
 
   .section        { display: none; }
   .section.active { display: block; animation: fadeIn 0.3s ease; }
@@ -126,7 +134,9 @@ date: 2025-12-02
     <a href="../" class="back-btn">← Back to Big Six</a>
   </div>
 
-  <div class="progress-bar" id="progressBar"></div>
+  <div class="progress-track">
+    <div class="progress-steps" id="progressSteps"></div>
+  </div>
 
   <!-- STEP 1 -->
   <div class="section active" id="step1">
@@ -226,7 +236,7 @@ import { CertificatePanel }   from '/assets/js/bigsix/analytics/certificates.js'
 import { FrqGrader }          from '/assets/js/bigsix/analytics/frq.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const nav   = new Navigator();
+  const nav   = new Navigator({ progressStyle: 'dots', labels: ['Analytics', 'Certificates', 'Free Response'] });
   const store = new Persistence('analytics_combined_v1', { fields: ['frq-answer'] });
   nav.init(() => store.persist());
   store.restore((n, s) => nav.showStep(n, s));

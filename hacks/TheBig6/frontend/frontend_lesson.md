@@ -26,10 +26,12 @@ date: 2025-12-02
     --panel:        var(--panel);
     --panel-2:      var(--bg-3);
     --border:       rgba(255,255,255,0.08);
+    --border-b:     rgba(255,255,255,0.14);
     --border-ac:    rgba(76,175,239,0.4);
     --txt:          var(--text);
     --muted:        var(--text-muted);
     --ac:           var(--accent);
+    --ac2:          var(--accent);
     --ac-hover:     var(--accent-700);
     --ok:           var(--green);
     --ok-bg:        var(--green-bg);
@@ -39,16 +41,29 @@ date: 2025-12-02
     --hover-bg:     rgba(76,175,239,0.1);
   }
 
-  * { box-sizing: border-box; }
-  .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 60px; }
-  .header { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px; color: var(--txt); }
-  .header p  { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 28px 16px 64px; }
 
-  .progress-bar { display: flex; gap: 6px; margin: 20px 0; align-items: center; }
-  .progress-bar .step { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; cursor: pointer; transition: 0.2s; }
-  .progress-bar .step.active { background: var(--ac); height: 6px; }
-  .progress-bar .step:hover  { background: var(--ac-hover); }
+  .lesson-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac2); margin-bottom: 10px; }
+  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 8px var(--ac); display: inline-block; }
+  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--txt); }
+  .lesson-header p  { color: var(--muted); font-size: 14px; }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
+  .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
+
+  .progress-track { margin: 20px 0 28px; }
+  .progress-steps { display: flex; }
+  .progress-step { flex: 1; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-b); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
+  .progress-step.active .step-dot { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: 0 0 12px rgba(76,175,239,0.5); }
+  .progress-step.done   .step-dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .progress-step .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; white-space: nowrap; }
+  .progress-step.active .step-label { color: var(--ac); }
+  .progress-step.done   .step-label { color: var(--ok); }
+  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-b); }
+  .progress-step:first-child::before { display: none; }
+  .progress-step.done::before { background: var(--ok); }
 
   .section        { display: none; }
   .section.active { display: block; animation: fadeIn 0.3s ease; }
@@ -145,13 +160,16 @@ date: 2025-12-02
 </style>
 
 <div class="container page-content">
-  <div class="header">
-    <h1>Frontend Development — All-in-One</h1>
+  <div class="lesson-header">
+    <div class="badge">Creators · Lesson 1</div>
+    <h1>Frontend Development</h1>
     <p>Interactive lessons: Markdown → HTML, CSS styling, Tailwind + Sass, JavaScript, and a live code sandbox.</p>
-    <a href="../" class="button back-btn" style="font-size:13px;padding:6px 14px;text-decoration:none;display:inline-block;margin-top:6px;">← Back</a>
+    <a href="../" class="back-btn">← Back to Big Six</a>
   </div>
 
-  <div class="progress-bar" id="progressBar"></div>
+  <div class="progress-track">
+    <div class="progress-steps" id="progressSteps"></div>
+  </div>
 
   <!-- STEP 1 -->
   <div class="section active" id="step1">
@@ -468,7 +486,7 @@ import { JsPlayground }   from '/assets/js/bigsix/frontend/javascript-playground
 import { Sandbox }        from '/assets/js/bigsix/frontend/sandbox.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const nav   = new Navigator();
+  const nav   = new Navigator({ progressStyle: 'dots', labels: ['Markdown', 'CSS Styling', 'Tailwind & Sass', 'JavaScript', 'Live Sandbox', 'Reflection'] });
   const store = new Persistence();
   nav.init(() => store.persist());
   store.restore((n, s) => nav.showStep(n, s));

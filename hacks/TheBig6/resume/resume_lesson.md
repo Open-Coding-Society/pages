@@ -21,29 +21,58 @@ date: 2025-12-01
    * Edit lessonbase.scss to change colors — not this file.
    */
   .page-content {
-    --bg:     var(--bg-1);
-    --panel:  var(--panel);
-    --border: rgba(255,255,255,0.08);
-    --txt:    var(--text);
-    --muted:  var(--text-muted);
-    --ac:     var(--accent);
-    --code-bg: var(--bg-0);
+    --bg:       var(--bg-1);
+    --panel:    var(--panel);
+    --panel-2:  var(--bg-3);
+    --panel-3:  var(--surface);
+    --border:   rgba(255,255,255,0.08);
+    --border-b: rgba(255,255,255,0.14);
+    --border-ac:rgba(76,175,239,0.4);
+    --txt:      var(--text);
+    --muted:    var(--text-muted);
+    --ac:       var(--accent);
+    --ac2:      var(--accent);
+    --ok:       var(--green);
+    --ok-bg:    var(--green-bg);
+    --err:      var(--red);
+    --err-bg:   var(--warn-bg);
+    --code-bg:  var(--bg-0);
+    --hover-bg: rgba(76,175,239,0.1);
   }
 
-  * { box-sizing: border-box; }
-  .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 40px; }
-  .header { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px; color: var(--txt); }
-  .header p  { color: var(--muted); font-size: 14px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 28px 16px 64px; }
 
-  .progress-bar-container { border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 24px; }
+  .lesson-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac2); margin-bottom: 10px; }
+  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 8px var(--ac); display: inline-block; }
+  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--txt); }
+  .lesson-header p  { color: var(--muted); font-size: 14px; }
 
-  .section { display: none; }
-  .section.active { display: block; }
+  .progress-track { margin: 20px 0 28px; }
+  .progress-steps { display: flex; }
+  .progress-step { flex: 1; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-b); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
+  .progress-step.active .step-dot { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: 0 0 12px rgba(76,175,239,0.5); }
+  .progress-step.done   .step-dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .progress-step .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; white-space: nowrap; }
+  .progress-step.active .step-label { color: var(--ac2); }
+  .progress-step.done   .step-label { color: var(--ok); }
+  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-b); }
+  .progress-step:first-child::before { display: none; }
+  .progress-step.done::before { background: var(--ok); }
 
-  .card    { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  .card h2 { margin-top: 0; font-size: 20px; color: var(--ac); }
-  .card h3 { margin-top: 16px; font-size: 16px; color: var(--ac); }
+  .section        { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--ac), var(--ac2)); opacity: 0.6; }
+  .card h2 { font-size: 20px; font-weight: 800; color: var(--txt); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .card h2 .step-num { width: 28px; height: 28px; border-radius: 8px; background: var(--ac); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card h3 { font-size: 15px; color: var(--ac2); margin: 20px 0 8px; }
+  .block-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+  .tip { font-size: 12px; color: var(--muted); border-left: 2px solid var(--border-ac); padding-left: 10px; margin-top: 16px; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
@@ -51,9 +80,12 @@ date: 2025-12-01
   input, textarea, select { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--txt); font-size: 14px; width: 100%; margin-bottom: 8px; }
   input:focus, textarea:focus { outline: none; box-shadow: 0 0 8px rgba(76,175,239,0.3); }
 
-  button { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); padding: 6px 14px; font-size: 13px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
-  button:hover { background: var(--bg-3); border-color: rgba(76,175,239,0.5); }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button { appearance: none; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.1s; }
+  button:hover { background: var(--hover-bg); border-color: var(--border-ac); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  button.primary { background: var(--ac); border-color: var(--border-ac); color: #fff; }
+  button.primary:hover { background: var(--accent-700); }
+  button.secondary { background: var(--panel-2); border-color: var(--border); }
 
   .preview-box { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-height: 200px; overflow: auto; }
   #resumePreview { color: var(--txt); }
@@ -88,44 +120,42 @@ date: 2025-12-01
   #nextModuleBtnNav:hover { background: var(--accent-700); }
 
   .flex-row-gap { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .back-btn { display: inline-block; margin-top: 8px; padding: 5px 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 13px; text-decoration: none; }
-  .back-btn:hover { border-color: rgba(76,175,239,0.5); color: var(--txt); }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
+  .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
 </style>
 
 <div class="container page-content">
-  <div class="header">
+  <div class="lesson-header">
+    <div class="badge">Grinders · Lesson 4</div>
     <h1>Resume — All-in-One</h1>
-    <p>Short, interactive steps. Autosaves locally.</p>
-    <a href="../" class="button back-btn">← Back</a>
+    <p>Short, interactive steps. Build your resume, export PDF, and practice interviews.</p>
+    <a href="../" class="back-btn">← Back to Big Six</a>
   </div>
 
-  <div class="progress-bar-container">
-    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:8px;">
-      <span>Progress</span><span id="progressLabel">Step 1 / 6</span>
-    </div>
-    <div style="width:100%; background:rgba(255,255,255,0.1); border-radius:4px; height:6px;">
-      <div id="progressBar" style="width:16.6667%; height:6px; border-radius:4px; background:var(--ac); transition:width 0.3s;"></div>
-    </div>
+  <div class="progress-track">
+    <div class="progress-steps" id="progressSteps"></div>
   </div>
 
   <!-- Step 1 -->
-  <section data-step="0" class="section active">
+  <section data-step="0" id="step1" class="section active">
     <div class="card">
-      <h2>1 — Contact</h2>
+      <h2><span class="step-num">1</span> Contact</h2>
+      <p class="block-desc">Fill in your basic contact information — this is the first thing recruiters see.</p>
       <div class="grid">
         <input id="fullName" placeholder="Full name" />
         <input id="email" placeholder="Email" />
         <input id="phone" placeholder="Phone" />
         <input id="location" placeholder="City, State" />
       </div>
-      <div class="tooltip">Keep it short and professional. Use a real contact email.</div>
+      <p class="tip">Keep it short and professional. Use a real contact email.</p>
     </div>
   </section>
 
   <!-- Step 2 -->
-  <section data-step="1" class="section">
+  <section data-step="1" id="step2" class="section">
     <div class="card">
-      <h2>2 — Skills</h2>
+      <h2><span class="step-num">2</span> Skills</h2>
+      <p class="block-desc">Select or add your hard and soft skills — these are keywords recruiters search for.</p>
       <div class="grid">
         <div>
           <h3>Hard Skills</h3>
@@ -146,23 +176,27 @@ date: 2025-12-01
           <div id="softSkillTags" class="flex-row-gap" style="margin-top:10px;"></div>
         </div>
       </div>
+      <p class="tip">Aim for 5–8 hard skills that match your target job descriptions.</p>
     </div>
   </section>
 
   <!-- Step 3 -->
-  <section data-step="2" class="section">
+  <section data-step="2" id="step3" class="section">
     <div class="card">
-      <h2>3 — Education</h2>
+      <h2><span class="step-num">3</span> Education</h2>
+      <p class="block-desc">List your school, degree, and key achievements to show academic credibility.</p>
       <input id="school" placeholder="School / Program" />
       <input id="degree" placeholder="Degree / Dates" />
       <textarea id="eduHighlights" rows="3" placeholder="Highlights (one per line)"></textarea>
+      <p class="tip">Include GPA only if 3.5+. List relevant coursework if you lack experience.</p>
     </div>
   </section>
 
   <!-- Step 4 -->
-  <section data-step="3" class="section">
+  <section data-step="3" id="step4" class="section">
     <div class="card">
-      <h2>4 — Experiences</h2>
+      <h2><span class="step-num">4</span> Experiences</h2>
+      <p class="block-desc">Add work, projects, and activities using the Action → Metric → Result formula.</p>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="margin:0;">Add Experiences (Action → Metric → Result)</h3>
         <button id="addExperienceBtn">+ Add</button>
@@ -177,26 +211,30 @@ date: 2025-12-01
         </div>
         <div id="itemsPool" class="flex-row-gap"></div>
       </div>
+      <p class="tip">Use strong action verbs: Built, Designed, Led, Reduced, Increased.</p>
     </div>
   </section>
 
   <!-- Step 5 -->
-  <section data-step="4" class="section">
+  <section data-step="4" id="step5" class="section">
     <div class="card">
-      <h2>5 — Preview &amp; PDF</h2>
+      <h2><span class="step-num">5</span> Preview &amp; PDF</h2>
+      <p class="block-desc">Review your assembled resume and download it as a polished PDF.</p>
       <div class="preview-box"><div id="resumePreview"></div></div>
       <div class="flex-row-gap" style="margin-top:12px;">
         <button id="downloadPdfBtn">⬇ Download PDF</button>
         <button id="saveDraft">💾 Save Draft</button>
       </div>
       <p id="saveMessage"></p>
+      <p class="tip">Keep your resume to one page. Save as PDF to preserve formatting.</p>
     </div>
   </section>
 
   <!-- Step 6 -->
-  <section data-step="5" class="section">
+  <section data-step="5" id="step6" class="section">
     <div class="card">
-      <h2>6 — LinkedIn &amp; Interview</h2>
+      <h2><span class="step-num">6</span> LinkedIn &amp; Interview</h2>
+      <p class="block-desc">Build your LinkedIn About section and practice interview questions with ELIO.</p>
       <div class="grid">
         <div>
           <h3 style="margin-top:0;">LinkedIn Builder</h3>
@@ -225,14 +263,15 @@ date: 2025-12-01
           </div>
         </div>
       </div>
+      <p class="tip">Practice ELIO answers out loud — fluency improves with repetition.</p>
     </div>
   </section>
 
   <div class="nav-buttons">
-    <button id="prevBtn" disabled>← Previous</button>
+    <button id="prevBtn" disabled class="secondary">← Previous</button>
     <div class="flex-row-gap">
       <span id="stepIndicator" style="color:var(--muted); font-size:12px;">Step 1 / 6</span>
-      <button id="nextBtn">Next →</button>
+      <button id="nextBtn" class="primary">Next →</button>
     </div>
   </div>
 
@@ -252,7 +291,8 @@ date: 2025-12-01
 <script type="module">
 import { Navigator } from '/assets/js/bigsix/shared/navigation.js';
 window.__ResumeNav = new Navigator({
-  progressStyle: 'fill',
+  progressStyle: 'dots',
+  labels: ['Contact', 'Skills', 'Education', 'Experiences', 'Preview PDF', 'LinkedIn'],
   onStep: (step) => {
     const nextBtn = document.getElementById('nextBtn');
     const lastStep = document.querySelectorAll('.section').length - 1;
