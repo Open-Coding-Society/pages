@@ -9,7 +9,7 @@ import subprocess
 from hashlib import sha256
 import concurrent.futures, traceback, re
 from dataclasses import dataclass, asdict
-from typing import Any
+from typing import Any, Optional
 
 if __name__ == "__main__":
     from progress_bar import ProgressBar
@@ -57,6 +57,25 @@ class GameRunner:
     runner_id: str
     code: str
     options: dict[str, Any]
+
+
+@dataclass
+class CodeFence:
+    opening_fence: str
+    body_lines: list[str]
+    closing_fence: str
+
+    @classmethod
+    def from_markdown_lines(cls, lines) -> Optional["CodeFence"]:
+        """Build a CodeFence from markdown lines that contain a fenced block."""
+        if len(lines) < 2:
+            return None
+        if not lines[0].startswith('```') or not lines[-1].startswith('```'):
+            return None
+        return cls(opening_fence=lines[0], body_lines=lines[1:-1], closing_fence=lines[-1])
+
+    def to_markdown_lines(self) -> list[str]:
+        return [self.opening_fence, *self.body_lines, self.closing_fence]
 
 def error_cleanup(notebook_file):
     destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
@@ -467,7 +486,7 @@ def _append_ui_runner_markup(result, runner_data):
     result.append('')
 
 
-def _append_code_runner_liquid(result, runner_data, code_block_content, code_runner_count):
+def _append_code_runner_liquid(result, runner_data, code_fence_lines, code_runner_count):
     result.append('')
     result.append('{% capture challenge' + str(code_runner_count) + ' %}')
     result.append(runner_data['challenge'])
@@ -478,7 +497,7 @@ def _append_code_runner_liquid(result, runner_data, code_block_content, code_run
     result.append('{% endcapture %}')
     result.append('')
     result.append('{% capture source' + str(code_runner_count) + ' %}')
-    result.extend(code_block_content)
+    result.extend(code_fence_lines)
     result.append('{% endcapture %}')
     result.append('')
     result.append('{% include code-runner.html')
@@ -595,7 +614,9 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                 # Add code-runner if metadata exists
                 if code_cell and 'code_runner' in code_cell.get('metadata', {}):
                     runner_data = code_cell['metadata']['code_runner']
-                    _append_code_runner_liquid(result, runner_data, code_block_content, code_runner_count)
+                    code_fence = CodeFence.from_markdown_lines(code_block_content)
+                    code_fence_lines = code_fence.to_markdown_lines() if code_fence else code_block_content
+                    _append_code_runner_liquid(result, runner_data, code_fence_lines, code_runner_count)
                     code_runner_count += 1
                 # Add game-runner if metadata exists
                 elif code_cell and 'game_runner' in code_cell.get('metadata', {}):
