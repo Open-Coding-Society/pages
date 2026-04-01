@@ -366,6 +366,42 @@ class CodeFence:
 
     def to_markdown_lines(self) -> list[str]:
         return [self.opening_fence, *self.body_lines, self.closing_fence]
+
+
+@dataclass
+class MermaidGraph:
+    output_directory: str
+    scale: str = "10"
+
+    def convert_to_image(self, mermaid_code: str) -> Optional[str]:
+        ensure_directory_exists(self.output_directory)
+        mermaid_hash = sha256(mermaid_code.encode()).hexdigest()
+        image_path = os.path.join(self.output_directory, f"{mermaid_hash}.png")
+
+        if not os.path.exists(image_path):
+            try:
+                subprocess.run(
+                    ["mmdc", "-i", "-", "-o", image_path, "-s", self.scale],
+                    input=mermaid_code,
+                    text=True,
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                print(f"Error converting mermaid diagram: {e}")
+                return None
+        return image_path
+
+    @staticmethod
+    def extract_code(cell_source: str) -> str:
+        return cell_source.replace("~~~mermaid", "").replace("~~~", "").strip()
+
+    def process_cells(self, notebook) -> None:
+        for cell in notebook.cells:
+            if cell.cell_type == "markdown" and cell.source.startswith("~~~mermaid"):
+                mermaid_code = self.extract_code(cell.source)
+                image_path = self.convert_to_image(mermaid_code)
+                if image_path:
+                    cell.source = f"![Mermaid Diagram](../../../../{image_path})"
     
 ########################################
 ### Section for Procedural functions ###
@@ -708,7 +744,8 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
         # Process custom cells (ID assignment + CODE/UI/GAME runner extraction)
         notebook = process_custom_cells(notebook, permalink)
         
-        process_mermaid_cells(notebook)
+        mermaid_graph = MermaidGraph(mermaid_output_directory)
+        mermaid_graph.process_cells(notebook)
         exporter = MarkdownExporter()
         markdown, _ = exporter.from_notebook_node(notebook)
         markdown = fix_js_code_blocks(markdown) # Fix JS code blocks
@@ -778,41 +815,6 @@ def convert_notebooks():
                 convertBar.continue_progress()
 
     convertBar.end_progress()
-
-
-# MERMAID STUFF =========
-def ensure_directory_exists(path):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-
-
-def convert_mermaid_to_image(mermaid_code):
-    ensure_directory_exists(mermaid_output_directory)
-    mermaid_hash = sha256(mermaid_code.encode()).hexdigest()
-    image_path = os.path.join(mermaid_output_directory, f"{mermaid_hash}.png")
-
-    if not os.path.exists(image_path):
-        try:
-            process = subprocess.run(
-                ["mmdc", "-i", "-", "-o", image_path, "-s", "10"],
-                input=mermaid_code,
-                text=True,
-                check=True,
-            )
-        except subprocess.CalledProcessError as e:
-            print(f"Error converting mermaid diagram: {e}")
-            return None
-    return image_path
-
-
-def process_mermaid_cells(notebook):
-    for cell in notebook.cells:
-        if cell.cell_type == "markdown" and cell.source.startswith("~~~mermaid"):
-            mermaid_code = (
-                cell.source.replace("~~~mermaid", "").replace("~~~", "").strip()
-            )
-            image_path = convert_mermaid_to_image(mermaid_code)
-            if image_path:
-                cell.source = f"![Mermaid Diagram](../../../../{image_path})"
 
 
 if __name__ == "__main__":
