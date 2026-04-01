@@ -1,4 +1,3 @@
-// List of assets to precache
 const CACHE_NAME = 'ocs-pwa-v1';
 const OFFLINE_URL = '/mobile/';
 const PRECACHE_ASSETS = [
