@@ -67,17 +67,19 @@ function updateNavButtons() {
 //  Coordinates all navigation workers.
 //  Also placed on window so inline onclick="showStep(n)" works.
 // ============================================================
-export function showStep(n, persist) {
+export function showStep(n, silent = false) {
   // Clamp to valid range [0, STEPS.length - 1]
   currentStep = Math.max(0, Math.min(STEPS.length - 1, n));
+  window.__currentStep = currentStep;
 
   toggleSections();    // show active section, hide others
   renderProgressBar(); // rebuild progress bar highlights
   renderStepCounter(); // update "Step X / Y" text
   updateNavButtons();  // disable buttons at boundaries
 
-  // Save position — persist passed in from persistence.js
-  if (persist) persist();
+  // Only persist real user-driven step changes, not the silent
+  // initial render triggered by initNavigation or restore.
+  if (!silent && _persist) _persist();
 }
 
 // Expose on window for inline onclick attributes in the HTML
@@ -89,14 +91,19 @@ window.showStep = showStep;
 //  Wires prev/next buttons and renders the initial step.
 //  Called once on DOMContentLoaded from analytics.md.
 // ============================================================
-export function initNavigation(showStepFn, persist) {
+let _persist = null;
+
+export function initNavigation(persistFn) {
+  _persist = persistFn || null;
+
   document.getElementById('prevBtn').addEventListener('click',
-    () => showStepFn(currentStep - 1, persist)
+    () => showStep(currentStep - 1)
   );
   document.getElementById('nextBtn').addEventListener('click',
-    () => showStepFn(currentStep + 1, persist)
+    () => showStep(currentStep + 1)
   );
 
-  // Render initial state
-  showStepFn(currentStep, persist);
+  // Silent initial render — does NOT call persist, so restore()
+  // can safely overwrite with the saved step.
+  showStep(0, true);
 }

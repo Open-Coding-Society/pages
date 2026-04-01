@@ -71,6 +71,7 @@ export function restore(showStep) {
   const ta = document.getElementById('frq-answer');
   if (ta && saved.frqAnswer) ta.value = saved.frqAnswer;
 
-  // Restore saved step position
-  if (typeof saved.step === 'number') showStep(saved.step);
+  // silent=true — this is a restore, not a user navigation,
+  // so we must not persist step 0 over the saved value.
+  if (typeof saved.step === 'number') showStep(saved.step, true);
 }

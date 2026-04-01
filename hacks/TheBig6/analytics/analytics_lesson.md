@@ -202,15 +202,15 @@ date: 2025-12-02
 
 <script type="module">
 import { javaURI, pythonURI, fetchOptions } from '/assets/js/api/config.js';
-import { restore, persist }         from '/assets/js/bigsix/persistence.js';
-import { initNavigation, showStep } from '/assets/js/bigsix/navigation.js';
+import { restore, persist }         from '/assets/js/bigsix/analytics/persistence.js';
+import { initNavigation, showStep } from '/assets/js/bigsix/analytics/navigation.js';
 import { loadAnalytics }            from '/assets/js/bigsix/analytics/analytics.js';
 import { initCerts }                from '/assets/js/bigsix/analytics/certificates.js';
 import { initFRQ }                  from '/assets/js/bigsix/analytics/frq.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  initNavigation(persist);
   restore(showStep);
-  initNavigation(showStep, persist);
   loadAnalytics(javaURI, fetchOptions);
   initCerts(pythonURI, fetchOptions);
   initFRQ(javaURI);
