@@ -5,7 +5,6 @@ description: Interactive test runner for the Calendar SRP modules. Runs all unit
 type: coding
 comments: true
 permalink: /calendar/tests
-courses: {'csse': {'week': 0}, 'csp': {'week': 0}, 'csa': {'week': 0}}
 author: Arnav Mittal
 ---
 

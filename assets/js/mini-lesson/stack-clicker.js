@@ -9,8 +9,12 @@ const state = {
   activeUpgradeTab: 'main',
   pushPower: 1,
   autoPushPerFrame: 0,
+  autoPushPerSecond: 0,
   processRate: 1,
+  processRatePerSecond: 0,
   overflowPenaltyRatio: 0.25,
+  autoPushSecondBuffer: 0,
+  processSecondBuffer: 0,
   upgradeMultipliers: {
     pushPower: 1,
     processRate: 1,
@@ -53,6 +57,28 @@ const upgrades = [
     purchases: 0,
     apply() {
       state.autoPushPerFrame += scaledGain(1, state.upgradeMultipliers.autoPushPerFrame);
+    }
+  },
+  {
+    id: 'schedulerClock',
+    category: 'main',
+    name: 'Scheduler Clock',
+    description: '+1 automatic push per second. Adds steady call pressure over time.',
+    baseCost: 95,
+    purchases: 0,
+    apply() {
+      state.autoPushPerSecond += 1;
+    }
+  },
+  {
+    id: 'pipelinePacer',
+    category: 'main',
+    name: 'Pipeline Pacer',
+    description: '+1 frame processed per second. Smooths stack unwinding continuously.',
+    baseCost: 105,
+    purchases: 0,
+    apply() {
+      state.processRatePerSecond += 1;
     }
   },
   {
@@ -140,15 +166,61 @@ const stackDepthEl = document.getElementById('stackDepth');
 const maxDepthEl = document.getElementById('maxDepth');
 const overflowCountEl = document.getElementById('overflowCount');
 const meterFillEl = document.getElementById('meterFill');
+const meterEl = meterFillEl?.parentElement;
+const meterWrapEl = document.getElementById('meterWrap');
+const steamLayerEl = document.getElementById('steamLayer');
 const tipTextEl = document.getElementById('tipText');
 const pushBtn = document.getElementById('pushBtn');
+const clickerStage = document.getElementById('clickerStage');
+const burstLayer = document.getElementById('burstLayer');
 const aiTutorBtn = document.getElementById('aiTutorBtn');
 const leaderboardToggleBtn = document.getElementById('leaderboardToggleBtn');
 const upgradeList = document.getElementById('upgradeList');
 const tabMainUpgrades = document.getElementById('tabMainUpgrades');
 const tabMultiplierUpgrades = document.getElementById('tabMultiplierUpgrades');
 const logList = document.getElementById('logList');
-const leaderboard = new Leaderboard(null, {
+const activeBurstParticles = [];
+let burstRafId = null;
+const EMBED_MESSAGE_SOURCE = 'stack-clicker-mini-lesson';
+const scoreGameEnv = {
+  stats: {
+    knowledgePoints: 0,
+    levelsCompleted: 0,
+    sessionTime: 0,
+    totalPowerUps: 0
+  },
+  scoreConfig: {
+    counterVar: 'knowledgePoints',
+    counterLabel: 'Knowledge Points',
+    scoreVar: 'knowledgePoints'
+  },
+  game: {
+    gameName: 'StackClicker'
+  },
+  initScoreManager() {
+    if (this.scoreManager) {
+      return Promise.resolve(this.scoreManager);
+    }
+    return import('/assets/js/GameEnginev1.1/essentials/GameEnvScore.js').then((module) => {
+      const GameEnvScore = module.default || module;
+      this.scoreManager = new GameEnvScore(this);
+      return this.scoreManager;
+    });
+  }
+};
+
+const leaderboardControlBridge = {
+  currentLevel: {
+    gameEnv: scoreGameEnv
+  },
+  gameEnv: scoreGameEnv
+};
+
+leaderboardControlBridge.game = {
+  getActiveControl: () => leaderboardControlBridge
+};
+
+const leaderboard = new Leaderboard(leaderboardControlBridge, {
   gameName: 'StackClicker',
   initiallyHidden: true
 });
@@ -273,21 +345,188 @@ function renderUpgradeTabs() {
   tabMultiplierUpgrades.setAttribute('aria-selected', String(!isMain));
 }
 
+function spawnSteamParticles(count, fillPercent) {
+  if (!steamLayerEl || !meterEl) {
+    return;
+  }
+
+  const meterWidth = meterEl.clientWidth || 0;
+  const edgeX = (Math.max(0, Math.min(100, fillPercent)) / 100) * meterWidth;
+
+  for (let i = 0; i < count; i += 1) {
+    const particle = document.createElement('span');
+    particle.className = 'steam-particle';
+    const spawnX = Math.max(6, Math.min(meterWidth - 6, edgeX + (-10 + Math.random() * 20)));
+    particle.style.setProperty('--x', `${spawnX}px`);
+    particle.style.setProperty('--size', `${7 + Math.random() * 8}px`);
+    particle.style.setProperty('--driftX', `${-10 + Math.random() * 20}px`);
+    steamLayerEl.appendChild(particle);
+    window.setTimeout(() => particle.remove(), 1200);
+  }
+}
+
+function updateSteamEffects(fillPercent) {
+  if (!meterWrapEl || !steamLayerEl) {
+    return;
+  }
+
+  const nearLimit = fillPercent >= 82;
+  const shakeActive = fillPercent > 0;
+  const ampPx = 0.2 + (fillPercent / 100) * 3.4;
+  const speedSeconds = Math.max(0.1, 0.42 - (fillPercent / 100) * 0.28);
+
+  meterWrapEl.style.setProperty('--meter-shake-amp', `${ampPx.toFixed(2)}px`);
+  meterWrapEl.style.setProperty('--meter-shake-speed', `${speedSeconds.toFixed(3)}s`);
+  meterWrapEl.classList.toggle('stack-shaking', shakeActive);
+  meterWrapEl.classList.toggle('near-limit', nearLimit);
+
+  if (!nearLimit) {
+    return;
+  }
+
+  const intensity = fillPercent >= 96 ? 3 : fillPercent >= 90 ? 2 : 1;
+  if (Math.random() < 0.78) {
+    spawnSteamParticles(intensity, fillPercent);
+  }
+}
+
 function render() {
   state.maxKnowledgePoints = Math.max(state.maxKnowledgePoints, state.points);
+  scoreGameEnv.stats.knowledgePoints = state.maxKnowledgePoints;
+  scoreGameEnv.stats.levelsCompleted = state.overflowCount;
+  scoreGameEnv.stats.totalPowerUps = upgrades.reduce((sum, upgrade) => sum + upgrade.purchases, 0);
 
-  pointsEl.textContent = String(state.points);
-  stackDepthEl.textContent = String(state.stackDepth);
-  maxDepthEl.textContent = String(state.maxDepth);
-  overflowCountEl.textContent = String(state.overflowCount);
+  if (pointsEl) pointsEl.textContent = String(state.points);
+  if (stackDepthEl) stackDepthEl.textContent = String(state.stackDepth);
+  if (maxDepthEl) maxDepthEl.textContent = String(state.maxDepth);
+  if (overflowCountEl) overflowCountEl.textContent = String(state.overflowCount);
 
   const fill = Math.min(100, (state.stackDepth / state.maxDepth) * 100);
   meterFillEl.style.width = `${fill}%`;
+  updateSteamEffects(fill);
 
   updateLeaderboardKnowledgePreview();
 
   renderUpgradeTabs();
   renderUpgrades();
+  postControlStateToParent();
+}
+
+function triggerButtonImpact() {
+  pushBtn.classList.remove('impact');
+  clickerStage.classList.remove('stage-shake');
+
+  // Force reflow so repeated clicks retrigger CSS animations.
+  void pushBtn.offsetWidth;
+
+  pushBtn.classList.add('impact');
+  clickerStage.classList.add('stage-shake');
+
+  window.setTimeout(() => pushBtn.classList.remove('impact'), 140);
+  window.setTimeout(() => clickerStage.classList.remove('stage-shake'), 240);
+}
+
+function spawnBurstSprites(event, burstPower = state.pushPower) {
+  if (!burstLayer || !clickerStage) {
+    return;
+  }
+
+  const stageRect = clickerStage.getBoundingClientRect();
+  const btnRect = pushBtn.getBoundingClientRect();
+  const centerX = (btnRect.left + btnRect.width / 2) - stageRect.left;
+  const centerY = (btnRect.top + btnRect.height / 2) - stageRect.top;
+  const particleCount = Math.max(1, Math.floor(burstPower));
+
+  for (let i = 0; i < particleCount; i += 1) {
+    const chip = document.createElement('div');
+    chip.className = 'burst-chip';
+
+    const angle = (Math.PI * 2 * i) / particleCount + Math.random() * 0.35;
+    const speed = 220 + Math.random() * 300;
+    const size = 28 + Math.random() * 12;
+
+    chip.style.width = `${size}px`;
+    chip.style.height = `${size}px`;
+    chip.style.left = `${centerX - size / 2}px`;
+    chip.style.top = `${centerY - size / 2}px`;
+
+    burstLayer.appendChild(chip);
+    activeBurstParticles.push({
+      el: chip,
+      x: 0,
+      y: 0,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 120,
+      gravity: 880,
+      rot: -35 + Math.random() * 70,
+      spin: -180 + Math.random() * 360,
+      age: 0,
+      life: 900 + Math.random() * 300
+    });
+  }
+
+  if (!burstRafId) {
+    burstRafId = window.requestAnimationFrame(stepBurstParticles);
+  }
+}
+
+function stepBurstParticles(timestamp) {
+  if (!stepBurstParticles.lastTs) {
+    stepBurstParticles.lastTs = timestamp;
+  }
+
+  const dt = Math.min(0.04, (timestamp - stepBurstParticles.lastTs) / 1000);
+  stepBurstParticles.lastTs = timestamp;
+
+  for (let i = activeBurstParticles.length - 1; i >= 0; i -= 1) {
+    const p = activeBurstParticles[i];
+    p.age += dt * 1000;
+
+    p.vy += p.gravity * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.rot += p.spin * dt;
+
+    const lifeRatio = p.age / p.life;
+    const opacity = Math.max(0, 1 - lifeRatio * lifeRatio);
+    p.el.style.opacity = opacity.toFixed(3);
+    p.el.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rot.toFixed(1)}deg)`;
+
+    if (lifeRatio >= 1) {
+      p.el.remove();
+      activeBurstParticles.splice(i, 1);
+    }
+  }
+
+  if (activeBurstParticles.length > 0) {
+    burstRafId = window.requestAnimationFrame(stepBurstParticles);
+    return;
+  }
+
+  burstRafId = null;
+  stepBurstParticles.lastTs = 0;
+}
+
+function postControlStateToParent() {
+  if (window.parent === window) {
+    return;
+  }
+
+  window.parent.postMessage(
+    {
+      source: EMBED_MESSAGE_SOURCE,
+      type: 'stack-clicker:controls-state',
+      leaderboardLabel: leaderboardToggleBtn?.textContent || 'Show Leaderboard',
+      aiLabel: aiTutorBtn?.textContent || 'Ask Stacky Box',
+      leaderboardVisible: Boolean(leaderboard?.isVisible?.()),
+      aiVisible: Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.()),
+      points: state.points,
+      stackDepth: state.stackDepth,
+      maxDepth: state.maxDepth,
+      overflowCount: state.overflowCount
+    },
+    '*'
+  );
 }
 
 tabMainUpgrades.addEventListener('click', () => {
@@ -300,7 +539,10 @@ tabMultiplierUpgrades.addEventListener('click', () => {
   render();
 });
 
-pushBtn.addEventListener('click', () => {
+pushBtn.addEventListener('click', (event) => {
+  triggerButtonImpact();
+  spawnBurstSprites(event, state.pushPower);
+
   state.stackDepth += state.pushPower;
   tipTextEl.textContent = `Pushed ${state.pushPower} frame(s). A call adds frames to the stack.`;
   maybeOverflow();
@@ -309,12 +551,18 @@ pushBtn.addEventListener('click', () => {
 
 const setAiTutorButtonLabel = () => {
   const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
-  aiTutorBtn.textContent = isOpen ? 'Hide Stacky Box' : 'Ask Stacky Box';
+  if (aiTutorBtn) {
+    aiTutorBtn.textContent = isOpen ? 'Hide Stacky Box' : 'Ask Stacky Box';
+  }
+  postControlStateToParent();
 };
 
 const setLeaderboardButtonLabel = () => {
   const isVisible = Boolean(leaderboard?.isVisible?.());
-  leaderboardToggleBtn.textContent = isVisible ? 'Hide Leaderboard' : 'Show Leaderboard';
+  if (leaderboardToggleBtn) {
+    leaderboardToggleBtn.textContent = isVisible ? 'Hide Leaderboard' : 'Show Leaderboard';
+  }
+  postControlStateToParent();
 };
 
 const updateLeaderboardKnowledgePreview = () => {
@@ -329,6 +577,18 @@ const updateLeaderboardKnowledgePreview = () => {
   }
 };
 
+const refreshLeaderboardData = async () => {
+  if (typeof leaderboard?.fetchLeaderboard !== 'function') {
+    return;
+  }
+
+  try {
+    await leaderboard.fetchLeaderboard();
+  } catch (error) {
+    console.error('Failed to refresh leaderboard:', error);
+  }
+};
+
 const wireLeaderboardSaveButton = () => {
   const originalSaveBtn = document.getElementById('leaderboard-save-score');
   if (!originalSaveBtn || originalSaveBtn.dataset.stackClickerBound === 'true') {
@@ -340,8 +600,13 @@ const wireLeaderboardSaveButton = () => {
   originalSaveBtn.replaceWith(saveBtn);
 
   saveBtn.addEventListener('click', async () => {
+    if (state.maxKnowledgePoints <= 0) {
+      addLog('Score not saved: earn some knowledge points first.');
+      return;
+    }
+
     const previousName = localStorage.getItem('stackClickerPlayerName') || '';
-    const entered = window.prompt('Enter your name to save this score:', previousName || 'Player');
+    const entered = window.prompt('Enter your name to save this run:', previousName || 'Player');
     const username = entered?.trim();
 
     if (!username) {
@@ -354,6 +619,7 @@ const wireLeaderboardSaveButton = () => {
     try {
       await leaderboard.submitScore(username, state.maxKnowledgePoints, 'StackClicker');
       addLog(`Leaderboard updated: ${username} saved ${state.maxKnowledgePoints} knowledge points.`);
+      await refreshLeaderboardData();
     } catch (error) {
       console.error('Failed to save leaderboard score:', error);
       addLog('Could not save score to leaderboard. Try again.');
@@ -363,7 +629,19 @@ const wireLeaderboardSaveButton = () => {
   });
 };
 
-aiTutorBtn.addEventListener('click', () => {
+const pinLeaderboardToTopCorner = () => {
+  const container = document.getElementById('leaderboard-container');
+  if (!container) {
+    return;
+  }
+
+  container.style.top = '12px';
+  container.style.left = '12px';
+  container.style.right = 'auto';
+  container.style.zIndex = '1000';
+};
+
+const toggleAiTutor = () => {
   const isOpen = Boolean(rpnBox.dialogueSystem?.isDialogueOpen?.());
   if (isOpen) {
     rpnBox.dialogueSystem.closeDialogue();
@@ -373,31 +651,111 @@ aiTutorBtn.addEventListener('click', () => {
 
   AiNpc.showInteraction(rpnBox);
   setAiTutorButtonLabel();
-});
+};
 
-leaderboardToggleBtn.addEventListener('click', () => {
+const toggleLeaderboard = () => {
+  const wasVisible = Boolean(leaderboard?.isVisible?.());
   leaderboard.toggleVisibility();
+  pinLeaderboardToTopCorner();
+
+  const nowVisible = Boolean(leaderboard?.isVisible?.());
+  if (nowVisible && !wasVisible) {
+    const contentEl = document.getElementById('leaderboard-content');
+    if (contentEl?.classList.contains('hidden')) {
+      leaderboard.toggle();
+    }
+
+    wireLeaderboardSaveButton();
+    refreshLeaderboardData();
+  }
+
   setLeaderboardButtonLabel();
+};
+
+if (aiTutorBtn) {
+  aiTutorBtn.addEventListener('click', toggleAiTutor);
+}
+if (leaderboardToggleBtn) {
+  leaderboardToggleBtn.addEventListener('click', toggleLeaderboard);
+}
+
+window.addEventListener('message', (event) => {
+  const data = event?.data;
+  if (!data || data.source !== 'stack-clicker-embed') {
+    return;
+  }
+
+  if (data.type === 'stack-clicker:toggle-ai') {
+    toggleAiTutor();
+    return;
+  }
+
+  if (data.type === 'stack-clicker:toggle-leaderboard') {
+    toggleLeaderboard();
+    return;
+  }
+
+  if (data.type === 'stack-clicker:get-controls-state') {
+    setAiTutorButtonLabel();
+    setLeaderboardButtonLabel();
+  }
 });
 
 setInterval(() => {
   let tip = '';
+  scoreGameEnv.stats.sessionTime += state.tickMs;
+  const tickSeconds = state.tickMs / 1000;
+  let totalAutoPushed = 0;
+  let totalResolved = 0;
 
   if (state.autoPushPerFrame > 0) {
+    triggerButtonImpact();
+    spawnBurstSprites(undefined, state.autoPushPerFrame);
+
     state.stackDepth += state.autoPushPerFrame;
-    tip = `Auto-pushed ${state.autoPushPerFrame} frame(s).`;
+    totalAutoPushed += state.autoPushPerFrame;
     maybeOverflow();
   }
 
+  if (state.autoPushPerSecond > 0) {
+    state.autoPushSecondBuffer += state.autoPushPerSecond * tickSeconds;
+    const secondPushes = Math.floor(state.autoPushSecondBuffer);
+
+    if (secondPushes > 0) {
+      triggerButtonImpact();
+      spawnBurstSprites(undefined, secondPushes);
+      state.autoPushSecondBuffer -= secondPushes;
+      state.stackDepth += secondPushes;
+      totalAutoPushed += secondPushes;
+      maybeOverflow();
+    }
+  }
+
+  if (totalAutoPushed > 0) {
+    tip = `Auto-pushed ${totalAutoPushed} frame(s).`;
+  }
+
   if (state.stackDepth > 0) {
-    const resolved = Math.min(state.processRate, state.stackDepth);
+    let resolved = Math.min(state.processRate, state.stackDepth);
+
+    if (state.processRatePerSecond > 0) {
+      state.processSecondBuffer += state.processRatePerSecond * tickSeconds;
+      const secondResolved = Math.floor(state.processSecondBuffer);
+      if (secondResolved > 0) {
+        state.processSecondBuffer -= secondResolved;
+        resolved += secondResolved;
+      }
+    }
+
+    resolved = Math.min(resolved, state.stackDepth);
     state.stackDepth -= resolved;
     state.points += resolved;
+    totalResolved += resolved;
 
-    if (resolved > 0) {
+    if (totalResolved > 0) {
       tip = tip
-        ? `${tip} Returned ${resolved} frame(s).`
-        : `Returned ${resolved} frame(s). Stack unwinds in LIFO order.`;
+        ? `${tip} Returned ${totalResolved} frame(s).`
+        : `Returned ${totalResolved} frame(s). Stack unwinds in LIFO order.`;
     }
   }
 
@@ -409,7 +767,12 @@ setInterval(() => {
 }, state.tickMs);
 
 addLog('Welcome. Click Push Function Call to grow the stack and earn points as frames return.');
-wireLeaderboardSaveButton();
+setTimeout(pinLeaderboardToTopCorner, 0);
+setTimeout(() => {
+  wireLeaderboardSaveButton();
+  refreshLeaderboardData();
+}, 0);
 setAiTutorButtonLabel();
 setLeaderboardButtonLabel();
+postControlStateToParent();
 render();
