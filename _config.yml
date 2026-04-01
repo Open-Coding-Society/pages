@@ -60,9 +60,8 @@ exclude:
 #   silence_deprecations: [import]
 incremental: true
 
-remote_theme: jekyll/minima
+theme: minima
 plugins:
-  - jekyll-remote-theme
   - jekyll-include-cache
 
 # Minima-specific settings (applicable to Minima v3 and above only)
