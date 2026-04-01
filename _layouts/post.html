@@ -136,6 +136,8 @@ Check if this is a course lesson and determine which course context to use
   const STORAGE_KEY = `${COURSE}-lesson-completion`;
   const STATUS_AUTO_HIDE_MS = 5000;
   const FILE_SIZE_LIMIT_MB = 10;
+  const ASSIGNMENT_ID = {{ page.assignment_id | default: 'null' }};
+  const ASSIGNMENT_NAME = {{ page.assignment_name | default: 'null' | jsonify }};
 
   /**
    * ============================================
@@ -469,36 +471,66 @@ Check if this is a course lesson and determine which course context to use
    * ASSIGNMENT SUBMISSION: API operations
    * ============================================
    */
-  async function fetchUserUID() {
-    try {
-      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
-      if (res.ok) {
-        const data = await res.json();
-        return data.uid;
-      }
-      return null;
-    } catch (err) {
-      console.error('Error fetching UID:', err);
-      return null;
+  async function resolveCurrentUser() {
+    const uidRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+    if (!uidRes.ok) throw new Error('Not authenticated. Please log in.');
+    const { uid } = await uidRes.json();
+    const personRes = await fetch(`${javaURI}/api/person/uid/${encodeURIComponent(uid)}`, fetchOptions);
+    if (!personRes.ok) throw new Error('Could not resolve your account in the gradebook.');
+    const person = await personRes.json();
+    return { uid, personId: person.id };
+  }
+
+  async function resolveAssignmentName() {
+    if (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) return ASSIGNMENT_NAME;
+    const res = await fetch(`${javaURI}/api/assignments/${ASSIGNMENT_ID}`, fetchOptions);
+    if (!res.ok) throw new Error('Assignment not found on server.');
+    return await res.text();
+  }
+
+  async function submitLinkToBackend(link, description) {
+    if (!ASSIGNMENT_ID) throw new Error("Assignment ID not configured. Add assignment_id to this page's frontmatter.");
+    const { personId } = await resolveCurrentUser();
+    const res = await fetch(`${javaURI}/api/submissions/${ASSIGNMENT_ID}`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({
+        assignmentId: ASSIGNMENT_ID,
+        submitterId: personId,
+        isGroupSubmission: false,
+        content: link,
+        comment: description,
+        isLate: false
+      })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error || res.statusText);
     }
   }
 
-  async function submitAssignmentToBackend(submissionData) {
-    try {
-      const uid = await fetchUserUID();
-      if (!uid) throw new Error('Authentication failed');
-
-      const payload = { uid, title: PAGE_TITLE, class: COURSE, ...submissionData };
-      const res = await fetch(`${javaURI}/api/grades`, {
-        ...fetchOptions,
+  async function submitFilesToBackend(files, notes) {
+    if (!ASSIGNMENT_ID) throw new Error("Assignment ID not configured. Add assignment_id to this page's frontmatter.");
+    const { uid, personId } = await resolveCurrentUser();
+    const assignmentName = await resolveAssignmentName();
+    for (const file of files) {
+      const fd = new FormData();
+      fd.append('assignmentName', assignmentName);
+      fd.append('userId', personId);
+      fd.append('username', uid);
+      fd.append('file', file);
+      if (notes) fd.append('notes', notes);
+      const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        mode: fetchOptions.mode,
+        credentials: fetchOptions.credentials,
+        headers: { 'X-Origin': 'client' },
+        body: fd
       });
-      return res.ok;
-    } catch (err) {
-      console.error('Error submitting assignment:', err);
-      return false;
+      if (!r.ok) {
+        const e = await r.json().catch(() => ({}));
+        throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+      }
     }
   }
 
@@ -538,12 +570,15 @@ Check if this is a course lesson and determine which course context to use
   function showStatus(type, message) {
     const status = document.getElementById('submission-status');
     if (!status) return;
+    const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
     status.className = `submission-status ${type}`;
-    status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+    status.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
     status.style.display = 'block';
-    setTimeout(() => {
-      status.style.display = 'none';
-    }, STATUS_AUTO_HIDE_MS);
+    if (type !== 'loading') {
+      setTimeout(() => {
+        status.style.display = 'none';
+      }, STATUS_AUTO_HIDE_MS);
+    }
   }
 
   /**
@@ -628,16 +663,20 @@ Check if this is a course lesson and determine which course context to use
     if (linkForm) {
       linkForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const link = document.getElementById('submission-link').value;
-        const description = document.getElementById('link-description').value;
-        
-        const success = await submitAssignmentToBackend({ notes: description, link });
-        if (success) {
+        const link = document.getElementById('submission-link').value.trim();
+        const description = document.getElementById('link-description').value.trim();
+        const submitBtn = linkForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        showStatus('loading', 'Submitting...');
+        try {
+          await submitLinkToBackend(link, description);
           saveSubmissionLocally('link', { link, description });
           showStatus('success', 'Link submitted successfully!');
           this.reset();
-        } else {
-          showStatus('error', 'Failed to submit link. Please try again.');
+        } catch (err) {
+          showStatus('error', err.message);
+        } finally {
+          submitBtn.disabled = false;
         }
       });
     }
@@ -647,32 +686,26 @@ Check if this is a course lesson and determine which course context to use
       fileForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         const fileInput = document.getElementById('file-input');
-        const notes = document.getElementById('file-notes').value;
-        
-        const uploads = [];
-        for (const file of fileInput.files) {
-          if (file.size > FILE_SIZE_LIMIT_MB * 1024 * 1024) {
-            showStatus('error', `File ${file.name} is too large (max ${FILE_SIZE_LIMIT_MB}MB)`);
-            return;
+        const notes = document.getElementById('file-notes')?.value?.trim() || '';
+        const submitBtn = fileForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        showStatus('loading', 'Uploading...');
+        try {
+          for (const file of fileInput.files) {
+            if (file.size > FILE_SIZE_LIMIT_MB * 1024 * 1024) {
+              throw new Error(`${file.name} exceeds ${FILE_SIZE_LIMIT_MB}MB limit.`);
+            }
           }
-          try {
-            const base64 = await fileToBase64(file);
-            uploads.push({ file: base64, filename: file.name });
-          } catch (err) {
-            showStatus('error', `Error reading file ${file.name}`);
-            return;
-          }
-        }
-        
-        const success = await submitAssignmentToBackend({ notes, uploads });
-        if (success) {
+          await submitFilesToBackend(Array.from(fileInput.files), notes);
           saveSubmissionLocally('file', { files: Array.from(fileInput.files).map(f => f.name), notes });
           showStatus('success', `${fileInput.files.length} file(s) submitted successfully!`);
           fileInput.value = '';
           updateFileListDisplay();
           this.reset();
-        } else {
-          showStatus('error', 'Failed to submit files. Please try again.');
+        } catch (err) {
+          showStatus('error', err.message);
+        } finally {
+          submitBtn.disabled = false;
         }
       });
     }
@@ -1022,6 +1055,13 @@ Check if this is a course lesson and determine which course context to use
     border: 1px solid #dc2626;
     color: #991b1b;
   }
+
+  .submission-status.loading {
+    display: block;
+    background: #dbeafe;
+    border: 1px solid #3b82f6;
+    color: #1d4ed8;
+  }
 </style>
 
 <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
@@ -1172,22 +1212,22 @@ Check if this is a course lesson and determine which course context to use
     </div>
 
     <script>
+      const ASSIGNMENT_ID = {{ page.assignment_id | default: 'null' }};
+      const ASSIGNMENT_NAME = {{ page.assignment_name | default: 'null' | jsonify }};
+
       // Submission type switching
       function switchSubmissionType(type) {
-        // Update tabs
         document.querySelectorAll('.submission-tab').forEach(tab => {
           tab.classList.remove('active');
         });
         event.target.closest('.submission-tab').classList.add('active');
 
-        // Update forms
         document.querySelectorAll('.submission-form').forEach(form => {
           form.classList.remove('active');
         });
         const formId = type + '-form-blog';
         document.getElementById(formId).classList.add('active');
 
-        // Clear status
         document.getElementById('submission-status-blog').style.display = 'none';
       }
 
@@ -1267,54 +1307,122 @@ Check if this is a course lesson and determine which course context to use
         return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
       }
 
-      document.getElementById('link-form-blog').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const link = document.getElementById('submission-link-blog').value;
-        const description = document.getElementById('link-description-blog').value;
-
-        saveSubmissionBlog('link', { link, description });
-        showStatusBlog('success', 'Link submitted successfully!');
-        this.reset();
-      });
-
-      document.getElementById('file-form-blog').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const notes = document.getElementById('file-notes-blog').value;
-
-        const fileNames = selectedFilesBlog.map(f => f.name);
-        saveSubmissionBlog('file', { files: fileNames, notes });
-
-        showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
-        selectedFilesBlog = [];
-        updateFileListBlog();
-        this.reset();
-      });
-
-      function saveSubmissionBlog(type, data) {
-        const submissions = JSON.parse(localStorage.getItem('assignment-submissions') || '{}');
-        const lessonId = window.location.pathname;
-
-        if (!submissions[lessonId]) {
-          submissions[lessonId] = [];
-        }
-
-        submissions[lessonId].push({
-          type,
-          data,
-          timestamp: new Date().toISOString()
-        });
-
-        localStorage.setItem('assignment-submissions', JSON.stringify(submissions));
+      // Helper: resolve current user's UID and numeric person ID
+      async function resolveCurrentUserBlog() {
+        const uidRes = await fetch(`${pythonURI}/api/id`, { ...fetchOptions });
+        if (!uidRes.ok) throw new Error('Not authenticated. Please log in.');
+        const { uid } = await uidRes.json();
+        const personRes = await fetch(`${javaURI}/api/person/uid/${encodeURIComponent(uid)}`, { ...fetchOptions });
+        if (!personRes.ok) throw new Error('Could not find your account in the gradebook.');
+        const person = await personRes.json();
+        return { uid, personId: person.id };
       }
+
+      // Link submission — POST to Spring API
+      document.getElementById('link-form-blog').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (!ASSIGNMENT_ID) {
+          showStatusBlog('error', "Assignment ID not configured. Add assignment_id to this page's frontmatter.");
+          return;
+        }
+        const link = document.getElementById('submission-link-blog').value.trim();
+        const description = document.getElementById('link-description-blog').value.trim();
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        showStatusBlog('loading', 'Submitting...');
+        try {
+          const { personId } = await resolveCurrentUserBlog();
+          const res = await fetch(`${javaURI}/api/submissions/${ASSIGNMENT_ID}`, {
+            ...fetchOptions,
+            method: 'POST',
+            body: JSON.stringify({
+              assignmentId: ASSIGNMENT_ID,
+              submitterId: personId,
+              isGroupSubmission: false,
+              content: link,
+              comment: description,
+              isLate: false
+            })
+          });
+          if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(e.error || res.statusText);
+          }
+          showStatusBlog('success', 'Link submitted successfully!');
+          this.reset();
+        } catch (err) {
+          showStatusBlog('error', err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      // File submission — POST to Spring file upload API
+      document.getElementById('file-form-blog').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (!ASSIGNMENT_ID) {
+          showStatusBlog('error', "Assignment ID not configured. Add assignment_id to this page's frontmatter.");
+          return;
+        }
+        if (selectedFilesBlog.length === 0) {
+          showStatusBlog('error', 'Please select at least one file.');
+          return;
+        }
+        const notes = document.getElementById('file-notes-blog').value.trim();
+        const btn = document.getElementById('file-submit-btn-blog');
+        btn.disabled = true;
+        showStatusBlog('loading', 'Uploading...');
+        try {
+          const { uid, personId } = await resolveCurrentUserBlog();
+          // Resolve assignment name for the file upload endpoint
+          let assignmentName = (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) ? ASSIGNMENT_NAME : null;
+          if (!assignmentName) {
+            const nameRes = await fetch(`${javaURI}/api/assignments/${ASSIGNMENT_ID}`, { ...fetchOptions });
+            if (!nameRes.ok) throw new Error('Assignment not found on server.');
+            assignmentName = await nameRes.text();
+          }
+          for (const file of selectedFilesBlog) {
+            if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} exceeds 10MB limit.`);
+            const fd = new FormData();
+            fd.append('assignmentName', assignmentName);
+            fd.append('userId', personId);
+            fd.append('username', uid);
+            fd.append('file', file);
+            if (notes) fd.append('notes', notes);
+            const r = await fetch(`${javaURI}/api/assignment-submissions/upload`, {
+              method: 'POST',
+              mode: fetchOptions.mode,
+              credentials: fetchOptions.credentials,
+              headers: { 'X-Origin': 'client' },
+              body: fd
+            });
+            if (!r.ok) {
+              const e = await r.json().catch(() => ({}));
+              throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
+            }
+          }
+          showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
+          selectedFilesBlog = [];
+          updateFileListBlog();
+          this.reset();
+        } catch (err) {
+          showStatusBlog('error', err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      });
 
       function showStatusBlog(type, message) {
         const status = document.getElementById('submission-status-blog');
+        const icon = type === 'success' ? 'check-circle' : type === 'loading' ? 'spinner fa-spin' : 'exclamation-circle';
         status.className = `submission-status ${type}`;
-        status.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
-
-        setTimeout(() => {
-          status.style.display = 'none';
-        }, 5000);
+        status.innerHTML = `<i class="fas fa-${icon}"></i> ${message}`;
+        status.style.display = 'block';
+        if (type !== 'loading') {
+          setTimeout(() => {
+            status.style.display = 'none';
+          }, 5000);
+        }
       }
     </script>
     {% endif %}
@@ -1329,9 +1437,10 @@ Check if this is a course lesson and determine which course context to use
 
   <!-- Enhanced Analytics Tracking -->
   <script type="module">
-    import { pythonURI, javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { pythonURI, javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
     window.pythonURI = pythonURI;
     window.javaURI = javaURI;
+    window.fetchOptions = fetchOptions;
   </script>
   <script src="{{ site.baseurl }}/assets/js/ocs-analytics-enhanced.js"></script>
   <script src="{{ site.baseurl }}/assets/js/code-runner-analytics.js"></script>
