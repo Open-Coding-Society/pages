@@ -17,6 +17,10 @@ else:
     from scripts.progress_bar import ProgressBar
 
 
+###########################################
+### Section for Constants and Patterns  ###
+###########################################
+
 notebook_directory = "_notebooks"
 destination_directory = "_posts"
 mermaid_output_directory = "assets/mermaid"
@@ -35,11 +39,12 @@ UI_RUNNER_PATTERN = r'^<!--\s*UI_RUNNER:\s*(.+)\s*-->$'
 GAME_RUNNER_PATTERN = r'^//\s*GAME_RUNNER:\s*(.+)$'
 
 
-########################################
+#########################################
 ### Section for Core Helper Functions ###
-########################################
+#########################################
 
 def ensure_directory_exists(path):
+    """Ensure the destination directory exists before writing output files."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
 
@@ -78,9 +83,9 @@ def get_custom_cell_id(cell) -> str:
     return cell.get('metadata', {}).get('custom_cell', {}).get('id', '')
 
 
-################################
+#################################
 ### Section for Object Models ###
-################################
+#################################
 
 
 @dataclass
@@ -93,6 +98,7 @@ class CodeRunner:
 
     @staticmethod
     def extract_challenge(cell_source: str, language: str) -> Optional[str]:
+        """Extract the CODE_RUNNER challenge text from a language-specific comment line."""
         if language not in CODE_RUNNER_PATTERNS:
             return None
 
@@ -105,6 +111,7 @@ class CodeRunner:
 
     @staticmethod
     def clean_code(cell_source: str, language: str) -> str:
+        """Strip magic commands and runner markers while preserving user code content."""
         lines = cell_source.split('\n')
         cleaned_lines = []
 
@@ -135,6 +142,7 @@ class CodeRunner:
 
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["CodeRunner"]:
+        """Build a CodeRunner instance when the cell includes a CODE_RUNNER marker."""
         language = detect_cell_language(cell)
         challenge = cls.extract_challenge(cell.source, language)
         if not challenge:
@@ -149,10 +157,12 @@ class CodeRunner:
         )
 
     def to_metadata(self) -> dict[str, Any]:
+        """Serialize runner data for notebook cell metadata storage."""
         return asdict(self)
 
     @classmethod
     def from_metadata(cls, metadata: dict[str, Any]) -> "CodeRunner":
+        """Rehydrate a CodeRunner from previously stored metadata."""
         return cls(
             challenge=metadata['challenge'],
             language=metadata['language'],
@@ -162,6 +172,7 @@ class CodeRunner:
         )
 
     def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
+        """Render Jekyll Liquid captures/includes for embedding the code runner widget."""
         return [
             '',
             '{% capture challenge' + str(code_runner_count) + ' %}',
@@ -197,6 +208,7 @@ class UiRunner:
 
     @staticmethod
     def extract_description(cell_source: str) -> Optional[str]:
+        """Extract the UI_RUNNER description directive from the cell source."""
         for line in cell_source.split('\n'):
             match = re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
             if match:
@@ -205,6 +217,7 @@ class UiRunner:
 
     @staticmethod
     def clean_html_and_script(cell_source: str, runner_index: int) -> tuple[str, str]:
+        """Split HTML/script content and namespace element IDs for safe reuse."""
         lines = cell_source.split('\n')
         in_script = False
         html_lines = []
@@ -242,6 +255,7 @@ class UiRunner:
 
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["UiRunner"]:
+        """Build a UiRunner instance when the cell includes a UI_RUNNER directive."""
         description = cls.extract_description(cell.source)
         if not description:
             return None
@@ -256,10 +270,12 @@ class UiRunner:
         )
 
     def to_metadata(self) -> dict[str, Any]:
+        """Serialize UI runner data for notebook cell metadata storage."""
         return asdict(self)
 
     @classmethod
     def from_metadata(cls, metadata: dict[str, Any]) -> "UiRunner":
+        """Rehydrate a UiRunner from previously stored metadata."""
         return cls(
             description=metadata['description'],
             runner_id=metadata['runner_id'],
@@ -269,6 +285,7 @@ class UiRunner:
         )
 
     def rendered_markup_lines(self) -> list[str]:
+        """Build the final HTML/script wrapper markup inserted into rendered markdown."""
         return [
             '<div class="ui-runner">',
             self.html,
@@ -303,6 +320,7 @@ class GameRunner:
 
     @staticmethod
     def extract_challenge_and_options(cell_source: str) -> Optional[tuple[str, dict[str, Any]]]:
+        """Parse GAME_RUNNER challenge text and optional key/value options."""
         for line in cell_source.split('\n'):
             match = re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
             if not match:
@@ -333,6 +351,7 @@ class GameRunner:
 
     @staticmethod
     def clean_code(cell_source: str) -> str:
+        """Remove game runner directives and notebook magics from JavaScript content."""
         cleaned_lines = []
         for i, line in enumerate(cell_source.split('\n')):
             if i == 0 and line.strip().startswith('%%js'):
@@ -350,6 +369,7 @@ class GameRunner:
 
     @classmethod
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["GameRunner"]:
+        """Build a GameRunner instance when the cell is a %%js GAME_RUNNER cell."""
         source = cell.get('source', '')
         if not source.strip().startswith('%%js'):
             return None
@@ -368,10 +388,12 @@ class GameRunner:
         )
 
     def to_metadata(self) -> dict[str, Any]:
+        """Serialize game runner data for notebook cell metadata storage."""
         return asdict(self)
 
     @classmethod
     def from_metadata(cls, metadata: dict[str, Any]) -> "GameRunner":
+        """Rehydrate a GameRunner from previously stored metadata."""
         return cls(
             challenge=metadata['challenge'],
             runner_id=metadata['runner_id'],
@@ -381,6 +403,7 @@ class GameRunner:
         )
 
     def liquid_lines(self, code_runner_count: int) -> list[str]:
+        """Render Jekyll Liquid captures/includes for embedding the game runner widget."""
         lines = [
             '',
             '{% capture challenge' + str(code_runner_count) + ' %}',
@@ -424,6 +447,7 @@ class CodeFence:
         return cls(opening_fence=lines[0], body_lines=lines[1:-1], closing_fence=lines[-1])
 
     def to_markdown_lines(self) -> list[str]:
+        """Convert the code fence representation back into markdown lines."""
         return [self.opening_fence, *self.body_lines, self.closing_fence]
 
 
@@ -433,6 +457,7 @@ class MermaidGraph:
     scale: str = "10"
 
     def convert_to_image(self, mermaid_code: str) -> Optional[str]:
+        """Render Mermaid source to a hashed PNG path, generating only when missing."""
         ensure_directory_exists(self.output_directory)
         mermaid_hash = sha256(mermaid_code.encode()).hexdigest()
         image_path = os.path.join(self.output_directory, f"{mermaid_hash}.png")
@@ -452,9 +477,11 @@ class MermaidGraph:
 
     @staticmethod
     def extract_code(cell_source: str) -> str:
+        """Remove Mermaid fence markers and return the raw diagram source."""
         return cell_source.replace("~~~mermaid", "").replace("~~~", "").strip()
 
     def process_cells(self, notebook) -> None:
+        """Replace Mermaid markdown cells with image markdown references."""
         for cell in notebook.cells:
             if cell.cell_type == "markdown" and cell.source.startswith("~~~mermaid"):
                 mermaid_code = self.extract_code(cell.source)
@@ -467,6 +494,7 @@ class MermaidGraph:
 ########################################
 
 def error_cleanup(notebook_file):
+    """Delete generated markdown output for a notebook when conversion fails."""
     destination_file = os.path.basename(notebook_file).replace(".ipynb", "_IPYNB_2_.md")
     destination_path = os.path.join(destination_directory, destination_file)
 
@@ -475,6 +503,7 @@ def error_cleanup(notebook_file):
 
 
 def extract_front_matter(notebook_file, cell):
+    """Parse YAML front matter from the notebook's first cell."""
     front_matter = {}
     source = cell.get("source", "")
 
@@ -489,6 +518,7 @@ def extract_front_matter(notebook_file, cell):
 
 
 def get_relative_output_path(notebook_file):
+    """Map a notebook path to the mirrored markdown output path under _posts."""
     relative_path = os.path.relpath(notebook_file, notebook_directory)
 
     markdown_filename = relative_path.replace(".ipynb", "_IPYNB_2_.md")
@@ -550,23 +580,14 @@ def assign_custom_cell_ids(notebook, permalink):
 
 
 def _build_lesson_key(front_matter):
+    """Build a stable lesson key from permalink metadata."""
     permalink = front_matter.get('permalink', '')
     return permalink.strip('/').replace('/', '-') if permalink else 'unknown-lesson'
 
 
-########################################
-### Section for Orchestrators        ###
-########################################
-
-
-def process_custom_cells(notebook, permalink):
-    """Main custom-cell orchestration pipeline for ID assignment and runner extraction."""
-    notebook = assign_custom_cell_ids(notebook, permalink)
-    notebook = process_code_runner_cells(notebook, permalink)
-    notebook = process_ui_runner_cells(notebook, permalink)
-    notebook = process_game_runner_cells(notebook, permalink)
-    return notebook
-
+#################################
+### Section for Orchestrators ###
+#################################
 
 def process_code_runner_cells(notebook, permalink):
     """Process notebook cells and add code-runner metadata"""
@@ -744,8 +765,18 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     return '\n'.join(result)
 
 
+def process_custom_cells(notebook, permalink):
+    """Main custom-cell orchestration pipeline for ID assignment and runner extraction."""
+    notebook = assign_custom_cell_ids(notebook, permalink)
+    notebook = process_code_runner_cells(notebook, permalink)
+    notebook = process_ui_runner_cells(notebook, permalink)
+    notebook = process_game_runner_cells(notebook, permalink)
+    return notebook
+
+
 # Function to convert the notebook to Markdown with front matter
 def convert_notebook_to_markdown_with_front_matter(notebook_file):
+    """Convert one notebook into markdown and prepend YAML front matter."""
     with open(notebook_file, "r", encoding="utf-8") as file:
         notebook = nbformat.read(file, as_version=nbformat.NO_CONVERT)
         front_matter = extract_front_matter(notebook_file, notebook.cells[0])
@@ -781,6 +812,7 @@ def convert_notebook_to_markdown_with_front_matter(notebook_file):
 
 # Function to convert the Jupyter Notebook files to Markdown
 def convert_single_notebook(notebook_file):
+    """Convert one notebook and fail fast on conversion exceptions."""
     try:
         convert_notebook_to_markdown_with_front_matter(notebook_file)
     except ConversionException as e:
@@ -790,6 +822,7 @@ def convert_single_notebook(notebook_file):
 
 
 def process_notebook(notebook_file):
+    """Process one notebook with broad exception handling for batch execution."""
     try:
         convert_single_notebook(notebook_file)
     except ConversionException as e:
@@ -800,6 +833,7 @@ def process_notebook(notebook_file):
 
 
 def convert_notebooks():
+    """Convert all notebooks in parallel while reporting progress."""
     maxCores = os.cpu_count()  # get the number of cores available on the system
 
     notebook_files = glob.glob(f"{notebook_directory}/**/*.ipynb", recursive=True)
