@@ -1,5 +1,5 @@
 // ============================================================
-//  certificates.js — Single Responsibility: Certificates & badges
+//  certificates.js — OOP: Certificates & badges
 //  Path: assets/js/bigsix/analytics/certificates.js
 //
 //  Owns everything related to the certificate step:
@@ -10,103 +10,134 @@
 //    - Wiring the download and LinkedIn buttons
 //
 //  EXPORTS:
-//    initCerts(pythonURI, fetchOptions)
+//    CertificatePanel
 // ============================================================
 
+export class CertificatePanel {
+  constructor(pythonURI, fetchOptions) {
+    this.pythonURI    = pythonURI;
+    this.fetchOptions = fetchOptions;
+  }
 
-// ============================================================
-//  WORKER 1 — fetchStudentName
-//  Single responsibility: get the logged-in user's display name.
-//  Falls back to 'Student Name' if the API is unavailable.
-// ============================================================
-async function fetchStudentName(pythonURI, fetchOptions) {
+  // ============================================================
+  //  ORCHESTRATOR — init
+  //  Sets cert date and wires buttons. Delegates all work to
+  //  private methods. Called once on DOMContentLoaded.
+  // ============================================================
+  init() {
+    const dateStr = new Date().toLocaleDateString('en-US', {
+      month: 'long',
+      year:  'numeric',
+    });
+
+    // Show date on the cert card
+    document.getElementById('certDate').textContent = dateStr;
+
+    // Wire download button
+    document.getElementById('btnDownload').addEventListener('click',
+      () => this.#downloadCert('CS Portfolio Certificate', 'Open Coding Society', dateStr)
+    );
+
+    // Wire LinkedIn button
+    document.getElementById('btnLinkedIn').addEventListener('click',
+      () => this.#openLinkedIn('CS Portfolio Certificate')
+    );
+  }
+
+
+  // ============================================================
+  //  WORKER 1 — #fetchStudentName
+  //  Single responsibility: get the logged-in user's display name.
+  //  Falls back to 'Student Name' if the API is unavailable.
+  // ============================================================
+  async #fetchStudentName() {
     try {
-      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      const res = await fetch(`${this.pythonURI}/api/id`, this.fetchOptions);
       if (res.ok) return (await res.json()).name || 'Student Name';
     } catch (err) {
       console.warn('Could not fetch student name:', err.message);
     }
     return 'Student Name';
   }
-  
-  
+
+
   // ============================================================
-  //  WORKER 2 — drawCertificate
+  //  WORKER 2 — #drawCertificate
   //  Single responsibility: render certificate onto canvas.
   //  Pure drawing function — no API calls, no downloads.
   // ============================================================
-  function drawCertificate(ctx, width, height, name, course, org, date) {
+  #drawCertificate(ctx, width, height, name, course, org, date) {
     // Background
     ctx.fillStyle = '#f8f6f0';
     ctx.fillRect(0, 0, width, height);
-  
+
     // Border
     ctx.strokeStyle = '#2c3e50';
     ctx.lineWidth   = 25;
     ctx.strokeRect(50, 50, width - 100, height - 100);
-  
+
     // Title
     ctx.fillStyle = '#2c3e50';
     ctx.font      = 'bold 60px Georgia';
     ctx.textAlign = 'center';
     ctx.fillText('CERTIFICATE OF COMPLETION', width / 2, 260);
-  
+
     // Intro text
     ctx.font = '28px Arial';
     ctx.fillText('This is to certify that', width / 2, 380);
-  
+
     // Recipient name — fetched dynamically from API
     ctx.fillStyle = '#ea8c33';
     ctx.font      = 'italic bold 52px Georgia';
     ctx.fillText(name, width / 2, 470);
-  
+
     // Course line
     ctx.fillStyle = '#2c3e50';
     ctx.font      = '32px Arial';
     ctx.fillText(`has successfully completed ${course}`, width / 2, 570);
-  
+
     // Org and date
     ctx.font      = '24px Arial';
     ctx.fillStyle = '#666';
     ctx.fillText(org, width / 2, 640);
     ctx.fillText(date, width / 2, 690);
   }
-  
-  
+
+
   // ============================================================
-  //  WORKER 3 — triggerDownload
+  //  WORKER 3 — #triggerDownload
   //  Single responsibility: convert canvas to PNG and download.
   // ============================================================
-  function triggerDownload(canvas, filename) {
+  #triggerDownload(canvas, filename) {
     const a    = document.createElement('a');
     a.download = `${filename}.png`;
     a.href     = canvas.toDataURL('image/png');
     a.click();
   }
-  
-  
+
+
   // ============================================================
-  //  WORKER 4 — downloadCert
+  //  WORKER 4 — #downloadCert
   //  Single responsibility: orchestrate fetch → draw → download.
   // ============================================================
-  async function downloadCert(pythonURI, fetchOptions, course, org, date) {
-    const name   = await fetchStudentName(pythonURI, fetchOptions);
+  async #downloadCert(course, org, date) {
+    const name   = await this.#fetchStudentName();
     const canvas = document.getElementById('certCanvas');
     const ctx    = canvas.getContext('2d');
-  
+
     canvas.width  = 1400;
     canvas.height = 1000;
-  
-    drawCertificate(ctx, canvas.width, canvas.height, name, course, org, date);
-    triggerDownload(canvas, course.replace(/\s+/g, '_') + '_Certificate');
+
+    this.#drawCertificate(ctx, canvas.width, canvas.height, name, course, org, date);
+    this.#triggerDownload(canvas, course.replace(/\s+/g, '_') + '_Certificate');
   }
-  
-  
+
+
   // ============================================================
-  //  WORKER 5 — openLinkedIn
+  //  WORKER 5 — #openLinkedIn
   //  Single responsibility: open LinkedIn Add Certification page.
   // ============================================================
-  function openLinkedIn(courseName) {
+  #openLinkedIn(courseName) {
     const url = new URL('https://www.linkedin.com/profile/add');
     url.searchParams.append('name',             courseName);
     url.searchParams.append('organizationName', 'Open Coding Society');
@@ -115,29 +146,4 @@ async function fetchStudentName(pythonURI, fetchOptions) {
     url.searchParams.append('certId',           `CSPORTFOLIO-${Date.now()}`);
     window.open(url.toString(), '_blank');
   }
-  
-  
-  // ============================================================
-  //  ORCHESTRATOR — initCerts
-  //  Sets cert date and wires buttons. Delegates all work to workers.
-  //  Called once on DOMContentLoaded from analytics.md.
-  // ============================================================
-  export function initCerts(pythonURI, fetchOptions) {
-    const dateStr = new Date().toLocaleDateString('en-US', {
-      month: 'long',
-      year:  'numeric',
-    });
-  
-    // Show date on the cert card
-    document.getElementById('certDate').textContent = dateStr;
-  
-    // Wire download button
-    document.getElementById('btnDownload').addEventListener('click',
-      () => downloadCert(pythonURI, fetchOptions, 'CS Portfolio Certificate', 'Open Coding Society', dateStr)
-    );
-  
-    // Wire LinkedIn button
-    document.getElementById('btnLinkedIn').addEventListener('click',
-      () => openLinkedIn('CS Portfolio Certificate')
-    );
-  }
+}

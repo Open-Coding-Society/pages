@@ -1,0 +1,12 @@
+<div
+  class="container-panel container-panel--{{ include.layout | default: 'row' }}"
+  id="container-panel-{{ include.panel_id | default: 'panel' }}"
+  style="--cp-gap: {{ include.gap | default: '1rem' }}; --cp-left: {{ include.left_width | default: '1fr' }}; --cp-right: {{ include.right_width | default: '1fr' }};"
+>
+  <div class="container-panel__item container-panel__item--left">
+    {{ include.left }}
+  </div>
+  <div class="container-panel__item container-panel__item--right">
+    {{ include.right }}
+  </div>
+</div>

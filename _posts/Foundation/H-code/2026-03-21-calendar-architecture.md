@@ -6,7 +6,6 @@ description: Documentation for the calendar sync system's Single Responsibility 
 type: coding
 comments: true
 permalink: /calendar/architecture
-courses: {'csse': {'week': 0}, 'csp': {'week': 0}, 'csa': {'week': 0}}
 author: Arnav Nadar
 ---
 

@@ -31,6 +31,10 @@ class Player extends Character {
         this.acceleration = 0.001;
         this.time = 0;
         this.moved = false;
+        // Floating label support — pass label: 'text' in player data to enable
+        this.labelText = data?.label || null;
+        this._labelEl = null;
+        if (this.labelText) this._createLabel();
         // Initialize touch controls for mobile devices
         this.touchControls = new TouchControls(gameEnv, this.touchOptions);
     }
@@ -141,6 +145,7 @@ class Player extends Character {
         else{
             this.time = 0;
         }
+        this._updateLabel(); // 👈 add this
         }
         
     /**
@@ -226,16 +231,44 @@ class Player extends Character {
         return this.touchControls ? this.touchControls.isInteractButtonVisible() : false;
     }
 
-    /**
+    _createLabel() {
+        this._labelEl = document.createElement('div');
+        this._labelEl.style.cssText = [
+            'position:fixed',
+            'z-index:9000',
+            'pointer-events:none',
+            'background:rgba(26,26,46,0.92)',
+            'border:2px solid #6c63ff',
+            'border-radius:20px',
+            'padding:3px 12px',
+            'color:#fff',
+            'font-family:Segoe UI,sans-serif',
+            'font-size:0.82em',
+            'font-weight:bold',
+            'white-space:nowrap',
+            'box-shadow:0 0 10px rgba(100,100,255,0.4)',
+            'transform:translateX(-50%)'
+        ].join(';');
+        this._labelEl.textContent = this.labelText;
+        document.body.appendChild(this._labelEl);
+    }
+    
+    _updateLabel() {
+        if (!this._labelEl || !this.canvas) return;
+        var rect = this.canvas.getBoundingClientRect();
+        this._labelEl.style.left = (rect.left + rect.width / 2) + 'px';
+        this._labelEl.style.top  = (rect.top - 26) + 'px';
+    }
+     /**
      * Clean up resources when player is destroyed
      */
     destroy() {
+        if (this._labelEl) { this._labelEl.remove(); this._labelEl = null; }
         if (this.touchControls) {
             this.touchControls.destroy();
         }
         super.destroy?.();
     }
-
 
 }
 

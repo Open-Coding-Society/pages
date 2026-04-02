@@ -1,0 +1,26 @@
+<!-- LESSON PLAYER TOP BAR - Navigation and progress -->
+{% comment %}
+  Shows breadcrumbs, current page info, completion toggle, and progress bar
+  Expects: current_course, current_week, page, site
+{% endcomment %}
+
+<div class="topbar-lesson">
+  <div class="topbar-left">
+    <div class="breadcrumbs">
+      <a href="{{ site.baseurl }}/navigation/courses/{{ current_course }}" title="Back to course">
+        <i class="fas fa-home"></i>
+      </a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Week {{ current_week }}</span>
+      <i class="fas fa-chevron-right"></i>
+      <span class="current">{{ page.title }}</span>
+      <button id="topbar-complete-btn" onclick="toggleComplete()" type="button" title="Mark lesson complete">
+        <i class="fas fa-circle" id="complete-icon-topbar"></i>
+        <span id="complete-text-topbar">Burndown</span>
+      </button>
+    </div>
+  </div>
+  <div class="topbar-progress">
+    <div class="topbar-progress-fill" id="lesson-progress"></div>
+  </div>
+</div>
