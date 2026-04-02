@@ -9,11 +9,12 @@ Description: >
 Topics:
   - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
     subtitle: "Redesigned Website Experience"
-    link: "https://wi-fighters-csp.github.io/wi-pages/capstone/powayorchestra/"
-    buttonLabel: "View Live Site"
+    link: "https://pso.opencodingsociety.com/"
+    buttonLabel: "View Frontend Site"
+    backendLink: "http://pso.flask.com"
 
     description: >
-      We  rebuilt the website with a cleaner layout, clearer navigation, and more
+      We rebuilt the website with a cleaner layout, clearer navigation, and more
       interactive features. The goal was to help users easily find concerts,
       learn about musicians, and take action like attending or donating.
 
@@ -33,6 +34,7 @@ Topics:
       - "Responsive design"
       - "Figma for design and planning"
       - "User research and testing"
+      - "Flask backend integration"
 
     impact:
       - "Users can find information faster"
@@ -40,7 +42,6 @@ Topics:
       - "Better experience on all devices"
       - "More users are likely to attend concerts or donate"
 
-    # EXTRA DATA (kept from your original YAML)
     interactiveElements:
       - title: "Musician Profiles"
         description: "Users can scroll through cards to explore orchestra members"
@@ -62,10 +63,15 @@ Topics:
       - "Made text easier to read with better spacing"
 
     wowFactors:
-      - "Turns a basic website into an interactive experience"
-      - "Lets users hear instruments directly on the site"
-      - "Makes it easier for users to take action like attending events"
-      - "Feels more modern and engaging for all age groups"
+      - "Live deployed frontend at https://pso.opencodingsociety.com/ that users can interact with in real time"
+      - "Working Flask backend (http://pso.flask.com) powering dynamic data instead of a static-only site"
+      - "Clickable instrument feature that plays real audio, turning learning into an interactive experience"
+      - "Musician profile cards with images and structured data that make the orchestra feel personal and accessible"
+      - "Clear call-to-action buttons (Donate, Attend, Explore) that guide real user behavior, not just browsing"
+      - "Fully responsive layout that maintains usability and design across phones, tablets, and desktops"
+      - "Clean navigation system that reduces user confusion and allows quick access to concerts and information"
+      - "Combination of visual design (Figma) + frontend + backend into one cohesive, real-world product"
+      - "Transforms a traditional informational site into an engaging, interactive platform for community connection"
 
     customerPitch:
       - "Community members can easily find concerts and feel connected"
