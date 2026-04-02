@@ -25,6 +25,7 @@ Topics:
       - "Built a Contact page with embedded Google Map, social media links (Facebook, Instagram, X, Yelp), address, phone, email, and bookstore hours"
       - "Implemented an Events Calendar on the home page with admin controls for creating and managing library events"
       - "Added tree/nature-themed hero decorations site-wide and a persistent auth nav that shows the logged-in user's name on every page"
+      - "Built a server-rendered admin dashboard at /fopl/admin — registered users table, book catalog breakdowns by age group and condition, per-game session and win-rate stats, and calendar event count. JWT-gated, admin-only"
     tech:
       - "Jekyll (GitHub Pages)"
       - "Flask + Python"
