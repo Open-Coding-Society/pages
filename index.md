@@ -16,3 +16,5 @@ permalink: /
 </noscript>
 
 [Continue to the Gamified Home Pilot]({{ site.baseurl }}/home-gamified-mvp)
+
+[Need older materials? Open the Legacy Home Materials Hub]({{ site.baseurl }}/home-legacy)
