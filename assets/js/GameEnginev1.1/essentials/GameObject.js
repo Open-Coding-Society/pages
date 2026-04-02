@@ -1,3 +1,5 @@
+import Transform from './Transform.js';
+
 /**
  * The GameObject class serves as a base class for all game objects.
  * It mimics an interface by defining abstract methods that must be implemented
@@ -15,12 +17,13 @@
  * @method handleReaction - Handles player reaction / state updates to the collision.
  */
 class GameObject {
-    
+ 
     constructor(gameEnv = null) {
         if (new.target === GameObject) {
             throw new TypeError("Cannot construct GameObject instances directly");
         }
         this.gameEnv = gameEnv; 
+        this.transform = new Transform(0, 0);
         this.collisionWidth = 0;
         this.collisionHeight = 0;
         this.collisionData = {};
@@ -29,6 +32,66 @@ class GameObject {
             collisionEvents: [],
             movement: { up: true, down: true, left: true, right: true },
         };
+    }
+
+    get position() {
+        return this.transform.position;
+    }
+
+    set position(value) {
+        this.transform.position = value;
+    }
+
+    get velocity() {
+        return this.transform.velocity;
+    }
+
+    set velocity(value) {
+        this.transform.velocity = value;
+    }
+
+    get x() {
+        return this.transform.x;
+    }
+
+    set x(value) {
+        this.transform.x = value;
+    }
+
+    get y() {
+        return this.transform.y;
+    }
+
+    set y(value) {
+        this.transform.y = value;
+    }
+
+    get xv() {
+        return this.transform.xv;
+    }
+
+    set xv(value) {
+        this.transform.xv = value;
+    }
+
+    get yv() {
+        return this.transform.yv;
+    }
+
+    set yv(value) {
+        this.transform.yv = value;
+    }
+
+    setTransformPosition(x, y) {
+        this.transform.setPosition(x, y);
+    }
+
+    setTransformVelocity(x, y) {
+        this.transform.setVelocity(x, y);
+    }
+
+    resetTransformToSpawn() {
+        this.transform.resetToSpawn();
     }
 
     /**
@@ -65,6 +128,28 @@ class GameObject {
      */
     destroy() {
         throw new Error("Method 'destroy()' must be implemented.");
+    }
+
+    /**
+     * Check if a point (canvas/game coordinates) is inside this object's hitbox.
+     * @param {number} x - X coordinate (canvas/game space)
+     * @param {number} y - Y coordinate (canvas/game space)
+     * @returns {boolean} True if point is inside hitbox
+     */
+    isPointInside(x, y) {
+        // Use this.position, this.pixels, this.hitbox, etc.
+        const px = this.position?.x ?? this.INIT_POSITION?.x ?? 0;
+        const py = this.position?.y ?? this.INIT_POSITION?.y ?? 0;
+        let width = this.pixels?.width || (this.hitbox?.widthPercentage ? this.hitbox.widthPercentage * (this.gameEnv?.innerWidth || 1) : 32);
+        let height = this.pixels?.height || (this.hitbox?.heightPercentage ? this.hitbox.heightPercentage * (this.gameEnv?.innerHeight || 1) : 32);
+        return (x >= px && x <= px + width && y >= py && y <= py + height);
+    }
+
+    /**
+     * Handle click/touch interaction. Override in subclasses for custom behavior.
+     */
+    handleClick() {
+        // Default: do nothing. Subclasses can override for interactivity.
     }
 
     /** Collision checks

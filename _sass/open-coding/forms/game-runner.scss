@@ -8,12 +8,12 @@
 
 .game-runner-container {
   @include runner-base;
+  width: var(--gr-panel-width, 100%);
+  max-width: 100%;
 
   // Game output area - contained canvas for educational use
   .game-output {
     // Layout & Dimensions
-    min-height: 400px;
-    max-height: 600px;
     overflow: hidden;
     position: relative;
     
@@ -27,7 +27,7 @@
     // Game container styling
     .gameContainer {
       width: 100%;
-      height: 580px;
+      height: var(--gr-canvas-height, 580px);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -37,8 +37,6 @@
       // Only style the main canvas, not character canvases
       > canvas#gameCanvas {
         display: block;
-        width: 100% !important;
-        height: 580px !important;
         border: none;
         background: transparent;
       }

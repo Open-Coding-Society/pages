@@ -1,0 +1,31 @@
+<!-- SINGLE ITEM CARD (Lesson or Assignment) -->
+{% comment %}
+  Expects:
+    - parts: array from "title||url||type" split
+    - itemType: "lesson" or "assignment"
+    - isAssignment: boolean
+{% endcomment %}
+
+<div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}" data-title="{{ parts[0] }}">
+  <div class="item-content">
+    <button class="completion-toggle" type="button" title="Mark complete">
+      <i class="fas fa-circle status-icon incomplete"></i>
+    </button>
+    <a href="{{ site.baseurl }}{{ parts[1] }}" class="item-link">
+      {% if isAssignment %}
+        <i class="fas fa-file-alt type-icon assignment"></i>
+      {% else %}
+        <i class="fas fa-code type-icon lesson"></i>
+      {% endif %}
+      <span class="item-title">{{ parts[0] }}</span>
+    </a>
+    <div class="item-priority-selector">
+      <select class="item-priority-dropdown" data-item-url="{{ parts[1] }}" title="Set priority">
+        <option value="P3">P3</option>
+        <option value="P2" selected>P2</option>
+        <option value="P1">P1</option>
+        <option value="P0">P0</option>
+      </select>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,142 @@
+{% assign data = site.data.fops_infographic %}
+
+<div class="fops-infographic">
+  <!-- Header Section with Organization Link -->
+  <div class="infographic-header">
+    <div class="header-content">
+      <span class="status-badge">{{ data.topics[0].status }}</span>
+      <h1 class="infographic-title">{{ data.title }}</h1>
+      <p class="infographic-description">{{ data.description }}</p>
+      <!-- New Organization Button -->
+      <a href="https://www.friendsofpowayseniors.org" class="org-button" target="_blank" rel="noopener noreferrer">
+        Visit Friends of Poway Seniors →
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Topic Card -->
+  {% assign topic = data.topics[0] %}
+  <div class="topic-card">
+    <div class="topic-grid">
+      <!-- Left Column: Image and Basic Info -->
+      <div class="topic-left">
+        <div class="image-wrapper">
+         <img src="{{ site.baseurl }}/images/capstone/fops.png" alt="Friends of Poway Seniors infographic visual" class="topic-image">
+        <h2 class="topic-title">{{ topic.title }}</h2>
+        <p class="topic-subtitle">{{ topic.subtitle }}</p>
+        <a href="{{ topic.link }}" class="view-plan-btn">View Full Plan →</a>
+      </div>
+
+      <!-- Right Column: Description -->
+      <div class="topic-right">
+        <p class="topic-description">{{ topic.description }}</p>
+      </div>
+    </div>
+
+    <!-- Key Points Grid -->
+    <div class="key-points-section">
+      <h3 class="section-title">🔧 Key Improvements</h3>
+      <div class="points-grid">
+        {% for point in topic.keyPoints %}
+        <div class="point-card">
+          <span class="point-icon">✓</span>
+          <span class="point-text">{{ point }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tech Stack & Impact Split -->
+    <div class="features-impact-grid">
+      <!-- Tech Stack -->
+      <div class="tech-section">
+        <h3 class="section-title">🛠️ Technologies & Features</h3>
+        <div class="tech-tags">
+          {% for tech in topic.tech %}
+          <span class="tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Impact -->
+      <div class="impact-section">
+        <h3 class="section-title">✨ Impact</h3>
+        <ul class="impact-list">
+          {% for item in topic.impact %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Team Footer -->
+    <div class="team-footer">
+      <span class="team-label">Team:</span>
+      <div class="team-members">
+        {% for member in topic.team %}
+        <span class="team-member">{{ member }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Spotlight - Platform Features -->
+  <div class="feature-spotlight">
+    <div class="spotlight-content">
+      <span class="feature-badge">🚀 Platform Features</span>
+      <h3>Smart Features Coming to FOPS</h3>
+      <p>We're building an intelligent, engaging platform to better serve Poway seniors and volunteers.</p>
+      
+      <div class="tracker-preview">
+        <!-- AI Chatbot Feature -->
+        <div class="feature-item">
+          <div class="feature-icon">🤖</div>
+          <div class="feature-details">
+            <span class="feature-name">AI Chatbot</span>
+            <span class="feature-desc">24/7 virtual assistant to answer questions, provide resources, and guide seniors through services</span>
+            <span class="feature-status available">✓ Already Available</span>
+          </div>
+        </div>
+        
+        <!-- Machine Learning Feature -->
+        <div class="feature-item">
+          <div class="feature-icon">🧠</div>
+          <div class="feature-details">
+            <span class="feature-name">Machine Learning</span>
+            <span class="feature-desc">Personalized content recommendations and intelligent matching between seniors and volunteers</span>
+            <span class="feature-status in-progress">⚙️ In Development</span>
+          </div>
+        </div>
+        
+        <!-- Volunteer Signup Feature -->
+        <div class="feature-item">
+          <div class="feature-icon">🙋</div>
+          <div class="feature-details">
+            <span class="feature-name">Volunteer Signup Portal</span>
+            <span class="feature-desc">Easy online registration, schedule management, and opportunity matching for volunteers</span>
+            <span class="feature-status available">✓ Already Available</span>
+          </div>
+        </div>
+        
+        <!-- Gamification Feature -->
+        <div class="feature-item">
+          <div class="feature-icon">🎮</div>
+          <div class="feature-details">
+            <span class="feature-name">Gamification</span>
+            <span class="feature-desc">Points, badges, and achievements to make engagement fun and rewarding for all users</span>
+            <span class="feature-status in-progress">⚙️ Coming Soon</span>
+          </div>
+        </div>
+      </div>
+      
+      <p class="spotlight-note">Our goal is to create an interactive, engaging platform that makes staying connected with FOPS both easy and enjoyable.</p>
+      
+      <!-- Secondary Button -->
+      <div class="spotlight-footer">
+        <a href="https://www.friendsofpowayseniors.org" class="spotlight-button" target="_blank" rel="noopener noreferrer">
+          Learn More About FOPS
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
