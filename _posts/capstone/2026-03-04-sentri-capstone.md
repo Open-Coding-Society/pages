@@ -18,7 +18,7 @@ The platform utilizes a multi-step **PRC Guide**—an AI-driven onboarding syste
 ### Core Ecosystem Features
 *   **The PRC Guide (AI Matcher):** A diagnostic onboarding flow that calculates "Match Percentages" between users and programs like ACA, Alateen, or SA based on behavioral input.
 *   **Dynamic Meeting Calendar:** A personalized scheduling interface that filters global recovery meetings into a clean, weekly view tailored to the user’s selected programs.
-*   **Recovery Statistics Dashboard:** High-fidelity tracking of "Meetings Attended," "Current Streak," and "Days Active" to provide visual positive reinforcement.
+*   **Recovery Statistics Dashboard:** High-fidelity tracking of "Meetings Attended," and "Chat History" to provide visual positive reinforcement.
 *   **HIPAA-Compliant Architecture:** A secure authentication system ensuring that sensitive recovery data remains confidential and protected.
 *   **Program Discovery Hub:** A centralized library of 8+ specialized recovery programs, providing users with the definitions and differences between "Open" and "Closed" meetings.
 
@@ -189,7 +189,7 @@ The platform utilizes a multi-step **PRC Guide**—an AI-driven onboarding syste
 
             <div class="feature-item"><span class="ai-icon">✓</span><span><strong>PRC Guide matching:</strong> Multi-step onboarding quiz to identify the best-fit recovery program.</span></div>
             <div class="feature-item"><span class="ai-icon">✓</span><span><strong>Personalized Calendar:</strong> Tailored schedule of AA, NA, and GA meetings based on user interest.</span></div>
-            <div class="feature-item"><span class="ai-icon">✓</span><span><strong>Streak & Milestone Tracking:</strong> Gamified recovery stats showing "Days Active" and "Meetings Attended."</span></div>
+            <div class="feature-item"><span class="ai-icon">✓</span><span><strong> Milestone Tracking:</strong> Gamified recovery stats showing "Chat History" and "Meetings Attended."</span></div>
             <div class="feature-item"><span class="ai-icon">✓</span><span><strong>Program Discovery:</strong> Educational database explaining "Open" vs "Closed" meeting protocols.</span></div>
         </div>
 
