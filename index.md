@@ -314,6 +314,8 @@ document.querySelectorAll("#controls button").forEach(btn => {
 </script>
 
 <!-- ================= PAGE CONTENT ================= -->
+> Gamified Home Pilot: [Launch MVP-A]({{site.baseurl}}/home-gamified-mvp)
+
 ## About
 
 Empower yourself to solve real-world problems, unlock creativity, and open doors to every field—because coding is the language of innovation.
