@@ -35,100 +35,8 @@
       </div>
     </div>
 
-    <!-- Calendar Section -->
-    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6 mb-6">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          Group Calendar
-        </h2>
-        <div class="flex gap-2">
-          <button onclick="previousMonth()" class="p-2 hover:bg-neutral-700 rounded-lg transition-colors" title="Previous month">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-          <span id="currentMonth" class="px-4 py-2 text-white font-medium min-w-fit">January 2026</span>
-          <button onclick="nextMonth()" class="p-2 hover:bg-neutral-700 rounded-lg transition-colors" title="Next month">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Calendar Grid -->
-        <div class="lg:col-span-2">
-          <!-- Day headers -->
-          <div class="grid grid-cols-7 gap-2 mb-2">
-            <div class="text-center text-gray-500 text-sm font-medium py-2">Sun</div>
-            <div class="text-center text-gray-500 text-sm font-medium py-2">Mon</div>
-            <div class="text-center text-gray-500 text-sm font-medium py-2">Tue</div>
-            <div class="text-center text-gray-500 text-sm font-medium py-2">Wed</div>
-            <div class="text-center text-gray-500 text-sm font-medium py-2">Thu</div>
-            <div class="text-center text-gray-500 text-sm font-medium py-2">Fri</div>
-            <div class="text-center text-gray-500 text-sm font-medium py-2">Sat</div>
-          </div>
-          
-          <!-- Calendar days -->
-          <div id="calendarGrid" class="grid grid-cols-7 gap-2">
-            <!-- Populated by JavaScript -->
-          </div>
-        </div>
-
-        <!-- Today's Events Sidebar -->
-        <div class="bg-neutral-700/50 border border-neutral-600 rounded-lg p-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Today's Items</h3>
-          <div id="todayEvents" class="space-y-3">
-            <p class="text-gray-500 text-sm">No events scheduled for today</p>
-          </div>
-          <button onclick="openAddEventModal()" class="mt-4 w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg transition-colors">
-            + Add Item
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dashboard Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- Member Analytics Section (2 columns) -->
-      <div class="lg:col-span-2 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
-        <div class="p-4 border-b border-neutral-700">
-          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-            Member Analytics
-          </h2>
-        </div>
-        
-        <div class="p-4">
-          <!-- Members Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-gray-400 border-b border-neutral-700">
-                  <th class="pb-3 font-medium">Member</th>
-                  <th class="pb-3 font-medium">Messages</th>
-                </tr>
-              </thead>
-              <tbody id="memberAnalyticsBody" class="text-gray-300">
-                <!-- Will be populated dynamically -->
-                <tr>
-                  <td colspan="2" class="py-8 text-center text-gray-400">
-                    No members in this group
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
+    <!-- Dashboard Summary Row -->
+    <div class="grid grid-cols-1 gap-6">
       <!-- Quick Stats Sidebar -->
       <div class="space-y-6">
         <!-- Group Stats Card -->
@@ -149,31 +57,60 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Activity Chart Placeholder -->
-        <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4">
-          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Weekly Activity</h3>
-          <div class="h-32 flex items-end justify-between gap-1 px-2">
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 40%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 65%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 45%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 80%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 55%"></div>
-            <div class="flex-1 bg-indigo-600/60 rounded-t" style="height: 90%"></div>
-            <div class="flex-1 bg-indigo-600 rounded-t" style="height: 70%"></div>
+    <!-- Member Analytics Section -->
+    <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
+        <div class="p-4 border-b border-neutral-700">
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Member Analytics
+          </h2>
+        </div>
+        
+        <div class="p-4">
+          <!-- Members Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-400 border-b border-neutral-700">
+                  <th class="pb-3 font-medium whitespace-nowrap">Member</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Messages</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Images</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Time Spent</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Lessons Completed</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Code Runs</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Interaction %</th>
+                  <th class="pb-3 font-medium whitespace-nowrap">Scroll Depth %</th>
+                </tr>
+              </thead>
+              <tbody id="memberAnalyticsBody" class="text-gray-300">
+                <!-- Will be populated dynamically -->
+                <tr>
+                  <td colspan="8" class="py-8 text-center text-gray-400">
+                    No members in this group
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="flex justify-between text-xs text-gray-500 mt-2 px-1">
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
-            <span>Sun</span>
+
+          <div class="mt-4 flex flex-col gap-3 border-t border-neutral-700 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p id="memberAnalyticsPaginationInfo" class="text-sm text-gray-400">Showing 0-0 of 0</p>
+            <div class="flex items-center gap-2">
+              <button id="memberAnalyticsPrevButton" onclick="previousMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Previous
+              </button>
+              <button id="memberAnalyticsNextButton" onclick="nextMemberAnalyticsPage()" class="px-3 py-2 bg-neutral-700 text-gray-300 rounded-lg transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
     <!-- Shared Files Section -->
     <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
@@ -202,47 +139,50 @@
         </div>
       </div>
     </div>
-
-  </div>
-</div>
-
-<!-- Event Modal -->
-<div id="eventModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-  <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg p-6 w-full max-w-md">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-white">Add/Edit Event</h3>
-      <button onclick="closeEventModal()" class="text-gray-400 hover:text-white">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-    </div>
     
-    <div class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">Event Title</label>
-        <input id="eventTitle" type="text" placeholder="Enter event title" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+    <!-- Relationship Graph Section -->
+    <div class="mt-6 bg-neutral-800 border border-neutral-700 rounded-lg shadow-md">
+      <div class="p-4 border-b border-neutral-700">
+        <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+          <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+          Relationship Graph & Recommended Friends
+        </h2>
       </div>
       
-      <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">Date</label>
-        <input id="eventDate" type="date" class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-      </div>
-      
-      <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">Description</label>
-        <textarea id="eventDescription" placeholder="Add event details..." class="w-full px-3 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none" rows="3"></textarea>
-      </div>
-      
-      <div class="flex gap-2 pt-2">
-        <button onclick="saveEvent()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-medium">
-          Save Event
-        </button>
-        <button onclick="closeEventModal()" class="flex-1 px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
-          Cancel
-        </button>
+      <div class="p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Force Directed Graph Container -->
+        <div class="lg:col-span-2 relative bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden" style="min-height: 400px;" id="relationshipGraphContainer">
+          <!-- Graph populated by D3.js -->
+          <div id="relationshipGraphEmptyState" class="absolute inset-0 flex items-center justify-center text-gray-400">
+            Mapping user connections...
+          </div>
+          <!-- Zoom Controls -->
+          <div class="absolute bottom-4 right-4 flex flex-col gap-2">
+            <button id="graphZoomInButton" class="p-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded shadow transition-colors" title="Zoom in">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16M4 12h16"/></svg>
+            </button>
+            <button id="graphZoomOutButton" class="p-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded shadow transition-colors" title="Zoom out">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+            </button>
+            <button id="graphResetButton" class="p-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded shadow transition-colors" title="Reset view">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Friend Recommendations List -->
+        <div class="bg-neutral-700/50 border border-neutral-600 rounded-lg p-4 flex flex-col h-full max-h-[400px]">
+          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Recommended Friends</h3>
+          <p class="text-xs text-gray-500 mb-4">Users you share multiple groups with but haven't actively messaged recently.</p>
+          <div id="recommendedFriendsList" class="flex-1 overflow-y-auto space-y-3 pr-2">
+            <div class="text-center text-gray-500 text-sm py-8">Analyzing connections...</div>
+          </div>
+        </div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -259,11 +199,14 @@
         <h3 id="chatModalTitle" class="text-xl font-semibold text-white">Group Chat</h3>
         <p id="chatModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
       </div>
-      <button onclick="closeGroupChat()" class="text-gray-400 hover:text-white transition-colors">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
+      <div class="flex items-center gap-3">
+        <span id="chatConnectionStatus" class="text-xs px-2 py-1 rounded bg-neutral-700 text-gray-300">Disconnected</span>
+        <button onclick="closeGroupChat()" class="text-gray-400 hover:text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Tabs -->
@@ -279,6 +222,10 @@
     <div class="flex-1 flex flex-col min-h-0">
       <!-- Chat Panel -->
       <div id="chatPanel" class="flex-1 flex flex-col min-h-0">
+        <div class="px-4 pt-3">
+          <div id="chatParticipants" class="text-xs text-gray-400">Participants: none</div>
+          <div id="chatTypingIndicator" class="text-xs text-indigo-300 min-h-[1.25rem]"></div>
+        </div>
         <!-- Chat Messages Area -->
         <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
           <div id="chatEmptyState" class="text-center text-gray-500 text-sm py-6">No messages yet.</div>
@@ -290,11 +237,12 @@
           <div id="slashCommandPopup" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
             <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
             <div id="slashCommandList">
-              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/calendar')">
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3"
+                onclick="selectSlashCommand('/calendar')">
                 <span class="text-lg">📅</span>
                 <div>
                   <div class="text-white text-sm font-medium">/calendar</div>
-                  <div class="text-gray-400 text-xs">Add a calendar event or reminder</div>
+                  <div class="text-gray-400 text-xs">Add event: create a task in the calendar</div>
                 </div>
               </div>
               <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3" onclick="selectSlashCommand('/adduser')">
@@ -358,34 +306,91 @@
   </div>
 </div>
 
+<!-- Calendar Event Modal -->
+<div id="calendarEventModal" class="hidden fixed inset-0 flex items-center justify-center" style="z-index: 60;">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="calendarModalController.close()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-md mx-4 flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <h3 class="text-xl font-semibold text-white">Add Calendar Event</h3>
+      <button onclick="calendarModalController.close()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-4 space-y-4">
+      <!-- Linked Group Indicator -->
+      <div id="calEventGroupContainer" class="hidden mb-4 p-3 bg-indigo-900/30 border border-indigo-500/30 rounded-lg flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <span class="text-sm text-indigo-200">Linking to group: <strong id="calEventGroupName" class="text-white"></strong></span>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Title</label>
+        <input id="calEventTitle" type="text" placeholder="Event Title"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Date</label>
+          <input id="calEventDate" type="date"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-200 mb-2">Period</label>
+          <input id="calEventPeriod" type="text" placeholder="e.g. CSA"
+            class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Description</label>
+        <textarea id="calEventDesc" rows="3" placeholder="Optional description..."
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      </div>
+
+      <!-- Priority -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Priority</label>
+        <select id="calEventPriority"
+          class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="P2" selected>P2 (Normal)</option>
+          <option value="P0">P0 (Highest)</option>
+          <option value="P1">P1 (High)</option>
+          <option value="P3">P3 (Low)</option>
+        </select>
+      </div>
+
+      <div id="calEventStatus" class="text-sm mt-2"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+      <button onclick="calendarModalController.close()"
+        class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+        Cancel
+      </button>
+      <button id="calEventSubmitBtn" onclick="calendarModalController.submit()"
+        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center">
+        Create Event
+      </button>
+    </div>
+  </div>
+</div>
+
 <style>
   /* Dashboard-specific styles */
   .dashboard-card {
     @apply bg-neutral-800 border border-neutral-700 rounded-lg shadow-md;
-  }
-  
-  .calendar-day {
-    @apply min-h-24 p-2 rounded-lg border transition-colors cursor-pointer;
-  }
-  
-  .calendar-day.other-month {
-    @apply bg-neutral-700/30 border-neutral-700 text-gray-500;
-  }
-  
-  .calendar-day.current-month {
-    @apply bg-neutral-700/50 border-neutral-600 text-gray-300 hover:bg-neutral-700;
-  }
-  
-  .calendar-day.today {
-    @apply border-indigo-500 bg-indigo-500/10;
-  }
-  
-  .calendar-day.has-events {
-    @apply border-indigo-400;
-  }
-  
-  .event-badge {
-    @apply inline-block px-2 py-1 text-xs rounded bg-indigo-600 text-white truncate mb-1;
   }
 
   /* Chat Modal Scrollbar Styling */
@@ -435,27 +440,51 @@
   }
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-  // Calendar state
-  let currentDate = new Date(2026, 0, 5); // February 5, 2026
-  let calendarEvents = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
-  let selectedEventDate = null;
+  const chatSocketPort = 8589;
+
+  function buildChatSocketEndpoint() {
+    // JUST FOR TESTING, needs to be replaced in config.js for a more permanent implementation
+    const uri = new URL(javaURI);
+    if (uri.hostname === 'localhost' || uri.hostname === '127.0.0.1') {
+        return `${uri.protocol}//${uri.hostname}:${chatSocketPort}/ws-chat`;
+    }
+    return javaURI + '/ws-chat';
+  }
 
   // Chat state
   const dashboardGroupId = "{{ include.groupId | default: '' }}";
   let activeChatGroupId = dashboardGroupId ? Number(dashboardGroupId) : null;
   let activeChatGroupName = '';
-  let chatPollTimer = null;
+  const groupChatState = {
+    stompClient: null,
+    subscription: null,
+    socket: null,
+    connected: false,
+    connecting: false,
+    reconnectTimer: null,
+    reconnectDelayMs: 3000,
+    heartbeatTimer: null,
+    selfTyping: false,
+    typingStopTimer: null,
+    typingUsers: new Set(),
+    participants: [],
+    seenEventKeys: new Set(),
+    connectPromise: null,
+    allowReconnect: false
+  };
   let currentUser = null;
   let currentUserDisplayName = 'You';
   let pendingChatImageBase64 = null;
   let pendingChatImageMime = 'image/png';
+  let renderedChatMessageKeys = new Set();
   
-  // Initialize calendar
   document.addEventListener('DOMContentLoaded', () => {
-    renderCalendar();
-    updateTodayEvents();
     initializeChatUser();
   });
 
@@ -471,202 +500,10 @@
     }
   }
 
-  function renderCalendar() {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    // Update month display
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-    document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
-    
-    // Get first day of month and number of days
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysInPrevMonth = new Date(year, month, 0).getDate();
-    
-    const calendarGrid = document.getElementById('calendarGrid');
-    calendarGrid.innerHTML = '';
-    
-    // Previous month's days
-    for (let i = firstDay - 1; i >= 0; i--) {
-      const day = daysInPrevMonth - i;
-      const dayElement = createDayElement(day, false, new Date(year, month - 1, day));
-      dayElement.classList.add('other-month');
-      calendarGrid.appendChild(dayElement);
-    }
-    
-    // Current month's days
-    const today = new Date();
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day);
-      const dayElement = createDayElement(day, true, date);
-      dayElement.classList.add('current-month');
-      
-      // Highlight today
-      if (date.toDateString() === today.toDateString()) {
-        dayElement.classList.add('today');
-      }
-      
-      calendarGrid.appendChild(dayElement);
-    }
-    
-    // Next month's days
-    const totalCells = calendarGrid.children.length;
-    const remainingCells = 42 - totalCells;
-    for (let day = 1; day <= remainingCells; day++) {
-      const dayElement = createDayElement(day, false, new Date(year, month + 1, day));
-      dayElement.classList.add('other-month');
-      calendarGrid.appendChild(dayElement);
-    }
-  }
-
-  function createDayElement(day, isCurrentMonth, date) {
-    const dayElement = document.createElement('div');
-    dayElement.className = 'calendar-day';
-    
-    const dateStr = formatDate(date);
-    const dayEvents = calendarEvents[dateStr] || [];
-    
-    if (dayEvents.length > 0) {
-      dayElement.classList.add('has-events');
-    }
-    
-    let html = `<div class="font-semibold text-sm mb-1">${day}</div>`;
-    
-    // Show first 2 events
-    dayEvents.slice(0, 2).forEach(event => {
-      html += `<div class="event-badge">${event.title}</div>`;
-    });
-    
-    if (dayEvents.length > 2) {
-      html += `<div class="text-xs text-indigo-400">+${dayEvents.length - 2} more</div>`;
-    }
-    
-    dayElement.innerHTML = html;
-    dayElement.onclick = () => selectDate(date);
-    
-    return dayElement;
-  }
-
-  function selectDate(date) {
-    selectedEventDate = date;
-    const dateStr = formatDate(date);
-    const events = calendarEvents[dateStr] || [];
-    
-    // Update today's events display
-    const todayEventsDiv = document.getElementById('todayEvents');
-    if (events.length === 0) {
-      todayEventsDiv.innerHTML = `<p class="text-gray-500 text-sm">No events on ${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>`;
-    } else {
-      todayEventsDiv.innerHTML = events.map((event, index) => `
-        <div class="bg-neutral-600/50 border border-neutral-500 rounded p-3 group hover:bg-neutral-600">
-          <div class="flex items-start justify-between gap-2">
-            <div class="flex-1 min-w-0">
-              <p class="text-white text-sm font-medium">${event.title}</p>
-              <p class="text-gray-400 text-xs mt-1">${event.description || 'No description'}</p>
-            </div>
-            <button onclick="deleteEvent('${dateStr}', ${index})" class="text-gray-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
-  }
-
-  function previousMonth() {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar();
-  }
-
-  function nextMonth() {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
-  }
-
-  function openAddEventModal() {
-    if (!selectedEventDate) {
-      alert('Please select a date first');
-      return;
-    }
-    document.getElementById('eventDate').value = formatDate(selectedEventDate);
-    document.getElementById('eventTitle').value = '';
-    document.getElementById('eventDescription').value = '';
-    document.getElementById('eventModal').classList.remove('hidden');
-    document.getElementById('eventTitle').focus();
-  }
-
-  function closeEventModal() {
-    document.getElementById('eventModal').classList.add('hidden');
-  }
-
-  function saveEvent() {
-    const title = document.getElementById('eventTitle').value.trim();
-    const dateStr = document.getElementById('eventDate').value;
-    const description = document.getElementById('eventDescription').value.trim();
-    
-    if (!title) {
-      alert('Please enter an event title');
-      return;
-    }
-    
-    if (!dateStr) {
-      alert('Please select a date');
-      return;
-    }
-    
-    if (!calendarEvents[dateStr]) {
-      calendarEvents[dateStr] = [];
-    }
-    
-    calendarEvents[dateStr].push({
-      title: title,
-      description: description,
-      timestamp: new Date().toISOString()
-    });
-    
-    localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
-    closeEventModal();
-    renderCalendar();
-    
-    // Update selected date view if it matches
-    const selectedDateStr = selectedEventDate ? formatDate(selectedEventDate) : null;
-    if (selectedDateStr === dateStr) {
-      selectDate(new Date(dateStr));
-    }
-  }
-
-  function deleteEvent(dateStr, index) {
-    if (confirm('Delete this event?')) {
-      calendarEvents[dateStr].splice(index, 1);
-      if (calendarEvents[dateStr].length === 0) {
-        delete calendarEvents[dateStr];
-      }
-      localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
-      renderCalendar();
-      selectDate(new Date(dateStr));
-    }
-  }
-
-  function updateTodayEvents() {
-    const today = new Date(2026, 0, 5); // February 5, 2026
-    selectDate(today);
-  }
-
-  function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
   // ================================
   // CHAT FUNCTIONALITY
   // ================================
-  const slashCommands = ['/calendar', '/adduser'];
+  const slashCommands = ['/adduser'];
   let selectedCommandIndex = 0;
 
   function formatTimestamp(isoString) {
@@ -679,6 +516,101 @@
       hour: 'numeric',
       minute: '2-digit'
     });
+  }
+
+  function setConnectionStatus(text, type = 'idle') {
+    const el = document.getElementById('chatConnectionStatus');
+    if (!el) return;
+    const classMap = {
+      idle: 'bg-neutral-700 text-gray-300',
+      connecting: 'bg-amber-600/20 text-amber-300',
+      connected: 'bg-emerald-600/20 text-emerald-300',
+      disconnected: 'bg-neutral-700 text-gray-300'
+    };
+    el.className = `text-xs px-2 py-1 rounded ${classMap[type] || classMap.idle}`;
+    el.textContent = text;
+  }
+
+  function refreshParticipants() {
+    const el = document.getElementById('chatParticipants');
+    if (!el) return;
+    if (!groupChatState.participants.length) {
+      el.textContent = 'Participants: none';
+      return;
+    }
+    el.textContent = `Participants: ${groupChatState.participants.join(', ')}`;
+  }
+
+  function refreshTypingIndicator() {
+    const el = document.getElementById('chatTypingIndicator');
+    if (!el) return;
+    const names = Array.from(groupChatState.typingUsers);
+    if (names.length === 0) {
+      el.textContent = '';
+    } else if (names.length === 1) {
+      el.textContent = `${names[0]} is typing...`;
+    } else {
+      el.textContent = `${names.join(', ')} are typing...`;
+    }
+  }
+
+  function addTypingUser(name) {
+    if (!name) return;
+    groupChatState.typingUsers.add(String(name));
+    refreshTypingIndicator();
+  }
+
+  function removeTypingUser(name) {
+    if (!name) {
+      groupChatState.typingUsers.clear();
+    } else {
+      groupChatState.typingUsers.delete(String(name));
+    }
+    refreshTypingIndicator();
+  }
+
+  function clearChatStateForGroupSwitch() {
+    groupChatState.participants = [];
+    groupChatState.typingUsers.clear();
+    groupChatState.seenEventKeys.clear();
+    refreshParticipants();
+    refreshTypingIndicator();
+  }
+
+  function getEventKey(event) {
+    return JSON.stringify([
+      event?.context || '',
+      event?.sender || event?.name || '',
+      event?.date || '',
+      event?.message || '',
+      event?.image || '',
+      event?.filename || '',
+      event?.base64Data ? String(event.base64Data).slice(0, 32) : ''
+    ]);
+  }
+
+  function markSeenEvent(event) {
+    const key = getEventKey(event);
+    if (!key) return false;
+    if (groupChatState.seenEventKeys.has(key)) return true;
+    groupChatState.seenEventKeys.add(key);
+    if (groupChatState.seenEventKeys.size > 1500) {
+      const first = groupChatState.seenEventKeys.values().next().value;
+      if (first) groupChatState.seenEventKeys.delete(first);
+    }
+    return false;
+  }
+
+  function appendSystemMessage(text) {
+    const chatMessages = document.getElementById('chatMessages');
+    if (!chatMessages) return;
+    const emptyState = document.getElementById('chatEmptyState');
+    if (emptyState) emptyState.classList.add('hidden');
+    const line = document.createElement('div');
+    line.className = 'text-xs text-gray-400 italic';
+    line.textContent = text;
+    chatMessages.appendChild(line);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
   function fileToBase64(file) {
@@ -742,10 +674,86 @@
     }
   };
 
+  function getChatMessageKey(msg) {
+    return JSON.stringify([
+      msg?.context || '',
+      msg?.sender || msg?.name || '',
+      msg?.name || '',
+      msg?.date || '',
+      msg?.message || '',
+      msg?.image || '',
+      msg?.filename || ''
+    ]);
+  }
+
+  function getChatImageSrc(image) {
+    if (!image) return null;
+    if (/^(data:|https?:\/\/|\/)/i.test(image)) return image;
+    return `data:image/png;base64,${image}`;
+  }
+
+  function appendSingleMessage(msg) {
+    const chatMessages = document.getElementById('chatMessages');
+    let emptyState = document.getElementById('chatEmptyState');
+    const messageKey = getChatMessageKey(msg);
+
+    if (!chatMessages || renderedChatMessageKeys.has(messageKey)) {
+      return;
+    }
+
+    if (!emptyState) {
+      emptyState = document.createElement('div');
+      emptyState.id = 'chatEmptyState';
+      emptyState.className = 'text-center text-gray-500 text-sm py-6';
+      emptyState.textContent = 'No messages yet.';
+    }
+
+    emptyState.classList.add('hidden');
+
+    const wrapper = document.createElement('div');
+
+    const header = document.createElement('div');
+    header.className = 'flex items-baseline gap-2 mb-1';
+
+    const senderName = msg.sender || msg.name || 'Unknown';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'text-white font-semibold text-sm';
+    nameEl.textContent = senderName === currentUserDisplayName ? 'You' : senderName;
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'text-gray-500 text-xs';
+    timeEl.textContent = formatTimestamp(msg.date);
+
+    header.appendChild(nameEl);
+    header.appendChild(timeEl);
+    wrapper.appendChild(header);
+
+    if (msg.message) {
+      const textEl = document.createElement('p');
+      textEl.className = 'text-gray-200 text-sm';
+      textEl.textContent = msg.message;
+      wrapper.appendChild(textEl);
+    }
+
+    if (msg.image) {
+      const img = document.createElement('img');
+      img.src = getChatImageSrc(msg.image);
+      img.alt = 'Shared image';
+      img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
+      wrapper.appendChild(img);
+    }
+
+    chatMessages.appendChild(wrapper);
+    renderedChatMessageKeys.add(messageKey);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
   function renderChatMessages(messages) {
     const chatMessages = document.getElementById('chatMessages');
     let emptyState = document.getElementById('chatEmptyState');
     chatMessages.innerHTML = '';
+    renderedChatMessageKeys = new Set();
 
     if (!emptyState) {
       emptyState = document.createElement('div');
@@ -760,44 +768,7 @@
       return;
     }
 
-    emptyState.classList.add('hidden');
-    messages.forEach(msg => {
-      const wrapper = document.createElement('div');
-
-      const header = document.createElement('div');
-      header.className = 'flex items-baseline gap-2 mb-1';
-
-      const nameEl = document.createElement('span');
-      nameEl.className = 'text-white font-semibold text-sm';
-      nameEl.textContent = msg.name === currentUserDisplayName ? 'You' : (msg.name || 'Unknown');
-
-      const timeEl = document.createElement('span');
-      timeEl.className = 'text-gray-500 text-xs';
-      timeEl.textContent = formatTimestamp(msg.date);
-
-      header.appendChild(nameEl);
-      header.appendChild(timeEl);
-      wrapper.appendChild(header);
-
-      if (msg.message) {
-        const textEl = document.createElement('p');
-        textEl.className = 'text-gray-200 text-sm';
-        textEl.textContent = msg.message;
-        wrapper.appendChild(textEl);
-      }
-
-      if (msg.image) {
-        const img = document.createElement('img');
-        img.src = `data:image/png;base64,${msg.image}`;
-        img.alt = 'Shared image';
-        img.className = 'mt-2 max-w-xs rounded-lg border border-neutral-700';
-        wrapper.appendChild(img);
-      }
-
-      chatMessages.appendChild(wrapper);
-    });
-
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    messages.forEach(appendSingleMessage);
   }
 
   async function fetchChatMessages() {
@@ -807,8 +778,238 @@
       if (!res.ok) throw new Error('Failed to load chat messages');
       const messages = await res.json();
       renderChatMessages(messages);
+      (messages || []).forEach((message) => {
+        markSeenEvent({
+          context: 'sendMessageServer',
+          sender: message.name || 'Unknown',
+          message: message.message || '',
+          image: message.image || null,
+          date: message.date
+        });
+      });
     } catch (err) {
       console.error('Chat fetch failed', err);
+    }
+  }
+
+  function ensureConnected() {
+    if (groupChatState.connected) {
+      return Promise.resolve(true);
+    }
+    if (groupChatState.connecting && groupChatState.connectPromise) {
+      return groupChatState.connectPromise;
+    }
+    if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+      console.error('SockJS/STOMP dependencies are not available');
+      setConnectionStatus('Unavailable', 'disconnected');
+      return Promise.resolve(false);
+    }
+
+    groupChatState.connecting = true;
+    setConnectionStatus('Connecting', 'connecting');
+
+    const socket = new SockJS(buildChatSocketEndpoint());
+    const client = Stomp.over(socket);
+    client.debug = null;
+
+    groupChatState.socket = socket;
+    groupChatState.stompClient = client;
+
+    groupChatState.connectPromise = new Promise((resolve) => {
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        groupChatState.connectPromise = null;
+        resolve(ok);
+      };
+
+      socket.onclose = () => {
+        if (groupChatState.connected || groupChatState.connecting) {
+          handleDisconnect();
+        }
+        finish(false);
+      };
+
+      client.connect({}, () => {
+        groupChatState.connected = true;
+        groupChatState.connecting = false;
+        setConnectionStatus('Connected', 'connected');
+        startHeartbeat();
+        subscribeToActiveGroup();
+        finish(true);
+      }, (err) => {
+        console.error('WebSocket connection failed', err);
+        handleDisconnect();
+        finish(false);
+      });
+    });
+
+    return groupChatState.connectPromise;
+  }
+
+  function handleDisconnect() {
+    stopHeartbeat();
+    groupChatState.connected = false;
+    groupChatState.connecting = false;
+    if (groupChatState.subscription) {
+      try {
+        groupChatState.subscription.unsubscribe();
+      } catch (err) {
+        console.warn('Subscription cleanup failed', err);
+      }
+      groupChatState.subscription = null;
+    }
+    groupChatState.stompClient = null;
+    groupChatState.socket = null;
+    setConnectionStatus('Disconnected', 'disconnected');
+    if (groupChatState.allowReconnect) {
+      scheduleReconnect();
+    }
+  }
+
+  function scheduleReconnect() {
+    if (groupChatState.reconnectTimer) return;
+    groupChatState.reconnectTimer = window.setTimeout(() => {
+      groupChatState.reconnectTimer = null;
+      if (!groupChatState.allowReconnect) return;
+      ensureConnected();
+    }, groupChatState.reconnectDelayMs);
+  }
+
+  function startHeartbeat() {
+    stopHeartbeat();
+    groupChatState.heartbeatTimer = window.setInterval(() => {
+      if (activeChatGroupId) {
+        sendGroupEvent('heartbeat', {}, true);
+      }
+    }, 25000);
+  }
+
+  function stopHeartbeat() {
+    if (groupChatState.heartbeatTimer) {
+      window.clearInterval(groupChatState.heartbeatTimer);
+      groupChatState.heartbeatTimer = null;
+    }
+  }
+
+  function sendGroupEvent(context, extraPayload = {}, silent = false) {
+    if (!groupChatState.connected || !groupChatState.stompClient) {
+      if (!silent) {
+        alert('Chat socket is not connected yet. Try again in a moment.');
+      }
+      return false;
+    }
+    if (!activeChatGroupId) {
+      if (!silent) {
+        alert('Please open a group chat first.');
+      }
+      return false;
+    }
+
+    const payload = {
+      context,
+      groupId: activeChatGroupId,
+      sender: currentUserDisplayName || 'anonymous',
+      ...extraPayload
+    };
+
+    try {
+      groupChatState.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload));
+      return true;
+    } catch (err) {
+      console.error('Failed to send websocket event', err);
+      if (!silent) {
+        alert('Failed to send chat event. Please retry.');
+      }
+      return false;
+    }
+  }
+
+  function subscribeToActiveGroup() {
+    if (!groupChatState.connected || !groupChatState.stompClient || !activeChatGroupId) return;
+
+    if (groupChatState.subscription) {
+      try {
+        groupChatState.subscription.unsubscribe();
+      } catch (err) {
+        console.warn('Unsubscribe failed', err);
+      }
+      groupChatState.subscription = null;
+    }
+
+    groupChatState.subscription = groupChatState.stompClient.subscribe(`/topic/group/${activeChatGroupId}`, (frame) => {
+      try {
+        const event = JSON.parse(frame.body);
+        handleIncomingEvent(event);
+      } catch (err) {
+        console.error('Failed to parse incoming chat event', err);
+      }
+    });
+
+    sendGroupEvent('joinGroup', {}, true);
+  }
+
+  function handleIncomingEvent(event) {
+    if (!event || !event.context) return;
+
+    switch (event.context) {
+      case 'sendMessageServer': {
+        if (markSeenEvent(event)) return;
+        appendSingleMessage({
+          sender: event.sender || 'Unknown',
+          message: event.message || '',
+          date: event.date,
+          image: event.image || null,
+          context: event.context
+        });
+        removeTypingUser(event.sender || '');
+        break;
+      }
+      case 'sendFileServer': {
+        if (markSeenEvent(event)) return;
+        appendSystemMessage(`${event.sender || 'Someone'} shared file: ${event.filename || 'file'}`);
+        removeTypingUser(event.sender || '');
+        fetchSharedFiles();
+        fetchDashboardSharedFiles();
+        break;
+      }
+      case 'joinGroupServer':
+      case 'leaveGroupServer': {
+        if (!markSeenEvent(event)) {
+          const verb = event.context === 'joinGroupServer' ? 'joined' : 'left';
+          appendSystemMessage(`${event.sender || 'Someone'} ${verb} the chat`);
+        }
+        groupChatState.participants = Array.isArray(event.participants) ? event.participants : [];
+        refreshParticipants();
+        if (event.context === 'leaveGroupServer') {
+          removeTypingUser(event.sender || '');
+        }
+        break;
+      }
+      case 'heartbeatServer': {
+        groupChatState.participants = Array.isArray(event.participants) ? event.participants : [];
+        refreshParticipants();
+        break;
+      }
+      case 'typingStartServer': {
+        if ((event.sender || '') !== currentUserDisplayName) {
+          addTypingUser(event.sender || 'Someone');
+        }
+        break;
+      }
+      case 'typingStopServer': {
+        if ((event.sender || '') !== currentUserDisplayName) {
+          removeTypingUser(event.sender || '');
+        }
+        break;
+      }
+      case 'errorServer': {
+        appendSystemMessage(`Error: ${event.error || 'Unknown websocket error'}`);
+        break;
+      }
+      default:
+        break;
     }
   }
 
@@ -823,44 +1024,52 @@
 
     if (!text && !image) return;
 
-    const payload = {
-      name: currentUserDisplayName,
+    const sent = sendGroupEvent('sendMessage', {
       message: text,
-      date: new Date().toISOString(),
-      image: image
-    };
+      image: image,
+      date: new Date().toISOString()
+    });
 
-    try {
-      const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/messages`, {
-        ...fetchOptions,
-        method: 'POST',
-        headers: {
-          ...(fetchOptions.headers || {}),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Failed to send message');
-      const messages = await res.json();
-      renderChatMessages(messages);
-      chatInput.value = '';
-      clearChatImagePreview();
-    } catch (err) {
-      console.error('Send message failed', err);
-    }
+    if (!sent) return;
+    chatInput.value = '';
+    clearChatImagePreview();
+    groupChatState.selfTyping = false;
+    sendGroupEvent('typingStop', {}, true);
   };
 
-  function startChatPolling() {
-    if (chatPollTimer) clearInterval(chatPollTimer);
-    chatPollTimer = setInterval(fetchChatMessages, 4000);
+  async function startChatPolling() {
+    groupChatState.allowReconnect = true;
+    if (groupChatState.connected) {
+      subscribeToActiveGroup();
+      return;
+    }
+    await ensureConnected();
   }
 
   function stopChatPolling() {
-    if (chatPollTimer) {
-      clearInterval(chatPollTimer);
-      chatPollTimer = null;
+    groupChatState.allowReconnect = false;
+    stopHeartbeat();
+    if (groupChatState.subscription) {
+      try {
+        groupChatState.subscription.unsubscribe();
+      } catch (err) {
+        console.warn('Subscription cleanup failed', err);
+      }
+      groupChatState.subscription = null;
     }
+    if (groupChatState.stompClient) {
+      const clientToDisconnect = groupChatState.stompClient;
+      groupChatState.stompClient = null;
+      groupChatState.connected = false;
+      groupChatState.connecting = false;
+      clientToDisconnect.disconnect(() => {});
+    }
+    if (groupChatState.reconnectTimer) {
+      window.clearTimeout(groupChatState.reconnectTimer);
+      groupChatState.reconnectTimer = null;
+    }
+    groupChatState.socket = null;
+    setConnectionStatus('Disconnected', 'disconnected');
   }
 
   function downloadBase64File(filename, base64Data) {
@@ -964,21 +1173,16 @@
 
     try {
       const base64Data = await fileToBase64(file);
-      const payload = { filename: file.name, base64Data };
-
-      const res = await fetch(`${javaURI}/api/groups/chat/${activeChatGroupId}/files`, {
-        ...fetchOptions,
-        method: 'POST',
-        headers: {
-          ...(fetchOptions.headers || {}),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+      const sent = sendGroupEvent('sendFile', {
+        filename: file.name,
+        base64Data,
+        date: new Date().toISOString()
       });
 
-      if (!res.ok) throw new Error('Failed to upload file');
+      if (!sent) throw new Error('Failed to upload file');
       input.value = '';
       await fetchSharedFiles();
+      await fetchDashboardSharedFiles();
     } catch (err) {
       console.error('Upload failed', err);
     }
@@ -1020,8 +1224,8 @@
   }
 
   window.openGroupChatFromDashboard = async function () {
-    const groupName = document.getElementById('dashboardGroupName').textContent || 'Group';
-    const groupMeta = document.getElementById('dashboardGroupMeta').textContent || '';
+    const groupName = document.getElementById('dashboardGroupName')?.textContent || 'Group';
+    const groupMeta = document.getElementById('dashboardGroupMeta')?.textContent || '';
 
     activeChatGroupName = groupName;
 
@@ -1037,23 +1241,29 @@
 
     showChatTab();
     clearChatImagePreview();
+    clearChatStateForGroupSwitch();
+    setConnectionStatus('Connecting', 'connecting');
 
     try {
       await resolveActiveGroupId(groupName);
       await fetchChatMessages();
       await fetchSharedFiles();
-      startChatPolling();
+      await startChatPolling();
     } catch (err) {
       console.error('Failed to open chat', err);
     }
   };
 
   window.closeGroupChat = function () {
+    if (activeChatGroupId && groupChatState.connected) {
+      sendGroupEvent('leaveGroup', {}, true);
+    }
     document.getElementById('chatModal').classList.add('hidden');
     document.body.classList.remove('modal-open');
     stopChatPolling();
     activeChatGroupId = null;
     activeChatGroupName = '';
+    clearChatStateForGroupSwitch();
     clearChatImagePreview();
   };
 
@@ -1115,7 +1325,27 @@
         popup.classList.add('hidden');
       }
     } else if (event.key === 'Enter') {
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput.value.trim().toLowerCase() === '/calendar') {
+         event.preventDefault();
+         chatInput.value = '';
+         calendarModalController.open();
+         return;
+      }
       window.sendChatMessage();
+      return;
+    } else {
+      if (!groupChatState.selfTyping) {
+        groupChatState.selfTyping = true;
+        sendGroupEvent('typingStart', {}, true);
+      }
+      if (groupChatState.typingStopTimer) {
+        window.clearTimeout(groupChatState.typingStopTimer);
+      }
+      groupChatState.typingStopTimer = window.setTimeout(() => {
+        groupChatState.selfTyping = false;
+        sendGroupEvent('typingStop', {}, true);
+      }, 700);
     }
   }
 
@@ -1131,6 +1361,13 @@
   }
 
   function selectSlashCommand(command) {
+    if (command === '/calendar') {
+      document.getElementById('slashCommandPopup').classList.add('hidden');
+      document.getElementById('chatInput').value = '';
+      calendarModalController.open();
+      return;
+    }
+
     const input = document.getElementById('chatInput');
     const popup = document.getElementById('slashCommandPopup');
 
@@ -1151,15 +1388,117 @@
     }
   }
 
+  /* ================================
+     CALENDAR EVENT MODAL (SRP)
+  ================================ */
+  const calendarModalController = {
+    open: function() {
+      document.getElementById('calendarEventModal').classList.remove('hidden');
+      document.getElementById('calEventTitle').focus();
+      document.getElementById('calEventPeriod').value = '';
+      document.getElementById('calEventStatus').textContent = '';
+      document.getElementById('calEventStatus').className = 'text-sm mt-2';
+      
+      const groupContainer = document.getElementById('calEventGroupContainer');
+      const groupNameEl = document.getElementById('calEventGroupName');
+      if (typeof activeChatGroupName !== 'undefined' && activeChatGroupName) {
+        if (groupNameEl) groupNameEl.textContent = activeChatGroupName;
+        if (groupContainer) groupContainer.classList.remove('hidden');
+      } else {
+        if (groupContainer) groupContainer.classList.add('hidden');
+      }
+    },
+    close: function() {
+      document.getElementById('calendarEventModal').classList.add('hidden');
+      this.reset();
+    },
+    reset: function() {
+      document.getElementById('calEventTitle').value = '';
+      document.getElementById('calEventDate').value = '';
+      document.getElementById('calEventPeriod').value = '';
+      document.getElementById('calEventDesc').value = '';
+      document.getElementById('calEventPriority').value = 'P2';
+      document.getElementById('calEventStatus').textContent = '';
+      document.getElementById('calEventSubmitBtn').disabled = false;
+      document.getElementById('calEventSubmitBtn').innerHTML = 'Create Event';
+    },
+    setStatus: function(msg, isError = false) {
+      const statusEl = document.getElementById('calEventStatus');
+      statusEl.textContent = msg;
+      statusEl.className = 'text-sm mt-2 ' + (isError ? 'text-red-400' : 'text-green-400');
+    },
+    submit: async function() {
+      const titleInput = document.getElementById('calEventTitle').value.trim();
+      const dateInput = document.getElementById('calEventDate').value;
+      const periodInput = document.getElementById('calEventPeriod').value.trim();
+      const descInput = document.getElementById('calEventDesc').value.trim();
+      const priorityInput = document.getElementById('calEventPriority').value;
+
+      if (!titleInput || !dateInput) {
+        this.setStatus('Title and Date are required.', true);
+        return;
+      }
+
+      const btn = document.getElementById('calEventSubmitBtn');
+      btn.disabled = true;
+      // spinner
+      btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Creating...';
+      
+      let emoji = '📅';
+      let finalTitle = `[${priorityInput}] ${emoji} ${titleInput}`;
+      if (typeof activeChatGroupName !== 'undefined' && activeChatGroupName) {
+        finalTitle += ` (${activeChatGroupName})`;
+      }
+
+      const eventPayload = {
+        title: finalTitle,
+        description: descInput,
+        date: dateInput,
+        period: periodInput,
+        priority: priorityInput
+      };
+
+      if (typeof activeChatGroupId !== 'undefined' && activeChatGroupId) {
+        eventPayload.groupId = activeChatGroupId;
+      }
+
+      try {
+        const res = await fetch(`${javaURI}/api/calendar/add_event`, {
+          ...fetchOptions,
+          method: 'POST',
+          body: JSON.stringify(eventPayload)
+        });
+
+        if (res.status === 401 || res.status === 403 || (res.redirected && res.url.includes('/login'))) {
+          this.setStatus('Session expired. Please log in again.', true);
+          btn.disabled = false;
+          btn.innerHTML = 'Create Event';
+          return;
+        }
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Server returned an error');
+        }
+
+        this.setStatus('Event created successfully!');
+        setTimeout(() => {
+          this.close();
+        }, 1000);
+      } catch (err) {
+        console.error('Failed to create calendar event:', err);
+        this.setStatus(`Error: ${err.message}`, true);
+        btn.disabled = false;
+        btn.innerHTML = 'Create Event';
+      }
+    }
+  };
+  
+  window.calendarModalController = calendarModalController;
+
   window.handleChatInputChange = handleChatInputChange;
   window.handleChatInputKeydown = handleChatInputKeydown;
   window.selectSlashCommand = selectSlashCommand;
-  window.previousMonth = previousMonth;
-  window.nextMonth = nextMonth;
-  window.openAddEventModal = openAddEventModal;
-  window.closeEventModal = closeEventModal;
-  window.saveEvent = saveEvent;
-  window.deleteEvent = deleteEvent;
   window.refreshDashboard = refreshDashboard;
   window.downloadBase64File = downloadBase64File;
   window.handleSharedFileUpload = handleSharedFileUpload;
@@ -1170,6 +1509,13 @@
     if (typeof window.handlePastedChatImage === 'function') {
       window.handlePastedChatImage(event);
     }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    if (activeChatGroupId && groupChatState.connected) {
+      sendGroupEvent('leaveGroup', {}, true);
+    }
+    stopHeartbeat();
   });
 
   // ================================

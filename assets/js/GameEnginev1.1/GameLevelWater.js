@@ -29,6 +29,7 @@ class GameLevelWater {
     const OCTOPUS_SCALE_FACTOR = 5;
     const sprite_data_octopus = {
         id: 'Octopus',
+        name: 'mainplayer',
         greeting: "Hi I am Octopus, the water wanderer. I am looking for wisdome and adventure!",
         src: sprite_src_octopus,
         SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
@@ -97,107 +98,22 @@ class GameLevelWater {
         pixels: {height: 225, width: 225},
         INIT_POSITION: { x: 100, y: 100},
         orientation: {rows: 1, columns: 1 },
-        down: {row: 0, start: 0, columns: 1 },  
+        down: {row: 0, start: 0, columns: 1, wiggle: 0.005 },
+        right: {row: 0, start: 0, columns: 1, wiggle: 0.005 },
+        left: {row: 0, start: 0, columns: 1, wiggle: 0.005, mirror: true }, // mirror is used to flip the sprite
         hitbox: { widthPercentage: 0.25, heightPercentage: 0.55
          },
           //walking area creates the box where the Shark can walk in 
-          walkingArea: {
-            xMin: width / 5, //left boundary
-            xMax: (width * 3 / 5), //right boundary 
-            yMin: height / 4, //top boundary 
-            yMax: (height * 3 / 5) //bottom boundary
-          },
-        speed: 10,
+        walkingArea: {
+            xMin: 0, //left boundary
+            xMax: width, //right boundary 
+            yMin: (height * .25), //top boundary 
+            yMax: (height * .55) //bottom boundary
+         },
+        speed: 0.5,
         direction: { x: 1, y: 1 },
-        sound: new Audio(path + "/assets/audio/shark.mp3"),
-        // sound: new Audio(path + "/assets/audio/shark.mp3"),
-        updatePosition: function () {
-          this.INIT_POSITION.x += this.direction.x * this.speed;
-          this.INIT_POSITION.y += this.direction.y * this.speed;
-          if (this.INIT_POSITION.x <= this.walkingArea.xMin) {
-            this.INIT_POSITION.x = this.walkingArea.xMin;
-            this.direction.x = 1;
-          }
-          if (this.INIT_POSITION.x >= this.walkingArea.xMax) {
-            this.INIT_POSITION.x = this.walkingArea.xMax;
-            this.direction.x = -1;
-          }
-          if (this.INIT_POSITION.y <= this.walkingArea.yMin) {
-            this.INIT_POSITION.y = this.walkingArea.yMin;
-            this.direction.y = 1;
-          }
-          if (this.INIT_POSITION.y >= this.walkingArea.yMax) {
-            this.INIT_POSITION.y = this.walkingArea.yMax;
-            this.direction.y = -1;
-          }
-          const spriteElement = document.getElementById(this.id);
-          if (spriteElement) {
-            spriteElement.style.transform = this.direction.x === -1 ? "scaleX(-1)" : "scaleX(1)";
-            spriteElement.style.left = this.INIT_POSITION.x + 'px';
-            spriteElement.style.top = this.INIT_POSITION.y + 'px';
-          }
-        },
-        // Splash Animation
-        // This function creates a splash animation when the shark moves
-        isAnimating: false,
-        playAnimation: function () {
-          if (this.isAnimating) return;
-          this.isAnimating = true;
-        
-          const spriteElement = document.getElementById(this.id);
-          if (!spriteElement) return;
-        
-          this.sound.play();
-        
-          const particleCount = 20;
-        
-          for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'splash-particle';
-        
-            // Random position and direction
-            particle.style.position = 'absolute';
-            particle.style.left = `${spriteElement.offsetLeft + spriteElement.offsetWidth / 3}px`;
-            particle.style.top = `${spriteElement.offsetTop + spriteElement.offsetHeight / 3}px`;
-            particle.style.width = '6px';
-            particle.style.height = '6px';
-            particle.style.borderRadius = '50%';
-            particle.style.backgroundColor = 'aqua';
-            particle.style.pointerEvents = 'none';
-            particle.style.zIndex = 1000;
-            particle.style.opacity = 1;
-            particle.style.transition = 'transform 1s ease-out, opacity 1s ease-out';
-        
-            // Animate outward
-            const angle = Math.random() * 2 * Math.PI;
-            const distance = 60 + Math.random() * 40;
-            const x = Math.cos(angle) * distance;
-            const y = Math.sin(angle) * distance;
-        
-            document.body.appendChild(particle);
-            requestAnimationFrame(() => {
-              particle.style.transform = `translate(${x}px, ${y}px)`;
-              particle.style.opacity = 0;
-            });
-        
-            // Cleanup
-            setTimeout(() => {
-              particle.remove();
-            }, 1000);
-          }
-        
-          setTimeout(() => {
-            this.isAnimating = false;
-          }, 1000);
-        }
+        sound: new Audio(path + "/assets/audio/shark.mp3")
       };
-      // Set intervals to update position and play animation  
-      setInterval(() => {
-        sprite_data_shark.updatePosition();
-      }, 100);
-      setInterval(() => {
-        sprite_data_shark.playAnimation();
-      }, 1000);
 
     // Nezuko NPC sprite data
     const sprite_src_nezuko = path + "/images/gamify/water/nezuko.png"; // be sure to include the path
@@ -246,7 +162,18 @@ const sprite_src_puffer = path + "/images/gamify/water/puffer.png";
       INIT_POSITION: { x: width / 2, y: height / 2 },
       orientation: { rows: 1, columns: 2 },
       down: { row: 0, start: 0, columns: 2 },
+      right: {row: 0, start: 0, columns: 2, wiggle: 0.005 },
+      left: {row: 0, start: 0, columns: 2, wiggle: 0.005, mirror: true }, // mirror is used to flip the sprite
+      walkingArea: {
+          xMin: 0, //left boundary
+          xMax: width, //right boundary 
+          yMin: (height * .65), //top boundary 
+          yMax: (height * .65) //bottom boundary
+       },
+      speed: 0.3,
+      direction: { x: 1, y: 1 },
       hitbox: { widthPercentage: 0.25, heightPercentage: 0.55 }
+ 
     };
 
     this.classes = [      

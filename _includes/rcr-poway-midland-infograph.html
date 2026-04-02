@@ -1,0 +1,70 @@
+{% assign data = site.data.rcr_poway_midland_infograph %}
+
+<div class="rcr-pmr-infograph">
+  <!-- Header Section -->
+  <div class="rcr-pmr-header">
+    <div class="rcr-pmr-badge">Design-Based Research Capstone</div>
+    <h1 class="rcr-pmr-title">{{ data.Title }}</h1>
+    <p class="rcr-pmr-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for feature in data.Features %}
+  <div class="rcr-pmr-card">
+    <div class="rcr-pmr-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="rcr-pmr-visual">
+        <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-image-link">
+          <img src="https://static.vecteezy.com/system/resources/previews/034/949/404/non_2x/simple-steam-train-icon-illustration-design-steam-locomotive-symbol-template-vector.jpg">
+          <div class="rcr-pmr-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+        <div class="rcr-pmr-status">{{ feature.status }}</div>
+        <div class="rcr-pmr-team">
+          <span class="rcr-pmr-team-label">Project Leads</span>
+          <span class="rcr-pmr-team-name">{{ feature.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="rcr-pmr-content">
+        <h2 class="rcr-pmr-project-title">{{ feature.title }}</h2>
+        <p class="rcr-pmr-subtitle">{{ feature.subtitle }}</p>
+
+        <div class="rcr-pmr-keypoints">
+          {% for point in feature.keyPoints %}
+          <div class="rcr-pmr-keypoint">
+            <span class="rcr-pmr-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="rcr-pmr-tech-stack">
+          {% for tech in feature.tech %}
+          <span class="rcr-pmr-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="rcr-pmr-details">
+        <h3 class="rcr-pmr-section-title">About</h3>
+        <p class="rcr-pmr-about">{{ feature.description }}</p>
+
+        <h3 class="rcr-pmr-section-title">Impact</h3>
+        <div class="rcr-pmr-impact-list">
+          {% for item in feature.impact %}
+          <div class="rcr-pmr-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>

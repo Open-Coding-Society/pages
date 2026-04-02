@@ -8,7 +8,7 @@
       <img src="{{ site.baseurl }}/images/{{ data.HeaderImage }}" alt="{{ data.Title }}" class="sip-header-image">
     </div>
     {% endif %}
-    <div class="sip-badge">Nonprofit Site Analysis</div>
+    <div class="sip-badge">{{ data.Badge | default: 'Design-Based Research Capstone' }}</div>
     <h1 class="sip-title">{{ data.Title }}</h1>
     <p class="sip-description">{{ data.Description }}</p>
   </div>
@@ -51,7 +51,7 @@
           {% endfor %}
         </div>
 
-        <a href="{{ topic.link }}" class="sip-btn" target="_blank" rel="noopener">Visit Site</a>
+        <a href="{{ topic.link }}" class="sip-btn">{{ topic.buttonLabel | default: 'Learn More' }}</a>
       </div>
 
     </div>

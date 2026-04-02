@@ -8,12 +8,12 @@
 
 .game-runner-container {
   @include runner-base;
+  width: var(--gr-panel-width, 100%);
+  max-width: 100%;
 
   // Game output area - contained canvas for educational use
   .game-output {
     // Layout & Dimensions
-    min-height: 400px;
-    max-height: 600px;
     overflow: hidden;
     position: relative;
     
@@ -27,7 +27,7 @@
     // Game container styling
     .gameContainer {
       width: 100%;
-      height: 580px;
+      height: var(--gr-canvas-height, 580px);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -37,8 +37,6 @@
       // Only style the main canvas, not character canvases
       > canvas#gameCanvas {
         display: block;
-        width: 100% !important;
-        height: 580px !important;
         border: none;
         background: transparent;
       }
@@ -100,6 +98,45 @@
     .status-text {
       color: var(--pref-accent-color);
       font-weight: 600;
+    }
+  }
+
+  // Compact controls for hide_edit mode (mini-game experiences)
+  .compact-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    background: var(--pref-bg-color);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    
+    .runBtn,
+    .stopBtn,
+    .resetBtn {
+      @include icon-button(38px, 0);
+    }
+    
+    .levelSelect {
+      @include select-control();
+      min-width: 120px;
+      flex: 1;
+      max-width: 200px;
+    }
+  }
+
+  // Hide-editor mode - cleaner experience for mini-games
+  &.hide-editor {
+    // Remove challenge box
+    .challenge-box {
+      display: none;
+    }
+    
+    // Make game output more prominent
+    .game-output {
+      border-radius: 8px;
+      border: 2px solid var(--pref-accent-color);
     }
   }
 }
