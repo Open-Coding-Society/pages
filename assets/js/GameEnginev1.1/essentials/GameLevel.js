@@ -157,6 +157,33 @@ class GameLevel {
   }
 
   /**
+   * Ensure spawned instances have distinct ids for collision/click routing.
+   * Can be disabled with spawn.uniqueIds === false.
+   * @param {Object} data spawned data object
+   * @param {Object} spawn spawn settings
+   * @param {number} index zero-based spawn index
+   * @param {number} count total spawn count
+   * @returns {Object}
+   */
+  ensureSpawnId(data, spawn, index, count) {
+    if (!data || typeof data !== 'object') {
+      return data
+    }
+    if (count <= 1 || spawn?.uniqueIds === false) {
+      return data
+    }
+
+    const baseId = (typeof data.id === 'string' && data.id.trim()) ? data.id.trim() : null
+    if (!baseId) {
+      return data
+    }
+
+    // Default behavior: append ordinal suffix to keep ids unique and readable.
+    data.id = `${baseId} #${index + 1}`
+    return data
+  }
+
+  /**
    * Apply spawn configuration to a data object to produce one instance variant.
    * Supports numeric ranges and pickOne value lists.
    * @param {Object} data base game object data
@@ -196,9 +223,11 @@ class GameLevel {
 
     const expanded = []
     for (let i = 0; i < count; i++) {
+      const spawnedData = this.applySpawnConfig(normalized.data, spawn)
+      this.ensureSpawnId(spawnedData, spawn, i, count)
       expanded.push({
         class: normalized.class,
-        data: this.applySpawnConfig(normalized.data, spawn),
+        data: spawnedData,
       })
     }
     return expanded
