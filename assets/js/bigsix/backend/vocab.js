@@ -3,7 +3,28 @@
 //  Path: assets/js/bigsix/backend/vocab.js
 // ============================================================
 
-function renderVocab(vocabId, items) {
+export class Vocab {
+  #vocabMap;
+
+  constructor(vocabMap) {
+    this.#vocabMap = vocabMap;
+  }
+
+  init() {
+    Object.entries(this.#vocabMap).forEach(([id, items]) => {
+      this.#renderVocab(id, items);
+      const num = id.replace('vocab', '');
+      document.getElementById(`gradeVocab${num}Btn`)
+        ?.addEventListener('click', () => this.#gradeVocab(id, items));
+      document.getElementById(`resetVocab${num}Btn`)
+        ?.addEventListener('click', () => {
+          document.getElementById(`${id}-score`).style.display = 'none';
+          this.#renderVocab(id, items);
+        });
+    });
+  }
+
+  #renderVocab(vocabId, items) {
     const box = document.getElementById(vocabId);
     if (!box) return;
     box.innerHTML = items.map((item, i) => `
@@ -15,8 +36,8 @@ function renderVocab(vocabId, items) {
         <input class="vocab-input" id="${vocabId}-inp-${i}" placeholder="?" maxlength="10"/>
       </div>`).join('');
   }
-  
-  function gradeVocab(vocabId, items) {
+
+  #gradeVocab(vocabId, items) {
     let correct = 0;
     items.forEach((item, i) => {
       const inp = document.getElementById(`${vocabId}-inp-${i}`);
@@ -33,17 +54,4 @@ function renderVocab(vocabId, items) {
       scoreEl.className     = 'score-badge' + (correct === items.length ? ' perfect' : '');
     }
   }
-  
-  export function initVocab(vocabMap) {
-    Object.entries(vocabMap).forEach(([id, items]) => {
-      renderVocab(id, items);
-      const num = id.replace('vocab','');
-      document.getElementById(`gradeVocab${num}Btn`)
-        ?.addEventListener('click', () => gradeVocab(id, items));
-      document.getElementById(`resetVocab${num}Btn`)
-        ?.addEventListener('click', () => {
-          document.getElementById(`${id}-score`).style.display = 'none';
-          renderVocab(id, items);
-        });
-    });
-  }
+}

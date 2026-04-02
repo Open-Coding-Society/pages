@@ -62,5 +62,13 @@ lxdData:
       Lessons: "/bigsix/analytics_lesson"
       Image: "/images/cs-portfolio-quest/analytics/analytics_main.png"
       Alt: "CS Portfolio Quest Mastery Certificate"
+    - Title: "Big Six Game"
+      Genre: "Game"
+      Level: 3
+      Description: "Gamify Big Six games to help user have fun while learning"
+      Categories: ["Big Six", "Game", "Lessons"]
+      Lessons: "/bigsix/game"
+      Image: "/images/cs-portfolio-quest/analytics/analytics_main.png"
+      Alt: "Big Six Game"
 ---
 {%- include tailwind/cs-portfolio-big6_info.html -%}
