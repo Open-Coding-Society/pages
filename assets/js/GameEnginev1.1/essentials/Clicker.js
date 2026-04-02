@@ -10,7 +10,8 @@ class Clicker extends Npc {
     handleClick(event) {
         if (this.interact) {
             this.clcks++;
-             this.interact(this.clcks);
+            // Backward compatible: callbacks that only use the first arg still work.
+            this.interact(this.clcks, this.spriteData?.id || this.uniqueId || 'unknown', this);
         }
     }
 

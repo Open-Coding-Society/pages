@@ -1,5 +1,5 @@
 // ============================================================
-//  css-playground.js — Single Responsibility: CSS playground
+//  css-playground.js — OOP class: CSS playground
 //  Path: assets/js/bigsix/frontend/css-playground.js
 //
 //  Owns everything related to the CSS styling step:
@@ -8,11 +8,13 @@
 //    - Resetting to the default CSS
 //
 //  EXPORTS:
-//    initCssPlayground()  — call once on DOMContentLoaded
+//    CssPlayground  — instantiate and call .init() on DOMContentLoaded
 // ============================================================
 
-// ── Default CSS shown on first load ──────────────────────────
-const DEFAULT_CSS = `.box {
+export class CssPlayground {
+
+  // ── Default CSS shown on first load ──────────────────────────
+  #defaultCss = `.box {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     padding: 32px 24px;
     border-radius: 12px;
@@ -30,15 +32,15 @@ const DEFAULT_CSS = `.box {
     transform: translateY(-6px);
     box-shadow: 0 16px 32px rgba(102,126,234,0.4);
   }`;
-  
-  
+
+
   // ============================================================
-  //  WORKER 1 — scopeCss
+  //  WORKER 1 — #scopeCss
   //  Single responsibility: prefix every .box selector with the
   //  preview container id so user CSS doesn't leak into the page.
   //  Pure function — no DOM access.
   // ============================================================
-  
+
   /**
    * Scope CSS rules to the preview container so they don't affect
    * the rest of the page.
@@ -46,52 +48,53 @@ const DEFAULT_CSS = `.box {
    * @param {string} css - Raw CSS from the editor
    * @returns {string}   - Scoped CSS string
    */
-  function scopeCss(css) {
+  #scopeCss(css) {
     // Replace all .box selectors with the scoped version
     return css.replace(/\.box/g, '#cssPreviewBody .box');
   }
-  
-  
+
+
   // ============================================================
-  //  WORKER 2 — injectCss
+  //  WORKER 2 — #injectCss
   //  Single responsibility: write a CSS string into the dynamic
   //  <style> tag in the DOM. Only touches #dynamicStyle.
   // ============================================================
-  
+
   /**
    * Inject a CSS string into the dynamic style element.
    *
    * @param {string} css - CSS to inject
    */
-  function injectCss(css) {
+  #injectCss(css) {
     document.getElementById('dynamicStyle').textContent = css;
   }
-  
-  
+
+
   // ============================================================
-  //  ORCHESTRATOR — initCssPlayground
+  //  ORCHESTRATOR — init
   //  Wires the Apply and Reset buttons.
   //  Called once on DOMContentLoaded from frontend_lesson.md.
   // ============================================================
-  
+
   /**
    * Initialise the CSS playground section.
    * Call once on DOMContentLoaded.
    */
-  export function initCssPlayground() {
+  init() {
     const input = document.getElementById('cssInput');
-  
+
     // Apply the default CSS immediately on load
-    injectCss(scopeCss(input.value));
-  
+    this.#injectCss(this.#scopeCss(input.value));
+
     // Wire Apply button — scope then inject
     document.getElementById('cssApplyBtn').addEventListener('click', () => {
-      injectCss(scopeCss(input.value));
+      this.#injectCss(this.#scopeCss(input.value));
     });
-  
+
     // Wire Reset button — restore default, then apply
     document.getElementById('cssResetBtn').addEventListener('click', () => {
-      input.value = DEFAULT_CSS;
-      injectCss(scopeCss(input.value));
+      input.value = this.#defaultCss;
+      this.#injectCss(this.#scopeCss(input.value));
     });
   }
+}
