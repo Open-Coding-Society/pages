@@ -51,7 +51,12 @@
           {% endfor %}
         </div>
 
-        <a href="{{ topic.link }}" class="sip-btn">{{ topic.buttonLabel | default: 'Learn More' }}</a>
+        <div class="sip-actions">
+          <a href="{{ topic.link }}" class="sip-btn" target="_blank" rel="noopener">{{ topic.buttonLabel | default: 'View Frontend Site' }}</a>
+          {% if topic.backendLink %}
+          <a href="{{ topic.backendLink }}" class="sip-btn" target="_blank" rel="noopener">{{ topic.backendButtonLabel | default: 'View Backend Site' }}</a>
+          {% endif %}
+        </div>
       </div>
 
     </div>
