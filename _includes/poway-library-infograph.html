@@ -427,7 +427,7 @@
   /* ── Stats Row ──────────────────────────────────────────────── */
   .fopl-ig-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     margin-top: 2.5rem;
   }
@@ -437,11 +437,12 @@
   }
 
   .fopl-ig-stat {
-    background: var(--fopl-green);
+    background: var(--fopl-green-pale);
+    border: 2px solid var(--fopl-green);
     border-radius: 6px;
     padding: 20px 16px;
     text-align: center;
-    color: var(--fopl-white);
+    color: var(--fopl-green);
   }
 
   .fopl-ig-stat-value {
@@ -451,14 +452,15 @@
     display: block;
     line-height: 1;
     margin-bottom: 6px;
+    color: var(--fopl-green);
   }
 
   .fopl-ig-stat-label {
     font-size: 0.75rem;
-    opacity: 0.82;
     text-transform: uppercase;
     letter-spacing: 0.07em;
     line-height: 1.35;
+    color: var(--fopl-green-mid);
   }
 
   /* ── Repo Footer ────────────────────────────────────────────── */
@@ -499,16 +501,8 @@
     <!-- Stats Row -->
     <div class="fopl-ig-stats">
       <div class="fopl-ig-stat">
-        <span class="fopl-ig-stat-value">8+</span>
-        <span class="fopl-ig-stat-label">Live pages deployed</span>
-      </div>
-      <div class="fopl-ig-stat">
         <span class="fopl-ig-stat-value">6</span>
         <span class="fopl-ig-stat-label">Interactive games built</span>
-      </div>
-      <div class="fopl-ig-stat">
-        <span class="fopl-ig-stat-value">10+</span>
-        <span class="fopl-ig-stat-label">REST API endpoints</span>
       </div>
       <div class="fopl-ig-stat">
         <span class="fopl-ig-stat-value">1978</span>
