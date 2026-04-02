@@ -24,8 +24,8 @@
 
   .fopl-ig {
     font-family: 'Lato', sans-serif;
-    color: var(--fopl-text);
-    background: var(--fopl-bg);
+    color: #1a1a1a !important;
+    background: #f4f8f4;
     width: 100vw;
     position: relative;
     left: 50%;
@@ -36,7 +36,7 @@
   /* ── Hero ───────────────────────────────────────────────────── */
   .fopl-ig-hero {
     background: #c8e6c9;
-    color: #023b0f;
+    color: #023b0f !important;
     text-align: center;
     padding: 56px 24px 48px;
     position: relative;
@@ -50,7 +50,7 @@
     border-radius: 999px;
     border: 1px solid rgba(2,59,15,0.5);
     background: rgba(2,59,15,0.1);
-    color: #023b0f;
+    color: #023b0f !important;
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -64,14 +64,14 @@
     font-weight: 700;
     letter-spacing: 0.03em;
     margin: 0 0 12px;
-    color: #023b0f;
+    color: #023b0f !important;
     border: none;
     text-transform: uppercase;
   }
 
   .fopl-ig-hero-sub {
     font-size: 1.05rem;
-    color: #0d5c1e;
+    color: #0d5c1e !important;
     max-width: 640px;
     margin: 0 auto 24px;
     line-height: 1.6;
@@ -84,7 +84,7 @@
     gap: 1.5rem;
     flex-wrap: wrap;
     font-size: 0.82rem;
-    color: #0d5c1e;
+    color: #0d5c1e !important;
   }
 
   .fopl-ig-hero-meta span { display: flex; align-items: center; gap: 0.35rem; }
@@ -97,7 +97,7 @@
     border-radius: 999px;
     background: rgba(2,59,15,0.12);
     border: 1px solid rgba(2,59,15,0.4);
-    color: #023b0f;
+    color: #023b0f !important;
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -122,11 +122,11 @@
 
   /* ── Main Project Card ──────────────────────────────────────── */
   .fopl-ig-card {
-    background: var(--fopl-white);
-    border: 1px solid var(--fopl-border);
-    border-top: 4px solid var(--fopl-green);
+    background: #ffffff;
+    border: 1px solid rgba(2,59,15,0.18);
+    border-top: 4px solid #023b0f;
     border-radius: 6px;
-    box-shadow: var(--fopl-shadow);
+    box-shadow: 0 2px 12px rgba(2,59,15,0.12);
     margin-top: 2.5rem;
     overflow: hidden;
   }
@@ -143,7 +143,7 @@
 
   /* Left column */
   .fopl-ig-visual {
-    background: var(--fopl-green);
+    background: #023b0f;
     padding: 28px 20px;
     display: flex;
     flex-direction: column;
@@ -165,7 +165,7 @@
     gap: 0.4rem;
     background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
+    color: #fff !important;
     border-radius: 999px;
     padding: 4px 12px;
     font-size: 0.76rem;
@@ -184,7 +184,7 @@
 
   .fopl-ig-team {
     text-align: center;
-    color: rgba(255,255,255,0.85);
+    color: rgba(255,255,255,0.85) !important;
     font-size: 0.8rem;
     line-height: 1.6;
   }
@@ -219,15 +219,15 @@
   }
 
   .fopl-ig-link-btn.primary {
-    background: var(--fopl-white);
-    color: var(--fopl-green);
+    background: #ffffff;
+    color: #023b0f !important;
   }
 
   .fopl-ig-link-btn.primary:hover { background: #e8f5eb; }
 
   .fopl-ig-link-btn.secondary {
     background: rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.9);
+    color: rgba(255,255,255,0.9) !important;
     border: 1px solid rgba(255,255,255,0.3);
   }
 
@@ -236,20 +236,20 @@
   /* Center column */
   .fopl-ig-center {
     padding: 28px 24px;
-    border-right: 1px solid var(--fopl-border);
+    border-right: 1px solid rgba(2,59,15,0.18);
   }
 
   .fopl-ig-project-title {
     font-family: 'Cabin', sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--fopl-green);
+    color: #023b0f !important;
     margin: 0 0 4px;
   }
 
   .fopl-ig-subtitle {
     font-size: 0.85rem;
-    color: var(--fopl-text-mid);
+    color: #1a1a1a !important;
     margin: 0 0 18px;
     font-style: italic;
   }
@@ -259,8 +259,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--fopl-green);
-    border-bottom: 2px solid var(--fopl-green-pale);
+    color: #023b0f !important;
+    border-bottom: 2px solid #e8f5eb;
     padding-bottom: 4px;
     margin: 0 0 12px;
   }
@@ -273,8 +273,9 @@
     align-items: flex-start;
     font-size: 0.85rem;
     line-height: 1.55;
+    color: #1a1a1a !important;
     padding: 5px 0;
-    border-bottom: 1px solid var(--fopl-border);
+    border-bottom: 1px solid rgba(2,59,15,0.18);
   }
 
   .fopl-ig-keypoints li:last-child { border-bottom: none; }
@@ -283,8 +284,8 @@
     flex-shrink: 0;
     width: 18px;
     height: 18px;
-    background: var(--fopl-green);
-    color: #fff;
+    background: #023b0f;
+    color: #fff !important;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -303,8 +304,8 @@
 
   .fopl-ig-tech-tag {
     padding: 3px 10px;
-    background: var(--fopl-green-pale);
-    color: var(--fopl-green);
+    background: #e8f5eb;
+    color: #023b0f !important;
     border: 1px solid rgba(2,59,15,0.2);
     border-radius: 3px;
     font-size: 0.72rem;
@@ -320,7 +321,7 @@
   .fopl-ig-about {
     font-size: 0.88rem;
     line-height: 1.65;
-    color: var(--fopl-text-mid);
+    color: #1a1a1a !important;
     margin: 0 0 22px;
   }
 
@@ -333,8 +334,8 @@
     font-size: 0.84rem;
     line-height: 1.5;
     padding: 6px 0;
-    border-bottom: 1px solid var(--fopl-border);
-    color: var(--fopl-text-mid);
+    border-bottom: 1px solid rgba(2,59,15,0.18);
+    color: #1a1a1a !important;
   }
 
   .fopl-ig-impact-item:last-child { border-bottom: none; }
@@ -344,7 +345,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--fopl-green);
+    background: #023b0f;
     margin-top: 7px;
   }
 
@@ -357,12 +358,12 @@
     font-family: 'Cabin', sans-serif;
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--fopl-green);
+    color: #023b0f !important;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin: 0 0 1rem;
     padding-bottom: 8px;
-    border-bottom: 3px solid var(--fopl-green);
+    border-bottom: 3px solid #023b0f;
   }
 
   .fopl-ig-features-grid {
@@ -380,16 +381,16 @@
   }
 
   .fopl-ig-feature-card {
-    background: var(--fopl-white);
-    border: 1px solid var(--fopl-border);
+    background: #ffffff;
+    border: 1px solid rgba(2,59,15,0.18);
     border-radius: 6px;
     padding: 18px 16px;
-    box-shadow: var(--fopl-shadow);
+    box-shadow: 0 2px 12px rgba(2,59,15,0.12);
     transition: border-color 0.18s, box-shadow 0.18s;
   }
 
   .fopl-ig-feature-card:hover {
-    border-color: var(--fopl-green-mid);
+    border-color: #0d5c1e !important;
     box-shadow: 0 4px 16px rgba(2, 59, 15, 0.18);
   }
 
@@ -403,7 +404,7 @@
     font-family: 'Cabin', sans-serif;
     font-size: 0.9rem;
     font-weight: 700;
-    color: var(--fopl-green);
+    color: #023b0f !important;
     margin: 0 0 6px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -412,7 +413,7 @@
   .fopl-ig-feature-desc {
     font-size: 0.82rem;
     line-height: 1.5;
-    color: var(--fopl-text-mid);
+    color: #1a1a1a !important;
     margin: 0;
   }
 
@@ -429,12 +430,12 @@
   }
 
   .fopl-ig-stat {
-    background: var(--fopl-green-pale);
-    border: 2px solid var(--fopl-green);
+    background: #e8f5eb;
+    border: 2px solid #023b0f;
     border-radius: 6px;
     padding: 20px 16px;
     text-align: center;
-    color: var(--fopl-green);
+    color: #023b0f !important;
   }
 
   .fopl-ig-stat-value {
@@ -444,7 +445,7 @@
     display: block;
     line-height: 1;
     margin-bottom: 6px;
-    color: var(--fopl-green);
+    color: #023b0f !important;
   }
 
   .fopl-ig-stat-label {
@@ -452,13 +453,28 @@
     text-transform: uppercase;
     letter-spacing: 0.07em;
     line-height: 1.35;
-    color: var(--fopl-green-mid);
+    color: #0d5c1e !important;
+  }
+
+  /* ── Planned feature cards ─────────────────────────────────── */
+  .fopl-ig-planned-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #c8a030 !important;
+    background: #fdf8ec;
+    border: 1px solid #c8a030;
+    border-radius: 3px;
+    padding: 2px 8px;
+    margin-bottom: 8px;
   }
 
   /* ── Repo Footer ────────────────────────────────────────────── */
   .fopl-ig-footer {
-    background: var(--fopl-green);
-    color: rgba(255,255,255,0.85);
+    background: #023b0f;
+    color: rgba(255,255,255,0.85) !important;
     text-align: center;
     padding: 24px;
     margin-top: 2.5rem;
@@ -466,11 +482,11 @@
   }
 
   .fopl-ig-footer a {
-    color: rgba(255,255,255,0.9);
+    color: rgba(255,255,255,0.9) !important;
     text-decoration: underline;
   }
 
-  .fopl-ig-footer a:hover { color: #fff; }
+  .fopl-ig-footer a:hover { color: #fff !important; }
 </style>
 
 {% for topic in data.Topics %}
@@ -558,6 +574,28 @@
             </li>
             {% endfor %}
           </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Planned Features -->
+    <div class="fopl-ig-features-section">
+      <h2 class="fopl-ig-section-header" style="border-bottom-color:#c8a030;color:#023b0f !important;">Planned Features</h2>
+      <div class="fopl-ig-features-grid">
+
+        <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+          <span class="fopl-ig-planned-badge">Coming Soon</span>
+          <span class="fopl-ig-feature-icon">📷</span>
+          <h3 class="fopl-ig-feature-title">Book Scan — Add to Catalog</h3>
+          <p class="fopl-ig-feature-desc">Volunteers scan a book's barcode or ISBN with their phone camera to instantly add it to the online catalog — no manual data entry. Title, author, and cover art pulled automatically.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+          <span class="fopl-ig-planned-badge">Coming Soon</span>
+          <span class="fopl-ig-feature-icon">🛒</span>
+          <h3 class="fopl-ig-feature-title">Book Scan — Remove on Sale</h3>
+          <p class="fopl-ig-feature-desc">When a customer buys a book, staff scan it again to automatically remove it from the catalog and decrement inventory — keeping the online listing in sync with the physical shelf in real time.</p>
         </div>
 
       </div>
