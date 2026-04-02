@@ -54,8 +54,8 @@ The platform utilizes a multi-step **PRC Guide**—an AI-driven onboarding syste
             </div>
             
             <div class="ui-links">
-                <a href="#" class="ui-btn btn-fe">Sentri User UI</a>
-                <a href="#" class="ui-btn btn-admin">Sentri Admin UI</a>
+                <a href="https://sentri-prc.opencodingsociety.com/" class="ui-btn btn-fe">Sentri User UI</a>
+                <a href="https://sentri.opencodingsociety.com/" class="ui-btn btn-admin">Sentri Admin UI</a>
             </div>
             <p style="font-size: 10px; color: #64748b; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px;">Build v3.1.0-Stable</p>
         </div>
