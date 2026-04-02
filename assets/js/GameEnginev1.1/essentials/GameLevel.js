@@ -105,6 +105,58 @@ class GameLevel {
   }
 
   /**
+   * Recursively apply numeric range overrides to matching keys.
+   * A range tuple [min, max] becomes one randomized value.
+   * @param {Object} target object to mutate
+   * @param {Object} ranges range map
+   */
+  applyRanges(target, ranges) {
+    if (!ranges || typeof ranges !== 'object' || Array.isArray(ranges)) {
+      return
+    }
+
+    for (const [key, spec] of Object.entries(ranges)) {
+      if (Array.isArray(spec)) {
+        target[key] = this.randomInRange(spec, target[key])
+        continue
+      }
+
+      if (spec && typeof spec === 'object') {
+        if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
+          target[key] = {}
+        }
+        this.applyRanges(target[key], spec)
+      }
+    }
+  }
+
+  /**
+   * Recursively apply pick-one overrides to matching keys.
+   * Any array value becomes one randomly selected value.
+   * @param {Object} target object to mutate
+   * @param {Object} picks pickOne map
+   */
+  applyPickOne(target, picks) {
+    if (!picks || typeof picks !== 'object' || Array.isArray(picks)) {
+      return
+    }
+
+    for (const [key, spec] of Object.entries(picks)) {
+      if (Array.isArray(spec)) {
+        target[key] = this.pickOne(spec, target[key])
+        continue
+      }
+
+      if (spec && typeof spec === 'object') {
+        if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
+          target[key] = {}
+        }
+        this.applyPickOne(target[key], spec)
+      }
+    }
+  }
+
+  /**
    * Apply spawn configuration to a data object to produce one instance variant.
    * Supports numeric ranges and pickOne value lists.
    * @param {Object} data base game object data
@@ -116,20 +168,9 @@ class GameLevel {
     const ranges = (spawn && spawn.ranges) || {}
     const picks = (spawn && spawn.pickOne) || {}
 
-    // Phase 2 range support: INIT_POSITION, speed, SCALE_FACTOR
-    if (ranges.INIT_POSITION && typeof ranges.INIT_POSITION === 'object') {
-      const init = out.INIT_POSITION || { x: 0, y: 0 }
-      init.x = this.randomInRange(ranges.INIT_POSITION.x, init.x)
-      init.y = this.randomInRange(ranges.INIT_POSITION.y, init.y)
-      out.INIT_POSITION = init
-    }
-    out.speed = this.randomInRange(ranges.speed, out.speed)
-    out.SCALE_FACTOR = this.randomInRange(ranges.SCALE_FACTOR, out.SCALE_FACTOR)
-
-    // Optional pickOne support for variant assets/values.
-    if (Object.prototype.hasOwnProperty.call(picks, 'src')) {
-      out.src = this.pickOne(picks.src, out.src)
-    }
+    // Generic override model: apply ranges first, then pickOne choices.
+    this.applyRanges(out, ranges)
+    this.applyPickOne(out, picks)
 
     return out
   }
