@@ -184,29 +184,17 @@
 /**
  * Zone Section Container
  * Individual zone content areas that show/hide based on selection
+ * Wrapper div contains: Header (markdown) -> UI_RUNNER -> GAME_RUNNER -> Footer
  */
 .zone-section {
-  padding: 1rem;
-  min-height: 200px;
+  margin-top: 1.5rem;
   
+  // JavaScript controls display via inline styles
   &[style*="display: none"] {
     display: none !important;
   }
   
   &[style*="display: block"] {
-    display: block !important;
-  }
-}
-
-/**
- * Zone Panel Containers
- * Hide zone game panels by default
- */
-[id^="uirunner-zone_"][id$="-container"],
-[id^="gamerunner-zone_"] {
-  display: none !important;
-  
-  &.zone-active {
     display: block !important;
   }
 }
