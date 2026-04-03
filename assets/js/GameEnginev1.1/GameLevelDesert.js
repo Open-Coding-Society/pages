@@ -857,6 +857,7 @@ class GameLevelDesert {
       hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
       
       // AI-specific properties (required for AiNpc utility)
+      drawCounter: false,
       expertise: "history",              // Topic area for backend
       chatHistory: [],                   // Conversation memory
       dialogues: [                       // Random greetings
@@ -948,7 +949,7 @@ class GameLevelDesert {
          { class: Npc, data: sprite_data_crypto },
          { class: Npc, data: sprite_data_chickenj },
          { class: Npc, data: sprite_data_endportal },
-         { class: Npc, data: sprite_data_historian },
+         { class: Clicker, data: sprite_data_historian },
      ];
 
  }
