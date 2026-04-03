@@ -152,7 +152,7 @@
 
   .pso-infograph .sip-card-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 2.25rem;
     align-items: start;
     justify-content: center;
@@ -373,7 +373,7 @@
 
   @media (min-width: 1280px) {
     .pso-infograph .sip-card-grid {
-      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
   }
 
@@ -477,7 +477,12 @@
           {% for element in topic.interactiveElements %}
           <div class="sip-keypoint">
             <span class="sip-check">✓</span>
-            <span><strong>{{ element.title }}:</strong> {{ element.description }}</span>
+            <span>
+              <strong>{{ element.title }}:</strong> {{ element.description }}
+              {% if element.link %}
+              <a href="{{ element.link }}" class="sip-btn" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
+              {% endif %}
+            </span>
           </div>
           {% endfor %}
         </div>
@@ -492,14 +497,6 @@
         </div>
         {% endif %}
 
-        {% if topic.improvementsMade %}
-        <h3 class="sip-section-title">Improvements Made</h3>
-        <div class="sip-impact-list">
-          {% for improvement in topic.improvementsMade %}
-          <div class="sip-impact-item">{{ improvement }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
       </div>
 
       <!-- Right: About & Impact -->
@@ -507,18 +504,29 @@
         <h3 class="sip-section-title">About</h3>
         <p class="sip-about">{{ topic.description }}</p>
 
+        {% if topic.impact %}
         <h3 class="sip-section-title">Impact</h3>
         <div class="sip-impact-list">
           {% for item in topic.impact %}
           <div class="sip-impact-item">{{ item }}</div>
           {% endfor %}
         </div>
+        {% endif %}
 
         {% if topic.wowFactors %}
         <h3 class="sip-section-title">Wow Factors</h3>
         <div class="sip-impact-list">
           {% for factor in topic.wowFactors %}
           <div class="sip-impact-item">{{ factor }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if topic.improvementsMade %}
+        <h3 class="sip-section-title">Improvements Made</h3>
+        <div class="sip-impact-list">
+          {% for improvement in topic.improvementsMade %}
+          <div class="sip-impact-item">{{ improvement }}</div>
           {% endfor %}
         </div>
         {% endif %}

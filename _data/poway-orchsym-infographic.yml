@@ -2,9 +2,9 @@ Title: "Poway Symphony Orchestra - Expanding Community Through Music"
 Badge: "Design-Based Research Capstone"
 
 Description: >
-  This project redesigns the orchestra's website to make it easier to use,
-  more engaging, and more visually appealing. It focuses on helping users
-  quickly find information, explore musicians, and feel more connected to the orchestra.
+  This project redesigns the orchestra's website into a guided community journey.
+  It introduces visitors to the mission, rewards exploration with an EXP bar,
+  and makes it easier to discover concerts, musicians, and ways to support the orchestra.
 
 Topics:
   - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
@@ -12,20 +12,22 @@ Topics:
     link: "https://pso.opencodingsociety.com/"
     buttonLabel: "View Frontend Site"
     backendLink: "http://wifighters.opencodingsociety.com"
+    backendButtonLabel: "View Admin UI"
 
     description: >
-      We rebuilt the website with a cleaner layout, clearer navigation, and more
-      interactive features. The goal was to help users easily find concerts,
-      learn about musicians, and take action like attending or donating.
+      We rebuilt the site to follow a clear presentation arc: a mission-forward home page,
+      an EXP bar that rewards engagement, a conductor section that deepens the story,
+      an orchestra builder that turns exploration into interaction, and musician profiles
+      with instrument audio that make the organization feel personal.
 
     keyPoints:
-      - "Musician cards that show each member's name, instrument, and image"
-      - "Clickable instrument feature where users can hear what each instrument sounds like"
-      - "Simplified navigation so users can quickly find concerts, tickets, and donations"
-      - "Clear buttons like 'Buy Tickets' and 'Donate' to guide users"
-      - "Layout that adjusts to phones, tablets, and computers"
-      - "Better spacing and organization to make content easier to read"
-      - "Stronger visuals with images and highlighted sections"
+      - "Home page introduces the orchestra with a cleaner layout, clearer mission, and faster access to concerts, donations, and events"
+      - "EXP bar gamifies every interaction so visitors can see progress as they move through the experience"
+      - "Conductor section uses story-driven content to build trust while showing EXP growth through active engagement"
+      - "Orchestra builder turns browsing into customization, giving users an interactive milestone instead of a static page"
+      - "Meet the musicians section uses profile cards, instrument labels, and audio playback to fully reveal the orchestra's personality"
+      - "Responsive layout keeps the full journey usable across phones, tablets, and desktops"
+      - "Clear spacing, stronger visuals, and focused CTAs reduce friction for attendance and donations"
 
     tech:
       - "HTML"
@@ -36,55 +38,42 @@ Topics:
       - "User research and testing"
       - "Flask backend integration"
 
-    impact:
-      - "Users can find information faster"
-      - "The site is more engaging and interactive"
-      - "Better experience on all devices"
-      - "More users are likely to attend concerts or donate"
-
     interactiveElements:
-      - title: "Musician Profiles"
-        description: "Users can scroll through cards to explore orchestra members"
-      - title: "Instrument Audio"
-        description: "Clicking an instrument plays a sound to make the site more interactive"
-      - title: "Easy Navigation"
-        description: "Clear sections help users move through the site without confusion"
+      - title: "EXP Bar"
+        description: "Visitors earn visible progress as they move through the site, turning browsing into a guided journey"
+      - title: "Orchestra Builder"
+        description: "Users interact with a customization feature that makes the experience feel participatory instead of static"
+        link: "https://pso.opencodingsociety.com/games/"
+        buttonLabel: "Open Games Page"
+      - title: "Virtual Conductor"
+        description: "A rhythm game that encourages the user to keep time the way a conductor guides an orchestra"
+      - title: "Tuning The Orchestra"
+        description: "Users experience what it is like to tune the orchestra before a performance or rehearsal so the ensemble sounds ready to play"
+      - title: "Musician Profiles and Audio"
+        description: "Visitors can explore member cards and click instruments to hear audio tied to each section"
 
     problemsSolved:
-      - "Users had trouble finding concert information -> we simplified the menu"
-      - "The old site felt plain -> we added visuals and interactive features"
-      - "Text was crowded -> we improved spacing and layout"
-      - "Hard to use on phones -> we made the site work on all screen sizes"
+      - "Users did not have a strong guided journey -> we structured the site around a clear narrative flow from home page to musicians"
+      - "The old site felt static -> we introduced the EXP bar and interactive milestones to reward engagement"
+      - "Important actions were easy to miss -> we added clearer CTAs for concerts, tickets, and donations"
+      - "The experience felt less personal -> we highlighted the conductor story, musician profiles, and instrument audio"
+      - "Hard to use on phones -> we made the site work across all screen sizes"
 
     improvementsMade:
-      - "Organized content into clear sections"
-      - "Used cards to break information into smaller, easier parts"
-      - "Added interactive sound features"
-      - "Made text easier to read with better spacing"
+      - "Reorganized the site into a presentation-ready sequence that mirrors the capstone walkthrough"
+      - "Added a visible EXP system so engagement is named as a feature, not hidden in the background"
+      - "Used interactive cards, builder tools, and audio to make exploration feel hands-on"
+      - "Made content easier to read with better spacing, stronger hierarchy, and clearer buttons"
 
     wowFactors:
-      - "Live deployed frontend at https://pso.opencodingsociety.com/ that users can interact with in real time"
-      - "Working Flask backend (http://pso.flask.com) powering dynamic data instead of a static-only site"
-      - "Clickable instrument feature that plays real audio, turning learning into an interactive experience"
-      - "Musician profile cards with images and structured data that make the orchestra feel personal and accessible"
-      - "Clear call-to-action buttons (Donate, Attend, Explore) that guide real user behavior, not just browsing"
-      - "Fully responsive layout that maintains usability and design across phones, tablets, and desktops"
-      - "Clean navigation system that reduces user confusion and allows quick access to concerts and information"
-      - "Combination of visual design (Figma) + frontend + backend into one cohesive, real-world product"
-      - "Transforms a traditional informational site into an engaging, interactive platform for community connection"
-
-    customerPitch:
-      - "Community members can easily find concerts and feel connected"
-      - "Donors have a clear and simple way to support the orchestra"
-      - "Musicians are better represented through profile cards"
-      - "The organization gains a more professional online presence"
-
-    futurePlans:
-      - "Add ticket purchasing directly on the site"
-      - "Include videos of performances"
-      - "Track how users interact with the site"
-      - "Add reminders and newsletter sign-ups"
-      - "Continue improving accessibility"
+      - "Home page leads with a polished, mission-forward layout that immediately feels more professional and intentional"
+      - "EXP bar turns every click into visible progress, transforming a nonprofit site into a gamified experience"
+      - "Conductor section deepens the narrative while showing that user engagement is actively rewarded"
+      - "Orchestra builder adds a milestone interaction that makes customization part of the presentation"
+      - "Musician profile cards with instrument audio fully reveal the orchestra through both visuals and sound"
+      - "Live deployed capstone entry at /capstone/powayorchestra/ gives reviewers a direct path into the required walkthrough"
+      - "Working Flask backend at http://wifighters.opencodingsociety.com proves the project is more than a static redesign"
+      - "Clear CTA buttons and responsive design support real user behavior across devices, not just a demo flow"
 
 status: "Research and Testing Phase (Deployed Prototype Complete)"
 
