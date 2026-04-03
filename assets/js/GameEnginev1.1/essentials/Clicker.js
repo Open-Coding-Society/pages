@@ -4,6 +4,7 @@ import Npc from "./Npc.js";
 class Clicker extends Npc {
     constructor(data = {}, gameEnv = null) {
         super(data, gameEnv);
+        this.drawCounter = data.drawCounter !== undefined ? data.drawCounter : true;   
         this.clcks = 0;
     }
 
@@ -18,8 +19,8 @@ class Clicker extends Npc {
     draw() {
         // Draw the NPC sprite as usual
         super.draw();
-        // Draw the click counter on top of the box
-        if (this.ctx && this.canvas) {
+        // Draw the click counter on top of the image 
+        if (this.visible &&this.drawCounter && this.ctx && this.canvas) {
             this.ctx.save();
             this.ctx.font = 'bold 32px Arial';
             this.ctx.fillStyle = 'yellow';
