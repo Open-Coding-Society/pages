@@ -199,6 +199,19 @@
 }
 
 /**
+ * Zone Panel Containers
+ * Hide zone game panels by default
+ */
+[id^="uirunner-zone_"][id$="-container"],
+[id^="gamerunner-zone_"] {
+  display: none !important;
+  
+  &.zone-active {
+    display: block !important;
+  }
+}
+
+/**
  * Zone Button
  * Individual zone selection button with unlock states
  */
