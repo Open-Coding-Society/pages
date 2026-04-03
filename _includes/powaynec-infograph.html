@@ -17,9 +17,8 @@
   <div class="powaynec-card">
     <div class="powaynec-card-grid">
       <div class="powaynec-visual">
-        <a href="{{ project_link }}" class="powaynec-image-link" target="_blank" rel="noopener noreferrer">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="powaynec-image">
-          <div class="powaynec-overlay"><span>View Project</span></div>
+        <a href="{{ topic.project_link }}" class="powaynec-image-link" target="_blank" rel="noopener noreferrer">          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="powaynec-image">
+          <div class="powaynec-overlay"><span>View Our Project</span></div>
         </a>
         <div class="powaynec-status">{{ topic.status }}</div>
         <div class="powaynec-team">
@@ -52,8 +51,7 @@
           <div class="powaynec-impact-item">{{ item }}</div>
           {% endfor %}
         </div>
-        <a href="{{ project_link }}" class="powaynec-btn" target="_blank" rel="noopener noreferrer">Learn More</a>
-      </div>
+        <a href="{{ topic.link }}" class="powaynec-btn" target="_blank" rel="noopener noreferrer">Learn More</a>      </div>
     </div>
   </div>
   {% endfor %}
