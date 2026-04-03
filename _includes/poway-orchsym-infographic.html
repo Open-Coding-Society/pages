@@ -154,7 +154,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 2.25rem;
-    align-items: start;
+    align-items: stretch;
     justify-content: center;
   }
 
@@ -473,6 +473,11 @@
 
         {% if topic.interactiveElements %}
         <h3 class="sip-section-title">Interactive Elements</h3>
+        {% if topic.interactiveLink %}
+        <div class="sip-section-action">
+          <a href="{{ topic.interactiveLink }}" class="sip-btn" target="_blank" rel="noopener">{{ topic.interactiveButtonLabel | default: 'Open Games Page' }}</a>
+        </div>
+        {% endif %}
         <div class="sip-keypoints">
           {% for element in topic.interactiveElements %}
           <div class="sip-keypoint">
@@ -488,6 +493,13 @@
         </div>
         {% endif %}
 
+      </div>
+
+      <!-- Right: About & Impact -->
+      <div class="sip-details">
+        <h3 class="sip-section-title">About</h3>
+        <p class="sip-about">{{ topic.description }}</p>
+
         {% if topic.problemsSolved %}
         <h3 class="sip-section-title">Problems Solved</h3>
         <div class="sip-impact-list">
@@ -496,13 +508,6 @@
           {% endfor %}
         </div>
         {% endif %}
-
-      </div>
-
-      <!-- Right: About & Impact -->
-      <div class="sip-details">
-        <h3 class="sip-section-title">About</h3>
-        <p class="sip-about">{{ topic.description }}</p>
 
         {% if topic.impact %}
         <h3 class="sip-section-title">Impact</h3>
