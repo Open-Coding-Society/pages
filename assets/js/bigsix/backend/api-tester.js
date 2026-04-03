@@ -3,45 +3,53 @@
 //  Path: assets/js/bigsix/backend/api-tester.js
 // ============================================================
 
-function updateRequestPreview(endpoints) {
-  const val    = document.getElementById('endpointSelect')?.value || '';
-  const [method, path] = val.split(':');
-  const preEl  = document.getElementById('reqPreview');
-  if (!preEl) return;
-  const bodies = {
-    POST: '{\n  "name": "Dave Lee",\n  "email": "dave@example.com"\n}',
-    PUT:  '{\n  "name": "Alice Johnson-Updated",\n  "email": "alice.new@example.com"\n}',
-  };
-  const body = bodies[method] ? `\nContent-Type: application/json\n\n${bodies[method]}` : '';
-  preEl.textContent = `${method} ${path} HTTP/1.1\nHost: localhost:8080\nAccept: application/json${body}`;
-}
+export class ApiTester {
+  #config;
 
-function sendApiRequest(responses) {
-  const key  = document.getElementById('endpointSelect')?.value;
-  const mock = responses[key];
-  if (!mock) return;
+  constructor(config) {
+    this.#config = config;
+  }
 
-  const cls = mock.status >= 500 ? 'status-5xx' : mock.status >= 400 ? 'status-4xx' : 'status-2xx';
-  document.getElementById('statusBadgeWrap').innerHTML =
-    `<span class="status-badge ${cls}">${mock.status}</span>`;
-  document.getElementById('responseBody').textContent  = mock.body || '(no body)';
-  document.getElementById('respTime').textContent      = `${mock.time}ms`;
-  document.getElementById('respSize').textContent      = `${new Blob([mock.body]).size} bytes`;
-  document.getElementById('responseMeta').style.display = '';
-  document.getElementById('apiHint').textContent       = mock.hint;
-}
+  init() {
+    const sel = document.getElementById('endpointSelect');
+    if (!sel) return;
 
-export function initApiTester(config) {
-  const sel = document.getElementById('endpointSelect');
-  if (!sel) return;
+    sel.innerHTML = this.#config.API_ENDPOINTS.map(ep =>
+      `<option value="${ep.value}">${ep.label}</option>`
+    ).join('');
 
-  sel.innerHTML = config.API_ENDPOINTS.map(ep =>
-    `<option value="${ep.value}">${ep.label}</option>`
-  ).join('');
+    sel.addEventListener('change', () => this.#updateRequestPreview());
+    document.getElementById('sendRequestBtn')
+      ?.addEventListener('click', () => this.#sendApiRequest());
 
-  sel.addEventListener('change', () => updateRequestPreview(config.API_ENDPOINTS));
-  document.getElementById('sendRequestBtn')
-    ?.addEventListener('click', () => sendApiRequest(config.API_RESPONSES));
+    this.#updateRequestPreview();
+  }
 
-  updateRequestPreview(config.API_ENDPOINTS);
+  #updateRequestPreview() {
+    const val    = document.getElementById('endpointSelect')?.value || '';
+    const [method, path] = val.split(':');
+    const preEl  = document.getElementById('reqPreview');
+    if (!preEl) return;
+    const bodies = {
+      POST: '{\n  "name": "Dave Lee",\n  "email": "dave@example.com"\n}',
+      PUT:  '{\n  "name": "Alice Johnson-Updated",\n  "email": "alice.new@example.com"\n}',
+    };
+    const body = bodies[method] ? `\nContent-Type: application/json\n\n${bodies[method]}` : '';
+    preEl.textContent = `${method} ${path} HTTP/1.1\nHost: localhost:8080\nAccept: application/json${body}`;
+  }
+
+  #sendApiRequest() {
+    const key  = document.getElementById('endpointSelect')?.value;
+    const mock = this.#config.API_RESPONSES[key];
+    if (!mock) return;
+
+    const cls = mock.status >= 500 ? 'status-5xx' : mock.status >= 400 ? 'status-4xx' : 'status-2xx';
+    document.getElementById('statusBadgeWrap').innerHTML =
+      `<span class="status-badge ${cls}">${mock.status}</span>`;
+    document.getElementById('responseBody').textContent  = mock.body || '(no body)';
+    document.getElementById('respTime').textContent      = `${mock.time}ms`;
+    document.getElementById('respSize').textContent      = `${new Blob([mock.body]).size} bytes`;
+    document.getElementById('responseMeta').style.display = '';
+    document.getElementById('apiHint').textContent       = mock.hint;
+  }
 }
