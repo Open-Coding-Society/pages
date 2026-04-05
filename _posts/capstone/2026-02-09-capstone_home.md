@@ -163,7 +163,9 @@ document.addEventListener('DOMContentLoaded', function(){
     button.setAttribute('aria-label', 'Open project links');
     button.innerHTML = '📁';
     const popup = document.createElement('div');
-    popup.className = 'capstone-popup hidden absolute right-3 top-14 z-30 w-64 rounded-2xl border border-white/10 bg-slate-950/95 p-3 shadow-2xl backdrop-blur-xl';
+    popup.className = 'capstone-popup hidden absolute right-3 top-14 z-30 w-64 rounded-2xl border border-white/10 bg-slate-950 p-3 shadow-2xl';
+    popup.style.backdropFilter = 'blur(14px)';
+    popup.style.backgroundColor = 'rgba(15, 23, 42, 0.96)';
     popup.innerHTML = '<div class="capstone-popup-links space-y-2"></div>';
     button.addEventListener('click', event=>{
       event.stopPropagation();
