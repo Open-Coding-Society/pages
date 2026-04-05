@@ -1,0 +1,76 @@
+<script>
+  window.PageFeatures = window.PageFeatures || {};
+  window.PageFeatures.grading_modules = true;
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PIXEL SUBMIT WIDGET
+════════════════════════════════════════════════════════════════════ -->
+<div class="grading-submission-module">
+  {% include gist-export-button.html %}
+</div>
+
+<!-- Hidden admin button (shown by JS for admins only) -->
+<button id="open-grades-admin" class="btn-secondary" style="display:none;margin:0 auto 1rem;">
+  Grades Admin
+</button>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     ADMIN PANEL (hidden until admin clicks)
+════════════════════════════════════════════════════════════════════ -->
+<div id="grading-module-widget">
+  <div id="grading-module" class="grading-module-panel" style="display:none;">
+    <h2>Grades Admin</h2>
+    <section>
+      <form id="grade-create-form">
+        <input name="uid"                                   placeholder="Student UID"                          required />
+        <input name="assignment"                            placeholder="Assignment"                           required />
+        <input type="number" name="score" step="0.01"      placeholder="Score"                                required />
+        <input name="teacherComments"                       placeholder="Teacher comments" />
+        <input name="submission"                            placeholder="Submission (text, URL, comments)" />
+        <button type="submit" class="btn-primary">Submit Grade</button>
+      </form>
+      <table id="grades-table" class="grading-table">
+        <thead>
+          <tr>
+            <th>ID</th><th>UID</th><th>Assignment</th><th>Score</th>
+            <th>Comments</th><th>Submission</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <form id="grade-edit-form" style="display:none;margin-top:1rem;">
+        <input type="hidden" name="id" />
+        <input name="uid"              readonly />
+        <input name="assignment"       required />
+        <input type="number" name="score" step="0.01" required />
+        <input name="teacherComments" />
+        <input name="submission" />
+        <button type="submit" class="btn-primary">Update</button>
+        <button type="button" id="grade-edit-cancel" class="btn-secondary">Cancel</button>
+      </form>
+    </section>
+    <div id="grading-status"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MANUAL FALLBACK MODAL
+     Opened automatically by the pixel widget if the API is unreachable
+════════════════════════════════════════════════════════════════════ -->
+<div id="grade-manual-modal" class="grading-modal-backdrop">
+  <div class="grading-modal-box">
+    <h3>Submit Failed — Enter Manually</h3>
+    <p class="grading-modal-error" id="manual-error-msg"></p>
+    <label>UID            <input id="manual-uid"        placeholder="Your UID / username" /></label>
+    <label>Assignment     <input id="manual-assignment" placeholder="e.g. homework1.html" /></label>
+    <label>Submission URL <input id="manual-submission" placeholder="https://yoursite.com/page" /></label>
+    <label>Comments       <input id="manual-comments"   placeholder="Optional notes" /></label>
+    <div class="grading-modal-actions">
+      <button id="manual-cancel-btn" class="btn-secondary">Cancel</button>
+      <button id="manual-send-btn"   class="btn-primary">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script src="{{ '/assets/js/grading-module.js' | relative_url }}" defer></script>
