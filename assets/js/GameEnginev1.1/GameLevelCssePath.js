@@ -140,7 +140,7 @@ class GameLevelCssePath {
 
     const npc_data_identityGatekeeper = {
       id: 'IdentityGatekeeper',
-      greeting: "This terminal is waiting for your identity...",
+      greeting: "This terminal is waiting for your identity. Please wait for the pop-up to verify your identity!",
       src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
