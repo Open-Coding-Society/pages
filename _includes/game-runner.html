@@ -11,9 +11,9 @@
 
   <div class="editor-container">
     <div class="control-panel">
-      <button class="runBtn" title="Start Game">▶ Start</button>
-      <button class="pauseBtn" title="Pause Game">⏸ Pause</button>
-      <button class="stopBtn" title="Stop Game">■ Stop</button>
+      <button type="button" class="runBtn" title="Start Game">▶ Start</button>
+      <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
+      <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
       <select class="engineVersionSelect" title="Select Game Engine Version">
         <option value="GameEnginev1">Engine v1</option>
         <option value="GameEnginev1.1" selected>Engine v1.1</option>
@@ -26,17 +26,17 @@
     <div class="control-panel">
       <span class="lineCount">Lines: 1</span>
       <span class="charCount">Characters: 0</span>
-      <button class="copyBtn" title="Copy Code">📋 Copy</button>
-      <button class="saveBtn" title="Save Code">💾 Save</button>
-      <button class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
+      <button type="button" class="copyBtn" title="Copy Code">📋 Copy</button>
+      <button type="button" class="saveBtn" title="Save Code">💾 Save</button>
+      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
     </div>
   </div>
   {% else %}
   <!-- Compact controls for hide_edit mode -->
   <div class="compact-controls">
-    <button class="runBtn" title="Start Game">▶ Play</button>
-    <button class="pauseBtn" title="Pause Game">⏸ Pause</button>
-    <button class="stopBtn" title="Stop Game">■ Stop</button>
+    <button type="button" class="runBtn" title="Start Game">▶ Play</button>
+    <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
+    <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
     <select class="engineVersionSelect" title="Select Game Engine Version">
       <option value="GameEnginev1">Engine v1</option>
       <option value="GameEnginev1.1" selected>Engine v1.1</option>
@@ -279,7 +279,7 @@
       pauseBtn.textContent = '⏸ Pause';
       pauseBtn.title = 'Pause Game';
       stopBtn.disabled = false;
-      levelSelect.disabled = true;
+      levelSelect.disabled = true; // temporary while levels are being loaded
 
       // Get container (GameEnv will use this reference directly)
       const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
@@ -342,17 +342,18 @@
         };
 
         // Populate level selector
-        if (levelSelect.options.length <= 1) {
-          gameLevelClasses.forEach((levelClass, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = levelClass.name || `Level ${index + 1}`;
-            levelSelect.appendChild(option);
-          });
-          if (gameLevelClasses.length > 0) {
-            levelSelect.value = "0";
-          }
+        levelSelect.innerHTML = '<option value="">Select Level...</option>';
+        for (let index = 0; index < gameLevelClasses.length; index++) {
+          const levelClass = gameLevelClasses[index];
+          const option = document.createElement('option');
+          option.value = String(index);
+          option.textContent = levelClass?.name || `Level ${index + 1}`;
+          levelSelect.appendChild(option);
         }
+        if (gameLevelClasses.length > 0) {
+          levelSelect.value = "0";
+        }
+        levelSelect.disabled = gameLevelClasses.length <= 1;
 
         // Start the game
         gameCore = Game.main(environment, GameControl);
@@ -391,11 +392,30 @@
   }
 
   // Event listeners
-  runBtn.onclick = runGame;
-  if (pauseBtn) {
-    pauseBtn.onclick = togglePause;
+  if (runBtn) {
+    runBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      runGame();
+    });
+  } else {
+    console.error('Game runner {{ include.runner_id }}: run button not found');
   }
-  stopBtn.onclick = stopGame;
+
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      togglePause();
+    });
+  }
+
+  if (stopBtn) {
+    stopBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      stopGame();
+    });
+  } else {
+    console.error('Game runner {{ include.runner_id }}: stop button not found');
+  }
 
   // Level selector
   levelSelect.addEventListener('change', () => {
