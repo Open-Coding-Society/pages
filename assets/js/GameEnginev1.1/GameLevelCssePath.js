@@ -6,6 +6,9 @@ import GameControl from './essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js'; // change this to your mini-game level
 
 class GameLevelCssePath {
+  static levelId = 'csse-path';
+  static displayName = 'Identity Forge';
+
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -14,7 +17,7 @@ class GameLevelCssePath {
     // Background data
     const image_src = path + "/images/gamify/pathway/csse/bg/indentity-forge-1.png"; 
     const bg_data = {
-        name: 'Identity Forge',
+        name: GameLevelCssePath.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
         src: image_src,
     };

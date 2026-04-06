@@ -81,6 +81,16 @@
     return Number.isFinite(parsed) ? parsed : fallback;
   }
 
+  function getLevelOptionLabel(levelClass, index) {
+    return levelClass?.displayName
+      || levelClass?.levelName
+      || levelClass?.title
+      || levelClass?.levelId
+      || levelClass?.id
+      || levelClass?.name
+      || `Level ${index + 1}`;
+  }
+
   const configuredCanvasHeight = parseCssSizeToPixels(canvasHeight, 580);
   
   // Load code from localStorage or use default
@@ -347,7 +357,7 @@
           const levelClass = gameLevelClasses[index];
           const option = document.createElement('option');
           option.value = String(index);
-          option.textContent = levelClass?.name || `Level ${index + 1}`;
+          option.textContent = getLevelOptionLabel(levelClass, index);
           levelSelect.appendChild(option);
         }
         if (gameLevelClasses.length > 0) {
