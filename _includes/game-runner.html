@@ -65,6 +65,8 @@
 </div>
 
 <script type="module">
+import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+
 (function() {
   const container = document.getElementById('game-runner-{{ include.runner_id }}');
   if (!container) return;
@@ -92,33 +94,21 @@
   }
 
   const configuredCanvasHeight = parseCssSizeToPixels(canvasHeight, 580);
-  
-  // Load code from localStorage or use default
-  const savedCode = localStorage.getItem(storageKey);
-  const initialCode = savedCode !== null ? savedCode : defaultCode;
-  
-  let editor = null;
-  
-  // Initialize CodeMirror only if not in hide_edit mode
-  if (!hideEdit) {
-    // Set CodeMirror height dynamically
-    const style = document.createElement('style');
-    if (editorHeight && editorHeight !== "") {
-      style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
-    } else {
-      style.textContent = `#game-runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
-    }
-    document.head.appendChild(style);
+  const runner = new BaseRunner(container, {
+    storageKey,
+    statusSelector: '.status-text'
+  });
 
-    // Initialize CodeMirror
-    editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    enabled: !hideEdit,
+    codeMirrorOptions: {
       mode: 'javascript',
       theme: 'darcula',
-      lineNumbers: true,
-      value: initialCode
-    });
-    editor.setValue(initialCode);
-  }
+      lineNumbers: true
+    }
+  });
 
   // Get UI elements
   const runBtn = container.querySelector('.runBtn');
@@ -141,74 +131,18 @@
   pauseBtn.disabled = true;
   stopBtn.disabled = true;
 
-  // Update stats (only if editor exists)
-  function updateStats() {
-    if (!editor || hideEdit) return;
-    const code = editor.getValue();
-    const lines = code.split('\n').length;
-    const chars = code.length;
-    if (lineCountSpan) lineCountSpan.textContent = `Lines: ${lines}`;
-    if (charCountSpan) charCountSpan.textContent = `Characters: ${chars}`;
-  }
-  
-  if (editor) {
-    editor.on('change', updateStats);
-    updateStats();
-  }
-
   // Update status
   function updateStatus(status) {
-    if (statusText) statusText.textContent = status;
+    runner.updateStatus(status);
   }
 
-  // Clear storage button - removes localStorage and resets to default code
-  const clearStorageBtn = container.querySelector('.clearStorageBtn');
-  if (clearStorageBtn) {
-    clearStorageBtn.onclick = () => {
-      localStorage.removeItem(storageKey);
-      if (editor) editor.setValue(defaultCode || "");
-      if (gameOutput) gameOutput.textContent = 'Storage cleared. Code reset to default.';
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "",
+    onClear: () => {
+      stopGame();
       updateStatus('Reset');
-      const originalText = clearStorageBtn.textContent;
-      clearStorageBtn.textContent = '✔';
-      setTimeout(() => {
-        clearStorageBtn.textContent = originalText;
-      }, 2000);
-    };
-  }
-
-  // Save code button - saves to localStorage
-  const saveBtn = container.querySelector('.saveBtn');
-  if (saveBtn) {
-    saveBtn.onclick = () => {
-      if (editor) {
-        const code = editor.getValue();
-        localStorage.setItem(storageKey, code);
-      }
-      const originalText = saveBtn.innerHTML;
-      saveBtn.innerHTML = '✔ Saved';
-      setTimeout(() => {
-        saveBtn.innerHTML = originalText;
-      }, 2000);
-    };
-  }
-
-  // Copy code button
-  const copyBtn = container.querySelector('.copyBtn');
-  if (copyBtn) {
-    copyBtn.onclick = () => {
-      if (editor) {
-        const code = editor.getValue();
-        navigator.clipboard.writeText(code).then(() => {
-          const originalText = copyBtn.innerHTML;
-          copyBtn.innerHTML = '✔ Copied';
-          setTimeout(() => {
-            copyBtn.innerHTML = originalText;
-          }, 2000);
-        });
-      }
-    };
-  }
+    }
+  });
 
   // Stop game
   function stopGame() {
@@ -277,7 +211,7 @@
       stopGame(); // Stop any existing game
       
       // Get code from editor or use default code (for hide_edit mode)
-      let code = editor ? editor.getValue() : defaultCode;
+      let code = runner.getValue();
       if (!code.trim()) {
         updateStatus('Error: No code to run');
         return;
@@ -402,28 +336,13 @@
   }
 
   // Event listeners
-  if (runBtn) {
-    runBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      runGame();
-    });
-  } else {
+  if (!runner.bindButton('.runBtn', runGame)) {
     console.error('Game runner {{ include.runner_id }}: run button not found');
   }
 
-  if (pauseBtn) {
-    pauseBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      togglePause();
-    });
-  }
+  runner.bindButton('.pauseBtn', togglePause);
 
-  if (stopBtn) {
-    stopBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      stopGame();
-    });
-  } else {
+  if (!runner.bindButton('.stopBtn', stopGame)) {
     console.error('Game runner {{ include.runner_id }}: stop button not found');
   }
 
@@ -440,12 +359,7 @@
   });
 
   // Keyboard shortcuts (only if editor exists)
-  if (editor) {
-    editor.setOption("extraKeys", {
-      "Ctrl-Enter": runGame,
-      "Cmd-Enter": runGame
-    });
-  }
+  runner.bindShortcut(runGame);
 
 })();
 </script>

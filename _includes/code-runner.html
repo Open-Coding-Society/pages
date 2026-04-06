@@ -22,10 +22,10 @@
 
   <div class="editor-container">
     <div class="control-panel">
-      <button class="runBtn" title="Run">▶</button>
-      <button class="copyBtn" title="Copy Code">⎘</button>
-      <button class="saveBtn" title="Save Code">💾</button>
-      <button class="clearStorageBtn" title="Clear Storage">🗑</button>
+      <button type="button" class="runBtn" title="Run">▶</button>
+      <button type="button" class="copyBtn" title="Copy Code">⎘</button>
+      <button type="button" class="saveBtn" title="Save Code">💾</button>
+      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑</button>
       <select class="languageSelect">
         <option value="python">Python</option>
         <option value="java">Java</option>
@@ -48,7 +48,7 @@
   <div class="output-container">
     <div class="control-panel">
       <span>Output</span>
-      <button class="copyOutputBtn" title="Copy Output">⎘</button>
+      <button type="button" class="copyOutputBtn" title="Copy Output">⎘</button>
     </div>
     <div class="output-content">Click "Run" in code control panel to see output ...</div>
     <div class="control-panel">
@@ -58,6 +58,7 @@
 </div>
 
 <script type="module">
+import { BaseRunner } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
 import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 (function() {
@@ -68,31 +69,20 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
   const editorHeight = "{{ include.height }}";
   const storageKey = container.dataset.storageKey;
-  
-  // Load code from localStorage or use default
-  const savedCode = localStorage.getItem(storageKey);
-  const initialCode = savedCode !== null ? savedCode : defaultCode;
-  
-  // Set CodeMirror height dynamically
-  if (editorHeight) {
-    const style = document.createElement('style');
-    style.textContent = `#runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
-    document.head.appendChild(style);
-  } else {
-    const style = document.createElement('style');
-    style.textContent = `#runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
-    document.head.appendChild(style);
-  }
-  
-  const editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
-    lineNumbers: true,
-    mode: initialLang === "java" ? "text/x-java" : (initialLang || "python"),
-    theme: "darcula",
-    indentUnit: 4,
-    tabSize: 4
-  });
+  const runner = new BaseRunner(container, { storageKey });
 
-  editor.setValue(initialCode || "print('Hello, world!')");
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    fallbackCode: "print('Hello, world!')",
+    codeMirrorOptions: {
+      lineNumbers: true,
+      mode: initialLang === "java" ? "text/x-java" : (initialLang || "python"),
+      theme: "darcula",
+      indentUnit: 4,
+      tabSize: 4
+    }
+  });
 
   const langSelect = container.querySelector('.languageSelect');
   const fontSizeSelect = container.querySelector('.fontSizeSelect');
@@ -106,16 +96,13 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     langSelect.value = initialLang;
   }
 
-  // Update stats
-  function updateStats() {
-    const code = editor.getValue();
-    const lines = code.split('\n').length;
-    const chars = code.length;
-    lineCountSpan.textContent = `Lines: ${lines}`;
-    charCountSpan.textContent = `Characters: ${chars}`;
-  }
-  editor.on('change', updateStats);
-  updateStats();
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "print('Hello, world!')",
+    onClear: () => {
+      outputDiv.textContent = 'Storage cleared. Code reset to default.';
+      execTimeSpan.textContent = '';
+    }
+  });
 
   // Font size changer
   fontSizeSelect.addEventListener("change", () => {
@@ -135,45 +122,6 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
       editor.setOption("mode", "javascript");
     }
   });
-
-  // Clear storage button - removes localStorage and resets to default code
-  container.querySelector('.clearStorageBtn').onclick = () => {
-    localStorage.removeItem(storageKey);
-    editor.setValue(defaultCode || "print('Hello, world!')");
-    outputDiv.textContent = 'Storage cleared. Code reset to default.';
-    execTimeSpan.textContent = '';
-    const btn = container.querySelector('.clearStorageBtn');
-    const originalText = btn.textContent;
-    btn.textContent = '✔';
-    setTimeout(() => {
-      btn.textContent = originalText;
-    }, 2000);
-  };
-
-  // Save code button - saves to localStorage
-  container.querySelector('.saveBtn').onclick = () => {
-    const code = editor.getValue();
-    localStorage.setItem(storageKey, code);
-    const btn = container.querySelector('.saveBtn');
-    const originalText = btn.textContent;
-    btn.textContent = '✔';
-    setTimeout(() => {
-      btn.textContent = originalText;
-    }, 2000);
-  };
-
-  // Copy code button
-  container.querySelector('.copyBtn').onclick = () => {
-    const code = editor.getValue();
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = container.querySelector('.copyBtn');
-      const originalText = btn.textContent;
-      btn.textContent = '✔';
-      setTimeout(() => {
-        btn.textContent = originalText;
-      }, 2000);
-    });
-  };
 
   // Copy output icon
   container.querySelector('.copyOutputBtn').onclick = () => {
@@ -262,12 +210,9 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
       });
   }
 
-  container.querySelector('.runBtn').onclick = runCode;
+  runner.bindButton('.runBtn', runCode);
 
   // Keyboard shortcut
-  editor.setOption("extraKeys", {
-    "Ctrl-Enter": runCode,
-    "Cmd-Enter": runCode
-  });
+  runner.bindShortcut(runCode);
 })();
 </script>

@@ -7,11 +7,11 @@
 
   <div class="editor-container">
     <div class="control-panel">
-      <button class="runBtn" title="Run">▶</button>
-      <button class="stopBtn" title="Stop">■</button>
-      <button class="copyBtn" title="Copy Code">⎘</button>
-      <button class="saveBtn" title="Save Code">💾</button>
-      <button class="clearStorageBtn" title="Clear Storage">🗑</button>
+      <button type="button" class="runBtn" title="Run">▶</button>
+      <button type="button" class="stopBtn" title="Stop">■</button>
+      <button type="button" class="copyBtn" title="Copy Code">⎘</button>
+      <button type="button" class="saveBtn" title="Save Code">💾</button>
+      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑</button>
     </div>
     <textarea class="editor-textarea"></textarea>
     <div class="control-panel">
@@ -23,13 +23,15 @@
   <div class="output-container">
     <div class="control-panel">
       <span>UI Output</span>
-      <button class="resetBtn" title="Reset">↻</button>
+      <button type="button" class="resetBtn" title="Reset">↻</button>
     </div>
     <div class="ui-output" id="ui-output-{{ include.runner_id }}"></div>
   </div>
 </div>
 
 <script type="module">
+import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+
 (function() {
   const container = document.getElementById('ui-runner-{{ include.runner_id }}');
   if (!container) return;
@@ -38,94 +40,37 @@
   const editorHeight = "{{ include.height }}";
   const outputHeight = "{{ include.output_height }}";
   const storageKey = container.dataset.storageKey;
-  
-  // Load code from localStorage or use default
-  const savedCode = localStorage.getItem(storageKey);
-  const initialCode = savedCode !== null ? savedCode : defaultCode;
-  
-  // Set CodeMirror height dynamically
-  if (editorHeight) {
-    const style = document.createElement('style');
-    style.textContent = `#ui-runner-{{ include.runner_id }} .CodeMirror { height: ${editorHeight}; }`;
-    document.head.appendChild(style);
-  } else {
-    const style = document.createElement('style');
-    style.textContent = `#ui-runner-{{ include.runner_id }} .CodeMirror { height: 300px; }`;
-    document.head.appendChild(style);
-  }
+  const runner = new BaseRunner(container, { storageKey });
 
-  // Set UI output height
-  if (outputHeight) {
-    const style = document.createElement('style');
-    style.textContent = `#ui-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`;
-    document.head.appendChild(style);
-  }
-  
-  const editor = CodeMirror.fromTextArea(container.querySelector('.editor-textarea'), {
-    lineNumbers: true,
-    mode: "javascript",
-    theme: "darcula",
-    indentUnit: 2,
-    tabSize: 2
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    fallbackCode: "// Write your JavaScript code here",
+    codeMirrorOptions: {
+      lineNumbers: true,
+      mode: "javascript",
+      theme: "darcula",
+      indentUnit: 2,
+      tabSize: 2
+    }
   });
 
-  editor.setValue(initialCode || "// Write your JavaScript code here");
+  if (outputHeight) {
+    runner.applyScopedStyle(`#ui-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`);
+  }
 
-  const fontSizeSelect = container.querySelector('.fontSizeSelect');
   const uiOutput = container.querySelector('.ui-output');
-  const lineCountSpan = container.querySelector('.lineCount');
-  const charCountSpan = container.querySelector('.charCount');
 
   let currentExecution = null;
 
-  // Update stats
-  function updateStats() {
-    const code = editor.getValue();
-    const lines = code.split('\n').length;
-    const chars = code.length;
-    lineCountSpan.textContent = `Lines: ${lines}`;
-    charCountSpan.textContent = `Characters: ${chars}`;
-  }
-  editor.on('change', updateStats);
-  updateStats();
-
-  // Clear storage button - removes localStorage and resets to default code
-  container.querySelector('.clearStorageBtn').onclick = () => {
-    localStorage.removeItem(storageKey);
-    editor.setValue(defaultCode || "// Write your JavaScript code here");
-    stopExecution();
-    const btn = container.querySelector('.clearStorageBtn');
-    const originalText = btn.textContent;
-    btn.textContent = '✔';
-    setTimeout(() => {
-      btn.textContent = originalText;
-    }, 2000);
-  };
-
-  // Save code button - saves to localStorage
-  container.querySelector('.saveBtn').onclick = () => {
-    const code = editor.getValue();
-    localStorage.setItem(storageKey, code);
-    const btn = container.querySelector('.saveBtn');
-    const originalText = btn.textContent;
-    btn.textContent = '✔';
-    setTimeout(() => {
-      btn.textContent = originalText;
-    }, 2000);
-  };
-
-  // Copy code button
-  container.querySelector('.copyBtn').onclick = () => {
-    const code = editor.getValue();
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = container.querySelector('.copyBtn');
-      const originalText = btn.textContent;
-      btn.textContent = '✔';
-      setTimeout(() => {
-        btn.textContent = originalText;
-      }, 2000);
-    });
-  };
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "// Write your JavaScript code here",
+    onClear: () => {
+      stopExecution();
+    },
+    saveFeedback: '✔',
+    copyFeedback: '✔'
+  });
 
   // Stop execution
   function stopExecution() {
@@ -171,12 +116,9 @@
     }
   }
 
-  container.querySelector('.runBtn').onclick = runCode;
+  runner.bindButton('.runBtn', runCode);
 
   // Keyboard shortcut
-  editor.setOption("extraKeys", {
-    "Ctrl-Enter": runCode,
-    "Cmd-Enter": runCode
-  });
+  runner.bindShortcut(runCode);
 })();
 </script>
