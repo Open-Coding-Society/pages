@@ -325,11 +325,11 @@ class GameControl {
         // Ensure the running-loop flag is cleared so new transitions can start the loop
         this._loopRunning = false;
 
-        // Alert the user that the level has ended
+        // Notify the user that the level has ended
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
-            alert("Level ended.");
+            console.log("Level ended.");
         } else {
-            alert("All levels completed.");
+            console.log("All levels or sublevels completed.");
         }
         
         // Clean up any lingering interaction handlers

@@ -602,9 +602,14 @@ export class PreferencesController {
     /** Main initialisation — called on DOMContentLoaded */
     static async init() {
         // Step 1: Load & apply saved preferences
-        const saved = await PreferencesStore.get();
+        let saved = null;
+        try {
+            saved = await PreferencesStore.get();
+        } catch (e) {
+            console.error('Error loading preferences during init', e);
+        }
 
-        // Step 2: Render theme buttons
+        // Step 2: Render theme buttons (must run even if prefs load fails)
         ThemeRenderer.setPresets();
         ThemeRenderer.setCustom();
 
@@ -729,8 +734,13 @@ export function initializePreferences(javaURI, fetchOptions) {
     // Initialize API config
     PreferencesAPI.init(javaURI, fetchOptions);
 
-    // Boot orchestrator on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', () => PreferencesController.init());
+    // Boot orchestrator — module scripts are deferred so DOMContentLoaded
+    // may have already fired by the time this runs. Handle both cases.
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        PreferencesController.init();
+    } else {
+        document.addEventListener('DOMContentLoaded', () => PreferencesController.init());
+    }
 
     // Expose global functions for compatibility
     window.loadPreferences = () => PreferencesStore.get();
