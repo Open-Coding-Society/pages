@@ -118,8 +118,8 @@ class GameLevelCssePath {
     };
 
     const identityGatekeeperPos = {
-      x: width * 0.60,
-      y: height * 0.72,
+      x: width * 0.48,
+      y: height * 0.74,
     };
 
     const npc_data_startGatekeeper = {
@@ -153,6 +153,38 @@ class GameLevelCssePath {
       right: { row: 1, start: 1, columns: 1 },
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
+
+    this.createProfilePanel = function() {
+      this.profilePanel = document.createElement('div');
+      this.profilePanel.style.cssText = `
+        position: fixed; top: 16px; left: 16px; z-index: 10000;
+        background: rgba(13,13,26,0.92); border: 1px solid #4ecca3;
+        border-radius: 10px; padding: 12px 14px;
+        width: 260px; font-family: 'Courier New', monospace;
+        color: #e0e0e0; box-shadow: 0 0 20px rgba(78,204,163,0.18);
+      `;
+      this.profilePanel.innerHTML = `
+        <div style="color: #4ecca3; font-size: 12px; letter-spacing: 1px; margin-bottom: 8px;">PLAYER PROFILE</div>
+        <div id="profile-name">Name: —</div>
+        <div id="profile-email">Email: —</div>
+        <div id="profile-github">GitHub: —</div>
+      `;
+      document.body.appendChild(this.profilePanel);
+    };
+
+    this.updateProfilePanel = function(profile = {}) {
+      if (!this.profilePanel) {
+        this.createProfilePanel();
+      }
+      const name = profile.name || '—';
+      const email = profile.email || '—';
+      const github = profile.github || '—';
+      this.profilePanel.querySelector('#profile-name').textContent = `Name: ${name}`;
+      this.profilePanel.querySelector('#profile-email').textContent = `Email: ${email}`;
+      this.profilePanel.querySelector('#profile-github').textContent = `GitHub: ${github}`;
+    };
+
+    this.createProfilePanel();
 
     this.showIdentityForm = function() {
       return new Promise((resolve) => {
@@ -247,7 +279,9 @@ class GameLevelCssePath {
           const github = githubInput.value.trim();
           if (name && email && github) {
             overlay.remove();
-            resolve({ name, email, github });
+            const profile = { name, email, github };
+            this.updateProfilePanel(profile);
+            resolve(profile);
           }
         });
       });
