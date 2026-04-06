@@ -21,9 +21,9 @@ class GameLevelCssePath {
 
     // ── Background ──────────────────────────────────────────────
     const bg_data = {
-      name: 'Identity Forge',
-      greeting: "Welcome to the CSSE pathway!",
-      src: path + "/images/gamify/pathway/csse/bg/indentity-forge-1.png",
+        name: GameLevelCssePath.displayName,
+        greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
+        src: image_src,
     };
 
     // ── Player ───────────────────────────────────────────────────
