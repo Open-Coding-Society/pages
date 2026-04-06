@@ -159,7 +159,7 @@ class GameLevelCssePath {
         const overlay = document.createElement('div');
         overlay.style.cssText = `
           position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-          width: 90%; max-width: 500px; z-index: 10000;
+          width: 90%; max-width: 520px; z-index: 10000;
           background: #0d0d1a; border: 2px solid #4ecca3;
           border-radius: 10px; padding: 24px 28px;
           font-family: 'Courier New', monospace;
@@ -169,11 +169,18 @@ class GameLevelCssePath {
 
         const title = document.createElement('div');
         title.style.cssText = `
-          color: #4ecca3; font-size: 14px; font-weight: bold;
-          letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;
+          color: #4ecca3; font-size: 16px; font-weight: bold;
+          letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
           text-align: center;
         `;
         title.textContent = '⚔ Identity Terminal Setup';
+
+        const message = document.createElement('div');
+        message.style.cssText = `
+          color: #c7f2d4; font-size: 12px; line-height: 1.6;
+          margin-bottom: 16px; white-space: pre-wrap;
+        `;
+        message.textContent = "Make sure you're logged in.\nIf not, navigate to https://pages.opencodingsociety.com/login to create an account!";
 
         const form = document.createElement('form');
         form.style.cssText = `display: flex; flex-direction: column; gap: 12px;`;
@@ -200,6 +207,17 @@ class GameLevelCssePath {
           padding: 8px; color: #e0e0e0; font-family: 'Courier New', monospace;
         `;
 
+        const githubLabel = document.createElement('label');
+        githubLabel.textContent = 'GitHub Username:';
+        githubLabel.style.cssText = `color: #4ecca3; font-size: 12px;`;
+        const githubInput = document.createElement('input');
+        githubInput.type = 'text';
+        githubInput.required = true;
+        githubInput.style.cssText = `
+          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
+          padding: 8px; color: #e0e0e0; font-family: 'Courier New', monospace;
+        `;
+
         const submitBtn = document.createElement('button');
         submitBtn.type = 'submit';
         submitBtn.textContent = 'Unlock Identity Terminal';
@@ -213,9 +231,12 @@ class GameLevelCssePath {
         form.appendChild(nameInput);
         form.appendChild(emailLabel);
         form.appendChild(emailInput);
+        form.appendChild(githubLabel);
+        form.appendChild(githubInput);
         form.appendChild(submitBtn);
 
         overlay.appendChild(title);
+        overlay.appendChild(message);
         overlay.appendChild(form);
         document.body.appendChild(overlay);
 
@@ -223,9 +244,10 @@ class GameLevelCssePath {
           e.preventDefault();
           const name = nameInput.value.trim();
           const email = emailInput.value.trim();
-          if (name && email) {
+          const github = githubInput.value.trim();
+          if (name && email && github) {
             overlay.remove();
-            resolve({ name, email });
+            resolve({ name, email, github });
           }
         });
       });
@@ -271,16 +293,13 @@ class GameLevelCssePath {
       // ── Identity terminal gatekeeper interaction ──────────────
       if (distToIdentityGatekeeper < triggerDist && !csseState.identityUnlocked) {
         csseState.interactCooldown = 180;
-        await this.showDialogue('Identity Gatekeeper', [
-            "This terminal is the key to your persona.\nPlease provide your identity to unlock access."
-        ]);
-
         const identityData = await this.showIdentityForm();
         if (identityData) {
           csseState.identityUnlocked = true;
 
           await this.showDialogue('Identity Gatekeeper', [
               `Identity registered for ${identityData.name}.`,
+              `GitHub: ${identityData.github}`,
               'Identity Terminal unlocked.',
               'Complete the identity setup before you can move on to the next module.'
           ]);
