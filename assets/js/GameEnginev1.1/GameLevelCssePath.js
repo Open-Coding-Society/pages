@@ -54,10 +54,10 @@ class GameLevelCssePath {
         ANIMATION_RATE: 50,
         pixels: {width: 1024, height: 1024},
         orientation: {rows: 2, columns: 2 },
-        INIT_POSITION: { x: (width * .25), y: (height * .65)},
+        INIT_POSITION: { x: (width * .25), y: (height * .66)},
         down: {row: 0, start: 0, columns: 1, wiggle: 0.005 },
         up: {row: 0, start: 1, columns: 1 },
-        hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+        hitbox: { widthPercentage: 0.15, heightPercentage: 0.2 },
         // Add dialogues array for random messages
         dialogues: [
             "Welcome, traveler. Are you ready to embark on the CSSE pathway?",
