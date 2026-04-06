@@ -85,13 +85,21 @@ document.addEventListener('DOMContentLoaded', function(){
     const text = normalize(card.textContent);
     return !currentQuery || text.includes(currentQuery);
   }
+  
   function updateStatus(count){
-    if(currentQuery){
-      status.textContent = count ? `${count} project${count === 1 ? '' : 's'} found for "${currentQuery}".` : `No projects match "${currentQuery}".`;
-    } else {
-      status.textContent = count ? `${count} project${count === 1 ? '' : 's'} shown.` : 'No matching projects.';
-    }
+  const total = getTotalProjects();
+
+  if(currentQuery){
+    status.textContent = count
+      ? `${count} of ${total} project${total === 1 ? '' : 's'} found for "${currentQuery}".`
+      : `No projects match "${currentQuery}".`;
+  } else {
+    status.textContent = `${total} total project${total === 1 ? '' : 's'}.`;
   }
+}
+  function getTotalProjects(){
+  return cards.length;
+}
   function applyFilters(){
     let count = 0;
     cards.forEach(card=>{
