@@ -124,7 +124,7 @@ class GameLevelCssePath {
 
     const npc_data_startGatekeeper = {
       id: 'StartGatekeeper',
-      greeting: "Welcome to the Path of Code...",
+      greeting: "Welcome to the Path of Code...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
       src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
