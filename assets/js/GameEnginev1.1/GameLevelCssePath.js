@@ -190,11 +190,8 @@ class GameLevelCssePath {
         <div id="profile-name">Name: —</div>
         <div id="profile-email">Email: —</div>
         <div id="profile-github">GitHub: —</div>
-        <div style="margin-top: 8px; color: #4ecca3; font-size: 11px; letter-spacing: 1px;">Avatar</div>
-        <div id="profile-style">Style: —</div>
-        <div id="profile-palette">Palette: —</div>
-        <div id="profile-accessory">Accessory: —</div>
-        <div id="profile-animation">Animation: —</div>
+        <div style="margin-top: 8px; color: #4ecca3; font-size: 11px; letter-spacing: 1px;">Avatar Sprite</div>
+        <div id="profile-sprite">Sprite: —</div>
       `;
       document.body.appendChild(this.profilePanel);
     };
@@ -206,17 +203,11 @@ class GameLevelCssePath {
       const name = profile.name || '—';
       const email = profile.email || '—';
       const github = profile.github || '—';
-      const style = profile.style || '—';
-      const palette = profile.palette || '—';
-      const accessory = profile.accessory || '—';
-      const animation = profile.animation || '—';
+      const sprite = profile.sprite || '—';
       this.profilePanel.querySelector('#profile-name').textContent = `Name: ${name}`;
       this.profilePanel.querySelector('#profile-email').textContent = `Email: ${email}`;
       this.profilePanel.querySelector('#profile-github').textContent = `GitHub: ${github}`;
-      this.profilePanel.querySelector('#profile-style').textContent = `Style: ${style}`;
-      this.profilePanel.querySelector('#profile-palette').textContent = `Palette: ${palette}`;
-      this.profilePanel.querySelector('#profile-accessory').textContent = `Accessory: ${accessory}`;
-      this.profilePanel.querySelector('#profile-animation').textContent = `Animation: ${animation}`;
+      this.profilePanel.querySelector('#profile-sprite').textContent = `Sprite: ${sprite}`;
     };
 
     this.createProfilePanel();
@@ -232,75 +223,49 @@ class GameLevelCssePath {
         return;
       }
 
-      const styleFilters = {
-        'Minimalist': 'none',
-        'Futuristic': 'contrast(150%) saturate(200%) hue-rotate(220deg)',
-        'Pixel': 'contrast(130%) saturate(160%)',
-        'Shadow': 'brightness(80%) drop-shadow(0 0 12px rgba(0,0,0,0.45))'
-      };
-
-      const paletteFilters = {
-        'Neon': 'saturate(180%) brightness(110%)',
-        'Earth': 'sepia(0.35) saturate(120%) brightness(95%)',
-        'Pastel': 'saturate(90%) brightness(120%)',
-        'Mono': 'grayscale(90%) contrast(120%)'
-      };
-
-      const accessoryStyles = {
-        'None': '',
-        'Hat': '0 0 0 2px rgba(255,255,255,0.12)',
-        'Glasses': '0 0 12px rgba(80,180,255,0.45)',
-        'Backpack': '0 0 16px rgba(90,220,145,0.35)'
-      };
-
-      const animationMods = {
-        'None': { wiggle: false, spin: false },
-        'Bounce': { wiggle: 0.08, spin: false },
-        'Spin': { wiggle: false, spin: 6 },
-        'Wiggle': { wiggle: 0.06, spin: false }
-      };
-
-      const chosenStyle = options.style || 'Minimalist';
-      const chosenPalette = options.palette || 'Neon';
-      const chosenAccessory = options.accessory || 'None';
-      const chosenAnimation = options.animation || 'None';
-
-      const styleFilter = styleFilters[chosenStyle] || '';
-      const paletteFilter = paletteFilters[chosenPalette] || '';
-      const combined = [styleFilter, paletteFilter].filter(Boolean).join(' ');
-      playerObj.data.canvasFilter = combined || 'none';
-      playerObj.data.boxShadow = accessoryStyles[chosenAccessory] || 'none';
-
-      const animationConfig = animationMods[chosenAnimation] || { wiggle: false, spin: false };
-      const directions = ['down', 'up', 'left', 'right', 'downRight', 'downLeft', 'upRight', 'upLeft'];
-      directions.forEach(direction => {
-        if (!playerObj.spriteData[direction]) return;
-        if (animationConfig.wiggle) {
-          playerObj.spriteData[direction].wiggle = animationConfig.wiggle;
-        } else {
-          delete playerObj.spriteData[direction].wiggle;
-        }
-
-        if (animationConfig.spin) {
-          playerObj.spriteData[direction].spin = animationConfig.spin;
-        } else {
-          delete playerObj.spriteData[direction].spin;
-        }
-      });
+      const chosenSprite = options.sprite || 'minimalist.png';
+      
+      // Update the player sprite source
+      playerObj.data.src = path + "/images/gamify/pathway/csse/player/" + chosenSprite;
+      
+      // Reload the sprite image
+      if (playerObj.loadImage) {
+        playerObj.loadImage();
+      }
 
       this.updateProfilePanel({
         name: this.profileData?.name,
         email: this.profileData?.email,
         github: this.profileData?.github,
-        style: chosenStyle,
-        palette: chosenPalette,
-        accessory: chosenAccessory,
-        animation: chosenAnimation,
+        sprite: chosenSprite,
       });
     };
 
     this.showAvatarCustomForm = function() {
       return new Promise((resolve) => {
+        const spriteOptions = [
+          'minimalist.png',
+          'ufo.png',
+          'zombieNpc.png',
+          'worker.png',
+          'wizard.png',
+          'villager.png',
+          'tree.png',
+          'stockguy.png',
+          'spookMcWalk.png',
+          'shark.png',
+          'schwabbman.png',
+          'r2_idle.png',
+          'pilot.png',
+          'octopus.png',
+          'octocat.png',
+          'npc1.png',
+          'npc2.png',
+          'npc3.png',
+          'npc4.png',
+          'npc5.png'
+        ];
+
         const overlay = document.createElement('div');
         overlay.style.cssText = `
           position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -318,44 +283,42 @@ class GameLevelCssePath {
           text-transform: uppercase; margin-bottom: 14px;
           text-align: center;
         `;
-        title.textContent = '⚔ Avatar Forge Configurator';
+        title.textContent = '⚔ Avatar Forge Sprite Selector';
 
         const description = document.createElement('div');
         description.style.cssText = `
           color: #c7f2d4; font-size: 13px; margin-bottom: 18px; line-height: 1.6;
           white-space: pre-wrap;
         `;
-        description.textContent = 'Pick your character style, palette, accessories, and animation style. Changes update live as you choose.';
+        description.textContent = 'Choose a sprite. Your character will update live as you select.';
 
         const form = document.createElement('form');
         form.style.cssText = `display: flex; flex-direction: column; gap: 14px;`;
 
-        const buildSelect = (labelText, id, options) => {
-          const wrapper = document.createElement('div');
-          const label = document.createElement('label');
-          label.textContent = labelText;
-          label.style.cssText = `color: #4ecca3; font-size: 12px; margin-bottom: 6px; display: block;`;
-          const select = document.createElement('select');
-          select.id = id;
-          select.style.cssText = `
-            background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
-            padding: 10px; color: #e0e0e0; font-family: 'Courier New', monospace;
-          `;
-          options.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt;
-            option.textContent = opt;
-            select.appendChild(option);
-          });
-          wrapper.appendChild(label);
-          wrapper.appendChild(select);
-          return { wrapper, select };
-        };
+        const spriteLabel = document.createElement('label');
+        spriteLabel.textContent = 'Select Sprite';
+        spriteLabel.style.cssText = `color: #4ecca3; font-size: 12px; margin-bottom: 6px; display: block;`;
 
-        const styleField = buildSelect('Character style', 'avatar-style', ['Minimalist', 'Futuristic', 'Pixel', 'Shadow']);
-        const paletteField = buildSelect('Color palette', 'avatar-palette', ['Neon', 'Earth', 'Pastel', 'Mono']);
-        const accessoryField = buildSelect('Accessories', 'avatar-accessory', ['None', 'Hat', 'Glasses', 'Backpack']);
-        const animationField = buildSelect('Animation style', 'avatar-animation', ['None', 'Bounce', 'Spin', 'Wiggle']);
+        const spriteSelect = document.createElement('select');
+        spriteSelect.id = 'avatar-sprite';
+        spriteSelect.style.cssText = `
+          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
+          padding: 10px; color: #e0e0e0; font-family: 'Courier New', monospace;
+          max-height: 200px; overflow-y: auto;
+        `;
+        
+        spriteOptions.forEach(sprite => {
+          const option = document.createElement('option');
+          option.value = sprite;
+          option.textContent = sprite.replace('.png', '');
+          if (sprite === 'minimalist.png') option.selected = true;
+          spriteSelect.appendChild(option);
+        });
+
+        const spriteWrapper = document.createElement('div');
+        spriteWrapper.appendChild(spriteLabel);
+        spriteWrapper.appendChild(spriteSelect);
+        form.appendChild(spriteWrapper);
 
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
@@ -366,45 +329,28 @@ class GameLevelCssePath {
           cursor: pointer; margin-top: 10px;
         `;
 
-        const applyOptions = () => {
+        const applySprite = () => {
           const options = {
-            style: styleField.select.value,
-            palette: paletteField.select.value,
-            accessory: accessoryField.select.value,
-            animation: animationField.select.value,
+            sprite: spriteSelect.value,
           };
           this.applyAvatarOptions(options);
         };
 
-        [styleField.select, paletteField.select, accessoryField.select, animationField.select].forEach(select => {
-          select.addEventListener('change', applyOptions);
-        });
+        spriteSelect.addEventListener('change', applySprite);
 
-        form.appendChild(styleField.wrapper);
-        form.appendChild(paletteField.wrapper);
-        form.appendChild(accessoryField.wrapper);
-        form.appendChild(animationField.wrapper);
         overlay.appendChild(title);
         overlay.appendChild(description);
         overlay.appendChild(form);
         overlay.appendChild(closeBtn);
         document.body.appendChild(overlay);
 
-        const initialOptions = {
-          style: 'Minimalist',
-          palette: 'Neon',
-          accessory: 'None',
-          animation: 'None',
-        };
-        this.applyAvatarOptions(initialOptions);
+        // Apply default sprite
+        this.applyAvatarOptions({ sprite: 'minimalist.png' });
 
         closeBtn.addEventListener('click', () => {
           overlay.remove();
           resolve({
-            style: styleField.select.value,
-            palette: paletteField.select.value,
-            accessory: accessoryField.select.value,
-            animation: animationField.select.value,
+            sprite: spriteSelect.value,
           });
         });
       });
@@ -585,17 +531,17 @@ class GameLevelCssePath {
       if (distToAvatarGatekeeper < triggerDist && !csseState.avatarForgeDone) {
         csseState.interactCooldown = 180;
         await this.showDialogue('Avatar Forge Gatekeeper', [
-            'Welcome to the Avatar Forge. Customize your character and watch it update live!' 
+            'Welcome to the Avatar Forge. Choose your sprite and watch yourself transform live!' 
         ]);
 
         const avatarChoices = await this.showAvatarCustomForm();
         if (avatarChoices) {
           csseState.avatarForgeDone = true;
+          const spriteName = avatarChoices.sprite.replace('.png', '');
           await this.showDialogue('Avatar Forge Gatekeeper', [
-              `Avatar style set to ${avatarChoices.style}.`,
-              `Palette set to ${avatarChoices.palette}.`,
-              `Accessory: ${avatarChoices.accessory}.`,
-              `Animation: ${avatarChoices.animation}.`
+              `Your new form: ${spriteName}`,
+              'You have been forged in the Avatar Forge!',
+              'Your journey continues with your new appearance.'
           ]);
         }
       }
