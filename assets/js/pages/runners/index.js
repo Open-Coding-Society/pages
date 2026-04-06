@@ -1,5 +1,9 @@
 export { BaseRunner } from './core/BaseRunner.js';
 export { default } from './core/BaseRunner.js';
+export { EditorManager } from './core/EditorManager.js';
+export { StorageManager } from './core/StorageManager.js';
+export { StatsManager } from './core/StatsManager.js';
+export { ButtonFeedback } from './core/ButtonFeedback.js';
 export { CodeExecutor } from './executors/CodeExecutor.js';
 export { UiExecutor } from './executors/UiExecutor.js';
 export { GameExecutor } from './executors/GameExecutor.js';

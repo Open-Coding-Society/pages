@@ -1,3 +1,8 @@
+import { ButtonFeedback } from './ButtonFeedback.js';
+import { EditorManager } from './EditorManager.js';
+import { StatsManager } from './StatsManager.js';
+import { StorageManager } from './StorageManager.js';
+
 export class BaseRunner {
   constructor(container, options = {}) {
     if (!container) {
@@ -8,28 +13,36 @@ export class BaseRunner {
     this.containerId = container.id;
     this.storageKey = options.storageKey || container.dataset.storageKey || '';
     this.statusSelector = options.statusSelector || '.status-text';
-    this.statusElement = container.querySelector(this.statusSelector);
+
     this.editor = null;
     this.defaultCode = '';
     this.initialCode = '';
     this.currentCode = '';
+    this.trackStats = true;
+
+    this.storage = new StorageManager(this.storageKey);
+    this.stats = new StatsManager(container, { statusSelector: this.statusSelector });
+    this.editorManager = new EditorManager(container, {
+      containerId: this.containerId,
+      onChange: (code) => {
+        this.currentCode = code;
+        if (this.trackStats) {
+          this.stats.updateFromCode(code);
+        }
+      },
+    });
   }
 
   applyScopedStyle(cssText) {
-    const style = document.createElement('style');
-    style.textContent = cssText;
-    document.head.appendChild(style);
-    return style;
+    return this.editorManager.applyScopedStyle(cssText);
   }
 
   setCodeMirrorHeight(height = '300px') {
-    return this.applyScopedStyle(`#${this.containerId} .CodeMirror { height: ${height}; }`);
+    return this.editorManager.setCodeMirrorHeight(height);
   }
 
   getStoredValue(fallback = '') {
-    if (!this.storageKey) return fallback;
-    const savedCode = localStorage.getItem(this.storageKey);
-    return savedCode !== null ? savedCode : fallback;
+    return this.storage.get(fallback);
   }
 
   initializeEditor({
@@ -43,94 +56,55 @@ export class BaseRunner {
     this.defaultCode = defaultCode ?? '';
     this.initialCode = this.getStoredValue(this.defaultCode);
     this.currentCode = this.initialCode || fallbackCode || '';
+    this.trackStats = trackStats;
 
-    if (!enabled) {
-      return null;
-    }
+    this.editor = this.editorManager.initialize({
+      initialCode: this.currentCode,
+      editorHeight,
+      enabled,
+      fallbackCode,
+      codeMirrorOptions,
+      trackChanges: true,
+    });
 
-    const textarea = this.container.querySelector('.editor-textarea');
-    if (!textarea || typeof CodeMirror === 'undefined') {
-      console.warn(`Runner ${this.containerId}: CodeMirror editor unavailable`);
-      return null;
-    }
-
-    this.setCodeMirrorHeight(editorHeight || '300px');
-    this.editor = CodeMirror.fromTextArea(textarea, codeMirrorOptions);
-    this.editor.setValue(this.currentCode);
-
-    if (trackStats) {
-      this.editor.on('change', () => {
-        this.currentCode = this.editor.getValue();
-        this.updateStats();
-      });
-      this.updateStats();
+    if (this.trackStats) {
+      this.stats.updateFromCode(this.currentCode);
     }
 
     return this.editor;
   }
 
   getValue() {
-    if (this.editor) {
-      return this.editor.getValue();
-    }
-    return this.currentCode ?? this.initialCode ?? this.defaultCode ?? '';
+    return this.editorManager.getValue(this.currentCode ?? this.initialCode ?? this.defaultCode ?? '');
   }
 
   setValue(value = '') {
     this.currentCode = value;
-    if (this.editor) {
-      this.editor.setValue(value);
-      return;
-    }
-
-    const textarea = this.container.querySelector('.editor-textarea');
-    if (textarea) {
-      textarea.value = value;
+    this.editorManager.setValue(value);
+    if (this.trackStats) {
+      this.stats.updateFromCode(value);
     }
   }
 
   updateStats() {
-    if (!this.editor) return;
-
-    const code = this.editor.getValue();
-    const lineCountSpan = this.container.querySelector('.lineCount');
-    const charCountSpan = this.container.querySelector('.charCount');
-
-    if (lineCountSpan) {
-      lineCountSpan.textContent = `Lines: ${code.split('\n').length}`;
-    }
-    if (charCountSpan) {
-      charCountSpan.textContent = `Characters: ${code.length}`;
-    }
+    this.stats.updateFromCode(this.getValue());
   }
 
   updateStatus(status) {
-    if (this.statusElement) {
-      this.statusElement.textContent = status;
-    }
+    this.stats.updateStatus(status);
   }
 
   saveToStorage(value = this.getValue()) {
-    if (this.storageKey) {
-      localStorage.setItem(this.storageKey, value);
-    }
     this.currentCode = value;
-    return value;
+    return this.storage.save(value);
   }
 
   clearStorage() {
-    if (this.storageKey) {
-      localStorage.removeItem(this.storageKey);
-    }
+    this.storage.clear();
   }
 
   flashButton(button, temporaryLabel = '✔', duration = 2000) {
-    if (!button) return;
-    const original = button.innerHTML;
-    button.innerHTML = temporaryLabel;
-    setTimeout(() => {
-      button.innerHTML = original;
-    }, duration);
+    ButtonFeedback.flash(button, temporaryLabel, duration);
   }
 
   bindButton(selector, handler) {
@@ -199,14 +173,7 @@ export class BaseRunner {
   }
 
   bindShortcut(handler) {
-    if (!this.editor || typeof handler !== 'function') return;
-
-    const existing = this.editor.getOption('extraKeys') || {};
-    this.editor.setOption('extraKeys', {
-      ...existing,
-      'Ctrl-Enter': handler,
-      'Cmd-Enter': handler,
-    });
+    this.editorManager.bindShortcut(handler);
   }
 }
 
