@@ -490,7 +490,8 @@ Check if this is a course lesson and determine which course context to use
 
   async function submitLinkToBackend(link, description) {
     if (!ASSIGNMENT_ID) throw new Error("Assignment ID not configured. Add assignment_id to this page's frontmatter.");
-    const { personId } = await resolveCurrentUser();
+    const { uid, personId } = await resolveCurrentUser();
+    const content = { type: 'link', url: link, notes: description };
     const res = await fetch(`${javaURI}/api/submissions/${ASSIGNMENT_ID}`, {
       ...fetchOptions,
       method: 'POST',
@@ -498,7 +499,7 @@ Check if this is a course lesson and determine which course context to use
         assignmentId: ASSIGNMENT_ID,
         submitterId: personId,
         isGroupSubmission: false,
-        content: link,
+        content,
         comment: description,
         isLate: false
       })
@@ -507,6 +508,13 @@ Check if this is a course lesson and determine which course context to use
       const e = await res.json().catch(() => ({}));
       throw new Error(e.error || res.statusText);
     }
+    // Dual-write to EshikaP1's grades system
+    const assignmentLabel = (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) ? ASSIGNMENT_NAME : String(ASSIGNMENT_ID);
+    await fetch(`${javaURI}/api/grades`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+    }).catch(() => {}); // non-blocking — don't fail submission if grades write fails
   }
 
   async function submitFilesToBackend(files, notes) {
@@ -514,6 +522,7 @@ Check if this is a course lesson and determine which course context to use
     const { uid, personId } = await resolveCurrentUser();
     const assignmentName = await resolveAssignmentName();
     for (const file of files) {
+      const content = { type: 'file', filename: file.name, notes: notes || '' };
       const fd = new FormData();
       fd.append('assignmentName', assignmentName);
       fd.append('userId', personId);
@@ -531,6 +540,13 @@ Check if this is a course lesson and determine which course context to use
         const e = await r.json().catch(() => ({}));
         throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
       }
+      // Dual-write to EshikaP1's grades system
+      const assignmentLabel = (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) ? ASSIGNMENT_NAME : String(ASSIGNMENT_ID);
+      await fetch(`${javaURI}/api/grades`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+      }).catch(() => {}); // non-blocking
     }
   }
 
@@ -1331,7 +1347,8 @@ Check if this is a course lesson and determine which course context to use
         btn.disabled = true;
         showStatusBlog('loading', 'Submitting...');
         try {
-          const { personId } = await resolveCurrentUserBlog();
+          const { uid, personId } = await resolveCurrentUserBlog();
+          const content = { type: 'link', url: link, notes: description };
           const res = await fetch(`${javaURI}/api/submissions/${ASSIGNMENT_ID}`, {
             ...fetchOptions,
             method: 'POST',
@@ -1339,7 +1356,7 @@ Check if this is a course lesson and determine which course context to use
               assignmentId: ASSIGNMENT_ID,
               submitterId: personId,
               isGroupSubmission: false,
-              content: link,
+              content,
               comment: description,
               isLate: false
             })
@@ -1348,6 +1365,13 @@ Check if this is a course lesson and determine which course context to use
             const e = await res.json().catch(() => ({}));
             throw new Error(e.error || res.statusText);
           }
+          // Dual-write to EshikaP1's grades system
+          const assignmentLabel = (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) ? ASSIGNMENT_NAME : String(ASSIGNMENT_ID);
+          await fetch(`${javaURI}/api/grades`, {
+            ...fetchOptions,
+            method: 'POST',
+            body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+          }).catch(() => {});
           showStatusBlog('success', 'Link submitted successfully!');
           this.reset();
         } catch (err) {
@@ -1383,6 +1407,7 @@ Check if this is a course lesson and determine which course context to use
           }
           for (const file of selectedFilesBlog) {
             if (file.size > 10 * 1024 * 1024) throw new Error(`${file.name} exceeds 10MB limit.`);
+            const content = { type: 'file', filename: file.name, notes: notes || '' };
             const fd = new FormData();
             fd.append('assignmentName', assignmentName);
             fd.append('userId', personId);
@@ -1400,6 +1425,13 @@ Check if this is a course lesson and determine which course context to use
               const e = await r.json().catch(() => ({}));
               throw new Error(`Upload failed for ${file.name}: ` + (e.error || r.statusText));
             }
+            // Dual-write to EshikaP1's grades system
+            const assignmentLabel = (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) ? ASSIGNMENT_NAME : String(ASSIGNMENT_ID);
+            await fetch(`${javaURI}/api/grades`, {
+              ...fetchOptions,
+              method: 'POST',
+              body: JSON.stringify({ uid, assignment: assignmentLabel, score: null, submission: content, submittedAt: new Date().toISOString() })
+            }).catch(() => {});
           }
           showStatusBlog('success', `${selectedFilesBlog.length} file(s) submitted successfully!`);
           selectedFilesBlog = [];
