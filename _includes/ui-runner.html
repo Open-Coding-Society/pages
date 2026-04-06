@@ -30,7 +30,7 @@
 </div>
 
 <script type="module">
-import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+import { BaseRunner, UiExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
 
 (function() {
   const container = document.getElementById('ui-runner-{{ include.runner_id }}');
@@ -60,8 +60,10 @@ import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js'
   }
 
   const uiOutput = container.querySelector('.ui-output');
-
-  let currentExecution = null;
+  const uiExecutor = new UiExecutor({
+    editor,
+    outputElement: uiOutput,
+  });
 
   runner.bindEditorButtons({
     resetValue: defaultCode || "// Write your JavaScript code here",
@@ -74,11 +76,7 @@ import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js'
 
   // Stop execution
   function stopExecution() {
-    uiOutput.innerHTML = '';
-    if (currentExecution && currentExecution.stop) {
-      currentExecution.stop();
-    }
-    currentExecution = null;
+    uiExecutor.stop();
   }
 
   // Reset button
@@ -93,27 +91,7 @@ import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js'
 
   // Run button logic
   function runCode() {
-    const code = editor.getValue();
-    
-    // Clear previous output
-    stopExecution();
-    
-    try {
-      // Create a sandboxed execution context
-      const outputElement = uiOutput;
-      
-      // Create function with access to output element
-      const userFunction = new Function('outputElement', `
-        'use strict';
-        ${code}
-      `);
-      
-      // Execute user code
-      currentExecution = userFunction(outputElement);
-      
-    } catch (err) {
-      uiOutput.innerHTML = `<div style="color: red; padding: 1rem;">Error: ${err.message}</div>`;
-    }
+    return uiExecutor.run();
   }
 
   runner.bindButton('.runBtn', runCode);

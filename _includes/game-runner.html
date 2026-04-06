@@ -65,7 +65,7 @@
 </div>
 
 <script type="module">
-import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
 
 (function() {
   const container = document.getElementById('game-runner-{{ include.runner_id }}');
@@ -118,14 +118,20 @@ import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js'
   const levelSelect = container.querySelector('.levelSelect');
   const gameOutput = container.querySelector('.game-output');
   const statusText = container.querySelector('.status-text');
-  const lineCountSpan = container.querySelector('.lineCount');
-  const charCountSpan = container.querySelector('.charCount');
 
-  // Game state
-  let gameCore = null;  // Return value from Game.main()
-  let gameControl = null;  // The actual GameControl instance with pause/resume
-  let currentLevelIndex = 0;
-  let gameStateMonitor = null;  // Interval to monitor game state
+  const gameExecutor = new GameExecutor({
+    getCode: () => runner.getValue(),
+    updateStatus: (status) => runner.updateStatus(status),
+    runBtn,
+    pauseBtn,
+    stopBtn,
+    levelSelect,
+    engineVersionSelect,
+    getGameContainer: () => document.getElementById('game-container-{{ include.runner_id }}'),
+    configuredCanvasHeight,
+    path: '{{ site.baseurl }}',
+    getLevelOptionLabel,
+  });
 
   // Disable game controls initially
   pauseBtn.disabled = true;
@@ -146,193 +152,17 @@ import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js'
 
   // Stop game
   function stopGame() {
-    if (gameCore) {
-      try {
-        if (gameCore.destroy) {
-          gameCore.destroy();
-        }
-      } catch (e) {
-        console.warn('Error destroying game:', e);
-      }
-      gameCore = null;
-      gameControl = null;
-    }
-    
-    // Stop monitoring game state
-    if (gameStateMonitor) {
-      clearInterval(gameStateMonitor);
-      gameStateMonitor = null;
-    }
-    
-    // Get the game container and clear all remaining canvases
-    const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
-    
-    if (gameContainer) {
-      const canvases = gameContainer.querySelectorAll('canvas');
-      canvases.forEach(c => c.remove());
-    }
-    
-    updateStatus('Stopped');
-    runBtn.disabled = false;
-    pauseBtn.disabled = true;
-    stopBtn.disabled = true;
-    levelSelect.disabled = false;
+    gameExecutor.stop();
   }
 
   // Toggle pause/resume
   function togglePause() {
-    if (!gameControl) return;
-    
-    // Check actual game state
-    const currentlyPaused = gameControl.isPaused;
-    
-    if (currentlyPaused) {
-      // Resume - use pauseFeature if available, otherwise call resume directly
-      if (gameControl.pauseFeature && typeof gameControl.pauseFeature.hide === 'function') {
-        gameControl.pauseFeature.hide(); // This will call resume() internally and hide overlay
-      } else if (gameControl.resume) {
-        gameControl.resume();
-      }
-      updateStatus('Running');
-    } else {
-      // Pause - use pauseFeature to show menu if available, otherwise call pause directly
-      if (gameControl.pauseFeature && typeof gameControl.pauseFeature.show === 'function') {
-        gameControl.pauseFeature.show(); // This will call pause() internally and show menu overlay
-      } else if (gameControl.pause) {
-        gameControl.pause();
-      }
-      updateStatus('Paused');
-    }
+    gameExecutor.togglePause();
   }
 
   // Run game
   async function runGame() {
-    try {
-      stopGame(); // Stop any existing game
-      
-      // Get code from editor or use default code (for hide_edit mode)
-      let code = runner.getValue();
-      if (!code.trim()) {
-        updateStatus('Error: No code to run');
-        return;
-      }
-
-      updateStatus('Loading...');
-      runBtn.disabled = true;
-      pauseBtn.disabled = false;
-      pauseBtn.textContent = '⏸ Pause';
-      pauseBtn.title = 'Pause Game';
-      stopBtn.disabled = false;
-      levelSelect.disabled = true; // temporary while levels are being loaded
-
-      // Get container (GameEnv will use this reference directly)
-      const gameContainer = document.getElementById('game-container-{{ include.runner_id }}');
-      
-      // Setup game environment
-      const path = '{{ site.baseurl }}';
-      const baseUrl = window.location.origin + path;
-      
-      // Get selected engine version
-      const selectedVersion = engineVersionSelect ? engineVersionSelect.value : 'GameEnginev1';
-      
-      // Replace engine version in import paths (GameEnginev1 -> selected version)
-      code = code.replace(/GameEnginev1(?:\.1)?/g, selectedVersion);
-      
-      // Replace relative import paths with absolute URLs
-      // Match import statements and convert paths starting with / or relative paths to absolute URLs
-      code = code.replace(/from\s+['"](\/?[^'"]+)['"]/g, (match, importPath) => {
-        // If path starts with / or is relative, make it absolute
-        if (importPath.startsWith('/')) {
-          return `from '${baseUrl}${importPath}'`;
-        } else if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
-          return `from '${baseUrl}/${importPath}'`;
-        }
-        return match; // Already absolute
-      });
-      
-      // Import core Game engine (using selected version)
-      const GameModule = await import(baseUrl + '/assets/js/' + selectedVersion + '/essentials/Game.js');
-      const Game = GameModule.default;
-      
-      // Create a blob URL to execute user code as a module
-      const blob = new Blob([code], { type: 'application/javascript' });
-      const blobUrl = URL.createObjectURL(blob);
-      
-      try {
-        // Import the user's code as a module
-        const userModule = await import(blobUrl);
-        
-        // Get exports from user code
-        const GameControl = userModule.GameControl;
-        const gameLevelClasses = userModule.gameLevelClasses;
-        
-        if (!gameLevelClasses) {
-          throw new Error('Code must export gameLevelClasses');
-        }
-
-        // Get container dimensions for environment
-        const containerWidth = gameContainer.clientWidth || gameContainer.parentElement.clientWidth || 800;
-        const containerHeight = configuredCanvasHeight;
-
-        // Create environment object (GameEnv will create canvas dynamically)
-        const environment = {
-          path: path,
-          gameContainer: gameContainer,
-          gameLevelClasses: gameLevelClasses,
-          innerWidth: containerWidth,   // Override window.innerWidth
-          innerHeight: containerHeight,  // Override window.innerHeight
-          disablePauseMenu: true,  // Disable pause menu in game runner
-          disableContainerAdjustment: true  // Disable 40px offset for embedded context
-        };
-
-        // Populate level selector
-        levelSelect.innerHTML = '<option value="">Select Level...</option>';
-        for (let index = 0; index < gameLevelClasses.length; index++) {
-          const levelClass = gameLevelClasses[index];
-          const option = document.createElement('option');
-          option.value = String(index);
-          option.textContent = getLevelOptionLabel(levelClass, index);
-          levelSelect.appendChild(option);
-        }
-        if (gameLevelClasses.length > 0) {
-          levelSelect.value = "0";
-        }
-        levelSelect.disabled = gameLevelClasses.length <= 1;
-
-        // Start the game
-        gameCore = Game.main(environment, GameControl);
-        gameControl = gameCore.gameControl; // Get the actual GameControl instance
-        
-        updateStatus('Running');
-        
-        // Monitor game state to keep UI in sync (e.g., when PauseMenu's Resume button is clicked)
-        gameStateMonitor = setInterval(() => {
-          if (gameControl && gameControl.isPaused) {
-            updateStatus('Paused');
-          } else if (gameControl) {
-            updateStatus('Running');
-          }
-        }, 200);
-        
-      } finally {
-        // Clean up blob URL
-        URL.revokeObjectURL(blobUrl);
-      }
-
-    } catch (error) {
-      updateStatus('Error: ' + error.message);
-      console.error('Game error:', error);
-      runBtn.disabled = false;
-      pauseBtn.disabled = true;
-      stopBtn.disabled = true;
-      levelSelect.disabled = false;
-      
-      // Stop monitoring if error occurs
-      if (gameStateMonitor) {
-        clearInterval(gameStateMonitor);
-        gameStateMonitor = null;
-      }
-    }
+    return gameExecutor.run();
   }
 
   // Event listeners
@@ -347,16 +177,7 @@ import { BaseRunner } from '{{ site.baseurl }}/assets/js/pages/runners/index.js'
   }
 
   // Level selector
-  levelSelect.addEventListener('change', () => {
-    if (gameControl && levelSelect.value !== "") {
-      const levelIndex = parseInt(levelSelect.value);
-      if (gameControl.transitionToLevel) {
-        gameControl.currentLevelIndex = levelIndex;
-        gameControl.transitionToLevel();
-        updateStatus('Switched to ' + levelSelect.options[levelSelect.selectedIndex].text);
-      }
-    }
-  });
+  gameExecutor.bindLevelSelector();
 
   // Keyboard shortcuts (only if editor exists)
   runner.bindShortcut(runGame);
