@@ -5,9 +5,10 @@ import Npc from './essentials/Npc.js';
 import GameControl from './essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 
+
 const csseState = {
   interactCooldown: 0,
-  gatekeeperDone: false,
+  startGatekeeperDone: false,
   identityUnlocked: false,
 };
 
@@ -27,7 +28,7 @@ class GameLevelCssePath {
     // ── Player ───────────────────────────────────────────────────
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
-      id: 'Minimalist Identity',
+      id: 'Minimalist_Identity',
       greeting: "Hi I am a new adventurer on the CSSE pathway!",
       src: path + "/images/gamify/pathway/csse/player/minimalist.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
@@ -110,24 +111,126 @@ class GameLevelCssePath {
       });
     };
 
-    // ── Gatekeeper NPC (on the Start board) ─────────────────────
-    const gatekeeperPos = {
-      x: width * 0.08,   // adjust these to land on your Start board
-      y: height * 0.70,
+    // ── Gatekeepers ────────────────────────────────────────────
+    const startGatekeeperPos = {
+      x: width * 0.14,
+      y: height * 0.78,
     };
 
-    const npc_data_gatekeeper = {
+    const identityGatekeeperPos = {
+      x: width * 0.60,
+      y: height * 0.72,
+    };
+
+    const npc_data_startGatekeeper = {
       id: 'StartGatekeeper',
       greeting: "Welcome to the Path of Code...",
       src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
+      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
       pixels: { width: 1024, height: 1024 },
       orientation: { rows: 2, columns: 2 },
-      INIT_POSITION: { x: gatekeeperPos.x, y: gatekeeperPos.y },
+      INIT_POSITION: { x: startGatekeeperPos.x, y: startGatekeeperPos.y },
       down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
       up:   { row: 0, start: 1, columns: 1 },
-      hitbox: { widthPercentage: 0.15, heightPercentage: 0.2 },
+      left: { row: 1, start: 0, columns: 1 },
+      right: { row: 1, start: 1, columns: 1 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
+
+    const npc_data_identityGatekeeper = {
+      id: 'IdentityGatekeeper',
+      greeting: "This terminal is waiting for your identity...",
+      src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
+      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
+      ANIMATION_RATE: 50,
+      pixels: { width: 1024, height: 1024 },
+      orientation: { rows: 2, columns: 2 },
+      INIT_POSITION: { x: identityGatekeeperPos.x, y: identityGatekeeperPos.y },
+      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
+      up:   { row: 0, start: 1, columns: 1 },
+      left: { row: 1, start: 0, columns: 1 },
+      right: { row: 1, start: 1, columns: 1 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+    };
+
+    this.showIdentityForm = function() {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+          width: 90%; max-width: 500px; z-index: 10000;
+          background: #0d0d1a; border: 2px solid #4ecca3;
+          border-radius: 10px; padding: 24px 28px;
+          font-family: 'Courier New', monospace;
+          box-shadow: 0 0 30px rgba(78,204,163,0.25);
+          color: #e0e0e0;
+        `;
+
+        const title = document.createElement('div');
+        title.style.cssText = `
+          color: #4ecca3; font-size: 14px; font-weight: bold;
+          letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;
+          text-align: center;
+        `;
+        title.textContent = '⚔ Identity Terminal Setup';
+
+        const form = document.createElement('form');
+        form.style.cssText = `display: flex; flex-direction: column; gap: 12px;`;
+
+        const nameLabel = document.createElement('label');
+        nameLabel.textContent = 'Name:';
+        nameLabel.style.cssText = `color: #4ecca3; font-size: 12px;`;
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.required = true;
+        nameInput.style.cssText = `
+          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
+          padding: 8px; color: #e0e0e0; font-family: 'Courier New', monospace;
+        `;
+
+        const emailLabel = document.createElement('label');
+        emailLabel.textContent = 'Email:';
+        emailLabel.style.cssText = `color: #4ecca3; font-size: 12px;`;
+        const emailInput = document.createElement('input');
+        emailInput.type = 'email';
+        emailInput.required = true;
+        emailInput.style.cssText = `
+          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
+          padding: 8px; color: #e0e0e0; font-family: 'Courier New', monospace;
+        `;
+
+        const submitBtn = document.createElement('button');
+        submitBtn.type = 'submit';
+        submitBtn.textContent = 'Unlock Identity Terminal';
+        submitBtn.style.cssText = `
+          background: #4ecca3; color: #0d0d1a; border: none; border-radius: 4px;
+          padding: 10px; font-family: 'Courier New', monospace; font-weight: bold;
+          cursor: pointer; margin-top: 8px;
+        `;
+
+        form.appendChild(nameLabel);
+        form.appendChild(nameInput);
+        form.appendChild(emailLabel);
+        form.appendChild(emailInput);
+        form.appendChild(submitBtn);
+
+        overlay.appendChild(title);
+        overlay.appendChild(form);
+        document.body.appendChild(overlay);
+
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = nameInput.value.trim();
+          const email = emailInput.value.trim();
+          if (name && email) {
+            overlay.remove();
+            resolve({ name, email });
+          }
+        });
+      });
+    };
+
 
     // ── Collision loop ───────────────────────────────────────────
     const checkCollisions = async () => {
@@ -136,8 +239,8 @@ class GameLevelCssePath {
         return;
       }
 
-      // Find the player element by its id (matches player_data.id, spaces → underscores + _id)
-      const playerEl = document.getElementById('Minimalist_Identity_id')
+      // Find the player element by its id (matches player_data.id)
+      const playerEl = document.getElementById('Minimalist_Identity')
                     || document.querySelector('[id$="_id"]'); // fallback
 
       if (!playerEl) return;
@@ -145,37 +248,55 @@ class GameLevelCssePath {
       const playerX = parseFloat(playerEl.style.left || 0) + 50;
       const playerY = parseFloat(playerEl.style.top  || 0) + 50;
 
-      const distToGatekeeper = Math.hypot(
-        playerX - gatekeeperPos.x,
-        playerY - gatekeeperPos.y
+      const distToStartGatekeeper = Math.hypot(
+        playerX - startGatekeeperPos.x,
+        playerY - startGatekeeperPos.y
+      );
+      const distToIdentityGatekeeper = Math.hypot(
+        playerX - identityGatekeeperPos.x,
+        playerY - identityGatekeeperPos.y
       );
 
       const triggerDist = width * 0.12;
 
-      // ── Gatekeeper interaction ───────────────────────────────
-      if (distToGatekeeper < triggerDist && !csseState.gatekeeperDone) {
-        csseState.interactCooldown = 180; // 180 ticks cooldown (~36 sec at 200ms)
-        csseState.gatekeeperDone = true;
-
+      // ── Start gatekeeper interaction ─────────────────────────
+      if (distToStartGatekeeper < triggerDist && !csseState.startGatekeeperDone) {
+        csseState.interactCooldown = 180;
         await this.showDialogue('Gatekeeper', [
-            "Welcome to the Path of Code...\nBefore you build worlds…\nYou must define who you are…\n[ Identity Terminal — UNLOCKED ]"
+            "Welcome to the Path of Code...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are."
+        ]);
+        csseState.startGatekeeperDone = true;
+      }
+
+      // ── Identity terminal gatekeeper interaction ──────────────
+      if (distToIdentityGatekeeper < triggerDist && !csseState.identityUnlocked) {
+        csseState.interactCooldown = 180;
+        await this.showDialogue('Identity Gatekeeper', [
+            "This terminal is the key to your persona.\nPlease provide your identity to unlock access."
         ]);
 
-        // Unlock the Identity Terminal
-        csseState.identityUnlocked = true;
+        const identityData = await this.showIdentityForm();
+        if (identityData) {
+          csseState.identityUnlocked = true;
 
-        // Toast confirmation
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-          position: fixed; top: 20px; right: 20px; z-index: 99999;
-          background: #0d0d1a; border: 2px solid #4ecca3;
-          color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-          padding: 12px 20px; border-radius: 6px; letter-spacing: 1px;
-          box-shadow: 0 0 20px rgba(78,204,163,0.3);
-        `;
-        toast.textContent = '✦ Identity Terminal unlocked';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+          await this.showDialogue('Identity Gatekeeper', [
+              `Identity registered for ${identityData.name}.`,
+              'Identity Terminal unlocked.',
+              'Complete the identity setup before you can move on to the next module.'
+          ]);
+
+          const toast = document.createElement('div');
+          toast.style.cssText = `
+            position: fixed; top: 20px; right: 20px; z-index: 99999;
+            background: #0d0d1a; border: 2px solid #4ecca3;
+            color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
+            padding: 12px 20px; border-radius: 6px; letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(78,204,163,0.3);
+          `;
+          toast.textContent = '✦ Identity Terminal unlocked';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 3000);
+        }
       }
     };
 
@@ -186,7 +307,8 @@ class GameLevelCssePath {
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player,           data: player_data },
-      { class: Npc,              data: npc_data_gatekeeper },
+      { class: Npc,              data: npc_data_startGatekeeper },
+      { class: Npc,              data: npc_data_identityGatekeeper },
     ];
   }
 }
