@@ -21,9 +21,10 @@
           {% include admin_foundation.html %}
         {% endif %}
 
-        {% if page.grading %}
+        {% if page.grading_modules %}
           <div class="grading-actions-wrapper">
-            {% include grading_foundation.html %}
+            {% include microblog_foundation.html %}
+            {% include grading_modules.html %}
           </div>
         {% endif %}
 

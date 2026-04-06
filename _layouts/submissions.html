@@ -160,10 +160,10 @@ active_tab: submissions
     import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
     const apiUrl = `${javaURI}/api/assignment-submission-view/list`;
-    const userCurrentUrl = `${javaURI}/api/user/current`;
+    const userInfoUrl = `${javaURI}/api/assignment-submission-view/user-info`;
     
     let allSubmissions = [];
-    let userRoles = [];
+    let isAdmin = false;
 
     async function init() {
         try {
@@ -174,115 +174,184 @@ active_tab: submissions
             hideLoadingSpinners();
         } catch (error) {
             console.error('Error initializing submissions:', error);
+            showErrorMessage('Failed to initialize submissions dashboard');
         }
     }
 
     async function checkAdminStatus() {
         try {
-            const response = await fetch(userCurrentUrl, fetchOptions);
+            console.log('Checking admin status from:', userInfoUrl);
+            const response = await fetch(userInfoUrl, fetchOptions);
+            
             if (response.ok) {
-                const userData = await response.json();
-                userRoles = userData.roles || [];
-                const isAdmin = userRoles.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_TEACHER');
+                const userInfo = await response.json();
+                isAdmin = userInfo.isAdmin;
+                console.log('User is admin:', isAdmin);
+                
+                // Show admin tab only for admins
                 if (isAdmin) {
                     document.getElementById('tab-all-submissions').style.display = 'block';
                 }
+            } else {
+                console.warn('Could not fetch user info, status:', response.status);
             }
         } catch (error) {
             console.error('Error checking admin status:', error);
+            // Continue anyway - just won't show admin tab
         }
     }
 
     async function loadSubmissions() {
         try {
+            console.log('Fetching submissions from:', apiUrl);
             const response = await fetch(apiUrl, fetchOptions);
 
+            console.log('Response status:', response.status, 'ok:', response.ok);
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                console.error(`HTTP error! status: ${response.status}`);
+                
+                // Try to parse error message from response
+                let errorMsg = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.error) {
+                        errorMsg = errorData.error;
+                        console.error('Server error message:', errorMsg);
+                    }
+                } catch (parseError) {
+                    console.warn('Could not parse error response');
+                }
+                
+                throw new Error(`Failed to fetch submissions: ${errorMsg}`);
             }
 
-            const data = await response.json();
-            allSubmissions = data;
+            // Parse response as JSON
+            let data;
+            try {
+                data = await response.json();
+                console.log('Successfully parsed response, submissions count:', data.length);
+            } catch (parseError) {
+                console.error('Failed to parse JSON response:', parseError);
+                throw new Error('Invalid response format from server');
+            }
+
+            // Handle both array and null responses
+            allSubmissions = Array.isArray(data) ? data : [];
+            console.log('Set allSubmissions to', allSubmissions.length, 'items');
 
             displayUserSubmissions();
-            if (userRoles.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_TEACHER')) {
+            if (isAdmin) {
                 displayAllSubmissions();
             }
+            
         } catch (error) {
-            console.error('Error loading submissions:', error);
-            document.getElementById('my-submissions-container').innerHTML = 
-                '<div class="error-message">Error loading submissions. Please try again.</div>';
+            console.error('Error in loadSubmissions:', error);
+            console.error('Error type:', error.constructor.name);
+            console.error('Error message:', error.message);
+            console.error('Full error:', error);
+            
+            showErrorMessage(`Error loading submissions: ${error.message}`);
         }
     }
 
     function displayUserSubmissions() {
         const container = document.getElementById('my-submissions-container');
         
-        if (allSubmissions.length === 0) {
+        if (!allSubmissions || allSubmissions.length === 0) {
+            console.log('No submissions to display');
             container.innerHTML = '<div class="no-submissions">No submissions yet.</div>';
             return;
         }
 
-        const tableHTML = `
-            <table class="submissions-table">
-                <thead>
-                    <tr>
-                        <th>Assignment</th>
-                        <th>Status</th>
-                        <th>Grade</th>
-                        <th>Feedback</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${allSubmissions.map(submission => `
-                        <tr>
-                            <td><strong>${escapeHtml(submission.assignmentName)}</strong></td>
-                            <td>${getStatusBadge(submission)}</td>
-                            <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
-                            <td>${submission.feedback ? escapeHtml(submission.feedback.substring(0, 50)) + '...' : 'No feedback'}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
+        console.log('Displaying', allSubmissions.length, 'user submissions');
         
-        container.innerHTML = tableHTML;
+        try {
+            const tableHTML = `
+                <table class="submissions-table">
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Status</th>
+                            <th>Grade</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allSubmissions.map((submission, idx) => {
+                            try {
+                                return `
+                                    <tr>
+                                        <td><strong>${escapeHtml(submission.assignmentName || 'Unknown')}</strong></td>
+                                        <td>${getStatusBadge(submission)}</td>
+                                        <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                                        <td>${submission.feedback ? escapeHtml(submission.feedback.substring(0, 50)) + '...' : 'No feedback'}</td>
+                                    </tr>
+                                `;
+                            } catch (rowError) {
+                                console.error('Error rendering row', idx, ':', rowError);
+                                return `<tr><td colspan="4" style="color: red;">Error rendering submission</td></tr>`;
+                            }
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+            console.log('Successfully rendered submissions table');
+        } catch (error) {
+            console.error('Error rendering submissions table:', error);
+            container.innerHTML = '<div class="error-message">Error rendering submissions table. Please try again.</div>';
+        }
     }
 
     function displayAllSubmissions() {
         const container = document.getElementById('all-submissions-container');
         
-        if (allSubmissions.length === 0) {
+        if (!allSubmissions || allSubmissions.length === 0) {
             container.innerHTML = '<div class="no-submissions">No submissions found.</div>';
             return;
         }
 
-        const tableHTML = `
-            <table class="submissions-table">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Assignment</th>
-                        <th>Status</th>
-                        <th>Grade</th>
-                        <th>Comment</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${allSubmissions.map(submission => `
+        try {
+            const tableHTML = `
+                <table class="submissions-table">
+                    <thead>
                         <tr>
-                            <td><strong>${escapeHtml(submission.submitterName)}</strong></td>
-                            <td>${escapeHtml(submission.assignmentName)}</td>
-                            <td>${getStatusBadge(submission)}</td>
-                            <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
-                            <td>${submission.comment ? escapeHtml(submission.comment.substring(0, 50)) + '...' : 'No comment'}</td>
+                            <th>Student</th>
+                            <th>Assignment</th>
+                            <th>Status</th>
+                            <th>Grade</th>
+                            <th>Comment</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-        
-        container.innerHTML = tableHTML;
+                    </thead>
+                    <tbody>
+                        ${allSubmissions.map((submission, idx) => {
+                            try {
+                                return `
+                                    <tr>
+                                        <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
+                                        <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
+                                        <td>${getStatusBadge(submission)}</td>
+                                        <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                                        <td>${submission.comment ? escapeHtml(submission.comment.substring(0, 50)) + '...' : 'No comment'}</td>
+                                    </tr>
+                                `;
+                            } catch (rowError) {
+                                console.error('Error rendering admin row', idx, ':', rowError);
+                                return `<tr><td colspan="5" style="color: red;">Error rendering submission</td></tr>`;
+                            }
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+            console.log('Successfully rendered all submissions table');
+        } catch (error) {
+            console.error('Error rendering all submissions table:', error);
+            container.innerHTML = '<div class="error-message">Error rendering submissions table. Please try again.</div>';
+        }
     }
 
     function getStatusBadge(submission) {
@@ -293,6 +362,15 @@ active_tab: submissions
         } else {
             return '<span class="status-badge status-pending">Pending Review</span>';
         }
+    }
+
+    function showErrorMessage(message) {
+        const myContainer = document.getElementById('my-submissions-container');
+        const allContainer = document.getElementById('all-submissions-container');
+        const errorHTML = `<div class="error-message">${escapeHtml(message)}</div>`;
+        
+        if (myContainer) myContainer.innerHTML = errorHTML;
+        if (allContainer) allContainer.innerHTML = errorHTML;
     }
 
     function setupTabSwitcher() {
@@ -346,8 +424,8 @@ active_tab: submissions
         const statusFilter = document.getElementById('admin-filter-status').value;
 
         const filtered = allSubmissions.filter(sub => {
-            const assignmentMatch = sub.assignmentName.toLowerCase().includes(assignmentFilter);
-            const studentMatch = sub.submitterName.toLowerCase().includes(studentFilter);
+            const assignmentMatch = (sub.assignmentName || '').toLowerCase().includes(assignmentFilter);
+            const studentMatch = (sub.submitterName || '').toLowerCase().includes(studentFilter);
             const statusMatch = !statusFilter || getFilterStatus(sub) === statusFilter;
             
             return assignmentMatch && studentMatch && statusMatch;
@@ -373,8 +451,8 @@ active_tab: submissions
                 <tbody>
                     ${filtered.map(submission => `
                         <tr>
-                            <td><strong>${escapeHtml(submission.submitterName)}</strong></td>
-                            <td>${escapeHtml(submission.assignmentName)}</td>
+                            <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
+                            <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
                             <td>${getStatusBadge(submission)}</td>
                             <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
                             <td>${submission.comment ? escapeHtml(submission.comment.substring(0, 50)) + '...' : 'No comment'}</td>
@@ -398,8 +476,11 @@ active_tab: submissions
     }
 
     function hideLoadingSpinners() {
-        document.getElementById('my-submissions-loading').style.display = 'none';
-        document.getElementById('all-submissions-loading').style.display = 'none';
+        const myLoading = document.getElementById('my-submissions-loading');
+        const allLoading = document.getElementById('all-submissions-loading');
+        
+        if (myLoading) myLoading.style.display = 'none';
+        if (allLoading) allLoading.style.display = 'none';
     }
 
     function escapeHtml(text) {

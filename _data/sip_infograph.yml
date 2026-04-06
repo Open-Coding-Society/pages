@@ -3,6 +3,14 @@ Title: "Soroptimist International of Poway"
 Description: "A site analysis of sipoway.com identifying key organizational information and recommending UI improvements to better serve donors, volunteers, and program applicants."
 HeaderImage: "sip/sip_header.png"
 
+Links:
+  - label: "Deployed Site"
+    url: "https://sip.opencodingsociety.com/"
+  - label: "Frontend Repo"
+    url: "https://github.com/cspcodewarriors/codewarrior-pages"
+  - label: "Backend Repo"
+    url: "https://github.com/cspcodewarriors/codewarriorflask"
+
 Topics:
   - title: "Who They Are"
     image: "sip/sip_overview.jpg"

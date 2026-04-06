@@ -5,7 +5,7 @@ Description: "A Design-Based Research capstone building a Slack-style messaging 
 Topics:
   - title: "Slack Messaging Platform"
     image: "capstone/database_defenders.png"
-    link: "/capstone/slack-messaging/"
+    link: "/capstone/assignment-submission/"
     alt: "Slack Messaging Platform - Real-Time Collaborative Chat"
     keyPoints:
       - "Create/join channels with real-time Socket.IO message delivery"
@@ -38,7 +38,7 @@ Topics:
 
   - title: "AI-Powered Task List Integration"
     image: "capstone/database_defenders.png"
-    link: "/capstone/slack-messaging/"
+    link: "/capstone/assignment-submission/"
     alt: "AI Task Extraction - Auto-generate task lists from channel messages"
     keyPoints:
       - "Claude API reads channel messages and detects action items"
