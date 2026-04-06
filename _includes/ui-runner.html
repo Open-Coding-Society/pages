@@ -1,24 +1,21 @@
 <!-- Reusable UI Runner Component -->
 <div class="ui-runner-container" id="ui-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
-  <div class="challenge-box">
-    <h3>Challenge</h3>
-    <p>{{ include.challenge }}</p>
-  </div>
+  {% include runners/challenge-box.html challenge=include.challenge %}
 
-  <div class="editor-container">
-    <div class="control-panel">
+  {% capture ui_runner_top_controls %}
       <button type="button" class="runBtn" title="Run">▶</button>
       <button type="button" class="stopBtn" title="Stop">■</button>
       <button type="button" class="copyBtn" title="Copy Code">⎘</button>
       <button type="button" class="saveBtn" title="Save Code">💾</button>
       <button type="button" class="clearStorageBtn" title="Clear Storage">🗑</button>
-    </div>
-    <textarea class="editor-textarea"></textarea>
-    <div class="control-panel">
-      <span class="lineCount">Lines: 1</span>
-      <span class="charCount">Characters: 0</span>
-    </div>
-  </div>
+  {% endcapture %}
+  {% capture ui_runner_bottom_controls %}
+    {% include runners/editor-stats.html %}
+  {% endcapture %}
+  {% include runners/editor-container.html
+     top_controls=ui_runner_top_controls
+     bottom_controls=ui_runner_bottom_controls
+  %}
 
   <div class="output-container">
     <div class="control-panel">

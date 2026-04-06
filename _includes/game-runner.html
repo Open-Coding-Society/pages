@@ -4,13 +4,9 @@
   style="{% if include.width %}--gr-panel-width: {{ include.width }};{% endif %}{% if include.height %}--gr-canvas-height: {{ include.height }};{% endif %}{% if include.editor_height %}--gr-editor-height: {{ include.editor_height }};{% endif %}"
   {% endif %}>
   {% if include.hide_edit != 'true' %}
-  <div class="challenge-box">
-    <h3>Challenge</h3>
-    <p>{{ include.challenge }}</p>
-  </div>
+  {% include runners/challenge-box.html challenge=include.challenge %}
 
-  <div class="editor-container">
-    <div class="control-panel">
+  {% capture game_runner_top_controls %}
       <button type="button" class="runBtn" title="Start Game">▶ Start</button>
       <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
       <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
@@ -21,16 +17,19 @@
       <select class="levelSelect" title="Select Level">
         <option value="">Select Level...</option>
       </select>
-    </div>
-    <textarea class="editor-textarea"></textarea>
-    <div class="control-panel">
-      <span class="lineCount">Lines: 1</span>
-      <span class="charCount">Characters: 0</span>
+  {% endcapture %}
+  {% capture game_runner_bottom_actions %}
       <button type="button" class="copyBtn" title="Copy Code">📋 Copy</button>
       <button type="button" class="saveBtn" title="Save Code">💾 Save</button>
       <button type="button" class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
-    </div>
-  </div>
+  {% endcapture %}
+  {% capture game_runner_bottom_controls %}
+    {% include runners/editor-stats.html extra_controls=game_runner_bottom_actions %}
+  {% endcapture %}
+  {% include runners/editor-container.html
+     top_controls=game_runner_top_controls
+     bottom_controls=game_runner_bottom_controls
+  %}
   {% else %}
   <!-- Compact controls for hide_edit mode -->
   <div class="compact-controls">
@@ -71,7 +70,7 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   const container = document.getElementById('game-runner-{{ include.runner_id }}');
   if (!container) return;
   
-  const hideEdit = {{ include.hide_edit | default: 'false' }};
+  const hideEdit = "{{ include.hide_edit | default: 'false' }}" === "true";
   const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.editor_height }}";
   const canvasHeight = "{{ include.height }}";

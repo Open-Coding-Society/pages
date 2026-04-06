@@ -4,10 +4,8 @@
   data-runner-id="{{ include.runner_id }}"
   data-default-code="{{ include.code | jsonify | escape }}"
   data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
-  <div class="challenge-box">
-    <h3>Code Runner Challenge {% if include.challenge_number %}#{{ include.challenge_number }}{% endif %}</h3>
-    <p>{{ include.challenge }}</p>
-  </div>
+  {% capture code_runner_title %}Code Runner Challenge {% if include.challenge_number %}#{{ include.challenge_number }}{% endif %}{% endcapture %}
+  {% include runners/challenge-box.html title=code_runner_title challenge=include.challenge %}
 
   {% if include.source %}
   <details>
@@ -20,8 +18,7 @@
   </details>
   {% endif %}
 
-  <div class="editor-container">
-    <div class="control-panel">
+  {% capture code_runner_top_controls %}
       <button type="button" class="runBtn" title="Run">▶</button>
       <button type="button" class="copyBtn" title="Copy Code">⎘</button>
       <button type="button" class="saveBtn" title="Save Code">💾</button>
@@ -37,13 +34,14 @@
         <option value="18">18px</option>
         <option value="20">20px</option>
       </select>
-    </div>
-    <textarea class="editor-textarea"></textarea>
-    <div class="control-panel">
-      <span class="lineCount">Lines: 1</span>
-      <span class="charCount">Characters: 0</span>
-    </div>
-  </div>
+  {% endcapture %}
+  {% capture code_runner_bottom_controls %}
+    {% include runners/editor-stats.html %}
+  {% endcapture %}
+  {% include runners/editor-container.html
+     top_controls=code_runner_top_controls
+     bottom_controls=code_runner_bottom_controls
+  %}
 
   <div class="output-container">
     <div class="control-panel">
