@@ -294,78 +294,144 @@ class GameLevelCssePath {
         const overlay = document.createElement('div');
         overlay.style.cssText = `
           position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-          width: 92%; max-width: 520px; z-index: 10001;
+          width: 94%; max-width: 700px; max-height: 90vh; z-index: 10001;
           background: #0d0d1a; border: 2px solid #4ecca3;
           border-radius: 12px; padding: 24px 28px;
           font-family: 'Courier New', monospace;
           box-shadow: 0 0 30px rgba(78,204,163,0.25);
           color: #e0e0e0;
+          overflow-y: auto;
         `;
 
         const title = document.createElement('div');
         title.style.cssText = `
           color: #4ecca3; font-size: 16px; font-weight: bold;
           text-transform: uppercase; margin-bottom: 14px;
-          text-align: center;
+          text-align: center; position: sticky; top: 0; background: #0d0d1a; z-index: 1;
         `;
         title.textContent = '⚔ Avatar Forge Sprite Selector';
 
         const description = document.createElement('div');
         description.style.cssText = `
           color: #c7f2d4; font-size: 13px; margin-bottom: 18px; line-height: 1.6;
-          white-space: pre-wrap;
+          white-space: pre-wrap; position: sticky; top: 35px; background: #0d0d1a; z-index: 1;
         `;
-        description.textContent = 'Choose a sprite. Your character will update live as you select.';
+        description.textContent = 'Click any sprite to preview and select it.';
 
-        const form = document.createElement('form');
-        form.style.cssText = `display: flex; flex-direction: column; gap: 14px;`;
-
-        const spriteLabel = document.createElement('label');
-        spriteLabel.textContent = 'Select Sprite';
-        spriteLabel.style.cssText = `color: #4ecca3; font-size: 12px; margin-bottom: 6px; display: block;`;
-
-        const spriteSelect = document.createElement('select');
-        spriteSelect.id = 'avatar-sprite';
-        spriteSelect.style.cssText = `
-          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
-          padding: 10px; color: #e0e0e0; font-family: 'Courier New', monospace;
-          max-height: 200px; overflow-y: auto;
+        const spriteGrid = document.createElement('div');
+        spriteGrid.style.cssText = `
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+          gap: 12px; margin-bottom: 18px;
         `;
-        
+
+        let selectedSprite = 'minimalist.png';
+
         spriteOptions.forEach(sprite => {
-          const option = document.createElement('option');
-          option.value = sprite;
-          option.textContent = sprite.replace('.png', '');
-          if (sprite === 'minimalist.png') option.selected = true;
-          spriteSelect.appendChild(option);
-        });
+          const spriteContainer = document.createElement('div');
+          spriteContainer.style.cssText = `
+            background: #1a1a2e; border: 2px solid #4ecca3;
+            border-radius: 6px; padding: 8px; text-align: center;
+            cursor: pointer; transition: all 0.2s;
+            opacity: 0.7;
+          `;
 
-        const spriteWrapper = document.createElement('div');
-        spriteWrapper.appendChild(spriteLabel);
-        spriteWrapper.appendChild(spriteSelect);
-        form.appendChild(spriteWrapper);
+          const spriteImg = document.createElement('img');
+          spriteImg.src = path + "/images/gamify/pathway/csse/player/" + sprite;
+          spriteImg.style.cssText = `
+            max-width: 80px; max-height: 80px; 
+            image-rendering: pixelated; margin-bottom: 4px;
+          `;
+
+          const spriteLabel = document.createElement('div');
+          spriteLabel.textContent = sprite.replace('.png', '');
+          spriteLabel.style.cssText = `
+            font-size: 10px; color: #4ecca3; word-break: break-word;
+          `;
+
+          spriteContainer.appendChild(spriteImg);
+          spriteContainer.appendChild(spriteLabel);
+
+          spriteContainer.addEventListener('mouseenter', () => {
+            spriteContainer.style.cssText = `
+              background: #1a1a2e; border: 2px solid #4ecca3;
+              border-radius: 6px; padding: 8px; text-align: center;
+              cursor: pointer; transition: all 0.2s;
+              opacity: 1; box-shadow: 0 0 15px rgba(78,204,163,0.5);
+              transform: scale(1.05);
+            `;
+          });
+
+          spriteContainer.addEventListener('mouseleave', () => {
+            const isSelected = selectedSprite === sprite;
+            spriteContainer.style.cssText = `
+              background: ${isSelected ? '#2a2a4a' : '#1a1a2e'}; border: 2px solid ${isSelected ? '#7effff' : '#4ecca3'};
+              border-radius: 6px; padding: 8px; text-align: center;
+              cursor: pointer; transition: all 0.2s;
+              opacity: ${isSelected ? 1 : 0.7};
+            `;
+          });
+
+          spriteContainer.addEventListener('click', () => {
+            selectedSprite = sprite;
+            
+            // Update all sprites to show selection state
+            Array.from(spriteGrid.children).forEach(child => {
+              const childSprite = child.querySelector('div:last-child').textContent + '.png';
+              if (childSprite === sprite) {
+                child.style.cssText = `
+                  background: #2a2a4a; border: 2px solid #7effff;
+                  border-radius: 6px; padding: 8px; text-align: center;
+                  cursor: pointer; transition: all 0.2s;
+                  opacity: 1; box-shadow: 0 0 20px rgba(126,255,255,0.6);
+                `;
+              } else {
+                child.style.cssText = `
+                  background: #1a1a2e; border: 2px solid #4ecca3;
+                  border-radius: 6px; padding: 8px; text-align: center;
+                  cursor: pointer; transition: all 0.2s;
+                  opacity: 0.7;
+                `;
+              }
+            });
+
+            // Apply sprite change in real-time
+            this.applyAvatarOptions({ sprite });
+          });
+
+          spriteGrid.appendChild(spriteContainer);
+
+          // Highlight first sprite as default
+          if (sprite === 'minimalist.png') {
+            spriteContainer.style.cssText = `
+              background: #2a2a4a; border: 2px solid #7effff;
+              border-radius: 6px; padding: 8px; text-align: center;
+              cursor: pointer; transition: all 0.2s;
+              opacity: 1; box-shadow: 0 0 20px rgba(126,255,255,0.6);
+            `;
+          }
+        });
 
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.textContent = 'Done';
         closeBtn.style.cssText = `
           background: #4ecca3; color: #0d0d1a; border: none; border-radius: 4px;
-          padding: 12px; font-family: 'Courier New', monospace; font-weight: bold;
-          cursor: pointer; margin-top: 10px;
+          padding: 12px 24px; font-family: 'Courier New', monospace; font-weight: bold;
+          cursor: pointer; margin-top: 10px; width: 100%;
+          transition: all 0.2s;
         `;
 
-        const applySprite = () => {
-          const options = {
-            sprite: spriteSelect.value,
-          };
-          this.applyAvatarOptions(options);
-        };
+        closeBtn.addEventListener('mouseenter', () => {
+          closeBtn.style.background = '#7effff';
+        });
 
-        spriteSelect.addEventListener('change', applySprite);
+        closeBtn.addEventListener('mouseleave', () => {
+          closeBtn.style.background = '#4ecca3';
+        });
 
         overlay.appendChild(title);
         overlay.appendChild(description);
-        overlay.appendChild(form);
+        overlay.appendChild(spriteGrid);
         overlay.appendChild(closeBtn);
         document.body.appendChild(overlay);
 
@@ -375,7 +441,7 @@ class GameLevelCssePath {
         closeBtn.addEventListener('click', () => {
           overlay.remove();
           resolve({
-            sprite: spriteSelect.value,
+            sprite: selectedSprite,
           });
         });
       });
