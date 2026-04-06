@@ -224,14 +224,39 @@ class GameLevelCssePath {
       }
 
       const chosenSprite = options.sprite || 'minimalist.png';
+      const newSpritePath = path + "/images/gamify/pathway/csse/player/" + chosenSprite;
       
-      // Update the player sprite source
-      playerObj.data.src = path + "/images/gamify/pathway/csse/player/" + chosenSprite;
+      // Update the sprite source
+      playerObj.data.src = newSpritePath;
       
-      // Reload the sprite image
-      if (playerObj.loadImage) {
-        playerObj.loadImage();
-      }
+      // Create a new Image and load the sprite
+      playerObj.spriteSheet = new Image();
+      playerObj.spriteReady = false;
+      
+      playerObj.spriteSheet.onload = () => {
+        playerObj.spriteReady = true;
+        // Update canvas dimensions if needed
+        try {
+          if (!playerObj.spriteData.pixels || playerObj.spriteData.pixels.width === undefined) {
+            playerObj.spriteData.pixels = { 
+              width: playerObj.spriteSheet.naturalWidth, 
+              height: playerObj.spriteSheet.naturalHeight 
+            };
+          }
+          if (!playerObj.spriteData.orientation) {
+            playerObj.spriteData.orientation = { rows: 1, columns: 1 };
+          }
+          playerObj.resize();
+        } catch (err) {
+          console.warn('Error updating sprite dimensions', err);
+        }
+      };
+      
+      playerObj.spriteSheet.onerror = (e) => {
+        console.warn('Failed to load sprite:', newSpritePath, e);
+      };
+      
+      playerObj.spriteSheet.src = newSpritePath;
 
       this.updateProfilePanel({
         name: this.profileData?.name,
