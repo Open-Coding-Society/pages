@@ -14,6 +14,9 @@ const csseState = {
 };
 
 class GameLevelCssePath {
+  static levelId = 'csse-path';
+  static displayName = 'Identity Forge';
+
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
