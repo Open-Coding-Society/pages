@@ -88,6 +88,31 @@ class GameLevelCssePath {
         `;
         hint.textContent = 'Click anywhere to continue...';
 
+        const speakLine = (line) => {
+          if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') {
+            return;
+          }
+
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(String(line).replace(/\n/g, ' '));
+          utterance.rate = 0.9;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+
+          const voices = window.speechSynthesis.getVoices();
+          const preferredVoice =
+            voices.find(voice => voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('male')) ||
+            voices.find(voice => voice.lang.includes('en-AU')) ||
+            voices.find(voice => voice.name.toLowerCase().includes('male')) ||
+            voices[0];
+
+          if (preferredVoice) {
+            utterance.voice = preferredVoice;
+          }
+
+          window.speechSynthesis.speak(utterance);
+        };
+
         overlay.appendChild(speaker);
         overlay.appendChild(textEl);
         overlay.appendChild(hint);
@@ -97,7 +122,7 @@ class GameLevelCssePath {
 
         const showLine = () => {
           textEl.textContent = lines[index];
-          // Update hint on last line
+          speakLine(lines[index]);
           if (index === lines.length - 1) {
             hint.textContent = 'Click to close.';
           }
@@ -108,6 +133,9 @@ class GameLevelCssePath {
           if (index < lines.length) {
             showLine();
           } else {
+            if (window.speechSynthesis) {
+              window.speechSynthesis.cancel();
+            }
             overlay.remove();
             resolve();
           }
