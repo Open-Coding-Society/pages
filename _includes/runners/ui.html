@@ -1,6 +1,6 @@
 <!-- Reusable UI Runner Component -->
 <div class="ui-runner-container" id="ui-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
-  {% include runners/challenge-box.html challenge=include.challenge %}
+  {% include runners/fragments/challenge-box.html challenge=include.challenge %}
 
   {% capture ui_runner_top_controls %}
       <button type="button" class="runBtn" title="Run">▶</button>
@@ -10,9 +10,9 @@
       <button type="button" class="clearStorageBtn" title="Clear Storage">🗑</button>
   {% endcapture %}
   {% capture ui_runner_bottom_controls %}
-    {% include runners/editor-stats.html %}
+    {% include runners/fragments/editor-stats.html %}
   {% endcapture %}
-  {% include runners/editor-container.html
+  {% include runners/fragments/editor-container.html
      top_controls=ui_runner_top_controls
      bottom_controls=ui_runner_bottom_controls
   %}

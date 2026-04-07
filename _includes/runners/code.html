@@ -5,7 +5,7 @@
   data-default-code="{{ include.code | jsonify | escape }}"
   data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
   {% capture code_runner_title %}Code Runner Challenge {% if include.challenge_number %}#{{ include.challenge_number }}{% endif %}{% endcapture %}
-  {% include runners/challenge-box.html title=code_runner_title challenge=include.challenge %}
+  {% include runners/fragments/challenge-box.html title=code_runner_title challenge=include.challenge %}
 
   {% if include.source %}
   <details>
@@ -36,9 +36,9 @@
       </select>
   {% endcapture %}
   {% capture code_runner_bottom_controls %}
-    {% include runners/editor-stats.html %}
+    {% include runners/fragments/editor-stats.html %}
   {% endcapture %}
-  {% include runners/editor-container.html
+  {% include runners/fragments/editor-container.html
      top_controls=code_runner_top_controls
      bottom_controls=code_runner_bottom_controls
   %}
