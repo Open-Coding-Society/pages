@@ -23,6 +23,7 @@ class GameLevelCssePath {
     let path = gameEnv.path;
 
     // ── Background ──────────────────────────────────────────────
+    const image_src = path + "/images/gamify/pathway/csse/bg/indentity-forge-1.png";
     const bg_data = {
         name: GameLevelCssePath.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
@@ -30,11 +31,12 @@ class GameLevelCssePath {
     };
 
     // ── Player ───────────────────────────────────────────────────
+    const player_src = path + "/images/gamify/pathway/csse/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
       greeting: "Hi I am a new adventurer on the CSSE pathway!",
-      src: path + "/images/gamify/pathway/csse/player/minimalist.png",
+      src: player_src,
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
