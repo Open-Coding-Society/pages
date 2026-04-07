@@ -2,8 +2,8 @@
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
-import GameControl from './essentials/GameControl.js';
-import GameLevelStarWars from './GameLevelStarWars.js';
+import StatusPanel from './essentials/StatusPanel.js';
+import FormPanel from './essentials/FormPanel.js';
 
 
 const csseState = {
@@ -186,6 +186,52 @@ class GameLevelCssePath {
       ...(interact ? { interact } : {}),
     });
 
+    const uiTheme = {
+      background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
+      borderColor: 'var(--ocs-game-accent, #4ecca3)',
+      textColor: 'var(--ocs-game-text, #e0e0e0)',
+      secondaryTextColor: 'var(--ocs-game-muted, #c7f2d4)',
+      accentColor: 'var(--ocs-game-accent, #4ecca3)',
+      inputBackground: 'var(--ocs-game-surface-alt, #1a1a2e)',
+      buttonBackground: 'var(--ocs-game-accent, #4ecca3)',
+      buttonTextColor: 'var(--ocs-game-surface-contrast, #0d0d1a)',
+      secondaryButtonBackground: 'var(--ocs-game-surface-alt, #1a1a2e)',
+      secondaryButtonTextColor: 'var(--ocs-game-text, #e0e0e0)',
+      overlayBackground: 'var(--ocs-game-overlay, rgba(13,13,26,0.72))',
+      boxShadow: '0 0 20px rgba(78,204,163,0.18)',
+    };
+
+    const profilePanelConfig = {
+      id: 'csse-profile-panel',
+      title: 'PLAYER PROFILE',
+      fields: [
+        { key: 'name', label: 'Name', emptyValue: '—' },
+        { key: 'email', label: 'Email', emptyValue: '—' },
+        { key: 'github', label: 'GitHub', emptyValue: '—' },
+        { type: 'section', title: 'Avatar Sprite', marginTop: '8px' },
+        { key: 'sprite', label: 'Sprite', emptyValue: '—' },
+      ],
+      theme: uiTheme,
+    };
+
+    const identityFormConfig = {
+      id: 'csse-identity-terminal',
+      title: '⚔ Identity Terminal Setup',
+      description: "Make sure you're logged in.\nIf not, navigate to https://pages.opencodingsociety.com/login to create an account!",
+      submitLabel: 'Unlock Identity Terminal',
+      showCancel: true,
+      cancelLabel: 'Cancel',
+      fields: [
+        { name: 'name', label: 'Name:', type: 'text', required: true, autocomplete: 'name' },
+        { name: 'email', label: 'Email:', type: 'email', required: true, autocomplete: 'email' },
+        { name: 'github', label: 'GitHub Username:', type: 'text', required: true, autocomplete: 'username' },
+      ],
+      theme: uiTheme,
+    };
+
+    this.profilePanelView = new StatusPanel(profilePanelConfig);
+    this.identityFormView = new FormPanel(identityFormConfig);
+
     this.showToast = function(message) {
       const toast = document.createElement('div');
       toast.style.cssText = `
@@ -327,37 +373,18 @@ class GameLevelCssePath {
     });
 
     this.createProfilePanel = function() {
-      this.profilePanel = document.createElement('div');
-      this.profilePanel.style.cssText = `
-        position: fixed; top: 16px; left: 16px; z-index: 10000;
-        background: rgba(13,13,26,0.92); border: 1px solid #4ecca3;
-        border-radius: 10px; padding: 12px 14px;
-        width: 260px; font-family: 'Courier New', monospace;
-        color: #e0e0e0; box-shadow: 0 0 20px rgba(78,204,163,0.18);
-      `;
-      this.profilePanel.innerHTML = `
-        <div style="color: #4ecca3; font-size: 12px; letter-spacing: 1px; margin-bottom: 8px;">PLAYER PROFILE</div>
-        <div id="profile-name">Name: —</div>
-        <div id="profile-email">Email: —</div>
-        <div id="profile-github">GitHub: —</div>
-        <div style="margin-top: 8px; color: #4ecca3; font-size: 11px; letter-spacing: 1px;">Avatar Sprite</div>
-        <div id="profile-sprite">Sprite: —</div>
-      `;
-      document.body.appendChild(this.profilePanel);
+      this.profilePanel = this.profilePanelView.ensureMounted();
+      return this.profilePanel;
     };
 
     this.updateProfilePanel = function(profile = {}) {
-      if (!this.profilePanel) {
-        this.createProfilePanel();
-      }
-      const name = profile.name || '—';
-      const email = profile.email || '—';
-      const github = profile.github || '—';
-      const sprite = profile.sprite || '—';
-      this.profilePanel.querySelector('#profile-name').textContent = `Name: ${name}`;
-      this.profilePanel.querySelector('#profile-email').textContent = `Email: ${email}`;
-      this.profilePanel.querySelector('#profile-github').textContent = `GitHub: ${github}`;
-      this.profilePanel.querySelector('#profile-sprite').textContent = `Sprite: ${sprite}`;
+      this.createProfilePanel();
+      this.profilePanelView.update({
+        name: profile.name || '—',
+        email: profile.email || '—',
+        github: profile.github || '—',
+        sprite: profile.sprite || '—',
+      });
     };
 
     this.createProfilePanel();
@@ -598,104 +625,14 @@ class GameLevelCssePath {
     };
 
     this.showIdentityForm = function() {
-      return new Promise((resolve) => {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-          position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-          width: 90%; max-width: 520px; z-index: 10000;
-          background: #0d0d1a; border: 2px solid #4ecca3;
-          border-radius: 10px; padding: 24px 28px;
-          font-family: 'Courier New', monospace;
-          box-shadow: 0 0 30px rgba(78,204,163,0.25);
-          color: #e0e0e0;
-        `;
+      return this.identityFormView.show(this.profileData || {}).then((profile) => {
+        if (!profile) {
+          return null;
+        }
 
-        const title = document.createElement('div');
-        title.style.cssText = `
-          color: #4ecca3; font-size: 16px; font-weight: bold;
-          letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
-          text-align: center;
-        `;
-        title.textContent = '⚔ Identity Terminal Setup';
-
-        const message = document.createElement('div');
-        message.style.cssText = `
-          color: #c7f2d4; font-size: 12px; line-height: 1.6;
-          margin-bottom: 16px; white-space: pre-wrap;
-        `;
-        message.textContent = "Make sure you're logged in.\nIf not, navigate to https://pages.opencodingsociety.com/login to create an account!";
-
-        const form = document.createElement('form');
-        form.style.cssText = `display: flex; flex-direction: column; gap: 12px;`;
-
-        const nameLabel = document.createElement('label');
-        nameLabel.textContent = 'Name:';
-        nameLabel.style.cssText = `color: #4ecca3; font-size: 12px;`;
-        const nameInput = document.createElement('input');
-        nameInput.type = 'text';
-        nameInput.required = true;
-        nameInput.style.cssText = `
-          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
-          padding: 8px; color: #e0e0e0; font-family: 'Courier New', monospace;
-        `;
-
-        const emailLabel = document.createElement('label');
-        emailLabel.textContent = 'Email:';
-        emailLabel.style.cssText = `color: #4ecca3; font-size: 12px;`;
-        const emailInput = document.createElement('input');
-        emailInput.type = 'email';
-        emailInput.required = true;
-        emailInput.style.cssText = `
-          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
-          padding: 8px; color: #e0e0e0; font-family: 'Courier New', monospace;
-        `;
-
-        const githubLabel = document.createElement('label');
-        githubLabel.textContent = 'GitHub Username:';
-        githubLabel.style.cssText = `color: #4ecca3; font-size: 12px;`;
-        const githubInput = document.createElement('input');
-        githubInput.type = 'text';
-        githubInput.required = true;
-        githubInput.style.cssText = `
-          background: #1a1a2e; border: 1px solid #4ecca3; border-radius: 4px;
-          padding: 8px; color: #e0e0e0; font-family: 'Courier New', monospace;
-        `;
-
-        const submitBtn = document.createElement('button');
-        submitBtn.type = 'submit';
-        submitBtn.textContent = 'Unlock Identity Terminal';
-        submitBtn.style.cssText = `
-          background: #4ecca3; color: #0d0d1a; border: none; border-radius: 4px;
-          padding: 10px; font-family: 'Courier New', monospace; font-weight: bold;
-          cursor: pointer; margin-top: 8px;
-        `;
-
-        form.appendChild(nameLabel);
-        form.appendChild(nameInput);
-        form.appendChild(emailLabel);
-        form.appendChild(emailInput);
-        form.appendChild(githubLabel);
-        form.appendChild(githubInput);
-        form.appendChild(submitBtn);
-
-        overlay.appendChild(title);
-        overlay.appendChild(message);
-        overlay.appendChild(form);
-        document.body.appendChild(overlay);
-
-        form.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const name = nameInput.value.trim();
-          const email = emailInput.value.trim();
-          const github = githubInput.value.trim();
-          if (name && email && github) {
-            overlay.remove();
-            const profile = { name, email, github };
-            this.profileData = profile;
-            this.updateProfilePanel(profile);
-            resolve(profile);
-          }
-        });
+        this.profileData = profile;
+        this.updateProfilePanel(profile);
+        return profile;
       });
     };
 
