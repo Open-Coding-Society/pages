@@ -7,6 +7,7 @@ import GameLevelStarWars from './GameLevelStarWars.js';
 import StatusPanel from './essentials/StatusPanel.js';
 import FormPanel from './essentials/FormPanel.js';
 import AvatarPicker from './essentials/AvatarPicker.js';
+import DialogueSystem from './essentials/DialogueSystem.js';
 
 
 const csseState = {
@@ -59,93 +60,73 @@ class GameLevelCssePath {
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
 
-    // ── Dialogue overlay helper ──────────────────────────────────
-    // Shows lines one at a time; resolves when player clicks through all of them.
-    this.showDialogue = function(speakerName, lines) {
+    // ── Dialogue helper backed by DialogueSystem ─────────────────
+    this.levelDialogueSystem = new DialogueSystem({
+      id: 'csse-path-dialogue',
+      dialogues: [],
+      gameControl: gameEnv.gameControl,
+      enableVoice: true,
+      enableTypewriter: true,
+      typewriterSpeed: 24,
+      voiceRate: 0.9,
+    });
+
+    // Shows lines one at a time and resolves when the user presses Next/Close.
+    this.showDialogue = function(speakerName, lines, options = {}) {
+      const queue = Array.isArray(lines) ? lines.filter(Boolean) : [String(lines || '')];
+      if (queue.length === 0) {
+        return Promise.resolve();
+      }
+
       return new Promise((resolve) => {
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-          position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
-          width: 90%; max-width: 700px; z-index: 9999;
-          background: #0d0d1a; border: 2px solid #4ecca3;
-          border-radius: 10px; padding: 24px 28px;
-          font-family: 'Courier New', monospace;
-          box-shadow: 0 0 30px rgba(78,204,163,0.25);
-          color: #e0e0e0;
-        `;
+        let index = 0;
+        let finished = false;
 
-        const speaker = document.createElement('div');
-        speaker.style.cssText = `
-          color: #4ecca3; font-size: 12px; font-weight: bold;
-          letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
-        `;
-        speaker.textContent = `⚔ ${speakerName}`;
+        const finish = () => {
+          if (finished) {
+            return;
+          }
+          finished = true;
+          this.levelDialogueSystem.closeDialogue();
+          resolve();
+        };
 
-        const textEl = document.createElement('div');
-        textEl.style.cssText = `font-size: 15px; line-height: 1.8; min-height: 48px;`;
-
-        const hint = document.createElement('div');
-        hint.style.cssText = `
-          margin-top: 16px; text-align: right;
-          color: #4ecca3; font-size: 11px; letter-spacing: 1px;
-        `;
-        hint.textContent = 'Click anywhere to continue...';
-
-        const speakLine = (line) => {
-          if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === 'undefined') {
+        const showStep = () => {
+          if (finished) {
             return;
           }
 
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(String(line).replace(/\n/g, ' '));
-          utterance.rate = 0.9;
-          utterance.pitch = 1.0;
-          utterance.volume = 1.0;
+          const message = queue[index];
+          const isLast = index === queue.length - 1;
 
-          const voices = window.speechSynthesis.getVoices();
-          const preferredVoice =
-            voices.find(voice => voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('male')) ||
-            voices.find(voice => voice.lang.includes('en-AU')) ||
-            voices.find(voice => voice.name.toLowerCase().includes('male')) ||
-            voices[0];
+          this.levelDialogueSystem.closeDialogue();
+          this.levelDialogueSystem.showDialogue(
+            message,
+            speakerName,
+            options.avatarSrc || null,
+            options.spriteData || null,
+          );
 
-          if (preferredVoice) {
-            utterance.voice = preferredVoice;
-          }
+          this.levelDialogueSystem.closeBtn.textContent = isLast ? 'Close' : 'Skip';
+          this.levelDialogueSystem.closeBtn.onclick = () => finish();
 
-          window.speechSynthesis.speak(utterance);
+          this.levelDialogueSystem.addButtons([
+            {
+              text: isLast ? 'Done' : 'Next',
+              primary: true,
+              action: () => {
+                index += 1;
+                if (index < queue.length) {
+                  showStep();
+                } else {
+                  finish();
+                }
+              },
+            },
+          ]);
         };
 
-        overlay.appendChild(speaker);
-        overlay.appendChild(textEl);
-        overlay.appendChild(hint);
-        document.body.appendChild(overlay);
-
-        let index = 0;
-
-        const showLine = () => {
-          textEl.textContent = lines[index];
-          speakLine(lines[index]);
-          if (index === lines.length - 1) {
-            hint.textContent = 'Click to close.';
-          }
-        };
-
-        const advance = () => {
-          index++;
-          if (index < lines.length) {
-            showLine();
-          } else {
-            if (window.speechSynthesis) {
-              window.speechSynthesis.cancel();
-            }
-            overlay.remove();
-            resolve();
-          }
-        };
-
-        overlay.addEventListener('click', advance);
-        showLine();
+        showStep();
       });
     };
 
