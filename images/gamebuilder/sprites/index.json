@@ -1,8 +1,42 @@
 [
-    { "name": "Astronaut", "src": "astro.png", "rows": 4, "cols": 4 },
-    { "name": "Kirby", "src": "kirby.png", "rows": 1, "cols": 13 },
-    { "name": "Pew", "src": "pew.png", "rows": 4, "cols": 4 },
-    { "name": "Slime", "src": "slime.png", "rows": 4, "cols": 4 },
-    { "name": "Ufos", "src": "ufos.png", "rows": 4, "cols": 3 }
-
+  {
+    "name": "Astronaut",
+    "src": "astro.png",
+    "rows": 4,
+    "cols": 4,
+    "scaleFactor": 5,
+    "movementPreset": "four-row-8way"
+  },
+  {
+    "name": "Kirby",
+    "src": "kirby.png",
+    "rows": 1,
+    "cols": 13,
+    "scaleFactor": 6,
+    "movementPreset": "single-row"
+  },
+  {
+    "name": "Pew",
+    "src": "pew.png",
+    "rows": 4,
+    "cols": 4,
+    "scaleFactor": 5,
+    "movementPreset": "four-row-8way"
+  },
+  {
+    "name": "Slime",
+    "src": "slime.png",
+    "rows": 4,
+    "cols": 4,
+    "scaleFactor": 5,
+    "movementPreset": "four-row-8way"
+  },
+  {
+    "name": "Ufos",
+    "src": "ufos.png",
+    "rows": 4,
+    "cols": 3,
+    "scaleFactor": 5,
+    "movementPreset": "four-row-8way"
+  }
 ]

@@ -2,8 +2,11 @@
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
+import GameControl from './essentials/GameControl.js';
+import GameLevelStarWars from './GameLevelStarWars.js';
 import StatusPanel from './essentials/StatusPanel.js';
 import FormPanel from './essentials/FormPanel.js';
+import AvatarPicker from './essentials/AvatarPicker.js';
 
 
 const csseState = {
@@ -231,6 +234,113 @@ class GameLevelCssePath {
 
     this.profilePanelView = new StatusPanel(profilePanelConfig);
     this.identityFormView = new FormPanel(identityFormConfig);
+    this.avatarPickerView = new AvatarPicker({
+      id: 'csse-avatar-picker',
+      title: '⚔ Avatar Forge Sprite Selector',
+      description: 'Tap any sprite to preview it. Use Done to keep your choice.',
+      confirmLabel: 'Done',
+      cancelLabel: 'Cancel',
+      showCancel: true,
+      theme: uiTheme,
+    });
+
+    this.getAvatarCatalog = async function() {
+      if (this.avatarCatalog) {
+        return this.avatarCatalog;
+      }
+
+      const fallbackCatalog = [
+        {
+          name: 'Minimalist',
+          src: `${path}/images/gamify/pathway/csse/player/minimalist.png`,
+          rows: 2,
+          cols: 2,
+          scaleFactor: PLAYER_SCALE_FACTOR,
+          movementPreset: 'two-row-8way',
+          previewText: '2×2 starter sprite',
+        },
+      ];
+
+      try {
+        const response = await fetch(`${path}/images/gamebuilder/sprites/index.json`, { cache: 'no-cache' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const manifest = await response.json();
+        const manifestSprites = Array.isArray(manifest)
+          ? manifest.map((entry) => ({
+              name: entry.name,
+              src: `${path}/images/gamebuilder/sprites/${entry.src}`,
+              rows: entry.rows || 1,
+              cols: entry.cols || 1,
+              scaleFactor: entry.scaleFactor || PLAYER_SCALE_FACTOR,
+              movementPreset: entry.movementPreset || (entry.rows >= 4 ? 'four-row-8way' : 'single-row'),
+              previewText: `${entry.rows || 1}×${entry.cols || 1} spritesheet`,
+            }))
+          : [];
+
+        const seen = new Set();
+        this.avatarCatalog = [...fallbackCatalog, ...manifestSprites].filter((sprite) => {
+          if (!sprite?.src || seen.has(sprite.src)) {
+            return false;
+          }
+          seen.add(sprite.src);
+          return true;
+        });
+      } catch (error) {
+        console.warn('Avatar Forge: failed to load sprite catalog', error);
+        this.avatarCatalog = fallbackCatalog;
+      }
+
+      return this.avatarCatalog;
+    };
+
+    this.getAvatarMovementConfig = function(spriteMeta = {}) {
+      const rows = Math.max(1, Number(spriteMeta.rows || 1));
+      const columns = Math.max(1, Number(spriteMeta.cols || 1));
+      const preset = spriteMeta.movementPreset || (rows >= 4 ? 'four-row-8way' : 'single-row');
+
+      if (preset === 'two-row-8way') {
+        return {
+          orientation: { rows, columns },
+          down: { row: 0, start: 0, columns: 1 },
+          downRight: { row: 0, start: 0, columns: 1, rotate: Math.PI / 16 },
+          downLeft: { row: 0, start: 0, columns: 1, rotate: -Math.PI / 16 },
+          left: { row: Math.min(1, rows - 1), start: 0, columns: 1, mirror: true },
+          right: { row: Math.min(1, rows - 1), start: 0, columns: 1 },
+          up: { row: 0, start: Math.min(1, columns - 1), columns: 1 },
+          upLeft: { row: Math.min(1, rows - 1), start: 0, columns: 1, mirror: true, rotate: Math.PI / 16 },
+          upRight: { row: Math.min(1, rows - 1), start: 0, columns: 1, rotate: -Math.PI / 16 },
+        };
+      }
+
+      if (preset === 'single-row') {
+        return {
+          orientation: { rows, columns },
+          down: { row: 0, start: 0, columns },
+          downRight: { row: 0, start: 0, columns, rotate: Math.PI / 16 },
+          downLeft: { row: 0, start: 0, columns, rotate: -Math.PI / 16 },
+          left: { row: 0, start: 0, columns, mirror: true },
+          right: { row: 0, start: 0, columns },
+          up: { row: 0, start: 0, columns },
+          upLeft: { row: 0, start: 0, columns, mirror: true, rotate: Math.PI / 16 },
+          upRight: { row: 0, start: 0, columns, rotate: -Math.PI / 16 },
+        };
+      }
+
+      return {
+        orientation: { rows, columns },
+        down: { row: 0, start: 0, columns },
+        downRight: { row: Math.min(1, rows - 1), start: 0, columns, rotate: Math.PI / 16 },
+        downLeft: { row: Math.min(2, rows - 1), start: 0, columns, rotate: -Math.PI / 16 },
+        left: { row: Math.min(2, rows - 1), start: 0, columns },
+        right: { row: Math.min(1, rows - 1), start: 0, columns },
+        up: { row: Math.min(3, rows - 1), start: 0, columns },
+        upLeft: { row: Math.min(2, rows - 1), start: 0, columns, rotate: Math.PI / 16 },
+        upRight: { row: Math.min(1, rows - 1), start: 0, columns, rotate: -Math.PI / 16 },
+      };
+    };
 
     this.showToast = function(message) {
       const toast = document.createElement('div');
@@ -313,7 +423,7 @@ class GameLevelCssePath {
         if (!avatarChoices) return;
 
         csseState.avatarForgeDone = true;
-        const spriteName = avatarChoices.sprite.replace('.png', '');
+        const spriteName = avatarChoices.spriteMeta?.name || avatarChoices.sprite || 'Minimalist';
 
         if (npc?.spriteData) {
           npc.spriteData.greeting = `Your forged avatar is ${spriteName}.`;
@@ -400,228 +510,85 @@ class GameLevelCssePath {
         return;
       }
 
-      const chosenSprite = options.sprite || 'minimalist.png';
-      const newSpritePath = path + "/images/gamify/pathway/csse/player/" + chosenSprite;
-      
-      // Update the sprite source
+      const spriteMeta = typeof options.sprite === 'object'
+        ? options.sprite
+        : options.spriteMeta || {
+            name: 'Minimalist',
+            src: `${path}/images/gamify/pathway/csse/player/minimalist.png`,
+            rows: 2,
+            cols: 2,
+            scaleFactor: PLAYER_SCALE_FACTOR,
+            movementPreset: 'two-row-8way',
+          };
+
+      const newSpritePath = spriteMeta.src;
+      const movementConfig = this.getAvatarMovementConfig(spriteMeta);
+      const scaleFactor = Number(spriteMeta.scaleFactor || PLAYER_SCALE_FACTOR);
+
       playerObj.data.src = newSpritePath;
-      
-      // Create a new Image and load the sprite
+      playerObj.data.SCALE_FACTOR = scaleFactor;
+      playerObj.scaleFactor = scaleFactor;
+
+      Object.assign(playerObj.spriteData, movementConfig, {
+        src: newSpritePath,
+        SCALE_FACTOR: scaleFactor,
+      });
+
       playerObj.spriteSheet = new Image();
       playerObj.spriteReady = false;
-      
+
       playerObj.spriteSheet.onload = () => {
         playerObj.spriteReady = true;
-        // Update canvas dimensions if needed
         try {
-          if (!playerObj.spriteData.pixels || playerObj.spriteData.pixels.width === undefined) {
-            playerObj.spriteData.pixels = { 
-              width: playerObj.spriteSheet.naturalWidth, 
-              height: playerObj.spriteSheet.naturalHeight 
-            };
-          }
-          if (!playerObj.spriteData.orientation) {
-            playerObj.spriteData.orientation = { rows: 1, columns: 1 };
-          }
+          playerObj.spriteData.pixels = {
+            width: playerObj.spriteSheet.naturalWidth,
+            height: playerObj.spriteSheet.naturalHeight,
+          };
           playerObj.resize();
         } catch (err) {
           console.warn('Error updating sprite dimensions', err);
         }
       };
-      
+
       playerObj.spriteSheet.onerror = (e) => {
         console.warn('Failed to load sprite:', newSpritePath, e);
       };
-      
+
       playerObj.spriteSheet.src = newSpritePath;
 
-      this.updateProfilePanel({
-        name: this.profileData?.name,
-        email: this.profileData?.email,
-        github: this.profileData?.github,
-        sprite: chosenSprite,
-      });
+      this.profileData = {
+        ...this.profileData,
+        sprite: spriteMeta.name || 'Minimalist',
+        spriteSrc: newSpritePath,
+        spriteMeta,
+      };
+
+      this.updateProfilePanel(this.profileData);
     };
 
-    this.showAvatarCustomForm = function() {
-      return new Promise((resolve) => {
-        const spriteOptions = [
-          'minimalist.png',
-          'ufo.png',
-          'zombieNpc.png',
-          'worker.png',
-          'wizard.png',
-          'villager.png',
-          'tree.png',
-          'stockguy.png',
-          'spookMcWalk.png',
-          'shark.png',
-          'schwabbman.png',
-          'r2_idle.png',
-          'pilot.png',
-          'octopus.png',
-          'octocat.png',
-          'npc1.png',
-          'npc2.png',
-          'npc3.png',
-          'npc4.png',
-          'npc5.png'
-        ];
+    this.showAvatarCustomForm = async function() {
+      const sprites = await this.getAvatarCatalog();
+      const originalSprite = this.profileData?.spriteMeta || sprites[0];
 
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-          position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-          width: 94%; max-width: 700px; max-height: 90vh; z-index: 10001;
-          background: #0d0d1a; border: 2px solid #4ecca3;
-          border-radius: 12px; padding: 24px 28px;
-          font-family: 'Courier New', monospace;
-          box-shadow: 0 0 30px rgba(78,204,163,0.25);
-          color: #e0e0e0;
-          overflow-y: auto;
-        `;
-
-        const title = document.createElement('div');
-        title.style.cssText = `
-          color: #4ecca3; font-size: 16px; font-weight: bold;
-          text-transform: uppercase; margin-bottom: 14px;
-          text-align: center; position: sticky; top: 0; background: #0d0d1a; z-index: 1;
-        `;
-        title.textContent = '⚔ Avatar Forge Sprite Selector';
-
-        const description = document.createElement('div');
-        description.style.cssText = `
-          color: #c7f2d4; font-size: 13px; margin-bottom: 18px; line-height: 1.6;
-          white-space: pre-wrap; position: sticky; top: 35px; background: #0d0d1a; z-index: 1;
-        `;
-        description.textContent = 'Click any sprite to preview and select it.';
-
-        const spriteGrid = document.createElement('div');
-        spriteGrid.style.cssText = `
-          display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-          gap: 12px; margin-bottom: 18px;
-        `;
-
-        let selectedSprite = 'minimalist.png';
-
-        spriteOptions.forEach(sprite => {
-          const spriteContainer = document.createElement('div');
-          spriteContainer.style.cssText = `
-            background: #1a1a2e; border: 2px solid #4ecca3;
-            border-radius: 6px; padding: 8px; text-align: center;
-            cursor: pointer; transition: all 0.2s;
-            opacity: 0.7;
-          `;
-
-          const spriteImg = document.createElement('img');
-          spriteImg.src = path + "/images/gamify/pathway/csse/player/" + sprite;
-          spriteImg.style.cssText = `
-            max-width: 80px; max-height: 80px; 
-            image-rendering: pixelated; margin-bottom: 4px;
-          `;
-
-          const spriteLabel = document.createElement('div');
-          spriteLabel.textContent = sprite.replace('.png', '');
-          spriteLabel.style.cssText = `
-            font-size: 10px; color: #4ecca3; word-break: break-word;
-          `;
-
-          spriteContainer.appendChild(spriteImg);
-          spriteContainer.appendChild(spriteLabel);
-
-          spriteContainer.addEventListener('mouseenter', () => {
-            spriteContainer.style.cssText = `
-              background: #1a1a2e; border: 2px solid #4ecca3;
-              border-radius: 6px; padding: 8px; text-align: center;
-              cursor: pointer; transition: all 0.2s;
-              opacity: 1; box-shadow: 0 0 15px rgba(78,204,163,0.5);
-              transform: scale(1.05);
-            `;
-          });
-
-          spriteContainer.addEventListener('mouseleave', () => {
-            const isSelected = selectedSprite === sprite;
-            spriteContainer.style.cssText = `
-              background: ${isSelected ? '#2a2a4a' : '#1a1a2e'}; border: 2px solid ${isSelected ? '#7effff' : '#4ecca3'};
-              border-radius: 6px; padding: 8px; text-align: center;
-              cursor: pointer; transition: all 0.2s;
-              opacity: ${isSelected ? 1 : 0.7};
-            `;
-          });
-
-          spriteContainer.addEventListener('click', () => {
-            selectedSprite = sprite;
-            
-            // Update all sprites to show selection state
-            Array.from(spriteGrid.children).forEach(child => {
-              const childSprite = child.querySelector('div:last-child').textContent + '.png';
-              if (childSprite === sprite) {
-                child.style.cssText = `
-                  background: #2a2a4a; border: 2px solid #7effff;
-                  border-radius: 6px; padding: 8px; text-align: center;
-                  cursor: pointer; transition: all 0.2s;
-                  opacity: 1; box-shadow: 0 0 20px rgba(126,255,255,0.6);
-                `;
-              } else {
-                child.style.cssText = `
-                  background: #1a1a2e; border: 2px solid #4ecca3;
-                  border-radius: 6px; padding: 8px; text-align: center;
-                  cursor: pointer; transition: all 0.2s;
-                  opacity: 0.7;
-                `;
-              }
-            });
-
-            // Apply sprite change in real-time
-            this.applyAvatarOptions({ sprite });
-          });
-
-          spriteGrid.appendChild(spriteContainer);
-
-          // Highlight first sprite as default
-          if (sprite === 'minimalist.png') {
-            spriteContainer.style.cssText = `
-              background: #2a2a4a; border: 2px solid #7effff;
-              border-radius: 6px; padding: 8px; text-align: center;
-              cursor: pointer; transition: all 0.2s;
-              opacity: 1; box-shadow: 0 0 20px rgba(126,255,255,0.6);
-            `;
-          }
-        });
-
-        const closeBtn = document.createElement('button');
-        closeBtn.type = 'button';
-        closeBtn.textContent = 'Done';
-        closeBtn.style.cssText = `
-          background: #4ecca3; color: #0d0d1a; border: none; border-radius: 4px;
-          padding: 12px 24px; font-family: 'Courier New', monospace; font-weight: bold;
-          cursor: pointer; margin-top: 10px; width: 100%;
-          transition: all 0.2s;
-        `;
-
-        closeBtn.addEventListener('mouseenter', () => {
-          closeBtn.style.background = '#7effff';
-        });
-
-        closeBtn.addEventListener('mouseleave', () => {
-          closeBtn.style.background = '#4ecca3';
-        });
-
-        overlay.appendChild(title);
-        overlay.appendChild(description);
-        overlay.appendChild(spriteGrid);
-        overlay.appendChild(closeBtn);
-        document.body.appendChild(overlay);
-
-        // Apply default sprite
-        this.applyAvatarOptions({ sprite: 'minimalist.png' });
-
-        closeBtn.addEventListener('click', () => {
-          overlay.remove();
-          resolve({
-            sprite: selectedSprite,
-          });
-        });
+      const selectedSprite = await this.avatarPickerView.show({
+        sprites,
+        initialSelection: this.profileData?.spriteSrc || originalSprite?.src,
+        onPreview: (sprite) => {
+          this.applyAvatarOptions({ sprite });
+        },
       });
+
+      if (!selectedSprite) {
+        if (originalSprite) {
+          this.applyAvatarOptions({ sprite: originalSprite });
+        }
+        return null;
+      }
+
+      return {
+        sprite: selectedSprite.name,
+        spriteMeta: selectedSprite,
+      };
     };
 
     this.showIdentityForm = function() {
@@ -630,9 +597,12 @@ class GameLevelCssePath {
           return null;
         }
 
-        this.profileData = profile;
-        this.updateProfilePanel(profile);
-        return profile;
+        this.profileData = {
+          ...this.profileData,
+          ...profile,
+        };
+        this.updateProfilePanel(this.profileData);
+        return this.profileData;
       });
     };
 
