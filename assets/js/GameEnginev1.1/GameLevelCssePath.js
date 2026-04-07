@@ -7,8 +7,8 @@ import FormPanel from './essentials/FormPanel.js';
 import AvatarPicker from './essentials/AvatarPicker.js';
 import DialogueSystem from './essentials/DialogueSystem.js';
 
-
-const csseState = {
+// State: Track player progress and choices.
+const indentityState = {
   startGatekeeperDone: false,
   identityUnlocked: false,
   avatarForgeDone: false,
@@ -16,6 +16,9 @@ const csseState = {
   avatarFlowActive: false,
 };
 
+/**
+ * GameLevel CS Pathway - Identity Forge
+ */
 class GameLevelCssePath {
   static levelId = 'csse-path';
   static displayName = 'Identity Forge';
@@ -106,22 +109,20 @@ class GameLevelCssePath {
     /**
      * Section: Journey flow.
      */
-
-
     
     // Journey: Start gatekeeper intro.
     const npc_data_startGatekeeper = createGatekeeperData({
       id: 'StartGatekeeper',
-      greeting: "Welcome to the Path of Code...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
+      greeting: "Welcome to the Path of Code-Code-Coding...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
       position: startGatekeeperPos,
       reaction: () => {
-        if (csseState.startGatekeeperDone) return;
-        csseState.startGatekeeperDone = true;
+        if (indentityState.startGatekeeperDone) return;
+        indentityState.startGatekeeperDone = true;
         void level.showDialogue('Gatekeeper', [
-          'Welcome to the Path of Code...',
+          'Welcome to the Path of Code-Code-Coding...',
           'This adventure begins with your identity.',
           'Travel to the Identity Terminal to define who you are.',
-          'Then press E at each station to interact.'
+          'Interact with the gatekeeper to obtain guidance.'
         ]);
       },
     });
@@ -133,11 +134,11 @@ class GameLevelCssePath {
       greeting: "This terminal is waiting for your identity. Press E to verify it!",
       position: identityGatekeeperPos,
       reaction: function() {
-        void level.runIdentityTerminal(!csseState.identityUnlocked);
+        void level.runIdentityTerminal(!indentityState.identityUnlocked);
       },
       interact: async function() {
         await level.runIdentityTerminal(false);
-        if (csseState.identityUnlocked) {
+        if (indentityState.identityUnlocked) {
           this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the Avatar Forge.`;
         }
       },
@@ -145,11 +146,11 @@ class GameLevelCssePath {
     
     // Journey: Identity terminal flow.
     this.runIdentityTerminal = async function(showIntro = false) {
-      if (csseState.identityFlowActive) return;
-      csseState.identityFlowActive = true;
+      if (indentityState.identityFlowActive) return;
+      indentityState.identityFlowActive = true;
 
       try {
-        if (csseState.identityUnlocked) {
+        if (indentityState.identityUnlocked) {
           await this.showDialogue('Identity Gatekeeper', [
             this.profileData?.name
               ? `Identity already registered for ${this.profileData.name}.`
@@ -171,17 +172,17 @@ class GameLevelCssePath {
         const identityData = await this.showIdentityForm();
         if (!identityData) return;
 
-        csseState.identityUnlocked = true;
+        indentityState.identityUnlocked = true;
         await this.showDialogue('Identity Gatekeeper', [
           `Identity registered for ${identityData.name}.`,
+          `Email: ${identityData.email}`,
           `GitHub: ${identityData.github}`,
-          'Identity Terminal unlocked.',
-          'Complete the identity setup before you move on.'
+          'Identity Terminal unlocked.'
         ]);
 
         this.showToast('✦ Identity Terminal unlocked');
       } finally {
-        csseState.identityFlowActive = false;
+        indentityState.identityFlowActive = false;
       }
     };
 
@@ -218,11 +219,11 @@ class GameLevelCssePath {
 
     // Journey: Avatar forge flow.
     this.runAvatarForge = async function(showIntro = false, npc = null) {
-      if (csseState.avatarFlowActive) return;
-      csseState.avatarFlowActive = true;
+      if (indentityState.avatarFlowActive) return;
+      indentityState.avatarFlowActive = true;
 
       try {
-        if (!csseState.identityUnlocked) {
+        if (!indentityState.identityUnlocked) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
             'The Avatar Forge is locked.',
             'Complete the Identity Terminal first.'
@@ -232,17 +233,17 @@ class GameLevelCssePath {
 
         if (showIntro) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
-            csseState.avatarForgeDone
+            indentityState.avatarForgeDone
               ? 'Your forged avatar is ready. Opening the forge again.'
               : 'Welcome to the Avatar Forge.',
-            'Choose your sprite and watch yourself transform live!'
+            'Choose your sprite and watch yourself transform!'
           ]);
         }
 
         const avatarChoices = await this.showAvatarCustomForm();
         if (!avatarChoices) return;
 
-        csseState.avatarForgeDone = true;
+        indentityState.avatarForgeDone = true;
         const spriteName = avatarChoices.spriteMeta?.name || avatarChoices.sprite || 'Minimalist';
 
         if (npc?.spriteData) {
@@ -255,7 +256,7 @@ class GameLevelCssePath {
           'Your journey continues with your new appearance.'
         ]);
       } finally {
-        csseState.avatarFlowActive = false;
+        indentityState.avatarFlowActive = false;
       }
     };
 
@@ -638,7 +639,11 @@ class GameLevelCssePath {
       this.profilePanel = this.profilePanelView.ensureMounted();
       return this.profilePanel;
     };
-    this.createProfilePanel(); // safe now that the UI views exist
+    this.createProfilePanel(); // safe at the end to ensure it runs after dependencies set
+
+    /**
+     * Section: Level objects and classes.
+     */
 
     // Objects: Build level class list.
     this.classes = [
