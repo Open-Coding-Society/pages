@@ -527,7 +527,7 @@ startBtn.onclick = () => {
 };
 {% endcapture %}
 
-{% include ui-runner.html
+{% include runners/ui.html
    runner_id="flask_ui_check"
    challenge=challenge_flask_ui
    code=code_flask_ui

@@ -1,0 +1,185 @@
+<!-- Reusable Game Runner Component -->
+<div class="game-runner-container{% if include.hide_edit == 'true' %} hide-editor{% endif %}" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}"
+  {% if include.width or include.height or include.editor_height %}
+  style="{% if include.width %}--gr-panel-width: {{ include.width }};{% endif %}{% if include.height %}--gr-canvas-height: {{ include.height }};{% endif %}{% if include.editor_height %}--gr-editor-height: {{ include.editor_height }};{% endif %}"
+  {% endif %}>
+  {% if include.hide_edit != 'true' %}
+  {% include runners/fragments/challenge-box.html challenge=include.challenge %}
+
+  {% capture game_runner_top_controls %}
+      <button type="button" class="runBtn" title="Start Game">▶ Start</button>
+      <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
+      <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
+      <select class="engineVersionSelect" title="Select Game Engine Version">
+        <option value="GameEnginev1">Engine v1</option>
+        <option value="GameEnginev1.1" selected>Engine v1.1</option>
+      </select>
+      <select class="levelSelect" title="Select Level">
+        <option value="">Select Level...</option>
+      </select>
+  {% endcapture %}
+  {% capture game_runner_bottom_actions %}
+      <button type="button" class="copyBtn" title="Copy Code">📋 Copy</button>
+      <button type="button" class="saveBtn" title="Save Code">💾 Save</button>
+      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
+  {% endcapture %}
+  {% capture game_runner_bottom_controls %}
+    {% include runners/fragments/editor-stats.html extra_controls=game_runner_bottom_actions %}
+  {% endcapture %}
+  {% include runners/fragments/editor-container.html
+     top_controls=game_runner_top_controls
+     bottom_controls=game_runner_bottom_controls
+  %}
+  {% else %}
+  <!-- Compact controls for hide_edit mode -->
+  <div class="compact-controls">
+    <button type="button" class="runBtn" title="Start Game">▶ Play</button>
+    <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
+    <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
+    <select class="engineVersionSelect" title="Select Game Engine Version">
+      <option value="GameEnginev1">Engine v1</option>
+      <option value="GameEnginev1.1" selected>Engine v1.1</option>
+    </select>
+    <select class="levelSelect" title="Select Level">
+      <option value="">Select Level...</option>
+    </select>
+  </div>
+  {% endif %}
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span class="game-status">Game Status: 
+        <span class="status-text">Not Started</span> 
+      </span>
+      <span class="game-status"> 
+        <span id="{{ include.runner_id }}-metric"></span>
+      </span>
+    </div>
+    <div class="game-output" id="game-output-{{ include.runner_id }}">
+      <div id="game-container-{{ include.runner_id }}" class="gameContainer">
+        <!-- GameEnv will create canvas dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+
+(function() {
+  const container = document.getElementById('game-runner-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const hideEdit = "{{ include.hide_edit | default: 'false' }}" === "true";
+  const defaultCode = `{{ include.code }}`.trim();
+  const editorHeight = "{{ include.editor_height }}";
+  const canvasHeight = "{{ include.height }}";
+  const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
+  const storageKey = container.dataset.storageKey;
+
+  function parseCssSizeToPixels(value, fallback) {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  function getLevelOptionLabel(levelClass, index) {
+    return levelClass?.displayName
+      || levelClass?.levelName
+      || levelClass?.title
+      || levelClass?.levelId
+      || levelClass?.id
+      || levelClass?.name
+      || `Level ${index + 1}`;
+  }
+
+  const configuredCanvasHeight = parseCssSizeToPixels(canvasHeight, 580);
+  const runner = new BaseRunner(container, {
+    storageKey,
+    statusSelector: '.status-text'
+  });
+
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    enabled: !hideEdit,
+    codeMirrorOptions: {
+      mode: 'javascript',
+      theme: 'darcula',
+      lineNumbers: true
+    }
+  });
+
+  // Get UI elements
+  const runBtn = container.querySelector('.runBtn');
+  const pauseBtn = container.querySelector('.pauseBtn');
+  const stopBtn = container.querySelector('.stopBtn');
+  const engineVersionSelect = container.querySelector('.engineVersionSelect');
+  const levelSelect = container.querySelector('.levelSelect');
+  const gameOutput = container.querySelector('.game-output');
+  const statusText = container.querySelector('.status-text');
+
+  const gameExecutor = new GameExecutor({
+    getCode: () => runner.getValue(),
+    updateStatus: (status) => runner.updateStatus(status),
+    runBtn,
+    pauseBtn,
+    stopBtn,
+    levelSelect,
+    engineVersionSelect,
+    getGameContainer: () => document.getElementById('game-container-{{ include.runner_id }}'),
+    configuredCanvasHeight,
+    path: '{{ site.baseurl }}',
+    getLevelOptionLabel,
+  });
+
+  // Disable game controls initially
+  pauseBtn.disabled = true;
+  stopBtn.disabled = true;
+
+  // Update status
+  function updateStatus(status) {
+    runner.updateStatus(status);
+  }
+
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "",
+    onClear: () => {
+      stopGame();
+      updateStatus('Reset');
+    }
+  });
+
+  // Stop game
+  function stopGame() {
+    gameExecutor.stop();
+  }
+
+  // Toggle pause/resume
+  function togglePause() {
+    gameExecutor.togglePause();
+  }
+
+  // Run game
+  async function runGame() {
+    return gameExecutor.run();
+  }
+
+  // Event listeners
+  if (!runner.bindButton('.runBtn', runGame)) {
+    console.error('Game runner {{ include.runner_id }}: run button not found');
+  }
+
+  runner.bindButton('.pauseBtn', togglePause);
+
+  if (!runner.bindButton('.stopBtn', stopGame)) {
+    console.error('Game runner {{ include.runner_id }}: stop button not found');
+  }
+
+  // Level selector
+  gameExecutor.bindLevelSelector();
+
+  // Keyboard shortcuts (only if editor exists)
+  runner.bindShortcut(runGame);
+
+})();
+</script>
