@@ -7,10 +7,11 @@ import GameLevelStarWars from './GameLevelStarWars.js';
 
 
 const csseState = {
-  interactCooldown: 0,
   startGatekeeperDone: false,
   identityUnlocked: false,
   avatarForgeDone: false,
+  identityFlowActive: false,
+  avatarFlowActive: false,
 };
 
 class GameLevelCssePath {
@@ -118,6 +119,8 @@ class GameLevelCssePath {
     };
 
     // ── Gatekeepers ────────────────────────────────────────────
+    const level = this;
+
     const startGatekeeperPos = {
       x: width * 0.14,
       y: height * 0.78,
@@ -133,53 +136,167 @@ class GameLevelCssePath {
       y: height * 0.23,
     };
 
-    const npc_data_startGatekeeper = {
+    const gatekeeperBaseData = {
+      src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
+      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
+      ANIMATION_RATE: 50,
+      pixels: { width: 1024, height: 1024 },
+      orientation: { rows: 2, columns: 2 },
+      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
+      up: { row: 0, start: 1, columns: 1 },
+      left: { row: 1, start: 0, columns: 1 },
+      right: { row: 1, start: 1, columns: 1 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+    };
+
+    const createGatekeeperData = ({ id, greeting, position, reaction, interact }) => ({
+      ...gatekeeperBaseData,
+      id,
+      greeting,
+      INIT_POSITION: { ...position },
+      ...(reaction ? { reaction } : {}),
+      ...(interact ? { interact } : {}),
+    });
+
+    this.showToast = function(message) {
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 99999;
+        background: #0d0d1a; border: 2px solid #4ecca3;
+        color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
+        padding: 12px 20px; border-radius: 6px; letter-spacing: 1px;
+        box-shadow: 0 0 20px rgba(78,204,163,0.3);
+      `;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    };
+
+    this.runIdentityTerminal = async function(showIntro = false) {
+      if (csseState.identityFlowActive) return;
+      csseState.identityFlowActive = true;
+
+      try {
+        if (csseState.identityUnlocked) {
+          await this.showDialogue('Identity Gatekeeper', [
+            this.profileData?.name
+              ? `Identity already registered for ${this.profileData.name}.`
+              : 'Identity already registered.',
+            this.profileData?.github
+              ? `GitHub: ${this.profileData.github}`
+              : 'Your profile is saved.'
+          ]);
+          return;
+        }
+
+        if (showIntro) {
+          await this.showDialogue('Identity Gatekeeper', [
+            'This terminal is waiting for your identity.',
+            'Opening the Identity Terminal now.'
+          ]);
+        }
+
+        const identityData = await this.showIdentityForm();
+        if (!identityData) return;
+
+        csseState.identityUnlocked = true;
+        await this.showDialogue('Identity Gatekeeper', [
+          `Identity registered for ${identityData.name}.`,
+          `GitHub: ${identityData.github}`,
+          'Identity Terminal unlocked.',
+          'Complete the identity setup before you move on.'
+        ]);
+
+        this.showToast('✦ Identity Terminal unlocked');
+      } finally {
+        csseState.identityFlowActive = false;
+      }
+    };
+
+    this.runAvatarForge = async function(showIntro = false, npc = null) {
+      if (csseState.avatarFlowActive) return;
+      csseState.avatarFlowActive = true;
+
+      try {
+        if (!csseState.identityUnlocked) {
+          await this.showDialogue('Avatar Forge Gatekeeper', [
+            'The Avatar Forge is locked.',
+            'Complete the Identity Terminal first.'
+          ]);
+          return;
+        }
+
+        if (showIntro) {
+          await this.showDialogue('Avatar Forge Gatekeeper', [
+            csseState.avatarForgeDone
+              ? 'Your forged avatar is ready. Opening the forge again.'
+              : 'Welcome to the Avatar Forge.',
+            'Choose your sprite and watch yourself transform live!'
+          ]);
+        }
+
+        const avatarChoices = await this.showAvatarCustomForm();
+        if (!avatarChoices) return;
+
+        csseState.avatarForgeDone = true;
+        const spriteName = avatarChoices.sprite.replace('.png', '');
+
+        if (npc?.spriteData) {
+          npc.spriteData.greeting = `Your forged avatar is ${spriteName}.`;
+        }
+
+        await this.showDialogue('Avatar Forge Gatekeeper', [
+          `Your new form: ${spriteName}`,
+          'You have been forged in the Avatar Forge!',
+          'Your journey continues with your new appearance.'
+        ]);
+      } finally {
+        csseState.avatarFlowActive = false;
+      }
+    };
+
+    const npc_data_startGatekeeper = createGatekeeperData({
       id: 'StartGatekeeper',
       greeting: "Welcome to the Path of Code...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
-      src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
-      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
-      ANIMATION_RATE: 50,
-      pixels: { width: 1024, height: 1024 },
-      orientation: { rows: 2, columns: 2 },
-      INIT_POSITION: { x: startGatekeeperPos.x, y: startGatekeeperPos.y },
-      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
-      up:   { row: 0, start: 1, columns: 1 },
-      left: { row: 1, start: 0, columns: 1 },
-      right: { row: 1, start: 1, columns: 1 },
-      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
-    };
+      position: startGatekeeperPos,
+      reaction: () => {
+        if (csseState.startGatekeeperDone) return;
+        csseState.startGatekeeperDone = true;
+        void level.showDialogue('Gatekeeper', [
+          'Welcome to the Path of Code...',
+          'This adventure begins with your identity.',
+          'Travel to the Identity Terminal to define who you are.',
+          'Then press E at each station to interact.'
+        ]);
+      },
+    });
 
-    const npc_data_identityGatekeeper = {
+    const npc_data_identityGatekeeper = createGatekeeperData({
       id: 'IdentityGatekeeper',
-      greeting: "This terminal is waiting for your identity. Please wait for the pop-up to verify your identity!",
-      src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
-      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
-      ANIMATION_RATE: 50,
-      pixels: { width: 1024, height: 1024 },
-      orientation: { rows: 2, columns: 2 },
-      INIT_POSITION: { x: identityGatekeeperPos.x, y: identityGatekeeperPos.y },
-      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
-      up:   { row: 0, start: 1, columns: 1 },
-      left: { row: 1, start: 0, columns: 1 },
-      right: { row: 1, start: 1, columns: 1 },
-      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
-    };
+      greeting: "This terminal is waiting for your identity. Press E to verify it!",
+      position: identityGatekeeperPos,
+      reaction: function() {
+        void level.runIdentityTerminal(!csseState.identityUnlocked);
+      },
+      interact: async function() {
+        await level.runIdentityTerminal(false);
+        if (csseState.identityUnlocked) {
+          this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the Avatar Forge.`;
+        }
+      },
+    });
 
-    const npc_data_avatarGatekeeper = {
+    const npc_data_avatarGatekeeper = createGatekeeperData({
       id: 'AvatarGatekeeper',
       greeting: "Welcome to the Avatar Forge...\nChoose your look and watch your character update live!",
-      src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
-      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
-      ANIMATION_RATE: 50,
-      pixels: { width: 1024, height: 1024 },
-      orientation: { rows: 2, columns: 2 },
-      INIT_POSITION: { x: avatarGatekeeperPos.x, y: avatarGatekeeperPos.y },
-      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
-      up:   { row: 0, start: 1, columns: 1 },
-      left: { row: 1, start: 0, columns: 1 },
-      right: { row: 1, start: 1, columns: 1 },
-      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
-    };
+      position: avatarGatekeeperPos,
+      reaction: function() {
+        void level.runAvatarForge(true, this);
+      },
+      interact: async function() {
+        await level.runAvatarForge(false, this);
+      },
+    });
 
     this.createProfilePanel = function() {
       this.profilePanel = document.createElement('div');
@@ -554,97 +671,6 @@ class GameLevelCssePath {
       });
     };
 
-
-    // ── Collision loop ───────────────────────────────────────────
-    const checkCollisions = async () => {
-      if (csseState.interactCooldown > 0) {
-        csseState.interactCooldown--;
-        return;
-      }
-
-      // Find the player element by its id (matches player_data.id)
-      const playerEl = document.getElementById('Minimalist_Identity')
-                    || document.querySelector('[id$="_id"]'); // fallback
-
-      if (!playerEl) return;
-
-      const playerX = parseFloat(playerEl.style.left || 0) + 50;
-      const playerY = parseFloat(playerEl.style.top  || 0) + 50;
-
-      const distToStartGatekeeper = Math.hypot(
-        playerX - startGatekeeperPos.x,
-        playerY - startGatekeeperPos.y
-      );
-      const distToIdentityGatekeeper = Math.hypot(
-        playerX - identityGatekeeperPos.x,
-        playerY - identityGatekeeperPos.y
-      );
-      const distToAvatarGatekeeper = Math.hypot(
-        playerX - avatarGatekeeperPos.x,
-        playerY - avatarGatekeeperPos.y
-      );
-
-      const triggerDist = width * 0.12;
-
-      // ── Start gatekeeper interaction ─────────────────────────
-      if (distToStartGatekeeper < triggerDist && !csseState.startGatekeeperDone) {
-        csseState.interactCooldown = 180;
-        await this.showDialogue('Gatekeeper', [
-            "Welcome to the Path of Code...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are."
-        ]);
-        csseState.startGatekeeperDone = true;
-      }
-
-      // ── Identity terminal gatekeeper interaction ──────────────
-      if (distToIdentityGatekeeper < triggerDist && !csseState.identityUnlocked) {
-        csseState.interactCooldown = 180;
-        const identityData = await this.showIdentityForm();
-        if (identityData) {
-          csseState.identityUnlocked = true;
-
-          await this.showDialogue('Identity Gatekeeper', [
-              `Identity registered for ${identityData.name}.`,
-              `GitHub: ${identityData.github}`,
-              'Identity Terminal unlocked.',
-              'Complete the identity setup before you can move on to the next module.'
-          ]);
-
-          const toast = document.createElement('div');
-          toast.style.cssText = `
-            position: fixed; top: 20px; right: 20px; z-index: 99999;
-            background: #0d0d1a; border: 2px solid #4ecca3;
-            color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-            padding: 12px 20px; border-radius: 6px; letter-spacing: 1px;
-            box-shadow: 0 0 20px rgba(78,204,163,0.3);
-          `;
-          toast.textContent = '✦ Identity Terminal unlocked';
-          document.body.appendChild(toast);
-          setTimeout(() => toast.remove(), 3000);
-        }
-      }
-
-      // ── Avatar Forge gatekeeper interaction ───────────────────
-      if (distToAvatarGatekeeper < triggerDist && !csseState.avatarForgeDone) {
-        csseState.interactCooldown = 180;
-        await this.showDialogue('Avatar Forge Gatekeeper', [
-            'Welcome to the Avatar Forge. Choose your sprite and watch yourself transform live!' 
-        ]);
-
-        const avatarChoices = await this.showAvatarCustomForm();
-        if (avatarChoices) {
-          csseState.avatarForgeDone = true;
-          const spriteName = avatarChoices.sprite.replace('.png', '');
-          await this.showDialogue('Avatar Forge Gatekeeper', [
-              `Your new form: ${spriteName}`,
-              'You have been forged in the Avatar Forge!',
-              'Your journey continues with your new appearance.'
-          ]);
-        }
-      }
-    };
-
-    // Start the collision interval
-    setInterval(() => checkCollisions.call(this), 200);
 
     // ── Class list ───────────────────────────────────────────────
     this.classes = [
