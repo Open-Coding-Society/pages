@@ -46,6 +46,21 @@
     "cols": 1,
     "scaleFactor": 5,
     "movementPreset": "single-row"
+  },
+  {
+    "name": "Chill Guy",
+    "src": "chillguy.png",
+    "rows": 4,
+    "cols": 3,
+    "scaleFactor": 5,
+    "movementPreset": "four-row-8way"
+  },
+  {
+    "name": "Miku",
+    "src": "miku.png",
+    "rows": 4,
+    "cols": 3,
+    "scaleFactor": 5,
+    "movementPreset": "four-row-8way"
   }
-
 ]
