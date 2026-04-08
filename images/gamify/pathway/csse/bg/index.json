@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Identity Forge",
+    "src": "indentity-forge-1.png",
+    "description": "The original forge",
+    "previewText": "Default theme",
+    "compatibleSprites": ["Minimalist", "Fidelity Girl"]
+  },
+  {
+    "name": "Identity Forge Alt",
+    "src": "indentity-forge-2.png",
+    "description": "Alternative forge design",
+    "previewText": "Forge theme alt",
+    "compatibleSprites": ["Minimalist", "Fidelity Girl"]
+  },
+  {
+    "name": "City",
+    "src": "city.png",
+    "description": "Neon-lit urban sprawl",
+    "previewText": "Urban theme",
+    "compatibleSprites": ["Chill Guy", "Miku"]
+  },
+  {
+    "name": "Space",
+    "src": "space.png",
+    "description": "The void between stars",
+    "previewText": "Space theme",
+    "compatibleSprites": ["Astronaut", "Ufos", "Pew"]
+  },
+  {
+    "name": "Clouds",
+    "src": "clouds.png",
+    "description": "Floating islands of possibility",
+    "previewText": "Cloud theme",
+    "compatibleSprites": ["Kirby", "Slime"]
+  }
+]
