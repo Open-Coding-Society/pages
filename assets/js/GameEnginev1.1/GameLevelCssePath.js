@@ -103,11 +103,12 @@ class GameLevelCssePath {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
 
-    const createGatekeeperData = ({ id, greeting, position, reaction, interact }) => ({
+    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
       ...gatekeeperBaseData,
       id,
       greeting,
       INIT_POSITION: { ...position },
+      interactDistance: interactDistance || 120,
       ...(reaction ? { reaction } : {}),
       ...(interact ? { interact } : {}),
     });
@@ -129,11 +130,7 @@ class GameLevelCssePath {
           'Welcome to the Path of Code-Code-Coding...',
           'This adventure begins with your identity.',
           'Travel to the Identity Terminal to define who you are.',
-          'Interact with the gatekeeper to obtain guidance.',
-          'Then visit the World Theme Portal to shape your world.',
-          'Each world theme unlocks different avatar sprites!',
-          'Finally, forge your avatar in the Avatar Forge.',
-          'Press E at each station to interact.'
+          'Interact with the gatekeeper for guidance by pressing E at each station to interact.',
         ]);
       },
     });
@@ -148,6 +145,10 @@ class GameLevelCssePath {
         void level.runIdentityTerminal(!identityState.identityUnlocked);
       },
       interact: async function() {
+        await level.showDialogue('Identity Gatekeeper', [
+          'Welcome to the Identity Terminal.',
+          'Enter your name to begin your journey!'
+        ]);
         await level.runIdentityTerminal(false);
         if (identityState.identityUnlocked) {
           this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the World Theme Portal.`;
@@ -224,6 +225,10 @@ class GameLevelCssePath {
         void level.runAvatarForge(true, this);
       },
       interact: async function() {
+        await level.showDialogue('Avatar Forge Gatekeeper', [
+          'Welcome to the Avatar Forge.',
+          'Choose your look and watch your character update live!'
+        ]);
         await level.runAvatarForge(false, this);
       },
     });
@@ -283,8 +288,13 @@ class GameLevelCssePath {
         void level.runWorldThemePortal(true, this);
       },
       interact: async function() {
+        await level.showDialogue('World Theme Gatekeeper', [
+          'Welcome to the World Theme Portal.',
+          'Choose a background and watch your world transform live!'
+        ]);
         await level.runWorldThemePortal(false, this);
       },
+
     });
  
     // Journey: World Theme portal flow.

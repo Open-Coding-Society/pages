@@ -56,14 +56,51 @@ class Npc extends Character {
             this.patrol();
         }
         this.draw();
-        // Check if player is still in collision - add null checks
-        const players = this.gameEnv.gameObjects.filter(
-            obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
-        );
-        // Reset interaction state if player moved away
-        if (players.length === 0 && this.isInteracting) {
+
+        const nearPlayer = this.canInteractWithPlayer();
+        if (!nearPlayer && this.isInteracting) {
             this.isInteracting = false;
         }
+    }
+
+    findPlayer() {
+        return this.gameEnv?.gameObjects?.find(obj => obj && obj.constructor && obj.constructor.name === 'Player');
+    }
+
+    canInteractWithPlayer(interactDistance = 96) {
+        const player = this.findPlayer();
+        if (!player) return false;
+        const distance = this.spriteData?.interactDistance || interactDistance;
+        return this.isNear(player, distance);
+    }
+
+    isNearestNpcToPlayer() {
+        const player = this.findPlayer();
+        if (!player) return false;
+
+        const myDist = Math.hypot(
+            (this.position.x + this.width / 2) - (player.position.x + player.width / 2),
+            (this.position.y + this.height / 2) - (player.position.y + player.height / 2)
+        );
+
+        const allNpcs = this.gameEnv.gameObjects.filter(
+            obj => obj instanceof Npc && obj !== this && obj.canInteractWithPlayer()
+        );
+
+        // If no other NPCs are in range, we're automatically nearest
+        if (allNpcs.length === 0) return true;
+
+        return allNpcs.every(other => {
+            const otherDist = Math.hypot(
+                (other.position.x + other.width / 2) - (player.position.x + player.width / 2),
+                (other.position.y + other.height / 2) - (player.position.y + player.height / 2)
+            );
+            return myDist <= otherDist;
+        });
+    }
+
+    handleClick(event) {
+        this.handleKeyInteract();
     }
 
     /**
@@ -158,12 +195,13 @@ class Npc extends Character {
             obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
         );
         const hasInteract = this.interact !== undefined;
+        const nearPlayer = this.canInteractWithPlayer();
 
         // Only trigger interaction if:
-        // 1. Player is in collision with this NPC
+        // 1. Player is near this NPC (distance-based) or colliding with it
         // 2. NPC has an interact function
         // 3. Not already interacting
-        if (players.length > 0 && hasInteract && !this.isInteracting) {
+        if ((nearPlayer || players.length > 0) && hasInteract && !this.isInteracting) {
             this.isInteracting = true;
             
             // Store a reference to this NPC's interact function
