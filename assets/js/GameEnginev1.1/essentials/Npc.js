@@ -74,6 +74,31 @@ class Npc extends Character {
         return this.isNear(player, distance);
     }
 
+    isNearestNpcToPlayer() {
+        const player = this.findPlayer();
+        if (!player) return false;
+
+        const myDist = Math.hypot(
+            (this.position.x + this.width / 2) - (player.position.x + player.width / 2),
+            (this.position.y + this.height / 2) - (player.position.y + player.height / 2)
+        );
+
+        const allNpcs = this.gameEnv.gameObjects.filter(
+            obj => obj instanceof Npc && obj !== this && obj.canInteractWithPlayer()
+        );
+
+        // If no other NPCs are in range, we're automatically nearest
+        if (allNpcs.length === 0) return true;
+
+        return allNpcs.every(other => {
+            const otherDist = Math.hypot(
+                (other.position.x + other.width / 2) - (player.position.x + player.width / 2),
+                (other.position.y + other.height / 2) - (player.position.y + player.height / 2)
+            );
+            return myDist <= otherDist;
+        });
+    }
+
     handleClick(event) {
         this.handleKeyInteract();
     }

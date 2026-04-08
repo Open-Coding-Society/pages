@@ -108,7 +108,7 @@ class GameLevelCssePath {
       id,
       greeting,
       INIT_POSITION: { ...position },
-      interactDistance: interactDistance || 200,
+      interactDistance: interactDistance || 120,
       ...(reaction ? { reaction } : {}),
       ...(interact ? { interact } : {}),
     });
@@ -225,7 +225,7 @@ class GameLevelCssePath {
         void level.runAvatarForge(true, this);
       },
       interact: async function() {
-        await this.showDialogue('Avatar Forge Gatekeeper', [
+        await level.showDialogue('Avatar Forge Gatekeeper', [
           'Welcome to the Avatar Forge.',
           'Choose your look and watch your character update live!'
         ]);
