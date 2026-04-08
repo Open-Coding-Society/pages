@@ -8,8 +8,8 @@ import AvatarPicker from './essentials/AvatarPicker.js';
 import WorldThemePicker from './essentials/WorldThemePicker.js';
 import DialogueSystem from './essentials/DialogueSystem.js';
 
-
-const csseState = {
+// State: Track player progress and choices.
+const identityState = {
   startGatekeeperDone: false,
   identityUnlocked: false,
   avatarForgeDone: false,
@@ -19,6 +19,9 @@ const csseState = {
   worldThemeFlowActive: false,
 };
 
+/**
+ * GameLevel CS Pathway - Identity Forge
+ */
 class GameLevelCssePath {
   static levelId = 'csse-path';
   static displayName = 'Identity Forge';
@@ -33,7 +36,7 @@ class GameLevelCssePath {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/pathway/csse/bg/indentity-forge-1.png";
+    const image_src = path + "/images/gamify/pathway/csse/bg/identity-forge-1.png";
     const bg_data = {
         name: GameLevelCssePath.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
@@ -114,25 +117,20 @@ class GameLevelCssePath {
     /**
      * Section: Journey flow.
      */
-
-
     
     // Journey: Start gatekeeper intro.
     const npc_data_startGatekeeper = createGatekeeperData({
       id: 'StartGatekeeper',
-      greeting: "Welcome to the Path of Code...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
+      greeting: "Welcome to the Path of Code-Code-Coding...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
       position: startGatekeeperPos,
       reaction: () => {
-        if (csseState.startGatekeeperDone) return;
-        csseState.startGatekeeperDone = true;
+        if (identityState.startGatekeeperDone) return;
+        identityState.startGatekeeperDone = true;
         void level.showDialogue('Gatekeeper', [
-          'Welcome to the Path of Code...',
+          'Welcome to the Path of Code-Code-Coding...',
           'This adventure begins with your identity.',
           'Travel to the Identity Terminal to define who you are.',
-          'Then visit the World Theme Portal to shape your world.',
-          'Each world theme unlocks different avatar sprites!',
-          'Finally, forge your avatar in the Avatar Forge.',
-          'Press E at each station to interact.'
+          'Interact with the gatekeeper to obtain guidance.'
         ]);
       },
     });
@@ -144,23 +142,23 @@ class GameLevelCssePath {
       greeting: "This terminal is waiting for your identity. Press E to verify it!",
       position: identityGatekeeperPos,
       reaction: function() {
-        void level.runIdentityTerminal(!csseState.identityUnlocked);
+        void level.runIdentityTerminal(!identityState.identityUnlocked);
       },
       interact: async function() {
         await level.runIdentityTerminal(false);
-        if (csseState.identityUnlocked) {
-          this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the World Theme Portal.`;
+        if (identityState.identityUnlocked) {
+          this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the Avatar Forge.`;
         }
       },
     });
     
     // Journey: Identity terminal flow.
     this.runIdentityTerminal = async function(showIntro = false) {
-      if (csseState.identityFlowActive) return;
-      csseState.identityFlowActive = true;
+      if (identityState.identityFlowActive) return;
+      identityState.identityFlowActive = true;
 
       try {
-        if (csseState.identityUnlocked) {
+        if (identityState.identityUnlocked) {
           await this.showDialogue('Identity Gatekeeper', [
             this.profileData?.name
               ? `Identity already registered for ${this.profileData.name}.`
@@ -182,17 +180,17 @@ class GameLevelCssePath {
         const identityData = await this.showIdentityForm();
         if (!identityData) return;
 
-        csseState.identityUnlocked = true;
+        identityState.identityUnlocked = true;
         await this.showDialogue('Identity Gatekeeper', [
           `Identity registered for ${identityData.name}.`,
+          `Email: ${identityData.email}`,
           `GitHub: ${identityData.github}`,
-          'Identity Terminal unlocked.',
-          'Complete the identity setup before you move on.'
+          'Identity Terminal unlocked.'
         ]);
 
         this.showToast('✦ Identity Terminal unlocked');
       } finally {
-        csseState.identityFlowActive = false;
+        identityState.identityFlowActive = false;
       }
     };
 
@@ -229,11 +227,11 @@ class GameLevelCssePath {
 
     // Journey: Avatar forge flow.
     this.runAvatarForge = async function(showIntro = false, npc = null) {
-      if (csseState.avatarFlowActive) return;
-      csseState.avatarFlowActive = true;
+      if (identityState.avatarFlowActive) return;
+      identityState.avatarFlowActive = true;
 
       try {
-        if (!csseState.worldThemeDone) {
+        if (!identityState.identityUnlocked) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
             'The Avatar Forge is locked.',
             'Complete the World Theme Portal first.'
@@ -243,18 +241,17 @@ class GameLevelCssePath {
 
         if (showIntro) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
-            csseState.avatarForgeDone
+            identityState.avatarForgeDone
               ? 'Your forged avatar is ready. Opening the forge again.'
               : 'Welcome to the Avatar Forge.',
-            'Choose your sprite that matches your selected world theme!',
-            'Only compatible sprites for your world are available.'
+            'Choose your sprite and watch yourself transform!'
           ]);
         }
 
         const avatarChoices = await this.showAvatarCustomForm();
         if (!avatarChoices) return;
 
-        csseState.avatarForgeDone = true;
+        identityState.avatarForgeDone = true;
         const spriteName = avatarChoices.spriteMeta?.name || avatarChoices.sprite || 'Minimalist';
 
         if (npc?.spriteData) {
@@ -270,7 +267,7 @@ class GameLevelCssePath {
 
         this.showToast('✦ Avatar Forge completed');
       } finally {
-        csseState.avatarFlowActive = false;
+        identityState.avatarFlowActive = false;
       }
     };
 
@@ -900,7 +897,11 @@ class GameLevelCssePath {
       this.profilePanel = this.profilePanelView.ensureMounted();
       return this.profilePanel;
     };
-    this.createProfilePanel(); // safe now that the UI views exist
+    this.createProfilePanel(); // safe at the end to ensure it runs after dependencies set
+
+    /**
+     * Section: Level objects and classes.
+     */
 
     // Objects: Build level class list.
     this.classes = [
