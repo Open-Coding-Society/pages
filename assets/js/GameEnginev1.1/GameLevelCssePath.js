@@ -4,8 +4,7 @@ import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
 import StatusPanel from './essentials/StatusPanel.js';
 import FormPanel from './essentials/FormPanel.js';
-import AvatarPicker from './essentials/AvatarPicker.js';
-import WorldThemePicker from './essentials/WorldThemePicker.js';
+import Picker from './essentials/Picker.js';
 import DialogueSystem from './essentials/DialogueSystem.js';
 
 // State: Track player progress and choices.
@@ -449,7 +448,7 @@ class GameLevelCssePath {
      */
 
     // Picker: Avatar config.
-    this.avatarPickerView = new AvatarPicker({
+    this.avatarPickerView = new Picker({
       id: 'csse-avatar-picker',
       title: '⚔ Avatar Forge Sprite Selector',
       description: 'Tap any sprite to preview it. Use Done to keep your choice.',
@@ -457,6 +456,34 @@ class GameLevelCssePath {
       cancelLabel: 'Cancel',
       showCancel: true,
       theme: uiTheme,
+      normalizer: (sprite = {}) => {
+        const rows = Number(sprite.rows || sprite.orientation?.rows || 1);
+        const cols = Number(sprite.cols || sprite.orientation?.columns || 1);
+        const name = sprite.name || sprite.label || String(sprite.src || 'sprite').replace(/\.[^.]+$/, '');
+
+        return {
+          id: sprite.id || String(sprite.src || name),
+          name,
+          label: sprite.label || name,
+          src: sprite.src || '',
+          rawSrc: sprite.src || '',
+          rows,
+          cols,
+          scaleFactor: Number(sprite.scaleFactor || sprite.scale || 5),
+          movementPreset: sprite.movementPreset || (rows >= 4 ? 'four-row-8way' : 'single-row'),
+          directions: sprite.directions || null,
+          previewText: sprite.previewText || `${rows}×${cols} spritesheet`,
+        };
+      },
+      gridStyle: {
+        columns: 'repeat(auto-fill, minmax(110px, 1fr))',
+      },
+      imageStyle: {
+        maxWidth: '80px',
+        maxHeight: '80px',
+        imageRendering: 'pixelated',
+        marginBottom: '4px',
+      },
     });
 
 
@@ -657,13 +684,13 @@ class GameLevelCssePath {
       const sprites = await this.getAvatarCatalog();
       const originalSprite = this.profileData?.spriteMeta || sprites[0];
 
-      const selectedSprite = await this.avatarPickerView.show({
+      const selectedSprite = await this.avatarPickerView.show(
         sprites,
-        initialSelection: this.profileData?.spriteSrc || originalSprite?.src,
-        onPreview: (sprite) => {
+        originalSprite,
+        (sprite) => {
           this.applyAvatarOptions({ sprite });
-        },
-      });
+        }
+      );
 
       if (!selectedSprite) {
         if (originalSprite) {
@@ -684,7 +711,7 @@ class GameLevelCssePath {
      */
  
     // Picker: World Theme config.
-    this.worldThemePickerView = new WorldThemePicker({
+    this.worldThemePickerView = new Picker({
       id: 'csse-world-theme-picker',
       title: '🌐 World Theme Portal',
       description: 'Tap any background to preview it. Use Done to lock in your world.',
@@ -692,6 +719,31 @@ class GameLevelCssePath {
       cancelLabel: 'Cancel',
       showCancel: true,
       theme: uiTheme,
+      normalizer: (theme = {}) => {
+        const name = theme.name || theme.label || String(theme.src || 'theme').replace(/\.[^.]+$/, '');
+
+        return {
+          ...theme,
+          id: theme.id || String(theme.src || name),
+          name,
+          label: theme.label || name,
+          src: theme.src || '',
+          rawSrc: theme.src || '',
+          previewText: theme.previewText || theme.description || '',
+          compatibleSprites: Array.isArray(theme.compatibleSprites) ? theme.compatibleSprites : [],
+        };
+      },
+      gridStyle: {
+        columns: 'repeat(auto-fill, minmax(140px, 1fr))',
+      },
+      imageStyle: {
+        width: '120px',
+        height: '70px',
+        objectFit: 'cover',
+        borderRadius: '4px',
+        marginBottom: '6px',
+        display: 'block',
+      },
     });
  
     // Data: Load background catalog.
@@ -819,10 +871,11 @@ class GameLevelCssePath {
       const originalTheme = this.profileData?.themeMeta || themes[0];
  
       // Don't define onPreview (as in AvatarPicker) - it breaks player movement on exit
-      const selectedTheme = await this.worldThemePickerView.show({
+      const selectedTheme = await this.worldThemePickerView.show(
         themes,
-        initialSelection: this.profileData?.worldThemeSrc || originalTheme?.src,
-      });
+        originalTheme,
+        null  // no onPreview callback
+      );
  
       if (!selectedTheme) {
         // User cancelled - nothing to do, keep current background, we should allow existing theme as OK to advance? 
