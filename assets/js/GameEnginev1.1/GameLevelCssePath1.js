@@ -1,6 +1,7 @@
 // Imports: Level objects and UI helpers.
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
+import Npc from './essentials/Npc.js';
 
 class GameLevelCssePath1 {
   static levelId = 'wayfinding-world';
@@ -48,10 +49,33 @@ class GameLevelCssePath1 {
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
 
+    // ── Gatekeepers ────────────────────────────────────────────
+    const codeHubGatekeeperPos = {
+      x: width * 0.73,
+      y: height * 0.26,
+    };
+
+    const npc_data_codeHubGatekeeper = {
+      id: 'CodeHubGatekeeper',
+      greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
+      src: path + '/images/gamify/pathway/csse/npc/gatekeeper2.png',
+      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
+      ANIMATION_RATE: 50,
+      INIT_POSITION: { ...codeHubGatekeeperPos },
+      pixels: { width: 1024, height: 1024 },
+      orientation: { rows: 2, columns: 2 },
+      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
+      up: { row: 0, start: 1, columns: 1 },
+      left: { row: 1, start: 0, columns: 1 },
+      right: { row: 1, start: 1, columns: 1 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+    };
+
     // List of objects defnitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
+      { class: Npc, data: npc_data_codeHubGatekeeper },
     ];
   }
 
