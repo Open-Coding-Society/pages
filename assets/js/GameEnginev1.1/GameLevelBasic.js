@@ -6,6 +6,9 @@ import GameControl from './essentials/GameControl.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 
 class GameLevelBasic {
+  static levelId = 'basic-desert';
+  static displayName = 'Desert Journey';
+
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
@@ -14,7 +17,7 @@ class GameLevelBasic {
     // Background data
     const image_src_desert = path + "/images/gamify/desert.png"; // be sure to include the path
     const image_data_desert = {
-        name: 'desert',
+        name: GameLevelBasic.displayName,
         greeting: "Welcome to the desert!  It is hot and dry here, but there are many adventures to be had!",
         src: image_src_desert,
         pixels: {height: 580, width: 1038}
