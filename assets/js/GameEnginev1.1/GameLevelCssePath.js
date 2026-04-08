@@ -129,11 +129,7 @@ class GameLevelCssePath {
           'Welcome to the Path of Code-Code-Coding...',
           'This adventure begins with your identity.',
           'Travel to the Identity Terminal to define who you are.',
-          'Interact with the gatekeeper to obtain guidance.',
-          'Then visit the World Theme Portal to shape your world.',
-          'Each world theme unlocks different avatar sprites!',
-          'Finally, forge your avatar in the Avatar Forge.',
-          'Press E at each station to interact.'
+          'Interact with the gatekeeper for guidance by pressing E at each station to interact.',
         ]);
       },
     });
