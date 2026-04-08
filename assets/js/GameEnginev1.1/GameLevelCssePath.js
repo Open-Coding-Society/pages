@@ -818,20 +818,19 @@ class GameLevelCssePath {
       const themes = await this.getBackgroundCatalog();
       const originalTheme = this.profileData?.themeMeta || themes[0];
  
+      // Don't define onPreview (as in AvatarPicker) - it breaks player movement on exit
       const selectedTheme = await this.worldThemePickerView.show({
         themes,
         initialSelection: this.profileData?.worldThemeSrc || originalTheme?.src,
-        onPreview: (theme) => {
-          this.applyWorldTheme(theme);
-        },
       });
  
       if (!selectedTheme) {
-        if (originalTheme) {
-          this.applyWorldTheme(originalTheme);
-        }
+        // User cancelled - nothing to do, keep current background, we should allow existing theme as OK to advance? 
         return null;
       }
+ 
+      // Only apply the theme after user confirms selection
+      this.applyWorldTheme(selectedTheme);
  
       return {
         theme: selectedTheme.name,
