@@ -144,6 +144,10 @@ class GameLevelCssePath {
         void level.runIdentityTerminal(!identityState.identityUnlocked);
       },
       interact: async function() {
+        await this.showDialogue('Identity Gatekeeper', [
+          'Welcome to the Identity Terminal.',
+          'Enter your name to begin your journey!'
+        ]);
         await level.runIdentityTerminal(false);
         if (identityState.identityUnlocked) {
           this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the World Theme Portal.`;
@@ -220,6 +224,10 @@ class GameLevelCssePath {
         void level.runAvatarForge(true, this);
       },
       interact: async function() {
+        await this.showDialogue('Avatar Forge Gatekeeper', [
+          'Welcome to the Avatar Forge.',
+          'Choose your look and watch your character update live!'
+        ]);
         await level.runAvatarForge(false, this);
       },
     });
