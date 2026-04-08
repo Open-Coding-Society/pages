@@ -35,12 +35,14 @@ class WorldThemePicker {
     const name = theme.name || theme.label || String(theme.src || 'theme').replace(/\.[^.]+$/, '');
 
     return {
+      ...theme,
       id: theme.id || String(theme.src || name),
       name,
       label: theme.label || name,
       src: this.resolveSrc(theme.src || ''),
       rawSrc: theme.src || '',
       previewText: theme.previewText || theme.description || '',
+      compatibleSprites: Array.isArray(theme.compatibleSprites) ? theme.compatibleSprites : [],
     };
   }
 

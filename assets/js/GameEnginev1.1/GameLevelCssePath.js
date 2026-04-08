@@ -84,8 +84,8 @@ class GameLevelCssePath {
     };
 
     const worldThemeGatekeeperPos = {
-      x: width * 0.75,
-      y: height * 0.50,
+      x: width * 0.85,
+      y: height * 0.16,
     };
 
     const gatekeeperBaseData = {
@@ -500,17 +500,28 @@ class GameLevelCssePath {
 
         // Filter sprites based on selected world theme
         const selectedTheme = this.profileData?.themeMeta;
-        if (selectedTheme && selectedTheme.compatibleSprites) {
+        let catalogSprites = manifestSprites;
+
+        if (selectedTheme && Array.isArray(selectedTheme.compatibleSprites) && selectedTheme.compatibleSprites.length > 0) {
           console.log('Avatar Forge: filtering sprites for theme', selectedTheme.name, 'compatible:', selectedTheme.compatibleSprites);
-          manifestSprites = manifestSprites.filter(sprite =>
+          const filteredSprites = manifestSprites.filter((sprite) =>
             selectedTheme.compatibleSprites.includes(sprite.name)
           );
+
+          if (filteredSprites.length > 0) {
+            catalogSprites = filteredSprites;
+          } else {
+            console.warn('Avatar Forge: no compatible sprites found for theme', selectedTheme.name, selectedTheme.compatibleSprites);
+          }
         } else {
           console.log('Avatar Forge: no world theme selected, showing all sprites');
         }
 
         const seen = new Set();
-        this.avatarCatalog = [...fallbackCatalog, ...manifestSprites].filter((sprite) => {
+        this.avatarCatalog = [
+          ...(catalogSprites === manifestSprites ? fallbackCatalog : []),
+          ...catalogSprites,
+        ].filter((sprite) => {
           if (!sprite?.src || seen.has(sprite.src)) {
             return false;
           }
