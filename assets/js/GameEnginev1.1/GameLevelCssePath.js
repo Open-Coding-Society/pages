@@ -103,11 +103,12 @@ class GameLevelCssePath {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
 
-    const createGatekeeperData = ({ id, greeting, position, reaction, interact }) => ({
+    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
       ...gatekeeperBaseData,
       id,
       greeting,
       INIT_POSITION: { ...position },
+      interactDistance: interactDistance || 200,
       ...(reaction ? { reaction } : {}),
       ...(interact ? { interact } : {}),
     });
@@ -144,7 +145,7 @@ class GameLevelCssePath {
         void level.runIdentityTerminal(!identityState.identityUnlocked);
       },
       interact: async function() {
-        await this.showDialogue('Identity Gatekeeper', [
+        await level.showDialogue('Identity Gatekeeper', [
           'Welcome to the Identity Terminal.',
           'Enter your name to begin your journey!'
         ]);

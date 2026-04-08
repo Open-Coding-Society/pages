@@ -70,7 +70,8 @@ class Npc extends Character {
     canInteractWithPlayer(interactDistance = 96) {
         const player = this.findPlayer();
         if (!player) return false;
-        return this.isNear(player, interactDistance);
+        const distance = this.spriteData?.interactDistance || interactDistance;
+        return this.isNear(player, distance);
     }
 
     handleClick(event) {
