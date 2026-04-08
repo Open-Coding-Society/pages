@@ -150,7 +150,7 @@ class GameLevelCssePath {
       },
       interact: async function() {
         await level.runIdentityTerminal(false);
-        if (csseState.identityUnlocked) {
+        if (identityState.identityUnlocked) {
           this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the World Theme Portal.`;
         }
       },
@@ -235,7 +235,7 @@ class GameLevelCssePath {
       identityState.avatarFlowActive = true;
 
       try {
-        if (!csseState.worldThemeDone) {
+        if (!identityState.worldThemeDone) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
             'The Avatar Forge is locked.',
             'Complete the World Theme Portal first.'
@@ -290,11 +290,11 @@ class GameLevelCssePath {
  
     // Journey: World Theme portal flow.
     this.runWorldThemePortal = async function(showIntro = false, npc = null) {
-      if (csseState.worldThemeFlowActive) return;
-      csseState.worldThemeFlowActive = true;
+      if (identityState.worldThemeFlowActive) return;
+      identityState.worldThemeFlowActive = true;
  
       try {
-        if (!csseState.identityUnlocked) {
+        if (!identityState.identityUnlocked) {
           await this.showDialogue('World Theme Gatekeeper', [
             'The World Theme Portal is locked.',
             'Complete the Identity Terminal first.'
@@ -304,7 +304,7 @@ class GameLevelCssePath {
  
         if (showIntro) {
           await this.showDialogue('World Theme Gatekeeper', [
-            csseState.worldThemeDone
+            identityState.worldThemeDone
               ? 'Your world theme is set. Opening the portal again.'
               : 'Welcome to the World Theme Portal.',
             'Choose a background and watch your world transform live!'
@@ -314,7 +314,7 @@ class GameLevelCssePath {
         const themeChoice = await this.showWorldThemeForm();
         if (!themeChoice) return;
  
-        csseState.worldThemeDone = true;
+        identityState.worldThemeDone = true;
         const themeName = themeChoice.themeMeta?.name || themeChoice.theme || 'Default';
  
         if (npc?.spriteData) {
@@ -331,7 +331,7 @@ class GameLevelCssePath {
 
         this.showToast('✦ Avatar Forge unlocked');
       } finally {
-        csseState.worldThemeFlowActive = false;
+        identityState.worldThemeFlowActive = false;
       }
     };    
 
@@ -442,8 +442,6 @@ class GameLevelCssePath {
       overlayBackground: 'var(--ocs-game-overlay, rgba(13,13,26,0.72))',
       boxShadow: '0 0 20px rgba(78,204,163,0.18)',
     };
-
-
 
 
     /**
