@@ -279,8 +279,13 @@ class GameLevelCssePath {
         void level.runWorldThemePortal(true, this);
       },
       interact: async function() {
+        await level.showDialogue('World Theme Gatekeeper', [
+          'Welcome to the World Theme Portal.',
+          'Choose a background and watch your world transform live!'
+        ]);
         await level.runWorldThemePortal(false, this);
       },
+
     });
  
     // Journey: World Theme portal flow.
