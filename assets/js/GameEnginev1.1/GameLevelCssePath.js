@@ -130,7 +130,11 @@ class GameLevelCssePath {
           'Welcome to the Path of Code-Code-Coding...',
           'This adventure begins with your identity.',
           'Travel to the Identity Terminal to define who you are.',
-          'Interact with the gatekeeper to obtain guidance.'
+          'Interact with the gatekeeper to obtain guidance.',
+          'Then visit the World Theme Portal to shape your world.',
+          'Each world theme unlocks different avatar sprites!',
+          'Finally, forge your avatar in the Avatar Forge.',
+          'Press E at each station to interact.'
         ]);
       },
     });
@@ -146,8 +150,8 @@ class GameLevelCssePath {
       },
       interact: async function() {
         await level.runIdentityTerminal(false);
-        if (identityState.identityUnlocked) {
-          this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the Avatar Forge.`;
+        if (csseState.identityUnlocked) {
+          this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the World Theme Portal.`;
         }
       },
     });
@@ -231,7 +235,7 @@ class GameLevelCssePath {
       identityState.avatarFlowActive = true;
 
       try {
-        if (!identityState.identityUnlocked) {
+        if (!csseState.worldThemeDone) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
             'The Avatar Forge is locked.',
             'Complete the World Theme Portal first.'
