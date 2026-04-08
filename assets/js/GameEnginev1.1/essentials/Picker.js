@@ -1,6 +1,6 @@
 /**
  * Unified modal picker for selecting items (avatars, themes, etc.) from a grid.
- * Consolidates AvatarPicker and WorldThemePicker into a single reusable component.
+ * Originally consolidated AvatarPicker and WorldThemePicker into a single reusable component.
  * 
  * @author OpenCS Team
  * @version 1.0
@@ -45,7 +45,7 @@ class Picker {
       zIndex: config.zIndex || 10000,
       fontFamily: config.fontFamily || 'Orbitron, monospace',
       theme: config.theme || {},
-      normalizer: config.normalizer || ((item) => item),
+      normalizer: config.normalizer || ((item) => ({ rows: 1, cols: 1, ...item })),
       gridStyle: {
         columns: 'repeat(auto-fill, minmax(110px, 1fr))',
         ...(config.gridStyle || {})
@@ -243,14 +243,44 @@ class Picker {
           color: this.config.theme.textColor || 'var(--ocs-game-text, #e0e0e0)',
         });
 
-        // Image
-        const img = document.createElement('img');
-        img.src = item.src;
-        img.alt = item.label;
-        Object.assign(img.style, {
-          pointerEvents: 'none',
-          ...this.config.imageStyle
-        });
+        // Image - use sprite cell (0,0) for sprite sheets, full image otherwise
+        const isSpriteSheet = item.rows > 1 || item.cols > 1;
+        let imageElement;
+        
+        if (isSpriteSheet) {
+          // For sprite sheets, use a div with background-image to show only cell (0,0)
+          imageElement = document.createElement('div');
+          imageElement.setAttribute('role', 'img');
+          imageElement.setAttribute('aria-label', item.label);
+          
+          // Convert maxWidth/maxHeight to explicit width/height for background-image divs
+          const width = this.config.imageStyle.width || this.config.imageStyle.maxWidth || '80px';
+          const height = this.config.imageStyle.height || this.config.imageStyle.maxHeight || '80px';
+          
+          const baseStyle = {
+            pointerEvents: 'none',
+            backgroundImage: `url(${item.src})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: `${item.cols * 100}% ${item.rows * 100}%`,
+            backgroundPosition: '0% 0%',
+            width: width,
+            height: height,
+            margin: '0 auto',
+            ...this.config.imageStyle
+          };
+          Object.assign(imageElement.style, baseStyle);
+        } else {
+          // For single images, use regular img tag
+          imageElement = document.createElement('img');
+          imageElement.src = item.src;
+          imageElement.alt = item.label;
+          Object.assign(imageElement.style, {
+            pointerEvents: 'none',
+            display: 'block',
+            margin: '0 auto',
+            ...this.config.imageStyle
+          });
+        }
 
         // Label
         const name = document.createElement('div');
@@ -270,7 +300,7 @@ class Picker {
           color: this.config.theme.secondaryTextColor || 'var(--ocs-game-muted, #c7f2d4)',
         });
 
-        button.appendChild(img);
+        button.appendChild(imageElement);
         button.appendChild(name);
         button.appendChild(meta);
 

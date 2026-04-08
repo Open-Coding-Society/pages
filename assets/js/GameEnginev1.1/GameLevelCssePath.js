@@ -729,6 +729,8 @@ class GameLevelCssePath {
           label: theme.label || name,
           src: theme.src || '',
           rawSrc: theme.src || '',
+          rows: 1,  // Themes are single images, not sprite sheets
+          cols: 1,
           previewText: theme.previewText || theme.description || '',
           compatibleSprites: Array.isArray(theme.compatibleSprites) ? theme.compatibleSprites : [],
         };
