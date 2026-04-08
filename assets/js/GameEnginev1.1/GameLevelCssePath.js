@@ -5,6 +5,7 @@ import Npc from './essentials/Npc.js';
 import StatusPanel from './essentials/StatusPanel.js';
 import FormPanel from './essentials/FormPanel.js';
 import AvatarPicker from './essentials/AvatarPicker.js';
+import WorldThemePicker from './essentials/WorldThemePicker.js';
 import DialogueSystem from './essentials/DialogueSystem.js';
 
 
@@ -12,8 +13,10 @@ const csseState = {
   startGatekeeperDone: false,
   identityUnlocked: false,
   avatarForgeDone: false,
+  worldThemeDone: false,
   identityFlowActive: false,
   avatarFlowActive: false,
+  worldThemeFlowActive: false,
 };
 
 class GameLevelCssePath {
@@ -80,6 +83,11 @@ class GameLevelCssePath {
       y: height * 0.23,
     };
 
+    const worldThemeGatekeeperPos = {
+      x: width * 0.75,
+      y: height * 0.50,
+    };
+
     const gatekeeperBaseData = {
       src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
@@ -121,7 +129,10 @@ class GameLevelCssePath {
           'Welcome to the Path of Code...',
           'This adventure begins with your identity.',
           'Travel to the Identity Terminal to define who you are.',
-          'Then press E at each station to interact.'
+          'Then visit the World Theme Portal to shape your world.',
+          'Each world theme unlocks different avatar sprites!',
+          'Finally, forge your avatar in the Avatar Forge.',
+          'Press E at each station to interact.'
         ]);
       },
     });
@@ -138,7 +149,7 @@ class GameLevelCssePath {
       interact: async function() {
         await level.runIdentityTerminal(false);
         if (csseState.identityUnlocked) {
-          this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the Avatar Forge.`;
+          this.spriteData.greeting = `Identity registered for ${level.profileData?.name || 'this player'}. Proceed to the World Theme Portal.`;
         }
       },
     });
@@ -222,10 +233,10 @@ class GameLevelCssePath {
       csseState.avatarFlowActive = true;
 
       try {
-        if (!csseState.identityUnlocked) {
+        if (!csseState.worldThemeDone) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
             'The Avatar Forge is locked.',
-            'Complete the Identity Terminal first.'
+            'Complete the World Theme Portal first.'
           ]);
           return;
         }
@@ -235,7 +246,8 @@ class GameLevelCssePath {
             csseState.avatarForgeDone
               ? 'Your forged avatar is ready. Opening the forge again.'
               : 'Welcome to the Avatar Forge.',
-            'Choose your sprite and watch yourself transform live!'
+            'Choose your sprite that matches your selected world theme!',
+            'Only compatible sprites for your world are available.'
           ]);
         }
 
@@ -252,12 +264,75 @@ class GameLevelCssePath {
         await this.showDialogue('Avatar Forge Gatekeeper', [
           `Your new form: ${spriteName}`,
           'You have been forged in the Avatar Forge!',
-          'Your journey continues with your new appearance.'
+          'Your journey is now complete with your new appearance.',
+          'Feel free to revisit the forge to change your look anytime.'
         ]);
+
+        this.showToast('✦ Avatar Forge completed');
       } finally {
         csseState.avatarFlowActive = false;
       }
     };
+
+    // Journey: World Theme gatekeeper.
+    const npc_data_worldThemeGatekeeper = createGatekeeperData({
+      id: 'WorldThemeGatekeeper',
+      greeting: "Welcome to the World Theme Portal...\nChoose a background and watch your world transform live!",
+      position: worldThemeGatekeeperPos,
+      reaction: function() {
+        void level.runWorldThemePortal(true, this);
+      },
+      interact: async function() {
+        await level.runWorldThemePortal(false, this);
+      },
+    });
+ 
+    // Journey: World Theme portal flow.
+    this.runWorldThemePortal = async function(showIntro = false, npc = null) {
+      if (csseState.worldThemeFlowActive) return;
+      csseState.worldThemeFlowActive = true;
+ 
+      try {
+        if (!csseState.identityUnlocked) {
+          await this.showDialogue('World Theme Gatekeeper', [
+            'The World Theme Portal is locked.',
+            'Complete the Identity Terminal first.'
+          ]);
+          return;
+        }
+ 
+        if (showIntro) {
+          await this.showDialogue('World Theme Gatekeeper', [
+            csseState.worldThemeDone
+              ? 'Your world theme is set. Opening the portal again.'
+              : 'Welcome to the World Theme Portal.',
+            'Choose a background and watch your world transform live!'
+          ]);
+        }
+ 
+        const themeChoice = await this.showWorldThemeForm();
+        if (!themeChoice) return;
+ 
+        csseState.worldThemeDone = true;
+        const themeName = themeChoice.themeMeta?.name || themeChoice.theme || 'Default';
+ 
+        if (npc?.spriteData) {
+          npc.spriteData.greeting = `Your world is set to ${themeName}.`;
+        }
+ 
+        await this.showDialogue('World Theme Gatekeeper', [
+          `World theme applied: ${themeName}`,
+          'Your world has been reshaped!',
+          'Your journey continues in a new environment.',
+          'The Avatar Forge is now unlocked with theme-compatible sprites!',
+          'Visit the forge to choose your character that matches this world.'
+        ]);
+
+        this.showToast('✦ Avatar Forge unlocked');
+      } finally {
+        csseState.worldThemeFlowActive = false;
+      }
+    };    
 
 
     /**
@@ -411,7 +486,7 @@ class GameLevelCssePath {
         }
 
         const manifest = await response.json();
-        const manifestSprites = Array.isArray(manifest)
+        let manifestSprites = Array.isArray(manifest)
           ? manifest.map((entry) => ({
               name: entry.name,
               src: `${path}/images/gamebuilder/sprites/${entry.src}`,
@@ -422,6 +497,17 @@ class GameLevelCssePath {
               previewText: `${entry.rows || 1}×${entry.cols || 1} spritesheet`,
             }))
           : [];
+
+        // Filter sprites based on selected world theme
+        const selectedTheme = this.profileData?.themeMeta;
+        if (selectedTheme && selectedTheme.compatibleSprites) {
+          console.log('Avatar Forge: filtering sprites for theme', selectedTheme.name, 'compatible:', selectedTheme.compatibleSprites);
+          manifestSprites = manifestSprites.filter(sprite =>
+            selectedTheme.compatibleSprites.includes(sprite.name)
+          );
+        } else {
+          console.log('Avatar Forge: no world theme selected, showing all sprites');
+        }
 
         const seen = new Set();
         this.avatarCatalog = [...fallbackCatalog, ...manifestSprites].filter((sprite) => {
@@ -582,6 +668,168 @@ class GameLevelCssePath {
       };
     };
 
+
+    /**
+     * Section: World Theme data.
+     */
+ 
+    // Picker: World Theme config.
+    this.worldThemePickerView = new WorldThemePicker({
+      id: 'csse-world-theme-picker',
+      title: '🌐 World Theme Portal',
+      description: 'Tap any background to preview it. Use Done to lock in your world.',
+      confirmLabel: 'Done',
+      cancelLabel: 'Cancel',
+      showCancel: true,
+      theme: uiTheme,
+    });
+ 
+    // Data: Load background catalog.
+    this.getBackgroundCatalog = async function() {
+      if (this.backgroundCatalog) {
+        return this.backgroundCatalog;
+      }
+ 
+      const fallbackCatalog = [
+        {
+          name: 'Identity Forge',
+          src: `${path}/images/gamify/pathway/csse/bg/indentity-forge-1.png`,
+          previewText: 'Default theme',
+        },
+      ];
+ 
+      try {
+        const response = await fetch(`${path}/images/gamify/pathway/csse/bg/index.json`, { cache: 'no-cache' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+ 
+        const manifest = await response.json();
+        const manifestThemes = Array.isArray(manifest)
+          ? manifest.map((entry) => ({
+              name: entry.name,
+              src: `${path}/images/gamify/pathway/csse/bg/${entry.src}`,
+              previewText: entry.previewText || entry.description || '',
+            }))
+          : [];
+ 
+        const seen = new Set();
+        this.backgroundCatalog = [...fallbackCatalog, ...manifestThemes].filter((theme) => {
+          if (!theme?.src || seen.has(theme.src)) {
+            return false;
+          }
+          seen.add(theme.src);
+          return true;
+        });
+      } catch (error) {
+        console.warn('World Theme Portal: failed to load background catalog', error);
+        this.backgroundCatalog = fallbackCatalog;
+      }
+ 
+      return this.backgroundCatalog;
+    };
+ 
+    // Background: Find the background object.
+    this.getBackgroundObject = function() {
+      const bgObj = gameEnv.gameObjects.find(obj =>
+        (obj.data && obj.data.name === GameLevelCssePath.displayName)
+      );
+      if (!bgObj) {
+        console.warn('World Theme Portal: background object not found');
+        console.log('Looking for name:', GameLevelCssePath.displayName);
+        console.log('Available objects:', gameEnv.gameObjects.map(obj => ({
+          hasData: !!obj.data,
+          dataName: obj.data?.name,
+          className: obj.constructor.name,
+          id: obj.id
+        })));
+      }
+      return bgObj;
+    };
+ 
+    // Background: Apply theme selection live.
+    this.applyWorldTheme = function(themeMeta = {}) {
+      const bgObj = this.getBackgroundObject();
+      if (!bgObj) {
+        console.warn('World Theme Portal: background object not found');
+        console.log('Available objects:', gameEnv.gameObjects.map(obj => ({ data: obj.data, id: obj.id })));
+        return;
+      }
+
+      const newSrc = themeMeta.src;
+      if (!newSrc) {
+        console.warn('World Theme Portal: no src provided in themeMeta', themeMeta);
+        return;
+      }
+
+      console.log('World Theme Portal: applying theme', themeMeta.name, 'with src:', newSrc);
+
+      // Update the data source
+      if (bgObj.data) {
+        bgObj.data.src = newSrc;
+      }
+
+      // Reload the image
+      bgObj.image = new Image();
+      bgObj.spriteReady = false;
+
+      bgObj.image.onload = () => {
+        bgObj.spriteReady = true;
+        console.log('World Theme Portal: background image loaded successfully for', themeMeta.name);
+        try {
+          bgObj.resize?.();
+        } catch (err) {
+          console.warn('Error updating background dimensions', err);
+        }
+      };
+
+      bgObj.image.onerror = (e) => {
+        console.warn('Failed to load background:', newSrc, 'for theme:', themeMeta.name, e);
+      };
+
+      console.log('World Theme Portal: setting background src to:', newSrc);
+      bgObj.image.src = newSrc;
+
+      this.profileData = {
+        ...this.profileData,
+        worldTheme: themeMeta.name || 'Default',
+        worldThemeSrc: newSrc,
+        themeMeta,
+      };
+
+      this.updateProfilePanel(this.profileData);
+
+      // Clear avatar catalog cache so it reloads with theme-compatible sprites
+      this.avatarCatalog = null;
+    };
+ 
+    // Picker: Show world theme form.
+    this.showWorldThemeForm = async function() {
+      const themes = await this.getBackgroundCatalog();
+      const originalTheme = this.profileData?.themeMeta || themes[0];
+ 
+      const selectedTheme = await this.worldThemePickerView.show({
+        themes,
+        initialSelection: this.profileData?.worldThemeSrc || originalTheme?.src,
+        onPreview: (theme) => {
+          this.applyWorldTheme(theme);
+        },
+      });
+ 
+      if (!selectedTheme) {
+        if (originalTheme) {
+          this.applyWorldTheme(originalTheme);
+        }
+        return null;
+      }
+ 
+      return {
+        theme: selectedTheme.name,
+        themeMeta: selectedTheme,
+      };
+    };
+
+
     /**
      * Section: UI config.
      */
@@ -596,6 +844,8 @@ class GameLevelCssePath {
         { key: 'github', label: 'GitHub', emptyValue: '—' },
         { type: 'section', title: 'Avatar Sprite', marginTop: '8px' },
         { key: 'sprite', label: 'Sprite', emptyValue: '—' },
+        { type: 'section', title: 'World Theme', marginTop: '8px' },
+        { key: 'worldTheme', label: 'Theme', emptyValue: '—' },
       ],
       theme: uiTheme,
     };
@@ -627,6 +877,7 @@ class GameLevelCssePath {
         email: profile.email || '—',
         github: profile.github || '—',
         sprite: profile.sprite || '—',
+        worldTheme: profile.worldTheme || '—',
       });
     };
 
@@ -647,6 +898,7 @@ class GameLevelCssePath {
       { class: Npc,              data: npc_data_startGatekeeper },
       { class: Npc,              data: npc_data_identityGatekeeper },
       { class: Npc,              data: npc_data_avatarGatekeeper },
+      { class: Npc,              data: npc_data_worldThemeGatekeeper },
     ];
   }
 }
