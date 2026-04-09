@@ -20,7 +20,7 @@ class GameLevelCssePath1 {
     const image_src = path + "/images/gamify/pathway/csse/bg1/wayfinding-world.png";
     const bg_data = {
         name: GameLevelCssePath1.displayName,
-        greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
+        greeting: "Welcome to the CSSE pathway! This quest will identify your profile and persona!",
         src: image_src,
     };
     
@@ -55,6 +55,21 @@ class GameLevelCssePath1 {
       y: height * 0.26,
     };
 
+    const personalEnrichmentGatekeeperPos = {
+      x: width * 0.20,
+      y: height * 0.23,
+    };
+
+    const skillPassportGatekeeperPos = {
+      x: width * 0.74,
+      y: height * 0.49  ,
+    };
+
+    const courseEnlistGatekeeperPos = {
+      x: width * 0.20,
+      y: height * 0.46,
+    };
+
     const gatekeeperBaseData = {
       src: path + '/images/gamify/pathway/csse/npc/gatekeeper2.png',
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
@@ -84,11 +99,32 @@ class GameLevelCssePath1 {
       position: codeHubGatekeeperPos,
     });
 
-    // List of objects defnitions for this level
+    const npc_data_personalEnrichmentGatekeeper = createGatekeeperData({
+      id: 'PersonalEnrichmentGatekeeper',
+      greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
+      position: personalEnrichmentGatekeeperPos,
+    });
+
+    const npc_data_skillPassportGatekeeper = createGatekeeperData({
+      id: 'SkillPassportGatekeeper',
+      greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
+      position: skillPassportGatekeeperPos,
+    });
+
+    const npc_data_courseEnlistGatekeeper = createGatekeeperData({
+      id: 'CourseEnlistGatekeeper',
+      greeting: 'Welcome to Course Enlist! Choose your next class and map your pathway.',
+      position: courseEnlistGatekeeperPos,
+    });
+
+    // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
       { class: Npc, data: npc_data_codeHubGatekeeper },
+      { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
+      { class: Npc, data: npc_data_skillPassportGatekeeper },
+      { class: Npc, data: npc_data_courseEnlistGatekeeper },
     ];
   }
 
