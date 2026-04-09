@@ -5,7 +5,7 @@ import StatusPanel from './essentials/StatusPanel.js';
 import FormPanel from './essentials/FormPanel.js';
 import Picker from './essentials/Picker.js';
 import Npc from './essentials/Npc.js';
-// import FriendlyNpc from './essentials/FriendlyNpc.js';
+import FriendlyNpc from './essentials/FriendlyNpc.js';
 import DialogueSystem from './essentials/DialogueSystem.js';
 import ProfileManager from '../pages/home-gamified/ProfileManager.js';
 
@@ -164,7 +164,13 @@ class GameLevelCssePath {
       greeting,
       INIT_POSITION: { ...position },
       interactDistance: interactDistance || 120,
-      ...(reaction ? { reaction } : {}),
+      reaction: function () {
+        if (reaction) reaction.call(this);
+        if (level?.showToast) {
+          level.showToast("Press E to interact");
+        }
+      },
+
       ...(interact ? { interact } : {}),
     });
 
@@ -1073,10 +1079,10 @@ class GameLevelCssePath {
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player,           data: player_data },
-      { class: Npc,      data: npc_data_startGatekeeper },
-      { class: Npc,      data: npc_data_identityGatekeeper },
-      { class: Npc,      data: npc_data_avatarGatekeeper },
-      { class: Npc,      data: npc_data_worldThemeGatekeeper },
+      { class: FriendlyNpc,      data: npc_data_startGatekeeper },
+      { class: FriendlyNpc,      data: npc_data_identityGatekeeper },
+      { class: FriendlyNpc,      data: npc_data_avatarGatekeeper },
+      { class: FriendlyNpc,      data: npc_data_worldThemeGatekeeper },
     ];
   }
 }
