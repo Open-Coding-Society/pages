@@ -92,10 +92,8 @@ window.handleGuestSignup = async function(event) {
     // Step 1: Try to create guest account using Flask backend
     statusMessage.textContent = 'Creating guest account...';
     const signupResponse = await fetch(`${pythonURI}/api/user/guest`, {
+      ...fetchOptions,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(signupData)
     });
 
