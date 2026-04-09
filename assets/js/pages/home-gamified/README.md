@@ -10,13 +10,7 @@ Dual-backend profile system for home-gamified experiences with automatic authent
 
 ## Quick Start
 
-### 1. Include Widget (optional)
-
-```html
-{% include home-gamified/local_profile.html %}
-```
-
-### 2. Initialize ProfileManager
+### 1. Initialize ProfileManager
 
 ```javascript
 import ProfileManager from '/assets/js/pages/home-gamified/ProfileManager.js';
@@ -61,11 +55,11 @@ assets/js/pages/home-gamified/
   ├── README.md                # This file
   └── MVC_ARCHITECTURE.md      # Architecture diagrams
 
-_includes/home-gamified/
-  └── local_profile.html       # Profile widget (VIEW)
+assets/js/GameEnginev1.1/essentials/
+  └── StatusPanel.js           # Profile panel UI (VIEW)
 
 _sass/open-coding/forms/
-  └── home-gamified.scss       # Widget styles
+  └── home-gamified.scss       # Panel styles
 ```
 
 ## Features
@@ -290,6 +284,10 @@ CREATE TABLE game_profiles (
 
 ```javascript
 import ProfileManager from '/assets/js/pages/home-gamified/ProfileManager.js';
+import StatusPanel from '../GameEnginev1.1/essentials/StatusPanel.js';
+
+// Constants
+const PROFILE_PANEL_ID = 'csse-profile-panel';
 
 export default class GameLevelCssePath {
   constructor() {
@@ -305,6 +303,9 @@ export default class GameLevelCssePath {
         this.profileRestored = true;
       }
     });
+    
+    // Create profile panel with reset action
+    this.createProfilePanel();
   }
   
   restoreFromProfile(state) {
@@ -368,6 +369,39 @@ export default class GameLevelCssePath {
       this.updateGameTheme(theme, themeMeta);
     }
   }
+  
+  createProfilePanel() {
+    const level = this;
+    const profilePanelConfig = {
+      id: PROFILE_PANEL_ID,
+      title: 'PLAYER PROFILE',
+      fields: [
+        { key: 'name', label: 'Name', emptyValue: '—' },
+        { key: 'email', label: 'Email', emptyValue: '—' },
+        { key: 'github', label: 'GitHub', emptyValue: '—' },
+        { type: 'section', title: 'Avatar Sprite', marginTop: '8px' },
+        { key: 'sprite', label: 'Sprite', emptyValue: '—' },
+        { type: 'section', title: 'World Theme', marginTop: '8px' },
+        { key: 'worldTheme', label: 'Theme', emptyValue: '—' },
+      ],
+      actions: [
+        {
+          label: '🔄 Reset Profile',
+          title: 'Clear all profile data and start fresh',
+          danger: true,
+          onClick: async () => {
+            if (confirm('Reset profile and clear all progress?')) {
+              await level.profileManager.clear();
+              window.location.reload();
+            }
+          }
+        }
+      ],
+      theme: { /* your theme config */ }
+    };
+    this.profilePanelView = new StatusPanel(profilePanelConfig);
+    this.profilePanelView.ensureMounted();
+  }
 }
 ```
 
@@ -404,11 +438,12 @@ export default class GameLevelCssePath {
 - **Authenticated users**: `clear()` keeps identity (expected behavior for safety)
 - For full account deletion, use backend admin flow
 
-### Widget not appearing
+### Panel not appearing
 
-- Check include: `{% include home-gamified/local_profile.html %}`
-- Verify profile exists: `LocalProfile.exists()` should return true
-- Check SCSS imported: `@import 'open-coding/forms/home-gamified'`
+- Verify StatusPanel is imported and created
+- Check `createProfilePanel()` is called in constructor
+- Ensure ProfileManager is initialized before panel creation
+- Check CSS variables are defined for panel theme
 
 ### Import/Export failing
 

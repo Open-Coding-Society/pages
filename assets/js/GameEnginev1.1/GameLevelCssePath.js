@@ -8,6 +8,9 @@ import Picker from './essentials/Picker.js';
 import DialogueSystem from './essentials/DialogueSystem.js';
 import ProfileManager from '../pages/home-gamified/ProfileManager.js';
 
+// Constants: Profile panel configuration
+const PROFILE_PANEL_ID = 'csse-profile-panel';
+
 // State: Track player progress and choices.
 const identityState = {
   startGatekeeperDone: false,
@@ -976,7 +979,7 @@ class GameLevelCssePath {
 
     // Panel: Profile config.
     const profilePanelConfig = {
-      id: 'csse-profile-panel',
+      id: PROFILE_PANEL_ID,
       title: 'PLAYER PROFILE',
       fields: [
         { key: 'name', label: 'Name', emptyValue: '—' },
@@ -986,6 +989,35 @@ class GameLevelCssePath {
         { key: 'sprite', label: 'Sprite', emptyValue: '—' },
         { type: 'section', title: 'World Theme', marginTop: '8px' },
         { key: 'worldTheme', label: 'Theme', emptyValue: '—' },
+      ],
+      actions: [
+        {
+          label: '🔄 Reset Profile',
+          title: 'Clear all profile data and start fresh',
+          danger: true,
+          onClick: async () => {
+            const confirmed = confirm(
+              '🔄 Reset Profile?\n\n' +
+              'This will clear:\n' +
+              '• Your identity (name, email, GitHub)\n' +
+              '• All progress (terminals, forges, portals)\n' +
+              '• Avatar and world theme selections\n\n' +
+              'Are you sure you want to start fresh?'
+            );
+
+            if (confirmed) {
+              try {
+                await level.profileManager.clear();
+                console.log('Profile cleared successfully');
+                level.showToast('✦ Profile reset - reloading...');
+                setTimeout(() => window.location.reload(), 1000);
+              } catch (error) {
+                console.error('Failed to reset profile:', error);
+                alert('Failed to reset profile. Check console for details.');
+              }
+            }
+          }
+        }
       ],
       theme: uiTheme,
     };
