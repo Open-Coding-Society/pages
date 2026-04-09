@@ -6,6 +6,7 @@ import StatusPanel from './essentials/StatusPanel.js';
 import FormPanel from './essentials/FormPanel.js';
 import Picker from './essentials/Picker.js';
 import DialogueSystem from './essentials/DialogueSystem.js';
+import ProfileManager from '../pages/home-gamified/ProfileManager.js';
 
 // State: Track player progress and choices.
 const identityState = {
@@ -29,6 +30,56 @@ class GameLevelCssePath {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
+
+    /**
+     * Section: Profile persistence.
+     */
+
+    // Initialize ProfileManager for save/load
+    this.profileManager = new ProfileManager();
+    this.profileManagerReady = this.profileManager.initialize().then((restored) => {
+      if (restored) {
+        console.log('GameLevel: restoring saved profile', restored);
+        
+        // Restore profile data
+        if (restored.profileData) {
+          this.profileData = { ...restored.profileData };
+        }
+        
+        // Restore progress state
+        if (restored.identityState) {
+          Object.assign(identityState, restored.identityState);
+        }
+        
+        console.log('GameLevel: profile restored', {
+          name: this.profileData?.name,
+          identityUnlocked: identityState.identityUnlocked,
+          worldThemeDone: identityState.worldThemeDone,
+          avatarForgeDone: identityState.avatarForgeDone,
+        });
+        
+        // Update the profile panel with restored data
+        this.updateProfilePanel(this.profileData);
+        
+        // Restore avatar sprite if saved
+        if (this.profileData?.spriteMeta) {
+          // Wait a bit for player object to be created
+          setTimeout(() => {
+            this.applyAvatarOptions({ sprite: this.profileData.spriteMeta });
+          }, 500);
+        }
+        
+        // Restore world theme if saved
+        if (this.profileData?.themeMeta) {
+          // Wait a bit for background object to be created
+          setTimeout(() => {
+            this.applyWorldTheme(this.profileData.themeMeta);
+          }, 500);
+        }
+      }
+    }).catch((err) => {
+      console.warn('GameLevel: ProfileManager initialization failed', err);
+    });
 
     /**
      * Section: Level objects.
@@ -199,19 +250,26 @@ class GameLevelCssePath {
     };
 
     // Form: Show identity panel.
-    this.showIdentityForm = function() {
-      return this.identityFormView.show(this.profileData || {}).then((profile) => {
-        if (!profile) {
-          return null;
-        }
+    this.showIdentityForm = async function() {
+      // Wait for ProfileManager to be ready
+      await this.profileManagerReady;
+      
+      const profile = await this.identityFormView.show(this.profileData || {});
+      if (!profile) {
+        return null;
+      }
 
-        this.profileData = {
-          ...this.profileData,
-          ...profile,
-        };
-        this.updateProfilePanel(this.profileData);
-        return this.profileData;
-      });
+      this.profileData = {
+        ...this.profileData,
+        ...profile,
+      };
+      
+      // Save identity to ProfileManager
+      await this.profileManager.saveIdentity(profile);
+      await this.profileManager.updateIdentityProgress(true);
+      
+      this.updateProfilePanel(this.profileData);
+      return this.profileData;
     };
 
 
@@ -261,6 +319,10 @@ class GameLevelCssePath {
 
         identityState.avatarForgeDone = true;
         const spriteName = avatarChoices.spriteMeta?.name || avatarChoices.sprite || 'Minimalist';
+        
+        // Save avatar to ProfileManager
+        await this.profileManager.saveAvatar(avatarChoices.spriteMeta);
+        await this.profileManager.updateAvatarProgress(true);
 
         if (npc?.spriteData) {
           npc.spriteData.greeting = `Your forged avatar is ${spriteName}.`;
@@ -325,6 +387,10 @@ class GameLevelCssePath {
  
         identityState.worldThemeDone = true;
         const themeName = themeChoice.themeMeta?.name || themeChoice.theme || 'Default';
+        
+        // Save theme to ProfileManager
+        await this.profileManager.saveTheme(themeChoice.themeMeta);
+        await this.profileManager.updateThemeProgress(true);
  
         if (npc?.spriteData) {
           npc.spriteData.greeting = `Your world is set to ${themeName}.`;
