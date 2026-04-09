@@ -55,13 +55,10 @@ class GameLevelCssePath1 {
       y: height * 0.26,
     };
 
-    const npc_data_codeHubGatekeeper = {
-      id: 'CodeHubGatekeeper',
-      greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
+    const gatekeeperBaseData = {
       src: path + '/images/gamify/pathway/csse/npc/gatekeeper2.png',
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
-      INIT_POSITION: { ...codeHubGatekeeperPos },
       pixels: { width: 1024, height: 1024 },
       orientation: { rows: 2, columns: 2 },
       down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
@@ -70,6 +67,22 @@ class GameLevelCssePath1 {
       right: { row: 1, start: 1, columns: 1 },
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
+
+    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
+      ...gatekeeperBaseData,
+      id,
+      greeting,
+      INIT_POSITION: { ...position },
+      interactDistance: interactDistance || 120,
+      ...(reaction ? { reaction } : {}),
+      ...(interact ? { interact } : {}),
+    });
+
+    const npc_data_codeHubGatekeeper = createGatekeeperData({
+      id: 'CodeHubGatekeeper',
+      greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
+      position: codeHubGatekeeperPos,
+    });
 
     // List of objects defnitions for this level
     this.classes = [
