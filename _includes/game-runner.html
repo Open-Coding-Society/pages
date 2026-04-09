@@ -1,5 +1,8 @@
 <!-- Reusable Game Runner Component -->
-<div class="game-runner-container{% if include.hide_edit == 'true' %} hide-editor{% endif %}" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+<div class="game-runner-container{% if include.hide_edit == 'true' %} hide-editor{% endif %}" id="game-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}"
+  {% if include.width or include.height or include.editor_height %}
+  style="{% if include.width %}--gr-panel-width: {{ include.width }};{% endif %}{% if include.height %}--gr-canvas-height: {{ include.height }};{% endif %}{% if include.editor_height %}--gr-editor-height: {{ include.editor_height }};{% endif %}"
+  {% endif %}>
   {% if include.hide_edit != 'true' %}
   <div class="challenge-box">
     <h3>Challenge</h3>
@@ -71,6 +74,13 @@
   const editorHeight = "{{ include.height }}";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
   const storageKey = container.dataset.storageKey;
+
+  function parseCssSizeToPixels(value, fallback) {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
+  const configuredCanvasHeight = parseCssSizeToPixels(canvasHeight, 580);
   
   // Load code from localStorage or use default
   const savedCode = localStorage.getItem(storageKey);
@@ -316,8 +326,8 @@
         }
 
         // Get container dimensions for environment
-        const containerWidth = gameContainer.parentElement.clientWidth || 800;
-        const containerHeight = 580;
+        const containerWidth = gameContainer.clientWidth || gameContainer.parentElement.clientWidth || 800;
+        const containerHeight = configuredCanvasHeight;
 
         // Create environment object (GameEnv will create canvas dynamically)
         const environment = {

@@ -69,7 +69,7 @@ function copyCloneUrl(url) {
 Browse and explore all capstone projects. Use the search bar to find projects by keyword, or filter by course below.
 
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 my-6">
+<div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 my-6">
 
 
    <!-- Slack Messaging Platform -->
@@ -419,7 +419,7 @@ Browse and explore all capstone projects. Use the search bar to find projects by
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-sentri-capstone %}">Sentri</a></h3>
-           <p class="text-sm text-gray-700">A sobriety tracker that analyzes daily biometric and mood data to predict a user's relapse risk and proactively deliver personalized interventions before a crisis occurs</p>
+           <p class="text-sm text-gray-700">A comprehensive recovery ecosystem for the Poway Recovery Center that utilizes an intelligent guide to match users with specialized support programs, provides personalized meeting schedules, and tracks long-term sobriety milestones through a secure, high-fidelity user profile/dashboard</p>
            <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
        </div>
        <button onclick="copyCloneUrl('https://github.com/PLACEHOLDER/sentri')" title="Copy clone URL" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 cursor-pointer bg-transparent border-0 p-1">

@@ -1,46 +1,83 @@
-# Poway Symphony Orchestra Capstone Infographic
+Title: "Poway Symphony Orchestra Capstone"
 Badge: "Design-Based Research Capstone"
-Title: "Poway Symphony Orchestra - Expanding Community Through Music"
-Description: "A design-research capstone focused on enhancing the digital presence, audience engagement, and accessibility of a community orchestra through a modern, user-centered website experience."
+
+Description: >
+  A design-based research capstone focused on expanding community engagement
+  through a more accessible, modern, and story-driven Poway Symphony Orchestra
+  website experience.
 
 Topics:
   - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
-    image: "pso_logo.png"
-    link: "https://wi-fighters-csp.github.io/wi-pages/capstone/powayorchestra/"
-    alt: "Poway Symphony Orchestra"
-    buttonLabel: "View Project"
+    subtitle: "Redesigned Website Experience"
+    link: "https://pso.opencodingsociety.com/"
+    buttonLabel: "View Frontend Site"
+    backendLink: "http://wifighters.opencodingsociety.com"
+    backendButtonLabel: "View Admin UI"
+
+    description: >
+      This project redesigns the PSO's existing Google Sites-based website into a full
+      custom web experience. Where the original site is a static, text-heavy Google Sites
+      page with minimal navigation and no interactivity, the capstone site introduces
+      dynamic concert listings, interactive games, a musician directory with section
+      filtering, media playback, and gamified exploration while preserving the real
+      orchestra's content accurately.
+
     keyPoints:
-      - "Modern, accessible website redesign for improved user experience"
-      - "Clear navigation for concerts, donations, and musician information"
-      - "Engaging homepage showcasing upcoming performances and highlights"
-      - "Mobile-friendly and responsive design across devices"
-      - "Streamlined ticketing and donation flow"
-      - "Visual storytelling of orchestra members and conductor"
-      - "Enhanced accessibility for all age groups and technical skill levels"
-    subtitle: "Research and Testing Phase"
-    description: "The Poway Symphony Orchestra is a community-based ensemble dedicated to bringing high-quality orchestral music to local audiences. This capstone explores how intentional design can elevate the orchestra's online experience, making it easier for users to discover concerts, connect with the musicians, and support the organization. Through user research and design iteration, the project emphasizes clarity, accessibility, and storytelling so the site does more than present information. It invites people into the world of the orchestra and makes participation feel welcoming, useful, and memorable."
+      - "Home page introduces the orchestra with a cleaner layout, accurate mission content, and faster access to concerts, donations, and events, replacing the original's dense text block and image-only structure"
+      - "Concert section shows real 2025-2026 season data with a live countdown, interactive calendar, and ticket links, replacing the original's external-only event flow"
+      - "Conductor section presents John LoPiccolo's biography and PSO history in a structured, visually engaging format instead of a single text-heavy page"
+      - "Musician directory includes roster cards organized by section with instrument filters and audio playback instead of a plain text roster"
+      - "EXP bar gamifies browsing so visitors see progress as they move through the experience"
+      - "Orchestra Builder turns section placement into an interactive milestone that teaches how a symphony is structured"
+      - "Responsive layout keeps the full experience usable across phones, tablets, and desktops"
+      - "Join section consolidates rehearsal schedules, registration info, attire, and contact details in one place"
+
     tech:
       - "HTML"
       - "CSS"
       - "JavaScript"
-      - "Responsive Web Design"
-      - "UX/UI Design Principles"
-      - "WCAG Accessibility Standards"
+      - "Responsive Design"
       - "Figma"
-      - "Analytics and User Behavior Tracking"
-      - "Content Management Strategy"
-    impact:
-      - "Increased engagement with concert information and event pages"
-      - "Improved navigation and reduced friction for donate, attend, and learn actions"
-      - "Stronger emotional connection through visual storytelling and media"
-      - "Higher accessibility for diverse audiences, including older users"
-      - "Increased likelihood of return visits and ongoing community involvement"
-      - "Clearer communication of the orchestra's mission and value"
-    status: "Research and Testing Phase"
-    team:
-      - "Wi-Fighters"
-      - "Meryl"
-      - "Kailyn"
-      - "Hope"
-      - "Laya"
-      
+      - "User research and testing"
+      - "Flask Backend Integration"
+
+    interactiveLink: "https://pso.opencodingsociety.com/games/"
+    interactiveButtonLabel: "Open Games Page"
+    interactiveElements:
+      - title: "EXP Bar"
+        description: "Visitors earn visible progress as they move through the site, turning browsing into a guided journey"
+      - title: "Orchestra Builder"
+        description: "Users place instrument sections onto a real stage layout and unlock a featured PSO performance on completion"
+      - title: "Virtual Conductor"
+        description: "A rhythm game that puts the user in the conductor's role, keeping time the way John LoPiccolo guides the ensemble"
+      - title: "Tuning The Orchestra"
+        description: "Users experience tuning the ensemble before a performance, making the pre-concert ritual tangible and educational"
+      - title: "Musician Profiles and Audio"
+        description: "Visitors explore roster cards filtered by section or instrument and hear audio tied to each family of the orchestra"
+
+    problemsSolved:
+      - "The original site is built on Google Sites with no custom interactivity -> we rebuilt it as a fully custom site with dynamic content and user engagement features"
+      - "The original musician page is a plain text list -> we replaced it with filterable profile cards and section audio"
+      - "The site felt passive and informational only -> we introduced the EXP bar, games, and interactive milestones to reward exploration"
+
+    improvementsMade:
+      - "Rebuilt the original Google Sites experience as a custom frontend with modern layout, richer navigation, and interactive storytelling"
+      - "Integrated real concert season data, ticket links, and time-based event elements directly into the site"
+      - "Replaced passive text sections with structured content modules for the conductor, musicians, support, and join flows"
+      - "Added interactive games, progress tracking, and media elements to turn browsing into guided participation"
+
+    wowFactors:
+      - "The capstone preserves real PSO content while significantly modernizing how visitors discover and interact with it"
+      - "Concert, conductor, musician, support, and join experiences are all surfaced within one cohesive on-site journey"
+      - "EXP progression and Orchestra Builder make an arts organization website feel interactive without losing accuracy or professionalism"
+      - "Games like Virtual Conductor and Tuning the Orchestra make symphonic concepts tangible for broader community audiences"
+      - "The live deployed frontend and admin UI demonstrate that the project moves beyond mockups into a working prototype"
+
+status: "Research and Testing Phase (Deployed Prototype Complete)"
+
+team:
+  - "Wi-Fighters"
+  - "Meryl"
+  - "Kailyn"
+  - "Hope"
+  - "Laya"

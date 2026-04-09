@@ -1,97 +1,106 @@
 {% assign data = site.data.acs-cancer-infograph %}
 
 <style>
-.acs-feature-grid {
+/* Only extras not covered by infograph.scss */
+
+.acs-links-section { margin-bottom: 2rem; }
+.acs-links-heading {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 1rem;
+}
+.acs-links-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
-  margin: 1.5rem 0 2rem 0;
 }
+.acs-link-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px; padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s;
+}
+.acs-link-card:hover { border-color: rgba(255,255,255,0.3); }
+.acs-link-card-placeholder {
+  width: 100%; aspect-ratio: 16/9; border-radius: 10px;
+  margin-bottom: 0.85rem; background: rgba(255,255,255,0.04);
+  border: 1px dashed rgba(255,255,255,0.12);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 6px;
+  font-size: 0.72rem; color: rgba(255,255,255,0.2);
+}
+.acs-link-card-placeholder span { font-size: 1.8rem; opacity: 0.3; }
+.acs-link-card img {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover;
+  border-radius: 10px; margin-bottom: 0.85rem; display: block;
+}
+.acs-link-card-title { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem; }
+.acs-link-card-desc { font-size: 0.8rem; color: rgba(255,255,255,0.55); line-height: 1.55; margin-bottom: 0.9rem; }
 
-.acs-feature-card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
-  padding: 1rem;
-  text-align: left;
+/* Image placeholder for visual column */
+.acs-image-placeholder {
+  width: 100%; aspect-ratio: 4/3; border-radius: 16px;
+  background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.12);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 6px;
+  font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-bottom: 1rem;
 }
-
-.acs-feature-title {
-  margin: 0 0 0.5rem 0;
-  color: #ffffff;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.acs-feature-desc {
-  margin: 0 0 1rem 0;
-  color: rgba(255, 255, 255, 0.88) !important;
-  font-size: 0.92rem;
-  line-height: 1.45;
-}
-
-.acs-feature-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 0.65rem 1rem !important;
-  background: #1a73e8 !important;
-  border: none !important;
-  border-radius: 10px !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  font-size: 0.9rem !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  transition: background 0.2s ease, transform 0.2s ease !important;
-}
-
-.acs-feature-btn:hover {
-  background: #1558b0 !important;
-  transform: translateY(-2px) !important;
-  color: #ffffff !important;
-  text-decoration: none !important;
-}
-
-@media (max-width: 1024px) {
-  .acs-feature-grid {
-    grid-template-columns: 1fr;
-  }
-}
+.acs-image-placeholder span { font-size: 1.8rem; opacity: 0.3; }
 </style>
 
 
-<div class="wp-infograph">
- <!-- Header Section -->
- <div class="wp-header">
-   <div class="wp-badge">Design-Based Research Capstone</div>
-   <h1 class="wp-title">{{ data.Title }}</h1>
-   <p class="wp-description">{{ data.Description }}</p>
-   <div class="acs-feature-grid">
-     <div class="acs-feature-card">
-       <h3 class="acs-feature-title">Cell Cycle &amp; Cancer Lab</h3>
-       <p class="acs-feature-desc">An interactive simulation that teaches how the cell cycle works and breaks down in cancer with phase checkpoints, gene toggles, and live mutation tracking.</p>
-       <a href="https://acs.opencodingsociety.com/cyclegame" target="_blank" rel="noopener noreferrer" class="acs-feature-btn">Open Cell Cycle Lab</a>
-     </div>
-        <div class="acs-feature-grid">
-     <div class="acs-feature-card">
-       <h3 class="acs-feature-title">Cell Game</h3>
-       <p class="acs-feature-desc">Interactive RPG game that players navigate through to learn about cell biology and cancer.</p>
-       <a href="https://acs.opencodingsociety.com/cellgame" target="_blank" rel="noopener noreferrer" class="acs-feature-btn">Open Cell Game</a>
-     </div>
-     <div class="acs-feature-card">
-       <h3 class="acs-feature-title">ML Cancer Risk Calculator</h3>
-       <p class="acs-feature-desc">Enter age, lifestyle, and medical history to receive a personalized risk score with relative risk, lifetime estimates, key factors, and AI follow-up support.</p>
-       <a href="https://acs.opencodingsociety.com/cancerrisk" target="_blank" rel="noopener noreferrer" class="acs-feature-btn">Open Risk Calculator</a>
-     </div>
-     <div class="acs-feature-card">
-       <h3 class="acs-feature-title">ACS Cancer Body Map Chat</h3>
-       <p class="acs-feature-desc">Explore an interactive body map that connects cancer types to anatomical regions with symptoms, risk factors, resources, and plain-English AI assistance.</p>
-       <a href="https://acs.opencodingsociety.com/map" target="_blank" rel="noopener noreferrer" class="acs-feature-btn">Open Body Map Chat</a>
-     </div>
-   </div>
- </div>
+<div class="acs-infograph">
 
+  <!-- HEADER -->
+  <div class="acs-header">
+    <div class="acs-badge">Treatment Management and Community Learning</div>
+    <h1 class="acs-title">{{ data.Title }}</h1>
+    <p class="acs-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- FEATURE LINKS -->
+  <div class="acs-links-section">
+    <div class="acs-links-heading">Project Tools</div>
+    <div class="acs-links-grid">
+
+      <div class="acs-link-card">
+        <!-- Replace with <img src="..." alt="..."> when ready -->
+        <img src="{{ site.baseurl }}/images/capstone/acs/lab_acs.png" alt="Cell Cycle & Cancer Lab" class="ded-update-img">
+        <div class="acs-link-card-title">Cell Cycle &amp; Cancer Lab</div>
+        <div class="acs-link-card-desc">An interactive simulation teaching how the cell cycle works and breaks down in cancer with phase checkpoints, gene toggles, and live mutation tracking.</div>
+        <a href="https://acs.opencodingsociety.com/cyclegame" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Cell Cycle Lab</a>
+      </div>
+
+      <div class="acs-link-card">
+        <img src="{{ site.baseurl }}/images/capstone/acs/game_acs.png" alt="Cell Game" class="ded-update-img">
+        <div class="acs-link-card-title">Cell Game</div>
+        <div class="acs-link-card-desc">An interactive RPG where players navigate through cell biology and cancer concepts in an engaging story-driven format.</div>
+        <a href="https://acs.opencodingsociety.com/cellgame" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Cell Game</a>
+      </div>
+
+      <div class="acs-link-card">
+        <img src="{{ site.baseurl }}/images/capstone/acs/risk_acs.png" alt="ML Cancer Risk Calculator" class="ded-update-img">
+        <div class="acs-link-card-title">ML Cancer Risk Calculator</div>
+        <div class="acs-link-card-desc">Enter age, lifestyle, and medical history to receive a personalized risk score with relative risk, lifetime estimates, key factors, and AI follow-up support.</div>
+        <a href="https://acs.opencodingsociety.com/cancerrisk" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Risk Calculator</a>
+      </div>
+
+      <div class="acs-link-card">
+        <img src="{{ site.baseurl }}/images/capstone/acs/map_acs.png" alt="ACS Cancer Body Map Chat" class="ded-update-img">
+        <div class="acs-link-card-title">ACS Cancer Body Map Chat</div>
+        <div class="acs-link-card-desc">Explore an interactive body map connecting cancer types to anatomical regions with symptoms, risk factors, resources, and plain-English AI assistance.</div>
+        <a href="https://acs.opencodingsociety.com/map" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Body Map Chat</a>
+      </div>
+
+      <div class="acs-link-card">
+        <img src="{{ site.baseurl }}/images/capstone/acs/blog_acs.png" alt="Community Blog" class="ded-update-img">
+        <div class="acs-link-card-title">Community Blog</div>
+        <div class="acs-link-card-desc">Stay updated with the updates, news, and stories from the ACS community.</div>
+        <a href="https://acs.opencodingsociety.com/blog" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Community Blog</a>
+      </div>
+
+
+    </div>
+  </div>
 
  <!-- Project Cards -->
  {% for topic in data.Topics %}
@@ -100,7 +109,7 @@
     
      <!-- Left: Image & Status -->
      <div class="wp-visual">
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
+       <a href="{{ topic.external_link }}" target="_blank" rel="noopener noreferrer" class="wp-image-link">
          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
          <div class="wp-overlay">
            <span>View Project</span>
@@ -155,6 +164,7 @@
 
 
    </div>
+   
  </div>
  {% endfor %}
 </div>
