@@ -32,6 +32,16 @@ You’ll use standard Unix shell commands:
 
 - MacOS: `ls`, `pwd`, `mkdir`, `cd`, `git`, `cat`
 
+```
+ls: lists all the files and directories in current directory
+pwd: Tells you the current directory you're in and its path
+mkdir [directory]: Makes a new directory
+cd [path]: Changes into a new directory
+cat [file]: Views contents of a file 
+```
+
+> NOTE: Think of directories as folders
+
 ## Version Control Commands
 
 - **git clone**: Make a working copy of a git repository from the cloud to your local machine.

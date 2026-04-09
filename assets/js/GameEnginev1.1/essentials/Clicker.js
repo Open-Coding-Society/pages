@@ -9,6 +9,10 @@ class Clicker extends Npc {
     }
 
     handleClick(event) {
+        if (!this.canInteractWithPlayer()) {
+            return;
+        }
+
         if (this.interact) {
             this.clcks++;
             // Backward compatible: callbacks that only use the first arg still work.

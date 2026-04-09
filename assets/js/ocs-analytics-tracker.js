@@ -409,6 +409,13 @@
     async function submitAnalytics() {
         try {
             const javaURI = window.javaURI || '/api';
+            
+            // Skip submission if no backend URI is configured (static site mode)
+            if (!window.javaURI || javaURI === '/api') {
+                debug('Skipping analytics submission - no backend configured');
+                return;
+            }
+            
             const payload = preparePayload();
             
             // Only submit if there's meaningful data

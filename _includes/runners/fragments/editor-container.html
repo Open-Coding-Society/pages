@@ -1,0 +1,15 @@
+<div class="editor-container">
+  {% if include.top_controls %}
+  <div class="control-panel">
+    {{ include.top_controls }}
+  </div>
+  {% endif %}
+
+  <textarea class="editor-textarea"></textarea>
+
+  {% if include.bottom_controls %}
+  <div class="control-panel">
+    {{ include.bottom_controls }}
+  </div>
+  {% endif %}
+</div>

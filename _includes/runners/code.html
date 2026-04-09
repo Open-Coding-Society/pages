@@ -1,0 +1,143 @@
+<!-- Reusable Code Runner Component -->
+<div class="code-runner-container"
+  id="runner-{{ include.runner_id }}"
+  data-runner-id="{{ include.runner_id }}"
+  data-default-code="{{ include.code | jsonify | escape }}"
+  data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  {% capture code_runner_title %}Code Runner Challenge {% if include.challenge_number %}#{{ include.challenge_number }}{% endif %}{% endcapture %}
+  {% include runners/fragments/challenge-box.html title=code_runner_title challenge=include.challenge %}
+
+  {% if include.source %}
+  <details>
+    <summary>View IPYNB Source</summary>
+
+<div markdown="1">
+{{ include.source }}
+</div>
+
+  </details>
+  {% endif %}
+
+  {% capture code_runner_top_controls %}
+      <button type="button" class="runBtn" title="Run">▶</button>
+      <button type="button" class="copyBtn" title="Copy Code">⎘</button>
+      <button type="button" class="saveBtn" title="Save Code">💾</button>
+      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑</button>
+      <select class="languageSelect">
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
+      </select>
+      <select class="fontSizeSelect">
+        <option value="14">14px</option>
+        <option value="16">16px</option>
+        <option value="18">18px</option>
+        <option value="20">20px</option>
+      </select>
+  {% endcapture %}
+  {% capture code_runner_bottom_controls %}
+    {% include runners/fragments/editor-stats.html %}
+  {% endcapture %}
+  {% include runners/fragments/editor-container.html
+     top_controls=code_runner_top_controls
+     bottom_controls=code_runner_bottom_controls
+  %}
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span>Output</span>
+      <button type="button" class="copyOutputBtn" title="Copy Output">⎘</button>
+    </div>
+    <div class="output-content">Click "Run" in code control panel to see output ...</div>
+    <div class="control-panel">
+      <span class="execTime"></span>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { BaseRunner, CodeExecutor } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
+import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+(function() {
+  const container = document.getElementById('runner-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const initialLang = "{{ include.language }}";
+  const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
+  const editorHeight = "{{ include.height }}";
+  const storageKey = container.dataset.storageKey;
+  const runner = new BaseRunner(container, { storageKey });
+
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    fallbackCode: "print('Hello, world!')",
+    codeMirrorOptions: {
+      lineNumbers: true,
+      mode: initialLang === "java" ? "text/x-java" : (initialLang || "python"),
+      theme: "darcula",
+      indentUnit: 4,
+      tabSize: 4
+    }
+  });
+
+  const langSelect = container.querySelector('.languageSelect');
+  const fontSizeSelect = container.querySelector('.fontSizeSelect');
+  const outputDiv = container.querySelector('.output-content');
+  const execTimeSpan = container.querySelector('.execTime');
+  const codeExecutor = new CodeExecutor({
+    editor,
+    outputElement: outputDiv,
+    execTimeElement: execTimeSpan,
+    languageSelect: langSelect,
+    pythonURI,
+    javaURI,
+    fetchOptions,
+  });
+
+  // Set initial language selection
+  if (initialLang) {
+    langSelect.value = initialLang;
+  }
+
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "print('Hello, world!')",
+    onClear: () => {
+      outputDiv.textContent = 'Storage cleared. Code reset to default.';
+      execTimeSpan.textContent = '';
+    }
+  });
+
+  // Font size changer
+  fontSizeSelect.addEventListener("change", () => {
+    const size = fontSizeSelect.value;
+    container.querySelector('.CodeMirror').style.fontSize = size + 'px';
+    editor.refresh();
+  });
+
+  // Language switcher
+  langSelect.addEventListener("change", () => {
+    const lang = langSelect.value;
+    if (lang === "python") {
+      editor.setOption("mode", "python");
+    } else if (lang === "java") {
+      editor.setOption("mode", "text/x-java");
+    } else if (lang === "javascript") {
+      editor.setOption("mode", "javascript");
+    }
+  });
+
+  codeExecutor.bindCopyOutput(container.querySelector('.copyOutputBtn'));
+
+  // Run button logic
+  function runCode() {
+    return codeExecutor.run();
+  }
+
+  runner.bindButton('.runBtn', runCode);
+
+  // Keyboard shortcut
+  runner.bindShortcut(runCode);
+})();
+</script>

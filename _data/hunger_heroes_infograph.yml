@@ -14,10 +14,13 @@ Topics:
       - "JavaScript interactive frontend"
       - "SQLite/PostgreSQL database integration"
       - "Real-time notifications for time-sensitive donations"
+      - "<a href='https://github.com/Ahaanv19/hunger_heroes/issues/46' target='_blank'>DS2 Objectives (Issue #46)</a>"
+      - "<a href='https://github.com/Ahaanv19/hunger_heroes/issues/54' target='_blank'>DS2 Objectives (Issue #54)</a>"
     subtitle: "Fighting Food Insecurity with Technology"
     description: "A community-driven platform connecting restaurants, grocery stores, and individuals with excess fresh food to local shelters, food banks, and families in need. Features intelligent graph algorithms for optimal location matching, real-time donor-receiver pairing, and time-sensitive notifications to ensure food reaches those in need before it spoils. Supports UN Sustainable Development Goal 2: Zero Hunger."
     tech:
       - "Python Flask Backend"
+      - "Spring Boot Java Backend"
       - "JavaScript Frontend"
       - "RESTful API Design"
       - "Graph Data Structures"

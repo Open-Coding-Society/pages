@@ -31,7 +31,7 @@ ctx.fillStyle = 'red';
 ctx.fillRect(100, 100, 200, 200);
 {% endcapture %}
 
-{% include ui-runner.html 
+{% include runners/ui.html 
    runner_id="visual1"
    challenge=challenge1
    code=code1
@@ -50,7 +50,7 @@ ctx.fillRect(100, 100, 200, 200);
 
 #### HTML Component
 
-- File: `_includes/ui-runner.html`
+- File: `_includes/runners/ui.html`
 - Reusable component for visual JavaScript output
 - Uses CodeMirror for syntax highlighting (JavaScript mode only)
 - Provides `outputElement` variable for DOM manipulation
@@ -107,7 +107,7 @@ ctx.fillStyle = 'red';
 ctx.fillRect(100, 100, 200, 200);
 {% endcapture %}
 
-{% include ui-runner.html
+{% include runners/ui.html
    runner_id="visual1"
    challenge=challenge1
    code=code1
@@ -183,7 +183,7 @@ draw();
 update();
 {% endcapture %}
 
-{% include ui-runner.html
+{% include runners/ui.html
    runner_id="visual2"
    challenge=challenge2
    code=code2
@@ -230,7 +230,7 @@ button.addEventListener('click', () => {
 outputElement.appendChild(button);
 {% endcapture %}
 
-{% include ui-runner.html
+{% include runners/ui.html
    runner_id="visual3"
    challenge=challenge3
    code=code3
