@@ -206,22 +206,33 @@ class GameLevelCsPathIdentity {
       return;
     }
 
-    const bgObj = this.getBackgroundObject();
+    // Update config data immediately so late-mounted backgrounds still inherit
+    // the restored theme source.
+    bgData.src = themeMeta.src;
+
     const candidateImage = new Image();
 
-    candidateImage.onload = () => {
-      // Keep source-of-truth bg data and live object in sync.
-      bgData.src = themeMeta.src;
+    const applyToLiveBackground = (remainingAttempts = 20) => {
+      const bgObj = this.getBackgroundObject();
+      if (!bgObj) {
+        if (remainingAttempts > 0) {
+          setTimeout(() => applyToLiveBackground(remainingAttempts - 1), 100);
+        }
+        return;
+      }
 
       if (bgObj?.data) {
         bgObj.data.src = themeMeta.src;
       }
 
-      if (bgObj) {
-        bgObj.image = candidateImage;
-        bgObj.spriteReady = true;
-        bgObj.resize?.();
-      }
+      bgObj.image = candidateImage;
+      bgObj.spriteReady = true;
+      bgObj.resize?.();
+    };
+
+    candidateImage.onload = () => {
+      // Keep source-of-truth bg data and live object in sync.
+      applyToLiveBackground();
     };
 
     candidateImage.onerror = (e) => {
