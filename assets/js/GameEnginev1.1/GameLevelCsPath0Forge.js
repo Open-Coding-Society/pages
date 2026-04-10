@@ -26,7 +26,7 @@ const identityState = {
 /**
  * GameLevel CS Pathway - Identity Forge
  */
-class GameLevelCssePath {
+class GameLevelCsPath0Forge {
   static levelId = 'csse-path';
   static displayName = 'Identity Forge';
 
@@ -92,7 +92,7 @@ class GameLevelCssePath {
     // ── Background ──────────────────────────────────────────────
     const image_src = path + "/images/gamify/pathway/csse/bg/identity-forge-1.png";
     const bg_data = {
-        name: GameLevelCssePath.displayName,
+        name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
         src: image_src,
     };
@@ -882,11 +882,11 @@ class GameLevelCssePath {
     // Background: Find the background object.
     this.getBackgroundObject = function() {
       const bgObj = gameEnv.gameObjects.find(obj =>
-        (obj.data && obj.data.name === GameLevelCssePath.displayName)
+        (obj.data && obj.data.name === GameLevelCsPath0Forge.displayName)
       );
       if (!bgObj) {
         console.warn('World Theme Portal: background object not found');
-        console.log('Looking for name:', GameLevelCssePath.displayName);
+        console.log('Looking for name:', GameLevelCsPath0Forge.displayName);
         console.log('Available objects:', gameEnv.gameObjects.map(obj => ({
           hasData: !!obj.data,
           dataName: obj.data?.name,
@@ -1087,4 +1087,4 @@ class GameLevelCssePath {
   }
 }
 
-export default GameLevelCssePath;
+export default GameLevelCsPath0Forge;
