@@ -29,10 +29,129 @@ class GameLevelCssePath1 {
     // Read the saved world theme from CSSE Path, then translate it to the
     // matching Wayfinding World background so the player's choice carries over
     // without forcing the exact same image.
+    // This keeps the level progression feeling connected while still allowing
+    // the second level to use its own version of each theme.
     this.profileManager = new ProfileManager();
     this.getBackgroundObject = () => gameEnv.gameObjects.find((obj) =>
       obj?.data?.name === GameLevelCssePath1.displayName
     );
+
+    // Character transfer:
+    // Reuse the exact same selected sprite in Wayfinding World so the player's
+    // character stays consistent across both levels without any remapping.
+    // Unlike the background, the avatar should not be translated into a new
+    // variant; it should be the identical sprite the player already chose.
+    this.getPlayerObject = () => gameEnv.gameObjects.find((obj) =>
+      obj?.data?.id === 'Minimalist_Identity' || obj?.id === 'Minimalist_Identity'
+    );
+
+    // Match the original sprite sheet layout used by the CSSE Path player.
+    // Most sprites can be restored directly, but we still rebuild the frame
+    // map so the animation logic stays correct for each sprite sheet shape.
+    this.getAvatarMovementConfig = (spriteMeta = {}) => {
+      const rows = Math.max(1, Number(spriteMeta.rows || 1));
+      const columns = Math.max(1, Number(spriteMeta.cols || 1));
+      const preset = spriteMeta.movementPreset || (rows >= 4 ? 'four-row-8way' : 'single-row');
+
+      if (preset === 'two-row-8way') {
+        return {
+          orientation: { rows, columns },
+          down: { row: 0, start: 0, columns: 1 },
+          downRight: { row: 0, start: 0, columns: 1, rotate: Math.PI / 16 },
+          downLeft: { row: 0, start: 0, columns: 1, rotate: -Math.PI / 16 },
+          left: { row: Math.min(1, rows - 1), start: 0, columns: 1, mirror: true },
+          right: { row: Math.min(1, rows - 1), start: 0, columns: 1 },
+          up: { row: 0, start: Math.min(1, columns - 1), columns: 1 },
+          upLeft: { row: Math.min(1, rows - 1), start: 0, columns: 1, mirror: true, rotate: Math.PI / 16 },
+          upRight: { row: Math.min(1, rows - 1), start: 0, columns: 1, rotate: -Math.PI / 16 },
+        };
+      }
+
+      if (preset === 'single-row') {
+        return {
+          orientation: { rows, columns },
+          down: { row: 0, start: 0, columns },
+          downRight: { row: 0, start: 0, columns, rotate: Math.PI / 16 },
+          downLeft: { row: 0, start: 0, columns, rotate: -Math.PI / 16 },
+          left: { row: 0, start: 0, columns, mirror: true },
+          right: { row: 0, start: 0, columns },
+          up: { row: 0, start: 0, columns },
+          upLeft: { row: 0, start: 0, columns, mirror: true, rotate: Math.PI / 16 },
+          upRight: { row: 0, start: 0, columns, rotate: -Math.PI / 16 },
+        };
+      }
+
+      return {
+        orientation: { rows, columns },
+        down: { row: 0, start: 0, columns },
+        downRight: { row: Math.min(1, rows - 1), start: 0, columns, rotate: Math.PI / 16 },
+        downLeft: { row: Math.min(2, rows - 1), start: 0, columns, rotate: -Math.PI / 16 },
+        left: { row: Math.min(2, rows - 1), start: 0, columns },
+        right: { row: Math.min(1, rows - 1), start: 0, columns },
+        up: { row: Math.min(3, rows - 1), start: 0, columns },
+        upLeft: { row: Math.min(2, rows - 1), start: 0, columns, rotate: Math.PI / 16 },
+        upRight: { row: Math.min(1, rows - 1), start: 0, columns, rotate: -Math.PI / 16 },
+      };
+    };
+
+    // Load the exact saved character sprite after the player object mounts.
+    // The image is preloaded first so we only swap the sprite once the file is
+    // confirmed valid, which avoids replacing the player with a broken asset.
+    this.applyAvatarOptions = (options = {}) => {
+      const playerObj = this.getPlayerObject();
+      if (!playerObj) {
+        return;
+      }
+
+      const spriteMeta = typeof options.sprite === 'object'
+        ? options.sprite
+        : options.spriteMeta || null;
+
+      const spriteSrc = spriteMeta?.src || spriteMeta?.rawSrc;
+      if (!spriteSrc) {
+        return;
+      }
+
+      const normalizedSpriteMeta = {
+        ...spriteMeta,
+        src: spriteSrc,
+      };
+
+      const candidateSheet = new Image();
+      candidateSheet.onload = () => {
+        // Rebuild the directional frame data using the saved sprite metadata.
+        const movementConfig = this.getAvatarMovementConfig(normalizedSpriteMeta);
+        const scaleFactor = Number(normalizedSpriteMeta.scaleFactor || 5);
+
+        playerObj.data.src = spriteSrc;
+        playerObj.data.SCALE_FACTOR = scaleFactor;
+        playerObj.scaleFactor = scaleFactor;
+
+        Object.assign(playerObj.spriteData, movementConfig, {
+          src: spriteSrc,
+          SCALE_FACTOR: scaleFactor,
+          pixels: {
+            width: candidateSheet.naturalWidth,
+            height: candidateSheet.naturalHeight,
+          },
+        });
+
+        playerObj.spriteSheet = candidateSheet;
+        playerObj.spriteReady = true;
+
+        try {
+          playerObj.resize();
+        } catch (err) {
+          console.warn('Wayfinding World: error resizing transferred character sprite', err);
+        }
+      };
+
+      candidateSheet.onerror = (e) => {
+        console.warn('Wayfinding World: failed to load transferred character sprite, keeping default', spriteSrc, e);
+      };
+
+      candidateSheet.src = spriteSrc;
+    };
 
     // Load the Wayfinding World theme catalog so we can match the saved theme
     // name to the correct bg1 asset.
@@ -125,20 +244,30 @@ class GameLevelCssePath1 {
     };
 
     this.profileManager.initialize().then(async (restored) => {
+      // Keep a local copy of the restored profile so both transfer flows can
+      // read from the same saved state in this level.
+      this.profileData = { ...restored?.profileData };
+
       const selectedTheme = restored?.profileData?.themeMeta;
       if (!selectedTheme) {
-        return;
+        // Theme is optional here, but character transfer can still continue.
+      } else {
+        const catalog = await this.getWayfindingThemeCatalog();
+        const mappedTheme = this.resolveWayfindingTheme(selectedTheme, catalog);
+        if (mappedTheme) {
+          // Delay the swap until the level objects exist, otherwise the background
+          // object lookup can run before the scene is mounted.
+          setTimeout(() => this.applyWayfindingTheme(mappedTheme), 300);
+        }
       }
 
-      const catalog = await this.getWayfindingThemeCatalog();
-      const mappedTheme = this.resolveWayfindingTheme(selectedTheme, catalog);
-      if (!mappedTheme) {
-        return;
+      const selectedSprite = restored?.profileData?.spriteMeta;
+      if (selectedSprite) {
+        // Keep the exact same character selection across both CSSE levels.
+        // The saved sprite metadata already contains everything needed to
+        // reconstruct the player's appearance here.
+        setTimeout(() => this.applyAvatarOptions({ sprite: selectedSprite }), 300);
       }
-
-      // Delay the swap until the level objects exist, otherwise the background
-      // object lookup can run before the scene is mounted.
-      setTimeout(() => this.applyWayfindingTheme(mappedTheme), 300);
     }).catch((err) => {
       console.warn('Wayfinding World: ProfileManager initialization failed', err);
     });
