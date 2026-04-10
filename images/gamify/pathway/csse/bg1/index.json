@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Rural",
+    "src": "wayfinding-world.png",
+    "description": "A forest vibe and village backdrop",
+    "previewText": "Default theme",
+    "compatibleSprites": ["Minimalist", "Fidelity Girl"]
+  },
+  {
+    "name": "City",
+    "src": "wayfinding-world-city.png",
+    "description": "Neon-lit urban sprawl",
+    "previewText": "Urban theme",
+    "compatibleSprites": ["Chill Guy", "Miku"]
+  },
+  {
+    "name": "Space",
+    "src": "wayfinding-world-space.png",
+    "description": "The void between stars and planets",
+    "previewText": "Space theme",
+    "compatibleSprites": ["Astronaut", "Ufos", "Pew"]
+  },
+  {
+    "name": "Clouds",
+    "src": "wayfinding-world-clouds.png",
+    "description": "Cloudy skiew with city backdrop",
+    "previewText": "Cloud theme",
+    "compatibleSprites": ["Kirby", "Slime"]
+  }
+]
