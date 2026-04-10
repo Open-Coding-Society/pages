@@ -1,7 +1,7 @@
 [
   {
     "name": "Fantasy",
-    "src": "mission-tools.png",
+    "src": "mission-tools-fantasy.png",
     "description": "A retro style workshop theme with vibrant colors and whimsical elements",
     "previewText": "Default theme",
     "compatibleSprites": ["Minimalist", "Fidelity Girl"]
