@@ -118,7 +118,7 @@ class GameLevelCssePath {
       up:        { row: 0, start: 1, columns: 1 },
       upLeft:    { row: 1, start: 0, columns: 1, mirror: true, rotate:  Math.PI / 16 },
       upRight:   { row: 1, start: 0, columns: 1, rotate: -Math.PI / 16 },
-      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+      hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
 
@@ -155,7 +155,8 @@ class GameLevelCssePath {
       up: { row: 0, start: 1, columns: 1 },
       left: { row: 1, start: 0, columns: 1 },
       right: { row: 1, start: 1, columns: 1 },
-      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+      hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+      alertDistance: 1.25,   
     };
 
     const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
@@ -166,9 +167,6 @@ class GameLevelCssePath {
       interactDistance: interactDistance || 120,
       reaction: function () {
         if (reaction) reaction.call(this);
-        if (level?.showToast) {
-          level.showToast("Press E to interact");
-        }
       },
 
       ...(interact ? { interact } : {}),
@@ -185,7 +183,7 @@ class GameLevelCssePath {
       greeting: "Welcome to the Path of Code-Code-Coding...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
       position: startGatekeeperPos,
       reaction: () => {
-        if (identityState.startGatekeeperDone) return;
+        if (!identityState.startGatekeeperDone);
         identityState.startGatekeeperDone = true;
         void level.showDialogue('Gatekeeper', [
           'Welcome to the Path of Code-Code-Coding...',
