@@ -35,7 +35,7 @@ class GameLevelCsPath1Way {
     // without forcing the exact same image.
     this.profileManager = new ProfileManager();
     this.getBackgroundObject = () => gameEnv.gameObjects.find((obj) =>
-      obj?.data?.name === GameLevelCsPath0Forge.displayName
+      obj?.data?.name === GameLevelCsPath1Way.displayName
     );
 
     // Load the Wayfinding World theme catalog so we can match the saved theme

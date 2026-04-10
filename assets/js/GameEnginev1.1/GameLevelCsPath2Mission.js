@@ -8,7 +8,7 @@ import GameLevelCsPath0Forge from './GameLevelCsPath0Forge.js';
 /**
  * GameLevel CS Pathway - Mission Tools
  */
-class GameLevelCsPath3Mission {
+class GameLevelCsPath2Mission {
   static levelId = 'mission-tools';
   static displayName = 'Mission Tools';
 
@@ -24,7 +24,7 @@ class GameLevelCsPath3Mission {
     // ── Background ──────────────────────────────────────────────
     const image_src = path + "/images/gamify/pathway/csse/bg2/mission-tools.png";
     const bg_data = {
-        name: GameLevelCsPath3Mission.displayName,
+        name: GameLevelCsPath2Mission.displayName,
         greeting: "Welcome to the CS pathway! This quest will prepare you for your mission ahead by introducing your essential tools and resources!",
         src: image_src,
     };
@@ -35,7 +35,7 @@ class GameLevelCsPath3Mission {
     // without forcing the exact same image.
     this.profileManager = new ProfileManager();
     this.getBackgroundObject = () => gameEnv.gameObjects.find((obj) =>
-      obj?.data?.name === GameLevelCsPath0Forge.displayName
+      obj?.data?.name === GameLevelCsPath2Mission.displayName
     );
 
     // Load the Mission Tools theme catalog so we can match the saved theme
@@ -215,4 +215,4 @@ class GameLevelCsPath3Mission {
 
 }
 
-export default GameLevelCsPath3Mission;
+export default GameLevelCsPath2Mission;
