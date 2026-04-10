@@ -1,7 +1,7 @@
 [
   {
-    "name": "Rural",
-    "src": "wayfinding-world.png",
+    "name": "Fantasy",
+    "src": "wayfinding-world-fantasy.png",
     "description": "A forest vibe and village backdrop",
     "previewText": "Default theme",
     "compatibleSprites": ["Minimalist", "Fidelity Girl"]

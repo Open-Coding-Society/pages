@@ -90,7 +90,7 @@ class GameLevelCsPath0Forge {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/pathway/csse/bg/identity-forge-1.png";
+    const image_src = path + "/images/gamify/cs-pathway/bg/identity-forge-fantasy.png";
     const bg_data = {
         name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
@@ -98,7 +98,7 @@ class GameLevelCsPath0Forge {
     };
 
     // ── Player ───────────────────────────────────────────────────
-    const player_src = path + "/images/gamify/pathway/csse/player/minimalist.png";
+    const player_src = path + "/images/gamify/cs-pathway/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
@@ -146,7 +146,7 @@ class GameLevelCsPath0Forge {
     };
 
     const gatekeeperBaseData = {
-      src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
+      src: path + "/images/gamify/cs-pathway/npc/gatekeeper2.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
       pixels: { width: 1024, height: 1024 },
@@ -582,7 +582,7 @@ class GameLevelCsPath0Forge {
       const fallbackCatalog = [
         {
           name: 'Minimalist',
-          src: `${path}/images/gamify/pathway/csse/player/minimalist.png`,
+          src: `${path}/images/gamify/cs-pathway/player/minimalist.png`,
           rows: 2,
           cols: 2,
           scaleFactor: PLAYER_SCALE_FACTOR,
@@ -713,7 +713,7 @@ class GameLevelCsPath0Forge {
         ? options.sprite
         : options.spriteMeta || {
             name: 'Minimalist',
-            src: `${path}/images/gamify/pathway/csse/player/minimalist.png`,
+            src: `${path}/images/gamify/cs-pathway/player/minimalist.png`,
             rows: 2,
             cols: 2,
             scaleFactor: PLAYER_SCALE_FACTOR,
@@ -843,13 +843,13 @@ class GameLevelCsPath0Forge {
       const fallbackCatalog = [
         {
           name: 'Identity Forge',
-          src: `${path}/images/gamify/pathway/csse/bg/indentity-forge-1.png`,
+          src: image_src,
           previewText: 'Default theme',
         },
       ];
  
       try {
-        const response = await fetch(`${path}/images/gamify/pathway/csse/bg/index.json`, { cache: 'no-cache' });
+        const response = await fetch(`${path}/images/gamify/cs-pathway/bg/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
@@ -858,7 +858,7 @@ class GameLevelCsPath0Forge {
         const manifestThemes = Array.isArray(manifest)
           ? manifest.map((entry) => ({
               name: entry.name,
-              src: `${path}/images/gamify/pathway/csse/bg/${entry.src}`,
+              src: `${path}/images/gamify/cs-pathway/bg/${entry.src}`,
               previewText: entry.previewText || entry.description || '',
             }))
           : [];
