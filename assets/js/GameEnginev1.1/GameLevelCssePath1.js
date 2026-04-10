@@ -2,6 +2,7 @@
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
+import ProfileManager from '../pages/home-gamified/ProfileManager.js';
 
 class GameLevelCssePath1 {
   static levelId = 'wayfinding-world';
@@ -23,6 +24,124 @@ class GameLevelCssePath1 {
         greeting: "Welcome to the CSSE pathway! This quest will identify your profile and persona!",
         src: image_src,
     };
+
+    // Theme transfer:
+    // Read the saved world theme from CSSE Path, then translate it to the
+    // matching Wayfinding World background so the player's choice carries over
+    // without forcing the exact same image.
+    this.profileManager = new ProfileManager();
+    this.getBackgroundObject = () => gameEnv.gameObjects.find((obj) =>
+      obj?.data?.name === GameLevelCssePath1.displayName
+    );
+
+    // Load the Wayfinding World theme catalog so we can match the saved theme
+    // name to the correct bg1 asset.
+    this.getWayfindingThemeCatalog = async () => {
+      if (this.wayfindingThemeCatalog) {
+        return this.wayfindingThemeCatalog;
+      }
+
+      try {
+        const response = await fetch(`${path}/images/gamify/pathway/csse/bg1/index.json`, { cache: 'no-cache' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const manifest = await response.json();
+        this.wayfindingThemeCatalog = Array.isArray(manifest)
+          ? manifest.map((entry) => ({
+              name: entry.name,
+              src: `${path}/images/gamify/pathway/csse/bg1/${entry.src}`,
+              compatibleSprites: Array.isArray(entry.compatibleSprites) ? entry.compatibleSprites : [],
+            }))
+          : [];
+      } catch (error) {
+        console.warn('Wayfinding World: failed to load bg1 theme catalog', error);
+        this.wayfindingThemeCatalog = [];
+      }
+
+      return this.wayfindingThemeCatalog;
+    };
+
+    // Prefer an exact theme-name match, then fall back to any shared sprite
+    // compatibility so theme families stay consistent across levels.
+    this.resolveWayfindingTheme = (selectedTheme, catalog) => {
+      if (!selectedTheme || !Array.isArray(catalog) || catalog.length === 0) {
+        return null;
+      }
+
+      const selectedName = String(selectedTheme.name || '').toLowerCase();
+      const byName = catalog.find((theme) => String(theme.name || '').toLowerCase() === selectedName);
+      if (byName) {
+        return byName;
+      }
+
+      const selectedSprites = Array.isArray(selectedTheme.compatibleSprites)
+        ? selectedTheme.compatibleSprites
+        : [];
+      if (selectedSprites.length > 0) {
+        const bySprites = catalog.find((theme) =>
+          Array.isArray(theme.compatibleSprites)
+          && theme.compatibleSprites.some((sprite) => selectedSprites.includes(sprite))
+        );
+        if (bySprites) {
+          return bySprites;
+        }
+      }
+
+      return null;
+    };
+
+    // Only swap the live background after the image finishes loading.
+    // This keeps the level on the default background if the themed asset is
+    // missing or broken.
+    this.applyWayfindingTheme = (themeMeta) => {
+      if (!themeMeta?.src) {
+        return;
+      }
+
+      const bgObj = this.getBackgroundObject();
+      const candidateImage = new Image();
+
+      candidateImage.onload = () => {
+        bg_data.src = themeMeta.src;
+
+        if (bgObj?.data) {
+          bgObj.data.src = themeMeta.src;
+        }
+
+        if (bgObj) {
+          bgObj.image = candidateImage;
+          bgObj.spriteReady = true;
+          bgObj.resize?.();
+        }
+      };
+
+      candidateImage.onerror = (e) => {
+        console.warn('Wayfinding World: failed to load themed background, keeping default', themeMeta.src, e);
+      };
+
+      candidateImage.src = themeMeta.src;
+    };
+
+    this.profileManager.initialize().then(async (restored) => {
+      const selectedTheme = restored?.profileData?.themeMeta;
+      if (!selectedTheme) {
+        return;
+      }
+
+      const catalog = await this.getWayfindingThemeCatalog();
+      const mappedTheme = this.resolveWayfindingTheme(selectedTheme, catalog);
+      if (!mappedTheme) {
+        return;
+      }
+
+      // Delay the swap until the level objects exist, otherwise the background
+      // object lookup can run before the scene is mounted.
+      setTimeout(() => this.applyWayfindingTheme(mappedTheme), 300);
+    }).catch((err) => {
+      console.warn('Wayfinding World: ProfileManager initialization failed', err);
+    });
     
     // ── Player ───────────────────────────────────────────────────
     const player_src = path + "/images/gamify/pathway/csse/player/minimalist.png";
