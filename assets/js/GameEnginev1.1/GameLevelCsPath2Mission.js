@@ -3,10 +3,14 @@ import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
 import ProfileManager from '../pages/home-gamified/ProfileManager.js';
+import GameLevelCsPath0Forge from './GameLevelCsPath0Forge.js';
 
-class GameLevelCssePath1 {
-  static levelId = 'wayfinding-world';
-  static displayName = 'Wayfinding World';
+/**
+ * GameLevel CS Pathway - Mission Tools
+ */
+class GameLevelCsPath3Mission {
+  static levelId = 'mission-tools';
+  static displayName = 'Mission Tools';
 
   constructor(gameEnv) {
     let width = gameEnv.innerWidth;
@@ -18,54 +22,54 @@ class GameLevelCssePath1 {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/pathway/csse/bg1/wayfinding-world.png";
+    const image_src = path + "/images/gamify/pathway/csse/bg2/mission-tools.png";
     const bg_data = {
-        name: GameLevelCssePath1.displayName,
-        greeting: "Welcome to the CSSE pathway! This quest will identify your profile and persona!",
+        name: GameLevelCsPath3Mission.displayName,
+        greeting: "Welcome to the CS pathway! This quest will prepare you for your mission ahead by introducing your essential tools and resources!",
         src: image_src,
     };
 
     // Theme transfer:
-    // Read the saved world theme from CSSE Path, then translate it to the
-    // matching Wayfinding World background so the player's choice carries over
+    // Read the saved world theme from CS Forge, then translate it to the
+    // matching Mission Tools background so the player's choice carries over
     // without forcing the exact same image.
     this.profileManager = new ProfileManager();
     this.getBackgroundObject = () => gameEnv.gameObjects.find((obj) =>
-      obj?.data?.name === GameLevelCssePath1.displayName
+      obj?.data?.name === GameLevelCsPath0Forge.displayName
     );
 
-    // Load the Wayfinding World theme catalog so we can match the saved theme
-    // name to the correct bg1 asset.
-    this.getWayfindingThemeCatalog = async () => {
-      if (this.wayfindingThemeCatalog) {
-        return this.wayfindingThemeCatalog;
+    // Load the Mission Tools theme catalog so we can match the saved theme
+    // name to the correct bg2 asset.
+    this.getMissionToolsThemeCatalog = async () => {
+      if (this.missionToolsThemeCatalog) {
+        return this.missionToolsThemeCatalog;
       }
 
       try {
-        const response = await fetch(`${path}/images/gamify/pathway/csse/bg1/index.json`, { cache: 'no-cache' });
+        const response = await fetch(`${path}/images/gamify/pathway/csse/bg2/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
 
         const manifest = await response.json();
-        this.wayfindingThemeCatalog = Array.isArray(manifest)
+        this.missionToolsThemeCatalog = Array.isArray(manifest)
           ? manifest.map((entry) => ({
               name: entry.name,
-              src: `${path}/images/gamify/pathway/csse/bg1/${entry.src}`,
+              src: `${path}/images/gamify/pathway/csse/bg2/${entry.src}`,
               compatibleSprites: Array.isArray(entry.compatibleSprites) ? entry.compatibleSprites : [],
             }))
           : [];
       } catch (error) {
-        console.warn('Wayfinding World: failed to load bg1 theme catalog', error);
-        this.wayfindingThemeCatalog = [];
+        console.warn('Mission Tools: failed to load bg2 theme catalog', error);
+        this.missionToolsThemeCatalog = [];
       }
 
-      return this.wayfindingThemeCatalog;
+      return this.missionToolsThemeCatalog;
     };
 
     // Prefer an exact theme-name match, then fall back to any shared sprite
     // compatibility so theme families stay consistent across levels.
-    this.resolveWayfindingTheme = (selectedTheme, catalog) => {
+    this.resolveMissionToolsTheme = (selectedTheme, catalog) => {
       if (!selectedTheme || !Array.isArray(catalog) || catalog.length === 0) {
         return null;
       }
@@ -95,7 +99,7 @@ class GameLevelCssePath1 {
     // Only swap the live background after the image finishes loading.
     // This keeps the level on the default background if the themed asset is
     // missing or broken.
-    this.applyWayfindingTheme = (themeMeta) => {
+    this.applyMissionToolsTheme = (themeMeta) => {
       if (!themeMeta?.src) {
         return;
       }
@@ -118,7 +122,7 @@ class GameLevelCssePath1 {
       };
 
       candidateImage.onerror = (e) => {
-        console.warn('Wayfinding World: failed to load themed background, keeping default', themeMeta.src, e);
+        console.warn('Mission Tools: failed to load themed background, keeping default', themeMeta.src, e);
       };
 
       candidateImage.src = themeMeta.src;
@@ -130,17 +134,17 @@ class GameLevelCssePath1 {
         return;
       }
 
-      const catalog = await this.getWayfindingThemeCatalog();
-      const mappedTheme = this.resolveWayfindingTheme(selectedTheme, catalog);
+      const catalog = await this.getMissionToolsThemeCatalog();
+      const mappedTheme = this.resolveMissionToolsTheme(selectedTheme, catalog);
       if (!mappedTheme) {
         return;
       }
 
       // Delay the swap until the level objects exist, otherwise the background
       // object lookup can run before the scene is mounted.
-      setTimeout(() => this.applyWayfindingTheme(mappedTheme), 300);
+      setTimeout(() => this.applyMissionToolsTheme(mappedTheme), 300);
     }).catch((err) => {
-      console.warn('Wayfinding World: ProfileManager initialization failed', err);
+      console.warn('Mission Tools: ProfileManager initialization failed', err);
     });
     
     // ── Player ───────────────────────────────────────────────────
@@ -202,51 +206,13 @@ class GameLevelCssePath1 {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
 
-    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
-      ...gatekeeperBaseData,
-      id,
-      greeting,
-      INIT_POSITION: { ...position },
-      interactDistance: interactDistance || 120,
-      ...(reaction ? { reaction } : {}),
-      ...(interact ? { interact } : {}),
-    });
-
-    const npc_data_codeHubGatekeeper = createGatekeeperData({
-      id: 'CodeHubGatekeeper',
-      greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
-      position: codeHubGatekeeperPos,
-    });
-
-    const npc_data_personalEnrichmentGatekeeper = createGatekeeperData({
-      id: 'PersonalEnrichmentGatekeeper',
-      greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
-      position: personalEnrichmentGatekeeperPos,
-    });
-
-    const npc_data_skillPassportGatekeeper = createGatekeeperData({
-      id: 'SkillPassportGatekeeper',
-      greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
-      position: skillPassportGatekeeperPos,
-    });
-
-    const npc_data_courseEnlistGatekeeper = createGatekeeperData({
-      id: 'CourseEnlistGatekeeper',
-      greeting: 'Welcome to Course Enlist! Choose your next class and map your pathway.',
-      position: courseEnlistGatekeeperPos,
-    });
-
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
-      { class: Npc, data: npc_data_codeHubGatekeeper },
-      { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
-      { class: Npc, data: npc_data_skillPassportGatekeeper },
-      { class: Npc, data: npc_data_courseEnlistGatekeeper },
     ];
   }
 
 }
 
-export default GameLevelCssePath1;
+export default GameLevelCsPath3Mission;
