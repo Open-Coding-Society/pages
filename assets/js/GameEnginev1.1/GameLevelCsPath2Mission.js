@@ -2,20 +2,22 @@
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
-import ProfileManager from '../pages/home-gamified/ProfileManager.js';
-import GameLevelCsPath0Forge from './GameLevelCsPath0Forge.js';
+import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
 /**
  * GameLevel CS Pathway - Mission Tools
  */
-class GameLevelCsPath2Mission {
+class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   static levelId = 'mission-tools';
   static displayName = 'Mission Tools';
 
   constructor(gameEnv) {
-    let width = gameEnv.innerWidth;
-    let height = gameEnv.innerHeight;
-    let path = gameEnv.path;
+    super(gameEnv, {
+      levelDisplayName: GameLevelCsPath2Mission.displayName,
+      logPrefix: 'Mission Tools',
+    });
+
+    let { width, height, path } = this.getLevelDimensions();
 
     /**
      * Section: Level objects.
@@ -29,241 +31,10 @@ class GameLevelCsPath2Mission {
         src: image_src,
     };
 
-    // Theme transfer:
-    // Read the saved world theme from CS Forge, then translate it to the
-    // matching Mission Tools background so the player's choice carries over
-    // without forcing the exact same image.
-    this.profileManager = new ProfileManager();
-    this.getBackgroundObject = () => gameEnv.gameObjects.find((obj) =>
-      obj?.data?.name === GameLevelCsPath2Mission.displayName
-    );
-
-    // Character transfer:
-    // Reuse the exact same selected sprite in Mission Tools so the player's
-    // character stays consistent across all CS pathway levels.
-    this.getPlayerObject = () => gameEnv.gameObjects.find((obj) =>
-      obj?.data?.id === 'Minimalist_Identity' || obj?.id === 'Minimalist_Identity'
-    );
-
-    // Rebuild the directional frame map from the saved sprite metadata so the
-    // restored character keeps its original animation layout.
-    this.getAvatarMovementConfig = (spriteMeta = {}) => {
-      const rows = Math.max(1, Number(spriteMeta.rows || 1));
-      const columns = Math.max(1, Number(spriteMeta.cols || 1));
-      const preset = spriteMeta.movementPreset || (rows >= 4 ? 'four-row-8way' : 'single-row');
-
-      if (preset === 'two-row-8way') {
-        return {
-          orientation: { rows, columns },
-          down: { row: 0, start: 0, columns: 1 },
-          downRight: { row: 0, start: 0, columns: 1, rotate: Math.PI / 16 },
-          downLeft: { row: 0, start: 0, columns: 1, rotate: -Math.PI / 16 },
-          left: { row: Math.min(1, rows - 1), start: 0, columns: 1, mirror: true },
-          right: { row: Math.min(1, rows - 1), start: 0, columns: 1 },
-          up: { row: 0, start: Math.min(1, columns - 1), columns: 1 },
-          upLeft: { row: Math.min(1, rows - 1), start: 0, columns: 1, mirror: true, rotate: Math.PI / 16 },
-          upRight: { row: Math.min(1, rows - 1), start: 0, columns: 1, rotate: -Math.PI / 16 },
-        };
-      }
-
-      if (preset === 'single-row') {
-        return {
-          orientation: { rows, columns },
-          down: { row: 0, start: 0, columns },
-          downRight: { row: 0, start: 0, columns, rotate: Math.PI / 16 },
-          downLeft: { row: 0, start: 0, columns, rotate: -Math.PI / 16 },
-          left: { row: 0, start: 0, columns, mirror: true },
-          right: { row: 0, start: 0, columns },
-          up: { row: 0, start: 0, columns },
-          upLeft: { row: 0, start: 0, columns, mirror: true, rotate: Math.PI / 16 },
-          upRight: { row: 0, start: 0, columns, rotate: -Math.PI / 16 },
-        };
-      }
-
-      return {
-        orientation: { rows, columns },
-        down: { row: 0, start: 0, columns },
-        downRight: { row: Math.min(1, rows - 1), start: 0, columns, rotate: Math.PI / 16 },
-        downLeft: { row: Math.min(2, rows - 1), start: 0, columns, rotate: -Math.PI / 16 },
-        left: { row: Math.min(2, rows - 1), start: 0, columns },
-        right: { row: Math.min(1, rows - 1), start: 0, columns },
-        up: { row: Math.min(3, rows - 1), start: 0, columns },
-        upLeft: { row: Math.min(2, rows - 1), start: 0, columns, rotate: Math.PI / 16 },
-        upRight: { row: Math.min(1, rows - 1), start: 0, columns, rotate: -Math.PI / 16 },
-      };
-    };
-
-    // Load the exact saved character sprite after the player object mounts.
-    // The image is preloaded first so we only swap the sprite once the file is
-    // confirmed valid, which avoids replacing the player with a broken asset.
-    this.applyAvatarOptions = (options = {}) => {
-      const playerObj = this.getPlayerObject();
-      if (!playerObj) {
-        return;
-      }
-
-      const spriteMeta = typeof options.sprite === 'object'
-        ? options.sprite
-        : options.spriteMeta || null;
-
-      const spriteSrc = spriteMeta?.src || spriteMeta?.rawSrc;
-      if (!spriteSrc) {
-        return;
-      }
-
-      const normalizedSpriteMeta = {
-        ...spriteMeta,
-        src: spriteSrc,
-      };
-
-      const candidateSheet = new Image();
-      candidateSheet.onload = () => {
-        const movementConfig = this.getAvatarMovementConfig(normalizedSpriteMeta);
-        const scaleFactor = Number(normalizedSpriteMeta.scaleFactor || 5);
-
-        playerObj.data.src = spriteSrc;
-        playerObj.data.SCALE_FACTOR = scaleFactor;
-        playerObj.scaleFactor = scaleFactor;
-
-        Object.assign(playerObj.spriteData, movementConfig, {
-          src: spriteSrc,
-          SCALE_FACTOR: scaleFactor,
-          pixels: {
-            width: candidateSheet.naturalWidth,
-            height: candidateSheet.naturalHeight,
-          },
-        });
-
-        playerObj.spriteSheet = candidateSheet;
-        playerObj.spriteReady = true;
-
-        try {
-          playerObj.resize();
-        } catch (err) {
-          console.warn('Mission Tools: error resizing transferred character sprite', err);
-        }
-      };
-
-      candidateSheet.onerror = (e) => {
-        console.warn('Mission Tools: failed to load transferred character sprite, keeping default', spriteSrc, e);
-      };
-
-      candidateSheet.src = spriteSrc;
-    };
-
-    // Load the Mission Tools theme catalog so we can match the saved theme
-    // name to the correct bg2 asset.
-    this.getMissionToolsThemeCatalog = async () => {
-      if (this.missionToolsThemeCatalog) {
-        return this.missionToolsThemeCatalog;
-      }
-
-      try {
-        const response = await fetch(`${path}/images/gamify/pathway/csse/bg2/index.json`, { cache: 'no-cache' });
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const manifest = await response.json();
-        this.missionToolsThemeCatalog = Array.isArray(manifest)
-          ? manifest.map((entry) => ({
-              name: entry.name,
-              src: `${path}/images/gamify/pathway/csse/bg2/${entry.src}`,
-              compatibleSprites: Array.isArray(entry.compatibleSprites) ? entry.compatibleSprites : [],
-            }))
-          : [];
-      } catch (error) {
-        console.warn('Mission Tools: failed to load bg2 theme catalog', error);
-        this.missionToolsThemeCatalog = [];
-      }
-
-      return this.missionToolsThemeCatalog;
-    };
-
-    // Prefer an exact theme-name match, then fall back to any shared sprite
-    // compatibility so theme families stay consistent across levels.
-    this.resolveMissionToolsTheme = (selectedTheme, catalog) => {
-      if (!selectedTheme || !Array.isArray(catalog) || catalog.length === 0) {
-        return null;
-      }
-
-      const selectedName = String(selectedTheme.name || '').toLowerCase();
-      const byName = catalog.find((theme) => String(theme.name || '').toLowerCase() === selectedName);
-      if (byName) {
-        return byName;
-      }
-
-      const selectedSprites = Array.isArray(selectedTheme.compatibleSprites)
-        ? selectedTheme.compatibleSprites
-        : [];
-      if (selectedSprites.length > 0) {
-        const bySprites = catalog.find((theme) =>
-          Array.isArray(theme.compatibleSprites)
-          && theme.compatibleSprites.some((sprite) => selectedSprites.includes(sprite))
-        );
-        if (bySprites) {
-          return bySprites;
-        }
-      }
-
-      return null;
-    };
-
-    // Only swap the live background after the image finishes loading.
-    // This keeps the level on the default background if the themed asset is
-    // missing or broken.
-    this.applyMissionToolsTheme = (themeMeta) => {
-      if (!themeMeta?.src) {
-        return;
-      }
-
-      const bgObj = this.getBackgroundObject();
-      const candidateImage = new Image();
-
-      candidateImage.onload = () => {
-        bg_data.src = themeMeta.src;
-
-        if (bgObj?.data) {
-          bgObj.data.src = themeMeta.src;
-        }
-
-        if (bgObj) {
-          bgObj.image = candidateImage;
-          bgObj.spriteReady = true;
-          bgObj.resize?.();
-        }
-      };
-
-      candidateImage.onerror = (e) => {
-        console.warn('Mission Tools: failed to load themed background, keeping default', themeMeta.src, e);
-      };
-
-      candidateImage.src = themeMeta.src;
-    };
-
-    this.profileManager.initialize().then(async (restored) => {
-      // Keep a local copy of the restored profile so both transfer flows can
-      // read from the same saved state in this level.
-      this.profileData = { ...restored?.profileData };
-
-      const selectedTheme = restored?.profileData?.themeMeta;
-      if (selectedTheme) {
-        const catalog = await this.getMissionToolsThemeCatalog();
-        const mappedTheme = this.resolveMissionToolsTheme(selectedTheme, catalog);
-        if (mappedTheme) {
-          // Delay the swap until the level objects exist, otherwise the background
-          // object lookup can run before the scene is mounted.
-          setTimeout(() => this.applyMissionToolsTheme(mappedTheme), 300);
-        }
-      }
-
-      const selectedSprite = restored?.profileData?.spriteMeta;
-      if (selectedSprite) {
-        // Keep the exact same character selection across all CS pathway levels.
-        setTimeout(() => this.applyAvatarOptions({ sprite: selectedSprite }), 300);
-      }
-    }).catch((err) => {
-      console.warn('Mission Tools: ProfileManager initialization failed', err);
+    this.restoreIdentitySelections({
+      bgData: bg_data,
+      themeManifestUrl: `${path}/images/gamify/pathway/csse/bg2/index.json`,
+      themeAssetPrefix: `${path}/images/gamify/pathway/csse/bg2/`,
     });
     
     // ── Player ───────────────────────────────────────────────────
