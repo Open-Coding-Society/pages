@@ -1,7 +1,7 @@
 // Imports: Level objects and UI helpers.
-import GamEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
+import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
 /**
@@ -24,7 +24,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/cs-pathway/bg1/wayfinding-world-fantasy.png";
+    const image_src = path + "/images/projects/cs-pathway-game/bg1/wayfinding-world-fantasy.png";
     const bg_data = {
         name: GameLevelCsPath1Way.displayName,
         greeting: "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll discover your course, uncover your strengths, and enrich your persona!",
@@ -33,12 +33,12 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     this.restoreIdentitySelections({
       bgData: bg_data,
-      themeManifestUrl: `${path}/images/gamify/cs-pathway/bg1/index.json`,
-      themeAssetPrefix: `${path}/images/gamify/cs-pathway/bg1/`,
+      themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg1/index.json`,
+      themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg1/`,
     });
     
     // ── Player ───────────────────────────────────────────────────
-    const player_src = path + "/images/gamify/cs-pathway/player/minimalist.png";
+    const player_src = path + "/images/projects/cs-pathway-game/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
@@ -84,7 +84,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     };
 
     const gatekeeperBaseData = {
-      src: path + '/images/gamify/cs-pathway/npc/gatekeeper2.png',
+      src: path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
       pixels: { width: 1024, height: 1024 },

@@ -48,8 +48,17 @@ _docx/~$*
 _posts/**/*_csp.md
 _posts/**/*_csa.md
 _posts/**/*_csse.md
+
+# Project distributions (auto-generated from projects/ source)
+_notebooks/projects/
+assets/js/projects/
+images/projects/
+
+# Post generations
 _posts/**/*_cwgu.md
 _posts/**/*_content.md
+
+# Multiple formats of the same content (auto-generated)
 _notebooks/**/*_csp.ipynb
 _notebooks/**/*_csa.ipynb
 _notebooks/**/*_csse.ipynb
