@@ -23,6 +23,9 @@ The CS Pathway game is made up of the following files.
 /_notebooks/home/2026-04-02-home2-gamified-mvp.ipynb - Launching point for Pathway Game (OCS connection)
  GameLevelCSPath*.js files into a unified game.  Addtionally, ths file provide a journey from landing page to this game as an integrated introduction to course work.  This file is bigger than the individual pathway game.
 
+/assets/js/GameEnginev1.1/essentials/* - Gameengine and View of MVC
+This project is an exploritary concept to add gaming into a course introduction.  In true Project-based learning fashiion we are trying to minimze words for an immersizve experience.  The game engine is key and it abstracts so much, include most of the View in StatusPanel.js and FormPanel which were added to the essentials as a result of early game needs.   This is the game engine behind the gamified project.
+
 
 ### Model Description
 
