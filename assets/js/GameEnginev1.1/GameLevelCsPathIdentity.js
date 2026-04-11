@@ -252,9 +252,10 @@ class GameLevelCsPathIdentity {
       if (selectedTheme) {
         const catalog = await this.loadThemeCatalog(themeManifestUrl, themeAssetPrefix);
         const mappedTheme = this.resolveThemeSelection(selectedTheme, catalog);
-        if (mappedTheme) {
+        const themeToApply = mappedTheme || (selectedTheme?.src ? selectedTheme : null);
+        if (themeToApply) {
           // Delay application until scene objects are mounted and discoverable.
-          setTimeout(() => this.applyBackgroundTheme(mappedTheme, bgData), delayMs);
+          setTimeout(() => this.applyBackgroundTheme(themeToApply, bgData), delayMs);
         }
       }
 

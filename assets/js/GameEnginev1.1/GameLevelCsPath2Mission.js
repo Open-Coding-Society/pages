@@ -33,8 +33,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
     this.restoreIdentitySelections({
       bgData: bg_data,
-      themeManifestUrl: `${path}/images/gamify/pathway/csse/bg2/index.json`,
-      themeAssetPrefix: `${path}/images/gamify/pathway/csse/bg2/`,
+      themeManifestUrl: `${path}/images/gamify/cs-pathway/bg2/index.json`,
+      themeAssetPrefix: `${path}/images/gamify/cs-pathway/bg2/`,
     });
     
     // ── Player ───────────────────────────────────────────────────
