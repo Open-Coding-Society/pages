@@ -251,7 +251,11 @@ refresh:
 
 # Development mode: clean start, no conversion, converts files on save
 # Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
-dev: stop clean jekyll-serve
+dev: stop clean
+	@echo "📦 Building registered projects..."
+	@make cs-pathway-game
+	@make convert-single NOTEBOOK_FILE="_notebooks/projects/cs-pathway-game/2026-04-02-cs-pathway-game.ipynb"
+	@make jekyll-serve
 	@make watch-notebooks &
 	@make watch-files &
 	@make watch-cs-pathway-game &
@@ -261,10 +265,11 @@ dev: stop clean jekyll-serve
 
 # Watch notebooks directory for changes (since Jekyll excludes _notebooks)
 # Converts immediately (async), Jekyll serve handles regeneration batching
+# Excludes _notebooks/projects/* (handled by project-specific watchers)
 watch-notebooks:
 	@echo "Watching _notebooks for changes..."
 	@while true; do \
-		find _notebooks -name '*.ipynb' -newer /tmp/.notebook_watch_marker 2>/dev/null | while read notebook; do \
+		find _notebooks -path "_notebooks/projects" -prune -o -name '*.ipynb' -newer /tmp/.notebook_watch_marker -print 2>/dev/null | while read notebook; do \
 			echo "Notebook changed: $$notebook"; \
 			make convert-single NOTEBOOK_FILE="$$notebook" & \
 		done; \

@@ -18,6 +18,10 @@ CS_PATHWAY_IMAGES_DEST = images/projects/cs-pathway-game
 cs-pathway-game:
 	@mkdir -p $(CS_PATHWAY_NOTEBOOK_DEST)
 	@cp $(CS_PATHWAY_SRC)/notebook.src.ipynb $(CS_PATHWAY_NOTEBOOK_DEST)/2026-04-02-cs-pathway-game.ipynb 2>/dev/null || true
+	@make cs-pathway-game-assets
+
+# Copy only JS and image assets (not notebook) - for watch triggers
+cs-pathway-game-assets:
 	@mkdir -p $(CS_PATHWAY_JS_DEST)/levels
 	@cp $(CS_PATHWAY_SRC)/levels/*.js $(CS_PATHWAY_JS_DEST)/levels/ 2>/dev/null || true
 	@mkdir -p $(CS_PATHWAY_JS_DEST)/model
@@ -68,9 +72,29 @@ cs-pathway-game-clean:
 watch-cs-pathway-game:
 	@echo "👀 Watching CS Pathway Game project (auto-copy on save)..."
 	@if command -v fswatch >/dev/null 2>&1; then \
-		fswatch -o $(CS_PATHWAY_SRC) 2>/dev/null | while read num; do \
-			echo "  🔄 CS Pathway Game file changed, copying..."; \
-			make cs-pathway-game 2>&1 | grep -v "cp:"; \
+		fswatch -l 0.3 -r $(CS_PATHWAY_SRC) 2>/dev/null | while read changed_file; do \
+			if echo "$$changed_file" | grep -q "notebook.src.ipynb"; then \
+				echo "  🔄 Notebook changed - copying and converting..."; \
+				mkdir -p $(CS_PATHWAY_NOTEBOOK_DEST); \
+				cp $(CS_PATHWAY_SRC)/notebook.src.ipynb $(CS_PATHWAY_NOTEBOOK_DEST)/2026-04-02-cs-pathway-game.ipynb 2>/dev/null || true; \
+				make convert-single NOTEBOOK_FILE="$(CS_PATHWAY_NOTEBOOK_DEST)/2026-04-02-cs-pathway-game.ipynb" 2>&1; \
+			elif echo "$$changed_file" | grep -q "/levels/"; then \
+				filename=$$(basename "$$changed_file"); \
+				echo "  🔄 Level changed: $$filename"; \
+				mkdir -p $(CS_PATHWAY_JS_DEST)/levels; \
+				cp "$$changed_file" $(CS_PATHWAY_JS_DEST)/levels/ 2>/dev/null || true; \
+			elif echo "$$changed_file" | grep -q "/model/"; then \
+				filename=$$(basename "$$changed_file"); \
+				echo "  🔄 Model changed: $$filename"; \
+				mkdir -p $(CS_PATHWAY_JS_DEST)/model; \
+				cp "$$changed_file" $(CS_PATHWAY_JS_DEST)/model/ 2>/dev/null || true; \
+			elif echo "$$changed_file" | grep -q "/images/"; then \
+				echo "  🔄 Images changed - copying all images..."; \
+				make cs-pathway-game-assets 2>&1 | grep -v "cp:" | head -1; \
+			else \
+				echo "  🔄 File changed: $$changed_file (copying all assets)"; \
+				make cs-pathway-game-assets 2>&1 | grep -v "cp:"; \
+			fi; \
 		done; \
 	else \
 		echo "⚠️  fswatch not installed (brew install fswatch for auto-watch)"; \
@@ -78,4 +102,4 @@ watch-cs-pathway-game:
 		while true; do sleep 3600; done; \
 	fi
 
-.PHONY: cs-pathway-game cs-pathway-game-build cs-pathway-game-clean watch-cs-pathway-game
+.PHONY: cs-pathway-game cs-pathway-game-assets cs-pathway-game-build cs-pathway-game-clean watch-cs-pathway-game

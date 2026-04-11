@@ -32,6 +32,7 @@ exclude:
   - Makefile
   - _notebooks
   - _docx
+  - projects
   - venv
 
 
