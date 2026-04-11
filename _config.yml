@@ -32,8 +32,9 @@ exclude:
   - Makefile
   - _notebooks
   - _docx
+  - _projects
   - venv
-# Note: _projects/ auto-excluded by Jekyll (underscore prefix)
+# Note: / auto-excluded by Jekyll (underscore prefix)
 
 
 # Build settings
