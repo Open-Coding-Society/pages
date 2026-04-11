@@ -24,8 +24,14 @@ cs-pathway-game:
 	@cp $(CS_PATHWAY_SRC)/levels/*.js $(CS_PATHWAY_LEVELS_DEST)/ 2>/dev/null || true
 	@mkdir -p $(CS_PATHWAY_MODEL_DEST)
 	@cp $(CS_PATHWAY_SRC)/model/*.js $(CS_PATHWAY_MODEL_DEST)/ 2>/dev/null || true
-	@mkdir -p $(CS_PATHWAY_IMAGES_DEST)
-	@cp -r $(CS_PATHWAY_SRC)/images/* $(CS_PATHWAY_IMAGES_DEST)/ 2>/dev/null || true
+	@mkdir -p $(CS_PATHWAY_IMAGES_DEST)/bg $(CS_PATHWAY_IMAGES_DEST)/bg1 $(CS_PATHWAY_IMAGES_DEST)/bg2
+	@cp -r $(CS_PATHWAY_SRC)/images/backgrounds/identity-forge/* $(CS_PATHWAY_IMAGES_DEST)/bg/ 2>/dev/null || true
+	@cp -r $(CS_PATHWAY_SRC)/images/backgrounds/wayfinding-world/* $(CS_PATHWAY_IMAGES_DEST)/bg1/ 2>/dev/null || true
+	@cp -r $(CS_PATHWAY_SRC)/images/backgrounds/mission-tools/* $(CS_PATHWAY_IMAGES_DEST)/bg2/ 2>/dev/null || true
+	@cp -r $(CS_PATHWAY_SRC)/images/npc $(CS_PATHWAY_IMAGES_DEST)/ 2>/dev/null || true
+	@cp -r $(CS_PATHWAY_SRC)/images/player $(CS_PATHWAY_IMAGES_DEST)/ 2>/dev/null || true
+	@cp -r $(CS_PATHWAY_SRC)/images/sprites $(CS_PATHWAY_IMAGES_DEST)/ 2>/dev/null || true
+	@cp -r $(CS_PATHWAY_SRC)/images/ui $(CS_PATHWAY_IMAGES_DEST)/ 2>/dev/null || true
 	@cp $(CS_PATHWAY_SRC)/docs/README_ARCHITECTURE.md $(CS_PATHWAY_DOCS_DEST)/ 2>/dev/null || true
 
 # Full build with clean and status output (for explicit builds)
