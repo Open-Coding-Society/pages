@@ -1,0 +1,68 @@
+# Makefile additions for CS Pathway Game project distribution
+# Add this section to your existing Makefile
+
+###########################################
+# CS Pathway Game Project Distribution
+###########################################
+
+# Project source directory
+CS_PATHWAY_SRC = projects/cs-pathway-game
+
+# Distribution destinations
+CS_PATHWAY_NOTEBOOK_DEST = _notebooks/home/2026-04-02-cs-pathway-game.ipynb
+CS_PATHWAY_LEVELS_DEST = assets/js/GameEnginev1.1
+CS_PATHWAY_MODEL_DEST = assets/js/pages/home-gamified
+CS_PATHWAY_IMAGES_DEST = images/gamify/cs-pathway
+CS_PATHWAY_DOCS_DEST = assets/js/pages/home-gamified
+
+# Build cs-pathway-game project (copy source to Jekyll locations)
+# Silent version for auto-watch (no cs-pathway-game-clean to avoid clearing during dev)
+cs-pathway-game:
+	@mkdir -p _notebooks/home
+	@cp $(CS_PATHWAY_SRC)/notebook.src.ipynb $(CS_PATHWAY_NOTEBOOK_DEST) 2>/dev/null || true
+	@mkdir -p $(CS_PATHWAY_LEVELS_DEST)
+	@cp $(CS_PATHWAY_SRC)/levels/*.js $(CS_PATHWAY_LEVELS_DEST)/ 2>/dev/null || true
+	@mkdir -p $(CS_PATHWAY_MODEL_DEST)
+	@cp $(CS_PATHWAY_SRC)/model/*.js $(CS_PATHWAY_MODEL_DEST)/ 2>/dev/null || true
+	@mkdir -p $(CS_PATHWAY_IMAGES_DEST)
+	@cp -r $(CS_PATHWAY_SRC)/images/* $(CS_PATHWAY_IMAGES_DEST)/ 2>/dev/null || true
+	@cp $(CS_PATHWAY_SRC)/docs/README_ARCHITECTURE.md $(CS_PATHWAY_DOCS_DEST)/ 2>/dev/null || true
+
+# Full build with clean and status output (for explicit builds)
+cs-pathway-game-build: cs-pathway-game-clean
+	@echo "🎮 Building CS Pathway Game project..."
+	@make cs-pathway-game
+	@echo "✅ CS Pathway Game built successfully"
+	@echo "   Source: $(CS_PATHWAY_SRC)/"
+	@echo "   Notebook: $(CS_PATHWAY_NOTEBOOK_DEST)"
+	@echo "   Levels: $(CS_PATHWAY_LEVELS_DEST)/"
+	@echo "   Model: $(CS_PATHWAY_MODEL_DEST)/"
+	@echo "   Images: $(CS_PATHWAY_IMAGES_DEST)/"
+
+# Clean distributed CS Pathway Game files (keeps source intact)
+cs-pathway-game-clean:
+	@echo "🧹 Cleaning CS Pathway Game distribution..."
+	@rm -f $(CS_PATHWAY_NOTEBOOK_DEST)
+	@rm -f $(CS_PATHWAY_LEVELS_DEST)/GameLevelCSPath*.js
+	@rm -f $(CS_PATHWAY_MODEL_DEST)/ProfileManager.js
+	@rm -f $(CS_PATHWAY_MODEL_DEST)/localProfile.js
+	@rm -f $(CS_PATHWAY_MODEL_DEST)/persistentProfile.js
+	@rm -rf $(CS_PATHWAY_IMAGES_DEST)
+	@echo "✓ Distribution cleaned (source files preserved in $(CS_PATHWAY_SRC))"
+
+# Watch cs-pathway-game project files and auto-copy on change
+# Integrates with 'make dev' workflow - runs in background
+watch-cs-pathway-game:
+	@echo "👀 Watching CS Pathway Game project (auto-copy on save)..."
+	@if command -v fswatch >/dev/null 2>&1; then \
+		fswatch -o $(CS_PATHWAY_SRC) 2>/dev/null | while read num; do \
+			echo "  🔄 CS Pathway Game file changed, copying..."; \
+			make cs-pathway-game 2>&1 | grep -v "cp:"; \
+		done; \
+	else \
+		echo "⚠️  fswatch not installed (brew install fswatch for auto-watch)"; \
+		echo "   Falling back to manual: run 'make cs-pathway-game' after edits"; \
+		while true; do sleep 3600; done; \
+	fi
+
+.PHONY: cs-pathway-game cs-pathway-game-build cs-pathway-game-clean watch-cs-pathway-game

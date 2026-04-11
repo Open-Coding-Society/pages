@@ -214,6 +214,8 @@ clean: stop
 	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
 	@echo "Cleaning course-specific files..."
 	@make clean-courses
+	@echo "Cleaning project distributions..."
+	@make cs-pathway-game-clean
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
 	@echo "Cleaning DOCX index page..."
@@ -233,6 +235,9 @@ stop:
 	@echo "Stopping notebook watcher..."
 	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@echo "Stopping project watchers..."
+	@@ps aux | grep "watch-cs-pathway-game" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "fswatch.*cs-pathway-game" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.jekyll_regenerating
 
 reload:
@@ -249,6 +254,7 @@ refresh:
 dev: stop clean jekyll-serve
 	@make watch-notebooks &
 	@make watch-files &
+	@make watch-cs-pathway-game &
 	@echo "Dev server running in background on http://localhost:$(PORT)"
 	@echo "  View logs: tail -f $(LOG_FILE)"
 	@echo "  Stop: make stop"
@@ -380,3 +386,10 @@ convert-fix:
 	@echo "Running conversion fixes..."
 	@echo "️Fixing notebooks with known warnings or errors..."
 	@$(PYTHON) scripts/check_conversion_warnings.py --fix
+
+###########################################
+# Project-Specific Build Targets
+###########################################
+
+# Include CS Pathway Game project build rules
+include projects/cs-pathway-game/Makefile.fragment
