@@ -1,8 +1,14 @@
-# CS Pathway Game - Project Directory
-
-**Student-friendly project organization for the CS Pathway gamified learning experience.**
+---
+layout: post
+title: CS Pathway Game - Overview
+description: Complete documentation for the CS Pathway Game project with unified source-of-truth structure
+categories: [CS Pathway Game]
+permalink: /projects/cs-pathway-game/overview
+---
 
 ## Directory Structure
+
+**Student-friendly project organization for the CS Pathway gamified learning experience.**
 
 ```type
 projects/cs-pathway-game/
@@ -61,6 +67,7 @@ make                   # Full conversion + serve, alternat is make serve
 ```
 
 This copies files to Jekyll-required locations:
+
 - `notebook.src.ipynb` → `_notebooks/home/2026-04-02-cs-pathway-game.ipynb`
 - `levels/*.js` → `assets/js/GameEnginev1.1/`
 - `model/*.js` → `assets/js/pages/home-gamified/`
@@ -69,6 +76,7 @@ This copies files to Jekyll-required locations:
 ### Path Management
 
 **All paths in code use absolute runtime paths** (no config.js needed):
+
 - JavaScript imports: `/assets/js/GameEnginev1.1/GameLevelCSPath0Forge.js`
 - Images via gameEnv: `gameEnv.path + '/images/gamify/cs-pathway/sprite.png'`
 - Game engine essentials: `/assets/js/GameEnginev1.1/essentials/Game.js` (external reference)
@@ -78,6 +86,7 @@ The build system handles distribution - you just edit here!
 ## File References
 
 ### In notebook.src.ipynb
+
 ```javascript
 // Imports use final deployed paths (do not use ./relative-paths)
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
@@ -88,6 +97,7 @@ const sprite = gameEnv.path + '/images/gamify/cs-pathway/sprites/knight.png';
 ```
 
 ### In level files (GameLevelCSPath*.js)
+
 ```javascript
 // Import shared model
 import { ProfileManager } from '/assets/js/pages/home-gamified/ProfileManager.js';

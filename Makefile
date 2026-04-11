@@ -116,8 +116,52 @@ serve-so-simple: use-so-simple clean
 serve-yat: use-yat clean
 	@make serve-current
 
+# Build all registered projects (game assets, not docs)
+build-registered-projects:
+	@if [ -f projects/.makeprojects ]; then \
+		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "projects/$$proj/Makefile.fragment" ]; then \
+				echo "📦 Building project: $$proj"; \
+				make $$proj 2>/dev/null || echo "  ⚠️  No build target for $$proj"; \
+			fi; \
+		done; \
+	fi
+
+# Convert notebooks for all registered projects (dev mode initial build)
+convert-registered-notebooks:
+	@if [ -f projects/.makeprojects ]; then \
+		find _notebooks/projects -name '*.ipynb' 2>/dev/null | while read notebook; do \
+			echo "Converting project notebook: $$notebook"; \
+			make convert-single NOTEBOOK_FILE="$$notebook" 2>&1; \
+		done; \
+	fi
+
+# Build documentation for all registered projects (serve mode only)
+build-registered-docs:
+	@if [ -f projects/.makeprojects ]; then \
+		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if make -n $$proj-docs >/dev/null 2>&1; then \
+				echo "📚 Building docs for: $$proj"; \
+				make $$proj-docs; \
+			fi; \
+		done; \
+	fi
+
+# Clean all registered project distributions
+clean-registered-projects:
+	@if [ -f projects/.makeprojects ]; then \
+		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if make -n $$proj-clean >/dev/null 2>&1; then \
+				make $$proj-clean 2>/dev/null; \
+			fi; \
+			if make -n $$proj-docs-clean >/dev/null 2>&1; then \
+				make $$proj-docs-clean 2>/dev/null; \
+			fi; \
+		done; \
+	fi
+
 # General serve target (uses whatever is in _config.yml/Gemfile)
-serve-current: stop convert split-courses jekyll-serve
+serve-current: stop build-registered-projects convert split-courses build-registered-docs jekyll-serve
 
 # Build with selected theme
 build-minima: use-minima build-current
@@ -215,7 +259,7 @@ clean: stop
 	@echo "Cleaning course-specific files..."
 	@make clean-courses
 	@echo "Cleaning project distributions..."
-	@make cs-pathway-game-clean
+	@make clean-registered-projects
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
 	@echo "Cleaning DOCX index page..."
@@ -253,8 +297,8 @@ refresh:
 # Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
 dev: stop clean
 	@echo "📦 Building registered projects..."
-	@make cs-pathway-game
-	@make convert-single NOTEBOOK_FILE="_notebooks/projects/cs-pathway-game/2026-04-02-cs-pathway-game.ipynb"
+	@make build-registered-projects
+	@make convert-registered-notebooks
 	@make jekyll-serve
 	@make watch-notebooks &
 	@make watch-files &

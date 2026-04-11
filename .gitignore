@@ -51,6 +51,7 @@ _posts/**/*_csse.md
 
 # Project distributions (auto-generated from projects/ source)
 _notebooks/projects/
+_markdown/projects/
 assets/js/projects/
 images/projects/
 

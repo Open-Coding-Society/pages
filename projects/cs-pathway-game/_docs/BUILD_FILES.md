@@ -1,4 +1,12 @@
-# Integration Guide: Adding CS Pathway Game to Build System
+---
+layout: post
+title: CS Pathway Game - Build Integration
+description: Guide for integrating CS Pathway Game into Makefile and CI/CD workflows
+categories: [CS Pathway Game]
+permalink: /projects/cs-pathway-game/build-integration
+---
+
+## Adding CS Pathway Game to Build System
 
 This guide shows how to integrate the cs-pathway-game project into your existing Makefile and CI/CD workflow.
 
