@@ -2,8 +2,6 @@
 
 ## Overview
 
-Clean MVC architecture with **localStorage-first persistence** and **async backend analytics**. All user state lives in localStorage for instant performance. Backend provides instructor analytics and cross-device recovery.
-
 ```text
 ╔════════════════════════════════════════════════════════════════════════════╗
 ║                   PROFILE SYSTEM - MVC ARCHITECTURE                        ║
@@ -25,6 +23,10 @@ The CS Pathway game is made up of the following files.
 /_notebooks/home/2026-04-02-home2-gamified-mvp.ipynb - Launching point for Pathway Game (OCS connection)
  GameLevelCSPath*.js files into a unified game.  Addtionally, ths file provide a journey from landing page to this game as an integrated introduction to course work.  This file is bigger than the individual pathway game.
 
+
+### Model Description
+
+Clean MVC architecture with **localStorage-first persistence** and **async backend analytics**. All user state lives in localStorage for instant performance. Backend provides instructor analytics and cross-device recovery.
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ MODEL LAYER (Data & Persistence)                                            │
