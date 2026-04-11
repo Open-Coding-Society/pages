@@ -7,29 +7,90 @@
 ║                   PROFILE SYSTEM - MVC ARCHITECTURE                        ║
 ╚════════════════════════════════════════════════════════════════════════════╝
 
-The CS Pathway game is made up of the following files.
+## File Organization
 
-/assets/js/GameEnginev1.1 - View & Control
- - GameLevelCSPath0Forge.js - Identity Forge, which is intended has ambition of Course Entry and a PII lesson.  This establish OCS account and is intended to integrate with Flask and MySQL.  Launching this level enables user view PII and themeing information.
- - GameLevelCSPath1Way.js - Wayfinding World, which is goal to register and connect socially to the classroom.  Some of the social connection is by introducing social computing foundations blogging and coding "about" informaton.  Completing this level includes self evaluation whhich serves as a passport on avancement to final level.
- - GameLevelCSPath2Mission.js - Mission Tools, which is a dive into the students personal computer and how it is used to establish SDLC using GitHub projects.  This is transition from entirely online to working with online respostiories with a personal computer, VSCode, Browser, Termainal, and Make.  At the conclusion of this level the student is ready to learn CompSci through PBL.
- - GameLevelCSPathIdentity.js - A Base Object that assist in sharing Identity Forge information with Wayfinding and Mission class definitions.  This is a helper / base class that is extendended in game to simplify management
+The CS Pathway game implements MVC architecture across the following file structure:
 
-/assets/js/pages/home-gamified - Model Bridge
-- ProfileManager.js - Unified profile persistence manager, assist abstraction of Model information from View and Control.  The key intention of abstraction is this would be JSON in and JSON out.  The "in" and "out" would be how the View and Control want to see and interpet the data.  The bridge is localstorage speed, backend reliability and remapping for data in persistence for effenciency in SQL storage.  Information is mapped to OCS key User columns where needed or simply archived as JSON 
-- localProfile.js - localstorage management module.
-- persistendProfile.js - flask fetch request/response interface layer.
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CS PATHWAY GAME ARCHITECTURE                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  📂 /_notebooks/home/                                   [ENTRY POINT]        │
+│     └─ 2026-04-02-home2-gamified-mvp.ipynb                                  │
+│        • Launches the CS Pathway Game                                       │
+│        • Provides journey from landing page to gamified course intro        │
+│        • Integrates all GameLevelCSPath*.js files                           │
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────┐    │
+│  │  📂 /assets/js/GameEnginev1.1/               [CONTROLLER + VIEW]  │    │
+│  │                                                                    │    │
+│  │  Game Level Controllers:                                           │    │
+│  │  ├─ GameLevelCSPath0Forge.js       Level 0: Identity Forge        │    │
+│  │  │  • Course entry and PII lesson                                 │    │
+│  │  │  • Establishes OCS account (Flask + MySQL integration)         │    │
+│  │  │  • Enables PII viewing and theming customization               │    │
+│  │  │                                                                 │    │
+│  │  ├─ GameLevelCSPath1Way.js         Level 1: Wayfinding World      │    │
+│  │  │  • Social classroom connection and registration                │    │
+│  │  │  • Introduces blogging and "about me" coding foundations       │    │
+│  │  │  • Self-evaluation checkpoint (passport to next level)         │    │
+│  │  │                                                                 │    │
+│  │  ├─ GameLevelCSPath2Mission.js     Level 2: Mission Tools         │    │
+│  │  │  • Personal computer setup and local SDLC workflow             │    │
+│  │  │  • Transition from online-only to local development            │    │
+│  │  │  • Tools: GitHub, VSCode, Browser, Terminal, Make              │    │
+│  │  │  • Prepares student for PBL-based CompSci learning             │    │
+│  │  │                                                                 │    │
+│  │  └─ GameLevelCSPathIdentity.js     Shared Base Class              │    │
+│  │     • Shares Identity Forge data across all levels                │    │
+│  │     • Helper class extended by Wayfinding and Mission             │    │
+│  │     • Simplifies profile management across game progression       │    │
+│  │                                                                    │    │
+│  │  Game Engine Essentials (View Components):                         │    │
+│  │  └─ essentials/*                                                   │    │
+│  │     • StatusPanel.js  - Player profile display                    │    │
+│  │     • FormPanel.js    - Identity Terminal input forms             │    │
+│  │     • Picker.js       - Avatar and theme selectors                │    │
+│  │     • DialogueSystem  - NPC interactions                          │    │
+│  │     • Core rendering and UI abstraction                           │    │
+│  └────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  ┌────────────────────────────────────────────────────────────────────┐    │
+│  │  📂 /assets/js/pages/home-gamified/                   [MODEL]     │    │
+│  │                                                                    │    │
+│  │  Data Persistence Bridge:                                          │    │
+│  │  ├─ ProfileManager.js           Profile Orchestrator              │    │
+│  │  │  • Unified persistence manager (abstraction layer)             │    │
+│  │  │  • JSON in / JSON out interface for View and Controller        │    │
+│  │  │  • Coordinates localStorage speed + backend reliability        │    │
+│  │  │  • Maps data to OCS User table columns efficiently             │    │
+│  │  │                                                                 │    │
+│  │  ├─ localProfile.js              Primary Storage                  │    │
+│  │  │  • localStorage management (instant, client-side)              │    │
+│  │  │  • Source of truth for all users                               │    │
+│  │  │                                                                 │    │
+│  │  └─ persistentProfile.js         Secondary Storage                │    │
+│  │     • Flask API fetch request/response layer                      │    │
+│  │     • Backend analytics and cross-device recovery                 │    │
+│  │     • Instructor dashboard data                                   │    │
+│  └────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  Design Philosophy:                                                      │
+│     • Immersive experience minimizing text/walls of instructions            │
+│     • Exploratory, game-based onboarding to course concepts                 │
+│     • Project-Based Learning (PBL) preparation through gaming               │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
 
-/_notebooks/home/2026-04-02-home2-gamified-mvp.ipynb - Launching point for Pathway Game (OCS connection)
- GameLevelCSPath*.js files into a unified game.  Addtionally, ths file provide a journey from landing page to this game as an integrated introduction to course work.  This file is bigger than the individual pathway game.
 
-/assets/js/GameEnginev1.1/essentials/* - Gameengine and View of MVC
-This project is an exploritary concept to add gaming into a course introduction.  In true Project-based learning fashiion we are trying to minimze words for an immersizve experience.  The game engine is key and it abstracts so much, include most of the View in StatusPanel.js and FormPanel which were added to the essentials as a result of early game needs.   This is the game engine behind the gamified project.
+### Architecture Summary
 
+**Clean MVC architecture** with **localStorage-first persistence** and **async backend analytics**. 
 
-### Model Description
-
-Clean MVC architecture with **localStorage-first persistence** and **async backend analytics**. All user state lives in localStorage for instant performance. Backend provides instructor analytics and cross-device recovery.
+- **Model**: All user state lives in localStorage for instant performance
+- **View**: GameEngine essentials provide reusable UI components  
+- **Controller**: Game level classes orchestrate progression and business logic
+- **Backend**: Flask API provides instructor analytics and cross-device recovery
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ MODEL LAYER (Data & Persistence)                                            │
