@@ -62,6 +62,11 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
 
+    this.primeAssetGate({
+      playerSrc: player_data.src,
+      backgroundSrc: bg_data.src,
+    });
+
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
       x: width * 0.73,
