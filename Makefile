@@ -388,8 +388,36 @@ convert-fix:
 	@$(PYTHON) scripts/check_conversion_warnings.py --fix
 
 ###########################################
-# Project-Specific Build Targets
+# Project Auto-Registration
 ###########################################
 
-# Include CS Pathway Game project build rules
-include projects/cs-pathway-game/Makefile.fragment
+# Read .makeprojects and include each project's Makefile.fragment
+# Add projects to .makeprojects (one per line) to enable them
+# Each project must have: projects/<name>/Makefile.fragment
+-include $(shell test -f .makeprojects && grep -v '^\#' .makeprojects | grep -v '^$$' | sed 's|^|projects/|' | sed 's|$$|/Makefile.fragment|' || echo)
+
+# List all registered projects
+list-projects:
+	@echo "📦 Registered Projects:"
+	@if [ -f .makeprojects ]; then \
+		grep -v '^\#' .makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "projects/$$proj/Makefile.fragment" ]; then \
+				echo "  ✅ $$proj (active)"; \
+			else \
+				echo "  ⚠️  $$proj (missing Makefile.fragment)"; \
+			fi; \
+		done; \
+	else \
+		echo "  No .makeprojects file found"; \
+	fi
+	@echo ""
+	@echo "Available projects (in projects/ directory):"
+	@ls -d projects/*/ 2>/dev/null | sed 's|projects/||' | sed 's|/||' | while read proj; do \
+		if grep -q "^$$proj$$" .makeprojects 2>/dev/null; then \
+			echo "  • $$proj (registered)"; \
+		else \
+			echo "  • $$proj (not registered)"; \
+		fi; \
+	done || echo "  None found"
+
+.PHONY: list-projects
