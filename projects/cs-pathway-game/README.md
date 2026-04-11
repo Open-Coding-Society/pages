@@ -4,7 +4,7 @@
 
 ## Directory Structure
 
-```
+```type
 projects/cs-pathway-game/
 ├── README.md                        [This file - project overview]
 ├── notebook.src.ipynb               [Source notebook - edit here]
@@ -29,21 +29,18 @@ projects/cs-pathway-game/
 
 ### Fast Development Mode (Recommended)
 
-**Use `make dev` for rapid iteration** - doesn't preload all notebooks:
+**Use `make dev` for rapid iteration** - doesn't preload all _notebooks
+
+Regeneration has dependncy now:
 
 ```bash
-# Terminal 1: Start dev server with auto-watch
-cd ~/pages
-make dev
-# Server starts at http://localhost:4500
-# Auto-converts notebooks on save (via Jekyll log watch)
+# macOS
+brew install fswatch
 
-# Terminal 2: Watch cs-pathway-game project files
-make watch-cs-pathway-game &
-# Auto-copies to Jekyll locations when you save .js files
-```
+# Ubuntu/Debian
+sudo apt install fswatch
 
-**Edit workflow:**
+**Edit/Save workflow example:**
 1. Edit files in `projects/cs-pathway-game/`
    - `notebook.src.ipynb` - converted automatically when saved (via make dev)
    - `levels/*.js` - copied automatically when saved (via watch-cs-pathway-game)
@@ -56,12 +53,11 @@ make watch-cs-pathway-game &
 
 **BIG TIME SAVINGS**: `make dev` doesn't pre-convert notebooks, only converts on save!
 
-### Manual Build (When Needed)
+### Complete Build (When Needed)
 
 For explicit full rebuild (rarely needed):
 ```bash
-make cs-pathway-game-build  # Clean + copy all files with status output
-make serve                   # Full conversion + serve
+make                   # Full conversion + serve, alternat is make serve
 ```
 
 This copies files to Jekyll-required locations:
@@ -83,7 +79,7 @@ The build system handles distribution - you just edit here!
 
 ### In notebook.src.ipynb
 ```javascript
-// Imports use final deployed paths (not ./levels)
+// Imports use final deployed paths (do not use ./relative-paths)
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
 import GameLevelCsPath0Forge from '/assets/js/GameEnginev1.1/GameLevelCsPath0Forge.js';
 

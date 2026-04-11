@@ -5,6 +5,7 @@ This guide shows how to integrate the cs-pathway-game project into your existing
 ## Step 1: Add Makefile Rules
 
 **Option A: Include the fragment** (Recommended - keeps main Makefile clean)
+
 ```makefile
 # At the end of your main Makefile
 include projects/cs-pathway-game/Makefile.fragment
@@ -88,6 +89,7 @@ make clean
 ## Complete Example: Updated Makefile Sections
 
 ### Development Target
+
 ```makefile
 dev: stop clean jekyll-serve
 	@touch /tmp/.notebook_watch_marker
@@ -100,6 +102,7 @@ dev: stop clean jekyll-serve
 ```
 
 ### Clean Target
+
 ```makefile
 clean: stop
 	@echo "Cleaning converted IPYNB files..."
@@ -120,6 +123,7 @@ clean: stop
 ```
 
 ### Stop Target (No changes needed)
+
 ```makefile
 stop:
 	@echo "Stopping server..."
@@ -197,6 +201,7 @@ build:
 
 ### fswatch Not Found
 If you see: `⚠️ fswatch not installed`
+
 ```bash
 # macOS:
 brew install fswatch
@@ -208,22 +213,26 @@ sudo yum install fswatch       # RedHat/CentOS
 
 ### Auto-copy Not Working
 1. Check that `watch-cs-pathway-game` is running:
+
    ```bash
    ps aux | grep watch-cs-pathway-game
    ```
 
 2. Manually trigger copy to test:
+
    ```bash
    make cs-pathway-game
    ```
 
 3. Check file permissions:
+
    ```bash
    ls -la projects/cs-pathway-game/
    ```
 
 ### Jekyll Not Regenerating After Copy
 1. Check Jekyll is watching:
+
    ```bash
    tail -f /tmp/jekyll4500.log
    ```
@@ -231,6 +240,7 @@ sudo yum install fswatch       # RedHat/CentOS
 2. Look for file change events in log when you save
 
 3. Restart dev server:
+
    ```bash
    make stop
    make dev
