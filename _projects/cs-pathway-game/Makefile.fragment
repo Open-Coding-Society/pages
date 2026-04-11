@@ -8,7 +8,8 @@
 # Project source directory
 CS_PATHWAY_SRC = _projects/cs-pathway-game
 PROJECT_NAME = $(notdir $(CS_PATHWAY_SRC))
-NOTEBOOK_FILENAME = 2026-04-02-$(PROJECT_NAME).ipynb
+DATE_OF_CREATION = 2026-04-02
+NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
 
 # Distribution destinations (all in .gitignore - auto-generated, not tracked)
 CS_PATHWAY_NOTEBOOK_DEST = _notebooks/projects/cs-pathway-game
@@ -105,12 +106,17 @@ watch-cs-pathway-game:
 	fi
 
 # Documentation distribution (for 'make serve' only, NOT 'make dev')
-# Copies documentation with front matter to _markdown/projects/
-CS_PATHWAY_DOCS_DEST = _markdown/projects/cs-pathway-game
+# Copies documentation with front matter to _posts/projects/
+CS_PATHWAY_DOCS_DEST = _posts/projects/cs-pathway-game
 cs-pathway-game-docs:
 	@echo "📚 Publishing CS Pathway Game documentation..."
 	@mkdir -p $(CS_PATHWAY_DOCS_DEST)
-	@cp $(CS_PATHWAY_SRC)/_docs/*.md $(CS_PATHWAY_DOCS_DEST)/ 2>/dev/null || true
+	@for doc in $(CS_PATHWAY_SRC)/docs/*.md; do \
+		if [ -f "$$doc" ]; then \
+			filename=$$(basename "$$doc"); \
+			cp "$$doc" "$(CS_PATHWAY_DOCS_DEST)/$(DATE_OF_CREATION)-$(PROJECT_NAME)-$$filename" 2>/dev/null || true; \
+		fi; \
+	done
 	@echo "✓ Documentation published to $(CS_PATHWAY_DOCS_DEST)/"
 
 # Clean documentation distribution
