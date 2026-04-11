@@ -156,6 +156,7 @@ class GameLevelCsPath0Forge {
       left: { row: 1, start: 0, columns: 1 },
       right: { row: 1, start: 1, columns: 1 },
       hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+      alertDistance: 1.25,
     };
 
     const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
@@ -166,9 +167,6 @@ class GameLevelCsPath0Forge {
       interactDistance: interactDistance || 120,
       reaction: function () {
         if (reaction) reaction.call(this);
-        if (level?.showToast) {
-          level.showToast("Press E to interact");
-        }
       },
 
       ...(interact ? { interact } : {}),
@@ -185,7 +183,7 @@ class GameLevelCsPath0Forge {
       greeting: "Welcome to the Path of Code-Code-Coding...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
       position: startGatekeeperPos,
       reaction: () => {
-        if (identityState.startGatekeeperDone) return;
+        if (!identityState.startGatekeeperDone);
         identityState.startGatekeeperDone = true;
         void level.showDialogue('Gatekeeper', [
           'Welcome to the Path of Code-Code-Coding...',
