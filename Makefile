@@ -391,16 +391,16 @@ convert-fix:
 # Project Auto-Registration
 ###########################################
 
-# Read .makeprojects and include each project's Makefile.fragment
-# Add projects to .makeprojects (one per line) to enable them
+# Read projects/.makeprojects and include each project's Makefile.fragment
+# Add projects to projects/.makeprojects (one per line) to enable them
 # Each project must have: projects/<name>/Makefile.fragment
--include $(shell test -f .makeprojects && grep -v '^\#' .makeprojects | grep -v '^$$' | sed 's|^|projects/|' | sed 's|$$|/Makefile.fragment|' || echo)
+-include $(shell test -f projects/.makeprojects && grep -v '^\#' projects/.makeprojects | grep -v '^$$' | sed 's|^|projects/|' | sed 's|$$|/Makefile.fragment|' || echo)
 
 # List all registered projects
 list-projects:
 	@echo "📦 Registered Projects:"
-	@if [ -f .makeprojects ]; then \
-		grep -v '^\#' .makeprojects | grep -v '^$$' | while read proj; do \
+	@if [ -f projects/.makeprojects ]; then \
+		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
 			if [ -f "projects/$$proj/Makefile.fragment" ]; then \
 				echo "  ✅ $$proj (active)"; \
 			else \
@@ -408,12 +408,12 @@ list-projects:
 			fi; \
 		done; \
 	else \
-		echo "  No .makeprojects file found"; \
+		echo "  No projects/.makeprojects file found"; \
 	fi
 	@echo ""
 	@echo "Available projects (in projects/ directory):"
 	@ls -d projects/*/ 2>/dev/null | sed 's|projects/||' | sed 's|/||' | while read proj; do \
-		if grep -q "^$$proj$$" .makeprojects 2>/dev/null; then \
+		if grep -q "^$$proj$$" projects/.makeprojects 2>/dev/null; then \
 			echo "  • $$proj (registered)"; \
 		else \
 			echo "  • $$proj (not registered)"; \
