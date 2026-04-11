@@ -9,6 +9,23 @@ Clean MVC architecture with **localStorage-first persistence** and **async backe
 ║                   PROFILE SYSTEM - MVC ARCHITECTURE                        ║
 ╚════════════════════════════════════════════════════════════════════════════╝
 
+The CS Pathway game is made up of the following files.
+
+/assets/js/GameEnginev1.1 - View & Control
+ - GameLevelCSPath0Forge.js - Identity Forge, which is intended has ambition of Course Entry and a PII lesson.  This establish OCS account and is intended to integrate with Flask and MySQL.  Launching this level enables user view PII and themeing information.
+ - GameLevelCSPath1Way.js - Wayfinding World, which is goal to register and connect socially to the classroom.  Some of the social connection is by introducing social computing foundations blogging and coding "about" informaton.  Completing this level includes self evaluation whhich serves as a passport on avancement to final level.
+ - GameLevelCSPath2Mission.js - Mission Tools, which is a dive into the students personal computer and how it is used to establish SDLC using GitHub projects.  This is transition from entirely online to working with online respostiories with a personal computer, VSCode, Browser, Termainal, and Make.  At the conclusion of this level the student is ready to learn CompSci through PBL.
+ - GameLevelCSPathIdentity.js - A Base Object that assist in sharing Identity Forge information with Wayfinding and Mission class definitions.  This is a helper / base class that is extendended in game to simplify management
+
+/assets/js/pages/home-gamified - Model Bridge
+- ProfileManager.js - Unified profile persistence manager, assist abstraction of Model information from View and Control.  The key intention of abstraction is this would be JSON in and JSON out.  The "in" and "out" would be how the View and Control want to see and interpet the data.  The bridge is localstorage speed, backend reliability and remapping for data in persistence for effenciency in SQL storage.  Information is mapped to OCS key User columns where needed or simply archived as JSON 
+- localProfile.js - localstorage management module.
+- persistendProfile.js - flask fetch request/response interface layer.
+
+/_notebooks/home/2026-04-02-home2-gamified-mvp.ipynb - Launching point for Pathway Game (OCS connection)
+ GameLevelCSPath*.js files into a unified game.  Addtionally, ths file provide a journey from landing page to this game as an integrated introduction to course work.  This file is bigger than the individual pathway game.
+
+
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ MODEL LAYER (Data & Persistence)                                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
