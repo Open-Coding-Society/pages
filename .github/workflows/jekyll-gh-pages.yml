@@ -43,9 +43,9 @@ jobs:
           source venv/bin/activate  # Activate the virtual environment
           pip install -r requirements.txt  # Install Python packages
 
-      - name: Build CS Pathway Game project
+      - name: Build registered projects
         run: |
-          make cs-pathway-game-build  # Distribute project files to Jekyll locations
+          make build-registered-projects  # Distribute all registered project files to Jekyll locations
 
       - name: Execute notebook conversion script
         run: |
