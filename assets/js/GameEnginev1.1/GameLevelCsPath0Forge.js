@@ -155,7 +155,7 @@ class GameLevelCsPath0Forge {
       up: { row: 0, start: 1, columns: 1 },
       left: { row: 1, start: 0, columns: 1 },
       right: { row: 1, start: 1, columns: 1 },
-      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+      hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
     };
 
     const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
