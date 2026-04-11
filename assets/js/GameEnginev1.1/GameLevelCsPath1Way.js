@@ -33,8 +33,8 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     this.restoreIdentitySelections({
       bgData: bg_data,
-      themeManifestUrl: `${path}/images/gamify/pathway/csse/bg1/index.json`,
-      themeAssetPrefix: `${path}/images/gamify/pathway/csse/bg1/`,
+      themeManifestUrl: `${path}/images/gamify/cs-pathway/bg1/index.json`,
+      themeAssetPrefix: `${path}/images/gamify/cs-pathway/bg1/`,
     });
     
     // ── Player ───────────────────────────────────────────────────
