@@ -24,7 +24,7 @@ third-project
 - Project name only (no paths)
 - Lines starting with `#` are comments
 - Blank lines ignored
-- Must have corresponding `projects/<name>/Makefile.fragment`
+- Must have corresponding `_projects/<name>/Makefile.fragment`
 
 ### 2. Auto-Include in Makefile
 
@@ -38,14 +38,14 @@ The Makefile reads `.makeprojects` and includes each fragment:
 -include $(shell test -f .makeprojects && \
          grep -v '^\#' .makeprojects | \
          grep -v '^$$' | \
-         sed 's|^|projects/|' | \
+         sed 's|^|_projects/|' | \
          sed 's|$$|/Makefile.fragment|' || echo)
 ```
 
 **What it does:**
 1. Checks if `.makeprojects` exists
 2. Filters out comments (#) and blank lines
-3. Prepends `projects/` and appends `/Makefile.fragment`
+3. Prepends `_projects/` and appends `/Makefile.fragment`
 4. Includes each fragment file
 5. Uses `-include` (silent if file missing)
 
@@ -58,7 +58,7 @@ The main Makefile contains **zero** project-specific code. All project targets c
 Each project must have:
 
 ```
-projects/<project-name>/
+_projects/<project-name>/
 ├── Makefile.fragment          # REQUIRED - Build rules
 ├── README.md                   # Documentation
 ├── notebook.src.ipynb          # Source notebook (optional)
@@ -74,7 +74,7 @@ Must define these targets (or variants):
 
 ```makefile
 # Distribution paths
-<PROJECT>_SRC = projects/<project-name>
+<PROJECT>_SRC = _projects/<project-name>
 <PROJECT>_NOTEBOOK_DEST = _notebooks/projects/<project-name>
 <PROJECT>_JS_DEST = assets/js/projects/<project-name>
 <PROJECT>_IMAGES_DEST = images/projects/<project-name>
@@ -118,7 +118,7 @@ Output:
   ✅ cs-pathway-game (active)
   ⚠️  broken-project (missing Makefile.fragment)
 
-Available projects (in projects/ directory):
+Available projects (in _projects/ directory):
   • cs-pathway-game (registered)
   • new-project (not registered)
 ```
@@ -127,13 +127,13 @@ Available projects (in projects/ directory):
 
 1. Create project directory:
    ```bash
-   mkdir -p projects/new-game/{levels,model,images,docs}
+   mkdir -p _projects/new-game/{levels,model,images,docs}
    ```
 
 2. Create `Makefile.fragment`:
    ```bash
-   cp projects/cs-pathway-game/Makefile.fragment \
-      projects/new-game/Makefile.fragment
+   cp _projects/cs-pathway-game/Makefile.fragment \
+      _projects/new-game/Makefile.fragment
    # Edit for your project
    ```
 
@@ -191,7 +191,7 @@ dev: bundle-install jekyll-serve watch-notebooks watch-files watch-all-projects
 
 watch-all-projects:
 	@grep -v '^\#' .makeprojects | grep -v '^$$' | while read proj; do \
-		if [ -f "projects/$$proj/Makefile.fragment" ]; then \
+		if [ -f "_projects/$$proj/Makefile.fragment" ]; then \
 			make watch-$$proj & \
 		fi; \
 	done
@@ -246,20 +246,20 @@ stop:
 
 ### ✅ Teaching-Friendly
 - Students see their project as a unit
-- Copy entire `projects/example/` to start new project
+- Copy entire `_projects/example/` to start new project
 - No scary main Makefile edits
 
 ## Example: Adding a Second Project
 
 ```bash
 # 1. Create new project structure
-mkdir -p projects/quiz-game/{levels,model,images/sprites,docs}
+mkdir -p _projects/quiz-game/{levels,model,images/sprites,docs}
 
 # 2. Copy template files
-cp projects/cs-pathway-game/Makefile.fragment \
-   projects/quiz-game/Makefile.fragment
-cp projects/cs-pathway-game/README.md \
-   projects/quiz-game/README.md
+cp _projects/cs-pathway-game/Makefile.fragment \
+   _projects/quiz-game/Makefile.fragment
+cp _projects/cs-pathway-game/README.md \
+   _projects/quiz-game/README.md
 
 # 3. Edit Makefile.fragment
 # - Change all "cs-pathway-game" to "quiz-game"
@@ -293,7 +293,7 @@ make list-projects
 ### "Targets not working"
 ```bash
 # Check fragment defines targets
-grep -A 5 "^quiz-game:" projects/quiz-game/Makefile.fragment
+grep -A 5 "^quiz-game:" _projects/quiz-game/Makefile.fragment
 
 # Test include is working
 make -p | grep quiz-game
@@ -339,8 +339,8 @@ docs-only-project:3:no
 validate-projects:
 	@echo "Validating registered projects..."
 	@grep -v '^\#' .makeprojects | while read proj; do \
-		test -f projects/$$proj/Makefile.fragment || echo "⚠️  $$proj missing fragment"; \
-		test -f projects/$$proj/README.md || echo "⚠️  $$proj missing README"; \
+		test -f _projects/$$proj/Makefile.fragment || echo "⚠️  $$proj missing fragment"; \
+		test -f _projects/$$proj/README.md || echo "⚠️  $$proj missing README"; \
 	done
 ```
 
@@ -349,9 +349,9 @@ validate-projects:
 **Old Way:**
 ```makefile
 # In Makefile - hardcoded!
-include projects/cs-pathway-game/Makefile.fragment
-include projects/quiz-game/Makefile.fragment
-include projects/another-game/Makefile.fragment
+include _projects/cs-pathway-game/Makefile.fragment
+include _projects/quiz-game/Makefile.fragment
+include _projects/another-game/Makefile.fragment
 
 dev:
 	@make watch-cs-pathway-game &

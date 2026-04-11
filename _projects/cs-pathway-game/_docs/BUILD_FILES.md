@@ -16,7 +16,7 @@ This guide shows how to integrate the cs-pathway-game project into your existing
 
 ```makefile
 # At the end of your main Makefile
-include projects/cs-pathway-game/Makefile.fragment
+include _projects/cs-pathway-game/Makefile.fragment
 ```
 
 **Option B: Copy rules directly**
@@ -85,13 +85,13 @@ make cs-pathway-game-build
 make dev
 # Should see: 👀 Watching CS Pathway Game project (auto-copy on save)...
 
-# 3. Edit a file in projects/cs-pathway-game/
+# 3. Edit a file in _projects/cs-pathway-game/
 # Save changes → should see auto-copy message → Jekyll regenerates
 
 # 4. Clean up
 make stop
 make clean
-# Should clean distributed files but preserve source in projects/
+# Should clean distributed files but preserve source in _projects/
 ```
 
 ## Complete Example: Updated Makefile Sections
@@ -235,7 +235,7 @@ sudo yum install fswatch       # RedHat/CentOS
 3. Check file permissions:
 
    ```bash
-   ls -la projects/cs-pathway-game/
+   ls -la _projects/cs-pathway-game/
    ```
 
 ### Jekyll Not Regenerating After Copy
@@ -258,7 +258,7 @@ sudo yum install fswatch       # RedHat/CentOS
 
 After integration, your workflow becomes:
 1. **One-time setup**: `make dev` (includes auto-watch)
-2. **Daily work**: Edit files in `projects/cs-pathway-game/`
+2. **Daily work**: Edit files in `_projects/cs-pathway-game/`
 3. **Automatic**: Files copy → notebooks convert → Jekyll regenerates → browser refreshes
 
 No manual build steps needed during development!

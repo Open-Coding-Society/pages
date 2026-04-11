@@ -118,9 +118,9 @@ serve-yat: use-yat clean
 
 # Build all registered projects (game assets, not docs)
 build-registered-projects:
-	@if [ -f projects/.makeprojects ]; then \
-		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
-			if [ -f "projects/$$proj/Makefile.fragment" ]; then \
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile.fragment" ]; then \
 				echo "📦 Building project: $$proj"; \
 				make $$proj 2>/dev/null || echo "  ⚠️  No build target for $$proj"; \
 			fi; \
@@ -129,7 +129,7 @@ build-registered-projects:
 
 # Convert notebooks for all registered projects (dev mode initial build)
 convert-registered-notebooks:
-	@if [ -f projects/.makeprojects ]; then \
+	@if [ -f _projects/.makeprojects ]; then \
 		find _notebooks/projects -name '*.ipynb' 2>/dev/null | while read notebook; do \
 			echo "Converting project notebook: $$notebook"; \
 			make convert-single NOTEBOOK_FILE="$$notebook" 2>&1; \
@@ -138,8 +138,8 @@ convert-registered-notebooks:
 
 # Build documentation for all registered projects (serve mode only)
 build-registered-docs:
-	@if [ -f projects/.makeprojects ]; then \
-		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
 			if make -n $$proj-docs >/dev/null 2>&1; then \
 				echo "📚 Building docs for: $$proj"; \
 				make $$proj-docs; \
@@ -149,8 +149,8 @@ build-registered-docs:
 
 # Clean all registered project distributions
 clean-registered-projects:
-	@if [ -f projects/.makeprojects ]; then \
-		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
 			if make -n $$proj-clean >/dev/null 2>&1; then \
 				make $$proj-clean 2>/dev/null; \
 			fi; \
@@ -440,29 +440,29 @@ convert-fix:
 # Project Auto-Registration
 ###########################################
 
-# Read projects/.makeprojects and include each project's Makefile.fragment
-# Add projects to projects/.makeprojects (one per line) to enable them
-# Each project must have: projects/<name>/Makefile.fragment
--include $(shell test -f projects/.makeprojects && grep -v '^\#' projects/.makeprojects | grep -v '^$$' | sed 's|^|projects/|' | sed 's|$$|/Makefile.fragment|' || echo)
+# Read _projects/.makeprojects and include each project's Makefile.fragment
+# Add projects to _projects/.makeprojects (one per line) to enable them
+# Each project must have: _projects/<name>/Makefile.fragment
+-include $(shell test -f _projects/.makeprojects && grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | sed 's|^|_projects/|' | sed 's|$$|/Makefile.fragment|' || echo)
 
 # List all registered projects
 list-projects:
 	@echo "📦 Registered Projects:"
-	@if [ -f projects/.makeprojects ]; then \
-		grep -v '^\#' projects/.makeprojects | grep -v '^$$' | while read proj; do \
-			if [ -f "projects/$$proj/Makefile.fragment" ]; then \
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile.fragment" ]; then \
 				echo "  ✅ $$proj (active)"; \
 			else \
 				echo "  ⚠️  $$proj (missing Makefile.fragment)"; \
 			fi; \
 		done; \
 	else \
-		echo "  No projects/.makeprojects file found"; \
+		echo "  No _projects/.makeprojects file found"; \
 	fi
 	@echo ""
-	@echo "Available projects (in projects/ directory):"
-	@ls -d projects/*/ 2>/dev/null | sed 's|projects/||' | sed 's|/||' | while read proj; do \
-		if grep -q "^$$proj$$" projects/.makeprojects 2>/dev/null; then \
+	@echo "Available projects (in _projects/ directory):"
+	@ls -d _projects/*/ 2>/dev/null | sed 's|_projects/||' | sed 's|/||' | while read proj; do \
+		if grep -q "^$$proj$$" _projects/.makeprojects 2>/dev/null; then \
 			echo "  • $$proj (registered)"; \
 		else \
 			echo "  • $$proj (not registered)"; \

@@ -6,7 +6,7 @@
 ###########################################
 
 # Project source directory
-CS_PATHWAY_SRC = projects/cs-pathway-game
+CS_PATHWAY_SRC = _projects/cs-pathway-game
 PROJECT_NAME = $(notdir $(CS_PATHWAY_SRC))
 NOTEBOOK_FILENAME = 2026-04-02-$(PROJECT_NAME).ipynb
 

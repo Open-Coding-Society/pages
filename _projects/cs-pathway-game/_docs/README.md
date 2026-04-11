@@ -47,7 +47,7 @@ brew install fswatch
 sudo apt install fswatch
 
 **Edit/Save workflow example:**
-1. Edit files in `projects/cs-pathway-game/`
+1. Edit files in `_projects/cs-pathway-game/`
    - `notebook.src.ipynb` - converted automatically when saved (via make dev)
    - `levels/*.js` - copied automatically when saved (via watch-cs-pathway-game)
    - `model/*.js` - copied automatically when saved
