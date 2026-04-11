@@ -2,30 +2,43 @@
 import GamEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
+import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
-class GameLevelCssePath1 {
+/**
+ * GameLevel CS Pathway - Wayfinding World
+ */
+class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
   static levelId = 'wayfinding-world';
   static displayName = 'Wayfinding World';
 
   constructor(gameEnv) {
-    let width = gameEnv.innerWidth;
-    let height = gameEnv.innerHeight;
-    let path = gameEnv.path;
+    super(gameEnv, {
+      levelDisplayName: GameLevelCsPath1Way.displayName,
+      logPrefix: 'Wayfinding World',
+    });
+
+    let { width, height, path } = this.getLevelDimensions();
 
     /**
      * Section: Level objects.
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/pathway/csse/bg1/wayfinding-world.png";
+    const image_src = path + "/images/gamify/cs-pathway/bg1/wayfinding-world-fantasy.png";
     const bg_data = {
-        name: GameLevelCssePath1.displayName,
-        greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
+        name: GameLevelCsPath1Way.displayName,
+        greeting: "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll discover your course, uncover your strengths, and enrich your persona!",
         src: image_src,
     };
+
+    this.restoreIdentitySelections({
+      bgData: bg_data,
+      themeManifestUrl: `${path}/images/gamify/pathway/csse/bg1/index.json`,
+      themeAssetPrefix: `${path}/images/gamify/pathway/csse/bg1/`,
+    });
     
     // ── Player ───────────────────────────────────────────────────
-    const player_src = path + "/images/gamify/pathway/csse/player/minimalist.png";
+    const player_src = path + "/images/gamify/cs-pathway/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
@@ -55,8 +68,23 @@ class GameLevelCssePath1 {
       y: height * 0.26,
     };
 
+    const personalEnrichmentGatekeeperPos = {
+      x: width * 0.20,
+      y: height * 0.23,
+    };
+
+    const skillPassportGatekeeperPos = {
+      x: width * 0.74,
+      y: height * 0.49  ,
+    };
+
+    const courseEnlistGatekeeperPos = {
+      x: width * 0.20,
+      y: height * 0.46,
+    };
+
     const gatekeeperBaseData = {
-      src: path + '/images/gamify/pathway/csse/npc/gatekeeper2.png',
+      src: path + '/images/gamify/cs-pathway/npc/gatekeeper2.png',
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
       pixels: { width: 1024, height: 1024 },
@@ -84,14 +112,35 @@ class GameLevelCssePath1 {
       position: codeHubGatekeeperPos,
     });
 
-    // List of objects defnitions for this level
+    const npc_data_personalEnrichmentGatekeeper = createGatekeeperData({
+      id: 'PersonalEnrichmentGatekeeper',
+      greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
+      position: personalEnrichmentGatekeeperPos,
+    });
+
+    const npc_data_skillPassportGatekeeper = createGatekeeperData({
+      id: 'SkillPassportGatekeeper',
+      greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
+      position: skillPassportGatekeeperPos,
+    });
+
+    const npc_data_courseEnlistGatekeeper = createGatekeeperData({
+      id: 'CourseEnlistGatekeeper',
+      greeting: 'Welcome to Course Enlist! Choose your next class and map your pathway.',
+      position: courseEnlistGatekeeperPos,
+    });
+
+    // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
       { class: Npc, data: npc_data_codeHubGatekeeper },
+      { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
+      { class: Npc, data: npc_data_skillPassportGatekeeper },
+      { class: Npc, data: npc_data_courseEnlistGatekeeper },
     ];
   }
 
 }
 
-export default GameLevelCssePath1;
+export default GameLevelCsPath1Way;

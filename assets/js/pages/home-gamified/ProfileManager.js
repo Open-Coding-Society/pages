@@ -122,7 +122,7 @@ class ProfileManager {
       profileData: {
         name: profile.name,
         email: profile.email,
-        github: profile.github,
+        githubID: profile.githubID,  // Updated from 'github'
         sprite: profile.sprite,
         spriteMeta: profile.spriteMeta,
         spriteSrc: profile.spriteSrc,
@@ -131,18 +131,24 @@ class ProfileManager {
         worldThemeSrc: profile.worldThemeSrc,
       },
       identityState: {
+        // Identity Forge (includes avatar)
         identityUnlocked: profile.identityUnlocked || false,
-        worldThemeDone: profile.worldThemeDone || false,
-        avatarForgeDone: profile.avatarForgeDone || false,
+        avatarSelected: profile.avatarSelected || false,
+        // Wayfinding World
+        worldThemeSelected: profile.worldThemeSelected || false,
+        navigationComplete: profile.navigationComplete || false,
+        // Mission Tooling
+        toolsUnlocked: profile.toolsUnlocked || false,
       },
     };
   }
 
   /**
-   * Save identity information (name, email, github)
+   * Save identity information (name, email, githubID)
    * Creates new profile if none exists, updates if it does
+   * Part of Identity Forge level
    * 
-   * @param {Object} identityData - { name, email, github }
+   * @param {Object} identityData - { name, email, githubID }
    * @returns {Promise<boolean>} Success status
    */
   async saveIdentity(identityData) {
@@ -154,7 +160,7 @@ class ProfileManager {
     const payload = {
       name: identityData.name,
       email: identityData.email || '',
-      github: identityData.github || '',
+      githubID: identityData.githubID || '',  // Updated from 'github'
     };
 
     try {
@@ -186,6 +192,7 @@ class ProfileManager {
 
   /**
    * Update identity unlock progress
+   * Part of Identity Forge level
    * 
    * @param {boolean} unlocked - Whether identity terminal is unlocked
    * @returns {Promise<boolean>} Success status
@@ -210,6 +217,7 @@ class ProfileManager {
 
   /**
    * Save avatar/sprite selection
+   * Part of Identity Forge level (avatar included in identity)
    * 
    * @param {Object} spriteMeta - { name, src, rows, cols, scaleFactor, movementPreset, ... }
    * @returns {Promise<boolean>} Success status
@@ -225,6 +233,7 @@ class ProfileManager {
         sprite: spriteMeta.name,
         spriteMeta: spriteMeta,
         spriteSrc: spriteMeta.src,
+        avatarSelected: true,  // Mark avatar as selected
       };
 
       if (this.isAuthenticated) {
@@ -243,14 +252,15 @@ class ProfileManager {
   }
 
   /**
-   * Update avatar forge completion progress
+   * Update avatar selection completion (part of Identity Forge)
+   * Identity Forge includes both identity and avatar
    * 
-   * @param {boolean} done - Whether avatar forge is complete
+   * @param {boolean} selected - Whether avatar has been selected
    * @returns {Promise<boolean>} Success status
    */
-  async updateAvatarProgress(done = true) {
+  async updateAvatarProgress(selected = true) {
     try {
-      const update = { avatarForgeDone: done };
+      const update = { avatarSelected: selected };
       
       if (this.isAuthenticated) {
         await this.backend.update(update);
@@ -268,6 +278,7 @@ class ProfileManager {
 
   /**
    * Save world theme selection
+   * Part of Wayfinding World level
    * 
    * @param {Object} themeMeta - { name, src, compatibleSprites?, ... }
    * @returns {Promise<boolean>} Success status
@@ -283,6 +294,7 @@ class ProfileManager {
         theme: themeMeta.name,
         themeMeta: themeMeta,
         worldThemeSrc: themeMeta.src,
+        worldThemeSelected: true,  // Mark theme as selected
       };
 
       if (this.isAuthenticated) {
@@ -301,14 +313,15 @@ class ProfileManager {
   }
 
   /**
-   * Update world theme portal completion progress
+   * Update world theme navigation completion
+   * Part of Wayfinding World level
    * 
-   * @param {boolean} done - Whether theme portal is complete
+   * @param {boolean} complete - Whether navigation is complete
    * @returns {Promise<boolean>} Success status
    */
-  async updateThemeProgress(done = true) {
+  async updateThemeProgress(complete = true) {
     try {
-      const update = { worldThemeDone: done };
+      const update = { navigationComplete: complete };
       
       if (this.isAuthenticated) {
         await this.backend.update(update);

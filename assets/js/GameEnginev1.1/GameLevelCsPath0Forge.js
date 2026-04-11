@@ -26,7 +26,7 @@ const identityState = {
 /**
  * GameLevel CS Pathway - Identity Forge
  */
-class GameLevelCssePath {
+class GameLevelCsPath0Forge {
   static levelId = 'csse-path';
   static displayName = 'Identity Forge';
 
@@ -90,15 +90,15 @@ class GameLevelCssePath {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/pathway/csse/bg/identity-forge-1.png";
+    const image_src = path + "/images/gamify/cs-pathway/bg/identity-forge-fantasy.png";
     const bg_data = {
-        name: GameLevelCssePath.displayName,
+        name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
         src: image_src,
     };
 
     // ── Player ───────────────────────────────────────────────────
-    const player_src = path + "/images/gamify/pathway/csse/player/minimalist.png";
+    const player_src = path + "/images/gamify/cs-pathway/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
@@ -146,7 +146,7 @@ class GameLevelCssePath {
     };
 
     const gatekeeperBaseData = {
-      src: path + "/images/gamify/pathway/csse/npc/gatekeeper2.png",
+      src: path + "/images/gamify/cs-pathway/npc/gatekeeper2.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
       pixels: { width: 1024, height: 1024 },
@@ -582,7 +582,7 @@ class GameLevelCssePath {
       const fallbackCatalog = [
         {
           name: 'Minimalist',
-          src: `${path}/images/gamify/pathway/csse/player/minimalist.png`,
+          src: `${path}/images/gamify/cs-pathway/player/minimalist.png`,
           rows: 2,
           cols: 2,
           scaleFactor: PLAYER_SCALE_FACTOR,
@@ -713,7 +713,7 @@ class GameLevelCssePath {
         ? options.sprite
         : options.spriteMeta || {
             name: 'Minimalist',
-            src: `${path}/images/gamify/pathway/csse/player/minimalist.png`,
+            src: `${path}/images/gamify/cs-pathway/player/minimalist.png`,
             rows: 2,
             cols: 2,
             scaleFactor: PLAYER_SCALE_FACTOR,
@@ -843,13 +843,13 @@ class GameLevelCssePath {
       const fallbackCatalog = [
         {
           name: 'Identity Forge',
-          src: `${path}/images/gamify/pathway/csse/bg/indentity-forge-1.png`,
+          src: image_src,
           previewText: 'Default theme',
         },
       ];
  
       try {
-        const response = await fetch(`${path}/images/gamify/pathway/csse/bg/index.json`, { cache: 'no-cache' });
+        const response = await fetch(`${path}/images/gamify/cs-pathway/bg/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
@@ -858,7 +858,7 @@ class GameLevelCssePath {
         const manifestThemes = Array.isArray(manifest)
           ? manifest.map((entry) => ({
               name: entry.name,
-              src: `${path}/images/gamify/pathway/csse/bg/${entry.src}`,
+              src: `${path}/images/gamify/cs-pathway/bg/${entry.src}`,
               previewText: entry.previewText || entry.description || '',
             }))
           : [];
@@ -882,11 +882,11 @@ class GameLevelCssePath {
     // Background: Find the background object.
     this.getBackgroundObject = function() {
       const bgObj = gameEnv.gameObjects.find(obj =>
-        (obj.data && obj.data.name === GameLevelCssePath.displayName)
+        (obj.data && obj.data.name === GameLevelCsPath0Forge.displayName)
       );
       if (!bgObj) {
         console.warn('World Theme Portal: background object not found');
-        console.log('Looking for name:', GameLevelCssePath.displayName);
+        console.log('Looking for name:', GameLevelCsPath0Forge.displayName);
         console.log('Available objects:', gameEnv.gameObjects.map(obj => ({
           hasData: !!obj.data,
           dataName: obj.data?.name,
@@ -1087,4 +1087,4 @@ class GameLevelCssePath {
   }
 }
 
-export default GameLevelCssePath;
+export default GameLevelCsPath0Forge;

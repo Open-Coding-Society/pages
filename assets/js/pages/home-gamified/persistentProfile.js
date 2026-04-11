@@ -1,28 +1,32 @@
 /**
  * Persistent Profile - Authenticated User Storage
  * 
- * Backend-persisted profile storage for authenticated users.
+ * Backend-persisted profile storage via users table integration.
  * Complements localProfile.js with same API interface.
  * 
  * Key Differences from Local Profile:
- * - Data stored in backend database via API
+ * - Data stored in users table via Python Flask API
  * - Requires authentication (JWT cookies)
- * - clear() preserves identity (name, email, github)
+ * - clear() preserves identity (_name, _email, _uid)
  * - Identity changes require separate admin flow
- * - Supports GUEST and STUDENT roles
+ * - Supports full user management
  * 
- * API Endpoints (Python backend):
- * - GET    /api/profile/game     - Load profile
- * - POST   /api/profile/game     - Create profile
- * - PUT    /api/profile/game     - Update profile
- * - DELETE /api/profile/game     - Clear preferences only
+ * API Endpoints (Python Flask backend):
+ * - GET    /api/profile/game     - Load game profile
+ * - POST   /api/profile/game     - Create game profile
+ * - PUT    /api/profile/game     - Update game profile
+ * - DELETE /api/profile/game     - Clear game data only
  * 
- * Storage Structure (same as localProfile):
+ * Users Table Structure (SQLAlchemy):
+ *   id, _name, _email, _uid (githubID), _sid, _password, _role,
+ *   _pfp, _grade_data, _ap_exam, _class, _school, _game_profile
+ * 
+ * _game_profile JSON Structure:
  * {
- *   identity: { name, email, github },
- *   preferences: { sprite, spriteMeta, theme, themeMeta },
- *   progress: { identityUnlocked, worldThemeDone, avatarForgeDone, ... },
- *   metadata: { localId, createdAt, updatedAt, version }
+ *   localId, createdAt, updatedAt, lastModified,
+ *   "identity-forge": { preferences, progress, completedAt },
+ *   "wayfinding-world": { preferences, progress, completedAt },
+ *   "mission-tooling": { progress, completedAt }
  * }
  */
 
@@ -115,6 +119,7 @@ class PersistentProfile {
 
   /**
    * Save new profile to backend
+   * Maps to users table structure
    * @param {Object} profileData - Initial profile data
    * @returns {Promise<boolean>} Success status
    */
@@ -125,35 +130,51 @@ class PersistentProfile {
         throw new Error('User not authenticated');
       }
 
-      const profile = {
-        identity: {
-          name: profileData.name || userInfo.name || '',
-          email: profileData.email || userInfo.email || '',
-          github: profileData.github || '',
-        },
-        preferences: {
-          sprite: profileData.sprite || '',
-          spriteMeta: profileData.spriteMeta || null,
-          theme: profileData.theme || '',
-          themeMeta: profileData.themeMeta || null,
-        },
-        progress: {
-          identityUnlocked: profileData.identityUnlocked || false,
-          worldThemeDone: profileData.worldThemeDone || false,
-          avatarForgeDone: profileData.avatarForgeDone || false,
-        },
-        metadata: {
-          localId: profileData.localId || null, // Preserve local ID if migrating
+      const payload = {
+        _name: profileData.name || userInfo.name || '',
+        _email: profileData.email || userInfo.email || '',
+        _uid: profileData.githubID || userInfo.uid || '',  // githubID maps to _uid
+        _game_profile: {
           version: VERSION,
+          localId: profileData.localId || null,  // Preserve if migrating
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          lastModified: Date.now(),
+          'identity-forge': {
+            preferences: {
+              sprite: profileData.sprite || null,
+              spriteMeta: profileData.spriteMeta || null,
+            },
+            progress: {
+              identityUnlocked: profileData.identityUnlocked || false,
+              avatarSelected: profileData.avatarSelected || false,
+            },
+            completedAt: null,
+          },
+          'wayfinding-world': {
+            preferences: {
+              theme: profileData.theme || null,
+              themeMeta: profileData.themeMeta || null,
+            },
+            progress: {
+              worldThemeSelected: profileData.worldThemeSelected || false,
+              navigationComplete: profileData.navigationComplete || false,
+            },
+            completedAt: null,
+          },
+          'mission-tooling': {
+            progress: {
+              toolsUnlocked: profileData.toolsUnlocked || false,
+            },
+            completedAt: null,
+          },
         },
       };
 
       const response = await fetch(API_BASE, {
         ...fetchOptions,
         method: 'POST',
-        body: JSON.stringify(profile),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -171,6 +192,7 @@ class PersistentProfile {
 
   /**
    * Update existing profile
+   * Merges updates into _game_profile JSON column
    * @param {Object} updates - Partial profile data to merge
    * @returns {Promise<boolean>} Success status
    */
@@ -182,37 +204,60 @@ class PersistentProfile {
         return await this.save(updates);
       }
 
-      // Merge updates preserving structure
-      const updated = {
-        identity: {
-          ...existing.identity,
-          ...(updates.name && { name: updates.name }),
-          ...(updates.email && { email: updates.email }),
-          ...(updates.github && { github: updates.github }),
-        },
-        preferences: {
-          ...existing.preferences,
-          ...(updates.sprite && { sprite: updates.sprite }),
-          ...(updates.spriteMeta && { spriteMeta: updates.spriteMeta }),
-          ...(updates.theme && { theme: updates.theme }),
-          ...(updates.themeMeta && { themeMeta: updates.themeMeta }),
-        },
-        progress: {
-          ...existing.progress,
-          ...Object.keys(updates)
-            .filter(key => !['name', 'email', 'github', 'sprite', 'spriteMeta', 'theme', 'themeMeta'].includes(key))
-            .reduce((acc, key) => ({ ...acc, [key]: updates[key] }), {}),
-        },
-        metadata: {
-          ...existing.metadata,
+      // Merge updates into existing _game_profile structure
+      const gameProfile = existing._game_profile || {};
+      const identityForge = gameProfile['identity-forge'] || { preferences: {}, progress: {} };
+      const wayfindingWorld = gameProfile['wayfinding-world'] || { preferences: {}, progress: {} };
+      const missionTooling = gameProfile['mission-tooling'] || { progress: {} };
+
+      const payload = {
+        _name: updates.name || existing._name,
+        _email: updates.email || existing._email,
+        _uid: updates.githubID || existing._uid,
+        _game_profile: {
+          ...gameProfile,
+          lastModified: Date.now(),
           updatedAt: new Date().toISOString(),
+          'identity-forge': {
+            preferences: {
+              ...identityForge.preferences,
+              ...(updates.sprite !== undefined && { sprite: updates.sprite }),
+              ...(updates.spriteMeta !== undefined && { spriteMeta: updates.spriteMeta }),
+            },
+            progress: {
+              ...identityForge.progress,
+              ...(updates.identityUnlocked !== undefined && { identityUnlocked: updates.identityUnlocked }),
+              ...(updates.avatarSelected !== undefined && { avatarSelected: updates.avatarSelected }),
+            },
+            completedAt: updates.identityForgeCompleted || identityForge.completedAt,
+          },
+          'wayfinding-world': {
+            preferences: {
+              ...wayfindingWorld.preferences,
+              ...(updates.theme !== undefined && { theme: updates.theme }),
+              ...(updates.themeMeta !== undefined && { themeMeta: updates.themeMeta }),
+            },
+            progress: {
+              ...wayfindingWorld.progress,
+              ...(updates.worldThemeSelected !== undefined && { worldThemeSelected: updates.worldThemeSelected }),
+              ...(updates.navigationComplete !== undefined && { navigationComplete: updates.navigationComplete }),
+            },
+            completedAt: updates.wayfindingCompleted || wayfindingWorld.completedAt,
+          },
+          'mission-tooling': {
+            progress: {
+              ...missionTooling.progress,
+              ...(updates.toolsUnlocked !== undefined && { toolsUnlocked: updates.toolsUnlocked }),
+            },
+            completedAt: updates.missionToolingCompleted || missionTooling.completedAt,
+          },
         },
       };
 
       const response = await fetch(API_BASE, {
         ...fetchOptions,
         method: 'PUT',
-        body: JSON.stringify(updated),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -228,9 +273,9 @@ class PersistentProfile {
   }
 
   /**
-   * Clear profile preferences (NOT identity)
-   * Identity (name, email, github) is preserved
-   * Use for "reset progress" without losing account
+   * Clear game profile data (NOT identity)
+   * Preserves _name, _email, _uid (identity columns)
+   * Only clears _game_profile JSON column
    * @returns {Promise<boolean>} Success status
    */
   static async clear() {
@@ -241,30 +286,46 @@ class PersistentProfile {
         return true;
       }
 
-      // Preserve identity, clear everything else
-      const cleared = {
-        identity: existing.identity, // KEEP identity
-        preferences: {
-          sprite: '',
-          spriteMeta: null,
-          theme: '',
-          themeMeta: null,
-        },
-        progress: {
-          identityUnlocked: false,
-          worldThemeDone: false,
-          avatarForgeDone: false,
-        },
-        metadata: {
-          ...existing.metadata,
+      // Preserve identity columns, reset game_profile only
+      const payload = {
+        _name: existing._name,
+        _email: existing._email,
+        _uid: existing._uid,
+        _game_profile: {
+          version: VERSION,
+          localId: existing._game_profile?.localId || null,  // Preserve for analytics
+          createdAt: existing._game_profile?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          lastModified: Date.now(),
+          'identity-forge': {
+            preferences: {},
+            progress: {
+              identityUnlocked: false,
+              avatarSelected: false,
+            },
+            completedAt: null,
+          },
+          'wayfinding-world': {
+            preferences: {},
+            progress: {
+              worldThemeSelected: false,
+              navigationComplete: false,
+            },
+            completedAt: null,
+          },
+          'mission-tooling': {
+            progress: {
+              toolsUnlocked: false,
+            },
+            completedAt: null,
+          },
         },
       };
 
       const response = await fetch(API_BASE, {
         ...fetchOptions,
         method: 'PUT',
-        body: JSON.stringify(cleared),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -320,37 +381,49 @@ class PersistentProfile {
 
   /**
    * Get flat profile structure (for easy access)
+   * Maps users table back to flat structure
    * @returns {Promise<Object|null>}
    */
   static async getFlatProfile() {
     try {
-      const profile = await this.load();
-      if (!profile) {
+      const data = await this.load();
+      if (!data) {
         return null;
       }
 
+      const gameProfile = data._game_profile || {};
+      const identityForge = gameProfile['identity-forge'] || { preferences: {}, progress: {} };
+      const wayfindingWorld = gameProfile['wayfinding-world'] || { preferences: {}, progress: {} };
+      const missionTooling = gameProfile['mission-tooling'] || { progress: {} };
+
       return {
-        // Identity
-        name: profile.identity?.name || '',
-        email: profile.identity?.email || '',
-        github: profile.identity?.github || '',
+        // Identity (from users table columns)
+        name: data._name || '',
+        email: data._email || '',
+        githubID: data._uid || '',  // _uid maps back to githubID
         
-        // Preferences
-        sprite: profile.preferences?.sprite || '',
-        spriteMeta: profile.preferences?.spriteMeta || null,
-        spriteSrc: profile.preferences?.spriteMeta?.src || '',
-        theme: profile.preferences?.theme || '',
-        themeMeta: profile.preferences?.themeMeta || null,
-        worldThemeSrc: profile.preferences?.themeMeta?.src || '',
+        // Identity Forge (includes avatar)
+        sprite: identityForge.preferences?.sprite || null,
+        spriteMeta: identityForge.preferences?.spriteMeta || null,
+        spriteSrc: identityForge.preferences?.spriteMeta?.src || null,
+        identityUnlocked: identityForge.progress?.identityUnlocked || false,
+        avatarSelected: identityForge.progress?.avatarSelected || false,
         
-        // Progress
-        ...profile.progress,
+        // Wayfinding World
+        theme: wayfindingWorld.preferences?.theme || null,
+        themeMeta: wayfindingWorld.preferences?.themeMeta || null,
+        worldThemeSrc: wayfindingWorld.preferences?.themeMeta?.src || null,
+        worldThemeSelected: wayfindingWorld.progress?.worldThemeSelected || false,
+        navigationComplete: wayfindingWorld.progress?.navigationComplete || false,
+        
+        // Mission Tooling
+        toolsUnlocked: missionTooling.progress?.toolsUnlocked || false,
         
         // Metadata
-        localId: profile.metadata?.localId || null,
-        createdAt: profile.metadata?.createdAt || '',
-        updatedAt: profile.metadata?.updatedAt || '',
-        version: profile.metadata?.version || VERSION,
+        localId: gameProfile.localId || null,
+        createdAt: gameProfile.createdAt || '',
+        updatedAt: gameProfile.updatedAt || '',
+        version: gameProfile.version || VERSION,
       };
     } catch (error) {
       console.error('PersistentProfile: getFlatProfile failed', error);
@@ -361,6 +434,7 @@ class PersistentProfile {
   /**
    * Migrate local profile to persistent profile
    * Preserves all local data including local ID
+   * Maps to users table structure
    * @param {Object} localData - Local profile data
    * @returns {Promise<boolean>} Success status
    */
@@ -383,6 +457,7 @@ class PersistentProfile {
         // Override with authenticated user info
         name: userInfo.name || localData.name,
         email: userInfo.email || localData.email,
+        githubID: userInfo.uid || localData.githubID,
         // Preserve local metadata
         localId: localData.localId,
       };

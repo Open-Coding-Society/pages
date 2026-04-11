@@ -74,7 +74,7 @@ const LocalProfile = {
    * @param {Object} data - Profile data
    * @param {string} data.name - User's name
    * @param {string} data.email - User's email
-   * @param {string} data.github - User's GitHub username
+   * @param {string} data.githubID - User's GitHub username
    * @returns {Object} The saved profile with metadata
    */
   save(data) {
@@ -84,22 +84,41 @@ const LocalProfile = {
         localId: generateLocalId(),
         createdAt: getTimestamp(),
         updatedAt: getTimestamp(),
-        identity: {
-          name: data.name || '',
-          email: data.email || '',
-          github: data.github || '',
+        // Top-level identity fields
+        name: data.name || '',
+        email: data.email || '',
+        githubID: data.githubID || '',
+        // Game data organized by level
+        game_profile: {
+          'identity-forge': {
+            preferences: {
+              sprite: data.sprite || null,
+              spriteMeta: data.spriteMeta || null,
+            },
+            progress: {
+              identityUnlocked: data.identityUnlocked || false,
+              avatarSelected: data.avatarSelected || false,
+            },
+            completedAt: null,
+          },
+          'wayfinding-world': {
+            preferences: {
+              theme: data.theme || null,
+              themeMeta: data.themeMeta || null,
+            },
+            progress: {
+              worldThemeSelected: data.worldThemeSelected || false,
+              navigationComplete: data.navigationComplete || false,
+            },
+            completedAt: null,
+          },
+          'mission-tooling': {
+            progress: {
+              toolsUnlocked: data.toolsUnlocked || false,
+            },
+            completedAt: null,
+          },
         },
-        preferences: {
-          sprite: data.sprite || null,
-          spriteMeta: data.spriteMeta || null,
-          theme: data.theme || null,
-          themeMeta: data.themeMeta || null,
-        },
-        progress: {
-          identityUnlocked: data.identityUnlocked || false,
-          worldThemeDone: data.worldThemeDone || false,
-          avatarForgeDone: data.avatarForgeDone || false,
-        }
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
@@ -132,25 +151,46 @@ const LocalProfile = {
       const profile = {
         ...existing,
         updatedAt: getTimestamp(),
-        identity: {
-          ...existing.identity,
-          ...(updates.name !== undefined ? { name: updates.name } : {}),
-          ...(updates.email !== undefined ? { email: updates.email } : {}),
-          ...(updates.github !== undefined ? { github: updates.github } : {}),
+        // Top-level identity updates
+        ...(updates.name !== undefined && { name: updates.name }),
+        ...(updates.email !== undefined && { email: updates.email }),
+        ...(updates.githubID !== undefined && { githubID: updates.githubID }),
+        // Game profile updates
+        game_profile: {
+          'identity-forge': {
+            preferences: {
+              ...existing.game_profile?.['identity-forge']?.preferences,
+              ...(updates.sprite !== undefined && { sprite: updates.sprite }),
+              ...(updates.spriteMeta !== undefined && { spriteMeta: updates.spriteMeta }),
+            },
+            progress: {
+              ...existing.game_profile?.['identity-forge']?.progress,
+              ...(updates.identityUnlocked !== undefined && { identityUnlocked: updates.identityUnlocked }),
+              ...(updates.avatarSelected !== undefined && { avatarSelected: updates.avatarSelected }),
+            },
+            completedAt: updates.identityForgeCompleted || existing.game_profile?.['identity-forge']?.completedAt,
+          },
+          'wayfinding-world': {
+            preferences: {
+              ...existing.game_profile?.['wayfinding-world']?.preferences,
+              ...(updates.theme !== undefined && { theme: updates.theme }),
+              ...(updates.themeMeta !== undefined && { themeMeta: updates.themeMeta }),
+            },
+            progress: {
+              ...existing.game_profile?.['wayfinding-world']?.progress,
+              ...(updates.worldThemeSelected !== undefined && { worldThemeSelected: updates.worldThemeSelected }),
+              ...(updates.navigationComplete !== undefined && { navigationComplete: updates.navigationComplete }),
+            },
+            completedAt: updates.wayfindingCompleted || existing.game_profile?.['wayfinding-world']?.completedAt,
+          },
+          'mission-tooling': {
+            progress: {
+              ...existing.game_profile?.['mission-tooling']?.progress,
+              ...(updates.toolsUnlocked !== undefined && { toolsUnlocked: updates.toolsUnlocked }),
+            },
+            completedAt: updates.missionToolingCompleted || existing.game_profile?.['mission-tooling']?.completedAt,
+          },
         },
-        preferences: {
-          ...existing.preferences,
-          ...(updates.sprite !== undefined ? { sprite: updates.sprite } : {}),
-          ...(updates.spriteMeta !== undefined ? { spriteMeta: updates.spriteMeta } : {}),
-          ...(updates.theme !== undefined ? { theme: updates.theme } : {}),
-          ...(updates.themeMeta !== undefined ? { themeMeta: updates.themeMeta } : {}),
-        },
-        progress: {
-          ...existing.progress,
-          ...(updates.identityUnlocked !== undefined ? { identityUnlocked: updates.identityUnlocked } : {}),
-          ...(updates.worldThemeDone !== undefined ? { worldThemeDone: updates.worldThemeDone } : {}),
-          ...(updates.avatarForgeDone !== undefined ? { avatarForgeDone: updates.avatarForgeDone } : {}),
-        }
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
@@ -196,22 +236,33 @@ const LocalProfile = {
     const profile = this.load();
     if (!profile) return null;
 
+    const identityForge = profile.game_profile?.['identity-forge'] || {};
+    const wayfindingWorld = profile.game_profile?.['wayfinding-world'] || {};
+    const missionTooling = profile.game_profile?.['mission-tooling'] || {};
+
     return {
+      // Metadata
       localId: profile.localId,
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt,
-      name: profile.identity.name,
-      email: profile.identity.email,
-      github: profile.identity.github,
-      sprite: profile.preferences.sprite,
-      spriteMeta: profile.preferences.spriteMeta,
-      spriteSrc: profile.preferences.spriteMeta?.src || null,
-      theme: profile.preferences.theme,
-      themeMeta: profile.preferences.themeMeta,
-      worldThemeSrc: profile.preferences.themeMeta?.src || null,
-      identityUnlocked: profile.progress.identityUnlocked,
-      worldThemeDone: profile.progress.worldThemeDone,
-      avatarForgeDone: profile.progress.avatarForgeDone,
+      // Top-level identity
+      name: profile.name,
+      email: profile.email,
+      githubID: profile.githubID,
+      // Identity Forge (includes avatar)
+      sprite: identityForge.preferences?.sprite || null,
+      spriteMeta: identityForge.preferences?.spriteMeta || null,
+      spriteSrc: identityForge.preferences?.spriteMeta?.src || null,
+      identityUnlocked: identityForge.progress?.identityUnlocked || false,
+      avatarSelected: identityForge.progress?.avatarSelected || false,
+      // Wayfinding World
+      theme: wayfindingWorld.preferences?.theme || null,
+      themeMeta: wayfindingWorld.preferences?.themeMeta || null,
+      worldThemeSrc: wayfindingWorld.preferences?.themeMeta?.src || null,
+      worldThemeSelected: wayfindingWorld.progress?.worldThemeSelected || false,
+      navigationComplete: wayfindingWorld.progress?.navigationComplete || false,
+      // Mission Tooling
+      toolsUnlocked: missionTooling.progress?.toolsUnlocked || false,
     };
   },
 
