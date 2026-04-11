@@ -190,7 +190,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  StatusPanel (GameEngine Component)                              │       │
 │  │  ───────────────────────────────────                             │       │
 │  │  Used for: PLAYER PROFILE display                                │       │
-│  │  Location: GameLevelCssePath.js                                  │       │
+│  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Current Configuration:                                          │       │
 │  │  ┌────────────────────────────────────────────────────────┐     │       │
@@ -220,7 +220,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  FormPanel (GameEngine Component)                                │       │
 │  │  ─────────────────────────────────                               │       │
 │  │  Used for: Identity Terminal input                               │       │
-│  │  Location: GameLevelCssePath.js                                  │       │
+│  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Configuration:                                                  │       │
 │  │  ┌────────────────────────────────────────────────────────┐     │       │
@@ -242,7 +242,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  Picker (GameEngine Component)                                   │       │
 │  │  ──────────────────────────────                                  │       │
 │  │  Used for: Avatar selection & World Theme selection              │       │
-│  │  Location: GameLevelCssePath.js                                  │       │
+│  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Avatar Picker Configuration:                                    │       │
 │  │  • Title: ⚔ Avatar Forge Sprite Selector                        │       │
@@ -259,7 +259,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  DialogueSystem (GameEngine Component)                           │       │
 │  │  ──────────────────────────────────────                          │       │
 │  │  Used for: NPC interactions and level guidance                   │       │
-│  │  Location: GameLevelCssePath.js                                  │       │
+│  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Features:                                                        │       │
 │  │  • Typewriter effect for text display                            │       │
@@ -272,7 +272,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  Toast Messages (Custom Implementation)                          │       │
 │  │  ───────────────────────────────────────                         │       │
 │  │  Used for: Status updates and notifications                      │       │
-│  │  Location: GameLevelCssePath.js                                  │       │
+│  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Example:                                                         │       │
 │  │  ┌────────────────────────────────────────────────────────┐     │       │
@@ -302,8 +302,8 @@ The CS Pathway game implements MVC architecture across the following file struct
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
-│  │  GameLevelCssePath.js (or your game controller)                 │       │
-│  │  ────────────────────────────────────────────                    │       │
+│  │  GameLevelCSPath*.js (Game Level Controllers)                    │       │
+│  │  ──────────────────────────────────────────────                  │       │
 │  │  Orchestrates game flow and user interactions                   │       │
 │  │                                                                  │       │
 │  │  Responsibilities:                                               │       │
