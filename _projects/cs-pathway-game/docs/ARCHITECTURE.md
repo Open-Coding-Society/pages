@@ -2,8 +2,8 @@
 layout: post
 title: CS Pathway Game - MVC Architecture
 description: MVC architecture and file organization for the CS Pathway Game project
-categories: [CS Pathway Game]
-permalink: /projects/cs-pathway-game/architecture
+categories: [Gamify]
+permalink: /cs-pathway-game/architecture
 ---
 
 ## Overview

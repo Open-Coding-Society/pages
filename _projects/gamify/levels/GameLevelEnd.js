@@ -27,7 +27,7 @@ class GameLevelEnd {
     this.dialogueSystem = new DialogueSystem();
     
     // Parallax background configuration
-    const image_src_parallax = path + "/images/gamify/parallaxbg.png";
+    const image_src_parallax = path + "/images/projects/gamify/parallaxbg.png";
     const image_data_parallax = {
         name: 'parallax_background',
         id: 'parallax-background',
@@ -40,7 +40,7 @@ class GameLevelEnd {
         zIndex: 1  // Use positive z-index but keep it low
     };
     
-    const image_src_end = path + "/images/gamify/TransparentEnd.png";
+    const image_src_end = path + "/images/projects/gamify/TransparentEnd.png";
     const image_data_end = {
         name: 'end',
         id: 'end-background',
@@ -51,7 +51,7 @@ class GameLevelEnd {
         zIndex: 5  // Higher z-index to appear above parallax
     };
     
-    const sprite_src_steve = path + "/images/gamify/end_steve.png";
+    const sprite_src_steve = path + "/images/projects/gamify/end_steve.png";
     const CHILLGUY_SCALE_FACTOR = 7;
     const sprite_data_steve = {
         id: 'Steve',
@@ -82,7 +82,7 @@ class GameLevelEnd {
         */
     };
     
-    const sprite_src_alex = path + "/images/gamify/Alex.png";
+    const sprite_src_alex = path + "/images/projects/gamify/Alex.png";
     const alex_SCALE_FACTOR = 7;
     const sprite_data_alex = {
         id: 'Alex',
@@ -114,7 +114,7 @@ class GameLevelEnd {
     // Store a reference to the current instance to use in closures
     const self = this;
 
-    const sprite_src_enemy = path + "/images/gamify/enderman.png";
+    const sprite_src_enemy = path + "/images/projects/gamify/enderman.png";
     const sprite_data_enemy = {
         id: 'Enderman',
         greeting: "You feel a dark presence...",
@@ -282,7 +282,7 @@ class GameLevelEnd {
         }
     };
         
-    const sprite_src_endship = path + "/images/gamify/endship.png";
+    const sprite_src_endship = path + "/images/projects/gamify/endship.png";
     const sprite_greet_endship = "Find the elytra";
 
     // Store a reference to the dialogueSystem for use in sprite data
@@ -333,7 +333,7 @@ class GameLevelEnd {
         }
     };
 
-    const sprite_src_eye = path + "/images/gamify/eyeOfEnder.png";
+    const sprite_src_eye = path + "/images/projects/gamify/eyeOfEnder.png";
     const sprite_data_eye = {
         id: 'Eye of Ender',
         greeting: `Press E to claim this Eye of Ender.`,
@@ -526,7 +526,7 @@ class GameLevelEnd {
         portal.spriteData = {
             id: 'End Portal',
             greeting: "Return to Desert?",
-            src: "./images/gamify/exitportalfull.png"
+            src: "./images/projects/gamify/exitportalfull.png"
         };
         
         // Position the portal at custom coordinates
@@ -540,10 +540,10 @@ class GameLevelEnd {
         
         // FIX: use this.gameEnv.path instead of path
         if (this.gameEnv && this.gameEnv.path) {
-            portal.style.backgroundImage = `url('${this.gameEnv.path}/images/gamify/exitportalfull.png')`;
+            portal.style.backgroundImage = `url('${this.gameEnv.path}/images/projects/gamify/exitportalfull.png')`;
         } else {
             // Fallback to a relative path if gameEnv.path is not available
-            portal.style.backgroundImage = "url('./images/gamify/exitportalfull.png')";
+            portal.style.backgroundImage = "url('./images/projects/gamify/exitportalfull.png')";
             console.warn("Warning: gameEnv.path is not available, using relative path");
         }
         
@@ -775,10 +775,10 @@ class GameLevelEnd {
     
     // Check if gameEnv exists before accessing path
     if (this.gameEnv && this.gameEnv.path) {
-        eyeIcon.style.backgroundImage = `url('${this.gameEnv.path}/images/gamify/eyeOfEnder.png')`;
+        eyeIcon.style.backgroundImage = `url('${this.gameEnv.path}/images/projects/gamify/eyeOfEnder.png')`;
     } else {
         // Fallback to a relative path if gameEnv.path is not available
-        eyeIcon.style.backgroundImage = "url('./images/gamify/eyeOfEnder.png')";
+        eyeIcon.style.backgroundImage = "url('./images/projects/gamify/eyeOfEnder.png')";
         console.warn("Warning: gameEnv.path is not available, using relative path");
     }
     

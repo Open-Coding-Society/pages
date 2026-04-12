@@ -2,8 +2,8 @@
 layout: post
 title: CS Pathway Game - Build Integration
 description: Guide for integrating CS Pathway Game into Makefile and CI/CD workflows
-categories: [CS Pathway Game]
-permalink: /projects/cs-pathway-game/build-integration
+categories: [Gamify]
+permalink: /cs-pathway-game/build-integration
 ---
 
 ## Adding CS Pathway Game to Build System

@@ -17,7 +17,7 @@ class GameLevelWater {
     let path = gameEnv.path;
 
     // Background data
-    const image_src_water = path + "/images/gamify/water/deepseadungeon.jpeg";
+    const image_src_water = path + "/images/projects/gamify/water/deepseadungeon.jpeg";
     const image_data_water = {
         id: 'Water',
         src: image_src_water,
@@ -25,7 +25,7 @@ class GameLevelWater {
     };
 
     // Player Data for Octopus
-    const sprite_src_octopus = path + "/images/gamify/water/octopus.png"; // be sure to include the path
+    const sprite_src_octopus = path + "/images/projects/gamify/water/octopus.png"; // be sure to include the path
     const OCTOPUS_SCALE_FACTOR = 5;
     const sprite_data_octopus = {
         id: 'Octopus',
@@ -52,7 +52,7 @@ class GameLevelWater {
     };
 
     // NPC Data for Byte Nomad (Smaller Version)
-    const sprite_src_nomad = path + "/images/gamify/water/animwizard.png"; // be sure to include the path
+    const sprite_src_nomad = path + "/images/projects/gamify/water/animwizard.png"; // be sure to include the path
     const sprite_data_nomad = {
         id: 'JavaWorld',
         greeting: "Hi I am Java Portal.  Leave this world and go on a Java adventure!",
@@ -88,7 +88,7 @@ class GameLevelWater {
       };
 
      // Shark Data
-    const sprite_src_shark = path + "/images/gamify/water/shark.png"; // be sure to include the path
+    const sprite_src_shark = path + "/images/projects/gamify/water/shark.png"; // be sure to include the path
     const sprite_data_shark = {
         id: 'Shark',
         greeting: "Enemy Shark",
@@ -116,7 +116,7 @@ class GameLevelWater {
       };
 
     // Nezuko NPC sprite data
-    const sprite_src_nezuko = path + "/images/gamify/water/nezuko.png"; // be sure to include the path
+    const sprite_src_nezuko = path + "/images/projects/gamify/water/nezuko.png"; // be sure to include the path
     const sprite_greet_nezuko = "I've never seen you before. Are you lost? Well, even if you are.. I don't think I'm going to help you get out of here.";
     const platformerLink = "https://pages.opencodingsociety.com/navigation/game.html"; // Replace this with your actual platformer game link
 
@@ -137,7 +137,7 @@ class GameLevelWater {
       }
     };
 
-const sprite_src_puffer = path + "/images/gamify/water/puffer.png";
+const sprite_src_puffer = path + "/images/projects/gamify/water/puffer.png";
     const sprite_data_puffer = {
       id: 'Pufferfish',
       greeting: "Enemy Pufferfish",
@@ -151,7 +151,7 @@ const sprite_src_puffer = path + "/images/gamify/water/puffer.png";
       hitbox: { widthPercentage: 0.25, heightPercentage: 0.55 }
     };
 
-    const sprite_src_gold = path + "/images/gamify/water/gold.png";
+    const sprite_src_gold = path + "/images/projects/gamify/water/gold.png";
     const sprite_data_gold = {
       id: 'Goldfish',
       greeting: "Enemy Goldfish",

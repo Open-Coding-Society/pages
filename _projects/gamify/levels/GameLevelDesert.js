@@ -22,7 +22,7 @@ class GameLevelDesert {
 
 
    // Background data
-   const image_src_desert = path + "/images/gamify/desert.png"; // be sure to include the path
+   const image_src_desert = path + "/images/projects/gamify/desert.png"; // be sure to include the path
    const image_data_desert = {
        name: 'desert',
        greeting: "Welcome to the desert!  It is hot and dry here, but there are many adventures to be had!",
@@ -32,7 +32,7 @@ class GameLevelDesert {
 
 
    // Player data for Chillguy
-   const sprite_src_chillguy = path + "/images/gamify/chillguy.png"; // be sure to include the path
+   const sprite_src_chillguy = path + "/images/projects/gamify/chillguy.png"; // be sure to include the path
    const CHILLGUY_SCALE_FACTOR = 5;
    const sprite_data_chillguy = {
        id: 'Chill Guy',
@@ -71,7 +71,7 @@ class GameLevelDesert {
 
 
        // Clicker box-button object literal
-   const sprite_src_clicker = path + "/images/gamify/box-button.png";
+   const sprite_src_clicker = path + "/images/projects/gamify/box-button.png";
    const sprite_data_clicker = {
        id: 'Clicker Box',
        //updateDOM: 'clicker-box', // optional to see updates from DOM on page
@@ -93,7 +93,7 @@ class GameLevelDesert {
 
    
    // NPC data for Tux
-   const sprite_src_tux = path + "/images/gamify/tux.png";
+   const sprite_src_tux = path + "/images/projects/gamify/tux.png";
    const sprite_greet_tux = "Hi I am Tux, the Linux mascot. I am very happy to spend some linux shell time with you!";
    const sprite_data_tux = {
        id: 'Tux',
@@ -135,7 +135,7 @@ class GameLevelDesert {
 
 
 
-    const sprite_src_octocat = path + "/images/gamify/octocat.png";
+    const sprite_src_octocat = path + "/images/projects/gamify/octocat.png";
     const sprite_greet_octocat = "Hi I am Octocat! I am the GitHub code code code collaboration mascot";
     const sprite_data_octocat = {
         id: 'Octocat',
@@ -175,7 +175,7 @@ class GameLevelDesert {
         }
     };
 
-    const sprite_src_endportal = path + "/images/gamify/exitportalfull.png";
+    const sprite_src_endportal = path + "/images/projects/gamify/exitportalfull.png";
     const sprite_greet_endportal = "Teleport to the End? Press E";
     const sprite_data_endportal = {
         id: 'End Portal',
@@ -311,7 +311,7 @@ class GameLevelDesert {
     }
 
 
-    const sprite_src_chickenj = path + "/images/gamify/chickenj.png";
+    const sprite_src_chickenj = path + "/images/projects/gamify/chickenj.png";
     const sprite_greet_chickenj = "FOLLOW THAT CHICKEN JOCKEY. ( Press E )";
     const sprite_data_chickenj = {
         id: 'Chicken Jockey',
@@ -384,7 +384,7 @@ class GameLevelDesert {
     }
     
 
-    const sprite_src_stocks = path + "/images/gamify/stockguy.png";
+    const sprite_src_stocks = path + "/images/projects/gamify/stockguy.png";
     const sprite_greet_stocks = "Darn it, I lost some money on the stock market.. come with me to help me out?";
     const sprite_data_stocks = {
         id: 'Stock-NPC',
@@ -501,7 +501,7 @@ class GameLevelDesert {
     };
 
 
-   const sprite_src_crypto = path + "/images/gamify/bitcoin.png";
+   const sprite_src_crypto = path + "/images/projects/gamify/bitcoin.png";
    const sprite_greet_crypto = "*cha-ching*";
    const sprite_data_crypto = {
        id: 'Crypto-NPC',
@@ -619,7 +619,7 @@ class GameLevelDesert {
    };
 
 
-   const sprite_src_robot = path + "/images/gamify/robot.png";
+   const sprite_src_robot = path + "/images/projects/gamify/robot.png";
    const sprite_greet_robot = "Hi I am Robot, the Jupyter Notebook mascot. I am very happy to spend some linux shell time with you!";
    const sprite_data_robot = {
        id: 'Robot',
@@ -683,7 +683,7 @@ class GameLevelDesert {
        }
    };
 
-  const sprite_src_r2d2 = path + "/images/gamify/r2_idle.png";
+  const sprite_src_r2d2 = path + "/images/projects/gamify/r2_idle.png";
   const sprite_greet_r2d2 = "Hi I am R2D2. Leave this planet and help defend the rebel base on Hoth!";
   const sprite_data_r2d2 = {
       id: 'StarWarsR2D2',
@@ -816,7 +816,7 @@ class GameLevelDesert {
    * 
    * const sprite_data_wizard = {
    *     id: "MerlinTheWizard",
-   *     src: path + "/images/gamify/wizard.png",
+   *     src: path + "/images/projects/gamify/wizard.png",
    *     expertise: "magic",
    *     chatHistory: [],
    *     dialogues: ["Greetings, young apprentice!", "Seek magical wisdom?"],
@@ -829,7 +829,7 @@ class GameLevelDesert {
    */
 
   
-  const sprite_src_historian = path + "/images/gamify/historyProf.png";
+  const sprite_src_historian = path + "/images/projects/gamify/historyProf.png";
   const sprite_greet_historian = "Hello! I'm an expert in history!";
   const sprite_data_historian = {
       id: "Professor History",

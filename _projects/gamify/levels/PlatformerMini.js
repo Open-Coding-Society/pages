@@ -18,13 +18,13 @@ class PlatformerMini {
       this.ctx = this.canvas.getContext('2d'); 
 
       this.backgroundImage = new Image();
-      this.backgroundImage.src = `${gameEnv.path}/images/gamify/mcbg.jpg`; 
+      this.backgroundImage.src = `${gameEnv.path}/images/projects/gamify/mcbg.jpg`; 
 
       this.collectibleImage = new Image();
-      this.collectibleImage.src = `${gameEnv.path}/images/gamify/sword.png`; 
+      this.collectibleImage.src = `${gameEnv.path}/images/projects/gamify/sword.png`; 
 
       this.playerImage = new Image();
-      this.playerImage.src = `${gameEnv.path}/images/gamify/stevelol.png`; 
+      this.playerImage.src = `${gameEnv.path}/images/projects/gamify/stevelol.png`; 
 
       this.playerX = 50; 
       this.playerY = 600; 
@@ -41,7 +41,7 @@ class PlatformerMini {
       this.playerDirection = 1;
 
       this.enemyImage = new Image();
-      this.enemyImage.src = `${gameEnv.path}/images/gamify/mzombie.png`;
+      this.enemyImage.src = `${gameEnv.path}/images/projects/gamify/mzombie.png`;
 
       const platformStartX = this.canvas.width / 2 + 50;
       const platformEndX = this.canvas.width / 2 + 410;
@@ -54,7 +54,7 @@ class PlatformerMini {
       this.enemyDirection = -1;
 
       this.npcImage = new Image();
-      this.npcImage.src = `${gameEnv.path}/images/gamify/mchicken.png`;
+      this.npcImage.src = `${gameEnv.path}/images/projects/gamify/mchicken.png`;
       this.npcWidth = 50;
       this.npcHeight = 50;
       this.npcX = this.canvas.width - 150;
@@ -105,9 +105,9 @@ class PlatformerMini {
         new Image(),
         new Image()
       ];
-      this.platformImages[0].src = `${this.gameEnv.path}/images/gamify/grassblock.jpg`;
-      this.platformImages[1].src = `${this.gameEnv.path}/images/gamify/grassblock.jpg`;
-      this.platformImages[2].src = `${this.gameEnv.path}/images/gamify/grassblock.jpg`;
+      this.platformImages[0].src = `${this.gameEnv.path}/images/projects/gamify/grassblock.jpg`;
+      this.platformImages[1].src = `${this.gameEnv.path}/images/projects/gamify/grassblock.jpg`;
+      this.platformImages[2].src = `${this.gameEnv.path}/images/projects/gamify/grassblock.jpg`;
 
       this.loadImages();
 
