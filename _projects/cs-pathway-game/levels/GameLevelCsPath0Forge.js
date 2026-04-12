@@ -1,15 +1,13 @@
 // Imports: Level objects and UI helpers.
-import GamEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import StatusPanel from './essentials/StatusPanel.js';
-import FormPanel from './essentials/FormPanel.js';
-import Picker from './essentials/Picker.js';
-import Npc from './essentials/Npc.js';
-import FriendlyNpc from './essentials/FriendlyNpc.js';
-import DialogueSystem from './essentials/DialogueSystem.js';
-import ProfileManager from '../pages/home-gamified/ProfileManager.js';
-import PersistentProfile from '../pages/home-gamified/persistentProfile.js';
-import { pythonURI, javaURI, fetchOptions } from '../api/config.js';
+import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
+import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import FormPanel from '/assets/js/GameEnginev1.1/essentials/FormPanel.js';
+import Picker from '/assets/js/GameEnginev1.1/essentials/Picker.js';
+import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
+import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 
 // Constants: Profile panel configuration
 const PROFILE_PANEL_ID = 'csse-profile-panel';
@@ -92,7 +90,7 @@ class GameLevelCsPath0Forge {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/cs-pathway/bg/identity-forge-fantasy.png";
+    const image_src = path + "/images/projects/cs-pathway-game/bg/identity-forge-fantasy.png";
     const bg_data = {
         name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
@@ -100,7 +98,7 @@ class GameLevelCsPath0Forge {
     };
 
     // ── Player ───────────────────────────────────────────────────
-    const player_src = path + "/images/gamify/cs-pathway/player/minimalist.png";
+    const player_src = path + "/images/projects/cs-pathway-game/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
@@ -120,7 +118,7 @@ class GameLevelCsPath0Forge {
       up:        { row: 0, start: 1, columns: 1 },
       upLeft:    { row: 1, start: 0, columns: 1, mirror: true, rotate:  Math.PI / 16 },
       upRight:   { row: 1, start: 0, columns: 1, rotate: -Math.PI / 16 },
-      hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
 
@@ -148,7 +146,7 @@ class GameLevelCsPath0Forge {
     };
 
     const gatekeeperBaseData = {
-      src: path + "/images/gamify/cs-pathway/npc/gatekeeper2.png",
+      src: path + "/images/projects/cs-pathway-game/npc/gatekeeper2.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
       pixels: { width: 1024, height: 1024 },
@@ -157,8 +155,7 @@ class GameLevelCsPath0Forge {
       up: { row: 0, start: 1, columns: 1 },
       left: { row: 1, start: 0, columns: 1 },
       right: { row: 1, start: 1, columns: 1 },
-      hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-      alertDistance: 1.25,
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
 
     const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
@@ -169,6 +166,9 @@ class GameLevelCsPath0Forge {
       interactDistance: interactDistance || 120,
       reaction: function () {
         if (reaction) reaction.call(this);
+        if (level?.showToast) {
+          level.showToast("Press E to interact");
+        }
       },
 
       ...(interact ? { interact } : {}),
@@ -185,7 +185,7 @@ class GameLevelCsPath0Forge {
       greeting: "Welcome to the Path of Code-Code-Coding...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
       position: startGatekeeperPos,
       reaction: () => {
-        if (!identityState.startGatekeeperDone);
+        if (identityState.startGatekeeperDone) return;
         identityState.startGatekeeperDone = true;
         void level.showDialogue('Gatekeeper', [
           'Welcome to the Path of Code-Code-Coding...',
@@ -904,7 +904,7 @@ class GameLevelCsPath0Forge {
       const fallbackCatalog = [
         {
           name: 'Minimalist',
-          src: `${path}/images/gamify/cs-pathway/player/minimalist.png`,
+          src: `${path}/images/projects/cs-pathway-game/player/minimalist.png`,
           rows: 2,
           cols: 2,
           scaleFactor: PLAYER_SCALE_FACTOR,
@@ -1035,7 +1035,7 @@ class GameLevelCsPath0Forge {
         ? options.sprite
         : options.spriteMeta || {
             name: 'Minimalist',
-            src: `${path}/images/gamify/cs-pathway/player/minimalist.png`,
+            src: `${path}/images/projects/cs-pathway-game/player/minimalist.png`,
             rows: 2,
             cols: 2,
             scaleFactor: PLAYER_SCALE_FACTOR,
@@ -1171,7 +1171,7 @@ class GameLevelCsPath0Forge {
       ];
  
       try {
-        const response = await fetch(`${path}/images/gamify/cs-pathway/bg/index.json`, { cache: 'no-cache' });
+        const response = await fetch(`${path}/images/projects/cs-pathway-game/bg/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }
@@ -1180,7 +1180,7 @@ class GameLevelCsPath0Forge {
         const manifestThemes = Array.isArray(manifest)
           ? manifest.map((entry) => ({
               name: entry.name,
-              src: `${path}/images/gamify/cs-pathway/bg/${entry.src}`,
+              src: `${path}/images/projects/cs-pathway-game/bg/${entry.src}`,
               previewText: entry.previewText || entry.description || '',
             }))
           : [];

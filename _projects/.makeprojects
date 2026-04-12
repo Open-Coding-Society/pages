@@ -1,0 +1,8 @@
+# Project Auto-Registration
+# List enabled projects (one per line, no paths needed)
+# Projects must have: _projects/<name>/Makefile.fragment
+#
+# Format: <project-name>
+# Example: cs-pathway-game
+
+cs-pathway-game

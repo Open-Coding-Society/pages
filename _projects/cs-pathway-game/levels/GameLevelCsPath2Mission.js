@@ -1,20 +1,20 @@
 // Imports: Level objects and UI helpers.
-import GamEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
+import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
 /**
- * GameLevel CS Pathway - Wayfinding World
+ * GameLevel CS Pathway - Mission Tools
  */
-class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
-  static levelId = 'wayfinding-world';
-  static displayName = 'Wayfinding World';
+class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
+  static levelId = 'mission-tools';
+  static displayName = 'Mission Tools';
 
   constructor(gameEnv) {
     super(gameEnv, {
-      levelDisplayName: GameLevelCsPath1Way.displayName,
-      logPrefix: 'Wayfinding World',
+      levelDisplayName: GameLevelCsPath2Mission.displayName,
+      logPrefix: 'Mission Tools',
     });
 
     let { width, height, path } = this.getLevelDimensions();
@@ -24,21 +24,21 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/gamify/cs-pathway/bg1/wayfinding-world-fantasy.png";
+    const image_src = path + "/images/projects/cs-pathway-game/bg2/mission-tools-fantasy.png";
     const bg_data = {
-        name: GameLevelCsPath1Way.displayName,
-        greeting: "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll discover your course, uncover your strengths, and enrich your persona!",
+        name: GameLevelCsPath2Mission.displayName,
+        greeting: "Welcome to the CS pathway! This quest will prepare you for your mission ahead by introducing your essential tools and resources!",
         src: image_src,
     };
 
     this.restoreIdentitySelections({
       bgData: bg_data,
-      themeManifestUrl: `${path}/images/gamify/cs-pathway/bg1/index.json`,
-      themeAssetPrefix: `${path}/images/gamify/cs-pathway/bg1/`,
+      themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg2/index.json`,
+      themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg2/`,
     });
     
     // ── Player ───────────────────────────────────────────────────
-    const player_src = path + "/images/gamify/cs-pathway/player/minimalist.png";
+    const player_src = path + "/images/projects/cs-pathway-game/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
@@ -84,7 +84,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     };
 
     const gatekeeperBaseData = {
-      src: path + '/images/gamify/cs-pathway/npc/gatekeeper2.png',
+      src: path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       ANIMATION_RATE: 50,
       pixels: { width: 1024, height: 1024 },
@@ -96,51 +96,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
 
-    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
-      ...gatekeeperBaseData,
-      id,
-      greeting,
-      INIT_POSITION: { ...position },
-      interactDistance: interactDistance || 120,
-      ...(reaction ? { reaction } : {}),
-      ...(interact ? { interact } : {}),
-    });
-
-    const npc_data_codeHubGatekeeper = createGatekeeperData({
-      id: 'CodeHubGatekeeper',
-      greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
-      position: codeHubGatekeeperPos,
-    });
-
-    const npc_data_personalEnrichmentGatekeeper = createGatekeeperData({
-      id: 'PersonalEnrichmentGatekeeper',
-      greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
-      position: personalEnrichmentGatekeeperPos,
-    });
-
-    const npc_data_skillPassportGatekeeper = createGatekeeperData({
-      id: 'SkillPassportGatekeeper',
-      greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
-      position: skillPassportGatekeeperPos,
-    });
-
-    const npc_data_courseEnlistGatekeeper = createGatekeeperData({
-      id: 'CourseEnlistGatekeeper',
-      greeting: 'Welcome to Course Enlist! Choose your next class and map your pathway.',
-      position: courseEnlistGatekeeperPos,
-    });
-
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
-      { class: Npc, data: npc_data_codeHubGatekeeper },
-      { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
-      { class: Npc, data: npc_data_skillPassportGatekeeper },
-      { class: Npc, data: npc_data_courseEnlistGatekeeper },
     ];
   }
 
 }
 
-export default GameLevelCsPath1Way;
+export default GameLevelCsPath2Mission;
