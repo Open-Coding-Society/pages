@@ -1,18 +1,18 @@
 /**
  * ProfileManager - MODEL Layer
  * 
- * Unified profile persistence manager for home-gamified game levels.
+ * Unified profile persistence manager for game levels.
  * Follows MVC architecture by separating data persistence from view/controller.
  * 
  * Supports multiple profile backends:
- * - guestProfile.js: Guest users (localStorage, no auth, full CRUD)
- * - persistentProfile.js: Authenticated users (API backend, protected identity)
+ * - localProfile.js: temporary users (localStorage, no auth, full CRUD)
+ * - persistentProfile.js: Teacher, Student, or Follower users (API backend, protected identity)
  * 
  * Profile Lookup Strategy:
  * 1. Check if user is authenticated
  * 2. If authenticated: Use persistentProfile (backend API)
- * 3. If guest: Use guestProfile (localStorage)
- * 4. Support migration: guest → persistent when user logs in
+ * 3. If temporary: Use localProfile (localStorage)
+ * 4. Support migration: temporary → persistent when user logs in
  * 
  * Usage in GameLevelCssePath (View/Controller):
  *   import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
@@ -52,10 +52,12 @@ class ProfileManager {
 
     this.initialized = true;
 
-    // Step 1: Check authentication
-    this.isAuthenticated = await PersistentProfile.isAuthenticated();
+    // Check authentication
+    //this.isAuthenticated = await PersistentProfile.isAuthenticated();
+    this.isAuthenticated = false; // TEMP: Force local profile for testing without auth until fully implemented
     
     if (this.isAuthenticated) {
+      // Authenticated user - use persistent backend
       console.log('ProfileManager: user authenticated, using persistent backend');
       this.backend = PersistentProfile;
       
@@ -86,8 +88,9 @@ class ProfileManager {
       
       console.log('ProfileManager: no profile found (authenticated, new user)');
       return null;
+    
     } else {
-      // Local user
+      // Local user - use localStorage
       console.log('ProfileManager: local user, using localStorage backend');
       this.backend = LocalProfile;
       
