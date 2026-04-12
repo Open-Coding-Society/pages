@@ -8,6 +8,7 @@ import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
 // Constants: Profile panel configuration
 const PROFILE_PANEL_ID = 'csse-profile-panel';
@@ -47,10 +48,17 @@ class GameLevelCsPath0Forge {
       overlay: null,
     };
 
+    this._assetTracking = {
+      playerSrc: null,
+      backgroundSrc: null,
+    };
+
     this.getLoadingHostElement = GameLevelCsPathIdentity.prototype.getLoadingHostElement.bind(this);
     this.beginLoadingScreen = GameLevelCsPathIdentity.prototype.beginLoadingScreen.bind(this);
     this.queueLoadingWork = GameLevelCsPathIdentity.prototype.queueLoadingWork.bind(this);
     this.finishLoadingWork = GameLevelCsPathIdentity.prototype.finishLoadingWork.bind(this);
+    this.primeAssetGate = GameLevelCsPathIdentity.prototype.primeAssetGate.bind(this);
+    this.preloadTrackedAsset = GameLevelCsPathIdentity.prototype.preloadTrackedAsset.bind(this);
 
     /**
      * Section: Profile persistence.
@@ -141,6 +149,11 @@ class GameLevelCsPath0Forge {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
+
+    this.primeAssetGate({
+      playerSrc: player_data.src,
+      backgroundSrc: bg_data.src,
+    });
 
     // ── Gatekeepers ────────────────────────────────────────────
     const level = this;
