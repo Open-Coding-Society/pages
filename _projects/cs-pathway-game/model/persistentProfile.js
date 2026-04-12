@@ -105,14 +105,15 @@ class PersistentProfile {
           console.log('PersistentProfile: no profile found');
           return null;
         }
-        throw new Error(`HTTP ${response.status}`);
+        console.warn(`PersistentProfile: load failed with HTTP ${response.status}`);
+        return null;
       }
 
       const data = await response.json();
       console.log('PersistentProfile: loaded profile', data);
       return data;
     } catch (error) {
-      console.error('PersistentProfile: load failed', error);
+      console.warn('PersistentProfile: load failed (network error) - continuing with local storage', error.message);
       return null;
     }
   }
@@ -127,7 +128,8 @@ class PersistentProfile {
     try {
       const userInfo = await this.getUserInfo();
       if (!userInfo) {
-        throw new Error('User not authenticated');
+        console.warn('PersistentProfile: user not authenticated - continuing with local storage');
+        return false;
       }
 
       const payload = {
@@ -178,14 +180,19 @@ class PersistentProfile {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        if (response.status === 404) {
+          console.warn('PersistentProfile: save endpoint not available (404) - continuing with local storage');
+          return false;
+        }
+        console.warn(`PersistentProfile: save failed with HTTP ${response.status} - continuing with local storage`);
+        return false;
       }
 
       console.log('PersistentProfile: created profile');
       this._trackEvent('profile_created', { role: userInfo.roles?.[0]?.name });
       return true;
     } catch (error) {
-      console.error('PersistentProfile: save failed', error);
+      console.warn('PersistentProfile: save failed (network or auth error) - continuing with local storage', error.message);
       return false;
     }
   }
@@ -261,13 +268,18 @@ class PersistentProfile {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        if (response.status === 404) {
+          console.warn('PersistentProfile: update endpoint not available (404) - continuing with local storage');
+          return false;
+        }
+        console.warn(`PersistentProfile: update failed with HTTP ${response.status} - continuing with local storage`);
+        return false;
       }
 
       console.log('PersistentProfile: updated profile');
       return true;
     } catch (error) {
-      console.error('PersistentProfile: update failed', error);
+      console.warn('PersistentProfile: update failed (network or auth error) - continuing with local storage', error.message);
       return false;
     }
   }
@@ -329,14 +341,19 @@ class PersistentProfile {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        if (response.status === 404) {
+          console.warn('PersistentProfile: clear endpoint not available (404) - continuing with local storage');
+          return false;
+        }
+        console.warn(`PersistentProfile: clear failed with HTTP ${response.status} - continuing with local storage`);
+        return false;
       }
 
       console.log('PersistentProfile: cleared preferences (identity preserved)');
       this._trackEvent('profile_cleared');
       return true;
     } catch (error) {
-      console.error('PersistentProfile: clear failed', error);
+      console.warn('PersistentProfile: clear failed (network or auth error) - continuing with local storage', error.message);
       return false;
     }
   }
@@ -447,7 +464,8 @@ class PersistentProfile {
 
       const userInfo = await this.getUserInfo();
       if (!userInfo) {
-        throw new Error('User not authenticated');
+        console.warn('PersistentProfile: user not authenticated - cannot migrate to server');
+        return false;
       }
 
       console.log('PersistentProfile: migrating local profile', localData.localId);
