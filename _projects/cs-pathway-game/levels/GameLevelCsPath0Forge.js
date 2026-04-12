@@ -10,6 +10,7 @@ import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 import PersistentProfile from '/assets/js/projects/cs-pathway-game/model/persistentProfile.js';
 import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
 // Constants: Profile panel configuration
 const PROFILE_PANEL_ID = 'csse-profile-panel';
@@ -33,9 +34,33 @@ class GameLevelCsPath0Forge {
   static displayName = 'Identity Forge';
 
   constructor(gameEnv) {
+    this.gameEnv = gameEnv;
+    this.levelDisplayName = GameLevelCsPath0Forge.displayName;
+    this.logPrefix = GameLevelCsPath0Forge.displayName;
+
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
+
+    this._loadingState = {
+      active: false,
+      pending: 0,
+      shownAt: 0,
+      hideTimer: null,
+      overlay: null,
+    };
+
+    this._assetTracking = {
+      playerSrc: null,
+      backgroundSrc: null,
+    };
+
+    this.getLoadingHostElement = GameLevelCsPathIdentity.prototype.getLoadingHostElement.bind(this);
+    this.beginLoadingScreen = GameLevelCsPathIdentity.prototype.beginLoadingScreen.bind(this);
+    this.queueLoadingWork = GameLevelCsPathIdentity.prototype.queueLoadingWork.bind(this);
+    this.finishLoadingWork = GameLevelCsPathIdentity.prototype.finishLoadingWork.bind(this);
+    this.primeAssetGate = GameLevelCsPathIdentity.prototype.primeAssetGate.bind(this);
+    this.preloadTrackedAsset = GameLevelCsPathIdentity.prototype.preloadTrackedAsset.bind(this);
 
     /**
      * Section: Profile persistence.
@@ -43,7 +68,8 @@ class GameLevelCsPath0Forge {
 
     // Initialize ProfileManager for save/load
     this.profileManager = new ProfileManager();
-    this.profileManagerReady = this.profileManager.initialize().then((restored) => {
+    this.queueLoadingWork();
+    this.profileManagerReady = this.profileManager.initialize().then(async (restored) => {
       if (restored) {
         console.log('GameLevel: restoring saved profile', restored);
         
@@ -66,25 +92,27 @@ class GameLevelCsPath0Forge {
         
         // Update the profile panel with restored data
         this.updateProfilePanel(this.profileData);
+
+        const restoreTasks = [];
         
         // Restore avatar sprite if saved
         if (this.profileData?.spriteMeta) {
-          // Wait a bit for player object to be created
-          setTimeout(() => {
-            this.applyAvatarOptions({ sprite: this.profileData.spriteMeta });
-          }, 500);
+          restoreTasks.push(this.applyAvatarOptions({ sprite: this.profileData.spriteMeta }));
         }
         
         // Restore world theme if saved
         if (this.profileData?.themeMeta) {
-          // Wait a bit for background object to be created
-          setTimeout(() => {
-            this.applyWorldTheme(this.profileData.themeMeta);
-          }, 500);
+          restoreTasks.push(this.applyWorldTheme(this.profileData.themeMeta));
+        }
+
+        if (restoreTasks.length > 0) {
+          await Promise.allSettled(restoreTasks);
         }
       }
     }).catch((err) => {
       console.warn('GameLevel: ProfileManager initialization failed', err);
+    }).finally(() => {
+      this.finishLoadingWork();
     });
 
     /**
@@ -123,6 +151,11 @@ class GameLevelCsPath0Forge {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
+
+    this.primeAssetGate({
+      playerSrc: player_data.src,
+      backgroundSrc: bg_data.src,
+    });
 
     // ── Gatekeepers ────────────────────────────────────────────
     const level = this;
@@ -1026,12 +1059,19 @@ class GameLevelCsPath0Forge {
     };
 
     // Player: Apply avatar selection.
-    this.applyAvatarOptions = function(options = {}) {
-      const playerObj = this.getPlayerObject();
-      if (!playerObj) {
-        console.warn('Avatar Forge: player object not found');
-        return;
-      }
+    this.applyAvatarOptions = function(options = {}, remainingAttempts = 20) {
+      return new Promise((resolve) => {
+        const attemptApply = (attemptNumber) => {
+          const playerObj = this.getPlayerObject();
+          if (!playerObj) {
+            if (attemptNumber > 0) {
+              setTimeout(() => attemptApply(attemptNumber - 1), 50);
+            } else {
+              console.warn('Avatar Forge: player object not found');
+              resolve(false);
+            }
+            return;
+          }
 
       const spriteMeta = typeof options.sprite === 'object'
         ? options.sprite
@@ -1044,49 +1084,56 @@ class GameLevelCsPath0Forge {
             movementPreset: 'two-row-8way',
           };
 
-      const newSpritePath = spriteMeta.src;
-      const movementConfig = this.getAvatarMovementConfig(spriteMeta);
-      const scaleFactor = Number(spriteMeta.scaleFactor || PLAYER_SCALE_FACTOR);
+          const newSpritePath = spriteMeta.src;
+          const movementConfig = this.getAvatarMovementConfig(spriteMeta);
+          const scaleFactor = Number(spriteMeta.scaleFactor || PLAYER_SCALE_FACTOR);
 
-      playerObj.data.src = newSpritePath;
-      playerObj.data.SCALE_FACTOR = scaleFactor;
-      playerObj.scaleFactor = scaleFactor;
+          playerObj.data.src = newSpritePath;
+          playerObj.data.SCALE_FACTOR = scaleFactor;
+          playerObj.scaleFactor = scaleFactor;
 
-      Object.assign(playerObj.spriteData, movementConfig, {
-        src: newSpritePath,
-        SCALE_FACTOR: scaleFactor,
-      });
+          Object.assign(playerObj.spriteData, movementConfig, {
+            src: newSpritePath,
+            SCALE_FACTOR: scaleFactor,
+          });
 
-      playerObj.spriteSheet = new Image();
-      playerObj.spriteReady = false;
+          playerObj.spriteSheet = new Image();
+          playerObj.spriteReady = false;
 
-      playerObj.spriteSheet.onload = () => {
-        playerObj.spriteReady = true;
-        try {
-          playerObj.spriteData.pixels = {
-            width: playerObj.spriteSheet.naturalWidth,
-            height: playerObj.spriteSheet.naturalHeight,
+          playerObj.spriteSheet.onload = () => {
+            playerObj.spriteReady = true;
+            try {
+              playerObj.spriteData.pixels = {
+                width: playerObj.spriteSheet.naturalWidth,
+                height: playerObj.spriteSheet.naturalHeight,
+              };
+              playerObj.resize();
+            } catch (err) {
+              console.warn('Error updating sprite dimensions', err);
+            }
+
+            resolve(true);
           };
-          playerObj.resize();
-        } catch (err) {
-          console.warn('Error updating sprite dimensions', err);
-        }
-      };
 
-      playerObj.spriteSheet.onerror = (e) => {
-        console.warn('Failed to load sprite:', newSpritePath, e);
-      };
+          playerObj.spriteSheet.onerror = (e) => {
+            console.warn('Failed to load sprite:', newSpritePath, e);
+            resolve(false);
+          };
 
-      playerObj.spriteSheet.src = newSpritePath;
+          playerObj.spriteSheet.src = newSpritePath;
 
-      this.profileData = {
-        ...this.profileData,
-        sprite: spriteMeta.name || 'Minimalist',
-        spriteSrc: newSpritePath,
-        spriteMeta,
-      };
+          this.profileData = {
+            ...this.profileData,
+            sprite: spriteMeta.name || 'Minimalist',
+            spriteSrc: newSpritePath,
+            spriteMeta,
+          };
 
-      this.updateProfilePanel(this.profileData);
+          this.updateProfilePanel(this.profileData);
+        };
+
+        attemptApply(remainingAttempts);
+      });
     };
 
     // Picker: Show avatar form.
@@ -1222,59 +1269,74 @@ class GameLevelCsPath0Forge {
     };
  
     // Background: Apply theme selection live.
-    this.applyWorldTheme = function(themeMeta = {}) {
-      const bgObj = this.getBackgroundObject();
-      if (!bgObj) {
-        console.warn('World Theme Portal: background object not found');
-        console.log('Available objects:', gameEnv.gameObjects.map(obj => ({ data: obj.data, id: obj.id })));
-        return;
-      }
+    this.applyWorldTheme = function(themeMeta = {}, remainingAttempts = 20) {
+      return new Promise((resolve) => {
+        const attemptApply = (attemptNumber) => {
+          const bgObj = this.getBackgroundObject();
+          if (!bgObj) {
+            if (attemptNumber > 0) {
+              setTimeout(() => attemptApply(attemptNumber - 1), 100);
+            } else {
+              console.warn('World Theme Portal: background object not found');
+              console.log('Available objects:', gameEnv.gameObjects.map(obj => ({ data: obj.data, id: obj.id })));
+              resolve(false);
+            }
+            return;
+          }
 
-      const newSrc = themeMeta.src;
-      if (!newSrc) {
-        console.warn('World Theme Portal: no src provided in themeMeta', themeMeta);
-        return;
-      }
+          const newSrc = themeMeta.src;
+          if (!newSrc) {
+            console.warn('World Theme Portal: no src provided in themeMeta', themeMeta);
+            resolve(false);
+            return;
+          }
 
-      console.log('World Theme Portal: applying theme', themeMeta.name, 'with src:', newSrc);
+          console.log('World Theme Portal: applying theme', themeMeta.name, 'with src:', newSrc);
 
-      // Update the data source
-      if (bgObj.data) {
-        bgObj.data.src = newSrc;
-      }
+          // Update the data source
+          if (bgObj.data) {
+            bgObj.data.src = newSrc;
+          }
 
-      // Reload the image
-      bgObj.image = new Image();
-      bgObj.spriteReady = false;
+          // Reload the image
+          bgObj.image = new Image();
+          bgObj.spriteReady = false;
 
-      bgObj.image.onload = () => {
-        bgObj.spriteReady = true;
-        console.log('World Theme Portal: background image loaded successfully for', themeMeta.name);
-        try {
-          bgObj.resize?.();
-        } catch (err) {
-          console.warn('Error updating background dimensions', err);
-        }
-      };
+          bgObj.image.onload = () => {
+            bgObj.spriteReady = true;
+            console.log('World Theme Portal: background image loaded successfully for', themeMeta.name);
+            try {
+              bgObj.resize?.();
+            } catch (err) {
+              console.warn('Error updating background dimensions', err);
+            }
 
-      bgObj.image.onerror = (e) => {
-        console.warn('Failed to load background:', newSrc, 'for theme:', themeMeta.name, e);
-      };
+            resolve(true);
+          };
 
-      console.log('World Theme Portal: setting background src to:', newSrc);
-      bgObj.image.src = newSrc;
+          bgObj.image.onerror = (e) => {
+            console.warn('Failed to load background:', newSrc, 'for theme:', themeMeta.name, e);
+            resolve(false);
+          };
 
-      this.profileData = {
-        ...this.profileData,
-        worldTheme: themeMeta.name || 'Default',
-        worldThemeSrc: newSrc,
-        themeMeta,
-      };
+          console.log('World Theme Portal: setting background src to:', newSrc);
+          bgObj.image.src = newSrc;
 
-      this.updateProfilePanel(this.profileData);
+          this.profileData = {
+            ...this.profileData,
+            worldTheme: themeMeta.name || 'Default',
+            worldThemeSrc: newSrc,
+            themeMeta,
+          };
 
-      // Clear avatar catalog cache so it reloads with theme-compatible sprites
-      this.avatarCatalog = null;
+          this.updateProfilePanel(this.profileData);
+
+          // Clear avatar catalog cache so it reloads with theme-compatible sprites
+          this.avatarCatalog = null;
+        };
+
+        attemptApply(remainingAttempts);
+      });
     };
  
     // Picker: Show world theme form.

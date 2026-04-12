@@ -1,6 +1,7 @@
 # Project Auto-Registration
 # List enabled projects (one per line, no paths needed)
-# Projects must have: _projects/<name>/Makefile.fragment
+# Projects must have: _projects/<name>/Makefile
+# Each Makefile must provide generic targets: build, clean, docs, watch
 #
 # Format: <project-name>
 # Example: cs-pathway-game
