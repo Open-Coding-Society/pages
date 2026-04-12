@@ -1,4 +1,4 @@
-import ProfileManager from '../pages/home-gamified/ProfileManager.js';
+import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 
 /**
  * Shared identity behavior for CS Path levels.
