@@ -120,9 +120,9 @@ serve-yat: use-yat clean
 build-registered-projects:
 	@if [ -f _projects/.makeprojects ]; then \
 		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
-			if [ -f "_projects/$$proj/Makefile.fragment" ]; then \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
 				echo "📦 Building project: $$proj"; \
-				make $$proj 2>/dev/null || echo "  ⚠️  No build target for $$proj"; \
+				make -C "_projects/$$proj" build 2>/dev/null || echo "  ⚠️  Build failed for $$proj"; \
 			fi; \
 		done; \
 	fi
@@ -140,9 +140,20 @@ convert-registered-notebooks:
 build-registered-docs:
 	@if [ -f _projects/.makeprojects ]; then \
 		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
-			if make -n $$proj-docs >/dev/null 2>&1; then \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
 				echo "📚 Building docs for: $$proj"; \
-				make $$proj-docs; \
+				make -C "_projects/$$proj" docs 2>/dev/null || true; \
+			fi; \
+		done; \
+	fi
+
+# Watch all registered projects for changes (dev mode)
+watch-registered-projects:
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				echo "👀 Starting watcher for: $$proj"; \
+				make -C "_projects/$$proj" watch & \
 			fi; \
 		done; \
 	fi
@@ -151,11 +162,9 @@ build-registered-docs:
 clean-registered-projects:
 	@if [ -f _projects/.makeprojects ]; then \
 		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
-			if make -n $$proj-clean >/dev/null 2>&1; then \
-				make $$proj-clean 2>/dev/null; \
-			fi; \
-			if make -n $$proj-docs-clean >/dev/null 2>&1; then \
-				make $$proj-docs-clean 2>/dev/null; \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				make -C "_projects/$$proj" clean 2>/dev/null || true; \
+				make -C "_projects/$$proj" docs-clean 2>/dev/null || true; \
 			fi; \
 		done; \
 	fi
@@ -280,8 +289,8 @@ stop:
 	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping project watchers..."
-	@@ps aux | grep "watch-cs-pathway-game" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@@ps aux | grep "fswatch.*cs-pathway-game" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "fswatch.*_projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "make -C _projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.jekyll_regenerating
 
 reload:
@@ -302,7 +311,7 @@ dev: stop clean
 	@make jekyll-serve
 	@make watch-notebooks &
 	@make watch-files &
-	@make watch-cs-pathway-game &
+	@make watch-registered-projects &
 	@echo "Dev server running in background on http://localhost:$(PORT)"
 	@echo "  View logs: tail -f $(LOG_FILE)"
 	@echo "  Stop: make stop"
@@ -440,20 +449,19 @@ convert-fix:
 # Project Auto-Registration
 ###########################################
 
-# Read _projects/.makeprojects and include each project's Makefile.fragment
-# Add projects to _projects/.makeprojects (one per line) to enable them
-# Each project must have: _projects/<name>/Makefile.fragment
--include $(shell test -f _projects/.makeprojects && grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | sed 's|^|_projects/|' | sed 's|$$|/Makefile.fragment|' || echo)
+# Projects are registered in _projects/.makeprojects (one per line)
+# Each project must have: _projects/<name>/Makefile with generic targets: build, clean, docs, watch
+# Main Makefile calls projects via: make -C _projects/<name> <target>
 
 # List all registered projects
 list-projects:
 	@echo "📦 Registered Projects:"
 	@if [ -f _projects/.makeprojects ]; then \
 		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
-			if [ -f "_projects/$$proj/Makefile.fragment" ]; then \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
 				echo "  ✅ $$proj (active)"; \
 			else \
-				echo "  ⚠️  $$proj (missing Makefile.fragment)"; \
+				echo "  ⚠️  $$proj (missing Makefile)"; \
 			fi; \
 		done; \
 	else \
@@ -469,4 +477,4 @@ list-projects:
 		fi; \
 	done || echo "  None found"
 
-.PHONY: list-projects
+.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects
