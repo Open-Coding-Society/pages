@@ -263,8 +263,8 @@ class GameLevelCsPath0Forge {
             this.profileData?.name
               ? `Identity already registered for ${this.profileData.name}.`
               : 'Identity already registered.',
-            this.profileData?.github
-              ? `GitHub: ${this.profileData.github}`
+            this.profileData?.githubID
+              ? `GitHub ID: ${this.profileData.githubID}`
               : 'Your profile is saved.'
           ]);
           return;
@@ -291,7 +291,7 @@ class GameLevelCsPath0Forge {
         await this.showDialogue('Identity Gatekeeper', [
           `Identity registered for ${identityData.name}.`,
           `Email: ${identityData.email}`,
-          `GitHub: ${identityData.github}`,
+          `GitHub ID: ${identityData.githubID}`,
           'Identity Terminal unlocked.'
         ]);
 
@@ -1377,7 +1377,7 @@ class GameLevelCsPath0Forge {
       fields: [
         { key: 'name', label: 'Name', emptyValue: '—' },
         { key: 'email', label: 'Email', emptyValue: '—' },
-        { key: 'github', label: 'GitHub', emptyValue: '—' },
+        { key: 'githubID', label: 'GitHub ID', emptyValue: '—' },
         { type: 'section', title: 'Avatar Sprite', marginTop: '8px' },
         { key: 'sprite', label: 'Sprite', emptyValue: '—' },
         { type: 'section', title: 'World Theme', marginTop: '8px' },
@@ -1392,7 +1392,7 @@ class GameLevelCsPath0Forge {
             const confirmed = confirm(
               '🔄 Reset Profile?\n\n' +
               'This will clear:\n' +
-              '• Your identity (name, email, GitHub)\n' +
+              '• Your identity (name, email, GitHub ID)\n' +
               '• All progress (terminals, forges, portals)\n' +
               '• Avatar and world theme selections\n\n' +
               'Are you sure you want to start fresh?'
@@ -1427,7 +1427,7 @@ class GameLevelCsPath0Forge {
       fields: [
         { name: 'name', label: 'Name:', type: 'text', required: true, autocomplete: 'name' },
         { name: 'email', label: 'Email:', type: 'email', required: true, autocomplete: 'email' },
-        { name: 'github', label: 'GitHub Username:', type: 'text', required: true, autocomplete: 'username' },
+        { name: 'githubID', label: 'GitHub ID:', type: 'text', required: true, autocomplete: 'username' },
       ],
       theme: uiTheme,
     };
@@ -1440,7 +1440,7 @@ class GameLevelCsPath0Forge {
       this.profilePanelView.update({
         name: profile.name || '—',
         email: profile.email || '—',
-        github: profile.github || '—',
+        githubID: profile.githubID || '—',
         sprite: profile.sprite || '—',
         worldTheme: profile.worldTheme || '—',
       });

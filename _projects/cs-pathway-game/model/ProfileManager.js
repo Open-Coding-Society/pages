@@ -125,7 +125,7 @@ class ProfileManager {
       profileData: {
         name: profile.name,
         email: profile.email,
-        githubID: profile.githubID,  // Updated from 'github'
+        githubID: profile.githubID,
         sprite: profile.sprite,
         spriteMeta: profile.spriteMeta,
         spriteSrc: profile.spriteSrc,
@@ -163,7 +163,7 @@ class ProfileManager {
     const payload = {
       name: identityData.name,
       email: identityData.email || '',
-      githubID: identityData.githubID || '',  // Updated from 'github'
+      githubID: identityData.githubID || '', 
     };
 
     try {
