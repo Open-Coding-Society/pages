@@ -1,7 +1,6 @@
-import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
-import Projectile from './Projectile.js';
+import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import Projectile from '/assets/js/GameEnginev1.1/Projectile.js';
 
 class GameLevelStarWars {
   constructor(gameEnv) {

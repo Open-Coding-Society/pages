@@ -1,21 +1,18 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GamEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
-// Using v1.1 DialogueSystem for improved ID sanitization
-import DialogueSystem from './essentials/DialogueSystem.js';
-import AiNpc from './essentials/AiNpc.js';
-import GameControl from './essentials/GameControl.js';
+import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js'; // game-in-game for minigames
+import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
+import Clicker from '/assets/js/GameEnginev1.1/essentials/Clicker.js';
+import GameLevelMeteorBlaster from '/assets/js/GameEnginev1.1/GameLevelMeteorBlaster.js';
+import Coin from '/assets/js/GameEnginev1.1/Coin.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
-import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
-import GameLevelMinesweeper from './GameLevelMinesweeper.js';
 import GameLevelEnd from './GameLevelEnd.js';
-import Coin from './Coin.js';
-import { pythonURI, fetchOptions } from '../api/config.js';
+import PlatformerMini from './PlatformerMini.js';
 
 // Import PlatformerMini (game-in-game)
-import PlatformerMini from './PlatformerMini.js';
-import Clicker from './essentials/Clicker.js';
 
 class GameLevelDesert {
  constructor(gameEnv) {
