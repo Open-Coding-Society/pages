@@ -8,6 +8,8 @@ import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+import PersistentProfile from '/assets/js/projects/cs-pathway-game/model/persistentProfile.js';
+import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 // Constants: Profile panel configuration
 const PROFILE_PANEL_ID = 'csse-profile-panel';

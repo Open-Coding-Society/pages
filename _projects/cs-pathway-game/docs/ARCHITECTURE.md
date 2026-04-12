@@ -28,11 +28,12 @@ The CS Pathway game implements MVC architecture across the following file struct
 │        • Integrates all GameLevelCSPath*.js files                           │
 │                                                                              │
 │  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │  📂 /assets/js/GameEnginev1.1/               [CONTROLLER + VIEW]  │    │
+│  │  📂 /_projects/cs-pathway-game/levels/        [CONTROLLER + VIEW]  │    │
 │  │                                                                    │    │
 │  │  Game Level Controllers:                                           │    │
 │  │  ├─ GameLevelCSPath0Forge.js       Level 0: Identity Forge        │    │
 │  │  │  • Course entry and PII lesson                                 │    │
+│  │  │  • Built-in sign-up / login flow (no redirect required)        │    │
 │  │  │  • Establishes OCS account (Flask + MySQL integration)         │    │
 │  │  │  • Enables PII viewing and theming customization               │    │
 │  │  │                                                                 │    │
@@ -62,7 +63,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  └────────────────────────────────────────────────────────────────────┘    │
 │                                                                              │
 │  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │  📂 /assets/js/pages/home-gamified/                   [MODEL]     │    │
+│  │  📂 /_projects/cs-pathway-game/model/                 [MODEL]     │    │
 │  │                                                                    │    │
 │  │  Data Persistence Bridge:                                          │    │
 │  │  ├─ ProfileManager.js           Profile Orchestrator              │    │
@@ -232,7 +233,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  ┌────────────────────────────────────────────────────────┐     │       │
 │  │  │  ⚔ Identity Terminal Setup                            │     │       │
 │  │  │  ──────────────────────────                            │     │       │
-│  │  │  Make sure you're logged in.                          │     │       │
+│  │  │  You're logged in. Enter your profile info below.     │     │       │
 │  │  │                                                        │     │       │
 │  │  │  Name: [________________]                             │     │       │
 │  │  │  Email: [________________]                            │     │       │
@@ -242,6 +243,38 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  └────────────────────────────────────────────────────────┘     │       │
 │  │                                                                  │       │
 │  │  Component: this.identityFormView = new FormPanel({...})        │       │
+│  └──────────────────────────────────────────────────────────────────┘       │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────┐       │
+│  │  AuthFlow Panel (Custom - GameLevelCsPath0Forge.js)              │       │
+│  │  ──────────────────────────────────────────────────               │       │
+│  │  Used for: Built-in sign-up and login inside the terminal        │       │
+│  │  Location: GameLevelCSPath0Forge.js (this.showAuthFlow)          │       │
+│  │                                                                  │       │
+│  │  Flow:                                                            │       │
+│  │  ┌────────────────────────────────────────────────────────┐     │       │
+│  │  │  ⚔ IDENTITY TERMINAL                                  │     │       │
+│  │  │  ────────────────────────────────────────────────────  │     │       │
+│  │  │  To register your identity, you need an account.      │     │       │
+│  │  │                                                        │     │       │
+│  │  │  [Log In]  [Sign Up]  [Cancel]                        │     │       │
+│  │  └────────────────────────────────────────────────────────┘     │       │
+│  │           │                     │                                │       │
+│  │      ┌────▼────┐          ┌─────▼──────┐                        │       │
+│  │      │  LOG IN │          │ CREATE ACCT│                        │       │
+│  │      │ uid+pw  │          │ full form  │                        │       │
+│  │      │ →/api/  │          │ →/api/user │                        │       │
+│  │      │ authen- │          │ then auto- │                        │       │
+│  │      │  ticate │          │ fills login│                        │       │
+│  │      └────┬────┘          └─────┬──────┘                        │       │
+│  │           └──────────┬──────────┘                                │       │
+│  │                      ▼                                            │       │
+│  │             resolve(true) → Identity Form opens                  │       │
+│  │                                                                  │       │
+│  │  API calls:                                                      │       │
+│  │  • POST /api/authenticate  (login)                               │       │
+│  │  • POST /api/user          (signup → Flask)                      │       │
+│  │  • POST /api/person/create (signup → Spring, non-blocking)       │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
 │                                                                              │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
@@ -314,12 +347,21 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │                                                                  │       │
 │  │  Responsibilities:                                               │       │
 │  │  • Initialize ProfileManager                                     │       │
+│  │  • Gate Identity Terminal behind built-in auth flow             │       │
 │  │  • Handle form submissions                                       │       │
 │  │  • Call ProfileManager methods                                   │       │
 │  │  • Update game state based on profile                            │       │
 │  │  • Trigger level unlocks                                         │       │
 │  │                                                                  │       │
-│  │  Example Flow:                                                   │       │
+│  │  Identity Terminal Flow (Level 0):                               │       │
+│  │  1. Player approaches Identity Gatekeeper NPC                   │       │
+│  │  2. runIdentityTerminal() checks PersistentProfile.isAuth()     │       │
+│  │  3. Not logged in → showAuthFlow() (sign-up or login in-game)   │       │
+│  │  4. Auth success → showIdentityForm() (name, email, github)     │       │
+│  │  5. Submit → saveIdentity() + updateIdentityProgress()          │       │
+│  │  6. identityUnlocked = true, World Theme Portal gate opens      │       │
+│  │                                                                  │       │
+│  │  General Flow:                                                   │       │
 │  │  1. constructor() - Create ProfileManager instance              │       │
 │  │  2. async init() - Call profileManager.initialize()             │       │
 │  │  3. Restore state if profile exists                             │       │
