@@ -23,12 +23,13 @@ projects/cs-pathway-game/
 ├── images/                        [40+ Samples] 
 └── docs/
     └── README.md                   [This file - project overview]
+```
 
 ## Development Workflow
 
-### Fast Development Mode (Recommended)
+### Fast Development Mode (Pre-requisite)
 
-**Use `make dev` for rapid iteration** - doesn't preload all _notebooks
+**Use `make dev` Only test-loads _projects
 
 Regeneration has dependncy now:
 
@@ -39,32 +40,39 @@ brew install fswatch
 # Ubuntu/Debian
 sudo apt install fswatch
 
-**Edit/Save workflow example:**
-1. Edit files in `_projects/cs-pathway-game/`
+```
+
+### Build Commands
+
+```bash
+# 1. Test make changes
+make -C _project/cs-pathway-game
+# Should see: ✅ CS Pathway Game built successfully
+
+# 2. Start dev server with auto-watch
+make dev
+# Should see: 👀 Watching CS Pathway Game project (auto-copy on save)...
+
+# 3. Edit a file in _projects/cs-pathway-game/
+# Save changes → should see auto-copy message → Jekyll regenerates
+
+# 4. Clean up
+make stop
+make clean
+# Should clean distributed files but preserve source in _projects/
+```
+
+### Edit/Save workflow
+
+1. Edit files in `_projects/gamify/`
    - `notebook.src.ipynb` - converted automatically when saved (via make dev)
-   - `levels/*.js` - copied automatically when saved (via watch-cs-pathway-game)
-   - `model/*.js` - copied automatically when saved
-   - `images/*` - copied automatically when added/changed
+   - `levels/*.js` - copied automatically when saved to js/projects
+   - `images/*` - copied automatically when added/changed to images/projects
 
 2. Save file → Auto-distribution happens → Jekyll regenerates → Refresh browser
 
 3. See changes immediately at http://localhost:4500/gamify
 
-**BIG TIME SAVINGS**: `make dev` doesn't pre-convert notebooks, only converts on save!
-
-### Complete Build (When Needed)
-
-For explicit full rebuild (rarely needed):
-```bash
-make                   # Full conversion + serve, alternat is make serve
-```
-
-This copies files to Jekyll-required locations:
-
-- `notebook.src.ipynb` → `_notebooks/home/2026-04-02-cs-pathway-game.ipynb`
-- `levels/*.js` → `assets/js/GameEnginev1.1/`
-- `model/*.js` → `assets/js/pages/home-gamified/`
-- `images/*` → `images/gamify/cs-pathway/`
 
 ### Path Management
 
@@ -86,12 +94,11 @@ The build system handles distribution - you just edit here!
 const sprite = gameEnv.path + '/images/projects/gamify/knight.png';
 // Sample GameEngine import 
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-
 ```
 
 ## Why This Structure?
 
-1. **Student-friendly**: All related files in one place
+1. **Project-friendly**: All related files in one place, easier to manage project and understand dependendencies
 2. **Jekyll-compatible**: Build distributes to required locations
 3. **No path complexity**: Code uses final deployed paths
 4. **Version control**: Track source files here, generated files ignored

@@ -77,8 +77,8 @@ clean: stop
 Test the integration:
 
 ```bash
-# 1. Build project
-make cs-pathway-game-build
+# 1. Test make changes
+make -C _project/cs-pathway-game
 # Should see: ✅ CS Pathway Game built successfully
 
 # 2. Start dev server with auto-watch
