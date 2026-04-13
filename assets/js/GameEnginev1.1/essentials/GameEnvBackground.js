@@ -6,6 +6,7 @@ import GameObject from './GameObject.js';
 export class GameEnvBackground extends GameObject {
     constructor(data = null, gameEnv = null) {
         super(gameEnv);
+        this.data = data; // Store the data for identification
         if (data.src) {
             this.image = new Image();
             this.image.src = data.src;

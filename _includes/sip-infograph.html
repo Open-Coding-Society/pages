@@ -11,6 +11,13 @@
     <div class="sip-badge">Nonprofit Site Analysis</div>
     <h1 class="sip-title">{{ data.Title }}</h1>
     <p class="sip-description">{{ data.Description }}</p>
+    {% if data.Links %}
+    <div class="sip-links">
+      {% for link in data.Links %}
+      <a href="{{ link.url }}" class="sip-link-btn" target="_blank" rel="noopener">{{ link.label }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
   </div>
 
   <!-- Cards -->

@@ -21,6 +21,45 @@ else:
 ### Section for Constants and Patterns  ###
 ###########################################
 
+"""
+=============================================================
+SIDE-BY-SIDE RUNNER LEGEND (Container Panel Composition)
+=============================================================
+
+Supported cell directives for side-by-side layout:
+- CODE_RUNNER (python/javascript/java comment marker)
+- UI_RUNNER   (HTML comment marker)
+- GAME_RUNNER (javascript comment marker)
+
+Shared panel options (append after `|` in directive comment):
+- panel: <panel_id>       Required to opt into pairing.
+- slot: left|right        Which side this runner occupies. Defaults:
+                                                    CODE_RUNNER -> left, UI_RUNNER -> left, GAME_RUNNER -> right.
+- layout: row|column      Panel direction. Default: row.
+- ratio: A-B              Column/row split. Examples: 40-60, 1fr-2fr. Default: 50-50.
+- gap: <css-size>         Spacing between sides. Default: 1rem.
+
+Pairing behavior:
+- Runners with the same panel id are queued until both left and right slots exist.
+- When both slots are present, a single `container-panel.html` include is emitted.
+- If only one slot is ever provided, content is emitted standalone at flush time.
+- Last writer wins for layout/gap/ratio if options differ within the same panel id.
+
+Examples:
+- // CODE_RUNNER: Challenge text | panel: demo, slot: left, ratio: 35-65
+- <!-- UI_RUNNER: Notes | panel: demo, slot: left -->
+- // GAME_RUNNER: Arcade mode | panel: demo, slot: right, layout: row
+
+Real pair example (Cookie Clicker):
+- <!-- UI_RUNNER: How to Play panel | panel: cookie_intro_game, slot: left, layout: row, ratio: 20-80, gap: 1rem -->
+- // GAME_RUNNER: Cookie Clicker Mini Game with large cookie | hide_edit: true, panel: cookie_intro_game, slot: right, layout: row, ratio: 20-80, gap: 1rem, width: 100%, height: 520px
+
+Notes on CodeFence and MermaidGraph:
+- Plain markdown code fences and Mermaid markdown are not panel-aware by default.
+- To place those side-by-side, wrap desired content in a panel-aware runner cell
+    (for example, UI_RUNNER HTML shell plus panel options), then pair by panel id.
+"""
+
 notebook_directory = "_notebooks"
 destination_directory = "_posts"
 mermaid_output_directory = "assets/mermaid"
@@ -87,26 +126,56 @@ def get_custom_cell_id(cell) -> str:
 ### Section for Object Models ###
 #################################
 
-
 @dataclass
 class CodeRunner:
     challenge: str
     language: str
     runner_id: str
     code: str
+    options: dict[str, Any]
     custom_cell_id: str
 
     @staticmethod
-    def extract_challenge(cell_source: str, language: str) -> Optional[str]:
-        """Extract the CODE_RUNNER challenge text from a language-specific comment line."""
+    def extract_challenge_and_options(cell_source: str, language: str) -> Optional[tuple[str, dict[str, Any]]]:
+        """Parse CODE_RUNNER challenge text and optional key/value options."""
         if language not in CODE_RUNNER_PATTERNS:
             return None
 
         pattern = CODE_RUNNER_PATTERNS[language]
         for line in cell_source.split('\n'):
             match = re.match(pattern, line.strip(), re.IGNORECASE)
-            if match:
-                return match.group(1).strip()
+            if not match:
+                continue
+
+            content = match.group(1).strip()
+            if '|' not in content:
+                return (content, {})
+
+            challenge, options_str = content.split('|', 1)
+            options: dict[str, Any] = {}
+            for option in options_str.strip().split(','):
+                if ':' not in option:
+                    continue
+                key, value = option.split(':', 1)
+                key = key.strip()
+                value = value.strip().lower()
+                if value == 'true':
+                    options[key] = True
+                elif value == 'false':
+                    options[key] = False
+                else:
+                    options[key] = value
+
+            return (challenge.strip(), options)
+
+        return None
+
+    @staticmethod
+    def extract_challenge(cell_source: str, language: str) -> Optional[str]:
+        """Extract the CODE_RUNNER challenge text from a language-specific comment line."""
+        parsed = CodeRunner.extract_challenge_and_options(cell_source, language)
+        if parsed:
+            return parsed[0]
         return None
 
     @staticmethod
@@ -144,15 +213,18 @@ class CodeRunner:
     def from_cell(cls, cell, permalink: str, runner_index: int) -> Optional["CodeRunner"]:
         """Build a CodeRunner instance when the cell includes a CODE_RUNNER marker."""
         language = detect_cell_language(cell)
-        challenge = cls.extract_challenge(cell.source, language)
-        if not challenge:
+        parsed = cls.extract_challenge_and_options(cell.source, language)
+        if not parsed:
             return None
+
+        challenge, options = parsed
 
         return cls(
             challenge=challenge,
             language=language,
             runner_id=generate_runner_id(permalink, runner_index),
             code=cls.clean_code(cell.source, language),
+            options=options,
             custom_cell_id=get_custom_cell_id(cell),
         )
 
@@ -168,6 +240,7 @@ class CodeRunner:
             language=metadata['language'],
             runner_id=metadata['runner_id'],
             code=metadata['code'],
+            options=metadata.get('options', {}),
             custom_cell_id=metadata.get('custom_cell_id', ''),
         )
 
@@ -187,7 +260,7 @@ class CodeRunner:
             *code_fence_lines,
             '{% endcapture %}',
             '',
-            '{% include code-runner.html',
+            '{% include runners/code.html',
             '   runner_id="' + self.runner_id + '"',
             '   language="' + self.language + '"',
             '   challenge=challenge' + str(code_runner_count),
@@ -459,7 +532,7 @@ class GameRunner:
             self.code,
             '{% endcapture %}',
             '',
-            '{% include game-runner.html',
+            '{% include runners/game.html',
             '   runner_id="' + self.runner_id + '"',
             '   challenge=challenge' + str(code_runner_count),
             '   code=code' + str(code_runner_count),
@@ -476,7 +549,6 @@ class GameRunner:
 
         lines.extend(['%}', ''])
         return lines
-
 
 @dataclass
 class CodeFence:
@@ -729,6 +801,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     code_cell_count = 0
     code_runner_count = 0
     ui_runner_count = 0
+    emitted_ui_cells: set[str] = set()
     in_ui_runner_output = False
     ui_runner_depth = 0
     
@@ -831,6 +904,18 @@ def inject_code_runners(markdown, notebook, front_matter=None):
 
         return []
 
+    def queue_ui_runner_once(ui_runner: UiRunner, lines_to_queue: list[str]) -> list[str]:
+        """Queue UI runner content once, avoiding duplicate injection from dual paths."""
+        cell_key = ui_runner.custom_cell_id or ui_runner.runner_id
+        if cell_key in emitted_ui_cells:
+            return []
+        emitted_ui_cells.add(cell_key)
+
+        config = panel_config(ui_runner.options, 'left')
+        if config:
+            return queue_panel_runner(config, lines_to_queue)
+        return lines_to_queue
+
     while i < len(lines):
         line = lines[i]
         
@@ -849,11 +934,7 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                         ui_cell = ui_runner_cells[ui_runner_count]
                         ui_runner = UiRunner.from_metadata(ui_cell['metadata']['ui_runner'])
                         ui_runner_lines = ui_runner.rendered_markup_lines()
-                        config = panel_config(ui_runner.options, 'left')
-                        if config:
-                            result.extend(queue_panel_runner(config, ui_runner_lines))
-                        else:
-                            result.extend(ui_runner_lines)
+                        result.extend(queue_ui_runner_once(ui_runner, ui_runner_lines))
                         
                         ui_runner_count += 1
         
@@ -888,17 +969,18 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     code_runner = CodeRunner.from_metadata(code_cell['metadata']['code_runner'])
                     code_fence = CodeFence.from_markdown_lines(code_block_content)
                     code_fence_lines = code_fence.to_markdown_lines() if code_fence else code_block_content
-                    result.extend(code_runner.liquid_lines(code_fence_lines, code_runner_count))
+                    code_lines = code_runner.liquid_lines(code_fence_lines, code_runner_count)
+                    config = panel_config(code_runner.options, 'left')
+                    if config:
+                        result.extend(queue_panel_runner(config, code_lines))
+                    else:
+                        result.extend(code_lines)
                     code_runner_count += 1
                 # Add ui-runner if metadata exists
                 elif code_cell and 'ui_runner' in code_cell.get('metadata', {}):
                     ui_runner = UiRunner.from_metadata(code_cell['metadata']['ui_runner'])
                     ui_runner_lines = ui_runner.rendered_markup_lines()
-                    config = panel_config(ui_runner.options, 'left')
-                    if config:
-                        result.extend(queue_panel_runner(config, ui_runner_lines))
-                    else:
-                        result.extend(ui_runner_lines)
+                    result.extend(queue_ui_runner_once(ui_runner, ui_runner_lines))
                 # Add game-runner if metadata exists
                 elif code_cell and 'game_runner' in code_cell.get('metadata', {}):
                     game_runner = GameRunner.from_metadata(code_cell['metadata']['game_runner'])
@@ -911,7 +993,15 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                     code_runner_count += 1
                 else:
                     # Regular code block without code-runner
-                    result.extend(code_block_content)                
+                    # Suppress raw UI_RUNNER source fences from leaking into final markdown.
+                    code_fence = CodeFence.from_markdown_lines(code_block_content)
+                    body_lines = code_fence.body_lines if code_fence else code_block_content[1:-1]
+                    is_ui_runner_fence = any(
+                        re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
+                        for line in body_lines
+                    )
+                    if not is_ui_runner_fence:
+                        result.extend(code_block_content)
                 code_block_content = []
         elif in_code_block:
             code_block_content.append(line)
