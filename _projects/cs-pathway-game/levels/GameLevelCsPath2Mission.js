@@ -212,7 +212,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           AiNpc.showInteraction(this);
         },
       }),
-      visible: true,
+      visible: false,
       hitbox: { widthPercentage: 0.35, heightPercentage: 0.35 },
       alertDistance: 0.18,
       dialogues: [
