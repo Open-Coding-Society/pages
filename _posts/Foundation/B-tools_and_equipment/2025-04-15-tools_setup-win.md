@@ -63,7 +63,7 @@ flowchart TD
 
 ### WSL common commands
 
-- `wsl --help`, `wsl -l -o`, `wsl -l -v`, `wsl --shutdown`, `wsl --uregister`
+- `wsl --help`, `wsl -l -o`, `wsl -l -v`, `wsl --shutdown`, `wsl --unregister`
 
 ### WSL install
 
@@ -73,7 +73,7 @@ flowchart TD
    wsl --install -d Ubuntu-24.04
    ```
 
-2. Setup a username and password when prompted. On password you will be typing but will not see respones.
+2. Setup a username and password when prompted. On password you will be typing but will not see responses.
 
 3. At the conclusion of the install you will receive a WSL Ubuntu prompt.  For now we will exit WSL.
 
@@ -142,3 +142,49 @@ cd opencs/student
 source venv/bin/activate
 code .
 ```
+
+---
+
+## 💻 Interactive Terminal Practice
+
+Now that you’ve learned about Windows tools and file systems, try using a simulated terminal.
+
+This is a safe environment where you can practice basic commands.
+
+### Try these commands:
+
+* `ls` → list files/folders
+* `cd <folder>` → move into a folder
+* `cd ..` → go back
+* `mkdir <folder>` → create a folder
+* `touch <file>` → create a file
+* `cat <file>` → view file contents
+* `echo "text" > <file>` → write content into a file
+* `echo "text" >> <file>` → append content to a file
+* `git clone <url>` → mock clone a repo
+* `clear` → clear terminal output
+* `pwd` → show current path
+* `help` → show commands
+
+---
+
+### Terminal:
+
+{% include tools/interactive-terminal-simulator.html id="windows-tools-terminal" %}
+
+### Game Terminal:
+
+This version is a training mission that teaches real terminal commands.
+
+Try this flow:
+
+* `mission` → get current objective
+* `hint` → get help if stuck
+* `progress` → show completed missions
+* `status` → view rank and current directory
+
+To win, complete missions using actual commands like `pwd`, `ls`, `mkdir`, `cd`, `touch`, `echo`, and `cat`.
+
+{% include tools/interactive-terminal-simulator-game.html id="windows-tools-terminal-game" %}
+
+---
