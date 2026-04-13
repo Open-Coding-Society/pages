@@ -167,28 +167,6 @@
                 blockId: blockId,
                 codeLength: code.length
             });
-        }
-                
-                // Track copy events within editor
-                editor.addEventListener('copy', (e) => {
-                    const selected = window.getSelection().toString();
-                    if (selected.length > 0) {
-                        this.trackCopy(selected, {
-                            language: this.currentLanguage,
-                            codeLength: selected.length
-                        });
-                    }
-                });
-                
-                // Track paste events within editor
-                editor.addEventListener('paste', (e) => {
-                    const pastedText = e.clipboardData.getData('text/plain');
-                    this.trackPaste(pastedText, {
-                        language: this.currentLanguage,
-                        codeLength: pastedText.length
-                    });
-                });
-            }
         },
         
         /**
