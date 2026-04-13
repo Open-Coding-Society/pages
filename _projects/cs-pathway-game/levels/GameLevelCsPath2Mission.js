@@ -152,26 +152,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._zoneAlertEl = null;
     };
 
-    // ── Gatekeepers ────────────────────────────────────────────
-    const codeHubGatekeeperPos = {
-      x: width * 0.73,
-      y: height * 0.26,
-    };
-
-    const personalEnrichmentGatekeeperPos = {
-      x: width * 0.20,
-      y: height * 0.23,
-    };
-
-    const skillPassportGatekeeperPos = {
-      x: width * 0.74,
-      y: height * 0.49  ,
-    };
-
-    const courseEnlistGatekeeperPos = {
-      x: width * 0.20,
-      y: height * 0.46,
-    };
 
     const gatekeeperBaseData = {
       src: path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
@@ -250,28 +230,28 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         id: 'MissionDeskAiAdmin',
         label: 'The Admin',
         expertise: 'how to work different operating systems',
-        position: { x: width * 0.20, y: height * 0.25 },
+        position: { x: width * 0.20, y: height * 0.17 },
         zonePrompt: 'Collision zone active. Press E to interact.',
       }),
       createHiddenMissionDesk({
         id: 'MissionDeskAiArchivist',
         label: 'The Archivist',
         expertise: 'how to manage files and folders',
-        position: { x: width * 0.65, y: height * 0.25 },
+        position: { x: width * 0.65, y: height * 0.17 },
         zonePrompt: 'Collision zone active. Press E to interact.',
       }),
       createHiddenMissionDesk({
         id: 'MissionDeskAiSDLC',
         label: 'The SDLC Master',
         expertise: 'what SDLC is',
-        position: { x: width * 0.20, y: height * 0.75 },
+        position: { x: width * 0.20, y: height * 0.60 },
         zonePrompt: 'Collision zone active. Press E to interact.',
       }),
       createHiddenMissionDesk({
         id: 'MissionDeskAiScrum',
         label: 'The Scrum Master',
         expertise: 'how to set up a scrum board',
-        position: { x: width * 0.65, y: height * 0.75 },
+        position: { x: width * 0.65, y: height * 0.60 },
         zonePrompt: 'Collision zone active. Press E to interact.',
       }),
     ];
