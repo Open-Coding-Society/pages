@@ -289,13 +289,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   initialize() {
     const objects = this.gameEnv?.gameObjects || [];
     const desks = objects.filter((obj) => this._missionDeskIds?.includes(obj?.spriteData?.id));
-
-    // Runtime patch: Npc currently doesn't assign this.reaction from data.
-    desks.forEach((desk) => {
-      if (typeof desk?.reaction !== 'function' && typeof desk?.spriteData?.reaction === 'function') {
-        desk.reaction = desk.spriteData.reaction;
-      }
-    });
+    this._rebindMissingDeskReactions(desks);
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
       id: d?.spriteData?.id,
@@ -307,29 +301,42 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._activeZoneDeskId = null;
   }
 
-  update() {
-    const player = this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
-    if (!player || !Array.isArray(this._missionDeskObjects)) return;
+  _rebindMissingDeskReactions(desks) {
+    // Runtime patch: Npc currently doesn't assign this.reaction from data.
+    desks.forEach((desk) => {
+      if (typeof desk?.reaction !== 'function' && typeof desk?.spriteData?.reaction === 'function') {
+        desk.reaction = desk.spriteData.reaction;
+      }
+    });
+  }
 
-    const playerCenterX = (player.position?.x || 0) + (player.width || 0) / 2;
-    const playerCenterY = (player.position?.y || 0) + (player.height || 0) / 2;
+  _getObjectCenter(object) {
+    return {
+      x: (object?.position?.x || 0) + (object?.width || 0) / 2,
+      y: (object?.position?.y || 0) + (object?.height || 0) / 2,
+    };
+  }
+
+  _getDeskAlertDistancePx(desk) {
+    const alertMultiplier = desk?._alertDistanceMultiplier ?? desk?.spriteData?.alertDistance ?? 1.25;
+    if ((desk?.width || 0) > 0) {
+      return desk.width * alertMultiplier;
+    }
+    return (desk?.interactDistance || 120) * 1.5;
+  }
+
+  _findNearestDeskInZone(player, desks) {
+    const playerCenter = this._getObjectCenter(player);
+    const collisionIds = player?.state?.collisionEvents || [];
 
     let nearestDesk = null;
     let nearestDistance = Infinity;
-    const collisionIds = player?.state?.collisionEvents || [];
 
-    for (const desk of this._missionDeskObjects) {
-      const deskCenterX = (desk.position?.x || 0) + (desk.width || 0) / 2;
-      const deskCenterY = (desk.position?.y || 0) + (desk.height || 0) / 2;
-      const distance = Math.hypot(playerCenterX - deskCenterX, playerCenterY - deskCenterY);
-
-      const alertMultiplier = desk._alertDistanceMultiplier ?? desk.spriteData?.alertDistance ?? 1.25;
-      const baseAlertDistancePx = (desk.width > 0)
-        ? desk.width * alertMultiplier
-        : (desk.interactDistance || 120) * 1.5;
-      const alertDistancePx = baseAlertDistancePx;
-      const inCollision = collisionIds.includes(desk.spriteData?.id);
-      const inZone = inCollision || distance < alertDistancePx;
+    for (const desk of desks) {
+      const deskCenter = this._getObjectCenter(desk);
+      const distance = Math.hypot(playerCenter.x - deskCenter.x, playerCenter.y - deskCenter.y);
+      const inCollision = collisionIds.includes(desk?.spriteData?.id);
+      const inZone = inCollision || distance < this._getDeskAlertDistancePx(desk);
 
       if (inZone && distance < nearestDistance) {
         nearestDesk = desk;
@@ -337,14 +344,29 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       }
     }
 
+    return nearestDesk;
+  }
+
+  _syncDeskZoneAlert(nearestDesk) {
     if (nearestDesk) {
       const zoneMessage = nearestDesk.spriteData?.zoneMessage || 'Press E to interact';
       this.setZoneAlert(zoneMessage);
       this._activeZoneDeskId = nearestDesk.spriteData?.id || null;
-    } else if (this._activeZoneDeskId) {
+      return;
+    }
+
+    if (this._activeZoneDeskId) {
       this.clearZoneAlert();
       this._activeZoneDeskId = null;
     }
+  }
+
+  update() {
+    const player = this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
+    if (!player || !Array.isArray(this._missionDeskObjects)) return;
+
+    const nearestDesk = this._findNearestDeskInZone(player, this._missionDeskObjects);
+    this._syncDeskZoneAlert(nearestDesk);
   }
 
   destroy() {
