@@ -9,202 +9,104 @@ permalink: /cs-pathway-game/build-integration
 
 ## Adding CS Pathway Game to Build System
 
-This guide shows how to integrate the cs-pathway-game project into your existing Makefile and CI/CD workflow.
+This project now uses the shared auto-registration build system. You do not need a Makefile fragment or project-specific targets in the root Makefile.
 
-## Step 1: Add Makefile Rules
+## Current Architecture
 
-**Option A: Include the fragment** (Recommended - keeps main Makefile clean)
+The root Makefile provides generic targets that run for every registered project:
 
-```makefile
-# At the end of your main Makefile
-include _projects/cs-pathway-game/Makefile.fragment
-```
+- `build-registered-projects`
+- `build-registered-docs`
+- `watch-registered-projects`
+- `clean-registered-projects`
 
-**Option B: Copy rules directly**
-Copy the contents of `Makefile.fragment` into your main `Makefile` (after the existing rules).
-
-## Step 2: Update `make dev` to Include Auto-Watch
-
-Add the project watcher to your development workflow:
-
-```makefile
-# In your existing Makefile, find the 'dev' target and update:
-
-# Development mode: clean start, no conversion, converts files on save
-# Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
-dev: stop clean jekyll-serve
-	@make watch-notebooks &
-	@make watch-cs-pathway-game &    # ADD THIS LINE
-```
-
-This makes `make dev` automatically watch project files for changes.
-
-## Step 3: Update GitHub Actions Workflow
-
-Add project build step to `.github/workflows/jekyll-gh-pages.yml`:
-
-```yaml
-# In the 'build' job, after 'Install Python dependencies' step:
-
-      - name: Build CS Pathway Game project
-        run: |
-          make cs-pathway-game-build  # Copies project files to Jekyll
-
-      - name: Execute notebook conversion script
-        run: |
-          source venv/bin/activate
-          python scripts/convert_notebooks.py
-      # ... rest of workflow
-```
-
-This ensures the project is built before notebook conversion during CI/CD deployment.
-
-## Step 4: Optional - Add to Clean Target
-
-Update your `clean` target to also clean distributed project files:
-
-```makefile
-clean: stop
-	@echo "Cleaning converted IPYNB files..."
-	@find _posts -type f -name '*_IPYNB_2_.md' -exec rm {} +
-	# ... existing clean commands ...
-	@make cs-pathway-game-clean    # ADD THIS LINE
-	@echo "Removing _site directory..."
-	@rm -rf _site
-```
-
-## Step 5: Verify Installation
-
-Test the integration:
+Projects are discovered from `_projects/.makeprojects` and executed with:
 
 ```bash
-# 1. Test make changes
-make -C _project/cs-pathway-game
-# Should see: ✅ CS Pathway Game built successfully
-
-# 2. Start dev server with auto-watch
-make dev
-# Should see: 👀 Watching CS Pathway Game project (auto-copy on save)...
-
-# 3. Edit a file in _projects/cs-pathway-game/
-# Save changes → should see auto-copy message → Jekyll regenerates
-
-# 4. Clean up
-make stop
-make clean
-# Should clean distributed files but preserve source in _projects/
+make -C _projects/<project-name> <target>
 ```
 
-## Complete Example: Updated Makefile Sections
+Each project Makefile must expose these generic targets:
 
-### Development Target
+- `build`
+- `clean`
+- `docs`
+- `docs-clean`
+- `watch`
+
+## Step 1: Register Project
+
+Add one line to `_projects/.makeprojects`:
+
+```text
+cs-pathway-game
+```
+
+No include lines are required in the root Makefile.
+
+## Step 2: Use the Standard Project Makefile Template
+
+Project Makefiles are template-friendly and infer project name from folder name.
+In most cases, the only value you change per project is `DATE_OF_CREATION`.
 
 ```makefile
-dev: stop clean jekyll-serve
-	@touch /tmp/.notebook_watch_marker
-	@make watch-notebooks &
-	@make watch-files &
-	@make watch-cs-pathway-game &    # ← NEW: Auto-copy project files
-	@echo "Server running in background on http://localhost:$(PORT)"
-	@echo "  View logs: tail -f $(LOG_FILE)"
-	@echo "  Stop: make stop"
+# _projects/<project-name>/Makefile
+DATE_OF_CREATION = 2026-04-02
+PROJECT_SRC = $(CURDIR)
+PROJECT_NAME = $(notdir $(PROJECT_SRC))
+NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
+
+WORKSPACE_ROOT = ../..
+JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
+IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
+NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
+DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
 ```
 
-### Clean Target
+## Step 3: Local Build + Dev Behavior
 
-```makefile
-clean: stop
-	@echo "Cleaning converted IPYNB files..."
-	@find _posts -type f -name '*_IPYNB_2_.md' -exec rm {} +
-	@echo "Cleaning Github Issue files..."
-	@find _posts -type f -name '*_GithubIssue_.md' -exec rm {} +
-	@echo "Cleaning converted DOCX files..."
-	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
-	@echo "Cleaning course-specific files..."
-	@make clean-courses
-	@make cs-pathway-game-clean    # ← NEW: Clean distributed project files
-	@echo "Removing empty directories in _posts..."
-	@while [ $$(find _posts -type d -empty | wc -l) -gt 0 ]; do \
-		find _posts -type d -empty -exec rmdir {} +; \
-	done
-	@echo "Removing _site directory..."
-	@rm -rf _site
-```
+Local top-level commands already include registered projects:
 
-### Stop Target (No changes needed)
+- `make refresh` runs root `make` flow, which uses `serve-current`
+- `serve-current` includes `build-registered-projects` and `build-registered-docs`
+- `make dev` starts `watch-registered-projects`
 
-```makefile
-stop:
-	@echo "Stopping server..."
-	@lsof -ti :$(PORT) | xargs kill >/dev/null 2>&1 || true
-	@echo "Stopping logging process..."
-	@ps aux | awk -v log_file=$(LOG_FILE) '$$0 ~ "tail -f " log_file { print $$2 }' | xargs kill >/dev/null 2>&1 || true
-	@echo "Stopping notebook watcher..."
-	@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@echo "Stopping project watchers..."    # ← NEW: Stop message
-	@ps aux | grep "watch-cs-pathway-game" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.jekyll_regenerating
-```
+No project-specific watcher wiring is needed in the root Makefile.
 
-## GitHub Actions Complete Build Job
+## Step 4: CI/CD Behavior
+
+GitHub Actions should call generic registered targets:
 
 ```yaml
-build:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-    
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.1'
-        bundler-cache: true
-    
-    - name: Install Jekyll and dependencies
-      run: |
-        gem install bundler
-        bundle install
-    
-    - name: Install Python dependencies
-      run: |
-        python -m venv venv
-        source venv/bin/activate
-        pip install -r requirements.txt
-    
-    # NEW: Build project before conversion
-    - name: Build CS Pathway Game project
-      run: |
-        make cs-pathway-game-build
-    
-    - name: Execute notebook conversion script
-      run: |
-        source venv/bin/activate
-        python scripts/convert_notebooks.py
-    
-    - name: Execute DOCX conversion script
-      run: |
-        source venv/bin/activate
-        if [ -d "_docx" ] && [ "$(ls -A _docx 2>/dev/null)" ]; then
-          echo "Converting DOCX files..."
-          python scripts/convert_docx.py
-        else
-          echo "No DOCX files found, skipping conversion"
-        fi
-    
-    - name: Split multi-course files
-      run: |
-        source venv/bin/activate
-        python scripts/split_multi_course_files.py
-    
-    - name: Build with Jekyll
-      run: |
-        bundle exec jekyll build
-    
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+- name: Build registered projects
+  run: |
+    make build-registered-projects
+    make build-registered-docs
 ```
+
+This is now the canonical CI integration point (not `make <project>-build`).
+
+## Step 5: Verification
+
+Validate one project directly:
+
+```bash
+make -C _projects/cs-pathway-game build
+make -C _projects/cs-pathway-game docs
+```
+
+Validate all registered projects:
+
+```bash
+make build-registered-projects
+make build-registered-docs
+```
+
+Expected outputs:
+
+- Notebook: `_notebooks/projects/cs-pathway-game/<date>-cs-pathway-game.ipynb`
+- Assets: `assets/js/projects/cs-pathway-game/` and `images/projects/cs-pathway-game/`
+- Docs: `_posts/projects/cs-pathway-game/<date>-cs-pathway-game-*.md`
 
 ## Troubleshooting
 
@@ -221,16 +123,16 @@ sudo yum install fswatch       # RedHat/CentOS
 ```
 
 ### Auto-copy Not Working
-1. Check that `watch-cs-pathway-game` is running:
+1. Check that the project watcher is running via the registered watcher target:
 
    ```bash
-   ps aux | grep watch-cs-pathway-game
+  ps aux | grep "make -C _projects"
    ```
 
 2. Manually trigger copy to test:
 
    ```bash
-   make cs-pathway-game
+  make -C _projects/cs-pathway-game build
    ```
 
 3. Check file permissions:
@@ -258,8 +160,8 @@ sudo yum install fswatch       # RedHat/CentOS
 ## Summary
 
 After integration, your workflow becomes:
-1. **One-time setup**: `make dev` (includes auto-watch)
-2. **Daily work**: Edit files in `_projects/cs-pathway-game/`
-3. **Automatic**: Files copy → notebooks convert → Jekyll regenerates → browser refreshes
+1. **Register once**: add project name to `_projects/.makeprojects`.
+2. **Template reuse**: keep generic targets in project Makefile and update `DATE_OF_CREATION`.
+3. **Use shared commands**: root Makefile and CI run all registered projects automatically.
 
 No manual build steps needed during development!

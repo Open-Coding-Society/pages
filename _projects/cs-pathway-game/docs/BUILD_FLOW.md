@@ -9,166 +9,112 @@ permalink: /cs-pathway-game/build-flow
 
 ## Problem Statement
 
-**Student Confusion**: Files scattered across distant directories
+Students edit source files in one place, but Jekyll serves content from runtime paths in other places.
 
-- Notebook in `_notebooks/home/YYYY-MM-DD-name.ipynb` (needs date prefix)
-- JavaScript in `assets/js/GameEnginev1.1/` (far from notebook)
-- Images in `images/gamify/cs-pathway/` (caching optimization)
-- Model in `assets/js/pages/home-gamified/` (another location)
+- Source notebook: _projects/cs-pathway-game/notebook.src.ipynb
+- Runtime notebook: _notebooks/projects/cs-pathway-game/
+- Runtime JS: assets/js/projects/cs-pathway-game/
+- Runtime images: images/projects/cs-pathway-game/
+- Runtime docs: _posts/projects/cs-pathway-game/
 
-**Path Management Complexity**: 
+Without a build flow, path assumptions drift and CI/local behavior can diverge.
 
-- Jekyll requires specific locations
-- Web server caching rules need `/images`
-- Students struggle with relative vs absolute paths
+## Solution: Source-of-Truth Project Directory + Distribution
 
-## Solution: Source-of-Truth Project Directory + Build Distribution
+The source of truth remains in _projects/cs-pathway-game/. Project Makefile targets distribute files to Jekyll/runtime locations.
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         BUILD SYSTEM FLOW                                   │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  STUDENT WORKSPACE (Edit Here)                                              │
-│  ───────────────────────────                                                │
-│  📁 _projects/cs-pathway-game/          ← Single directory for everything   │
-│     ├── README.md                                                           │
-│     ├── notebook.src.ipynb              ← Friendly name (no date prefix)    │
-│     ├── levels/                                                             │
-│     │   ├── GameLevelCSPath0Forge.js                                        │
-│     │   ├── GameLevelCSPath1Way.js                                          │
-│     │   ├── GameLevelCSPath2Mission.js                                      │
-│     │   └── GameLevelCSPathIdentity.js                                      │
-│     ├── model/                                                              │
-│     │   ├── ProfileManager.js                                               │
-│     │   ├── localProfile.js                                                 │
-│     │   └── persistentProfile.js                                            │
-│     ├── images/                         ← Images co-located with code       │
-│     │   ├── backgrounds/                                                    │
-│     │   ├── sprites/                                                        │
-│     │   └── ui/                                                             │
-│     └── docs/                                                               │
-│         └── ARCHITECTURE.md                                                 │
-│                                                                             │
-│                     │                                                       │
-│                     │ make cs-pathway-game                                  │
-│                     ▼                                                       │
-│                                                                             │
-│  BUILD DISTRIBUTION (Automatic)                                             │
-│  ───────────────────────────────────                                        │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────┐           │
-│  │ NOTEBOOK: Copy with date prefix                              │           │
-│  │                                                              │           │
-│  │ _projects/cs-pathway-game/notebook.src.ipynb                 │           │
-│  │                    ↓ (copy + rename)                         │           │
-│  │ _notebooks/home/2026-04-02-cs-pathway-game.ipynb             │           │
-│  │                    ↓ (convert_notebooks.py)                  │           │
-│  │ _posts/home/2026-04-02-cs-pathway-game_IPYNB_2_.md           │           │
-│  └──────────────────────────────────────────────────────────────┘           │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────┐           │
-│  │ GAME LEVELS: Copy to assets/js                               │           │
-│  │                                                              │           │
-│  │ _projects/cs-pathway-game/levels/*.js                        │           │
-│  │                    ↓ (copy)                                  │           │
-│  │ assets/js/projects/cs-pathway-game/levels/*.js               │           │
-│  └──────────────────────────────────────────────────────────────┘           │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────┐           │
-│  │ MODEL: to assets/js                                          │           │
-│  │                                                              │           │
-│  │ _projects/cs-pathway-game/model/*.js                         │           │
-│  │                    ↓ (copy)                                  │           │
-│  │ assets/js/projects/cs-pathway-game/model/*.js                │           │
-│  └──────────────────────────────────────────────────────────────┘           │
-│                                                                             │
-│  ┌──────────────────────────────────────────────────────────────┐           │
-│  │ IMAGES: Copy to web-optimized location                       │           │
-│  │                                                              │           │
-│  │ _projects/cs-pathway-game/images/*                           │           │
-│  │                    ↓ (recursive copy)                        │           │
-│  │ images/gamify/cs-pathway/*                                   │           │
-│  └──────────────────────────────────────────────────────────────┘           │
-│                                                                             │
-│                     │                                                       │
-│                     │ bundle exec jekyll build                              │
-│                     ▼                                                       │
-│                                                                             │
-│  DEPLOYED SITE (_site/)                                                     │
-│  ───────────────────────                                                    │
-│  • All paths work: /assets/js/projects/...                                  │
-│  • Images cached: /images/gamify/cs-pathway/...                             │
-│  • Notebook rendered as blog post                                           │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+Build one project:
+
+```bash
+make -C _projects/cs-pathway-game build
+make -C _projects/cs-pathway-game docs
 ```
+
+Build all registered projects from repo root:
+
+```bash
+make build-registered-projects
+make build-registered-docs
+```
+
+## End-to-End Flow
+
+1. Edit files in _projects/cs-pathway-game/.
+2. Project Makefile build target copies notebook/assets/images to runtime locations.
+3. Notebook conversion turns copied .ipynb into _posts markdown.
+4. Jekyll builds the site from those runtime paths.
+
+Resulting paths:
+
+- Notebook copy: _notebooks/projects/cs-pathway-game/2026-04-02-cs-pathway-game.ipynb
+- Notebook post: _posts/projects/cs-pathway-game/2026-04-02-cs-pathway-game_IPYNB_2_.md
+- JS levels/model: assets/js/projects/cs-pathway-game/
+- Images: images/projects/cs-pathway-game/
+- Project docs posts: _posts/projects/cs-pathway-game/
 
 ## Path Strategy
 
-**In Code (notebook.src.ipynb and level files):**
+Use deployed/runtime paths in code (not source-relative paths).
 
 ```javascript
-// Imports use DEPLOYED paths (not ./relative)
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelCsPath0Forge from '/assets/js/GameEnginev1.1/GameLevelCsPath0Forge.js';
-
-// Images use gameEnv.path (already provided by Game.js environment)
-const sprite = this.gameEnv.path + '/images/gamify/cs-pathway/sprites/knight.png';
-
-// External reference (shared essentials - not copied)
 import Game from '/assets/js/GameEnginev1.1/essentials/Game.js';
+import GameLevelCsPath0Forge from '/assets/js/projects/cs-pathway-game/levels/GameLevelCSPath0Forge.js';
+
+const sprite = this.gameEnv.path + '/images/projects/cs-pathway-game/sprites/knight.png';
 ```
 
-**Why this works:**
+Why this works:
 
-1. Code references final deployed locations (absolute paths)
-2. `gameEnv.path` comes from Jekyll's `{{site.baseurl}}` (via notebook)
-3. No environment detection logic needed
-4. Works locally (localhost:4500) and deployed (GitHub Pages)
+1. Code references final runtime locations.
+2. gameEnv.path carries baseurl context for local and deployed environments.
+3. No environment-specific path switching is needed in game files.
 
-### Development Mode Details
+## Development Mode (make dev)
 
-**make dev workflow:**
+Current behavior:
 
-1. `make dev` starts Jekyll server WITHOUT pre-converting notebooks (BIG TIME SAVINGS)
-2. Jekyll log watcher monitors `_notebooks/*.ipynb` saves → triggers conversion
-3. `watch-cs-pathway-game` monitors `_projects/cs-pathway-game/**` saves → copies to Jekyll
-4. Jekyll detects copied files → regenerates affected pages
-5. Browser sees updates
+1. make dev starts Jekyll and file/notebook watchers.
+2. watch-registered-projects starts each project watcher listed in _projects/.makeprojects.
+3. Project watch targets sync changed files from _projects/<name>/ to runtime paths.
+4. Jekyll regenerates affected pages.
 
-**Key benefits:**
+Benefits:
 
-- **Fast startup**: No waiting for full notebook conversion
-- **Incremental**: Only converts/copies what you actually edit
-- **Automatic**: Save file → see changes (no manual commands)
-- **Multi-project ready**: Can watch multiple project directories simultaneously
+- Fast startup and incremental regeneration.
+- Multi-project support without custom root Makefile wiring.
 
+## CI/CD Integration
+
+GitHub Actions should use registered targets:
+
+```yaml
+- name: Build registered projects
+  run: |
+    make build-registered-projects
+    make build-registered-docs
 ```
+
+This is the canonical CI path for project assets and docs.
 
 ## Version Control Strategy
 
-### Track Source Files (.gitignore additions)
+Track source files in _projects. Treat distributed files as generated artifacts.
 
 ```gitignore
-# Track source (_projects/)
+# Track source
 !_projects/cs-pathway-game/**
 
-# Ignore distributed files (generated by build)
-_notebooks/home/2026-04-02-cs-pathway-game.ipynb
-assets/js/GameEnginev1.1/GameLevelCSPath*.js
-assets/js/pages/home-gamified/ProfileManager.js
-assets/js/pages/home-gamified/localProfile.js
-assets/js/pages/home-gamified/persistentProfile.js
-images/gamify/cs-pathway/
+# Ignore generated distribution
+_notebooks/projects/cs-pathway-game/
+assets/js/projects/cs-pathway-game/
+images/projects/cs-pathway-game/
+_posts/projects/cs-pathway-game/
 ```
-
 
 ## Benefits Summary
 
-1. ✅ **Student-friendly**: One directory, obvious organization
-2. ✅ **No path magic**: Code uses final deployed paths (simple)
-3. ✅ **Jekyll-compatible**: Build distributes to required locations
-4. ✅ **Image optimization**: Still in /images for caching
-5. ✅ **Date prefix handled**: Makefile adds it automatically
-6. ✅ **Migration support**: Multiple projects, shared essentials
+1. Project-friendly source layout.
+2. Consistent local and CI behavior.
+3. Reusable project template with minimal per-project changes.
+4. Scale to multiple projects through registration.

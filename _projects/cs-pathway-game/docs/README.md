@@ -9,36 +9,36 @@ permalink: /cs-pathway-game/overview
 
 ## Directory Structure
 
-**Student-friendly project organization for the CS Pathway gamified learning experience.**
+Project-facing source lives in one project directory.
 
-```type
-projects/cs-pathway-game/
-├── README.md                        [This file - project overview]
-├── notebook.src.ipynb               [Source notebook - edit here]
+```text
+_projects/cs-pathway-game/
+├── notebook.src.ipynb
 ├── levels/
-│   ├── GameLevelCSPath0Forge.js    [Level 0: Identity Forge]
-│   ├── GameLevelCSPath1Way.js      [Level 1: Wayfinding World]
-│   ├── GameLevelCSPath2Mission.js  [Level 2: Mission Tools]
-│   └── GameLevelCSPathIdentity.js  [Shared base class]
 ├── model/
-│   ├── ProfileManager.js           [Profile orchestrator]
-│   ├── localProfile.js             [Primary localStorage]
-│   └── persistentProfile.js        [Backend sync]
-├── images/                          [Project-specific images]
-│   ├── backgrounds/
-│   ├── sprites/
-│   └── ui/
-└── docs/
-    └── README_ARCHITECTURE.md      [Architecture documentation]
+├── images/
+├── docs/
+└── Makefile
 ```
 
-## Development Workflow
+Runtime/distributed outputs are generated into GitHub Pages folder by Makefile:
 
-### Fast Development Mode (Recommended)
+- _notebooks/projects/cs-pathway-game/
+- _posts/projects/cs-pathway-game/
+- assets/js/projects/cs-pathway-game/
+- images/projects/cs-pathway-game/
 
-**Use `make dev` for rapid iteration** - doesn't preload all _notebooks
+## Build + Dev Workflow
 
-Regeneration has dependncy now:
+Primary SDLC workflow:
+
+```bash
+make dev
+```
+
+This is the main build-and-test loop for development. It starts Jekyll and the registered project watchers so edits are copied, converted, and regenerated automatically.
+
+Before using live regeneration with `make dev`, install `fswatch`:
 
 ```bash
 # macOS
@@ -46,75 +46,45 @@ brew install fswatch
 
 # Ubuntu/Debian
 sudo apt install fswatch
+```
 
-**Edit/Save workflow example:**
-1. Edit files in `_projects/cs-pathway-game/`
-   - `notebook.src.ipynb` - converted automatically when saved (via make dev)
-   - `levels/*.js` - copied automatically when saved (via watch-cs-pathway-game)
-   - `model/*.js` - copied automatically when saved
-   - `images/*` - copied automatically when added/changed
+Without `fswatch`, the project watcher falls back to manual rebuild instructions instead of auto-regeneration.
 
-2. Save file → Auto-distribution happens → Jekyll regenerates → Refresh browser
+Validation this project. These are useful for confirming project copy behavior or isolating a single project's distribution step. Use these in conjunct with 'make dev' to refresh directory and force a full directory regenteration, perhaps after a rename.
 
-3. See changes immediately at http://localhost:4500
-
-**BIG TIME SAVINGS**: `make dev` doesn't pre-convert notebooks, only converts on save!
-
-### Complete Build (When Needed)
-
-For explicit full rebuild (rarely needed):
 ```bash
-make                   # Full conversion + serve, alternat is make serve
+make -C _projects/cs-pathway-game build
+make -C _projects/cs-pathway-game docs # docs are not in make dev
 ```
 
-This copies files to Jekyll-required locations:
+Validate all project.  These are repo-level validation commands for checking distribution across all registered projects. Use case are similar to make dev.
 
-- `notebook.src.ipynb` → `_notebooks/home/2026-04-02-cs-pathway-game.ipynb`
-- `levels/*.js` → `assets/js/GameEnginev1.1/`
-- `model/*.js` → `assets/js/pages/home-gamified/`
-- `images/*` → `images/gamify/cs-pathway/`
+```bash
+make build-registered-projects
+make build-registered-docs # docs are not in make dev
+```
 
-### Path Management
+## Path Guidance
 
-**All paths in code use absolute runtime paths** (no config.js needed):
-
-- JavaScript imports: `/assets/js/GameEnginev1.1/GameLevelCSPath0Forge.js`
-- Images via gameEnv: `gameEnv.path + '/images/gamify/cs-pathway/sprite.png'`
-- Game engine essentials: `/assets/js/GameEnginev1.1/essentials/Game.js` (external reference)
-
-The build system handles distribution - you just edit here!
-
-## File References
-
-### In notebook.src.ipynb
+Use runtime absolute paths in code.
 
 ```javascript
-// Imports use final deployed paths (do not use ./relative-paths)
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelCsPath0Forge from '/assets/js/GameEnginev1.1/GameLevelCsPath0Forge.js';
+import { ProfileManager } from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 
-// Images use gameEnv.path (provided by Game.js environment)
-const sprite = gameEnv.path + '/images/gamify/cs-pathway/sprites/knight.png';
+const bg = this.gameEnv.path + '/images/projects/cs-pathway-game/backgrounds/forest.png';
 ```
 
-### In level files (GameLevelCSPath*.js)
+## Registration Model
 
-```javascript
-// Import shared model
-import { ProfileManager } from '/assets/js/pages/home-gamified/ProfileManager.js';
+Project integration into Makefile is registration-based.
 
-// Load images via gameEnv (passed from Game.js)
-const bg = this.gameEnv.path + '/images/gamify/cs-pathway/backgrounds/forest.png';
-```
+1. Add project name to _projects/.makeprojects.
+2. Use the project Makefile as a template as it has necessary targets: build, clean, watch, docs, docs-clean.
+3. Use the same template pattern as other projects, typically changing only DATE_OF_CREATION.
 
-## Why This Structure?
+No Makefile fragments or project-specific root targets are required.
 
-1. **Student-friendly**: All related files in one place
-2. **Jekyll-compatible**: Build distributes to required locations
-3. **No path complexity**: Code uses final deployed paths
-4. **Version control**: Track source files here, generated files ignored
-5. **Migration support**: Can build v1.1 and v1 simultaneously
+## Notes
 
-## Build Details
-
-See Makefile target `cs-pathway-game` for distribution rules.
+For detailed flow and troubleshooting, see the companion build flow doc.
