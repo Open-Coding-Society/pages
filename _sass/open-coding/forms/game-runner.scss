@@ -164,6 +164,7 @@
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
@@ -182,6 +183,8 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s ease;
+  position: absolute;
+  left: 1.5rem;
 
   &:hover {
     background: rgba(255, 255, 255, 0.3);
@@ -193,14 +196,15 @@
   color: var(--pref-text-color);
   font-weight: 600;
   font-size: 1rem;
-  margin-right: auto;
+  position: absolute;
+  left: 4rem;
 }
 
 .fullscreen-controls-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  flex: 1;
   transition: all 0.3s ease;
 
   &.collapsed {
