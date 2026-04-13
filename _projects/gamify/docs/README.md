@@ -2,7 +2,7 @@
 layout: post
 title: Adventure Game - Overview
 description: README starting documentation for the adventure game 
-categories: [Gamify]
+category: Gamify
 breadcrumb: true
 permalink: /gamify/overview
 ---

@@ -2,7 +2,8 @@
 layout: post
 title: CS Pathway Game - Overview
 description: Complete documentation for the CS Pathway Game project with unified source-of-truth structure
-categories: [Gamify]
+category: Gamify
+breadcrumb: true
 permalink: /cs-pathway-game/overview
 ---
 
