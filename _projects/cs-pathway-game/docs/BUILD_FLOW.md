@@ -2,8 +2,8 @@
 layout: post
 title: CS Pathway Game - Build Flow
 description: Understanding the source-to-distribution build flow for CS Pathway Game
-categories: [CS Pathway Game]
-permalink: /projects/cs-pathway-game/build-flow
+categories: [Gamify]
+permalink: /cs-pathway-game/build-flow
 ---
 
 ## Problem Statement

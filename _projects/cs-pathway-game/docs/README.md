@@ -2,8 +2,8 @@
 layout: post
 title: CS Pathway Game - Overview
 description: Complete documentation for the CS Pathway Game project with unified source-of-truth structure
-categories: [CS Pathway Game]
-permalink: /projects/cs-pathway-game/overview
+categories: [Gamify]
+permalink: /cs-pathway-game/overview
 ---
 
 ## Directory Structure
