@@ -7,7 +7,7 @@ title: Capstone Projects
 description: Design-Based Research (DBR) capstone projects solving real-world problems through iterative design, implementation, and analysis. Each project features ML, database work, and advanced data structures (e.g., graphs). Projects must be deployed and accessible through this infographic.
 courses: {'csse': {'week': 25}}
 type: capstone
-categories: [Capstone]
+categories: Capstone
 permalink: /capstone/
 sticky_rank: 1
 ---

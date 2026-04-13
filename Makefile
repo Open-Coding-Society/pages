@@ -116,8 +116,61 @@ serve-so-simple: use-so-simple clean
 serve-yat: use-yat clean
 	@make serve-current
 
+# Build all registered projects (game assets, not docs)
+build-registered-projects:
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				echo "📦 Building project: $$proj"; \
+				make -C "_projects/$$proj" build 2>/dev/null || echo "  ⚠️  Build failed for $$proj"; \
+			fi; \
+		done; \
+	fi
+
+# Convert notebooks for all registered projects (dev mode initial build)
+convert-registered-notebooks:
+	@if [ -f _projects/.makeprojects ]; then \
+		find _notebooks/projects -name '*.ipynb' 2>/dev/null | while read notebook; do \
+			echo "Converting project notebook: $$notebook"; \
+			make convert-single NOTEBOOK_FILE="$$notebook" 2>&1; \
+		done; \
+	fi
+
+# Build documentation for all registered projects (serve mode only)
+build-registered-docs:
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				echo "📚 Building docs for: $$proj"; \
+				make -C "_projects/$$proj" docs 2>/dev/null || true; \
+			fi; \
+		done; \
+	fi
+
+# Watch all registered projects for changes (dev mode)
+watch-registered-projects:
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				echo "👀 Starting watcher for: $$proj"; \
+				make -C "_projects/$$proj" watch & \
+			fi; \
+		done; \
+	fi
+
+# Clean all registered project distributions
+clean-registered-projects:
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				make -C "_projects/$$proj" clean 2>/dev/null || true; \
+				make -C "_projects/$$proj" docs-clean 2>/dev/null || true; \
+			fi; \
+		done; \
+	fi
+
 # General serve target (uses whatever is in _config.yml/Gemfile)
-serve-current: stop convert split-courses jekyll-serve
+serve-current: stop build-registered-projects convert split-courses build-registered-docs jekyll-serve
 
 # Build with selected theme
 build-minima: use-minima build-current
@@ -214,6 +267,8 @@ clean: stop
 	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
 	@echo "Cleaning course-specific files..."
 	@make clean-courses
+	@echo "Cleaning project distributions..."
+	@make clean-registered-projects
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
 	@echo "Cleaning DOCX index page..."
@@ -233,6 +288,9 @@ stop:
 	@echo "Stopping notebook watcher..."
 	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@echo "Stopping project watchers..."
+	@@ps aux | grep "fswatch.*_projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "make -C _projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.jekyll_regenerating
 
 reload:
@@ -246,19 +304,25 @@ refresh:
 
 # Development mode: clean start, no conversion, converts files on save
 # Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
-dev: stop clean jekyll-serve
+dev: stop clean
+	@echo "📦 Building registered projects..."
+	@make build-registered-projects
+	@make convert-registered-notebooks
+	@make jekyll-serve
 	@make watch-notebooks &
 	@make watch-files &
+	@make watch-registered-projects &
 	@echo "Dev server running in background on http://localhost:$(PORT)"
 	@echo "  View logs: tail -f $(LOG_FILE)"
 	@echo "  Stop: make stop"
 
 # Watch notebooks directory for changes (since Jekyll excludes _notebooks)
 # Converts immediately (async), Jekyll serve handles regeneration batching
+# Excludes _notebooks/projects/* (handled by project-specific watchers)
 watch-notebooks:
 	@echo "Watching _notebooks for changes..."
 	@while true; do \
-		find _notebooks -name '*.ipynb' -newer /tmp/.notebook_watch_marker 2>/dev/null | while read notebook; do \
+		find _notebooks -path "_notebooks/projects" -prune -o -name '*.ipynb' -newer /tmp/.notebook_watch_marker -print 2>/dev/null | while read notebook; do \
 			echo "Notebook changed: $$notebook"; \
 			make convert-single NOTEBOOK_FILE="$$notebook" & \
 		done; \
@@ -380,3 +444,37 @@ convert-fix:
 	@echo "Running conversion fixes..."
 	@echo "️Fixing notebooks with known warnings or errors..."
 	@$(PYTHON) scripts/check_conversion_warnings.py --fix
+
+###########################################
+# Project Auto-Registration
+###########################################
+
+# Projects are registered in _projects/.makeprojects (one per line)
+# Each project must have: _projects/<name>/Makefile with generic targets: build, clean, docs, watch
+# Main Makefile calls projects via: make -C _projects/<name> <target>
+
+# List all registered projects
+list-projects:
+	@echo "📦 Registered Projects:"
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				echo "  ✅ $$proj (active)"; \
+			else \
+				echo "  ⚠️  $$proj (missing Makefile)"; \
+			fi; \
+		done; \
+	else \
+		echo "  No _projects/.makeprojects file found"; \
+	fi
+	@echo ""
+	@echo "Available projects (in _projects/ directory):"
+	@ls -d _projects/*/ 2>/dev/null | sed 's|_projects/||' | sed 's|/||' | while read proj; do \
+		if grep -q "^$$proj$$" _projects/.makeprojects 2>/dev/null; then \
+			echo "  • $$proj (registered)"; \
+		else \
+			echo "  • $$proj (not registered)"; \
+		fi; \
+	done || echo "  None found"
+
+.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects

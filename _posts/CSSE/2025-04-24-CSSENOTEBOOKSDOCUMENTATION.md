@@ -2,7 +2,6 @@
 layout: post
 title: Web APIs and Local Storage Documentation
 description: This documentation provides a comprehensive overview of Web APIs and Local Storage, based on our notebooks. It covers key concepts, implementation details, and practical examples.
-categories: [JavaScript]
 type: docs
 courses: { csse: {week: 17} }
 author: Zhengji Li

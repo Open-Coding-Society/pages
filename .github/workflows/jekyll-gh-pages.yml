@@ -43,6 +43,26 @@ jobs:
           source venv/bin/activate  # Activate the virtual environment
           pip install -r requirements.txt  # Install Python packages
 
+      - name: Build registered projects
+        run: |
+          make build-registered-projects  # Distribute all registered project files to Jekyll locations
+          make build-registered-docs  # Distribute all registered documentation files to Jekyll locations  
+
+      - name: Verify registered docs output
+        run: |
+          if [ -d "_posts/projects" ]; then
+            DOC_COUNT=$(find _posts/projects -type f -name '*.md' | wc -l | tr -d ' ')
+            echo "Registered project docs found: ${DOC_COUNT}"
+            if [ "${DOC_COUNT}" -gt 0 ]; then
+              echo "Sample generated docs:"
+              find _posts/projects -type f -name '*.md' | sort | head -20
+            else
+              echo "No markdown docs found under _posts/projects"
+            fi
+          else
+            echo "_posts/projects directory not found"
+          fi
+
       - name: Execute notebook conversion script
         run: |
           source venv/bin/activate  # Activate virtual environment
