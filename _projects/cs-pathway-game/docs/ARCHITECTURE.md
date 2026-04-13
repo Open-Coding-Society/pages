@@ -19,75 +19,75 @@ permalink: /cs-pathway-game/architecture
 The CS Pathway game implements MVC architecture across the following file structure:
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         CS PATHWAY GAME ARCHITECTURE                         │
+│                         CS PATHWAY GAME ARCHITECTURE                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  📂 /_notebooks/home/                                   [ENTRY POINT]        │
+│                                                                             │
+│  📂 /_notebooks/home/                                   [ENTRY POINT]       │
 │     └─ 2026-04-02-home2-gamified-mvp.ipynb                                  │
 │        • Launches the CS Pathway Game                                       │
 │        • Provides journey from landing page to gamified course intro        │
 │        • Integrates all GameLevelCSPath*.js files                           │
-│                                                                              │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │  📂 /_projects/cs-pathway-game/levels/        [CONTROLLER + VIEW]  │    │
-│  │                                                                    │    │
-│  │  Game Level Controllers:                                           │    │
-│  │  ├─ GameLevelCSPath0Forge.js       Level 0: Identity Forge        │    │
-│  │  │  • Course entry and PII lesson                                 │    │
-│  │  │  • Built-in sign-up / login flow (no redirect required)        │    │
-│  │  │  • Establishes OCS account (Flask + MySQL integration)         │    │
-│  │  │  • Enables PII viewing and theming customization               │    │
-│  │  │                                                                 │    │
-│  │  ├─ GameLevelCSPath1Way.js         Level 1: Wayfinding World      │    │
-│  │  │  • Social classroom connection and registration                │    │
-│  │  │  • Introduces blogging and "about me" coding foundations       │    │
-│  │  │  • Self-evaluation checkpoint (passport to next level)         │    │
-│  │  │                                                                 │    │
-│  │  ├─ GameLevelCSPath2Mission.js     Level 2: Mission Tools         │    │
-│  │  │  • Personal computer setup and local SDLC workflow             │    │
-│  │  │  • Transition from online-only to local development            │    │
-│  │  │  • Tools: GitHub, VSCode, Browser, Terminal, Make              │    │
-│  │  │  • Prepares student for PBL-based CompSci learning             │    │
-│  │  │                                                                 │    │
-│  │  └─ GameLevelCSPathIdentity.js     Shared Base Class              │    │
-│  │     • Shares Identity Forge data across all levels                │    │
-│  │     • Helper class extended by Wayfinding and Mission             │    │
-│  │     • Simplifies profile management across game progression       │    │
-│  │                                                                    │    │
-│  │  Game Engine Essentials (View Components):                         │    │
-│  │  └─ essentials/*                                                   │    │
-│  │     • StatusPanel.js  - Player profile display                    │    │
-│  │     • FormPanel.js    - Identity Terminal input forms             │    │
-│  │     • Picker.js       - Avatar and theme selectors                │    │
-│  │     • DialogueSystem  - NPC interactions                          │    │
-│  │     • Core rendering and UI abstraction                           │    │
-│  └────────────────────────────────────────────────────────────────────┘    │
-│                                                                              │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │  📂 /_projects/cs-pathway-game/model/                 [MODEL]     │    │
-│  │                                                                    │    │
-│  │  Data Persistence Bridge:                                          │    │
-│  │  ├─ ProfileManager.js           Profile Orchestrator              │    │
-│  │  │  • Unified persistence manager (abstraction layer)             │    │
-│  │  │  • JSON in / JSON out interface for View and Controller        │    │
-│  │  │  • Coordinates localStorage speed + backend reliability        │    │
-│  │  │  • Maps data to OCS User table columns efficiently             │    │
-│  │  │                                                                 │    │
-│  │  ├─ localProfile.js              Primary Storage                  │    │
-│  │  │  • localStorage management (instant, client-side)              │    │
-│  │  │  • Source of truth for all users                               │    │
-│  │  │                                                                 │    │
-│  │  └─ persistentProfile.js         Secondary Storage                │    │
-│  │     • Flask API fetch request/response layer                      │    │
-│  │     • Backend analytics and cross-device recovery                 │    │
-│  │     • Instructor dashboard data                                   │    │
-│  └────────────────────────────────────────────────────────────────────┘    │
-│                                                                              │
-│  Design Philosophy:                                                      │
+│                                                                             │
+│  ┌────────────────────────────────────────────────────────────────────┐     │
+│  │  📂 /_projects/cs-pathway-game/levels/        [CONTROLLER + VIEW]  │     │
+│  │                                                                    │     │
+│  │  Game Level Controllers:                                           │     │
+│  │  ├─ GameLevelCSPath0Forge.js       Level 0: Identity Forge         │     │
+│  │  │  • Course entry and PII lesson                                  │     │
+│  │  │  • Built-in sign-up / login flow (no redirect required)         │     │
+│  │  │  • Establishes OCS account (Flask + MySQL integration)          │     │
+│  │  │  • Enables PII viewing and theming customization                │     │
+│  │  │                                                                 │     │
+│  │  ├─ GameLevelCSPath1Way.js         Level 1: Wayfinding World       │     │
+│  │  │  • Social classroom connection and registration                 │     │
+│  │  │  • Introduces blogging and "about me" coding foundations        │     │
+│  │  │  • Self-evaluation checkpoint (passport to next level)          │     │
+│  │  │                                                                 │     │
+│  │  ├─ GameLevelCSPath2Mission.js     Level 2: Mission Tools          │     │
+│  │  │  • Personal computer setup and local SDLC workflow              │     │
+│  │  │  • Transition from online-only to local development             │     │
+│  │  │  • Tools: GitHub, VSCode, Browser, Terminal, Make               │     │
+│  │  │  • Prepares student for PBL-based CompSci learning              │     │
+│  │  │                                                                 │     │
+│  │  └─ GameLevelCSPathIdentity.js     Shared Base Class               │     │
+│  │     • Shares Identity Forge data across all levels                 │     │
+│  │     • Helper class extended by Wayfinding and Mission              │     │
+│  │     • Simplifies profile management across game progression        │     │
+│  │                                                                    │     │
+│  │  Game Engine Essentials (View Components):                         │     │
+│  │  └─ essentials/*                                                   │     │
+│  │     • StatusPanel.js  - Player profile display                     │     │
+│  │     • FormPanel.js    - Identity Terminal input forms              │     │
+│  │     • Picker.js       - Avatar and theme selectors                 │     │
+│  │     • DialogueSystem  - NPC interactions                           │     │
+│  │     • Core rendering and UI abstraction                            │     │
+│  └────────────────────────────────────────────────────────────────────┘     │
+│                                                                             │
+│  ┌────────────────────────────────────────────────────────────────────┐     │
+│  │  📂 /_projects/cs-pathway-game/model/                 [MODEL]      │     │
+│  │                                                                    │     │
+│  │  Data Persistence Bridge:                                          │     │
+│  │  ├─ ProfileManager.js           Profile Orchestrator               │     │
+│  │  │  • Unified persistence manager (abstraction layer)              │     │
+│  │  │  • JSON in / JSON out interface for View and Controller         │     │
+│  │  │  • Coordinates localStorage speed + backend reliability         │     │
+│  │  │  • Maps data to OCS User table columns efficiently              │     │
+│  │  │                                                                 │     │
+│  │  ├─ localProfile.js              Primary Storage                   │     │
+│  │  │  • localStorage management (instant, client-side)               │     │
+│  │  │  • Source of truth for all users                                │     │
+│  │  │                                                                 │     │
+│  │  └─ persistentProfile.js         Secondary Storage                 │     │
+│  │     • Flask API fetch request/response layer                       │     │
+│  │     • Backend analytics and cross-device recovery                  │     │
+│  │     • Instructor dashboard data                                    │     │
+│  └────────────────────────────────────────────────────────────────────┘     │
+│                                                                             │
+│  Design Philosophy:                                                         │
 │     • Immersive experience minimizing text/walls of instructions            │
 │     • Exploratory, game-based onboarding to course concepts                 │
 │     • Project-Based Learning (PBL) preparation through gaming               │
-│                                                                              │
+│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 
