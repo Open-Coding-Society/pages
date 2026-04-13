@@ -9,29 +9,40 @@ permalink: /gamify/overview
 
 ## Directory Structure
 
-**Student-friendly project organization for the CS Pathway gamified learning experience.**
+Project-friendly project organization for the introductory gamify experience.
 
-```type
-projects/cs-pathway-game/
-├── notebook.src.ipynb               [Source notebook - edit here]
+```text
+_projects/gamify/
+├── notebook.src.ipynb
 ├── levels/
-│   ├── GameLevelWater.js           [Underwater with Gravity]
-│   ├── GameLevelDesert.js          [GameObject Samples]
-│   ├── GameLevelEnd.js             [Spider Attach Game]
-│   └── GameLevelOverworld.js  [Creeper Attack Game]
-├── model/                         [Not used]
-├── images/                        [40+ Samples] 
+│   ├── GameLevelWater.js
+│   ├── GameLevelDesert.js
+│   ├── GameLevelEnd.js
+│   └── GameLevelOverworld.js
+├── model/
+├── images/
 └── docs/
-    └── README.md                   [This file - project overview]
+    └── README.md
 ```
+
+Runtime/distributed outputs are generated into GitHub Pages folders by Makefile:
+
+- _notebooks/projects/gamify/
+- _posts/projects/gamify/
+- assets/js/projects/gamify/
+- images/projects/gamify/
 
 ## Development Workflow
 
-### Fast Development Mode (Pre-requisite)
+Primary SDLC workflow:
 
-**Use `make dev` Only test-loads _projects
+```bash
+make dev
+```
 
-Regeneration has dependncy now:
+This is the main build-and-test loop for development. It starts Jekyll and the registered project watchers so edits are copied, converted, and regenerated automatically.
+
+Before using live regeneration with make dev, install fswatch:
 
 ```bash
 # macOS
@@ -39,66 +50,103 @@ brew install fswatch
 
 # Ubuntu/Debian
 sudo apt install fswatch
-
 ```
 
-### Build Commands
+Without fswatch, the project watcher falls back to manual rebuild instructions instead of auto-regeneration.
+
+Validate this project after make dev when you want to force a full re-copy of distributed files.
+
+Use this when:
+
+- You renamed files or folders.
+- You want to confirm files were copied to expected runtime directories.
+- You want to isolate one project's distribution behavior while debugging.
 
 ```bash
-# 1. Test make changes
-make -C _project/cs-pathway-game
-# Should see: ✅ CS Pathway Game built successfully
-
-# 2. Start dev server with auto-watch
-make dev
-# Should see: 👀 Watching CS Pathway Game project (auto-copy on save)...
-
-# 3. Edit a file in _projects/cs-pathway-game/
-# Save changes → should see auto-copy message → Jekyll regenerates
-
-# 4. Clean up
-make stop
-make clean
-# Should clean distributed files but preserve source in _projects/
+make -C _projects/gamify build
+make -C _projects/gamify docs # docs are not in make dev
 ```
 
-### Edit/Save workflow
+Validate all registered projects when you need a repo-wide distribution refresh or consistency check.
 
-1. Edit files in `_projects/gamify/`
-   - `notebook.src.ipynb` - converted automatically when saved (via make dev)
-   - `levels/*.js` - copied automatically when saved to js/projects
-   - `images/*` - copied automatically when added/changed to images/projects
+Use this when:
 
-2. Save file → Auto-distribution happens → Jekyll regenerates → Refresh browser
+- Multiple projects were renamed or restructured.
+- You want to verify all registered project outputs in one run.
+- You want a quick pre-commit sanity check for project distribution.
 
-3. See changes immediately at http://localhost:4500/gamify
+```bash
+make build-registered-projects
+make build-registered-docs # docs are not in make dev
+```
 
+## CI/CD Targets and Action Logs
 
-### Path Management
+GitHub Actions uses the same registered targets:
 
-**All paths in code use absolute runtime paths** (no config.js needed):
+```yaml
+- name: Build registered projects
+  run: |
+    make build-registered-projects
+    make build-registered-docs
+```
 
-- Images via gameEnv: `gameEnv.path + '/images/gamify/gamify/odtocat.png'`
-- Game engine: `/assets/js/GameEnginev1.1/Coin.js`
-- Game engine essentials: `/assets/js/GameEnginev1.1/essentials/Player.js`
-- Local imports (levels): `./GameLevelDesert.js`
+Expected Actions log lines for project-level visibility:
 
-The build system handles distribution - you just edit here!
+- 📦 Building project: gamify
+- 📚 Building docs for: gamify
 
-## File References
+If docs verification is enabled in workflow, expect summary lines similar to:
 
-### In notebook.src.ipynb
+- Registered project docs found: <count>
+- Sample generated docs:
+
+These logs are the quickest way to confirm _projects registration and distribution are running in CI.
+
+## Edit/Save Workflow
+
+1. Edit files in _projects/gamify/
+2. Save file and let auto-distribution run.
+3. Jekyll regenerates affected pages.
+4. Refresh browser and validate changes.
+
+## Path Guidance
+
+Use runtime absolute paths in code.
 
 ```javascript
-// Images use gameEnv.path
+// Image path from gameEnv
 const sprite = gameEnv.path + '/images/projects/gamify/knight.png';
-// Sample GameEngine import 
+
+// Shared game engine import
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
 ```
 
-## Why This Structure?
+## Registration Model
 
-1. **Project-friendly**: All related files in one place, easier to manage project and understand dependendencies
-2. **Jekyll-compatible**: Build distributes to required locations
-3. **No path complexity**: Code uses final deployed paths
-4. **Version control**: Track source files here, generated files ignored
+Project integration into Makefile is registration-based.
+
+1. Add project name to _projects/.makeprojects.
+2. Use the project Makefile template targets: build, clean, watch, docs, docs-clean.
+3. For new projects, typically only DATE_OF_CREATION and project files change.
+
+No Makefile fragments or project-specific root targets are required.
+
+## Version Control Strategy
+
+Track source files in _projects. Treat distributed files as generated artifacts.
+
+```gitignore
+# Track source
+!_projects/gamify/**
+
+# Ignore generated distribution
+_notebooks/projects/gamify/
+assets/js/projects/gamify/
+images/projects/gamify/
+_posts/projects/gamify/
+```
+
+## Notes
+
+This README is the baseline introduction to the build system concepts. Real-world, deeper references belong in the cs-pathway-game docs.
