@@ -157,6 +157,10 @@ class GameLevelCsPath0Forge {
       backgroundSrc: bg_data.src,
     });
 
+    // FriendlyNpc expects these level references for toast routing in this engine build
+    this.gameEnv.currentLevel = this;
+    this.gameEnv.gameLevel = this;
+
     // ── Gatekeepers ────────────────────────────────────────────
     const level = this;
 
@@ -193,12 +197,14 @@ class GameLevelCsPath0Forge {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
 
-    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
+    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance, zoneMessage, alertDistance }) => ({
       ...gatekeeperBaseData,
       id,
       greeting,
       INIT_POSITION: { ...position },
       interactDistance: interactDistance || 120,
+      ...(zoneMessage ? { zoneMessage } : {}),
+      ...(typeof alertDistance === 'number' ? { alertDistance } : {}),
       reaction: function () {
         if (reaction) reaction.call(this);
         if (level?.showToast) {
@@ -219,6 +225,8 @@ class GameLevelCsPath0Forge {
       id: 'StartGatekeeper',
       greeting: "Welcome to the Path of Code-Code-Coding...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
       position: startGatekeeperPos,
+      zoneMessage: 'Gatekeeper: Press E to begin your identity journey.',
+      alertDistance: 0.2,
       reaction: () => {
         if (identityState.startGatekeeperDone) return;
         identityState.startGatekeeperDone = true;
@@ -237,6 +245,8 @@ class GameLevelCsPath0Forge {
       id: 'IdentityGatekeeper',
       greeting: "This terminal is waiting for your identity. Press E to verify it!",
       position: identityGatekeeperPos,
+      zoneMessage: 'Identity Terminal: Press E to verify your identity.',
+      alertDistance: 0.2,
       reaction: function() {
         void level.runIdentityTerminal(!identityState.identityUnlocked);
       },
@@ -646,6 +656,8 @@ class GameLevelCsPath0Forge {
       id: 'AvatarGatekeeper',
       greeting: "Welcome to the Avatar Forge...\nChoose your look and watch your character update live!",
       position: avatarGatekeeperPos,
+      zoneMessage: 'Avatar Forge: Press E to customize your avatar.',
+      alertDistance: 0.2,
       reaction: function() {
         void level.runAvatarForge(true, this);
       },
@@ -713,6 +725,8 @@ class GameLevelCsPath0Forge {
       id: 'WorldThemeGatekeeper',
       greeting: "Welcome to the World Theme Portal...\nChoose a background and watch your world transform live!",
       position: worldThemeGatekeeperPos,
+      zoneMessage: 'World Theme Portal: Press E to reshape your world.',
+      alertDistance: 0.2,
       reaction: function() {
         void level.runWorldThemePortal(true, this);
       },
@@ -855,17 +869,80 @@ class GameLevelCsPath0Forge {
 
     // Toast: Show status message.
     this.showToast = function(message) {
+      if (message === 'Press E to interact') {
+        return;
+      }
+
+      const host = this.gameEnv?.container || this.gameEnv?.gameContainer || document.body;
+      if (!host) return;
+
+      const hostPosition = window.getComputedStyle(host).position;
+      if (hostPosition === 'static') {
+        host.style.position = 'relative';
+      }
+
+      if (this._toastEl?.parentNode) {
+        this._toastEl.parentNode.removeChild(this._toastEl);
+      }
+      if (this._toastTimer) {
+        clearTimeout(this._toastTimer);
+      }
+
       const toast = document.createElement('div');
       toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 99999;
-        background: #0d0d1a; border: 2px solid #4ecca3;
+        position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
+        z-index: 1200; pointer-events: none;
+        background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
         color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-        padding: 12px 20px; border-radius: 6px; letter-spacing: 1px;
-        box-shadow: 0 0 20px rgba(78,204,163,0.3);
+        padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
+        box-shadow: 0 0 20px rgba(78,204,163,0.25);
+        max-width: min(92%, 760px); text-align: center;
       `;
       toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
+      host.appendChild(toast);
+
+      this._toastEl = toast;
+      this._toastTimer = setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+        if (this._toastEl === toast) this._toastEl = null;
+        this._toastTimer = null;
+      }, 2200);
+    };
+
+    this.setZoneAlert = function(message) {
+      const host = this.gameEnv?.container || this.gameEnv?.gameContainer || document.body;
+      if (!host) return;
+
+      if (!this._zoneAlertEl) {
+        const zoneAlert = document.createElement('div');
+        zoneAlert.style.cssText = `
+          position: fixed; left: 12px; top: 50%; transform: translateY(-50%);
+          z-index: 1201; pointer-events: none;
+          background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
+          color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
+          padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
+          box-shadow: 0 0 20px rgba(78,204,163,0.25);
+          width: min(320px, 28vw); text-align: left;
+        `;
+        document.body.appendChild(zoneAlert);
+        this._zoneAlertEl = zoneAlert;
+      }
+
+      this._zoneAlertEl.textContent = message;
+
+      const hostRect = host.getBoundingClientRect();
+      const desiredLeft = hostRect.left - this._zoneAlertEl.offsetWidth - 16;
+      const clampedLeft = Math.max(12, desiredLeft);
+      const desiredTop = hostRect.top + (hostRect.height * 0.5);
+      this._zoneAlertEl.style.left = `${clampedLeft}px`;
+      this._zoneAlertEl.style.top = `${desiredTop}px`;
+    };
+
+    this.clearZoneAlert = function() {
+      if (this._zoneAlertEl?.parentNode) {
+        this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
+      }
+      this._zoneAlertEl = null;
     };
 
 
@@ -1470,6 +1547,99 @@ class GameLevelCsPath0Forge {
       { class: FriendlyNpc,      data: npc_data_avatarGatekeeper },
       { class: FriendlyNpc,      data: npc_data_worldThemeGatekeeper },
     ];
+
+    this._forgeGatekeeperIds = [
+      'StartGatekeeper',
+      'IdentityGatekeeper',
+      'AvatarGatekeeper',
+      'WorldThemeGatekeeper',
+    ];
+  }
+
+  initialize() {
+    const objects = this.gameEnv?.gameObjects || [];
+    const gatekeepers = objects.filter((obj) => this._forgeGatekeeperIds?.includes(obj?.spriteData?.id));
+    this._rebindMissingGatekeeperReactions(gatekeepers);
+
+    console.log('[Forge] gatekeeper reactions rebound:', gatekeepers.map((g) => ({
+      id: g?.spriteData?.id,
+      hasReaction: typeof g?.reaction === 'function',
+      hasSpriteReaction: typeof g?.spriteData?.reaction === 'function',
+    })));
+
+    this._forgeGatekeeperObjects = gatekeepers;
+    this._activeZoneGatekeeperId = null;
+  }
+
+  _rebindMissingGatekeeperReactions(gatekeepers) {
+    gatekeepers.forEach((gatekeeper) => {
+      if (typeof gatekeeper?.reaction !== 'function' && typeof gatekeeper?.spriteData?.reaction === 'function') {
+        gatekeeper.reaction = gatekeeper.spriteData.reaction;
+      }
+    });
+  }
+
+  _getObjectCenter(object) {
+    return {
+      x: (object?.position?.x || 0) + (object?.width || 0) / 2,
+      y: (object?.position?.y || 0) + (object?.height || 0) / 2,
+    };
+  }
+
+  _getGatekeeperAlertDistancePx(gatekeeper) {
+    const alertMultiplier = gatekeeper?._alertDistanceMultiplier ?? gatekeeper?.spriteData?.alertDistance ?? 1.25;
+    if ((gatekeeper?.width || 0) > 0) {
+      return gatekeeper.width * alertMultiplier;
+    }
+    return (gatekeeper?.interactDistance || 120) * 1.5;
+  }
+
+  _findNearestGatekeeperInZone(player, gatekeepers) {
+    const playerCenter = this._getObjectCenter(player);
+    const collisionIds = player?.state?.collisionEvents || [];
+
+    let nearestGatekeeper = null;
+    let nearestDistance = Infinity;
+
+    for (const gatekeeper of gatekeepers) {
+      const gatekeeperCenter = this._getObjectCenter(gatekeeper);
+      const distance = Math.hypot(playerCenter.x - gatekeeperCenter.x, playerCenter.y - gatekeeperCenter.y);
+      const inCollision = collisionIds.includes(gatekeeper?.spriteData?.id);
+      const inZone = inCollision || distance < this._getGatekeeperAlertDistancePx(gatekeeper);
+
+      if (inZone && distance < nearestDistance) {
+        nearestGatekeeper = gatekeeper;
+        nearestDistance = distance;
+      }
+    }
+
+    return nearestGatekeeper;
+  }
+
+  _syncGatekeeperZoneAlert(nearestGatekeeper) {
+    if (nearestGatekeeper) {
+      const zoneMessage = nearestGatekeeper.spriteData?.zoneMessage || 'Press E to interact';
+      this.setZoneAlert(zoneMessage);
+      this._activeZoneGatekeeperId = nearestGatekeeper.spriteData?.id || null;
+      return;
+    }
+
+    if (this._activeZoneGatekeeperId) {
+      this.clearZoneAlert();
+      this._activeZoneGatekeeperId = null;
+    }
+  }
+
+  update() {
+    const player = this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
+    if (!player || !Array.isArray(this._forgeGatekeeperObjects)) return;
+
+    const nearestGatekeeper = this._findNearestGatekeeperInZone(player, this._forgeGatekeeperObjects);
+    this._syncGatekeeperZoneAlert(nearestGatekeeper);
+  }
+
+  destroy() {
+    this.clearZoneAlert();
   }
 }
 
