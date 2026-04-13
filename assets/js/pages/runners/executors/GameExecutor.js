@@ -233,57 +233,20 @@ export class GameExecutor {
 
       // Create fullscreen overlay
       this.fullscreenOverlay = document.createElement('div');
-      this.fullscreenOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.95);
-        z-index: 10000;
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
-      `;
+      this.fullscreenOverlay.className = 'game-fullscreen-overlay';
 
       // Create collapsible control panel header
       const controlHeader = document.createElement('div');
       controlHeader.className = 'fullscreen-control-header';
-      controlHeader.style.cssText = `
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        padding: 0.75rem 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-      `;
 
       // Add collapse toggle button
       const collapseBtn = document.createElement('button');
+      collapseBtn.className = 'fullscreen-collapse-btn';
       collapseBtn.textContent = '▲';
       collapseBtn.title = 'Collapse Controls';
-      collapseBtn.style.cssText = `
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-      `;
 
       const controlsContainer = document.createElement('div');
       controlsContainer.className = 'fullscreen-controls-container';
-      controlsContainer.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        flex: 1;
-        transition: all 0.3s ease;
-      `;
 
       // Clone control buttons
       const clonedRunBtn = this.runBtn ? this.runBtn.cloneNode(true) : null;
@@ -292,38 +255,6 @@ export class GameExecutor {
       const clonedFullscreenBtn = this.fullscreenBtn ? this.fullscreenBtn.cloneNode(true) : null;
       const clonedEngineSelect = this.engineVersionSelect ? this.engineVersionSelect.cloneNode(true) : null;
       const clonedLevelSelect = this.levelSelect ? this.levelSelect.cloneNode(true) : null;
-
-      // Style cloned buttons for fullscreen
-      [clonedRunBtn, clonedPauseBtn, clonedStopBtn, clonedFullscreenBtn].forEach(btn => {
-        if (btn) {
-          btn.style.cssText = `
-            background: rgba(102, 126, 234, 0.9);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-          `;
-        }
-      });
-
-      // Style cloned selects for fullscreen
-      [clonedEngineSelect, clonedLevelSelect].forEach(select => {
-        if (select) {
-          select.style.cssText = `
-            background: rgba(102, 126, 234, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 0.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-          `;
-        }
-      });
 
       // Add event listeners to cloned buttons to trigger original buttons
       if (clonedRunBtn) {
@@ -366,27 +297,22 @@ export class GameExecutor {
       collapseBtn.addEventListener('click', () => {
         isCollapsed = !isCollapsed;
         if (isCollapsed) {
-          controlsContainer.style.display = 'none';
+          controlsContainer.classList.add('collapsed');
+          controlHeader.classList.add('collapsed');
           collapseBtn.textContent = '▼';
           collapseBtn.title = 'Expand Controls';
-          controlHeader.style.padding = '0.5rem 1.5rem';
         } else {
-          controlsContainer.style.display = 'flex';
+          controlsContainer.classList.remove('collapsed');
+          controlHeader.classList.remove('collapsed');
           collapseBtn.textContent = '▲';
           collapseBtn.title = 'Collapse Controls';
-          controlHeader.style.padding = '0.75rem 1.5rem';
         }
       });
 
       // Add title
       const title = document.createElement('span');
+      title.className = 'fullscreen-title';
       title.textContent = 'Game Controls';
-      title.style.cssText = `
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-        margin-right: auto;
-      `;
 
       controlHeader.appendChild(collapseBtn);
       controlHeader.appendChild(title);
