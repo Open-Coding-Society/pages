@@ -8,9 +8,8 @@ import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
-import PersistentProfile from '/assets/js/projects/cs-pathway-game/model/persistentProfile.js';
-import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import LoginManager from '/assets/js/projects/cs-pathway-game/model/LoginManager.js';
 
 // Constants: Profile panel configuration
 const PROFILE_PANEL_ID = 'csse-profile-panel';
@@ -287,11 +286,25 @@ class GameLevelCsPath0Forge {
           ]);
         }
 
-        // Check if already authenticated before showing identity form.
-        const isAuth = await PersistentProfile.isAuthenticated().catch(() => false);
-        if (!isAuth) {
-          const didAuth = await level.showAuthFlow();
-          if (!didAuth) return;
+        // Check auth status via LoginManager; show built-in panel if not logged in.
+        let authBody = null;
+        const authStatus = await LoginManager.isAuthenticated();
+        if (authStatus.success) {
+          authBody = authStatus.body;
+        } else {
+          const authResult = await LoginManager.showPanel(uiTheme);
+          if (!authResult.success) return;
+          authBody = authResult.body;
+        }
+
+        // Prefill identity form with data from the authenticated user.
+        if (authBody) {
+          this.profileData = {
+            ...this.profileData,
+            name:     authBody.name  || this.profileData?.name     || '',
+            email:    authBody.email || this.profileData?.email    || '',
+            githubID: authBody.uid   || this.profileData?.githubID || '',
+          };
         }
 
         const identityData = await this.showIdentityForm();
@@ -309,321 +322,6 @@ class GameLevelCsPath0Forge {
       } finally {
         identityState.identityFlowActive = false;
       }
-    };
-
-    // Auth flow: built-in sign-up / login panel shown inside the terminal.
-    this.showAuthFlow = function() {
-      return new Promise((resolve) => {
-        const overlay = document.createElement('div');
-        Object.assign(overlay.style, {
-          position: 'fixed', inset: '0', zIndex: '10001',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '16px',
-          background: uiTheme.overlayBackground,
-        });
-
-        const panel = document.createElement('section');
-        Object.assign(panel.style, {
-          width: '90%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto',
-          padding: '24px 28px', borderRadius: '10px',
-          fontFamily: '"Courier New", monospace',
-          background: uiTheme.background,
-          border: `2px solid ${uiTheme.borderColor}`,
-          color: uiTheme.textColor,
-          boxShadow: uiTheme.boxShadow,
-        });
-
-        // ── helpers ─────────────────────────────────────────────────────
-        const mkStyle = (el, styles) => Object.assign(el.style, styles);
-
-        const mkText = (tag, text, styles = {}) => {
-          const el = document.createElement(tag);
-          el.textContent = text;
-          mkStyle(el, styles);
-          return el;
-        };
-
-        const mkInput = (type, placeholder, autocomplete) => {
-          const el = document.createElement('input');
-          el.type = type; el.placeholder = placeholder;
-          el.autocomplete = autocomplete || 'off';
-          mkStyle(el, {
-            width: '100%', boxSizing: 'border-box',
-            background: uiTheme.inputBackground,
-            border: `1px solid ${uiTheme.borderColor}`,
-            borderRadius: '4px', padding: '8px',
-            color: uiTheme.textColor,
-            fontFamily: '"Courier New", monospace',
-            marginBottom: '8px',
-          });
-          ['keydown','keyup','keypress'].forEach(ev =>
-            el.addEventListener(ev, e => e.stopPropagation())
-          );
-          return el;
-        };
-
-        const mkBtn = (text, primary) => {
-          const btn = document.createElement('button');
-          btn.type = 'button'; btn.textContent = text;
-          mkStyle(btn, {
-            background: primary ? uiTheme.buttonBackground : uiTheme.secondaryButtonBackground,
-            color: primary ? uiTheme.buttonTextColor : uiTheme.secondaryButtonTextColor,
-            border: primary ? 'none' : `1px solid ${uiTheme.borderColor}`,
-            borderRadius: '4px', padding: '10px 16px',
-            fontFamily: '"Courier New", monospace',
-            fontWeight: primary ? 'bold' : 'normal',
-            cursor: 'pointer', marginRight: '8px',
-          });
-          return btn;
-        };
-
-        const mkStatus = () => {
-          const el = document.createElement('div');
-          mkStyle(el, { fontSize: '12px', marginTop: '8px', minHeight: '18px', whiteSpace: 'pre-wrap' });
-          return el;
-        };
-
-        const close = (result) => { overlay.remove(); resolve(result); };
-
-        // ── view builder ────────────────────────────────────────────────
-        const renderView = (view) => {
-          panel.innerHTML = '';
-
-          panel.appendChild(mkText('div', '⚔ IDENTITY TERMINAL', {
-            color: uiTheme.accentColor, fontSize: '15px', fontWeight: 'bold',
-            letterSpacing: '2px', textTransform: 'uppercase',
-            marginBottom: '4px', textAlign: 'center',
-          }));
-
-          if (view === 'choose') {
-            panel.appendChild(mkText('p', 'To register your identity, you need an account.', {
-              fontSize: '12px', color: uiTheme.secondaryTextColor, marginBottom: '16px', textAlign: 'center',
-            }));
-
-            const loginBtn = mkBtn('Log In', true);
-            const signupBtn = mkBtn('Sign Up', false);
-            const cancelBtn = mkBtn('Cancel', false);
-
-            loginBtn.addEventListener('click', () => renderView('login'));
-            signupBtn.addEventListener('click', () => renderView('signup'));
-            cancelBtn.addEventListener('click', () => close(false));
-
-            const row = document.createElement('div');
-            mkStyle(row, { display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', marginTop: '8px' });
-            row.appendChild(loginBtn);
-            row.appendChild(signupBtn);
-            row.appendChild(cancelBtn);
-            panel.appendChild(row);
-          }
-
-          if (view === 'login') {
-            panel.appendChild(mkText('div', 'LOG IN', {
-              color: uiTheme.accentColor, fontSize: '13px', letterSpacing: '1px',
-              marginBottom: '14px', marginTop: '8px',
-            }));
-
-            const uid = mkInput('text', 'GitHub ID', 'username');
-            const pass = mkInput('password', 'Password', 'current-password');
-            const status = mkStatus();
-
-            const doLogin = async () => {
-              const uidVal = uid.value.trim();
-              const passVal = pass.value;
-              if (!uidVal || !passVal) { status.textContent = 'Please fill in all fields.'; return; }
-
-              submitBtn.disabled = true;
-              status.style.color = uiTheme.secondaryTextColor;
-              status.textContent = 'Logging in…';
-
-              try {
-                const res = await fetch(`${pythonURI}/api/authenticate`, {
-                  ...fetchOptions, method: 'POST',
-                  body: JSON.stringify({ uid: uidVal, password: passVal }),
-                });
-                if (!res.ok) {
-                  status.style.color = '#ff6b6b';
-                  status.textContent = res.status === 401 ? 'Invalid credentials. Try again.' : `Login failed (${res.status}).`;
-                  submitBtn.disabled = false;
-                  return;
-                }
-                status.style.color = uiTheme.accentColor;
-                status.textContent = '✓ Logged in! Loading profile…';
-                setTimeout(() => close(true), 800);
-              } catch (err) {
-                status.style.color = '#ff6b6b';
-                status.textContent = 'Network error. Check connection.';
-                submitBtn.disabled = false;
-              }
-            };
-
-            const submitBtn = mkBtn('Log In', true);
-            submitBtn.addEventListener('click', doLogin);
-            uid.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doLogin(); } });
-            pass.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doLogin(); } });
-
-            const backBtn = mkBtn('← Back', false);
-            backBtn.addEventListener('click', () => renderView('choose'));
-            const cancelBtn = mkBtn('Cancel', false);
-            cancelBtn.addEventListener('click', () => close(false));
-
-            panel.appendChild(uid);
-            panel.appendChild(pass);
-            panel.appendChild(status);
-
-            const row = document.createElement('div');
-            mkStyle(row, { display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '8px', marginTop: '8px' });
-            row.appendChild(backBtn); row.appendChild(cancelBtn); row.appendChild(submitBtn);
-            panel.appendChild(row);
-
-            setTimeout(() => uid.focus(), 0);
-          }
-
-          if (view === 'signup') {
-            panel.appendChild(mkText('div', 'CREATE ACCOUNT', {
-              color: uiTheme.accentColor, fontSize: '13px', letterSpacing: '1px',
-              marginBottom: '14px', marginTop: '8px',
-            }));
-
-            const name   = mkInput('text',     'Name',                       'name');
-            const uidEl  = mkInput('text',     'GitHub ID',                  'username');
-            const sidEl  = mkInput('text',     'Student ID',                 'off');
-            const school = document.createElement('select');
-            mkStyle(school, {
-              width: '100%', boxSizing: 'border-box',
-              background: uiTheme.inputBackground,
-              border: `1px solid ${uiTheme.borderColor}`,
-              borderRadius: '4px', padding: '8px',
-              color: uiTheme.textColor,
-              fontFamily: '"Courier New", monospace',
-              marginBottom: '8px',
-            });
-            [
-              ['', 'Select Your High School', true],
-              ['Abraxas High School',       'Abraxas'],
-              ['Del Norte High School',     'Del Norte'],
-              ['Mt Carmel High School',     'Mt Carmel'],
-              ['Poway High School',         'Poway'],
-              ['Poway to Palomar',          'Poway to Palomar'],
-              ['Rancho Bernardo High School','Rancho Bernardo'],
-              ['Westview High School',      'Westview'],
-            ].forEach(([val, label, disabled]) => {
-              const opt = document.createElement('option');
-              opt.value = val; opt.textContent = label;
-              if (!val) { opt.disabled = true; opt.selected = true; }
-              school.appendChild(opt);
-            });
-
-            const email  = mkInput('email',    'Personal (not school) Email', 'email');
-            const pass   = mkInput('password', 'Password',                    'new-password');
-            const pass2  = mkInput('password', 'Confirm Password',             'new-password');
-            const status = mkStatus();
-
-            const doSignup = async () => {
-              const nameVal   = name.value.trim();
-              const uidVal    = uidEl.value.trim();
-              const sidVal    = sidEl.value.trim();
-              const schoolVal = school.value;
-              const emailVal  = email.value.trim();
-              const passVal   = pass.value;
-              const pass2Val  = pass2.value;
-
-              if (!nameVal || !uidVal || !sidVal || !schoolVal || !emailVal || !passVal) {
-                status.style.color = '#ff6b6b';
-                status.textContent = 'Please fill in all fields.';
-                return;
-              }
-              if (passVal.length < 8) {
-                status.style.color = '#ff6b6b';
-                status.textContent = 'Password must be at least 8 characters.';
-                return;
-              }
-              if (passVal !== pass2Val) {
-                status.style.color = '#ff6b6b';
-                status.textContent = 'Passwords do not match.';
-                return;
-              }
-
-              submitBtn.disabled = true;
-              status.style.color = uiTheme.secondaryTextColor;
-              status.textContent = 'Creating account…';
-
-              try {
-                const flaskRes = await fetch(`${pythonURI}/api/user`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    name: nameVal, uid: uidVal, sid: sidVal, school: schoolVal,
-                    email: emailVal, password: passVal, kasm_server_needed: false,
-                  }),
-                });
-
-                if (!flaskRes.ok) {
-                  const errText = await flaskRes.text().catch(() => '');
-                  status.style.color = '#ff6b6b';
-                  status.textContent = `Signup failed (${flaskRes.status}): ${errText.slice(0, 80)}`;
-                  submitBtn.disabled = false;
-                  return;
-                }
-
-                // Also register with Spring backend (non-blocking — ignore errors)
-                fetch(`${javaURI}/api/person/create`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    uid: uidVal, sid: sidVal, email: emailVal,
-                    dob: '11-01-2024', name: nameVal, password: passVal,
-                    kasmServerNeeded: false,
-                  }),
-                }).catch(() => {});
-
-                status.style.color = uiTheme.accentColor;
-                status.textContent = '✓ Account created! Now log in to continue.';
-                submitBtn.disabled = false;
-
-                // Pre-fill login view with same uid
-                setTimeout(() => {
-                  renderView('login');
-                  const uidInput = panel.querySelector('input[autocomplete="username"]');
-                  if (uidInput) uidInput.value = uidVal;
-                }, 1200);
-
-              } catch (err) {
-                status.style.color = '#ff6b6b';
-                status.textContent = 'Network error. Check connection.';
-                submitBtn.disabled = false;
-              }
-            };
-
-            const submitBtn = mkBtn('Create Account', true);
-            submitBtn.addEventListener('click', doSignup);
-
-            const backBtn = mkBtn('← Back', false);
-            backBtn.addEventListener('click', () => renderView('choose'));
-            const cancelBtn = mkBtn('Cancel', false);
-            cancelBtn.addEventListener('click', () => close(false));
-
-            panel.appendChild(name);
-            panel.appendChild(uidEl);
-            panel.appendChild(sidEl);
-            panel.appendChild(school);
-            panel.appendChild(email);
-            panel.appendChild(pass);
-            panel.appendChild(pass2);
-            panel.appendChild(status);
-
-            const row = document.createElement('div');
-            mkStyle(row, { display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '8px', marginTop: '8px' });
-            row.appendChild(backBtn); row.appendChild(cancelBtn); row.appendChild(submitBtn);
-            panel.appendChild(row);
-
-            setTimeout(() => name.focus(), 0);
-          }
-        };
-
-        overlay.appendChild(panel);
-        document.body.appendChild(overlay);
-        renderView('choose');
-      });
     };
 
     // Form: Show identity panel.
