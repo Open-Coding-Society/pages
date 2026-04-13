@@ -150,3 +150,7 @@ _posts/projects/gamify/
 ## Notes
 
 This README is the baseline introduction to the build system concepts. Real-world, deeper references belong in the cs-pathway-game docs.
+
+For an example of lightweight team documentation, see the sample GameLevelWater write-up:
+
+- [Sample Level Documentation](/gamify/gamelevelwater)
