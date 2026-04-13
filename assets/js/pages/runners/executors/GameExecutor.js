@@ -5,9 +5,11 @@ export class GameExecutor {
     runBtn,
     pauseBtn,
     stopBtn,
+    fullscreenBtn,
     levelSelect,
     engineVersionSelect,
     getGameContainer,
+    getGameOutput,
     configuredCanvasHeight = 580,
     path = '',
     getLevelOptionLabel = (levelClass, index) => levelClass?.name || `Level ${index + 1}`,
@@ -17,9 +19,11 @@ export class GameExecutor {
     this.runBtn = runBtn;
     this.pauseBtn = pauseBtn;
     this.stopBtn = stopBtn;
+    this.fullscreenBtn = fullscreenBtn;
     this.levelSelect = levelSelect;
     this.engineVersionSelect = engineVersionSelect;
     this.getGameContainer = getGameContainer;
+    this.getGameOutput = getGameOutput;
     this.configuredCanvasHeight = configuredCanvasHeight;
     this.path = path;
     this.getLevelOptionLabel = getLevelOptionLabel;
@@ -27,6 +31,9 @@ export class GameExecutor {
     this.gameCore = null;
     this.gameControl = null;
     this.gameStateMonitor = null;
+    this.isFullscreen = false;
+    this.fullscreenOverlay = null;
+    this.originalGameOutput = null;
   }
 
   stop() {
@@ -57,6 +64,7 @@ export class GameExecutor {
     if (this.runBtn) this.runBtn.disabled = false;
     if (this.pauseBtn) this.pauseBtn.disabled = true;
     if (this.stopBtn) this.stopBtn.disabled = true;
+    if (this.fullscreenBtn) this.fullscreenBtn.disabled = true;
     if (this.levelSelect) this.levelSelect.disabled = false;
   }
 
@@ -132,6 +140,7 @@ export class GameExecutor {
         this.pauseBtn.title = 'Pause Game';
       }
       if (this.stopBtn) this.stopBtn.disabled = false;
+      if (this.fullscreenBtn) this.fullscreenBtn.disabled = false;
       if (this.levelSelect) this.levelSelect.disabled = true;
 
       const gameContainer = this.getGameContainer?.();
@@ -199,12 +208,254 @@ export class GameExecutor {
       if (this.runBtn) this.runBtn.disabled = false;
       if (this.pauseBtn) this.pauseBtn.disabled = true;
       if (this.stopBtn) this.stopBtn.disabled = true;
+      if (this.fullscreenBtn) this.fullscreenBtn.disabled = true;
       if (this.levelSelect) this.levelSelect.disabled = false;
 
       if (this.gameStateMonitor) {
         clearInterval(this.gameStateMonitor);
         this.gameStateMonitor = null;
       }
+    }
+  }
+
+  toggleFullscreen() {
+    if (!this.getGameOutput) return;
+
+    const gameOutput = this.getGameOutput();
+    if (!gameOutput) return;
+
+    if (!this.isFullscreen) {
+      // Enter fullscreen mode
+      this.originalGameOutput = {
+        parent: gameOutput.parentElement,
+        height: this.configuredCanvasHeight
+      };
+
+      // Create fullscreen overlay
+      this.fullscreenOverlay = document.createElement('div');
+      this.fullscreenOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+      `;
+
+      // Create collapsible control panel header
+      const controlHeader = document.createElement('div');
+      controlHeader.className = 'fullscreen-control-header';
+      controlHeader.style.cssText = `
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      `;
+
+      // Add collapse toggle button
+      const collapseBtn = document.createElement('button');
+      collapseBtn.textContent = '▲';
+      collapseBtn.title = 'Collapse Controls';
+      collapseBtn.style.cssText = `
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      `;
+
+      const controlsContainer = document.createElement('div');
+      controlsContainer.className = 'fullscreen-controls-container';
+      controlsContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 1;
+        transition: all 0.3s ease;
+      `;
+
+      // Clone control buttons
+      const clonedRunBtn = this.runBtn ? this.runBtn.cloneNode(true) : null;
+      const clonedPauseBtn = this.pauseBtn ? this.pauseBtn.cloneNode(true) : null;
+      const clonedStopBtn = this.stopBtn ? this.stopBtn.cloneNode(true) : null;
+      const clonedFullscreenBtn = this.fullscreenBtn ? this.fullscreenBtn.cloneNode(true) : null;
+      const clonedEngineSelect = this.engineVersionSelect ? this.engineVersionSelect.cloneNode(true) : null;
+      const clonedLevelSelect = this.levelSelect ? this.levelSelect.cloneNode(true) : null;
+
+      // Style cloned buttons for fullscreen
+      [clonedRunBtn, clonedPauseBtn, clonedStopBtn, clonedFullscreenBtn].forEach(btn => {
+        if (btn) {
+          btn.style.cssText = `
+            background: rgba(102, 126, 234, 0.9);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+          `;
+        }
+      });
+
+      // Style cloned selects for fullscreen
+      [clonedEngineSelect, clonedLevelSelect].forEach(select => {
+        if (select) {
+          select.style.cssText = `
+            background: rgba(102, 126, 234, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+          `;
+        }
+      });
+
+      // Add event listeners to cloned buttons to trigger original buttons
+      if (clonedRunBtn) {
+        clonedRunBtn.addEventListener('click', () => this.runBtn?.click());
+        controlsContainer.appendChild(clonedRunBtn);
+      }
+      if (clonedPauseBtn) {
+        clonedPauseBtn.addEventListener('click', () => this.pauseBtn?.click());
+        controlsContainer.appendChild(clonedPauseBtn);
+      }
+      if (clonedStopBtn) {
+        clonedStopBtn.addEventListener('click', () => this.stopBtn?.click());
+        controlsContainer.appendChild(clonedStopBtn);
+      }
+      if (clonedFullscreenBtn) {
+        clonedFullscreenBtn.addEventListener('click', () => this.fullscreenBtn?.click());
+        controlsContainer.appendChild(clonedFullscreenBtn);
+      }
+
+      // Add event listeners to cloned selects to sync with originals
+      if (clonedEngineSelect && this.engineVersionSelect) {
+        clonedEngineSelect.addEventListener('change', () => {
+          this.engineVersionSelect.value = clonedEngineSelect.value;
+          // Trigger change event on original
+          this.engineVersionSelect.dispatchEvent(new Event('change'));
+        });
+        controlsContainer.appendChild(clonedEngineSelect);
+      }
+      if (clonedLevelSelect && this.levelSelect) {
+        clonedLevelSelect.addEventListener('change', () => {
+          this.levelSelect.value = clonedLevelSelect.value;
+          // Trigger change event on original
+          this.levelSelect.dispatchEvent(new Event('change'));
+        });
+        controlsContainer.appendChild(clonedLevelSelect);
+      }
+
+      // Collapse/expand functionality
+      let isCollapsed = false;
+      collapseBtn.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
+        if (isCollapsed) {
+          controlsContainer.style.display = 'none';
+          collapseBtn.textContent = '▼';
+          collapseBtn.title = 'Expand Controls';
+          controlHeader.style.padding = '0.5rem 1.5rem';
+        } else {
+          controlsContainer.style.display = 'flex';
+          collapseBtn.textContent = '▲';
+          collapseBtn.title = 'Collapse Controls';
+          controlHeader.style.padding = '0.75rem 1.5rem';
+        }
+      });
+
+      // Add title
+      const title = document.createElement('span');
+      title.textContent = 'Game Controls';
+      title.style.cssText = `
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-right: auto;
+      `;
+
+      controlHeader.appendChild(collapseBtn);
+      controlHeader.appendChild(title);
+      controlHeader.appendChild(controlsContainer);
+
+      // Assemble fullscreen overlay
+      this.fullscreenOverlay.appendChild(controlHeader);
+      this.fullscreenOverlay.appendChild(gameOutput);
+      document.body.appendChild(this.fullscreenOverlay);
+
+      // Update canvas height to account for control header
+      const headerHeight = controlHeader.offsetHeight || 60;
+      const viewportHeight = window.innerHeight - headerHeight - 20; // Leave some padding
+      this.configuredCanvasHeight = viewportHeight;
+
+      // Update button text
+      if (this.fullscreenBtn) {
+        this.fullscreenBtn.textContent = '⛶ Minimize';
+        this.fullscreenBtn.title = 'Exit Fullscreen';
+      }
+
+      this.isFullscreen = true;
+
+      // Restart game with new dimensions
+      this.run();
+
+      // Handle ESC key to exit fullscreen
+      this.escapeHandler = (e) => {
+        if (e.key === 'Escape' && this.isFullscreen) {
+          this.toggleFullscreen();
+        }
+      };
+      document.addEventListener('keydown', this.escapeHandler);
+
+    } else {
+      // Exit fullscreen mode
+      if (this.fullscreenOverlay) {
+        // Move game-output back to original parent
+        if (this.originalGameOutput && this.originalGameOutput.parent) {
+          this.originalGameOutput.parent.appendChild(gameOutput);
+        }
+
+        // Remove overlay
+        this.fullscreenOverlay.remove();
+        this.fullscreenOverlay = null;
+      }
+
+      // Restore original height
+      if (this.originalGameOutput) {
+        this.configuredCanvasHeight = this.originalGameOutput.height;
+        this.originalGameOutput = null;
+      }
+
+      // Update button text
+      if (this.fullscreenBtn) {
+        this.fullscreenBtn.textContent = '⛶ Fullscreen';
+        this.fullscreenBtn.title = 'Enter Fullscreen';
+      }
+
+      this.isFullscreen = false;
+
+      // Remove ESC key handler
+      if (this.escapeHandler) {
+        document.removeEventListener('keydown', this.escapeHandler);
+        this.escapeHandler = null;
+      }
+
+      // Restart game with original dimensions
+      this.run();
     }
   }
 }

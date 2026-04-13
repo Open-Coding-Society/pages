@@ -10,6 +10,7 @@
       <button type="button" class="runBtn" title="Start Game">▶ Start</button>
       <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
       <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
+      <button type="button" class="fullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
       <select class="engineVersionSelect" title="Select Game Engine Version">
         <option value="GameEnginev1">Engine v1</option>
         <option value="GameEnginev1.1" selected>Engine v1.1</option>
@@ -36,6 +37,7 @@
     <button type="button" class="runBtn" title="Start Game">▶ Play</button>
     <button type="button" class="pauseBtn" title="Pause Game">⏸ Pause</button>
     <button type="button" class="stopBtn" title="Stop Game">■ Stop</button>
+    <button type="button" class="fullscreenBtn" title="Toggle Fullscreen">⛶ Fullscreen</button>
     <select class="engineVersionSelect" title="Select Game Engine Version">
       <option value="GameEnginev1">Engine v1</option>
       <option value="GameEnginev1.1" selected>Engine v1.1</option>
@@ -113,6 +115,7 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   const runBtn = container.querySelector('.runBtn');
   const pauseBtn = container.querySelector('.pauseBtn');
   const stopBtn = container.querySelector('.stopBtn');
+  const fullscreenBtn = container.querySelector('.fullscreenBtn');
   const engineVersionSelect = container.querySelector('.engineVersionSelect');
   const levelSelect = container.querySelector('.levelSelect');
   const gameOutput = container.querySelector('.game-output');
@@ -124,9 +127,11 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
     runBtn,
     pauseBtn,
     stopBtn,
+    fullscreenBtn,
     levelSelect,
     engineVersionSelect,
     getGameContainer: () => document.getElementById('game-container-{{ include.runner_id }}'),
+    getGameOutput: () => gameOutput,
     configuredCanvasHeight,
     path: '{{ site.baseurl }}',
     getLevelOptionLabel,
@@ -135,6 +140,7 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   // Disable game controls initially
   pauseBtn.disabled = true;
   stopBtn.disabled = true;
+  if (fullscreenBtn) fullscreenBtn.disabled = true;
 
   // Update status
   function updateStatus(status) {
@@ -173,6 +179,16 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
 
   if (!runner.bindButton('.stopBtn', stopGame)) {
     console.error('Game runner {{ include.runner_id }}: stop button not found');
+  }
+
+  // Fullscreen handler
+  function toggleFullscreen() {
+    console.log('Toggling fullscreen');
+    gameExecutor.toggleFullscreen();
+  }
+
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
   }
 
   // Level selector
