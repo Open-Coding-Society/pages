@@ -287,10 +287,24 @@ class GameLevelCsPath0Forge {
         }
 
         // Check auth status via LoginManager; show built-in panel if not logged in.
+        let authBody = null;
         const authStatus = await LoginManager.isAuthenticated();
-        if (!authStatus.success) {
+        if (authStatus.success) {
+          authBody = authStatus.body;
+        } else {
           const authResult = await LoginManager.showPanel(uiTheme);
           if (!authResult.success) return;
+          authBody = authResult.body;
+        }
+
+        // Prefill identity form with data from the authenticated user.
+        if (authBody) {
+          this.profileData = {
+            ...this.profileData,
+            name:     authBody.name  || this.profileData?.name     || '',
+            email:    authBody.email || this.profileData?.email    || '',
+            githubID: authBody.uid   || this.profileData?.githubID || '',
+          };
         }
 
         const identityData = await this.showIdentityForm();
