@@ -5,9 +5,11 @@ export class GameExecutor {
     runBtn,
     pauseBtn,
     stopBtn,
+    fullscreenBtn,
     levelSelect,
     engineVersionSelect,
     getGameContainer,
+    getGameOutput,
     configuredCanvasHeight = 580,
     path = '',
     getLevelOptionLabel = (levelClass, index) => levelClass?.name || `Level ${index + 1}`,
@@ -17,9 +19,11 @@ export class GameExecutor {
     this.runBtn = runBtn;
     this.pauseBtn = pauseBtn;
     this.stopBtn = stopBtn;
+    this.fullscreenBtn = fullscreenBtn;
     this.levelSelect = levelSelect;
     this.engineVersionSelect = engineVersionSelect;
     this.getGameContainer = getGameContainer;
+    this.getGameOutput = getGameOutput;
     this.configuredCanvasHeight = configuredCanvasHeight;
     this.path = path;
     this.getLevelOptionLabel = getLevelOptionLabel;
@@ -27,6 +31,9 @@ export class GameExecutor {
     this.gameCore = null;
     this.gameControl = null;
     this.gameStateMonitor = null;
+    this.isFullscreen = false;
+    this.fullscreenOverlay = null;
+    this.originalGameOutput = null;
   }
 
   stop() {
@@ -57,6 +64,7 @@ export class GameExecutor {
     if (this.runBtn) this.runBtn.disabled = false;
     if (this.pauseBtn) this.pauseBtn.disabled = true;
     if (this.stopBtn) this.stopBtn.disabled = true;
+    if (this.fullscreenBtn) this.fullscreenBtn.disabled = true;
     if (this.levelSelect) this.levelSelect.disabled = false;
   }
 
@@ -132,6 +140,7 @@ export class GameExecutor {
         this.pauseBtn.title = 'Pause Game';
       }
       if (this.stopBtn) this.stopBtn.disabled = false;
+      if (this.fullscreenBtn) this.fullscreenBtn.disabled = false;
       if (this.levelSelect) this.levelSelect.disabled = true;
 
       const gameContainer = this.getGameContainer?.();
@@ -199,12 +208,106 @@ export class GameExecutor {
       if (this.runBtn) this.runBtn.disabled = false;
       if (this.pauseBtn) this.pauseBtn.disabled = true;
       if (this.stopBtn) this.stopBtn.disabled = true;
+      if (this.fullscreenBtn) this.fullscreenBtn.disabled = true;
       if (this.levelSelect) this.levelSelect.disabled = false;
 
       if (this.gameStateMonitor) {
         clearInterval(this.gameStateMonitor);
         this.gameStateMonitor = null;
       }
+    }
+  }
+
+  toggleFullscreen() {
+    if (!this.getGameOutput) return;
+
+    const gameOutput = this.getGameOutput();
+    if (!gameOutput) return;
+
+    if (!this.isFullscreen) {
+      // Enter fullscreen mode
+      this.originalGameOutput = {
+        parent: gameOutput.parentElement,
+        height: this.configuredCanvasHeight
+      };
+
+      // Create fullscreen overlay
+      this.fullscreenOverlay = document.createElement('div');
+      this.fullscreenOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+      `;
+
+      // Move game-output into overlay
+      this.fullscreenOverlay.appendChild(gameOutput);
+      document.body.appendChild(this.fullscreenOverlay);
+
+      // Update canvas height to viewport height
+      const viewportHeight = window.innerHeight - 50; // Leave some padding
+      this.configuredCanvasHeight = viewportHeight;
+
+      // Update button text
+      if (this.fullscreenBtn) {
+        this.fullscreenBtn.textContent = '⛶ Minimize';
+        this.fullscreenBtn.title = 'Exit Fullscreen';
+      }
+
+      this.isFullscreen = true;
+
+      // Restart game with new dimensions
+      this.run();
+
+      // Handle ESC key to exit fullscreen
+      this.escapeHandler = (e) => {
+        if (e.key === 'Escape' && this.isFullscreen) {
+          this.toggleFullscreen();
+        }
+      };
+      document.addEventListener('keydown', this.escapeHandler);
+
+    } else {
+      // Exit fullscreen mode
+      if (this.fullscreenOverlay) {
+        // Move game-output back to original parent
+        if (this.originalGameOutput && this.originalGameOutput.parent) {
+          this.originalGameOutput.parent.appendChild(gameOutput);
+        }
+
+        // Remove overlay
+        this.fullscreenOverlay.remove();
+        this.fullscreenOverlay = null;
+      }
+
+      // Restore original height
+      if (this.originalGameOutput) {
+        this.configuredCanvasHeight = this.originalGameOutput.height;
+        this.originalGameOutput = null;
+      }
+
+      // Update button text
+      if (this.fullscreenBtn) {
+        this.fullscreenBtn.textContent = '⛶ Fullscreen';
+        this.fullscreenBtn.title = 'Enter Fullscreen';
+      }
+
+      this.isFullscreen = false;
+
+      // Remove ESC key handler
+      if (this.escapeHandler) {
+        document.removeEventListener('keydown', this.escapeHandler);
+        this.escapeHandler = null;
+      }
+
+      // Restart game with original dimensions
+      this.run();
     }
   }
 }
