@@ -571,13 +571,8 @@ class GameLevelCsPath0Forge {
         return;
       }
 
-      const host = this.gameEnv?.container || this.gameEnv?.gameContainer || document.body;
+      const host = document.body;
       if (!host) return;
-
-      const hostPosition = window.getComputedStyle(host).position;
-      if (hostPosition === 'static') {
-        host.style.position = 'relative';
-      }
 
       if (this._toastEl?.parentNode) {
         this._toastEl.parentNode.removeChild(this._toastEl);
@@ -588,13 +583,13 @@ class GameLevelCsPath0Forge {
 
       const toast = document.createElement('div');
       toast.style.cssText = `
-        position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
+        position: fixed; top: 20px; right: 20px;
         z-index: 1200; pointer-events: none;
         background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
         color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
         padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
         box-shadow: 0 0 20px rgba(78,204,163,0.25);
-        max-width: min(92%, 760px); text-align: center;
+        width: min(360px, 32vw); text-align: left;
       `;
       toast.textContent = message;
       host.appendChild(toast);
@@ -608,32 +603,25 @@ class GameLevelCsPath0Forge {
     };
 
     this.setZoneAlert = function(message) {
-      const host = this.gameEnv?.container || this.gameEnv?.gameContainer || document.body;
+      const host = document.body;
       if (!host) return;
 
       if (!this._zoneAlertEl) {
         const zoneAlert = document.createElement('div');
         zoneAlert.style.cssText = `
-          position: fixed; left: 12px; top: 50%; transform: translateY(-50%);
+          position: fixed; top: 84px; right: 20px;
           z-index: 1201; pointer-events: none;
           background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
           color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
           padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
           box-shadow: 0 0 20px rgba(78,204,163,0.25);
-          width: min(320px, 28vw); text-align: left;
+          width: min(360px, 32vw); text-align: left;
         `;
         document.body.appendChild(zoneAlert);
         this._zoneAlertEl = zoneAlert;
       }
 
       this._zoneAlertEl.textContent = message;
-
-      const hostRect = host.getBoundingClientRect();
-      const desiredLeft = hostRect.left - this._zoneAlertEl.offsetWidth - 16;
-      const clampedLeft = Math.max(12, desiredLeft);
-      const desiredTop = hostRect.top + (hostRect.height * 0.5);
-      this._zoneAlertEl.style.left = `${clampedLeft}px`;
-      this._zoneAlertEl.style.top = `${desiredTop}px`;
     };
 
     this.clearZoneAlert = function() {
