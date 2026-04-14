@@ -80,12 +80,12 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     // ── NPC Positions ──────────────────────────────────────────────
     // Position NPCs on opposite sides of screen, centered vertically
     const analyticsGuidePos = {
-      x: width * 0.35,
+      x: width * 0.30,
       y: height * 0.35,
     };
 
     const githubMetricsPos = {
-      x: width * 0.65,
+      x: width * 0.60,
       y: height * 0.35,
     };
 
