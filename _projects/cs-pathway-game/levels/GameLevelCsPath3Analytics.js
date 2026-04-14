@@ -285,7 +285,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     // Use cached data if available
     const userData = this.cachedUserData || await this.fetchUserData();
     
-    if (!userData) {
+    if (!userData || !userData.analyticsSummary) {
       await this.showDialogue('Analytics Guide', [
         'Unable to load your analytics.',
         'Please ensure you are logged in.',
@@ -293,7 +293,17 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       return;
     }
 
-    const summary = userData.analyticsSummary || {};
+    const s = userData.analyticsSummary;
+    
+    const timeSpent = s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h';
+    const codeRuns = s.totalCodeExecutions || 0;
+    const lessonsViewed = s.totalLessonsViewed || 0;
+    const lessonsCompleted = s.totalLessonsCompleted || 0;
+    const engagement = ((s.interactionPercentage || 0).toFixed(1)) + '%';
+    const scrollDepth = ((s.averageScrollDepth || 0).toFixed(0)) + '%';
+    const avgSessionDuration = s.averageSessionDurationSeconds ? this.formatTime(s.averageSessionDurationSeconds * 1000) : '0m';
+    const accuracy = ((s.averageAccuracyPercentage || 0).toFixed(1)) + '%';
+    const copyPaste = s.totalCopyPasteAttempts || 0;
     
     const messages = [
       'Your Learning Analytics:',
@@ -303,19 +313,19 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       `UID: ${userData.uid || 'Not set'}`,
       '',
       'Time & Engagement:',
-      `Total Time Spent: ${this.formatTime(summary.totalTimeSpent || 0)}`,
-      `Sessions: ${summary.totalSessions || 0}`,
-      `Quests Completed: ${summary.questsCompleted || 0}`,
-      `Engagement Score: ${summary.engagementScore || 0}%`,
+      `Total Time Spent: ${timeSpent}`,
+      `Avg Session Duration: ${avgSessionDuration}`,
+      `Code Executions: ${codeRuns}`,
+      `Engagement Rate: ${engagement}`,
+      `Accuracy: ${accuracy}`,
       '',
       'Learning Progress:',
-      `Lessons Completed: ${summary.lessonsCompleted || 0}`,
-      `Current Quest: ${summary.currentQuestName || 'None'}`,
-      `Quest Progress: ${summary.questProgress || 0}%`,
+      `Lessons Viewed: ${lessonsViewed}`,
+      `Lessons Completed: ${lessonsCompleted}`,
+      `Scroll Depth: ${scrollDepth}`,
+      `Copy/Paste Attempts: ${copyPaste}`,
       '',
-      `Last Active: ${this.formatDate(summary.lastActiveDate) || 'Never'}`,
-      '',
-      'Press Next to see more details!',
+      'You are making excellent progress!',
     ];
 
     await this.showDialogue('Analytics Guide', messages);
@@ -377,24 +387,21 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     }
 
     const gh = userData.github;
+    const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
+    
     const messages = [
       'Your GitHub Contribution Stats:',
       '',
       `Total Commits: ${gh.commits || 0}`,
       `Pull Requests: ${gh.prs || 0}`,
-      `Issues: ${gh.issues || 0}`,
-      `Code Reviews: ${gh.codeReviews || 0}`,
-      `Repositories: ${gh.repos || 0}`,
-      `Gists: ${gh.gists || 0}`,
+      `Issues Reported: ${gh.issues || 0}`,
       '',
-      `Lines Added: ${gh.additions || 0}`,
-      `Lines Deleted: ${gh.deletions || 0}`,
-      `Files Changed: ${gh.filesChanged || 0}`,
+      `Lines Added: +${gh.linesAdded || 0}`,
+      `Lines Deleted: -${gh.linesDeleted || 0}`,
+      `Total Edits: ${totalEdits}`,
       '',
-      `Followers: ${gh.followers || 0}`,
-      `Following: ${gh.following || 0}`,
-      '',
-      'Your contributions matter! Keep coding!',
+      'Your code contributions show dedication!',
+      'Keep coding and collaborating!',
     ];
 
     await this.showDialogue('GitHub Guide', messages);
