@@ -326,14 +326,14 @@ description: Here are the activities. Hover over image for more details
       image: "https://www.churchofjesuschrist.org/imgs/li6h2f1zh38l26ueaiy8epfjmrpqc8oywz2uy7cf/full/!1280%2C1024/0/default",
       title: "Conference Notes",
       shortDesc: "Learn of Prophets",
-      hoverDesc: "Watch General Conference, take notes, and discuss over a delicious lunch together."
+      hoverDesc: "Watch General Conference, take notes, and discuss over a delicious lunch together.",
       date: "Oct 13 - Church"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Utopia_Playground_td_%282020-12-14%29_100.jpg/2560px-Utopia_Playground_td_%282020-12-14%29_100.jpg",
       title: "Four Square and other Games",
       shortDesc: "Classic Game",
-      hoverDesc: "The timeless playground game! Develop hand-eye coordination and quick thinking."
+      hoverDesc: "The timeless playground game! Develop hand-eye coordination and quick thinking.",
       date: "Oct 27 - Church"
     },
     {
