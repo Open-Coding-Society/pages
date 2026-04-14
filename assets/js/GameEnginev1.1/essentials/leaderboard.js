@@ -1,11 +1,12 @@
 /**
- * Leaderboard (Python Variant) - Dual-Mode Leaderboard Widget for GameEngine v1.1
+ * Leaderboard - Dual-Mode Leaderboard Widget for GameEngine v1.1
  *
- * Mirrors Leaderboard.js functionality while targeting the Flask
- * /api/events backend only.
+ * Unified variant that supports both backend targets:
+ * - Java/Spring (`backend: 'java'`)
+ * - Python/Flask (`backend: 'python'` or `backend: 'flask'`)
  */
 
-import { pythonURI, fetchOptions } from '../../api/config.js';
+import { pythonURI, javaURI, fetchOptions } from '../../api/config.js';
 
 export default class Leaderboard {
 	constructor(gameControl = null, options = {}) {
@@ -44,11 +45,41 @@ export default class Leaderboard {
 				.map((v) => String(v))
 		);
 
-		// Flask backend only for this Python variant.
-		this.backendURI = pythonURI ? String(pythonURI).trim() : '';
+		const backendOption = typeof options.backend === 'string'
+			? options.backend.toLowerCase()
+			: 'java';
+		this.backendType = backendOption === 'flask' ? 'python' : backendOption;
+
+		const preferredURI = this.backendType === 'python' ? pythonURI : javaURI;
+		const fallbackURI = this.backendType === 'python' ? javaURI : pythonURI;
+		this.backendURI = preferredURI
+			? String(preferredURI).trim()
+			: (fallbackURI ? String(fallbackURI).trim() : '');
 		this.hasBackend = Boolean(this.backendURI);
 
 		this.init();
+	}
+
+	_getDynamicLeaderboardPath() {
+		return this.backendType === 'python'
+			? '/api/dynamic/leaderboard'
+			: '/api/events/SCORE_COUNTER';
+	}
+
+	_getDynamicSubmitPath() {
+		return this._getDynamicLeaderboardPath();
+	}
+
+	_disableBackendForOffline(reason = '') {
+		if (!this.hasBackend) return;
+		this.hasBackend = false;
+		if (this.refreshInterval) {
+			clearInterval(this.refreshInterval);
+			this.refreshInterval = null;
+		}
+		if (reason) {
+			console.warn(`Leaderboard switched to offline mode (${reason})`);
+		}
 	}
 
 	_isNetworkError(error) {
@@ -81,18 +112,6 @@ export default class Leaderboard {
 
 			return res;
 		});
-	}
-
-	_disableBackendForOffline(reason = '') {
-		if (!this.hasBackend) return;
-		this.hasBackend = false;
-		if (this.refreshInterval) {
-			clearInterval(this.refreshInterval);
-			this.refreshInterval = null;
-		}
-		if (reason) {
-			console.warn(`Leaderboard switched to offline mode (${reason})`);
-		}
 	}
 
 	_getLoggedInUser() {
@@ -278,6 +297,22 @@ export default class Leaderboard {
 			return;
 		}
 
+		if (this.backendType === 'java' && gameEnv.scoreManager) {
+			const saveButton = buttonEl || document.getElementById('leaderboard-save-score');
+			gameEnv.scoreManager.saveScore(saveButton)
+				.then(() => {
+					if (this.mode === 'dynamic') {
+						return this.fetchLeaderboard();
+					}
+					return null;
+				})
+				.catch((error) => {
+					console.error('Failed to save score from leaderboard:', error);
+					alert('Failed to save score. Please try again.');
+				});
+			return;
+		}
+
 		const saveButton = buttonEl || document.getElementById('leaderboard-save-score');
 		if (saveButton) saveButton.disabled = true;
 
@@ -307,12 +342,12 @@ export default class Leaderboard {
 				return null;
 			})
 			.catch((error) => {
-				console.error('Failed to submit score to Flask:', error);
+				console.error('Failed to submit score:', error);
 				if (error.message && (error.message.includes('401') || error.message.includes('403') || error.message === 'AUTH_REDIRECT' || error.message === 'AUTH_REQUIRED')) {
 					alert('Please login to access this feature.');
 				} else if (this._isNetworkError(error)) {
 					this._disableBackendForOffline('score submission failed');
-					alert('Network error: Unable to connect to Flask backend.');
+					alert('Network error: Unable to connect to backend.');
 				} else {
 					alert('Failed to save score. Please try again.');
 				}
@@ -404,7 +439,7 @@ export default class Leaderboard {
 			return;
 		}
 
-		list.innerHTML = '<p class="loading">Loading dynamic leaderboard…</p>';
+		list.innerHTML = '<p class="loading">Loading dynamic leaderboard...</p>';
 
 		const backBtn = document.getElementById('back-btn');
 		if (backBtn) backBtn.style.display = this.isOpen ? 'inline-block' : 'none';
@@ -742,7 +777,7 @@ export default class Leaderboard {
 			return Promise.resolve();
 		}
 
-		return this._fetchFromBackends('/api/dynamic/leaderboard', fetchOptions)
+		return this._fetchFromBackends(this._getDynamicLeaderboardPath(), fetchOptions)
 			.then((res) => res.json())
 			.then((data) => {
 				this.displayLeaderboard(Array.isArray(data) ? data : []);
@@ -798,7 +833,7 @@ export default class Leaderboard {
 		};
 
 		return this._fetchFromBackends(
-			'/api/dynamic/leaderboard',
+			this._getDynamicSubmitPath(),
 			{
 				...fetchOptions,
 				method: 'POST',

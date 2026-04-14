@@ -19,15 +19,10 @@ permalink: /gamify/adventureGamev1-1
     import GameLevelOverworld from "{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelOverworld.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    // One-word switch: change only this word to swap leaderboard variants.
+    // One-word switch: change only this word to swap leaderboard backend.
     // Options: 'python' | 'java'
     const leaderboardVariant = 'java';
-    const leaderboardModuleByVariant = {
-        python: "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/leaderboard_python.js",
-        java: "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/leaderboard_java.js"
-    };
-    const leaderboardModulePath = leaderboardModuleByVariant[leaderboardVariant] || leaderboardModuleByVariant.python;
-    const leaderboardModule = await import(leaderboardModulePath);
+    const leaderboardModule = await import("{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/leaderboard.js");
     const Leaderboard = leaderboardModule.default || leaderboardModule;
 
     const gameLevelClasses = [ GameLevelDesert, GameLevelWater, GameLevelEnd, GameLevelOverworld ];
