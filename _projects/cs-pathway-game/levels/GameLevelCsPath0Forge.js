@@ -175,7 +175,7 @@ class GameLevelCsPath0Forge {
 
     const avatarGatekeeperPos = {
       x: width * 0.50,
-      y: height * 0.23,
+      y: height * 0.20,
     };
 
     const worldThemeGatekeeperPos = {
