@@ -1,12 +1,5 @@
 ---
-# ============================================================
-# FRONT MATTER — Jekyll reads this block before rendering the page.
-# Keys here control layout, metadata, and how the site indexes
-# this page.  The "defaults" approach (see _config.yml note at
-# the bottom of this file) means you usually DON'T need to repeat
-# layout/team/categories on every new lesson — they're inherited.
-# ============================================================
-layout: cs-bigsix-lesson          # which Jekyll layout template to use
+layout: cs-bigsix-lesson
 title: "Analytics — All-in-One Interactive Lesson"
 description: "A multi-step interactive lesson covering the admin dashboard, certificates, and mastery questions."
 permalink: /bigsix/analytics_lesson
@@ -19,730 +12,253 @@ author: "Curators Team"
 date: 2025-12-02
 ---
 
-<!--
-  ============================================================
-  NOTE — To make layout/team/categories the DEFAULT for ALL
-  Curators lessons without repeating them in every file, add
-  this block to your Jekyll _config.yml:
-
-    defaults:
-      - scope:
-          path: ""
-          type: "pages"
-        values:
-          layout: cs-bigsix-lesson
-          team: "Curators"
-          categories: [CSP, Interactive]
-
-  After that, a new lesson only needs title, description,
-  permalink, lesson_number, and tags in its front matter.
-  ============================================================
--->
-
-<!-- ============================================================
-     STYLESHEET — All colors are CSS custom properties (variables)
-     so the entire theme can be changed from one place (:root {}).
-     ============================================================ -->
 <style>
-  /* ---- Design tokens: change these to retheme the whole page ---- */
-  :root {
-    --bg:      #0a0e27;           /* page background */
-    --panel:   #0f1729;           /* card / widget background */
-    --border:  rgba(255,255,255,0.08);
-    --text:    #e6eef8;           /* primary text */
-    --muted:   #9aa6bf;           /* secondary / label text */
-    --accent:  #7c3aed;           /* purple brand color */
-    --accent2: #9f7aea;           /* lighter purple for gradients */
-    --success: #22c55e;           /* green used in cert card */
-    --danger:  #ef4444;           /* error red */
+  .page-content {
+    --bg:       var(--bg-1);
+    --panel:    var(--panel);
+    --panel-2:  var(--bg-3);
+    --panel-3:  var(--surface);
+    --border:   rgba(255,255,255,0.08);
+    --border-b: rgba(255,255,255,0.14);
+    --border-ac:rgba(76,175,239,0.4);
+    --txt:      var(--text);
+    --muted:    var(--text-muted);
+    --ac:       var(--accent);
+    --ac2:      var(--accent);
+    --ok:       var(--green);
+    --ok-bg:    var(--green-bg);
+    --err:      var(--red);
+    --err-bg:   var(--warn-bg);
+    --code-bg:  var(--bg-0);
+    --hover-bg: rgba(76,175,239,0.1);
   }
 
-  /* ---- Reset & base ---- */
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 28px 16px 64px; }
 
-  /* ---- Page shell ---- */
-  .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 40px; }
-  .header    { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
-  .header p  { color: var(--muted); font-size: 14px; }
+  .lesson-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac2); margin-bottom: 10px; }
+  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 8px var(--ac); display: inline-block; }
+  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--txt); }
+  .lesson-header p  { color: var(--muted); font-size: 14px; }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
+  .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
 
-  /* ---- Step progress bar ---- */
-  /* Each colored segment represents one lesson step */
-  .progress-bar           { display: flex; gap: 8px; margin: 20px 0; align-items: center; }
-  .progress-bar .step     { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; cursor: pointer; transition: 0.2s; }
-  .progress-bar .step.active { background: var(--accent); height: 6px; }
+  .progress-track { margin: 20px 0 28px; }
+  .progress-steps { display: flex; }
+  .progress-step { flex: 1; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-b); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
+  .progress-step.active .step-dot { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: 0 0 12px rgba(76,175,239,0.5); }
+  .progress-step.done   .step-dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .progress-step .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; white-space: nowrap; }
+  .progress-step.active .step-label { color: var(--ac2); }
+  .progress-step.done   .step-label { color: var(--ok); }
+  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-b); }
+  .progress-step:first-child::before { display: none; }
+  .progress-step.done::before { background: var(--ok); }
 
-  /* ---- Sections: only the active one is visible ---- */
   .section        { display: none; }
-  .section.active { display: block; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-  /* ---- Card (content panel) ---- */
-  .card    { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  .card h2 { margin-bottom: 12px; font-size: 20px; color: #a6c9ff; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--ac), var(--ac2)); opacity: 0.6; }
+  .card h2 { font-size: 20px; font-weight: 800; color: var(--txt); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .card h2 .step-num { width: 28px; height: 28px; border-radius: 8px; background: var(--ac); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card h3 { font-size: 15px; color: var(--ac2); margin: 20px 0 8px; }
+  .block-desc { background: rgba(76,175,239,0.06); border-left: 3px solid var(--ac); padding: 12px 16px; border-radius: 0 8px 8px 0; color: var(--txt); font-size: 14px; margin: 0 0 20px; line-height: 1.7; }
 
-  /* ---- Prev / Next navigation ---- */
-  .nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
-  button            { appearance: none; border: 1px solid var(--border); background: var(--accent); color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
-  button:hover      { background: #6d28d9; transform: translateY(-1px); }
-  button.secondary  { background: #334155; color: #fff; }
-  button.secondary:hover { background: #1e293b; }
-  button:disabled   { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin-bottom: 20px; }
+  .concept-tile { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; transition: border-color 0.2s, transform 0.2s; }
+  .concept-tile:hover { border-color: var(--border-ac); transform: translateY(-2px); }
+  .concept-tile .tile-icon  { font-size: 22px; margin-bottom: 6px; }
+  .concept-tile .tile-title { font-size: 13px; font-weight: 700; color: var(--ac2); margin-bottom: 4px; }
+  .concept-tile .tile-body  { font-size: 12px; color: var(--muted); line-height: 1.55; }
 
-  /* ---- Metrics grid (3 KPI cards side-by-side) ---- */
-  .metrics-grid  { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
-  .metric-card   { background: #051226; border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .metric-title  { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .metric-value  { font-size: 32px; font-weight: 800; color: var(--accent); margin: 8px 0 4px; }
-  .metric-subtitle { font-size: 12px; color: var(--muted); }
+  /* KPI cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 12px; margin-bottom: 20px; }
+  .kpi-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+  .kpi-value { font-size: 28px; font-weight: 800; color: var(--ac); }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+  .kpi-sub   { font-size: 12px; color: var(--txt); margin-top: 2px; }
 
-  /* ---- Toolbar above the table ---- */
-  .toolbar       { display: flex; align-items: center; justify-content: space-between; background: #051226; border: 1px solid var(--border); border-radius: 8px 8px 0 0; padding: 12px 16px; }
-  .toolbar-title { font-weight: 700; color: var(--accent); }
-  .download-btn  { background: var(--accent); }
+  /* Gradebook table */
+  .gradebook { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .gradebook thead th { background: var(--panel-2); padding: 10px 14px; text-align: left; font-weight: 700; color: var(--ac2); border-bottom: 1px solid var(--border-b); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; user-select: none; }
+  .gradebook thead th:hover { color: var(--ac); }
+  .gradebook td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--txt); vertical-align: middle; }
+  .gradebook tr.data-row:hover td { background: var(--hover-bg); cursor: pointer; }
+  .gradebook tr:last-child td { border-bottom: none; }
+  .bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .bar-fill  { height: 100%; background: var(--ac); border-radius: 3px; transition: width 0.4s; }
+  .bar-label { font-size: 12px; font-weight: 700; color: var(--ac); min-width: 36px; }
+  .student-name { font-weight: 600; }
+  .detail-row td { background: var(--panel-2); }
+  .detail-header { font-size: 12px; font-weight: 700; color: var(--ac2); margin-bottom: 8px; }
+  .modules-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .module-chip { background: var(--hover-bg); border: 1px solid var(--border-ac); border-radius: 4px; padding: 2px 8px; font-size: 11px; color: var(--ac); }
 
-  /* ---- Sortable gradebook table ---- */
-  .table-container { background: #051226; border: 1px solid var(--border); border-top: none; border-radius: 0 0 8px 8px; overflow-x: auto; }
-  table            { width: 100%; border-collapse: collapse; font-size: 14px; }
-  thead            { border-bottom: 2px solid var(--accent); }
-  th               { padding: 10px 16px; text-align: left; color: var(--accent); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; user-select: none; }
-  th:hover         { background: rgba(124,58,237,0.1); }
-  /* Sort-direction arrow rendered via ::after pseudo-element */
-  th[data-sort]::after { content: " ↕"; font-size: 10px; opacity: 0.5; }
-  th[data-sort="asc"]::after  { content: " ↑"; opacity: 1; }
-  th[data-sort="desc"]::after { content: " ↓"; opacity: 1; }
-  td               { padding: 10px 16px; border-bottom: 1px solid var(--border); }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td      { background: rgba(255,255,255,0.03); }
-  .student-name    { font-weight: 600; color: var(--accent); }
-  td.center        { text-align: center; }
+  /* Certificate canvas */
+  #certCanvas { display: block; max-width: 100%; border: 1px solid var(--border); border-radius: 10px; margin: 12px 0; }
 
-  /* ---- Progress bar inside table cells ---- */
-  .bar-wrap  { display: flex; align-items: center; gap: 8px; }
-  .bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; }
-  .bar-fill  { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%); transition: width 0.4s ease; }
-  .bar-label { font-size: 12px; min-width: 36px; text-align: right; }
+  /* FRQ */
+  textarea { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); font-size: 13px; padding: 10px 12px; width: 100%; resize: vertical; min-height: 120px; line-height: 1.6; }
+  textarea:focus { outline: none; border-color: var(--ac); box-shadow: 0 0 0 2px rgba(76,175,239,0.15); }
+  .frq-feedback { margin-top: 12px; padding: 12px 16px; background: var(--panel-3); border-radius: 8px; border-left: 3px solid var(--ok); font-size: 13px; color: var(--txt); line-height: 1.7; display: none; }
+  .frq-feedback.show { display: block; }
 
-  /* ---- Expandable detail row ---- */
-  .detail-row    { border-top: 1px solid var(--accent); background: rgba(124,58,237,0.05); }
-  .detail-header { font-weight: 700; color: var(--accent); margin-bottom: 8px; }
-  .modules-list  { display: flex; flex-wrap: wrap; gap: 8px; }
-  .module-chip   { background: rgba(124,58,237,0.15); border: 1px solid var(--accent); border-radius: 20px; padding: 4px 12px; font-size: 12px; }
+  button { appearance: none; border: 1px solid var(--border); background: var(--ac); color: #fff; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  button:hover { background: var(--accent-700); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(76,175,239,0.3); }
+  button:active { transform: translateY(0); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  button.secondary { background: var(--panel-2); color: var(--txt); }
+  button.secondary:hover { background: var(--panel-3); box-shadow: none; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
 
-  /* ---- Certificate card ---- */
-  .cert-card     { background: #051226; border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; }
-  .cert-badge    { display: inline-block; background: var(--success); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-bottom: 12px; }
-  .cert-title    { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
-  .cert-org      { font-size: 13px; color: var(--muted); }
-  .cert-date     { font-size: 12px; color: var(--muted); margin: 8px 0 16px; }
-  .cert-actions  { display: flex; gap: 10px; }
-  .btn-share     { background: #0077b5; }   /* LinkedIn blue */
-  .btn-share:hover { background: #005f91; }
+  input { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); font-size: 13px; padding: 9px 12px; width: 100%; }
+  input:focus { outline: none; border-color: var(--ac); }
 
-  /* ---- FRQ (free response) box ---- */
-  .frq-box      { border: 1px solid #2c2c2e; padding: 1rem; border-radius: 8px; margin: 1.5rem 0; background: #1c1c1e; color: #e5e5ea; font-weight: 300; }
-  .frq-box textarea { width: 100%; border-radius: 6px; border: 1px solid #3a3a3c; padding: 0.5rem; margin-top: 0.5rem; background: #2c2c2e; color: #f2f2f7; resize: vertical; }
-  #frq-feedback { margin-top: 12px; line-height: 1.6; }
+  .tip { font-size: 12px; color: var(--muted); padding: 8px 14px; background: var(--panel-2); border-radius: 6px; border-left: 2px solid var(--ac); line-height: 1.5; margin-top: 14px; }
+  .tip::before { content: '💡 '; }
 
-  /* ---- Loading / empty state ---- */
-  .loading { color: var(--muted); font-style: italic; padding: 20px 0; }
+  .nav-buttons { display: flex; gap: 12px; margin-top: 28px; justify-content: space-between; align-items: center; }
+  #stepIndicator { font-size: 12px; color: var(--muted); }
 </style>
 
-<!-- ============================================================
-     HTML STRUCTURE
-     The page is split into three <section> divs (#step1-3).
-     JavaScript shows only the active one and updates the
-     progress bar + navigation buttons accordingly.
-     ============================================================ -->
 <div class="container page-content">
-
-  <!-- Page header + back link -->
-  <div class="header">
-    <h1>Analytics — All-in-One</h1>
-    <p>Interactive lesson covering the admin dashboard, certificates, and mastery questions.</p>
-    <a href="../" class="button back-btn">Back</a>
+  <div class="lesson-header">
+    <div class="badge">Module 6 · Curators Team</div>
+    <h1>Analytics</h1>
+    <p>Admin dashboard, student gradebook, certificates, and AI-graded mastery questions.</p>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
-  <!-- Progress indicator: rendered dynamically by JS -->
-  <div class="progress-bar" id="progressBar"></div>
+  <div class="progress-track">
+    <div class="progress-steps" id="progressSteps"></div>
+  </div>
 
-  <!-- ======================================================
-       STEP 1 — Admin Analytics Dashboard
-       Fetches real student data from the backend API,
-       computes summary metrics, and renders a sortable table.
-       ====================================================== -->
+  <!-- STEP 1 -->
   <div class="section active" id="step1">
     <div class="card">
-      <h2>1 — Admin Analytics Dashboard</h2>
-      <p>This dashboard provides a comprehensive overview of student performance. View real-time metrics, sort the interactive gradebook, and expand any row to see per-module progress.</p>
-
-      <!-- KPI cards — values injected by JS after the API responds -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-title">Class Average</div>
-          <div class="metric-value" id="class-average">—</div>
-          <div class="metric-subtitle" id="students-enrolled">loading…</div>
+      <h2><span class="step-num">1</span> Admin Analytics Dashboard</h2>
+      <div class="block-desc">This dashboard provides a comprehensive overview of student performance with real-time KPI metrics, a sortable gradebook, and expandable per-module breakdowns.</div>
+      <div class="concept-grid">
+        <div class="concept-tile"><div class="tile-icon">📊</div><div class="tile-title">KPI Metrics</div><div class="tile-body">Key Performance Indicators summarize class health at a glance.</div></div>
+        <div class="concept-tile"><div class="tile-icon">🏆</div><div class="tile-title">Top Performer</div><div class="tile-body">Identify the highest-scoring student to celebrate achievement.</div></div>
+        <div class="concept-tile"><div class="tile-icon">📋</div><div class="tile-title">Gradebook</div><div class="tile-body">Sortable table with per-module breakdown expandable on click.</div></div>
+        <div class="concept-tile"><div class="tile-icon">📥</div><div class="tile-title">CSV Export</div><div class="tile-body">Download the full gradebook as a spreadsheet with one click.</div></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-value" id="class-average">—</div>
+          <div class="kpi-label">Class Average</div>
+          <div class="kpi-sub" id="students-enrolled">loading…</div>
         </div>
-        <div class="metric-card">
-          <div class="metric-title">Modules Completed</div>
-          <div class="metric-value" id="modules-completed">—</div>
-          <div class="metric-subtitle">Out of 25 total</div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="modules-completed">—</div>
+          <div class="kpi-label">Modules Completed</div>
+          <div class="kpi-sub">Out of 25 total</div>
         </div>
-        <div class="metric-card">
-          <div class="metric-title">Top Performer</div>
-          <div class="metric-value" id="top-grade">—</div>
-          <div class="metric-subtitle" id="top-scorer">—</div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="top-grade">—</div>
+          <div class="kpi-label">Top Performer</div>
+          <div class="kpi-sub" id="top-scorer">—</div>
         </div>
       </div>
-
-      <!-- Toolbar: title on the left, export button on the right -->
-      <div class="toolbar">
-        <span class="toolbar-title">Class Gradebook</span>
-        <button class="download-btn" id="exportBtn">Export Report</button>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <span style="font-weight:700; color:var(--ac2); font-size:13px;">Class Gradebook</span>
+        <button id="exportBtn">Export Report</button>
       </div>
-
-      <!-- Table: <thead> is static; <tbody> is filled by JS -->
-      <div class="table-container">
-        <table id="gradebook">
+      <div style="overflow-x:auto;">
+        <table class="gradebook" id="gradebook">
           <thead>
             <tr>
-              <!-- data-key matches the property name in studentData[] -->
               <th data-key="name">Student Name</th>
-              <th data-key="overall" class="center">Overall</th>
-              <th data-key="modules" class="center">Modules</th>
+              <th data-key="overall">Overall</th>
+              <th data-key="modules">Modules</th>
             </tr>
           </thead>
           <tbody id="tableBody">
-            <tr><td colspan="3" class="loading">Loading gradebook…</td></tr>
+            <tr><td colspan="3" style="color:var(--muted); font-style:italic; padding:20px 14px;">Loading gradebook…</td></tr>
           </tbody>
         </table>
       </div>
+      <p class="tip">Click any student row to expand their per-module breakdown, or click a column header to sort.</p>
     </div>
   </div>
 
-  <!-- ======================================================
-       STEP 2 — Certificates & Badges
-       Fetches the logged-in user's name from the API and
-       generates a downloadable PNG certificate via <canvas>.
-       ====================================================== -->
+  <!-- STEP 2 -->
   <div class="section" id="step2">
     <div class="card">
-      <h2>2 — Certificates and Badges</h2>
-      <p>Claim your certificates for completed modules. Download as a high-quality image or share directly to LinkedIn.</p>
-      <div class="cert-card">
-        <span class="cert-badge">Verified</span>
-        <div class="cert-title">CS Portfolio Certificate</div>
-        <div class="cert-org">Open Coding Society</div>
-        <div class="cert-date" id="certDate">—</div>
-        <div class="cert-actions">
-          <button class="btn-download" id="btnDownload">⬇ Download</button>
-          <button class="btn-share"    id="btnLinkedIn">Add to LinkedIn</button>
-        </div>
+      <h2><span class="step-num">2</span> Certificates and Badges</h2>
+      <div class="block-desc">Claim your certificate for completed modules — download as a high-quality image or share it directly to LinkedIn to showcase your achievement.</div>
+      <canvas id="certCanvas"></canvas>
+      <div class="btn-row">
+        <button class="btn-download" id="btnDownload">⬇ Download</button>
+        <button id="btnLinkedIn" style="background:#0077b5;">Add to LinkedIn</button>
       </div>
-      <!-- Hidden canvas used only for rendering the certificate PNG -->
-      <canvas id="certCanvas" style="display:none;"></canvas>
+      <p class="tip">Your certificate is generated with your name and completion date automatically pulled from your profile.</p>
     </div>
   </div>
 
-  <!-- ======================================================
-       STEP 3 — Free Response Question (FRQ)
-       Sends the student's answer to a grading endpoint and
-       displays AI-generated feedback inline.
-       ====================================================== -->
+  <!-- STEP 3 -->
   <div class="section" id="step3">
     <div class="card">
-      <h2>3 — Free Response Question</h2>
-      <p>Submit a response below. Your answer will be graded by an AI assistant.</p>
-      <div class="frq-box">
-        <b>FRQ:</b>
-        <span id="frq-question">Describe what analytics or metrics you aim to collect and how you'll present them.</span>
-        <br><br>
-        <textarea id="frq-answer" rows="5" placeholder="Type your response here…"></textarea>
-        <br>
-        <button id="frq-grade-btn" style="margin-top:10px;">Grade</button>
-        <div id="frq-feedback"></div>
+      <h2><span class="step-num">3</span> Free Response Question</h2>
+      <div class="block-desc">Submit a written response below — your answer will be evaluated by an AI assistant and you will receive instant feedback.</div>
+      <h3>FRQ Prompt</h3>
+      <p style="font-size:14px; color:var(--txt); margin-bottom:16px;" id="frq-question">Describe what analytics or metrics you aim to collect and how you'll present them.</p>
+      <textarea id="frq-answer" rows="5" placeholder="Type your response here…"></textarea>
+      <div class="btn-row">
+        <button id="frq-grade-btn">Grade</button>
       </div>
+      <div id="frq-feedback" class="frq-feedback"></div>
+      <p class="tip">Be specific about which data points you would track and what visualizations (charts, tables, KPIs) you would use to present them.</p>
     </div>
   </div>
 
-  <!-- Prev / Next navigation + step counter -->
   <div class="nav-buttons">
-    <button id="prevBtn" class="secondary" onclick="prevStep()">← Previous</button>
+    <button id="prevBtn" class="secondary">← Previous</button>
     <div style="display:flex; gap:8px; align-items:center;">
-      <span id="stepIndicator" style="color:var(--muted); font-size:12px;"></span>
-      <button id="nextBtn" onclick="nextStep()">Next →</button>
+      <span id="stepIndicator"></span>
+      <button id="nextBtn">Next →</button>
     </div>
   </div>
+</div>
 
-</div><!-- /.container -->
-
-<!-- ============================================================
-     MAIN SCRIPT (ES module so we can use import statements)
-     ============================================================ -->
 <script type="module">
+import { javaURI, pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
+import { AnalyticsDashboard } from '/assets/js/bigsix/analytics/analytics.js';
+import { CertificatePanel }   from '/assets/js/bigsix/analytics/certificates.js';
+import { FrqGrader }          from '/assets/js/bigsix/analytics/frq.js';
 
-// ── Imports ──────────────────────────────────────────────────
-// These config helpers centralise the API base URLs and default
-// fetch options (credentials, CORS mode, etc.) so every fetch
-// call doesn't need to repeat them.
-import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
-
-// ── Constants ─────────────────────────────────────────────────
-const STORAGE_KEY = 'analytics_combined_v1';   // localStorage key
-const TOTAL_MODULES = 25;                       // displayed in KPI card
-
-// ============================================================
-//  SECTION 1 — STEP / NAVIGATION
-//  currentStep tracks which section (0-indexed) is visible.
-//  showStep() is the single source of truth for UI state.
-// ============================================================
-
-let currentStep = 0;
-const STEPS = ['step1', 'step2', 'step3'];   // maps index → element id
-
-/**
- * Show a specific step by index.
- * - Hides all sections, then shows the target.
- * - Re-renders the progress bar with correct active states.
- * - Enables / disables prev/next buttons at the boundaries.
- * - Persists state to localStorage so a page reload restores position.
- */
-function showStep(n) {
-  // Clamp n to valid range [0, STEPS.length - 1]
-  currentStep = Math.max(0, Math.min(STEPS.length - 1, n));
-
-  // Toggle visibility of each section
-  STEPS.forEach((id, i) =>
-    document.getElementById(id).classList.toggle('active', i === currentStep)
-  );
-
-  // Rebuild progress bar segments
-  const bar = document.getElementById('progressBar');
-  bar.innerHTML = STEPS.map((_, i) =>
-    `<div class="step ${i <= currentStep ? 'active' : ''}"
-          onclick="showStep(${i})"
-          title="Go to step ${i + 1}"></div>`
-  ).join('');
-
-  // Update "Step X / Y" counter
-  document.getElementById('stepIndicator').textContent =
-    `Step ${currentStep + 1} / ${STEPS.length}`;
-
-  // Disable buttons at boundaries so users can't go out-of-range
-  document.getElementById('prevBtn').disabled = currentStep === 0;
-  document.getElementById('nextBtn').disabled = currentStep === STEPS.length - 1;
-
-  persist();  // save position
-}
-
-// Expose to inline onclick attributes in the HTML
-window.showStep = showStep;
-function prevStep() { showStep(currentStep - 1); }
-function nextStep() { showStep(currentStep + 1); }
-window.prevStep = prevStep;
-window.nextStep = nextStep;
-
-
-// ============================================================
-//  SECTION 2 — ANALYTICS DASHBOARD
-//  Fetches student data from the Java backend, computes summary
-//  metrics dynamically, and builds a sortable, expandable table.
-// ============================================================
-
-// Sort state: which column and which direction
-let sortKey = 'name';
-let sortDir = 'asc';   // 'asc' | 'desc'
-
-// Holds the raw data from the API so we can re-sort without re-fetching
-let studentData = [];
-
-/**
- * Fetch student grade data from the API.
- * Falls back to mock data if the endpoint is unavailable
- * (useful when developing locally without a running backend).
- */
-async function loadAnalytics() {
-  try {
-    const res = await fetch(`${javaURI}/api/analytics/students`, fetchOptions);
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    // Expected shape: [{ id, name, overall, modulesCompleted, moduleScores: {...} }, ...]
-    studentData = await res.json();
-  } catch (err) {
-    console.warn('Analytics API unavailable, using mock data:', err.message);
-
-    // ── Mock data (replace with real API when backend is ready) ──
-    // Each entry represents one student record returned by the server.
-    studentData = [
-      { id: 1, name: 'Priya Patel',   overall: 96, modulesCompleted: 6,
-        moduleScores: { Frontend: 98, Backend: 94, DataViz: 96, Security: 95, Analytics: 97, AI: 100 } },
-      { id: 2, name: 'John Doe',      overall: 88, modulesCompleted: 5,
-        moduleScores: { Frontend: 90, Backend: 85, DataViz: 88, Security: 87, Analytics: 90 } },
-      { id: 3, name: 'Maria Garcia',  overall: 74, modulesCompleted: 4,
-        moduleScores: { Frontend: 78, Backend: 70, DataViz: 76, Security: 72 } },
-      { id: 4, name: 'Sam Lee',       overall: 91, modulesCompleted: 5,
-        moduleScores: { Frontend: 93, Backend: 89, DataViz: 91, Security: 90, Analytics: 92 } },
-    ];
-  }
-
-  renderDashboard();
-}
-
-/**
- * Compute summary KPIs from studentData and render the table.
- * Called after every load or re-sort.
- */
-function renderDashboard() {
-  if (!studentData.length) return;
-
-  // ── Compute metrics ──────────────────────────────────────
-  const count   = studentData.length;
-  const avg     = Math.round(studentData.reduce((s, r) => s + r.overall, 0) / count);
-  const avgMods = (studentData.reduce((s, r) => s + r.modulesCompleted, 0) / count).toFixed(1);
-  const top     = studentData.reduce((a, b) => a.overall >= b.overall ? a : b);
-
-  // ── Update KPI cards ─────────────────────────────────────
-  document.getElementById('class-average').textContent    = `${avg}%`;
-  document.getElementById('students-enrolled').textContent = `${count} students enrolled`;
-  document.getElementById('modules-completed').textContent = avgMods;
-  document.getElementById('top-grade').textContent        = `${top.overall}%`;
-  document.getElementById('top-scorer').textContent       = top.name;
-
-  // ── Render sortable table ─────────────────────────────────
-  renderTable();
-
-  // ── Wire up column header sort clicks ────────────────────
-  document.querySelectorAll('#gradebook thead th[data-key]').forEach(th => {
-    // Remove old listener by replacing node (simple pattern for small tables)
-    const fresh = th.cloneNode(true);
-    th.replaceWith(fresh);
-    fresh.addEventListener('click', () => {
-      const key = fresh.dataset.key;
-      // Toggle direction if same column clicked again
-      sortDir = (sortKey === key && sortDir === 'asc') ? 'desc' : 'asc';
-      sortKey = key;
-      renderTable();
-    });
-  });
-}
-
-/**
- * Sort studentData and rebuild <tbody> rows.
- * Also updates column header arrows to show sort direction.
- */
-function renderTable() {
-  // ── Sort in-place ─────────────────────────────────────────
-  const sorted = [...studentData].sort((a, b) => {
-    const va = a[sortKey] ?? '';
-    const vb = b[sortKey] ?? '';
-    if (typeof va === 'string') return sortDir === 'asc'
-      ? va.localeCompare(vb)
-      : vb.localeCompare(va);
-    return sortDir === 'asc' ? va - vb : vb - va;
-  });
-
-  // ── Update sort-direction arrows on column headers ────────
-  document.querySelectorAll('#gradebook thead th[data-key]').forEach(th => {
-    delete th.dataset.sort;
-    if (th.dataset.key === sortKey) th.dataset.sort = sortDir;
-  });
-
-  // ── Build rows ────────────────────────────────────────────
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = sorted.map(s => {
-    const pct = s.overall;
-    return `
-      <!-- Main data row — clicking the name expands the detail row below -->
-      <tr class="data-row" data-id="${s.id}" style="cursor:pointer;">
-        <td><span class="student-name">${s.name}</span></td>
-        <td class="center">
-          <div class="bar-wrap">
-            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-            <span class="bar-label">${pct}%</span>
-          </div>
-        </td>
-        <td class="center">${s.modulesCompleted} / ${TOTAL_MODULES}</td>
-      </tr>
-      <!-- Hidden detail row — toggled by clicking the name cell above -->
-      <tr class="detail-row" id="detail-${s.id}" style="display:none;">
-        <td colspan="3" style="padding:12px 16px;">
-          <div class="detail-header">Per-module scores for ${s.name}</div>
-          <div class="modules-list">
-            ${Object.entries(s.moduleScores || {}).map(([mod, score]) =>
-              `<span class="module-chip">${mod}: ${score}%</span>`
-            ).join('')}
-          </div>
-        </td>
-      </tr>`;
-  }).join('');
-
-  // ── Toggle detail rows on click ───────────────────────────
-  tbody.querySelectorAll('.data-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const detail = document.getElementById(`detail-${row.dataset.id}`);
-      if (detail) detail.style.display = detail.style.display === 'none' ? '' : 'none';
-    });
-  });
-}
-
-/**
- * Export gradebook as a CSV file and trigger a browser download.
- * Uses the Blob / URL.createObjectURL pattern — no server needed.
- */
-function exportReport() {
-  if (!studentData.length) { alert('No data to export.'); return; }
-
-  // Build CSV header + one row per student
-  const header = ['Name', 'Overall (%)', 'Modules Completed'];
-  const rows   = studentData.map(s => [s.name, s.overall, s.modulesCompleted]);
-  const csv    = [header, ...rows].map(r => r.join(',')).join('\n');
-
-  // Create a temporary anchor element to trigger the download
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), {
-    href:     url,
-    download: `gradebook_${new Date().toISOString().slice(0, 10)}.csv`,
-  });
-  a.click();
-  URL.revokeObjectURL(url);   // free memory after download starts
-}
-
-document.getElementById('exportBtn').addEventListener('click', exportReport);
-
-
-// ============================================================
-//  SECTION 3 — CERTIFICATES
-//  Fetches the current user's real name from the API, then
-//  renders a certificate PNG using the HTML <canvas> element.
-// ============================================================
-
-/** Fetch the logged-in user's display name. */
-async function getStudentName() {
-  try {
-    const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
-    if (res.ok) return (await res.json()).name || 'Student Name';
-  } catch (err) {
-    console.warn('Could not fetch student name:', err.message);
-  }
-  return 'Student Name';   // safe fallback
-}
-
-/** Render and download a certificate PNG for the given course. */
-async function downloadCert(course, org, date) {
-  const name   = await getStudentName();
-  const canvas = document.getElementById('certCanvas');
-  const ctx    = canvas.getContext('2d');
-
-  // Certificate dimensions (landscape A4-ish)
-  canvas.width  = 1400;
-  canvas.height = 1000;
-
-  // ── Background ───────────────────────────────────────────
-  ctx.fillStyle = '#f8f6f0';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // ── Border ───────────────────────────────────────────────
-  ctx.strokeStyle = '#2c3e50';
-  ctx.lineWidth   = 25;
-  ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
-
-  // ── Title ─────────────────────────────────────────────────
-  ctx.fillStyle  = '#2c3e50';
-  ctx.font       = 'bold 60px Georgia';
-  ctx.textAlign  = 'center';
-  ctx.fillText('CERTIFICATE OF COMPLETION', canvas.width / 2, 260);
-
-  // ── Body text ─────────────────────────────────────────────
-  ctx.font      = '28px Arial';
-  ctx.fillText('This is to certify that', canvas.width / 2, 380);
-
-  // ── Recipient name (fetched dynamically from API) ─────────
-  ctx.fillStyle = '#ea8c33';
-  ctx.font      = 'italic bold 52px Georgia';
-  ctx.fillText(name, canvas.width / 2, 470);
-
-  // ── Course / org / date ───────────────────────────────────
-  ctx.fillStyle = '#2c3e50';
-  ctx.font      = '32px Arial';
-  ctx.fillText(`has successfully completed ${course}`, canvas.width / 2, 570);
-  ctx.font      = '24px Arial';
-  ctx.fillStyle = '#666';
-  ctx.fillText(org, canvas.width / 2, 640);
-  ctx.fillText(date, canvas.width / 2, 690);
-
-  // ── Trigger download ──────────────────────────────────────
-  const a     = document.createElement('a');
-  a.download  = `${course.replace(/\s+/g, '_')}_Certificate.png`;
-  a.href      = canvas.toDataURL('image/png');
-  a.click();
-}
-
-/** Open LinkedIn's "Add Certification" page pre-filled with course details. */
-function addToLinkedIn(courseName) {
-  const url = new URL('https://www.linkedin.com/profile/add');
-  url.searchParams.append('name',             courseName);
-  url.searchParams.append('organizationName', 'Open Coding Society');
-  url.searchParams.append('issueYear',        new Date().getFullYear());
-  url.searchParams.append('issueMonth',       new Date().getMonth() + 1);
-  url.searchParams.append('certId',           `CSPORTFOLIO-${Date.now()}`);
-  window.open(url.toString(), '_blank');
-}
-
-/** Populate the cert date on page load and wire up buttons. */
-function initCerts() {
-  // Show a human-readable month/year on the cert card
-  const dateStr = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  document.getElementById('certDate').textContent = dateStr;
-
-  document.getElementById('btnDownload').addEventListener('click',
-    () => downloadCert('CS Portfolio Certificate', 'Open Coding Society', dateStr)
-  );
-  document.getElementById('btnLinkedIn').addEventListener('click',
-    () => addToLinkedIn('CS Portfolio Certificate')
-  );
-}
-
-
-// ============================================================
-//  SECTION 4 — FREE RESPONSE QUESTION (FRQ)
-//  Posts the student's answer to the backend grading endpoint.
-//  Displays the AI-generated feedback with basic HTML formatting.
-// ============================================================
-
-function initFRQ() {
-  const btn = document.getElementById('frq-grade-btn');
-  const fb  = document.getElementById('frq-feedback');
-
-  btn.addEventListener('click', async () => {
-    const question = document.getElementById('frq-question').textContent.trim();
-    const answer   = document.getElementById('frq-answer').value.trim();
-
-    // Validate: don't submit an empty answer
-    if (!answer) {
-      fb.innerHTML = `<span style="color:var(--danger);">Please enter a response before grading.</span>`;
-      return;
-    }
-
-    // Disable button + show spinner text while waiting
-    btn.disabled    = true;
-    fb.innerHTML    = 'Grading…';
-
-    try {
-      const res = await fetch(`${javaURI}/api/gemini-frq/grade`, {
-        method:  'POST',
-        mode:    'cors',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ question, answer }),
-      });
-
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
-
-      const result = await res.json();
-
-      // The Gemini response is nested inside candidates[0].content.parts[0].text
-      // Convert **bold** markers and newlines to HTML
-      const raw = result.candidates?.[0]?.content?.parts?.[0]?.text ?? 'No feedback returned.';
-      fb.innerHTML = raw
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
-
-    } catch (err) {
-      fb.innerHTML = `<span style="color:var(--danger);">Grading error: ${err.message}</span>`;
-    } finally {
-      btn.disabled = false;   // always re-enable button
-    }
-  });
-}
-
-
-// ============================================================
-//  SECTION 5 — PERSISTENCE (localStorage)
-//  Saves current step + FRQ draft so a page refresh restores
-//  where the student left off.
-// ============================================================
-
-/** Write current UI state to localStorage. */
-function persist() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      step:      currentStep,
-      frqAnswer: document.getElementById('frq-answer')?.value ?? '',
-    }));
-  } catch (e) { /* quota exceeded or private browsing — silently skip */ }
-}
-
-/** Read saved state from localStorage and apply it. */
-function restore() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!saved) return;
-
-    // Restore the FRQ draft text if present
-    const ta = document.getElementById('frq-answer');
-    if (ta && saved.frqAnswer) ta.value = saved.frqAnswer;
-
-    // Restore which step was active (defaults to 0)
-    showStep(saved.step ?? 0);
-  } catch (e) { /* corrupt data — just start from the beginning */ }
-}
-
-
-// ============================================================
-//  SECTION 6 — BOOT
-//  DOMContentLoaded fires once the HTML is fully parsed.
-//  We restore saved state first, then kick off async data loads.
-// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-  restore();       // apply any saved step / FRQ draft
-  showStep(currentStep);   // initialise progress bar + button states
-
-  loadAnalytics(); // async: fetch students → render dashboard
-  initCerts();     // wire up download / LinkedIn buttons
-  initFRQ();       // wire up the grade button
+  const nav   = new Navigator({ progressStyle: 'dots', labels: ['Analytics', 'Certificates', 'Free Response'] });
+  const store = new Persistence('analytics_combined_v1', { fields: ['frq-answer'] });
+  nav.init(() => store.persist());
+  store.restore((n, s) => nav.showStep(n, s));
+  new AnalyticsDashboard(javaURI, fetchOptions).init();
+  new CertificatePanel(pythonURI, fetchOptions).init();
+  new FrqGrader(javaURI).init();
 });
-
 </script>
 
-<!-- ============================================================
-     BACK BUTTON HANDLER
-     Tries history.back() so the browser returns to wherever the
-     student navigated from; falls back to the parent path.
-     Kept as a separate non-module script because it doesn't need
-     any imports and runs independently.
-     ============================================================ -->
 <script>
-(function () {
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('a.back-btn').forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        // Let modifier-clicks (Cmd/Ctrl/Shift + click, middle-click) behave normally
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('a.back-btn').forEach(function(a){
+      a.addEventListener('click', function(e){
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
-
-        // Prefer history.back() when we came from the same origin
-        try {
-          if (document.referrer && new URL(document.referrer).origin === location.origin) {
-            history.back();
-            return;
-          }
-        } catch (err) { /* ignore URL parse errors */ }
-
-        // Fallback: navigate to the parent directory
-        const parts = location.pathname.replace(/\/$/, '').split('/');
-        if (parts.length > 1) {
-          parts.pop();
-          window.location.href = parts.join('/') + '/';
-        } else {
-          window.location.href = '/';
-        }
+        try { if (document.referrer && new URL(document.referrer).origin === location.origin) { history.back(); return; } } catch(err) {}
+        var p = location.pathname.replace(/\/$/, '').split('/');
+        if (p.length > 1) { p.pop(); window.location.href = p.join('/') + '/'; } else { window.location.href = '/'; }
       });
     });
   });
 })();
 </script>
-
-<!-- Lesson completion tracker (provided by the site framework) -->
 <script src="/assets/js/lesson-completion-bigsix.js"></script>

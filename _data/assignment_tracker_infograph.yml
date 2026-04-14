@@ -1,0 +1,105 @@
+Title: "Assignment Resource Management System"
+Description: "Complete ecosystem for managing assignment submissions, tracking resources, and monitoring student progress. Covers submission handling, file management, and gradebook integration."
+
+Features:
+  - title: "Student Submission Interface"
+    subtitle: "Direct submission from lessons and blog pages"
+    status: "Production Ready"
+    endpoints:
+      - "POST /api/submissions/{id}"
+      - "POST /api/assignment-submissions/upload"
+      - "GET /api/person/uid/{uid}"
+    icon: |
+      <path d="M12 4v16m8-8H4"/>
+    keyPoints:
+      - "Link submission directly from lesson/blog pages"
+      - "File upload to Spring backend with identity resolution"
+      - "Real-time status feedback with loading spinner"
+      - "Auto-resolves student identity via Flask UID service"
+    tech:
+      - "Flask ID Service"
+      - "Spring API"
+      - "JWT Authentication"
+      - "Multipart Upload"
+    description: "Students can submit assignments as URLs or file uploads directly from course materials. System resolves student identity through Flask service before writing to Spring gradebook."
+    security:
+      - "No assignment_id = user-friendly error message"
+      - "All mutations validated server-side"
+      - "JWT credentials included in all requests"
+    link: "/assignments"
+
+  - title: "Submissions Dashboard"
+    subtitle: "View and manage all submissions by role"
+    status: "Production Ready"
+    endpoints:
+      - "GET /api/assignment-submission-view/list"
+      - "GET /api/user/current"
+    icon: |
+      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    keyPoints:
+      - "Dual-tab interface: My Submissions / All Submissions"
+      - "Role-based filtering (students see own, admins see all)"
+      - "Real-time filter by assignment, student, status"
+      - "Status badges: Pending Review, Graded, Late"
+    tech:
+      - "Tailwind CSS"
+      - "Module Imports"
+      - "Tab Switching"
+      - "Real-time Filtering"
+    description: "Centralized view of all assignment submissions with role-based access control. Students see only their submissions; teachers/admins see all submissions across all students with advanced filtering."
+    security:
+      - "Server-side role checking via SecurityContext"
+      - "Regular users filtered to submitterId only"
+      - "Admins/Teachers see all via explicit permission check"
+    link: "/submissions"
+
+  - title: "Assignment Resource Tracking"
+    subtitle: "URL and file resource attachment with state management"
+    status: "In Development"
+    endpoints:
+      - "POST /api/assignments/{id}/resource/url"
+      - "POST /api/assignments/{id}/resource/file"
+      - "GET /api/assignments/{id}/resource/file-content"
+      - "GET /mvc/assignments/tracker-v2"
+    icon: |
+      <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+    keyPoints:
+      - "ID-scoped resource attachment (URL or file)"
+      - "Explicit resource state transitions (url → file)"
+      - "Uploader metadata preserved in state"
+      - "MVC admin viewer at /mvc/assignments/tracker-v2"
+    tech:
+      - "Spring JPA"
+      - "File Storage"
+      - "Metadata Tracking"
+      - "State Management"
+    description: "Teachers can attach assignment resources (URLs or files) scoped by assignment ID. System tracks which resource type (URL/file) and preserves uploader identity. File uploads replace URL metadata intentionally."
+    security:
+      - "Teacher/Admin only for mutations"
+      - "Resource downloads via session auth"
+      - "Consistent authz between MVC and API paths"
+    link: "/mvc/assignments/tracker-v2"
+
+  - title: "Security & File Validation"
+    subtitle: "Hardening upload restrictions and authorization"
+    status: "Planned"
+    endpoints:
+      - "POST /api/assignments/{id}/resource/file"
+      - "All resource mutation endpoints"
+    icon: |
+      <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+    keyPoints:
+      - "Extension allowlist (.pdf, .txt, .md, .csv, .json, .png, .jpg, .gif, .webp, .zip)"
+      - "Block executables (.exe, .bat, .sh, .ps1, .jar, .msi)"
+      - "MIME type validation"
+      - "403 errors for non-authorized users"
+    tech:
+      - "Extension Validation"
+      - "MIME Type Checking"
+      - "Authorization Audits"
+    description: "Server-side file type restrictions to prevent accidental upload of executable content. All authorization rules audited to prevent cross-user access and ensure consistent 403/401 responses."
+    security:
+      - "No reliance on client-side validation"
+      - "Blocked files return 400 with clear error"
+      - "All reads/writes verify teacher role"
+    link: "/mvc/assignments/tracker-v2"

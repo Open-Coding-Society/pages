@@ -16,269 +16,146 @@ date: 2025-12-01
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-  :root {
-    --bg: #0a0e27;
-    --panel: #0f1729;
-    --border: rgba(255, 255, 255, 0.08);
-    --text: #e6eef8;
-    --muted: #9aa6bf;
-    --accent: #7c3aed;
+  /*
+   * Colors from system SASS (_sass/minima/lessonbase.scss → :root).
+   * Edit lessonbase.scss to change colors — not this file.
+   */
+  .page-content {
+    --bg:       var(--bg-1);
+    --panel:    var(--panel);
+    --panel-2:  var(--bg-3);
+    --panel-3:  var(--surface);
+    --border:   rgba(255,255,255,0.08);
+    --border-b: rgba(255,255,255,0.14);
+    --border-ac:rgba(76,175,239,0.4);
+    --txt:      var(--text);
+    --muted:    var(--text-muted);
+    --ac:       var(--accent);
+    --ac2:      var(--accent);
+    --ok:       var(--green);
+    --ok-bg:    var(--green-bg);
+    --err:      var(--red);
+    --err-bg:   var(--warn-bg);
+    --code-bg:  var(--bg-0);
+    --hover-bg: rgba(76,175,239,0.1);
   }
 
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.5; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 28px 16px 64px; }
 
-  .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 40px; }
-  .header { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px 0; }
-  .header p { color: var(--muted); font-size: 14px; margin: 0; }
+  .lesson-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac2); margin-bottom: 10px; }
+  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 8px var(--ac); display: inline-block; }
+  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--txt); }
+  .lesson-header p  { color: var(--muted); font-size: 14px; }
 
-  .progress-bar-container {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 24px;
-  }
+  .progress-track { margin: 20px 0 28px; }
+  .progress-steps { display: flex; }
+  .progress-step { flex: 1; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-b); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
+  .progress-step.active .step-dot { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: 0 0 12px rgba(76,175,239,0.5); }
+  .progress-step.done   .step-dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .progress-step .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; white-space: nowrap; }
+  .progress-step.active .step-label { color: var(--ac2); }
+  .progress-step.done   .step-label { color: var(--ok); }
+  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-b); }
+  .progress-step:first-child::before { display: none; }
+  .progress-step.done::before { background: var(--ok); }
 
-  .progress-bar { display: flex; gap: 8px; justify-content: space-between; align-items: center; }
-  .progress-bar .step { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; transition: 0.2s; }
-  .progress-bar .step.active { background: var(--accent); height: 6px; }
+  .section        { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-  /* Section visibility — JS toggles .hidden/.active */
-  .section { display: none; }
-  .section.active { display: block; }
-
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  .card h2 { margin-top: 0; font-size: 20px; color: #a6c9ff; }
-  .card h3 { margin-top: 16px; font-size: 16px; color: #a6c9ff; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--ac), var(--ac2)); opacity: 0.6; }
+  .card h2 { font-size: 20px; font-weight: 800; color: var(--txt); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .card h2 .step-num { width: 28px; height: 28px; border-radius: 8px; background: var(--ac); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card h3 { font-size: 15px; color: var(--ac2); margin: 20px 0 8px; }
+  .block-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+  .tip { font-size: 12px; color: var(--muted); border-left: 2px solid var(--border-ac); padding-left: 10px; margin-top: 16px; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
-  /* Unified dark input style — all inputs/textareas everywhere */
-  input, textarea, select {
-    background: #051226;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    color: #dce9ff;
-    font-family: Inter, system-ui, sans-serif;
-    font-size: 14px;
-    width: 100%;
-    margin-bottom: 8px;
-  }
-  input:focus, textarea:focus { outline: none; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
+  input, textarea, select { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: var(--txt); font-size: 14px; width: 100%; margin-bottom: 8px; }
+  input:focus, textarea:focus { outline: none; box-shadow: 0 0 8px rgba(76,175,239,0.3); }
 
-  /* Unified dark button style */
-  button {
-    background: #0f1729;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 6px 14px;
-    font-family: Inter, system-ui, sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  button:hover { background: #1a2340; border-color: rgba(124,58,237,0.5); }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button { appearance: none; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.1s; }
+  button:hover { background: var(--hover-bg); border-color: var(--border-ac); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  button.primary { background: var(--ac); border-color: var(--border-ac); color: #fff; }
+  button.primary:hover { background: var(--accent-700); }
+  button.secondary { background: var(--panel-2); border-color: var(--border); }
 
-  .preview-box { background: #0f1729; border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-height: 200px; overflow: auto; }
-  /* Preview text should be light */
-  #resumePreview { color: var(--text); }
-  #resumePreview b { color: #a6c9ff; }
-  #resumePreview .text-gray-600 { color: var(--muted) !important; }
+  .preview-box { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-height: 200px; overflow: auto; }
+  #resumePreview { color: var(--txt); }
+  #resumePreview b { color: var(--ac); }
 
   .nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
+  .tooltip  { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .exercise { background: rgba(76,175,239,0.1); border-left: 3px solid var(--ac); padding: 12px; border-radius: 6px; margin: 8px 0; }
 
-  .tooltip { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .skill-tag { display: inline-block; padding: 4px 10px; background: rgba(76,175,239,0.15); border: 1px solid rgba(76,175,239,0.35); border-radius: 20px; font-size: 12px; color: var(--ac); }
+  .skill-check-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--txt); padding: 4px 0; cursor: pointer; }
+  .skill-check-label input[type="checkbox"] { width: 15px; height: 15px; min-width: 15px; padding: 0; margin: 0; background: var(--code-bg); border: 1px solid var(--border); border-radius: 3px; accent-color: var(--ac); cursor: pointer; margin-bottom: 0; }
 
-  .exercise { background: rgba(124, 58, 237, 0.1); border-left: 3px solid var(--accent); padding: 12px; border-radius: 6px; margin: 8px 0; }
+  .exp-entry { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+  .exp-entry input, .exp-entry textarea { margin-bottom: 8px; }
 
-  /* Skill tags — dark theme */
-  .skill-tag {
-    display: inline-block;
-    padding: 4px 10px;
-    background: rgba(124, 58, 237, 0.15);
-    border: 1px solid rgba(124, 58, 237, 0.35);
-    border-radius: 20px;
-    font-size: 12px;
-    color: #c4b5fd;
-  }
-
-  /* Skill checklist labels */
-  .skill-check-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text);
-    padding: 4px 0;
-    cursor: pointer;
-  }
-  .skill-check-label input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
-    min-width: 15px;
-    padding: 0;
-    margin: 0;
-    background: #051226;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    accent-color: var(--accent);
-    cursor: pointer;
-    margin-bottom: 0;
-  }
-
-  /* Experience entry cards */
-  .exp-entry {
-    background: #051226;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 10px;
-  }
-  .exp-entry input, .exp-entry textarea {
-    margin-bottom: 8px;
-  }
-
-  /* Drag & drop zones */
-  .drop-zone {
-    min-height: 80px;
-    padding: 10px;
-    border: 1px dashed rgba(124, 58, 237, 0.4);
-    border-radius: 8px;
-    background: rgba(124, 58, 237, 0.05);
-    color: var(--muted);
-    font-size: 13px;
-  }
-  .drop-zone.drag-over { border-color: var(--accent); background: rgba(124,58,237,0.12); }
-
-  /* Drag items */
-  .drag-item {
-    display: inline-block;
-    padding: 5px 12px;
-    background: #0f1729;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 12px;
-    color: var(--text);
-    cursor: grab;
-    margin: 4px;
-    user-select: none;
-  }
+  .drop-zone { min-height: 80px; padding: 10px; border: 1px dashed rgba(76,175,239,0.4); border-radius: 8px; background: rgba(76,175,239,0.05); color: var(--muted); font-size: 13px; }
+  .drop-zone.drag-over { border-color: var(--ac); background: rgba(76,175,239,0.12); }
+  .drag-item { display: inline-block; padding: 5px 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; color: var(--txt); cursor: grab; margin: 4px; user-select: none; }
   .drag-item:active { cursor: grabbing; }
 
-  /* Interview box */
-  .interview-box {
-    background: #051226;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-  }
+  .interview-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .video-container { height: 80px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 13px; }
 
-  /* Recording area */
-  .video-container {
-    height: 80px;
-    background: #051226;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-size: 13px;
-  }
-
-  #recordingIndicator {
-    color: #f87171;
-    font-size: 13px;
-    font-weight: 600;
-    animation: blink 1s step-start infinite;
-  }
+  #recordingIndicator { color: var(--red); font-size: 13px; font-weight: 600; animation: blink 1s step-start infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 
-  /* LinkedIn preview area */
-  #linkedinPreview {
-    background: #051226;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 13px;
-    color: var(--text);
-    min-height: 48px;
-    margin-top: 8px;
-  }
+  #linkedinPreview { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 13px; color: var(--txt); min-height: 48px; margin-top: 8px; }
+  #saveMessage { color: var(--green); font-size: 13px; margin-top: 6px; }
 
-  /* Save message */
-  #saveMessage { color: #4ade80; font-size: 13px; margin-top: 6px; }
+  #nextModuleBtnNav { background: var(--ac); border: none; border-radius: 8px; color: #fff; padding: 6px 14px; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; }
+  #nextModuleBtnNav:hover { background: var(--accent-700); }
 
-  /* Next module link styled as button */
-  #nextModuleBtnNav {
-    background: var(--accent);
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    padding: 6px 14px;
-    font-size: 13px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-  }
-  #nextModuleBtnNav:hover { background: #6d28d9; }
-
-  /* Flex helpers not relying on tailwind gap */
   .flex-row-gap { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-
-  .back-btn {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 5px 12px;
-    background: #0f1729;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    font-size: 13px;
-    text-decoration: none;
-  }
-  .back-btn:hover { border-color: rgba(124,58,237,0.5); color: var(--text); }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
+  .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
 </style>
 
 <div class="container page-content">
-  <div class="header">
+  <div class="lesson-header">
+    <div class="badge">Grinders · Lesson 4</div>
     <h1>Resume — All-in-One</h1>
-    <p>Short, interactive steps. Autosaves locally.</p>
-    <a href="../" class="back-btn">← Back</a>
+    <p>Short, interactive steps. Build your resume, export PDF, and practice interviews.</p>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
-  <div class="progress-bar-container">
-    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:8px;">
-      <span>Progress</span><span id="progressLabel">Step 1 / 6</span>
-    </div>
-    <div style="width:100%; background:rgba(255,255,255,0.1); border-radius:4px; height:6px;">
-      <div id="progressBar" style="width:16.6667%; height:6px; border-radius:4px; background:var(--accent); transition:width 0.3s;"></div>
-    </div>
+  <div class="progress-track">
+    <div class="progress-steps" id="progressSteps"></div>
   </div>
 
-  <!-- Step 1: Contact -->
-  <section data-step="0" class="section active">
+  <!-- Step 1 -->
+  <section data-step="0" id="step1" class="section active">
     <div class="card">
-      <h2>1 — Contact</h2>
+      <h2><span class="step-num">1</span> Contact</h2>
+      <p class="block-desc">Fill in your basic contact information — this is the first thing recruiters see.</p>
       <div class="grid">
         <input id="fullName" placeholder="Full name" />
         <input id="email" placeholder="Email" />
         <input id="phone" placeholder="Phone" />
         <input id="location" placeholder="City, State" />
       </div>
-      <div class="tooltip">Keep it short and professional. Use a real contact email.</div>
+      <p class="tip">Keep it short and professional. Use a real contact email.</p>
     </div>
   </section>
 
-  <!-- Step 2: Skills -->
-  <section data-step="1" class="section">
+  <!-- Step 2 -->
+  <section data-step="1" id="step2" class="section">
     <div class="card">
-      <h2>2 — Skills</h2>
+      <h2><span class="step-num">2</span> Skills</h2>
+      <p class="block-desc">Select or add your hard and soft skills — these are keywords recruiters search for.</p>
       <div class="grid">
         <div>
           <h3>Hard Skills</h3>
@@ -299,60 +176,65 @@ date: 2025-12-01
           <div id="softSkillTags" class="flex-row-gap" style="margin-top:10px;"></div>
         </div>
       </div>
+      <p class="tip">Aim for 5–8 hard skills that match your target job descriptions.</p>
     </div>
   </section>
 
-  <!-- Step 3: Education -->
-  <section data-step="2" class="section">
+  <!-- Step 3 -->
+  <section data-step="2" id="step3" class="section">
     <div class="card">
-      <h2>3 — Education</h2>
+      <h2><span class="step-num">3</span> Education</h2>
+      <p class="block-desc">List your school, degree, and key achievements to show academic credibility.</p>
       <input id="school" placeholder="School / Program" />
       <input id="degree" placeholder="Degree / Dates" />
       <textarea id="eduHighlights" rows="3" placeholder="Highlights (one per line)"></textarea>
+      <p class="tip">Include GPA only if 3.5+. List relevant coursework if you lack experience.</p>
     </div>
   </section>
 
-  <!-- Step 4: Experiences -->
-  <section data-step="3" class="section">
+  <!-- Step 4 -->
+  <section data-step="3" id="step4" class="section">
     <div class="card">
-      <h2>4 — Experiences</h2>
+      <h2><span class="step-num">4</span> Experiences</h2>
+      <p class="block-desc">Add work, projects, and activities using the Action → Metric → Result formula.</p>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="margin:0;">Add Experiences (Action → Metric → Result)</h3>
         <button id="addExperienceBtn">+ Add</button>
       </div>
       <div id="experienceContainer"></div>
-
       <div class="exercise" style="margin-top:16px;">
         <h3 style="margin-top:0;">Drag &amp; drop practice</h3>
         <p style="font-size:12px; color:var(--muted); margin:4px 0 10px;">Drag each item into the correct zone.</p>
         <div class="grid" style="gap:10px; margin-bottom:10px;">
           <div id="goodZone" class="drop-zone"><span style="font-size:12px; opacity:0.6;">✓ Good bullet points</span></div>
-          <div id="badZone" class="drop-zone"><span style="font-size:12px; opacity:0.6;">✗ Bad bullet points</span></div>
+          <div id="badZone"  class="drop-zone"><span style="font-size:12px; opacity:0.6;">✗ Bad bullet points</span></div>
         </div>
         <div id="itemsPool" class="flex-row-gap"></div>
       </div>
+      <p class="tip">Use strong action verbs: Built, Designed, Led, Reduced, Increased.</p>
     </div>
   </section>
 
-  <!-- Step 5: Preview & PDF -->
-  <section data-step="4" class="section">
+  <!-- Step 5 -->
+  <section data-step="4" id="step5" class="section">
     <div class="card">
-      <h2>5 — Preview &amp; PDF</h2>
-      <div class="preview-box">
-        <div id="resumePreview"></div>
-      </div>
+      <h2><span class="step-num">5</span> Preview &amp; PDF</h2>
+      <p class="block-desc">Review your assembled resume and download it as a polished PDF.</p>
+      <div class="preview-box"><div id="resumePreview"></div></div>
       <div class="flex-row-gap" style="margin-top:12px;">
         <button id="downloadPdfBtn">⬇ Download PDF</button>
         <button id="saveDraft">💾 Save Draft</button>
       </div>
       <p id="saveMessage"></p>
+      <p class="tip">Keep your resume to one page. Save as PDF to preserve formatting.</p>
     </div>
   </section>
 
-  <!-- Step 6: LinkedIn & Interview -->
-  <section data-step="5" class="section">
+  <!-- Step 6 -->
+  <section data-step="5" id="step6" class="section">
     <div class="card">
-      <h2>6 — LinkedIn &amp; Interview</h2>
+      <h2><span class="step-num">6</span> LinkedIn &amp; Interview</h2>
+      <p class="block-desc">Build your LinkedIn About section and practice interview questions with ELIO.</p>
       <div class="grid">
         <div>
           <h3 style="margin-top:0;">LinkedIn Builder</h3>
@@ -363,7 +245,7 @@ date: 2025-12-01
         <div>
           <h3 style="margin-top:0;">Interview Practice (ELIO)</h3>
           <div class="interview-box">
-            <div id="elioQuestion" style="font-size:14px; font-weight:600; color:#a6c9ff; margin-bottom:12px; min-height:40px;">Press Start to begin.</div>
+            <div id="elioQuestion" style="font-size:14px; font-weight:600; color:var(--ac); margin-bottom:12px; min-height:40px;">Press Start to begin.</div>
             <div class="flex-row-gap" style="margin-bottom:10px;">
               <button id="startInterviewBtn">▶ Start</button>
               <button id="nextQuestionBtn">→ Next</button>
@@ -381,467 +263,120 @@ date: 2025-12-01
           </div>
         </div>
       </div>
+      <p class="tip">Practice ELIO answers out loud — fluency improves with repetition.</p>
     </div>
   </section>
 
-  <!-- Bottom Nav -->
   <div class="nav-buttons">
-    <button id="prevBtn" disabled>← Previous</button>
+    <button id="prevBtn" disabled class="secondary">← Previous</button>
     <div class="flex-row-gap">
-      <button id="nextBtn">Next →</button>
-      <a id="nextModuleBtnNav" class="hidden" href="#">Next Module →</a>
+      <span id="stepIndicator" style="color:var(--muted); font-size:12px;">Step 1 / 6</span>
+      <button id="nextBtn" class="primary">Next →</button>
     </div>
   </div>
 
-  <!-- Floating Sprite -->
-  <video id="floating-sprite" width="150" height="160" loop muted playsinline style="position:fixed; bottom:20px; right:-200px; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); display:none; z-index:1000;">
+  <video id="floating-sprite" width="150" height="160" loop muted playsinline
+    style="position:fixed; bottom:20px; right:-200px; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,0.3); display:none; z-index:1000;">
     <source id="floating-source" src="" type="video/mp4">
   </video>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // ── State ──────────────────────────────────────────────────────────────────
-  const STORAGE_KEY = 'resume_combined_v1';
-  const state = {
-    step: 0,
-    personal: {},
-    hardSkills: new Set(['JavaScript','Python','HTML']),
-    softSkills: new Set(['Communication','Teamwork']),
-    education: {},
-    experiences: [],
-    about: ''
-  };
+<script src="/assets/js/bigsix/resume/persistence.js"></script>
+<script src="/assets/js/bigsix/resume/skills.js"></script>
+<script src="/assets/js/bigsix/resume/experience.js"></script>
+<script src="/assets/js/bigsix/resume/preview.js"></script>
+<script src="/assets/js/bigsix/resume/linkedin.js"></script>
+<script src="/assets/js/bigsix/resume/interview.js"></script>
 
-  // ── DOM helpers ────────────────────────────────────────────────────────────
-  const $ = s => document.querySelector(s);
-  const getAllSteps = () => Array.from(document.querySelectorAll('section[data-step]'));
-
-  const progressBar       = $('#progressBar');
-  const progressLabel     = $('#progressLabel');
-  const prevBtn           = $('#prevBtn');
-  const nextBtn           = $('#nextBtn');
-  const nextModuleBtnNav  = $('#nextModuleBtnNav');
-
-  const personalIds = ['fullName','email','phone','location'];
-  const eduIds      = ['school','degree','eduHighlights'];
-
-  const hardSkillsGrid      = $('#hardSkillsGrid');
-  const softSkillsGrid      = $('#softSkillsGrid');
-  const hardSkillTags       = $('#hardSkillTags');
-  const softSkillTags       = $('#softSkillTags');
-  const customHardSkillInput = $('#customHardSkill');
-  const customSoftSkillInput = $('#customSoftSkill');
-
-  const experienceContainer = $('#experienceContainer');
-  const addExperienceBtn    = $('#addExperienceBtn');
-  const itemsPool           = $('#itemsPool');
-  const goodZone            = $('#goodZone');
-  const badZone             = $('#badZone');
-
-  const resumePreview   = $('#resumePreview');
-  const downloadPdfBtn  = $('#downloadPdfBtn');
-  const saveDraftBtn    = $('#saveDraft');
-  const saveMessage     = $('#saveMessage');
-
-  const aboutPrompt        = $('#aboutPrompt');
-  const generateLinkedInBtn = $('#generateLinkedInBtn');
-  const linkedinPreview    = $('#linkedinPreview');
-
-  const elioQuestion      = $('#elioQuestion');
-  const startInterviewBtn = $('#startInterviewBtn');
-  const nextQuestionBtn   = $('#nextQuestionBtn');
-  const endInterviewBtn   = $('#endInterviewBtn');
-
-  const startRecordingBtn  = $('#startRecordingBtn');
-  const stopRecordingBtn   = $('#stopRecordingBtn');
-  const downloadRecBtn     = $('#downloadRecBtn');
-  const recordingIndicator = $('#recordingIndicator');
-  let mediaRecorder, recordedChunks = [];
-
-  // ── Step navigation ────────────────────────────────────────────────────────
-  function showStep(i) {
-    const steps = getAllSteps();
-    state.step = Math.max(0, Math.min(steps.length - 1, i));
-
-    steps.forEach((el, idx) => {
-      el.classList.toggle('active', idx === state.step);
-      // remove any stray 'hidden' class so CSS .section / .section.active controls display
-      el.classList.remove('hidden');
-    });
-
-    const pct = ((state.step + 1) / steps.length) * 100;
-    progressBar.style.width = pct + '%';
-    progressLabel.textContent = `Step ${state.step + 1} / ${steps.length}`;
-
-    prevBtn.disabled = state.step === 0;
-    nextBtn.style.display = state.step === steps.length - 1 ? 'none' : '';
-    nextModuleBtnNav.classList.toggle('hidden', state.step !== steps.length - 1);
-
-    persist();
-    if (state.step === 4) updateResumePreview();
-  }
-
-  prevBtn.addEventListener('click', () => showStep(state.step - 1));
-  nextBtn.addEventListener('click', () => showStep(state.step + 1));
-
-  // ── Persistence ────────────────────────────────────────────────────────────
-  function persist() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        personal:     state.personal,
-        hard:         Array.from(state.hardSkills),
-        soft:         Array.from(state.softSkills),
-        education:    state.education,
-        experiences:  state.experiences,
-        about:        state.about
-      }));
-    } catch(e) {}
-  }
-
-  function restore() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const s = JSON.parse(raw);
-      state.personal   = s.personal   || {};
-      state.education  = s.education  || {};
-      state.experiences = s.experiences || [];
-      state.about      = s.about      || '';
-      (s.hard || []).forEach(k => state.hardSkills.add(k));
-      (s.soft || []).forEach(k => state.softSkills.add(k));
-
-      personalIds.forEach(id => { const el = $('#' + id); if (el) el.value = state.personal[id] || ''; });
-      eduIds.forEach(id => { const el = $('#' + id); if (el) el.value = state.education[id] || ''; });
-      if (aboutPrompt) aboutPrompt.value = state.about || '';
-    } catch(e) {}
-  }
-
-  // Bind personal inputs
-  personalIds.forEach(id => {
-    const el = $('#' + id); if (!el) return;
-    el.addEventListener('input', () => { state.personal[id] = el.value; persist(); });
-  });
-  eduIds.forEach(id => {
-    const el = $('#' + id); if (!el) return;
-    el.addEventListener('input', () => { state.education[id] = el.value; persist(); });
-  });
-
-  // ── Skills UI ──────────────────────────────────────────────────────────────
-  function renderChecklist(gridEl, setRef) {
-    if (!gridEl) return;
-    gridEl.innerHTML = '';
-    Array.from(setRef).forEach(sk => {
-      const label = document.createElement('label');
-      label.className = 'skill-check-label';
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.dataset.skill = sk;
-      cb.checked = true;
-      const span = document.createElement('span');
-      span.textContent = sk;
-      label.appendChild(cb);
-      label.appendChild(span);
-      gridEl.appendChild(label);
-      cb.addEventListener('change', () => {
-        if (cb.checked) setRef.add(sk); else setRef.delete(sk);
-        renderTags(); persist();
-      });
-    });
-  }
-
-  function renderTags() {
-    hardSkillTags.innerHTML = Array.from(state.hardSkills)
-      .map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('');
-    softSkillTags.innerHTML = Array.from(state.softSkills)
-      .map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('');
-  }
-
-  $('#addHardSkillBtn').addEventListener('click', () => {
-    const v = customHardSkillInput.value.trim(); if (!v) return;
-    state.hardSkills.add(v); customHardSkillInput.value = '';
-    renderChecklist(hardSkillsGrid, state.hardSkills); renderTags(); persist();
-  });
-  $('#addSoftSkillBtn').addEventListener('click', () => {
-    const v = customSoftSkillInput.value.trim(); if (!v) return;
-    state.softSkills.add(v); customSoftSkillInput.value = '';
-    renderChecklist(softSkillsGrid, state.softSkills); renderTags(); persist();
-  });
-  // Allow Enter key in skill inputs
-  customHardSkillInput.addEventListener('keydown', e => { if (e.key === 'Enter') $('#addHardSkillBtn').click(); });
-  customSoftSkillInput.addEventListener('keydown', e => { if (e.key === 'Enter') $('#addSoftSkillBtn').click(); });
-
-  // ── Experiences ────────────────────────────────────────────────────────────
-  function addExperience(initial = { title:'', company:'', dates:'', bullets:'' }) {
-    const idx = state.experiences.length;
-    state.experiences.push({ ...initial });
-
-    const el = document.createElement('div');
-    el.className = 'exp-entry';
-    el.innerHTML = `
-      <input placeholder="Job Title / Role" data-idx="${idx}" data-key="title" value="${escapeHtml(initial.title || '')}" />
-      <input placeholder="Company | Dates" data-idx="${idx}" data-key="company" value="${escapeHtml(initial.company || '')}" />
-      <textarea rows="3" placeholder="Bullet points (one per line, start with action verbs)" data-idx="${idx}" data-key="bullets">${escapeHtml(initial.bullets || '')}</textarea>
-      <div style="display:flex; justify-content:flex-end; margin-top:4px;">
-        <button class="removeExpBtn" style="font-size:12px; color:#f87171; border-color:rgba(248,113,113,0.3);">✕ Remove</button>
-      </div>
-    `;
-    experienceContainer.appendChild(el);
-
-    el.querySelectorAll('input, textarea').forEach(inp => {
-      inp.addEventListener('input', e => {
-        const k = e.target.dataset.key;
-        const i = Number(e.target.dataset.idx);
-        if (state.experiences[i]) state.experiences[i][k] = e.target.value;
-        persist();
-      });
-    });
-    el.querySelector('.removeExpBtn').addEventListener('click', () => {
-      const i = Number(el.querySelector('[data-idx]').dataset.idx);
-      state.experiences.splice(i, 1);
-      renderExperiences(); persist();
-    });
-  }
-
-  function renderExperiences() {
-    experienceContainer.innerHTML = '';
-    const copy = state.experiences.slice();
-    state.experiences = [];
-    copy.forEach(e => addExperience(e));
-  }
-
-  addExperienceBtn.addEventListener('click', () => {
-    addExperience({ title:'Project / Role', company:'Org | Dates', bullets:'• Led X\n• Improved Y by 20%' });
-    persist();
-  });
-
-  // ── Drag & Drop practice ───────────────────────────────────────────────────
-  const dragItems = [
-    { text:'Reduced page load time by 40%', good:true },
-    { text:'Responsible for doing projects', good:false },
-    { text:'Implemented feature increasing retention by 12%', good:true },
-    { text:'Hardworking and motivated person', good:false }
-  ];
-
-  function initDragPool() {
-    itemsPool.innerHTML = '';
-    dragItems.forEach((it, idx) => {
-      const b = document.createElement('div');
-      b.className = 'drag-item';
-      b.draggable = true;
-      b.textContent = it.text;
-      b.dataset.idx = idx;
-      b.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', idx));
-      itemsPool.appendChild(b);
-    });
-
-    [goodZone, badZone].forEach(zone => {
-      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-      zone.addEventListener('drop', e => {
-        e.preventDefault();
-        zone.classList.remove('drag-over');
-        const idx = parseInt(e.dataTransfer.getData('text/plain'), 10);
-        const sourceEl = document.querySelector(`.drag-item[data-idx="${idx}"]`);
-        if (sourceEl) {
-          zone.appendChild(sourceEl);
-          // Visual feedback
-          const isGoodZone = zone.id === 'goodZone';
-          const isCorrect = dragItems[idx].good === isGoodZone;
-          sourceEl.style.borderColor = isCorrect ? 'rgba(74,222,128,0.6)' : 'rgba(248,113,113,0.6)';
-          sourceEl.style.background = isCorrect ? 'rgba(74,222,128,0.08)' : 'rgba(248,113,113,0.08)';
-        }
-      });
-    });
-  }
-
-  // ── Resume Preview & PDF ───────────────────────────────────────────────────
-  function updateResumePreview() {
-    const P   = state.personal;
-    const edu = state.education;
-    const exp = state.experiences;
-
-    const name    = escapeHtml(P.fullName || '(Your Name)');
-    const contact = [P.email, P.phone, P.location].filter(Boolean).map(escapeHtml).join(' &nbsp;•&nbsp; ');
-
-    const eduBlock = edu.school ? `
-      <div style="margin-bottom:10px;">
-        <b>${escapeHtml(edu.school)}</b>
-        <div style="color:var(--muted); font-size:12px;">${escapeHtml(edu.degree || '')}</div>
-        <div style="font-size:12px;">${escapeHtml(edu.eduHighlights || '')}</div>
-      </div>` : '';
-
-    const allSkills = [...state.hardSkills, ...state.softSkills].map(escapeHtml).join(', ');
-    const skillsBlock = allSkills
-      ? `<div style="margin-bottom:10px;"><b>Skills</b><div style="font-size:12px; color:var(--muted);">${allSkills}</div></div>`
-      : '';
-
-    const expHtml = exp.map(e => `
-      <div style="margin-bottom:8px;">
-        <b>${escapeHtml(e.title || '')}</b> <span style="color:var(--muted); font-size:12px;">— ${escapeHtml(e.company || '')}</span>
-        <div style="font-size:12px; padding-left:12px;">
-          ${(e.bullets || '').split('\n').map(l => l.trim()).filter(Boolean)
-            .map(li => `<div>• ${escapeHtml(li.replace(/^[•\-]\s*/,''))}</div>`).join('')}
-        </div>
-      </div>`).join('');
-
-    resumePreview.innerHTML = `
-      <div style="border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:12px;">
-        <div style="font-size:18px; font-weight:800; color:#a6c9ff;">${name}</div>
-        <div style="font-size:12px; color:var(--muted);">${contact}</div>
-      </div>
-      ${eduBlock}
-      ${skillsBlock}
-      ${expHtml ? `<div><b>Experience</b><div style="margin-top:6px;">${expHtml}</div></div>` : ''}
-    `;
-  }
-
-  downloadPdfBtn.addEventListener('click', () => {
-    updateResumePreview();
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.setFontSize(11);
-    const lines = (resumePreview.innerText || '').split('\n').filter(l => l.trim());
-    doc.text(lines.slice(0, 80).join('\n'), 10, 10, { maxWidth: 190 });
-    doc.save('Resume.pdf');
-  });
-
-  saveDraftBtn.addEventListener('click', () => {
-    persist();
-    saveMessage.textContent = '✓ Saved locally';
-    setTimeout(() => { saveMessage.textContent = ''; }, 2000);
-  });
-
-  // ── LinkedIn Generator ─────────────────────────────────────────────────────
-  function synthAbout({ fullName, about }) {
-    if (about) return about;
-    const skills = Array.from(state.hardSkills).slice(0, 3).join(', ');
-    return `${fullName || 'This candidate'} is a motivated student or early-career developer with hands-on experience in ${skills || 'software development'}, building projects and collaborating in teams.`;
-  }
-
-  generateLinkedInBtn.addEventListener('click', () => {
-    const full  = state.personal.fullName || $('#fullName').value || 'Candidate';
-    const about = aboutPrompt.value.trim();
-    const out   = synthAbout({ fullName: full, about });
-    linkedinPreview.textContent = out;
-    state.about = out;
-    persist();
-  });
-
-  // ── Interview ELIO ─────────────────────────────────────────────────────────
-  const interviewQuestions = [
-    'Tell me about yourself.',
-    'Describe a project you are proud of.',
-    'How do you handle team conflict?',
-    'What are your greatest strengths?',
-    'Where do you see yourself in 5 years?',
-    'Do you have any questions for us?'
-  ];
-  let currentQuestion = 0;
-
-  function speakText(t) {
-    if (!t || !('speechSynthesis' in window)) return;
-    const u = new SpeechSynthesisUtterance(t);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-  }
-  function askQuestion() {
-    const q = interviewQuestions[currentQuestion % interviewQuestions.length];
-    elioQuestion.textContent = q;
-    speakText(q);
-  }
-  startInterviewBtn.addEventListener('click', () => { currentQuestion = 0; askQuestion(); });
-  nextQuestionBtn.addEventListener('click', () => { currentQuestion++; askQuestion(); });
-  endInterviewBtn.addEventListener('click', () => {
-    elioQuestion.textContent = 'Session ended. Great practice!';
-    window.speechSynthesis.cancel();
-  });
-
-  // ── Recording ──────────────────────────────────────────────────────────────
-  startRecordingBtn.addEventListener('click', async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      recordedChunks = [];
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
-      mediaRecorder.start();
-      recordingIndicator.classList.remove('hidden');
-    } catch(e) {
-      alert('Microphone access is required for recording.');
-    }
-  });
-  stopRecordingBtn.addEventListener('click', () => {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-      recordingIndicator.classList.add('hidden');
-    }
-  });
-  downloadRecBtn.addEventListener('click', () => {
-    if (!recordedChunks.length) { alert('No recording found. Press Record first.'); return; }
-    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = 'interview.webm'; a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // ── Floating sprite ────────────────────────────────────────────────────────
-  const floatingSprite = $('#floating-sprite');
-  const floatingSource = $('#floating-source');
-  const savedCharacter = localStorage.getItem('selectedCharacter');
-  if (savedCharacter) showFloatingSprite(savedCharacter);
-
-  function showFloatingSprite(charId) {
-    const spriteMap = {
-      'char1': '/hacks/cs-portfolio-quest/resume/sprites/elephant_2.mp4',
-      'char2': '/hacks/cs-portfolio-quest/resume/sprites/fox_2.mp4'
-    };
-    const src = spriteMap[charId];
-    if (src) {
-      floatingSource.src = src;
-      floatingSprite.style.display = 'block';
-      floatingSprite.play().catch(() => {});
-    }
-  }
-
-  // ── Utilities ──────────────────────────────────────────────────────────────
-  function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, c => ({
-      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
-    }[c]));
-  }
-
-  // ── Boot ───────────────────────────────────────────────────────────────────
-  restore();
-  renderChecklist(hardSkillsGrid, state.hardSkills);
-  renderChecklist(softSkillsGrid, state.softSkills);
-  renderTags();
-  renderExperiences();
-  initDragPool();
-  showStep(0);
+<script type="module">
+import { Navigator } from '/assets/js/bigsix/shared/navigation.js';
+window.__ResumeNav = new Navigator({
+  progressStyle: 'dots',
+  labels: ['Contact', 'Skills', 'Education', 'Experiences', 'Preview PDF', 'LinkedIn'],
+  onStep: (step) => {
+    const nextBtn = document.getElementById('nextBtn');
+    const lastStep = document.querySelectorAll('.section').length - 1;
+    if (nextBtn) nextBtn.style.display = step === lastStep ? 'none' : '';
+    document.getElementById('nextModuleBtnNav')?.classList.toggle('hidden', step !== lastStep);
+    if (step === 4 && window.Resume) new Resume.ResumePreview(window.__resumeState).update();
+  },
 });
 </script>
 
 <script>
-// Back button handler
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = id => document.getElementById(id);
+
+  const state = {
+    step:        0,
+    personal:    {},
+    hardSkills:  new Set(['JavaScript', 'Python', 'HTML']),
+    softSkills:  new Set(['Communication', 'Teamwork']),
+    education:   {},
+    experiences: [],
+    about:       '',
+  };
+
+  window.__resumeState = state;
+
+  // Wire navigation using shared Navigator — persist uses Resume.persist(state)
+  __ResumeNav.init(() => Resume.persist(state));
+
+  const saved = Resume.restore();
+  if (saved) {
+    state.personal    = saved.personal    || {};
+    state.education   = saved.education   || {};
+    state.experiences = saved.experiences || [];
+    state.about       = saved.about       || '';
+    (saved.hard || []).forEach(k => state.hardSkills.add(k));
+    (saved.soft || []).forEach(k => state.softSkills.add(k));
+  }
+
+  ['fullName', 'email', 'phone', 'location'].forEach(id => {
+    const el = $(id); if (!el) return;
+    el.value = state.personal[id] || '';
+    el.addEventListener('input', () => { state.personal[id] = el.value; Resume.persist(state); });
+  });
+
+  ['school', 'degree', 'eduHighlights'].forEach(id => {
+    const el = $(id); if (!el) return;
+    el.value = state.education[id] || '';
+    el.addEventListener('input', () => { state.education[id] = el.value; Resume.persist(state); });
+  });
+
+  const aboutEl = $('aboutPrompt');
+  if (aboutEl) aboutEl.value = state.about || '';
+
+  new Resume.SkillsManager(state).init();
+  new Resume.ExperienceManager(state).init();
+  new Resume.ResumePreview(state).init();
+  new Resume.LinkedInBuilder(state).init();
+  new Resume.InterviewRecorder().init();
+
+  const savedChar = localStorage.getItem('selectedCharacter');
+  if (savedChar) {
+    const src = { char1: '/hacks/cs-portfolio-quest/resume/sprites/elephant_2.mp4', char2: '/hacks/cs-portfolio-quest/resume/sprites/fox_2.mp4' }[savedChar];
+    if (src) { $('floating-source').src = src; $('floating-sprite').style.display = 'block'; $('floating-sprite').play().catch(() => {}); }
+  }
+
+  // Restore saved step — silent=true so we don't re-persist step 0 over the saved value
+  __ResumeNav.showStep(saved?.step || 0, true);
+});
+</script>
+
+<script>
 (function(){
   document.addEventListener('DOMContentLoaded', function(){
     document.querySelectorAll('a.back-btn').forEach(function(a){
       a.addEventListener('click', function(e){
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
-        try {
-          if (document.referrer && new URL(document.referrer).origin === location.origin) {
-            history.back(); return;
-          }
-        } catch(err) {}
+        try { if (document.referrer && new URL(document.referrer).origin === location.origin) { history.back(); return; } } catch(err) {}
         var p = location.pathname.replace(/\/$/, '').split('/');
-        if (p.length > 1) { p.pop(); window.location.href = p.join('/') + '/'; }
-        else { window.location.href = '/'; }
+        if (p.length > 1) { p.pop(); window.location.href = p.join('/') + '/'; } else { window.location.href = '/'; }
       });
     });
   });
 })();
 </script>
-
 <script src="/assets/js/lesson-completion-bigsix.js"></script>
