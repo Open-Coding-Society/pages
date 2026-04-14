@@ -157,6 +157,16 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     this.gameEnv.currentLevel = this;
     this.gameEnv.gameLevel = this;
 
+    // Preload user analytics data as soon as the level initializes
+    this.cachedUserData = null;
+    this.dataLoaded = Promise.resolve().then(() => this.fetchUserData()).then((data) => {
+      this.cachedUserData = data;
+      console.log('Analytics Observatory: Data preloaded', data);
+      return data;
+    }).catch((err) => {
+      console.error('Analytics Observatory: Failed to preload data', err);
+    });
+
     // Dialogue: Sequential helper.
     this.levelDialogueSystem = new DialogueSystem({
       id: 'analytics-observatory-dialogue',
@@ -269,7 +279,11 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    * Show complete analytics dashboard
    */
   async showAnalyticsDashboard() {
-    const userData = await this.fetchUserData();
+    // Wait for preloaded data
+    await this.dataLoaded;
+    
+    // Use cached data if available
+    const userData = this.cachedUserData || await this.fetchUserData();
     
     if (!userData) {
       await this.showDialogue('Analytics Guide', [
@@ -348,7 +362,11 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    * Show GitHub contribution statistics
    */
   async showGitHubStats() {
-    const userData = await this.fetchUserData();
+    // Wait for preloaded data
+    await this.dataLoaded;
+    
+    // Use cached data if available
+    const userData = this.cachedUserData || await this.fetchUserData();
     
     if (!userData || !userData.github) {
       await this.showDialogue('GitHub Guide', [
@@ -388,57 +406,100 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    */
   async fetchUserData() {
     try {
+      console.log('Analytics: Starting data fetch...');
+      
       // Fetch user identity from Flask
       const userResponse = await fetch(`${pythonURI}/api/id`, fetchOptions);
       
       if (!userResponse.ok) {
-        console.warn('Analytics: Could not fetch user info');
+        console.error('Analytics: User info fetch failed:', userResponse.status);
         return null;
       }
 
       const userData = await userResponse.json();
+      console.log('Analytics: User info fetched, uid:', userData.uid);
       
-      // Fetch OCS analytics summary from Spring backend
-      // This endpoint returns time spent, sessions, engagement metrics, etc.
-      try {
-        const analyticsResponse = await fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions);
-        if (analyticsResponse.ok) {
-          const analyticsSummary = await analyticsResponse.json();
+      // Fetch all analytics in parallel
+      const [analyticsRes, commitsRes, prsRes, issuesRes] = await Promise.all([
+        fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions).catch(e => {
+          console.error('Analytics: OCS fetch threw error:', e);
+          return { ok: false };
+        }),
+        fetch(`${pythonURI}/api/analytics/github/user/commits`, fetchOptions).catch(e => {
+          console.error('Analytics: GitHub commits fetch threw error:', e);
+          return { ok: false };
+        }),
+        fetch(`${pythonURI}/api/analytics/github/user/prs`, fetchOptions).catch(e => {
+          console.error('Analytics: GitHub prs fetch threw error:', e);
+          return { ok: false };
+        }),
+        fetch(`${pythonURI}/api/analytics/github/user/issues`, fetchOptions).catch(e => {
+          console.error('Analytics: GitHub issues fetch threw error:', e);
+          return { ok: false };
+        })
+      ]);
+
+      // Process OCS Analytics
+      if (analyticsRes.ok) {
+        try {
+          const analyticsSummary = await analyticsRes.json();
+          console.log('Analytics: OCS summary received:', analyticsSummary);
           userData.analyticsSummary = analyticsSummary;
+        } catch (err) {
+          console.error('Analytics: Failed to parse OCS response:', err);
         }
-      } catch (err) {
-        console.warn('Analytics: Could not fetch OCS analytics summary', err);
+      } else {
+        console.warn('Analytics: OCS response not ok, status:', analyticsRes.status);
       }
 
-      // Try to fetch GitHub analytics if available
-      try {
-        const githubResponse = await fetch(`${pythonURI}/api/analytics/github/user`, fetchOptions);
-        if (githubResponse.ok) {
-          const githubData = await githubResponse.json();
-          userData.github = githubData;
+      // Process GitHub Commits
+      if (commitsRes.ok) {
+        try {
+          const commitsData = await commitsRes.json();
+          console.log('Analytics: GitHub commits received:', commitsData);
+          userData.github = userData.github || {};
+          userData.github.commits = commitsData.total_commit_contributions || 0;
+          userData.github.linesAdded = commitsData.total_lines_added || 0;
+          userData.github.linesDeleted = commitsData.total_lines_deleted || 0;
+        } catch (err) {
+          console.error('Analytics: Failed to parse commits response:', err);
         }
-      } catch (err) {
-        console.warn('Analytics: Could not fetch GitHub data', err);
+      } else {
+        console.warn('Analytics: Commits response not ok, status:', commitsRes.status);
       }
 
-      // Try to fetch skill count from profile
-      try {
-        const profileResponse = await fetch(`${pythonURI}/api/profile/game`, fetchOptions);
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          userData.gameProfile = profileData;
-          // Count skills from passport if available
-          if (profileData.skillPassport) {
-            userData.skillsCount = Object.keys(profileData.skillPassport).length;
-          }
+      // Process GitHub PRs
+      if (prsRes.ok) {
+        try {
+          const prsData = await prsRes.json();
+          console.log('Analytics: GitHub PRs received:', prsData);
+          userData.github = userData.github || {};
+          userData.github.prs = (prsData.pull_requests || []).length;
+        } catch (err) {
+          console.error('Analytics: Failed to parse PRs response:', err);
         }
-      } catch (err) {
-        console.warn('Analytics: Could not fetch game profile', err);
+      } else {
+        console.warn('Analytics: PRs response not ok, status:', prsRes.status);
       }
 
+      // Process GitHub Issues
+      if (issuesRes.ok) {
+        try {
+          const issuesData = await issuesRes.json();
+          console.log('Analytics: GitHub issues received:', issuesData);
+          userData.github = userData.github || {};
+          userData.github.issues = (issuesData.issues || []).length;
+        } catch (err) {
+          console.error('Analytics: Failed to parse issues response:', err);
+        }
+      } else {
+        console.warn('Analytics: Issues response not ok, status:', issuesRes.status);
+      }
+
+      console.log('Analytics: All data fetched, final object:', userData);
       return userData;
     } catch (err) {
-      console.error('Analytics: Error fetching user data', err);
+      console.error('Analytics: Fatal error in fetchUserData:', err);
       return null;
     }
   }
