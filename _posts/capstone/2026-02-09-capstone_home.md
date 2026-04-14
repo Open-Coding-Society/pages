@@ -370,7 +370,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- Binary Beasts -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-06-pybl-capstone %}">
            <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
        </a>
