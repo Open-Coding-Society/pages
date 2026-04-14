@@ -232,8 +232,8 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-uesl-capstone %}">UESL Foundation</a></h3>
-           <p class="text-sm text-gray-700">Empowering individuals with intellectual and developmental disabilities through year-round esports and community programs across San Diego and Imperial Counties.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: UESL Foundation Board of Directors, San Diego &amp; Imperial County Community Partners</p>
+           <p class="text-sm text-gray-700">Built an AI chatbot, accessible game engine with 8 IDD-friendly modes, and a social platform to extend UESL's reach for individuals with intellectual and developmental disabilities across San Diego.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Sathwik Kintada, Rudra B Joshi, Darshan</p>
        </div>
    </div>
 

@@ -22,9 +22,9 @@ Topics:
       - title: "Skill & Career Progress Tracker"
         description: "A digital portal where UESL participants log gaming milestones, STEM certifications, and career readiness checkpoints — making growth visible to families and employers"
       - title: "Inclusive Tournament Platform"
-        description: "A web-based bracket and event system purpose-built for neurodiverse participants, with adjustable pacing, simplified UI, and caregiver co-access"
-      - title: "Mentor Matchmaking Network"
-        description: "A community platform connecting UESL participants with volunteer mentors from the gaming and technology industries for guided career exploration"
+        description: "Built as a drag-and-drop Game Maker and accessible game engine with 8 IDD-specific modes — slow mode, single-button control, high-contrast, large sprites, guided mode, reduced motion, face tracking, and sound toggles — so every participant can compete regardless of ability"
+      - title: "Community Social Platform"
+        description: "Realized as a full social hub with microblog posts, replies, reactions, game leaderboards, and real-time co-op multiplayer rooms via WebSocket — keeping the UESL community connected and collaborating beyond in-person sessions"
 
     keyPoints:
       - "Serves San Diego & Imperial Counties year-round"
@@ -54,8 +54,8 @@ Topics:
       - "Multi-site arena presence across two California counties"
 
     weeklyIssues:
-      - "Research UESL arena locations and map service areas across San Diego & Imperial Counties"
-      - "Design and write YAML data structure with problems, ideas, and tech fields"
-      - "Build HTML/SCSS template for UESL infographic with all 4 capstone sections"
-      - "Create SVG badge logo for UESL Foundation and place in images/capstone/"
-      - "Write the capstone .md post and verify Jekyll build at /capstone/uesl/"
+      - "Deploy UESL Coach chatbot (Groq / LLaMA 3.3-70b) to production with full UESL context and bilingual support"
+      - "Add real-time co-op multiplayer rooms via Socket.IO to support inclusive tournament bracket play"
+      - "Improve face tracker calibration and sensitivity controls in the Game Maker accessibility settings"
+      - "Integrate UESL event calendar with live SDRC event data for the social platform"
+      - "Build per-level score leaderboards and surface them in the social platform feed"
