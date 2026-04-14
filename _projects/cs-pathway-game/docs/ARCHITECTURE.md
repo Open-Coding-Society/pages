@@ -19,75 +19,75 @@ permalink: /cs-pathway-game/architecture
 The CS Pathway game implements MVC architecture across the following file structure:
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         CS PATHWAY GAME ARCHITECTURE                         │
+│                         CS PATHWAY GAME ARCHITECTURE                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  📂 /_notebooks/home/                                   [ENTRY POINT]        │
+│                                                                             │
+│  📂 /_notebooks/home/                                   [ENTRY POINT]       │
 │     └─ 2026-04-02-home2-gamified-mvp.ipynb                                  │
 │        • Launches the CS Pathway Game                                       │
 │        • Provides journey from landing page to gamified course intro        │
 │        • Integrates all GameLevelCSPath*.js files                           │
-│                                                                              │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │  📂 /_projects/cs-pathway-game/levels/        [CONTROLLER + VIEW]  │    │
-│  │                                                                    │    │
-│  │  Game Level Controllers:                                           │    │
-│  │  ├─ GameLevelCSPath0Forge.js       Level 0: Identity Forge        │    │
-│  │  │  • Course entry and PII lesson                                 │    │
-│  │  │  • Built-in sign-up / login flow (no redirect required)        │    │
-│  │  │  • Establishes OCS account (Flask + MySQL integration)         │    │
-│  │  │  • Enables PII viewing and theming customization               │    │
-│  │  │                                                                 │    │
-│  │  ├─ GameLevelCSPath1Way.js         Level 1: Wayfinding World      │    │
-│  │  │  • Social classroom connection and registration                │    │
-│  │  │  • Introduces blogging and "about me" coding foundations       │    │
-│  │  │  • Self-evaluation checkpoint (passport to next level)         │    │
-│  │  │                                                                 │    │
-│  │  ├─ GameLevelCSPath2Mission.js     Level 2: Mission Tools         │    │
-│  │  │  • Personal computer setup and local SDLC workflow             │    │
-│  │  │  • Transition from online-only to local development            │    │
-│  │  │  • Tools: GitHub, VSCode, Browser, Terminal, Make              │    │
-│  │  │  • Prepares student for PBL-based CompSci learning             │    │
-│  │  │                                                                 │    │
-│  │  └─ GameLevelCSPathIdentity.js     Shared Base Class              │    │
-│  │     • Shares Identity Forge data across all levels                │    │
-│  │     • Helper class extended by Wayfinding and Mission             │    │
-│  │     • Simplifies profile management across game progression       │    │
-│  │                                                                    │    │
-│  │  Game Engine Essentials (View Components):                         │    │
-│  │  └─ essentials/*                                                   │    │
-│  │     • StatusPanel.js  - Player profile display                    │    │
-│  │     • FormPanel.js    - Identity Terminal input forms             │    │
-│  │     • Picker.js       - Avatar and theme selectors                │    │
-│  │     • DialogueSystem  - NPC interactions                          │    │
-│  │     • Core rendering and UI abstraction                           │    │
-│  └────────────────────────────────────────────────────────────────────┘    │
-│                                                                              │
-│  ┌────────────────────────────────────────────────────────────────────┐    │
-│  │  📂 /_projects/cs-pathway-game/model/                 [MODEL]     │    │
-│  │                                                                    │    │
-│  │  Data Persistence Bridge:                                          │    │
-│  │  ├─ ProfileManager.js           Profile Orchestrator              │    │
-│  │  │  • Unified persistence manager (abstraction layer)             │    │
-│  │  │  • JSON in / JSON out interface for View and Controller        │    │
-│  │  │  • Coordinates localStorage speed + backend reliability        │    │
-│  │  │  • Maps data to OCS User table columns efficiently             │    │
-│  │  │                                                                 │    │
-│  │  ├─ localProfile.js              Primary Storage                  │    │
-│  │  │  • localStorage management (instant, client-side)              │    │
-│  │  │  • Source of truth for all users                               │    │
-│  │  │                                                                 │    │
-│  │  └─ persistentProfile.js         Secondary Storage                │    │
-│  │     • Flask API fetch request/response layer                      │    │
-│  │     • Backend analytics and cross-device recovery                 │    │
-│  │     • Instructor dashboard data                                   │    │
-│  └────────────────────────────────────────────────────────────────────┘    │
-│                                                                              │
-│  Design Philosophy:                                                      │
+│                                                                             │
+│  ┌────────────────────────────────────────────────────────────────────┐     │
+│  │  📂 /_projects/cs-pathway-game/levels/        [CONTROLLER + VIEW]  │     │
+│  │                                                                    │     │
+│  │  Game Level Controllers:                                           │     │
+│  │  ├─ GameLevelCSPath0Forge.js       Level 0: Identity Forge         │     │
+│  │  │  • Course entry and PII lesson                                  │     │
+│  │  │  • Built-in sign-up / login flow (no redirect required)         │     │
+│  │  │  • Establishes OCS account (Flask + MySQL integration)          │     │
+│  │  │  • Enables PII viewing and theming customization                │     │
+│  │  │                                                                 │     │
+│  │  ├─ GameLevelCSPath1Way.js         Level 1: Wayfinding World       │     │
+│  │  │  • Social classroom connection and registration                 │     │
+│  │  │  • Introduces blogging and "about me" coding foundations        │     │
+│  │  │  • Self-evaluation checkpoint (passport to next level)          │     │
+│  │  │                                                                 │     │
+│  │  ├─ GameLevelCSPath2Mission.js     Level 2: Mission Tools          │     │
+│  │  │  • Personal computer setup and local SDLC workflow              │     │
+│  │  │  • Transition from online-only to local development             │     │
+│  │  │  • Tools: GitHub, VSCode, Browser, Terminal, Make               │     │
+│  │  │  • Prepares student for PBL-based CompSci learning              │     │
+│  │  │                                                                 │     │
+│  │  └─ GameLevelCSPathIdentity.js     Shared Base Class               │     │
+│  │     • Shares Identity Forge data across all levels                 │     │
+│  │     • Helper class extended by Wayfinding and Mission              │     │
+│  │     • Simplifies profile management across game progression        │     │
+│  │                                                                    │     │
+│  │  Game Engine Essentials (View Components):                         │     │
+│  │  └─ essentials/*                                                   │     │
+│  │     • StatusPanel.js  - Player profile display                     │     │
+│  │     • FormPanel.js    - Identity Terminal input forms              │     │
+│  │     • Picker.js       - Avatar and theme selectors                 │     │
+│  │     • DialogueSystem  - NPC interactions                           │     │
+│  │     • Core rendering and UI abstraction                            │     │
+│  └────────────────────────────────────────────────────────────────────┘     │
+│                                                                             │
+│  ┌────────────────────────────────────────────────────────────────────┐     │
+│  │  📂 /_projects/cs-pathway-game/model/                 [MODEL]      │     │
+│  │                                                                    │     │
+│  │  Data Persistence Bridge:                                          │     │
+│  │  ├─ ProfileManager.js           Profile Orchestrator               │     │
+│  │  │  • Unified persistence manager (abstraction layer)              │     │
+│  │  │  • JSON in / JSON out interface for View and Controller         │     │
+│  │  │  • Coordinates localStorage speed + backend reliability         │     │
+│  │  │  • Maps data to OCS User table columns efficiently              │     │
+│  │  │                                                                 │     │
+│  │  ├─ localProfile.js              Primary Storage                   │     │
+│  │  │  • localStorage management (instant, client-side)               │     │
+│  │  │  • Source of truth for all users                                │     │
+│  │  │                                                                 │     │
+│  │  └─ persistentProfile.js         Secondary Storage                 │     │
+│  │     • Flask API fetch request/response layer                       │     │
+│  │     • Backend analytics and cross-device recovery                  │     │
+│  │     • Instructor dashboard data                                    │     │
+│  └────────────────────────────────────────────────────────────────────┘     │
+│                                                                             │
+│  Design Philosophy:                                                         │
 │     • Immersive experience minimizing text/walls of instructions            │
 │     • Exploratory, game-based onboarding to course concepts                 │
 │     • Project-Based Learning (PBL) preparation through gaming               │
-│                                                                              │
+│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 
@@ -103,55 +103,55 @@ The CS Pathway game implements MVC architecture across the following file struct
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ MODEL LAYER (Data & Persistence)                                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌─────────────────────────────────────────────────────────────────┐       │
-│  │  ProfileManager.js                                              │       │
-│  │  ──────────────────                                             │       │
-│  │  localStorage-first with async backend analytics sync           │       │
-│  │                                                                 │       │
-│  │  ✓ async initialize()     - Load from localStorage, check auth  │       │
-│  │  ✓ async saveIdentity()   - Write localStorage + async backend  │       │
-│  │  ✓ async saveAvatar()     - Write localStorage + async backend  │       │
-│  │  ✓ async saveTheme()      - Write localStorage + async backend  │       │
-│  │  ✓ async updateProgress() - Write localStorage + async backend  │       │
-│  │  ✓ exists() / getProfile() - Read from localStorage only        │       │
-│  │  ✓ async clear()          - Clear localStorage, reset backend   │       │
-│  │  ✓ getAuthStatus()        - Return auth state + sync health     │       │
-│  │                                                                 │       │
-│  │  Properties:                                                    │       │
-│  │  • isAuthenticated: boolean   (/api/id status)                  │       │
-│  │  • syncFailureCount: number   (analytics sync errors)           │       │
-│  │  • lastSyncTime: timestamp    (last successful backend write)   │       │
-│  └──────────────────────────┬───────────────────────────────────────┘       │
-│                             │                                                │
-│                             │  ALWAYS                                        │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────┐        │
+│  │  ProfileManager.js                                              │        │
+│  │  ──────────────────                                             │        │
+│  │  localStorage-first with async backend analytics sync           │        │
+│  │                                                                 │        │
+│  │  ✓ async initialize()     - Load from localStorage, check auth  │        │
+│  │  ✓ async saveIdentity()   - Write localStorage + async backend  │        │
+│  │  ✓ async saveAvatar()     - Write localStorage + async backend  │        │
+│  │  ✓ async saveTheme()      - Write localStorage + async backend  │        │
+│  │  ✓ async updateProgress() - Write localStorage + async backend  │        │
+│  │  ✓ exists() / getProfile() - Read from localStorage only        │        │
+│  │  ✓ async clear()          - Clear localStorage, reset backend   │        │
+│  │  ✓ getAuthStatus()        - Return auth state + sync health     │        │
+│  │                                                                 │        │
+│  │  Properties:                                                    │        │
+│  │  • isAuthenticated: boolean   (/api/id status)                  │        │
+│  │  • syncFailureCount: number   (analytics sync errors)           │        │
+│  │  • lastSyncTime: timestamp    (last successful backend write)   │        │
+│  └──────────────────────────┬──────────────────────────────────────┘        │
+│                             │                                               │
+│                             │  ALWAYS                                       │
 │  ┌──────────────────────────▼───────────────┐                               │
 │  │  localProfile.js                         │                               │
 │  │  ────────────────                        │                               │
 │  │  PRIMARY: Source of truth for ALL users  │                               │
-│  │                                           │                               │
-│  │  Storage:                                 │                               │
-│  │  • localStorage (instant, reliable)       │                               │
-│  │  • Key: ocs_local_profile                 │                               │
-│  │  • Structure: flat top-level fields       │                               │
+│  │                                          │                               │
+│  │  Storage:                                │                               │
+│  │  • localStorage (instant, reliable)      │                               │
+│  │  • Key: ocs_local_profile                │                               │
+│  │  • Structure: flat top-level fields      │                               │
 │  │    name, email, githubID + game_profile  │                               │
-│  │  • game_profile: blob organized by level  │                               │
+│  │  • game_profile: blob organized by level │                               │
 │  │    - identity-forge (includes avatar)    │                               │
 │  │    - wayfinding-world                    │                               │
 │  │    - mission-tooling                     │                               │
-│  │  • Includes: lastModified timestamp       │                               │
-│  │                                           │                               │
-│  │  Methods:                                 │                               │
-│  │  • save(data)         - Sync write        │                               │
-│  │  • load()             - Sync read         │                               │
-│  │  • update(partial)    - Merge and save    │                               │
-│  │  • clear()            - FULL WIPE         │                               │
-│  │  • exists()           - Check presence    │                               │
-│  │  • getFlatProfile()   - Flatten structure │                               │
-│  └───────────────────┬───────────────────────┘                               │
-│                      │                                                       │
-│                      │  IF AUTHENTICATED (async, non-blocking)               │
-│                      │                                                       │
+│  │  • Includes: lastModified timestamp      │                               │
+│  │                                          │                               │
+│  │  Methods:                                │                               │
+│  │  • save(data)         - Sync write       │                               │
+│  │  • load()             - Sync read        │                               │
+│  │  • update(partial)    - Merge and save   │                               │
+│  │  • clear()            - FULL WIPE        │                               │
+│  │  • exists()           - Check presence   │                               │
+│  │  • getFlatProfile()   - Flatten structure│                               │
+│  └───────────────────┬──────────────────────┘                               │
+│                      │                                                      │
+│                      │  IF AUTHENTICATED (async, non-blocking)              │
+│                      │                                                      │
 │  ┌───────────────────▼──────────────────────────────────┐                   │
 │  │  persistentProfile.js                                │                   │
 │  │  ─────────────────                                   │                   │
@@ -159,15 +159,15 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │                                                      │                   │
 │  │  Storage:                                            │                   │
 │  │  • Python Flask API (SQLAlchemy)                     │                   │
-│  │  • Endpoints: /api/profile/game, /api/id            │                   │
+│  │  • Endpoints: /api/profile/game, /api/id             │                   │
 │  │  • Database: users table (existing)                  │                   │
 │  │    - id (primary key, not in localStorage)           │                   │
 │  │    - _name, _email (mapped from localStorage)        │                   │
 │  │    - _uid (stores githubID from localStorage)        │                   │
-│  │    - _sid, _password, _role, _pfp, _school          │                   │
-│  │    - _grade_data, _ap_exam, _class (JSON)           │                   │
-│  │    - _game_profile (NEW JSON column for game data)  │                   │
-│  │  • _game_profile structure matches localStorage     │                   │
+│  │    - _sid, _password, _role, _pfp, _school           │                   │
+│  │    - _grade_data, _ap_exam, _class (JSON)            │                   │
+│  │    - _game_profile (NEW JSON column for game data)   │                   │
+│  │  • _game_profile structure matches localStorage      │                   │
 │  │                                                      │                   │
 │  │  Auth: JWT cookies required                          │                   │
 │  │                                                      │                   │
@@ -176,8 +176,8 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  • static async save(data)     - Upload with CRC     │                   │
 │  │  • static async update(data)   - Partial update      │                   │
 │  │  • static async clear()        - Reset (keeps ID)    │                   │
-│  │      └─> PRESERVES id, _name, _email, _uid          │                   │
-│  │          only clears _game_profile (game data)      │                   │
+│  │      └─> PRESERVES id, _name, _email, _uid           │                   │
+│  │          only clears _game_profile (game data)       │                   │
 │  │  • static async isAuthenticated() - Check JWT        │                   │
 │  │  • static async getFlatProfile() - Backend read      │                   │
 │  │                                                      │                   │
@@ -187,13 +187,13 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  ✓ Progress tracking and reporting                   │                   │
 │  │  ✗ NOT required for game to function                 │                   │
 │  └──────────────────────────────────────────────────────┘                   │
-│                                                                              │
+│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ VIEW LAYER (GameEngine UI Components)                                        │
+│ VIEW LAYER (GameEngine UI Components)                                       │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
+│                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
 │  │  StatusPanel (GameEngine Component)                              │       │
 │  │  ───────────────────────────────────                             │       │
@@ -201,29 +201,29 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Current Configuration:                                          │       │
-│  │  ┌────────────────────────────────────────────────────────┐     │       │
-│  │  │  PLAYER PROFILE                                        │     │       │
-│  │  │  ──────────────                                        │     │       │
-│  │  │  Name:     John M                                      │     │       │
-│  │  │  Email:    jmort1021@gmail.com                         │     │       │
-│  │  │  GitHub:   jm1021                                      │     │       │
-│  │  │                                                        │     │       │
-│  │  │  Avatar Sprite                                         │     │       │
-│  │  │  ──────────────                                        │     │       │
-│  │  │  Sprite:   Miku                                        │     │       │
-│  │  │                                                        │     │       │
-│  │  │  World Theme                                           │     │       │
-│  │  │  ────────────                                          │     │       │
-│  │  │  Theme:    Forest                                      │     │       │
-│  │  │                                                        │     │       │
-│  │  │  ─────────────────────────────────────────────         │     │       │
-│  │  │  🔄 Reset Profile                                      │     │       │
-│  │  └────────────────────────────────────────────────────────┘     │       │
+│  │  ┌────────────────────────────────────────────────────────┐      │       │
+│  │  │  PLAYER PROFILE                                        │      │       │
+│  │  │  ──────────────                                        │      │       │
+│  │  │  Name:     John M                                      │      │       │
+│  │  │  Email:    jmort1021@gmail.com                         │      │       │
+│  │  │  GitHub:   jm1021                                      │      │       │
+│  │  │                                                        │      │       │
+│  │  │  Avatar Sprite                                         │      │       │
+│  │  │  ──────────────                                        │      │       │
+│  │  │  Sprite:   Miku                                        │      │       │
+│  │  │                                                        │      │       │
+│  │  │  World Theme                                           │      │       │
+│  │  │  ────────────                                          │      │       │
+│  │  │  Theme:    Forest                                      │      │       │
+│  │  │                                                        │      │       │
+│  │  │  ─────────────────────────────────────────────         │      │       │
+│  │  │  🔄 Reset Profile                                      │      │       │
+│  │  └────────────────────────────────────────────────────────┘      │       │
 │  │                                                                  │       │
-│  │  Component: this.profilePanelView = new StatusPanel({...})      │       │
-│  │  Updates via: this.updateProfilePanel(profileData)              │       │
+│  │  Component: this.profilePanelView = new StatusPanel({...})       │       │
+│  │  Updates via: this.updateProfilePanel(profileData)               │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
-│                                                                              │
+│                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
 │  │  FormPanel (GameEngine Component)                                │       │
 │  │  ─────────────────────────────────                               │       │
@@ -231,45 +231,45 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Configuration:                                                  │       │
-│  │  ┌────────────────────────────────────────────────────────┐     │       │
-│  │  │  ⚔ Identity Terminal Setup                            │     │       │
-│  │  │  ──────────────────────────                            │     │       │
-│  │  │  You're logged in. Enter your profile info below.     │     │       │
-│  │  │                                                        │     │       │
-│  │  │  Name: [________________]                             │     │       │
-│  │  │  Email: [________________]                            │     │       │
-│  │  │  GitHub Username: [______]                            │     │       │
-│  │  │                                                        │     │       │
-│  │  │  [Unlock Identity Terminal]  [Cancel]                 │     │       │
-│  │  └────────────────────────────────────────────────────────┘     │       │
+│  │  ┌────────────────────────────────────────────────────────┐      │       │
+│  │  │  ⚔ Identity Terminal Setup                             │      │       │
+│  │  │  ──────────────────────────                            │      │       │
+│  │  │  You're logged in. Enter your profile info below.      │      │       │
+│  │  │                                                        │      │       │
+│  │  │  Name: [________________]                              │      │       │
+│  │  │  Email: [________________]                             │      │       │
+│  │  │  GitHub Username: [______]                             │      │       │
+│  │  │                                                        │      │       │
+│  │  │  [Unlock Identity Terminal]  [Cancel]                  │      │       │
+│  │  └────────────────────────────────────────────────────────┘      │       │
 │  │                                                                  │       │
-│  │  Component: this.identityFormView = new FormPanel({...})        │       │
+│  │  Component: this.identityFormView = new FormPanel({...})         │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
-│                                                                              │
+│                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
 │  │  AuthFlow Panel (Custom - GameLevelCsPath0Forge.js)              │       │
-│  │  ──────────────────────────────────────────────────               │       │
+│  │  ──────────────────────────────────────────────────              │       │
 │  │  Used for: Built-in sign-up and login inside the terminal        │       │
 │  │  Location: GameLevelCSPath0Forge.js (this.showAuthFlow)          │       │
 │  │                                                                  │       │
-│  │  Flow:                                                            │       │
-│  │  ┌────────────────────────────────────────────────────────┐     │       │
-│  │  │  ⚔ IDENTITY TERMINAL                                  │     │       │
-│  │  │  ────────────────────────────────────────────────────  │     │       │
-│  │  │  To register your identity, you need an account.      │     │       │
-│  │  │                                                        │     │       │
-│  │  │  [Log In]  [Sign Up]  [Cancel]                        │     │       │
-│  │  └────────────────────────────────────────────────────────┘     │       │
+│  │  Flow:                                                           │       │
+│  │  ┌────────────────────────────────────────────────────────┐      │       │
+│  │  │  ⚔ IDENTITY TERMINAL                                   │      │       │
+│  │  │  ────────────────────────────────────────────────────  │      │       │
+│  │  │  To register your identity, you need an account.       │      │       │
+│  │  │                                                        │      │       │
+│  │  │  [Log In]  [Sign Up]  [Cancel]                         │      │       │
+│  │  └────────────────────────────────────────────────────────┘      │       │
 │  │           │                     │                                │       │
-│  │      ┌────▼────┐          ┌─────▼──────┐                        │       │
-│  │      │  LOG IN │          │ CREATE ACCT│                        │       │
-│  │      │ uid+pw  │          │ full form  │                        │       │
-│  │      │ →/api/  │          │ →/api/user │                        │       │
-│  │      │ authen- │          │ then auto- │                        │       │
-│  │      │  ticate │          │ fills login│                        │       │
-│  │      └────┬────┘          └─────┬──────┘                        │       │
+│  │      ┌────▼────┐          ┌─────▼──────┐                         │       │
+│  │      │  LOG IN │          │ CREATE ACCT│                         │       │
+│  │      │ uid+pw  │          │ full form  │                         │       │
+│  │      │ →/api/  │          │ →/api/user │                         │       │
+│  │      │ authen- │          │ then auto- │                         │       │
+│  │      │  ticate │          │ fills login│                         │       │
+│  │      └────┬────┘          └─────┬──────┘                         │       │
 │  │           └──────────┬──────────┘                                │       │
-│  │                      ▼                                            │       │
+│  │                      ▼                                           │       │
 │  │             resolve(true) → Identity Form opens                  │       │
 │  │                                                                  │       │
 │  │  API calls:                                                      │       │
@@ -277,7 +277,7 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  • POST /api/user          (signup → Flask)                      │       │
 │  │  • POST /api/person/create (signup → Spring, non-blocking)       │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
-│                                                                              │
+│                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
 │  │  Picker (GameEngine Component)                                   │       │
 │  │  ──────────────────────────────                                  │       │
@@ -285,8 +285,8 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
 │  │  Avatar Picker Configuration:                                    │       │
-│  │  • Title: ⚔ Avatar Forge Sprite Selector                        │       │
-│  │  • Grid of sprite previews with live preview on tap             │       │
+│  │  • Title: ⚔ Avatar Forge Sprite Selector                         │       │
+│  │  • Grid of sprite previews with live preview on tap              │       │
 │  │  • Component: this.avatarPickerView = new Picker({...})          │       │
 │  │                                                                  │       │
 │  │  World Theme Picker Configuration:                               │       │
@@ -294,81 +294,81 @@ The CS Pathway game implements MVC architecture across the following file struct
 │  │  • Grid of background previews                                   │       │
 │  │  • Component: this.worldThemePickerView = new Picker({...})      │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
-│                                                                              │
+│                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
 │  │  DialogueSystem (GameEngine Component)                           │       │
 │  │  ──────────────────────────────────────                          │       │
 │  │  Used for: NPC interactions and level guidance                   │       │
 │  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
-│  │  Features:                                                        │       │
+│  │  Features:                                                       │       │
 │  │  • Typewriter effect for text display                            │       │
-│  │  • Optional voice synthesis                                       │       │
-│  │  • Sequential dialogue queuing                                    │       │
+│  │  • Optional voice synthesis                                      │       │
+│  │  • Sequential dialogue queuing                                   │       │
 │  │  • Component: this.levelDialogueSystem = new DialogueSystem()    │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
-│                                                                              │
+│                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
 │  │  Toast Messages (Custom Implementation)                          │       │
 │  │  ───────────────────────────────────────                         │       │
 │  │  Used for: Status updates and notifications                      │       │
 │  │  Location: GameLevelCSPath*.js                                   │       │
 │  │                                                                  │       │
-│  │  Example:                                                         │       │
-│  │  ┌────────────────────────────────────────────────────────┐     │       │
-│  │  │  ✦ Profile saved successfully                          │     │       │
-│  │  └────────────────────────────────────────────────────────┘     │       │
+│  │  Example:                                                        │       │
+│  │  ┌────────────────────────────────────────────────────────┐      │       │
+│  │  │  ✦ Profile saved successfully                          │      │       │
+│  │  └────────────────────────────────────────────────────────┘      │       │
 │  │                                                                  │       │
-│  │  Usage: this.showToast('✦ Profile saved')                       │       │
+│  │  Usage: this.showToast('✦ Profile saved')                        │       │
 │  │  Auto-dismisses after 3 seconds                                  │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
-│                                                                              │
+│                                                                             │
 │  Status & Error Indicators (FUTURE - After Backend API):                    │
 │  ───────────────────────────────────────────────────────                    │
 │  Option 1: Extend StatusPanel with additional status fields                 │
 │  • Add fields for: Registration, Online, Last Sync, Activity Log            │
-│  • Use HTTP status codes: 🟢 200, ⚠️ 401/4xx, 🔴 5xx/ERR                    │
+│  • Use HTTP status codes: 🟢 200, ⚠️ 401/4xx, 🔴 5xx/ERR                     │
 │  • Update via: profileManager.getStatus() → updateProfilePanel()            │
-│                                                                              │
+│                                                                             │
 │  Option 2: Add toast messages for sync events                               │
 │  • Show: "✦ Profile synced (200)" on successful backend sync                │
-│  • Show: "⚠️ Offline - local only (401)" when not authenticated            │
+│  • Show: "⚠️ Offline - local only (401)" when not authenticated             │
 │  • Show: "🔴 Sync failed (500)" on backend errors                           │
-│                                                                              │
+│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ CONTROLLER LAYER (Game Logic)                                                │
+│ CONTROLLER LAYER (Game Logic)                                               │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
+│                                                                             │
 │  ┌──────────────────────────────────────────────────────────────────┐       │
 │  │  GameLevelCSPath*.js (Game Level Controllers)                    │       │
 │  │  ──────────────────────────────────────────────                  │       │
-│  │  Orchestrates game flow and user interactions                   │       │
+│  │  Orchestrates game flow and user interactions                    │       │
 │  │                                                                  │       │
 │  │  Responsibilities:                                               │       │
 │  │  • Initialize ProfileManager                                     │       │
-│  │  • Gate Identity Terminal behind built-in auth flow             │       │
+│  │  • Gate Identity Terminal behind built-in auth flow              │       │
 │  │  • Handle form submissions                                       │       │
 │  │  • Call ProfileManager methods                                   │       │
 │  │  • Update game state based on profile                            │       │
 │  │  • Trigger level unlocks                                         │       │
 │  │                                                                  │       │
 │  │  Identity Terminal Flow (Level 0):                               │       │
-│  │  1. Player approaches Identity Gatekeeper NPC                   │       │
-│  │  2. runIdentityTerminal() checks PersistentProfile.isAuth()     │       │
-│  │  3. Not logged in → showAuthFlow() (sign-up or login in-game)   │       │
-│  │  4. Auth success → showIdentityForm() (name, email, github)     │       │
-│  │  5. Submit → saveIdentity() + updateIdentityProgress()          │       │
-│  │  6. identityUnlocked = true, World Theme Portal gate opens      │       │
+│  │  1. Player approaches Identity Gatekeeper NPC                    │       │
+│  │  2. runIdentityTerminal() checks PersistentProfile.isAuth()      │       │
+│  │  3. Not logged in → showAuthFlow() (sign-up or login in-game)    │       │
+│  │  4. Auth success → showIdentityForm() (name, email, github)      │       │
+│  │  5. Submit → saveIdentity() + updateIdentityProgress()           │       │
+│  │  6. identityUnlocked = true, World Theme Portal gate opens       │       │
 │  │                                                                  │       │
 │  │  General Flow:                                                   │       │
-│  │  1. constructor() - Create ProfileManager instance              │       │
-│  │  2. async init() - Call profileManager.initialize()             │       │
-│  │  3. Restore state if profile exists                             │       │
-│  │  4. Handle user actions → save via ProfileManager               │       │
+│  │  1. constructor() - Create ProfileManager instance               │       │
+│  │  2. async init() - Call profileManager.initialize()              │       │
+│  │  3. Restore state if profile exists                              │       │
+│  │  4. Handle user actions → save via ProfileManager                │       │
 │  └──────────────────────────────────────────────────────────────────┘       │
-│                                                                              │
+│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 

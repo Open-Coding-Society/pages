@@ -4,6 +4,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 /**
  * GameLevel CS Pathway - Analytics Observatory
@@ -33,8 +34,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
      */
 
     // ── Background ──────────────────────────────────────────────
-    // Use Wayfinding World background as placeholder; can be customized later
-    const image_src = path + "/images/projects/cs-pathway-game/bg3/image.png";
+    const image_src = path + "/images/projects/cs-pathway-game/bg3/analytics-observatory-fantasy.png";
     const bg_data = {
         name: GameLevelCsPath3Analytics.displayName,
         greeting: "Welcome to the Analytics Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
@@ -43,8 +43,8 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
     this.restoreIdentitySelections({
       bgData: bg_data,
-      themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg1/index.json`,
-      themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg1/`,
+      themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg3/index.json`,
+      themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg3/`,
     });
     
     // ── Player ───────────────────────────────────────────────────
@@ -77,19 +77,15 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       backgroundSrc: bg_data.src,
     });
 
-    // ── Analytics Guide NPC ────────────────────────────────────
+    // ── NPC Positions ──────────────────────────────────────────────
+    // Position NPCs on opposite sides of screen, centered vertically
     const analyticsGuidePos = {
-      x: width * 0.50,
-      y: height * 0.35,
-    };
-
-    const profileMetricsPos = {
-      x: width * 0.20,
+      x: width * 0.30,
       y: height * 0.35,
     };
 
     const githubMetricsPos = {
-      x: width * 0.80,
+      x: width * 0.60,
       y: height * 0.35,
     };
 
@@ -134,21 +130,6 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       },
     });
 
-    // Profile Info NPC - shows user identity and basic stats
-    const npc_data_profileGuide = createGatekeeperData({
-      id: 'ProfileGuide',
-      greeting: 'View your profile information: name, email, uid, and account details.',
-      position: profileMetricsPos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('Profile Guide: Press E to see your profile info');
-        }
-      },
-      interact: async function() {
-        await level.showProfileInfo();
-      },
-    });
-
     // GitHub Metrics NPC - shows contribution statistics
     const npc_data_githubGuide = createGatekeeperData({
       id: 'GitHubGuide',
@@ -169,13 +150,22 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
       { class: Npc, data: npc_data_analyticsGuide },
-      { class: Npc, data: npc_data_profileGuide },
       { class: Npc, data: npc_data_githubGuide },
     ];
 
     // FriendlyNpc expects these level references for toast routing
     this.gameEnv.currentLevel = this;
     this.gameEnv.gameLevel = this;
+
+    // Preload user analytics data as soon as the level initializes
+    this.cachedUserData = null;
+    this.dataLoaded = Promise.resolve().then(() => this.fetchUserData()).then((data) => {
+      this.cachedUserData = data;
+      console.log('Analytics Observatory: Data preloaded', data);
+      return data;
+    }).catch((err) => {
+      console.error('Analytics Observatory: Failed to preload data', err);
+    });
 
     // Dialogue: Sequential helper.
     this.levelDialogueSystem = new DialogueSystem({
@@ -289,9 +279,13 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    * Show complete analytics dashboard
    */
   async showAnalyticsDashboard() {
-    const userData = await this.fetchUserData();
+    // Wait for preloaded data
+    await this.dataLoaded;
     
-    if (!userData) {
+    // Use cached data if available
+    const userData = this.cachedUserData || await this.fetchUserData();
+    
+    if (!userData || !userData.analyticsSummary) {
       await this.showDialogue('Analytics Guide', [
         'Unable to load your analytics.',
         'Please ensure you are logged in.',
@@ -299,29 +293,39 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       return;
     }
 
-    const summary = userData.analyticsSummary || {};
+    const s = userData.analyticsSummary;
+    
+    const timeSpent = s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h';
+    const codeRuns = s.totalCodeExecutions || 0;
+    const lessonsViewed = s.totalLessonsViewed || 0;
+    const lessonsCompleted = s.totalLessonsCompleted || 0;
+    const engagement = ((s.interactionPercentage || 0).toFixed(1)) + '%';
+    const scrollDepth = ((s.averageScrollDepth || 0).toFixed(0)) + '%';
+    const avgSessionDuration = s.averageSessionDurationSeconds ? this.formatTime(s.averageSessionDurationSeconds * 1000) : '0m';
+    const accuracy = ((s.averageAccuracyPercentage || 0).toFixed(1)) + '%';
+    const copyPaste = s.totalCopyPasteAttempts || 0;
     
     const messages = [
-      '📊 Your Learning Analytics:',
+      'Your Learning Analytics:',
       '',
       `Name: ${userData.name || 'Not set'}`,
       `Email: ${userData.email || 'Not set'}`,
       `UID: ${userData.uid || 'Not set'}`,
       '',
-      '⏱️  Time & Engagement:',
-      `Total Time Spent: ${this.formatTime(summary.totalTimeSpent || 0)}`,
-      `Sessions: ${summary.totalSessions || 0}`,
-      `Quests Completed: ${summary.questsCompleted || 0}`,
-      `Engagement Score: ${summary.engagementScore || 0}%`,
+      'Time & Engagement:',
+      `Total Time Spent: ${timeSpent}`,
+      `Avg Session Duration: ${avgSessionDuration}`,
+      `Code Executions: ${codeRuns}`,
+      `Engagement Rate: ${engagement}`,
+      `Accuracy: ${accuracy}`,
       '',
-      '📈 Learning Progress:',
-      `Lessons Completed: ${summary.lessonsCompleted || 0}`,
-      `Current Quest: ${summary.currentQuestName || 'None'}`,
-      `Quest Progress: ${summary.questProgress || 0}%`,
+      'Learning Progress:',
+      `Lessons Viewed: ${lessonsViewed}`,
+      `Lessons Completed: ${lessonsCompleted}`,
+      `Scroll Depth: ${scrollDepth}`,
+      `Copy/Paste Attempts: ${copyPaste}`,
       '',
-      `Last Active: ${this.formatDate(summary.lastActiveDate) || 'Never'}`,
-      '',
-      'Press Next to see more details!',
+      'You are making excellent progress!',
     ];
 
     await this.showDialogue('Analytics Guide', messages);
@@ -368,7 +372,11 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    * Show GitHub contribution statistics
    */
   async showGitHubStats() {
-    const userData = await this.fetchUserData();
+    // Wait for preloaded data
+    await this.dataLoaded;
+    
+    // Use cached data if available
+    const userData = this.cachedUserData || await this.fetchUserData();
     
     if (!userData || !userData.github) {
       await this.showDialogue('GitHub Guide', [
@@ -379,24 +387,21 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     }
 
     const gh = userData.github;
+    const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
+    
     const messages = [
-      '💻 Your GitHub Contribution Stats:',
+      'Your GitHub Contribution Stats:',
       '',
       `Total Commits: ${gh.commits || 0}`,
       `Pull Requests: ${gh.prs || 0}`,
-      `Issues: ${gh.issues || 0}`,
-      `Code Reviews: ${gh.codeReviews || 0}`,
-      `Repositories: ${gh.repos || 0}`,
-      `Gists: ${gh.gists || 0}`,
+      `Issues Reported: ${gh.issues || 0}`,
       '',
-      `Lines Added: ${gh.additions || 0}`,
-      `Lines Deleted: ${gh.deletions || 0}`,
-      `Files Changed: ${gh.filesChanged || 0}`,
+      `Lines Added: +${gh.linesAdded || 0}`,
+      `Lines Deleted: -${gh.linesDeleted || 0}`,
+      `Total Edits: ${totalEdits}`,
       '',
-      `Followers: ${gh.followers || 0}`,
-      `Following: ${gh.following || 0}`,
-      '',
-      'Your contributions matter! Keep coding! 🚀',
+      'Your code contributions show dedication!',
+      'Keep coding and collaborating!',
     ];
 
     await this.showDialogue('GitHub Guide', messages);
@@ -408,57 +413,100 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    */
   async fetchUserData() {
     try {
+      console.log('Analytics: Starting data fetch...');
+      
       // Fetch user identity from Flask
-      const userResponse = await fetch('/api/id', { credentials: 'include' });
+      const userResponse = await fetch(`${pythonURI}/api/id`, fetchOptions);
       
       if (!userResponse.ok) {
-        console.warn('Analytics: Could not fetch user info');
+        console.error('Analytics: User info fetch failed:', userResponse.status);
         return null;
       }
 
       const userData = await userResponse.json();
+      console.log('Analytics: User info fetched, uid:', userData.uid);
       
-      // Fetch OCS analytics summary from Spring backend
-      // This endpoint returns time spent, sessions, engagement metrics, etc.
-      try {
-        const analyticsResponse = await fetch('/api/ocs-analytics/user/summary', { credentials: 'include' });
-        if (analyticsResponse.ok) {
-          const analyticsSummary = await analyticsResponse.json();
+      // Fetch all analytics in parallel
+      const [analyticsRes, commitsRes, prsRes, issuesRes] = await Promise.all([
+        fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions).catch(e => {
+          console.error('Analytics: OCS fetch threw error:', e);
+          return { ok: false };
+        }),
+        fetch(`${pythonURI}/api/analytics/github/user/commits`, fetchOptions).catch(e => {
+          console.error('Analytics: GitHub commits fetch threw error:', e);
+          return { ok: false };
+        }),
+        fetch(`${pythonURI}/api/analytics/github/user/prs`, fetchOptions).catch(e => {
+          console.error('Analytics: GitHub prs fetch threw error:', e);
+          return { ok: false };
+        }),
+        fetch(`${pythonURI}/api/analytics/github/user/issues`, fetchOptions).catch(e => {
+          console.error('Analytics: GitHub issues fetch threw error:', e);
+          return { ok: false };
+        })
+      ]);
+
+      // Process OCS Analytics
+      if (analyticsRes.ok) {
+        try {
+          const analyticsSummary = await analyticsRes.json();
+          console.log('Analytics: OCS summary received:', analyticsSummary);
           userData.analyticsSummary = analyticsSummary;
+        } catch (err) {
+          console.error('Analytics: Failed to parse OCS response:', err);
         }
-      } catch (err) {
-        console.warn('Analytics: Could not fetch OCS analytics summary', err);
+      } else {
+        console.warn('Analytics: OCS response not ok, status:', analyticsRes.status);
       }
 
-      // Try to fetch GitHub analytics if available
-      try {
-        const githubResponse = await fetch('/api/analytics/github/user', { credentials: 'include' });
-        if (githubResponse.ok) {
-          const githubData = await githubResponse.json();
-          userData.github = githubData;
+      // Process GitHub Commits
+      if (commitsRes.ok) {
+        try {
+          const commitsData = await commitsRes.json();
+          console.log('Analytics: GitHub commits received:', commitsData);
+          userData.github = userData.github || {};
+          userData.github.commits = commitsData.total_commit_contributions || 0;
+          userData.github.linesAdded = commitsData.total_lines_added || 0;
+          userData.github.linesDeleted = commitsData.total_lines_deleted || 0;
+        } catch (err) {
+          console.error('Analytics: Failed to parse commits response:', err);
         }
-      } catch (err) {
-        console.warn('Analytics: Could not fetch GitHub data', err);
+      } else {
+        console.warn('Analytics: Commits response not ok, status:', commitsRes.status);
       }
 
-      // Try to fetch skill count from profile
-      try {
-        const profileResponse = await fetch('/api/profile/game', { credentials: 'include' });
-        if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
-          userData.gameProfile = profileData;
-          // Count skills from passport if available
-          if (profileData.skillPassport) {
-            userData.skillsCount = Object.keys(profileData.skillPassport).length;
-          }
+      // Process GitHub PRs
+      if (prsRes.ok) {
+        try {
+          const prsData = await prsRes.json();
+          console.log('Analytics: GitHub PRs received:', prsData);
+          userData.github = userData.github || {};
+          userData.github.prs = (prsData.pull_requests || []).length;
+        } catch (err) {
+          console.error('Analytics: Failed to parse PRs response:', err);
         }
-      } catch (err) {
-        console.warn('Analytics: Could not fetch game profile', err);
+      } else {
+        console.warn('Analytics: PRs response not ok, status:', prsRes.status);
       }
 
+      // Process GitHub Issues
+      if (issuesRes.ok) {
+        try {
+          const issuesData = await issuesRes.json();
+          console.log('Analytics: GitHub issues received:', issuesData);
+          userData.github = userData.github || {};
+          userData.github.issues = (issuesData.issues || []).length;
+        } catch (err) {
+          console.error('Analytics: Failed to parse issues response:', err);
+        }
+      } else {
+        console.warn('Analytics: Issues response not ok, status:', issuesRes.status);
+      }
+
+      console.log('Analytics: All data fetched, final object:', userData);
       return userData;
     } catch (err) {
-      console.error('Analytics: Error fetching user data', err);
+      console.error('Analytics: Fatal error in fetchUserData:', err);
       return null;
     }
   }
