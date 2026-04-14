@@ -247,7 +247,7 @@ description: Here are the activities. Hover over image for more details
       title: "Backpacking Prep",
       shortDesc: "Outdoor Skills",
       hoverDesc: "Learn essential backpacking and hiking skills. Perfect time to prepare for summer adventures!",
-      date: "May 12 - Backpacking (Prep)"
+      date: "May 12 - Backpacking (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/A_simple_campfire.jpg/2560px-A_simple_campfire.jpg",
