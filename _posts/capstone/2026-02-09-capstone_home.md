@@ -20,7 +20,10 @@ sticky_rank: 1
   <div class="flex flex-wrap gap-2">
     <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
     <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
-    <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded">CSP</button>
+    <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
+    <a href="{% post_url 2026-04-13-capstone_home_documentation %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
+      <span class="mr-2">📄</span>Documentation
+    </a>
   </div>
   <div class="flex flex-col items-start sm:items-end">
     <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="w-full min-w-[240px] rounded-lg border border-gray-300 bg-white/90 px-4 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
