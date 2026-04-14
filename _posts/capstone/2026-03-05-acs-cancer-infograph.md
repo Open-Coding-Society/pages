@@ -1,8 +1,8 @@
 ---
 toc: false
 layout: post
-title: ACS Cancer Infograph Capstone
-description: An interactive human-body diagram that consolidates the American Cancer Society's cancer information into one visual interface — so patients and families find what they need in seconds, not clicks.
+title: American Cancer Society Website
+description: An interactive platform for patients and loved ones to navigate and learn about cancer. Explore treatment tracking and community engagement to improve quality of life.
 permalink: /capstone/acscancer/
 sticky_rank: 1
 ---

@@ -6,7 +6,6 @@ permalink: /cs-portfolio-quest/resume/submodule_4/
 parent: "Resume Building"
 team: "Grinders"
 submodule: 4
-categories: [CSP, Submodule, ResumeBuilding]
 tags: [resume, submodule, grinders]
 author: "Grinders Team"
 date: 2025-10-21

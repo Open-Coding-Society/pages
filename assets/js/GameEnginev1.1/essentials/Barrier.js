@@ -1,13 +1,47 @@
-import GameObject from '.s/GameObject.js';
+import GameObject from './GameObject.js';
 
 class Barrier extends GameObject {
     constructor(data, gameEnv) {
         super(gameEnv);
-        // Position and size in game coordinates
-        this.x = data.x || 0;
-        this.y = data.y || 0;
-        this.width = data.width || 0;
-        this.height = data.height || 0;
+        
+        // Handle position with relative (0-1) or absolute pixel values
+        const xVal = data.x !== undefined ? data.x : 0;
+        const yVal = data.y !== undefined ? data.y : 0;
+        const wVal = data.width !== undefined ? data.width : 0;
+        const hVal = data.height !== undefined ? data.height : 0;
+        
+        // If values are between 0-1, treat as percentages; otherwise use as pixels
+        if (xVal >= 0 && xVal <= 1 && yVal >= 0 && yVal <= 1) {
+            // Convert decimal percentages to pixel positions
+            this.x = xVal * this.gameEnv.innerWidth;
+            this.y = yVal * this.gameEnv.innerHeight;
+            this.isRelativePosition = true;
+        } else {
+            // Use as pixel values (backward compatibility)
+            this.x = xVal;
+            this.y = yVal;
+            this.isRelativePosition = false;
+        }
+        
+        // Handle size with relative (0-1) or absolute pixel values
+        if (wVal >= 0 && wVal <= 1 && hVal >= 0 && hVal <= 1) {
+            // Convert decimal percentages to pixel dimensions
+            this.width = wVal * this.gameEnv.innerWidth;
+            this.height = hVal * this.gameEnv.innerHeight;
+            this.isRelativeSize = true;
+        } else {
+            // Use as pixel values (backward compatibility)
+            this.width = wVal;
+            this.height = hVal;
+            this.isRelativeSize = false;
+        }
+        
+        // Store original relative/percentage values for resize
+        this.relativeX = xVal;
+        this.relativeY = yVal;
+        this.relativeWidth = wVal;
+        this.relativeHeight = hVal;
+        
         this.color = data.color || 'rgba(255, 0, 0, 0.3)';
         this.visible = data.visible !== undefined ? data.visible : true;
         this.hitbox = data.hitbox || { widthPercentage: 0.0, heightPercentage: 0.0 };
@@ -55,23 +89,45 @@ class Barrier extends GameObject {
     }
 
     resize() {
-        // Reposition relative to new game size proportionally
+        // Reposition relative to new game size
         if (!this.gameEnv) return;
-        const newW = this.gameEnv.innerWidth;
-        const newH = this.gameEnv.innerHeight;
-        // Simple proportional scaling to keep placement relative; safe if env changes
-        if (this.canvas && this.canvas.width && this.canvas.height) {
-            const prevW = parseFloat(this.canvas.style.width) || this.canvas.width;
-            const prevH = parseFloat(this.canvas.style.height) || this.canvas.height;
-            const scaleX = newW / (this.gameEnv.canvas?.width || newW);
-            const scaleY = newH / (this.gameEnv.canvas?.height || newH);
-            this.x = Math.round(this.x * scaleX);
-            this.y = Math.round(this.y * scaleY);
-            this.width = Math.round(this.width * scaleX);
-            this.height = Math.round(this.height * scaleY);
-            this.canvas.width = Math.max(1, this.width);
-            this.canvas.height = Math.max(1, this.height);
+        
+        // If using relative positioning (0-1), recalculate from original percentages
+        if (this.isRelativePosition) {
+            this.x = this.relativeX * this.gameEnv.innerWidth;
+            this.y = this.relativeY * this.gameEnv.innerHeight;
+        } else {
+            // For absolute positioning, scale proportionally (backward compatibility)
+            const newW = this.gameEnv.innerWidth;
+            const newH = this.gameEnv.innerHeight;
+            if (this.canvas && this.canvas.width && this.canvas.height) {
+                const scaleX = newW / (this.gameEnv.canvas?.width || newW);
+                const scaleY = newH / (this.gameEnv.canvas?.height || newH);
+                this.x = Math.round(this.x * scaleX);
+                this.y = Math.round(this.y * scaleY);
+            }
         }
+        
+        // If using relative size (0-1), recalculate from original percentages
+        if (this.isRelativeSize) {
+            this.width = this.relativeWidth * this.gameEnv.innerWidth;
+            this.height = this.relativeHeight * this.gameEnv.innerHeight;
+        } else {
+            // For absolute size, scale proportionally (backward compatibility)
+            const newW = this.gameEnv.innerWidth;
+            const newH = this.gameEnv.innerHeight;
+            if (this.canvas && this.canvas.width && this.canvas.height) {
+                const scaleX = newW / (this.gameEnv.canvas?.width || newW);
+                const scaleY = newH / (this.gameEnv.canvas?.height || newH);
+                this.width = Math.round(this.width * scaleX);
+                this.height = Math.round(this.height * scaleY);
+            }
+        }
+        
+        // Update canvas dimensions
+        this.canvas.width = Math.max(1, this.width);
+        this.canvas.height = Math.max(1, this.height);
+        
         this.update();
     }
 

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="pusd-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1628;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f1f3d;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="pusd-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="pusd-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:0.25" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.25" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="150" cy="150" r="148" fill="url(#pusd-bg)" stroke="url(#pusd-accent)" stroke-width="2"/>
+
+  <!-- Outer decorative ring -->
+  <circle cx="150" cy="150" r="130" fill="none" stroke="#1e40af" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- School building icon -->
+  <!-- Main building body -->
+  <rect x="95" y="145" width="110" height="75" fill="url(#pusd-fill)" stroke="#1e40af" stroke-width="2"/>
+  <!-- Roof/pediment -->
+  <polygon points="85,145 215,145 150,105" fill="url(#pusd-fill)" stroke="#1e40af" stroke-width="2"/>
+  <!-- Columns -->
+  <rect x="110" y="145" width="8" height="75" fill="#1e40af" opacity="0.4"/>
+  <rect x="130" y="145" width="8" height="75" fill="#1e40af" opacity="0.4"/>
+  <rect x="162" y="145" width="8" height="75" fill="#1e40af" opacity="0.4"/>
+  <rect x="182" y="145" width="8" height="75" fill="#1e40af" opacity="0.4"/>
+  <!-- Door -->
+  <rect x="138" y="175" width="24" height="45" rx="12" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="158" cy="200" r="2" fill="#f59e0b"/>
+  <!-- Windows -->
+  <rect x="105" y="155" width="18" height="15" rx="2" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <rect x="177" y="155" width="18" height="15" rx="2" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <!-- Pediment star/detail -->
+  <text x="150" y="128" font-size="14" text-anchor="middle" fill="#f59e0b">★</text>
+
+  <!-- Graduation cap -->
+  <ellipse cx="150" cy="88" rx="25" ry="6" fill="#f59e0b" opacity="0.9"/>
+  <rect x="138" y="82" width="24" height="16" rx="2" fill="#1e40af"/>
+  <line x1="168" y1="88" x2="175" y2="98" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="176" cy="99" r="3" fill="#f59e0b"/>
+
+  <!-- PUSD text -->
+  <text x="150" y="238" font-family="Arial, sans-serif" font-size="22" font-weight="800"
+        text-anchor="middle" fill="url(#pusd-accent)">PUSD</text>
+
+  <!-- Foundation text -->
+  <text x="150" y="258" font-family="Arial, sans-serif" font-size="10" font-weight="400"
+        text-anchor="middle" fill="#94a3b8" letter-spacing="2">FOUNDATION</text>
+
+  <!-- Tagline -->
+  <text x="150" y="278" font-family="Arial, sans-serif" font-size="7.5" font-weight="500"
+        text-anchor="middle" fill="#f59e0b" opacity="0.85" letter-spacing="1">ENRICHING EDUCATION</text>
+</svg>

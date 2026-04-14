@@ -6,7 +6,6 @@ permalink: /digital-famine/end/submodule_2/
 parent: "End Quest"
 team: "CodeMaxxers"
 submodule: 2
-categories: [CSP, Submodule, End]
 tags: [end, submodule, codemaxxers, media-literacy]
 author: "Cyrus Zhang"
 microblog: true

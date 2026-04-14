@@ -7,4 +7,4 @@ permalink: /capstone/quant-trading-bot/
 sticky_rank: 1
 ---
 
-{% include quant-game-infograph.html %}
+{% include quant-infograph.html %}

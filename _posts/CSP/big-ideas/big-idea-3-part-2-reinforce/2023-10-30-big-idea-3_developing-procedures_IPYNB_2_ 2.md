@@ -5,7 +5,6 @@ layout: post
 title: Procedures
 description: Lesson for developing procedures in Python
 author: Eric, Gurshawn, Hanlun, Yeongsu
-categories: ['Python']
 ---
 
 <h1>- CB 3.12,3.13 Developing Procedures</h1>

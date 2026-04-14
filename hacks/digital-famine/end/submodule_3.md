@@ -7,7 +7,6 @@ permalink: /digital-famine/end/submodule_3/
 parent: "End Quest"
 team: "CodeMaxxers"
 submodule: 3
-categories: [CSP, Submodule, End]
 tags: [end, submodule, codemaxxers]
 author: "Evan"
 microblog: true

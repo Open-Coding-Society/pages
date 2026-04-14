@@ -2,7 +2,7 @@
 layout: post
 title: Playing with Jupyter Notebooks and Python
 description: GitHub pages was built with Python and Jupyter Notebooks in mind.  This post is to verify tools by using Python.
-categories: ['DevOps', 'Python']
+categories: DevOps
 permalink: /jupyter/notebook/python
 menu: nav/tools_setup.html
 toc: True

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="dsa-bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a12;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#12122a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dsa-gold3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4a853;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8c875;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="150" cy="150" r="148" fill="url(#dsa-bg3)" stroke="url(#dsa-gold3)" stroke-width="2"/>
+  <circle cx="150" cy="150" r="130" fill="none" stroke="#d4a853" stroke-width="0.5" opacity="0.3"/>
+  <!-- Nav bar -->
+  <rect x="65" y="80" width="170" height="24" rx="4" fill="rgba(212,168,83,0.1)" stroke="#d4a853" stroke-width="1.5"/>
+  <circle cx="80" cy="92" r="6" fill="#d4a853" opacity="0.5"/>
+  <text x="95" y="95" font-family="Arial" font-size="7" fill="#d4a853" font-weight="700">Home</text>
+  <text x="120" y="95" font-family="Arial" font-size="7" fill="#9aa3b0">About ▾</text>
+  <text x="152" y="95" font-family="Arial" font-size="7" fill="#9aa3b0">Resources ▾</text>
+  <text x="195" y="95" font-family="Arial" font-size="7" fill="#9aa3b0">Media ▾</text>
+  <!-- Mega menu panel -->
+  <rect x="65" y="106" width="170" height="90" rx="8" fill="rgba(18,18,42,0.95)" stroke="#d4a853" stroke-width="1.5"/>
+  <!-- Column 1 -->
+  <text x="85" y="125" font-family="Arial" font-size="8" fill="#d4a853" font-weight="700">🏛 About DSA</text>
+  <text x="85" y="138" font-family="Arial" font-size="6.5" fill="#9aa3b0">Our Team</text>
+  <text x="85" y="149" font-family="Arial" font-size="6.5" fill="#9aa3b0">70-Year History</text>
+  <text x="85" y="160" font-family="Arial" font-size="6.5" fill="#9aa3b0">Foundation</text>
+  <!-- Column 2 -->
+  <text x="145" y="125" font-family="Arial" font-size="8" fill="#4a90d9" font-weight="700">📋 Services</text>
+  <text x="145" y="138" font-family="Arial" font-size="6.5" fill="#9aa3b0">Negotiations</text>
+  <text x="145" y="149" font-family="Arial" font-size="6.5" fill="#9aa3b0">Legal Defense</text>
+  <text x="145" y="160" font-family="Arial" font-size="6.5" fill="#9aa3b0">Political Action</text>
+  <!-- Column 3 -->
+  <text x="85" y="178" font-family="Arial" font-size="8" fill="#d4a853" font-weight="700">📞 Connect</text>
+  <text x="85" y="190" font-family="Arial" font-size="6.5" fill="#9aa3b0">Contact · Social</text>
+  <!-- Title -->
+  <text x="150" y="230" font-family="Arial, sans-serif" font-size="16" font-weight="800" text-anchor="middle" fill="url(#dsa-gold3)">Mega Menu Nav</text>
+  <text x="150" y="250" font-family="Arial, sans-serif" font-size="8" font-weight="400" text-anchor="middle" fill="#9aa3b0" letter-spacing="2">SMALL FEATURE</text>
+</svg>

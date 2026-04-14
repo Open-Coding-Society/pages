@@ -1,0 +1,326 @@
+// Centralized Capstone Infograph Styles
+// This file replaces the per-project infograph SCSS files.
+// It provides a simple, black-and-white theme for all capstone infographics.
+
+// Color palette
+$infograph-bg: #000000;
+$infograph-foreground: #ffffff;
+$infograph-muted: rgba(255, 255, 255, 0.75);
+$infograph-border: rgba(255, 255, 255, 0.12);
+$infograph-card: rgba(255, 255, 255, 0.05);
+$infograph-btn-bg: rgba(255, 255, 255, 0.08);
+$infograph-btn-hover: rgba(255, 255, 255, 0.18);
+
+// Base layout for any infograph container (matches any class ending in "-infograph")
+[class$="-infograph"],
+[class$="-infograph"] * {
+  box-sizing: border-box;
+}
+
+[class$="-infograph"] {
+  max-width: 1800px;
+  width: min(100%, 1800px);
+  margin: 0 auto;
+  padding: 3rem 3rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: $infograph-foreground;
+  background-color: $infograph-bg;
+}
+
+/* Capstone-only page layout overrides to avoid global site styling conflicts */
+.capstone-page {
+  width: 100% !important;
+  max-width: none !important;
+}
+.capstone-page > .wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  margin: 0 auto !important;
+}
+.capstone-page .opencs_root {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+// Generic section styling
+[class$="-infograph"] [class$="-header"] {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  border: 1px solid $infograph-border;
+}
+
+[class$="-infograph"] [class$="-badge"] {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.12);
+  color: $infograph-foreground;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+}
+
+[class$="-infograph"] [class$="-title"] {
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.02em;
+}
+
+[class$="-infograph"] [class$="-description"],
+[class$="-infograph"] [class$="-subtitle"] {
+  color: $infograph-muted;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Cards & grid
+[class$="-infograph"] [class$="-card"] {
+  background: $infograph-card;
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid $infograph-border;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+[class$="-infograph"] [class$="-card-grid"] {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(320px, 1.3fr) minmax(320px, 1.7fr);
+  gap: 2rem;
+  align-items: stretch;
+  min-width: 0;
+}
+
+[class$="-infograph"] [class$="-visual"],
+[class$="-infograph"] [class$="-content"],
+[class$="-infograph"] [class$="-details"] {
+  min-width: 0;
+}
+
+[class$="-infograph"] [class$="-title"],
+[class$="-infograph"] [class$="-project-title"],
+[class$="-infograph"] [class$="-description"],
+[class$="-infograph"] [class$="-subtitle"],
+[class$="-infograph"] [class$="-about"],
+[class$="-infograph"] [class$="-section-title"],
+[class$="-infograph"] [class$="-impact-item"] {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1024px) {
+  [class$="-infograph"] [class$="-card-grid"] {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  [class$="-infograph"] [class$="-card-grid"] {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Visual column
+[class$="-infograph"] [class$="-visual"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[class$="-infograph"] [class$="-image-link"] {
+  position: relative;
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  width: 100%;
+}
+
+[class$="-infograph"] [class$="-image"] {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+[class$="-infograph"] [class$="-image-link"]:hover [class$="-image"] {
+  transform: scale(1.05);
+}
+
+[class$="-infograph"] [class$="-overlay"] {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+[class$="-infograph"] [class$="-image-link"]:hover [class$="-overlay"] {
+  opacity: 1;
+}
+
+[class$="-infograph"] [class$="-overlay"] span {
+  color: $infograph-foreground;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+[class$="-infograph"] [class$="-status"] {
+  background: rgba(255, 255, 255, 0.12);
+  color: $infograph-foreground;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+[class$="-infograph"] [class$="-team"] {
+  text-align: center;
+  margin-top: auto;
+}
+
+[class$="-infograph"] [class$="-team-label"] {
+  display: block;
+  color: $infograph-muted;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.25rem;
+}
+
+[class$="-infograph"] [class$="-team-name"] {
+  display: block;
+  color: $infograph-foreground;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+// Content Column
+[class$="-infograph"] [class$="-content"] {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[class$="-infograph"] [class$="-project-title"] {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: $infograph-foreground;
+  margin: 0 0 0.25rem 0;
+}
+
+[class$="-infograph"] [class$="-keypoints"] {
+  margin-top: 1rem;
+}
+
+[class$="-infograph"] [class$="-keypoint"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+[class$="-infograph"] [class$="-check"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+[class$="-infograph"] [class$="-tech-stack"] {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+[class$="-infograph"] [class$="-tech-tag"] {
+  padding: 0.35rem 0.7rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+// Details column
+[class$="-infograph"] [class$="-details"] {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[class$="-infograph"] [class$="-section-title"] {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+[class$="-infograph"] [class$="-about"] {
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+  color: $infograph-muted;
+}
+
+[class$="-infograph"] [class$="-impact-list"] {
+  display: grid;
+  gap: 0.75rem;
+}
+
+[class$="-infograph"] [class$="-impact-item"] {
+  padding: 0.8rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: $infograph-muted;
+}
+
+[class$="-infograph"] [class$="-btn"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.2rem;
+  margin-top: 1.5rem;
+  background: $infograph-btn-bg;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  color: $infograph-foreground;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+[class$="-infograph"] [class$="-btn"]:hover {
+  background: $infograph-btn-hover;
+  transform: translateY(-1px);
+}
