@@ -301,7 +301,7 @@ description: Here are the activities. Hover over image for more details
       image: "{{site.baseurl}}/images/activity/frisbeegolf.png",
       title: "Frisbee Golf",
       shortDesc: "Modified Sport",
-      hoverDesc: "Play disc golf on a custom course! Great outdoor activity combining skill and fun."
+      hoverDesc: "Play disc golf on a custom course! Great outdoor activity combining skill and fun.",
       date: "Aug 25 - Church Parking Lot (Brian)"
     }
   ];
@@ -319,7 +319,7 @@ description: Here are the activities. Hover over image for more details
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Catapult_made_with_craft_sticks.jpg/1920px-Catapult_made_with_craft_sticks.jpg?20161025110105",
       title: "Popsicle Catapults",
       shortDesc: "Engineering Fun",
-      hoverDesc: "Build working catapults from popsicle sticks! Learn about physics and medieval engineering."
+      hoverDesc: "Build working catapults from popsicle sticks! Learn about physics and medieval engineering.",
       date: "Sep 23 - Church (Justin)"
     },
     {
