@@ -83,12 +83,13 @@ class Coin extends Npc {
 		this.collectCooldownUntil = performance.now() + 200;
 		this.collectCount += 1;
 		
-		// Update game stats
-		const gameControl = this.gameEnv?.gameControl;
-		if (gameControl) {
-			gameControl.coinsCollected = (gameControl.coinsCollected || 0) + this.value;
-			if (!gameControl.stats) gameControl.stats = {};
-			gameControl.stats.coinsCollected = (gameControl.stats.coinsCollected || 0) + this.value;
+		// Update GameEnv stats (proper OOP - write to environment, not control)
+		if (this.gameEnv) {
+			// Ensure stats object exists
+			if (!this.gameEnv.stats) {
+				this.gameEnv.stats = { coinsCollected: 0 };
+			}
+			this.gameEnv.stats.coinsCollected = (this.gameEnv.stats.coinsCollected || 0) + this.value;
 		}
 		
 		console.log(`Coin collected! Total: ${this.collectCount}`);

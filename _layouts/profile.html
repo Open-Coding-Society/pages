@@ -109,59 +109,87 @@ active_tab: profile
                 Add Class
             </button>
         </div>
-    
+
         <div id="classesContainer">
             <!-- Classes will be loaded here dynamically -->
             <p class="text-gray-400 text-center py-4">Loading classes...</p>
         </div>
     </div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Group Information</h2>
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
 
-    <div id="springGroupInfo" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="col-span-1 md:col-span-2 text-center text-gray-400">
-            Loading group information...
+        <div id="personaSelectionContainer">
+            <p class="text-gray-400 text-center py-4">Loading personas...</p>
         </div>
     </div>
-</div>
 
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <div class="flex items-start justify-between gap-4 mb-4">
-        <div>
-            <h2 class="text-xl font-semibold">Join a Group</h2>
-        </div>
-        <div id="joinGroupStatus" class="text-sm text-gray-300"></div>
-    </div>
 
-    <div class="grid grid-cols-1 gap-4">
-        <div>
-            <label for="groupSearchInput" class="block text-sm font-medium text-gray-300 mb-1">Search
-                Groups</label>
-            <div class="flex gap-2">
-                <input id="groupSearchInput" type="text" placeholder="Enter a group name"
-                    class="flex-1 px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    autocomplete="off">
-                <button id="groupSearchBtn" type="button"
-                    class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
-                    Search
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Facial Registration</h2>
+        <div id="facialRegistrationContainer" class="space-y-4">
+            <p class="text-gray-400 text-sm">Register your face to use the Bathroom Pass system. Your data will be
+                stored securely and used only for identification.</p>
+
+            <div id="webcamOverlay"
+                class="hidden fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4">
+                <div
+                    class="relative w-full max-w-md bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-700 shadow-2xl">
+                    <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+                        <h3 class="font-semibold text-gray-200">Face Scanner</h3>
+                        <button type="button" onclick="closeScanner()" class="text-gray-500 hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative aspect-video bg-black flex items-center justify-center">
+                        <video id="webcamControl" class="w-full h-full object-cover" autoplay playsinline></video>
+                        <canvas id="captureCanvas" class="hidden"></canvas>
+                        <!-- Scanner Effect -->
+                        <div class="absolute inset-0 border-2 border-indigo-500/30 pointer-events-none">
+                            <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-indigo-500"></div>
+                            <div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-indigo-500"></div>
+                            <div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-indigo-500"></div>
+                            <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col items-center gap-4">
+                        <button type="button" id="captureFaceBtn" onclick="captureAndSaveFace()"
+                            class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Capture Face
+                        </button>
+                        <p id="scannerStatus" class="text-sm text-gray-400"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="openScanner()"
+                    class="px-6 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 rounded-lg transition-all flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Start Face Registration
                 </button>
+                <div id="registrationIndicator" class="flex items-center gap-2 text-sm text-gray-500">
+                    <div id="regStatusDot" class="w-2 h-2 rounded-full bg-gray-600"></div>
+                    <span id="regStatusText">Checking registration...</span>
+                </div>
             </div>
         </div>
-        <div id="groupResultsList" class="bg-neutral-700 border border-gray-600 rounded-lg max-h-64 overflow-y-auto hidden">
-        </div>
     </div>
-</div>
-
-<div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
-    <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
-    
-    <div id="personaSelectionContainer">
-        <p class="text-gray-400 text-center py-4">Loading personas...</p>
-    </div>
-</div>
-
-
 </form>
 
 <script type="module">
@@ -181,11 +209,6 @@ active_tab: profile
      */
 
     document.addEventListener("DOMContentLoaded", () => {
-        const springGroupInfo = document.getElementById('springGroupInfo');
-        const groupSearchInput = document.getElementById('groupSearchInput');
-        const groupResultsList = document.getElementById('groupResultsList');
-        const joinGroupStatus = document.getElementById('joinGroupStatus');
-        
         // Module-level cache for current user data - fetched once, reused throughout
         let currentPersonId = null;
         let currentUid = null;
@@ -202,8 +225,6 @@ active_tab: profile
             .then(response => {
                 // Handle authentication errors
                 if (response.status === 401) {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Please sign in to view group information.</p>`;
-                    groupSearchInput.disabled = true;
                     return null; // Stop the chain
                 }
                 if (!response.ok) {
@@ -213,13 +234,12 @@ active_tab: profile
             })
             .then(personData => {
                 if (!personData) return null; // Chain was stopped
-                
+
                 // Cache user identity for reuse in join/leave operations
                 currentPersonId = personData.id;
                 currentUid = personData.uid;
 
                 if (!currentPersonId || !currentUid) {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">Unable to verify user identity for group data.</p>`;
                     return null;
                 }
 
@@ -227,10 +247,10 @@ active_tab: profile
                 // This request DEPENDS on having currentPersonId from the previous call
                 return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
             })
-           
+
             .then(groupResp => {
                 if (!groupResp) return null; // Chain was stopped
-                
+
                 // Handle group fetch response
                 if (groupResp.ok) {
                     return groupResp.json();
@@ -252,146 +272,25 @@ active_tab: profile
             })
             .then(userGroups => {
                 if (!userGroups) return; // Chain was stopped
-                
+
                 const groups = Array.isArray(userGroups) ? userGroups : [];
 
                 // Build a Set of user's group IDs for O(1) lookup during search
                 groups.forEach(group => userGroupIds.add(group.id));
 
                 if (groups.length > 0) {
-                    springGroupInfo.innerHTML = groups.map(group => `
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Group Name</label>
-                        <input type="text" readonly
-                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
-                            value="${group.name}">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Period</label>
-                        <input type="text" readonly
-                            class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300 focus:outline-none cursor-default"
-                            value="${group.period}">
-                    </div>
-                    <div class="col-span-1 md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Members & GitHub IDs</label>
-                        <div class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-300">
-                            ${group.members.map(member => `${member.name} (${member.uid})`).join(', ')}
-                        </div>
-                    </div>
-                    <div class="col-span-1 md:col-span-2">
-                        <button type="button" class="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-600 transition-colors" onclick="leaveGroup('${group.id}', ${currentPersonId})">
-                            Leave Group
-                        </button>
-                    </div>
-                    `).join('');
+                    // Group display logic removed
                 } else {
-                    springGroupInfo.innerHTML = `<p class="text-gray-400 col-span-2 text-center">No group assignments found.</p>`;
+                    // No groups message removed
                 }
 
                 // Set up search functionality (uses cached personId)
-                setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, currentPersonId);
+                // setupGroupSearch function removed
             })
             .catch(error => {
                 console.error("Error in API chain:", error);
-                springGroupInfo.innerHTML = `<p class="text-red-400 col-span-2 text-center">Error loading group information.</p>`;
-                groupSearchInput.disabled = true;
+                // Group error handling removed
             });
-
-        /**
-         * Set up group search and join functionality
-         * Separated into a function to keep the main chain clean
-         */
-        function setupGroupSearch(groupSearchInput, groupResultsList, joinGroupStatus, userGroupIds, personId) {
-            // Search function using server-side API
-            const searchGroups = async (query) => {
-                const normalized = query.trim();
-                
-                if (!normalized) {
-                    groupResultsList.classList.add('hidden');
-                    return;
-                }
-
-                try {
-                    const searchResp = await fetch(`${javaURI}/api/groups/search?name=${encodeURIComponent(normalized)}`, fetchOptions);
-                    if (!searchResp.ok) throw new Error('Search failed');
-                    
-                    const filtered = await searchResp.json();
-
-                    if (filtered.length === 0) {
-                        groupResultsList.innerHTML = `<div class="px-4 py-3 text-gray-400 text-sm">No matching groups</div>`;
-                        groupResultsList.classList.remove('hidden');
-                        return;
-                    }
-
-                    groupResultsList.innerHTML = filtered.map(group => {
-                        const label = `${group.name || 'Unnamed'} (Period ${group.period || 'N/A'})`;
-                        const isAlreadyMember = userGroupIds.has(group.id);
-                        const disabledClass = isAlreadyMember ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-600 cursor-pointer';
-                        const membersText = group.members?.length > 0 
-                            ? group.members.map(m => m.name).join(', ')
-                            : 'No members';
-                        return `
-                            <div data-group-id="${group.id}" class="px-4 py-3 border-b border-gray-600 last:border-b-0 text-gray-300 ${disabledClass} transition-colors"
-                                onclick="joinGroupFromList('${group.id}', '${label}', ${isAlreadyMember})">
-                                <div class="font-medium">${label}</div>
-                                <div class="text-xs text-gray-500 mt-1">${membersText}</div>
-                                ${isAlreadyMember ? '<div class="text-xs text-gray-400 mt-1">Already a member</div>' : ''}
-                            </div>
-                        `;
-                    }).join('');
-                    groupResultsList.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Search error:', error);
-                    groupResultsList.innerHTML = `<div class="px-4 py-3 text-red-400 text-sm">Search failed</div>`;
-                    groupResultsList.classList.remove('hidden');
-                }
-            };
-
-            // Search button click handler
-            document.getElementById('groupSearchBtn')?.addEventListener('click', () => {
-                searchGroups(groupSearchInput.value);
-            });
-
-            // Optimized join function - uses cached personId instead of fetching all people
-            // This demonstrates how the cached personId from the initial chain is reused
-            window.joinGroupFromList = async (groupId, groupLabel, isAlreadyMember) => {
-                if (isAlreadyMember) {
-                    joinGroupStatus.textContent = 'You are already a member of this group.';
-                    return;
-                }
-
-                groupSearchInput.disabled = true;
-                joinGroupStatus.textContent = 'Joining group...';
-                groupResultsList.classList.add('hidden');
-
-                // Use cached personId - no additional API call needed!
-                if (!personId) {
-                    joinGroupStatus.textContent = 'User ID not available. Please refresh the page.';
-                    groupSearchInput.disabled = false;
-                    return;
-                }
-
-                // Join group using the cached person ID from the initial chain
-                fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
-                    ...fetchOptions,
-                    method: 'POST',
-                })
-                .then(joinResp => {
-                    if (!joinResp.ok) {
-                        return joinResp.text().then(body => {
-                            throw new Error(body || 'Failed to join group');
-                        });
-                    }
-                    joinGroupStatus.textContent = 'Refreshing...';
-                    window.location.reload();
-                })
-                .catch(joinError => {
-                    console.error('Join group error:', joinError);
-                    joinGroupStatus.textContent = joinError.message || 'Unable to join group.';
-                    groupSearchInput.disabled = false;
-                });
-            };
-        }
     });
 </script>
 
@@ -430,40 +329,40 @@ active_tab: profile
 
     async function loadPersonas() {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         try {
             // Fetch all available personas
-            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions); 
+            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions);
             if (!personasResp.ok) throw new Error('Failed to load personas');
             const personas = await personasResp.json();
-            
+
             console.log('📦 All personas loaded:', personas);
-            
+
             // Get user's personas
-            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions); 
-            
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions);
+
             let selectedPersonas = {};
             let totalSelected = 0;
-            
+
             if (!userPersonasResp.ok) {
                 console.log('⚠️ No personas found for user or not authenticated');
                 showPersonaSelectionCards(personas, {});
                 return;
             }
-            
+
             const userPersonasData = await userPersonasResp.json();
             console.log('👤 User personas data:', userPersonasData);
-            
+
             selectedPersonas = userPersonasData.personas || {};
             totalSelected = userPersonasData.total_selected || 0;
-            
+
             console.log('✅ Selected personas:', selectedPersonas);
             console.log('📊 Total selected:', totalSelected);
-            
+
             // Store globally
             window.allPersonasData = personas;
             window.selectedPersonasData = selectedPersonas;
-            
+
             // If user has selected all 4 categories, show the completed view
             if (totalSelected === 4) {
                 console.log('🎉 All 4 selected! Showing completed view');
@@ -473,7 +372,7 @@ active_tab: profile
                 // Show selection interface - hide completed categories
                 showPersonaSelectionCards(personas, selectedPersonas);
             }
-            
+
         } catch (error) {
             console.error('❌ Error loading personas:', error);
             container.innerHTML = `
@@ -484,7 +383,7 @@ active_tab: profile
     }
     function editProfile() {
         console.log('📝 Edit profile clicked - showing all categories');
-        
+
         if (window.allPersonasData && window.selectedPersonasData) {
             showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData, true); // Pass true to force show all
         } else {
@@ -493,19 +392,19 @@ active_tab: profile
     }
     function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         console.log('🎨 Rendering selection cards');
         console.log('Total personas:', allPersonas.length);
         console.log('Selected:', selectedPersonas);
         console.log('Force show all:', forceShowAll);
-        
+
         if (allPersonas.length === 0) {
             container.innerHTML = `
                 <p class="text-gray-400 text-center py-4">No personas available.</p>
             `;
             return;
         }
-        
+
         // Group personas by category
         const grouped = allPersonas.reduce((acc, persona) => {
             const category = persona.category || 'other';
@@ -513,30 +412,29 @@ active_tab: profile
             acc[category].push(persona);
             return acc;
         }, {});
-        
+
         console.log('📂 Grouped by category:', grouped);
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryDescriptions = {
             'student': 'How you approach learning and teamwork',
             'social': 'Your hobbies and social interests',
             'achievement': 'What drives and motivates you',
             'fantasy': 'Your aspirational superpower'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
         const totalSelected = Object.keys(selectedPersonas).length;
-        
+
         container.innerHTML = `
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-gray-100 mb-2">Build Your Persona Profile</h2>
-                <p class="text-gray-400">Select one persona from each category (${totalSelected}/4 selected)</p>
+                <h2 class="text-xl font-semibold text-gray-100">Persona Profile</h2>
                 <div class="mt-4 flex justify-center gap-2">
                     ${categoryOrder.map(cat => `
                         <div class="w-3 h-3 rounded-full ${selectedPersonas[cat] ? 'bg-indigo-500' : 'bg-gray-700'}"></div>
@@ -546,19 +444,19 @@ active_tab: profile
             
             <div class="space-y-8">
                 ${categoryOrder.map(category => {
-                    const personas = grouped[category] || [];
-                    const selectedInCategory = selectedPersonas[category];
-                    
-                    // CHANGED: Only hide if NOT forcing show all AND category is selected
-                    if (!forceShowAll && selectedInCategory) {
-                        console.log(`✓ Category ${category} already selected, hiding it`);
-                        return '';
-                    }
-                    
-                    // Show the selection grid
-                    console.log(`🎯 Showing selection grid for ${category}`);
-                    
-                    return `
+            const personas = grouped[category] || [];
+            const selectedInCategory = selectedPersonas[category];
+
+            // CHANGED: Only hide if NOT forcing show all AND category is selected
+            if (!forceShowAll && selectedInCategory) {
+                console.log(`✓ Category ${category} already selected, hiding it`);
+                return '';
+            }
+
+            // Show the selection grid
+            console.log(`🎯 Showing selection grid for ${category}`);
+
+            return `
                         <div class="mb-8" id="category-${category}">
                             <div class="flex items-center justify-between mb-4">
                                 <div>
@@ -572,11 +470,11 @@ active_tab: profile
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="category-grid-${category}">
                                 ${personas.map(persona => {
-                                    const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                                    const description = persona.bio_map?.description || 'No description';
-                                    const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
-                                    
-                                    return `
+                const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+                const description = persona.bio_map?.description || 'No description';
+                const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
+
+                return `
                                         <div 
                                             id="persona-card-${persona.id}"
                                             class="flex flex-col p-4 ${isCurrentlySelected ? 'bg-indigo-900 border-indigo-400' : 'bg-neutral-800 hover:bg-neutral-700'} border ${isCurrentlySelected ? 'border-indigo-400' : 'border-gray-700 hover:border-indigo-500'} rounded-lg cursor-pointer transition-all group h-full relative"
@@ -603,33 +501,33 @@ active_tab: profile
                                             </div>
                                         </div>
                                     `;
-                                }).join('')}
+            }).join('')}
                             </div>
                         </div>
                     `;
-                }).join('')}
+        }).join('')}
             </div>
         `;
     }
     function showCompletedPersonas(selectedPersonas, allPersonas) {
         const container = document.getElementById('personaSelectionContainer');
-        
+
         const categoryLabels = {
             'student': 'Student Archetype',
             'social': 'Social Interest',
             'achievement': 'Achievement Oriented',
             'fantasy': 'Fantasy Persona'
         };
-        
+
         const categoryEmojis = {
             'student': '📚',
             'social': '🎉',
             'achievement': '🏆',
             'fantasy': '✨'
         };
-        
+
         const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
-        
+
         container.innerHTML = `
             <div class="max-w-7xl mx-auto">
                 <!-- Header -->
@@ -647,70 +545,145 @@ active_tab: profile
                         Change Personas
                     </button>
                 </div>
-                
+                <!-- Skill Snapshot Panel -->
+        <div id="skillSnapshotPanel" class="bg-neutral-800 border border-indigo-500/40 rounded-xl p-6 mb-6">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-100">Log Your Skills for This Project</h3>
+                    <p class="text-sm text-gray-400 mt-0.5">This saves a snapshot to your Skill Passport</p>
+                </div>
+                <button 
+                    onclick="document.getElementById('skillSnapshotPanel').classList.toggle('hidden')"
+                    class="text-xs text-gray-500 hover:text-gray-300 transition">
+                    collapse
+                </button>
+            </div>
+        
+            <!-- Project Name -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Project Name</label>
+                <input 
+                    type="text" 
+                    id="snapshotProjectName"
+                    placeholder="e.g. Web App Sprint 1"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+            </div>
+            
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+    
+            <!-- Coding Ability -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Coding Ability</label>
+                    <span id="codingAbilityVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="codingAbility"
+                    oninput="document.getElementById('codingAbilityVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Beginner</span>
+                    <span>Expert</span>
+                </div>
+            </div>
+    
+            <!-- Collaboration -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Collaboration</label>
+                    <span id="collaborationVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="collaboration"
+                    oninput="document.getElementById('collaborationVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Solo</span>
+                    <span>Team player</span>
+                </div>
+            </div>
+    
+            <!-- Problem Solving -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Problem Solving</label>
+                    <span id="problemSolvingVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="problemSolving"
+                    oninput="document.getElementById('problemSolvingVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Developing</span>
+                    <span>Advanced</span>
+                </div>
+            </div>
+    
+            <!-- Initiative -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Initiative</label>
+                    <span id="initiativeVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="initiative"
+                    oninput="document.getElementById('initiativeVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Passive</span>
+                    <span>Self-starter</span>
+                </div>
+            </div>
+    
+        </div>
+    
+        <!-- Submit -->
+        <div class="flex items-center gap-4">
+            <button 
+                onclick="submitSkillSnapshot()"
+                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
+                Save Snapshot
+            </button>
+            <span id="snapshotStatus" class="text-sm text-gray-400"></span>
+        </div>
+    </div>
                 <!-- 2x2 Grid of Selected Personas -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     ${categoryOrder.map(category => {
-                        const personaData = selectedPersonas[category];
-                        if (!personaData) return '';
-                        
-                        const persona = allPersonas.find(p => p.id === personaData.persona_id);
-                        if (!persona) return '';
-                        
-                        const title = persona.bio_map?.title || persona.alias || 'Unnamed';
-                        const description = persona.bio_map?.description || 'No description';
-                        const empathyMap = persona.empathy_map || {};
-                        
-                        return `
-                            <div class="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border-2 border-indigo-500/50 rounded-xl p-6 hover:border-indigo-500 transition">
-                                
-                                <div class="flex items-start gap-4 mb-4">
-                                    <div class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
-                                        ${categoryEmojis[category]}
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-1">
-                                            <span class="text-xs font-medium text-indigo-400 uppercase">${categoryLabels[category]}</span>
-                                        </div>
-                                        <h3 class="text-xl font-bold text-gray-100">${title}</h3>
-                                    </div>
+            const personaData = selectedPersonas[category];
+            if (!personaData) return '';
+
+            const persona = allPersonas.find(p => p.id === personaData.persona_id);
+            if (!persona) return '';
+
+            const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+            const description = persona.bio_map?.description || 'No description';
+            const empathyMap = persona.empathy_map || {};
+
+            return `
+                        <div class="bg-neutral-800 border border-indigo-500/30 rounded-xl p-4 hover:border-indigo-500 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center text-base flex-shrink-0">
+                                    ${categoryEmojis[category]}
                                 </div>
-                                
-                                <p class="text-gray-300 text-sm leading-relaxed mb-4">${description}</p>
-                                
-                                ${empathyMap.says?.length || empathyMap.thinks?.length ? `
-                                    <div class="border-t border-gray-700 pt-4">
-                                        <div class="space-y-3">
-                                            ${empathyMap.says?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-blue-400 text-xs font-medium mt-0.5">💬</span>
-                                                    <p class="text-gray-400 text-xs italic flex-1">"${empathyMap.says[0]}"</p>
-                                                </div>
-                                            ` : ''}
-                                            ${empathyMap.thinks?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-purple-400 text-xs font-medium mt-0.5">💭</span>
-                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.thinks[0]}</p>
-                                                </div>
-                                            ` : ''}
-                                            ${empathyMap.does?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-green-400 text-xs font-medium mt-0.5">✋</span>
-                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.does[0]}</p>
-                                                </div>
-                                            ` : ''}
-                                            ${empathyMap.feels?.[0] ? `
-                                                <div class="flex items-start gap-2">
-                                                    <span class="text-pink-400 text-xs font-medium mt-0.5">❤️</span>
-                                                    <p class="text-gray-400 text-xs flex-1">${empathyMap.feels[0]}</p>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-                                ` : ''}
+                                <div>
+                                    <span class="text-xs font-medium text-indigo-400 uppercase">${categoryLabels[category]}</span>
+                                    <h3 class="text-sm font-bold text-gray-100">${title}</h3>
+                                </div>
                             </div>
-                        `;
-                    }).join('')}
+                            <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed">${description}</p>
+                        </div>
+                    `;
+        }).join('')}
                 </div>
             </div>
         `;
@@ -719,7 +692,7 @@ active_tab: profile
         console.log('🎯 SELECT PERSONA CALLED');
         console.log('   Persona ID:', personaId);
         console.log('   Category:', category);
-        
+
         // Show loading state on the clicked card
         const card = document.getElementById(`persona-card-${personaId}`);
         if (card) {
@@ -731,34 +704,34 @@ active_tab: profile
             }
             card.style.pointerEvents = 'none';
         }
-        
+
         try {
             const url = `${pythonURI}/api/user/persona`;
             const body = { persona_id: personaId };
-            
+
             console.log('📤 Making POST request');
             console.log('   URL:', url);
             console.log('   Body:', body);
-            
+
             const response = await fetch(url, {
                 ...fetchOptions,
                 method: 'POST',
                 body: JSON.stringify(body)
             });
-            
+
             console.log('📥 Response received');
             console.log('   Status:', response.status);
             console.log('   OK:', response.ok);
-            
+
             const responseData = await response.json();
             console.log('   Response Data:', responseData);
-            
+
             if (!response.ok) {
                 throw new Error(responseData.message || `Server error: ${response.status}`);
             }
-            
+
             console.log('✅ Selection successful!');
-            
+
             // Show success animation
             if (card) {
                 const overlay = card.querySelector('.loading-overlay');
@@ -771,17 +744,17 @@ active_tab: profile
                     console.log('   ✅ Success checkmark shown');
                 }
             }
-            
+
             // Wait a moment then reload
             console.log('   ⏳ Waiting 600ms before reload...');
             setTimeout(() => {
                 console.log('   🔄 Reloading personas...');
                 loadPersonas();
             }, 600);
-            
+
         } catch (error) {
             console.error('❌ ERROR in selectPersona:', error);
-            
+
             // Hide loading overlay and restore interactivity
             if (card) {
                 const overlay = card.querySelector('.loading-overlay');
@@ -790,13 +763,13 @@ active_tab: profile
                 }
                 card.style.pointerEvents = 'auto';
             }
-            
+
             // Show error message
             const categorySection = document.getElementById(`category-${category}`);
             if (categorySection) {
                 const existingError = categorySection.querySelector('.error-message');
                 if (existingError) existingError.remove();
-                
+
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'error-message bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4 flex items-start gap-3';
                 errorDiv.innerHTML = `
@@ -814,11 +787,88 @@ active_tab: profile
                     </button>
                 `;
                 categorySection.insertBefore(errorDiv, categorySection.querySelector(`#category-grid-${category}`));
-                
+
                 setTimeout(() => errorDiv.remove(), 5000);
             }
         }
     }
+    async function submitSkillSnapshot() {
+        const projectName = document.getElementById('snapshotProjectName')?.value?.trim();
+        const codingAbility = parseInt(document.getElementById('codingAbility')?.value);
+        const collaboration = parseInt(document.getElementById('collaboration')?.value);
+        const problemSolving = parseInt(document.getElementById('problemSolving')?.value);
+        const initiative = parseInt(document.getElementById('initiative')?.value);
+        const statusEl = document.getElementById('snapshotStatus');
+
+        if (!projectName) {
+            statusEl.textContent = 'Please enter a project name.';
+            statusEl.classList.add('text-red-400');
+            statusEl.classList.remove('text-green-400', 'text-gray-400');
+            return;
+        }
+
+        statusEl.textContent = 'Saving...';
+        statusEl.classList.remove('text-red-400', 'text-green-400');
+        statusEl.classList.add('text-gray-400');
+
+        try {
+            const response = await fetch(`${pythonURI}/api/user/skill-snapshot`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    project_name: projectName,
+                    coding_ability: codingAbility,
+                    collaboration: collaboration,
+                    problem_solving: problemSolving,
+                    initiative: initiative
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.message || 'Failed to save snapshot');
+            }
+
+            statusEl.textContent = 'Snapshot saved!';
+            statusEl.classList.add('text-green-400');
+            statusEl.classList.remove('text-red-400', 'text-gray-400');
+
+            // reset form
+            document.getElementById('snapshotProjectName').value = '';
+            ['codingAbility', 'collaboration', 'problemSolving', 'initiative'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 3;
+            });
+            ['codingAbility', 'collaboration', 'problemSolving', 'initiative'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '3';
+            });
+
+            // use existing toast if available
+            if (window.showToast) {
+                showToast({
+                    message: 'Skill snapshot saved to your Passport.',
+                    icon: `<svg class="size-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>`,
+                    duration: 3000
+                });
+            }
+
+            setTimeout(() => {
+                statusEl.textContent = '';
+            }, 3000);
+
+        } catch (error) {
+            console.error('Snapshot error:', error);
+            statusEl.textContent = error.message || 'Something went wrong.';
+            statusEl.classList.add('text-red-400');
+            statusEl.classList.remove('text-green-400', 'text-gray-400');
+        }
+    }
+
+    window.submitSkillSnapshot = submitSkillSnapshot;
+
     // Make functions globally accessible
     window.loadPersonas = loadPersonas;
     window.selectPersona = selectPersona;
@@ -972,10 +1022,10 @@ active_tab: profile
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
         console.log('DOMContentLoaded fired'); // ADD THIS
-        
+
         // Store original values
         saveOriginalValues();
-        
+
         // Load user classes
         loadUserClasses();
 
@@ -987,7 +1037,7 @@ active_tab: profile
         const addClassBtn = document.getElementById('addClassBtn');
         console.log('Add Class Button:', addClassBtn); // ADD THIS
         if (addClassBtn) {
-            addClassBtn.addEventListener('click', function() {
+            addClassBtn.addEventListener('click', function () {
                 console.log('Add Class button clicked!'); // ADD THIS
                 addClass();
             });
@@ -1009,7 +1059,7 @@ active_tab: profile
             }
         });
     });
-    
+
     // Save original form values
     function saveOriginalValues() {
         const form = document.getElementById('profileSettingsForm');
@@ -1076,10 +1126,10 @@ active_tab: profile
             saveButton.classList.remove('bg-indigo-500', 'text-white', 'hover:bg-indigo-600');
         }
     }
-    
+
     async function loadUserClasses() {
         try {
-            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
             if (!response.ok) {
                 console.error('Failed to load classes');
                 return;
@@ -1096,7 +1146,7 @@ active_tab: profile
     // Render classes in the UI
     function renderClasses(classes) {
         const container = document.getElementById('classesContainer');
-        
+
         if (!container) return;
 
         if (!classes || classes.length === 0) {
@@ -1168,9 +1218,9 @@ active_tab: profile
             const response = await fetch(`${pythonURI}/api/user/class`, {
                 ...fetchOptions,
                 method: 'POST',
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     action: 'remove',
-                    class: classToRemove 
+                    class: classToRemove
                 })
             });
 
@@ -1222,14 +1272,14 @@ active_tab: profile
         }
 
         try {
-            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions); 
+            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions);
             if (!response.ok) {
                 throw new Error(`Failed to fetch grade prediction: ${response.statusText}`);
             }
 
             const data = await response.json();
             console.log('Grade Prediction Data:', data);
-            
+
             // Process and display the grade prediction data
             if (data && data.prediction) {
                 displayGradePrediction(data);
@@ -1248,7 +1298,7 @@ active_tab: profile
     // Display grade prediction results
     function displayGradePrediction(data) {
         console.log('Displaying grade prediction:', data);
-        
+
         // You can add UI elements here to display the prediction
         // For now, just log to console
         if (data.prediction) {
@@ -1474,27 +1524,126 @@ active_tab: profile
     window.fetchGradePrediction = fetchGradePrediction;
     window.displayGradePrediction = displayGradePrediction;
 
-    // Leave group function
-    window.leaveGroup = async function(groupId, personId) {
-        if (!confirm('Are you sure you want to leave this group?')) {
+    // --- Facial Registration Logic ---
+    let scannerStream = null;
+
+    async function openScanner() {
+        const overlay = document.getElementById('webcamOverlay');
+        const video = document.getElementById('webcamControl');
+        const status = document.getElementById('scannerStatus');
+
+        overlay.classList.remove('hidden');
+        status.textContent = "Requesting camera access...";
+
+        try {
+            scannerStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = scannerStream;
+            status.textContent = "Camera active. Center your face.";
+        } catch (err) {
+            console.error("Camera error:", err);
+            status.textContent = "Error: Could not access camera.";
+        }
+    }
+
+    function closeScanner() {
+        const overlay = document.getElementById('webcamOverlay');
+        const video = document.getElementById('webcamControl');
+
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+        video.srcObject = null;
+        overlay.classList.add('hidden');
+    }
+
+    async function captureAndSaveFace() {
+        if (!window.currentUid) {
+            alert("No user ID found. Please refresh the page.");
             return;
         }
 
+        const video = document.getElementById('webcamControl');
+        const canvas = document.getElementById('captureCanvas');
+        const status = document.getElementById('scannerStatus');
+        const captureBtn = document.getElementById('captureFaceBtn');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL('image/jpeg');
+        const base64Image = imageData.split(',')[1];
+
+        status.textContent = "Registering face...";
+        captureBtn.disabled = true;
+
         try {
-            const response = await fetch(`${javaURI}/api/groups/${groupId}/members/${personId}`, {
+            console.log("Starting face registration with Spring...");
+            console.log("Image payload length:", base64Image.length);
+
+            // Persist in Spring (used for bathroom pass identification)
+            const springResp = await fetch(`${javaURI}/api/person/update`, {
                 ...fetchOptions,
-                method: 'DELETE',
+                method: 'POST',
+                body: JSON.stringify({
+                    faceData: base64Image
+                })
             });
 
-            if (!response.ok) {
-                throw new Error(`Failed to leave group: ${response.statusText}`);
-            }
+            console.log("Spring update response status:", springResp.status);
+            const springData = await springResp.json();
+            console.log("Spring update response data:", springData);
 
-            // alert('Successfully left the group.');
-            window.location.reload();
-        } catch (error) {
-            console.error('Error leaving group:', error);
-            alert(`Error leaving group: ${error.message}`);
+            if (!springResp.ok) throw new Error("Spring persistence failed");
+
+            status.textContent = "Registration successful!";
+            updateRegistrationStatus(true);
+            setTimeout(closeScanner, 1500);
+
+            if (window.showToast) {
+                showToast({
+                    message: "Facial registration complete!",
+                    icon: `<svg class="size-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>`,
+                    duration: 3000
+                });
+            }
+        } catch (err) {
+            console.error("Face registration error:", err);
+            status.textContent = "Registration failed. Try again.";
+        } finally {
+
+            captureBtn.disabled = false;
         }
-    };
+    }
+
+    function updateRegistrationStatus(isRegistered) {
+        const dot = document.getElementById('regStatusDot');
+        const text = document.getElementById('regStatusText');
+        if (isRegistered) {
+            dot.classList.remove('bg-gray-600');
+            dot.classList.add('bg-green-500');
+            text.textContent = "Face Registered";
+        } else {
+            dot.classList.remove('bg-green-500');
+            dot.classList.add('bg-gray-600');
+            text.textContent = "Not Registered";
+        }
+    }
+
+    // Export functions to window
+    window.openScanner = openScanner;
+    window.closeScanner = closeScanner;
+    window.captureAndSaveFace = captureAndSaveFace;
+
+    // Check registration on load
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch(`${javaURI}/api/person/get`, fetchOptions)
+            .then(res => res.json())
+            .then(data => {
+                window.currentUid = data.uid;
+                updateRegistrationStatus(!!data.faceData);
+            })
+            .catch(console.error);
+    });
 </script>

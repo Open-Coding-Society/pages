@@ -1,280 +1,308 @@
 /**
- * AINpc.js - BASE CLASS 
+ * AiNpc.js - Reusable AI-powered NPC conversation system
+ * 
+ * Provides common behaviors for conversational NPCs powered by backend Gemini API.
+ * Works with DialogueSystem.js for UI display.
+ * 
+ * USAGE:
+ * - Call AiNpc.showInteraction(npcInstance) in your NPC's interact() method
+ * - Requires spriteData properties: expertise, chatHistory, dialogues, knowledgeBase
+ * - DialogueSystem cycles through dialogues array sequentially on each interaction
+ * 
+ * BACKEND API:
+ * - POST /api/ainpc/prompt   - Send message to NPC, get response
+ * - POST /api/ainpc/greeting - Get NPC greeting and reset conversation
+ * - POST /api/ainpc/reset    - Clear conversation history
+ * - GET  /api/ainpc/test     - Test API availability
  */
 
 import DialogueSystem from './DialogueSystem.js';
+import { pythonURI, fetchOptions } from '../../api/config.js';
 
-class AINpc {
-  constructor(config) {
-    this.config = config;
-    this.spriteData = this.createSpriteData();
-    this.chatHistory = [];
-  }
+class AiNpc {
+    /**
+     * Main entry point - Shows full AI interaction dialog for an NPC
+     * Creates DialogueSystem with NPC's dialogues and uses cycling behavior
+     * @param {Object} npcInstance - The NPC instance (with this.spriteData, this.gameControl)
+     */
+    static showInteraction(npcInstance) {
+        const npc = npcInstance;
+        const data = npc.spriteData;
 
-  createSpriteData() {
-    const config = this.config;
-    const gameEnv = config.gameEnv;
-    const width = gameEnv.innerWidth;
-    const height = gameEnv.innerHeight;
+        // Close any existing dialogue
+        if (npc.dialogueSystem?.isDialogueOpen()) {
+            npc.dialogueSystem.closeDialogue();
+        }
 
-    let posX, posY;
-    if (config.randomPosition) {
-      posX = Math.random() * (width * 0.8) + (width * 0.1);
-      posY = Math.random() * (height * 0.7) + (height * 0.2);
-    } else {
-      posX = config.posX || width / 2;
-      posY = config.posY || height / 2;
+        // Initialize DialogueSystem if needed with NPC's dialogues
+        if (!npc.dialogueSystem) {
+            npc.dialogueSystem = new DialogueSystem({
+                dialogues: data.dialogues || [data.greeting || "Hello!"],
+                gameControl: npc.gameControl
+            });
+        }
+
+        // Use DialogueSystem's cycling showRandomDialogue method
+        npc.dialogueSystem.showRandomDialogue(data.id, data.src, data);
+
+        // Create and attach AI chat UI
+        const ui = AiNpc.createChatUI(data);
+        AiNpc.attachEventHandlers(npc, data, ui);
+        AiNpc.attachToDialogue(npc.dialogueSystem, ui.container);
     }
 
-    const defaultDialogues = [
-      `Ask me anything about ${config.expertise}!`,
-      `I have knowledge about ${config.expertise}...`,
-      `Want to learn about ${config.expertise}?`,
-      `I'm an expert in ${config.expertise}!`,
-      `Curious about ${config.expertise}? Talk to me!`
-    ];
+    /**
+     * Create the AI chat UI (input field, buttons, response area)
+     * @param {Object} spriteData - The NPC sprite data
+     * @returns {Object} UI elements { container, inputField, historyBtn, responseArea }
+     */
+    static createChatUI(spriteData) {
+        const container = document.createElement('div');
+        container.className = 'ai-npc-container';
 
-    const spriteData = {
-      id: config.id,
-      greeting: config.greeting,
-      src: config.sprite,
-      SCALE_FACTOR: config.scaleFactoR || 5,
-      ANIMATION_RATE: config.animationRate || 50,
-      pixels: { height: config.spriteHeight || 384, width: config.spriteWidth || 512 },
-      INIT_POSITION: { x: posX, y: posY },
-      orientation: config.orientation || { rows: 3, columns: 4 },
-
-      down: config.down || { row: 0, start: 0, columns: 3 },
-      downRight: config.downRight || { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
-      downLeft: config.downLeft || { row: 2, start: 0, columns: 3, rotate: -Math.PI / 16 },
-      left: config.left || { row: 2, start: 0, columns: 3 },
-      right: config.right || { row: 1, start: 0, columns: 3 },
-      up: config.up || { row: 3, start: 0, columns: 3 },
-      upLeft: config.upLeft || { row: 2, start: 0, columns: 3, rotate: Math.PI / 16 },
-      upRight: config.upRight || { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
-
-      hitbox: config.hitbox || { widthPercentage: 0.1, heightPercentage: 0.2 },
-      dialogues: config.dialogues || defaultDialogues,
-      knowledgeBase: config.knowledgeBase || {},
-      expertise: config.expertise,
-      chatHistory: [],
-
-      reaction: function () {
-        if (this.dialogueSystem) {
-          this.showReactionDialogue();
-        } else {
-          console.log(config.greeting);
+        const inputField = document.createElement('textarea');
+        inputField.className = 'ai-npc-input';
+        
+        // Use a random question from knowledgeBase as placeholder hint, or fall back to generic
+        let placeholder = `Ask about ${spriteData.expertise}...`;
+        const topics = spriteData.knowledgeBase?.[spriteData.expertise] || [];
+        if (topics.length > 0) {
+            const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+            placeholder = randomTopic.question;
         }
-      },
-
-      interact: function () {
-        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-          this.dialogueSystem.closeDialogue();
-        }
-
-        if (!this.dialogueSystem) {
-          this.dialogueSystem = new DialogueSystem();
-        }
-
-        let message = config.greeting;
-        if (this.dialogues && this.dialogues.length > 0) {
-          const randomIndex = Math.floor(Math.random() * this.dialogues.length);
-          message = this.dialogues[randomIndex];
-        }
-
-        this.dialogueSystem.showDialogue(message, config.id, this.src);
-
-        // UI Elements
-        const buttonContainer = document.createElement('div');
-        buttonContainer.style.display = 'flex';
-        buttonContainer.style.flexDirection = 'column';
-        buttonContainer.style.gap = '10px';
-        buttonContainer.style.marginTop = '15px';
-
-        const inputField = document.createElement('input');
-        inputField.type = 'text';
-        inputField.placeholder = `Ask about ${config.expertise}...`;
-        inputField.style.padding = '8px 12px';
-        inputField.style.borderRadius = '5px';
-        inputField.style.border = '2px solid #4a86e8';
-        inputField.style.backgroundColor = '#16213e';
-        inputField.style.color = '#fff';
+        inputField.placeholder = placeholder;
+        inputField.rows = 2;
 
         const buttonRow = document.createElement('div');
-        buttonRow.style.display = 'flex';
-        buttonRow.style.gap = '10px';
+        buttonRow.className = 'ai-npc-button-row';
 
         const historyBtn = document.createElement('button');
-        historyBtn.textContent = '📋 History';
-        historyBtn.style.padding = '8px 15px';
-        historyBtn.style.background = '#666';
-        historyBtn.style.color = 'white';
-        historyBtn.style.border = 'none';
-        historyBtn.style.borderRadius = '5px';
-        historyBtn.style.cursor = 'pointer';
-        historyBtn.style.flex = '1';
+        historyBtn.textContent = '📋 Chat History';
+        historyBtn.className = 'ai-npc-history-btn';
 
         const responseArea = document.createElement('div');
-        responseArea.style.minHeight = '40px';
-        responseArea.style.padding = '10px';
-        responseArea.style.backgroundColor = '#16213e';
-        responseArea.style.borderRadius = '5px';
-        responseArea.style.borderLeft = '3px solid #4a86e8';
-        responseArea.style.color = '#4a86e8';
-        responseArea.style.fontStyle = 'italic';
-        responseArea.style.display = 'none';
+        responseArea.className = 'ai-npc-response-area';
+        responseArea.style.display = 'none'; // Keep this one for show/hide logic
 
-        const typewriterEffect = (text, element, speed = 30) => {
-          element.textContent = '';
-          element.style.display = 'block';
-          let index = 0;
-          const type = () => {
-            if (index < text.length) {
-              element.textContent += text.charAt(index++);
-              setTimeout(type, speed);
-            }
-          };
-          type();
+        buttonRow.appendChild(historyBtn);
+        container.appendChild(inputField);
+        container.appendChild(buttonRow);
+        container.appendChild(responseArea);
+
+        return { container, inputField, historyBtn, responseArea };
+    }
+
+    /**
+     * Attach event handlers to UI elements
+     * @param {Object} npcInstance - The NPC instance
+     * @param {Object} spriteData - The NPC sprite data
+     * @param {Object} ui - UI elements from createChatUI
+     */
+    static attachEventHandlers(npcInstance, spriteData, ui) {
+        const { inputField, historyBtn, responseArea } = ui;
+
+        // History button
+        historyBtn.onclick = () => AiNpc.showChatHistory(spriteData);
+
+        // Send message function
+        const sendMessage = async () => {
+            const userMessage = inputField.value.trim();
+            if (!userMessage) return;
+            inputField.value = '';
+            await AiNpc.sendPromptToBackend(spriteData, userMessage, responseArea);
         };
 
-        // ✅ BACKEND CALL to Flask /api/ainpc/prompt with proper session management
-        const sendMessage = async () => {
-          const userMessage = inputField.value.trim();
-          if (!userMessage) return;
+        // Prevent game input while typing
+        AiNpc.preventGameInput(inputField);
 
-          spriteData.chatHistory.push({ role: 'user', message: userMessage });
-          inputField.value = '';
-          responseArea.textContent = 'Thinking...';
-          responseArea.style.display = 'block';
+        // Handle Enter key (Shift+Enter for new line, Enter to send)
+        inputField.onkeypress = e => {
+            e.stopPropagation();
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        };
 
-          try {
+        // Auto-focus input field
+        setTimeout(() => inputField.focus(), 100);
+    }
+
+    /**
+     * Attach UI container to DialogueSystem dialogue box
+     * @param {DialogueSystem} dialogueSystem - The dialogue system instance
+     * @param {HTMLElement} container - The UI container to attach
+     */
+    static attachToDialogue(dialogueSystem, container) {
+        const dialogueBox = document.getElementById('custom-dialogue-box-' + dialogueSystem.safeId);
+        if (dialogueBox) {
+            // Remove any existing AI NPC containers first
+            const existingContainers = dialogueBox.querySelectorAll('.ai-npc-container');
+            existingContainers.forEach(existing => existing.remove());
+            
+            // Find the close button using its specific ID
+            const closeBtn = document.getElementById('dialogue-close-btn-' + dialogueSystem.safeId);
+            if (closeBtn && closeBtn.parentNode === dialogueBox) {
+                dialogueBox.insertBefore(container, closeBtn);
+            } else {
+                dialogueBox.appendChild(container);
+            }
+        }
+    }
+
+    /**
+     * Send user prompt to backend API and display response
+     * @param {Object} spriteData - The NPC sprite data
+     * @param {string} userMessage - User's message
+     * @param {HTMLElement} responseArea - Response display element
+     */
+    static async sendPromptToBackend(spriteData, userMessage, responseArea) {
+        spriteData.chatHistory.push({ role: 'user', message: userMessage });
+
+        responseArea.textContent = 'Thinking...';
+        responseArea.style.display = 'block';
+
+        try {
+            // Build knowledge context
             let knowledgeContext = '';
-            const topics = config.knowledgeBase?.[config.expertise] || [];
-
+            const topics = spriteData.knowledgeBase?.[spriteData.expertise] || [];
             if (topics.length > 0) {
-              knowledgeContext = 'Here are some example topics I can help with:\n';
-              topics.slice(0, 3).forEach(t => {
-                knowledgeContext += `- ${t.question}\n`;
-              });
-              knowledgeContext += '\n';
+                knowledgeContext = 'Here are some example topics I can help with:\n';
+                topics.slice(0, 3).forEach(t => {
+                    knowledgeContext += `- ${t.question}\n`;
+                });
+                knowledgeContext += '\n';
             }
 
-            // Create a unique session ID for this NPC conversation
-            const sessionId = `player-${config.id}`;
+            const sessionId = `player-${spriteData.id}`;
+            const pythonURL = pythonURI + '/api/ainpc/prompt';
 
-            const pythonURL = this.pythonURI + '/api/ainpc/prompt';
             const response = await fetch(pythonURL, {
-              ...this.fetchOptions,
-              method: 'POST',
-              body: JSON.stringify({
-                prompt: userMessage,
-                session_id: sessionId,
-                npc_type: config.expertise,
-                expertise: config.expertise,
-                knowledgeContext: knowledgeContext
-              })
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    prompt: userMessage,
+                    session_id: sessionId,
+                    npc_type: spriteData.expertise,
+                    expertise: spriteData.expertise,
+                    knowledgeContext: knowledgeContext
+                })
             });
 
             const data = await response.json();
 
             if (data.status === 'error') {
-              typewriterEffect(
-                data.message || "I'm having trouble thinking right now.",
-                responseArea
-              );
-              return;
+                AiNpc.showResponse(
+                    data.message || "I'm having trouble thinking right now.",
+                    responseArea
+                );
+                return;
             }
 
             const aiResponse = data?.response || "I'm not sure how to answer that yet.";
-
             spriteData.chatHistory.push({ role: 'ai', message: aiResponse });
+            AiNpc.showResponse(aiResponse, responseArea);
 
-            typewriterEffect(aiResponse, responseArea);
-          } catch (err) {
+        } catch (err) {
             console.error('Frontend error:', err);
-            typewriterEffect(
-              "I'm having trouble reaching my brain right now.",
-              responseArea
+            AiNpc.showResponse(
+                "I'm having trouble reaching my brain right now.",
+                responseArea
             );
-          }
-        };
-
-        historyBtn.onclick = () => spriteData.showChatHistory();
-
-        inputField.onkeypress = e => {
-          e.stopPropagation();
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            sendMessage();
-          }
-        };
-
-        buttonRow.appendChild(historyBtn);
-        buttonContainer.appendChild(inputField);
-        buttonContainer.appendChild(buttonRow);
-        buttonContainer.appendChild(responseArea);
-
-        const dialogueBox =
-          document.getElementById('custom-dialogue-box-' + this.dialogueSystem.id);
-
-        if (dialogueBox) {
-          const closeBtn = dialogueBox.querySelector('button');
-          closeBtn
-            ? dialogueBox.insertBefore(buttonContainer, closeBtn)
-            : dialogueBox.appendChild(buttonContainer);
         }
-      },
+    }
 
-      showChatHistory: function () {
+    /**
+     * Display response with typewriter effect
+     * @param {string} text - Text to display
+     * @param {HTMLElement} element - Element to display in
+     * @param {number} speed - Typing speed in ms
+     */
+    static showResponse(text, element, speed = 30) {
+        element.textContent = '';
+        element.style.display = 'block';
+        let index = 0;
+        const type = () => {
+            if (index < text.length) {
+                element.textContent += text.charAt(index++);
+                setTimeout(type, speed);
+            }
+        };
+        type();
+    }
+
+    /**
+     * Prevent keyboard events from propagating to game
+     * @param {HTMLElement} element - Input element to protect
+     */
+    static preventGameInput(element) {
+        ['keydown', 'keyup', 'keypress'].forEach(eventType => {
+            element.addEventListener(eventType, e => e.stopPropagation());
+        });
+    }
+
+    /**
+     * Show chat history in modal dialog
+     * @param {Object} spriteData - The NPC sprite data
+     */
+    static showChatHistory(spriteData) {
         const modal = document.createElement('div');
-        modal.style.position = 'fixed';
-        modal.style.top = '50%';
-        modal.style.left = '50%';
-        modal.style.transform = 'translate(-50%, -50%)';
-        modal.style.background = '#1a1a2e';
-        modal.style.border = '2px solid #4a86e8';
-        modal.style.borderRadius = '10px';
-        modal.style.padding = '20px';
-        modal.style.maxWidth = '500px';
-        modal.style.maxHeight = '600px';
-        modal.style.overflowY = 'auto';
-        modal.style.zIndex = '10001';
-        modal.style.color = '#fff';
+        modal.className = 'ai-npc-modal';
 
         const title = document.createElement('h3');
         title.textContent = 'Chat History';
-        title.style.color = '#4a86e8';
-
+        title.className = 'ai-npc-modal-title';
         modal.appendChild(title);
 
         spriteData.chatHistory.forEach(msg => {
-          const div = document.createElement('div');
-          div.style.marginBottom = '8px';
-          div.style.padding = '8px';
-          div.style.borderRadius = '5px';
-          div.style.background =
-            msg.role === 'user' ? '#4a86e8' : '#16213e';
-          div.textContent = msg.message;
-          modal.appendChild(div);
+            const div = document.createElement('div');
+            div.className = msg.role === 'user' ? 'user-message' : 'ai-message';
+            div.textContent = msg.message;
+            modal.appendChild(div);
         });
 
-        const close = document.createElement('button');
-        close.textContent = 'Close';
-        close.style.width = '100%';
-        close.style.marginTop = '10px';
-        close.onclick = () => modal.remove();
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Close';
+        closeBtn.className = 'ai-npc-close-btn';
+        closeBtn.onclick = () => modal.remove();
 
-        modal.appendChild(close);
+        modal.appendChild(closeBtn);
         document.body.appendChild(modal);
-      }
-    };
+    }
 
-    return spriteData;
-  }
+    /**
+     * Test backend API availability
+     * @returns {Promise<boolean>} True if API is available
+     */
+    static async testAPI() {
+        try {
+            const response = await fetch(pythonURI + '/api/ainpc/test', {
+                ...fetchOptions,
+                method: 'GET'
+            });
+            const data = await response.json();
+            return data.status === 'ok';
+        } catch (err) {
+            console.error('AI NPC API test failed:', err);
+            return false;
+        }
+    }
 
-  getData() {
-    return this.spriteData;
-  }
+    /**
+     * Reset conversation history for a session
+     * @param {string} sessionId - Session ID to reset
+     */
+    static async resetConversation(sessionId) {
+        try {
+            await fetch(pythonURI + '/api/ainpc/reset', {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({ session_id: sessionId })
+            });
+        } catch (err) {
+            console.error('Failed to reset conversation:', err);
+        }
+    }
 }
 
-export default AINpc;
+export default AiNpc;

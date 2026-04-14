@@ -1,0 +1,58 @@
+{% assign data = site.data.powaynec_infograph %}
+
+<div class="powaynec-infograph">
+  <div class="powaynec-header">
+    <div class="powaynec-badge">Design-Based Research Capstone</div>
+    <h1 class="powaynec-title">{{ data.Title }}</h1>
+    <p class="powaynec-description">{{ data.Description }}</p>
+  </div>
+
+  {% for topic in data.Topics %}
+  {% assign project_link = topic.link %}
+  {% assign link_prefix = topic.link | slice: 0, 4 %}
+  {% if link_prefix != 'http' %}
+    {% assign project_link = site.baseurl | append: topic.link %}
+  {% endif %}
+
+  <div class="powaynec-card">
+    <div class="powaynec-card-grid">
+      <div class="powaynec-visual">
+        <a href="{{ topic.project_link }}" class="powaynec-image-link" target="_blank" rel="noopener noreferrer">          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="powaynec-image">
+          <div class="powaynec-overlay"><span>View Our Project</span></div>
+        </a>
+        <div class="powaynec-status">{{ topic.status }}</div>
+        <div class="powaynec-team">
+          <span class="powaynec-team-label">Project Leads</span>
+          <span class="powaynec-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <div class="powaynec-content">
+        <h2 class="powaynec-project-title">{{ topic.title }}</h2>
+        <p class="powaynec-subtitle">{{ topic.subtitle }}</p>
+        <div class="powaynec-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="powaynec-keypoint"><span class="powaynec-check">✓</span><span>{{ point }}</span></div>
+          {% endfor %}
+        </div>
+        <div class="powaynec-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="powaynec-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="powaynec-details">
+        <h3 class="powaynec-section-title">About</h3>
+        <p class="powaynec-about">{{ topic.description }}</p>
+        <h3 class="powaynec-section-title">Impact</h3>
+        <div class="powaynec-impact-list">
+          {% for item in topic.impact %}
+          <div class="powaynec-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+        <a href="{{ topic.link }}" class="powaynec-btn" target="_blank" rel="noopener noreferrer">Learn More</a>      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

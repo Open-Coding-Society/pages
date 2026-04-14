@@ -12,507 +12,505 @@ author: "Creators Team"
 date: 2025-12-02
 ---
 
-<link href="https://cdn.tailwindcss.com" rel="stylesheet">
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <style>
-  :root {
-    --bg: #0a0e27;
-    --panel: #0f1729;
-    --border: rgba(255, 255, 255, 0.08);
-    --text: #e6eef8;
-    --muted: #9aa6bf;
-    --accent: #7c3aed;
+  /*
+   * Colors from system SASS (_sass/minima/lessonbase.scss → :root).
+   * Edit lessonbase.scss to change colors — not this file.
+   */
+  .page-content {
+    --bg:           var(--bg-1);
+    --panel:        var(--panel);
+    --panel-2:      var(--bg-3);
+    --border:       rgba(255,255,255,0.08);
+    --border-b:     rgba(255,255,255,0.14);
+    --border-ac:    rgba(76,175,239,0.4);
+    --txt:          var(--text);
+    --muted:        var(--text-muted);
+    --ac:           var(--accent);
+    --ac2:          var(--accent);
+    --ac-hover:     var(--accent-700);
+    --ok:           var(--green);
+    --ok-bg:        var(--green-bg);
+    --err:          var(--red);
+    --err-bg:       var(--warn-bg);
+    --code-bg:      var(--bg-0);
+    --hover-bg:     rgba(76,175,239,0.1);
   }
 
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.5; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 28px 16px 64px; }
 
-  .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 40px; }
-  .header { margin-bottom: 32px; }
-  .header h1 { font-size: 28px; font-weight: 800; margin: 0 0 4px 0; }
-  .header p { color: var(--muted); font-size: 14px; margin: 0; }
+  .lesson-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac2); margin-bottom: 10px; }
+  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 8px var(--ac); display: inline-block; }
+  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--txt); }
+  .lesson-header p  { color: var(--muted); font-size: 14px; }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
+  .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
 
-  .progress-bar { display: flex; gap: 8px; margin: 20px 0; justify-content: space-between; align-items: center; }
-  .progress-bar .step { flex: 1; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; cursor: pointer; transition: 0.2s; }
-  .progress-bar .step.active { background: var(--accent); height: 6px; }
+  .progress-track { margin: 20px 0 28px; }
+  .progress-steps { display: flex; }
+  .progress-step { flex: 1; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-b); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
+  .progress-step.active .step-dot { background: var(--ac); border-color: var(--ac); color: #fff; box-shadow: 0 0 12px rgba(76,175,239,0.5); }
+  .progress-step.done   .step-dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .progress-step .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; white-space: nowrap; }
+  .progress-step.active .step-label { color: var(--ac); }
+  .progress-step.done   .step-label { color: var(--ok); }
+  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-b); }
+  .progress-step:first-child::before { display: none; }
+  .progress-step.done::before { background: var(--ok); }
 
-  .section { display: none; }
-  .section.active { display: block; }
+  .section        { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  .card h2 { margin-top: 0; font-size: 20px; color: #a6c9ff; }
-  .card h3 { margin-top: 16px; font-size: 16px; color: #a6c9ff; }
+  .card    { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 6px; font-size: 20px; color: var(--ac); }
+  .card h3 { margin: 20px 0 8px; font-size: 15px; color: var(--ac); }
+  .card > p { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-
-  .editor-box { background: #051226; border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-  .editor-box textarea, .editor-box input { width: 100%; background: #051226; color: #dce9ff; border: none; font-family: Consolas, monospace; font-size: 13px; padding: 8px; resize: vertical; min-height: 120px; }
-  .editor-box textarea:focus, .editor-box input:focus { outline: none; box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
-
-  .preview-box { background: #0f1729; border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-height: 200px; overflow: auto; }
-
-  button { appearance: none; border: 1px solid var(--border); background: var(--accent); color: #fff; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
-  button:hover { background: #6d28d9; transform: translateY(-1px); }
-  button.secondary { background: #334155; }
-  button.secondary:hover { background: #1e293b; }
-
-  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-
-  .nav-buttons { display: flex; gap: 12px; margin-top: 24px; justify-content: space-between; }
-
-  .code-console { background: #020617; border: 1px solid var(--border); border-radius: 10px; padding: 12px; min-height: 150px; max-height: 300px; overflow: auto; font-family: Consolas, monospace; font-size: 12px; color: #cfe8ff; white-space: pre-wrap; word-wrap: break-word; }
-
-  .lesson-nav { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
-  .lesson-nav button { padding: 6px 12px; font-size: 12px; }
-
-  .code-input-area { margin: 12px 0; }
-  .code-input-area label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
-
-  .tooltip { font-size: 11px; color: var(--muted); margin-top: 6px; }
-
-  .exercise { background: rgba(124, 58, 237, 0.1); border-left: 3px solid var(--accent); padding: 12px; border-radius: 6px; margin: 8px 0; }
+  .block-desc { background: rgba(76,175,239,0.06); border-left: 3px solid var(--ac); padding: 10px 14px; border-radius: 8px; color: var(--txt); font-size: 14px; margin: 0 0 18px; line-height: 1.6; }
 
   .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 900px) { .split-view { grid-template-columns: 1fr; } }
+  @media (max-width: 860px) { .split-view { grid-template-columns: 1fr; } }
+
+  .field-label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+
+  .editor-wrap { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .editor-header { background: var(--panel-2); border-bottom: 1px solid var(--border); padding: 6px 12px; display: flex; align-items: center; gap: 6px; }
+  .editor-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .editor-header .dot.red    { background: #ff5f57; }
+  .editor-header .dot.yellow { background: #ffbd2e; }
+  .editor-header .dot.green  { background: #28c840; }
+  .editor-header .lang-tag { margin-left: auto; font-size: 10px; color: var(--muted); font-family: monospace; }
+  .editor-wrap textarea { display: block; width: 100%; background: var(--code-bg); color: var(--txt); border: none; font-family: 'Consolas','Fira Code',monospace; font-size: 13px; padding: 14px; resize: vertical; min-height: 200px; line-height: 1.6; }
+  .editor-wrap textarea:focus { outline: none; }
+
+  .preview-wrap { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+  .preview-header { background: var(--panel); border-bottom: 1px solid var(--border); padding: 6px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .preview-header::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #28c840; box-shadow: 0 0 6px #28c840; }
+  .preview-body { padding: 16px; flex: 1; overflow: auto; min-height: 200px; color: var(--txt); font-size: 14px; line-height: 1.7; }
+  .preview-body h1,.preview-body h2,.preview-body h3 { color: var(--ac); margin-top: 12px; }
+  .preview-body code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+  .preview-body pre  { background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto; }
+  .preview-body a    { color: var(--ac); }
+  .preview-body ul,.preview-body ol { padding-left: 20px; }
+
+  .console-wrap { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .console-header { background: var(--panel-2); border-bottom: 1px solid var(--border); padding: 6px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
+  .console-body { padding: 12px 14px; min-height: 140px; max-height: 280px; overflow-y: auto; font-family: 'Consolas','Fira Code',monospace; font-size: 12px; color: var(--txt); white-space: pre-wrap; word-break: break-word; line-height: 1.6; }
+  .console-line.log::before   { content: '> ';  color: var(--muted); }
+  .console-line.error { color: var(--err); }
+  .console-line.error::before { content: '✕ '; }
+  .console-line.warn  { color: var(--warn); }
+  .console-line.warn::before  { content: '⚠ '; }
+  .console-empty { color: var(--muted); font-style: italic; }
+
+  button { appearance: none; border: 1px solid var(--border); background: var(--ac); color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  button:hover { background: var(--ac-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(76,175,239,0.3); }
+  button:active { transform: translateY(0); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  button.secondary { background: var(--panel-2); color: var(--txt); }
+  button.secondary:hover { background: var(--surface); box-shadow: none; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+
+  .tab-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tab-nav button { background: var(--panel-2); color: var(--muted); border: 1px solid var(--border); padding: 6px 14px; font-size: 12px; border-radius: 20px; font-weight: 600; }
+  .tab-nav button.active { background: var(--ac); color: #fff; border-color: var(--ac); }
+  .tab-nav button:hover:not(.active) { background: var(--hover-bg); color: var(--txt); transform: none; box-shadow: none; }
+
+  .concept-box { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--panel-2); margin-bottom: 10px; }
+  .concept-title { font-size: 13px; font-weight: 700; color: var(--ac); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .concept-title .tag { background: var(--hover-bg); border: 1px solid var(--border-ac); color: var(--ac); border-radius: 4px; padding: 1px 7px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; }
+  .concept-box p,.concept-box ul { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.65; }
+  .concept-box code { background: var(--code-bg); color: var(--ac); border-radius: 4px; padding: 1px 6px; font-size: 12px; font-family: monospace; }
+  .concept-box ul { padding-left: 18px; margin-top: 6px; }
+  .concept-box ul li { margin-bottom: 3px; }
+
+  .exercise { background: var(--hover-bg); border-left: 3px solid var(--ac); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 14px; color: var(--txt); line-height: 1.6; }
+  .exercise strong { color: var(--ac); }
+
+  select { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); padding: 7px 10px; font-size: 13px; cursor: pointer; }
+  select:focus { outline: none; box-shadow: 0 0 0 2px rgba(76,175,239,0.4); }
+
+  #twPreviewArea { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; min-height: 100px; display: flex; align-items: center; justify-content: center; margin-top: 12px; }
+
+  .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .code-block-header { background: var(--panel-2); border-bottom: 1px solid var(--border); padding: 6px 14px; font-size: 11px; color: var(--muted); font-family: monospace; display: flex; justify-content: space-between; align-items: center; }
+  .code-block pre { margin: 0; padding: 14px; font-family: 'Consolas','Fira Code',monospace; font-size: 12px; color: var(--txt); overflow-x: auto; line-height: 1.6; }
+
+  #sandboxFrame { width: 100%; min-height: 340px; border: 1px solid var(--border); border-radius: 0 0 10px 10px; background: white; display: block; }
+  .sandbox-preview-header { background: var(--panel); border: 1px solid var(--border); border-bottom: none; border-radius: 10px 10px 0 0; padding: 8px 14px; display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+
+  .nav-buttons { display: flex; gap: 12px; margin-top: 28px; justify-content: space-between; align-items: center; }
+  #stepIndicator { color: var(--muted); font-size: 12px; }
+
+  .tooltip { font-size: 12px; color: var(--muted); margin-top: 10px; padding: 8px 12px; background: var(--panel-2); border-radius: 6px; border-left: 2px solid var(--ac); line-height: 1.5; }
+  .tooltip::before { content: '💡 '; }
+
+  .checkpoint-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 12px; margin-top: 4px; }
+  .checkpoint { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 13px; line-height: 1.6; color: var(--txt); }
+  .checkpoint-title { font-weight: 700; color: var(--ac); margin-bottom: 4px; font-size: 14px; }
+  .checkpoint p { color: var(--muted); margin: 0; }
 </style>
 
 <div class="container page-content">
-  <div class="header">
-    <h1>Frontend Development — All-in-One</h1>
-    <p>Interactive lessons: Markdown → HTML, CSS styling, Tailwind + Sass, JavaScript, and code sandbox.</p>
-    <a href="../" class="button back-btn">Back</a>
+  <div class="lesson-header">
+    <div class="badge">Creators · Lesson 1</div>
+    <h1>Frontend Development</h1>
+    <p>Interactive lessons: Markdown → HTML, CSS styling, Tailwind + Sass, JavaScript, and a live code sandbox.</p>
+    <a href="../" class="button back-btn">← Back to Big Six</a>
   </div>
 
-  <div class="progress-bar" id="progressBar"></div>
+  <div class="progress-track">
+    <div class="progress-steps" id="progressSteps"></div>
+  </div>
 
-  <!-- Step 1: Markdown to HTML -->
+  <!-- STEP 1 -->
   <div class="section active" id="step1">
     <div class="card">
       <h2>1 — Markdown to HTML Conversion</h2>
-      <p>Write Markdown on the left. Watch it render as HTML on the right. Markdown simplifies content creation.</p>
-      
+      <div class="block-desc"><strong>What this shows:</strong> Markdown is shorthand that converts to HTML. Write on the left, click Convert, see the rendered HTML on the right.</div>
+      <div class="concept-box" style="margin-bottom:16px;">
+        <div class="concept-title">Markdown Cheat Sheet <span class="tag">REFERENCE</span></div>
+        <ul>
+          <li><code># H1</code> → &lt;h1&gt; &nbsp;·&nbsp; <code>## H2</code> → &lt;h2&gt;</li>
+          <li><code>**bold**</code> → <strong>bold</strong> &nbsp;·&nbsp; <code>*italic*</code> → <em>italic</em></li>
+          <li><code>- item</code> → unordered list &nbsp;·&nbsp; <code>1. item</code> → ordered list</li>
+          <li><code>[text](url)</code> → link &nbsp;·&nbsp; <code>![alt](url)</code> → image</li>
+          <li>Backtick <code>`code`</code> → inline code &nbsp;·&nbsp; <code>&gt; text</code> → blockquote</li>
+        </ul>
+      </div>
       <div class="split-view">
         <div>
-          <label style="display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">Markdown Input</label>
-          <textarea id="mdInput" class="editor-box" style="min-height: 280px; padding: 12px;">## Hello Frontend
+          <span class="field-label">✏️ Markdown Input</span>
+          <div class="editor-wrap">
+            <div class="editor-header"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="lang-tag">markdown</span></div>
+            <textarea id="mdInput" rows="14">## Hello Frontend!
 
-Write your **Markdown** here:
+Write your **Markdown** here and hit Convert.
+
+### Why Markdown?
 - HTML structures pages
 - CSS styles them
-- JavaScript makes them interactive
+- JavaScript makes them *interactive*
 
-```
-// Code blocks too!
-const x = 5;
-```
+> Markdown is faster to write than raw HTML.
 
-[Link example](https://example.com)</textarea>
+[Visit MDN Docs](https://developer.mozilla.org)</textarea>
+          </div>
+          <div class="btn-row">
+            <button id="mdConvertBtn">Convert to HTML</button>
+            <button id="mdResetBtn" class="secondary">Reset</button>
+          </div>
         </div>
         <div>
-          <label style="display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">HTML Output</label>
-          <div id="htmlPreview" class="preview-box" style="min-height: 280px;"></div>
-        </div>
-      </div>
-      <button onclick="convertMarkdown()" style="margin-top: 12px;">Convert to HTML</button>
-      <div class="tooltip">Pro tip: Use Markdown for fast writing, then convert to HTML for the web.</div>
-    </div>
-  </div>
-
-  <!-- Step 2: CSS Playground -->
-  <div class="section" id="step2">
-    <div class="card">
-      <h2>2 — CSS Styling Playground</h2>
-      <p>Write CSS and see your styled preview instantly. Practice selectors, box model, colors, and animations.</p>
-      
-      <div class="split-view">
-        <div>
-          <label style="display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">CSS Rules</label>
-          <textarea id="cssInput" class="editor-box" style="min-height: 300px; padding: 12px;">.box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 30px;
-  border-radius: 10px;
-  color: white;
-  text-align: center;
-  font-size: 18px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease;
-}
-
-.box:hover {
-  transform: translateY(-5px);
-}</textarea>
-        </div>
-        <div>
-          <label style="display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">Live Preview</label>
-          <div id="cssPreview" class="preview-box" style="min-height: 300px; display: flex; align-items: center; justify-content: center;">
-            <div class="box" style="padding: 20px; text-align: center;">Hover over me</div>
+          <span class="field-label">👁️ Rendered HTML Preview</span>
+          <div class="preview-wrap" style="min-height:320px;">
+            <div class="preview-header">Live Preview</div>
+            <div class="preview-body" id="htmlPreview"><span style="color:var(--muted);font-style:italic;">Click "Convert to HTML" to see output here.</span></div>
           </div>
         </div>
       </div>
-      <div style="display: flex; gap: 8px; margin-top: 12px;">
-        <button onclick="applyCss()">Apply CSS</button>
-        <button onclick="resetCss()" class="secondary">Reset</button>
-      </div>
-      <div class="tooltip">Tip: Use flexbox, grid, and transitions for modern layouts.</div>
+      <div class="tooltip">Pro tip: Jekyll and GitHub Pages auto-convert <code>.md</code> files to HTML.</div>
     </div>
   </div>
 
-  <!-- Step 3: Tailwind + Sass -->
+  <!-- STEP 2 -->
+  <div class="section" id="step2">
+    <div class="card">
+      <h2>2 — CSS Styling Playground</h2>
+      <div class="block-desc"><strong>What this shows:</strong> CSS controls how HTML looks. Edit the rules on the left and click Apply CSS to see them instantly on the right.</div>
+      <div class="concept-box" style="margin-bottom:16px;">
+        <div class="concept-title">Key CSS Concepts <span class="tag">REFERENCE</span></div>
+        <ul>
+          <li><strong>Selector</strong> — targets elements: <code>.class</code> <code>#id</code> <code>element:hover</code></li>
+          <li><strong>Box model</strong> — margin → border → padding → content</li>
+          <li><strong>Flexbox</strong> — <code>display:flex</code> aligns items in a row or column</li>
+          <li><strong>Transitions</strong> — <code>transition: all 0.3s ease</code> animates changes</li>
+          <li><strong>Gradients</strong> — <code>background: linear-gradient(direction, color1, color2)</code></li>
+        </ul>
+      </div>
+      <div class="split-view">
+        <div>
+          <span class="field-label">✏️ CSS Editor</span>
+          <div class="editor-wrap">
+            <div class="editor-header"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="lang-tag">css</span></div>
+            <textarea id="cssInput" rows="16">.box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 32px 24px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  max-width: 280px;
+  margin: 0 auto;
+}
+.box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(102,126,234,0.4);
+}</textarea>
+          </div>
+          <div class="btn-row">
+            <button id="cssApplyBtn">Apply CSS</button>
+            <button id="cssResetBtn" class="secondary">Reset</button>
+          </div>
+        </div>
+        <div>
+          <span class="field-label">👁️ Live Preview</span>
+          <div class="preview-wrap">
+            <div class="preview-header">CSS Output</div>
+            <div class="preview-body" id="cssPreviewBody" style="display:flex;align-items:center;justify-content:center;min-height:280px;">
+              <div class="box">Hover over me ✨</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <style id="dynamicStyle"></style>
+      <div class="tooltip">Try changing <code>border-radius</code> to <code>50%</code> or swapping the gradient for a solid color.</div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
   <div class="section" id="step3">
     <div class="card">
-      <h2>3 — Tailwind CSS & Sass</h2>
-      <p><strong>Tailwind:</strong> Utility-first classes for rapid UI (e.g., <code>p-4 bg-blue-500 rounded</code>).<br><strong>Sass:</strong> Preprocessor with variables and mixins for larger projects.</p>
-      
-      <div style="margin: 16px 0; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-        <h3>Tailwind Demo</h3>
-        <label style="display: block; color: var(--muted); font-size: 12px; margin-bottom: 8px;">Adjust settings:</label>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
-          <select id="twPadding" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel); color: var(--text);">
-            <option value="p-2">p-2 (small)</option>
-            <option value="p-4">p-4 (medium)</option>
-            <option value="p-6">p-6 (large)</option>
+      <h2>3 — Tailwind CSS &amp; Sass</h2>
+      <div class="block-desc"><strong>What this shows:</strong> Two professional CSS tools. <strong>Tailwind</strong> uses utility classes directly in HTML. <strong>Sass</strong> adds variables and nesting for large projects.</div>
+      <div class="concept-box"><div class="concept-title">Tailwind CSS — Live Demo <span class="tag">INTERACTIVE</span></div><p>Adjust the dropdowns and the card updates instantly.</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0 20px;">
+        <div>
+          <span class="field-label">Padding</span>
+          <select id="twPadding" style="width:100%;margin-bottom:10px;">
+            <option value="p-2">p-2 (small · 8px)</option>
+            <option value="p-4" selected>p-4 (medium · 16px)</option>
+            <option value="p-6">p-6 (large · 24px)</option>
+            <option value="p-8">p-8 (xl · 32px)</option>
           </select>
-          <select id="twColor" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel); color: var(--text);">
-            <option value="bg-blue-500 text-white">Blue</option>
-            <option value="bg-purple-500 text-white">Purple</option>
-            <option value="bg-green-500 text-white">Green</option>
+          <span class="field-label">Color</span>
+          <select id="twColor" style="width:100%;margin-bottom:10px;">
+            <option value="bg-blue-600 text-white">Blue</option>
+            <option value="bg-purple-600 text-white">Purple</option>
+            <option value="bg-emerald-600 text-white">Green</option>
+            <option value="bg-rose-600 text-white">Red</option>
+            <option value="bg-amber-400 text-black">Yellow</option>
+            <option value="bg-slate-800 text-white">Dark</option>
           </select>
-          <select id="twRadius" style="padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--panel); color: var(--text);">
+          <span class="field-label">Border Radius</span>
+          <select id="twRadius" style="width:100%;margin-bottom:10px;">
+            <option value="rounded-none">rounded-none</option>
             <option value="rounded">rounded</option>
-            <option value="rounded-lg">rounded-lg</option>
+            <option value="rounded-lg" selected>rounded-lg</option>
+            <option value="rounded-2xl">rounded-2xl</option>
             <option value="rounded-full">rounded-full</option>
           </select>
-          <button onclick="applyTailwind()">Apply</button>
+          <span class="field-label">Shadow</span>
+          <select id="twShadow" style="width:100%;margin-bottom:10px;">
+            <option value="">none</option>
+            <option value="shadow-sm">shadow-sm</option>
+            <option value="shadow-md" selected>shadow-md</option>
+            <option value="shadow-xl">shadow-xl</option>
+            <option value="shadow-2xl">shadow-2xl</option>
+          </select>
         </div>
-        <div id="twPreview" class="p-4 rounded bg-blue-500 text-white" style="text-align: center;">Tailwind Card</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <span class="field-label">Live Preview</span>
+          <div id="twPreviewArea">
+            <div id="twPreview" style="text-align:center;font-weight:700;min-width:160px;padding:16px;border-radius:8px;background:#2563eb;color:white;">Tailwind Card</div>
+          </div>
+          <span class="field-label">Generated Class String</span>
+          <div class="code-block">
+            <div class="code-block-header"><span>HTML</span></div>
+            <pre id="twClassDisplay">&lt;div class="p-4 bg-blue-600 text-white rounded-lg shadow-md"&gt;
+  Tailwind Card
+&lt;/div&gt;</pre>
+          </div>
+        </div>
       </div>
-
-      <div style="margin: 16px 0; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-        <h3>Sass Example</h3>
-        <p style="font-size: 13px; color: var(--muted);">Sass adds power with variables, nesting, and mixins:</p>
-        <pre style="background: #051226; padding: 12px; border-radius: 6px; overflow-x: auto; color: #dce9ff; font-size: 12px;">$primary: #667eea;
-$spacing: 1rem;
+      <div class="concept-box"><div class="concept-title">Sass vs CSS <span class="tag">REFERENCE</span></div><p>Sass compiles to plain CSS. Here is what it adds:</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+        <div>
+          <span class="field-label">Sass (.scss)</span>
+          <div class="code-block">
+            <div class="code-block-header"><span>scss</span><span style="color:var(--ac);">preprocessor</span></div>
+            <pre>$primary: #667eea;
+$radius: 12px;
 
 .card {
-  padding: $spacing;
+  padding: 1rem;
   background: $primary;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
+  border-radius: $radius;
+
+  &amp;:hover { transform: scale(1.05); }
+  &amp;__title { font-size: 1.25rem; }
 }</pre>
+          </div>
+        </div>
+        <div>
+          <span class="field-label">CSS output</span>
+          <div class="code-block">
+            <div class="code-block-header"><span>css</span><span style="color:var(--ok);">compiled</span></div>
+            <pre>.card {
+  padding: 1rem;
+  background: #667eea;
+  border-radius: 12px;
+}
+.card:hover { transform: scale(1.05); }
+.card__title { font-size: 1.25rem; }</pre>
+          </div>
+        </div>
       </div>
-      <div class="tooltip">Use Tailwind for quick prototyping. Use Sass when you need reusable design tokens and mixins.</div>
+      <div class="tooltip">Use Tailwind for fast prototyping. Use Sass in larger projects with reusable design tokens.</div>
     </div>
   </div>
 
-  <!-- Step 4: JavaScript Basics -->
+  <!-- STEP 4 -->
   <div class="section" id="step4">
     <div class="card">
       <h2>4 — JavaScript Fundamentals</h2>
-      <p>Variables, operators, functions, and DOM manipulation. Type code and run it in the sandbox below.</p>
-      
-      <div class="lesson-nav">
-        <button onclick="setJsExample('variables')" class="secondary">Variables</button>
-        <button onclick="setJsExample('operators')" class="secondary">Operators</button>
-        <button onclick="setJsExample('functions')" class="secondary">Functions</button>
-        <button onclick="setJsExample('dom')" class="secondary">DOM</button>
+      <div class="block-desc"><strong>What this shows:</strong> JavaScript makes pages interactive. Pick a tab, read the concept, then hit Run Code to see output in the console.</div>
+      <div class="tab-nav" id="jsTabNav">
+        <button class="active" data-example="variables">Variables &amp; Types</button>
+        <button data-example="operators">Operators</button>
+        <button data-example="functions">Functions</button>
+        <button data-example="arrays">Arrays</button>
+        <button data-example="dom">DOM</button>
+        <button data-example="events">Events</button>
       </div>
-
-      <div class="code-input-area">
-        <label>JavaScript Code</label>
-        <textarea id="jsInput" class="editor-box" style="min-height: 200px; padding: 12px;">// Variables
-let x = 5;
-const y = 10;
-var z = x + y;
-
-console.log("Sum:", z);
-console.log("Type of z:", typeof z);</textarea>
+      <div class="concept-box" id="jsConcept" style="margin-bottom:14px;">
+        <div class="concept-title" id="jsConceptTitle">Variables &amp; Types <span class="tag">BASICS</span></div>
+        <p id="jsConceptDesc">JavaScript has three ways to declare variables: <code>let</code>, <code>const</code>, and <code>var</code> (old — avoid).</p>
       </div>
-
-      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <button onclick="runJsCode()">Run Code</button>
-        <button onclick="clearJsConsole()" class="secondary">Clear</button>
+      <div class="split-view">
+        <div>
+          <span class="field-label">✏️ JavaScript Editor</span>
+          <div class="editor-wrap">
+            <div class="editor-header"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="lang-tag">javascript</span></div>
+            <textarea id="jsInput" rows="14"></textarea>
+          </div>
+          <div class="btn-row">
+            <button id="jsRunBtn">▶ Run Code</button>
+            <button id="jsClearBtn" class="secondary">Clear Console</button>
+          </div>
+        </div>
+        <div>
+          <span class="field-label">📟 Console Output</span>
+          <div class="console-wrap">
+            <div class="console-header"><span>Console</span><span id="consoleStatus" style="font-size:10px;color:var(--muted);">Ready</span></div>
+            <div class="console-body" id="jsConsole"><span class="console-empty">Run your code to see output here…</span></div>
+          </div>
+        </div>
       </div>
-
-      <label style="display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">Console Output</label>
-      <div id="jsConsole" class="code-console"></div>
-
-      <div class="tooltip">Use console.log() to print values. Errors appear in red.</div>
+      <div class="tooltip">Use <code>console.log()</code> to print any value. Errors appear in red.</div>
     </div>
   </div>
 
-  <!-- Step 5: Code Sandbox -->
+  <!-- STEP 5 -->
   <div class="section" id="step5">
     <div class="card">
-      <h2>5 — Interactive Code Sandbox</h2>
-      <p>Write HTML, CSS, and JavaScript. See live output instantly in an iframe sandbox.</p>
-      
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+      <h2>5 — Live Code Sandbox</h2>
+      <div class="block-desc"><strong>What this shows:</strong> Write HTML, CSS, and JavaScript together and see the result live in an isolated preview.</div>
+      <div class="tab-nav" id="sandboxTabNav" style="margin-bottom:14px;">
+        <button class="active" data-template="click">Click Counter</button>
+        <button data-template="todo">To-Do List</button>
+        <button data-template="color">Color Picker</button>
+        <button data-template="timer">Countdown Timer</button>
+        <button data-template="blank">Blank</button>
+      </div>
+      <div class="split-view">
         <div>
-          <label style="display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">HTML + CSS + JS</label>
-          <textarea id="sandboxCode" class="editor-box" style="min-height: 350px; padding: 12px;"><div id="app" style="padding: 20px; text-align: center; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 10px;">
-  <h2>Click the button</h2>
-  <button id="btn" style="padding: 10px 20px; background: white; color: #667eea; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
-    Click me
-  </button>
-</div>
-
-<script>
-  document.getElementById('btn').addEventListener('click', () => {
-    alert('Hello from the sandbox!');
-  });
-</script></textarea>
+          <span class="field-label">✏️ HTML + CSS + JS</span>
+          <div class="editor-wrap">
+            <div class="editor-header"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="lang-tag">html · css · js</span></div>
+            <textarea id="sandboxCode" rows="18"></textarea>
+          </div>
+          <div class="btn-row">
+            <button id="sandboxRunBtn">▶ Update Preview</button>
+            <button id="sandboxClearBtn" class="secondary">Clear</button>
+          </div>
         </div>
         <div>
-          <label style="display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin-bottom: 6px;">Live Preview</label>
-          <iframe id="sandboxFrame" style="width: 100%; height: 350px; border: 1px solid var(--border); border-radius: 10px; background: white;"></iframe>
+          <span class="field-label">👁️ Live Preview</span>
+          <div class="sandbox-preview-header">
+            <span style="width:8px;height:8px;border-radius:50%;background:#28c840;display:inline-block;box-shadow:0 0 6px #28c840;"></span>
+            Sandbox Output
+          </div>
+          <iframe id="sandboxFrame" sandbox="allow-scripts"></iframe>
         </div>
       </div>
-      <button onclick="runSandbox()">Update Preview</button>
-      <div class="tooltip">The iframe runs in a sandbox for safety. Scripts run in isolation.</div>
+      <div class="tooltip">The sandbox is isolated — use <code>alert()</code>, <code>addEventListener()</code>, <code>setInterval()</code>, and more.</div>
     </div>
   </div>
 
-  <!-- Step 6: Reflection -->
+  <!-- STEP 6 -->
   <div class="section" id="step6">
     <div class="card">
-      <h2>6 — Reflection & Next Steps</h2>
-      <p>You've explored the core tools of frontend development. Here are key takeaways:</p>
-      
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div class="exercise">
-          <strong>Markdown & HTML:</strong> Markdown is fast to write; HTML is what browsers render. Tools like Jekyll auto-convert.
-        </div>
-        <div class="exercise">
-          <strong>CSS:</strong> Style with selectors, box model, flexbox, grid, and animations. Practice specificity and cascading.
-        </div>
-        <div class="exercise">
-          <strong>Tailwind & Sass:</strong> Tailwind speeds up UI prototyping. Sass centralizes design tokens and reusable logic.
-        </div>
-        <div class="exercise">
-          <strong>JavaScript:</strong> Variables, functions, DOM manipulation, and event listeners make pages interactive.
-        </div>
-        <div class="exercise">
-          <strong>Integration:</strong> Combine HTML, CSS, and JS in a single sandbox to build complete components.
-        </div>
+      <h2>6 — Reflection &amp; What's Next</h2>
+      <div class="block-desc"><strong>You covered the full frontend stack.</strong> Here is a summary of each piece and where to go next.</div>
+      <div class="checkpoint-grid">
+        <div class="checkpoint"><div class="checkpoint-title">📝 Markdown &amp; HTML</div><p>Markdown is shorthand for HTML. Tools like Jekyll convert <code>.md</code> to <code>.html</code> automatically.</p></div>
+        <div class="checkpoint"><div class="checkpoint-title">🎨 CSS</div><p>CSS controls layout, colors, spacing, and animation. Master selectors, the box model, flexbox, and grid.</p></div>
+        <div class="checkpoint"><div class="checkpoint-title">⚡ Tailwind CSS</div><p>Utility-first classes let you build UI without CSS files.</p></div>
+        <div class="checkpoint"><div class="checkpoint-title">🔧 Sass</div><p>Sass adds variables, nesting, and mixins. Use it in larger projects with reusable design tokens.</p></div>
+        <div class="checkpoint"><div class="checkpoint-title">📦 JavaScript</div><p>JS makes pages interactive. The beginner stack: variables → functions → arrays → DOM → events.</p></div>
+        <div class="checkpoint"><div class="checkpoint-title">🚀 Next Steps</div><p>Build a calculator in the sandbox. Then explore React, fetch APIs, and GitHub Pages to deploy live.</p></div>
       </div>
-
-      <div style="margin-top: 20px; padding: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-        <h3>Challenge</h3>
-        <p>Try building a simple calculator in the sandbox. Use HTML for buttons, CSS for styling, and JavaScript for logic. You can save your progress locally by copying the code.</p>
+      <div class="exercise" style="margin-top:20px;">
+        <strong>🎯 Challenge:</strong> Go back to the sandbox and build a simple calculator. Use <code>&lt;button&gt;</code> elements for digits and JavaScript to handle clicks and compute results.
       </div>
     </div>
   </div>
 
-  <!-- Navigation -->
   <div class="nav-buttons">
-    <button id="prevBtn" onclick="prevStep()" class="secondary">← Previous</button>
-    <div style="display: flex; gap: 8px;">
-      <span id="stepIndicator" style="color: var(--muted); font-size: 12px; align-self: center;">Step 1 / 6</span>
-      <button id="nextBtn" onclick="nextStep()">Next →</button>
-    </div>
+    <button id="prevBtn" class="secondary" disabled>← Previous</button>
+    <span id="stepIndicator">Step 1 / 6</span>
+    <button id="nextBtn">Next →</button>
   </div>
 </div>
 
-<script>
-// ========== State & Navigation ==========
-let currentStep = 0;
-const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
-const STORAGE_KEY = 'frontend_combined_v1';
+<script type="module">
+import { Navigator }      from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence }    from '/assets/js/bigsix/shared/persistence.js';
+import { MarkdownEditor } from '/assets/js/bigsix/frontend/markdown.js';
+import { CssPlayground }  from '/assets/js/bigsix/frontend/css-playground.js';
+import { TailwindPreview } from '/assets/js/bigsix/frontend/tailwind.js';
+import { JsPlayground }   from '/assets/js/bigsix/frontend/javascript-playground.js';
+import { Sandbox }        from '/assets/js/bigsix/frontend/sandbox.js';
 
-function showStep(n) {
-  currentStep = Math.max(0, Math.min(steps.length - 1, n));
-  steps.forEach((s, i) => document.getElementById(s).classList.toggle('active', i === currentStep));
-  
-  // Update progress bar
-  const bar = document.getElementById('progressBar');
-  bar.innerHTML = steps.map((_, i) => `<div class="step ${i <= currentStep ? 'active' : ''}"></div>`).join('');
-  
-  document.getElementById('stepIndicator').textContent = `Step ${currentStep + 1} / ${steps.length}`;
-  document.getElementById('prevBtn').disabled = currentStep === 0;
-  document.getElementById('nextBtn').disabled = currentStep === steps.length - 1;
-
-  persist();
-}
-
-function prevStep() { showStep(currentStep - 1); }
-function nextStep() { showStep(currentStep + 1); }
-
-// ========== Markdown to HTML ==========
-function convertMarkdown() {
-  const md = document.getElementById('mdInput').value;
-  const html = marked.parse(md);
-  document.getElementById('htmlPreview').innerHTML = html;
-  persist();
-}
-
-// ========== CSS Playground ==========
-function applyCss() {
-  const css = document.getElementById('cssInput').value;
-  let style = document.getElementById('dynamicStyle');
-  if (!style) {
-    style = document.createElement('style');
-    style.id = 'dynamicStyle';
-    document.head.appendChild(style);
-  }
-  style.textContent = css;
-  persist();
-}
-
-function resetCss() {
-  document.getElementById('cssInput').value = '.box { background: #667eea; padding: 30px; border-radius: 10px; }';
-  applyCss();
-}
-
-// ========== Tailwind Demo ==========
-function applyTailwind() {
-  const padding = document.getElementById('twPadding').value;
-  const color = document.getElementById('twColor').value;
-  const radius = document.getElementById('twRadius').value;
-  const preview = document.getElementById('twPreview');
-  preview.className = `${padding} ${color} ${radius}`;
-  persist();
-}
-
-// ========== JavaScript Sandbox ==========
-function clearJsConsole() {
-  document.getElementById('jsConsole').innerHTML = '';
-}
-
-function runJsCode() {
-  clearJsConsole();
-  const code = document.getElementById('jsInput').value;
-  const console_output = document.getElementById('jsConsole');
-
-  // Override console.log
-  const origLog = console.log;
-  const logs = [];
-  console.log = function(...args) {
-    logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' '));
-    origLog.apply(console, args);
-  };
-
-  try {
-    eval(code);
-    logs.forEach(log => {
-      const line = document.createElement('div');
-      line.textContent = log;
-      console_output.appendChild(line);
-    });
-  } catch (err) {
-    const errLine = document.createElement('div');
-    errLine.style.color = '#ffb3b3';
-    errLine.textContent = '❌ ' + (err.message || err);
-    console_output.appendChild(errLine);
-  }
-  console.log = origLog;
-  persist();
-}
-
-function setJsExample(type) {
-  const examples = {
-    variables: `// Variables & Types
-let name = "Alex";
-const age = 22;
-var score = 95;
-
-console.log(name, age, score);
-console.log(typeof name, typeof age);`,
-    operators: `// Operators
-let x = 10, y = 3;
-
-console.log("Add:", x + y);
-console.log("Subtract:", x - y);
-console.log("Multiply:", x * y);
-console.log("Divide:", x / y);
-console.log("Modulus:", x % y);
-console.log("Power:", x ** 2);`,
-    functions: `// Functions
-function greet(name) {
-  return "Hello, " + name;
-}
-
-const add = (a, b) => a + b;
-
-console.log(greet("Frontend"));
-console.log("Sum:", add(5, 7));`,
-    dom: `// DOM Manipulation
-const element = document.createElement('div');
-element.textContent = 'DOM Content';
-element.style.color = 'blue';
-element.style.padding = '10px';
-console.log(element.outerHTML);`
-  };
-  document.getElementById('jsInput').value = examples[type] || '';
-}
-
-// ========== Code Sandbox ==========
-function runSandbox() {
-  const code = document.getElementById('sandboxCode').value;
-  const frame = document.getElementById('sandboxFrame');
-  frame.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body { margin: 0; font-family: system-ui; }</style></head><body>${code}</body></html>`;
-  persist();
-}
-
-// ========== Persistence ==========
-function persist() {
-  const data = {
-    step: currentStep,
-    md: document.getElementById('mdInput').value,
-    css: document.getElementById('cssInput').value,
-    js: document.getElementById('jsInput').value,
-    sandbox: document.getElementById('sandboxCode').value,
-    twPadding: document.getElementById('twPadding').value,
-    twColor: document.getElementById('twColor').value,
-    twRadius: document.getElementById('twRadius').value
-  };
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-}
-
-function restore() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (!data) return;
-    if (data.md) document.getElementById('mdInput').value = data.md;
-    if (data.css) document.getElementById('cssInput').value = data.css;
-    if (data.js) document.getElementById('jsInput').value = data.js;
-    if (data.sandbox) document.getElementById('sandboxCode').value = data.sandbox;
-    if (data.twPadding) document.getElementById('twPadding').value = data.twPadding;
-    if (data.twColor) document.getElementById('twColor').value = data.twColor;
-    if (data.twRadius) document.getElementById('twRadius').value = data.twRadius;
-    showStep(data.step || 0);
-  } catch (e) {}
-}
-
-// ========== Boot ==========
 document.addEventListener('DOMContentLoaded', () => {
-  restore();
-  applyCss();
-  convertMarkdown();
-  runSandbox();
+  const nav   = new Navigator({ progressStyle: 'dots', labels: ['Markdown', 'CSS Styling', 'Tailwind & Sass', 'JavaScript', 'Live Sandbox', 'Reflection'] });
+  const store = new Persistence();
+  nav.init(() => store.persist());
+  store.restore((n, s) => nav.showStep(n, s));
+  new MarkdownEditor().init();
+  new CssPlayground().init();
+  new TailwindPreview().init();
+  new JsPlayground().init();
+  new Sandbox().init();
 });
 </script>
 
 <script>
-// Back button handler: prefer history.back() when possible, fall back to parent path
 (function(){
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded',function(){
     document.querySelectorAll('a.back-btn').forEach(function(a){
-      a.addEventListener('click', function(e){
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+      a.addEventListener('click',function(e){
+        if(e.metaKey||e.ctrlKey||e.shiftKey||e.button===1)return;
         e.preventDefault();
-        try{ if (document.referrer && new URL(document.referrer).origin === location.origin){ history.back(); return; } }catch(err){}
-        var p = location.pathname.replace(/\/$/,'').split('/');
-        if (p.length>1){ p.pop(); window.location.href = p.join('/') + '/'; } else { window.location.href = '/'; }
+        try{if(document.referrer&&new URL(document.referrer).origin===location.origin){history.back();return;}}catch(err){}
+        var p=location.pathname.replace(/\/$/,'').split('/');
+        if(p.length>1){p.pop();window.location.href=p.join('/')+'/';}else{window.location.href='/';}
       });
     });
   });
 })();
 </script>
-
 <script src="/assets/js/lesson-completion-bigsix.js"></script>

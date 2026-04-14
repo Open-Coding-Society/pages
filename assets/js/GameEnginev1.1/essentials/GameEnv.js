@@ -37,7 +37,25 @@ class GameEnv {
         this.game = null; // Reference to the Game static environment variables
         this.path = ''; // Reference to the resource path
         this.gameControl = null; // Reference to the GameControl instance
-        this.gameObjects = []; // Reference list of game objects instancces    
+        this.gameObjects = []; // Reference list of game objects instances
+        
+        /* Game statistics - shared across all levels */
+        this.stats = {
+            coinsCollected: 0,
+            levelsCompleted: 0,
+            sessionTime: 0,
+            totalPowerUps: 0
+        };
+        
+        /* Score configuration - can be overridden per game */
+        this.scoreConfig = {
+            counterVar: 'coinsCollected',
+            counterLabel: 'Coins Collected',
+            scoreVar: 'coinsCollected'
+        };
+        
+        /* ScoreManager instance - initialized when needed */
+        this.scoreManager = null;
     }
 
     /**
@@ -67,6 +85,36 @@ class GameEnv {
         }
         
         this.size();
+    }
+
+    /**
+     * Initialize the score manager for tracking and persisting scores.
+     * This should be called once during game initialization.
+     * Lazy loads the GameEnvScore class and creates a singleton instance.
+     */
+    async initScoreManager() {
+        console.log('GameEnv: initScoreManager called');
+        
+        // Only initialize once
+        if (this.scoreManager) {
+            console.log('GameEnv: ScoreManager already exists, returning existing instance');
+            return this.scoreManager;
+        }
+        
+        try {
+            console.log('GameEnv: Importing GameEnvScore module...');
+            const module = await import(`${this.path}/assets/js/GameEnginev1.1/essentials/GameEnvScore.js`);
+            console.log('GameEnv: Module imported successfully', module);
+            const GameEnvScore = module.default;
+            console.log('GameEnv: Creating GameEnvScore instance...');
+            this.scoreManager = new GameEnvScore(this);
+            console.log('GameEnv: ScoreManager initialized successfully', this.scoreManager);
+            return this.scoreManager;
+        } catch (error) {
+            console.error('GameEnv: Failed to initialize ScoreManager:', error);
+            console.error('GameEnv: Error stack:', error.stack);
+            return null;
+        }
     }
 
     /**

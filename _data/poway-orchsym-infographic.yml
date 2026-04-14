@@ -1,72 +1,83 @@
-# Poway Symphony Orchestra Website Analysis Infographic
-Title: "Poway Symphony Orchestra Website Analysis"
-Description: "A UI and process analysis of the Poway Symphony Orchestra website identifying core messaging, audience targeting, and actionable improvements to help the site better serve concertgoers, donors, and prospective musicians."
+Title: "Poway Symphony Orchestra Capstone"
+Badge: "Design-Based Research Capstone"
+
+Description: >
+  A design-based research capstone focused on expanding community engagement
+  through a more accessible, modern, and story-driven Poway Symphony Orchestra
+  website experience.
 
 Topics:
-  - title: "Core Messaging Analysis"
-    image: "pso/pso_messaging.png"
-    link: "/capstone/pso-website/"
-    alt: "Poway Symphony Orchestra"
-    keyPoints:
-      - "Site built on Google Sites, a free platform with significant UI limitations"
-      - "Core message: credibility, community belonging, and open invitation"
-      - "20+ year history and named conductor used to establish legitimacy"
-      - "Local identity anchored to Poway Center for the Performing Arts"
-      - "501(c)(3) nonprofit status reinforces community service mission"
-      - "Three audiences addressed at once with no prioritization"
-    subtitle: "What the Site Is Trying to Say"
-    description: "The Poway Symphony Orchestra website carries one core message: we are a serious, long-standing, community-rooted orchestra that deserves your attendance, support, and participation. It backs this up with 20+ years of history, a named conductor and music director in John LoPiccolo, approximately 65 semi-professional musicians, and strong geographic ties to San Diego's North County Inland region. The site simultaneously targets three distinct audiences: concertgoers, donors, and prospective musicians. The intent is clear and the content is solid, but all three messages compete for space on a single homepage with no designed user journey."
-    tech:
-      - "Google Sites (current platform)"
-      - "PayPal Donate Integration"
-      - "YouTube Channel Link"
-      - "Facebook Page Link"
-      - "Instagram Profile Link"
-      - "Poway Center for the Performing Arts Ticketing"
-    impact:
-      - "Established credibility: 20+ year history clearly communicated"
-      - "Community identity: San Diego North County region explicitly named"
-      - "Donor pipeline: matching gift banner and PayPal donate button present"
-      - "Musician recruitment: rehearsal schedule and contact info included"
-      - "Nonprofit status: 501(c)(3) foundation mentioned for donor trust"
-      - "Season invite: 2025-2026 concert season linked from homepage"
-    status: "Analysis Complete"
-    team:
-      - "Michelle Ji, Anishka Sanghvi, Krishna Visvanath"
-      - "Audience: Concertgoers"
-      - "Audience: Donors"
-      - "Audience: Prospective Musicians"
+  - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
+    subtitle: "Redesigned Website Experience"
+    link: "https://pso.opencodingsociety.com/"
+    buttonLabel: "View Frontend Site"
+    backendLink: "http://wifighters.opencodingsociety.com"
+    backendButtonLabel: "View Admin UI"
 
-  - title: "UI and Process Improvements"
-    image: "pso/pso_improvements.png"
-    link: "/capstone/pso-website/"
-    alt: "Poway Symphony Orchestra"
+    description: >
+      This project redesigns the PSO's existing Google Sites-based website into a full
+      custom web experience. Where the original site is a static, text-heavy Google Sites
+      page with minimal navigation and no interactivity, the capstone site introduces
+      dynamic concert listings, interactive games, a musician directory with section
+      filtering, media playback, and gamified exploration while preserving the real
+      orchestra's content accurately.
+
     keyPoints:
-      - "No upcoming concert card above the fold with date and buy tickets button"
-      - "Ticket purchase redirects off-site with no warning or context"
-      - "Donate banner has no visual separation from the navigation"
-      - "Musician recruitment section targets a different audience than homepage visitors"
-      - "Social media links are oversized banner images instead of icons"
-      - "No clear user journey from arrival to action"
-    subtitle: "Where the Site Falls Short and How to Fix It"
-    description: "The homepage tries to serve three audiences simultaneously with no prioritization, so none of the three messages land as effectively as they should. The most urgent fix is surfacing a Next Concert card above the fold with a date and direct ticket link. Ticket flow currently sends users off-site without context, which increases abandonment. The donate banner blends into the navigation with no visual hierarchy. Musician recruitment content belongs on a dedicated Musicians page rather than the homepage. Social links should be replaced with small clean icons. A platform migration from Google Sites to Squarespace, Wix, or WordPress would resolve most of these issues structurally."
+      - "Home page introduces the orchestra with a cleaner layout, accurate mission content, and faster access to concerts, donations, and events, replacing the original's dense text block and image-only structure"
+      - "Concert section shows real 2025-2026 season data with a live countdown, interactive calendar, and ticket links, replacing the original's external-only event flow"
+      - "Conductor section presents John LoPiccolo's biography and PSO history in a structured, visually engaging format instead of a single text-heavy page"
+      - "Musician directory includes roster cards organized by section with instrument filters and audio playback instead of a plain text roster"
+      - "EXP bar gamifies browsing so visitors see progress as they move through the experience"
+      - "Orchestra Builder turns section placement into an interactive milestone that teaches how a symphony is structured"
+      - "Responsive layout keeps the full experience usable across phones, tablets, and desktops"
+      - "Join section consolidates rehearsal schedules, registration info, attire, and contact details in one place"
+
     tech:
-      - "Inline Email Capture Form"
-      - "Next Concert Hero Card"
-      - "Direct Ticket Deep-Link"
-      - "Dismissible Alert Banner"
-      - "Dedicated Musicians Page"
-    impact:
-      - "Surfacing next concert date reduces ticket purchase friction"
-      - "Inline email capture replaces hidden subscribe page"
-      - "Visible contact card replaces phone number buried in paragraph text"
-      - "Rehearsal info moved off homepage reduces audience confusion"
-      - "3-concert season calendar gives concertgoers at-a-glance planning"
-      - "Platform migration unlocks proper hero sections and mobile layouts"
-    status: "Recommendations Pending"
-    team:
-      - "Michelle Ji, Anishka Sanghvi, Krishna Visvanath"
-      - "Priority: Concertgoer Journey"
-      - "Priority: Donor Conversion"
-      - "Priority: Musician Recruitment Flow"
-      
+      - "HTML"
+      - "CSS"
+      - "JavaScript"
+      - "Responsive Design"
+      - "Figma"
+      - "User research and testing"
+      - "Flask Backend Integration"
+
+    interactiveLink: "https://pso.opencodingsociety.com/games/"
+    interactiveButtonLabel: "Open Games Page"
+    interactiveElements:
+      - title: "EXP Bar"
+        description: "Visitors earn visible progress as they move through the site, turning browsing into a guided journey"
+      - title: "Orchestra Builder"
+        description: "Users place instrument sections onto a real stage layout and unlock a featured PSO performance on completion"
+      - title: "Virtual Conductor"
+        description: "A rhythm game that puts the user in the conductor's role, keeping time the way John LoPiccolo guides the ensemble"
+      - title: "Tuning The Orchestra"
+        description: "Users experience tuning the ensemble before a performance, making the pre-concert ritual tangible and educational"
+      - title: "Musician Profiles and Audio"
+        description: "Visitors explore roster cards filtered by section or instrument and hear audio tied to each family of the orchestra"
+
+    problemsSolved:
+      - "The original site is built on Google Sites with no custom interactivity -> we rebuilt it as a fully custom site with dynamic content and user engagement features"
+      - "The original musician page is a plain text list -> we replaced it with filterable profile cards and section audio"
+      - "The site felt passive and informational only -> we introduced the EXP bar, games, and interactive milestones to reward exploration"
+
+    improvementsMade:
+      - "Rebuilt the original Google Sites experience as a custom frontend with modern layout, richer navigation, and interactive storytelling"
+      - "Integrated real concert season data, ticket links, and time-based event elements directly into the site"
+      - "Replaced passive text sections with structured content modules for the conductor, musicians, support, and join flows"
+      - "Added interactive games, progress tracking, and media elements to turn browsing into guided participation"
+
+    wowFactors:
+      - "The capstone preserves real PSO content while significantly modernizing how visitors discover and interact with it"
+      - "Concert, conductor, musician, support, and join experiences are all surfaced within one cohesive on-site journey"
+      - "EXP progression and Orchestra Builder make an arts organization website feel interactive without losing accuracy or professionalism"
+      - "Games like Virtual Conductor and Tuning the Orchestra make symphonic concepts tangible for broader community audiences"
+      - "The live deployed frontend and admin UI demonstrate that the project moves beyond mockups into a working prototype"
+
+status: "Research and Testing Phase (Deployed Prototype Complete)"
+
+team:
+  - "Wi-Fighters"
+  - "Meryl"
+  - "Kailyn"
+  - "Hope"
+  - "Laya"

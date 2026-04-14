@@ -31,313 +31,12 @@ layout: post
       {% assign unitData = shared[courseUnit.shared] %}
     {% endif %}
 
-    <div class="sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
-      <div class="sprint-header">
-        <div>
-          <p class="sprint-meta">{{ unitKey }}</p>
-          <h2 class="sprint-title">{{ unitData.title }}</h2>
-          {% if unitData.description %}
-            <p class="sprint-meta">{{ unitData.description }}</p>
-          {% endif %}
-        </div>
-        <div class="sprint-controls">
-          <!-- Sprint Calendar Sync -->
-          <div class="sprint-date-control">
-            <button class="sprint-btn date-toggle" type="button" data-sprint="{{ unitKey }}" title="Sync Sprint to Calendar">
-              <i class="fas fa-calendar-alt"></i>
-            </button>
-            <div class="sprint-date-dropdown hidden" data-sprint="{{ unitKey }}">
-              <div class="date-dropdown-header">
-                <span>Sync to Calendar</span>
-                <button class="date-dropdown-close" type="button">&times;</button>
-              </div>
-              <div class="calendar-sync-info">
-                <div class="sprint-week-range">
-                  <i class="fas fa-info-circle"></i>
-                  <span>This sprint covers <strong>Weeks {{ start }}-{{ end }}</strong></span>
-                </div>
-                <div class="sprint-date-preview" data-sprint="{{ unitKey }}">
-                  <!-- Will be populated by JS with actual dates from school calendar -->
-                  <div class="date-preview-loading">Loading calendar dates...</div>
-                </div>
-              </div>
-              <div class="date-actions">
-                <button class="advanced-sync-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
-                  <i class="fas fa-sync"></i> Sync to Calendar
-                </button>
-                <button class="advanced-remove-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}">
-                  <i class="fas fa-trash-alt"></i> Remove from Calendar
-                </button>
-              </div>
-              <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
-            </div>
-          </div>
-          <button class="sprint-toggle-btn" type="button" aria-expanded="false">
-            <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
-          </button>
-          {% if helpUrl %}
-          <button class="sprint-btn help" type="button" data-sprint="{{ unitKey }}" data-help-url="{{ helpUrl }}" onclick="openHelpModal('{{ unitKey }}', '{{ helpUrl }}')" title="Help & Navigation Guide">
-              <i class="fas fa-question"></i>
-          </button>
-          {% endif %}
-          <button class="sprint-btn certificate" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" onclick="openProgressionModal('{{ unitKey }}', {{ start }}, {{ end }})" title="Progress & Certificates">
-              <i class="fas fa-certificate"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="sprint-weeks">
-        <div class="sprint-body">
-
-          {% for index in (start..end) %}
-            {% assign entries = null | compact %}
-            {% assign totalItems = 0 %}
-
-            {% for post in posts %}
-              {% if post.courses[page.course] %}
-                {% comment %}Include all files with courses frontmatter (including converted notebook markdown files){% endcomment %}
-                {% comment %}Skip files with multiple courses - they should use course-specific versions{% endcomment %}
-                {% assign course_count = 0 %}
-                {% for course in post.courses %}
-                  {% assign course_count = course_count | plus: 1 %}
-                {% endfor %}
-                {% if course_count == 1 %}
-                {% assign week = post.courses[page.course].week | plus: 0 %}
-                {% if week == index %}
-                  {% if post.assignment == true %}
-                    {% assign itemType = "assignment" %}
-                  {% else %}
-                    {% assign itemType = "lesson" %}
-                  {% endif %}
-                  {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
-                  {% assign entries = entries | push: entry %}
-                  {% assign totalItems = totalItems | plus: 1 %}
-                {% endif %}
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-
-          {% if entries.size > 0 %}
-            {% assign assignmentTitles = "" %}
-            {% assign lessonTitles = "" %}
-            {% assign allEntries = "" %}
-            {% for entry in entries %}
-              {% assign parts = entry | split: "||" %}
-              {% if parts[2] == "assignment" %}
-                {% if assignmentTitles != "" %}
-                  {% assign assignmentTitles = assignmentTitles | append: ";;;" %}
-                {% endif %}
-                {% assign assignmentTitles = assignmentTitles | append: parts[0] | append: "|||" | append: parts[1] %}
-              {% else %}
-                {% if lessonTitles != "" %}
-                  {% assign lessonTitles = lessonTitles | append: ";;;" %}
-                {% endif %}
-                {% assign lessonTitles = lessonTitles | append: parts[0] | append: "|||" | append: parts[1] %}
-              {% endif %}
-              {% if allEntries != "" %}
-                {% assign allEntries = allEntries | append: ";;;" %}
-              {% endif %}
-              {% assign allEntries = allEntries | append: entry %}
-            {% endfor %}
-            <div class="week-card clickable" data-week="{{ index }}" data-sprint="{{ unitKey }}" data-assignments="{{ assignmentTitles | escape }}" data-lessons="{{ lessonTitles | escape }}" data-entries="{{ allEntries | escape }}">
-              <div class="week-content-wrapper">
-                <div class="week-indicator">
-                  <div class="week-circle">W{{ index }}</div>
-                  <div class="week-connector"></div>
-                </div>
-
-                <div class="week-main-content">
-                  <div class="week-header">
-                    <div class="week-title-group">
-                      <h3 data-week-title>Week {{ index }}</h3>
-                    </div>
-                    <div class="week-actions">
-                      <div class="completion-badge">
-                        {{ completedItems }}/{{ totalItems }} Complete
-                      </div>
-                    </div>
-                  </div>
-                  <div class="progress-bar-container">
-                    {% if totalItems > 0 %}
-                      {% assign progress = completedItems | times: 100 | divided_by: totalItems %}
-                    {% else %}
-                      {% assign progress = 0 %}
-                    {% endif %}
-                    <div class="progress-bar-fill" data-progress="{{ progress }}"></div>
-                  </div>
-
-                  <!-- MOVED: Learning Goals now appear BEFORE items -->
-                  <div class="week-skills-row" data-week-skills></div>
-
-                  <div class="items-grid">
-                    {% for entry in entries %}
-                      {% assign parts = entry | split: "||" %}
-                      {% if parts[2] == "assignment" %}
-                        {% assign isAssignment = true %}
-                        {% assign itemType = "assignment" %}
-                      {% else %}
-                        {% assign isAssignment = false %}
-                        {% assign itemType = "lesson" %}
-                      {% endif %}
-
-                      <div class="item-card" data-type="{{ itemType }}" data-item-id="{{ parts[1] }}" data-title="{{ parts[0] }}">
-                        <div class="item-content">
-                          <button class="completion-toggle">
-                            <i class="fas fa-circle status-icon incomplete"></i>
-                          </button>
-                          <a href="{{ site.baseurl }}{{ parts[1] }}" class="item-link">
-                            {% if isAssignment %}
-                              <i class="fas fa-file-alt type-icon assignment"></i>
-                            {% else %}
-                              <i class="fas fa-code type-icon lesson"></i>
-                            {% endif %}
-                            <span class="item-title">{{ parts[0] }}</span>
-                          </a>
-                          <div class="item-priority-selector">
-                            <select class="item-priority-dropdown" data-item-url="{{ parts[1] }}">
-                              <option value="P3">P3</option>
-                              <option value="P2" selected>P2</option>
-                              <option value="P1">P1</option>
-                              <option value="P0">P0</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    {% endfor %}
-                  </div>
-
-                  {% assign assignmentCount = 0 %}
-                  {% for entry in entries %}
-                    {% assign parts = entry | split: "||" %}
-                    {% if parts[2] == "assignment" %}
-                      {% assign assignmentCount = assignmentCount | plus: 1 %}
-                    {% endif %}
-                  {% endfor %}
-
-                  {% if assignmentCount > 0 %}
-                    <div class="assignment-due">
-                      <i class="fas fa-calendar"></i>
-                      <span>{{ assignmentCount }} assignment{% if assignmentCount > 1 %}s{% endif %} due</span>
-                    </div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          {% endif %}
-          {% endfor %}
-        </div>
-      </div>
-    </div>
+    {% include sprint-card.html %}
   {% endfor %}
 </div>
 
-<!-- ============================= -->
-<!--   PROGRESSION MODAL (DARK)   -->
-<!-- ============================= -->
-<div id="progression-modal">
-  <div>
-    <button id="close-progression-modal" class="close-btn">&times;</button>
-    
-    <h2><span id="modal-sprint-title"></span> Progress</h2>
-    <p class="week-theme" id="modal-sprint-subtitle"></p>
-
-    <div class="progress-bar-container" style="margin-bottom: 16px;">
-      <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
-    </div>
-
-    <div id="task-list"></div>
-
-    <div id="certificate-status" style="margin-top: 24px;"></div>
-  </div>
-</div>
-
-<!-- ============================= -->
-<!--   CERTIFICATE LIST MODAL      -->
-<!-- ============================= -->
-<div id="certificate-list-modal">
-  <button id="close-certificate-list-modal" class="close-btn">&times;</button>
-
-  <div>
-    <h2><span id="list-modal-sprint-title"></span> Certificates</h2>
-    <div id="certificate-list"></div>
-  </div>
-</div>
-
-<!-- ============================= -->
-<!--     CERTIFICATE MODAL         -->
-<!-- ============================= -->
-<div id="certificate-modal">
-  <div class="action-bar">
-    <button id="download-certificate-btn" class="action-btn">Download PNG</button>
-    <button id="print-certificate-btn" class="action-btn secondary-btn">Print</button>
-    <button id="linkedin-share-btn" class="action-btn">Add to LinkedIn</button>
-    <button id="close-certificate-modal" class="action-btn secondary-btn">Close</button>
-  </div>
-
-  <div id="certificate-content">
-    <div>
-      <div class="certificate-heading">
-        <div class="certificate-emblem">
-          <img id="certificate-logo" src="{{ '/assets/images/ocs-logo.png' | relative_url }}" alt="Open Coding Society Logo">
-        </div>
-        <div class="header-text">Open Coding Society</div>
-        <div id="certificate-type-text" class="certify-text">Certificate of Completion</div>
-        <div id="certificate-score-display" style="margin-top: 5px; font-size: 1.1rem; color: #4b5563;"></div>
-        <div class="certificate-subtitle">Presented to</div>
-      </div>
-
-      <div
-        contenteditable="true"
-        id="certificate-student-name"
-      ></div>
-
-      <div class="achievement-text">
-        Has successfully completed the module:
-        <br><strong id="certificate-week-theme"></strong><br>
-        as part of the course<br>
-        <strong id="certificate-course-name"></strong>.
-      </div>
-
-      <div class="skill-focus-pill">
-        <span id="certificate-skill-focus">Skill Focus</span>
-      </div>
-
-      <div id="certificate-date"></div>
-
-      <div class="certificate-divider"></div>
-
-      <!-- Skills -->
-      <div id="certificate-skills">
-        <h3 class="skills-heading">Skills Demonstrated</h3>
-        <div id="skills-container"></div>
-      </div>
-
-      <!-- Signature -->
-      <div class="signature-section">
-        <div class="signature">
-          <div class="signature-line"></div>
-          <div class="signature-name">John Mortensen</div>
-          <div class="signature-title">Course Instructor</div>
-          <div class="signature-subtitle">Open Coding Society</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ============================= -->
-<!--       HELP MODAL              -->
-<!-- ============================= -->
-<div id="help-modal">
-  <div>
-    <button id="close-help-modal" class="close-btn">&times;</button>
-    
-    <div id="help-content" >
-      <!-- Markdown content will be loaded here -->
-    </div>
-  </div>
-</div>
+<!-- Modals for sprint page -->
+{% include sprint-modals.html %}
 
 <!-- Include calendar sync modals and functionality -->
 {% include calendar.html %}
@@ -348,24 +47,47 @@ layout: post
 </script>
 
 <script>
-  // Completion tracking (course-specific)
+  /**
+   * ============================================
+   * CONFIGURATION & CONSTANTS
+   * ============================================
+   */
   const CURRENT_COURSE = '{{ page.course }}';
   const STORAGE_KEY = `${CURRENT_COURSE}-lesson-completion`;
+  const ITEM_PRIORITY_KEY = `item_priorities_${window.location.pathname}`;
+  const COURSE_LABELS = {
+    csp: 'Computer Science Principles',
+    csa: 'Computer Science A',
+    csse: 'Computer Science and Software Engineering'
+  };
 
-  // Load the skill library from the JSON script tag so the JS file itself contains no raw Liquid tokens
+  let currentModalWeekNumber = null;
+  let activeCertificateProfile = null;
+
+  /**
+   * ============================================
+   * SKILL LIBRARY INITIALIZATION
+   * ============================================
+   */
   let COURSE_SKILL_LIBRARY = {};
-  try {
-    const el = document.getElementById('course-skill-lib-json');
-    if (el && el.textContent) {
-      COURSE_SKILL_LIBRARY = JSON.parse(el.textContent);
+  function initializeSkillLibrary() {
+    try {
+      const el = document.getElementById('course-skill-lib-json');
+      if (el && el.textContent) {
+        COURSE_SKILL_LIBRARY = JSON.parse(el.textContent);
+      }
+    } catch (e) {
+      console.warn('Unable to parse COURSE_SKILL_LIBRARY, falling back to empty object', e);
+      COURSE_SKILL_LIBRARY = {};
     }
-  } catch (e) {
-    console.warn('Unable to parse COURSE_SKILL_LIBRARY, falling back to empty object', e);
-    COURSE_SKILL_LIBRARY = {};
   }
 
-  // Load completion data from localStorage
-  function loadCompletionData() {
+  /**
+   * ============================================
+   * DATA PERSISTENCE LAYER: Completion tracking
+   * ============================================
+   */
+  function getCompletionData() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       return stored ? JSON.parse(stored) : {};
@@ -374,8 +96,10 @@ layout: post
       return {};
     }
   }
-  
-  // Save completion data to localStorage
+
+  // Alias for backwards compatibility with any inline callers
+  const loadCompletionData = getCompletionData;
+
   function saveCompletionData(data) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -383,41 +107,44 @@ layout: post
       console.error('Error saving completion data:', e);
     }
   }
-  
-  // Toggle completion status
-  function toggleCompletion(button) {
+
+  /**
+   * ============================================
+   * DATA PERSISTENCE: Item priorities
+   * ============================================
+   */
+  function getItemPriorities() {
     try {
-      const itemCard = button.closest('.item-card');
-      if (!itemCard) {
-        console.error('Could not find item card');
-        return;
-      }
-      
-      const itemId = itemCard.dataset.itemId;
-      const completionData = loadCompletionData();
-      const isCompleted = completionData[itemId] || false;
-      
-      // Toggle status
-      completionData[itemId] = !isCompleted;
-      saveCompletionData(completionData);
-      
-      // Update UI
-      updateItemUI(itemCard, !isCompleted);
-      updateProgressBars();
-      
-      // Trigger cross-view sync by dispatching a custom event
-      window.dispatchEvent(new CustomEvent('completionChanged', { 
-        detail: { itemId, completed: !isCompleted }
-      }));
-    } catch (error) {
-      console.error('Error in toggleCompletion:', error);
+      const stored = localStorage.getItem(ITEM_PRIORITY_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch (e) {
+      console.error('Error loading item priorities:', e);
+      return {};
     }
   }
-  
-  // Update item UI based on completion status
+
+  function saveItemPriorities(data) {
+    try {
+      localStorage.setItem(ITEM_PRIORITY_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error('Error saving item priorities:', e);
+    }
+  }
+
+  function getItemPriority(itemUrl) {
+    const priorities = getItemPriorities();
+    return priorities[itemUrl] || 'P2';
+  }
+
+  /**
+   * ============================================
+   * COMPLETION TRACKING: Update UI elements
+   * ============================================
+   */
   function updateItemUI(itemCard, isCompleted) {
     const statusIcon = itemCard.querySelector('.status-icon');
-    
+    if (!statusIcon) return;
+
     if (isCompleted) {
       statusIcon.classList.remove('fa-circle', 'incomplete');
       statusIcon.classList.add('fa-circle-check', 'completed');
@@ -428,9 +155,8 @@ layout: post
       itemCard.classList.remove('completed');
     }
   }
-  
-  // Update progress bars for all weeks
-  function updateProgressBars() {
+
+  function updateWeekProgressBars() {
     const weekCards = document.querySelectorAll('.week-card');
     
     weekCards.forEach(weekCard => {
@@ -438,193 +164,219 @@ layout: post
       const completionBadge = weekCard.querySelector('.completion-badge');
       const progressFill = weekCard.querySelector('.progress-bar-fill');
       
-      let totalItems = itemCards.length;
-      let completedItems = 0;
-      
+      let completed = 0;
       itemCards.forEach(card => {
-        if (card.classList.contains('completed')) {
-          completedItems++;
-        }
+        if (card.classList.contains('completed')) completed++;
       });
       
-      const progress = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+      const progress = itemCards.length > 0 ? (completed / itemCards.length) * 100 : 0;
       
-      // Update badge
       if (completionBadge) {
-        completionBadge.textContent = `${completedItems}/${totalItems} Complete`;
+        completionBadge.textContent = `${completed}/${itemCards.length} Complete`;
       }
       
-      // Update progress bar
       if (progressFill) {
         progressFill.style.width = `${progress}%`;
       }
     });
   }
-  
-  // Initialize completion states on page load
+
+  // Alias so both names work (refactored code uses updateWeekProgressBars,
+  // original sync helpers call updateProgressBars)
+  const updateProgressBars = updateWeekProgressBars;
+
+  /**
+   * ============================================
+   * COMPLETION TOGGLE: Single responsibility
+   * ============================================
+   */
+  function toggleCompletion(button) {
+    try {
+      const itemCard = button.closest('.item-card');
+      if (!itemCard) return;
+      
+      const itemId = itemCard.dataset.itemId;
+      const completionData = getCompletionData();
+      const isCompleted = completionData[itemId] || false;
+      
+      completionData[itemId] = !isCompleted;
+      saveCompletionData(completionData);
+      
+      updateItemUI(itemCard, !isCompleted);
+      updateWeekProgressBars();
+      
+      window.dispatchEvent(new CustomEvent('completionChanged', { 
+        detail: { itemId, completed: !isCompleted }
+      }));
+    } catch (error) {
+      console.error('Error toggling completion:', error);
+    }
+  }
+
+  /**
+   * ============================================
+   * COMPLETION INITIALIZATION: Apply saved states
+   * ============================================
+   */
   function initializeCompletion() {
-    const completionData = loadCompletionData();
+    const completionData = getCompletionData();
     const itemCards = document.querySelectorAll('.item-card');
     
     itemCards.forEach(card => {
       const itemId = card.dataset.itemId;
       const isCompleted = completionData[itemId] || false;
       updateItemUI(card, isCompleted);
-      
-      // Add click event listener to the completion toggle button
-      const toggleButton = card.querySelector('.completion-toggle');
-      if (toggleButton) {
-        toggleButton.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleCompletion(this);
-        });
-      }
     });
     
-    updateProgressBars();
+    updateWeekProgressBars();
   }
 
-  // ===========================
-  // ITEM PRIORITY SYSTEM
-  // ===========================
-  
-  const ITEM_PRIORITY_KEY = `item_priorities_${window.location.pathname}`;
-  
-  // Load item priorities from localStorage
-  function loadItemPriorities() {
-    try {
-      const stored = localStorage.getItem(ITEM_PRIORITY_KEY);
-      return stored ? JSON.parse(stored) : {};
-    } catch (e) {
-      console.error('Error loading item priorities:', e);
-      return {};
-    }
+  /**
+   * ============================================
+   * EVENT HANDLERS: Attach all listeners
+   * ============================================
+   */
+  function attachCompletionToggleListeners() {
+    document.querySelectorAll('.completion-toggle').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleCompletion(button);
+      });
+    });
   }
-  
-  // Save item priorities to localStorage
-  function saveItemPriorities(data) {
-    try {
-      localStorage.setItem(ITEM_PRIORITY_KEY, JSON.stringify(data));
-    } catch (e) {
-      console.error('Error saving item priorities:', e);
-    }
-  }
-  
-  // Update dropdown styling based on priority
+
+  /**
+   * ============================================
+   * PRIORITY SYSTEM: Dropdown styling
+   * ============================================
+   */
   function updatePriorityDropdownStyle(dropdown) {
     const value = dropdown.value.toLowerCase();
     dropdown.classList.remove('priority-p0', 'priority-p1', 'priority-p2', 'priority-p3');
     dropdown.classList.add(`priority-${value}`);
   }
-  
-  // Get item priority (for use by calendar sync)
-  function getItemPriority(itemUrl) {
-    const priorities = loadItemPriorities();
-    return priorities[itemUrl] || 'P2';
-  }
-  
-  // Initialize item priority dropdowns
-  function initializeItemPriorities() {
-    const priorities = loadItemPriorities();
+
+  function attachPriorityListeners() {
+    const priorities = getItemPriorities();
     const dropdowns = document.querySelectorAll('.item-priority-dropdown');
     
     dropdowns.forEach(dropdown => {
       const itemUrl = dropdown.dataset.itemUrl;
-      
-      // Load saved priority or default to P2
       const savedPriority = priorities[itemUrl] || 'P2';
       dropdown.value = savedPriority;
       updatePriorityDropdownStyle(dropdown);
       
-      // Add change listener
-      dropdown.addEventListener('change', function(e) {
+      dropdown.addEventListener('change', (e) => {
         e.stopPropagation();
-        const newPriority = this.value;
-        const itemUrl = this.dataset.itemUrl;
-        
-        // Save to localStorage
-        const currentPriorities = loadItemPriorities();
+        const newPriority = dropdown.value;
+        const currentPriorities = getItemPriorities();
         currentPriorities[itemUrl] = newPriority;
         saveItemPriorities(currentPriorities);
-        
-        // Update styling
-        updatePriorityDropdownStyle(this);
-        
-        console.log(`Item priority updated: ${itemUrl} → ${newPriority}`);
+        updatePriorityDropdownStyle(dropdown);
       });
       
-      // Prevent click propagation so dropdown works
-      dropdown.addEventListener('click', function(e) {
+      dropdown.addEventListener('click', (e) => {
         e.stopPropagation();
       });
     });
   }
-  
-  // Filter functionality - per sprint
+
+  /**
+   * ============================================
+   * SPRINT FILTERING: Filter items per sprint
+   * ============================================
+   */
   function applySprintFilters(sprintKey, filterType) {
+    if (!sprintKey || !filterType) return;
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
     if (!sprintCard) return;
     
     const itemCards = sprintCard.querySelectorAll('.item-card');
-    
     itemCards.forEach(card => {
       const type = card.dataset.type;
       const isCompleted = card.classList.contains('completed');
       
+      let shouldShow = false;
       if (filterType === 'all') {
-        card.style.display = 'block';
+        shouldShow = true;
       } else if (filterType === 'lessons' && type === 'lesson') {
-        card.style.display = 'block';
+        shouldShow = true;
       } else if (filterType === 'assignments' && type === 'assignment') {
-        card.style.display = 'block';
+        shouldShow = true;
       } else if (filterType === 'incomplete' && !isCompleted) {
-        card.style.display = 'block';
-      } else {
-        card.style.display = 'none';
+        shouldShow = true;
       }
+      
+      card.style.display = shouldShow ? 'block' : 'none';
     });
   }
 
-  // Initialize sprint filters
-  function initializeSprintFilters() {
+  function attachFilterListeners() {
     document.querySelectorAll('.sprint-filter-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent sprint toggle
-        
+        e.stopPropagation();
         const sprintKey = btn.dataset.sprint;
         const filterType = btn.dataset.filter;
         
-        // Update active state for this sprint's filters only
         const sprintCard = btn.closest('.sprint-card');
         sprintCard.querySelectorAll('.sprint-filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        // Apply filter
         applySprintFilters(sprintKey, filterType);
       });
     });
   }
-  
-  // Initialize progress bars from data attributes
+
+  /**
+   * ============================================
+   * SPRINT COLLAPSE/EXPAND: Toggle sprint state
+   * ============================================
+   */
+  function toggleSprint(card, control) {
+    const isCollapsed = card.classList.toggle('collapsed');
+    if (control) {
+      control.setAttribute('aria-expanded', (!isCollapsed).toString());
+      control.querySelector('.sprint-toggle-icon').textContent = isCollapsed ? '▸' : '▾';
+    }
+  }
+
+  function attachSprintToggleListeners() {
+    document.querySelectorAll('.sprint-card').forEach(card => {
+      const toggleBtn = card.querySelector('.sprint-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.querySelector('.sprint-toggle-icon').textContent = '▸';
+        toggleBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleSprint(card, toggleBtn);
+        });
+      }
+      card.querySelector('.sprint-header').addEventListener('click', (e) => {
+        if (!e.target.closest('.sprint-controls')) {
+          toggleSprint(card, toggleBtn);
+        }
+      });
+    });
+  }
+
+  /**
+   * ============================================
+   * PROGRESS BARS: Initialize from data attributes
+   * ============================================
+   */
   function initializeProgressBars() {
-    const progressBars = document.querySelectorAll('.progress-bar-fill');
-    progressBars.forEach(bar => {
+    document.querySelectorAll('.progress-bar-fill').forEach(bar => {
       const progress = bar.dataset.progress || 0;
       bar.style.width = `${progress}%`;
     });
   }
-  
-  let currentModalWeekNumber = null;
-  let activeCertificateProfile = null;
 
-  const COURSE_LABELS = {
-    csp: 'Computer Science Principles',
-    csa: 'Computer Science A',
-    csse: 'Computer Science and Software Engineering'
-  };
-
-  // Extract week number from week card
+  /**
+   * ============================================
+   * WEEK UTILITIES: Extract and find weeks
+   * ============================================
+   */
   function extractWeekNumber(weekCard) {
     const weekCircle = weekCard.querySelector('.week-circle');
     if (weekCircle) {
@@ -636,33 +388,46 @@ layout: post
   }
 
   function getWeekCardElement(weekNumber) {
-    return Array.from(document.querySelectorAll('.week-card')).find(card => extractWeekNumber(card) === weekNumber);
+    return Array.from(document.querySelectorAll('.week-card')).find(card => 
+      extractWeekNumber(card) === weekNumber
+    );
   }
 
+  /**
+   * ============================================
+   * CERTIFICATE PROFILE BUILDING: Extract data
+   * ============================================
+   */
   function collectGoalsFromWeekCard(weekCard) {
-    const titles = Array.from(weekCard.querySelectorAll('.item-title')).map(el => el.textContent.trim()).filter(Boolean);
+    const titles = Array.from(weekCard.querySelectorAll('.item-title'))
+      .map(el => el.textContent.trim())
+      .filter(Boolean);
     const uniqueTitles = [...new Set(titles)];
-    if (uniqueTitles.length > 0) {
-      return uniqueTitles;
-    }
+    
+    if (uniqueTitles.length > 0) return uniqueTitles;
+    
     const header = weekCard.querySelector('.week-title-group h3')?.textContent.trim();
     return header ? [header] : [];
   }
 
   function buildCertificateProfile(weekCard, weekNumber) {
-    // Get sprint key from week card to access the correct sprint's week data
     const sprintKey = weekCard.dataset.sprint;
     const overrides = COURSE_SKILL_LIBRARY?.[sprintKey]?.[weekNumber] || null;
+    
     let theme = overrides?.theme || overrides?.title || overrides?.certificate || '';
     const weekHeader = weekCard.querySelector('.week-title-group h3')?.textContent.trim() || `Week ${weekNumber}`;
+    
     if (!theme) {
       const headerParts = weekHeader.split(':');
       theme = headerParts.length > 1 ? headerParts[1].trim() : weekHeader;
     }
-    const goals = (overrides?.goals && overrides.goals.length > 0) ? overrides.goals : collectGoalsFromWeekCard(weekCard);
-    if (goals.length === 0) {
-      goals.push(theme);
-    }
+    
+    const goals = (overrides?.goals && overrides.goals.length > 0) 
+      ? overrides.goals 
+      : collectGoalsFromWeekCard(weekCard);
+    
+    if (goals.length === 0) goals.push(theme);
+    
     return {
       weekNumber,
       theme,
@@ -672,23 +437,28 @@ layout: post
     };
   }
 
+  /**
+   * ============================================
+   * GOAL PREVIEW RENDERING: Display learning goals
+   * ============================================
+   */
   function renderWeekGoalPreviews() {
     document.querySelectorAll('.week-card').forEach(card => {
       const preview = card.querySelector('[data-week-skills]');
       if (!preview) return;
+      
       const weekNumber = extractWeekNumber(card);
       const profile = buildCertificateProfile(card, weekNumber);
       if (!profile) return;
+      
       preview.innerHTML = '';
       preview.className = 'week-goals-container';
       
-      // Add label
       const label = document.createElement('span');
       label.className = 'goals-label';
       label.textContent = 'Learning Goals';
       preview.appendChild(label);
       
-      // Add goals list
       const goalsList = document.createElement('div');
       goalsList.className = 'goals-list';
       
@@ -708,54 +478,48 @@ layout: post
     });
   }
 
-  // Get available certificates for a week
+  /**
+   * ============================================
+   * CERTIFICATE AVAILABILITY: Check completion
+   * ============================================
+   */
   function getAvailableCertificates(weekNumber) {
-    console.log('Getting certificates for week:', weekNumber);
     const weekCard = getWeekCardElement(weekNumber);
-
-    if (!weekCard) {
-      console.log('Week card not found for week:', weekNumber);
-      return [];
-    }
+    if (!weekCard) return [];
 
     const itemCards = weekCard.querySelectorAll('.item-card');
-    console.log('Found', itemCards.length, 'item cards');
-    if (itemCards.length === 0) {
-      return [];
-    }
+    if (itemCards.length === 0) return [];
 
-    const allCompleted = Array.from(itemCards).every(card => card.classList.contains('completed'));
-    if (!allCompleted) {
-      console.log('Week not fully completed, certificates locked.');
-      return [];
-    }
+    const allCompleted = Array.from(itemCards).every(card => 
+      card.classList.contains('completed')
+    );
+    if (!allCompleted) return [];
 
     const profile = buildCertificateProfile(weekCard, weekNumber);
-    if (!profile) {
-      return [];
-    }
+    if (!profile) return [];
 
-    const certificates = (profile.goals || []).map(goalName => {
-      return {
-        weekNumber: profile.weekNumber,
-        theme: profile.theme,
-        courseName: profile.courseName,
-        goal: goalName,
-        displayName: `${profile.theme} – ${goalName}`,
-        slug: `${CURRENT_COURSE}-${profile.weekNumber}-${goalName}`.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-      };
-    });
-
-    return certificates;
+    return (profile.goals || []).map(goalName => ({
+      weekNumber: profile.weekNumber,
+      theme: profile.theme,
+      courseName: profile.courseName,
+      goal: goalName,
+      displayName: `${profile.theme} – ${goalName}`,
+      slug: `${CURRENT_COURSE}-${profile.weekNumber}-${goalName}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+    }));
   }
 
-  // Open progression modal for entire sprint
+  /**
+   * ============================================
+   * PROGRESSION MODAL: Open for entire sprint
+   * ============================================
+   */
   function openProgressionModal(sprintKey, startWeek, endWeek) {
     console.log('Opening progression modal for sprint:', sprintKey, 'weeks', startWeek, '-', endWeek);
     
-    currentModalWeekNumber = null; // Not using this for sprint-level
+    currentModalWeekNumber = null;
     
-    // Get sprint card and title
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
     if (!sprintCard) {
       console.log('Sprint card not found');
@@ -763,19 +527,15 @@ layout: post
     }
     
     const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
-    const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
     
-    // Set sprint title and subtitle
     document.getElementById('modal-sprint-title').textContent = sprintTitle;
     document.getElementById('modal-sprint-subtitle').textContent = `${sprintKey} (Weeks ${startWeek}-${endWeek})`;
 
-    // Populate task list with all weeks in sprint
     const taskList = document.getElementById('task-list');
     taskList.innerHTML = '';
     
     let globalTaskIndex = 0;
     
-    // Iterate through all weeks in the sprint
     for (let weekNum = startWeek; weekNum <= endWeek; weekNum++) {
       const weekCard = Array.from(sprintCard.querySelectorAll('.week-card')).find(card => 
         extractWeekNumber(card) === weekNum
@@ -783,14 +543,12 @@ layout: post
       
       if (!weekCard) continue;
       
-      // Add week header in task list
       const weekHeader = document.createElement('div');
       weekHeader.className = 'progression-week-header';
       const weekTitle = weekCard.querySelector('[data-week-title]')?.textContent || `Week ${weekNum}`;
       weekHeader.textContent = weekTitle;
       taskList.appendChild(weekHeader);
       
-      // Add tasks for this week
       const itemCards = weekCard.querySelectorAll('.item-card');
       itemCards.forEach((card) => {
         const title = card.querySelector('.item-title').textContent;
@@ -803,7 +561,6 @@ layout: post
           <span class="task-number">#${globalTaskIndex + 1}</span>
         `;
 
-        // Add change listener
         const checkbox = taskDiv.querySelector('input[type="checkbox"]');
         checkbox.addEventListener('change', function() {
           const toggleBtn = card.querySelector('.completion-toggle');
@@ -822,16 +579,13 @@ layout: post
     updateModalProgress();
     updateCertificateStatusForSprint(sprintKey, startWeek, endWeek);
 
-    // Show modal
     document.getElementById('progression-modal').style.display = 'block';
   }
 
-  // Close progression modal
   function closeProgressionModal() {
     document.getElementById('progression-modal').style.display = 'none';
   }
 
-  // Update modal progress
   function updateModalProgress() {
     const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
     const checked = document.querySelectorAll('#task-list input[type="checkbox"]:checked');
@@ -839,7 +593,11 @@ layout: post
     document.getElementById('modal-progress-fill').style.width = `${progress}%`;
   }
 
-  // Update certificate status
+  /**
+   * ============================================
+   * CERTIFICATE STATUS: Update in progression modal
+   * ============================================
+   */
   function updateCertificateStatus() {
     const availableCertificates = getAvailableCertificates(currentModalWeekNumber);
     const certificateStatus = document.getElementById('certificate-status');
@@ -855,7 +613,6 @@ layout: post
     }
   }
   
-  // Update certificate status for entire sprint
   function updateCertificateStatusForSprint(sprintKey, startWeek, endWeek) {
     const certificateStatus = document.getElementById('certificate-status');
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
@@ -865,7 +622,6 @@ layout: post
       return;
     }
     
-    // Check if ALL tasks in the sprint are complete
     let totalTasks = 0;
     let completedTasks = 0;
     
@@ -899,9 +655,12 @@ layout: post
     }
   }
 
-  // Show certificate notification toast
+  /**
+   * ============================================
+   * NOTIFICATIONS: Display feedback to user
+   * ============================================
+   */
   function showCertificateNotification(type, title, message) {
-    // Remove existing notification if any
     const existing = document.querySelector('.cert-notification');
     if (existing) existing.remove();
 
@@ -925,19 +684,15 @@ layout: post
     `;
     
     document.body.appendChild(notification);
-    
-    // Animate in
     requestAnimationFrame(() => {
       notification.classList.add('cert-notification-visible');
     });
     
-    // Close button handler
     notification.querySelector('.cert-notification-close').addEventListener('click', () => {
       notification.classList.remove('cert-notification-visible');
       setTimeout(() => notification.remove(), 300);
     });
     
-    // Auto-dismiss after 5 seconds for success/info
     if (type === 'success' || type === 'info') {
       setTimeout(() => {
         if (notification.parentNode) {
@@ -948,16 +703,19 @@ layout: post
     }
   }
 
-  // Function to request certificate from backend
+  /**
+   * ============================================
+   * CERTIFICATE API: Request from backend
+   * ============================================
+   */
   async function requestCertificate(sprintKey, formative, summative) {
     try {
       const configModule = await import('{{ site.baseurl }}/assets/js/api/config.js');
       const { javaURI, fetchOptions } = configModule;
       
-      // Fine-tune: Convert "Sprint1" to "Sprint 1" and extract ID
       const sprintNumber = sprintKey.replace('Sprint', '');
       const formattedSprintName = `Sprint ${sprintNumber}`;
-      const certId = parseInt(sprintNumber) || 1; // Sprint 1 -> ID 1, etc.
+      const certId = parseInt(sprintNumber) || 1;
 
       const payload = {
         formativeAssignments: formative,
@@ -989,7 +747,11 @@ layout: post
     }
   }
 
-  // Open certificate for sprint (directly show the certificate, no list needed)
+  /**
+   * ============================================
+   * CERTIFICATE LIST MODAL: Open for a sprint
+   * ============================================
+   */
   async function openCertificateListModal(sprintKey, startWeek, endWeek) {
     const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
     if (!sprintCard) {
@@ -1000,7 +762,6 @@ layout: post
     const sprintTitle = sprintCard.querySelector('.sprint-title')?.textContent || sprintKey;
     const sprintDescription = sprintCard.querySelector('.sprint-meta:last-of-type')?.textContent || '';
     
-    // Check if sprint is complete
     let totalTasks = 0;
     let completedTasks = 0;
     const formative = [];
@@ -1019,9 +780,8 @@ layout: post
           if (card.classList.contains('completed')) {
             completedTasks++;
           }
-          // Collect unique task titles
           const taskTitle = card.querySelector('.item-title')?.textContent.trim();
-          const itemType = card.dataset.type; // "lesson" (formative) or "assignment" (summative)
+          const itemType = card.dataset.type;
           
           if (taskTitle) {
             if (itemType === 'lesson') {
@@ -1042,7 +802,6 @@ layout: post
       return;
     }
 
-    // Show loading state with spinner
     const viewBtn = document.getElementById('view-certificate-btn');
     const originalText = viewBtn ? viewBtn.textContent : 'View Your Certificate';
     if (viewBtn) {
@@ -1051,7 +810,6 @@ layout: post
       viewBtn.classList.add('cert-btn-loading');
     }
 
-    // Request from backend
     const result = await requestCertificate(sprintKey, formative, summative);
     
     if (viewBtn) {
@@ -1060,7 +818,6 @@ layout: post
       viewBtn.classList.remove('cert-btn-loading');
     }
 
-    // Handle different responses with improved notifications
     switch (result.status) {
       case 'INCOMPLETE':
         showCertificateNotification('warning', 'Missing Grades', `You are missing grades for: ${result.missingAssignments.join(', ')}`);
@@ -1070,7 +827,6 @@ layout: post
         return;
       case 'ALREADY_EARNED':
         console.log(`User already has ${result.existingType} certificate.`);
-        // Proceed to show existing one
         break;
       case 'UPGRADED':
         showCertificateNotification('success', 'Certificate Upgraded!', `Congratulations! You improved to ${result.averageScore}% and earned an EXCELLENCE certificate!`);
@@ -1086,12 +842,10 @@ layout: post
         console.log('Unexpected status:', result.status);
     }
 
-    // Determine certificate type for display (Use existingType if ALREADY_EARNED)
     const backendCertType = result.status === 'ALREADY_EARNED' ? result.existingType : result.certificateType;
     const certTypeLabel = backendCertType === 'EXCELLENCE' ? 'Excellence' : 'Completion';
     const displayTheme = `${sprintTitle} (${certTypeLabel})`;
     
-    // Create sprint-level certificate profile
     const certificateProfile = {
       sprintKey: sprintKey,
       theme: displayTheme,
@@ -1101,75 +855,18 @@ layout: post
       goals: allGoals.slice(0, 6), 
       weekRange: `Weeks ${startWeek}-${endWeek}`,
       description: sprintDescription,
-      averageScore: result.averageScore || result.score, // Handle both payload versions
+      averageScore: result.averageScore || result.score,
       certType: backendCertType
     };
     
-    // Open certificate modal directly
     openCertificateModal(certificateProfile);
   }
-  
-  // ===========================
-  // HELP MODAL FUNCTIONALITY
-  // ===========================
-  
-  // Open help modal
-  function openHelpModal(sprintKey, helpUrl) {
-    const sprintCard = document.querySelector(`.sprint-card[data-sprint="${sprintKey}"]`);
-    if (!sprintCard) {
-      console.error('Sprint card not found');
-      return;
-    }
-    
-    // Load markdown content
-    loadHelpContent(helpUrl);
-    
-    // Show modal
-    document.getElementById('help-modal').style.display = 'block';
-  }
-  
-  // Close help modal
-  function closeHelpModal() {
-    document.getElementById('help-modal').style.display = 'none';
-  }
-  
-  // Load help content from Jekyll-rendered page
-  async function loadHelpContent(helpUrl) {
-    const contentDiv = document.getElementById('help-content');
-    contentDiv.innerHTML = '<p style="text-align: center; color: #666;">Loading...</p>';
-    
-    try {
-      const response = await fetch(helpUrl);
-      if (!response.ok) {
-        throw new Error('Failed to load help content');
-      }
-      
-      const html = await response.text();
-      
-      // Parse the HTML to extract just the content
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      // Try to find the main content - adjust selector based on your layout
-      // Common selectors: article, .post-content, .content, main
-      let content = doc.querySelector('article') || 
-                    doc.querySelector('.post-content') || 
-                    doc.querySelector('.content') ||
-                    doc.querySelector('main');
-      
-      if (content) {
-        contentDiv.innerHTML = content.innerHTML;
-      } else {
-        // Fallback: use body content if no specific container found
-        contentDiv.innerHTML = doc.body.innerHTML;
-      }
-    } catch (error) {
-      console.error('Error loading help content:', error);
-      contentDiv.innerHTML = '<p style="color: #e53e3e;">Failed to load help content. Please try again later.</p>';
-    }
-  }
-  
-  // Legacy function for week-level (keep for backward compatibility)
+
+  /**
+   * ============================================
+   * CERTIFICATE LIST MODAL: Legacy week-level
+   * ============================================
+   */
   function openCertificateListModalForWeek(weekNumber) {
     document.getElementById('list-modal-sprint-title').textContent = `Week ${weekNumber}`;
     const certificateList = document.getElementById('certificate-list');
@@ -1193,26 +890,30 @@ layout: post
     document.getElementById('certificate-list-modal').style.display = 'block';
   }
 
-  // Open certificate modal
+  /**
+   * ============================================
+   * CERTIFICATE MODAL: Render and display
+   * ============================================
+   */
   function openCertificateModal(profile) {
     activeCertificateProfile = profile;
+
     document.getElementById('certificate-week-theme').textContent = profile.theme;
     document.getElementById('certificate-course-name').textContent = profile.courseName;
 
-    // Set type and score if available
     const typeText = document.getElementById('certificate-type-text');
-    const scoreDisplay = document.getElementById('certificate-score-display');
-    const content = document.getElementById('certificate-content');
-
     if (typeText) {
-      typeText.textContent = profile.certType === 'EXCELLENCE' ? 'Certificate of Excellence' : 'Certificate of Completion';
+      typeText.textContent = profile.certType === 'EXCELLENCE' 
+        ? 'Certificate of Excellence' 
+        : 'Certificate of Completion';
     }
 
+    const scoreDisplay = document.getElementById('certificate-score-display');
     if (scoreDisplay) {
       scoreDisplay.textContent = profile.averageScore ? `Average Score: ${profile.averageScore}%` : '';
     }
 
-    // Apply special styling for Excellence
+    const content = document.getElementById('certificate-content');
     if (content) {
       if (profile.certType === 'EXCELLENCE') {
         content.classList.add('excellence-theme');
@@ -1221,16 +922,13 @@ layout: post
       }
     }
 
-    // Set date
     const now = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('certificate-date').textContent = now.toLocaleDateString('en-US', options);
 
-    // Set goals - for sprint certificates, use the sprint title as main focus
     const goalFocus = profile.goal || profile.theme;
     document.getElementById('certificate-skill-focus').textContent = goalFocus;
 
-    // Add all goals/tasks as skill tags
     const goalsContainer = document.getElementById('skills-container');
     goalsContainer.innerHTML = '';
     
@@ -1242,22 +940,23 @@ layout: post
       goalsContainer.appendChild(goalTag);
     });
 
-    // Close list modal and open certificate modal
     document.getElementById('certificate-list-modal').style.display = 'none';
     document.getElementById('certificate-modal').style.display = 'block';
   }
 
-  // Close certificate modal
   function closeCertificateModal() {
     document.getElementById('certificate-modal').style.display = 'none';
   }
 
-  // Close certificate list modal
   function closeCertificateListModal() {
     document.getElementById('certificate-list-modal').style.display = 'none';
   }
 
-  // Download certificate
+  /**
+   * ============================================
+   * CERTIFICATE EXPORT: Download / Print / Share
+   * ============================================
+   */
   function downloadCertificate() {
     const certificateContent = document.getElementById('certificate-content');
     html2canvas(certificateContent, {
@@ -1273,19 +972,20 @@ layout: post
     });
   }
 
-  // Print certificate
   function printCertificate() {
     window.print();
   }
 
-  // Share on LinkedIn by opening the certification form with prefilled data
   function shareOnLinkedIn() {
     const profile = activeCertificateProfile;
-    const certificateName = profile?.displayName || profile?.theme || document.getElementById('certificate-week-theme')?.textContent.trim() || 'Course Module Completion';
-    const courseName = profile?.courseName || document.getElementById('certificate-course-name')?.textContent.trim() || 'Open Coding Society';
+    const certificateName = profile?.displayName || profile?.theme || 
+      document.getElementById('certificate-week-theme')?.textContent.trim() || 'Course Module Completion';
+    const courseName = profile?.courseName || 
+      document.getElementById('certificate-course-name')?.textContent.trim() || 'Open Coding Society';
     const studentName = document.getElementById('certificate-student-name')?.textContent.trim() || 'Learner';
     const issueDateText = document.getElementById('certificate-date')?.textContent.trim() || '';
-    const goalFocus = profile?.goal || document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
+    const goalFocus = profile?.goal || 
+      document.getElementById('certificate-skill-focus')?.textContent.trim() || certificateName;
 
     let issueMonth = '';
     let issueYear = '';
@@ -1300,7 +1000,7 @@ layout: post
 
     const params = new URLSearchParams({
       startTask: 'CERTIFICATION_NAME',
-      name: `${certificateName}`,
+      name: certificateName,
       organizationName: 'Open Coding Society',
       issueYear,
       issueMonth,
@@ -1312,79 +1012,108 @@ layout: post
     window.open(linkedInUrl, '_blank', 'noopener');
   }
 
-  // Initialize certificate system
-  function initializeCertificateSystem() {
-    // Sprint-level progression buttons
-    document.querySelectorAll('.sprint-controls .progression-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const sprintKey = btn.dataset.sprint;
-        const startWeek = parseInt(btn.dataset.start);
-        const endWeek = parseInt(btn.dataset.end);
-        openProgressionModal(sprintKey, startWeek, endWeek);
-      });
-    });
+  /**
+   * ============================================
+   * HELP MODAL: Load and display content
+   * ============================================
+   */
+  async function loadHelpContent(helpUrl) {
+    const contentDiv = document.getElementById('help-content');
+    contentDiv.innerHTML = '<p style="text-align: center; color: #666;">Loading...</p>';
     
-    console.log('Initializing certificate system');
-
-    const weekCards = document.querySelectorAll('.week-card');
-    console.log('Found', weekCards.length, 'week cards');
-
-    function toggleSprint(card, control) {
-      const isCollapsed = card.classList.toggle('collapsed');
-      if (control) {
-        control.setAttribute('aria-expanded', (!isCollapsed).toString());
-        control.querySelector('.sprint-toggle-icon').textContent = isCollapsed ? '▸' : '▾';
-      }
+    try {
+      const response = await fetch(helpUrl);
+      if (!response.ok) throw new Error('Failed to load help content');
+      
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      let content = doc.querySelector('article') || 
+                    doc.querySelector('.post-content') || 
+                    doc.querySelector('.content') ||
+                    doc.querySelector('main');
+      
+      contentDiv.innerHTML = content ? content.innerHTML : doc.body.innerHTML;
+    } catch (error) {
+      console.error('Error loading help content:', error);
+      contentDiv.innerHTML = '<p style="color: #e53e3e;">Failed to load help content. Please try again later.</p>';
     }
+  }
 
-    document.querySelectorAll('.sprint-card').forEach(card => {
-      const toggleBtn = card.querySelector('.sprint-toggle-btn');
-      if (toggleBtn) {
-        toggleBtn.querySelector('.sprint-toggle-icon').textContent = '▸';
-        toggleBtn.addEventListener('click', (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          toggleSprint(card, toggleBtn);
-        });
-      }
-      card.querySelector('.sprint-header').addEventListener('click', (event) => {
-        if (event.target.closest('.sprint-controls')) {
-          return;
-        }
-        toggleSprint(card, toggleBtn);
-      });
+  // Called by inline onclick="openHelpModal(...)" in sprint-card.html
+  function openHelpModal(sprintKey, helpUrl) {
+    loadHelpContent(helpUrl);
+    document.getElementById('help-modal').style.display = 'block';
+  }
+
+  function closeHelpModal() {
+    document.getElementById('help-modal').style.display = 'none';
+  }
+
+  /**
+   * ============================================
+   * MODAL CLOSE WIRING: Id-based buttons from
+   * sprint-modals.html (close-* ids)
+   * ============================================
+   */
+  function wireModalCloseButtons() {
+    const closeMap = {
+      'close-progression-modal':    closeProgressionModal,
+      'close-certificate-list-modal': closeCertificateListModal,
+      'close-certificate-modal':    closeCertificateModal,
+      'close-help-modal':           closeHelpModal,
+    };
+
+    Object.entries(closeMap).forEach(([id, fn]) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', fn);
     });
 
-    // Close buttons
-    document.getElementById('close-progression-modal').addEventListener('click', closeProgressionModal);
-    document.getElementById('close-certificate-list-modal').addEventListener('click', closeCertificateListModal);
-    document.getElementById('close-certificate-modal').addEventListener('click', closeCertificateModal);
+    // Certificate action buttons
+    const downloadBtn = document.getElementById('download-certificate-btn');
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadCertificate);
 
-    // Certificate actions
-    document.getElementById('download-certificate-btn').addEventListener('click', downloadCertificate);
-    document.getElementById('print-certificate-btn').addEventListener('click', printCertificate);
-    document.getElementById('linkedin-share-btn').addEventListener('click', shareOnLinkedIn);
+    const printBtn = document.getElementById('print-certificate-btn');
+    if (printBtn) printBtn.addEventListener('click', printCertificate);
 
-    // View certificate button (handles sprint-level data)
+    const linkedinBtn = document.getElementById('linkedin-share-btn');
+    if (linkedinBtn) linkedinBtn.addEventListener('click', shareOnLinkedIn);
+  }
+
+  /**
+   * ============================================
+   * VIEW CERTIFICATE BUTTON: Delegated listener
+   * The button is injected dynamically by
+   * updateCertificateStatusForSprint so we need
+   * event delegation on the document.
+   * ============================================
+   */
+  function wireViewCertificateButton() {
     document.addEventListener('click', function(e) {
-      if (e.target.id === 'view-certificate-btn') {
-        console.log('Certificate button clicked!');
-        console.log('Sprint key:', e.target.dataset.sprint);
-        console.log('Start week:', e.target.dataset.start);
-        console.log('End week:', e.target.dataset.end);
-        
-        closeProgressionModal();
-        const sprintKey = e.target.dataset.sprint;
-        const startWeek = parseInt(e.target.dataset.start);
-        const endWeek = parseInt(e.target.dataset.end);
-        
+      // ── Certificate icon button on each sprint card ──────────────────
+      const certBtn = e.target.closest('.sprint-btn.certificate');
+      if (certBtn) {
+        const sprintKey  = certBtn.dataset.sprint;
+        const startWeek  = parseInt(certBtn.dataset.start);
+        const endWeek    = parseInt(certBtn.dataset.end);
         if (sprintKey && !isNaN(startWeek) && !isNaN(endWeek)) {
-          console.log('Calling openCertificateListModal with:', sprintKey, startWeek, endWeek);
+          openProgressionModal(sprintKey, startWeek, endWeek);
+        }
+        return;
+      }
+
+      // ── "View Your Certificate" button (injected dynamically) ────────
+      if (e.target && e.target.id === 'view-certificate-btn') {
+        const sprintKey  = e.target.dataset.sprint;
+        const startWeek  = parseInt(e.target.dataset.start);
+        const endWeek    = parseInt(e.target.dataset.end);
+
+        closeProgressionModal();
+
+        if (sprintKey && !isNaN(startWeek) && !isNaN(endWeek)) {
           openCertificateListModal(sprintKey, startWeek, endWeek);
         } else if (currentModalWeekNumber) {
-          // Fallback to old week-level behavior if needed
-          console.log('Falling back to week-level with week:', currentModalWeekNumber);
           openCertificateListModalForWeek(currentModalWeekNumber);
         } else {
           console.error('No sprint data or week number available');
@@ -1393,33 +1122,13 @@ layout: post
     });
   }
 
-  // Cross-view synchronization - sync when switching between timeline and two-pane views
-  window.addEventListener('focus', function() {
-    updateAllCompletionStates();
-  });
-  
-  // Sync when page becomes visible (handles tab switching)
-  document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-      updateAllCompletionStates();
-    }
-  });
-  
-  // Listen for storage changes from other tabs/windows (cross-tab sync)
-  window.addEventListener('storage', function(e) {
-    if (e.key === STORAGE_KEY) {
-      updateAllCompletionStates();
-    }
-  });
-  
-  // Listen for completion changes from other views (same-window sync)
-  window.addEventListener('completionChanged', function(e) {
-    updateAllCompletionStates();
-  });
-
-  // Update all completion states from localStorage
+  /**
+   * ============================================
+   * SYNCHRONIZATION: Cross-tab & event listeners
+   * ============================================
+   */
   function updateAllCompletionStates() {
-    const completionData = loadCompletionData();
+    const completionData = getCompletionData();
     const itemCards = document.querySelectorAll('.item-card');
     
     itemCards.forEach(card => {
@@ -1427,24 +1136,47 @@ layout: post
       const isCompleted = completionData[itemId] || false;
       updateItemUI(card, isCompleted);
     });
-    
-    updateProgressBars();
+
+    updateWeekProgressBars();
   }
 
-  // Mobile-specific enhancements
+  function setupSyncListeners() {
+    window.addEventListener('storage', (e) => {
+      if (e.key === STORAGE_KEY) {
+        updateAllCompletionStates();
+      }
+    });
+
+    window.addEventListener('completionChanged', () => {
+      updateAllCompletionStates();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        updateAllCompletionStates();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      updateAllCompletionStates();
+    });
+  }
+
+  /**
+   * ============================================
+   * MOBILE ENHANCEMENTS: Touch & orientation
+   * ============================================
+   */
   function initMobileEnhancements() {
     if (window.innerWidth <= 768) {
-      // Auto-collapse all sprints on mobile for better navigation
       document.querySelectorAll('.sprint-card:not(.collapsed)').forEach(card => {
         card.classList.add('collapsed');
       });
-      
-      // Add touch-friendly interactions for modals
+
       document.querySelectorAll('.progression-btn').forEach(btn => {
-        btn.style.minHeight = '44px'; // iOS recommended touch target size
+        btn.style.minHeight = '44px';
       });
-      
-      // Improve modal close buttons for mobile
+
       document.querySelectorAll('.close-btn').forEach(btn => {
         btn.style.minWidth = '44px';
         btn.style.minHeight = '44px';
@@ -1453,56 +1185,64 @@ layout: post
         btn.style.justifyContent = 'center';
       });
     }
+
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => {
+        updateWeekProgressBars();
+        initMobileEnhancements();
+      }, 100);
+    });
   }
 
-  // Handle orientation changes
-  window.addEventListener('orientationchange', function() {
-    setTimeout(function() {
-      updateProgressBars();
-      initMobileEnhancements();
-    }, 100);
-  });
+  /**
+   * ============================================
+   * PAGE INITIALIZATION
+   * ============================================
+   */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Data
+    initializeSkillLibrary();
 
-  document.addEventListener('DOMContentLoaded', function() {
+    // UI state
     initializeProgressBars();
     initializeCompletion();
-    initializeItemPriorities();
-    initializeSprintFilters();
-    initializeCertificateSystem();
-    renderWeekGoalPreviews();
-    initMobileEnhancements();
-    initializeHelpButtons();
-    initializeSprintDates();
-  });
-  
-  // Initialize help button event listeners
-  function initializeHelpButtons() {
-    // Help button click handlers
-    document.querySelectorAll('.help-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const sprintKey = btn.dataset.sprint;
-        const helpUrl = btn.dataset.helpUrl;
+
+    // Event listeners
+    attachCompletionToggleListeners();
+    attachPriorityListeners();
+    attachFilterListeners();
+    attachSprintToggleListeners();
+
+    // Modal wiring
+    wireModalCloseButtons();
+    wireViewCertificateButton();
+
+    // Help buttons (data-help-url driven, for any non-inline callers)
+    document.querySelectorAll('[data-help-url]').forEach(button => {
+      button.addEventListener('click', () => {
+        const helpUrl = button.dataset.helpUrl;
+        const sprintKey = button.dataset.sprint || 
+          button.closest('[data-sprint]')?.dataset.sprint;
         openHelpModal(sprintKey, helpUrl);
       });
     });
-    
-    // Close help modal
-    const closeHelpBtn = document.getElementById('close-help-modal');
-    if (closeHelpBtn) {
-      closeHelpBtn.addEventListener('click', closeHelpModal);
+
+    // Cross-tab sync
+    setupSyncListeners();
+
+    // Rendering
+    renderWeekGoalPreviews();
+
+    // Mobile
+    initMobileEnhancements();
+
+    // Calendar (defined in calendar.html include)
+    if (typeof initializeSprintDates === 'function') {
+      initializeSprintDates();
     }
-    
-    // Close on outside click
-    const helpModal = document.getElementById('help-modal');
-    if (helpModal) {
-      helpModal.addEventListener('click', (e) => {
-        if (e.target === helpModal) {
-          closeHelpModal();
-        }
-      });
-    }
-  }
+
+    console.log('Sprint page initialized successfully');
+  });
 
 </script>
 </div>

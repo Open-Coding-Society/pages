@@ -1,0 +1,103 @@
+<!-- ============================= -->
+<!--   PROGRESSION MODAL         -->
+<!-- ============================= -->
+<div id="progression-modal" class="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-close" id="close-progression-modal">&times;</button>
+    <h2><span id="modal-sprint-title"></span> Progress</h2>
+    <p class="week-theme" id="modal-sprint-subtitle"></p>
+    <div class="progress-bar-container" style="margin-bottom: 16px;">
+      <div id="modal-progress-fill" style="height: 8px; background: #60a5fa; width: 0%; transition: width 0.3s;"></div>
+    </div>
+    <div id="task-list"></div>
+    <div id="certificate-status" style="margin-top: 24px;"></div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--   CERTIFICATE LIST MODAL     -->
+<!-- ============================= -->
+<div id="certificate-list-modal" class="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-close" id="close-certificate-list-modal">&times;</button>
+    <h2><span id="list-modal-sprint-title"></span> Certificates</h2>
+    <div id="certificate-list"></div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--    CERTIFICATE DISPLAY MODAL  -->
+<!-- ============================= -->
+<div id="certificate-modal" class="modal-overlay">
+  <div class="modal-content certificate-modal">
+    <div class="action-bar">
+      <button class="action-btn btn-download-cert">
+        <i class="fas fa-download"></i> Download PNG
+      </button>
+      <button class="action-btn secondary-btn btn-print-cert">
+        <i class="fas fa-print"></i> Print
+      </button>
+      <button class="action-btn btn-share-linkedin">
+        <i class="fab fa-linkedin"></i> Share on LinkedIn
+      </button>
+      <button class="action-btn secondary-btn modal-close">Close</button>
+    </div>
+
+    <div id="certificate-content" class="certificate-display">
+      <div class="certificate-container">
+        <div class="certificate-heading">
+          <div class="certificate-emblem">
+            <img id="certificate-logo" src="{{ '/assets/images/ocs-logo.png' | relative_url }}" alt="Open Coding Society Logo">
+          </div>
+          <div class="header-text">Open Coding Society</div>
+          <div id="certificate-type-text" class="certify-text">Certificate of Completion</div>
+          <div id="certificate-score-display" style="margin-top: 5px; font-size: 1.1rem; color: #4b5563;"></div>
+          <div class="certificate-subtitle">Presented to</div>
+        </div>
+
+        <div contenteditable="true" id="certificate-student-name" class="certificate-name-field"></div>
+
+        <div class="achievement-text">
+          Has successfully completed the module:
+          <br><strong id="certificate-week-theme"></strong><br>
+          as part of the course<br>
+          <strong id="certificate-course-name"></strong>.
+        </div>
+
+        <div class="skill-focus-pill">
+          <span id="certificate-skill-focus">Skill Focus</span>
+        </div>
+
+        <div id="certificate-date" class="certificate-date-field"></div>
+
+        <div class="certificate-divider"></div>
+
+        <div id="certificate-skills" class="certificate-skills">
+          <h3 class="skills-heading">Skills Demonstrated</h3>
+          <div id="skills-container" class="skills-list"></div>
+        </div>
+
+        <div class="signature-section">
+          <div class="signature">
+            <div class="signature-line"></div>
+            <div class="signature-name">John Mortensen</div>
+            <div class="signature-title">Course Instructor</div>
+            <div class="signature-subtitle">Open Coding Society</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--       HELP MODAL             -->
+<!-- ============================= -->
+<div id="help-modal" class="modal-overlay">
+  <div class="modal-content help-modal">
+    <button class="modal-close" id="close-help-modal">&times;</button>
+    <div id="help-content" class="help-content-area">
+      <!-- Markdown content will be loaded here -->
+    </div>
+  </div>
+</div>

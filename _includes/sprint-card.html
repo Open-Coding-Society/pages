@@ -1,0 +1,145 @@
+<!-- SPRINT CARD - Container for all weeks in a sprint -->
+{% comment %}
+  Expects:
+    - unit: unit number (from units loop)
+    - unitKey: "Sprint" + unit
+    - unitData: sprint data from course YAML
+    - courseUnit: course unit reference
+    - start: start week number
+    - end: end week number
+    - helpUrl: optional help URL
+    - page: page object with course
+    - posts: all posts/pages
+    - sites: site data
+    - shared: shared data
+{% endcomment %}
+
+<div class="sprint-card collapsed" data-sprint="{{ unitKey }}" data-course="{{ page.course }}">
+  <div class="sprint-header" style="display: flex; flex-direction: column; gap: 12px;">
+    <div class="sprint-controls" style="display: flex; gap: 8px; align-items: center; justify-content: space-between; width: 100%;">
+      
+      <!-- Sprint Label and Weeks Toggle on the left -->
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <p style="margin: 0;">{{ unitKey }}</p>
+        <button class="sprint-toggle-btn" type="button" aria-expanded="false">
+          <span class="sprint-toggle-icon">▾</span> {{ start }} - {{ end }} Weeks
+        </button>
+      </div>
+
+      <!-- Divider between left and right controls -->
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <!-- Sprint Calendar Sync -->
+        <div class="sprint-date-control">
+          <button class="sprint-btn date-toggle" type="button" data-sprint="{{ unitKey }}" title="Sync Sprint to Calendar">
+            <i class="fas fa-calendar-alt"></i>
+          </button>
+          <div class="sprint-date-dropdown hidden" data-sprint="{{ unitKey }}">
+            <div class="date-dropdown-header">
+              <span>Sync to Calendar</span>
+              <button class="date-dropdown-close" type="button">&times;</button>
+            </div>
+            <div class="calendar-sync-info">
+              <div class="sprint-week-range">
+                <i class="fas fa-info-circle"></i>
+                <span>This sprint covers <strong>Weeks {{ start }}-{{ end }}</strong></span>
+              </div>
+              <div class="sprint-date-preview" data-sprint="{{ unitKey }}">
+                <div class="date-preview-loading">Loading calendar dates...</div>
+              </div>
+            </div>
+            <div class="date-actions">
+              <button class="advanced-sync-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}" type="button">
+                <i class="fas fa-sync"></i> Sync to Calendar
+              </button>
+              <button class="advanced-remove-btn" data-sprint="{{ unitKey }}" data-course="{{ page.course }}" data-start-week="{{ start }}" data-end-week="{{ end }}" type="button">
+                <i class="fas fa-trash-alt"></i> Remove from Calendar
+              </button>
+            </div>
+            <p class="sprint-date-status" data-sprint="{{ unitKey }}"></p>
+          </div>
+        </div>
+        <!-- Help Button -->
+        {% if helpUrl %}
+        <button class="sprint-btn help" type="button" data-sprint="{{ unitKey }}" data-help-url="{{ helpUrl }}" title="Help & Navigation Guide">
+          <i class="fas fa-question"></i>
+        </button>
+        {% endif %}
+        <!-- Certificate Button -->
+        <button class="sprint-btn certificate" type="button" data-sprint="{{ unitKey }}" data-start="{{ start }}" data-end="{{ end }}" title="Progress & Certificates">
+          <i class="fas fa-certificate"></i>
+        </button>
+      </div>
+      <!-- End of right controls -->
+    </div>
+
+    <!-- Full-width sprint info section below buttons -->
+    <div class="sprint-info-full" style="width: 100%;">
+      <h2 class="sprint-title">{{ unitData.title }}</h2>
+      {% if unitData.description %}
+        <p class="sprint-meta">{{ unitData.description }}</p>
+      {% endif %}
+    </div>
+
+    <!-- End of Sprint Header-->
+  </div>
+
+  <!-- Weeks Container -->
+  <div class="sprint-weeks">
+    <div class="sprint-body">
+      {% for index in (start..end) %}
+        {% assign entries = null | compact %}
+        {% assign totalItems = 0 %}
+        {% assign completedItems = 0 %}
+
+        <!-- Collect entries for this week -->
+        {% for post in posts %}
+          {% if post.courses[page.course] %}
+            {% assign course_count = 0 %}
+            {% for course in post.courses %}
+              {% assign course_count = course_count | plus: 1 %}
+            {% endfor %}
+            {% if course_count == 1 %}
+              {% assign week = post.courses[page.course].week | plus: 0 %}
+              {% if week == index %}
+                {% if post.assignment == true %}
+                  {% assign itemType = "assignment" %}
+                {% else %}
+                  {% assign itemType = "lesson" %}
+                {% endif %}
+                {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: itemType %}
+                {% assign entries = entries | push: entry %}
+                {% assign totalItems = totalItems | plus: 1 %}
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        <!-- Process entries into assignment/lesson titles -->
+        {% assign assignmentTitles = "" %}
+        {% assign lessonTitles = "" %}
+        {% assign allEntries = "" %}
+        {% for entry in entries %}
+          {% assign parts = entry | split: "||" %}
+          {% if parts[2] == "assignment" %}
+            {% if assignmentTitles != "" %}
+              {% assign assignmentTitles = assignmentTitles | append: ";;;" %}
+            {% endif %}
+            {% assign assignmentTitles = assignmentTitles | append: parts[0] | append: "|||" | append: parts[1] %}
+          {% else %}
+            {% if lessonTitles != "" %}
+              {% assign lessonTitles = lessonTitles | append: ";;;" %}
+            {% endif %}
+            {% assign lessonTitles = lessonTitles | append: parts[0] | append: "|||" | append: parts[1] %}
+          {% endif %}
+          {% if allEntries != "" %}
+            {% assign allEntries = allEntries | append: ";;;" %}
+          {% endif %}
+          {% assign allEntries = allEntries | append: entry %}
+        {% endfor %}
+
+        <!-- Include week card template -->
+        {% include sprint-week-card.html %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
