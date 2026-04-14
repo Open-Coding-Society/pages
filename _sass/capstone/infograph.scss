@@ -18,10 +18,10 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 }
 
 [class$="-infograph"] {
-  max-width: 1440px;
-  width: min(100%, 1440px);
+  max-width: 1800px;
+  width: min(100%, 1800px);
   margin: 0 auto;
-  padding: 3rem 2rem;
+  padding: 3rem 3rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: $infograph-foreground;
   background-color: $infograph-bg;
@@ -78,7 +78,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 [class$="-infograph"] [class$="-card-grid"] {
   display: grid;
-  grid-template-columns: minmax(240px, 320px) 1fr 1fr;
+  grid-template-columns: minmax(280px, 360px) minmax(320px, 1.3fr) minmax(320px, 1.7fr);
   gap: 2rem;
   align-items: stretch;
   min-width: 0;
