@@ -8,10 +8,5 @@ sticky_rank: 1
 ---
 
 ## Binary Beasts
-This route now shows both Binary Beasts infographics together.
-
-### PYBL
-{% include pybl-infograph.html %}
-
 ### Poway NEC
 {% include powaynec-infograph.html %}

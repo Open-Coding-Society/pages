@@ -3,7 +3,6 @@
 <div class="powaynec-infograph">
   <div class="powaynec-header">
     <div class="powaynec-badge">Design-Based Research Capstone</div>
-    <h1 class="powaynec-title">{{ data.Title }}</h1>
     <p class="powaynec-description">{{ data.Description }}</p>
   </div>
 
@@ -28,7 +27,6 @@
       </div>
 
       <div class="powaynec-content">
-        <h2 class="powaynec-project-title">{{ topic.title }}</h2>
         <p class="powaynec-subtitle">{{ topic.subtitle }}</p>
         <div class="powaynec-keypoints">
           {% for point in topic.keyPoints %}
@@ -43,8 +41,6 @@
       </div>
 
       <div class="powaynec-details">
-        <h3 class="powaynec-section-title">About</h3>
-        <p class="powaynec-about">{{ topic.description }}</p>
         <h3 class="powaynec-section-title">Impact</h3>
         <div class="powaynec-impact-list">
           {% for item in topic.impact %}
