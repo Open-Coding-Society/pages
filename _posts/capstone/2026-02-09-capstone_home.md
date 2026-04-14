@@ -361,7 +361,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- Poway Symphonic Orchestra Capstone -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{{ '/capstone/powayorchestra/' | relative_url }}">
            <img src="{{ '/images/pso_logo.png' | relative_url }}" alt="Poway Symphony Orchestra logo" class="w-28 h-28 object-contain rounded bg-white p-2" />
        </a>
