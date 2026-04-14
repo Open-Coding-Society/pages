@@ -4,6 +4,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 /**
  * GameLevel CS Pathway - Analytics Observatory
@@ -33,8 +34,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
      */
 
     // ── Background ──────────────────────────────────────────────
-    // Use Wayfinding World background as placeholder; can be customized later
-    const image_src = path + "/images/projects/cs-pathway-game/bg3/image.png";
+    const image_src = path + "/images/projects/cs-pathway-game/bg3/analytics-observatory-fantasy.png";
     const bg_data = {
         name: GameLevelCsPath3Analytics.displayName,
         greeting: "Welcome to the Analytics Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
@@ -43,8 +43,8 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
     this.restoreIdentitySelections({
       bgData: bg_data,
-      themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg1/index.json`,
-      themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg1/`,
+      themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg3/index.json`,
+      themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg3/`,
     });
     
     // ── Player ───────────────────────────────────────────────────
@@ -77,19 +77,15 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       backgroundSrc: bg_data.src,
     });
 
-    // ── Analytics Guide NPC ────────────────────────────────────
+    // ── NPC Positions ──────────────────────────────────────────────
+    // Position NPCs on opposite sides of screen, centered vertically
     const analyticsGuidePos = {
-      x: width * 0.50,
-      y: height * 0.35,
-    };
-
-    const profileMetricsPos = {
-      x: width * 0.20,
+      x: width * 0.30,
       y: height * 0.35,
     };
 
     const githubMetricsPos = {
-      x: width * 0.80,
+      x: width * 0.60,
       y: height * 0.35,
     };
 
@@ -134,21 +130,6 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       },
     });
 
-    // Profile Info NPC - shows user identity and basic stats
-    const npc_data_profileGuide = createGatekeeperData({
-      id: 'ProfileGuide',
-      greeting: 'View your profile information: name, email, uid, and account details.',
-      position: profileMetricsPos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('Profile Guide: Press E to see your profile info');
-        }
-      },
-      interact: async function() {
-        await level.showProfileInfo();
-      },
-    });
-
     // GitHub Metrics NPC - shows contribution statistics
     const npc_data_githubGuide = createGatekeeperData({
       id: 'GitHubGuide',
@@ -169,7 +150,6 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
       { class: Npc, data: npc_data_analyticsGuide },
-      { class: Npc, data: npc_data_profileGuide },
       { class: Npc, data: npc_data_githubGuide },
     ];
 
@@ -302,19 +282,19 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     const summary = userData.analyticsSummary || {};
     
     const messages = [
-      '📊 Your Learning Analytics:',
+      'Your Learning Analytics:',
       '',
       `Name: ${userData.name || 'Not set'}`,
       `Email: ${userData.email || 'Not set'}`,
       `UID: ${userData.uid || 'Not set'}`,
       '',
-      '⏱️  Time & Engagement:',
+      'Time & Engagement:',
       `Total Time Spent: ${this.formatTime(summary.totalTimeSpent || 0)}`,
       `Sessions: ${summary.totalSessions || 0}`,
       `Quests Completed: ${summary.questsCompleted || 0}`,
       `Engagement Score: ${summary.engagementScore || 0}%`,
       '',
-      '📈 Learning Progress:',
+      'Learning Progress:',
       `Lessons Completed: ${summary.lessonsCompleted || 0}`,
       `Current Quest: ${summary.currentQuestName || 'None'}`,
       `Quest Progress: ${summary.questProgress || 0}%`,
@@ -380,7 +360,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
     const gh = userData.github;
     const messages = [
-      '💻 Your GitHub Contribution Stats:',
+      'Your GitHub Contribution Stats:',
       '',
       `Total Commits: ${gh.commits || 0}`,
       `Pull Requests: ${gh.prs || 0}`,
@@ -396,7 +376,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       `Followers: ${gh.followers || 0}`,
       `Following: ${gh.following || 0}`,
       '',
-      'Your contributions matter! Keep coding! 🚀',
+      'Your contributions matter! Keep coding!',
     ];
 
     await this.showDialogue('GitHub Guide', messages);
@@ -409,7 +389,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   async fetchUserData() {
     try {
       // Fetch user identity from Flask
-      const userResponse = await fetch('/api/id', { credentials: 'include' });
+      const userResponse = await fetch(`${pythonURI}/api/id`, fetchOptions);
       
       if (!userResponse.ok) {
         console.warn('Analytics: Could not fetch user info');
@@ -421,7 +401,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       // Fetch OCS analytics summary from Spring backend
       // This endpoint returns time spent, sessions, engagement metrics, etc.
       try {
-        const analyticsResponse = await fetch('/api/ocs-analytics/user/summary', { credentials: 'include' });
+        const analyticsResponse = await fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions);
         if (analyticsResponse.ok) {
           const analyticsSummary = await analyticsResponse.json();
           userData.analyticsSummary = analyticsSummary;
@@ -432,7 +412,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
       // Try to fetch GitHub analytics if available
       try {
-        const githubResponse = await fetch('/api/analytics/github/user', { credentials: 'include' });
+        const githubResponse = await fetch(`${pythonURI}/api/analytics/github/user`, fetchOptions);
         if (githubResponse.ok) {
           const githubData = await githubResponse.json();
           userData.github = githubData;
@@ -443,7 +423,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
       // Try to fetch skill count from profile
       try {
-        const profileResponse = await fetch('/api/profile/game', { credentials: 'include' });
+        const profileResponse = await fetch(`${pythonURI}/api/profile/game`, fetchOptions);
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
           userData.gameProfile = profileData;
