@@ -184,16 +184,16 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       ],
     };
 
-    const createHiddenMissionDesk = ({ id, label, expertise, position, zonePrompt }) => ({
-      zoneMessage: `${label}: ${zonePrompt}`,
+    const createHiddenMissionDesk = ({ id, expertise, position, zonePrompt }) => ({
+      zoneMessage: `${id}: ${zonePrompt}`,
       ...createGatekeeperData({
         id,
-        greeting: `${label} ready. ${zonePrompt}`,
+        greeting: `${id} ready. ${zonePrompt}`,
         position,
         interactDistance: 90,
         reaction: function () {
           if (level?.showToast) {
-            level.showToast(`${label}: ${zonePrompt}`);
+            level.showToast(`${id}: ${zonePrompt}`);
           }
         },
         interact: function () {
@@ -204,7 +204,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       hitbox: { widthPercentage: 0.35, heightPercentage: 0.35 },
       alertDistance: 0.18,
       dialogues: [
-        `${label} channel online.`,
+        `${id} channel online.`,
         'Ask your mission question and I will guide you.',
       ],
       expertise,
@@ -215,29 +215,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
     const missionDeskZones = [
       createHiddenMissionDesk({
-        id: 'MissionDeskAiAdmin',
-        label: 'The Admin',
+        id: 'The Admin',
         expertise: 'how to work different operating systems',
         position: { x: width * 0.20, y: height * 0.17 },
         zonePrompt: 'Collision zone active. Press E to interact.',
       }),
       createHiddenMissionDesk({
-        id: 'MissionDeskAiArchivist',
-        label: 'The Archivist',
+        id: 'The Archivist',
         expertise: 'how to manage files and folders',
         position: { x: width * 0.65, y: height * 0.17 },
         zonePrompt: 'Collision zone active. Press E to interact.',
       }),
       createHiddenMissionDesk({
-        id: 'MissionDeskAiSDLC',
-        label: 'The SDLC Master',
+        id: 'The SDLC Master',
         expertise: 'what SDLC is',
         position: { x: width * 0.20, y: height * 0.60 },
         zonePrompt: 'Collision zone active. Press E to interact.',
       }),
       createHiddenMissionDesk({
-        id: 'MissionDeskAiScrum',
-        label: 'The Scrum Master',
+        id: 'The Scrum Master',
         expertise: 'how to set up a scrum board',
         position: { x: width * 0.65, y: height * 0.60 },
         zonePrompt: 'Collision zone active. Press E to interact.',
