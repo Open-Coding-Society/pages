@@ -218,25 +218,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         id: 'The Admin',
         expertise: 'how to work different operating systems',
         position: { x: width * 0.20, y: height * 0.17 },
-        zonePrompt: 'Collision zone active. Press E to interact.',
+        zonePrompt: 'Hello! Press E to interact.',
       }),
       createHiddenMissionDesk({
         id: 'The Archivist',
         expertise: 'how to manage files and folders',
         position: { x: width * 0.65, y: height * 0.17 },
-        zonePrompt: 'Collision zone active. Press E to interact.',
+        zonePrompt: 'Hello! Press E to interact.',
       }),
       createHiddenMissionDesk({
         id: 'The SDLC Master',
         expertise: 'what SDLC is',
         position: { x: width * 0.20, y: height * 0.60 },
-        zonePrompt: 'Collision zone active. Press E to interact.',
+        zonePrompt: 'Hello! Press E to interact.',
       }),
       createHiddenMissionDesk({
         id: 'The Scrum Master',
         expertise: 'how to set up a scrum board',
         position: { x: width * 0.65, y: height * 0.60 },
-        zonePrompt: 'Collision zone active. Press E to interact.',
+        zonePrompt: 'Hello! Press E to interact.',
       }),
     ];
 
