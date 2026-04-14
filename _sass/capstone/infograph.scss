@@ -27,6 +27,23 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   background-color: $infograph-bg;
 }
 
+/* Capstone-only page layout overrides to avoid global site styling conflicts */
+.capstone-page {
+  width: 100% !important;
+  max-width: none !important;
+}
+.capstone-page > .wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  margin: 0 auto !important;
+}
+.capstone-page .opencs_root {
+  width: 100% !important;
+  max-width: none !important;
+}
+
 // Generic section styling
 [class$="-infograph"] [class$="-header"] {
   text-align: center;
