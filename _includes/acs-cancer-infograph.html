@@ -53,9 +53,8 @@
   <!-- HEADER -->
   <div class="acs-header">
     <div class="acs-badge">Treatment Management and Community Learning</div>
-    <h1 class="acs-title">{{ data.Title }}</h1>
-    <p class="acs-description">{{ data.Description }}</p>
   </div>
+
 
   <!-- FEATURE LINKS -->
   <div class="acs-links-section">
@@ -137,20 +136,8 @@
          {% endfor %}
        </div>
 
-
-       <div class="wp-tech-stack">
-         {% for tech in topic.tech %}
-         <span class="wp-tech-tag">{{ tech }}</span>
-         {% endfor %}
-       </div>
-     </div>
-
-
      <!-- Right: Description & Impact -->
      <div class="wp-details">
-       <h3 class="wp-section-title">About</h3>
-       <p class="wp-about">{{ topic.description }}</p>
-      
        <h3 class="wp-section-title">Impact</h3>
        <div class="wp-impact-list">
          {% for item in topic.impact %}
