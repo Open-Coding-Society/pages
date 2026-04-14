@@ -307,6 +307,7 @@ refresh:
 dev: stop clean
 	@echo "📦 Building registered projects..."
 	@make build-registered-projects
+# 	@make build-registered-docs
 	@make convert-registered-notebooks
 	@make jekyll-serve
 	@make watch-notebooks &
