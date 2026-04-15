@@ -162,7 +162,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       reaction: function () {
         if (reaction) reaction.call(this);
         if (level?.showToast) {
-          level.showToast('Press E to interact');
+          level.showToast('Click desk to start challenge.');
         }
       },
       ...(interact ? { interact } : {}),
@@ -189,7 +189,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         id,
         greeting: `${id} ready. ${zonePrompt}`,
         position,
-        interactDistance: 90,
+        interactDistance: 40,
         interact: function (_clicks, _objectId, npc) {
           if (level?.showToast) {
             level.showToast(`${id}: challenge channel opened.`);
@@ -203,7 +203,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       visible: false,
       clickOnly: true,
       hitbox: { widthPercentage: 0.35, heightPercentage: 0.35 },
-      alertDistance: 0.18,
+      alertDistance: 0.30,
       dialogues: [
         `${id} channel online.`,
         'Ask your mission question and I will guide you.',
@@ -219,25 +219,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         id: 'The Admin',
         expertise: 'how to work different operating systems',
         position: { x: width * 0.20, y: height * 0.17 },
-        zonePrompt: 'Click to start your challenge.',
+        zonePrompt: 'Move to desk and click to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Archivist',
         expertise: 'how to manage files and folders',
-        position: { x: width * 0.65, y: height * 0.17 },
-        zonePrompt: 'Click to start your challenge.',
+        position: { x: width * 0.67, y: height * 0.17 },
+        zonePrompt: 'Move to desk and click to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The SDLC Master',
         expertise: 'what SDLC is',
-        position: { x: width * 0.20, y: height * 0.60 },
-        zonePrompt: 'Click to start your challenge.',
+        position: { x: width * 0.18, y: height * 0.60 },
+        zonePrompt: 'Move to desk and click to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Scrum Master',
         expertise: 'how to set up a scrum board',
-        position: { x: width * 0.65, y: height * 0.60 },
-        zonePrompt: 'Click to start your challenge.',
+        position: { x: width * 0.62, y: height * 0.58 },
+        zonePrompt: 'Move to desk and click to start challenge.',
       }),
     ];
 
@@ -255,12 +255,47 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const objects = this.gameEnv?.gameObjects || [];
     const desks = objects.filter((obj) => this._missionDeskIds?.includes(obj?.spriteData?.id));
     this._rebindMissingDeskReactions(desks);
+    this._wireDeskClickDistanceGate(desks);
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
       id: d?.spriteData?.id,
       hasReaction: typeof d?.reaction === 'function',
       hasSpriteReaction: typeof d?.spriteData?.reaction === 'function',
     })));
+
+    this._missionDeskObjects = desks;
+    this._activeZoneDeskId = null;
+  }
+
+  _findPlayer() {
+    return this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
+  }
+
+  _deskIsColliding(player, desk) {
+    return !!player?.state?.collisionEvents?.includes(desk?.spriteData?.id);
+  }
+
+  _wireDeskClickDistanceGate(desks) {
+    desks.forEach((desk) => {
+      if (!desk || typeof desk.handleClick !== 'function') return;
+
+      const originalHandleClick = desk.handleClick.bind(desk);
+      desk.handleClick = (event) => {
+        const player = this._findPlayer();
+        if (!player) return;
+
+        const playerCenter = this._getObjectCenter(player);
+        const deskCenter = this._getObjectCenter(desk);
+        const distance = Math.hypot(playerCenter.x - deskCenter.x, playerCenter.y - deskCenter.y);
+        const inCollision = this._deskIsColliding(player, desk);
+        const clickDistance = this._getDeskClickDistancePx(desk);
+        const inZone = inCollision || distance < clickDistance;
+
+        if (!inZone) return;
+
+        originalHandleClick(event);
+      };
+    });
   }
 
   _rebindMissingDeskReactions(desks) {
@@ -285,6 +320,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       return desk.width * alertMultiplier;
     }
     return (desk?.interactDistance || 120) * 1.5;
+  }
+
+  _getDeskClickDistancePx(desk) {
+    const alertDistance = this._getDeskAlertDistancePx(desk);
+    const interactDistance = desk?.interactDistance || 120;
+    return Math.max(alertDistance, interactDistance * 1.5);
   }
 
   _findNearestDeskInZone(player, desks) {
