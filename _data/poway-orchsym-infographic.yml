@@ -40,7 +40,7 @@ Topics:
         text: "Conductor biography presented in a structured, visual format"
         link: "https://pso.opencodingsociety.com/conductor/"
         buttonLabel: "See Conductor"
-        previewImage: "https://pso.opencodingsociety.com/images/pso_logo.png"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch11.png"
         previewAlt: "John LoPiccolo conductor page preview"
       - previewLabel: "Musicians"
         text: "Musician directory with section filters and audio previews"
@@ -52,7 +52,7 @@ Topics:
         text: "Consolidated Join page covering registration, rehearsals, attire, and contact info"
         link: "https://pso.opencodingsociety.com/join/"
         buttonLabel: "See Join"
-        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch11.png"
+        previewImage: "https://pso.opencodingsociety.com/images/pso_logo.png"
         previewAlt: "Poway Symphony Orchestra join page preview"
       - previewLabel: "Responsive"
         text: "Fully responsive across mobile, tablet, and desktop"
@@ -111,17 +111,17 @@ Topics:
     impact:
       - "The redesign transforms a basic Google Sites page into a modern, engaging experience that's easier to navigate, more visually appealing, and actually gives visitors reasons to stay and explore rather than just look up a concert date."
 
-    additionsTitle: "Additions (Not on the Original Site at All)"
+    additionsTitle: "Wow Factors"
     additions:
-      - text: "Games hub"
+      - text: "Interactive games hub that turns orchestra learning into guided challenge play"
         link: "https://pso.opencodingsociety.com/games/"
         buttonLabel: "Open Games Hub"
-      - text: "Orchestra Builder"
+      - text: "Orchestra Builder with a real stage layout and a performance unlock reward"
         link: "https://pso.opencodingsociety.com/orchestra-builder/"
         buttonLabel: "Open Orchestra Builder"
-      - text: "EXP/gamification system"
-      - text: "Embedded live performance videos with in-page playback"
-      - text: "Concert countdown timer"
+      - text: "Virtual Conductor game that syncs tapping to live PSO performance recordings"
+      - text: "Site-wide XP progression system with sign-in persistence"
+      - text: "Concert countdown and season discovery flow that make upcoming performances feel active"
 
     organizationTitle: "About the Organization"
     organizationSummary: >

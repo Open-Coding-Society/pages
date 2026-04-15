@@ -89,7 +89,7 @@
   .pso-infograph .sip-title,
   .pso-infograph .sip-project-title,
   .pso-infograph .sip-section-title {
-    color: var(--pso-burgundy-soft);
+    color: var(--pso-cream-strong);
   }
 
   .pso-infograph .sip-header .sip-title,
@@ -106,7 +106,7 @@
   .pso-infograph .sip-content,
   .pso-infograph .sip-details,
   .pso-infograph .sip-tech-tag {
-    color: var(--pso-burgundy-deep);
+    color: var(--pso-cream-strong);
   }
 
   .pso-infograph .sip-header,
@@ -123,12 +123,12 @@
   .pso-infograph .sip-details > :not(.sip-keypoints):not(.sip-impact-list) *,
   .pso-infograph .sip-card > :not(.sip-card-grid),
   .pso-infograph .sip-card > :not(.sip-card-grid) * {
-    color: var(--pso-burgundy-deep);
+    color: var(--pso-cream-strong);
   }
 
   .pso-infograph .sip-description,
   .pso-infograph .sip-header .sip-impact-item {
-    color: var(--pso-burgundy-deep);
+    color: var(--pso-cream-strong);
   }
 
   .pso-infograph .sip-header .sip-description,
@@ -145,7 +145,7 @@
     box-shadow: 0 22px 44px rgba(26, 4, 6, 0.22);
     padding: 2.45rem;
     margin: 0 auto 2rem;
-    color: var(--pso-burgundy-deep);
+    color: var(--pso-cream-strong);
   }
 
   .pso-infograph .sip-card-grid {
@@ -161,7 +161,7 @@
   .pso-infograph .sip-card .sip-subtitle,
   .pso-infograph .sip-card .sip-about,
   .pso-infograph .sip-card .sip-impact-item {
-    color: var(--pso-burgundy-deep) !important;
+    color: var(--pso-cream-strong) !important;
   }
 
   .pso-infograph .sip-card .sip-section-title {
@@ -294,8 +294,20 @@
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
+    object-position: center;
     border-bottom: 1px solid rgba(255, 248, 234, 0.12);
     background: rgba(255, 248, 234, 0.08);
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint:nth-child(3) .sip-keypoint-image {
+    object-position: center 24%;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint:nth-child(5) .sip-keypoint-image {
+    object-fit: contain;
+    object-position: center;
+    padding: 0.85rem;
+    background: #fff;
   }
 
   .pso-infograph .sip-keypoint-eyebrow {
@@ -322,6 +334,25 @@
     font-size: 0.9rem;
   }
 
+  .pso-infograph .sip-wow-factors .sip-impact-action {
+    margin-top: 0.7rem;
+    justify-self: start;
+  }
+
+  .pso-infograph .sip-wow-factors .sip-impact-item {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .pso-infograph .sip-wow-factors .sip-impact-action .sip-btn {
+    min-width: 0;
+    width: auto;
+    padding: 0.68rem 1rem;
+    font-size: 0.84rem;
+    letter-spacing: 0.02em;
+    justify-content: flex-start;
+  }
+
   .pso-infograph .sip-preview-card {
     display: block;
     width: 100%;
@@ -338,7 +369,12 @@
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
+    object-position: center;
     background: rgba(255, 248, 234, 0.08);
+  }
+
+  .pso-infograph .sip-interactive-list .sip-keypoint:nth-child(3) .sip-preview-image {
+    object-position: center 22%;
   }
 
   .pso-infograph .sip-preview-body {
@@ -475,13 +511,27 @@
   }
 
   .pso-infograph .sip-actions .sip-btn-primary {
-    min-width: 320px;
-    padding: 1.18rem 1.95rem;
-    font-size: 1.02rem;
+    min-width: 390px;
+    padding: 1.35rem 2.45rem;
+    font-size: 1.14rem;
+    letter-spacing: 0.055em;
+    border-width: 1px;
+    background: linear-gradient(135deg, #7a171d 0%, #ad3538 50%, #c88966 100%);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
       inset 0 -1px 0 rgba(91, 28, 37, 0.18),
-      0 16px 30px rgba(21, 4, 6, 0.24);
+      0 20px 36px rgba(21, 4, 6, 0.28),
+      0 0 0 6px rgba(234, 217, 207, 0.08);
+  }
+
+  .pso-infograph .sip-actions .sip-btn-primary:hover,
+  .pso-infograph .sip-actions .sip-btn-primary:focus-visible {
+    background: linear-gradient(135deg, #8a1d23 0%, #be4043 50%, #d49872 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.16),
+      0 24px 42px rgba(21, 4, 6, 0.32),
+      0 0 0 7px rgba(234, 217, 207, 0.1);
   }
 
   .pso-infograph .sip-actions .sip-btn-secondary {
@@ -726,7 +776,7 @@
           <a href="{{ topic.interactiveLink }}" class="sip-btn" target="_blank" rel="noopener">{{ topic.interactiveButtonLabel | default: 'Open Games Page' }}</a>
         </div>
         {% endif %}
-        <div class="sip-keypoints">
+        <div class="sip-keypoints sip-interactive-list">
           {% for element in topic.interactiveElements %}
           <div class="sip-keypoint">
             <span class="sip-check">✓</span>
@@ -804,7 +854,7 @@
 
         {% if topic.additions %}
         <h3 class="sip-section-title">{{ topic.additionsTitle | default: 'Additions' }}</h3>
-        <div class="sip-impact-list">
+        <div class="sip-impact-list sip-wow-factors">
           {% for addition in topic.additions %}
           <div class="sip-impact-item">
             {{ addition.text | default: addition }}

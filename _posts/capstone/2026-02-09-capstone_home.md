@@ -26,7 +26,7 @@ sticky_rank: 1
     </a>
   </div>
   <div class="flex flex-col items-start sm:items-end">
-    <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="w-full min-w-[240px] rounded-lg border border-gray-300 bg-white/90 px-4 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+                         <p class="text-sm text-gray-700">A design-based research capstone focused on expanding community engagement through a more accessible, modern, and story-driven Poway Symphony Orchestra website experience, with clearer navigation and stronger paths to attend, support, and explore performances.</p>
     <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
   </div>
 </div>
