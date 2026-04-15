@@ -16,7 +16,7 @@ show_reading_time: false
         <hr>
         <form id="pythonForm" onsubmit="loginBoth(); return false;">
             <div class="form-group">
-                <input type="text" id="uid" placeholder="GitHub ID" required>
+                <input type="text" id="uid" placeholder="User ID" required>
             </div>
             <div class="form-group">
                 <input type="password" id="password" placeholder="Password" required>

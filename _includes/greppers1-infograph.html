@@ -1,0 +1,55 @@
+{% assign data = site.data["greppers1-infograph"] %}
+
+<div class="sfi-infograph sfi-infograph--backup">
+  <div class="sfi-header">
+    <div class="sfi-backup-banner">Backup Project</div>
+    <div class="sfi-badge">{{ data.Badge }}</div>
+    <h1 class="sfi-title">{{ data.Title }}</h1>
+    <p class="sfi-desc">{{ data.Description }}</p>
+  </div>
+
+  <div class="sfi-card">
+    <div class="sfi-card-grid">
+      <div class="sfi-visual">
+        <div class="sfi-icon-wrap">🚨</div>
+        <div class="sfi-status">Community Tech</div>
+        <div class="sfi-team">
+          <span class="sfi-team-label">Organization</span>
+          <span class="sfi-team-name">{{ data.Organization }}</span>
+        </div>
+      </div>
+
+      <div class="sfi-content">
+        <h2 class="sfi-project-title">{{ data.Subtitle }}</h2>
+        <p class="sfi-subtitle">Emergency Response Platform</p>
+
+        <div class="sfi-keypoints">
+          {% for feature in data.Features %}
+          <div class="sfi-keypoint">
+            <span class="sfi-check">✓</span>
+            <span>{{ feature }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="sfi-tech-stack">
+          {% for tech in data.Tech %}
+          <span class="sfi-tech-tag">{{ tech.icon }} {{ tech.name }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="sfi-details">
+        <h3 class="sfi-section-title">Impact</h3>
+        <div class="sfi-impact-list">
+          {% for metric in data.Metrics %}
+          <div class="sfi-impact-item">{{ metric.value }} — {{ metric.label }}</div>
+          {% endfor %}
+        </div>
+        <a href="https://github.com/TheGreppers/greppers/issues/1" target="_blank" class="sfi-issue-link">
+          📋 Week 1 Sprint Plan
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

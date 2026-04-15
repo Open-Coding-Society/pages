@@ -4,7 +4,6 @@ layout: post
 title: Agile Methodology Intro
 description: Agile methodology helps bring out all the good characteristics in group development.  The sociology of how an individual and group of individuals work in a Scrum Team using Agile methodology is a key development skill.  Often interview questions, for a job interview in the real world, focus on the processes of how you work on code.
 courses: { csa: {week: 1}}
-categories: [Collaboration]
 type: human 
 ---
 ## Agile Methodology Introduction

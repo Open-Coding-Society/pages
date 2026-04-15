@@ -17,6 +17,8 @@ constructor(options = {}) {
    this.dialogueBox = null;
   this.dialogueText = null;
   this.closeBtn = null;
+  this.controlsRow = null;
+  this.actionButtonGroup = null;
    // Game control reference for pausing
   this.gameControl = options.gameControl || null;
   // Track if this dialogue system paused the game
@@ -91,24 +93,6 @@ createDialogueBox() {
     const styleSheet = document.createElement('style');
     styleSheet.id = 'dialogue-animations-' + this.safeId;
     styleSheet.textContent = `
-      @keyframes glow-pulse-${this.safeId} {
-        0%, 100% {
-          box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), inset 0 0 20px rgba(0, 255, 255, 0.2);
-        }
-        50% {
-          box-shadow: 0 0 30px rgba(0, 255, 255, 0.9), inset 0 0 30px rgba(0, 255, 255, 0.3);
-        }
-      }
-    
-      @keyframes text-glow-${this.safeId} {
-        0%, 100% {
-          text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(74, 134, 232, 0.3);
-        }
-        50% {
-          text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(74, 134, 232, 0.6);
-        }
-      }
-    
       @keyframes char-pop-${this.safeId} {
         0% {
           opacity: 0;
@@ -121,10 +105,6 @@ createDialogueBox() {
           opacity: 1;
           transform: scale(1) translateY(0);
         }
-      }
-    
-      .dialogue-text-animated-${this.safeId} {
-        animation: text-glow-${this.safeId} 2s ease-in-out infinite;
       }
     
       .dialogue-char-${this.safeId} {
@@ -145,15 +125,11 @@ createDialogueBox() {
     transform: "translateX(-50%)",
     padding: "20px",
     maxWidth: "80%",
-    background: "rgba(0, 0, 0, 0.85)",
-    color: "#00FFFF",
     fontFamily: "'Press Start 2P', cursive, monospace",
     fontSize: "14px",
     textAlign: "center",
-    border: "2px solid #4a86e8",
     borderRadius: "12px",
     zIndex: "9999",
-    animation: `glow-pulse-${this.safeId} 2s ease-in-out infinite`,
     display: "none"
   });
 
@@ -181,7 +157,6 @@ createDialogueBox() {
   speakerName.id = "dialogue-speaker-" + this.safeId;
   Object.assign(speakerName.style, {
     fontWeight: "bold",
-    color: "#4a86e8",
     marginBottom: "10px",
     fontSize: "16px"
   });
@@ -203,22 +178,42 @@ createDialogueBox() {
 
   // Create close button
   this.closeBtn = document.createElement("button");
+  this.closeBtn.id = "dialogue-close-btn-" + this.safeId;
   this.closeBtn.innerText = "Close";
   Object.assign(this.closeBtn.style, {
-    marginTop: "15px",
+    marginTop: "0",
     padding: "10px 20px",
-    background: "#4a86e8",
-    color: "#fff",
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
     fontFamily: "'Press Start 2P', cursive, monospace",
-    fontSize: "12px"
+    fontSize: "12px",
+    flexShrink: "0"
   });
    // Add click handler
   this.closeBtn.onclick = () => {
     this.closeDialogue();
   };
+
+  this.controlsRow = document.createElement("div");
+  this.controlsRow.id = "dialogue-controls-" + this.safeId;
+  Object.assign(this.controlsRow.style, {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "10px",
+    marginTop: "10px",
+    flexWrap: "wrap"
+  });
+
+  this.actionButtonGroup = document.createElement("div");
+  Object.assign(this.actionButtonGroup.style, {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginLeft: "auto"
+  });
 
 
 
@@ -240,8 +235,10 @@ createDialogueBox() {
 
 
   // Assemble the dialogue box
+  this.controlsRow.appendChild(this.closeBtn);
+  this.controlsRow.appendChild(this.actionButtonGroup);
   this.dialogueBox.appendChild(contentContainer);
-  this.dialogueBox.appendChild(this.closeBtn);
+  this.dialogueBox.appendChild(this.controlsRow);
    // Add to the document
   document.body.appendChild(this.dialogueBox);
    // Also listen for Escape key to close dialogue
@@ -275,9 +272,6 @@ typewriteText(element, text, speed = this.typewriterSpeed) {
   
       charIndex++;
       this.typewriterTimeoutId = setTimeout(typeNextChar, speed);
-    } else {
-      // Add glow animation to the complete text
-      element.classList.add(`dialogue-text-animated-${this.safeId}`);
     }
   };
    typeNextChar();
@@ -287,7 +281,7 @@ typewriteText(element, text, speed = this.typewriterSpeed) {
 
 
 // Show a specific dialogue message
-showDialogue(message, speaker = "", avatarSrc = null) {
+showDialogue(message, speaker = "", avatarSrc = null, spriteData = null) {
   // Clear any existing typewriter timeout
   if (this.typewriterTimeoutId) {
     clearTimeout(this.typewriterTimeoutId);
@@ -304,17 +298,60 @@ showDialogue(message, speaker = "", avatarSrc = null) {
     if (avatarSrc) {
       avatarElement.style.backgroundImage = `url('${avatarSrc}')`;
       avatarElement.style.display = "block";
+      
+      // If sprite data provided with orientation (sprite sheet), show only down row, column 0
+      if (spriteData && spriteData.orientation && spriteData.pixels && spriteData.down) {
+        const { rows, columns } = spriteData.orientation;
+        const { width, height } = spriteData.pixels;
+        const { row } = spriteData.down;
+        
+        // Calculate frame dimensions
+        const frameWidth = width / columns;
+        const frameHeight = height / rows;
+        
+        // Scale avatar to fit nicely (max 80px on longest side)
+        const maxAvatarSize = 80;
+        const aspectRatio = frameWidth / frameHeight;
+        let displayWidth, displayHeight;
+        
+        if (frameWidth > frameHeight) {
+          displayWidth = Math.min(maxAvatarSize, frameWidth);
+          displayHeight = displayWidth / aspectRatio;
+        } else {
+          displayHeight = Math.min(maxAvatarSize, frameHeight);
+          displayWidth = displayHeight * aspectRatio;
+        }
+        
+        // Calculate scale factor for background image
+        const scale = displayWidth / frameWidth;
+        const scaledSpriteWidth = width * scale;
+        const scaledSpriteHeight = height * scale;
+        
+        // Calculate background position to show down row, column 0
+        const bgPosX = 0; // Column 0
+        const bgPosY = -(row * frameHeight * scale); // Down row
+        
+        // Set styles to crop to single frame
+        avatarElement.style.width = `${displayWidth}px`;
+        avatarElement.style.height = `${displayHeight}px`;
+        avatarElement.style.backgroundSize = `${scaledSpriteWidth}px ${scaledSpriteHeight}px`;
+        avatarElement.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+      } else {
+        // No orientation data, show entire image
+        avatarElement.style.width = "50px";
+        avatarElement.style.height = "50px";
+        avatarElement.style.backgroundSize = "contain";
+        avatarElement.style.backgroundPosition = "center";
+      }
     } else {
       avatarElement.style.display = "none";
     }
   }
    // Apply typewriter effect or set text directly
   if (this.enableTypewriter) {
-    this.dialogueText.classList.remove(`dialogue-text-animated-${this.safeId}`);
     this.typewriteText(this.dialogueText, message, this.typewriterSpeed);
   } else {
     this.dialogueText.textContent = message;
-    this.dialogueText.classList.add(`dialogue-text-animated-${this.safeId}`);
   }
    // Show the dialogue box
   this.dialogueBox.style.display = "block";
@@ -343,23 +380,14 @@ showDialogue(message, speaker = "", avatarSrc = null) {
 
 
 
-// Show a random dialogue from the dialogues array
-showRandomDialogue(speaker = "", avatarSrc = null) {
+// Show the next dialogue from the dialogues array (cycles through sequentially)
+showRandomDialogue(speaker = "", avatarSrc = null, spriteData = null) {
   if (this.dialogues.length === 0) return;
-   // Pick a random index that's different from the last one
-  let randomIndex;
-  if (this.dialogues.length > 1) {
-    do {
-      randomIndex = Math.floor(Math.random() * this.dialogues.length);
-    } while (randomIndex === this.lastShownIndex);
-  } else {
-    randomIndex = 0; // Only one dialogue available
-  }
-   // Store the current index to avoid repetition next time
-  this.lastShownIndex = randomIndex;
+   // Increment to next dialogue, wrapping around to 0 when reaching the end
+  this.lastShownIndex = (this.lastShownIndex + 1) % this.dialogues.length;
    // Show the dialogue
-  const randomDialogue = this.dialogues[randomIndex];
-  return this.showDialogue(randomDialogue, speaker, avatarSrc);
+  const dialogue = this.dialogues[this.lastShownIndex];
+  return this.showDialogue(dialogue, speaker, avatarSrc, spriteData);
 }
 
 
@@ -384,15 +412,20 @@ closeDialogue() {
     this.gameControl.resume();
     this.didPauseGame = false; // Reset the flag
   }
-   // Remove any custom buttons
-  const buttonContainers = this.dialogueBox.querySelectorAll('div[style*="display: flex"]');
-  buttonContainers.forEach(container => {
-    // Skip the main content container
-    if (container.contains(document.getElementById("dialogue-avatar-" + this.safeId))) {
-      return;
-    }
-    container.remove();
-  });
+
+  if (this.actionButtonGroup) {
+    this.actionButtonGroup.innerHTML = '';
+  }
+
+  if (this.closeBtn) {
+    this.closeBtn.innerText = 'Close';
+    this.closeBtn.onclick = () => {
+      this.closeDialogue();
+    };
+    this.closeBtn.style.marginRight = '0';
+    this.closeBtn.style.marginLeft = '0';
+    this.closeBtn.style.float = 'none';
+  }
 }
 
 
@@ -408,12 +441,9 @@ isDialogueOpen() {
 
 // Add buttons to the dialogue
 addButtons(buttons) {
-    if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0) return;
-  
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.justifyContent = 'space-between';
-    buttonContainer.style.marginTop = '10px';
+    if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0 || !this.actionButtonGroup) return;
+
+    this.actionButtonGroup.innerHTML = '';
   
     // Add each button
     buttons.forEach(button => {
@@ -421,13 +451,11 @@ addButtons(buttons) {
       
         const btn = document.createElement('button');
         btn.textContent = button.text;
+        btn.className = button.primary ? 'primary-button' : 'secondary-button';
         btn.style.padding = '8px 15px';
-        btn.style.background = button.primary ? '#4a86e8' : '#666';
-        btn.style.color = 'white';
         btn.style.border = 'none';
         btn.style.borderRadius = '5px';
         btn.style.cursor = 'pointer';
-        btn.style.marginRight = '10px';
       
         // Add click handler
         btn.onclick = () => {
@@ -436,13 +464,8 @@ addButtons(buttons) {
             }
         };
       
-        buttonContainer.appendChild(btn);
+        this.actionButtonGroup.appendChild(btn);
     });
-  
-    // Insert before the close button
-    if (buttonContainer.children.length > 0) {
-        this.dialogueBox.insertBefore(buttonContainer, this.closeBtn);
-    }
 }
 }
 

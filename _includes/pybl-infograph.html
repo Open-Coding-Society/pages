@@ -1,0 +1,60 @@
+{% assign data = site.data.pybl_infograph %}
+
+<div class="pybl-infograph">
+  <div class="pybl-header">
+    <div class="pybl-badge">Design-Based Research Capstone</div>
+    <h1 class="pybl-title">{{ data.Title }}</h1>
+    <p class="pybl-description">{{ data.Description }}</p>
+  </div>
+
+  {% for topic in data.Topics %}
+  {% assign project_link = topic.link %}
+  {% assign link_prefix = topic.link | slice: 0, 4 %}
+  {% if link_prefix != 'http' %}
+    {% assign project_link = site.baseurl | append: topic.link %}
+  {% endif %}
+
+  <div class="pybl-card">
+    <div class="pybl-card-grid">
+      <div class="pybl-visual">
+        <a href="{{ project_link }}" class="pybl-image-link" target="_blank" rel="noopener noreferrer">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pybl-image">
+          <div class="pybl-overlay"><span>View Project</span></div>
+        </a>
+        <div class="pybl-status">{{ topic.status }}</div>
+        <div class="pybl-team">
+          <span class="pybl-team-label">Project Leads</span>
+          <span class="pybl-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <div class="pybl-content">
+        <h2 class="pybl-project-title">{{ topic.title }}</h2>
+        <p class="pybl-subtitle">{{ topic.subtitle }}</p>
+        <div class="pybl-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="pybl-keypoint"><span class="pybl-check">✓</span><span>{{ point }}</span></div>
+          {% endfor %}
+        </div>
+        <div class="pybl-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="pybl-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="pybl-details">
+        <h3 class="pybl-section-title">About</h3>
+        <p class="pybl-about">{{ topic.description }}</p>
+        <h3 class="pybl-section-title">Impact</h3>
+        <div class="pybl-impact-list">
+          {% for item in topic.impact %}
+          <div class="pybl-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+        <a href="{{ project_link }}" class="pybl-btn" target="_blank" rel="noopener noreferrer">Learn More</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

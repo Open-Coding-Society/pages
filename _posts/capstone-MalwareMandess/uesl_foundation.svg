@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="uesl-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0a1e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1033;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="uesl-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="uesl-shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="150" cy="150" r="148" fill="url(#uesl-bg)" stroke="url(#uesl-accent)" stroke-width="2"/>
+
+  <!-- Shield shape -->
+  <path d="M150 50 L220 85 L220 165 C220 210 150 250 150 250 C150 250 80 210 80 165 L80 85 Z"
+        fill="url(#uesl-shield)" stroke="url(#uesl-accent)" stroke-width="2"/>
+
+  <!-- Controller icon inside shield -->
+  <!-- Controller body -->
+  <rect x="110" y="130" width="80" height="50" rx="12" ry="12"
+        fill="none" stroke="url(#uesl-accent)" stroke-width="2.5"/>
+  <!-- D-pad -->
+  <rect x="120" y="148" width="6" height="14" rx="2" fill="#7c3aed"/>
+  <rect x="116" y="152" width="14" height="6" rx="2" fill="#7c3aed"/>
+  <!-- Buttons -->
+  <circle cx="175" cy="148" r="4" fill="#06b6d4"/>
+  <circle cx="184" cy="155" r="4" fill="#7c3aed"/>
+  <circle cx="175" cy="162" r="4" fill="#06b6d4"/>
+  <circle cx="166" cy="155" r="4" fill="#7c3aed"/>
+  <!-- Joystick dots -->
+  <circle cx="135" cy="163" r="6" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <circle cx="163" cy="145" r="6" fill="none" stroke="#06b6d4" stroke-width="1.5"/>
+
+  <!-- Stars around controller (representing inclusivity/community) -->
+  <text x="97" y="122" font-size="10" fill="#7c3aed" opacity="0.8">★</text>
+  <text x="195" y="115" font-size="10" fill="#06b6d4" opacity="0.8">★</text>
+  <text x="88" y="175" font-size="8" fill="#06b6d4" opacity="0.6">★</text>
+  <text x="205" y="180" font-size="8" fill="#7c3aed" opacity="0.6">★</text>
+
+  <!-- UESL text -->
+  <text x="150" y="228" font-family="Arial, sans-serif" font-size="22" font-weight="800"
+        text-anchor="middle" fill="url(#uesl-accent)">UESL</text>
+
+  <!-- Foundation text -->
+  <text x="150" y="248" font-family="Arial, sans-serif" font-size="10" font-weight="400"
+        text-anchor="middle" fill="#94a3b8" letter-spacing="2">FOUNDATION</text>
+
+  <!-- Tagline arc area -->
+  <text x="150" y="75" font-family="Arial, sans-serif" font-size="8" font-weight="600"
+        text-anchor="middle" fill="#7c3aed" opacity="0.9" letter-spacing="1">GAMING FOR ALL</text>
+</svg>

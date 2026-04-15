@@ -9,37 +9,12 @@
 @import "lessonbase";
 @import "footer";
 
-// Hunger Heroes Capstone
-@import "capstone/hunger-heroes-infograph";
-
-// Wayfinding Pages Capstone
-@import "capstone/wayfinding-pages-infograph";
-
-// Database Defenders Capstone
-@import "capstone/database-defenders-infograph";
-
-// Granolaa Capstone
-@import "capstone/granolaa-infograph";
-
-// Bud-E Capstone
-@import "capstone/bud-e-infograph";
-
-// Educators Capstone
-@import "capstone/educators-infograph";
-// HawkHub Capstone
-@import "capstone/hawkhub-infograph";
-
-// College Bound Capstone
-@import "capstone/college-bound-infograph";
-
-// DeFlock SD Capstone
-@import "capstone/deflock-infograph";
+// Capstone Infograph Styles (centralized)
+// All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
+@import "capstone/infograph";
 
 // RPN Calculator Lesson Interactives
 @import "nighthawk/rpn-interactive";
 
-// PUSD Foundation Capstone
-@import "capstone/pusd-infograph";
-
-// UESL Foundation Capstone
-@import "capstone/uesl-infograph";
+// FRQ Interactive Lesson Styles (popcorn hacks, drag-drop, visualizer, quiz, game)
+@import "nighthawk/frq-interactive";

@@ -1,0 +1,393 @@
+{% assign data = site.data.sip_infograph %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap');
+
+  .sip-infograph {
+    --gold: #c9a84c;
+    --gold-light: rgba(201,168,76,0.12);
+    --text: #e8e4dc;
+    --muted: #9a9490;
+    --rule: #2e2b28;
+    --bg: #141210;
+    --card-bg: #1c1916;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--text);
+    background: var(--bg);
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 28px 80px;
+  }
+
+  /* ── Header ── */
+  .sip-header {
+    padding: 64px 0 48px;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+  }
+
+  .sip-header-image-wrap { margin-bottom: 28px; }
+  .sip-header-image {
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  .sip-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 18px;
+  }
+
+  .sip-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 400;
+    line-height: 1.15;
+    margin: 0 0 14px;
+    color: #fff;
+  }
+
+  .sip-description {
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin: 0 auto 26px;
+    max-width: 520px;
+  }
+
+  .sip-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    justify-content: center;
+  }
+
+  .sip-link-btn {
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--rule);
+    padding: 8px 16px;
+    border-radius: 2px;
+    transition: border-color .2s, color .2s;
+  }
+  .sip-link-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── Cards ── */
+  .sip-card {
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 36px;
+    margin-top: 24px;
+  }
+
+  .sip-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .sip-status {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 2px;
+    background: var(--gold-light);
+    color: var(--gold);
+  }
+
+  .sip-team-names { font-size: 12px; color: var(--muted); }
+
+  .sip-project-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    margin: 0 0 4px;
+    line-height: 1.2;
+    color: #fff;
+  }
+
+  .sip-subtitle {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin: 0 0 24px;
+  }
+
+  /* Image */
+  .sip-image-link {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 28px;
+    height: 200px;
+  }
+
+  .sip-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: transform .4s ease;
+  }
+  .sip-image-link:hover .sip-image { transform: scale(1.02); }
+
+  .sip-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .22s;
+  }
+  .sip-overlay span {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .sip-image-link:hover .sip-overlay { opacity: 1; }
+
+  /* Section label */
+  .sip-section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* Key points */
+  .sip-keypoints { display: flex; flex-direction: column; gap: 9px; margin-bottom: 28px; }
+  .sip-keypoint { display: flex; gap: 11px; font-size: 13.5px; line-height: 1.65; color: var(--text); }
+  .sip-check { color: var(--gold); font-size: 11px; margin-top: 3px; flex-shrink: 0; }
+
+  /* About */
+  .sip-about {
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+
+  /* Sprint changes */
+  .sip-changes { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+  .sip-change {
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid var(--gold);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .sip-change-title {
+    font-size: 12.5px;
+    font-weight: 500;
+    margin: 0 0 5px;
+    color: var(--text);
+  }
+
+  .sip-change-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* Tags */
+  .sip-tech-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 26px; }
+  .sip-tech-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--muted);
+  }
+
+  /* CTA */
+  .sip-btn {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--bg);
+    background: var(--text);
+    padding: 9px 20px;
+    border-radius: 2px;
+    transition: background .2s;
+  }
+  .sip-btn:hover { background: var(--gold); color: var(--bg); }
+</style>
+
+<div class="sip-infograph">
+
+  <!-- Header -->
+  <div class="sip-header">
+    {% if data.HeaderImage %}
+    <div class="sip-header-image-wrap">
+      <img src="{{ site.baseurl }}/images/{{ data.HeaderImage }}" alt="{{ data.Title }}" class="sip-header-image">
+    </div>
+    {% endif %}
+    <div class="sip-badge">Nonprofit Site Analysis</div>
+    <h1 class="sip-title">{{ data.Title }}</h1>
+    <p class="sip-description">{{ data.Description }}</p>
+    {% if data.Links %}
+    <div class="sip-links">
+      {% for link in data.Links %}
+      <a href="{{ link.url }}" class="sip-link-btn" target="_blank" rel="noopener">{{ link.label }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Who They Are ── -->
+  <div class="sip-card">
+    <div class="sip-meta">
+      <span class="sip-status">Live</span>
+      <span class="sip-team-names">Anishka Sanghvi · Michelle Ji · Krishna Visvanath · West Stefany</span>
+    </div>
+    <h2 class="sip-project-title">Who They Are</h2>
+    <p class="sip-subtitle">A Global Volunteer Organization with Local Roots</p>
+
+    <a href="https://www.sipoway.com/" class="sip-image-link" target="_blank" rel="noopener">
+      <img src="{{ site.baseurl }}/images/sip/sip_overview.jpg" alt="Soroptimist International of Poway" class="sip-image">
+      <div class="sip-overlay"><span>Visit Site</span></div>
+    </a>
+
+    <p class="sip-section-label">Overview</p>
+    <p class="sip-about">Soroptimist International of Poway (SIP) is a 501(c)(3) nonprofit chartered in 1971, part of a global network active in 118+ countries. Members — working moms, educators, retirees, and business owners — volunteer their time to empower women and girls through education and economic opportunity. Funded by donations and an annual Celebration of Courage fundraiser.</p>
+
+    <p class="sip-section-label">Tech</p>
+    <div class="sip-tech-stack">
+      <span class="sip-tech-tag">Custom Website</span>
+      <span class="sip-tech-tag">PayPal</span>
+      <span class="sip-tech-tag">Instagram</span>
+      <span class="sip-tech-tag">Facebook</span>
+    </div>
+
+    <a href="https://www.sipoway.com/" class="sip-btn" target="_blank" rel="noopener">Visit Site</a>
+  </div>
+
+  <!-- ── Programs ── -->
+  <div class="sip-card">
+    <div class="sip-meta">
+      <span class="sip-status">Active</span>
+      <span class="sip-team-names">Anishka Sanghvi · Michelle Ji · Krishna Visvanath · West Stefany</span>
+    </div>
+    <h2 class="sip-project-title">Programs</h2>
+    <p class="sip-subtitle">Six Programs, One Mission</p>
+
+    <a href="https://www.sipoway.com/copy-of-home" class="sip-image-link" target="_blank" rel="noopener">
+      <img src="{{ site.baseurl }}/images/sip/sip_programs.jpg" alt="SIP Programs" class="sip-image">
+      <div class="sip-overlay"><span>Visit Site</span></div>
+    </a>
+
+    <p class="sip-section-label">What We Offer</p>
+    <div class="sip-keypoints">
+      <div class="sip-keypoint"><span class="sip-check">✓</span><span><strong>Transitional Housing</strong> — connects women leaving crisis situations to stable housing resources.</span></div>
+      <div class="sip-keypoint"><span class="sip-check">✓</span><span><strong>Live Your Dream</strong> — cash grants for women supporting families while pursuing education.</span></div>
+      <div class="sip-keypoint"><span class="sip-check">✓</span><span><strong>Dream It, Be It</strong> — career mentors visit schools to broaden girls' professional horizons.</span></div>
+      <div class="sip-keypoint"><span class="sip-check">✓</span><span><strong>STAT!</strong> — anti-trafficking awareness and advocacy program.</span></div>
+      <div class="sip-keypoint"><span class="sip-check">✓</span><span><strong>Abraxas Scholarship</strong> — annual financial award for Abraxas High School students.</span></div>
+      <div class="sip-keypoint"><span class="sip-check">✓</span><span><strong>Colegio La Esperanza</strong> — supports an elementary school in Baja California, Mexico.</span></div>
+    </div>
+
+    <p class="sip-section-label">This Sprint</p>
+    <div class="sip-changes">
+      <div class="sip-change">
+        <p class="sip-change-title">Program Cards — Home Page</p>
+        <p class="sip-change-desc">Each of the six program cards was trimmed from two paragraphs to a single clear sentence, making them faster to scan without losing meaning.</p>
+      </div>
+    </div>
+
+    <a href="https://www.sipoway.com/copy-of-home" class="sip-btn" target="_blank" rel="noopener">Visit Site</a>
+  </div>
+
+  <!-- ── What We Built ── -->
+  <div class="sip-card">
+    <div class="sip-meta">
+      <span class="sip-status">Shipped</span>
+      <span class="sip-team-names">Anishka Sanghvi · Michelle Ji · Krishna Visvanath · West Stefany</span>
+    </div>
+    <h2 class="sip-project-title">What We Built</h2>
+    <p class="sip-subtitle">Sprint Changes Across the Site</p>
+
+    <a href="https://www.sipoway.com/" class="sip-image-link" target="_blank" rel="noopener">
+      <img src="{{ site.baseurl }}/images/sip/sip_improvements.jpg" alt="SIP Improvements" class="sip-image">
+      <div class="sip-overlay"><span>Visit Site</span></div>
+    </a>
+
+    <p class="sip-section-label">Changes This Sprint</p>
+    <div class="sip-changes">
+
+      <div class="sip-change">
+        <p class="sip-change-title">Backend — PythonURI Integration</p>
+        <p class="sip-change-desc">Replaced hardcoded URLs with PythonURI on all pages that call the backend, including login and the blog page.</p>
+      </div>
+
+      <div class="sip-change">
+        <p class="sip-change-title">Blog &amp; Team Page</p>
+        <p class="sip-change-desc">Added profile photo upload using the pfp API so members can personalize their team presence directly from the page.</p>
+      </div>
+
+      <div class="sip-change">
+        <p class="sip-change-title">Community Garden</p>
+        <p class="sip-change-desc">Sprite selection is now saved to the database and restored on login. The garden displays every member's chosen sprite, and switching accounts correctly loads the right one.</p>
+      </div>
+
+      <div class="sip-change">
+        <p class="sip-change-title">Contact Page</p>
+        <p class="sip-change-desc">Removed duplicate name and email fields. Messages submitted through the form are now saved to the backend.</p>
+      </div>
+
+      <div class="sip-change">
+        <p class="sip-change-title">Program Finder — Full Redesign</p>
+        <p class="sip-change-desc">Replaced the 7-question quiz with three interactive mechanics: drag sliders mapping program axes, a bucket toss where users claim statements that resonate, and a card sort for ranking desired outcomes by priority. The scoring engine was rewritten to handle continuous values and rank weighting.</p>
+      </div>
+
+    </div>
+
+    <p class="sip-section-label">Tags</p>
+    <div class="sip-tech-stack">
+      <span class="sip-tech-tag">PythonURI</span>
+      <span class="sip-tech-tag">pfp API</span>
+      <span class="sip-tech-tag">Database Persistence</span>
+      <span class="sip-tech-tag">Drag &amp; Drop</span>
+      <span class="sip-tech-tag">Scoring Engine</span>
+      <span class="sip-tech-tag">Contact Backend</span>
+    </div>
+
+    <a href="https://sip.opencodingsociety.com/" class="sip-btn" target="_blank" rel="noopener">View Deployed Site</a>
+  </div>
+
+</div>

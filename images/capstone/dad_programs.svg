@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="dad-bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a0f0a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dad-coral3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e85d3a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f39c12;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="150" cy="150" r="148" fill="url(#dad-bg3)" stroke="url(#dad-coral3)" stroke-width="2"/>
+  <circle cx="150" cy="150" r="130" fill="none" stroke="#e85d3a" stroke-width="0.5" opacity="0.3"/>
+  <!-- Program hero -->
+  <rect x="75" y="75" width="150" height="35" rx="6" fill="rgba(232,93,58,0.1)" stroke="#e85d3a" stroke-width="1.5"/>
+  <text x="85" y="90" font-family="Arial" font-size="6" fill="#e85d3a" font-weight="700" letter-spacing="1">D.A.D. PROGRAMS</text>
+  <text x="85" y="102" font-family="Arial" font-size="10" fill="#fff" font-weight="800">Youth Athletics</text>
+  <!-- Photo gallery grid -->
+  <rect x="75" y="120" width="46" height="35" rx="4" fill="rgba(232,93,58,0.15)" stroke="#e85d3a" stroke-width="1"/>
+  <text x="98" y="142" font-size="16" text-anchor="middle" fill="#e85d3a">⚽</text>
+  <rect x="127" y="120" width="46" height="35" rx="4" fill="rgba(41,128,185,0.15)" stroke="#2980b9" stroke-width="1"/>
+  <text x="150" y="142" font-size="16" text-anchor="middle" fill="#2980b9">🏃</text>
+  <rect x="179" y="120" width="46" height="35" rx="4" fill="rgba(243,156,18,0.15)" stroke="#f39c12" stroke-width="1"/>
+  <text x="202" y="142" font-size="16" text-anchor="middle" fill="#f39c12">🤝</text>
+  <!-- Info cards -->
+  <rect x="75" y="165" width="70" height="25" rx="4" fill="rgba(232,93,58,0.08)"/>
+  <line x1="75" y1="165" x2="75" y2="190" stroke="#e85d3a" stroke-width="3"/>
+  <text x="82" y="177" font-family="Arial" font-size="6" fill="#e85d3a" font-weight="700">📅 Schedule</text>
+  <text x="82" y="186" font-family="Arial" font-size="5.5" fill="#888">Saturdays 9am</text>
+  <rect x="155" y="165" width="70" height="25" rx="4" fill="rgba(41,128,185,0.08)"/>
+  <line x1="155" y1="165" x2="155" y2="190" stroke="#2980b9" stroke-width="3"/>
+  <text x="162" y="177" font-family="Arial" font-size="6" fill="#2980b9" font-weight="700">📍 Location</text>
+  <text x="162" y="186" font-family="Arial" font-size="5.5" fill="#888">San Marcos, CA</text>
+  <!-- Register button -->
+  <rect x="90" y="200" width="120" height="20" rx="10" fill="url(#dad-coral3)"/>
+  <text x="150" y="214" font-family="Arial" font-size="8" font-weight="700" text-anchor="middle" fill="#fff">Register Your Child →</text>
+  <!-- Title -->
+  <text x="150" y="248" font-family="Arial, sans-serif" font-size="13" font-weight="800" text-anchor="middle" fill="url(#dad-coral3)">Program Pages</text>
+  <text x="150" y="268" font-family="Arial, sans-serif" font-size="8" font-weight="400" text-anchor="middle" fill="#9aa0a8" letter-spacing="2">SMALL FEATURE</text>
+</svg>

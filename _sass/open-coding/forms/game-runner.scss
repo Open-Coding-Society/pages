@@ -8,12 +8,12 @@
 
 .game-runner-container {
   @include runner-base;
+  width: var(--gr-panel-width, 100%);
+  max-width: 100%;
 
   // Game output area - contained canvas for educational use
   .game-output {
     // Layout & Dimensions
-    min-height: 400px;
-    max-height: 600px;
     overflow: hidden;
     position: relative;
     
@@ -27,7 +27,7 @@
     // Game container styling
     .gameContainer {
       width: 100%;
-      height: 580px;
+      height: var(--gr-canvas-height, 580px);
       position: relative;
       overflow: hidden;
       display: flex;
@@ -37,8 +37,6 @@
       // Only style the main canvas, not character canvases
       > canvas#gameCanvas {
         display: block;
-        width: 100% !important;
-        height: 580px !important;
         border: none;
         background: transparent;
       }
@@ -100,6 +98,162 @@
     .status-text {
       color: var(--pref-accent-color);
       font-weight: 600;
+    }
+  }
+
+  // Compact controls for hide_edit mode (mini-game experiences)
+  .compact-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    background: var(--pref-bg-color);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    
+    .runBtn,
+    .stopBtn,
+    .resetBtn {
+      @include icon-button(38px, 0);
+    }
+    
+    .levelSelect {
+      @include select-control();
+      min-width: 120px;
+      flex: 1;
+      max-width: 200px;
+    }
+  }
+
+  // Hide-editor mode - cleaner experience for mini-games
+  &.hide-editor {
+    // Remove challenge box
+    .challenge-box {
+      display: none;
+    }
+    
+    // Make game output more prominent
+    .game-output {
+      border-radius: 8px;
+      border: 2px solid var(--pref-accent-color);
+    }
+  }
+}
+
+/* ========================================
+   Fullscreen Game Mode Styles
+   ======================================== */
+
+.game-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.fullscreen-control-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+
+  &.collapsed {
+    padding: 0.5rem 1.5rem;
+  }
+}
+
+.fullscreen-collapse-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: var(--pref-text-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  position: absolute;
+  left: 1.5rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+  }
+}
+
+.fullscreen-title {
+  color: var(--pref-text-color);
+  font-weight: 600;
+  font-size: 1rem;
+  position: absolute;
+  left: 4rem;
+}
+
+.fullscreen-controls-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+
+  &.collapsed {
+    display: none;
+  }
+
+  button {
+    background: var(--pref-accent-color);
+    border: none;
+    color: var(--pref-text-color);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.2);
+      transform: scale(1.05);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  select {
+    background: var(--pref-accent-color);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--pref-text-color);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.2);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    option {
+      background: var(--pref-bg-color);
+      color: var(--pref-text-color);
     }
   }
 }

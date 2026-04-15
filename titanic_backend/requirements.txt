@@ -1,0 +1,7 @@
+flask
+flask-restful
+flask-cors
+pandas
+seaborn
+scikit-learn
+numpy

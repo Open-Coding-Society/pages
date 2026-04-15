@@ -6,7 +6,6 @@ permalink: /digital-famine/end/submodule_4/
 parent: "End Quest"
 team: "CodeMaxxers"
 submodule: 4
-categories: [CSP, Submodule, End]
 tags: [end, submodule, codemaxxers]
 author: "David, Aryan"
 date: 2025-10-24

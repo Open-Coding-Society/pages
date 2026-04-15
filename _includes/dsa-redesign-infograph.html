@@ -1,0 +1,130 @@
+{% assign data = site.data.dsa_redesign_infograph %}
+
+<div class="dsa-infograph">
+  <!-- Header Section -->
+  <div class="dsa-header">
+    <div class="dsa-badge">Capstone Website Redesign</div>
+    <h1 class="dsa-title">{{ data.Title }}</h1>
+    <div class="dsa-team-badge">TheSprinters — Akhil, Neil, Moiz</div>
+    <p class="dsa-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- About the Organization -->
+  <div class="dsa-about-org">
+    <div class="dsa-about-org-grid">
+      <div class="dsa-about-org-text">
+        <h2 class="dsa-about-org-title">About the Organization</h2>
+        <p class="dsa-about-org-body">The <strong>Deputy Sheriffs' Association of San Diego County (DSA)</strong> is the labor union representing the dedicated officers of the San Diego Sheriff's Department. With <strong>70 years</strong> of service and over <strong>4,229 members</strong>, the DSA provides essential benefits, organizes events, and advocates for deputies of all ranks.</p>
+        <p class="dsa-about-org-body">As the collective bargaining unit, the DSA negotiates contracts, provides legal defense, supports political action, and offers member benefits and wellness programs. Their website serves as the primary digital hub for member resources, news, the DSA store, and community engagement.</p>
+        <div class="dsa-about-org-details">
+          <span class="dsa-about-org-detail">📍 13881 Danielson Street, Poway, CA 92064</span>
+          <span class="dsa-about-org-detail">📞 (858) 486-9009</span>
+          <span class="dsa-about-org-detail">📧 info@dsasd.org</span>
+        </div>
+        <a href="https://dsasd.org/" class="dsa-about-org-link" target="_blank" rel="noopener noreferrer">Visit DSA Website ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="dsa-card">
+    <div class="dsa-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="dsa-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dsa-image-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dsa-image">
+          <div class="dsa-overlay">
+            <span>View Details</span>
+          </div>
+        </a>
+        <div class="dsa-status {% if topic.status == 'Main Feature' %}dsa-status-main{% endif %}">{{ topic.status }}</div>
+        <div class="dsa-team">
+          <span class="dsa-team-label">Work Split</span>
+          {% for member in topic.team %}
+          <span class="dsa-team-member">{{ member }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="dsa-content">
+        <h2 class="dsa-project-title">{{ topic.title }}</h2>
+        <p class="dsa-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="dsa-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="dsa-keypoint">
+            <span class="dsa-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="dsa-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="dsa-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="dsa-details">
+        <h3 class="dsa-section-title">About</h3>
+        <p class="dsa-about">{{ topic.description }}</p>
+
+        <h3 class="dsa-section-title">Impact</h3>
+        <div class="dsa-impact-list">
+          {% for item in topic.impact %}
+          <div class="dsa-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dsa-btn">Learn More</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Team Distribution -->
+  <div class="dsa-additional">
+    <h2 class="dsa-additional-title">Team Work Distribution</h2>
+    <p class="dsa-additional-desc">Every member rotates across different responsibilities — backend, frontend, design, content, and testing — ensuring well-rounded experience.</p>
+    <div class="dsa-distribution">
+      <div class="dsa-member-card">
+        <div class="dsa-member-name">Akhil</div>
+        <div class="dsa-member-roles">
+          <span class="dsa-role-tag">Backend & API</span>
+          <span class="dsa-role-tag">Live Chat Widget</span>
+          <span class="dsa-role-tag">Responsive Frontend</span>
+        </div>
+      </div>
+      <div class="dsa-member-card">
+        <div class="dsa-member-name">Neil</div>
+        <div class="dsa-member-roles">
+          <span class="dsa-role-tag">UI/UX Design</span>
+          <span class="dsa-role-tag">Content Audit</span>
+          <span class="dsa-role-tag">Search & A11y</span>
+        </div>
+      </div>
+      <div class="dsa-member-card">
+        <div class="dsa-member-name">Moiz</div>
+        <div class="dsa-member-roles">
+          <span class="dsa-role-tag">Calendar & Notifications</span>
+          <span class="dsa-role-tag">Frontend Search</span>
+          <span class="dsa-role-tag">IA & Design</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Website Link -->
+  <div class="dsa-website-link">
+    <span class="dsa-website-label">Official Website</span>
+    <a href="https://dsasd.org/" class="dsa-website-btn" target="_blank" rel="noopener noreferrer">
+      Visit dsasd.org ↗
+    </a>
+  </div>
+</div>

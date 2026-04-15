@@ -1,0 +1,563 @@
+{% assign data = site.data.poway-orchsym-infographic %}
+{% assign first_topic = data.Topics | first %}
+
+<style>
+  .pso-infograph-shell {
+    width: 100vw;
+    max-width: 100vw;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    box-sizing: border-box;
+  }
+
+  .pso-infograph {
+    --pso-burgundy: #5c1118;
+    --pso-burgundy-deep: #3a090f;
+    --pso-burgundy-soft: #704444;
+    --pso-cream: #eadccf;
+    --pso-card-cream: #dec8b8;
+    --pso-cream-strong: #f1e4db;
+    --pso-cream-muted: #d2b9a9;
+    --pso-cream-deep: #bea18f;
+    --pso-panel-soft: #8a6262;
+    --pso-panel-deep: #5a3434;
+    --pso-rose-pale: #c79f9f;
+    --pso-text: #2f120f;
+    --pso-shadow: rgba(46, 8, 12, 0.24);
+    width: min(1600px, 90vw, calc(100vw - 2rem)) !important;
+    max-width: none !important;
+    min-width: 0;
+    flex: 0 1 auto;
+    box-sizing: border-box;
+    margin: 0 auto !important;
+    padding: 2.25rem clamp(1rem, 2vw, 1.5rem) 3.25rem;
+    background: linear-gradient(180deg, var(--pso-cream) 0%, var(--pso-cream-muted) 52%, var(--pso-cream-deep) 100%);
+    border-radius: 32px;
+    box-shadow: 0 24px 60px rgba(30, 5, 7, 0.18);
+    color: var(--pso-text);
+  }
+
+  .pso-infograph .sip-header {
+    width: 100%;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, var(--pso-panel-soft) 0%, var(--pso-panel-deep) 100%);
+    border: 1px solid rgba(212, 168, 168, 0.32);
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(30, 5, 7, 0.16);
+    padding: 2.5rem 3rem;
+    margin: 0 auto 1.75rem;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    color: var(--pso-cream-strong);
+  }
+
+  .pso-infograph .sip-header > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .pso-infograph .sip-header::after {
+    content: "";
+    position: absolute;
+    inset: auto -8% -30% auto;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(127, 83, 83, 0.14) 0%, rgba(127, 83, 83, 0) 70%);
+    pointer-events: none;
+  }
+
+  .pso-infograph .sip-tech-tag {
+    background: rgba(127, 83, 83, 0.1);
+    color: var(--pso-burgundy-soft);
+    border: 1px solid rgba(199, 159, 159, 0.5);
+  }
+
+  .pso-infograph .sip-header .sip-badge {
+    background: rgba(99, 55, 55, 0.34) !important;
+    background-color: rgba(99, 55, 55, 0.34) !important;
+    color: var(--pso-cream-strong) !important;
+    border: 1px solid rgba(241, 228, 219, 0.2) !important;
+    box-shadow: 0 10px 24px rgba(30, 5, 7, 0.18);
+  }
+
+  .pso-infograph .sip-title,
+  .pso-infograph .sip-project-title,
+  .pso-infograph .sip-section-title {
+    color: var(--pso-burgundy-soft);
+  }
+
+  .pso-infograph .sip-header .sip-title,
+  .pso-infograph .sip-header .sip-section-title,
+  .pso-infograph .sip-card .sip-project-title,
+  .pso-infograph .sip-card .sip-section-title,
+  .pso-infograph .sip-card .sip-subtitle,
+  .pso-infograph .sip-card .sip-about {
+    color: var(--pso-cream-strong) !important;
+  }
+
+  .pso-infograph .sip-header,
+  .pso-infograph .sip-card,
+  .pso-infograph .sip-content,
+  .pso-infograph .sip-details,
+  .pso-infograph .sip-tech-tag,
+  .pso-infograph .sip-btn,
+  .pso-infograph .sip-btn::after {
+    color: var(--pso-burgundy-deep);
+  }
+
+  .pso-infograph .sip-header,
+  .pso-infograph .sip-header > :not(.sip-impact-list),
+  .pso-infograph .sip-header > :not(.sip-impact-list) * {
+    color: var(--pso-cream-strong);
+  }
+
+  .pso-infograph .sip-header > :not(.sip-impact-list),
+  .pso-infograph .sip-header > :not(.sip-impact-list) *,
+  .pso-infograph .sip-content > :not(.sip-keypoints):not(.sip-impact-list),
+  .pso-infograph .sip-content > :not(.sip-keypoints):not(.sip-impact-list) *,
+  .pso-infograph .sip-details > :not(.sip-keypoints):not(.sip-impact-list),
+  .pso-infograph .sip-details > :not(.sip-keypoints):not(.sip-impact-list) *,
+  .pso-infograph .sip-card > :not(.sip-card-grid),
+  .pso-infograph .sip-card > :not(.sip-card-grid) * {
+    color: var(--pso-burgundy-deep);
+  }
+
+  .pso-infograph .sip-description,
+  .pso-infograph .sip-header .sip-impact-item {
+    color: var(--pso-burgundy-deep);
+  }
+
+  .pso-infograph .sip-header .sip-description,
+  .pso-infograph .sip-header .sip-description * {
+    color: var(--pso-cream-strong) !important;
+  }
+
+  .pso-infograph .sip-card {
+    width: 100%;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, var(--pso-card-cream) 0%, var(--pso-cream-muted) 100%);
+    border: 1px solid var(--pso-rose-pale);
+    border-radius: 24px;
+    box-shadow: 0 22px 44px rgba(26, 4, 6, 0.22);
+    padding: 2.2rem;
+    margin: 0 auto 1.75rem;
+    color: var(--pso-burgundy-deep);
+  }
+
+  .pso-infograph .sip-card-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2.25rem;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .pso-infograph .sip-card .sip-project-title,
+  .pso-infograph .sip-card .sip-section-title,
+  .pso-infograph .sip-card .sip-subtitle,
+  .pso-infograph .sip-card .sip-about,
+  .pso-infograph .sip-card .sip-impact-item {
+    color: var(--pso-burgundy-deep) !important;
+  }
+
+  .pso-infograph .sip-card .sip-section-title {
+    border-bottom: 1px solid rgba(212, 168, 168, 0.7);
+    padding-bottom: 0.35rem;
+  }
+
+  .pso-infograph .sip-content,
+  .pso-infograph .sip-details {
+    min-width: 0;
+    text-align: center;
+    background: linear-gradient(180deg, var(--pso-panel-soft) 0%, var(--pso-panel-deep) 100%);
+    border: 1px solid rgba(199, 159, 159, 0.26);
+    border-radius: 18px;
+    padding: 1.25rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 234, 0.06);
+    color: var(--pso-cream-strong) !important;
+  }
+
+  .pso-infograph .sip-content h1,
+  .pso-infograph .sip-content h2,
+  .pso-infograph .sip-content h3,
+  .pso-infograph .sip-content h4,
+  .pso-infograph .sip-content p,
+  .pso-infograph .sip-content span,
+  .pso-infograph .sip-content strong,
+  .pso-infograph .sip-content em,
+  .pso-infograph .sip-content li,
+  .pso-infograph .sip-details h1,
+  .pso-infograph .sip-details h2,
+  .pso-infograph .sip-details h3,
+  .pso-infograph .sip-details h4,
+  .pso-infograph .sip-details p,
+  .pso-infograph .sip-details span,
+  .pso-infograph .sip-details strong,
+  .pso-infograph .sip-details em,
+  .pso-infograph .sip-details li {
+    color: var(--pso-cream-strong) !important;
+  }
+
+  .pso-infograph .sip-tech-stack,
+  .pso-infograph .sip-keypoints,
+  .pso-infograph .sip-impact-list {
+    justify-items: center;
+  }
+
+  .pso-infograph .sip-about,
+  .pso-infograph .sip-subtitle,
+  .pso-infograph .sip-description {
+    max-width: 70ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pso-infograph .sip-keypoints,
+  .pso-infograph .sip-impact-list {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .pso-infograph .sip-keypoint,
+  .pso-infograph .sip-impact-item {
+    background: #512f2f;
+    border-left: 4px solid var(--pso-gold);
+    border-radius: 14px;
+    padding: 0.9rem 1rem;
+    width: min(100%, 60ch);
+    color: var(--pso-cream-strong);
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 234, 0.1);
+    backdrop-filter: blur(1px);
+  }
+
+  .pso-infograph .sip-keypoint,
+  .pso-infograph .sip-impact-item,
+  .pso-infograph .sip-header .sip-impact-item {
+    color: var(--pso-cream-strong) !important;
+  }
+
+  .pso-infograph .sip-keypoint *,
+  .pso-infograph .sip-impact-item * {
+    color: inherit !important;
+  }
+
+  .pso-infograph .sip-impact-list .sip-impact-item,
+  .pso-infograph .sip-impact-list .sip-impact-item *,
+  .pso-infograph .sip-keypoints .sip-keypoint,
+  .pso-infograph .sip-keypoints .sip-keypoint * {
+    color: var(--pso-cream-strong) !important;
+  }
+
+  .pso-infograph .sip-keypoint span,
+  .pso-infograph .sip-keypoint strong,
+  .pso-infograph .sip-keypoint em,
+  .pso-infograph .sip-keypoint p,
+  .pso-infograph .sip-impact-item span,
+  .pso-infograph .sip-impact-item strong,
+  .pso-infograph .sip-impact-item em,
+  .pso-infograph .sip-impact-item p,
+  .pso-infograph .sip-header .sip-impact-item span,
+  .pso-infograph .sip-header .sip-impact-item strong,
+  .pso-infograph .sip-header .sip-impact-item em,
+  .pso-infograph .sip-header .sip-impact-item p {
+    color: var(--pso-cream-strong) !important;
+  }
+
+  .pso-infograph .sip-header .sip-impact-item {
+    background: #512f2f;
+    border-left-color: var(--pso-gold);
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 234, 0.1);
+  }
+
+  .pso-infograph .sip-check {
+    color: var(--pso-cream-strong) !important;
+    font-weight: 700;
+  }
+
+  .pso-infograph .sip-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.1rem;
+    margin-top: 1.6rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .pso-infograph .sip-header .sip-impact-list {
+    margin-top: 0.4rem;
+  }
+
+  .pso-infograph .sip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 0.7rem;
+    min-width: 244px;
+    padding: 1.05rem 1.55rem;
+    background: linear-gradient(145deg, var(--pso-cream) 0%, var(--pso-card-cream) 55%, var(--pso-cream-deep) 100%);
+    color: var(--pso-burgundy-deep);
+    border: 1px solid rgba(127, 83, 83, 0.24);
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(127, 83, 83, 0.12), 0 14px 24px rgba(21, 4, 6, 0.16);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    overflow: hidden;
+  }
+
+  .pso-infograph .sip-btn:link,
+  .pso-infograph .sip-btn:visited,
+  .pso-infograph .sip-btn:hover,
+  .pso-infograph .sip-btn:active,
+  .pso-infograph .sip-btn:focus-visible {
+    color: var(--pso-burgundy-deep) !important;
+    text-decoration: none;
+  }
+
+  .pso-infograph a.sip-btn,
+  .pso-infograph a.sip-btn:link,
+  .pso-infograph a.sip-btn:visited,
+  .pso-infograph a.sip-btn:hover,
+  .pso-infograph a.sip-btn:active,
+  .pso-infograph a.sip-btn:focus-visible,
+  .pso-infograph a.sip-btn *,
+  .pso-infograph a.sip-btn::after {
+    color: var(--pso-burgundy-deep) !important;
+    text-decoration: none !important;
+  }
+
+  .pso-infograph .sip-btn::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%);
+    pointer-events: none;
+  }
+
+  .pso-infograph .sip-btn::after {
+    content: "->";
+    font-size: 1rem;
+    color: inherit;
+    opacity: 0.95;
+    position: relative;
+    transform: translateX(0);
+    transition: transform 0.18s ease;
+  }
+
+  .pso-infograph .sip-btn:hover,
+  .pso-infograph .sip-btn:focus-visible {
+    background: linear-gradient(145deg, #f1e3d7 0%, var(--pso-cream) 55%, var(--pso-card-cream) 100%);
+    border-color: rgba(127, 83, 83, 0.34);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 -1px 0 rgba(127, 83, 83, 0.14), 0 18px 30px rgba(21, 4, 6, 0.2);
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  .pso-infograph .sip-btn:hover::after,
+  .pso-infograph .sip-btn:focus-visible::after {
+    transform: translateX(2px);
+  }
+
+  .pso-infograph .sip-btn:focus-visible {
+    outline: 2px solid var(--pso-gold);
+    outline-offset: 2px;
+  }
+
+  @media (min-width: 1280px) {
+    .pso-infograph .sip-card-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .pso-infograph .sip-card-grid {
+      grid-template-columns: 1fr;
+      gap: 1.4rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .pso-infograph-shell {
+      width: 100%;
+      max-width: 100%;
+      left: auto;
+      right: auto;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .pso-infograph {
+      width: min(100%, calc(100vw - 1rem));
+      border-radius: 24px;
+      padding: 1.25rem 0.75rem 2rem;
+    }
+
+    .pso-infograph .sip-header {
+      padding: 1.75rem;
+    }
+
+    .pso-infograph .sip-card {
+      padding: 1.4rem;
+    }
+
+    .pso-infograph .sip-card-grid {
+      gap: 1.25rem;
+    }
+  }
+</style>
+
+<div class="pso-infograph-shell">
+<div class="sip-infograph pso-infograph">
+  <!-- Header -->
+  <div class="sip-header">
+    {% if data.HeaderImage %}
+    <div class="sip-header-image-wrap">
+      <img src="{{ site.baseurl }}/images/{{ data.HeaderImage }}" alt="{{ data.Title }}" class="sip-header-image">
+    </div>
+    {% endif %}
+    <div class="sip-badge">{{ data.Badge | default: 'Design-Based Research Capstone' }}</div>
+    <h1 class="sip-title">{{ data.Title }}</h1>
+    <p class="sip-description">{{ data.Description }}</p>
+    {% if first_topic %}
+    <div class="sip-actions">
+      <a href="{{ first_topic.link }}" class="sip-btn" target="_blank" rel="noopener">{{ first_topic.buttonLabel | default: 'View Frontend Site' }}</a>
+      {% if first_topic.backendLink %}
+      <a href="{{ first_topic.backendLink }}" class="sip-btn" target="_blank" rel="noopener">{{ first_topic.backendButtonLabel | default: 'View Backend Site' }}</a>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% if data.status or data.team %}
+    <div class="sip-impact-list">
+      {% if data.status %}
+      <div class="sip-impact-item">Status: {{ data.status }}</div>
+      {% endif %}
+      {% if data.team %}
+      <div class="sip-impact-item">Team: {{ data.team | join: ", " }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Cards -->
+  {% for topic in data.Topics %}
+  <div class="sip-card">
+    <div class="sip-card-grid">
+
+      <!-- Center: Key Points & Tags -->
+      <div class="sip-content">
+        <h2 class="sip-project-title">{{ topic.title }}</h2>
+        <p class="sip-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="sip-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="sip-keypoint">
+            <span class="sip-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="sip-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="sip-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+
+        {% if topic.interactiveElements %}
+        <h3 class="sip-section-title">Interactive Elements</h3>
+        {% if topic.interactiveLink %}
+        <div class="sip-section-action">
+          <a href="{{ topic.interactiveLink }}" class="sip-btn" target="_blank" rel="noopener">{{ topic.interactiveButtonLabel | default: 'Open Games Page' }}</a>
+        </div>
+        {% endif %}
+        <div class="sip-keypoints">
+          {% for element in topic.interactiveElements %}
+          <div class="sip-keypoint">
+            <span class="sip-check">✓</span>
+            <span>
+              <strong>{{ element.title }}:</strong> {{ element.description }}
+              {% if element.link %}
+              <a href="{{ element.link }}" class="sip-btn" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
+              {% endif %}
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Right: About & Impact -->
+      <div class="sip-details">
+        <h3 class="sip-section-title">About</h3>
+        <p class="sip-about">{{ topic.description }}</p>
+
+        {% if topic.problemsSolved %}
+        <h3 class="sip-section-title">Problems Solved</h3>
+        <div class="sip-impact-list">
+          {% for problem in topic.problemsSolved %}
+          <div class="sip-impact-item">{{ problem }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if topic.impact %}
+        <h3 class="sip-section-title">Impact</h3>
+        <div class="sip-impact-list">
+          {% for item in topic.impact %}
+          <div class="sip-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if topic.wowFactors %}
+        <h3 class="sip-section-title">Wow Factors</h3>
+        <div class="sip-impact-list">
+          {% for factor in topic.wowFactors %}
+          <div class="sip-impact-item">{{ factor }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if topic.improvementsMade %}
+        <h3 class="sip-section-title">Improvements Made</h3>
+        <div class="sip-impact-list">
+          {% for improvement in topic.improvementsMade %}
+          <div class="sip-impact-item">{{ improvement }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if topic.customerPitch %}
+        <h3 class="sip-section-title">Customer Pitch</h3>
+        <div class="sip-impact-list">
+          {% for pitch in topic.customerPitch %}
+          <div class="sip-impact-item">{{ pitch }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if topic.futurePlans %}
+        <h3 class="sip-section-title">Future Plans</h3>
+        <div class="sip-impact-list">
+          {% for plan in topic.futurePlans %}
+          <div class="sip-impact-item">{{ plan }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+</div>
