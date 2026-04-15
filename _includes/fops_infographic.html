@@ -1,400 +1,87 @@
 {% assign data = site.data.fops_infographic %}
 
-<div class="fops-infographic">
-  <!-- Hero Section -->
-  <div class="hero-section">
-    <h1 class="hero-title">{{ data.title }}</h1>
-    <p class="hero-description">{{ data.description }}</p>
-    <div class="hero-buttons">
-      <a href="https://www.friendsofpowayseniors.org" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-        Visit Friends of Poway Seniors →
-      </a>
-      <a href="https://fops.opencodingsociety.com/fops" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
-        View FOPS Open Coding Platform →
-      </a>
-    </div>
-  </div>
-
-  <!-- Project Title Bar -->
-  <div class="project-title-bar">
-    <h2 class="project-title">{{ data.topics[0].title }}</h2>
-    <p class="project-subtitle">{{ data.topics[0].subtitle }}</p>
-  </div>
-
-  <!-- Project Tools Grid -->
-  <div class="tools-grid">
-    <!-- Bingo Game Card -->
-    <div class="tool-card">
-      <div class="tool-icon">🎲</div>
-      <div class="tool-label">Bingo Game</div>
-      <div class="tool-name">Interactive Bingo</div>
-      <div class="tool-description">75-ball Bingo with auto-caller — call numbers, mark your card, and shout BINGO when you win!</div>
-      <div class="tool-links">
-        <a href="https://fops.opencodingsociety.com/fopsbingo/" class="tool-link" target="_blank" rel="noopener noreferrer">Play Bingo Game →</a>
-        <a href="https://fops.opencodingsociety.com/fopsbingo/#volunteer" class="tool-link volunteer-link" target="_blank" rel="noopener noreferrer">Volunteer at Bingo →</a>
-      </div>
-    </div>
-
-    <!-- ML Event Predictor Card -->
-    <div class="tool-card">
-      <div class="tool-icon">📊</div>
-      <div class="tool-label">Event Predictor</div>
-      <div class="tool-name">ML-Powered Forecasting</div>
-      <div class="tool-description">AI forecasts volunteer needs and meal quantities to prevent shortages and reduce waste before event day.</div>
-      <a href="https://fops.opencodingsociety.com/fopspredictor/" class="tool-link" target="_blank" rel="noopener noreferrer">Open Event Predictor →</a>
-    </div>
-
-    <!-- AI Chatbot Card -->
-    <div class="tool-card">
-      <div class="tool-icon">🤖</div>
-      <div class="tool-label">AI Chatbot</div>
-      <div class="tool-name">24/7 Virtual Assistant</div>
-      <div class="tool-description">Answers questions, provides resources, and guides seniors through available services.</div>
-      <a href="https://fops.opencodingsociety.com/fops#chatbot" class="tool-link" target="_blank" rel="noopener noreferrer">Open AI Assistant →</a>
-    </div>
-  </div>
-
-  <!-- Feature Highlights Section -->
-  <div class="feature-highlights">
-    <div class="feature-highlights-header">
-      <h3 class="black-text">Friends of Poway Seniors Website</h3>
-      <p class="tagline-black">One Platform. Every Service. Instantly.</p>
-    </div>
-    <div class="highlights-grid">
-      <div class="highlight-item black-text">✓ Simplified navigation — 7+ dropdowns reduced to 3 clear links</div>
-      <div class="highlight-item black-text">✓ Prominent CTA buttons (Donate, Volunteer, Get Help) above the fold</div>
-      <div class="highlight-item black-text">✓ Meal tracker for seniors to log daily nutrition with caregiver support</div>
-      <div class="highlight-item black-text">✓ Mobile-responsive design for elderly users and caregivers</div>
-      <div class="highlight-item black-text">✓ AI chatbot answers questions 24/7 in plain English</div>
-      <div class="highlight-item black-text">✓ Interactive Bingo game with auto-caller for community engagement</div>
-      <div class="highlight-item black-text">✓ ML-powered event predictor forecasts volunteer and food needs</div>
-      <div class="highlight-item black-text">✓ Volunteer signup portal with schedule management</div>
-    </div>
-  </div>
-
-  <!-- Impact Section -->
-  <div class="impact-section">
-    <h3 class="impact-title">Impact</h3>
-    <div class="impact-grid">
-      <div class="impact-card">Reduces cognitive load for elderly users through simplified menus</div>
-      <div class="impact-card">Makes donation and volunteer opportunities impossible to miss</div>
-      <div class="impact-card">Builds trust through authentic photography of real community impact</div>
-      <div class="impact-card">Helps seniors and caregivers track daily nutrition with meal logger</div>
-      <div class="impact-card">Ensures critical contact info is always visible and accessible</div>
-      <div class="impact-card">Preserves organization's mission while modernizing presentation</div>
-      <div class="impact-card">Sets foundation for future digital services (event RSVP, meal scheduling)</div>
-      <div class="impact-card">Reduces service lookup from multiple clicks to one interaction</div>
-    </div>
-  </div>
-
-  <!-- Footer with Team and Learn More -->
-  <div class="project-footer">
-    <div class="team-section">
-      <span class="team-label">Project Leads</span>
-      <div class="team-names">
-        {% for member in data.topics[0].team %}
-        <span class="team-name">{{ member }}</span>
-        {% endfor %}
-      </div>
-    </div>
-    <div class="status-section">
-      <a href="https://www.friendsofpowayseniors.org" class="learn-more-link" target="_blank" rel="noopener noreferrer">Learn More →</a>
-    </div>
-  </div>
-</div>
-
 <style>
-  /* ACS-inspired styling */
-  .fops-infographic {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  }
-
-  .hero-section {
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-
-  .hero-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: #1b5e20;
-    line-height: 1.2;
-  }
-
-  .hero-description {
-    font-size: 1.1rem;
-    color: #555;
-    max-width: 800px;
-    margin: 0 auto 1.5rem;
-    line-height: 1.5;
-  }
-
-  .hero-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
-  }
-
-  .btn-primary {
-    background: #2e7d32;
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background: #1b5e20;
-    transform: translateY(-2px);
-  }
-
-  .btn-secondary {
-    background: #f5f5f5;
-    color: #2e7d32;
-    border: 1px solid #ddd;
-  }
-
-  .btn-secondary:hover {
-    background: #e8f5e9;
-    transform: translateY(-2px);
-  }
-
-  .project-title-bar {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #e8f5e9;
-  }
-
-  .project-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #2e7d32;
-    margin-bottom: 0.25rem;
-  }
-
-  .project-subtitle {
-    font-size: 1rem;
-    color: #666;
-  }
-
-  .tools-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-  }
-
-  .tool-card {
-    background: #f9f9f9;
-    border-radius: 16px;
-    padding: 1.5rem;
-    transition: all 0.2s ease;
-    border: 1px solid #e0e0e0;
-  }
-
-  .tool-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border-color: #4caf50;
-  }
-
-  .tool-icon {
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .tool-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #4caf50;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-
-  .tool-name {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 0.75rem;
-  }
-
-  .tool-description {
-    font-size: 0.9rem;
-    color: #666;
-    line-height: 1.4;
-    margin-bottom: 1rem;
-  }
-
-  .tool-link {
-    color: #2e7d32;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    display: inline-block;
-    margin-right: 1rem;
-  }
-
-  .tool-link:hover {
-    text-decoration: underline;
-  }
-
-  .volunteer-link {
-    color: #e65100;
-  }
-
-  .tool-links {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .feature-highlights {
-    background: #e8f5e9;
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 3rem;
-  }
-
-  .feature-highlights-header {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .feature-highlights-header h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-  }
-
-  .tagline-black {
-    font-size: 0.95rem;
-    color: #000000 !important;
-    font-weight: 500;
-  }
-
-  .black-text {
-    color: #000000 !important;
-  }
-
-  .highlights-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 0.75rem;
-  }
-
-  .highlight-item {
-    font-size: 0.9rem;
-    padding: 0.5rem 0;
-  }
-
-  .impact-section {
-    margin-bottom: 3rem;
-  }
-
-  .impact-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1b5e20;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .impact-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-  }
-
-  .impact-card {
-    background: #f5f5f5;
-    padding: 1rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    color: #333;
-    line-height: 1.4;
-    border-left: 3px solid #4caf50;
-  }
-
-  .project-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 2rem;
-    border-top: 1px solid #e0e0e0;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .team-section {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .team-label {
-    font-size: 0.85rem;
-    color: #666;
-    font-weight: 500;
-  }
-
-  .team-names {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .team-name {
-    font-size: 0.9rem;
-    color: #2e7d32;
-    font-weight: 500;
-  }
-
-  .status-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .learn-more-link {
-    color: #2e7d32;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  .learn-more-link:hover {
-    text-decoration: underline;
-  }
-
-  @media (max-width: 768px) {
-    .hero-title {
-      font-size: 1.8rem;
-    }
-    .tools-grid {
-      grid-template-columns: 1fr;
-    }
-    .highlights-grid {
-      grid-template-columns: 1fr;
-    }
-    .impact-grid {
-      grid-template-columns: 1fr;
-    }
-    .project-footer {
-      flex-direction: column;
-      text-align: center;
-    }
-    .team-section {
-      flex-direction: column;
-    }
+  .fops { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #111; color: #e0e0e0; border-radius: 12px; }
+  .fops h1 { font-size: 20px; font-weight: 500; color: #fff; margin: 0 0 16px; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .btn { font-size: 12px; padding: 6px 14px; border-radius: 6px; text-decoration: none; }
+  .btn-g { background: #1a3a1a; color: #6fcf6f; border: 0.5px solid #2d5a2d; }
+  .btn-d { background: #1e1e1e; color: #999; border: 0.5px solid #333; }
+  .tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .card { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 12px; padding: 14px; }
+  .card-tag { font-size: 10px; letter-spacing: 1px; color: #4caf50; text-transform: uppercase; margin-bottom: 6px; }
+  .card-name { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 6px; }
+  .card-desc { font-size: 12px; color: #777; line-height: 1.5; margin-bottom: 10px; }
+  .card-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .card-link { font-size: 12px; color: #4caf50; text-decoration: none; }
+  .card-link:hover { text-decoration: underline; }
+  .card-link.orange { color: #e07030; }
+  .highlights { background: #161f16; border: 0.5px solid #2a3a2a; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+  .hl-title { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 4px; }
+  .hl-sub { font-size: 12px; color: #666; margin-bottom: 12px; }
+  .hl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .hl-item { font-size: 12px; color: #999; }
+  .footer { border-top: 0.5px solid #222; padding-top: 16px; }
+  .footer-left { font-size: 12px; color: #555; }
+  @media (max-width: 700px) {
+    .tools { grid-template-columns: 1fr; }
+    .hl-grid { grid-template-columns: 1fr; }
   }
 </style>
+
+<div class="fops">
+  <h1>{{ data.title }}</h1>
+  <div class="btn-row">
+    <a href="https://www.friendsofpowayseniors.org" class="btn btn-g" target="_blank" rel="noopener noreferrer">Visit Original Site →</a>
+    <a href="https://fops.opencodingsociety.com/fops" class="btn btn-d" target="_blank" rel="noopener noreferrer">Visit New Site →</a>
+  </div>
+
+  <div class="tools">
+    <div class="card">
+      <div class="card-tag">Bingo Game</div>
+      <div class="card-name">Interactive Bingo</div>
+      <div class="card-desc">75-ball bingo with auto-caller — mark your card and shout BINGO when you win.</div>
+      <div class="card-links">
+        <a href="https://fops.opencodingsociety.com/fopsbingo/" class="card-link" target="_blank" rel="noopener noreferrer">Play →</a>
+        <a href="https://fops.opencodingsociety.com/fopsbingo/#volunteer" class="card-link orange" target="_blank" rel="noopener noreferrer">Volunteer →</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-tag">Event Predictor</div>
+      <div class="card-name">ML Forecasting</div>
+      <div class="card-desc">AI forecasts volunteer needs and meal quantities to prevent shortages before event day.</div>
+      <div class="card-links">
+        <a href="https://fops.opencodingsociety.com/fopspredictor/" class="card-link" target="_blank" rel="noopener noreferrer">Open →</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-tag">AI Chatbot</div>
+      <div class="card-name">24/7 Assistant</div>
+      <div class="card-desc">Answers questions and guides seniors through available services around the clock.</div>
+      <div class="card-links">
+        <a href="https://fops.opencodingsociety.com/fops#chatbot" class="card-link" target="_blank" rel="noopener noreferrer">Open →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlights">
+    <div class="hl-title">{{ data.topics[0].title }}</div>
+    <div class="hl-sub">One platform. Every service. Instantly.</div>
+    <div class="hl-grid">
+      <div class="hl-item">✓ Navigation reduced from 7+ dropdowns to 3 clear links</div>
+      <div class="hl-item">✓ Donate, Volunteer, Get Help CTAs above the fold</div>
+      <div class="hl-item">✓ Meal tracker with caregiver support</div>
+      <div class="hl-item">✓ Mobile-responsive for elderly users</div>
+      <div class="hl-item">✓ AI chatbot in plain English, 24/7</div>
+      <div class="hl-item">✓ Volunteer signup with schedule management</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-left">Project leads:
+      {% for member in data.topics[0].team %}
+        {{ member }}{% unless forloop.last %}, {% endunless %}
+      {% endfor %}
+    </span>
+  </div>
+</div>
