@@ -1,51 +1,191 @@
 {% assign data = site.data.dsa_redesign_infograph %}
 
+<style>
+  .dsa-infograph .dsa-demo-card {
+    text-align: center;
+  }
+  .dsa-infograph .dsa-demo-header {
+    background: none;
+    border: none;
+    padding: 0 0 1.5rem 0;
+    margin-bottom: 1.5rem;
+  }
+  .dsa-infograph .dsa-demo-label {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    padding: 0.4rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+  }
+  .dsa-infograph .dsa-demo-note {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .dsa-infograph .dsa-demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 768px) {
+    .dsa-infograph .dsa-demo-grid { grid-template-columns: 1fr; }
+  }
+  .dsa-infograph .dsa-demo-link {
+    display: block;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    text-align: left;
+  }
+  .dsa-infograph .dsa-demo-link:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+  }
+  .dsa-infograph .dsa-demo-link-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+  .dsa-infograph .dsa-demo-link-url {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+    word-break: break-all;
+  }
+  .dsa-infograph .dsa-demo-link-hint {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .dsa-infograph .dsa-pitch-card .dsa-section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .dsa-infograph .dsa-features-header {
+    background: none;
+    border: none;
+    padding: 1rem 0 0.5rem 0;
+    text-align: center;
+  }
+  .dsa-infograph .dsa-about-org {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 2rem;
+    margin-top: 1rem;
+  }
+  .dsa-infograph .dsa-about-org-body {
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .dsa-infograph .dsa-about-org-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+  }
+  .dsa-infograph .dsa-about-org-detail {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .dsa-infograph .dsa-about-org-link {
+    display: inline-block;
+    padding: 0.7rem 1.1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  .dsa-infograph .dsa-about-org-link:hover {
+    background: rgba(255, 255, 255, 0.18);
+  }
+</style>
+
 <div class="dsa-infograph">
+
   <!-- Header Section -->
   <div class="dsa-header">
-    <div class="dsa-badge">Capstone Website Redesign</div>
-    <h1 class="dsa-title">{{ data.Title }}</h1>
-    <div class="dsa-team-badge">TheSprinters — Akhil, Neil, Moiz</div>
-    <p class="dsa-description">{{ data.Description }}</p>
+    <div class="dsa-badge">Capstone Pitch · Website Redesign</div>
+    <h1 class="dsa-title">A New Digital Home for the DSA</h1>
+    <p class="dsa-description">A proposal for the <strong>Deputy Sheriffs' Association of San Diego County</strong> — a modern, member-first website that turns resources, benefits, and news into a single, clear experience. Built, hosted, and ready to demo today.</p>
+    <p class="dsa-subtitle">Proposed by <strong>TheSprinters</strong> — Akhil, Neil, Moiz</p>
   </div>
 
-  <!-- About the Organization -->
-  <div class="dsa-about-org">
-    <div class="dsa-about-org-grid">
-      <div class="dsa-about-org-text">
-        <h2 class="dsa-about-org-title">About the Organization</h2>
-        <p class="dsa-about-org-body">The <strong>Deputy Sheriffs' Association of San Diego County (DSA)</strong> is the labor union representing the dedicated officers of the San Diego Sheriff's Department. With <strong>70 years</strong> of service and over <strong>4,229 members</strong>, the DSA provides essential benefits, organizes events, and advocates for deputies of all ranks.</p>
-        <p class="dsa-about-org-body">As the collective bargaining unit, the DSA negotiates contracts, provides legal defense, supports political action, and offers member benefits and wellness programs. Their website serves as the primary digital hub for member resources, news, the DSA store, and community engagement.</p>
-        <div class="dsa-about-org-details">
-          <span class="dsa-about-org-detail">📍 13881 Danielson Street, Poway, CA 92064</span>
-          <span class="dsa-about-org-detail">📞 (858) 486-9009</span>
-          <span class="dsa-about-org-detail">📧 info@dsasd.org</span>
-        </div>
-        <a href="https://dsasd.org/" class="dsa-about-org-link" target="_blank" rel="noopener noreferrer">Visit DSA Website ↗</a>
-      </div>
+  <!-- Live Demo Links (Most Important - Top) -->
+  <div class="dsa-demo-card">
+    <div class="dsa-demo-header">
+      <div class="dsa-demo-label">See It Live</div>
+      <h2 class="dsa-demo-title">Our Redesign Is Deployed and Working</h2>
+      <p class="dsa-demo-note">Click either link below to interact with the proposed site. The frontend is fully hosted, connected to a working backend API.</p>
+    </div>
+    <div class="dsa-demo-grid">
+      <a href="https://dsasd.opencodingsociety.com" target="_blank" rel="noopener noreferrer" class="dsa-demo-link">
+        <div class="dsa-demo-link-label">Proposed Website</div>
+        <div class="dsa-demo-link-url">dsasd.opencodingsociety.com</div>
+        <div class="dsa-demo-link-hint">Live member-facing frontend ↗</div>
+      </a>
+      <a href="https://sheriff.opencodingsociety.com" target="_blank" rel="noopener noreferrer" class="dsa-demo-link">
+        <div class="dsa-demo-link-label">Backend API</div>
+        <div class="dsa-demo-link-url">sheriff.opencodingsociety.com</div>
+        <div class="dsa-demo-link-hint">Powers dashboard, FAQ, and search ↗</div>
+      </a>
     </div>
   </div>
 
-  <!-- Project Cards -->
+  <!-- The Pitch: Why Redesign -->
+  <div class="dsa-pitch-card">
+    <h2 class="dsa-section-title">Why a Redesign — and Why Now</h2>
+    <p class="dsa-about">Your members today navigate 9+ menu items and multiple pages to find benefits, forms, meeting minutes, and event tickets. The Latest News section shows only 2 static cards. The FAQ has no search. On mobile, the dropdowns are hard to use. We rebuilt the site around what members actually do — find resources, stay informed, and get answers — so the DSA's digital presence matches the prestige of the organization.</p>
+    <div class="dsa-impact-list">
+      <div class="dsa-impact-item"><strong>1-click access</strong> to benefits, forms, events, and the store — down from 3–4 pages of hunting</div>
+      <div class="dsa-impact-item"><strong>Instant answers</strong> with smart FAQ search, so members self-serve before calling</div>
+      <div class="dsa-impact-item"><strong>Mobile-first</strong> experience for the 50%+ of members browsing from their phones</div>
+      <div class="dsa-impact-item"><strong>Modern, professional look</strong> reflecting 70 years of service and 4,229+ members</div>
+      <div class="dsa-impact-item"><strong>Live news feed and calendar</strong> so announcements, meetings, and events never get buried</div>
+    </div>
+  </div>
+
+  <!-- What We Built: Feature Cards -->
+  <div class="dsa-features-header">
+    <h2 class="dsa-section-title">What We Built</h2>
+    <p class="dsa-about">Three focused upgrades that address the biggest friction points on dsasd.org today.</p>
+  </div>
+
   {% for topic in data.Topics %}
   <div class="dsa-card">
     <div class="dsa-card-grid">
 
       <!-- Left: Image & Status -->
       <div class="dsa-visual">
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="dsa-image-link">
+        <a href="https://dsasd.opencodingsociety.com" class="dsa-image-link" target="_blank" rel="noopener noreferrer">
           <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dsa-image">
           <div class="dsa-overlay">
-            <span>View Details</span>
+            <span>View on Live Site</span>
           </div>
         </a>
         <div class="dsa-status {% if topic.status == 'Main Feature' %}dsa-status-main{% endif %}">{{ topic.status }}</div>
-        <div class="dsa-team">
-          <span class="dsa-team-label">Work Split</span>
-          {% for member in topic.team %}
-          <span class="dsa-team-member">{{ member }}</span>
-          {% endfor %}
-        </div>
       </div>
 
       <!-- Center: Key Points -->
@@ -71,60 +211,50 @@
 
       <!-- Right: Description & Impact -->
       <div class="dsa-details">
-        <h3 class="dsa-section-title">About</h3>
+        <h3 class="dsa-section-title">What Changes</h3>
         <p class="dsa-about">{{ topic.description }}</p>
 
-        <h3 class="dsa-section-title">Impact</h3>
+        <h3 class="dsa-section-title">Member Impact</h3>
         <div class="dsa-impact-list">
           {% for item in topic.impact %}
           <div class="dsa-impact-item">{{ item }}</div>
           {% endfor %}
         </div>
 
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="dsa-btn">Learn More</a>
+        <a href="https://dsasd.opencodingsociety.com" class="dsa-btn" target="_blank" rel="noopener noreferrer">Try It Live ↗</a>
       </div>
 
     </div>
   </div>
   {% endfor %}
 
-  <!-- Team Distribution -->
-  <div class="dsa-additional">
-    <h2 class="dsa-additional-title">Team Work Distribution</h2>
-    <p class="dsa-additional-desc">Every member rotates across different responsibilities — backend, frontend, design, content, and testing — ensuring well-rounded experience.</p>
-    <div class="dsa-distribution">
-      <div class="dsa-member-card">
-        <div class="dsa-member-name">Akhil</div>
-        <div class="dsa-member-roles">
-          <span class="dsa-role-tag">Backend & API</span>
-          <span class="dsa-role-tag">Live Chat Widget</span>
-          <span class="dsa-role-tag">Responsive Frontend</span>
+  <!-- Why Choose Us -->
+  <div class="dsa-pitch-card">
+    <h2 class="dsa-section-title">Why Go With Our Redesign</h2>
+    <div class="dsa-impact-list">
+      <div class="dsa-impact-item"><strong>It's already built.</strong> Not a mockup — a live, hosted site with a working backend you can click through right now.</div>
+      <div class="dsa-impact-item"><strong>Zero risk to evaluate.</strong> Deployed on our infrastructure; no commitment, no takedown pressure, no cost to try.</div>
+      <div class="dsa-impact-item"><strong>Built on industry standards.</strong> WordPress REST API, React, and WCAG 2.1 AA accessibility — maintainable by any modern web team.</div>
+      <div class="dsa-impact-item"><strong>Focused on your members.</strong> Every feature maps to a real pain point on the current site, not cosmetic changes.</div>
+      <div class="dsa-impact-item"><strong>Designed to grow with you.</strong> Dashboard tiles, FAQ categories, and news feeds can all be expanded without a re-launch.</div>
+    </div>
+  </div>
+
+  <!-- About Current Webpage (Less Important - Bottom) -->
+  <div class="dsa-about-org">
+    <div class="dsa-about-org-grid">
+      <div class="dsa-about-org-text">
+        <h2 class="dsa-about-org-title">About the Current Webpage</h2>
+        <p class="dsa-about-org-body">The <strong>Deputy Sheriffs' Association of San Diego County (DSA)</strong> is the labor union representing the officers of the San Diego Sheriff's Department — 70 years of service and over 4,229 members strong. Its website at <strong>dsasd.org</strong> is the primary digital hub for member resources, news, the DSA store, and community engagement.</p>
+        <p class="dsa-about-org-body">Today the site surfaces information through a long top navigation, a static news section, and a short accordion FAQ. Members report difficulty locating benefits, forms, and meeting minutes — especially on mobile. Our redesign keeps every existing resource but reorganizes the experience around how members actually use it.</p>
+        <div class="dsa-about-org-details">
+          <span class="dsa-about-org-detail">📍 13881 Danielson Street, Poway, CA 92064</span>
+          <span class="dsa-about-org-detail">📞 (858) 486-9009</span>
+          <span class="dsa-about-org-detail">📧 info@dsasd.org</span>
         </div>
-      </div>
-      <div class="dsa-member-card">
-        <div class="dsa-member-name">Neil</div>
-        <div class="dsa-member-roles">
-          <span class="dsa-role-tag">UI/UX Design</span>
-          <span class="dsa-role-tag">Content Audit</span>
-          <span class="dsa-role-tag">Search & A11y</span>
-        </div>
-      </div>
-      <div class="dsa-member-card">
-        <div class="dsa-member-name">Moiz</div>
-        <div class="dsa-member-roles">
-          <span class="dsa-role-tag">Calendar & Notifications</span>
-          <span class="dsa-role-tag">Frontend Search</span>
-          <span class="dsa-role-tag">IA & Design</span>
-        </div>
+        <a href="https://dsasd.org/" class="dsa-about-org-link" target="_blank" rel="noopener noreferrer">View Current Website ↗</a>
       </div>
     </div>
   </div>
 
-  <!-- External Website Link -->
-  <div class="dsa-website-link">
-    <span class="dsa-website-label">Official Website</span>
-    <a href="https://dsasd.org/" class="dsa-website-btn" target="_blank" rel="noopener noreferrer">
-      Visit dsasd.org ↗
-    </a>
-  </div>
 </div>
