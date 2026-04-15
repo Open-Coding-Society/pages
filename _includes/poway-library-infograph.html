@@ -1,77 +1,692 @@
 {% assign data = site.data.poway_library_infograph %}
 
+<style>
+  /* ── FOPL Capstone Infographic ────────────────────────────────── */
+  @import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
 
-<div class="wp-infograph">
- <!-- Header Section -->
- <div class="wp-header">
-   <div class="wp-badge">Design-Based Research Capstone</div>
-   <h1 class="wp-title">{{ data.Title }}</h1>
-   <p class="wp-description">{{ data.Description }}</p>
- </div>
+  :root {
+    --fopl-green:      #023b0f;
+    --fopl-green-mid:  #0d5c1e;
+    --fopl-green-lite: #1a7a2e;
+    --fopl-green-pale: #e8f5eb;
+    --fopl-gold:       #c8a030;
+    --fopl-white:      #ffffff;
+    --fopl-bg:         #f4f8f4;
+    --fopl-text:       #1a1a1a;
+    --fopl-text-mid:   #4a5a4a;
+    --fopl-border:     rgba(2, 59, 15, 0.18);
+    --fopl-shadow:     0 2px 12px rgba(2, 59, 15, 0.12);
+  }
 
+  .fopl-ig *,
+  .fopl-ig *::before,
+  .fopl-ig *::after { box-sizing: border-box; }
 
- <!-- Project Cards -->
- {% for topic in data.Topics %}
- <div class="wp-card">
-   <div class="wp-card-grid">
+  .fopl-ig {
+    font-family: 'Lato', sans-serif;
+    color: #1a1a1a !important;
+    background: #f4f8f4;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    padding-bottom: 3rem;
+  }
 
-     <!-- Left: Image & Status -->
-     <div class="wp-visual">
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
-         <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
-         <div class="wp-overlay">
-           <span>View Project</span>
-         </div>
-       </a>
-       <div class="wp-status">{{ topic.status }}</div>
-       <div class="wp-team">
-         <span class="wp-team-label">Project Leads</span>
-         <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
-       </div>
-     </div>
+  /* ── Hero ───────────────────────────────────────────────────── */
+  .fopl-ig-hero {
+    background: #c8e6c9;
+    color: #023b0f !important;
+    text-align: center;
+    padding: 56px 24px 48px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 3px solid #023b0f;
+  }
 
+  .fopl-ig-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(2,59,15,0.5);
+    background: rgba(2,59,15,0.1);
+    color: #023b0f !important;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+  }
 
-     <!-- Center: Key Points -->
-     <div class="wp-content">
-       <h2 class="wp-project-title">{{ topic.title }}</h2>
-       <p class="wp-subtitle">{{ topic.subtitle }}</p>
+  .fopl-ig-hero h1 {
+    font-family: 'Cabin', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin: 0 0 12px;
+    color: #023b0f !important;
+    border: none;
+    text-transform: uppercase;
+  }
 
-       <div class="wp-keypoints">
-         {% for point in topic.keyPoints %}
-         <div class="wp-keypoint">
-           <span class="wp-check">✓</span>
-           <span>{{ point }}</span>
-         </div>
-         {% endfor %}
-       </div>
+  .fopl-ig-hero-sub {
+    font-size: 1.05rem;
+    color: #0d5c1e !important;
+    max-width: 640px;
+    margin: 0 auto 24px;
+    line-height: 1.6;
+  }
 
+  .fopl-ig-hero-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: #0d5c1e !important;
+  }
 
-       <div class="wp-tech-stack">
-         {% for tech in topic.tech %}
-         <span class="wp-tech-tag">{{ tech }}</span>
-         {% endfor %}
-       </div>
-     </div>
+  .fopl-ig-hero-meta span { display: flex; align-items: center; gap: 0.35rem; }
 
+  .fopl-ig-status-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(2,59,15,0.12);
+    border: 1px solid rgba(2,59,15,0.4);
+    color: #023b0f !important;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
 
-     <!-- Right: Description & Impact -->
-     <div class="wp-details">
-       <h3 class="wp-section-title">About</h3>
-       <p class="wp-about">{{ topic.description }}</p>
+  .fopl-ig-status-live::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #1a7a2e;
+    box-shadow: 0 0 6px #1a7a2e;
+  }
 
-       <h3 class="wp-section-title">Impact</h3>
-       <div class="wp-impact-list">
-         {% for item in topic.impact %}
-         <div class="wp-impact-item">{{ item }}</div>
-         {% endfor %}
-       </div>
+  /* ── Content Wrapper ────────────────────────────────────────── */
+  .fopl-ig-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
 
+  /* ── Main Project Card ──────────────────────────────────────── */
+  .fopl-ig-card {
+    background: #ffffff;
+    border: 1px solid rgba(2,59,15,0.18);
+    border-top: 4px solid #023b0f;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(2,59,15,0.12);
+    margin-top: 2.5rem;
+    overflow: hidden;
+  }
 
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
-     </div>
+  .fopl-ig-card-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr 1fr;
+    gap: 0;
+  }
 
+  @media (max-width: 860px) {
+    .fopl-ig-card-grid { grid-template-columns: 1fr; }
+  }
 
-   </div>
- </div>
- {% endfor %}
+  /* Left column */
+  .fopl-ig-visual {
+    background: #023b0f;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .fopl-ig-img {
+    width: 130px;
+    height: 130px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.25);
+  }
+
+  .fopl-ig-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff !important;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .fopl-ig-status-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #5dde7a;
+    box-shadow: 0 0 5px #5dde7a;
+  }
+
+  .fopl-ig-team {
+    text-align: center;
+    color: rgba(255,255,255,0.85) !important;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .fopl-ig-team-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.7;
+    margin-bottom: 4px;
+  }
+
+  .fopl-ig-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .fopl-ig-link-btn {
+    display: block;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: background 0.18s;
+  }
+
+  .fopl-ig-link-btn.primary {
+    background: #ffffff;
+    color: #023b0f !important;
+  }
+
+  .fopl-ig-link-btn.primary:hover { background: #e8f5eb; }
+
+  .fopl-ig-link-btn.secondary {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9) !important;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  .fopl-ig-link-btn.secondary:hover { background: rgba(255,255,255,0.2); }
+
+  /* Center column */
+  .fopl-ig-center {
+    padding: 28px 24px;
+    border-right: 1px solid rgba(2,59,15,0.18);
+  }
+
+  .fopl-ig-project-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #023b0f !important;
+    margin: 0 0 4px;
+  }
+
+  .fopl-ig-subtitle {
+    font-size: 0.85rem;
+    color: #1a1a1a !important;
+    margin: 0 0 18px;
+    font-style: italic;
+  }
+
+  .fopl-ig-section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #023b0f !important;
+    border-bottom: 2px solid #e8f5eb;
+    padding-bottom: 4px;
+    margin: 0 0 12px;
+  }
+
+  .fopl-ig-keypoints { list-style: none; padding: 0; margin: 0 0 20px; }
+
+  .fopl-ig-keypoints li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: #1a1a1a !important;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(2,59,15,0.18);
+  }
+
+  .fopl-ig-keypoints li:last-child { border-bottom: none; }
+
+  .fopl-ig-check {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    background: #023b0f;
+    color: #fff !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 900;
+    margin-top: 1px;
+  }
+
+  .fopl-ig-tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 16px;
+  }
+
+  .fopl-ig-tech-tag {
+    padding: 3px 10px;
+    background: #e8f5eb;
+    color: #023b0f !important;
+    border: 1px solid rgba(2,59,15,0.2);
+    border-radius: 3px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  /* Right column */
+  .fopl-ig-right {
+    padding: 28px 24px;
+  }
+
+  .fopl-ig-about {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: #1a1a1a !important;
+    margin: 0 0 22px;
+  }
+
+  .fopl-ig-impact-list { list-style: none; padding: 0; margin: 0; }
+
+  .fopl-ig-impact-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(2,59,15,0.18);
+    color: #1a1a1a !important;
+  }
+
+  .fopl-ig-impact-item:last-child { border-bottom: none; }
+
+  .fopl-ig-impact-dot {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #023b0f;
+    margin-top: 7px;
+  }
+
+  /* ── Live Features Grid ─────────────────────────────────────── */
+  .fopl-ig-features-section {
+    margin-top: 2.5rem;
+  }
+
+  .fopl-ig-section-header {
+    font-family: 'Cabin', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #023b0f !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 1rem;
+    padding-bottom: 8px;
+    border-bottom: 3px solid #023b0f;
+  }
+
+  .fopl-ig-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 720px) {
+    .fopl-ig-features-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .fopl-ig-features-grid { grid-template-columns: 1fr; }
+  }
+
+  .fopl-ig-feature-card {
+    background: #ffffff;
+    border: 1px solid rgba(2,59,15,0.18);
+    border-radius: 6px;
+    padding: 18px 16px;
+    box-shadow: 0 2px 12px rgba(2,59,15,0.12);
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+
+  .fopl-ig-feature-card:hover {
+    border-color: #0d5c1e !important;
+    box-shadow: 0 4px 16px rgba(2, 59, 15, 0.18);
+  }
+
+  .fopl-ig-feature-icon {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .fopl-ig-feature-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #023b0f !important;
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .fopl-ig-feature-desc {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: #1a1a1a !important;
+    margin: 0;
+  }
+
+  /* ── Stats Row ──────────────────────────────────────────────── */
+  .fopl-ig-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 2.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .fopl-ig-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .fopl-ig-stat {
+    background: #e8f5eb;
+    border: 2px solid #023b0f;
+    border-radius: 6px;
+    padding: 20px 16px;
+    text-align: center;
+    color: #023b0f !important;
+  }
+
+  .fopl-ig-stat-value {
+    font-family: 'Cabin', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: #023b0f !important;
+  }
+
+  .fopl-ig-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    line-height: 1.35;
+    color: #0d5c1e !important;
+  }
+
+  /* ── Planned feature cards ─────────────────────────────────── */
+  .fopl-ig-planned-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #c8a030 !important;
+    background: #fdf8ec;
+    border: 1px solid #c8a030;
+    border-radius: 3px;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+
+  /* ── Repo Footer ────────────────────────────────────────────── */
+  .fopl-ig-footer {
+    background: #023b0f;
+    color: rgba(255,255,255,0.85) !important;
+    text-align: center;
+    padding: 24px;
+    margin-top: 2.5rem;
+    font-size: 0.85rem;
+  }
+
+  .fopl-ig-footer a {
+    color: rgba(255,255,255,0.9) !important;
+    text-decoration: underline;
+  }
+
+  .fopl-ig-footer a:hover { color: #fff !important; }
+</style>
+
+{% for topic in data.Topics %}
+<div class="fopl-ig">
+
+  <!-- Hero -->
+  <div class="fopl-ig-hero">
+    <div class="fopl-ig-badge">Design-Based Research Capstone · CSP</div>
+    <h1>{{ data.Title }}</h1>
+    <p class="fopl-ig-hero-sub">{{ data.Description }}</p>
+    <div class="fopl-ig-hero-meta">
+      <span class="fopl-ig-status-live">{{ topic.status }}</span>
+      <span>Team: {{ topic.team | join: ", " }}</span>
+      <span>Boolean-Boyz · Poway, CA</span>
+    </div>
+  </div>
+
+  <div class="fopl-ig-inner">
+
+    <!-- Stats Row -->
+    <div class="fopl-ig-stats">
+      <div class="fopl-ig-stat">
+        <span class="fopl-ig-stat-value">6</span>
+        <span class="fopl-ig-stat-label">Interactive games built</span>
+      </div>
+      <div class="fopl-ig-stat">
+        <span class="fopl-ig-stat-value">1978</span>
+        <span class="fopl-ig-stat-label">Organization founded</span>
+      </div>
+    </div>
+
+    <!-- Main Project Card -->
+    <div class="fopl-ig-card">
+      <div class="fopl-ig-card-grid">
+
+        <!-- Left: Image, Status, Team, Links -->
+        <div class="fopl-ig-visual">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="fopl-ig-img">
+          <div class="fopl-ig-status-tag">{{ topic.status }}</div>
+          <div class="fopl-ig-team">
+            <span class="fopl-ig-team-label">Project Team</span>
+            {{ topic.team | join: " · " }}
+          </div>
+          <div class="fopl-ig-links">
+            <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener" class="fopl-ig-link-btn primary">Frontend Repo</a>
+            <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener" class="fopl-ig-link-btn secondary">Backend Repo</a>
+            <a href="https://github.com/orgs/Boolean-Boyz/repositories" target="_blank" rel="noopener" class="fopl-ig-link-btn secondary">GitHub Org</a>
+          </div>
+        </div>
+
+        <!-- Center: Key Points + Tech Stack -->
+        <div class="fopl-ig-center">
+          <h2 class="fopl-ig-project-title">{{ topic.title }}</h2>
+          <p class="fopl-ig-subtitle">{{ topic.subtitle }}</p>
+
+          <div class="fopl-ig-section-label">What we built</div>
+          <ul class="fopl-ig-keypoints">
+            {% for point in topic.keyPoints %}
+            <li>
+              <span class="fopl-ig-check">✓</span>
+              <span>{{ point }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+
+          <div class="fopl-ig-section-label">Tech Stack</div>
+          <div class="fopl-ig-tech-stack">
+            {% for tech in topic.tech %}
+            <span class="fopl-ig-tech-tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Right: About + Impact -->
+        <div class="fopl-ig-right">
+          <div class="fopl-ig-section-label">About</div>
+          <p class="fopl-ig-about">{{ topic.description }}</p>
+
+          <div class="fopl-ig-section-label">Impact</div>
+          <ul class="fopl-ig-impact-list">
+            {% for item in topic.impact %}
+            <li class="fopl-ig-impact-item">
+              <span class="fopl-ig-impact-dot"></span>
+              <span>{{ item }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Planned Features -->
+    <div class="fopl-ig-features-section">
+      <h2 class="fopl-ig-section-header" style="border-bottom-color:#c8a030;color:#023b0f !important;">Planned Features</h2>
+      <div class="fopl-ig-features-grid">
+
+        <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+          <span class="fopl-ig-planned-badge">Coming Soon</span>
+          <span class="fopl-ig-feature-icon">📷</span>
+          <h3 class="fopl-ig-feature-title">Book Scan — Add to Catalog</h3>
+          <p class="fopl-ig-feature-desc">Volunteers scan a book's barcode or ISBN with their phone camera to instantly add it to the online catalog — no manual data entry. Title, author, and cover art pulled automatically.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+          <span class="fopl-ig-planned-badge">Coming Soon</span>
+          <span class="fopl-ig-feature-icon">🛒</span>
+          <h3 class="fopl-ig-feature-title">Book Scan — Remove on Sale</h3>
+          <p class="fopl-ig-feature-desc">When a customer buys a book, staff scan it again to automatically remove it from the catalog and decrement inventory — keeping the online listing in sync with the physical shelf in real time.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+          <span class="fopl-ig-planned-badge">Coming Soon</span>
+          <span class="fopl-ig-feature-icon">💬</span>
+          <h3 class="fopl-ig-feature-title">AI Chatbot</h3>
+          <p class="fopl-ig-feature-desc">A conversational AI assistant embedded on the site to help visitors find books, answer questions about the library, and guide them through available resources and events.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live Features Grid -->
+    <div class="fopl-ig-features-section">
+      <h2 class="fopl-ig-section-header">Live Features</h2>
+      <div class="fopl-ig-features-grid">
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">📚</span>
+          <h3 class="fopl-ig-feature-title">Book Catalog</h3>
+          <p class="fopl-ig-feature-desc">Search, filter by age group and condition, sort by price/title/author. Admin CRUD with Book Detail modal. Connected to Flask REST API.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">🤖</span>
+          <h3 class="fopl-ig-feature-title">AI Recommendations</h3>
+          <p class="fopl-ig-feature-desc">Gemini-powered chat interface on the catalog page. Ask for book recommendations by genre, age group, or mood. Groq API as fallback.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">🎮</span>
+          <h3 class="fopl-ig-feature-title">Gamification Hub</h3>
+          <p class="fopl-ig-feature-desc">Six interactive games: PinShelf (daily word), Book Trivia, Word Scramble, Library Shelf Run (arcade), Network Stack Challenge, OSI Layers RPG.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">🔐</span>
+          <h3 class="fopl-ig-feature-title">Authentication</h3>
+          <p class="fopl-ig-feature-desc">Full sign-in and registration system. JWT tokens, localStorage session management, and protected routes. Backend: /api/fopl/login and /api/fopl/register.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">👤</span>
+          <h3 class="fopl-ig-feature-title">User Profiles</h3>
+          <p class="fopl-ig-feature-desc">Profile pages with game stats: Wordle streaks, guess distribution, XP level, sessions played, and win rate across all six games.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">📅</span>
+          <h3 class="fopl-ig-feature-title">Events Calendar</h3>
+          <p class="fopl-ig-feature-desc">Embedded events calendar on the home page with admin controls. No more redirecting visitors to the SD County Library system to find Storytime or Chess Club.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">📰</span>
+          <h3 class="fopl-ig-feature-title">Newsletter Archive</h3>
+          <p class="fopl-ig-feature-desc">"The Open Book" quarterly issues with inline PDF viewer and issue grid cards going back to 2023. Membership callout section.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">🗓️</span>
+          <h3 class="fopl-ig-feature-title">History + Timeline</h3>
+          <p class="fopl-ig-feature-desc">Rebuilt the History page with a real organizational timeline: founding in 1978, used book sales in the 1980s, permanent bookstore in the 1990s, through today.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">🛠️</span>
+          <h3 class="fopl-ig-feature-title">Admin Dashboard</h3>
+          <p class="fopl-ig-feature-desc">Server-rendered dashboard at /fopl/admin showing registered users, book catalog breakdowns by age group and condition, per-game session and win-rate stats, and total event count. JWT-gated, admin-only.</p>
+        </div>
+
+        <div class="fopl-ig-feature-card">
+          <span class="fopl-ig-feature-icon">📍</span>
+          <h3 class="fopl-ig-feature-title">Contact + Map</h3>
+          <p class="fopl-ig-feature-desc">Contact page with embedded Google Map, social media links, address, phone, email, and bookstore hours. Get Involved card with volunteer CTA.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="fopl-ig-footer">
+    <strong>Boolean-Boyz · Friends of the Poway Library Capstone</strong><br>
+    <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener">Frontend (bb-pages)</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener">Backend (bb-flask)</a>
+    &nbsp;·&nbsp;
+    13137 Poway Rd, Poway CA 92064 · (858) 513-2862
+  </div>
+
 </div>
+{% endfor %}
