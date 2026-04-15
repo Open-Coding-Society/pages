@@ -16,6 +16,19 @@ sticky_rank: 1
 
 <h2>Design-Based Research (DBR) Capstone Projects</h2>
 
+<style>
+#capstone-grid > div {
+  min-height: 10rem;
+}
+#capstone-grid > div a img {
+  height: 7rem;
+  width: auto;
+  max-width: 7rem;
+  object-fit: contain;
+  display: block;
+}
+</style>
+
 <div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
   <div class="flex flex-wrap gap-2">
     <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
