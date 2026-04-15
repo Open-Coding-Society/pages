@@ -101,5 +101,3 @@ sticky_rank: 8
   </div>
 
 </div>
-
-{% include uesl-infograph.html %}
