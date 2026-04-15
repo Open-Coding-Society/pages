@@ -191,11 +191,11 @@ build: build-current
 # Multi-course file splitting
 split-courses:
 	@echo " ------ Splitting multi-course files... -------"
-	@$(PYTHON) scripts/split_multi_course_files.py
+	@python3 scripts/split_multi_course_files.py
 
 clean-courses:
 	@echo "🧹 Cleaning course-specific files..."
-	@$(PYTHON) scripts/split_multi_course_files.py clean
+	@python3 scripts/split_multi_course_files.py clean
 
 # Notebook and DOCX conversion
 convert: $(MARKDOWN_FILES) convert-docx
@@ -341,7 +341,7 @@ bundle-install:
 # Start Jekyll server (incremental for development, production is GitHub Actions)
 jekyll-serve: bundle-install
 	@touch /tmp/.notebook_watch_marker
-	@LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental > $(LOG_FILE) 2>&1 & \
+	@bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental > $(LOG_FILE) 2>&1 & \
 		echo "Server PID: $$!"
 	@make wait-for-server
 
