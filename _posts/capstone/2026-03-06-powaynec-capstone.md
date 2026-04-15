@@ -1,8 +1,8 @@
 ---
 toc: false
 layout: post
-title: Binary Beasts Capstone
-description: Binary Beasts combines Poway NEC and PYBL into one shared Design-Based Research capstone page.
+title: Poway Neighborhood Emergency Corps
+description: Binary Beasts overview of changes and updates made to PowayNEC website.
 permalink: /capstone/powaynec/
 sticky_rank: 1
 ---

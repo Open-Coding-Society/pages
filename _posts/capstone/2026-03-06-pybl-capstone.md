@@ -1,8 +1,7 @@
 ---
 toc: false
 layout: post
-title: Binary Beasts Capstone
-description:
+title: Poway Neighborhood Emergency Corps
 permalink: /capstone/binary-beasts/
 sticky_rank: 1
 ---
