@@ -1,0 +1,37 @@
+# SD Auto Capstone Infographic
+Title: "Design-Based Research Project Brief: SD Auto — Intelligent Routing Platform"
+Logo: "capstone/sd_auto_logo.png"
+Description: "Enhance daily commutes in San Diego through real-time traffic data, community hazard reporting, and AI-driven route optimization — making transportation more efficient, reliable, and adaptive."
+
+Topics:
+  - title: "SD Auto"
+    image: "capstone/sd_auto_visual.png"
+    link: "/capstone/sd-auto/"
+    alt: "SD Auto — Intelligent Routing Platform for San Diego"
+    keyPoints:
+      - "ML-Powered Smart Route Finder (Scikit-learn)"
+      - "Real-Time Hazard Reporting & Map Visualization (Leaflet)"
+      - "Daily Routine Planner with Automated Scheduling"
+      - "Favorite Locations with Quick-Access Saved Routes"
+      - "Location-Verified User Authentication System"
+      - "Community-Driven Crowd-Sourced Traffic Data"
+    subtitle: "AI-Driven Intelligent Routing for Smarter Commutes"
+    description: "SD Auto is a full-stack intelligent routing platform designed to enhance daily commutes in San Diego, California. By combining real-time traffic data, community hazard reporting, and machine learning-driven route optimization, SD Auto helps commuters navigate congestion using smarter tools. The platform features an ML prediction engine built with Scikit-learn that analyzes historical traffic trends, time-of-day patterns, and crowd-sourced hazard data to deliver optimal routes. Built with a Flask/Python backend, Leaflet-based interactive maps, and a TailwindCSS frontend, SD Auto transforms unstructured traffic information into actionable routing intelligence."
+    tech:
+      - "Flask & Python Backend"
+      - "TailwindCSS & JavaScript Frontend"
+      - "Leaflet Interactive Maps"
+      - "Scikit-learn ML Models"
+      - "SQLAlchemy & REST APIs"
+      - "Pandas Data Processing"
+    impact:
+      - "Reduces Commute Times with AI-Optimized Routes"
+      - "Improves Road Safety via Community Hazard Alerts"
+      - "Automates Daily Trip Planning & Scheduling"
+      - "Provides Real-Time Traffic Visualization"
+      - "Enables Crowd-Sourced Hazard Intelligence"
+      - "Location-Verified Secure User Experience"
+    status: "Active Full-Stack Development"
+    team:
+      - "Ahaan"
+      - "Arnav"
