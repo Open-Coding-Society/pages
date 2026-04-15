@@ -1,9 +1,22 @@
 {% assign data = site.data.acs-cancer-infograph %}
 
 <style>
-/* Only extras not covered by infograph.scss */
+/* ── Reset & base ──────────────────────────────────────────────── */
+.acs-infograph { font-family: 'Segoe UI', system-ui, sans-serif; }
 
-.acs-links-section { margin-bottom: 2rem; }
+/* ── Header ────────────────────────────────────────────────────── */
+.acs-header { margin-bottom: 2rem; }
+.acs-badge {
+  display: inline-block;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 99px; padding: 0.35rem 1rem;
+}
+
+/* ── Project Tools (links) section ─────────────────────────────── */
+.acs-links-section { margin-bottom: 2.5rem; }
 .acs-links-heading {
   font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
   text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 1rem;
@@ -17,18 +30,9 @@
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 16px; padding: 1.25rem 1.5rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s;
 }
-.acs-link-card:hover { border-color: rgba(255,255,255,0.3); }
-.acs-link-card-placeholder {
-  width: 100%; aspect-ratio: 16/9; border-radius: 10px;
-  margin-bottom: 0.85rem; background: rgba(255,255,255,0.04);
-  border: 1px dashed rgba(255,255,255,0.12);
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 6px;
-  font-size: 0.72rem; color: rgba(255,255,255,0.2);
-}
-.acs-link-card-placeholder span { font-size: 1.8rem; opacity: 0.3; }
+.acs-link-card:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
 .acs-link-card img {
   width: 100%; aspect-ratio: 16/9; object-fit: cover;
   border-radius: 10px; margin-bottom: 0.85rem; display: block;
@@ -36,15 +40,164 @@
 .acs-link-card-title { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem; }
 .acs-link-card-desc { font-size: 0.8rem; color: rgba(255,255,255,0.55); line-height: 1.55; margin-bottom: 0.9rem; }
 
-/* Image placeholder for visual column */
-.acs-image-placeholder {
-  width: 100%; aspect-ratio: 4/3; border-radius: 16px;
-  background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.12);
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 6px;
-  font-size: 0.75rem; color: rgba(255,255,255,0.2); margin-bottom: 1rem;
+/* ── Main project card ──────────────────────────────────────────── */
+.acs-project-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 2rem;
 }
-.acs-image-placeholder span { font-size: 1.8rem; opacity: 0.3; }
+
+/* top visual band */
+.acs-project-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+@media (max-width: 700px) {
+  .acs-project-hero { grid-template-columns: 1fr; }
+}
+
+.acs-project-img-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.acs-project-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; min-height: 200px;
+}
+.acs-project-img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(0,80,40,0.55) 0%, transparent 70%);
+  display: flex; align-items: flex-end; padding: 1.5rem;
+}
+.acs-project-status-badge {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #fff;
+  background: rgba(0,200,100,0.25);
+  border: 1px solid rgba(0,220,110,0.45);
+  border-radius: 99px; padding: 0.3rem 0.85rem;
+}
+
+.acs-project-header {
+  padding: 2rem 2rem 1.5rem;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.acs-project-eyebrow {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.35);
+  margin-bottom: 0.65rem;
+}
+.acs-project-title {
+  font-size: 1.7rem; font-weight: 800;
+  color: #fff; line-height: 1.15; margin: 0 0 0.6rem;
+}
+.acs-project-subtitle {
+  font-size: 1rem; font-weight: 500;
+  color: rgba(255,255,255,0.55); margin: 0 0 1.2rem;
+  font-style: italic;
+}
+.acs-project-team {
+  font-size: 0.78rem; color: rgba(255,255,255,0.4);
+}
+.acs-project-team strong { color: rgba(255,255,255,0.65); }
+
+/* divider */
+.acs-divider {
+  height: 1px; background: rgba(255,255,255,0.08);
+  margin: 0;
+}
+
+/* ── Key Points 2×2 + 1 grid ─────────────────────────────────── */
+.acs-keypoints-section { padding: 2rem; }
+.acs-section-label {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3);
+  margin-bottom: 1.25rem;
+}
+
+.acs-kp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+@media (max-width: 580px) {
+  .acs-kp-grid { grid-template-columns: 1fr; }
+}
+
+.acs-kp-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 1.25rem 1.4rem;
+  display: flex; gap: 0.85rem; align-items: flex-start;
+  transition: border-color 0.2s, background 0.2s;
+}
+.acs-kp-card:hover {
+  border-color: rgba(80,220,140,0.35);
+  background: rgba(80,220,140,0.06);
+}
+
+/* 5th card spans full width */
+.acs-kp-card--wide {
+  grid-column: 1 / -1;
+}
+
+.acs-kp-check {
+  flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(80,220,140,0.2);
+  border: 1px solid rgba(80,220,140,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; color: rgb(80,220,140);
+  font-weight: 800; margin-top: 2px;
+}
+.acs-kp-text {
+  font-size: 0.875rem; color: rgba(255,255,255,0.75);
+  line-height: 1.5; font-weight: 500;
+}
+
+/* ── Impact section ──────────────────────────────────────────── */
+.acs-impact-section {
+  padding: 0 2rem 2rem;
+}
+.acs-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+.acs-impact-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem 0.9rem 2rem;
+  font-size: 0.82rem; color: rgba(255,255,255,0.6);
+  line-height: 1.5;
+  position: relative;
+}
+.acs-impact-item::before {
+  content: "→";
+  position: absolute; left: 0.8rem; top: 0.9rem;
+  color: rgba(80,220,140,0.6); font-size: 0.85rem;
+}
+
+/* ── Learn more button ───────────────────────────────────────── */
+.acs-learn-btn-wrap { padding: 0 2rem 2rem; }
+.acs-learn-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(80,220,140,0.15);
+  border: 1px solid rgba(80,220,140,0.35);
+  color: rgb(120,240,170); border-radius: 10px;
+  padding: 0.65rem 1.4rem; font-size: 0.88rem; font-weight: 600;
+  text-decoration: none; transition: background 0.2s, border-color 0.2s;
+}
+.acs-learn-btn:hover {
+  background: rgba(80,220,140,0.25);
+  border-color: rgba(80,220,140,0.55);
+  color: #fff;
+}
 </style>
 
 
@@ -55,103 +208,107 @@
     <div class="acs-badge">Treatment Management and Community Learning</div>
   </div>
 
-
-  <!-- FEATURE LINKS -->
+  <!-- FEATURE LINKS (Project Tools) -->
   <div class="acs-links-section">
     <div class="acs-links-heading">Project Tools</div>
     <div class="acs-links-grid">
 
       <div class="acs-link-card">
-        <!-- Replace with <img src="..." alt="..."> when ready -->
-        <img src="{{ site.baseurl }}/images/capstone/acs/lab_acs.png" alt="Cell Cycle & Cancer Lab" class="ded-update-img">
+        <img src="{{ site.baseurl }}/images/capstone/acs/lab_acs.png" alt="Cell Cycle & Cancer Lab">
         <div class="acs-link-card-title">Cell Lab</div>
         <div class="acs-link-card-desc">An interactive simulation teaching how the cell cycle works and breaks down in cancer with phase checkpoints, gene toggles, and live mutation tracking.</div>
         <a href="https://acs.opencodingsociety.com/celllab" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Cell Cycle Lab</a>
       </div>
 
       <div class="acs-link-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/game_acs.png" alt="Cell Game" class="ded-update-img">
+        <img src="{{ site.baseurl }}/images/capstone/acs/game_acs.png" alt="Cell Game">
         <div class="acs-link-card-title">Cell Game</div>
         <div class="acs-link-card-desc">An interactive RPG where players navigate through cell biology and cancer concepts in an engaging story-driven format.</div>
         <a href="https://acs.opencodingsociety.com/cellgame" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Cell Game</a>
       </div>
 
       <div class="acs-link-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/risk_acs.png" alt="ML Cancer Risk Calculator" class="ded-update-img">
+        <img src="{{ site.baseurl }}/images/capstone/acs/risk_acs.png" alt="ML Cancer Risk Calculator">
         <div class="acs-link-card-title">Risk Calculator</div>
         <div class="acs-link-card-desc">Enter age, lifestyle, and medical history to receive a personalized risk score with relative risk, lifetime estimates, key factors, and AI follow-up support.</div>
         <a href="https://acs.opencodingsociety.com/cancerrisk" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Risk Calculator</a>
       </div>
 
       <div class="acs-link-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/map_acs.png" alt="ACS Cancer Body Map Chat" class="ded-update-img">
+        <img src="{{ site.baseurl }}/images/capstone/acs/map_acs.png" alt="ACS Cancer Body Map Chat">
         <div class="acs-link-card-title">Body Map</div>
         <div class="acs-link-card-desc">Explore an interactive body map connecting cancer types to anatomical regions with symptoms, risk factors, resources, and plain-English AI assistance.</div>
         <a href="https://acs.opencodingsociety.com/map" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Body Map Chat</a>
       </div>
 
       <div class="acs-link-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/blog_acs.png" alt="Community Blog" class="ded-update-img">
+        <img src="{{ site.baseurl }}/images/capstone/acs/blog_acs.png" alt="Community Blog">
         <div class="acs-link-card-title">Blog</div>
         <div class="acs-link-card-desc">Stay updated with the updates, news, and stories from the ACS community.</div>
         <a href="https://acs.opencodingsociety.com/blog/" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Community Blog</a>
       </div>
 
-
     </div>
   </div>
 
- <!-- Project Cards -->
- {% for topic in data.Topics %}
- <div class="wp-card">
-   <div class="wp-card-grid">
-    
-     <!-- Left: Image & Status -->
-     <div class="wp-visual">
-       <a href="{{ topic.external_link }}" target="_blank" rel="noopener noreferrer" class="wp-image-link">
-         <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
-         <div class="wp-overlay">
-           <span>View Project</span>
-         </div>
-       </a>
-       <div class="wp-status">{{ topic.status }}</div>
-       <div class="wp-team">
-         <span class="wp-team-label">Project Leads</span>
-         <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
-       </div>
-     </div>
+  <!-- PROJECT CARDS (driven by YAML) -->
+  {% for topic in data.Topics %}
+  <div class="acs-project-card">
 
+    <!-- Hero: image left, title right -->
+    <div class="acs-project-hero">
+      <div class="acs-project-img-wrap">
+        <a href="{{ topic.external_link }}" target="_blank" rel="noopener noreferrer">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}">
+        </a>
+        <div class="acs-project-img-overlay">
+          <span class="acs-project-status-badge">{{ topic.status }}</span>
+        </div>
+      </div>
 
-     <!-- Center: Key Points -->
-     <div class="wp-content">
-       <h2 class="wp-project-title">{{ topic.title }}</h2>
-       <p class="wp-subtitle">{{ topic.subtitle }}</p>
-      
-       <div class="wp-keypoints">
-         {% for point in topic.keyPoints %}
-         <div class="wp-keypoint">
-           <span class="wp-check">✓</span>
-           <span>{{ point }}</span>
-         </div>
-         {% endfor %}
-       </div>
+      <div class="acs-project-header">
+        <div class="acs-project-eyebrow">Capstone Project</div>
+        <h2 class="acs-project-title">{{ topic.title }}</h2>
+        <p class="acs-project-subtitle">{{ topic.subtitle }}</p>
+        <div class="acs-project-team">
+          <strong>Project Leads:</strong> {{ topic.team | join: ", " }}
+        </div>
+      </div>
+    </div>
 
-     <!-- Right: Description & Impact -->
-     <div class="wp-details">
-       <h3 class="wp-section-title">Impact</h3>
-       <div class="wp-impact-list">
-         {% for item in topic.impact %}
-         <div class="wp-impact-item">{{ item }}</div>
-         {% endfor %}
-       </div>
+    <div class="acs-divider"></div>
 
+    <!-- Key Points — 2×2 + 1 wide at bottom -->
+    <div class="acs-keypoints-section">
+      <div class="acs-section-label">Key Features</div>
+      <div class="acs-kp-grid">
+        {% for point in topic.keyPoints %}
+        <div class="acs-kp-card{% if forloop.index == 5 %} acs-kp-card--wide{% endif %}">
+          <div class="acs-kp-check">✓</div>
+          <div class="acs-kp-text">{{ point }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
 
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
-     </div>
+    <div class="acs-divider"></div>
 
+    <!-- Impact -->
+    <div class="acs-impact-section">
+      <div class="acs-section-label" style="margin-top:1.5rem;">Impact</div>
+      <div class="acs-impact-grid">
+        {% for item in topic.impact %}
+        <div class="acs-impact-item">{{ item }}</div>
+        {% endfor %}
+      </div>
+    </div>
 
-   </div>
-   
- </div>
- {% endfor %}
+    <!-- Learn More -->
+    <div class="acs-learn-btn-wrap">
+      <a href="{{ site.baseurl }}{{ topic.link }}" class="acs-learn-btn">Learn More →</a>
+    </div>
+
+  </div>
+  {% endfor %}
+
 </div>
