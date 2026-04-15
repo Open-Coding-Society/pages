@@ -5,7 +5,7 @@ Description: "A suite of interactive web tools built for Safe Passage Heals — 
 Topics:
   - title: "Dynamic Event Calendar"
     image: "capstone/dynamic_event_calendar.png"
-    link: "/capstone/dynamiceventcalendar/"
+    link: "/sph/eventcalendar1/"
     alt: "Dynamic Event Calendar — Interactive Community Events for Safe Passage Heals"
     keyPoints:
       - "Interactive monthly calendar displaying all upcoming Safe Passage Heals events"
@@ -36,7 +36,7 @@ Topics:
 
   - title: "Water Usage Calculator"
     image: "capstone/dynamic_event_calendar.png"
-    link: "/capstone/dynamiceventcalendar/"
+    link: ""
     alt: "Water Usage Calculator — Estimate Your Daily Water Consumption"
     keyPoints:
       - "Users input daily activities like shower time, laundry loads, and tooth brushing"
@@ -67,7 +67,7 @@ Topics:
 
   - title: "My Water Dashboard"
     image: "capstone/dynamic_event_calendar.png"
-    link: "/capstone/dynamiceventcalendar/"
+    link: ""
     alt: "My Water Dashboard — Personalized Water Insights by Location"
     keyPoints:
       - "Users enter their zip code to identify their local water district"
