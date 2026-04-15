@@ -3,6 +3,8 @@ import Npc from "./Npc.js";
 class FriendlyNpc extends Npc {
     constructor(data = {}, gameEnv = null) {
         super(data, gameEnv);
+        this.clickOnly = data.clickOnly !== undefined ? data.clickOnly : false;
+        this.clicks = 0;
 
         // ── Zone distances ───────────────────────────────────────────────────
         // alertDistance: how far away the NPC "notices" the player and stands up.
@@ -76,17 +78,19 @@ class FriendlyNpc extends Npc {
             this.direction = 'up';
 
             // Always show the "Press E" toast — unconditionally, every entry
-            const toast = this.gameEnv?.currentLevel?.showToast
-                       ?? this.gameEnv?.gameLevel?.showToast;
-            if (toast) {
-                toast.call(
-                    this.gameEnv.currentLevel ?? this.gameEnv.gameLevel,
-                    "Press E to interact"
-                );
+            if (!this.clickOnly) {
+                const toast = this.gameEnv?.currentLevel?.showToast
+                           ?? this.gameEnv?.gameLevel?.showToast;
+                if (toast) {
+                    toast.call(
+                        this.gameEnv.currentLevel ?? this.gameEnv.gameLevel,
+                        "Press E to interact"
+                    );
+                }
             }
 
             // Fire reaction so level can run its own once/always logic
-            if (typeof this.reaction === 'function') {
+            if (!this.clickOnly && typeof this.reaction === 'function') {
                 this.reaction();
             }
         }
@@ -109,6 +113,18 @@ class FriendlyNpc extends Npc {
             this._inCollision = engineCollision;
             // Future hook: visual highlight on collision entry/exit
         }
+    }
+
+    handleClick(event) {
+        if (typeof this.interact !== 'function') return;
+
+        this.clicks += 1;
+        this.interact(this.clicks, this.spriteData?.id || this.uniqueId || 'unknown', this, event);
+    }
+
+    handleKeyInteract() {
+        if (this.clickOnly) return;
+        super.handleKeyInteract();
     }
 }
 
