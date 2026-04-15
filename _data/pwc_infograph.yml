@@ -1,42 +1,70 @@
 # Poway Woman's Club Capstone Infographic
 Title: "Poway Woman's Club — Website Refurbishment"
-Description: "Modernizing a 65-year-old community nonprofit's web presence with member portals, online payments, and a fresh UI — while preserving the heart of the original site."
+Description: "A design-based research capstone rebuilding the website of a 65-year-old community nonprofit with member portals, online payments, and a cohesive modern UI."
 
+Status: "In Development"
 
-Topics:
-  - title: "Poway Woman's Club"
-    image: "capstone/pwc_logo.png"
-    link: "/capstone/poway-womans-club/"
-    alt: "Poway Woman's Club — Website Refurbishment Capstone"
-    keyPoints:
-      - "Fix broken email button — replace with a working contact form"
-      - "Full UI redesign with softer, cohesive color palette"
-      - "Clarify the club's purpose with better visual hierarchy and messaging"
-      - "Member login system with user profiles and personal dashboards"
-      - "Interactive event calendar with RSVP functionality"
-      - "Online membership payment portal"
-      - "Admin panel for managing content, members, and events"
-      - "Comment system / mini-blog for member interaction"
-      - "Member activity and engagement tracking"
-    subtitle: "Bringing a Legacy Nonprofit Into the Modern Web"
-    description: "A design-based research capstone that rebuilds the Poway Woman's Club website from the ground up. The club is a 501(c)(3) nonprofit founded in 1960 and affiliated with the General Federation of Women's Clubs International. For over six decades it has served Poway through scholarships, art exhibits, library support, and youth leadership programs — but its current site is a table-based layout with clashing colors, a broken email link, and no clear communication of its mission. This project delivers a modern, welcoming interface that makes the club's purpose obvious at a glance, lets new members sign up and pay dues online, gives existing members a space to interact through comments and calendars, and provides administrators with a dashboard to manage everything without touching code."
-    tech:
-      - "Modern Responsive Frontend"
-      - "User Authentication & Profiles"
-      - "Event Calendar System"
-      - "Payment Integration"
-      - "Admin Dashboard"
-      - "Messaging / Comment Engine"
-      - "Data Tracking"
-    impact:
-      - "Makes the club's purpose and community work immediately clear to visitors"
-      - "Removes friction from joining — members can sign up and pay online"
-      - "Gives members a space to interact, comment, and stay connected between meetings"
-      - "Provides administrators with a dashboard to manage events, members, and content"
-      - "Modernizes a 65-year-old organization's digital presence while respecting its legacy"
-      - "Preserves existing strengths: working navigation, meeting schedule, and contact info"
-    status: "In Development"
-    team:
-      - "Evan S"
-      - "Maya D"
-      - "Cyrus Z"
+Team:
+  - name: "Evan S"
+    role: "Full-Stack / Backend"
+    bio: "Built the interactive front-page game, groups system, admin panel backend APIs, and blogging system, plus other backend and management contributions."
+  - name: "Maya D"
+    role: "Deployment / Frontend"
+    bio: "Deployed the site and built the friends and login system, messaging system, and user interaction flows."
+  - name: "Cyrus Z"
+    role: "Frontend / Integrations"
+    bio: "Built the events system and calendar, Google-based login APIs, customizable profile elements, and an ML system that helps users connect."
+
+About:
+  who: "We're a team of three students partnering with the Poway Woman's Club — a 501(c)(3) nonprofit founded in 1960 and affiliated with the General Federation of Women's Clubs International."
+  what: "We're rebuilding their website from the ground up: a responsive member portal, an interactive event calendar, an online dues payment flow, and an admin dashboard that lets club leaders manage content without touching code."
+  why: "The club has served Poway for over six decades through scholarships, art exhibits, library support, and youth leadership programs. Our goal is to make that mission clear to every visitor and remove friction from joining, paying dues, and staying connected between meetings."
+
+Fixes:
+  - "Replace the non-functional email link with a working contact form"
+  - "Restructure the homepage so the club's mission is visible at a glance"
+  - "Unify the color palette and typography for a cohesive look"
+
+Features:
+  - title: "Event Calendar & RSVP"
+    description: "Interactive calendar where members browse upcoming events and RSVP directly from their dashboard."
+    image: "capstone/pwc-events-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/events/"
+  - title: "Login System with Google Auth"
+    description: "Secure authentication with both local accounts and one-click Google sign-in."
+    image: "capstone/pwc-login-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/login.html"
+  - title: "Groups System"
+    description: "Members join groups that filter and populate their calendar with the events that actually apply to them."
+    image: "capstone/pwc-groups-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/events/"
+  - title: "Friends & Live Messaging"
+    description: "Add friends and chat in real time — built for members to stay connected between meetings."
+    image: "capstone/pwc-messaging-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/profile/"
+  - title: "Admin Dashboard"
+    description: "One unified control center for club leaders: manage members, events, groups, and content without touching code."
+    image: "capstone/pwc-admin-view.gif"
+    url: "https://pwc-flask.opencodingsociety.com/"
+
+Tech:
+  - "Responsive Frontend"
+  - "User Auth & Profiles"
+  - "Event Calendar"
+  - "Payment Integration"
+  - "Admin Dashboard"
+  - "Comment Engine"
+
+Impact:
+  - "Makes the club's mission and community work clear to first-time visitors"
+  - "Lets prospective members sign up and pay dues online"
+  - "Gives existing members a space to interact between meetings"
+  - "Provides administrators a dashboard to manage events, members, and content"
+
+Link: "/capstone/poway-womans-club/"
+SiteUrl: "https://poway-women-s-club.github.io/pwc/"
+Repos:
+  frontend: "https://github.com/Poway-Women-s-Club/pwc"
+  backend: "https://github.com/Poway-Women-s-Club/pwc-flask"
+Logo: "capstone/pwc_logo.png"
+Alt: "Poway Woman's Club — Website Refurbishment Capstone"
