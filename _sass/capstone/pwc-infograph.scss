@@ -1,0 +1,334 @@
+// Poway Woman's Club Capstone Infograph
+// Scoped under .pwc-infograph
+
+$pwc-primary: #7c6aa8;        // muted purple
+$pwc-secondary: #a87894;      // muted rose
+$pwc-bg: #181520;             // soft dark
+$pwc-surface: #201d2b;        // card surface
+$pwc-surface-2: #2a2636;      // raised surface
+$pwc-border: #3a3447;
+$pwc-text: #e8e5ef;
+$pwc-muted: #a8a3b8;
+$pwc-heading: #f2f0f7;
+
+.pwc-infograph {
+  width: 100vw;
+  max-width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding: 2.5rem clamp(1.5rem, 5vw, 5rem);
+  border-radius: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: $pwc-text;
+  background: $pwc-bg;
+  border-radius: 24px;
+
+  h1, h2, h3, p { margin: 0; color: inherit; }
+  a { color: $pwc-secondary; }
+
+  // Intro (merged header + about)
+  .wp-intro {
+    padding: 2.5rem 2.5rem 2rem;
+  }
+
+  .wp-intro-head {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding-bottom: 1.75rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid $pwc-border;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+  }
+
+  .wp-intro-heading { flex: 1; }
+
+  .wp-badge {
+    display: inline-block;
+    background: rgba($pwc-primary, 0.2);
+    color: lighten($pwc-primary, 20%);
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba($pwc-primary, 0.35);
+  }
+
+  .wp-header-row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+  }
+
+  .wp-header-logo {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    border-radius: 18px;
+    background: #fff;
+    padding: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .wp-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: $pwc-heading;
+    margin-bottom: 0.6rem;
+    line-height: 1.15;
+  }
+
+  .wp-description {
+    color: $pwc-muted;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    max-width: 800px;
+  }
+
+  .wp-status {
+    display: inline-block;
+    background: rgba($pwc-secondary, 0.18);
+    color: lighten($pwc-secondary, 15%);
+    padding: 0.3rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba($pwc-secondary, 0.3);
+  }
+
+  // Sections
+  .wp-section {
+    background: $pwc-surface;
+    border: 1px solid $pwc-border;
+    border-radius: 20px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .wp-section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: $pwc-heading;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid $pwc-border;
+    display: block;
+  }
+
+  .wp-section p {
+    color: $pwc-muted;
+    line-height: 1.65;
+    font-size: 0.95rem;
+  }
+
+  // About grid
+  .wp-about-section {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2.5rem;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .wp-about-col > p {
+    margin-bottom: 1rem;
+  }
+
+  // Team cards
+  .wp-team-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  .wp-team-card {
+    background: $pwc-surface-2;
+    border-left: 4px solid $pwc-primary;
+    border-radius: 10px;
+    padding: 0.85rem 1.1rem;
+  }
+
+  .wp-team-name {
+    font-weight: 700;
+    color: $pwc-heading;
+    font-size: 1rem;
+  }
+
+  .wp-team-role {
+    color: $pwc-secondary;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .wp-team-bio {
+    color: $pwc-muted;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  // Keypoints
+  .wp-keypoints {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .wp-keypoint {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    color: $pwc-text;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    background: $pwc-surface-2;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border-left: 3px solid $pwc-primary;
+  }
+
+  .wp-check {
+    color: $pwc-secondary;
+    font-weight: 800;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+  }
+
+  // Feature grid
+  .wp-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 1200px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .wp-feature-card {
+    display: block;
+    background: $pwc-surface-2;
+    border: 1px solid $pwc-border;
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      border-color: rgba($pwc-primary, 0.6);
+      text-decoration: none;
+      color: inherit;
+    }
+  }
+
+  .wp-feature-image-wrap {
+    background: #fff;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid $pwc-border;
+  }
+
+  .wp-feature-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .wp-feature-body {
+    padding: 1.1rem 1.25rem;
+  }
+
+  .wp-feature-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $pwc-heading;
+    margin-bottom: 0.35rem;
+  }
+
+  .wp-feature-desc {
+    color: $pwc-muted;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  // Two-col
+  .wp-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+
+    @media (max-width: 800px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  // Tech
+  .wp-tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .wp-tech-tag {
+    background: rgba($pwc-primary, 0.18);
+    color: lighten($pwc-primary, 15%);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid rgba($pwc-primary, 0.5);
+  }
+
+  // Impact
+  .wp-impact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .wp-impact-item {
+    background: rgba($pwc-secondary, 0.12);
+    color: $pwc-text;
+    padding: 0.7rem 0.95rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border-left: 3px solid $pwc-secondary;
+    line-height: 1.5;
+  }
+}
