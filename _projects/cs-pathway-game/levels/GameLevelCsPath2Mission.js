@@ -1,7 +1,6 @@
 // Imports: Level objects and UI helpers.
 import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
@@ -191,16 +190,18 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         greeting: `${id} ready. ${zonePrompt}`,
         position,
         interactDistance: 90,
-        reaction: function () {
+        interact: function (_clicks, _objectId, npc) {
           if (level?.showToast) {
-            level.showToast(`${id}: ${zonePrompt}`);
+            level.showToast(`${id}: challenge channel opened.`);
           }
-        },
-        interact: function () {
+          if (npc?.dialogueSystem?.speakText) {
+            npc.dialogueSystem.speakText(`${id} ready for your mission challenge.`);
+          }
           AiNpc.showInteraction(this);
         },
       }),
       visible: false,
+      clickOnly: true,
       hitbox: { widthPercentage: 0.35, heightPercentage: 0.35 },
       alertDistance: 0.18,
       dialogues: [
@@ -218,25 +219,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         id: 'The Admin',
         expertise: 'how to work different operating systems',
         position: { x: width * 0.20, y: height * 0.17 },
-        zonePrompt: 'Hello! Press E to interact.',
+        zonePrompt: 'Click to start your challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Archivist',
         expertise: 'how to manage files and folders',
         position: { x: width * 0.65, y: height * 0.17 },
-        zonePrompt: 'Hello! Press E to interact.',
+        zonePrompt: 'Click to start your challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The SDLC Master',
         expertise: 'what SDLC is',
         position: { x: width * 0.20, y: height * 0.60 },
-        zonePrompt: 'Hello! Press E to interact.',
+        zonePrompt: 'Click to start your challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Scrum Master',
         expertise: 'how to set up a scrum board',
         position: { x: width * 0.65, y: height * 0.60 },
-        zonePrompt: 'Hello! Press E to interact.',
+        zonePrompt: 'Click to start your challenge.',
       }),
     ];
 
@@ -260,9 +261,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       hasReaction: typeof d?.reaction === 'function',
       hasSpriteReaction: typeof d?.spriteData?.reaction === 'function',
     })));
-
-    this._missionDeskObjects = desks;
-    this._activeZoneDeskId = null;
   }
 
   _rebindMissingDeskReactions(desks) {
@@ -291,7 +289,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
   _findNearestDeskInZone(player, desks) {
     const playerCenter = this._getObjectCenter(player);
-    const collisionIds = player?.state?.collisionEvents || [];
 
     let nearestDesk = null;
     let nearestDistance = Infinity;
@@ -299,8 +296,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     for (const desk of desks) {
       const deskCenter = this._getObjectCenter(desk);
       const distance = Math.hypot(playerCenter.x - deskCenter.x, playerCenter.y - deskCenter.y);
-      const inCollision = collisionIds.includes(desk?.spriteData?.id);
-      const inZone = inCollision || distance < this._getDeskAlertDistancePx(desk);
+      const inZone = distance < this._getDeskAlertDistancePx(desk);
 
       if (inZone && distance < nearestDistance) {
         nearestDesk = desk;
@@ -313,7 +309,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
   _syncDeskZoneAlert(nearestDesk) {
     if (nearestDesk) {
-      const zoneMessage = nearestDesk.spriteData?.zoneMessage || 'Press E to interact';
+      const zoneMessage = nearestDesk.spriteData?.zoneMessage || 'Click to interact';
       this.setZoneAlert(zoneMessage);
       this._activeZoneDeskId = nearestDesk.spriteData?.id || null;
       return;
