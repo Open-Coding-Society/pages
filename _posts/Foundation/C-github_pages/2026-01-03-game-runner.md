@@ -15,7 +15,7 @@ Game Runner integrates your GameEngine framework for teaching game development. 
 
 #### HTML Component
 
-- File: `_includes/game-runner.html`
+- File: `_includes/runners/game.html`
 - Reusable component for GameEngine integration
 - Automatically creates gameContainer and gameCanvas
 - Provides game controls: Start, Pause/Resume, Stop, Reset
@@ -122,7 +122,7 @@ export const gameLevelClasses = [CustomLevel];
 export { GameControl };
 {% endcapture %}
 
-{% include game-runner.html
+{% include runners/game.html
    runner_id="game1"
    challenge=challenge1
    code=code1
@@ -143,7 +143,7 @@ export const gameLevelClasses = [GameLevelWater, GameLevelParallaxFish];
 export { GameControl };
 {% endcapture %}
 
-{% include game-runner.html
+{% include runners/game.html
    runner_id="game2"
    challenge=challenge2
    code=code2

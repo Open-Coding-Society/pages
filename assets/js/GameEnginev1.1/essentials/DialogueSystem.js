@@ -17,6 +17,8 @@ constructor(options = {}) {
    this.dialogueBox = null;
   this.dialogueText = null;
   this.closeBtn = null;
+  this.controlsRow = null;
+  this.actionButtonGroup = null;
    // Game control reference for pausing
   this.gameControl = options.gameControl || null;
   // Track if this dialogue system paused the game
@@ -179,18 +181,39 @@ createDialogueBox() {
   this.closeBtn.id = "dialogue-close-btn-" + this.safeId;
   this.closeBtn.innerText = "Close";
   Object.assign(this.closeBtn.style, {
-    marginTop: "15px",
+    marginTop: "0",
     padding: "10px 20px",
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
     fontFamily: "'Press Start 2P', cursive, monospace",
-    fontSize: "12px"
+    fontSize: "12px",
+    flexShrink: "0"
   });
    // Add click handler
   this.closeBtn.onclick = () => {
     this.closeDialogue();
   };
+
+  this.controlsRow = document.createElement("div");
+  this.controlsRow.id = "dialogue-controls-" + this.safeId;
+  Object.assign(this.controlsRow.style, {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "10px",
+    marginTop: "10px",
+    flexWrap: "wrap"
+  });
+
+  this.actionButtonGroup = document.createElement("div");
+  Object.assign(this.actionButtonGroup.style, {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginLeft: "auto"
+  });
 
 
 
@@ -212,8 +235,10 @@ createDialogueBox() {
 
 
   // Assemble the dialogue box
+  this.controlsRow.appendChild(this.closeBtn);
+  this.controlsRow.appendChild(this.actionButtonGroup);
   this.dialogueBox.appendChild(contentContainer);
-  this.dialogueBox.appendChild(this.closeBtn);
+  this.dialogueBox.appendChild(this.controlsRow);
    // Add to the document
   document.body.appendChild(this.dialogueBox);
    // Also listen for Escape key to close dialogue
@@ -387,15 +412,20 @@ closeDialogue() {
     this.gameControl.resume();
     this.didPauseGame = false; // Reset the flag
   }
-   // Remove any custom buttons
-  const buttonContainers = this.dialogueBox.querySelectorAll('div[style*="display: flex"]');
-  buttonContainers.forEach(container => {
-    // Skip the main content container
-    if (container.contains(document.getElementById("dialogue-avatar-" + this.safeId))) {
-      return;
-    }
-    container.remove();
-  });
+
+  if (this.actionButtonGroup) {
+    this.actionButtonGroup.innerHTML = '';
+  }
+
+  if (this.closeBtn) {
+    this.closeBtn.innerText = 'Close';
+    this.closeBtn.onclick = () => {
+      this.closeDialogue();
+    };
+    this.closeBtn.style.marginRight = '0';
+    this.closeBtn.style.marginLeft = '0';
+    this.closeBtn.style.float = 'none';
+  }
 }
 
 
@@ -411,12 +441,9 @@ isDialogueOpen() {
 
 // Add buttons to the dialogue
 addButtons(buttons) {
-    if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0) return;
-  
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.justifyContent = 'space-between';
-    buttonContainer.style.marginTop = '10px';
+    if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0 || !this.actionButtonGroup) return;
+
+    this.actionButtonGroup.innerHTML = '';
   
     // Add each button
     buttons.forEach(button => {
@@ -429,7 +456,6 @@ addButtons(buttons) {
         btn.style.border = 'none';
         btn.style.borderRadius = '5px';
         btn.style.cursor = 'pointer';
-        btn.style.marginRight = '10px';
       
         // Add click handler
         btn.onclick = () => {
@@ -438,13 +464,8 @@ addButtons(buttons) {
             }
         };
       
-        buttonContainer.appendChild(btn);
+        this.actionButtonGroup.appendChild(btn);
     });
-  
-    // Insert before the close button
-    if (buttonContainer.children.length > 0) {
-        this.dialogueBox.insertBefore(buttonContainer, this.closeBtn);
-    }
 }
 }
 
