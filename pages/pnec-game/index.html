@@ -1,0 +1,106 @@
+---
+layout: none
+title: PNEC Preparedness Explorer
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Poway Neighborhood Emergency Corps — Interactive Preparedness Explorer. Walk through a virtual neighborhood and learn from PNEC experts on earthquake prep, wildfire safety, first aid, emergency kits, and more.">
+    <title>PNEC Preparedness Explorer</title>
+
+    <!-- Google Fonts: Chakra Petch (techy/emergency headings) + IBM Plex Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./assets/css/game.css">
+</head>
+<body>
+
+<!-- ─── Splash Screen ──────────────────────────────────────────────────────── -->
+<div id="pnec-splash">
+    <div class="splash__logo">PNEC <span>Preparedness</span> Explorer</div>
+    <div class="splash__divider"></div>
+    <div class="splash__sub">Poway Neighborhood Emergency Corps</div>
+    <div class="splash__stations">🎒 🌍 🔥 🏥 📡</div>
+    <div class="splash__sub" style="font-size:13px;margin-top:4px;color:#7f9ab0">
+        Walk the neighborhood · Visit all 5 stations · Ask the AI experts
+    </div>
+    <div class="splash__cta">CLICK OR PRESS ANY KEY TO BEGIN</div>
+</div>
+
+<!-- ─── Game Canvas ────────────────────────────────────────────────────────── -->
+<div id="pnec-game-container">
+    <canvas id="pnec-game-canvas"></canvas>
+    <!--
+        Chat panels are injected here dynamically by chatbot.js
+        when the player presses E near a station.
+    -->
+</div>
+
+<!-- ─── Game Bootstrap ─────────────────────────────────────────────────────── -->
+<script type="module">
+    /**
+     * Main entry point for the PNEC Preparedness Explorer.
+     *
+     * Teammates (Aneesh, Ethan) — quick guide:
+     *   • Station positions / AI prompts → pages/pnec-game/assets/js/stations.js
+     *   • Chatbot / API key setup        → pages/pnec-game/assets/js/chatbot.js
+     *   • Game physics / rendering       → pages/pnec-game/assets/js/game-engine.js
+     *   • All styles                     → pages/pnec-game/assets/css/game.css
+     *
+     * To replace the background with a ChatGPT-generated image:
+     *   1. Save your image as  pages/pnec-game/assets/images/game-bg.png
+     *   2. Uncomment the loadBackgroundImage() line inside game-engine.js init()
+     *   3. Adjust station worldX / worldY in stations.js to match the new image
+     */
+
+    import { GameEngine } from './assets/js/game-engine.js';
+
+    const splash     = document.getElementById('pnec-splash');
+    const canvas     = document.getElementById('pnec-game-canvas');
+    let   engine     = null;
+    let   started    = false;
+
+    // ── Ask for player name ──────────────────────────────────────────────────
+    function getPlayerName() {
+        // Try session storage so the prompt only fires once per browser session
+        const stored = sessionStorage.getItem('pnec-player-name');
+        if (stored) return stored;
+
+        const name = (prompt('Welcome to the PNEC Preparedness Explorer!\n\nEnter your name to begin:') || '').trim();
+        const safe = name.slice(0, 22) || 'Neighbor';
+        sessionStorage.setItem('pnec-player-name', safe);
+        return safe;
+    }
+
+    // ── Start the game ───────────────────────────────────────────────────────
+    function startGame() {
+        if (started) return;
+        started = true;
+
+        // Fade out and remove splash
+        splash.classList.add('splash--fade');
+        setTimeout(() => splash.remove(), 520);
+
+        // Build and start the engine
+        engine = new GameEngine(canvas);
+        engine.playerName = getPlayerName();
+        engine.init();
+    }
+
+    // ── Splash dismiss triggers ──────────────────────────────────────────────
+    splash.addEventListener('click',   startGame, { once: true });
+    window.addEventListener('keydown', startGame, { once: true });
+
+    // Auto-start after 8 seconds if user hasn't interacted (accessibility)
+    setTimeout(startGame, 8000);
+
+    // ── Cleanup on page unload ───────────────────────────────────────────────
+    window.addEventListener('beforeunload', () => engine?.stop());
+</script>
+
+</body>
+</html>
