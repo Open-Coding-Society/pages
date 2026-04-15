@@ -79,6 +79,11 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/educators/",
       frontendUrl: "https://github.com/NithikaVivek/pages-educators",
       backendUrl: "https://github.com/NithikaVivek/spring-educators"
+    },
+    "SD Auto": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/sd-auto/",
+      frontendUrl: "https://github.com/Ahaanv19/SD_Auto_Frontend",
+      backendUrl: "https://github.com/Ahaanv19/SD_Auto_Backend"
     }
   };
 
@@ -500,7 +505,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
-           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, donation flow, and impact dashboard to match the quality of their community mission.</p>
+           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, and donation flow.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
        </div>
    </div>
@@ -553,14 +558,26 @@ Below are the capstone infographic pages created by student groups. Click an ima
     </div>
 
 </div>
+  <!-- SD Auto (CSP) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+       <a href="{% post_url 2026-04-15-sd-auto-capstone %}">
+           <div class="w-28 h-28 flex items-center justify-center bg-blue-600 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">SD Auto</div>
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-04-15-sd-auto-capstone %}">SD Auto</a></h3>
+           <p class="text-sm text-gray-700">A full-stack intelligent routing platform that enhances daily commutes in San Diego through real-time traffic data, community hazard reporting, and AI-driven route optimization.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Ahaan, Arnav</p>
+       </div>
+   </div>
+
   <!-- FOPS -->
   <div class="flex items-start space-x-4 p-4 border rounded-lg">
-       <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
-           <img src="/images/capstone/fops.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
-           <p class="text-sm text-gray-700">Diet tracker for the elderly.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Nitya, Virginia, Ginny</p>
-       </div>
-   </div>
+       <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
+           <img src="/images/capstone/fops.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
+           <p class="text-sm text-gray-700">Diet tracker for the elderly.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Nitya, Virginia, Ginny</p>
+       </div>
+   </div>
