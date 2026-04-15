@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Fantasy",
+    "src": "csa-frq-fantasy.png",
+    "description": "A retro style workshop theme with vibrant colors and whimsical elements",
+    "previewText": "Default theme",
+    "compatibleSprites": ["Minimalist", "Fidelity Girl"]
+  },
+  {
+    "name": "City",
+    "src": "csa-frq-city.png",
+    "description": "A gothic style workshop theme with dark colors and industrial elements",
+    "previewText": "Urban theme",
+    "compatibleSprites": ["Chill Guy", "Miku"]
+  },
+  {
+    "name": "Space",
+    "src": "csa-frq-space.png",
+    "description": "A futuristic space-themed workshop with sci-fi elements and starry backdrops",
+    "previewText": "Space theme",
+    "compatibleSprites": ["Astronaut", "Ufos", "Pew"]
+  },
+  {
+    "name": "Clouds",
+    "src": "csa-frq-clouds.png",
+    "description": "A fantasy-themed workshop with clouds and floating workbenches",
+    "previewText": "Cloud theme",
+    "compatibleSprites": ["Kirby", "Slime"]
+  }
+]
