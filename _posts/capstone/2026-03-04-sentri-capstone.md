@@ -26,6 +26,8 @@ permalink: /capstone/sentri/
     border-radius: 40px;
     max-width: 1100px;
     margin: auto;
+    position: relative;
+    overflow: hidden;
 }
 
 /* HERO */
@@ -78,16 +80,12 @@ permalink: /capstone/sentri/
     border-color: var(--accent-green);
 }
 
-.pillar-card h3 {
-    margin-bottom: 8px;
-}
-
 .pillar-card p {
     color: var(--text-muted);
     font-size: 0.95rem;
 }
 
-/* LOGO NAV GRID */
+/* EMOJI NAV */
 .logo-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
@@ -112,14 +110,10 @@ permalink: /capstone/sentri/
     box-shadow: 0 8px 25px rgba(76,175,80,0.25);
 }
 
-.logo-card img {
-    width: 70px;
-    margin-bottom: 12px;
-}
-
-.logo-card span {
+.logo-emoji {
+    font-size: 3rem;
     display: block;
-    font-weight: 600;
+    margin-bottom: 10px;
 }
 
 /* STATS */
@@ -150,43 +144,30 @@ permalink: /capstone/sentri/
     margin-top: 60px;
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.08);
-    padding-top: 30px;
-}
-
-.btn-group {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.sentri-btn {
-    padding: 14px 24px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: 0.25s;
-}
-
-.btn-green {
-    background: linear-gradient(135deg,#4CAF50,#2e7d32);
-    box-shadow: 0 0 18px rgba(76,175,80,0.35);
-}
-
-.btn-outline {
-    border: 1px solid rgba(129,199,132,0.3);
-    background: rgba(76,175,80,0.05);
-}
-
-.sentri-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(76,175,80,0.25);
+    padding-top: 25px;
 }
 
 .footer-note {
-    margin-top: 20px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
+}
+
+/* CONFETTI */
+.confetti {
+    position: absolute;
+    width: 6px;
+    height: 10px;
+    background: var(--accent-light);
+    top: -10px;
+    opacity: 0.8;
+    animation: fall 2.5s linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(600px) rotate(360deg);
+        opacity: 0;
+    }
 }
 </style>
 
@@ -205,26 +186,26 @@ permalink: /capstone/sentri/
     </div>
     <div class="pillar-card">
         <h3>📅 Easy Scheduling</h3>
-        <p>Find and save meetings in seconds.</p>
+        <p>Find and save meetings fast.</p>
     </div>
     <div class="pillar-card">
         <h3>📊 Progress Tracking</h3>
-        <p>Log mood, patterns, and milestones.</p>
+        <p>Track mood, patterns, and growth.</p>
     </div>
 </section>
 
-<!-- LOGO NAV -->
+<!-- EMOJI NAV -->
 <section class="logo-grid">
     <a href="https://sentri-prc.opencodingsociety.com/" class="logo-card" target="_blank">
-        <img src="{{site.baseurl}}/images/logo.png" alt="Homepage">
+        <span class="logo-emoji">🏠</span>
         <span>Homepage</span>
     </a>
     <a href="https://sentri-prc.opencodingsociety.com/programs" class="logo-card" target="_blank">
-        <img src="{{site.baseurl}}/images/logo.png" alt="Programs">
+        <span class="logo-emoji">📋</span>
         <span>Programs</span>
     </a>
     <a href="https://sentri-prc.opencodingsociety.com/meetings" class="logo-card" target="_blank">
-        <img src="{{site.baseurl}}/images/logo.png" alt="Meetings">
+        <span class="logo-emoji">📅</span>
         <span>Meetings</span>
     </a>
 </section>
@@ -236,3 +217,30 @@ permalink: /capstone/sentri/
     <div class="stat"><strong>Smart</strong> AI-supported</div>
     <div class="stat"><strong>Organized</strong> Clean data system</div>
 </section>
+
+<!-- FOOTER -->
+<footer class="sentri-footer">
+    <p class="footer-note">Poway Recovery Center × Open Coding Society</p>
+</footer>
+
+<script>
+// Confetti burst on load (runs once)
+window.addEventListener("load", () => {
+    const container = document.getElementById("sentri-showcase");
+
+    for (let i = 0; i < 60; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+
+        confetti.style.left = Math.random() * 100 + "%";
+        confetti.style.animationDuration = (Math.random() * 1.5 + 1.5) + "s";
+        confetti.style.background = ["#4CAF50","#81c784","#a5d6a7"][Math.floor(Math.random()*3)];
+
+        container.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), 3000);
+    }
+});
+</script>
+
+</div>
