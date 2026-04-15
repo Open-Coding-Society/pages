@@ -7,13 +7,13 @@ Status: "In Development"
 Team:
   - name: "Evan S"
     role: "Full-Stack / Backend"
-    bio: "Leading backend architecture, authentication, and the admin dashboard."
+    bio: "Built the interactive front-page game, groups system, admin panel backend APIs, and blogging system, plus other backend and management contributions."
   - name: "Maya D"
-    role: "Design / Frontend"
-    bio: "Driving the UI redesign, color palette, and visual hierarchy."
+    role: "Deployment / Frontend"
+    bio: "Deployed the site and built the friends and login system, messaging system, and user interaction flows."
   - name: "Cyrus Z"
     role: "Frontend / Integrations"
-    bio: "Building the event calendar, payment portal, and member-facing pages."
+    bio: "Built the events system and calendar, Google-based login APIs, customizable profile elements, and an ML system that helps users connect."
 
 About:
   who: "We're a team of three students partnering with the Poway Woman's Club — a 501(c)(3) nonprofit founded in 1960 and affiliated with the General Federation of Women's Clubs International."
@@ -37,11 +37,11 @@ Features:
   - title: "Admin Dashboard"
     description: "Lets club leaders manage members, events, and content without code."
     image: "capstone/pwc_admin_users.png"
-    url: "https://poway-women-s-club.github.io/pwc/navigation/profile/"
+    url: "https://pwc-flask.opencodingsociety.com/"
   - title: "API Layer"
     description: "Flask backend powering authentication, events, payments, and member data."
     image: "capstone/pwc_api_endpoints.png"
-    url: "https://pwc-flask.opencodingsociety.com/"
+    url: "https://pwc-flask.opencodingsociety.com/api/health"
 
 Tech:
   - "Responsive Frontend"
