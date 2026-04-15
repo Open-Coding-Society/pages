@@ -1,0 +1,323 @@
+---
+layout: default
+title: Event Calendar
+permalink: /sph/eventcalendar1/
+---
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <span>For inquiry about our programs and services Contact@SafePassageHeals</span>
+  <span>Or Call Us 818-232-7476</span>
+</div>
+
+<!-- Main Header -->
+<div class="custom-header">
+  <div class="logo">
+    <img src="{{site.baseurl}}/safepassageheals/Safe_Passage.png" alt="Logo" style="width: 80px;">
+    Safe Passage Heals
+  </div>
+  <nav>
+    <a href="{{site.baseurl}}/">Home</a>
+    <a href="{{site.baseurl}}/whoweare">Who We Are</a>
+    <a href="{{site.baseurl}}/sph/eventcalendar1">Events Calendar</a>
+    <a href="{{site.baseurl}}/sph/blog">Blog</a>
+    <a href="{{site.baseurl}}/login">Login</a>
+  </nav>
+</div>
+
+<!-- User bar -->
+<div id="user-bar" style="
+  max-width: 900px;
+  margin: 24px auto 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Segoe UI', sans-serif;
+">
+  <span id="user-greeting" style="color:#4f46e5; font-weight:600; font-size:0.95rem;"></span>
+  <button id="logout-btn" style="display:none;
+    padding: 7px 16px;
+    background: white;
+    color: #ef4444;
+    border: 1.5px solid #ef4444;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.88rem;"
+    onclick="fetch('${BACKEND}/api/authenticate', {method:'DELETE', credentials:'include'}).finally(() => window.location.href='{{ site.baseurl }}/login')">
+    Sign Out
+  </button>
+  <a id="login-btn" href="{{ site.baseurl }}/login" style="display:none;
+    padding: 7px 16px;
+    background: #4f46e5;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;">
+    Sign In
+  </a>
+</div>
+<!-- Edit Events Button (admin only) -->
+<div id="edit-events-bar" style="
+  max-width: 900px;
+  margin: 16px auto 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  font-family: 'Segoe UI', sans-serif;
+">
+  <a id="edit-events-btn" href="{{ site.baseurl }}/blog/post" style="display:none;
+    padding: 9px 20px;
+    background: #2563eb;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition: background 0.2s;">
+    ✏️ Edit Events
+  </a>
+</div>
+
+<div id="calendar"></div>
+<div id="event-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:1000; justify-content:center; align-items:center;">
+  <div id="modal-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6);"></div>
+  <div id="modal-content" style="
+    position:relative;
+    background: #1e1e2e;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 650px;
+    width: 90%;
+    z-index: 1001;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  ">
+    <button id="modal-close" style="position:absolute; top:10px; right:14px; background:none; border:none; font-size:24px; color:white; cursor:pointer; z-index:10;">&times;</button>
+
+    <!-- Left: Image -->
+    <div id="modal-image" style="
+      width: 220px;
+      min-width: 220px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 12px 0 0 12px;
+    "></div>
+
+    <!-- Right: Event Details -->
+    <div style="
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      color: white;
+      flex: 1;
+    ">
+      <h2 id="modal-title" style="margin:0 0 6px 0; font-size:1.3rem; font-family:'Segoe UI',sans-serif;"></h2>
+      <p id="modal-time" style="margin:0; font-size:0.9rem; color:#a5b4fc;"></p>
+      <p id="modal-writeup" style="margin:0; font-size:0.92rem; color:#e2e8f0;"></p>
+      <p id="modal-location" style="margin:0; font-size:0.9rem; color:#94a3b8;"></p>
+      <a id="modal-registration" href="#" target="_blank" style="color:#ffd700; font-weight:bold; font-size:0.95rem; text-decoration:none; margin-top:4px;"></a>
+    </div>
+  </div>
+</div>
+
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet"/>
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script type ="module">
+import {pythonURI, fetchOptions} from "{{ site.baseurl }}/assets/js/api/config.js";
+
+document.addEventListener('DOMContentLoaded', async function() {
+  const BACKEND = pythonURI;
+// Check session and update user bar
+  try {
+    const res = await fetch(`${BACKEND}/api/id`, { credentials: 'include' });
+    if (res.ok) {
+      const user = await res.json();
+      document.getElementById('user-greeting').textContent = `Hello, ${user.name || user.uid}`;
+      document.getElementById('logout-btn').style.display = 'inline-block';
+
+      // Show Edit Events button only for admins
+      if (user.role === 'Admin') {
+        document.getElementById('edit-events-btn').style.display = 'inline-block';
+      }
+    } else {
+      document.getElementById('login-btn').style.display = 'inline-block';
+    }
+  } catch (_) {
+    document.getElementById('login-btn').style.display = 'inline-block';
+  }
+  var calendarEl = document.getElementById('calendar');
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+    },
+    navLinks: true,
+    selectable: true,
+    selectMirror: true,
+    dayMaxEvents: true,
+    events: BACKEND + '/api/events',
+    eventClick: function(info) {
+      const e = info.event.extendedProps;
+      const start = info.event.start;
+      const end = info.event.end;
+      const eventDescription = e.description || e.writeup || '';
+
+      const formatDate = date => new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(date);
+
+      let timeText = '';
+      if (start) {
+        timeText = formatDate(start);
+        if (end && end > start) {
+          timeText += ` — ${formatDate(end)}`;
+        }
+      }
+
+      document.getElementById('modal-title').textContent = info.event.title;
+      document.getElementById('modal-time').textContent = timeText ? `Time: ${timeText}` : '';
+      document.getElementById('modal-writeup').textContent = eventDescription;
+      document.getElementById('modal-location').textContent = e.location ? 'Location: ' + e.location : '';
+
+      const regLink = document.getElementById('modal-registration');
+      if (e.registration) {
+        regLink.href = e.registration;
+        regLink.textContent = 'Register Here';
+      } else {
+        regLink.textContent = '';
+      }
+
+      const flyer = e.flyer || '/images/docx/Safe_Passage.png';
+      const flyerPath = flyer.startsWith('/') ? flyer : '/' + flyer;
+      document.getElementById('modal-image').style.backgroundImage = `url('${BACKEND}${flyerPath}')`;
+      const modal = document.getElementById('event-modal');
+      modal.style.display = 'flex';
+    },
+  });
+
+  calendar.render();
+
+  const modal = document.getElementById('event-modal');
+  const closeButton = document.getElementById('modal-close');
+  const overlay = document.getElementById('modal-overlay');
+
+  const closeModal = () => {
+    modal.style.display = 'none';
+  };
+
+  closeButton.addEventListener('click', closeModal);
+  overlay.addEventListener('click', closeModal);
+});
+</script>
+
+<style>
+/* ── BREAKOUT HEADER ── */
+.top-bar, .custom-header {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  background: #6b3fa0;
+  color: white;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.top-bar a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ── HEADER ── */
+.custom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 40px;
+  background: white;
+  border-bottom: 2px solid #e8dff5;
+}
+
+.custom-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #6b3fa0;
+}
+
+.custom-header nav {
+  display: flex;
+  gap: 24px;
+}
+
+.custom-header nav a {
+  color: #2a1f3d;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+
+.custom-header nav a:hover {
+  color: #6b3fa0;
+}
+
+#calendar {
+  max-width: 900px;
+  margin: 40px auto;
+}
+body {
+  position: relative;
+  background-color: #ffffff;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/flaskandfurious/safepassageheals/Safe_Passage.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 400px;
+  opacity: 0.08;
+  z-index: -1;
+}
+.purple-bar {
+  width: 100%;
+  height: 40px;
+  background-color: #6f5aa8;
+  display: block;
+}
+</style>

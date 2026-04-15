@@ -1,0 +1,522 @@
+---
+layout: default
+title: Add Event
+permalink: /blog/post/
+---
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <span>For inquiry about our programs and services Contact@SafePassageHeals</span>
+  <span>Or Call Us 818-232-7476</span>
+</div>
+
+<!-- Main Header -->
+<div class="custom-header">
+  <div class="logo">
+    <img src="{{site.baseurl}}/safepassageheals/Safe_Passage.png" alt="Logo" style="width: 80px;">
+    Safe Passage Heals
+  </div>
+  <nav>
+    <a href="{{site.baseurl}}/whoweare">Who We Are</a>
+    <a href="{{site.baseurl}}/sph/eventcalendar1">Events Calendar</a>
+    <a href="{{site.baseurl}}/sph/blog">Blog</a>
+    <a href="{{site.baseurl}}/login">Login</a>
+  </nav>
+</div>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f7f5fb;
+    --border: #ddd5ee;
+    --text: #2a1f3d;
+    --muted: #7a6a95;
+    --accent: #6b3fa0;
+    --accent-mid: #8b5bbf;
+    --accent-light: #c9a8e8;
+    --accent-bg: #f0eaf8;
+  }
+
+  .top-bar,
+  .custom-header {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+  }
+
+  .top-bar {
+    background-color: #7B5EA7;
+    color: white;
+    padding: 8px 40px;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .top-bar a {
+    color: #ffd700;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .custom-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 40px;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+  }
+
+  .custom-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #7B5EA7;
+  }
+
+  .custom-header nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+
+  .custom-header nav a:hover {
+    color: #7B5EA7;
+  }
+
+  /* ── SPLIT ── */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+
+  /* LEFT — Image */
+  .split-image {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .split-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .split-image .placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--accent-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .split-image .placeholder:hover { background: #e8dff5; }
+
+  .split-image .placeholder svg {
+    width: 44px; height: 44px;
+    stroke: var(--accent-light);
+    fill: none;
+    stroke-width: 1.5;
+  }
+
+  .split-image .placeholder span {
+    color: var(--accent-mid);
+    font-weight: 500;
+  }
+
+  #imageInput { display: none; }
+
+  /* RIGHT — Content */
+  .split-content {
+    padding: 4.5rem 4rem 5rem 4.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  .post-category {
+    display: inline-block;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-light);
+    padding: 0.28rem 0.85rem;
+    border-radius: 20px;
+    margin-bottom: 1.6rem;
+    width: fit-content;
+    outline: none;
+    font-weight: 500;
+  }
+
+  /* ── Form fields ── */
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .field-group label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .field-input {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--border);
+    padding: 0.45rem 0;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .field-input:focus {
+    border-bottom-color: var(--accent);
+  }
+
+  .field-input::placeholder {
+    color: var(--accent-light);
+  }
+
+  .split-content h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 0;
+    color: var(--text);
+    outline: none;
+    border: none;
+    background: transparent;
+    width: 100%;
+    padding: 0;
+    font-style: italic;
+  }
+
+  .h1-wrapper {
+    margin-bottom: 1.2rem;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--accent-bg);
+  }
+
+  .meta-row .field-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  textarea.field-input {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.85;
+    font-weight: 300;
+    padding-top: 0.6rem;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  textarea.field-input:focus {
+    border-color: var(--accent);
+  }
+
+  /* ── Save button ── */
+  .button-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .save-btn {
+    padding: 0.8rem 2.2rem;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .exit-btn {
+    padding: 0.8rem 2.2rem;
+    background: #fff;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    border-radius: 30px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+  }
+
+  .save-btn:hover  { background: var(--accent-mid); }
+  .save-btn:active { transform: scale(0.97); }
+  .save-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .exit-btn:hover { background: var(--accent-bg); }
+  .exit-btn:active { transform: scale(0.97); }
+
+  /* ── Status message ── */
+  .status-msg {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 1.2em;
+  }
+  .status-msg.success { color: #3a8a5a; }
+  .status-msg.error   { color: #c0392b; }
+
+  .edit-hint {
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.7rem;
+    color: var(--accent-light);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 768px) {
+    .split {
+      grid-template-columns: 1fr;
+      grid-template-rows: 50vw auto;
+    }
+    .split-image { position: relative; height: 50vw; top: 0; }
+    .split-content { padding: 2.5rem 1.5rem; }
+    .meta-row { flex-direction: column; gap: 0; }
+  }
+</style>
+
+<div class="split">
+
+  <!-- LEFT: Flyer image -->
+  <div class="split-image" id="imagePanel">
+    <div class="placeholder" id="imagePlaceholder" onclick="document.getElementById('imageInput').click()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+      <span>Click to add flyer image</span>
+    </div>
+    <input type="file" id="imageInput" accept="image/*" />
+  </div>
+
+  <!-- RIGHT: Event entry form -->
+  <div class="split-content">
+
+    <div class="post-category">New Event</div>
+
+    <!-- Title -->
+    <div class="h1-wrapper field-group">
+      <label for="titleInput">Event Title</label>
+      <input
+        id="titleInput"
+        class="field-input"
+        style="font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.5vw,2.2rem);font-weight:700;font-style:italic;border-bottom-width:2px;"
+        type="text"
+        placeholder="Your Event Title"
+        autocomplete="off"
+      />
+    </div>
+
+    <!-- Date / Time / Location row -->
+    <div class="meta-row">
+      <div class="field-group">
+        <label for="dateInput">Date</label>
+        <input id="dateInput" class="field-input" type="date" />
+      </div>
+      <div class="field-group">
+        <label for="timeInput">Time</label>
+        <input id="timeInput" class="field-input" type="time" />
+      </div>
+      <div class="field-group">
+        <label for="locationInput">Location</label>
+        <input id="locationInput" class="field-input" type="text" placeholder="e.g. Room 204" />
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="field-group">
+      <label for="writeupInput">Description</label>
+      <textarea
+        id="writeupInput"
+        class="field-input"
+        placeholder="Tell attendees what this event is about…"
+        rows="6"
+      ></textarea>
+    </div>
+
+    <!-- Registration link -->
+    <div class="field-group" style="margin-top:0.5rem;">
+      <label for="regInput">Registration Link</label>
+      <input id="regInput" class="field-input" type="url" placeholder="https://forms.gle/…" />
+    </div>
+
+    <!-- Save + Exit buttons -->
+    <div class="button-row">
+      <button class="save-btn" id="saveBtn" onclick="submitEvent()">Save Event</button>
+      <button class="exit-btn" id="exitBtn" onclick="window.location.href='{{ site.baseurl | default: '/' | append: '/' | replace: '//', '/' }}'">Exit</button>
+    </div>
+    <p class="status-msg" id="statusMsg"></p>
+
+    <p class="edit-hint">Fill in the fields above · Click the image panel to upload a flyer</p>
+  </div>
+
+</div>
+<script type="module">
+  import { pythonURI } from "{{ site.baseurl }}/assets/js/api/config.js";
+
+  /* ── Image preview ── */
+  const imageInput = document.getElementById('imageInput');
+  const imagePanel = document.getElementById('imagePanel');
+  const placeholder = document.getElementById('imagePlaceholder');
+
+  imageInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      placeholder.style.display = 'none';
+      const existing = imagePanel.querySelector('img');
+      if (existing) existing.remove();
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cursor = 'pointer';
+      img.title = 'Click to change image';
+      img.onclick = () => imageInput.click();
+      imagePanel.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* ── Submit ── */
+  async function submitEvent() {
+    const btn = document.getElementById('saveBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    const title    = document.getElementById('titleInput').value.trim();
+    const date     = document.getElementById('dateInput').value;
+    const time     = document.getElementById('timeInput').value;
+    const location = document.getElementById('locationInput').value.trim();
+    const writeup  = document.getElementById('writeupInput').value.trim();
+    const reg      = document.getElementById('regInput').value.trim();
+    const flyerFile = imageInput.files[0];
+
+    if (!title) {
+      statusMsg.textContent = 'Please enter an event title.';
+      statusMsg.className = 'status-msg error';
+      return;
+    }
+    if (!date) {
+      statusMsg.textContent = 'Please select a date.';
+      statusMsg.className = 'status-msg error';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    statusMsg.textContent = '';
+    statusMsg.className = 'status-msg';
+
+    const formData = new FormData();
+    formData.append('title',        title);
+    formData.append('event_date',   date);
+    formData.append('event_time',   time);
+    formData.append('location',     location);
+    formData.append('writeup',      writeup);
+    formData.append('registration', reg);
+
+    if (flyerFile) {
+      formData.append('flyer', flyerFile);
+    }
+
+    try {
+      const res = await fetch(`${pythonURI}/api/events/add`, {
+        method: 'POST',
+        credentials: 'include',   // ← sends cookies cross-origin
+        body: formData
+        // Don't set Content-Type — browser sets multipart boundary automatically
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        statusMsg.textContent = 'Event saved successfully! Redirecting to calendar...';
+        statusMsg.className = 'status-msg success';
+        // Redirect to calendar after 1.5 seconds
+        setTimeout(() => {
+          window.location.href = '{{ site.baseurl }}/sph/eventcalendar/';
+        }, 1500);
+        // Optional: reset form
+        // document.querySelectorAll('.field-input').forEach(el => { el.value = ''; el.textContent = ''; });
+      } else {
+        statusMsg.textContent = data.error || 'Something went wrong.';
+        statusMsg.className = 'status-msg error';
+      }
+    } catch (err) {
+      statusMsg.textContent = 'Network error — could not reach the server.';
+      statusMsg.className = 'status-msg error';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save Event';
+    }
+  }
+
+  // Expose submitEvent to global scope for onclick handler
+  window.submitEvent = submitEvent;
+</script>

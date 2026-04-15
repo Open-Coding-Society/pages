@@ -1,0 +1,495 @@
+---
+Title: Login
+permalink: /login
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login / Sign Up</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .navbar-wrapper {
+      flex: 0 0 auto;
+    }
+
+    .login-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 36px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+      color: #1a1a2e;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e8e8e8;
+      margin-bottom: 28px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: #999;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+    }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 5px;
+      margin-top: 16px;
+    }
+
+    label:first-of-type { margin-top: 0; }
+
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus { border-color: #4f46e5; }
+
+    .hint {
+      font-size: 0.78rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 24px;
+      transition: background 0.2s;
+    }
+
+    button[type="submit"]:hover { background: #3730a3; }
+    button[type="submit"]:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    .message {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .message.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+      display: block;
+    }
+
+    .message.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+      display: block;
+    }
+
+    .user-info {
+      background: #f5f3ff;
+      border: 1px solid #c4b5fd;
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 18px;
+      font-size: 0.88rem;
+      display: none;
+    }
+
+    .user-info.visible { display: block; }
+
+    .user-info p { margin: 4px 0; color: #3730a3; }
+    .user-info strong { color: #1e1b4b; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .badge.admin { background: #fef3c7; color: #92400e; }
+    .badge.user  { background: #e0e7ff; color: #3730a3; }
+
+    .logout-btn {
+      width: 100%;
+      padding: 10px;
+      background: white;
+      color: #ef4444;
+      border: 1.5px solid #ef4444;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover { background: #fef2f2; }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      background: #6b3fa0;
+      color: white;
+      padding: 8px 20px;
+      font-size: 0.85rem;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .top-bar a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* ── HEADER ── */
+    .custom-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 40px;
+      background: white;
+      border-bottom: 2px solid #e8dff5;
+    }
+
+    .custom-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #6b3fa0;
+    }
+
+    .custom-header nav {
+      display: flex;
+      gap: 24px;
+    }
+
+    .custom-header nav a {
+      color: #2a1f3d;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .custom-header nav a:hover {
+      color: #6b3fa0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="navbar-wrapper">
+<!-- Top Bar -->
+<div class="top-bar">
+  <span>For inquiry about our programs and services Contact@SafePassageHeals</span>
+  <span>Or Call Us 818-232-7476</span>
+</div>
+
+<!-- Main Header -->
+<div class="custom-header">
+  <div class="logo">
+    <img src="{{site.baseurl}}/safepassageheals/Safe_Passage.png" alt="Logo" style="width: 80px;">
+    Safe Passage Heals
+  </div>
+  <nav>
+    <a href="{{site.baseurl}}/">Home</a>
+    <a href="{{site.baseurl}}/whoweare">Who We Are</a>
+    <a href="{{site.baseurl}}/sph/eventcalendar1">Events Calendar</a>
+    <a href="{{site.baseurl}}/sph/blog">Blog</a>
+    <a href="{{site.baseurl}}/login">Login</a>
+  </nav>
+</div>
+</div>
+
+<div class="login-wrapper">
+<div class="card">
+  <h1>Welcome</h1>
+  <p class="subtitle">Sign in to your account or create a new one.</p>
+
+  <!-- Logged-in state -->
+  <div id="loggedIn" style="display:none">
+    <div class="user-info visible" id="userInfoBox"></div>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+    <div class="message" id="logoutMsg"></div>
+  </div>
+
+  <!-- Auth forms -->
+  <div id="authForms">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab"        onclick="switchTab('signup')">Sign Up</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="form-section active" id="loginSection">
+      <form onsubmit="handleLogin(event)">
+        <label for="loginUid">Username</label>
+        <input id="loginUid" type="text" placeholder="your_username" required />
+
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" placeholder="••••••••" required />
+
+        <button type="submit" id="loginBtn">Sign In</button>
+      </form>
+      <div class="message" id="loginMsg"></div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div class="form-section" id="signupSection">
+      <form onsubmit="handleSignup(event)">
+        <label for="signupName">Full Name</label>
+        <input id="signupName" type="text" placeholder="Jane Doe" required />
+
+        <label for="signupUid">Username</label>
+        <input id="signupUid" type="text" placeholder="janedoe" required />
+
+        <label for="signupContact">Email or Phone</label>
+        <input id="signupContact" type="text" placeholder="jane@email.com or 555-1234" required />
+
+        <label for="signupPassword">Password</label>
+        <input id="signupPassword" type="password" placeholder="At least 8 characters" required />
+
+        <label for="signupAdminSecret">Admin Secret <span style="font-weight:400;color:#aaa">(optional)</span></label>
+        <input id="signupAdminSecret" type="password" placeholder="Leave blank for regular account" />
+        <p class="hint">Only fill this if you have the admin secret key.</p>
+
+        <button type="submit" id="signupBtn">Create Account</button>
+      </form>
+      <div class="message" id="signupMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import {pythonURI, fetchOptions} from "{{ site.baseurl }}/assets/js/api/config.js";
+
+  // ── helpers ──────────────────────────────────────────────
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'message ' + type;
+  }
+
+  function clearMsg(id) {
+    const el = document.getElementById(id);
+    el.textContent = '';
+    el.className = 'message';
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'signup' && i === 1));
+    });
+    document.getElementById('loginSection').classList.toggle('active', tab === 'login');
+    document.getElementById('signupSection').classList.toggle('active', tab === 'signup');
+    clearMsg('loginMsg');
+    clearMsg('signupMsg');
+  }
+
+  function isEmail(val) { return val.includes('@'); }
+
+  // ── check session on page load ────────────────────────────
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch(`${pythonURI}/api/id`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        showLoggedIn(data);
+      }
+      // 401 just means not logged in — do nothing, show the login form
+    } catch (_) { /* network error — also fine, just show login form */ }
+  });
+
+  // ── login ─────────────────────────────────────────────────
+  async function handleLogin(e) {
+    e.preventDefault();
+    clearMsg('loginMsg');
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    const uid      = document.getElementById('loginUid').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+      const res = await fetch(`${pythonURI}/api/authenticate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ uid, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (data.token) localStorage.setItem('authToken', data.token);
+        window.location.href = '/flaskandfurious/';
+      } else {
+        showMsg('loginMsg', data.message || 'Login failed.', 'error');
+      }
+    } catch (err) {
+      showMsg('loginMsg', 'Could not reach the server. Is it running?', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  // ── signup ────────────────────────────────────────────────
+  async function handleSignup(e) {
+    e.preventDefault();
+    clearMsg('signupMsg');
+    const btn = document.getElementById('signupBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating account…';
+
+    const name        = document.getElementById('signupName').value.trim();
+    const uid         = document.getElementById('signupUid').value.trim();
+    const contact     = document.getElementById('signupContact').value.trim();
+    const password    = document.getElementById('signupPassword').value;
+    const adminSecret = document.getElementById('signupAdminSecret').value;
+
+    // Route email vs phone
+    const body = { name, uid, password };
+    if (isEmail(contact)) { body.email = contact; }
+    else                   { body.phone = contact; }
+    if (adminSecret) body.admin_secret = adminSecret;
+
+    try {
+      const res = await fetch(`${pythonURI}/api/user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showMsg('signupMsg', `Account created! You can now log in as "${uid}".`, 'success');
+        // clear form
+        document.getElementById('signupName').value = '';
+        document.getElementById('signupUid').value = '';
+        document.getElementById('signupContact').value = '';
+        document.getElementById('signupPassword').value = '';
+        document.getElementById('signupAdminSecret').value = '';
+        // auto-switch to login tab after 1.5s
+        setTimeout(() => switchTab('login'), 1500);
+      } else {
+        showMsg('signupMsg', data.message || 'Sign up failed.', 'error');
+      }
+    } catch (err) {
+      showMsg('signupMsg', 'Could not reach the server. Is it running?', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+  }
+
+  // ── logout ────────────────────────────────────────────────
+  async function logout() {
+    try {
+      await fetch(`${pythonURI}/api/authenticate`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+    } catch (_) {}
+    document.getElementById('loggedIn').style.display = 'none';
+    document.getElementById('authForms').style.display = 'block';
+    switchTab('login');
+  }
+
+  // ── show logged-in panel ──────────────────────────────────
+  function showLoggedIn(user) {
+    document.getElementById('authForms').style.display = 'none';
+    document.getElementById('loggedIn').style.display  = 'block';
+
+    const role  = user.role || 'User';
+    const badge = `<span class="badge ${role.toLowerCase()}">${role}</span>`;
+
+    document.getElementById('userInfoBox').innerHTML = `
+      <p><strong>Logged in as:</strong> ${user.name || user.uid} ${badge}</p>
+      <p><strong>Username:</strong> ${user.uid}</p>
+      ${user.email && user.email !== '?' ? `<p><strong>Email:</strong> ${user.email}</p>` : ''}
+    `;
+  }
+  window.switchTab = switchTab;
+  window.logout = logout;
+  window.handleLogin = handleLogin;   
+  window.handleSignup = handleSignup; 
+</script>
+</div>
+</div>
+</body>
+</html>
