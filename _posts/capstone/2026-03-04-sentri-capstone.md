@@ -1,7 +1,6 @@
 ---
 toc: false
 title: "Sentri: The AI-Driven Recovery Ecosystem"
-description: A streamlined digital platform for program matching, meeting scheduling, and recovery tracking.
 permalink: /capstone/sentri/
 ---
 
