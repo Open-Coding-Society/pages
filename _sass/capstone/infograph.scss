@@ -12,13 +12,36 @@ $infograph-btn-bg: rgba(255, 255, 255, 0.08);
 $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 // Base layout for any infograph container (matches any class ending in "-infograph")
+[class$="-infograph"],
+[class$="-infograph"] * {
+  box-sizing: border-box;
+}
+
 [class$="-infograph"] {
-  max-width: 1200px;
+  max-width: 1800px;
+  width: min(100%, 1800px);
   margin: 0 auto;
-  padding: 2rem;
+  padding: 3rem 3rem;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: $infograph-foreground;
   background-color: $infograph-bg;
+}
+
+/* Capstone-only page layout overrides to avoid global site styling conflicts */
+.capstone-page {
+  width: 100% !important;
+  max-width: none !important;
+}
+.capstone-page > .wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  margin: 0 auto !important;
+}
+.capstone-page .opencs_root {
+  width: 100% !important;
+  max-width: none !important;
 }
 
 // Generic section styling
@@ -72,9 +95,27 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 [class$="-infograph"] [class$="-card-grid"] {
   display: grid;
-  grid-template-columns: 250px 1fr 1fr;
+  grid-template-columns: minmax(280px, 360px) minmax(320px, 1.3fr) minmax(320px, 1.7fr);
   gap: 2rem;
   align-items: stretch;
+  min-width: 0;
+}
+
+[class$="-infograph"] [class$="-visual"],
+[class$="-infograph"] [class$="-content"],
+[class$="-infograph"] [class$="-details"] {
+  min-width: 0;
+}
+
+[class$="-infograph"] [class$="-title"],
+[class$="-infograph"] [class$="-project-title"],
+[class$="-infograph"] [class$="-description"],
+[class$="-infograph"] [class$="-subtitle"],
+[class$="-infograph"] [class$="-about"],
+[class$="-infograph"] [class$="-section-title"],
+[class$="-infograph"] [class$="-impact-item"] {
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 1024px) {
