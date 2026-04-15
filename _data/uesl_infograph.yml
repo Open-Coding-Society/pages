@@ -6,6 +6,26 @@ Topics:
     image: "capstone/uesl_foundation.svg"
     link: "https://www.unifiedesl.com/foundation"
     alt: "Unified Esports League Foundation logo — shield with game controller"
+    subtitle: "Gaming for All — Inclusion Through Esports"
+    description: "A 501(c)(3) nonprofit (EIN: 88-2591302) dedicated to supporting individuals with intellectual and developmental disabilities. UESL provides esports competitions, multi-location gaming arenas, and structured career development pathways — giving participants meaningful connection, skill-building, and a path into the STEM and gaming workforce."
+    status: "Active 501(c)(3) Nonprofit"
+    team:
+      - "UESL Foundation Board of Directors"
+      - "San Diego & Imperial County Community Partners"
+
+    problems:
+      - "Individuals with intellectual and developmental disabilities lack structured, accessible social and career-development spaces outside the school calendar"
+      - "Mainstream esports and gaming environments are rarely designed for neurodiverse participants, creating exclusion in a growing industry"
+      - "Career and college pathways in STEM and gaming are almost never adapted for people with IDD, leaving a workforce pipeline gap"
+
+    ideas:
+      - title: "Skill & Career Progress Tracker"
+        description: "A digital portal where UESL participants log gaming milestones, STEM certifications, and career readiness checkpoints — making growth visible to families and employers"
+      - title: "Inclusive Tournament Platform"
+        description: "Built as a drag-and-drop Game Maker and accessible game engine with 8 IDD-specific modes — slow mode, single-button control, high-contrast, large sprites, guided mode, reduced motion, face tracking, and sound toggles — so every participant can compete regardless of ability"
+      - title: "Community Social Platform"
+        description: "Realized as a full social hub with microblog posts, replies, reactions, game leaderboards, and real-time co-op multiplayer rooms via WebSocket — keeping the UESL community connected and collaborating beyond in-person sessions"
+
     keyPoints:
       - "Serves San Diego & Imperial Counties year-round"
       - "Gaming arenas open independent of school calendars"
@@ -13,21 +33,29 @@ Topics:
       - "Builds communication, collaboration & problem-solving skills"
       - "Spanish-language programming for broader community access"
       - "Hosts Special Needs Super Smash Grand Championship events"
-    subtitle: "Gaming for All — Inclusion Through Esports"
-    description: "A 501(c)(3) nonprofit (EIN: 88-2591302) dedicated to supporting individuals with intellectual and developmental disabilities. UESL provides esports competitions, multi-location gaming arenas, and structured career development pathways — giving participants meaningful connection, skill-building, and a path into the STEM and gaming workforce."
+
     tech:
-      - "Esports Competitions"
-      - "Multi-Location Gaming Arenas"
-      - "STEM Career Pathways"
-      - "College Readiness Programs"
-      - "Community Enrichment Events"
-      - "Bilingual Outreach"
+      - name: "Esports Competitions"
+        solves: "Structured competitive play builds social skills and routine for IDD participants"
+      - name: "Multi-Location Gaming Arenas"
+        solves: "Accessible physical spaces remove barriers and provide consistent community hubs"
+      - name: "STEM Career Pathway Programs"
+        solves: "Adapted curriculum creates real workforce entry points in the gaming industry"
+      - name: "Bilingual Outreach Tools"
+        solves: "Spanish-language support ensures non-English-speaking families can participate"
+      - name: "Year-Round Scheduling Platform"
+        solves: "School-calendar-independent programming eliminates seasonal access gaps"
+
     impact:
       - "Year-round access to competitive gaming and social community"
       - "Structured career development into gaming & technology industries"
       - "Inclusive championship events celebrating diverse abilities"
       - "Bilingual support expanding reach across cultural communities"
       - "Multi-site arena presence across two California counties"
-    status: "Active 501(c)(3) Nonprofit"
-    team:
-      - "Rudra Darshan Sathwik"
+
+    weeklyIssues:
+      - "Deploy UESL Coach chatbot (Groq / LLaMA 3.3-70b) to production with full UESL context and bilingual support"
+      - "Add real-time co-op multiplayer rooms via Socket.IO to support inclusive tournament bracket play"
+      - "Improve face tracker calibration and sensitivity controls in the Game Maker accessibility settings"
+      - "Integrate UESL event calendar with live SDRC event data for the social platform"
+      - "Build per-level score leaderboards and surface them in the social platform feed"
