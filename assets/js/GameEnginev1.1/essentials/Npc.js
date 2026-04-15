@@ -127,13 +127,15 @@ class Npc extends Character {
     }
 
     handleKeyDown(event) {
-        if (event.key === 'e' || event.key === 'u') {
+        const key = (event && event.key) ? String(event.key).toLowerCase() : '';
+        if (key === 'e' || key === 'u') {
             this.handleKeyInteract();
         }
     }
 
     handleKeyUp(event) {
-        if (event.key === 'e' || event.key === 'u') {
+        const key = (event && event.key) ? String(event.key).toLowerCase() : '';
+        if (key === 'e' || key === 'u') {
             if (this.alertTimeout) {
                 clearTimeout(this.alertTimeout);
                 this.alertTimeout = null;

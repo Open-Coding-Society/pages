@@ -106,10 +106,12 @@ export class GameLevelRealEstateOffice {
       SCALE_FACTOR: 9,
       ANIMATION_RATE: 50,
       pixels: { height: 301, width: 801 },
-      INIT_POSITION: { x: 0.45, y: 0.12 },
+      // Place mid-screen so collision is easy to trigger
+      INIT_POSITION: { x: 0.52, y: 0.32 },
       orientation: { rows: 1, columns: 4 },
       down: { row: 0, start: 0, columns: 3 },
-      hitbox: { widthPercentage: 0.14, heightPercentage: 0.12 },
+      // Larger hitbox to make interaction reliable
+      hitbox: { widthPercentage: 0.35, heightPercentage: 0.25 },
       dialogues: [
         "GPS says traffic is light — perfect for a showing.",
         "I only do FIFO pickups: you’re next in queue.",
