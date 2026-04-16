@@ -585,11 +585,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
  <!-- Dynamic Event Calendar (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">
-           <img src="/images/capstone/dynamic_event_calendar.png" alt="Dynamic Event Calendar — Safe Passage Heals" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/sph.png" alt="Dynamic Event Calendar — Safe Passage Heals" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Dynamic Event Calendar</a></h3>
-           <p class="text-sm text-gray-700">A suite of interactive web tools for Safe Passage Heals — centralizing community events, estimating personal water usage, and delivering personalized water insights by location.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Dynamic Event Calendar and Media Management</a></h3>
+           <p class="text-sm text-gray-700">A system of interactive web tools for Safe Passage Heals — centralizing community events through a dynamic event calendar, and media management (blog and admin interface).</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
        </div>
    </div>
