@@ -1,0 +1,495 @@
+---
+title: Submissions
+layout: aesthetihawk
+active_tab: submissions
+---
+
+<div class="w-full">
+    <div class="space-y-4 sm:space-y-6">
+        <div class="text-sm font-medium text-center border-b text-neutral-400 border-neutral-700 relative">
+            <ul class="flex flex-wrap -mb-px relative" id="tab-bar">
+                <li class="me-2">
+                    <button id="tab-my-submissions" class="tab-btn active inline-block p-4 border-b-2 border-blue-500 text-blue-500 rounded-t-lg">
+                        My Submissions
+                    </button>
+                </li>
+                <li class="me-2">
+                    <button id="tab-all-submissions" class="tab-btn inline-block p-4 border-b-2 border-transparent rounded-t-lg text-neutral-400 hover:text-neutral-300" style="display: none;">
+                        All Submissions
+                    </button>
+                </li>
+            </ul>
+            <!-- sliding underline indicator -->
+            <div id="tab-underline"
+                style="position:absolute;bottom:0;left:0;height:2px;width:0;background:#2563eb;transition:all 0.3s cubic-bezier(.4,0,.2,1);border-radius:2px;">
+            </div>
+        </div>
+
+        <!-- tab content container -->
+        <div id="tab-content-container" class="relative min-h-[400px]">
+            
+            <!-- My Submissions tab content -->
+            <div id="tab-content-my-submissions" class="tab-content block px-6 py-4 text-neutral-200">
+                <div id="my-submissions-loading" class="flex items-center justify-center min-h-[400px]">
+                    <div class="text-center">
+                        <div class="inline-block">
+                            <svg class="h-8 w-8 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-neutral-400 mt-4">Loading submissions...</p>
+                    </div>
+                </div>
+                <div id="my-submissions-container"></div>
+            </div>
+
+            <!-- All Submissions tab content (Admin only) -->
+            <div id="tab-content-all-submissions" class="tab-content hidden px-6 py-4 text-neutral-200">
+                <div class="mb-6 flex gap-3 flex-wrap">
+                    <input type="text" id="admin-filter-assignment" class="px-4 py-2 rounded-lg border border-neutral-600 bg-neutral-700 text-neutral-50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Filter by assignment...">
+                    <input type="text" id="admin-filter-student" class="px-4 py-2 rounded-lg border border-neutral-600 bg-neutral-700 text-neutral-50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Filter by student...">
+                    <select id="admin-filter-status" class="px-4 py-2 rounded-lg border border-neutral-600 bg-neutral-700 text-neutral-50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending Review</option>
+                        <option value="graded">Graded</option>
+                        <option value="late">Late</option>
+                    </select>
+                </div>
+                <div id="all-submissions-loading" class="flex items-center justify-center min-h-[400px]">
+                    <div class="text-center">
+                        <div class="inline-block">
+                            <svg class="h-8 w-8 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-neutral-400 mt-4">Loading submissions...</p>
+                    </div>
+                </div>
+                <div id="all-submissions-container"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .submissions-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .submissions-table thead {
+        background: rgb(31, 41, 55);
+        border-bottom: 1px solid rgb(55, 65, 81);
+    }
+
+    .submissions-table th {
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: rgb(209, 213, 219);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .submissions-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgb(55, 65, 81);
+        color: rgb(209, 213, 219);
+        font-size: 0.875rem;
+    }
+
+    .submissions-table tbody tr:hover {
+        background: rgb(31, 41, 55);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: rgb(120, 53, 15);
+        color: rgb(254, 243, 199);
+    }
+
+    .status-graded {
+        background: rgb(30, 64, 175);
+        color: rgb(219, 234, 254);
+    }
+
+    .status-late {
+        background: rgb(153, 27, 27);
+        color: rgb(254, 226, 226);
+    }
+
+    .grade-display {
+        font-weight: 600;
+        color: rgb(134, 239, 172);
+    }
+
+    .no-submissions {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgb(107, 114, 128);
+        font-size: 1rem;
+        background: rgb(17, 24, 39);
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .error-message {
+        background: rgb(153, 27, 27);
+        color: rgb(254, 226, 226);
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin: 20px 0;
+    }
+</style>
+
+<script type="module">
+    import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+    const apiUrl = `${javaURI}/api/assignment-submission-view/list`;
+    const userInfoUrl = `${javaURI}/api/assignment-submission-view/user-info`;
+    
+    let allSubmissions = [];
+    let isAdmin = false;
+
+    async function init() {
+        try {
+            await checkAdminStatus();
+            await loadSubmissions();
+            setupTabSwitcher();
+            setupFilters();
+            hideLoadingSpinners();
+        } catch (error) {
+            console.error('Error initializing submissions:', error);
+            showErrorMessage('Failed to initialize submissions dashboard');
+        }
+    }
+
+    async function checkAdminStatus() {
+        try {
+            console.log('Checking admin status from:', userInfoUrl);
+            const response = await fetch(userInfoUrl, fetchOptions);
+            
+            if (response.ok) {
+                const userInfo = await response.json();
+                isAdmin = userInfo.isAdmin;
+                console.log('User is admin:', isAdmin);
+                
+                // Show admin tab only for admins
+                if (isAdmin) {
+                    document.getElementById('tab-all-submissions').style.display = 'block';
+                }
+            } else {
+                console.warn('Could not fetch user info, status:', response.status);
+            }
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+            // Continue anyway - just won't show admin tab
+        }
+    }
+
+    async function loadSubmissions() {
+        try {
+            console.log('Fetching submissions from:', apiUrl);
+            const response = await fetch(apiUrl, fetchOptions);
+
+            console.log('Response status:', response.status, 'ok:', response.ok);
+
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                
+                // Try to parse error message from response
+                let errorMsg = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.error) {
+                        errorMsg = errorData.error;
+                        console.error('Server error message:', errorMsg);
+                    }
+                } catch (parseError) {
+                    console.warn('Could not parse error response');
+                }
+                
+                throw new Error(`Failed to fetch submissions: ${errorMsg}`);
+            }
+
+            // Parse response as JSON
+            let data;
+            try {
+                data = await response.json();
+                console.log('Successfully parsed response, submissions count:', data.length);
+            } catch (parseError) {
+                console.error('Failed to parse JSON response:', parseError);
+                throw new Error('Invalid response format from server');
+            }
+
+            // Handle both array and null responses
+            allSubmissions = Array.isArray(data) ? data : [];
+            console.log('Set allSubmissions to', allSubmissions.length, 'items');
+
+            displayUserSubmissions();
+            if (isAdmin) {
+                displayAllSubmissions();
+            }
+            
+        } catch (error) {
+            console.error('Error in loadSubmissions:', error);
+            console.error('Error type:', error.constructor.name);
+            console.error('Error message:', error.message);
+            console.error('Full error:', error);
+            
+            showErrorMessage(`Error loading submissions: ${error.message}`);
+        }
+    }
+
+    function displayUserSubmissions() {
+        const container = document.getElementById('my-submissions-container');
+        
+        if (!allSubmissions || allSubmissions.length === 0) {
+            console.log('No submissions to display');
+            container.innerHTML = '<div class="no-submissions">No submissions yet.</div>';
+            return;
+        }
+
+        console.log('Displaying', allSubmissions.length, 'user submissions');
+        
+        try {
+            const tableHTML = `
+                <table class="submissions-table">
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Status</th>
+                            <th>Grade</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allSubmissions.map((submission, idx) => {
+                            try {
+                                return `
+                                    <tr>
+                                        <td><strong>${escapeHtml(submission.assignmentName || 'Unknown')}</strong></td>
+                                        <td>${getStatusBadge(submission)}</td>
+                                        <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                                        <td>${submission.feedback ? escapeHtml(submission.feedback.substring(0, 50)) + '...' : 'No feedback'}</td>
+                                    </tr>
+                                `;
+                            } catch (rowError) {
+                                console.error('Error rendering row', idx, ':', rowError);
+                                return `<tr><td colspan="4" style="color: red;">Error rendering submission</td></tr>`;
+                            }
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+            console.log('Successfully rendered submissions table');
+        } catch (error) {
+            console.error('Error rendering submissions table:', error);
+            container.innerHTML = '<div class="error-message">Error rendering submissions table. Please try again.</div>';
+        }
+    }
+
+    function displayAllSubmissions() {
+        const container = document.getElementById('all-submissions-container');
+        
+        if (!allSubmissions || allSubmissions.length === 0) {
+            container.innerHTML = '<div class="no-submissions">No submissions found.</div>';
+            return;
+        }
+
+        try {
+            const tableHTML = `
+                <table class="submissions-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Assignment</th>
+                            <th>Status</th>
+                            <th>Grade</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allSubmissions.map((submission, idx) => {
+                            try {
+                                return `
+                                    <tr>
+                                        <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
+                                        <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
+                                        <td>${getStatusBadge(submission)}</td>
+                                        <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                                        <td>${submission.comment ? escapeHtml(submission.comment.substring(0, 50)) + '...' : 'No comment'}</td>
+                                    </tr>
+                                `;
+                            } catch (rowError) {
+                                console.error('Error rendering admin row', idx, ':', rowError);
+                                return `<tr><td colspan="5" style="color: red;">Error rendering submission</td></tr>`;
+                            }
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+            console.log('Successfully rendered all submissions table');
+        } catch (error) {
+            console.error('Error rendering all submissions table:', error);
+            container.innerHTML = '<div class="error-message">Error rendering submissions table. Please try again.</div>';
+        }
+    }
+
+    function getStatusBadge(submission) {
+        if (submission.grade !== null && submission.grade !== undefined) {
+            return '<span class="status-badge status-graded">Graded</span>';
+        } else if (submission.isLate) {
+            return '<span class="status-badge status-late">Late</span>';
+        } else {
+            return '<span class="status-badge status-pending">Pending Review</span>';
+        }
+    }
+
+    function showErrorMessage(message) {
+        const myContainer = document.getElementById('my-submissions-container');
+        const allContainer = document.getElementById('all-submissions-container');
+        const errorHTML = `<div class="error-message">${escapeHtml(message)}</div>`;
+        
+        if (myContainer) myContainer.innerHTML = errorHTML;
+        if (allContainer) allContainer.innerHTML = errorHTML;
+    }
+
+    function setupTabSwitcher() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const underline = document.getElementById('tab-underline');
+
+        function setUnderline(el) {
+            const rect = el.getBoundingClientRect();
+            const parentRect = el.parentElement.parentElement.getBoundingClientRect();
+            underline.style.width = `${rect.width}px`;
+            underline.style.left = `${rect.left - parentRect.left}px`;
+        }
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                tabs.forEach(t => t.classList.remove('active', 'text-blue-500', 'border-blue-500'));
+                tabContents.forEach(c => c.classList.add('hidden'));
+                tabContents.forEach(c => c.classList.remove('block'));
+                
+                const targetId = `tab-content-${tab.id.replace('tab-', '')}`;
+                document.getElementById(targetId).classList.remove('hidden');
+                document.getElementById(targetId).classList.add('block');
+                
+                tab.classList.add('active', 'text-blue-500', 'border-blue-500');
+                setUnderline(tab);
+            });
+        });
+
+        // Initialize underline
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) setUnderline(activeTab);
+    }
+
+    function setupFilters() {
+        const filterAssignment = document.getElementById('admin-filter-assignment');
+        const filterStudent = document.getElementById('admin-filter-student');
+        const filterStatus = document.getElementById('admin-filter-status');
+
+        [filterAssignment, filterStudent, filterStatus].forEach(filter => {
+            if (filter) {
+                filter.addEventListener('input', applyFilters);
+            }
+        });
+    }
+
+    function applyFilters() {
+        const assignmentFilter = (document.getElementById('admin-filter-assignment').value || '').toLowerCase();
+        const studentFilter = (document.getElementById('admin-filter-student').value || '').toLowerCase();
+        const statusFilter = document.getElementById('admin-filter-status').value;
+
+        const filtered = allSubmissions.filter(sub => {
+            const assignmentMatch = (sub.assignmentName || '').toLowerCase().includes(assignmentFilter);
+            const studentMatch = (sub.submitterName || '').toLowerCase().includes(studentFilter);
+            const statusMatch = !statusFilter || getFilterStatus(sub) === statusFilter;
+            
+            return assignmentMatch && studentMatch && statusMatch;
+        });
+
+        if (filtered.length === 0) {
+            document.getElementById('all-submissions-container').innerHTML = 
+                '<div class="no-submissions">No submissions match the filters.</div>';
+            return;
+        }
+
+        const tableHTML = `
+            <table class="submissions-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Assignment</th>
+                        <th>Status</th>
+                        <th>Grade</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filtered.map(submission => `
+                        <tr>
+                            <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
+                            <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
+                            <td>${getStatusBadge(submission)}</td>
+                            <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                            <td>${submission.comment ? escapeHtml(submission.comment.substring(0, 50)) + '...' : 'No comment'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+        document.getElementById('all-submissions-container').innerHTML = tableHTML;
+    }
+
+    function getFilterStatus(submission) {
+        if (submission.grade !== null && submission.grade !== undefined) {
+            return 'graded';
+        } else if (submission.isLate) {
+            return 'late';
+        } else {
+            return 'pending';
+        }
+    }
+
+    function hideLoadingSpinners() {
+        const myLoading = document.getElementById('my-submissions-loading');
+        const allLoading = document.getElementById('all-submissions-loading');
+        
+        if (myLoading) myLoading.style.display = 'none';
+        if (allLoading) allLoading.style.display = 'none';
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', init);
+</script>

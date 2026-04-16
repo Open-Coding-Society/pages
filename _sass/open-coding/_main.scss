@@ -8,11 +8,13 @@
 @import "forms/code-runner";
 @import "forms/ui-runner";
 @import "forms/game-runner";
+@import "forms/container-panel";
 @import "forms/pause-modal";
 @import "forms/leaderboard";
 @import "forms/game-engine";
 @import "forms/game-builder";
 @import "forms/game-dialogue-system";
+@import "forms/home-gamified";
 @import "hacks";
 @import "hacks_lxd";
 @import "hallpass";
@@ -23,6 +25,7 @@
 @import "quiz";
 @import "rps_lesson";
 @import "search";
+@import "stack-clicker";
 @import "user-preferences";
 // aesthetihawk stuff
 @import "materials/main.scss";
@@ -32,6 +35,8 @@
 @import "lesson-player";
 @import "documentation";
 @import "api-documentation";
+@import "open-coding/pixel-submit-widget";
+@import "open-coding/grading_modules";
 
 
 html,

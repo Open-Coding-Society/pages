@@ -1,77 +1,574 @@
 {% assign data = site.data.poway_library_infograph %}
 
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
 
-<div class="wp-infograph">
- <!-- Header Section -->
- <div class="wp-header">
-   <div class="wp-badge">Design-Based Research Capstone</div>
-   <h1 class="wp-title">{{ data.Title }}</h1>
-   <p class="wp-description">{{ data.Description }}</p>
- </div>
+  :root {
+    --fopl-green:      #023b0f;
+    --fopl-green-mid:  #0d5c1e;
+    --fopl-green-lite: #1a7a2e;
+    --fopl-green-pale: #e8f5eb;
+    --fopl-gold:       #c8a030;
+  }
 
+  .fopl-ig *, .fopl-ig *::before, .fopl-ig *::after { box-sizing: border-box; }
 
- <!-- Project Cards -->
- {% for topic in data.Topics %}
- <div class="wp-card">
-   <div class="wp-card-grid">
+  .fopl-ig {
+    font-family: 'Lato', sans-serif;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    padding-bottom: 3rem;
+  }
 
-     <!-- Left: Image & Status -->
-     <div class="wp-visual">
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
-         <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
-         <div class="wp-overlay">
-           <span>View Project</span>
-         </div>
-       </a>
-       <div class="wp-status">{{ topic.status }}</div>
-       <div class="wp-team">
-         <span class="wp-team-label">Project Leads</span>
-         <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
-       </div>
-     </div>
+  /* ── Hide OCS post header ────────────────────────────────── */
+  .post-header { display: none !important; }
 
+  /* ── Plain top section ───────────────────────────────────── */
+  .fopl-ig-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 0 1.5rem;
+    flex-wrap: wrap;
+  }
 
-     <!-- Center: Key Points -->
-     <div class="wp-content">
-       <h2 class="wp-project-title">{{ topic.title }}</h2>
-       <p class="wp-subtitle">{{ topic.subtitle }}</p>
+  .fopl-ig-top-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
 
-       <div class="wp-keypoints">
-         {% for point in topic.keyPoints %}
-         <div class="wp-keypoint">
-           <span class="wp-check">✓</span>
-           <span>{{ point }}</span>
-         </div>
-         {% endfor %}
-       </div>
+  .fopl-ig-top-text h2 {
+    font-family: 'Cabin', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    margin: 0 0 4px;
+    border: none;
+  }
 
+  .fopl-ig-top-text p {
+    font-size: 0.88rem;
+    color: var(--text) !important;
+    margin: 0 0 6px;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
 
-       <div class="wp-tech-stack">
-         {% for tech in topic.tech %}
-         <span class="wp-tech-tag">{{ tech }}</span>
-         {% endfor %}
-       </div>
-     </div>
+  .fopl-ig-top-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--text) !important;
+    opacity: 0.7;
+  }
 
+  .fopl-ig-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(2,59,15,0.5);
+    background: rgba(2,59,15,0.1);
+    color: #1a7a2e !important;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
 
-     <!-- Right: Description & Impact -->
-     <div class="wp-details">
-       <h3 class="wp-section-title">About</h3>
-       <p class="wp-about">{{ topic.description }}</p>
+  .fopl-ig-status-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(2,59,15,0.12);
+    border: 1px solid rgba(2,59,15,0.4);
+    color: #1a7a2e !important;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
 
-       <h3 class="wp-section-title">Impact</h3>
-       <div class="wp-impact-list">
-         {% for item in topic.impact %}
-         <div class="wp-impact-item">{{ item }}</div>
-         {% endfor %}
-       </div>
+  .fopl-ig-status-live::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #1a7a2e;
+    box-shadow: 0 0 5px #1a7a2e;
+  }
 
+  /* ── Inner wrapper ───────────────────────────────────────── */
+  .fopl-ig-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
 
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
-     </div>
+  /* ── Main Card ───────────────────────────────────────────── */
+  .fopl-ig-card {
+    background: #1e2a1e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-top: 4px solid #1a7a2e;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    margin-top: 2rem;
+    overflow: hidden;
+  }
 
+  .fopl-ig-card-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+  }
 
-   </div>
- </div>
- {% endfor %}
+  @media (max-width: 860px) { .fopl-ig-card-grid { grid-template-columns: 1fr; } }
+
+  .fopl-ig-visual {
+    background: #023b0f;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .fopl-ig-img {
+    width: 120px; height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.25);
+  }
+
+  .fopl-ig-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: var(--text) !important;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .fopl-ig-status-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #5dde7a;
+    box-shadow: 0 0 5px #5dde7a;
+  }
+
+  .fopl-ig-team {
+    text-align: center;
+    color: var(--text) !important;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .fopl-ig-team-label {
+    display: block;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+    margin-bottom: 3px;
+  }
+
+  .fopl-ig-links { display: flex; flex-direction: column; gap: 7px; width: 100%; }
+
+  .fopl-ig-link-btn {
+    display: block;
+    text-align: center;
+    padding: 7px 10px;
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.18s;
+  }
+
+  .fopl-ig-link-btn.primary { background: #023b0f; color: var(--text) !important; border: 1px solid rgba(255,255,255,0.15); }
+  .fopl-ig-link-btn.primary:hover { background: #0d5c1e; }
+  .fopl-ig-link-btn.secondary { background: #023b0f; color: var(--text) !important; border: 1px solid rgba(255,255,255,0.15); }
+  .fopl-ig-link-btn.secondary:hover { background: #0d5c1e; }
+
+  .fopl-ig-center {
+    padding: 24px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .fopl-ig-project-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    margin: 0 0 3px;
+  }
+
+  .fopl-ig-subtitle {
+    font-size: 0.83rem;
+    color: var(--text) !important;
+    opacity: 0.65;
+    margin: 0 0 14px;
+    font-style: italic;
+  }
+
+  .fopl-ig-section-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text) !important;
+    opacity: 0.5;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 3px;
+    margin: 0 0 10px;
+  }
+
+  .fopl-ig-keypoints { list-style: none; padding: 0; margin: 0 0 16px; }
+
+  .fopl-ig-keypoints li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 0.83rem;
+    line-height: 1.5;
+    color: var(--text) !important;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .fopl-ig-keypoints li:last-child { border-bottom: none; }
+
+  .fopl-ig-check {
+    flex-shrink: 0;
+    width: 16px; height: 16px;
+    background: #1a7a2e;
+    color: #fff !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 900;
+    margin-top: 2px;
+  }
+
+  .fopl-ig-tech-stack { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .fopl-ig-tech-tag {
+    padding: 2px 8px;
+    background: #2d3a2d;
+    color: var(--text) !important;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .fopl-ig-right { padding: 24px; }
+
+  .fopl-ig-about {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text) !important;
+    margin: 0 0 18px;
+  }
+
+  .fopl-ig-impact-list { list-style: none; padding: 0; margin: 0; }
+
+  .fopl-ig-impact-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    color: var(--text) !important;
+  }
+
+  .fopl-ig-impact-item:last-child { border-bottom: none; }
+
+  .fopl-ig-impact-dot {
+    flex-shrink: 0;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #1a7a2e;
+    margin-top: 7px;
+  }
+
+  /* ── Section Header ──────────────────────────────────────── */
+  .fopl-ig-section-header {
+    font-family: 'Cabin', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 2rem 0 1rem;
+    padding-bottom: 6px;
+    border-bottom: 2px solid rgba(255,255,255,0.15);
+  }
+
+  /* ── Features Grid ───────────────────────────────────────── */
+  .fopl-ig-features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(80px, auto);
+    gap: 10px;
+  }
+
+  .fopl-ig-features-grid.fopl-ig-planned-grid {
+    grid-auto-rows: minmax(100px, auto);
+  }
+
+  @media (max-width: 860px) { .fopl-ig-features-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 480px) { .fopl-ig-features-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .fopl-ig-feature-card {
+    background: #2a2a2a;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+    height: 100%;
+  }
+
+  .fopl-ig-feature-card:hover {
+    border-color: rgba(255,255,255,0.25);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  }
+
+  .fopl-ig-feature-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    margin: 0 0 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .fopl-ig-feature-desc {
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--text) !important;
+    opacity: 0.75;
+    margin: 0;
+  }
+
+  /* ── Planned badge ───────────────────────────────────────── */
+  .fopl-ig-planned-badge {
+    display: inline-block;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #c8a030 !important;
+    background: rgba(200,160,48,0.1);
+    border: 1px solid #c8a030;
+    border-radius: 3px;
+    padding: 2px 7px;
+    margin-bottom: 7px;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  .fopl-ig-footer {
+    background: #1a2a1a;
+    color: var(--text) !important;
+    text-align: center;
+    padding: 20px 24px;
+    margin-top: 2.5rem;
+    font-size: 0.82rem;
+  }
+
+  .fopl-ig-footer a { color: rgba(255,255,255,0.9) !important; text-decoration: underline; }
+  .fopl-ig-footer a:hover { color: #fff !important; }
+</style>
+
+{% for topic in data.Topics %}
+<div class="fopl-ig">
+
+  <div class="fopl-ig-inner">
+
+    <!-- Plain top: logo, title, goal, team -->
+    <div class="fopl-ig-top">
+      <img src="{{ site.baseurl }}/images/capstone/poway_library.png" alt="FOPL logo" class="fopl-ig-top-logo">
+      <div class="fopl-ig-top-text">
+        <h2>{{ data.Title }}</h2>
+        <p>{{ data.Description }}</p>
+        <div class="fopl-ig-top-meta">
+          <span class="fopl-ig-status-live">{{ topic.status }}</span>
+          <span class="fopl-ig-badge">Design-Based Research Capstone · CSH</span>
+          <span>Team: {{ topic.team | join: " · " }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="fopl-ig-card">
+      <div class="fopl-ig-card-grid">
+
+        <!-- Left -->
+        <div class="fopl-ig-visual">
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="fopl-ig-img">
+          <div class="fopl-ig-status-tag">{{ topic.status }}</div>
+          <div class="fopl-ig-team">
+            <span class="fopl-ig-team-label">Team</span>
+            {{ topic.team | join: " · " }}
+          </div>
+          <div class="fopl-ig-links">
+            <a href="https://fopl.opencodingsociety.com/home" target="_blank" rel="noopener" class="fopl-ig-link-btn primary">FOPL Website</a>
+          </div>
+        </div>
+
+        <!-- Center: Key Points + Tech -->
+        <div class="fopl-ig-center">
+          <h2 class="fopl-ig-project-title">{{ topic.title }}</h2>
+          <p class="fopl-ig-subtitle">{{ topic.subtitle }}</p>
+
+          <div class="fopl-ig-section-label">Features</div>
+          <ul class="fopl-ig-keypoints">
+            {% for point in topic.keyPoints limit:6 %}
+            <li>
+              <span class="fopl-ig-check">✓</span>
+              <span>{{ point }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+
+        </div>
+
+        <!-- Right: About + Impact -->
+        <div class="fopl-ig-right">
+          <div class="fopl-ig-section-label">About</div>
+          <p class="fopl-ig-about">{{ topic.description }}</p>
+
+          <div class="fopl-ig-section-label">Why it matters</div>
+          <ul class="fopl-ig-impact-list">
+            {% for item in topic.impact %}
+            <li class="fopl-ig-impact-item">
+              <span class="fopl-ig-impact-dot"></span>
+              <span>{{ item }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live Features -->
+    <h2 class="fopl-ig-section-header">Live Features</h2>
+    <div class="fopl-ig-features-grid">
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Book Catalog</h3>
+        <p class="fopl-ig-feature-desc">Browse and search the used bookstore inventory before you visit.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Book Recommendations</h3>
+        <p class="fopl-ig-feature-desc">Get personalized book picks based on your genre or mood.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Gamification Hub</h3>
+        <p class="fopl-ig-feature-desc">Play six library-themed games that make the site worth revisiting.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Accounts + Login</h3>
+        <p class="fopl-ig-feature-desc">Create an account to save preferences and track your activity.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">User Profiles</h3>
+        <p class="fopl-ig-feature-desc">View your game stats, XP level, and reading history in one place.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Events Calendar</h3>
+        <p class="fopl-ig-feature-desc">See all upcoming library events without leaving the site.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Newsletter Archive</h3>
+        <p class="fopl-ig-feature-desc">Read past FOPL newsletters with a built-in PDF viewer.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">History + Timeline</h3>
+        <p class="fopl-ig-feature-desc">Explore the library's story through an interactive timeline since 1971.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Volunteer Dashboard</h3>
+        <p class="fopl-ig-feature-desc">Volunteers can manage books, events, and users from one panel.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Contact + Map</h3>
+        <p class="fopl-ig-feature-desc">Find hours, location, and ways to get involved all in one place.</p>
+      </div>
+
+    </div>
+
+    <!-- Planned Features -->
+    <h2 class="fopl-ig-section-header" style="border-bottom-color:#c8a030;">Planned Features</h2>
+
+    <div class="fopl-ig-features-grid fopl-ig-planned-grid">
+
+      <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <span class="fopl-ig-planned-badge">Coming Soon</span>
+        <h3 class="fopl-ig-feature-title">Donation Flow</h3>
+        <p class="fopl-ig-feature-desc">Choose a preset amount and donate directly from the site, no redirects or third-party forms.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <span class="fopl-ig-planned-badge">Coming Soon</span>
+        <h3 class="fopl-ig-feature-title">Book Scan: Add to Catalog</h3>
+        <p class="fopl-ig-feature-desc">Scan a barcode to instantly add a book. Title, author, and cover pulled automatically.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <span class="fopl-ig-planned-badge">Coming Soon</span>
+        <h3 class="fopl-ig-feature-title">Book Scan: Remove on Sale</h3>
+        <p class="fopl-ig-feature-desc">Scan at checkout to remove the book and sync inventory in real time.</p>
+      </div>
+
+      <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <span class="fopl-ig-planned-badge">Coming Soon</span>
+        <h3 class="fopl-ig-feature-title">AI Chatbot</h3>
+        <p class="fopl-ig-feature-desc">Conversational assistant to help visitors find books, events, and resources.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="fopl-ig-footer">
+    <strong>Boolean-Boyz · Friends of the Poway Library Capstone</strong><br>
+    <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener">Frontend</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener">Backend</a>
+    &nbsp;·&nbsp;
+    13137 Poway Rd, Poway CA 92064
+  </div>
+
 </div>
+{% endfor %}

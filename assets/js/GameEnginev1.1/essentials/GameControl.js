@@ -1,3 +1,69 @@
+// CanvasClickHandler: enables click-to-interact for all game objects
+class CanvasClickHandler {
+    constructor(gameEnv, gameContainer) {
+        this.gameEnv = gameEnv;
+        this.gameContainer = gameContainer;
+        this._boundClick = this.handleCanvasClick.bind(this);
+        console.log('[CanvasClickHandler] constructor:', {
+            gameEnv: !!gameEnv,
+            gameContainer: gameContainer,
+            containerId: gameContainer && gameContainer.id
+        });
+    }
+
+    bindInteractKeyListeners() {
+        if (!this.gameContainer) {
+            console.warn('[CanvasClickHandler] No gameContainer to bind click listener');
+            return;
+        }
+        this.gameContainer.addEventListener('click', this._boundClick);
+        console.log('[CanvasClickHandler] Click listener bound to', this.gameContainer, 'id:', this.gameContainer.id);
+        // Optionally add touch support here
+    }
+
+    removeInteractKeyListeners() {
+        this.gameContainer.removeEventListener('click', this._boundClick);
+        // Optionally remove touch support here
+    }
+
+    handleCanvasClick(event) {
+        // Find the topmost canvas under the click point
+        const containerRect = this.gameContainer.getBoundingClientRect();
+        const x = event.clientX - containerRect.left;
+        const y = event.clientY - containerRect.top;
+        // Get all canvases in the container, in DOM order (last is topmost)
+        const canvases = Array.from(this.gameContainer.querySelectorAll('canvas'));
+        let clickedCanvas = null;
+        for (let i = canvases.length - 1; i >= 0; i--) {
+            const canvas = canvases[i];
+            const rect = canvas.getBoundingClientRect();
+            const cx = event.clientX - rect.left;
+            const cy = event.clientY - rect.top;
+            if (
+                cx >= 0 && cy >= 0 &&
+                cx <= rect.width && cy <= rect.height &&
+                canvas.style.display !== 'none' &&
+                canvas.style.visibility !== 'hidden' &&
+                canvas.style.opacity !== '0'
+            ) {
+                clickedCanvas = canvas;
+                break;
+            }
+        }
+        console.log('[CanvasClickHandler] handleCanvasClick fired', {
+            event,
+            container: this.gameContainer,
+            clickedCanvas: clickedCanvas && clickedCanvas.id,
+            x, y
+        });
+        if (!clickedCanvas) return;
+        // Find the game object whose canvas id matches
+        const obj = this.gameEnv.gameObjects.find(o => o.canvas && o.canvas.id === clickedCanvas.id);
+        if (obj && typeof obj.handleClick === 'function') {
+            obj.handleClick(event);
+        }
+    }
+}
 // GameControl.js with improved level transition handling
 import GameLevel from "./GameLevel.js";
 
@@ -43,6 +109,17 @@ class GameControl {
         this._loopRunning = false;
     }
 
+    /**
+     * Set up canvas click handler for object interaction
+     */
+    setupCanvasClickHandler() {
+        if (this.gameEnv && this.gameContainer) {
+            this._canvasClickHandler = new CanvasClickHandler(this.gameEnv, this.gameContainer);
+            this._canvasClickHandler.bindInteractKeyListeners();
+            this.registerInteractionHandler(this._canvasClickHandler);
+        }
+    }
+
     
     start() {
         // If this is a nested control (game-in-game), hide/disable the parent
@@ -69,6 +146,7 @@ class GameControl {
         } catch (e) {}
 
         this.addExitKeyListener();
+        this.setupCanvasClickHandler();
         this.transitionToLevel();
     }
 
@@ -184,6 +262,15 @@ class GameControl {
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
+
+        // Set gameEnv after level is created (if not already set by GameLevel)
+        if (this.currentLevel && this.currentLevel.gameEnv) {
+            this.gameEnv = this.currentLevel.gameEnv;
+        }
+
+        // Now that gameEnv is set, set up the canvas click handler
+        this.setupCanvasClickHandler();
+
         // Only start the game loop if it's not already running to avoid duplicate loops
         if (!this._loopRunning) {
             this.gameLoop();
@@ -238,11 +325,11 @@ class GameControl {
         // Ensure the running-loop flag is cleared so new transitions can start the loop
         this._loopRunning = false;
 
-        // Alert the user that the level has ended
+        // Notify the user that the level has ended
         if (this.currentLevelIndex < this.levelClasses.length - 1) {
-            alert("Level ended.");
+            console.log("Level ended.");
         } else {
-            alert("All levels completed.");
+            console.log("All levels or sublevels completed.");
         }
         
         // Clean up any lingering interaction handlers

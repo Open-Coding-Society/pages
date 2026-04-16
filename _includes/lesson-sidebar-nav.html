@@ -1,0 +1,73 @@
+<!-- LESSON PLAYER SIDEBAR NAVIGATION -->
+{% comment %}
+  Shows course progress and sprint/lesson list for navigation
+  Course data and posts must be available in page context
+{% endcomment %}
+
+<div class="lesson-sidebar">
+  <div class="sidebar-header">
+    {% if current_course == 'csp' %}
+      <h2>Computer Science Principles</h2>
+    {% elsif current_course == 'csa' %}
+      <h2>Computer Science A</h2>
+    {% elsif current_course == 'csse' %}
+      <h2>Computer Science & Software Engineering</h2>
+    {% elsif current_course == 'cwgu' %}
+      <h2>WGU Applied Computer Science</h2>
+    {% endif %}
+
+    <div class="course-progress-section">
+      <div class="progress-label">
+        <span>Course Progress</span>
+        <span id="progress-count">0/0</span>
+      </div>
+      <div class="progress-bar-sidebar">
+        <div class="progress-bar-sidebar-fill" id="sidebar-progress" style="width: 0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sprint-nav">
+    {% assign courseData = site.data[current_course] %}
+    {% for i in (1..9) %}
+      {% assign sprintKey = "Sprint" | append: i %}
+      {% assign sprint = courseData[sprintKey] %}
+
+      {% if sprint %}
+      <div class="sprint-section">
+        <button class="sprint-toggle" onclick="toggleSprint('{{ i }}')" type="button">
+          <i class="fas fa-chevron-right sprint-chevron" id="chevron-{{ i }}"></i>
+          <div class="sprint-info">
+            <div class="sprint-title">{{ sprintKey }}: {{ sprint.title }}</div>
+            <div class="sprint-weeks">Weeks {{ sprint.start }}-{{ sprint.end }}</div>
+          </div>
+        </button>
+
+        <div class="lesson-list" id="sprint-{{ i }}-lessons" style="display: none;">
+          {% for week in (sprint.start..sprint.end) %}
+            {% for post in posts %}
+              {% if post.courses[current_course] %}
+                {% assign course_count = 0 %}
+                {% for course in post.courses %}
+                  {% assign course_count = course_count | plus: 1 %}
+                {% endfor %}
+                {% if course_count == 1 %}
+                  {% assign postWeek = post.courses[current_course].week | plus: 0 %}
+                  {% if postWeek == week %}
+                  <a href="{{ site.baseurl }}{{ post.url }}" 
+                     class="lesson-item {% if page.url == post.url %}active{% endif %}"
+                     data-lesson-id="{{ post.url }}">
+                    <i class="fas fa-circle lesson-status-icon incomplete"></i>
+                    <span class="lesson-title">{{ post.title }}</span>
+                  </a>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
