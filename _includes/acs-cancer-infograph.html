@@ -36,6 +36,31 @@
     margin: 0;
     letter-spacing: 0.02em;
   }
+  .acs-site-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #1b3f78;
+    background: linear-gradient(135deg, #ffd2e6 0%, #ffbad8 100%);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 999px;
+    padding: 0.48rem 1rem;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(255, 149, 186, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+  }
+  .acs-site-link:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+    box-shadow: 0 10px 24px rgba(255, 149, 186, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  }
+  .acs-site-link:active {
+    transform: translateY(0);
+    box-shadow: 0 5px 14px rgba(255, 149, 186, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.48);
+  }
   .acs-title {
     font-size: 1.95rem;
     font-weight: 800;
@@ -113,15 +138,15 @@
   .acs-benefits-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    column-gap: 1.35rem;
+    column-gap: 1.55rem;
     row-gap: 0.8rem;
-    max-width: 1040px;
+    max-width: 1180px;
     margin: 0 auto 2rem;
-    padding: 0 0.25rem;
+    padding: 0;
   }
   .acs-benefit-card {
     border-radius: 14px;
-    padding: 0.24rem 0.56rem;
+    padding: 0.3rem 0.82rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -170,13 +195,25 @@
     line-height: 1.32;
     margin: 0;
   }
+  .acs-benefit-label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin-bottom: 0.36rem;
+  }
+  .acs-benefit-detail {
+    display: block;
+  }
 
   /* Features */
   .acs-features-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 438px));
     justify-content: center;
-    column-gap: 2.5rem;
+    column-gap: 2.9rem;
     row-gap: 1.6rem;
     max-width: 980px;
     margin: 0 auto;
@@ -269,6 +306,7 @@
   @media (max-width: 520px) {
     .acs-logo { width: 140px; height: 140px; }
     .acs-tagline { font-size: 1.08rem; }
+    .acs-site-link { font-size: 0.8rem; padding: 0.44rem 0.86rem; }
     .acs-title { font-size: 1.35rem; }
     .acs-section-label { font-size: 0.9rem; }
     .acs-info-card { padding: 0.22rem 0.28rem; }
@@ -287,6 +325,7 @@
     <div class="acs-header">
       <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="ACS Logo" class="acs-logo">
       <p class="acs-tagline">𝖮𝗇𝖾 𝖣𝗂𝖺𝗀𝗋𝖺𝗆. 𝖤𝗏𝖾𝗋𝗒 𝖢𝖺𝗇𝖼𝖾𝗋. 𝖨𝗇𝗌𝗍𝖺𝗇𝗍𝗅𝗒.</p>
+      <a href="https://acs.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" class="acs-site-link">𝖵𝗂𝖾𝗐 𝖲𝗂𝗍𝖾</a>
     </div>
 
     <div class="acs-overview-grid">
@@ -302,9 +341,11 @@
 
     <div class="acs-section-label acs-section-label--compact">Benefits</div>
     <div class="acs-benefits-grid">
+      {% assign benefit_labels = "Concise Cancer Info|Low-Stress Navigation|Plain-Language Access|Visualized Body Map|Earlier Detection" | split: "|" %}
       {% for item in topic.impact %}
       <div class="acs-benefit-card">
-        <p class="acs-benefit-text">{{ item }}</p>
+        {% assign benefit_label = benefit_labels[forloop.index0] | default: "Resource Access" %}
+        <p class="acs-benefit-text"><span class="acs-benefit-label">{{ benefit_label }}</span><span class="acs-benefit-detail">{{ item }}</span></p>
       </div>
       {% endfor %}
     </div>
