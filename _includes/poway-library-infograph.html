@@ -444,16 +444,6 @@
           <h2 class="fopl-ig-project-title">{{ topic.title }}</h2>
           <p class="fopl-ig-subtitle">{{ topic.subtitle }}</p>
 
-          <div class="fopl-ig-section-label">Features</div>
-          <ul class="fopl-ig-keypoints">
-            {% for point in topic.keyPoints limit:6 %}
-            <li>
-              <span class="fopl-ig-check">✓</span>
-              <span>{{ point }}</span>
-            </li>
-            {% endfor %}
-          </ul>
-
         </div>
 
         <!-- Right: Before/After + Impact -->

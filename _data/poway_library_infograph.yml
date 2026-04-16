@@ -4,7 +4,7 @@ Description: "A prototype redesign of the Friends of the Poway Library website, 
 
 Topics:
   - title: "Friends of the Poway Library"
-    subtitle: "Nonprofit Website Redesign and Community Engagement Hub"
+    subtitle: "Rebuilding the Friends of the Poway Library website to make it modern, functional, and community-facing. Our goal is to give visitors a reason to return, with a live bookstore catalog, events, and interactive games."
     link: "/capstone/poway-library/"
     image: "capstone/poway_library.png"
     alt: "Friends of the Poway Library capstone project"
@@ -18,7 +18,6 @@ Topics:
       - "Events required visiting the county library site"
       - "No way to donate directly through the site"
       - "No games or interactive features to engage visitors"
-      - "Broken pages with little to no real content"
     after:
       - "Full bookstore catalog with search and filtering"
       - "Events calendar embedded directly on the site"
