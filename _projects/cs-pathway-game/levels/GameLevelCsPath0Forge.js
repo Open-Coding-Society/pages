@@ -297,7 +297,7 @@ class GameLevelCsPath0Forge {
           authBody = authResult.body;
         }
 
-        // Prefill identity form with data from the authenticated user.
+        // Prefill identity form and update OCS nav with authenticated user data.
         if (authBody) {
           this.profileData = {
             ...this.profileData,
@@ -305,6 +305,7 @@ class GameLevelCsPath0Forge {
             email:    authBody.email || this.profileData?.email    || '',
             githubID: authBody.uid   || this.profileData?.githubID || '',
           };
+          LoginManager.updateNavMenu(authBody);
         }
 
         const identityData = await this.showIdentityForm();
