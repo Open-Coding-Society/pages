@@ -32,7 +32,9 @@ exclude:
   - Makefile
   - _notebooks
   - _docx
+  - _projects
   - venv
+# Note: / auto-excluded by Jekyll (underscore prefix)
 
 
 # Build settings
@@ -59,6 +61,7 @@ exclude:
 #   quiet_deps: true
 #   silence_deprecations: [import]
 incremental: true
+encoding: utf-8
 
 remote_theme: jekyll/minima
 plugins:

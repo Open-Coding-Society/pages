@@ -1,106 +1,16 @@
-# Soroptimist International of Poway Site Analysis Infographic
+# Soroptimist International of Poway — Infographic Data
+# _data/sip_infograph.yml
+
 Title: "Soroptimist International of Poway"
-Description: "A site analysis of sipoway.com identifying key organizational information and recommending UI improvements to better serve donors, volunteers, and program applicants."
 HeaderImage: "sip/sip_header.png"
 
-Topics:
-  - title: "Who They Are"
-    image: "sip/sip_overview.jpg"
-    link: "https://www.sipoway.com/"
-    alt: "Soroptimist International of Poway - Nonprofit Overview"
-    keyPoints:
-      - "501(c)(3) nonprofit chartered in Poway, CA in 1971"
-      - "Part of Soroptimist International, active in 118+ countries"
-      - "Mission: empowering women and girls through education and economic opportunity"
-      - "Members include working moms, business owners, retirees, and educators"
-      - "Membership open to all women committed to service"
-      - "Annual fundraiser: Celebration of Courage"
-    subtitle: "A Global Volunteer Organization with Local Roots"
-    description: "Soroptimist International of Poway (SIP) is a vibrant nonprofit volunteer organization chartered in 1971 and part of Soroptimist International of the Americas, one of five global federations. The name Soroptimist loosely translates from Latin as 'best for women.' SIP members share time, talents, and financial resources to improve the lives of women and girls locally and globally through awareness, advocacy, and direct action. The organization is funded through donations and is active on Instagram and Facebook."
-    tech:
-      - "Custom Website"
-      - "PayPal (Donations)"
-      - "Instagram"
-      - "Facebook"
-      - "Celebration of Courage (External Event Site)"
-    impact:
-      - "Active since 1971, over 50 years of community service"
-      - "Part of a global network spanning 118+ countries"
-      - "Runs 5 distinct programs serving women and girls"
-      - "Hosts annual Celebration of Courage fundraising event"
-      - "Supports women locally in Poway and internationally in Mexico"
-    status: "Live"
-    team:
-      - "Anishka Sanghvi"
-      - "Michelle Ji"
-      - "Krishna Visvanath"
-
-
-  - title: "Programs"
-    image: "sip/sip_programs.jpg"
-    link: "https://www.sipoway.com/copy-of-home"
-    alt: "Soroptimist International of Poway - Programs Overview"
-    keyPoints:
-      - "Transitional Housing: supports women transitioning out of crisis situations"
-      - "Live Your Dream: grants for women supporting families while pursuing education"
-      - "Dream It, Be It: career mentoring and development program for young girls"
-      - "Abraxas Scholarship: financial support for Abraxas High School students"
-      - "Colegio La Esperanza: supports an elementary school in Baja California, Mexico"
-    subtitle: "Five Programs, One Mission"
-    description: "SIP runs five distinct programs targeting different dimensions of women and girls' empowerment. Live Your Dream provides cash grants to women who serve as primary financial supporters for their families and are pursuing education or skills training. Dream It, Be It brings career mentors into schools to expand young girls' aspirations. The Abraxas Scholarship supports local at-risk high school students. Colegio La Esperanza extends the mission internationally by supporting a school in Mexico. Transitional Housing connects women in crisis with stable living support."
-    tech:
-      - "Live Your Dream (Grant Applications)"
-      - "Dream It, Be It (School Outreach)"
-      - "Abraxas Scholarship Administration"
-      - "Colegio La Esperanza (International)"
-      - "Transitional Housing Coordination"
-    impact:
-      - "Cash grants delivered directly to women pursuing education"
-      - "Career mentoring reaching girls in local schools"
-      - "Scholarships awarded to Abraxas High School students annually"
-      - "School support sustained in Baja California, Mexico"
-      - "Transitional housing assistance for women in crisis"
-    status: "Active"
-    team:
-      - "Anishka Sanghvi"
-      - "Michelle Ji"
-      - "Krishna Visvanath"
-
-
-  - title: "UI Improvements"
-    image: "sip/sip_improvements.jpg"
-    link: "https://www.sipoway.com/"
-    alt: "Soroptimist International of Poway - Recommended UI Improvements"
-    keyPoints:
-      - "Empty homepage: add a hero section with Donate, Join, and Get Help buttons"
-      - "About Us and Our Mission overlap: merge into a single cohesive About page"
-      - "Programs page is a bare link list: add a short description under each program"
-      - "Donation button redirects with no context: add a brief message before the link"
-      - "Celebration of Courage has no shared branding: embed event details on the main site"
-      - "No impact numbers anywhere: add a section showing how many people have been helped"
-      - "Contact page is a meeting schedule: split into a contact form and a meetings section"
-      - "No news or updates section: a recent activity feed would show the org is active"
-    subtitle: "Eight UI Improvements to Better Serve Visitors"
-    description: "The current site communicates SIP's mission but does not guide visitors toward taking action. The homepage offers no clear next step for someone who wants to donate, volunteer, or apply for a program. Redundant pages and a programs list with no descriptions make it hard for first-time visitors to understand what the organization offers. The donation experience sends users away from the site without any context. There are no impact figures to build trust with potential donors. Addressing these issues through focused layout and content changes would make the site significantly more effective at turning visitors into supporters and applicants."
-    tech:
-      - "Hero + CTA Buttons"
-      - "Merged About / Mission Page"
-      - "Program Cards with Descriptions"
-      - "Donation Context Banner"
-      - "Embedded Event Info"
-      - "Impact Stats Section"
-      - "Separate Contact + Meetings Pages"
-      - "Recent Activity Feed"
-    impact:
-      - "Clearer homepage drives higher donor and volunteer conversion"
-      - "Merged About page reduces confusion for first-time visitors"
-      - "Program descriptions help applicants self-identify before clicking"
-      - "Donation context keeps users informed and on-site longer"
-      - "Impact stats build credibility and trust with new visitors"
-      - "Restructured contact section reduces friction for new inquiries"
-      - "News feed signals an active, engaged organization"
-    status: "Recommended"
-    team:
-      - "Anishka Sanghvi"
-      - "Michelle Ji"
-      - "Krishna Visvanath"
+Links:
+  - label: "Live site"
+    url: "https://sip.opencodingsociety.com/"
+    icon: "globe"
+  - label: "What you see (pages)"
+    url: "https://github.com/cspcodewarriors/codewarrior-pages"
+    icon: "pages"
+  - label: "What runs behind it (server)"
+    url: "https://github.com/cspcodewarriors/codewarriorflask"
+    icon: "server"
