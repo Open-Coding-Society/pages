@@ -383,8 +383,8 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Binary Beasts</a></h3>
-           <p class="text-sm text-gray-700">Combined PYBL + Poway NEC capstone infographics on one page: youth basketball operations and emergency preparedness information architecture improvements.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
+           <p class="text-sm text-gray-700">Poway NEC website updated with new features to provide valuable changes that improve quality of life for the organization, including a login system, danger predictor, and AI chatbot.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
        </div>
    </div>
@@ -534,8 +534,8 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- RCR: Poway-Midland Railroad Project - ADD THIS ENTIRE BLOCK -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+   <!-- RCR: Poway-Midland Railroad Project -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">
            <img src="https://static.vecteezy.com/system/resources/previews/034/949/404/non_2x/simple-steam-train-icon-illustration-design-steam-locomotive-symbol-template-vector.jpg" alt="RCR Poway-Midland Railroad Digital Experience" class="w-28 h-28 object-cover rounded" />
        </a>
@@ -585,11 +585,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
  <!-- Dynamic Event Calendar (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">
-           <img src="/images/capstone/dynamic_event_calendar.png" alt="Dynamic Event Calendar — Safe Passage Heals" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/sph.png" alt="Dynamic Event Calendar — Safe Passage Heals" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Dynamic Event Calendar</a></h3>
-           <p class="text-sm text-gray-700">A suite of interactive web tools for Safe Passage Heals — centralizing community events, estimating personal water usage, and delivering personalized water insights by location.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Dynamic Event Calendar and Media Management</a></h3>
+           <p class="text-sm text-gray-700">A system of interactive web tools for Safe Passage Heals — centralizing community events through a dynamic event calendar, and media management (blog and admin interface).</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
        </div>
    </div>
