@@ -1,4 +1,4 @@
-{% assign data = site.data.dynamic-event-calendar-infograph %}
+{% assign data = site.data.flaskandfurious-infograph %}
 
 
 <div class="dec-infograph">
@@ -40,7 +40,11 @@
           {% for point in topic.keyPoints %}
           <div class="dec-keypoint">
             <span class="dec-check">✓</span>
-            <span>{{ point }}</span>
+            {% if point.url %}
+              <a href="{{ point.url }}" target="_blank" rel="noopener noreferrer">{{ point.text }}</a>
+            {% else %}
+              <span>{{ point.text | default: point }}</span>
+            {% endif %}
           </div>
           {% endfor %}
         </div>
@@ -71,4 +75,31 @@
     </div>
   </div>
   {% endfor %}
+
+  <div class="dec-video-gallery">
+    <h2 class="dec-video-section-title">Project Videos</h2>
+    <div class="dec-video-grid">
+      <div class="dec-video-card">
+        <video controls preload="metadata" playsinline>
+          <source src="https://github.com/user-attachments/assets/c8256a6f-1827-4f69-9c84-6e784f289ebf" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div class="dec-video-label">Blog</div>
+      </div>
+      <div class="dec-video-card">
+        <video controls preload="metadata" playsinline>
+          <source src="https://github.com/user-attachments/assets/d2dc12ad-ca7b-47b9-bf80-55c2ecc4b4f7" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div class="dec-video-label">Event Calendar</div>
+      </div>
+      <div class="dec-video-card">
+        <video controls preload="metadata" playsinline>
+          <source src="https://github.com/user-attachments/assets/3856a348-8330-4ad3-957c-aabf244ba393" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <div class="dec-video-label">Login</div>
+      </div>
+    </div>
+  </div>
 </div>
