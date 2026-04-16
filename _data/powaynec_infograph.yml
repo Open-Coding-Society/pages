@@ -10,13 +10,20 @@ Topics:
     alt: "Poway NEC website preview"
     keyPoints:
       - title: "ML Wildfire Risk Predictor."
-        image: /PNECML.png
+        image: "PNECML.png"
+        location: "status"
+        link: "https://pnec.opencodingsociety.com"
       - title: "AI Preparedness Chatbot."
-        image: /PNECChatbot.png
+        image: "PNECChatbot.png"
+        location: "status"
+        link: "https://pnec.opencodingsociety.com"
       - title: "Admin & Volunteer Login System."
-        image: /PNECLogin.png
+        link: "https://pnec.opencodingsociety.com/pages/login.html"
       - title: "Emergency Preparedness Mini Game."
-        image: /PNECGame.png
+        link: "https://pnec.opencodingsociety.com"
+        images:
+          - "PNECGame.png"
+          - "PNECLogin.png"
     impact:
       - title: "Residents can see the risk of fire in their area"
       - title: "Questions can be answered quickly"

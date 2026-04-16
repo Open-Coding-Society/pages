@@ -150,20 +150,20 @@ class ProfileManager {
    * Save identity information (name, email, githubID)
    * Creates new profile if none exists, updates if it does
    * Part of Identity Forge level
-   * 
+   *
    * @param {Object} identityData - { name, email, githubID }
-   * @returns {Promise<boolean>} Success status
+   * @returns {Promise<{ success: boolean, code: number, body: Object|null }>}
    */
   async saveIdentity(identityData) {
     if (!identityData || !identityData.name) {
       console.warn('ProfileManager: saveIdentity called with invalid data', identityData);
-      return false;
+      return { success: false, code: 400, body: { error: 'Invalid identity data' } };
     }
 
     const payload = {
       name: identityData.name,
       email: identityData.email || '',
-      githubID: identityData.githubID || '', 
+      githubID: identityData.githubID || '',
     };
 
     try {
@@ -186,35 +186,35 @@ class ProfileManager {
 
       this._updateWidget();
       console.log('ProfileManager: identity saved', payload.name);
-      return true;
+      return { success: true, code: 200, body: payload };
     } catch (error) {
       console.error('ProfileManager: saveIdentity failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
   /**
    * Update identity unlock progress
    * Part of Identity Forge level
-   * 
+   *
    * @param {boolean} unlocked - Whether identity terminal is unlocked
-   * @returns {Promise<boolean>} Success status
+   * @returns {Promise<{ success: boolean, code: number, body: Object|null }>}
    */
   async updateIdentityProgress(unlocked = true) {
     try {
       const update = { identityUnlocked: unlocked };
-      
+
       if (this.isAuthenticated) {
         await this.backend.update(update);
       } else {
         this.backend.update(update);
       }
-      
+
       console.log('ProfileManager: identity progress updated', unlocked);
-      return true;
+      return { success: true, code: 200, body: update };
     } catch (error) {
       console.error('ProfileManager: updateIdentityProgress failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
@@ -228,7 +228,7 @@ class ProfileManager {
   async saveAvatar(spriteMeta) {
     if (!spriteMeta || !spriteMeta.name) {
       console.warn('ProfileManager: saveAvatar called with invalid data', spriteMeta);
-      return false;
+      return { success: false, code: 400, body: { error: 'Invalid avatar data' } };
     }
 
     try {
@@ -247,35 +247,35 @@ class ProfileManager {
 
       this._updateWidget();
       console.log('ProfileManager: avatar saved', spriteMeta.name);
-      return true;
+      return { success: true, code: 200, body: { sprite: spriteMeta.name } };
     } catch (error) {
       console.error('ProfileManager: saveAvatar failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
   /**
    * Update avatar selection completion (part of Identity Forge)
    * Identity Forge includes both identity and avatar
-   * 
+   *
    * @param {boolean} selected - Whether avatar has been selected
-   * @returns {Promise<boolean>} Success status
+   * @returns {Promise<{ success: boolean, code: number, body: Object|null }>}
    */
   async updateAvatarProgress(selected = true) {
     try {
       const update = { avatarSelected: selected };
-      
+
       if (this.isAuthenticated) {
         await this.backend.update(update);
       } else {
         this.backend.update(update);
       }
-      
-      console.log('ProfileManager: avatar progress updated', done);
-      return true;
+
+      console.log('ProfileManager: avatar progress updated', selected);
+      return { success: true, code: 200, body: update };
     } catch (error) {
       console.error('ProfileManager: updateAvatarProgress failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
@@ -289,7 +289,7 @@ class ProfileManager {
   async saveTheme(themeMeta) {
     if (!themeMeta || !themeMeta.name) {
       console.warn('ProfileManager: saveTheme called with invalid data', themeMeta);
-      return false;
+      return { success: false, code: 400, body: { error: 'Invalid theme data' } };
     }
 
     try {
@@ -308,35 +308,35 @@ class ProfileManager {
 
       this._updateWidget();
       console.log('ProfileManager: theme saved', themeMeta.name);
-      return true;
+      return { success: true, code: 200, body: { theme: themeMeta.name } };
     } catch (error) {
       console.error('ProfileManager: saveTheme failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
   /**
    * Update world theme navigation completion
    * Part of Wayfinding World level
-   * 
+   *
    * @param {boolean} complete - Whether navigation is complete
-   * @returns {Promise<boolean>} Success status
+   * @returns {Promise<{ success: boolean, code: number, body: Object|null }>}
    */
   async updateThemeProgress(complete = true) {
     try {
       const update = { navigationComplete: complete };
-      
+
       if (this.isAuthenticated) {
         await this.backend.update(update);
       } else {
         this.backend.update(update);
       }
-      
-      console.log('ProfileManager: theme progress updated', done);
-      return true;
+
+      console.log('ProfileManager: theme progress updated', complete);
+      return { success: true, code: 200, body: update };
     } catch (error) {
       console.error('ProfileManager: updateThemeProgress failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
@@ -350,7 +350,7 @@ class ProfileManager {
   async updateProgress(key, value) {
     if (!key) {
       console.warn('ProfileManager: updateProgress called without key');
-      return false;
+      return { success: false, code: 400, body: { error: 'Missing key' } };
     }
 
     try {
@@ -363,10 +363,10 @@ class ProfileManager {
       }
 
       console.log('ProfileManager: progress updated', key, value);
-      return true;
+      return { success: true, code: 200, body: { [key]: value } };
     } catch (error) {
       console.error('ProfileManager: updateProgress failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
@@ -424,10 +424,10 @@ class ProfileManager {
       this.initialized = false;
       this._updateWidget();
       console.log('ProfileManager: profile cleared');
-      return true;
+      return { success: true, code: 200, body: null };
     } catch (error) {
       console.error('ProfileManager: clear failed', error);
-      return false;
+      return { success: false, code: 500, body: { error: error.message } };
     }
   }
 
