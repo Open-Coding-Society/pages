@@ -2,76 +2,149 @@ Title: "Poway Symphony Orchestra Capstone"
 Badge: "Design-Based Research Capstone"
 
 Description: >
-  A design-based research capstone focused on expanding community engagement
-  through a more accessible, modern, and story-driven Poway Symphony Orchestra
-  website experience.
+  An accessible, color-rich site experience that adds faster paths to concerts,
+  tickets, musicians, and joining the orchestra so visitors can discover what
+  matters without digging through dense text.
 
 Topics:
   - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
     subtitle: "Redesigned Website Experience"
     link: "https://pso.opencodingsociety.com/"
-    buttonLabel: "View Frontend Site"
+    buttonLabel: "View Site"
     backendLink: "http://wifighters.opencodingsociety.com"
-    backendButtonLabel: "View Admin UI"
+    backendButtonLabel: "Administrator Site"
+    aboutTitle: "Why This Is More Accessible"
 
     description: >
-      This project redesigns the PSO's existing Google Sites-based website into a full
-      custom web experience. Where the original site is a static, text-heavy Google Sites
-      page with minimal navigation and no interactivity, the capstone site introduces
-      dynamic concert listings, interactive games, a musician directory with section
-      filtering, media playback, and gamified exploration while preserving the real
-      orchestra's content accurately.
+      The site adds accessible entry points for patrons, families, and musicians who want
+      to hear the orchestra, find the next concert, explore the roster, or decide whether
+      to join. Instead of feeling like a lesson or a text archive, the experience now
+      feels active, welcoming, and easier to move through.
+
+    keyFeaturesTitle: "Key Features"
 
     keyPoints:
-      - "Home page introduces the orchestra with a cleaner layout, accurate mission content, and faster access to concerts, donations, and events, replacing the original's dense text block and image-only structure"
-      - "Concert section shows real 2025-2026 season data with a live countdown, interactive calendar, and ticket links, replacing the original's external-only event flow"
-      - "Conductor section presents John LoPiccolo's biography and PSO history in a structured, visually engaging format instead of a single text-heavy page"
-      - "Musician directory includes roster cards organized by section with instrument filters and audio playback instead of a plain text roster"
-      - "EXP bar gamifies browsing so visitors see progress as they move through the experience"
-      - "Orchestra Builder turns section placement into an interactive milestone that teaches how a symphony is structured"
-      - "Responsive layout keeps the full experience usable across phones, tablets, and desktops"
-      - "Join section consolidates rehearsal schedules, registration info, attire, and contact details in one place"
+      - previewLabel: "Home"
+        text: "Cleaner home page with direct access to tickets, donations, and season info"
+        link: "https://pso.opencodingsociety.com/"
+        buttonLabel: "See Home"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch1.jpg"
+        previewAlt: "Poway Symphony Orchestra home page concert image"
+      - previewLabel: "Concerts"
+        text: "Full 2025-2026 season with concert details, program notes, and ticket links"
+        link: "https://pso.opencodingsociety.com/concerts/"
+        buttonLabel: "See Concerts"
+        previewImage: "https://i.ytimg.com/vi/npmu4m4iGeY/hqdefault.jpg"
+        previewAlt: "Poway Symphony Orchestra concerts page preview"
+      - previewLabel: "Conductor"
+        text: "Conductor biography presented in a structured, visual format"
+        link: "https://pso.opencodingsociety.com/conductor/"
+        buttonLabel: "See Conductor"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch11.png"
+        previewAlt: "John LoPiccolo conductor page preview"
+      - previewLabel: "Musicians"
+        text: "Musician directory with section filters and audio previews"
+        link: "https://pso.opencodingsociety.com/musicians/"
+        buttonLabel: "See Musicians"
+        previewImage: "https://i.ytimg.com/vi/yGQPgauT7LU/hqdefault.jpg"
+        previewAlt: "Poway Symphony Orchestra musicians page preview"
+      - previewLabel: "Join"
+        text: "Consolidated Join page covering registration, rehearsals, attire, and contact info"
+        link: "https://pso.opencodingsociety.com/join/"
+        buttonLabel: "See Join"
+        previewImage: "https://pso.opencodingsociety.com/images/pso_logo.png"
+        previewAlt: "Poway Symphony Orchestra join page preview"
+      - previewLabel: "Responsive"
+        text: "Fully responsive across mobile, tablet, and desktop"
+        link: "https://pso.opencodingsociety.com/"
+        buttonLabel: "See Responsive Layout"
+        previewImage: "https://i.ytimg.com/vi/Loba21sbY9k/hqdefault.jpg"
+        previewAlt: "Responsive PSO site preview"
 
     tech:
-      - "HTML"
-      - "CSS"
-      - "JavaScript"
-      - "Responsive Design"
-      - "Figma"
-      - "User research and testing"
-      - "Flask Backend Integration"
+      - "Accessible navigation"
+      - "Concert discovery"
+      - "Roster exploration"
+      - "Responsive design"
 
+    interactiveTitle: "Interactive Features"
     interactiveLink: "https://pso.opencodingsociety.com/games/"
-    interactiveButtonLabel: "Open Games Page"
+    interactiveButtonLabel: "See Games"
     interactiveElements:
       - title: "EXP Bar"
-        description: "Visitors earn visible progress as they move through the site, turning browsing into a guided journey"
+        description: "EXP progress bar that tracks how much of the site you've explored"
       - title: "Orchestra Builder"
-        description: "Users place instrument sections onto a real stage layout and unlock a featured PSO performance on completion"
+        description: "Orchestra Builder - drag-and-drop stage placement game"
+        link: "https://pso.opencodingsociety.com/orchestra-builder/"
+        buttonLabel: "Open Orchestra Builder"
+        previewLabel: "Stage Logic"
+        previewTitle: "Orchestra Builder"
+        previewText: "Balance the ensemble on a real concert stage by placing each family in the right section before the performance unlocks."
+        previewHighlights: "Orchestra Builder highlights"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/stage.jpeg"
+        previewAlt: "Poway Symphony Orchestra Builder stage layout preview"
       - title: "Virtual Conductor"
-        description: "A rhythm game that puts the user in the conductor's role, keeping time the way John LoPiccolo guides the ensemble"
+        description: "Virtual Conductor - tap along to live PSO recordings"
+        link: "https://pso.opencodingsociety.com/conductor/"
+        buttonLabel: "Open Virtual Conductor"
+        previewLabel: "Tempo Lab"
+        previewTitle: "Virtual Conductor"
+        previewText: "Tap with the orchestra as live PSO recordings play, keep your stability high, and guide the ensemble through each excerpt."
+        previewHighlights: "Virtual Conductor highlights"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch11.png"
+        previewAlt: "Virtual Conductor preview with John LoPiccolo conducting"
       - title: "Tuning The Orchestra"
-        description: "Users experience tuning the ensemble before a performance, making the pre-concert ritual tangible and educational"
+        description: "Tune the Orchestra - ear training mini game with pitch sliders"
+        link: "https://pso.opencodingsociety.com/media/#tune-the-orchestra"
+        buttonLabel: "Open Tune the Orchestra"
+        previewLabel: "Ear Training"
+        previewTitle: "Tune the Orchestra"
+        previewText: "Match each drone to its target pitch by ear, then jump straight into the performances once the orchestra is ready."
+        previewHighlights: "Tune the Orchestra highlights"
       - title: "Musician Profiles and Audio"
-        description: "Visitors explore roster cards filtered by section or instrument and hear audio tied to each family of the orchestra"
+        description: "Musician directory with searchable/filterable roster"
+      - title: "Concert Countdown"
+        description: "Live countdown to the next concert"
+      - title: "Season Calendar"
+        description: "Interactive season calendar to browse performance months"
 
-    problemsSolved:
-      - "The original site is built on Google Sites with no custom interactivity -> we rebuilt it as a fully custom site with dynamic content and user engagement features"
-      - "The original musician page is a plain text list -> we replaced it with filterable profile cards and section audio"
-      - "The site felt passive and informational only -> we introduced the EXP bar, games, and interactive milestones to reward exploration"
+    impact:
+      - "The redesign transforms a basic Google Sites page into a modern, engaging experience that's easier to navigate, more visually appealing, and actually gives visitors reasons to stay and explore rather than just look up a concert date."
 
-    improvementsMade:
-      - "Rebuilt the original Google Sites experience as a custom frontend with modern layout, richer navigation, and interactive storytelling"
-      - "Integrated real concert season data, ticket links, and time-based event elements directly into the site"
-      - "Replaced passive text sections with structured content modules for the conductor, musicians, support, and join flows"
-      - "Added interactive games, progress tracking, and media elements to turn browsing into guided participation"
-
-    wowFactors:
-      - "The capstone preserves real PSO content while significantly modernizing how visitors discover and interact with it"
-      - "Concert, conductor, musician, support, and join experiences are all surfaced within one cohesive on-site journey"
-      - "EXP progression and Orchestra Builder make an arts organization website feel interactive without losing accuracy or professionalism"
-      - "Games like Virtual Conductor and Tuning the Orchestra make symphonic concepts tangible for broader community audiences"
-      - "The live deployed frontend and admin UI demonstrate that the project moves beyond mockups into a working prototype"
+    organizationTitle: "About the Organization"
+    organizationSummary: >
+      The Poway Symphony Orchestra (PSO) is a semi-professional orchestra formed in 2004
+      that presents three symphonic concerts each year at the Poway Center for the Performing
+      Arts in Poway, CA. For over 20 years, the PSO has served San Diego's North County Inland
+      communities, performing classical, romantic, and contemporary repertoire with roughly
+      65-67 musicians under the direction of Conductor and Music Director John LoPiccolo.
+      The Poway Symphony Orchestra Foundation, a 501(c)(3) non-profit, was established in 2015
+      solely to support the orchestra.
+    organizationInfo:
+      - label: "Founded"
+        value: "2004"
+      - label: "Type"
+        value: "Semi-professional orchestra / 501(c)(3) non-profit"
+      - label: "Conductor & Music Director"
+        value: "John LoPiccolo (11th season)"
+      - label: "Venue"
+        value: "Poway Center for the Performing Arts, 15498 Espola Road, Poway, CA 92064"
+      - label: "Box Office Phone"
+        value: "(858) 748-0505"
+      - label: "Conductor Phone"
+        value: "(208) 757-1980"
+      - label: "Website (original)"
+        value: "powaysymphonyorchestra.org"
+        link: "https://www.powaysymphonyorchestra.org/"
+      - label: "YouTube"
+        value: "Poway Symphony Orchestra YouTube"
+        link: "https://youtube.com/channel/UCiqC2aUbjfNbMcLIr-oFifQ"
+      - label: "Facebook"
+        value: "facebook.com/powaysymphony"
+        link: "https://www.facebook.com/powaysymphony/"
+      - label: "Instagram"
+        value: "instagram.com/powaysymphonyorchestra"
+        link: "https://www.instagram.com/powaysymphonyorchestra/"
 
 status: "Research and Testing Phase (Deployed Prototype Complete)"
 
