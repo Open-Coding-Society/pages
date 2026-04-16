@@ -27,6 +27,7 @@
     --pso-panel-soft: #72342d;
     --pso-panel-deep: #471517;
     --pso-rose-pale: #a97969;
+    --pso-gold: #e2bc86;
     --pso-text: #23100d;
     --pso-shadow: rgba(46, 8, 12, 0.24);
     width: min(1880px, 96vw, calc(100vw - 1.5rem)) !important;
@@ -92,7 +93,6 @@
     color: var(--pso-cream-strong);
   }
 
-  .pso-infograph .sip-header .sip-title,
   .pso-infograph .sip-header .sip-section-title,
   .pso-infograph .sip-card .sip-project-title,
   .pso-infograph .sip-card .sip-section-title,
@@ -101,7 +101,6 @@
     color: var(--pso-cream-strong) !important;
   }
 
-  .pso-infograph .sip-header,
   .pso-infograph .sip-card,
   .pso-infograph .sip-content,
   .pso-infograph .sip-details,
@@ -109,7 +108,6 @@
     color: var(--pso-cream-strong);
   }
 
-  .pso-infograph .sip-header,
   .pso-infograph .sip-header > :not(.sip-impact-list),
   .pso-infograph .sip-header > :not(.sip-impact-list) * {
     color: var(--pso-cream-strong);
@@ -124,6 +122,41 @@
   .pso-infograph .sip-card > :not(.sip-card-grid),
   .pso-infograph .sip-card > :not(.sip-card-grid) * {
     color: var(--pso-cream-strong);
+  }
+
+  .pso-infograph .sip-info-list {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.2rem 0.7rem;
+    align-items: baseline;
+    padding: 0.1rem 0;
+    border-bottom: 1px solid rgba(241, 228, 219, 0.08);
+  }
+
+  .pso-infograph .sip-info-list:last-child {
+    border-bottom: 0;
+  }
+
+  .pso-infograph .sip-info-list dt {
+    color: #f3d7b0 !important;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .pso-infograph .sip-info-list dd,
+  .pso-infograph .sip-info-list a {
+    color: var(--pso-cream-strong) !important;
+    font-weight: 500;
+    line-height: 1.5;
+    text-decoration: none;
+    margin: 0;
+  }
+
+  .pso-infograph .sip-info-list a:hover {
+    text-decoration: underline;
   }
 
   .pso-infograph .sip-description,
@@ -150,10 +183,20 @@
 
   .pso-infograph .sip-card-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(380px, 0.95fr);
-    gap: 2.6rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     align-items: stretch;
     justify-content: center;
+  }
+
+  .pso-infograph .sip-content,
+  .pso-infograph .sip-details {
+    display: grid;
+    gap: 1.2rem;
+    align-content: start;
+    width: 100%;
+    max-width: 1220px;
+    margin: 0 auto;
   }
 
   .pso-infograph .sip-card .sip-project-title,
@@ -248,7 +291,7 @@
 
   .pso-infograph .sip-site-highlights {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.15rem;
+    gap: 1.3rem;
     margin-top: 1.2rem;
     align-items: stretch;
   }
@@ -292,7 +335,8 @@
   .pso-infograph .sip-keypoint-image {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 16 / 10;
+    min-height: 220px;
     object-fit: cover;
     object-position: center;
     border-bottom: 1px solid rgba(255, 248, 234, 0.12);
@@ -367,10 +411,107 @@
   .pso-infograph .sip-preview-image {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 16 / 10;
+    min-height: 250px;
     object-fit: cover;
     object-position: center;
     background: rgba(255, 248, 234, 0.08);
+  }
+
+  .pso-infograph .sip-panel-section {
+    display: grid;
+    gap: 0.95rem;
+    padding: 1.2rem;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(64, 18, 22, 0.92) 0%, rgba(37, 9, 12, 0.98) 100%);
+    border: 1px solid rgba(241, 228, 219, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 234, 0.05);
+  }
+
+  .pso-infograph .sip-panel-section--soft {
+    background: linear-gradient(180deg, rgba(82, 33, 35, 0.9) 0%, rgba(48, 16, 18, 0.98) 100%);
+  }
+
+  .pso-infograph .sip-panel-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid rgba(241, 228, 219, 0.12);
+  }
+
+  .pso-infograph .sip-panel-label {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 0.42rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(226, 188, 134, 0.14);
+    border: 1px solid rgba(226, 188, 134, 0.32);
+    color: #f3d7b0 !important;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-section-copy {
+    max-width: none;
+    margin: 0;
+    text-align: left;
+  }
+
+  .pso-infograph .sip-details .sip-section-copy,
+  .pso-infograph .sip-details .sip-impact-item,
+  .pso-infograph .sip-content .sip-section-copy {
+    width: 100%;
+  }
+
+  .pso-infograph .sip-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .pso-infograph .sip-detail-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+  }
+
+  .pso-infograph .sip-detail-pair .sip-panel-section {
+    height: 100%;
+    align-content: start;
+  }
+
+  .pso-infograph .sip-info-card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    background: rgba(255, 248, 234, 0.06);
+    border: 1px solid rgba(241, 228, 219, 0.1);
+  }
+
+  .pso-infograph .sip-info-card strong {
+    color: #f3d7b0 !important;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-info-card span,
+  .pso-infograph .sip-info-card a {
+    color: var(--pso-cream-strong) !important;
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .pso-infograph .sip-info-card a:hover {
+    text-decoration: underline;
   }
 
   .pso-infograph .sip-interactive-list .sip-keypoint:nth-child(3) .sip-preview-image {
@@ -386,6 +527,62 @@
   .pso-infograph .sip-content > .sip-keypoints:not(.sip-site-highlights) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
+  }
+
+  .pso-infograph .sip-interactive-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .pso-infograph .sip-interactive-featured {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.15rem;
+    align-items: stretch;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-keypoint {
+    grid-template-columns: 1fr;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    border-left-width: 0;
+    border-top: 4px solid var(--pso-gold);
+    text-align: left;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-check {
+    display: none;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-keypoint-body {
+    gap: 0.6rem;
+    padding: 0 0 1rem;
+    min-height: 100%;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-keypoint-text,
+  .pso-infograph .sip-interactive-featured .sip-keypoint-action {
+    padding: 0 1rem;
+  }
+
+  .pso-infograph .sip-interactive-secondary {
+    grid-template-columns: 1fr;
+  }
+
+  .pso-infograph .sip-secondary-heading {
+    margin: 0.25rem 0 0;
+    color: #f3d7b0 !important;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-interactive-list .sip-keypoint,
+  .pso-infograph .sip-wow-factors .sip-impact-item,
+  .pso-infograph .sip-details .sip-impact-item {
+    width: 100%;
   }
 
   .pso-infograph .sip-content > .sip-keypoints:not(.sip-site-highlights) .sip-keypoint {
@@ -576,8 +773,8 @@
     justify-content: center;
     position: relative;
     gap: 0.45rem;
-    min-width: 244px;
-    padding: 1.05rem 1.55rem;
+    min-width: 272px;
+    padding: 1.15rem 1.75rem;
     background:
       linear-gradient(135deg, #6f1a1f 0%, #9d3940 52%, #be8669 100%);
     color: var(--pso-cream-strong);
@@ -585,7 +782,7 @@
     border-radius: 999px;
     font-weight: 700;
     letter-spacing: 0.035em;
-    font-size: 0.92rem;
+    font-size: 0.98rem;
     text-decoration: none;
     text-shadow: 0 1px 0 rgba(58, 9, 15, 0.18);
     box-shadow:
@@ -645,8 +842,84 @@
     outline-offset: 2px;
   }
 
-  @media (max-width: 1450px) {
+  .pso-infograph .sip-btn-spotlight,
+  .pso-infograph .sip-btn-interactive,
+  .pso-infograph .sip-btn-interactive-main {
+    border-width: 1px;
+    border-color: rgba(255, 236, 201, 0.52);
+    background:
+      linear-gradient(135deg, #8f1d24 0%, #d14a45 46%, #f0b56c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.34),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.14),
+      0 16px 32px rgba(56, 10, 14, 0.28),
+      0 0 0 5px rgba(240, 181, 108, 0.09);
+    text-shadow: 0 1px 0 rgba(58, 9, 15, 0.22);
+  }
+
+  .pso-infograph .sip-btn-spotlight::after,
+  .pso-infograph .sip-btn-interactive::after,
+  .pso-infograph .sip-btn-interactive-main::after {
+    content: "";
+    position: absolute;
+    inset: auto 14% 10% 14%;
+    height: 48%;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255, 235, 198, 0.26) 0%, rgba(255, 235, 198, 0) 78%);
+    pointer-events: none;
+    filter: blur(10px);
+  }
+
+  .pso-infograph .sip-btn-spotlight {
+    min-width: 420px;
+    padding: 1.42rem 2.7rem;
+    font-size: 1.16rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-btn-interactive-main {
+    min-width: 250px;
+    padding: 0.96rem 1.45rem;
+    font-size: 0.96rem;
+  }
+
+  .pso-infograph .sip-btn-interactive {
+    min-width: 0;
+    padding: 0.88rem 1.3rem;
+    font-size: 0.92rem;
+  }
+
+  .pso-infograph .sip-btn-spotlight:hover,
+  .pso-infograph .sip-btn-spotlight:focus-visible,
+  .pso-infograph .sip-btn-interactive:hover,
+  .pso-infograph .sip-btn-interactive:focus-visible,
+  .pso-infograph .sip-btn-interactive-main:hover,
+  .pso-infograph .sip-btn-interactive-main:focus-visible {
+    background:
+      linear-gradient(135deg, #a9242d 0%, #eb5a52 46%, #ffd089 100%);
+    border-color: rgba(255, 242, 219, 0.68);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.1),
+      0 20px 38px rgba(56, 10, 14, 0.34),
+      0 0 0 6px rgba(240, 181, 108, 0.12);
+    transform: translateY(-3px) scale(1.02);
+    filter: saturate(1.05) brightness(1.03);
+  }
+
+  .pso-infograph .sip-btn-interactive-main,
+  .pso-infograph .sip-preview-body .sip-btn-interactive,
+  .pso-infograph .sip-keypoint-action .sip-btn-interactive {
+    font-weight: 800;
+  }
+
+  @media (max-width: 1400px) {
     .pso-infograph .sip-site-highlights {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pso-infograph .sip-interactive-featured {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
@@ -654,18 +927,41 @@
   @media (max-width: 1100px) {
     .pso-infograph .sip-card-grid {
       grid-template-columns: 1fr;
-      gap: 1.4rem;
+      gap: 1.2rem;
     }
 
     .pso-infograph .sip-site-highlights {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .pso-infograph .sip-content > .sip-keypoints:not(.sip-site-highlights) {
       grid-template-columns: 1fr;
     }
 
+    .pso-infograph .sip-interactive-list,
+    .pso-infograph .sip-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-detail-pair {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-interactive-featured {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-info-grid {
+      grid-template-columns: 1fr;
+    }
+
     .pso-infograph .sip-meta-footer {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .pso-infograph .sip-site-highlights {
       grid-template-columns: 1fr;
     }
   }
@@ -695,12 +991,33 @@
     }
 
     .pso-infograph .sip-card-grid {
-      gap: 1.1rem;
+      gap: 1rem;
     }
 
     .pso-infograph .sip-content,
     .pso-infograph .sip-details {
       padding: 1.1rem;
+    }
+
+    .pso-infograph .sip-panel-section {
+      padding: 1rem;
+    }
+
+    .pso-infograph .sip-keypoint-image,
+    .pso-infograph .sip-preview-image {
+      min-height: 200px;
+    }
+
+    .pso-infograph .sip-btn,
+    .pso-infograph .sip-actions .sip-btn-primary,
+    .pso-infograph .sip-actions .sip-btn-secondary {
+      min-width: 100%;
+      width: 100%;
+    }
+
+    .pso-infograph .sip-btn-spotlight {
+      min-width: 100%;
+      width: 100%;
     }
   }
 </style>
@@ -719,7 +1036,7 @@
     <p class="sip-description">{{ data.Description }}</p>
     {% if first_topic %}
     <div class="sip-actions">
-      <a href="{{ first_topic.link }}" class="sip-btn sip-btn-primary" target="_blank" rel="noopener">{{ first_topic.buttonLabel | default: 'View Frontend Site' }}</a>
+      <a href="{{ first_topic.link }}" class="sip-btn sip-btn-primary sip-btn-spotlight" target="_blank" rel="noopener">{{ first_topic.buttonLabel | default: 'View Frontend Site' }}</a>
       {% if first_topic.backendLink %}
       <a href="{{ first_topic.backendLink }}" class="sip-btn sip-btn-secondary" target="_blank" rel="noopener">{{ first_topic.backendButtonLabel | default: 'View Backend Site' }}</a>
       {% endif %}
@@ -734,33 +1051,74 @@
 
       <!-- Center: Key Points & Tags -->
       <div class="sip-content">
-        <h2 class="sip-project-title">{{ topic.title }}</h2>
-        <p class="sip-subtitle">{{ topic.subtitle }}</p>
+        <div class="sip-panel-section sip-panel-section--soft">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Project Overview</div>
+              <h2 class="sip-project-title">{{ topic.title }}</h2>
+            </div>
+          </div>
+          <p class="sip-subtitle sip-section-copy">{{ topic.subtitle }}</p>
+          <p class="sip-about sip-section-copy">{{ topic.description }}</p>
+        </div>
 
-        {% if topic.keyFeaturesTitle %}
-        <h3 class="sip-section-title">{{ topic.keyFeaturesTitle }}</h3>
-        {% endif %}
-        <div class="sip-keypoints sip-site-highlights">
-          {% for point in topic.keyPoints %}
-          <div class="sip-keypoint">
-            <div class="sip-keypoint-body">
-              {% if point.previewImage %}
-              <a href="{{ point.link | default: '#' }}" class="sip-keypoint-image-link" target="_blank" rel="noopener">
-                <img src="{{ point.previewImage }}" alt="{{ point.previewAlt | default: point.text }}" class="sip-keypoint-image">
-              </a>
-              {% endif %}
-              {% if point.previewLabel %}
-              <div class="sip-keypoint-eyebrow">{{ point.previewLabel }}</div>
-              {% endif %}
-              <span class="sip-keypoint-copy">{{ point.text | default: point }}</span>
-              {% if point.link %}
-              <div class="sip-keypoint-action">
-                <a href="{{ point.link }}" class="sip-btn" target="_blank" rel="noopener">{{ point.buttonLabel | default: 'Open Page' }}</a>
+        <div class="sip-detail-pair">
+          <div class="sip-panel-section sip-panel-section--soft">
+            <div class="sip-panel-heading">
+              <div>
+                <div class="sip-panel-label">Accessibility</div>
+                <h3 class="sip-section-title">{{ topic.aboutTitle | default: 'About' }}</h3>
               </div>
+            </div>
+            <p class="sip-about sip-section-copy">{{ topic.description }}</p>
+          </div>
+
+          {% if topic.organizationSummary %}
+          <div class="sip-panel-section">
+            <div class="sip-panel-heading">
+              <div>
+                <div class="sip-panel-label">Organization Context</div>
+                <h3 class="sip-section-title">{{ topic.organizationTitle | default: 'About the Organization' }}</h3>
+              </div>
+            </div>
+            <p class="sip-about sip-section-copy">{{ topic.organizationSummary }}</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Website Pages</div>
+              {% if topic.keyFeaturesTitle %}
+              <h3 class="sip-section-title">{{ topic.keyFeaturesTitle }}</h3>
+              {% else %}
+              <h3 class="sip-section-title">Key Features</h3>
               {% endif %}
             </div>
           </div>
-          {% endfor %}
+          <div class="sip-keypoints sip-site-highlights">
+            {% for point in topic.keyPoints %}
+            <div class="sip-keypoint">
+              <div class="sip-keypoint-body">
+                {% if point.previewImage %}
+                <a href="{{ point.link | default: '#' }}" class="sip-keypoint-image-link" target="_blank" rel="noopener">
+                  <img src="{{ point.previewImage }}" alt="{{ point.previewAlt | default: point.text }}" class="sip-keypoint-image">
+                </a>
+                {% endif %}
+                {% if point.previewLabel %}
+                <div class="sip-keypoint-eyebrow">{{ point.previewLabel }}</div>
+                {% endif %}
+                <span class="sip-keypoint-copy">{{ point.text | default: point }}</span>
+                {% if point.link %}
+                <div class="sip-keypoint-action">
+                  <a href="{{ point.link }}" class="sip-btn" target="_blank" rel="noopener">{{ point.buttonLabel | default: 'Open Page' }}</a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
 
         <div class="sip-tech-stack">
@@ -770,46 +1128,83 @@
         </div>
 
         {% if topic.interactiveElements %}
-        <h3 class="sip-section-title">{{ topic.interactiveTitle | default: 'Interactive Elements' }}</h3>
-        {% if topic.interactiveLink %}
-        <div class="sip-section-action">
-          <a href="{{ topic.interactiveLink }}" class="sip-btn" target="_blank" rel="noopener">{{ topic.interactiveButtonLabel | default: 'Open Games Page' }}</a>
-        </div>
-        {% endif %}
-        <div class="sip-keypoints sip-interactive-list">
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Interactive Layer</div>
+              <h3 class="sip-section-title">{{ topic.interactiveTitle | default: 'Interactive Elements' }}</h3>
+            </div>
+            {% if topic.interactiveLink %}
+            <div class="sip-section-action">
+              <a href="{{ topic.interactiveLink }}" class="sip-btn sip-btn-interactive-main" target="_blank" rel="noopener">{{ topic.interactiveButtonLabel | default: 'Open Games Page' }}</a>
+            </div>
+            {% endif %}
+          </div>
+          {% assign has_interactive_preview = false %}
+          {% assign has_interactive_secondary = false %}
           {% for element in topic.interactiveElements %}
-          <div class="sip-keypoint">
-            <span class="sip-check">✓</span>
-            <div class="sip-keypoint-body">
-              <span class="sip-keypoint-text">
-                <strong>{{ element.title }}:</strong> {{ element.description }}
-              </span>
-              {% if element.previewImage or element.previewText %}
-              <div class="sip-preview-card">
-                {% if element.previewImage %}
-                <img src="{{ element.previewImage }}" alt="{{ element.previewAlt | default: element.title }}" class="sip-preview-image">
-                {% endif %}
-                <div class="sip-preview-body{% unless element.previewImage %} sip-preview-fallback{% endunless %}">
-                  <div class="sip-preview-label">{{ element.previewLabel | default: 'Interactive Preview' }}</div>
-                  <div class="sip-preview-title">{{ element.previewTitle | default: element.title }}</div>
-                  <div class="sip-preview-text">{{ element.previewText | default: element.description }}</div>
-                  {% if element.previewHighlights %}
-                  <div class="sip-preview-highlights">{{ element.previewHighlights }}</div>
+            {% if element.previewImage or element.previewText %}
+              {% assign has_interactive_preview = true %}
+            {% else %}
+              {% assign has_interactive_secondary = true %}
+            {% endif %}
+          {% endfor %}
+
+          {% if has_interactive_preview %}
+          <div class="sip-keypoints sip-interactive-list sip-interactive-featured">
+            {% for element in topic.interactiveElements %}
+            {% if element.previewImage or element.previewText %}
+            <div class="sip-keypoint">
+              <span class="sip-check">✓</span>
+              <div class="sip-keypoint-body">
+                <span class="sip-keypoint-text">
+                  <strong>{{ element.title }}:</strong> {{ element.description }}
+                </span>
+                <div class="sip-preview-card">
+                  {% if element.previewImage %}
+                  <img src="{{ element.previewImage }}" alt="{{ element.previewAlt | default: element.title }}" class="sip-preview-image">
                   {% endif %}
-                  {% if element.link %}
-                  <a href="{{ element.link }}" class="sip-btn" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
-                  {% endif %}
+                  <div class="sip-preview-body{% unless element.previewImage %} sip-preview-fallback{% endunless %}">
+                    <div class="sip-preview-label">{{ element.previewLabel | default: 'Interactive Preview' }}</div>
+                    <div class="sip-preview-title">{{ element.previewTitle | default: element.title }}</div>
+                    <div class="sip-preview-text">{{ element.previewText | default: element.description }}</div>
+                    {% if element.previewHighlights %}
+                    <div class="sip-preview-highlights">{{ element.previewHighlights }}</div>
+                    {% endif %}
+                    {% if element.link %}
+                    <a href="{{ element.link }}" class="sip-btn sip-btn-interactive" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
-              {% endif %}
-              {% if element.link and element.previewImage == nil and element.previewText == nil %}
-              <div class="sip-keypoint-action">
-                <a href="{{ element.link }}" class="sip-btn" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
-              </div>
-              {% endif %}
             </div>
+            {% endif %}
+            {% endfor %}
           </div>
-          {% endfor %}
+          {% endif %}
+
+          {% if has_interactive_secondary %}
+          <h4 class="sip-secondary-heading">More Interactive Features</h4>
+          <div class="sip-keypoints sip-interactive-list sip-interactive-secondary">
+            {% for element in topic.interactiveElements %}
+            {% unless element.previewImage or element.previewText %}
+            <div class="sip-keypoint">
+              <span class="sip-check">✓</span>
+              <div class="sip-keypoint-body">
+                <span class="sip-keypoint-text">
+                  <strong>{{ element.title }}:</strong> {{ element.description }}
+                </span>
+                {% if element.link %}
+                <div class="sip-keypoint-action">
+                  <a href="{{ element.link }}" class="sip-btn sip-btn-interactive" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endunless %}
+            {% endfor %}
+          </div>
+          {% endif %}
         </div>
         {% endif %}
 
@@ -817,70 +1212,81 @@
 
       <!-- Right: About & Impact -->
       <div class="sip-details">
-        <h3 class="sip-section-title">{{ topic.aboutTitle | default: 'About' }}</h3>
-        <p class="sip-about">{{ topic.description }}</p>
+        {% if topic.customerPitch or topic.futurePlans %}
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Next Steps</div>
+              <h3 class="sip-section-title">Project Outlook</h3>
+            </div>
+          </div>
+          {% if topic.customerPitch %}
+          <div>
+            <h4 class="sip-section-title">Customer Pitch</h4>
+            <div class="sip-impact-list">
+              {% for pitch in topic.customerPitch %}
+              <div class="sip-impact-item">{{ pitch }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
 
-        {% if topic.organizationSummary %}
-        <h3 class="sip-section-title">{{ topic.organizationTitle | default: 'About the Organization' }}</h3>
-        <p class="sip-about">{{ topic.organizationSummary }}</p>
-        {% endif %}
-
-        {% if topic.impact %}
-        <h3 class="sip-section-title">Impact</h3>
-        <div class="sip-impact-list">
-          {% for item in topic.impact %}
-          <div class="sip-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if topic.customerPitch %}
-        <h3 class="sip-section-title">Customer Pitch</h3>
-        <div class="sip-impact-list">
-          {% for pitch in topic.customerPitch %}
-          <div class="sip-impact-item">{{ pitch }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if topic.futurePlans %}
-        <h3 class="sip-section-title">Future Plans</h3>
-        <div class="sip-impact-list">
-          {% for plan in topic.futurePlans %}
-          <div class="sip-impact-item">{{ plan }}</div>
-          {% endfor %}
+          {% if topic.futurePlans %}
+          <div>
+            <h4 class="sip-section-title">Future Plans</h4>
+            <div class="sip-impact-list">
+              {% for plan in topic.futurePlans %}
+              <div class="sip-impact-item">{{ plan }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
         </div>
         {% endif %}
 
         {% if topic.additions %}
-        <h3 class="sip-section-title">{{ topic.additionsTitle | default: 'Additions' }}</h3>
-        <div class="sip-impact-list sip-wow-factors">
-          {% for addition in topic.additions %}
-          <div class="sip-impact-item">
-            {{ addition.text | default: addition }}
-            {% if addition.link %}
-            <div class="sip-impact-action">
-              <a href="{{ addition.link }}" class="sip-btn" target="_blank" rel="noopener">{{ addition.buttonLabel | default: 'Open' }}</a>
+        <div class="sip-panel-section sip-panel-section--soft">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Highlights</div>
+              <h3 class="sip-section-title">{{ topic.additionsTitle | default: 'Additions' }}</h3>
             </div>
-            {% endif %}
           </div>
-          {% endfor %}
+          <div class="sip-impact-list sip-wow-factors">
+            {% for addition in topic.additions %}
+            <div class="sip-impact-item">
+              {{ addition.text | default: addition }}
+              {% if addition.link %}
+              <div class="sip-impact-action">
+                <a href="{{ addition.link }}" class="sip-btn" target="_blank" rel="noopener">{{ addition.buttonLabel | default: 'Open' }}</a>
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
         </div>
         {% endif %}
 
         {% if topic.organizationInfo %}
-        <h3 class="sip-section-title">{{ topic.organizationInfoTitle | default: 'Organization Information' }}</h3>
-        <div class="sip-impact-list">
-          {% for info in topic.organizationInfo %}
-          <div class="sip-impact-item">
-            {% if info.label %}<strong>{{ info.label }}:</strong> {% endif %}
-            {% if info.link %}
-            <a href="{{ info.link }}" target="_blank" rel="noopener">{{ info.value }}</a>
-            {% else %}
-            {{ info.value | default: info }}
-            {% endif %}
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Reference Details</div>
+              <h3 class="sip-section-title">{{ topic.organizationInfoTitle | default: 'Organization Information' }}</h3>
+            </div>
           </div>
-          {% endfor %}
+          <div class="sip-info-grid">
+            {% for info in topic.organizationInfo %}
+            <dl class="sip-info-list">
+              {% if info.label %}<dt>{{ info.label }}</dt>{% endif %}
+              {% if info.link %}
+              <dd><a href="{{ info.link }}" target="_blank" rel="noopener">{{ info.value }}</a></dd>
+              {% else %}
+              <dd>{{ info.value | default: info }}</dd>
+              {% endif %}
+            </dl>
+            {% endfor %}
+          </div>
         </div>
         {% endif %}
 

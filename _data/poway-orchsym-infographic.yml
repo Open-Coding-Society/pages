@@ -111,18 +111,6 @@ Topics:
     impact:
       - "The redesign transforms a basic Google Sites page into a modern, engaging experience that's easier to navigate, more visually appealing, and actually gives visitors reasons to stay and explore rather than just look up a concert date."
 
-    additionsTitle: "Wow Factors"
-    additions:
-      - text: "Interactive games hub that turns orchestra learning into guided challenge play"
-        link: "https://pso.opencodingsociety.com/games/"
-        buttonLabel: "Open Games Hub"
-      - text: "Orchestra Builder with a real stage layout and a performance unlock reward"
-        link: "https://pso.opencodingsociety.com/orchestra-builder/"
-        buttonLabel: "Open Orchestra Builder"
-      - text: "Virtual Conductor game that syncs tapping to live PSO performance recordings"
-      - text: "Site-wide XP progression system with sign-in persistence"
-      - text: "Concert countdown and season discovery flow that make upcoming performances feel active"
-
     organizationTitle: "About the Organization"
     organizationSummary: >
       The Poway Symphony Orchestra (PSO) is a semi-professional orchestra formed in 2004
@@ -139,18 +127,12 @@ Topics:
         value: "Semi-professional orchestra / 501(c)(3) non-profit"
       - label: "Conductor & Music Director"
         value: "John LoPiccolo (11th season)"
-      - label: "Ensemble Size"
-        value: "~65-67 musicians"
-      - label: "Concerts Per Season"
-        value: "3"
       - label: "Venue"
         value: "Poway Center for the Performing Arts, 15498 Espola Road, Poway, CA 92064"
       - label: "Box Office Phone"
         value: "(858) 748-0505"
       - label: "Conductor Phone"
         value: "(208) 757-1980"
-      - label: "Rehearsals"
-        value: "Mondays, 7:15-9:15 PM at Tierra Bonita Elementary School"
       - label: "Website (original)"
         value: "powaysymphonyorchestra.org"
         link: "https://www.powaysymphonyorchestra.org/"
