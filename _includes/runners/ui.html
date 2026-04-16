@@ -1,0 +1,99 @@
+<!-- Reusable UI Runner Component -->
+<div class="ui-runner-container" id="ui-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  {% include runners/fragments/challenge-box.html challenge=include.challenge %}
+
+  {% capture ui_runner_top_controls %}
+      <button type="button" class="runBtn" title="Run">▶</button>
+      <button type="button" class="stopBtn" title="Stop">■</button>
+      <button type="button" class="copyBtn" title="Copy Code">⎘</button>
+      <button type="button" class="saveBtn" title="Save Code">💾</button>
+      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑</button>
+  {% endcapture %}
+  {% capture ui_runner_bottom_controls %}
+    {% include runners/fragments/editor-stats.html %}
+  {% endcapture %}
+  {% include runners/fragments/editor-container.html
+     top_controls=ui_runner_top_controls
+     bottom_controls=ui_runner_bottom_controls
+  %}
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span>UI Output</span>
+      <button type="button" class="resetBtn" title="Reset">↻</button>
+    </div>
+    <div class="ui-output" id="ui-output-{{ include.runner_id }}"></div>
+  </div>
+</div>
+
+<script type="module">
+import { BaseRunner, UiExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+
+(function() {
+  const container = document.getElementById('ui-runner-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const defaultCode = `{{ include.code }}`.trim();
+  const editorHeight = "{{ include.height }}";
+  const outputHeight = "{{ include.output_height }}";
+  const storageKey = container.dataset.storageKey;
+  const runner = new BaseRunner(container, { storageKey });
+
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    fallbackCode: "// Write your JavaScript code here",
+    codeMirrorOptions: {
+      lineNumbers: true,
+      mode: "javascript",
+      theme: "darcula",
+      indentUnit: 2,
+      tabSize: 2
+    }
+  });
+
+  if (outputHeight) {
+    runner.applyScopedStyle(`#ui-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`);
+  }
+
+  const uiOutput = container.querySelector('.ui-output');
+  const uiExecutor = new UiExecutor({
+    editor,
+    outputElement: uiOutput,
+  });
+
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "// Write your JavaScript code here",
+    onClear: () => {
+      stopExecution();
+    },
+    saveFeedback: '✔',
+    copyFeedback: '✔'
+  });
+
+  // Stop execution
+  function stopExecution() {
+    uiExecutor.stop();
+  }
+
+  // Reset button
+  container.querySelector('.resetBtn').onclick = () => {
+    stopExecution();
+  };
+
+  // Stop button
+  container.querySelector('.stopBtn').onclick = () => {
+    stopExecution();
+  };
+
+  // Run button logic
+  function runCode() {
+    return uiExecutor.run();
+  }
+
+  runner.bindButton('.runBtn', runCode);
+
+  // Keyboard shortcut
+  runner.bindShortcut(runCode);
+})();
+</script>

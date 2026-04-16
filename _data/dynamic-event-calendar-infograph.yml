@@ -1,0 +1,37 @@
+# Dynamic Event Calendar Capstone Infographic
+Title: "Dynamic Event Calendar"
+Description: "A suite of interactive web tools built for Safe Passage Heals — centralizing community events, visualizing personal water usage, and delivering personalized water insights in one place."
+
+Topics:
+  - title: "Dynamic Event Calendar, Event/Media management, and Login System"
+    image: "capstone/dynamic_event_calendar.png"
+    link: "ruchikak19.github.io/flaskandfurious/"
+    alt: "Dynamic Event Calendar — Interactive Community Event Management for Safe Passage Heals"
+    keyPoints:
+      - "Interactive monthly calendar displaying all upcoming Safe Passage Heals events"
+      - "Click any event to open a popup with flyer, description, date/time, and registration link"
+      - "Replaces scattered static posts with one centralized, browsable interface, streamlining user flow"
+      - "Increases event visibility and encourages greater community participation"
+      - "Login system allows users to login in and register for events!"
+      - "User friendly interface for admins to add events to the blog and calendar simultaneously"
+      - "Dynamic event calendar and blog allow for a centralized management system for all events and media content, eliminating the need for multiple platforms"
+    subtitle: "One Calendar. Every Event. Instantly."
+    description: "Safe Passage Heals hosts workshops, support groups, and community events that help survivors of domestic violence access healing resources. Previously, event information was buried across static posts and flyers, making it hard for users to find upcoming programs. The Dynamic Event Calendar centralizes everything into one interactive monthly view — users browse by date and click any event to instantly see the flyer, full description, date and time, and a direct registration link. Built with FullCalendar.js on the frontend and a Flask + SQLite backend, the calendar fetches live event data via a REST API and presents it in a clean, accessible interface."
+    tech:
+      - "HTML / CSS / JavaScript"
+      - "FullCalendar.js"
+      - "Flask REST API"
+      - "SQLite Database"
+      - "GitHub Pages Deployment"
+    impact:
+      - "Centralizes all upcoming events in one interactive interface"
+      - "Eliminates the need to search across multiple pages for event info"
+      - "Provides direct registration access from a single click"
+      - "Creates a more organized and engaging user experience"
+      - "Increases event visibility and community participation for Safe Passage Heals"
+    status: "In Development"
+    team:
+      - "Ruchika Kench"
+      - "Akshara Shankar"
+      - "Avantika Chittari"
+
