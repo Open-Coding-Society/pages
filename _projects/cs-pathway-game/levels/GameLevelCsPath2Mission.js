@@ -20,6 +20,26 @@ const CHALLENGE_ERROR_MESSAGES = {
   [CHALLENGE_ERROR_TYPES.UNKNOWN]: () => 'Challenge generation failed.',
 };
 
+// Centralized communication prompt text used for AI question generation and grading.
+const CHALLENGE_PROMPT_TEXT = {
+  QUESTION_ROLE: 'You are {{deskName}} in a classroom coding game.',
+  QUESTION_FOCUS: 'Generate exactly one challenge question focused on: {{expertise}}.',
+  QUESTION_CONCISE: 'Use the provided desk context and keep the question concise (max 30 words).',
+  QUESTION_SHORT_ANSWER: 'The challenge should require a short written answer from a student.',
+  QUESTION_FORMAT: 'Do not include explanation, rubric, markdown, numbering, or extra text.',
+  QUESTION_TOPIC_HEADER: 'Desk topic examples:\n{{sampleTopics}}',
+
+  EVAL_ROLE: 'You are grading a student answer for {{deskName}}.',
+  EVAL_EXPERTISE: 'Desk expertise: {{expertise}}.',
+  EVAL_SCOPE: 'Assess whether the student answer is correct, mostly correct, or incorrect.',
+  EVAL_QUESTION: 'Challenge question: {{question}}',
+  EVAL_ANSWER: 'Student answer: {{answer}}',
+  EVAL_FORMAT: 'Respond in exactly two lines and nothing else:',
+  EVAL_VERDICT: 'VERDICT: RIGHT or WRONG',
+  EVAL_FEEDBACK: 'FEEDBACK: one short sentence with actionable feedback.',
+  EVAL_RIGHT_RULE: 'Mark RIGHT for correct or mostly correct answers.',
+};
+
 // Grading is intentionally binary for student-facing feedback in this level.
 const CHALLENGE_VERDICTS = {
   RIGHT: 'RIGHT',
@@ -425,15 +445,15 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const deskName = spriteData?.id || 'Desk Guide';
 
     return [
-      `You are grading a student answer for ${deskName}.`,
-      `Desk expertise: ${expertise}.`,
-      'Assess whether the student answer is correct, mostly correct, or incorrect.',
-      `Challenge question: ${question}`,
-      `Student answer: ${answer}`,
-      'Respond in exactly two lines and nothing else:',
-      'VERDICT: RIGHT or WRONG',
-      'FEEDBACK: one short sentence with actionable feedback.',
-      'Mark RIGHT for correct or mostly correct answers.',
+      CHALLENGE_PROMPT_TEXT.EVAL_ROLE.replace('{{deskName}}', deskName),
+      CHALLENGE_PROMPT_TEXT.EVAL_EXPERTISE.replace('{{expertise}}', expertise),
+      CHALLENGE_PROMPT_TEXT.EVAL_SCOPE,
+      CHALLENGE_PROMPT_TEXT.EVAL_QUESTION.replace('{{question}}', question),
+      CHALLENGE_PROMPT_TEXT.EVAL_ANSWER.replace('{{answer}}', answer),
+      CHALLENGE_PROMPT_TEXT.EVAL_FORMAT,
+      CHALLENGE_PROMPT_TEXT.EVAL_VERDICT,
+      CHALLENGE_PROMPT_TEXT.EVAL_FEEDBACK,
+      CHALLENGE_PROMPT_TEXT.EVAL_RIGHT_RULE,
     ].join('\n\n');
   }
 
@@ -613,12 +633,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       .join('\n');
 
     return [
-      `You are ${deskName} in a classroom coding game.`,
-      `Generate exactly one challenge question focused on: ${expertise}.`,
-      'Use the provided desk context and keep the question concise (max 30 words).',
-      'The challenge should require a short written answer from a student.',
-      'Do not include explanation, rubric, markdown, numbering, or extra text.',
-      sampleTopics ? `Desk topic examples:\n${sampleTopics}` : '',
+      CHALLENGE_PROMPT_TEXT.QUESTION_ROLE.replace('{{deskName}}', deskName),
+      CHALLENGE_PROMPT_TEXT.QUESTION_FOCUS.replace('{{expertise}}', expertise),
+      CHALLENGE_PROMPT_TEXT.QUESTION_CONCISE,
+      CHALLENGE_PROMPT_TEXT.QUESTION_SHORT_ANSWER,
+      CHALLENGE_PROMPT_TEXT.QUESTION_FORMAT,
+      sampleTopics ? CHALLENGE_PROMPT_TEXT.QUESTION_TOPIC_HEADER.replace('{{sampleTopics}}', sampleTopics) : '',
     ].filter(Boolean).join('\n\n');
   }
 
