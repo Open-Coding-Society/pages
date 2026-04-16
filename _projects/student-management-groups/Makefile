@@ -26,6 +26,7 @@ build:
 	@mkdir -p $(NOTEBOOK_DEST)
 	@cp notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true
 	@$(MAKE) assets
+	@$(MAKE) docs
 	@echo "✅ $(PROJECT_NAME) built successfully"
 	@echo "   Source: _projects/$(PROJECT_NAME)/"
 	@echo "   Notebook: _notebooks/projects/$(PROJECT_NAME)/$(NOTEBOOK_FILENAME)"
@@ -60,6 +61,9 @@ watch:
 				mkdir -p $(NOTEBOOK_DEST); \
 				cp $(PROJECT_SRC)/notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
 				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)" 2>&1; \
+			elif echo "$$changed_file" | grep -q "/docs/"; then \
+				echo "  🔄 Docs changed - publishing docs..."; \
+				$(MAKE) docs; \
 			elif echo "$$changed_file" | grep -q "/levels/"; then \
 				filename=$$(basename "$$changed_file"); \
 				echo "  🔄 Level changed: $$filename"; \
@@ -80,7 +84,7 @@ watch:
 		done; \
 	else \
 		echo "⚠️  fswatch not installed (brew install fswatch for auto-watch)"; \
-		echo "   Falling back to manual: run 'make -C _projects/$(PROJECT_NAME) build' after edits"; \
+		echo "   Falling back to manual: run 'make -C _projects/$(PROJECT_NAME) build docs' after edits"; \
 		while true; do sleep 3600; done; \
 	fi
 
