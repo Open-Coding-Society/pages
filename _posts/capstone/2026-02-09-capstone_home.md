@@ -282,8 +282,8 @@ Browse and explore all capstone projects. Use the search bar to find projects by
            <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Binary Beasts</a></h3>
-           <p class="text-sm text-gray-700">Combined PYBL + Poway NEC capstone infographics on one page: youth basketball operations and emergency preparedness information architecture improvements.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
+           <p class="text-sm text-gray-700">Poway NEC website updated with new features to provide valuable changes that improve quality of life for the organization, including a login system, danger predictor, and AI chatbot.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
        </div>
        <button onclick="copyCloneUrl('https://github.com/PLACEHOLDER/binary-beasts')" title="Copy clone URL" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 cursor-pointer bg-transparent border-0 p-1">
@@ -374,8 +374,8 @@ Browse and explore all capstone projects. Use the search bar to find projects by
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-uesl-capstone %}">UESL Foundation</a></h3>
-           <p class="text-sm text-gray-700">Empowering individuals with intellectual and developmental disabilities through year-round esports and community programs across San Diego and Imperial Counties.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Rudra Darshan Sathwik</p>
+           <p class="text-sm text-gray-700">Built an AI chatbot, accessible game engine with 8 IDD-friendly modes, and a social platform to extend UESL's reach for individuals with intellectual and developmental disabilities across San Diego.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Sathwik Kintada, Rudra B Joshi, Darshan</p>
        </div>
        <button onclick="copyCloneUrl('https://github.com/PLACEHOLDER/uesl-foundation')" title="Copy clone URL" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 cursor-pointer bg-transparent border-0 p-1">
          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
@@ -434,7 +434,7 @@ Browse and explore all capstone projects. Use the search bar to find projects by
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
-           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, donation flow, and impact dashboard to match the quality of their community mission.</p>
+           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, and donation flow.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
        </div>
        <button onclick="copyCloneUrl('https://github.com/PLACEHOLDER/poway-library')" title="Copy clone URL" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 cursor-pointer bg-transparent border-0 p-1">

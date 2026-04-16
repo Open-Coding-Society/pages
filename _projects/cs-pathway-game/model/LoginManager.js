@@ -17,7 +17,7 @@
  *   GET  /api/id            - Auth status check
  */
 
-import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+import { pythonURI, javaURI, fetchOptions, baseurl } from '/assets/js/api/config.js';
 
 class LoginManager {
 
@@ -100,6 +100,61 @@ class LoginManager {
     } catch (err) {
       return { success: false, code: 0, body: { error: err.message } };
     }
+  }
+
+  // ── Nav Update ────────────────────────────────────────────────────────────
+
+  /**
+   * Update the OCS header nav (#loginArea) to reflect the logged-in user.
+   * Mirrors the logic in /assets/js/api/login.js so a mid-session login
+   * (e.g. via the game panel) is reflected immediately without a page reload.
+   *
+   * @param {{ name: string, uid: string, roles?: Array }} userData
+   */
+  static updateNavMenu(userData) {
+    const loginArea = document.getElementById('loginArea');
+    if (!loginArea || !userData) return;
+
+    // Build roles line if present
+    const rolesHtml = userData.roles && Array.isArray(userData.roles) && userData.roles.length > 0
+      ? `<div style="padding:8px 16px;color:#888;font-size:0.95em;">
+           Roles: ${userData.roles.map(r => r.name).join(', ')}
+         </div><hr style="margin:4px 0;">`
+      : '';
+
+    loginArea.innerHTML = `
+      <div class="dropdown">
+        <button class="dropbtn page-link"
+          style="border:none;background:none;cursor:pointer;color:inherit;font-size:inherit;font-family:inherit;padding:0;">
+          ${userData.name}
+        </button>
+        <div class="dropdown-content hidden">
+          ${rolesHtml}
+          <a href="${baseurl}/profile">Profile</a>
+          <a href="${baseurl}/logout">Logout</a>
+        </div>
+      </div>
+    `;
+
+    const btn     = loginArea.querySelector('.dropbtn');
+    const content = loginArea.querySelector('.dropdown-content');
+    if (btn && content) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        content.classList.toggle('hidden');
+      });
+      if (!window._loginDropdownListener) {
+        document.addEventListener('click', (e) => {
+          if (!btn.contains(e.target) && !content.contains(e.target)) {
+            content.classList.add('hidden');
+          }
+        });
+        window._loginDropdownListener = true;
+      }
+    }
+
+    loginArea.style.opacity = '1';
+    window.user = userData;
   }
 
   // ── UI Panel ───────────────────────────────────────────────────────────────

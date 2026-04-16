@@ -71,7 +71,7 @@ To add a new capstone project:
 1. Add a new card inside the `<div id="capstone-grid">` container.
 2. Use the same card structure as existing entries:
    - `div` wrapper with `class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA"` or `CSP`
-   - `<a href="{% post_url yyyy-mm-dd-slug %}">` around the image
+   - `{% raw %}`<a href="{% post_url yyyy-mm-dd-slug %}">{% endraw %}` around the image
    - `<h3>` title with the same `post_url` destination
    - project description text
    - team member text
