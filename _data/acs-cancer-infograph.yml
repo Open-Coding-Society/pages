@@ -1,20 +1,21 @@
 # ACS Cancer Capstone Infographic
-Title: "ACS Cancer Infograph"
-Description: "An interactive human-body diagram that consolidates the American Cancer Society's cancer information into one visual interface — so patients and families find what they need in seconds, not clicks."
+Title: "ACS Cancer Website"
+Description: "An interactive human-body diagram that consolidates the American Cancer Society's cancer information into one visual interface so patients and families find what they need in seconds, not clicks."
 
 
 Topics:
- - title: "ACS Cancer Infograph"
+ - title: "ACS Cancer Website"
+   external_link: "https://acs.opencodingsociety.com"
    image: "capstone/acs_logo.png"
    link: "/capstone/acscancer/"
-   alt: "ACS Cancer Infograph — Interactive Body Map for Cancer Information"
+   alt: "ACS Cancer Infograph: Interactive Body Map for Cancer Information"
    keyPoints:
-     - "Interactive human-body diagram with labeled cancer sites"
-     - "Click any body region to navigate directly to ACS cancer information"
-     - "Replaces 30+ scattered text links with one spatial visual interface"
-     - "Cancers mapped anatomically (e.g. pancreatic cancer → pancreas)"
-     - "Accessible design with keyboard navigation and screen-reader support"
-     - "Embeds on ACS homepage for immediate discoverability"
+    - "Interactive anatomical body map linking cancer types to symptoms, risk factors, and ACS resources"
+    - "Plain-English AI assistant answers follow-up questions directly within the body map"
+    - "Cell Cycle Lab simulates phase checkpoints, gene toggles, and live mutation tracking"
+    - "Story-driven RPG teaches cell biology and cancer concepts through interactive gameplay"
+    - "ML-powered risk calculator delivers personalized scores from age, lifestyle, and medical history"
+    - "Community blog keeps patients, families, and learners connected to ACS news and stories"
    subtitle: "One Diagram. Every Cancer. Instantly."
    description: "A design-based research capstone that reimagines the American Cancer Society's 'All About Cancer' page. Instead of scrolling through dozens of text links, users interact with an annotated diagram of the human body — each labeled region links directly to the relevant ACS cancer information page. Cancers are positioned anatomically with clear visual callouts (e.g. pancreatic cancer mapped to the pancreas, lung cancer to the lungs). The diagram is designed to live both on the dedicated 'All About Cancer' page and as an accessible widget on the ACS homepage, dramatically reducing the number of clicks needed to reach life-saving information."
    tech:
@@ -25,12 +26,12 @@ Topics:
      - "Responsive / Mobile Layout"
      - "GitHub Pages Deployment"
    impact:
-     - "Reduces cancer information lookup from 5+ clicks to a single interaction"
-     - "Lowers cognitive load for patients, caregivers, and first-time visitors"
-     - "Improves ACS accessibility for users unfamiliar with cancer terminology"
-     - "Consolidates 30+ standalone cancer links into one cohesive visual entry point"
-     - "Supports early detection by making cancer resources faster to discover"
-   status: "In Development"
+    - "Reduces cancer information lookup from 5+ clicks to a single fast interaction, especially on mobile"
+    - "Lowers cognitive load for patients, caregivers, and first-time visitors navigating care during stressful moments"
+    - "Improves ACS accessibility for users unfamiliar with cancer terminology or medical language by using clearer pathways"
+    - "Consolidates 30+ standalone cancer links into one cohesive visual entry point with anatomy-based navigation"
+    - "Supports earlier detection by making trusted cancer resources faster and easier to discover at first search"
+   status: "In Production"
    team:
      - "Aashika"
      - "Anwita"
