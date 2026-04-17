@@ -98,6 +98,11 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/sd-auto/",
       frontendUrl: "https://github.com/Ahaanv19/SD_Auto_Frontend",
       backendUrl: "https://github.com/Ahaanv19/SD_Auto_Backend"
+    },
+    "Greppers": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/greppers/",
+      frontendUrl: "http://sfifoundation.opencodingsociety.com",
+      backendUrl: "https://greppers-be.opencodingsociety.com/"
     }
   };
 

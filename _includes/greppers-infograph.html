@@ -1,53 +1,73 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 {% assign data = site.data["greppers-infograph"] %}
 
-<div class="sfi-infograph sfi-infograph--warm">
-  <div class="sfi-header">
-    <div class="sfi-badge">{{ data.Badge }}</div>
-    <h1 class="sfi-title">{{ data.Title }}</h1>
-    <p class="sfi-desc">{{ data.Description }}</p>
+<article class="sfi-wrap">
+
+  <!-- HERO -->
+  <header class="sfi-hero">
+    <div class="sfi-hero-inner">
+      <span class="sfi-eyebrow">{{ data.Badge }}</span>
+      <h1 class="sfi-headline">{{ data.Title }}</h1>
+      <div class="sfi-rule"></div>
+      <p class="sfi-lede">{{ data.Tagline }}</p>
+    </div>
+  </header>
+
+  <!-- PROBLEM / WHAT CHANGED -->
+  <section class="sfi-pitch">
+    <div class="sfi-pitch-col sfi-pitch-col--problem">
+      <h2 class="sfi-col-heading">The Problem</h2>
+      <p class="sfi-col-body">{{ data.Problem }}</p>
+    </div>
+    <div class="sfi-pitch-col sfi-pitch-col--solution">
+      <h2 class="sfi-col-heading">What Changed</h2>
+      <p class="sfi-col-body">{{ data.Solution }}</p>
+    </div>
+  </section>
+
+  <!-- METRICS STRIP -->
+  {% if data.Metrics %}
+  <div class="sfi-metrics">
+    {% for m in data.Metrics %}
+    <div class="sfi-metric">
+      <span class="sfi-metric-val">{{ m.value }}</span>
+      <span class="sfi-metric-lbl">{{ m.label }}</span>
+    </div>
+    {% endfor %}
   </div>
+  {% endif %}
 
-  <div class="sfi-card">
-    <div class="sfi-card-grid">
-      <div class="sfi-visual">
-        <div class="sfi-icon-wrap">🏁</div>
-        <div class="sfi-status">Motorsport Safety</div>
-        <div class="sfi-team">
-          <span class="sfi-team-label">Organization</span>
-          <span class="sfi-team-name">{{ data.Organization }}</span>
+  <!-- WHAT WE BUILT -->
+  <section class="sfi-builds">
+    <p class="sfi-section-tag">What We Built</p>
+    <div class="sfi-build-grid">
+      {% for f in data.FeatureCards %}
+      <div class="sfi-build-item">
+        <span class="sfi-build-num">0{{ forloop.index }}</span>
+        <div class="sfi-build-text">
+          <h4 class="sfi-build-title">{{ f.title }}</h4>
+          <p class="sfi-build-desc">{{ f.desc }}</p>
         </div>
       </div>
+      {% endfor %}
+    </div>
+  </section>
 
-      <div class="sfi-content">
-        <h2 class="sfi-project-title">{{ data.Subtitle }}</h2>
-        <p class="sfi-subtitle">Web Modernization Platform</p>
-
-        <div class="sfi-keypoints">
-          {% for feature in data.Features %}
-          <div class="sfi-keypoint">
-            <span class="sfi-check">✓</span>
-            <span>{{ feature }}</span>
-          </div>
-          {% endfor %}
-        </div>
-
-        <div class="sfi-tech-stack">
-          {% for tech in data.Tech %}
-          <span class="sfi-tech-tag">{{ tech.icon }} {{ tech.name }}</span>
-          {% endfor %}
-        </div>
+  <!-- FOOTER -->
+  <footer class="sfi-foot">
+    <div class="sfi-foot-inner">
+      <div class="sfi-foot-team">
+        <span class="sfi-foot-label">Team</span>
+        <span class="sfi-foot-names">{{ data.Team }}</span>
       </div>
-
-      <div class="sfi-details">
-        <h3 class="sfi-section-title">Impact</h3>
-        <div class="sfi-impact-list">
-          {% for metric in data.Metrics %}
-          <div class="sfi-impact-item">{{ metric.value }} — {{ metric.label }}</div>
-          {% endfor %}
-        </div>
-        <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-btn">View Live Demo</a>
-        
+      <div class="sfi-foot-links">
+        <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-cta">View Live Site</a>
+        <a href="{{ data.BackendUrl }}" target="_blank" class="sfi-cta sfi-cta--outline">Source Code</a>
       </div>
     </div>
-  </div>
-</div>
+  </footer>
+
+</article>
