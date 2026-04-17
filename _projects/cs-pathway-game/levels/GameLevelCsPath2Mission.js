@@ -314,6 +314,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._deskChallengeEvalBusy = new Set();
     this._activeDeskChallenges = new Map();
     this._missionQuestionHistory = new Map();
+    this._missionProgressCount = 0;
+    this._missionProgressEl = null;
     this._handleMissionDeskKeyDownBound = this._handleMissionDeskKeyDown.bind(this);
   }
 
@@ -324,6 +326,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._rebindMissingDeskReactions(desks);
     this._wireDeskClickDistanceGate(desks);
     document.addEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    this._syncMissionProgressBoard();
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
       id: d?.spriteData?.id,
@@ -657,6 +660,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           );
           this._renderChallengeEvaluation(ui.responseArea, active.question, answer, evaluation);
           this._speakChallengeEvaluation(npc, evaluation);
+          if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
+            this._missionProgressCount += 1;
+            this._syncMissionProgressBoard();
+          }
           this._logChallengeEvent({
             deskId: active?.deskId || '',
             question: active?.question || '',
@@ -763,6 +770,64 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._challengeLog.shift();
     }
     console.log('[MissionTools] challenge created:', entry);
+  }
+
+  // Render the level scoreboard with score ramp and completion count.
+  _syncMissionProgressBoard() {
+    const host = document.body;
+    if (!host) return;
+
+    if (!this._missionProgressEl) {
+      const board = document.createElement('div');
+      board.style.cssText = `
+        position: fixed; right: 20px; bottom: 20px;
+        z-index: 9999; pointer-events: none;
+        min-width: 220px;
+        background: rgba(13,13,26,0.96);
+        border: 2px solid #f59e0b;
+        color: #f8fafc;
+        font-family: 'Courier New', monospace;
+        padding: 12px 14px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(245,158,11,0.22);
+        letter-spacing: 0.6px;
+      `;
+      board.innerHTML = `
+        <div style="font-size: 11px; text-transform: uppercase; opacity: 0.78; margin-bottom: 6px;">Mission Scoreboard</div>
+        <div class="mission-progress-score" style="font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 6px;">.55</div>
+        <div class="mission-progress-count" style="font-size: 13px; opacity: 0.92; margin-bottom: 10px;">0/4</div>
+        <div style="height: 8px; border-radius: 999px; background: rgba(255,255,255,0.10); overflow: hidden;">
+          <div class="mission-progress-bar" style="height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #f59e0b, #fbbf24, #fde68a);"></div>
+        </div>
+      `;
+      host.appendChild(board);
+      this._missionProgressEl = board;
+    }
+
+    const score = this._getMissionProgressScore(this._missionProgressCount);
+    const scoreText = score.toFixed(2).replace(/^0/, '');
+    const completedText = `${this._missionProgressCount}/4`;
+    const progressRatio = Math.max(0, Math.min(1, (score - 0.55) / (0.92 - 0.55)));
+
+    const scoreNode = this._missionProgressEl.querySelector('.mission-progress-score');
+    const countNode = this._missionProgressEl.querySelector('.mission-progress-count');
+    const barNode = this._missionProgressEl.querySelector('.mission-progress-bar');
+
+    if (scoreNode) scoreNode.textContent = scoreText;
+    if (countNode) countNode.textContent = completedText;
+    if (barNode) barNode.style.width = `${progressRatio * 100}%`;
+  }
+
+  // Map completions to the requested mission score progression.
+  _getMissionProgressScore(completedCount) {
+    if (completedCount <= 0) return 0.55;
+    if (completedCount === 1) return 0.66;
+    if (completedCount === 2) return 0.77;
+    if (completedCount === 3) return 0.88;
+    if (completedCount === 4) return 0.89;
+
+    const bonusSteps = Math.min(completedCount - 4, 12);
+    return 0.89 + (bonusSteps * 0.0025);
   }
 
   // Helper to locate the player object in active game objects.
@@ -902,6 +967,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   destroy() {
     this.clearZoneAlert();
     document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    if (this._missionProgressEl?.parentNode) {
+      this._missionProgressEl.parentNode.removeChild(this._missionProgressEl);
+    }
+    this._missionProgressEl = null;
   }
 
 }
