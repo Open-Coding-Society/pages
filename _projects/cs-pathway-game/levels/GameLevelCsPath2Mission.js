@@ -314,6 +314,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._deskChallengeEvalBusy = new Set();
     this._activeDeskChallenges = new Map();
     this._missionQuestionHistory = new Map();
+    this._missionCompletedStations = new Set();
     this._missionProgressCount = 0;
     this._missionProgressEl = null;
     this._handleMissionDeskKeyDownBound = this._handleMissionDeskKeyDown.bind(this);
@@ -661,8 +662,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           this._renderChallengeEvaluation(ui.responseArea, active.question, answer, evaluation);
           this._speakChallengeEvaluation(npc, evaluation);
           if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
-            this._missionProgressCount += 1;
-            this._syncMissionProgressBoard();
+            this._awardMissionProgress(active?.deskId || '');
           }
           this._logChallengeEvent({
             deskId: active?.deskId || '',
@@ -770,6 +770,34 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._challengeLog.shift();
     }
     console.log('[MissionTools] challenge created:', entry);
+  }
+
+  // Progress rule: repeats do not count until every station is completed once.
+  _awardMissionProgress(deskId) {
+    if (!deskId) return;
+
+    const stationTargetCount = this._missionDeskIds?.length || 4;
+    const alreadyCompleted = this._missionCompletedStations.has(deskId);
+    const allStationsCompleted = this._missionCompletedStations.size >= stationTargetCount;
+
+    if (!alreadyCompleted) {
+      this._missionCompletedStations.add(deskId);
+      this._missionProgressCount += 1;
+      this._syncMissionProgressBoard();
+
+      if (this._missionCompletedStations.size >= stationTargetCount) {
+        this.showToast?.('All stations cleared once. Repeat solves now count toward bonus progress.');
+      }
+      return;
+    }
+
+    if (!allStationsCompleted) {
+      this.showToast?.('Progress lock: clear each station once before repeats count.');
+      return;
+    }
+
+    this._missionProgressCount += 1;
+    this._syncMissionProgressBoard();
   }
 
   // Render the level scoreboard with score ramp and completion count.
