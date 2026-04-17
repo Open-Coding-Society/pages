@@ -16,6 +16,19 @@ sticky_rank: 1
 
 <h2>Design-Based Research (DBR) Capstone Projects</h2>
 
+<style>
+#capstone-grid > div {
+  min-height: 10rem;
+}
+#capstone-grid > div a img {
+  height: 7rem;
+  width: auto;
+  max-width: 7rem;
+  object-fit: contain;
+  display: block;
+}
+</style>
+
 <div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
   <div class="flex flex-wrap gap-2">
     <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
@@ -30,6 +43,7 @@ sticky_rank: 1
     <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
   </div>
 </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
@@ -198,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   document.addEventListener('keydown', event=>{
     if(event.key === 'Escape') closeAllPopups();
-  });
+  });     
   searchInput.addEventListener('input', event=>{
     currentQuery = normalize(event.target.value);
     applyFilters();
@@ -366,9 +380,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- Poway Symphonic Orchestra Capstone -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{{ '/capstone/powayorchestra/' | relative_url }}">
-           <img src="{{ '/images/pso_logo.png' | relative_url }}" alt="Poway Symphony Orchestra logo" class="w-28 h-28 object-contain rounded bg-white p-2" />
+           <div class="w-28 h-28 overflow-hidden rounded bg-white">
+               <img src="{{ '/images/pso_logo.png' | relative_url }}" alt="Poway Symphony Orchestra logo" class="w-full h-full object-cover scale-125" />
+           </div>
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{{ '/capstone/powayorchestra/' | relative_url }}">Poway Symphony Orchestra</a></h3>
@@ -541,7 +557,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">RCR: Poway-Midland Railroad</a></h3>
-           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with interactive features, real-time train schedules, virtual tours, GPS tracking, educational coding games, and volunteer management tools.</p>
+           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with interactive features, real-time train schedules, virtual tours, GPS tracking, and volunteer management tools.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Rebecca, Cyrus, Rishabh</p>
        </div>
    </div>
