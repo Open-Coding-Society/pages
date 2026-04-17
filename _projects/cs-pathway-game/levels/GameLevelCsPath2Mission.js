@@ -203,7 +203,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       reaction: function () {
         if (reaction) reaction.call(this);
         if (level?.showToast) {
-          level.showToast('Click desk to start challenge.');
+            level.showToast('Click desk or press E to start challenge.');
         }
       },
       ...(interact ? { interact } : {}),
@@ -254,25 +254,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         id: 'The Admin',
         expertise: 'how to work different operating systems',
         position: { x: width * 0.20, y: height * 0.17 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+          zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Archivist',
         expertise: 'how to manage files and folders',
         position: { x: width * 0.67, y: height * 0.17 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+          zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The SDLC Master',
         expertise: 'what SDLC is',
         position: { x: width * 0.18, y: height * 0.60 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+          zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Scrum Master',
         expertise: 'how to set up a scrum board',
         position: { x: width * 0.62, y: height * 0.58 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+          zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
     ];
 
@@ -288,6 +288,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._deskChallengeBusy = new Set();
     this._deskChallengeEvalBusy = new Set();
     this._activeDeskChallenges = new Map();
+    this._handleMissionDeskKeyDownBound = this._handleMissionDeskKeyDown.bind(this);
   }
 
   // Find desk objects after engine instantiates them and apply runtime behavior patches.
@@ -296,6 +297,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const desks = objects.filter((obj) => this._missionDeskIds?.includes(obj?.spriteData?.id));
     this._rebindMissingDeskReactions(desks);
     this._wireDeskClickDistanceGate(desks);
+    document.addEventListener('keydown', this._handleMissionDeskKeyDownBound);
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
       id: d?.spriteData?.id,
@@ -705,6 +707,26 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
+  // Allow the mission challenge to start with E as well as click while in range.
+  _handleMissionDeskKeyDown(event) {
+    if (event?.key !== 'e' && event?.key !== 'E' && event?.code !== 'KeyE') return;
+    if (event?.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+
+    const player = this._findPlayer();
+    if (!player || !Array.isArray(this._missionDeskObjects)) return;
+
+    const nearestDesk = this._findNearestDeskInZone(player, this._missionDeskObjects);
+    if (!nearestDesk) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const deskId = nearestDesk?.spriteData?.id;
+    if (!deskId) return;
+
+    this.startDeskChallenge(nearestDesk, deskId, nearestDesk);
+  }
+
   // Runtime patch for engine quirk where reaction function may not bind automatically.
   _rebindMissingDeskReactions(desks) {
     // Runtime patch: Npc currently doesn't assign this.reaction from data.
@@ -787,6 +809,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   // Cleanup transient UI owned by this level.
   destroy() {
     this.clearZoneAlert();
+    document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
   }
 
 }
