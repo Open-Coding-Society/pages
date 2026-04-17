@@ -16,6 +16,19 @@ sticky_rank: 1
 
 <h2>Design-Based Research (DBR) Capstone Projects</h2>
 
+<style>
+#capstone-grid > div {
+  min-height: 10rem;
+}
+#capstone-grid > div a img {
+  height: 7rem;
+  width: auto;
+  max-width: 7rem;
+  object-fit: contain;
+  display: block;
+}
+</style>
+
 <div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
   <div class="flex flex-wrap gap-2">
     <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
@@ -26,10 +39,11 @@ sticky_rank: 1
     </a>
   </div>
   <div class="flex flex-col items-start sm:items-end">
-                         <p class="text-sm text-gray-700">A design-based research capstone focused on expanding community engagement through a more accessible, modern, and story-driven Poway Symphony Orchestra website experience, with clearer navigation and stronger paths to attend, support, and explore performances.</p>
+    <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="w-full min-w-[240px] rounded-lg border border-gray-300 bg-white/90 px-4 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
     <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
   </div>
 </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
