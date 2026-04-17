@@ -16,6 +16,19 @@ sticky_rank: 1
 
 <h2>Design-Based Research (DBR) Capstone Projects</h2>
 
+<style>
+#capstone-grid > div {
+  min-height: 10rem;
+}
+#capstone-grid > div a img {
+  height: 7rem;
+  width: auto;
+  max-width: 7rem;
+  object-fit: contain;
+  display: block;
+}
+</style>
+
 <div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
   <div class="flex flex-wrap gap-2">
     <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
@@ -30,6 +43,7 @@ sticky_rank: 1
     <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
   </div>
 </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
@@ -84,6 +98,11 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/sd-auto/",
       frontendUrl: "https://github.com/Ahaanv19/SD_Auto_Frontend",
       backendUrl: "https://github.com/Ahaanv19/SD_Auto_Backend"
+    },
+    "SFI Foundation": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/greppers/",
+      frontendUrl: "http://sfifoundation.opencodingsociety.com",
+      backendUrl: "https://greppers-be.opencodingsociety.com/"
     }
   };
 
@@ -198,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   document.addEventListener('keydown', event=>{
     if(event.key === 'Escape') closeAllPopups();
-  });
+  });     
   searchInput.addEventListener('input', event=>{
     currentQuery = normalize(event.target.value);
     applyFilters();
@@ -366,9 +385,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- Poway Symphonic Orchestra Capstone -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{{ '/capstone/powayorchestra/' | relative_url }}">
-           <img src="{{ '/images/pso_logo.png' | relative_url }}" alt="Poway Symphony Orchestra logo" class="w-28 h-28 object-contain rounded bg-white p-2" />
+           <div class="w-28 h-28 overflow-hidden rounded bg-white">
+               <img src="{{ '/images/pso_logo.png' | relative_url }}" alt="Poway Symphony Orchestra logo" class="w-full h-full object-cover scale-125" />
+           </div>
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{{ '/capstone/powayorchestra/' | relative_url }}">Poway Symphony Orchestra</a></h3>
@@ -377,14 +398,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- Binary Beasts -->
+   <!-- Poway NEC -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-06-pybl-capstone %}">
-           <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
+       <a href="{% post_url 2026-03-06-powaynec-capstone %}">
+           <img src="/images/capstone/powaynec.png" alt="Poway NEC capstone preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
-           <p class="text-sm text-gray-700">Poway NEC website updated with new features to provide valuable changes that improve quality of life for the organization, including a login system, danger predictor, and AI chatbot.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
+           <p class="text-sm text-gray-700">Poway NEC capstone updates for preparedness access, including live risk information, emergency learning games, a chatbot, and account tools for volunteer coordination.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
        </div>
    </div>
@@ -541,7 +562,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">RCR: Poway-Midland Railroad</a></h3>
-           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with interactive features, real-time train schedules, virtual tours, GPS tracking, educational coding games, and volunteer management tools.</p>
+           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with interactive features, real-time train schedules, virtual tours, GPS tracking, and volunteer management tools.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Rebecca, Cyrus, Rishabh</p>
        </div>
    </div>
@@ -594,4 +615,3 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 </div>
-

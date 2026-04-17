@@ -12,16 +12,36 @@
   {% for topic in data.Topics %}
   <div class="pv-card">
     <div class="pv-card-grid">
-      
-      <!-- Left: Image & Status -->
+
+      <!-- Left: Before Section -->
+      {% if topic.beforePoints %}
       <div class="pv-visual">
-        <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-image-link">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-image">
-          <div class="pv-overlay">
-            <span>View Project</span>
+        <div class="pv-before-block">
+
+          <!-- Logo banner at top -->
+          <div class="pv-before-logo-wrap">
+            <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-before-logo">
+            <div class="pv-before-logo-overlay">
+              {% if topic.before_link %}
+              <a href="{{ topic.before_link }}" target="_blank" rel="noopener noreferrer" class="pv-before-title-link">
+                <span class="pv-before-label">BEFORE</span><span class="pv-before-arrow">↗</span>
+              </a>
+              {% else %}
+              <span class="pv-before-label">BEFORE</span>
+              {% endif %}
+            </div>
           </div>
-        </a>
+
+          <!-- Bullet points below -->
+          <ul class="pv-before-list">
+            {% for point in topic.beforePoints %}
+            <li class="pv-before-item">{{ point }}</li>
+            {% endfor %}
+          </ul>
+
+        </div>
       </div>
+      {% endif %}
 
       <!-- Center: Key Points -->
       <div class="pv-content">
@@ -44,22 +64,164 @@
         </div>
       </div>
 
-      <!-- Right: Description & Impact -->
+      <!-- Right: Description & GIF -->
       <div class="pv-details">
         <h3 class="pv-section-title">About</h3>
         <p class="pv-about">{{ topic.description }}</p>
-        
-        <h3 class="pv-section-title">Impact</h3>
-        <div class="pv-impact-list">
-          {% for item in topic.impact %}
-          <div class="pv-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
 
+        {% if topic.gif %}
+        <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-gif-link">
+          <img src="{{ site.baseurl }}/images/{{ topic.gif }}" alt="{{ topic.alt }} preview" class="pv-gif">
+          <div class="pv-gif-overlay">
+            <span>Learn More →</span>
+          </div>
+        </a>
+        {% else %}
         <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-btn">Learn More</a>
+        {% endif %}
       </div>
 
     </div>
   </div>
   {% endfor %}
 </div>
+
+<style>
+/* ── Visual column reset ─────────────────────────────────────── */
+.pv-infograph .pv-visual {
+  padding: 0;
+  background: none;
+  border: none;
+  align-items: stretch;
+}
+
+/* ── Before block ────────────────────────────────────────────── */
+.pv-before-block {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Logo banner — fixed height at top */
+.pv-before-logo-wrap {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pv-before-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* BEFORE label overlaid on the logo */
+.pv-before-logo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.4rem 0.6rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+
+.pv-before-title-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pv-before-title-link:hover .pv-before-label {
+  color: #ddd;
+}
+
+.pv-before-arrow {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.pv-before-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+/* Bullet points below the logo */
+.pv-before-list {
+  margin: 0;
+  padding: 0.75rem 0.9rem 0.75rem 1.75rem;
+  list-style: disc;
+  flex: 1;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pv-before-item {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.45;
+  margin-bottom: 0.35rem;
+}
+
+.pv-before-item:last-child {
+  margin-bottom: 0;
+}
+
+/* ── GIF with hover overlay ──────────────────────────────────── */
+.pv-gif-link {
+  display: block;
+  position: relative;
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.pv-gif {
+  width: 100%;
+  display: block;
+  border-radius: 8px;
+  transition: filter 0.25s ease;
+}
+
+.pv-gif-link:hover .pv-gif {
+  filter: brightness(0.45);
+}
+
+.pv-gif-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.pv-gif-link:hover .pv-gif-overlay {
+  opacity: 1;
+}
+
+.pv-gif-overlay span {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+</style>
