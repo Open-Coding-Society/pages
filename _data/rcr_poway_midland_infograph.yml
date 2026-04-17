@@ -5,7 +5,7 @@ Description: "A Design-Based Research capstone by RCR team transforming the Powa
 Features:
   - title: "RCR Interactive Train Schedule System"
     image: "images/capstone/RCR-inforgraph.png"
-    link: "https://rcr.opencodingsociety.com/railroad/schedule"
+    link: "https://rcr.opencodingsociety.com/schedule"
     alt: "RCR Interactive Train Schedule - Real-time departure board showing train times and availability"
     keyPoints:
       - "Real-time departure status (Running, Delayed, Full)"
@@ -30,7 +30,7 @@ Features:
 
   - title: "RCR Virtual Railroad Tour"
     image: "images/capstone/360.png"
-    link: "https://rcr.opencodingsociety.com/railroad/camera"
+    link: "https://rcr.opencodingsociety.com/camera"
     alt: "RCR Virtual Railroad Tour - 360° interactive views of trains and Old Poway Park"
     keyPoints:
       - "360° panoramic views of locomotives and tracks"
@@ -55,7 +55,7 @@ Features:
 
   - title: "RCR Live Train Tracker"
     image: "images/capstone/tracking.png"
-    link: "https://rcr.opencodingsociety.com/railroad/calendar"
+    link: "https://rcr.opencodingsociety.com/schedule"
     alt: "RCR Live Train Tracker - Real-time GPS map showing train position on tracks"
     keyPoints:
       - "Live train position on interactive park map"
@@ -80,7 +80,7 @@ Features:
 
   - title: "RCR Volunteer Management Portal"
     image: "images/capstone/Management Portal.png"
-    link: "https://rcr.opencodingsociety.com/railroad/volunteer-schedule"
+    link: "https://rcr.opencodingsociety.com/volunteer-schedule"
     alt: "RCR Volunteer Portal - Digital scheduling and hours tracking interface"
     keyPoints:
       - "Online shift sign-up with automated reminders"

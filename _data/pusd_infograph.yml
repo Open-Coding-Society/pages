@@ -6,6 +6,26 @@ Topics:
     image: "capstone/pusd_foundation.svg"
     link: "https://pusdfoundation.powayusd.com/"
     alt: "PUSD Foundation logo — school building with graduation cap"
+    subtitle: "Enriching Education — Investing in Every PUSD Student"
+    description: "The PUSD Foundation is the philanthropic partner of Poway Unified School District, one of California's top-performing districts in northern San Diego County. Through business partnerships, community donations (Golf Classic fundraiser, The Giving Tree), and strategic grants, the Foundation funds programs that would otherwise be beyond standard district budgets — bridging the gap between classroom learning and real-world career preparation."
+    status: "Active 501(c)(3) District Foundation"
+    team:
+      - "PUSD Foundation Board of Directors"
+      - "Poway Unified School District Partners"
+
+    problems:
+      - "Standard district budgets cannot fund enrichment programs like STEAM arts, advanced STEM tracks, or career-technical education without outside support"
+      - "Students lack direct, structured connections to industry professionals and real-world career pathways before graduation"
+      - "School safety, wellness, and transition support programs are chronically underfunded, leaving vulnerable students without critical resources"
+
+    ideas:
+      - title: "Student STEAM Portfolio Platform"
+        description: "An interactive showcase where students document and publish STEAM projects funded by the Foundation, creating a college-ready digital portfolio"
+      - title: "Business–School Mentor Matchmaker"
+        description: "A platform connecting PUSD students with vetted business partners for mentorship, job shadows, and career-fair follow-ups beyond the annual event"
+      - title: "Donor Impact Dashboard"
+        description: "A transparent, real-time web dashboard showing donors exactly which programs and school sites their contributions are funding — driving continued community investment"
+
     keyPoints:
       - "Funds Dream to STEAM arts and STEM education programs"
       - "Project Lead The Way career technical education"
@@ -13,21 +33,29 @@ Topics:
       - "Project Fuel the Future community support initiative"
       - "The Giving Tree and Starstruck! Awards recognition programs"
       - "School Safety Programs and Youth in Transition support"
-    subtitle: "Enriching Education — Investing in Every PUSD Student"
-    description: "The PUSD Foundation is the philanthropic partner of Poway Unified School District, one of California's top-performing districts in northern San Diego County. Through business partnerships, community donations (Golf Classic fundraiser, The Giving Tree), and strategic grants, the Foundation funds programs that would otherwise be beyond standard district budgets — bridging the gap between classroom learning and real-world career preparation."
+
     tech:
-      - "Dream to STEAM"
-      - "Project Lead The Way"
-      - "Career Fairs & Readiness"
-      - "Youth in Transition"
-      - "School Safety Programs"
-      - "Annual Golf Classic Fundraiser"
+      - name: "Dream to STEAM"
+        solves: "Bridges arts and STEM for interdisciplinary learning that standard budgets cannot support"
+      - name: "Project Lead The Way"
+        solves: "Industry-aligned technical curriculum prepares students for real STEM/CTE careers"
+      - name: "Career Fair Platform"
+        solves: "Direct student-to-employer connections that overcome the school-to-work gap"
+      - name: "Youth in Transition Program"
+        solves: "Dedicated support system for students navigating difficult life circumstances"
+      - name: "Annual Golf Classic Fundraiser"
+        solves: "Community philanthropy engine that sustains all programs outside public funding cycles"
+
     impact:
       - "Funds STEM and arts education across all PUSD school sites"
       - "Business and industry partnerships creating workforce pipelines"
       - "Career fairs connecting students with real employers"
       - "Community-funded safety and wellness infrastructure"
       - "Starstruck! Awards recognizing outstanding district partners"
-    status: "Active 501(c)(3) District Foundation"
-    team:
-      - "Rudra Darshan Sathwik"
+
+    weeklyIssues:
+      - "Research PUSD Foundation programs in detail — Dream to STEAM, PLTW, Career Fairs"
+      - "Design YAML data structure with problems, ideas, tech, and weeklyIssues fields"
+      - "Build HTML/SCSS template for PUSD infographic matching capstone pattern"
+      - "Create SVG badge logo for PUSD Foundation and place in images/capstone/"
+      - "Write the capstone .md post and verify Jekyll build at /capstone/pusd/"

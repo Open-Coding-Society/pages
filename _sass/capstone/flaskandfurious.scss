@@ -355,6 +355,7 @@ $dec-text-light: #d8eeec;
   max-height: 220px;
   object-fit: cover;
   display: block;
+  max-width: 100%;
 }
 
 .dec-video-label {
@@ -370,5 +371,20 @@ $dec-text-light: #d8eeec;
 @media (max-width: 960px) {
   .dec-video-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dec-video-card video {
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dec-infograph {
+    padding: 1rem;
+  }
+  .dec-video-card video {
+    max-height: 150px;
   }
 }
