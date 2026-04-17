@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function(){
       frontendUrl: "https://github.com/Ahaanv19/SD_Auto_Frontend",
       backendUrl: "https://github.com/Ahaanv19/SD_Auto_Backend"
     },
-    "Greppers": {
+    "SFI Foundation": {
       pageUrl: "https://pages.opencodingsociety.com/capstone/greppers/",
       frontendUrl: "http://sfifoundation.opencodingsociety.com",
       backendUrl: "https://greppers-be.opencodingsociety.com/"
