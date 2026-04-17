@@ -1,6 +1,7 @@
 _site
 *.pyc
 __pycache__/
+_config.local.yml
 _posts/**/*_IPYNB_2_.md
 _posts/**/*_GithubIssue_.md
 _posts/**/*_GithubIssue.md

@@ -16,27 +16,28 @@
   }
 
   .pso-infograph {
-    --pso-burgundy: #5c1118;
-    --pso-burgundy-deep: #3a090f;
-    --pso-burgundy-soft: #704444;
-    --pso-cream: #eadccf;
-    --pso-card-cream: #dec8b8;
-    --pso-cream-strong: #f1e4db;
-    --pso-cream-muted: #d2b9a9;
-    --pso-cream-deep: #bea18f;
-    --pso-panel-soft: #8a6262;
-    --pso-panel-deep: #5a3434;
-    --pso-rose-pale: #c79f9f;
-    --pso-text: #2f120f;
+    --pso-burgundy: #561116;
+    --pso-burgundy-deep: #2b0608;
+    --pso-burgundy-soft: #683029;
+    --pso-cream: #d7c2b4;
+    --pso-card-cream: #c9afa0;
+    --pso-cream-strong: #ead9cf;
+    --pso-cream-muted: #b59584;
+    --pso-cream-deep: #96786c;
+    --pso-panel-soft: #72342d;
+    --pso-panel-deep: #471517;
+    --pso-rose-pale: #a97969;
+    --pso-gold: #e2bc86;
+    --pso-text: #23100d;
     --pso-shadow: rgba(46, 8, 12, 0.24);
-    width: min(1600px, 90vw, calc(100vw - 2rem)) !important;
+    width: min(1880px, 96vw, calc(100vw - 1.5rem)) !important;
     max-width: none !important;
     min-width: 0;
     flex: 0 1 auto;
     box-sizing: border-box;
     margin: 0 auto !important;
-    padding: 2.25rem clamp(1rem, 2vw, 1.5rem) 3.25rem;
-    background: linear-gradient(180deg, var(--pso-cream) 0%, var(--pso-cream-muted) 52%, var(--pso-cream-deep) 100%);
+    padding: 2.6rem clamp(1.1rem, 2.2vw, 1.9rem) 3.6rem;
+    background: linear-gradient(180deg, var(--pso-cream) 0%, var(--pso-cream-muted) 52%, #84665b 100%);
     border-radius: 32px;
     box-shadow: 0 24px 60px rgba(30, 5, 7, 0.18);
     color: var(--pso-text);
@@ -45,11 +46,11 @@
   .pso-infograph .sip-header {
     width: 100%;
     box-sizing: border-box;
-    background: linear-gradient(180deg, var(--pso-panel-soft) 0%, var(--pso-panel-deep) 100%);
+    background: linear-gradient(180deg, #78332c 0%, var(--pso-panel-deep) 100%);
     border: 1px solid rgba(212, 168, 168, 0.32);
     border-radius: 24px;
     box-shadow: 0 18px 40px rgba(30, 5, 7, 0.16);
-    padding: 2.5rem 3rem;
+    padding: 2.9rem 3.4rem;
     margin: 0 auto 1.75rem;
     position: relative;
     overflow: hidden;
@@ -89,10 +90,9 @@
   .pso-infograph .sip-title,
   .pso-infograph .sip-project-title,
   .pso-infograph .sip-section-title {
-    color: var(--pso-burgundy-soft);
+    color: var(--pso-cream-strong);
   }
 
-  .pso-infograph .sip-header .sip-title,
   .pso-infograph .sip-header .sip-section-title,
   .pso-infograph .sip-card .sip-project-title,
   .pso-infograph .sip-card .sip-section-title,
@@ -101,17 +101,13 @@
     color: var(--pso-cream-strong) !important;
   }
 
-  .pso-infograph .sip-header,
   .pso-infograph .sip-card,
   .pso-infograph .sip-content,
   .pso-infograph .sip-details,
-  .pso-infograph .sip-tech-tag,
-  .pso-infograph .sip-btn,
-  .pso-infograph .sip-btn::after {
-    color: var(--pso-burgundy-deep);
+  .pso-infograph .sip-tech-tag {
+    color: var(--pso-cream-strong);
   }
 
-  .pso-infograph .sip-header,
   .pso-infograph .sip-header > :not(.sip-impact-list),
   .pso-infograph .sip-header > :not(.sip-impact-list) * {
     color: var(--pso-cream-strong);
@@ -125,12 +121,47 @@
   .pso-infograph .sip-details > :not(.sip-keypoints):not(.sip-impact-list) *,
   .pso-infograph .sip-card > :not(.sip-card-grid),
   .pso-infograph .sip-card > :not(.sip-card-grid) * {
-    color: var(--pso-burgundy-deep);
+    color: var(--pso-cream-strong);
+  }
+
+  .pso-infograph .sip-info-list {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.2rem 0.7rem;
+    align-items: baseline;
+    padding: 0.1rem 0;
+    border-bottom: 1px solid rgba(241, 228, 219, 0.08);
+  }
+
+  .pso-infograph .sip-info-list:last-child {
+    border-bottom: 0;
+  }
+
+  .pso-infograph .sip-info-list dt {
+    color: #f3d7b0 !important;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .pso-infograph .sip-info-list dd,
+  .pso-infograph .sip-info-list a {
+    color: var(--pso-cream-strong) !important;
+    font-weight: 500;
+    line-height: 1.5;
+    text-decoration: none;
+    margin: 0;
+  }
+
+  .pso-infograph .sip-info-list a:hover {
+    text-decoration: underline;
   }
 
   .pso-infograph .sip-description,
   .pso-infograph .sip-header .sip-impact-item {
-    color: var(--pso-burgundy-deep);
+    color: var(--pso-cream-strong);
   }
 
   .pso-infograph .sip-header .sip-description,
@@ -141,21 +172,31 @@
   .pso-infograph .sip-card {
     width: 100%;
     box-sizing: border-box;
-    background: linear-gradient(180deg, var(--pso-card-cream) 0%, var(--pso-cream-muted) 100%);
+    background: linear-gradient(180deg, var(--pso-card-cream) 0%, #b38f81 100%);
     border: 1px solid var(--pso-rose-pale);
     border-radius: 24px;
     box-shadow: 0 22px 44px rgba(26, 4, 6, 0.22);
-    padding: 2.2rem;
-    margin: 0 auto 1.75rem;
-    color: var(--pso-burgundy-deep);
+    padding: 2.45rem;
+    margin: 0 auto 2rem;
+    color: var(--pso-cream-strong);
   }
 
   .pso-infograph .sip-card-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 2.25rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     align-items: stretch;
     justify-content: center;
+  }
+
+  .pso-infograph .sip-content,
+  .pso-infograph .sip-details {
+    display: grid;
+    gap: 1.2rem;
+    align-content: start;
+    width: 100%;
+    max-width: 1220px;
+    margin: 0 auto;
   }
 
   .pso-infograph .sip-card .sip-project-title,
@@ -163,7 +204,7 @@
   .pso-infograph .sip-card .sip-subtitle,
   .pso-infograph .sip-card .sip-about,
   .pso-infograph .sip-card .sip-impact-item {
-    color: var(--pso-burgundy-deep) !important;
+    color: var(--pso-cream-strong) !important;
   }
 
   .pso-infograph .sip-card .sip-section-title {
@@ -178,7 +219,7 @@
     background: linear-gradient(180deg, var(--pso-panel-soft) 0%, var(--pso-panel-deep) 100%);
     border: 1px solid rgba(199, 159, 159, 0.26);
     border-radius: 18px;
-    padding: 1.25rem;
+    padding: 1.55rem;
     box-shadow: inset 0 0 0 1px rgba(255, 248, 234, 0.06);
     color: var(--pso-cream-strong) !important;
   }
@@ -210,6 +251,10 @@
     justify-items: center;
   }
 
+  .pso-infograph .sip-tech-stack {
+    display: none;
+  }
+
   .pso-infograph .sip-about,
   .pso-infograph .sip-subtitle,
   .pso-infograph .sip-description {
@@ -221,12 +266,16 @@
   .pso-infograph .sip-keypoints,
   .pso-infograph .sip-impact-list {
     display: grid;
-    gap: 0.8rem;
+    gap: 1rem;
   }
 
   .pso-infograph .sip-keypoint,
   .pso-infograph .sip-impact-item {
-    background: #512f2f;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: 0.75rem;
+    background: #4d1d1b;
     border-left: 4px solid var(--pso-gold);
     border-radius: 14px;
     padding: 0.9rem 1rem;
@@ -234,6 +283,376 @@
     color: var(--pso-cream-strong);
     box-shadow: inset 0 0 0 1px rgba(255, 248, 234, 0.1);
     backdrop-filter: blur(1px);
+  }
+
+  .pso-infograph .sip-keypoint-copy {
+    display: block;
+  }
+
+  .pso-infograph .sip-site-highlights {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.3rem;
+    margin-top: 1.2rem;
+    align-items: stretch;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint {
+    grid-template-columns: 1fr;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    border-left-width: 0;
+    border-top: 4px solid var(--pso-gold);
+    text-align: left;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-check {
+    display: none;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint-body {
+    gap: 0.6rem;
+    padding: 0 0 1rem;
+    min-height: 100%;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint-copy,
+  .pso-infograph .sip-site-highlights .sip-keypoint-text {
+    padding: 0 1rem;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint-action {
+    margin-top: 0.15rem;
+    padding: 0 1rem;
+  }
+
+  .pso-infograph .sip-keypoint-image-link {
+    display: block;
+    width: 100%;
+  }
+
+  .pso-infograph .sip-keypoint-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    min-height: 220px;
+    object-fit: cover;
+    object-position: center;
+    border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+    background: rgba(255, 248, 234, 0.08);
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint:nth-child(3) .sip-keypoint-image {
+    object-position: center 24%;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint:nth-child(5) .sip-keypoint-image {
+    object-fit: contain;
+    object-position: center;
+    padding: 0.85rem;
+    background: #fff;
+  }
+
+  .pso-infograph .sip-keypoint-eyebrow {
+    color: #e6c9b7 !important;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0 1rem;
+    margin-top: 0.95rem;
+  }
+
+  .pso-infograph .sip-keypoint-action {
+    margin-top: 0.35rem;
+  }
+
+  .pso-infograph .sip-impact-action {
+    margin-top: 0.55rem;
+  }
+
+  .pso-infograph .sip-impact-action .sip-btn {
+    min-width: 0;
+    padding: 0.72rem 1.1rem;
+    font-size: 0.9rem;
+  }
+
+  .pso-infograph .sip-wow-factors .sip-impact-action {
+    margin-top: 0.7rem;
+    justify-self: start;
+  }
+
+  .pso-infograph .sip-wow-factors .sip-impact-item {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .pso-infograph .sip-wow-factors .sip-impact-action .sip-btn {
+    min-width: 0;
+    width: auto;
+    padding: 0.68rem 1rem;
+    font-size: 0.84rem;
+    letter-spacing: 0.02em;
+    justify-content: flex-start;
+  }
+
+  .pso-infograph .sip-preview-card {
+    display: block;
+    width: 100%;
+    margin: 0.95rem 0 0;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 248, 234, 0.14);
+    background: linear-gradient(180deg, rgba(50, 14, 18, 0.96) 0%, rgba(29, 8, 11, 0.99) 100%);
+    box-shadow: 0 16px 32px rgba(21, 4, 6, 0.24), inset 0 0 0 1px rgba(255, 248, 234, 0.05);
+  }
+
+  .pso-infograph .sip-preview-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    min-height: 250px;
+    object-fit: cover;
+    object-position: center;
+    background: rgba(255, 248, 234, 0.08);
+  }
+
+  .pso-infograph .sip-panel-section {
+    display: grid;
+    gap: 0.95rem;
+    padding: 1.2rem;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(64, 18, 22, 0.92) 0%, rgba(37, 9, 12, 0.98) 100%);
+    border: 1px solid rgba(241, 228, 219, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(255, 248, 234, 0.05);
+  }
+
+  .pso-infograph .sip-panel-section--soft {
+    background: linear-gradient(180deg, rgba(82, 33, 35, 0.9) 0%, rgba(48, 16, 18, 0.98) 100%);
+  }
+
+  .pso-infograph .sip-panel-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid rgba(241, 228, 219, 0.12);
+  }
+
+  .pso-infograph .sip-panel-label {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 0.42rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(226, 188, 134, 0.14);
+    border: 1px solid rgba(226, 188, 134, 0.32);
+    color: #f3d7b0 !important;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-section-copy {
+    max-width: none;
+    margin: 0;
+    text-align: left;
+  }
+
+  .pso-infograph .sip-details .sip-section-copy,
+  .pso-infograph .sip-details .sip-impact-item,
+  .pso-infograph .sip-content .sip-section-copy {
+    width: 100%;
+  }
+
+  .pso-infograph .sip-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .pso-infograph .sip-detail-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+  }
+
+  .pso-infograph .sip-detail-pair .sip-panel-section {
+    height: 100%;
+    align-content: start;
+  }
+
+  .pso-infograph .sip-info-card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    background: rgba(255, 248, 234, 0.06);
+    border: 1px solid rgba(241, 228, 219, 0.1);
+  }
+
+  .pso-infograph .sip-info-card strong {
+    color: #f3d7b0 !important;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-info-card span,
+  .pso-infograph .sip-info-card a {
+    color: var(--pso-cream-strong) !important;
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+
+  .pso-infograph .sip-info-card a:hover {
+    text-decoration: underline;
+  }
+
+  .pso-infograph .sip-interactive-list .sip-keypoint:nth-child(3) .sip-preview-image {
+    object-position: center 22%;
+  }
+
+  .pso-infograph .sip-preview-body {
+    display: grid;
+    gap: 0.7rem;
+    padding: 1rem 1.1rem 1.1rem;
+  }
+
+  .pso-infograph .sip-content > .sip-keypoints:not(.sip-site-highlights) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .pso-infograph .sip-interactive-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .pso-infograph .sip-interactive-featured {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.15rem;
+    align-items: stretch;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-keypoint {
+    grid-template-columns: 1fr;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    border-left-width: 0;
+    border-top: 4px solid var(--pso-gold);
+    text-align: left;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-check {
+    display: none;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-keypoint-body {
+    gap: 0.6rem;
+    padding: 0 0 1rem;
+    min-height: 100%;
+  }
+
+  .pso-infograph .sip-interactive-featured .sip-keypoint-text,
+  .pso-infograph .sip-interactive-featured .sip-keypoint-action {
+    padding: 0 1rem;
+  }
+
+  .pso-infograph .sip-interactive-secondary {
+    grid-template-columns: 1fr;
+  }
+
+  .pso-infograph .sip-secondary-heading {
+    margin: 0.25rem 0 0;
+    color: #f3d7b0 !important;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-interactive-list .sip-keypoint,
+  .pso-infograph .sip-wow-factors .sip-impact-item,
+  .pso-infograph .sip-details .sip-impact-item {
+    width: 100%;
+  }
+
+  .pso-infograph .sip-content > .sip-keypoints:not(.sip-site-highlights) .sip-keypoint {
+    width: 100%;
+    height: 100%;
+  }
+
+  .pso-infograph .sip-details .sip-impact-list {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .pso-infograph .sip-preview-fallback {
+    min-height: 10.5rem;
+    background:
+      radial-gradient(circle at top right, rgba(199, 159, 159, 0.28), rgba(199, 159, 159, 0) 42%),
+      linear-gradient(180deg, rgba(255, 248, 234, 0.09) 0%, rgba(255, 248, 234, 0.04) 100%);
+  }
+
+  .pso-infograph .sip-preview-label {
+    color: #e6c9b7 !important;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.95;
+  }
+
+  .pso-infograph .sip-preview-title {
+    color: var(--pso-cream-strong) !important;
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .pso-infograph .sip-preview-text {
+    color: rgba(241, 228, 219, 0.92) !important;
+    font-size: 0.91rem;
+    line-height: 1.55;
+  }
+
+  .pso-infograph .sip-preview-highlights {
+    color: rgba(230, 201, 183, 0.88) !important;
+    font-size: 0.83rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .pso-infograph .sip-preview-body .sip-btn {
+    min-width: 0;
+    width: fit-content;
+    padding: 0.78rem 1.2rem;
+    font-size: 0.9rem;
+    margin-top: 0.15rem;
+  }
+
+  .pso-infograph .sip-keypoint-action .sip-btn {
+    min-width: 0;
+    padding: 0.78rem 1.2rem;
+    font-size: 0.92rem;
+  }
+
+  .pso-infograph .sip-keypoint-body {
+    display: grid;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .pso-infograph .sip-keypoint-text {
+    display: block;
   }
 
   .pso-infograph .sip-keypoint,
@@ -281,16 +700,71 @@
   }
 
   .pso-infograph .sip-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.1rem;
+    display: grid;
+    justify-items: center;
+    gap: 0.7rem;
     margin-top: 1.6rem;
     margin-bottom: 1.8rem;
   }
 
+  .pso-infograph .sip-actions .sip-btn-primary {
+    min-width: 390px;
+    padding: 1.35rem 2.45rem;
+    font-size: 1.14rem;
+    letter-spacing: 0.055em;
+    border-width: 1px;
+    background: linear-gradient(135deg, #7a171d 0%, #ad3538 50%, #c88966 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.18),
+      0 20px 36px rgba(21, 4, 6, 0.28),
+      0 0 0 6px rgba(234, 217, 207, 0.08);
+  }
+
+  .pso-infograph .sip-actions .sip-btn-primary:hover,
+  .pso-infograph .sip-actions .sip-btn-primary:focus-visible {
+    background: linear-gradient(135deg, #8a1d23 0%, #be4043 50%, #d49872 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.32),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.16),
+      0 24px 42px rgba(21, 4, 6, 0.32),
+      0 0 0 7px rgba(234, 217, 207, 0.1);
+  }
+
+  .pso-infograph .sip-actions .sip-btn-secondary {
+    min-width: 0;
+    padding: 0.82rem 1.15rem;
+    font-size: 0.84rem;
+    letter-spacing: 0.03em;
+    background: linear-gradient(135deg, rgba(102, 32, 34, 0.94) 0%, rgba(142, 69, 59, 0.98) 100%);
+    border-color: rgba(241, 228, 219, 0.24);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.12),
+      0 8px 18px rgba(21, 4, 6, 0.16);
+    opacity: 0.96;
+    justify-self: center;
+  }
+
+  .pso-infograph .sip-actions .sip-btn-secondary:hover,
+  .pso-infograph .sip-actions .sip-btn-secondary:focus-visible {
+    background: linear-gradient(135deg, rgba(118, 36, 39, 0.97) 0%, rgba(164, 82, 69, 0.99) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.1),
+      0 12px 22px rgba(21, 4, 6, 0.18);
+  }
+
   .pso-infograph .sip-header .sip-impact-list {
     margin-top: 0.4rem;
+  }
+
+  .pso-infograph .sip-meta-footer {
+    margin: 0.75rem auto 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
   }
 
   .pso-infograph .sip-btn {
@@ -298,18 +772,24 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    gap: 0.7rem;
-    min-width: 244px;
-    padding: 1.05rem 1.55rem;
-    background: linear-gradient(145deg, var(--pso-cream) 0%, var(--pso-card-cream) 55%, var(--pso-cream-deep) 100%);
-    color: var(--pso-burgundy-deep);
-    border: 1px solid rgba(127, 83, 83, 0.24);
+    gap: 0.45rem;
+    min-width: 272px;
+    padding: 1.15rem 1.75rem;
+    background:
+      linear-gradient(135deg, #6f1a1f 0%, #9d3940 52%, #be8669 100%);
+    color: var(--pso-cream-strong);
+    border: 1px solid rgba(241, 228, 219, 0.38);
     border-radius: 999px;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.035em;
+    font-size: 0.98rem;
     text-decoration: none;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 -1px 0 rgba(127, 83, 83, 0.12), 0 14px 24px rgba(21, 4, 6, 0.16);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    text-shadow: 0 1px 0 rgba(58, 9, 15, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.26),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.18),
+      0 12px 24px rgba(21, 4, 6, 0.18);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease, filter 0.18s ease;
     overflow: hidden;
   }
 
@@ -318,7 +798,7 @@
   .pso-infograph .sip-btn:hover,
   .pso-infograph .sip-btn:active,
   .pso-infograph .sip-btn:focus-visible {
-    color: var(--pso-burgundy-deep) !important;
+    color: var(--pso-cream-strong) !important;
     text-decoration: none;
   }
 
@@ -329,8 +809,8 @@
   .pso-infograph a.sip-btn:active,
   .pso-infograph a.sip-btn:focus-visible,
   .pso-infograph a.sip-btn *,
-  .pso-infograph a.sip-btn::after {
-    color: var(--pso-burgundy-deep) !important;
+  .pso-infograph a.sip-btn::before {
+    color: var(--pso-cream-strong) !important;
     text-decoration: none !important;
   }
 
@@ -339,31 +819,22 @@
     position: absolute;
     inset: 1px;
     border-radius: inherit;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 45%);
+    background:
+      radial-gradient(circle at top left, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 34%),
+      linear-gradient(180deg, rgba(255, 245, 239, 0.2) 0%, rgba(255, 255, 255, 0) 54%);
     pointer-events: none;
-  }
-
-  .pso-infograph .sip-btn::after {
-    content: "->";
-    font-size: 1rem;
-    color: inherit;
-    opacity: 0.95;
-    position: relative;
-    transform: translateX(0);
-    transition: transform 0.18s ease;
   }
 
   .pso-infograph .sip-btn:hover,
   .pso-infograph .sip-btn:focus-visible {
-    background: linear-gradient(145deg, #f1e3d7 0%, var(--pso-cream) 55%, var(--pso-card-cream) 100%);
-    border-color: rgba(127, 83, 83, 0.34);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26), inset 0 -1px 0 rgba(127, 83, 83, 0.14), 0 18px 30px rgba(21, 4, 6, 0.2);
-    transform: translateY(-2px) scale(1.01);
-  }
-
-  .pso-infograph .sip-btn:hover::after,
-  .pso-infograph .sip-btn:focus-visible::after {
-    transform: translateX(2px);
+    background: linear-gradient(135deg, #75202d 0%, #a94e61 52%, #cd9984 100%);
+    border-color: rgba(255, 242, 236, 0.48);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.14),
+      0 16px 30px rgba(21, 4, 6, 0.22);
+    transform: translateY(-2px) scale(1.015);
+    filter: saturate(1.02) brightness(1.02);
   }
 
   .pso-infograph .sip-btn:focus-visible {
@@ -371,16 +842,127 @@
     outline-offset: 2px;
   }
 
-  @media (min-width: 1280px) {
-    .pso-infograph .sip-card-grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  .pso-infograph .sip-btn-spotlight,
+  .pso-infograph .sip-btn-interactive,
+  .pso-infograph .sip-btn-interactive-main {
+    border-width: 1px;
+    border-color: rgba(255, 236, 201, 0.52);
+    background:
+      linear-gradient(135deg, #8f1d24 0%, #d14a45 46%, #f0b56c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.34),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.14),
+      0 16px 32px rgba(56, 10, 14, 0.28),
+      0 0 0 5px rgba(240, 181, 108, 0.09);
+    text-shadow: 0 1px 0 rgba(58, 9, 15, 0.22);
+  }
+
+  .pso-infograph .sip-btn-spotlight::after,
+  .pso-infograph .sip-btn-interactive::after,
+  .pso-infograph .sip-btn-interactive-main::after {
+    content: "";
+    position: absolute;
+    inset: auto 14% 10% 14%;
+    height: 48%;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(255, 235, 198, 0.26) 0%, rgba(255, 235, 198, 0) 78%);
+    pointer-events: none;
+    filter: blur(10px);
+  }
+
+  .pso-infograph .sip-btn-spotlight {
+    min-width: 420px;
+    padding: 1.42rem 2.7rem;
+    font-size: 1.16rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .pso-infograph .sip-btn-interactive-main {
+    min-width: 250px;
+    padding: 0.96rem 1.45rem;
+    font-size: 0.96rem;
+  }
+
+  .pso-infograph .sip-btn-interactive {
+    min-width: 0;
+    padding: 0.88rem 1.3rem;
+    font-size: 0.92rem;
+  }
+
+  .pso-infograph .sip-btn-spotlight:hover,
+  .pso-infograph .sip-btn-spotlight:focus-visible,
+  .pso-infograph .sip-btn-interactive:hover,
+  .pso-infograph .sip-btn-interactive:focus-visible,
+  .pso-infograph .sip-btn-interactive-main:hover,
+  .pso-infograph .sip-btn-interactive-main:focus-visible {
+    background:
+      linear-gradient(135deg, #a9242d 0%, #eb5a52 46%, #ffd089 100%);
+    border-color: rgba(255, 242, 219, 0.68);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.38),
+      inset 0 -1px 0 rgba(91, 28, 37, 0.1),
+      0 20px 38px rgba(56, 10, 14, 0.34),
+      0 0 0 6px rgba(240, 181, 108, 0.12);
+    transform: translateY(-3px) scale(1.02);
+    filter: saturate(1.05) brightness(1.03);
+  }
+
+  .pso-infograph .sip-btn-interactive-main,
+  .pso-infograph .sip-preview-body .sip-btn-interactive,
+  .pso-infograph .sip-keypoint-action .sip-btn-interactive {
+    font-weight: 800;
+  }
+
+  @media (max-width: 1400px) {
+    .pso-infograph .sip-site-highlights {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pso-infograph .sip-interactive-featured {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (max-width: 1100px) {
     .pso-infograph .sip-card-grid {
       grid-template-columns: 1fr;
-      gap: 1.4rem;
+      gap: 1.2rem;
+    }
+
+    .pso-infograph .sip-site-highlights {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pso-infograph .sip-content > .sip-keypoints:not(.sip-site-highlights) {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-interactive-list,
+    .pso-infograph .sip-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-detail-pair {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-interactive-featured {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pso-infograph .sip-meta-footer {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .pso-infograph .sip-site-highlights {
+      grid-template-columns: 1fr;
     }
   }
 
@@ -395,21 +977,47 @@
     }
 
     .pso-infograph {
-      width: min(100%, calc(100vw - 1rem));
+      width: min(100%, calc(100vw - 0.75rem));
       border-radius: 24px;
-      padding: 1.25rem 0.75rem 2rem;
+      padding: 1.35rem 0.75rem 2.1rem;
     }
 
     .pso-infograph .sip-header {
-      padding: 1.75rem;
+      padding: 1.8rem 1.35rem;
     }
 
     .pso-infograph .sip-card {
-      padding: 1.4rem;
+      padding: 1.2rem;
     }
 
     .pso-infograph .sip-card-grid {
-      gap: 1.25rem;
+      gap: 1rem;
+    }
+
+    .pso-infograph .sip-content,
+    .pso-infograph .sip-details {
+      padding: 1.1rem;
+    }
+
+    .pso-infograph .sip-panel-section {
+      padding: 1rem;
+    }
+
+    .pso-infograph .sip-keypoint-image,
+    .pso-infograph .sip-preview-image {
+      min-height: 200px;
+    }
+
+    .pso-infograph .sip-btn,
+    .pso-infograph .sip-actions .sip-btn-primary,
+    .pso-infograph .sip-actions .sip-btn-secondary {
+      min-width: 100%;
+      width: 100%;
+    }
+
+    .pso-infograph .sip-btn-spotlight {
+      min-width: 100%;
+      width: 100%;
     }
   }
 </style>
@@ -428,19 +1036,9 @@
     <p class="sip-description">{{ data.Description }}</p>
     {% if first_topic %}
     <div class="sip-actions">
-      <a href="{{ first_topic.link }}" class="sip-btn" target="_blank" rel="noopener">{{ first_topic.buttonLabel | default: 'View Frontend Site' }}</a>
+      <a href="{{ first_topic.link }}" class="sip-btn sip-btn-primary sip-btn-spotlight" target="_blank" rel="noopener">{{ first_topic.buttonLabel | default: 'View Frontend Site' }}</a>
       {% if first_topic.backendLink %}
-      <a href="{{ first_topic.backendLink }}" class="sip-btn" target="_blank" rel="noopener">{{ first_topic.backendButtonLabel | default: 'View Backend Site' }}</a>
-      {% endif %}
-    </div>
-    {% endif %}
-    {% if data.status or data.team %}
-    <div class="sip-impact-list">
-      {% if data.status %}
-      <div class="sip-impact-item">Status: {{ data.status }}</div>
-      {% endif %}
-      {% if data.team %}
-      <div class="sip-impact-item">Team: {{ data.team | join: ", " }}</div>
+      <a href="{{ first_topic.backendLink }}" class="sip-btn sip-btn-secondary" target="_blank" rel="noopener">{{ first_topic.backendButtonLabel | default: 'View Backend Site' }}</a>
       {% endif %}
     </div>
     {% endif %}
@@ -453,16 +1051,74 @@
 
       <!-- Center: Key Points & Tags -->
       <div class="sip-content">
-        <h2 class="sip-project-title">{{ topic.title }}</h2>
-        <p class="sip-subtitle">{{ topic.subtitle }}</p>
-
-        <div class="sip-keypoints">
-          {% for point in topic.keyPoints %}
-          <div class="sip-keypoint">
-            <span class="sip-check">✓</span>
-            <span>{{ point }}</span>
+        <div class="sip-panel-section sip-panel-section--soft">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Project Overview</div>
+              <h2 class="sip-project-title">{{ topic.title }}</h2>
+            </div>
           </div>
-          {% endfor %}
+          <p class="sip-subtitle sip-section-copy">{{ topic.subtitle }}</p>
+          <p class="sip-about sip-section-copy">{{ topic.description }}</p>
+        </div>
+
+        <div class="sip-detail-pair">
+          <div class="sip-panel-section sip-panel-section--soft">
+            <div class="sip-panel-heading">
+              <div>
+                <div class="sip-panel-label">Accessibility</div>
+                <h3 class="sip-section-title">{{ topic.aboutTitle | default: 'About' }}</h3>
+              </div>
+            </div>
+            <p class="sip-about sip-section-copy">{{ topic.description }}</p>
+          </div>
+
+          {% if topic.organizationSummary %}
+          <div class="sip-panel-section">
+            <div class="sip-panel-heading">
+              <div>
+                <div class="sip-panel-label">Organization Context</div>
+                <h3 class="sip-section-title">{{ topic.organizationTitle | default: 'About the Organization' }}</h3>
+              </div>
+            </div>
+            <p class="sip-about sip-section-copy">{{ topic.organizationSummary }}</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Website Pages</div>
+              {% if topic.keyFeaturesTitle %}
+              <h3 class="sip-section-title">{{ topic.keyFeaturesTitle }}</h3>
+              {% else %}
+              <h3 class="sip-section-title">Key Features</h3>
+              {% endif %}
+            </div>
+          </div>
+          <div class="sip-keypoints sip-site-highlights">
+            {% for point in topic.keyPoints %}
+            <div class="sip-keypoint">
+              <div class="sip-keypoint-body">
+                {% if point.previewImage %}
+                <a href="{{ point.link | default: '#' }}" class="sip-keypoint-image-link" target="_blank" rel="noopener">
+                  <img src="{{ point.previewImage }}" alt="{{ point.previewAlt | default: point.text }}" class="sip-keypoint-image">
+                </a>
+                {% endif %}
+                {% if point.previewLabel %}
+                <div class="sip-keypoint-eyebrow">{{ point.previewLabel }}</div>
+                {% endif %}
+                <span class="sip-keypoint-copy">{{ point.text | default: point }}</span>
+                {% if point.link %}
+                <div class="sip-keypoint-action">
+                  <a href="{{ point.link }}" class="sip-btn" target="_blank" rel="noopener">{{ point.buttonLabel | default: 'Open Page' }}</a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
 
         <div class="sip-tech-stack">
@@ -472,24 +1128,83 @@
         </div>
 
         {% if topic.interactiveElements %}
-        <h3 class="sip-section-title">Interactive Elements</h3>
-        {% if topic.interactiveLink %}
-        <div class="sip-section-action">
-          <a href="{{ topic.interactiveLink }}" class="sip-btn" target="_blank" rel="noopener">{{ topic.interactiveButtonLabel | default: 'Open Games Page' }}</a>
-        </div>
-        {% endif %}
-        <div class="sip-keypoints">
-          {% for element in topic.interactiveElements %}
-          <div class="sip-keypoint">
-            <span class="sip-check">✓</span>
-            <span>
-              <strong>{{ element.title }}:</strong> {{ element.description }}
-              {% if element.link %}
-              <a href="{{ element.link }}" class="sip-btn" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
-              {% endif %}
-            </span>
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Interactive Layer</div>
+              <h3 class="sip-section-title">{{ topic.interactiveTitle | default: 'Interactive Elements' }}</h3>
+            </div>
+            {% if topic.interactiveLink %}
+            <div class="sip-section-action">
+              <a href="{{ topic.interactiveLink }}" class="sip-btn sip-btn-interactive-main" target="_blank" rel="noopener">{{ topic.interactiveButtonLabel | default: 'Open Games Page' }}</a>
+            </div>
+            {% endif %}
           </div>
+          {% assign has_interactive_preview = false %}
+          {% assign has_interactive_secondary = false %}
+          {% for element in topic.interactiveElements %}
+            {% if element.previewImage or element.previewText %}
+              {% assign has_interactive_preview = true %}
+            {% else %}
+              {% assign has_interactive_secondary = true %}
+            {% endif %}
           {% endfor %}
+
+          {% if has_interactive_preview %}
+          <div class="sip-keypoints sip-interactive-list sip-interactive-featured">
+            {% for element in topic.interactiveElements %}
+            {% if element.previewImage or element.previewText %}
+            <div class="sip-keypoint">
+              <span class="sip-check">✓</span>
+              <div class="sip-keypoint-body">
+                <span class="sip-keypoint-text">
+                  <strong>{{ element.title }}:</strong> {{ element.description }}
+                </span>
+                <div class="sip-preview-card">
+                  {% if element.previewImage %}
+                  <img src="{{ element.previewImage }}" alt="{{ element.previewAlt | default: element.title }}" class="sip-preview-image">
+                  {% endif %}
+                  <div class="sip-preview-body{% unless element.previewImage %} sip-preview-fallback{% endunless %}">
+                    <div class="sip-preview-label">{{ element.previewLabel | default: 'Interactive Preview' }}</div>
+                    <div class="sip-preview-title">{{ element.previewTitle | default: element.title }}</div>
+                    <div class="sip-preview-text">{{ element.previewText | default: element.description }}</div>
+                    {% if element.previewHighlights %}
+                    <div class="sip-preview-highlights">{{ element.previewHighlights }}</div>
+                    {% endif %}
+                    {% if element.link %}
+                    <a href="{{ element.link }}" class="sip-btn sip-btn-interactive" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if has_interactive_secondary %}
+          <h4 class="sip-secondary-heading">More Interactive Features</h4>
+          <div class="sip-keypoints sip-interactive-list sip-interactive-secondary">
+            {% for element in topic.interactiveElements %}
+            {% unless element.previewImage or element.previewText %}
+            <div class="sip-keypoint">
+              <span class="sip-check">✓</span>
+              <div class="sip-keypoint-body">
+                <span class="sip-keypoint-text">
+                  <strong>{{ element.title }}:</strong> {{ element.description }}
+                </span>
+                {% if element.link %}
+                <div class="sip-keypoint-action">
+                  <a href="{{ element.link }}" class="sip-btn sip-btn-interactive" target="_blank" rel="noopener">{{ element.buttonLabel | default: 'Open' }}</a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endunless %}
+            {% endfor %}
+          </div>
+          {% endif %}
         </div>
         {% endif %}
 
@@ -497,60 +1212,81 @@
 
       <!-- Right: About & Impact -->
       <div class="sip-details">
-        <h3 class="sip-section-title">About</h3>
-        <p class="sip-about">{{ topic.description }}</p>
+        {% if topic.customerPitch or topic.futurePlans %}
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Next Steps</div>
+              <h3 class="sip-section-title">Project Outlook</h3>
+            </div>
+          </div>
+          {% if topic.customerPitch %}
+          <div>
+            <h4 class="sip-section-title">Customer Pitch</h4>
+            <div class="sip-impact-list">
+              {% for pitch in topic.customerPitch %}
+              <div class="sip-impact-item">{{ pitch }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
 
-        {% if topic.problemsSolved %}
-        <h3 class="sip-section-title">Problems Solved</h3>
-        <div class="sip-impact-list">
-          {% for problem in topic.problemsSolved %}
-          <div class="sip-impact-item">{{ problem }}</div>
-          {% endfor %}
+          {% if topic.futurePlans %}
+          <div>
+            <h4 class="sip-section-title">Future Plans</h4>
+            <div class="sip-impact-list">
+              {% for plan in topic.futurePlans %}
+              <div class="sip-impact-item">{{ plan }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
         </div>
         {% endif %}
 
-        {% if topic.impact %}
-        <h3 class="sip-section-title">Impact</h3>
-        <div class="sip-impact-list">
-          {% for item in topic.impact %}
-          <div class="sip-impact-item">{{ item }}</div>
-          {% endfor %}
+        {% if topic.additions %}
+        <div class="sip-panel-section sip-panel-section--soft">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Highlights</div>
+              <h3 class="sip-section-title">{{ topic.additionsTitle | default: 'Additions' }}</h3>
+            </div>
+          </div>
+          <div class="sip-impact-list sip-wow-factors">
+            {% for addition in topic.additions %}
+            <div class="sip-impact-item">
+              {{ addition.text | default: addition }}
+              {% if addition.link %}
+              <div class="sip-impact-action">
+                <a href="{{ addition.link }}" class="sip-btn" target="_blank" rel="noopener">{{ addition.buttonLabel | default: 'Open' }}</a>
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
         </div>
         {% endif %}
 
-        {% if topic.wowFactors %}
-        <h3 class="sip-section-title">Wow Factors</h3>
-        <div class="sip-impact-list">
-          {% for factor in topic.wowFactors %}
-          <div class="sip-impact-item">{{ factor }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if topic.improvementsMade %}
-        <h3 class="sip-section-title">Improvements Made</h3>
-        <div class="sip-impact-list">
-          {% for improvement in topic.improvementsMade %}
-          <div class="sip-impact-item">{{ improvement }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if topic.customerPitch %}
-        <h3 class="sip-section-title">Customer Pitch</h3>
-        <div class="sip-impact-list">
-          {% for pitch in topic.customerPitch %}
-          <div class="sip-impact-item">{{ pitch }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if topic.futurePlans %}
-        <h3 class="sip-section-title">Future Plans</h3>
-        <div class="sip-impact-list">
-          {% for plan in topic.futurePlans %}
-          <div class="sip-impact-item">{{ plan }}</div>
-          {% endfor %}
+        {% if topic.organizationInfo %}
+        <div class="sip-panel-section">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Reference Details</div>
+              <h3 class="sip-section-title">{{ topic.organizationInfoTitle | default: 'Organization Information' }}</h3>
+            </div>
+          </div>
+          <div class="sip-info-grid">
+            {% for info in topic.organizationInfo %}
+            <dl class="sip-info-list">
+              {% if info.label %}<dt>{{ info.label }}</dt>{% endif %}
+              {% if info.link %}
+              <dd><a href="{{ info.link }}" target="_blank" rel="noopener">{{ info.value }}</a></dd>
+              {% else %}
+              <dd>{{ info.value | default: info }}</dd>
+              {% endif %}
+            </dl>
+            {% endfor %}
+          </div>
         </div>
         {% endif %}
 
@@ -559,5 +1295,16 @@
     </div>
   </div>
   {% endfor %}
+
+  {% if data.status or data.team %}
+  <div class="sip-meta-footer">
+    {% if data.status %}
+    <div class="sip-impact-item">Status: {{ data.status }}</div>
+    {% endif %}
+    {% if data.team %}
+    <div class="sip-impact-item">Team: {{ data.team | join: ", " }}</div>
+    {% endif %}
+  </div>
+  {% endif %}
 </div>
 </div>

@@ -1,16 +1,112 @@
 <style>
-.powaynec-keypoint {
-  display: flex;
-  flex-direction: column;
-}
+  .powaynec-infograph {
+    font-family: 'Georgia', serif;
+  }
 
-.powaynec-keypoint img {
-  width: 100%;
-  max-width: 150px;
-  height: auto;
-  border-radius: 6px;
-  margin-top: 6px;
-}
+  .powaynec-badge {
+    background: linear-gradient(135deg, #b22200, #ff6a00) !important;
+    color: #fff8f0 !important;
+    border: none !important;
+  }
+
+  .powaynec-description {
+    color: #ffcba4 !important;
+  }
+
+  .powaynec-card {
+    background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
+    border: 1px solid #ff4500 !important;
+    box-shadow: 0 0 18px rgba(255, 80, 0, 0.3) !important;
+  }
+
+  .powaynec-visual {
+    background: linear-gradient(180deg, #1f0900, #3b1200) !important;
+    border-right: 1px solid #ff4500 !important;
+  }
+
+  .powaynec-status {
+    background: linear-gradient(135deg, #b22200, #ff6a00) !important;
+    color: #fff8f0 !important;
+    border: none !important;
+  }
+
+  .powaynec-team-label {
+    color: #ff9a5c !important;
+  }
+
+  .powaynec-team-name {
+    color: #ffd4a8 !important;
+  }
+
+  .powaynec-check {
+    color: #ff4500 !important;
+  }
+
+  .powaynec-keypoint a {
+    color: #ff9a5c !important;
+    text-decoration: underline !important;
+  }
+
+  .powaynec-keypoint a:hover {
+    color: #ffcba4 !important;
+    text-decoration: underline !important;
+  }
+
+  .powaynec-keypoint span {
+    color: #ffd4a8 !important;
+    text-decoration: underline !important;
+  }
+
+  .powaynec-keypoint img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 6px !important;
+    margin-top: 6px !important;
+    border: 1px solid #ff4500 !important;
+  }
+
+  .powaynec-keypoint {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .powaynec-section-title {
+    color: #ff6a00 !important;
+    border-bottom: 1px solid #ff4500 !important;
+  }
+
+  .powaynec-impact-item {
+    background: linear-gradient(135deg, #2d1000, #1a0a00) !important;
+    border: 1px solid #ff4500 !important;
+    color: #ffd4a8 !important;
+  }
+
+  .powaynec-btn {
+    background: linear-gradient(135deg, #b22200, #ff6a00) !important;
+    color: #fff8f0 !important;
+    border: none !important;
+    box-shadow: 0 0 10px rgba(255, 80, 0, 0.4) !important;
+  }
+
+  .powaynec-btn:hover {
+    background: linear-gradient(135deg, #ff6a00, #ffaa00) !important;
+    box-shadow: 0 0 18px rgba(255, 120, 0, 0.6) !important;
+  }
+
+  .powaynec-header {
+    background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
+    border: 1px solid #ff4500 !important;
+    box-shadow: 0 0 18px rgba(255, 80, 0, 0.3) !important;
+  }
+
+  .powaynec-content {
+    background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
+  }
+
+  .powaynec-details {
+    background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
+  }
 </style>
 
 {% assign data = site.data.powaynec_infograph %}
@@ -36,7 +132,7 @@
         </a>
         <div class="powaynec-status">{{ topic.status }}</div>
         {% for point in topic.keyPoints %}
-          {% if point.image %}
+          {% if point.image and point.location == "status" %}
           <img src="{{ site.baseurl }}/images/{{ point.image }}" alt="{{ point.title }}" style="width:100%; border-radius:8px; margin-top:10px;">
           {% endif %}
         {% endfor %}
@@ -52,7 +148,16 @@
           {% for point in topic.keyPoints %}
           <div class="powaynec-keypoint">
             <span class="powaynec-check">✓</span>
+            {% if point.link %}
+            <a href="{{ point.link }}" target="_blank" rel="noopener noreferrer">{{ point.title }}</a>
+            {% else %}
             <span>{{ point.title }}</span>
+            {% endif %}
+            {% if point.images %}
+              {% for img in point.images %}
+              <img src="{{ site.baseurl }}/images/{{ img }}" alt="{{ point.title }}" style="width:100%; border-radius:8px; margin-top:8px;">
+              {% endfor %}
+            {% endif %}
           </div>
           {% endfor %}
         </div>
@@ -75,8 +180,8 @@
           </div>
           {% endfor %}
         </div>
-        <a href="{{ topic.link }}" class="powaynec-btn" target="_blank" rel="noopener noreferrer">Learn More</a>      </div>
+        <a href="https://pnec.opencodingsociety.com" class="powaynec-btn" target="_blank" rel="noopener noreferrer">View Our Site</a>
+      </div>
     </div>
   </div>
   {% endfor %}
-</div>
