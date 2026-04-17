@@ -1,14 +1,6 @@
 {% assign data = site.data.flaskandfurious-infograph %}
 
-
 <div class="dec-infograph">
-  <!-- Header Section -->
-  <div class="dec-header">
-    <div class="dec-badge">Design-Based Research Capstone</div>
-    <h1 class="dec-title">{{ data.Title }}</h1>
-    <p class="dec-description">{{ data.Description }}</p>
-  </div>
-
 
   <!-- Project Cards -->
   {% for topic in data.Topics %}
@@ -29,7 +21,6 @@
           <span class="dec-team-name">{{ topic.team | join: ", " }}</span>
         </div>
       </div>
-
 
       <!-- Center: Key Points -->
       <div class="dec-content">
@@ -56,7 +47,6 @@
         </div>
       </div>
 
-
       <!-- Right: Description & Impact -->
       <div class="dec-details">
         <h3 class="dec-section-title">About</h3>
@@ -69,37 +59,52 @@
           {% endfor %}
         </div>
 
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="dec-btn">Learn More</a>
-      </div>
+        {% if topic.futurePlans %}
+        <div class="dec-future">
+          <h3 class="dec-section-title">Future Plans</h3>
+          <div class="dec-future-list">
+            {% for plan in topic.futurePlans %}
+            <div class="dec-future-item">{{ plan }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
 
-    </div>
-  </div>
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="dec-btn">Learn More</a>
+      </div>  <!-- closes dec-details -->
+
+    </div>  <!-- closes dec-card-grid -->
+  </div>  <!-- closes dec-card -->
   {% endfor %}
 
-  <div class="dec-video-gallery">
-    <h2 class="dec-video-section-title">Project Videos</h2>
-    <div class="dec-video-grid">
-      <div class="dec-video-card">
-        <video controls preload="metadata" playsinline>
-          <source src="https://github.com/user-attachments/assets/c8256a6f-1827-4f69-9c84-6e784f289ebf" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <div class="dec-video-label">Blog</div>
-      </div>
-      <div class="dec-video-card">
-        <video controls preload="metadata" playsinline>
-          <source src="https://github.com/user-attachments/assets/d2dc12ad-ca7b-47b9-bf80-55c2ecc4b4f7" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <div class="dec-video-label">Event Calendar</div>
-      </div>
-      <div class="dec-video-card">
-        <video controls preload="metadata" playsinline>
-          <source src="https://github.com/user-attachments/assets/3856a348-8330-4ad3-957c-aabf244ba393" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <div class="dec-video-label">Login</div>
+  <!-- Video Gallery Card -->
+  <div class="dec-card">
+    <div class="dec-video-gallery">
+      <h2 class="dec-video-section-title">Project Videos</h2>
+      <div class="dec-video-grid">
+        <div class="dec-video-card">
+          <video autoplay loop muted playsinline>
+            <source src="{{ site.baseurl }}/images/newcal.mov" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="dec-video-label">New Calendar</div>
+        </div>
+        <div class="dec-video-card">
+          <video autoplay loop muted playsinline>
+            <source src="{{ site.baseurl }}/images/events.mov" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="dec-video-label">Events</div>
+        </div>
+        <div class="dec-video-card">
+          <video autoplay loop muted playsinline>
+            <source src="{{ site.baseurl }}/images/login.mov" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="dec-video-label">Login</div>
+        </div>
       </div>
     </div>
-  </div>
+  </div>  <!-- closes dec-card -->
+
 </div>
