@@ -21,8 +21,6 @@ menu:
     url: /navigation/search/
   - title: Login
     url: /login/
-  - title: Capstone
-    url: /capstone/
 hydejack:
   post_addons:         [about, newsletter, related, random, comments]
   project_addons:      [about, newsletter, other, comments]
