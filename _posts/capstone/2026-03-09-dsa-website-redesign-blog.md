@@ -323,7 +323,7 @@ sticky_rank: 8
     <p>Benefits, legal defense, events &mdash; all in one place.</p>
     <div style="display:flex;gap:6px;justify-content:center;margin-top:6px">
       <span class="mock-btn gold" style="font-size:0.6rem">Explore Services</span>
-      <span class="mock-btn out" style="font-size:0.6rem">About the DSA</span>
+      <span class="mock-btn out" style="font-size:0.6rem">About DSA</span>
     </div>
     <div style="display:flex;justify-content:center;gap:14px;margin-top:8px;font-size:0.56rem;color:#475569">
       <div><b style="display:block;font-size:0.82rem;color:#fbbf24">4,229</b>Members</div>
