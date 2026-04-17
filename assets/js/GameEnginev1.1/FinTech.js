@@ -1,4 +1,4 @@
-import Game from './essentials/Game.js';
+import { GameCore as Game } from './essentials/Game.js';
 import GameControl from './essentials/GameControl.js';
 import Quiz from './Quiz.js';
 import Inventory from "./Inventory.js";
