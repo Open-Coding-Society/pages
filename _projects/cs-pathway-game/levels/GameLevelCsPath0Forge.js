@@ -175,7 +175,7 @@ class GameLevelCsPath0Forge {
 
     const avatarGatekeeperPos = {
       x: width * 0.50,
-      y: height * 0.23,
+      y: height * 0.20,
     };
 
     const worldThemeGatekeeperPos = {
@@ -286,18 +286,26 @@ class GameLevelCsPath0Forge {
           ]);
         }
 
-        // Check auth status via LoginManager; show built-in panel if not logged in.
+        // Resolve auth: student JWT → guest session → show panel.
         let authBody = null;
         const authStatus = await LoginManager.isAuthenticated();
         if (authStatus.success) {
+          // Authenticated student/teacher
           authBody = authStatus.body;
         } else {
-          const authResult = await LoginManager.showPanel(uiTheme);
-          if (!authResult.success) return;
-          authBody = authResult.body;
+          // Check for an existing guest session before prompting
+          const guestSession = LoginManager.getGuestSession();
+          if (guestSession) {
+            authBody = guestSession;
+          } else {
+            const authResult = await LoginManager.showPanel(uiTheme);
+            if (!authResult.success) return;
+            authBody = authResult.body;
+          }
         }
 
-        // Prefill identity form with data from the authenticated user.
+        // Prefill identity form with auth data.
+        // For students, also update the OCS nav menu.
         if (authBody) {
           this.profileData = {
             ...this.profileData,
@@ -305,6 +313,9 @@ class GameLevelCsPath0Forge {
             email:    authBody.email || this.profileData?.email    || '',
             githubID: authBody.uid   || this.profileData?.githubID || '',
           };
+          if (authBody.role !== 'guest') {
+            LoginManager.updateNavMenu(authBody);
+          }
         }
 
         const identityData = await this.showIdentityForm();
