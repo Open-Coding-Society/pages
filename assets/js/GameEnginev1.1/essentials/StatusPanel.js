@@ -4,7 +4,7 @@ class StatusPanel {
       id: 'ocs-status-panel',
       title: '',
       fields: [],
-      actions: [], // Array of { label, onClick, danger, title }
+      actions: [],
       className: 'ocs-status-panel',
       mountTo: null,
       width: '260px',
@@ -20,6 +20,10 @@ class StatusPanel {
     this.element = null;
     this.fieldElements = new Map();
     this.actionElements = [];
+
+    // NEW: collapse state
+    this.isCollapsed = false;
+    this.contentContainer = null;
   }
 
   getMountTarget() {
@@ -60,16 +64,22 @@ class StatusPanel {
       boxShadow: this.config.theme.boxShadow || 'none',
     });
 
+    // Title
     const title = document.createElement('div');
     Object.assign(title.style, {
       color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
       fontSize: '12px',
       fontWeight: 'bold',
       letterSpacing: '1px',
-      marginBottom: '8px',
     });
     title.textContent = this.config.title;
-    panel.appendChild(title);
+
+    // Header (title + collapse button)
+    const header = this.createHeader(title);
+
+    // Content container (this gets hidden on collapse)
+    const content = document.createElement('div');
+    this.contentContainer = content;
 
     this.fieldElements.clear();
 
@@ -83,18 +93,18 @@ class StatusPanel {
           letterSpacing: '1px',
         });
         section.textContent = field.title;
-        panel.appendChild(section);
+        content.appendChild(section);
         continue;
       }
 
       const row = document.createElement('div');
       row.dataset.field = field.key;
       row.textContent = `${field.label}: ${field.emptyValue || '—'}`;
-      panel.appendChild(row);
+      content.appendChild(row);
       this.fieldElements.set(field.key, row);
     }
 
-    // Render action buttons if provided
+    // Actions
     if (this.config.actions && this.config.actions.length > 0) {
       const actionsContainer = document.createElement('div');
       Object.assign(actionsContainer.style, {
@@ -107,9 +117,11 @@ class StatusPanel {
       });
 
       this.actionElements = [];
+
       for (const action of this.config.actions) {
         const btn = document.createElement('button');
         btn.textContent = action.label;
+
         if (action.title) {
           btn.title = action.title;
         }
@@ -159,26 +171,73 @@ class StatusPanel {
         this.actionElements.push(btn);
       }
 
-      panel.appendChild(actionsContainer);
+      content.appendChild(actionsContainer);
     }
+
+    panel.appendChild(header);
+    panel.appendChild(content);
 
     this.getMountTarget().appendChild(panel);
     this.element = panel;
+
     return panel;
+  }
+
+  createHeader(titleElement) {
+    const header = document.createElement('div');
+
+    Object.assign(header.style, {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '8px',
+    });
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.textContent = '−';
+
+    Object.assign(toggleBtn.style, {
+      background: 'transparent',
+      border: 'none',
+      color: this.config.theme.accentColor || '#4ecca3',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: 'bold',
+    });
+
+    toggleBtn.onclick = () => {
+      this.isCollapsed = !this.isCollapsed;
+
+      if (this.isCollapsed) {
+        this.contentContainer.style.display = 'none';
+
+        // shrink panel when collapsed
+        this.element.style.height = 'auto';
+        this.element.style.paddingBottom = '6px';
+      } else {
+        this.contentContainer.style.display = 'block';
+
+        // restore padding
+        this.element.style.paddingBottom = this.config.padding;
+      }
+
+      toggleBtn.textContent = this.isCollapsed ? '+' : '−';
+    };
+
+    header.appendChild(titleElement);
+    header.appendChild(toggleBtn);
+
+    return header;
   }
 
   update(values = {}) {
     this.ensureMounted();
 
     for (const field of this.config.fields) {
-      if (field.type === 'section') {
-        continue;
-      }
+      if (field.type === 'section') continue;
 
       const row = this.fieldElements.get(field.key);
-      if (!row) {
-        continue;
-      }
+      if (!row) continue;
 
       const value = values[field.key];
       row.textContent = `${field.label}: ${value || field.emptyValue || '—'}`;
