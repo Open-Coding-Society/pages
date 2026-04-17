@@ -1,6 +1,6 @@
 # PYBL Capstone Infographic
-Title: "Binary Beasts: PYBL"
-Description: "Binary Beasts capstone track for pybl.com, focused on clearer youth basketball operations and faster family access to key tasks."
+Title: "PYBL Platform Redesign"
+Description: "Capstone work for pybl.com, focused on clearer youth basketball operations and faster family access to key tasks."
 
 Topics:
   - title: "PYBL Platform"
@@ -8,12 +8,12 @@ Topics:
     link: "https://pybl.com/"
     alt: "PYBL platform preview"
     keyPoints:
-      - "Idea 1: Improve rules readability using a good UI that makes it better."
-      - "Idea 2: Have season schedule with backend database that stores wins and losses for each team."
-      - "Idea 3: Build clear role paths for parents, coaches, and administrators."
-      - "Problem solved: Too much navigation friction during common seasonal tasks."
-      - "Problem solved: Easier to see best teams."
-      - "Problem solved: Have everyone know what to do."
+      - "Improve rules readability with clearer page structure and scannable UI."
+      - "Create a season schedule and standings workflow backed by team win and loss data."
+      - "Build clear role paths for parents, coaches, and administrators."
+      - "Reduce navigation friction during common seasonal tasks."
+      - "Help families and players compare team standings more quickly."
+      - "Give parents, coaches, and administrators clearer next steps."
     subtitle: "Youth Sports Operations, Simplified"
     description: "PYBL provides community basketball information and logistics that must remain simple and fast for families. This capstone focuses on reducing navigation ambiguity, improving page hierarchy, and making registration and schedule workflows easier to complete from phones and school devices."
     tech:

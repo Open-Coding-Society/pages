@@ -23,7 +23,14 @@ Topics:
       - "Allows users to view event details and register instantly with a single click"
       - "Provides a clean, organized, and engaging browsing experience"
       - "Enhances event visibility and encourages greater community participation for Safe Passage Heals"
-    status: "Working draft"
+    futurePlans:
+      - "Interactive simulation where users travel through a virtual environment and learn about the process of responding to domestic violence."
+      - "Interactive user character talks/interacts with various NPCs in the simulation to be informed about the process, step by step with access to an AI chatbot for questions"
+      - "Eg. 1) Call the domestic violence hotline"
+      - "2) Explain your case to the hotline worker"
+      - "3) Get connected to local resources and support groups"
+      - "4) Attend workshops and events hosted by Safe Passage Heals to rebuild your life"
+    status: "Working Prototype"
     team:
       - "Ruchika Kench"
       - "Akshara Shankar"
