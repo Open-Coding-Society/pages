@@ -323,12 +323,12 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- Greppers -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-04-greppers-capstone %}">
            <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-3xl font-bold rounded">SFI</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-greppers-capstone %}">Greppers</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-greppers-capstone %}">SFI Foundation</a></h3>
            <p class="text-sm text-gray-700">SFI Foundation web modernization — ML-powered spec search, QR-based manufacturer verification, and a mobile-first UI redesign for motorsports safety certification.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aditya Srivastava, Dhyan Soni, Aaryav Lal</p>
        </div>
