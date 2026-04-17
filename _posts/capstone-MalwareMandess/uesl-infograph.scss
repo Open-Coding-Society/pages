@@ -308,3 +308,169 @@ $uesl-text-light: #e2e8f0;
     text-decoration: none;
   }
 }
+
+// ── Section Cards (Problems / Ideas / Tech / Issues) ──────
+.uesl-section-card {
+  background: $uesl-card-bg;
+  border: 1px solid $uesl-border;
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.uesl-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $uesl-primary;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid $uesl-border;
+}
+
+// Problems
+.uesl-problems-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.uesl-problem-item {
+  background: rgba($uesl-primary, 0.06);
+  border: 1px solid rgba($uesl-primary, 0.15);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $uesl-text-light;
+    line-height: 1.6;
+  }
+}
+
+.uesl-problem-num {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: rgba($uesl-primary, 0.35);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+// Ideas
+.uesl-ideas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.uesl-idea-item {
+  background: rgba($uesl-secondary, 0.05);
+  border: 1px solid rgba($uesl-secondary, 0.2);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+}
+
+.uesl-idea-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.uesl-idea-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, $uesl-primary, $uesl-secondary);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.uesl-idea-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: $uesl-text-light;
+  margin: 0;
+}
+
+.uesl-idea-desc {
+  font-size: 0.825rem;
+  color: $uesl-text-muted;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// Tech table
+.uesl-tech-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.uesl-tech-row {
+  display: grid;
+  grid-template-columns: 220px 24px 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba($uesl-border, 0.5);
+
+  &:last-child { border-bottom: none; }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}
+
+.uesl-tech-arrow {
+  color: $uesl-secondary;
+  font-weight: 700;
+  text-align: center;
+
+  @media (max-width: 768px) { display: none; }
+}
+
+.uesl-tech-solve {
+  font-size: 0.875rem;
+  color: $uesl-text-muted;
+  line-height: 1.5;
+}
+
+// Weekly Issues
+.uesl-issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.uesl-issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: $uesl-text-light;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  background: rgba($uesl-primary, 0.04);
+  border-radius: 6px;
+}
+
+.uesl-issue-icon {
+  color: $uesl-primary;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
