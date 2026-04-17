@@ -108,3 +108,11 @@ Once ready, talk to the **pilot NPC** to move to **Wall Street**, where more com
 **Role:** Stock Market Hub  
 **Bio:** Dive deep into the world of public trading. Analyze companies, track performance, and build your virtual fortune through strategic investments.  
 <br clear="left" />
+
+---
+
+### Quant Bot  
+<img src="{{site.baseurl}}/images/gamify/stockupdatepc.png" width="60" align="left" />  
+**Role:** Quant Challenge Guide  
+**Bio:** Quant Bot introduces algorithmic trading inside *Fortune Finders*. Through this NPC, players launch the Quant Trading Bot challenge to practice indicators, ML forecasting, backtesting, and paper trading directly from the Wall Street level.  
+<br clear="left" />
