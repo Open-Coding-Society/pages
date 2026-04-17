@@ -1,33 +1,29 @@
-Badge: "Design-Based Research Capstone"
-Title: "SFI Foundation — Web Modernization"
-Subtitle: "Safety Made Searchable"
+Badge: "CSP Capstone — SFI Foundation"
+Title: "Safety Made Searchable"
+Tagline: "SFI Foundation certifies the equipment that keeps 50,000 drivers safe. We rebuilt how inspectors, staff, and fabricators find and use that information."
+
+Problem: "SFI's certification standards define exactly what equipment is legal for competition — the fire suits, helmets, fuel cells, and roll bars that protect drivers at every level of motorsport. For inspectors, fabricators, and the staff who maintain those standards, the site should be a reliable working tool. But it functioned more like a filing cabinet: static HTML pages, manual updates that required editing raw code, and a layout that broke down on mobile. The information existed. Getting to it consistently did not."
+
+Solution: "We treated this as a usability problem first. The result is a site where any spec can be found by searching in plain English, equipment can be identified from a photo taken at the track, and the relationship between components and certifications is visible in an interactive diagram. Staff can now update standards through a simple dashboard with no developer required and no risk of accidental breakage. The goal was to make SFI's expertise as accessible as its mission demands."
+
 Organization: "SFI Foundation"
-Description: "SFI certifies the safety gear that protects motorsports drivers worldwide — but outdated tools force inspectors to dig through static pages and staff to update HTML by hand. We're rebuilding their digital experience so the people keeping racers safe can do their jobs faster."
+Team: "Aditya Srivastava, Dhyan Soni, Aaryav Lal"
+BackendUrl: "https://github.com/orgs/TheGreppers/repositories"
 
-Features:
-  - "Unified Spec Search — fuzzy matching + TF-IDF scoring so typing 'fire suit' finds SFI 3.2A/5 instantly across all specs"
-  - "Admin Spec Manager — staff update specifications through a simple dashboard instead of editing raw HTML"
-  - "AI powered visual spec search to instantly look up manafacturing details"
-  - "Mobile-First Redesign — accessible, responsive site that actually works on pit-lane devices"
-
-Tech:
-  - name: "Python / Flask"
-    icon: "🐍"
-  - name: "HTML / CSS / JS"
-    icon: "🌐"
-  - name: "SQLite"
-    icon: "🗄️"
+FeatureCards:
+  - title: "Any Spec, Instantly"
+    desc: "Type what you are looking for and the database returns the right standard. Fire suits come up when you search for fire suits, not when you already know the document number. Search the way you actually think."
+  - title: "Identify Equipment by Photo"
+    desc: "Tech inspection happens in person, at the car. The visual scanner is built for that: photograph a piece of gear and get back its SFI certification number immediately. Less cross-referencing, more time on the inspection itself."
+  - title: "Browse by Component"
+    desc: "An interactive race car diagram maps each component to its certification. Useful for fabricators speccing a build, buyers verifying equipment before purchase, and anyone learning what standards apply to what parts."
+  - title: "Staff Control, No Code"
+    desc: "When a standard changes, that update should be publishable the same day. Staff add, edit, or retire certifications through a simple interface. No developer in the loop, no chance of accidentally breaking the rest of the site."
 
 Metrics:
-  - label: "Spec Lookup Time"
-    value: "< 5 sec"
-  - label: "Mobile Accessible"
-    value: "100%"
-  - label: "Staff Update Hours Saved"
-    value: "~20 hrs/wk"
-  - label: "Static Pages Replaced"
-    value: "8 → 1"
-  - label: "Part ID Accuracy"
-    value: "> 90%"
-  - label: "WCAG 2.1 AA Compliance"
-    value: "Full"
+  - value: "50,000+"
+    label: "Drivers protected"
+  - value: "Live search"
+    label: "Not static pages"
+  - value: "Zero code"
+    label: "To update specs"
