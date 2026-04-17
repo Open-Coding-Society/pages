@@ -26,11 +26,11 @@ Topics:
      - "Responsive / Mobile Layout"
      - "GitHub Pages Deployment"
    impact:
-     - "Reduces cancer information lookup from 5+ clicks to a single interaction"
-     - "Lowers cognitive load for patients, caregivers, and first-time visitors"
-     - "Improves ACS accessibility for users unfamiliar with cancer terminology"
-     - "Consolidates 30+ standalone cancer links into one cohesive visual entry point"
-     - "Supports early detection by making cancer resources faster to discover"
+    - "Reduces cancer information lookup from 5+ clicks to a single fast interaction, especially on mobile"
+    - "Lowers cognitive load for patients, caregivers, and first-time visitors navigating care during stressful moments"
+    - "Improves ACS accessibility for users unfamiliar with cancer terminology or medical language by using clearer pathways"
+    - "Consolidates 30+ standalone cancer links into one cohesive visual entry point with anatomy-based navigation"
+    - "Supports earlier detection by making trusted cancer resources faster and easier to discover at first search"
    status: "In Production"
    team:
      - "Aashika"
