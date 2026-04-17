@@ -17,3 +17,6 @@ header:
   - titles:
       en: Login
     url: /login/
+  - titles:
+      en: Capstone
+    url: /capstone/
