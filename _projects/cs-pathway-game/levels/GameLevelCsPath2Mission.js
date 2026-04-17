@@ -28,6 +28,10 @@ const CHALLENGE_PROMPT_TEXT = {
   QUESTION_SHORT_ANSWER: 'The challenge should require a short written answer from a student.',
   QUESTION_FORMAT: 'Do not include explanation, rubric, markdown, numbering, or extra text.',
   QUESTION_TOPIC_HEADER: 'Desk topic examples:\n{{sampleTopics}}',
+  QUESTION_VARIETY_HEADER: 'Question style options:\n{{questionStyles}}',
+  QUESTION_RECENT_HEADER: 'Recently used questions to avoid repeating:\n{{recentQuestions}}',
+  QUESTION_ANTI_REPEAT: 'Do not repeat or closely paraphrase any recent question. Prefer a fresh angle each time.',
+  QUESTION_UNIQUE_STYLE: 'Choose a different question style than the recent examples when possible.',
 
   EVAL_ROLE: 'You are grading a student answer for {{deskName}}.',
   EVAL_EXPERTISE: 'Desk expertise: {{expertise}}.',
@@ -45,6 +49,27 @@ const CHALLENGE_VERDICTS = {
   RIGHT: 'RIGHT',
   WRONG: 'WRONG',
 };
+
+const CHALLENGE_QUESTION_STYLES = [
+  'Ask for a definition in the desk topic area.',
+  'Ask for the best next step in a scenario.',
+  'Ask the student to compare two options.',
+  'Ask which tool, command, or process fits best.',
+  'Ask for a debugging or troubleshooting step.',
+  'Ask for a short explanation of why something works.',
+  'Ask the student to order steps in the correct sequence.',
+  'Ask what would happen if one part changed.',
+  'Ask for a practical example from the topic.',
+  'Ask the student to identify the most important concept.',
+  'Ask how to avoid a common mistake in the topic.',
+  'Ask for a simple decision between two approaches.',
+  'Ask for a real-world use case.',
+  'Ask for a short scenario response that needs a concise answer.',
+  'Ask for a best-practice recommendation.',
+  'Ask for a quick cause-and-effect explanation.',
+];
+
+const CHALLENGE_RECENT_HISTORY_LIMIT = 12;
 
 /**
  * GameLevel CS Pathway - Mission Tools
@@ -203,7 +228,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       reaction: function () {
         if (reaction) reaction.call(this);
         if (level?.showToast) {
-          level.showToast('Click desk to start challenge.');
+            level.showToast('Click desk or press E to start challenge.');
         }
       },
       ...(interact ? { interact } : {}),
@@ -254,25 +279,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         id: 'The Admin',
         expertise: 'how to work different operating systems',
         position: { x: width * 0.20, y: height * 0.17 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Archivist',
         expertise: 'how to manage files and folders',
         position: { x: width * 0.67, y: height * 0.17 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The SDLC Master',
         expertise: 'what SDLC is',
         position: { x: width * 0.18, y: height * 0.60 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Scrum Master',
         expertise: 'how to set up a scrum board',
         position: { x: width * 0.62, y: height * 0.58 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
     ];
 
@@ -288,6 +313,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._deskChallengeBusy = new Set();
     this._deskChallengeEvalBusy = new Set();
     this._activeDeskChallenges = new Map();
+    this._missionQuestionHistory = new Map();
+    this._missionProgressCount = 0;
+    this._missionProgressEl = null;
+    this._handleMissionDeskKeyDownBound = this._handleMissionDeskKeyDown.bind(this);
   }
 
   // Find desk objects after engine instantiates them and apply runtime behavior patches.
@@ -296,6 +325,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const desks = objects.filter((obj) => this._missionDeskIds?.includes(obj?.spriteData?.id));
     this._rebindMissingDeskReactions(desks);
     this._wireDeskClickDistanceGate(desks);
+    document.addEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    this._syncMissionProgressBoard();
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
       id: d?.spriteData?.id,
@@ -367,9 +398,22 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
   // Build and execute question-generation request, then normalize to one display line.
   async _loadDeskChallengeQuestion(spriteData) {
-    const prompt = this._buildChallengePrompt(spriteData);
-    const raw = await this._requestChallengeAiText(spriteData, prompt);
-    return this._extractFirstChallengeLine(raw);
+    let lastQuestion = '';
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const prompt = this._buildChallengePrompt(spriteData);
+      const raw = await this._requestChallengeAiText(spriteData, prompt);
+      const question = this._extractFirstChallengeLine(raw);
+      lastQuestion = question;
+
+      if (!this._isRepeatedMissionQuestion(spriteData, question)) {
+        this._recordMissionQuestion(spriteData, question);
+        return question;
+      }
+    }
+
+    this._recordMissionQuestion(spriteData, lastQuestion);
+    return lastQuestion;
   }
 
   // Build and execute answer-evaluation request, then parse verdict + feedback.
@@ -455,6 +499,78 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       CHALLENGE_PROMPT_TEXT.EVAL_FEEDBACK,
       CHALLENGE_PROMPT_TEXT.EVAL_RIGHT_RULE,
     ].join('\n\n');
+  }
+
+  // Return a stable per-desk key so prompt history stays isolated by station.
+  _getMissionQuestionHistoryKey(spriteData) {
+    return spriteData?.id || 'desk';
+  }
+
+  // Normalize questions before comparing them so punctuation and case don't matter.
+  _normalizeMissionQuestion(question) {
+    return (question || '')
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[^a-z0-9 ]/g, '')
+      .trim();
+  }
+
+  // Keep a rolling recent-question list per station to discourage repeats.
+  _recordMissionQuestion(spriteData, question) {
+    const key = this._getMissionQuestionHistoryKey(spriteData);
+    const normalized = this._normalizeMissionQuestion(question);
+    if (!normalized) return;
+
+    const existing = this._missionQuestionHistory.get(key) || [];
+    const nextHistory = [...existing, question].slice(-CHALLENGE_RECENT_HISTORY_LIMIT);
+    this._missionQuestionHistory.set(key, nextHistory);
+  }
+
+  // Pull the recent question list for the current desk.
+  _getRecentMissionQuestions(spriteData) {
+    const key = this._getMissionQuestionHistoryKey(spriteData);
+    return this._missionQuestionHistory.get(key) || [];
+  }
+
+  // Detect whether the new question is a repeat of a recent station question.
+  _isRepeatedMissionQuestion(spriteData, question) {
+    const normalizedQuestion = this._normalizeMissionQuestion(question);
+    if (!normalizedQuestion) return false;
+
+    return this._getRecentMissionQuestions(spriteData).some((recentQuestion) => {
+      return this._normalizeMissionQuestion(recentQuestion) === normalizedQuestion;
+    });
+  }
+
+  // Build a large, varied prompt that tells the model which recent questions to avoid.
+  _buildChallengePrompt(spriteData) {
+    const expertise = spriteData?.expertise || 'general problem solving';
+    const deskName = spriteData?.id || 'Desk Guide';
+    const sampleTopics = (spriteData?.knowledgeBase?.[expertise] || [])
+      .slice(0, 8)
+      .map((topic) => `- ${topic.question}`)
+      .join('\n');
+    const recentQuestions = this._getRecentMissionQuestions(spriteData)
+      .slice(-CHALLENGE_RECENT_HISTORY_LIMIT)
+      .map((question) => `- ${question}`)
+      .join('\n');
+    const questionStyles = CHALLENGE_QUESTION_STYLES
+      .map((style, index) => `${index + 1}. ${style}`)
+      .join('\n');
+
+    return [
+      CHALLENGE_PROMPT_TEXT.QUESTION_ROLE.replace('{{deskName}}', deskName),
+      CHALLENGE_PROMPT_TEXT.QUESTION_FOCUS.replace('{{expertise}}', expertise),
+      CHALLENGE_PROMPT_TEXT.QUESTION_CONCISE,
+      CHALLENGE_PROMPT_TEXT.QUESTION_SHORT_ANSWER,
+      CHALLENGE_PROMPT_TEXT.QUESTION_FORMAT,
+      CHALLENGE_PROMPT_TEXT.QUESTION_ANTI_REPEAT,
+      CHALLENGE_PROMPT_TEXT.QUESTION_UNIQUE_STYLE,
+      CHALLENGE_PROMPT_TEXT.QUESTION_VARIETY_HEADER.replace('{{questionStyles}}', questionStyles),
+      recentQuestions ? CHALLENGE_PROMPT_TEXT.QUESTION_RECENT_HEADER.replace('{{recentQuestions}}', recentQuestions) : '',
+      sampleTopics ? CHALLENGE_PROMPT_TEXT.QUESTION_TOPIC_HEADER.replace('{{sampleTopics}}', sampleTopics) : '',
+    ].filter(Boolean).join('\n\n');
   }
 
   // Parse AI grading output into app-level verdict and feedback fields.
@@ -544,6 +660,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           );
           this._renderChallengeEvaluation(ui.responseArea, active.question, answer, evaluation);
           this._speakChallengeEvaluation(npc, evaluation);
+          if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
+            this._missionProgressCount += 1;
+            this._syncMissionProgressBoard();
+          }
           this._logChallengeEvent({
             deskId: active?.deskId || '',
             question: active?.question || '',
@@ -623,25 +743,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return formatter();
   }
 
-  // Prompt template for producing a single desk-specific challenge question.
-  _buildChallengePrompt(spriteData) {
-    const expertise = spriteData?.expertise || 'general problem solving';
-    const deskName = spriteData?.id || 'Desk Guide';
-    const sampleTopics = (spriteData?.knowledgeBase?.[expertise] || [])
-      .slice(0, 4)
-      .map((topic) => `- ${topic.question}`)
-      .join('\n');
-
-    return [
-      CHALLENGE_PROMPT_TEXT.QUESTION_ROLE.replace('{{deskName}}', deskName),
-      CHALLENGE_PROMPT_TEXT.QUESTION_FOCUS.replace('{{expertise}}', expertise),
-      CHALLENGE_PROMPT_TEXT.QUESTION_CONCISE,
-      CHALLENGE_PROMPT_TEXT.QUESTION_SHORT_ANSWER,
-      CHALLENGE_PROMPT_TEXT.QUESTION_FORMAT,
-      sampleTopics ? CHALLENGE_PROMPT_TEXT.QUESTION_TOPIC_HEADER.replace('{{sampleTopics}}', sampleTopics) : '',
-    ].filter(Boolean).join('\n\n');
-  }
-
   // Inject generated question into the AI response area and prepare answer input.
   _renderChallengeQuestion(npc, questionText) {
     const safeId = npc?.dialogueSystem?.safeId;
@@ -669,6 +770,64 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._challengeLog.shift();
     }
     console.log('[MissionTools] challenge created:', entry);
+  }
+
+  // Render the level scoreboard with score ramp and completion count.
+  _syncMissionProgressBoard() {
+    const host = document.body;
+    if (!host) return;
+
+    if (!this._missionProgressEl) {
+      const board = document.createElement('div');
+      board.style.cssText = `
+        position: fixed; right: 20px; bottom: 20px;
+        z-index: 9999; pointer-events: none;
+        min-width: 220px;
+        background: rgba(13,13,26,0.96);
+        border: 2px solid #f59e0b;
+        color: #f8fafc;
+        font-family: 'Courier New', monospace;
+        padding: 12px 14px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(245,158,11,0.22);
+        letter-spacing: 0.6px;
+      `;
+      board.innerHTML = `
+        <div style="font-size: 11px; text-transform: uppercase; opacity: 0.78; margin-bottom: 6px;">Mission Scoreboard</div>
+        <div class="mission-progress-score" style="font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 6px;">.55</div>
+        <div class="mission-progress-count" style="font-size: 13px; opacity: 0.92; margin-bottom: 10px;">0/4</div>
+        <div style="height: 8px; border-radius: 999px; background: rgba(255,255,255,0.10); overflow: hidden;">
+          <div class="mission-progress-bar" style="height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #f59e0b, #fbbf24, #fde68a);"></div>
+        </div>
+      `;
+      host.appendChild(board);
+      this._missionProgressEl = board;
+    }
+
+    const score = this._getMissionProgressScore(this._missionProgressCount);
+    const scoreText = score.toFixed(2).replace(/^0/, '');
+    const completedText = `${this._missionProgressCount}/4`;
+    const progressRatio = Math.max(0, Math.min(1, (score - 0.55) / (0.92 - 0.55)));
+
+    const scoreNode = this._missionProgressEl.querySelector('.mission-progress-score');
+    const countNode = this._missionProgressEl.querySelector('.mission-progress-count');
+    const barNode = this._missionProgressEl.querySelector('.mission-progress-bar');
+
+    if (scoreNode) scoreNode.textContent = scoreText;
+    if (countNode) countNode.textContent = completedText;
+    if (barNode) barNode.style.width = `${progressRatio * 100}%`;
+  }
+
+  // Map completions to the requested mission score progression.
+  _getMissionProgressScore(completedCount) {
+    if (completedCount <= 0) return 0.55;
+    if (completedCount === 1) return 0.66;
+    if (completedCount === 2) return 0.77;
+    if (completedCount === 3) return 0.88;
+    if (completedCount === 4) return 0.89;
+
+    const bonusSteps = Math.min(completedCount - 4, 12);
+    return 0.89 + (bonusSteps * 0.0025);
   }
 
   // Helper to locate the player object in active game objects.
@@ -703,6 +862,26 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         originalHandleClick(event);
       };
     });
+  }
+
+  // Allow the mission challenge to start with E as well as click while in range.
+  _handleMissionDeskKeyDown(event) {
+    if (event?.key !== 'e' && event?.key !== 'E' && event?.code !== 'KeyE') return;
+    if (event?.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+
+    const player = this._findPlayer();
+    if (!player || !Array.isArray(this._missionDeskObjects)) return;
+
+    const nearestDesk = this._findNearestDeskInZone(player, this._missionDeskObjects);
+    if (!nearestDesk) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const deskId = nearestDesk?.spriteData?.id;
+    if (!deskId) return;
+
+    this.startDeskChallenge(nearestDesk, deskId, nearestDesk);
   }
 
   // Runtime patch for engine quirk where reaction function may not bind automatically.
@@ -787,6 +966,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   // Cleanup transient UI owned by this level.
   destroy() {
     this.clearZoneAlert();
+    document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    if (this._missionProgressEl?.parentNode) {
+      this._missionProgressEl.parentNode.removeChild(this._missionProgressEl);
+    }
+    this._missionProgressEl = null;
   }
 
 }
