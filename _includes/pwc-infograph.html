@@ -5,11 +5,13 @@
   <!-- Intro: logo, title, and Who/What/Why merged -->
   <section class="wp-section wp-intro">
     <div class="wp-intro-head">
-      <img src="{{ site.baseurl }}/images/{{ data.Logo }}" alt="{{ data.Alt }}" class="wp-header-logo">
+      <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-header-logo-link">
+        <img src="{{ site.baseurl }}/images/{{ data.Logo }}" alt="{{ data.Alt }}" class="wp-header-logo">
+      </a>
       <div class="wp-intro-heading">
         <h1 class="wp-title">{{ data.Title }}</h1>
         <p class="wp-description">{{ data.Description }}</p>
-        <div class="wp-status">{{ data.Status }}</div>
+        <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-status">{{ data.Status }}</a>
       </div>
     </div>
 
