@@ -1,77 +1,91 @@
 {% assign data = site.data.pwc_infograph %}
 
+<div class="pwc-infograph">
 
-<div class="wp-infograph">
- <!-- Header Section -->
- <div class="wp-header">
-   <div class="wp-badge">Design-Based Research Capstone</div>
-   <h1 class="wp-title">{{ data.Title }}</h1>
-   <p class="wp-description">{{ data.Description }}</p>
- </div>
+  <!-- Intro: logo, title, and Who/What/Why merged -->
+  <section class="wp-section wp-intro">
+    <div class="wp-intro-head">
+      <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-header-logo-link">
+        <img src="{{ site.baseurl }}/images/{{ data.Logo }}" alt="{{ data.Alt }}" class="wp-header-logo">
+      </a>
+      <div class="wp-intro-heading">
+        <h1 class="wp-title">{{ data.Title }}</h1>
+        <p class="wp-description">{{ data.Description }}</p>
+        <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-status">{{ data.Status }}</a>
+      </div>
+    </div>
 
+    <div class="wp-about-section">
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">Who We Are</h2>
+        <p>{{ data.About.who }}</p>
+        <div class="wp-team-grid">
+          {% for member in data.Team %}
+          <div class="wp-team-card">
+            <div class="wp-team-name">{{ member.name }}</div>
+            <div class="wp-team-role">{{ member.role }}</div>
+            <div class="wp-team-bio">{{ member.bio }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">What We're Building</h2>
+        <p>{{ data.About.what }}</p>
+      </div>
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">Why It Matters</h2>
+        <p>{{ data.About.why }}</p>
+      </div>
+    </div>
+  </section>
 
- <!-- Project Cards -->
- {% for topic in data.Topics %}
- <div class="wp-card">
-   <div class="wp-card-grid">
-    
-     <!-- Left: Image & Status -->
-     <div class="wp-visual">
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
-         <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
-         <div class="wp-overlay">
-           <span>View Project</span>
-         </div>
-       </a>
-       <div class="wp-status">{{ topic.status }}</div>
-       <div class="wp-team">
-         <span class="wp-team-label">Project Leads</span>
-         <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
-       </div>
-     </div>
+  <!-- Fixes -->
+  <section class="wp-section">
+    <h2 class="wp-section-title">Site Improvements</h2>
+    <div class="wp-keypoints">
+      {% for point in data.Fixes %}
+      <div class="wp-keypoint"><span class="wp-check">→</span><span>{{ point }}</span></div>
+      {% endfor %}
+    </div>
+  </section>
 
+  <!-- Features with screenshots -->
+  <section class="wp-section">
+    <h2 class="wp-section-title">Key Features</h2>
+    <div class="wp-feature-grid">
+      {% for feature in data.Features %}
+      <a href="{{ feature.url | default: data.SiteUrl }}" target="_blank" rel="noopener" class="wp-feature-card">
+        <div class="wp-feature-image-wrap">
+          <img src="{{ site.baseurl }}/images/{{ feature.image }}" alt="{{ feature.title }}" class="wp-feature-image">
+        </div>
+        <div class="wp-feature-body">
+          <h3 class="wp-feature-title">{{ feature.title }}</h3>
+          <p class="wp-feature-desc">{{ feature.description }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
 
-     <!-- Center: Key Points -->
-     <div class="wp-content">
-       <h2 class="wp-project-title">{{ topic.title }}</h2>
-       <p class="wp-subtitle">{{ topic.subtitle }}</p>
-      
-       <div class="wp-keypoints">
-         {% for point in topic.keyPoints %}
-         <div class="wp-keypoint">
-           <span class="wp-check">✓</span>
-           <span>{{ point }}</span>
-         </div>
-         {% endfor %}
-       </div>
+  <!-- Tech + Impact -->
+  <section class="wp-section wp-two-col">
+    <div>
+      <h2 class="wp-section-title">Tech & Components</h2>
+      <div class="wp-tech-stack">
+        {% for tech in data.Tech %}
+        <span class="wp-tech-tag">{{ tech }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <h2 class="wp-section-title">Impact</h2>
+      <div class="wp-impact-list">
+        {% for item in data.Impact %}
+        <div class="wp-impact-item">{{ item }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
 
-
-       <div class="wp-tech-stack">
-         {% for tech in topic.tech %}
-         <span class="wp-tech-tag">{{ tech }}</span>
-         {% endfor %}
-       </div>
-     </div>
-
-
-     <!-- Right: Description & Impact -->
-     <div class="wp-details">
-       <h3 class="wp-section-title">About</h3>
-       <p class="wp-about">{{ topic.description }}</p>
-      
-       <h3 class="wp-section-title">Impact</h3>
-       <div class="wp-impact-list">
-         {% for item in topic.impact %}
-         <div class="wp-impact-item">{{ item }}</div>
-         {% endfor %}
-       </div>
-
-
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
-     </div>
-
-
-   </div>
- </div>
- {% endfor %}
 </div>
