@@ -1,0 +1,9 @@
+# Local development overrides — copy this file to _config.local.yml
+# _config.local.yml is git-ignored and will never be pushed upstream.
+#
+# Usage: cp _config.local.yml.example _config.local.yml
+# Then edit the values below for your fork.
+
+# Override baseurl for local/forked repo (e.g. GitHub Pages project site)
+# baseurl: "/pages"
+baseurl: ""
