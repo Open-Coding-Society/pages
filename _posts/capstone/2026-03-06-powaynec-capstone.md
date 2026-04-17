@@ -1,17 +1,19 @@
 ---
 toc: false
 layout: post
-title: Binary Beasts Capstone
-description: Binary Beasts combines Poway NEC and PYBL into one shared Design-Based Research capstone page.
+title: Poway Neighborhood Emergency Corps
+description: Overview of changes and updates made to the Poway NEC website.
 permalink: /capstone/powaynec/
 sticky_rank: 1
 ---
 
-## Binary Beasts
-This route now shows both Binary Beasts infographics together.
-
-### PYBL
-{% include pybl-infograph.html %}
+<style>
+.post-content p, .post-content h3 {
+  color: #ff9a5c !important;
+}
+</style>
 
 ### Poway NEC
+Poway NEC is a neighborhood emergency preparedness organization. The capstone starts with who the organization serves, then moves into the homepage features that share the same entry point, followed by direct links to the risk watch, mini games, chatbot, and login tools.
+
 {% include powaynec-infograph.html %}
