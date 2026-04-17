@@ -205,6 +205,7 @@ class GameLevelAirport {
             "The stock market is a place of opportunity and risk. You can buy shares in companies and watch your investments grow—or shrink.\nWould you like to proceed to the Stock Exchange and begin your investment journey?",
             [
               { label: "Take me to the Stock Exchange", action: () => openInModal(`${pagesURI}/stocks/viewer`) },
+              { label: "Teach me Quantitative Trading", action: () => openInModal(`${pagesURI}/gamify/fortuneFinders/quant`) },
               { label: "Remind me what stocks are", action: () => dialogFunctions.whatAreStocks(), keepOpen: true },
               { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
             ]
