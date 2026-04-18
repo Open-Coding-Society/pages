@@ -9,6 +9,7 @@ import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import Present from './Present.js';
 import LoginManager from '/assets/js/projects/cs-pathway-game/model/LoginManager.js';
 
 // Constants: Profile panel configuration
@@ -60,6 +61,19 @@ class GameLevelCsPath0Forge {
     this.finishLoadingWork = GameLevelCsPathIdentity.prototype.finishLoadingWork.bind(this);
     this.primeAssetGate = GameLevelCsPathIdentity.prototype.primeAssetGate.bind(this);
     this.preloadTrackedAsset = GameLevelCsPathIdentity.prototype.preloadTrackedAsset.bind(this);
+
+    this.present = new Present(this, {
+      toastDuration: 2200,
+      ignoreToasts: ['Press E to interact'],
+      isActiveLevel: () => this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this,
+    });
+    this.showToast = (message) => this.present.toast(message);
+    this.setZoneAlert = (message) => this.present.alerts(message);
+    this.clearZoneAlert = () => this.present.clearAlerts();
+    this.panel = (message) => this.present.panel(message);
+    this.score = (message) => this.present.score(message);
+    this.clearPanel = () => this.present.clearPanel();
+    this.clearScore = () => this.present.clearScore();
 
     /**
      * Section: Profile persistence.
@@ -573,79 +587,6 @@ class GameLevelCsPath0Forge {
 
         showStep();
       });
-    };
-
-
-    // Toast: Show status message.
-    this.showToast = function(message) {
-      if (message === 'Press E to interact') {
-        return;
-      }
-
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-
-      const host = document.body;
-      if (!host) return;
-
-      if (this._toastEl?.parentNode) {
-        this._toastEl.parentNode.removeChild(this._toastEl);
-      }
-      if (this._toastTimer) {
-        clearTimeout(this._toastTimer);
-      }
-
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px;
-        z-index: 1200; pointer-events: none;
-        background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-        color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-        padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-        box-shadow: 0 0 20px rgba(78,204,163,0.25);
-        width: min(360px, 32vw); text-align: left;
-      `;
-      toast.textContent = message;
-      host.appendChild(toast);
-
-      this._toastEl = toast;
-      this._toastTimer = setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-        if (this._toastEl === toast) this._toastEl = null;
-        this._toastTimer = null;
-      }, 2200);
-    };
-
-    this.setZoneAlert = function(message) {
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-
-      const host = document.body;
-      if (!host) return;
-
-      if (!this._zoneAlertEl) {
-        const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = `
-          position: fixed; top: 84px; right: 20px;
-          z-index: 1201; pointer-events: none;
-          background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-          color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-          padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-          box-shadow: 0 0 20px rgba(78,204,163,0.25);
-          width: min(360px, 32vw); text-align: left;
-        `;
-        document.body.appendChild(zoneAlert);
-        this._zoneAlertEl = zoneAlert;
-      }
-
-      this._zoneAlertEl.textContent = message;
-    };
-
-    this.clearZoneAlert = function() {
-      if (this._zoneAlertEl?.parentNode) {
-        this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
-      }
-      this._zoneAlertEl = null;
     };
 
 
@@ -1347,14 +1288,7 @@ class GameLevelCsPath0Forge {
 
   destroy() {
     this.clearZoneAlert();
-    if (this._toastTimer) {
-      clearTimeout(this._toastTimer);
-      this._toastTimer = null;
-    }
-    if (this._toastEl?.parentNode) {
-      this._toastEl.parentNode.removeChild(this._toastEl);
-    }
-    this._toastEl = null;
+    this.present?.destroy();
   }
 }
 
