@@ -733,7 +733,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     for (const desk of desks) {
       const deskCenter = this._getObjectCenter(desk);
       const distance = Math.hypot(playerCenter.x - deskCenter.x, playerCenter.y - deskCenter.y);
-      const inZone = distance < this._getDeskAlertDistancePx(desk);
+      const inCollision = this._deskIsColliding(player, desk);
+      const inZone = inCollision || distance < this._getDeskAlertDistancePx(desk);
 
       if (inZone && distance < nearestDistance) {
         nearestDesk = desk;
