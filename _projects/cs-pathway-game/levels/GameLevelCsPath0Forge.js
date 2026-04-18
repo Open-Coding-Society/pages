@@ -9,6 +9,7 @@ import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import Present from './Present.js';
 import LoginManager from '/assets/js/projects/cs-pathway-game/model/LoginManager.js';
 
 const PROFILE_PANEL_ID = 'csse-profile-panel';
@@ -64,6 +65,19 @@ class GameLevelCsPath0Forge {
     this.finishLoadingWork = GameLevelCsPathIdentity.prototype.finishLoadingWork.bind(this);
     this.primeAssetGate = GameLevelCsPathIdentity.prototype.primeAssetGate.bind(this);
     this.preloadTrackedAsset = GameLevelCsPathIdentity.prototype.preloadTrackedAsset.bind(this);
+
+    this.present = new Present(this, {
+      toastDuration: 2200,
+      ignoreToasts: ['Press E to interact'],
+      isActiveLevel: () => this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this,
+    });
+    this.showToast = (message) => this.present.toast(message);
+    this.setZoneAlert = (message) => this.present.alerts(message);
+    this.clearZoneAlert = () => this.present.clearAlerts();
+    this.panel = (message) => this.present.panel(message);
+    this.score = (message) => this.present.score(message);
+    this.clearPanel = () => this.present.clearPanel();
+    this.clearScore = () => this.present.clearScore();
 
     /**
      * Section: Profile persistence.
@@ -1446,14 +1460,7 @@ await this.profileManager.saveIdentity(profile);
    */
   destroy() {
     this.clearZoneAlert();
-    if (this._toastTimer) {
-      clearTimeout(this._toastTimer);
-      this._toastTimer = null;
-    }
-    if (this._toastEl?.parentNode) {
-      this._toastEl.parentNode.removeChild(this._toastEl);
-    }
-    this._toastEl = null;
+    this.present?.destroy();
   }
 }
 
