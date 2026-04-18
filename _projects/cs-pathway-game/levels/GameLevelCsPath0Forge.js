@@ -582,6 +582,9 @@ class GameLevelCsPath0Forge {
         return;
       }
 
+      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
+      if (!isActiveLevel) return;
+
       const host = document.body;
       if (!host) return;
 
@@ -614,6 +617,9 @@ class GameLevelCsPath0Forge {
     };
 
     this.setZoneAlert = function(message) {
+      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
+      if (!isActiveLevel) return;
+
       const host = document.body;
       if (!host) return;
 
@@ -1337,6 +1343,14 @@ class GameLevelCsPath0Forge {
 
   destroy() {
     this.clearZoneAlert();
+    if (this._toastTimer) {
+      clearTimeout(this._toastTimer);
+      this._toastTimer = null;
+    }
+    if (this._toastEl?.parentNode) {
+      this._toastEl.parentNode.removeChild(this._toastEl);
+    }
+    this._toastEl = null;
   }
 }
 

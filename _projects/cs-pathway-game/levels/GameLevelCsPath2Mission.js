@@ -145,6 +145,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         return;
       }
 
+      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
+      if (!isActiveLevel) return;
+
       const host = document.body;
       if (!host) return;
 
@@ -177,6 +180,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     };
 
     this.setZoneAlert = function(message) {
+      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
+      if (!isActiveLevel) return;
+
       const host = document.body;
       if (!host) return;
 
@@ -995,6 +1001,14 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   destroy() {
     this.clearZoneAlert();
     document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    if (this._toastTimer) {
+      clearTimeout(this._toastTimer);
+      this._toastTimer = null;
+    }
+    if (this._toastEl?.parentNode) {
+      this._toastEl.parentNode.removeChild(this._toastEl);
+    }
+    this._toastEl = null;
     if (this._missionProgressEl?.parentNode) {
       this._missionProgressEl.parentNode.removeChild(this._missionProgressEl);
     }
