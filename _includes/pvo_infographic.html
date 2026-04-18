@@ -13,10 +13,9 @@
   <div class="pv-card">
     <div class="pv-card-grid">
 
-      <!-- Left: Before Section -->
-      {% if topic.beforePoints %}
+      <!-- Left: Logo + Power Features + Pitch Stats -->
       <div class="pv-visual">
-        <div class="pv-before-block">
+        <div class="pv-left-block">
 
           <!-- Logo banner at top -->
           <div class="pv-before-logo-wrap">
@@ -24,24 +23,44 @@
             <div class="pv-before-logo-overlay">
               {% if topic.before_link %}
               <a href="{{ topic.before_link }}" target="_blank" rel="noopener noreferrer" class="pv-before-title-link">
-                <span class="pv-before-label">BEFORE</span><span class="pv-before-arrow">↗</span>
+                <span class="pv-before-label">LIVE SITE</span><span class="pv-before-arrow">↗</span>
               </a>
-              {% else %}
-              <span class="pv-before-label">BEFORE</span>
               {% endif %}
             </div>
           </div>
 
-          <!-- Bullet points below -->
-          <ul class="pv-before-list">
-            {% for point in topic.beforePoints %}
-            <li class="pv-before-item">{{ point }}</li>
+          <!-- Power Features (glowing tech highlights) -->
+          {% if topic.powerFeatures %}
+          <div class="pv-power-section">
+            <div class="pv-power-eyebrow">✦ What We Brought to the Table</div>
+            {% for feat in topic.powerFeatures %}
+            <div class="pv-power-pill">
+              <div class="pv-power-top">
+                <span class="pv-power-icon">{{ feat.icon }}</span>
+                <span class="pv-power-label">{{ feat.label }}</span>
+              </div>
+              <div class="pv-power-note">{{ feat.note }}</div>
+            </div>
             {% endfor %}
-          </ul>
+          </div>
+          {% endif %}
+
+          <!-- Pitch Stats -->
+          {% if topic.pitchStats %}
+          <div class="pv-pitch-section">
+            <div class="pv-pitch-eyebrow">📊 By the Numbers</div>
+            {% for stat in topic.pitchStats %}
+            <div class="pv-stat-item">
+              <div class="pv-stat-value">{{ stat.value }}</div>
+              <div class="pv-stat-label">{{ stat.label }}</div>
+              <div class="pv-stat-note">{{ stat.note }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
 
         </div>
       </div>
-      {% endif %}
 
       <!-- Center: Key Points -->
       <div class="pv-content">
@@ -95,24 +114,26 @@
   align-items: stretch;
 }
 
-/* ── Before block ────────────────────────────────────────────── */
-.pv-before-block {
+/* ── Left block: full column container ───────────────────────── */
+.pv-left-block {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 16px;
   overflow: hidden;
+  background: linear-gradient(170deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
 }
 
-/* Logo banner — fixed height at top */
+/* ── Logo banner ─────────────────────────────────────────────── */
 .pv-before-logo-wrap {
   position: relative;
   width: 100%;
-  height: 140px;
+  height: 130px;
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .pv-before-logo {
@@ -123,14 +144,13 @@
   object-position: center;
 }
 
-/* BEFORE label overlaid on the logo */
 .pv-before-logo-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   padding: 0.4rem 0.6rem;
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
 }
 
 .pv-before-title-link {
@@ -144,39 +164,139 @@
   color: #ddd;
 }
 
-.pv-before-arrow {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.55);
-}
-
 .pv-before-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.13em;
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   transition: color 0.2s ease;
 }
 
-/* Bullet points below the logo */
-.pv-before-list {
-  margin: 0;
-  padding: 0.75rem 0.9rem 0.75rem 1.75rem;
-  list-style: disc;
-  flex: 1;
-  overflow-y: auto;
-  background: rgba(255, 255, 255, 0.03);
+.pv-before-arrow {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.pv-before-item {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.65);
-  line-height: 1.45;
+/* ── Power Features Section ──────────────────────────────────── */
+.pv-power-section {
+  padding: 0.7rem 0.85rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.pv-power-eyebrow {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 220, 100, 0.7);
+  margin-bottom: 0.2rem;
+}
+
+/* Each glowing pill */
+.pv-power-pill {
+  background: linear-gradient(135deg, rgba(120, 80, 255, 0.18) 0%, rgba(0, 200, 255, 0.10) 100%);
+  border: 1px solid rgba(160, 120, 255, 0.35);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  box-shadow:
+    0 0 10px rgba(140, 100, 255, 0.18),
+    0 0 24px rgba(100, 180, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+  cursor: default;
+}
+
+.pv-power-pill:hover {
+  box-shadow:
+    0 0 18px rgba(160, 110, 255, 0.38),
+    0 0 40px rgba(100, 200, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(190, 150, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.pv-power-top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.pv-power-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(180, 140, 255, 0.6));
+}
+
+.pv-power-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(220, 200, 255, 0.95);
+  text-shadow: 0 0 12px rgba(180, 140, 255, 0.5);
+}
+
+.pv-power-note {
+  font-size: 0.67rem;
+  line-height: 1.4;
+  color: rgba(200, 190, 255, 0.65);
+  padding-left: 1.3rem;
+}
+
+/* ── Pitch Stats Section ─────────────────────────────────────── */
+.pv-pitch-section {
+  padding: 0.6rem 0.85rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+}
+
+.pv-pitch-eyebrow {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
   margin-bottom: 0.35rem;
 }
 
-.pv-before-item:last-child {
-  margin-bottom: 0;
+.pv-stat-item {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s ease;
+}
+
+.pv-stat-item:last-child {
+  border-bottom: none;
+}
+
+.pv-stat-value {
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin-bottom: 0.1rem;
+}
+
+.pv-stat-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 0.2rem;
+}
+
+.pv-stat-note {
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ── GIF with hover overlay ──────────────────────────────────── */
