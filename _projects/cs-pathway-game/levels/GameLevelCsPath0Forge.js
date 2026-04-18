@@ -1299,6 +1299,10 @@ class GameLevelCsPath0Forge {
     let nearestDistance = Infinity;
 
     for (const gatekeeper of gatekeepers) {
+      // Skip until sprite is loaded — width===0 means the fallback alert
+      // distance (180 px) is active and can catch the player at spawn.
+      if ((gatekeeper?.width || 0) === 0) continue;
+
       const gatekeeperCenter = this._getObjectCenter(gatekeeper);
       const distance = Math.hypot(playerCenter.x - gatekeeperCenter.x, playerCenter.y - gatekeeperCenter.y);
       const inCollision = collisionIds.includes(gatekeeper?.spriteData?.id);

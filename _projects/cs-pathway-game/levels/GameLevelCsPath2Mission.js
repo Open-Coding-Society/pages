@@ -2,23 +2,10 @@
 import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
-import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
-const CHALLENGE_ERROR_TYPES = {
-  HTTP_ERROR: 'HTTP_ERROR',
-  EMPTY_RESPONSE: 'EMPTY_RESPONSE',
-  INVALID_RESPONSE: 'INVALID_RESPONSE',
-  UNKNOWN: 'UNKNOWN',
-};
-
-const CHALLENGE_ERROR_MESSAGES = {
-  [CHALLENGE_ERROR_TYPES.HTTP_ERROR]: (status) => `Challenge request failed (${status}).`,
-  [CHALLENGE_ERROR_TYPES.EMPTY_RESPONSE]: () => 'Challenge response was empty.',
-  [CHALLENGE_ERROR_TYPES.INVALID_RESPONSE]: () => 'Challenge response format was invalid.',
-  [CHALLENGE_ERROR_TYPES.UNKNOWN]: () => 'Challenge generation failed.',
-};
+// CHALLENGE_ERROR_TYPES and CHALLENGE_VERDICTS are imported from AiChallengeNpc.
 
 // Centralized communication prompt text used for AI question generation and grading.
 const CHALLENGE_PROMPT_TEXT = {
@@ -44,11 +31,6 @@ const CHALLENGE_PROMPT_TEXT = {
   EVAL_RIGHT_RULE: 'Mark RIGHT for correct or mostly correct answers.',
 };
 
-// Grading is intentionally binary for student-facing feedback in this level.
-const CHALLENGE_VERDICTS = {
-  RIGHT: 'RIGHT',
-  WRONG: 'WRONG',
-};
 
 const CHALLENGE_QUESTION_STYLES = [
   'Ask for a definition in the desk topic area.',
@@ -353,10 +335,14 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       task: async () => {
         try {
           this.showToast?.(`${deskId}: challenge channel opened.`);
-          AiNpc.showInteraction(npc);
+          AiChallengeNpc.showInteraction(npc);
           const challengeQuestion = await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData));
-          this._deliverChallengeToNpc(npc, challengeQuestion);
-          this._armChallengeSubmission(npc, deskId, challengeQuestion);
+          AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
+          AiChallengeNpc.armSubmission(
+            npc, deskId, challengeQuestion, this._activeDeskChallenges,
+            (answer, active, ui) => this._submitChallengeAnswer(npc, npcId, answer, active, ui),
+            this.showToast?.bind(this),
+          );
           this._logChallengeEvent({
             deskId,
             expertise: npc?.spriteData?.expertise || '',
@@ -364,26 +350,15 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
             createdAt: Date.now(),
           });
         } catch (error) {
-          this._handleChallengeFailure(npc, deskId, error);
+          AiChallengeNpc.handleFailure(npc, deskId, error, this.showToast?.bind(this));
         }
       },
     });
   }
 
-  // Generic concurrency guard keyed per desk so duplicate async actions do not overlap.
-  async _runBusyTask({ busySet, key, busyMessage, task }) {
-    // Shared guard so generation/evaluation cannot overlap per desk instance.
-    if (busySet.has(key)) {
-      if (busyMessage) this.showToast?.(busyMessage);
-      return;
-    }
-
-    busySet.add(key);
-    try {
-      await task();
-    } finally {
-      busySet.delete(key);
-    }
+  // Delegate to shared concurrency guard in AiChallengeNpc.
+  async _runBusyTask(opts) {
+    return AiChallengeNpc.runBusyTask({ ...opts, showToast: this.showToast?.bind(this) });
   }
 
   // Wrap async work with level spinner lifecycle so loading UX stays consistent.
@@ -404,7 +379,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const prompt = this._buildChallengePrompt(spriteData);
       const raw = await this._requestChallengeAiText(spriteData, prompt);
-      const question = this._extractFirstChallengeLine(raw);
+      const question = AiChallengeNpc.extractFirstLine(raw);
       lastQuestion = question;
 
       if (!this._isRepeatedMissionQuestion(spriteData, question)) {
@@ -424,64 +399,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return this._parseChallengeEvaluation(raw);
   }
 
-  // Shared request chain used by both question generation and answer evaluation.
+  // AI request pipeline delegated to AiChallengeNpc.
   async _requestChallengeAiText(spriteData, prompt) {
-    // Unified request pipeline used by both question generation and answer grading.
-    const payload = this._buildChallengeRequestPayload(spriteData, prompt);
-    const response = await this._postChallengeRequest(payload);
-    const data = await this._parseChallengeResponseData(response);
-    return this._extractAiResponseText(data);
-  }
-
-  // Create backend payload shape for this level's AI challenge requests.
-  _buildChallengeRequestPayload(spriteData, prompt) {
-    return {
-      prompt,
-      session_id: `mission-challenge-${spriteData?.id || 'desk'}`,
-      npc_type: spriteData?.expertise || 'challenge',
-      expertise: spriteData?.expertise || 'challenge',
-      knowledgeContext: 'Mission Tools challenge generation',
-    };
-  }
-
-  // Send request to AI backend and convert non-2xx status into typed error codes.
-  async _postChallengeRequest(payload) {
-    const pythonURL = `${pythonURI}/api/ainpc/prompt`;
-    const response = await fetch(pythonURL, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`${CHALLENGE_ERROR_TYPES.HTTP_ERROR}_${response.status}`);
-    }
-
-    return response;
-  }
-
-  // Parse JSON safely so malformed body maps to a known error category.
-  async _parseChallengeResponseData(response) {
-    try {
-      return await response.json();
-    } catch (_error) {
-      throw new Error(CHALLENGE_ERROR_TYPES.INVALID_RESPONSE);
-    }
-  }
-
-  // Keep generated question concise by taking first non-empty line only.
-  _extractFirstChallengeLine(raw) {
-    const firstLine = raw.split(/\r?\n/).find((line) => line.trim().length > 0) || raw;
-    return firstLine.trim();
-  }
-
-  // Standard extractor for model text response with empty-response validation.
-  _extractAiResponseText(data) {
-    const raw = (data?.response || '').toString().trim();
-    if (!raw) {
-      throw new Error(CHALLENGE_ERROR_TYPES.EMPTY_RESPONSE);
-    }
-    return raw;
+    return AiChallengeNpc.requestAiText(spriteData, prompt, 'mission-challenge', 'Mission Tools challenge generation');
   }
 
   // Prompt template that forces a strict 2-line grading format for easy parsing.
@@ -574,78 +494,14 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     ].filter(Boolean).join('\n\n');
   }
 
-  // Parse AI grading output into app-level verdict and feedback fields.
+  // Delegate grading parse to AiChallengeNpc.
   _parseChallengeEvaluation(raw) {
-    // Accept strict format first, then gracefully fall back to first two lines.
-    const lines = raw
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
-
-    let verdictLine = lines.find((line) => /^VERDICT\s*:/i.test(line)) || lines[0] || '';
-    let feedbackLine = lines.find((line) => /^FEEDBACK\s*:/i.test(line)) || lines[1] || '';
-
-    const verdictText = verdictLine.replace(/^VERDICT\s*:/i, '').trim().toUpperCase();
-    const feedbackText = feedbackLine.replace(/^FEEDBACK\s*:/i, '').trim();
-
-    const verdict = verdictText.includes(CHALLENGE_VERDICTS.RIGHT)
-      ? CHALLENGE_VERDICTS.RIGHT
-      : CHALLENGE_VERDICTS.WRONG;
-
-    return {
-      verdict,
-      feedback: feedbackText || 'Review the desk topic and try again with a more specific answer.',
-    };
-  }
-
-  // Configure input box for mission mode: Enter submits answer for grading.
-  _armChallengeSubmission(npc, deskId, challengeQuestion) {
-    const ui = this._getChallengeUiElements(npc);
-    if (!ui?.input || !ui?.responseArea) return;
-
-    const npcId = npc?.spriteData?.id || deskId;
-    this._activeDeskChallenges.set(npcId, {
-      deskId,
-      question: challengeQuestion,
-      startedAt: Date.now(),
-    });
-
-    ui.input.value = '';
-    ui.input.placeholder = 'Type your answer, then press Enter to submit...';
-    // Mission mode: Enter submits to evaluator, Shift+Enter remains newline.
-    ui.input.onkeypress = (event) => {
-      event.stopPropagation();
-      if (event.key !== 'Enter' || event.shiftKey) return;
-
-      event.preventDefault();
-      const answer = ui.input.value.trim();
-      if (!answer) {
-        this.showToast?.(`${deskId}: please type an answer first.`);
-        return;
-      }
-
-      this._submitChallengeAnswer(npc, npcId, answer, ui);
-    };
-  }
-
-  // Resolve current NPC dialogue DOM nodes needed for question/answer rendering.
-  _getChallengeUiElements(npc) {
-    const safeId = npc?.dialogueSystem?.safeId;
-    if (!safeId) return null;
-
-    const dialogueRoot = document.getElementById(`custom-dialogue-box-${safeId}`);
-    if (!dialogueRoot) return null;
-
-    return {
-      dialogueRoot,
-      input: dialogueRoot.querySelector('.ai-npc-input'),
-      responseArea: dialogueRoot.querySelector('.ai-npc-response-area'),
-    };
+    return AiChallengeNpc.parseEvaluation(raw);
   }
 
   // Evaluate one submitted answer and update UI/TTS/log in a guarded async flow.
-  async _submitChallengeAnswer(npc, npcId, answer, ui) {
-    const active = this._activeDeskChallenges.get(npcId);
+  // Called by AiChallengeNpc.armSubmission via the onSubmit callback.
+  async _submitChallengeAnswer(npc, npcId, answer, active, ui) {
     if (!active?.question) return;
 
     // Orchestrator: evaluate, render, speak, and log in one guarded flow.
@@ -659,8 +515,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           const evaluation = await this._runWithLoading(() =>
             this._loadChallengeEvaluation(npc?.spriteData, active.question, answer)
           );
-          this._renderChallengeEvaluation(ui.responseArea, active.question, answer, evaluation);
-          this._speakChallengeEvaluation(npc, evaluation);
+          AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, evaluation);
+          AiChallengeNpc.speakEvaluation(npc, evaluation);
           if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
             this._awardMissionProgress(active?.deskId || '');
           }
@@ -674,7 +530,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           });
         } catch (error) {
           console.warn('[MissionTools] challenge answer evaluation failed:', error);
-          this._renderChallengeEvaluation(ui.responseArea, active.question, answer, {
+          AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, {
             verdict: CHALLENGE_VERDICTS.WRONG,
             feedback: 'Could not evaluate right now. Please try submitting again.',
           });
@@ -682,85 +538,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         }
       },
     });
-  }
-
-  // Render full grading summary so learner sees question, answer, verdict, feedback.
-  _renderChallengeEvaluation(responseArea, question, answer, evaluation) {
-    if (!responseArea) return;
-
-    const verdictLabel = evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT ? 'RIGHT' : 'WRONG';
-    const icon = verdictLabel === 'RIGHT' ? '✅' : '❌';
-
-    responseArea.style.display = 'block';
-    responseArea.textContent = [
-      `Challenge Question: ${question}`,
-      `Your Answer: ${answer}`,
-      `${icon} Result: ${verdictLabel}`,
-      `Feedback: ${evaluation?.feedback || 'No feedback provided.'}`,
-    ].join('\n\n');
-  }
-
-  // Read verdict and feedback aloud for accessibility and reinforcement.
-  _speakChallengeEvaluation(npc, evaluation) {
-    if (!npc?.dialogueSystem?.speakText) return;
-
-    const verdict = evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT ? 'Right' : 'Wrong';
-    const feedback = evaluation?.feedback || 'Please try again.';
-    npc.dialogueSystem.speakText(`${verdict}. ${feedback}`);
-  }
-
-  // Display and speak generated question when challenge starts.
-  _deliverChallengeToNpc(npc, challengeQuestion) {
-    this._renderChallengeQuestion(npc, challengeQuestion);
-    if (npc?.dialogueSystem?.speakText) {
-      npc.dialogueSystem.speakText(challengeQuestion);
-    }
-  }
-
-  // Fallback path when question generation fails: show safe default and keep flow usable.
-  _handleChallengeFailure(npc, deskId, error) {
-    const mappedMessage = this._getChallengeErrorMessage(error);
-    console.warn('[MissionTools] challenge generation failed:', mappedMessage, error);
-
-    const fallback = 'Challenge unavailable right now. Ask this: What is one practical step you would take for this desk topic?';
-    this._renderChallengeQuestion(npc, fallback);
-    this.showToast?.(`${deskId}: using fallback challenge.`);
-    if (npc?.dialogueSystem?.speakText) {
-      npc.dialogueSystem.speakText(fallback);
-    }
-  }
-
-  // Map internal error codes to user-readable messages for logs and diagnostics.
-  _getChallengeErrorMessage(error) {
-    const code = (error?.message || '').toString();
-
-    if (code.startsWith(`${CHALLENGE_ERROR_TYPES.HTTP_ERROR}_`)) {
-      const status = code.replace(`${CHALLENGE_ERROR_TYPES.HTTP_ERROR}_`, '');
-      return CHALLENGE_ERROR_MESSAGES[CHALLENGE_ERROR_TYPES.HTTP_ERROR](status);
-    }
-
-    const formatter = CHALLENGE_ERROR_MESSAGES[code] || CHALLENGE_ERROR_MESSAGES[CHALLENGE_ERROR_TYPES.UNKNOWN];
-    return formatter();
-  }
-
-  // Inject generated question into the AI response area and prepare answer input.
-  _renderChallengeQuestion(npc, questionText) {
-    const safeId = npc?.dialogueSystem?.safeId;
-    if (!safeId) return;
-
-    const dialogueRoot = document.getElementById(`custom-dialogue-box-${safeId}`);
-    if (!dialogueRoot) return;
-
-    const responseArea = dialogueRoot.querySelector('.ai-npc-response-area');
-    if (responseArea) {
-      responseArea.style.display = 'block';
-      responseArea.textContent = `Challenge Question: ${questionText}`;
-    }
-
-    const input = dialogueRoot.querySelector('.ai-npc-input');
-    if (input) {
-      input.placeholder = 'Type your answer to the challenge question...';
-    }
   }
 
   // Keep a bounded in-memory challenge log for debugging and future persistence hooks.
@@ -956,7 +733,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     for (const desk of desks) {
       const deskCenter = this._getObjectCenter(desk);
       const distance = Math.hypot(playerCenter.x - deskCenter.x, playerCenter.y - deskCenter.y);
-      const inZone = distance < this._getDeskAlertDistancePx(desk);
+      const inCollision = this._deskIsColliding(player, desk);
+      const inZone = inCollision || distance < this._getDeskAlertDistancePx(desk);
 
       if (inZone && distance < nearestDistance) {
         nearestDesk = desk;
