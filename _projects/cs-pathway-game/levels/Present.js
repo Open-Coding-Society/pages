@@ -1,3 +1,6 @@
+// Shared presentation manager for HUD-style game UI.
+// Owns stateful panel/toast/alerts/score elements and keeps their
+// placement/styles consistent across levels.
 class Present {
   constructor(level, options = {}) {
     this.level = level;
@@ -15,6 +18,7 @@ class Present {
     };
 
     this.toastTimer = null;
+    // Keep one stable listener so we can safely add/remove it.
     this._boundViewportSync = () => this._syncNodeStylesForViewport();
 
     this._ensureBaseStylesheet();
@@ -28,6 +32,7 @@ class Present {
   }
 
   toast(msg = '') {
+    // Toasts are transient and ignored when level is inactive.
     if (!msg || this.options.ignoreToasts.has(msg) || !this._isActiveLevel()) {
       return null;
     }
@@ -95,6 +100,7 @@ class Present {
   }
 
   _renderPersistent(kind, msg) {
+    // Persistent surfaces (panel/alerts/score) update in place until cleared.
     if (!this._isActiveLevel()) {
       return null;
     }
@@ -118,6 +124,7 @@ class Present {
     }
 
     const node = document.createElement('div');
+    // Keep class naming predictable for debugging and optional theming hooks.
     node.className = `present present-${kind}`;
     node.setAttribute('aria-live', 'polite');
     this._applyNodeStyle(kind, node);
@@ -137,6 +144,7 @@ class Present {
 
   _isActiveLevel() {
     try {
+      // The level decides whether UI should currently be visible.
       return Boolean(this.options.isActiveLevel());
     } catch (_error) {
       return true;
@@ -160,6 +168,7 @@ class Present {
       return;
     }
 
+    // Minimal shared rule so links inside messages inherit the panel theme.
     const style = document.createElement('style');
     style.id = 'cs-path-present-base-style';
     style.textContent = `
@@ -175,6 +184,7 @@ class Present {
   }
 
   _syncNodeStylesForViewport() {
+    // Recompute styles for existing nodes when viewport crosses compact layout thresholds.
     Object.entries(this.nodes).forEach(([kind, node]) => {
       if (!node) return;
       this._applyNodeStyle(kind, node);
@@ -183,6 +193,7 @@ class Present {
   }
 
   _applyNodeStyle(kind, node) {
+    // Layout switches at <= 900px to keep overlays readable on smaller screens.
     const compact = typeof window !== 'undefined' && window.innerWidth <= 900;
 
     const base = {
@@ -239,6 +250,7 @@ class Present {
       return;
     }
 
+    // Only score has structured inner markup with sub-elements to style.
     if (kind !== 'score') {
       return;
     }
