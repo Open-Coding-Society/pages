@@ -243,6 +243,9 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
         return;
       }
 
+      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
+      if (!isActiveLevel) return;
+
       const host = document.body;
       if (!host) return;
 
@@ -536,6 +539,17 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     } catch {
       return dateString;
     }
+  }
+
+  destroy() {
+    if (this._toastTimer) {
+      clearTimeout(this._toastTimer);
+      this._toastTimer = null;
+    }
+    if (this._toastEl?.parentNode) {
+      this._toastEl.parentNode.removeChild(this._toastEl);
+    }
+    this._toastEl = null;
   }
 }
 
