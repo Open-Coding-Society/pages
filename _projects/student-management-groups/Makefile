@@ -34,8 +34,10 @@ build:
 	@echo "   Images: images/projects/$(PROJECT_NAME)/"
 
 assets:
-	@mkdir -p $(JS_DEST)/js
-	@cp js/*.js $(JS_DEST)/js/ 2>/dev/null || true
+	@mkdir -p $(JS_DEST)/levels
+	@cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true
+	@mkdir -p $(JS_DEST)/model
+	@cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true
 	@mkdir -p $(IMAGES_DEST)
 	@cp -r images/* $(IMAGES_DEST)/ 2>/dev/null || true
 
@@ -62,11 +64,16 @@ watch:
 			elif echo "$$changed_file" | grep -q "/docs/"; then \
 				echo "  🔄 Docs changed - publishing docs..."; \
 				$(MAKE) docs; \
-			elif echo "$$changed_file" | grep -q "/js/"; then \
+			elif echo "$$changed_file" | grep -q "/levels/"; then \
 				filename=$$(basename "$$changed_file"); \
-				echo "  🔄 JS changed: $$filename"; \
-				mkdir -p $(JS_DEST)/js; \
-				cp "$$changed_file" $(JS_DEST)/js/ 2>/dev/null || true; \
+				echo "  🔄 Level changed: $$filename"; \
+				mkdir -p $(JS_DEST)/levels; \
+				cp "$$changed_file" $(JS_DEST)/levels/ 2>/dev/null || true; \
+			elif echo "$$changed_file" | grep -q "/model/"; then \
+				filename=$$(basename "$$changed_file"); \
+				echo "  🔄 Model changed: $$filename"; \
+				mkdir -p $(JS_DEST)/model; \
+				cp "$$changed_file" $(JS_DEST)/model/ 2>/dev/null || true; \
 			elif echo "$$changed_file" | grep -q "/images/"; then \
 				echo "  🔄 Images changed - copying all images..."; \
 				$(MAKE) assets 2>&1 | grep -v "cp:" | head -1; \
