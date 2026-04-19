@@ -14,6 +14,8 @@
   }
 
   .powaynec-card {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
     border: 1px solid #ff4500 !important;
     box-shadow: 0 0 18px rgba(255, 80, 0, 0.3) !important;
@@ -54,7 +56,33 @@
 
   .powaynec-keypoint span {
     color: #ffd4a8 !important;
+    text-decoration: none !important;
+  }
+
+  .powaynec-org-summary {
+    color: #ffd4a8 !important;
+    font-size: 0.92rem !important;
+    line-height: 1.55 !important;
+    margin: 12px 0 0 !important;
+  }
+
+  .powaynec-team {
+    margin-top: 12px !important;
+  }
+
+  .powaynec-feature-link {
+    align-self: flex-start;
+    color: #ff9a5c !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    margin-top: 8px !important;
     text-decoration: underline !important;
+  }
+
+  .powaynec-feature-links {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
   }
 
   .powaynec-keypoint img {
@@ -95,9 +123,16 @@
   }
 
   .powaynec-header {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
     border: 1px solid #ff4500 !important;
     box-shadow: 0 0 18px rgba(255, 80, 0, 0.3) !important;
+  }
+
+  .powaynec-header > * {
+    position: relative;
+    z-index: 1;
   }
 
   .powaynec-content {
@@ -107,6 +142,7 @@
   .powaynec-details {
     background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
   }
+
 </style>
 
 {% assign data = site.data.powaynec_infograph %}
@@ -131,11 +167,9 @@
           <div class="powaynec-overlay"><span>View Our Project</span></div>
         </a>
         <div class="powaynec-status">{{ topic.status }}</div>
-        {% for point in topic.keyPoints %}
-          {% if point.image and point.location == "status" %}
-          <img src="{{ site.baseurl }}/images/{{ point.image }}" alt="{{ point.title }}" style="width:100%; border-radius:8px; margin-top:10px;">
-          {% endif %}
-        {% endfor %}
+        {% if topic.description %}
+        <p class="powaynec-org-summary">{{ topic.description }}</p>
+        {% endif %}
         <div class="powaynec-team">
           <span class="powaynec-team-label">Project Leads</span>
           <span class="powaynec-team-name">{{ topic.team | join: ", " }}</span>
@@ -147,11 +181,24 @@
         <div class="powaynec-keypoints">
           {% for point in topic.keyPoints %}
           <div class="powaynec-keypoint">
-            <span class="powaynec-check">✓</span>
-            {% if point.link %}
-            <a href="{{ point.link }}" target="_blank" rel="noopener noreferrer">{{ point.title }}</a>
+            {% if point.title == "New Website Features:" %}
+            <h3 class="powaynec-section-title">{{ point.title }}</h3>
             {% else %}
+            <span class="powaynec-check">✓</span>
             <span>{{ point.title }}</span>
+            {% endif %}
+            {% if point.link %}
+            <div class="powaynec-feature-links">
+            <a href="{{ point.link }}" class="powaynec-feature-link" target="_blank" rel="noopener noreferrer">{{ point.link_label | default: "Open Feature" }}</a>
+              {% if point.extra_links %}
+                {% for extra_link in point.extra_links %}
+                <a href="{{ extra_link.url }}" class="powaynec-feature-link" target="_blank" rel="noopener noreferrer">{{ extra_link.label }}</a>
+                {% endfor %}
+              {% endif %}
+            </div>
+            {% endif %}
+            {% if point.image %}
+            <img src="{{ site.baseurl }}/images/{{ point.image }}" alt="{{ point.title }}" style="width:100%; border-radius:8px; margin-top:8px;">
             {% endif %}
             {% if point.images %}
               {% for img in point.images %}
@@ -169,7 +216,7 @@
       </div>
 
       <div class="powaynec-details">
-        <h3 class="powaynec-section-title">Impact</h3>
+        <h3 class="powaynec-section-title">Impacts:</h3>
         <div class="powaynec-impact-list">
           {% for item in topic.impact %}
           <div class="powaynec-impact-item">
@@ -180,7 +227,6 @@
           </div>
           {% endfor %}
         </div>
-        <a href="https://pnec.opencodingsociety.com" class="powaynec-btn" target="_blank" rel="noopener noreferrer">View Our Site</a>
       </div>
     </div>
   </div>
