@@ -193,79 +193,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       backgroundSrc: bg_data.src,
     });
 
-    // Toast helper for zone prompts.
-    this.showToast = function(message) {
-      if (message === 'Press E to interact') {
-        return;
-      }
-
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-
-      const host = document.body;
-      if (!host) return;
-
-      if (this._toastEl?.parentNode) {
-        this._toastEl.parentNode.removeChild(this._toastEl);
-      }
-      if (this._toastTimer) {
-        clearTimeout(this._toastTimer);
-      }
-
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px;
-        z-index: 1200; pointer-events: none;
-        background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-        color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-        padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-        box-shadow: 0 0 20px rgba(78,204,163,0.25);
-        width: min(360px, 32vw); text-align: left;
-      `;
-      toast.textContent = message;
-      host.appendChild(toast);
-
-      this._toastEl = toast;
-      this._toastTimer = setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-        if (this._toastEl === toast) this._toastEl = null;
-        this._toastTimer = null;
-      }, 2200);
-    };
-
-    this.setZoneAlert = function(message) {
-      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
-      if (!isActiveLevel) return;
-
-      const host = document.body;
-      if (!host) return;
-
-      if (!this._zoneAlertEl) {
-        const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = `
-          position: fixed; top: 84px; right: 20px;
-          z-index: 1201; pointer-events: none;
-          background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-          color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-          padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-          box-shadow: 0 0 20px rgba(78,204,163,0.25);
-          width: min(360px, 32vw); text-align: left;
-        `;
-        document.body.appendChild(zoneAlert);
-        this._zoneAlertEl = zoneAlert;
-      }
-
-      this._zoneAlertEl.textContent = message;
-    };
-
-    this.clearZoneAlert = function() {
-      if (this._zoneAlertEl?.parentNode) {
-        this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
-      }
-      this._zoneAlertEl = null;
-    };
-
-
     const gatekeeperBaseData = {
       src: path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
@@ -359,7 +286,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._missionQuestionHistory = new Map();
     this._missionCompletedStations = new Set();
     this._missionProgressCount = 0;
-    this._missionProgressEl = null;
     this._handleMissionDeskKeyDownBound = this._handleMissionDeskKeyDown.bind(this);
   }
 
@@ -709,48 +635,19 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * @private
    */
   _syncMissionProgressBoard() {
-    const host = document.body;
-    if (!host) return;
-
-    if (!this._missionProgressEl) {
-      const board = document.createElement('div');
-      board.style.cssText = `
-        position: fixed; right: 20px; bottom: 20px;
-        z-index: 9999; pointer-events: none;
-        min-width: 220px;
-        background: rgba(13,13,26,0.96);
-        border: 2px solid #f59e0b;
-        color: #f8fafc;
-        font-family: 'Courier New', monospace;
-        padding: 12px 14px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(245,158,11,0.22);
-        letter-spacing: 0.6px;
-      `;
-      board.innerHTML = `
-        <div style="font-size: 11px; text-transform: uppercase; opacity: 0.78; margin-bottom: 6px;">Mission Scoreboard</div>
-        <div class="mission-progress-score" style="font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 6px;">.55</div>
-        <div class="mission-progress-count" style="font-size: 13px; opacity: 0.92; margin-bottom: 10px;">0/4</div>
-        <div style="height: 8px; border-radius: 999px; background: rgba(255,255,255,0.10); overflow: hidden;">
-          <div class="mission-progress-bar" style="height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #f59e0b, #fbbf24, #fde68a);"></div>
-        </div>
-      `;
-      host.appendChild(board);
-      this._missionProgressEl = board;
-    }
-
     const score = this._getMissionProgressScore(this._missionProgressCount);
     const scoreText = score.toFixed(2).replace(/^0/, '');
     const completedText = `${this._missionProgressCount}/4`;
     const progressRatio = Math.max(0, Math.min(1, (score - 0.55) / (0.92 - 0.55)));
 
-    const scoreNode = this._missionProgressEl.querySelector('.mission-progress-score');
-    const countNode = this._missionProgressEl.querySelector('.mission-progress-count');
-    const barNode = this._missionProgressEl.querySelector('.mission-progress-bar');
-
-    if (scoreNode) scoreNode.textContent = scoreText;
-    if (countNode) countNode.textContent = completedText;
-    if (barNode) barNode.style.width = `${progressRatio * 100}%`;
+    this.score(`
+      <div class="present-score-title">Mission Scoreboard</div>
+      <div class="present-score-main mission-progress-score">${scoreText}</div>
+      <div class="present-score-sub mission-progress-count">${completedText}</div>
+      <div class="present-progress-track">
+        <div class="present-progress-bar mission-progress-bar" style="width: ${progressRatio * 100}%;"></div>
+      </div>
+    `);
   }
 
   /**
@@ -949,20 +846,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * scoreboard) and detaches the keydown listener.
    */
   destroy() {
-    this.clearZoneAlert();
     document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
-    if (this._toastTimer) {
-      clearTimeout(this._toastTimer);
-      this._toastTimer = null;
-    }
-    if (this._toastEl?.parentNode) {
-      this._toastEl.parentNode.removeChild(this._toastEl);
-    }
-    this._toastEl = null;
-    if (this._missionProgressEl?.parentNode) {
-      this._missionProgressEl.parentNode.removeChild(this._missionProgressEl);
-    }
-    this._missionProgressEl = null;
+    super.destroy();
   }
 
 }
