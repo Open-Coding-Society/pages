@@ -75,6 +75,10 @@ class Present {
     this._removeNode('panel');
   }
 
+  clearToast() {
+    this._removeNode('toast');
+  }
+
   clearAlerts() {
     this._removeNode('alerts');
   }

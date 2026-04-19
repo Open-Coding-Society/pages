@@ -287,6 +287,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._missionCompletedStations = new Set();
     this._missionProgressCount = 0;
     this._handleMissionDeskKeyDownBound = this._handleMissionDeskKeyDown.bind(this);
+    this._aiLoadingPending = 0;
+    this._aiLoadingToastTimer = null;
+    this._aiLoadingFrame = 0;
   }
 
   /**
@@ -362,16 +365,49 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Wrap with loading. Brackets any async task with the level spinner lifecycle.
+   * Wrap with loading. Uses in-world toast animation instead of full-screen overlay
+   * while AI question/evaluation requests are in flight.
    * @private
    */
   async _runWithLoading(task) {
-    this.queueLoadingWork();
+    this._startAiLoadingToast();
     try {
       return await task();
     } finally {
-      this.finishLoadingWork();
+      this._stopAiLoadingToast();
     }
+  }
+
+  _startAiLoadingToast() {
+    this._aiLoadingPending += 1;
+    if (this._aiLoadingToastTimer) {
+      return;
+    }
+
+    const frames = ['◴', '◷', '◶', '◵'];
+    const renderFrame = () => {
+      const glyph = frames[this._aiLoadingFrame % frames.length];
+      this.showToast?.(`${glyph} Desk AI is thinking...`);
+      this._aiLoadingFrame += 1;
+    };
+
+    renderFrame();
+    this._aiLoadingToastTimer = setInterval(renderFrame, 420);
+  }
+
+  _stopAiLoadingToast() {
+    this._aiLoadingPending = Math.max(0, this._aiLoadingPending - 1);
+    if (this._aiLoadingPending > 0) {
+      return;
+    }
+
+    if (this._aiLoadingToastTimer) {
+      clearInterval(this._aiLoadingToastTimer);
+      this._aiLoadingToastTimer = null;
+    }
+
+    this._aiLoadingFrame = 0;
+    this.present?.clearToast?.();
   }
 
   /**
@@ -847,6 +883,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    */
   destroy() {
     document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    if (this._aiLoadingToastTimer) {
+      clearInterval(this._aiLoadingToastTimer);
+      this._aiLoadingToastTimer = null;
+    }
     super.destroy();
   }
 
