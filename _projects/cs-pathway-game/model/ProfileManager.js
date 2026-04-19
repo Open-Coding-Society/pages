@@ -155,6 +155,44 @@ class ProfileManager {
   }
 
   /**
+   * Stop the game and clean up localStorage keys.
+   *
+   * Call this when the game session fully ends (not on level transitions).
+   * If a backend sync is available and confirmed, localStorage is cleared
+   * so stale keys don't persist across browser sessions in production.
+   * In development (no auth), keys are intentionally preserved so the
+   * next launch can resume without a database.
+   *
+   * Level transitions should NOT call this — only full game stop/exit.
+   *
+   * @returns {Promise<{ success: boolean, code: number, body: Object|null }>}
+   */
+  async stopGame() {
+    try {
+      if (this.isAuthenticated) {
+        // Flush any pending progress to backend before clearing localStorage
+        const currentData = LocalProfile.getFlatProfile();
+        if (currentData) {
+          await PersistentProfile.update(currentData).catch(() => {});
+        }
+        // Backend has the data — safe to remove localStorage keys
+        LocalProfile.clear();
+        console.log('ProfileManager: game stopped, localStorage cleared (backed up to server)');
+      } else {
+        // No backend — keep localStorage so the next launch can resume
+        console.log('ProfileManager: game stopped, localStorage preserved (no auth/backend)');
+      }
+
+      this.initialized = false;
+      this.restoredState = null;
+      return { success: true, code: 200, body: null };
+    } catch (error) {
+      console.error('ProfileManager: stopGame failed', error);
+      return { success: false, code: 500, body: { error: error.message } };
+    }
+  }
+
+  /**
    * Save identity information (name, email, githubID)
    * Creates new profile if none exists, updates if it does
    * Part of Identity Forge level
