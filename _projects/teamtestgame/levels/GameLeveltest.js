@@ -11,13 +11,13 @@ class GameLeveltest {
 
     const backgroundData = {
       name: "custom_bg",
-      src: "/images/projects/teamtestgame/space.jpeg",
+      src: path + "/images/projects/teamtestgame/space.jpeg",
       pixels: { height: 772, width: 1134 }
     };
 
-    const spriteSrc = '/images/projects/teamtestgame/gamebuilder/sprites/pew.png';
-    const alienSpriteSrc = '/images/projects/teamtestgame/gamebuilder/sprites/ufos.png';
-    const meteorSpriteSrc = '/images/projects/teamtestgame/gamebuilder/sprites/meteorforgame.jpg';
+    const spriteSrc = path + '/images/projects/teamtestgame/gamebuilder/sprites/pew.png';
+    const alienSpriteSrc = path + '/images/projects/teamtestgame/gamebuilder/sprites/ufos.png';
+    const meteorSpriteSrc = path + '/images/projects/teamtestgame/gamebuilder/sprites/meteorforgame.jpg';
 
     const _meteorImg = new Image();
     _meteorImg.src = meteorSpriteSrc;
