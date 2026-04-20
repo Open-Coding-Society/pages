@@ -86,6 +86,7 @@ sticky_rank: 8
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
           <div style="background: rgba(124,58,237,0.25); border: 1px solid rgba(124,58,237,0.5); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.7rem; color: #a78bfa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Component 01</div>
           <h3 style="color: #f5f3ff; font-size: 1.05rem; font-weight: 700; margin: 0;">UESL Coach — AI Chatbot</h3>
+          <a href="https://ueslhub.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #a78bfa; text-decoration: none; border: 1px solid rgba(124,58,237,0.4); border-radius: 9999px; padding: 0.15rem 0.6rem; white-space: nowrap;">Try it ↗</a>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,100,100,0.2); border-radius: 12px; padding: 1.1rem;">
@@ -120,6 +121,7 @@ sticky_rank: 8
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
           <div style="background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.4); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.7rem; color: #67e8f9; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Component 02</div>
           <h3 style="color: #f5f3ff; font-size: 1.05rem; font-weight: 700; margin: 0;">Accessible Game Engine &amp; Maker</h3>
+          <a href="https://ueslhub.opencodingsociety.com/play/" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #67e8f9; text-decoration: none; border: 1px solid rgba(6,182,212,0.4); border-radius: 9999px; padding: 0.15rem 0.6rem; white-space: nowrap;">Play now ↗</a>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.75rem;">
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,100,100,0.2); border-radius: 12px; padding: 1.1rem;">
@@ -165,6 +167,7 @@ sticky_rank: 8
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
           <div style="background: rgba(124,58,237,0.25); border: 1px solid rgba(124,58,237,0.5); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.7rem; color: #a78bfa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Component 03</div>
           <h3 style="color: #f5f3ff; font-size: 1.05rem; font-weight: 700; margin: 0;">Community Hub — Social Platform</h3>
+          <a href="https://ueslhub.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #a78bfa; text-decoration: none; border: 1px solid rgba(124,58,237,0.4); border-radius: 9999px; padding: 0.15rem 0.6rem; white-space: nowrap;">View community ↗</a>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,100,100,0.2); border-radius: 12px; padding: 1.1rem;">
