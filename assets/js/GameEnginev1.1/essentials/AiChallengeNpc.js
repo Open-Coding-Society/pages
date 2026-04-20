@@ -220,8 +220,12 @@ class AiChallengeNpc extends AiNpc {
     // Build the shared AiNpc chat UI shell (input + response area).
     const ui = AiNpc.createChatUI(data);
 
-    // Challenge mode: disable history button (not relevant) and show loading state.
-    if (ui.historyBtn) ui.historyBtn.style.display = 'none';
+    // Challenge mode: keep history visible so players can review transcript.
+    if (ui.historyBtn) {
+      ui.historyBtn.style.display = 'inline-block';
+      ui.historyBtn.textContent = 'Chat Transcript';
+      ui.historyBtn.onclick = () => AiNpc.showChatHistory(data);
+    }
 
     // Prevent game input while input is focused — but do NOT wire Enter yet;
     // armSubmission() will do that once the question is ready.
