@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Test Project Documentation
-permalink: /projects/test-project/docs/
+permalink: /test-project/docs/
 ---
 
 # Test Project Documentation
