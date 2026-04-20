@@ -92,10 +92,43 @@ class GameLevelOptionsHub {
       }
     };
 
+    const sprite_data_airport_return = {
+      id: 'Go-to-Airport-Level-NPC',
+      greeting: 'Go to Airport Level',
+      src: `${path}/images/gamify/miningRigMan.png`,
+      SCALE_FACTOR: 6,
+      ANIMATION_RATE: 50,
+      pixels: { height: 400, width: 354 },
+      INIT_POSITION: { x: width * 0.22, y: height * 0.55 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.08, heightPercentage: 0.14 },
+      interact: function () {
+        showDialogBox(
+          'Crypto Miner: Go to Airport Level',
+          'Want to go back to Airport Level?',
+          [
+            {
+              label: 'Go to Airport Level',
+              action: () => {
+                if (gameEnv?.game?.gameControl) {
+                  gameEnv.game.gameControl.currentLevelIndex = 0;
+                  gameEnv.game.gameControl.transitionToLevel();
+                }
+              },
+              keepOpen: false
+            },
+            { label: 'Stay on Map 2', action: () => {}, keepOpen: false }
+          ]
+        );
+      }
+    };
+
     this.classes = [
       { class: GameEnvBackground, data: image_data_hub },
       { class: Player, data: sprite_data_player },
       { class: Npc, data: sprite_data_options_npc },
+      { class: Npc, data: sprite_data_airport_return },
       { class: Npc, data: sprite_data_guide }
     ];
   }

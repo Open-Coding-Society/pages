@@ -637,7 +637,18 @@ class GameLevelAirport {
           showDialogBox(
             "Map Locked",
             "Finish all core Airport NPC interactions first: Stock, Fidelity, Schwab, Casino, Crypto, and Bank.",
-            [{ label: "Got it", action: () => {}, keepOpen: false }]
+            [
+              { label: "Got it", action: () => {}, keepOpen: false },
+              {
+                label: "Skip to Map 2 anyway",
+                action: () => {
+                  if (gameEnv?.game?.gameControl?.endLevel) {
+                    gameEnv.game.gameControl.endLevel();
+                  }
+                },
+                keepOpen: false
+              }
+            ]
           );
           return;
         }
