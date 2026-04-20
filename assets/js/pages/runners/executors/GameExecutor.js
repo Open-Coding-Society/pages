@@ -89,7 +89,7 @@ export class GameExecutor {
     }
   }
 
-  populateLevelSelector(gameLevelClasses) {
+  populateLevelSelector(gameLevelClasses, preferredIndex = null) {
     if (!this.levelSelect) return;
 
     this.levelSelect.innerHTML = '<option value="">Select Level...</option>';
@@ -102,7 +102,10 @@ export class GameExecutor {
     }
 
     if (gameLevelClasses.length > 0) {
-      this.levelSelect.value = '0';
+      const fallbackIndex = 0;
+      const maxIndex = gameLevelClasses.length - 1;
+      const hasPreferred = Number.isInteger(preferredIndex) && preferredIndex >= 0 && preferredIndex <= maxIndex;
+      this.levelSelect.value = String(hasPreferred ? preferredIndex : fallbackIndex);
     }
     this.levelSelect.disabled = gameLevelClasses.length <= 1;
   }
@@ -124,6 +127,19 @@ export class GameExecutor {
 
   async run() {
     try {
+      const preservedLevelIndex = (() => {
+        if (Number.isInteger(this.gameControl?.currentLevelIndex) && this.gameControl.currentLevelIndex >= 0) {
+          return this.gameControl.currentLevelIndex;
+        }
+
+        if (!this.levelSelect || this.levelSelect.value === '') {
+          return null;
+        }
+
+        const parsed = parseInt(this.levelSelect.value, 10);
+        return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
+      })();
+
       this.stop();
 
       let code = this.getCode();
@@ -186,10 +202,24 @@ export class GameExecutor {
           disableContainerAdjustment: true
         };
 
-        this.populateLevelSelector(gameLevelClasses);
+        this.populateLevelSelector(gameLevelClasses, preservedLevelIndex);
 
         this.gameCore = Game.main(environment, GameControl);
         this.gameControl = this.gameCore?.gameControl || null;
+
+        if (
+          Number.isInteger(preservedLevelIndex) &&
+          this.gameControl &&
+          Array.isArray(gameLevelClasses) &&
+          preservedLevelIndex >= 0 &&
+          preservedLevelIndex < gameLevelClasses.length &&
+          preservedLevelIndex !== this.gameControl.currentLevelIndex &&
+          typeof this.gameControl.transitionToLevel === 'function'
+        ) {
+          this.gameControl.currentLevelIndex = preservedLevelIndex;
+          this.gameControl.transitionToLevel();
+        }
+
         this.updateStatus('Running');
 
         this.gameStateMonitor = setInterval(() => {

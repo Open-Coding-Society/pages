@@ -27,3 +27,14 @@ Topics:
     status: "Active"
     team:
       - "TheFlockers (Adhav, Lucas, Perry)"
+    links:
+      - title: "Backend Subdomain"
+        url: "https://theflockers.opencodingsociety.com"
+      - title: "Frontend Subdomain"
+        url: "http://deflock.opencodingsociety.com/"
+      - title: "Frontend Repository"
+        url: "https://github.com/the-flockers/frontend"
+      - title: "Backend Repository"
+        url: "https://github.com/the-flockers/backend"
+
+
