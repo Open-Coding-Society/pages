@@ -50,13 +50,13 @@ fromOverlay:true
 
 const bgData = {
 name:"custom_bg",
-src:path + "/_projects/teamtestgame/images/alien_planet.jpg",
+src:"/images/projects/teamtestgame/alien_planet.jpg",
 pixels:{height:772,width:1134}
 };
 
 const playerData = {
 id:'playerData',
-src:path + "/_projects/teamtestgame/images/gamebuilder/sprites/astro.png",
+src:"/images/projects/teamtestgame/gamebuilder/sprites/astro.png",
 SCALE_FACTOR:8,
 STEP_FACTOR:1000,
 ANIMATION_RATE:50,
@@ -78,7 +78,7 @@ keypress:{up:87,left:65,down:83,right:68}
 const npcData = {
 id:'npc1',
 greeting:'Hello!',
-src:path + "/_projects/teamtestgame/images/gamify/chillguy.png",
+src:"/images/projects/teamtestgame/gamify/chillguy.png",
 SCALE_FACTOR:8,
 ANIMATION_RATE:50,
 INIT_POSITION:{x:431*scaleX, y:106*scaleY},

@@ -22,7 +22,7 @@ class GameLevelprologue {
 
         const playerData = {
             id: 'playerData',
-            src: path + "/_projects/teamtestgame/images/gamebuilder/sprites/astro.png",
+            src: "/images/projects/teamtestgame/gamebuilder/sprites/astro.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -45,7 +45,7 @@ class GameLevelprologue {
         const npcData1 = {
             id: 'guy',
             greeting: 'Hi Astro. You are being sent on a mission to see if planet - B34FG is save to live on. Good luck.',
-            src: path + "/_projects/teamtestgame/images/gamify/chillguy.png",
+            src: "/images/projects/teamtestgame/gamify/chillguy.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 500, y: floorY - Math.floor(height / 8) },
@@ -68,7 +68,7 @@ class GameLevelprologue {
         const npcData2 = {
             id: 'ship',
             greeting: 'BORADING NOW.',
-            src: path + "/_projects/teamtestgame/images/gamebuilder/sprites/pew.png",
+            src: "/images/projects/teamtestgame/gamebuilder/sprites/pew.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 679, y: floorY - Math.floor(height / 8) },
@@ -95,7 +95,7 @@ class GameLevelprologue {
             }
         };
 
-        const sprite_src_chilldude = path + "/_projects/teamtestgame/images/r2_idle.png";
+        const sprite_src_chilldude = "/images/projects/teamtestgame/r2_idle.png";
         const sprite_greet_chilldude = "Beep boop. I'm R2-D2, and I can answer questions about this mission!";
         const npcData3 = {
             id: "ChillDude",
