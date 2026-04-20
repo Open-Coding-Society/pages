@@ -7,10 +7,10 @@ import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 /**
- * GameLevel CS Pathway - Analytics Observatory
+ * GameLevel CS Pathway - Assessment Observatory
  * 
  * This level introduces students to their personal analytics and learning metrics.
- * An Analytics Guide NPC provides insights into:
+ * An Assessment Hub with NPCs provides insights into:
  * - User profile (email, uid, name)
  * - GitHub contribution stats (commits, PRs, issues)
  * - Skill metrics and progress
@@ -18,13 +18,13 @@ import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
  * - Learning journey overview
  */
 class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
-  static levelId = 'analytics-observatory';
-  static displayName = 'Analytics Observatory';
+  static levelId = 'assessment-observatory';
+  static displayName = 'Assessment Observatory';
 
   constructor(gameEnv) {
     super(gameEnv, {
       levelDisplayName: GameLevelCsPath3Analytics.displayName,
-      logPrefix: 'Analytics Observatory',
+      logPrefix: 'Assessment Observatory',
     });
 
     let { width, height, path } = this.getLevelDimensions();
@@ -34,10 +34,10 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/projects/cs-pathway-game/bg3/analytics-observatory-fantasy.png";
+    const image_src = path + "/images/projects/cs-pathway-game/bg3/assessment-observatory-fantasy.png";
     const bg_data = {
         name: GameLevelCsPath3Analytics.displayName,
-        greeting: "Welcome to the Analytics Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
+        greeting: "Welcome to the Assessment Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
         src: image_src,
     };
 
@@ -52,7 +52,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
-      greeting: "Welcome to the Analytics Observatory! Let's explore your learning journey.",
+      greeting: "Welcome to the Assessment Observatory! Let's explore your learning journey.",
       src: player_src,
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 1000,
@@ -183,15 +183,15 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     this.cachedUserData = null;
     this.dataLoaded = Promise.resolve().then(() => this.fetchUserData()).then((data) => {
       this.cachedUserData = data;
-      console.log('Analytics Observatory: Data preloaded', data);
+      console.log('Assessment Observatory: Data preloaded', data);
       return data;
     }).catch((err) => {
-      console.error('Analytics Observatory: Failed to preload data', err);
+      console.error('Assessment Observatory: Failed to preload data', err);
     });
 
     // Dialogue: Sequential helper.
     this.levelDialogueSystem = new DialogueSystem({
-      id: 'analytics-observatory-dialogue',
+      id: 'assessment-observatory-dialogue',
       dialogues: [],
       gameControl: gameEnv.gameControl,
       enableVoice: true,
@@ -684,18 +684,18 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    */
   async fetchUserData() {
     try {
-      console.log('Analytics: Starting data fetch...');
+      console.log('Assessment Observatory: Starting data fetch...');
       
       // Fetch user identity from Flask
       const userResponse = await fetch(`${pythonURI}/api/id`, fetchOptions);
       
       if (!userResponse.ok) {
-        console.error('Analytics: User info fetch failed:', userResponse.status);
+        console.error('Assessment Observatory: User info fetch failed:', userResponse.status);
         return null;
       }
 
       const userData = await userResponse.json();
-      console.log('Analytics: User info fetched, uid:', userData.uid);
+      console.log('Assessment Observatory: User info fetched, uid:', userData.uid);
       
       // Fetch all analytics in parallel
       const [analyticsRes, commitsRes, prsRes, issuesRes] = await Promise.all([
@@ -704,15 +704,15 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
           return { ok: false };
         }),
         fetch(`${pythonURI}/api/analytics/github/user/commits`, fetchOptions).catch(e => {
-          console.error('Analytics: GitHub commits fetch threw error:', e);
+          console.error('Assessment Observatory: GitHub commits fetch threw error:', e);
           return { ok: false };
         }),
         fetch(`${pythonURI}/api/analytics/github/user/prs`, fetchOptions).catch(e => {
-          console.error('Analytics: GitHub prs fetch threw error:', e);
+          console.error('Assessment Observatory: GitHub prs fetch threw error:', e);
           return { ok: false };
         }),
         fetch(`${pythonURI}/api/analytics/github/user/issues`, fetchOptions).catch(e => {
-          console.error('Analytics: GitHub issues fetch threw error:', e);
+          console.error('Assessment Observatory: GitHub issues fetch threw error:', e);
           return { ok: false };
         })
       ]);
@@ -721,63 +721,63 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       if (analyticsRes.ok) {
         try {
           const analyticsSummary = await analyticsRes.json();
-          console.log('Analytics: OCS summary received:', analyticsSummary);
+          console.log('Assessment Observatory: OCS summary received:', analyticsSummary);
           userData.analyticsSummary = analyticsSummary;
         } catch (err) {
-          console.error('Analytics: Failed to parse OCS response:', err);
+          console.error('Assessment Observatory: Failed to parse OCS response:', err);
         }
       } else {
-        console.warn('Analytics: OCS response not ok, status:', analyticsRes.status);
+        console.warn('Assessment Observatory: OCS response not ok, status:', analyticsRes.status);
       }
 
       // Process GitHub Commits
       if (commitsRes.ok) {
         try {
           const commitsData = await commitsRes.json();
-          console.log('Analytics: GitHub commits received:', commitsData);
+          console.log('Assessment Observatory: GitHub commits received:', commitsData);
           userData.github = userData.github || {};
           userData.github.commits = commitsData.total_commit_contributions || 0;
           userData.github.linesAdded = commitsData.total_lines_added || 0;
           userData.github.linesDeleted = commitsData.total_lines_deleted || 0;
         } catch (err) {
-          console.error('Analytics: Failed to parse commits response:', err);
+          console.error('Assessment Observatory: Failed to parse commits response:', err);
         }
       } else {
-        console.warn('Analytics: Commits response not ok, status:', commitsRes.status);
+        console.warn('Assessment Observatory: Commits response not ok, status:', commitsRes.status);
       }
 
       // Process GitHub PRs
       if (prsRes.ok) {
         try {
           const prsData = await prsRes.json();
-          console.log('Analytics: GitHub PRs received:', prsData);
+          console.log('Assessment Observatory: GitHub PRs received:', prsData);
           userData.github = userData.github || {};
           userData.github.prs = (prsData.pull_requests || []).length;
         } catch (err) {
-          console.error('Analytics: Failed to parse PRs response:', err);
+          console.error('Assessment Observatory: Failed to parse PRs response:', err);
         }
       } else {
-        console.warn('Analytics: PRs response not ok, status:', prsRes.status);
+        console.warn('Assessment Observatory: PRs response not ok, status:', prsRes.status);
       }
 
       // Process GitHub Issues
       if (issuesRes.ok) {
         try {
           const issuesData = await issuesRes.json();
-          console.log('Analytics: GitHub issues received:', issuesData);
+          console.log('Assessment Observatory: GitHub issues received:', issuesData);
           userData.github = userData.github || {};
           userData.github.issues = (issuesData.issues || []).length;
         } catch (err) {
-          console.error('Analytics: Failed to parse issues response:', err);
+          console.error('Assessment Observatory: Failed to parse issues response:', err);
         }
       } else {
-        console.warn('Analytics: Issues response not ok, status:', issuesRes.status);
+        console.warn('Assessment Observatory: Issues response not ok, status:', issuesRes.status);
       }
 
-      console.log('Analytics: All data fetched, final object:', userData);
+      console.log('Assessment Observatory: All data fetched, final object:', userData);
       return userData;
     } catch (err) {
-      console.error('Analytics: Fatal error in fetchUserData:', err);
+      console.error('Assessment Observatory: Fatal error in fetchUserData:', err);
       return null;
     }
   }
