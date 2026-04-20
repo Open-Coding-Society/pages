@@ -337,6 +337,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           this.showToast?.(`${deskId}: challenge channel opened.`);
           AiChallengeNpc.showInteraction(npc);
           const challengeQuestion = await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData));
+          this._appendDeskChatMessage(npc, 'ai', `Challenge Question: ${challengeQuestion}`);
           AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
           AiChallengeNpc.armSubmission(
             npc, deskId, challengeQuestion, this._activeDeskChallenges,
@@ -350,6 +351,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
             createdAt: Date.now(),
           });
         } catch (error) {
+          this._appendDeskChatMessage(
+            npc,
+            'ai',
+            'Challenge Question: Challenge unavailable right now. Ask this: What is one practical step you would take for this desk topic?'
+          );
           AiChallengeNpc.handleFailure(npc, deskId, error, this.showToast?.bind(this));
         }
       },
@@ -579,12 +585,35 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
+   * Append transcript message. Stores a single chat item on the NPC sprite data
+   * so the built-in history modal can render mission conversation context.
+   * @private
+   */
+  _appendDeskChatMessage(npc, role, message) {
+    if (!npc?.spriteData || !message) return;
+    if (!Array.isArray(npc.spriteData.chatHistory)) {
+      npc.spriteData.chatHistory = [];
+    }
+
+    npc.spriteData.chatHistory.push({
+      role: role === 'user' ? 'user' : 'ai',
+      message: String(message),
+      createdAt: Date.now(),
+    });
+
+    if (npc.spriteData.chatHistory.length > 200) {
+      npc.spriteData.chatHistory = npc.spriteData.chatHistory.slice(-200);
+    }
+  }
+
+  /**
    * Submit answer. Evaluates the student answer, renders feedback, speaks
    * the result, and awards progress if correct. Called via onSubmit callback.
    * @private
    */
   async _submitChallengeAnswer(npc, npcId, answer, active, ui) {
     if (!active?.question) return;
+    this._appendDeskChatMessage(npc, 'user', answer);
 
     await this._runBusyTask({
       busySet: this._deskChallengeEvalBusy,
@@ -598,6 +627,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           );
           AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, evaluation);
           AiChallengeNpc.speakEvaluation(npc, evaluation);
+          this._appendDeskChatMessage(
+            npc,
+            'ai',
+            `Result: ${evaluation?.verdict || CHALLENGE_VERDICTS.WRONG}. ${evaluation?.feedback || 'No feedback provided.'}`
+          );
           if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
             this._awardMissionProgress(active?.deskId || '');
           }
@@ -611,6 +645,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           });
         } catch (error) {
           console.warn('[MissionTools] challenge answer evaluation failed:', error);
+          this._appendDeskChatMessage(
+            npc,
+            'ai',
+            'Result: WRONG. Could not evaluate right now. Please try submitting again.'
+          );
           AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, {
             verdict: CHALLENGE_VERDICTS.WRONG,
             feedback: 'Could not evaluate right now. Please try submitting again.',
