@@ -30,7 +30,7 @@
     const token = (formData.get("token") || "").toString().trim();
 
     try {
-      const response = await fetch("http://localhost:8080/api/capstones", {
+      const response = await fetch("http://localhost:8585/api/capstones", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
