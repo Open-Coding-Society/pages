@@ -6,7 +6,6 @@ import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
 
 
 
-
 // SCORE SYSTEM
 class GameScorer {
  constructor(gameEnv) {
