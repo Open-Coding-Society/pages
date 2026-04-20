@@ -16,13 +16,13 @@ class GameLevelprologue {
 
         const bgData = {
             name: "custom_bg",
-            src: path + "//_projects/teamtestgame/images/newgamebg.jpeg",
+            src: path + "/images/projects/teamtestgame/newgamebg.jpeg",
             pixels: { height: 720, width: 1280 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: path + "/images/projects/teamtestgame/gamebuilder/sprites/astro.png",
+            src: path + "/images/projects/teamtestgame/astro.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -45,7 +45,7 @@ class GameLevelprologue {
         const npcData1 = {
             id: 'guy',
             greeting: 'Hi Astro. You are being sent on a mission to see if planet - B34FG is save to live on. Good luck.',
-            src: path + "/images/projects/teamtestgame/gamify/chillguy.png",
+            src: path + "/images/projects/teamtestgame/chillguy.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 500, y: floorY - Math.floor(height / 8) },
@@ -68,7 +68,7 @@ class GameLevelprologue {
         const npcData2 = {
             id: 'ship',
             greeting: 'BORADING NOW.',
-            src: path + "/images/projects/teamtestgame/gamebuilder/sprites/pew.png",
+            src: path + "/images/projects/teamtestgame/pew.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 679, y: floorY - Math.floor(height / 8) },

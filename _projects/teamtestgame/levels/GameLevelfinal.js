@@ -23,7 +23,7 @@ class GameLevelfinal {
 
         const playerData = {
             id: 'playerData',
-            src: path + "/images/projects/teamtestgame/gamebuilder/sprites/astro.png",
+            src: path + "/images/projects/teamtestgame/astro.png",
             SCALE_FACTOR: 8,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -48,7 +48,7 @@ class GameLevelfinal {
         const npcData1 = {
             id: 'AI',
             greeting: 'ah',
-            src: path + "/images/projects/teamtestgame/gamify/chillguy.png",
+            src: path + "/images/projects/teamtestgame/chillguy.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 500, y: 300 },
@@ -234,7 +234,7 @@ class GameLevelfinal {
         }
 
         const killerChoices = [
-            path + "/images/projects/teamtestgame/gamebuilder/sprites/meteorforgame.jpg"
+            path + "/images/projects/teamtestgame/meteorforgame.jpg"
         ];
 
         const killerSrc = killerChoices[Math.floor(Math.random() * killerChoices.length)];

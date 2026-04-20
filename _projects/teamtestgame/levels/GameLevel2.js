@@ -56,7 +56,7 @@ pixels:{height:772,width:1134}
 
 const playerData = {
 id:'playerData',
-src:path + "/images/projects/teamtestgame/gamebuilder/sprites/astro.png",
+src:path + "/images/projects/teamtestgame/astro.png",
 SCALE_FACTOR:8,
 STEP_FACTOR:1000,
 ANIMATION_RATE:50,
@@ -78,7 +78,7 @@ keypress:{up:87,left:65,down:83,right:68}
 const npcData = {
 id:'npc1',
 greeting:'Hello!',
-src:path + "/images/projects/teamtestgame/gamify/chillguy.png",
+src:path + "/images/projects/teamtestgame/chillguy.png",
 SCALE_FACTOR:8,
 ANIMATION_RATE:50,
 INIT_POSITION:{x:431*scaleX, y:106*scaleY},
@@ -270,7 +270,7 @@ this.initialize = () => {
     placeCoinSafely();
   }
 
-  const mineSrc = path + '/_projects/teamtestgame/images/gamebuilder/sprites/Mine.jpg';
+  const mineSrc = path + '/images/projects/teamtestgame/Mine.jpg';
   this._mineImages = [];
   for (const obj of gameEnv.gameObjects) {
     if (!obj.canvas?.id?.startsWith('mine_')) continue;

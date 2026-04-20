@@ -15,9 +15,9 @@ class GameLeveltest {
       pixels: { height: 772, width: 1134 }
     };
 
-    const spriteSrc = path + '/images/projects/teamtestgame/gamebuilder/sprites/pew.png';
-    const alienSpriteSrc = path + '/images/projects/teamtestgame/gamebuilder/sprites/ufos.png';
-    const meteorSpriteSrc = path + '/images/projects/teamtestgame/gamebuilder/sprites/meteorforgame.jpg';
+    const spriteSrc = path + '/images/projects/teamtestgame/pew.png';
+    const alienSpriteSrc = path + '/images/projects/teamtestgame/ufos.png';
+    const meteorSpriteSrc = path + '/images/projects/teamtestgame/meteorforgame.jpg';
 
     const _meteorImg = new Image();
     _meteorImg.src = meteorSpriteSrc;
