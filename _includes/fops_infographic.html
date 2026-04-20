@@ -1,85 +1,105 @@
 {% assign data = site.data.fops_infographic %}
 
 <style>
-  .fops { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #111; color: #e0e0e0; border-radius: 12px; }
-  .fops h1 { font-size: 20px; font-weight: 500; color: #fff; margin: 0 0 16px; }
-  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-  .btn { font-size: 12px; padding: 6px 14px; border-radius: 6px; text-decoration: none; }
-  .btn-g { background: #1a3a1a; color: #6fcf6f; border: 0.5px solid #2d5a2d; }
-  .btn-d { background: #1e1e1e; color: #999; border: 0.5px solid #333; }
-  .tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
-  .card { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 12px; padding: 14px; }
-  .card-tag { font-size: 10px; letter-spacing: 1px; color: #4caf50; text-transform: uppercase; margin-bottom: 6px; }
-  .card-name { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 6px; }
-  .card-desc { font-size: 12px; color: #fff; line-height: 1.5; margin-bottom: 10px; }
-  .card-links { display: flex; gap: 10px; flex-wrap: wrap; }
-  .card-link { font-size: 12px; color: #4caf50; text-decoration: none; }
-  .card-link:hover { text-decoration: underline; }
-  .card-link.orange { color: #e07030; }
-  .highlights { background: #161f16; border: 0.5px solid #2a3a2a; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
-  .hl-title { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 4px; }
-  .hl-sub { font-size: 12px; color: #666; margin-bottom: 12px; }
-  .hl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-  .hl-item { font-size: 12px; color: #999; }
-  .footer { border-top: 0.5px solid #222; padding-top: 16px; }
-  .footer-left { font-size: 12px; color: #555; }
-  @media (max-width: 700px) {
-    .tools { grid-template-columns: 1fr; }
-    .hl-grid { grid-template-columns: 1fr; }
+  .fops{max-width:900px;margin:0 auto;padding:1.5rem 1rem;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#111;color:#e0e0e0;border-radius:12px}
+  .fops h1{font-size:20px;font-weight:500;color:#fff;margin:0 0 10px}
+  .fops-desc{font-size:13px;color:#888;line-height:1.6;margin-bottom:16px}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .btn{font-size:12px;padding:6px 14px;border-radius:6px;text-decoration:none}
+  .btn-g{background:#1a3a1a;color:#6fcf6f;border:0.5px solid #2d5a2d}
+  .btn-d{background:#1e1e1e;color:#999;border:0.5px solid #333}
+  .meta{font-size:12px;color:#555;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid #222}
+  .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+  .card{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:12px;padding:14px}
+  .card-tag{font-size:10px;letter-spacing:1px;color:#4caf50;text-transform:uppercase;margin-bottom:6px}
+  .card-name{font-size:14px;font-weight:500;color:#fff;margin-bottom:6px}
+  .card-desc{font-size:12px;color:#ccc;line-height:1.5;margin-bottom:10px}
+  .card-links{display:flex;gap:10px;flex-wrap:wrap}
+  .card-link{font-size:12px;color:#4caf50;text-decoration:none}
+  .card-link.orange{color:#e07030}
+  .comparison{border-radius:12px;overflow:hidden;margin-bottom:24px;border:0.5px solid #2a2a2a}
+  .cmp-header{display:grid;grid-template-columns:1fr 1fr 1fr;background:#1a1a1a;border-bottom:0.5px solid #2a2a2a}
+  .cmp-header div{font-size:11px;font-weight:500;padding:10px 14px;letter-spacing:.5px;text-transform:uppercase}
+  .cmp-header .col-label{color:#555}
+  .cmp-header .col-before{color:#c0392b}
+  .cmp-header .col-after{color:#4caf50}
+  .cmp-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid #1e1e1e}
+  .cmp-row:last-child{border-bottom:none}
+  .cmp-row div{font-size:12px;padding:10px 14px;line-height:1.5}
+  .cmp-row:nth-child(odd){background:#181818}
+  .cmp-row:nth-child(even){background:#141414}
+  .col-label{color:#888;font-weight:500}
+  .col-before{color:#e57373}
+  .col-after{color:#81c784}
+  .highlights{background:#161f16;border:0.5px solid #2a3a2a;border-radius:12px;padding:16px;margin-bottom:24px}
+  .hl-title{font-size:14px;font-weight:500;color:#fff;margin-bottom:4px}
+  .hl-sub{font-size:12px;color:#666;margin-bottom:12px}
+  .hl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+  .hl-item{font-size:12px;color:#999}
+  .section-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  @media(max-width:700px){
+    .tools{grid-template-columns:1fr}
+    .hl-grid{grid-template-columns:1fr}
+    .cmp-header,.cmp-row{grid-template-columns:1fr}
+    .cmp-header .col-before,.cmp-header .col-after,.cmp-row .col-before,.cmp-row .col-after{display:none}
   }
 </style>
 
 <div class="fops">
   <h1>{{ data.title }}</h1>
+  <p class="fops-desc">{{ data.description }}</p>
+
   <div class="btn-row">
-    <a href="https://www.friendsofpowayseniors.org" class="btn btn-g" target="_blank" rel="noopener noreferrer">Visit Original Site →</a>
-    <a href="https://fops.opencodingsociety.com/fops" class="btn btn-d" target="_blank" rel="noopener noreferrer">Visit New Site →</a>
+    <a href="https://www.friendsofpowayseniors.org" class="btn btn-g" target="_blank" rel="noopener noreferrer">Visit original site →</a>
+    <a href="https://fops.opencodingsociety.com/fops" class="btn btn-d" target="_blank" rel="noopener noreferrer">Visit new site →</a>
   </div>
 
-  <div class="tools">
-    <div class="card">
-      <div class="card-tag">Bingo Game</div>
-      <div class="card-name">Interactive Bingo</div>
-      <div class="card-desc">75-ball bingo with auto-caller — mark your card and shout BINGO when you win.</div>
-      <div class="card-links">
-        <a href="https://fops.opencodingsociety.com/fopsbingo/" class="card-link" target="_blank" rel="noopener noreferrer">Play →</a>
-        <a href="https://fops.opencodingsociety.com/fopsbingo/#volunteer" class="card-link orange" target="_blank" rel="noopener noreferrer">Volunteer →</a>
-      </div>
+  <div class="meta">Project leads:
+    {% for member in data.topics[0].team %}
+      {{ member }}{% unless forloop.last %}, {% endunless %}
+    {% endfor %}
+  </div>
+
+  <div class="section-label">Site improvements</div>
+  <div class="comparison">
+    <div class="cmp-header">
+      <div class="col-label">Feature</div>
+      <div class="col-before">Before</div>
+      <div class="col-after">After</div>
     </div>
-    <div class="card">
-      <div class="card-tag">Event Predictor</div>
-      <div class="card-name">ML Forecasting</div>
-      <div class="card-desc">AI forecasts volunteer needs and meal quantities to prevent shortages before event day.</div>
-      <div class="card-links">
-        <a href="https://fops.opencodingsociety.com/fopspredictor/" class="card-link" target="_blank" rel="noopener noreferrer">Open →</a>
-      </div>
+    {% for item in data.comparison %}
+    <div class="cmp-row">
+      <div class="col-label">{{ item.feature }}</div>
+      <div class="col-before">{{ item.before }}</div>
+      <div class="col-after">{{ item.after }}</div>
     </div>
-    <div class="card">
-      <div class="card-tag">AI Chatbot</div>
-      <div class="card-name">24/7 Assistant</div>
-      <div class="card-desc">Answers questions and guides seniors through available services around the clock.</div>
-      <div class="card-links">
-        <a href="https://fops.opencodingsociety.com/fops#chatbot" class="card-link" target="_blank" rel="noopener noreferrer">Open →</a>
-      </div>
-    </div>
+    {% endfor %}
   </div>
 
   <div class="highlights">
     <div class="hl-title">{{ data.topics[0].title }}</div>
     <div class="hl-sub">Key improvements</div>
     <div class="hl-grid">
-      <div class="hl-item">✓ Navigation reduced from 7+ dropdowns to 3 clear links</div>
-      <div class="hl-item">✓ Donate, Volunteer, Get Help CTAs above the fold</div>
-      <div class="hl-item">✓ AI chatbot in plain English, 24/7</div>
-      <div class="hl-item">✓ Volunteer signup with schedule management</div>
+      {% for item in data.topics[0].highlights %}
+      <div class="hl-item">✓ {{ item }}</div>
+      {% endfor %}
     </div>
   </div>
 
-  <div class="footer">
-    <span class="footer-left">Project leads:
-      {% for member in data.topics[0].team %}
-        {{ member }}{% unless forloop.last %}, {% endunless %}
-      {% endfor %}
-    </span>
+  <div class="section-label">Key features</div>
+  <div class="tools">
+    {% for tool in data.tools %}
+    <div class="card">
+      <div class="card-tag">{{ tool.tag }}</div>
+      <div class="card-name">{{ tool.name }}</div>
+      <div class="card-desc">{{ tool.desc }}</div>
+      <div class="card-links">
+        {% for link in tool.links %}
+        <a href="{{ link.url }}" class="card-link {% if link.style == 'orange' %}orange{% endif %}" target="_blank" rel="noopener noreferrer">{{ link.label }} →</a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
   </div>
+
 </div>
