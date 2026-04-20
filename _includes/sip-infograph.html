@@ -273,6 +273,38 @@
     transition: background .2s;
   }
   .sip-btn:hover { background: var(--gold); color: var(--bg); }
+  .sip-prog-links {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .sip-prog-link {
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 3px 9px;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    transition: border-color .2s, color .2s;
+  }
+
+  .sip-prog-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .sip-prog-link--new {
+    border-color: rgba(201,168,76,0.3);
+    color: var(--gold);
+  }
+
+  .sip-prog-link--new:hover {
+    border-color: var(--gold);
+    background: var(--gold-light);
+  }
 </style>
 
 <div class="sip">
@@ -289,30 +321,27 @@
           <circle cx="8" cy="8" r="6.5"/>
           <path d="M8 1.5C6 4 5 6 5 8s1 4 3 6.5M8 1.5C10 4 11 6 11 8s-1 4-3 6.5M1.5 8h13"/>
         </svg>
-        Live site (Prototype)
+        Live Site (prototype)
       </a>
       <a href="https://github.com/cspcodewarriors/codewarrior-pages" class="sip-link-btn" target="_blank" rel="noopener">
         <svg class="sip-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="2" y="2" width="12" height="12" rx="2"/>
           <path d="M5 6h6M5 9h4"/>
         </svg>
-        What you see (pages)
+        Site Code (pages)
       </a>
-      <a href="https://github.com/cspcodewarriors/codewarriorflask" class="sip-link-btn" target="_blank" rel="noopener">
+      <a href="https://sipoway.opencodingsociety.com/" class="sip-link-btn" target="_blank" rel="noopener">
         <svg class="sip-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="2" y="2" width="12" height="12" rx="2"/>
           <path d="M5 5l2 3-2 3M9 11h2"/>
         </svg>
-        What runs behind it (server)
+        Admin Database (server)
       </a>
     </div>
   </div>
 
   <!-- ── Who They Are (merged with Programs) ── -->
   <div class="sip-card">
-    <div class="sip-meta-row">
-      <span class="sip-team-names">Anishka Sanghvi · Michelle Ji · Krishna Visvanath · West Stefany</span>
-    </div>
     <h2 class="sip-project-title">Who They Are</h2>
     <p class="sip-subtitle">A Global Volunteer Organization with Local Roots</p>
 
@@ -326,33 +355,57 @@
 
     <p class="sip-section-label">Programs (Click the buttons below to learn more)</p>
     <div class="sip-programs-grid">
-      <a href="https://sip.opencodingsociety.com/sip/transitional-housing/" class="sip-prog" target="_blank" rel="noopener">
-        <p class="sip-prog-name">Transitional Housing <span class="sip-prog-arrow">↗</span></p>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Transitional Housing</p>
         <p class="sip-prog-desc">Connects women leaving crisis situations to stable housing resources.</p>
-      </a>
-      <a href="https://sip.opencodingsociety.com/sip/live-your-dream/" class="sip-prog" target="_blank" rel="noopener">
-        <p class="sip-prog-name">Live Your Dream <span class="sip-prog-arrow">↗</span></p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/transitional-housing" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/transitional-housing/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Live Your Dream</p>
         <p class="sip-prog-desc">Cash grants for women supporting families while pursuing education.</p>
-      </a>
-      <a href="https://sip.opencodingsociety.com/sip/dreamit-beit/" class="sip-prog" target="_blank" rel="noopener">
-        <p class="sip-prog-name">Dream It, Be It <span class="sip-prog-arrow">↗</span></p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/live-your-dream" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/live-your-dream/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Dream It, Be It</p>
         <p class="sip-prog-desc">Career mentors visit schools to broaden girls' professional horizons.</p>
-      </a>
-      <a href="https://sip.opencodingsociety.com/sip/stat/" class="sip-prog" target="_blank" rel="noopener">
-        <p class="sip-prog-name">STAT! <span class="sip-prog-arrow">↗</span></p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/dream-it-be-it" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/dreamit-beit/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">STAT!</p>
         <p class="sip-prog-desc">Anti-trafficking awareness and advocacy program.</p>
-      </a>
-      <a href="https://sip.opencodingsociety.com/sip/abraxas-scholarship/" class="sip-prog" target="_blank" rel="noopener">
-        <p class="sip-prog-name">Abraxas Scholarship <span class="sip-prog-arrow">↗</span></p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/stat-1" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/stat/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Abraxas Scholarship</p>
         <p class="sip-prog-desc">Annual financial award for Abraxas High School students.</p>
-      </a>
-      <a href="https://sip.opencodingsociety.com/sip/colegio-la-esparanza/" class="sip-prog" target="_blank" rel="noopener">
-        <p class="sip-prog-name">Colegio La Esperanza <span class="sip-prog-arrow">↗</span></p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/abraxas" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/abraxas-scholarship/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Colegio La Esperanza</p>
         <p class="sip-prog-desc">Supports an elementary school in Baja California, Mexico.</p>
-      </a>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/colegio-la-esperanza" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/colegio-la-esparanza/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
     </div>
 
-    <a href="https://www.sipoway.com/" class="sip-btn" target="_blank" rel="noopener">Visit Site</a>
+    <a href="https://www.sipoway.com/" class="sip-btn" target="_blank" rel="noopener">Visit Original Site</a>
   </div>
 
   <!-- ── What We Built ── -->
@@ -391,7 +444,9 @@
         <p class="sip-change-desc">Program cards on the home page now feature concise descriptions, making it easier to quickly understand and choose the right program.</p>
       </div>
       <div class="sip-change">
-        <p class="sip-change-title">Admin Panel</p>
+        <p class="sip-change-title"><a href="https://sipoway.opencodingsociety.com/" target="_blank" rel="noopener">Admin Panel</a></p>
         <p class="sip-change-desc">An admin panel has been added to allow for easier management and updates of program information. It also allows admins to approve user requests to become a volunteer.</p>
       </div>
     </div>
+  </div>
+</div>

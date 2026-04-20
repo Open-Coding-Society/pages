@@ -42,46 +42,95 @@ constructor(options = {}) {
   this.isOpen = false;
 }
 
-
+ // Shared speech state so dialogue lines from different DialogueSystem instances
+ // are spoken in sequence instead of interrupting each other.
+ static getSpeechState() {
+   if (!DialogueSystem._speechState) {
+     DialogueSystem._speechState = {
+       queue: [],
+       speaking: false,
+     };
+   }
+   return DialogueSystem._speechState;
+ }
+ 
+ static flushSpeechQueue() {
+   const state = DialogueSystem.getSpeechState();
+   state.queue = [];
+   state.speaking = false;
+ 
+   if (window.speechSynthesis) {
+     window.speechSynthesis.cancel();
+   }
+ }
+ 
+ static drainSpeechQueue() {
+   const state = DialogueSystem.getSpeechState();
+   if (state.speaking) return;
+   if (!window.speechSynthesis) return;
+ 
+   const nextUtterance = state.queue.shift();
+   if (!nextUtterance) return;
+ 
+   state.speaking = true;
+ 
+   nextUtterance.onend = () => {
+     state.speaking = false;
+     DialogueSystem.drainSpeechQueue();
+   };
+ 
+   nextUtterance.onerror = () => {
+     state.speaking = false;
+     DialogueSystem.drainSpeechQueue();
+   };
+ 
+   window.speechSynthesis.speak(nextUtterance);
+ }
 
 
 // Voice synthesis helper
 speakText(text) {
-  // Cancel any ongoing speech
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
-   if (!this.enableVoice || !window.speechSynthesis) {
+  if (!this.enableVoice || !window.speechSynthesis) {
     return; // Voice synthesis not available or disabled
   }
-   const utterance = new SpeechSynthesisUtterance(text);
-   // Set voice properties
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  // Set voice properties
   utterance.rate = this.voiceRate;
   utterance.pitch = this.voicePitch;
   utterance.volume = this.voiceVolume;
-   // Try to set Australian male voice
+
+  // Try to set Australian male voice
   const voices = window.speechSynthesis.getVoices();
-   // First, look for Australian English voices
-  let australianVoice = voices.find(voice =>
+
+  // First, look for Australian English voices
+  let australianVoice = voices.find((voice) =>
     voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('male')
   );
-   // If no Australian male voice found, look for any Australian voice
+
+  // If no Australian male voice found, look for any Australian voice
   if (!australianVoice) {
-    australianVoice = voices.find(voice => voice.lang.includes('en-AU'));
+    australianVoice = voices.find((voice) => voice.lang.includes('en-AU'));
   }
-   // If still no Australian voice, look for any male voice
+
+  // If still no Australian voice, look for any male voice
   if (!australianVoice) {
-    australianVoice = voices.find(voice => voice.name.toLowerCase().includes('male'));
+    australianVoice = voices.find((voice) => voice.name.toLowerCase().includes('male'));
   }
-   // If no male voice found, just pick the first voice
+
+  // If no male voice found, just pick the first voice
   if (!australianVoice && voices.length > 0) {
     australianVoice = voices[0];
   }
-   if (australianVoice) {
+
+  if (australianVoice) {
     utterance.voice = australianVoice;
   }
-   // Speak the text
-  window.speechSynthesis.speak(utterance);
+
+  const state = DialogueSystem.getSpeechState();
+  state.queue.push(utterance);
+  DialogueSystem.drainSpeechQueue();
 }
 
 
@@ -400,10 +449,7 @@ closeDialogue() {
   if (this.typewriterTimeoutId) {
     clearTimeout(this.typewriterTimeoutId);
   }
-   // Cancel speech synthesis
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
+   // Leave speech running so queued lines can finish naturally.
    // Hide the dialogue box
   this.dialogueBox.style.display = "none";
   this.isOpen = false;

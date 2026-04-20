@@ -60,15 +60,12 @@ class FriendlyNpc extends Npc {
             player?.state?.collisionEvents?.includes(this.spriteData?.id)
         );
 
-        // ════════════════════════════════════════════════════════════════════
-        // ALERT ZONE  (distance < alertDist)
-        //   • NPC switches to standing / alert frame
-        //   • "Press E to interact" toast shown on every fresh entry
-        //   • reaction() called on every fresh entry so level logic can run
-        //     (it is the level's own guards that decide whether to show
-        //      dialogue again — we must NOT gate it here)
-        // ════════════════════════════════════════════════════════════════════
-        const nowInAlert = distance < alertDist;
+        // Don't trigger alert zone until the NPC sprite is loaded (width > 0).
+        // On frame 1 width is 0 and alertDist falls back to interactDistance*1.5
+        // (~180 px), which can encompass the player spawn position and fire
+        // reaction() before the player has moved — the phantom collision.
+        const spriteReady = (this.width || 0) > 0;
+        const nowInAlert = spriteReady && distance < alertDist;
 
         if (nowInAlert && !this._inAlertZone) {
             // ── Entered alert zone ───────────────────────────────────────────

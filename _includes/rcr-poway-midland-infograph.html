@@ -16,7 +16,7 @@
       <!-- Left: Image & Status -->
       <div class="rcr-pmr-visual">
         <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-image-link">
-          <img src="https://static.vecteezy.com/system/resources/previews/034/949/404/non_2x/simple-steam-train-icon-illustration-design-steam-locomotive-symbol-template-vector.jpg">
+          <img src="{{ site.baseurl }}/{{ feature.image }}" alt="{{ feature.alt }}">
           <div class="rcr-pmr-overlay">
             <span>View Project</span>
           </div>
@@ -49,20 +49,27 @@
         </div>
       </div>
 
-      <!-- Right: Description & Impact -->
-      <div class="rcr-pmr-details">
-        <h3 class="rcr-pmr-section-title">About</h3>
-        <p class="rcr-pmr-about">{{ feature.description }}</p>
+<!-- Right: Description & Impact -->
+<div class="rcr-pmr-details">
+  <h3 class="rcr-pmr-section-title">About</h3>
+  
+  <!-- Current  -->
+  <h4 class="rcr-pmr-subsection-title" style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem; margin-bottom: 0.25rem;">Current</h4>
+  <p class="rcr-pmr-current" style="margin-bottom: 1rem;">{{ feature.current }}</p>
+  
+  <!-- Purpose  -->
+  <h4 class="rcr-pmr-subsection-title" style="font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem; margin-bottom: 0.25rem;">Purpose</h4>
+  <p class="rcr-pmr-purpose" style="margin-bottom: 1.5rem;">{{ feature.purpose }}</p>
 
-        <h3 class="rcr-pmr-section-title">Impact</h3>
-        <div class="rcr-pmr-impact-list">
-          {% for item in feature.impact %}
-          <div class="rcr-pmr-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
+  <h3 class="rcr-pmr-section-title">Impact</h3>
+  <div class="rcr-pmr-impact-list">
+    {% for item in feature.impact %}
+    <div class="rcr-pmr-impact-item">{{ item }}</div>
+    {% endfor %}
+  </div>
 
-        <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-btn">Learn More</a>
-      </div>
+  <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-btn">Learn More</a>
+</div>
 
     </div>
   </div>
