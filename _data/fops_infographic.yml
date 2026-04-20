@@ -5,6 +5,7 @@ topics:
   - title: "Friends of Poway Seniors"
     image: "capstone/fops_logo.png"
     link: "/plans/friendsofpowayseniors/"
+    updatedSite: "https://fops.opencodingsociety.com/"
     alt: "Friends of Poway Seniors — Website Improvements Capstone"
     keyPoints:
       - "Simplify navigation — reduce dropdown clutter from 7+ options to 3 clear links"
