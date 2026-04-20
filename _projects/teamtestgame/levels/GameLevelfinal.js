@@ -1,8 +1,8 @@
-import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
-import Coin from '/assets/js/GameEnginev1.1/Coin.js';
+import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '../../../GameEnginev1.1/essentials/Player.js';
+import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
+import Barrier from '../../../GameEnginev1.1/essentials/Barrier.js';
+import Coin from '../../../GameEnginev1.1/Coin.js';
 
 class GameLevelfinal {
     constructor(gameEnv) {
@@ -17,13 +17,13 @@ class GameLevelfinal {
 
         const bgData = {
             name: "custom_bg",
-            src: path + "/projects/teamtestgame/images/pixelgameimgforgame.jpg",
+            src: path + "/images/projects/teamtestgame/pixelgameimgforgame.jpg",
             pixels: { height: 772, width: 1134 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: path + "/projects/teamtestgame/images/astro.png",
+            src: path + "/images/projects/teamtestgame/astro.png",
             SCALE_FACTOR: 8,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -48,7 +48,7 @@ class GameLevelfinal {
         const npcData1 = {
             id: 'AI',
             greeting: 'ah',
-            src: path + "/projects/teamtestgame/images/chillguy.png",
+            src: path + "/images/projects/teamtestgame/chillguy.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 500, y: 300 },
@@ -234,7 +234,7 @@ class GameLevelfinal {
         }
 
         const killerChoices = [
-            path + "/images/projects/teamtestgame/meteorforgame.jpg"
+            this.path + "/images/projects/teamtestgame/meteorforgame.jpg"
         ];
 
         const killerSrc = killerChoices[Math.floor(Math.random() * killerChoices.length)];

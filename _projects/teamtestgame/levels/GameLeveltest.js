@@ -1,7 +1,7 @@
-import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-import Coin from '/assets/js/GameEnginev1.1/Coin.js';
+import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '../../../GameEnginev1.1/essentials/Player.js';
+import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
+import Coin from '../../../GameEnginev1.1/Coin.js';
 
 class GameLeveltest {
   constructor(gameEnv) {
@@ -11,13 +11,13 @@ class GameLeveltest {
 
     const backgroundData = {
       name: "custom_bg",
-      src: path + "/projects/teamtestgame/images/space.jpeg",
+      src: path + "/images/projects/teamtestgame/space.jpeg",
       pixels: { height: 772, width: 1134 }
     };
 
-    const spriteSrc = path + '/projects/teamtestgame/images/pew.png';
-    const alienSpriteSrc = path + '/projects/teamtestgame/images/ufos.png';
-    const meteorSpriteSrc = path + '/projects/teamtestgame/images/meteorforgame.jpg';
+    const spriteSrc = path + '/images/projects/teamtestgame/pew.png';
+    const alienSpriteSrc = path + '/images/projects/teamtestgame/ufos.png';
+    const meteorSpriteSrc = path + '/images/projects/teamtestgame/meteorforgame.jpg';
 
     const _meteorImg = new Image();
     _meteorImg.src = meteorSpriteSrc;

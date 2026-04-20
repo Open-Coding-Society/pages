@@ -11,12 +11,12 @@ permalink: /TestGame
 
 <script type="module">
     // Adnventure Game assets locations
-    import Core from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/GameControl.js";
-    import GameLeveltest from "{{site.baseurl}}/_projects/teamtestgame/levels/GameLeveltest.js";
-    import GameLevelfinal from "{{site.baseurl}}/_projects/teamtestgame/levels/GameLevelfinal.js";
-    import GameLevelprologue from "{{site.baseurl}}/_projects/teamtestgame/levels/GameLevelprologue.js";
-    import GameLevel2 from "{{site.baseurl}}/_projects/teamtestgame/levels/GameLevel2.js";
+    import Core from "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/Game.js";
+    import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/GameControl.js";
+    import GameLevelprologue from "{{site.baseurl}}/assets/js/projects/teamtestgame/levels/GameLevelprologue.js";
+    import GameLeveltest from "{{site.baseurl}}/assets/js/projects/teamtestgame/levels/GameLeveltest.js";
+    import GameLevel2 from "{{site.baseurl}}/assets/js/projects/teamtestgame/levels/GameLevel2.js";
+    import GameLevelfinal from "{{site.baseurl}}/assets/js/projects/teamtestgame/levels/GameLevelfinal.js";
     import Leaderboard from "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/Leaderboard.js";
 
 

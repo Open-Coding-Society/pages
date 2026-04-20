@@ -1,9 +1,9 @@
-import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
-import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import Coin from '/assets/js/GameEnginev1.1/Coin.js';
+import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '../../../GameEnginev1.1/essentials/Player.js';
+import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
+import Barrier from '../../../GameEnginev1.1/essentials/Barrier.js';
+import AiNpc from '../../../GameEnginev1.1/essentials/AiNpc.js';
+import Coin from '../../../GameEnginev1.1/Coin.js';
 
 class GameLevelprologue {
     constructor(gameEnv) {
@@ -16,13 +16,13 @@ class GameLevelprologue {
 
         const bgData = {
             name: "custom_bg",
-            src: path + "/projects/teamtestgame/images/newgamebg.jpeg",
+            src: path + "/images/projects/teamtestgame/newgamebg.jpeg",
             pixels: { height: 720, width: 1280 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: path + "/projects/teamtestgame/images/astro.png",
+            src: path + "/images/projects/teamtestgame/astro.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -45,7 +45,7 @@ class GameLevelprologue {
         const npcData1 = {
             id: 'guy',
             greeting: 'Hi Astro. You are being sent on a mission to see if planet - B34FG is save to live on. Good luck.',
-            src: path + "/projects/teamtestgame/images/chillguy.png",
+            src: path + "/images/projects/teamtestgame/chillguy.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 500, y: floorY - Math.floor(height / 8) },
@@ -68,7 +68,7 @@ class GameLevelprologue {
         const npcData2 = {
             id: 'ship',
             greeting: 'BORADING NOW.',
-            src: path + "  /projects/teamtestgame/images/pew.png",
+            src: path + "/images/projects/teamtestgame/pew.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 679, y: floorY - Math.floor(height / 8) },
@@ -95,7 +95,7 @@ class GameLevelprologue {
             }
         };
 
-        const sprite_src_chilldude = path + "/projects/teamtestgame/images/r2_idle.png";
+        const sprite_src_chilldude = path + "/images/projects/teamtestgame/r2_idle.png";
         const sprite_greet_chilldude = "Beep boop. I'm R2-D2, and I can answer questions about this mission!";
         const npcData3 = {
             id: "ChillDude",

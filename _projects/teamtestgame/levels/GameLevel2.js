@@ -1,8 +1,8 @@
-import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
-import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-import Coin from '/assets/js/GameEnginev1.1/Coin.js';
+import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '../../../GameEnginev1.1/essentials/Player.js';
+import Barrier from '../../../GameEnginev1.1/essentials/Barrier.js';
+import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
+import Coin from '../../../GameEnginev1.1/Coin.js';
 
 class GameLevel2 {
 
@@ -50,13 +50,13 @@ fromOverlay:true
 
 const bgData = {
 name:"custom_bg",
-src:path + "/projects/teamtestgame/images/alien_planet.jpg",
+src:path + "/images/projects/teamtestgame/alien_planet.jpg",
 pixels:{height:772,width:1134}
 };
 
 const playerData = {
 id:'playerData',
-src:path + "/projects/teamtestgame/images/astro.png",
+src:path + "/images/projects/teamtestgame/astro.png",
 SCALE_FACTOR:8,
 STEP_FACTOR:1000,
 ANIMATION_RATE:50,
@@ -78,7 +78,7 @@ keypress:{up:87,left:65,down:83,right:68}
 const npcData = {
 id:'npc1',
 greeting:'Hello!',
-src:path + "/projects/teamtestgame/images/chillguy.png",
+src:path + "/images/projects/teamtestgame/chillguy.png",
 SCALE_FACTOR:8,
 ANIMATION_RATE:50,
 INIT_POSITION:{x:431*scaleX, y:106*scaleY},
@@ -270,7 +270,7 @@ this.initialize = () => {
     placeCoinSafely();
   }
 
-  const mineSrc = path + '/projects/teamtestgame/images/Mine.jpg';
+  const mineSrc = path + '/images/projects/teamtestgame/Mine.jpg';
   this._mineImages = [];
   for (const obj of gameEnv.gameObjects) {
     if (!obj.canvas?.id?.startsWith('mine_')) continue;
