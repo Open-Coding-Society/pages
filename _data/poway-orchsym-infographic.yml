@@ -14,6 +14,15 @@ Topics:
     backendLink: "http://wifighters.opencodingsociety.com"
     backendButtonLabel: "Administrator Site"
     aboutTitle: "Why This Is More Accessible"
+    organizationTitle: "About the Organization"
+    organizationSummary: >
+      The Poway Symphony Orchestra (PSO) is a semi-professional orchestra formed in 2004
+      that presents three symphonic concerts each year at the Poway Center for the Performing
+      Arts in Poway, CA. For over 20 years, the PSO has served San Diego's North County Inland
+      communities, performing classical, romantic, and contemporary repertoire with roughly
+      65-67 musicians under the direction of Conductor and Music Director John LoPiccolo.
+      The Poway Symphony Orchestra Foundation, a 501(c)(3) non-profit, was established in 2015
+      solely to support the orchestra.
 
     description: >
       The site adds accessible entry points for patrons, families, and musicians who want
