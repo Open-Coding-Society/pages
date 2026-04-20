@@ -187,6 +187,11 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/sd-auto/",
       frontendUrl: "https://github.com/Ahaanv19/SD_Auto_Frontend",
       backendUrl: "https://github.com/Ahaanv19/SD_Auto_Backend"
+    },
+    "SFI Foundation": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/greppers/",
+      frontendUrl: "http://sfifoundation.opencodingsociety.com",
+      backendUrl: "https://greppers-be.opencodingsociety.com/"
     }
   };
 
@@ -440,12 +445,12 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- Greppers -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg">
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-04-greppers-capstone %}">
            <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-3xl font-bold rounded">SFI</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-greppers-capstone %}">Greppers</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-greppers-capstone %}">SFI Foundation</a></h3>
            <p class="text-sm text-gray-700">SFI Foundation web modernization — ML-powered spec search, QR-based manufacturer verification, and a mobile-first UI redesign for motorsports safety certification.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aditya Srivastava, Dhyan Soni, Aaryav Lal</p>
        </div>
@@ -515,14 +520,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- Binary Beasts -->
+   <!-- Poway NEC -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-06-pybl-capstone %}">
-           <img src="/images/capstone/pybl.png" alt="PYBL capstone preview image" class="w-28 h-28 object-cover rounded" />
+       <a href="{% post_url 2026-03-06-powaynec-capstone %}">
+           <img src="/images/capstone/powaynec.png" alt="Poway NEC capstone preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pybl-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
-           <p class="text-sm text-gray-700">Poway NEC website updated with new features to provide valuable changes that improve quality of life for the organization, including a login system, danger predictor, and AI chatbot.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
+           <p class="text-sm text-gray-700">Poway NEC capstone updates for preparedness access, including live risk information, emergency learning games, a chatbot, and account tools for volunteer coordination.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
        </div>
    </div>
@@ -709,14 +714,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
   <!-- FOPS -->
-  <div class="flex items-start space-x-4 p-4 border rounded-lg">
+ <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
            <img src="/images/capstone/fops.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
-           <p class="text-sm text-gray-700">Diet tracker for the elderly.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Nitya, Virginia, Ginny</p>
+           <p class="text-sm text-gray-700"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
+           <p class="text-xs text-gray-500 mt-2">Team: Nitya, Vivian, Virginia</p>
        </div>
    </div>
 
@@ -732,4 +737,3 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 </div>
-
