@@ -15,10 +15,7 @@ sticky_rank: 1
 
 <link rel="stylesheet" href="/assets/css/new-capstone.css">
 
-<div class="capstone-action-buttons">
-  <a href="/new-capstone/" class="new-capstone-fab" title="Create new capstone" aria-label="Create new capstone">+</a>
-  <a href="/edit-capstone/" class="new-capstone-fab" title="Edit capstone" aria-label="Edit capstone">✎</a>
-</div>
+<button id="ncFab" class="new-capstone-fab" title="Submit your capstone" aria-label="Submit capstone project">+</button>
 
 ## Capstone Infographics Home
 
@@ -72,45 +69,6 @@ sticky_rank: 1
   border-radius: 4px;
   font-weight: 500;
   white-space: nowrap;
-}
-
-/* Comment nudge toast */
-#capstone-comment-toast {
-  position: fixed;
-  top: 1.1rem;
-  right: -360px;
-  z-index: 100000;
-  background: #161616;
-  color: #f3f4f6;
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 9px;
-  padding: 0.65rem 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-size: 0.82rem;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
-  transition: right 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
-  max-width: 300px;
-  line-height: 1.4;
-}
-#capstone-comment-toast.capstone-toast-visible {
-  right: 1.1rem;
-}
-.capstone-toast-dismiss {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  cursor: pointer;
-  font-size: 0.82rem;
-  padding: 0;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: color 0.12s ease;
-}
-.capstone-toast-dismiss:hover { color: #f3f4f6; }
-@media (max-width: 480px) {
-  #capstone-comment-toast { max-width: calc(100vw - 2rem); }
 }
 </style>
 
@@ -330,29 +288,10 @@ document.addEventListener('DOMContentLoaded', function(){
     applyFilters();
   });
   applyFilters();
-
-  // Comment nudge toast
-  (function(){
-    const toast = document.getElementById('capstone-comment-toast');
-    if(!toast) return;
-    let _toastTimer;
-    function _hideToast(){ toast.classList.remove('capstone-toast-visible'); clearTimeout(_toastTimer); }
-    setTimeout(function(){
-      toast.classList.add('capstone-toast-visible');
-      _toastTimer = setTimeout(_hideToast, 6000);
-    }, 3000);
-    const _dismiss = document.getElementById('capstone-toast-dismiss');
-    if(_dismiss) _dismiss.addEventListener('click', _hideToast);
-  })();
 });
 </script>
 
 Below are the capstone infographic pages created by student groups. Click an image or title to open the full infographic and project page.
-
-<div id="capstone-comment-toast" role="status" aria-live="polite">
-  <span>Got thoughts on a project? Drop a comment.</span>
-  <button id="capstone-toast-dismiss" class="capstone-toast-dismiss" aria-label="Dismiss">✕</button>
-</div>
 
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
@@ -740,3 +679,167 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 </div>
+
+
+<script>
+(function(){
+  /* ── helpers ── */
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function lines(v){return String(v||'').split('\n').map(function(s){return s.trim();}).filter(Boolean);}
+
+  /* ── build modal DOM once ── */
+  var modal = document.createElement('div');
+  modal.id = 'ncModal';
+  modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:99000;background:rgba(0,0,0,0.82);overflow-y:auto;padding:28px 14px 56px;';
+  modal.innerHTML = [
+    '<div class="nc-modal__panel">',
+      '<button id="ncClose" class="nc-modal__close" type="button">&#x00D7;</button>',
+      '<h2 class="nc-modal__title">Submit a Capstone Project</h2>',
+      '<p class="nc-modal__sub">Fill in the fields — your project will appear in the grid exactly like the others.</p>',
+      '<form id="ncForm" class="nc-form" novalidate>',
+        '<p class="nc-section-title">Project Info</p>',
+        '<div class="nc-row-2">',
+          '<div class="nc-field"><label class="nc-label">Project Name <span>*</span></label><input id="ncTitle" name="title" class="nc-input" type="text" placeholder="e.g. Hunger Heroes"></div>',
+          '<div class="nc-field"><label class="nc-label">Tagline</label><input id="ncSub" name="subtitle" class="nc-input" type="text" placeholder="One-line hook"></div>',
+        '</div>',
+        '<div class="nc-row-2">',
+          '<div class="nc-field"><label class="nc-label">Course</label><select name="courseCode" class="nc-select"><option value="CSA">CSA</option><option value="CSP">CSP</option><option value="CSSE">CSSE</option></select></div>',
+          '<div class="nc-field"><label class="nc-label">Status</label><select name="status" class="nc-select"><option>In Development</option><option>Live</option><option>Completed</option></select></div>',
+        '</div>',
+        '<div class="nc-field"><label class="nc-label">Short Description</label><textarea name="description" class="nc-textarea" rows="3" placeholder="2-3 sentences shown on the homepage card"></textarea></div>',
+        '<div class="nc-field"><label class="nc-label">Full About Paragraph</label><textarea name="about" class="nc-textarea" rows="3" placeholder="Shown on the project detail page"></textarea></div>',
+        '<p class="nc-section-title">Team &amp; Tech</p>',
+        '<div class="nc-field"><label class="nc-label">Team Members</label><div id="ncTeamWrap" class="nc-tag-input"><div id="ncTeamChips" class="nc-tag-input__chips"></div><input id="ncTeamInp" class="nc-tag-input__field" type="text" placeholder="Type a name, press Enter"></div><input type="hidden" id="ncTeamHidden" name="teamMembers"><p class="nc-help">Enter or comma after each name.</p></div>',
+        '<div class="nc-field"><label class="nc-label">Tech Stack</label><div id="ncTechWrap" class="nc-tag-input"><div id="ncTechChips" class="nc-tag-input__chips"></div><input id="ncTechInp" class="nc-tag-input__field" type="text" placeholder="e.g. Python Flask, PostgreSQL"></div><input type="hidden" id="ncTechHidden" name="tech"><p class="nc-help">Enter or comma after each tag.</p></div>',
+        '<p class="nc-section-title">Features &amp; Impact</p>',
+        '<div class="nc-row-2">',
+          '<div class="nc-field"><label class="nc-label">Key Features</label><textarea name="keyPoints" class="nc-textarea" rows="5" placeholder="One feature per line"></textarea><p class="nc-help">One per line.</p></div>',
+          '<div class="nc-field"><label class="nc-label">Impact Bullets</label><textarea name="impact" class="nc-textarea" rows="5" placeholder="One bullet per line"></textarea><p class="nc-help">One per line.</p></div>',
+        '</div>',
+        '<p class="nc-section-title">Project Image</p>',
+        '<div class="nc-image-row">',
+          '<div id="ncImgPrev" class="nc-image-preview"></div>',
+          '<div class="nc-image-zone"><input id="ncImage" type="file" accept="image/*"><p class="nc-image-zone__text">Click or drag image here<br><span style="font-size:.72rem">PNG / JPG / SVG</span></p></div>',
+        '</div>',
+        '<p class="nc-section-title">Links (optional)</p>',
+        '<div class="nc-row-2">',
+          '<div class="nc-field"><label class="nc-label">Live Page URL</label><input name="pageUrl" class="nc-input" type="text" placeholder="https://…"></div>',
+          '<div class="nc-field"><label class="nc-label">Frontend Repo</label><input name="frontendUrl" class="nc-input" type="text" placeholder="https://github.com/…"></div>',
+        '</div>',
+        '<div class="nc-actions">',
+          '<button type="submit" id="ncSubmitBtn" class="nc-submit">Create Project</button>',
+          '<button type="button" id="ncCancel" class="nc-cancel">Cancel</button>',
+          '<span id="ncStatus" class="nc-status"></span>',
+        '</div>',
+      '</form>',
+    '</div>'
+  ].join('');
+  document.body.appendChild(modal);
+
+  /* ── show / hide ── */
+  function openModal(){modal.style.display='flex';modal.style.alignItems='flex-start';modal.style.justifyContent='center';document.body.style.overflow='hidden';}
+  function closeModal(){modal.style.display='none';document.body.style.overflow='';}
+
+  document.getElementById('ncFab').addEventListener('click', openModal);
+  document.getElementById('ncClose').addEventListener('click', closeModal);
+  document.getElementById('ncCancel').addEventListener('click', closeModal);
+  modal.addEventListener('click', function(e){if(e.target===modal)closeModal();});
+  document.addEventListener('keydown', function(e){if(e.key==='Escape')closeModal();});
+
+  /* ── tag-chip inputs ── */
+  function makeTagInput(wrapId, chipsId, inputId, hiddenId){
+    var tags=[], chips=document.getElementById(chipsId), inp=document.getElementById(inputId), hidden=document.getElementById(hiddenId);
+    function render(){
+      chips.innerHTML=tags.map(function(t,i){return '<span class="nc-chip">'+esc(t)+'<button type="button" data-i="'+i+'">×</button></span>';}).join('');
+      hidden.value=tags.join('\n');
+    }
+    function add(v){v=v.trim();if(v&&tags.indexOf(v)===-1){tags.push(v);render();}inp.value='';}
+    inp.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===','){e.preventDefault();add(inp.value);}if(e.key==='Backspace'&&!inp.value&&tags.length){tags.pop();render();}});
+    inp.addEventListener('blur',function(){add(inp.value);});
+    chips.addEventListener('click',function(e){var b=e.target.closest('[data-i]');if(b){tags.splice(+b.dataset.i,1);render();}});
+  }
+  makeTagInput('ncTeamWrap','ncTeamChips','ncTeamInp','ncTeamHidden');
+  makeTagInput('ncTechWrap','ncTechChips','ncTechInp','ncTechHidden');
+
+  /* ── image preview ── */
+  document.getElementById('ncImage').addEventListener('change',function(){
+    var file=this.files[0]; if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var prev=document.getElementById('ncImgPrev');
+      prev.style.backgroundImage='url('+e.target.result+')';
+      prev.classList.add('nc-image-preview--loaded');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* ── resize image via canvas ── */
+  function resizeImg(file,cb){
+    var img=new Image(),url=URL.createObjectURL(file);
+    img.onload=function(){
+      var max=600,r=Math.min(max/img.width,max/img.height,1);
+      var c=document.createElement('canvas');c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);cb(c.toDataURL('image/jpeg',0.78));
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);cb(null);};
+    img.src=url;
+  }
+
+  /* ── card injection ── */
+  function injectCard(p){
+    var grid=document.getElementById('capstone-grid'); if(!grid)return;
+    var href='/capstone/view/?id='+encodeURIComponent(p.id);
+    var imgHtml=p.imageUrl
+      ? '<img src="'+p.imageUrl+'" alt="'+esc(p.title)+'" class="w-28 h-28 object-cover rounded">'
+      : '<div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded">'+esc((p.title||'?').slice(0,3).toUpperCase())+'</div>';
+    var team=Array.isArray(p.teamMembers)?p.teamMembers.join(', '):String(p.teamMembers||'');
+    var course=(p.courseCode||'CSA').toUpperCase();
+    var div=document.createElement('div');
+    div.className='flex items-start space-x-4 p-4 border rounded-lg capstone-item relative '+course;
+    div.innerHTML='<a href="'+esc(href)+'">'+imgHtml+'</a><div><h3 class="text-lg font-semibold"><a href="'+esc(href)+'">'+esc(p.title)+'</a></h3><p class="text-sm text-gray-700">'+esc(p.description||'')+'</p><p class="text-xs text-gray-500 mt-2">Team: '+esc(team)+'</p></div>';
+    grid.prepend(div);
+    div.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  /* ── form submit ── */
+  document.getElementById('ncForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var title=this.querySelector('[name="title"]').value.trim();
+    var statusEl=document.getElementById('ncStatus');
+    if(!title){statusEl.textContent='Project name is required.';statusEl.className='nc-status nc-status--err';return;}
+    var btn=document.getElementById('ncSubmitBtn');
+    btn.disabled=true;btn.textContent='Creating…';statusEl.textContent='';
+    var form=this;
+    function finish(imgUrl){
+      var p={
+        id:'local_'+Date.now(),
+        title:title,
+        subtitle:form.querySelector('[name="subtitle"]').value.trim(),
+        description:form.querySelector('[name="description"]').value.trim(),
+        about:form.querySelector('[name="about"]').value.trim(),
+        courseCode:form.querySelector('[name="courseCode"]').value,
+        status:form.querySelector('[name="status"]').value,
+        tech:lines(form.querySelector('[name="tech"]').value),
+        teamMembers:lines(form.querySelector('[name="teamMembers"]').value),
+        keyPoints:lines(form.querySelector('[name="keyPoints"]').value),
+        impact:lines(form.querySelector('[name="impact"]').value),
+        pageUrl:form.querySelector('[name="pageUrl"]').value.trim(),
+        frontendUrl:form.querySelector('[name="frontendUrl"]').value.trim(),
+        imageUrl:imgUrl
+      };
+      try{var all=JSON.parse(sessionStorage.getItem('ncLP')||'[]');all.push(p);sessionStorage.setItem('ncLP',JSON.stringify(all));}catch(er){}
+      injectCard(p);
+      statusEl.textContent='✓ Project added!';statusEl.className='nc-status nc-status--ok';
+      form.reset();
+      document.getElementById('ncTeamChips').innerHTML='';document.getElementById('ncTeamHidden').value='';
+      document.getElementById('ncTechChips').innerHTML='';document.getElementById('ncTechHidden').value='';
+      var prev=document.getElementById('ncImgPrev');prev.style.backgroundImage='';prev.classList.remove('nc-image-preview--loaded');
+      btn.disabled=false;btn.textContent='Create Project';
+      setTimeout(closeModal,1100);
+    }
+    var imgFile=document.getElementById('ncImage').files[0];
+    if(imgFile){resizeImg(imgFile,finish);}else{finish(null);}
+  });
+})();
+</script>
