@@ -2,7 +2,7 @@
 
 <div class="pwc-infograph">
 
-  <!-- Intro: logo, title, and Who/What/Why merged -->
+  <!-- Intro: logo, title, description -->
   <section class="wp-section wp-intro">
     <div class="wp-intro-head">
       <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-header-logo-link">
@@ -13,40 +13,6 @@
         <p class="wp-description">{{ data.Description }}</p>
         <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-status">{{ data.Status }}</a>
       </div>
-    </div>
-
-    <div class="wp-about-section">
-      <div class="wp-about-col">
-        <h2 class="wp-section-title">Who We Are</h2>
-        <p>{{ data.About.who }}</p>
-        <div class="wp-team-grid">
-          {% for member in data.Team %}
-          <div class="wp-team-card">
-            <div class="wp-team-name">{{ member.name }}</div>
-            <div class="wp-team-role">{{ member.role }}</div>
-            <div class="wp-team-bio">{{ member.bio }}</div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="wp-about-col">
-        <h2 class="wp-section-title">What We're Building</h2>
-        <p>{{ data.About.what }}</p>
-      </div>
-      <div class="wp-about-col">
-        <h2 class="wp-section-title">Why It Matters</h2>
-        <p>{{ data.About.why }}</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Fixes -->
-  <section class="wp-section">
-    <h2 class="wp-section-title">Site Improvements</h2>
-    <div class="wp-keypoints">
-      {% for point in data.Fixes %}
-      <div class="wp-keypoint"><span class="wp-check">→</span><span>{{ point }}</span></div>
-      {% endfor %}
     </div>
   </section>
 
@@ -84,6 +50,33 @@
         {% for item in data.Impact %}
         <div class="wp-impact-item">{{ item }}</div>
         {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Who We Are (moved to end) -->
+  <section class="wp-section">
+    <div class="wp-about-section">
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">Who We Are</h2>
+        <p>{{ data.About.who }}</p>
+        <div class="wp-team-grid">
+          {% for member in data.Team %}
+          <div class="wp-team-card">
+            <div class="wp-team-name">{{ member.name }}</div>
+            <div class="wp-team-role">{{ member.role }}</div>
+            <div class="wp-team-bio">{{ member.bio }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">What We're Building</h2>
+        <p>{{ data.About.what }}</p>
+      </div>
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">Why It Matters</h2>
+        <p>{{ data.About.why }}</p>
       </div>
     </div>
   </section>

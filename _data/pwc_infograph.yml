@@ -1,6 +1,6 @@
 # Poway Woman's Club Capstone Infographic
 Title: "Poway Woman's Club — Website Refurbishment"
-Description: "A design-based research capstone rebuilding the website of a 65-year-old community nonprofit with member portals, online payments, and a cohesive modern UI."
+Description: "We're a group of passionate students rebuilding the website for a 65-year-old community nonprofit — adding member portals, live messaging, and a modern UI that makes the club more personal and accessible."
 
 Status: "In Development"
 
@@ -17,7 +17,7 @@ Team:
 
 About:
   who: "We're a team of three students partnering with the Poway Woman's Club — a 501(c)(3) nonprofit founded in 1960 and affiliated with the General Federation of Women's Clubs International."
-  what: "We're rebuilding their website from the ground up: a responsive member portal, an interactive event calendar, an online dues payment flow, and an admin dashboard that lets club leaders manage content without touching code."
+  what: "We're rebuilding their website from the ground up: a responsive member portal, an interactive event calendar, and an admin dashboard that lets club leaders manage content without touching code."
   why: "The club has served Poway for over six decades through scholarships, art exhibits, library support, and youth leadership programs. Our goal is to make that mission clear to every visitor and remove friction from joining, paying dues, and staying connected between meetings."
 
 Fixes:
@@ -30,7 +30,7 @@ Features:
     description: "Interactive calendar where members browse upcoming events and RSVP directly from their dashboard."
     image: "capstone/pwc-events-view.gif"
     url: "https://poway-women-s-club.github.io/pwc/navigation/events/"
-  - title: "Login System with Google Auth"
+  - title: "Login System with Google Authorization"
     description: "Secure authentication with both local accounts and one-click Google sign-in."
     image: "capstone/pwc-login-view.gif"
     url: "https://poway-women-s-club.github.io/pwc/navigation/login.html"
@@ -51,9 +51,9 @@ Tech:
   - "Responsive Frontend"
   - "User Auth & Profiles"
   - "Event Calendar"
-  - "Payment Integration"
+  - "Live Messaging"
   - "Admin Dashboard"
-  - "Comment Engine"
+  - "Blog Engine"
 
 Impact:
   - "Makes the club's mission and community work clear to first-time visitors"
