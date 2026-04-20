@@ -1,4 +1,5 @@
 ---
+microblog: true
 toc: False
 layout: post
 tailwind: True
@@ -24,6 +25,7 @@ sticky_rank: 1
 <style>
 #capstone-grid > div {
   min-height: 10rem;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 #capstone-grid > div a img {
   height: 7rem;
@@ -31,6 +33,81 @@ sticky_rank: 1
   max-width: 7rem;
   object-fit: contain;
   display: block;
+}
+#capstone-grid > div:hover {
+  border-color: rgba(156,163,175,0.55);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+/* Tech stack tooltip */
+.capstone-tech-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 7px;
+  padding: 7px 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+  min-width: 160px;
+  max-width: 280px;
+}
+#capstone-grid > div:hover .capstone-tech-tooltip {
+  opacity: 1;
+}
+.capstone-tech-tt-tag {
+  background: rgba(255,255,255,0.11);
+  color: #e5e7eb;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Comment nudge toast */
+#capstone-comment-toast {
+  position: fixed;
+  top: 1.1rem;
+  right: -360px;
+  z-index: 9999;
+  background: #161616;
+  color: #f3f4f6;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 9px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+  transition: right 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
+  max-width: 300px;
+  line-height: 1.4;
+}
+#capstone-comment-toast.capstone-toast-visible {
+  right: 1.1rem;
+}
+.capstone-toast-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.12s ease;
+}
+.capstone-toast-dismiss:hover { color: #f3f4f6; }
+@media (max-width: 480px) {
+  #capstone-comment-toast { max-width: calc(100vw - 2rem); }
 }
 </style>
 
@@ -49,6 +126,13 @@ sticky_rank: 1
   </div>
 </div>
 
+
+<script>
+// Tech stacks sourced from _data/*_infograph.yml files via Liquid
+var _capstoneTech = {};
+{% for pair in site.data %}{% assign _d = pair[1] %}{% if _d.Topics %}{% for _t in _d.Topics %}{% if _t.tech %}_capstoneTech[{{ _t.title | jsonify }}] = {{ _t.tech | jsonify }};
+{% endif %}{% endfor %}{% endif %}{% endfor %}
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
@@ -192,6 +276,21 @@ document.addEventListener('DOMContentLoaded', function(){
         card.dataset.backendUrl = mapped.backendUrl;
       }
     }
+    // Inject tech stack tooltip from _capstoneTech map
+    const _ttTitle = titleAnchor ? titleAnchor.textContent.trim() : '';
+    if(_ttTitle && typeof _capstoneTech !== 'undefined' && _capstoneTech[_ttTitle] && _capstoneTech[_ttTitle].length){
+      const _tt = document.createElement('div');
+      _tt.className = 'capstone-tech-tooltip';
+      _tt.setAttribute('aria-hidden','true');
+      _capstoneTech[_ttTitle].forEach(function(t){
+        const _tag = document.createElement('span');
+        _tag.className = 'capstone-tech-tt-tag';
+        _tag.textContent = t;
+        _tt.appendChild(_tag);
+      });
+      card.appendChild(_tt);
+    }
+
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'capstone-links-button absolute top-3 right-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white/90 text-xl text-slate-900 shadow-sm transition hover:bg-white';
@@ -223,13 +322,31 @@ document.addEventListener('DOMContentLoaded', function(){
     applyFilters();
   });
   applyFilters();
+
+  // Comment nudge toast
+  (function(){
+    const toast = document.getElementById('capstone-comment-toast');
+    if(!toast) return;
+    let _toastTimer;
+    function _hideToast(){ toast.classList.remove('capstone-toast-visible'); clearTimeout(_toastTimer); }
+    setTimeout(function(){
+      toast.classList.add('capstone-toast-visible');
+      _toastTimer = setTimeout(_hideToast, 6000);
+    }, 3000);
+    const _dismiss = document.getElementById('capstone-toast-dismiss');
+    if(_dismiss) _dismiss.addEventListener('click', _hideToast);
+  })();
 });
 </script>
 
 Below are the capstone infographic pages created by student groups. Click an image or title to open the full infographic and project page.
 
+<div id="capstone-comment-toast" role="status" aria-live="polite">
+  <span>Got thoughts on a project? Drop a comment.</span>
+  <button id="capstone-toast-dismiss" class="capstone-toast-dismiss" aria-label="Dismiss">✕</button>
+</div>
 
-<div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 my-6">
+<div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
    <!-- Slack Messaging Platform -->

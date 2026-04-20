@@ -1,4 +1,5 @@
 ---
+microblog: true
 layout: post
 title: "Poway Veterans Organization — Website Redesign Infographic"
 date: 2026-03-06
