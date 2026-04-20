@@ -17,13 +17,13 @@ class GameLevelfinal {
 
         const bgData = {
             name: "custom_bg",
-            src: path + "/images/projects/teamtestgame/pixelgameimgforgame.jpg",
+            src: path + "/projects/teamtestgame/images/pixelgameimgforgame.jpg",
             pixels: { height: 772, width: 1134 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: path + "/images/projects/teamtestgame/astro.png",
+            src: path + "/projects/teamtestgame/images/astro.png",
             SCALE_FACTOR: 8,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -48,7 +48,7 @@ class GameLevelfinal {
         const npcData1 = {
             id: 'AI',
             greeting: 'ah',
-            src: path + "/images/projects/teamtestgame/chillguy.png",
+            src: path + "/projects/teamtestgame/images/chillguy.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 500, y: 300 },
