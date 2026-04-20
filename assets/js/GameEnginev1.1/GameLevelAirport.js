@@ -597,6 +597,70 @@ class GameLevelAirport {
       }
     };
 
+    const requiredAirportNpcIds = [
+      'Stock-NPC',
+      'Fidelity',
+      'Schwab',
+      'Casino-NPC',
+      'Crypto-NPC',
+      'Bank-NPC'
+    ];
+
+    const areAirportInteractionsComplete = async () => {
+      const game = gameEnv.game;
+      if (!game || !game.statsManager || !game.id) return false;
+
+      try {
+        const npcProgress = await game.statsManager.getNpcProgress(game.id);
+        if (!npcProgress) return false;
+        return requiredAirportNpcIds.every((npcId) => npcProgress[npcId] === true);
+      } catch (error) {
+        console.error('Could not verify airport NPC completion:', error);
+        return false;
+      }
+    };
+
+    const sprite_data_options_gate = {
+      id: 'Options-Gate-NPC',
+      greeting: 'Complete the airport NPC interactions to unlock the next map.',
+      src: path + "/images/gamify/miningRigMan.png",
+      SCALE_FACTOR: 6,
+      ANIMATION_RATE: 50,
+      pixels: { height: 400, width: 354 },
+      INIT_POSITION: { x: width * 0.83, y: height * 0.2 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.05, heightPercentage: 0.08 },
+      interact: async function () {
+        const unlocked = await areAirportInteractionsComplete();
+        if (!unlocked) {
+          showDialogBox(
+            "Map Locked",
+            "Finish all core Airport NPC interactions first: Stock, Fidelity, Schwab, Casino, Crypto, and Bank.",
+            [{ label: "Got it", action: () => {}, keepOpen: false }]
+          );
+          return;
+        }
+
+        showDialogBox(
+          "New Map Unlocked",
+          "Great work. You unlocked the Options Hub. Ready to travel?",
+          [
+            {
+              label: "Travel to Options Hub",
+              action: () => {
+                if (gameEnv?.game?.gameControl?.endLevel) {
+                  gameEnv.game.gameControl.endLevel();
+                }
+              },
+              keepOpen: false
+            },
+            { label: "Not yet", action: () => {}, keepOpen: false }
+          ]
+        );
+      }
+    };
+
     this.classes = [
       { class: GameEnvBackground, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
@@ -607,6 +671,7 @@ class GameLevelAirport {
       { class: Npc, data: sprite_data_fidelity },
       { class: Npc, data: sprite_data_schwab },
       { class: Npc, data: sprite_data_bank},
+      { class: Npc, data: sprite_data_options_gate },
       { class: Npc, data: sprite_data_mining}
     ];
     this.npcProgressSystem = new NpcProgressSystem();
