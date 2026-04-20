@@ -5,7 +5,7 @@ Sprint1:
   start: 0
   end: 3
   0:
-    theme: "Onboarding Objectives"
+    theme: "Getting Started"
     goals:
       - "Tool Mastery"
       - "Project-Based Learning"
@@ -80,7 +80,7 @@ Sprint4:
   end: 16
 Sprint5:
   title: Advanced Features
-  description: The Teacher will be providing topics such as local storage, leaderboard APIs, websockets, platformer and more to add to the game.  Students will be expected to learn these topics and implement them in their game.  
+  description: The Teacher will be providing topics such as local storage, leaderboard APIs, websockets, platformer and more to add to the game.  Students will be expected to learn these topics and implement them into to OCS game.  
   start: 17
   end: 18
 Sprint6:

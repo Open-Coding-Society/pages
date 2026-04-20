@@ -13,152 +13,173 @@ date: 2025-12-02
 ---
 
 <style>
-  :root {
-    --bg:       #0a0e27;
-    --panel:    #0f1729;
-    --panel-2:  #1a2540;
-    --panel-3:  #1e2d45;
-    --border:   rgba(255,255,255,0.08);
-    --border-bright: rgba(255,255,255,0.14);
-    --text:     #e6eef8;
-    --muted:    #9aa6bf;
-    --accent:   #7c3aed;
-    --accent2:  #a78bfa;
-    --success:  #22c55e;
-    --danger:   #ef4444;
-    --warn:     #f59e0b;
-    --good-bg:  rgba(34,197,94,0.12);
-    --bad-bg:   rgba(239,68,68,0.12);
-    --hover-bg: rgba(124,58,237,0.1);
-    --sel-bg:   rgba(124,58,237,0.2);
-    --code-bg:  #060d1f;
+  /*
+   * Colors come from the system SASS (_sass/minima/lessonbase.scss).
+   * lessonbase.scss compiles those $variables into :root custom properties
+   * which are already on the page. We just alias them here for readability.
+   * To change a color, edit lessonbase.scss — NOT this file.p
+   */
+  .page-content {
+    --bg:          var(--bg-1);
+    --panel:       var(--panel);
+    --panel-2:     var(--bg-3);
+    --panel-3:     var(--surface);
+    --border:      rgba(255,255,255,0.08);
+    --border-b:    rgba(255,255,255,0.14);
+    --txt:         var(--text);
+    --muted:       var(--text-muted);
+    --ac:          var(--accent);
+    --ac2:         var(--accent);
+    --ok:          var(--green);
+    --ok-bg:       var(--green-bg);
+    --err:         var(--red);
+    --err-bg:      var(--warn-bg);
+    --warning:     var(--warn);
+    --hover-bg:    rgba(76,175,239,0.1);
+    --sel-bg:      rgba(76,175,239,0.2);
+    --code-bg:     var(--bg-0);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.65; }
   .container { max-width: 1000px; margin: 0 auto; padding: 28px 16px 64px; }
 
+  /* ---- Header ---- */
   .lesson-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-bright); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent2); margin-bottom: 10px; }
-  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); display: inline-block; }
-  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .lesson-header .badge { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac2); margin-bottom: 10px; }
+  .lesson-header .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 8px var(--ac); display: inline-block; }
+  .lesson-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--txt); }
   .lesson-header p  { color: var(--muted); font-size: 14px; }
   .back-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-decoration: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; transition: 0.2s; }
-  .back-btn:hover { color: var(--text); border-color: var(--border-bright); }
+  .back-btn:hover { color: var(--txt); border-color: var(--border-b); }
 
+  /* ---- Progress dots ---- */
   .progress-track { margin: 20px 0 28px; }
-  .progress-steps { display: flex; gap: 0; }
+  .progress-steps { display: flex; }
   .progress-step { flex: 1; position: relative; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-bright); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
-  .progress-step.active .step-dot { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 12px rgba(124,58,237,0.5); }
-  .progress-step.done .step-dot { background: var(--success); border-color: var(--success); color: #fff; }
+  .progress-step .step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--panel-2); border: 2px solid var(--border-b); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); transition: all 0.3s; z-index: 1; position: relative; }
+  .progress-step.active .step-dot { background: var(--ac);  border-color: var(--ac);  color: #fff; box-shadow: 0 0 12px rgba(76,175,239,0.5); }
+  .progress-step.done   .step-dot { background: var(--ok);  border-color: var(--ok);  color: #fff; }
   .progress-step .step-label { font-size: 10px; color: var(--muted); font-weight: 600; text-align: center; white-space: nowrap; }
-  .progress-step.active .step-label { color: var(--accent2); }
-  .progress-step.done  .step-label  { color: var(--success); }
-  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-bright); }
+  .progress-step.active .step-label { color: var(--ac2); }
+  .progress-step.done   .step-label { color: var(--ok); }
+  .progress-step::before { content: ''; position: absolute; top: 14px; left: calc(-50% + 14px); right: calc(50% + 14px); height: 2px; background: var(--border-b); }
   .progress-step:first-child::before { display: none; }
-  .progress-step.done::before { background: var(--success); }
+  .progress-step.done::before { background: var(--ok); }
 
+  /* ---- Sections ---- */
   .section        { display: none; }
   .section.active { display: block; animation: slideIn 0.3s ease; }
   @keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
+  /* ---- Cards ---- */
   .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2)); opacity: 0.6; }
-  .card h2 { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
-  .card h2 .step-num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .card h3 { font-size: 15px; color: var(--accent2); margin: 20px 0 8px; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--ac), var(--ac2)); opacity: 0.6; }
+  .card h2 { font-size: 20px; font-weight: 800; color: var(--txt); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .card h2 .step-num { width: 28px; height: 28px; border-radius: 8px; background: var(--ac); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .card h3 { font-size: 15px; color: var(--ac2); margin: 20px 0 8px; }
 
-  .block-desc { background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(167,139,250,0.06)); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 8px 8px 0; color: var(--text); font-size: 14px; margin: 0 0 20px; line-height: 1.7; }
+  .block-desc { background: rgba(76,175,239,0.06); border-left: 3px solid var(--ac); padding: 12px 16px; border-radius: 0 8px 8px 0; color: var(--txt); font-size: 14px; margin: 0 0 20px; line-height: 1.7; }
 
+  /* ---- Concept tiles ---- */
   .concept-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 12px; margin-bottom: 20px; }
   .concept-tile { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; transition: border-color 0.2s, transform 0.2s; }
-  .concept-tile:hover { border-color: rgba(124,58,237,0.4); transform: translateY(-2px); }
+  .concept-tile:hover { border-color: rgba(76,175,239,0.4); transform: translateY(-2px); }
   .concept-tile .tile-icon  { font-size: 22px; margin-bottom: 6px; }
-  .concept-tile .tile-title { font-size: 13px; font-weight: 700; color: var(--accent2); margin-bottom: 4px; }
+  .concept-tile .tile-title { font-size: 13px; font-weight: 700; color: var(--ac2); margin-bottom: 4px; }
   .concept-tile .tile-body  { font-size: 12px; color: var(--muted); line-height: 1.55; }
 
+  /* ---- Code blocks ---- */
   .code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 12px 0; }
   .code-header { background: var(--panel-2); border-bottom: 1px solid var(--border); padding: 7px 14px; display: flex; align-items: center; justify-content: space-between; }
   .code-header .dots { display: flex; gap: 5px; }
   .code-header .dots span { width: 10px; height: 10px; border-radius: 50%; }
   .code-header .dots .d-r { background: #ff5f57; } .code-header .dots .d-y { background: #ffbd2e; } .code-header .dots .d-g { background: #28c840; }
   .code-header .lang { font-size: 10px; color: var(--muted); font-family: monospace; font-weight: 700; letter-spacing: 0.05em; }
-  .code-block pre { margin: 0; padding: 16px; font-family: 'Consolas','Fira Code',monospace; font-size: 12px; color: #e6edf3; overflow-x: auto; line-height: 1.65; white-space: pre; }
-  .kw { color: #ff7b72; } .fn { color: #d2a8ff; } .st { color: #a5d6ff; } .cm { color: #8b949e; font-style: italic; } .an { color: #7c3aed; } .nb { color: #a78bfa; }
+  .code-block pre { margin: 0; padding: 16px; font-family: 'Consolas','Fira Code',monospace; font-size: 12px; color: var(--txt); overflow-x: auto; line-height: 1.65; white-space: pre; }
+  .kw { color: #ff7b72; } .fn { color: #d2a8ff; } .st { color: #a5d6ff; }
+  .cm { color: var(--muted); font-style: italic; } .an { color: var(--ac); } .nb { color: var(--ac2); }
 
+  /* ---- Quiz ---- */
   .quiz-wrap { margin: 16px 0; }
   .question-block { margin-bottom: 22px; }
-  .question-text { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.6; padding: 10px 14px; background: var(--panel-2); border-radius: 8px; border-left: 3px solid var(--accent); }
-  .opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; margin: 6px 0; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--panel-2); color: var(--text); font-size: 13px; transition: all 0.2s; user-select: none; line-height: 1.5; }
-  .opt:hover { background: var(--hover-bg); border-color: var(--accent); }
-  .opt.sel  { background: var(--sel-bg);  border-color: var(--accent); }
-  .opt.good { background: var(--good-bg); border-color: rgba(34,197,94,0.5); color: #86efac; }
-  .opt.bad  { background: var(--bad-bg);  border-color: rgba(239,68,68,0.5);  color: #fca5a5; }
+  .question-text { font-size: 14px; font-weight: 700; color: var(--txt); margin-bottom: 10px; line-height: 1.6; padding: 10px 14px; background: var(--panel-2); border-radius: 8px; border-left: 3px solid var(--ac); }
+  .opt { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; margin: 6px 0; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--panel-2); color: var(--txt); font-size: 13px; transition: all 0.2s; user-select: none; line-height: 1.5; }
+  .opt:hover { background: var(--hover-bg); border-color: var(--ac); }
+  .opt.sel  { background: var(--sel-bg);  border-color: var(--ac); }
+  .opt.good { background: var(--ok-bg);   border-color: var(--ok);  color: var(--ok); }
+  .opt.bad  { background: var(--err-bg);  border-color: var(--err); color: var(--err); }
   .radio-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--muted); flex-shrink: 0; margin-top: 2px; transition: all 0.2s; }
-  .opt.sel  .radio-dot { background: var(--accent);  border-color: var(--accent); }
-  .opt.good .radio-dot { background: var(--success); border-color: var(--success); }
-  .opt.bad  .radio-dot { background: var(--danger);  border-color: var(--danger); }
+  .opt.sel  .radio-dot { background: var(--ac);  border-color: var(--ac); }
+  .opt.good .radio-dot { background: var(--ok);  border-color: var(--ok); }
+  .opt.bad  .radio-dot { background: var(--err); border-color: var(--err); }
   .opt-label { flex: 1; }
-  .explanation { display: none; margin: 6px 0 4px 24px; padding: 8px 12px; background: var(--panel-3); border-radius: 6px; font-size: 12px; color: var(--muted); border-left: 2px solid var(--success); line-height: 1.6; }
+  .explanation { display: none; margin: 6px 0 4px 24px; padding: 8px 12px; background: var(--panel-3); border-radius: 6px; font-size: 12px; color: var(--muted); border-left: 2px solid var(--ok); line-height: 1.6; }
   .explanation.show { display: block; }
 
+  /* ---- Vocab fill-in ---- */
   .vocab-item { display: flex; align-items: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
-  .vocab-clue { font-size: 13px; color: var(--text); flex: 1; min-width: 200px; line-height: 1.5; }
+  .vocab-clue { font-size: 13px; color: var(--txt); flex: 1; min-width: 200px; line-height: 1.5; }
   .vocab-clue .hint { font-size: 11px; color: var(--muted); }
-  .vocab-input { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: monospace; font-size: 13px; padding: 7px 10px; text-transform: uppercase; transition: border-color 0.2s; width: 130px; }
-  .vocab-input:focus { outline: none; border-color: var(--accent); }
-  .vocab-input.correct { border-color: var(--success); background: var(--good-bg); }
-  .vocab-input.wrong   { border-color: var(--danger);  background: var(--bad-bg); }
+  .vocab-input { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--txt); font-family: monospace; font-size: 13px; padding: 7px 10px; text-transform: uppercase; transition: border-color 0.2s; width: 130px; }
+  .vocab-input:focus  { outline: none; border-color: var(--ac); }
+  .vocab-input.correct { border-color: var(--ok);  background: var(--ok-bg); }
+  .vocab-input.wrong   { border-color: var(--err); background: var(--err-bg); }
 
+  /* ---- API tester ---- */
   .api-tester { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 720px) { .api-tester { grid-template-columns: 1fr; } }
   .field-label { font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; display: block; }
-  select { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 12px; font-size: 13px; cursor: pointer; width: 100%; }
-  select:focus { outline: none; box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
+  select { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); padding: 8px 12px; font-size: 13px; cursor: pointer; width: 100%; }
+  select:focus { outline: none; box-shadow: 0 0 0 2px rgba(76,175,239,0.3); }
   .status-badge { display: inline-block; border-radius: 4px; padding: 2px 10px; font-family: monospace; font-size: 12px; font-weight: 800; }
-  .status-2xx { background: var(--good-bg); color: #86efac; }
-  .status-4xx { background: var(--bad-bg);  color: #fca5a5; }
-  .status-5xx { background: rgba(245,158,11,0.15); color: var(--warn); }
+  .status-2xx { background: var(--ok-bg);   color: var(--ok); }
+  .status-4xx { background: var(--err-bg);  color: var(--err); }
+  .status-5xx { background: var(--warn-bg); color: var(--warning); }
   .response-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .response-box-header { background: var(--panel-2); border-bottom: 1px solid var(--border); padding: 7px 14px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-  .response-box-body { padding: 14px; font-family: 'Consolas',monospace; font-size: 12px; color: #a5d6ff; min-height: 120px; white-space: pre-wrap; word-break: break-word; line-height: 1.6; }
+  .response-box-body { padding: 14px; font-family: 'Consolas',monospace; font-size: 12px; color: var(--ac2); min-height: 120px; white-space: pre-wrap; word-break: break-word; line-height: 1.6; }
   .response-meta { font-size: 11px; color: var(--muted); padding: 6px 14px; border-top: 1px solid var(--border); display: flex; gap: 14px; }
 
+  /* ---- FRQ ---- */
   .frq-box { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 16px 0; }
-  .frq-question { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.6; padding: 10px 14px; background: var(--panel-3); border-radius: 8px; border-left: 3px solid var(--accent2); }
-  .frq-textarea { width: 100%; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Segoe UI',system-ui,sans-serif; font-size: 13px; padding: 12px; resize: vertical; min-height: 120px; line-height: 1.6; transition: border-color 0.2s; }
-  .frq-textarea:focus { outline: none; border-color: var(--accent); }
-  .frq-feedback { margin-top: 12px; padding: 12px 16px; background: var(--panel-3); border-radius: 8px; border-left: 3px solid var(--success); font-size: 13px; color: var(--text); line-height: 1.7; display: none; }
+  .frq-question { font-size: 14px; font-weight: 700; color: var(--txt); margin-bottom: 12px; line-height: 1.6; padding: 10px 14px; background: var(--panel-3); border-radius: 8px; border-left: 3px solid var(--ac2); }
+  .frq-textarea { width: 100%; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--txt); font-size: 13px; padding: 12px; resize: vertical; min-height: 120px; line-height: 1.6; transition: border-color 0.2s; }
+  .frq-textarea:focus { outline: none; border-color: var(--ac); }
+  .frq-feedback { margin-top: 12px; padding: 12px 16px; background: var(--panel-3); border-radius: 8px; border-left: 3px solid var(--ok); font-size: 13px; color: var(--txt); line-height: 1.7; display: none; }
   .frq-feedback.show { display: block; }
 
+  /* ---- Compare table ---- */
   .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 12px 0; }
-  .compare-table th { background: var(--panel-2); padding: 8px 12px; text-align: left; font-weight: 700; color: var(--accent2); border-bottom: 1px solid var(--border-bright); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
-  .compare-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; line-height: 1.5; }
+  .compare-table th { background: var(--panel-2); padding: 8px 12px; text-align: left; font-weight: 700; color: var(--ac2); border-bottom: 1px solid var(--border-b); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+  .compare-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--txt); vertical-align: top; line-height: 1.5; }
   .compare-table tr:last-child td { border-bottom: none; }
   .compare-table tr:hover td { background: var(--hover-bg); }
-  .compare-table code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 11px; color: #a5d6ff; }
+  .compare-table code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 11px; color: var(--ac2); }
 
-  .arch-diagram { display: flex; align-items: center; gap: 0; margin: 16px 0; flex-wrap: wrap; justify-content: center; }
-  .arch-box { background: var(--panel-2); border: 1px solid var(--border-bright); border-radius: 8px; padding: 10px 16px; text-align: center; min-width: 110px; flex-shrink: 0; }
+  /* ---- Architecture diagram ---- */
+  .arch-diagram { display: flex; align-items: center; margin: 16px 0; flex-wrap: wrap; justify-content: center; }
+  .arch-box { background: var(--panel-2); border: 1px solid var(--border-b); border-radius: 8px; padding: 10px 16px; text-align: center; min-width: 110px; flex-shrink: 0; }
   .arch-box .arch-icon  { font-size: 20px; margin-bottom: 4px; }
-  .arch-box .arch-label { font-size: 11px; font-weight: 700; color: var(--accent2); letter-spacing: 0.05em; text-transform: uppercase; }
+  .arch-box .arch-label { font-size: 11px; font-weight: 700; color: var(--ac2); letter-spacing: 0.05em; text-transform: uppercase; }
   .arch-box .arch-sub   { font-size: 10px; color: var(--muted); margin-top: 2px; }
   .arch-arrow { color: var(--muted); font-size: 18px; padding: 0 6px; flex-shrink: 0; }
 
-  button { appearance: none; border: 1px solid var(--border); background: var(--accent); color: #fff; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
-  button:hover { background: #6d28d9; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(124,58,237,0.3); }
+  /* ---- Buttons ---- */
+  button { appearance: none; border: 1px solid var(--border); background: var(--ac); color: #fff; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  button:hover { background: var(--accent-700); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(76,175,239,0.3); }
   button:active { transform: translateY(0); }
   button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-  button.secondary { background: var(--panel-2); color: var(--text); }
+  button.secondary { background: var(--panel-2); color: var(--txt); }
   button.secondary:hover { background: var(--panel-3); box-shadow: none; }
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
-  .score-badge { font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 6px; background: var(--panel-2); color: var(--text); }
-  .score-badge.perfect { background: var(--good-bg); color: #86efac; }
+  .score-badge { font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 6px; background: var(--panel-2); color: var(--txt); }
+  .score-badge.perfect { background: var(--ok-bg); color: var(--ok); }
 
-  .tip { font-size: 12px; color: var(--muted); padding: 8px 14px; background: var(--panel-2); border-radius: 6px; border-left: 2px solid var(--accent); line-height: 1.5; margin-top: 12px; }
+  /* ---- Tip ---- */
+  .tip { font-size: 12px; color: var(--muted); padding: 8px 14px; background: var(--panel-2); border-radius: 6px; border-left: 2px solid var(--ac); line-height: 1.5; margin-top: 12px; }
   .tip::before { content: '💡 '; }
 
+  /* ---- Nav ---- */
   .nav-buttons { display: flex; gap: 12px; margin-top: 28px; justify-content: space-between; align-items: center; }
   #stepIndicator { font-size: 12px; color: var(--muted); }
 </style>
@@ -183,7 +204,7 @@ date: 2025-12-02
       <div class="arch-diagram">
         <div class="arch-box"><div class="arch-icon">🌐</div><div class="arch-label">Client</div><div class="arch-sub">Browser / App</div></div>
         <div class="arch-arrow">→</div>
-        <div class="arch-box" style="border-color:rgba(124,58,237,0.5);"><div class="arch-icon">🛡️</div><div class="arch-label">Auth</div><div class="arch-sub">Validate &amp; Guard</div></div>
+        <div class="arch-box" style="border-color:rgba(76,175,239,0.5);"><div class="arch-icon">🛡️</div><div class="arch-label">Auth</div><div class="arch-sub">Validate &amp; Guard</div></div>
         <div class="arch-arrow">→</div>
         <div class="arch-box"><div class="arch-icon">⚙️</div><div class="arch-label">Controller</div><div class="arch-sub">Route Handler</div></div>
         <div class="arch-arrow">→</div>
@@ -375,13 +396,13 @@ SECRET = <span class="st">"your-secret-key"</span>
       <div class="block-desc">Apply everything you've learned. Answer each question thoughtfully.</div>
       <div id="frqContainer"></div>
       <div style="margin-top:24px;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:16px;">
-        <div style="font-size:14px;font-weight:700;color:var(--accent2);margin-bottom:10px;">✅ What You Covered</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ac2);margin-bottom:10px;">✅ What You Covered</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;">
-          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--success);font-weight:700;">Step 1</span> — Backend flow: validate → authenticate → process → persist</div>
-          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--success);font-weight:700;">Step 2</span> — SQL vs NoSQL, REST CRUD, HTTP methods &amp; status codes</div>
-          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--success);font-weight:700;">Step 3</span> — Flask vs Spring Boot architecture and layering</div>
-          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--success);font-weight:700;">Step 4</span> — API testing: status codes, request/response shape</div>
-          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--success);font-weight:700;">Step 5</span> — Serverless, JWT, caching, observability, AI integration</div>
+          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--ok);font-weight:700;">Step 1</span> — Backend flow: validate → authenticate → process → persist</div>
+          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--ok);font-weight:700;">Step 2</span> — SQL vs NoSQL, REST CRUD, HTTP methods &amp; status codes</div>
+          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--ok);font-weight:700;">Step 3</span> — Flask vs Spring Boot architecture and layering</div>
+          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--ok);font-weight:700;">Step 4</span> — API testing: status codes, request/response shape</div>
+          <div style="background:var(--panel-3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);"><span style="color:var(--ok);font-weight:700;">Step 5</span> — Serverless, JWT, caching, observability, AI integration</div>
         </div>
       </div>
     </div>
@@ -395,23 +416,23 @@ SECRET = <span class="st">"your-secret-key"</span>
 </div>
 
 <script type="module">
-import { CONFIG }         from '/assets/js/bigsix/backend/data.js';
-import { showStep,
-         initNavigation } from '/assets/js/bigsix/backend/navigation.js';
-import { persist,
-         restore }        from '/assets/js/bigsix/backend/persistence.js';
-import { initQuizzes }    from '/assets/js/bigsix/backend/quiz.js';
-import { initVocab }      from '/assets/js/bigsix/backend/vocab.js';
-import { initFrqs }       from '/assets/js/bigsix/backend/frq.js';
-import { initApiTester }  from '/assets/js/bigsix/backend/api-tester.js';
+import { CONFIG }      from '/assets/js/bigsix/backend/data.js';
+import { Navigator }   from '/assets/js/bigsix/shared/navigation.js';
+import { Persistence } from '/assets/js/bigsix/shared/persistence.js';
+import { Quiz }        from '/assets/js/bigsix/backend/quiz.js';
+import { Vocab }       from '/assets/js/bigsix/backend/vocab.js';
+import { Frq }         from '/assets/js/bigsix/backend/frq.js';
+import { ApiTester }   from '/assets/js/bigsix/backend/api-tester.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  initNavigation(CONFIG.STEP_LABELS, persist);
-  restore(showStep);
-  initQuizzes(CONFIG.QUIZZES);
-  initVocab(CONFIG.VOCAB);
-  initFrqs(CONFIG.FRQS);
-  initApiTester(CONFIG);
+  const nav   = new Navigator({ progressStyle: 'dots', labels: CONFIG.STEP_LABELS });
+  const store = new Persistence();
+  nav.init(() => store.persist());
+  store.restore((n, s) => nav.showStep(n, s));
+  new Quiz(CONFIG.QUIZZES).init();
+  new Vocab(CONFIG.VOCAB).init();
+  new Frq(CONFIG.FRQS).init();
+  new ApiTester(CONFIG).init();
 });
 </script>
 

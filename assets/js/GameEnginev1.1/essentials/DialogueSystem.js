@@ -17,6 +17,8 @@ constructor(options = {}) {
    this.dialogueBox = null;
   this.dialogueText = null;
   this.closeBtn = null;
+  this.controlsRow = null;
+  this.actionButtonGroup = null;
    // Game control reference for pausing
   this.gameControl = options.gameControl || null;
   // Track if this dialogue system paused the game
@@ -40,46 +42,95 @@ constructor(options = {}) {
   this.isOpen = false;
 }
 
-
+ // Shared speech state so dialogue lines from different DialogueSystem instances
+ // are spoken in sequence instead of interrupting each other.
+ static getSpeechState() {
+   if (!DialogueSystem._speechState) {
+     DialogueSystem._speechState = {
+       queue: [],
+       speaking: false,
+     };
+   }
+   return DialogueSystem._speechState;
+ }
+ 
+ static flushSpeechQueue() {
+   const state = DialogueSystem.getSpeechState();
+   state.queue = [];
+   state.speaking = false;
+ 
+   if (window.speechSynthesis) {
+     window.speechSynthesis.cancel();
+   }
+ }
+ 
+ static drainSpeechQueue() {
+   const state = DialogueSystem.getSpeechState();
+   if (state.speaking) return;
+   if (!window.speechSynthesis) return;
+ 
+   const nextUtterance = state.queue.shift();
+   if (!nextUtterance) return;
+ 
+   state.speaking = true;
+ 
+   nextUtterance.onend = () => {
+     state.speaking = false;
+     DialogueSystem.drainSpeechQueue();
+   };
+ 
+   nextUtterance.onerror = () => {
+     state.speaking = false;
+     DialogueSystem.drainSpeechQueue();
+   };
+ 
+   window.speechSynthesis.speak(nextUtterance);
+ }
 
 
 // Voice synthesis helper
 speakText(text) {
-  // Cancel any ongoing speech
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
-   if (!this.enableVoice || !window.speechSynthesis) {
+  if (!this.enableVoice || !window.speechSynthesis) {
     return; // Voice synthesis not available or disabled
   }
-   const utterance = new SpeechSynthesisUtterance(text);
-   // Set voice properties
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  // Set voice properties
   utterance.rate = this.voiceRate;
   utterance.pitch = this.voicePitch;
   utterance.volume = this.voiceVolume;
-   // Try to set Australian male voice
+
+  // Try to set Australian male voice
   const voices = window.speechSynthesis.getVoices();
-   // First, look for Australian English voices
-  let australianVoice = voices.find(voice =>
+
+  // First, look for Australian English voices
+  let australianVoice = voices.find((voice) =>
     voice.lang.includes('en-AU') && voice.name.toLowerCase().includes('male')
   );
-   // If no Australian male voice found, look for any Australian voice
+
+  // If no Australian male voice found, look for any Australian voice
   if (!australianVoice) {
-    australianVoice = voices.find(voice => voice.lang.includes('en-AU'));
+    australianVoice = voices.find((voice) => voice.lang.includes('en-AU'));
   }
-   // If still no Australian voice, look for any male voice
+
+  // If still no Australian voice, look for any male voice
   if (!australianVoice) {
-    australianVoice = voices.find(voice => voice.name.toLowerCase().includes('male'));
+    australianVoice = voices.find((voice) => voice.name.toLowerCase().includes('male'));
   }
-   // If no male voice found, just pick the first voice
+
+  // If no male voice found, just pick the first voice
   if (!australianVoice && voices.length > 0) {
     australianVoice = voices[0];
   }
-   if (australianVoice) {
+
+  if (australianVoice) {
     utterance.voice = australianVoice;
   }
-   // Speak the text
-  window.speechSynthesis.speak(utterance);
+
+  const state = DialogueSystem.getSpeechState();
+  state.queue.push(utterance);
+  DialogueSystem.drainSpeechQueue();
 }
 
 
@@ -179,18 +230,39 @@ createDialogueBox() {
   this.closeBtn.id = "dialogue-close-btn-" + this.safeId;
   this.closeBtn.innerText = "Close";
   Object.assign(this.closeBtn.style, {
-    marginTop: "15px",
+    marginTop: "0",
     padding: "10px 20px",
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
     fontFamily: "'Press Start 2P', cursive, monospace",
-    fontSize: "12px"
+    fontSize: "12px",
+    flexShrink: "0"
   });
    // Add click handler
   this.closeBtn.onclick = () => {
     this.closeDialogue();
   };
+
+  this.controlsRow = document.createElement("div");
+  this.controlsRow.id = "dialogue-controls-" + this.safeId;
+  Object.assign(this.controlsRow.style, {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "10px",
+    marginTop: "10px",
+    flexWrap: "wrap"
+  });
+
+  this.actionButtonGroup = document.createElement("div");
+  Object.assign(this.actionButtonGroup.style, {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginLeft: "auto"
+  });
 
 
 
@@ -212,8 +284,10 @@ createDialogueBox() {
 
 
   // Assemble the dialogue box
+  this.controlsRow.appendChild(this.closeBtn);
+  this.controlsRow.appendChild(this.actionButtonGroup);
   this.dialogueBox.appendChild(contentContainer);
-  this.dialogueBox.appendChild(this.closeBtn);
+  this.dialogueBox.appendChild(this.controlsRow);
    // Add to the document
   document.body.appendChild(this.dialogueBox);
    // Also listen for Escape key to close dialogue
@@ -375,10 +449,7 @@ closeDialogue() {
   if (this.typewriterTimeoutId) {
     clearTimeout(this.typewriterTimeoutId);
   }
-   // Cancel speech synthesis
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
+   // Leave speech running so queued lines can finish naturally.
    // Hide the dialogue box
   this.dialogueBox.style.display = "none";
   this.isOpen = false;
@@ -387,15 +458,20 @@ closeDialogue() {
     this.gameControl.resume();
     this.didPauseGame = false; // Reset the flag
   }
-   // Remove any custom buttons
-  const buttonContainers = this.dialogueBox.querySelectorAll('div[style*="display: flex"]');
-  buttonContainers.forEach(container => {
-    // Skip the main content container
-    if (container.contains(document.getElementById("dialogue-avatar-" + this.safeId))) {
-      return;
-    }
-    container.remove();
-  });
+
+  if (this.actionButtonGroup) {
+    this.actionButtonGroup.innerHTML = '';
+  }
+
+  if (this.closeBtn) {
+    this.closeBtn.innerText = 'Close';
+    this.closeBtn.onclick = () => {
+      this.closeDialogue();
+    };
+    this.closeBtn.style.marginRight = '0';
+    this.closeBtn.style.marginLeft = '0';
+    this.closeBtn.style.float = 'none';
+  }
 }
 
 
@@ -411,12 +487,9 @@ isDialogueOpen() {
 
 // Add buttons to the dialogue
 addButtons(buttons) {
-    if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0) return;
-  
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.justifyContent = 'space-between';
-    buttonContainer.style.marginTop = '10px';
+    if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0 || !this.actionButtonGroup) return;
+
+    this.actionButtonGroup.innerHTML = '';
   
     // Add each button
     buttons.forEach(button => {
@@ -429,7 +502,6 @@ addButtons(buttons) {
         btn.style.border = 'none';
         btn.style.borderRadius = '5px';
         btn.style.cursor = 'pointer';
-        btn.style.marginRight = '10px';
       
         // Add click handler
         btn.onclick = () => {
@@ -438,13 +510,8 @@ addButtons(buttons) {
             }
         };
       
-        buttonContainer.appendChild(btn);
+        this.actionButtonGroup.appendChild(btn);
     });
-  
-    // Insert before the close button
-    if (buttonContainer.children.length > 0) {
-        this.dialogueBox.insertBefore(buttonContainer, this.closeBtn);
-    }
 }
 }
 

@@ -1,46 +1,156 @@
-# Poway Symphony Orchestra Capstone Infographic
+Title: "Poway Symphony Orchestra Capstone"
 Badge: "Design-Based Research Capstone"
-Title: "Poway Symphony Orchestra - Expanding Community Through Music"
-Description: "A design-research capstone focused on enhancing the digital presence, audience engagement, and accessibility of a community orchestra through a modern, user-centered website experience."
+
+Description: >
+  An accessible, color-rich site experience that adds faster paths to concerts,
+  tickets, musicians, and joining the orchestra so visitors can discover what
+  matters without digging through dense text.
 
 Topics:
   - title: "Poway Symphony Orchestra - Connecting Community Through Live Music"
-    image: "pso_logo.png"
-    link: "https://wi-fighters-csp.github.io/wi-pages/capstone/powayorchestra/"
-    alt: "Poway Symphony Orchestra"
-    buttonLabel: "View Project"
+    subtitle: "Redesigned Website Experience"
+    link: "https://pso.opencodingsociety.com/"
+    buttonLabel: "View Site"
+    backendLink: "http://wifighters.opencodingsociety.com"
+    backendButtonLabel: "Administrator Site"
+    aboutTitle: "Why This Is More Accessible"
+
+    description: >
+      The site adds accessible entry points for patrons, families, and musicians who want
+      to hear the orchestra, find the next concert, explore the roster, or decide whether
+      to join. Instead of feeling like a lesson or a text archive, the experience now
+      feels active, welcoming, and easier to move through.
+
+    keyFeaturesTitle: "Key Features"
+
     keyPoints:
-      - "Modern, accessible website redesign for improved user experience"
-      - "Clear navigation for concerts, donations, and musician information"
-      - "Engaging homepage showcasing upcoming performances and highlights"
-      - "Mobile-friendly and responsive design across devices"
-      - "Streamlined ticketing and donation flow"
-      - "Visual storytelling of orchestra members and conductor"
-      - "Enhanced accessibility for all age groups and technical skill levels"
-    subtitle: "Research and Testing Phase"
-    description: "The Poway Symphony Orchestra is a community-based ensemble dedicated to bringing high-quality orchestral music to local audiences. This capstone explores how intentional design can elevate the orchestra's online experience, making it easier for users to discover concerts, connect with the musicians, and support the organization. Through user research and design iteration, the project emphasizes clarity, accessibility, and storytelling so the site does more than present information. It invites people into the world of the orchestra and makes participation feel welcoming, useful, and memorable."
+      - previewLabel: "Home"
+        text: "Cleaner home page with direct access to tickets, donations, and season info"
+        link: "https://pso.opencodingsociety.com/"
+        buttonLabel: "See Home"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch1.jpg"
+        previewAlt: "Poway Symphony Orchestra home page concert image"
+      - previewLabel: "Concerts"
+        text: "Full 2025-2026 season with concert details, program notes, and ticket links"
+        link: "https://pso.opencodingsociety.com/concerts/"
+        buttonLabel: "See Concerts"
+        previewImage: "https://i.ytimg.com/vi/npmu4m4iGeY/hqdefault.jpg"
+        previewAlt: "Poway Symphony Orchestra concerts page preview"
+      - previewLabel: "Conductor"
+        text: "Conductor biography presented in a structured, visual format"
+        link: "https://pso.opencodingsociety.com/conductor/"
+        buttonLabel: "See Conductor"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch11.png"
+        previewAlt: "John LoPiccolo conductor page preview"
+      - previewLabel: "Musicians"
+        text: "Musician directory with section filters and audio previews"
+        link: "https://pso.opencodingsociety.com/musicians/"
+        buttonLabel: "See Musicians"
+        previewImage: "https://i.ytimg.com/vi/yGQPgauT7LU/hqdefault.jpg"
+        previewAlt: "Poway Symphony Orchestra musicians page preview"
+      - previewLabel: "Join"
+        text: "Consolidated Join page covering registration, rehearsals, attire, and contact info"
+        link: "https://pso.opencodingsociety.com/join/"
+        buttonLabel: "See Join"
+        previewImage: "https://pso.opencodingsociety.com/images/pso_logo.png"
+        previewAlt: "Poway Symphony Orchestra join page preview"
+      - previewLabel: "Responsive"
+        text: "Fully responsive across mobile, tablet, and desktop"
+        link: "https://pso.opencodingsociety.com/"
+        buttonLabel: "See Responsive Layout"
+        previewImage: "https://i.ytimg.com/vi/Loba21sbY9k/hqdefault.jpg"
+        previewAlt: "Responsive PSO site preview"
+
     tech:
-      - "HTML"
-      - "CSS"
-      - "JavaScript"
-      - "Responsive Web Design"
-      - "UX/UI Design Principles"
-      - "WCAG Accessibility Standards"
-      - "Figma"
-      - "Analytics and User Behavior Tracking"
-      - "Content Management Strategy"
+      - "Accessible navigation"
+      - "Concert discovery"
+      - "Roster exploration"
+      - "Responsive design"
+
+    interactiveTitle: "Interactive Features"
+    interactiveLink: "https://pso.opencodingsociety.com/games/"
+    interactiveButtonLabel: "See Games"
+    interactiveElements:
+      - title: "EXP Bar"
+        description: "EXP progress bar that tracks how much of the site you've explored"
+      - title: "Orchestra Builder"
+        description: "Orchestra Builder - drag-and-drop stage placement game"
+        link: "https://pso.opencodingsociety.com/orchestra-builder/"
+        buttonLabel: "Open Orchestra Builder"
+        previewLabel: "Stage Logic"
+        previewTitle: "Orchestra Builder"
+        previewText: "Balance the ensemble on a real concert stage by placing each family in the right section before the performance unlocks."
+        previewHighlights: "Orchestra Builder highlights"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/stage.jpeg"
+        previewAlt: "Poway Symphony Orchestra Builder stage layout preview"
+      - title: "Virtual Conductor"
+        description: "Virtual Conductor - tap along to live PSO recordings"
+        link: "https://pso.opencodingsociety.com/conductor/"
+        buttonLabel: "Open Virtual Conductor"
+        previewLabel: "Tempo Lab"
+        previewTitle: "Virtual Conductor"
+        previewText: "Tap with the orchestra as live PSO recordings play, keep your stability high, and guide the ensemble through each excerpt."
+        previewHighlights: "Virtual Conductor highlights"
+        previewImage: "https://pso.opencodingsociety.com/images/capstone/powaysymphonyorchestra/orch11.png"
+        previewAlt: "Virtual Conductor preview with John LoPiccolo conducting"
+      - title: "Tuning The Orchestra"
+        description: "Tune the Orchestra - ear training mini game with pitch sliders"
+        link: "https://pso.opencodingsociety.com/media/#tune-the-orchestra"
+        buttonLabel: "Open Tune the Orchestra"
+        previewLabel: "Ear Training"
+        previewTitle: "Tune the Orchestra"
+        previewText: "Match each drone to its target pitch by ear, then jump straight into the performances once the orchestra is ready."
+        previewHighlights: "Tune the Orchestra highlights"
+      - title: "Musician Profiles and Audio"
+        description: "Musician directory with searchable/filterable roster"
+      - title: "Concert Countdown"
+        description: "Live countdown to the next concert"
+      - title: "Season Calendar"
+        description: "Interactive season calendar to browse performance months"
+
     impact:
-      - "Increased engagement with concert information and event pages"
-      - "Improved navigation and reduced friction for donate, attend, and learn actions"
-      - "Stronger emotional connection through visual storytelling and media"
-      - "Higher accessibility for diverse audiences, including older users"
-      - "Increased likelihood of return visits and ongoing community involvement"
-      - "Clearer communication of the orchestra's mission and value"
-    status: "Research and Testing Phase"
-    team:
-      - "Wi-Fighters"
-      - "Meryl"
-      - "Kailyn"
-      - "Hope"
-      - "Laya"
-      
+      - "The redesign transforms a basic Google Sites page into a modern, engaging experience that's easier to navigate, more visually appealing, and actually gives visitors reasons to stay and explore rather than just look up a concert date."
+
+    organizationTitle: "About the Organization"
+    organizationSummary: >
+      The Poway Symphony Orchestra (PSO) is a semi-professional orchestra formed in 2004
+      that presents three symphonic concerts each year at the Poway Center for the Performing
+      Arts in Poway, CA. For over 20 years, the PSO has served San Diego's North County Inland
+      communities, performing classical, romantic, and contemporary repertoire with roughly
+      65-67 musicians under the direction of Conductor and Music Director John LoPiccolo.
+      The Poway Symphony Orchestra Foundation, a 501(c)(3) non-profit, was established in 2015
+      solely to support the orchestra.
+    organizationInfo:
+      - label: "Founded"
+        value: "2004"
+      - label: "Type"
+        value: "Semi-professional orchestra / 501(c)(3) non-profit"
+      - label: "Conductor & Music Director"
+        value: "John LoPiccolo (11th season)"
+      - label: "Venue"
+        value: "Poway Center for the Performing Arts, 15498 Espola Road, Poway, CA 92064"
+      - label: "Box Office Phone"
+        value: "(858) 748-0505"
+      - label: "Conductor Phone"
+        value: "(208) 757-1980"
+      - label: "Website (original)"
+        value: "powaysymphonyorchestra.org"
+        link: "https://www.powaysymphonyorchestra.org/"
+      - label: "YouTube"
+        value: "Poway Symphony Orchestra YouTube"
+        link: "https://youtube.com/channel/UCiqC2aUbjfNbMcLIr-oFifQ"
+      - label: "Facebook"
+        value: "facebook.com/powaysymphony"
+        link: "https://www.facebook.com/powaysymphony/"
+      - label: "Instagram"
+        value: "instagram.com/powaysymphonyorchestra"
+        link: "https://www.instagram.com/powaysymphonyorchestra/"
+
+status: "Research and Testing Phase (Deployed Prototype Complete)"
+
+team:
+  - "Wi-Fighters"
+  - "Meryl"
+  - "Kailyn"
+  - "Hope"
+  - "Laya"
