@@ -1,4 +1,4 @@
-// Imports: Level objects and UI helpers.
+// Level objects and UI helpers.
 import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
@@ -9,12 +9,12 @@ import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import Present from './Present.js';
 import LoginManager from '/assets/js/projects/cs-pathway-game/model/LoginManager.js';
 
-// Constants: Profile panel configuration
 const PROFILE_PANEL_ID = 'csse-profile-panel';
 
-// State: Track player progress and choices.
+// Track player progress and choices per session.
 const identityState = {
   startGatekeeperDone: false,
   identityUnlocked: false,
@@ -26,7 +26,12 @@ const identityState = {
 };
 
 /**
- * GameLevel CS Pathway - Identity Forge
+ * GameLevelCsPath0Forge - Identity Forge Level
+ *
+ * Opening level on the CS Pathway. Guides the player through three
+ * identity stations: Identity Terminal, World Theme Portal, and Avatar Forge.
+ * Profile data persisted via ProfileManager and module-level identityState.
+ * @class
  */
 class GameLevelCsPath0Forge {
   static levelId = 'csse-path';
@@ -61,11 +66,24 @@ class GameLevelCsPath0Forge {
     this.primeAssetGate = GameLevelCsPathIdentity.prototype.primeAssetGate.bind(this);
     this.preloadTrackedAsset = GameLevelCsPathIdentity.prototype.preloadTrackedAsset.bind(this);
 
+    this.present = new Present(this, {
+      toastDuration: 2200,
+      ignoreToasts: ['Press E to interact'],
+      isActiveLevel: () => this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this,
+    });
+    this.showToast = (message) => this.present.toast(message);
+    this.setZoneAlert = (message) => this.present.alerts(message);
+    this.clearZoneAlert = () => this.present.clearAlerts();
+    this.panel = (message) => this.present.panel(message);
+    this.score = (message) => this.present.score(message);
+    this.clearPanel = () => this.present.clearPanel();
+    this.clearScore = () => this.present.clearScore();
+
     /**
      * Section: Profile persistence.
      */
 
-    // Initialize ProfileManager for save/load
+    // Initialize ProfileManager for save/load.
     this.profileManager = new ProfileManager();
     this.queueLoadingWork();
     this.profileManagerReady = this.profileManager.initialize().then(async (restored) => {
@@ -219,7 +237,9 @@ class GameLevelCsPath0Forge {
      * Section: Journey flow.
      */
     
-    // Journey: Start gatekeeper intro.
+    /**
+     * Start gatekeeper NPC. Opening guide who introduces the identity journey.
+     */
     const npc_data_startGatekeeper = createGatekeeperData({
       id: 'StartGatekeeper',
       greeting: "Welcome to the Path of Code-Code-Coding...\nThis adventure begins with your identity.\nTravel to the Identity Terminal to define who you are.",
@@ -239,7 +259,9 @@ class GameLevelCsPath0Forge {
     });
 
 
-    // Journey: Identity gatekeeper.
+    /**
+     * Identity gatekeeper NPC. Guards the Identity Terminal station.
+     */
     const npc_data_identityGatekeeper = createGatekeeperData({
       id: 'IdentityGatekeeper',
       greeting: "This terminal is waiting for your identity. Press E to verify it!",
@@ -261,7 +283,10 @@ class GameLevelCsPath0Forge {
       },
     });
     
-    // Journey: Identity terminal flow.
+    /**
+     * Identity terminal flow. Run the authentication and identity registration wizard.
+     * @private
+     */
     this.runIdentityTerminal = async function(showIntro = false) {
       if (identityState.identityFlowActive) return;
       identityState.identityFlowActive = true;
@@ -286,18 +311,26 @@ class GameLevelCsPath0Forge {
           ]);
         }
 
-        // Check auth status via LoginManager; show built-in panel if not logged in.
+        // Resolve auth: student JWT → guest session → show panel.
         let authBody = null;
         const authStatus = await LoginManager.isAuthenticated();
         if (authStatus.success) {
+          // Authenticated student/teacher
           authBody = authStatus.body;
         } else {
-          const authResult = await LoginManager.showPanel(uiTheme);
-          if (!authResult.success) return;
-          authBody = authResult.body;
+          // Check for an existing guest session before prompting
+          const guestSession = LoginManager.getGuestSession();
+          if (guestSession) {
+            authBody = guestSession;
+          } else {
+            const authResult = await LoginManager.showPanel(uiTheme);
+            if (!authResult.success) return;
+            authBody = authResult.body;
+          }
         }
 
-        // Prefill identity form with data from the authenticated user.
+        // Prefill identity form with auth data.
+        // For students, also update the OCS nav menu.
         if (authBody) {
           this.profileData = {
             ...this.profileData,
@@ -305,6 +338,9 @@ class GameLevelCsPath0Forge {
             email:    authBody.email || this.profileData?.email    || '',
             githubID: authBody.uid   || this.profileData?.githubID || '',
           };
+          if (authBody.role !== 'guest') {
+            LoginManager.updateNavMenu(authBody);
+          }
         }
 
         const identityData = await this.showIdentityForm();
@@ -324,7 +360,10 @@ class GameLevelCsPath0Forge {
       }
     };
 
-    // Form: Show identity panel.
+    /**
+     * Show identity form. Present the identity FormPanel and save profile on submit.
+     * @private
+     */
     this.showIdentityForm = async function() {
       // Wait for ProfileManager to be ready
       await this.profileManagerReady;
@@ -339,8 +378,7 @@ class GameLevelCsPath0Forge {
         ...profile,
       };
 
-      // Save identity to ProfileManager
-      await this.profileManager.saveIdentity(profile);
+await this.profileManager.saveIdentity(profile);
       await this.profileManager.updateIdentityProgress(true);
 
       this.updateProfilePanel(this.profileData);
@@ -349,7 +387,9 @@ class GameLevelCsPath0Forge {
 
 
 
-    // Journey: Avatar gatekeeper.
+    /**
+     * Avatar gatekeeper NPC. Guards the Avatar Forge station.
+     */
     const npc_data_avatarGatekeeper = createGatekeeperData({
       id: 'AvatarGatekeeper',
       greeting: "Welcome to the Avatar Forge...\nChoose your look and watch your character update live!",
@@ -368,7 +408,10 @@ class GameLevelCsPath0Forge {
       },
     });
 
-    // Journey: Avatar forge flow.
+    /**
+     * Avatar forge flow. Run the avatar sprite selection wizard and persist the result.
+     * @private
+     */
     this.runAvatarForge = async function(showIntro = false, npc = null) {
       if (identityState.avatarFlowActive) return;
       identityState.avatarFlowActive = true;
@@ -397,7 +440,6 @@ class GameLevelCsPath0Forge {
         identityState.avatarForgeDone = true;
         const spriteName = avatarChoices.spriteMeta?.name || avatarChoices.sprite || 'Minimalist';
         
-        // Save avatar to ProfileManager
         await this.profileManager.saveAvatar(avatarChoices.spriteMeta);
         await this.profileManager.updateAvatarProgress(true);
 
@@ -418,7 +460,9 @@ class GameLevelCsPath0Forge {
       }
     };
 
-    // Journey: World Theme gatekeeper.
+    /**
+     * World Theme gatekeeper NPC. Guards the World Theme Portal station.
+     */
     const npc_data_worldThemeGatekeeper = createGatekeeperData({
       id: 'WorldThemeGatekeeper',
       greeting: "Welcome to the World Theme Portal...\nChoose a background and watch your world transform live!",
@@ -438,7 +482,10 @@ class GameLevelCsPath0Forge {
 
     });
  
-    // Journey: World Theme portal flow.
+    /**
+     * World theme flow. Run the background theme selection wizard and persist the result.
+     * @private
+     */
     this.runWorldThemePortal = async function(showIntro = false, npc = null) {
       if (identityState.worldThemeFlowActive) return;
       identityState.worldThemeFlowActive = true;
@@ -467,7 +514,6 @@ class GameLevelCsPath0Forge {
         identityState.worldThemeDone = true;
         const themeName = themeChoice.themeMeta?.name || themeChoice.theme || 'Default';
         
-        // Save theme to ProfileManager
         await this.profileManager.saveTheme(themeChoice.themeMeta);
         await this.profileManager.updateThemeProgress(true);
  
@@ -494,7 +540,9 @@ class GameLevelCsPath0Forge {
      * Section: UI and dialogue.
      */
 
-    // Dialogue: Sequential helper.
+    /**
+     * Level dialogue system. DialogueSystem instance shared by all NPC conversations.
+     */
     this.levelDialogueSystem = new DialogueSystem({
       id: 'csse-path-dialogue',
       dialogues: [],
@@ -505,7 +553,9 @@ class GameLevelCsPath0Forge {
       voiceRate: 0.9,
     });
 
-    // Dialogue: Show lines in sequence.
+    /**
+     * Show dialogue. Present an array of lines sequentially in the level dialogue system.
+     */
     this.showDialogue = function(speakerName, lines, options = {}) {
       const queue = Array.isArray(lines) ? lines.filter(Boolean) : [String(lines || '')];
       if (queue.length === 0) {
@@ -565,11 +615,16 @@ class GameLevelCsPath0Forge {
     };
 
 
-    // Toast: Show status message.
+    /**
+     * Show toast. Display a timed status overlay at the top-right of the screen.
+     */
     this.showToast = function(message) {
       if (message === 'Press E to interact') {
         return;
       }
+
+      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
+      if (!isActiveLevel) return;
 
       const host = document.body;
       if (!host) return;
@@ -602,7 +657,13 @@ class GameLevelCsPath0Forge {
       }, 2200);
     };
 
+    /**
+     * Set zone alert. Display a persistent proximity message below the toast area.
+     */
     this.setZoneAlert = function(message) {
+      const isActiveLevel = this.gameEnv?.currentLevel === this || this.gameEnv?.gameLevel === this;
+      if (!isActiveLevel) return;
+
       const host = document.body;
       if (!host) return;
 
@@ -624,6 +685,9 @@ class GameLevelCsPath0Forge {
       this._zoneAlertEl.textContent = message;
     };
 
+    /**
+     * Clear zone alert. Remove the zone alert element from the DOM.
+     */
     this.clearZoneAlert = function() {
       if (this._zoneAlertEl?.parentNode) {
         this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
@@ -632,7 +696,9 @@ class GameLevelCsPath0Forge {
     };
 
 
-    // Theme: Shared panel colors.
+    /**
+     * Shared UI theme. Color and style tokens applied to all panels in this level.
+     */
     const uiTheme = {
       background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
       borderColor: 'var(--ocs-game-accent, #4ecca3)',
@@ -653,7 +719,9 @@ class GameLevelCsPath0Forge {
      * Section: Avatar data.
      */
 
-    // Picker: Avatar config.
+    /**
+     * Avatar picker view. Picker for sprite selection with normalizer and grid config.
+     */
     this.avatarPickerView = new Picker({
       id: 'csse-avatar-picker',
       title: '⚔ Avatar Forge Sprite Selector',
@@ -693,7 +761,10 @@ class GameLevelCsPath0Forge {
     });
 
 
-    // Data: Load avatar catalog.
+    /**
+     * Load avatar catalog. Fetch sprite manifest, filter by world theme, and cache.
+     * @private
+     */
     this.getAvatarCatalog = async function() {
       if (this.avatarCatalog) {
         return this.avatarCatalog;
@@ -768,7 +839,10 @@ class GameLevelCsPath0Forge {
       return this.avatarCatalog;
     };
 
-    // Data: Map avatar movement.
+    /**
+     * Map avatar movement. Return direction-to-row/column config for a given sprite preset.
+     * @private
+     */
     this.getAvatarMovementConfig = function(spriteMeta = {}) {
       const rows = Math.max(1, Number(spriteMeta.rows || 1));
       const columns = Math.max(1, Number(spriteMeta.cols || 1));
@@ -816,12 +890,18 @@ class GameLevelCsPath0Forge {
     };
 
 
-    // Player: Find avatar target.
+    /**
+     * Find player object. Return the Player game object from the current game environment.
+     * @private
+     */
     this.getPlayerObject = function() {
       return gameEnv.gameObjects.find(obj => (obj.data && obj.data.id === 'Minimalist_Identity') || obj.id === 'Minimalist_Identity');
     };
 
-    // Player: Apply avatar selection.
+    /**
+     * Apply avatar options. Swap the player's sprite sheet and movement config live.
+     * @private
+     */
     this.applyAvatarOptions = function(options = {}, remainingAttempts = 20) {
       return new Promise((resolve) => {
         const attemptApply = (attemptNumber) => {
@@ -899,7 +979,10 @@ class GameLevelCsPath0Forge {
       });
     };
 
-    // Picker: Show avatar form.
+    /**
+     * Show avatar form. Open the avatar Picker, preview live, and return the confirmed sprite.
+     * @private
+     */
     this.showAvatarCustomForm = async function() {
       const sprites = await this.getAvatarCatalog();
       const originalSprite = this.profileData?.spriteMeta || sprites[0];
@@ -930,7 +1013,9 @@ class GameLevelCsPath0Forge {
      * Section: World Theme data.
      */
  
-    // Picker: World Theme config.
+    /**
+     * World theme picker. Picker for background theme selection with grid config.
+     */
     this.worldThemePickerView = new Picker({
       id: 'csse-world-theme-picker',
       title: '🌐 World Theme Portal',
@@ -968,7 +1053,10 @@ class GameLevelCsPath0Forge {
       },
     });
  
-    // Data: Load background catalog.
+    /**
+     * Load background catalog. Fetch background manifest from JSON and cache results.
+     * @private
+     */
     this.getBackgroundCatalog = async function() {
       if (this.backgroundCatalog) {
         return this.backgroundCatalog;
@@ -1013,7 +1101,10 @@ class GameLevelCsPath0Forge {
       return this.backgroundCatalog;
     };
  
-    // Background: Find the background object.
+    /**
+     * Find background object. Return the level background game object by display name.
+     * @private
+     */
     this.getBackgroundObject = function() {
       const bgObj = gameEnv.gameObjects.find(obj =>
         (obj.data && obj.data.name === GameLevelCsPath0Forge.displayName)
@@ -1031,7 +1122,10 @@ class GameLevelCsPath0Forge {
       return bgObj;
     };
  
-    // Background: Apply theme selection live.
+    /**
+     * Apply world theme. Swap background image live and update profile with the new theme.
+     * @private
+     */
     this.applyWorldTheme = function(themeMeta = {}, remainingAttempts = 20) {
       return new Promise((resolve) => {
         const attemptApply = (attemptNumber) => {
@@ -1056,12 +1150,10 @@ class GameLevelCsPath0Forge {
 
           console.log('World Theme Portal: applying theme', themeMeta.name, 'with src:', newSrc);
 
-          // Update the data source
           if (bgObj.data) {
             bgObj.data.src = newSrc;
           }
 
-          // Reload the image
           bgObj.image = new Image();
           bgObj.spriteReady = false;
 
@@ -1102,7 +1194,10 @@ class GameLevelCsPath0Forge {
       });
     };
  
-    // Picker: Show world theme form.
+    /**
+     * Show world theme form. Open the World Theme Picker and apply the confirmed theme.
+     * @private
+     */
     this.showWorldThemeForm = async function() {
       const themes = await this.getBackgroundCatalog();
       const originalTheme = this.profileData?.themeMeta || themes[0];
@@ -1119,7 +1214,7 @@ class GameLevelCsPath0Forge {
         return null;
       }
  
-      // Only apply the theme after user confirms selection
+      // Only apply the theme after user confirms selection.
       this.applyWorldTheme(selectedTheme);
  
       return {
@@ -1133,7 +1228,9 @@ class GameLevelCsPath0Forge {
      * Section: UI config.
      */
 
-    // Panel: Profile config.
+    /**
+     * Profile panel config. StatusPanel config showing player identity, avatar, and theme.
+     */
     const profilePanelConfig = {
       id: PROFILE_PANEL_ID,
       title: 'PLAYER PROFILE',
@@ -1179,7 +1276,9 @@ class GameLevelCsPath0Forge {
     };
     this.profilePanelView = new StatusPanel(profilePanelConfig);
 
-    // Form: Identity config.
+    /**
+     * Identity form config. FormPanel config for the Identity Terminal input fields.
+     */
     const identityFormConfig = {
       id: 'csse-identity-terminal',
       title: '⚔ Identity Terminal Setup',
@@ -1197,7 +1296,9 @@ class GameLevelCsPath0Forge {
     this.identityFormView = new FormPanel(identityFormConfig);
 
 
-    // Panel: Update profile display.
+    /**
+     * Update profile panel. Re-render profile panel fields with current profile data.
+     */
     this.updateProfilePanel = function(profile = {}) {
       this.createProfilePanel();
       this.profilePanelView.update({
@@ -1209,7 +1310,9 @@ class GameLevelCsPath0Forge {
       });
     };
 
-    // Panel: Mount profile view.
+    /**
+     * Create profile panel. Ensure the profile StatusPanel is mounted in the DOM.
+     */
     this.createProfilePanel = function() {
       if (!this.profilePanelView) {
         return null;
@@ -1222,8 +1325,6 @@ class GameLevelCsPath0Forge {
     /**
      * Section: Level objects and classes.
      */
-
-    // Objects: Build level class list.
 
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
@@ -1242,6 +1343,9 @@ class GameLevelCsPath0Forge {
     ];
   }
 
+  /**
+   * Level initialization. Binds gatekeeper reactions and stores live NPC references.
+   */
   initialize() {
     const objects = this.gameEnv?.gameObjects || [];
     const gatekeepers = objects.filter((obj) => this._forgeGatekeeperIds?.includes(obj?.spriteData?.id));
@@ -1257,6 +1361,10 @@ class GameLevelCsPath0Forge {
     this._activeZoneGatekeeperId = null;
   }
 
+  /**
+   * Rebind reactions. Copy spriteData.reaction onto gatekeeper if the engine dropped the binding.
+   * @private
+   */
   _rebindMissingGatekeeperReactions(gatekeepers) {
     gatekeepers.forEach((gatekeeper) => {
       if (typeof gatekeeper?.reaction !== 'function' && typeof gatekeeper?.spriteData?.reaction === 'function') {
@@ -1265,6 +1373,10 @@ class GameLevelCsPath0Forge {
     });
   }
 
+  /**
+   * Get object center. Return the {x, y} mid-point of a game object's bounding box.
+   * @private
+   */
   _getObjectCenter(object) {
     return {
       x: (object?.position?.x || 0) + (object?.width || 0) / 2,
@@ -1272,6 +1384,10 @@ class GameLevelCsPath0Forge {
     };
   }
 
+  /**
+   * Alert distance px. Compute the pixel alert radius for a gatekeeper.
+   * @private
+   */
   _getGatekeeperAlertDistancePx(gatekeeper) {
     const alertMultiplier = gatekeeper?._alertDistanceMultiplier ?? gatekeeper?.spriteData?.alertDistance ?? 1.25;
     if ((gatekeeper?.width || 0) > 0) {
@@ -1280,6 +1396,10 @@ class GameLevelCsPath0Forge {
     return (gatekeeper?.interactDistance || 120) * 1.5;
   }
 
+  /**
+   * Find nearest gatekeeper. Return the closest in-zone gatekeeper relative to the player.
+   * @private
+   */
   _findNearestGatekeeperInZone(player, gatekeepers) {
     const playerCenter = this._getObjectCenter(player);
     const collisionIds = player?.state?.collisionEvents || [];
@@ -1288,6 +1408,10 @@ class GameLevelCsPath0Forge {
     let nearestDistance = Infinity;
 
     for (const gatekeeper of gatekeepers) {
+      // Skip until sprite is loaded — width===0 means the fallback alert
+      // distance (180 px) is active and can catch the player at spawn.
+      if ((gatekeeper?.width || 0) === 0) continue;
+
       const gatekeeperCenter = this._getObjectCenter(gatekeeper);
       const distance = Math.hypot(playerCenter.x - gatekeeperCenter.x, playerCenter.y - gatekeeperCenter.y);
       const inCollision = collisionIds.includes(gatekeeper?.spriteData?.id);
@@ -1302,6 +1426,10 @@ class GameLevelCsPath0Forge {
     return nearestGatekeeper;
   }
 
+  /**
+   * Sync zone alert. Show or clear the zone alert banner based on nearest gatekeeper.
+   * @private
+   */
   _syncGatekeeperZoneAlert(nearestGatekeeper) {
     if (nearestGatekeeper) {
       const zoneMessage = nearestGatekeeper.spriteData?.zoneMessage || 'Press E to interact';
@@ -1316,6 +1444,9 @@ class GameLevelCsPath0Forge {
     }
   }
 
+  /**
+   * Per-frame update. Detect player proximity to gatekeepers and sync zone alerts.
+   */
   update() {
     const player = this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
     if (!player || !Array.isArray(this._forgeGatekeeperObjects)) return;
@@ -1324,8 +1455,12 @@ class GameLevelCsPath0Forge {
     this._syncGatekeeperZoneAlert(nearestGatekeeper);
   }
 
+  /**
+   * Level teardown. Remove toast and zone alert DOM elements on level exit.
+   */
   destroy() {
     this.clearZoneAlert();
+    this.present?.destroy();
   }
 }
 

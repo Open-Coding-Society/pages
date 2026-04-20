@@ -59,6 +59,9 @@ class AiNpc {
     static createChatUI(spriteData) {
         const container = document.createElement('div');
         container.className = 'ai-npc-container';
+        container.style.display = 'flex';
+        container.style.flexDirection = 'column';
+        container.style.gap = '10px';
 
         const inputField = document.createElement('textarea');
         inputField.className = 'ai-npc-input';
@@ -76,6 +79,13 @@ class AiNpc {
         const buttonRow = document.createElement('div');
         buttonRow.className = 'ai-npc-button-row';
 
+        const entryArea = document.createElement('div');
+        entryArea.className = 'ai-npc-entry-area';
+        entryArea.style.display = 'flex';
+        entryArea.style.flexDirection = 'column';
+        entryArea.style.gap = '8px';
+        entryArea.style.marginTop = 'auto';
+
         const historyBtn = document.createElement('button');
         historyBtn.textContent = '📋 Chat History';
         historyBtn.className = 'ai-npc-history-btn';
@@ -85,9 +95,10 @@ class AiNpc {
         responseArea.style.display = 'none'; // Keep this one for show/hide logic
 
         buttonRow.appendChild(historyBtn);
-        container.appendChild(inputField);
-        container.appendChild(buttonRow);
+        entryArea.appendChild(inputField);
+        entryArea.appendChild(buttonRow);
         container.appendChild(responseArea);
+        container.appendChild(entryArea);
 
         return { container, inputField, historyBtn, responseArea };
     }
@@ -139,11 +150,11 @@ class AiNpc {
             // Remove any existing AI NPC containers first
             const existingContainers = dialogueBox.querySelectorAll('.ai-npc-container');
             existingContainers.forEach(existing => existing.remove());
-            
-            // Find the close button using its specific ID
-            const closeBtn = document.getElementById('dialogue-close-btn-' + dialogueSystem.safeId);
-            if (closeBtn && closeBtn.parentNode === dialogueBox) {
-                dialogueBox.insertBefore(container, closeBtn);
+
+            // Keep AI interaction area above the dialogue controls row.
+            const controlsRow = document.getElementById('dialogue-controls-' + dialogueSystem.safeId);
+            if (controlsRow && controlsRow.parentNode === dialogueBox) {
+                dialogueBox.insertBefore(container, controlsRow);
             } else {
                 dialogueBox.appendChild(container);
             }
