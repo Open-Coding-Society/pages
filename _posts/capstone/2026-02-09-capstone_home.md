@@ -76,7 +76,7 @@ sticky_rank: 1
   position: fixed;
   top: 1.1rem;
   right: -360px;
-  z-index: 9999;
+  z-index: 100000;
   background: #161616;
   color: #f3f4f6;
   border: 1px solid rgba(255,255,255,0.14);
