@@ -16,19 +16,26 @@
     </div>
   </section>
 
-  <!-- Features with screenshots -->
+  <!-- Features with titles above gifs -->
   <section class="wp-section">
     <h2 class="wp-section-title">Key Features</h2>
     <div class="wp-feature-grid">
       {% for feature in data.Features %}
       <a href="{{ feature.url | default: data.SiteUrl }}" target="_blank" rel="noopener" class="wp-feature-card">
-        <div class="wp-feature-image-wrap">
-          <img src="{{ site.baseurl }}/images/{{ feature.image }}" alt="{{ feature.title }}" class="wp-feature-image">
-        </div>
         <div class="wp-feature-body">
           <h3 class="wp-feature-title">{{ feature.title }}</h3>
           <p class="wp-feature-desc">{{ feature.description }}</p>
         </div>
+        <div class="wp-feature-image-wrap">
+          <img src="{{ site.baseurl }}/images/{{ feature.image }}" alt="{{ feature.title }}" class="wp-feature-image">
+        </div>
+        {% if feature.bullets %}
+        <ul class="wp-feature-bullets">
+          {% for bullet in feature.bullets %}
+          <li>{{ bullet }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
       </a>
       {% endfor %}
     </div>
@@ -54,7 +61,7 @@
     </div>
   </section>
 
-  <!-- Who We Are (moved to end) -->
+  <!-- Who We Are -->
   <section class="wp-section">
     <div class="wp-about-section">
       <div class="wp-about-col">
@@ -71,7 +78,7 @@
         </div>
       </div>
       <div class="wp-about-col">
-        <h2 class="wp-section-title">What We're Building</h2>
+        <h2 class="wp-section-title">What We Built</h2>
         <p>{{ data.About.what }}</p>
       </div>
       <div class="wp-about-col">
