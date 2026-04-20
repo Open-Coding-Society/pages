@@ -78,14 +78,20 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     });
 
     // ── NPC Positions ──────────────────────────────────────────────
-    // Position NPCs on opposite sides of screen, centered vertically
+    // Position NPCs along pathway progression
     const analyticsGuidePos = {
-      x: width * 0.30,
+      x: width * 0.20,
       y: height * 0.35,
     };
 
     const githubMetricsPos = {
-      x: width * 0.60,
+      x: width * 0.50,
+      y: height * 0.35,
+    };
+
+    // Self-evaluation NPC at end of pathway
+    const selfEvalPos = {
+      x: width * 0.80,
       y: height * 0.35,
     };
 
@@ -145,12 +151,28 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       },
     });
 
+    // Self-Evaluation NPC - end-of-sprint reflection
+    const npc_data_selfEval = createGatekeeperData({
+      id: 'SelfEvaluator',
+      greeting: 'Welcome to the end-of-sprint reflection station! Here you can evaluate your progress, assess your skills, and reflect on your learning. Press E to begin your self-evaluation.',
+      position: selfEvalPos,
+      reaction: function() {
+        if (level?.showToast) {
+          level.showToast('Self-Evaluator: Press E to reflect on your sprint');
+        }
+      },
+      interact: async function() {
+        await level.showSelfEvaluation();
+      },
+    });
+
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
       { class: Npc, data: npc_data_analyticsGuide },
       { class: Npc, data: npc_data_githubGuide },
+      { class: Npc, data: npc_data_selfEval },
     ];
 
     // FriendlyNpc expects these level references for toast routing
@@ -240,59 +262,57 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Show complete analytics dashboard
+   * Show complete analytics dashboard with dialogue + accumulating toasts
    */
   async showAnalyticsDashboard() {
-    // Wait for preloaded data
-    await this.dataLoaded;
-    
-    // Use cached data if available
-    const userData = this.cachedUserData || await this.fetchUserData();
-    
-    if (!userData || !userData.analyticsSummary) {
-      await this.showDialogue('Analytics Guide', [
-        'Unable to load your analytics.',
-        'Please ensure you are logged in.',
-      ]);
-      return;
+    try {
+      // Wait for preloaded data
+      await this.dataLoaded;
+      
+      // Use cached data if available
+      const userData = this.cachedUserData || await this.fetchUserData();
+      
+      if (!userData || !userData.analyticsSummary) {
+        this.showToast('Unable to load your analytics. Please ensure you are logged in.');
+        return;
+      }
+
+      const s = userData.analyticsSummary;
+      
+      // Build dialogue lines
+      const stats = [
+        `Analytics for ${userData.name || 'Student'}`,
+        `Email: ${userData.email || 'Not set'}`,
+        `UID: ${userData.uid || 'Not set'}`,
+        '',
+        'Time & Engagement:',
+        `Total Time Spent: ${s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h'}`,
+        `Avg Session: ${s.averageSessionDurationSeconds ? this.formatTime(s.averageSessionDurationSeconds * 1000) : '0m'}`,
+        `Code Executions: ${s.totalCodeExecutions || 0}`,
+        `Engagement: ${((s.interactionPercentage || 0).toFixed(1))}%`,
+        `Accuracy: ${((s.averageAccuracyPercentage || 0).toFixed(1))}%`,
+        '',
+        'Learning Progress:',
+        `Lessons Viewed: ${s.totalLessonsViewed || 0}`,
+        `Lessons Completed: ${s.totalLessonsCompleted || 0}`,
+        `Scroll Depth: ${((s.averageScrollDepth || 0).toFixed(0))}%`,
+        `Copy/Paste: ${s.totalCopyPasteAttempts || 0}`,
+        '',
+        'Keep pushing forward! You are making progress!',
+      ];
+
+      // Show dialogue while toasts accumulate
+      this.showDialogue('Analytics Guide', stats);
+      
+      // Simultaneously show toasts
+      for (const stat of stats) {
+        this.showToast(stat);
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
+    } catch (err) {
+      console.error('Error showing analytics:', err);
+      this.showToast('Error loading analytics');
     }
-
-    const s = userData.analyticsSummary;
-    
-    const timeSpent = s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h';
-    const codeRuns = s.totalCodeExecutions || 0;
-    const lessonsViewed = s.totalLessonsViewed || 0;
-    const lessonsCompleted = s.totalLessonsCompleted || 0;
-    const engagement = ((s.interactionPercentage || 0).toFixed(1)) + '%';
-    const scrollDepth = ((s.averageScrollDepth || 0).toFixed(0)) + '%';
-    const avgSessionDuration = s.averageSessionDurationSeconds ? this.formatTime(s.averageSessionDurationSeconds * 1000) : '0m';
-    const accuracy = ((s.averageAccuracyPercentage || 0).toFixed(1)) + '%';
-    const copyPaste = s.totalCopyPasteAttempts || 0;
-    
-    const messages = [
-      'Your Learning Analytics:',
-      '',
-      `Name: ${userData.name || 'Not set'}`,
-      `Email: ${userData.email || 'Not set'}`,
-      `UID: ${userData.uid || 'Not set'}`,
-      '',
-      'Time & Engagement:',
-      `Total Time Spent: ${timeSpent}`,
-      `Avg Session Duration: ${avgSessionDuration}`,
-      `Code Executions: ${codeRuns}`,
-      `Engagement Rate: ${engagement}`,
-      `Accuracy: ${accuracy}`,
-      '',
-      'Learning Progress:',
-      `Lessons Viewed: ${lessonsViewed}`,
-      `Lessons Completed: ${lessonsCompleted}`,
-      `Scroll Depth: ${scrollDepth}`,
-      `Copy/Paste Attempts: ${copyPaste}`,
-      '',
-      'You are making excellent progress!',
-    ];
-
-    await this.showDialogue('Analytics Guide', messages);
   }
 
   /**
@@ -333,42 +353,329 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Show GitHub contribution statistics
+   * Show GitHub contribution statistics with dialogue + accumulating toasts
    */
   async showGitHubStats() {
-    // Wait for preloaded data
-    await this.dataLoaded;
-    
-    // Use cached data if available
-    const userData = this.cachedUserData || await this.fetchUserData();
-    
-    if (!userData || !userData.github) {
-      await this.showDialogue('GitHub Guide', [
-        'No GitHub data available.',
-        'Connect your GitHub account in the Dashboard.',
-      ]);
-      return;
+    try {
+      // Wait for preloaded data
+      await this.dataLoaded;
+      
+      // Use cached data if available
+      const userData = this.cachedUserData || await this.fetchUserData();
+      
+      if (!userData || !userData.github) {
+        this.showToast('No GitHub data available. Connect your GitHub account in the Dashboard.');
+        return;
+      }
+
+      const gh = userData.github;
+      const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
+      
+      // Build dialogue lines
+      const stats = [
+        'Your GitHub Contributions:',
+        '',
+        `Total Commits: ${gh.commits || 0}`,
+        `Pull Requests: ${gh.prs || 0}`,
+        `Issues Reported: ${gh.issues || 0}`,
+        '',
+        `Lines Added: +${gh.linesAdded || 0}`,
+        `Lines Deleted: -${gh.linesDeleted || 0}`,
+        `Total Edits: ${totalEdits}`,
+        '',
+        'Your code shows dedication and growth!',
+      ];
+
+      // Show dialogue while toasts accumulate
+      this.showDialogue('GitHub Guide', stats);
+      
+      // Simultaneously show toasts
+      for (const stat of stats) {
+        this.showToast(stat);
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
+    } catch (err) {
+      console.error('Error showing GitHub stats:', err);
+      this.showToast('Error loading GitHub stats');
     }
+  }
 
-    const gh = userData.github;
-    const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
-    
-    const messages = [
-      'Your GitHub Contribution Stats:',
-      '',
-      `Total Commits: ${gh.commits || 0}`,
-      `Pull Requests: ${gh.prs || 0}`,
-      `Issues Reported: ${gh.issues || 0}`,
-      '',
-      `Lines Added: +${gh.linesAdded || 0}`,
-      `Lines Deleted: -${gh.linesDeleted || 0}`,
-      `Total Edits: ${totalEdits}`,
-      '',
-      'Your code contributions show dedication!',
-      'Keep coding and collaborating!',
-    ];
+  /**
+   * Show interactive end-of-sprint self-evaluation with sliders
+   */
+  async showSelfEvaluation() {
+    try {
+      // Create evaluation modal overlay
+      const modal = document.createElement('div');
+      modal.id = 'self-eval-modal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      `;
 
-    await this.showDialogue('GitHub Guide', messages);
+      const container = document.createElement('div');
+      container.style.cssText = `
+        background: #1a1a1a;
+        border: 2px solid #3b82f6;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        color: #e5e7eb;
+        font-family: Arial, sans-serif;
+      `;
+
+      // Title
+      const title = document.createElement('h2');
+      title.textContent = 'Sprint Self-Evaluation';
+      title.style.cssText = 'margin-top: 0; color: #60a5fa; margin-bottom: 20px; font-size: 24px;';
+      container.appendChild(title);
+
+      // Instructions
+      const instructions = document.createElement('p');
+      instructions.textContent = 'Rate your skills on a scale of 1-5 for this sprint:';
+      instructions.style.cssText = 'color: #9ca3af; margin-bottom: 20px; font-size: 14px;';
+      container.appendChild(instructions);
+
+      // Skills to evaluate
+      const skills = [
+        { id: 'communication', label: 'Communication & Collaboration', category: 'soft' },
+        { id: 'problem_solving', label: 'Problem Solving & Creativity', category: 'soft' },
+        { id: 'perseverance', label: 'Perseverance & Growth Mindset', category: 'soft' },
+        { id: 'time_mgmt', label: 'Time Management & Organization', category: 'soft' },
+        { id: 'code_quality', label: 'Code Quality & Best Practices', category: 'hard' },
+        { id: 'debugging', label: 'Debugging & Testing', category: 'hard' },
+        { id: 'algorithms', label: 'Algorithm Understanding', category: 'hard' },
+        { id: 'optimization', label: 'Performance Optimization', category: 'hard' },
+      ];
+
+      const sliderValues = {};
+
+      // Soft Skills Section
+      const softTitle = document.createElement('h3');
+      softTitle.textContent = 'Soft Skills';
+      softTitle.style.cssText = 'color: #10b981; margin-top: 20px; margin-bottom: 15px; font-size: 16px;';
+      container.appendChild(softTitle);
+
+      // Hard Skills Section
+      const hardTitle = document.createElement('h3');
+      hardTitle.textContent = 'Hard Coding Skills';
+      hardTitle.style.cssText = 'color: #f59e0b; margin-top: 20px; margin-bottom: 15px; font-size: 16px;';
+
+      // Add sliders for soft skills
+      let firstHardSkillIndex = -1;
+      skills.forEach((skill, idx) => {
+        if (skill.category === 'hard' && firstHardSkillIndex === -1) {
+          firstHardSkillIndex = idx;
+          container.appendChild(hardTitle);
+        }
+
+        const sliderBox = document.createElement('div');
+        sliderBox.style.cssText = 'margin-bottom: 15px;';
+
+        const label = document.createElement('label');
+        label.textContent = skill.label;
+        label.style.cssText = 'display: block; font-size: 13px; margin-bottom: 5px; color: #d1d5db;';
+        sliderBox.appendChild(label);
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '1';
+        slider.max = '5';
+        slider.value = '3';
+        slider.style.cssText = 'width: 100%; cursor: pointer;';
+        sliderValues[skill.id] = 3;
+
+        const valueDisplay = document.createElement('span');
+        valueDisplay.textContent = '3 / 5';
+        valueDisplay.style.cssText = 'float: right; color: #60a5fa; font-size: 12px; font-weight: bold;';
+        label.appendChild(valueDisplay);
+
+        slider.addEventListener('input', (e) => {
+          sliderValues[skill.id] = parseInt(e.target.value);
+          valueDisplay.textContent = `${e.target.value} / 5`;
+        });
+
+        sliderBox.appendChild(slider);
+        container.appendChild(sliderBox);
+      });
+
+      // Buttons
+      const buttonBox = document.createElement('div');
+      buttonBox.style.cssText = 'margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;';
+
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.style.cssText = `
+        padding: 10px 20px;
+        background: #4b5563;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      `;
+      cancelBtn.onclick = () => modal.remove();
+
+      const submitBtn = document.createElement('button');
+      submitBtn.textContent = 'Submit & Predict Grade';
+      submitBtn.style.cssText = `
+        padding: 10px 20px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      `;
+      submitBtn.onclick = async () => {
+        await this.submitSelfEvaluation(sliderValues);
+        modal.remove();
+      };
+
+      buttonBox.appendChild(cancelBtn);
+      buttonBox.appendChild(submitBtn);
+      container.appendChild(buttonBox);
+
+      modal.appendChild(container);
+      document.body.appendChild(modal);
+    } catch (err) {
+      console.error('Error showing self-evaluation:', err);
+      this.showToast('Error loading self-evaluation');
+    }
+  }
+
+  /**
+   * Submit self-evaluation and show grade prediction
+   */
+  async submitSelfEvaluation(sliderValues) {
+    try {
+      // Calculate weighted score
+      const softSkills = ['communication', 'problem_solving', 'perseverance', 'time_mgmt'];
+      const hardSkills = ['code_quality', 'debugging', 'algorithms', 'optimization'];
+
+      const softAvg = softSkills.reduce((sum, id) => sum + (sliderValues[id] || 0), 0) / softSkills.length;
+      const hardAvg = hardSkills.reduce((sum, id) => sum + (sliderValues[id] || 0), 0) / hardSkills.length;
+
+      // Weighted: 40% soft skills, 60% hard skills
+      const overallScore = (softAvg * 0.4 + hardAvg * 0.6);
+
+      // Convert to grade
+      let grade, gradeColor;
+      if (overallScore >= 4.5) {
+        grade = 'A (Excellent)';
+        gradeColor = '#10b981';
+      } else if (overallScore >= 4.0) {
+        grade = 'A- (Very Good)';
+        gradeColor = '#10b981';
+      } else if (overallScore >= 3.5) {
+        grade = 'B+ (Good)';
+        gradeColor = '#60a5fa';
+      } else if (overallScore >= 3.0) {
+        grade = 'B (Satisfactory)';
+        gradeColor = '#60a5fa';
+      } else if (overallScore >= 2.5) {
+        grade = 'C (Needs Improvement)';
+        gradeColor = '#f59e0b';
+      } else {
+        grade = 'F (Below Expectations)';
+        gradeColor = '#ef4444';
+      }
+
+      // Show result
+      const resultModal = document.createElement('div');
+      resultModal.id = 'eval-result-modal';
+      resultModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10001;
+      `;
+
+      const resultContainer = document.createElement('div');
+      resultContainer.style.cssText = `
+        background: #1a1a1a;
+        border: 2px solid #3b82f6;
+        border-radius: 12px;
+        padding: 40px;
+        max-width: 400px;
+        text-align: center;
+        color: #e5e7eb;
+      `;
+
+      const resultTitle = document.createElement('h2');
+      resultTitle.textContent = 'Your Sprint Grade';
+      resultTitle.style.cssText = 'color: #60a5fa; margin-bottom: 30px; font-size: 28px;';
+      resultContainer.appendChild(resultTitle);
+
+      const gradeDisplay = document.createElement('div');
+      gradeDisplay.textContent = grade;
+      gradeDisplay.style.cssText = `
+        font-size: 48px;
+        font-weight: bold;
+        color: ${gradeColor};
+        margin-bottom: 20px;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+      `;
+      resultContainer.appendChild(gradeDisplay);
+
+      const scoreText = document.createElement('p');
+      scoreText.textContent = `Score: ${overallScore.toFixed(2)} / 5.0`;
+      scoreText.style.cssText = 'color: #9ca3af; margin-bottom: 20px; font-size: 14px;';
+      resultContainer.appendChild(scoreText);
+
+      const breakdown = document.createElement('div');
+      breakdown.style.cssText = 'text-align: left; margin: 20px 0; font-size: 13px; color: #d1d5db;';
+      breakdown.innerHTML = `
+        <p>Soft Skills Average: <span style="color: #10b981; font-weight: bold;">${softAvg.toFixed(2)}/5</span></p>
+        <p>Hard Skills Average: <span style="color: #f59e0b; font-weight: bold;">${hardAvg.toFixed(2)}/5</span></p>
+      `;
+      resultContainer.appendChild(breakdown);
+
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Great! Keep improving!';
+      closeBtn.style.cssText = `
+        margin-top: 30px;
+        padding: 12px 24px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        width: 100%;
+      `;
+      closeBtn.onclick = () => {
+        resultModal.remove();
+      };
+      resultContainer.appendChild(closeBtn);
+
+      resultModal.appendChild(resultContainer);
+      document.body.appendChild(resultModal);
+
+      // Show toast celebration
+      this.showToast('Evaluation submitted! Check your grade above.');
+    } catch (err) {
+      console.error('Error submitting evaluation:', err);
+      this.showToast('Error saving evaluation. Please try again.');
+    }
   }
 
   /**
