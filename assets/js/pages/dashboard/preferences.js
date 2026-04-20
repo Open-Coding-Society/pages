@@ -531,6 +531,291 @@ export class TTSPanel {
 }
 
 // ============================================
+// RESPONSIBILITY: Camera-based head tracking cursor
+// ============================================
+export class HeadTrackingController {
+    static STORAGE_KEY = 'headTrackingPreferences';
+    static state = {
+        enabled: false,
+        sensitivity: 0.45
+    };
+    static refs = {
+        toggle: null,
+        sensitivity: null,
+        sensitivityLabel: null,
+        status: null
+    };
+
+    static stream = null;
+    static video = null;
+    static cursorEl = null;
+    static rafId = null;
+    static faceLandmarker = null;
+    static visionModule = null;
+    static lastPoint = null;
+
+    static init() {
+        HeadTrackingController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
+        HeadTrackingController.refs.sensitivity = document.getElementById('pref-head-tracking-sensitivity');
+        HeadTrackingController.refs.sensitivityLabel = document.getElementById('head-tracking-sensitivity-label');
+        HeadTrackingController.refs.status = document.getElementById('head-tracking-status');
+
+        if (!HeadTrackingController.refs.toggle || !HeadTrackingController.refs.status) return;
+
+        HeadTrackingController._loadState();
+        HeadTrackingController._createCursor();
+
+        HeadTrackingController.refs.toggle.checked = !!HeadTrackingController.state.enabled;
+        if (HeadTrackingController.refs.sensitivity) {
+            HeadTrackingController.refs.sensitivity.value = String(HeadTrackingController.state.sensitivity);
+        }
+        HeadTrackingController._updateSensitivityLabel();
+
+        HeadTrackingController.refs.toggle.addEventListener('change', async (e) => {
+            await HeadTrackingController.setEnabled(!!e.target.checked);
+        });
+
+        if (HeadTrackingController.refs.sensitivity) {
+            HeadTrackingController.refs.sensitivity.addEventListener('input', () => {
+                const raw = Number(HeadTrackingController.refs.sensitivity.value);
+                HeadTrackingController.state.sensitivity = Number.isFinite(raw) ? raw : 0.45;
+                HeadTrackingController._updateSensitivityLabel();
+                HeadTrackingController._saveState();
+            });
+        }
+
+        if (HeadTrackingController.state.enabled) {
+            HeadTrackingController.setEnabled(true);
+        } else {
+            HeadTrackingController._setStatus('Head tracking is off.');
+        }
+
+        window.addEventListener('beforeunload', () => {
+            HeadTrackingController._stopTracking();
+        });
+    }
+
+    static async setEnabled(enabled) {
+        HeadTrackingController.state.enabled = !!enabled;
+        HeadTrackingController._saveState();
+
+        if (HeadTrackingController.refs.toggle) {
+            HeadTrackingController.refs.toggle.checked = HeadTrackingController.state.enabled;
+        }
+
+        if (!HeadTrackingController.state.enabled) {
+            HeadTrackingController._stopTracking();
+            HeadTrackingController._setStatus('Head tracking disabled.');
+            return;
+        }
+
+        await HeadTrackingController._startTracking();
+    }
+
+    static _loadState() {
+        try {
+            const raw = localStorage.getItem(HeadTrackingController.STORAGE_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            HeadTrackingController.state.enabled = !!parsed.enabled;
+            const incomingSensitivity = Number(parsed.sensitivity);
+            if (Number.isFinite(incomingSensitivity)) {
+                HeadTrackingController.state.sensitivity = Math.min(0.9, Math.max(0.1, incomingSensitivity));
+            }
+        } catch (e) {
+            console.error('head tracking load state error', e);
+        }
+    }
+
+    static _saveState() {
+        try {
+            localStorage.setItem(HeadTrackingController.STORAGE_KEY, JSON.stringify(HeadTrackingController.state));
+        } catch (e) {
+            console.error('head tracking save state error', e);
+        }
+    }
+
+    static _updateSensitivityLabel() {
+        if (!HeadTrackingController.refs.sensitivityLabel) return;
+        HeadTrackingController.refs.sensitivityLabel.textContent = HeadTrackingController.state.sensitivity.toFixed(2);
+    }
+
+    static _setStatus(message, isError = false) {
+        if (!HeadTrackingController.refs.status) return;
+        HeadTrackingController.refs.status.textContent = message;
+        HeadTrackingController.refs.status.style.color = isError ? '#f87171' : '';
+    }
+
+    static _createCursor() {
+        if (HeadTrackingController.cursorEl) return;
+        const el = document.createElement('div');
+        el.id = 'head-tracking-cursor';
+        el.style.position = 'fixed';
+        el.style.width = '18px';
+        el.style.height = '18px';
+        el.style.border = '2px solid #22d3ee';
+        el.style.borderRadius = '9999px';
+        el.style.background = 'rgba(34, 211, 238, 0.15)';
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = '99999';
+        el.style.transform = 'translate(-9999px, -9999px)';
+        el.style.boxShadow = '0 0 12px rgba(34, 211, 238, 0.5)';
+        document.body.appendChild(el);
+        HeadTrackingController.cursorEl = el;
+    }
+
+    static _showCursor(x, y) {
+        if (!HeadTrackingController.cursorEl) return;
+        HeadTrackingController.cursorEl.style.transform = `translate(${Math.round(x - 9)}px, ${Math.round(y - 9)}px)`;
+    }
+
+    static _hideCursor() {
+        if (!HeadTrackingController.cursorEl) return;
+        HeadTrackingController.cursorEl.style.transform = 'translate(-9999px, -9999px)';
+    }
+
+    static async _startTracking() {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            HeadTrackingController._setStatus('Camera API is not available in this browser.', true);
+            HeadTrackingController.state.enabled = false;
+            HeadTrackingController._saveState();
+            if (HeadTrackingController.refs.toggle) HeadTrackingController.refs.toggle.checked = false;
+            return;
+        }
+
+        HeadTrackingController._setStatus('Requesting camera access...');
+
+        try {
+            if (!HeadTrackingController.visionModule) {
+                HeadTrackingController.visionModule = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm');
+            }
+
+            if (!HeadTrackingController.faceLandmarker) {
+                const fileset = await HeadTrackingController.visionModule.FilesetResolver.forVisionTasks(
+                    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+                );
+                HeadTrackingController.faceLandmarker = await HeadTrackingController.visionModule.FaceLandmarker.createFromOptions(fileset, {
+                    baseOptions: {
+                        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task'
+                    },
+                    runningMode: 'VIDEO',
+                    numFaces: 1
+                });
+            }
+
+            HeadTrackingController.stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'user'
+                },
+                audio: false
+            });
+
+            if (!HeadTrackingController.video) {
+                const v = document.createElement('video');
+                v.autoplay = true;
+                v.muted = true;
+                v.playsInline = true;
+                v.style.position = 'fixed';
+                v.style.width = '1px';
+                v.style.height = '1px';
+                v.style.opacity = '0';
+                v.style.pointerEvents = 'none';
+                v.style.left = '-9999px';
+                document.body.appendChild(v);
+                HeadTrackingController.video = v;
+            }
+
+            HeadTrackingController.video.srcObject = HeadTrackingController.stream;
+            await HeadTrackingController.video.play();
+
+            HeadTrackingController.lastPoint = null;
+            HeadTrackingController._runLoop();
+            HeadTrackingController._setStatus('Head tracking active. Move your head to steer the cursor.');
+        } catch (e) {
+            console.error('head tracking start error', e);
+            HeadTrackingController._setStatus('Could not start head tracking. Check camera permission.', true);
+            HeadTrackingController.state.enabled = false;
+            HeadTrackingController._saveState();
+            if (HeadTrackingController.refs.toggle) HeadTrackingController.refs.toggle.checked = false;
+            HeadTrackingController._stopTracking();
+        }
+    }
+
+    static _runLoop() {
+        if (!HeadTrackingController.state.enabled || !HeadTrackingController.faceLandmarker || !HeadTrackingController.video) {
+            return;
+        }
+
+        const tick = () => {
+            if (!HeadTrackingController.state.enabled || !HeadTrackingController.faceLandmarker || !HeadTrackingController.video) {
+                return;
+            }
+
+            if (HeadTrackingController.video.readyState >= 2) {
+                const result = HeadTrackingController.faceLandmarker.detectForVideo(HeadTrackingController.video, performance.now());
+                const landmarks = result?.faceLandmarks?.[0];
+                const nose = landmarks?.[1];
+
+                if (nose) {
+                    const targetX = (1 - nose.x) * window.innerWidth;
+                    const targetY = nose.y * window.innerHeight;
+
+                    const alpha = Math.min(0.9, Math.max(0.1, HeadTrackingController.state.sensitivity));
+                    if (!HeadTrackingController.lastPoint) {
+                        HeadTrackingController.lastPoint = { x: targetX, y: targetY };
+                    } else {
+                        HeadTrackingController.lastPoint.x += (targetX - HeadTrackingController.lastPoint.x) * alpha;
+                        HeadTrackingController.lastPoint.y += (targetY - HeadTrackingController.lastPoint.y) * alpha;
+                    }
+
+                    const x = Math.max(0, Math.min(window.innerWidth - 1, HeadTrackingController.lastPoint.x));
+                    const y = Math.max(0, Math.min(window.innerHeight - 1, HeadTrackingController.lastPoint.y));
+
+                    HeadTrackingController._showCursor(x, y);
+
+                    const moveEvent = new MouseEvent('mousemove', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window,
+                        clientX: x,
+                        clientY: y
+                    });
+                    window.dispatchEvent(moveEvent);
+                    const target = document.elementFromPoint(x, y);
+                    if (target) target.dispatchEvent(moveEvent);
+                }
+            }
+
+            HeadTrackingController.rafId = requestAnimationFrame(tick);
+        };
+
+        HeadTrackingController.rafId = requestAnimationFrame(tick);
+    }
+
+    static _stopTracking() {
+        if (HeadTrackingController.rafId) {
+            cancelAnimationFrame(HeadTrackingController.rafId);
+            HeadTrackingController.rafId = null;
+        }
+
+        if (HeadTrackingController.stream) {
+            HeadTrackingController.stream.getTracks().forEach(t => t.stop());
+            HeadTrackingController.stream = null;
+        }
+
+        if (HeadTrackingController.video) {
+            HeadTrackingController.video.pause();
+            HeadTrackingController.video.srcObject = null;
+        }
+
+        HeadTrackingController.lastPoint = null;
+        HeadTrackingController._hideCursor();
+    }
+}
+
+// ============================================
 // RESPONSIBILITY: Cookie cleanup & clean reload
 // ============================================
 export class TranslationHelper {
@@ -622,6 +907,9 @@ export class PreferencesController {
         // Step 4: Set form values from saved prefs (or defaults)
         FormManager.set(saved || PreferencesConfig.SITE_DEFAULT);
 
+        // Step 4.5: Initialise camera-driven head-tracking cursor controls
+        HeadTrackingController.init();
+
         // Step 5: Login status hint
         if (PreferencesAPI.isLoggedIn) {
             StatusDisplay.set(saved ? 'Preferences synced from your account' : 'No saved preferences found - using defaults');
@@ -682,9 +970,12 @@ export class PreferencesController {
 
             localStorage.removeItem(PreferencesConfig.LOCAL_STORAGE_KEY);
             localStorage.removeItem(PreferencesConfig.LOCAL_THEMES_KEY);
+            localStorage.removeItem(HeadTrackingController.STORAGE_KEY);
             localStorage.setItem('preferencesReset', 'true');
             PreferencesStore.cachedPrefs = null;
             PreferencesAPI.backendPrefsExist = false;
+
+            await HeadTrackingController.setEnabled(false);
 
             if (window.SitePreferences?.resetPreferences) {
                 window.SitePreferences.resetPreferences();

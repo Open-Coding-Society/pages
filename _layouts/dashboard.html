@@ -133,6 +133,27 @@ active_tab: dashboard
                     <p class="text-xs text-neutral-500 mt-3">Uses your browser's built-in speech synthesis. Available voices depend on your operating system.</p>
                 </div>
 
+                <!-- Head Tracking Cursor Section -->
+                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
+                    <div class="flex justify-between items-center mb-4 gap-3">
+                        <h3 class="font-medium">Head Tracking Cursor</h3>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input id="pref-head-tracking-enabled" type="checkbox" class="sr-only peer" />
+                            <div class="relative w-11 h-6 bg-neutral-600 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                            <span class="ms-3 text-sm text-neutral-300">Enable</span>
+                        </label>
+                    </div>
+
+                    <p class="text-sm text-neutral-400 mb-4">Use your webcam and head movement to drive an on-screen cursor. This uses MediaPipe from CDN, so no npm setup is required.</p>
+
+                    <div>
+                        <label class="text-sm text-neutral-400">Sensitivity: <span id="head-tracking-sensitivity-label">0.45</span></label>
+                        <input type="range" id="pref-head-tracking-sensitivity" min="0.10" max="0.90" step="0.05" value="0.45" class="w-full mt-1" />
+                    </div>
+
+                    <p id="head-tracking-status" class="text-sm text-neutral-400 mt-3"></p>
+                </div>
+
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Column 1: Text (font size, font family only) -->
                     <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
