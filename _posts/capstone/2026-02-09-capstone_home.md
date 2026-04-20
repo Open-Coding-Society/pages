@@ -15,7 +15,10 @@ sticky_rank: 1
 
 <link rel="stylesheet" href="/assets/css/new-capstone.css">
 
-<button id="ncFab" class="new-capstone-fab" title="Submit your capstone" aria-label="Submit capstone project">+</button>
+<div class="capstone-action-buttons">
+  <button id="editCapstoneFab" class="new-capstone-fab" title="Edit capstone" aria-label="Edit capstone" style="bottom: 100px;">✎</button>
+  <button id="ncFab" class="new-capstone-fab" title="Create new capstone" aria-label="Create new capstone">+</button>
+</div>
 
 ## Capstone Infographics Home
 
@@ -93,6 +96,13 @@ sticky_rank: 1
 var _capstoneTech = {};
 {% for pair in site.data %}{% assign _d = pair[1] %}{% if _d.Topics %}{% for _t in _d.Topics %}{% if _t.tech %}_capstoneTech[{{ _t.title | jsonify }}] = {{ _t.tech | jsonify }};
 {% endif %}{% endfor %}{% endif %}{% endfor %}
+</script>
+
+<script>
+// Full project data sourced from _data/*_infograph.yml files via Liquid
+var _capstoneData = {};
+{% for pair in site.data %}{% assign _d = pair[1] %}{% if _d.Topics %}{% for _t in _d.Topics %}_capstoneData[{{ _t.title | jsonify }}] = {{ _t | jsonify }};
+{% endfor %}{% endif %}{% endfor %}
 </script>
 
 <script>
@@ -680,6 +690,106 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 </div>
 
+<!-- Edit Capstone Modal -->
+<div id="editCapstoneModal" style="display:none;position:fixed;inset:0;z-index:99000;background:rgba(0,0,0,0.82);overflow-y:auto;padding:28px 14px 56px;">
+  <div class="nc-modal__panel">
+    <button id="editCapstoneModalClose" class="nc-modal__close" aria-label="Close modal">×</button>
+    <h2 class="nc-modal__title">Edit Capstone Project</h2>
+    <p class="nc-modal__sub">Select a project and update its details.</p>
+    <form id="editCapstoneForm" class="nc-form">
+      <div class="nc-field">
+        <label class="nc-label" for="editProjectSelect">Select Project <span>*</span></label>
+        <select id="editProjectSelect" class="nc-select" required>
+          <option value="">Choose a project...</option>
+        </select>
+      </div>
+      <div class="nc-row-2">
+        <div class="nc-field">
+          <label class="nc-label" for="editTitle">Project Title <span>*</span></label>
+          <input id="editTitle" name="title" type="text" class="nc-input" required />
+        </div>
+        <div class="nc-field">
+          <label class="nc-label" for="editCourseCode">Course Code</label>
+          <select id="editCourseCode" name="courseCode" class="nc-select">
+            <option value="CSA">CSA</option>
+            <option value="CSP">CSP</option>
+          </select>
+        </div>
+      </div>
+      <div class="nc-field">
+        <label class="nc-label" for="editSubtitle">Subtitle</label>
+        <input id="editSubtitle" name="subtitle" type="text" class="nc-input" />
+      </div>
+      <div class="nc-field">
+        <label class="nc-label" for="editDescription">Description <span>*</span></label>
+        <textarea id="editDescription" name="description" class="nc-textarea" rows="3" required></textarea>
+      </div>
+      <div class="nc-field">
+        <label class="nc-label" for="editAbout">About</label>
+        <textarea id="editAbout" name="about" class="nc-textarea" rows="4"></textarea>
+      </div>
+      <div class="nc-row-2">
+        <div class="nc-field">
+          <label class="nc-label" for="editStatus">Status</label>
+          <select id="editStatus" name="status" class="nc-select">
+            <option value="In Development">In Development</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+          </select>
+        </div>
+        <div class="nc-field">
+          <label class="nc-label" for="editPageUrl">Project Page URL</label>
+          <input id="editPageUrl" name="pageUrl" type="url" class="nc-input" />
+        </div>
+      </div>
+      <div class="nc-row-2">
+        <div class="nc-field">
+          <label class="nc-label" for="editFrontendUrl">Frontend Repo URL</label>
+          <input id="editFrontendUrl" name="frontendUrl" type="url" class="nc-input" />
+        </div>
+        <div class="nc-field">
+          <label class="nc-label" for="editBackendUrl">Backend Repo URL</label>
+          <input id="editBackendUrl" name="backendUrl" type="url" class="nc-input" />
+        </div>
+      </div>
+      <div class="nc-section-title">Team Members</div>
+      <div id="editTeamWrap" class="nc-tag-input">
+        <div id="editTeamChips" class="nc-tag-input__chips"></div>
+        <input id="editTeamInp" type="text" class="nc-tag-input__field" placeholder="Add team member..." />
+        <input id="editTeamHidden" name="teamMembers" type="hidden" />
+      </div>
+      <div class="nc-section-title">Tech Stack</div>
+      <div id="editTechWrap" class="nc-tag-input">
+        <div id="editTechChips" class="nc-tag-input__chips"></div>
+        <input id="editTechInp" type="text" class="nc-tag-input__field" placeholder="Add technology..." />
+        <input id="editTechHidden" name="tech" type="hidden" />
+      </div>
+      <div class="nc-section-title">Key Points</div>
+      <div class="nc-field">
+        <textarea id="editKeyPoints" name="keyPoints" class="nc-textarea" rows="4" placeholder="One point per line"></textarea>
+      </div>
+      <div class="nc-section-title">Impact</div>
+      <div class="nc-field">
+        <textarea id="editImpact" name="impact" class="nc-textarea" rows="4" placeholder="One impact per line"></textarea>
+      </div>
+      <div class="nc-image-row">
+        <div class="nc-field">
+          <label class="nc-label">Project Image</label>
+          <div class="nc-image-zone">
+            <input id="editImage" name="image" type="file" accept="image/*" />
+            <p class="nc-image-zone__text">Click to upload or drag image here</p>
+          </div>
+        </div>
+        <div id="editImagePreview" class="nc-image-preview"></div>
+      </div>
+      <div class="nc-actions">
+        <button type="submit" class="nc-submit">Update Project</button>
+        <button type="button" id="editCancel" class="nc-cancel">Cancel</button>
+        <div id="editStatus" class="nc-status"></div>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -841,5 +951,139 @@ Below are the capstone infographic pages created by student groups. Click an ima
     var imgFile=document.getElementById('ncImage').files[0];
     if(imgFile){resizeImg(imgFile,finish);}else{finish(null);}
   });
+
+  // ── Edit Modal Functions ──
+  function openEditModal(){
+    var modal=document.getElementById('editCapstoneModal');
+    modal.style.display='flex';modal.style.alignItems='flex-start';modal.style.justifyContent='center';document.body.style.overflow='hidden';
+  }
+  function closeEditModal(){
+    var modal=document.getElementById('editCapstoneModal');
+    modal.style.display='none';document.body.style.overflow='';
+  }
+
+  // Populate project select
+  function populateProjectSelect(){
+    var select=document.getElementById('editProjectSelect');
+    select.innerHTML='<option value="">Choose a project...</option>';
+    for(var title in _capstoneData){
+      var option=document.createElement('option');
+      option.value=title;
+      option.textContent=title;
+      select.appendChild(option);
+    }
+  }
+
+  // Populate form with project data
+  function populateForm(title){
+    var data=_capstoneData[title];
+    if(!data)return;
+    document.getElementById('editTitle').value=data.title||'';
+    document.getElementById('editCourseCode').value=data.courseCode||'CSA';
+    document.getElementById('editSubtitle').value=data.subtitle||'';
+    document.getElementById('editDescription').value=data.description||'';
+    document.getElementById('editAbout').value=data.about||'';
+    document.getElementById('editStatus').value=data.status||'In Development';
+    document.getElementById('editPageUrl').value=data.pageUrl||'';
+    document.getElementById('editFrontendUrl').value=data.frontendUrl||'';
+    document.getElementById('editBackendUrl').value=data.backendUrl||'';
+    document.getElementById('editKeyPoints').value=Array.isArray(data.keyPoints)?data.keyPoints.join('\n'):(data.keyPoints||'');
+    document.getElementById('editImpact').value=Array.isArray(data.impact)?data.impact.join('\n'):(data.impact||'');
+
+    // Team members
+    var teamTags=Array.isArray(data.teamMembers)?data.teamMembers:(data.teamMembers?data.teamMembers.split('\n').map(function(s){return s.trim();}).filter(Boolean):[]);
+    updateTagInput('editTeamWrap','editTeamChips','editTeamInp','editTeamHidden',teamTags);
+
+    // Tech stack
+    var techTags=Array.isArray(data.tech)?data.tech:(data.tech?data.tech.split('\n').map(function(s){return s.trim();}).filter(Boolean):[]);
+    updateTagInput('editTechWrap','editTechChips','editTechInp','editTechHidden',techTags);
+
+    // Image preview
+    var preview=document.getElementById('editImagePreview');
+    if(data.imageUrl){
+      preview.style.backgroundImage='url('+data.imageUrl+')';
+      preview.classList.add('nc-image-preview--loaded');
+    }else{
+      preview.style.backgroundImage='';preview.classList.remove('nc-image-preview--loaded');
+    }
+  }
+
+  // Helper to update tag inputs
+  function updateTagInput(wrapId,chipsId,inputId,hiddenId,tags){
+    var chips=document.getElementById(chipsId);
+    var hidden=document.getElementById(hiddenId);
+    chips.innerHTML=tags.map(function(t,i){return '<span class="nc-chip">'+esc(t)+'<button type="button" data-i="'+i+'" aria-label="Remove '+esc(t)+'">×</button></span>';}).join('');
+    hidden.value=tags.join('\n');
+  }
+
+  // Event listeners for edit modal
+  document.getElementById('editCapstoneFab').addEventListener('click',function(){
+    populateProjectSelect();
+    openEditModal();
+  });
+  document.getElementById('editCapstoneModalClose').addEventListener('click',closeEditModal);
+  document.getElementById('editCancel').addEventListener('click',closeEditModal);
+  document.getElementById('editCapstoneModal').addEventListener('click',function(e){if(e.target===this)closeEditModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('editCapstoneModal').style.display!=='none')closeEditModal();});
+
+  document.getElementById('editProjectSelect').addEventListener('change',function(){
+    var title=this.value;
+    if(title){populateForm(title);}
+  });
+
+  // Tag inputs for edit
+  function makeTagInput(wrapId,chipsId,inputId,hiddenId){
+    var wrap=document.getElementById(wrapId),chips=document.getElementById(chipsId),inp=document.getElementById(inputId),hidden=document.getElementById(hiddenId);
+    var tags=[];
+    function render(){
+      chips.innerHTML=tags.map(function(t,i){return '<span class="nc-chip">'+esc(t)+'<button type="button" data-i="'+i+'" aria-label="Remove '+esc(t)+'">×</button></span>';}).join('');
+      hidden.value=tags.join('\n');
+    }
+    inp.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===','){
+        e.preventDefault();
+        var val=inp.value.trim();
+        if(val&&!tags.includes(val)){tags.push(val);render();}
+        inp.value='';
+      }
+      if(e.key==='Backspace'&&!inp.value&&tags.length){tags.pop();render();}
+    });
+    inp.addEventListener('blur',function(){
+      var val=inp.value.trim();
+      if(val&&!tags.includes(val)){tags.push(val);render();}
+      inp.value='';
+    });
+    chips.addEventListener('click',function(e){
+      var btn=e.target.closest('button[data-i]');
+      if(btn){tags.splice(+btn.dataset.i,1);render();}
+    });
+    return {tags:tags,render:render};
+  }
+  var editTeamTag=makeTagInput('editTeamWrap','editTeamChips','editTeamInp','editTeamHidden');
+  var editTechTag=makeTagInput('editTechWrap','editTechChips','editTechInp','editTechHidden');
+
+  // Image upload for edit
+  document.getElementById('editImage').addEventListener('change',function(){
+    var file=this.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      document.getElementById('editImagePreview').style.backgroundImage='url('+e.target.result+')';
+      document.getElementById('editImagePreview').classList.add('nc-image-preview--loaded');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Form submit (placeholder)
+  document.getElementById('editCapstoneForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var statusEl=document.getElementById('editStatus');
+    statusEl.textContent='✓ Project updated (frontend only)';
+    statusEl.className='nc-status nc-status--ok';
+    setTimeout(function(){
+      closeEditModal();
+      statusEl.textContent='';statusEl.className='nc-status';
+    },2000);
+  });
+
 })();
 </script>
