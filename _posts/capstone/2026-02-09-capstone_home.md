@@ -11,6 +11,11 @@ categories: Capstone
 permalink: /capstone/
 sticky_rank: 1
 ---
+
+<link rel="stylesheet" href="/assets/css/new-capstone.css">
+
+<a href="/new-capstone/" class="new-capstone-fab" title="Create new capstone" aria-label="Create new capstone">+</a>
+
 ## Capstone Infographics Home
 
 
