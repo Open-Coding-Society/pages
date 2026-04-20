@@ -136,26 +136,11 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       },
     });
 
-    // GitHub Metrics NPC - shows contribution statistics
-    const npc_data_githubGuide = createGatekeeperData({
-      id: 'GitHubGuide',
-      greeting: 'Explore your GitHub contribution metrics: commits, pull requests, issues, and code changes.',
-      position: githubMetricsPos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('GitHub Guide: Press E to see your GitHub stats');
-        }
-      },
-      interact: async function() {
-        await level.showGitHubStats();
-      },
-    });
-
-    // Self-Evaluation NPC - end-of-sprint reflection
+    // Self-Evaluation NPC - end-of-sprint reflection (at 50%)
     const npc_data_selfEval = createGatekeeperData({
       id: 'SelfEvaluator',
-      greeting: 'Welcome to the end-of-sprint reflection station! Here you can evaluate your progress, assess your skills, and reflect on your learning. Press E to begin your self-evaluation.',
-      position: selfEvalPos,
+      greeting: 'Welcome to the mid-sprint assessment station! Here you can evaluate your progress, assess your skills, and reflect on your learning. Press E to begin your self-evaluation.',
+      position: githubMetricsPos,
       reaction: function() {
         if (level?.showToast) {
           level.showToast('Self-Evaluator: Press E to reflect on your sprint');
@@ -163,6 +148,21 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       },
       interact: async function() {
         await level.showSelfEvaluation();
+      },
+    });
+
+    // GitHub Metrics NPC - shows contribution statistics (at 80%)
+    const npc_data_githubGuide = createGatekeeperData({
+      id: 'GitHubGuide',
+      greeting: 'Welcome to the GitHub contributions hub! Explore your GitHub contribution metrics: commits, pull requests, issues, and code changes.',
+      position: selfEvalPos,
+      reaction: function() {
+        if (level?.showToast) {
+          level.showToast('GitHub Guide: Press E to see your GitHub stats');
+        }
+      },
+      interact: async function() {
+        await level.showGitHubStats();
       },
     });
 
