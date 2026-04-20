@@ -807,14 +807,14 @@
     </div>
   </header>
 
-  <!-- PROBLEM / WHAT CHANGED -->
+  <!-- CURRENT SYSTEM vs PROTOTYPE SYSTEM -->
   <section class="sfi-pitch">
     <div class="sfi-pitch-col sfi-pitch-col--problem" data-reveal>
-      <h2 class="sfi-col-heading">The Problem</h2>
+      <h2 class="sfi-col-heading">Current System</h2>
       <p class="sfi-col-body">{{ data.Problem }}</p>
     </div>
     <div class="sfi-pitch-col sfi-pitch-col--solution" data-reveal>
-      <h2 class="sfi-col-heading">What Changed</h2>
+      <h2 class="sfi-col-heading">Prototype System</h2>
       <p class="sfi-col-body">{{ data.Solution }}</p>
     </div>
   </section>
@@ -831,9 +831,9 @@
   </div>
   {% endif %}
 
-  <!-- WHAT WE BUILT -->
+  <!-- PROTOTYPE BUILD -->
   <section class="sfi-builds">
-    <p class="sfi-section-tag" data-reveal>What We Built</p>
+    <p class="sfi-section-tag" data-reveal>Prototype Build</p>
     <div class="sfi-build-grid">
       {% for f in data.FeatureCards %}
       <div class="sfi-build-item" data-reveal>
@@ -847,12 +847,40 @@
     </div>
   </section>
 
-  <!-- PRODUCTION FEATURES -->
+  <!-- TECHNOLOGY INTRODUCTIONS -->
+  <section class="sfi-features" style="background:#ffffff;">
+    <p class="sfi-section-tag" data-reveal>Technology Introductions</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Three focus areas, one non-profit goal.</h2>
+      <p class="sfi-feat-subtext">Capstone pitch sheets translated into a prototype aimed at SFI's specific mission — surfacing safety data, teaching it, and keeping the foundation in control of every word.</p>
+    </div>
+
+    <div class="sfi-feat-grid">
+      {% for focus in data.TechFocus %}
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-top">
+          <span class="sfi-feat-badge">Focus 0{{ forloop.index }}</span>
+          <span class="sfi-feat-endpoint">{{ focus.tag }}</span>
+        </div>
+        <div class="sfi-feat-body" style="padding:1.4rem 1.2rem 1rem;">
+          <h3 class="sfi-feat-title" style="font-size:1.15rem;margin-bottom:0.6rem;">{{ focus.heading }}</h3>
+          <ul class="sfi-feat-list">
+            {% for item in focus.items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- PROTOTYPE IN PRACTICE -->
   <section class="sfi-features">
-    <p class="sfi-section-tag" data-reveal>Production Features</p>
+    <p class="sfi-section-tag" data-reveal>Prototype in Practice</p>
     <div class="sfi-features-intro" data-reveal>
       <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Three surfaces, one data layer.</h2>
-      <p class="sfi-feat-subtext">Each feature is live on the production site, drawing from real requests against the Greppers Flask API.</p>
+      <p class="sfi-feat-subtext">Live on the prototype site — real HTTP calls to a working Flask API. This is what the focus areas above look like once they're wired up.</p>
     </div>
 
     <div class="sfi-feat-grid">
@@ -967,42 +995,118 @@
     </div>
   </section>
 
-  <!-- DEMO: AI EQUIPMENT SCANNER -->
+  <!-- ARCHITECTURE AT A GLANCE -->
   <section class="sfi-demo">
     <div class="sfi-demo-inner">
       <div class="sfi-demo-header" data-reveal>
-        <span class="sfi-eyebrow">Try It</span>
-        <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:0.6rem;">Equipment Scanner</h2>
-        <p class="sfi-col-body" style="max-width:560px;margin-bottom:1.5rem;">Upload a photo of motorsport safety gear and the on-device AI will identify its SFI certification category — no server, no account, nothing leaves your browser.</p>
-        <div class="demo-status" id="demoModelStatus">
-          <span class="demo-status-dot"></span>
-          <span id="demoModelStatusText">Initializing models&hellip;</span>
-        </div>
-        <div class="demo-progress" id="demoModelProgress">
-          <div class="demo-progress-bar" id="demoModelProgressBar"></div>
-        </div>
+        <span class="sfi-eyebrow">How It Fits Together</span>
+        <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:0.6rem;">Architecture at a Glance</h2>
+        <p class="sfi-col-body" style="max-width:620px;margin-bottom:0.6rem;">Every user flow in the prototype — driver, inspector, or staff — routes through one login layer, one data layer, and one admin console. The AI and gamification surfaces ride on top of the same Flask API, so spec changes propagate instantly across every feature.</p>
+        <p class="sfi-col-body" style="max-width:620px;">Below is the full prototype at a glance: users on the left, the surfaces they touch in the middle, and the non-profit's control loop on the right.</p>
       </div>
 
-      <!-- Upload zone -->
-      <div class="demo-upload-zone" id="demoUploadZone">
-        <span class="demo-upload-icon">&#128247;</span>
-        <div class="demo-upload-text">Drag &amp; drop an image here, or click to browse</div>
-        <div class="demo-upload-hint">JPG &bull; PNG &bull; WebP &bull; Max 20 MB</div>
-        <input type="file" id="demoFileInput" accept="image/*">
+      <div data-reveal style="background:#f5f1eb; border:1px solid #cec8bc; border-radius:2px; padding:1.75rem 1.25rem; overflow-x:auto;">
+<div class="mermaid" style="font-family:'Lora',Georgia,serif;">
+%%{init: {'theme':'base','themeVariables':{'background':'#f5f1eb','primaryColor':'#ffffff','primaryTextColor':'#080502','primaryBorderColor':'#cec8bc','lineColor':'#3d3830','secondaryColor':'#edeae2','tertiaryColor':'#ffffff','fontFamily':'Lora, Georgia, serif','fontSize':'14px'}}}%%
+flowchart LR
+    U1["Driver"]:::user
+    U2["Inspector"]:::user
+    U3["Staff"]:::user
+
+    Login["Login &amp; Profiles"]:::data
+
+    subgraph Surfaces["Prototype Surfaces"]
+      direction TB
+      S["Spec Search"]:::surface
+      C["AI Classifier"]:::surface
+      P["Photo Identification"]:::surface
+      G["Gamified Learning"]:::surface
+    end
+
+    subgraph Backend["Flask API &middot; Backend"]
+      direction TB
+      API["REST Endpoints"]:::svc
+      ML["ML &middot; TF-IDF + SVC"]:::svc
+      CV["CV &middot; MobileNet + COCO-SSD"]:::svc
+    end
+
+    DB[("Spec Database")]:::store
+    US[("User Store &amp; Chat")]:::store
+
+    Admin["Admin Console<br/>Roles &middot; Content &middot; Safety"]:::admin
+
+    U1 --> Login
+    U2 --> Login
+    U3 --> Login
+    Login --> Surfaces
+    Login -.-> US
+    S --> API
+    C --> ML
+    P --> CV
+    G --> API
+    API --> DB
+    ML --> DB
+    CV --> DB
+    Admin --> DB
+    Admin --> US
+
+    classDef user fill:#ffffff,stroke:#8b1c1c,stroke-width:1.5px,color:#080502;
+    classDef data fill:#ffffff,stroke:#3d3830,stroke-width:1.5px,color:#080502;
+    classDef surface fill:#ffffff,stroke:#cec8bc,color:#080502;
+    classDef svc fill:#edeae2,stroke:#cec8bc,color:#080502;
+    classDef store fill:#080502,stroke:#080502,color:#ffffff;
+    classDef admin fill:#8b1c1c,stroke:#8b1c1c,color:#ffffff;
+</div>
       </div>
 
-      <!-- Results area (hidden until analysis) -->
-      <div id="demoResultsArea" style="display:none;margin-top:32px;">
-        <div class="demo-result-wrap" id="demoResultWrap">
-          <img id="demoResultImg" src="" alt="Analysis result">
-          <canvas id="demoResultCanvas"></canvas>
-          <div class="demo-analyzing-overlay" id="demoAnalyzingOverlay" style="display:none;">
-            <div class="demo-analyzing-spinner"></div>
-            <div class="demo-analyzing-text">Analyzing&hellip;</div>
+      <div class="sfi-feat-grid" style="grid-template-columns:repeat(3,1fr); margin-top:2.5rem;">
+        <div class="sfi-feat-card" data-reveal>
+          <div class="sfi-feat-body" style="padding:1.2rem;">
+            <h3 class="sfi-feat-title" style="font-size:0.95rem;">One login, many views</h3>
+            <p class="sfi-feat-sub" style="margin:0;">Profiles scope what each role sees — a driver browsing vs a staff member editing vs an inspector logging a certification check.</p>
           </div>
         </div>
-        <div id="demoDetectResults"></div>
+        <div class="sfi-feat-card" data-reveal>
+          <div class="sfi-feat-body" style="padding:1.2rem;">
+            <h3 class="sfi-feat-title" style="font-size:0.95rem;">AI where it earns its keep</h3>
+            <p class="sfi-feat-sub" style="margin:0;">ML handles the classifier; on-device CV handles photo identification. Neither blocks the page nor ships user photos to a server.</p>
+          </div>
+        </div>
+        <div class="sfi-feat-card" data-reveal>
+          <div class="sfi-feat-body" style="padding:1.2rem;">
+            <h3 class="sfi-feat-title" style="font-size:0.95rem;">Non-profit in control</h3>
+            <p class="sfi-feat-sub" style="margin:0;">The admin console is the single source of truth: content, roles, and safety rules flow outward to every feature from one place.</p>
+          </div>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- DISCUSSION AGENDA -->
+  <section class="sfi-features" style="background:#ffffff; border-top:1px solid #cec8bc;">
+    <p class="sfi-section-tag" data-reveal>Discussion Agenda</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Your direction from here.</h2>
+      <p class="sfi-feat-subtext">The prototype is a starting point. We'd like your take on which pieces matter most — and whether the work continues in the fall with 3rd- and 4th-year students on the real system.</p>
+    </div>
+
+    <div class="sfi-feat-grid" style="grid-template-columns:repeat(2,1fr); max-width:900px;">
+      {% for topic in data.DiscussionAgenda %}
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-top">
+          <span class="sfi-feat-badge">0{{ forloop.index }}</span>
+          <span class="sfi-feat-endpoint">{{ topic.subtitle }}</span>
+        </div>
+        <div class="sfi-feat-body" style="padding:1.4rem 1.2rem 1rem;">
+          <h3 class="sfi-feat-title" style="font-size:1.15rem;margin-bottom:0.7rem;">{{ topic.heading }}</h3>
+          <ul class="sfi-feat-list">
+            {% for item in topic.items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
     </div>
   </section>
 
@@ -1043,209 +1147,6 @@
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('[data-reveal]').forEach(function (el) {
         observer.observe(el);
-      });
-    });
-  })();
-  </script>
-
-  <!-- TF.js + model CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
-  <script src="{{ '/assets/js/sfi/sfi-categories.js' | relative_url }}"></script>
-  <script src="{{ '/assets/js/sfi/detect-engine.js' | relative_url }}"></script>
-
-  <script>
-  // ── Demo App ─────────────────────────────────────────
-  // Self-contained orchestration for the pitch page demo.
-  // Uses demo- prefixed IDs to avoid conflicts with /detect/ page.
-  (function () {
-    // Polyfill roundRect for older browsers
-    if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
-      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-        if (typeof r === 'number') r = [r, r, r, r];
-        this.moveTo(x + r[0], y);
-        this.lineTo(x + w - r[1], y);
-        this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
-        this.lineTo(x + w, y + h - r[2]);
-        this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
-        this.lineTo(x + r[3], y + h);
-        this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
-        this.lineTo(x, y + r[0]);
-        this.quadraticCurveTo(x, y, x + r[0], y);
-        this.closePath();
-        return this;
-      };
-    }
-
-    function setStatus(text, percent) {
-      var statusEl = document.getElementById('demoModelStatus');
-      document.getElementById('demoModelStatusText').textContent = text;
-      if (percent === -1) {
-        statusEl.classList.add('error');
-        return;
-      }
-      document.getElementById('demoModelProgressBar').style.width = percent + '%';
-      if (percent >= 100) {
-        statusEl.classList.add('ready');
-        document.getElementById('demoModelProgress').style.display = 'none';
-      }
-    }
-
-    function drawBoundingBoxes(imgEl, regions, sfiResults) {
-      var canvas = document.getElementById('demoResultCanvas');
-      var wrap = document.getElementById('demoResultWrap');
-      var displayWidth = wrap.clientWidth;
-      var displayHeight = imgEl.naturalHeight * (displayWidth / imgEl.naturalWidth);
-
-      canvas.width = displayWidth;
-      canvas.height = displayHeight;
-      canvas.style.height = displayHeight + 'px';
-
-      var ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      var scaleX = displayWidth / imgEl.naturalWidth;
-      var scaleY = displayHeight / imgEl.naturalHeight;
-
-      regions.forEach(function (region) {
-        var fallback = sfiResults.length > 0 ? sfiResults[0].cat : SFI_CATEGORIES[0];
-        var bestCat = DetectEngine.matchRegionToCategory(region, fallback);
-        var bbox = region.bbox;
-        var sx = bbox[0] * scaleX, sy = bbox[1] * scaleY, sw = bbox[2] * scaleX, sh = bbox[3] * scaleY;
-        var color = bestCat.color;
-
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2.5;
-        ctx.setLineDash([]);
-        ctx.strokeRect(sx, sy, sw, sh);
-        ctx.fillStyle = color + '18';
-        ctx.fillRect(sx, sy, sw, sh);
-
-        var label = bestCat.name;
-        ctx.font = 'bold 12px "DM Mono", monospace';
-        var textWidth = ctx.measureText(label).width;
-        var labelH = 20;
-        var labelY = sy > labelH + 4 ? sy - labelH - 2 : sy + 2;
-
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.roundRect(sx, labelY, textWidth + 12, labelH, 3);
-        ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.fillText(label, sx + 6, labelY + 14);
-      });
-
-      if (regions.length === 0 && sfiResults.length > 0) {
-        var cat = sfiResults[0].cat;
-        var color = cat.color;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 3;
-        ctx.setLineDash([8, 4]);
-        ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
-        ctx.setLineDash([]);
-
-        var label = cat.name;
-        ctx.font = 'bold 13px "DM Mono", monospace';
-        var tw = ctx.measureText(label).width;
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.roundRect(12, 12, tw + 18, 24, 4);
-        ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.fillText(label, 21, 29);
-      }
-    }
-
-    function displayResults(sfiResults) {
-      var div = document.getElementById('demoDetectResults');
-      if (sfiResults.length === 0) {
-        div.innerHTML = '<div class="demo-no-results">No SFI equipment detected.<br>Try a photo of a helmet, fire suit, harness, or roll cage.</div>';
-        return;
-      }
-
-      var html = '<div class="demo-results-title">Detected SFI Equipment</div>';
-      sfiResults.forEach(function (result) {
-        var conf = result.confidence;
-        var confColor = conf >= 60 ? '#27ae60' : conf >= 30 ? '#8b1c1c' : '#cec8bc';
-        html += '<div class="demo-result-card">' +
-          '<div class="demo-result-color" style="background:' + result.cat.color + '"></div>' +
-          '<div class="demo-result-info">' +
-            '<div class="demo-result-name">' + result.cat.name + '</div>' +
-            '<div class="demo-result-items">' + result.cat.items.slice(0, 3).join(' &bull; ') + (result.cat.items.length > 3 ? ' &bull; +' + (result.cat.items.length - 3) + ' more' : '') + '</div>' +
-          '</div>' +
-          '<div style="text-align:right;">' +
-            '<div class="demo-result-conf" style="color:' + confColor + '">' + conf + '%</div>' +
-            '<div class="demo-result-conf-label">confidence</div>' +
-          '</div>' +
-        '</div>';
-      });
-      div.innerHTML = html;
-    }
-
-    function loadImageFromFile(file) {
-      if (!file || !file.type.startsWith('image/')) return;
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var img = new Image();
-        img.onload = function () { analyzeImage(img); };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function analyzeImage(imgEl) {
-      if (!DetectEngine.isReady()) return;
-
-      var area = document.getElementById('demoResultsArea');
-      var resultImg = document.getElementById('demoResultImg');
-      var overlay = document.getElementById('demoAnalyzingOverlay');
-      var resultsDiv = document.getElementById('demoDetectResults');
-
-      resultImg.src = imgEl.src;
-      area.style.display = 'block';
-      overlay.style.display = 'flex';
-      resultsDiv.innerHTML = '';
-      area.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      await new Promise(function (r) { setTimeout(r, 80); });
-
-      try {
-        var detection = await DetectEngine.runDetection(imgEl);
-        var regions = await DetectEngine.classifyRegions(imgEl, detection.cocoResults);
-        var sfiResults = DetectEngine.mapToSFI(detection.mnetResults, regions);
-        drawBoundingBoxes(imgEl, regions, sfiResults);
-        displayResults(sfiResults);
-      } catch (err) {
-        console.error('Demo analysis error:', err);
-        resultsDiv.innerHTML = '<div class="demo-no-results">Analysis failed — please try a different image.</div>';
-      }
-
-      overlay.style.display = 'none';
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      // Load models
-      DetectEngine.loadModels(setStatus);
-
-      // File input
-      var fileInput = document.getElementById('demoFileInput');
-      fileInput.addEventListener('change', function () {
-        loadImageFromFile(fileInput.files[0]);
-      });
-
-      // Drag and drop
-      var zone = document.getElementById('demoUploadZone');
-      zone.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        zone.classList.add('dragover');
-      });
-      zone.addEventListener('dragleave', function () {
-        zone.classList.remove('dragover');
-      });
-      zone.addEventListener('drop', function (e) {
-        e.preventDefault();
-        zone.classList.remove('dragover');
-        loadImageFromFile(e.dataTransfer.files[0]);
       });
     });
   })();
