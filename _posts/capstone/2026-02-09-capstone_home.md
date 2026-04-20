@@ -28,7 +28,7 @@ sticky_rank: 1
 <style>
 #capstone-grid > div {
   min-height: 10rem;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 #capstone-grid > div a img {
   height: 7rem;
@@ -38,8 +38,9 @@ sticky_rank: 1
   display: block;
 }
 #capstone-grid > div:hover {
-  border-color: rgba(156,163,175,0.55);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  border-color: rgba(59,130,246,0.45);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.22), 0 6px 18px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
 }
 
 /* Tech stack tooltip */
@@ -92,10 +93,8 @@ sticky_rank: 1
 
 
 <script>
-// Tech stacks sourced from _data/*_infograph.yml files via Liquid
-var _capstoneTech = {};
-{% for pair in site.data %}{% assign _d = pair[1] %}{% if _d.Topics %}{% for _t in _d.Topics %}{% if _t.tech %}_capstoneTech[{{ _t.title | jsonify }}] = {{ _t.tech | jsonify }};
-{% endif %}{% endfor %}{% endif %}{% endfor %}
+// Tech stacks sourced from _data/capstone_card_tech.yml — keyed by exact card title
+var _capstoneTech = {% assign ct = site.data.capstone_card_tech %}{{ ct | jsonify }};
 </script>
 
 <script>
