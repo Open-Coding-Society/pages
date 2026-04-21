@@ -307,11 +307,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
    <!-- Slack Messaging Platform -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-06-slack-messaging-capstone %}">
+       <a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">
            <img src="/images/capstone/database_defenders.png" alt="Slack Messaging Platform - Real-Time Collaborative Chat" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-slack-messaging-capstone %}">Slack Messaging Platform</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">Slack Messaging Platform</a></h3>
            <p class="text-sm text-gray-700">A full-stack Slack-style messaging platform with real-time channels, message threading, AI-powered task extraction, and admin moderation — deployed to messaging.opencodingsociety.com.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Anvay Vahia, Mihir Bapat, Yash Parikh</p>
        </div>
@@ -320,11 +320,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
    <!-- Educators Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-06-educators-capstone %}">
+       <a href="{% post_url capstone/2026-02-06-educators-capstone %}">
            <img src="/images/capstone/educators_icon.png" alt="Educators - Temporal Wayfinding for CS Learning" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-educators-capstone %}">Educators</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-educators-capstone %}">Educators</a></h3>
            <p class="text-sm text-gray-700">An educational platform that helps CS newcomers build mental models for temporal problem-solving in software development.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Nithika Vivek, Eshika Pallpotu, Saanvi Dogra</p>
        </div>
@@ -333,11 +333,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
    <!-- Hunger Heroes -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-06-hunger-heroes-capstone %}">
+       <a href="{% post_url capstone/2026-02-06-hunger-heroes-capstone %}">
            <img src="/images/capstone/hunger_heroes.svg" alt="Hunger Heroes - Food Redistribution Platform" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-hunger-heroes-capstone %}">Hunger Heroes</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-hunger-heroes-capstone %}">Hunger Heroes</a></h3>
            <p class="text-sm text-gray-700">A community-driven platform connecting restaurants, grocery stores, and individuals with excess fresh food to local shelters, food banks, and families in need.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ahaan, Shaurya, Arnav</p>
        </div>
@@ -346,11 +346,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
    <!-- Quant Game -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-06-quant-game-capstone %}">
+       <a href="{% post_url capstone/2026-02-06-quant-game-capstone %}">
            <img src="/images/capstone/quant-trading-game.png" alt="Quantitative Trading Bot capstone infographic preview image" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-quant-game-capstone %}">Quantitative Trading Bot</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-quant-game-capstone %}">Quantitative Trading Bot</a></h3>
            <p class="text-sm text-gray-700">We are developing a quantitative trading bot that predicts short-term stock movement using market indicators and real-time financial news sentiment.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Anvay, Sai, Aashray</p>
        </div>
@@ -359,11 +359,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
    <!-- Bud-E -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-08-bud-e-capstone %}">
+       <a href="{% post_url capstone/2026-02-08-bud-e-capstone %}">
            <img src="/images/capstone/bud_e.png" alt="Bud-E - Productivity Gamification Through Virtual Pet" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-08-bud-e-capstone %}">Bud-E</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-08-bud-e-capstone %}">Bud-E</a></h3>
            <p class="text-sm text-gray-700">Bud-E is a browser extension that gamifies productivity through a persistent virtual pet that grows when users stay focused on whitelisted websites and degrades when they navigate to distracting sites.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aadi Bhat, Pranav Santhosh, Nolan Hightower</p>
        </div>
@@ -372,11 +372,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
    <!-- Granolaa -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-08-granolaa-capstone %}">
+       <a href="{% post_url capstone/2026-02-08-granolaa-capstone %}">
            <img src="/images/capstone/granolaa.png" alt="Granolaa - Local-First Screen and Webcam Monitoring" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-08-granolaa-capstone %}">Granolaa</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-08-granolaa-capstone %}">Granolaa</a></h3>
            <p class="text-sm text-gray-700">Granolaa is a local monitoring application that streams live screen and webcam feeds over local HTTP URLs, viewable in any browser without cloud infrastructure.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aadi Bhat, Pranav Santhosh, Nolan Hightower</p>
        </div>
@@ -385,11 +385,11 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
    <!-- Wayfinding Pages -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-08-wayfinding-pages-capstone %}">
+       <a href="{% post_url capstone/2026-02-08-wayfinding-pages-capstone %}">
            <img src="/images/capstone/wayfinding_logo.png" alt="Wayfinding Pages - Sorting Groups Based on your Persona" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-08-wayfinding-pages-capstone %}">Wayfinding Pages</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-08-wayfinding-pages-capstone %}">Wayfinding Pages</a></h3>
            <p class="text-sm text-gray-700">A system that transforms social collaboration from subjective evaluation into measurable, visible signals for team formation and persona-based matching.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ruta, Vibha, Risha</p>
        </div>
