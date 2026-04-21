@@ -591,9 +591,19 @@
   // ============================================
   class GlobalHeadTracking {
     static STORAGE_KEY = 'headTrackingPreferences';
+    static CALIBRATION_KEY = 'headTrackingCalibration';
     static state = {
       enabled: false,
       sensitivity: 0.45,
+    };
+    static calibration = {
+      centerX: 0.5,
+      centerY: 0.5,
+      leftX: 0.3,
+      rightX: 0.7,
+      upY: 0.3,
+      downY: 0.7,
+      calibrated: false,
     };
 
     static stream = null;
@@ -609,6 +619,7 @@
       if (document.getElementById('pref-head-tracking-enabled')) return;
 
       GlobalHeadTracking._loadState();
+      GlobalHeadTracking._loadCalibration();
       if (!GlobalHeadTracking.state.enabled) return;
 
       GlobalHeadTracking._createCursor();
@@ -640,6 +651,52 @@
       } catch (e) {
         console.error('global head tracking save state error', e);
       }
+    }
+
+    static _loadCalibration() {
+      try {
+        const raw = localStorage.getItem(GlobalHeadTracking.CALIBRATION_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        const asNum = (v, fallback) => {
+          const n = Number(v);
+          if (!Number.isFinite(n)) return fallback;
+          return Math.max(0, Math.min(1, n));
+        };
+        GlobalHeadTracking.calibration = {
+          centerX: asNum(parsed?.centerX, 0.5),
+          centerY: asNum(parsed?.centerY, 0.5),
+          leftX: asNum(parsed?.leftX, 0.3),
+          rightX: asNum(parsed?.rightX, 0.7),
+          upY: asNum(parsed?.upY, 0.3),
+          downY: asNum(parsed?.downY, 0.7),
+          calibrated: !!parsed?.calibrated,
+        };
+      } catch (e) {
+        console.error('global head tracking load calibration error', e);
+      }
+    }
+
+    static _mapRawToViewport(rawX, rawY) {
+      const x = Math.max(0, Math.min(1, rawX));
+      const y = Math.max(0, Math.min(1, rawY));
+      const c = GlobalHeadTracking.calibration;
+
+      if (!c?.calibrated) {
+        return { x, y };
+      }
+
+      const normalize = (value, min, max) => {
+        if (!Number.isFinite(min) || !Number.isFinite(max) || Math.abs(max - min) < 0.001) {
+          return 0.5;
+        }
+        return (value - min) / (max - min);
+      };
+
+      return {
+        x: Math.max(0, Math.min(1, normalize(x, c.leftX, c.rightX))),
+        y: Math.max(0, Math.min(1, normalize(y, c.upY, c.downY))),
+      };
     }
 
     static _createCursor() {
@@ -755,8 +812,11 @@
           const nose = landmarks?.[1];
 
           if (nose) {
-            const targetX = (1 - nose.x) * window.innerWidth;
-            const targetY = nose.y * window.innerHeight;
+            const rawX = 1 - nose.x;
+            const rawY = nose.y;
+            const mapped = GlobalHeadTracking._mapRawToViewport(rawX, rawY);
+            const targetX = mapped.x * window.innerWidth;
+            const targetY = mapped.y * window.innerHeight;
 
             const alpha = Math.min(0.9, Math.max(0.1, GlobalHeadTracking.state.sensitivity));
             if (!GlobalHeadTracking.lastPoint) {
