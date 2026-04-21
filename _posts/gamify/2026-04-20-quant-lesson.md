@@ -40,6 +40,17 @@ const response = await fetch('/bank/quant/market/history?ticker=AAPL');
 const data = await response.json();
 </code></pre>
       <p>The backend receives this request, fetches the stock history from its database or an external provider (like Alpha Vantage), and sends it back as JSON data.</p>
+      
+      <div class="interactive-playground">
+        <h3>🛠️ API Playground</h3>
+        <p>Try sending a mock API request yourself!</p>
+        <div class="playground-controls">
+          <input type="text" id="ticker-input" value="AAPL" style="padding: 8px; border-radius: 4px; border: 1px solid #3b82f6; background: #0f172a; color: white; width: 100px;" />
+          <button class="btn-primary" onclick="simulateAPIRequest()" style="margin-top: 0;">Send Request</button>
+        </div>
+        <pre><code id="api-response-console" class="console-output">Waiting for request...</code></pre>
+      </div>
+
       <button class="btn-primary" onclick="showQuiz('api')">Test Knowledge</button>
       <div id="quiz-api" class="quiz-box hidden">
         <p><strong>Question:</strong> What format is commonly used to send data back from the API?</p>
@@ -71,7 +82,30 @@ const response = await fetch('/bank/quant/ml/train', {
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(payload)
 });
+});
 </code></pre>
+
+      <div class="interactive-playground">
+        <h3>🧠 ML Model Trainer</h3>
+        <p>Tweak the parameters below and train a mock model to see the results.</p>
+        <div class="playground-controls" style="flex-direction: column; gap: 10px; align-items: flex-start;">
+          <label>Lookback Period: <span id="lookback-val">60</span> days</label>
+          <input type="range" id="lookback-slider" min="10" max="200" value="60" oninput="document.getElementById('lookback-val').innerText = this.value" style="width: 100%;" />
+          
+          <label>Model Type:</label>
+          <select id="model-select" style="padding: 8px; border-radius: 4px; background: #0f172a; color: white; border: 1px solid #3b82f6; width: 100%;">
+            <option value="Random Forest">Random Forest</option>
+            <option value="Neural Network">Neural Network</option>
+            <option value="SVM">Support Vector Machine</option>
+          </select>
+          
+          <button class="btn-primary" onclick="simulateMLTraining()" style="margin-top: 10px;">Train Model</button>
+        </div>
+        <div id="ml-results" class="console-output" style="margin-top: 15px; display: none;">
+          <p id="ml-status">Waiting to train...</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -172,6 +206,32 @@ const response = await fetch('/bank/quant/ml/train', {
   }
   .feedback.success { color: #10b981; }
   .feedback.error { color: #ef4444; }
+  .interactive-playground {
+    background: #1e293b;
+    border: 1px solid #38bdf8;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 20px 0;
+  }
+  .interactive-playground h3 {
+    margin-top: 0;
+    color: #38bdf8;
+  }
+  .playground-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+  }
+  .console-output {
+    background: #000;
+    color: #4ade80;
+    font-family: monospace;
+    padding: 12px;
+    border-radius: 4px;
+    min-height: 50px;
+    white-space: pre-wrap;
+  }
 </style>
 
 <script>
@@ -188,5 +248,42 @@ const response = await fetch('/bank/quant/ml/train', {
       feedbackEl.textContent = 'Incorrect. Try again!';
       feedbackEl.className = 'feedback error';
     }
+  }
+
+  function simulateAPIRequest() {
+    const ticker = document.getElementById('ticker-input').value.toUpperCase();
+    const consoleEl = document.getElementById('api-response-console');
+    consoleEl.textContent = `Fetching data for ${ticker}...`;
+    
+    setTimeout(() => {
+      const mockData = {
+        ticker: ticker,
+        lastPrice: (Math.random() * 300 + 50).toFixed(2),
+        volume: Math.floor(Math.random() * 10000000),
+        timestamp: new Date().toISOString(),
+        status: "success"
+      };
+      consoleEl.textContent = `HTTP 200 OK\n\n` + JSON.stringify(mockData, null, 2);
+    }, 800);
+  }
+
+  function simulateMLTraining() {
+    const lookback = document.getElementById('lookback-slider').value;
+    const model = document.getElementById('model-select').value;
+    const resultsEl = document.getElementById('ml-results');
+    const statusEl = document.getElementById('ml-status');
+    
+    resultsEl.style.display = 'block';
+    statusEl.innerHTML = `Training ${model} on past ${lookback} days... ⏳`;
+    statusEl.style.color = "#fbbf24";
+    
+    setTimeout(() => {
+      // Create a mock accuracy based on lookback just for fun
+      const baseAccuracy = 50 + (lookback / 4) + (Math.random() * 10);
+      const finalAccuracy = Math.min(baseAccuracy, 98.5).toFixed(1);
+      
+      statusEl.innerHTML = `Model: ${model}\nLookback: ${lookback} days\nStatus: Trained Successfully\nAccuracy: <strong style="color: #10b981;">${finalAccuracy}%</strong>`;
+      statusEl.style.color = "#4ade80";
+    }, 1500);
   }
 </script>
