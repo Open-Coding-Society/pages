@@ -570,6 +570,12 @@ export class HeadCalibrationManager {
         };
     }
 
+    static _normalizeUserId(value) {
+        if (value === null || value === undefined) return null;
+        const normalized = String(value).trim();
+        return normalized ? normalized : null;
+    }
+
     static init(statusRef) {
         HeadCalibrationManager.refs.status = statusRef || null;
         HeadCalibrationManager.loadLocal();
@@ -671,12 +677,14 @@ export class HeadCalibrationManager {
         const res = await fetch(`${PreferencesAPI.javaURI}/api/person/get`, PreferencesAPI.fetchOptions);
         if (!res.ok) return null;
         const person = await res.json();
-        return person?.id || person?.uid || person?.username || person?.name || null;
+        return HeadCalibrationManager._normalizeUserId(
+            person?.id || person?.uid || person?.username || person?.name || null
+        );
     }
 
     static async saveToBackend() {
         try {
-            const userId = await HeadCalibrationManager._getCurrentUserId();
+            const userId = HeadCalibrationManager._normalizeUserId(await HeadCalibrationManager._getCurrentUserId());
             if (!userId) {
                 HeadCalibrationManager.setStatus('You must be logged in to save calibration to backend.', true);
                 return false;
@@ -710,7 +718,7 @@ export class HeadCalibrationManager {
 
     static async loadFromBackend() {
         try {
-            const userId = await HeadCalibrationManager._getCurrentUserId();
+            const userId = HeadCalibrationManager._normalizeUserId(await HeadCalibrationManager._getCurrentUserId());
             if (!userId) {
                 HeadCalibrationManager.setStatus('You must be logged in to load calibration.', true);
                 return false;
@@ -723,8 +731,13 @@ export class HeadCalibrationManager {
             }
 
             const allRows = await res.json();
+            const expectedBody = `${userId}-calibration`;
             const matches = Array.isArray(allRows)
-                ? allRows.filter(row => row?.userId === userId)
+                ? allRows.filter(row => {
+                    const rowUserId = HeadCalibrationManager._normalizeUserId(row?.userId);
+                    const rowBody = HeadCalibrationManager._normalizeUserId(row?.body);
+                    return rowUserId === userId || rowBody === expectedBody;
+                })
                 : [];
 
             if (!matches.length) {
