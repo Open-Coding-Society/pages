@@ -238,6 +238,8 @@ class AiChallengeNpc extends AiNpc {
       ui.responseArea.style.flexDirection = 'column';
       ui.responseArea.style.gap = '6px';
       ui.responseArea.style.padding = '8px';
+      ui.responseArea.style.position = 'relative';
+      AiChallengeNpc.ensureJumpToLatestButton(ui.responseArea);
       AiChallengeNpc.renderChatHistory(ui.responseArea, data?.chatHistory || []);
       AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Generating challenge question…');
     }
@@ -374,6 +376,7 @@ class AiChallengeNpc extends AiNpc {
   static renderChatHistory(responseArea, history) {
     if (!responseArea) return;
     responseArea.textContent = '';
+    AiChallengeNpc.ensureJumpToLatestButton(responseArea);
 
     history.forEach((entry) => {
       const role = entry?.role === 'user' ? 'user' : 'ai';
@@ -383,6 +386,7 @@ class AiChallengeNpc extends AiNpc {
     });
 
     responseArea.scrollTop = responseArea.scrollHeight;
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
   }
 
   /**
@@ -403,9 +407,73 @@ class AiChallengeNpc extends AiNpc {
     bubble.style.border = role === 'user' ? '1px solid rgba(76, 139, 245, 0.45)' : '1px solid rgba(255, 255, 255, 0.18)';
 
     responseArea.appendChild(bubble);
+    AiChallengeNpc.ensureJumpToLatestButton(responseArea);
     if (scrollToBottom) {
       responseArea.scrollTop = responseArea.scrollHeight;
     }
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Create a sticky jump control that appears when the user scrolls up.
+   */
+  static ensureJumpToLatestButton(responseArea) {
+    if (!responseArea) return;
+
+    if (!responseArea.dataset.jumpLatestBound) {
+      responseArea.dataset.jumpLatestBound = 'true';
+      responseArea.addEventListener('scroll', () => {
+        AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+      });
+    }
+
+    if (responseArea.querySelector('.ai-challenge-jump-latest')) {
+      return;
+    }
+
+    const jumpBtn = document.createElement('button');
+    jumpBtn.type = 'button';
+    jumpBtn.className = 'ai-challenge-jump-latest';
+    jumpBtn.textContent = 'Jump to latest';
+    jumpBtn.style.position = 'sticky';
+    jumpBtn.style.bottom = '0';
+    jumpBtn.style.alignSelf = 'center';
+    jumpBtn.style.margin = '4px auto 0';
+    jumpBtn.style.padding = '5px 10px';
+    jumpBtn.style.borderRadius = '999px';
+    jumpBtn.style.border = '1px solid rgba(255, 255, 255, 0.22)';
+    jumpBtn.style.background = 'rgba(12, 16, 24, 0.88)';
+    jumpBtn.style.color = '#f7f7f7';
+    jumpBtn.style.fontSize = '12px';
+    jumpBtn.style.cursor = 'pointer';
+    jumpBtn.style.zIndex = '2';
+    jumpBtn.style.display = 'none';
+
+    jumpBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      responseArea.scrollTop = responseArea.scrollHeight;
+      AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+    });
+
+    responseArea.appendChild(jumpBtn);
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Toggle jump button visibility based on distance from the bottom.
+   */
+  static updateJumpToLatestVisibility(responseArea) {
+    if (!responseArea) return;
+
+    const jumpBtn = responseArea.querySelector('.ai-challenge-jump-latest');
+    if (!jumpBtn) return;
+
+    const distanceFromBottom = Math.max(
+      0,
+      responseArea.scrollHeight - responseArea.clientHeight - responseArea.scrollTop
+    );
+
+    jumpBtn.style.display = distanceFromBottom > 24 ? 'inline-flex' : 'none';
   }
 
   /**
