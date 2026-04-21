@@ -470,19 +470,6 @@
     white-space: pre-wrap;
   }
 
-  .oasis-task-row-flash {
-    animation: oasisTaskFlash 1.4s ease;
-  }
-
-  @keyframes oasisTaskFlash {
-    0% {
-      background: rgba(244, 201, 93, 0.38);
-    }
-    100% {
-      background: transparent;
-    }
-  }
-
   @media (max-width: 1120px) {
     .wp-card-grid,
     .oasis-live-section {
@@ -808,15 +795,11 @@
         .sort(function(a, b) { return a.localeCompare(b); });
     }
 
-    function aggregateCompletedByTask(rows, taskFilter) {
+    function aggregateCompletedByTask(rows, taskName) {
       var counts = new Map();
 
       rows.forEach(function(row) {
-        if (!row.completed) {
-          return;
-        }
-
-        if (taskFilter !== "all" && row.taskName !== taskFilter) {
+        if (!row.completed || row.taskName !== taskName) {
           return;
         }
 
@@ -830,10 +813,30 @@
         .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
     }
 
+    function aggregateCompletionsByTaskName(rows) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed) {
+          return;
+        }
+
+        var taskName = row.taskName || "(unknown task)";
+        var current = counts.get(taskName) || { name: taskName, count: 0, players: new Set(), rooms: new Set() };
+        current.count += 1;
+        current.players.add(row.userName);
+        current.rooms.add(String(row.room));
+        counts.set(taskName, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+    }
+
     function renderLeaderboardItems(items) {
       leaderboardListEl.innerHTML = items.map(function(item, index) {
         return "" +
-          "<div class=\"oasis-leaderboard-item oasis-task-row-flash\">" +
+          "<div class=\"oasis-leaderboard-item\">" +
             "<div class=\"oasis-leaderboard-rank\">" + (index + 1) + "</div>" +
             "<div class=\"oasis-leaderboard-main\">" +
               "<div class=\"oasis-leaderboard-name\">" + escapeHtml(item.name) + "</div>" +
@@ -859,17 +862,15 @@
         return;
       }
 
-      if (activeTaskFilter !== "all" && taskNames.indexOf(activeTaskFilter) === -1) {
-        activeTaskFilter = "all";
+      if (activeTaskFilter === "all" || taskNames.indexOf(activeTaskFilter) === -1) {
+        activeTaskFilter = taskNames[0];
       }
 
       taskFilterTabsEl.hidden = false;
-      taskFilterTabsEl.innerHTML =
-        "<button class=\"oasis-tab-button" + (activeTaskFilter === "all" ? " is-active" : "") + "\" type=\"button\" data-task-filter=\"all\">All Tasks</button>" +
-        taskNames.map(function(taskName) {
-          var activeClass = activeTaskFilter === taskName ? " is-active" : "";
-          return "<button class=\"oasis-tab-button" + activeClass + "\" type=\"button\" data-task-filter=\"" + escapeHtml(taskName) + "\">" + escapeHtml(taskName) + "</button>";
-        }).join("");
+      taskFilterTabsEl.innerHTML = taskNames.map(function(taskName) {
+        var activeClass = activeTaskFilter === taskName ? " is-active" : "";
+        return "<button class=\"oasis-tab-button" + activeClass + "\" type=\"button\" data-task-filter=\"" + escapeHtml(taskName) + "\">" + escapeHtml(taskName) + "</button>";
+      }).join("");
     }
 
     function renderActiveView(rows) {
@@ -904,7 +905,7 @@
         leaderboardItems = aggregateCompletedByTask(rows, activeTaskFilter).map(function(entry) {
           return {
             name: entry.name,
-            meta: (activeTaskFilter === "all" ? "Across every completed task" : activeTaskFilter) + " in " + entry.rooms.size + " " + pluralize("room", entry.rooms.size),
+            meta: entry.count + " " + pluralize("completion", entry.count) + " in " + entry.rooms.size + " " + pluralize("room", entry.rooms.size),
             score: entry.count + " completed"
           };
         });
@@ -937,15 +938,6 @@
             return (String(a.room) + a.userName + a.taskName).localeCompare(String(b.room) + b.userName + b.taskName);
           })
       );
-    }
-
-    function markRowsAsFresh() {
-      var renderedRows = document.querySelectorAll("#oasis-task-table-body tr, #oasis-leaderboard-list .oasis-leaderboard-item");
-      renderedRows.forEach(function(row) {
-        row.classList.remove("oasis-task-row-flash");
-        void row.offsetWidth;
-        row.classList.add("oasis-task-row-flash");
-      });
     }
 
     async function fetchTasksFromBackend() {
@@ -997,7 +989,6 @@
 
         if (hasChanged) {
           syncStatusEl.textContent = "Live from " + result.endpoint;
-          markRowsAsFresh();
           lastSerializedRows = serializedRows;
         } else {
           syncStatusEl.textContent = "Live from " + result.endpoint;
