@@ -6,13 +6,493 @@ layout: aesthetihawk
 active_tab: calendar
 ---
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
+<style>
+    .calendar-dashboard-tabs {
+        display: inline-flex;
+        gap: 8px;
+        margin-bottom: 14px;
+        padding: 6px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 14px;
+    }
 
-<!-- FullCalendar Container -->
-<div id="calendar-auth-banner" style="display:none; background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%); color: #fff; padding: 12px 20px; border-radius: 12px; margin-bottom: 12px; font-size: 0.95rem; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-    <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
-    <span>Your session has expired. <a href="{{site.baseurl}}/login" style="color: #fbbf24; text-decoration: underline; font-weight: 600;">Log in again</a> to view and manage your calendar events.</span>
+    .dashboard-tab-btn {
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #cbd5e1;
+        background: transparent;
+        transition: 140ms ease;
+    }
+
+    .dashboard-tab-btn.active {
+        color: #f8fafc;
+        background: rgba(37, 99, 235, 0.22);
+        border-color: rgba(59, 130, 246, 0.45);
+    }
+
+    .dashboard-panel.hidden {
+        display: none;
+    }
+
+    .calendar-issues-panel {
+        margin-top: 8px;
+        border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.86) 100%);
+        color: #e2e8f0;
+        padding: 16px;
+    }
+
+    .calendar-issues-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .calendar-issues-title {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+    }
+
+    .calendar-issues-subtitle {
+        margin: 3px 0 0;
+        color: #94a3b8;
+        font-size: 0.92rem;
+    }
+
+    .calendar-issue-action-btn {
+        border: 0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .calendar-issue-action-btn.primary { background: #2563eb; color: #fff; }
+    .calendar-issue-action-btn.secondary { background: rgba(148, 163, 184, 0.15); color: #e2e8f0; }
+    .calendar-issue-action-btn.danger { background: #b91c1c; color: #fff; }
+
+    .issues-controls-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .issues-controls-row > * {
+        flex: 1 1 160px;
+        min-width: 0;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        background: rgba(15, 23, 42, 0.72);
+        color: #e2e8f0;
+        padding: 9px 10px;
+    }
+
+    .issues-subtabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .issues-subtab-btn {
+        border: 1px solid rgba(148, 163, 184, 0.28);
+        border-radius: 999px;
+        padding: 7px 12px;
+        background: rgba(15, 23, 42, 0.75);
+        color: #cbd5e1;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .issues-subtab-btn.active {
+        color: #f8fafc;
+        border-color: rgba(37, 99, 235, 0.7);
+        background: rgba(37, 99, 235, 0.24);
+    }
+
+    .issues-subpanel.hidden {
+        display: none;
+    }
+
+    .issue-form {
+        display: grid;
+        gap: 10px;
+        background: rgba(2, 6, 23, 0.46);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+        border-radius: 14px;
+        padding: 14px;
+    }
+
+    .issue-form label {
+        font-size: 0.88rem;
+        color: #cbd5e1;
+        font-weight: 600;
+    }
+
+    .issue-form input,
+    .issue-form textarea,
+    .issue-form select {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        background: rgba(15, 23, 42, 0.75);
+        color: #e2e8f0;
+        padding: 9px 10px;
+        box-sizing: border-box;
+    }
+
+    .issue-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .issue-form-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .issues-list {
+        display: grid;
+        gap: 10px;
+    }
+
+    .issue-card {
+        background: rgba(2, 6, 23, 0.52);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        border-radius: 14px;
+        padding: 12px;
+        display: grid;
+        gap: 8px;
+    }
+
+    .issue-card-top,
+    .issue-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .issue-card-title {
+        font-size: 1rem;
+        font-weight: 800;
+    }
+
+    .issue-pill {
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .issue-pill.open { background: rgba(37, 99, 235, 0.22); color: #93c5fd; }
+    .issue-pill.in-progress { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+    .issue-pill.blocked { background: rgba(220, 38, 38, 0.22); color: #fca5a5; }
+    .issue-pill.done { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+    .issue-pill.low { background: rgba(100, 116, 139, 0.18); color: #cbd5e1; }
+    .issue-pill.medium { background: rgba(59, 130, 246, 0.16); color: #93c5fd; }
+    .issue-pill.high { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+
+    .issue-description {
+        color: #dbeafe;
+        white-space: pre-wrap;
+        font-size: 0.92rem;
+    }
+
+    .issue-markdown-preview {
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        background: rgba(15, 23, 42, 0.58);
+        padding: 12px;
+    }
+
+    .issue-markdown-preview h1,
+    .issue-markdown-preview h2,
+    .issue-markdown-preview h3 {
+        margin: 0 0 8px;
+        color: #f8fafc;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
+    .issue-markdown-preview h1 { font-size: 1.35rem; }
+    .issue-markdown-preview h2 { font-size: 1.18rem; }
+    .issue-markdown-preview h3 { font-size: 1.05rem; }
+
+    .issue-markdown-preview p {
+        margin: 0 0 8px;
+        line-height: 1.55;
+        color: #dbeafe;
+    }
+
+    .issue-markdown-preview ul {
+        margin: 0 0 8px 18px;
+        padding: 0;
+        color: #dbeafe;
+    }
+
+    .issue-markdown-preview li {
+        margin: 4px 0;
+    }
+
+    .issue-markdown-preview code {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 6px;
+        padding: 1px 5px;
+        color: #f8fafc;
+        font-size: 0.9em;
+    }
+
+    .issue-markdown-preview a {
+        color: #93c5fd;
+        text-decoration: underline;
+    }
+
+    .issue-markdown-empty {
+        color: #94a3b8;
+        font-style: italic;
+        margin: 0;
+    }
+
+    .issue-author {
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
+    .issue-meta {
+        color: #94a3b8;
+        font-size: 0.82rem;
+    }
+
+    .issue-tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .issue-tag {
+        border-radius: 999px;
+        padding: 4px 9px;
+        background: rgba(30, 41, 59, 0.9);
+        color: #cbd5e1;
+        font-size: 0.76rem;
+        font-weight: 700;
+    }
+
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .kanban-column {
+        background: rgba(2, 6, 23, 0.44);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 14px;
+        min-height: 220px;
+        padding: 10px;
+        display: grid;
+        grid-auto-rows: min-content;
+        gap: 8px;
+    }
+
+    .kanban-column-title {
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: #e2e8f0;
+        margin-bottom: 2px;
+    }
+
+    .kanban-item {
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 12px;
+        padding: 9px;
+        display: grid;
+        gap: 7px;
+    }
+
+    .calendar-issue-count-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 7px;
+        border-radius: 999px;
+        background: #2563eb;
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        pointer-events: none;
+    }
+
+    .issues-empty {
+        border-radius: 12px;
+        border: 1px dashed rgba(148, 163, 184, 0.34);
+        padding: 14px;
+        color: #94a3b8;
+        text-align: center;
+    }
+
+    @media (max-width: 1040px) {
+        .kanban-board {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .issue-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .kanban-board {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="calendar-dashboard-tabs" role="tablist" aria-label="Calendar Dashboard Tabs">
+    <button type="button" class="dashboard-tab-btn active" data-dashboard-tab="calendar" role="tab" aria-selected="true">Calendar</button>
+    <button type="button" class="dashboard-tab-btn" data-dashboard-tab="issues" role="tab" aria-selected="false">Issues</button>
 </div>
-<div id="calendar" class="box-border z-0"></div>
+
+<section id="dashboard-panel-calendar" class="dashboard-panel" role="tabpanel" aria-label="Calendar Panel">
+    <!-- FullCalendar Container -->
+    <div id="calendar-auth-banner" style="display:none; background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%); color: #fff; padding: 12px 20px; border-radius: 12px; margin-bottom: 12px; font-size: 0.95rem; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+        <span>Your session has expired. <a href="{{site.baseurl}}/login" style="color: #fbbf24; text-decoration: underline; font-weight: 600;">Log in again</a> to view and manage your calendar events.</span>
+    </div>
+    <div id="calendar" class="box-border z-0"></div>
+</section>
+
+<section id="dashboard-panel-issues" class="dashboard-panel hidden" role="tabpanel" aria-label="Issues Panel">
+    <div id="calendar-issues-panel" class="calendar-issues-panel">
+        <div class="calendar-issues-header">
+            <div>
+                <h2 class="calendar-issues-title">Issues</h2>
+                <p class="calendar-issues-subtitle">GitHub-inspired issue tracking synced with calendar dates and event context.</p>
+            </div>
+            <button id="issues-new-btn" class="calendar-issue-action-btn primary" type="button">New Issue</button>
+        </div>
+
+        <div class="issues-controls-row">
+            <input id="issues-filter-query" type="search" placeholder="Search title, description, tags" />
+            <select id="issues-filter-status">
+                <option value="">All statuses</option>
+                <option value="open">Open</option>
+                <option value="in-progress">In Progress</option>
+                <option value="blocked">Blocked</option>
+                <option value="done">Done</option>
+            </select>
+            <select id="issues-filter-priority">
+                <option value="">All priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <input id="issues-filter-date" type="date" title="Filter by due date" />
+        </div>
+
+        <div class="issues-subtabs" role="tablist" aria-label="Issue Views">
+            <button type="button" class="issues-subtab-btn active" data-issues-subtab="create" role="tab" aria-selected="true">Create / Edit</button>
+            <button type="button" class="issues-subtab-btn" data-issues-subtab="list" role="tab" aria-selected="false">List</button>
+            <button type="button" class="issues-subtab-btn" data-issues-subtab="kanban" role="tab" aria-selected="false">Kanban</button>
+        </div>
+
+        <div id="issues-subpanel-create" class="issues-subpanel">
+            <form id="issue-form" class="issue-form">
+                <input type="hidden" id="issue-id" />
+
+                <div>
+                    <label for="issue-title">Title</label>
+                    <input id="issue-title" type="text" maxlength="200" required placeholder="Describe the issue" />
+                </div>
+
+                <div>
+                    <label for="issue-description">Description</label>
+                    <textarea id="issue-description" rows="4" placeholder="Add details"></textarea>
+                </div>
+
+                <div>
+                    <label>Live Markdown Preview</label>
+                    <div id="issue-description-preview" class="issue-markdown-preview">
+                        <p class="issue-markdown-empty">Preview will appear here as you type.</p>
+                    </div>
+                </div>
+
+                <div class="issue-form-grid">
+                    <div>
+                        <label for="issue-status">Status</label>
+                        <select id="issue-status">
+                            <option value="open">Open</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="issue-priority">Priority</label>
+                        <select id="issue-priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="issue-form-grid">
+                    <div>
+                        <label for="issue-due-date">Due Date</label>
+                        <input id="issue-due-date" type="date" required />
+                    </div>
+                    <div>
+                        <label for="issue-event-id">Linked Event ID (optional)</label>
+                        <input id="issue-event-id" type="text" placeholder="Calendar event id" />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="issue-tags">Tags (comma-separated)</label>
+                    <input id="issue-tags" type="text" placeholder="frontend, sprint-9" />
+                </div>
+
+                <div class="issue-form-actions">
+                    <button id="issue-clear-btn" type="button" class="calendar-issue-action-btn secondary">Clear</button>
+                    <button id="issue-save-btn" type="submit" class="calendar-issue-action-btn primary">Create Issue</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="issues-subpanel-list" class="issues-subpanel hidden">
+            <div id="issues-list" class="issues-list"></div>
+        </div>
+
+        <div id="issues-subpanel-kanban" class="issues-subpanel hidden">
+            <div id="issues-kanban" class="kanban-board"></div>
+        </div>
+    </div>
+</section>
 <!-- Modal -->
 <div id="eventModal" class="fixed z-[99999] inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm py-4 overflow-y-auto hidden">
     <div class="relative mx-auto my-4 p-8 rounded-2xl shadow-2xl max-w-xl max-h-[90vh] overflow-y-auto w-full font-sans modal-content">
@@ -107,6 +587,32 @@ active_tab: calendar
     // Filter mode: 'my-groups' (default) or 'all'
     let filterMode = 'my-groups';
 
+    // Issue state
+    let calendarIssues = [];
+    let issueCountsByDate = {};
+    let selectedIssueId = null;
+    let activeDashboardTab = 'calendar';
+    let activeIssuesSubtab = 'create';
+
+    const ISSUE_STATUS_OPTIONS = ['open', 'in-progress', 'blocked', 'done'];
+    const ISSUE_STATUS_LABELS = {
+        open: 'Open',
+        'in-progress': 'In Progress',
+        blocked: 'Blocked',
+        done: 'Done'
+    };
+    const ISSUE_PRIORITY_ORDER = {
+        high: 0,
+        medium: 1,
+        low: 2
+    };
+    const ISSUE_STATUS_FLOW = {
+        open: ['open', 'in-progress', 'blocked', 'done'],
+        'in-progress': ['open', 'in-progress', 'blocked', 'done'],
+        blocked: ['open', 'in-progress', 'blocked', 'done'],
+        done: ['done', 'open']
+    };
+
     // School holidays from _data/school_calendar.yml via Liquid
     const schoolHolidays = [
         {% for entry in site.data.school_calendar.weeks %}
@@ -196,10 +702,160 @@ active_tab: calendar
         });
     }
 
+    function escapeIssueText(s) {
+        return s ? String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;") : '';
+    }
+
+    function getCurrentIssueAuthor() {
+        return (window.user && (window.user.uid || window.user.name)) || '';
+    }
+
+    function renderInlineMarkdown(text) {
+        const escaped = escapeIssueText(String(text || ''));
+        return escaped
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    }
+
+    function renderIssueMarkdown(text) {
+        const source = String(text || '').replace(/\r\n/g, '\n');
+        if (!source.trim()) {
+            return '<p class="issue-markdown-empty">No description provided.</p>';
+        }
+
+        const lines = source.split('\n');
+        const html = [];
+        let inList = false;
+
+        const closeList = () => {
+            if (inList) {
+                html.push('</ul>');
+                inList = false;
+            }
+        };
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) {
+                closeList();
+                continue;
+            }
+
+            const headingMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
+            if (headingMatch) {
+                closeList();
+                const headingLevel = headingMatch[1].length;
+                html.push(`<h${headingLevel}>${renderInlineMarkdown(headingMatch[2])}</h${headingLevel}>`);
+                continue;
+            }
+
+            const listMatch = trimmed.match(/^[-*]\s+(.*)$/);
+            if (listMatch) {
+                if (!inList) {
+                    html.push('<ul>');
+                    inList = true;
+                }
+                html.push(`<li>${renderInlineMarkdown(listMatch[1])}</li>`);
+                continue;
+            }
+
+            closeList();
+            html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`);
+        }
+
+        closeList();
+        return html.join('');
+    }
+
+    function updateIssueDescriptionPreview() {
+        const preview = document.getElementById('issue-description-preview');
+        const description = document.getElementById('issue-description');
+        if (!preview || !description) return;
+        preview.innerHTML = renderIssueMarkdown(description.value);
+    }
+
+    function getLocalIsoDate(date = new Date()) {
+        const localDate = new Date(date);
+        const timezoneOffset = localDate.getTimezoneOffset() * 60000;
+        return new Date(localDate.getTime() - timezoneOffset).toISOString().slice(0, 10);
+    }
+
+    function normalizeTags(tags) {
+        if (Array.isArray(tags)) {
+            return tags.map(tag => String(tag).trim()).filter(Boolean);
+        }
+        if (!tags) {
+            return [];
+        }
+        return String(tags).split(',').map(tag => tag.trim()).filter(Boolean);
+    }
+
+    function formatIssueDate(dateString) {
+        if (!dateString) return 'No due date';
+        const date = new Date(`${dateString}T00:00:00`);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function buildIssueCountMap(issues) {
+        return (issues || []).reduce((counts, issue) => {
+            if (!issue || !issue.dueDate) return counts;
+            counts[issue.dueDate] = (counts[issue.dueDate] || 0) + 1;
+            return counts;
+        }, {});
+    }
+
+    function switchDashboardTab(tabName) {
+        activeDashboardTab = tabName;
+        document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
+            const isActive = btn.dataset.dashboardTab === tabName;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        document.getElementById('dashboard-panel-calendar')?.classList.toggle('hidden', tabName !== 'calendar');
+        document.getElementById('dashboard-panel-issues')?.classList.toggle('hidden', tabName !== 'issues');
+    }
+
+    function switchIssuesSubtab(subtab) {
+        activeIssuesSubtab = subtab;
+        document.querySelectorAll('.issues-subtab-btn').forEach(btn => {
+            const isActive = btn.dataset.issuesSubtab === subtab;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        document.getElementById('issues-subpanel-create')?.classList.toggle('hidden', subtab !== 'create');
+        document.getElementById('issues-subpanel-list')?.classList.toggle('hidden', subtab !== 'list');
+        document.getElementById('issues-subpanel-kanban')?.classList.toggle('hidden', subtab !== 'kanban');
+    }
+
+    function showIssueToast(message, type = 'success') {
+        const existing = document.getElementById('issues-toast');
+        if (existing) {
+            existing.remove();
+        }
+
+        const toast = document.createElement('div');
+        toast.id = 'issues-toast';
+        toast.className = `calendar-issue-action-btn ${type === 'error' ? 'danger' : type === 'warning' ? 'secondary' : 'primary'}`;
+        toast.style.position = 'fixed';
+        toast.style.right = '16px';
+        toast.style.bottom = '16px';
+        toast.style.zIndex = '100001';
+        toast.style.maxWidth = '400px';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 2800);
+    }
+
     // ─── Main ───────────────────────────────────────────────────────
     document.addEventListener("DOMContentLoaded", async function () {
         userGroups = await fetchUserGroups();
         populateGroupDropdown();
+            document.getElementById('issue-description')?.addEventListener('input', updateIssueDescriptionPreview);
 
         let currentEvent = null;
         let isAddingNewEvent = false;
@@ -233,12 +889,241 @@ active_tab: calendar
                 .catch(e => { handleFetchError(e); return []; });
         }
 
+        function requestIssues() {
+            return fetch(`${javaURI}/api/calendar/issues`, fetchOptions)
+                .then(r => {
+                    if (handleAuthError(r)) return [];
+                    if (!r.ok) return [];
+                    return r.json();
+                })
+                .catch(e => {
+                    handleFetchError(e);
+                    return [];
+                });
+        }
+
+        function getIssueElements() {
+            return {
+                form: document.getElementById('issue-form'),
+                id: document.getElementById('issue-id'),
+                title: document.getElementById('issue-title'),
+                description: document.getElementById('issue-description'),
+                status: document.getElementById('issue-status'),
+                priority: document.getElementById('issue-priority'),
+                dueDate: document.getElementById('issue-due-date'),
+                eventId: document.getElementById('issue-event-id'),
+                tags: document.getElementById('issue-tags'),
+                saveBtn: document.getElementById('issue-save-btn'),
+                clearBtn: document.getElementById('issue-clear-btn'),
+                newBtn: document.getElementById('issues-new-btn'),
+                list: document.getElementById('issues-list'),
+                kanban: document.getElementById('issues-kanban'),
+                filterQuery: document.getElementById('issues-filter-query'),
+                filterStatus: document.getElementById('issues-filter-status'),
+                filterPriority: document.getElementById('issues-filter-priority'),
+                filterDate: document.getElementById('issues-filter-date')
+            };
+        }
+
+        function resetIssueForm(preserveDate = '') {
+            const el = getIssueElements();
+            selectedIssueId = null;
+            el.form?.reset();
+            if (el.id) el.id.value = '';
+            if (el.status) el.status.value = 'open';
+            if (el.priority) el.priority.value = 'medium';
+            if (el.dueDate) el.dueDate.value = preserveDate || el.filterDate?.value || getLocalIsoDate();
+            if (el.saveBtn) el.saveBtn.textContent = 'Create Issue';
+            updateIssueDescriptionPreview();
+            renderIssueViews();
+        }
+
+        function setIssueForm(issue) {
+            const el = getIssueElements();
+            selectedIssueId = issue.id;
+            if (el.id) el.id.value = issue.id || '';
+            if (el.title) el.title.value = issue.title || '';
+            if (el.description) el.description.value = issue.description || '';
+            if (el.status) el.status.value = issue.status || 'open';
+            if (el.priority) el.priority.value = issue.priority || 'medium';
+            if (el.dueDate) el.dueDate.value = issue.dueDate || '';
+            if (el.eventId) el.eventId.value = issue.eventId || '';
+            if (el.tags) el.tags.value = normalizeTags(issue.tags).join(', ');
+            if (el.saveBtn) el.saveBtn.textContent = 'Update Issue';
+            updateIssueDescriptionPreview();
+            switchIssuesSubtab('create');
+            el.title?.focus();
+            switchDashboardTab('issues');
+            renderIssueViews();
+        }
+
+        function getFilteredIssues() {
+            const el = getIssueElements();
+            const query = (el.filterQuery?.value || '').trim().toLowerCase();
+            const statusFilter = el.filterStatus?.value || '';
+            const priorityFilter = el.filterPriority?.value || '';
+            const dateFilter = el.filterDate?.value || '';
+
+            return (calendarIssues || [])
+                .filter(issue => !statusFilter || (issue.status || 'open') === statusFilter)
+                .filter(issue => !priorityFilter || (issue.priority || 'medium') === priorityFilter)
+                .filter(issue => !dateFilter || issue.dueDate === dateFilter)
+                .filter(issue => {
+                    if (!query) return true;
+                    const haystack = [issue.title, issue.description, issue.eventId, normalizeTags(issue.tags).join(' ')].join(' ').toLowerCase();
+                    return haystack.includes(query);
+                })
+                .sort((a, b) => {
+                    const aDate = a.dueDate || '';
+                    const bDate = b.dueDate || '';
+                    if (aDate !== bDate) return aDate.localeCompare(bDate);
+                    const pDelta = (ISSUE_PRIORITY_ORDER[a.priority || 'medium'] ?? 1) - (ISSUE_PRIORITY_ORDER[b.priority || 'medium'] ?? 1);
+                    if (pDelta !== 0) return pDelta;
+                    return (b.updatedAt || '').localeCompare(a.updatedAt || '');
+                });
+        }
+
+        function renderIssueList(issues) {
+            const el = getIssueElements();
+            if (!el.list) return;
+            if (!issues.length) {
+                el.list.innerHTML = '<div class="issues-empty">No issues match current filters.</div>';
+                return;
+            }
+
+            el.list.innerHTML = issues.map(issue => {
+                const status = issue.status || 'open';
+                const priority = issue.priority || 'medium';
+                const tags = normalizeTags(issue.tags);
+                const canMove = ISSUE_STATUS_FLOW[status] || ISSUE_STATUS_OPTIONS;
+                return `
+                    <article class="issue-card" data-issue-id="${escapeIssueText(issue.id)}">
+                        <div class="issue-card-top">
+                            <div class="issue-card-title">${escapeIssueText(issue.title || 'Untitled issue')}</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                <span class="issue-pill ${escapeIssueText(status)}">${escapeIssueText(ISSUE_STATUS_LABELS[status] || status)}</span>
+                                <span class="issue-pill ${escapeIssueText(priority)}">${escapeIssueText(priority.toUpperCase())}</span>
+                            </div>
+                        </div>
+                        <div class="issue-description issue-markdown-preview">${renderIssueMarkdown(issue.description || '')}</div>
+                        <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
+                        <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}${issue.eventId ? ` · Event ${escapeIssueText(issue.eventId)}` : ''}</div>
+                        ${tags.length ? `<div class="issue-tags">${tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('')}</div>` : ''}
+                        <div class="issue-card-footer">
+                            <select data-action="status" data-issue-id="${escapeIssueText(issue.id)}">
+                                ${ISSUE_STATUS_OPTIONS.map(option => `<option value="${option}" ${option === status ? 'selected' : ''} ${canMove.includes(option) ? '' : 'disabled'}>${ISSUE_STATUS_LABELS[option]}</option>`).join('')}
+                            </select>
+                            <div style="display:flex;gap:8px;">
+                                <button type="button" class="calendar-issue-action-btn secondary" data-action="edit" data-issue-id="${escapeIssueText(issue.id)}">Edit</button>
+                                <button type="button" class="calendar-issue-action-btn danger" data-action="delete" data-issue-id="${escapeIssueText(issue.id)}" ${issue.author && getCurrentIssueAuthor() && issue.author !== getCurrentIssueAuthor() ? 'disabled title="Only the author can delete this issue"' : ''}>Delete</button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function renderKanban(issues) {
+            const el = getIssueElements();
+            if (!el.kanban) return;
+
+            const groups = {
+                open: issues.filter(issue => (issue.status || 'open') === 'open'),
+                'in-progress': issues.filter(issue => (issue.status || 'open') === 'in-progress'),
+                blocked: issues.filter(issue => (issue.status || 'open') === 'blocked'),
+                done: issues.filter(issue => (issue.status || 'open') === 'done')
+            };
+
+            el.kanban.innerHTML = ISSUE_STATUS_OPTIONS.map(status => {
+                const statusIssues = groups[status] || [];
+                return `
+                    <section class="kanban-column">
+                        <h3 class="kanban-column-title">${ISSUE_STATUS_LABELS[status]} (${statusIssues.length})</h3>
+                        ${statusIssues.length ? statusIssues.map(issue => `
+                            <article class="kanban-item" data-issue-id="${escapeIssueText(issue.id)}">
+                                <div class="issue-card-title">${escapeIssueText(issue.title || 'Untitled issue')}</div>
+                                <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
+                                <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</div>
+                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                    <span class="issue-pill ${escapeIssueText(issue.priority || 'medium')}">${escapeIssueText((issue.priority || 'medium').toUpperCase())}</span>
+                                </div>
+                                <select data-action="status" data-issue-id="${escapeIssueText(issue.id)}">
+                                    ${ISSUE_STATUS_OPTIONS.map(option => `<option value="${option}" ${option === (issue.status || 'open') ? 'selected' : ''}>${ISSUE_STATUS_LABELS[option]}</option>`).join('')}
+                                </select>
+                            </article>
+                        `).join('') : '<div class="issues-empty">No issues.</div>'}
+                    </section>
+                `;
+            }).join('');
+        }
+
+        function renderIssueViews() {
+            const filteredIssues = getFilteredIssues();
+            renderIssueList(filteredIssues);
+            renderKanban(filteredIssues);
+            updateIssueDescriptionPreview();
+        }
+
+        async function upsertIssue(isEdit, payload) {
+            const path = isEdit ? `/api/calendar/issues/${selectedIssueId}` : '/api/calendar/issues';
+            const method = isEdit ? 'PUT' : 'POST';
+
+            const response = await fetch(`${javaURI}${path}`, {
+                ...fetchOptions,
+                method,
+                headers: {
+                    ...(fetchOptions.headers || {}),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (handleAuthError(response)) throw new Error('AUTH');
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Failed to save issue');
+            }
+        }
+
+        async function deleteIssue(issueId) {
+            const response = await fetch(`${javaURI}/api/calendar/issues/${issueId}`, {
+                ...fetchOptions,
+                method: 'DELETE'
+            });
+
+            if (handleAuthError(response)) throw new Error('AUTH');
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Failed to delete issue');
+            }
+        }
+
+        async function changeIssueStatus(issueId, status) {
+            const response = await fetch(`${javaURI}/api/calendar/issues/${issueId}/status`, {
+                ...fetchOptions,
+                method: 'PATCH',
+                headers: {
+                    ...(fetchOptions.headers || {}),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            });
+
+            if (handleAuthError(response)) throw new Error('AUTH');
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Failed to change issue status');
+            }
+        }
+
         // ── handleRequest: build allEvents, then render ─────────────
         function handleRequest() {
-            Promise.all([request(), getBreaks()])
-                .then(([calendarEvents, breaks]) => {
+            return Promise.all([request(), getBreaks(), requestIssues()])
+                .then(([calendarEvents, breaks, issues]) => {
                     if (calendarEvents !== null) { javaAuthenticated = true; hideAuthBanner(); }
                     allEvents = [];
+                    calendarIssues = Array.isArray(issues) ? issues : [];
+                    issueCountsByDate = buildIssueCountMap(calendarIssues);
 
                     // --- Calendar events ---
                     if (calendarEvents !== null) {
@@ -320,11 +1205,13 @@ active_tab: calendar
                     });
 
                     displayCalendar(filterEvents());
+                    renderIssueViews();
                 })
                 .catch(error => {
                     handleFetchError(error);
                     console.error("handleRequest error:", error);
                     displayCalendar(filterEvents());
+                    renderIssueViews();
                 });
         }
 
@@ -406,6 +1293,17 @@ active_tab: calendar
                         const dateStr = formatDate(arg.date);
                         if (isBreakDay(dateStr)) arg.el.classList.add('break-day');
                         else arg.el.classList.remove('break-day');
+
+                        const existingBadge = arg.el.querySelector('.calendar-issue-count-badge');
+                        if (existingBadge) existingBadge.remove();
+                        const issueCount = issueCountsByDate[dateStr] || 0;
+                        if (issueCount > 0) {
+                            const badge = document.createElement('span');
+                            badge.className = 'calendar-issue-count-badge';
+                            badge.textContent = issueCount > 99 ? '99+' : String(issueCount);
+                            badge.title = `${issueCount} issue${issueCount === 1 ? '' : 's'} due`;
+                            arg.el.appendChild(badge);
+                        }
                     } catch (e) { /* ignore */ }
                 },
                 events: events,
@@ -464,11 +1362,21 @@ active_tab: calendar
                     }
                 },
                 dateClick: function (info) {
+                    const selectedDate = formatDate(info.date);
+                    const issueFilterDate = document.getElementById('issues-filter-date');
+                    if (issueFilterDate) {
+                        issueFilterDate.value = selectedDate;
+                    }
+                    const issueDueDate = document.getElementById('issue-due-date');
+                    if (issueDueDate && !selectedIssueId) {
+                        issueDueDate.value = selectedDate;
+                    }
+                    renderIssueViews();
+
                     if (!javaAuthenticated || ((!window.user || !window.user.uid) && !currentPersonId)) {
                         alert('You must be logged in to create events. Please log in and try again.');
                         return;
                     }
-                    const selectedDate = formatDate(info.date);
                     if (isBreakDay(selectedDate)) {
                         alert(`There is already a break on ${formatDisplayDate(info.date)}`);
                         return;
@@ -716,6 +1624,145 @@ active_tab: calendar
             })
             .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to create break.\n\n" + e.message); } });
         };
+
+        function initializeDashboardControls() {
+            document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchDashboardTab(btn.dataset.dashboardTab);
+                });
+            });
+
+            document.querySelectorAll('.issues-subtab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchIssuesSubtab(btn.dataset.issuesSubtab);
+                });
+            });
+
+            switchDashboardTab('calendar');
+            switchIssuesSubtab('create');
+        }
+
+        function initializeIssueWorkspace() {
+            const el = getIssueElements();
+
+            el.newBtn?.addEventListener('click', () => {
+                resetIssueForm(el.filterDate?.value || getLocalIsoDate());
+                switchIssuesSubtab('create');
+                el.title?.focus();
+            });
+
+            el.clearBtn?.addEventListener('click', () => {
+                resetIssueForm(el.filterDate?.value || getLocalIsoDate());
+            });
+
+            [el.filterQuery, el.filterStatus, el.filterPriority, el.filterDate].forEach(control => {
+                control?.addEventListener('input', renderIssueViews);
+                control?.addEventListener('change', renderIssueViews);
+            });
+
+            el.form?.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const payload = {
+                    title: (el.title?.value || '').trim(),
+                    description: (el.description?.value || '').trim(),
+                    status: el.status?.value || 'open',
+                    priority: el.priority?.value || 'medium',
+                    dueDate: el.dueDate?.value || '',
+                    eventId: (el.eventId?.value || '').trim() || null,
+                    tags: normalizeTags(el.tags?.value || '')
+                };
+
+                if (!payload.title) {
+                    showIssueToast('Issue title is required.', 'error');
+                    el.title?.focus();
+                    return;
+                }
+                if (!payload.dueDate) {
+                    showIssueToast('Issue due date is required.', 'error');
+                    el.dueDate?.focus();
+                    return;
+                }
+
+                try {
+                    await upsertIssue(Boolean(selectedIssueId), payload);
+                    showIssueToast(selectedIssueId ? 'Issue updated.' : 'Issue created.', 'success');
+                    resetIssueForm(payload.dueDate);
+                    await handleRequest();
+                } catch (error) {
+                    console.error('Issue save error:', error);
+                    if (error.message === 'AUTH') {
+                        showIssueToast('Please log in again.', 'error');
+                    } else {
+                        showIssueToast('Could not save issue.', 'error');
+                    }
+                }
+            });
+
+            function resolveIssueFromEventTarget(target) {
+                const issueId = target?.dataset?.issueId || target?.closest('[data-issue-id]')?.dataset?.issueId;
+                if (!issueId) return null;
+                return calendarIssues.find(issue => String(issue.id) === String(issueId)) || null;
+            }
+
+            function wireContainerActions(container) {
+                container?.addEventListener('click', async (event) => {
+                    const action = event.target?.dataset?.action;
+                    if (!action) return;
+
+                    const issue = resolveIssueFromEventTarget(event.target);
+                    if (!issue) return;
+
+                    if (action === 'edit') {
+                        setIssueForm(issue);
+                        return;
+                    }
+
+                    if (action === 'delete') {
+                        const confirmed = confirm(`Delete issue \"${issue.title}\"? This cannot be undone.`);
+                        if (!confirmed) return;
+
+                        try {
+                            await deleteIssue(issue.id);
+                            showIssueToast('Issue deleted.', 'warning');
+                            if (String(selectedIssueId) === String(issue.id)) {
+                                resetIssueForm(el.filterDate?.value || getLocalIsoDate());
+                            }
+                            await handleRequest();
+                        } catch (error) {
+                            console.error('Issue delete error:', error);
+                            showIssueToast('Could not delete issue.', 'error');
+                        }
+                    }
+                });
+
+                container?.addEventListener('change', async (event) => {
+                    const statusSelect = event.target.closest('select[data-action="status"]');
+                    if (!statusSelect) return;
+
+                    const issue = resolveIssueFromEventTarget(statusSelect);
+                    if (!issue) return;
+                    if (statusSelect.value === (issue.status || 'open')) return;
+
+                    const previousStatus = issue.status || 'open';
+                    try {
+                        await changeIssueStatus(issue.id, statusSelect.value);
+                        showIssueToast(`Issue moved to ${ISSUE_STATUS_LABELS[statusSelect.value]}.`, 'success');
+                        await handleRequest();
+                    } catch (error) {
+                        console.error('Issue status error:', error);
+                        statusSelect.value = previousStatus;
+                        showIssueToast('Could not change issue status.', 'error');
+                    }
+                });
+            }
+
+            wireContainerActions(el.list);
+            wireContainerActions(el.kanban);
+            resetIssueForm(getLocalIsoDate());
+        }
+
+        initializeDashboardControls();
+        initializeIssueWorkspace();
 
         // ── GO! ─────────────────────────────────────────────────────
         handleRequest();
