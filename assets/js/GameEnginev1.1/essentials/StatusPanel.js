@@ -21,9 +21,9 @@ class StatusPanel {
     this.fieldElements = new Map();
     this.actionElements = [];
 
-    // NEW: collapse state
     this.isCollapsed = false;
     this.contentContainer = null;
+    this.toggleBtn = null;
   }
 
   getMountTarget() {
@@ -34,15 +34,16 @@ class StatusPanel {
   }
 
   ensureMounted() {
-    if (!this.element || !this.element.isConnected) {
-      this.render();
+    if (this.element && this.element.isConnected) {
+      return this.element;
     }
-    return this.element;
+    return this.render();
   }
 
   render() {
-    if (this.element?.isConnected) {
-      this.element.remove();
+    const existing = document.getElementById(this.config.id);
+    if (existing) {
+      existing.remove();
     }
 
     const panel = document.createElement('section');
@@ -62,6 +63,7 @@ class StatusPanel {
       border: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
       color: this.config.theme.textColor || 'var(--ocs-status-panel-text)',
       boxShadow: this.config.theme.boxShadow || 'none',
+      overflow: 'hidden', // prevents weird visual overflow
     });
 
     // Title
@@ -74,13 +76,15 @@ class StatusPanel {
     });
     title.textContent = this.config.title;
 
-    // Header (title + collapse button)
+    // Header
     const header = this.createHeader(title);
 
-    // Content container (this gets hidden on collapse)
+    // Content container (EVERYTHING goes inside here)
     const content = document.createElement('div');
     this.contentContainer = content;
+
     this.fieldElements.clear();
+
     for (const field of this.config.fields) {
       if (field.type === 'section') {
         const section = document.createElement('div');
@@ -91,8 +95,7 @@ class StatusPanel {
           letterSpacing: '1px',
         });
         section.textContent = field.title;
-
-        content.appendChild(section); // ✅ correct
+        content.appendChild(section);
         continue;
       }
 
@@ -100,11 +103,10 @@ class StatusPanel {
       row.dataset.field = field.key;
       row.textContent = `${field.label}: ${field.emptyValue || '—'}`;
 
-      content.appendChild(row); // ✅ MUST be here
+      content.appendChild(row);
       this.fieldElements.set(field.key, row);
     }
 
-    // Actions
     if (this.config.actions && this.config.actions.length > 0) {
       const actionsContainer = document.createElement('div');
       Object.assign(actionsContainer.style, {
@@ -122,11 +124,9 @@ class StatusPanel {
         const btn = document.createElement('button');
         btn.textContent = action.label;
 
-        if (action.title) {
-          btn.title = action.title;
-        }
+        if (action.title) btn.title = action.title;
 
-        const bgColor = action.danger 
+        const bgColor = action.danger
           ? '#d32f2f'
           : (this.config.theme.secondaryButtonBackground || 'var(--ocs-status-panel-button-bg)');
         const textColor = action.danger
@@ -174,6 +174,10 @@ class StatusPanel {
       content.appendChild(actionsContainer);
     }
 
+    if (this.isCollapsed) {
+      content.style.display = 'none';
+    }
+
     panel.appendChild(header);
     panel.appendChild(content);
 
@@ -194,7 +198,7 @@ class StatusPanel {
     });
 
     const toggleBtn = document.createElement('button');
-    toggleBtn.textContent = '−';
+    this.toggleBtn = toggleBtn;
 
     Object.assign(toggleBtn.style, {
       background: 'transparent',
@@ -205,19 +209,16 @@ class StatusPanel {
       fontWeight: 'bold',
     });
 
+    toggleBtn.textContent = this.isCollapsed ? '+' : '−';
+
     toggleBtn.onclick = () => {
       this.isCollapsed = !this.isCollapsed;
 
       if (this.isCollapsed) {
         this.contentContainer.style.display = 'none';
-
-        // shrink panel when collapsed
-        this.element.style.height = 'auto';
         this.element.style.paddingBottom = '6px';
       } else {
         this.contentContainer.style.display = 'block';
-
-        // restore padding
         this.element.style.paddingBottom = this.config.padding;
       }
 
