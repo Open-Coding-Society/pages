@@ -1,0 +1,42 @@
+source:
+  repo: "/Users/neahadian/community-backend"
+  database: "/Users/neahadian/community-backend/community-backend.db"
+  table: "task data"
+  synced_at: "2026-04-20"
+rows:
+  - userName: "Character 1"
+    taskName: "do laundry"
+    room: 1
+    completed: false
+  - userName: "Character 1"
+    taskName: "take out trash"
+    room: 1
+    completed: false
+  - userName: "Character 1"
+    taskName: "wash dishes"
+    room: 1
+    completed: false
+  - userName: "brisk-badger907"
+    taskName: "do laundry"
+    room: 1
+    completed: true
+  - userName: "brisk-badger907"
+    taskName: "take out trash"
+    room: 1
+    completed: true
+  - userName: "nimble-lynx892"
+    taskName: "do laundry"
+    room: 1
+    completed: true
+  - userName: "DebugUser"
+    taskName: "debug-assign-1"
+    room: 99
+    completed: false
+  - userName: "DebugUser"
+    taskName: "debug-complete-1"
+    room: 99
+    completed: true
+  - userName: "DebugUser2"
+    taskName: "debug-complete-2"
+    room: 100
+    completed: true
