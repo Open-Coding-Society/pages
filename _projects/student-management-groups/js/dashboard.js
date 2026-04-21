@@ -1,20 +1,4 @@
----
-layout: aesthetihawk
-title: Group Dashboard
-type: issues
-permalink: /student/groups/dashboard/legacy
-comments: false
----
-
-<!-- 
-  This page serves as a dynamic dashboard for individual groups.
-  The group name is passed via URL query parameter: /student/groups/dashboard?group=group-name
--->
-
-{% include group_dashboard.html %}
-
-<script type="module">
-  import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+import { javaURI, pythonURI, fetchOptions } from '/assets/js/api/config.js';
 
   // ---------------------------------------------
   // CONFIG: Constants + error catalog
@@ -795,7 +779,7 @@ comments: false
    * Used when no group parameter is provided in URL
    */
   function redirectToGroupsList() {
-    window.location.href = '{{site.baseurl}}/student/groups';
+    window.location.href = '/student/groups';
   }
 
   /**
@@ -898,4 +882,3 @@ comments: false
 
   // Entry point: Load dashboard when page is ready
   document.addEventListener('DOMContentLoaded', loadGroupDashboard);
-</script>
