@@ -214,6 +214,68 @@ active_tab: calendar
         font-size: 0.92rem;
     }
 
+    .issue-markdown-preview {
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        background: rgba(15, 23, 42, 0.58);
+        padding: 12px;
+    }
+
+    .issue-markdown-preview h1,
+    .issue-markdown-preview h2,
+    .issue-markdown-preview h3 {
+        margin: 0 0 8px;
+        color: #f8fafc;
+        font-weight: 800;
+        line-height: 1.15;
+    }
+
+    .issue-markdown-preview h1 { font-size: 1.35rem; }
+    .issue-markdown-preview h2 { font-size: 1.18rem; }
+    .issue-markdown-preview h3 { font-size: 1.05rem; }
+
+    .issue-markdown-preview p {
+        margin: 0 0 8px;
+        line-height: 1.55;
+        color: #dbeafe;
+    }
+
+    .issue-markdown-preview ul {
+        margin: 0 0 8px 18px;
+        padding: 0;
+        color: #dbeafe;
+    }
+
+    .issue-markdown-preview li {
+        margin: 4px 0;
+    }
+
+    .issue-markdown-preview code {
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 6px;
+        padding: 1px 5px;
+        color: #f8fafc;
+        font-size: 0.9em;
+    }
+
+    .issue-markdown-preview a {
+        color: #93c5fd;
+        text-decoration: underline;
+    }
+
+    .issue-markdown-empty {
+        color: #94a3b8;
+        font-style: italic;
+        margin: 0;
+    }
+
+    .issue-author {
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+
     .issue-meta {
         color: #94a3b8;
         font-size: 0.82rem;
@@ -370,6 +432,13 @@ active_tab: calendar
                 <div>
                     <label for="issue-description">Description</label>
                     <textarea id="issue-description" rows="4" placeholder="Add details"></textarea>
+                </div>
+
+                <div>
+                    <label>Live Markdown Preview</label>
+                    <div id="issue-description-preview" class="issue-markdown-preview">
+                        <p class="issue-markdown-empty">Preview will appear here as you type.</p>
+                    </div>
                 </div>
 
                 <div class="issue-form-grid">
@@ -637,6 +706,76 @@ active_tab: calendar
         return s ? String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;") : '';
     }
 
+    function getCurrentIssueAuthor() {
+        return (window.user && (window.user.uid || window.user.name)) || '';
+    }
+
+    function renderInlineMarkdown(text) {
+        const escaped = escapeIssueText(String(text || ''));
+        return escaped
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    }
+
+    function renderIssueMarkdown(text) {
+        const source = String(text || '').replace(/\r\n/g, '\n');
+        if (!source.trim()) {
+            return '<p class="issue-markdown-empty">No description provided.</p>';
+        }
+
+        const lines = source.split('\n');
+        const html = [];
+        let inList = false;
+
+        const closeList = () => {
+            if (inList) {
+                html.push('</ul>');
+                inList = false;
+            }
+        };
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) {
+                closeList();
+                continue;
+            }
+
+            const headingMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
+            if (headingMatch) {
+                closeList();
+                const headingLevel = headingMatch[1].length;
+                html.push(`<h${headingLevel}>${renderInlineMarkdown(headingMatch[2])}</h${headingLevel}>`);
+                continue;
+            }
+
+            const listMatch = trimmed.match(/^[-*]\s+(.*)$/);
+            if (listMatch) {
+                if (!inList) {
+                    html.push('<ul>');
+                    inList = true;
+                }
+                html.push(`<li>${renderInlineMarkdown(listMatch[1])}</li>`);
+                continue;
+            }
+
+            closeList();
+            html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`);
+        }
+
+        closeList();
+        return html.join('');
+    }
+
+    function updateIssueDescriptionPreview() {
+        const preview = document.getElementById('issue-description-preview');
+        const description = document.getElementById('issue-description');
+        if (!preview || !description) return;
+        preview.innerHTML = renderIssueMarkdown(description.value);
+    }
+
     function getLocalIsoDate(date = new Date()) {
         const localDate = new Date(date);
         const timezoneOffset = localDate.getTimezoneOffset() * 60000;
@@ -716,6 +855,7 @@ active_tab: calendar
     document.addEventListener("DOMContentLoaded", async function () {
         userGroups = await fetchUserGroups();
         populateGroupDropdown();
+            document.getElementById('issue-description')?.addEventListener('input', updateIssueDescriptionPreview);
 
         let currentEvent = null;
         let isAddingNewEvent = false;
@@ -794,6 +934,7 @@ active_tab: calendar
             if (el.priority) el.priority.value = 'medium';
             if (el.dueDate) el.dueDate.value = preserveDate || el.filterDate?.value || getLocalIsoDate();
             if (el.saveBtn) el.saveBtn.textContent = 'Create Issue';
+            updateIssueDescriptionPreview();
             renderIssueViews();
         }
 
@@ -809,6 +950,7 @@ active_tab: calendar
             if (el.eventId) el.eventId.value = issue.eventId || '';
             if (el.tags) el.tags.value = normalizeTags(issue.tags).join(', ');
             if (el.saveBtn) el.saveBtn.textContent = 'Update Issue';
+            updateIssueDescriptionPreview();
             switchIssuesSubtab('create');
             el.title?.focus();
             switchDashboardTab('issues');
@@ -863,7 +1005,8 @@ active_tab: calendar
                                 <span class="issue-pill ${escapeIssueText(priority)}">${escapeIssueText(priority.toUpperCase())}</span>
                             </div>
                         </div>
-                        <div class="issue-description">${escapeIssueText(issue.description || 'No description provided.')}</div>
+                        <div class="issue-description issue-markdown-preview">${renderIssueMarkdown(issue.description || '')}</div>
+                        <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
                         <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}${issue.eventId ? ` · Event ${escapeIssueText(issue.eventId)}` : ''}</div>
                         ${tags.length ? `<div class="issue-tags">${tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('')}</div>` : ''}
                         <div class="issue-card-footer">
@@ -872,7 +1015,7 @@ active_tab: calendar
                             </select>
                             <div style="display:flex;gap:8px;">
                                 <button type="button" class="calendar-issue-action-btn secondary" data-action="edit" data-issue-id="${escapeIssueText(issue.id)}">Edit</button>
-                                <button type="button" class="calendar-issue-action-btn danger" data-action="delete" data-issue-id="${escapeIssueText(issue.id)}">Delete</button>
+                                <button type="button" class="calendar-issue-action-btn danger" data-action="delete" data-issue-id="${escapeIssueText(issue.id)}" ${issue.author && getCurrentIssueAuthor() && issue.author !== getCurrentIssueAuthor() ? 'disabled title="Only the author can delete this issue"' : ''}>Delete</button>
                             </div>
                         </div>
                     </article>
@@ -899,6 +1042,7 @@ active_tab: calendar
                         ${statusIssues.length ? statusIssues.map(issue => `
                             <article class="kanban-item" data-issue-id="${escapeIssueText(issue.id)}">
                                 <div class="issue-card-title">${escapeIssueText(issue.title || 'Untitled issue')}</div>
+                                <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
                                 <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</div>
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                     <span class="issue-pill ${escapeIssueText(issue.priority || 'medium')}">${escapeIssueText((issue.priority || 'medium').toUpperCase())}</span>
@@ -917,6 +1061,7 @@ active_tab: calendar
             const filteredIssues = getFilteredIssues();
             renderIssueList(filteredIssues);
             renderKanban(filteredIssues);
+            updateIssueDescriptionPreview();
         }
 
         async function upsertIssue(isEdit, payload) {
