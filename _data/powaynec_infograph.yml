@@ -30,11 +30,11 @@ Topics:
         link: "https://pnec.opencodingsociety.com/#chatbot-trigger-btn"
         link_label: "Open Chatbot"
         impact: "Preparedness questions can be answered quickly."
-      - title: "Emergency Escape Room mini game."
+      - title: "Emergency Situational Mini Game."
         link: "https://pnec.opencodingsociety.com/pages/escape-room.html"
-        link_label: "Open Escape Room"
+        link_label: "Open Mini Game"
         images:
-          - "PNECGame.png"
+          - "PNECMiniGame.png"
         impact: "The game gives younger learners an accessible way to practice preparedness."
     status: "Prototype"
     team:
