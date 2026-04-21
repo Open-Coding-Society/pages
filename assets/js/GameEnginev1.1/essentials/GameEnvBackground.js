@@ -7,12 +7,41 @@ export class GameEnvBackground extends GameObject {
     constructor(data = null, gameEnv = null) {
         super(gameEnv);
         this.data = data; // Store the data for identification
-        if (data.src) {
-            this.image = new Image();
-            this.image.src = data.src;
-        } else {
-            this.image = null;
-        }
+
+        this.image = null;
+        this.imageReady = false;
+
+        const primarySrc = data?.src;
+        const fallbackSrc = data?.fallbackSrc;
+        if (!primarySrc) return;
+
+        const loadImage = (src, { onFail } = {}) => {
+            const img = new Image();
+            // Attach handlers BEFORE setting src (avoid races).
+            img.onload = () => {
+                this.image = img;
+                this.imageReady = true;
+            };
+            img.onerror = () => {
+                if (typeof onFail === 'function') onFail();
+                else {
+                    this.image = null;
+                    this.imageReady = false;
+                }
+            };
+            img.src = src;
+        };
+
+        loadImage(primarySrc, {
+            onFail: () => {
+                if (fallbackSrc && typeof fallbackSrc === 'string') {
+                    loadImage(fallbackSrc);
+                } else {
+                    this.image = null;
+                    this.imageReady = false;
+                }
+            }
+        });
     }
 
     
@@ -26,8 +55,7 @@ export class GameEnvBackground extends GameObject {
         const width = this.gameEnv.innerWidth;
         const height = this.gameEnv.innerHeight;
 
-        if (this.image) {
-            // Draw the background image scaled to the canvas size
+        if (this.image && this.imageReady && this.image.complete && this.image.naturalWidth > 0) {
             ctx.drawImage(this.image, 0, 0, width, height);
         } else {
             // Fill the canvas with fillstyle color if no image is provided

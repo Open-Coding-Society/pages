@@ -28,6 +28,8 @@ class GameLevelAirport {
     const image_data_desert = {
       id: 'Airport-Background',
       src: image_src_desert,
+      // Fallback so the level doesn't render broken if map.png is missing.
+      fallbackSrc: path + "/images/gamify/map.svg",
       pixels: { height: 580, width: 386 }
     };
 
@@ -623,11 +625,12 @@ class GameLevelAirport {
     const sprite_data_options_gate = {
       id: 'Options-Gate-NPC',
       greeting: 'Complete the airport NPC interactions to unlock the next map.',
-      src: path + "/images/gamify/miningRigMan.png",
-      SCALE_FACTOR: 6,
+      src: path + "/images/gamify/level-gate.svg",
+      SCALE_FACTOR: 2.2,
       ANIMATION_RATE: 50,
-      pixels: { height: 400, width: 354 },
-      INIT_POSITION: { x: width * 0.83, y: height * 0.2 },
+      pixels: { height: 512, width: 512 },
+      // Center-ish so it's obvious where to go next
+      INIT_POSITION: { x: width * 0.52, y: height * 0.48 },
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.05, heightPercentage: 0.08 },

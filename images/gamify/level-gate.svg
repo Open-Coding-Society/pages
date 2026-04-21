@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="frame" x1="0" x2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#102a2a"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0" x2="1">
+      <stop offset="0" stop-color="#39ffb6"/>
+      <stop offset="1" stop-color="#00c2ff"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feColorMatrix in="b" type="matrix"
+        values="0 0 0 0 0.2  0 0 0 0 1  0 0 0 0 0.72  0 0 0 0.55 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" fill="none"/>
+
+  <!-- gate base -->
+  <g filter="url(#glow)">
+    <path d="M112 468V164c0-18 10-32 24-32h240c14 0 24 14 24 32v304"
+          fill="url(#frame)" stroke="url(#neon)" stroke-width="10" stroke-linejoin="round"/>
+
+    <!-- inner portal -->
+    <path d="M160 468V192c0-10 6-18 14-18h164c8 0 14 8 14 18v276"
+          fill="#060c12" stroke="#39ffb6" stroke-opacity="0.6" stroke-width="6"/>
+
+    <!-- scan lines -->
+    <g opacity="0.35" stroke="#00c2ff" stroke-width="3">
+      <path d="M176 250H336"/>
+      <path d="M176 292H336"/>
+      <path d="M176 334H336"/>
+      <path d="M176 376H336"/>
+    </g>
+
+    <!-- top sign -->
+    <rect x="132" y="78" width="248" height="70" rx="18"
+          fill="#08131c" stroke="url(#neon)" stroke-width="8"/>
+    <text x="256" y="123" text-anchor="middle"
+          font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace"
+          font-size="22" fill="#c7fff0" opacity="0.9">
+      NEXT MAP
+    </text>
+
+    <!-- floor -->
+    <rect x="92" y="468" width="328" height="26" rx="10" fill="#061018" stroke="#39ffb6" stroke-opacity="0.5" stroke-width="6"/>
+  </g>
+</svg>
