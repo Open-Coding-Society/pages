@@ -7,10 +7,10 @@ import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
 
 /**
- * GameLevel CS Pathway - Analytics Observatory
+ * GameLevel CS Pathway - Assessment Observatory
  * 
  * This level introduces students to their personal analytics and learning metrics.
- * An Analytics Guide NPC provides insights into:
+ * An Assessment Hub with NPCs provides insights into:
  * - User profile (email, uid, name)
  * - GitHub contribution stats (commits, PRs, issues)
  * - Skill metrics and progress
@@ -18,13 +18,13 @@ import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
  * - Learning journey overview
  */
 class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
-  static levelId = 'analytics-observatory';
-  static displayName = 'Analytics Observatory';
+  static levelId = 'assessment-observatory';
+  static displayName = 'Assessment Observatory';
 
   constructor(gameEnv) {
     super(gameEnv, {
       levelDisplayName: GameLevelCsPath3Analytics.displayName,
-      logPrefix: 'Analytics Observatory',
+      logPrefix: 'Assessment Observatory',
     });
 
     let { width, height, path } = this.getLevelDimensions();
@@ -34,10 +34,10 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/projects/cs-pathway-game/bg3/analytics-observatory-fantasy.png";
+    const image_src = path + "/images/projects/cs-pathway-game/bg3/assessment-observatory-fantasy.png";
     const bg_data = {
         name: GameLevelCsPath3Analytics.displayName,
-        greeting: "Welcome to the Analytics Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
+        greeting: "Welcome to the Assessment Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
         src: image_src,
     };
 
@@ -52,7 +52,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     const PLAYER_SCALE_FACTOR = 5;
     const player_data = {
       id: 'Minimalist_Identity',
-      greeting: "Welcome to the Analytics Observatory! Let's explore your learning journey.",
+      greeting: "Welcome to the Assessment Observatory! Let's explore your learning journey.",
       src: player_src,
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 1000,
@@ -78,14 +78,20 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     });
 
     // ── NPC Positions ──────────────────────────────────────────────
-    // Position NPCs on opposite sides of screen, centered vertically
+    // Position NPCs along pathway progression
     const analyticsGuidePos = {
-      x: width * 0.30,
+      x: width * 0.20,
       y: height * 0.35,
     };
 
     const githubMetricsPos = {
-      x: width * 0.60,
+      x: width * 0.50,
+      y: height * 0.35,
+    };
+
+    // Self-evaluation NPC at end of pathway
+    const selfEvalPos = {
+      x: width * 0.80,
       y: height * 0.35,
     };
 
@@ -130,11 +136,26 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       },
     });
 
-    // GitHub Metrics NPC - shows contribution statistics
+    // Self-Evaluation NPC - end-of-sprint reflection (at 50%)
+    const npc_data_selfEval = createGatekeeperData({
+      id: 'SelfEvaluator',
+      greeting: 'Welcome to the mid-sprint assessment station! Here you can evaluate your progress, assess your skills, and reflect on your learning. Press E to begin your self-evaluation.',
+      position: githubMetricsPos,
+      reaction: function() {
+        if (level?.showToast) {
+          level.showToast('Self-Evaluator: Press E to reflect on your sprint');
+        }
+      },
+      interact: async function() {
+        await level.showSelfEvaluation();
+      },
+    });
+
+    // GitHub Metrics NPC - shows contribution statistics (at 80%)
     const npc_data_githubGuide = createGatekeeperData({
       id: 'GitHubGuide',
-      greeting: 'Explore your GitHub contribution metrics: commits, pull requests, issues, and code changes.',
-      position: githubMetricsPos,
+      greeting: 'Welcome to the GitHub contributions hub! Explore your GitHub contribution metrics: commits, pull requests, issues, and code changes.',
+      position: selfEvalPos,
       reaction: function() {
         if (level?.showToast) {
           level.showToast('GitHub Guide: Press E to see your GitHub stats');
@@ -151,6 +172,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       { class: Player, data: player_data },
       { class: Npc, data: npc_data_analyticsGuide },
       { class: Npc, data: npc_data_githubGuide },
+      { class: Npc, data: npc_data_selfEval },
     ];
 
     // FriendlyNpc expects these level references for toast routing
@@ -161,15 +183,15 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     this.cachedUserData = null;
     this.dataLoaded = Promise.resolve().then(() => this.fetchUserData()).then((data) => {
       this.cachedUserData = data;
-      console.log('Analytics Observatory: Data preloaded', data);
+      console.log('Assessment Observatory: Data preloaded', data);
       return data;
     }).catch((err) => {
-      console.error('Analytics Observatory: Failed to preload data', err);
+      console.error('Assessment Observatory: Failed to preload data', err);
     });
 
     // Dialogue: Sequential helper.
     this.levelDialogueSystem = new DialogueSystem({
-      id: 'analytics-observatory-dialogue',
+      id: 'assessment-observatory-dialogue',
       dialogues: [],
       gameControl: gameEnv.gameControl,
       enableVoice: true,
@@ -237,98 +259,60 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       });
     }.bind(this);
 
-    // Toast: Show status message.
-    this.showToast = function(message) {
-      if (message === 'Press E to interact') {
-        return;
-      }
-
-      const host = document.body;
-      if (!host) return;
-
-      if (this._toastEl?.parentNode) {
-        this._toastEl.parentNode.removeChild(this._toastEl);
-      }
-      if (this._toastTimer) {
-        clearTimeout(this._toastTimer);
-      }
-
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px;
-        z-index: 1200; pointer-events: none;
-        background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-        color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-        padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-        box-shadow: 0 0 20px rgba(78,204,163,0.25);
-        width: min(360px, 32vw); text-align: left;
-      `;
-      toast.textContent = message;
-      host.appendChild(toast);
-
-      this._toastEl = toast;
-      this._toastTimer = setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-        if (this._toastEl === toast) this._toastEl = null;
-        this._toastTimer = null;
-      }, 2200);
-    }.bind(this);
   }
 
   /**
-   * Show complete analytics dashboard
+   * Show complete analytics dashboard with dialogue + accumulating toasts
    */
   async showAnalyticsDashboard() {
-    // Wait for preloaded data
-    await this.dataLoaded;
-    
-    // Use cached data if available
-    const userData = this.cachedUserData || await this.fetchUserData();
-    
-    if (!userData || !userData.analyticsSummary) {
-      await this.showDialogue('Analytics Guide', [
-        'Unable to load your analytics.',
-        'Please ensure you are logged in.',
-      ]);
-      return;
+    try {
+      // Wait for preloaded data
+      await this.dataLoaded;
+      
+      // Use cached data if available
+      const userData = this.cachedUserData || await this.fetchUserData();
+      
+      if (!userData || !userData.analyticsSummary) {
+        this.showToast('Unable to load your analytics. Please ensure you are logged in.');
+        return;
+      }
+
+      const s = userData.analyticsSummary;
+      
+      // Build dialogue lines
+      const stats = [
+        `Analytics for ${userData.name || 'Student'}`,
+        `Email: ${userData.email || 'Not set'}`,
+        `UID: ${userData.uid || 'Not set'}`,
+        '',
+        'Time & Engagement:',
+        `Total Time Spent: ${s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h'}`,
+        `Avg Session: ${s.averageSessionDurationSeconds ? this.formatTime(s.averageSessionDurationSeconds * 1000) : '0m'}`,
+        `Code Executions: ${s.totalCodeExecutions || 0}`,
+        `Engagement: ${((s.interactionPercentage || 0).toFixed(1))}%`,
+        `Accuracy: ${((s.averageAccuracyPercentage || 0).toFixed(1))}%`,
+        '',
+        'Learning Progress:',
+        `Lessons Viewed: ${s.totalLessonsViewed || 0}`,
+        `Lessons Completed: ${s.totalLessonsCompleted || 0}`,
+        `Scroll Depth: ${((s.averageScrollDepth || 0).toFixed(0))}%`,
+        `Copy/Paste: ${s.totalCopyPasteAttempts || 0}`,
+        '',
+        'Keep pushing forward! You are making progress!',
+      ];
+
+      // Show dialogue while toasts accumulate
+      this.showDialogue('Analytics Guide', stats);
+      
+      // Simultaneously show toasts
+      for (const stat of stats) {
+        this.showToast(stat);
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
+    } catch (err) {
+      console.error('Error showing analytics:', err);
+      this.showToast('Error loading analytics');
     }
-
-    const s = userData.analyticsSummary;
-    
-    const timeSpent = s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h';
-    const codeRuns = s.totalCodeExecutions || 0;
-    const lessonsViewed = s.totalLessonsViewed || 0;
-    const lessonsCompleted = s.totalLessonsCompleted || 0;
-    const engagement = ((s.interactionPercentage || 0).toFixed(1)) + '%';
-    const scrollDepth = ((s.averageScrollDepth || 0).toFixed(0)) + '%';
-    const avgSessionDuration = s.averageSessionDurationSeconds ? this.formatTime(s.averageSessionDurationSeconds * 1000) : '0m';
-    const accuracy = ((s.averageAccuracyPercentage || 0).toFixed(1)) + '%';
-    const copyPaste = s.totalCopyPasteAttempts || 0;
-    
-    const messages = [
-      'Your Learning Analytics:',
-      '',
-      `Name: ${userData.name || 'Not set'}`,
-      `Email: ${userData.email || 'Not set'}`,
-      `UID: ${userData.uid || 'Not set'}`,
-      '',
-      'Time & Engagement:',
-      `Total Time Spent: ${timeSpent}`,
-      `Avg Session Duration: ${avgSessionDuration}`,
-      `Code Executions: ${codeRuns}`,
-      `Engagement Rate: ${engagement}`,
-      `Accuracy: ${accuracy}`,
-      '',
-      'Learning Progress:',
-      `Lessons Viewed: ${lessonsViewed}`,
-      `Lessons Completed: ${lessonsCompleted}`,
-      `Scroll Depth: ${scrollDepth}`,
-      `Copy/Paste Attempts: ${copyPaste}`,
-      '',
-      'You are making excellent progress!',
-    ];
-
-    await this.showDialogue('Analytics Guide', messages);
   }
 
   /**
@@ -369,42 +353,329 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Show GitHub contribution statistics
+   * Show GitHub contribution statistics with dialogue + accumulating toasts
    */
   async showGitHubStats() {
-    // Wait for preloaded data
-    await this.dataLoaded;
-    
-    // Use cached data if available
-    const userData = this.cachedUserData || await this.fetchUserData();
-    
-    if (!userData || !userData.github) {
-      await this.showDialogue('GitHub Guide', [
-        'No GitHub data available.',
-        'Connect your GitHub account in the Dashboard.',
-      ]);
-      return;
+    try {
+      // Wait for preloaded data
+      await this.dataLoaded;
+      
+      // Use cached data if available
+      const userData = this.cachedUserData || await this.fetchUserData();
+      
+      if (!userData || !userData.github) {
+        this.showToast('No GitHub data available. Connect your GitHub account in the Dashboard.');
+        return;
+      }
+
+      const gh = userData.github;
+      const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
+      
+      // Build dialogue lines
+      const stats = [
+        'Your GitHub Contributions:',
+        '',
+        `Total Commits: ${gh.commits || 0}`,
+        `Pull Requests: ${gh.prs || 0}`,
+        `Issues Reported: ${gh.issues || 0}`,
+        '',
+        `Lines Added: +${gh.linesAdded || 0}`,
+        `Lines Deleted: -${gh.linesDeleted || 0}`,
+        `Total Edits: ${totalEdits}`,
+        '',
+        'Your code shows dedication and growth!',
+      ];
+
+      // Show dialogue while toasts accumulate
+      this.showDialogue('GitHub Guide', stats);
+      
+      // Simultaneously show toasts
+      for (const stat of stats) {
+        this.showToast(stat);
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
+    } catch (err) {
+      console.error('Error showing GitHub stats:', err);
+      this.showToast('Error loading GitHub stats');
     }
+  }
 
-    const gh = userData.github;
-    const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
-    
-    const messages = [
-      'Your GitHub Contribution Stats:',
-      '',
-      `Total Commits: ${gh.commits || 0}`,
-      `Pull Requests: ${gh.prs || 0}`,
-      `Issues Reported: ${gh.issues || 0}`,
-      '',
-      `Lines Added: +${gh.linesAdded || 0}`,
-      `Lines Deleted: -${gh.linesDeleted || 0}`,
-      `Total Edits: ${totalEdits}`,
-      '',
-      'Your code contributions show dedication!',
-      'Keep coding and collaborating!',
-    ];
+  /**
+   * Show interactive end-of-sprint self-evaluation with sliders
+   */
+  async showSelfEvaluation() {
+    try {
+      // Create evaluation modal overlay
+      const modal = document.createElement('div');
+      modal.id = 'self-eval-modal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      `;
 
-    await this.showDialogue('GitHub Guide', messages);
+      const container = document.createElement('div');
+      container.style.cssText = `
+        background: #1a1a1a;
+        border: 2px solid #3b82f6;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        color: #e5e7eb;
+        font-family: Arial, sans-serif;
+      `;
+
+      // Title
+      const title = document.createElement('h2');
+      title.textContent = 'Sprint Self-Evaluation';
+      title.style.cssText = 'margin-top: 0; color: #60a5fa; margin-bottom: 20px; font-size: 24px;';
+      container.appendChild(title);
+
+      // Instructions
+      const instructions = document.createElement('p');
+      instructions.textContent = 'Rate your skills on a scale of 1-5 for this sprint:';
+      instructions.style.cssText = 'color: #9ca3af; margin-bottom: 20px; font-size: 14px;';
+      container.appendChild(instructions);
+
+      // Skills to evaluate
+      const skills = [
+        { id: 'communication', label: 'Communication & Collaboration', category: 'soft' },
+        { id: 'problem_solving', label: 'Problem Solving & Creativity', category: 'soft' },
+        { id: 'perseverance', label: 'Perseverance & Growth Mindset', category: 'soft' },
+        { id: 'time_mgmt', label: 'Time Management & Organization', category: 'soft' },
+        { id: 'code_quality', label: 'Code Quality & Best Practices', category: 'hard' },
+        { id: 'debugging', label: 'Debugging & Testing', category: 'hard' },
+        { id: 'algorithms', label: 'Algorithm Understanding', category: 'hard' },
+        { id: 'optimization', label: 'Performance Optimization', category: 'hard' },
+      ];
+
+      const sliderValues = {};
+
+      // Soft Skills Section
+      const softTitle = document.createElement('h3');
+      softTitle.textContent = 'Soft Skills';
+      softTitle.style.cssText = 'color: #10b981; margin-top: 20px; margin-bottom: 15px; font-size: 16px;';
+      container.appendChild(softTitle);
+
+      // Hard Skills Section
+      const hardTitle = document.createElement('h3');
+      hardTitle.textContent = 'Hard Coding Skills';
+      hardTitle.style.cssText = 'color: #f59e0b; margin-top: 20px; margin-bottom: 15px; font-size: 16px;';
+
+      // Add sliders for soft skills
+      let firstHardSkillIndex = -1;
+      skills.forEach((skill, idx) => {
+        if (skill.category === 'hard' && firstHardSkillIndex === -1) {
+          firstHardSkillIndex = idx;
+          container.appendChild(hardTitle);
+        }
+
+        const sliderBox = document.createElement('div');
+        sliderBox.style.cssText = 'margin-bottom: 15px;';
+
+        const label = document.createElement('label');
+        label.textContent = skill.label;
+        label.style.cssText = 'display: block; font-size: 13px; margin-bottom: 5px; color: #d1d5db;';
+        sliderBox.appendChild(label);
+
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.min = '1';
+        slider.max = '5';
+        slider.value = '3';
+        slider.style.cssText = 'width: 100%; cursor: pointer;';
+        sliderValues[skill.id] = 3;
+
+        const valueDisplay = document.createElement('span');
+        valueDisplay.textContent = '3 / 5';
+        valueDisplay.style.cssText = 'float: right; color: #60a5fa; font-size: 12px; font-weight: bold;';
+        label.appendChild(valueDisplay);
+
+        slider.addEventListener('input', (e) => {
+          sliderValues[skill.id] = parseInt(e.target.value);
+          valueDisplay.textContent = `${e.target.value} / 5`;
+        });
+
+        sliderBox.appendChild(slider);
+        container.appendChild(sliderBox);
+      });
+
+      // Buttons
+      const buttonBox = document.createElement('div');
+      buttonBox.style.cssText = 'margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;';
+
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.style.cssText = `
+        padding: 10px 20px;
+        background: #4b5563;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      `;
+      cancelBtn.onclick = () => modal.remove();
+
+      const submitBtn = document.createElement('button');
+      submitBtn.textContent = 'Submit & Predict Grade';
+      submitBtn.style.cssText = `
+        padding: 10px 20px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      `;
+      submitBtn.onclick = async () => {
+        await this.submitSelfEvaluation(sliderValues);
+        modal.remove();
+      };
+
+      buttonBox.appendChild(cancelBtn);
+      buttonBox.appendChild(submitBtn);
+      container.appendChild(buttonBox);
+
+      modal.appendChild(container);
+      document.body.appendChild(modal);
+    } catch (err) {
+      console.error('Error showing self-evaluation:', err);
+      this.showToast('Error loading self-evaluation');
+    }
+  }
+
+  /**
+   * Submit self-evaluation and show grade prediction
+   */
+  async submitSelfEvaluation(sliderValues) {
+    try {
+      // Calculate weighted score
+      const softSkills = ['communication', 'problem_solving', 'perseverance', 'time_mgmt'];
+      const hardSkills = ['code_quality', 'debugging', 'algorithms', 'optimization'];
+
+      const softAvg = softSkills.reduce((sum, id) => sum + (sliderValues[id] || 0), 0) / softSkills.length;
+      const hardAvg = hardSkills.reduce((sum, id) => sum + (sliderValues[id] || 0), 0) / hardSkills.length;
+
+      // Weighted: 40% soft skills, 60% hard skills
+      const overallScore = (softAvg * 0.4 + hardAvg * 0.6);
+
+      // Convert to grade
+      let grade, gradeColor;
+      if (overallScore >= 4.5) {
+        grade = 'A (Excellent)';
+        gradeColor = '#10b981';
+      } else if (overallScore >= 4.0) {
+        grade = 'A- (Very Good)';
+        gradeColor = '#10b981';
+      } else if (overallScore >= 3.5) {
+        grade = 'B+ (Good)';
+        gradeColor = '#60a5fa';
+      } else if (overallScore >= 3.0) {
+        grade = 'B (Satisfactory)';
+        gradeColor = '#60a5fa';
+      } else if (overallScore >= 2.5) {
+        grade = 'C (Needs Improvement)';
+        gradeColor = '#f59e0b';
+      } else {
+        grade = 'F (Below Expectations)';
+        gradeColor = '#ef4444';
+      }
+
+      // Show result
+      const resultModal = document.createElement('div');
+      resultModal.id = 'eval-result-modal';
+      resultModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10001;
+      `;
+
+      const resultContainer = document.createElement('div');
+      resultContainer.style.cssText = `
+        background: #1a1a1a;
+        border: 2px solid #3b82f6;
+        border-radius: 12px;
+        padding: 40px;
+        max-width: 400px;
+        text-align: center;
+        color: #e5e7eb;
+      `;
+
+      const resultTitle = document.createElement('h2');
+      resultTitle.textContent = 'Your Sprint Grade';
+      resultTitle.style.cssText = 'color: #60a5fa; margin-bottom: 30px; font-size: 28px;';
+      resultContainer.appendChild(resultTitle);
+
+      const gradeDisplay = document.createElement('div');
+      gradeDisplay.textContent = grade;
+      gradeDisplay.style.cssText = `
+        font-size: 48px;
+        font-weight: bold;
+        color: ${gradeColor};
+        margin-bottom: 20px;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+      `;
+      resultContainer.appendChild(gradeDisplay);
+
+      const scoreText = document.createElement('p');
+      scoreText.textContent = `Score: ${overallScore.toFixed(2)} / 5.0`;
+      scoreText.style.cssText = 'color: #9ca3af; margin-bottom: 20px; font-size: 14px;';
+      resultContainer.appendChild(scoreText);
+
+      const breakdown = document.createElement('div');
+      breakdown.style.cssText = 'text-align: left; margin: 20px 0; font-size: 13px; color: #d1d5db;';
+      breakdown.innerHTML = `
+        <p>Soft Skills Average: <span style="color: #10b981; font-weight: bold;">${softAvg.toFixed(2)}/5</span></p>
+        <p>Hard Skills Average: <span style="color: #f59e0b; font-weight: bold;">${hardAvg.toFixed(2)}/5</span></p>
+      `;
+      resultContainer.appendChild(breakdown);
+
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Great! Keep improving!';
+      closeBtn.style.cssText = `
+        margin-top: 30px;
+        padding: 12px 24px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        width: 100%;
+      `;
+      closeBtn.onclick = () => {
+        resultModal.remove();
+      };
+      resultContainer.appendChild(closeBtn);
+
+      resultModal.appendChild(resultContainer);
+      document.body.appendChild(resultModal);
+
+      // Show toast celebration
+      this.showToast('Evaluation submitted! Check your grade above.');
+    } catch (err) {
+      console.error('Error submitting evaluation:', err);
+      this.showToast('Error saving evaluation. Please try again.');
+    }
   }
 
   /**
@@ -413,18 +684,18 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    */
   async fetchUserData() {
     try {
-      console.log('Analytics: Starting data fetch...');
+      console.log('Assessment Observatory: Starting data fetch...');
       
       // Fetch user identity from Flask
       const userResponse = await fetch(`${pythonURI}/api/id`, fetchOptions);
       
       if (!userResponse.ok) {
-        console.error('Analytics: User info fetch failed:', userResponse.status);
+        console.error('Assessment Observatory: User info fetch failed:', userResponse.status);
         return null;
       }
 
       const userData = await userResponse.json();
-      console.log('Analytics: User info fetched, uid:', userData.uid);
+      console.log('Assessment Observatory: User info fetched, uid:', userData.uid);
       
       // Fetch all analytics in parallel
       const [analyticsRes, commitsRes, prsRes, issuesRes] = await Promise.all([
@@ -433,15 +704,15 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
           return { ok: false };
         }),
         fetch(`${pythonURI}/api/analytics/github/user/commits`, fetchOptions).catch(e => {
-          console.error('Analytics: GitHub commits fetch threw error:', e);
+          console.error('Assessment Observatory: GitHub commits fetch threw error:', e);
           return { ok: false };
         }),
         fetch(`${pythonURI}/api/analytics/github/user/prs`, fetchOptions).catch(e => {
-          console.error('Analytics: GitHub prs fetch threw error:', e);
+          console.error('Assessment Observatory: GitHub prs fetch threw error:', e);
           return { ok: false };
         }),
         fetch(`${pythonURI}/api/analytics/github/user/issues`, fetchOptions).catch(e => {
-          console.error('Analytics: GitHub issues fetch threw error:', e);
+          console.error('Assessment Observatory: GitHub issues fetch threw error:', e);
           return { ok: false };
         })
       ]);
@@ -450,63 +721,63 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       if (analyticsRes.ok) {
         try {
           const analyticsSummary = await analyticsRes.json();
-          console.log('Analytics: OCS summary received:', analyticsSummary);
+          console.log('Assessment Observatory: OCS summary received:', analyticsSummary);
           userData.analyticsSummary = analyticsSummary;
         } catch (err) {
-          console.error('Analytics: Failed to parse OCS response:', err);
+          console.error('Assessment Observatory: Failed to parse OCS response:', err);
         }
       } else {
-        console.warn('Analytics: OCS response not ok, status:', analyticsRes.status);
+        console.warn('Assessment Observatory: OCS response not ok, status:', analyticsRes.status);
       }
 
       // Process GitHub Commits
       if (commitsRes.ok) {
         try {
           const commitsData = await commitsRes.json();
-          console.log('Analytics: GitHub commits received:', commitsData);
+          console.log('Assessment Observatory: GitHub commits received:', commitsData);
           userData.github = userData.github || {};
           userData.github.commits = commitsData.total_commit_contributions || 0;
           userData.github.linesAdded = commitsData.total_lines_added || 0;
           userData.github.linesDeleted = commitsData.total_lines_deleted || 0;
         } catch (err) {
-          console.error('Analytics: Failed to parse commits response:', err);
+          console.error('Assessment Observatory: Failed to parse commits response:', err);
         }
       } else {
-        console.warn('Analytics: Commits response not ok, status:', commitsRes.status);
+        console.warn('Assessment Observatory: Commits response not ok, status:', commitsRes.status);
       }
 
       // Process GitHub PRs
       if (prsRes.ok) {
         try {
           const prsData = await prsRes.json();
-          console.log('Analytics: GitHub PRs received:', prsData);
+          console.log('Assessment Observatory: GitHub PRs received:', prsData);
           userData.github = userData.github || {};
           userData.github.prs = (prsData.pull_requests || []).length;
         } catch (err) {
-          console.error('Analytics: Failed to parse PRs response:', err);
+          console.error('Assessment Observatory: Failed to parse PRs response:', err);
         }
       } else {
-        console.warn('Analytics: PRs response not ok, status:', prsRes.status);
+        console.warn('Assessment Observatory: PRs response not ok, status:', prsRes.status);
       }
 
       // Process GitHub Issues
       if (issuesRes.ok) {
         try {
           const issuesData = await issuesRes.json();
-          console.log('Analytics: GitHub issues received:', issuesData);
+          console.log('Assessment Observatory: GitHub issues received:', issuesData);
           userData.github = userData.github || {};
           userData.github.issues = (issuesData.issues || []).length;
         } catch (err) {
-          console.error('Analytics: Failed to parse issues response:', err);
+          console.error('Assessment Observatory: Failed to parse issues response:', err);
         }
       } else {
-        console.warn('Analytics: Issues response not ok, status:', issuesRes.status);
+        console.warn('Assessment Observatory: Issues response not ok, status:', issuesRes.status);
       }
 
-      console.log('Analytics: All data fetched, final object:', userData);
+      console.log('Assessment Observatory: All data fetched, final object:', userData);
       return userData;
     } catch (err) {
-      console.error('Analytics: Fatal error in fetchUserData:', err);
+      console.error('Assessment Observatory: Fatal error in fetchUserData:', err);
       return null;
     }
   }
@@ -536,6 +807,10 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     } catch {
       return dateString;
     }
+  }
+
+  destroy() {
+    super.destroy();
   }
 }
 

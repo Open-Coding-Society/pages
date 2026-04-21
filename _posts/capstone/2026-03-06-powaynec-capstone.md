@@ -2,11 +2,15 @@
 toc: false
 layout: post
 title: Poway Neighborhood Emergency Corps
-description: Binary Beasts overview of changes and updates made to PowayNEC website.
+description: Overview of changes and updates made to the Poway NEC website.
 permalink: /capstone/powaynec/
 sticky_rank: 1
 ---
 
-## Binary Beasts
-### Poway NEC
+<style>
+.post-content p, .post-content h3 {
+  color: #ff9a5c !important;
+}
+</style>
+
 {% include powaynec-infograph.html %}
