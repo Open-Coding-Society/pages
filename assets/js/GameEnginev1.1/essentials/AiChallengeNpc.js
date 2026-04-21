@@ -220,7 +220,7 @@ class AiChallengeNpc extends AiNpc {
     // Build the shared AiNpc chat UI shell (input + response area).
     const ui = AiNpc.createChatUI(data);
 
-    // Challenge mode: disable history button (not relevant) and show loading state.
+    // Challenge mode uses an in-panel scrollable chat log instead of a modal transcript.
     if (ui.historyBtn) ui.historyBtn.style.display = 'none';
 
     // Prevent game input while input is focused — but do NOT wire Enter yet;
@@ -231,7 +231,17 @@ class AiChallengeNpc extends AiNpc {
 
     if (ui.responseArea) {
       ui.responseArea.style.display = 'block';
-      ui.responseArea.textContent = 'Generating challenge question…';
+      ui.responseArea.style.maxHeight = '220px';
+      ui.responseArea.style.overflowY = 'auto';
+      ui.responseArea.style.whiteSpace = 'normal';
+      ui.responseArea.style.display = 'flex';
+      ui.responseArea.style.flexDirection = 'column';
+      ui.responseArea.style.gap = '6px';
+      ui.responseArea.style.padding = '8px';
+      ui.responseArea.style.position = 'relative';
+      AiChallengeNpc.ensureJumpToLatestButton(ui.responseArea);
+      AiChallengeNpc.renderChatHistory(ui.responseArea, data?.chatHistory || []);
+      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Generating challenge question…');
     }
 
     AiNpc.attachToDialogue(npc.dialogueSystem, ui.container);
@@ -286,7 +296,7 @@ class AiChallengeNpc extends AiNpc {
 
     if (ui.responseArea) {
       ui.responseArea.style.display = 'block';
-      ui.responseArea.textContent = `Challenge Question: ${questionText}`;
+      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', `Challenge Question: ${questionText}`);
     }
 
     if (ui.input) {
@@ -332,6 +342,7 @@ class AiChallengeNpc extends AiNpc {
         return;
       }
 
+      AiChallengeNpc.appendChatMessage(ui.responseArea, 'user', answer);
       const active = activeChallenges.get(npcId);
       onSubmit(answer, active, ui);
     };
@@ -352,14 +363,117 @@ class AiChallengeNpc extends AiNpc {
     const isRight = evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT;
     const verdictLabel = isRight ? 'RIGHT' : 'WRONG';
     const icon = isRight ? '✅' : '❌';
+    const feedback = evaluation?.feedback || 'No feedback provided.';
 
     responseArea.style.display = 'block';
-    responseArea.textContent = [
-      `Challenge Question: ${question}`,
-      `Your Answer: ${answer}`,
-      `${icon} Result: ${verdictLabel}`,
-      `Feedback: ${evaluation?.feedback || 'No feedback provided.'}`,
-    ].join('\n\n');
+    AiChallengeNpc.appendChatMessage(responseArea, 'ai', `${icon} ${verdictLabel}: ${feedback}`);
+  }
+
+  /**
+   * Build chat log entries from saved history so the panel can be scrolled like
+   * a standard messenger timeline each time the dialogue is opened.
+   */
+  static renderChatHistory(responseArea, history) {
+    if (!responseArea) return;
+    responseArea.textContent = '';
+    AiChallengeNpc.ensureJumpToLatestButton(responseArea);
+
+    history.forEach((entry) => {
+      const role = entry?.role === 'user' ? 'user' : 'ai';
+      const message = (entry?.message || '').toString().trim();
+      if (!message) return;
+      AiChallengeNpc.appendChatMessage(responseArea, role, message, false);
+    });
+
+    responseArea.scrollTop = responseArea.scrollHeight;
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Append a single chat bubble into the scrollable response area.
+   */
+  static appendChatMessage(responseArea, role, message, scrollToBottom = true) {
+    if (!responseArea || !message) return;
+
+    const bubble = document.createElement('div');
+    bubble.className = role === 'user' ? 'ai-challenge-user-message' : 'ai-challenge-ai-message';
+    bubble.textContent = message;
+    bubble.style.maxWidth = '92%';
+    bubble.style.padding = '6px 8px';
+    bubble.style.borderRadius = '8px';
+    bubble.style.lineHeight = '1.35';
+    bubble.style.alignSelf = role === 'user' ? 'flex-end' : 'flex-start';
+    bubble.style.background = role === 'user' ? 'rgba(76, 139, 245, 0.18)' : 'rgba(255, 255, 255, 0.08)';
+    bubble.style.border = role === 'user' ? '1px solid rgba(76, 139, 245, 0.45)' : '1px solid rgba(255, 255, 255, 0.18)';
+
+    responseArea.appendChild(bubble);
+    AiChallengeNpc.ensureJumpToLatestButton(responseArea);
+    if (scrollToBottom) {
+      responseArea.scrollTop = responseArea.scrollHeight;
+    }
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Create a sticky jump control that appears when the user scrolls up.
+   */
+  static ensureJumpToLatestButton(responseArea) {
+    if (!responseArea) return;
+
+    if (!responseArea.dataset.jumpLatestBound) {
+      responseArea.dataset.jumpLatestBound = 'true';
+      responseArea.addEventListener('scroll', () => {
+        AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+      });
+    }
+
+    if (responseArea.querySelector('.ai-challenge-jump-latest')) {
+      return;
+    }
+
+    const jumpBtn = document.createElement('button');
+    jumpBtn.type = 'button';
+    jumpBtn.className = 'ai-challenge-jump-latest';
+    jumpBtn.textContent = 'Jump to latest';
+    jumpBtn.style.position = 'sticky';
+    jumpBtn.style.bottom = '0';
+    jumpBtn.style.alignSelf = 'center';
+    jumpBtn.style.margin = '4px auto 0';
+    jumpBtn.style.padding = '5px 10px';
+    jumpBtn.style.borderRadius = '999px';
+    jumpBtn.style.border = '1px solid rgba(255, 255, 255, 0.22)';
+    jumpBtn.style.background = 'rgba(12, 16, 24, 0.88)';
+    jumpBtn.style.color = '#f7f7f7';
+    jumpBtn.style.fontSize = '12px';
+    jumpBtn.style.cursor = 'pointer';
+    jumpBtn.style.zIndex = '2';
+    jumpBtn.style.display = 'none';
+
+    jumpBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      responseArea.scrollTop = responseArea.scrollHeight;
+      AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+    });
+
+    responseArea.appendChild(jumpBtn);
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Toggle jump button visibility based on distance from the bottom.
+   */
+  static updateJumpToLatestVisibility(responseArea) {
+    if (!responseArea) return;
+
+    const jumpBtn = responseArea.querySelector('.ai-challenge-jump-latest');
+    if (!jumpBtn) return;
+
+    const distanceFromBottom = Math.max(
+      0,
+      responseArea.scrollHeight - responseArea.clientHeight - responseArea.scrollTop
+    );
+
+    jumpBtn.style.display = distanceFromBottom > 24 ? 'inline-flex' : 'none';
   }
 
   /**
