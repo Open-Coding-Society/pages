@@ -1,6 +1,7 @@
 import GameEnvBackground from './essentials/GameEnvBackground.js';
 import Npc from './essentials/Npc.js';
 import Player from './essentials/Player.js';
+import showDialogBox from './essentials/DialogBox.js';
 
 class GameLevelWallstreet {
   constructor(gameEnv) {
@@ -110,18 +111,35 @@ class GameLevelWallstreet {
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
       reaction: function () {
-        function intro() {
-          alert("Good day, I am J.P. Morgan, financier of industry and architect of American banking.\nAre you ready to test your skills in the stock market?");
-        }
-        function explainStocks() {
-          alert("The stock market is a place of opportunity and risk. You can buy shares in companies and watch your investments grow—or shrink.\nWould you like to proceed to the Stock Exchange and begin your investment journey?");
-        }
-        function whatAreStocks() {
-          alert("Stocks represent ownership in a company. When you buy a stock, you become a partial owner and can benefit from its success.\nWould you like to try investing now?");
-        }
-        intro();
+        const dialogFunctions = {
+          intro: function() {
+            showDialogBox(
+              "J.P. Morgan",
+              "Good day, I am J.P. Morgan, financier of industry and architect of American banking.\nAre you ready to test your skills in the stock market?",
+              [
+                { label: "Yes", action: () => dialogFunctions.explainStocks(), keepOpen: true },
+                { label: "No", action: () => {} }
+              ]
+            );
+          },
+          explainStocks: function() {
+            showDialogBox(
+              "J.P. Morgan",
+              "The stock market is a place of opportunity and risk. You can buy shares in companies and watch your investments grow—or shrink.\nWould you like to proceed to the Stock Exchange, or learn the coding behind quant trading?",
+              [
+                { label: "Proceed to Stock Exchange", action: () => window.open(gameEnv.path + '/stocks/viewer', '_blank') },
+                { label: "Learn the coding behind quant trading", action: () => window.open(gameEnv.path + '/gamify/fortuneFinders/quant-lesson', '_blank') },
+                { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
+              ]
+            );
+          }
+        };
+        return dialogFunctions;
       },
-      interact: function () { this.reaction(); }
+      interact: function () { 
+        const dialogFunctions = this.reaction();
+        dialogFunctions.intro();
+      }
     };
 
     const sprite_src_crypto = path + "/images/gamify/satoshiNakamoto.png";
