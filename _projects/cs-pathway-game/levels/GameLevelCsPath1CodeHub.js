@@ -86,10 +86,10 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
     const bg_data = {
       name:     GameLevelCsPath1CodeHub.displayName,
       greeting: 'Welcome to the Code Hub.',
-      src:      path + '/images/projects/cs-pathway-game/bg-codehub/futuristic_underground_tech_hub.svg',
+      src:      path + '/images/projects/cs-pathway-game/bg-codehub/tech_hub_rpg_map.png',
     };
 
-    this.primeAssetGate({ backgroundSrc: bg_data.src, playerSrc: path + '/images/projects/cs-pathway-game/player/minimalist.png', backgroundType: 'svg' });
+    this.primeAssetGate({ backgroundSrc: bg_data.src, playerSrc: path + '/images/projects/cs-pathway-game/player/minimalist.png' });
 
     // Restore only the player avatar (not the world theme)
     this.profileReady.then(async (restored) => {
@@ -137,12 +137,12 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       interactDistance: 120,
     };
 
-    // NPC x/y ratios — used for both positioning and the floating labels
+    // NPC x/y ratios — aligned to the four corner zones on tech_hub_rpg_map.png
     const positions = {
-      exit:     { x: 0.05, y: 0.35 },
-      frontend: { x: 0.28, y: 0.35 },
-      backend:  { x: 0.55, y: 0.35 },
-      dataviz:  { x: 0.80, y: 0.35 },
+      frontend: { x: 0.18, y: 0.30 },  // top-left zone
+      backend:  { x: 0.75, y: 0.30 },  // top-right zone
+      dataviz:  { x: 0.75, y: 0.68 },  // bottom-right zone
+      exit:     { x: 0.18, y: 0.68 },  // bottom-left (Code Hub exit portal)
     };
 
     // ── Frontend Terminal ────────────────────────────────────────────────────
