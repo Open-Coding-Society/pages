@@ -310,6 +310,96 @@
     padding: 0.45rem 0.8rem;
   }
 
+  .oasis-leaderboard-tabs,
+  .oasis-task-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
+  }
+
+  .oasis-tab-button {
+    appearance: none;
+    background: rgba(16, 33, 38, 0.05);
+    border: 1px solid rgba(16, 33, 38, 0.08);
+    border-radius: 999px;
+    color: var(--oasis-ink);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.6rem 0.9rem;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  }
+
+  .oasis-tab-button:hover,
+  .oasis-tab-button:focus-visible {
+    background: rgba(15, 124, 132, 0.12);
+    border-color: rgba(15, 124, 132, 0.22);
+    outline: none;
+  }
+
+  .oasis-tab-button.is-active {
+    background: linear-gradient(135deg, var(--oasis-accent), var(--oasis-accent-deep));
+    border-color: transparent;
+    color: #ffffff;
+  }
+
+  .oasis-task-filter-tabs[hidden] {
+    display: none;
+  }
+
+  .oasis-leaderboard-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .oasis-leaderboard-item {
+    align-items: center;
+    background: rgba(16, 33, 38, 0.04);
+    border: 1px solid rgba(16, 33, 38, 0.06);
+    border-radius: 16px;
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 0.85rem 0.95rem;
+  }
+
+  .oasis-leaderboard-rank {
+    align-items: center;
+    background: rgba(244, 201, 93, 0.26);
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 800;
+    height: 2rem;
+    justify-content: center;
+    width: 2rem;
+  }
+
+  .oasis-leaderboard-main {
+    min-width: 0;
+  }
+
+  .oasis-leaderboard-name {
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .oasis-leaderboard-meta {
+    color: var(--oasis-muted);
+    font-size: 0.84rem;
+    line-height: 1.4;
+    margin-top: 0.2rem;
+  }
+
+  .oasis-leaderboard-score {
+    color: var(--oasis-accent-deep);
+    font-size: 1rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
   .oasis-task-table-wrap {
     border: 1px solid rgba(16, 33, 38, 0.08);
     border-radius: 18px;
@@ -423,6 +513,14 @@
       font-size: 0.92rem;
     }
 
+    .oasis-leaderboard-item {
+      grid-template-columns: auto 1fr;
+    }
+
+    .oasis-leaderboard-score {
+      grid-column: 2;
+    }
+
     .oasis-task-table th:nth-child(3),
     .oasis-task-table td:nth-child(3) {
       display: none;
@@ -527,10 +625,10 @@
 
     <aside class="oasis-task-card">
       <div class="oasis-panel-header">
-        <span class="oasis-mini-kicker">Task Table Mirror</span>
-        <h2 class="oasis-panel-title">Room Tasks</h2>
+        <span class="oasis-mini-kicker">Live Leaderboards</span>
+        <h2 class="oasis-panel-title">Community Progress</h2>
         <p class="oasis-panel-copy">
-          This table stays empty until <code>community-backend</code> is running. Once the backend is live, the page pulls the current SQLite task rows straight from the backend and renders them here.
+          This panel stays empty until <code>community-backend</code> is running. Once it is live, these leaderboards and filters recalculate from the SQLite task rows every refresh.
         </p>
       </div>
 
@@ -554,7 +652,16 @@
         <div class="oasis-sync-badge" id="oasis-sync-status">Backend not connected</div>
       </div>
 
-      <div class="oasis-task-table-wrap">
+      <div class="oasis-leaderboard-tabs" id="oasis-leaderboard-tabs">
+        <button class="oasis-tab-button is-active" type="button" data-view="players">Top Players</button>
+        <button class="oasis-tab-button" type="button" data-view="tasks">Task Leaders</button>
+        <button class="oasis-tab-button" type="button" data-view="rooms">Room Leaders</button>
+        <button class="oasis-tab-button" type="button" data-view="table">Live Table</button>
+      </div>
+
+      <div class="oasis-task-filter-tabs" id="oasis-task-filter-tabs" hidden></div>
+
+      <div class="oasis-task-table-wrap" id="oasis-table-wrap" hidden>
         <table class="oasis-task-table">
           <thead>
             <tr>
@@ -567,6 +674,8 @@
           <tbody id="oasis-task-table-body"></tbody>
         </table>
       </div>
+
+      <div class="oasis-leaderboard-list" id="oasis-leaderboard-list"></div>
 
       <p class="oasis-task-empty" id="oasis-task-empty">Start <code>community-backend</code> to load the live SQLite task table.</p>
       <p class="oasis-task-error" id="oasis-task-error" hidden></p>
@@ -585,8 +694,15 @@
     var syncStatusEl = document.getElementById("oasis-sync-status");
     var emptyEl = document.getElementById("oasis-task-empty");
     var errorEl = document.getElementById("oasis-task-error");
+    var leaderboardListEl = document.getElementById("oasis-leaderboard-list");
+    var leaderboardTabsEl = document.getElementById("oasis-leaderboard-tabs");
+    var taskFilterTabsEl = document.getElementById("oasis-task-filter-tabs");
+    var tableWrapEl = document.getElementById("oasis-table-wrap");
     var lastSerializedRows = "";
     var pollHandle = null;
+    var activeView = "players";
+    var activeTaskFilter = "all";
+    var latestRows = [];
 
     function normalizedBackendCandidates(baseUrl) {
       var trimmed = String(baseUrl || "").replace(/\/$/, "");
@@ -630,24 +746,8 @@
       roomCount.textContent = String(uniqueRooms);
     }
 
-    function renderRows(rows, sourceLabel) {
-      var normalizedRows = Array.isArray(rows) ? rows.map(normalizeTask) : [];
-      updateStats(normalizedRows);
-
-      if (normalizedRows.length === 0) {
-        tableBody.innerHTML = "";
-        emptyEl.hidden = false;
-        emptyEl.textContent = "Backend is running, but the task table is empty.";
-        errorEl.hidden = true;
-        syncStatusEl.textContent = sourceLabel;
-        return;
-      }
-
-      emptyEl.hidden = true;
-      errorEl.hidden = true;
-      syncStatusEl.textContent = sourceLabel;
-
-      tableBody.innerHTML = normalizedRows.map(function(row) {
+    function renderTableRows(rows) {
+      tableBody.innerHTML = rows.map(function(row) {
         var statusClass = row.completed ? "is-complete" : "is-pending";
         var statusText = row.completed ? "Complete" : "Pending";
 
@@ -661,6 +761,174 @@
       }).join("");
     }
 
+    function pluralize(word, count) {
+      return count === 1 ? word : word + "s";
+    }
+
+    function aggregateCompletedByPlayer(rows) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed) {
+          return;
+        }
+
+        var current = counts.get(row.userName) || { name: row.userName, count: 0, rooms: new Set(), tasks: new Set() };
+        current.count += 1;
+        current.rooms.add(String(row.room));
+        current.tasks.add(row.taskName);
+        counts.set(row.userName, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+    }
+
+    function aggregateCompletedByRoom(rows) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed) {
+          return;
+        }
+
+        var key = String(row.room);
+        var current = counts.get(key) || { room: row.room, count: 0, players: new Set() };
+        current.count += 1;
+        current.players.add(row.userName);
+        counts.set(key, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || String(a.room).localeCompare(String(b.room)); });
+    }
+
+    function taskNamesFromRows(rows) {
+      return Array.from(new Set(rows.map(function(row) { return row.taskName; }).filter(Boolean)))
+        .sort(function(a, b) { return a.localeCompare(b); });
+    }
+
+    function aggregateCompletedByTask(rows, taskFilter) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed) {
+          return;
+        }
+
+        if (taskFilter !== "all" && row.taskName !== taskFilter) {
+          return;
+        }
+
+        var current = counts.get(row.userName) || { name: row.userName, count: 0, rooms: new Set() };
+        current.count += 1;
+        current.rooms.add(String(row.room));
+        counts.set(row.userName, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+    }
+
+    function renderLeaderboardItems(items) {
+      leaderboardListEl.innerHTML = items.map(function(item, index) {
+        return "" +
+          "<div class=\"oasis-leaderboard-item oasis-task-row-flash\">" +
+            "<div class=\"oasis-leaderboard-rank\">" + (index + 1) + "</div>" +
+            "<div class=\"oasis-leaderboard-main\">" +
+              "<div class=\"oasis-leaderboard-name\">" + escapeHtml(item.name) + "</div>" +
+              "<div class=\"oasis-leaderboard-meta\">" + escapeHtml(item.meta) + "</div>" +
+            "</div>" +
+            "<div class=\"oasis-leaderboard-score\">" + escapeHtml(item.score) + "</div>" +
+          "</div>";
+      }).join("");
+    }
+
+    function setActiveButtons(container, activeValue, attributeName) {
+      Array.from(container.querySelectorAll(".oasis-tab-button")).forEach(function(button) {
+        button.classList.toggle("is-active", button.getAttribute(attributeName) === activeValue);
+      });
+    }
+
+    function renderTaskFilters(rows) {
+      var taskNames = taskNamesFromRows(rows);
+
+      if (activeView !== "tasks" || taskNames.length === 0) {
+        taskFilterTabsEl.hidden = true;
+        taskFilterTabsEl.innerHTML = "";
+        return;
+      }
+
+      if (activeTaskFilter !== "all" && taskNames.indexOf(activeTaskFilter) === -1) {
+        activeTaskFilter = "all";
+      }
+
+      taskFilterTabsEl.hidden = false;
+      taskFilterTabsEl.innerHTML =
+        "<button class=\"oasis-tab-button" + (activeTaskFilter === "all" ? " is-active" : "") + "\" type=\"button\" data-task-filter=\"all\">All Tasks</button>" +
+        taskNames.map(function(taskName) {
+          var activeClass = activeTaskFilter === taskName ? " is-active" : "";
+          return "<button class=\"oasis-tab-button" + activeClass + "\" type=\"button\" data-task-filter=\"" + escapeHtml(taskName) + "\">" + escapeHtml(taskName) + "</button>";
+        }).join("");
+    }
+
+    function renderActiveView(rows) {
+      tableWrapEl.hidden = activeView !== "table";
+      leaderboardListEl.hidden = activeView === "table";
+      renderTaskFilters(rows);
+
+      if (rows.length === 0) {
+        tableBody.innerHTML = "";
+        leaderboardListEl.innerHTML = "";
+        return;
+      }
+
+      emptyEl.hidden = true;
+
+      if (activeView === "table") {
+        renderTableRows(rows);
+        return;
+      }
+
+      var leaderboardItems = [];
+
+      if (activeView === "players") {
+        leaderboardItems = aggregateCompletedByPlayer(rows).map(function(entry) {
+          return {
+            name: entry.name,
+            meta: entry.tasks.size + " " + pluralize("task type", entry.tasks.size) + " across " + entry.rooms.size + " " + pluralize("room", entry.rooms.size),
+            score: entry.count + " completed"
+          };
+        });
+      } else if (activeView === "tasks") {
+        leaderboardItems = aggregateCompletedByTask(rows, activeTaskFilter).map(function(entry) {
+          return {
+            name: entry.name,
+            meta: (activeTaskFilter === "all" ? "Across every completed task" : activeTaskFilter) + " in " + entry.rooms.size + " " + pluralize("room", entry.rooms.size),
+            score: entry.count + " completed"
+          };
+        });
+      } else if (activeView === "rooms") {
+        leaderboardItems = aggregateCompletedByRoom(rows).map(function(entry) {
+          return {
+            name: "Room " + entry.room,
+            meta: entry.players.size + " " + pluralize("player", entry.players.size) + " contributed completions here",
+            score: entry.count + " completed"
+          };
+        });
+      }
+
+      if (leaderboardItems.length === 0) {
+        leaderboardListEl.innerHTML = "";
+        emptyEl.hidden = false;
+        emptyEl.textContent = "Backend is running, but there are no completed tasks for this leaderboard yet.";
+        return;
+      }
+
+      emptyEl.hidden = true;
+      renderLeaderboardItems(leaderboardItems);
+    }
+
     function serializeRows(rows) {
       return JSON.stringify(
         rows
@@ -672,7 +940,7 @@
     }
 
     function markRowsAsFresh() {
-      var renderedRows = tableBody.querySelectorAll("tr");
+      var renderedRows = document.querySelectorAll("#oasis-task-table-body tr, #oasis-leaderboard-list .oasis-leaderboard-item");
       renderedRows.forEach(function(row) {
         row.classList.remove("oasis-task-row-flash");
         void row.offsetWidth;
@@ -714,21 +982,37 @@
     async function refreshFromBackend() {
       try {
         var result = await fetchTasksFromBackend();
-        var serializedRows = serializeRows(result.rows);
+        var normalizedRows = result.rows.map(normalizeTask);
+        var serializedRows = serializeRows(normalizedRows);
         var hasChanged = serializedRows !== lastSerializedRows;
 
+        latestRows = normalizedRows;
+        updateStats(normalizedRows);
+        renderActiveView(normalizedRows);
+
+        if (normalizedRows.length === 0) {
+          emptyEl.hidden = false;
+          emptyEl.textContent = "Backend is running, but the task table is empty.";
+        }
+
         if (hasChanged) {
-          renderRows(result.rows, "Live from " + result.endpoint);
+          syncStatusEl.textContent = "Live from " + result.endpoint;
           markRowsAsFresh();
           lastSerializedRows = serializedRows;
         } else {
           syncStatusEl.textContent = "Live from " + result.endpoint;
           errorEl.hidden = true;
-          emptyEl.hidden = result.rows.length > 0;
+          if (normalizedRows.length > 0) {
+            emptyEl.hidden = true;
+          }
         }
       } catch (error) {
         tableBody.innerHTML = "";
+        leaderboardListEl.innerHTML = "";
+        taskFilterTabsEl.hidden = true;
+        taskFilterTabsEl.innerHTML = "";
         updateStats([]);
+        latestRows = [];
         lastSerializedRows = "";
         emptyEl.hidden = false;
         emptyEl.innerHTML = "Start <code>community-backend</code> to load the live SQLite task table.";
@@ -737,6 +1021,28 @@
         syncStatusEl.textContent = "Backend not connected";
       }
     }
+
+    leaderboardTabsEl.addEventListener("click", function(event) {
+      var button = event.target.closest("[data-view]");
+      if (!button) {
+        return;
+      }
+
+      activeView = button.getAttribute("data-view");
+      setActiveButtons(leaderboardTabsEl, activeView, "data-view");
+      renderActiveView(latestRows);
+    });
+
+    taskFilterTabsEl.addEventListener("click", function(event) {
+      var button = event.target.closest("[data-task-filter]");
+      if (!button) {
+        return;
+      }
+
+      activeTaskFilter = button.getAttribute("data-task-filter");
+      setActiveButtons(taskFilterTabsEl, activeTaskFilter, "data-task-filter");
+      renderActiveView(latestRows);
+    });
 
     refreshFromBackend();
 
