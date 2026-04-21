@@ -13,21 +13,15 @@ sticky_rank: 8
   <div style="display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
 
     <div style="flex-shrink: 0; text-align: center;">
-      <img src="/images/capstone/uesl_foundation.svg" alt="UESL Foundation logo" style="width: 110px; height: 110px; display: block; margin-bottom: 0.6rem;">
-      <div style="background: rgba(124,58,237,0.25); border: 1px solid rgba(124,58,237,0.5); border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.7rem; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Active 501(c)(3)</div>
+      <img src="/images/capstone/uesl_foundation.svg" alt="UESL Foundation logo" style="width: 110px; height: 110px; display: block;">
     </div>
 
     <div style="flex: 1; min-width: 240px;">
       <div style="display: inline-block; background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4); border-radius: 9999px; padding: 0.2rem 0.9rem; font-size: 0.7rem; color: #a78bfa; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem;">CSP Capstone Project</div>
-      <h2 style="color: #f5f3ff; font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">Building for UESL Foundation</h2>
+      <h2 style="color: #f5f3ff; font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">UESL Foundation Platform</h2>
       <p style="color: #a78bfa; margin: 0 0 0.75rem; font-size: 0.9rem;">Sathwik Kintada &nbsp;·&nbsp; Rudra B Joshi &nbsp;·&nbsp; Darshan</p>
-      <p style="color: #c4b5fd; font-size: 0.9rem; line-height: 1.6; margin: 0 0 1rem;">We partnered with the Unified Esports League Foundation — a 501(c)(3) nonprofit serving individuals with intellectual and developmental disabilities — to build an integrated digital platform that extends their mission beyond in-person programming across San Diego and Imperial Counties.</p>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 1rem;">
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Serves San Diego &amp; Imperial Counties year-round</div>
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Career &amp; college pathways in STEM and gaming</div>
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Gaming arenas open independent of school calendars</div>
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Spanish-language programming for broader access</div>
-      </div>
+      <p style="color: #c4b5fd; font-size: 0.9rem; line-height: 1.6; margin: 0 0 1rem;">A working prototype built for UESL Foundation — a nonprofit supporting individuals with intellectual and developmental disabilities through esports and STEM. The platform consists of three live components: an AI chatbot, an accessible game engine, and a social hub, all backed by a shared user management system.</p>
+      <a href="https://ueslhub.opencodingsociety.com" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; font-size: 0.78rem; font-weight: 700; padding: 0.35rem 1rem; border-radius: 9999px; text-decoration: none;">View Live Platform ↗</a>
     </div>
 
   </div>
