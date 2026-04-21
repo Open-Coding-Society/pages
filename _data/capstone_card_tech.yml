@@ -1,0 +1,140 @@
+# Maps homepage card titles (exact) to tech stacks.
+# All data sourced directly from _data/*_infograph.yml files.
+# Projects without a real tech array are omitted (no tooltip > wrong tooltip).
+
+"Slack Messaging Platform":
+  - "Spring Boot 3.5 / Java 21"
+  - "Flask Socket.IO"
+  - "Claude API (Anthropic)"
+  - "Amazon S3 / Aurora"
+  - "JWT Cookie Auth"
+  - "GitHub Actions CI/CD"
+
+"Educators":
+  - "GitHub Pages"
+  - "JavaScript / React"
+  - "Interactive Tutorials"
+  - "Git Workflows"
+  - "Progress Analytics"
+
+"Hunger Heroes":
+  - "Python Flask Backend"
+  - "Spring Boot Java"
+  - "JavaScript Frontend"
+  - "Graph Data Structures"
+  - "PostgreSQL Database"
+
+"Quantitative Trading Bot":
+  - "Python"
+  - "Machine Learning"
+  - "NLP Sentiment Analysis"
+  - "Web Scraping"
+  - "SQL Database"
+  - "Backtesting Engine"
+
+"Bud-E":
+  - "Manifest V3 Extension"
+  - "Background Service Worker"
+  - "Chrome Storage API"
+  - "Content Script Injection"
+  - "CSS Animations"
+
+"Granolaa":
+  - "Java Client (JavaCV/OpenCV)"
+  - "Node.js Backend"
+  - "MJPEG Streaming"
+  - "WebSocket Manager"
+  - "Stream Multiplexing"
+
+"Wayfinding Pages":
+  - "Spring Boot Backend"
+  - "React / JavaScript"
+  - "PostgreSQL Database"
+  - "GitHub API Integration"
+  - "Team Formation Algorithms"
+
+"NodCursor":
+  - "React + TypeScript + Vite"
+  - "MediaPipe FaceLandmarker"
+  - "Web Worker"
+  - "Exponential Smoothing"
+  - "Gesture Dispatch Hooks"
+
+"Pirna":
+  - "WebSockets (Real-Time)"
+  - "Hashing & Encryption"
+  - "Graphs & Machine Learning"
+  - "Sorting Algorithms"
+  - "OOP & Design Patterns"
+
+"College Bound":
+  - "Jekyll"
+  - "Spring Boot (Java)"
+  - "JavaScript"
+  - "College Scorecard API"
+  - "HTML / CSS"
+
+"HawkHub":
+  - "JWT Authentication"
+  - "RESTful API Architecture"
+  - "Club Recommendation System"
+  - "Real-time Notifications"
+
+"DeFlock SD":
+  - "Flask RESTful API"
+  - "Vue.js Frontend"
+  - "Geospatial Data Analysis"
+  - "Path Routing Algorithms"
+
+"Poway Neighborhood Emergency Corps":
+  - "Jekyll Templates"
+  - "YAML + Markdown Content"
+  - "SCSS Components"
+  - "Responsive Layouts"
+
+"Friends of the Poway Library":
+  - "Jekyll"
+  - "JavaScript"
+  - "Spring Boot"
+  - "REST APIs"
+
+"DSA Website Redesign":
+  - "WordPress REST API"
+  - "React Dashboard UI"
+  - "Fuse.js Fuzzy Search"
+  - "Push Notifications"
+  - "Authentication Integration"
+
+"D.A.D. Website Redesign":
+  - "Wix Custom Components"
+  - "CSS Grid / Flexbox"
+  - "Animated Counters JS"
+  - "Testimonial Carousel"
+  - "SEO Optimization"
+
+"RCR: Poway-Midland Railroad":
+  - "HTML / CSS / JavaScript"
+  - "YAML Data Storage"
+  - "Jekyll Liquid Templates"
+  - "360° Image Processing"
+  - "Local Storage API"
+
+"SD Auto":
+  - "Flask & Python Backend"
+  - "Scikit-learn ML Models"
+  - "Leaflet Interactive Maps"
+  - "SQLAlchemy & REST APIs"
+  - "Pandas Data Processing"
+
+"UESL Foundation":
+  - "AI Coach Chatbot (Groq / LLaMA)"
+  - "Accessible Game Engine"
+  - "Tournament Platform"
+  - "Bilingual Outreach Tools"
+  - "Jekyll / Spring Boot"
+
+"Oasis":
+  - "Spring Boot Backend"
+  - "JavaScript Frontend"
+  - "PostgreSQL Database"
+  - "REST APIs"
