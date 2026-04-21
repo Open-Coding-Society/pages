@@ -34,7 +34,6 @@ permalink: /gamify/fortuneFindersv1-1
 
     window.addEventListener("unhandledrejection", (event) => {
         console.error("Unhandled startup rejection:", event.reason);
-        showStartupError(event.reason);
     });
 
     (async () => {
@@ -63,7 +62,6 @@ permalink: /gamify/fortuneFindersv1-1
             FinTech.main(environment);
         } catch (error) {
             console.error("Fortune Finders startup error:", error);
-            showStartupError(error);
         }
     })();
 </script>
