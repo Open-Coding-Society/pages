@@ -80,9 +80,7 @@ class StatusPanel {
     // Content container (this gets hidden on collapse)
     const content = document.createElement('div');
     this.contentContainer = content;
-
     this.fieldElements.clear();
-
     for (const field of this.config.fields) {
       if (field.type === 'section') {
         const section = document.createElement('div');
@@ -93,14 +91,16 @@ class StatusPanel {
           letterSpacing: '1px',
         });
         section.textContent = field.title;
-        content.appendChild(section);
+
+        content.appendChild(section); // ✅ correct
         continue;
       }
 
       const row = document.createElement('div');
       row.dataset.field = field.key;
       row.textContent = `${field.label}: ${field.emptyValue || '—'}`;
-      content.appendChild(row);
+
+      content.appendChild(row); // ✅ MUST be here
       this.fieldElements.set(field.key, row);
     }
 
