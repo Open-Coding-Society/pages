@@ -36,6 +36,7 @@ constructor(options = {}) {
   this.voiceRate = options.voiceRate !== undefined ? options.voiceRate : 0.9;
   this.voicePitch = options.voicePitch !== undefined ? options.voicePitch : 1.0;
   this.voiceVolume = options.voiceVolume !== undefined ? options.voiceVolume : 1.0;
+  this.lifecycleSession = null;
    // Create the dialogue box
   this.createDialogueBox();
    // Keep track of whether the dialogue is currently open
@@ -298,6 +299,10 @@ createDialogueBox() {
   });
 }
 
+setLifecycleSession(session) {
+  this.lifecycleSession = session || null;
+}
+
 
 
 
@@ -445,11 +450,20 @@ showRandomDialogue(speaker = "", avatarSrc = null, spriteData = null) {
 // Close the dialogue box
 closeDialogue() {
   if (!this.isOpen) return;
+
+  if (this.lifecycleSession) {
+    this.lifecycleSession.cancel();
+    this.lifecycleSession = null;
+  }
+
    // Clear typewriter timeout
   if (this.typewriterTimeoutId) {
     clearTimeout(this.typewriterTimeoutId);
+    this.typewriterTimeoutId = null;
   }
-   // Leave speech running so queued lines can finish naturally.
+
+  DialogueSystem.flushSpeechQueue();
+
    // Hide the dialogue box
   this.dialogueBox.style.display = "none";
   this.isOpen = false;
