@@ -6,7 +6,8 @@ permalink: /gamify/fortuneFindersv1-1
 
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
-    <canvas id='gameCanvas'></canvas>
+    <!-- Engine creates its own canvases; hide legacy canvas to avoid visual artifacts -->
+    <canvas id='gameCanvas' style="display:none"></canvas>
 </div>
 
 <script type="module">

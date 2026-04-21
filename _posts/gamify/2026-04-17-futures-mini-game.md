@@ -68,6 +68,11 @@ permalink: /gamify/fortuneFinders/futures
   <div class="grid">
     <div class="card">
       <h3>Setup</h3>
+      <div class="sub" style="margin-top:-6px;line-height:1.5;">
+        <b>What you’re doing:</b> You’re trading a <b>contract</b> whose value moves with the product price.
+        You post <b>margin</b> (a deposit), not the full value. Your <b>P/L</b> changes every day.
+        If your <b>equity</b> drops below $0, you get a <b>margin call</b> and lose.
+      </div>
       <label>Commodity</label>
       <select id="commodity">
         <option value="CORN">Corn seeds (bushels)</option>
@@ -113,7 +118,7 @@ permalink: /gamify/fortuneFinders/futures
       </div>
 
       <div class="footer">
-        <div>Goal: finish 10 simulated days without going negative.</div>
+        <div><b>Goal:</b> finish 10 simulated days without going negative. Try to keep equity comfortably above $0 by sizing (contracts) and margin.</div>
         <button id="btnComplete" disabled class="primary">Mark complete</button>
       </div>
     </div>
@@ -250,8 +255,11 @@ permalink: /gamify/fortuneFinders/futures
     };
 
     logEl.innerHTML = "";
+    appendLog(`Lesson: Futures are contracts. You control big notional with small margin (leverage).`);
+    appendLog(`Rule of thumb: Size first (contracts), then margin. If you’re unsure, trade smaller.`);
     appendLog(`Started: ${prod.label} | ${side} | ${contracts} contract(s)`);
     appendLog(`Entry futures: $${entry}/${prod.unit} | Contract size: ${prod.contractSize.toLocaleString()} ${prod.unit}`);
+    appendLog(`How P/L works: Δprice × contractSize × contracts (flipped for SHORT).`);
     setStatus("warn","In session");
 
     el("btnStep").disabled = false;
@@ -278,9 +286,18 @@ permalink: /gamify/fortuneFinders/futures
     const sign = state.pnl >= 0 ? "+" : "";
     appendLog(`Day ${state.day}: futures=${fmt(next)} | P/L=${sign}${state.pnl.toFixed(2)} | equity≈${equity.toFixed(2)}`);
 
+    // Lightweight teaching prompts during play
+    if (state.day === 1) {
+      appendLog("Tip: Margin used rises with price, contracts, and margin %. Bigger size = bigger swings.");
+    } else if (state.day === 3) {
+      appendLog("Tip: SHORT profits when price drops, but it can still blow up fast if price spikes.");
+    } else if (state.day === 6) {
+      appendLog("Tip: Surviving is a risk game. Smaller contracts is the safest lever to pull.");
+    }
+
     if (equity < 0) {
       setStatus("bad","Margin call (failed)");
-      appendLog("Margin call: equity below $0. Reset and try again.");
+      appendLog("Margin call: equity below $0. Try fewer contracts and/or higher margin %, then attempt again.");
       el("btnStep").disabled = true;
       el("btnComplete").disabled = true;
       return;

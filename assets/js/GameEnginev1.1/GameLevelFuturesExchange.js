@@ -135,14 +135,30 @@ class GameLevelFuturesExchange {
         if (!allowed) return;
 
         const url = `${path}/gamify/fortuneFinders/futures`;
-        showDialogBox(
-          "Futures Trader",
-          "Instead of just talking, you’ll play a futures mini-game (pick pigs/seeds, choose long/short, manage margin).",
-          [
-            { label: "Start Futures Mini-Game", action: () => openReusableModal("futuresModal", "futuresFrame", url) },
-            { label: "Not now", action: () => {}, keepOpen: false }
-          ]
-        );
+        const teach = [
+          "Futures = a contract to buy/sell a product later at a price agreed today.",
+          "LONG means you profit if price goes up. SHORT means you profit if price goes down.",
+          "You don’t pay full notional up front — you post MARGIN. Leverage cuts both ways.",
+          "In the mini‑game, survive 10 days without your equity going negative (margin call)."
+        ].join("\n\n");
+
+        showDialogBox("Futures Trader", teach, [
+          {
+            label: "Play mini-game",
+            action: () => openReusableModal("futuresModal", "futuresFrame", url),
+            keepOpen: false
+          },
+          {
+            label: "Quick tip",
+            action: () => showDialogBox(
+              "Quick tip",
+              "Start with 1 contract and ~12–20% margin. If you’re guessing direction, reduce contracts first — sizing matters more than being right.",
+              [{ label: "Got it", action: () => {}, keepOpen: false }]
+            ),
+            keepOpen: true
+          },
+          { label: "Not now", action: () => {}, keepOpen: false }
+        ]);
       }
     };
 

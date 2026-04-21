@@ -270,7 +270,11 @@ class GameLevel {
     // Properly clean up all game objects
     for (let index = this.gameEnv.gameObjects.length - 1; index >= 0; index--) {
       // Make sure each object's destroy method is called to clean up event listeners
-      this.gameEnv.gameObjects[index].destroy()
+      try {
+        this.gameEnv.gameObjects[index].destroy()
+      } catch (e) {
+        console.warn('Error destroying game object:', e)
+      }
     }
 
     // Clear out the game objects array
