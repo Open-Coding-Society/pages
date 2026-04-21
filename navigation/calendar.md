@@ -473,6 +473,13 @@ active_tab: calendar
                 </div>
 
                 <div>
+                    <label for="issue-group-name">Group (optional)</label>
+                    <select id="issue-group-name">
+                        <option value="">-- No group link --</option>
+                    </select>
+                </div>
+
+                <div>
                     <label for="issue-tags">Tags (comma-separated)</label>
                     <input id="issue-tags" type="text" placeholder="frontend, sprint-9" />
                 </div>
@@ -702,6 +709,23 @@ active_tab: calendar
         });
     }
 
+    function populateIssueGroupDropdown() {
+        const sel = document.getElementById('issue-group-name');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">-- No group link --</option>';
+        userGroups.forEach(group => {
+            const opt = document.createElement('option');
+            opt.value = group.name;
+            let label = group.name;
+            const parts = [];
+            if (group.course) parts.push(group.course.toUpperCase());
+            if (group.period != null) parts.push(`Period ${group.period}`);
+            if (parts.length) label += ` — ${parts.join(' ')}`;
+            opt.textContent = label;
+            sel.appendChild(opt);
+        });
+    }
+
     function escapeIssueText(s) {
         return s ? String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;") : '';
     }
@@ -855,7 +879,8 @@ active_tab: calendar
     document.addEventListener("DOMContentLoaded", async function () {
         userGroups = await fetchUserGroups();
         populateGroupDropdown();
-            document.getElementById('issue-description')?.addEventListener('input', updateIssueDescriptionPreview);
+        populateIssueGroupDropdown();
+        document.getElementById('issue-description')?.addEventListener('input', updateIssueDescriptionPreview);
 
         let currentEvent = null;
         let isAddingNewEvent = false;
@@ -912,6 +937,7 @@ active_tab: calendar
                 priority: document.getElementById('issue-priority'),
                 dueDate: document.getElementById('issue-due-date'),
                 eventId: document.getElementById('issue-event-id'),
+                groupName: document.getElementById('issue-group-name'),
                 tags: document.getElementById('issue-tags'),
                 saveBtn: document.getElementById('issue-save-btn'),
                 clearBtn: document.getElementById('issue-clear-btn'),
@@ -933,6 +959,7 @@ active_tab: calendar
             if (el.status) el.status.value = 'open';
             if (el.priority) el.priority.value = 'medium';
             if (el.dueDate) el.dueDate.value = preserveDate || el.filterDate?.value || getLocalIsoDate();
+            if (el.groupName) el.groupName.value = '';
             if (el.saveBtn) el.saveBtn.textContent = 'Create Issue';
             updateIssueDescriptionPreview();
             renderIssueViews();
@@ -948,6 +975,7 @@ active_tab: calendar
             if (el.priority) el.priority.value = issue.priority || 'medium';
             if (el.dueDate) el.dueDate.value = issue.dueDate || '';
             if (el.eventId) el.eventId.value = issue.eventId || '';
+            if (el.groupName) el.groupName.value = issue.groupName || '';
             if (el.tags) el.tags.value = normalizeTags(issue.tags).join(', ');
             if (el.saveBtn) el.saveBtn.textContent = 'Update Issue';
             updateIssueDescriptionPreview();
@@ -1007,6 +1035,7 @@ active_tab: calendar
                         </div>
                         <div class="issue-description issue-markdown-preview">${renderIssueMarkdown(issue.description || '')}</div>
                         <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
+                        ${issue.groupName ? `<div class="issue-meta">Group: ${escapeIssueText(issue.groupName)}</div>` : ''}
                         <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}${issue.eventId ? ` · Event ${escapeIssueText(issue.eventId)}` : ''}</div>
                         ${tags.length ? `<div class="issue-tags">${tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('')}</div>` : ''}
                         <div class="issue-card-footer">
@@ -1043,6 +1072,7 @@ active_tab: calendar
                             <article class="kanban-item" data-issue-id="${escapeIssueText(issue.id)}">
                                 <div class="issue-card-title">${escapeIssueText(issue.title || 'Untitled issue')}</div>
                                 <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
+                                ${issue.groupName ? `<div class="issue-meta">Group: ${escapeIssueText(issue.groupName)}</div>` : ''}
                                 <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</div>
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                     <span class="issue-pill ${escapeIssueText(issue.priority || 'medium')}">${escapeIssueText((issue.priority || 'medium').toUpperCase())}</span>
@@ -1124,6 +1154,30 @@ active_tab: calendar
                     allEvents = [];
                     calendarIssues = Array.isArray(issues) ? issues : [];
                     issueCountsByDate = buildIssueCountMap(calendarIssues);
+
+                    calendarIssues.forEach(issue => {
+                        if (!issue || !issue.dueDate) return;
+                        allEvents.push({
+                            id: `issue-${issue.id}`,
+                            title: issue.title ? `Issue: ${issue.title}` : 'Issue',
+                            description: issue.description || '',
+                            start: issue.dueDate,
+                            allDay: true,
+                            priority: issue.priority || 'medium',
+                            groupName: issue.groupName || '',
+                            classNames: ['fc-event-issue', `priority-${String(issue.priority || 'medium').toLowerCase()}`],
+                            extendedProps: {
+                                type: 'issue',
+                                isIssue: true,
+                                author: issue.author || '',
+                                groupName: issue.groupName || '',
+                                description: issue.description || '',
+                                status: issue.status || 'open',
+                                priority: issue.priority || 'medium',
+                                dueDate: issue.dueDate || ''
+                            }
+                        });
+                    });
 
                     // --- Calendar events ---
                     if (calendarEvents !== null) {
@@ -1311,6 +1365,7 @@ active_tab: calendar
                     const event = arg.event;
                     const ext = event.extendedProps || {};
                     const isAppointment = ext.type === 'appointment';
+                    const isIssue = ext.isIssue === true;
                     const isBreak = ext.isBreak === true;
                     if (isAppointment && !isBreak) {
                         const individual = ext.individual || '';
@@ -1320,6 +1375,14 @@ active_tab: calendar
                         if (individual) html += '<div class="fc-event-individual">' + individual + '</div>';
                         html += '<div class="fc-event-title-custom">' + title + '</div>';
                         if (groupName) html += '<div class="fc-event-group">' + groupName + '</div>';
+                        html += '</div>';
+                        return { html };
+                    }
+                    if (isIssue && !isBreak) {
+                        let html = '<div class="fc-event-issue">';
+                        html += '<div class="fc-event-title-custom">' + (event.title || 'Issue') + '</div>';
+                        if (ext.author) html += '<div class="fc-event-individual">' + ext.author + '</div>';
+                        if (ext.groupName) html += '<div class="fc-event-group">' + ext.groupName + '</div>';
                         html += '</div>';
                         return { html };
                     }
@@ -1669,6 +1732,7 @@ active_tab: calendar
                     priority: el.priority?.value || 'medium',
                     dueDate: el.dueDate?.value || '',
                     eventId: (el.eventId?.value || '').trim() || null,
+                    groupName: (el.groupName?.value || '').trim() || null,
                     tags: normalizeTags(el.tags?.value || '')
                 };
 
