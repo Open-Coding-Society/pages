@@ -24,7 +24,7 @@ Features:
       - "Replaced static date table with a live, queryable departure board"
       - "Added real-time seat availability for every ride"
       - "Gave staff operational data they never had before"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -49,7 +49,7 @@ Features:
       - "Created PMRR's first-ever online reservation capability"
       - "Eliminates risk of visitors arriving to a full train"
       - "Provides a digital record of every booking for staff"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -74,7 +74,7 @@ Features:
       - "Entirely new feature — nothing like it on original site"
       - "First data tool for visitor planning at PMRR"
       - "Model accuracy grows significantly with real park data"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -99,7 +99,7 @@ Features:
       - "Replaced text-only list with an interactive visual roster"
       - "Added historical photos and restoration timelines for each vehicle"
       - "Created a permanent digital archive of the collection"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -124,7 +124,7 @@ Features:
       - "Transformed unread text into an engaging interactive exhibit"
       - "Surfaced the full Baldwin #30646 detective story for visitors"
       - "Structured educational resource for schools"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -149,7 +149,7 @@ Features:
       - "First-ever digital volunteer scheduling tool for PMRR"
       - "Eliminates manual phone and paper coordination"
       - "Gives coordinators a live view of all shift coverage"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -173,7 +173,7 @@ Features:
       - "Added search and filter to a previously unnavigable list"
       - "Structured event data ready for future backend integration"
       - "Faster visitor access to relevant announcements"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -198,7 +198,7 @@ Features:
       - "Entirely new feature — no equivalent on original site"
       - "Accessible virtual experience for mobility-limited visitors"
       - "Drives park interest from online audiences"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -223,7 +223,7 @@ Features:
       - "First community and social feature for PMRR"
       - "Generates user content that promotes the railroad organically"
       - "Gives PMRR a living visitor memory archive"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -248,7 +248,7 @@ Features:
       - "First visitor help system on any PMRR digital property"
       - "Reduces basic inquiry volume for volunteers"
       - "Available 24/7 with no staff required"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
@@ -273,7 +273,7 @@ Features:
       - "Converted contact-only process into self-service digital flow"
       - "Lowers barrier to membership for new supporters"
       - "Creates a recurring revenue stream for the non-profit"
-    status: "Active"
+    status: "Prototype"
     team:
       - "Rebecca, Cyrus, Rishabh"
 
