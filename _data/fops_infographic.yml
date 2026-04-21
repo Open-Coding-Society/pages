@@ -1,5 +1,5 @@
 title: "Friends of Poway Seniors — Website Refurbishment"
-description: "Modernizing a community senior support organization's web presence with simplified navigation, clearer communication, and a dedicated meal tracker — while preserving their mission of serving Poway's elderly population."
+description: "An improved website for Friends of Poway Seniors featuring simpler navigation, enhanced functionality, new features that aid existing services, and gamification that makes the site more interactive for seniors and their families."
 
 topics:
   - title: "Friends of Poway Seniors"
@@ -39,3 +39,51 @@ topics:
       - "Vivian Zhang"
       - "Nitya R"
       - "Virginia Z"
+    highlights:
+      - "Navigation reduced from 7+ dropdowns to 3 clear links"
+      - "Donate, Volunteer, Get Help CTAs above the fold"
+      - "AI chatbot in plain English, 24/7"
+      - "Volunteer signup with schedule management"
+
+comparison:
+  - feature: "Navigation"
+    before: "7+ nested dropdowns, hard to scan"
+    after: "3 clear top-level links"
+  - feature: "Primary CTAs"
+    before: "Buried in menus, not visible on load"
+    after: "Donate, Volunteer, Get Help above the fold"
+  - feature: "Support access"
+    before: "Phone/email only during business hours"
+    after: "AI chatbot in plain English, 24/7"
+  - feature: "Volunteering"
+    before: "Static form, no schedule visibility"
+    after: "Signup with schedule management"
+  - feature: "Event planning"
+    before: "Manual estimates, reactive planning"
+    after: "ML forecasting for staffing and meals"
+  - feature: "Engagement"
+    before: "Text-only, no interactive elements"
+    after: "Gamified bingo and activity tools"
+
+tools:
+  - tag: "Bingo Game"
+    name: "Interactive bingo"
+    desc: "75-ball bingo with auto-caller — mark your card and shout BINGO when you win."
+    links:
+      - label: "Play"
+        url: "https://fops.opencodingsociety.com/fopsbingo/"
+      - label: "Volunteer"
+        url: "https://fops.opencodingsociety.com/fopsbingo/#volunteer"
+        style: "orange"
+  - tag: "Event Predictor"
+    name: "ML forecasting"
+    desc: "AI forecasts volunteer needs and meal quantities to prevent shortages before event day."
+    links:
+      - label: "Open"
+        url: "https://fops.opencodingsociety.com/fopspredictor/"
+  - tag: "AI Chatbot"
+    name: "24/7 assistant"
+    desc: "Answers questions and guides seniors through available services around the clock."
+    links:
+      - label: "Open"
+        url: "https://fops.opencodingsociety.com/fops#chatbot"
