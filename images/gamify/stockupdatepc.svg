@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="pcFrame" x1="0" x2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#102a2a"/>
+    </linearGradient>
+    <linearGradient id="pcNeon" x1="0" x2="1">
+      <stop offset="0" stop-color="#39ffb6"/>
+      <stop offset="1" stop-color="#00c2ff"/>
+    </linearGradient>
+    <filter id="pcGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feColorMatrix in="b" type="matrix"
+        values="0 0 0 0 0.2  0 0 0 0 1  0 0 0 0 0.72  0 0 0 0.55 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" fill="none"/>
+
+  <!-- monitor -->
+  <g filter="url(#pcGlow)">
+    <rect x="72" y="88" width="368" height="260" rx="28" fill="url(#pcFrame)" stroke="url(#pcNeon)" stroke-width="10"/>
+    <rect x="104" y="120" width="304" height="196" rx="18" fill="#061018" stroke="#39ffb6" stroke-opacity="0.55" stroke-width="6"/>
+
+    <!-- screen graph -->
+    <path d="M126 270 L168 250 L206 266 L246 214 L288 232 L328 192 L388 210"
+          fill="none" stroke="url(#pcNeon)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <g opacity="0.35" stroke="#00c2ff" stroke-width="3">
+      <path d="M126 154H388"/>
+      <path d="M126 190H388"/>
+      <path d="M126 226H388"/>
+      <path d="M126 262H388"/>
+    </g>
+
+    <!-- bezel label -->
+    <rect x="176" y="322" width="160" height="26" rx="12" fill="#08131c" stroke="url(#pcNeon)" stroke-width="4" opacity="0.95"/>
+    <text x="256" y="341" text-anchor="middle"
+          font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace"
+          font-size="14" fill="#c7fff0" opacity="0.9">
+      MARKET TERMINAL
+    </text>
+
+    <!-- stand -->
+    <path d="M220 352h72l12 52h-96z" fill="#0a1720" stroke="#39ffb6" stroke-opacity="0.45" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="156" y="408" width="200" height="34" rx="14" fill="#061018" stroke="url(#pcNeon)" stroke-opacity="0.55" stroke-width="6"/>
+
+    <!-- keyboard hint -->
+    <g opacity="0.55" fill="#39ffb6">
+      <rect x="174" y="418" width="18" height="10" rx="2"/>
+      <rect x="198" y="418" width="18" height="10" rx="2"/>
+      <rect x="222" y="418" width="18" height="10" rx="2"/>
+      <rect x="246" y="418" width="18" height="10" rx="2"/>
+      <rect x="270" y="418" width="18" height="10" rx="2"/>
+      <rect x="294" y="418" width="18" height="10" rx="2"/>
+      <rect x="318" y="418" width="18" height="10" rx="2"/>
+    </g>
+  </g>
+</svg>

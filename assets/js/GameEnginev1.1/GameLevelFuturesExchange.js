@@ -165,10 +165,15 @@ class GameLevelFuturesExchange {
     const gateNpc = {
       id: 'Futures-Gate',
       greeting: 'Complete the futures mini-game to unlock the next map.',
-      src: `${path}/images/gamify/casino2.png`,
-      SCALE_FACTOR: 1.2,
+      // Use the dedicated gate asset; if it ever fails to load, don't render a huge red fallback.
+      src: `${path}/images/gamify/level-gate.svg`,
+      // If the SVG fails to load, Character falls back to a solid square.
+      // Make it visible (so progression isn't "invisible") but subtle.
+      fillStyle: 'rgba(57,255,182,0.18)',
+      SCALE_FACTOR: 7,
       ANIMATION_RATE: 50,
-      pixels: { height: 1024, width: 1024 },
+      // Must match the SVG (512x512) or the renderer will crop the image.
+      pixels: { height: 512, width: 512 },
       INIT_POSITION: { x: width * 0.82, y: height * 0.25 },
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },

@@ -463,15 +463,15 @@ class GameLevelAirport {
       }
     };
 
-    const sprite_src_computer = path + "/images/gamify/stockupdatepc.png";
+    const sprite_src_computer = path + "/images/gamify/stockupdatepc.svg";
     const sprite_greet_computer = "*Computer Fan Whirs* Let me show you the latest market news!";
     const sprite_data_computer = {
       id: 'Market Computer',
       greeting: sprite_greet_computer,
       src: sprite_src_computer,
-      SCALE_FACTOR: 1.5,
+      SCALE_FACTOR: 5.5,
       ANIMATION_RATE: 50,
-      pixels: { height: 1068, width: 1078 },
+      pixels: { height: 512, width: 512 },
       INIT_POSITION: { x: width * 0.9, y: height * 0.65 },
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
