@@ -31,7 +31,7 @@ Topics:
         link_label: "Open Chatbot"
         impact: "Preparedness questions can be answered quickly."
       - title: "Emergency Situational Mini Game."
-        link: "https://pnec.opencodingsociety.com/pages/escape-room.html"
+        link: "https://pnec.opencodingsociety.com/#disaster-game"
         link_label: "Open Mini Game"
         images:
           - "PNECMiniGame.png"
