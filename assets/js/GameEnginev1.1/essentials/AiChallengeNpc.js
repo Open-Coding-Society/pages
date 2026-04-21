@@ -76,9 +76,9 @@ class AiChallengeNpc extends AiNpc {
    * @param {string} [knowledgeContext='']       - Optional context hint for backend.
    * @returns {Promise<string>} Raw AI response text.
    */
-  static async requestAiText(spriteData, prompt, sessionPrefix = 'challenge', knowledgeContext = '') {
+  static async requestAiText(spriteData, prompt, sessionPrefix = 'challenge', knowledgeContext = '', session = null) {
     const payload = AiChallengeNpc.buildPayload(spriteData, prompt, sessionPrefix, knowledgeContext);
-    const response = await AiChallengeNpc.postRequest(payload);
+    const response = await AiChallengeNpc.postRequest(payload, session);
     const data = await AiChallengeNpc.parseResponseData(response);
     return AiChallengeNpc.extractAiResponseText(data);
   }
@@ -99,11 +99,12 @@ class AiChallengeNpc extends AiNpc {
   /**
    * POST to the AI backend; throws a typed error on non-2xx responses.
    */
-  static async postRequest(payload) {
+  static async postRequest(payload, session = null) {
     const pythonURL = `${pythonURI}/api/ainpc/prompt`;
     const response = await fetch(pythonURL, {
       ...fetchOptions,
       method: 'POST',
+      signal: session?.signal,
       body: JSON.stringify(payload),
     });
 
@@ -213,6 +214,11 @@ class AiChallengeNpc extends AiNpc {
       });
     }
 
+    const session = AiNpc.beginSession(npc);
+    if (npc.dialogueSystem?.setLifecycleSession) {
+      npc.dialogueSystem.setLifecycleSession(session);
+    }
+
     // Show the dialogue box using the NPC name / avatar but with a fixed
     // challenge-mode title rather than cycling through the dialogues array.
     npc.dialogueSystem?.showRandomDialogue(data.id, data.src, data);
@@ -248,7 +254,13 @@ class AiChallengeNpc extends AiNpc {
     AiNpc.attachToDialogue(npc.dialogueSystem, ui.container);
 
     // Auto-focus once the DOM has settled.
-    setTimeout(() => ui.inputField?.focus(), 100);
+    if (session) {
+      session.setTimeout(() => {
+        if (AiNpc.canUseElement(ui.inputField, session)) ui.inputField.focus();
+      }, 100);
+    } else {
+      setTimeout(() => ui.inputField?.focus(), 100);
+    }
   }
 
   /**
@@ -278,6 +290,8 @@ class AiChallengeNpc extends AiNpc {
    * @param {string} questionText  - Generated question string.
    */
   static deliverQuestion(npc, questionText) {
+    if (!AiNpc.isSessionActive(npc?.aiSession)) return;
+
     // Re-enable input now that the question is ready.
     const ui = AiChallengeNpc.getUiElements(npc);
     if (ui?.input) ui.input.disabled = false;
@@ -292,6 +306,8 @@ class AiChallengeNpc extends AiNpc {
    * Inject a question string into the response area and update the input placeholder.
    */
   static renderQuestion(npc, questionText) {
+    if (!AiNpc.isSessionActive(npc?.aiSession)) return;
+
     const ui = AiChallengeNpc.getUiElements(npc);
     if (!ui) return;
 
@@ -373,7 +389,8 @@ class AiChallengeNpc extends AiNpc {
    * The active challenge remains open and the follow-up is not scored.
    */
   static async handleChallengeFollowUpQuestion(npc, deskId, challengeQuestion, followUpQuestion, ui, activeChallenges = null, npcId = '') {
-    if (!npc?.spriteData || !ui?.responseArea) return;
+    const session = npc?.aiSession || null;
+    if (!npc?.spriteData || !ui?.responseArea || !AiNpc.canUseElement(ui.responseArea, session)) return;
 
     AiChallengeNpc.appendChatMessage(ui.responseArea, 'user', followUpQuestion);
     AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Thinking about a safe hint...');
@@ -392,7 +409,10 @@ class AiChallengeNpc extends AiNpc {
         prompt,
         'mission-challenge-followup',
         'Mission Tools challenge follow-up assistance',
+        session,
       );
+
+      if (!AiNpc.canUseElement(ui.responseArea, session)) return;
 
       const safeReply = AiChallengeNpc.sanitizeFollowUpReply(raw);
       AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', safeReply);
@@ -407,6 +427,9 @@ class AiChallengeNpc extends AiNpc {
 
       AiChallengeNpc.updateJumpToLatestVisibility(ui.responseArea);
     } catch (error) {
+      if (error?.name === 'AbortError' || session?.signal?.aborted) {
+        return;
+      }
       console.warn(`[AiChallengeNpc] follow-up hint failed for ${deskId}:`, error);
       const fallbackReply = 'I can give a hint, but I cannot reveal the full answer. Try focusing on the next step or the key concept the question is testing.';
       AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', fallbackReply);

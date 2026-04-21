@@ -336,7 +336,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         try {
           this.showToast?.(`${deskId}: challenge channel opened.`);
           AiChallengeNpc.showInteraction(npc);
-          const challengeQuestion = await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData));
+          const challengeQuestion = await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData, npc?.aiSession || null));
           this._appendDeskChatMessage(npc, 'ai', `Challenge Question: ${challengeQuestion}`);
           AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
           AiChallengeNpc.armSubmission(
@@ -421,12 +421,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * to avoid repeating a question already seen this session.
    * @private
    */
-  async _loadDeskChallengeQuestion(spriteData) {
+  async _loadDeskChallengeQuestion(spriteData, session = null) {
     let lastQuestion = '';
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const prompt = this._buildChallengePrompt(spriteData);
-      const raw = await this._requestChallengeAiText(spriteData, prompt);
+      const raw = await this._requestChallengeAiText(spriteData, prompt, session);
       const question = AiChallengeNpc.extractFirstLine(raw);
       lastQuestion = question;
 
@@ -445,9 +445,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * then parses the graded verdict and feedback.
    * @private
    */
-  async _loadChallengeEvaluation(spriteData, question, answer) {
+  async _loadChallengeEvaluation(spriteData, question, answer, session = null) {
     const prompt = this._buildChallengeEvaluationPrompt(spriteData, question, answer);
-    const raw = await this._requestChallengeAiText(spriteData, prompt);
+    const raw = await this._requestChallengeAiText(spriteData, prompt, session);
     return this._parseChallengeEvaluation(raw);
   }
 
@@ -455,8 +455,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * Request AI text. Routes the prompt through AiChallengeNpc.
    * @private
    */
-  async _requestChallengeAiText(spriteData, prompt) {
-    return AiChallengeNpc.requestAiText(spriteData, prompt, 'mission-challenge', 'Mission Tools challenge generation');
+  async _requestChallengeAiText(spriteData, prompt, session = null) {
+    return AiChallengeNpc.requestAiText(spriteData, prompt, 'mission-challenge', 'Mission Tools challenge generation', session);
   }
 
   /**
@@ -623,7 +623,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         try {
           ui.input.value = '';
           const evaluation = await this._runWithLoading(() =>
-            this._loadChallengeEvaluation(npc?.spriteData, active.question, answer)
+            this._loadChallengeEvaluation(npc?.spriteData, active.question, answer, npc?.aiSession || null)
           );
           AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, evaluation);
           AiChallengeNpc.speakEvaluation(npc, evaluation);
