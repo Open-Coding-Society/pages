@@ -100,7 +100,6 @@
 
 .sfi-pitch {
   max-width: 1100px;
-  text-decoration-color: #080502;
   margin: 0 auto;
   padding: 4.5rem clamp(1.5rem, 5vw, 3.5rem);
   display: grid;
@@ -119,8 +118,6 @@
   padding-top: 1.5rem;
   position: relative;
 }
-.sfi-pitch-col--problem { text-emphasis-color: #080502; }
-.sfi-pitch-col--solution { text-emphasis-color: #080502; }
 .sfi-pitch-col::before {
   content: '';
   position: absolute;
@@ -228,6 +225,7 @@
   transition: background 0.2s ease;
   position: relative;
   overflow: hidden;
+  align-items: flex-start;
 }
 .sfi-build-item::before {
   content: '';
@@ -242,21 +240,28 @@
 .sfi-build-item:hover { background: #edeae2; }
 .sfi-build-item:hover::before { transform: scaleY(1); }
 
-.sfi-build-num {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #5c504a;
-  line-height: 1;
+.sfi-build-icon {
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
-  user-select: none;
-  transition: color 0.25s ease;
+  background: #f5f1eb;
+  border: 1px solid #cec8bc;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
-.sfi-build-item:hover .sfi-build-num { color: #8b1c1c; }
+.sfi-build-item:hover .sfi-build-icon {
+  background: #ffffff;
+  border-color: #8b1c1c;
+}
+.sfi-build-icon svg { width: 24px; height: 24px; display: block; }
 
 .sfi-build-text {
   flex: 1;
-  padding-top: 0.2rem;
+  padding-top: 0.25rem;
 }
 
 .sfi-build-title {
@@ -289,10 +294,10 @@
 .sfi-feat-subtext {
   font-family: "Lora", serif;
   font-style: italic;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #3d3830 !important;
   margin: 0.5rem auto 0;
-  max-width: 540px;
+  max-width: 560px;
   line-height: 1.75;
 }
 
@@ -319,109 +324,67 @@
   box-shadow: 0 4px 28px rgba(8, 5, 2, 0.07);
 }
 
-.sfi-feat-top {
+.sfi-feat-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem 1.2rem;
-  border-bottom: 1px solid #cec8bc;
   gap: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid #cec8bc;
+  background: #f5f1eb;
 }
-
-.sfi-feat-badge {
+.sfi-feat-head-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #cec8bc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+}
+.sfi-feat-head-icon svg { width: 18px; height: 18px; }
+.sfi-feat-head-label {
   font-family: "DM Mono", monospace;
-  font-size: 0.57rem;
+  font-size: 0.6rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #27ae60 !important;
-  background: rgba(39, 174, 96, 0.07);
-  border: 1px solid rgba(39, 174, 96, 0.22);
-  padding: 3px 8px;
-  border-radius: 2px;
-  flex-shrink: 0;
+  color: #3d3830 !important;
 }
 
-.sfi-feat-endpoint {
-  font-family: "DM Mono", monospace;
-  font-size: 0.6rem;
-  color: rgba(61, 56, 48, 0.6) !important;
-  text-align: right;
-  line-height: 1.45;
-}
-
-.sfi-feat-terminal {
-  background: #111110;
-  flex-shrink: 0;
-}
-
-.sfi-term-chrome {
+.sfi-feat-illust {
+  background: #fbf7ef;
+  padding: 1.75rem 1.5rem;
+  border-bottom: 1px solid #cec8bc;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: #1c1c1a;
-  border-bottom: 1px solid #282826;
+  justify-content: center;
+  min-height: 180px;
 }
-
-.sfi-term-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-}
-.sfi-term-dot--r { background: #ff5f57; }
-.sfi-term-dot--y { background: #ffbd2e; }
-.sfi-term-dot--g { background: #28ca40; }
-
-.sfi-term-fname {
-  font-family: "DM Mono", monospace;
-  font-size: 0.6rem;
-  color: #555;
-  margin-left: 5px;
-}
-
-.sfi-term-body {
-  font-family: "DM Mono", monospace;
-  font-size: 0.68rem;
-  line-height: 1.85;
-  padding: 14px 16px;
-  margin: 0;
-  color: #9a9890;
-  overflow-x: auto;
-  white-space: pre;
-}
-.sfi-term-body .tc-cmd   { color: #e0d8c8; }
-.sfi-term-body .tc-arg   { color: #707068; }
-.sfi-term-body .tc-arrow { color: #8b1c1c; }
-.sfi-term-body .tc-key   { color: #a0a898; }
-.sfi-term-body .tc-val   { color: #b8d0a0; }
-.sfi-term-body .tc-hi    { color: #e8c468; font-weight: 500; }
-.sfi-term-body .tc-dim   { color: #484840; }
-.sfi-term-body .tc-tag   { color: #88b8cc; }
-.sfi-term-body .tc-num   { color: #e0c060; }
-.sfi-term-body .tc-ok    { color: #28ca40; }
-.sfi-term-body .tc-dft   { color: #7a7870; }
-.sfi-term-body .tc-sep   { color: #303028; }
+.sfi-feat-illust svg { width: 100%; max-width: 280px; height: auto; display: block; }
 
 .sfi-feat-body {
-  padding: 1.2rem 1.2rem 0;
+  padding: 1.4rem 1.25rem 0.4rem;
   flex: 1;
 }
 
 .sfi-feat-title {
-  font-family: "Lora", serif;
-  font-size: 0.98rem;
-  font-weight: 500;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.4rem;
+  font-weight: 600;
   color: #080502 !important;
-  margin: 0 0 0.3rem;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
-.sfi-feat-sub {
-  font-family: "DM Mono", monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.03em;
+.sfi-feat-copy {
+  font-family: "Lora", serif;
+  font-size: 0.9rem;
+  line-height: 1.8;
   color: #3d3830 !important;
-  margin: 0 0 0.9rem;
-  line-height: 1.55;
+  margin: 0 0 1rem;
 }
 
 .sfi-feat-list {
@@ -431,7 +394,7 @@
 }
 .sfi-feat-list li {
   font-family: "Lora", serif;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   color: #3d3830 !important;
   line-height: 1.7;
   padding-left: 1rem;
@@ -442,21 +405,11 @@
   position: absolute;
   left: 0;
   color: #8b1c1c !important;
-  font-size: 0.68rem;
-}
-
-.sfi-feat-stack {
-  font-family: "DM Mono", monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.06em;
-  color: #a39881 !important;
-  line-height: 1.6;
-  border-top: 1px solid #cec8bc;
-  padding: 0.7rem 1.2rem;
+  font-size: 0.72rem;
 }
 
 .sfi-feat-cta-wrap {
-  padding: 0.65rem 1.2rem 1.2rem;
+  padding: 0.4rem 1.25rem 1.25rem;
 }
 
 .sfi-feat-link {
@@ -479,251 +432,134 @@
 .sfi-feat-card:nth-child(2)[data-reveal] { transition-delay: 0.1s; }
 .sfi-feat-card:nth-child(3)[data-reveal] { transition-delay: 0.2s; }
 
-.sfi-demo {
+/* ── How It Fits Together (journey) ────────────────── */
+.sfi-journey {
   padding: 4.5rem clamp(1.5rem, 5vw, 3.5rem);
   background: #ffffff;
   border-top: 1px solid #cec8bc;
 }
-
-.sfi-demo-inner {
-  max-width: 820px;
+.sfi-journey-inner {
+  max-width: 1100px;
   margin: 0 auto;
 }
-
-.sfi-demo-header { margin-bottom: 2.5rem; }
-
-.demo-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: "DM Mono", monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #3d3830;
-  margin-bottom: 1.5rem;
-}
-
-.demo-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #c8a84b;
-  flex-shrink: 0;
-  animation: demoDotPulse 1.5s ease-in-out infinite;
-}
-.demo-status.ready .demo-status-dot {
-  background: #27ae60;
-  animation: none;
-}
-.demo-status.error .demo-status-dot {
-  background: #8b1c1c;
-  animation: none;
-}
-
-@keyframes demoDotPulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-
-.demo-progress {
-  width: 180px;
-  height: 3px;
-  background: #f5f1eb;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 2px;
-  margin-bottom: 1.5rem;
-}
-
-.demo-progress-bar {
-  height: 100%;
-  background: #8b1c1c;
-  border-radius: 2px;
-  transition: width 0.3s;
-  width: 0%;
-}
-
-.demo-upload-zone {
-  border: 2px dashed #cec8bc;
-  border-radius: 2px;
-  padding: 52px 40px;
+.sfi-journey-intro {
+  max-width: 720px;
+  margin: 0 auto 3rem;
   text-align: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
+}
+.sfi-journey-flow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .sfi-journey-flow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+.sfi-journey-col {
   background: #f5f1eb;
-  position: relative;
-}
-.demo-upload-zone:hover, .demo-upload-zone.dragover {
-  border-color: #8b1c1c;
-  background: #ffffff;
-}
-.demo-upload-zone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.demo-upload-icon {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: 14px;
-  opacity: 0.5;
-}
-
-.demo-upload-text {
-  font-family: "Lora", serif;
-  font-style: italic;
-  font-size: 0.95rem;
-  color: #3d3830;
-  margin-bottom: 6px;
-}
-
-.demo-upload-hint {
-  font-family: "DM Mono", monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #cec8bc;
-}
-
-.demo-result-wrap {
-  position: relative;
-  display: block;
-  width: 100%;
   border: 1px solid #cec8bc;
-  border-radius: 2px;
-  overflow: hidden;
-  background: #080502;
-  margin-bottom: 24px;
-}
-.demo-result-wrap img {
-  width: 100%;
-  display: block;
-}
-.demo-result-wrap canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.demo-analyzing-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(245, 241, 235, 0.88);
+  padding: 1.5rem 1.4rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+  gap: 0.9rem;
 }
-
-.demo-analyzing-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #cec8bc;
-  border-top-color: #8b1c1c;
-  border-radius: 50%;
-  animation: demoSpin 0.8s linear infinite;
-  margin-bottom: 10px;
+.sfi-journey-col--admin {
+  background: #080502;
+  border-color: #080502;
+  color: #ffffff !important;
 }
+.sfi-journey-col--admin .sfi-journey-eyebrow,
+.sfi-journey-col--admin .sfi-journey-h,
+.sfi-journey-col--admin .sfi-journey-item-t,
+.sfi-journey-col--admin .sfi-journey-item-d { color: #ffffff !important; }
+.sfi-journey-col--admin .sfi-journey-item { border-color: rgba(255,255,255,0.15); }
+.sfi-journey-col--admin .sfi-journey-icon { color: #f5f1eb; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
 
-@keyframes demoSpin {
-  to { transform: rotate(360deg); }
-}
-
-.demo-analyzing-text {
+.sfi-journey-eyebrow {
   font-family: "DM Mono", monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.12em;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #8b1c1c;
+  color: #8b1c1c !important;
+}
+.sfi-journey-h {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #080502 !important;
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
-.demo-results-title {
-  font-family: "DM Mono", monospace;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #3d3830;
-  margin-bottom: 1rem;
-}
-
-.demo-result-card {
+.sfi-journey-items { display: flex; flex-direction: column; gap: 0.55rem; }
+.sfi-journey-item {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 0.7rem;
+  padding: 0.65rem 0.7rem;
   background: #ffffff;
   border: 1px solid #cec8bc;
-  padding: 14px 18px;
-  margin-bottom: 8px;
-  transition: background 0.2s ease;
-}
-.demo-result-card:hover { background: #f5f1eb; }
-
-.demo-result-color {
-  width: 4px;
-  height: 44px;
   border-radius: 2px;
-  flex-shrink: 0;
 }
-
-.demo-result-info { flex: 1; }
-
-.demo-result-name {
+.sfi-journey-col--admin .sfi-journey-item { background: rgba(255,255,255,0.05); }
+.sfi-journey-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: 1px solid #cec8bc;
+  border-radius: 50%;
+  background: #f5f1eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+}
+.sfi-journey-icon svg { width: 14px; height: 14px; }
+.sfi-journey-item-text { flex: 1; min-width: 0; }
+.sfi-journey-item-t {
   font-family: "Lora", serif;
-  font-size: 0.93rem;
+  font-size: 0.87rem;
   font-weight: 500;
-  color: #080502;
-  margin-bottom: 3px;
+  color: #080502 !important;
+  line-height: 1.25;
 }
-
-.demo-result-items {
-  font-family: "DM Mono", monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  color: #3d3830;
-  line-height: 1.5;
-}
-
-.demo-result-conf {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-.demo-result-conf-label {
+.sfi-journey-item-d {
   font-family: "DM Mono", monospace;
   font-size: 0.58rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #3d3830;
-  text-align: right;
+  color: #3d3830 !important;
   margin-top: 2px;
 }
 
-.demo-no-results {
-  text-align: center;
-  padding: 40px 20px;
-  font-family: "Lora", serif;
-  font-style: italic;
-  color: #3d3830;
-  font-size: 0.9rem;
-  line-height: 1.8;
+.sfi-journey-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+  font-family: "DM Mono", monospace;
+  font-size: 1.4rem;
+  min-width: 28px;
+}
+@media (max-width: 900px) {
+  .sfi-journey-arrow {
+    min-width: 0;
+    padding: 0.75rem 0;
+    transform: rotate(90deg);
+  }
 }
 
+/* ── Footer ───────────────────────────────────────── */
 .sfi-foot {
   background: #ffffff;
   border-top: 1px solid #cec8bc;
   padding: 2.5rem clamp(1.5rem, 5vw, 3.5rem);
 }
-
 .sfi-foot-inner {
   max-width: 1100px;
   margin: 0 auto;
@@ -733,13 +569,11 @@
   gap: 2rem;
   flex-wrap: wrap;
 }
-
 .sfi-foot-team {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
-
 .sfi-foot-label {
   font-family: "DM Mono", monospace;
   font-size: 0.6rem;
@@ -747,19 +581,16 @@
   text-transform: uppercase;
   color: #0d0802 !important;
 }
-
 .sfi-foot-names {
   font-family: "Lora", serif;
   font-size: 0.9rem;
   color: #3d3830 !important;
 }
-
 .sfi-foot-links {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
 }
-
 .sfi-cta {
   display: inline-block;
   background: #8b1c1c;
@@ -795,6 +626,20 @@
 
 {% assign data = site.data["greppers-infograph"] %}
 
+{% capture icon_search %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 L20 20"/></svg>{% endcapture %}
+
+{% capture icon_camera %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8 h3 l1.5 -2 h7 l1.5 2 h3 v11 h-16 Z"/><circle cx="12" cy="13.5" r="3.5"/></svg>{% endcapture %}
+
+{% capture icon_user %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20 c1.5 -4 5 -5.5 7.5 -5.5 s6 1.5 7.5 5.5"/></svg>{% endcapture %}
+
+{% capture icon_admin %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><line x1="3.5" y1="9" x2="20.5" y2="9"/><line x1="7" y1="13" x2="14" y2="13"/><line x1="7" y1="16" x2="12" y2="16"/></svg>{% endcapture %}
+
+{% capture icon_people %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.3"/><path d="M3.5 19 c1 -3.5 3.5 -5 5.5 -5 s4.5 1.5 5.5 5"/><path d="M15 19 c0.6 -2.5 2.3 -3.6 3.5 -3.6 s2.6 1.1 3.2 3.6"/></svg>{% endcapture %}
+
+{% capture icon_spark %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L13.5 9.5 L20 11 L13.5 12.5 L12 19 L10.5 12.5 L4 11 L10.5 9.5 Z"/></svg>{% endcapture %}
+
+{% capture icon_shield %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L20 6 V12 C20 16.5 16.5 19.5 12 21 C7.5 19.5 4 16.5 4 12 V6 Z"/><path d="M9 12.5 L11.3 14.8 L15 10.8"/></svg>{% endcapture %}
+
 <article class="sfi-wrap">
 
   <!-- HERO -->
@@ -807,14 +652,14 @@
     </div>
   </header>
 
-  <!-- PROBLEM / WHAT CHANGED -->
+  <!-- CURRENT SYSTEM vs PROTOTYPE SYSTEM -->
   <section class="sfi-pitch">
     <div class="sfi-pitch-col sfi-pitch-col--problem" data-reveal>
-      <h2 class="sfi-col-heading">The Problem</h2>
+      <h2 class="sfi-col-heading">Current System</h2>
       <p class="sfi-col-body">{{ data.Problem }}</p>
     </div>
     <div class="sfi-pitch-col sfi-pitch-col--solution" data-reveal>
-      <h2 class="sfi-col-heading">What Changed</h2>
+      <h2 class="sfi-col-heading">Prototype System</h2>
       <p class="sfi-col-body">{{ data.Solution }}</p>
     </div>
   </section>
@@ -831,13 +676,20 @@
   </div>
   {% endif %}
 
-  <!-- WHAT WE BUILT -->
+  <!-- PROTOTYPE BUILD -->
   <section class="sfi-builds">
-    <p class="sfi-section-tag" data-reveal>What We Built</p>
+    <p class="sfi-section-tag" data-reveal>Prototype Build</p>
     <div class="sfi-build-grid">
       {% for f in data.FeatureCards %}
       <div class="sfi-build-item" data-reveal>
-        <span class="sfi-build-num">0{{ forloop.index }}</span>
+        <div class="sfi-build-icon">
+          {% case forloop.index %}
+            {% when 1 %}{{ icon_search }}
+            {% when 2 %}{{ icon_camera }}
+            {% when 3 %}{{ icon_user }}
+            {% when 4 %}{{ icon_admin }}
+          {% endcase %}
+        </div>
         <div class="sfi-build-text">
           <h4 class="sfi-build-title">{{ f.title }}</h4>
           <p class="sfi-build-desc">{{ f.desc }}</p>
@@ -847,162 +699,270 @@
     </div>
   </section>
 
-  <!-- PRODUCTION FEATURES -->
-  <section class="sfi-features">
-    <p class="sfi-section-tag" data-reveal>Production Features</p>
+  <!-- THREE FOCUS AREAS -->
+  <section class="sfi-features" style="background:#ffffff;">
+    <p class="sfi-section-tag" data-reveal>Three Focus Areas</p>
     <div class="sfi-features-intro" data-reveal>
-      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Three surfaces, one data layer.</h2>
-      <p class="sfi-feat-subtext">Each feature is live on the production site, drawing from real requests against the Greppers Flask API.</p>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">The people, the features, the foundation.</h2>
+      <p class="sfi-feat-subtext">Three lenses to read the prototype through — who uses it, what's new about it, and how the foundation stays in charge of every word on the page.</p>
+    </div>
+
+    <div class="sfi-feat-grid">
+      {% for focus in data.TechFocus %}
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-head">
+          <span class="sfi-feat-head-icon">
+            {% case forloop.index %}
+              {% when 1 %}{{ icon_people }}
+              {% when 2 %}{{ icon_spark }}
+              {% when 3 %}{{ icon_shield }}
+            {% endcase %}
+          </span>
+          <span class="sfi-feat-head-label">{{ focus.tag }}</span>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title" style="font-size:1.3rem;margin-bottom:0.8rem;">{{ focus.heading }}</h3>
+          <ul class="sfi-feat-list">
+            {% for item in focus.items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- PROTOTYPE IN PRACTICE -->
+  <section class="sfi-features">
+    <p class="sfi-section-tag" data-reveal>Prototype in Practice</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Three moments, three people.</h2>
+      <p class="sfi-feat-subtext">What the prototype feels like in the hands of a driver, an inspector, and your own staff.</p>
     </div>
 
     <div class="sfi-feat-grid">
 
-      <!-- Card 01: AI Classification Pipeline -->
+      <!-- Card 01: Plain-English Search -->
       <div class="sfi-feat-card" data-reveal>
-        <div class="sfi-feat-top">
-          <span class="sfi-feat-badge">Shipped</span>
-          <span class="sfi-feat-endpoint">sfifoundation&nbsp;&middot;&nbsp;/api/sfi/classify</span>
-        </div>
-        <div class="sfi-feat-terminal">
-          <div class="sfi-term-chrome">
-            <span class="sfi-term-dot sfi-term-dot--r"></span>
-            <span class="sfi-term-dot sfi-term-dot--y"></span>
-            <span class="sfi-term-dot sfi-term-dot--g"></span>
-            <span class="sfi-term-fname">classify &middot; POST</span>
-          </div>
-          <pre class="sfi-term-body"><span class="tc-cmd">$ POST /api/sfi/classify</span>
-<span class="tc-arg">  input: "carbon fiber racing jacket"</span>
-<span class="tc-arrow">&#8594;</span> <span class="tc-key">spec:       </span> <span class="tc-val">SFI 3.2A/5</span>
-<span class="tc-arrow">&#8594;</span> <span class="tc-key">category:  </span> <span class="tc-val">Driver Apparel</span>
-<span class="tc-arrow">&#8594;</span> <span class="tc-key">confidence:</span> <span class="tc-hi">0.947</span>
-<span class="tc-dim">&#8594; runner-up:  SFI 3.3 &middot; Gloves &middot; 0.062</span></pre>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="20" y="26" width="240" height="34" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
+            <circle cx="36" cy="43" r="6" fill="none" stroke="#8b1c1c" stroke-width="1.5"/>
+            <line x1="40" y1="47" x2="46" y2="53" stroke="#8b1c1c" stroke-width="1.5" stroke-linecap="round"/>
+            <text x="60" y="48" font-family="Lora, serif" font-style="italic" font-size="12" fill="#3d3830">fire suit for my son</text>
+            <path d="M140 64 L140 82 M134 76 L140 82 L146 76" stroke="#8b1c1c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M105 94 L175 94 L175 128 C175 136 150 146 140 149 C130 146 105 136 105 128 Z" fill="#ffffff" stroke="#8b1c1c" stroke-width="1.5"/>
+            <text x="140" y="115" font-family="Cormorant Garamond, serif" font-weight="700" font-size="15" text-anchor="middle" fill="#080502">SFI 3.2A/1</text>
+            <text x="140" y="128" font-family="Lora, serif" font-size="8.5" text-anchor="middle" fill="#3d3830">Driver Suit — Junior</text>
+            <text x="140" y="140" font-family="DM Mono, monospace" font-size="7" fill="#8b1c1c" text-anchor="middle" letter-spacing="1.5">CERTIFIED</text>
+          </svg>
         </div>
         <div class="sfi-feat-body">
-          <h3 class="sfi-feat-title">AI Classification Pipeline</h3>
-          <p class="sfi-feat-sub">Plain-English &rarr; correct SFI spec in a single call</p>
-          <ul class="sfi-feat-list">
-            <li>Classifies descriptions to spec + category with confidence score</li>
-            <li>Top-N ranked predictions, not just a single guess</li>
-            <li>&gt;95% precision on held-out evaluation set</li>
-            <li>Synonym expansion for driver-facing language</li>
-          </ul>
+          <h3 class="sfi-feat-title">Type it the way you'd say it.</h3>
+          <p class="sfi-feat-copy">A driver's parent types "fire suit for my son" — not a standard number. The right junior rating comes up first, with close alternatives right behind it.</p>
         </div>
-        <p class="sfi-feat-stack">scikit-learn &middot; TF-IDF &middot; LinearSVC &middot; Flask-RESTful &middot; SQLAlchemy</p>
         <div class="sfi-feat-cta-wrap">
-          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">Open the live feature &rarr;</a>
+          <a href="https://sfifoundation.opencodingsociety.com/sfi-specs/" target="_blank" class="sfi-feat-link">Open the search &rarr;</a>
         </div>
       </div>
 
-      <!-- Card 02: Spec Search -->
+      <!-- Card 02: Photo Identification -->
       <div class="sfi-feat-card" data-reveal>
-        <div class="sfi-feat-top">
-          <span class="sfi-feat-badge">Shipped</span>
-          <span class="sfi-feat-endpoint">sfifoundation&nbsp;&middot;&nbsp;/sfi-specs</span>
-        </div>
-        <div class="sfi-feat-terminal">
-          <div class="sfi-term-chrome">
-            <span class="sfi-term-dot sfi-term-dot--r"></span>
-            <span class="sfi-term-dot sfi-term-dot--y"></span>
-            <span class="sfi-term-dot sfi-term-dot--g"></span>
-            <span class="sfi-term-fname">spec-search &middot; GET</span>
-          </div>
-          <pre class="sfi-term-body"><span class="tc-cmd">$ GET /sfi-specs?q=fire+suit+junior</span>
-<span class="tc-sep">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
-<span class="tc-tag">SFI 3.2A/1</span> <span class="tc-dft">Driver Suit &mdash; Junior</span>    <span class="tc-hi">98%</span>
-<span class="tc-tag">SFI 3.2A/5</span> <span class="tc-dft">Driver Suit &mdash; Multi-Layer</span> <span class="tc-num">91%</span>
-<span class="tc-tag">SFI 40.1  </span> <span class="tc-dft">Junior Dragster Helmet</span>   <span class="tc-dim">74%</span></pre>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="80" y="14" width="120" height="132" rx="10" fill="#080502" stroke="#3d3830" stroke-width="1.2"/>
+            <rect x="88" y="26" width="104" height="96" fill="#f5f1eb"/>
+            <path d="M108 104 Q124 74 140 92 Q156 104 172 88 L172 122 L108 122 Z" fill="#cec8bc"/>
+            <circle cx="152" cy="54" r="8" fill="#e8c468"/>
+            <circle cx="140" cy="74" r="22" fill="none" stroke="#8b1c1c" stroke-width="2" stroke-dasharray="3 3"/>
+            <rect x="112" y="128" width="56" height="12" rx="1" fill="#ffffff" stroke="#cec8bc" stroke-width="0.8"/>
+            <text x="140" y="137" font-family="DM Mono, monospace" font-weight="600" font-size="7" text-anchor="middle" fill="#8b1c1c" letter-spacing="1.2">HELMET · SFI 24.1</text>
+            <circle cx="140" cy="16" r="2" fill="#3d3830"/>
+            <rect x="131" y="142" width="18" height="1.5" rx="0.75" fill="#3d3830"/>
+          </svg>
         </div>
         <div class="sfi-feat-body">
-          <h3 class="sfi-feat-title">Spec Search &amp; Visual Browser</h3>
-          <p class="sfi-feat-sub">Fuzzy search across 140+ standards &mdash; and a car diagram you can click</p>
-          <ul class="sfi-feat-list">
-            <li>Keyword search across spec numbers, names, categories</li>
-            <li>Typo-tolerant with &ldquo;did you mean?&rdquo; suggestions</li>
-            <li>Filter by discipline &mdash; drag, oval, karting, off-road, junior</li>
-            <li>Interactive car diagram maps components to certifications</li>
-          </ul>
+          <h3 class="sfi-feat-title">Point the phone at the gear.</h3>
+          <p class="sfi-feat-copy">An inspector at the track aims a phone at a helmet, suit, or harness. The prototype names the standard it's meant to meet — without sending a photo anywhere.</p>
         </div>
-        <p class="sfi-feat-stack">JS Levenshtein &middot; cosine scoring &middot; Flask &middot; SQLAlchemy &middot; HTML5 Canvas</p>
         <div class="sfi-feat-cta-wrap">
-          <a href="https://sfifoundation.opencodingsociety.com/sfi-specs/" target="_blank" class="sfi-feat-link">Open the live feature &rarr;</a>
+          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">See the identifier &rarr;</a>
         </div>
       </div>
 
-      <!-- Card 03: Admin Console -->
+      <!-- Card 03: Staff Dashboard -->
       <div class="sfi-feat-card" data-reveal>
-        <div class="sfi-feat-top">
-          <span class="sfi-feat-badge">Shipped</span>
-          <span class="sfi-feat-endpoint">sfifoundation&nbsp;&middot;&nbsp;/admin</span>
-        </div>
-        <div class="sfi-feat-terminal">
-          <div class="sfi-term-chrome">
-            <span class="sfi-term-dot sfi-term-dot--r"></span>
-            <span class="sfi-term-dot sfi-term-dot--y"></span>
-            <span class="sfi-term-dot sfi-term-dot--g"></span>
-            <span class="sfi-term-fname">admin &middot; inventory</span>
-          </div>
-          <pre class="sfi-term-body"><span class="tc-dft">ID    Spec       State</span>
-<span class="tc-sep">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
-<span class="tc-tag">#042</span>  <span class="tc-val">SFI 16.1</span>  <span class="tc-ok">Active</span>
-<span class="tc-tag">#043</span>  <span class="tc-val">SFI 28.1</span>  <span class="tc-ok">Active</span>
-<span class="tc-tag">#044</span>  <span class="tc-val">SFI 45.1</span>  <span class="tc-dft">Draft</span>
-<span class="tc-dim">+ Add new spec &hellip;</span></pre>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="20" y="16" width="240" height="128" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
+            <rect x="20" y="16" width="240" height="22" fill="#080502"/>
+            <text x="32" y="31" font-family="DM Mono, monospace" font-size="9" fill="#f5f1eb" letter-spacing="1">SFI STANDARDS · ADMIN</text>
+            <text x="32" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STANDARD</text>
+            <text x="168" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STATUS</text>
+            <line x1="20" y1="62" x2="260" y2="62" stroke="#cec8bc" stroke-width="1"/>
+
+            <text x="32" y="82" font-family="Lora, serif" font-size="10" fill="#080502">SFI 16.1 — Restraints</text>
+            <rect x="168" y="73" width="48" height="13" rx="1.5" fill="#27ae60"/>
+            <text x="192" y="82" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
+
+            <text x="32" y="104" font-family="Lora, serif" font-size="10" fill="#080502">SFI 28.1 — Fuel Cells</text>
+            <rect x="168" y="95" width="48" height="13" rx="1.5" fill="#27ae60"/>
+            <text x="192" y="104" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
+
+            <text x="32" y="126" font-family="Lora, serif" font-size="10" fill="#080502">SFI 45.1 — Roll Cages</text>
+            <rect x="168" y="117" width="48" height="13" rx="1.5" fill="#8b1c1c"/>
+            <text x="192" y="126" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">UPDATED</text>
+
+            <text x="32" y="140" font-family="DM Mono, monospace" font-size="7" fill="#707068">+ add new standard</text>
+          </svg>
         </div>
         <div class="sfi-feat-body">
-          <h3 class="sfi-feat-title">Admin Part Inventory</h3>
-          <p class="sfi-feat-sub">Staff-operated CRUD dashboard &mdash; no deploy, no developer</p>
-          <ul class="sfi-feat-list">
-            <li>Role-gated CRUD for the full SFI spec table</li>
-            <li>Live summary stats &mdash; totals, per-category counts, effective dates</li>
-            <li>Inline validation with success / error toasts</li>
-            <li>Single source of truth for search + AI downstream</li>
-          </ul>
+          <h3 class="sfi-feat-title">Your staff, in charge.</h3>
+          <p class="sfi-feat-copy">A staff member updates a standard from a simple dashboard. The site reflects the change the same day — no email to a developer, no waiting, no deploy.</p>
         </div>
-        <p class="sfi-feat-stack">Flask Blueprints &middot; @login_required &middot; SQLAlchemy ORM &middot; Jinja2 &middot; Bootstrap 5</p>
         <div class="sfi-feat-cta-wrap">
-          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">Open the live feature &rarr;</a>
+          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">Preview the admin &rarr;</a>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- DEMO: AI EQUIPMENT SCANNER -->
-  <section class="sfi-demo">
-    <div class="sfi-demo-inner">
-      <div class="sfi-demo-header" data-reveal>
-        <span class="sfi-eyebrow">Try It</span>
-        <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:0.6rem;">Equipment Scanner</h2>
-        <p class="sfi-col-body" style="max-width:560px;margin-bottom:1.5rem;">Upload a photo of motorsport safety gear and the on-device AI will identify its SFI certification category — no server, no account, nothing leaves your browser.</p>
-        <div class="demo-status" id="demoModelStatus">
-          <span class="demo-status-dot"></span>
-          <span id="demoModelStatusText">Initializing models&hellip;</span>
-        </div>
-        <div class="demo-progress" id="demoModelProgress">
-          <div class="demo-progress-bar" id="demoModelProgressBar"></div>
-        </div>
+  <!-- HOW IT FITS TOGETHER -->
+  <section class="sfi-journey">
+    <div class="sfi-journey-inner">
+      <div class="sfi-journey-intro" data-reveal>
+        <span class="sfi-eyebrow">How It Fits Together</span>
+        <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.5rem;">Three roles, one prototype, one foundation in control.</h2>
+        <p class="sfi-feat-subtext">Every path through the prototype begins with someone signing in, passes through the features they need, and ends at the dashboard where your staff keep the whole thing accurate and on-mission.</p>
       </div>
 
-      <!-- Upload zone -->
-      <div class="demo-upload-zone" id="demoUploadZone">
-        <span class="demo-upload-icon">&#128247;</span>
-        <div class="demo-upload-text">Drag &amp; drop an image here, or click to browse</div>
-        <div class="demo-upload-hint">JPG &bull; PNG &bull; WebP &bull; Max 20 MB</div>
-        <input type="file" id="demoFileInput" accept="image/*">
-      </div>
-
-      <!-- Results area (hidden until analysis) -->
-      <div id="demoResultsArea" style="display:none;margin-top:32px;">
-        <div class="demo-result-wrap" id="demoResultWrap">
-          <img id="demoResultImg" src="" alt="Analysis result">
-          <canvas id="demoResultCanvas"></canvas>
-          <div class="demo-analyzing-overlay" id="demoAnalyzingOverlay" style="display:none;">
-            <div class="demo-analyzing-spinner"></div>
-            <div class="demo-analyzing-text">Analyzing&hellip;</div>
+      <div class="sfi-journey-flow">
+        <!-- People -->
+        <div class="sfi-journey-col" data-reveal>
+          <span class="sfi-journey-eyebrow">The People</span>
+          <h3 class="sfi-journey-h">Who signs in</h3>
+          <div class="sfi-journey-items">
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_user }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Drivers &amp; crews</div>
+                <div class="sfi-journey-item-d">Look up, learn, check</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_user }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Inspectors</div>
+                <div class="sfi-journey-item-d">Verify gear at the track</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_user }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Staff</div>
+                <div class="sfi-journey-item-d">Maintain the source of truth</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div id="demoDetectResults"></div>
+
+        <div class="sfi-journey-arrow" data-reveal>&#8594;</div>
+
+        <!-- Prototype -->
+        <div class="sfi-journey-col" data-reveal>
+          <span class="sfi-journey-eyebrow">The Prototype</span>
+          <h3 class="sfi-journey-h">What they use</h3>
+          <div class="sfi-journey-items">
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_search }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Plain-English Search</div>
+                <div class="sfi-journey-item-d">140+ standards, findable</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_camera }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Photo Identifier</div>
+                <div class="sfi-journey-item-d">On the phone, nothing uploaded</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_spark }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Quizzes &amp; Learning</div>
+                <div class="sfi-journey-item-d">Short loops, by role</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sfi-journey-arrow" data-reveal>&#8594;</div>
+
+        <!-- Foundation -->
+        <div class="sfi-journey-col sfi-journey-col--admin" data-reveal>
+          <span class="sfi-journey-eyebrow" style="color:#8b1c1c !important;">The Foundation</span>
+          <h3 class="sfi-journey-h">Who stays in control</h3>
+          <div class="sfi-journey-items">
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_admin }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Staff dashboard</div>
+                <div class="sfi-journey-item-d">Edit standards directly</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_people }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Role management</div>
+                <div class="sfi-journey-item-d">Decide who sees what</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_shield }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Content &amp; safety</div>
+                <div class="sfi-journey-item-d">On-mission, moderated</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- DISCUSSION AGENDA -->
+  <section class="sfi-features" style="background:#ffffff;">
+    <p class="sfi-section-tag" data-reveal>Discussion Agenda</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Your direction from here.</h2>
+      <p class="sfi-feat-subtext">The prototype is a starting point. We'd like your take on which pieces matter most — and whether the work continues in the fall with 3rd- and 4th-year students on the real system.</p>
+    </div>
+
+    <div class="sfi-feat-grid" style="grid-template-columns:repeat(2,1fr); max-width:900px;">
+      {% for topic in data.DiscussionAgenda %}
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-head">
+          <span class="sfi-feat-head-icon">
+            {% case forloop.index %}
+              {% when 1 %}{{ icon_spark }}
+              {% when 2 %}{{ icon_shield }}
+            {% endcase %}
+          </span>
+          <span class="sfi-feat-head-label">{{ topic.subtitle }}</span>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title" style="font-size:1.3rem;margin-bottom:0.8rem;">{{ topic.heading }}</h3>
+          <ul class="sfi-feat-list">
+            {% for item in topic.items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
     </div>
   </section>
 
@@ -1015,7 +975,6 @@
         var el = entry.target;
         el.classList.add('is-visible');
 
-        // Counter animation for numeric metrics
         var raw = el.dataset.count;
         if (raw) {
           var digits = raw.replace(/[^0-9]/g, '');
@@ -1043,209 +1002,6 @@
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('[data-reveal]').forEach(function (el) {
         observer.observe(el);
-      });
-    });
-  })();
-  </script>
-
-  <!-- TF.js + model CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
-  <script src="{{ '/assets/js/sfi/sfi-categories.js' | relative_url }}"></script>
-  <script src="{{ '/assets/js/sfi/detect-engine.js' | relative_url }}"></script>
-
-  <script>
-  // ── Demo App ─────────────────────────────────────────
-  // Self-contained orchestration for the pitch page demo.
-  // Uses demo- prefixed IDs to avoid conflicts with /detect/ page.
-  (function () {
-    // Polyfill roundRect for older browsers
-    if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
-      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-        if (typeof r === 'number') r = [r, r, r, r];
-        this.moveTo(x + r[0], y);
-        this.lineTo(x + w - r[1], y);
-        this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
-        this.lineTo(x + w, y + h - r[2]);
-        this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
-        this.lineTo(x + r[3], y + h);
-        this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
-        this.lineTo(x, y + r[0]);
-        this.quadraticCurveTo(x, y, x + r[0], y);
-        this.closePath();
-        return this;
-      };
-    }
-
-    function setStatus(text, percent) {
-      var statusEl = document.getElementById('demoModelStatus');
-      document.getElementById('demoModelStatusText').textContent = text;
-      if (percent === -1) {
-        statusEl.classList.add('error');
-        return;
-      }
-      document.getElementById('demoModelProgressBar').style.width = percent + '%';
-      if (percent >= 100) {
-        statusEl.classList.add('ready');
-        document.getElementById('demoModelProgress').style.display = 'none';
-      }
-    }
-
-    function drawBoundingBoxes(imgEl, regions, sfiResults) {
-      var canvas = document.getElementById('demoResultCanvas');
-      var wrap = document.getElementById('demoResultWrap');
-      var displayWidth = wrap.clientWidth;
-      var displayHeight = imgEl.naturalHeight * (displayWidth / imgEl.naturalWidth);
-
-      canvas.width = displayWidth;
-      canvas.height = displayHeight;
-      canvas.style.height = displayHeight + 'px';
-
-      var ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      var scaleX = displayWidth / imgEl.naturalWidth;
-      var scaleY = displayHeight / imgEl.naturalHeight;
-
-      regions.forEach(function (region) {
-        var fallback = sfiResults.length > 0 ? sfiResults[0].cat : SFI_CATEGORIES[0];
-        var bestCat = DetectEngine.matchRegionToCategory(region, fallback);
-        var bbox = region.bbox;
-        var sx = bbox[0] * scaleX, sy = bbox[1] * scaleY, sw = bbox[2] * scaleX, sh = bbox[3] * scaleY;
-        var color = bestCat.color;
-
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2.5;
-        ctx.setLineDash([]);
-        ctx.strokeRect(sx, sy, sw, sh);
-        ctx.fillStyle = color + '18';
-        ctx.fillRect(sx, sy, sw, sh);
-
-        var label = bestCat.name;
-        ctx.font = 'bold 12px "DM Mono", monospace';
-        var textWidth = ctx.measureText(label).width;
-        var labelH = 20;
-        var labelY = sy > labelH + 4 ? sy - labelH - 2 : sy + 2;
-
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.roundRect(sx, labelY, textWidth + 12, labelH, 3);
-        ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.fillText(label, sx + 6, labelY + 14);
-      });
-
-      if (regions.length === 0 && sfiResults.length > 0) {
-        var cat = sfiResults[0].cat;
-        var color = cat.color;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 3;
-        ctx.setLineDash([8, 4]);
-        ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
-        ctx.setLineDash([]);
-
-        var label = cat.name;
-        ctx.font = 'bold 13px "DM Mono", monospace';
-        var tw = ctx.measureText(label).width;
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.roundRect(12, 12, tw + 18, 24, 4);
-        ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.fillText(label, 21, 29);
-      }
-    }
-
-    function displayResults(sfiResults) {
-      var div = document.getElementById('demoDetectResults');
-      if (sfiResults.length === 0) {
-        div.innerHTML = '<div class="demo-no-results">No SFI equipment detected.<br>Try a photo of a helmet, fire suit, harness, or roll cage.</div>';
-        return;
-      }
-
-      var html = '<div class="demo-results-title">Detected SFI Equipment</div>';
-      sfiResults.forEach(function (result) {
-        var conf = result.confidence;
-        var confColor = conf >= 60 ? '#27ae60' : conf >= 30 ? '#8b1c1c' : '#cec8bc';
-        html += '<div class="demo-result-card">' +
-          '<div class="demo-result-color" style="background:' + result.cat.color + '"></div>' +
-          '<div class="demo-result-info">' +
-            '<div class="demo-result-name">' + result.cat.name + '</div>' +
-            '<div class="demo-result-items">' + result.cat.items.slice(0, 3).join(' &bull; ') + (result.cat.items.length > 3 ? ' &bull; +' + (result.cat.items.length - 3) + ' more' : '') + '</div>' +
-          '</div>' +
-          '<div style="text-align:right;">' +
-            '<div class="demo-result-conf" style="color:' + confColor + '">' + conf + '%</div>' +
-            '<div class="demo-result-conf-label">confidence</div>' +
-          '</div>' +
-        '</div>';
-      });
-      div.innerHTML = html;
-    }
-
-    function loadImageFromFile(file) {
-      if (!file || !file.type.startsWith('image/')) return;
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var img = new Image();
-        img.onload = function () { analyzeImage(img); };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function analyzeImage(imgEl) {
-      if (!DetectEngine.isReady()) return;
-
-      var area = document.getElementById('demoResultsArea');
-      var resultImg = document.getElementById('demoResultImg');
-      var overlay = document.getElementById('demoAnalyzingOverlay');
-      var resultsDiv = document.getElementById('demoDetectResults');
-
-      resultImg.src = imgEl.src;
-      area.style.display = 'block';
-      overlay.style.display = 'flex';
-      resultsDiv.innerHTML = '';
-      area.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      await new Promise(function (r) { setTimeout(r, 80); });
-
-      try {
-        var detection = await DetectEngine.runDetection(imgEl);
-        var regions = await DetectEngine.classifyRegions(imgEl, detection.cocoResults);
-        var sfiResults = DetectEngine.mapToSFI(detection.mnetResults, regions);
-        drawBoundingBoxes(imgEl, regions, sfiResults);
-        displayResults(sfiResults);
-      } catch (err) {
-        console.error('Demo analysis error:', err);
-        resultsDiv.innerHTML = '<div class="demo-no-results">Analysis failed — please try a different image.</div>';
-      }
-
-      overlay.style.display = 'none';
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      // Load models
-      DetectEngine.loadModels(setStatus);
-
-      // File input
-      var fileInput = document.getElementById('demoFileInput');
-      fileInput.addEventListener('change', function () {
-        loadImageFromFile(fileInput.files[0]);
-      });
-
-      // Drag and drop
-      var zone = document.getElementById('demoUploadZone');
-      zone.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        zone.classList.add('dragover');
-      });
-      zone.addEventListener('dragleave', function () {
-        zone.classList.remove('dragover');
-      });
-      zone.addEventListener('drop', function (e) {
-        e.preventDefault();
-        zone.classList.remove('dragover');
-        loadImageFromFile(e.dataTransfer.files[0]);
       });
     });
   })();
