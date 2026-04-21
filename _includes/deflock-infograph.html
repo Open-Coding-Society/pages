@@ -61,6 +61,12 @@
           {% endfor %}
         </div>
 
+        <div class="hh-links-list">
+          {% for link in topic.links %}
+          <a href="{{link.url}}" class="hh-btn">{{ link.title }}</a>>
+          {% endfor %}
+        </div>
+       
         <a href="https://deflock.opencodingsociety.com" class="hh-btn">Learn More</a>
       </div>
 
