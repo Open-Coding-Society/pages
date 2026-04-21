@@ -239,6 +239,7 @@ class AiChallengeNpc extends AiNpc {
       ui.responseArea.style.gap = '6px';
       ui.responseArea.style.padding = '8px';
       ui.responseArea.style.position = 'relative';
+      AiChallengeNpc.ensureModeLabel(ui.container, 'Challenge Question');
       AiChallengeNpc.ensureJumpToLatestButton(ui.responseArea);
       AiChallengeNpc.renderChatHistory(ui.responseArea, data?.chatHistory || []);
       AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Generating challenge question…');
@@ -329,7 +330,7 @@ class AiChallengeNpc extends AiNpc {
     });
 
     ui.input.value = '';
-    ui.input.placeholder = 'Type your answer, then press Enter to submit...';
+    ui.input.placeholder = 'Type your answer, or ask for a hint, then press Enter...';
 
     ui.input.onkeypress = (event) => {
       event.stopPropagation();
@@ -342,10 +343,131 @@ class AiChallengeNpc extends AiNpc {
         return;
       }
 
+      if (AiChallengeNpc.isChallengeFollowUpQuestion(answer)) {
+        AiChallengeNpc.handleChallengeFollowUpQuestion(npc, deskId, challengeQuestion, answer, ui, activeChallenges, npcId);
+        ui.input.value = '';
+        return;
+      }
+
       AiChallengeNpc.appendChatMessage(ui.responseArea, 'user', answer);
       const active = activeChallenges.get(npcId);
       onSubmit(answer, active, ui);
     };
+  }
+
+  /**
+   * Detect whether the input is a follow-up question rather than a challenge answer.
+   * This keeps players from accidentally submitting requests for hints as their answer.
+   */
+  static isChallengeFollowUpQuestion(text) {
+    const normalized = (text || '').trim().toLowerCase();
+    if (!normalized) return false;
+
+    if (normalized.includes('?')) return true;
+
+    return /^(what|why|how|when|where|who|which|can you|could you|would you|should i|please|hint|help|give me|tell me|explain)/i.test(normalized);
+  }
+
+  /**
+   * Answer a follow-up question without revealing the challenge answer.
+   * The active challenge remains open and the follow-up is not scored.
+   */
+  static async handleChallengeFollowUpQuestion(npc, deskId, challengeQuestion, followUpQuestion, ui, activeChallenges = null, npcId = '') {
+    if (!npc?.spriteData || !ui?.responseArea) return;
+
+    AiChallengeNpc.appendChatMessage(ui.responseArea, 'user', followUpQuestion);
+    AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Thinking about a safe hint...');
+
+    const activeChallenge = activeChallenges?.get?.(npcId) || null;
+
+    try {
+      const prompt = AiChallengeNpc.buildFollowUpPrompt(
+        npc.spriteData,
+        challengeQuestion,
+        followUpQuestion,
+        activeChallenge,
+      );
+      const raw = await AiChallengeNpc.requestAiText(
+        npc.spriteData,
+        prompt,
+        'mission-challenge-followup',
+        'Mission Tools challenge follow-up assistance',
+      );
+
+      const safeReply = AiChallengeNpc.sanitizeFollowUpReply(raw);
+      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', safeReply);
+      if (npc?.dialogueSystem?.speakText) {
+        npc.dialogueSystem.speakText(safeReply);
+      }
+
+      if (Array.isArray(npc.spriteData.chatHistory)) {
+        npc.spriteData.chatHistory.push({ role: 'user', message: followUpQuestion, createdAt: Date.now() });
+        npc.spriteData.chatHistory.push({ role: 'ai', message: safeReply, createdAt: Date.now() });
+      }
+
+      AiChallengeNpc.updateJumpToLatestVisibility(ui.responseArea);
+    } catch (error) {
+      console.warn(`[AiChallengeNpc] follow-up hint failed for ${deskId}:`, error);
+      const fallbackReply = 'I can give a hint, but I cannot reveal the full answer. Try focusing on the next step or the key concept the question is testing.';
+      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', fallbackReply);
+      if (npc?.dialogueSystem?.speakText) {
+        npc.dialogueSystem.speakText(fallbackReply);
+      }
+    }
+  }
+
+  /**
+   * Build a safe follow-up prompt that keeps the answer hidden.
+   */
+  static buildFollowUpPrompt(spriteData, challengeQuestion, followUpQuestion, activeChallenge = null) {
+    const expertise = spriteData?.expertise || 'general problem solving';
+    const deskName = spriteData?.id || 'Desk Guide';
+    const lastVerdict = activeChallenge?.lastEvaluation?.verdict || '';
+    const lastFeedback = activeChallenge?.lastEvaluation?.feedback || '';
+    const lastAnswer = activeChallenge?.lastAnswer || '';
+    const hasFeedback = Boolean(lastVerdict || lastFeedback);
+
+    const modeInstructions = hasFeedback
+      ? [
+          'The student already submitted an answer and received feedback.',
+          `Last student answer: ${lastAnswer || 'not recorded'}`,
+          `Last verdict: ${lastVerdict || 'not recorded'}`,
+          `Last feedback: ${lastFeedback || 'not recorded'}`,
+          'The student is asking why the feedback was given.',
+          'Explain the reasoning behind the verdict using the question and the student answer.',
+          'Do not re-grade the answer.',
+          'Do not change the verdict.',
+        ]
+      : [
+          'The student has not submitted an answer yet.',
+          'Answer as a hint or clarification only.',
+          'Do not reveal the full answer to the challenge question.',
+          'Do not say whether the student is correct.',
+          'Do not grade the answer.',
+          'If the student asks for the answer directly, refuse politely and offer a hint instead.',
+        ];
+
+    return [
+      `You are ${deskName} in a classroom coding game.`,
+      `Desk expertise: ${expertise}.`,
+      `Current challenge question: ${challengeQuestion}`,
+      `Student follow-up question: ${followUpQuestion}`,
+      ...modeInstructions,
+      'Respond with a short helpful explanation or hint depending on the current mode.',
+      'Keep the reply to 2 sentences maximum.',
+    ].join('\n\n');
+  }
+
+  /**
+   * Trim and constrain the AI follow-up response so it stays hint-like.
+   */
+  static sanitizeFollowUpReply(raw) {
+    const reply = (raw || '').toString().trim();
+    if (!reply) {
+      return 'Try narrowing your focus to the key concept in the question.';
+    }
+
+    return AiChallengeNpc.extractFirstLine(reply);
   }
 
   // ── Evaluation rendering ────────────────────────────────────────────────────
@@ -366,6 +488,7 @@ class AiChallengeNpc extends AiNpc {
     const feedback = evaluation?.feedback || 'No feedback provided.';
 
     responseArea.style.display = 'block';
+    AiChallengeNpc.ensureModeLabel(responseArea.parentElement, 'Feedback Q&A');
     AiChallengeNpc.appendChatMessage(responseArea, 'ai', `${icon} ${verdictLabel}: ${feedback}`);
   }
 
@@ -457,6 +580,40 @@ class AiChallengeNpc extends AiNpc {
 
     responseArea.appendChild(jumpBtn);
     AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Ensure the chat panel has a small mode label above the response log.
+   */
+  static ensureModeLabel(container, text) {
+    if (!container) return;
+
+    let label = container.querySelector('.ai-challenge-mode-label');
+    if (!label) {
+      label = document.createElement('div');
+      label.className = 'ai-challenge-mode-label';
+      label.style.margin = '0 0 6px 0';
+      label.style.padding = '4px 8px';
+      label.style.borderRadius = '999px';
+      label.style.border = '1px solid rgba(255, 255, 255, 0.18)';
+      label.style.background = 'rgba(12, 16, 24, 0.72)';
+      label.style.color = '#f7f7f7';
+      label.style.fontSize = '12px';
+      label.style.fontWeight = '600';
+      label.style.letterSpacing = '0.02em';
+      label.style.width = 'fit-content';
+      label.style.maxWidth = '100%';
+
+      const responseArea = container.querySelector('.ai-npc-response-area');
+      if (responseArea && responseArea.parentNode === container) {
+        container.insertBefore(label, responseArea);
+      } else {
+        container.appendChild(label);
+      }
+    }
+
+    label.textContent = text;
+    return label;
   }
 
   /**

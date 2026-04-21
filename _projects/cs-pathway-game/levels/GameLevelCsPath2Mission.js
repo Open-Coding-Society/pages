@@ -627,6 +627,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           );
           AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, evaluation);
           AiChallengeNpc.speakEvaluation(npc, evaluation);
+          active.lastAnswer = answer;
+          active.lastEvaluation = evaluation || {
+            verdict: CHALLENGE_VERDICTS.WRONG,
+            feedback: 'No feedback provided.',
+          };
           this._appendDeskChatMessage(
             npc,
             'ai',
@@ -645,6 +650,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           });
         } catch (error) {
           console.warn('[MissionTools] challenge answer evaluation failed:', error);
+          active.lastAnswer = answer;
+          active.lastEvaluation = {
+            verdict: CHALLENGE_VERDICTS.WRONG,
+            feedback: 'Could not evaluate right now. Please try submitting again.',
+          };
           this._appendDeskChatMessage(
             npc,
             'ai',
