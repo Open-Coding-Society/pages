@@ -171,7 +171,26 @@ class GameEnv {
 
 
     resize() {
-        this.create();
+        // Resize should not create a new canvas (that causes duplicated layers/entities).
+        // Instead, recompute dimensions and resize the existing canvas.
+        this.setTop();
+        this.setBottom();
+
+        if (this.game?.environment?.innerWidth !== undefined) {
+            this.innerWidth = this.game.environment.innerWidth;
+        } else {
+            this.innerWidth = window.innerWidth;
+        }
+
+        if (this.game?.environment?.innerHeight !== undefined) {
+            this.innerHeight = this.game.environment.innerHeight;
+        } else {
+            this.innerHeight = window.innerHeight - this.top - this.bottom;
+        }
+
+        if (this.canvas && this.ctx) {
+            this.size();
+        }
     }
 
  

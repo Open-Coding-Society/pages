@@ -603,8 +603,117 @@ class GameLevelAirport {
       'Schwab',
       'Casino-NPC',
       'Crypto-NPC',
-      'Bank-NPC'
+      'Bank-NPC',
+      'Futures-NPC'
     ];
+
+    // Futures trading NPC (Airport-specific "new" experience)
+    const sprite_data_futures = {
+      id: 'Futures-NPC',
+      greeting: "Welcome to the Futures Desk. Want to hedge some risk… or take some?",
+      src: path + "/images/gamify/stockguy.png",
+      SCALE_FACTOR: 7,
+      ANIMATION_RATE: 50,
+      pixels: { height: 441, width: 339 },
+      INIT_POSITION: { x: width * 0.78, y: height * 0.48 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.03, heightPercentage: 0.06 },
+      reaction: function () {
+        const commodities = [
+          { name: "Corn seeds", unit: "bushel", contractSize: 5000, basePrice: 4.20 },
+          { name: "Lean hogs (pigs)", unit: "lb", contractSize: 40000, basePrice: 0.86 },
+          { name: "Wheat seeds", unit: "bushel", contractSize: 5000, basePrice: 5.10 },
+        ];
+
+        const pick = commodities[Math.floor(Math.random() * commodities.length)];
+        const spot = Number((pick.basePrice * (0.92 + Math.random() * 0.18)).toFixed(3));
+        const futures = Number((spot * (1.0 + (Math.random() * 0.04 - 0.01))).toFixed(3));
+        const marginRate = 0.12;
+
+        const explain = () => {
+          const notional = futures * pick.contractSize;
+          const margin = notional * marginRate;
+          showDialogBox(
+            "Futures Desk",
+            `Today’s product: ${pick.name}\n\n` +
+              `Spot: $${spot}/${pick.unit}\n` +
+              `Futures (next month): $${futures}/${pick.unit}\n` +
+              `Contract size: ${pick.contractSize.toLocaleString()} ${pick.unit}\n\n` +
+              `You don’t pay full notional. You post margin (~${Math.round(marginRate*100)}%).\n` +
+              `Notional ≈ $${notional.toFixed(2)} | Margin ≈ $${margin.toFixed(2)}\n\n` +
+              `Choose an action:`,
+            [
+              { label: "Go LONG (bet price rises)", action: () => simulate("LONG"), keepOpen: false },
+              { label: "Go SHORT (bet price falls)", action: () => simulate("SHORT"), keepOpen: false },
+              { label: "What is hedging?", action: () => hedging(), keepOpen: true },
+              { label: "I’m done", action: () => markDone(), keepOpen: false },
+            ]
+          );
+        };
+
+        const hedging = () => {
+          showDialogBox(
+            "Hedging (why futures exist)",
+            `If you’re a farmer raising pigs or growing seeds, your profit depends on the price at delivery.\n` +
+              `A futures contract can lock in a price today to reduce uncertainty.\n\n` +
+              `Speculators take the other side, providing liquidity—but take on risk.`,
+            [
+              { label: "Back", action: () => explain(), keepOpen: true },
+            ]
+          );
+        };
+
+        const simulate = (side) => {
+          // Simulate settlement with a random move
+          const movePct = (Math.random() * 0.12) - 0.06; // -6%..+6%
+          const settle = Number((futures * (1 + movePct)).toFixed(3));
+          const delta = settle - futures;
+          const pnl = (side === "LONG" ? delta : -delta) * pick.contractSize;
+
+          const outcome =
+            pnl > 0 ? "You profited." :
+            pnl < 0 ? "You lost money." :
+            "You broke even.";
+
+          showDialogBox(
+            "Settlement (simulated)",
+            `${pick.name}\n\n` +
+              `Entry futures: $${futures}/${pick.unit}\n` +
+              `Settlement:   $${settle}/${pick.unit}\n\n` +
+              `P/L: $${pnl.toFixed(2)}\n${outcome}\n\n` +
+              `Key lesson: futures amplify outcomes because contract size is large.`,
+            [
+              { label: "Try again (new product)", action: () => explain(), keepOpen: false },
+              { label: "Mark complete", action: () => markDone(), keepOpen: false },
+            ]
+          );
+        };
+
+        const markDone = () => {
+          if (gameEnv.game && gameEnv.game.giveNpcCookie) {
+            gameEnv.game.updateNpcProgress(gameEnv.game.id, sprite_data_futures.id);
+            gameEnv.game.giveNpcCookie(sprite_data_futures.id, "completed", "Completed futures simulation (seeds/pigs).");
+          }
+          showDialogBox(
+            "Futures Desk",
+            "Nice work. You completed a futures simulation.",
+            [{ label: "Done", action: () => {}, keepOpen: false }]
+          );
+        };
+
+        return { intro: explain };
+      },
+      interact: async function () {
+        const game = gameEnv.game;
+        const npcProgressSystem = new NpcProgressSystem();
+        const allowed = await npcProgressSystem.checkNpcProgress(game, sprite_data_futures.id);
+        if (allowed) {
+          const dialogFunctions = sprite_data_futures.reaction();
+          dialogFunctions.intro();
+        }
+      }
+    };
 
     const areAirportInteractionsComplete = async () => {
       const game = gameEnv.game;
@@ -682,8 +791,8 @@ class GameLevelAirport {
       { class: Npc, data: sprite_data_fidelity },
       { class: Npc, data: sprite_data_schwab },
       { class: Npc, data: sprite_data_bank},
+      { class: Npc, data: sprite_data_futures },
       { class: Npc, data: sprite_data_options_gate },
-      { class: Npc, data: sprite_data_mining}
     ];
     this.npcProgressSystem = new NpcProgressSystem();
   }

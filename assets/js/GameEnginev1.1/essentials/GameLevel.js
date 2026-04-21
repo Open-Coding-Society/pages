@@ -8,6 +8,7 @@ class GameLevel {
     this.gameEnv.path = gameControl.path
     this.gameEnv.gameContainer = gameControl.gameContainer
     this.gameEnv.gameControl = gameControl
+    this._boundResize = this.resize.bind(this)
   }
 
   /** Spawning Object Literals to Class */
@@ -258,7 +259,7 @@ class GameLevel {
         this.gameLevel.initialize()
     }
 
-    window.addEventListener("resize", this.resize.bind(this))
+    window.addEventListener("resize", this._boundResize)
   }
 
   destroy() {
@@ -280,7 +281,7 @@ class GameLevel {
       this.gameEnv.destroy();
     }
     
-    window.removeEventListener("resize", this.resize.bind(this))
+    window.removeEventListener("resize", this._boundResize)
   }
 
   update() {
