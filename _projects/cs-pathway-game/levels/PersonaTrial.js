@@ -136,29 +136,32 @@ export default class PersonaTrial {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 28px;
+      padding: 20px;
       background:
-        radial-gradient(circle at 50% 20%, rgba(56,189,248,0.14), transparent 24%),
-        radial-gradient(circle at 20% 80%, rgba(168,85,247,0.10), transparent 24%),
-        radial-gradient(circle at 80% 30%, rgba(250,204,21,0.08), transparent 20%),
-        rgba(4, 8, 20, 0.92);
-      backdrop-filter: blur(8px);
+        radial-gradient(circle at 50% 20%, rgba(56,189,248,0.10), transparent 24%),
+        radial-gradient(circle at 20% 80%, rgba(168,85,247,0.08), transparent 24%),
+        radial-gradient(circle at 80% 30%, rgba(250,204,21,0.06), transparent 20%),
+        rgba(4, 8, 20, 0.50);
+      backdrop-filter: blur(4px) brightness(0.84);
+      -webkit-backdrop-filter: blur(4px) brightness(0.84);
+      box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.36);
       font-family: system-ui, sans-serif;
     `;
 
     this.card = document.createElement('div');
     this.card.style.cssText = `
-      width: min(920px, 100%);
-      min-height: 580px;
-      border-radius: 28px;
-      overflow: hidden;
+      width: min(680px, 92%);
+      max-height: 78vh;
+      overflow-y: auto;
+      border-radius: 18px;
       color: #f8fafc;
-      border: 1px solid rgba(255,255,255,0.10);
-      background:
-        linear-gradient(180deg, rgba(14,22,40,0.97) 0%, rgba(8,13,28,0.98) 100%);
+      background: linear-gradient(180deg, rgba(14,22,40,0.86) 0%, rgba(8,13,28,0.88) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
       box-shadow:
-        0 30px 100px rgba(0,0,0,0.45),
-        inset 0 1px 0 rgba(255,255,255,0.05);
+        0 18px 46px rgba(0,0,0,0.42),
+        0 0 34px rgba(96,165,250,0.08);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
     `;
 
     this.overlay.appendChild(this.card);
@@ -176,7 +179,8 @@ export default class PersonaTrial {
       display:flex;
       justify-content:space-between;
       align-items:center;
-      padding:18px 24px;
+      gap: 10px;
+      padding:12px 16px;
       border-bottom:1px solid rgba(255,255,255,0.08);
       background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
     `;
@@ -185,9 +189,9 @@ export default class PersonaTrial {
     left.textContent = leftText;
     left.style.cssText = `
       color:#93c5fd;
-      font-size:13px;
+      font-size:12px;
       font-weight:700;
-      letter-spacing:0.12em;
+      letter-spacing:0.10em;
       text-transform:uppercase;
     `;
 
@@ -195,7 +199,7 @@ export default class PersonaTrial {
     right.textContent = rightText;
     right.style.cssText = `
       color:#94a3b8;
-      font-size:13px;
+      font-size:12px;
     `;
 
     top.append(left, right);
@@ -205,27 +209,20 @@ export default class PersonaTrial {
   makeShell() {
     const wrap = document.createElement('div');
     wrap.style.cssText = `
-      display:grid;
-      grid-template-columns: 1.12fr 0.88fr;
-      min-height: 500px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      padding: 14px 16px 12px 16px;
     `;
 
     const left = document.createElement('div');
     left.style.cssText = `
-      padding: 38px 36px 34px 36px;
-      border-right:1px solid rgba(255,255,255,0.06);
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
+      padding: 0;
     `;
 
     const right = document.createElement('div');
     right.style.cssText = `
-      padding: 34px 28px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
+      padding: 0;
     `;
 
     wrap.append(left, right);
@@ -238,8 +235,8 @@ export default class PersonaTrial {
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:12px;
-      padding:18px 24px;
+      gap:10px;
+      padding:12px 16px;
       border-top:1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.02);
     `;
@@ -258,7 +255,7 @@ export default class PersonaTrial {
         background: linear-gradient(135deg, #60a5fa 0%, #8b5cf6 100%);
         color: #ffffff;
         border: none;
-        box-shadow: 0 12px 32px rgba(96,165,250,0.18);
+        box-shadow: 0 10px 24px rgba(96,165,250,0.16);
       `,
       secondary: `
         background: rgba(255,255,255,0.03);
@@ -275,17 +272,17 @@ export default class PersonaTrial {
     };
 
     btn.style.cssText = `
-      padding: 15px 16px;
-      border-radius: 16px;
+      padding: 12px 14px;
+      border-radius: 14px;
       cursor: pointer;
-      font-size: 15px;
-      line-height: 1.45;
+      font-size: 14px;
+      line-height: 1.35;
       transition: transform 0.14s ease, opacity 0.14s ease, border-color 0.14s ease;
       ${styles[variant]}
     `;
 
     btn.onmouseenter = () => {
-      btn.style.transform = 'translateY(-2px)';
+      btn.style.transform = 'translateY(-1px)';
       btn.style.opacity = '0.98';
       btn.style.borderColor = 'rgba(147,197,253,0.42)';
     };
@@ -361,16 +358,16 @@ export default class PersonaTrial {
 
   makeBar(label, percent) {
     const wrap = document.createElement('div');
-    wrap.style.cssText = `margin-bottom:14px;`;
+    wrap.style.cssText = `margin-bottom:12px;`;
 
     const top = document.createElement('div');
     top.style.cssText = `
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:8px;
+      margin-bottom:6px;
       color:#e2e8f0;
-      font-size:15px;
+      font-size:14px;
     `;
 
     const left = document.createElement('span');
@@ -385,7 +382,7 @@ export default class PersonaTrial {
     const track = document.createElement('div');
     track.style.cssText = `
       width:100%;
-      height:12px;
+      height:10px;
       border-radius:999px;
       background: rgba(255,255,255,0.08);
       overflow:hidden;
@@ -397,7 +394,7 @@ export default class PersonaTrial {
       height:100%;
       border-radius:999px;
       background: linear-gradient(90deg, #60a5fa 0%, #8b5cf6 100%);
-      box-shadow: 0 0 18px rgba(96,165,250,0.18);
+      box-shadow: 0 0 16px rgba(96,165,250,0.16);
     `;
 
     track.appendChild(fill);
@@ -414,21 +411,21 @@ export default class PersonaTrial {
 
     const orb = document.createElement('div');
     orb.style.cssText = `
-      width: 86px;
-      height: 86px;
+      width: 64px;
+      height: 64px;
       border-radius: 999px;
-      margin-bottom: 22px;
+      margin-bottom: 14px;
       background: radial-gradient(circle, rgba(147,197,253,0.95) 0%, rgba(96,165,250,0.50) 36%, rgba(168,85,247,0.28) 56%, rgba(0,0,0,0) 74%);
-      box-shadow: 0 0 44px rgba(96,165,250,0.22);
+      box-shadow: 0 0 34px rgba(96,165,250,0.20);
     `;
 
     const title = document.createElement('h2');
     title.textContent = 'The Chamber of Persona';
     title.style.cssText = `
-      margin:0 0 14px 0;
-      font-size: 42px;
-      line-height:1.02;
-      letter-spacing:-0.03em;
+      margin:0 0 10px 0;
+      font-size: 30px;
+      line-height:1.05;
+      letter-spacing:-0.02em;
     `;
 
     const text = document.createElement('p');
@@ -437,17 +434,16 @@ export default class PersonaTrial {
     text.style.cssText = `
       margin:0;
       color:#cbd5e1;
-      line-height:1.8;
-      font-size:17px;
-      max-width:560px;
+      line-height:1.6;
+      font-size:15px;
     `;
 
     left.append(orb, title, text);
 
     const panel = document.createElement('div');
     panel.style.cssText = `
-      padding:22px;
-      border-radius:22px;
+      padding:16px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.03);
     `;
@@ -455,11 +451,11 @@ export default class PersonaTrial {
     const panelLabel = document.createElement('div');
     panelLabel.textContent = 'What the gateway will reveal';
     panelLabel.style.cssText = `
-      margin-bottom:14px;
+      margin-bottom:10px;
       color:#93c5fd;
-      font-size:13px;
+      font-size:12px;
       text-transform:uppercase;
-      letter-spacing:0.12em;
+      letter-spacing:0.10em;
       font-weight:700;
     `;
 
@@ -467,10 +463,10 @@ export default class PersonaTrial {
     panelText.textContent =
       'You will walk through moments shaped by uncertainty, teamwork, pressure, and choice. At the end, the gateway will reveal your current persona as a living balance, not a fixed label.';
     panelText.style.cssText = `
-      margin:0 0 22px 0;
+      margin:0 0 14px 0;
       color:#e2e8f0;
-      line-height:1.75;
-      font-size:15px;
+      line-height:1.55;
+      font-size:14px;
     `;
 
     const beginBtn = this.makeButton('Step Into the Vision', () => {
@@ -484,7 +480,7 @@ export default class PersonaTrial {
     }, 'secondary');
 
     const actionWrap = document.createElement('div');
-    actionWrap.style.cssText = `display:grid; gap:12px;`;
+    actionWrap.style.cssText = `display:grid; gap:10px;`;
     actionWrap.append(beginBtn, leaveBtn);
 
     panel.append(panelLabel, panelText, actionWrap);
@@ -492,7 +488,7 @@ export default class PersonaTrial {
 
     const leftFooter = document.createElement('div');
     leftFooter.textContent = 'The chamber responds to instinct, not performance.';
-    leftFooter.style.cssText = `color:#94a3b8; font-size:14px;`;
+    leftFooter.style.cssText = `color:#94a3b8; font-size:13px;`;
 
     this.card.append(wrap, this.makeFooter(leftFooter, null));
   }
@@ -510,8 +506,8 @@ export default class PersonaTrial {
     const title = document.createElement('h2');
     title.textContent = scene.title;
     title.style.cssText = `
-      margin:0 0 18px 0;
-      font-size:36px;
+      margin:0 0 10px 0;
+      font-size:28px;
       line-height:1.08;
       letter-spacing:-0.02em;
     `;
@@ -521,17 +517,16 @@ export default class PersonaTrial {
     text.style.cssText = `
       margin:0;
       color:#dbeafe;
-      line-height:1.85;
-      font-size:17px;
-      max-width:560px;
+      line-height:1.6;
+      font-size:15px;
     `;
 
     const hint = document.createElement('div');
     hint.textContent = 'Choose the response that feels most natural in this moment.';
     hint.style.cssText = `
-      margin-top:22px;
+      margin-top:12px;
       color:#94a3b8;
-      font-size:14px;
+      font-size:13px;
     `;
 
     left.append(title, text, hint);
@@ -539,16 +534,16 @@ export default class PersonaTrial {
     const label = document.createElement('div');
     label.textContent = 'How do you answer the vision?';
     label.style.cssText = `
-      margin-bottom:14px;
+      margin-bottom:10px;
       color:#93c5fd;
-      font-size:13px;
+      font-size:12px;
       text-transform:uppercase;
-      letter-spacing:0.12em;
+      letter-spacing:0.10em;
       font-weight:700;
     `;
 
     const choices = document.createElement('div');
-    choices.style.cssText = `display:grid; gap:12px;`;
+    choices.style.cssText = `display:grid; gap:10px;`;
 
     scene.choices.forEach((choice) => {
       const btn = this.makeButton(choice.text, () => {
@@ -569,7 +564,7 @@ export default class PersonaTrial {
 
     const footerLeft = document.createElement('div');
     footerLeft.textContent = 'The gateway is reading your pattern.';
-    footerLeft.style.cssText = `color:#94a3b8; font-size:14px;`;
+    footerLeft.style.cssText = `color:#94a3b8; font-size:13px;`;
 
     const footerRight = this.makeButton('Leave Chamber', () => {
       this.destroy();
@@ -603,31 +598,30 @@ export default class PersonaTrial {
     const label = document.createElement('div');
     label.textContent = 'The chamber reveals your current path as...';
     label.style.cssText = `
-      margin-bottom:10px;
+      margin-bottom:8px;
       color:#93c5fd;
-      font-size:14px;
+      font-size:12px;
       text-transform:uppercase;
-      letter-spacing:0.12em;
+      letter-spacing:0.10em;
       font-weight:700;
     `;
 
     const title = document.createElement('h2');
     title.textContent = insights.title;
     title.style.cssText = `
-      margin:0 0 16px 0;
-      font-size:44px;
-      line-height:1.03;
-      letter-spacing:-0.03em;
+      margin:0 0 10px 0;
+      font-size:32px;
+      line-height:1.05;
+      letter-spacing:-0.02em;
     `;
 
     const summary = document.createElement('p');
     summary.textContent = insights.summary;
     summary.style.cssText = `
-      margin:0 0 14px 0;
+      margin:0 0 10px 0;
       color:#e2e8f0;
-      line-height:1.8;
-      font-size:17px;
-      max-width:560px;
+      line-height:1.6;
+      font-size:15px;
     `;
 
     const growth = document.createElement('p');
@@ -635,17 +629,16 @@ export default class PersonaTrial {
     growth.style.cssText = `
       margin:0;
       color:#cbd5e1;
-      line-height:1.8;
-      font-size:16px;
-      max-width:560px;
+      line-height:1.6;
+      font-size:14px;
     `;
 
     left.append(label, title, summary, growth);
 
     const panel = document.createElement('div');
     panel.style.cssText = `
-      padding:24px;
-      border-radius:22px;
+      padding:16px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.03);
     `;
@@ -653,11 +646,11 @@ export default class PersonaTrial {
     const panelTitle = document.createElement('div');
     panelTitle.textContent = 'Current persona balance';
     panelTitle.style.cssText = `
-      margin-bottom:16px;
+      margin-bottom:12px;
       color:#93c5fd;
-      font-size:13px;
+      font-size:12px;
       text-transform:uppercase;
-      letter-spacing:0.12em;
+      letter-spacing:0.10em;
       font-weight:700;
     `;
 
@@ -673,10 +666,10 @@ export default class PersonaTrial {
     note.textContent =
       'This is a living snapshot, not a permanent label. As your choices change, the balance of your persona can shift with them.';
     note.style.cssText = `
-      margin:18px 0 0 0;
+      margin:12px 0 0 0;
       color:#94a3b8;
-      line-height:1.7;
-      font-size:14px;
+      line-height:1.55;
+      font-size:13px;
     `;
 
     panel.appendChild(note);
@@ -684,7 +677,7 @@ export default class PersonaTrial {
 
     const footerLeft = document.createElement('div');
     footerLeft.textContent = 'Your path continues beyond this chamber.';
-    footerLeft.style.cssText = `color:#94a3b8; font-size:14px;`;
+    footerLeft.style.cssText = `color:#94a3b8; font-size:13px;`;
 
     const footerRight = this.makeButton('Accept Revelation', () => {
       this.destroy();
