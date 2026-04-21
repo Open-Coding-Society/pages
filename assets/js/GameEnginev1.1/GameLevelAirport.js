@@ -706,7 +706,15 @@ window.addEventListener('DOMContentLoaded', function() {
   if (!gameContainer) return;
 
   // Initialize the waypoint arrow
-  new WaypointArrow(gameCanvas, window.gamePath);
+  if (!window.waypointArrow) {
+    new WaypointArrow(gameCanvas, window.gamePath);
+  } else {
+    try {
+      window.waypointArrow.gameCanvas = gameCanvas;
+      window.waypointArrow.gamePath = window.gamePath;
+      window.waypointArrow.refresh?.();
+    } catch (_) {}
+  }
 });
 
 // Utility function to create and open a reusable modal with an iframe

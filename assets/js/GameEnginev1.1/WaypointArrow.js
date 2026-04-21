@@ -1,5 +1,15 @@
 export default class WaypointArrow {
   constructor(gameCanvas, gamePath) {
+    // Singleton: reuse existing arrow instance if already created.
+    if (window.waypointArrow && window.waypointArrow.arrowImg && document.getElementById('waypointArrow')) {
+      try {
+        window.waypointArrow.gameCanvas = gameCanvas;
+        window.waypointArrow.gamePath = gamePath;
+        window.waypointArrow.refresh?.();
+      } catch (_) {}
+      return window.waypointArrow;
+    }
+
     this.gameCanvas = gameCanvas;
     this.gamePath = gamePath;
     // Start at J.P. Morgan and follow the correct order as seen in GameLevelAirport.js
@@ -347,16 +357,36 @@ export default class WaypointArrow {
 
   setupEventListeners() {
     // Right-click to reset (for debugging)
-    this.arrowImg.addEventListener('contextmenu', (e) => {
+    this._onContextMenu = this._onContextMenu || ((e) => {
       e.preventDefault();
       this.resetStep();
     });
+    this.arrowImg.addEventListener('contextmenu', this._onContextMenu);
 
     // Resize handler
-    window.addEventListener('resize', () => this.moveArrowToCurrentWaypoint());
+    this._onResize = this._onResize || (() => this.moveArrowToCurrentWaypoint());
+    window.addEventListener('resize', this._onResize);
 
     // Remove the automatic 'E' key advancement - now only cookies can advance the arrow
     // The 'E' key interaction should be handled by the NPC itself when giving cookies
+  }
+
+  destroy() {
+    try {
+      if (this.arrowImg && this._onContextMenu) {
+        this.arrowImg.removeEventListener('contextmenu', this._onContextMenu);
+      }
+    } catch (_) {}
+    try {
+      if (this._onResize) window.removeEventListener('resize', this._onResize);
+    } catch (_) {}
+    try {
+      if (this.trailInterval) clearInterval(this.trailInterval);
+    } catch (_) {}
+    try {
+      const el = document.getElementById('waypointArrow');
+      if (el) el.remove();
+    } catch (_) {}
   }
 
   // Public method to refresh arrow position (can be called from outside)

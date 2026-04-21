@@ -122,6 +122,7 @@ class GameLevelFuturesExchange {
       id: 'Futures-NPC',
       greeting: 'Step into the pit. This is futures trading.',
       src: `${path}/images/gamify/futures-trader.svg`,
+      zIndex: 12,
       SCALE_FACTOR: 4.2,
       ANIMATION_RATE: 50,
       pixels: { height: 512, width: 512 },
@@ -167,14 +168,16 @@ class GameLevelFuturesExchange {
       greeting: 'Complete the futures mini-game to unlock the next map.',
       // Use the dedicated gate asset; if it ever fails to load, don't render a huge red fallback.
       src: `${path}/images/gamify/level-gate.svg`,
+      zIndex: 11,
       // If the SVG fails to load, Character falls back to a solid square.
       // Make it visible (so progression isn't "invisible") but subtle.
       fillStyle: 'rgba(57,255,182,0.18)',
-      SCALE_FACTOR: 7,
+      SCALE_FACTOR: 9,
       ANIMATION_RATE: 50,
       // Must match the SVG (512x512) or the renderer will crop the image.
       pixels: { height: 512, width: 512 },
-      INIT_POSITION: { x: width * 0.82, y: height * 0.25 },
+      // Keep the gate out of the center so it never blocks the trader NPC on small screens.
+      INIT_POSITION: { x: width * 0.88, y: height * 0.16 },
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.08, heightPercentage: 0.12 },

@@ -259,6 +259,26 @@ class GameControl {
             this.currentLevel = null;
         }
 
+        // Hard cleanup: ensure no stale canvas layers remain in the container.
+        // If any game object failed to destroy cleanly, its canvas can sit on top
+        // of the next level and block clicks (looks like "old NPCs still there").
+        try {
+            if (this.gameContainer && this.gameContainer.querySelectorAll) {
+                this.gameContainer.querySelectorAll('canvas').forEach(c => c.remove());
+            }
+        } catch (e) {
+            console.warn('Failed to hard-remove stale canvases:', e);
+        }
+
+        // Remove global UI artifacts that are not part of the level GameEnv.
+        // NOTE: Do not remove `waypointArrow` here; it's a persistent UI element
+        // designed to span levels. Removing it can lead to duplicate instances
+        // if later code recreates it.
+        try {
+            const dialog = document.getElementById('custom-dialog-box');
+            if (dialog) dialog.remove();
+        } catch (_) {}
+
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
