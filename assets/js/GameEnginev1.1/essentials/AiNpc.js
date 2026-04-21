@@ -17,9 +17,36 @@
  */
 
 import DialogueSystem from './DialogueSystem.js';
+import AiNpcSession from './AiNpcSession.js';
 import { pythonURI, fetchOptions } from '../../api/config.js';
 
 class AiNpc {
+    static beginSession(npcInstance) {
+        if (!npcInstance) return null;
+
+        if (npcInstance.aiSession) {
+            npcInstance.aiSession.cancel();
+        }
+
+        npcInstance.aiSession = new AiNpcSession(npcInstance?.spriteData?.id || 'npc');
+
+        if (npcInstance.dialogueSystem?.setLifecycleSession) {
+            npcInstance.dialogueSystem.setLifecycleSession(npcInstance.aiSession);
+        }
+
+        return npcInstance.aiSession;
+    }
+
+    static isSessionActive(session) {
+        return !!session && typeof session.isActive === 'function' && session.isActive();
+    }
+
+    static canUseElement(element, session) {
+        if (!element || !element.isConnected) return false;
+        if (!session) return true;
+        return AiNpc.isSessionActive(session);
+    }
+
     /**
      * Main entry point - Shows full AI interaction dialog for an NPC
      * Creates DialogueSystem with NPC's dialogues and uses cycling behavior
@@ -40,6 +67,11 @@ class AiNpc {
                 dialogues: data.dialogues || [data.greeting || "Hello!"],
                 gameControl: npc.gameControl
             });
+        }
+
+        const session = AiNpc.beginSession(npc);
+        if (npc.dialogueSystem?.setLifecycleSession) {
+            npc.dialogueSystem.setLifecycleSession(session);
         }
 
         // Use DialogueSystem's cycling showRandomDialogue method
@@ -111,6 +143,7 @@ class AiNpc {
      */
     static attachEventHandlers(npcInstance, spriteData, ui) {
         const { inputField, historyBtn, responseArea } = ui;
+        const session = npcInstance?.aiSession || null;
 
         // History button
         historyBtn.onclick = () => AiNpc.showChatHistory(spriteData);
@@ -120,11 +153,11 @@ class AiNpc {
             const userMessage = inputField.value.trim();
             if (!userMessage) return;
             inputField.value = '';
-            await AiNpc.sendPromptToBackend(spriteData, userMessage, responseArea);
+            await AiNpc.sendPromptToBackend(npcInstance, userMessage, responseArea);
         };
 
         // Prevent game input while typing
-        AiNpc.preventGameInput(inputField);
+        AiNpc.preventGameInput(inputField, session);
 
         // Handle Enter key (Shift+Enter for new line, Enter to send)
         inputField.onkeypress = e => {
@@ -136,7 +169,13 @@ class AiNpc {
         };
 
         // Auto-focus input field
-        setTimeout(() => inputField.focus(), 100);
+        if (session) {
+            session.setTimeout(() => {
+                if (AiNpc.canUseElement(inputField, session)) inputField.focus();
+            }, 100);
+        } else {
+            setTimeout(() => inputField.focus(), 100);
+        }
     }
 
     /**
@@ -167,11 +206,20 @@ class AiNpc {
      * @param {string} userMessage - User's message
      * @param {HTMLElement} responseArea - Response display element
      */
-    static async sendPromptToBackend(spriteData, userMessage, responseArea) {
+    static async sendPromptToBackend(npcInstance, userMessage, responseArea) {
+        const spriteData = npcInstance?.spriteData || npcInstance;
+        const session = npcInstance?.aiSession || null;
+
+        if (!spriteData || !Array.isArray(spriteData.chatHistory)) {
+            return;
+        }
+
         spriteData.chatHistory.push({ role: 'user', message: userMessage });
 
-        responseArea.textContent = 'Thinking...';
-        responseArea.style.display = 'block';
+        if (AiNpc.canUseElement(responseArea, session)) {
+            responseArea.textContent = 'Thinking...';
+            responseArea.style.display = 'block';
+        }
 
         try {
             // Build knowledge context
@@ -191,6 +239,7 @@ class AiNpc {
             const response = await fetch(pythonURL, {
                 ...fetchOptions,
                 method: 'POST',
+                signal: session?.signal,
                 body: JSON.stringify({
                     prompt: userMessage,
                     session_id: sessionId,
@@ -202,24 +251,37 @@ class AiNpc {
 
             const data = await response.json();
 
+            if (!AiNpc.canUseElement(responseArea, session)) {
+                return;
+            }
+
             if (data.status === 'error') {
                 AiNpc.showResponse(
                     data.message || "I'm having trouble thinking right now.",
-                    responseArea
+                    responseArea,
+                    30,
+                    session,
                 );
                 return;
             }
 
             const aiResponse = data?.response || "I'm not sure how to answer that yet.";
             spriteData.chatHistory.push({ role: 'ai', message: aiResponse });
-            AiNpc.showResponse(aiResponse, responseArea);
+            AiNpc.showResponse(aiResponse, responseArea, 30, session);
 
         } catch (err) {
+            if (err?.name === 'AbortError' || session?.signal?.aborted) {
+                return;
+            }
             console.error('Frontend error:', err);
-            AiNpc.showResponse(
-                "I'm having trouble reaching my brain right now.",
-                responseArea
-            );
+            if (AiNpc.canUseElement(responseArea, session)) {
+                AiNpc.showResponse(
+                    "I'm having trouble reaching my brain right now.",
+                    responseArea,
+                    30,
+                    session,
+                );
+            }
         }
     }
 
@@ -229,14 +291,26 @@ class AiNpc {
      * @param {HTMLElement} element - Element to display in
      * @param {number} speed - Typing speed in ms
      */
-    static showResponse(text, element, speed = 30) {
+    static showResponse(text, element, speed = 30, session = null) {
+        if (!AiNpc.canUseElement(element, session)) return;
+
         element.textContent = '';
         element.style.display = 'block';
         let index = 0;
+
+        const scheduleNext = (fn) => {
+            if (session) {
+                session.setTimeout(fn, speed);
+                return;
+            }
+            setTimeout(fn, speed);
+        };
+
         const type = () => {
+            if (!AiNpc.canUseElement(element, session)) return;
             if (index < text.length) {
                 element.textContent += text.charAt(index++);
-                setTimeout(type, speed);
+                scheduleNext(type);
             }
         };
         type();
@@ -246,9 +320,14 @@ class AiNpc {
      * Prevent keyboard events from propagating to game
      * @param {HTMLElement} element - Input element to protect
      */
-    static preventGameInput(element) {
+    static preventGameInput(element, session = null) {
         ['keydown', 'keyup', 'keypress'].forEach(eventType => {
-            element.addEventListener(eventType, e => e.stopPropagation());
+            const handler = (e) => e.stopPropagation();
+            if (session) {
+                session.addListener(element, eventType, handler);
+            } else {
+                element.addEventListener(eventType, handler);
+            }
         });
     }
 

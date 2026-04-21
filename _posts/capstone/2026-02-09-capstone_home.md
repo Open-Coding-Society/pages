@@ -401,7 +401,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    <!-- Poway NEC -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-06-powaynec-capstone %}">
-           <img src="/images/capstone/powaynec.png" alt="Poway NEC capstone preview image" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/powaynec-logo-white.png" alt="Poway NEC logo" class="w-56 h-32 object-contain rounded bg-emerald-950 p-2" />
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
@@ -562,7 +562,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">RCR: Poway-Midland Railroad</a></h3>
-           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with interactive features, real-time train schedules, virtual tours, GPS tracking, and volunteer management tools.</p>
+           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with an accounts system, interactive features, real-time train schedules, virtual tours, GPS tracking, and volunteer management tools.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Rebecca, Cyrus, Rishabh</p>
        </div>
    </div>
