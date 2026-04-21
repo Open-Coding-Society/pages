@@ -11,7 +11,7 @@ let pagesURI;
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     javaURI = "http://localhost:8585";
     socketURI = "ws://localhost:8585/websocket";
-    pagesURI = "http://127.0.0.1:4500";
+    pagesURI = "http://127.0.0.1:4500/finalpages";
 } else {
     javaURI = "https://spring.opencodingsociety.com";
     socketURI = "wss://spring.opencodingsociety.com/websocket";
@@ -87,7 +87,7 @@ class GameLevelAirport {
                   gameEnv.game.updateNpcProgress(gameEnv.game.id, sprite_data_casino.id);
                   gameEnv.game.giveNpcCookie(sprite_data_casino.id, "casino_visited", "Try your luck at the casino games! Play responsibly and remember - the house always has an edge.");
                 }
-                openInModal(`${pagesURI}/gamify/casinohomepage`);
+                openInModal(`${path}/gamify/casinohomepage`);
               }},
               { label: "No thanks", action: () => {} }
             ]
@@ -108,7 +108,7 @@ class GameLevelAirport {
                   gameEnv.game.giveNpcCookie(sprite_data_casino.id, "casino_visited", "Try your luck at the casino games! Play responsibly and remember - the house always has an edge.");
                 }
 
-                openInModal(`${pagesURI}/gamify/casinohomepage`);
+                openInModal(`${path}/gamify/casinohomepage`);
               }},
               { label: "Another tip", action: () => dialogFunctions.giveAdvice(), keepOpen: true },
               { label: "Maybe later", action: () => {} }
@@ -138,7 +138,7 @@ class GameLevelAirport {
                   gameEnv.game.updateNpcProgress(gameEnv.game.id, sprite_data_casino.id);
                   gameEnv.game.giveNpcCookie(sprite_data_casino.id, "casino_visited", "Try your luck at the casino games! Play responsibly and remember - the house always has an edge.");
                 }
-                openInModal(`${pagesURI}/gamify/casinohomepage`);
+                openInModal(`${path}/gamify/casinohomepage`);
               }},
               { label: "Back to advice", action: () => dialogFunctions.giveAdvice(), keepOpen: true },
               { label: "Thanks, Frank!", action: () => {
@@ -206,8 +206,9 @@ class GameLevelAirport {
             "J.P. Morgan",
             "The stock market is a place of opportunity and risk. You can buy shares in companies and watch your investments grow—or shrink.\nWould you like to proceed to the Stock Exchange and begin your investment journey?",
             [
-              { label: "Take me to the Stock Exchange", action: () => openInModal(`${pagesURI}/stocks/viewer`) },
-              { label: "Teach me Quantitative Trading", action: () => openInModal(`${pagesURI}/gamify/fortuneFinders/quante`) },
+              { label: "Take me to the Stock Exchange", action: () => openInModal(`${path}/stocks/viewer`) },
+              { label: "Teach me Quantitative Trading", action: () => openInModal(`${path}/gamify/fortuneFinders/quante`) },
+              { label: "Learn Coding Behind Quant Trading", action: () => openInModal(`${path}/gamify/fortuneFinders/quant-lesson`) },
               { label: "Remind me what stocks are", action: () => dialogFunctions.whatAreStocks(), keepOpen: true },
               { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
             ]
@@ -220,7 +221,7 @@ class GameLevelAirport {
             "J.P. Morgan",
             fact + "\nWould you like to try investing now?",
             [
-              { label: "Yes, let's invest", action: () => openInModal(`${pagesURI}/stocks/viewer`) },
+              { label: "Yes, let's invest", action: () => openInModal(`${path}/stocks/viewer`) },
               { label: "Back", action: () => dialogFunctions.explainStocks(), keepOpen: true }
             ]
           );
@@ -271,7 +272,7 @@ class GameLevelAirport {
             "Greetings, seeker. I am Satoshi Nakamoto, architect of decentralized currency.\nAre you curious about Bitcoin or ready to explore the Crypto Hub?",
             [
                 { label: "Tell me about Bitcoin", action: () => dialogFunctions.aboutBitcoin(), keepOpen: true },
-              { label: "Go to Crypto Hub", action: () => openInModal(`${pagesURI}/crypto/portfolio`) },
+              { label: "Go to Crypto Hub", action: () => openInModal(`${path}/crypto/portfolio`) },
               { label: "Thank you, Satoshi", action: () => {
                 // Give NPC cookie for completing the dialogue
                 if (gameEnv.game && gameEnv.game.giveNpcCookie) {
@@ -297,7 +298,7 @@ class GameLevelAirport {
             "Satoshi Nakamoto",
             "To buy Bitcoin, you need a digital wallet and access to a crypto exchange. You can purchase fractions of a Bitcoin.\nWould you like to visit the Crypto Hub to start your journey?",
             [
-              { label: "Yes, take me there", action: () => openInModal(`${pagesURI}/crypto/portfolio`) },
+              { label: "Yes, take me there", action: () => openInModal(`${path}/crypto/portfolio`) },
               { label: "Back", action: () => dialogFunctions.aboutBitcoin(), keepOpen: true }
             ]
           );
@@ -342,7 +343,7 @@ class GameLevelAirport {
               "Hey there! I'm Max, your friendly neighborhood crypto miner. I've been mining Bitcoin since the early days!\nWant to learn about mining or try your hand at it?",
               [
                 { label: "Tell me about mining", action: () => dialogFunctions.explainMining(), keepOpen: true },
-                { label: "Try Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Try Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "What's your setup?", action: () => dialogFunctions.mySetup(), keepOpen: true },
                 { label: "Thank you, Max", action: () => {
                   // Give NPC cookie for completing the dialogue
@@ -360,7 +361,7 @@ class GameLevelAirport {
               "Mining is like solving complex puzzles to verify transactions on the blockchain. Miners use powerful computers to compete for rewards in cryptocurrency.\nThe more computing power you have, the better your chances of winning!\nWould you like to know more about the technical side?",
               [
                 { label: "Technical Details", action: () => dialogFunctions.technicalDetails(), keepOpen: true },
-                { label: "Try Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Try Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
               ]
             );
@@ -370,7 +371,7 @@ class GameLevelAirport {
               "Max the Miner",
               "Here's the cool stuff:\n• Mining uses SHA-256 hashing algorithm\n• Difficulty adjusts automatically\n• You need specialized hardware (ASICs) for Bitcoin\n• Electricity costs are crucial\n• Mining pools help small miners compete\n\nReady to try mining yourself?",
               [
-                { label: "Start Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Start Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "Back", action: () => dialogFunctions.explainMining(), keepOpen: true }
               ]
             );
@@ -380,7 +381,7 @@ class GameLevelAirport {
               "Max the Miner",
               "I've got a sweet setup:\n• 10 ASIC miners running 24/7\n• Custom cooling system to keep them frosty\n• Solar panels to offset electricity costs\n• Mining pool connection for consistent rewards\n\nWant to see how it all works?",
               [
-                { label: "Try Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Try Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
               ]
             );
@@ -530,8 +531,8 @@ class GameLevelAirport {
                 { label: "Learn about the Bank", action: () => dialogFunctions.explainBank(), keepOpen: true },
                 { label: "Review Analytics", action: () => dialogFunctions.analyticsIntro(), keepOpen: true },
                 { label: "Financial Tip", action: () => dialogFunctions.financialTip(), keepOpen: true },
-                { label: "Loans", action: () => openInModal(`${pagesURI}/gamify/loan`)},
-                { label: "Overall Leaderboard", action: () => openInModal(`${pagesURI}/leaderboard/overall-leaderboard`) },
+                { label: "Loans", action: () => openInModal(`${path}/gamify/loan`)},
+                { label: "Overall Leaderboard", action: () => openInModal(`${path}/leaderboard/overall-leaderboard`) },
                 { label: "Thank you, Ms. Yellen", action: () => {
                   // Give NPC cookie for completing the dialogue
                   if (gameEnv.game && gameEnv.game.giveNpcCookie) {
@@ -559,7 +560,7 @@ class GameLevelAirport {
             "Janet Yellen",
             "Bank Analytics provides a detailed overview of your spending, investments, and savings.\nWould you like to proceed to the analytics dashboard?",
             [
-              { label: "Open Analytics", action: () => showYellenModal(`${pagesURI}/gamify/bankanalytics`) },
+              { label: "Open Analytics", action: () => showYellenModal(`${path}/gamify/bankanalytics`) },
                 { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
             ]
           );
