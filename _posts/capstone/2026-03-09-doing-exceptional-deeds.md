@@ -1,4 +1,5 @@
 ---
+microblog: true
 toc: false
 layout: opencs
 title: Doing Exceptional Deeds
