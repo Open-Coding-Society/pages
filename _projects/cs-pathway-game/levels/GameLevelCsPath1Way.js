@@ -4,6 +4,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaTrial from './PersonaTrial.js';
+import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 /**
  * GameLevel CS Pathway - Wayfinding World
  */
