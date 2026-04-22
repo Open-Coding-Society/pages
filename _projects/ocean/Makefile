@@ -7,7 +7,7 @@
 ###########################################
 
 # Project paths (relative to workspace root)
-DATE_OF_CREATION = 2026-04-02
+DATE_OF_CREATION = 2026-04-21
 PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb

@@ -20,7 +20,7 @@ description: "Class of 2029"
 owner_name: Isha Chaturvedi
 github_username: ishachaturvedi27
 github_repo: "Pages-Team-Repo" 
-baseurl: "/Pages-Team-Repo" 
+baseurl: "" 
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
