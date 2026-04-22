@@ -491,42 +491,67 @@ closeDialogue() {
 
 
 
-// Check if dialogue is currently open
-isDialogueOpen() {
-  return this.isOpen;
-}
+/**
+ * Remove all DOM nodes injected by this DialogueSystem instance.
+ * Call this when the owning NPC or level is destroyed so elements
+ * do not persist in document.body across level transitions.
+ */
+destroy() {
+    // Close first so any pending typewriter/speech is cancelled cleanly.
+    if (this.isOpen) {
+      try { this.closeDialogue(); } catch (_) { /* ignore */ }
+    }
 
+    // Remove the dialogue box from wherever it was mounted.
+    if (this.dialogueBox?.parentNode) {
+      this.dialogueBox.parentNode.removeChild(this.dialogueBox);
+    }
+    this.dialogueBox = null;
+    this.dialogueText = null;
+    this.closeBtn = null;
+    this.controlsRow = null;
+    this.actionButtonGroup = null;
 
+    // Remove the injected <style> animation block.
+    const styleEl = document.getElementById('dialogue-animations-' + this.safeId);
+    if (styleEl?.parentNode) {
+      styleEl.parentNode.removeChild(styleEl);
+    }
+  }
 
+  // Check if dialogue is currently open
+  isDialogueOpen() {
+    return this.isOpen;
+  }
 
-// Add buttons to the dialogue
-addButtons(buttons) {
+  // Add buttons to the dialogue
+  addButtons(buttons) {
     if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0 || !this.actionButtonGroup) return;
 
     this.actionButtonGroup.innerHTML = '';
   
     // Add each button
     buttons.forEach(button => {
-        if (!button || !button.text) return;
+      if (!button || !button.text) return;
       
-        const btn = document.createElement('button');
-        btn.textContent = button.text;
-        btn.className = button.primary ? 'primary-button' : 'secondary-button';
-        btn.style.padding = '8px 15px';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '5px';
-        btn.style.cursor = 'pointer';
+      const btn = document.createElement('button');
+      btn.textContent = button.text;
+      btn.className = button.primary ? 'primary-button' : 'secondary-button';
+      btn.style.padding = '8px 15px';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '5px';
+      btn.style.cursor = 'pointer';
       
-        // Add click handler
-        btn.onclick = () => {
-            if (button.action && typeof button.action === 'function') {
-                button.action();
-            }
-        };
+      // Add click handler
+      btn.onclick = () => {
+        if (button.action && typeof button.action === 'function') {
+          button.action();
+        }
+      };
       
-        this.actionButtonGroup.appendChild(btn);
+      this.actionButtonGroup.appendChild(btn);
     });
-}
+  }
 }
 
 

@@ -4,7 +4,7 @@ class StatusPanel {
       id: 'ocs-status-panel',
       title: '',
       fields: [],
-      actions: [], // Array of { label, onClick, danger, title }
+      actions: [],
       className: 'ocs-status-panel',
       mountTo: null,
       width: '260px',
@@ -20,6 +20,10 @@ class StatusPanel {
     this.element = null;
     this.fieldElements = new Map();
     this.actionElements = [];
+
+    this.isCollapsed = false;
+    this.contentContainer = null;
+    this.toggleBtn = null;
   }
 
   getMountTarget() {
@@ -30,15 +34,16 @@ class StatusPanel {
   }
 
   ensureMounted() {
-    if (!this.element || !this.element.isConnected) {
-      this.render();
+    if (this.element && this.element.isConnected) {
+      return this.element;
     }
-    return this.element;
+    return this.render();
   }
 
   render() {
-    if (this.element?.isConnected) {
-      this.element.remove();
+    const existing = document.getElementById(this.config.id);
+    if (existing) {
+      existing.remove();
     }
 
     const panel = document.createElement('section');
@@ -54,22 +59,29 @@ class StatusPanel {
       padding: this.config.padding,
       borderRadius: this.config.borderRadius,
       fontFamily: this.config.fontFamily,
-      background: this.config.theme.background || 'var(--ocs-status-panel-background)',
-      border: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
-      color: this.config.theme.textColor || 'var(--ocs-status-panel-text)',
+      background: this.config.theme.background || 'var(--panel-mid)',
+      border: `1px solid ${this.config.theme.borderColor || 'var(--pref-accent-color)'}`,
+      color: this.config.theme.textColor || 'var(--pref-text-color)',
       boxShadow: this.config.theme.boxShadow || 'none',
+      overflow: 'hidden', // prevents weird visual overflow
     });
 
+    // Title
     const title = document.createElement('div');
     Object.assign(title.style, {
-      color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+      color: this.config.theme.accentColor || 'var(--pref-accent-color)',
       fontSize: '12px',
       fontWeight: 'bold',
       letterSpacing: '1px',
-      marginBottom: '8px',
     });
     title.textContent = this.config.title;
-    panel.appendChild(title);
+
+    // Header
+    const header = this.createHeader(title);
+
+    // Content container (EVERYTHING goes inside here)
+    const content = document.createElement('div');
+    this.contentContainer = content;
 
     this.fieldElements.clear();
 
@@ -78,51 +90,51 @@ class StatusPanel {
         const section = document.createElement('div');
         Object.assign(section.style, {
           marginTop: field.marginTop || '8px',
-          color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+          color: this.config.theme.accentColor || 'var(--pref-accent-color)',
           fontSize: '11px',
           letterSpacing: '1px',
         });
         section.textContent = field.title;
-        panel.appendChild(section);
+        content.appendChild(section);
         continue;
       }
 
       const row = document.createElement('div');
       row.dataset.field = field.key;
       row.textContent = `${field.label}: ${field.emptyValue || '—'}`;
-      panel.appendChild(row);
+
+      content.appendChild(row);
       this.fieldElements.set(field.key, row);
     }
 
-    // Render action buttons if provided
     if (this.config.actions && this.config.actions.length > 0) {
       const actionsContainer = document.createElement('div');
       Object.assign(actionsContainer.style, {
         marginTop: '12px',
         paddingTop: '10px',
-        borderTop: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
+        borderTop: `1px solid ${this.config.theme.borderColor || 'var(--pref-accent-color)'}`,
         display: 'flex',
         flexDirection: 'column',
         gap: '6px',
       });
 
       this.actionElements = [];
+
       for (const action of this.config.actions) {
         const btn = document.createElement('button');
         btn.textContent = action.label;
-        if (action.title) {
-          btn.title = action.title;
-        }
 
-        const bgColor = action.danger 
+        if (action.title) btn.title = action.title;
+
+        const bgColor = action.danger
           ? '#d32f2f'
-          : (this.config.theme.secondaryButtonBackground || 'var(--ocs-status-panel-button-bg)');
+          : (this.config.theme.secondaryButtonBackground || 'var(--panel-mid)');
         const textColor = action.danger
           ? '#fff'
-          : (this.config.theme.secondaryButtonTextColor || 'var(--ocs-status-panel-button-text)');
+          : (this.config.theme.secondaryButtonTextColor || 'var(--pref-text-color)');
         const borderColor = action.danger
           ? '#d32f2f'
-          : (this.config.theme.borderColor || 'var(--ocs-status-panel-border)');
+          : (this.config.theme.borderColor || 'var(--pref-accent-color)');
 
         Object.assign(btn.style, {
           padding: '6px 10px',
@@ -159,26 +171,74 @@ class StatusPanel {
         this.actionElements.push(btn);
       }
 
-      panel.appendChild(actionsContainer);
+      content.appendChild(actionsContainer);
     }
+
+    if (this.isCollapsed) {
+      content.style.display = 'none';
+    }
+
+    panel.appendChild(header);
+    panel.appendChild(content);
 
     this.getMountTarget().appendChild(panel);
     this.element = panel;
+
     return panel;
+  }
+
+  createHeader(titleElement) {
+    const header = document.createElement('div');
+
+    Object.assign(header.style, {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '8px',
+    });
+
+    const toggleBtn = document.createElement('button');
+    this.toggleBtn = toggleBtn;
+
+    Object.assign(toggleBtn.style, {
+      background: 'transparent',
+      border: 'none',
+      color: this.config.theme.accentColor || '#4ecca3',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: 'bold',
+    });
+
+    toggleBtn.textContent = this.isCollapsed ? '+' : '−';
+
+    toggleBtn.onclick = () => {
+      this.isCollapsed = !this.isCollapsed;
+
+      if (this.isCollapsed) {
+        this.contentContainer.style.display = 'none';
+        this.element.style.paddingBottom = '6px';
+      } else {
+        this.contentContainer.style.display = 'block';
+        this.element.style.paddingBottom = this.config.padding;
+      }
+
+      toggleBtn.textContent = this.isCollapsed ? '+' : '−';
+    };
+
+    header.appendChild(titleElement);
+    header.appendChild(toggleBtn);
+
+    return header;
   }
 
   update(values = {}) {
     this.ensureMounted();
 
     for (const field of this.config.fields) {
-      if (field.type === 'section') {
-        continue;
-      }
+      if (field.type === 'section') continue;
 
       const row = this.fieldElements.get(field.key);
-      if (!row) {
-        continue;
-      }
+      if (!row) continue;
 
       const value = values[field.key];
       row.textContent = `${field.label}: ${value || field.emptyValue || '—'}`;

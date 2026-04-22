@@ -67,6 +67,9 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       backgroundSrc: bg_data.src,
     });
 
+
+    this.updateProfilePanel({ course: 'CSSE A', persona: 'Builder', skill: 'JavaScript' });
+
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
       x: width * 0.76,
@@ -271,7 +274,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       'No known ProfileManager save method found. Persona result stored in this.profileData only.'
     );
   }
-
+  
+  initialize() {
+    this.activateProfilePanel();
+  }
 }
 
 export default GameLevelCsPath1Way;
