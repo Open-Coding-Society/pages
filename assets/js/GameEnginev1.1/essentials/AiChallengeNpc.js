@@ -221,7 +221,7 @@ class AiChallengeNpc extends AiNpc {
 
     // Show the dialogue box using the NPC name / avatar but with a fixed
     // challenge-mode title rather than cycling through the dialogues array.
-    npc.dialogueSystem?.showRandomDialogue(data.id, data.src, data);
+    npc.dialogueSystem?.showRandomDialogue(data.id, null, data);
 
     // Build the shared AiNpc chat UI shell (input + response area).
     const ui = AiNpc.createChatUI(data);

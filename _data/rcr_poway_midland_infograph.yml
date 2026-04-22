@@ -54,7 +54,7 @@ Features:
       - "Rebecca, Cyrus, Rishabh"
 
   - title: "ML-Powered Visitor Forecast"
-    image: "/images/capstone/rcr/tracking.png"
+    image: "/images/capstone/rcr/forecast.png"
     link: "https://rcr.opencodingsociety.com/forecast"
     alt: "Machine learning visitor forecast with weather and calendar data"
     keyPoints:
