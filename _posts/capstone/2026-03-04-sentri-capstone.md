@@ -182,18 +182,18 @@ permalink: /capstone/sentri/
 
 <!-- PILLARS -->
 <section class="pillar-grid">
-    <a href="/smart-matching" class="pillar-card">
+    <div class="pillar-card" onclick="triggerConfetti()">
         <h3>🎯 Smart Matching</h3>
         <p>Quick questions → best-fit recovery path.</p>
-    </a>
-    <a href="/easy-scheduling" class="pillar-card">
+    </div>
+    <div class="pillar-card" onclick="triggerConfetti()">
         <h3>📅 Easy Scheduling</h3>
         <p>Find and save meetings fast.</p>
-    </a>
-    <a href="/progress-tracking" class="pillar-card">
+    </div>
+    <div class="pillar-card" onclick="triggerConfetti()">
         <h3>📊 Progress Tracking</h3>
         <p>Track mood, patterns, and growth.</p>
-    </a>
+    </div>
 </section>
 
 <!-- EMOJI NAV -->
@@ -226,8 +226,7 @@ permalink: /capstone/sentri/
 </footer>
 
 <script>
-// Confetti burst on load (runs once)
-window.addEventListener("load", () => {
+function triggerConfetti() {
     const container = document.getElementById("sentri-showcase");
 
     for (let i = 0; i < 60; i++) {
@@ -242,7 +241,7 @@ window.addEventListener("load", () => {
 
         setTimeout(() => confetti.remove(), 3000);
     }
-});
+}
 </script>
 
 </div>
