@@ -166,16 +166,34 @@ active_tab: calendar
 
     .issues-list {
         display: grid;
-        gap: 10px;
+        gap: 14px;
     }
 
     .issue-card {
-        background: rgba(2, 6, 23, 0.52);
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(180deg, rgba(8, 15, 37, 0.96) 0%, rgba(2, 6, 23, 0.78) 100%);
         border: 1px solid rgba(148, 163, 184, 0.16);
-        border-radius: 14px;
-        padding: 12px;
+        border-radius: 18px;
+        padding: 16px;
         display: grid;
-        gap: 8px;
+        gap: 12px;
+        box-shadow: 0 14px 30px rgba(2, 6, 23, 0.26);
+        transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .issue-card::before {
+        content: '';
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(180deg, rgba(37, 99, 235, 0.95) 0%, rgba(168, 85, 247, 0.92) 100%);
+    }
+
+    .issue-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(96, 165, 250, 0.34);
+        box-shadow: 0 18px 36px rgba(2, 6, 23, 0.34);
     }
 
     .issue-card-top,
@@ -188,8 +206,9 @@ active_tab: calendar
     }
 
     .issue-card-title {
-        font-size: 1rem;
+        font-size: 1.02rem;
         font-weight: 800;
+        line-height: 1.2;
     }
 
     .issue-link-btn {
@@ -229,6 +248,12 @@ active_tab: calendar
         color: #dbeafe;
         white-space: pre-wrap;
         font-size: 0.92rem;
+    }
+
+    .issue-card-note {
+        color: #94a3b8;
+        font-size: 0.86rem;
+        line-height: 1.45;
     }
 
     .issue-markdown-preview {
@@ -316,18 +341,18 @@ active_tab: calendar
     .kanban-board {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 10px;
+        gap: 12px;
     }
 
     .kanban-column {
-        background: rgba(2, 6, 23, 0.44);
+        background: linear-gradient(180deg, rgba(4, 10, 29, 0.86) 0%, rgba(2, 6, 23, 0.52) 100%);
         border: 1px solid rgba(148, 163, 184, 0.15);
-        border-radius: 14px;
-        min-height: 220px;
-        padding: 10px;
+        border-radius: 16px;
+        min-height: 240px;
+        padding: 12px;
         display: grid;
         grid-auto-rows: min-content;
-        gap: 8px;
+        gap: 10px;
     }
 
     .kanban-column-title {
@@ -340,8 +365,8 @@ active_tab: calendar
     .kanban-item {
         background: rgba(15, 23, 42, 0.92);
         border: 1px solid rgba(148, 163, 184, 0.2);
-        border-radius: 12px;
-        padding: 9px;
+        border-radius: 14px;
+        padding: 10px;
         display: grid;
         gap: 7px;
     }
@@ -1101,7 +1126,7 @@ active_tab: calendar
                                 <span class="issue-pill ${escapeIssueText(priority)}">${escapeIssueText(priority.toUpperCase())}</span>
                             </div>
                         </div>
-                        <div class="issue-description issue-markdown-preview">${renderIssueMarkdown(issue.description || '')}</div>
+                        <div class="issue-card-note">Description is hidden here. Press View to open the full issue modal.</div>
                         <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
                         <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}${issue.eventId ? ` · Event ${escapeIssueText(issue.eventId)}` : ''}</div>
                         ${tags.length ? `<div class="issue-tags">${tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('')}</div>` : ''}
