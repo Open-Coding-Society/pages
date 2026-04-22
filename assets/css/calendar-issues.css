@@ -1,0 +1,517 @@
+.calendar-dashboard-tabs {
+    display: inline-flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 6px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 14px;
+}
+
+.dashboard-tab-btn {
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #cbd5e1;
+    background: transparent;
+    transition: 140ms ease;
+}
+
+.dashboard-tab-btn.active {
+    color: #f8fafc;
+    background: rgba(37, 99, 235, 0.22);
+    border-color: rgba(59, 130, 246, 0.45);
+}
+
+.dashboard-panel.hidden {
+    display: none;
+}
+
+.calendar-issues-panel {
+    margin-top: 8px;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.86) 100%);
+    color: #e2e8f0;
+    padding: 16px;
+}
+
+.calendar-issues-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.calendar-issues-title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.calendar-issues-subtitle {
+    margin: 3px 0 0;
+    color: #94a3b8;
+    font-size: 0.92rem;
+}
+
+.calendar-auth-banner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    color: #fff;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.calendar-auth-banner-icon {
+    font-size: 1.2rem;
+}
+
+.calendar-auth-banner-link {
+    color: #fbbf24;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.calendar-issue-action-btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.calendar-issue-action-btn.primary { background: #2563eb; color: #fff; }
+.calendar-issue-action-btn.secondary { background: rgba(148, 163, 184, 0.15); color: #e2e8f0; }
+.calendar-issue-action-btn.danger { background: #b91c1c; color: #fff; }
+
+.issues-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.issues-controls-row > * {
+    flex: 1 1 160px;
+    min-width: 0;
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(15, 23, 42, 0.72);
+    color: #e2e8f0;
+    padding: 9px 10px;
+}
+
+.issues-subtabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.issues-subtab-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 999px;
+    padding: 7px 12px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #cbd5e1;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.issues-subtab-btn.active {
+    color: #f8fafc;
+    border-color: rgba(37, 99, 235, 0.7);
+    background: rgba(37, 99, 235, 0.24);
+}
+
+.issues-subpanel.hidden {
+    display: none;
+}
+
+.issue-form {
+    display: grid;
+    gap: 10px;
+    background: rgba(2, 6, 23, 0.46);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.issue-form label {
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.issue-form input,
+.issue-form textarea,
+.issue-form select {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(15, 23, 42, 0.75);
+    color: #e2e8f0;
+    padding: 9px 10px;
+    box-sizing: border-box;
+}
+
+.issue-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.issue-form-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.issues-list {
+    display: grid;
+    gap: 14px;
+}
+
+.issue-card {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(8, 15, 37, 0.96) 0%, rgba(2, 6, 23, 0.78) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 18px;
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.26);
+    transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.issue-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.95) 0%, rgba(168, 85, 247, 0.92) 100%);
+}
+
+.issue-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(96, 165, 250, 0.34);
+    box-shadow: 0 18px 36px rgba(2, 6, 23, 0.34);
+}
+
+.issue-card-top,
+.issue-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.issue-card-title {
+    font-size: 1.02rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.issue-card-badge-row,
+.issue-card-action-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.issue-card-action-row {
+    justify-content: flex-end;
+}
+
+.issue-link-btn {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    color: #e2e8f0;
+    text-align: left;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.issue-link-btn:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.issue-pill {
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.issue-pill.open { background: rgba(37, 99, 235, 0.22); color: #93c5fd; }
+.issue-pill.in-progress { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+.issue-pill.blocked { background: rgba(220, 38, 38, 0.22); color: #fca5a5; }
+.issue-pill.done { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+.issue-pill.low { background: rgba(100, 116, 139, 0.18); color: #cbd5e1; }
+.issue-pill.medium { background: rgba(59, 130, 246, 0.16); color: #93c5fd; }
+.issue-pill.high { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+
+.issue-description {
+    color: #dbeafe;
+    white-space: pre-wrap;
+    font-size: 0.92rem;
+}
+
+.issue-card-note {
+    color: #94a3b8;
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
+.issue-form-date-hidden {
+    display: none;
+}
+
+.issue-markdown-preview {
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(15, 23, 42, 0.58);
+    padding: 12px;
+}
+
+.issue-markdown-preview h1,
+.issue-markdown-preview h2,
+.issue-markdown-preview h3 {
+    margin: 0 0 8px;
+    color: #f8fafc;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.issue-markdown-preview h1 { font-size: 1.35rem; }
+.issue-markdown-preview h2 { font-size: 1.18rem; }
+.issue-markdown-preview h3 { font-size: 1.05rem; }
+
+.issue-markdown-preview p {
+    margin: 0 0 8px;
+    line-height: 1.55;
+    color: #dbeafe;
+}
+
+.issue-markdown-preview ul {
+    margin: 0 0 8px 18px;
+    padding: 0;
+    color: #dbeafe;
+}
+
+.issue-markdown-preview li {
+    margin: 4px 0;
+}
+
+.issue-markdown-preview code {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 6px;
+    padding: 1px 5px;
+    color: #f8fafc;
+    font-size: 0.9em;
+}
+
+.issue-markdown-preview a {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.issue-markdown-empty {
+    color: #94a3b8;
+    font-style: italic;
+    margin: 0;
+}
+
+.issue-author {
+    color: #cbd5e1;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.issue-meta {
+    color: #94a3b8;
+    font-size: 0.82rem;
+}
+
+.issue-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.issue-tag {
+    border-radius: 999px;
+    padding: 4px 9px;
+    background: rgba(30, 41, 59, 0.9);
+    color: #cbd5e1;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.kanban-column {
+    background: linear-gradient(180deg, rgba(4, 10, 29, 0.86) 0%, rgba(2, 6, 23, 0.52) 100%);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 16px;
+    min-height: 240px;
+    padding: 12px;
+    display: grid;
+    grid-auto-rows: min-content;
+    gap: 10px;
+}
+
+.kanban-column-title {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    margin-bottom: 2px;
+}
+
+.kanban-item {
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px;
+    padding: 10px;
+    display: grid;
+    gap: 7px;
+}
+
+.calendar-issue-count-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    pointer-events: none;
+}
+
+.issues-empty {
+    border-radius: 12px;
+    border: 1px dashed rgba(148, 163, 184, 0.34);
+    padding: 14px;
+    color: #94a3b8;
+    text-align: center;
+}
+
+.issue-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100002;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(2, 6, 23, 0.72);
+    backdrop-filter: blur(4px);
+}
+
+.issue-modal.open {
+    display: flex;
+}
+
+.issue-modal-content {
+    width: min(920px, 100%);
+    max-height: min(92vh, 840px);
+    overflow-y: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.26);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.94) 100%);
+    color: #e2e8f0;
+    padding: 16px;
+    box-shadow: 0 30px 60px rgba(2, 6, 23, 0.56);
+}
+
+.issue-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.issue-modal-title {
+    margin: 0;
+    font-size: 1.28rem;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.issue-modal-close {
+    border: 0;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.issue-modal-close:hover {
+    color: #e2e8f0;
+}
+
+.issue-modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.issue-modal-description {
+    margin: 0 0 12px;
+}
+
+.issue-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+@media (max-width: 1040px) {
+    .kanban-board {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .issue-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .kanban-board {
+        grid-template-columns: 1fr;
+    }
+}
