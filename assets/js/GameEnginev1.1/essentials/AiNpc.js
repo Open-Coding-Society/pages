@@ -75,7 +75,7 @@ class AiNpc {
         }
 
         // Use DialogueSystem's cycling showRandomDialogue method
-        npc.dialogueSystem.showRandomDialogue(data.id, data.src, data);
+        npc.dialogueSystem.showRandomDialogue(data.id, null, data);
 
         // Create and attach AI chat UI
         const ui = AiNpc.createChatUI(data);
@@ -190,8 +190,78 @@ class AiNpc {
             const existingContainers = dialogueBox.querySelectorAll('.ai-npc-container');
             existingContainers.forEach(existing => existing.remove());
 
+            // Remove any previously injected top-left close control for AI panels.
+            const existingCloseTopLeft = dialogueBox.querySelector('.ai-npc-close-top-left');
+            if (existingCloseTopLeft) {
+                existingCloseTopLeft.remove();
+            }
+
+            // Ensure a top-left close control exists for AI interactions.
+            const closeTopLeftBtn = document.createElement('button');
+            closeTopLeftBtn.type = 'button';
+            closeTopLeftBtn.className = 'ai-npc-close-top-left';
+            closeTopLeftBtn.setAttribute('aria-label', 'Close AI panel');
+            closeTopLeftBtn.title = 'Close';
+            closeTopLeftBtn.textContent = '×';
+            closeTopLeftBtn.style.position = 'absolute';
+            closeTopLeftBtn.style.top = '10px';
+            closeTopLeftBtn.style.left = '10px';
+            closeTopLeftBtn.style.width = '30px';
+            closeTopLeftBtn.style.height = '30px';
+            closeTopLeftBtn.style.borderRadius = '999px';
+            closeTopLeftBtn.style.border = '1px solid rgba(255,255,255,0.28)';
+            closeTopLeftBtn.style.background = 'rgba(12,16,24,0.68)';
+            closeTopLeftBtn.style.backdropFilter = 'blur(2px)';
+            closeTopLeftBtn.style.color = 'rgba(255,255,255,0.92)';
+            closeTopLeftBtn.style.cursor = 'pointer';
+            closeTopLeftBtn.style.fontSize = '20px';
+            closeTopLeftBtn.style.fontWeight = '600';
+            closeTopLeftBtn.style.lineHeight = '1';
+            closeTopLeftBtn.style.display = 'flex';
+            closeTopLeftBtn.style.alignItems = 'center';
+            closeTopLeftBtn.style.justifyContent = 'center';
+            closeTopLeftBtn.style.padding = '0';
+            closeTopLeftBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.22)';
+            closeTopLeftBtn.style.transition = 'transform 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease';
+            closeTopLeftBtn.style.zIndex = '10001';
+            closeTopLeftBtn.onmouseenter = () => {
+                closeTopLeftBtn.style.background = 'rgba(30,36,50,0.86)';
+                closeTopLeftBtn.style.borderColor = 'rgba(255,255,255,0.5)';
+                closeTopLeftBtn.style.transform = 'translateY(-1px)';
+                closeTopLeftBtn.style.boxShadow = '0 6px 14px rgba(0,0,0,0.3)';
+            };
+            closeTopLeftBtn.onmouseleave = () => {
+                closeTopLeftBtn.style.background = 'rgba(12,16,24,0.68)';
+                closeTopLeftBtn.style.borderColor = 'rgba(255,255,255,0.28)';
+                closeTopLeftBtn.style.transform = 'translateY(0)';
+                closeTopLeftBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.22)';
+            };
+            closeTopLeftBtn.onmousedown = () => {
+                closeTopLeftBtn.style.transform = 'translateY(1px) scale(0.97)';
+            };
+            closeTopLeftBtn.onmouseup = () => {
+                closeTopLeftBtn.style.transform = 'translateY(-1px)';
+            };
+            closeTopLeftBtn.onfocus = () => {
+                closeTopLeftBtn.style.borderColor = 'rgba(120,180,255,0.9)';
+                closeTopLeftBtn.style.boxShadow = '0 0 0 2px rgba(120,180,255,0.25), 0 6px 14px rgba(0,0,0,0.3)';
+            };
+            closeTopLeftBtn.onblur = () => {
+                closeTopLeftBtn.style.borderColor = 'rgba(255,255,255,0.28)';
+                closeTopLeftBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.22)';
+            };
+            closeTopLeftBtn.onclick = (event) => {
+                event.stopPropagation();
+                dialogueSystem.closeDialogue();
+            };
+            dialogueBox.appendChild(closeTopLeftBtn);
+
             // Keep AI interaction area above the dialogue controls row.
             const controlsRow = document.getElementById('dialogue-controls-' + dialogueSystem.safeId);
+            const defaultCloseBtn = document.getElementById('dialogue-close-btn-' + dialogueSystem.safeId);
+            if (defaultCloseBtn) {
+                defaultCloseBtn.style.display = 'none';
+            }
             if (controlsRow && controlsRow.parentNode === dialogueBox) {
                 dialogueBox.insertBefore(container, controlsRow);
             } else {
