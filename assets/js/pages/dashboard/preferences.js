@@ -768,6 +768,8 @@ export class HeadCalibrationManager {
 // ============================================
 export class HeadTrackingController {
     static STORAGE_KEY = 'headTrackingPreferences';
+    static BLINK_EAR_THRESHOLD = 0.15;
+    static BLINK_COOLDOWN_MS = 550;
     static state = {
         enabled: false,
         sensitivity: 0.45
@@ -798,6 +800,10 @@ export class HeadTrackingController {
     static visionModule = null;
     static lastPoint = null;
     static lastRawPoint = null;
+    static blinkState = {
+        isClosed: false,
+        lastClickAt: 0
+    };
 
     static init() {
         HeadTrackingController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
@@ -960,6 +966,93 @@ export class HeadTrackingController {
         HeadTrackingController.cursorEl.style.transform = 'translate(-9999px, -9999px)';
     }
 
+    static _eyeAspectRatio(landmarks, topIndex, bottomIndex, leftIndex, rightIndex) {
+        const top = landmarks?.[topIndex];
+        const bottom = landmarks?.[bottomIndex];
+        const left = landmarks?.[leftIndex];
+        const right = landmarks?.[rightIndex];
+        if (!top || !bottom || !left || !right) return null;
+
+        const vertical = Math.abs(top.y - bottom.y);
+        const horizontal = Math.abs(left.x - right.x);
+        if (horizontal < 0.0001) return null;
+        return vertical / horizontal;
+    }
+
+    static _dispatchBlinkClick(x, y) {
+        const target = document.elementFromPoint(x, y);
+        if (!target) return;
+
+        const pointerDown = new PointerEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0,
+            pointerType: 'mouse'
+        });
+        const pointerUp = new PointerEvent('pointerup', {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0,
+            pointerType: 'mouse'
+        });
+
+        const mouseDown = new MouseEvent('mousedown', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        const mouseUp = new MouseEvent('mouseup', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        const click = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+
+        target.dispatchEvent(pointerDown);
+        target.dispatchEvent(mouseDown);
+        target.dispatchEvent(pointerUp);
+        target.dispatchEvent(mouseUp);
+        target.dispatchEvent(click);
+    }
+
+    static _handleBlinkClick(landmarks, x, y) {
+        const leftEar = HeadTrackingController._eyeAspectRatio(landmarks, 159, 145, 33, 133);
+        const rightEar = HeadTrackingController._eyeAspectRatio(landmarks, 386, 374, 362, 263);
+        if (!Number.isFinite(leftEar) || !Number.isFinite(rightEar)) {
+            HeadTrackingController.blinkState.isClosed = false;
+            return;
+        }
+
+        const avgEar = (leftEar + rightEar) / 2;
+        const isClosedNow = avgEar < HeadTrackingController.BLINK_EAR_THRESHOLD;
+        const now = performance.now();
+        const canClick = now - HeadTrackingController.blinkState.lastClickAt > HeadTrackingController.BLINK_COOLDOWN_MS;
+
+        if (isClosedNow && !HeadTrackingController.blinkState.isClosed && canClick) {
+            HeadTrackingController._dispatchBlinkClick(x, y);
+            HeadTrackingController.blinkState.lastClickAt = now;
+        }
+
+        HeadTrackingController.blinkState.isClosed = isClosedNow;
+    }
+
     static async _startTracking() {
         if (!navigator.mediaDevices?.getUserMedia) {
             HeadTrackingController._setStatus('Camera API is not available in this browser.', true);
@@ -1078,6 +1171,8 @@ export class HeadTrackingController {
                     window.dispatchEvent(moveEvent);
                     const target = document.elementFromPoint(x, y);
                     if (target) target.dispatchEvent(moveEvent);
+
+                    HeadTrackingController._handleBlinkClick(landmarks, x, y);
                 }
             }
 
@@ -1105,6 +1200,7 @@ export class HeadTrackingController {
 
         HeadTrackingController.lastPoint = null;
         HeadTrackingController.lastRawPoint = null;
+        HeadTrackingController.blinkState.isClosed = false;
         HeadTrackingController._hideCursor();
     }
 }
