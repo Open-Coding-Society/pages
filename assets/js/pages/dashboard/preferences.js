@@ -935,7 +935,7 @@ export class HeadTrackingController {
         const enabled = !!HeadTrackingController.state.enabled;
         toggleTrack.classList.toggle('bg-cyan-500', enabled);
         toggleTrack.classList.toggle('bg-neutral-600', !enabled);
-        toggleDot.classList.toggle('translate-x-5', enabled);
+        toggleDot.style.transform = enabled ? 'translateX(20px)' : 'translateX(0px)';
     }
 
     static _createCursor() {
