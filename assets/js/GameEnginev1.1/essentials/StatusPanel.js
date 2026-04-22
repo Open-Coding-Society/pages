@@ -59,9 +59,9 @@ class StatusPanel {
       padding: this.config.padding,
       borderRadius: this.config.borderRadius,
       fontFamily: this.config.fontFamily,
-      background: this.config.theme.background || 'var(--ocs-status-panel-background)',
-      border: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
-      color: this.config.theme.textColor || 'var(--ocs-status-panel-text)',
+      background: this.config.theme.background || 'var(--panel-mid)',
+      border: `1px solid ${this.config.theme.borderColor || 'var(--pref-accent-color)'}`,
+      color: this.config.theme.textColor || 'var(--pref-text-color)',
       boxShadow: this.config.theme.boxShadow || 'none',
       overflow: 'hidden', // prevents weird visual overflow
     });
@@ -69,7 +69,7 @@ class StatusPanel {
     // Title
     const title = document.createElement('div');
     Object.assign(title.style, {
-      color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+      color: this.config.theme.accentColor || 'var(--pref-accent-color)',
       fontSize: '12px',
       fontWeight: 'bold',
       letterSpacing: '1px',
@@ -90,7 +90,7 @@ class StatusPanel {
         const section = document.createElement('div');
         Object.assign(section.style, {
           marginTop: field.marginTop || '8px',
-          color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+          color: this.config.theme.accentColor || 'var(--pref-accent-color)',
           fontSize: '11px',
           letterSpacing: '1px',
         });
@@ -112,7 +112,7 @@ class StatusPanel {
       Object.assign(actionsContainer.style, {
         marginTop: '12px',
         paddingTop: '10px',
-        borderTop: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
+        borderTop: `1px solid ${this.config.theme.borderColor || 'var(--pref-accent-color)'}`,
         display: 'flex',
         flexDirection: 'column',
         gap: '6px',
@@ -128,13 +128,13 @@ class StatusPanel {
 
         const bgColor = action.danger
           ? '#d32f2f'
-          : (this.config.theme.secondaryButtonBackground || 'var(--ocs-status-panel-button-bg)');
+          : (this.config.theme.secondaryButtonBackground || 'var(--panel-mid)');
         const textColor = action.danger
           ? '#fff'
-          : (this.config.theme.secondaryButtonTextColor || 'var(--ocs-status-panel-button-text)');
+          : (this.config.theme.secondaryButtonTextColor || 'var(--pref-text-color)');
         const borderColor = action.danger
           ? '#d32f2f'
-          : (this.config.theme.borderColor || 'var(--ocs-status-panel-border)');
+          : (this.config.theme.borderColor || 'var(--pref-accent-color)');
 
         Object.assign(btn.style, {
           padding: '6px 10px',
