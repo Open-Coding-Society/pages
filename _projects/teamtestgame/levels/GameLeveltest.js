@@ -11,13 +11,13 @@ class GameLeveltest {
 
     const backgroundData = {
       name: "custom_bg",
-      src: path + "/images/projects/teamtestgame/space.jpeg",
+      src: path + "/images/gamify/bg/space.jpeg",
       pixels: { height: 772, width: 1134 }
     };
 
-    const spriteSrc = path + '/images/projects/teamtestgame/pew.png';
-    const alienSpriteSrc = path + '/images/projects/teamtestgame/ufos.png';
-    const meteorSpriteSrc = path + '/images/projects/teamtestgame/meteorforgame.jpg';
+    const spriteSrc = path + '/images/gamebuilder/sprites/pew.png';
+    const alienSpriteSrc = path + '/images/gamebuilder/sprites/ufos.png';
+    const meteorSpriteSrc = path + '/images/gamebuilder/sprites/meteorforgame.jpg';
 
     const _meteorImg = new Image();
     _meteorImg.src = meteorSpriteSrc;
@@ -61,8 +61,8 @@ class GameLeveltest {
           borderRadius: '6px',
           zIndex: 100000,
         });
-        el.style.top = '160px';  // below the navbar
-        el.style.right = '12px'; // flush with right edge of viewport
+        el.style.top = '160px';
+        el.style.right = '12px';
       }
       return el;
     };
@@ -122,7 +122,6 @@ class GameLeveltest {
               <div style="margin-bottom:15px;font-size:22px;">✅ You have done well</div>
               <div style="font-size:16px;">You may pass.</div>`;
             document.body.appendChild(msg);
-            // Transition to next level after showing the message
             setTimeout(() => {
               if (msg.parentNode) msg.parentNode.removeChild(msg);
               if (gameEnv?.gameControl?.currentLevel) {
@@ -216,6 +215,8 @@ class GameLeveltest {
         if (deathMsg.parentNode) deathMsg.parentNode.removeChild(deathMsg);
         if (player.position) { player.position.x = _respawnPosition.x; player.position.y = _respawnPosition.y; }
         if (player.velocity) { player.velocity.x = 0; player.velocity.y = 0; }
+        player._gravityVelocity = 0;
+        player._wWasDown = false;
         if (player.pressedKeys) player.pressedKeys = {};
         _respawnInProgress = false;
       }, 2000);
@@ -264,15 +265,20 @@ class GameLeveltest {
       }
     };
 
+    // ── Gravity constants ─────────────────────────────────────────────────────
+    const GRAVITY    = 0.5;
+    const FLAP_FORCE = -10;
+    const MAX_FALL   = 12;
+
     // ── Player ────────────────────────────────────────────────────────────────
     const playerData = {
       id: 'player-test',
-      greeting: 'Use WASD to move',
+      greeting: 'Press W to flap up, A/D to move sideways',
       src: spriteSrc,
       SCALE_FACTOR: 8,
       STEP_FACTOR: 600,
       ANIMATION_RATE: 50,
-      INIT_POSITION: { x: 50, y: height - height / 8 },
+      INIT_POSITION: { x: 50, y: height / 2 },
       pixels: { height: 320, width: 320 },
       orientation: { rows: 4, columns: 4 },
       down:  { row: 0, start: 0, columns: 3 },
@@ -280,7 +286,9 @@ class GameLeveltest {
       left:  { row: Math.min(2, 3), start: 0, columns: 3 },
       up:    { row: Math.min(3, 3), start: 0, columns: 3 },
       hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
-      keypress: { up: 87, left: 65, down: 83, right: 68 }
+      keypress: { up: 87, left: 65, down: 83, right: 68 },
+      // GRAVITY: false — we handle gravity ourselves in initialize()
+      GRAVITY: false
     };
 
     const _respawnPosition = { ...playerData.INIT_POSITION };
@@ -302,7 +310,7 @@ class GameLeveltest {
       dialogues: ['I can call more meteors if you like.', 'Ready for some falling rocks?'],
       interact: function() {
         if (this.dialogueSystem) this.showRandomDialogue();
-        activateMeteors(4); // spawn exactly 4 meteors each time
+        activateMeteors(4);
         resetSurvivalTimer();
       }
     };
@@ -333,11 +341,64 @@ class GameLeveltest {
       { class: Npc, data: alienData }
     ];
 
-    // ── initialize() — called by GameLevel after all objects are created ──────
+    // ── initialize() ─────────────────────────────────────────────────────────
+    // Called by GameLevel AFTER all objects are created.
+    // This is the correct place to monkey-patch the player's update method
+    // because here we have the actual player instance, not just playerData.
     this.initialize = () => {
+      // Grab meteor pool
       const found = gameEnv.gameObjects.filter(obj => obj?.spriteData?.isMeteor);
       meteorPool.push(...found);
       meteorPool.forEach(m => hideMeteor(m));
+
+      // Grab the player instance
+      const player = gameEnv.gameObjects.find(obj => obj instanceof Player);
+      if (!player) return;
+
+      // Initialize gravity state on the instance
+      player._gravityVelocity = 0;
+      player._wWasDown = false;
+
+      // Save the original update so we can still call it for drawing/collision
+      const _originalUpdate = player.update.bind(player);
+
+      // Replace update with our gravity-aware version
+      player.update = function() {
+        // ── Flap on fresh W press ───────────────────────────────────────────
+        const wDown = this.pressedKeys?.[87];
+        if (wDown && !this._wWasDown) {
+          this._gravityVelocity = FLAP_FORCE;  // instant upward kick
+        }
+        this._wWasDown = !!wDown;
+
+        // ── Accumulate gravity every frame ──────────────────────────────────
+        this._gravityVelocity += GRAVITY;
+        if (this._gravityVelocity > MAX_FALL) this._gravityVelocity = MAX_FALL;
+
+        // ── Apply gravity to position BEFORE original update runs ───────────
+        // We zero velocity.y first so Player.js's move() doesn't fight us,
+        // then apply our gravity directly to position.y
+        this.velocity.y = 0;
+        this.position.y += this._gravityVelocity;
+
+        // ── Floor / ceiling clamp ───────────────────────────────────────────
+        const floor = gameEnv.innerHeight - this.height;
+        if (this.position.y >= floor) {
+          this.position.y = floor;
+          this._gravityVelocity = 0;
+        }
+        if (this.position.y < 0) {
+          this.position.y = 0;
+          this._gravityVelocity = 0;
+        }
+
+        // ── Run original Player update for drawing, collision, A/D movement ─
+        _originalUpdate();
+
+        // ── After original update, re-zero velocity.y so move() doesn't ─────
+        // undo our gravity next frame
+        this.velocity.y = 0;
+      };
     };
   }
 }
