@@ -261,11 +261,6 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
   }
 
-    initialize() {
-      this.activateProfilePanel();
-    }
-
-
   /**
    * Accumulated Toast System - collects toasts until complete
    */
@@ -1315,8 +1310,6 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
         grade = 'F (Below Expectations)';
         gradeColor = '#ef4444';
       }
-
-      this.updateProfilePanel({ grade });
 
       // Show result
       const resultModal = document.createElement('div');
