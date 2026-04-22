@@ -131,18 +131,18 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     // Position NPCs along pathway progression
     const analyticsGuidePos = {
       x: width * 0.20,
-      y: height * 0.35,
+      y: height * 0.65,
     };
 
     const githubMetricsPos = {
-      x: width * 0.50,
-      y: height * 0.35,
+      x: width * 0.48,
+      y: height * 0.44,
     };
 
     // Self-evaluation NPC at end of pathway
     const selfEvalPos = {
       x: width * 0.80,
-      y: height * 0.35,
+      y: height * 0.65,
     };
 
     const createOrbNpcData = ({ id, greeting, position, color, expertise, interact }) => ({
