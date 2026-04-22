@@ -67,6 +67,9 @@ permalink: /capstone/sentri/
 }
 
 .pillar-card {
+    display: block;
+    text-decoration: none;
+    color: white;
     padding: 25px;
     border-radius: 20px;
     background: var(--glass);
@@ -77,11 +80,11 @@ permalink: /capstone/sentri/
 .pillar-card:hover {
     transform: translateY(-6px);
     border-color: var(--accent-green);
+    box-shadow: 0 8px 25px rgba(76,175,80,0.25);
 }
 
-.pillar-card p {
-    color: var(--text-muted);
-    font-size: 0.95rem;
+.pillar-card h3, .pillar-card p {
+    margin: 0;
 }
 
 /* EMOJI NAV */
@@ -179,18 +182,18 @@ permalink: /capstone/sentri/
 
 <!-- PILLARS -->
 <section class="pillar-grid">
-    <div class="pillar-card">
+    <a href="/smart-matching" class="pillar-card">
         <h3>🎯 Smart Matching</h3>
         <p>Quick questions → best-fit recovery path.</p>
-    </div>
-    <div class="pillar-card">
+    </a>
+    <a href="/easy-scheduling" class="pillar-card">
         <h3>📅 Easy Scheduling</h3>
         <p>Find and save meetings fast.</p>
-    </div>
-    <div class="pillar-card">
+    </a>
+    <a href="/progress-tracking" class="pillar-card">
         <h3>📊 Progress Tracking</h3>
         <p>Track mood, patterns, and growth.</p>
-    </div>
+    </a>
 </section>
 
 <!-- EMOJI NAV -->
