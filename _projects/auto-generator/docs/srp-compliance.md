@@ -1,3 +1,12 @@
+---
+layout: post
+title: SRP Compliance Report — Auto-Table Generation System
+description: How the Auto-Generator adheres to the Single Responsibility Principle
+permalink: /auto-generator/docs/srp-compliance/
+author: Yash Patil
+date: 2026-01-20
+---
+
 # Single Responsibility Principle (SRP) Compliance Report
 
 ## Overview
