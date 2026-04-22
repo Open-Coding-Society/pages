@@ -582,7 +582,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
     };
 
     const npcBase = {
-      src:            path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
+      src:            path + '/images/projects/cs-pathway-game/npc/robotcharacter.png',
       SCALE_FACTOR:   SCALE,
       ANIMATION_RATE: 50,
       pixels:         { width: 1024, height: 1024 },
