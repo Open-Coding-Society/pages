@@ -5,40 +5,49 @@
 // DO NOT EDIT MANUALLY - Run the script to regenerate
 
 
-// LESSONBASE.SCSS
+// FLASKANDFURIOUS.SCSS
 // -----------------------------------------------------------------------------
 
-$accent: #4CAFEF;
-$accent-700: #007ACC;
-$accent-700-hover: #005FA3;
-$bg-0: #000;
-$bg-1: #1F2020;
-$bg-2: #1F1F1F;
-$bg-3: #2A2D2D;
-$blue: #3182CE;
-$green: #4ADE80;
-$green-bg: #2D5A3D;
-$orange: #ED8936;
-$panel: #2B2B2B;
-$popup-bg: #222;
-$red: #E53E3E;
-$success-green: #28A745;
-$surface: #333;
-$teal: #38B2AC;
-$text: #F0F0F0;
-$text-muted: #aaa;
-$warn: #FBBF24;
-$warn-bg: #5A3D2D;
+$dec-accent: #ffffff;
+$dec-card-bg: #0f2320;
+$dec-dark-bg: #0a1a18;
+$dec-primary: #1a7f74;
+$dec-secondary: #e8604c;
+$dec-text-light: #d8eeec;
+$dec-text-muted: #8fb3af;
 
-// CHATBOT.SCSS
+// FOPS-INFOGRAPHIC.SCSS
 // -----------------------------------------------------------------------------
 
-$left-msg-bg: white;
-$msger-send-btn-bg: blue;
-$msger-send-btn-hover-bg: darkblue;
-$right-msg-bg: lightBlue1;
-$toggle-btn-bg: green;
-$toggle-btn-hover-bg: darkgreen;
+$fops-bg: #152418;
+$fops-border: #2a4030;
+$fops-card-bg: #1c3320;
+$fops-dark: #0f1f11;
+$fops-gold: #c4993a;
+$fops-green: #5aab64;
+$fops-green-light: #243d27;
+$fops-highlight: rgba(196, 153, 58, 0.15);
+$fops-mid: #a8c4ab;
+$fops-white: #e8f2e9;
+
+// INFOGRAPH.SCSS
+// -----------------------------------------------------------------------------
+
+$infograph-bg: #000000;
+$infograph-border: rgba(255, 255, 255, 0.12);
+$infograph-btn-bg: rgba(255, 255, 255, 0.08);
+$infograph-btn-hover: rgba(255, 255, 255, 0.18);
+$infograph-card: rgba(255, 255, 255, 0.05);
+$infograph-foreground: #ffffff;
+$infograph-muted: rgba(255, 255, 255, 0.75);
+
+// CALENDAR.SCSS
+// -----------------------------------------------------------------------------
+
+$priority-p0: #dc2626;
+$priority-p1: #ea580c;
+$priority-p2: #ca8a04;
+$priority-p3: #16a34a;
 
 // CONTAINERS.SCSS
 // -----------------------------------------------------------------------------
@@ -67,41 +76,78 @@ $status-indicator-success-bg: rgba(40, 167, 69, 0.2);
 $status-indicator-success-border: rgba(40, 167, 69, 0.3);
 $status-indicator-success-color: #28a745;
 
-// COLORS.SCSS
+// GAME-BUILDER.SCSS
 // -----------------------------------------------------------------------------
 
-// NOTE: Primary user-editable palette has been moved to `_sass/user-colors.scss`.
-// This file should only import the user colors so designers can edit the
-// palette in one place. Keep other component-level variables above.
+$bg: rgba(0,0,0,0.3), $blur: 20px, $border-radius: 12px) {
+  background: $bg;
+
+// _VARIABLES.SCSS
+// -----------------------------------------------------------------------------
+
+$scale: $mobile-text-scale) {
+  font-size: $size;
 
 // PLATFORMER-GAME.SCSS
 // -----------------------------------------------------------------------------
 
 $dt-leaderboard: #e85252;
 
+// MAIN.SCSS
+// -----------------------------------------------------------------------------
 
-// User-editable colors are extracted to a separate file so designers can
-// modify them without touching the auto-generated master color map.
-@import "user-colors";
+$test-color: #ff00ff;
+
+// USER-COLORS.SCSS
+// -----------------------------------------------------------------------------
+
+$background: #121212;
+$black1: rgba(0, 0, 0, 1);
+$blue1: #007aff;
+$blueShadow1: #2196f3;
+$gradient1: linear-gradient(120deg, #1e1e1e 45%, #2a2a2a);
+$gray1: rgba(142, 142, 147, 1);
+$gray2: rgba(99, 99, 102, 1);
+$gray3: rgba(72, 72, 74, 1);
+$gray4: rgba(58, 58, 60, 1);
+$gray5: rgba(44, 44, 46, 1);
+$gray6: rgba(28, 28, 30, 1);
+$green1: #34c759;
+$lightBlue1: rgba(75, 186, 255, 1);
+$my-custom-cat: #02375a;
+$my-custom-dog: #cafff3;
+$white1: rgba(255, 255, 255, 1);
+$white2: rgba(white, 0.87);
+$white3: rgba(225, 225, 230, 1);
 
 // =============================================================================
 // CSS CUSTOM PROPERTIES
 // =============================================================================
 
 :root {
-  --accent: #{$accent};
-  --accent-700: #{$accent-700};
-  --accent-700-hover: #{$accent-700-hover};
   --background: #{$background};
-  --bg-0: #{$bg-0};
-  --bg-1: #{$bg-1};
-  --bg-2: #{$bg-2};
-  --bg-3: #{$bg-3};
+  --bg: #{$bg};
   --black1: #{$black1};
-  --blue: #{$blue};
   --blue1: #{$blue1};
   --blueShadow1: #{$blueShadow1};
+  --dec-accent: #{$dec-accent};
+  --dec-card-bg: #{$dec-card-bg};
+  --dec-dark-bg: #{$dec-dark-bg};
+  --dec-primary: #{$dec-primary};
+  --dec-secondary: #{$dec-secondary};
+  --dec-text-light: #{$dec-text-light};
+  --dec-text-muted: #{$dec-text-muted};
   --dt-leaderboard: #{$dt-leaderboard};
+  --fops-bg: #{$fops-bg};
+  --fops-border: #{$fops-border};
+  --fops-card-bg: #{$fops-card-bg};
+  --fops-dark: #{$fops-dark};
+  --fops-gold: #{$fops-gold};
+  --fops-green: #{$fops-green};
+  --fops-green-light: #{$fops-green-light};
+  --fops-highlight: #{$fops-highlight};
+  --fops-mid: #{$fops-mid};
+  --fops-white: #{$fops-white};
   --gradient1: #{$gradient1};
   --gray1: #{$gray1};
   --gray2: #{$gray2};
@@ -109,21 +155,23 @@ $dt-leaderboard: #e85252;
   --gray4: #{$gray4};
   --gray5: #{$gray5};
   --gray6: #{$gray6};
-  --green: #{$green};
-  --green-bg: #{$green-bg};
   --green1: #{$green1};
-  --left-msg-bg: #{$left-msg-bg};
+  --infograph-bg: #{$infograph-bg};
+  --infograph-border: #{$infograph-border};
+  --infograph-btn-bg: #{$infograph-btn-bg};
+  --infograph-btn-hover: #{$infograph-btn-hover};
+  --infograph-card: #{$infograph-card};
+  --infograph-foreground: #{$infograph-foreground};
+  --infograph-muted: #{$infograph-muted};
   --lightBlue1: #{$lightBlue1};
   --login-container-bg: #{$login-container-bg};
-  --msger-send-btn-bg: #{$msger-send-btn-bg};
-  --msger-send-btn-hover-bg: #{$msger-send-btn-hover-bg};
   --my-custom-cat: #{$my-custom-cat};
   --my-custom-dog: #{$my-custom-dog};
-  --orange: #{$orange};
-  --panel: #{$panel};
-  --popup-bg: #{$popup-bg};
-  --red: #{$red};
-  --right-msg-bg: #{$right-msg-bg};
+  --priority-p0: #{$priority-p0};
+  --priority-p1: #{$priority-p1};
+  --priority-p2: #{$priority-p2};
+  --priority-p3: #{$priority-p3};
+  --scale: #{$scale};
   --status-indicator-base-bg: #{$status-indicator-base-bg};
   --status-indicator-base-border: #{$status-indicator-base-border};
   --status-indicator-error-bg: #{$status-indicator-error-bg};
@@ -135,18 +183,10 @@ $dt-leaderboard: #e85252;
   --status-indicator-success-bg: #{$status-indicator-success-bg};
   --status-indicator-success-border: #{$status-indicator-success-border};
   --status-indicator-success-color: #{$status-indicator-success-color};
-  --success-green: #{$success-green};
-  --surface: #{$surface};
-  --teal: #{$teal};
-  --text: #{$text};
-  --text-muted: #{$text-muted};
-  --toggle-btn-bg: #{$toggle-btn-bg};
-  --toggle-btn-hover-bg: #{$toggle-btn-hover-bg};
+  --test-color: #{$test-color};
   --validation-error-color: #{$validation-error-color};
   --validation-focus-color: #{$validation-focus-color};
   --validation-success-color: #{$validation-success-color};
-  --warn: #{$warn};
-  --warn-bg: #{$warn-bg};
   --white1: #{$white1};
   --white2: #{$white2};
   --white3: #{$white3};
