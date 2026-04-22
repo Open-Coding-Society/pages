@@ -18,7 +18,7 @@
 title: Open Coding 
 description: "Class of 2026"
 owner_name: Open Coding Society 
-github_username: open-coding-society 
+github_username: Ahmad-Se-tech 
 github_repo: "pages" 
 baseurl: "" 
 future: true
@@ -61,6 +61,7 @@ exclude:
 #   quiet_deps: true
 #   silence_deprecations: [import]
 incremental: true
+encoding: utf-8
 
 remote_theme: jekyll/minima
 plugins:
