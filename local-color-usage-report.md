@@ -2,50 +2,43 @@
 
 ## Summary
 
-- Total unique colors found: 65
-- Files with colors: 12
+- Total unique colors found: 61
+- Files with colors: 8
 
 ## Colors by File
 
-### flaskandfurious.scss (7 colors)
+### lessonbase.scss (21 colors)
 
-- `$dec-accent`: `#ffffff`
-- `$dec-card-bg`: `#0f2320`
-- `$dec-dark-bg`: `#0a1a18`
-- `$dec-primary`: `#1a7f74`
-- `$dec-secondary`: `#e8604c`
-- `$dec-text-light`: `#d8eeec`
-- `$dec-text-muted`: `#8fb3af`
+- `$accent`: `#4CAFEF`
+- `$accent-700`: `#007ACC`
+- `$accent-700-hover`: `#005FA3`
+- `$bg-0`: `#000`
+- `$bg-1`: `#1F2020`
+- `$bg-2`: `#1F1F1F`
+- `$bg-3`: `#2A2D2D`
+- `$blue`: `#3182CE`
+- `$green`: `#4ADE80`
+- `$green-bg`: `#2D5A3D`
+- `$orange`: `#ED8936`
+- `$panel`: `#2B2B2B`
+- `$popup-bg`: `#222`
+- `$red`: `#E53E3E`
+- `$success-green`: `#28A745`
+- `$surface`: `#333`
+- `$teal`: `#38B2AC`
+- `$text`: `#F0F0F0`
+- `$text-muted`: `#aaa`
+- `$warn`: `#FBBF24`
+- `$warn-bg`: `#5A3D2D`
 
-### fops-infographic.scss (10 colors)
+### chatbot.scss (6 colors)
 
-- `$fops-bg`: `#152418`
-- `$fops-border`: `#2a4030`
-- `$fops-card-bg`: `#1c3320`
-- `$fops-dark`: `#0f1f11`
-- `$fops-gold`: `#c4993a`
-- `$fops-green`: `#5aab64`
-- `$fops-green-light`: `#243d27`
-- `$fops-highlight`: `rgba(196, 153, 58, 0.15)`
-- `$fops-mid`: `#a8c4ab`
-- `$fops-white`: `#e8f2e9`
-
-### infograph.scss (7 colors)
-
-- `$infograph-bg`: `#000000`
-- `$infograph-border`: `rgba(255, 255, 255, 0.12)`
-- `$infograph-btn-bg`: `rgba(255, 255, 255, 0.08)`
-- `$infograph-btn-hover`: `rgba(255, 255, 255, 0.18)`
-- `$infograph-card`: `rgba(255, 255, 255, 0.05)`
-- `$infograph-foreground`: `#ffffff`
-- `$infograph-muted`: `rgba(255, 255, 255, 0.75)`
-
-### calendar.scss (4 colors)
-
-- `$priority-p0`: `#dc2626`
-- `$priority-p1`: `#ea580c`
-- `$priority-p2`: `#ca8a04`
-- `$priority-p3`: `#16a34a`
+- `$left-msg-bg`: `white`
+- `$msger-send-btn-bg`: `blue`
+- `$msger-send-btn-hover-bg`: `darkblue`
+- `$right-msg-bg`: `lightBlue1`
+- `$toggle-btn-bg`: `green`
+- `$toggle-btn-hover-bg`: `darkgreen`
 
 ### containers.scss (1 colors)
 
@@ -71,23 +64,28 @@
 - `$status-indicator-success-border`: `rgba(40, 167, 69, 0.3)`
 - `$status-indicator-success-color`: `#28a745`
 
-### game-builder.scss (1 colors)
+### colors.scss (16 colors)
 
-- `$bg`: `rgba(0,0,0,0.3), $blur: 20px, $border-radius: 12px) {
-  background: $bg`
-
-### _variables.scss (1 colors)
-
-- `$scale`: `$mobile-text-scale) {
-  font-size: $size`
+- `$background`: `#121212`
+- `$black1`: `rgba(0, 0, 0, 1)`
+- `$blue1`: `#007aff`
+- `$blueShadow1`: `#2196f3`
+- `$gradient1`: `linear-gradient(120deg, #1e1e1e 45%, #2a2a2a)`
+- `$gray1`: `rgba(142, 142, 147, 1)`
+- `$gray2`: `rgba(99, 99, 102, 1)`
+- `$gray3`: `rgba(72, 72, 74, 1)`
+- `$gray4`: `rgba(58, 58, 60, 1)`
+- `$gray5`: `rgba(44, 44, 46, 1)`
+- `$gray6`: `rgba(28, 28, 30, 1)`
+- `$green1`: `#34c759`
+- `$lightBlue1`: `rgba(75, 186, 255, 1)`
+- `$white1`: `rgba(255, 255, 255, 1)`
+- `$white2`: `rgba(white, 0.87)`
+- `$white3`: `rgba(225, 225, 230, 1)`
 
 ### platformer-game.scss (1 colors)
 
 - `$dt-leaderboard`: `#e85252`
-
-### main.scss (1 colors)
-
-- `$test-color`: `#ff00ff`
 
 ### user-colors.scss (18 colors)
 
@@ -112,34 +110,117 @@
 
 ## Colors Used in Multiple Files
 
-No colors are used in multiple files.
+### `$black1` (2 files)
+
+**Value**: `rgba(0, 0, 0, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$gray1` (2 files)
+
+**Value**: `rgba(142, 142, 147, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$gray2` (2 files)
+
+**Value**: `rgba(99, 99, 102, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$gray3` (2 files)
+
+**Value**: `rgba(72, 72, 74, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$gray4` (2 files)
+
+**Value**: `rgba(58, 58, 60, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$gray5` (2 files)
+
+**Value**: `rgba(44, 44, 46, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$gray6` (2 files)
+
+**Value**: `rgba(28, 28, 30, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$white1` (2 files)
+
+**Value**: `rgba(255, 255, 255, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$white2` (2 files)
+
+**Value**: `rgba(white, 0.87)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$white3` (2 files)
+
+**Value**: `rgba(225, 225, 230, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$gradient1` (2 files)
+
+**Value**: `linear-gradient(120deg, #1e1e1e 45%, #2a2a2a)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$blue1` (2 files)
+
+**Value**: `#007aff`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$green1` (2 files)
+
+**Value**: `#34c759`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$lightBlue1` (2 files)
+
+**Value**: `rgba(75, 186, 255, 1)`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$blueShadow1` (2 files)
+
+**Value**: `#2196f3`
+
+**Files**: colors.scss, user-colors.scss
+
+### `$background` (2 files)
+
+**Value**: `#121212`
+
+**Files**: colors.scss, user-colors.scss
 
 ## All Colors (Alphabetical)
 
+- **$accent**: `#4CAFEF`
+- **$accent-700**: `#007ACC`
+- **$accent-700-hover**: `#005FA3`
 - **$background**: `#121212`
-- **$bg**: `rgba(0,0,0,0.3), $blur: 20px, $border-radius: 12px) {
-  background: $bg`
+- **$bg-0**: `#000`
+- **$bg-1**: `#1F2020`
+- **$bg-2**: `#1F1F1F`
+- **$bg-3**: `#2A2D2D`
 - **$black1**: `rgba(0, 0, 0, 1)`
+- **$blue**: `#3182CE`
 - **$blue1**: `#007aff`
 - **$blueShadow1**: `#2196f3`
-- **$dec-accent**: `#ffffff`
-- **$dec-card-bg**: `#0f2320`
-- **$dec-dark-bg**: `#0a1a18`
-- **$dec-primary**: `#1a7f74`
-- **$dec-secondary**: `#e8604c`
-- **$dec-text-light**: `#d8eeec`
-- **$dec-text-muted**: `#8fb3af`
 - **$dt-leaderboard**: `#e85252`
-- **$fops-bg**: `#152418`
-- **$fops-border**: `#2a4030`
-- **$fops-card-bg**: `#1c3320`
-- **$fops-dark**: `#0f1f11`
-- **$fops-gold**: `#c4993a`
-- **$fops-green**: `#5aab64`
-- **$fops-green-light**: `#243d27`
-- **$fops-highlight**: `rgba(196, 153, 58, 0.15)`
-- **$fops-mid**: `#a8c4ab`
-- **$fops-white**: `#e8f2e9`
 - **$gradient1**: `linear-gradient(120deg, #1e1e1e 45%, #2a2a2a)`
 - **$gray1**: `rgba(142, 142, 147, 1)`
 - **$gray2**: `rgba(99, 99, 102, 1)`
@@ -147,24 +228,21 @@ No colors are used in multiple files.
 - **$gray4**: `rgba(58, 58, 60, 1)`
 - **$gray5**: `rgba(44, 44, 46, 1)`
 - **$gray6**: `rgba(28, 28, 30, 1)`
+- **$green**: `#4ADE80`
+- **$green-bg**: `#2D5A3D`
 - **$green1**: `#34c759`
-- **$infograph-bg**: `#000000`
-- **$infograph-border**: `rgba(255, 255, 255, 0.12)`
-- **$infograph-btn-bg**: `rgba(255, 255, 255, 0.08)`
-- **$infograph-btn-hover**: `rgba(255, 255, 255, 0.18)`
-- **$infograph-card**: `rgba(255, 255, 255, 0.05)`
-- **$infograph-foreground**: `#ffffff`
-- **$infograph-muted**: `rgba(255, 255, 255, 0.75)`
+- **$left-msg-bg**: `white`
 - **$lightBlue1**: `rgba(75, 186, 255, 1)`
 - **$login-container-bg**: `#1e1e1e`
+- **$msger-send-btn-bg**: `blue`
+- **$msger-send-btn-hover-bg**: `darkblue`
 - **$my-custom-cat**: `#02375a`
 - **$my-custom-dog**: `#cafff3`
-- **$priority-p0**: `#dc2626`
-- **$priority-p1**: `#ea580c`
-- **$priority-p2**: `#ca8a04`
-- **$priority-p3**: `#16a34a`
-- **$scale**: `$mobile-text-scale) {
-  font-size: $size`
+- **$orange**: `#ED8936`
+- **$panel**: `#2B2B2B`
+- **$popup-bg**: `#222`
+- **$red**: `#E53E3E`
+- **$right-msg-bg**: `lightBlue1`
 - **$status-indicator-base-bg**: `rgba(255, 255, 255, 0.05)`
 - **$status-indicator-base-border**: `rgba(255, 255, 255, 0.1)`
 - **$status-indicator-error-bg**: `rgba(220, 53, 69, 0.2)`
@@ -176,10 +254,18 @@ No colors are used in multiple files.
 - **$status-indicator-success-bg**: `rgba(40, 167, 69, 0.2)`
 - **$status-indicator-success-border**: `rgba(40, 167, 69, 0.3)`
 - **$status-indicator-success-color**: `#28a745`
-- **$test-color**: `#ff00ff`
+- **$success-green**: `#28A745`
+- **$surface**: `#333`
+- **$teal**: `#38B2AC`
+- **$text**: `#F0F0F0`
+- **$text-muted**: `#aaa`
+- **$toggle-btn-bg**: `green`
+- **$toggle-btn-hover-bg**: `darkgreen`
 - **$validation-error-color**: `#ef4444`
 - **$validation-focus-color**: `#6366f1`
 - **$validation-success-color**: `#10b981`
+- **$warn**: `#FBBF24`
+- **$warn-bg**: `#5A3D2D`
 - **$white1**: `rgba(255, 255, 255, 1)`
 - **$white2**: `rgba(white, 0.87)`
 - **$white3**: `rgba(225, 225, 230, 1)`

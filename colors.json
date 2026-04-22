@@ -1,173 +1,167 @@
 {
   "generated_by": "scripts/update_color_map.py",
-  "total_colors": 65,
+  "total_colors": 61,
   "colors": {
-    "dec-primary": {
-      "value": "#1a7f74",
+    "bg-0": {
+      "value": "#000",
       "source_files": [
-        "_sass/capstone/flaskandfurious.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "dec-secondary": {
-      "value": "#e8604c",
+    "bg-1": {
+      "value": "#1F2020",
       "source_files": [
-        "_sass/capstone/flaskandfurious.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "dec-accent": {
-      "value": "#ffffff",
+    "bg-2": {
+      "value": "#1F1F1F",
       "source_files": [
-        "_sass/capstone/flaskandfurious.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "dec-dark-bg": {
-      "value": "#0a1a18",
+    "bg-3": {
+      "value": "#2A2D2D",
       "source_files": [
-        "_sass/capstone/flaskandfurious.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "dec-card-bg": {
-      "value": "#0f2320",
+    "panel": {
+      "value": "#2B2B2B",
       "source_files": [
-        "_sass/capstone/flaskandfurious.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "dec-text-muted": {
-      "value": "#8fb3af",
+    "surface": {
+      "value": "#333",
       "source_files": [
-        "_sass/capstone/flaskandfurious.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "dec-text-light": {
-      "value": "#d8eeec",
+    "text": {
+      "value": "#F0F0F0",
       "source_files": [
-        "_sass/capstone/flaskandfurious.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-green": {
-      "value": "#5aab64",
+    "text-muted": {
+      "value": "#aaa",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-green-light": {
-      "value": "#243d27",
+    "accent": {
+      "value": "#4CAFEF",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-gold": {
-      "value": "#c4993a",
+    "accent-700": {
+      "value": "#007ACC",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-dark": {
-      "value": "#0f1f11",
+    "accent-700-hover": {
+      "value": "#005FA3",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-mid": {
-      "value": "#a8c4ab",
+    "green": {
+      "value": "#4ADE80",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-bg": {
-      "value": "#152418",
+    "green-bg": {
+      "value": "#2D5A3D",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-white": {
-      "value": "#e8f2e9",
+    "warn": {
+      "value": "#FBBF24",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-border": {
-      "value": "#2a4030",
+    "warn-bg": {
+      "value": "#5A3D2D",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-card-bg": {
-      "value": "#1c3320",
+    "popup-bg": {
+      "value": "#222",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "fops-highlight": {
-      "value": "rgba(196, 153, 58, 0.15)",
+    "teal": {
+      "value": "#38B2AC",
       "source_files": [
-        "_sass/capstone/fops-infographic.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "infograph-bg": {
-      "value": "#000000",
+    "orange": {
+      "value": "#ED8936",
       "source_files": [
-        "_sass/capstone/infograph.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "infograph-foreground": {
-      "value": "#ffffff",
+    "blue": {
+      "value": "#3182CE",
       "source_files": [
-        "_sass/capstone/infograph.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "infograph-muted": {
-      "value": "rgba(255, 255, 255, 0.75)",
+    "red": {
+      "value": "#E53E3E",
       "source_files": [
-        "_sass/capstone/infograph.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "infograph-border": {
-      "value": "rgba(255, 255, 255, 0.12)",
+    "success-green": {
+      "value": "#28A745",
       "source_files": [
-        "_sass/capstone/infograph.scss"
+        "_sass/minima/lessonbase.scss"
       ]
     },
-    "infograph-card": {
-      "value": "rgba(255, 255, 255, 0.05)",
+    "toggle-btn-bg": {
+      "value": "green",
       "source_files": [
-        "_sass/capstone/infograph.scss"
+        "_sass/open-coding/chatbot.scss"
       ]
     },
-    "infograph-btn-bg": {
-      "value": "rgba(255, 255, 255, 0.08)",
+    "toggle-btn-hover-bg": {
+      "value": "darkgreen",
       "source_files": [
-        "_sass/capstone/infograph.scss"
+        "_sass/open-coding/chatbot.scss"
       ]
     },
-    "infograph-btn-hover": {
-      "value": "rgba(255, 255, 255, 0.18)",
+    "msger-send-btn-bg": {
+      "value": "blue",
       "source_files": [
-        "_sass/capstone/infograph.scss"
+        "_sass/open-coding/chatbot.scss"
       ]
     },
-    "priority-p0": {
-      "value": "#dc2626",
+    "msger-send-btn-hover-bg": {
+      "value": "darkblue",
       "source_files": [
-        "_sass/open-coding/calendar.scss"
+        "_sass/open-coding/chatbot.scss"
       ]
     },
-    "priority-p1": {
-      "value": "#ea580c",
+    "left-msg-bg": {
+      "value": "white",
       "source_files": [
-        "_sass/open-coding/calendar.scss"
+        "_sass/open-coding/chatbot.scss"
       ]
     },
-    "priority-p2": {
-      "value": "#ca8a04",
+    "right-msg-bg": {
+      "value": "lightBlue1",
       "source_files": [
-        "_sass/open-coding/calendar.scss"
-      ]
-    },
-    "priority-p3": {
-      "value": "#16a34a",
-      "source_files": [
-        "_sass/open-coding/calendar.scss"
+        "_sass/open-coding/chatbot.scss"
       ]
     },
     "login-container-bg": {
@@ -260,124 +254,122 @@
         "_sass/open-coding/elements/status-indicators/common.scss"
       ]
     },
-    "bg": {
-      "value": "rgba(0,0,0,0.3), $blur: 20px, $border-radius: 12px) {\n  background: $bg",
-      "source_files": [
-        "_sass/open-coding/forms/game-builder.scss"
-      ]
-    },
-    "scale": {
-      "value": "$mobile-text-scale) {\n  font-size: $size",
-      "source_files": [
-        "_sass/open-coding/mixins/_variables.scss"
-      ]
-    },
-    "dt-leaderboard": {
-      "value": "#e85252",
-      "source_files": [
-        "_sass/open-coding/platformer-game.scss"
-      ]
-    },
-    "test-color": {
-      "value": "#ff00ff",
-      "source_files": [
-        "_sass/projects/test-project/main.scss"
-      ]
-    },
-    "background": {
-      "value": "#121212",
-      "source_files": [
-        "_sass/user-colors.scss"
-      ]
-    },
     "black1": {
       "value": "rgba(0, 0, 0, 1)",
       "source_files": [
-        "_sass/user-colors.scss"
-      ]
-    },
-    "blue1": {
-      "value": "#007aff",
-      "source_files": [
-        "_sass/user-colors.scss"
-      ]
-    },
-    "blueShadow1": {
-      "value": "#2196f3",
-      "source_files": [
-        "_sass/user-colors.scss"
-      ]
-    },
-    "gradient1": {
-      "value": "linear-gradient(120deg, #1e1e1e 45%, #2a2a2a)",
-      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "gray1": {
       "value": "rgba(142, 142, 147, 1)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "gray2": {
       "value": "rgba(99, 99, 102, 1)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "gray3": {
       "value": "rgba(72, 72, 74, 1)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "gray4": {
       "value": "rgba(58, 58, 60, 1)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "gray5": {
       "value": "rgba(44, 44, 46, 1)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "gray6": {
       "value": "rgba(28, 28, 30, 1)",
       "source_files": [
-        "_sass/user-colors.scss"
-      ]
-    },
-    "green1": {
-      "value": "#34c759",
-      "source_files": [
-        "_sass/user-colors.scss"
-      ]
-    },
-    "lightBlue1": {
-      "value": "rgba(75, 186, 255, 1)",
-      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "white1": {
       "value": "rgba(255, 255, 255, 1)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "white2": {
       "value": "rgba(white, 0.87)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
       ]
     },
     "white3": {
       "value": "rgba(225, 225, 230, 1)",
       "source_files": [
+        "_sass/open-coding/materials/colors.scss",
         "_sass/user-colors.scss"
+      ]
+    },
+    "gradient1": {
+      "value": "linear-gradient(120deg, #1e1e1e 45%, #2a2a2a)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "blue1": {
+      "value": "#007aff",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "green1": {
+      "value": "#34c759",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "lightBlue1": {
+      "value": "rgba(75, 186, 255, 1)",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "blueShadow1": {
+      "value": "#2196f3",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "background": {
+      "value": "#121212",
+      "source_files": [
+        "_sass/open-coding/materials/colors.scss",
+        "_sass/user-colors.scss"
+      ]
+    },
+    "dt-leaderboard": {
+      "value": "#e85252",
+      "source_files": [
+        "_sass/open-coding/platformer-game.scss"
       ]
     },
     "my-custom-cat": {
