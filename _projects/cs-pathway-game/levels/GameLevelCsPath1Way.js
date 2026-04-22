@@ -3,10 +3,7 @@ import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackgr
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
-
-import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
-// ─────────────────────────────────────────────────────────────────────────────
-
+import PersonaTrial from './PersonaTrial.js';
 /**
  * GameLevel CS Pathway - Wayfinding World
  */
@@ -69,6 +66,9 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       playerSrc: player_data.src,
       backgroundSrc: bg_data.src,
     });
+
+
+    this.updateProfilePanel({ course: 'CSSE A', persona: 'Builder', skill: 'JavaScript' });
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
@@ -193,8 +193,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
       position: personalEnrichmentGatekeeperPos,
       markerColor: '#3b82f6',
+      interact: () => {
+        this.openPersonaTrial();
+      },
     });
-
     const npc_data_skillPassportGatekeeper = createGatekeeperData({
       id: 'SkillPassportGatekeeper',
       greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
@@ -218,8 +220,86 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_courseEnlistGatekeeper },
     ];
+    
+  }
+  openPersonaTrial() {
+    if (this._personaTrialOpen) return;
+    this._personaTrialOpen = true;
+
+    const trial = new PersonaTrial({
+      onComplete: async (result) => {
+        try {
+          await this.savePersonaResult(result);
+
+          this.showToast?.(`Persona updated: ${result.title}`);
+          this.panel?.(
+            `${result.title}\n\n${result.summary}\n\nTechnologist ${result.percentages.technologist}% | Scrummer ${result.percentages.scrummer}% | Planner ${result.percentages.planner}% | Finisher ${result.percentages.finisher}%`
+          );
+        } catch (error) {
+          console.error('Failed to save persona result:', error);
+          this.showToast?.('Persona trial completed, but saving failed.');
+        } finally {
+          this._personaTrialOpen = false;
+        }
+      },
+      onClose: () => {
+        this._personaTrialOpen = false;
+      },
+    });
+
+    trial.start();
   }
 
+  async savePersonaResult(result) {
+    const currentProfile = { ...(this.profileData || {}) };
+
+    const updatedProfile = {
+      ...currentProfile,
+      personaMeta: {
+        primaryPersona: result.primaryPersona,
+        title: result.title,
+        summary: result.summary,
+        growth: result.growth,
+        percentages: result.percentages,
+        scores: result.scores,
+        completedAt: result.completedAt,
+      },
+    };
+
+    this.profileData = updatedProfile;
+
+    // Try a few common persistence method names in case your ProfileManager
+    // implementation differs. Keep the first one that exists.
+    if (typeof this.profileManager?.updateProfileData === 'function') {
+      await this.profileManager.updateProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfileData === 'function') {
+      await this.profileManager.saveProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfile === 'function') {
+      await this.profileManager.saveProfile(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.setProfileData === 'function') {
+      await this.profileManager.setProfileData(updatedProfile);
+      return;
+    }
+
+    // Fallback so you still see it work during testing even if persistence
+    // method name is different.
+    console.warn(
+      'No known ProfileManager save method found. Persona result stored in this.profileData only.'
+    );
+  }
+  
+  initialize() {
+    this.activateProfilePanel();
+  }
 }
 
 export default GameLevelCsPath1Way;

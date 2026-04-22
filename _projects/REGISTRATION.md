@@ -24,7 +24,7 @@ third-project
 - Project name only (no paths)
 - Lines starting with `#` are comments
 - Blank lines ignored
-- Must have corresponding `_projects/<name>/Makefile.fragment`
+- Must have corresponding `_projects/<name>/Makefile`
 
 ### 2. Auto-Include in Makefile
 
@@ -45,8 +45,8 @@ The Makefile reads `.makeprojects` and includes each fragment:
 **What it does:**
 1. Checks if `.makeprojects` exists
 2. Filters out comments (#) and blank lines
-3. Prepends `_projects/` and appends `/Makefile.fragment`
-4. Includes each fragment file
+3. Prepends `_projects/` and appends `/Makefile`
+4. Includes each file
 5. Uses `-include` (silent if file missing)
 
 ### 3. No Project-Specific Targets in Makefile
@@ -57,18 +57,26 @@ The main Makefile contains **zero** project-specific code. All project targets c
 
 Each project must have:
 
-```
+```text
 _projects/<project-name>/
-├── Makefile.fragment          # REQUIRED - Build rules
+├── Makefile                    # REQUIRED - Build rules (usually copied from _template/Makefile)
 ├── README.md                   # Documentation
 ├── notebook.src.ipynb          # Source notebook (optional)
-├── levels/                     # Project code
-├── model/                      # Data layer
+├── js/                         # JavaScript source code
+├── sass/                       # SCSS definitions (must include a main.scss)
+├── levels/                     # Legacy project code
+├── model/                      # Legacy data layer
 ├── images/                     # Assets
 └── docs/                       # Project docs
 ```
 
-### Makefile.fragment Requirements
+### JS and SASS Deployment (Native Pipeline)
+
+Projects can seamlessly deploy standard styles and scripts to the global `assets/` and `_sass` directories:
+* **JS**: Any files inside `js/` will be copied to `assets/js/projects/<project-name>/`.
+* **SASS**: Any `.scss` files inside `sass/` will be copied to `_sass/projects/<project-name>/`. If a `main.scss` exists inside the `sass/` directory, it configures Jekyll to natively compile the SCSS into `assets/css/projects/<project-name>/main.css`.
+
+### Makefile Requirements
 
 Must define these targets (or variants):
 
@@ -130,11 +138,11 @@ Available projects (in _projects/ directory):
    mkdir -p _projects/new-game/{levels,model,images,docs}
    ```
 
-2. Create `Makefile.fragment`:
+2. Create `Makefile`:
    ```bash
-   cp _projects/cs-pathway-game/Makefile.fragment \
-      _projects/new-game/Makefile.fragment
-   # Edit for your project
+   cp _projects/_template/Makefile \
+      _projects/new-game/Makefile
+   # Or copy from an existing project
    ```
 
 3. Add to `.makeprojects`:
@@ -191,8 +199,8 @@ dev: bundle-install jekyll-serve watch-notebooks watch-files watch-all-projects
 
 watch-all-projects:
 	@grep -v '^\#' .makeprojects | grep -v '^$$' | while read proj; do \
-		if [ -f "_projects/$$proj/Makefile.fragment" ]; then \
-			make watch-$$proj & \
+		if [ -f "_projects/$$proj/Makefile" ]; then \
+			make -C _projects/$$proj watch & \
 		fi; \
 	done
 ```
@@ -256,13 +264,13 @@ stop:
 mkdir -p _projects/quiz-game/{levels,model,images/sprites,docs}
 
 # 2. Copy template files
-cp _projects/cs-pathway-game/Makefile.fragment \
-   _projects/quiz-game/Makefile.fragment
-cp _projects/cs-pathway-game/README.md \
-   _projects/quiz-game/README.md
+cp _projects/_template/Makefile \
+   _projects/quiz-game/Makefile
+cp _projects/_template/README.md \
+   _projects/quiz-game/README.md 2>/dev/null || true
 
-# 3. Edit Makefile.fragment
-# - Change all "cs-pathway-game" to "quiz-game"
+# 3. Edit Makefile
+# - Depending on the template used, you may need to update targets.
 # - Update paths and targets
 
 # 4. Register the project
@@ -286,17 +294,17 @@ make quiz-game-build
 make list-projects
 # Check if project is:
 # - Listed in .makeprojects
-# - Has Makefile.fragment
+# - Has Makefile
 # - Named correctly (no typos)
 ```
 
 ### "Targets not working"
 ```bash
-# Check fragment defines targets
-grep -A 5 "^quiz-game:" _projects/quiz-game/Makefile.fragment
+# Check if targets are defined (e.g. build, clean, watch)
+grep -A 5 "^build:" _projects/quiz-game/Makefile
 
-# Test include is working
-make -p | grep quiz-game
+# Test make is working
+make -C _projects/quiz-game build
 ```
 
 ### "Changes not reflected"
@@ -339,7 +347,7 @@ docs-only-project:3:no
 validate-projects:
 	@echo "Validating registered projects..."
 	@grep -v '^\#' .makeprojects | while read proj; do \
-		test -f _projects/$$proj/Makefile.fragment || echo "⚠️  $$proj missing fragment"; \
+		test -f _projects/$$proj/Makefile || echo "⚠️  $$proj missing Makefile"; \
 		test -f _projects/$$proj/README.md || echo "⚠️  $$proj missing README"; \
 	done
 ```
@@ -349,9 +357,9 @@ validate-projects:
 **Old Way:**
 ```makefile
 # In Makefile - hardcoded!
-include _projects/cs-pathway-game/Makefile.fragment
-include _projects/quiz-game/Makefile.fragment
-include _projects/another-game/Makefile.fragment
+include _projects/cs-pathway-game/Makefile
+include _projects/quiz-game/Makefile
+include _projects/another-game/Makefile
 
 dev:
 	@make watch-cs-pathway-game &
