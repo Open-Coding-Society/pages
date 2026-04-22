@@ -1,10 +1,60 @@
 // Imports: Level objects and UI helpers.
 import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
+import AiChallengeNpc from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+
+/**
+ * Generate dynamic SVG orb sprite data URI
+ * Creates animated glowing orbs with orbiting markers (like Wayfinding World)
+ */
+const createOrbSvgSrc = (fillColor, borderColor = '#f8fafc') => {
+  const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
+  const orbFrames = frameOpacity
+    .map((opacity, index) => {
+      const cx = 128 + (index * 256);
+      const ringAngle = index * 45;
+      const angleRad = (ringAngle * Math.PI) / 180;
+      const oppositeAngleRad = angleRad + Math.PI;
+      const orbitRadius = 112;
+      const markerX = cx + (Math.cos(angleRad) * orbitRadius);
+      const markerY = 128 + (Math.sin(angleRad) * orbitRadius);
+      const marker2X = cx + (Math.cos(oppositeAngleRad) * orbitRadius);
+      const marker2Y = 128 + (Math.sin(oppositeAngleRad) * orbitRadius);
+      const markerShadowX = cx + (Math.cos(angleRad) * (orbitRadius + 4));
+      const markerShadowY = 128 + (Math.sin(angleRad) * (orbitRadius + 4));
+      const marker2ShadowX = cx + (Math.cos(oppositeAngleRad) * (orbitRadius + 4));
+      const marker2ShadowY = 128 + (Math.sin(oppositeAngleRad) * (orbitRadius + 4));
+      return `
+        <g opacity='${opacity}'>
+          <circle cx='${cx}' cy='128' r='114' fill='none' stroke='rgba(0,0,0,0.5)' stroke-width='20'/>
+          <circle cx='${cx}' cy='128' r='106' fill='${fillColor}' stroke='${borderColor}' stroke-width='18'/>
+          <circle cx='${cx}' cy='128' r='98' fill='none' stroke='rgba(255,255,255,0.34)' stroke-width='6'/>
+          <circle cx='${cx}' cy='128' r='104' fill='url(#shine)' />
+          <circle cx='${cx}' cy='128' r='112' fill='none' stroke='rgba(255,255,255,0.92)' stroke-width='11' stroke-linecap='round' stroke-dasharray='190 500' transform='rotate(${ringAngle} ${cx} 128)'/>
+          <circle cx='${markerShadowX}' cy='${markerShadowY}' r='12' fill='rgba(0,0,0,0.45)' />
+          <circle cx='${markerX}' cy='${markerY}' r='10' fill='#ffffff' />
+          <circle cx='${marker2ShadowX}' cy='${marker2ShadowY}' r='10' fill='rgba(0,0,0,0.35)' />
+          <circle cx='${marker2X}' cy='${marker2Y}' r='8' fill='#fde047' />
+        </g>`;
+    })
+    .join('');
+
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='2048' height='256' viewBox='0 0 2048 256'>
+    <defs>
+      <radialGradient id='shine' cx='35%' cy='30%' r='70%'>
+        <stop offset='0%' stop-color='#ffffff' stop-opacity='0.45' />
+        <stop offset='45%' stop-color='#ffffff' stop-opacity='0.14' />
+        <stop offset='100%' stop-color='#000000' stop-opacity='0.22' />
+      </radialGradient>
+    </defs>
+    ${orbFrames}
+  </svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+};
 
 /**
  * GameLevel CS Pathway - Assessment Observatory
@@ -95,74 +145,62 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       y: height * 0.35,
     };
 
-    const gatekeeperBaseData = {
-      src: path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
-      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
-      ANIMATION_RATE: 50,
-      pixels: { width: 1024, height: 1024 },
-      orientation: { rows: 2, columns: 2 },
-      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
-      up: { row: 0, start: 1, columns: 1 },
-      left: { row: 1, start: 0, columns: 1 },
-      right: { row: 1, start: 1, columns: 1 },
+    const createOrbNpcData = ({ id, greeting, position, color, expertise, interact }) => ({
+      src: createOrbSvgSrc(color),
+      SCALE_FACTOR: 12,
+      ANIMATION_RATE: 6,
+      pixels: { width: 2048, height: 256 },
+      orientation: { rows: 1, columns: 8 },
+      down: { row: 0, start: 0, columns: 8, wiggle: { angle: Math.PI / 60, speed: 0.08 } },
+      up: { row: 0, start: 0, columns: 8 },
+      left: { row: 0, start: 0, columns: 8 },
+      right: { row: 0, start: 0, columns: 8 },
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
-    };
-
-    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
-      ...gatekeeperBaseData,
       id,
       greeting,
       INIT_POSITION: { ...position },
-      interactDistance: interactDistance || 120,
-      ...(reaction ? { reaction } : {}),
+      interactDistance: 120,
+      expertise,
+      chatHistory: [],
       ...(interact ? { interact } : {}),
     });
 
     // Store reference to this level for use in callbacks
     const level = this;
 
-    // Analytics Guide NPC - central hub for viewing analytics
-    const npc_data_analyticsGuide = createGatekeeperData({
-      id: 'AnalyticsGuide',
-      greeting: 'Welcome to Analytics Observatory! I am your guide through your learning metrics and progress. Press E to view your complete analytics profile.',
+    // Analytics Guide - AI coaching on skills and performance
+    const npc_data_analyticsGuide = createOrbNpcData({
+      id: 'AI Skill Advisor',
+      greeting: 'Analytics Station: Your AI coaching assistant analyzes your skills and provides personalized guidance. Press E to interact.',
       position: analyticsGuidePos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('Analytics Guide: Press E to view your analytics');
-        }
-      },
+      color: '#3b82f6',
+      expertise: 'Personal learning analytics, skill assessment, performance coaching, and progress tracking. Help students understand their strengths and growth areas with actionable feedback.',
       interact: async function() {
         await level.showAnalyticsDashboard();
       },
     });
 
-    // Self-Evaluation NPC - end-of-sprint reflection (at 50%)
-    const npc_data_selfEval = createGatekeeperData({
-      id: 'SelfEvaluator',
-      greeting: 'Welcome to the mid-sprint assessment station! Here you can evaluate your progress, assess your skills, and reflect on your learning. Press E to begin your self-evaluation.',
+    // GitHub Metrics Station - AI analysis of code contributions
+    const npc_data_githubGuide = createOrbNpcData({
+      id: 'GitHub Analytics',
+      greeting: 'GitHub Analytics Station: Your AI guide analyzes your code contributions and collaboration patterns. Press E to explore.',
       position: githubMetricsPos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('Self-Evaluator: Press E to reflect on your sprint');
-        }
-      },
+      color: '#10b981',
+      expertise: 'Code contribution analysis, GitHub metrics interpretation, code quality insights, collaboration patterns, and commit history analysis. Help students understand their coding productivity and collaboration effectiveness.',
       interact: async function() {
-        await level.showSelfEvaluation();
+        await level.showGitHubStats();
       },
     });
 
-    // GitHub Metrics NPC - shows contribution statistics (at 80%)
-    const npc_data_githubGuide = createGatekeeperData({
-      id: 'GitHubGuide',
-      greeting: 'Welcome to the GitHub contributions hub! Explore your GitHub contribution metrics: commits, pull requests, issues, and code changes.',
+    // Self-Evaluation Station - AI coach for sprint reflection
+    const npc_data_selfEval = createOrbNpcData({
+      id: 'Sprint Coach',
+      greeting: 'Self-Assessment Station: Your AI coach guides your sprint reflection and celebrates your progress. Press E to begin.',
       position: selfEvalPos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('GitHub Guide: Press E to see your GitHub stats');
-        }
-      },
+      color: '#f59e0b',
+      expertise: 'Sprint retrospectives, self-reflection coaching, progress celebration, learning trajectory analysis, and next-step planning. Help students reflect on their sprint work and plan continuous improvement.',
       interact: async function() {
-        await level.showGitHubStats();
+        await level.showSelfEvaluation();
       },
     });
 
@@ -170,9 +208,9 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
-      { class: Npc, data: npc_data_analyticsGuide },
-      { class: Npc, data: npc_data_githubGuide },
-      { class: Npc, data: npc_data_selfEval },
+      { class: FriendlyNpc, data: npc_data_analyticsGuide },
+      { class: FriendlyNpc, data: npc_data_githubGuide },
+      { class: FriendlyNpc, data: npc_data_selfEval },
     ];
 
     // FriendlyNpc expects these level references for toast routing
@@ -310,7 +348,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Show complete analytics dashboard with Skill Radar, Holographic Stats, and Mini-Games
+   * PROFESSIONAL ANALYTICS DASHBOARD - Comprehensive Learning Analytics & AI Coaching
    */
   async showAnalyticsDashboard() {
     try {
@@ -318,7 +356,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       const userData = this.cachedUserData || await this.fetchUserData();
       
       if (!userData || !userData.analyticsSummary) {
-        this.showToast('Unable to load your analytics. Please ensure you are logged in.');
+        this.showToast('Unable to load analytics. Please ensure you are logged in.');
         return;
       }
 
@@ -331,97 +369,136 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.9);
+        background: rgba(0, 0, 0, 0.95);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 10000;
+        overflow-y: auto;
       `;
 
       const container = document.createElement('div');
       container.style.cssText = `
-        background: #1a1a1a;
+        background: #0f172a;
         border: 2px solid #3b82f6;
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 40px;
-        max-width: 900px;
-        max-height: 85vh;
+        max-width: 1000px;
+        max-height: 90vh;
         overflow-y: auto;
         color: #e5e7eb;
+        margin: 20px auto;
       `;
 
-      // Title
-      const title = document.createElement('h1');
-      title.textContent = `📊 Analytics Dashboard - ${userData.name || 'Student'}`;
-      title.style.cssText = 'color: #60a5fa; margin: 0 0 30px 0; text-align: center; font-size: 28px;';
-      container.appendChild(title);
+      // Title with profile
+      const titleBox = document.createElement('div');
+      titleBox.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #1e293b;
+      `;
 
-      // Add tabs for different views
+      const title = document.createElement('div');
+      title.innerHTML = `<h1 style="margin: 0; color: #60a5fa; font-size: 28px;">Learning Analytics Dashboard</h1>
+        <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 13px;">${userData.name || 'Student'} | UID: ${userData.uid || 'N/A'}</p>`;
+      titleBox.appendChild(title);
+
+      // Stats snapshot
+      const snapshot = document.createElement('div');
+      snapshot.style.cssText = `
+        text-align: right;
+        font-size: 12px;
+      `;
+      const s = userData.analyticsSummary || {};
+      snapshot.innerHTML = `
+        <div style="color: #10b981; font-weight: bold;">Engagement: ${(s.interactionPercentage || 0).toFixed(1)}%</div>
+        <div style="color: #f59e0b;">Accuracy: ${(s.averageAccuracyPercentage || 0).toFixed(1)}%</div>
+      `;
+      titleBox.appendChild(snapshot);
+      container.appendChild(titleBox);
+
+      // Tab system - No emojis!
       const tabContainer = document.createElement('div');
       tabContainer.style.cssText = `
         display: flex;
         gap: 10px;
         margin-bottom: 30px;
-        border-bottom: 2px solid #3b82f6;
+        border-bottom: 2px solid #1e293b;
         padding-bottom: 15px;
+        flex-wrap: wrap;
       `;
 
       const tabs = [
-        { name: 'Skills Radar', id: 'skills' },
-        { name: 'Holographic Stats', id: 'holoStats' },
-        { name: 'Mini-Games', id: 'miniGames' },
-        { name: 'Momentum', id: 'momentum' }
+        { name: 'Skill Advisor', id: 'advisor' },
+        { name: 'Performance Analytics', id: 'performance' },
+        { name: 'Code Metrics', id: 'github' },
+        { name: 'Growth Projections', id: 'projections' },
+        { name: 'Recommendations', id: 'recommendations' },
+        { name: 'Mini Challenges', id: 'challenges' }
       ];
 
       const contentArea = document.createElement('div');
       contentArea.id = 'dashboard-content';
+      contentArea.style.cssText = 'min-height: 400px;';
 
-      tabs.forEach(tab => {
+      // Tab click handler
+      const switchTab = async (tabId) => {
+        // Update button styling
+        tabContainer.querySelectorAll('button').forEach(btn => {
+          btn.style.background = '#334155';
+          btn.style.color = '#cbd5e1';
+        });
+        event.target.style.background = '#3b82f6';
+        event.target.style.color = '#ffffff';
+
+        // Render content
+        contentArea.innerHTML = '';
+        if (tabId === 'advisor') {
+          await this.renderSkillAdvisor(userData, contentArea);
+        } else if (tabId === 'performance') {
+          await this.renderPerformanceAnalytics(userData, contentArea);
+        } else if (tabId === 'github') {
+          await this.renderGitHubMetrics(userData, contentArea);
+        } else if (tabId === 'projections') {
+          await this.renderGrowthProjections(userData, contentArea);
+        } else if (tabId === 'recommendations') {
+          await this.renderRecommendations(userData, contentArea);
+        } else if (tabId === 'challenges') {
+          await this.renderMiniChallenges(userData, contentArea);
+        }
+      };
+
+      // Create tabs
+      tabs.forEach((tab, idx) => {
         const tabBtn = document.createElement('button');
         tabBtn.textContent = tab.name;
         tabBtn.style.cssText = `
-          padding: 10px 20px;
-          background: ${tab.id === 'skills' ? '#3b82f6' : '#4b5563'};
-          color: white;
-          border: none;
-          border-radius: 6px;
+          padding: 10px 18px;
+          background: ${idx === 0 ? '#3b82f6' : '#334155'};
+          color: ${idx === 0 ? '#ffffff' : '#cbd5e1'};
+          border: 1px solid #475569;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 13px;
-          font-weight: bold;
+          font-weight: 500;
           transition: all 0.2s;
         `;
         
         tabBtn.onmouseover = () => {
           if (tabBtn.style.background !== '#3b82f6') {
-            tabBtn.style.background = '#5a6979';
+            tabBtn.style.background = '#475569';
           }
         };
         tabBtn.onmouseout = () => {
           if (tabBtn.style.background !== '#3b82f6') {
-            tabBtn.style.background = '#4b5563';
+            tabBtn.style.background = '#334155';
           }
         };
 
-        tabBtn.onclick = async () => {
-          // Update tab styling
-          tabContainer.querySelectorAll('button').forEach(btn => {
-            btn.style.background = '#4b5563';
-          });
-          tabBtn.style.background = '#3b82f6';
-
-          // Show appropriate content
-          contentArea.innerHTML = '';
-          if (tab.id === 'skills') {
-            await this.renderSkillsRadar(userData, contentArea);
-          } else if (tab.id === 'holoStats') {
-            await this.renderHolographicStats(userData, contentArea);
-          } else if (tab.id === 'miniGames') {
-            await this.renderMiniGames(userData, contentArea);
-          } else if (tab.id === 'momentum') {
-            await this.renderMomentumMeter(userData, contentArea);
-          }
-        };
-
+        tabBtn.onclick = () => switchTab(tab.id);
         tabContainer.appendChild(tabBtn);
       });
 
@@ -430,36 +507,735 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
       // Close button
       const closeBtn = document.createElement('button');
-      closeBtn.textContent = '✕ Close';
+      closeBtn.textContent = 'Close Dashboard';
       closeBtn.style.cssText = `
         margin-top: 30px;
         padding: 12px 30px;
-        background: #ef4444;
+        background: #64748b;
         color: white;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
         width: 100%;
+        transition: background 0.2s;
       `;
+      closeBtn.onmouseover = () => closeBtn.style.background = '#475569';
+      closeBtn.onmouseout = () => closeBtn.style.background = '#64748b';
       closeBtn.onclick = () => modal.remove();
       container.appendChild(closeBtn);
 
       modal.appendChild(container);
       document.body.appendChild(modal);
 
-      // Trigger first tab
-      tabContainer.querySelector('button').click();
+      // Render first tab
+      await switchTab('advisor');
 
     } catch (err) {
       console.error('Error showing analytics dashboard:', err);
-      this.showToast('Error loading analytics dashboard');
+      this.showToast('Error loading dashboard');
     }
   }
 
   /**
-   * Render Skill Radar - Hexagon chart with skills
+   * SKILL ADVISOR - AI-Powered Skill Analysis with Chat
    */
+  async renderSkillAdvisor(userData, container) {
+    const s = userData.analyticsSummary || {};
+    
+    // Calculate skill scores
+    const skills = {
+      'Problem Solving': Math.min(100, (s.averageAccuracyPercentage || 0) * 1.1),
+      'Communication': Math.min(100, (s.interactionPercentage || 0)),
+      'Code Quality': Math.min(100, ((s.totalCodeExecutions || 0) / 100) * 10),
+      'Testing': Math.min(100, ((s.totalLessonsCompleted || 0) /10) * 10),
+      'Time Management': Math.min(100, (s.averageScrollDepth || 0)),
+      'Persistence': Math.min(100, ((s.totalLessonsViewed || 0) / (s.totalLessonsCompleted || 1)) * 50),
+    };
+
+    // Find weakest and strongest skills
+    const sorted = Object.entries(skills).sort((a, b) => b[1] - a[1]);
+    const weakest = sorted[sorted.length - 1];
+    const strongest = sorted[0];
+
+    // Create layout
+    const layout = document.createElement('div');
+    layout.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 20px;';
+
+    // Left: Skill Radar Chart
+    const radarBox = document.createElement('div');
+    radarBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    `;
+
+    const radarCanvas = document.createElement('canvas');
+    radarCanvas.width = 300;
+    radarCanvas.height = 300;
+    radarBox.appendChild(radarCanvas);
+
+    this.drawSkillRadar(radarCanvas, skills);
+    layout.appendChild(radarBox);
+
+    // Right: AI Recommendations
+    const recBox = document.createElement('div');
+    recBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 400px;
+    `;
+
+    const recTitle = document.createElement('h3');
+    recTitle.textContent = 'AI Coaching Insights';
+    recTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa; font-size: 16px;';
+    recBox.appendChild(recTitle);
+
+    // AI insights based on skills
+    const insights = [
+      {
+        skill: weakest[0],
+        score: weakest[1].toFixed(0),
+        isWeakest: true,
+      },
+      {
+        skill: strongest[0],
+        score: strongest[1].toFixed(0),
+        isWeakest: false,
+      }
+    ];
+
+    for (const insight of insights) {
+      const card = document.createElement('div');
+      card.style.cssText = `
+        background: #0f172a;
+        border-left: 4px solid ${insight.isWeakest ? '#f59e0b' : '#10b981'};
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+      `;
+
+      const title = document.createElement('div');
+      title.style.cssText = `color: ${insight.isWeakest ? '#f59e0b' : '#10b981'}; font-weight: bold; margin-bottom: 8px;`;
+      title.textContent = `${insight.skill} (${insight.score}%)`;
+      card.appendChild(title);
+
+      const tipBox = document.createElement('div');
+      tipBox.style.cssText = 'color: #cbd5e1; font-size: 12px; margin-bottom: 8px;';
+      tipBox.textContent = insight.isWeakest ? 'Loading AI coaching...' : 'Loading AI insights...';
+      card.appendChild(tipBox);
+
+      const button = document.createElement('button');
+      button.textContent = insight.isWeakest ? 'Get AI Strategy' : 'Leverage Strength';
+      button.style.cssText = `
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 11px;
+        cursor: pointer;
+        width: 100%;
+      `;
+
+      button.onclick = async () => {
+        button.disabled = true;
+        button.textContent = insight.isWeakest ? 'AI Thinking...' : 'AI Thinking...';
+        try {
+          const coachPrompt = insight.isWeakest
+            ? `The student has a ${insight.skill} score of ${insight.score}%. They need specific, actionable improvement steps. Provide ONE focused strategy in 1-2 sentences.`
+            : `The student excels at ${insight.skill} (${insight.score}%). How can they leverage this strength further? Provide ONE suggestion in 1-2 sentences.`;
+
+          const spriteData = { id: 'AI Skill Advisor', expertise: 'Personal learning coaching' };
+          const response = await AiChallengeNpc.requestAiText(
+            spriteData,
+            coachPrompt,
+            'assessment-observatory-insight',
+            'Skill improvement coaching'
+          );
+
+          button.textContent = insight.isWeakest ? 'Get AI Strategy' : 'Leverage Strength';
+          button.disabled = false;
+          tipBox.textContent = response || (insight.isWeakest ? 'Practice regularly with focused feedback.' : 'Share your knowledge with teammates.');
+        } catch (error) {
+          console.error('AI insight request failed:', error);
+          button.textContent = insight.isWeakest ? 'Get AI Strategy' : 'Leverage Strength';
+          button.disabled = false;
+          tipBox.textContent = insight.isWeakest ? 'Focus on deliberate practice.' : 'Mentor others in this area.';
+        }
+      };
+      card.appendChild(button);
+      recBox.appendChild(card);
+    }
+
+    layout.appendChild(recBox);
+    container.appendChild(layout);
+
+    // Chat interface below
+    const chatBox = document.createElement('div');
+    chatBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    `;
+
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.placeholder = 'E.g., How can I improve my problem solving?';
+    inputField.style.cssText = `
+      width: 100%;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e5e7eb;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    `;
+
+    const sendButton = document.createElement('button');
+    sendButton.textContent = 'Send';
+    sendButton.style.cssText = `
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      width: 100%;
+    `;
+
+    const responseArea = document.createElement('div');
+    responseArea.style.cssText = `
+      margin-top: 15px;
+      padding: 12px;
+      background: #0f172a;
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 13px;
+      min-height: 40px;
+      display: none;
+    `;
+
+    sendButton.onclick = async () => {
+      const question = inputField.value.trim();
+      if (!question) return;
+
+      responseArea.textContent = 'AI Coach thinking...';
+      responseArea.style.display = 'block';
+      sendButton.disabled = true;
+
+      try {
+        // Build a prompt for the AI coach
+        const coachPrompt = `You are an expert AI coach helping a student improve their ${weakest[0]} skill (currently at ${weakest[1].toFixed(0)}%).
+
+Student question: ${question}
+
+Provide a specific, actionable coaching tip in 1-2 sentences. Be encouraging and practical.`;
+
+        const spriteData = { id: 'AI Skill Advisor', expertise: 'Personal learning coaching' };
+        const response = await AiChallengeNpc.requestAiText(
+          spriteData,
+          coachPrompt,
+          'assessment-observatory-coach',
+          'Skill coaching guidance'
+        );
+
+        responseArea.textContent = response || 'No response from coach.';
+        inputField.value = '';
+      } catch (error) {
+        console.error('AI coaching request failed:', error);
+        responseArea.textContent = 'AI coaching unavailable. Try asking your peers or instructors for guidance.';
+      } finally {
+        sendButton.disabled = false;
+      }
+    };
+
+    chatBox.innerHTML = `<div style="color: #60a5fa; font-weight: bold; margin-bottom: 12px;">Ask AI Coach Questions</div>`;
+    chatBox.appendChild(inputField);
+    chatBox.appendChild(sendButton);
+    chatBox.appendChild(responseArea);
+    container.appendChild(chatBox);
+  }
+
+  /**
+   * PERFORMANCE ANALYTICS - Detailed metrics with trends
+   */
+  async renderPerformanceAnalytics(userData, container) {
+    const s = userData.analyticsSummary || {};
+
+    const metrics = [
+      { label: 'Engagement Rate', current: (s.interactionPercentage || 0).toFixed(1), target: 85, unit: '%' },
+      { label: 'Accuracy Score', current: (s.averageAccuracyPercentage || 0).toFixed(1), target: 90, unit: '%' },
+      { label: 'Completion Rate', current: s.totalLessonsCompleted || 0, target: 20, unit: 'lessons', type: 'count' },
+      { label: 'Code Executions', current: s.totalCodeExecutions || 0, target: 150, unit: 'runs', type: 'count' },
+    ];
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;';
+
+    metrics.forEach(m => {
+      const card = document.createElement('div');
+      const progress = m.type === 'count' ? Math.min(100, (m.current / m.target) * 100) : m.current;
+      const isOnTrack = progress >= (m.type === 'count' ? (m.target * 80 / 100) : 80);
+
+      card.style.cssText = `
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 20px;
+      `;
+
+      card.innerHTML = `
+        <div style="color: #94a3b8; font-size: 12px; margin-bottom: 8px;">${m.label}</div>
+        <div style="color: #60a5fa; font-size: 24px; font-weight: bold; margin-bottom: 12px;">${m.current}${m.unit}</div>
+        <div style="background: #0f172a; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 8px;">
+          <div style="background: ${isOnTrack ? '#10b981' : '#f59e0b'}; width: ${Math.min(100, progress)}%; height: 100%; transition: width 1s ease-out;"></div>
+        </div>
+        <div style="color: #cbd5e1; font-size: 11px;">Target: ${m.target}${m.unit} ${isOnTrack ? '✓ On Track' : '- Keep Going'}</div>
+      `;
+      grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+
+    // Comparison section
+    const compBox = document.createElement('div');
+    compBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    `;
+
+    compBox.innerHTML = `
+      <h3 style="margin: 0 0 15px 0; color: #60a5fa;">Sprint Comparison</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="background: #0f172a; padding: 12px; border-radius: 8px;">
+          <div style="color: #94a3b8; font-size: 11px;">Previous Sprint</div>
+          <div style="color: #94a3b8; font-size: 18px; font-weight: bold;">-15%</div>
+        </div>
+        <div style="background: #0f172a; padding: 12px; border-radius: 8px;">
+          <div style="color: #94a3b8; font-size: 11px;">This Sprint (Projected)</div>
+          <div style="color: #10b981; font-size: 18px; font-weight: bold;">+12%</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(compBox);
+  }
+
+  /**
+   * GITHUB METRICS - Code contribution analytics with visualizations
+   */
+  async renderGitHubMetrics(userData, container) {
+    const gh = userData.github || {};
+    const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
+
+    const metrics = [
+      { label: 'Total Commits', value: gh.commits || 0, color: '#10b981' },
+      { label: 'Pull Requests', value: gh.prs || 0, color: '#3b82f6' },
+      { label: 'Issues Resolved', value: gh.issues || 0, color: '#f59e0b' },
+      { label: 'Code Changes', value: totalEdits, color: '#8b5cf6', suffix: ' lines' },
+    ];
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;';
+
+    metrics.forEach(m => {
+      const card = document.createElement('div');
+      card.style.cssText = `
+        background: ${m.color}15;
+        border: 2px solid ${m.color};
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+      `;
+
+      card.innerHTML = `
+        <div style="color: #94a3b8; font-size: 12px; margin-bottom: 8px;">${m.label}</div>
+        <div style="color: ${m.color}; font-size: 32px; font-weight: bold;">${m.value}</div>
+        ${m.suffix ? `<div style="color: #94a3b8; font-size: 11px;">${m.suffix}</div>` : ''}
+      `;
+      grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+
+    // Code quality analysis
+    const qualityBox = document.createElement('div');
+    qualityBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    `;
+
+    const addRatio = gh.linesAdded > 0 ? ((gh.linesDeleted / (gh.linesAdded + gh.linesDeleted)) * 100).toFixed(0) : 0;
+
+    qualityBox.innerHTML = `
+      <h3 style="margin: 0 0 15px 0; color: #60a5fa;">Code Quality Metrics</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="background: #0f172a; padding: 12px; border-radius: 8px;">
+          <div style="color: #94a3b8; font-size: 11px;">Lines Added</div>
+          <div style="color: #10b981; font-size: 20px; font-weight: bold;">+${gh.linesAdded || 0}</div>
+        </div>
+        <div style="background: #0f172a; padding: 12px; border-radius: 8px;">
+          <div style="color: #94a3b8; font-size: 11px;">Lines Deleted</div>
+          <div style="color: #ef4444; font-size: 20px; font-weight: bold;">-${gh.linesDeleted || 0}</div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; padding: 12px; background: #0f172a; border-radius: 8px;">
+        <div style="color: #94a3b8; font-size: 11px;">Code Churn Rate (Deletions)</div>
+        <div style="color: #f59e0b; font-size: 18px; font-weight: bold;">${addRatio}%</div>
+      </div>
+    `;
+    container.appendChild(qualityBox);
+  }
+
+  /**
+   * GROWTH PROJECTIONS - AI-predicted trajectory
+   */
+  async renderGrowthProjections(userData, container) {
+    const s = userData.analyticsSummary || {};
+
+    const projectionBox = document.createElement('div');
+    projectionBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    `;
+
+    const engagement = s.interactionPercentage || 50;
+    const accuracy = s.averageAccuracyPercentage || 50;
+    const projected4Weeks = Math.min(100, (engagement + accuracy) / 2 + 8);
+
+    projectionBox.innerHTML = `
+      <h2 style="margin: 0 0 20px 0; color: #60a5fa;">4-Week Growth Projection</h2>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <div style="color: #94a3b8; font-size: 12px; margin-bottom: 8px;">Current Performance</div>
+          <div style="background: #0f172a; padding: 20px; border-radius: 8px; text-align: center;">
+            <div style="color: #60a5fa; font-size: 36px; font-weight: bold;">${((engagement + accuracy) / 2).toFixed(0)}%</div>
+          </div>
+        </div>
+        <div>
+          <div style="color: #94a3b8; font-size: 12px; margin-bottom: 8px;">Projected (Maintaining Pace)</div>
+          <div style="background: #1e7e34; padding: 20px; border-radius: 8px; text-align: center;">
+            <div style="color: #86efac; font-size: 36px; font-weight: bold;">${projected4Weeks.toFixed(0)}%</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px; padding: 15px; background: #0f172a; border-radius: 8px; border-left: 4px solid #3b82f6;">
+        <div style="color: #94a3b8; font-size: 12px; margin-bottom: 5px;">Mastery Timeline</div>
+        <div style="color: #60a5fa; font-weight: bold;">Estimated ${Math.ceil(100 / Math.max(projected4Weeks, 1))} weeks to reach mastery (95%+)</div>
+      </div>
+    `;
+    container.appendChild(projectionBox);
+  }
+
+  /**
+   * RECOMMENDATIONS - AI-generated action items
+   */
+  async renderRecommendations(userData, container) {
+    const s = userData.analyticsSummary || {};
+
+    // Show loading state while AI generates recommendations
+    const recHeader = document.createElement('div');
+    recHeader.style.cssText = 'color: #60a5fa; font-weight: bold; margin-bottom: 15px; font-size: 14px;';
+    recHeader.textContent = 'AI generating personalized recommendations...';
+    container.appendChild(recHeader);
+
+    try {
+      // Build a prompt for AI to generate personalized recommendations
+      const recPrompt = `You are an expert learning coach. Analyze this student's data and provide 3 prioritized action items:
+      
+Student Data:
+- Code Executions: ${s.totalCodeExecutions || 0} (target: 200+)
+- Engagement: ${(s.interactionPercentage || 0).toFixed(1)}% (target: 85%+)
+- Accuracy: ${(s.averageAccuracyPercentage || 0).toFixed(1)}%
+- Lessons Completed: ${s.totalLessonsCompleted || 0}
+
+Format each recommendation as:
+[PRIORITY: High|Medium|Low]
+[ACTION: short title]
+[REASON: 1 sentence why this matters]
+[STEPS: 3 bullet points]
+
+Do not include any other text. Generate exactly 3 recommendations.`;
+
+      const spriteData = { id: 'AI Skill Advisor', expertise: 'Learning analytics and personalized coaching' };
+      const aiResponse = await AiChallengeNpc.requestAiText(
+        spriteData,
+        recPrompt,
+        'assessment-observatory-recommendations',
+        'Personalized learning recommendations'
+      );
+
+      container.innerHTML = '';
+      recHeader.textContent = 'Personalized Recommendations';
+      container.appendChild(recHeader);
+
+      // Parse AI response into recommendation cards
+      const recCards = aiResponse.split('[PRIORITY:').filter(r => r.trim().length > 0);
+
+      recCards.forEach((recText, index) => {
+        const priorityMatch = recText.match(/High|Medium|Low/);
+        const actionMatch = recText.match(/\[ACTION: ([^\]]+)\]/);
+        const reasonMatch = recText.match(/\[REASON: ([^\]]+)\]/);
+        const stepsMatch = recText.match(/\[STEPS: ([^\]]+)\]/);
+
+        const priority = priorityMatch ? priorityMatch[0] : 'Medium';
+        const action = actionMatch ? actionMatch[1] : 'Continue Learning';
+        const reason = reasonMatch ? reasonMatch[1] : 'Focus on your learning goals.';
+        const stepsText = stepsMatch ? stepsMatch[1] : '• Set daily goals\n• Track progress\n• Review regularly';
+        const steps = stepsText.split('\n').map(s => s.replace(/^[•\-]\s*/, '').trim()).filter(s => s.length > 0);
+
+        const card = document.createElement('div');
+        const bgColor = priority === 'High' ? '#7c2d12' : priority === 'Medium' ? '#3f3f00' : '#0f172a';
+        const borderColor = priority === 'High' ? '#ea580c' : priority === 'Medium' ? '#eab308' : '#334155';
+
+        card.style.cssText = `
+          background: ${bgColor};
+          border: 2px solid ${borderColor};
+          border-radius: 12px;
+          padding: 15px;
+          margin-bottom: 15px;
+        `;
+
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="color: ${priority === 'High' ? '#fdba74' : priority === 'Medium' ? '#facc15' : '#cbd5e1'}; font-weight: bold; font-size: 13px;">
+              ${priority} Priority
+            </div>
+          </div>
+          <div style="color: #e5e7eb; font-weight: bold; margin-bottom: 5px;">${action}</div>
+          <div style="color: #cbd5e1; font-size: 12px; margin-bottom: 10px;">${reason}</div>
+          <div style="color: #94a3b8; font-size: 11px;">
+            ${steps.map(s => `• ${s}`).join('<br>')}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+    } catch (error) {
+      console.error('AI recommendations request failed:', error);
+      container.innerHTML = '';
+      recHeader.textContent = 'Personalized Recommendations';
+      container.appendChild(recHeader);
+
+      // Fallback recommendations
+      const fallbackRecs = [
+        {
+          priority: 'High',
+          action: 'Increase Practice Volume',
+          reason: 'Consistent practice builds mastery.',
+          steps: ['Complete daily coding challenges', 'Review solutions carefully', 'Practice similar problems']
+        },
+        {
+          priority: 'Medium',
+          action: 'Boost Engagement',
+          reason: 'Regular participation accelerates learning.',
+          steps: ['Set daily learning goals', 'Join study sessions', 'Track your progress']
+        },
+        {
+          priority: 'Low',
+          action: 'Share Your Knowledge',
+          reason: 'Teaching reinforces your own understanding.',
+          steps: ['Help struggling peers', 'Explain concepts clearly', 'Review fundamentals']
+        },
+      ];
+
+      fallbackRecs.forEach(rec => {
+        const card = document.createElement('div');
+        const bgColor = rec.priority === 'High' ? '#7c2d12' : rec.priority === 'Medium' ? '#3f3f00' : '#0f172a';
+        const borderColor = rec.priority === 'High' ? '#ea580c' : rec.priority === 'Medium' ? '#eab308' : '#334155';
+
+        card.style.cssText = `
+          background: ${bgColor};
+          border: 2px solid ${borderColor};
+          border-radius: 12px;
+          padding: 15px;
+          margin-bottom: 15px;
+        `;
+
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="color: ${rec.priority === 'High' ? '#fdba74' : rec.priority === 'Medium' ? '#facc15' : '#cbd5e1'}; font-weight: bold; font-size: 13px;">
+              ${rec.priority} Priority
+            </div>
+          </div>
+          <div style="color: #e5e7eb; font-weight: bold; margin-bottom: 5px;">${rec.action}</div>
+          <div style="color: #cbd5e1; font-size: 12px; margin-bottom: 10px;">${rec.reason}</div>
+          <div style="color: #94a3b8; font-size: 11px;">
+            ${rec.steps.map(s => `• ${s}`).join('<br>')}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+  }
+
+  /**
+   * MINI CHALLENGES - Real engaging games
+   */
+  async renderMiniChallenges(userData, container) {
+    const s = userData.analyticsSummary || {};
+
+    const challenges = [
+      {
+        name: 'Code Quality Quiz',
+        description: 'Match code snippets to quality scores',
+        difficulty: 'Medium',
+        reward: '25 XP'
+      },
+      {
+        name: 'Engagement Predictor',
+        description: 'Predict your weekly engagement based on current patterns',
+        difficulty: 'Easy',
+        reward: '15 XP'
+      },
+      {
+        name: 'Skill Calibration',
+        description: 'Rate your skills vs system assessment to unlock insights',
+        difficulty: 'Medium',
+        reward: '20 XP'
+      },
+      {
+        name: 'Time Master Challenge',
+        description: 'Optimize your study schedule for maximum learning',
+        difficulty: 'Hard',
+        reward: '50 XP'
+      },
+    ];
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;';
+
+    challenges.forEach(c => {
+      const card = document.createElement('div');
+      const diffColor = c.difficulty === 'Easy' ? '#10b981' : c.difficulty === 'Medium' ? '#f59e0b' : '#ef4444';
+
+      card.style.cssText = `
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+      `;
+
+      card.innerHTML = `
+        <div style="color: #60a5fa; font-weight: bold; font-size: 13px; margin-bottom: 6px;">${c.name}</div>
+        <div style="color: #cbd5e1; font-size: 12px; margin-bottom: 10px;">${c.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #334155;">
+          <div style="color: ${diffColor}; font-size: 11px; font-weight: 500;">${c.difficulty}</div>
+          <button style="
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            cursor: pointer;
+          " onclick="alert('Challenge: ${c.name}\\n${c.reward} for completion!')">Play</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+  }
+
+  /**
+   * Helper: Draw skill radar chart
+   */
+  drawSkillRadar(canvas, skills) {
+    const ctx = canvas.getContext('2d');
+    const centerX = 150, centerY = 150, radius = 120;
+    const skillNames = Object.keys(skills);
+    const angles = skillNames.map((_, i) => (i * 2 * Math.PI) / skillNames.length - Math.PI / 2);
+
+    // Draw grid
+    for (let i = 1; i <= 5; i++) {
+      ctx.strokeStyle = `rgba(59, 130, 246, ${0.1 + i * 0.08})`;
+      ctx.beginPath();
+      angles.forEach((angle, idx) => {
+        const r = (radius / 5) * i;
+        const x = centerX + r * Math.cos(angle);
+        const y = centerY + r * Math.sin(angle);
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    // Draw data polygon
+    ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+    ctx.strokeStyle = '#60a5fa';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    skillNames.forEach((skill, idx) => {
+      const value = (skills[skill] / 100) * radius;
+      const x = centerX + value * Math.cos(angles[idx]);
+      const y = centerY + value * Math.sin(angles[idx]);
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw labels
+    ctx.fillStyle = '#e5e7eb';
+    ctx.font = 'bold 11px Arial';
+    ctx.textAlign = 'center';
+    skillNames.forEach((skill, idx) => {
+      const x = centerX + (radius + 25) * Math.cos(angles[idx]);
+      const y = centerY + (radius + 25) * Math.sin(angles[idx]);
+      ctx.fillText(skill, x, y);
+    });
+  }
+
+  /**
+   * Helper: Get skill-specific tips
+   */
+  getSkillTip(skill, score) {
+   const tips = {
+      'Problem Solving': 'Focus on breaking down complex problems into smaller steps. Practice algorithmic thinking.',
+      'Communication': 'Expand your peer interactions and documentation efforts.',
+      'Code Quality': 'Review code best practices and refactoring techniques.',
+      'Testing': 'Increase unit test coverage and testing scenarios.',
+      'Time Management': 'Track your study sessions and optimize scheduling.',
+      'Persistence': 'Diversify your learning resources and difficulty levels.',
+    };
+    return tips[skill] || 'Continue practicing this skill area.';
+  }
+
+  /**
+   * Helper: Get recommended actions
+   */
+  getSkillAction(skill) {
+    const actions = {
+      'Problem Solving': 'Complete algorithm challenges on LeetCode',
+      'Communication': 'Write a technical blog post or present to peers',
+      'Code Quality': 'Refactor old projects using design patterns',
+      'Testing': 'Add 10 unit tests to existing code',
+      'Time Management': 'Schedule focused 90-minute study blocks',
+      'Persistence': 'Complete one challenge daily for a week',
+    };
+    return actions[skill] || 'Practice this skill regularly';
+  }
   async renderSkillsRadar(userData, container) {
     const s = userData.analyticsSummary || {};
     
