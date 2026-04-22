@@ -541,227 +541,188 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
    * SKILL ADVISOR - AI-Powered Skill Analysis with Chat
    */
   async renderSkillAdvisor(userData, container) {
-    const s = userData.analyticsSummary || {};
-    
-    // Calculate skill scores
-    const skills = {
-      'Problem Solving': Math.min(100, (s.averageAccuracyPercentage || 0) * 1.1),
-      'Communication': Math.min(100, (s.interactionPercentage || 0)),
-      'Code Quality': Math.min(100, ((s.totalCodeExecutions || 0) / 100) * 10),
-      'Testing': Math.min(100, ((s.totalLessonsCompleted || 0) /10) * 10),
-      'Time Management': Math.min(100, (s.averageScrollDepth || 0)),
-      'Persistence': Math.min(100, ((s.totalLessonsViewed || 0) / (s.totalLessonsCompleted || 1)) * 50),
-    };
-
-    // Find weakest and strongest skills
-    const sorted = Object.entries(skills).sort((a, b) => b[1] - a[1]);
-    const weakest = sorted[sorted.length - 1];
-    const strongest = sorted[0];
+    const skillFields = [
+      { name: 'attendance', label: 'Attendance' },
+      { name: 'work_habits', label: 'Work Habits' },
+      { name: 'behavior', label: 'Behavior' },
+      { name: 'timeliness', label: 'Timeliness' },
+      { name: 'tech_sense', label: 'Tech Sense' },
+      { name: 'tech_talk', label: 'Tech Talk' },
+      { name: 'tech_growth', label: 'Tech Growth' },
+      { name: 'advocacy', label: 'Advocacy' },
+      { name: 'communication', label: 'Communication' },
+      { name: 'integrity', label: 'Integrity' },
+      { name: 'organization', label: 'Organization' }
+    ];
 
     // Create layout
     const layout = document.createElement('div');
-    layout.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 20px;';
+    layout.style.cssText = 'display: grid; grid-template-columns: 1fr; gap: 20px;';
 
-    // Left: Skill Radar Chart
+    // Section 1: Evaluation Form
+    const evalBox = document.createElement('div');
+    evalBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    `;
+
+    const evalTitle = document.createElement('h3');
+    evalTitle.textContent = 'Self-Evaluation of Skills (1=Lowest, 5=Highest)';
+    evalTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa;';
+    evalBox.appendChild(evalTitle);
+
+    // Create slider inputs for skill evaluation
+    const sliders = {};
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;';
+
+    skillFields.forEach(field => {
+      const sliderBox = document.createElement('div');
+      sliderBox.style.cssText = `
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 12px;
+      `;
+
+      const label = document.createElement('label');
+      label.textContent = field.label;
+      label.style.cssText = 'display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 8px;';
+
+      const slider = document.createElement('input');
+      slider.type = 'range';
+      slider.min = '1';
+      slider.max = '5';
+      slider.value = '3';
+      slider.style.cssText = 'width: 100%; cursor: pointer;';
+
+      const value = document.createElement('div');
+      value.textContent = '3/5';
+      value.style.cssText = 'font-size: 12px; color: #60a5fa; text-align: center; margin-top: 6px;';
+
+      slider.oninput = () => {
+        value.textContent = slider.value + '/5';
+      };
+
+      sliders[field.name] = slider;
+      sliderBox.appendChild(label);
+      sliderBox.appendChild(slider);
+      sliderBox.appendChild(value);
+      grid.appendChild(sliderBox);
+    });
+
+    evalBox.appendChild(grid);
+    layout.appendChild(evalBox);
+
+    // Section 2: Skill Radar Display
     const radarBox = document.createElement('div');
     radarBox.style.cssText = `
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 12px;
       padding: 20px;
+      display: none;
     `;
+
+    const radarTitle = document.createElement('h3');
+    radarTitle.textContent = 'Your Skill Radar';
+    radarTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa;';
+    radarBox.appendChild(radarTitle);
 
     const radarCanvas = document.createElement('canvas');
-    radarCanvas.width = 300;
-    radarCanvas.height = 300;
+    radarCanvas.width = 400;
+    radarCanvas.height = 400;
+    radarCanvas.style.cssText = 'display: block; margin: 0 auto;';
     radarBox.appendChild(radarCanvas);
 
-    this.drawSkillRadar(radarCanvas, skills);
     layout.appendChild(radarBox);
 
-    // Right: AI Recommendations
-    const recBox = document.createElement('div');
-    recBox.style.cssText = `
+    // Section 3: Strength & Growth Areas
+    const analysisBox = document.createElement('div');
+    analysisBox.style.cssText = `
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 12px;
       padding: 20px;
-      overflow-y: auto;
-      max-height: 400px;
+      display: none;
     `;
 
-    const recTitle = document.createElement('h3');
-    recTitle.textContent = 'AI Coaching Insights';
-    recTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa; font-size: 16px;';
-    recBox.appendChild(recTitle);
+    const analysisTitle = document.createElement('h3');
+    analysisTitle.textContent = 'Strength & Growth Areas';
+    analysisTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa;';
+    analysisBox.appendChild(analysisTitle);
 
-    // AI insights based on skills
-    const insights = [
-      {
-        skill: weakest[0],
-        score: weakest[1].toFixed(0),
-        isWeakest: true,
-      },
-      {
-        skill: strongest[0],
-        score: strongest[1].toFixed(0),
-        isWeakest: false,
-      }
-    ];
+    const analysisList = document.createElement('div');
+    analysisList.style.cssText = '';
+    analysisBox.appendChild(analysisList);
 
-    for (const insight of insights) {
-      const card = document.createElement('div');
-      card.style.cssText = `
-        background: #0f172a;
-        border-left: 4px solid ${insight.isWeakest ? '#f59e0b' : '#10b981'};
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-      `;
+    layout.appendChild(analysisBox);
 
-      const title = document.createElement('div');
-      title.style.cssText = `color: ${insight.isWeakest ? '#f59e0b' : '#10b981'}; font-weight: bold; margin-bottom: 8px;`;
-      title.textContent = `${insight.skill} (${insight.score}%)`;
-      card.appendChild(title);
-
-      const tipBox = document.createElement('div');
-      tipBox.style.cssText = 'color: #cbd5e1; font-size: 12px; margin-bottom: 8px;';
-      tipBox.textContent = insight.isWeakest ? 'Loading AI coaching...' : 'Loading AI insights...';
-      card.appendChild(tipBox);
-
-      const button = document.createElement('button');
-      button.textContent = insight.isWeakest ? 'Get AI Strategy' : 'Leverage Strength';
-      button.style.cssText = `
-        background: #3b82f6;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 6px 12px;
-        font-size: 11px;
-        cursor: pointer;
-        width: 100%;
-      `;
-
-      button.onclick = async () => {
-        button.disabled = true;
-        button.textContent = insight.isWeakest ? 'AI Thinking...' : 'AI Thinking...';
-        try {
-          const coachPrompt = insight.isWeakest
-            ? `The student has a ${insight.skill} score of ${insight.score}%. They need specific, actionable improvement steps. Provide ONE focused strategy in 1-2 sentences.`
-            : `The student excels at ${insight.skill} (${insight.score}%). How can they leverage this strength further? Provide ONE suggestion in 1-2 sentences.`;
-
-          const spriteData = { id: 'AI Skill Advisor', expertise: 'Personal learning coaching' };
-          const response = await AiChallengeNpc.requestAiText(
-            spriteData,
-            coachPrompt,
-            'assessment-observatory-insight',
-            'Skill improvement coaching'
-          );
-
-          button.textContent = insight.isWeakest ? 'Get AI Strategy' : 'Leverage Strength';
-          button.disabled = false;
-          tipBox.textContent = response || (insight.isWeakest ? 'Practice regularly with focused feedback.' : 'Share your knowledge with teammates.');
-        } catch (error) {
-          console.error('AI insight request failed:', error);
-          button.textContent = insight.isWeakest ? 'Get AI Strategy' : 'Leverage Strength';
-          button.disabled = false;
-          tipBox.textContent = insight.isWeakest ? 'Focus on deliberate practice.' : 'Mentor others in this area.';
-        }
-      };
-      card.appendChild(button);
-      recBox.appendChild(card);
-    }
-
-    layout.appendChild(recBox);
-    container.appendChild(layout);
-
-    // Chat interface below
-    const chatBox = document.createElement('div');
-    chatBox.style.cssText = `
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-    `;
-
-    const inputField = document.createElement('input');
-    inputField.type = 'text';
-    inputField.placeholder = 'E.g., How can I improve my problem solving?';
-    inputField.style.cssText = `
-      width: 100%;
-      padding: 10px;
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      color: #e5e7eb;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    `;
-
-    const sendButton = document.createElement('button');
-    sendButton.textContent = 'Send';
-    sendButton.style.cssText = `
+    // Generate Radar Button
+    const genBtn = document.createElement('button');
+    genBtn.textContent = 'Generate My Skill Radar';
+    genBtn.style.cssText = `
       background: #3b82f6;
       color: white;
       border: none;
       border-radius: 6px;
-      padding: 10px 20px;
+      padding: 12px 24px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
       width: 100%;
     `;
 
-    const responseArea = document.createElement('div');
-    responseArea.style.cssText = `
-      margin-top: 15px;
-      padding: 12px;
-      background: #0f172a;
-      border-radius: 6px;
-      color: #94a3b8;
-      font-size: 13px;
-      min-height: 40px;
-      display: none;
-    `;
+    genBtn.onclick = () => {
+      // Collect skill values
+      const skills = {};
+      let lowestSkill = null;
+      let lowestValue = 6;
+      let highestSkill = null;
+      let highestValue = 0;
 
-    sendButton.onclick = async () => {
-      const question = inputField.value.trim();
-      if (!question) return;
+      skillFields.forEach(field => {
+        const value = parseInt(sliders[field.name].value);
+        skills[field.label] = value;
 
-      responseArea.textContent = 'AI Coach thinking...';
-      responseArea.style.display = 'block';
-      sendButton.disabled = true;
+        if (value < lowestValue) {
+          lowestValue = value;
+          lowestSkill = field.label;
+        }
+        if (value > highestValue) {
+          highestValue = value;
+          highestSkill = field.label;
+        }
+      });
 
-      try {
-        // Build a prompt for the AI coach
-        const coachPrompt = `You are an expert AI coach helping a student improve their ${weakest[0]} skill (currently at ${weakest[1].toFixed(0)}%).
+      // Draw radar
+      this.drawSkillRadar(radarCanvas, skills);
+      radarBox.style.display = 'block';
 
-Student question: ${question}
+      // Show analysis
+      analysisList.innerHTML = `
+        <div style="margin-bottom: 15px;">
+          <div style="color: #10b981; font-weight: bold; margin-bottom: 8px;">Strongest Area: ${highestSkill} (${highestValue}/5)</div>
+          <div style="color: #cbd5e1; font-size: 13px;">You excel in this area. Consider leveraging this strength to help teammates or take on advanced challenges.</div>
+        </div>
+        <div>
+          <div style="color: #f59e0b; font-weight: bold; margin-bottom: 8px;">Growth Area: ${lowestSkill} (${lowestValue}/5)</div>
+          <div style="color: #cbd5e1; font-size: 13px;">This is an opportunity for growth. Focus on deliberate practice and seek feedback in this area.</div>
+        </div>
+      `;
+      analysisBox.style.display = 'block';
 
-Provide a specific, actionable coaching tip in 1-2 sentences. Be encouraging and practical.`;
-
-        const spriteData = { id: 'AI Skill Advisor', expertise: 'Personal learning coaching' };
-        const response = await AiChallengeNpc.requestAiText(
-          spriteData,
-          coachPrompt,
-          'assessment-observatory-coach',
-          'Skill coaching guidance'
-        );
-
-        responseArea.textContent = response || 'No response from coach.';
-        inputField.value = '';
-      } catch (error) {
-        console.error('AI coaching request failed:', error);
-        responseArea.textContent = 'AI coaching unavailable. Try asking your peers or instructors for guidance.';
-      } finally {
-        sendButton.disabled = false;
-      }
+      genBtn.textContent = 'Radar Generated';
+      genBtn.disabled = true;
     };
 
-    chatBox.innerHTML = `<div style="color: #60a5fa; font-weight: bold; margin-bottom: 12px;">Ask AI Coach Questions</div>`;
-    chatBox.appendChild(inputField);
-    chatBox.appendChild(sendButton);
-    chatBox.appendChild(responseArea);
-    container.appendChild(chatBox);
+    evalBox.appendChild(document.createElement('br'));
+    evalBox.appendChild(genBtn);
+
+    layout.appendChild(evalBox);
+    container.appendChild(layout);
   }
 
   /**
@@ -773,8 +734,7 @@ Provide a specific, actionable coaching tip in 1-2 sentences. Be encouraging and
     const metrics = [
       { label: 'Engagement Rate', current: (s.interactionPercentage || 0).toFixed(1), target: 85, unit: '%' },
       { label: 'Accuracy Score', current: (s.averageAccuracyPercentage || 0).toFixed(1), target: 90, unit: '%' },
-      { label: 'Completion Rate', current: s.totalLessonsCompleted || 0, target: 20, unit: 'lessons', type: 'count' },
-      { label: 'Code Executions', current: s.totalCodeExecutions || 0, target: 150, unit: 'runs', type: 'count' },
+      { label: 'Time Spent', current: (s.totalTimeSpentMinutes || 0), target: 300, unit: ' min', type: 'count' },
     ];
 
     const grid = document.createElement('div');
@@ -960,10 +920,9 @@ Provide a specific, actionable coaching tip in 1-2 sentences. Be encouraging and
       const recPrompt = `You are an expert learning coach. Analyze this student's data and provide 3 prioritized action items:
       
 Student Data:
-- Code Executions: ${s.totalCodeExecutions || 0} (target: 200+)
 - Engagement: ${(s.interactionPercentage || 0).toFixed(1)}% (target: 85%+)
 - Accuracy: ${(s.averageAccuracyPercentage || 0).toFixed(1)}%
-- Lessons Completed: ${s.totalLessonsCompleted || 0}
+- Time Invested: ${(s.totalTimeSpentMinutes || 0)} minutes (building consistent habits)
 
 Format each recommendation as:
 [PRIORITY: High|Medium|Low]
@@ -1090,70 +1049,294 @@ Do not include any other text. Generate exactly 3 recommendations.`;
    */
   async renderMiniChallenges(userData, container) {
     const s = userData.analyticsSummary || {};
+    const gh = userData.github || {};
 
-    const challenges = [
-      {
-        name: 'Code Quality Quiz',
-        description: 'Match code snippets to quality scores',
-        difficulty: 'Medium',
-        reward: '25 XP'
-      },
-      {
-        name: 'Engagement Predictor',
-        description: 'Predict your weekly engagement based on current patterns',
-        difficulty: 'Easy',
-        reward: '15 XP'
-      },
-      {
-        name: 'Skill Calibration',
-        description: 'Rate your skills vs system assessment to unlock insights',
-        difficulty: 'Medium',
-        reward: '20 XP'
-      },
-      {
-        name: 'Time Master Challenge',
-        description: 'Optimize your study schedule for maximum learning',
-        difficulty: 'Hard',
-        reward: '50 XP'
-      },
+    const layout = document.createElement('div');
+    layout.style.cssText = 'display: grid; grid-template-columns: 1fr; gap: 20px;';
+
+    // GAME 1: Analytics Wordle
+    const wordleBox = document.createElement('div');
+    wordleBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    `;
+
+    const wordleTitle = document.createElement('h3');
+    wordleTitle.textContent = 'Game 1: Learning Wordle';
+    wordleTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa;';
+    wordleBox.appendChild(wordleTitle);
+
+    const wordleWords = ['COMMIT', 'ITERATE', 'REFACTOR', 'COMPILE', 'SYNTAX', 'EXECUTE'];
+    let wordleWord = wordleWords[Math.floor(Math.random() * wordleWords.length)].toUpperCase();
+    let wordleGuesses = 0;
+    const wordleMaxGuesses = 6;
+
+    const wordleInput = document.createElement('input');
+    wordleInput.type = 'text';
+    wordleInput.placeholder = 'Guess an analytics/coding word (6 letters)...';
+    wordleInput.style.cssText = `
+      width: 100%;
+      padding: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e5e7eb;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    `;
+
+    const wordleResult = document.createElement('div');
+    wordleResult.style.cssText = 'color: #cbd5e1; font-size: 14px; margin-bottom: 10px; min-height: 20px;';
+    wordleResult.textContent = `Guesses remaining: ${wordleMaxGuesses}`;
+
+    const wordleGuessBtn = document.createElement('button');
+    wordleGuessBtn.textContent = 'Guess';
+    wordleGuessBtn.style.cssText = `
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      width: 100%;
+    `;
+
+    wordleGuessBtn.onclick = () => {
+      const guess = wordleInput.value.toUpperCase().trim();
+      wordleInput.value = '';
+
+      if (guess.length !== 6) {
+        wordleResult.textContent = 'Please enter a 6-letter word';
+        wordleResult.style.color = '#f59e0b';
+        return;
+      }
+
+      wordleGuesses++;
+
+      if (guess === wordleWord) {
+        wordleResult.textContent = `Correct! The word is ${wordleWord}. You used ${wordleGuesses}/${wordleMaxGuesses} guesses.`;
+        wordleResult.style.color = '#10b981';
+        wordleInput.disabled = true;
+        wordleGuessBtn.disabled = true;
+      } else if (wordleGuesses >= wordleMaxGuesses) {
+        wordleResult.textContent = `Game Over! The word was ${wordleWord}.`;
+        wordleResult.style.color = '#ef4444';
+        wordleInput.disabled = true;
+        wordleGuessBtn.disabled = true;
+      } else {
+        const correct = guess.split('').filter((c, i) => c === wordleWord[i]).length;
+        wordleResult.textContent = `Incorrect. ${correct} letter(s) in correct position. Guesses remaining: ${wordleMaxGuesses - wordleGuesses}`;
+        wordleResult.style.color = '#f59e0b';
+      }
+    };
+
+    wordleBox.appendChild(wordleInput);
+    wordleBox.appendChild(wordleResult);
+    wordleBox.appendChild(wordleGuessBtn);
+    layout.appendChild(wordleBox);
+
+    // GAME 2: Schedule Optimizer
+    const scheduleBox = document.createElement('div');
+    scheduleBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    `;
+
+    const scheduleTitle = document.createElement('h3');
+    scheduleTitle.textContent = 'Game 2: Weekly Schedule Builder';
+    scheduleTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa;';
+    scheduleBox.appendChild(scheduleTitle);
+
+    const scheduleDesc = document.createElement('p');
+    scheduleDesc.textContent = 'Plan your week: allocate your engagement across 4 days. Your actual engagement is ' + (s.interactionPercentage || 0).toFixed(1) + '%. Can you match it?';
+    scheduleDesc.style.cssText = 'color: #cbd5e1; font-size: 13px; margin-bottom: 15px;';
+    scheduleBox.appendChild(scheduleDesc);
+
+    const schedule = { Mon: 0, Tue: 0, Wed: 0, Thu: 0 };
+    const scheduleInputs = {};
+    const scheduleGrid = document.createElement('div');
+    scheduleGrid.style.cssText = 'display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;';
+
+    Object.keys(schedule).forEach(day => {
+      const dayBox = document.createElement('div');
+      const dayInput = document.createElement('input');
+      dayInput.type = 'range';
+      dayInput.min = '0';
+      dayInput.max = '100';
+      dayInput.value = '25';
+      dayInput.style.cssText = 'width: 100%;';
+
+      const dayLabel = document.createElement('div');
+      dayLabel.style.cssText = 'font-size: 12px; color: #9ca3af; text-align: center; margin-bottom: 5px;';
+      dayLabel.textContent = day;
+
+      const dayValue = document.createElement('div');
+      dayValue.style.cssText = 'font-size: 14px; font-weight: bold; color: #60a5fa; text-align: center;';
+      dayValue.textContent = '25%';
+
+      dayInput.oninput = () => {
+        dayValue.textContent = dayInput.value + '%';
+        scheduleInputs[day] = parseInt(dayInput.value);
+      };
+
+      scheduleInputs[day] = 25;
+      dayBox.appendChild(dayLabel);
+      dayBox.appendChild(dayInput);
+      dayBox.appendChild(dayValue);
+      scheduleGrid.appendChild(dayBox);
+    });
+
+    scheduleBox.appendChild(scheduleGrid);
+
+    const scheduleCheckBtn = document.createElement('button');
+    scheduleCheckBtn.textContent = 'Check My Schedule';
+    scheduleCheckBtn.style.cssText = `
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      width: 100%;
+    `;
+
+    const scheduleResult = document.createElement('div');
+    scheduleResult.style.cssText = 'color: #cbd5e1; font-size: 13px; margin-top: 10px; min-height: 20px;';
+
+    scheduleCheckBtn.onclick = () => {
+      const total = Object.values(scheduleInputs).reduce((a, b) => a + b, 0);
+      const target = s.interactionPercentage || 50;
+      const diff = Math.abs(total - target);
+
+      if (diff < 5) {
+        scheduleResult.textContent = `Excellent scheduling! You matched your engagement pattern perfectly.`;
+        scheduleResult.style.color = '#10b981';
+      } else if (diff < 15) {
+        scheduleResult.textContent = `Good plan! You're close to your engagement target (off by ${diff.toFixed(1)}%).`;
+        scheduleResult.style.color = '#f59e0b';
+      } else {
+        scheduleResult.textContent = `Your plan differs from your pattern by ${diff.toFixed(1)}%. Consider if this is more balanced or realistic.`;
+        scheduleResult.style.color = '#cbd5e1';
+      }
+    };
+
+    scheduleBox.appendChild(scheduleCheckBtn);
+    scheduleBox.appendChild(scheduleResult);
+    layout.appendChild(scheduleBox);
+
+    // GAME 3: Engagement Predictor
+    const predictorBox = document.createElement('div');
+    predictorBox.style.cssText = `
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+    `;
+
+    const predictorTitle = document.createElement('h3');
+    predictorTitle.textContent = 'Game 3: Next Week Engagement Predictor';
+    predictorTitle.style.cssText = 'margin: 0 0 15px 0; color: #60a5fa;';
+    predictorBox.appendChild(predictorTitle);
+
+    const predictorDesc = document.createElement('p');
+    predictorDesc.textContent = 'Based on your current engagement (' + (s.interactionPercentage || 0).toFixed(1) + '%) and accuracy (' + (s.averageAccuracyPercentage || 0).toFixed(1) + '%), predict your engagement next week:';
+    predictorDesc.style.cssText = 'color: #cbd5e1; font-size: 13px; margin-bottom: 15px;';
+    predictorBox.appendChild(predictorDesc);
+
+    const predictionOptions = document.createElement('div');
+    predictionOptions.style.cssText = 'display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;';
+
+    const predictions = [
+      { label: 'Higher (+10%)', value: 'higher' },
+      { label: 'Lower (-10%)', value: 'lower' },
+      { label: 'Same', value: 'same' },
+      { label: 'Much Higher (+20%)', value: 'much_higher' }
     ];
 
-    const grid = document.createElement('div');
-    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;';
-
-    challenges.forEach(c => {
-      const card = document.createElement('div');
-      const diffColor = c.difficulty === 'Easy' ? '#10b981' : c.difficulty === 'Medium' ? '#f59e0b' : '#ef4444';
-
-      card.style.cssText = `
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 16px;
+    let selectedPrediction = null;
+    predictions.forEach(pred => {
+      const btn = document.createElement('button');
+      btn.textContent = pred.label;
+      btn.style.cssText = `
+        padding: 12px;
+        background: #334155;
+        color: #cbd5e1;
+        border: 1px solid #475569;
+        border-radius: 6px;
         cursor: pointer;
         transition: all 0.2s;
       `;
 
-      card.innerHTML = `
-        <div style="color: #60a5fa; font-weight: bold; font-size: 13px; margin-bottom: 6px;">${c.name}</div>
-        <div style="color: #cbd5e1; font-size: 12px; margin-bottom: 10px;">${c.description}</div>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #334155;">
-          <div style="color: ${diffColor}; font-size: 11px; font-weight: 500;">${c.difficulty}</div>
-          <button style="
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 11px;
-            cursor: pointer;
-          " onclick="alert('Challenge: ${c.name}\\n${c.reward} for completion!')">Play</button>
-        </div>
-      `;
-      grid.appendChild(card);
+      btn.onmouseover = () => btn.style.background = '#475569';
+      btn.onmouseout = () => btn.style.background = selectedPrediction === pred.value ? '#3b82f6' : '#334155';
+
+      btn.onclick = () => {
+        predictions.forEach(p => {
+          const allBtns = predictionOptions.querySelectorAll('button');
+          allBtns.forEach(b => b.style.background = '#334155');
+        });
+        btn.style.background = '#3b82f6';
+        selectedPrediction = pred.value;
+        predictorResult.textContent = '';
+      };
+
+      predictionOptions.appendChild(btn);
     });
 
-    container.appendChild(grid);
+    predictorBox.appendChild(predictionOptions);
+
+    const predictorCheckBtn = document.createElement('button');
+    predictorCheckBtn.textContent = 'Submit Prediction';
+    predictorCheckBtn.style.cssText = `
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      cursor: pointer;
+      width: 100%;
+      marginBottom: '10px';
+    `;
+
+    const predictorResult = document.createElement('div');
+    predictorResult.style.cssText = 'color: #cbd5e1; font-size: 13px; margin-top: 10px; min-height: 20px;';
+
+    predictorCheckBtn.onclick = () => {
+      if (!selectedPrediction) {
+        predictorResult.textContent = 'Please select a prediction';
+        predictorResult.style.color = '#f59e0b';
+        return;
+      }
+
+      const currentEngagement = s.interactionPercentage || 50;
+      const currentAccuracy = s.averageAccuracyPercentage || 70;
+      const accuracyTrend = currentAccuracy > 80 ? 'strong' : 'moderate';
+
+      let prediction = '';
+      if (accuracyTrend === 'strong') {
+        prediction = (selectedPrediction === 'higher' || selectedPrediction === 'much_higher') ? 'Correct' : 'Incorrect';
+      } else {
+        prediction = (selectedPrediction === 'same' || selectedPrediction === 'lower') ? 'Correct' : 'Incorrect';
+      }
+
+      if (prediction === 'Correct') {
+        predictorResult.textContent = 'Your prediction aligns with the trend! Based on your accuracy, you understand your learning patterns well.';
+        predictorResult.style.color = '#10b981';
+      } else {
+        predictorResult.textContent = 'Your prediction differs from the trend. Review your patterns to improve predictions next time.';
+        predictorResult.style.color = '#f59e0b';
+      }
+    };
+
+    predictorBox.appendChild(predictorCheckBtn);
+    predictorBox.appendChild(predictorResult);
+    layout.appendChild(predictorBox);
+
+    container.appendChild(layout);
   }
 
   /**
@@ -1236,33 +1419,13 @@ Do not include any other text. Generate exactly 3 recommendations.`;
     };
     return actions[skill] || 'Practice this skill regularly';
   }
+  // renderSkillsRadar removed - use renderSkillAdvisor for self-evaluated skills instead
   async renderSkillsRadar(userData, container) {
-    const s = userData.analyticsSummary || {};
-    
-    // Calculate skill scores (0-100)
-    const skills = {
-      'Problem Solving': Math.min(100, (s.averageAccuracyPercentage || 0) * 1.1),
-      'Communication': Math.min(100, (s.interactionPercentage || 0)),
-      'Code Quality': Math.min(100, ((s.totalCodeExecutions || 0) / 100) * 10),
-      'Testing': Math.min(100, ((s.totalLessonsCompleted || 0) / 10) * 10),
-      'Time Mgmt': Math.min(100, (s.averageScrollDepth || 0)),
-      'Learning': Math.min(100, ((s.totalLessonsViewed || 0) / (s.totalLessonsCompleted || 1)) * 50),
-    };
-
-    // Create SVG canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = 500;
-    canvas.height = 500;
-    canvas.style.cssText = `
-      display: block;
-      margin: 20px auto;
-      filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.4));
-    `;
-    container.appendChild(canvas);
-
-    const ctx = canvas.getContext('2d');
-    const centerX = 250, centerY = 250, radius = 150;
-    const skillNames = Object.keys(skills);
+    container.innerHTML = '';
+    const msg = document.createElement('div');
+    msg.textContent = 'Skills are now tracked through self-evaluation in the Skill Advisor section.';
+    msg.style.cssText = 'color: #94a3b8; padding: 20px; text-align: center;';
+    container.appendChild(msg);
     const angles = skillNames.map((_, i) => (i * 2 * Math.PI) / skillNames.length - Math.PI / 2);
 
     // Animate radar fill
@@ -1360,7 +1523,7 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       border-left: 4px solid #60a5fa;
     `;
     statsDiv.innerHTML = `
-      <p style="margin: 0;"><strong>💡 Skill Insights:</strong></p>
+      <p style="margin: 0;"><strong>Skill Insights:</strong></p>
       <p style="margin: 8px 0 0 0; font-size: 13px; color: #d1d5db;">
         Your radar shows a balanced skill profile. Focus on areas with lower scores through targeted practice and exercises.
       </p>
@@ -1369,103 +1532,25 @@ Do not include any other text. Generate exactly 3 recommendations.`;
   }
 
   /**
-   * Render Holographic Stats Display - Animated stat cards
+   * Profile Information Display
    */
-  async renderHolographicStats(userData, container) {
-    const s = userData.analyticsSummary || {};
-    const gh = userData.github || {};
-
-    const stats = [
-      { label: '⏱️ Total Time Spent', value: s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h', color: '#10b981' },
-      { label: '📊 Engagement', value: `${(s.interactionPercentage || 0).toFixed(1)}%`, color: '#f59e0b' },
-      { label: '🎯 Accuracy', value: `${(s.averageAccuracyPercentage || 0).toFixed(1)}%`, color: '#3b82f6' },
-      { label: '📚 Lessons Completed', value: s.totalLessonsCompleted || 0, color: '#8b5cf6' },
-      { label: '💻 Code Executions', value: s.totalCodeExecutions || 0, color: '#ec4899' },
-      { label: '🔗 GitHub Commits', value: gh.commits || 0, color: '#06b6d4' },
-    ];
-
-    const grid = document.createElement('div');
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin: 20px 0;
-    `;
-
-    stats.forEach((stat, idx) => {
-      const card = document.createElement('div');
-      card.style.cssText = `
-        background: linear-gradient(135deg, ${stat.color}22 0%, ${stat.color}11 100%);
-        border: 2px solid ${stat.color};
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-        animation: holographicPulse 2s ease-in-out ${idx * 0.1}s infinite;
-      `;
-
-      const label = document.createElement('div');
-      label.textContent = stat.label;
-      label.style.cssText = `
-        font-size: 12px;
-        color: #9ca3af;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
-      `;
-
-      const valueDisplay = document.createElement('div');
-      valueDisplay.textContent = stat.value;
-      valueDisplay.style.cssText = `
-        font-size: 32px;
-        font-weight: bold;
-        color: ${stat.color};
-        text-shadow: 0 0 10px ${stat.color}60;
-      `;
-
-      card.appendChild(label);
-      card.appendChild(valueDisplay);
-
-      card.style.setProperty('--stat-color', stat.color);
-      card.onmouseover = () => {
-        card.style.transform = 'scale(1.05) translateY(-5px)';
-        card.style.boxShadow = `0 10px 30px ${stat.color}40`;
-      };
-      card.onmouseout = () => {
-        card.style.transform = 'scale(1)';
-        card.style.boxShadow = 'none';
-      };
-
-      grid.appendChild(card);
-    });
-
-    container.appendChild(grid);
-
-    // Add CSS animation if not exists
-    if (!document.querySelector('style#holographic-animations')) {
-      const style = document.createElement('style');
-      style.id = 'holographic-animations';
-      style.textContent = `
-        @keyframes holographicPulse {
-          0%, 100% { transform: translateZ(0); box-shadow: 0 0 5px ${stats[0].color}40; }
-          50% { transform: translateZ(5px); box-shadow: 0 0 20px ${stats[0].color}60; }
-        }
-        @keyframes slideInRight {
-          from { opacity: 0; transform: translateX(20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-      `;
-      document.head.appendChild(style);
-    }
+  async renderProfileDisplay(userData, container) {
+    // Reserved for future profile visualizations
+    container.innerHTML = '';
+    const msg = document.createElement('div');
+    msg.textContent = 'Profile information displayed in the Profile Info section.';
+    msg.style.cssText = 'color: #94a3b8; padding: 20px; text-align: center;';
+    container.appendChild(msg);
   }
 
   /**
-   * Render Mini-Games - Interactive stat discovery
+   * Show Performance Info - DEPRECATED: Use renderPerformanceAnalytics and renderGitHubMetrics
    */
-  async renderMiniGames(userData, container) {
+  async showPerformanceInfo() {
+    // This function is no longer needed - performance info is shown in the dashboard tabs
+    console.log('showPerformanceInfo() is deprecated. Use renderPerformanceAnalytics instead.');
+    return;
+    
     const s = userData.analyticsSummary || {};
     const gh = userData.github || {};
 
@@ -1485,7 +1570,7 @@ Do not include any other text. Generate exactly 3 recommendations.`;
     `;
 
     game1.innerHTML = `
-      <h3 style="color: #60a5fa; margin: 0 0 15px 0;">🎮 Game 1: Guess Your Engagement</h3>
+      <h3 style="color: #60a5fa; margin: 0 0 15px 0;">Game 1: Guess Your Engagement</h3>
       <p style="margin: 0 0 15px 0; color: #d1d5db;">How much do you think your engagement score is? (0-100%)</p>
     `;
 
@@ -1524,9 +1609,9 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       const diff = Math.abs(guess - actualScore);
       
       let resultMsg = '';
-      if (diff < 5) resultMsg = '🎯 Perfect! You know yourself well!';
-      else if (diff < 15) resultMsg = '😄 Close! Great self-awareness!';
-      else resultMsg = `📊 Actual: ${actualScore}% - ${guess > actualScore ? 'You were too optimistic!' : 'You undersold yourself!'}`;
+      if (diff < 5) resultMsg = 'Perfect! You know yourself well!';
+      else if (diff < 15) resultMsg = 'Close! Great self-awareness!';
+      else resultMsg = `Actual: ${actualScore}% - ${guess > actualScore ? 'You were too optimistic!' : 'You undersold yourself!'}`;
 
       guessBtn.textContent = resultMsg;
       guessBtn.style.background = '#10b981';
@@ -1549,7 +1634,7 @@ Do not include any other text. Generate exactly 3 recommendations.`;
     `;
 
     game2.innerHTML = `
-      <h3 style="color: #d8b4fe; margin: 0 0 15px 0;">🎯 Game 2: Skill Calibration</h3>
+      <h3 style="color: #d8b4fe; margin: 0 0 15px 0;">Game 2: Skill Calibration</h3>
       <p style="margin: 0 0 15px 0; color: #d1d5db;">Rate your Problem-Solving skill (1-5)</p>
     `;
 
@@ -1603,7 +1688,7 @@ Do not include any other text. Generate exactly 3 recommendations.`;
           } else if (num > systemScore) {
             feedbackDiv.innerHTML = `💪 Confident! Consider taking on more challenging problems to build those skills.`;
           } else {
-            feedbackDiv.innerHTML = `📚 Humble! You may be stronger than you think. Keep building confidence!`;
+            feedbackDiv.innerHTML = `Humble! You may be stronger than you think. Keep building confidence!`;
           }
         }
       };
@@ -1622,15 +1707,15 @@ Do not include any other text. Generate exactly 3 recommendations.`;
   }
 
   /**
-   * Render Momentum Meter - Growth visualization
+   * Render Momentum Meter - Growth visualization - DEPRECATED
    */
   async renderMomentumMeter(userData, container) {
     const s = userData.analyticsSummary || {};
 
-    // Simulate growth data
+    // Growth visualization using real data
     const engagementTrend = (s.interactionPercentage || 0);
     const accuracyTrend = (s.averageAccuracyPercentage || 0);
-    const progressTrend = ((s.totalLessonsCompleted || 0) / (s.totalLessonsViewed || 1)) * 100;
+    const progressTrend = Math.min(100, (s.totalTimeSpentMinutes || 0) / 3);
 
     const meterContainer = document.createElement('div');
     meterContainer.style.cssText = `
@@ -1638,9 +1723,9 @@ Do not include any other text. Generate exactly 3 recommendations.`;
     `;
 
     const metrics = [
-      { label: 'Engagement Momentum', value: engagementTrend, icon: '📈', color: '#10b981' },
-      { label: 'Accuracy Momentum', value: accuracyTrend, icon: '🎯', color: '#f59e0b' },
-      { label: 'Progress Momentum', value: Math.min(100, progressTrend), icon: '🚀', color: '#3b82f6' },
+      { label: 'Engagement Momentum', value: engagementTrend, color: '#10b981' },
+      { label: 'Accuracy Momentum', value: accuracyTrend, color: '#f59e0b' },
+      { label: 'Progress Momentum', value: Math.min(100, progressTrend), color: '#3b82f6' },
     ];
 
     metrics.forEach((metric, idx) => {
@@ -1705,12 +1790,12 @@ Do not include any other text. Generate exactly 3 recommendations.`;
 
     const avgMomentum = (engagementTrend + accuracyTrend + progressTrend) / 3;
     let projection = '🌟 Stellar Growth!';
-    if (avgMomentum < 30) projection = '📈 Building Momentum - Keep Going!';
+    if (avgMomentum < 30) projection = 'Building Momentum - Keep Going!';
     else if (avgMomentum < 60) projection = '⚡ Good Pace - You\'re on Track!';
-    else if (avgMomentum < 85) projection = '🚀 Excellent Trajectory!';
+    else if (avgMomentum < 85) projection = 'Excellent Trajectory!';
 
     projectionDiv.innerHTML = `
-      <p style="margin: 0; color: #d1d5db;"><strong>📊 Overall Momentum Score: ${avgMomentum.toFixed(1)}/100</strong></p>
+      <p style="margin: 0; color: #d1d5db;"><strong>Overall Momentum Score: ${avgMomentum.toFixed(1)}/100</strong></p>
       <p style="margin: 10px 0 0 0; color: #a5f3fc;">${projection}</p>
       <p style="margin: 10px 0 0 0; font-size: 12px; color: #9ca3af;">
         If you maintain this pace, you'll reach mastery in ~${Math.ceil(100 / Math.max(avgMomentum, 1))} sprints.
@@ -1745,14 +1830,14 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       `UID: ${userData.uid || 'Not set'}`,
       `GitHub ID: ${userData.githubID || 'Not set'}`,
       '',
-      '📊 Overall Learning Metrics:',
+      'Overall Learning Metrics:',
       `Engagement Score: ${summary.engagementScore || 0}%`,
       `Total Sessions: ${summary.totalSessions || 0}`,
       `Avg Session Length: ${this.formatTime(summary.avgSessionDuration || 0)}`,
       `Lessons Completed: ${summary.lessonsCompleted || 0}`,
       `Quests Completed: ${summary.questsCompleted || 0}`,
       '',
-      'Your dedication shows growth! Keep going! 🚀',
+      'Your dedication shows growth! Keep going!',
     ];
 
     await this.showDialogue('Profile Guide', messages);
@@ -1800,7 +1885,7 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       `;
 
       const title = document.createElement('h1');
-      title.textContent = '🔗 Your GitHub Journey';
+      title.textContent = 'Your GitHub Journey';
       title.style.cssText = 'color: #06b6d4; margin: 0 0 30px 0; text-align: center; font-size: 28px;';
       container.appendChild(title);
 
@@ -1808,8 +1893,8 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       const stats = [
         { icon: '📝', label: 'Commits', value: gh.commits || 0, color: '#10b981' },
         { icon: '🔀', label: 'Pull Requests', value: gh.prs || 0, color: '#f59e0b' },
-        { icon: '⚠️', label: 'Issues', value: gh.issues || 0, color: '#ef4444' },
-        { icon: '📊', label: 'Total Edits', value: totalEdits, color: '#06b6d4' },
+        { label: 'Issues', value: gh.issues || 0, color: '#ef4444' },
+        { label: 'Total Edits', value: totalEdits, color: '#06b6d4' },
       ];
 
       const statsGrid = document.createElement('div');
@@ -1848,7 +1933,7 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       `;
 
       const lineRatio = gh.linesAdded > 0 ? (gh.linesDeleted / (gh.linesAdded + gh.linesDeleted) * 100).toFixed(0) : 0;
-      const insight = gh.commits > 50 ? '🔥 Heavy contributor - Amazing dedication!' : '✨ Keep pushing those commits!';
+      const insight = gh.commits > 50 ? 'Heavy contributor - Amazing dedication!' : 'Keep pushing those commits!';
 
       codeInsight.innerHTML = `
         <p style="margin: 0 0 8px 0; color: #60a5fa;"><strong>${insight}</strong></p>
