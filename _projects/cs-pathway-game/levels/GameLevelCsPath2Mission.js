@@ -297,6 +297,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * and renders the initial mission scoreboard.
    */
   initialize() {
+    this.activateProfilePanel();
     const objects = this.gameEnv?.gameObjects || [];
     const desks = objects.filter((obj) => this._missionDeskIds?.includes(obj?.spriteData?.id));
     this._rebindMissingDeskReactions(desks);
@@ -699,6 +700,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._missionProgressCount += 1;
       this._syncMissionProgressBoard();
 
+      this.updateProfilePanel({
+        workbench1: this._missionCompletedStations.has('The Admin')       ? 'The Admin ✓'       : '—',
+        workbench2: this._missionCompletedStations.has('The Archivist')   ? 'The Archivist ✓'   : '—',
+        workbench3: this._missionCompletedStations.has('The SDLC Master') ? 'The SDLC Master ✓' : '—',
+        workbench4: this._missionCompletedStations.has('The Scrum Master') ? 'The Scrum Master ✓' : '—',
+      });
       if (this._missionCompletedStations.size >= stationTargetCount) {
         this.showToast?.('All stations cleared once. Repeat solves now count toward bonus progress.');
       }

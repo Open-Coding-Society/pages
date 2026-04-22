@@ -21,8 +21,84 @@ import AiNpcSession from './AiNpcSession.js';
 import { pythonURI, fetchOptions } from '../../api/config.js';
 
 class AiNpc {
+    static cleanupDialogueArtifacts(dialogueSystem) {
+        if (!dialogueSystem?.safeId) return;
+
+        const dialogueBox = document.getElementById('custom-dialogue-box-' + dialogueSystem.safeId);
+        if (!dialogueBox) return;
+
+        const aiContainers = dialogueBox.querySelectorAll('.ai-npc-container');
+        aiContainers.forEach((node) => node.remove());
+
+        const topLeftClose = dialogueBox.querySelector('.ai-npc-close-top-left');
+        if (topLeftClose) topLeftClose.remove();
+
+        const defaultCloseBtn = document.getElementById('dialogue-close-btn-' + dialogueSystem.safeId);
+        if (defaultCloseBtn) {
+            defaultCloseBtn.style.display = '';
+        }
+    }
+
+    static cleanupInteraction(npcInstance) {
+        if (!npcInstance) return;
+
+        const dialogueSystem = npcInstance.dialogueSystem;
+
+        if (dialogueSystem?.isDialogueOpen?.()) {
+            dialogueSystem.closeDialogue();
+        } else {
+            if (npcInstance.aiSession) {
+                npcInstance.aiSession.cancel();
+                npcInstance.aiSession = null;
+            }
+            if (dialogueSystem?.setLifecycleSession) {
+                dialogueSystem.setLifecycleSession(null);
+            }
+        }
+
+        AiNpc.cleanupDialogueArtifacts(dialogueSystem);
+    }
+
+    static ensureDialogueCleanupHook(dialogueSystem) {
+        if (!dialogueSystem || dialogueSystem.__aiNpcCleanupWrapped) return;
+
+        const originalCloseDialogue = typeof dialogueSystem.closeDialogue === 'function'
+            ? dialogueSystem.closeDialogue.bind(dialogueSystem)
+            : null;
+        if (!originalCloseDialogue) return;
+
+        dialogueSystem.closeDialogue = (...args) => {
+            const result = originalCloseDialogue(...args);
+            AiNpc.cleanupDialogueArtifacts(dialogueSystem);
+            return result;
+        };
+
+        dialogueSystem.__aiNpcCleanupWrapped = true;
+    }
+
+    static ensureDestroyHook(npcInstance) {
+        if (!npcInstance || npcInstance.__aiNpcDestroyWrapped) return;
+
+        const originalDestroy = typeof npcInstance.destroy === 'function'
+            ? npcInstance.destroy.bind(npcInstance)
+            : null;
+
+        npcInstance.destroy = (...args) => {
+            AiNpc.cleanupInteraction(npcInstance);
+            if (originalDestroy) {
+                return originalDestroy(...args);
+            }
+            return undefined;
+        };
+
+        npcInstance.__aiNpcDestroyWrapped = true;
+    }
+
     static beginSession(npcInstance) {
         if (!npcInstance) return null;
+
+        AiNpc.ensureDestroyHook(npcInstance);
+        AiNpc.ensureDialogueCleanupHook(npcInstance.dialogueSystem);
 
         if (npcInstance.aiSession) {
             npcInstance.aiSession.cancel();
@@ -68,6 +144,8 @@ class AiNpc {
                 gameControl: npc.gameControl
             });
         }
+
+        AiNpc.ensureDialogueCleanupHook(npc.dialogueSystem);
 
         const session = AiNpc.beginSession(npc);
         if (npc.dialogueSystem?.setLifecycleSession) {
