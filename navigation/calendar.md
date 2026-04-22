@@ -192,6 +192,23 @@ active_tab: calendar
         font-weight: 800;
     }
 
+    .issue-link-btn {
+        border: 0;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        color: #e2e8f0;
+        text-align: left;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .issue-link-btn:hover {
+        color: #93c5fd;
+        text-decoration: underline;
+    }
+
     .issue-pill {
         border-radius: 999px;
         padding: 4px 9px;
@@ -356,6 +373,80 @@ active_tab: calendar
         text-align: center;
     }
 
+    .issue-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 100002;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(2, 6, 23, 0.72);
+        backdrop-filter: blur(4px);
+    }
+
+    .issue-modal.open {
+        display: flex;
+    }
+
+    .issue-modal-content {
+        width: min(920px, 100%);
+        max-height: min(92vh, 840px);
+        overflow-y: auto;
+        border-radius: 16px;
+        border: 1px solid rgba(148, 163, 184, 0.26);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.94) 100%);
+        color: #e2e8f0;
+        padding: 16px;
+        box-shadow: 0 30px 60px rgba(2, 6, 23, 0.56);
+    }
+
+    .issue-modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .issue-modal-title {
+        margin: 0;
+        font-size: 1.28rem;
+        font-weight: 800;
+        line-height: 1.25;
+    }
+
+    .issue-modal-close {
+        border: 0;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 1.7rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .issue-modal-close:hover {
+        color: #e2e8f0;
+    }
+
+    .issue-modal-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .issue-modal-description {
+        margin: 0 0 12px;
+    }
+
+    .issue-modal-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
     @media (max-width: 1040px) {
         .kanban-board {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -473,13 +564,6 @@ active_tab: calendar
                 </div>
 
                 <div>
-                    <label for="issue-group-name">Group (optional)</label>
-                    <select id="issue-group-name">
-                        <option value="">-- No group link --</option>
-                    </select>
-                </div>
-
-                <div>
                     <label for="issue-tags">Tags (comma-separated)</label>
                     <input id="issue-tags" type="text" placeholder="frontend, sprint-9" />
                 </div>
@@ -540,8 +624,27 @@ active_tab: calendar
     </div>
 </div>
 
+<div id="issueModal" class="issue-modal" aria-hidden="true" role="dialog" aria-label="Issue Details">
+    <div class="issue-modal-content">
+        <div class="issue-modal-header">
+            <h3 id="issue-modal-title" class="issue-modal-title">Issue</h3>
+            <button id="issue-modal-close" class="issue-modal-close" type="button" aria-label="Close Issue Modal">&times;</button>
+        </div>
+        <div id="issue-modal-meta" class="issue-modal-meta"></div>
+        <div id="issue-modal-description" class="issue-markdown-preview issue-modal-description"></div>
+        <div id="issue-modal-tags" class="issue-tags"></div>
+        <div class="issue-modal-actions">
+            <button id="issue-modal-copy-link" type="button" class="calendar-issue-action-btn secondary">Copy Link</button>
+            <button id="issue-modal-edit" type="button" class="calendar-issue-action-btn secondary">Edit</button>
+            <button id="issue-modal-delete" type="button" class="calendar-issue-action-btn danger">Delete</button>
+        </div>
+    </div>
+</div>
+
 <!-- FullCalendar JS -->
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
@@ -600,6 +703,7 @@ active_tab: calendar
     let selectedIssueId = null;
     let activeDashboardTab = 'calendar';
     let activeIssuesSubtab = 'create';
+    let onIssuesRefreshedHook = null;
 
     const ISSUE_STATUS_OPTIONS = ['open', 'in-progress', 'blocked', 'done'];
     const ISSUE_STATUS_LABELS = {
@@ -709,23 +813,6 @@ active_tab: calendar
         });
     }
 
-    function populateIssueGroupDropdown() {
-        const sel = document.getElementById('issue-group-name');
-        if (!sel) return;
-        sel.innerHTML = '<option value="">-- No group link --</option>';
-        userGroups.forEach(group => {
-            const opt = document.createElement('option');
-            opt.value = group.name;
-            let label = group.name;
-            const parts = [];
-            if (group.course) parts.push(group.course.toUpperCase());
-            if (group.period != null) parts.push(`Period ${group.period}`);
-            if (parts.length) label += ` — ${parts.join(' ')}`;
-            opt.textContent = label;
-            sel.appendChild(opt);
-        });
-    }
-
     function escapeIssueText(s) {
         return s ? String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;") : '';
     }
@@ -734,63 +821,22 @@ active_tab: calendar
         return (window.user && (window.user.uid || window.user.name)) || '';
     }
 
-    function renderInlineMarkdown(text) {
-        const escaped = escapeIssueText(String(text || ''));
-        return escaped
-            .replace(/`([^`]+)`/g, '<code>$1</code>')
-            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-            .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
-    }
-
     function renderIssueMarkdown(text) {
         const source = String(text || '').replace(/\r\n/g, '\n');
         if (!source.trim()) {
             return '<p class="issue-markdown-empty">No description provided.</p>';
         }
-
-        const lines = source.split('\n');
-        const html = [];
-        let inList = false;
-
-        const closeList = () => {
-            if (inList) {
-                html.push('</ul>');
-                inList = false;
+        if (window.marked) {
+            marked.setOptions({ gfm: true, breaks: true, headerIds: true, mangle: false });
+            const rendered = marked.parse(source);
+            if (window.DOMPurify) {
+                return DOMPurify.sanitize(rendered, {
+                    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|ftp):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i
+                });
             }
-        };
-
-        for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed) {
-                closeList();
-                continue;
-            }
-
-            const headingMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
-            if (headingMatch) {
-                closeList();
-                const headingLevel = headingMatch[1].length;
-                html.push(`<h${headingLevel}>${renderInlineMarkdown(headingMatch[2])}</h${headingLevel}>`);
-                continue;
-            }
-
-            const listMatch = trimmed.match(/^[-*]\s+(.*)$/);
-            if (listMatch) {
-                if (!inList) {
-                    html.push('<ul>');
-                    inList = true;
-                }
-                html.push(`<li>${renderInlineMarkdown(listMatch[1])}</li>`);
-                continue;
-            }
-
-            closeList();
-            html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`);
+            return rendered;
         }
-
-        closeList();
-        return html.join('');
+        return `<p>${escapeIssueText(source).replace(/\n/g, '<br>')}</p>`;
     }
 
     function updateIssueDescriptionPreview() {
@@ -875,11 +921,36 @@ active_tab: calendar
         }, 2800);
     }
 
+    function buildIssueShareUrl(issueId) {
+        const shareUrl = new URL(window.location.href);
+        shareUrl.searchParams.set('issue', String(issueId));
+        return shareUrl.toString();
+    }
+
+    function setIssueModalUrl(issueId, replaceState = false) {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set('issue', String(issueId));
+        if (replaceState) {
+            window.history.replaceState({}, '', nextUrl.toString());
+        } else {
+            window.history.pushState({}, '', nextUrl.toString());
+        }
+    }
+
+    function clearIssueModalUrl(replaceState = true) {
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.delete('issue');
+        if (replaceState) {
+            window.history.replaceState({}, '', nextUrl.toString());
+        } else {
+            window.history.pushState({}, '', nextUrl.toString());
+        }
+    }
+
     // ─── Main ───────────────────────────────────────────────────────
     document.addEventListener("DOMContentLoaded", async function () {
         userGroups = await fetchUserGroups();
         populateGroupDropdown();
-        populateIssueGroupDropdown();
         document.getElementById('issue-description')?.addEventListener('input', updateIssueDescriptionPreview);
 
         let currentEvent = null;
@@ -937,7 +1008,6 @@ active_tab: calendar
                 priority: document.getElementById('issue-priority'),
                 dueDate: document.getElementById('issue-due-date'),
                 eventId: document.getElementById('issue-event-id'),
-                groupName: document.getElementById('issue-group-name'),
                 tags: document.getElementById('issue-tags'),
                 saveBtn: document.getElementById('issue-save-btn'),
                 clearBtn: document.getElementById('issue-clear-btn'),
@@ -959,7 +1029,6 @@ active_tab: calendar
             if (el.status) el.status.value = 'open';
             if (el.priority) el.priority.value = 'medium';
             if (el.dueDate) el.dueDate.value = preserveDate || el.filterDate?.value || getLocalIsoDate();
-            if (el.groupName) el.groupName.value = '';
             if (el.saveBtn) el.saveBtn.textContent = 'Create Issue';
             updateIssueDescriptionPreview();
             renderIssueViews();
@@ -975,7 +1044,6 @@ active_tab: calendar
             if (el.priority) el.priority.value = issue.priority || 'medium';
             if (el.dueDate) el.dueDate.value = issue.dueDate || '';
             if (el.eventId) el.eventId.value = issue.eventId || '';
-            if (el.groupName) el.groupName.value = issue.groupName || '';
             if (el.tags) el.tags.value = normalizeTags(issue.tags).join(', ');
             if (el.saveBtn) el.saveBtn.textContent = 'Update Issue';
             updateIssueDescriptionPreview();
@@ -1027,7 +1095,7 @@ active_tab: calendar
                 return `
                     <article class="issue-card" data-issue-id="${escapeIssueText(issue.id)}">
                         <div class="issue-card-top">
-                            <div class="issue-card-title">${escapeIssueText(issue.title || 'Untitled issue')}</div>
+                            <button type="button" class="issue-link-btn issue-card-title" data-action="view" data-issue-id="${escapeIssueText(issue.id)}">${escapeIssueText(issue.title || 'Untitled issue')}</button>
                             <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                 <span class="issue-pill ${escapeIssueText(status)}">${escapeIssueText(ISSUE_STATUS_LABELS[status] || status)}</span>
                                 <span class="issue-pill ${escapeIssueText(priority)}">${escapeIssueText(priority.toUpperCase())}</span>
@@ -1035,7 +1103,6 @@ active_tab: calendar
                         </div>
                         <div class="issue-description issue-markdown-preview">${renderIssueMarkdown(issue.description || '')}</div>
                         <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
-                        ${issue.groupName ? `<div class="issue-meta">Group: ${escapeIssueText(issue.groupName)}</div>` : ''}
                         <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}${issue.eventId ? ` · Event ${escapeIssueText(issue.eventId)}` : ''}</div>
                         ${tags.length ? `<div class="issue-tags">${tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('')}</div>` : ''}
                         <div class="issue-card-footer">
@@ -1043,6 +1110,7 @@ active_tab: calendar
                                 ${ISSUE_STATUS_OPTIONS.map(option => `<option value="${option}" ${option === status ? 'selected' : ''} ${canMove.includes(option) ? '' : 'disabled'}>${ISSUE_STATUS_LABELS[option]}</option>`).join('')}
                             </select>
                             <div style="display:flex;gap:8px;">
+                                <button type="button" class="calendar-issue-action-btn secondary" data-action="view" data-issue-id="${escapeIssueText(issue.id)}">View</button>
                                 <button type="button" class="calendar-issue-action-btn secondary" data-action="edit" data-issue-id="${escapeIssueText(issue.id)}">Edit</button>
                                 <button type="button" class="calendar-issue-action-btn danger" data-action="delete" data-issue-id="${escapeIssueText(issue.id)}" ${issue.author && getCurrentIssueAuthor() && issue.author !== getCurrentIssueAuthor() ? 'disabled title="Only the author can delete this issue"' : ''}>Delete</button>
                             </div>
@@ -1070,9 +1138,8 @@ active_tab: calendar
                         <h3 class="kanban-column-title">${ISSUE_STATUS_LABELS[status]} (${statusIssues.length})</h3>
                         ${statusIssues.length ? statusIssues.map(issue => `
                             <article class="kanban-item" data-issue-id="${escapeIssueText(issue.id)}">
-                                <div class="issue-card-title">${escapeIssueText(issue.title || 'Untitled issue')}</div>
+                                <button type="button" class="issue-link-btn issue-card-title" data-action="view" data-issue-id="${escapeIssueText(issue.id)}">${escapeIssueText(issue.title || 'Untitled issue')}</button>
                                 <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
-                                ${issue.groupName ? `<div class="issue-meta">Group: ${escapeIssueText(issue.groupName)}</div>` : ''}
                                 <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</div>
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                     <span class="issue-pill ${escapeIssueText(issue.priority || 'medium')}">${escapeIssueText((issue.priority || 'medium').toUpperCase())}</span>
@@ -1164,13 +1231,11 @@ active_tab: calendar
                             start: issue.dueDate,
                             allDay: true,
                             priority: issue.priority || 'medium',
-                            groupName: issue.groupName || '',
                             classNames: ['fc-event-issue', `priority-${String(issue.priority || 'medium').toLowerCase()}`],
                             extendedProps: {
                                 type: 'issue',
                                 isIssue: true,
                                 author: issue.author || '',
-                                groupName: issue.groupName || '',
                                 description: issue.description || '',
                                 status: issue.status || 'open',
                                 priority: issue.priority || 'medium',
@@ -1260,12 +1325,18 @@ active_tab: calendar
 
                     displayCalendar(filterEvents());
                     renderIssueViews();
+                    if (typeof onIssuesRefreshedHook === 'function') {
+                        onIssuesRefreshedHook();
+                    }
                 })
                 .catch(error => {
                     handleFetchError(error);
                     console.error("handleRequest error:", error);
                     displayCalendar(filterEvents());
                     renderIssueViews();
+                    if (typeof onIssuesRefreshedHook === 'function') {
+                        onIssuesRefreshedHook();
+                    }
                 });
         }
 
@@ -1382,7 +1453,6 @@ active_tab: calendar
                         let html = '<div class="fc-event-issue">';
                         html += '<div class="fc-event-title-custom">' + (event.title || 'Issue') + '</div>';
                         if (ext.author) html += '<div class="fc-event-individual">' + ext.author + '</div>';
-                        if (ext.groupName) html += '<div class="fc-event-group">' + ext.groupName + '</div>';
                         html += '</div>';
                         return { html };
                     }
@@ -1545,7 +1615,14 @@ active_tab: calendar
             document.getElementById("editGroupName").disabled = true;
         }
         document.getElementById("closeModal").onclick = closeModal;
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.getElementById('issueModal')?.classList.remove('open');
+                document.getElementById('issueModal')?.setAttribute('aria-hidden', 'true');
+                clearIssueModalUrl(true);
+            }
+        });
         window.onclick = function (e) {
             if (e.target === document.getElementById("eventModal")) closeModal();
         };
@@ -1707,6 +1784,74 @@ active_tab: calendar
 
         function initializeIssueWorkspace() {
             const el = getIssueElements();
+            const issueModal = document.getElementById('issueModal');
+            const issueModalTitle = document.getElementById('issue-modal-title');
+            const issueModalMeta = document.getElementById('issue-modal-meta');
+            const issueModalDescription = document.getElementById('issue-modal-description');
+            const issueModalTags = document.getElementById('issue-modal-tags');
+            const issueModalCloseBtn = document.getElementById('issue-modal-close');
+            const issueModalCopyLinkBtn = document.getElementById('issue-modal-copy-link');
+            const issueModalEditBtn = document.getElementById('issue-modal-edit');
+            const issueModalDeleteBtn = document.getElementById('issue-modal-delete');
+            let activeModalIssueId = null;
+
+            function getIssueFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('issue');
+            }
+
+            function closeIssueModal(syncUrl = true) {
+                activeModalIssueId = null;
+                issueModal?.classList.remove('open');
+                issueModal?.setAttribute('aria-hidden', 'true');
+                if (syncUrl) {
+                    clearIssueModalUrl(true);
+                }
+            }
+
+            function openIssueModal(issue, syncUrl = true, replaceState = false) {
+                if (!issue || !issueModal) return;
+
+                activeModalIssueId = String(issue.id);
+                issueModalTitle.textContent = issue.title || 'Untitled issue';
+                const status = issue.status || 'open';
+                const priority = issue.priority || 'medium';
+                issueModalMeta.innerHTML = [
+                    `<span class="issue-pill ${escapeIssueText(status)}">${escapeIssueText(ISSUE_STATUS_LABELS[status] || status)}</span>`,
+                    `<span class="issue-pill ${escapeIssueText(priority)}">${escapeIssueText(priority.toUpperCase())}</span>`,
+                    `<span class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</span>`,
+                    `<span class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</span>`
+                ].join('');
+                issueModalDescription.innerHTML = renderIssueMarkdown(issue.description || '');
+                const tags = normalizeTags(issue.tags);
+                issueModalTags.innerHTML = tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('');
+                const canDelete = !(issue.author && getCurrentIssueAuthor() && issue.author !== getCurrentIssueAuthor());
+                if (issueModalDeleteBtn) {
+                    issueModalDeleteBtn.disabled = !canDelete;
+                    issueModalDeleteBtn.title = canDelete ? '' : 'Only the author can delete this issue';
+                }
+                issueModal.classList.add('open');
+                issueModal.setAttribute('aria-hidden', 'false');
+
+                if (syncUrl) {
+                    setIssueModalUrl(issue.id, replaceState);
+                }
+            }
+
+            function openIssueFromUrlIfPresent(replaceState = true) {
+                const issueId = getIssueFromUrl();
+                if (!issueId) {
+                    closeIssueModal(false);
+                    return;
+                }
+                const issue = calendarIssues.find(item => String(item.id) === String(issueId));
+                if (!issue) {
+                    closeIssueModal(false);
+                    return;
+                }
+                switchDashboardTab('issues');
+                openIssueModal(issue, true, replaceState);
+            }
 
             el.newBtn?.addEventListener('click', () => {
                 resetIssueForm(el.filterDate?.value || getLocalIsoDate());
@@ -1732,7 +1877,6 @@ active_tab: calendar
                     priority: el.priority?.value || 'medium',
                     dueDate: el.dueDate?.value || '',
                     eventId: (el.eventId?.value || '').trim() || null,
-                    groupName: (el.groupName?.value || '').trim() || null,
                     tags: normalizeTags(el.tags?.value || '')
                 };
 
@@ -1752,6 +1896,7 @@ active_tab: calendar
                     showIssueToast(selectedIssueId ? 'Issue updated.' : 'Issue created.', 'success');
                     resetIssueForm(payload.dueDate);
                     await handleRequest();
+                    openIssueFromUrlIfPresent(true);
                 } catch (error) {
                     console.error('Issue save error:', error);
                     if (error.message === 'AUTH') {
@@ -1778,6 +1923,13 @@ active_tab: calendar
 
                     if (action === 'edit') {
                         setIssueForm(issue);
+                        closeIssueModal(false);
+                        clearIssueModalUrl(true);
+                        return;
+                    }
+
+                    if (action === 'view') {
+                        openIssueModal(issue, true, false);
                         return;
                     }
 
@@ -1790,6 +1942,10 @@ active_tab: calendar
                             showIssueToast('Issue deleted.', 'warning');
                             if (String(selectedIssueId) === String(issue.id)) {
                                 resetIssueForm(el.filterDate?.value || getLocalIsoDate());
+                            }
+                            if (String(activeModalIssueId) === String(issue.id)) {
+                                closeIssueModal(false);
+                                clearIssueModalUrl(true);
                             }
                             await handleRequest();
                         } catch (error) {
@@ -1822,7 +1978,78 @@ active_tab: calendar
 
             wireContainerActions(el.list);
             wireContainerActions(el.kanban);
+
+            issueModalCloseBtn?.addEventListener('click', () => closeIssueModal(true));
+            issueModal?.addEventListener('click', (event) => {
+                if (event.target === issueModal) {
+                    closeIssueModal(true);
+                }
+            });
+            issueModalCopyLinkBtn?.addEventListener('click', async () => {
+                if (!activeModalIssueId) return;
+                const shareUrl = buildIssueShareUrl(activeModalIssueId);
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    showIssueToast('Issue link copied.', 'success');
+                } catch (error) {
+                    console.error('Clipboard copy failed:', error);
+                    showIssueToast('Could not copy issue link.', 'error');
+                }
+            });
+            issueModalEditBtn?.addEventListener('click', () => {
+                if (!activeModalIssueId) return;
+                const issue = calendarIssues.find(item => String(item.id) === String(activeModalIssueId));
+                if (!issue) return;
+                setIssueForm(issue);
+                closeIssueModal(false);
+                clearIssueModalUrl(true);
+            });
+            issueModalDeleteBtn?.addEventListener('click', async () => {
+                if (!activeModalIssueId) return;
+                const issue = calendarIssues.find(item => String(item.id) === String(activeModalIssueId));
+                if (!issue) return;
+                const confirmed = confirm(`Delete issue \"${issue.title}\"? This cannot be undone.`);
+                if (!confirmed) return;
+                try {
+                    await deleteIssue(issue.id);
+                    showIssueToast('Issue deleted.', 'warning');
+                    if (String(selectedIssueId) === String(issue.id)) {
+                        resetIssueForm(el.filterDate?.value || getLocalIsoDate());
+                    }
+                    closeIssueModal(false);
+                    clearIssueModalUrl(true);
+                    await handleRequest();
+                } catch (error) {
+                    console.error('Issue delete error:', error);
+                    showIssueToast('Could not delete issue.', 'error');
+                }
+            });
+
+            window.addEventListener('popstate', () => {
+                const issueId = getIssueFromUrl();
+                if (!issueId) {
+                    closeIssueModal(false);
+                    return;
+                }
+                const issue = calendarIssues.find(item => String(item.id) === String(issueId));
+                if (issue) {
+                    switchDashboardTab('issues');
+                    openIssueModal(issue, false, true);
+                }
+            });
+
             resetIssueForm(getLocalIsoDate());
+
+            onIssuesRefreshedHook = () => {
+                if (getIssueFromUrl()) {
+                    openIssueFromUrlIfPresent(true);
+                }
+            };
+
+            const issueIdFromUrl = getIssueFromUrl();
+            if (issueIdFromUrl) {
+                openIssueFromUrlIfPresent(true);
+            }
         }
 
         initializeDashboardControls();
