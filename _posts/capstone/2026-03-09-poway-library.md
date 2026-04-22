@@ -1,4 +1,5 @@
 ---
+microblog: true
 toc: false
 layout: post
 title: Friends of the Poway Library
