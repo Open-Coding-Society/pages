@@ -4,8 +4,7 @@ import Present from './Present.js';
 
 /**
  * Shared identity behavior for CS Path levels.
- * Handles profile restore, avatar transfer, themed background transfer,
- * and the world-aware profile StatusPanel.
+ * Handles profile restore, avatar transfer, and themed background transfer.
  */
 class GameLevelCsPathIdentity {
   static themeCatalogCache = new Map();
