@@ -40,27 +40,6 @@ class StatusPanel {
     return this.render();
   }
 
-  reconfigure(newConfig = {}, initialData = null) {
-    const wasCollapsed = this.isCollapsed;
-
-    this.config = {
-      ...this.config,
-      ...newConfig,
-      theme:    { ...this.config.theme,    ...(newConfig.theme    || {}) },
-      position: { ...this.config.position, ...(newConfig.position || {}) },
-    };
-
-    this.isCollapsed = wasCollapsed;
-    this.destroy();
-    this.render();
-
-    if (initialData) {
-      this.update(initialData);
-    }
-
-    return this.element;
-  }
-
   render() {
     const existing = document.getElementById(this.config.id);
     if (existing) {
@@ -72,27 +51,27 @@ class StatusPanel {
     panel.className = this.config.className;
 
     Object.assign(panel.style, {
-      position:     'fixed',
-      top:          this.config.position?.top  || '16px',
-      left:         this.config.position?.left || '16px',
-      zIndex:       this.config.zIndex,
-      width:        this.config.width,
-      padding:      this.config.padding,
+      position: 'fixed',
+      top: this.config.position?.top || '16px',
+      left: this.config.position?.left || '16px',
+      zIndex: this.config.zIndex,
+      width: this.config.width,
+      padding: this.config.padding,
       borderRadius: this.config.borderRadius,
-      fontFamily:   this.config.fontFamily,
-      background:   'var(--ocs-game-panel-bg)',
-      border:       '1px solid var(--ocs-game-accent)',
-      color:        'var(--ocs-game-text)',
-      boxShadow:    'var(--ocs-game-shadow, none)',
-      overflow:     'hidden',
+      fontFamily: this.config.fontFamily,
+      background: this.config.theme.background || 'var(--ocs-status-panel-background)',
+      border: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
+      color: this.config.theme.textColor || 'var(--ocs-status-panel-text)',
+      boxShadow: this.config.theme.boxShadow || 'none',
+      overflow: 'hidden', // prevents weird visual overflow
     });
 
     // Title
     const title = document.createElement('div');
     Object.assign(title.style, {
-      color:         'var(--ocs-game-accent)',
-      fontSize:      '12px',
-      fontWeight:    'bold',
+      color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+      fontSize: '12px',
+      fontWeight: 'bold',
       letterSpacing: '1px',
     });
     title.textContent = this.config.title;
@@ -100,7 +79,7 @@ class StatusPanel {
     // Header
     const header = this.createHeader(title);
 
-    // Content container
+    // Content container (EVERYTHING goes inside here)
     const content = document.createElement('div');
     this.contentContainer = content;
 
@@ -110,9 +89,9 @@ class StatusPanel {
       if (field.type === 'section') {
         const section = document.createElement('div');
         Object.assign(section.style, {
-          marginTop:     field.marginTop || '8px',
-          color:         'var(--ocs-game-accent)',
-          fontSize:      '11px',
+          marginTop: field.marginTop || '8px',
+          color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+          fontSize: '11px',
           letterSpacing: '1px',
         });
         section.textContent = field.title;
@@ -123,6 +102,7 @@ class StatusPanel {
       const row = document.createElement('div');
       row.dataset.field = field.key;
       row.textContent = `${field.label}: ${field.emptyValue || '—'}`;
+
       content.appendChild(row);
       this.fieldElements.set(field.key, row);
     }
@@ -130,12 +110,12 @@ class StatusPanel {
     if (this.config.actions && this.config.actions.length > 0) {
       const actionsContainer = document.createElement('div');
       Object.assign(actionsContainer.style, {
-        marginTop:     '12px',
-        paddingTop:    '10px',
-        borderTop:     '1px solid var(--ocs-game-accent)',
-        display:       'flex',
+        marginTop: '12px',
+        paddingTop: '10px',
+        borderTop: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
+        display: 'flex',
         flexDirection: 'column',
-        gap:           '6px',
+        gap: '6px',
       });
 
       this.actionElements = [];
@@ -143,35 +123,44 @@ class StatusPanel {
       for (const action of this.config.actions) {
         const btn = document.createElement('button');
         btn.textContent = action.label;
+
         if (action.title) btn.title = action.title;
 
-        // Danger buttons stay red intentionally.
-        const bgColor     = action.danger ? '#d32f2f' : 'var(--ocs-game-surface-alt)';
-        const textColor   = action.danger ? '#fff'    : 'var(--ocs-game-text)';
-        const borderColor = action.danger ? '#d32f2f' : 'var(--ocs-game-accent)';
+        const bgColor = action.danger
+          ? '#d32f2f'
+          : (this.config.theme.secondaryButtonBackground || 'var(--ocs-status-panel-button-bg)');
+        const textColor = action.danger
+          ? '#fff'
+          : (this.config.theme.secondaryButtonTextColor || 'var(--ocs-status-panel-button-text)');
+        const borderColor = action.danger
+          ? '#d32f2f'
+          : (this.config.theme.borderColor || 'var(--ocs-status-panel-border)');
 
         Object.assign(btn.style, {
-          padding:       '6px 10px',
-          borderRadius:  '4px',
-          fontFamily:    this.config.fontFamily,
-          fontSize:      '11px',
-          fontWeight:    'bold',
+          padding: '6px 10px',
+          borderRadius: '4px',
+          fontFamily: this.config.fontFamily,
+          fontSize: '11px',
+          fontWeight: 'bold',
           letterSpacing: '0.5px',
-          background:    bgColor,
-          color:         textColor,
-          border:        `1px solid ${borderColor}`,
-          cursor:        'pointer',
-          transition:    'all 0.2s ease',
+          background: bgColor,
+          color: textColor,
+          border: `1px solid ${borderColor}`,
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
         });
 
         btn.addEventListener('mouseenter', () => {
-          btn.style.background = action.danger ? '#b71c1c' : 'var(--ocs-game-accent)';
-          btn.style.color      = action.danger ? '#fff'    : 'var(--ocs-game-surface-contrast)';
+          if (action.danger) {
+            btn.style.background = '#b71c1c';
+          } else {
+            btn.style.opacity = '0.8';
+          }
         });
 
         btn.addEventListener('mouseleave', () => {
           btn.style.background = bgColor;
-          btn.style.color      = textColor;
+          btn.style.opacity = '1';
         });
 
         if (action.onClick) {
@@ -200,11 +189,12 @@ class StatusPanel {
 
   createHeader(titleElement) {
     const header = document.createElement('div');
+
     Object.assign(header.style, {
-      display:        'flex',
+      display: 'flex',
       justifyContent: 'space-between',
-      alignItems:     'center',
-      marginBottom:   '8px',
+      alignItems: 'center',
+      marginBottom: '8px',
     });
 
     const toggleBtn = document.createElement('button');
@@ -212,10 +202,10 @@ class StatusPanel {
 
     Object.assign(toggleBtn.style, {
       background: 'transparent',
-      border:     'none',
-      color:      'var(--ocs-game-accent)',
-      cursor:     'pointer',
-      fontSize:   '14px',
+      border: 'none',
+      color: this.config.theme.accentColor || '#4ecca3',
+      cursor: 'pointer',
+      fontSize: '14px',
       fontWeight: 'bold',
     });
 

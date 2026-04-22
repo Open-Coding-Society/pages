@@ -376,20 +376,3 @@
     }
   }
 }
-
-/**
- * Game Status Panel Theme Bridge
- * Maps site theme variables to the --ocs-game-* custom properties
- * that StatusPanel.js reads. Adding this here means the panel
- * automatically follows every theme switch, just like the zone buttons.
- */
-:root {
-  --ocs-game-panel-bg:         var(--panel);
-  --ocs-game-accent:           var(--pref-accent-color);
-  --ocs-game-text:             var(--pref-text-color);
-  --ocs-game-muted:            var(--pref-text-color);
-  --ocs-game-surface-alt:      var(--panel-mid);
-  --ocs-game-surface-contrast: var(--pref-bg-color);
-  --ocs-game-overlay:          var(--panel);
-  --ocs-game-score-accent:     var(--pref-accent-color);
-}
