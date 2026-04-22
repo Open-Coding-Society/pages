@@ -3,6 +3,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
 // Prompt templates for AI question generation and grading.
 const CHALLENGE_PROMPT_TEXT = {
@@ -140,6 +141,36 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const level = this;
 
     let { width, height, path } = this.getLevelDimensions();
+    this.profilePanelView = new StatusPanel({
+      id: 'csse-mission-panel',
+      title: 'MISSION TOOLS',
+      fields: [
+        { key: 'desk1', label: 'Workbench 1', emptyValue: '—' },
+        { key: 'desk2', label: 'Workbench 2', emptyValue: '—' },
+        { key: 'desk3', label: 'Workbench 3', emptyValue: '—' },
+        { key: 'desk4', label: 'Workbench 4', emptyValue: '—' },
+      ],
+      theme: {
+        background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
+        borderColor: 'var(--ocs-game-accent, #4ecca3)',
+        textColor: 'var(--ocs-game-text, #e0e0e0)',
+        accentColor: 'var(--ocs-game-accent, #4ecca3)',
+        secondaryButtonBackground: 'var(--ocs-game-surface-alt, #1a1a2e)',
+        secondaryButtonTextColor: 'var(--ocs-game-text, #e0e0e0)',
+      },
+      position: { top: '16px', left: '16px' },
+      width: '260px',
+      padding: '12px 14px',
+      zIndex: '10000',
+      fontFamily: '"Courier New", monospace',
+    });
+    this.profilePanelView.render();
+    this.profilePanelView.update({
+      desk1: '—',
+      desk2: '—',
+      desk3: '—',
+      desk4: '—',
+    });
 
     /**
      * Section: Level objects.

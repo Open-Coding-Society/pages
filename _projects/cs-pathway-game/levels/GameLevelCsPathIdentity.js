@@ -424,6 +424,9 @@ class GameLevelCsPathIdentity {
   }
 
   destroy() {
+    if (this.profilePanelView) {
+      this.profilePanelView.destroy();
+    }
     this.present?.destroy();
   }
 
