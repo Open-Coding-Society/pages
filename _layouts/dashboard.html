@@ -133,47 +133,6 @@ active_tab: dashboard
                     <p class="text-xs text-neutral-500 mt-3">Uses your browser's built-in speech synthesis. Available voices depend on your operating system.</p>
                 </div>
 
-                <!-- Head Tracking Cursor Section -->
-                <div class="mt-6 p-4 rounded-lg bg-neutral-800 border border-neutral-700">
-                    <div class="flex justify-between items-center mb-4 gap-3">
-                        <h3 class="font-medium">Head Tracking Cursor</h3>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input id="pref-head-tracking-enabled" type="checkbox" class="sr-only" />
-                            <div id="head-tracking-toggle-track" class="relative w-11 h-6 bg-neutral-600 rounded-full transition-colors duration-200">
-                                <div id="head-tracking-toggle-dot" class="absolute left-0.5 top-0.5 bg-white rounded-full h-5 w-5 transition-transform duration-200"></div>
-                            </div>
-                            <span class="ms-3 text-sm text-neutral-300">Enable</span>
-                        </label>
-                    </div>
-
-                    <p class="text-sm text-neutral-400 mb-4">Use your webcam and head movement to drive an on-screen cursor, from <a href="https://aadibhat09.github.io/NodCursor/" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 underline">NodCursor</a>. This uses MediaPipe from CDN.</p>
-
-                    <div>
-                        <label class="text-sm text-neutral-400">Sensitivity: <span id="head-tracking-sensitivity-label">0.45</span></label>
-                        <input type="range" id="pref-head-tracking-sensitivity" min="0.10" max="0.90" step="0.05" value="0.45" class="w-full mt-1" />
-                    </div>
-
-                    <div class="mt-4">
-                        <p class="text-sm text-neutral-300 mb-2">Calibration</p>
-                        <p class="text-xs text-neutral-500 mb-3">Capture center, left, right, up, and down while head tracking is active.</p>
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                            <button type="button" id="head-calibrate-center" class="px-2 py-1 text-xs rounded bg-neutral-700 hover:bg-neutral-600 text-white">Capture Center</button>
-                            <button type="button" id="head-calibrate-left" class="px-2 py-1 text-xs rounded bg-neutral-700 hover:bg-neutral-600 text-white">Capture Left</button>
-                            <button type="button" id="head-calibrate-right" class="px-2 py-1 text-xs rounded bg-neutral-700 hover:bg-neutral-600 text-white">Capture Right</button>
-                            <button type="button" id="head-calibrate-up" class="px-2 py-1 text-xs rounded bg-neutral-700 hover:bg-neutral-600 text-white">Capture Up</button>
-                            <button type="button" id="head-calibrate-down" class="px-2 py-1 text-xs rounded bg-neutral-700 hover:bg-neutral-600 text-white">Capture Down</button>
-                        </div>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                            <button type="button" id="head-calibration-save" class="px-3 py-1 text-sm rounded bg-cyan-600 hover:bg-cyan-700 text-white">Save Calibration</button>
-                            <button type="button" id="head-calibration-load" class="px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white">Load Calibration</button>
-                            <button type="button" id="head-calibration-reset" class="px-3 py-1 text-sm rounded bg-neutral-700 hover:bg-neutral-600 text-white">Reset Calibration</button>
-                        </div>
-                        <p id="head-calibration-status" class="text-xs text-neutral-400 mt-2"></p>
-                    </div>
-
-                    <p id="head-tracking-status" class="text-sm text-neutral-400 mt-3"></p>
-                </div>
-
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Column 1: Text (font size, font family only) -->
                     <div class="p-4 rounded-lg bg-neutral-800 border border-neutral-700">
