@@ -70,3 +70,6 @@ _notebooks/**/*_csa.md
 _notebooks/**/*_csse.md
 _notebooks/**/*_cwgu.md
 _notebooks/**/*_content.md
+
+# remove all the .scss cache files
+*.scssc
