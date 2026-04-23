@@ -1300,6 +1300,7 @@ await this.profileManager.saveIdentity(profile);
      * Update profile panel. Re-render profile panel fields with current profile data.
      */
     this.updateProfilePanel = function(profile = {}) {
+      this.createProfilePanel();
       this.profilePanelView.update({
         name: profile.name || '—',
         email: profile.email || '—',
