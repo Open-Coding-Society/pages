@@ -11,6 +11,7 @@ DATE_OF_CREATION = 2026-04-12
 PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
+NOTEBOOK_SOURCE = $(firstword $(wildcard notebook.src.ipynb teamlesson.ipynb))
 
 # Workspace root (main Makefile directory - two levels up from here)
 WORKSPACE_ROOT = ../..
@@ -28,7 +29,11 @@ DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
 # Main build target - copy notebook and call assets
 build:
 	@mkdir -p $(NOTEBOOK_DEST)
-	@cp notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true
+	@if [ -n "$(NOTEBOOK_SOURCE)" ]; then \
+		cp "$(NOTEBOOK_SOURCE)" $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
+	else \
+		echo "⚠️  No notebook source found (expected notebook.src.ipynb or teamlesson.ipynb)"; \
+	fi
 	@$(MAKE) assets
 	@echo "✅ $(PROJECT_NAME) built successfully"
 	@echo "   Source: _projects/$(PROJECT_NAME)/"
@@ -62,10 +67,14 @@ watch:
 	@echo "👀 Watching $(PROJECT_NAME) project (auto-copy on save)..."
 	@if command -v fswatch >/dev/null 2>&1; then \
 		fswatch -l 0.3 -r $(PROJECT_SRC) 2>/dev/null | while read changed_file; do \
-			if echo "$$changed_file" | grep -q "notebook.src.ipynb"; then \
+			if echo "$$changed_file" | grep -Eq "(notebook\.src\.ipynb|teamlesson\.ipynb)"; then \
 				echo "  🔄 Notebook changed - copying and converting..."; \
 				mkdir -p $(NOTEBOOK_DEST); \
-				cp $(PROJECT_SRC)/notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
+				if [ -n "$(NOTEBOOK_SOURCE)" ]; then \
+					cp "$(PROJECT_SRC)/$(NOTEBOOK_SOURCE)" $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
+				else \
+					echo "  ⚠️  No notebook source found (expected notebook.src.ipynb or teamlesson.ipynb)"; \
+				fi; \
 				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)" 2>&1; \
 			elif echo "$$changed_file" | grep -q "/levels/"; then \
 				filename=$$(basename "$$changed_file"); \
