@@ -4,7 +4,7 @@ title: Test Project Documentation
 permalink: /test-project/docs/
 ---
 
-# Test Project Documentation
+## Test Project Documentation
 
 This project serves as a test case for the `_projects` integration system.
 
