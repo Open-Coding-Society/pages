@@ -6,6 +6,8 @@ import AiChallengeNpc from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+
 
 /**
  * Generate dynamic SVG orb sprite data URI
