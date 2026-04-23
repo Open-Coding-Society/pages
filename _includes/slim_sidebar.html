@@ -445,6 +445,9 @@
       const ttsButton = document.getElementById('tts-button');
       // Ensure lessonContent is available, otherwise the TTS and Highlight features won't work
       const lessonContent = document.getElementById('lesson-content'); // IMPORTANT: This ID must match your main content div
+      const lessonStorageScope = {{ page.permalink | default: page.url | jsonify }} || window.location.pathname || 'global';
+      const userNotesStorageKey = `userNotes:${lessonStorageScope}`;
+      const lessonHighlightsStorageKey = `lessonHighlights:${lessonStorageScope}`;
 
       // --- TEXT-TO-SPEECH (TTS) ---
       ttsButton.addEventListener('mousedown', () => {
@@ -755,11 +758,11 @@
 
       // --- Local Storage Functions ---
       function saveNotes() {
-          localStorage.setItem('userNotes', JSON.stringify(notesData));
+          localStorage.setItem(userNotesStorageKey, JSON.stringify(notesData));
       }
 
       function loadNotes() {
-          const storedNotes = localStorage.getItem('userNotes');
+          const storedNotes = localStorage.getItem(userNotesStorageKey);
           if (storedNotes) {
               notesData = JSON.parse(storedNotes);
               renderNotesList();
@@ -769,11 +772,11 @@
       function saveHighlights() {
           // This saves the entire innerHTML of lessonContent after highlights are applied.
           // This is a simple approach but can have side effects if lessonContent changes outside of highlights.
-          localStorage.setItem('lessonHighlights', lessonContent.innerHTML);
+          localStorage.setItem(lessonHighlightsStorageKey, lessonContent.innerHTML);
       }
 
       function loadHighlights() {
-          const storedHighlights = localStorage.getItem('lessonHighlights');
+          const storedHighlights = localStorage.getItem(lessonHighlightsStorageKey);
           if (storedHighlights && lessonContent) {
               // Temporarily store current scroll position
               const scrollPosition = window.scrollY;
