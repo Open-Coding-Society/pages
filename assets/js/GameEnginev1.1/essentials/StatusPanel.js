@@ -20,6 +20,7 @@ class StatusPanel {
     this.element = null;
     this.fieldElements = new Map();
     this.actionElements = [];
+    this.collapsed = false;
   }
 
   getMountTarget() {
@@ -50,8 +51,8 @@ class StatusPanel {
       top: this.config.position?.top || '16px',
       left: this.config.position?.left || '16px',
       zIndex: this.config.zIndex,
-      width: this.config.width,
-      padding: this.config.padding,
+      width: this.collapsed ? 'auto' : this.config.width,
+      padding: this.collapsed ? '6px 10px' : this.config.padding,
       borderRadius: this.config.borderRadius,
       fontFamily: this.config.fontFamily,
       background: this.config.theme.background || 'var(--ocs-status-panel-background)',
@@ -67,9 +68,34 @@ class StatusPanel {
       fontWeight: 'bold',
       letterSpacing: '1px',
       marginBottom: '8px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     });
     title.textContent = this.config.title;
+    const toggleBtn = document.createElement('button');
+    toggleBtn.textContent = '−';
+    Object.assign(toggleBtn.style, {
+      background: 'transparent',
+      border: 'none',
+      color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+      fontSize: '16px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      lineHeight: '1',
+      padding: '0 2px',
+      fontFamily: this.config.fontFamily,
+      position: 'relative',
+    });
+    toggleBtn.title = 'Minimize panel';
+    toggleBtn.addEventListener('click', () => this.setCollapsed(!this.collapsed));
+    title.appendChild(toggleBtn);
+    this._toggleBtn = toggleBtn;
     panel.appendChild(title);
+    const body = document.createElement('div');
+    body.style.display = this.collapsed ? 'none' : 'block';
+    this._bodyEl = body;
+    panel.appendChild(body);
 
     this.fieldElements.clear();
 
@@ -83,14 +109,14 @@ class StatusPanel {
           letterSpacing: '1px',
         });
         section.textContent = field.title;
-        panel.appendChild(section);
+        body.appendChild(section);
         continue;
       }
 
       const row = document.createElement('div');
       row.dataset.field = field.key;
       row.textContent = `${field.label}: ${field.emptyValue || '—'}`;
-      panel.appendChild(row);
+      body.appendChild(row);
       this.fieldElements.set(field.key, row);
     }
 
@@ -159,7 +185,7 @@ class StatusPanel {
         this.actionElements.push(btn);
       }
 
-      panel.appendChild(actionsContainer);
+      body.appendChild(actionsContainer);
     }
 
     this.getMountTarget().appendChild(panel);
@@ -182,6 +208,23 @@ class StatusPanel {
 
       const value = values[field.key];
       row.textContent = `${field.label}: ${value || field.emptyValue || '—'}`;
+    }
+  }
+
+  setCollapsed(collapsed) {
+    this.collapsed = collapsed;
+    if (this._bodyEl) {
+      this._bodyEl.style.display = collapsed ? 'none' : 'block';
+    }
+    if (this.element) {
+      this.element.style.padding = collapsed ? '6px 10px' : this.config.padding;
+      this.element.style.width = collapsed ? 'auto' : this.config.width;
+      this.element.style.minWidth = collapsed ? '0' : '';
+    }
+
+    if (this._toggleBtn) {
+      this._toggleBtn.textContent = collapsed ? '+' : '−';
+      this._toggleBtn.title = collapsed ? 'Expand panel' : 'Minimize panel';
     }
   }
 

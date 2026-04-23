@@ -1,6 +1,7 @@
 _site
 *.pyc
 __pycache__/
+_config.local.yml
 _posts/**/*_IPYNB_2_.md
 _posts/**/*_GithubIssue_.md
 _posts/**/*_GithubIssue.md
@@ -69,3 +70,6 @@ _notebooks/**/*_csa.md
 _notebooks/**/*_csse.md
 _notebooks/**/*_cwgu.md
 _notebooks/**/*_content.md
+
+# remove all the .scss cache files
+*.scssc

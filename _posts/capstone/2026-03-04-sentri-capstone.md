@@ -1,4 +1,5 @@
 ---
+microblog: true
 toc: false
 title: "Sentri: The AI-Driven Recovery Ecosystem"
 permalink: /capstone/sentri/

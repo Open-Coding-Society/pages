@@ -339,10 +339,17 @@ bundle-install:
 	fi
 
 # Start Jekyll server (incremental for development, production is GitHub Actions)
+# Supports optional _config.local.yml override for local settings (e.g. baseurl)
 jekyll-serve: bundle-install
 	@touch /tmp/.notebook_watch_marker
-	@bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental > $(LOG_FILE) 2>&1 & \
-		echo "Server PID: $$!"
+	@if [ -f _config.local.yml ]; then \
+		echo "Using local config override: _config.local.yml"; \
+		bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental --config _config.yml,_config.local.yml > $(LOG_FILE) 2>&1 & \
+		echo "Server PID: $$!"; \
+	else \
+		bundle exec jekyll serve -H $(HOST) -P $(PORT) --incremental > $(LOG_FILE) 2>&1 & \
+		echo "Server PID: $$!"; \
+	fi
 	@make wait-for-server
 
 # Common server wait logic

@@ -125,14 +125,6 @@
 
 <div class="dsa-infograph">
 
-  <!-- Header Section -->
-  <div class="dsa-header">
-    <div class="dsa-badge">Capstone Pitch · Website Redesign</div>
-    <h1 class="dsa-title">A New Digital Home for the DSA</h1>
-    <p class="dsa-description">A proposal for the <strong>Deputy Sheriffs' Association of San Diego County</strong> — a modern, member-first website that turns resources, benefits, and news into a single, clear experience. Built, hosted, and ready to demo today.</p>
-    <p class="dsa-subtitle">Proposed by <strong>TheSprinters</strong> — Akhil, Neil, Moiz</p>
-  </div>
-
   <!-- Live Demo Links (Most Important - Top) -->
   <div class="dsa-demo-card">
     <div class="dsa-demo-header">
@@ -180,12 +172,16 @@
 
       <!-- Left: Image & Status -->
       <div class="dsa-visual">
-        <a href="https://dsasd.opencodingsociety.com" class="dsa-image-link" target="_blank" rel="noopener noreferrer">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dsa-image">
-          <div class="dsa-overlay">
-            <span>View on Live Site</span>
-          </div>
-        </a>
+        {% if topic.status == 'Main Feature' %}
+          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dsa-image" style="border-radius:16px;width:100%;height:auto;display:block;">
+        {% else %}
+          <a href="https://dsasd.opencodingsociety.com" class="dsa-image-link" target="_blank" rel="noopener noreferrer">
+            <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="dsa-image">
+            <div class="dsa-overlay">
+              <span>View on Live Site</span>
+            </div>
+          </a>
+        {% endif %}
         <div class="dsa-status {% if topic.status == 'Main Feature' %}dsa-status-main{% endif %}">{{ topic.status }}</div>
       </div>
 
@@ -193,15 +189,6 @@
       <div class="dsa-content">
         <h2 class="dsa-project-title">{{ topic.title }}</h2>
         <p class="dsa-subtitle">{{ topic.subtitle }}</p>
-
-        <div class="dsa-keypoints">
-          {% for point in topic.keyPoints %}
-          <div class="dsa-keypoint">
-            <span class="dsa-check">✓</span>
-            <span>{{ point }}</span>
-          </div>
-          {% endfor %}
-        </div>
 
         <div class="dsa-tech-stack">
           {% for tech in topic.tech %}
@@ -233,21 +220,18 @@
   <div class="dsa-pitch-card">
     <h2 class="dsa-section-title">Why Go With Our Redesign</h2>
     <div class="dsa-impact-list">
-      <div class="dsa-impact-item"><strong>It's already built.</strong> Not a mockup — a live, hosted site with a working backend you can click through right now.</div>
-      <div class="dsa-impact-item"><strong>Zero risk to evaluate.</strong> Deployed on our infrastructure; no commitment, no takedown pressure, no cost to try.</div>
-      <div class="dsa-impact-item"><strong>Built on industry standards.</strong> WordPress REST API, React, and WCAG 2.1 AA accessibility — maintainable by any modern web team.</div>
-      <div class="dsa-impact-item"><strong>Focused on your members.</strong> Every feature maps to a real pain point on the current site, not cosmetic changes.</div>
-      <div class="dsa-impact-item"><strong>Designed to grow with you.</strong> Dashboard tiles, FAQ categories, and news feeds can all be expanded without a re-launch.</div>
+      <div class="dsa-impact-item"><strong>It's already live.</strong> Not a mockup — a fully hosted site with a working backend you can try right now.</div>
+      <div class="dsa-impact-item"><strong>Zero commitment to evaluate.</strong> Deployed on our infrastructure with no cost or pressure to adopt.</div>
+      <div class="dsa-impact-item"><strong>Every feature solves a real problem.</strong> Built around actual pain points on dsasd.org, not cosmetic changes.</div>
     </div>
   </div>
 
-  <!-- About Current Webpage (Less Important - Bottom) -->
+  <!-- About the Organization -->
   <div class="dsa-about-org">
     <div class="dsa-about-org-grid">
       <div class="dsa-about-org-text">
-        <h2 class="dsa-about-org-title">About the Current Webpage</h2>
-        <p class="dsa-about-org-body">The <strong>Deputy Sheriffs' Association of San Diego County (DSA)</strong> is the labor union representing the officers of the San Diego Sheriff's Department — 70 years of service and over 4,229 members strong. Its website at <strong>dsasd.org</strong> is the primary digital hub for member resources, news, the DSA store, and community engagement.</p>
-        <p class="dsa-about-org-body">Today the site surfaces information through a long top navigation, a static news section, and a short accordion FAQ. Members report difficulty locating benefits, forms, and meeting minutes — especially on mobile. Our redesign keeps every existing resource but reorganizes the experience around how members actually use it.</p>
+        <h2 class="dsa-about-org-title">About the Organization</h2>
+        <p class="dsa-about-org-body">The <strong>Deputy Sheriffs' Association of San Diego County (DSA)</strong> is the labor union for the San Diego Sheriff's Department — 70 years of service and 4,229+ members strong. Our redesign keeps every existing resource but reorganizes the experience around how members actually use it.</p>
         <div class="dsa-about-org-details">
           <span class="dsa-about-org-detail">📍 13881 Danielson Street, Poway, CA 92064</span>
           <span class="dsa-about-org-detail">📞 (858) 486-9009</span>

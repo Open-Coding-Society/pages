@@ -1,0 +1,38 @@
+# Dynamic Event Calendar Capstone Infographic
+Title: "Dynamic Event Calendar"
+Description: "A system of interactive web tools for Safe Passage Heals — centralizing community events through a dynamic event calendar, and media management (blog and admin interface)."
+Topics:
+  - title: "Dynamic Event Calendar, Event/Media management, and Login System"
+    image: "capstone/sph.png"
+    link: "https://ruchikak19.github.io/flaskandfurious"
+    alt: "Dynamic Event Calendar — Interactive Community Event Management for Safe Passage Heals"
+    keyPoints:
+      - text: "Interactive calendar shows all upcoming Safe Passage Heals events in a centralized view, with important event details displayed"
+        url: "https://ruchikak19.github.io/flaskandfurious/sph/eventcalendar1/"
+      - text: "Login system allows admins to access a secure dashboard to add events, which automatically update the calendar and blog"
+        url: "https://ruchikak19.github.io/flaskandfurious/login"
+      - text: "Blog displays all upcoming events writeups based on calendar data to effectively manage media"
+        url: "https://ruchikak19.github.io/flaskandfurious/sph/blog/"
+    description: "Safe Passage Heals hosts workshops, support groups, and community events for survivors of domestic violence. Event information was previously scattered across posts and flyers. The Dynamic Event Calendar centralizes events in an interactive monthly view where users can click to see details, flyers, and registration links. Built with FullCalendar.js and a Flask + SQLite REST API backend"
+    tech:
+      - "HTML / CSS / JavaScript"
+      - "Flask Backend with a SQLITE database"
+      - "GitHub Pages Deployment"
+    impact:
+      - "Centralizes all upcoming events into one interactive calendar, eliminating the need to search multiple pages"
+      - "Allows users to view event details and register instantly with a single click"
+      - "Provides a clean, organized, and engaging browsing experience"
+      - "Enhances event visibility and encourages greater community participation for Safe Passage Heals"
+    futurePlans:
+      - "Interactive simulation where users travel through a virtual environment and learn about the process of responding to domestic violence."
+      - "Interactive user character talks/interacts with various NPCs in the simulation to be informed about the process, step by step with access to an AI chatbot for questions"
+      - "Eg. 1) Call the domestic violence hotline"
+      - "2) Explain your case to the hotline worker"
+      - "3) Get connected to local resources and support groups"
+      - "4) Attend workshops and events hosted by Safe Passage Heals to rebuild your life"
+    status: "Working Prototype"
+    team:
+      - "Ruchika Kench"
+      - "Akshara Shankar"
+      - "Avantika Chittari"
+
