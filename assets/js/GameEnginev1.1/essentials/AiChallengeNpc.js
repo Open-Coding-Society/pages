@@ -197,9 +197,12 @@ class AiChallengeNpc extends AiNpc {
    *
    * @param {Object} npc - Live NPC game object.
    */
-  static showInteraction(npc) {
+  static showInteraction(npc, options = {}) {
     const data = npc?.spriteData;
     if (!data) return;
+    const statusMessage = options?.statusMessage !== undefined
+      ? options.statusMessage
+      : 'Generating challenge question…';
 
     // Close any already-open dialogue for this NPC.
     if (npc.dialogueSystem?.isDialogueOpen()) {
@@ -248,7 +251,9 @@ class AiChallengeNpc extends AiNpc {
       AiChallengeNpc.ensureModeLabel(ui.container, 'Challenge Question');
       AiChallengeNpc.ensureJumpToLatestButton(ui.responseArea);
       AiChallengeNpc.renderChatHistory(ui.responseArea, data?.chatHistory || []);
-      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Generating challenge question…');
+      if (statusMessage) {
+        AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', statusMessage);
+      }
     }
 
     AiNpc.attachToDialogue(npc.dialogueSystem, ui.container);
@@ -321,6 +326,116 @@ class AiChallengeNpc extends AiNpc {
     }
   }
 
+  /**
+   * Restore an already-issued challenge question after the dialogue is reopened.
+   * This keeps the existing question on screen without generating a new one.
+   */
+  static restoreQuestion(npc, questionText) {
+    if (!AiNpc.isSessionActive(npc?.aiSession)) return;
+
+    const ui = AiChallengeNpc.getUiElements(npc);
+    if (!ui) return;
+
+    if (ui.input) {
+      ui.input.disabled = false;
+      ui.input.placeholder = 'Type your answer to the challenge question...';
+    }
+
+    if (ui.responseArea) {
+      ui.responseArea.style.display = 'block';
+      ui.responseArea.scrollTop = ui.responseArea.scrollHeight;
+      AiChallengeNpc.updateJumpToLatestVisibility(ui.responseArea);
+    }
+  }
+
+  /**
+   * Return the current challenge lock state stored on the live NPC object.
+   */
+  static getChallengeState(npc) {
+    return npc?._aiChallengeState || null;
+  }
+
+  /**
+   * Shared lock registry so pending questions survive object churn.
+   */
+  static getChallengeLocks() {
+    if (!AiChallengeNpc._challengeLocks) {
+      AiChallengeNpc._challengeLocks = new Map();
+    }
+    return AiChallengeNpc._challengeLocks;
+  }
+
+  /**
+   * Read the current pending challenge question for a desk, if any.
+   */
+  static getPendingChallengeQuestion(deskId = '') {
+    const key = (deskId || '').toString().trim();
+    if (!key) return '';
+    return (AiChallengeNpc.getChallengeLocks().get(key) || '').toString().trim();
+  }
+
+  /**
+   * Set or clear the pending challenge question lock for a desk.
+   */
+  static setPendingChallengeQuestion(deskId = '', questionText = '') {
+    const key = (deskId || '').toString().trim();
+    if (!key) return;
+
+    const value = (questionText || '').toString().trim();
+    const locks = AiChallengeNpc.getChallengeLocks();
+    if (!value) {
+      locks.delete(key);
+      return;
+    }
+    locks.set(key, value);
+  }
+
+  /**
+   * True when the NPC has an issued challenge question that has not been answered yet.
+   */
+  static hasPendingChallenge(npc, deskId = '') {
+    const lockedQuestion = AiChallengeNpc.getPendingChallengeQuestion(deskId);
+    if (lockedQuestion) return true;
+
+    const state = AiChallengeNpc.getChallengeState(npc);
+    if (!state?.question || state?.answeredAt) return false;
+    if (!deskId) return true;
+    return state.deskId === deskId;
+  }
+
+  /**
+   * Lock a freshly-issued challenge question on the NPC until a player submits an answer.
+   */
+  static setPendingChallenge(npc, deskId, questionText) {
+    if (!npc || !questionText) return;
+
+    AiChallengeNpc.setPendingChallengeQuestion(deskId, questionText);
+
+    npc._aiChallengeState = {
+      deskId: deskId || npc?.spriteData?.id || 'desk',
+      question: String(questionText),
+      issuedAt: Date.now(),
+      answeredAt: null,
+      lastAnswer: '',
+    };
+  }
+
+  /**
+   * Mark the current locked challenge as answered so reopening can generate a new one.
+   */
+  static markChallengeAnswered(npc, answerText = '') {
+    const state = AiChallengeNpc.getChallengeState(npc);
+    if (!npc || !state?.question || state?.answeredAt) return;
+
+    AiChallengeNpc.setPendingChallengeQuestion(state.deskId, '');
+
+    npc._aiChallengeState = {
+      ...state,
+      answeredAt: Date.now(),
+      lastAnswer: (answerText || '').toString(),
+    };
+  }
+
   // ── Answer submission ───────────────────────────────────────────────────────
 
   /**
@@ -343,6 +458,7 @@ class AiChallengeNpc extends AiNpc {
       deskId,
       question: challengeQuestion,
       startedAt: Date.now(),
+      status: 'pending',
     });
 
     ui.input.value = '';
