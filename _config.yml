@@ -21,6 +21,12 @@ owner_name: Open Coding Society
 github_username: open-coding-society 
 github_repo: "pages" 
 baseurl: "/Team-Pranigas" 
+=======
+description: "Class of 2029"
+owner_name: Pranay Kamath
+github_username: pkdev0101
+github_repo: "Team-Pranigas" 
+baseurl: "/Team-Pranigas"
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
