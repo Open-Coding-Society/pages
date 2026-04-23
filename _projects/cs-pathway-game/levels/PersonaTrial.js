@@ -246,205 +246,245 @@ export default class PersonaTrial {
   renderScene() {
     const scene = this.scenes[this.currentSceneIndex];
     if (!scene) return;
-
+  
     this.destroy();
-
+  
     const overlay = document.createElement('div');
     overlay.style.cssText = `
       position: fixed;
       inset: 0;
       z-index: 10000;
-      font-family: Georgia, 'Times New Roman', serif;
-      color: #f7f1de;
-      background:
-        linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.30) 45%, rgba(0,0,0,0.18) 100%),
-        url('${VISION_BG}') center center / cover no-repeat;
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 22px 26px 28px;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
       box-sizing: border-box;
+      background: rgba(4, 8, 20, 0.48);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      font-family: Georgia, 'Times New Roman', serif;
     `;
-
+  
     overlay.innerHTML = `
       <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:flex-start;
-        color:#e8e0c8;
-        font-size:18px;
+        position: relative;
+        width: min(980px, 92vw);
+        height: min(700px, 86vh);
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid rgba(205, 170, 92, 0.38);
+        box-shadow:
+          0 24px 70px rgba(0,0,0,0.50),
+          0 0 28px rgba(96,165,250,0.10);
+        background:
+          linear-gradient(to top, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.38) 42%, rgba(0,0,0,0.12) 100%),
+          url('${VISION_BG}') center center / cover no-repeat;
+        color: #f7f1de;
       ">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span style="color:#78b8ff;">✦</span>
-          <span style="font-size:20px;">The Persona Trial</span>
-        </div>
-
-        <div style="text-align:right;">
-          <div style="font-size:16px; margin-bottom:10px;">Progress</div>
-          <div style="display:flex; gap:10px; justify-content:flex-end;">
-            ${this.makeProgressDots(this.currentSceneIndex, this.scenes.length)}
+        <div style="
+          position: absolute;
+          top: 18px;
+          left: 22px;
+          right: 22px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          z-index: 2;
+        ">
+          <div style="display:flex; align-items:center; gap:10px; color:#e8e0c8;">
+            <span style="color:#78b8ff; font-size:20px;">✦</span>
+            <span style="font-size:22px;">The Persona Trial</span>
+          </div>
+  
+          <div style="text-align:right; color:#e8e0c8;">
+            <div style="font-size:15px; margin-bottom:8px;">Progress</div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              ${this.makeProgressDots(this.currentSceneIndex, this.scenes.length)}
+            </div>
           </div>
         </div>
-      </div>
-
-      <div style="
-        text-align:center;
-        margin-top: 8px;
-        color:#8fc0ff;
-      ">
+  
         <div style="
-          font-size:56px;
-          line-height:1;
-          letter-spacing:0.08em;
-          margin-bottom:8px;
-        ">${scene.chapter}</div>
-        <div style="
-          font-size:24px;
-          color:#b6d4ff;
-        ">${scene.title}</div>
-      </div>
-
-      <div style="
-        width:min(900px, 92%);
-        margin: 0 auto 0;
-      ">
-        <div style="
-          background: linear-gradient(180deg, rgba(3,10,25,0.88), rgba(4,11,28,0.94));
-          border: 1px solid rgba(182,140,66,0.45);
-          border-radius: 18px;
-          box-shadow: 0 16px 36px rgba(0,0,0,0.45);
-          padding: 22px 28px;
-          text-align:center;
-          margin-bottom: 18px;
+          position: absolute;
+          top: 52px;
+          left: 0;
+          width: 100%;
+          text-align: center;
+          z-index: 2;
         ">
           <div style="
-            color:#7cb8ff;
-            font-size:14px;
-            letter-spacing:0.16em;
-            text-transform:uppercase;
-            margin-bottom:12px;
-          ">The Chamber Whispers...</div>
-
+            font-size: 44px;
+            line-height: 1;
+            letter-spacing: 0.08em;
+            color: #8fc0ff;
+            margin-bottom: 6px;
+          ">
+            ${scene.chapter}
+          </div>
           <div style="
-            font-size:18px;
-            line-height:1.6;
-            color:#e9e1ce;
-            margin-bottom:10px;
-          ">${scene.narration}</div>
-
-          <div style="
-            font-size:20px;
-            line-height:1.6;
-            color:#e3aa41;
-            font-style:italic;
-            margin-bottom:14px;
-            font-weight:700;
-          ">“${scene.quote}”</div>
-
-          <div style="
-            font-size:21px;
-            color:#f4ead6;
-          ">${scene.prompt}</div>
+            font-size: 22px;
+            color: #bcd6ff;
+          ">
+            ${scene.title}
+          </div>
         </div>
-
+  
         <div style="
-          display:grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
+          position: absolute;
+          left: 22px;
+          right: 22px;
+          bottom: 20px;
+          z-index: 2;
         ">
-          ${scene.choices.map((choice, index) => `
-            <button
-              data-choice-index="${index}"
-              style="
-                display:flex;
-                align-items:center;
-                justify-content:space-between;
-                gap:16px;
-                text-align:left;
-                padding:18px 20px;
-                border-radius:16px;
-                border:1px solid ${choice.accent};
-                background: linear-gradient(180deg, rgba(8,15,32,0.92), rgba(10,18,38,0.96));
-                color:#f6eedb;
-                cursor:pointer;
-                box-shadow: 0 0 18px color-mix(in srgb, ${choice.accent} 25%, transparent);
-                font-family: Georgia, 'Times New Roman', serif;
-              "
-            >
-              <div style="
-                width:42px;
-                height:42px;
-                min-width:42px;
-                border-radius:999px;
-                border:1px solid ${choice.accent};
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                color:${choice.accent};
-                font-size:22px;
-                box-shadow: 0 0 12px color-mix(in srgb, ${choice.accent} 28%, transparent);
-              ">
-                ${choice.number}
-              </div>
-
-              <div style="
-                flex:1;
-                font-size:18px;
-                line-height:1.45;
-              ">
-                ${choice.label}
-              </div>
+          <div style="
+            background: linear-gradient(180deg, rgba(3,10,25,0.88), rgba(4,11,28,0.95));
+            border: 1px solid rgba(182,140,66,0.40);
+            border-radius: 18px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+            padding: 18px 22px;
+            margin-bottom: 14px;
+            text-align: center;
+          ">
+            <div style="
+              color:#7cb8ff;
+              font-size:13px;
+              letter-spacing:0.16em;
+              text-transform:uppercase;
+              margin-bottom:10px;
+            ">
+              The Chamber Whispers...
+            </div>
+  
+            <div style="
+              font-size:17px;
+              line-height:1.55;
+              color:#e9e1ce;
+              margin-bottom:8px;
+            ">
+              ${scene.narration}
+            </div>
+  
+            <div style="
+              font-size:19px;
+              line-height:1.5;
+              color:#e3aa41;
+              font-style:italic;
+              font-weight:700;
+              margin-bottom:10px;
+            ">
+              “${scene.quote}”
+            </div>
+  
+            <div style="
+              font-size:20px;
+              color:#f4ead6;
+            ">
+              ${scene.prompt}
+            </div>
+          </div>
+  
+          <div style="
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+          ">
+            ${scene.choices.map((choice, index) => `
+              <button
+                data-choice-index="${index}"
+                style="
+                  display:flex;
+                  align-items:center;
+                  gap:14px;
+                  text-align:left;
+                  padding:14px 16px;
+                  min-height:72px;
+                  border-radius:14px;
+                  border:1px solid ${choice.accent};
+                  background: linear-gradient(180deg, rgba(8,15,32,0.94), rgba(10,18,38,0.96));
+                  color:#f6eedb;
+                  cursor:pointer;
+                  box-shadow: 0 0 18px rgba(0,0,0,0.22);
+                  font-family: Georgia, 'Times New Roman', serif;
+                  transition: transform 0.14s ease, filter 0.14s ease, box-shadow 0.14s ease;
+                "
+              >
+                <div style="
+                  width:38px;
+                  height:38px;
+                  min-width:38px;
+                  border-radius:999px;
+                  border:1px solid ${choice.accent};
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  color:${choice.accent};
+                  font-size:18px;
+                  box-shadow: 0 0 10px rgba(0,0,0,0.18);
+                ">
+                  ${choice.number}
+                </div>
+  
+                <div style="
+                  flex:1;
+                  font-size:16px;
+                  line-height:1.35;
+                ">
+                  ${choice.label}
+                </div>
+              </button>
+            `).join('')}
+          </div>
+  
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:12px;
+          ">
+            <div style="
+              color:rgba(255,255,255,0.72);
+              font-size:14px;
+            ">
+              The chamber is reading your pattern.
+            </div>
+  
+            <button id="leave-trial-btn" style="
+              padding:10px 14px;
+              border-radius:12px;
+              border:1px solid rgba(255,255,255,0.20);
+              background: rgba(0,0,0,0.34);
+              color:#ddd6c0;
+              cursor:pointer;
+              font-family: inherit;
+              font-size:14px;
+            ">
+              Leave Chamber
             </button>
-          `).join('')}
-        </div>
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          margin-top:16px;
-        ">
-          <div style="
-            color:rgba(255,255,255,0.72);
-            font-size:15px;
-          ">
-            The chamber is reading your pattern.
           </div>
-
-          <button id="leave-trial-btn" style="
-            padding:10px 16px;
-            border-radius:12px;
-            border:1px solid rgba(255,255,255,0.20);
-            background: rgba(0,0,0,0.32);
-            color:#ddd6c0;
-            cursor:pointer;
-            font-family: inherit;
-            font-size:15px;
-          ">
-            Leave Chamber
-          </button>
         </div>
       </div>
     `;
-
+  
     document.body.appendChild(overlay);
     this.overlay = overlay;
-
+  
     overlay.querySelectorAll('[data-choice-index]').forEach((btn) => {
       btn.addEventListener('mouseenter', () => {
         btn.style.transform = 'translateY(-2px)';
         btn.style.filter = 'brightness(1.06)';
+        btn.style.boxShadow = '0 0 18px rgba(255,255,255,0.06)';
       });
-
+  
       btn.addEventListener('mouseleave', () => {
         btn.style.transform = 'translateY(0)';
         btn.style.filter = 'brightness(1)';
+        btn.style.boxShadow = '0 0 18px rgba(0,0,0,0.22)';
       });
-
+  
       btn.addEventListener('click', () => {
         const choice = scene.choices[Number(btn.dataset.choiceIndex)];
         this.applyWeights(choice.weights);
-
+  
         if (this.currentSceneIndex < this.scenes.length - 1) {
           this.currentSceneIndex += 1;
           this.renderScene();
@@ -453,7 +493,7 @@ export default class PersonaTrial {
         }
       });
     });
-
+  
     overlay.querySelector('#leave-trial-btn').addEventListener('click', () => {
       this.destroy();
       this.onClose();
@@ -464,7 +504,7 @@ export default class PersonaTrial {
     const percentages = this.getPercentages();
     const primary = this.getPrimaryPersona(percentages);
     const insights = this.getPersonaInsights(primary);
-
+  
     const result = {
       scores: { ...this.scores },
       percentages,
@@ -474,139 +514,152 @@ export default class PersonaTrial {
       growth: insights.growth,
       completedAt: new Date().toISOString(),
     };
-
+  
     this.destroy();
-
+  
     const overlay = document.createElement('div');
     overlay.style.cssText = `
       position: fixed;
       inset: 0;
       z-index: 10000;
-      font-family: Georgia, 'Times New Roman', serif;
-      color: #f7f1de;
-      background:
-        linear-gradient(to top, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0.36) 45%, rgba(0,0,0,0.22) 100%),
-        url('${VISION_BG}') center center / cover no-repeat;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: center;
       padding: 24px;
       box-sizing: border-box;
+      background: rgba(4, 8, 20, 0.48);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      font-family: Georgia, 'Times New Roman', serif;
     `;
-
+  
     overlay.innerHTML = `
       <div style="
-        width:min(920px, 94%);
-        background: linear-gradient(180deg, rgba(3,10,25,0.90), rgba(4,11,28,0.96));
-        border: 1px solid rgba(182,140,66,0.45);
-        border-radius: 18px;
-        box-shadow: 0 16px 40px rgba(0,0,0,0.50);
-        padding: 24px 28px;
+        width:min(860px, 92vw);
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid rgba(205, 170, 92, 0.38);
+        box-shadow:
+          0 24px 70px rgba(0,0,0,0.50),
+          0 0 28px rgba(96,165,250,0.10);
+        background:
+          linear-gradient(180deg, rgba(3,10,25,0.90), rgba(4,11,28,0.96)),
+          url('${VISION_BG}') center center / cover no-repeat;
+        color: #f7f1de;
       ">
         <div style="
-          color:#7cb8ff;
-          font-size:14px;
+          padding: 22px 26px;
+          border-bottom:1px solid rgba(255,255,255,0.08);
+          color:#8fc0ff;
+          font-size:13px;
           letter-spacing:0.16em;
           text-transform:uppercase;
-          margin-bottom:10px;
-        ">Persona Revealed</div>
-
-        <div style="
-          font-size:42px;
-          color:#f4ead6;
-          margin-bottom:10px;
-        ">${insights.title}</div>
-
-        <div style="
-          font-size:18px;
-          line-height:1.65;
-          color:#e9e1ce;
-          margin-bottom:12px;
-        ">${insights.summary}</div>
-
-        <div style="
-          font-size:17px;
-          line-height:1.6;
-          color:#cbd7ea;
-          margin-bottom:20px;
         ">
-          <strong style="color:#e3aa41;">Growth edge:</strong> ${insights.growth}
+          Persona Revealed
         </div>
-
-        <div style="
-          display:grid;
-          grid-template-columns: 1fr 1fr;
-          gap:12px 20px;
-          margin-bottom:20px;
-        ">
-          ${[
-            ['Technologist', percentages.technologist],
-            ['Scrummer', percentages.scrummer],
-            ['Planner', percentages.planner],
-            ['Finisher', percentages.finisher],
-          ].map(([label, value]) => `
-            <div>
-              <div style="
-                display:flex;
-                justify-content:space-between;
-                font-size:16px;
-                margin-bottom:6px;
-              ">
-                <span>${label}</span>
-                <span style="color:#8fc0ff; font-weight:700;">${value}%</span>
-              </div>
-              <div style="
-                width:100%;
-                height:10px;
-                border-radius:999px;
-                background: rgba(255,255,255,0.10);
-                overflow:hidden;
-              ">
-                <div style="
-                  width:${value}%;
-                  height:100%;
-                  background: linear-gradient(90deg, #3e8fff 0%, #8b4dff 100%);
-                  box-shadow: 0 0 12px rgba(62,143,255,0.30);
-                "></div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:16px;
-        ">
+  
+        <div style="padding: 22px 26px 24px;">
           <div style="
-            color:rgba(255,255,255,0.72);
-            font-size:14px;
-            line-height:1.5;
+            font-size:38px;
+            color:#f4ead6;
+            margin-bottom:10px;
           ">
-            This is a living snapshot, not a fixed label.
+            ${insights.title}
           </div>
-
-          <button id="accept-revelation-btn" style="
-            padding:12px 18px;
-            border:none;
-            border-radius:12px;
-            background: linear-gradient(135deg, #3e8fff 0%, #7b5cff 100%);
-            color:white;
-            cursor:pointer;
-            font-family: inherit;
-            font-size:16px;
-            box-shadow: 0 10px 22px rgba(62,143,255,0.26);
+  
+          <div style="
+            font-size:17px;
+            line-height:1.6;
+            color:#e9e1ce;
+            margin-bottom:10px;
           ">
-            Accept Revelation
-          </button>
+            ${insights.summary}
+          </div>
+  
+          <div style="
+            font-size:16px;
+            line-height:1.55;
+            color:#cbd7ea;
+            margin-bottom:18px;
+          ">
+            <strong style="color:#e3aa41;">Growth edge:</strong> ${insights.growth}
+          </div>
+  
+          <div style="
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap:12px 20px;
+            margin-bottom:18px;
+          ">
+            ${[
+              ['Technologist', percentages.technologist],
+              ['Scrummer', percentages.scrummer],
+              ['Planner', percentages.planner],
+              ['Finisher', percentages.finisher],
+            ].map(([label, value]) => `
+              <div>
+                <div style="
+                  display:flex;
+                  justify-content:space-between;
+                  font-size:15px;
+                  margin-bottom:6px;
+                ">
+                  <span>${label}</span>
+                  <span style="color:#8fc0ff; font-weight:700;">${value}%</span>
+                </div>
+                <div style="
+                  width:100%;
+                  height:10px;
+                  border-radius:999px;
+                  background: rgba(255,255,255,0.10);
+                  overflow:hidden;
+                ">
+                  <div style="
+                    width:${value}%;
+                    height:100%;
+                    background: linear-gradient(90deg, #3e8fff 0%, #8b4dff 100%);
+                    box-shadow: 0 0 12px rgba(62,143,255,0.30);
+                  "></div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+  
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:16px;
+          ">
+            <div style="
+              color:rgba(255,255,255,0.72);
+              font-size:14px;
+              line-height:1.5;
+            ">
+              This is a living snapshot, not a fixed label.
+            </div>
+  
+            <button id="accept-revelation-btn" style="
+              padding:12px 18px;
+              border:none;
+              border-radius:12px;
+              background: linear-gradient(135deg, #3e8fff 0%, #7b5cff 100%);
+              color:white;
+              cursor:pointer;
+              font-family: inherit;
+              font-size:15px;
+              box-shadow: 0 10px 22px rgba(62,143,255,0.26);
+            ">
+              Accept Revelation
+            </button>
+          </div>
         </div>
       </div>
     `;
-
+  
     document.body.appendChild(overlay);
     this.overlay = overlay;
-
+  
     overlay.querySelector('#accept-revelation-btn').addEventListener('click', () => {
       this.destroy();
       this.onComplete(result);
