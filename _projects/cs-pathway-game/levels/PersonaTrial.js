@@ -1,9 +1,10 @@
+const VISION_BG = '/images/vision-doors.png';
+
 export default class PersonaTrial {
   constructor({ onComplete, onClose } = {}) {
     this.onComplete = onComplete || (() => {});
     this.onClose = onClose || (() => {});
     this.overlay = null;
-    this.card = null;
     this.currentSceneIndex = 0;
 
     this.scores = {
@@ -15,97 +16,141 @@ export default class PersonaTrial {
 
     this.scenes = [
       {
-        chapter: 'Vision I',
+        chapter: 'VISION I',
         title: 'The Chamber of First Light',
-        text:
-          'As you step through the gateway, the forest fades behind you. The air turns still. Lanternlight drifts across stone walls, and a voice echoes from somewhere unseen: “Every builder carries a different instinct. Let yours speak.”',
+        narration:
+          'As you step through the gateway, the past fades behind you. The air turns still. Lanterns light across stone walls, and a voice echoes from somewhere unseen:',
+        quote:
+          'Every builder carries a different instinct. Let yours speak.',
+        prompt: 'Where does your instinct lead you first?',
         choices: [
           {
-            text: 'Step toward the brightest corridor, drawn by challenge itself.',
+            label: 'Step toward the brightest corridor, drawn by challenge itself.',
+            number: '1',
+            accent: '#d6a23a',
             weights: { technologist: 2, planner: 1 },
           },
           {
-            text: 'Pause and listen for the footsteps of others before moving.',
+            label: 'Pause and listen for the footsteps of others before moving.',
+            number: '2',
+            accent: '#2d8cff',
             weights: { scrummer: 2, finisher: 1 },
           },
           {
-            text: 'Study the room and search for the shape of the path first.',
+            label: 'Study the room and search for the shape of the path first.',
+            number: '3',
+            accent: '#8b4dff',
             weights: { planner: 3 },
           },
           {
-            text: 'Choose the clearest route and commit to reaching its end.',
+            label: 'Choose the clearest route and commit to reaching its end.',
+            number: '4',
+            accent: '#73b84a',
             weights: { finisher: 3 },
           },
         ],
       },
       {
-        chapter: 'Vision II',
+        chapter: 'VISION II',
         title: 'The Fractured Build',
-        text:
-          'A vision forms before you. It is the night before a great showcase. Your team’s project trembles at the edge of failure. One feature flickers. One teammate panics. Another falls silent. The clock grows louder.',
+        narration:
+          'A new vision rises. It is the night before a showcase. The project trembles at the edge of failure. One feature flickers. One teammate panics. Another falls silent.',
+        quote:
+          'When time narrows, instinct becomes visible.',
+        prompt: 'How do you move when the work begins to fracture?',
         choices: [
           {
-            text: 'Take hold of the hardest technical flaw and begin solving it at once.',
+            label: 'Take hold of the hardest technical flaw and begin solving it at once.',
+            number: '1',
+            accent: '#d6a23a',
             weights: { technologist: 3, finisher: 1 },
           },
           {
-            text: 'Gather the group, steady their energy, and move everyone into sync.',
+            label: 'Gather the group, steady their energy, and move everyone into sync.',
+            number: '2',
+            accent: '#2d8cff',
             weights: { scrummer: 3, planner: 1 },
           },
           {
-            text: 'Cut through the chaos, rebuild the plan, and assign the next steps.',
+            label: 'Cut through the chaos, rebuild the plan, and assign the next steps.',
+            number: '3',
+            accent: '#8b4dff',
             weights: { planner: 3, finisher: 1 },
           },
           {
-            text: 'Carry one crucial piece fully across the line so something survives intact.',
+            label: 'Carry one crucial piece fully across the line so something survives intact.',
+            number: '4',
+            accent: '#73b84a',
             weights: { finisher: 3, planner: 1 },
           },
         ],
       },
       {
-        chapter: 'Vision III',
+        chapter: 'VISION III',
         title: 'The Unwritten Path',
-        text:
-          'The chamber shifts again. Now you face a challenge with no instructions, no example, and no map. Only possibility. The path ahead is open, but uncertain.',
+        narration:
+          'The chamber shifts again. Now you face a path with no instructions, no example, and no map. Only possibility.',
+        quote:
+          'What you choose without certainty reveals more than what you choose with guidance.',
+        prompt: 'Which path calls to you when nothing is defined?',
         choices: [
           {
-            text: 'Push toward the boldest technical solution and discover what is possible.',
+            label: 'Push toward the boldest technical solution and discover what is possible.',
+            number: '1',
+            accent: '#d6a23a',
             weights: { technologist: 3 },
           },
           {
-            text: 'Turn first to the others around you and shape the path together.',
+            label: 'Turn first to the others around you and shape the path together.',
+            number: '2',
+            accent: '#2d8cff',
             weights: { scrummer: 3, planner: 1 },
           },
           {
-            text: 'Break the unknown into milestones, tasks, and a path that can be followed.',
+            label: 'Break the unknown into milestones, tasks, and a path that can be followed.',
+            number: '3',
+            accent: '#8b4dff',
             weights: { planner: 3, finisher: 1 },
           },
           {
-            text: 'Search for clarity before committing, so your effort lands in the right place.',
+            label: 'Search for clarity before committing, so your effort lands in the right place.',
+            number: '4',
+            accent: '#73b84a',
             weights: { finisher: 3, planner: 1 },
           },
         ],
       },
       {
-        chapter: 'Vision IV',
+        chapter: 'VISION IV',
         title: 'The Final Passage',
-        text:
-          'One last vision rises. Voices clash. Progress has stalled. The project still can be saved, but only if someone chooses how to move forward when the way is no longer obvious.',
+        narration:
+          'One last vision rises. Voices clash. Progress has stalled. The project can still be saved, but only if someone chooses how to move forward when the way is no longer obvious.',
+        quote:
+          'Your pattern has always been there. Now the chamber asks you to see it.',
+        prompt: 'What do you do when the team stands at the edge of uncertainty?',
         choices: [
           {
-            text: 'Take the implementation into your own hands and push progress forward.',
+            label: 'Take the implementation into your own hands and push progress forward.',
+            number: '1',
+            accent: '#d6a23a',
             weights: { technologist: 2, finisher: 1 },
           },
           {
-            text: 'Guide the voices into alignment until the team can move as one.',
+            label: 'Guide the voices into alignment until the team can move as one.',
+            number: '2',
+            accent: '#2d8cff',
             weights: { scrummer: 3, planner: 1 },
           },
           {
-            text: 'Define the roles, the order, and the next concrete actions.',
+            label: 'Define the roles, the order, and the next concrete actions.',
+            number: '3',
+            accent: '#8b4dff',
             weights: { planner: 3, finisher: 1 },
           },
           {
-            text: 'Secure your part completely so at least one piece is unquestionably done.',
+            label: 'Secure your part completely so at least one piece is unquestionably done.',
+            number: '4',
+            accent: '#73b84a',
             weights: { finisher: 3 },
           },
         ],
@@ -114,7 +159,7 @@ export default class PersonaTrial {
   }
 
   start() {
-    this.renderIntro();
+    this.renderScene();
   }
 
   destroy() {
@@ -122,181 +167,6 @@ export default class PersonaTrial {
       this.overlay.parentNode.removeChild(this.overlay);
     }
     this.overlay = null;
-    this.card = null;
-  }
-
-  ensureOverlay() {
-    if (this.overlay) return;
-
-    this.overlay = document.createElement('div');
-    this.overlay.style.cssText = `
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background:
-        radial-gradient(circle at 50% 20%, rgba(56,189,248,0.10), transparent 24%),
-        radial-gradient(circle at 20% 80%, rgba(168,85,247,0.08), transparent 24%),
-        radial-gradient(circle at 80% 30%, rgba(250,204,21,0.06), transparent 20%),
-        rgba(4, 8, 20, 0.50);
-      backdrop-filter: blur(4px) brightness(0.84);
-      -webkit-backdrop-filter: blur(4px) brightness(0.84);
-      box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.36);
-      font-family: system-ui, sans-serif;
-    `;
-
-    this.card = document.createElement('div');
-    this.card.style.cssText = `
-      width: min(680px, 92%);
-      max-height: 78vh;
-      overflow-y: auto;
-      border-radius: 18px;
-      color: #f8fafc;
-      background: linear-gradient(180deg, rgba(14,22,40,0.86) 0%, rgba(8,13,28,0.88) 100%);
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow:
-        0 18px 46px rgba(0,0,0,0.42),
-        0 0 34px rgba(96,165,250,0.08);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    `;
-
-    this.overlay.appendChild(this.card);
-    document.body.appendChild(this.overlay);
-  }
-
-  clearCard() {
-    this.ensureOverlay();
-    this.card.innerHTML = '';
-  }
-
-  makeTopBar(leftText, rightText) {
-    const top = document.createElement('div');
-    top.style.cssText = `
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap: 10px;
-      padding:12px 16px;
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    `;
-
-    const left = document.createElement('div');
-    left.textContent = leftText;
-    left.style.cssText = `
-      color:#93c5fd;
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:0.10em;
-      text-transform:uppercase;
-    `;
-
-    const right = document.createElement('div');
-    right.textContent = rightText;
-    right.style.cssText = `
-      color:#94a3b8;
-      font-size:12px;
-    `;
-
-    top.append(left, right);
-    return top;
-  }
-
-  makeShell() {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = `
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-      padding: 14px 16px 12px 16px;
-    `;
-
-    const left = document.createElement('div');
-    left.style.cssText = `
-      padding: 0;
-    `;
-
-    const right = document.createElement('div');
-    right.style.cssText = `
-      padding: 0;
-    `;
-
-    wrap.append(left, right);
-    return { wrap, left, right };
-  }
-
-  makeFooter(leftNode, rightNode) {
-    const footer = document.createElement('div');
-    footer.style.cssText = `
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      padding:12px 16px;
-      border-top:1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.02);
-    `;
-
-    if (leftNode) footer.appendChild(leftNode);
-    if (rightNode) footer.appendChild(rightNode);
-    return footer;
-  }
-
-  makeButton(label, onClick, variant = 'primary') {
-    const btn = document.createElement('button');
-    btn.textContent = label;
-
-    const styles = {
-      primary: `
-        background: linear-gradient(135deg, #60a5fa 0%, #8b5cf6 100%);
-        color: #ffffff;
-        border: none;
-        box-shadow: 0 10px 24px rgba(96,165,250,0.16);
-      `,
-      secondary: `
-        background: rgba(255,255,255,0.03);
-        color: #cbd5e1;
-        border: 1px solid rgba(255,255,255,0.14);
-      `,
-      choice: `
-        width:100%;
-        text-align:left;
-        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-        color:#f8fafc;
-        border:1px solid rgba(255,255,255,0.10);
-      `,
-    };
-
-    btn.style.cssText = `
-      padding: 12px 14px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-size: 14px;
-      line-height: 1.35;
-      transition: transform 0.14s ease, opacity 0.14s ease, border-color 0.14s ease;
-      ${styles[variant]}
-    `;
-
-    btn.onmouseenter = () => {
-      btn.style.transform = 'translateY(-1px)';
-      btn.style.opacity = '0.98';
-      btn.style.borderColor = 'rgba(147,197,253,0.42)';
-    };
-
-    btn.onmouseleave = () => {
-      btn.style.transform = 'translateY(0)';
-      btn.style.opacity = '1';
-      if (variant === 'choice') {
-        btn.style.borderColor = 'rgba(255,255,255,0.10)';
-      }
-    };
-
-    btn.onclick = onClick;
-    return btn;
   }
 
   applyWeights(weights = {}) {
@@ -356,197 +226,223 @@ export default class PersonaTrial {
     return map[primary];
   }
 
-  makeBar(label, percent) {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = `margin-bottom:12px;`;
-
-    const top = document.createElement('div');
-    top.style.cssText = `
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:6px;
-      color:#e2e8f0;
-      font-size:14px;
-    `;
-
-    const left = document.createElement('span');
-    left.textContent = label;
-
-    const right = document.createElement('span');
-    right.textContent = `${percent}%`;
-    right.style.cssText = `color:#bfdbfe; font-weight:700;`;
-
-    top.append(left, right);
-
-    const track = document.createElement('div');
-    track.style.cssText = `
-      width:100%;
-      height:10px;
-      border-radius:999px;
-      background: rgba(255,255,255,0.08);
-      overflow:hidden;
-    `;
-
-    const fill = document.createElement('div');
-    fill.style.cssText = `
-      width:${percent}%;
-      height:100%;
-      border-radius:999px;
-      background: linear-gradient(90deg, #60a5fa 0%, #8b5cf6 100%);
-      box-shadow: 0 0 16px rgba(96,165,250,0.16);
-    `;
-
-    track.appendChild(fill);
-    wrap.append(top, track);
-    return wrap;
-  }
-
-  renderIntro() {
-    this.clearCard();
-
-    this.card.appendChild(this.makeTopBar('Persona Enrichment Gateway', 'Threshold'));
-
-    const { wrap, left, right } = this.makeShell();
-
-    const orb = document.createElement('div');
-    orb.style.cssText = `
-      width: 64px;
-      height: 64px;
-      border-radius: 999px;
-      margin-bottom: 14px;
-      background: radial-gradient(circle, rgba(147,197,253,0.95) 0%, rgba(96,165,250,0.50) 36%, rgba(168,85,247,0.28) 56%, rgba(0,0,0,0) 74%);
-      box-shadow: 0 0 34px rgba(96,165,250,0.20);
-    `;
-
-    const title = document.createElement('h2');
-    title.textContent = 'The Chamber of Persona';
-    title.style.cssText = `
-      margin:0 0 10px 0;
-      font-size: 30px;
-      line-height:1.05;
-      letter-spacing:-0.02em;
-    `;
-
-    const text = document.createElement('p');
-    text.textContent =
-      'Beyond this threshold, your instincts will be reflected back to you through a sequence of living visions. There are no correct answers here—only the shape of the path that feels most like yours.';
-    text.style.cssText = `
-      margin:0;
-      color:#cbd5e1;
-      line-height:1.6;
-      font-size:15px;
-    `;
-
-    left.append(orb, title, text);
-
-    const panel = document.createElement('div');
-    panel.style.cssText = `
-      padding:16px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-    `;
-
-    const panelLabel = document.createElement('div');
-    panelLabel.textContent = 'What the gateway will reveal';
-    panelLabel.style.cssText = `
-      margin-bottom:10px;
-      color:#93c5fd;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:0.10em;
-      font-weight:700;
-    `;
-
-    const panelText = document.createElement('p');
-    panelText.textContent =
-      'You will walk through moments shaped by uncertainty, teamwork, pressure, and choice. At the end, the gateway will reveal your current persona as a living balance, not a fixed label.';
-    panelText.style.cssText = `
-      margin:0 0 14px 0;
-      color:#e2e8f0;
-      line-height:1.55;
-      font-size:14px;
-    `;
-
-    const beginBtn = this.makeButton('Step Into the Vision', () => {
-      this.currentSceneIndex = 0;
-      this.renderScene();
-    }, 'primary');
-
-    const leaveBtn = this.makeButton('Turn Back', () => {
-      this.destroy();
-      this.onClose();
-    }, 'secondary');
-
-    const actionWrap = document.createElement('div');
-    actionWrap.style.cssText = `display:grid; gap:10px;`;
-    actionWrap.append(beginBtn, leaveBtn);
-
-    panel.append(panelLabel, panelText, actionWrap);
-    right.appendChild(panel);
-
-    const leftFooter = document.createElement('div');
-    leftFooter.textContent = 'The chamber responds to instinct, not performance.';
-    leftFooter.style.cssText = `color:#94a3b8; font-size:13px;`;
-
-    this.card.append(wrap, this.makeFooter(leftFooter, null));
+  makeProgressDots(current, total) {
+    return Array.from({ length: total }).map((_, i) => {
+      const active = i === current;
+      return `
+        <span style="
+          width: 12px;
+          height: 12px;
+          border-radius: 999px;
+          display: inline-block;
+          border: 1px solid rgba(255,255,255,0.45);
+          background: ${active ? '#d6a23a' : 'transparent'};
+          box-shadow: ${active ? '0 0 10px rgba(214,162,58,0.45)' : 'none'};
+        "></span>
+      `;
+    }).join('');
   }
 
   renderScene() {
     const scene = this.scenes[this.currentSceneIndex];
-    this.clearCard();
+    if (!scene) return;
 
-    this.card.appendChild(
-      this.makeTopBar(scene.chapter, `Vision ${this.currentSceneIndex + 1} of ${this.scenes.length}`)
-    );
+    this.destroy();
 
-    const { wrap, left, right } = this.makeShell();
-
-    const title = document.createElement('h2');
-    title.textContent = scene.title;
-    title.style.cssText = `
-      margin:0 0 10px 0;
-      font-size:28px;
-      line-height:1.08;
-      letter-spacing:-0.02em;
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #f7f1de;
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.30) 45%, rgba(0,0,0,0.18) 100%),
+        url('${VISION_BG}') center center / cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px 26px 28px;
+      box-sizing: border-box;
     `;
 
-    const text = document.createElement('p');
-    text.textContent = scene.text;
-    text.style.cssText = `
-      margin:0;
-      color:#dbeafe;
-      line-height:1.6;
-      font-size:15px;
+    overlay.innerHTML = `
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        color:#e8e0c8;
+        font-size:18px;
+      ">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="color:#78b8ff;">✦</span>
+          <span style="font-size:20px;">The Persona Trial</span>
+        </div>
+
+        <div style="text-align:right;">
+          <div style="font-size:16px; margin-bottom:10px;">Progress</div>
+          <div style="display:flex; gap:10px; justify-content:flex-end;">
+            ${this.makeProgressDots(this.currentSceneIndex, this.scenes.length)}
+          </div>
+        </div>
+      </div>
+
+      <div style="
+        text-align:center;
+        margin-top: 8px;
+        color:#8fc0ff;
+      ">
+        <div style="
+          font-size:56px;
+          line-height:1;
+          letter-spacing:0.08em;
+          margin-bottom:8px;
+        ">${scene.chapter}</div>
+        <div style="
+          font-size:24px;
+          color:#b6d4ff;
+        ">${scene.title}</div>
+      </div>
+
+      <div style="
+        width:min(900px, 92%);
+        margin: 0 auto 0;
+      ">
+        <div style="
+          background: linear-gradient(180deg, rgba(3,10,25,0.88), rgba(4,11,28,0.94));
+          border: 1px solid rgba(182,140,66,0.45);
+          border-radius: 18px;
+          box-shadow: 0 16px 36px rgba(0,0,0,0.45);
+          padding: 22px 28px;
+          text-align:center;
+          margin-bottom: 18px;
+        ">
+          <div style="
+            color:#7cb8ff;
+            font-size:14px;
+            letter-spacing:0.16em;
+            text-transform:uppercase;
+            margin-bottom:12px;
+          ">The Chamber Whispers...</div>
+
+          <div style="
+            font-size:18px;
+            line-height:1.6;
+            color:#e9e1ce;
+            margin-bottom:10px;
+          ">${scene.narration}</div>
+
+          <div style="
+            font-size:20px;
+            line-height:1.6;
+            color:#e3aa41;
+            font-style:italic;
+            margin-bottom:14px;
+            font-weight:700;
+          ">“${scene.quote}”</div>
+
+          <div style="
+            font-size:21px;
+            color:#f4ead6;
+          ">${scene.prompt}</div>
+        </div>
+
+        <div style="
+          display:grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        ">
+          ${scene.choices.map((choice, index) => `
+            <button
+              data-choice-index="${index}"
+              style="
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:16px;
+                text-align:left;
+                padding:18px 20px;
+                border-radius:16px;
+                border:1px solid ${choice.accent};
+                background: linear-gradient(180deg, rgba(8,15,32,0.92), rgba(10,18,38,0.96));
+                color:#f6eedb;
+                cursor:pointer;
+                box-shadow: 0 0 18px color-mix(in srgb, ${choice.accent} 25%, transparent);
+                font-family: Georgia, 'Times New Roman', serif;
+              "
+            >
+              <div style="
+                width:42px;
+                height:42px;
+                min-width:42px;
+                border-radius:999px;
+                border:1px solid ${choice.accent};
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                color:${choice.accent};
+                font-size:22px;
+                box-shadow: 0 0 12px color-mix(in srgb, ${choice.accent} 28%, transparent);
+              ">
+                ${choice.number}
+              </div>
+
+              <div style="
+                flex:1;
+                font-size:18px;
+                line-height:1.45;
+              ">
+                ${choice.label}
+              </div>
+            </button>
+          `).join('')}
+        </div>
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          margin-top:16px;
+        ">
+          <div style="
+            color:rgba(255,255,255,0.72);
+            font-size:15px;
+          ">
+            The chamber is reading your pattern.
+          </div>
+
+          <button id="leave-trial-btn" style="
+            padding:10px 16px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.20);
+            background: rgba(0,0,0,0.32);
+            color:#ddd6c0;
+            cursor:pointer;
+            font-family: inherit;
+            font-size:15px;
+          ">
+            Leave Chamber
+          </button>
+        </div>
+      </div>
     `;
 
-    const hint = document.createElement('div');
-    hint.textContent = 'Choose the response that feels most natural in this moment.';
-    hint.style.cssText = `
-      margin-top:12px;
-      color:#94a3b8;
-      font-size:13px;
-    `;
+    document.body.appendChild(overlay);
+    this.overlay = overlay;
 
-    left.append(title, text, hint);
+    overlay.querySelectorAll('[data-choice-index]').forEach((btn) => {
+      btn.addEventListener('mouseenter', () => {
+        btn.style.transform = 'translateY(-2px)';
+        btn.style.filter = 'brightness(1.06)';
+      });
 
-    const label = document.createElement('div');
-    label.textContent = 'How do you answer the vision?';
-    label.style.cssText = `
-      margin-bottom:10px;
-      color:#93c5fd;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:0.10em;
-      font-weight:700;
-    `;
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translateY(0)';
+        btn.style.filter = 'brightness(1)';
+      });
 
-    const choices = document.createElement('div');
-    choices.style.cssText = `display:grid; gap:10px;`;
-
-    scene.choices.forEach((choice) => {
-      const btn = this.makeButton(choice.text, () => {
+      btn.addEventListener('click', () => {
+        const choice = scene.choices[Number(btn.dataset.choiceIndex)];
         this.applyWeights(choice.weights);
 
         if (this.currentSceneIndex < this.scenes.length - 1) {
@@ -555,23 +451,13 @@ export default class PersonaTrial {
         } else {
           this.renderResults();
         }
-      }, 'choice');
-
-      choices.appendChild(btn);
+      });
     });
 
-    right.append(label, choices);
-
-    const footerLeft = document.createElement('div');
-    footerLeft.textContent = 'The gateway is reading your pattern.';
-    footerLeft.style.cssText = `color:#94a3b8; font-size:13px;`;
-
-    const footerRight = this.makeButton('Leave Chamber', () => {
+    overlay.querySelector('#leave-trial-btn').addEventListener('click', () => {
       this.destroy();
       this.onClose();
-    }, 'secondary');
-
-    this.card.append(wrap, this.makeFooter(footerLeft, footerRight));
+    });
   }
 
   renderResults() {
@@ -589,101 +475,141 @@ export default class PersonaTrial {
       completedAt: new Date().toISOString(),
     };
 
-    this.clearCard();
+    this.destroy();
 
-    this.card.appendChild(this.makeTopBar('Persona Revealed', 'Revelation'));
-
-    const { wrap, left, right } = this.makeShell();
-
-    const label = document.createElement('div');
-    label.textContent = 'The chamber reveals your current path as...';
-    label.style.cssText = `
-      margin-bottom:8px;
-      color:#93c5fd;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:0.10em;
-      font-weight:700;
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #f7f1de;
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0.36) 45%, rgba(0,0,0,0.22) 100%),
+        url('${VISION_BG}') center center / cover no-repeat;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
     `;
 
-    const title = document.createElement('h2');
-    title.textContent = insights.title;
-    title.style.cssText = `
-      margin:0 0 10px 0;
-      font-size:32px;
-      line-height:1.05;
-      letter-spacing:-0.02em;
+    overlay.innerHTML = `
+      <div style="
+        width:min(920px, 94%);
+        background: linear-gradient(180deg, rgba(3,10,25,0.90), rgba(4,11,28,0.96));
+        border: 1px solid rgba(182,140,66,0.45);
+        border-radius: 18px;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.50);
+        padding: 24px 28px;
+      ">
+        <div style="
+          color:#7cb8ff;
+          font-size:14px;
+          letter-spacing:0.16em;
+          text-transform:uppercase;
+          margin-bottom:10px;
+        ">Persona Revealed</div>
+
+        <div style="
+          font-size:42px;
+          color:#f4ead6;
+          margin-bottom:10px;
+        ">${insights.title}</div>
+
+        <div style="
+          font-size:18px;
+          line-height:1.65;
+          color:#e9e1ce;
+          margin-bottom:12px;
+        ">${insights.summary}</div>
+
+        <div style="
+          font-size:17px;
+          line-height:1.6;
+          color:#cbd7ea;
+          margin-bottom:20px;
+        ">
+          <strong style="color:#e3aa41;">Growth edge:</strong> ${insights.growth}
+        </div>
+
+        <div style="
+          display:grid;
+          grid-template-columns: 1fr 1fr;
+          gap:12px 20px;
+          margin-bottom:20px;
+        ">
+          ${[
+            ['Technologist', percentages.technologist],
+            ['Scrummer', percentages.scrummer],
+            ['Planner', percentages.planner],
+            ['Finisher', percentages.finisher],
+          ].map(([label, value]) => `
+            <div>
+              <div style="
+                display:flex;
+                justify-content:space-between;
+                font-size:16px;
+                margin-bottom:6px;
+              ">
+                <span>${label}</span>
+                <span style="color:#8fc0ff; font-weight:700;">${value}%</span>
+              </div>
+              <div style="
+                width:100%;
+                height:10px;
+                border-radius:999px;
+                background: rgba(255,255,255,0.10);
+                overflow:hidden;
+              ">
+                <div style="
+                  width:${value}%;
+                  height:100%;
+                  background: linear-gradient(90deg, #3e8fff 0%, #8b4dff 100%);
+                  box-shadow: 0 0 12px rgba(62,143,255,0.30);
+                "></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:16px;
+        ">
+          <div style="
+            color:rgba(255,255,255,0.72);
+            font-size:14px;
+            line-height:1.5;
+          ">
+            This is a living snapshot, not a fixed label.
+          </div>
+
+          <button id="accept-revelation-btn" style="
+            padding:12px 18px;
+            border:none;
+            border-radius:12px;
+            background: linear-gradient(135deg, #3e8fff 0%, #7b5cff 100%);
+            color:white;
+            cursor:pointer;
+            font-family: inherit;
+            font-size:16px;
+            box-shadow: 0 10px 22px rgba(62,143,255,0.26);
+          ">
+            Accept Revelation
+          </button>
+        </div>
+      </div>
     `;
 
-    const summary = document.createElement('p');
-    summary.textContent = insights.summary;
-    summary.style.cssText = `
-      margin:0 0 10px 0;
-      color:#e2e8f0;
-      line-height:1.6;
-      font-size:15px;
-    `;
+    document.body.appendChild(overlay);
+    this.overlay = overlay;
 
-    const growth = document.createElement('p');
-    growth.textContent = `Growth edge: ${insights.growth}`;
-    growth.style.cssText = `
-      margin:0;
-      color:#cbd5e1;
-      line-height:1.6;
-      font-size:14px;
-    `;
-
-    left.append(label, title, summary, growth);
-
-    const panel = document.createElement('div');
-    panel.style.cssText = `
-      padding:16px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-    `;
-
-    const panelTitle = document.createElement('div');
-    panelTitle.textContent = 'Current persona balance';
-    panelTitle.style.cssText = `
-      margin-bottom:12px;
-      color:#93c5fd;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:0.10em;
-      font-weight:700;
-    `;
-
-    panel.append(
-      panelTitle,
-      this.makeBar('Technologist', percentages.technologist),
-      this.makeBar('Scrummer', percentages.scrummer),
-      this.makeBar('Planner', percentages.planner),
-      this.makeBar('Finisher', percentages.finisher),
-    );
-
-    const note = document.createElement('p');
-    note.textContent =
-      'This is a living snapshot, not a permanent label. As your choices change, the balance of your persona can shift with them.';
-    note.style.cssText = `
-      margin:12px 0 0 0;
-      color:#94a3b8;
-      line-height:1.55;
-      font-size:13px;
-    `;
-
-    panel.appendChild(note);
-    right.appendChild(panel);
-
-    const footerLeft = document.createElement('div');
-    footerLeft.textContent = 'Your path continues beyond this chamber.';
-    footerLeft.style.cssText = `color:#94a3b8; font-size:13px;`;
-
-    const footerRight = this.makeButton('Accept Revelation', () => {
+    overlay.querySelector('#accept-revelation-btn').addEventListener('click', () => {
       this.destroy();
       this.onComplete(result);
-    }, 'primary');
-
-    this.card.append(wrap, this.makeFooter(footerLeft, footerRight));
+    });
   }
 }
