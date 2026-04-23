@@ -7,7 +7,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelDoors from '/assets/js/projects/gamify/levels/GameLevelDoors.js';
+import GameLevelDoors from '/assets/js/projects/escape-game/levels/GameLevelDoors.js';
 import Coin from '/assets/js/GameEnginev1.1/Coin.js';
 import Barrier from '/assets/js/GameEnginev1.1/essentials/Barrier.js';
 
@@ -25,7 +25,7 @@ class GameLevelMazeSub {
     const image_data_cave = {
       name: 'maze',
       greeting: "The walls close in around you...",
-      src: "/projects/escape-game/images/dungeon.png",
+      src: "/images/projects/escape-game/dungeon.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -34,7 +34,7 @@ class GameLevelMazeSub {
     const sprite_data_octopus = {
       id: 'Octopus',
       greeting: "I must find my way through...",
-      src: "/projects/escape-game/images/octopus.png",
+      src: "/images/projects/escape-game/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -83,7 +83,7 @@ class GameLevelMazeSub {
     const sprite_data_shadow = {
       id: 'Whispering Shadow',
       greeting: sprite_greet_shadow,
-      src: "/projects/escape-game/images/tux.png",
+      src: "/images/projects/escape-game/tux.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 256, width: 352 },
@@ -115,7 +115,7 @@ class GameLevelMazeSub {
     const sprite_data_lantern = {
       id: 'Lantern Keeper',
       greeting: sprite_greet_lantern,
-      src: "/projects/escape-game/images/octocat.png",
+      src: "/images/projects/escape-game/octocat.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 301, width: 801 },
@@ -147,7 +147,7 @@ class GameLevelMazeSub {
     const sprite_data_warden = {
       id: 'Exit Warden',
       greeting: sprite_greet_warden,
-      src: "/projects/escape-game/images/robot.png",
+      src: "/images/projects/escape-game/robot.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 100,
       pixels: { height: 316, width: 627 },

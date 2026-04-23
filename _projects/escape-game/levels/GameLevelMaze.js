@@ -7,7 +7,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelMazeSub from '/assets/js/projects/gamify/levels/GameLevelMazeSub.js';
+import GameLevelMazeSub from '/assets/js/projects/escape-game/levels/GameLevelMazeSub.js';
 
 class GameLevelMaze {
   constructor(gameEnv) {
@@ -23,7 +23,7 @@ class GameLevelMaze {
     const image_data_cave = {
       name: 'cave',
       greeting: "A dark entrance looms before you. The maze lies within.",
-      src: "/projects/escape-game/images/dungeon.png",
+      src: "/images/projects/escape-game/dungeon.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -32,7 +32,7 @@ class GameLevelMaze {
     const sprite_data_octopus = {
       id: 'Octopus',
       greeting: "Something about this place feels wrong...",
-      src: "/projects/escape-game/images/octopus.png",
+      src: "/images/projects/escape-game/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -57,7 +57,7 @@ class GameLevelMaze {
     const sprite_data_gate = {
       id: 'Gate Keeper',
       greeting: sprite_greet_gate,
-      src: "/projects/escape-game/images/robot.png",
+      src: "/images/projects/escape-game/robot.png",
       SCALE_FACTOR: 8,
       ANIMATION_RATE: 100,
       pixels: { height: 316, width: 627 },

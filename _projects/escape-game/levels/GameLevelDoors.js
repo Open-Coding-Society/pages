@@ -5,7 +5,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelForest from '/assets/js/projects/gamify/levels/GameLevelForest.js';
+import GameLevelForest from '/assets/js/projects/escape-game/levels/GameLevelForest.js';
 import Coin from '/assets/js/GameEnginev1.1/Coin.js';
 
 class GameLevelDoors {

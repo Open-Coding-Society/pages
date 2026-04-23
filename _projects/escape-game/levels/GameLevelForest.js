@@ -6,7 +6,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelForestSub from '/assets/js/projects/gamify/levels/GameLevelForestSub.js';
+import GameLevelForestSub from '/assets/js/projects/escape-game/levels/GameLevelForestSub.js';
 import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
 
 class GameLevelForest {
@@ -23,7 +23,7 @@ class GameLevelForest {
     const image_data_forest = {
       name: 'forest',
       greeting: "You step into the Whispering Forest. Something watches from the dark...",
-      src: "/projects/escape-game/images/forest.png",
+      src: "/images/projects/escape-game/forest.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -32,7 +32,7 @@ class GameLevelForest {
     const sprite_data_octopus = {
       id: 'Octopus',
       greeting: "I can feel eyes on me...",
-      src: "/projects/escape-game/images/octopus.png",
+      src: "/images/projects/escape-game/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -57,7 +57,7 @@ class GameLevelForest {
     const sprite_data_wraith = {
       id: 'The Wraith',
       greeting: sprite_greet_wraith,
-      src: "/projects/escape-game/images/tux.png",
+      src: "/images/projects/escape-game/tux.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 256, width: 352 },
@@ -94,7 +94,7 @@ class GameLevelForest {
     const sprite_data_figure = {
       id: 'Dark Figure',
       greeting: sprite_greet_figure,
-      src: "/projects/escape-game/images/octocat.png",
+      src: "/images/projects/escape-game/octocat.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 301, width: 801 },
@@ -131,7 +131,7 @@ class GameLevelForest {
     const sprite_data_warden = {
       id: 'The Warden',
       greeting: sprite_greet_warden,
-      src: "/projects/escape-game/images/robot.png",
+      src: "/images/projects/escape-game/robot.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 100,
       pixels: { height: 316, width: 627 },
@@ -225,7 +225,7 @@ class GameLevelForest {
         ]);
       }
     };
-    const sprite_src_historian = "/projects/escape-game/images/historyProf.png";
+    const sprite_src_historian = "/images/projects/escape-game/historyProf.png";
     const sprite_greet_historian = "Hello! I'm an expert in the forest!";
     const sprite_data_historian = {
       id: "Mr. Forest",
