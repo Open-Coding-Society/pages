@@ -3,18 +3,16 @@ layout: post
 feedback: true
 hide: true
 title: Open Coding Society
-description: Redirect to Gamified Home Pilot.
+description: Home page.
 permalink: /
 ---
 
-<script>
-  window.location.replace("{{ site.baseurl }}/cs-pathway-game");
-</script>
+# Open Coding Society
 
-<noscript>
-  <meta http-equiv="refresh" content="0; url={{ site.baseurl }}/cs-pathway-game">
-</noscript>
+Welcome to the Open Coding Society homepage.
 
-[Continue to the Gamified Home Pilot]({{ site.baseurl }}/cs-pathway-game)
+## 🚀 Start Here
+[Go to CS Pathway Game]({{ site.baseurl }}/cs-pathway-game)
 
-[Need older materials? Open the Legacy Home Materials Hub]({{ site.baseurl }}/home-legacy)
+## 📚 Other Resources
+[Open Legacy Home Materials Hub]({{ site.baseurl }}/home-legacy)
