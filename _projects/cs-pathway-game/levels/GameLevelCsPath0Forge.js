@@ -1301,6 +1301,11 @@ await this.profileManager.saveIdentity(profile);
      */
     this.updateProfilePanel = function(profile = {}) {
       this.createProfilePanel();
+      window._forgePanelCleanup = () => {
+        if (this.profilePanelView) {
+          this.profilePanelView.destroy();
+        }
+      };
       this.profilePanelView.update({
         name: profile.name || '—',
         email: profile.email || '—',
@@ -1461,6 +1466,9 @@ await this.profileManager.saveIdentity(profile);
   destroy() {
     this.clearZoneAlert();
     this.present?.destroy();
+    if (this.profilePanelView) {
+      this.profilePanelView.destroy();
+    }
   }
 }
 
