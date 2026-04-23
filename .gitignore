@@ -52,7 +52,7 @@ _posts/**/*_csse.md
 
 # Project distributions (auto-generated from _projects/ source)
 _notebooks/projects/
-_posts/projects/
+# _posts/projects/ intentionally tracked — needed for Jekyll to serve docs on prod
 assets/js/projects/
 images/projects/
 
