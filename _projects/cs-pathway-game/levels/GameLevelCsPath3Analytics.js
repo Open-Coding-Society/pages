@@ -1,21 +1,69 @@
 // Imports: Level objects and UI helpers.
 import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
+import AiChallengeNpc from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
+import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+
+
+/**
+ * Generate dynamic SVG orb sprite data URI
+ * Creates animated glowing orbs with orbiting markers (like Wayfinding World)
+ */
+const createOrbSvgSrc = (fillColor, borderColor = '#f8fafc') => {
+  const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
+  const orbFrames = frameOpacity
+    .map((opacity, index) => {
+      const cx = 128 + (index * 256);
+      const ringAngle = index * 45;
+      const angleRad = (ringAngle * Math.PI) / 180;
+      const oppositeAngleRad = angleRad + Math.PI;
+      const orbitRadius = 112;
+      const markerX = cx + (Math.cos(angleRad) * orbitRadius);
+      const markerY = 128 + (Math.sin(angleRad) * orbitRadius);
+      const marker2X = cx + (Math.cos(oppositeAngleRad) * orbitRadius);
+      const marker2Y = 128 + (Math.sin(oppositeAngleRad) * orbitRadius);
+      const markerShadowX = cx + (Math.cos(angleRad) * (orbitRadius + 4));
+      const markerShadowY = 128 + (Math.sin(angleRad) * (orbitRadius + 4));
+      const marker2ShadowX = cx + (Math.cos(oppositeAngleRad) * (orbitRadius + 4));
+      const marker2ShadowY = 128 + (Math.sin(oppositeAngleRad) * (orbitRadius + 4));
+      return `
+        <g opacity='${opacity}'>
+          <circle cx='${cx}' cy='128' r='114' fill='none' stroke='rgba(0,0,0,0.5)' stroke-width='20'/>
+          <circle cx='${cx}' cy='128' r='106' fill='${fillColor}' stroke='${borderColor}' stroke-width='18'/>
+          <circle cx='${cx}' cy='128' r='98' fill='none' stroke='rgba(255,255,255,0.34)' stroke-width='6'/>
+          <circle cx='${cx}' cy='128' r='104' fill='url(#shine)' />
+          <circle cx='${cx}' cy='128' r='112' fill='none' stroke='rgba(255,255,255,0.92)' stroke-width='11' stroke-linecap='round' stroke-dasharray='190 500' transform='rotate(${ringAngle} ${cx} 128)'/>
+          <circle cx='${markerShadowX}' cy='${markerShadowY}' r='12' fill='rgba(0,0,0,0.45)' />
+          <circle cx='${markerX}' cy='${markerY}' r='10' fill='#ffffff' />
+          <circle cx='${marker2ShadowX}' cy='${marker2ShadowY}' r='10' fill='rgba(0,0,0,0.35)' />
+          <circle cx='${marker2X}' cy='${marker2Y}' r='8' fill='#fde047' />
+        </g>`;
+    })
+    .join('');
+
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='2048' height='256' viewBox='0 0 2048 256'>
+    <defs>
+      <radialGradient id='shine' cx='35%' cy='30%' r='70%'>
+        <stop offset='0%' stop-color='#ffffff' stop-opacity='0.45' />
+        <stop offset='45%' stop-color='#ffffff' stop-opacity='0.14' />
+        <stop offset='100%' stop-color='#000000' stop-opacity='0.22' />
+      </radialGradient>
+    </defs>
+    ${orbFrames}
+  </svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+};
 
 /**
  * GameLevel CS Pathway - Assessment Observatory
- * 
- * This level introduces students to their personal analytics and learning metrics.
- * An Assessment Hub with NPCs provides insights into:
- * - User profile (email, uid, name)
- * - GitHub contribution stats (commits, PRs, issues)
- * - Skill metrics and progress
- * - Grade predictions
- * - Learning journey overview
+ *
+ * NPC 1 (Blue  - AI Skill Advisor):  Performance Analytics, Sprint Comparison (timestamp-aware), AI Recommendations + chat, Mini Challenges (Wordle only)
+ * NPC 2 (Green - GitHub Analytics):  GitHub / Code Metrics
+ * NPC 3 (Amber - Sprint Coach):      Skill Radar (self-evaluated, rendered correctly)
  */
 class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   static levelId = 'assessment-observatory';
@@ -29,16 +77,35 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
     let { width, height, path } = this.getLevelDimensions();
 
-    /**
-     * Section: Level objects.
-     */
+    this.profilePanelView = new StatusPanel({
+      id: 'csse-analytics-panel',
+      title: 'ASSESSMENT OBSERVATORY',
+      fields: [
+        { key: 'grade', label: 'Grade', emptyValue: '—' },
+      ],
+      theme: {
+        background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
+        borderColor: 'var(--ocs-game-accent, #4ecca3)',
+        textColor: 'var(--ocs-game-text, #e0e0e0)',
+        accentColor: 'var(--ocs-game-accent, #4ecca3)',
+        secondaryButtonBackground: 'var(--ocs-game-surface-alt, #1a1a2e)',
+        secondaryButtonTextColor: 'var(--ocs-game-text, #e0e0e0)',
+      },
+      position: { top: '16px', left: '16px' },
+      width: '260px',
+      padding: '12px 14px',
+      zIndex: '10000',
+      fontFamily: '"Courier New", monospace',
+    });
+    this.profilePanelView.render();
+    this.profilePanelView.update({ grade: '—' });
 
     // ── Background ──────────────────────────────────────────────
     const image_src = path + "/images/projects/cs-pathway-game/bg3/assessment-observatory-fantasy.png";
     const bg_data = {
-        name: GameLevelCsPath3Analytics.displayName,
-        greeting: "Welcome to the Assessment Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
-        src: image_src,
+      name: GameLevelCsPath3Analytics.displayName,
+      greeting: "Welcome to the Assessment Observatory! Here you can explore your learning journey, track your progress, and discover insights from your contributions and achievements.",
+      src: image_src,
     };
 
     this.restoreIdentitySelections({
@@ -46,7 +113,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg3/index.json`,
       themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg3/`,
     });
-    
+
     // ── Player ───────────────────────────────────────────────────
     const player_src = path + "/images/projects/cs-pathway-game/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
@@ -78,108 +145,80 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     });
 
     // ── NPC Positions ──────────────────────────────────────────────
-    // Position NPCs along pathway progression
-    const analyticsGuidePos = {
-      x: width * 0.20,
-      y: height * 0.35,
-    };
+    const analyticsGuidePos = { x: width * 0.20, y: height * 0.65 };
+    const githubMetricsPos  = { x: width * 0.80, y: height * 0.65 };
+    const selfEvalPos       = { x: width * 0.48, y: height * 0.44 };
 
-    const githubMetricsPos = {
-      x: width * 0.50,
-      y: height * 0.35,
-    };
-
-    // Self-evaluation NPC at end of pathway
-    const selfEvalPos = {
-      x: width * 0.80,
-      y: height * 0.35,
-    };
-
-    const gatekeeperBaseData = {
-      src: path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
-      SCALE_FACTOR: PLAYER_SCALE_FACTOR,
-      ANIMATION_RATE: 50,
-      pixels: { width: 1024, height: 1024 },
-      orientation: { rows: 2, columns: 2 },
-      down: { row: 0, start: 0, columns: 1, wiggle: 0.005 },
-      up: { row: 0, start: 1, columns: 1 },
-      left: { row: 1, start: 0, columns: 1 },
-      right: { row: 1, start: 1, columns: 1 },
+    const createOrbNpcData = ({ id, greeting, position, color, expertise, interact }) => ({
+      src: createOrbSvgSrc(color),
+      SCALE_FACTOR: 12,
+      ANIMATION_RATE: 6,
+      pixels: { width: 2048, height: 256 },
+      orientation: { rows: 1, columns: 8 },
+      down: { row: 0, start: 0, columns: 8, wiggle: { angle: Math.PI / 60, speed: 0.08 } },
+      up: { row: 0, start: 0, columns: 8 },
+      left: { row: 0, start: 0, columns: 8 },
+      right: { row: 0, start: 0, columns: 8 },
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
-    };
-
-    const createGatekeeperData = ({ id, greeting, position, reaction, interact, interactDistance }) => ({
-      ...gatekeeperBaseData,
       id,
       greeting,
       INIT_POSITION: { ...position },
-      interactDistance: interactDistance || 120,
-      ...(reaction ? { reaction } : {}),
+      interactDistance: 120,
+      expertise,
+      chatHistory: [],
       ...(interact ? { interact } : {}),
     });
 
-    // Store reference to this level for use in callbacks
     const level = this;
 
-    // Analytics Guide NPC - central hub for viewing analytics
-    const npc_data_analyticsGuide = createGatekeeperData({
-      id: 'AnalyticsGuide',
-      greeting: 'Welcome to Analytics Observatory! I am your guide through your learning metrics and progress. Press E to view your complete analytics profile.',
+    // ── NPC 1: AI Skill Advisor (blue) ──────────────────────────
+    const npc_data_analyticsGuide = createOrbNpcData({
+      id: 'AI Skill Advisor',
+      greeting: 'Analytics Station: Performance metrics, sprint comparisons, AI recommendations, and mini challenges. Press E to interact.',
       position: analyticsGuidePos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('Analytics Guide: Press E to view your analytics');
-        }
-      },
+      color: '#3b82f6',
+      expertise: 'Personal learning analytics, skill assessment, performance coaching, sprint comparisons, and progress tracking. Help students understand their strengths and growth areas with actionable feedback.',
       interact: async function() {
         await level.showAnalyticsDashboard();
       },
     });
 
-    // Self-Evaluation NPC - end-of-sprint reflection (at 50%)
-    const npc_data_selfEval = createGatekeeperData({
-      id: 'SelfEvaluator',
-      greeting: 'Welcome to the mid-sprint assessment station! Here you can evaluate your progress, assess your skills, and reflect on your learning. Press E to begin your self-evaluation.',
+    // ── NPC 2: GitHub Analytics (green) ─────────────────────────
+    const npc_data_githubGuide = createOrbNpcData({
+      id: 'GitHub Analytics',
+      greeting: 'GitHub Analytics Station: Deep dive into your code contributions, commit history, and collaboration patterns. Press E to explore.',
       position: githubMetricsPos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('Self-Evaluator: Press E to reflect on your sprint');
-        }
-      },
-      interact: async function() {
-        await level.showSelfEvaluation();
-      },
-    });
-
-    // GitHub Metrics NPC - shows contribution statistics (at 80%)
-    const npc_data_githubGuide = createGatekeeperData({
-      id: 'GitHubGuide',
-      greeting: 'Welcome to the GitHub contributions hub! Explore your GitHub contribution metrics: commits, pull requests, issues, and code changes.',
-      position: selfEvalPos,
-      reaction: function() {
-        if (level?.showToast) {
-          level.showToast('GitHub Guide: Press E to see your GitHub stats');
-        }
-      },
+      color: '#10b981',
+      expertise: 'Code contribution analysis, GitHub metrics interpretation, code quality insights, collaboration patterns, and commit history analysis. Help students understand their coding productivity and collaboration effectiveness.',
       interact: async function() {
         await level.showGitHubStats();
       },
     });
 
-    // List of objects definitions for this level
+    // ── NPC 3: Sprint Coach (amber) – Skill Radar only ───────────
+    const npc_data_selfEval = createOrbNpcData({
+      id: 'Sprint Coach',
+      greeting: 'Skill Radar Station: Rate yourself on your skills and visualise your strengths and growth areas. Press E to begin.',
+      position: selfEvalPos,
+      color: '#f59e0b',
+      expertise: 'Self-reflection coaching, skill radar visualisation, strength identification, and growth-area planning.',
+      interact: async function() {
+        await level.showSkillRadar();
+      },
+    });
+
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
-      { class: Npc, data: npc_data_analyticsGuide },
-      { class: Npc, data: npc_data_githubGuide },
-      { class: Npc, data: npc_data_selfEval },
+      { class: FriendlyNpc, data: npc_data_analyticsGuide },
+      { class: FriendlyNpc, data: npc_data_githubGuide },
+      { class: FriendlyNpc, data: npc_data_selfEval },
     ];
 
-    // FriendlyNpc expects these level references for toast routing
     this.gameEnv.currentLevel = this;
     this.gameEnv.gameLevel = this;
 
-    // Preload user analytics data as soon as the level initializes
+    // Preload
     this.cachedUserData = null;
     this.dataLoaded = Promise.resolve().then(() => this.fetchUserData()).then((data) => {
       this.cachedUserData = data;
@@ -189,7 +228,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       console.error('Assessment Observatory: Failed to preload data', err);
     });
 
-    // Dialogue: Sequential helper.
+    // Dialogue helper
     this.levelDialogueSystem = new DialogueSystem({
       id: 'assessment-observatory-dialogue',
       dialogues: [],
@@ -200,252 +239,144 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       voiceRate: 0.9,
     });
 
-    // Dialogue: Show lines in sequence.
     this.showDialogue = function(speakerName, lines, options = {}) {
       const queue = Array.isArray(lines) ? lines.filter(Boolean) : [String(lines || '')];
-      if (queue.length === 0) {
-        return Promise.resolve();
-      }
+      if (queue.length === 0) return Promise.resolve();
 
       return new Promise((resolve) => {
         let index = 0;
         let finished = false;
-
         const finish = () => {
-          if (finished) {
-            return;
-          }
+          if (finished) return;
           finished = true;
           this.levelDialogueSystem.closeDialogue();
           resolve();
         };
-
         const showStep = () => {
-          if (finished) {
-            return;
-          }
-
+          if (finished) return;
           const message = queue[index];
           const isLast = index === queue.length - 1;
-
           this.levelDialogueSystem.closeDialogue();
-          this.levelDialogueSystem.showDialogue(
-            message,
-            speakerName,
-            options.avatarSrc || null,
-            options.spriteData || null,
-          );
-
+          this.levelDialogueSystem.showDialogue(message, speakerName, options.avatarSrc || null, options.spriteData || null);
           this.levelDialogueSystem.closeBtn.textContent = isLast ? 'Close' : 'Skip';
           this.levelDialogueSystem.closeBtn.onclick = () => finish();
-
-          this.levelDialogueSystem.addButtons([
-            {
-              text: isLast ? 'Done' : 'Next',
-              primary: true,
-              action: () => {
-                index += 1;
-                if (index < queue.length) {
-                  showStep();
-                } else {
-                  finish();
-                }
-              },
+          this.levelDialogueSystem.addButtons([{
+            text: isLast ? 'Done' : 'Next',
+            primary: true,
+            action: () => {
+              index += 1;
+              if (index < queue.length) showStep();
+              else finish();
             },
-          ]);
+          }]);
         };
-
         showStep();
       });
     }.bind(this);
-
   }
 
-    initialize() {
-      this.activateProfilePanel();
-    }
-
-
-  /**
-   * Accumulated Toast System - collects toasts until complete
-   */
-  createAccumulatedToastContainer() {
-    const container = document.createElement('div');
-    container.id = 'accumulated-toast-' + Date.now();
-    container.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      max-width: 400px;
-      background: rgba(26, 26, 26, 0.95);
-      border: 2px solid #3b82f6;
-      border-radius: 12px;
-      padding: 20px;
-      color: #e5e7eb;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.6;
-      max-height: 60vh;
-      overflow-y: auto;
-      z-index: 9999;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    `;
-    document.body.appendChild(container);
-    return container;
-  }
-
-  addToAccumulatedToast(container, text) {
-    const line = document.createElement('div');
-    line.style.cssText = `
-      margin: 6px 0;
-      padding: 4px 0;
-      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-      animation: slideInRight 0.3s ease-out;
-    `;
-    
-    if (text === '') {
-      line.style.borderBottom = 'none';
-      line.style.height = '8px';
-    } else {
-      line.textContent = text;
-    }
-    
-    container.appendChild(line);
-    return container;
-  }
-
-  /**
-   * Show complete analytics dashboard with Skill Radar, Holographic Stats, and Mini-Games
-   */
+  // ════════════════════════════════════════════════════════════════
+  //  NPC 1 – ANALYTICS DASHBOARD
+  //  Tabs: Performance Analytics | Sprint Comparison | AI Recommendations | Mini Challenges
+  // ════════════════════════════════════════════════════════════════
   async showAnalyticsDashboard() {
     try {
       await this.dataLoaded;
       const userData = this.cachedUserData || await this.fetchUserData();
-      
+
       if (!userData || !userData.analyticsSummary) {
-        this.showToast('Unable to load your analytics. Please ensure you are logged in.');
+        this.showToast('Unable to load analytics. Please ensure you are logged in.');
         return;
       }
 
-      // Create main dashboard modal
       const modal = document.createElement('div');
       modal.id = 'analytics-dashboard-modal';
       modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.95); display: flex;
+        justify-content: center; align-items: center; z-index: 10000; overflow-y: auto;
       `;
 
       const container = document.createElement('div');
       container.style.cssText = `
-        background: #1a1a1a;
-        border: 2px solid #3b82f6;
-        border-radius: 12px;
-        padding: 40px;
-        max-width: 900px;
-        max-height: 85vh;
-        overflow-y: auto;
-        color: #e5e7eb;
+        background: #0f172a; border: 2px solid #3b82f6; border-radius: 16px;
+        padding: 40px; max-width: 1000px; max-height: 90vh; overflow-y: auto;
+        color: #e5e7eb; margin: 20px auto;
       `;
 
-      // Title
-      const title = document.createElement('h1');
-      title.textContent = `📊 Analytics Dashboard - ${userData.name || 'Student'}`;
-      title.style.cssText = 'color: #60a5fa; margin: 0 0 30px 0; text-align: center; font-size: 28px;';
-      container.appendChild(title);
+      // Header
+      const titleBox = document.createElement('div');
+      titleBox.style.cssText = `
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #1e293b;
+      `;
+      const s = userData.analyticsSummary || {};
+      titleBox.innerHTML = `
+        <div>
+          <h1 style="margin:0;color:#60a5fa;font-size:28px;">Learning Analytics Dashboard</h1>
+          <p style="margin:5px 0 0 0;color:#94a3b8;font-size:13px;">${userData.name || 'Student'} | UID: ${userData.uid || 'N/A'}</p>
+        </div>
+        <div style="text-align:right;font-size:12px;">
+          <div style="color:#10b981;font-weight:bold;">Engagement: ${(s.interactionPercentage || 0).toFixed(1)}%</div>
+          <div style="color:#f59e0b;">Scroll Depth: ${(s.averageScrollDepth || 0).toFixed(1)}%</div>
+        </div>
+      `;
+      container.appendChild(titleBox);
 
-      // Add tabs for different views
+      // Tabs
       const tabContainer = document.createElement('div');
       tabContainer.style.cssText = `
-        display: flex;
-        gap: 10px;
-        margin-bottom: 30px;
-        border-bottom: 2px solid #3b82f6;
-        padding-bottom: 15px;
+        display: flex; gap: 10px; margin-bottom: 30px;
+        border-bottom: 2px solid #1e293b; padding-bottom: 15px; flex-wrap: wrap;
       `;
 
       const tabs = [
-        { name: 'Skills Radar', id: 'skills' },
-        { name: 'Holographic Stats', id: 'holoStats' },
-        { name: 'Mini-Games', id: 'miniGames' },
-        { name: 'Momentum', id: 'momentum' }
+        { name: 'Performance Analytics', id: 'performance' },
+        { name: 'Sprint Comparison',     id: 'sprint' },
+        { name: 'AI Recommendations',    id: 'recommendations' },
+        { name: 'Mini Challenges',       id: 'challenges' },
       ];
 
       const contentArea = document.createElement('div');
       contentArea.id = 'dashboard-content';
+      contentArea.style.cssText = 'min-height: 400px;';
 
-      tabs.forEach(tab => {
+      let activeTabBtn = null;
+      const switchTab = async (tabId, btn) => {
+        if (activeTabBtn) { activeTabBtn.style.background = '#334155'; activeTabBtn.style.color = '#cbd5e1'; }
+        btn.style.background = '#3b82f6'; btn.style.color = '#ffffff';
+        activeTabBtn = btn;
+
+        contentArea.innerHTML = '';
+        if      (tabId === 'performance')    await this.renderPerformanceAnalytics(userData, contentArea);
+        else if (tabId === 'sprint')         await this.renderSprintComparison(userData, contentArea);
+        else if (tabId === 'recommendations')await this.renderRecommendations(userData, contentArea);
+        else if (tabId === 'challenges')     await this.renderMiniChallenges(userData, contentArea);
+      };
+
+      tabs.forEach((tab, idx) => {
         const tabBtn = document.createElement('button');
         tabBtn.textContent = tab.name;
         tabBtn.style.cssText = `
-          padding: 10px 20px;
-          background: ${tab.id === 'skills' ? '#3b82f6' : '#4b5563'};
-          color: white;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 13px;
-          font-weight: bold;
-          transition: all 0.2s;
+          padding: 10px 18px; background: #334155; color: #cbd5e1;
+          border: 1px solid #475569; border-radius: 8px; cursor: pointer;
+          font-size: 13px; font-weight: 500; transition: all 0.2s;
         `;
-        
-        tabBtn.onmouseover = () => {
-          if (tabBtn.style.background !== '#3b82f6') {
-            tabBtn.style.background = '#5a6979';
-          }
-        };
-        tabBtn.onmouseout = () => {
-          if (tabBtn.style.background !== '#3b82f6') {
-            tabBtn.style.background = '#4b5563';
-          }
-        };
-
-        tabBtn.onclick = async () => {
-          // Update tab styling
-          tabContainer.querySelectorAll('button').forEach(btn => {
-            btn.style.background = '#4b5563';
-          });
-          tabBtn.style.background = '#3b82f6';
-
-          // Show appropriate content
-          contentArea.innerHTML = '';
-          if (tab.id === 'skills') {
-            await this.renderSkillsRadar(userData, contentArea);
-          } else if (tab.id === 'holoStats') {
-            await this.renderHolographicStats(userData, contentArea);
-          } else if (tab.id === 'miniGames') {
-            await this.renderMiniGames(userData, contentArea);
-          } else if (tab.id === 'momentum') {
-            await this.renderMomentumMeter(userData, contentArea);
-          }
-        };
-
+        tabBtn.onmouseover = () => { if (tabBtn !== activeTabBtn) tabBtn.style.background = '#475569'; };
+        tabBtn.onmouseout  = () => { if (tabBtn !== activeTabBtn) tabBtn.style.background = '#334155'; };
+        tabBtn.onclick = () => switchTab(tab.id, tabBtn);
         tabContainer.appendChild(tabBtn);
+        if (idx === 0) { tabBtn.style.background = '#3b82f6'; tabBtn.style.color = '#ffffff'; activeTabBtn = tabBtn; }
       });
 
       container.appendChild(tabContainer);
       container.appendChild(contentArea);
 
-      // Close button
       const closeBtn = document.createElement('button');
-      closeBtn.textContent = '✕ Close';
+      closeBtn.textContent = 'Close Dashboard';
       closeBtn.style.cssText = `
-        margin-top: 30px;
-        padding: 12px 30px;
-        background: #ef4444;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        width: 100%;
+        margin-top: 30px; padding: 12px 30px; background: #64748b; color: white;
+        border: none; border-radius: 8px; cursor: pointer; font-size: 14px; width: 100%;
       `;
       closeBtn.onclick = () => modal.remove();
       container.appendChild(closeBtn);
@@ -453,548 +384,607 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       modal.appendChild(container);
       document.body.appendChild(modal);
 
-      // Trigger first tab
-      tabContainer.querySelector('button').click();
-
+      // Render first tab
+      await switchTab('performance', activeTabBtn);
     } catch (err) {
       console.error('Error showing analytics dashboard:', err);
-      this.showToast('Error loading analytics dashboard');
+      this.showToast('Error loading dashboard');
     }
   }
 
-  /**
-   * Render Skill Radar - Hexagon chart with skills
-   */
-  async renderSkillsRadar(userData, container) {
+  // ── Performance Analytics ────────────────────────────────────────
+  async renderPerformanceAnalytics(userData, container) {
     const s = userData.analyticsSummary || {};
-    
-    // Calculate skill scores (0-100)
-    const skills = {
-      'Problem Solving': Math.min(100, (s.averageAccuracyPercentage || 0) * 1.1),
-      'Communication': Math.min(100, (s.interactionPercentage || 0)),
-      'Code Quality': Math.min(100, ((s.totalCodeExecutions || 0) / 100) * 10),
-      'Testing': Math.min(100, ((s.totalLessonsCompleted || 0) / 10) * 10),
-      'Time Mgmt': Math.min(100, (s.averageScrollDepth || 0)),
-      'Learning': Math.min(100, ((s.totalLessonsViewed || 0) / (s.totalLessonsCompleted || 1)) * 50),
-    };
 
-    // Create SVG canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = 500;
-    canvas.height = 500;
-    canvas.style.cssText = `
-      display: block;
-      margin: 20px auto;
-      filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.4));
-    `;
-    container.appendChild(canvas);
-
-    const ctx = canvas.getContext('2d');
-    const centerX = 250, centerY = 250, radius = 150;
-    const skillNames = Object.keys(skills);
-    const angles = skillNames.map((_, i) => (i * 2 * Math.PI) / skillNames.length - Math.PI / 2);
-
-    // Animate radar fill
-    let animationProgress = 0;
-    const animationDuration = 2000;
-    const startTime = Date.now();
-
-    const drawRadar = () => {
-      const elapsed = Date.now() - startTime;
-      animationProgress = Math.min(1, elapsed / animationDuration);
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw hexagon grid
-      for (let i = 1; i <= 5; i++) {
-        ctx.strokeStyle = `rgba(59, 130, 246, ${0.1 + i * 0.1})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        angles.forEach((angle, idx) => {
-          const r = (radius / 5) * i;
-          const x = centerX + r * Math.cos(angle);
-          const y = centerY + r * Math.sin(angle);
-          if (idx === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.closePath();
-        ctx.stroke();
-      }
-
-      // Draw axes
-      ctx.strokeStyle = 'rgba(96, 165, 250, 0.3)';
-      angles.forEach(angle => {
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
-        ctx.stroke();
-      });
-
-      // Draw data polygon (animated)
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
-      ctx.strokeStyle = '#60a5fa';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      
-      skillNames.forEach((skill, idx) => {
-        const value = (skills[skill] / 100) * radius * animationProgress;
-        const x = centerX + value * Math.cos(angles[idx]);
-        const y = centerY + value * Math.sin(angles[idx]);
-        if (idx === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      });
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Draw points and labels
-      skillNames.forEach((skill, idx) => {
-        const x = centerX + radius * Math.cos(angles[idx]);
-        const y = centerY + radius * Math.sin(angles[idx]);
-
-        // Point
-        ctx.fillStyle = '#60a5fa';
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, 2 * Math.PI);
-        ctx.fill();
-
-        // Label
-        ctx.fillStyle = '#e5e7eb';
-        ctx.font = 'bold 12px Arial';
-        ctx.textAlign = 'center';
-        const labelX = centerX + (radius + 30) * Math.cos(angles[idx]);
-        const labelY = centerY + (radius + 30) * Math.sin(angles[idx]);
-        ctx.fillText(skill, labelX, labelY);
-
-        // Score
-        ctx.font = '11px Arial';
-        ctx.fillStyle = '#a5f3fc';
-        ctx.fillText(`${skills[skill].toFixed(0)}%`, labelX, labelY + 15);
-      });
-
-      if (animationProgress < 1) {
-        requestAnimationFrame(drawRadar);
-      }
-    };
-
-    drawRadar();
-
-    // Add stats below
-    const statsDiv = document.createElement('div');
-    statsDiv.style.cssText = `
-      margin-top: 30px;
-      padding: 20px;
-      background: rgba(59, 130, 246, 0.1);
-      border-radius: 8px;
-      border-left: 4px solid #60a5fa;
-    `;
-    statsDiv.innerHTML = `
-      <p style="margin: 0;"><strong>💡 Skill Insights:</strong></p>
-      <p style="margin: 8px 0 0 0; font-size: 13px; color: #d1d5db;">
-        Your radar shows a balanced skill profile. Focus on areas with lower scores through targeted practice and exercises.
-      </p>
-    `;
-    container.appendChild(statsDiv);
-  }
-
-  /**
-   * Render Holographic Stats Display - Animated stat cards
-   */
-  async renderHolographicStats(userData, container) {
-    const s = userData.analyticsSummary || {};
-    const gh = userData.github || {};
-
-    const stats = [
-      { label: '⏱️ Total Time Spent', value: s.totalTimeSpentSeconds ? this.formatTime(s.totalTimeSpentSeconds * 1000) : '0h', color: '#10b981' },
-      { label: '📊 Engagement', value: `${(s.interactionPercentage || 0).toFixed(1)}%`, color: '#f59e0b' },
-      { label: '🎯 Accuracy', value: `${(s.averageAccuracyPercentage || 0).toFixed(1)}%`, color: '#3b82f6' },
-      { label: '📚 Lessons Completed', value: s.totalLessonsCompleted || 0, color: '#8b5cf6' },
-      { label: '💻 Code Executions', value: s.totalCodeExecutions || 0, color: '#ec4899' },
-      { label: '🔗 GitHub Commits', value: gh.commits || 0, color: '#06b6d4' },
+    const metrics = [
+      { label: 'Engagement Rate', current: (s.interactionPercentage || 0).toFixed(1), target: 85, unit: '%' },
+      { label: 'Scroll Depth',    current: (s.averageScrollDepth || 0).toFixed(1), target: 70, unit: '%' },
+      { label: 'Time Spent',      current: Math.round((s.totalTimeSpentSeconds || 0) / 60), target: 300, unit: ' min', type: 'count' },
     ];
 
     const grid = document.createElement('div');
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin: 20px 0;
-    `;
+    grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;';
 
-    stats.forEach((stat, idx) => {
+    metrics.forEach(m => {
       const card = document.createElement('div');
-      card.style.cssText = `
-        background: linear-gradient(135deg, ${stat.color}22 0%, ${stat.color}11 100%);
-        border: 2px solid ${stat.color};
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        overflow: hidden;
-        animation: holographicPulse 2s ease-in-out ${idx * 0.1}s infinite;
+      const progress = m.type === 'count' ? Math.min(100, (m.current / m.target) * 100) : parseFloat(m.current);
+      const isOnTrack = progress >= 80;
+
+      card.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;`;
+      card.innerHTML = `
+        <div style="color:#94a3b8;font-size:12px;margin-bottom:8px;">${m.label}</div>
+        <div style="color:#60a5fa;font-size:24px;font-weight:bold;margin-bottom:12px;">${m.current}${m.unit}</div>
+        <div style="background:#0f172a;border-radius:8px;height:8px;overflow:hidden;margin-bottom:8px;">
+          <div style="background:${isOnTrack ? '#10b981' : '#f59e0b'};width:${Math.min(100, progress)}%;height:100%;transition:width 1s ease-out;"></div>
+        </div>
+        <div style="color:#cbd5e1;font-size:11px;">Target: ${m.target}${m.unit} ${isOnTrack ? '✓ On Track' : '- Keep Going'}</div>
       `;
-
-      const label = document.createElement('div');
-      label.textContent = stat.label;
-      label.style.cssText = `
-        font-size: 12px;
-        color: #9ca3af;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
-      `;
-
-      const valueDisplay = document.createElement('div');
-      valueDisplay.textContent = stat.value;
-      valueDisplay.style.cssText = `
-        font-size: 32px;
-        font-weight: bold;
-        color: ${stat.color};
-        text-shadow: 0 0 10px ${stat.color}60;
-      `;
-
-      card.appendChild(label);
-      card.appendChild(valueDisplay);
-
-      card.style.setProperty('--stat-color', stat.color);
-      card.onmouseover = () => {
-        card.style.transform = 'scale(1.05) translateY(-5px)';
-        card.style.boxShadow = `0 10px 30px ${stat.color}40`;
-      };
-      card.onmouseout = () => {
-        card.style.transform = 'scale(1)';
-        card.style.boxShadow = 'none';
-      };
-
       grid.appendChild(card);
     });
 
     container.appendChild(grid);
 
-    // Add CSS animation if not exists
-    if (!document.querySelector('style#holographic-animations')) {
-      const style = document.createElement('style');
-      style.id = 'holographic-animations';
-      style.textContent = `
-        @keyframes holographicPulse {
-          0%, 100% { transform: translateZ(0); box-shadow: 0 0 5px ${stats[0].color}40; }
-          50% { transform: translateZ(5px); box-shadow: 0 0 20px ${stats[0].color}60; }
-        }
-        @keyframes slideInRight {
-          from { opacity: 0; transform: translateX(20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-      `;
-      document.head.appendChild(style);
-    }
+    // Session overview
+    const sessionBox = document.createElement('div');
+    sessionBox.style.cssText = `
+      background:#1e293b;border:1px solid #334155;border-radius:12px;
+      padding:20px;margin-top:20px;
+    `;
+    sessionBox.innerHTML = `
+      <h3 style="margin:0 0 15px 0;color:#60a5fa;">Session Overview</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;">
+        <div style="background:#0f172a;padding:12px;border-radius:8px;">
+          <div style="color:#94a3b8;font-size:11px;">Total Sessions</div>
+          <div style="color:#e5e7eb;font-size:20px;font-weight:bold;">${s.totalSessions || 0}</div>
+        </div>
+        <div style="background:#0f172a;padding:12px;border-radius:8px;">
+          <div style="color:#94a3b8;font-size:11px;">Lessons Completed</div>
+          <div style="color:#10b981;font-size:20px;font-weight:bold;">${s.lessonsCompleted || 0}</div>
+        </div>
+        <div style="background:#0f172a;padding:12px;border-radius:8px;">
+          <div style="color:#94a3b8;font-size:11px;">Avg Session Length</div>
+          <div style="color:#f59e0b;font-size:20px;font-weight:bold;">${this.formatTime(s.averageSessionDurationSeconds || 0)}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(sessionBox);
   }
 
-  /**
-   * Render Mini-Games - Interactive stat discovery
-   */
-  async renderMiniGames(userData, container) {
+  // ── Sprint Comparison (timestamp-aware, 4-week sprints) ──────────
+  async renderSprintComparison(userData, container) {
+    const s = userData.analyticsSummary || {};
+    const sessions = userData.analyticsSessions || s.sessions || s.recentSessions || [];
+
+    const SPRINT_DAYS = 28;
+    const now = new Date();
+    const startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - (SPRINT_DAYS - 1));
+    startDate.setHours(0, 0, 0, 0);
+
+    const dayKey = (date) => date.toLocaleDateString('en-CA');
+    const dayBuckets = new Map();
+
+    for (let i = 0; i < SPRINT_DAYS; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      dayBuckets.set(dayKey(date), { date, minutes: 0, sessions: 0 });
+    }
+
+    sessions.forEach((session) => {
+      const rawDate = session.sessionStartTime || session.createdAt || session.timestamp || session.date;
+      const rawMinutes = Number(session.sessionDurationSeconds || 0) / 60;
+      const parsedDate = new Date(rawDate);
+      if (Number.isNaN(parsedDate.getTime())) return;
+      const key = dayKey(parsedDate);
+      if (!dayBuckets.has(key)) return;
+      const bucket = dayBuckets.get(key);
+      bucket.minutes += rawMinutes;
+      bucket.sessions += 1;
+    });
+
+    const buckets = Array.from(dayBuckets.values());
+    const maxMinutes = Math.max(...buckets.map((bucket) => bucket.minutes), 1);
+    const totalMinutes = buckets.reduce((sum, bucket) => sum + bucket.minutes, 0);
+    const busiest = buckets.reduce((best, current) => (current.minutes > best.minutes ? current : best), buckets[0]);
+    const avgMinutes = totalMinutes / buckets.length;
+
+    const heatColor = (minutes) => {
+      if (minutes <= 0) return '#0f172a';
+      const ratio = minutes / maxMinutes;
+      if (ratio < 0.2) return '#1e293b';
+      if (ratio < 0.4) return '#334155';
+      if (ratio < 0.6) return '#475569';
+      if (ratio < 0.8) return '#0f766e';
+      return '#10b981';
+    };
+
+    const textColor = (minutes) => (minutes <= 0 ? '#64748b' : (minutes / maxMinutes > 0.6 ? '#ecfdf5' : '#e5e7eb'));
+
+    const box = document.createElement('div');
+    box.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;`;
+
+    box.innerHTML = `
+      <h3 style="margin:0 0 6px 0;color:#60a5fa;">Sprint Activity Heatmap</h3>
+      <div style="color:#94a3b8;font-size:12px;margin-bottom:16px;">
+        Each cell is one day from the last 28 days. Color intensity shows total minutes spent that day based on saved analytics sessions.
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="background:#0f172a;border-radius:10px;padding:12px 14px;min-width:180px;">
+          <div style="color:#94a3b8;font-size:11px;">Total time in sprint</div>
+          <div style="color:#10b981;font-size:22px;font-weight:bold;">${Math.round(totalMinutes)} min</div>
+        </div>
+        <div style="background:#0f172a;border-radius:10px;padding:12px 14px;min-width:180px;">
+          <div style="color:#94a3b8;font-size:11px;">Most active day</div>
+          <div style="color:#f59e0b;font-size:14px;font-weight:bold;">${busiest.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</div>
+          <div style="color:#cbd5e1;font-size:12px;">${Math.round(busiest.minutes)} min</div>
+        </div>
+        <div style="background:#0f172a;border-radius:10px;padding:12px 14px;min-width:180px;">
+          <div style="color:#94a3b8;font-size:11px;">Average per day</div>
+          <div style="color:#60a5fa;font-size:22px;font-weight:bold;">${Math.round(avgMinutes)} min</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7, 1fr);gap:8px;margin-bottom:10px;color:#64748b;font-size:11px;text-align:center;">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+    `;
+
+    const heatmap = document.createElement('div');
+    heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:8px;';
+
+    buckets.forEach((bucket) => {
+      const cell = document.createElement('div');
+      cell.title = `${bucket.date.toLocaleDateString()} — ${Math.round(bucket.minutes)} min across ${bucket.sessions} session(s)`;
+      cell.style.cssText = `
+        aspect-ratio: 1 / 1;
+        min-height: 68px;
+        border-radius: 10px;
+        padding: 8px;
+        background: ${heatColor(bucket.minutes)};
+        border: 1px solid rgba(148,163,184,0.18);
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        box-sizing:border-box;
+      `;
+
+      cell.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;">
+          <div style="color:${textColor(bucket.minutes)};font-size:11px;font-weight:bold;">${bucket.date.getDate()}</div>
+          <div style="color:${textColor(bucket.minutes)};font-size:10px;opacity:0.85;">${bucket.sessions}</div>
+        </div>
+        <div style="color:${textColor(bucket.minutes)};font-size:12px;font-weight:bold;line-height:1.1;">${Math.round(bucket.minutes)}m</div>
+      `;
+
+      heatmap.appendChild(cell);
+    });
+
+    box.appendChild(heatmap);
+
+    const legend = document.createElement('div');
+    legend.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;color:#94a3b8;font-size:11px;';
+    legend.innerHTML = `
+      <span>Low</span>
+      <div style="width:16px;height:16px;border-radius:4px;background:#0f172a;border:1px solid #334155;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#1e293b;border:1px solid #334155;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#334155;border:1px solid #334155;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#0f766e;border:1px solid #0f766e;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#10b981;border:1px solid #10b981;"></div>
+      <span>High</span>
+    `;
+    box.appendChild(legend);
+
+    container.appendChild(box);
+  }
+
+  // ── AI Recommendations with chat ────────────────────────────────
+  async renderRecommendations(userData, container) {
     const s = userData.analyticsSummary || {};
     const gh = userData.github || {};
 
-    const gameContainer = document.createElement('div');
-    gameContainer.style.cssText = `
-      padding: 20px;
-    `;
+    // Build the stats context string used in every AI prompt
+    const statsContext = `
+Student Stats:
+- Engagement: ${(s.interactionPercentage || 0).toFixed(1)}% (target: 85%)
+  - Scroll Depth: ${(s.averageScrollDepth || 0).toFixed(1)}%
+  - Time Invested: ${Math.round((s.totalTimeSpentSeconds || 0) / 60)} minutes
+- Total Sessions: ${s.totalSessions || 0}
+- Lessons Completed: ${s.lessonsCompleted || 0}
+- GitHub Commits: ${gh.commits || 0}
+- Pull Requests: ${gh.prs || 0}
+- Issues Resolved: ${gh.issues || 0}
+- Lines Added: ${gh.linesAdded || 0}
+- Lines Deleted: ${gh.linesDeleted || 0}
+    `.trim();
 
-    // Game 1: Guess Your Stats
-    const game1 = document.createElement('div');
-    game1.style.cssText = `
-      background: rgba(59, 130, 246, 0.1);
-      border: 2px solid #3b82f6;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    `;
+    const recHeader = document.createElement('div');
+    recHeader.style.cssText = 'color:#60a5fa;font-weight:bold;margin-bottom:15px;font-size:14px;';
+    recHeader.textContent = 'AI generating personalized recommendations...';
+    container.appendChild(recHeader);
 
-    game1.innerHTML = `
-      <h3 style="color: #60a5fa; margin: 0 0 15px 0;">🎮 Game 1: Guess Your Engagement</h3>
-      <p style="margin: 0 0 15px 0; color: #d1d5db;">How much do you think your engagement score is? (0-100%)</p>
-    `;
+    const recListArea = document.createElement('div');
+    container.appendChild(recListArea);
 
-    const guessContainer = document.createElement('div');
-    guessContainer.style.cssText = 'display: flex; gap: 10px; align-items: center;';
-
-    const guessInput = document.createElement('input');
-    guessInput.type = 'range';
-    guessInput.min = '0';
-    guessInput.max = '100';
-    guessInput.value = '50';
-    guessInput.style.cssText = 'flex: 1; cursor: pointer;';
-
-    const guessDisplay = document.createElement('span');
-    guessDisplay.textContent = '50%';
-    guessDisplay.style.cssText = 'color: #60a5fa; font-weight: bold; min-width: 50px;';
-
-    const guessBtn = document.createElement('button');
-    guessBtn.textContent = 'Reveal';
-    guessBtn.style.cssText = `
-      padding: 10px 20px;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    `;
-
-    guessInput.oninput = () => {
-      guessDisplay.textContent = guessInput.value + '%';
+    const renderRecCards = (recCards) => {
+      recListArea.innerHTML = '';
+      recCards.forEach((rec) => {
+        const card = document.createElement('div');
+        const bgColor     = rec.priority === 'High' ? '#7c2d12' : rec.priority === 'Medium' ? '#3f3f00' : '#0f172a';
+        const borderColor = rec.priority === 'High' ? '#ea580c' : rec.priority === 'Medium' ? '#eab308' : '#334155';
+        const labelColor  = rec.priority === 'High' ? '#fdba74' : rec.priority === 'Medium' ? '#facc15' : '#cbd5e1';
+        card.style.cssText = `background:${bgColor};border:2px solid ${borderColor};border-radius:12px;padding:15px;margin-bottom:15px;`;
+        card.innerHTML = `
+          <div style="color:${labelColor};font-weight:bold;font-size:13px;margin-bottom:6px;">${rec.priority} Priority</div>
+          <div style="color:#e5e7eb;font-weight:bold;margin-bottom:5px;">${rec.action}</div>
+          <div style="color:#cbd5e1;font-size:12px;margin-bottom:10px;">${rec.reason}</div>
+          <div style="color:#94a3b8;font-size:11px;">${rec.steps.map(s => `• ${s}`).join('<br>')}</div>
+        `;
+        recListArea.appendChild(card);
+      });
     };
 
-    guessBtn.onclick = () => {
-      const actualScore = (s.interactionPercentage || 0).toFixed(1);
-      const guess = parseInt(guessInput.value);
-      const diff = Math.abs(guess - actualScore);
-      
-      let resultMsg = '';
-      if (diff < 5) resultMsg = '🎯 Perfect! You know yourself well!';
-      else if (diff < 15) resultMsg = '😄 Close! Great self-awareness!';
-      else resultMsg = `📊 Actual: ${actualScore}% - ${guess > actualScore ? 'You were too optimistic!' : 'You undersold yourself!'}`;
+    // AI call
+    let recommendations = [];
+    try {
+      const recPrompt = `You are an expert learning coach. Analyze this student's data and provide 3 prioritized action items.
 
-      guessBtn.textContent = resultMsg;
-      guessBtn.style.background = '#10b981';
-      guessBtn.disabled = true;
-    };
+${statsContext}
 
-    guessContainer.appendChild(guessInput);
-    guessContainer.appendChild(guessDisplay);
-    guessContainer.appendChild(guessBtn);
-    game1.appendChild(guessContainer);
-    gameContainer.appendChild(game1);
+Format each recommendation as:
+[PRIORITY: High|Medium|Low]
+[ACTION: short title]
+[REASON: 1 sentence why this matters]
+[STEPS: 3 bullet points separated by newlines]
 
-    // Game 2: Skill Calibration
-    const game2 = document.createElement('div');
-    game2.style.cssText = `
-      background: rgba(139, 92, 246, 0.1);
-      border: 2px solid #8b5cf6;
-      border-radius: 12px;
-      padding: 20px;
-    `;
+Do not include any other text. Generate exactly 3 recommendations.`;
 
-    game2.innerHTML = `
-      <h3 style="color: #d8b4fe; margin: 0 0 15px 0;">🎯 Game 2: Skill Calibration</h3>
-      <p style="margin: 0 0 15px 0; color: #d1d5db;">Rate your Problem-Solving skill (1-5)</p>
-    `;
+      const spriteData = { id: 'AI Skill Advisor', expertise: 'Learning analytics and personalized coaching' };
+      const aiResponse = await AiChallengeNpc.requestAiText(spriteData, recPrompt, 'assessment-observatory-recommendations', 'Personalized learning recommendations');
 
-    const calibContainer = document.createElement('div');
-    calibContainer.style.cssText = 'display: flex; gap: 10px;';
+      const recParts = aiResponse.split('[PRIORITY:').filter(r => r.trim().length > 0);
+      recParts.forEach(recText => {
+        const priorityMatch = recText.match(/High|Medium|Low/);
+        const actionMatch   = recText.match(/\[ACTION: ([^\]]+)\]/);
+        const reasonMatch   = recText.match(/\[REASON: ([^\]]+)\]/);
+        const stepsMatch    = recText.match(/\[STEPS: ([^\]]+)\]/s);
 
-    [1, 2, 3, 4, 5].forEach(num => {
-      const btn = document.createElement('button');
-      btn.textContent = num;
-      btn.style.cssText = `
-        flex: 1;
-        padding: 15px;
-        background: #374151;
-        color: #e5e7eb;
-        border: 2px solid #4b5563;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 18px;
-        transition: all 0.2s;
-      `;
+        const priority = priorityMatch ? priorityMatch[0] : 'Medium';
+        const action   = actionMatch ? actionMatch[1] : 'Continue Learning';
+        const reason   = reasonMatch ? reasonMatch[1] : 'Focus on your learning goals.';
+        const stepsText = stepsMatch ? stepsMatch[1] : '• Set daily goals\n• Track progress\n• Review regularly';
+        const steps = stepsText.split('\n').map(s => s.replace(/^[•\-]\s*/, '').trim()).filter(s => s.length > 0);
 
-      btn.onmouseover = () => {
-        btn.style.background = '#8b5cf6';
-        btn.style.borderColor = '#d8b4fe';
-      };
-
-      btn.ontouched = btn.onmouseout = () => {
-        if (!btn.dataset.selected) {
-          btn.style.background = '#374151';
-          btn.style.borderColor = '#4b5563';
-        }
-      };
-
-      btn.onclick = () => {
-        calibContainer.querySelectorAll('button').forEach(b => {
-          b.dataset.selected = '';
-          b.style.background = '#374151';
-          b.style.borderColor = '#4b5563';
-        });
-        btn.dataset.selected = 'true';
-        btn.style.background = '#8b5cf6';
-        btn.style.borderColor = '#d8b4fe';
-
-        const systemScore = (s.averageAccuracyPercentage || 0) / 20; // Convert 0-100 to 1-5
-        const feedbackDiv = document.querySelector('#calib-feedback');
-        if (feedbackDiv) {
-          const diff = Math.abs(num - systemScore);
-          if (diff < 1) {
-            feedbackDiv.innerHTML = `✅ Excellent calibration! Your assessment matches your metrics.`;
-          } else if (num > systemScore) {
-            feedbackDiv.innerHTML = `💪 Confident! Consider taking on more challenging problems to build those skills.`;
-          } else {
-            feedbackDiv.innerHTML = `📚 Humble! You may be stronger than you think. Keep building confidence!`;
-          }
-        }
-      };
-
-      calibContainer.appendChild(btn);
-    });
-
-    game2.appendChild(calibContainer);
-    const feedbackDiv = document.createElement('div');
-    feedbackDiv.id = 'calib-feedback';
-    feedbackDiv.style.cssText = 'color: #a5f3fc; margin-top: 15px; text-align: center; font-size: 13px;';
-    game2.appendChild(feedbackDiv);
-
-    gameContainer.appendChild(game2);
-    container.appendChild(gameContainer);
-  }
-
-  /**
-   * Render Momentum Meter - Growth visualization
-   */
-  async renderMomentumMeter(userData, container) {
-    const s = userData.analyticsSummary || {};
-
-    // Simulate growth data
-    const engagementTrend = (s.interactionPercentage || 0);
-    const accuracyTrend = (s.averageAccuracyPercentage || 0);
-    const progressTrend = ((s.totalLessonsCompleted || 0) / (s.totalLessonsViewed || 1)) * 100;
-
-    const meterContainer = document.createElement('div');
-    meterContainer.style.cssText = `
-      padding: 20px;
-    `;
-
-    const metrics = [
-      { label: 'Engagement Momentum', value: engagementTrend, icon: '📈', color: '#10b981' },
-      { label: 'Accuracy Momentum', value: accuracyTrend, icon: '🎯', color: '#f59e0b' },
-      { label: 'Progress Momentum', value: Math.min(100, progressTrend), icon: '🚀', color: '#3b82f6' },
-    ];
-
-    metrics.forEach((metric, idx) => {
-      const meterDiv = document.createElement('div');
-      meterDiv.style.cssText = 'margin-bottom: 30px;';
-
-      const label = document.createElement('div');
-      label.style.cssText = 'margin-bottom: 10px;';
-      label.innerHTML = `
-        <span style="color: #e5e7eb; font-weight: bold;">${metric.icon} ${metric.label}</span>
-        <span style="float: right; color: ${metric.color}; font-weight: bold;">↗ ${metric.value.toFixed(1)}%</span>
-      `;
-
-      const barContainer = document.createElement('div');
-      barContainer.style.cssText = `
-        background: #374151;
-        border-radius: 10px;
-        height: 25px;
-        overflow: hidden;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-      `;
-
-      const bar = document.createElement('div');
-      bar.style.cssText = `
-        background: linear-gradient(90deg, ${metric.color}80, ${metric.color});
-        height: 100%;
-        width: 0%;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 12px;
-        transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.2}s;
-      `;
-
-      barContainer.appendChild(bar);
-
-      meterDiv.appendChild(label);
-      meterDiv.appendChild(barContainer);
-      meterContainer.appendChild(meterDiv);
-
-      // Animate on render
-      setTimeout(() => {
-        bar.style.width = metric.value + '%';
-        if (metric.value > 0) {
-          bar.textContent = metric.value.toFixed(0) + '%';
-        }
-      }, 100);
-    });
-
-    // Add projection
-    const projectionDiv = document.createElement('div');
-    projectionDiv.style.cssText = `
-      background: rgba(96, 165, 250, 0.1);
-      border: 2px solid #60a5fa;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 30px;
-    `;
-
-    const avgMomentum = (engagementTrend + accuracyTrend + progressTrend) / 3;
-    let projection = '🌟 Stellar Growth!';
-    if (avgMomentum < 30) projection = '📈 Building Momentum - Keep Going!';
-    else if (avgMomentum < 60) projection = '⚡ Good Pace - You\'re on Track!';
-    else if (avgMomentum < 85) projection = '🚀 Excellent Trajectory!';
-
-    projectionDiv.innerHTML = `
-      <p style="margin: 0; color: #d1d5db;"><strong>📊 Overall Momentum Score: ${avgMomentum.toFixed(1)}/100</strong></p>
-      <p style="margin: 10px 0 0 0; color: #a5f3fc;">${projection}</p>
-      <p style="margin: 10px 0 0 0; font-size: 12px; color: #9ca3af;">
-        If you maintain this pace, you'll reach mastery in ~${Math.ceil(100 / Math.max(avgMomentum, 1))} sprints.
-      </p>
-    `;
-
-    meterContainer.appendChild(projectionDiv);
-    container.appendChild(meterContainer);
-  }
-
-  /**
-   * Show profile information
-   */
-  async showProfileInfo() {
-    const userData = await this.fetchUserData();
-    
-    if (!userData) {
-      await this.showDialogue('Profile Guide', [
-        'Unable to load your profile.',
-        'Please ensure you are logged in.',
-      ]);
-      return;
+        recommendations.push({ priority, action, reason, steps });
+      });
+    } catch (err) {
+      console.error('AI recommendations failed:', err);
+      recommendations = [
+        { priority: 'High',   action: 'Increase Practice Volume',  reason: 'Consistent practice builds mastery.',          steps: ['Complete daily coding challenges', 'Review solutions carefully', 'Practice similar problems'] },
+        { priority: 'Medium', action: 'Boost Engagement',          reason: 'Regular participation accelerates learning.',   steps: ['Set daily learning goals', 'Join study sessions', 'Track your progress'] },
+        { priority: 'Low',    action: 'Share Your Knowledge',       reason: 'Teaching reinforces your own understanding.',  steps: ['Help struggling peers', 'Explain concepts clearly', 'Review fundamentals'] },
+      ];
     }
 
-    const summary = userData.analyticsSummary || {};
-    
-    const messages = [
-      '👤 Your Profile & Learning Summary:',
-      '',
-      `Name: ${userData.name || 'Not set'}`,
-      `Email: ${userData.email || 'Not set'}`,
-      `UID: ${userData.uid || 'Not set'}`,
-      `GitHub ID: ${userData.githubID || 'Not set'}`,
-      '',
-      '📊 Overall Learning Metrics:',
-      `Engagement Score: ${summary.engagementScore || 0}%`,
-      `Total Sessions: ${summary.totalSessions || 0}`,
-      `Avg Session Length: ${this.formatTime(summary.avgSessionDuration || 0)}`,
-      `Lessons Completed: ${summary.lessonsCompleted || 0}`,
-      `Quests Completed: ${summary.questsCompleted || 0}`,
-      '',
-      'Your dedication shows growth! Keep going! 🚀',
-    ];
+    recHeader.textContent = 'Personalized Recommendations';
+    renderRecCards(recommendations);
 
-    await this.showDialogue('Profile Guide', messages);
+    // ── AI Chat Box ──────────────────────────────────────────────
+    const chatSection = document.createElement('div');
+    chatSection.style.cssText = `
+      background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-top:10px;
+    `;
+
+    const chatTitle = document.createElement('div');
+    chatTitle.style.cssText = 'color:#60a5fa;font-weight:bold;margin-bottom:12px;font-size:13px;';
+    chatTitle.textContent = 'Ask the AI Coach about your recommendations';
+    chatSection.appendChild(chatTitle);
+
+    const chatHistory = document.createElement('div');
+    chatHistory.style.cssText = `
+      background:#0f172a;border-radius:8px;padding:12px;min-height:80px;max-height:200px;
+      overflow-y:auto;margin-bottom:12px;font-size:13px;color:#cbd5e1;line-height:1.6;
+    `;
+    chatHistory.innerHTML = '<span style="color:#475569;font-style:italic;">Ask why you got these recommendations, request more detail, or ask for tips...</span>';
+    chatSection.appendChild(chatHistory);
+
+    const chatInputRow = document.createElement('div');
+    chatInputRow.style.cssText = 'display:flex;gap:10px;';
+
+    const chatInput = document.createElement('input');
+    chatInput.type = 'text';
+    chatInput.placeholder = 'e.g. "Why did I get the engagement recommendation?"';
+    chatInput.style.cssText = `
+      flex:1;padding:10px;background:#0f172a;border:1px solid #334155;
+      border-radius:6px;color:#e5e7eb;font-size:13px;
+    `;
+
+    const chatSendBtn = document.createElement('button');
+    chatSendBtn.textContent = 'Ask';
+    chatSendBtn.style.cssText = `
+      padding:10px 20px;background:#3b82f6;color:white;border:none;
+      border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;white-space:nowrap;
+    `;
+
+    const conversationHistory = [];
+
+    const sendChatMessage = async () => {
+      const userMsg = chatInput.value.trim();
+      if (!userMsg) return;
+      chatInput.value = '';
+
+      // Add user message to display
+      const userBubble = document.createElement('div');
+      userBubble.style.cssText = 'margin-bottom:8px;';
+      userBubble.innerHTML = `<span style="color:#60a5fa;font-weight:bold;">You:</span> ${userMsg}`;
+      chatHistory.appendChild(userBubble);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      chatSendBtn.disabled = true;
+      chatSendBtn.textContent = '...';
+
+      // Build full prompt with stats + conversation context
+      conversationHistory.push({ role: 'user', content: userMsg });
+
+      const systemPrompt = `You are an expert learning coach in a CS education game. 
+You have already given this student the following 3 recommendations:
+${recommendations.map((r, i) => `${i+1}. [${r.priority}] ${r.action}: ${r.reason}`).join('\n')}
+
+The student's current stats are:
+${statsContext}
+
+Answer the student's question concisely and helpfully. Refer to their specific stats when relevant. Keep responses to 2-4 sentences unless more detail is genuinely needed.`;
+
+      try {
+        const spriteData = { id: 'AI Skill Advisor', expertise: 'Learning analytics and personalized coaching' };
+        const fullPrompt = `${systemPrompt}\n\nStudent question: ${userMsg}`;
+        const aiReply = await AiChallengeNpc.requestAiText(spriteData, fullPrompt, 'assessment-observatory-chat', 'AI coach chat reply');
+
+        const aiBubble = document.createElement('div');
+        aiBubble.style.cssText = 'margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #1e293b;';
+        aiBubble.innerHTML = `<span style="color:#10b981;font-weight:bold;">Coach:</span> ${aiReply}`;
+        chatHistory.appendChild(aiBubble);
+        conversationHistory.push({ role: 'assistant', content: aiReply });
+      } catch (err) {
+        const errBubble = document.createElement('div');
+        errBubble.style.cssText = 'margin-bottom:8px;color:#f59e0b;';
+        errBubble.textContent = 'Coach: Sorry, I had trouble connecting. Please try again.';
+        chatHistory.appendChild(errBubble);
+      }
+
+      chatSendBtn.disabled = false;
+      chatSendBtn.textContent = 'Ask';
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    };
+
+    chatSendBtn.onclick = sendChatMessage;
+    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+
+    chatInputRow.appendChild(chatInput);
+    chatInputRow.appendChild(chatSendBtn);
+    chatSection.appendChild(chatInputRow);
+    container.appendChild(chatSection);
   }
 
-  /**
-   * Show GitHub contribution statistics with gamified display
-   */
+  // ── Mini Challenges – Wordle only ───────────────────────────────
+  async renderMiniChallenges(userData, container) {
+    const wordleBox = document.createElement('div');
+    wordleBox.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;`;
+
+    const wordleTitle = document.createElement('h3');
+    wordleTitle.textContent = 'Learning Wordle';
+    wordleTitle.style.cssText = 'margin:0 0 4px 0;color:#60a5fa;font-size:20px;';
+    wordleBox.appendChild(wordleTitle);
+
+    const wordleSubtitle = document.createElement('div');
+    wordleSubtitle.textContent = 'Guess the 6-letter CS / analytics word in 6 tries.';
+    wordleSubtitle.style.cssText = 'color:#94a3b8;font-size:13px;margin-bottom:20px;';
+    wordleBox.appendChild(wordleSubtitle);
+
+    // Word bank (all 6 letters)
+    const wordBank = ['COMMIT', 'SYNTAX', 'BRANCH', 'PYTHON', 'SPRINT', 'GITHUB', 'ARRAYS', 'BINARY', 'REBASE', 'STATIC', 'EXPORT', 'STRUCT', 'RETURN', 'IMPORT', 'OBJECT', 'MATRIX'];
+    const targetWord = wordBank[Math.floor(Math.random() * wordBank.length)];
+    const MAX_GUESSES = 6;
+    const WORD_LEN = 6;
+
+    let guesses = [];         // Array of submitted guess strings
+    let currentGuess = '';
+    let gameOver = false;
+
+    // ── Grid ────────────────────────────────────────────────────
+    const grid = document.createElement('div');
+    grid.style.cssText = `display:grid;grid-template-columns:repeat(${WORD_LEN},52px);grid-template-rows:repeat(6,52px);gap:6px;margin:0 auto 20px auto;width:${WORD_LEN * 58}px;`;
+    const cells = [];
+    for (let row = 0; row < MAX_GUESSES; row++) {
+      const rowCells = [];
+      for (let col = 0; col < WORD_LEN; col++) {
+        const cell = document.createElement('div');
+        cell.style.cssText = `
+          width:48px;height:48px;border:2px solid #334155;border-radius:6px;
+          display:flex;align-items:center;justify-content:center;
+          font-size:22px;font-weight:bold;color:#e5e7eb;
+          text-transform:uppercase;transition:background 0.3s,border-color 0.3s;
+          background:#0f172a;
+        `;
+        grid.appendChild(cell);
+        rowCells.push(cell);
+      }
+      cells.push(rowCells);
+    }
+    wordleBox.appendChild(grid);
+
+    // ── Keyboard ────────────────────────────────────────────────
+    const rows = [
+      ['Q','W','E','R','T','Y','U','I','O','P'],
+      ['A','S','D','F','G','H','J','K','L'],
+      ['ENTER','Z','X','C','V','B','N','M','⌫'],
+    ];
+
+    const keyMap = {};
+    const keyboard = document.createElement('div');
+    keyboard.style.cssText = 'display:flex;flex-direction:column;gap:6px;align-items:center;margin-bottom:16px;';
+
+    rows.forEach(rowKeys => {
+      const rowEl = document.createElement('div');
+      rowEl.style.cssText = 'display:flex;gap:5px;';
+      rowKeys.forEach(key => {
+        const btn = document.createElement('button');
+        btn.textContent = key;
+        const isWide = key === 'ENTER' || key === '⌫';
+        btn.style.cssText = `
+          padding: 14px ${isWide ? '10px' : '12px'};
+          background:#334155;color:#e5e7eb;border:none;border-radius:6px;
+          cursor:pointer;font-size:${isWide ? '11px' : '14px'};font-weight:600;
+          min-width:${isWide ? '52px' : '36px'};transition:background 0.2s;
+        `;
+        btn.onclick = () => handleKey(key);
+        if (!isWide) keyMap[key] = btn;
+        rowEl.appendChild(btn);
+      });
+      keyboard.appendChild(rowEl);
+    });
+    wordleBox.appendChild(keyboard);
+
+    // ── Message area ────────────────────────────────────────────
+    const message = document.createElement('div');
+    message.style.cssText = 'text-align:center;font-size:14px;color:#94a3b8;min-height:22px;margin-bottom:10px;';
+    wordleBox.appendChild(message);
+
+    // ── Current row display helper ───────────────────────────────
+    const updateCurrentRow = () => {
+      const rowIdx = guesses.length;
+      if (rowIdx >= MAX_GUESSES) return;
+      for (let c = 0; c < WORD_LEN; c++) {
+        cells[rowIdx][c].textContent = currentGuess[c] || '';
+        cells[rowIdx][c].style.borderColor = currentGuess[c] ? '#60a5fa' : '#334155';
+      }
+    };
+
+    // ── Colour a submitted row ───────────────────────────────────
+    const colourRow = (rowIdx, guess) => {
+      // Build per-position result
+      const result = Array(WORD_LEN).fill('absent');
+      const targetArr = targetWord.split('');
+      const guessArr  = guess.split('');
+
+      // First pass: correct positions
+      guessArr.forEach((ch, i) => {
+        if (ch === targetArr[i]) {
+          result[i] = 'correct';
+          targetArr[i] = null;
+        }
+      });
+      // Second pass: present but wrong position
+      guessArr.forEach((ch, i) => {
+        if (result[i] === 'correct') return;
+        const idx = targetArr.indexOf(ch);
+        if (idx !== -1) {
+          result[i] = 'present';
+          targetArr[idx] = null;
+        }
+      });
+
+      const colors = { correct: '#16a34a', present: '#d97706', absent: '#374151' };
+      const borders = { correct: '#22c55e', present: '#f59e0b', absent: '#4b5563' };
+      const keyColors = { correct: '#16a34a', present: '#d97706', absent: '#4b5563' };
+
+      result.forEach((state, i) => {
+        setTimeout(() => {
+          cells[rowIdx][i].style.background   = colors[state];
+          cells[rowIdx][i].style.borderColor  = borders[state];
+          cells[rowIdx][i].style.color        = '#ffffff';
+          // Update keyboard
+          const key = guess[i];
+          if (keyMap[key]) {
+            const current = keyMap[key].dataset.state;
+            // Correct > present > absent – don't downgrade
+            if (current !== 'correct' && (state === 'correct' || current !== 'present')) {
+              keyMap[key].dataset.state = state;
+              keyMap[key].style.background = keyColors[state];
+              keyMap[key].style.color = '#ffffff';
+            }
+          }
+        }, i * 120);
+      });
+
+      return result;
+    };
+
+    // ── Handle key input ─────────────────────────────────────────
+    const handleKey = (key) => {
+      if (gameOver) return;
+
+      if (key === '⌫' || key === 'Backspace') {
+        if (currentGuess.length > 0) {
+          currentGuess = currentGuess.slice(0, -1);
+          updateCurrentRow();
+        }
+        return;
+      }
+
+      if (key === 'ENTER' || key === 'Enter') {
+        if (currentGuess.length < WORD_LEN) {
+          message.textContent = `Word must be ${WORD_LEN} letters.`;
+          message.style.color = '#f59e0b';
+          return;
+        }
+        // Submit guess
+        const rowIdx = guesses.length;
+        guesses.push(currentGuess);
+        const result = colourRow(rowIdx, currentGuess);
+
+        const won = currentGuess === targetWord;
+        currentGuess = '';
+        message.textContent = '';
+
+        setTimeout(() => {
+          if (won) {
+            gameOver = true;
+            message.textContent = `You got it in ${guesses.length}! The word was ${targetWord}.`;
+            message.style.color = '#10b981';
+          } else if (guesses.length >= MAX_GUESSES) {
+            gameOver = true;
+            message.textContent = `Game over! The word was ${targetWord}.`;
+            message.style.color = '#ef4444';
+          }
+        }, WORD_LEN * 120 + 100);
+
+        return;
+      }
+
+      if (/^[A-Za-z]$/.test(key) && currentGuess.length < WORD_LEN) {
+        currentGuess += key.toUpperCase();
+        updateCurrentRow();
+      }
+    };
+
+    // Physical keyboard listener
+    const keyListener = (e) => {
+      if (gameOver) return;
+      if (e.key === 'Backspace') { handleKey('⌫'); return; }
+      if (e.key === 'Enter')     { handleKey('ENTER'); return; }
+      if (/^[A-Za-z]$/.test(e.key)) handleKey(e.key);
+    };
+    document.addEventListener('keydown', keyListener);
+
+    // Cleanup listener when modal closes (observe DOM removal)
+    const observer = new MutationObserver(() => {
+      if (!document.body.contains(wordleBox)) {
+        document.removeEventListener('keydown', keyListener);
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    container.appendChild(wordleBox);
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  //  NPC 2 – GITHUB ANALYTICS (standalone modal)
+  // ════════════════════════════════════════════════════════════════
   async showGitHubStats() {
     try {
       await this.dataLoaded;
       const userData = this.cachedUserData || await this.fetchUserData();
-      
+
       if (!userData || !userData.github) {
         this.showToast('No GitHub data available. Connect your GitHub account in the Dashboard.');
         return;
@@ -1002,420 +992,391 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
       const gh = userData.github;
       const totalEdits = (gh.linesAdded || 0) + (gh.linesDeleted || 0);
-      
-      // Create modal for GitHub stats with gamification
+
       const modal = document.createElement('div');
       modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
+        position:fixed;top:0;left:0;width:100%;height:100%;
+        background:rgba(0,0,0,0.92);display:flex;justify-content:center;
+        align-items:center;z-index:10000;overflow-y:auto;
       `;
 
       const container = document.createElement('div');
       container.style.cssText = `
-        background: #1a1a1a;
-        border: 2px solid #06b6d4;
-        border-radius: 12px;
-        padding: 40px;
-        max-width: 450px;
-        color: #e5e7eb;
+        background:#0f172a;border:2px solid #10b981;border-radius:16px;
+        padding:40px;max-width:600px;max-height:90vh;overflow-y:auto;
+        color:#e5e7eb;margin:20px auto;
       `;
 
-      const title = document.createElement('h1');
-      title.textContent = '🔗 Your GitHub Journey';
-      title.style.cssText = 'color: #06b6d4; margin: 0 0 30px 0; text-align: center; font-size: 28px;';
-      container.appendChild(title);
-
-      // Stat cards with animations
-      const stats = [
-        { icon: '📝', label: 'Commits', value: gh.commits || 0, color: '#10b981' },
-        { icon: '🔀', label: 'Pull Requests', value: gh.prs || 0, color: '#f59e0b' },
-        { icon: '⚠️', label: 'Issues', value: gh.issues || 0, color: '#ef4444' },
-        { icon: '📊', label: 'Total Edits', value: totalEdits, color: '#06b6d4' },
-      ];
-
-      const statsGrid = document.createElement('div');
-      statsGrid.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;';
-
-      stats.forEach((stat, idx) => {
-        const card = document.createElement('div');
-        card.style.cssText = `
-          background: ${stat.color}15;
-          border: 2px solid ${stat.color};
-          border-radius: 8px;
-          padding: 15px;
-          text-align: center;
-          animation: scaleIn 0.5s ease-out ${idx * 0.1}s backwards;
-        `;
-
-        card.innerHTML = `
-          <div style="font-size: 24px; margin-bottom: 5px;">${stat.icon}</div>
-          <div style="font-size: 24px; font-weight: bold; color: ${stat.color};">${stat.value}</div>
-          <div style="font-size: 12px; color: #9ca3af; margin-top: 5px;">${stat.label}</div>
-        `;
-
-        statsGrid.appendChild(card);
-      });
-
-      container.appendChild(statsGrid);
-
-      // Code insight
-      const codeInsight = document.createElement('div');
-      codeInsight.style.cssText = `
-        background: rgba(96, 165, 250, 0.1);
-        border: 2px solid #60a5fa;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-      `;
-
-      const lineRatio = gh.linesAdded > 0 ? (gh.linesDeleted / (gh.linesAdded + gh.linesDeleted) * 100).toFixed(0) : 0;
-      const insight = gh.commits > 50 ? '🔥 Heavy contributor - Amazing dedication!' : '✨ Keep pushing those commits!';
-
-      codeInsight.innerHTML = `
-        <p style="margin: 0 0 8px 0; color: #60a5fa;"><strong>${insight}</strong></p>
-        <p style="margin: 0; font-size: 12px; color: #d1d5db;">
-          Lines added vs removed ratio: ${lineRatio}% deletions - ${100 - lineRatio}% additions
+      container.innerHTML = `
+        <h1 style="margin:0 0 6px 0;color:#10b981;font-size:26px;">GitHub Contribution Report</h1>
+        <p style="margin:0 0 28px 0;color:#64748b;font-size:13px;">
+          ${userData.name || 'Student'} — GitHub ID: ${userData.githubID || 'N/A'}
         </p>
       `;
 
-      container.appendChild(codeInsight);
+      // Stat cards
+      const statsGrid = document.createElement('div');
+      statsGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:24px;';
 
-      // Close button
+      const stats = [
+        { label: 'Commits',        value: gh.commits || 0,    color: '#10b981', suffix: '' },
+        { label: 'Pull Requests',  value: gh.prs    || 0,    color: '#3b82f6', suffix: '' },
+        { label: 'Issues Resolved',value: gh.issues || 0,    color: '#f59e0b', suffix: '' },
+        { label: 'Total Edits',    value: totalEdits,         color: '#8b5cf6', suffix: ' lines' },
+      ];
+
+      stats.forEach(stat => {
+        const card = document.createElement('div');
+        card.style.cssText = `
+          background:${stat.color}15;border:2px solid ${stat.color};
+          border-radius:10px;padding:18px;text-align:center;
+        `;
+        card.innerHTML = `
+          <div style="color:#94a3b8;font-size:12px;margin-bottom:6px;">${stat.label}</div>
+          <div style="color:${stat.color};font-size:32px;font-weight:bold;">${stat.value}${stat.suffix}</div>
+        `;
+        statsGrid.appendChild(card);
+      });
+      container.appendChild(statsGrid);
+
+      // Code quality breakdown
+      const addRatio    = totalEdits > 0 ? ((gh.linesAdded    || 0) / totalEdits * 100).toFixed(0) : 50;
+      const deleteRatio = totalEdits > 0 ? ((gh.linesDeleted  || 0) / totalEdits * 100).toFixed(0) : 50;
+
+      const qualityBox = document.createElement('div');
+      qualityBox.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px;`;
+      qualityBox.innerHTML = `
+        <h3 style="margin:0 0 16px 0;color:#10b981;">Code Quality Metrics</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:16px;">
+          <div style="background:#0f172a;padding:12px;border-radius:8px;">
+            <div style="color:#94a3b8;font-size:11px;">Lines Added</div>
+            <div style="color:#10b981;font-size:22px;font-weight:bold;">+${gh.linesAdded || 0}</div>
+          </div>
+          <div style="background:#0f172a;padding:12px;border-radius:8px;">
+            <div style="color:#94a3b8;font-size:11px;">Lines Deleted</div>
+            <div style="color:#ef4444;font-size:22px;font-weight:bold;">-${gh.linesDeleted || 0}</div>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;font-size:12px;color:#94a3b8;">Net change bar (green = additions, red = deletions)</div>
+        <div style="background:#0f172a;border-radius:6px;height:14px;overflow:hidden;display:flex;">
+          <div style="background:#10b981;width:${addRatio}%;height:100%;"></div>
+          <div style="background:#ef4444;width:${deleteRatio}%;height:100%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-top:5px;">
+          <span>Additions: ${addRatio}%</span>
+          <span>Deletions: ${deleteRatio}%</span>
+        </div>
+      `;
+      container.appendChild(qualityBox);
+
+      // Contribution insight
+      const insight = document.createElement('div');
+      insight.style.cssText = `background:#0f172a;border-left:4px solid #10b981;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px;`;
+      const commitLevel = gh.commits > 100 ? 'Elite contributor' : gh.commits > 50 ? 'Active contributor' : gh.commits > 10 ? 'Growing contributor' : 'Getting started';
+      const commitMsg   = gh.commits > 100 ? 'Outstanding dedication to the codebase!' : gh.commits > 50 ? 'Solid commit cadence — keep it up.' : gh.commits > 10 ? 'Good start — try to commit more regularly.' : 'Push your first commits to build momentum.';
+      insight.innerHTML = `
+        <div style="color:#10b981;font-weight:bold;margin-bottom:4px;">${commitLevel}</div>
+        <div style="color:#cbd5e1;font-size:13px;">${commitMsg}</div>
+      `;
+      container.appendChild(insight);
+
       const closeBtn = document.createElement('button');
-      closeBtn.textContent = 'Great Work! Close';
+      closeBtn.textContent = 'Close';
       closeBtn.style.cssText = `
-        width: 100%;
-        padding: 12px;
-        background: #06b6d4;
-        color: #000;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
+        width:100%;padding:12px;background:#10b981;color:#000;
+        border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:14px;
       `;
       closeBtn.onclick = () => modal.remove();
       container.appendChild(closeBtn);
 
       modal.appendChild(container);
       document.body.appendChild(modal);
-
-      // Add animation CSS
-      if (!document.querySelector('style#github-animations')) {
-        const style = document.createElement('style');
-        style.id = 'github-animations';
-        style.textContent = `
-          @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-          }
-        `;
-        document.head.appendChild(style);
-      }
     } catch (err) {
       console.error('Error showing GitHub stats:', err);
       this.showToast('Error loading GitHub stats');
     }
   }
 
-  /**
-   * Show interactive end-of-sprint self-evaluation with sliders
-   */
-  async showSelfEvaluation() {
+  // ════════════════════════════════════════════════════════════════
+  //  NPC 3 – SKILL RADAR (standalone modal, fixed rendering)
+  // ════════════════════════════════════════════════════════════════
+  async showSkillRadar() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.92);display:flex;justify-content:center;
+      align-items:center;z-index:10000;overflow-y:auto;
+    `;
+
+    const container = document.createElement('div');
+    container.style.cssText = `
+      background:#0f172a;border:2px solid #f59e0b;border-radius:16px;
+      padding:40px;max-width:750px;max-height:90vh;overflow-y:auto;
+      color:#e5e7eb;margin:20px auto;
+    `;
+
+    container.innerHTML = `
+      <h1 style="margin:0 0 4px 0;color:#f59e0b;font-size:26px;">Skill Radar</h1>
+      <p style="margin:0 0 24px 0;color:#64748b;font-size:13px;">This radar is built directly from your saved self-evaluation data.</p>
+    `;
+
+    const loadingBox = document.createElement('div');
+    loadingBox.style.cssText = 'padding:16px;border-radius:12px;background:#1e293b;border:1px solid #334155;color:#cbd5e1;margin-bottom:20px;';
+    loadingBox.textContent = 'Loading your self-evaluation...';
+    container.appendChild(loadingBox);
+
+    const canvasWrap = document.createElement('div');
+    canvasWrap.style.cssText = 'display:none;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px;';
+
+    const canvasTitle = document.createElement('div');
+    canvasTitle.style.cssText = 'color:#f59e0b;font-weight:bold;margin-bottom:16px;font-size:16px;text-align:center;';
+    canvasTitle.textContent = 'Your Skill Radar';
+    canvasWrap.appendChild(canvasTitle);
+
+    const canvas = document.createElement('canvas');
+    const CANVAS_SIZE = 440;
+    const DPR = window.devicePixelRatio || 1;
+    canvas.width = CANVAS_SIZE * DPR;
+    canvas.height = CANVAS_SIZE * DPR;
+    canvas.style.cssText = `display:block;margin:0 auto;width:${CANVAS_SIZE}px;height:${CANVAS_SIZE}px;`;
+    canvasWrap.appendChild(canvas);
+
+    const analysisBox = document.createElement('div');
+    analysisBox.style.cssText = 'margin-top:16px;';
+    canvasWrap.appendChild(analysisBox);
+    container.appendChild(canvasWrap);
+
+    const apiToSkillLabel = {
+      attendance: 'Attendance',
+      workHabits: 'Work Habits',
+      behavior: 'Behavior',
+      timeliness: 'Timeliness',
+      techSense: 'Tech Sense',
+      techTalk: 'Tech Talk',
+      techGrowth: 'Tech Growth',
+      advocacy: 'Advocacy',
+      communication: 'Communication',
+      integrity: 'Integrity',
+      organization: 'Organization',
+    };
+
+    const normalizeSkillValue = (value) => {
+      const numeric = Number(value);
+      if (Number.isFinite(numeric)) return Math.max(1, Math.min(5, numeric));
+      return 3;
+    };
+
     try {
-      // Create evaluation modal overlay
-      const modal = document.createElement('div');
-      modal.id = 'self-eval-modal';
-      modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-      `;
+      const pyRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (!pyRes.ok) throw new Error('Unable to identify the current user');
+      const pyData = await pyRes.json();
 
-      const container = document.createElement('div');
-      container.style.cssText = `
-        background: #1a1a1a;
-        border: 2px solid #3b82f6;
-        border-radius: 12px;
-        padding: 30px;
-        max-width: 600px;
-        max-height: 80vh;
-        overflow-y: auto;
-        color: #e5e7eb;
-        font-family: Arial, sans-serif;
-      `;
+      const personRes = await fetch(`${javaURI}/api/person/uid/${pyData.uid}`, fetchOptions);
+      if (!personRes.ok) throw new Error('Unable to load the student record');
+      const person = await personRes.json();
 
-      // Title
-      const title = document.createElement('h2');
-      title.textContent = 'Sprint Self-Evaluation';
-      title.style.cssText = 'margin-top: 0; color: #60a5fa; margin-bottom: 20px; font-size: 24px;';
-      container.appendChild(title);
+      const evalRes = await fetch(`${javaURI}/api/student-evaluation/get/${person.id}`, fetchOptions);
+      if (!evalRes.ok) throw new Error('Unable to load self-evaluation data');
+      const evalJson = await evalRes.json();
+      const evaluation = evalJson.evaluation || evalJson;
 
-      // Instructions
-      const instructions = document.createElement('p');
-      instructions.textContent = 'Rate your skills on a scale of 1-5 for this sprint:';
-      instructions.style.cssText = 'color: #9ca3af; margin-bottom: 20px; font-size: 14px;';
-      container.appendChild(instructions);
-
-      // Skills to evaluate
-      const skills = [
-        { id: 'communication', label: 'Communication & Collaboration', category: 'soft' },
-        { id: 'problem_solving', label: 'Problem Solving & Creativity', category: 'soft' },
-        { id: 'perseverance', label: 'Perseverance & Growth Mindset', category: 'soft' },
-        { id: 'time_mgmt', label: 'Time Management & Organization', category: 'soft' },
-        { id: 'code_quality', label: 'Code Quality & Best Practices', category: 'hard' },
-        { id: 'debugging', label: 'Debugging & Testing', category: 'hard' },
-        { id: 'algorithms', label: 'Algorithm Understanding', category: 'hard' },
-        { id: 'optimization', label: 'Performance Optimization', category: 'hard' },
-      ];
-
-      const sliderValues = {};
-
-      // Soft Skills Section
-      const softTitle = document.createElement('h3');
-      softTitle.textContent = 'Soft Skills';
-      softTitle.style.cssText = 'color: #10b981; margin-top: 20px; margin-bottom: 15px; font-size: 16px;';
-      container.appendChild(softTitle);
-
-      // Hard Skills Section
-      const hardTitle = document.createElement('h3');
-      hardTitle.textContent = 'Hard Coding Skills';
-      hardTitle.style.cssText = 'color: #f59e0b; margin-top: 20px; margin-bottom: 15px; font-size: 16px;';
-
-      // Add sliders for soft skills
-      let firstHardSkillIndex = -1;
-      skills.forEach((skill, idx) => {
-        if (skill.category === 'hard' && firstHardSkillIndex === -1) {
-          firstHardSkillIndex = idx;
-          container.appendChild(hardTitle);
-        }
-
-        const sliderBox = document.createElement('div');
-        sliderBox.style.cssText = 'margin-bottom: 15px;';
-
-        const label = document.createElement('label');
-        label.textContent = skill.label;
-        label.style.cssText = 'display: block; font-size: 13px; margin-bottom: 5px; color: #d1d5db;';
-        sliderBox.appendChild(label);
-
-        const slider = document.createElement('input');
-        slider.type = 'range';
-        slider.min = '1';
-        slider.max = '5';
-        slider.value = '3';
-        slider.style.cssText = 'width: 100%; cursor: pointer;';
-        sliderValues[skill.id] = 3;
-
-        const valueDisplay = document.createElement('span');
-        valueDisplay.textContent = '3 / 5';
-        valueDisplay.style.cssText = 'float: right; color: #60a5fa; font-size: 12px; font-weight: bold;';
-        label.appendChild(valueDisplay);
-
-        slider.addEventListener('input', (e) => {
-          sliderValues[skill.id] = parseInt(e.target.value);
-          valueDisplay.textContent = `${e.target.value} / 5`;
-        });
-
-        sliderBox.appendChild(slider);
-        container.appendChild(sliderBox);
+      const skills = {};
+      Object.entries(apiToSkillLabel).forEach(([apiKey, label]) => {
+        const rawValue = evaluation?.[apiKey] ?? evaluation?.[label] ?? 3;
+        skills[label] = normalizeSkillValue(rawValue);
       });
 
-      // Buttons
-      const buttonBox = document.createElement('div');
-      buttonBox.style.cssText = 'margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;';
+      const orderedSkills = Object.entries(skills).map(([label, value]) => ({ label, value }));
+      const strongest = orderedSkills.reduce((best, current) => (current.value > best.value ? current : best), orderedSkills[0]);
+      const weakest = orderedSkills.reduce((best, current) => (current.value < best.value ? current : best), orderedSkills[0]);
 
-      const cancelBtn = document.createElement('button');
-      cancelBtn.textContent = 'Cancel';
-      cancelBtn.style.cssText = `
-        padding: 10px 20px;
-        background: #4b5563;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
+      this.drawSkillRadarOnCanvas(canvas, skills, DPR);
+      loadingBox.remove();
+      canvasWrap.style.display = 'block';
+
+      analysisBox.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:#0f172a;border:1px solid #22c55e;border-radius:8px;padding:14px;">
+            <div style="color:#22c55e;font-weight:bold;margin-bottom:4px;">Strongest: ${strongest.label}</div>
+            <div style="color:#94a3b8;font-size:12px;">${strongest.value}/5 — Leverage this strength to take on harder challenges or mentor peers.</div>
+          </div>
+          <div style="background:#0f172a;border:1px solid #f59e0b;border-radius:8px;padding:14px;">
+            <div style="color:#f59e0b;font-weight:bold;margin-bottom:4px;">Growth Area: ${weakest.label}</div>
+            <div style="color:#94a3b8;font-size:12px;">${weakest.value}/5 — Focus deliberate practice here and seek feedback.</div>
+          </div>
+        </div>
       `;
-      cancelBtn.onclick = () => modal.remove();
-
-      const submitBtn = document.createElement('button');
-      submitBtn.textContent = 'Submit & Predict Grade';
-      submitBtn.style.cssText = `
-        padding: 10px 20px;
-        background: #3b82f6;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-      `;
-      submitBtn.onclick = async () => {
-        await this.submitSelfEvaluation(sliderValues);
-        modal.remove();
-      };
-
-      buttonBox.appendChild(cancelBtn);
-      buttonBox.appendChild(submitBtn);
-      container.appendChild(buttonBox);
-
-      modal.appendChild(container);
-      document.body.appendChild(modal);
-    } catch (err) {
-      console.error('Error showing self-evaluation:', err);
-      this.showToast('Error loading self-evaluation');
+    } catch (error) {
+      console.error('Error loading skill radar:', error);
+      loadingBox.textContent = 'Unable to load your self-evaluation right now.';
+      loadingBox.style.borderColor = '#ef4444';
+      loadingBox.style.color = '#fca5a5';
     }
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.cssText = `
+      width:100%;padding:12px;background:#64748b;color:white;
+      border:none;border-radius:8px;cursor:pointer;font-size:14px;
+    `;
+    closeBtn.onclick = () => modal.remove();
+    container.appendChild(closeBtn);
+
+    modal.appendChild(container);
+    document.body.appendChild(modal);
   }
 
   /**
-   * Submit self-evaluation and show grade prediction
+   * Draw a skill radar on a canvas element.
+   * @param {HTMLCanvasElement} canvas
+   * @param {Object} skills  e.g. { Attendance: 4, "Work Habits": 3, ... }
+   * @param {number} dpr     device pixel ratio (default 1)
    */
-  async submitSelfEvaluation(sliderValues) {
-    try {
-      // Calculate weighted score
-      const softSkills = ['communication', 'problem_solving', 'perseverance', 'time_mgmt'];
-      const hardSkills = ['code_quality', 'debugging', 'algorithms', 'optimization'];
+  drawSkillRadarOnCanvas(canvas, skills, dpr = 1) {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;   // already multiplied by dpr
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.scale(dpr, dpr);      // scale once so all coords are in CSS pixels
 
-      const softAvg = softSkills.reduce((sum, id) => sum + (sliderValues[id] || 0), 0) / softSkills.length;
-      const hardAvg = hardSkills.reduce((sum, id) => sum + (sliderValues[id] || 0), 0) / hardSkills.length;
+    const cssW = W / dpr;
+    const cssH = H / dpr;
+    const cx = cssW / 2;
+    const cy = cssH / 2;
+    const radius = Math.min(cx, cy) * 0.60;   // 60% of half-size → leaves room for labels
 
-      // Weighted: 40% soft skills, 60% hard skills
-      const overallScore = (softAvg * 0.4 + hardAvg * 0.6);
+    const labels  = Object.keys(skills);
+    const values  = Object.values(skills);     // 1–5
+    const n = labels.length;
+    if (n === 0) return;
 
-      // Convert to grade
-      let grade, gradeColor;
-      if (overallScore >= 4.5) {
-        grade = 'A (Excellent)';
-        gradeColor = '#10b981';
-      } else if (overallScore >= 4.0) {
-        grade = 'A- (Very Good)';
-        gradeColor = '#10b981';
-      } else if (overallScore >= 3.5) {
-        grade = 'B+ (Good)';
-        gradeColor = '#60a5fa';
-      } else if (overallScore >= 3.0) {
-        grade = 'B (Satisfactory)';
-        gradeColor = '#60a5fa';
-      } else if (overallScore >= 2.5) {
-        grade = 'C (Needs Improvement)';
-        gradeColor = '#f59e0b';
-      } else {
-        grade = 'F (Below Expectations)';
-        gradeColor = '#ef4444';
+    const angleStep = (2 * Math.PI) / n;
+    const startAngle = -Math.PI / 2;           // start at top
+
+    const ptX = (i, r) => cx + r * Math.cos(startAngle + i * angleStep);
+    const ptY = (i, r) => cy + r * Math.sin(startAngle + i * angleStep);
+
+    // ── Grid rings (1–5) ────────────────────────────────────────
+    for (let ring = 1; ring <= 5; ring++) {
+      const r = (radius / 5) * ring;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const x = ptX(i, r);
+        const y = ptY(i, r);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
-
-      this.updateProfilePanel({ grade });
-
-      // Show result
-      const resultModal = document.createElement('div');
-      resultModal.id = 'eval-result-modal';
-      resultModal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10001;
-      `;
-
-      const resultContainer = document.createElement('div');
-      resultContainer.style.cssText = `
-        background: #1a1a1a;
-        border: 2px solid #3b82f6;
-        border-radius: 12px;
-        padding: 40px;
-        max-width: 400px;
-        text-align: center;
-        color: #e5e7eb;
-      `;
-
-      const resultTitle = document.createElement('h2');
-      resultTitle.textContent = 'Your Sprint Grade';
-      resultTitle.style.cssText = 'color: #60a5fa; margin-bottom: 30px; font-size: 28px;';
-      resultContainer.appendChild(resultTitle);
-
-      const gradeDisplay = document.createElement('div');
-      gradeDisplay.textContent = grade;
-      gradeDisplay.style.cssText = `
-        font-size: 48px;
-        font-weight: bold;
-        color: ${gradeColor};
-        margin-bottom: 20px;
-        padding: 20px;
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 8px;
-      `;
-      resultContainer.appendChild(gradeDisplay);
-
-      const scoreText = document.createElement('p');
-      scoreText.textContent = `Score: ${overallScore.toFixed(2)} / 5.0`;
-      scoreText.style.cssText = 'color: #9ca3af; margin-bottom: 20px; font-size: 14px;';
-      resultContainer.appendChild(scoreText);
-
-      const breakdown = document.createElement('div');
-      breakdown.style.cssText = 'text-align: left; margin: 20px 0; font-size: 13px; color: #d1d5db;';
-      breakdown.innerHTML = `
-        <p>Soft Skills Average: <span style="color: #10b981; font-weight: bold;">${softAvg.toFixed(2)}/5</span></p>
-        <p>Hard Skills Average: <span style="color: #f59e0b; font-weight: bold;">${hardAvg.toFixed(2)}/5</span></p>
-      `;
-      resultContainer.appendChild(breakdown);
-
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = 'Great! Keep improving!';
-      closeBtn.style.cssText = `
-        margin-top: 30px;
-        padding: 12px 24px;
-        background: #3b82f6;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        width: 100%;
-      `;
-      closeBtn.onclick = () => {
-        resultModal.remove();
-      };
-      resultContainer.appendChild(closeBtn);
-
-      resultModal.appendChild(resultContainer);
-      document.body.appendChild(resultModal);
-
-      // Show toast celebration
-      this.showToast('Evaluation submitted! Check your grade above.');
-    } catch (err) {
-      console.error('Error submitting evaluation:', err);
-      this.showToast('Error saving evaluation. Please try again.');
+      ctx.closePath();
+      ctx.strokeStyle = `rgba(251,191,36,${0.08 + ring * 0.04})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
     }
+
+    // ── Spokes ───────────────────────────────────────────────────
+    ctx.strokeStyle = 'rgba(251,191,36,0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < n; i++) {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(ptX(i, radius), ptY(i, radius));
+      ctx.stroke();
+    }
+
+    // ── Data polygon ─────────────────────────────────────────────
+    ctx.beginPath();
+    labels.forEach((label, i) => {
+      const r = (values[i] / 5) * radius;
+      const x = ptX(i, r);
+      const y = ptY(i, r);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fillStyle   = 'rgba(251,191,36,0.25)';
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth   = 2.5;
+    ctx.fill();
+    ctx.stroke();
+
+    // ── Data points ──────────────────────────────────────────────
+    labels.forEach((label, i) => {
+      const r = (values[i] / 5) * radius;
+      ctx.beginPath();
+      ctx.arc(ptX(i, r), ptY(i, r), 5, 0, 2 * Math.PI);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // ── Labels ───────────────────────────────────────────────────
+    const LABEL_PADDING = 22;
+    ctx.font = `bold ${Math.round(cssW * 0.028)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    labels.forEach((label, i) => {
+      const lx = ptX(i, radius + LABEL_PADDING);
+      const ly = ptY(i, radius + LABEL_PADDING);
+      ctx.fillStyle = '#e5e7eb';
+      ctx.fillText(label, lx, ly);
+
+      // Score below label
+      ctx.font = `${Math.round(cssW * 0.024)}px Arial`;
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText(`${values[i]}/5`, lx, ly + 14);
+      ctx.font = `bold ${Math.round(cssW * 0.028)}px Arial`;
+    });
+
+    // Reset scale for future redraws
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
-  /**
-   * Fetch user data from backend
-   * @returns {Promise<Object|null>} User data or null if fetch fails
-   */
+  // ════════════════════════════════════════════════════════════════
+  //  DATA FETCHING
+  // ════════════════════════════════════════════════════════════════
   async fetchUserData() {
     try {
       console.log('Assessment Observatory: Starting data fetch...');
-      
-      // Fetch user identity from Flask
+
+      // Check for debug test data flag
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('debug-test-data')) {
+        console.log('Assessment Observatory: Using debug test data');
+        return {
+          uid: 'test-student',
+          name: 'Test Student',
+          avatar: 'default.png',
+          analyticsSummary: {
+            interactionPercentage: 72.5,
+            averageScrollDepth: 64.2,
+            totalTimeSpentSeconds: 170820,
+            scrollDepthTrend: 'stable',
+            engagementTrend: 'stable'
+          },
+          github: {
+            commits: 42,
+            prs: 8,
+            issues: 15,
+            linesAdded: 3421,
+            linesDeleted: 892
+          },
+          skills: {
+            'Attendance': 4,
+            'Work Habits': 3,
+            'Behavior': 4,
+            'Timeliness': 3,
+            'Tech Sense': 4,
+            'Tech Talk': 3,
+            'Tech Growth': 4,
+            'Advocacy': 2,
+            'Communication': 3,
+            'Integrity': 5,
+            'Organization': 3
+          }
+        };
+      }
+
       const userResponse = await fetch(`${pythonURI}/api/id`, fetchOptions);
-      
       if (!userResponse.ok) {
         console.error('Assessment Observatory: User info fetch failed:', userResponse.status);
         return null;
@@ -1423,85 +1384,58 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
       const userData = await userResponse.json();
       console.log('Assessment Observatory: User info fetched, uid:', userData.uid);
-      
-      // Fetch all analytics in parallel
-      const [analyticsRes, commitsRes, prsRes, issuesRes] = await Promise.all([
-        fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions).catch(e => {
-          console.error('Analytics: OCS fetch threw error:', e);
-          return { ok: false };
-        }),
-        fetch(`${pythonURI}/api/analytics/github/user/commits`, fetchOptions).catch(e => {
-          console.error('Assessment Observatory: GitHub commits fetch threw error:', e);
-          return { ok: false };
-        }),
-        fetch(`${pythonURI}/api/analytics/github/user/prs`, fetchOptions).catch(e => {
-          console.error('Assessment Observatory: GitHub prs fetch threw error:', e);
-          return { ok: false };
-        }),
-        fetch(`${pythonURI}/api/analytics/github/user/issues`, fetchOptions).catch(e => {
-          console.error('Assessment Observatory: GitHub issues fetch threw error:', e);
-          return { ok: false };
-        })
+
+      const [analyticsRes, detailedRes, commitsRes, prsRes, issuesRes] = await Promise.all([
+        fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions).catch(e => { console.error('Analytics fetch error:', e); return { ok: false }; }),
+        fetch(`${javaURI}/api/ocs-analytics/user/detailed`, fetchOptions).catch(e => { console.error('Detailed analytics fetch error:', e); return { ok: false }; }),
+        fetch(`${pythonURI}/api/analytics/github/user/commits`, fetchOptions).catch(e => { console.error('Commits fetch error:', e); return { ok: false }; }),
+        fetch(`${pythonURI}/api/analytics/github/user/prs`,     fetchOptions).catch(e => { console.error('PRs fetch error:', e);     return { ok: false }; }),
+        fetch(`${pythonURI}/api/analytics/github/user/issues`,  fetchOptions).catch(e => { console.error('Issues fetch error:', e);  return { ok: false }; }),
       ]);
 
-      // Process OCS Analytics
       if (analyticsRes.ok) {
-        try {
-          const analyticsSummary = await analyticsRes.json();
-          console.log('Assessment Observatory: OCS summary received:', analyticsSummary);
-          userData.analyticsSummary = analyticsSummary;
-        } catch (err) {
-          console.error('Assessment Observatory: Failed to parse OCS response:', err);
-        }
-      } else {
-        console.warn('Assessment Observatory: OCS response not ok, status:', analyticsRes.status);
+        try { userData.analyticsSummary = await analyticsRes.json(); }
+        catch (err) { console.error('Failed to parse OCS response:', err); }
       }
 
-      // Process GitHub Commits
+      if (detailedRes.ok) {
+        try {
+          userData.analyticsSessions = await detailedRes.json();
+        } catch (err) {
+          console.error('Failed to parse detailed analytics:', err);
+          userData.analyticsSessions = [];
+        }
+      } else {
+        userData.analyticsSessions = [];
+      }
+
       if (commitsRes.ok) {
         try {
-          const commitsData = await commitsRes.json();
-          console.log('Assessment Observatory: GitHub commits received:', commitsData);
+          const d = await commitsRes.json();
           userData.github = userData.github || {};
-          userData.github.commits = commitsData.total_commit_contributions || 0;
-          userData.github.linesAdded = commitsData.total_lines_added || 0;
-          userData.github.linesDeleted = commitsData.total_lines_deleted || 0;
-        } catch (err) {
-          console.error('Assessment Observatory: Failed to parse commits response:', err);
-        }
-      } else {
-        console.warn('Assessment Observatory: Commits response not ok, status:', commitsRes.status);
+          userData.github.commits      = d.total_commit_contributions || 0;
+          userData.github.linesAdded   = d.total_lines_added   || 0;
+          userData.github.linesDeleted = d.total_lines_deleted  || 0;
+        } catch (err) { console.error('Failed to parse commits:', err); }
       }
 
-      // Process GitHub PRs
       if (prsRes.ok) {
         try {
-          const prsData = await prsRes.json();
-          console.log('Assessment Observatory: GitHub PRs received:', prsData);
+          const d = await prsRes.json();
           userData.github = userData.github || {};
-          userData.github.prs = (prsData.pull_requests || []).length;
-        } catch (err) {
-          console.error('Assessment Observatory: Failed to parse PRs response:', err);
-        }
-      } else {
-        console.warn('Assessment Observatory: PRs response not ok, status:', prsRes.status);
+          userData.github.prs = (d.pull_requests || []).length;
+        } catch (err) { console.error('Failed to parse PRs:', err); }
       }
 
-      // Process GitHub Issues
       if (issuesRes.ok) {
         try {
-          const issuesData = await issuesRes.json();
-          console.log('Assessment Observatory: GitHub issues received:', issuesData);
+          const d = await issuesRes.json();
           userData.github = userData.github || {};
-          userData.github.issues = (issuesData.issues || []).length;
-        } catch (err) {
-          console.error('Assessment Observatory: Failed to parse issues response:', err);
-        }
-      } else {
-        console.warn('Assessment Observatory: Issues response not ok, status:', issuesRes.status);
+          userData.github.issues = (d.issues || []).length;
+        } catch (err) { console.error('Failed to parse issues:', err); }
       }
 
-      console.log('Assessment Observatory: All data fetched, final object:', userData);
+      console.log('Assessment Observatory: All data fetched', userData);
       return userData;
     } catch (err) {
       console.error('Assessment Observatory: Fatal error in fetchUserData:', err);
@@ -1509,31 +1443,24 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     }
   }
 
-  /**
-   * Format time in milliseconds to human-readable format
-   */
+  // ════════════════════════════════════════════════════════════════
+  //  UTILITIES
+  // ════════════════════════════════════════════════════════════════
   formatTime(milliseconds) {
     if (!milliseconds || milliseconds <= 0) return '0h 0m';
-    
     const totalMinutes = Math.floor(milliseconds / (1000 * 60));
-    const hours = Math.floor(totalMinutes / 60);
+    const hours   = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    
     if (hours === 0) return `${minutes}m`;
     return `${hours}h ${minutes}m`;
   }
 
-  /**
-   * Format date to human-readable format
-   */
   formatDate(dateString) {
     if (!dateString) return null;
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return dateString;
-    }
+    } catch { return dateString; }
   }
 
   destroy() {

@@ -4,7 +4,7 @@ class StatusPanel {
       id: 'ocs-status-panel',
       title: '',
       fields: [],
-      actions: [],
+      actions: [], // Array of { label, onClick, danger, title }
       className: 'ocs-status-panel',
       mountTo: null,
       width: '260px',
@@ -20,10 +20,7 @@ class StatusPanel {
     this.element = null;
     this.fieldElements = new Map();
     this.actionElements = [];
-
-    this.isCollapsed = false;
-    this.contentContainer = null;
-    this.toggleBtn = null;
+    this.collapsed = false;
   }
 
   getMountTarget() {
@@ -34,16 +31,15 @@ class StatusPanel {
   }
 
   ensureMounted() {
-    if (this.element && this.element.isConnected) {
-      return this.element;
+    if (!this.element || !this.element.isConnected) {
+      this.render();
     }
-    return this.render();
+    return this.element;
   }
 
   render() {
-    const existing = document.getElementById(this.config.id);
-    if (existing) {
-      existing.remove();
+    if (this.element?.isConnected) {
+      this.element.remove();
     }
 
     const panel = document.createElement('section');
@@ -55,33 +51,51 @@ class StatusPanel {
       top: this.config.position?.top || '16px',
       left: this.config.position?.left || '16px',
       zIndex: this.config.zIndex,
-      width: this.config.width,
-      padding: this.config.padding,
+      width: this.collapsed ? 'auto' : this.config.width,
+      padding: this.collapsed ? '6px 10px' : this.config.padding,
       borderRadius: this.config.borderRadius,
       fontFamily: this.config.fontFamily,
-      background: this.config.theme.background || 'var(--panel-mid)',
-      border: `1px solid ${this.config.theme.borderColor || 'var(--pref-accent-color)'}`,
-      color: this.config.theme.textColor || 'var(--pref-text-color)',
+      background: this.config.theme.background || 'var(--ocs-status-panel-background)',
+      border: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
+      color: this.config.theme.textColor || 'var(--ocs-status-panel-text)',
       boxShadow: this.config.theme.boxShadow || 'none',
-      overflow: 'hidden', // prevents weird visual overflow
     });
 
-    // Title
     const title = document.createElement('div');
     Object.assign(title.style, {
-      color: this.config.theme.accentColor || 'var(--pref-accent-color)',
+      color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
       fontSize: '12px',
       fontWeight: 'bold',
       letterSpacing: '1px',
+      marginBottom: '8px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     });
     title.textContent = this.config.title;
-
-    // Header
-    const header = this.createHeader(title);
-
-    // Content container (EVERYTHING goes inside here)
-    const content = document.createElement('div');
-    this.contentContainer = content;
+    const toggleBtn = document.createElement('button');
+    toggleBtn.textContent = '−';
+    Object.assign(toggleBtn.style, {
+      background: 'transparent',
+      border: 'none',
+      color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
+      fontSize: '16px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      lineHeight: '1',
+      padding: '0 2px',
+      fontFamily: this.config.fontFamily,
+      position: 'relative',
+    });
+    toggleBtn.title = 'Minimize panel';
+    toggleBtn.addEventListener('click', () => this.setCollapsed(!this.collapsed));
+    title.appendChild(toggleBtn);
+    this._toggleBtn = toggleBtn;
+    panel.appendChild(title);
+    const body = document.createElement('div');
+    body.style.display = this.collapsed ? 'none' : 'block';
+    this._bodyEl = body;
+    panel.appendChild(body);
 
     this.fieldElements.clear();
 
@@ -90,51 +104,51 @@ class StatusPanel {
         const section = document.createElement('div');
         Object.assign(section.style, {
           marginTop: field.marginTop || '8px',
-          color: this.config.theme.accentColor || 'var(--pref-accent-color)',
+          color: this.config.theme.accentColor || 'var(--ocs-status-panel-accent)',
           fontSize: '11px',
           letterSpacing: '1px',
         });
         section.textContent = field.title;
-        content.appendChild(section);
+        body.appendChild(section);
         continue;
       }
 
       const row = document.createElement('div');
       row.dataset.field = field.key;
       row.textContent = `${field.label}: ${field.emptyValue || '—'}`;
-
-      content.appendChild(row);
+      body.appendChild(row);
       this.fieldElements.set(field.key, row);
     }
 
+    // Render action buttons if provided
     if (this.config.actions && this.config.actions.length > 0) {
       const actionsContainer = document.createElement('div');
       Object.assign(actionsContainer.style, {
         marginTop: '12px',
         paddingTop: '10px',
-        borderTop: `1px solid ${this.config.theme.borderColor || 'var(--pref-accent-color)'}`,
+        borderTop: `1px solid ${this.config.theme.borderColor || 'var(--ocs-status-panel-border)'}`,
         display: 'flex',
         flexDirection: 'column',
         gap: '6px',
       });
 
       this.actionElements = [];
-
       for (const action of this.config.actions) {
         const btn = document.createElement('button');
         btn.textContent = action.label;
+        if (action.title) {
+          btn.title = action.title;
+        }
 
-        if (action.title) btn.title = action.title;
-
-        const bgColor = action.danger
+        const bgColor = action.danger 
           ? '#d32f2f'
-          : (this.config.theme.secondaryButtonBackground || 'var(--panel-mid)');
+          : (this.config.theme.secondaryButtonBackground || 'var(--ocs-status-panel-button-bg)');
         const textColor = action.danger
           ? '#fff'
-          : (this.config.theme.secondaryButtonTextColor || 'var(--pref-text-color)');
+          : (this.config.theme.secondaryButtonTextColor || 'var(--ocs-status-panel-button-text)');
         const borderColor = action.danger
           ? '#d32f2f'
-          : (this.config.theme.borderColor || 'var(--pref-accent-color)');
+          : (this.config.theme.borderColor || 'var(--ocs-status-panel-border)');
 
         Object.assign(btn.style, {
           padding: '6px 10px',
@@ -171,77 +185,46 @@ class StatusPanel {
         this.actionElements.push(btn);
       }
 
-      content.appendChild(actionsContainer);
+      body.appendChild(actionsContainer);
     }
-
-    if (this.isCollapsed) {
-      content.style.display = 'none';
-    }
-
-    panel.appendChild(header);
-    panel.appendChild(content);
 
     this.getMountTarget().appendChild(panel);
     this.element = panel;
-
     return panel;
-  }
-
-  createHeader(titleElement) {
-    const header = document.createElement('div');
-
-    Object.assign(header.style, {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '8px',
-    });
-
-    const toggleBtn = document.createElement('button');
-    this.toggleBtn = toggleBtn;
-
-    Object.assign(toggleBtn.style, {
-      background: 'transparent',
-      border: 'none',
-      color: this.config.theme.accentColor || '#4ecca3',
-      cursor: 'pointer',
-      fontSize: '14px',
-      fontWeight: 'bold',
-    });
-
-    toggleBtn.textContent = this.isCollapsed ? '+' : '−';
-
-    toggleBtn.onclick = () => {
-      this.isCollapsed = !this.isCollapsed;
-
-      if (this.isCollapsed) {
-        this.contentContainer.style.display = 'none';
-        this.element.style.paddingBottom = '6px';
-      } else {
-        this.contentContainer.style.display = 'block';
-        this.element.style.paddingBottom = this.config.padding;
-      }
-
-      toggleBtn.textContent = this.isCollapsed ? '+' : '−';
-    };
-
-    header.appendChild(titleElement);
-    header.appendChild(toggleBtn);
-
-    return header;
   }
 
   update(values = {}) {
     this.ensureMounted();
 
     for (const field of this.config.fields) {
-      if (field.type === 'section') continue;
+      if (field.type === 'section') {
+        continue;
+      }
 
       const row = this.fieldElements.get(field.key);
-      if (!row) continue;
+      if (!row) {
+        continue;
+      }
 
       const value = values[field.key];
       row.textContent = `${field.label}: ${value || field.emptyValue || '—'}`;
+    }
+  }
+
+  setCollapsed(collapsed) {
+    this.collapsed = collapsed;
+    if (this._bodyEl) {
+      this._bodyEl.style.display = collapsed ? 'none' : 'block';
+    }
+    if (this.element) {
+      this.element.style.padding = collapsed ? '6px 10px' : this.config.padding;
+      this.element.style.width = collapsed ? 'auto' : this.config.width;
+      this.element.style.minWidth = collapsed ? '0' : '';
+    }
+
+    if (this._toggleBtn) {
+      this._toggleBtn.textContent = collapsed ? '+' : '−';
+      this._toggleBtn.title = collapsed ? 'Expand panel' : 'Minimize panel';
     }
   }
 
