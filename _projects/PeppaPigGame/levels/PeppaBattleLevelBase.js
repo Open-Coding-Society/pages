@@ -287,7 +287,7 @@ class PeppaBattleLevelBase {
         const overlay = document.createElement('div');
         overlay.id = `peppa-lose-overlay-${this.config.levelId}`;
         overlay.style.cssText = `
-            position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column;
+            position: absolute; inset: 0; z-index: 99999; display: flex; flex-direction: column;
             align-items: center; justify-content: center; background: rgba(0,0,0,0.88);
             color: #fff; font-family: Arial, sans-serif; text-align: center;
         `;
@@ -511,7 +511,7 @@ class PeppaBattleLevelBase {
         const overlay = document.createElement('div');
         overlay.id = 'peppa-win-overlay';
         overlay.style.cssText = `
-            position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column;
+            position: absolute; inset: 0; z-index: 99999; display: flex; flex-direction: column;
             align-items: center; justify-content: center; background: rgba(0,0,0,0.85);
             color: #fff; font-family: Arial, sans-serif; text-align: center;
         `;
