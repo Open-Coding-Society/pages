@@ -25,7 +25,7 @@ class GameLevelMazeSub {
     const image_data_cave = {
       name: 'maze',
       greeting: "The walls close in around you...",
-      src: path + "/images/gamify/dungeon.png",
+      src: "/projects/escape-game/images/dungeon.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -34,7 +34,7 @@ class GameLevelMazeSub {
     const sprite_data_octopus = {
       id: 'Octopus',
       greeting: "I must find my way through...",
-      src: path + "/images/gamify/octopus.png",
+      src: "/projects/escape-game/images/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -70,15 +70,6 @@ class GameLevelMazeSub {
     }
 
     // ── Staircase platforms ───────────────────────────────────────────────────
-    //
-    //                                         [E]
-    //                               ┌─────────┐
-    //                     ┌─────────┘
-    //           ┌─────────┘
-    // ┌─────────┘
-    // [S]
-    // └──────────────────────────────────────────┘  floor
-
     const floor = b('floor', 0.00, 0.90, 1.00, 0.10);
     const step1 = b('step1', 0.03, 0.72, 0.22, 0.03);
     const step2 = b('step2', 0.22, 0.55, 0.22, 0.03);
@@ -92,7 +83,7 @@ class GameLevelMazeSub {
     const sprite_data_shadow = {
       id: 'Whispering Shadow',
       greeting: sprite_greet_shadow,
-      src: path + "/images/gamify/tux.png",
+      src: "/projects/escape-game/images/tux.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 256, width: 352 },
@@ -124,7 +115,7 @@ class GameLevelMazeSub {
     const sprite_data_lantern = {
       id: 'Lantern Keeper',
       greeting: sprite_greet_lantern,
-      src: path + "/images/gamify/octocat.png",
+      src: "/projects/escape-game/images/octocat.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 301, width: 801 },
@@ -156,7 +147,7 @@ class GameLevelMazeSub {
     const sprite_data_warden = {
       id: 'Exit Warden',
       greeting: sprite_greet_warden,
-      src: path + "/images/gamify/robot.png",
+      src: "/projects/escape-game/images/robot.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 100,
       pixels: { height: 316, width: 627 },
@@ -242,6 +233,7 @@ class GameLevelMazeSub {
         ]);
       }
     };
+
     const sprite_data_coin = {
       id: 'coin',
       greeting: false,
@@ -252,7 +244,7 @@ class GameLevelMazeSub {
       hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
       zIndex: 12,
       value: 1
-};
+    };
 
     // ── Level class list ──────────────────────────────────────────────────────
     this.classes = [
@@ -264,7 +256,7 @@ class GameLevelMazeSub {
       { class: Barrier, data: step3 },
       { class: Barrier, data: step4 },
       { class: Barrier, data: step5 },
-      
+
       { class: Coin, data: sprite_data_coin },
 
       { class: Npc,    data: sprite_data_shadow  },

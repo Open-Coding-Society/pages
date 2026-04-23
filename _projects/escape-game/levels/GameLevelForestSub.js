@@ -38,7 +38,6 @@ class GameLevelForestSub {
       requestAnimationFrame(() => {
         fade.style.opacity = '1';
         setTimeout(() => {
-          // Wipe stale canvases before launching next sublevel
           const gameContainer = document.getElementById('gameContainer');
           if (gameContainer) {
             Array.from(gameContainer.children).forEach(child => {
@@ -67,7 +66,7 @@ class GameLevelForestSub {
     const image_data_bg = {
       name: 'fork',
       greeting: "Two paths stretch into the distance. The air is still. Which way?",
-      src: path + "/images/gamify/desert.png",
+      src: "/projects/escape-game/images/desert.png",
       pixels: { height: 580, width: 1038 }
     };
 
@@ -76,7 +75,7 @@ class GameLevelForestSub {
     const sprite_data_player = {
       id: 'Octopus',
       greeting: "Two roads. One chance.",
-      src: path + "/images/gamify/octopus.png",
+      src: "/projects/escape-game/images/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -101,7 +100,7 @@ class GameLevelForestSub {
     const sprite_data_guide = {
       id: 'The Guide',
       greeting: sprite_greet_guide,
-      src: path + "/images/gamify/tux.png",
+      src: "/projects/escape-game/images/tux.png",
       SCALE_FACTOR: 8,
       ANIMATION_RATE: 50,
       pixels: { height: 256, width: 352 },
@@ -131,7 +130,7 @@ class GameLevelForestSub {
     const sprite_data_lost = {
       id: 'Lost Wanderer',
       greeting: sprite_greet_lost,
-      src: path + "/images/gamify/stockguy.png",
+      src: "/projects/escape-game/images/stockguy.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 441, width: 339 },
@@ -161,7 +160,7 @@ class GameLevelForestSub {
     const sprite_data_left = {
       id: 'Strange Beckoner',
       greeting: sprite_greet_left,
-      src: path + "/images/gamify/chickenj.png",
+      src: "/projects/escape-game/images/chickenj.png",
       SCALE_FACTOR: 9,
       ANIMATION_RATE: 100,
       pixels: { height: 255, width: 150 },
@@ -198,7 +197,7 @@ class GameLevelForestSub {
     const sprite_data_right = {
       id: 'R2D2',
       greeting: sprite_greet_right,
-      src: path + "/images/gamify/r2_idle.png",
+      src: "/projects/escape-game/images/r2_idle.png",
       SCALE_FACTOR: 8,
       ANIMATION_RATE: 100,
       pixels: { height: 223, width: 505 },

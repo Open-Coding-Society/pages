@@ -23,7 +23,7 @@ class GameLevelForest {
     const image_data_forest = {
       name: 'forest',
       greeting: "You step into the Whispering Forest. Something watches from the dark...",
-      src: path + "/images/gamify/forest.png",
+      src: "/projects/escape-game/images/forest.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -32,7 +32,7 @@ class GameLevelForest {
     const sprite_data_octopus = {
       id: 'Octopus',
       greeting: "I can feel eyes on me...",
-      src: path + "/images/gamify/octopus.png",
+      src: "/projects/escape-game/images/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -57,7 +57,7 @@ class GameLevelForest {
     const sprite_data_wraith = {
       id: 'The Wraith',
       greeting: sprite_greet_wraith,
-      src: path + "/images/gamify/tux.png",
+      src: "/projects/escape-game/images/tux.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 256, width: 352 },
@@ -94,7 +94,7 @@ class GameLevelForest {
     const sprite_data_figure = {
       id: 'Dark Figure',
       greeting: sprite_greet_figure,
-      src: path + "/images/gamify/octocat.png",
+      src: "/projects/escape-game/images/octocat.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 301, width: 801 },
@@ -131,7 +131,7 @@ class GameLevelForest {
     const sprite_data_warden = {
       id: 'The Warden',
       greeting: sprite_greet_warden,
-      src: path + "/images/gamify/robot.png",
+      src: "/projects/escape-game/images/robot.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 100,
       pixels: { height: 316, width: 627 },
@@ -171,7 +171,6 @@ class GameLevelForest {
 
               const primaryGame = gameEnv.gameControl;
 
-              // Fade in
               const fade = document.createElement('div');
               Object.assign(fade.style, {
                 position: 'fixed',
@@ -188,10 +187,8 @@ class GameLevelForest {
               requestAnimationFrame(() => {
                 fade.style.opacity = '1';
                 setTimeout(() => {
-                  // Pause the forest level
                   primaryGame.pause();
 
-                  // Hide parent canvases so sublevel renders cleanly
                   try {
                     if (typeof primaryGame.hideCanvasState === 'function') {
                       primaryGame.hideCanvasState();
@@ -200,19 +197,16 @@ class GameLevelForest {
                     console.warn('Could not hide parent canvas state', e);
                   }
 
-                  // Launch the sublevel
                   const levelArray  = [GameLevelForestSub];
                   const gameInGame  = new GameControl(gameEnv.game, levelArray, {
                     parentControl: primaryGame
                   });
                   gameInGame.start();
 
-                  // When the sublevel ends, return to the forest
                   gameInGame.gameOver = function() {
                     primaryGame.resume();
                   };
 
-                  // Fade out overlay
                   setTimeout(() => {
                     fade.style.opacity = '0';
                     setTimeout(() => {
@@ -231,9 +225,9 @@ class GameLevelForest {
         ]);
       }
     };
-    const sprite_src_historian = path + "/images/gamify/historyProf.png";
-  const sprite_greet_historian = "Hello! I'm an expert in the forest!";
-  const sprite_data_historian = {
+    const sprite_src_historian = "/projects/escape-game/images/historyProf.png";
+    const sprite_greet_historian = "Hello! I'm an expert in the forest!";
+    const sprite_data_historian = {
       id: "Mr. Forest",
       greeting: sprite_greet_historian,
       src: sprite_src_historian,
@@ -242,8 +236,6 @@ class GameLevelForest {
       pixels: { height: 263, width: 559 },
       INIT_POSITION: { x: width * 0.53, y: height * 0.28 },
       orientation: { rows: 4, columns: 9 },
-      
-      // LOCK: use ONLY the 4th row (index 3) for every direction/state
       down:      { row: 3, start: 0, columns: 9 },
       up:        { row: 3, start: 0, columns: 9 },
       left:      { row: 3, start: 0, columns: 9 },
@@ -252,56 +244,47 @@ class GameLevelForest {
       downRight: { row: 3, start: 0, columns: 9 },
       upLeft:    { row: 3, start: 0, columns: 9 },
       upRight:   { row: 3, start: 0, columns: 9 },
-      
       hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
-      
-      // AI-specific properties (required for AiNpc utility)
-      expertise: "The forest",              // Topic area for backend
-      chatHistory: [],                   // Conversation memory
-      dialogues: [                       // Random greetings
-          "Ask me anything about the forest!",
-          "I have a depth of knowledge in the forest...",
-          "Do you want to learn about the forest?",
-          "Try out my chat session feature on the forest!",
-          "Are you curious about the forest? Talk to me!"
+      expertise: "The forest",
+      chatHistory: [],
+      dialogues: [
+        "Ask me anything about the forest!",
+        "I have a depth of knowledge in the forest...",
+        "Do you want to learn about the forest?",
+        "Try out my chat session feature on the forest!",
+        "Are you curious about the forest? Talk to me!"
       ],
-      knowledgeBase: {                   // Context hints for AI
-          history: [
-              {
-                  question: "What is the forest?",
-                  answer: "The Whispering Forest is an ancient and disorienting place. The trees shift positions in the fog, and those who wander too long often lose their sense of direction entirely."
-              },
-              {
-                  question: "Who are the lost souls here?",
-                  answer: "The Wraith and the Dark Figure were once travelers like you. They chose wrong at the fork and became trapped — unable to leave, slowly forgetting where they came from."
-              },
-              {
-                  question: "What is the fork in the path?",
-                  answer: "Deep in the forest lies a fork with two paths. One leads out to safety. The other leads deeper into the dark, where no one returns. The Warden guards the entrance to it."
-              },
-              {
-                  question: "How do I get through the forest?",
-                  answer: "Speak to The Warden when you are ready to face the fork. Listen carefully to the lost souls before you go — their regrets are clues. The right path is the one that feels less inviting."
-              }
-          ]
-      },
-      
-      // Orchestrator: Handle collision/proximity reactions
-      reaction: function() {
-          if (this.dialogueSystem) {
-              this.showReactionDialogue();
-          } else {
-              console.log(sprite_greet_historian);
+      knowledgeBase: {
+        history: [
+          {
+            question: "What is the forest?",
+            answer: "The Whispering Forest is an ancient and disorienting place. The trees shift positions in the fog, and those who wander too long often lose their sense of direction entirely."
+          },
+          {
+            question: "Who are the lost souls here?",
+            answer: "The Wraith and the Dark Figure were once travelers like you. They chose wrong at the fork and became trapped — unable to leave, slowly forgetting where they came from."
+          },
+          {
+            question: "What is the fork in the path?",
+            answer: "Deep in the forest lies a fork with two paths. One leads out to safety. The other leads deeper into the dark, where no one returns. The Warden guards the entrance to it."
+          },
+          {
+            question: "How do I get through the forest?",
+            answer: "Speak to The Warden when you are ready to face the fork. Listen carefully to the lost souls before you go — their regrets are clues. The right path is the one that feels less inviting."
           }
+        ]
       },
-      
-      // Orchestrator: Handle player interaction (E key press)
+      reaction: function() {
+        if (this.dialogueSystem) {
+          this.showReactionDialogue();
+        } else {
+          console.log(sprite_greet_historian);
+        }
+      },
       interact: function() {
-          // Delegate to AiNpc utility for full AI conversation interface
-          AiNpc.showInteraction(this);
+        AiNpc.showInteraction(this);
       }
-  };
-
+    };
 
     // ── Level class list ──────────────────────────────────────────────────────
     this.classes = [

@@ -20,7 +20,7 @@ class GameLevelForestDeath {
     const image_data_bg = {
       name: 'death_room',
       greeting: "The warmth you followed was never welcoming.",
-      src: path + "/images/gamify/cave.png",
+      src: "/projects/escape-game/images/cave.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -29,7 +29,7 @@ class GameLevelForestDeath {
     const sprite_data_player = {
       id: 'Octopus',
       greeting: "What have I done...",
-      src: path + "/images/gamify/octopus.png",
+      src: "/projects/escape-game/images/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -54,7 +54,7 @@ class GameLevelForestDeath {
     const sprite_data_beckoner = {
       id: 'Strange Beckoner',
       greeting: sprite_greet_beckoner,
-      src: path + "/images/gamify/chickenj.png",
+      src: "/projects/escape-game/images/chickenj.png",
       SCALE_FACTOR: 7,
       ANIMATION_RATE: 80,
       pixels: { height: 255, width: 150 },
@@ -139,7 +139,7 @@ class GameLevelForestDeath {
     const sprite_data_victim = {
       id: 'Another Victim',
       greeting: sprite_greet_victim,
-      src: path + "/images/gamify/stockguy.png",
+      src: "/projects/escape-game/images/stockguy.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 441, width: 339 },
