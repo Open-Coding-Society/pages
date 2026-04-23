@@ -179,6 +179,7 @@ permalink: /student/bathroom_pass
             showToast({ message: "Fetching student face data...", duration: 2000 });
             const resp = await fetch(`${javaURI}/api/person/faces`, fetchOptions);
             const faces = await resp.json();
+            console.log(`Fetched ${faces.length} faces from backend:`, faces);
             
             const labeledDescriptors = [];
             for (const face of faces) {
@@ -190,7 +191,11 @@ permalink: /student/bathroom_pass
                     
                     const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
                     if (detection) {
-                        labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(face.name, [detection.descriptor]));
+                        const label = String(face.name || face.uid || "Unknown");
+                        console.log(`Processing face for: ${label}`);
+                        labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [detection.descriptor]));
+                    } else {
+                        console.warn(`No face detected in stored image for: ${face.name || face.uid}`);
                     }
                 } catch(e) {
                     console.error("Failed to process face for", face.name, e);
