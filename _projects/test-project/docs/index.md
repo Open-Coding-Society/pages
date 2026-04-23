@@ -1,10 +1,10 @@
 ---
 layout: post
-title: Test Project Documentation
-permalink: /test-project/docs/
+title: Sassjs-documentation Project
+permalink: /sassjs-documentation/docs/
 ---
 
-## Test Project Documentation
+## Sassjs-documentation Project
 
 This project serves as a test case for the `_projects` integration system.
 
