@@ -1,14 +1,21 @@
 // CourseEnlistmentTrial.js
 
+import AiNpcSession from '/assets/js/GameEnginev1.1/essentials/AiNpcSession.js';
+import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+
 const ENLISTMENT_BG = '/images/vision-doors.png';
 
-export default class CourseEnlistmentTrial {
+class CourseEnlistmentTrial {
   constructor({ profileData = {}, onComplete, onClose } = {}) {
     this.profileData = profileData || {};
     this.onComplete = onComplete || (() => {});
     this.onClose = onClose || (() => {});
     this.overlay = null;
     this.currentSceneIndex = 0;
+    this.aiSession = null;
+    this.advisorChatHistory = [];
+    this.currentResult = null;
+    this._escapeHandler = null;
 
     this.scores = {
       foundations: 0,
@@ -18,40 +25,41 @@ export default class CourseEnlistmentTrial {
     };
 
     this.answers = [];
+    this.historyModal = null;
 
     this.scenes = [
       {
         chapter: 'ENLISTMENT I',
         title: 'The Signal of Intent',
         narration:
-          'A crimson chamber opens beneath the gatekeeper. Symbols gather in the air like glowing constellations, waiting to read what you want from your time in computer science.',
+          'A crimson chamber opens beneath the gatekeeper. Symbols gather in the air, reading what you want from computer science.',
         quote:
-          'The path should not only challenge you. It should fit the kind of builder you are becoming.',
+          'The best path is not the loudest one. It is the one that fits your growth.',
         prompt: 'What do you most want your CS journey to give you first?',
         choices: [
           {
-            label: 'A strong foundation so I can understand the logic behind everything.',
+            label: 'A strong foundation so I can understand how things work.',
             number: '1',
             accent: '#f59e0b',
             weights: { foundations: 3, systems: 1 },
           },
           {
-            label: 'A way to build visible, expressive, interactive projects I can show people.',
+            label: 'A way to build visible, creative, interactive projects.',
             number: '2',
             accent: '#60a5fa',
             weights: { creative: 3, ai: 1 },
           },
           {
-            label: 'A chance to solve hard technical problems and work with deeper systems.',
+            label: 'A chance to solve harder technical problems and go deeper.',
             number: '3',
             accent: '#a78bfa',
             weights: { systems: 3, foundations: 1 },
           },
           {
-            label: 'A path toward AI, data, and the future of intelligent tools.',
+            label: 'A path toward AI, smart tools, and future-facing work.',
             number: '4',
             accent: '#34d399',
-            weights: { ai: 3, foundations: 1 },
+            weights: { ai: 3, systems: 1 },
           },
         ],
       },
@@ -59,19 +67,19 @@ export default class CourseEnlistmentTrial {
         chapter: 'ENLISTMENT II',
         title: 'The Mode of Learning',
         narration:
-          'The chamber shifts. Four pathways unfold. One crackles with puzzles. One glows with interfaces. One hums with machine patterns. One rises in careful sequence, stone by stone.',
+          'Four routes open. One is structured. One is expressive. One is rigorous. One points toward intelligent systems.',
         quote:
-          'How you learn matters almost as much as what you learn.',
+          'How you learn matters as much as what you learn.',
         prompt: 'Which kind of work pulls you in most naturally?',
         choices: [
           {
-            label: 'Solving structured problems step by step until the pattern makes sense.',
+            label: 'Step-by-step logic that builds my confidence.',
             number: '1',
             accent: '#f59e0b',
             weights: { foundations: 3 },
           },
           {
-            label: 'Designing experiences, visuals, and things people can directly interact with.',
+            label: 'Designing and making things people can directly use.',
             number: '2',
             accent: '#60a5fa',
             weights: { creative: 3 },
@@ -83,7 +91,7 @@ export default class CourseEnlistmentTrial {
             weights: { systems: 3, foundations: 1 },
           },
           {
-            label: 'Working with patterns, predictions, data, and intelligent behavior.',
+            label: 'Patterns, data, prediction, and intelligent behavior.',
             number: '4',
             accent: '#34d399',
             weights: { ai: 3, systems: 1 },
@@ -94,31 +102,31 @@ export default class CourseEnlistmentTrial {
         chapter: 'ENLISTMENT III',
         title: 'The Pace of Ascent',
         narration:
-          'The gatekeeper draws a circle of light around your feet. The glow rises and falls, measuring not just ambition, but readiness.',
+          'The chamber measures not just ambition, but readiness.',
         quote:
-          'A good route does not rush you past your footing. It builds it.',
+          'A strong route builds footing before acceleration.',
         prompt: 'What level of challenge feels right for your next class?',
         choices: [
           {
-            label: 'A steady entry point where I can build confidence and core habits first.',
+            label: 'A steady entry point where I can build strong habits first.',
             number: '1',
             accent: '#f59e0b',
             weights: { foundations: 3, creative: 1 },
           },
           {
-            label: 'A class that lets me create while I learn, even if it is a little challenging.',
+            label: 'A class that lets me create while I learn.',
             number: '2',
             accent: '#60a5fa',
             weights: { creative: 3, foundations: 1 },
           },
           {
-            label: 'Something rigorous where I can stretch technically and think more deeply.',
+            label: 'Something more rigorous where I can stretch technically.',
             number: '3',
             accent: '#a78bfa',
             weights: { systems: 3, ai: 1 },
           },
           {
-            label: 'A forward-looking path that prepares me for AI and advanced applications.',
+            label: 'A path that gets me closer to AI and advanced applications.',
             number: '4',
             accent: '#34d399',
             weights: { ai: 3, systems: 1 },
@@ -129,31 +137,31 @@ export default class CourseEnlistmentTrial {
         chapter: 'ENLISTMENT IV',
         title: 'The Future Echo',
         narration:
-          'The chamber shows a vision of you one year from now: a builder with more confidence, more direction, and a clearer sense of where you belong in the pathway.',
+          'You see a future version of yourself one year from now: more capable, more directed, more sure of your place in the pathway.',
         quote:
-          'Choose not only the class you can take. Choose the path you want to grow into.',
+          'Choose the class that helps you become who you want to be next.',
         prompt: 'Which future version of yourself feels most exciting?',
         choices: [
           {
-            label: 'Someone with strong fundamentals who can later go anywhere in CS.',
+            label: 'Someone with strong fundamentals who can go anywhere later.',
             number: '1',
             accent: '#f59e0b',
             weights: { foundations: 3 },
           },
           {
-            label: 'Someone building polished apps, websites, interfaces, and creative tools.',
+            label: 'Someone building polished apps, websites, and creative tools.',
             number: '2',
             accent: '#60a5fa',
             weights: { creative: 3 },
           },
           {
-            label: 'Someone confident with logic, structure, debugging, and harder engineering work.',
+            label: 'Someone confident with logic, debugging, and deeper engineering.',
             number: '3',
             accent: '#a78bfa',
             weights: { systems: 3 },
           },
           {
-            label: 'Someone exploring machine intelligence, smart systems, and data-driven design.',
+            label: 'Someone exploring AI, data, and intelligent systems.',
             number: '4',
             accent: '#34d399',
             weights: { ai: 3 },
@@ -168,14 +176,40 @@ export default class CourseEnlistmentTrial {
   }
 
   destroy() {
+    if (this._escapeHandler) {
+      document.removeEventListener('keydown', this._escapeHandler);
+      this._escapeHandler = null;
+    }
+
+    if (this.aiSession) {
+      this.aiSession.cancel();
+      this.aiSession = null;
+    }
+
+    if (this.historyModal?.parentNode) {
+      this.historyModal.parentNode.removeChild(this.historyModal);
+    }
+    this.historyModal = null;
+
     if (this.overlay?.parentNode) {
       this.overlay.parentNode.removeChild(this.overlay);
     }
     this.overlay = null;
-    if (this._keyHandler) {
-      document.removeEventListener('keydown', this._keyHandler);
-      this._keyHandler = null;
+  }
+
+  installEscapeHandler() {
+    if (this._escapeHandler) {
+      document.removeEventListener('keydown', this._escapeHandler);
     }
+
+    this._escapeHandler = (event) => {
+      if (event.key === 'Escape') {
+        this.destroy();
+        this.onClose();
+      }
+    };
+
+    document.addEventListener('keydown', this._escapeHandler);
   }
 
   applyWeights(weights = {}) {
@@ -218,258 +252,464 @@ export default class CourseEnlistmentTrial {
     const map = {
       foundations: {
         title: 'Foundation Cartographer',
-        summary:
-          'Your best next step is a pathway that builds confidence, structure, and the core habits that make every later branch of CS stronger.',
-        learningStyle:
-          'You learn best when concepts are sequenced clearly and each new skill locks into a larger framework.',
-        tokenCode: 'FOUNDATION_CARTOGRAPHER',
-        tokenLabel: 'Foundation Route Token',
-        tokenColor: '#f59e0b',
+        summary: 'You will grow most strongly from a route that builds confidence, structure, and reliable core habits.',
+        learningStyle: 'You learn best when concepts are clearly scaffolded and each skill locks into the next.',
+        accent: '#f59e0b',
       },
       creative: {
         title: 'Creative Builder',
-        summary:
-          'You are energized by making things people can see, feel, and interact with. Your best class path should let you create while you grow.',
-        learningStyle:
-          'You learn fastest when ideas become visible through projects, interfaces, and hands-on building.',
-        tokenCode: 'CREATIVE_BUILDER',
-        tokenLabel: 'Creative Route Token',
-        tokenColor: '#60a5fa',
+        summary: 'You are energized by making visible, expressive, interactive work.',
+        learningStyle: 'You learn fastest when ideas become projects you can see, shape, and share.',
+        accent: '#60a5fa',
       },
       systems: {
         title: 'Systems Pathfinder',
-        summary:
-          'You are drawn toward deeper technical structure. A stronger engineering-leaning route will keep you engaged and challenged.',
-        learningStyle:
-          'You grow through rigor, debugging, logic, and learning how the system works beneath the surface.',
-        tokenCode: 'SYSTEMS_PATHFINDER',
-        tokenLabel: 'Systems Route Token',
-        tokenColor: '#a78bfa',
+        summary: 'You are drawn toward rigor, deeper logic, and stronger engineering structure.',
+        learningStyle: 'You grow through problem-solving, debugging, and understanding what is happening beneath the surface.',
+        accent: '#a78bfa',
       },
       ai: {
         title: 'AI Wayfinder',
-        summary:
-          'You are looking ahead to intelligent systems, data, and the next generation of computational tools. Your route should prepare you for that future without skipping the base you need.',
-        learningStyle:
-          'You thrive when pattern-finding, experimentation, and future-facing ideas are connected to real projects.',
-        tokenCode: 'AI_WAYFINDER',
-        tokenLabel: 'AI Route Token',
-        tokenColor: '#34d399',
+        summary: 'You are motivated by intelligent systems, pattern-finding, and future-facing applications.',
+        learningStyle: 'You stay engaged when technical growth connects to smart systems and ambitious ideas.',
+        accent: '#34d399',
       },
     };
 
     return map[pathKey];
   }
 
-  getRecommendedClasses(primaryPath, secondaryPath) {
-    const planMap = {
-      foundations: [
-        {
-          name: 'CSSE',
-          reason: 'Best entry point for building strong programming habits and confidence.',
-          fit: 'foundation',
-        },
-        {
-          name: 'CSP',
-          reason: 'Expands your view of computing and keeps the pathway broad and exploratory.',
-          fit: 'breadth',
-        },
-        {
+  getSingleRecommendedClass(primaryPath, percentages) {
+    if (primaryPath === 'systems') {
+      return {
+        name: 'CSA',
+        why: 'Your strongest signal points toward rigor, structured logic, and deeper programming depth.',
+      };
+    }
+
+    if (primaryPath === 'creative') {
+      return {
+        name: 'CSP',
+        why: 'Your strongest signal points toward creative exploration, building visible projects, and broad computing applications.',
+      };
+    }
+
+    if (primaryPath === 'ai') {
+      if ((percentages.systems || 0) >= 24 || (percentages.foundations || 0) >= 28) {
+        return {
           name: 'CSA',
-          reason: 'A strong next step after your foundation is built and you are ready for deeper coding rigor.',
-          fit: 'next-step',
-        },
-      ],
-      creative: [
-        {
-          name: 'CSSE',
-          reason: 'Gives you the coding basics you need to build interactive work with confidence.',
-          fit: 'entry',
-        },
-        {
-          name: 'CSP',
-          reason: 'A great match for creative exploration, digital products, and broad computing ideas.',
-          fit: 'best-fit',
-        },
-        {
-          name: 'Code Hub / Frontend Projects',
-          reason: 'Reinforces your visual and interactive strengths through actual creation.',
-          fit: 'extension',
-        },
-      ],
-      systems: [
-        {
-          name: 'CSA',
-          reason: 'Best match for your interest in logic, rigor, and stronger programming depth.',
-          fit: 'best-fit',
-        },
-        {
-          name: 'CSSE',
-          reason: 'Important if you still want to strengthen core habits before or alongside harder material.',
-          fit: 'support',
-        },
-        {
-          name: 'Code Hub / Backend Challenges',
-          reason: 'Lets you practice structured engineering thinking in applied form.',
-          fit: 'extension',
-        },
-      ],
-      ai: [
-        {
-          name: 'CSSE',
-          reason: 'Build the coding base you need so your future AI work has real technical footing.',
-          fit: 'entry',
-        },
-        {
-          name: 'CSA',
-          reason: 'Strengthens algorithmic thinking that will support later AI and data work.',
-          fit: 'core',
-        },
-        {
-          name: 'AI / Data Exploration Projects',
-          reason: 'Keeps your long-term goal visible while you build the right prerequisites.',
-          fit: 'best-fit',
-        },
-      ],
+          why: 'Your path points toward AI, and you also show enough readiness for stronger programming depth that supports that future.',
+        };
+      }
+      return {
+        name: 'CSSE',
+        why: 'Your path points toward AI, but the best next step is building the coding foundation that will make later advanced work much easier.',
+      };
+    }
+
+    return {
+      name: 'CSSE',
+      why: 'Your strongest signal is foundations, so the best next step is the class that builds dependable coding habits and confidence first.',
     };
-
-    const list = [...(planMap[primaryPath] || [])];
-
-    if (secondaryPath === 'creative' && primaryPath !== 'creative') {
-      list.push({
-        name: 'Frontend / Design-Oriented Project Track',
-        reason: 'Your secondary signal shows you will stay motivated when your work becomes visible and tangible.',
-        fit: 'secondary-strength',
-      });
-    }
-
-    if (secondaryPath === 'ai' && primaryPath !== 'ai') {
-      list.push({
-        name: 'AI Curiosity Sprint',
-        reason: 'Your secondary signal suggests future-facing intelligent systems will keep you engaged.',
-        fit: 'secondary-strength',
-      });
-    }
-
-    if (secondaryPath === 'systems' && primaryPath !== 'systems') {
-      list.push({
-        name: 'Structured Problem-Solving Practice',
-        reason: 'Your secondary signal shows you also enjoy technical challenge and deeper reasoning.',
-        fit: 'secondary-strength',
-      });
-    }
-
-    if (secondaryPath === 'foundations' && primaryPath !== 'foundations') {
-      list.push({
-        name: 'Foundation Reinforcement',
-        reason: 'Your secondary signal suggests you still benefit from clear scaffolding and strong fundamentals.',
-        fit: 'secondary-strength',
-      });
-    }
-
-    return list.slice(0, 4);
   }
 
-  getGamePlan(primaryPath, secondaryPath) {
-    const map = {
-      foundations: [
+  getSuccessPlanForClass(className, primaryPath, secondaryPath) {
+    const plans = {
+      CSSE: [
         {
-          title: 'Secure the Core',
-          description: 'Choose the class that builds dependable programming habits before trying to specialize too early.',
+          title: 'Build consistency',
+          description: 'Practice small coding reps regularly so syntax and logic stop feeling intimidating.',
         },
         {
-          title: 'Practice in Small Wins',
-          description: 'Create short, consistent coding reps so confidence grows through repetition, not pressure.',
+          title: 'Strengthen debugging',
+          description: 'Get comfortable reading errors, testing changes, and fixing one issue at a time.',
         },
         {
-          title: 'Branch with Intention',
-          description: `Use your secondary signal in ${this.prettyLabel(secondaryPath)} as the next thing you layer in after your footing is strong.`,
-        },
-      ],
-      creative: [
-        {
-          title: 'Build While You Learn',
-          description: 'Choose the route that lets you create visible projects instead of only studying concepts in isolation.',
-        },
-        {
-          title: 'Strengthen the Engine Beneath the Art',
-          description: 'Pair your creative momentum with enough coding rigor that your ideas can scale and improve.',
-        },
-        {
-          title: 'Turn Projects into Proof',
-          description: 'Use every build as evidence of growth for your passport, portfolio, and future pathway decisions.',
+          title: 'Ask how it works',
+          description: `Use your ${this.prettyLabel(primaryPath)} interest to stay curious while your fundamentals grow.`,
         },
       ],
-      systems: [
+      CSP: [
         {
-          title: 'Lean into Rigor',
-          description: 'Take the class that gives you harder logical structure and stronger debugging experience.',
+          title: 'Think through the user',
+          description: 'Focus on how computing ideas become experiences, products, and real-world impact.',
         },
         {
-          title: 'Translate Depth into Output',
-          description: 'Do not let your work stay hidden; turn deeper thinking into finished challenges or features.',
+          title: 'Create visible work',
+          description: 'Turn your ideas into small projects, presentations, or prototypes you can reflect on.',
         },
         {
-          title: 'Balance Precision with Curiosity',
-          description: `Keep your ${this.prettyLabel(secondaryPath)} signal alive so your path stays motivating as well as rigorous.`,
+          title: 'Balance creativity with structure',
+          description: `Use your ${this.prettyLabel(secondaryPath)} strength to give your creative work more technical depth.`,
         },
       ],
-      ai: [
+      CSA: [
         {
-          title: 'Build the Base First',
-          description: 'Use your next class to strengthen the coding and algorithmic foundation behind future AI work.',
+          title: 'Practice structured problem-solving',
+          description: 'Break problems into parts and solve them carefully instead of rushing to the full answer.',
         },
         {
-          title: 'Keep the Future Visible',
-          description: 'Stay motivated by pairing current coursework with small AI or data explorations on the side.',
+          title: 'Get stronger at persistence',
+          description: 'More rigorous classes reward students who keep iterating through hard problems.',
         },
         {
-          title: 'Grow Toward Intelligent Systems',
-          description: `Use your secondary strength in ${this.prettyLabel(secondaryPath)} to shape a broader, more resilient path forward.`,
+          title: 'Connect rigor to purpose',
+          description: `Use your ${this.prettyLabel(primaryPath)} motivation to stay engaged when the work gets more technical.`,
         },
       ],
     };
 
-    return map[primaryPath] || [];
+    return plans[className] || [];
   }
 
   prettyLabel(key) {
     const labels = {
-      foundations: 'foundations',
+      foundations: 'foundational growth',
       creative: 'creative building',
       systems: 'systems thinking',
       ai: 'AI exploration',
     };
-    return labels[key] || key;
+    return labels[key] || 'future pathway growth';
   }
 
-  makeProgressDots(current, total) {
-    return Array.from({ length: total })
-      .map((_, i) => {
-        const active = i === current;
-        return `
-          <span style="
-            width: 12px;
-            height: 12px;
-            border-radius: 999px;
-            display: inline-block;
-            border: 1px solid rgba(255,255,255,0.45);
-            background: ${active ? '#ef4444' : 'transparent'};
-            box-shadow: ${active ? '0 0 10px rgba(239,68,68,0.45)' : 'none'};
-          "></span>
-        `;
-      })
-      .join('');
+  buildResult() {
+    const percentages = this.getPercentages();
+    const primaryPath = this.getPrimaryPath(percentages);
+    const secondaryPath = this.getSecondaryPath(percentages, primaryPath);
+    const meta = this.getPathMeta(primaryPath);
+    const recommendedClass = this.getSingleRecommendedClass(primaryPath, percentages);
+    const successPlan = this.getSuccessPlanForClass(recommendedClass.name, primaryPath, secondaryPath);
+
+    return {
+      scores: { ...this.scores },
+      percentages,
+      answers: [...this.answers],
+      primaryPath,
+      secondaryPath,
+      title: meta.title,
+      summary: meta.summary,
+      learningStyle: meta.learningStyle,
+      accent: meta.accent,
+      recommendedClass,
+      successPlan,
+      advisorChatHistory: [...this.advisorChatHistory],
+      completedAt: new Date().toISOString(),
+    };
   }
 
-  installEscapeToClose() {
-    this._keyHandler = (event) => {
-      if (event.key === 'Escape') {
-        this.destroy();
-        this.onClose();
+  createAdvisorKnowledgeContext(result) {
+    const answers = result.answers
+      .map((item, index) => `${index + 1}. ${item.prompt} -> ${item.selection}`)
+      .join('\n');
+
+    const successPlan = result.successPlan
+      .map((item, index) => `${index + 1}. ${item.title}: ${item.description}`)
+      .join('\n');
+
+    return [
+      `The student just completed a course recommendation flow in the Wayfinding game.`,
+      `Recommended class: ${result.recommendedClass.name}`,
+      `Why that class: ${result.recommendedClass.why}`,
+      `Primary path: ${result.primaryPath}`,
+      `Secondary path: ${result.secondaryPath}`,
+      `Summary: ${result.summary}`,
+      `Learning style: ${result.learningStyle}`,
+      `Success plan:`,
+      successPlan,
+      `Survey answers:`,
+      answers,
+      `You should explain the recommendation clearly, compare classes when asked, and help the student succeed in the recommended class.`,
+    ].join('\n');
+  }
+
+  canUseElement(element) {
+    return !!element && element.isConnected && !!this.aiSession?.isActive?.();
+  }
+
+  async showTypedResponse(text, element, speed = 16) {
+    if (!this.canUseElement(element)) return;
+
+    element.textContent = '';
+    element.style.display = 'block';
+    let index = 0;
+
+    const type = () => {
+      if (!this.canUseElement(element)) return;
+      if (index < text.length) {
+        element.textContent += text.charAt(index);
+        index += 1;
+        this.aiSession.setTimeout(type, speed);
       }
     };
-    document.addEventListener('keydown', this._keyHandler);
+
+    type();
+  }
+
+  renderChatHistory(listEl) {
+    listEl.innerHTML = '';
+
+    if (!this.advisorChatHistory.length) {
+      const intro = document.createElement('div');
+      intro.style.cssText = `
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: #eadfd8;
+        font-size: 13px;
+        line-height: 1.5;
+      `;
+      intro.textContent = 'Ask why this class fits you, what to work on before taking it, or how to prepare for success.';
+      listEl.appendChild(intro);
+      return;
+    }
+
+    this.advisorChatHistory.forEach((entry) => {
+      const bubble = document.createElement('div');
+      const isUser = entry.role === 'user';
+      bubble.style.cssText = `
+        max-width: 88%;
+        align-self: ${isUser ? 'flex-end' : 'flex-start'};
+        padding: 10px 12px;
+        margin-top: 8px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: #fff4ef;
+        background: ${isUser ? 'rgba(248,113,113,0.16)' : 'rgba(255,255,255,0.06)'};
+        border: 1px solid ${isUser ? 'rgba(248,113,113,0.24)' : 'rgba(255,255,255,0.08)'};
+        white-space: pre-wrap;
+      `;
+      bubble.textContent = entry.message;
+      listEl.appendChild(bubble);
+    });
+
+    listEl.scrollTop = listEl.scrollHeight;
+  }
+
+  showChatHistoryModal() {
+    if (this.historyModal?.parentNode) {
+      this.historyModal.parentNode.removeChild(this.historyModal);
+      this.historyModal = null;
+    }
+
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      inset: 0;
+      z-index: 10020;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.42);
+      padding: 20px;
+      box-sizing: border-box;
+    `;
+
+    modal.innerHTML = `
+      <div style="
+        width:min(640px, 92vw);
+        max-height:75vh;
+        overflow:auto;
+        border-radius:18px;
+        background: linear-gradient(180deg, rgba(18,7,10,0.98), rgba(10,8,16,0.98));
+        border:1px solid rgba(255,255,255,0.10);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.38);
+        color:#f8f1e7;
+      ">
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          padding:14px 16px;
+          border-bottom:1px solid rgba(255,255,255,0.08);
+        ">
+          <div style="font-size:15px; color:#fca5a5; letter-spacing:0.08em; text-transform:uppercase;">
+            Advisor Chat History
+          </div>
+          <button id="advisor-history-close" style="
+            border:none;
+            background:transparent;
+            color:#f3dfd9;
+            font-size:20px;
+            cursor:pointer;
+          ">×</button>
+        </div>
+        <div id="advisor-history-content" style="
+          padding:14px 16px 18px;
+          display:flex;
+          flex-direction:column;
+        "></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    this.historyModal = modal;
+
+    const content = modal.querySelector('#advisor-history-content');
+    if (!this.advisorChatHistory.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = `
+        color:#eadfd8;
+        font-size:14px;
+        line-height:1.5;
+      `;
+      empty.textContent = 'No messages yet.';
+      content.appendChild(empty);
+    } else {
+      this.advisorChatHistory.forEach((entry) => {
+        const bubble = document.createElement('div');
+        const isUser = entry.role === 'user';
+        bubble.style.cssText = `
+          max-width: 88%;
+          align-self: ${isUser ? 'flex-end' : 'flex-start'};
+          padding: 10px 12px;
+          margin-top: 8px;
+          border-radius: 12px;
+          font-size: 13px;
+          line-height: 1.5;
+          color: #fff4ef;
+          background: ${isUser ? 'rgba(248,113,113,0.16)' : 'rgba(255,255,255,0.06)'};
+          border: 1px solid ${isUser ? 'rgba(248,113,113,0.24)' : 'rgba(255,255,255,0.08)'};
+          white-space: pre-wrap;
+        `;
+        bubble.textContent = entry.message;
+        content.appendChild(bubble);
+      });
+    }
+
+    modal.querySelector('#advisor-history-close').addEventListener('click', () => {
+      if (this.historyModal?.parentNode) {
+        this.historyModal.parentNode.removeChild(this.historyModal);
+      }
+      this.historyModal = null;
+    });
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        if (this.historyModal?.parentNode) {
+          this.historyModal.parentNode.removeChild(this.historyModal);
+        }
+        this.historyModal = null;
+      }
+    });
+  }
+
+  async sendAdvisorMessage(userMessage, responseArea, inputField, sendBtn) {
+    const trimmed = String(userMessage || '').trim();
+    if (!trimmed || !this.currentResult || !this.aiSession?.isActive?.()) return;
+
+    this.advisorChatHistory.push({ role: 'user', message: trimmed });
+    this.renderChatHistory(responseArea);
+
+    inputField.value = '';
+    inputField.disabled = true;
+    sendBtn.disabled = true;
+
+    const thinking = document.createElement('div');
+    thinking.style.cssText = `
+      max-width: 88%;
+      align-self: flex-start;
+      padding: 10px 12px;
+      margin-top: 8px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #f3e7de;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+    `;
+    thinking.textContent = 'Thinking...';
+    responseArea.appendChild(thinking);
+    responseArea.scrollTop = responseArea.scrollHeight;
+
+    try {
+      const knowledgeContext = this.createAdvisorKnowledgeContext(this.currentResult);
+      const response = await fetch(`${pythonURI}/api/ainpc/prompt`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({
+          prompt: trimmed,
+          session_id: 'player-course-advisor',
+          npc_type: 'course_advisor',
+          expertise: 'course_advisor',
+          knowledgeContext,
+        }),
+        signal: this.aiSession.signal,
+      });
+
+      const data = await response.json();
+      if (!this.canUseElement(responseArea)) return;
+
+      thinking.remove();
+
+      if (data.status === 'error') {
+        const failText = data.message || "I'm having trouble thinking right now.";
+        this.advisorChatHistory.push({ role: 'ai', message: failText });
+        this.currentResult.advisorChatHistory = [...this.advisorChatHistory];
+        this.renderChatHistory(responseArea);
+        return;
+      }
+
+      const aiResponse = data?.response || "I'm not sure how to answer that yet.";
+      this.advisorChatHistory.push({ role: 'ai', message: aiResponse });
+      this.currentResult.advisorChatHistory = [...this.advisorChatHistory];
+
+      const aiBubble = document.createElement('div');
+      aiBubble.style.cssText = `
+        max-width: 88%;
+        align-self: flex-start;
+        padding: 10px 12px;
+        margin-top: 8px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: #fff4ef;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        white-space: pre-wrap;
+      `;
+      responseArea.appendChild(aiBubble);
+      responseArea.scrollTop = responseArea.scrollHeight;
+      await this.showTypedResponse(aiResponse, aiBubble, 10);
+
+    } catch (err) {
+      if (err?.name === 'AbortError' || this.aiSession?.signal?.aborted) {
+        return;
+      }
+
+      console.error('Course advisor frontend error:', err);
+
+      if (this.canUseElement(responseArea)) {
+        thinking.remove();
+        const fallback = "I'm having trouble reaching my brain right now. Based on your path, focus on the recommended class first and build the success skills shown beside it.";
+        this.advisorChatHistory.push({ role: 'ai', message: fallback });
+        this.currentResult.advisorChatHistory = [...this.advisorChatHistory];
+        this.renderChatHistory(responseArea);
+      }
+    } finally {
+      inputField.disabled = false;
+      sendBtn.disabled = false;
+      if (this.canUseElement(inputField)) {
+        this.aiSession.setTimeout(() => {
+          if (this.canUseElement(inputField)) inputField.focus();
+        }, 60);
+      }
+    }
+  }
+
+  resetAndRestart() {
+    this.currentSceneIndex = 0;
+    this.scores = {
+      foundations: 0,
+      creative: 0,
+      systems: 0,
+      ai: 0,
+    };
+    this.answers = [];
+    this.advisorChatHistory = [];
+    this.currentResult = null;
+    this.renderScene();
   }
 
   renderScene() {
@@ -486,7 +726,7 @@ export default class CourseEnlistmentTrial {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
       box-sizing: border-box;
       background: rgba(7, 5, 10, 0.56);
       backdrop-filter: blur(5px);
@@ -497,73 +737,66 @@ export default class CourseEnlistmentTrial {
     overlay.innerHTML = `
       <div style="
         position: relative;
-        width: min(980px, 92vw);
-        height: min(700px, 86vh);
-        border-radius: 24px;
+        width: min(920px, 92vw);
+        height: min(640px, 86vh);
+        border-radius: 22px;
         overflow: hidden;
-        border: 1px solid rgba(239, 68, 68, 0.34);
-        box-shadow:
-          0 28px 80px rgba(0,0,0,0.58),
-          0 0 30px rgba(239,68,68,0.14);
+        border: 1px solid rgba(239,68,68,0.30);
+        box-shadow: 0 24px 70px rgba(0,0,0,0.56);
         background:
-          linear-gradient(to top, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.40) 42%, rgba(0,0,0,0.14) 100%),
+          linear-gradient(to top, rgba(0,0,0,0.84) 0%, rgba(0,0,0,0.38) 42%, rgba(0,0,0,0.12) 100%),
           url('${ENLISTMENT_BG}') center center / cover no-repeat;
         color: #f8f1e7;
       ">
-        <div style="
+        <button id="enlist-close-top" style="
           position:absolute;
-          inset:0;
-          background:
-            radial-gradient(circle at 20% 22%, rgba(239,68,68,0.16), transparent 26%),
-            radial-gradient(circle at 80% 26%, rgba(168,85,247,0.14), transparent 24%),
-            radial-gradient(circle at 50% 78%, rgba(96,165,250,0.10), transparent 24%);
-          pointer-events:none;
-        "></div>
+          top:14px;
+          right:16px;
+          z-index:3;
+          border:none;
+          background:transparent;
+          color:#f3dfd9;
+          font-size:26px;
+          cursor:pointer;
+        ">×</button>
 
         <div style="
           position:absolute;
           top:18px;
           left:22px;
-          right:22px;
+          right:58px;
           display:flex;
           justify-content:space-between;
           align-items:flex-start;
           z-index:2;
         ">
           <div style="display:flex; align-items:center; gap:10px; color:#f6d7d2;">
-            <span style="color:#f87171; font-size:20px;">✦</span>
-            <span style="font-size:22px;">Course Enlistment Chamber</span>
+            <span style="color:#f87171; font-size:18px;">✦</span>
+            <span style="font-size:20px;">Course Enlistment Chamber</span>
           </div>
-
-          <div style="text-align:right; color:#f5d9d5;">
-            <div style="font-size:15px; margin-bottom:8px;">Path Calibration</div>
-            <div style="display:flex; gap:8px; justify-content:flex-end;">
-              ${this.makeProgressDots(this.currentSceneIndex, this.scenes.length)}
-            </div>
+          <div style="display:flex; gap:8px;">
+            ${Array.from({ length: this.scenes.length }).map((_, i) => `
+              <span style="
+                width:10px; height:10px; border-radius:999px; display:inline-block;
+                border:1px solid rgba(255,255,255,0.45);
+                background:${i === this.currentSceneIndex ? '#ef4444' : 'transparent'};
+              "></span>
+            `).join('')}
           </div>
         </div>
 
         <div style="
           position:absolute;
-          top:52px;
+          top:54px;
           left:0;
           width:100%;
           text-align:center;
           z-index:2;
         ">
-          <div style="
-            font-size:44px;
-            line-height:1;
-            letter-spacing:0.08em;
-            color:#fca5a5;
-            margin-bottom:6px;
-          ">
+          <div style="font-size:36px; letter-spacing:0.08em; color:#fca5a5; margin-bottom:6px;">
             ${scene.chapter}
           </div>
-          <div style="
-            font-size:22px;
-            color:#fde2e2;
-          ">
+          <div style="font-size:20px; color:#fde2e2;">
             ${scene.title}
           </div>
         </div>
@@ -577,132 +810,56 @@ export default class CourseEnlistmentTrial {
         ">
           <div style="
             background: linear-gradient(180deg, rgba(24,8,12,0.70), rgba(16,6,12,0.78));
-            border: 1px solid rgba(248,113,113,0.22);
+            border: 1px solid rgba(248,113,113,0.20);
             border-radius: 16px;
-            box-shadow: 0 10px 24px rgba(0,0,0,0.30);
             padding: 12px 16px;
-            margin: 0 auto 10px auto;
-            max-width: 760px;
+            margin: 0 auto 12px auto;
+            max-width: 720px;
             text-align: center;
-            backdrop-filter: blur(3px);
-            -webkit-backdrop-filter: blur(3px);
           ">
-            <div style="
-              color:#fca5a5;
-              font-size:11px;
-              letter-spacing:0.14em;
-              text-transform:uppercase;
-              margin-bottom:6px;
-            ">
-              The Gatekeeper Reads Your Route...
-            </div>
-            <div style="
-              font-size:15px;
-              line-height:1.45;
-              color:#f3e7dc;
-              margin-bottom:6px;
-            ">
+            <div style="font-size:14px; line-height:1.45; color:#f3e7dc; margin-bottom:6px;">
               ${scene.narration}
             </div>
-            <div style="
-              font-size:17px;
-              line-height:1.4;
-              color:#fda4af;
-              font-style:italic;
-              font-weight:700;
-              margin-bottom:8px;
-            ">
+            <div style="font-size:16px; line-height:1.4; color:#fda4af; font-style:italic; font-weight:700; margin-bottom:8px;">
               “${scene.quote}”
             </div>
-            <div style="
-              font-size:17px;
-              color:#fff2f0;
-            ">
+            <div style="font-size:16px; color:#fff2f0;">
               ${scene.prompt}
             </div>
           </div>
 
-          <div style="
-            display:grid;
-            grid-template-columns: 1fr 1fr;
-            gap:12px;
-          ">
-            ${scene.choices
-              .map(
-                (choice, index) => `
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            ${scene.choices.map((choice, index) => `
               <button
                 data-choice-index="${index}"
                 style="
                   display:flex;
                   align-items:center;
-                  gap:14px;
+                  gap:12px;
                   text-align:left;
-                  padding:14px 16px;
-                  min-height:72px;
+                  padding:12px 14px;
+                  min-height:66px;
                   border-radius:14px;
                   border:1px solid ${choice.accent};
                   background: linear-gradient(180deg, rgba(20,9,16,0.94), rgba(16,8,18,0.98));
                   color:#fff6ef;
                   cursor:pointer;
-                  box-shadow: 0 0 18px rgba(0,0,0,0.22);
                   font-family: Georgia, 'Times New Roman', serif;
-                  transition: transform 0.14s ease, filter 0.14s ease, box-shadow 0.14s ease;
                 "
               >
                 <div style="
-                  width:38px;
-                  height:38px;
-                  min-width:38px;
-                  border-radius:999px;
+                  width:34px; height:34px; min-width:34px; border-radius:999px;
                   border:1px solid ${choice.accent};
-                  display:flex;
-                  align-items:center;
-                  justify-content:center;
-                  color:${choice.accent};
-                  font-size:18px;
-                  box-shadow: 0 0 10px rgba(0,0,0,0.18);
+                  display:flex; align-items:center; justify-content:center;
+                  color:${choice.accent}; font-size:16px;
                 ">
                   ${choice.number}
                 </div>
-
-                <div style="
-                  flex:1;
-                  font-size:16px;
-                  line-height:1.35;
-                ">
+                <div style="flex:1; font-size:15px; line-height:1.32;">
                   ${choice.label}
                 </div>
               </button>
-            `
-              )
-              .join('')}
-          </div>
-
-          <div style="
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-top:12px;
-          ">
-            <div style="
-              color:rgba(255,255,255,0.72);
-              font-size:14px;
-            ">
-              The chamber is calibrating your best next route.
-            </div>
-
-            <button id="leave-enlistment-btn" style="
-              padding:10px 14px;
-              border-radius:12px;
-              border:1px solid rgba(255,255,255,0.20);
-              background: rgba(0,0,0,0.34);
-              color:#f1ddd7;
-              cursor:pointer;
-              font-family: inherit;
-              font-size:14px;
-            ">
-              Leave Chamber
-            </button>
+            `).join('')}
           </div>
         </div>
       </div>
@@ -710,21 +867,9 @@ export default class CourseEnlistmentTrial {
 
     document.body.appendChild(overlay);
     this.overlay = overlay;
-    this.installEscapeToClose();
+    this.installEscapeHandler();
 
     overlay.querySelectorAll('[data-choice-index]').forEach((btn) => {
-      btn.addEventListener('mouseenter', () => {
-        btn.style.transform = 'translateY(-2px)';
-        btn.style.filter = 'brightness(1.06)';
-        btn.style.boxShadow = '0 0 18px rgba(255,255,255,0.06)';
-      });
-
-      btn.addEventListener('mouseleave', () => {
-        btn.style.transform = 'translateY(0)';
-        btn.style.filter = 'brightness(1)';
-        btn.style.boxShadow = '0 0 18px rgba(0,0,0,0.22)';
-      });
-
       btn.addEventListener('click', () => {
         const choice = scene.choices[Number(btn.dataset.choiceIndex)];
         this.answers.push({
@@ -745,43 +890,19 @@ export default class CourseEnlistmentTrial {
       });
     });
 
-    overlay.querySelector('#leave-enlistment-btn').addEventListener('click', () => {
+    overlay.querySelector('#enlist-close-top').addEventListener('click', () => {
       this.destroy();
       this.onClose();
     });
   }
 
   renderResults() {
-    const percentages = this.getPercentages();
-    const primaryPath = this.getPrimaryPath(percentages);
-    const secondaryPath = this.getSecondaryPath(percentages, primaryPath);
-    const meta = this.getPathMeta(primaryPath);
-
-    const recommendedClasses = this.getRecommendedClasses(primaryPath, secondaryPath);
-    const gamePlan = this.getGamePlan(primaryPath, secondaryPath);
-
-    const result = {
-      scores: { ...this.scores },
-      percentages,
-      answers: [...this.answers],
-      primaryPath,
-      secondaryPath,
-      title: meta.title,
-      summary: meta.summary,
-      learningStyle: meta.learningStyle,
-      recommendedClasses,
-      gamePlan,
-      redeemToken: {
-        code: meta.tokenCode,
-        label: meta.tokenLabel,
-        color: meta.tokenColor,
-        claimed: true,
-      },
-      completedAt: new Date().toISOString(),
-    };
+    this.currentResult = this.buildResult();
 
     this.destroy();
+    this.aiSession = new AiNpcSession('course-advisor');
 
+    const result = this.currentResult;
     const overlay = document.createElement('div');
     overlay.style.cssText = `
       position: fixed;
@@ -790,7 +911,7 @@ export default class CourseEnlistmentTrial {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
       box-sizing: border-box;
       background: rgba(7, 5, 10, 0.58);
       backdrop-filter: blur(5px);
@@ -800,269 +921,235 @@ export default class CourseEnlistmentTrial {
 
     overlay.innerHTML = `
       <div style="
-        width:min(940px, 92vw);
-        border-radius: 24px;
-        overflow: hidden;
-        border: 1px solid rgba(248,113,113,0.30);
-        box-shadow:
-          0 24px 70px rgba(0,0,0,0.56),
-          0 0 30px rgba(239,68,68,0.14);
-        background:
-          linear-gradient(180deg, rgba(18,7,10,0.94), rgba(10,8,16,0.98)),
-          url('${ENLISTMENT_BG}') center center / cover no-repeat;
-        color: #f8f1e7;
+        width:min(900px, 94vw);
+        max-height:88vh;
+        overflow:auto;
+        border-radius:22px;
+        border:1px solid rgba(248,113,113,0.26);
+        box-shadow: 0 24px 70px rgba(0,0,0,0.56);
+        background: linear-gradient(180deg, rgba(18,7,10,0.96), rgba(10,8,16,0.98));
+        color:#f8f1e7;
       ">
         <div style="
-          padding: 20px 26px;
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          padding:14px 18px;
           border-bottom:1px solid rgba(255,255,255,0.08);
-          color:#fca5a5;
-          font-size:13px;
-          letter-spacing:0.16em;
-          text-transform:uppercase;
         ">
-          Route Generated
+          <div style="
+            color:#fca5a5;
+            font-size:12px;
+            letter-spacing:0.14em;
+            text-transform:uppercase;
+          ">
+            Recommendation Complete
+          </div>
+          <button id="course-close-top" style="
+            border:none;
+            background:transparent;
+            color:#f3dfd9;
+            font-size:24px;
+            cursor:pointer;
+          ">×</button>
         </div>
 
-        <div style="padding: 22px 26px 26px;">
-          <div style="
-            font-size:40px;
-            color:#fff2f0;
-            margin-bottom:10px;
-          ">
-            ${meta.title}
+        <div style="padding:18px;">
+          <div style="font-size:28px; color:#fff2f0; margin-bottom:6px;">
+            ${result.title}
           </div>
 
-          <div style="
-            font-size:17px;
-            line-height:1.6;
-            color:#f3e7dc;
-            margin-bottom:10px;
-          ">
-            ${meta.summary}
-          </div>
-
-          <div style="
-            font-size:16px;
-            line-height:1.55;
-            color:#f5d6d0;
-            margin-bottom:18px;
-          ">
-            <strong style="color:${meta.tokenColor};">AI Guide Insight:</strong> ${meta.learningStyle}
+          <div style="font-size:15px; line-height:1.55; color:#f3e7dc; margin-bottom:14px;">
+            ${result.summary}
           </div>
 
           <div style="
             display:grid;
             grid-template-columns: 1fr 1fr;
-            gap:12px 20px;
-            margin-bottom:18px;
-          ">
-            ${[
-              ['Foundations', percentages.foundations],
-              ['Creative Build', percentages.creative],
-              ['Systems', percentages.systems],
-              ['AI / Data', percentages.ai],
-            ]
-              .map(
-                ([label, value]) => `
-              <div>
-                <div style="
-                  display:flex;
-                  justify-content:space-between;
-                  font-size:15px;
-                  margin-bottom:6px;
-                ">
-                  <span>${label}</span>
-                  <span style="color:${meta.tokenColor}; font-weight:700;">${value}%</span>
-                </div>
-                <div style="
-                  width:100%;
-                  height:10px;
-                  border-radius:999px;
-                  background: rgba(255,255,255,0.10);
-                  overflow:hidden;
-                ">
-                  <div style="
-                    width:${value}%;
-                    height:100%;
-                    background: linear-gradient(90deg, ${meta.tokenColor} 0%, #fda4af 100%);
-                    box-shadow: 0 0 12px rgba(248,113,113,0.20);
-                  "></div>
-                </div>
-              </div>
-            `
-              )
-              .join('')}
-          </div>
-
-          <div style="
-            display:grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap:18px;
-            margin-bottom:20px;
+            gap:14px;
+            margin-bottom:14px;
           ">
             <div style="
               border:1px solid rgba(255,255,255,0.10);
               border-radius:16px;
-              padding:16px;
+              padding:14px;
               background: rgba(255,255,255,0.03);
             ">
               <div style="
                 color:#fca5a5;
-                font-size:12px;
+                font-size:11px;
                 letter-spacing:0.12em;
                 text-transform:uppercase;
-                margin-bottom:10px;
+                margin-bottom:8px;
                 font-weight:700;
               ">
-                AI Guided Class Selection
+                Recommended Class
               </div>
 
-              <div style="display:grid; gap:10px;">
-                ${recommendedClasses
-                  .map(
-                    (item, index) => `
-                  <div style="
-                    padding:12px 12px;
-                    border-radius:12px;
-                    border:1px solid rgba(255,255,255,0.08);
-                    background: rgba(0,0,0,0.16);
-                  ">
-                    <div style="
-                      display:flex;
-                      justify-content:space-between;
-                      gap:12px;
-                      align-items:center;
-                      margin-bottom:6px;
-                    ">
-                      <div style="font-size:18px; color:#fff5f1;">
-                        ${index + 1}. ${item.name}
-                      </div>
-                      <div style="
-                        font-size:11px;
-                        text-transform:uppercase;
-                        letter-spacing:0.08em;
-                        color:${meta.tokenColor};
-                      ">
-                        ${item.fit}
-                      </div>
-                    </div>
-                    <div style="
-                      font-size:14px;
-                      line-height:1.5;
-                      color:#eadfda;
-                    ">
-                      ${item.reason}
-                    </div>
-                  </div>
-                `
-                  )
-                  .join('')}
+              <div style="font-size:28px; color:${result.accent}; margin-bottom:8px;">
+                ${result.recommendedClass.name}
+              </div>
+
+              <div style="font-size:14px; line-height:1.55; color:#eadfd8;">
+                ${result.recommendedClass.why}
               </div>
             </div>
 
             <div style="
               border:1px solid rgba(255,255,255,0.10);
               border-radius:16px;
-              padding:16px;
+              padding:14px;
               background: rgba(255,255,255,0.03);
             ">
               <div style="
                 color:#fca5a5;
-                font-size:12px;
+                font-size:11px;
                 letter-spacing:0.12em;
                 text-transform:uppercase;
-                margin-bottom:10px;
+                margin-bottom:8px;
                 font-weight:700;
               ">
-                Class Game Plan
+                Skills to Develop
               </div>
 
-              <div style="display:grid; gap:10px;">
-                ${gamePlan
-                  .map(
-                    (step, index) => `
+              <div style="display:grid; gap:8px;">
+                ${result.successPlan.map((step, index) => `
                   <div style="
-                    padding:12px 12px;
+                    padding:10px 10px;
                     border-radius:12px;
                     border:1px solid rgba(255,255,255,0.08);
-                    background: rgba(0,0,0,0.16);
+                    background: rgba(0,0,0,0.14);
                   ">
-                    <div style="
-                      font-size:16px;
-                      color:#fff2f0;
-                      margin-bottom:6px;
-                    ">
-                      Step ${index + 1}: ${step.title}
+                    <div style="font-size:15px; color:#fff2f0; margin-bottom:4px;">
+                      ${index + 1}. ${step.title}
                     </div>
-                    <div style="
-                      font-size:14px;
-                      line-height:1.5;
-                      color:#e6dbd5;
-                    ">
+                    <div style="font-size:13px; line-height:1.5; color:#e6dbd5;">
                       ${step.description}
                     </div>
                   </div>
-                `
-                  )
-                  .join('')}
+                `).join('')}
               </div>
             </div>
           </div>
 
           <div style="
             border:1px solid rgba(255,255,255,0.10);
-            border-radius:18px;
-            padding:16px 18px;
-            background: linear-gradient(180deg, rgba(36,10,14,0.74), rgba(25,8,16,0.86));
-            margin-bottom:20px;
+            border-radius:16px;
+            padding:14px;
+            background: rgba(255,255,255,0.03);
+            margin-bottom:14px;
           ">
-            <div style="
-              color:#fca5a5;
-              font-size:12px;
-              letter-spacing:0.12em;
-              text-transform:uppercase;
-              margin-bottom:10px;
-              font-weight:700;
-            ">
-              Redeemable Path Token
-            </div>
-
             <div style="
               display:flex;
               justify-content:space-between;
               align-items:center;
-              gap:16px;
+              gap:10px;
+              margin-bottom:8px;
               flex-wrap:wrap;
             ">
-              <div>
-                <div style="
-                  font-size:26px;
-                  color:#fff2f0;
-                  margin-bottom:6px;
-                ">
-                  ${result.redeemToken.label}
-                </div>
-                <div style="
-                  font-size:14px;
-                  color:#f2d9d6;
-                  letter-spacing:0.08em;
-                ">
-                  ${result.redeemToken.code}
-                </div>
+              <div style="
+                color:#fca5a5;
+                font-size:11px;
+                letter-spacing:0.12em;
+                text-transform:uppercase;
+                font-weight:700;
+              ">
+                Ask the AI Advisor
               </div>
 
-              <div style="
-                padding:10px 16px;
+              <button id="advisor-history-btn" style="
+                padding:6px 10px;
                 border-radius:999px;
-                border:1px solid ${meta.tokenColor};
-                color:${meta.tokenColor};
-                font-weight:700;
-                letter-spacing:0.08em;
-                text-transform:uppercase;
-                box-shadow: 0 0 18px rgba(255,255,255,0.04);
+                border:1px solid rgba(255,255,255,0.12);
+                background: rgba(0,0,0,0.18);
+                color:#f2e4de;
+                cursor:pointer;
+                font-size:12px;
+                font-family: inherit;
               ">
-                Redeem Ready
-              </div>
+                Chat History
+              </button>
+            </div>
+
+            <div id="advisor-suggestion-wrap" style="
+              display:flex;
+              flex-wrap:wrap;
+              gap:8px;
+              margin-bottom:10px;
+            ">
+              ${[
+                'Why is this class my best fit?',
+                'What should I work on before taking it?',
+                'Why not the other classes?',
+              ].map((text) => `
+                <button
+                  class="advisor-suggestion-btn"
+                  data-suggestion="${text.replace(/"/g, '&quot;')}"
+                  style="
+                    padding:8px 10px;
+                    border-radius:999px;
+                    border:1px solid rgba(255,255,255,0.12);
+                    background: rgba(0,0,0,0.18);
+                    color:#f2e4de;
+                    cursor:pointer;
+                    font-size:12px;
+                    font-family: inherit;
+                  "
+                >
+                  ${text}
+                </button>
+              `).join('')}
+            </div>
+
+            <div id="advisor-chat-history" style="
+              min-height:120px;
+              max-height:200px;
+              overflow:auto;
+              display:flex;
+              flex-direction:column;
+              padding:4px 0;
+              margin-bottom:10px;
+            "></div>
+
+            <div style="
+              display:grid;
+              grid-template-columns: 1fr auto;
+              gap:8px;
+              align-items:end;
+            ">
+              <textarea
+                id="advisor-input"
+                rows="2"
+                placeholder="Ask the advisor..."
+                style="
+                  resize:none;
+                  width:100%;
+                  border-radius:14px;
+                  border:1px solid rgba(255,255,255,0.12);
+                  background: rgba(12,8,14,0.58);
+                  color:#fff4ef;
+                  padding:10px 12px;
+                  box-sizing:border-box;
+                  font-family: inherit;
+                  font-size:13px;
+                  line-height:1.5;
+                "
+              ></textarea>
+
+              <button id="advisor-send-btn" style="
+                padding:10px 14px;
+                border-radius:12px;
+                border:1px solid ${result.accent};
+                background: linear-gradient(180deg, rgba(248,113,113,0.20), rgba(127,29,29,0.16));
+                color:#fff6f4;
+                cursor:pointer;
+                font-family: inherit;
+                font-size:13px;
+                font-weight:700;
+                min-width:80px;
+              ">
+                Send
+              </button>
             </div>
           </div>
 
@@ -1070,11 +1157,11 @@ export default class CourseEnlistmentTrial {
             display:flex;
             justify-content:space-between;
             align-items:center;
-            gap:12px;
+            gap:10px;
             flex-wrap:wrap;
           ">
             <button id="course-restart-btn" style="
-              padding:12px 16px;
+              padding:10px 14px;
               border-radius:12px;
               border:1px solid rgba(255,255,255,0.18);
               background: rgba(0,0,0,0.24);
@@ -1083,22 +1170,21 @@ export default class CourseEnlistmentTrial {
               font-family: inherit;
               font-size:14px;
             ">
-              Recalibrate Path
+              Recalibrate
             </button>
 
             <button id="course-redeem-btn" style="
               padding:12px 18px;
               border-radius:12px;
-              border:1px solid ${meta.tokenColor};
+              border:1px solid ${result.accent};
               background: linear-gradient(180deg, rgba(248,113,113,0.22), rgba(127,29,29,0.18));
               color:#fff6f4;
               cursor:pointer;
               font-family: inherit;
               font-size:15px;
               font-weight:700;
-              box-shadow: 0 0 18px rgba(248,113,113,0.12);
             ">
-              Redeem Plan & Return
+              Redeem and Move On
             </button>
           </div>
         </div>
@@ -1107,26 +1193,68 @@ export default class CourseEnlistmentTrial {
 
     document.body.appendChild(overlay);
     this.overlay = overlay;
-    this.installEscapeToClose();
+    this.installEscapeHandler();
+
+    const responseArea = overlay.querySelector('#advisor-chat-history');
+    const inputField = overlay.querySelector('#advisor-input');
+    const sendBtn = overlay.querySelector('#advisor-send-btn');
+
+    this.renderChatHistory(responseArea);
+
+    const sendCurrent = async () => {
+      const value = inputField.value;
+      if (!String(value || '').trim()) return;
+      await this.sendAdvisorMessage(value, responseArea, inputField, sendBtn);
+    };
+
+    inputField.addEventListener('keydown', (event) => {
+      event.stopPropagation();
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendCurrent();
+      }
+    });
+
+    sendBtn.addEventListener('click', sendCurrent);
+
+    overlay.querySelectorAll('.advisor-suggestion-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const suggestion = btn.getAttribute('data-suggestion') || '';
+        await this.sendAdvisorMessage(suggestion, responseArea, inputField, sendBtn);
+      });
+    });
+
+    overlay.querySelector('#advisor-history-btn').addEventListener('click', () => {
+      this.showChatHistoryModal();
+    });
+
+    overlay.querySelector('#course-close-top').addEventListener('click', () => {
+      this.destroy();
+      this.onClose();
+    });
 
     overlay.querySelector('#course-restart-btn').addEventListener('click', () => {
-      this.currentSceneIndex = 0;
-      this.scores = {
-        foundations: 0,
-        creative: 0,
-        systems: 0,
-        ai: 0,
-      };
-      this.answers = [];
-      this.renderScene();
+      this.resetAndRestart();
     });
 
     overlay.querySelector('#course-redeem-btn').addEventListener('click', async () => {
       try {
-        await this.onComplete(result);
+        if (this.currentResult) {
+          this.currentResult.advisorChatHistory = [...this.advisorChatHistory];
+          this.currentResult.completedAt = new Date().toISOString();
+        }
+        await this.onComplete(this.currentResult);
       } finally {
         this.destroy();
       }
     });
+
+    if (this.aiSession) {
+      this.aiSession.setTimeout(() => {
+        if (this.canUseElement(inputField)) inputField.focus();
+      }, 100);
+    }
   }
 }
+
+export default CourseEnlistmentTrial;
