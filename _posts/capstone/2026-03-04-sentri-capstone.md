@@ -202,11 +202,11 @@ permalink: /capstone/sentri/
         <span class="logo-emoji">🏠</span>
         <span>Homepage</span>
     </a>
-    <a href="https://sentri-prc.opencodingsociety.com/programs" class="logo-card" target="_blank">
+    <a href="https://sentri-prc.opencodingsociety.com/" class="logo-card" target="_blank">
         <span class="logo-emoji">📋</span>
         <span>Programs</span>
     </a>
-    <a href="https://sentri-prc.opencodingsociety.com/meetings" class="logo-card" target="_blank">
+    <a href="https://sentri-prc.opencodingsociety.com/" class="logo-card" target="_blank">
         <span class="logo-emoji">📅</span>
         <span>Meetings</span>
     </a>
