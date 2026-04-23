@@ -5,8 +5,14 @@ import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
 // ── Shared panel shell ────────────────────────────────────────────────────────
-function createPanel(title, accentColor) {
+// Pauses the game on open and resumes on close, matching DialogueSystem behavior.
+function createPanel(title, accentColor, gameControl) {
   document.getElementById('code-hub-panel')?.remove();
+
+  // Pause the game while the panel is open
+  if (gameControl && typeof gameControl.pause === 'function' && !gameControl.isPaused) {
+    gameControl.pause();
+  }
 
   const panel = document.createElement('div');
   panel.id = 'code-hub-panel';
@@ -51,13 +57,22 @@ function createPanel(title, accentColor) {
   panel.appendChild(header);
   panel.appendChild(body);
   document.body.appendChild(panel);
-  document.getElementById('panel-close').onclick = () => panel.remove();
+
+  // Resume game when panel is closed
+  const closePanel = () => {
+    panel.remove();
+    if (gameControl && typeof gameControl.resume === 'function') {
+      gameControl.resume();
+    }
+  };
+  document.getElementById('panel-close').onclick = closePanel;
+
   return body;
 }
 
 // ── Frontend Panel — Markdown Converter + CSS Playground ─────────────────────
-function openFrontendPanel() {
-  const body = createPanel('⌨ Frontend Terminal — Markdown & CSS', '#4caef0');
+function openFrontendPanel(gameControl) {
+  const body = createPanel('⌨ Frontend Terminal — Markdown & CSS', '#4caef0', gameControl);
 
   body.innerHTML = `
     <!-- Reference box -->
@@ -215,8 +230,8 @@ Write your **Markdown** here and hit Convert.
 }
 
 // ── Backend Panel — REST API Simulator ───────────────────────────────────────
-function openBackendPanel() {
-  const body = createPanel('⌨ Backend Terminal — REST API Simulator', '#86efac');
+function openBackendPanel(gameControl) {
+  const body = createPanel('⌨ Backend Terminal — REST API Simulator', '#86efac', gameControl);
 
   const db = [
     { id:1, name:'TechCorp',    industry:'Software',  location:'San Francisco', size:150, skills:['Java','Spring'] },
@@ -375,8 +390,8 @@ function openBackendPanel() {
 }
 
 // ── Dataviz Panel — Filtering + Pagination + Query Builder ───────────────────
-function openDatavizPanel() {
-  const body = createPanel('⌨ Dataviz Terminal — Filtering, Pagination & Queries', '#c084fc');
+function openDatavizPanel(gameControl) {
+  const body = createPanel('⌨ Dataviz Terminal — Filtering, Pagination & Queries', '#c084fc', gameControl);
 
   const dataset = [
     { id:1,  name:'TechCorp',    industry:'Software',      location:'San Francisco', size:500,  skills:['Java','Spring'] },
@@ -646,7 +661,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: true,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openFrontendPanel();
+              openFrontendPanel(this.gameEnv.gameControl);
             },
           },
         ]);
@@ -676,7 +691,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: true,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openBackendPanel();
+              openBackendPanel(this.gameEnv.gameControl);
             },
           },
         ]);
@@ -706,7 +721,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: true,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openDatavizPanel();
+              openDatavizPanel(this.gameEnv.gameControl);
             },
           },
         ]);
