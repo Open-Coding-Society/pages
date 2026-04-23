@@ -1461,6 +1461,9 @@ await this.profileManager.saveIdentity(profile);
   destroy() {
     this.clearZoneAlert();
     this.present?.destroy();
+    if (this.profilePanelView) {
+      this.profilePanelView.destroy();
+    }
   }
 }
 

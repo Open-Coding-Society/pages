@@ -141,6 +141,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const level = this;
 
     let { width, height, path } = this.getLevelDimensions();
+
     this.profilePanelView = new StatusPanel({
       id: 'csse-mission-panel',
       title: 'MISSION TOOLS',
@@ -358,6 +359,15 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     if (!npc?.spriteData?.id) return;
 
     const npcId = npc.spriteData.id;
+    const historyPendingQuestion = this._getPendingQuestionFromChatHistory(npc);
+    const activeChallenge = this._activeDeskChallenges.get(npcId) || null;
+    const lockedQuestion = AiChallengeNpc.getPendingChallengeQuestion(deskId);
+    const stateQuestion = (AiChallengeNpc.getChallengeState(npc)?.question || '').toString().trim();
+    const hasPendingChallenge = Boolean(historyPendingQuestion || lockedQuestion) || AiChallengeNpc.hasPendingChallenge(npc, deskId) || (
+      Boolean(activeChallenge?.question) &&
+      !activeChallenge?.completedAt &&
+      activeChallenge?.lastEvaluation?.verdict !== CHALLENGE_VERDICTS.RIGHT
+    );
     // Orchestrator: open UI, generate one question, then arm answer submission.
     await this._runBusyTask({
       busySet: this._deskChallengeBusy,
@@ -365,11 +375,23 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       busyMessage: `${deskId}: challenge is already loading.`,
       task: async () => {
         try {
-          this.showToast?.(`${deskId}: challenge channel opened.`);
-          AiChallengeNpc.showInteraction(npc);
-          const challengeQuestion = await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData, npc?.aiSession || null));
-          this._appendDeskChatMessage(npc, 'ai', `Challenge Question: ${challengeQuestion}`);
-          AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
+          this.showToast?.(hasPendingChallenge ? `${deskId}: resuming your current challenge.` : `${deskId}: challenge channel opened.`);
+          AiChallengeNpc.showInteraction(npc, {
+            statusMessage: hasPendingChallenge ? null : 'Generating challenge question…',
+          });
+
+          const challengeQuestion = hasPendingChallenge
+            ? (historyPendingQuestion || lockedQuestion || stateQuestion || activeChallenge?.question)
+            : await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData, npc?.aiSession || null));
+
+          if (hasPendingChallenge) {
+            AiChallengeNpc.restoreQuestion(npc, challengeQuestion);
+          } else {
+            AiChallengeNpc.setPendingChallenge(npc, deskId, challengeQuestion);
+            this._appendDeskChatMessage(npc, 'ai', `Challenge Question: ${challengeQuestion}`);
+            AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
+          }
+
           AiChallengeNpc.armSubmission(
             npc, deskId, challengeQuestion, this._activeDeskChallenges,
             (answer, active, ui) => this._submitChallengeAnswer(npc, npcId, answer, active, ui),
@@ -638,12 +660,41 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
+   * Return the most recent unresolved challenge question from transcript history.
+   * A question is unresolved when no Result line appears after it.
+   * @private
+   */
+  _getPendingQuestionFromChatHistory(npc) {
+    const history = npc?.spriteData?.chatHistory;
+    if (!Array.isArray(history) || history.length === 0) return '';
+
+    let pending = '';
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      const entry = history[i];
+      const message = (entry?.message || '').toString().trim();
+      if (!message) continue;
+
+      if (/^Result\s*:/i.test(message)) {
+        return '';
+      }
+
+      if (/^Challenge Question\s*:/i.test(message)) {
+        pending = message.replace(/^Challenge Question\s*:\s*/i, '').trim();
+        break;
+      }
+    }
+
+    return pending;
+  }
+
+  /**
    * Submit answer. Evaluates the student answer, renders feedback, speaks
    * the result, and awards progress if correct. Called via onSubmit callback.
    * @private
    */
   async _submitChallengeAnswer(npc, npcId, answer, active, ui) {
     if (!active?.question) return;
+    AiChallengeNpc.markChallengeAnswered(npc, answer);
     this._appendDeskChatMessage(npc, 'user', answer);
 
     await this._runBusyTask({
@@ -669,6 +720,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
             `Result: ${evaluation?.verdict || CHALLENGE_VERDICTS.WRONG}. ${evaluation?.feedback || 'No feedback provided.'}`
           );
           if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
+            active.status = 'completed';
+            active.completedAt = Date.now();
             this._awardMissionProgress(active?.deskId || '');
           }
           this._logChallengeEvent({
