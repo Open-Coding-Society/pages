@@ -37,6 +37,11 @@ export class GameExecutor {
   }
 
   stop() {
+    if (this._transitionTimer) {
+      clearTimeout(this._transitionTimer);
+      this._transitionTimer = null;
+    }
+
     if (this.gameCore) {
       try {
         if (this.gameCore.destroy) {
@@ -116,13 +121,67 @@ export class GameExecutor {
     this.levelSelect.addEventListener('change', () => {
       if (this.gameControl && this.levelSelect.value !== '') {
         const levelIndex = parseInt(this.levelSelect.value, 10);
-        if (this.gameControl.transitionToLevel) {
-          this.gameControl.currentLevelIndex = levelIndex;
-          this.gameControl.transitionToLevel();
-          this.updateStatus('Switched to ' + this.levelSelect.options[this.levelSelect.selectedIndex].text);
-        }
+        const label = this.levelSelect.options[this.levelSelect.selectedIndex].text;
+        this._scheduleLevelTransition(levelIndex, label);
       }
     });
+  }
+
+  /**
+   * Schedule level transition. Debounces rapid selector changes and performs a
+   * full teardown before handing off to transitionToLevel, ensuring in-flight
+   * async constructors from the previous level cannot inject objects into the
+   * new level's environment.
+   * @param {number} levelIndex - Zero-based index of the target level.
+   * @param {string} label - Display name shown in the status bar after switching.
+   * @private
+   */
+  _scheduleLevelTransition(levelIndex, label) {
+    // Cancel any previously scheduled transition so rapid changes collapse into one.
+    if (this._transitionTimer) {
+      clearTimeout(this._transitionTimer);
+      this._transitionTimer = null;
+    }
+
+    this.updateStatus('Loading...');
+    this.levelSelect.disabled = true;
+
+    this._transitionTimer = setTimeout(() => {
+      this._transitionTimer = null;
+
+      if (!this.gameControl?.transitionToLevel) {
+        this.levelSelect.disabled = false;
+        return;
+      }
+
+      // Force-destroy any game objects that survived the previous tear-down.
+      // This catches objects whose async constructors completed after destroy()
+      // was already called (e.g. image onload callbacks, ProfileManager promises).
+      try {
+        const env = this.gameControl.gameEnv || this.gameControl.currentLevel?.gameEnv;
+        if (env) {
+          const stale = env.gameObjects || [];
+          for (let i = stale.length - 1; i >= 0; i--) {
+            try { stale[i].destroy?.(); } catch (_) { /* ignore individual failures */ }
+          }
+          env.gameObjects = [];
+        }
+      } catch (e) {
+        console.warn('GameExecutor: pre-transition cleanup error', e);
+      }
+
+      // Purge any orphaned canvases from the container DOM that destroy() may
+      // have missed (e.g. canvas created after destroy was called).
+      const gameContainer = this.getGameContainer?.();
+      if (gameContainer) {
+        gameContainer.querySelectorAll('canvas').forEach(c => c.remove());
+      }
+
+      this.gameControl.currentLevelIndex = levelIndex;
+      this.gameControl.transitionToLevel();
+      this.levelSelect.disabled = false;
+      this.updateStatus('Switched to ' + label);
+    }, 250);
   }
 
   async run() {

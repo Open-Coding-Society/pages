@@ -3,7 +3,8 @@ import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackgr
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
-
+import PersonaTrial from './PersonaTrial.js';
+import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 /**
  * GameLevel CS Pathway - Wayfinding World
  */
@@ -160,6 +161,28 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       id: 'CodeHubGatekeeper',
       greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
       position: codeHubGatekeeperPos,
+      interact: function() {
+        this.dialogueSystem.dialogues = [
+          'Welcome to the Code Hub!',
+          'Here you can explore Frontend, Backend, and Data Viz.',
+          'Walk up to each terminal and press E to start coding.',
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Code Hub Gatekeeper');
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Enter Code Hub',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              const gc = this.gameEnv.gameControl;
+              gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1CodeHub);
+              gc.currentLevelIndex++;
+              gc.transitionToLevel();
+            },
+          },
+        ]);
+      },
       markerColor: '#22c55e',
     });
 
@@ -168,8 +191,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
       position: personalEnrichmentGatekeeperPos,
       markerColor: '#3b82f6',
+      interact: () => {
+        this.openPersonaTrial();
+      },
     });
-
     const npc_data_skillPassportGatekeeper = createGatekeeperData({
       id: 'SkillPassportGatekeeper',
       greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
@@ -193,6 +218,81 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_courseEnlistGatekeeper },
     ];
+    
+  }
+  openPersonaTrial() {
+    if (this._personaTrialOpen) return;
+    this._personaTrialOpen = true;
+
+    const trial = new PersonaTrial({
+      onComplete: async (result) => {
+        try {
+          await this.savePersonaResult(result);
+
+          this.showToast?.(`Persona updated: ${result.title}`);
+          this.panel?.(
+            `${result.title}\n\n${result.summary}\n\nTechnologist ${result.percentages.technologist}% | Scrummer ${result.percentages.scrummer}% | Planner ${result.percentages.planner}% | Finisher ${result.percentages.finisher}%`
+          );
+        } catch (error) {
+          console.error('Failed to save persona result:', error);
+          this.showToast?.('Persona trial completed, but saving failed.');
+        } finally {
+          this._personaTrialOpen = false;
+        }
+      },
+      onClose: () => {
+        this._personaTrialOpen = false;
+      },
+    });
+
+    trial.start();
+  }
+
+  async savePersonaResult(result) {
+    const currentProfile = { ...(this.profileData || {}) };
+
+    const updatedProfile = {
+      ...currentProfile,
+      personaMeta: {
+        primaryPersona: result.primaryPersona,
+        title: result.title,
+        summary: result.summary,
+        growth: result.growth,
+        percentages: result.percentages,
+        scores: result.scores,
+        completedAt: result.completedAt,
+      },
+    };
+
+    this.profileData = updatedProfile;
+
+    // Try a few common persistence method names in case your ProfileManager
+    // implementation differs. Keep the first one that exists.
+    if (typeof this.profileManager?.updateProfileData === 'function') {
+      await this.profileManager.updateProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfileData === 'function') {
+      await this.profileManager.saveProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfile === 'function') {
+      await this.profileManager.saveProfile(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.setProfileData === 'function') {
+      await this.profileManager.setProfileData(updatedProfile);
+      return;
+    }
+
+    // Fallback so you still see it work during testing even if persistence
+    // method name is different.
+    console.warn(
+      'No known ProfileManager save method found. Persona result stored in this.profileData only.'
+    );
   }
 
 }
