@@ -601,7 +601,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       SCALE_FACTOR:   SCALE,
       ANIMATION_RATE: 50,
       pixels:         { width: 1024, height: 1024 },
-      orientation:    { rows: 2, columns: 2 },
+      orientation:    { rows: 1, columns: 1 },
       down:           { row: 0, start: 0, columns: 1, wiggle: 0.005 },
       up:             { row: 0, start: 1, columns: 1 },
       left:           { row: 1, start: 0, columns: 1 },
