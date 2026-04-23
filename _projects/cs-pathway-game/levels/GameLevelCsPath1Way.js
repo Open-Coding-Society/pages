@@ -1,9 +1,12 @@
+// GameLevelCsPath1Way.js
+
 // Imports: Level objects and UI helpers.
 import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaTrial from './PersonaTrial.js';
+import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
@@ -21,7 +24,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       logPrefix: 'Wayfinding World',
     });
 
-    let { width, height, path } = this.getLevelDimensions();
+    const { width, height, path } = this.getLevelDimensions();
 
     /**
      * Section: Level objects.
@@ -30,9 +33,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     // ── Background ──────────────────────────────────────────────
     const image_src = path + "/images/projects/cs-pathway-game/bg1/wayfinding-world-fantasy.png";
     const bg_data = {
-        name: GameLevelCsPath1Way.displayName,
-        greeting: "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll discover your course, uncover your strengths, and enrich your persona!",
-        src: image_src,
+      name: GameLevelCsPath1Way.displayName,
+      greeting:
+        "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll discover your course, uncover your strengths, and enrich your persona!",
+      src: image_src,
     };
 
     this.restoreIdentitySelections({
@@ -40,7 +44,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       themeManifestUrl: `${path}/images/projects/cs-pathway-game/bg1/index.json`,
       themeAssetPrefix: `${path}/images/projects/cs-pathway-game/bg1/`,
     });
-    
+
     // ── Player ───────────────────────────────────────────────────
     const player_src = path + "/images/projects/cs-pathway-game/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
@@ -54,14 +58,14 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       INIT_POSITION: { x: 0, y: height - (height / PLAYER_SCALE_FACTOR) },
       pixels: { height: 1024, width: 1024 },
       orientation: { rows: 2, columns: 2 },
-      down:      { row: 0, start: 0, columns: 1 },
-      downRight: { row: 0, start: 0, columns: 1, rotate:  Math.PI / 16 },
-      downLeft:  { row: 0, start: 0, columns: 1, rotate: -Math.PI / 16 },
-      left:      { row: 1, start: 0, columns: 1, mirror: true },
-      right:     { row: 1, start: 0, columns: 1 },
-      up:        { row: 0, start: 1, columns: 1 },
-      upLeft:    { row: 1, start: 0, columns: 1, mirror: true, rotate:  Math.PI / 16 },
-      upRight:   { row: 1, start: 0, columns: 1, rotate: -Math.PI / 16 },
+      down: { row: 0, start: 0, columns: 1 },
+      downRight: { row: 0, start: 0, columns: 1, rotate: Math.PI / 16 },
+      downLeft: { row: 0, start: 0, columns: 1, rotate: -Math.PI / 16 },
+      left: { row: 1, start: 0, columns: 1, mirror: true },
+      right: { row: 1, start: 0, columns: 1 },
+      up: { row: 0, start: 1, columns: 1 },
+      upLeft: { row: 1, start: 0, columns: 1, mirror: true, rotate: Math.PI / 16 },
+      upRight: { row: 1, start: 0, columns: 1, rotate: -Math.PI / 16 },
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
       keypress: { up: 87, left: 65, down: 83, right: 68 },
     };
@@ -149,7 +153,15 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
     };
 
-    const createGatekeeperData = ({ id, greeting, position, markerColor, reaction, interact, interactDistance }) => ({
+    const createGatekeeperData = ({
+      id,
+      greeting,
+      position,
+      markerColor,
+      reaction,
+      interact,
+      interactDistance,
+    }) => ({
       ...gatekeeperBaseData,
       src: createDiscMarkerSrc(markerColor),
       id,
@@ -164,7 +176,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       id: 'CodeHubGatekeeper',
       greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
       position: codeHubGatekeeperPos,
-      interact: function() {
+      interact: function () {
         this.dialogueSystem.dialogues = [
           'Welcome to the Code Hub!',
           'Here you can explore Frontend, Backend, and Data Viz.',
@@ -214,6 +226,9 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       greeting: 'Welcome to Course Enlist! Choose your next class and map your pathway.',
       position: courseEnlistGatekeeperPos,
       markerColor: '#ef4444',
+      interact: () => {
+        this.openCourseEnlistment();
+      },
     });
 
     // List of objects definitions for this level
@@ -225,7 +240,6 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_courseEnlistGatekeeper },
     ];
-    
   }
 
   // ── Skill Passport ───────────────────────────────────────────
@@ -267,6 +281,45 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       },
       onClose: () => {
         this._personaTrialOpen = false;
+      },
+    });
+
+    trial.start();
+  }
+
+  // ── Course Enlistment Trial ──────────────────────────────────
+  openCourseEnlistment() {
+    if (this._courseEnlistmentOpen) return;
+    this._courseEnlistmentOpen = true;
+
+    const trial = new CourseEnlistmentTrial({
+      profileData: this.profileData || {},
+      onComplete: async (result) => {
+        try {
+          await this.saveCoursePlanResult(result);
+
+          this.showToast?.(`Path unlocked: ${result.title}`);
+
+          const classesText = Array.isArray(result.recommendedClasses)
+            ? result.recommendedClasses.map((item) => item.name).join(' → ')
+            : '';
+
+          const planText = Array.isArray(result.gamePlan)
+            ? result.gamePlan.map((step, index) => `${index + 1}. ${step.title}`).join('\n')
+            : '';
+
+          this.panel?.(
+            `${result.title}\n\n${result.summary}\n\nRecommended Classes: ${classesText}\n\nGame Plan:\n${planText}\n\nRedeemed Token: ${result.redeemToken?.label || result.redeemToken?.code || 'Unlocked'}`
+          );
+        } catch (error) {
+          console.error('Failed to save course enlistment result:', error);
+          this.showToast?.('Course plan completed, but saving failed.');
+        } finally {
+          this._courseEnlistmentOpen = false;
+        }
+      },
+      onClose: () => {
+        this._courseEnlistmentOpen = false;
       },
     });
 
@@ -316,6 +369,52 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     );
   }
 
+  async saveCoursePlanResult(result) {
+    const currentProfile = { ...(this.profileData || {}) };
+
+    const updatedProfile = {
+      ...currentProfile,
+      coursePlanMeta: {
+        title: result.title,
+        summary: result.summary,
+        primaryPath: result.primaryPath,
+        secondaryPath: result.secondaryPath,
+        learningStyle: result.learningStyle,
+        percentages: result.percentages,
+        scores: result.scores,
+        recommendedClasses: result.recommendedClasses,
+        gamePlan: result.gamePlan,
+        redeemToken: result.redeemToken,
+        completedAt: result.completedAt,
+      },
+    };
+
+    this.profileData = updatedProfile;
+
+    if (typeof this.profileManager?.updateProfileData === 'function') {
+      await this.profileManager.updateProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfileData === 'function') {
+      await this.profileManager.saveProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfile === 'function') {
+      await this.profileManager.saveProfile(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.setProfileData === 'function') {
+      await this.profileManager.setProfileData(updatedProfile);
+      return;
+    }
+
+    console.warn(
+      'No known ProfileManager save method found. Course plan result stored in this.profileData only.'
+    );
+  }
 }
 
 export default GameLevelCsPath1Way;
