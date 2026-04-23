@@ -7,6 +7,7 @@ permalink: /student/bathroom_pass
 <head>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 </head>
 
 <div class="max-w-7xl mx-auto px-4 py-8">
@@ -161,6 +162,58 @@ permalink: /student/bathroom_pass
     let scanStream = null;
     let identifiedPerson = null;
     let isProcessing = false;
+    let faceMatcher = null;
+    let isFaceApiLoaded = false;
+
+    async function loadFaceData() {
+        showToast({ message: "Loading Face AI models...", duration: 3000 });
+        
+        try {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+            await Promise.all([
+                faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+            
+            showToast({ message: "Fetching student face data...", duration: 2000 });
+            const resp = await fetch(`${javaURI}/api/person/faces`, fetchOptions);
+            const faces = await resp.json();
+            console.log(`Fetched ${faces.length} faces from backend:`, faces);
+            
+            const labeledDescriptors = [];
+            for (const face of faces) {
+                if (!face.faceData) continue;
+                try {
+                    const img = new Image();
+                    img.src = `data:image/jpeg;base64,${face.faceData}`;
+                    await new Promise((resolve) => { img.onload = resolve; });
+                    
+                    const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+                    if (detection) {
+                        const label = String(face.name || face.uid || "Unknown");
+                        console.log(`Processing face for: ${label}`);
+                        labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [detection.descriptor]));
+                    } else {
+                        console.warn(`No face detected in stored image for: ${face.name || face.uid}`);
+                    }
+                } catch(e) {
+                    console.error("Failed to process face for", face.name, e);
+                }
+            }
+            
+            if (labeledDescriptors.length === 0) {
+                 showToast({ message: "No registered faces retrieved. Scanner will not work.", style: { background: "#ef4444" }, duration: 5000 });
+            } else {
+                 faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
+                 isFaceApiLoaded = true;
+                 showToast({ message: "Scanner Ready!", duration: 3000 });
+            }
+        } catch (err) {
+             console.error("Failed to initialize FaceAPI", err);
+             showToast({ message: "Face scanner initialization failed.", duration: 5000, style: { background: "#ef4444" } });
+        }
+    }
 
     // Fetch current user email on load
     async function initializeCurrentUser() {
@@ -206,63 +259,37 @@ permalink: /student/bathroom_pass
     }
 
     async function startIdentificationLoop() {
-        if (!scanStream || isProcessing) return;
+        if (!scanStream || !isFaceApiLoaded || identifiedPerson) {
+             if (!isFaceApiLoaded && scanStream && !identifiedPerson) {
+                 setTimeout(startIdentificationLoop, 1000);
+             }
+             return;
+        }
+        if (isProcessing) return;
         
+        isProcessing = true;
         const video = document.getElementById('scanVideo');
-        const canvas = document.getElementById('scanCanvas');
-        
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        
-        const base64Image = canvas.toDataURL('image/jpeg').split(',')[1];
-        
-        const threshold = document.getElementById('thresholdLimit').value;
-        
-        // Get JWT token from cookies (Spring token for backend calls)
-        const jwtToken = document.cookie.split(';').find(c => c.trim().startsWith('jwt_java_spring='))?.split('=')[1];
+        const threshold = parseFloat(document.getElementById('thresholdLimit').value);
         
         try {
-            const resp = await fetch(`${javaURI}/api/person/identify`, {
-                ...fetchOptions,
-                method: 'POST',
-                headers: {
-                    ...fetchOptions.headers,
-                    ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
-                },
-                body: JSON.stringify({ 
-                    image: base64Image,
-                    threshold: threshold
-                })
-            });
-
-            if (!resp.ok) {
-                console.error(`Face identify API returned ${resp.status}:`, resp.statusText);
-                const errorText = await resp.text();
-                console.error("Error response:", errorText);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-
-            let result;
-            try {
-                result = await resp.json();
-            } catch (parseErr) {
-                console.error("Failed to parse API response as JSON:", parseErr);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-            console.log("Identify result:", result);
-            
-            if (result.match) {
-                showIdentification(result.name);
-            } else {
-                setTimeout(startIdentificationLoop, 1000);
+            if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
+                const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                
+                if (detection) {
+                    const match = faceMatcher.findBestMatch(detection.descriptor);
+                    if (match.label !== 'unknown' && match.distance <= threshold) {
+                        showIdentification(match.label);
+                        isProcessing = false;
+                        return; // Wait for user action
+                    }
+                }
             }
         } catch (err) {
-            console.error("Identification error:", err);
-            setTimeout(startIdentificationLoop, 3000);
+            console.error("Identification loop error:", err);
         }
+        
+        isProcessing = false;
+        setTimeout(startIdentificationLoop, 500);
     }
 
     function showIdentification(name) {
@@ -495,5 +522,8 @@ permalink: /student/bathroom_pass
     // Polling for queue updates
     initializeCurrentUser();
     setInterval(refreshQueue, 5000);
-    document.addEventListener('DOMContentLoaded', refreshQueue);
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshQueue();
+        loadFaceData();
+    });
 </script>
