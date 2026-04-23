@@ -5,6 +5,9 @@ import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaTrial from './PersonaTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
+import SkillPassport from './SkillPassport.js';
+import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+
 /**
  * GameLevel CS Pathway - Wayfinding World
  */
@@ -81,7 +84,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     const skillPassportGatekeeperPos = {
       x: width * 0.77,
-      y: height * 0.49  ,
+      y: height * 0.49,
     };
 
     const courseEnlistGatekeeperPos = {
@@ -195,11 +198,15 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         this.openPersonaTrial();
       },
     });
+
     const npc_data_skillPassportGatekeeper = createGatekeeperData({
       id: 'SkillPassportGatekeeper',
       greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
       position: skillPassportGatekeeperPos,
       markerColor: '#f59e0b',
+      interact: () => {
+        this.openSkillPassport();
+      },
     });
 
     const npc_data_courseEnlistGatekeeper = createGatekeeperData({
@@ -220,6 +227,24 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     ];
     
   }
+
+  // ── Skill Passport ───────────────────────────────────────────
+  openSkillPassport() {
+    if (this._skillPassportOpen) return;
+    this._skillPassportOpen = true;
+
+    const passport = new SkillPassport({
+      pythonURI,
+      fetchOptions,
+      onClose: () => {
+        this._skillPassportOpen = false;
+      },
+    });
+
+    passport.start();
+  }
+
+  // ── Persona Trial ────────────────────────────────────────────
   openPersonaTrial() {
     if (this._personaTrialOpen) return;
     this._personaTrialOpen = true;
@@ -266,8 +291,6 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     this.profileData = updatedProfile;
 
-    // Try a few common persistence method names in case your ProfileManager
-    // implementation differs. Keep the first one that exists.
     if (typeof this.profileManager?.updateProfileData === 'function') {
       await this.profileManager.updateProfileData(updatedProfile);
       return;
@@ -288,8 +311,6 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       return;
     }
 
-    // Fallback so you still see it work during testing even if persistence
-    // method name is different.
     console.warn(
       'No known ProfileManager save method found. Persona result stored in this.profileData only.'
     );
