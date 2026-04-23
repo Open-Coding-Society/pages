@@ -336,51 +336,52 @@ export default class PersonaTrial {
           bottom: 20px;
           z-index: 2;
         ">
-          <div style="
-            background: linear-gradient(180deg, rgba(3,10,25,0.88), rgba(4,11,28,0.95));
-            border: 1px solid rgba(182,140,66,0.40);
-            border-radius: 18px;
-            box-shadow: 0 16px 36px rgba(0,0,0,0.45);
-            padding: 18px 22px;
-            margin-bottom: 14px;
-            text-align: center;
-          ">
+        <div style="
+          background: linear-gradient(180deg, rgba(3,10,25,0.62), rgba(4,11,28,0.72));
+          border: 1px solid rgba(182,140,66,0.24);
+          border-radius: 16px;
+          box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+          padding: 12px 16px;
+          margin: 0 auto 10px auto;
+          max-width: 760px;
+          text-align: center;
+          backdrop-filter: blur(3px);
+          -webkit-backdrop-filter: blur(3px);
+        ">            
+        <div style="
+          color:#7cb8ff;
+          font-size:11px;
+          letter-spacing:0.14em;
+          text-transform:uppercase;
+          margin-bottom:6px;
+        ">
+          The Chamber Whispers...
+        </div>
             <div style="
-              color:#7cb8ff;
-              font-size:13px;
-              letter-spacing:0.16em;
-              text-transform:uppercase;
-              margin-bottom:10px;
-            ">
-              The Chamber Whispers...
-            </div>
-  
-            <div style="
-              font-size:17px;
-              line-height:1.55;
+              font-size:15px;
+              line-height:1.45;
               color:#e9e1ce;
-              margin-bottom:8px;
+              margin-bottom:6px;
             ">
               ${scene.narration}
             </div>
-  
             <div style="
-              font-size:19px;
-              line-height:1.5;
+              font-size:17px;
+              line-height:1.4;
               color:#e3aa41;
               font-style:italic;
               font-weight:700;
-              margin-bottom:10px;
+              margin-bottom:8px;
             ">
               “${scene.quote}”
             </div>
-  
+              
             <div style="
-              font-size:20px;
+              font-size:17px;
               color:#f4ead6;
-            ">
-              ${scene.prompt}
-            </div>
+              ">
+                ${scene.prompt}
+              </div>
           </div>
   
           <div style="
