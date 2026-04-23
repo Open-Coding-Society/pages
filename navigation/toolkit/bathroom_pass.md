@@ -65,7 +65,7 @@ permalink: /student/bathroom_pass
                         </div>
                         <h2 class="text-2xl font-bold text-white mb-2">Ready to Scan</h2>
                         <p class="text-neutral-400 text-center max-w-xs mb-8">Position yourself clearly in front of the camera for identification.</p>
-                        <button onclick="startScanning()" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 flex items-center gap-3">
+                        <button id="initScannerBtn" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 flex items-center gap-3">
                             <span>Initialize Scanner</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
@@ -83,8 +83,8 @@ permalink: /student/bathroom_pass
                             </div>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="confirmIdentity()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all">Confirm</button>
-                            <button onclick="resetId()" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all">Not Me</button>
+                            <button id="confirmIdBtn" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all">Confirm</button>
+                            <button id="notMeBtn" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all">Not Me</button>
                         </div>
                     </div>
                 </div>
@@ -140,10 +140,10 @@ permalink: /student/bathroom_pass
                     <input type="text" id="emergencyName" placeholder="Enter student name manually..." 
                            class="flex-1 bg-neutral-950 border border-neutral-800 rounded-2xl px-6 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium">
                     <div class="flex gap-3">
-                        <button onclick="emergencyCheckIn()" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
+                        <button id="emergencyCheckInBtn" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
                             Check In
                         </button>
-                        <button onclick="emergencyCheckOut()" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
+                        <button id="emergencyCheckOutBtn" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
                             Check Out
                         </button>
                     </div>
@@ -484,6 +484,13 @@ permalink: /student/bathroom_pass
     window.returnFromBathroom = returnFromBathroom;
     window.emergencyCheckIn = emergencyCheckIn;
     window.emergencyCheckOut = emergencyCheckOut;
+
+    // Attach event listeners to buttons
+    document.getElementById('initScannerBtn')?.addEventListener('click', startScanning);
+    document.getElementById('confirmIdBtn')?.addEventListener('click', confirmIdentity);
+    document.getElementById('notMeBtn')?.addEventListener('click', resetId);
+    document.getElementById('emergencyCheckInBtn')?.addEventListener('click', emergencyCheckIn);
+    document.getElementById('emergencyCheckOutBtn')?.addEventListener('click', emergencyCheckOut);
 
     // Polling for queue updates
     initializeCurrentUser();
