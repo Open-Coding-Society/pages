@@ -121,8 +121,8 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
     // ── NPC Positions ──────────────────────────────────────────────
     const analyticsGuidePos = { x: width * 0.20, y: height * 0.65 };
-    const githubMetricsPos  = { x: width * 0.48, y: height * 0.44 };
-    const selfEvalPos       = { x: width * 0.80, y: height * 0.65 };
+    const githubMetricsPos  = { x: width * 0.80, y: height * 0.65 };
+    const selfEvalPos       = { x: width * 0.48, y: height * 0.44 };
 
     const createOrbNpcData = ({ id, greeting, position, color, expertise, interact }) => ({
       src: createOrbSvgSrc(color),
@@ -293,7 +293,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
         </div>
         <div style="text-align:right;font-size:12px;">
           <div style="color:#10b981;font-weight:bold;">Engagement: ${(s.interactionPercentage || 0).toFixed(1)}%</div>
-          <div style="color:#f59e0b;">Accuracy: ${(s.averageAccuracyPercentage || 0).toFixed(1)}%</div>
+          <div style="color:#f59e0b;">Scroll Depth: ${(s.averageScrollDepth || 0).toFixed(1)}%</div>
         </div>
       `;
       container.appendChild(titleBox);
@@ -373,8 +373,8 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
 
     const metrics = [
       { label: 'Engagement Rate', current: (s.interactionPercentage || 0).toFixed(1), target: 85, unit: '%' },
-      { label: 'Accuracy Score',  current: (s.averageAccuracyPercentage || 0).toFixed(1), target: 90, unit: '%' },
-      { label: 'Time Spent',      current: (s.totalTimeSpentMinutes || 0), target: 300, unit: ' min', type: 'count' },
+      { label: 'Scroll Depth',    current: (s.averageScrollDepth || 0).toFixed(1), target: 70, unit: '%' },
+      { label: 'Time Spent',      current: Math.round((s.totalTimeSpentSeconds || 0) / 60), target: 300, unit: ' min', type: 'count' },
     ];
 
     const grid = document.createElement('div');
@@ -418,7 +418,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
         </div>
         <div style="background:#0f172a;padding:12px;border-radius:8px;">
           <div style="color:#94a3b8;font-size:11px;">Avg Session Length</div>
-          <div style="color:#f59e0b;font-size:20px;font-weight:bold;">${this.formatTime(s.avgSessionDuration || 0)}</div>
+          <div style="color:#f59e0b;font-size:20px;font-weight:bold;">${this.formatTime(s.averageSessionDurationSeconds || 0)}</div>
         </div>
       </div>
     `;
@@ -428,128 +428,127 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   // ── Sprint Comparison (timestamp-aware, 4-week sprints) ──────────
   async renderSprintComparison(userData, container) {
     const s = userData.analyticsSummary || {};
+    const sessions = userData.analyticsSessions || s.sessions || s.recentSessions || [];
 
-    // Determine which sprint we're in and split data by sprint windows
-    // A sprint = 4 weeks = 28 days
-    const SPRINT_MS = 28 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
+    const SPRINT_DAYS = 28;
+    const now = new Date();
+    const startDate = new Date(now);
+    startDate.setDate(startDate.getDate() - (SPRINT_DAYS - 1));
+    startDate.setHours(0, 0, 0, 0);
 
-    // Try to use timestamps from analytics data if available
-    // Expected shape: s.sessions = [{ timestamp, engagementScore, accuracyScore }, ...]
-    const sessions = s.sessions || s.recentSessions || [];
+    const dayKey = (date) => date.toLocaleDateString('en-CA');
+    const dayBuckets = new Map();
 
-    let currentSprintData = null;
-    let previousSprintData = null;
-
-    if (sessions.length > 0) {
-      // Group sessions by sprint
-      const currentSprintStart  = now - SPRINT_MS;
-      const previousSprintStart = now - 2 * SPRINT_MS;
-
-      const currentSessions  = sessions.filter(sess => {
-        const t = new Date(sess.timestamp || sess.date || sess.createdAt || 0).getTime();
-        return t >= currentSprintStart;
-      });
-      const previousSessions = sessions.filter(sess => {
-        const t = new Date(sess.timestamp || sess.date || sess.createdAt || 0).getTime();
-        return t >= previousSprintStart && t < currentSprintStart;
-      });
-
-      const avg = (arr, key) => arr.length === 0 ? null : arr.reduce((sum, x) => sum + (x[key] || 0), 0) / arr.length;
-
-      if (currentSessions.length > 0) {
-        currentSprintData = {
-          engagement: avg(currentSessions, 'engagementScore') ?? avg(currentSessions, 'interactionPercentage'),
-          accuracy:   avg(currentSessions, 'accuracyScore')   ?? avg(currentSessions, 'averageAccuracyPercentage'),
-          count: currentSessions.length,
-        };
-      }
-      if (previousSessions.length > 0) {
-        previousSprintData = {
-          engagement: avg(previousSessions, 'engagementScore') ?? avg(previousSessions, 'interactionPercentage'),
-          accuracy:   avg(previousSessions, 'accuracyScore')   ?? avg(previousSessions, 'averageAccuracyPercentage'),
-          count: previousSessions.length,
-        };
-      }
+    for (let i = 0; i < SPRINT_DAYS; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      dayBuckets.set(dayKey(date), { date, minutes: 0, sessions: 0 });
     }
 
-    // Fallback: use overall summary (can't split, so show honest message)
-    const hasSplitData = currentSprintData !== null && previousSprintData !== null;
-    const hasCurrent   = currentSprintData !== null;
+    sessions.forEach((session) => {
+      const rawDate = session.sessionStartTime || session.createdAt || session.timestamp || session.date;
+      const rawMinutes = Number(session.sessionDurationSeconds || 0) / 60;
+      const parsedDate = new Date(rawDate);
+      if (Number.isNaN(parsedDate.getTime())) return;
+      const key = dayKey(parsedDate);
+      if (!dayBuckets.has(key)) return;
+      const bucket = dayBuckets.get(key);
+      bucket.minutes += rawMinutes;
+      bucket.sessions += 1;
+    });
 
-    const curEng  = hasCurrent ? (currentSprintData.engagement || 0)  : (s.interactionPercentage || 0);
-    const curAcc  = hasCurrent ? (currentSprintData.accuracy   || 0)  : (s.averageAccuracyPercentage || 0);
-    const prevEng = hasSplitData ? (previousSprintData.engagement || 0) : null;
-    const prevAcc = hasSplitData ? (previousSprintData.accuracy   || 0) : null;
+    const buckets = Array.from(dayBuckets.values());
+    const maxMinutes = Math.max(...buckets.map((bucket) => bucket.minutes), 1);
+    const totalMinutes = buckets.reduce((sum, bucket) => sum + bucket.minutes, 0);
+    const busiest = buckets.reduce((best, current) => (current.minutes > best.minutes ? current : best), buckets[0]);
+    const avgMinutes = totalMinutes / buckets.length;
 
-    const engDelta = prevEng !== null ? (curEng - prevEng) : null;
-    const accDelta = prevAcc !== null ? (curAcc - prevAcc) : null;
-
-    const deltaLabel = (delta) => {
-      if (delta === null) return { text: 'N/A', color: '#94a3b8' };
-      const sign = delta >= 0 ? '+' : '';
-      return { text: `${sign}${delta.toFixed(1)}%`, color: delta >= 0 ? '#10b981' : '#ef4444' };
+    const heatColor = (minutes) => {
+      if (minutes <= 0) return '#0f172a';
+      const ratio = minutes / maxMinutes;
+      if (ratio < 0.2) return '#1e293b';
+      if (ratio < 0.4) return '#334155';
+      if (ratio < 0.6) return '#475569';
+      if (ratio < 0.8) return '#0f766e';
+      return '#10b981';
     };
 
-    // Sprint week indicator
-    const sprintWeek = Math.min(4, Math.ceil(((now % SPRINT_MS) / SPRINT_MS) * 4) || 1);
+    const textColor = (minutes) => (minutes <= 0 ? '#64748b' : (minutes / maxMinutes > 0.6 ? '#ecfdf5' : '#e5e7eb'));
 
     const box = document.createElement('div');
     box.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;`;
 
     box.innerHTML = `
-      <h3 style="margin:0 0 5px 0;color:#60a5fa;">Sprint Comparison</h3>
-      <div style="color:#94a3b8;font-size:12px;margin-bottom:20px;">
-        Each sprint is 4 weeks. Currently in week ${sprintWeek} of this sprint.
-        ${!hasSplitData ? '<br><span style="color:#f59e0b;">Note: Not enough session-level timestamps to split by sprint — showing overall averages.</span>' : ''}
+      <h3 style="margin:0 0 6px 0;color:#60a5fa;">Sprint Activity Heatmap</h3>
+      <div style="color:#94a3b8;font-size:12px;margin-bottom:16px;">
+        Each cell is one day from the last 28 days. Color intensity shows total minutes spent that day based on saved analytics sessions.
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div>
-          <div style="color:#94a3b8;font-size:11px;margin-bottom:8px;">Previous Sprint</div>
-          <div style="background:#0f172a;padding:15px;border-radius:8px;">
-            <div style="color:#94a3b8;font-size:12px;">Engagement</div>
-            <div style="color:#e5e7eb;font-size:22px;font-weight:bold;">${prevEng !== null ? prevEng.toFixed(1) + '%' : '—'}</div>
-            <div style="color:#94a3b8;font-size:12px;margin-top:10px;">Accuracy</div>
-            <div style="color:#e5e7eb;font-size:22px;font-weight:bold;">${prevAcc !== null ? prevAcc.toFixed(1) + '%' : '—'}</div>
-            ${hasSplitData ? `<div style="color:#64748b;font-size:11px;margin-top:8px;">${previousSprintData.count} sessions</div>` : ''}
-          </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="background:#0f172a;border-radius:10px;padding:12px 14px;min-width:180px;">
+          <div style="color:#94a3b8;font-size:11px;">Total time in sprint</div>
+          <div style="color:#10b981;font-size:22px;font-weight:bold;">${Math.round(totalMinutes)} min</div>
         </div>
-        <div>
-          <div style="color:#94a3b8;font-size:11px;margin-bottom:8px;">This Sprint</div>
-          <div style="background:#0f172a;padding:15px;border-radius:8px;">
-            <div style="color:#94a3b8;font-size:12px;">Engagement</div>
-            <div style="display:flex;align-items:baseline;gap:8px;">
-              <div style="color:#60a5fa;font-size:22px;font-weight:bold;">${curEng.toFixed(1)}%</div>
-              <div style="color:${deltaLabel(engDelta).color};font-size:14px;font-weight:bold;">${deltaLabel(engDelta).text}</div>
-            </div>
-            <div style="color:#94a3b8;font-size:12px;margin-top:10px;">Accuracy</div>
-            <div style="display:flex;align-items:baseline;gap:8px;">
-              <div style="color:#60a5fa;font-size:22px;font-weight:bold;">${curAcc.toFixed(1)}%</div>
-              <div style="color:${deltaLabel(accDelta).color};font-size:14px;font-weight:bold;">${deltaLabel(accDelta).text}</div>
-            </div>
-            ${hasCurrent ? `<div style="color:#64748b;font-size:11px;margin-top:8px;">${currentSprintData.count} sessions</div>` : ''}
-          </div>
+        <div style="background:#0f172a;border-radius:10px;padding:12px 14px;min-width:180px;">
+          <div style="color:#94a3b8;font-size:11px;">Most active day</div>
+          <div style="color:#f59e0b;font-size:14px;font-weight:bold;">${busiest.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</div>
+          <div style="color:#cbd5e1;font-size:12px;">${Math.round(busiest.minutes)} min</div>
         </div>
+        <div style="background:#0f172a;border-radius:10px;padding:12px 14px;min-width:180px;">
+          <div style="color:#94a3b8;font-size:11px;">Average per day</div>
+          <div style="color:#60a5fa;font-size:22px;font-weight:bold;">${Math.round(avgMinutes)} min</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7, 1fr);gap:8px;margin-bottom:10px;color:#64748b;font-size:11px;text-align:center;">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
       </div>
     `;
+
+    const heatmap = document.createElement('div');
+    heatmap.style.cssText = 'display:grid;grid-template-columns:repeat(7, minmax(0, 1fr));gap:8px;';
+
+    buckets.forEach((bucket) => {
+      const cell = document.createElement('div');
+      cell.title = `${bucket.date.toLocaleDateString()} — ${Math.round(bucket.minutes)} min across ${bucket.sessions} session(s)`;
+      cell.style.cssText = `
+        aspect-ratio: 1 / 1;
+        min-height: 68px;
+        border-radius: 10px;
+        padding: 8px;
+        background: ${heatColor(bucket.minutes)};
+        border: 1px solid rgba(148,163,184,0.18);
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        box-sizing:border-box;
+      `;
+
+      cell.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;">
+          <div style="color:${textColor(bucket.minutes)};font-size:11px;font-weight:bold;">${bucket.date.getDate()}</div>
+          <div style="color:${textColor(bucket.minutes)};font-size:10px;opacity:0.85;">${bucket.sessions}</div>
+        </div>
+        <div style="color:${textColor(bucket.minutes)};font-size:12px;font-weight:bold;line-height:1.1;">${Math.round(bucket.minutes)}m</div>
+      `;
+
+      heatmap.appendChild(cell);
+    });
+
+    box.appendChild(heatmap);
+
+    const legend = document.createElement('div');
+    legend.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;color:#94a3b8;font-size:11px;';
+    legend.innerHTML = `
+      <span>Low</span>
+      <div style="width:16px;height:16px;border-radius:4px;background:#0f172a;border:1px solid #334155;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#1e293b;border:1px solid #334155;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#334155;border:1px solid #334155;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#0f766e;border:1px solid #0f766e;"></div>
+      <div style="width:16px;height:16px;border-radius:4px;background:#10b981;border:1px solid #10b981;"></div>
+      <span>High</span>
+    `;
+    box.appendChild(legend);
 
     container.appendChild(box);
-
-    // Sprint timeline bar
-    const timelineBox = document.createElement('div');
-    timelineBox.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-top:20px;`;
-    const weekPct = ((sprintWeek - 1) / 4 * 100).toFixed(0);
-    timelineBox.innerHTML = `
-      <h4 style="margin:0 0 12px 0;color:#60a5fa;">Sprint Progress</h4>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:#94a3b8;margin-bottom:6px;">
-        <span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span>
-      </div>
-      <div style="background:#0f172a;border-radius:8px;height:12px;overflow:hidden;">
-        <div style="background:linear-gradient(90deg,#3b82f6,#60a5fa);width:${Math.min(100, (sprintWeek / 4) * 100)}%;height:100%;border-radius:8px;transition:width 1s ease-out;"></div>
-      </div>
-      <div style="color:#94a3b8;font-size:12px;margin-top:8px;">Week ${sprintWeek} of 4 — ${(100 - weekPct)}% of sprint remaining</div>
-    `;
-    container.appendChild(timelineBox);
   }
 
   // ── AI Recommendations with chat ────────────────────────────────
@@ -561,8 +560,8 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     const statsContext = `
 Student Stats:
 - Engagement: ${(s.interactionPercentage || 0).toFixed(1)}% (target: 85%)
-- Accuracy: ${(s.averageAccuracyPercentage || 0).toFixed(1)}%
-- Time Invested: ${(s.totalTimeSpentMinutes || 0)} minutes
+  - Scroll Depth: ${(s.averageScrollDepth || 0).toFixed(1)}%
+  - Time Invested: ${Math.round((s.totalTimeSpentSeconds || 0) / 60)} minutes
 - Total Sessions: ${s.totalSessions || 0}
 - Lessons Completed: ${s.lessonsCompleted || 0}
 - GitHub Commits: ${gh.commits || 0}
@@ -1093,63 +1092,14 @@ Answer the student's question concisely and helpfully. Refer to their specific s
 
     container.innerHTML = `
       <h1 style="margin:0 0 4px 0;color:#f59e0b;font-size:26px;">Skill Radar</h1>
-      <p style="margin:0 0 24px 0;color:#64748b;font-size:13px;">Rate each skill from 1 (lowest) to 5 (highest), then generate your radar.</p>
+      <p style="margin:0 0 24px 0;color:#64748b;font-size:13px;">This radar is built directly from your saved self-evaluation data.</p>
     `;
 
-    const skillFields = [
-      { name: 'attendance',    label: 'Attendance'    },
-      { name: 'work_habits',   label: 'Work Habits'   },
-      { name: 'behavior',      label: 'Behavior'      },
-      { name: 'timeliness',    label: 'Timeliness'    },
-      { name: 'tech_sense',    label: 'Tech Sense'    },
-      { name: 'tech_talk',     label: 'Tech Talk'     },
-      { name: 'tech_growth',   label: 'Tech Growth'   },
-      { name: 'advocacy',      label: 'Advocacy'      },
-      { name: 'communication', label: 'Communication' },
-      { name: 'integrity',     label: 'Integrity'     },
-      { name: 'organization',  label: 'Organization'  },
-    ];
+    const loadingBox = document.createElement('div');
+    loadingBox.style.cssText = 'padding:16px;border-radius:12px;background:#1e293b;border:1px solid #334155;color:#cbd5e1;margin-bottom:20px;';
+    loadingBox.textContent = 'Loading your self-evaluation...';
+    container.appendChild(loadingBox);
 
-    // Slider grid
-    const sliderGrid = document.createElement('div');
-    sliderGrid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;';
-
-    const sliders = {};
-    skillFields.forEach(field => {
-      const box = document.createElement('div');
-      box.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:8px;padding:12px;`;
-
-      const lbl = document.createElement('div');
-      lbl.style.cssText = 'font-size:12px;color:#cbd5e1;margin-bottom:8px;font-weight:500;';
-      lbl.textContent = field.label;
-
-      const slider = document.createElement('input');
-      slider.type = 'range'; slider.min = '1'; slider.max = '5'; slider.value = '3';
-      slider.style.cssText = 'width:100%;cursor:pointer;accent-color:#f59e0b;';
-
-      const val = document.createElement('div');
-      val.style.cssText = 'font-size:13px;color:#f59e0b;text-align:center;margin-top:6px;font-weight:bold;';
-      val.textContent = '3 / 5';
-
-      slider.oninput = () => { val.textContent = slider.value + ' / 5'; };
-      sliders[field.name] = slider;
-
-      box.appendChild(lbl); box.appendChild(slider); box.appendChild(val);
-      sliderGrid.appendChild(box);
-    });
-    container.appendChild(sliderGrid);
-
-    // Generate button
-    const genBtn = document.createElement('button');
-    genBtn.textContent = 'Generate My Skill Radar';
-    genBtn.style.cssText = `
-      background:#f59e0b;color:#000;border:none;border-radius:8px;
-      padding:12px 28px;cursor:pointer;font-size:14px;font-weight:bold;
-      width:100%;margin-bottom:24px;
-    `;
-    container.appendChild(genBtn);
-
-    // Canvas (hidden until generated)
     const canvasWrap = document.createElement('div');
     canvasWrap.style.cssText = 'display:none;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;margin-bottom:20px;';
 
@@ -1159,10 +1109,9 @@ Answer the student's question concisely and helpfully. Refer to their specific s
     canvasWrap.appendChild(canvasTitle);
 
     const canvas = document.createElement('canvas');
-    // Use device pixel ratio for sharp rendering
     const CANVAS_SIZE = 440;
     const DPR = window.devicePixelRatio || 1;
-    canvas.width  = CANVAS_SIZE * DPR;
+    canvas.width = CANVAS_SIZE * DPR;
     canvas.height = CANVAS_SIZE * DPR;
     canvas.style.cssText = `display:block;margin:0 auto;width:${CANVAS_SIZE}px;height:${CANVAS_SIZE}px;`;
     canvasWrap.appendChild(canvas);
@@ -1170,40 +1119,74 @@ Answer the student's question concisely and helpfully. Refer to their specific s
     const analysisBox = document.createElement('div');
     analysisBox.style.cssText = 'margin-top:16px;';
     canvasWrap.appendChild(analysisBox);
-
     container.appendChild(canvasWrap);
 
-    genBtn.onclick = () => {
-      const skillValues = {};
-      let lowest  = { label: '', val: 6 };
-      let highest = { label: '', val: 0 };
+    const apiToSkillLabel = {
+      attendance: 'Attendance',
+      workHabits: 'Work Habits',
+      behavior: 'Behavior',
+      timeliness: 'Timeliness',
+      techSense: 'Tech Sense',
+      techTalk: 'Tech Talk',
+      techGrowth: 'Tech Growth',
+      advocacy: 'Advocacy',
+      communication: 'Communication',
+      integrity: 'Integrity',
+      organization: 'Organization',
+    };
 
-      skillFields.forEach(f => {
-        const v = parseInt(sliders[f.name].value);
-        skillValues[f.label] = v;
-        if (v < lowest.val)  { lowest  = { label: f.label, val: v }; }
-        if (v > highest.val) { highest = { label: f.label, val: v }; }
+    const normalizeSkillValue = (value) => {
+      const numeric = Number(value);
+      if (Number.isFinite(numeric)) return Math.max(1, Math.min(5, numeric));
+      return 3;
+    };
+
+    try {
+      const pyRes = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (!pyRes.ok) throw new Error('Unable to identify the current user');
+      const pyData = await pyRes.json();
+
+      const personRes = await fetch(`${javaURI}/api/person/uid/${pyData.uid}`, fetchOptions);
+      if (!personRes.ok) throw new Error('Unable to load the student record');
+      const person = await personRes.json();
+
+      const evalRes = await fetch(`${javaURI}/api/student-evaluation/get/${person.id}`, fetchOptions);
+      if (!evalRes.ok) throw new Error('Unable to load self-evaluation data');
+      const evalJson = await evalRes.json();
+      const evaluation = evalJson.evaluation || evalJson;
+
+      const skills = {};
+      Object.entries(apiToSkillLabel).forEach(([apiKey, label]) => {
+        const rawValue = evaluation?.[apiKey] ?? evaluation?.[label] ?? 3;
+        skills[label] = normalizeSkillValue(rawValue);
       });
 
-      this.drawSkillRadarOnCanvas(canvas, skillValues, DPR);
+      const orderedSkills = Object.entries(skills).map(([label, value]) => ({ label, value }));
+      const strongest = orderedSkills.reduce((best, current) => (current.value > best.value ? current : best), orderedSkills[0]);
+      const weakest = orderedSkills.reduce((best, current) => (current.value < best.value ? current : best), orderedSkills[0]);
+
+      this.drawSkillRadarOnCanvas(canvas, skills, DPR);
+      loadingBox.remove();
       canvasWrap.style.display = 'block';
 
       analysisBox.innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div style="background:#0f172a;border:1px solid #22c55e;border-radius:8px;padding:14px;">
-            <div style="color:#22c55e;font-weight:bold;margin-bottom:4px;">Strongest: ${highest.label}</div>
-            <div style="color:#94a3b8;font-size:12px;">${highest.val}/5 — Leverage this strength to take on harder challenges or mentor peers.</div>
+            <div style="color:#22c55e;font-weight:bold;margin-bottom:4px;">Strongest: ${strongest.label}</div>
+            <div style="color:#94a3b8;font-size:12px;">${strongest.value}/5 — Leverage this strength to take on harder challenges or mentor peers.</div>
           </div>
           <div style="background:#0f172a;border:1px solid #f59e0b;border-radius:8px;padding:14px;">
-            <div style="color:#f59e0b;font-weight:bold;margin-bottom:4px;">Growth Area: ${lowest.label}</div>
-            <div style="color:#94a3b8;font-size:12px;">${lowest.val}/5 — Focus deliberate practice here and seek feedback.</div>
+            <div style="color:#f59e0b;font-weight:bold;margin-bottom:4px;">Growth Area: ${weakest.label}</div>
+            <div style="color:#94a3b8;font-size:12px;">${weakest.value}/5 — Focus deliberate practice here and seek feedback.</div>
           </div>
         </div>
       `;
-
-      genBtn.textContent = 'Regenerate Radar';
-      genBtn.disabled = false;
-    };
+    } catch (error) {
+      console.error('Error loading skill radar:', error);
+      loadingBox.textContent = 'Unable to load your self-evaluation right now.';
+      loadingBox.style.borderColor = '#ef4444';
+      loadingBox.style.color = '#fca5a5';
+    }
 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = 'Close';
@@ -1340,9 +1323,9 @@ Answer the student's question concisely and helpfully. Refer to their specific s
           avatar: 'default.png',
           analyticsSummary: {
             interactionPercentage: 72.5,
-            averageAccuracyPercentage: 81.3,
-            totalTimeSpentMinutes: 2847,
-            accuracyTrend: 'improving',
+            averageScrollDepth: 64.2,
+            totalTimeSpentSeconds: 170820,
+            scrollDepthTrend: 'stable',
             engagementTrend: 'stable'
           },
           github: {
@@ -1377,8 +1360,9 @@ Answer the student's question concisely and helpfully. Refer to their specific s
       const userData = await userResponse.json();
       console.log('Assessment Observatory: User info fetched, uid:', userData.uid);
 
-      const [analyticsRes, commitsRes, prsRes, issuesRes] = await Promise.all([
+      const [analyticsRes, detailedRes, commitsRes, prsRes, issuesRes] = await Promise.all([
         fetch(`${javaURI}/api/ocs-analytics/user/summary`, fetchOptions).catch(e => { console.error('Analytics fetch error:', e); return { ok: false }; }),
+        fetch(`${javaURI}/api/ocs-analytics/user/detailed`, fetchOptions).catch(e => { console.error('Detailed analytics fetch error:', e); return { ok: false }; }),
         fetch(`${pythonURI}/api/analytics/github/user/commits`, fetchOptions).catch(e => { console.error('Commits fetch error:', e); return { ok: false }; }),
         fetch(`${pythonURI}/api/analytics/github/user/prs`,     fetchOptions).catch(e => { console.error('PRs fetch error:', e);     return { ok: false }; }),
         fetch(`${pythonURI}/api/analytics/github/user/issues`,  fetchOptions).catch(e => { console.error('Issues fetch error:', e);  return { ok: false }; }),
@@ -1387,6 +1371,17 @@ Answer the student's question concisely and helpfully. Refer to their specific s
       if (analyticsRes.ok) {
         try { userData.analyticsSummary = await analyticsRes.json(); }
         catch (err) { console.error('Failed to parse OCS response:', err); }
+      }
+
+      if (detailedRes.ok) {
+        try {
+          userData.analyticsSessions = await detailedRes.json();
+        } catch (err) {
+          console.error('Failed to parse detailed analytics:', err);
+          userData.analyticsSessions = [];
+        }
+      } else {
+        userData.analyticsSessions = [];
       }
 
       if (commitsRes.ok) {
