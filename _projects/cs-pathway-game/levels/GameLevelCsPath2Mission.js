@@ -254,6 +254,28 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
 
     // Desk knowledge base and expertise are defined at the top of the file in DESK_AI_KNOWLEDGE_BASE.
+    const deskDialoguePool = {
+      'The Admin': [
+        'Kernel check complete. Toolchain status: await your command.',
+        'Before heroes code, they configure. Show me your terminal wisdom.',
+        'Permissions granted. Your mission begins where setup meets precision.',
+      ],
+      'The Archivist': [
+        'Every great build starts with organized files and clean history.',
+        'I guard naming, structure, and version trails. Can you keep order?',
+        'Chaos hides in bad folders. Bring me a tidy answer.',
+      ],
+      'The SDLC Master': [
+        'Small commits. Fast feedback. Strong systems. Prove you know the rhythm.',
+        'Plan, build, test, integrate. Tell me where discipline lives in code.',
+        'A product is forged in iteration, not luck. Ready for your trial?',
+      ],
+      'The Scrum Master': [
+        'A team without cadence drifts. Show me you can steer a sprint.',
+        'Backlog to done is a story of focus. What chapter comes next?',
+        'Standup brief. Retrospective honest. Planning sharp. Your turn.',
+      ],
+    };
 
     const createHiddenMissionDesk = ({ id, position, zonePrompt }) => ({
       zoneMessage: `${id}: ${zonePrompt}`,
@@ -271,8 +293,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       hitbox: { widthPercentage: 0.35, heightPercentage: 0.35 },
       alertDistance: 0.30,
       dialogues: [
-        `${id} channel online.`,
-        'Ask your mission question and I will guide you.',
+        `${id} online. Challenge protocols ready.`,
+        ...(deskDialoguePool[id] || ['Prove yourself by answering my challenge question.']),
       ],
       expertise: DESK_AI_KNOWLEDGE_BASE[id]?.expertise || '',
       chatHistory: [],
