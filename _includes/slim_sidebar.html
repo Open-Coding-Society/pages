@@ -448,6 +448,8 @@
       const lessonStorageScope = {{ page.permalink | default: page.url | jsonify }} || window.location.pathname || 'global';
       const userNotesStorageKey = `userNotes:${lessonStorageScope}`;
       const lessonHighlightsStorageKey = `lessonHighlights:${lessonStorageScope}`;
+      const legacyUserNotesStorageKey = 'userNotes';
+      const legacyLessonHighlightsStorageKey = 'lessonHighlights';
 
       // --- TEXT-TO-SPEECH (TTS) ---
       ttsButton.addEventListener('mousedown', () => {
@@ -797,6 +799,15 @@
           }
       }
 
+      function clearLegacyLessonStorage() {
+          try {
+              localStorage.removeItem(legacyUserNotesStorageKey);
+              localStorage.removeItem(legacyLessonHighlightsStorageKey);
+          } catch (error) {
+              console.warn('Unable to clear legacy lesson storage:', error);
+          }
+      }
+
       // --- Render Notes List ---
       function renderNotesList() {
           notesListContainer.innerHTML = ''; // Clear current list
@@ -1041,6 +1052,7 @@
       });
 
       // Initial loads
+      clearLegacyLessonStorage();
       loadHighlights(); // Load highlights first
       loadNotes(); // Then load notes, which will render them
       attachHighlightDeleteListeners(); // Ensure listeners are attached on page load
