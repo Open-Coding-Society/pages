@@ -424,6 +424,9 @@ class GameLevelCsPathIdentity {
   }
 
   destroy() {
+    if (this.profilePanelView) {
+      this.profilePanelView.destroy();
+    }
     this.present?.destroy();
   }
 
@@ -477,6 +480,10 @@ class GameLevelCsPathIdentity {
   }
 
   restoreIdentitySelections({ bgData, themeManifestUrl, themeAssetPrefix, delayMs = 0 }) {
+    if (typeof window._forgePanelCleanup === 'function') {
+      window._forgePanelCleanup();
+      window._forgePanelCleanup = null;
+    }
     // One shared restore pipeline for all inherited CS Path levels.
     this.queueLoadingWork();
 
