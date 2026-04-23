@@ -4,6 +4,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaTrial from './PersonaTrial.js';
+import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 /**
  * GameLevel CS Pathway - Wayfinding World
  */
@@ -66,9 +67,6 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       playerSrc: player_data.src,
       backgroundSrc: bg_data.src,
     });
-
-
-    this.updateProfilePanel({ course: 'CSSE A', persona: 'Builder', skill: 'JavaScript' });
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
@@ -163,6 +161,28 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       id: 'CodeHubGatekeeper',
       greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
       position: codeHubGatekeeperPos,
+      interact: function() {
+        this.dialogueSystem.dialogues = [
+          'Welcome to the Code Hub!',
+          'Here you can explore Frontend, Backend, and Data Viz.',
+          'Walk up to each terminal and press E to start coding.',
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Code Hub Gatekeeper');
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Enter Code Hub',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              const gc = this.gameEnv.gameControl;
+              gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1CodeHub);
+              gc.currentLevelIndex++;
+              gc.transitionToLevel();
+            },
+          },
+        ]);
+      },
       markerColor: '#22c55e',
     });
 
@@ -274,10 +294,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       'No known ProfileManager save method found. Persona result stored in this.profileData only.'
     );
   }
-  
-  initialize() {
-    this.activateProfilePanel();
-  }
+
 }
 
 export default GameLevelCsPath1Way;
