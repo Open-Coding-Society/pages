@@ -296,7 +296,10 @@ class PeppaBattleLevelBase {
             <div style="font-size:22px; margin-bottom:8px;">Try again.</div>
             <div style="font-size:14px; opacity:0.8;">Restarting level...</div>
         `;
-        document.body.appendChild(overlay);
+
+        const container = this.gameEnv.gameContainer || this.gameEnv.container || document.getElementById('gameContainer') || document.body;
+        container.style.position = 'relative';
+        container.appendChild(overlay);
 
         const ctrl = this.gameEnv?.gameControl;
         this.restartTimeout = setTimeout(() => {
@@ -532,7 +535,10 @@ class PeppaBattleLevelBase {
         };
         overlay.addEventListener('click', finish);
         document.addEventListener('keydown', finish, { once: true });
-        document.body.appendChild(overlay);
+
+        const container = this.gameEnv.gameContainer || this.gameEnv.container || document.getElementById('gameContainer') || document.body;
+        container.style.position = 'relative';
+        container.appendChild(overlay);
     }
 
     enforceFloorBarriers() {
