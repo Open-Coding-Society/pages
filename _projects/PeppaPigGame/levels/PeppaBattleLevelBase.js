@@ -1,5 +1,5 @@
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
+import GameEnvBackground from '/Team-Pranigas/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '/Team-Pranigas/assets/js/GameEnginev1.1/essentials/Player.js';
 import PeppaBossEnemy from './PeppaBossEnemy.js';
 
 class PeppaBattleLevelBase {
@@ -83,7 +83,7 @@ class PeppaBattleLevelBase {
         };
 
         this.classes = [
-            { class: GamEnvBackground, data: image_data_background },
+            { class: GameEnvBackground, data: image_data_background },
             { class: Player, data: sprite_data_ishan },
             { class: PeppaBossEnemy, data: sprite_data_enemy }
         ];
