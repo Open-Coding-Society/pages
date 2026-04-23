@@ -10,6 +10,7 @@ import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -24,8 +25,35 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       logPrefix: 'Wayfinding World',
     });
 
-    const { width, height, path } = this.getLevelDimensions();
-
+    let { width, height, path } = this.getLevelDimensions();
+    this.profilePanelView = new StatusPanel({
+      id: 'csse-wayfinding-panel',
+      title: 'WAYFINDING WORLD',
+      fields: [
+        { key: 'course', label: 'Course', emptyValue: '—' },
+        { key: 'persona', label: 'Persona', emptyValue: '—' },
+        { key: 'skill', label: 'Skill', emptyValue: '—' },
+      ],
+      theme: {
+        background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
+        borderColor: 'var(--ocs-game-accent, #4ecca3)',
+        textColor: 'var(--ocs-game-text, #e0e0e0)',
+        accentColor: 'var(--ocs-game-accent, #4ecca3)',
+        secondaryButtonBackground: 'var(--ocs-game-surface-alt, #1a1a2e)',
+        secondaryButtonTextColor: 'var(--ocs-game-text, #e0e0e0)',
+      },
+      position: { top: '16px', left: '16px' },
+      width: '260px',
+      padding: '12px 14px',
+      zIndex: '10000',
+      fontFamily: '"Courier New", monospace',
+    });
+    this.profilePanelView.render();
+    this.profilePanelView.update({
+      course: '—',
+      persona: '—',
+      skill: '—',
+    });
     /**
      * Section: Level objects.
      */
