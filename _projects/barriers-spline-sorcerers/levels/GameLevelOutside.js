@@ -37,7 +37,7 @@ class GameLevelOutside {
         const path = gameEnv.path;
 
         // --- Floor ---
-        const image_src_floor = path + "/images/castleGame/castleOutside.png";
+        const image_src_floor = path + "/images/projects/barriers-spline-sorcerers/castleOutside.png";
         const image_data_floor = {
             name: 'floor',
             src: image_src_floor,
@@ -50,7 +50,7 @@ class GameLevelOutside {
          * Represents the main controllable character (knight)
          * The player can move around the map and interact with NPCs. It can also shoot arrows.
          */
-        const sprite_src_mc = path + "/images/castleGame/playerSpritesheet.png";
+        const sprite_src_mc = path + "/images/projects/barriers-spline-sorcerers/playerSpritesheet.png";
         const MC_SCALE_FACTOR = 15;
         const sprite_data_mc = {
             id: 'Knight',
@@ -78,7 +78,7 @@ class GameLevelOutside {
         };
     
 
-        const sir_morty = path + "/images/castleGame/mortyKnight.png";
+        const sir_morty = path + "/images/projects/barriers-spline-sorcerers/mortyKnight.png";
         const sir_morty_greeting = "Hello! I'm Sir Morty!";
         const sir_morty_data = {
         id: "Sir Morty",
@@ -168,7 +168,7 @@ class GameLevelOutside {
          * Acts as the  trigger to start the archery mini-game.
          * When the player interacts (presses E), a dialogue appears allowing the player to start or cancel the game.
          */
-        const sprite_src_darkKnight = path + "/images/castleGame/darkKnight.png";
+        const sprite_src_darkKnight = path + "/images/projects/barriers-spline-sorcerers/darkKnight.png";
         const sprite_greet_darkKnight = "Start the game? Press E";
         const sprite_data_darkKnight = {
             id: 'DarkKnight',
@@ -223,7 +223,11 @@ class GameLevelOutside {
                     this.spriteData.src
                 );
                 
-                
+
+                // this is taken from the castle game our team made, and USUALLY we would transition to the next
+                // levels here. however this project is literally just curved barriers and so we deleted all that
+                // so interactions with the dark knight don't actually do anything :)))
+
             }
         };
 
@@ -233,7 +237,7 @@ class GameLevelOutside {
             INIT_POSITION: { x: 0.5, y: 0.5 },
             SCALE_FACTOR: 30,
             value: 5,
-            spriteImagePath: path + '/images/castleGame/gems.png',
+            spriteImagePath: path + '/images/projects/barriers-spline-sorcerers/gems.png',
             spriteFrames: { rows: 2, columns: 4, frameIndex: Math.floor(Math.random() * 8) }     
         }
 
