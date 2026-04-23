@@ -2,74 +2,35 @@
 
 <div class="uesl-infograph">
 
-  <!-- Header -->
-  <div class="uesl-header">
-    <div class="uesl-badge">Community Foundation Infographic</div>
-    <h1 class="uesl-title">{{ data.Title }}</h1>
-    <p class="uesl-description">{{ data.Description }}</p>
-  </div>
-
-  <!-- Cards -->
   {% for topic in data.Topics %}
-  <div class="uesl-card">
-    <div class="uesl-card-grid">
 
-      <!-- Left: Image & Status -->
-      <div class="uesl-visual">
-        <a href="{{ topic.link }}" class="uesl-image-link" target="_blank" rel="noopener noreferrer">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}"
-               alt="{{ topic.alt }}" class="uesl-image">
-          <div class="uesl-overlay">
-            <span>Visit Foundation ↗</span>
-          </div>
-        </a>
-        <div class="uesl-status">{{ topic.status }}</div>
-        <div class="uesl-team">
-          <span class="uesl-team-label">Operated By</span>
-          <span class="uesl-team-name">{{ topic.team | join: " · " }}</span>
-        </div>
+  <!-- ── Problems Being Solved ──────────────────────── -->
+  <div class="uesl-section-card">
+    <div class="uesl-section-label">Problems Being Solved</div>
+    <div class="uesl-problems-grid">
+      {% for problem in topic.problems %}
+      <div class="uesl-problem-item">
+        <span class="uesl-problem-num">0{{ forloop.index }}</span>
+        <p>{{ problem }}</p>
       </div>
-
-      <!-- Center: Key Points & Tech Tags -->
-      <div class="uesl-content">
-        <h2 class="uesl-project-title">{{ topic.title }}</h2>
-        <p class="uesl-subtitle">{{ topic.subtitle }}</p>
-
-        <div class="uesl-keypoints">
-          {% for point in topic.keyPoints %}
-          <div class="uesl-keypoint">
-            <span class="uesl-check">✓</span>
-            <span>{{ point }}</span>
-          </div>
-          {% endfor %}
-        </div>
-
-        <div class="uesl-tech-stack">
-          {% for tag in topic.tech %}
-          <span class="uesl-tech-tag">{{ tag }}</span>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Right: About & Impact -->
-      <div class="uesl-details">
-        <h3 class="uesl-section-title">About</h3>
-        <p class="uesl-about">{{ topic.description }}</p>
-
-        <h3 class="uesl-section-title">Impact</h3>
-        <div class="uesl-impact-list">
-          {% for item in topic.impact %}
-          <div class="uesl-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
-
-        <a href="{{ topic.link }}" class="uesl-btn" target="_blank" rel="noopener noreferrer">
-          Learn More ↗
-        </a>
-      </div>
-
+      {% endfor %}
     </div>
   </div>
+
+  <!-- ── Key Tech That Solves Problems ──────────────── -->
+  <div class="uesl-section-card">
+    <div class="uesl-section-label">Key Tech &amp; How It Helps</div>
+    <div class="uesl-tech-table">
+      {% for t in topic.tech %}
+      <div class="uesl-tech-row">
+        <span class="uesl-tech-tag">{{ t.name }}</span>
+        <span class="uesl-tech-arrow">→</span>
+        <span class="uesl-tech-solve">{{ t.solves }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
   {% endfor %}
 
 </div>

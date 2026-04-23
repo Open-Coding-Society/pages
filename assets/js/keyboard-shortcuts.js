@@ -6,28 +6,40 @@
 // Alt+Shift can produce accented characters on some OS/browser
 // combos (e.g. Alt+Shift+C → Ç on macOS).
 
-(function() {
-    // Map KeyboardEvent.code → destination path
-    const shortcuts = {
-        'KeyC': '/student/calendar',
-        'KeyH': '/',               // home page
-        'KeyP': '/profile',        // profile page
-        'KeyS': '/student',        // student toolkit
-        'KeyT': '/teacher',        // teacher toolkit
-        'KeyL': '/login',          // login page
-        'KeyU': '/signup',         // signup page
-    };
+/**
+ * Manages keyboard shortcuts and help overlay
+ * Responsibility: Orchestrate keyboard event handling and overlay UI
+ */
+class KeyboardShortcutsManager {
+    constructor() {
+        this.shortcuts = {
+            'KeyC': '/student/calendar',
+            'KeyH': '/',               // home page
+            'KeyP': '/profile',        // profile page
+            'KeyS': '/student',        // student toolkit
+            'KeyT': '/teacher',        // teacher toolkit
+            'KeyL': '/login',          // login page
+            'KeyU': '/signup',         // signup page
+        };
+        this.helpCodes = new Set(['Slash', 'Period']);
+        this.overlay = null;
+        this.initialize();
+    }
 
-    // Help trigger codes
-    const helpCodes = new Set(['Slash', 'Period']);
+    /**
+     * Responsibility: Initialize the keyboard shortcuts manager
+     */
+    initialize() {
+        document.addEventListener('keydown', (e) => this.handleKeydown(e));
+    }
 
-    // Help overlay element (created on first use)
-    let overlay = null;
-
-    function createHelpOverlay() {
-        overlay = document.createElement('div');
-        overlay.id = 'keyboard-shortcuts-overlay';
-        overlay.innerHTML = `
+    /**
+     * Responsibility: Create the HTML structure for the overlay
+     */
+    createOverlayHTML() {
+        const div = document.createElement('div');
+        div.id = 'keyboard-shortcuts-overlay';
+        div.innerHTML = `
             <div class="ks-backdrop"></div>
             <div class="ks-modal">
                 <h3>Keyboard Shortcuts</h3>
@@ -45,6 +57,13 @@
                 <p class="ks-close-hint">Press <kbd>Esc</kbd> or click outside to close</p>
             </div>
         `;
+        return div;
+    }
+
+    /**
+     * Responsibility: Inject CSS styles for the overlay
+     */
+    injectOverlayStyles() {
         const style = document.createElement('style');
         style.textContent = `
             #keyboard-shortcuts-overlay { position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center; }
@@ -59,60 +78,133 @@
             #keyboard-shortcuts-overlay .ks-close-hint { margin:14px 0 0; font-size:0.8em; color:#6c7086; text-align:center; }
         `;
         document.head.appendChild(style);
-        document.body.appendChild(overlay);
-
-        // Close on backdrop click
-        overlay.querySelector('.ks-backdrop').addEventListener('click', hideHelp);
     }
 
-    function showHelp() {
-        if (!overlay) createHelpOverlay();
-        overlay.style.display = 'flex';
+    /**
+     * Responsibility: Attach event listeners to overlay elements
+     */
+    attachOverlayListeners(overlayElement) {
+        overlayElement.querySelector('.ks-backdrop').addEventListener('click', () => this.hideHelp());
     }
 
-    function hideHelp() {
-        if (overlay) overlay.style.display = 'none';
+    /**
+     * Responsibility: Initialize the overlay (one-time setup)
+     */
+    initializeOverlay() {
+        this.overlay = this.createOverlayHTML();
+        this.injectOverlayStyles();
+        this.attachOverlayListeners(this.overlay);
+        document.body.appendChild(this.overlay);
     }
 
-    function navigate(dest) {
+    /**
+     * Responsibility: Show the help overlay
+     */
+    showHelp() {
+        if (!this.overlay) {
+            this.initializeOverlay();
+        }
+        this.overlay.style.display = 'flex';
+    }
+
+    /**
+     * Responsibility: Hide the help overlay
+     */
+    hideHelp() {
+        if (this.overlay) {
+            this.overlay.style.display = 'none';
+        }
+    }
+
+    /**
+     * Responsibility: Navigate to a destination URL
+     */
+    navigate(destination) {
         const baseurl = window.baseurl || '';
-        let url = dest;
+        let url = destination;
         if (baseurl && !url.startsWith(baseurl)) {
             url = baseurl + url;
         }
         window.location.href = url;
     }
 
-    document.addEventListener('keydown', function(e) {
-        // Close help overlay on Escape
-        if (e.key === 'Escape' && overlay && overlay.style.display !== 'none') {
-            hideHelp();
-            e.preventDefault();
-            return;
-        }
-
-        // Require Alt+Shift (no conflict with browser shortcuts)
-        if (!e.altKey || !e.shiftKey) return;
-        // Ignore Ctrl/Meta combos to stay out of browser shortcut space
-        if (e.metaKey || e.ctrlKey) return;
-
-        // Don't fire when typing in inputs, textareas, or code editors
+    /**
+     * Responsibility: Check if the active element is in edit mode
+     */
+    isInEditMode() {
         const tag = document.activeElement?.tagName?.toLowerCase();
-        if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
-        if (document.activeElement?.closest('.CodeMirror')) return;
+        if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) {
+            return true;
+        }
+        if (document.activeElement?.closest('.CodeMirror')) {
+            return true;
+        }
+        return false;
+    }
 
-        const code = e.code; // physical key — stable regardless of Alt+Shift char remapping
+    /**
+     * Responsibility: Validate if a keyboard event should trigger shortcuts
+     */
+    isValidShortcutEvent(event) {
+        // Must have Alt+Shift modifiers
+        if (!event.altKey || !event.shiftKey) {
+            return false;
+        }
+        // Cannot have Ctrl/Meta to avoid browser shortcuts
+        if (event.metaKey || event.ctrlKey) {
+            return false;
+        }
+        // Cannot be in edit mode
+        if (this.isInEditMode()) {
+            return false;
+        }
+        return true;
+    }
 
-        // Help overlay (Shift+/ = ? on US keyboards)
-        if (helpCodes.has(code)) {
-            e.preventDefault();
-            showHelp();
+    /**
+     * Responsibility: Route keyboard code to appropriate shortcut handler
+     */
+    processShortcut(code) {
+        // Help overlay
+        if (this.helpCodes.has(code)) {
+            this.showHelp();
+            return true;
+        }
+
+        // Navigate shortcuts
+        if (this.shortcuts[code]) {
+            this.navigate(this.shortcuts[code]);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Responsibility: Handle keydown events
+     */
+    handleKeydown(event) {
+        // Close overlay on Escape
+        if (event.key === 'Escape' && this.overlay && this.overlay.style.display !== 'none') {
+            this.hideHelp();
+            event.preventDefault();
             return;
         }
 
-        if (shortcuts[code]) {
-            e.preventDefault();
-            navigate(shortcuts[code]);
+        // Process shortcuts if event is valid
+        if (this.isValidShortcutEvent(event)) {
+            if (this.processShortcut(event.code)) {
+                event.preventDefault();
+            }
         }
+    }
+}
+
+// Initialize the manager when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        new KeyboardShortcutsManager();
     });
-})();
+} else {
+    new KeyboardShortcutsManager();
+}

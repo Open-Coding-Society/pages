@@ -1,14 +1,20 @@
 {% assign data = site.data.rcr_poway_midland_infograph %}
 
 <div class="rcr-pmr-infograph">
-  <!-- Header Section -->
+
+  <!-- Page Header -->
   <div class="rcr-pmr-header">
     <div class="rcr-pmr-badge">Design-Based Research Capstone</div>
     <h1 class="rcr-pmr-title">{{ data.Title }}</h1>
     <p class="rcr-pmr-description">{{ data.Description }}</p>
   </div>
 
-  <!-- Project Cards -->
+  <!-- Part 1 Label -->
+  <div class="rcr-section-label">
+    <span class="rcr-section-label-text part1">Part 1 — What We Built: New Features vs. Original PMRR Website</span>
+  </div>
+
+  <!-- Feature Cards -->
   {% for feature in data.Features %}
   <div class="rcr-pmr-card">
     <div class="rcr-pmr-card-grid">
@@ -16,10 +22,8 @@
       <!-- Left: Image & Status -->
       <div class="rcr-pmr-visual">
         <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-image-link">
-          <img src="https://static.vecteezy.com/system/resources/previews/034/949/404/non_2x/simple-steam-train-icon-illustration-design-steam-locomotive-symbol-template-vector.jpg">
-          <div class="rcr-pmr-overlay">
-            <span>View Project</span>
-          </div>
+          <img src="{{ feature.image | relative_url }}" alt="{{ feature.alt }}">
+          <div class="rcr-pmr-overlay"><span>View Feature</span></div>
         </a>
         <div class="rcr-pmr-status">{{ feature.status }}</div>
         <div class="rcr-pmr-team">
@@ -32,7 +36,6 @@
       <div class="rcr-pmr-content">
         <h2 class="rcr-pmr-project-title">{{ feature.title }}</h2>
         <p class="rcr-pmr-subtitle">{{ feature.subtitle }}</p>
-
         <div class="rcr-pmr-keypoints">
           {% for point in feature.keyPoints %}
           <div class="rcr-pmr-keypoint">
@@ -41,7 +44,6 @@
           </div>
           {% endfor %}
         </div>
-
         <div class="rcr-pmr-tech-stack">
           {% for tech in feature.tech %}
           <span class="rcr-pmr-tech-tag">{{ tech }}</span>
@@ -49,22 +51,50 @@
         </div>
       </div>
 
-      <!-- Right: Description & Impact -->
+      <!-- Right: About & Impact -->
       <div class="rcr-pmr-details">
-        <h3 class="rcr-pmr-section-title">About</h3>
-        <p class="rcr-pmr-about">{{ feature.description }}</p>
+        <div class="rcr-pmr-section-title">Before (Original Site)</div>
+        <p class="rcr-pmr-current">{{ feature.current }}</p>
 
-        <h3 class="rcr-pmr-section-title">Impact</h3>
+        <div class="rcr-pmr-section-title">What We Built</div>
+        <p class="rcr-pmr-purpose">{{ feature.purpose }}</p>
+
+        <div class="rcr-pmr-section-title">Impact</div>
         <div class="rcr-pmr-impact-list">
           {% for item in feature.impact %}
           <div class="rcr-pmr-impact-item">{{ item }}</div>
           {% endfor %}
         </div>
 
-        <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-btn">Learn More</a>
+        <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-btn">View Feature →</a>
       </div>
 
     </div>
   </div>
   {% endfor %}
+
+  <!-- Part 2 Label -->
+  <div class="rcr-section-label" style="margin-top: 56px;">
+    <span class="rcr-section-label-text part2">Part 2 — With Partnership: What We Could Build Together</span>
+  </div>
+
+  <!-- Future Features -->
+  <div class="rcr-pmr-future-section">
+    <div class="rcr-pmr-future-header">
+      <div class="rcr-pmr-future-badge">Requires PMRR Collaboration</div>
+      <h2>Next-Phase Features</h2>
+      <p>These features are technically ready for development. Each requires access to PMRR hardware, data, or operational coordination that a formal partnership would provide.</p>
+    </div>
+    <div class="rcr-pmr-future-grid">
+      {% for item in data.FutureFeatures %}
+      <div class="rcr-pmr-future-card">
+        <div class="rcr-pmr-future-icon">{{ item.icon }}</div>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.description }}</p>
+        <div class="rcr-pmr-future-needs">Requires: {{ item.needs }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
 </div>

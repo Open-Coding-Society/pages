@@ -1,142 +1,105 @@
 {% assign data = site.data.fops_infographic %}
 
-<div class="fops-infographic">
-  <!-- Header Section with Organization Link -->
-  <div class="infographic-header">
-    <div class="header-content">
-      <span class="status-badge">{{ data.topics[0].status }}</span>
-      <h1 class="infographic-title">{{ data.title }}</h1>
-      <p class="infographic-description">{{ data.description }}</p>
-      <!-- New Organization Button -->
-      <a href="https://www.friendsofpowayseniors.org" class="org-button" target="_blank" rel="noopener noreferrer">
-        Visit Friends of Poway Seniors →
-      </a>
+<style>
+  .fops{max-width:900px;margin:0 auto;padding:1.5rem 1rem;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#111;color:#e0e0e0;border-radius:12px}
+  .fops h1{font-size:20px;font-weight:500;color:#fff;margin:0 0 10px}
+  .fops-desc{font-size:13px;color:#888;line-height:1.6;margin-bottom:16px}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .btn{font-size:12px;padding:6px 14px;border-radius:6px;text-decoration:none}
+  .btn-g{background:#1a3a1a;color:#6fcf6f;border:0.5px solid #2d5a2d}
+  .btn-d{background:#1e1e1e;color:#999;border:0.5px solid #333}
+  .meta{font-size:12px;color:#555;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid #222}
+  .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+  .card{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:12px;padding:14px}
+  .card-tag{font-size:10px;letter-spacing:1px;color:#4caf50;text-transform:uppercase;margin-bottom:6px}
+  .card-name{font-size:14px;font-weight:500;color:#fff;margin-bottom:6px}
+  .card-desc{font-size:12px;color:#ccc;line-height:1.5;margin-bottom:10px}
+  .card-links{display:flex;gap:10px;flex-wrap:wrap}
+  .card-link{font-size:12px;color:#4caf50;text-decoration:none}
+  .card-link.orange{color:#e07030}
+  .comparison{border-radius:12px;overflow:hidden;margin-bottom:24px;border:0.5px solid #2a2a2a}
+  .cmp-header{display:grid;grid-template-columns:1fr 1fr 1fr;background:#1a1a1a;border-bottom:0.5px solid #2a2a2a}
+  .cmp-header div{font-size:11px;font-weight:500;padding:10px 14px;letter-spacing:.5px;text-transform:uppercase}
+  .cmp-header .col-label{color:#555}
+  .cmp-header .col-before{color:#c0392b}
+  .cmp-header .col-after{color:#4caf50}
+  .cmp-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid #1e1e1e}
+  .cmp-row:last-child{border-bottom:none}
+  .cmp-row div{font-size:12px;padding:10px 14px;line-height:1.5}
+  .cmp-row:nth-child(odd){background:#181818}
+  .cmp-row:nth-child(even){background:#141414}
+  .col-label{color:#888;font-weight:500}
+  .col-before{color:#e57373}
+  .col-after{color:#81c784}
+  .highlights{background:#161f16;border:0.5px solid #2a3a2a;border-radius:12px;padding:16px;margin-bottom:24px}
+  .hl-title{font-size:14px;font-weight:500;color:#fff;margin-bottom:4px}
+  .hl-sub{font-size:12px;color:#666;margin-bottom:12px}
+  .hl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+  .hl-item{font-size:12px;color:#999}
+  .section-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  @media(max-width:700px){
+    .tools{grid-template-columns:1fr}
+    .hl-grid{grid-template-columns:1fr}
+    .cmp-header,.cmp-row{grid-template-columns:1fr}
+    .cmp-header .col-before,.cmp-header .col-after,.cmp-row .col-before,.cmp-row .col-after{display:none}
+  }
+</style>
+
+<div class="fops">
+  <h1>{{ data.title }}</h1>
+  <p class="fops-desc">{{ data.description }}</p>
+
+  <div class="btn-row">
+    <a href="https://www.friendsofpowayseniors.org" class="btn btn-g" target="_blank" rel="noopener noreferrer">Visit original site →</a>
+    <a href="https://fops.opencodingsociety.com/fops" class="btn btn-d" target="_blank" rel="noopener noreferrer">Visit new site →</a>
+  </div>
+
+  <div class="meta">Project leads:
+    {% for member in data.topics[0].team %}
+      {{ member }}{% unless forloop.last %}, {% endunless %}
+    {% endfor %}
+  </div>
+
+  <div class="section-label">Site improvements</div>
+  <div class="comparison">
+    <div class="cmp-header">
+      <div class="col-label">Feature</div>
+      <div class="col-before">Before</div>
+      <div class="col-after">After</div>
+    </div>
+    {% for item in data.comparison %}
+    <div class="cmp-row">
+      <div class="col-label">{{ item.feature }}</div>
+      <div class="col-before">{{ item.before }}</div>
+      <div class="col-after">{{ item.after }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="highlights">
+    <div class="hl-title">{{ data.topics[0].title }}</div>
+    <div class="hl-sub">Key improvements</div>
+    <div class="hl-grid">
+      {% for item in data.topics[0].highlights %}
+      <div class="hl-item">✓ {{ item }}</div>
+      {% endfor %}
     </div>
   </div>
 
-  <!-- Main Topic Card -->
-  {% assign topic = data.topics[0] %}
-  <div class="topic-card">
-    <div class="topic-grid">
-      <!-- Left Column: Image and Basic Info -->
-      <div class="topic-left">
-        <div class="image-wrapper">
-         <img src="{{ site.baseurl }}/images/capstone/fops.png" alt="Friends of Poway Seniors infographic visual" class="topic-image">
-        <h2 class="topic-title">{{ topic.title }}</h2>
-        <p class="topic-subtitle">{{ topic.subtitle }}</p>
-        <a href="{{ topic.link }}" class="view-plan-btn">View Full Plan →</a>
-      </div>
-
-      <!-- Right Column: Description -->
-      <div class="topic-right">
-        <p class="topic-description">{{ topic.description }}</p>
-      </div>
-    </div>
-
-    <!-- Key Points Grid -->
-    <div class="key-points-section">
-      <h3 class="section-title">🔧 Key Improvements</h3>
-      <div class="points-grid">
-        {% for point in topic.keyPoints %}
-        <div class="point-card">
-          <span class="point-icon">✓</span>
-          <span class="point-text">{{ point }}</span>
-        </div>
+  <div class="section-label">Key features</div>
+  <div class="tools">
+    {% for tool in data.tools %}
+    <div class="card">
+      <div class="card-tag">{{ tool.tag }}</div>
+      <div class="card-name">{{ tool.name }}</div>
+      <div class="card-desc">{{ tool.desc }}</div>
+      <div class="card-links">
+        {% for link in tool.links %}
+        <a href="{{ link.url }}" class="card-link {% if link.style == 'orange' %}orange{% endif %}" target="_blank" rel="noopener noreferrer">{{ link.label }} →</a>
         {% endfor %}
       </div>
     </div>
-
-    <!-- Tech Stack & Impact Split -->
-    <div class="features-impact-grid">
-      <!-- Tech Stack -->
-      <div class="tech-section">
-        <h3 class="section-title">🛠️ Technologies & Features</h3>
-        <div class="tech-tags">
-          {% for tech in topic.tech %}
-          <span class="tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Impact -->
-      <div class="impact-section">
-        <h3 class="section-title">✨ Impact</h3>
-        <ul class="impact-list">
-          {% for item in topic.impact %}
-          <li>{{ item }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-
-    <!-- Team Footer -->
-    <div class="team-footer">
-      <span class="team-label">Team:</span>
-      <div class="team-members">
-        {% for member in topic.team %}
-        <span class="team-member">{{ member }}</span>
-        {% endfor %}
-      </div>
-    </div>
+    {% endfor %}
   </div>
 
-  <!-- Feature Spotlight - Platform Features -->
-  <div class="feature-spotlight">
-    <div class="spotlight-content">
-      <span class="feature-badge">🚀 Platform Features</span>
-      <h3>Smart Features Coming to FOPS</h3>
-      <p>We're building an intelligent, engaging platform to better serve Poway seniors and volunteers.</p>
-      
-      <div class="tracker-preview">
-        <!-- AI Chatbot Feature -->
-        <div class="feature-item">
-          <div class="feature-icon">🤖</div>
-          <div class="feature-details">
-            <span class="feature-name">AI Chatbot</span>
-            <span class="feature-desc">24/7 virtual assistant to answer questions, provide resources, and guide seniors through services</span>
-            <span class="feature-status available">✓ Already Available</span>
-          </div>
-        </div>
-        
-        <!-- Machine Learning Feature -->
-        <div class="feature-item">
-          <div class="feature-icon">🧠</div>
-          <div class="feature-details">
-            <span class="feature-name">Machine Learning</span>
-            <span class="feature-desc">Personalized content recommendations and intelligent matching between seniors and volunteers</span>
-            <span class="feature-status in-progress">⚙️ In Development</span>
-          </div>
-        </div>
-        
-        <!-- Volunteer Signup Feature -->
-        <div class="feature-item">
-          <div class="feature-icon">🙋</div>
-          <div class="feature-details">
-            <span class="feature-name">Volunteer Signup Portal</span>
-            <span class="feature-desc">Easy online registration, schedule management, and opportunity matching for volunteers</span>
-            <span class="feature-status available">✓ Already Available</span>
-          </div>
-        </div>
-        
-        <!-- Gamification Feature -->
-        <div class="feature-item">
-          <div class="feature-icon">🎮</div>
-          <div class="feature-details">
-            <span class="feature-name">Gamification</span>
-            <span class="feature-desc">Points, badges, and achievements to make engagement fun and rewarding for all users</span>
-            <span class="feature-status in-progress">⚙️ Coming Soon</span>
-          </div>
-        </div>
-      </div>
-      
-      <p class="spotlight-note">Our goal is to create an interactive, engaging platform that makes staying connected with FOPS both easy and enjoyable.</p>
-      
-      <!-- Secondary Button -->
-      <div class="spotlight-footer">
-        <a href="https://www.friendsofpowayseniors.org" class="spotlight-button" target="_blank" rel="noopener noreferrer">
-          Learn More About FOPS
-        </a>
-      </div>
-    </div>
-  </div>
 </div>

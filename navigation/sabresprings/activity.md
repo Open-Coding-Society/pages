@@ -225,99 +225,116 @@ description: Here are the activities. Hover over image for more details
       image: "https://i.pinimg.com/736x/00/9e/8d/009e8d29e58f7f92385055dafcdd35e9.jpg",
       title: "Easter Activities",
       shortDesc: "Atonement Study",
-      hoverDesc: "Breakfast study about the Atonement followed by a fun Easter egg hunt in the spring sunshine!",
-      date: "Sunday April 5 - Spring Meadow Lane"
+      hoverDesc: "Study about the Atonement followed by a fun Easter egg hunt in the spring weather!",
+      date: "Apr 14 - Church (Brian)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/9/99/Kompas_Sofia.JPG",
       title: "Compass Navigation",
       shortDesc: "Find Your Way",
       hoverDesc: "Learn to use a compass and map! Discover navigation skills for hiking and outdoor adventures.",
-      date: "Apr 21 - Church"
+      date: "Apr 28 - Church (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/6/61/Overgrown_yard_-_geograph.org.uk_-_964505.jpg",
       title: "Yard Cleanup",
       shortDesc: "Bless Your Fellow Man",
       hoverDesc: "Help someone in the community with spring yard cleanup. Service project with lunch included!",
-      date: "May 5 - Church"
+      date: "May 12 - Mara Ogle (John)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Backpacking_supplies_%28pack%2C_tent%2C_sleeping_pad%2C_and_bear_box%29_at_Panhandle_Gap.jpg",
       title: "Backpacking Prep",
       shortDesc: "Outdoor Skills",
       hoverDesc: "Learn essential backpacking and hiking skills. Perfect time to prepare for summer adventures!",
-      date: "May 19 - Church"
+      date: "May 12 - Backpacking (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/A_simple_campfire.jpg/2560px-A_simple_campfire.jpg",
       image2: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Coleman_stove.jpg",
-      title: "Camping & Outdoors Activities",
+      title: "Hiking & Outdoors Activities",
       shortDesc: "Outdoor Adventure",
       hoverDesc: "Setup camp, learn campfire safety, how to cook delicious meals in nature, hiking, milling, offroad, and how to enjoy the great outdoors under the stars!",
-      date: "Saturday May 23 - Julian"
+      date: "Saturday May 23, 10-2 - Julian (John)"
     },
-    {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg/1280px-An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg",
-      title: "Air Rockets",
-      shortDesc: "Science & Launch",
-      hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics.",
-      date: "June 9 - Church"
-    }
-  ];
-  
-  // Summer Activities (June - August)
-  const summerActivities = [
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Cloth_dodgeball.jpg",
       title: "Modified Dodgeball",
       shortDesc: "Team Sport",
       hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!",
-      date: "June 23 - Church"
+      date: "June 9 - Church (Tiffany)"
+    },
+
+  ];
+  
+  // Summer Activities (June - August)
+  const summerActivities = [
+    {
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg/1280px-An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg",
+      title: "Air Rockets",
+      shortDesc: "Science & Launch",
+      hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics.",
+      date: "June 23 - Church (Brian)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Napa_Pool_Party.jpg/2560px-Napa_Pool_Party.jpg",
       title: "Pool Party",
       shortDesc: "Water Fun",
       hoverDesc: "Beat the summer heat with swimming, pool games, and water safety lessons!",
-      date: "July 7 - Spring Meadow Lane"
+      date: "July 14 - Spring Meadow Lane (John)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/e/ed/Scouts_Scuba_in_Pool.jpg",
       title: "Scuba Basics",
       shortDesc: "Underwater World",
       hoverDesc: "Introduction to scuba diving! Learn basic equipment, safety, and breathing techniques.",
-      date: "July 21 - Spring Meadow Lane"
+      date: "July 28 - Spring Meadow Lane (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/8/8c/Look_765_Gravel_Bicycle.jpg",
       title: "Gravel Biking",
       shortDesc: "Bike Adventure",
       hoverDesc: "Explore trails on two wheels! Learn bike safety and enjoy outdoor cycling adventures.",
-      date: "Aug 4 - Spring Meadow Lane"
+      date: "Aug 11 - Spring Meadow Lane (John)"
     },
     {
-      image: "{{site.baseurl}}/images/activity/planofhappygame.png",
-      title: "Video Game Making",
-      shortDesc: "Plan of Happiness",
-      hoverDesc: "Create your own video game with a positive message! Learn basic game design and coding.",
-      date: "Aug 18 - Spring Meadow Lane"
+      image: "{{site.baseurl}}/images/activity/frisbeegolf.png",
+      title: "Frisbee Golf",
+      shortDesc: "Modified Sport",
+      hoverDesc: "Play disc golf on a custom course! Great outdoor activity combining skill and fun.",
+      date: "Aug 25 - Church Parking Lot (Brian)"
     }
   ];
   
   // Fall Activities (September - November)
   const fallActivities = [
     {
-      image: "{{site.baseurl}}/images/activity/frisbeegolf.png",
-      title: "Frisbee Golf",
-      shortDesc: "Modified Sport",
-      hoverDesc: "Play disc golf on a custom course! Great outdoor activity combining skill and fun."
+      image: "{{site.baseurl}}/images/activity/planofhappygame.png",
+      title: "Video Game Making",
+      shortDesc: "Plan of Happiness",
+      hoverDesc: "Create your own video game with a positive message! Learn basic game design and coding.",
+      date: "Sep 9 - Church (John)"
+    },
+    {
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Catapult_made_with_craft_sticks.jpg/1920px-Catapult_made_with_craft_sticks.jpg?20161025110105",
+      title: "Popsicle Catapults",
+      shortDesc: "Engineering Fun",
+      hoverDesc: "Build working catapults from popsicle sticks! Learn about physics and medieval engineering.",
+      date: "Sep 23 - Church (Justin)"
+    },
+    {
+      image: "https://www.churchofjesuschrist.org/imgs/li6h2f1zh38l26ueaiy8epfjmrpqc8oywz2uy7cf/full/!1280%2C1024/0/default",
+      title: "Conference Notes",
+      shortDesc: "Learn of Prophets",
+      hoverDesc: "Watch General Conference, take notes, and discuss over a delicious lunch together.",
+      date: "Oct 13 - Church"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Utopia_Playground_td_%282020-12-14%29_100.jpg/2560px-Utopia_Playground_td_%282020-12-14%29_100.jpg",
-      title: "Four Square",
+      title: "Four Square and other Games",
       shortDesc: "Classic Game",
-      hoverDesc: "The timeless playground game! Develop hand-eye coordination and quick thinking."
+      hoverDesc: "The timeless playground game! Develop hand-eye coordination and quick thinking.",
+      date: "Oct 27 - Church"
     },
     {
       image: "{{site.baseurl}}/images/activity/learningtopaint.png",
@@ -325,18 +342,6 @@ description: Here are the activities. Hover over image for more details
       shortDesc: "Artistic Expression",
       hoverDesc: "Explore painting with different mediums. Express yourself through color and creativity!"
     },
-    {
-      image: "https://www.churchofjesuschrist.org/imgs/li6h2f1zh38l26ueaiy8epfjmrpqc8oywz2uy7cf/full/!1280%2C1024/0/default",
-      title: "Conference Notes",
-      shortDesc: "Learn of Prophets",
-      hoverDesc: "Watch General Conference, take notes, and discuss over a delicious lunch together."
-    },
-    {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Catapult_made_with_craft_sticks.jpg/1920px-Catapult_made_with_craft_sticks.jpg?20161025110105",
-      title: "Popsicle Catapults",
-      shortDesc: "Engineering Fun",
-      hoverDesc: "Build working catapults from popsicle sticks! Learn about physics and medieval engineering."
-    }
   ];
   
   // Create all grids

@@ -1,53 +1,1024 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+@keyframes sfi-fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.sfi-pitch-col:nth-child(2)[data-reveal] { transition-delay: 0.13s; }
+
+.sfi-metric:nth-child(2)[data-reveal] { transition-delay: 0.1s; }
+.sfi-metric:nth-child(3)[data-reveal] { transition-delay: 0.2s; }
+
+.sfi-build-item:nth-child(2)[data-reveal] { transition-delay: 0.08s; }
+.sfi-build-item:nth-child(3)[data-reveal] { transition-delay: 0.16s; }
+.sfi-build-item:nth-child(4)[data-reveal] { transition-delay: 0.24s; }
+
+.sfi-wrap {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: #f5f1eb;
+  color: #080502 !important;
+  font-family: "Lora", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  animation: sfi-fadein 0.18s ease both;
+}
+.sfi-wrap *, .sfi-wrap *::before, .sfi-wrap *::after {
+  color: inherit;
+}
+.sfi-wrap a {
+  color: #8b1c1c;
+}
+
+.sfi-hero {
+  background: #ffffff;
+  border-bottom: 1px solid #cec8bc;
+  padding: 5rem clamp(1.5rem, 8vw, 6rem) 4.5rem;
+}
+
+.sfi-hero-inner {
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.sfi-eyebrow {
+  display: block;
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8b1c1c !important;
+  margin-bottom: 1.25rem;
+}
+
+.sfi-headline {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1.04;
+  color: #080502 !important;
+  letter-spacing: -0.025em;
+  margin: 0 0 1.5rem;
+}
+
+.sfi-rule {
+  width: 0;
+  height: 2px;
+  background: #8b1c1c;
+  margin: 0 auto 1.75rem;
+  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s;
+}
+.sfi-hero-inner.is-visible .sfi-rule {
+  width: 2.5rem;
+}
+
+.sfi-lede {
+  font-family: "Lora", serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #3d3830 !important;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.sfi-pitch {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4.5rem clamp(1.5rem, 5vw, 3.5rem);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+}
+@media (max-width: 680px) {
+  .sfi-pitch {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 3rem clamp(1.5rem, 5vw, 3rem);
+  }
+}
+
+.sfi-pitch-col {
+  padding-top: 1.5rem;
+  position: relative;
+}
+.sfi-pitch-col::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0;
+  transition: width 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+.sfi-pitch-col--problem::before { background: #8b1c1c; }
+.sfi-pitch-col--solution::before { background: #cec8bc; }
+.sfi-pitch-col.is-visible::before { width: 100%; }
+
+.sfi-col-heading {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  color: #080502 !important;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+}
+
+.sfi-col-body {
+  font-size: 0.93rem;
+  line-height: 1.95;
+  color: #3d3830 !important;
+  margin: 0;
+}
+
+.sfi-metrics {
+  background: #080502;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sfi-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 2rem 3.5rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+.sfi-metric:last-child { border-right: none; }
+@media (max-width: 600px) {
+  .sfi-metric {
+    padding: 1.5rem 2rem;
+    flex: 1 1 33%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+  }
+}
+
+.sfi-metric-val {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  line-height: 1;
+}
+
+.sfi-metric-lbl {
+  font-family: "DM Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.sfi-builds {
+  padding: 4.5rem clamp(1.5rem, 5vw, 3.5rem);
+  background: #f5f1eb;
+}
+
+.sfi-section-tag {
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #0d0802 !important;
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+}
+
+.sfi-build-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #cec8bc;
+  border-left: 1px solid #cec8bc;
+}
+@media (max-width: 620px) {
+  .sfi-build-grid { grid-template-columns: 1fr; }
+}
+
+.sfi-build-item {
+  display: flex;
+  gap: 1.25rem;
+  padding: 2rem 2rem 2rem 1.75rem;
+  border-right: 1px solid #cec8bc;
+  border-bottom: 1px solid #cec8bc;
+  background: #ffffff;
+  transition: background 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  align-items: flex-start;
+}
+.sfi-build-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: #8b1c1c;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.sfi-build-item:hover { background: #edeae2; }
+.sfi-build-item:hover::before { transform: scaleY(1); }
+
+.sfi-build-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  background: #f5f1eb;
+  border: 1px solid #cec8bc;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.sfi-build-item:hover .sfi-build-icon {
+  background: #ffffff;
+  border-color: #8b1c1c;
+}
+.sfi-build-icon svg { width: 24px; height: 24px; display: block; }
+
+.sfi-build-text {
+  flex: 1;
+  padding-top: 0.25rem;
+}
+
+.sfi-build-title {
+  font-family: "Lora", serif;
+  font-size: 0.97rem;
+  font-weight: 500;
+  color: #080502 !important;
+  margin: 0 0 0.55rem;
+}
+
+.sfi-build-desc {
+  font-size: 0.84rem;
+  line-height: 1.85;
+  color: #0d0802 !important;
+  margin: 0;
+}
+
+.sfi-features {
+  padding: 4.5rem clamp(1.5rem, 5vw, 3.5rem);
+  background: #f5f1eb;
+  border-top: 1px solid #cec8bc;
+}
+
+.sfi-features-intro {
+  max-width: 720px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+
+.sfi-feat-subtext {
+  font-family: "Lora", serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: #3d3830 !important;
+  margin: 0.5rem auto 0;
+  max-width: 560px;
+  line-height: 1.75;
+}
+
+.sfi-feat-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+@media (max-width: 900px) {
+  .sfi-feat-grid { grid-template-columns: 1fr; }
+}
+
+.sfi-feat-card {
+  background: #ffffff;
+  border: 1px solid #cec8bc;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+.sfi-feat-card:hover {
+  border-color: #b0a693;
+  box-shadow: 0 4px 28px rgba(8, 5, 2, 0.07);
+}
+
+.sfi-feat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid #cec8bc;
+  background: #f5f1eb;
+}
+.sfi-feat-head-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #cec8bc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+}
+.sfi-feat-head-icon svg { width: 18px; height: 18px; }
+.sfi-feat-head-label {
+  font-family: "DM Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #3d3830 !important;
+}
+
+.sfi-feat-illust {
+  background: #fbf7ef;
+  padding: 1.75rem 1.5rem;
+  border-bottom: 1px solid #cec8bc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+.sfi-feat-illust svg { width: 100%; max-width: 280px; height: auto; display: block; }
+
+.sfi-feat-body {
+  padding: 1.4rem 1.25rem 0.4rem;
+  flex: 1;
+}
+
+.sfi-feat-title {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #080502 !important;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.sfi-feat-copy {
+  font-family: "Lora", serif;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #3d3830 !important;
+  margin: 0 0 1rem;
+}
+
+.sfi-feat-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.8rem;
+}
+.sfi-feat-list li {
+  font-family: "Lora", serif;
+  font-size: 0.88rem;
+  color: #3d3830 !important;
+  line-height: 1.7;
+  padding-left: 1rem;
+  position: relative;
+}
+.sfi-feat-list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #8b1c1c !important;
+  font-size: 0.72rem;
+}
+
+.sfi-feat-cta-wrap {
+  padding: 0.4rem 1.25rem 1.25rem;
+}
+
+.sfi-feat-link {
+  font-family: "DM Mono", monospace;
+  font-size: 0.63rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8b1c1c !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: gap 0.2s ease;
+}
+.sfi-feat-link:hover {
+  gap: 10px;
+  color: #a32020 !important;
+}
+
+.sfi-feat-card:nth-child(2)[data-reveal] { transition-delay: 0.1s; }
+.sfi-feat-card:nth-child(3)[data-reveal] { transition-delay: 0.2s; }
+
+/* ── How It Fits Together (journey) ────────────────── */
+.sfi-journey {
+  padding: 4.5rem clamp(1.5rem, 5vw, 3.5rem);
+  background: #ffffff;
+  border-top: 1px solid #cec8bc;
+}
+.sfi-journey-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.sfi-journey-intro {
+  max-width: 720px;
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+.sfi-journey-flow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .sfi-journey-flow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+.sfi-journey-col {
+  background: #f5f1eb;
+  border: 1px solid #cec8bc;
+  padding: 1.5rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.sfi-journey-col--admin {
+  background: #080502;
+  border-color: #080502;
+  color: #ffffff !important;
+}
+.sfi-journey-col--admin .sfi-journey-eyebrow,
+.sfi-journey-col--admin .sfi-journey-h,
+.sfi-journey-col--admin .sfi-journey-item-t,
+.sfi-journey-col--admin .sfi-journey-item-d { color: #ffffff !important; }
+.sfi-journey-col--admin .sfi-journey-item { border-color: rgba(255,255,255,0.15); }
+.sfi-journey-col--admin .sfi-journey-icon { color: #f5f1eb; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+.sfi-journey-eyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8b1c1c !important;
+}
+.sfi-journey-h {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #080502 !important;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.sfi-journey-items { display: flex; flex-direction: column; gap: 0.55rem; }
+.sfi-journey-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.7rem;
+  background: #ffffff;
+  border: 1px solid #cec8bc;
+  border-radius: 2px;
+}
+.sfi-journey-col--admin .sfi-journey-item { background: rgba(255,255,255,0.05); }
+.sfi-journey-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: 1px solid #cec8bc;
+  border-radius: 50%;
+  background: #f5f1eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+}
+.sfi-journey-icon svg { width: 14px; height: 14px; }
+.sfi-journey-item-text { flex: 1; min-width: 0; }
+.sfi-journey-item-t {
+  font-family: "Lora", serif;
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: #080502 !important;
+  line-height: 1.25;
+}
+.sfi-journey-item-d {
+  font-family: "DM Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #3d3830 !important;
+  margin-top: 2px;
+}
+
+.sfi-journey-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b1c1c;
+  font-family: "DM Mono", monospace;
+  font-size: 1.4rem;
+  min-width: 28px;
+}
+@media (max-width: 900px) {
+  .sfi-journey-arrow {
+    min-width: 0;
+    padding: 0.75rem 0;
+    transform: rotate(90deg);
+  }
+}
+
+/* ── Footer ───────────────────────────────────────── */
+.sfi-foot {
+  background: #ffffff;
+  border-top: 1px solid #cec8bc;
+  padding: 2.5rem clamp(1.5rem, 5vw, 3.5rem);
+}
+.sfi-foot-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.sfi-foot-team {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.sfi-foot-label {
+  font-family: "DM Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #0d0802 !important;
+}
+.sfi-foot-names {
+  font-family: "Lora", serif;
+  font-size: 0.9rem;
+  color: #3d3830 !important;
+}
+.sfi-foot-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.sfi-cta {
+  display: inline-block;
+  background: #8b1c1c;
+  color: #ffffff !important;
+  padding: 0.65rem 1.4rem;
+  border-radius: 1px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.15s ease;
+}
+.sfi-cta:hover {
+  background: #a32020;
+  transform: translateY(-1px);
+  color: #ffffff !important;
+  text-decoration: none;
+}
+.sfi-cta--outline {
+  background: transparent;
+  color: #3d3830 !important;
+  border: 1px solid #cec8bc;
+}
+.sfi-cta--outline:hover {
+  background: #f5f1eb;
+  border-color: #3d3830;
+  color: #080502 !important;
+  transform: translateY(-1px);
+}
+</style>
+
 {% assign data = site.data["greppers-infograph"] %}
 
-<div class="sfi-infograph sfi-infograph--warm">
-  <div class="sfi-header">
-    <div class="sfi-badge">{{ data.Badge }}</div>
-    <h1 class="sfi-title">{{ data.Title }}</h1>
-    <p class="sfi-desc">{{ data.Description }}</p>
+{% capture icon_search %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 L20 20"/></svg>{% endcapture %}
+
+{% capture icon_camera %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8 h3 l1.5 -2 h7 l1.5 2 h3 v11 h-16 Z"/><circle cx="12" cy="13.5" r="3.5"/></svg>{% endcapture %}
+
+{% capture icon_user %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M4.5 20 c1.5 -4 5 -5.5 7.5 -5.5 s6 1.5 7.5 5.5"/></svg>{% endcapture %}
+
+{% capture icon_admin %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><line x1="3.5" y1="9" x2="20.5" y2="9"/><line x1="7" y1="13" x2="14" y2="13"/><line x1="7" y1="16" x2="12" y2="16"/></svg>{% endcapture %}
+
+{% capture icon_people %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.3"/><path d="M3.5 19 c1 -3.5 3.5 -5 5.5 -5 s4.5 1.5 5.5 5"/><path d="M15 19 c0.6 -2.5 2.3 -3.6 3.5 -3.6 s2.6 1.1 3.2 3.6"/></svg>{% endcapture %}
+
+{% capture icon_spark %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L13.5 9.5 L20 11 L13.5 12.5 L12 19 L10.5 12.5 L4 11 L10.5 9.5 Z"/></svg>{% endcapture %}
+
+{% capture icon_shield %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 L20 6 V12 C20 16.5 16.5 19.5 12 21 C7.5 19.5 4 16.5 4 12 V6 Z"/><path d="M9 12.5 L11.3 14.8 L15 10.8"/></svg>{% endcapture %}
+
+<article class="sfi-wrap">
+
+  <!-- HERO -->
+  <header class="sfi-hero">
+    <div class="sfi-hero-inner" data-reveal>
+      <span class="sfi-eyebrow">{{ data.Badge }}</span>
+      <h1 class="sfi-headline">{{ data.Title }}</h1>
+      <div class="sfi-rule"></div>
+      <p class="sfi-lede">{{ data.Tagline }}</p>
+    </div>
+  </header>
+
+  <!-- CURRENT SYSTEM vs PROTOTYPE SYSTEM -->
+  <section class="sfi-pitch">
+    <div class="sfi-pitch-col sfi-pitch-col--problem" data-reveal>
+      <h2 class="sfi-col-heading">Current System</h2>
+      <p class="sfi-col-body">{{ data.Problem }}</p>
+    </div>
+    <div class="sfi-pitch-col sfi-pitch-col--solution" data-reveal>
+      <h2 class="sfi-col-heading">Prototype System</h2>
+      <p class="sfi-col-body">{{ data.Solution }}</p>
+    </div>
+  </section>
+
+  <!-- METRICS STRIP -->
+  {% if data.Metrics %}
+  <div class="sfi-metrics">
+    {% for m in data.Metrics %}
+    <div class="sfi-metric" data-reveal data-count="{{ m.value }}">
+      <span class="sfi-metric-val">{{ m.value }}</span>
+      <span class="sfi-metric-lbl">{{ m.label }}</span>
+    </div>
+    {% endfor %}
   </div>
+  {% endif %}
 
-  <div class="sfi-card">
-    <div class="sfi-card-grid">
-      <div class="sfi-visual">
-        <div class="sfi-icon-wrap">🏁</div>
-        <div class="sfi-status">Motorsport Safety</div>
-        <div class="sfi-team">
-          <span class="sfi-team-label">Organization</span>
-          <span class="sfi-team-name">{{ data.Organization }}</span>
+  <!-- PROTOTYPE BUILD -->
+  <section class="sfi-builds">
+    <p class="sfi-section-tag" data-reveal>Prototype Build</p>
+    <div class="sfi-build-grid">
+      {% for f in data.FeatureCards %}
+      <div class="sfi-build-item" data-reveal>
+        <div class="sfi-build-icon">
+          {% case forloop.index %}
+            {% when 1 %}{{ icon_search }}
+            {% when 2 %}{{ icon_camera }}
+            {% when 3 %}{{ icon_user }}
+            {% when 4 %}{{ icon_admin }}
+          {% endcase %}
+        </div>
+        <div class="sfi-build-text">
+          <h4 class="sfi-build-title">{{ f.title }}</h4>
+          <p class="sfi-build-desc">{{ f.desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- THREE FOCUS AREAS -->
+  <section class="sfi-features" style="background:#ffffff;">
+    <p class="sfi-section-tag" data-reveal>Three Focus Areas</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">The people, the features, the foundation.</h2>
+      <p class="sfi-feat-subtext">Three lenses to read the prototype through — who uses it, what's new about it, and how the foundation stays in charge of every word on the page.</p>
+    </div>
+
+    <div class="sfi-feat-grid">
+      {% for focus in data.TechFocus %}
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-head">
+          <span class="sfi-feat-head-icon">
+            {% case forloop.index %}
+              {% when 1 %}{{ icon_people }}
+              {% when 2 %}{{ icon_spark }}
+              {% when 3 %}{{ icon_shield }}
+            {% endcase %}
+          </span>
+          <span class="sfi-feat-head-label">{{ focus.tag }}</span>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title" style="font-size:1.3rem;margin-bottom:0.8rem;">{{ focus.heading }}</h3>
+          <ul class="sfi-feat-list">
+            {% for item in focus.items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- PROTOTYPE IN PRACTICE -->
+  <section class="sfi-features">
+    <p class="sfi-section-tag" data-reveal>Prototype in Practice</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Three moments, three people.</h2>
+      <p class="sfi-feat-subtext">What the prototype feels like in the hands of a driver, an inspector, and your own staff.</p>
+    </div>
+
+    <div class="sfi-feat-grid">
+
+      <!-- Card 01: Plain-English Search -->
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="20" y="26" width="240" height="34" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
+            <circle cx="36" cy="43" r="6" fill="none" stroke="#8b1c1c" stroke-width="1.5"/>
+            <line x1="40" y1="47" x2="46" y2="53" stroke="#8b1c1c" stroke-width="1.5" stroke-linecap="round"/>
+            <text x="60" y="48" font-family="Lora, serif" font-style="italic" font-size="12" fill="#3d3830">fire suit for my son</text>
+            <path d="M140 64 L140 82 M134 76 L140 82 L146 76" stroke="#8b1c1c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M105 94 L175 94 L175 128 C175 136 150 146 140 149 C130 146 105 136 105 128 Z" fill="#ffffff" stroke="#8b1c1c" stroke-width="1.5"/>
+            <text x="140" y="115" font-family="Cormorant Garamond, serif" font-weight="700" font-size="15" text-anchor="middle" fill="#080502">SFI 3.2A/1</text>
+            <text x="140" y="128" font-family="Lora, serif" font-size="8.5" text-anchor="middle" fill="#3d3830">Driver Suit — Junior</text>
+            <text x="140" y="140" font-family="DM Mono, monospace" font-size="7" fill="#8b1c1c" text-anchor="middle" letter-spacing="1.5">CERTIFIED</text>
+          </svg>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title">Type it the way you'd say it.</h3>
+          <p class="sfi-feat-copy">A driver's parent types "fire suit for my son" — not a standard number. The right junior rating comes up first, with close alternatives right behind it.</p>
+        </div>
+        <div class="sfi-feat-cta-wrap">
+          <a href="https://sfifoundation.opencodingsociety.com/sfi-specs/" target="_blank" class="sfi-feat-link">Open the search &rarr;</a>
         </div>
       </div>
 
-      <div class="sfi-content">
-        <h2 class="sfi-project-title">{{ data.Subtitle }}</h2>
-        <p class="sfi-subtitle">Web Modernization Platform</p>
+      <!-- Card 02: Photo Identification -->
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="80" y="14" width="120" height="132" rx="10" fill="#080502" stroke="#3d3830" stroke-width="1.2"/>
+            <rect x="88" y="26" width="104" height="96" fill="#f5f1eb"/>
+            <path d="M108 104 Q124 74 140 92 Q156 104 172 88 L172 122 L108 122 Z" fill="#cec8bc"/>
+            <circle cx="152" cy="54" r="8" fill="#e8c468"/>
+            <circle cx="140" cy="74" r="22" fill="none" stroke="#8b1c1c" stroke-width="2" stroke-dasharray="3 3"/>
+            <rect x="112" y="128" width="56" height="12" rx="1" fill="#ffffff" stroke="#cec8bc" stroke-width="0.8"/>
+            <text x="140" y="137" font-family="DM Mono, monospace" font-weight="600" font-size="7" text-anchor="middle" fill="#8b1c1c" letter-spacing="1.2">HELMET · SFI 24.1</text>
+            <circle cx="140" cy="16" r="2" fill="#3d3830"/>
+            <rect x="131" y="142" width="18" height="1.5" rx="0.75" fill="#3d3830"/>
+          </svg>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title">Point the phone at the gear.</h3>
+          <p class="sfi-feat-copy">An inspector at the track aims a phone at a helmet, suit, or harness. The prototype names the standard it's meant to meet — without sending a photo anywhere.</p>
+        </div>
+        <div class="sfi-feat-cta-wrap">
+          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">See the identifier &rarr;</a>
+        </div>
+      </div>
 
-        <div class="sfi-keypoints">
-          {% for feature in data.Features %}
-          <div class="sfi-keypoint">
-            <span class="sfi-check">✓</span>
-            <span>{{ feature }}</span>
+      <!-- Card 03: Staff Dashboard -->
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="20" y="16" width="240" height="128" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
+            <rect x="20" y="16" width="240" height="22" fill="#080502"/>
+            <text x="32" y="31" font-family="DM Mono, monospace" font-size="9" fill="#f5f1eb" letter-spacing="1">SFI STANDARDS · ADMIN</text>
+            <text x="32" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STANDARD</text>
+            <text x="168" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STATUS</text>
+            <line x1="20" y1="62" x2="260" y2="62" stroke="#cec8bc" stroke-width="1"/>
+
+            <text x="32" y="82" font-family="Lora, serif" font-size="10" fill="#080502">SFI 16.1 — Restraints</text>
+            <rect x="168" y="73" width="48" height="13" rx="1.5" fill="#27ae60"/>
+            <text x="192" y="82" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
+
+            <text x="32" y="104" font-family="Lora, serif" font-size="10" fill="#080502">SFI 28.1 — Fuel Cells</text>
+            <rect x="168" y="95" width="48" height="13" rx="1.5" fill="#27ae60"/>
+            <text x="192" y="104" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
+
+            <text x="32" y="126" font-family="Lora, serif" font-size="10" fill="#080502">SFI 45.1 — Roll Cages</text>
+            <rect x="168" y="117" width="48" height="13" rx="1.5" fill="#8b1c1c"/>
+            <text x="192" y="126" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">UPDATED</text>
+
+            <text x="32" y="140" font-family="DM Mono, monospace" font-size="7" fill="#707068">+ add new standard</text>
+          </svg>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title">Your staff, in charge.</h3>
+          <p class="sfi-feat-copy">A staff member updates a standard from a simple dashboard. The site reflects the change the same day — no email to a developer, no waiting, no deploy.</p>
+        </div>
+        <div class="sfi-feat-cta-wrap">
+          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">Preview the admin &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- HOW IT FITS TOGETHER -->
+  <section class="sfi-journey">
+    <div class="sfi-journey-inner">
+      <div class="sfi-journey-intro" data-reveal>
+        <span class="sfi-eyebrow">How It Fits Together</span>
+        <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.5rem;">Three roles, one prototype, one foundation in control.</h2>
+        <p class="sfi-feat-subtext">Every path through the prototype begins with someone signing in, passes through the features they need, and ends at the dashboard where your staff keep the whole thing accurate and on-mission.</p>
+      </div>
+
+      <div class="sfi-journey-flow">
+        <!-- People -->
+        <div class="sfi-journey-col" data-reveal>
+          <span class="sfi-journey-eyebrow">The People</span>
+          <h3 class="sfi-journey-h">Who signs in</h3>
+          <div class="sfi-journey-items">
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_user }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Drivers &amp; crews</div>
+                <div class="sfi-journey-item-d">Look up, learn, check</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_user }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Inspectors</div>
+                <div class="sfi-journey-item-d">Verify gear at the track</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_user }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Staff</div>
+                <div class="sfi-journey-item-d">Maintain the source of truth</div>
+              </div>
+            </div>
           </div>
-          {% endfor %}
         </div>
 
-        <div class="sfi-tech-stack">
-          {% for tech in data.Tech %}
-          <span class="sfi-tech-tag">{{ tech.icon }} {{ tech.name }}</span>
-          {% endfor %}
-        </div>
-      </div>
+        <div class="sfi-journey-arrow" data-reveal>&#8594;</div>
 
-      <div class="sfi-details">
-        <h3 class="sfi-section-title">Impact</h3>
-        <div class="sfi-impact-list">
-          {% for metric in data.Metrics %}
-          <div class="sfi-impact-item">{{ metric.value }} — {{ metric.label }}</div>
-          {% endfor %}
+        <!-- Prototype -->
+        <div class="sfi-journey-col" data-reveal>
+          <span class="sfi-journey-eyebrow">The Prototype</span>
+          <h3 class="sfi-journey-h">What they use</h3>
+          <div class="sfi-journey-items">
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_search }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Plain-English Search</div>
+                <div class="sfi-journey-item-d">140+ standards, findable</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_camera }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Photo Identifier</div>
+                <div class="sfi-journey-item-d">On the phone, nothing uploaded</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_spark }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Quizzes &amp; Learning</div>
+                <div class="sfi-journey-item-d">Short loops, by role</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-btn">View Live Demo</a>
-        
+
+        <div class="sfi-journey-arrow" data-reveal>&#8594;</div>
+
+        <!-- Foundation -->
+        <div class="sfi-journey-col sfi-journey-col--admin" data-reveal>
+          <span class="sfi-journey-eyebrow" style="color:#8b1c1c !important;">The Foundation</span>
+          <h3 class="sfi-journey-h">Who stays in control</h3>
+          <div class="sfi-journey-items">
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_admin }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Staff dashboard</div>
+                <div class="sfi-journey-item-d">Edit standards directly</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_people }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Role management</div>
+                <div class="sfi-journey-item-d">Decide who sees what</div>
+              </div>
+            </div>
+            <div class="sfi-journey-item">
+              <span class="sfi-journey-icon">{{ icon_shield }}</span>
+              <div class="sfi-journey-item-text">
+                <div class="sfi-journey-item-t">Content &amp; safety</div>
+                <div class="sfi-journey-item-d">On-mission, moderated</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  </section>
+
+  <!-- DISCUSSION AGENDA -->
+  <section class="sfi-features" style="background:#ffffff;">
+    <p class="sfi-section-tag" data-reveal>Discussion Agenda</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Your direction from here.</h2>
+      <p class="sfi-feat-subtext">The prototype is a starting point. We'd like your take on which pieces matter most — and whether the work continues in the fall with 3rd- and 4th-year students on the real system.</p>
+    </div>
+
+    <div class="sfi-feat-grid" style="grid-template-columns:repeat(2,1fr); max-width:900px;">
+      {% for topic in data.DiscussionAgenda %}
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-head">
+          <span class="sfi-feat-head-icon">
+            {% case forloop.index %}
+              {% when 1 %}{{ icon_spark }}
+              {% when 2 %}{{ icon_shield }}
+            {% endcase %}
+          </span>
+          <span class="sfi-feat-head-label">{{ topic.subtitle }}</span>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title" style="font-size:1.3rem;margin-bottom:0.8rem;">{{ topic.heading }}</h3>
+          <ul class="sfi-feat-list">
+            {% for item in topic.items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Scroll reveal + metric counter -->
+  <script>
+  (function () {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        el.classList.add('is-visible');
+
+        var raw = el.dataset.count;
+        if (raw) {
+          var digits = raw.replace(/[^0-9]/g, '');
+          var num = parseInt(digits, 10);
+          var suffix = raw.replace(/[0-9,]/g, '');
+          var span = el.querySelector('.sfi-metric-val');
+          if (span && !isNaN(num) && num > 0) {
+            var dur = 1300;
+            var startTime = null;
+            (function tick(now) {
+              if (!startTime) startTime = now;
+              var t = Math.min((now - startTime) / dur, 1);
+              var ease = 1 - Math.pow(1 - t, 3);
+              var val = Math.round(ease * num);
+              span.textContent = val >= 1000 ? val.toLocaleString() + suffix : val + suffix;
+              if (t < 1) requestAnimationFrame(tick);
+            })(performance.now());
+          }
+        }
+
+        observer.unobserve(el);
+      });
+    }, { threshold: 0.18 });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('[data-reveal]').forEach(function (el) {
+        observer.observe(el);
+      });
+    });
+  })();
+  </script>
+
+  <!-- FOOTER -->
+  <footer class="sfi-foot" data-reveal>
+    <div class="sfi-foot-inner">
+      <div class="sfi-foot-team">
+        <span class="sfi-foot-label">Team</span>
+        <span class="sfi-foot-names">{{ data.Team }}</span>
+      </div>
+      <div class="sfi-foot-links">
+        <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-cta">View Live Site</a>
+        <a href="{{ data.BackendUrl }}" target="_blank" class="sfi-cta sfi-cta--outline">Source Code</a>
+      </div>
+    </div>
+  </footer>
+
+</article>

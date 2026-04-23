@@ -21,6 +21,13 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     javaURI = "https://spring.opencodingsociety.com";
 }
 
+export var javaWebSocketURI;
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    javaWebSocketURI = "http://localhost:8589";
+} else {
+    javaWebSocketURI = "https://spring.opencodingsociety.com:8589";
+}
+
 export const fetchOptions = {
     method: 'GET',  // Default method is GET
     mode: 'cors', // Enable CORS (Cross-Origin Resource Sharing)

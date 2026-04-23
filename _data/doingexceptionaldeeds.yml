@@ -15,11 +15,17 @@ Topics:
     description: "An extention for the Doing Exceptional Deeds non-profit website"
     keyPoints:
       - "AI Community Assistant"
-      - "Public Submissions"
-      - "Fix-up Website"
+      - "Redesign Website"
+      - "Public Deed Submission"
+      - "Photo Carousel"
+      - "Admin-User Chat System"
     tech:
       - "AI"
       - "Frontend"
     impact:
-      - "Impact point 1"
-      - "Impact point 2"
+      - "Delivers a clean, engaging homepage that makes programs and actions easy to find"
+      - "Provides instant support through an AI assistant, reducing wait times for help"
+      - "Encourages community involvement by allowing users to submit their own “exceptional deeds”"
+      - "Showcases positive stories through an interactive photo carousel"
+      - "Strengthens communication with a direct chat system between users and administrators"
+

@@ -1,33 +1,70 @@
-Badge: "Design-Based Research Capstone"
-Title: "SFI Foundation — Web Modernization"
-Subtitle: "Safety Made Searchable"
+Badge: "Prototype Review · CSP Capstone"
+Title: "A Prototype for the SFI Foundation"
+Tagline: "Today is a prototype review. We'll walk the build, compare it to SFI's current public system, and invite your direction on where the real system should go next."
+
+Problem: "SFI's current site holds the right standards — but they're buried. There's no search, no way to sign in, no way for a driver, inspector, or staff member to see anything tailored to them, and every standard change has to route through someone who can edit the page by hand."
+
+Solution: "A working prototype of what an SFI-run system could look like: sign-in with profiles, plain-English search, a photo identifier for safety gear, light quizzes for learning, and a dashboard that lets your staff update the site directly. It's a preview — and an invitation to shape where it goes from here."
+
 Organization: "SFI Foundation"
-Description: "SFI certifies the safety gear that protects motorsports drivers worldwide — but outdated tools force inspectors to dig through static pages and staff to update HTML by hand. We're rebuilding their digital experience so the people keeping racers safe can do their jobs faster."
+Team: "Aditya Srivastava, Dhyan Soni, Aaryav Lal"
+BackendUrl: "https://github.com/TheGreppers/greppers"
 
-Features:
-  - "Unified Spec Search — fuzzy matching + TF-IDF scoring so typing 'fire suit' finds SFI 3.2A/5 instantly across all specs"
-  - "Admin Spec Manager — staff update specifications through a simple dashboard instead of editing raw HTML"
-  - "AI powered visual spec search to instantly look up manafacturing details"
-  - "Mobile-First Redesign — accessible, responsive site that actually works on pit-lane devices"
-
-Tech:
-  - name: "Python / Flask"
-    icon: "🐍"
-  - name: "HTML / CSS / JS"
-    icon: "🌐"
-  - name: "SQLite"
-    icon: "🗄️"
+FeatureCards:
+  - title: "Plain-English Search"
+    desc: "Find any of 140+ safety standards by name or description — no memorizing numbers, and typos are fine."
+  - title: "Identify Equipment by Photo"
+    desc: "Photograph a piece of gear and the prototype tells you the standard it's meant to meet — right on the phone, nothing uploaded."
+  - title: "Sign-In That Knows You"
+    desc: "Drivers, inspectors, and staff each sign in and see the tools and information relevant to their role."
+  - title: "Staff Dashboard, No Code"
+    desc: "Your team updates standards, manages roles, and keeps the site on-mission — without a developer in the loop."
 
 Metrics:
-  - label: "Spec Lookup Time"
-    value: "< 5 sec"
-  - label: "Mobile Accessible"
-    value: "100%"
-  - label: "Staff Update Hours Saved"
-    value: "~20 hrs/wk"
-  - label: "Static Pages Replaced"
-    value: "8 → 1"
-  - label: "Part ID Accuracy"
-    value: "> 90%"
-  - label: "WCAG 2.1 AA Compliance"
-    value: "Full"
+  - value: "Prototype"
+    label: "Not production — yet"
+  - value: "140+"
+    label: "Standards covered"
+  - value: "3 roles"
+    label: "Drivers · Inspectors · Staff"
+  - value: "Same day"
+    label: "Changes to live site"
+
+TechFocus:
+  - heading: "Who It's For"
+    tag: "The people"
+    items:
+      - "Drivers, inspectors, and staff all sign in"
+      - "Each person sees the tools that fit their role"
+      - "Profiles remember history and preferences"
+      - "A place for inspectors and staff to talk"
+  - heading: "What's New"
+    tag: "The features"
+    items:
+      - "Search in plain English — not by standard number"
+      - "Point a camera at gear, get a standard back"
+      - "Learn through short quizzes and checkpoints"
+      - "Photo checks happen on the phone, nothing uploaded"
+  - heading: "Your Control"
+    tag: "The admin"
+    items:
+      - "Edit a standard; the site reflects it the same day"
+      - "Decide who can see and do what"
+      - "Keep content on-mission — moderation is built in"
+      - "Every change leaves a record"
+
+DiscussionAgenda:
+  - heading: "Prototype Direction"
+    subtitle: "What matters most"
+    items:
+      - "Which features are most important to the foundation?"
+      - "What's missing that you'd expect at launch?"
+      - "Where should further prototype work focus?"
+      - "Which role — driver, inspector, staff, fabricator — needs attention first?"
+  - heading: "Beyond the Prototype"
+    subtitle: "Into the real system"
+    items:
+      - "Fall engagement with 3rd- and 4th-year students"
+      - "Shape the real system — data, hosting, ownership"
+      - "Roadmap from capstone prototype to launch"
+      - "How the foundation wants to steer longer-term work"

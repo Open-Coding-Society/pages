@@ -196,6 +196,12 @@ Start the server, this is the best choice for initial and iterative development.
   make
   ```
 
+For easier build failure logging, run:
+
+```bash
+python _projects/make-helper/run_make.py
+```
+
 ### Load web application into the Browser
 
 Start the preview server in the terminal,

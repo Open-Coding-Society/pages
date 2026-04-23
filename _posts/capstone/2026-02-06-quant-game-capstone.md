@@ -1,4 +1,5 @@
 ---
+microblog: true
 toc: false
 layout: post
 title: Quantitative Trading Bot Capstone

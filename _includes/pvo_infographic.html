@@ -12,27 +12,47 @@
   {% for topic in data.Topics %}
   <div class="pv-card">
     <div class="pv-card-grid">
-      
-      <!-- Left: Image & Status -->
+
+      <!-- Left: Logo + Power Features -->
       <div class="pv-visual">
-        <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-image-link">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-image">
-          <div class="pv-overlay">
-            <span>View Project</span>
+        <div class="pv-left-block">
+
+          <!-- Logo banner -->
+          <div class="pv-before-logo-wrap">
+            <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-before-logo">
+            <div class="pv-before-logo-overlay">
+              {% if topic.link %}
+              <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-before-title-link">
+                <span class="pv-before-label">LIVE SITE</span><span class="pv-before-arrow">↗</span>
+              </a>
+              {% endif %}
+            </div>
           </div>
-        </a>
-        <div class="pv-status">{{ topic.status }}</div>
-        <div class="pv-team">
-          <span class="pv-team-label">Project Leads</span>
-          <span class="pv-team-name">{{ topic.team | join: ", " }}</span>
+
+          <!-- Power Features -->
+          {% if topic.powerFeatures %}
+          <div class="pv-power-section">
+            <div class="pv-power-eyebrow">✦ What We Brought to the Table</div>
+            {% for feat in topic.powerFeatures %}
+            <div class="pv-power-pill">
+              <div class="pv-power-top">
+                <span class="pv-power-icon">{{ feat.icon }}</span>
+                <span class="pv-power-label">{{ feat.label }}</span>
+              </div>
+              <div class="pv-power-note">{{ feat.note }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
         </div>
       </div>
 
-      <!-- Center: Key Points -->
+      <!-- Right: Title + Key Points (2 col) + GIF + Button -->
       <div class="pv-content">
         <h2 class="pv-project-title">{{ topic.title }}</h2>
         <p class="pv-subtitle">{{ topic.subtitle }}</p>
-        
+
         <div class="pv-keypoints">
           {% for point in topic.keyPoints %}
           <div class="pv-keypoint">
@@ -42,29 +62,255 @@
           {% endfor %}
         </div>
 
-        <div class="pv-tech-stack">
-          {% for tech in topic.tech %}
-          <span class="pv-tech-tag">{{ tech }}</span>
-          {% endfor %}
+        {% if topic.gif %}
+        <div class="pv-gif-wrap">
+          <img src="{{ site.baseurl }}/images/{{ topic.gif }}" alt="{{ topic.alt }} preview" class="pv-gif">
         </div>
-      </div>
+        {% endif %}
 
-      <!-- Right: Description & Impact -->
-      <div class="pv-details">
-        <h3 class="pv-section-title">About</h3>
-        <p class="pv-about">{{ topic.description }}</p>
-        
-        <h3 class="pv-section-title">Impact</h3>
-        <div class="pv-impact-list">
-          {% for item in topic.impact %}
-          <div class="pv-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
+        {% if topic.new %}
+        <a href="{{ topic.new }}" target="_blank" rel="noopener noreferrer" class="pv-learn-btn">
+          Learn More ↗
+        </a>
+        {% endif %}
 
-       <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-btn">Learn More</a>
       </div>
 
     </div>
   </div>
   {% endfor %}
 </div>
+
+<style>
+/* ── Card grid — wider left column ──────────────────────────── */
+.pv-card-grid {
+  display: grid !important;
+  grid-template-columns: 520px 1fr !important;
+  gap: 0 !important;
+  align-items: stretch !important;
+}
+
+/* ── Visual column reset ─────────────────────────────────────── */
+.pv-infograph .pv-visual {
+  padding: 0;
+  background: none;
+  border: none;
+  align-items: stretch;
+}
+
+/* ── Left block: full column container ───────────────────────── */
+.pv-left-block {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(170deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+}
+
+/* ── Logo banner ─────────────────────────────────────────────── */
+.pv-before-logo-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pv-before-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.pv-before-logo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.4rem 0.6rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+}
+
+.pv-before-title-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pv-before-title-link:hover .pv-before-label {
+  color: #ddd;
+}
+
+.pv-before-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.pv-before-arrow {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Power Features Section ──────────────────────────────────── */
+.pv-power-section {
+  padding: 1rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.pv-power-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 220, 100, 0.7);
+  margin-bottom: 0.3rem;
+}
+
+.pv-power-pill {
+  background: linear-gradient(135deg, rgba(120, 80, 255, 0.18) 0%, rgba(0, 200, 255, 0.10) 100%);
+  border: 1px solid rgba(160, 120, 255, 0.35);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  box-shadow:
+    0 0 10px rgba(140, 100, 255, 0.18),
+    0 0 24px rgba(100, 180, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+  cursor: default;
+}
+
+.pv-power-pill:hover {
+  box-shadow:
+    0 0 18px rgba(160, 110, 255, 0.38),
+    0 0 40px rgba(100, 200, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(190, 150, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.pv-power-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.pv-power-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.pv-power-label {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(220, 200, 255, 0.95);
+}
+
+.pv-power-note {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(200, 190, 255, 0.65);
+  padding-left: 1.7rem;
+}
+
+/* ── Right content column ────────────────────────────────────── */
+.pv-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pv-project-title {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.02em;
+}
+
+.pv-subtitle {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  margin: 0 0 1rem;
+}
+
+/* ── Key Points — 2 columns ──────────────────────────────────── */
+.pv-keypoints {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 1.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.pv-keypoint {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.93rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.pv-check {
+  color: rgba(100, 220, 160, 0.85);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+
+/* ── GIF ─────────────────────────────────────────────────────── */
+.pv-gif-wrap {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pv-gif {
+  width: 100%;
+  display: block;
+  border-radius: 10px;
+  min-height: 280px;
+  object-fit: cover;
+}
+
+/* ── Learn More button ───────────────────────────────────────── */
+.pv-learn-btn {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 0.55rem 1.2rem;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.pv-learn-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+</style>
