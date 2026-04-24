@@ -4,14 +4,14 @@ As AGENTS.md expands, this optimized format helps prevent the AI agent from expe
 while preserving all critical instructions. The agent must still communicate with the user in English. 
 -->
 
-# 智能体编程指南 (Agent Programming Guidelines)
+# 智能体编程指南
 
-## 核心原则 (Core Principles)
+## 核心原则
 
-### 单一职责原则 (SRP)
+### 单一职责原则
 * 每个函数、类和模块都应只有一个明确的修改原因。
 * 避免处理多重关注点的“上帝函数”。
-* 如果你在描述一个函数时使用了“和(and)”，它很可能违反了SRP。
+* 如果你在描述一个函数时使用了“和”，它很可能违反了单一职责原则。
 * 倾向于使用组合，而不是庞大的多用途单元。
 
 ### 简单胜于精巧
@@ -25,7 +25,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * 避免“魔法行为”（隐式全局变量、副作用）。
 * 尽可能隔离 I/O、网络和文件系统操作。
 
-## 架构规则 (Architecture Rules)
+## 架构规则
 
 ### 关注点分离
 将逻辑划分为清晰的层级：
@@ -41,7 +41,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * 按功能分组，而不是按类型分组（通常更适合系统扩展）。
 * 除非规模需要，否则优先选择模块化单体架构，而不是微服务。
 
-## 系统特定规则 (System-Specific Rules)
+## 系统特定规则
 
 ### 生态系统与工具默认设置
 * **优先使用 SASS：** 使用 SASS (`.scss`) 进行样式设计，而不是标准 CSS 或内联样式。
@@ -51,7 +51,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * **注释：** 为非平凡的逻辑添加注释，但要保持简短，重点关注“为什么”而不是“是什么”。
 * **提问：** 如果系统级约束、需求或模式不清楚，请在继续之前暂停并向用户提问。
 
-## 编码标准 (Coding Standards)
+## 编码标准
 
 ### 命名规范
 命名应：
@@ -70,7 +70,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * 日志应回答：**发生了什么以及为什么？**
 * 避免记录敏感数据。
 
-## 测试规则 (Testing Rules)
+## 测试规则
 
 ### 行为驱动测试
 * 测试应描述行为，而不是实现。
@@ -81,13 +81,13 @@ while preserving all critical instructions. The agent must still communicate wit
 * **智能体规则：** 如果代码改变了行为，请更新或添加测试。
 * 确保确定性行为（除非明确需要，否则避免随机性，需要时固定种子）。
 
-## 智能体行为规则 (Agent Behavior Rules)
+## 智能体行为规则
 
 ### 编码前计划
 * 对于非平凡任务：在编码前写一个简短计划。
 * 在实现前将其分解为多个步骤。
 
-### 最小化差异 (Minimize Diffs)
+### 最小化差异
 * 除非必要，否则优先考虑最小的差异，而不是重构。
 * 无故不要重写正在工作的代码。
 
@@ -99,14 +99,14 @@ while preserving all critical instructions. The agent must still communicate wit
 ### 自我更新与持续学习
 * **更新此文件：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`（及其优化版本），以便系统随时间不断改进。
 
-## 反模式 (Anti-Patterns)
+## 反模式
 
 ### 上帝函数
-* 避免做太多事情的函数。坚持单一职责原则 (SRP)。
+* 避免做太多事情的函数。坚持单一职责原则。
 
 ### 隐藏的副作用
 * 通过保持明确且记录良好的副作用来确保可预测性。
 
 ### 过度设计
-* **YAGNI (你不需要它)：** 除非现在需要，否则不要构建功能。避免推测性的泛化。
+* **你需要它吗 (YAGNI)：** 除非现在需要，否则不要构建功能。避免推测性的泛化。
 * 仅在保证正确性后才进行优化（优化前进行性能分析）。
