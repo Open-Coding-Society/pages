@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Robot Logic Game — Test Page</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #11162a;
+      color: #f2f2f2;
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    h1 { margin-top: 0; }
+    .card {
+      background: #1d2230;
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 20px;
+      border: 1px solid #2c3347;
+    }
+    button.launch {
+      padding: 14px 22px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      background: #2ea66a;
+      color: white;
+      cursor: pointer;
+    }
+    button.launch:hover { background: #38c07c; }
+    code, kbd {
+      background: #0f1524;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    ul { padding-left: 20px; line-height: 1.7; }
+    .level-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #2c3347;
+    }
+    .level-row:last-child { border-bottom: none; }
+    .level-row .meta { opacity: 0.7; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Robot Logic Game — Dev Test</h1>
+    <p>Pick a level below to launch it in a fullscreen overlay. Press <kbd>✕</kbd> in the corner to return.</p>
+
+    <div class="card">
+      <div class="level-row">
+        <div>
+          <strong>Level 1</strong>
+          <div class="meta">7×7 grid, no walls. Drag blocks to reach the flag.</div>
+        </div>
+        <button class="launch" data-level="1">Launch</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">How to play</h3>
+      <ul>
+        <li>Drag blocks from the <em>Blocks</em> panel into the <em>Program</em> panel.</li>
+        <li>Click <code>✕</code> on a program block to remove it.</li>
+        <li>Press <strong>Run</strong> to execute your program.</li>
+        <li>Press <strong>Reset</strong> to clear your program and move the robot back to start.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script type="module">
+    import RobotLogicLevel1 from './levels/RobotLogicLevel1.js';
+
+    const levels = {
+      1: RobotLogicLevel1,
+    };
+
+    document.querySelectorAll('button.launch').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const LevelClass = levels[btn.dataset.level];
+        if (!LevelClass) return;
+        const level = new LevelClass({});
+        level.onExit = () => console.log('Level exited.');
+        level.start();
+      });
+    });
+  </script>
+</body>
+</html>
