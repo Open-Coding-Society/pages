@@ -531,6 +531,681 @@ export class TTSPanel {
 }
 
 // ============================================
+// RESPONSIBILITY: Head calibration persistence + mapping
+// ============================================
+export class HeadCalibrationManager {
+    static STORAGE_KEY = 'headTrackingCalibration';
+    static data = HeadCalibrationManager._defaultCalibration();
+    static refs = {
+        status: null
+    };
+
+    static _defaultCalibration() {
+        return {
+            centerX: 0.5,
+            centerY: 0.5,
+            leftX: 0.3,
+            rightX: 0.7,
+            upY: 0.3,
+            downY: 0.7,
+            calibrated: false
+        };
+    }
+
+    static _sanitize(data) {
+        const d = HeadCalibrationManager._defaultCalibration();
+        const num = (v, fallback) => {
+            const n = Number(v);
+            if (!Number.isFinite(n)) return fallback;
+            return Math.max(0, Math.min(1, n));
+        };
+        return {
+            centerX: num(data?.centerX, d.centerX),
+            centerY: num(data?.centerY, d.centerY),
+            leftX: num(data?.leftX, d.leftX),
+            rightX: num(data?.rightX, d.rightX),
+            upY: num(data?.upY, d.upY),
+            downY: num(data?.downY, d.downY),
+            calibrated: !!data?.calibrated
+        };
+    }
+
+    static _normalizeUserId(value) {
+        if (value === null || value === undefined) return null;
+        const normalized = String(value).trim();
+        return normalized ? normalized : null;
+    }
+
+    static init(statusRef) {
+        HeadCalibrationManager.refs.status = statusRef || null;
+        HeadCalibrationManager.loadLocal();
+    }
+
+    static setStatus(message, isError = false) {
+        if (!HeadCalibrationManager.refs.status) return;
+        HeadCalibrationManager.refs.status.textContent = message;
+        HeadCalibrationManager.refs.status.style.color = isError ? '#f87171' : '';
+    }
+
+    static loadLocal() {
+        try {
+            const raw = localStorage.getItem(HeadCalibrationManager.STORAGE_KEY);
+            if (!raw) {
+                HeadCalibrationManager.data = HeadCalibrationManager._defaultCalibration();
+                return HeadCalibrationManager.data;
+            }
+            HeadCalibrationManager.data = HeadCalibrationManager._sanitize(JSON.parse(raw));
+            return HeadCalibrationManager.data;
+        } catch (e) {
+            console.error('head calibration load local error', e);
+            HeadCalibrationManager.data = HeadCalibrationManager._defaultCalibration();
+            return HeadCalibrationManager.data;
+        }
+    }
+
+    static saveLocal() {
+        try {
+            localStorage.setItem(HeadCalibrationManager.STORAGE_KEY, JSON.stringify(HeadCalibrationManager.data));
+        } catch (e) {
+            console.error('head calibration save local error', e);
+        }
+    }
+
+    static capture(point, rawX, rawY) {
+        if (!Number.isFinite(rawX) || !Number.isFinite(rawY)) {
+            HeadCalibrationManager.setStatus('No face landmark found. Keep your face in frame and try again.', true);
+            return false;
+        }
+
+        if (point === 'center') {
+            HeadCalibrationManager.data.centerX = rawX;
+            HeadCalibrationManager.data.centerY = rawY;
+        } else if (point === 'left') {
+            HeadCalibrationManager.data.leftX = rawX;
+        } else if (point === 'right') {
+            HeadCalibrationManager.data.rightX = rawX;
+        } else if (point === 'up') {
+            HeadCalibrationManager.data.upY = rawY;
+        } else if (point === 'down') {
+            HeadCalibrationManager.data.downY = rawY;
+        }
+
+        const complete = [
+            HeadCalibrationManager.data.leftX,
+            HeadCalibrationManager.data.rightX,
+            HeadCalibrationManager.data.upY,
+            HeadCalibrationManager.data.downY
+        ].every(Number.isFinite);
+        HeadCalibrationManager.data.calibrated = !!complete;
+        HeadCalibrationManager.saveLocal();
+        HeadCalibrationManager.setStatus(`Captured ${point}.`);
+        return true;
+    }
+
+    static reset() {
+        HeadCalibrationManager.data = HeadCalibrationManager._defaultCalibration();
+        HeadCalibrationManager.saveLocal();
+        HeadCalibrationManager.setStatus('Calibration reset to defaults.');
+    }
+
+    static mapRawToViewport(rawX, rawY) {
+        const x = Math.max(0, Math.min(1, rawX));
+        const y = Math.max(0, Math.min(1, rawY));
+        const c = HeadCalibrationManager.data;
+
+        if (!c?.calibrated) {
+            return { x, y };
+        }
+
+        const normalize = (value, min, max) => {
+            if (!Number.isFinite(min) || !Number.isFinite(max) || Math.abs(max - min) < 0.001) {
+                return 0.5;
+            }
+            return (value - min) / (max - min);
+        };
+
+        const nx = normalize(x, c.leftX, c.rightX);
+        const ny = normalize(y, c.upY, c.downY);
+        return {
+            x: Math.max(0, Math.min(1, nx)),
+            y: Math.max(0, Math.min(1, ny))
+        };
+    }
+
+    static async _getCurrentUserId() {
+        if (!PreferencesAPI.javaURI || !PreferencesAPI.fetchOptions) return null;
+        const res = await fetch(`${PreferencesAPI.javaURI}/api/person/get`, PreferencesAPI.fetchOptions);
+        if (!res.ok) return null;
+        const person = await res.json();
+        return HeadCalibrationManager._normalizeUserId(
+            person?.id || person?.uid || person?.username || person?.name || null
+        );
+    }
+
+    static async saveToBackend() {
+        try {
+            const userId = HeadCalibrationManager._normalizeUserId(await HeadCalibrationManager._getCurrentUserId());
+            if (!userId) {
+                HeadCalibrationManager.setStatus('You must be logged in to save calibration to backend.', true);
+                return false;
+            }
+
+            const payload = {
+                userId,
+                body: `${userId}-calibration`,
+                metadata: HeadCalibrationManager._sanitize(HeadCalibrationManager.data)
+            };
+
+            const res = await fetch(`${PreferencesAPI.javaURI}/api/content/HEAD_CALIBRATION`, {
+                ...PreferencesAPI.fetchOptions,
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                HeadCalibrationManager.setStatus(`Failed to save calibration (${res.status}).`, true);
+                return false;
+            }
+
+            HeadCalibrationManager.setStatus('Calibration saved to backend.');
+            return true;
+        } catch (e) {
+            console.error('save calibration backend error', e);
+            HeadCalibrationManager.setStatus('Could not save calibration (network/server error).', true);
+            return false;
+        }
+    }
+
+    static async loadFromBackend() {
+        try {
+            const userId = HeadCalibrationManager._normalizeUserId(await HeadCalibrationManager._getCurrentUserId());
+            if (!userId) {
+                HeadCalibrationManager.setStatus('You must be logged in to load calibration.', true);
+                return false;
+            }
+
+            const res = await fetch(`${PreferencesAPI.javaURI}/api/content/HEAD_CALIBRATION`, PreferencesAPI.fetchOptions);
+            if (!res.ok) {
+                HeadCalibrationManager.setStatus(`Failed to load calibration list (${res.status}).`, true);
+                return false;
+            }
+
+            const allRows = await res.json();
+            const expectedBody = `${userId}-calibration`;
+            const matches = Array.isArray(allRows)
+                ? allRows.filter(row => {
+                    const rowUserId = HeadCalibrationManager._normalizeUserId(row?.userId);
+                    const rowBody = HeadCalibrationManager._normalizeUserId(row?.body);
+                    return rowUserId === userId || rowBody === expectedBody;
+                })
+                : [];
+
+            if (!matches.length) {
+                HeadCalibrationManager.setStatus(`No saved calibration found for ${userId}.`, true);
+                return false;
+            }
+
+            const picked = matches.reduce((best, row) => {
+                if (!best) return row;
+                return Number(row?.id || 0) > Number(best?.id || 0) ? row : best;
+            }, null);
+
+            HeadCalibrationManager.data = HeadCalibrationManager._sanitize(picked?.metadata || {});
+            HeadCalibrationManager.data.calibrated = true;
+            HeadCalibrationManager.saveLocal();
+            HeadCalibrationManager.setStatus(`Loaded calibration for ${userId}.`);
+            return true;
+        } catch (e) {
+            console.error('load calibration backend error', e);
+            HeadCalibrationManager.setStatus('Could not load calibration (network/server error).', true);
+            return false;
+        }
+    }
+}
+
+// ============================================
+// RESPONSIBILITY: Camera-based head tracking cursor
+// ============================================
+export class HeadTrackingController {
+    static STORAGE_KEY = 'headTrackingPreferences';
+    static BLINK_EAR_THRESHOLD = 0.15;
+    static BLINK_COOLDOWN_MS = 550;
+    static state = {
+        enabled: false,
+        sensitivity: 0.45
+    };
+    static refs = {
+        toggle: null,
+        toggleTrack: null,
+        toggleDot: null,
+        sensitivity: null,
+        sensitivityLabel: null,
+        status: null,
+        calibrationStatus: null,
+        captureCenterBtn: null,
+        captureLeftBtn: null,
+        captureRightBtn: null,
+        captureUpBtn: null,
+        captureDownBtn: null,
+        saveCalibrationBtn: null,
+        loadCalibrationBtn: null,
+        resetCalibrationBtn: null
+    };
+
+    static stream = null;
+    static video = null;
+    static cursorEl = null;
+    static rafId = null;
+    static faceLandmarker = null;
+    static visionModule = null;
+    static lastPoint = null;
+    static lastRawPoint = null;
+    static blinkState = {
+        isClosed: false,
+        lastClickAt: 0
+    };
+
+    static init() {
+        HeadTrackingController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
+        HeadTrackingController.refs.toggleTrack = document.getElementById('head-tracking-toggle-track');
+        HeadTrackingController.refs.toggleDot = document.getElementById('head-tracking-toggle-dot');
+        HeadTrackingController.refs.sensitivity = document.getElementById('pref-head-tracking-sensitivity');
+        HeadTrackingController.refs.sensitivityLabel = document.getElementById('head-tracking-sensitivity-label');
+        HeadTrackingController.refs.status = document.getElementById('head-tracking-status');
+        HeadTrackingController.refs.calibrationStatus = document.getElementById('head-calibration-status');
+        HeadTrackingController.refs.captureCenterBtn = document.getElementById('head-calibrate-center');
+        HeadTrackingController.refs.captureLeftBtn = document.getElementById('head-calibrate-left');
+        HeadTrackingController.refs.captureRightBtn = document.getElementById('head-calibrate-right');
+        HeadTrackingController.refs.captureUpBtn = document.getElementById('head-calibrate-up');
+        HeadTrackingController.refs.captureDownBtn = document.getElementById('head-calibrate-down');
+        HeadTrackingController.refs.saveCalibrationBtn = document.getElementById('head-calibration-save');
+        HeadTrackingController.refs.loadCalibrationBtn = document.getElementById('head-calibration-load');
+        HeadTrackingController.refs.resetCalibrationBtn = document.getElementById('head-calibration-reset');
+
+        if (!HeadTrackingController.refs.toggle || !HeadTrackingController.refs.status) return;
+
+        HeadTrackingController._loadState();
+        HeadCalibrationManager.init(HeadTrackingController.refs.calibrationStatus);
+        HeadTrackingController._createCursor();
+
+        HeadTrackingController.refs.toggle.checked = !!HeadTrackingController.state.enabled;
+        HeadTrackingController._syncToggleVisual();
+        if (HeadTrackingController.refs.sensitivity) {
+            HeadTrackingController.refs.sensitivity.value = String(HeadTrackingController.state.sensitivity);
+        }
+        HeadTrackingController._updateSensitivityLabel();
+
+        HeadTrackingController.refs.toggle.addEventListener('change', async (e) => {
+            await HeadTrackingController.setEnabled(!!e.target.checked);
+        });
+
+        if (HeadTrackingController.refs.sensitivity) {
+            HeadTrackingController.refs.sensitivity.addEventListener('input', () => {
+                const raw = Number(HeadTrackingController.refs.sensitivity.value);
+                HeadTrackingController.state.sensitivity = Number.isFinite(raw) ? raw : 0.45;
+                HeadTrackingController._updateSensitivityLabel();
+                HeadTrackingController._saveState();
+            });
+        }
+
+        const capture = point => {
+            if (!HeadTrackingController.lastRawPoint) {
+                HeadCalibrationManager.setStatus('Start head tracking and keep your face visible before capturing.', true);
+                return;
+            }
+            HeadCalibrationManager.capture(point, HeadTrackingController.lastRawPoint.x, HeadTrackingController.lastRawPoint.y);
+        };
+
+        HeadTrackingController.refs.captureCenterBtn?.addEventListener('click', () => capture('center'));
+        HeadTrackingController.refs.captureLeftBtn?.addEventListener('click', () => capture('left'));
+        HeadTrackingController.refs.captureRightBtn?.addEventListener('click', () => capture('right'));
+        HeadTrackingController.refs.captureUpBtn?.addEventListener('click', () => capture('up'));
+        HeadTrackingController.refs.captureDownBtn?.addEventListener('click', () => capture('down'));
+        HeadTrackingController.refs.saveCalibrationBtn?.addEventListener('click', () => HeadCalibrationManager.saveToBackend());
+        HeadTrackingController.refs.loadCalibrationBtn?.addEventListener('click', () => HeadCalibrationManager.loadFromBackend());
+        HeadTrackingController.refs.resetCalibrationBtn?.addEventListener('click', () => HeadCalibrationManager.reset());
+
+        if (HeadTrackingController.state.enabled) {
+            HeadTrackingController.setEnabled(true);
+        } else {
+            HeadTrackingController._setStatus('Head tracking is off.');
+        }
+
+        window.addEventListener('beforeunload', () => {
+            HeadTrackingController._stopTracking();
+        });
+    }
+
+    static async setEnabled(enabled) {
+        HeadTrackingController.state.enabled = !!enabled;
+        HeadTrackingController._saveState();
+
+        if (HeadTrackingController.refs.toggle) {
+            HeadTrackingController.refs.toggle.checked = HeadTrackingController.state.enabled;
+        }
+        HeadTrackingController._syncToggleVisual();
+
+        if (!HeadTrackingController.state.enabled) {
+            HeadTrackingController._stopTracking();
+            HeadTrackingController._setStatus('Head tracking disabled.');
+            return;
+        }
+
+        await HeadTrackingController._startTracking();
+    }
+
+    static _loadState() {
+        try {
+            const raw = localStorage.getItem(HeadTrackingController.STORAGE_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            HeadTrackingController.state.enabled = !!parsed.enabled;
+            const incomingSensitivity = Number(parsed.sensitivity);
+            if (Number.isFinite(incomingSensitivity)) {
+                HeadTrackingController.state.sensitivity = Math.min(0.9, Math.max(0.1, incomingSensitivity));
+            }
+        } catch (e) {
+            console.error('head tracking load state error', e);
+        }
+    }
+
+    static _saveState() {
+        try {
+            localStorage.setItem(HeadTrackingController.STORAGE_KEY, JSON.stringify(HeadTrackingController.state));
+        } catch (e) {
+            console.error('head tracking save state error', e);
+        }
+    }
+
+    static _updateSensitivityLabel() {
+        if (!HeadTrackingController.refs.sensitivityLabel) return;
+        HeadTrackingController.refs.sensitivityLabel.textContent = HeadTrackingController.state.sensitivity.toFixed(2);
+    }
+
+    static _setStatus(message, isError = false) {
+        if (!HeadTrackingController.refs.status) return;
+        HeadTrackingController.refs.status.textContent = message;
+        HeadTrackingController.refs.status.style.color = isError ? '#f87171' : '';
+    }
+
+    static _syncToggleVisual() {
+        const { toggleTrack, toggleDot } = HeadTrackingController.refs;
+        if (!toggleTrack || !toggleDot) return;
+
+        const enabled = !!HeadTrackingController.state.enabled;
+        toggleTrack.classList.toggle('bg-cyan-500', enabled);
+        toggleTrack.classList.toggle('bg-neutral-600', !enabled);
+        toggleDot.style.transform = enabled ? 'translateX(20px)' : 'translateX(0px)';
+    }
+
+    static _createCursor() {
+        if (HeadTrackingController.cursorEl) return;
+        const el = document.createElement('div');
+        el.id = 'head-tracking-cursor';
+        el.style.position = 'fixed';
+        el.style.width = '18px';
+        el.style.height = '18px';
+        el.style.border = '2px solid #22d3ee';
+        el.style.borderRadius = '9999px';
+        el.style.background = 'rgba(34, 211, 238, 0.15)';
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = '99999';
+        el.style.transform = 'translate(-9999px, -9999px)';
+        el.style.boxShadow = '0 0 12px rgba(34, 211, 238, 0.5)';
+        document.body.appendChild(el);
+        HeadTrackingController.cursorEl = el;
+    }
+
+    static _showCursor(x, y) {
+        if (!HeadTrackingController.cursorEl) return;
+        HeadTrackingController.cursorEl.style.transform = `translate(${Math.round(x - 9)}px, ${Math.round(y - 9)}px)`;
+    }
+
+    static _hideCursor() {
+        if (!HeadTrackingController.cursorEl) return;
+        HeadTrackingController.cursorEl.style.transform = 'translate(-9999px, -9999px)';
+    }
+
+    static _eyeAspectRatio(landmarks, topIndex, bottomIndex, leftIndex, rightIndex) {
+        const top = landmarks?.[topIndex];
+        const bottom = landmarks?.[bottomIndex];
+        const left = landmarks?.[leftIndex];
+        const right = landmarks?.[rightIndex];
+        if (!top || !bottom || !left || !right) return null;
+
+        const vertical = Math.abs(top.y - bottom.y);
+        const horizontal = Math.abs(left.x - right.x);
+        if (horizontal < 0.0001) return null;
+        return vertical / horizontal;
+    }
+
+    static _dispatchBlinkClick(x, y) {
+        const target = document.elementFromPoint(x, y);
+        if (!target) return;
+
+        const pointerDown = new PointerEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0,
+            pointerType: 'mouse'
+        });
+        const pointerUp = new PointerEvent('pointerup', {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0,
+            pointerType: 'mouse'
+        });
+
+        const mouseDown = new MouseEvent('mousedown', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        const mouseUp = new MouseEvent('mouseup', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        const click = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+
+        target.dispatchEvent(pointerDown);
+        target.dispatchEvent(mouseDown);
+        target.dispatchEvent(pointerUp);
+        target.dispatchEvent(mouseUp);
+        target.dispatchEvent(click);
+    }
+
+    static _handleBlinkClick(landmarks, x, y) {
+        const leftEar = HeadTrackingController._eyeAspectRatio(landmarks, 159, 145, 33, 133);
+        const rightEar = HeadTrackingController._eyeAspectRatio(landmarks, 386, 374, 362, 263);
+        if (!Number.isFinite(leftEar) || !Number.isFinite(rightEar)) {
+            HeadTrackingController.blinkState.isClosed = false;
+            return;
+        }
+
+        const avgEar = (leftEar + rightEar) / 2;
+        const isClosedNow = avgEar < HeadTrackingController.BLINK_EAR_THRESHOLD;
+        const now = performance.now();
+        const canClick = now - HeadTrackingController.blinkState.lastClickAt > HeadTrackingController.BLINK_COOLDOWN_MS;
+
+        if (isClosedNow && !HeadTrackingController.blinkState.isClosed && canClick) {
+            HeadTrackingController._dispatchBlinkClick(x, y);
+            HeadTrackingController.blinkState.lastClickAt = now;
+        }
+
+        HeadTrackingController.blinkState.isClosed = isClosedNow;
+    }
+
+    static async _startTracking() {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            HeadTrackingController._setStatus('Camera API is not available in this browser.', true);
+            HeadTrackingController.state.enabled = false;
+            HeadTrackingController._saveState();
+            if (HeadTrackingController.refs.toggle) HeadTrackingController.refs.toggle.checked = false;
+            HeadTrackingController._syncToggleVisual();
+            return;
+        }
+
+        HeadTrackingController._setStatus('Requesting camera access...');
+
+        try {
+            if (!HeadTrackingController.visionModule) {
+                HeadTrackingController.visionModule = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm');
+            }
+
+            if (!HeadTrackingController.faceLandmarker) {
+                const fileset = await HeadTrackingController.visionModule.FilesetResolver.forVisionTasks(
+                    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+                );
+                HeadTrackingController.faceLandmarker = await HeadTrackingController.visionModule.FaceLandmarker.createFromOptions(fileset, {
+                    baseOptions: {
+                        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task'
+                    },
+                    runningMode: 'VIDEO',
+                    numFaces: 1
+                });
+            }
+
+            HeadTrackingController.stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'user'
+                },
+                audio: false
+            });
+
+            if (!HeadTrackingController.video) {
+                const v = document.createElement('video');
+                v.autoplay = true;
+                v.muted = true;
+                v.playsInline = true;
+                v.style.position = 'fixed';
+                v.style.width = '1px';
+                v.style.height = '1px';
+                v.style.opacity = '0';
+                v.style.pointerEvents = 'none';
+                v.style.left = '-9999px';
+                document.body.appendChild(v);
+                HeadTrackingController.video = v;
+            }
+
+            HeadTrackingController.video.srcObject = HeadTrackingController.stream;
+            await HeadTrackingController.video.play();
+
+            HeadTrackingController.lastPoint = null;
+            HeadTrackingController._runLoop();
+            HeadTrackingController._setStatus('Head tracking active. Move your head to steer the cursor.');
+        } catch (e) {
+            console.error('head tracking start error', e);
+            HeadTrackingController._setStatus('Could not start head tracking. Check camera permission.', true);
+            HeadTrackingController.state.enabled = false;
+            HeadTrackingController._saveState();
+            if (HeadTrackingController.refs.toggle) HeadTrackingController.refs.toggle.checked = false;
+            HeadTrackingController._syncToggleVisual();
+            HeadTrackingController._stopTracking();
+        }
+    }
+
+    static _runLoop() {
+        if (!HeadTrackingController.state.enabled || !HeadTrackingController.faceLandmarker || !HeadTrackingController.video) {
+            return;
+        }
+
+        const tick = () => {
+            if (!HeadTrackingController.state.enabled || !HeadTrackingController.faceLandmarker || !HeadTrackingController.video) {
+                return;
+            }
+
+            if (HeadTrackingController.video.readyState >= 2) {
+                const result = HeadTrackingController.faceLandmarker.detectForVideo(HeadTrackingController.video, performance.now());
+                const landmarks = result?.faceLandmarks?.[0];
+                const nose = landmarks?.[1];
+
+                if (nose) {
+                    const rawX = 1 - nose.x;
+                    const rawY = nose.y;
+                    HeadTrackingController.lastRawPoint = { x: rawX, y: rawY };
+
+                    const mapped = HeadCalibrationManager.mapRawToViewport(rawX, rawY);
+                    const targetX = mapped.x * window.innerWidth;
+                    const targetY = mapped.y * window.innerHeight;
+
+                    const alpha = Math.min(0.9, Math.max(0.1, HeadTrackingController.state.sensitivity));
+                    if (!HeadTrackingController.lastPoint) {
+                        HeadTrackingController.lastPoint = { x: targetX, y: targetY };
+                    } else {
+                        HeadTrackingController.lastPoint.x += (targetX - HeadTrackingController.lastPoint.x) * alpha;
+                        HeadTrackingController.lastPoint.y += (targetY - HeadTrackingController.lastPoint.y) * alpha;
+                    }
+
+                    const x = Math.max(0, Math.min(window.innerWidth - 1, HeadTrackingController.lastPoint.x));
+                    const y = Math.max(0, Math.min(window.innerHeight - 1, HeadTrackingController.lastPoint.y));
+
+                    HeadTrackingController._showCursor(x, y);
+
+                    const moveEvent = new MouseEvent('mousemove', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window,
+                        clientX: x,
+                        clientY: y
+                    });
+                    window.dispatchEvent(moveEvent);
+                    const target = document.elementFromPoint(x, y);
+                    if (target) target.dispatchEvent(moveEvent);
+
+                    HeadTrackingController._handleBlinkClick(landmarks, x, y);
+                }
+            }
+
+            HeadTrackingController.rafId = requestAnimationFrame(tick);
+        };
+
+        HeadTrackingController.rafId = requestAnimationFrame(tick);
+    }
+
+    static _stopTracking() {
+        if (HeadTrackingController.rafId) {
+            cancelAnimationFrame(HeadTrackingController.rafId);
+            HeadTrackingController.rafId = null;
+        }
+
+        if (HeadTrackingController.stream) {
+            HeadTrackingController.stream.getTracks().forEach(t => t.stop());
+            HeadTrackingController.stream = null;
+        }
+
+        if (HeadTrackingController.video) {
+            HeadTrackingController.video.pause();
+            HeadTrackingController.video.srcObject = null;
+        }
+
+        HeadTrackingController.lastPoint = null;
+        HeadTrackingController.lastRawPoint = null;
+        HeadTrackingController.blinkState.isClosed = false;
+        HeadTrackingController._hideCursor();
+    }
+}
+
+// ============================================
 // RESPONSIBILITY: Cookie cleanup & clean reload
 // ============================================
 export class TranslationHelper {
@@ -602,9 +1277,14 @@ export class PreferencesController {
     /** Main initialisation — called on DOMContentLoaded */
     static async init() {
         // Step 1: Load & apply saved preferences
-        const saved = await PreferencesStore.get();
+        let saved = null;
+        try {
+            saved = await PreferencesStore.get();
+        } catch (e) {
+            console.error('Error loading preferences during init', e);
+        }
 
-        // Step 2: Render theme buttons
+        // Step 2: Render theme buttons (must run even if prefs load fails)
         ThemeRenderer.setPresets();
         ThemeRenderer.setCustom();
 
@@ -616,6 +1296,9 @@ export class PreferencesController {
 
         // Step 4: Set form values from saved prefs (or defaults)
         FormManager.set(saved || PreferencesConfig.SITE_DEFAULT);
+
+        // Step 4.5: Initialise camera-driven head-tracking cursor controls
+        HeadTrackingController.init();
 
         // Step 5: Login status hint
         if (PreferencesAPI.isLoggedIn) {
@@ -677,9 +1360,13 @@ export class PreferencesController {
 
             localStorage.removeItem(PreferencesConfig.LOCAL_STORAGE_KEY);
             localStorage.removeItem(PreferencesConfig.LOCAL_THEMES_KEY);
+            localStorage.removeItem(HeadTrackingController.STORAGE_KEY);
+            localStorage.removeItem(HeadCalibrationManager.STORAGE_KEY);
             localStorage.setItem('preferencesReset', 'true');
             PreferencesStore.cachedPrefs = null;
             PreferencesAPI.backendPrefsExist = false;
+
+            await HeadTrackingController.setEnabled(false);
 
             if (window.SitePreferences?.resetPreferences) {
                 window.SitePreferences.resetPreferences();
@@ -729,8 +1416,13 @@ export function initializePreferences(javaURI, fetchOptions) {
     // Initialize API config
     PreferencesAPI.init(javaURI, fetchOptions);
 
-    // Boot orchestrator on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', () => PreferencesController.init());
+    // Boot orchestrator — module scripts are deferred so DOMContentLoaded
+    // may have already fired by the time this runs. Handle both cases.
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        PreferencesController.init();
+    } else {
+        document.addEventListener('DOMContentLoaded', () => PreferencesController.init());
+    }
 
     // Expose global functions for compatibility
     window.loadPreferences = () => PreferencesStore.get();

@@ -1,6 +1,7 @@
 _site
 *.pyc
 __pycache__/
+_config.local.yml
 _posts/**/*_IPYNB_2_.md
 _posts/**/*_GithubIssue_.md
 _posts/**/*_GithubIssue.md
@@ -48,8 +49,18 @@ _docx/~$*
 _posts/**/*_csp.md
 _posts/**/*_csa.md
 _posts/**/*_csse.md
+
+# Project distributions (auto-generated from _projects/ source)
+_notebooks/projects/
+_posts/projects/
+assets/js/projects/
+images/projects/
+
+# Post generations
 _posts/**/*_cwgu.md
 _posts/**/*_content.md
+
+# Multiple formats of the same content (auto-generated)
 _notebooks/**/*_csp.ipynb
 _notebooks/**/*_csa.ipynb
 _notebooks/**/*_csse.ipynb
@@ -59,3 +70,6 @@ _notebooks/**/*_csa.md
 _notebooks/**/*_csse.md
 _notebooks/**/*_cwgu.md
 _notebooks/**/*_content.md
+
+# remove all the .scss cache files
+*.scssc

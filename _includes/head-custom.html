@@ -34,7 +34,7 @@
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {%- endif -%}
 
-{%- if page.jquery or page.grading -%}
+{%- if page.jquery or page.grading_modules -%}
 	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -67,5 +67,7 @@
 <script>window.baseurl = "{{ site.baseurl }}";</script>
 <script src="{{ site.baseurl }}/assets/js/keyboard-shortcuts.js" defer></script>
 
-<!-- AI A/B Test Engine SDK -->
-<script src="https://ai-ab-test-engine.vercel.app/sdk.js" data-project-id="cmnfour780000f63gu69kg2v8"></script>
+<!-- AI A/B Test Engine SDK (passes site.baseurl for asset resolution) -->
+<script src="http://localhost:3000/sdk.js"
+  data-site-baseurl="{{ site.baseurl }}"
+  data-project-id="cmnfour780000f63gu69kg2v8"></script>

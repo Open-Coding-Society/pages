@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Fantasy",
+    "src": "assessment-observatory-fantasy.png",
+    "description": "Assessment Observatory with fantasy elements",
+    "previewText": "Fantasy Assessment",
+    "compatibleSprites": ["Minimalist", "Fidelity Girl"]
+  },
+  {
+    "name": "City",
+    "src": "assessment-observatory-city.png",
+    "description": "Assessment Observatory with urban backdrop",
+    "previewText": "Urban Assessment",
+    "compatibleSprites": ["Chill Guy", "Miku"]
+  },
+  {
+    "name": "Space",
+    "src": "assessment-observatory-space.png",
+    "description": "Assessment Observatory in space",
+    "previewText": "Space Assessment",
+    "compatibleSprites": ["Astronaut", "Ufos", "Pew"]
+  },
+  {
+    "name": "Clouds",
+    "src": "assessment-observatory-clouds.png",
+    "description": "Assessment Observatory in the clouds",
+    "previewText": "Cloud Assessment",
+    "compatibleSprites": ["Kirby", "Slime"]
+  }
+]
