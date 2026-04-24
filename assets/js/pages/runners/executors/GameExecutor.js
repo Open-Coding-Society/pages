@@ -37,6 +37,11 @@ export class GameExecutor {
   }
 
   stop() {
+    if (this._transitionTimer) {
+      clearTimeout(this._transitionTimer);
+      this._transitionTimer = null;
+    }
+
     if (this.gameCore) {
       try {
         if (this.gameCore.destroy) {
@@ -89,7 +94,7 @@ export class GameExecutor {
     }
   }
 
-  populateLevelSelector(gameLevelClasses) {
+  populateLevelSelector(gameLevelClasses, preferredIndex = null) {
     if (!this.levelSelect) return;
 
     this.levelSelect.innerHTML = '<option value="">Select Level...</option>';
@@ -102,7 +107,10 @@ export class GameExecutor {
     }
 
     if (gameLevelClasses.length > 0) {
-      this.levelSelect.value = '0';
+      const fallbackIndex = 0;
+      const maxIndex = gameLevelClasses.length - 1;
+      const hasPreferred = Number.isInteger(preferredIndex) && preferredIndex >= 0 && preferredIndex <= maxIndex;
+      this.levelSelect.value = String(hasPreferred ? preferredIndex : fallbackIndex);
     }
     this.levelSelect.disabled = gameLevelClasses.length <= 1;
   }
@@ -113,17 +121,97 @@ export class GameExecutor {
     this.levelSelect.addEventListener('change', () => {
       if (this.gameControl && this.levelSelect.value !== '') {
         const levelIndex = parseInt(this.levelSelect.value, 10);
-        if (this.gameControl.transitionToLevel) {
-          this.gameControl.currentLevelIndex = levelIndex;
-          this.gameControl.transitionToLevel();
-          this.updateStatus('Switched to ' + this.levelSelect.options[this.levelSelect.selectedIndex].text);
-        }
+        const label = this.levelSelect.options[this.levelSelect.selectedIndex].text;
+        this._scheduleLevelTransition(levelIndex, label);
       }
     });
   }
 
+  /**
+   * Schedule level transition. Debounces rapid selector changes and performs a
+   * full teardown before handing off to transitionToLevel, ensuring in-flight
+   * async constructors from the previous level cannot inject objects into the
+   * new level's environment.
+   * @param {number} levelIndex - Zero-based index of the target level.
+   * @param {string} label - Display name shown in the status bar after switching.
+   * @private
+   */
+  _scheduleLevelTransition(levelIndex, label) {
+    // Cancel any previously scheduled transition so rapid changes collapse into one.
+    if (this._transitionTimer) {
+      clearTimeout(this._transitionTimer);
+      this._transitionTimer = null;
+    }
+
+    this.updateStatus('Loading...');
+    this.levelSelect.disabled = true;
+
+    this._transitionTimer = setTimeout(() => {
+      this._transitionTimer = null;
+
+      if (!this.gameControl?.transitionToLevel) {
+        this.levelSelect.disabled = false;
+        return;
+      }
+
+      // Force-destroy any game objects that survived the previous tear-down.
+      // This catches objects whose async constructors completed after destroy()
+      // was already called (e.g. image onload callbacks, ProfileManager promises).
+      try {
+        const env = this.gameControl.gameEnv || this.gameControl.currentLevel?.gameEnv;
+        if (env) {
+          const stale = env.gameObjects || [];
+          for (let i = stale.length - 1; i >= 0; i--) {
+            try { stale[i].destroy?.(); } catch (_) { /* ignore individual failures */ }
+          }
+          env.gameObjects = [];
+        }
+      } catch (e) {
+        console.warn('GameExecutor: pre-transition cleanup error', e);
+      }
+
+      // Purge any orphaned canvases from the container DOM that destroy() may
+      // have missed (e.g. canvas created after destroy was called).
+      const gameContainer = this.getGameContainer?.();
+      if (gameContainer) {
+        gameContainer.querySelectorAll('canvas').forEach(c => c.remove());
+      }
+
+      this.gameControl.currentLevelIndex = levelIndex;
+      this.gameControl.transitionToLevel();
+      this.levelSelect.disabled = false;
+      this.updateStatus('Switched to ' + label);
+    }, 250);
+  }
+
   async run() {
     try {
+      // Save both the index AND the actual class reference so we can find it
+      // in the freshly-imported gameLevelClasses after restart.  This handles
+      // dynamically-spliced levels (e.g. Code Hub inserted by Wayfinding World)
+      // whose original index no longer maps to the right class after a restart.
+      const preservedLevelClass = (() => {
+        const idx = this.gameControl?.currentLevelIndex;
+        const classes = this.gameControl?.levelClasses;
+        if (Number.isInteger(idx) && Array.isArray(classes) && idx >= 0 && idx < classes.length) {
+          return classes[idx];
+        }
+        return null;
+      })();
+
+      const preservedLevelIndex = (() => {
+        if (Number.isInteger(this.gameControl?.currentLevelIndex) && this.gameControl.currentLevelIndex >= 0) {
+          return this.gameControl.currentLevelIndex;
+        }
+
+        if (!this.levelSelect || this.levelSelect.value === '') {
+          return null;
+        }
+
+        const parsed = parseInt(this.levelSelect.value, 10);
+        return Number.isInteger(parsed) && parsed >= 0 ? parsed : null;
+      })();
+
       this.stop();
 
       let code = this.getCode();
@@ -186,10 +274,42 @@ export class GameExecutor {
           disableContainerAdjustment: true
         };
 
-        this.populateLevelSelector(gameLevelClasses);
+        this.populateLevelSelector(gameLevelClasses, preservedLevelIndex);
 
         this.gameCore = Game.main(environment, GameControl);
         this.gameControl = this.gameCore?.gameControl || null;
+
+        // Resolve the best level to restore to:
+        // 1. If the preserved class exists in the new level array, use its index there.
+        // 2. Otherwise (it was a dynamically-spliced level like Code Hub) fall back
+        //    to the last level in the permanent array that comes before it, so the
+        //    player lands at Wayfinding World / the hub rather than an unrelated level.
+        let resolvedLevelIndex = preservedLevelIndex;
+        if (preservedLevelClass && Array.isArray(gameLevelClasses)) {
+          const classIndex = gameLevelClasses.indexOf(preservedLevelClass);
+          if (classIndex >= 0) {
+            // Class found in the permanent array — restore directly.
+            resolvedLevelIndex = classIndex;
+          } else if (Number.isInteger(preservedLevelIndex)) {
+            // Dynamic level: clamp to the last valid index so we don't overshoot
+            // into an unrelated level (e.g. Mission Tools instead of Code Hub).
+            resolvedLevelIndex = Math.min(preservedLevelIndex, gameLevelClasses.length - 1);
+          }
+        }
+
+        if (
+          Number.isInteger(resolvedLevelIndex) &&
+          this.gameControl &&
+          Array.isArray(gameLevelClasses) &&
+          resolvedLevelIndex >= 0 &&
+          resolvedLevelIndex < gameLevelClasses.length &&
+          resolvedLevelIndex !== this.gameControl.currentLevelIndex &&
+          typeof this.gameControl.transitionToLevel === 'function'
+        ) {
+          this.gameControl.currentLevelIndex = resolvedLevelIndex;
+          this.gameControl.transitionToLevel();
+        }
+
         this.updateStatus('Running');
 
         this.gameStateMonitor = setInterval(() => {

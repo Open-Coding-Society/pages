@@ -1,8 +1,9 @@
 ---
+microblog: true
 toc: false
 layout: post
 title: Poway Neighborhood Emergency Corps
-permalink: /capstone/binary-beasts/
+permalink: /capstone/powaynec-showcase/
 sticky_rank: 1
 ---
 
