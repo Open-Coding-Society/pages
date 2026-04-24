@@ -1,106 +1,112 @@
-# Agent Programming Guidelines
+<!-- 
+NOTE: This file is written in Chinese because it is 30-40% more token-efficient and information-dense than English. 
+As AGENTS.md expands, this optimized format helps prevent the AI agent from experiencing context forgetting 
+while preserving all critical instructions. The agent must still communicate with the user in English. 
+-->
 
-## Core Principles
+# 智能体编程指南
 
-### Single Responsibility Principle (SRP)
-* Every function, class, and module should have one clear reason to change.
-* Avoid "god functions" that handle multiple concerns.
-* If you describe a function with "and", it likely violates SRP.
-* Prefer composition over large multi-purpose units.
+## 核心原则
 
-### Simplicity over Cleverness
-* Prefer readable code over "clever" abstractions.
-* Avoid premature optimization.
-* If a junior engineer can’t understand it in 30 seconds → simplify.
+### 单一职责原则
+* 每个函数、类和模块都应只有一个明确的修改原因。
+* 避免处理多重关注点的“上帝函数”。
+* 如果你在描述一个函数时使用了“和”，它很可能违反了单一职责原则。
+* 倾向于使用组合，而不是庞大的多用途单元。
 
-### Explicit Over Implicit
-* Make dependencies visible.
-* Avoid hidden state changes.
-* Avoid "magic behavior" (implicit globals, side effects).
-* Isolate I/O, network, and filesystem operations where possible.
+### 简单胜于精巧
+* 倾向于可读的代码，而不是“自作聪明”的抽象。
+* 避免过早优化。
+* 如果初级工程师无法在30秒内理解 → 请简化。
 
-## Architecture Rules
+### 显式胜于隐式
+* 让依赖关系可见。
+* 避免隐藏的状态变化。
+* 避免“魔法行为”（隐式全局变量、副作用）。
+* 尽可能隔离 I/O、网络和文件系统操作。
 
-### Separation of Concerns
-Split logic into clear layers:
-* UI / interface layer
-* Business logic layer
-* Data / persistence layer
-* Utility/helpers (pure functions)
-**Agent rule:** Never mix data access with business logic unless explicitly justified.
+## 架构规则
 
-### Feature-based Modularity
-* Prefer modular files over large monoliths.
-* Keep file sizes reasonable (soft rule: <300–500 lines).
-* Group by feature, not by type (often better for scaling systems).
-* Prefer modular monolith over microservices unless scale demands it.
+### 关注点分离
+将逻辑划分为清晰的层级：
+* UI / 接口层
+* 业务逻辑层
+* 数据 / 持久层
+* 工具 / 助手（纯函数）
+**智能体规则：** 除非有明确理由，否则绝不要将数据访问与业务逻辑混合。
 
-## System-Specific Rules
+### 基于功能的模块化
+* 倾向于模块化的文件，而不是大型单体文件。
+* 保持合理的文件大小（软规则：<300–500行）。
+* 按功能分组，而不是按类型分组（通常更适合系统扩展）。
+* 除非规模需要，否则优先选择模块化单体架构，而不是微服务。
 
-### Ecosystem & Tooling Defaults
-* **Prioritize SASS:** Use SASS (`.scss`) for styling instead of standard CSS or inline styles.
-* **Use `_projects`:** Leverage the modular project auto-registration system in the `_projects/` directory for new projects.
-* **System Expansion:** Work within the existing systems and expand them if needed, rather than creating completely new parallel architectures.
-* **Documentation:** Create detailed documentation for difficult or complex implementations as necessary.
-* **Commenting:** Add comments for non-trivial logic, but keep them minimal and focused on *why* rather than *what*.
-* **Ask Questions:** If system-level constraints, requirements, or patterns are unclear, pause and ask the user questions before proceeding.
+## 系统特定规则
 
-## Coding Standards
+### 生态系统与工具默认设置
+* **优先使用 SASS：** 使用 SASS (`.scss`) 进行样式设计，而不是标准 CSS 或内联样式。
+* **使用 `_projects`：** 利用 `_projects/` 目录中的模块化项目自动注册系统来创建新项目。
+* **系统扩展：** 在现有系统内工作并在需要时进行扩展，而不是创建全新的并行架构。
+* **文档：** 必要时为困难或复杂的实现创建详细文档。
+* **注释：** 为非平凡的逻辑添加注释，但要保持简短，重点关注“为什么”而不是“是什么”。
+* **提问：** 如果系统级约束、需求或模式不清楚，请在继续之前暂停并向用户提问。
 
-### Naming Conventions
-Names should:
-* Explain *intent*, not implementation.
-* Avoid abbreviations unless standard.
-* Be consistent across the codebase.
-* Example: Use `normalizeUserTransactionData()` instead of `procData2()`.
+## 编码标准
 
-### Error Handling
-* **Fail Fast:** Validate inputs early, raise errors immediately with clear messages, and don't silently ignore failures.
-* **Defensive Programming:** Assume inputs are invalid or malicious, add guards for edge cases, and never trust external data sources.
-* **Discipline:** Never swallow exceptions silently. Always include context in errors and use typed/custom errors where appropriate.
+### 命名规范
+命名应：
+* 解释**意图**，而不是实现。
+* 避免使用缩写，除非是标准缩写。
+* 在整个代码库中保持一致。
+* 示例：使用 `normalizeUserTransactionData()` 而不是 `procData2()`。
 
-### Logging Rules
-* Log meaningful events, not noise.
-* Logs should answer: *what happened and why?*
-* Avoid logging sensitive data.
+### 错误处理
+* **快速失败：** 尽早验证输入，立即抛出包含清晰信息的错误，不要默默忽略失败。
+* **防御性编程：** 假设输入无效或恶意，为边缘情况添加保护，绝不信任外部数据源。
+* **纪律：** 绝不默默吞没异常。在错误中始终包含上下文，并在适当的地方使用类型化/自定义错误。
 
-## Testing Rules
+### 日志记录规则
+* 记录有意义的事件，而不是噪音。
+* 日志应回答：**发生了什么以及为什么？**
+* 避免记录敏感数据。
 
-### Behavior-driven Tests
-* Tests should describe behavior, not implementation.
-* Every critical logic path should be testable.
-* Prefer unit tests for logic, integration tests for flows.
+## 测试规则
 
-### Critical Path Coverage Required
-* **Agent rule:** If code changes behavior, update or add tests.
-* Ensure deterministic behavior (avoid randomness unless explicitly required, fix seeds when needed).
+### 行为驱动测试
+* 测试应描述行为，而不是实现。
+* 每条关键逻辑路径都应可测试。
+* 逻辑优先使用单元测试，流程优先使用集成测试。
 
-## Agent Behavior Rules
+### 要求关键路径覆盖
+* **智能体规则：** 如果代码改变了行为，请更新或添加测试。
+* 确保确定性行为（除非明确需要，否则避免随机性，需要时固定种子）。
 
-### Plan Before Coding
-* For non-trivial tasks: write a short plan before coding.
-* Break into steps before implementation.
+## 智能体行为规则
 
-### Minimize Diffs
-* Prefer minimal diffs over refactors unless required.
-* Don’t rewrite working code without reason.
+### 编码前计划
+* 对于非平凡任务：在编码前写一个简短计划。
+* 在实现前将其分解为多个步骤。
 
-### Follow Existing Patterns
-* Match existing codebase style and structure.
-* Don’t introduce new architecture unless necessary.
-* **Verify Assumptions:** If unclear, infer cautiously and flag assumptions. Never silently guess critical requirements.
+### 最小化差异
+* 除非必要，否则优先考虑最小的差异，而不是重构。
+* 无故不要重写正在工作的代码。
 
-### Self-Updating and Continuous Learning
-* **Update this file:** As you iterate, make mistakes, and learn new system patterns or constraints, actively update `AGENTS.md` (and its optimized counterpart) with important notes so the system improves over time.
+### 遵循现有模式
+* 匹配现有代码库的风格和结构。
+* 除非必要，不要引入新架构。
+* **验证假设：** 如果不清楚，请谨慎推断并标记假设。绝不默默猜测关键需求。
 
-## Anti-Patterns
+### 自我更新与持续学习
+* **同步更新文档：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`，并确保同步更新 `AGENTS_MD_DOCUMENTATION.md`（英文说明版本），以便系统随时间不断改进。
 
-### God Functions
-* Avoid functions that do too many things. Stick to SRP.
+## 反模式
 
-### Hidden Side Effects
-* Ensure predictability by keeping side effects explicit and well-documented.
+### 上帝函数
+* 避免做太多事情的函数。坚持单一职责原则。
 
-### Over-engineering
-* **YAGNI (You Aren’t Gonna Need It):** Don’t build features unless required now. Avoid speculative generalization.
-* Optimize only after correctness is guaranteed (Profile before optimizing).
+### 隐藏的副作用
+* 通过保持明确且记录良好的副作用来确保可预测性。
+
+### 过度设计
+* **你需要它吗 (YAGNI)：** 除非现在需要，否则不要构建功能。避免推测性的泛化。
+* 仅在保证正确性后才进行优化（优化前进行性能分析）。
