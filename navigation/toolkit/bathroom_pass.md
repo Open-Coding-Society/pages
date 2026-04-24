@@ -7,6 +7,7 @@ permalink: /student/bathroom_pass
 <head>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 </head>
 
 <div class="max-w-7xl mx-auto px-4 py-8">
@@ -65,7 +66,7 @@ permalink: /student/bathroom_pass
                         </div>
                         <h2 class="text-2xl font-bold text-white mb-2">Ready to Scan</h2>
                         <p class="text-neutral-400 text-center max-w-xs mb-8">Position yourself clearly in front of the camera for identification.</p>
-                        <button onclick="startScanning()" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 flex items-center gap-3">
+                        <button id="initScannerBtn" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 flex items-center gap-3">
                             <span>Initialize Scanner</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
@@ -83,8 +84,8 @@ permalink: /student/bathroom_pass
                             </div>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="confirmIdentity()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all">Confirm</button>
-                            <button onclick="resetId()" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all">Not Me</button>
+                            <button id="confirmIdBtn" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all">Confirm</button>
+                            <button id="notMeBtn" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all">Not Me</button>
                         </div>
                     </div>
                 </div>
@@ -140,10 +141,10 @@ permalink: /student/bathroom_pass
                     <input type="text" id="emergencyName" placeholder="Enter student name manually..." 
                            class="flex-1 bg-neutral-950 border border-neutral-800 rounded-2xl px-6 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium">
                     <div class="flex gap-3">
-                        <button onclick="emergencyCheckIn()" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
+                        <button id="emergencyCheckInBtn" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
                             Check In
                         </button>
-                        <button onclick="emergencyCheckOut()" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
+                        <button id="emergencyCheckOutBtn" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
                             Check Out
                         </button>
                     </div>
@@ -161,6 +162,58 @@ permalink: /student/bathroom_pass
     let scanStream = null;
     let identifiedPerson = null;
     let isProcessing = false;
+    let faceMatcher = null;
+    let isFaceApiLoaded = false;
+
+    async function loadFaceData() {
+        showToast({ message: "Loading Face AI models...", duration: 3000 });
+        
+        try {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+            await Promise.all([
+                faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+            
+            showToast({ message: "Fetching student face data...", duration: 2000 });
+            const resp = await fetch(`${javaURI}/api/person/faces`, fetchOptions);
+            const faces = await resp.json();
+            console.log(`Fetched ${faces.length} faces from backend:`, faces);
+            
+            const labeledDescriptors = [];
+            for (const face of faces) {
+                if (!face.faceData) continue;
+                try {
+                    const img = new Image();
+                    img.src = `data:image/jpeg;base64,${face.faceData}`;
+                    await new Promise((resolve) => { img.onload = resolve; });
+                    
+                    const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+                    if (detection) {
+                        const label = String(face.name || face.uid || "Unknown");
+                        console.log(`Processing face for: ${label}`);
+                        labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [detection.descriptor]));
+                    } else {
+                        console.warn(`No face detected in stored image for: ${face.name || face.uid}`);
+                    }
+                } catch(e) {
+                    console.error("Failed to process face for", face.name, e);
+                }
+            }
+            
+            if (labeledDescriptors.length === 0) {
+                 showToast({ message: "No registered faces retrieved. Scanner will not work.", style: { background: "#ef4444" }, duration: 5000 });
+            } else {
+                 faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
+                 isFaceApiLoaded = true;
+                 showToast({ message: "Scanner Ready!", duration: 3000 });
+            }
+        } catch (err) {
+             console.error("Failed to initialize FaceAPI", err);
+             showToast({ message: "Face scanner initialization failed.", duration: 5000, style: { background: "#ef4444" } });
+        }
+    }
 
     // Fetch current user email on load
     async function initializeCurrentUser() {
@@ -206,63 +259,37 @@ permalink: /student/bathroom_pass
     }
 
     async function startIdentificationLoop() {
-        if (!scanStream || isProcessing) return;
+        if (!scanStream || !isFaceApiLoaded || identifiedPerson) {
+             if (!isFaceApiLoaded && scanStream && !identifiedPerson) {
+                 setTimeout(startIdentificationLoop, 1000);
+             }
+             return;
+        }
+        if (isProcessing) return;
         
+        isProcessing = true;
         const video = document.getElementById('scanVideo');
-        const canvas = document.getElementById('scanCanvas');
-        
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        
-        const base64Image = canvas.toDataURL('image/jpeg').split(',')[1];
-        
-        const threshold = document.getElementById('thresholdLimit').value;
-        
-        // Get JWT token from cookies (Spring token for backend calls)
-        const jwtToken = document.cookie.split(';').find(c => c.trim().startsWith('jwt_java_spring='))?.split('=')[1];
+        const threshold = parseFloat(document.getElementById('thresholdLimit').value);
         
         try {
-            const resp = await fetch(`${javaURI}/api/person/identify`, {
-                ...fetchOptions,
-                method: 'POST',
-                headers: {
-                    ...fetchOptions.headers,
-                    ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
-                },
-                body: JSON.stringify({ 
-                    image: base64Image,
-                    threshold: threshold
-                })
-            });
-
-            if (!resp.ok) {
-                console.error(`Face identify API returned ${resp.status}:`, resp.statusText);
-                const errorText = await resp.text();
-                console.error("Error response:", errorText);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-
-            let result;
-            try {
-                result = await resp.json();
-            } catch (parseErr) {
-                console.error("Failed to parse API response as JSON:", parseErr);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-            console.log("Identify result:", result);
-            
-            if (result.match) {
-                showIdentification(result.name);
-            } else {
-                setTimeout(startIdentificationLoop, 1000);
+            if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
+                const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                
+                if (detection) {
+                    const match = faceMatcher.findBestMatch(detection.descriptor);
+                    if (match.label !== 'unknown' && match.distance <= threshold) {
+                        showIdentification(match.label);
+                        isProcessing = false;
+                        return; // Wait for user action
+                    }
+                }
             }
         } catch (err) {
-            console.error("Identification error:", err);
-            setTimeout(startIdentificationLoop, 3000);
+            console.error("Identification loop error:", err);
         }
+        
+        isProcessing = false;
+        setTimeout(startIdentificationLoop, 500);
     }
 
     function showIdentification(name) {
@@ -485,8 +512,18 @@ permalink: /student/bathroom_pass
     window.emergencyCheckIn = emergencyCheckIn;
     window.emergencyCheckOut = emergencyCheckOut;
 
+    // Attach event listeners to buttons
+    document.getElementById('initScannerBtn')?.addEventListener('click', startScanning);
+    document.getElementById('confirmIdBtn')?.addEventListener('click', confirmIdentity);
+    document.getElementById('notMeBtn')?.addEventListener('click', resetId);
+    document.getElementById('emergencyCheckInBtn')?.addEventListener('click', emergencyCheckIn);
+    document.getElementById('emergencyCheckOutBtn')?.addEventListener('click', emergencyCheckOut);
+
     // Polling for queue updates
     initializeCurrentUser();
     setInterval(refreshQueue, 5000);
-    document.addEventListener('DOMContentLoaded', refreshQueue);
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshQueue();
+        loadFaceData();
+    });
 </script>

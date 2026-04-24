@@ -1,30 +1,37 @@
 # Friends of the Poway Library Capstone Infographic
 Title: "Friends of the Poway Library"
-Description: "Rebuilding the Friends of the Poway Library website to actually serve their community."
+Description: "A prototype redesign of the Friends of the Poway Library website, built to better serve their community."
 
 Topics:
   - title: "Friends of the Poway Library"
-    subtitle: "Nonprofit Website Redesign and Community Engagement Hub"
+    subtitle: "Rebuilding the Friends of the Poway Library website to make it modern, functional, and community-facing. Our goal is to give visitors a reason to return, with a live bookstore catalog, events, and interactive games."
     link: "/capstone/poway-library/"
     image: "capstone/poway_library.png"
     alt: "Friends of the Poway Library capstone project"
-    status: "Live"
+    status: "Prototype"
     team:
       - "Shayan Bhatti"
       - "Arnav Pallapotu"
       - "Tanay Paranjpe"
-    description: "The Friends of the Poway Library is a volunteer-run nonprofit that operates a used bookstore, funds library programs, and hosts 400+ events a year. Their old website had broken pages, no real content, and sent visitors away to find basic information. We rebuilt it from the ground up to reflect what this organization does, including a full donation flow so supporters can contribute directly through the site."
+    before:
+      - "No way to browse bookstore inventory online"
+      - "Events required visiting the county library site"
+      - "No way to donate directly through the site"
+      - "No games or interactive features to engage visitors"
+    after:
+      - "Full bookstore catalog with search and filtering"
+      - "Events calendar embedded directly on the site"
+      - "Donation flow in progress so supporters can give online"
+      - "Six library-themed games with profiles and leaderboards"
+      - "Clean, modern site that actually reflects the organization"
     keyPoints:
       - "Browse and search the bookstore catalog before you walk in"
-      - "Get personalized book recommendations based on your genre or mood"
       - "See upcoming library events without ever leaving the site"
       - "Read past newsletters and stay connected to the community"
       - "Explore the library's history through an interactive timeline"
       - "Six games that make the library fun and worth coming back to"
     impact:
-      - "Visitors can find books online before visiting the bookstore, driving more sales"
-      - "Events are on the site directly, no more sending people to the county library system"
-      - "AI recommendations connect readers to books they will actually enjoy"
+      - "Bookstore catalog online means visitors can plan purchases before they arrive"
+      - "Events live on the site so the community stays informed in one place"
       - "Six games give people a real reason to return to the site"
       - "A donation flow will let supporters contribute directly for the first time"
-      - "Volunteers and donors have a modern home online for the first time"
