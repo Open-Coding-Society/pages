@@ -445,11 +445,6 @@
       const ttsButton = document.getElementById('tts-button');
       // Ensure lessonContent is available, otherwise the TTS and Highlight features won't work
       const lessonContent = document.getElementById('lesson-content'); // IMPORTANT: This ID must match your main content div
-      const lessonStorageScope = {{ page.permalink | default: page.url | jsonify }} || window.location.pathname || 'global';
-      const userNotesStorageKey = `userNotes:${lessonStorageScope}`;
-      const lessonHighlightsStorageKey = `lessonHighlights:${lessonStorageScope}`;
-      const legacyUserNotesStorageKey = 'userNotes';
-      const legacyLessonHighlightsStorageKey = 'lessonHighlights';
 
       // --- TEXT-TO-SPEECH (TTS) ---
       ttsButton.addEventListener('mousedown', () => {
@@ -760,11 +755,11 @@
 
       // --- Local Storage Functions ---
       function saveNotes() {
-          localStorage.setItem(userNotesStorageKey, JSON.stringify(notesData));
+          localStorage.setItem('userNotes', JSON.stringify(notesData));
       }
 
       function loadNotes() {
-          const storedNotes = localStorage.getItem(userNotesStorageKey);
+          const storedNotes = localStorage.getItem('userNotes');
           if (storedNotes) {
               notesData = JSON.parse(storedNotes);
               renderNotesList();
@@ -774,11 +769,11 @@
       function saveHighlights() {
           // This saves the entire innerHTML of lessonContent after highlights are applied.
           // This is a simple approach but can have side effects if lessonContent changes outside of highlights.
-          localStorage.setItem(lessonHighlightsStorageKey, lessonContent.innerHTML);
+          localStorage.setItem('lessonHighlights', lessonContent.innerHTML);
       }
 
       function loadHighlights() {
-          const storedHighlights = localStorage.getItem(lessonHighlightsStorageKey);
+          const storedHighlights = localStorage.getItem('lessonHighlights');
           if (storedHighlights && lessonContent) {
               // Temporarily store current scroll position
               const scrollPosition = window.scrollY;
@@ -796,15 +791,6 @@
 
               // Restore scroll position
               window.scrollTo(0, scrollPosition);
-          }
-      }
-
-      function clearLegacyLessonStorage() {
-          try {
-              localStorage.removeItem(legacyUserNotesStorageKey);
-              localStorage.removeItem(legacyLessonHighlightsStorageKey);
-          } catch (error) {
-              console.warn('Unable to clear legacy lesson storage:', error);
           }
       }
 
@@ -1052,7 +1038,6 @@
       });
 
       // Initial loads
-      clearLegacyLessonStorage();
       loadHighlights(); // Load highlights first
       loadNotes(); // Then load notes, which will render them
       attachHighlightDeleteListeners(); // Ensure listeners are attached on page load
