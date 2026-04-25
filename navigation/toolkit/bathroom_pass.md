@@ -17,23 +17,8 @@ permalink: /student/bathroom_pass
             <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 tracking-tight mb-2">
                 BATHROOM PASS
             </h1>
-            <p class="text-neutral-400 font-medium">Scan your face to join the queue or check out.</p>
         </div>
         
-        <div class="flex items-center gap-6 bg-neutral-900/50 backdrop-blur-xl p-4 rounded-2xl border border-neutral-800 shadow-2xl">
-            <div class="text-center px-4 border-r border-neutral-800">
-                <span id="currentAway" class="block text-3xl font-bold text-indigo-400">0</span>
-                <span class="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Away</span>
-            </div>
-            <div class="text-center px-4">
-                <span id="maxCapacity" class="block text-3xl font-bold text-neutral-400">1</span>
-                <span class="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Limit</span>
-            </div>
-            <div id="statusIndicator" class="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span class="text-xs font-bold text-green-500 uppercase tracking-wider">Available</span>
-            </div>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -358,32 +343,8 @@ permalink: /student/bathroom_pass
     }
 
     function updateQueueUI(data) {
-        document.getElementById('currentAway').textContent = data.away;
-        document.getElementById('maxCapacity').textContent = data.maxOccupancy;
-        
         const list = document.getElementById('queueList');
         const total = document.getElementById('queueTotal');
-        const indicator = document.getElementById('statusIndicator');
-        const dot = indicator.querySelector('div');
-        const statusText = indicator.querySelector('span');
-
-        if (data.away >= data.maxOccupancy) {
-            indicator.classList.remove('bg-green-500/10', 'border-green-500/20');
-            indicator.classList.add('bg-red-500/10', 'border-red-500/20');
-            dot.classList.remove('bg-green-500');
-            dot.classList.add('bg-red-500');
-            statusText.textContent = "Full";
-            statusText.classList.remove('text-green-500');
-            statusText.classList.add('text-red-500');
-        } else {
-            indicator.classList.remove('bg-red-500/10', 'border-red-500/20');
-            indicator.classList.add('bg-green-500/10', 'border-green-500/20');
-            dot.classList.remove('bg-red-500');
-            dot.classList.add('bg-green-500');
-            statusText.textContent = "Available";
-            statusText.classList.remove('text-red-500');
-            statusText.classList.add('text-green-500');
-        }
 
         if (!data.peopleQueue) {
             list.innerHTML = `<p class="text-neutral-500 text-center py-8">Queue is empty</p>`;
