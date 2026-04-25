@@ -188,6 +188,146 @@ build-current: clean convert split-courses
 serve: serve-current
 build: build-current
 
+# Full clean Jekyll build — no notebook conversion, no project builds, no course splitting
+# Optional scope arg limits which _posts subdirectory is built:
+#   make scope csp   → only _posts/CSP
+#   make scope csa   → only _posts/CSA
+#   make scope csse  → only _posts/CSSE
+#   make scope all   → all _posts dirs (default)
+ifeq (scope,$(firstword $(MAKECMDGOALS)))
+  _CORE_SCOPE := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(if $(_CORE_SCOPE),$(eval $(_CORE_SCOPE):;@:))
+endif
+scope: bundle-install
+	$(eval _CORE_SCOPE := $(or $(_CORE_SCOPE),all))
+	@echo "Building core site (scope: $(_CORE_SCOPE))..."
+	@bundle exec jekyll clean
+	@SCOPE="$(_CORE_SCOPE)"; \
+	if [ "$$SCOPE" = "all" ]; then \
+		bundle exec jekyll build; \
+	else \
+		TARGET=$$(echo "$$SCOPE" | tr '[:lower:]' '[:upper:]'); \
+		if [ ! -d "_posts/$$TARGET" ]; then \
+			echo "❌ No _posts/$$TARGET directory found. Use: csp, csa, csse, all"; \
+			exit 1; \
+		fi; \
+		printf 'exclude:\n' > /tmp/_jekyll_core_scope.yml; \
+		find _posts -mindepth 1 -maxdepth 1 -type d | sort | while read dir; do \
+			base=$$(basename "$$dir"); \
+			if [ "$$base" != "$$TARGET" ]; then \
+				printf '  - _posts/%s\n' "$$base" >> /tmp/_jekyll_core_scope.yml; \
+			fi; \
+		done; \
+		bundle exec jekyll build --config _config.yml,/tmp/_jekyll_core_scope.yml; \
+		rm -f /tmp/_jekyll_core_scope.yml; \
+	fi
+	@echo "✓ Scope build complete ($(_CORE_SCOPE))"
+
+# Convert a notebook/docx and serve only that post.
+# Usage: make specific <filename>   e.g. make specific fault_tolerance.ipynb
+ifeq (specific,$(firstword $(MAKECMDGOALS)))
+  _SPECIFIC_TARGET := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(if $(_SPECIFIC_TARGET),$(eval $(_SPECIFIC_TARGET):;@:))
+endif
+specific: bundle-install
+	$(eval _SPECIFIC_TARGET := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS)))
+	@if [ -z "$(_SPECIFIC_TARGET)" ]; then \
+		echo "Usage: make specific <filename>"; \
+		exit 1; \
+	fi
+	@FOUND=$$(find . \
+		-not -path "./_site/*" \
+		-not -path "./.git/*" \
+		-not -path "./venv/*" \
+		-not -path "./_posts/*" \
+		\( -name "$(_SPECIFIC_TARGET)" -o -name "$(_SPECIFIC_TARGET).ipynb" -o -name "$(_SPECIFIC_TARGET).docx" \) \
+		2>/dev/null | head -1); \
+	if [ -n "$$FOUND" ]; then \
+		echo "Found: $$FOUND"; \
+		case "$$FOUND" in \
+			*.ipynb) $(MAKE) convert-single NOTEBOOK_FILE="$$FOUND" ;; \
+			*.docx)  $(MAKE) convert-docx-single DOCX_FILE="$$FOUND" ;; \
+			*)       echo "❌ Unsupported file type: $$FOUND"; exit 1 ;; \
+		esac; \
+	fi; \
+	BASE=$$(basename "$(_SPECIFIC_TARGET)" .ipynb); \
+	BASE=$$(basename "$$BASE" .docx); \
+	POST=$$(find _posts -name "*$$BASE*" 2>/dev/null | head -1); \
+	if [ -z "$$POST" ]; then \
+		echo "❌ Post not found in _posts: $$BASE"; \
+		exit 1; \
+	fi; \
+	POST_DIR=$$(dirname "$$POST"); \
+	printf 'exclude:\n' > /tmp/_jekyll_target.yml; \
+	while IFS= read -r d; do \
+		case "$$POST" in \
+			"$$d/"*) ;; \
+			*) printf '  - %s\n' "$$d" >> /tmp/_jekyll_target.yml ;; \
+		esac; \
+	done < <(find _posts -mindepth 1 -maxdepth 1 -type d | sort); \
+	while IFS= read -r f; do \
+		[ "$$f" != "$$POST" ] && printf '  - %s\n' "$$f" >> /tmp/_jekyll_target.yml; \
+	done < <(find "$$POST_DIR" -maxdepth 1 -name "*.md" -o -name "*.html" | sort); \
+	echo "Serving only: $$POST"; \
+	bundle exec jekyll serve -H $(HOST) -P $(PORT) --config _config.yml,/tmp/_jekyll_target.yml
+
+# Convert all notebooks listed in buildset.txt and serve only those posts.
+# Usage: make from-list
+from-list: bundle-install
+	@if [ ! -f buildset.txt ]; then \
+		echo "❌ buildset.txt not found"; exit 1; \
+	fi
+	@echo "--- Converting notebooks in buildset.txt ---"
+	@while IFS= read -r name || [ -n "$$name" ]; do \
+		[ -z "$$name" ] && continue; \
+		FOUND=$$(find . \
+			-not -path "./_site/*" \
+			-not -path "./.git/*" \
+			-not -path "./venv/*" \
+			-not -path "./_posts/*" \
+			\( -name "$$name" -o -name "$$name.ipynb" -o -name "$$name.docx" \) \
+			2>/dev/null | head -1); \
+		if [ -z "$$FOUND" ]; then \
+			echo "⚠  Source not found: $$name"; continue; \
+		fi; \
+		echo "Converting: $$FOUND"; \
+		case "$$FOUND" in \
+			*.ipynb) $(MAKE) convert-single NOTEBOOK_FILE="$$FOUND" ;; \
+			*.docx)  $(MAKE) convert-docx-single DOCX_FILE="$$FOUND" ;; \
+			*)       echo "⚠  Unsupported type: $$FOUND" ;; \
+		esac; \
+	done < buildset.txt
+	@rm -f /tmp/_jekyll_fromlist_posts.txt
+	@while IFS= read -r name || [ -n "$$name" ]; do \
+		[ -z "$$name" ] && continue; \
+		BASE=$$(basename "$$name" .ipynb); \
+		BASE=$$(basename "$$BASE" .docx); \
+		POST=$$(find _posts -name "*$$BASE*" 2>/dev/null | head -1); \
+		if [ -n "$$POST" ]; then \
+			echo "$$POST" >> /tmp/_jekyll_fromlist_posts.txt; \
+			echo "  ✓ $$POST"; \
+		else \
+			echo "  ⚠  No post found for: $$name"; \
+		fi; \
+	done < buildset.txt
+	@if [ ! -s /tmp/_jekyll_fromlist_posts.txt ]; then \
+		echo "❌ No posts resolved — aborting"; exit 1; \
+	fi
+	@printf 'exclude:\n' > /tmp/_jekyll_fromlist.yml
+	@find _posts -mindepth 1 -maxdepth 1 -type d | sort | while IFS= read -r dir; do \
+		if ! grep -q "^$$dir/" /tmp/_jekyll_fromlist_posts.txt 2>/dev/null; then \
+			printf '  - %s\n' "$$dir" >> /tmp/_jekyll_fromlist.yml; \
+		else \
+			find "$$dir" -maxdepth 1 \( -name "*.md" -o -name "*.html" \) | sort | while IFS= read -r f; do \
+				if ! grep -qF "$$f" /tmp/_jekyll_fromlist_posts.txt; then \
+					printf '  - %s\n' "$$f" >> /tmp/_jekyll_fromlist.yml; \
+				fi; \
+			done; \
+		fi; \
+	done
+	@echo "Serving: $$(tr '\n' ' ' < /tmp/_jekyll_fromlist_posts.txt)"
+	@bundle exec jekyll serve -H $(HOST) -P $(PORT) --config _config.yml,/tmp/_jekyll_fromlist.yml
+
 # Multi-course file splitting
 split-courses:
 	@echo " ------ Splitting multi-course files... -------"
@@ -419,6 +559,13 @@ help:
 	@echo "Server Commands:"
 	@echo "  make              - Full conversion, serve, and watch for file changes (auto-convert on save)"
 	@echo "  make dev          - Fast dev mode: clean start, no conversion, file watching, only convert files on save (quick)"
+	@echo "  make scope         - Clean Jekyll build, all _posts dirs (no notebook conversion, no projects)"
+	@echo "  make scope csp     - Same but only _posts/CSP"
+	@echo "  make scope csa     - Same but only _posts/CSA"
+	@echo "  make scope csse    - Same but only _posts/CSSE"
+	@echo "  make scope all     - Same but all _posts dirs (explicit)"
+	@echo "  make specific <file> - Convert a notebook/docx and serve only that post locally"
+	@echo "  make from-list       - Convert all notebooks in buildset.txt and serve only those posts"
 	@echo "  make serve        - Convert and serve (no auto-convert watching)"
 	@echo "  make build        - Convert and build _site/ for deployment (no server)"
 	@echo "  make stop         - Stop server and logging"
@@ -484,4 +631,4 @@ list-projects:
 		fi; \
 	done || echo "  None found"
 
-.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects
+.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects scope specific from-list
