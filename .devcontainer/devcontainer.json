@@ -1,0 +1,20 @@
+{
+  "name": "Pages Jekyll Site",
+  "image": "mcr.microsoft.com/devcontainers/ruby:3.2",
+  "postCreateCommand": "bundle install && pip3 install -r requirements.txt",
+  "forwardPorts": [4500],
+  "portsAttributes": {
+    "4500": {
+      "label": "Jekyll Site",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "yzhang.markdown-all-in-one",
+        "Shopify.theme-check-vscode"
+      ]
+    }
+  }
+}
