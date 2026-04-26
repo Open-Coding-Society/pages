@@ -36,6 +36,7 @@ constructor(options = {}) {
   this.voiceRate = options.voiceRate !== undefined ? options.voiceRate : 0.9;
   this.voicePitch = options.voicePitch !== undefined ? options.voicePitch : 1.0;
   this.voiceVolume = options.voiceVolume !== undefined ? options.voiceVolume : 1.0;
+  this.lifecycleSession = null;
    // Create the dialogue box
   this.createDialogueBox();
    // Keep track of whether the dialogue is currently open
@@ -298,6 +299,10 @@ createDialogueBox() {
   });
 }
 
+setLifecycleSession(session) {
+  this.lifecycleSession = session || null;
+}
+
 
 
 
@@ -445,11 +450,20 @@ showRandomDialogue(speaker = "", avatarSrc = null, spriteData = null) {
 // Close the dialogue box
 closeDialogue() {
   if (!this.isOpen) return;
+
+  if (this.lifecycleSession) {
+    this.lifecycleSession.cancel();
+    this.lifecycleSession = null;
+  }
+
    // Clear typewriter timeout
   if (this.typewriterTimeoutId) {
     clearTimeout(this.typewriterTimeoutId);
+    this.typewriterTimeoutId = null;
   }
-   // Leave speech running so queued lines can finish naturally.
+
+  DialogueSystem.flushSpeechQueue();
+
    // Hide the dialogue box
   this.dialogueBox.style.display = "none";
   this.isOpen = false;
@@ -477,42 +491,87 @@ closeDialogue() {
 
 
 
-// Check if dialogue is currently open
-isDialogueOpen() {
-  return this.isOpen;
-}
+/**
+ * Remove all DOM nodes injected by this DialogueSystem instance.
+ * Call this when the owning NPC or level is destroyed so elements
+ * do not persist in document.body across level transitions.
+ */
+destroy() {
+    // Close first so any pending typewriter/speech is cancelled cleanly.
+    if (this.isOpen) {
+      try { this.closeDialogue(); } catch (_) { /* ignore */ }
+    }
 
+    // Remove the dialogue box from document.body forcibly.
+    try {
+      if (this.dialogueBox) {
+        // Try parentNode removal first
+        if (this.dialogueBox.parentNode) {
+          this.dialogueBox.parentNode.removeChild(this.dialogueBox);
+        }
+        // If element is still in document, remove it directly
+        if (document.body.contains(this.dialogueBox)) {
+          document.body.removeChild(this.dialogueBox);
+        }
+      }
+    } catch (e) {
+      console.warn('DialogueSystem: error removing dialogueBox', e);
+    }
 
+    this.dialogueBox = null;
+    this.dialogueText = null;
+    this.closeBtn = null;
+    this.controlsRow = null;
+    this.actionButtonGroup = null;
 
+    // Remove the injected <style> animation block.
+    try {
+      const styleEl = document.getElementById('dialogue-animations-' + this.safeId);
+      if (styleEl) {
+        if (styleEl.parentNode) {
+          styleEl.parentNode.removeChild(styleEl);
+        } else if (document.head.contains(styleEl)) {
+          document.head.removeChild(styleEl);
+        }
+      }
+    } catch (e) {
+      console.warn('DialogueSystem: error removing style element', e);
+    }
+  }
 
-// Add buttons to the dialogue
-addButtons(buttons) {
+  // Check if dialogue is currently open
+  isDialogueOpen() {
+    return this.isOpen;
+  }
+
+  // Add buttons to the dialogue
+  addButtons(buttons) {
     if (!this.isOpen || !buttons || !Array.isArray(buttons) || buttons.length === 0 || !this.actionButtonGroup) return;
 
     this.actionButtonGroup.innerHTML = '';
   
     // Add each button
     buttons.forEach(button => {
-        if (!button || !button.text) return;
+      if (!button || !button.text) return;
       
-        const btn = document.createElement('button');
-        btn.textContent = button.text;
-        btn.className = button.primary ? 'primary-button' : 'secondary-button';
-        btn.style.padding = '8px 15px';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '5px';
-        btn.style.cursor = 'pointer';
+      const btn = document.createElement('button');
+      btn.textContent = button.text;
+      btn.className = button.primary ? 'primary-button' : 'secondary-button';
+      btn.style.padding = '8px 15px';
+      btn.style.border = 'none';
+      btn.style.borderRadius = '5px';
+      btn.style.cursor = 'pointer';
       
-        // Add click handler
-        btn.onclick = () => {
-            if (button.action && typeof button.action === 'function') {
-                button.action();
-            }
-        };
+      // Add click handler
+      btn.onclick = () => {
+        if (button.action && typeof button.action === 'function') {
+          button.action();
+        }
+      };
       
-        this.actionButtonGroup.appendChild(btn);
+      this.actionButtonGroup.appendChild(btn);
     });
-}
+  }
 }
 
 

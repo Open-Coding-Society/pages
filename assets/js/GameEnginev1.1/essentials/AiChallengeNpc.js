@@ -76,9 +76,9 @@ class AiChallengeNpc extends AiNpc {
    * @param {string} [knowledgeContext='']       - Optional context hint for backend.
    * @returns {Promise<string>} Raw AI response text.
    */
-  static async requestAiText(spriteData, prompt, sessionPrefix = 'challenge', knowledgeContext = '') {
+  static async requestAiText(spriteData, prompt, sessionPrefix = 'challenge', knowledgeContext = '', session = null) {
     const payload = AiChallengeNpc.buildPayload(spriteData, prompt, sessionPrefix, knowledgeContext);
-    const response = await AiChallengeNpc.postRequest(payload);
+    const response = await AiChallengeNpc.postRequest(payload, session);
     const data = await AiChallengeNpc.parseResponseData(response);
     return AiChallengeNpc.extractAiResponseText(data);
   }
@@ -99,11 +99,12 @@ class AiChallengeNpc extends AiNpc {
   /**
    * POST to the AI backend; throws a typed error on non-2xx responses.
    */
-  static async postRequest(payload) {
+  static async postRequest(payload, session = null) {
     const pythonURL = `${pythonURI}/api/ainpc/prompt`;
     const response = await fetch(pythonURL, {
       ...fetchOptions,
       method: 'POST',
+      signal: session?.signal,
       body: JSON.stringify(payload),
     });
 
@@ -196,9 +197,12 @@ class AiChallengeNpc extends AiNpc {
    *
    * @param {Object} npc - Live NPC game object.
    */
-  static showInteraction(npc) {
+  static showInteraction(npc, options = {}) {
     const data = npc?.spriteData;
     if (!data) return;
+    const statusMessage = options?.statusMessage !== undefined
+      ? options.statusMessage
+      : 'Generating challenge question…';
 
     // Close any already-open dialogue for this NPC.
     if (npc.dialogueSystem?.isDialogueOpen()) {
@@ -213,9 +217,14 @@ class AiChallengeNpc extends AiNpc {
       });
     }
 
+    const session = AiNpc.beginSession(npc);
+    if (npc.dialogueSystem?.setLifecycleSession) {
+      npc.dialogueSystem.setLifecycleSession(session);
+    }
+
     // Show the dialogue box using the NPC name / avatar but with a fixed
     // challenge-mode title rather than cycling through the dialogues array.
-    npc.dialogueSystem?.showRandomDialogue(data.id, data.src, data);
+    npc.dialogueSystem?.showRandomDialogue(data.id, null, data);
 
     // Build the shared AiNpc chat UI shell (input + response area).
     const ui = AiNpc.createChatUI(data);
@@ -238,14 +247,25 @@ class AiChallengeNpc extends AiNpc {
       ui.responseArea.style.flexDirection = 'column';
       ui.responseArea.style.gap = '6px';
       ui.responseArea.style.padding = '8px';
+      ui.responseArea.style.position = 'relative';
+      AiChallengeNpc.ensureModeLabel(ui.container, 'Challenge Question');
+      AiChallengeNpc.ensureJumpToLatestButton(ui.responseArea);
       AiChallengeNpc.renderChatHistory(ui.responseArea, data?.chatHistory || []);
-      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Generating challenge question…');
+      if (statusMessage) {
+        AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', statusMessage);
+      }
     }
 
     AiNpc.attachToDialogue(npc.dialogueSystem, ui.container);
 
     // Auto-focus once the DOM has settled.
-    setTimeout(() => ui.inputField?.focus(), 100);
+    if (session) {
+      session.setTimeout(() => {
+        if (AiNpc.canUseElement(ui.inputField, session)) ui.inputField.focus();
+      }, 100);
+    } else {
+      setTimeout(() => ui.inputField?.focus(), 100);
+    }
   }
 
   /**
@@ -275,6 +295,8 @@ class AiChallengeNpc extends AiNpc {
    * @param {string} questionText  - Generated question string.
    */
   static deliverQuestion(npc, questionText) {
+    if (!AiNpc.isSessionActive(npc?.aiSession)) return;
+
     // Re-enable input now that the question is ready.
     const ui = AiChallengeNpc.getUiElements(npc);
     if (ui?.input) ui.input.disabled = false;
@@ -289,6 +311,8 @@ class AiChallengeNpc extends AiNpc {
    * Inject a question string into the response area and update the input placeholder.
    */
   static renderQuestion(npc, questionText) {
+    if (!AiNpc.isSessionActive(npc?.aiSession)) return;
+
     const ui = AiChallengeNpc.getUiElements(npc);
     if (!ui) return;
 
@@ -300,6 +324,116 @@ class AiChallengeNpc extends AiNpc {
     if (ui.input) {
       ui.input.placeholder = 'Type your answer to the challenge question...';
     }
+  }
+
+  /**
+   * Restore an already-issued challenge question after the dialogue is reopened.
+   * This keeps the existing question on screen without generating a new one.
+   */
+  static restoreQuestion(npc, questionText) {
+    if (!AiNpc.isSessionActive(npc?.aiSession)) return;
+
+    const ui = AiChallengeNpc.getUiElements(npc);
+    if (!ui) return;
+
+    if (ui.input) {
+      ui.input.disabled = false;
+      ui.input.placeholder = 'Type your answer to the challenge question...';
+    }
+
+    if (ui.responseArea) {
+      ui.responseArea.style.display = 'block';
+      ui.responseArea.scrollTop = ui.responseArea.scrollHeight;
+      AiChallengeNpc.updateJumpToLatestVisibility(ui.responseArea);
+    }
+  }
+
+  /**
+   * Return the current challenge lock state stored on the live NPC object.
+   */
+  static getChallengeState(npc) {
+    return npc?._aiChallengeState || null;
+  }
+
+  /**
+   * Shared lock registry so pending questions survive object churn.
+   */
+  static getChallengeLocks() {
+    if (!AiChallengeNpc._challengeLocks) {
+      AiChallengeNpc._challengeLocks = new Map();
+    }
+    return AiChallengeNpc._challengeLocks;
+  }
+
+  /**
+   * Read the current pending challenge question for a desk, if any.
+   */
+  static getPendingChallengeQuestion(deskId = '') {
+    const key = (deskId || '').toString().trim();
+    if (!key) return '';
+    return (AiChallengeNpc.getChallengeLocks().get(key) || '').toString().trim();
+  }
+
+  /**
+   * Set or clear the pending challenge question lock for a desk.
+   */
+  static setPendingChallengeQuestion(deskId = '', questionText = '') {
+    const key = (deskId || '').toString().trim();
+    if (!key) return;
+
+    const value = (questionText || '').toString().trim();
+    const locks = AiChallengeNpc.getChallengeLocks();
+    if (!value) {
+      locks.delete(key);
+      return;
+    }
+    locks.set(key, value);
+  }
+
+  /**
+   * True when the NPC has an issued challenge question that has not been answered yet.
+   */
+  static hasPendingChallenge(npc, deskId = '') {
+    const lockedQuestion = AiChallengeNpc.getPendingChallengeQuestion(deskId);
+    if (lockedQuestion) return true;
+
+    const state = AiChallengeNpc.getChallengeState(npc);
+    if (!state?.question || state?.answeredAt) return false;
+    if (!deskId) return true;
+    return state.deskId === deskId;
+  }
+
+  /**
+   * Lock a freshly-issued challenge question on the NPC until a player submits an answer.
+   */
+  static setPendingChallenge(npc, deskId, questionText) {
+    if (!npc || !questionText) return;
+
+    AiChallengeNpc.setPendingChallengeQuestion(deskId, questionText);
+
+    npc._aiChallengeState = {
+      deskId: deskId || npc?.spriteData?.id || 'desk',
+      question: String(questionText),
+      issuedAt: Date.now(),
+      answeredAt: null,
+      lastAnswer: '',
+    };
+  }
+
+  /**
+   * Mark the current locked challenge as answered so reopening can generate a new one.
+   */
+  static markChallengeAnswered(npc, answerText = '') {
+    const state = AiChallengeNpc.getChallengeState(npc);
+    if (!npc || !state?.question || state?.answeredAt) return;
+
+    AiChallengeNpc.setPendingChallengeQuestion(state.deskId, '');
+
+    npc._aiChallengeState = {
+      ...state,
+      answeredAt: Date.now(),
+      lastAnswer: (answerText || '').toString(),
+    };
   }
 
   // ── Answer submission ───────────────────────────────────────────────────────
@@ -324,10 +458,11 @@ class AiChallengeNpc extends AiNpc {
       deskId,
       question: challengeQuestion,
       startedAt: Date.now(),
+      status: 'pending',
     });
 
     ui.input.value = '';
-    ui.input.placeholder = 'Type your answer, then press Enter to submit...';
+    ui.input.placeholder = 'Type your answer, or ask for a hint, then press Enter...';
 
     ui.input.onkeypress = (event) => {
       event.stopPropagation();
@@ -340,10 +475,138 @@ class AiChallengeNpc extends AiNpc {
         return;
       }
 
+      if (AiChallengeNpc.isChallengeFollowUpQuestion(answer)) {
+        AiChallengeNpc.handleChallengeFollowUpQuestion(npc, deskId, challengeQuestion, answer, ui, activeChallenges, npcId);
+        ui.input.value = '';
+        return;
+      }
+
       AiChallengeNpc.appendChatMessage(ui.responseArea, 'user', answer);
       const active = activeChallenges.get(npcId);
       onSubmit(answer, active, ui);
     };
+  }
+
+  /**
+   * Detect whether the input is a follow-up question rather than a challenge answer.
+   * This keeps players from accidentally submitting requests for hints as their answer.
+   */
+  static isChallengeFollowUpQuestion(text) {
+    const normalized = (text || '').trim().toLowerCase();
+    if (!normalized) return false;
+
+    if (normalized.includes('?')) return true;
+
+    return /^(what|why|how|when|where|who|which|can you|could you|would you|should i|please|hint|help|give me|tell me|explain)/i.test(normalized);
+  }
+
+  /**
+   * Answer a follow-up question without revealing the challenge answer.
+   * The active challenge remains open and the follow-up is not scored.
+   */
+  static async handleChallengeFollowUpQuestion(npc, deskId, challengeQuestion, followUpQuestion, ui, activeChallenges = null, npcId = '') {
+    const session = npc?.aiSession || null;
+    if (!npc?.spriteData || !ui?.responseArea || !AiNpc.canUseElement(ui.responseArea, session)) return;
+
+    AiChallengeNpc.appendChatMessage(ui.responseArea, 'user', followUpQuestion);
+    AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Thinking about a safe hint...');
+
+    const activeChallenge = activeChallenges?.get?.(npcId) || null;
+
+    try {
+      const prompt = AiChallengeNpc.buildFollowUpPrompt(
+        npc.spriteData,
+        challengeQuestion,
+        followUpQuestion,
+        activeChallenge,
+      );
+      const raw = await AiChallengeNpc.requestAiText(
+        npc.spriteData,
+        prompt,
+        'mission-challenge-followup',
+        'Mission Tools challenge follow-up assistance',
+        session,
+      );
+
+      if (!AiNpc.canUseElement(ui.responseArea, session)) return;
+
+      const safeReply = AiChallengeNpc.sanitizeFollowUpReply(raw);
+      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', safeReply);
+      if (npc?.dialogueSystem?.speakText) {
+        npc.dialogueSystem.speakText(safeReply);
+      }
+
+      if (Array.isArray(npc.spriteData.chatHistory)) {
+        npc.spriteData.chatHistory.push({ role: 'user', message: followUpQuestion, createdAt: Date.now() });
+        npc.spriteData.chatHistory.push({ role: 'ai', message: safeReply, createdAt: Date.now() });
+      }
+
+      AiChallengeNpc.updateJumpToLatestVisibility(ui.responseArea);
+    } catch (error) {
+      if (error?.name === 'AbortError' || session?.signal?.aborted) {
+        return;
+      }
+      console.warn(`[AiChallengeNpc] follow-up hint failed for ${deskId}:`, error);
+      const fallbackReply = 'I can give a hint, but I cannot reveal the full answer. Try focusing on the next step or the key concept the question is testing.';
+      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', fallbackReply);
+      if (npc?.dialogueSystem?.speakText) {
+        npc.dialogueSystem.speakText(fallbackReply);
+      }
+    }
+  }
+
+  /**
+   * Build a safe follow-up prompt that keeps the answer hidden.
+   */
+  static buildFollowUpPrompt(spriteData, challengeQuestion, followUpQuestion, activeChallenge = null) {
+    const expertise = spriteData?.expertise || 'general problem solving';
+    const deskName = spriteData?.id || 'Desk Guide';
+    const lastVerdict = activeChallenge?.lastEvaluation?.verdict || '';
+    const lastFeedback = activeChallenge?.lastEvaluation?.feedback || '';
+    const lastAnswer = activeChallenge?.lastAnswer || '';
+    const hasFeedback = Boolean(lastVerdict || lastFeedback);
+
+    const modeInstructions = hasFeedback
+      ? [
+          'The student already submitted an answer and received feedback.',
+          `Last student answer: ${lastAnswer || 'not recorded'}`,
+          `Last verdict: ${lastVerdict || 'not recorded'}`,
+          `Last feedback: ${lastFeedback || 'not recorded'}`,
+          'The student is asking why the feedback was given.',
+          'Explain the reasoning behind the verdict using the question and the student answer.',
+          'Do not re-grade the answer.',
+          'Do not change the verdict.',
+        ]
+      : [
+          'The student has not submitted an answer yet.',
+          'Answer as a hint or clarification only.',
+          'Do not reveal the full answer to the challenge question.',
+          'Do not say whether the student is correct.',
+          'Do not grade the answer.',
+          'If the student asks for the answer directly, refuse politely and offer a hint instead.',
+        ];
+
+    return [
+      `You are ${deskName} in a classroom coding game.`,
+      `Desk expertise: ${expertise}.`,
+      `Current challenge question: ${challengeQuestion}`,
+      `Student follow-up question: ${followUpQuestion}`,
+      ...modeInstructions,
+      'Respond with a short helpful explanation or hint depending on the current mode.',
+      'Keep the reply to 2 sentences maximum.',
+    ].join('\n\n');
+  }
+
+  /**
+   * Trim and constrain the AI follow-up response so it stays hint-like.
+   */
+  static sanitizeFollowUpReply(raw) {
+    const reply = (raw || '').toString().trim();
+    if (!reply) {
+      return 'Try narrowing your focus to the key concept in the question.';
+    }
+
+    return AiChallengeNpc.extractFirstLine(reply);
   }
 
   // ── Evaluation rendering ────────────────────────────────────────────────────
@@ -364,6 +627,7 @@ class AiChallengeNpc extends AiNpc {
     const feedback = evaluation?.feedback || 'No feedback provided.';
 
     responseArea.style.display = 'block';
+    AiChallengeNpc.ensureModeLabel(responseArea.parentElement, 'Feedback Q&A');
     AiChallengeNpc.appendChatMessage(responseArea, 'ai', `${icon} ${verdictLabel}: ${feedback}`);
   }
 
@@ -374,6 +638,7 @@ class AiChallengeNpc extends AiNpc {
   static renderChatHistory(responseArea, history) {
     if (!responseArea) return;
     responseArea.textContent = '';
+    AiChallengeNpc.ensureJumpToLatestButton(responseArea);
 
     history.forEach((entry) => {
       const role = entry?.role === 'user' ? 'user' : 'ai';
@@ -383,6 +648,7 @@ class AiChallengeNpc extends AiNpc {
     });
 
     responseArea.scrollTop = responseArea.scrollHeight;
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
   }
 
   /**
@@ -403,9 +669,107 @@ class AiChallengeNpc extends AiNpc {
     bubble.style.border = role === 'user' ? '1px solid rgba(76, 139, 245, 0.45)' : '1px solid rgba(255, 255, 255, 0.18)';
 
     responseArea.appendChild(bubble);
+    AiChallengeNpc.ensureJumpToLatestButton(responseArea);
     if (scrollToBottom) {
       responseArea.scrollTop = responseArea.scrollHeight;
     }
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Create a sticky jump control that appears when the user scrolls up.
+   */
+  static ensureJumpToLatestButton(responseArea) {
+    if (!responseArea) return;
+
+    if (!responseArea.dataset.jumpLatestBound) {
+      responseArea.dataset.jumpLatestBound = 'true';
+      responseArea.addEventListener('scroll', () => {
+        AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+      });
+    }
+
+    if (responseArea.querySelector('.ai-challenge-jump-latest')) {
+      return;
+    }
+
+    const jumpBtn = document.createElement('button');
+    jumpBtn.type = 'button';
+    jumpBtn.className = 'ai-challenge-jump-latest';
+    jumpBtn.textContent = 'Jump to latest';
+    jumpBtn.style.position = 'sticky';
+    jumpBtn.style.bottom = '0';
+    jumpBtn.style.alignSelf = 'center';
+    jumpBtn.style.margin = '4px auto 0';
+    jumpBtn.style.padding = '5px 10px';
+    jumpBtn.style.borderRadius = '999px';
+    jumpBtn.style.border = '1px solid rgba(255, 255, 255, 0.22)';
+    jumpBtn.style.background = 'rgba(12, 16, 24, 0.88)';
+    jumpBtn.style.color = '#f7f7f7';
+    jumpBtn.style.fontSize = '12px';
+    jumpBtn.style.cursor = 'pointer';
+    jumpBtn.style.zIndex = '2';
+    jumpBtn.style.display = 'none';
+
+    jumpBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      responseArea.scrollTop = responseArea.scrollHeight;
+      AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+    });
+
+    responseArea.appendChild(jumpBtn);
+    AiChallengeNpc.updateJumpToLatestVisibility(responseArea);
+  }
+
+  /**
+   * Ensure the chat panel has a small mode label above the response log.
+   */
+  static ensureModeLabel(container, text) {
+    if (!container) return;
+
+    let label = container.querySelector('.ai-challenge-mode-label');
+    if (!label) {
+      label = document.createElement('div');
+      label.className = 'ai-challenge-mode-label';
+      label.style.margin = '0 0 6px 0';
+      label.style.padding = '4px 8px';
+      label.style.borderRadius = '999px';
+      label.style.border = '1px solid rgba(255, 255, 255, 0.18)';
+      label.style.background = 'rgba(12, 16, 24, 0.72)';
+      label.style.color = '#f7f7f7';
+      label.style.fontSize = '12px';
+      label.style.fontWeight = '600';
+      label.style.letterSpacing = '0.02em';
+      label.style.width = 'fit-content';
+      label.style.maxWidth = '100%';
+
+      const responseArea = container.querySelector('.ai-npc-response-area');
+      if (responseArea && responseArea.parentNode === container) {
+        container.insertBefore(label, responseArea);
+      } else {
+        container.appendChild(label);
+      }
+    }
+
+    label.textContent = text;
+    return label;
+  }
+
+  /**
+   * Toggle jump button visibility based on distance from the bottom.
+   */
+  static updateJumpToLatestVisibility(responseArea) {
+    if (!responseArea) return;
+
+    const jumpBtn = responseArea.querySelector('.ai-challenge-jump-latest');
+    if (!jumpBtn) return;
+
+    const distanceFromBottom = Math.max(
+      0,
+      responseArea.scrollHeight - responseArea.clientHeight - responseArea.scrollTop
+    );
+
+    jumpBtn.style.display = distanceFromBottom > 24 ? 'inline-flex' : 'none';
   }
 
   /**

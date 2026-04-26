@@ -3,19 +3,28 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
 // Prompt templates for AI question generation and grading.
 const CHALLENGE_PROMPT_TEXT = {
   QUESTION_ROLE: 'You are {{deskName}} in a classroom coding game.',
   QUESTION_FOCUS: 'Generate exactly one challenge question focused on: {{expertise}}.',
-  QUESTION_CONCISE: 'Use the provided desk context and keep the question concise (max 30 words).',
+  QUESTION_CONCISE: 'Use the provided desk context and keep the question concise (max 18 words).',
   QUESTION_SHORT_ANSWER: 'The challenge should require a short written answer from a student.',
+  QUESTION_BEGINNER_LEVEL: 'Target absolute beginners. Ask only one simple idea per question.',
+  QUESTION_PLAIN_WORDS: 'Use plain words a beginner would understand. Avoid jargon unless it is a basic class term.',
+  QUESTION_NO_TRICKS: 'Do not ask trick, edge-case, multi-step, or comparison-heavy questions.',
+  QUESTION_ALLOWED_SHAPES: 'Use one of these easy formats: "What command...", "What is...", "Which file...", or "Why do we...".',
   QUESTION_FORMAT: 'Do not include explanation, rubric, markdown, numbering, or extra text.',
   QUESTION_TOPIC_HEADER: 'Desk topic examples:\n{{sampleTopics}}',
   QUESTION_VARIETY_HEADER: 'Question style options:\n{{questionStyles}}',
   QUESTION_RECENT_HEADER: 'Recently used questions to avoid repeating:\n{{recentQuestions}}',
   QUESTION_ANTI_REPEAT: 'Do not repeat or closely paraphrase any recent question. Prefer a fresh angle each time.',
   QUESTION_UNIQUE_STYLE: 'Choose a different question style than the recent examples when possible.',
+  QUESTION_ADVANCED_MODE: 'Mission scoreboard is 4/4. Switch to advanced mode and make the question noticeably harder.',
+  QUESTION_ADVANCED_FOCUS: 'Ask for deeper understanding, not just a memorized fact.',
+  QUESTION_ADVANCED_RULES: 'Use a question that may combine two related ideas, require a comparison, or ask for a troubleshooting choice.',
+  QUESTION_ADVANCED_KEEP_SHORT: 'Keep the question concise, but more challenging than the earlier desk questions.',
 
   EVAL_ROLE: 'You are grading a student answer for {{deskName}}.',
   EVAL_EXPERTISE: 'Desk expertise: {{expertise}}.',
@@ -30,22 +39,25 @@ const CHALLENGE_PROMPT_TEXT = {
 
 
 const CHALLENGE_QUESTION_STYLES = [
-  'Ask for a definition in the desk topic area.',
-  'Ask for the best next step in a scenario.',
-  'Ask the student to compare two options.',
-  'Ask which tool, command, or process fits best.',
-  'Ask for a debugging or troubleshooting step.',
-  'Ask for a short explanation of why something works.',
-  'Ask the student to order steps in the correct sequence.',
-  'Ask what would happen if one part changed.',
-  'Ask for a practical example from the topic.',
-  'Ask the student to identify the most important concept.',
-  'Ask how to avoid a common mistake in the topic.',
-  'Ask for a simple decision between two approaches.',
-  'Ask for a real-world use case.',
-  'Ask for a short scenario response that needs a concise answer.',
-  'Ask for a best-practice recommendation.',
-  'Ask for a quick cause-and-effect explanation.',
+  'Ask for one basic command the student should memorize.',
+  'Ask what a single beginner term means.',
+  'Ask which file, tool, or button to use first.',
+  'Ask for one simple reason we do a basic step.',
+  'Ask for one short safety or setup check.',
+  'Ask for one small action before running code.',
+  'Ask for one clear yes/no understanding check with a short explanation.',
+  'Ask for one beginner-friendly definition using simple words.',
+];
+
+const CHALLENGE_ADVANCED_QUESTION_STYLES = [
+  'Ask for a two-step explanation that connects a command or concept to a result.',
+  'Ask which option is better and why, using one concrete reason.',
+  'Ask for a small troubleshooting decision with a likely fix.',
+  'Ask for a more specific command, file, or setting and what it changes.',
+  'Ask for a brief compare-and-contrast between two related terms.',
+  'Ask for one practical workflow step plus a short reason it matters.',
+  'Ask a scenario question that needs the student to choose the correct action.',
+  'Ask for a short explanation that uses at least two key terms correctly.',
 ];
 
 const CHALLENGE_RECENT_HISTORY_LIMIT = 12;
@@ -141,6 +153,37 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
     let { width, height, path } = this.getLevelDimensions();
 
+    this.profilePanelView = new StatusPanel({
+      id: 'csse-mission-panel',
+      title: 'MISSION TOOLS',
+      fields: [
+        { key: 'desk1', label: 'Workbench 1', emptyValue: '—' },
+        { key: 'desk2', label: 'Workbench 2', emptyValue: '—' },
+        { key: 'desk3', label: 'Workbench 3', emptyValue: '—' },
+        { key: 'desk4', label: 'Workbench 4', emptyValue: '—' },
+      ],
+      theme: {
+        background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
+        borderColor: 'var(--ocs-game-accent, #4ecca3)',
+        textColor: 'var(--ocs-game-text, #e0e0e0)',
+        accentColor: 'var(--ocs-game-accent, #4ecca3)',
+        secondaryButtonBackground: 'var(--ocs-game-surface-alt, #1a1a2e)',
+        secondaryButtonTextColor: 'var(--ocs-game-text, #e0e0e0)',
+      },
+      position: { top: '16px', left: '16px' },
+      width: '260px',
+      padding: '12px 14px',
+      zIndex: '10000',
+      fontFamily: '"Courier New", monospace',
+    });
+    this.profilePanelView.render();
+    this.profilePanelView.update({
+      desk1: '—',
+      desk2: '—',
+      desk3: '—',
+      desk4: '—',
+    });
+
     /**
      * Section: Level objects.
      */
@@ -222,6 +265,28 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
 
     // Desk knowledge base and expertise are defined at the top of the file in DESK_AI_KNOWLEDGE_BASE.
+    const deskDialoguePool = {
+      'The Admin': [
+        'Kernel check complete. Toolchain status: await your command.',
+        'Before heroes code, they configure. Show me your terminal wisdom.',
+        'Permissions granted. Your mission begins where setup meets precision.',
+      ],
+      'The Archivist': [
+        'Every great build starts with organized files and clean history.',
+        'I guard naming, structure, and version trails. Can you keep order?',
+        'Chaos hides in bad folders. Bring me a tidy answer.',
+      ],
+      'The SDLC Master': [
+        'Small commits. Fast feedback. Strong systems. Prove you know the rhythm.',
+        'Plan, build, test, integrate. Tell me where discipline lives in code.',
+        'A product is forged in iteration, not luck. Ready for your trial?',
+      ],
+      'The Scrum Master': [
+        'A team without cadence drifts. Show me you can steer a sprint.',
+        'Backlog to done is a story of focus. What chapter comes next?',
+        'Standup brief. Retrospective honest. Planning sharp. Your turn.',
+      ],
+    };
 
     const createHiddenMissionDesk = ({ id, position, zonePrompt }) => ({
       zoneMessage: `${id}: ${zonePrompt}`,
@@ -239,8 +304,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       hitbox: { widthPercentage: 0.35, heightPercentage: 0.35 },
       alertDistance: 0.30,
       dialogues: [
-        `${id} channel online.`,
-        'Ask your mission question and I will guide you.',
+        `${id} online. Challenge protocols ready.`,
+        ...(deskDialoguePool[id] || ['Prove yourself by answering my challenge question.']),
       ],
       expertise: DESK_AI_KNOWLEDGE_BASE[id]?.expertise || '',
       chatHistory: [],
@@ -327,6 +392,15 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     if (!npc?.spriteData?.id) return;
 
     const npcId = npc.spriteData.id;
+    const historyPendingQuestion = this._getPendingQuestionFromChatHistory(npc);
+    const activeChallenge = this._activeDeskChallenges.get(npcId) || null;
+    const lockedQuestion = AiChallengeNpc.getPendingChallengeQuestion(deskId);
+    const stateQuestion = (AiChallengeNpc.getChallengeState(npc)?.question || '').toString().trim();
+    const hasPendingChallenge = Boolean(historyPendingQuestion || lockedQuestion) || AiChallengeNpc.hasPendingChallenge(npc, deskId) || (
+      Boolean(activeChallenge?.question) &&
+      !activeChallenge?.completedAt &&
+      activeChallenge?.lastEvaluation?.verdict !== CHALLENGE_VERDICTS.RIGHT
+    );
     // Orchestrator: open UI, generate one question, then arm answer submission.
     await this._runBusyTask({
       busySet: this._deskChallengeBusy,
@@ -334,11 +408,23 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       busyMessage: `${deskId}: challenge is already loading.`,
       task: async () => {
         try {
-          this.showToast?.(`${deskId}: challenge channel opened.`);
-          AiChallengeNpc.showInteraction(npc);
-          const challengeQuestion = await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData));
-          this._appendDeskChatMessage(npc, 'ai', `Challenge Question: ${challengeQuestion}`);
-          AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
+          this.showToast?.(hasPendingChallenge ? `${deskId}: resuming your current challenge.` : `${deskId}: challenge channel opened.`);
+          AiChallengeNpc.showInteraction(npc, {
+            statusMessage: hasPendingChallenge ? null : 'Generating challenge question…',
+          });
+
+          const challengeQuestion = hasPendingChallenge
+            ? (historyPendingQuestion || lockedQuestion || stateQuestion || activeChallenge?.question)
+            : await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData, npc?.aiSession || null));
+
+          if (hasPendingChallenge) {
+            AiChallengeNpc.restoreQuestion(npc, challengeQuestion);
+          } else {
+            AiChallengeNpc.setPendingChallenge(npc, deskId, challengeQuestion);
+            this._appendDeskChatMessage(npc, 'ai', `Challenge Question: ${challengeQuestion}`);
+            AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
+          }
+
           AiChallengeNpc.armSubmission(
             npc, deskId, challengeQuestion, this._activeDeskChallenges,
             (answer, active, ui) => this._submitChallengeAnswer(npc, npcId, answer, active, ui),
@@ -421,12 +507,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * to avoid repeating a question already seen this session.
    * @private
    */
-  async _loadDeskChallengeQuestion(spriteData) {
+  async _loadDeskChallengeQuestion(spriteData, session = null) {
     let lastQuestion = '';
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
       const prompt = this._buildChallengePrompt(spriteData);
-      const raw = await this._requestChallengeAiText(spriteData, prompt);
+      const raw = await this._requestChallengeAiText(spriteData, prompt, session);
       const question = AiChallengeNpc.extractFirstLine(raw);
       lastQuestion = question;
 
@@ -445,9 +531,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * then parses the graded verdict and feedback.
    * @private
    */
-  async _loadChallengeEvaluation(spriteData, question, answer) {
+  async _loadChallengeEvaluation(spriteData, question, answer, session = null) {
     const prompt = this._buildChallengeEvaluationPrompt(spriteData, question, answer);
-    const raw = await this._requestChallengeAiText(spriteData, prompt);
+    const raw = await this._requestChallengeAiText(spriteData, prompt, session);
     return this._parseChallengeEvaluation(raw);
   }
 
@@ -455,8 +541,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * Request AI text. Routes the prompt through AiChallengeNpc.
    * @private
    */
-  async _requestChallengeAiText(spriteData, prompt) {
-    return AiChallengeNpc.requestAiText(spriteData, prompt, 'mission-challenge', 'Mission Tools challenge generation');
+  async _requestChallengeAiText(spriteData, prompt, session = null) {
+    return AiChallengeNpc.requestAiText(spriteData, prompt, 'mission-challenge', 'Mission Tools challenge generation', session);
   }
 
   /**
@@ -550,6 +636,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   _buildChallengePrompt(spriteData) {
     const expertise = spriteData?.expertise || 'general problem solving';
     const deskName = spriteData?.id || 'Desk Guide';
+    const advancedMode = (this._missionProgressCount || 0) >= 4;
     const sampleTopics = (spriteData?.knowledgeBase?.[deskName]?.questions || [])
       .slice(0, 8)
       .map((topic) => `- ${topic.question}`)
@@ -558,18 +645,23 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       .slice(-CHALLENGE_RECENT_HISTORY_LIMIT)
       .map((question) => `- ${question}`)
       .join('\n');
-    const questionStyles = CHALLENGE_QUESTION_STYLES
+    const questionStyles = (advancedMode ? CHALLENGE_ADVANCED_QUESTION_STYLES : CHALLENGE_QUESTION_STYLES)
       .map((style, index) => `${index + 1}. ${style}`)
       .join('\n');
 
     return [
       CHALLENGE_PROMPT_TEXT.QUESTION_ROLE.replace('{{deskName}}', deskName),
       CHALLENGE_PROMPT_TEXT.QUESTION_FOCUS.replace('{{expertise}}', expertise),
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_MODE : CHALLENGE_PROMPT_TEXT.QUESTION_BEGINNER_LEVEL,
       CHALLENGE_PROMPT_TEXT.QUESTION_CONCISE,
       CHALLENGE_PROMPT_TEXT.QUESTION_SHORT_ANSWER,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_FOCUS : CHALLENGE_PROMPT_TEXT.QUESTION_PLAIN_WORDS,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_RULES : CHALLENGE_PROMPT_TEXT.QUESTION_NO_TRICKS,
+      CHALLENGE_PROMPT_TEXT.QUESTION_ALLOWED_SHAPES,
       CHALLENGE_PROMPT_TEXT.QUESTION_FORMAT,
       CHALLENGE_PROMPT_TEXT.QUESTION_ANTI_REPEAT,
       CHALLENGE_PROMPT_TEXT.QUESTION_UNIQUE_STYLE,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_KEEP_SHORT : '',
       CHALLENGE_PROMPT_TEXT.QUESTION_VARIETY_HEADER.replace('{{questionStyles}}', questionStyles),
       recentQuestions ? CHALLENGE_PROMPT_TEXT.QUESTION_RECENT_HEADER.replace('{{recentQuestions}}', recentQuestions) : '',
       sampleTopics ? CHALLENGE_PROMPT_TEXT.QUESTION_TOPIC_HEADER.replace('{{sampleTopics}}', sampleTopics) : '',
@@ -607,12 +699,41 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
+   * Return the most recent unresolved challenge question from transcript history.
+   * A question is unresolved when no Result line appears after it.
+   * @private
+   */
+  _getPendingQuestionFromChatHistory(npc) {
+    const history = npc?.spriteData?.chatHistory;
+    if (!Array.isArray(history) || history.length === 0) return '';
+
+    let pending = '';
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      const entry = history[i];
+      const message = (entry?.message || '').toString().trim();
+      if (!message) continue;
+
+      if (/^Result\s*:/i.test(message)) {
+        return '';
+      }
+
+      if (/^Challenge Question\s*:/i.test(message)) {
+        pending = message.replace(/^Challenge Question\s*:\s*/i, '').trim();
+        break;
+      }
+    }
+
+    return pending;
+  }
+
+  /**
    * Submit answer. Evaluates the student answer, renders feedback, speaks
    * the result, and awards progress if correct. Called via onSubmit callback.
    * @private
    */
   async _submitChallengeAnswer(npc, npcId, answer, active, ui) {
     if (!active?.question) return;
+    AiChallengeNpc.markChallengeAnswered(npc, answer);
     this._appendDeskChatMessage(npc, 'user', answer);
 
     await this._runBusyTask({
@@ -623,16 +744,23 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         try {
           ui.input.value = '';
           const evaluation = await this._runWithLoading(() =>
-            this._loadChallengeEvaluation(npc?.spriteData, active.question, answer)
+            this._loadChallengeEvaluation(npc?.spriteData, active.question, answer, npc?.aiSession || null)
           );
           AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, evaluation);
           AiChallengeNpc.speakEvaluation(npc, evaluation);
+          active.lastAnswer = answer;
+          active.lastEvaluation = evaluation || {
+            verdict: CHALLENGE_VERDICTS.WRONG,
+            feedback: 'No feedback provided.',
+          };
           this._appendDeskChatMessage(
             npc,
             'ai',
             `Result: ${evaluation?.verdict || CHALLENGE_VERDICTS.WRONG}. ${evaluation?.feedback || 'No feedback provided.'}`
           );
           if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
+            active.status = 'completed';
+            active.completedAt = Date.now();
             this._awardMissionProgress(active?.deskId || '');
           }
           this._logChallengeEvent({
@@ -645,6 +773,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           });
         } catch (error) {
           console.warn('[MissionTools] challenge answer evaluation failed:', error);
+          active.lastAnswer = answer;
+          active.lastEvaluation = {
+            verdict: CHALLENGE_VERDICTS.WRONG,
+            feedback: 'Could not evaluate right now. Please try submitting again.',
+          };
           this._appendDeskChatMessage(
             npc,
             'ai',
