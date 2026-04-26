@@ -1,8 +1,8 @@
-import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '../../../GameEnginev1.1/essentials/Player.js';
-import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
-import Barrier from '../../../GameEnginev1.1/essentials/Barrier.js';
-import Collectible from '../../../GameEnginev1.1/essentials/Collectible.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
 
 console.log('GameLevelSeek.js loaded:', new Date().toISOString());
 

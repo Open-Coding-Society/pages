@@ -10,12 +10,12 @@
 // 3) Ensure images exist and paths resolve via 'path' provided by the engine.
 // 4) You can add more objects to this.classes inside the constructor.
 
-import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '../../../GameEnginev1.1/essentials/Player.js';
-import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
-import Barrier from '../../../GameEnginev1.1/essentials/Barrier.js';
-import Collectible from '../../../GameEnginev1.1/essentials/Collectible.js';
-import AiNpc from '../../../GameEnginev1.1/essentials/AiNpc.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
+import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
 
 class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
