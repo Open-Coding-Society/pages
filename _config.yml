@@ -15,6 +15,7 @@
 #   in _config.yml. It will appear in your document head meta (for Google search
 #   results) and in your feed.xml site description.
 
+title: Open Coding 
 description: "Class of 2026"
 owner_name: Open Coding Society 
 github_username: open-coding-society 
@@ -128,5 +129,3 @@ minima:
     - navigation/blog.md
     - navigation/courses.md
     - navigation/search.md
-
-gemini_api_key: AIzaSyBWEz5qHeWx5buC4I4dZ2fllaMk3z8k_-w
