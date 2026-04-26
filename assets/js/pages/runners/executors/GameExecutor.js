@@ -237,13 +237,24 @@ export class GameExecutor {
       const selectedVersion = this.engineVersionSelect ? this.engineVersionSelect.value : 'GameEnginev1';
 
       code = code.replace(/GameEnginev1(?:\.1)?/g, selectedVersion);
-      code = code.replace(/from\s+['"](\/?[^'"]+)['"]/g, (match, importPath) => {
+      code = code.replace(/from\s+['"]([^'"]+)['"]/g, (match, importPath) => {
+        // Keep import-map aliases, relative paths, and explicit schemes untouched.
+        if (
+          importPath.startsWith('@') ||
+          importPath.startsWith('./') ||
+          importPath.startsWith('../') ||
+          /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(importPath)
+        ) {
+          return match;
+        }
+
         if (importPath.startsWith('/')) {
           return `from '${baseUrl}${importPath}'`;
         } else if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
           return `from '${baseUrl}/${importPath}'`;
         }
-        return match;
+
+        return `from '${baseUrl}/${importPath}'`;
       });
 
       const GameModule = await import(baseUrl + '/assets/js/' + selectedVersion + '/essentials/Game.js');
@@ -301,12 +312,12 @@ export class GameExecutor {
           Number.isInteger(resolvedLevelIndex) &&
           this.gameControl &&
           Array.isArray(gameLevelClasses) &&
-          resolvedLevelIndex >= 0 &&
-          resolvedLevelIndex < gameLevelClasses.length &&
-          resolvedLevelIndex !== this.gameControl.currentLevelIndex &&
+          preservedLevelIndex >= 0 &&
+          preservedLevelIndex < gameLevelClasses.length &&
+          preservedLevelIndex !== this.gameControl.currentLevelIndex &&
           typeof this.gameControl.transitionToLevel === 'function'
         ) {
-          this.gameControl.currentLevelIndex = resolvedLevelIndex;
+          this.gameControl.currentLevelIndex = preservedLevelIndex;
           this.gameControl.transitionToLevel();
         }
 
