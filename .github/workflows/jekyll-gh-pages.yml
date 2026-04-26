@@ -42,10 +42,46 @@ jobs:
           python -m venv venv  # Create virtual environment
           source venv/bin/activate  # Activate the virtual environment
           pip install -r requirements.txt  # Install Python packages
-      - name: Execute conversion script
+
+      - name: Build registered projects
+        run: |
+          make build-registered-projects  # Distribute all registered project files to Jekyll locations
+          make build-registered-docs  # Distribute all registered documentation files to Jekyll locations  
+
+      - name: Verify registered docs output
+        run: |
+          if [ -d "_posts/projects" ]; then
+            DOC_COUNT=$(find _posts/projects -type f -name '*.md' | wc -l | tr -d ' ')
+            echo "Registered project docs found: ${DOC_COUNT}"
+            if [ "${DOC_COUNT}" -gt 0 ]; then
+              echo "Sample generated docs:"
+              find _posts/projects -type f -name '*.md' | sort | head -20
+            else
+              echo "No markdown docs found under _posts/projects"
+            fi
+          else
+            echo "_posts/projects directory not found"
+          fi
+
+      - name: Execute notebook conversion script
         run: |
           source venv/bin/activate  # Activate virtual environment
-          python scripts/convert_notebooks.py  # Run your Python script
+          python scripts/convert_notebooks.py  # Run notebook conversion
+          
+      - name: Execute DOCX conversion script
+        run: |
+          source venv/bin/activate  # Activate virtual environment
+          if [ -d "_docx" ] && [ "$(ls -A _docx 2>/dev/null)" ]; then
+            echo "Converting DOCX files..."
+            python scripts/convert_docx.py  # Run DOCX conversion
+          else
+            echo "No DOCX files found, skipping conversion"
+          fi
+
+      - name: Split multi-course files
+        run: |
+          source venv/bin/activate  # Activate virtual environment
+          python scripts/split_multi_course_files.py  # Run course splitting
       - name: Build with Jekyll
         run: |
           bundle exec jekyll build  # Build your Jekyll site
@@ -55,7 +91,7 @@ jobs:
   # Deployment job
   deploy:
     environment:
-      name: github-pages
+      name: github-pages-deployment
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
