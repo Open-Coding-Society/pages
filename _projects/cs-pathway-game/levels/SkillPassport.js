@@ -34,12 +34,20 @@ export default class SkillPassport {
    * Fetches the current user's skill snapshots from the backend,
    * then hands them off to _render() to build the modal.
    */
-  async start() {
-    const resp = await fetch(`${this.pythonURI}/api/user/skill-snapshot`, this.fetchOptions);
-    const snapshots = await resp.json();
-    this._render(snapshots);
+async start() {
+  try {
+    const resp = await fetch(`${this.pythonURI}/api/user/skill-passport`, this.fetchOptions);
+    if (!resp.ok) throw new Error(`Server returned ${resp.status}`);
+    const data = await resp.json();
+    // The endpoint returns { history: [...], current_skills: {...}, ... }
+    // so we pull out the history array to pass to _render
+    this._render(data.history ?? []);
+  } catch (err) {
+    console.error('SkillPassport fetch failed:', err);
+    // Still open the modal so the player sees something instead of nothing
+    this._render([]);
   }
-
+}
   /**
    * _render(snapshots)
    * Builds and injects the passport-styled full-screen overlay into the page.
