@@ -76,8 +76,7 @@ async start() {
 
     this.overlay.innerHTML = `
       <style>
-        .sp-passport { width: 520px; max-height: 90vh; overflow-y: auto; background: #1e3a2f; border-radius: 8px; border: 2px solid #2d5440; }        .sp-cover { background: #1e3a2f; padding: 24px 28px 16px; border-bottom: 3px solid #c9a84c; }
-        .sp-cover-row { display: flex; align-items: flex-start; justify-content: space-between; }
+        .sp-passport { width: 520px; background: #1e3a2f; border-radius: 8px; border: 2px solid #2d5440; margin: auto; }        .sp-cover-row { display: flex; align-items: flex-start; justify-content: space-between; }
         .sp-titles { text-align: center; flex: 1; }
         .sp-country { font-size: 10px; letter-spacing: 3px; color: #c9a84c; text-transform: uppercase; margin-bottom: 4px; }
         .sp-doctype { font-size: 20px; font-weight: bold; color: #e8dcc8; letter-spacing: 2px; margin-bottom: 2px; }
@@ -210,6 +209,14 @@ async start() {
                 }).join('')
             }
           </div>
+
+          </div>
+
+        <!-- Close button -->
+        <div class="sp-close-row">
+            <button class="sp-close-btn" id="sp-close">Close Passport</button>
+        </div>
+
         </div>
 
     `;
