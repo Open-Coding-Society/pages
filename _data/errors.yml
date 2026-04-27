@@ -1,0 +1,229 @@
+hero:
+  eyebrow: "Debug Mission"
+  title: "Bug Hunt: Identify and Correct Errors"
+  subtitle: "Move fast: spot the bug, fix the code, and clear four short rounds before the system crashes."
+  stats:
+    - label: "Rounds"
+      value: "4"
+    - label: "Goal"
+      value: "Find + Fix"
+
+directions:
+  - title: "Predict"
+    text: "Say what the code should do before you change anything."
+  - title: "Test"
+    text: "Use one simple test case so you can see the bug clearly."
+  - title: "Fix"
+    text: "Change one thing at a time instead of rewriting everything."
+  - title: "Re-check"
+    text: "Run the checker again to confirm the bug is really gone."
+
+error_types:
+  title: "Quick Guide To Error Types"
+  intro: "Beginners usually see the same few bug types again and again. Start by asking: does the code fail to run, or does it run and give the wrong answer?"
+  cards:
+    - title: "Syntax Error"
+      summary: "The code cannot run because Python does not understand the way it is written."
+      fix: "Check punctuation, missing quotes, missing colons, or bad indentation."
+    - title: "Logic Error"
+      summary: "The code runs, but the answer is wrong because the steps are wrong."
+      fix: "Compare the result to a test case and change the step that makes the wrong choice."
+    - title: "Input Error"
+      summary: "The code is given the wrong kind of value or a value it was not expecting."
+      fix: "Check what the function receives and make sure it matches what the code needs."
+    - title: "Name Error"
+      summary: "The code tries to use a variable or function name that does not exist."
+      fix: "Check spelling and make sure the name was created before it is used."
+
+debug_tip:
+  title: "Fast Beginner Strategy"
+  text: "If the code runs but the result is wrong, start by looking for a logic error. Use one small test case, trace each step, and find the first place where the code does something different from what you expected."
+
+levels:
+  - id: "alphabet"
+    badge: "Level 1"
+    title: "Alphabet Tracker"
+    story: "The tracker should report a letter's position in the alphabet for a human reader."
+    prompt: "Edit the code so the test case returns the correct position."
+    test_case: "Test case: d should return 4"
+    run_command: "find_letter_position(\"d\")"
+    buggy_result: "3"
+    expected_result: "4"
+    buggy_code: |
+      def find_letter_position(letter):
+              alphabet_list = list("abcdefghijklmnopqrstuvwxyz")
+              for index, current_letter in enumerate(alphabet_list):
+                      if current_letter == letter:
+                              return index
+    bug_options:
+      - id: "alphabet-syntax"
+        label: "Syntax error"
+        correct: false
+      - id: "alphabet-logic"
+        label: "Logic error"
+        correct: true
+      - id: "alphabet-input"
+        label: "Input error"
+        correct: false
+    hints:
+      - "Python list positions start at 0."
+      - "Humans usually say a is 1st, not 0th."
+      - "You can fix this by changing the loop count or the return value."
+    type_explanation: "This is a logic error because the code runs, but it gives the wrong answer for a human-friendly position."
+    fix_explanation: "The loop is finding the correct letter, but the number starts at 0 instead of 1. Fix the counting, not the whole function."
+    canonical_solution: |
+          def find_letter_position(letter):
+            alphabet_list = list("abcdefghijklmnopqrstuvwxyz")
+            for index, current_letter in enumerate(alphabet_list, start=1):
+              if current_letter == letter:
+                return index
+    solution_checks:
+      - all:
+          - "enumerate(alphabet_list, start=1)"
+          - "return index"
+      - all:
+          - "enumerate(alphabet_list)"
+          - "return index + 1"
+    success_message: "Tracker repaired. The alphabet signal is back online."
+
+  - id: "odds"
+    badge: "Level 2"
+    title: "Odd Number Generator Syntax Rescue"
+    story: "The generator should return odd numbers from 1 to 9, but it cannot run yet because of a syntax issue."
+    prompt: "Fix the syntax so this function can run and produce [1, 3, 5, 7, 9]."
+    test_case: "Target output: [1, 3, 5, 7, 9]"
+    run_command: "make_odd_numbers()"
+    buggy_result: "SyntaxError: expected ':' after function definition"
+    expected_result: "[1, 3, 5, 7, 9]"
+    buggy_code: |
+      def make_odd_numbers()
+              odds = []
+              i = 1
+
+              while i < 10:
+                      odds.append(i)
+                      i += 2
+
+              return odds
+    bug_options:
+      - id: "odds-syntax"
+        label: "Syntax error"
+        correct: true
+      - id: "odds-logic"
+        label: "Logic error"
+        correct: false
+      - id: "odds-name"
+        label: "Name error"
+        correct: false
+    hints:
+      - "Start at the very first line of the function."
+      - "Function definitions in Python need a colon at the end."
+      - "Once syntax is fixed, this code should generate odd numbers correctly."
+    type_explanation: "This is a syntax error because Python cannot parse the function definition line as written."
+    fix_explanation: "The algorithm is already set up for odd numbers. The main fix is adding the missing colon so Python can run the function."
+    canonical_solution: |
+      def make_odd_numbers():
+              odds = []
+              i = 1
+
+              while i < 10:
+                      odds.append(i)
+                      i += 2
+
+              return odds
+    solution_checks:
+      - all:
+          - "def make_odd_numbers():"
+          - "i = 1"
+          - "i += 2"
+          - "return odds"
+    success_message: "Generator repaired. The power grid is stable again."
+
+  - id: "average-input"
+    badge: "Level 3"
+    title: "Average Score Input Guard"
+    story: "The function should return the average score, but one input can crash the calculation."
+    prompt: "Fix the code so it safely handles an empty list and still returns the right average for normal input."
+    test_case: "Test case: [] should return 0"
+    run_command: "average_score([])"
+    buggy_result: "ZeroDivisionError: division by zero"
+    expected_result: "0"
+    buggy_code: |
+      def average_score(scores):
+              total = sum(scores)
+              return total / len(scores)
+    bug_options:
+      - id: "average-syntax"
+        label: "Syntax error"
+        correct: false
+      - id: "average-input"
+        label: "Input error"
+        correct: true
+      - id: "average-name"
+        label: "Name error"
+        correct: false
+    hints:
+      - "The formula is fine for normal lists."
+      - "What is len(scores) when the input is empty?"
+      - "Add a guard clause before dividing."
+    type_explanation: "This is an input error because the function receives an empty list, and the current code does not handle that valid-but-edge input."
+    fix_explanation: "Keep the average logic, but first handle empty input so the function avoids dividing by zero."
+    canonical_solution: |
+      def average_score(scores):
+              if len(scores) == 0:
+                      return 0
+              total = sum(scores)
+              return total / len(scores)
+    solution_checks:
+      - all:
+          - "if len(scores) == 0"
+          - "return 0"
+          - "return total / len(scores)"
+    success_message: "Input guard repaired. The score monitor now handles edge cases safely."
+
+  - id: "name-fix"
+    badge: "Level 4"
+    title: "Name Error Repair Drone"
+    story: "The function should greet the person by name, but it fails because of a wrong variable name."
+    prompt: "Fix the variable name so the function runs and returns the correct greeting."
+    test_case: "Test case: make_greeting() should return Hello, Ava!"
+    run_command: "make_greeting()"
+    buggy_result: "NameError: name 'student_name' is not defined"
+    expected_result: "Hello, Ava!"
+    buggy_code: |
+      def make_greeting():
+              name = "Ava"
+              message = "Hello, " + student_name + "!"
+              return message
+    bug_options:
+      - id: "name-syntax"
+        label: "Syntax error"
+        correct: false
+      - id: "name-logic"
+        label: "Logic error"
+        correct: false
+      - id: "name-variable"
+        label: "Name error"
+        correct: true
+    hints:
+      - "The variable name is already set to \"Ava\" in the function."
+      - "Use the same variable name inside the function body."
+      - "The undefined name is the bug."
+    type_explanation: "This is a name error because the code references a name that was never defined in this function."
+    fix_explanation: "Use the function parameter name consistently when building the greeting string."
+    canonical_solution: |
+      def make_greeting():
+              name = "Ava"
+              message = "Hello, " + name + "!"
+              return message
+    solution_checks:
+      - all:
+          - "def make_greeting():"
+          - "name = \"Ava\""
+          - "+ name +"
+          - "return message"
+    success_message: "Name repair complete. The greeting drone is online."
+
+closing:
+  title: "Victory Check"
+  prompt: "When all levels are green, you win."

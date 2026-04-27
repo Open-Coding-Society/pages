@@ -1,0 +1,1088 @@
+{% assign data = site.data.errors %}
+
+<style>
+  main.page-content > .wrapper {
+    width: min(80vw, 1500px) !important;
+    max-width: min(80vw, 1500px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  main.page-content > .wrapper > .opencs_root {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  article.post.h-entry {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  article.post.h-entry .post-header,
+  article.post.h-entry .post-content {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .errors-lesson {
+    --errors-ink: #eef2ff;
+    --errors-deep: #050816;
+    --errors-card: rgba(10, 14, 34, 0.9);
+    --errors-warm: #7c3aed;
+    --errors-gold: #4f46e5;
+    --errors-cyan: #38bdf8;
+    --errors-mint: #22c55e;
+    --errors-danger: #f43f5e;
+    --errors-muted: #c4b5fd;
+    --errors-border: rgba(96, 165, 250, 0.24);
+    color: var(--errors-ink);
+    width: 100%;
+    max-width: none !important;
+  }
+
+  .errors-lesson > .mx-auto {
+    width: 100%;
+    max-width: none !important;
+  }
+
+  .errors-shell {
+    background:
+      radial-gradient(circle at top left, rgba(124, 58, 237, 0.28), transparent 28%),
+      radial-gradient(circle at top right, rgba(56, 189, 248, 0.24), transparent 34%),
+      linear-gradient(160deg, #030712 0%, #0b1124 45%, #111827 100%);
+  }
+
+  .errors-hero,
+  .errors-card {
+    background: var(--errors-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--errors-border);
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
+  }
+
+  .errors-badge {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed 55%, #38bdf8);
+    color: #fff;
+    letter-spacing: 0.08em;
+  }
+
+  .errors-stat {
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+  }
+
+  .errors-lesson h1,
+  .errors-lesson h2,
+  .errors-lesson h3,
+  .errors-lesson p,
+  .errors-lesson span,
+  .errors-lesson div,
+  .errors-lesson label {
+    color: inherit;
+  }
+
+  .errors-lesson h1,
+  .errors-lesson h2,
+  .errors-lesson h3 {
+    color: #f8fbff !important;
+  }
+
+  .errors-lesson p {
+    color: #dbeafe !important;
+  }
+
+  .errors-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .errors-code,
+  .errors-editor {
+    font-family: "Fira Code", "SFMono-Regular", Consolas, monospace;
+    box-sizing: border-box;
+  }
+
+  .errors-code {
+    background: #0f172a;
+    color: #d9f1ff;
+    border: 1px solid rgba(62, 193, 211, 0.25);
+  }
+
+  .errors-editor {
+    min-height: 13rem;
+    background: #081521;
+    color: #effbff;
+    border: 1px solid rgba(62, 193, 211, 0.32);
+    tab-size: 4;
+  }
+
+  .errors-option {
+    border: 1px solid rgba(96, 165, 250, 0.26);
+    background: linear-gradient(180deg, rgba(20, 25, 48, 0.96), rgba(10, 14, 34, 0.96));
+    color: #f8fbff !important;
+    transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .errors-option:hover {
+    transform: translateY(-1px);
+    border-color: rgba(56, 189, 248, 0.75);
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+  }
+
+  .errors-option[data-selected="true"] {
+    border-color: var(--errors-cyan);
+    background: linear-gradient(180deg, rgba(30, 41, 90, 0.96), rgba(12, 20, 45, 0.96));
+  }
+
+  .errors-option[data-state="correct"] {
+    border-color: var(--errors-mint);
+    background: linear-gradient(180deg, rgba(10, 48, 36, 0.96), rgba(7, 30, 24, 0.96));
+  }
+
+  .errors-option[data-state="wrong"] {
+    border-color: var(--errors-danger);
+    background: linear-gradient(180deg, rgba(76, 11, 35, 0.96), rgba(45, 8, 22, 0.96));
+  }
+
+  .errors-progress-track {
+    background: rgba(30, 41, 59, 0.95);
+  }
+
+  .errors-progress-bar {
+    background: linear-gradient(90deg, #4f46e5, #7c3aed, #38bdf8);
+    transition: width 220ms ease;
+  }
+
+  .errors-chip {
+    background: rgba(76, 29, 149, 0.45);
+    color: #ede9fe;
+  }
+
+  .errors-output {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    color: #e0f2fe;
+  }
+
+  .errors-console {
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.98));
+    border: 1px solid rgba(79, 70, 229, 0.35);
+    color: #e2e8f0;
+    font-family: "Fira Code", "SFMono-Regular", Consolas, monospace;
+  }
+
+  .errors-console-block {
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    background: rgba(15, 23, 42, 0.88);
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.7rem;
+  }
+
+  .errors-console-label {
+    display: block;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+  }
+
+  .errors-console-label.command {
+    color: #a5b4fc;
+  }
+
+  .errors-console-label.output {
+    color: #67e8f9;
+  }
+
+  .errors-console-label.expected {
+    color: #c4b5fd;
+  }
+
+  .errors-console-output {
+    color: #e0f2fe;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .errors-console-expected {
+    color: #ddd6fe;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.45;
+  }
+
+  .errors-run-button {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.96), rgba(30, 27, 75, 0.96));
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    color: #eff6ff;
+  }
+
+  .errors-answer-button {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(14, 42, 74, 0.96));
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    color: #e0f2fe;
+  }
+
+  .errors-answer {
+    background: linear-gradient(180deg, rgba(6, 24, 44, 0.95), rgba(2, 17, 33, 0.98));
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #dbeafe;
+  }
+
+  .errors-feedback[data-state="success"] {
+    background: rgba(20, 83, 45, 0.82);
+    color: #dcfce7;
+  }
+
+  .errors-feedback[data-state="warning"] {
+    background: rgba(55, 48, 163, 0.86);
+    color: #e0e7ff;
+  }
+
+  .errors-feedback[data-state="danger"] {
+    background: rgba(76, 11, 35, 0.88);
+    color: #ffe4e6;
+  }
+
+  .errors-level[data-complete="true"] {
+    outline: 2px solid rgba(56, 189, 248, 0.45);
+  }
+
+  .errors-lesson .text-slate-900,
+  .errors-lesson .text-slate-700,
+  .errors-lesson .text-slate-500,
+  .errors-lesson .text-cyan-700,
+  .errors-lesson .text-slate-900.md\:text-5xl {
+    color: #f8fbff !important;
+  }
+
+  .errors-lesson .bg-slate-900 {
+    background: linear-gradient(135deg, #0f172a, #1e1b4b) !important;
+    color: #eff6ff !important;
+    border: 1px solid rgba(96, 165, 250, 0.32);
+  }
+
+  .errors-lesson .bg-cyan-600 {
+    background: linear-gradient(135deg, #2563eb, #4f46e5) !important;
+    color: #f8fbff !important;
+  }
+
+  .errors-lesson .bg-amber-400 {
+    background: linear-gradient(135deg, #1e1b4b, #312e81) !important;
+    color: #eef2ff !important;
+  }
+
+  .errors-lesson textarea,
+  .errors-lesson button,
+  .errors-lesson pre,
+  .errors-lesson code {
+    color: #f8fbff;
+  }
+
+  .errors-stage-layout {
+    position: relative;
+  }
+
+  .errors-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    background: rgba(6, 10, 26, 0.9);
+    border: 1px solid rgba(96, 165, 250, 0.24);
+    border-radius: 1rem;
+    padding: 0.9rem;
+    transition: width 180ms ease;
+    width: min(240px, 82vw);
+    overflow: hidden;
+  }
+
+  .errors-sidebar[data-collapsed="true"] {
+    width: 3.4rem;
+  }
+
+  .errors-stage-content {
+    width: 100%;
+  }
+
+  .errors-sidebar-toggle {
+    width: 100%;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.96), rgba(30, 27, 75, 0.96));
+    border-radius: 9999px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .errors-nav-list {
+    margin-top: 0.75rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .errors-nav-item {
+    text-align: left;
+    border: 1px solid rgba(96, 165, 250, 0.24);
+    background: rgba(15, 23, 42, 0.88);
+    border-radius: 0.85rem;
+    padding: 0.65rem 0.75rem;
+    width: 100%;
+    transition: border-color 140ms ease, transform 140ms ease, opacity 140ms ease;
+  }
+
+  .errors-nav-item[data-active="true"] {
+    border-color: rgba(56, 189, 248, 0.9);
+    transform: translateY(-1px);
+  }
+
+  .errors-nav-item[data-locked="true"] {
+    opacity: 0.45;
+    border-color: rgba(148, 163, 184, 0.35);
+    background: rgba(51, 65, 85, 0.7);
+    cursor: not-allowed;
+  }
+
+  .errors-nav-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: #c4b5fd;
+  }
+
+  .errors-nav-title {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+
+  .errors-nav-status {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #93c5fd;
+  }
+
+  .errors-sidebar[data-collapsed="true"] .errors-nav-title,
+  .errors-sidebar[data-collapsed="true"] .errors-nav-status,
+  .errors-sidebar[data-collapsed="true"] .errors-sidebar-heading-text {
+    display: none;
+  }
+
+  .errors-sidebar[data-collapsed="true"] .errors-nav-list {
+    display: none;
+  }
+
+  .errors-level[data-visible="false"] {
+    display: none;
+  }
+
+  .errors-next-level {
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    background: linear-gradient(135deg, rgba(14, 42, 74, 0.96), rgba(30, 27, 75, 0.96));
+    color: #dbeafe;
+  }
+
+  @media (min-width: 960px) {
+    .errors-grid {
+      grid-template-columns: 1.05fr 1fr;
+    }
+  }
+
+  @media (max-width: 960px) {
+    main.page-content > .wrapper {
+      width: min(94vw, 1500px) !important;
+      max-width: min(94vw, 1500px) !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    article.post.h-entry {
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    .errors-sidebar {
+      max-width: 86vw;
+    }
+  }
+</style>
+
+<div class="errors-lesson errors-shell rounded-[2rem] px-4 py-8 md:px-8 md:py-10">
+  <div class="mx-auto max-w-6xl space-y-8">
+    <section class="errors-hero rounded-[2rem] p-6 md:p-8">
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-3xl">
+          <span class="errors-badge inline-flex rounded-full px-4 py-2 text-xs font-black uppercase">{{ data.hero.eyebrow }}</span>
+          <h1 class="mt-4 text-4xl font-black tracking-tight text-slate-900 md:text-5xl">{{ data.hero.title }}</h1>
+          <p class="mt-4 max-w-2xl text-lg leading-8 text-slate-700">{{ data.hero.subtitle }}</p>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          {% for stat in data.hero.stats %}
+          <div class="errors-stat rounded-2xl px-4 py-3">
+            <div class="text-2xl font-black text-slate-900">{{ stat.value }}</div>
+            <div class="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{{ stat.label }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-4">
+      {% for step in data.directions %}
+      <article class="errors-card rounded-3xl p-5">
+        <div class="text-xs font-black uppercase tracking-[0.16em] text-cyan-700">{{ forloop.index }}. {{ step.title }}</div>
+        <p class="mt-3 text-sm leading-7 text-slate-700">{{ step.text }}</p>
+      </article>
+      {% endfor %}
+    </section>
+
+    <section class="errors-card rounded-[2rem] p-6 md:p-8">
+      <div class="max-w-3xl">
+        <div class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">{{ data.error_types.title }}</div>
+        <p class="mt-3 text-base leading-7 text-slate-700">{{ data.error_types.intro }}</p>
+      </div>
+      <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {% for card in data.error_types.cards %}
+        <article class="errors-card rounded-3xl p-5">
+          <h3 class="text-base font-black text-slate-900">{{ card.title }}</h3>
+          <p class="mt-3 text-sm leading-7 text-slate-700">{{ card.summary }}</p>
+          <p class="mt-3 text-sm leading-7 text-slate-700"><strong>How to fix it:</strong> {{ card.fix }}</p>
+        </article>
+        {% endfor %}
+      </div>
+      <div class="mt-6 rounded-3xl bg-slate-900 px-5 py-4 text-sm leading-7 text-cyan-100">
+        <strong>{{ data.debug_tip.title }}:</strong> {{ data.debug_tip.text }}
+      </div>
+    </section>
+
+    <section class="errors-card rounded-[2rem] p-6 md:p-8">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Mission Progress</div>
+          <p class="mt-2 text-base text-slate-700">Earn 1 point for identifying the bug type and 1 point for fixing the code in each round.</p>
+        </div>
+        <div class="min-w-[220px]">
+          <div class="mb-2 flex items-center justify-between text-sm font-semibold text-slate-700">
+            <span>Score</span>
+            <span id="errors-score">0 / 4</span>
+          </div>
+          <div class="errors-progress-track h-3 overflow-hidden rounded-full">
+            <div id="errors-progress" class="errors-progress-bar h-full rounded-full" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="errors-card rounded-[2rem] p-4 md:p-6">
+      <div class="errors-stage-layout">
+        <aside class="errors-sidebar" id="errors-level-sidebar" data-collapsed="false">
+          <button type="button" id="errors-sidebar-toggle" class="errors-sidebar-toggle errors-sidebar-heading mt-0" onclick="toggleLevelSidebar()">
+            <span class="errors-sidebar-heading-text">Levels</span>
+          </button>
+          <div class="errors-nav-list" id="errors-level-nav">
+            {% for level in data.levels %}
+            <button
+              type="button"
+              id="errors-nav-{{ level.id }}"
+              class="errors-nav-item"
+              data-level="{{ level.id }}"
+              data-active="false"
+              data-locked="true"
+              onclick="goToLevel('{{ level.id }}')"
+            >
+              <span class="errors-nav-label">{{ level.badge }}</span>
+              <span class="errors-nav-title">{{ level.title }}</span>
+              <span class="errors-nav-status" id="errors-nav-status-{{ level.id }}">Locked</span>
+            </button>
+            {% endfor %}
+          </div>
+        </aside>
+
+        <div class="errors-stage-content space-y-6">
+    {% for level in data.levels %}
+    <section class="errors-level errors-card rounded-[2rem] p-6 md:p-8" data-level="{{ level.id }}" data-complete="false" data-visible="false">
+      <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <span class="errors-chip inline-flex rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.14em]">{{ level.badge }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900">{{ level.title }}</h2>
+          <p class="mt-3 max-w-2xl text-base leading-7 text-slate-700">{{ level.story }}</p>
+        </div>
+        <div class="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-cyan-100">{{ level.test_case }}</div>
+      </div>
+
+      <div class="errors-grid items-start">
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Buggy Code</h3>
+            <pre class="errors-code mt-3 overflow-x-auto rounded-3xl p-5 text-sm leading-7"><code>{{ level.buggy_code | escape }}</code></pre>
+            <div class="mt-3 flex flex-wrap gap-3">
+              <button type="button" class="errors-run-button rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.14em]" onclick="runBuggyCode('{{ level.id }}')">Run Buggy Code</button>
+            </div>
+            <div id="buggy-run-output-{{ level.id }}" class="errors-console mt-3 hidden rounded-2xl px-4 py-3 text-sm leading-7"></div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">What Type Of Error Is It?</h3>
+            <div class="mt-3 flex flex-wrap gap-3">
+              {% for option in level.bug_options %}
+              <button
+                type="button"
+                class="errors-option rounded-full px-4 py-2 text-sm font-semibold text-slate-700"
+                data-level="{{ level.id }}"
+                data-choice="{{ option.id }}"
+                data-correct="{{ option.correct }}"
+                onclick="selectBugType('{{ level.id }}', '{{ option.id }}')"
+              >
+                {{ option.label }}
+              </button>
+              {% endfor %}
+            </div>
+            <div id="type-feedback-{{ level.id }}" class="errors-feedback mt-3 hidden rounded-2xl px-4 py-3 text-sm font-semibold"></div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Repair Station</h3>
+              <button type="button" class="rounded-full bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white" onclick="showHint('{{ level.id }}')">Show Hint</button>
+            </div>
+            <p class="mt-3 text-sm leading-7 text-slate-700">{{ level.prompt }}</p>
+            <textarea id="editor-{{ level.id }}" class="errors-editor mt-3 w-full rounded-3xl p-5 text-sm leading-7">{{ level.buggy_code }}</textarea>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <button type="button" class="rounded-full bg-cyan-600 px-5 py-3 text-sm font-black uppercase tracking-[0.14em] text-white shadow-lg shadow-cyan-500/25 transition hover:bg-cyan-500" onclick="checkFix('{{ level.id }}')">Check My Fix</button>
+            <button type="button" class="rounded-full bg-amber-400 px-5 py-3 text-sm font-black uppercase tracking-[0.14em] text-slate-900 transition hover:bg-amber-300" onclick="resetLevel('{{ level.id }}')">Reset Code</button>
+          </div>
+
+          <div id="editor-run-output-{{ level.id }}" class="errors-console hidden rounded-2xl px-4 py-3 text-sm leading-7"></div>
+
+          <div id="hint-{{ level.id }}" class="errors-feedback hidden rounded-2xl px-4 py-3 text-sm font-semibold" data-state="warning"></div>
+          <div id="fix-feedback-{{ level.id }}" class="errors-feedback hidden rounded-2xl px-4 py-3 text-sm font-semibold"></div>
+
+          {% unless forloop.last %}
+          <div class="pt-2">
+            <button
+              type="button"
+              id="next-level-{{ level.id }}"
+              class="errors-next-level hidden rounded-full px-5 py-3 text-sm font-black uppercase tracking-[0.14em]"
+              onclick="goToNextLevel('{{ level.id }}')"
+            >
+              Go To Next Level
+            </button>
+          </div>
+          {% endunless %}
+        </div>
+      </div>
+    </section>
+    {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section id="errors-victory" class="errors-card rounded-[2rem] p-6 text-center md:p-8">
+      <div class="text-sm font-black uppercase tracking-[0.16em] text-slate-500">{{ data.closing.title }}</div>
+      <p class="mx-auto mt-3 max-w-2xl text-lg leading-8 text-slate-700">{{ data.closing.prompt }}</p>
+      <div id="errors-victory-message" class="mt-5 rounded-3xl bg-slate-900 px-6 py-5 text-base font-semibold text-cyan-100">
+        Clear all levels to unlock the win message.
+      </div>
+      <div class="mt-5">
+        <button type="button" id="all-answers-toggle" class="errors-answer-button rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.12em]" onclick="toggleAllAnswers()">Show All Answers</button>
+      </div>
+      <div id="all-answers-panel" class="errors-answer mx-auto mt-4 hidden max-w-5xl rounded-2xl px-4 py-4 text-left text-sm leading-7"></div>
+    </section>
+  </div>
+</div>
+
+<script id="errors-lesson-data" type="application/json">{{ site.data.errors | jsonify }}</script>
+
+<script>
+  (() => {
+    const lessonData = JSON.parse(document.getElementById("errors-lesson-data").textContent);
+    const levelOrder = lessonData.levels.map((level) => level.id);
+    let activeLevelId = levelOrder[0];
+    const state = {};
+
+    function normalizeText(text) {
+      return text
+        .replace(/\r/g, "")
+        .replace(/[ \t]+/g, " ")
+        .replace(/\n+/g, "\n")
+        .trim()
+        .toLowerCase();
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getLevel(levelId) {
+      return lessonData.levels.find((level) => level.id === levelId);
+    }
+
+    function getCorrectTypeLabel(level) {
+      const correctType = level.bug_options.find((option) => option.correct);
+      return correctType ? correctType.label.toLowerCase() : "logic error";
+    }
+
+    function getCanonicalSolution(level) {
+      if (level.canonical_solution) {
+        return level.canonical_solution;
+      }
+
+      if (level.id === "alphabet") {
+        return level.buggy_code.replace("enumerate(alphabet_list)", "enumerate(alphabet_list, start=1)");
+      }
+
+      if (level.id === "odds") {
+        return level.buggy_code.replace("i = 0", "i = 1");
+      }
+
+      return level.buggy_code;
+    }
+
+    function loadState() {
+      lessonData.levels.forEach((level) => {
+        const savedCode = localStorage.getItem(`errors-code-${level.id}`);
+        const savedChoice = localStorage.getItem(`errors-choice-${level.id}`);
+        const savedHintIndex = Number(localStorage.getItem(`errors-hint-${level.id}`) || 0);
+        const solvedType = localStorage.getItem(`errors-solved-type-${level.id}`) === "true";
+        const solvedFix = localStorage.getItem(`errors-solved-fix-${level.id}`) === "true";
+
+        state[level.id] = {
+          selectedChoice: savedChoice || "",
+          hintIndex: savedHintIndex,
+          solvedType,
+          solvedFix
+        };
+
+        const editor = document.getElementById(`editor-${level.id}`);
+        if (editor) {
+          editor.value = savedCode || level.buggy_code;
+          editor.addEventListener("input", () => {
+            localStorage.setItem(`errors-code-${level.id}`, editor.value);
+          });
+        }
+
+        if (savedChoice) {
+          selectBugType(level.id, savedChoice, false);
+        }
+
+        if (solvedType) {
+          setTypeFeedback(level.id, `Correct: ${getCorrectTypeLabel(level)}. ${level.type_explanation}`, "success");
+        }
+
+        if (solvedFix) {
+          setFixFeedback(level.id, `${level.success_message} ${level.fix_explanation}`, "success");
+        }
+
+        markLevelComplete(level.id);
+      });
+
+      updateProgress();
+      refreshLevelFlow(true);
+    }
+
+    function isLevelComplete(levelId) {
+      const levelState = state[levelId] || { solvedType: false, solvedFix: false };
+      return levelState.solvedType && levelState.solvedFix;
+    }
+
+    function getUnlockedMap() {
+      const unlocked = {};
+      for (let i = 0; i < levelOrder.length; i++) {
+        const levelId = levelOrder[i];
+        if (i === 0) {
+          unlocked[levelId] = true;
+          continue;
+        }
+        const prevLevelId = levelOrder[i - 1];
+        unlocked[levelId] = !!(unlocked[prevLevelId] && isLevelComplete(prevLevelId));
+      }
+      return unlocked;
+    }
+
+    function setActiveLevel(levelId) {
+      activeLevelId = levelId;
+      levelOrder.forEach((id) => {
+        const section = document.querySelector(`.errors-level[data-level="${id}"]`);
+        const navButton = document.getElementById(`errors-nav-${id}`);
+        if (section) {
+          section.dataset.visible = id === levelId ? "true" : "false";
+        }
+        if (navButton) {
+          navButton.dataset.active = id === levelId ? "true" : "false";
+        }
+      });
+    }
+
+    function updateLevelNav(unlockedMap) {
+      levelOrder.forEach((levelId) => {
+        const navButton = document.getElementById(`errors-nav-${levelId}`);
+        const status = document.getElementById(`errors-nav-status-${levelId}`);
+        const complete = isLevelComplete(levelId);
+        const unlocked = !!unlockedMap[levelId];
+
+        if (navButton) {
+          navButton.dataset.locked = unlocked ? "false" : "true";
+          navButton.disabled = !unlocked;
+        }
+
+        if (status) {
+          status.textContent = complete ? "Complete" : (unlocked ? "Unlocked" : "Locked");
+        }
+      });
+    }
+
+    function updateNextLevelButtons(unlockedMap) {
+      levelOrder.forEach((levelId, index) => {
+        const nextButton = document.getElementById(`next-level-${levelId}`);
+        if (!nextButton) return;
+
+        const nextLevelId = levelOrder[index + 1];
+        const show = !!nextLevelId && isLevelComplete(levelId) && !!unlockedMap[nextLevelId];
+        nextButton.classList.toggle("hidden", !show);
+      });
+    }
+
+    function refreshLevelFlow(forceFirstLevel = false) {
+      const unlockedMap = getUnlockedMap();
+      updateLevelNav(unlockedMap);
+      updateNextLevelButtons(unlockedMap);
+
+      if (forceFirstLevel) {
+        setActiveLevel(levelOrder[0]);
+        return;
+      }
+
+      if (!unlockedMap[activeLevelId]) {
+        setActiveLevel(levelOrder[0]);
+      } else {
+        setActiveLevel(activeLevelId);
+      }
+    }
+
+    function setTypeFeedback(levelId, message, stateName) {
+      const feedback = document.getElementById(`type-feedback-${levelId}`);
+      if (!feedback) return;
+      feedback.textContent = message;
+      feedback.dataset.state = stateName;
+      feedback.classList.remove("hidden");
+    }
+
+    function setFixFeedback(levelId, message, stateName) {
+      const feedback = document.getElementById(`fix-feedback-${levelId}`);
+      if (!feedback) return;
+      feedback.textContent = message;
+      feedback.dataset.state = stateName;
+      feedback.classList.remove("hidden");
+    }
+
+    function setRunOutput(outputId, payload) {
+      const output = document.getElementById(outputId);
+      if (!output) return;
+
+      const result = payload.result || "";
+      const expectedOutput = payload.expectedOutput || "";
+
+      output.innerHTML = [
+        '<div class="errors-console-block mt-2">',
+        '<span class="errors-console-label output">Output</span>',
+        `<div class="errors-console-output">${escapeHtml(result)}</div>`,
+        '</div>',
+        '<div class="errors-console-block mt-2">',
+        '<span class="errors-console-label expected">Expected Output</span>',
+        `<div class="errors-console-expected">${escapeHtml(expectedOutput)}</div>`,
+        '</div>'
+      ].join("");
+
+      output.classList.remove("hidden");
+    }
+
+    function updateChoiceStyles(levelId) {
+      const levelState = state[levelId];
+      document.querySelectorAll(`.errors-option[data-level="${levelId}"]`).forEach((button) => {
+        button.dataset.selected = button.dataset.choice === levelState.selectedChoice ? "true" : "false";
+        if (levelState.solvedType) {
+          button.dataset.state = button.dataset.correct === "true" ? "correct" : "";
+        } else {
+          button.dataset.state = button.dataset.choice === levelState.selectedChoice && button.dataset.correct === "false" ? "wrong" : "";
+        }
+      });
+    }
+
+    function isFixCorrect(level, code) {
+      const normalizedCode = normalizeText(code);
+      return level.solution_checks.some((group) => {
+        return group.all.every((snippet) => normalizedCode.includes(normalizeText(snippet)));
+      });
+    }
+
+    function isOriginalBuggyCode(level, code) {
+      return normalizeText(code) === normalizeText(level.buggy_code);
+    }
+
+    function getEditedCodeResult(level, code) {
+      if (isFixCorrect(level, code)) {
+        return {
+          state: "success",
+          result: level.expected_result,
+          note: "Nice. Your code now matches the target test case."
+        };
+      }
+
+      if (isOriginalBuggyCode(level, code)) {
+        return {
+          state: "warning",
+          result: level.buggy_result,
+          note: "This is still the original buggy code, so it gives the original wrong result."
+        };
+      }
+
+      return {
+        state: "warning",
+        result: "Output still does not match the target yet.",
+        note: `Expected result for this test: ${level.expected_result}`
+      };
+    }
+
+    function markLevelComplete(levelId) {
+      const container = document.querySelector(`.errors-level[data-level="${levelId}"]`);
+      if (!container) return;
+      const levelState = state[levelId] || { solvedType: false, solvedFix: false };
+      container.dataset.complete = levelState.solvedType && levelState.solvedFix ? "true" : "false";
+    }
+
+    function updateProgress() {
+      let score = 0;
+      lessonData.levels.forEach((level) => {
+        const levelState = state[level.id] || { solvedType: false, solvedFix: false };
+        if (levelState.solvedType) score += 1;
+        if (levelState.solvedFix) score += 1;
+      });
+
+      const scoreEl = document.getElementById("errors-score");
+      const progressEl = document.getElementById("errors-progress");
+      const victoryEl = document.getElementById("errors-victory-message");
+      const maxScore = lessonData.levels.length * 2;
+
+      if (scoreEl) scoreEl.textContent = `${score} / ${maxScore}`;
+      if (progressEl) progressEl.style.width = `${(score / maxScore) * 100}%`;
+
+      const allCleared = lessonData.levels.every((level) => {
+        const levelState = state[level.id] || { solvedType: false, solvedFix: false };
+        return levelState.solvedType && levelState.solvedFix;
+      });
+      if (victoryEl) {
+        victoryEl.textContent = allCleared
+          ? "Debug Arena cleared. You identified the bug type and corrected the code in all levels."
+          : "Clear all levels to unlock the win message.";
+      }
+    }
+
+    window.goToLevel = function goToLevel(levelId) {
+      const unlockedMap = getUnlockedMap();
+      if (!unlockedMap[levelId]) return;
+      setActiveLevel(levelId);
+    };
+
+    window.goToNextLevel = function goToNextLevel(levelId) {
+      const index = levelOrder.indexOf(levelId);
+      if (index < 0 || index >= levelOrder.length - 1) return;
+      const nextLevelId = levelOrder[index + 1];
+      const unlockedMap = getUnlockedMap();
+      if (!unlockedMap[nextLevelId]) return;
+      setActiveLevel(nextLevelId);
+    };
+
+    window.toggleLevelSidebar = function toggleLevelSidebar() {
+      const sidebar = document.getElementById("errors-level-sidebar");
+      if (!sidebar) return;
+
+      const collapsed = sidebar.dataset.collapsed === "true";
+      sidebar.dataset.collapsed = collapsed ? "false" : "true";
+    };
+
+    window.selectBugType = function selectBugType(levelId, choiceId, persist = true) {
+      const level = getLevel(levelId);
+      if (!level || !state[levelId]) return;
+      const selected = level.bug_options.find((option) => option.id === choiceId);
+
+      state[levelId].selectedChoice = choiceId;
+      if (persist) {
+        localStorage.setItem(`errors-choice-${levelId}`, choiceId);
+      }
+
+      if (selected && selected.correct) {
+        state[levelId].solvedType = true;
+        localStorage.setItem(`errors-solved-type-${levelId}`, "true");
+        setTypeFeedback(levelId, `Correct: ${getCorrectTypeLabel(level)}. ${level.type_explanation}`, "success");
+      } else {
+        state[levelId].solvedType = false;
+        localStorage.setItem(`errors-solved-type-${levelId}`, "false");
+        setTypeFeedback(levelId, "Not quite. Use the test case and decide if the program fails to run or runs with the wrong result.", "danger");
+      }
+
+      updateChoiceStyles(levelId);
+      markLevelComplete(levelId);
+      updateProgress();
+      refreshLevelFlow();
+    };
+
+    window.showHint = function showHint(levelId) {
+      const level = getLevel(levelId);
+      const hintBox = document.getElementById(`hint-${levelId}`);
+      const hintIndex = Math.min(state[levelId].hintIndex, level.hints.length - 1);
+
+      if (!hintBox) return;
+
+      hintBox.textContent = level.hints[hintIndex];
+      hintBox.dataset.state = "warning";
+      hintBox.classList.remove("hidden");
+
+      state[levelId].hintIndex = Math.min(hintIndex + 1, level.hints.length - 1);
+      localStorage.setItem(`errors-hint-${levelId}`, state[levelId].hintIndex);
+    };
+
+    window.runBuggyCode = function runBuggyCode(levelId) {
+      const level = getLevel(levelId);
+      setRunOutput(`buggy-run-output-${levelId}`, {
+        result: level.buggy_result,
+        expectedOutput: level.expected_result
+      });
+    };
+
+    window.runEditedCode = function runEditedCode(levelId) {
+      const level = getLevel(levelId);
+      const editor = document.getElementById(`editor-${levelId}`);
+      if (!editor) return;
+
+      const outcome = getEditedCodeResult(level, editor.value);
+      setRunOutput(`editor-run-output-${levelId}`, {
+        result: outcome.result,
+        expectedOutput: level.expected_result
+      });
+    };
+
+    window.checkFix = function checkFix(levelId) {
+      const level = getLevel(levelId);
+      const editor = document.getElementById(`editor-${levelId}`);
+      if (!editor) return;
+
+      const code = editor.value;
+      const correct = isFixCorrect(level, code);
+      const outcome = getEditedCodeResult(level, code);
+
+      localStorage.setItem(`errors-code-${levelId}`, code);
+
+      setRunOutput(`editor-run-output-${levelId}`, {
+        result: outcome.result,
+        expectedOutput: level.expected_result
+      });
+
+      if (correct) {
+        state[levelId].solvedFix = true;
+        localStorage.setItem(`errors-solved-fix-${levelId}`, "true");
+        setFixFeedback(levelId, `${level.success_message} ${level.fix_explanation} I ran your code and it matches the target output.`, "success");
+      } else {
+        state[levelId].solvedFix = false;
+        localStorage.setItem(`errors-solved-fix-${levelId}`, "false");
+        setFixFeedback(levelId, `The checker still sees a bug. I ran your code and got: ${outcome.result}. ${outcome.note}`, "danger");
+      }
+
+      markLevelComplete(levelId);
+      updateProgress();
+      refreshLevelFlow();
+    };
+
+    window.resetLevel = function resetLevel(levelId) {
+      const level = getLevel(levelId);
+      const editor = document.getElementById(`editor-${levelId}`);
+      const hintBox = document.getElementById(`hint-${levelId}`);
+
+      if (editor) {
+        editor.value = level.buggy_code;
+      }
+
+      if (hintBox) {
+        hintBox.classList.add("hidden");
+      }
+
+      const buggyRunOutput = document.getElementById(`buggy-run-output-${levelId}`);
+      if (buggyRunOutput) {
+        buggyRunOutput.classList.add("hidden");
+      }
+
+      const editorRunOutput = document.getElementById(`editor-run-output-${levelId}`);
+      if (editorRunOutput) {
+        editorRunOutput.classList.add("hidden");
+      }
+
+      state[levelId].hintIndex = 0;
+      state[levelId].solvedFix = false;
+      localStorage.setItem(`errors-code-${levelId}`, level.buggy_code);
+      localStorage.setItem(`errors-hint-${levelId}`, "0");
+      localStorage.setItem(`errors-solved-fix-${levelId}`, "false");
+      setFixFeedback(levelId, "Code reset. Try the test case again and fix one bug at a time.", "warning");
+      markLevelComplete(levelId);
+      updateProgress();
+      refreshLevelFlow();
+    };
+
+    function buildAllAnswersHtml() {
+      return lessonData.levels.map((level) => {
+        const correctType = level.bug_options.find((option) => option.correct);
+        const fixedCode = getCanonicalSolution(level);
+        return [
+          `<div class="mb-5">`,
+          `<div class="text-xs font-black uppercase tracking-[0.14em] text-cyan-200">${escapeHtml(level.badge)}</div>`,
+          `<h3 class="mt-1 text-lg font-black text-white">${escapeHtml(level.title)}</h3>`,
+          `<div><strong>Correct bug type:</strong> ${escapeHtml(correctType ? correctType.label : "Logic error")}</div>`,
+          `<div><strong>Why:</strong> ${escapeHtml(level.type_explanation)}</div>`,
+          `<div><strong>Correct output target:</strong> ${escapeHtml(level.expected_result)}</div>`,
+          `<div><strong>One valid fixed code version:</strong></div>`,
+          `<pre class="errors-code mt-2 overflow-x-auto rounded-2xl p-4 text-sm leading-7"><code>${escapeHtml(fixedCode)}</code></pre>`,
+          `<div><strong>How we got there:</strong> ${escapeHtml(level.fix_explanation)}</div>`,
+          `</div>`
+        ].join("");
+      }).join("");
+    }
+
+    window.toggleAllAnswers = function toggleAllAnswers() {
+      const panel = document.getElementById("all-answers-panel");
+      const toggle = document.getElementById("all-answers-toggle");
+      if (!panel || !toggle) return;
+
+      if (!panel.classList.contains("hidden")) {
+        panel.classList.add("hidden");
+        toggle.textContent = "Show All Answers";
+        return;
+      }
+
+      panel.innerHTML = buildAllAnswersHtml();
+      panel.classList.remove("hidden");
+      toggle.textContent = "Hide All Answers";
+    };
+
+    document.addEventListener("DOMContentLoaded", loadState);
+  })();
+</script>
