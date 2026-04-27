@@ -172,6 +172,47 @@ date: 2025-12-02
   .btn-retry:hover   { background: #253353; }
   .btn-dismiss { background: #1a2340; color: #9aa6bf; border: 1px solid rgba(255,255,255,0.1); }
   .btn-dismiss:hover { background: #253353; color: #e6eef8; }
+
+  /* ── Mini-game HUD ───────────────────────────────────────── */
+  #mgHeader {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; padding: 8px 12px;
+    background: rgba(124,58,237,0.07); border-radius: 10px;
+  }
+  #mgLives   { font-size: 16px; letter-spacing: 2px; min-width: 64px; }
+  .mg-score-wrap { text-align: center; }
+  #mgScoreVal { font-size: 24px; font-weight: 800; color: #a78bfa; line-height: 1; }
+  #mgCombo    { font-size: 11px; color: #f59e0b; min-height: 15px; }
+  #mgProgress { font-size: 12px; color: #9aa6bf; min-width: 64px; text-align: right; }
+
+  /* ── Timer bar ───────────────────────────────────────────── */
+  .mg-timer-track {
+    height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px;
+    margin-bottom: 14px; overflow: hidden;
+  }
+  #mgTimerBar { height: 100%; width: 100%; border-radius: 3px; background: #7c3aed; }
+
+  @keyframes mgTimerAnim {
+    0%   { width: 100%; background: #7c3aed; }
+    60%  { background: #f59e0b; }
+    85%  { background: #ef4444; }
+    100% { width: 0%;   background: #ef4444; }
+  }
+  @keyframes slideInQ {
+    from { opacity: 0; transform: translateX(18px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── In-game feedback ────────────────────────────────────── */
+  #mgFeedback {
+    margin-top: 10px; padding: 10px 14px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; line-height: 1.5; display: none;
+  }
+  .mg-fb-correct { background: rgba(34,197,94,0.13);  color: #86efac; border: 1px solid rgba(34,197,94,0.3);  }
+  .mg-fb-wrong   { background: rgba(239,68,68,0.11);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.3);  }
+  .mg-combo-tag  { margin-left: 8px; font-size: 12px; color: #fcd34d; }
+  .mg-exp        { font-size: 11px; font-weight: 400; margin-top: 5px; opacity: 0.88; line-height: 1.55; }
+  .mg-exp b      { font-weight: 700; }
 </style>
 
 <div id="gameContainer">
@@ -204,7 +245,7 @@ date: 2025-12-02
     </div>
 
     <div id="dialogueActions">
-      <button class="d-btn d-btn-primary"   id="btnQuiz" style="display:none">📝 Take Quiz</button>
+      <button class="d-btn d-btn-primary"   id="btnQuiz" style="display:none">🎮 Play Challenge</button>
       <button class="d-btn d-btn-secondary" id="btnClose">Close</button>
     </div>
   </div>
@@ -367,8 +408,6 @@ const player = { x: 40, y: 0, vx: 0, vy: 0, size: 22 };
 let dialogueOpen   = false;
 let quizOpen       = false;
 let currentNPC     = null;    // { type: 'lesson'|'wizard', data: ... }
-let selectedAns    = {};      // { questionIndex: optionIndex }
-let graded         = false;
 let ePressed       = false;
 
 /* ── Key map ────────────────────────────────────────────────── */
@@ -637,143 +676,201 @@ function closeDialogue() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   QUIZ SYSTEM (Enhanced)
+   MINI-GAME SYSTEM
+   Replaces static quiz with a timed, lives-based challenge.
+   Same lesson questions and answer keys — assessed via:
+     • countdown timer (8 s) → timeout = wrong
+     • 3 lives — lose one per wrong answer or timeout
+     • speed bonus (0–50 pts) + combo multiplier
+   Win/lose conditions, instant per-question feedback, and a
+   final score banner mirror the original quiz result system.
    ═══════════════════════════════════════════════════════════ */
-function openQuiz(lesson) {
-  quizOpen      = true;
-  selectedAns   = {};
-  graded        = false;
 
-  document.getElementById('quizTitle').textContent = `${lesson.emoji} ${lesson.label} Quiz`;
-  document.getElementById('quizSub').textContent   = 'Select the best answer for each question, then press Grade.';
+let mgState = null;
+let mgTimer = null;
+const MG_TIME = 8000; // ms per question
+
+function openMiniGame(lesson) {
+  if (mgTimer) { clearTimeout(mgTimer); mgTimer = null; }
+  quizOpen = true;
+  mgState  = {
+    lesson, qi: 0, lives: 3, score: 0,
+    combo: 0, correct: 0, timerStart: 0, answered: false, done: false
+  };
+
+  document.getElementById('quizTitle').textContent = `${lesson.emoji} ${lesson.label} Challenge`;
+  document.getElementById('quizSub').textContent   = '⚡ Answer fast for bonus points! Wrong answer or timeout costs a ❤️.';
   document.getElementById('scoreBanner').style.display = 'none';
   document.getElementById('btnRetry').style.display    = 'none';
-  document.getElementById('btnGrade').style.display    = 'inline-block';
+  document.getElementById('btnGrade').style.display    = 'none';
 
-  buildQuizDOM(lesson);
+  buildMiniGameDOM();
   document.getElementById('quizModal').style.display = 'block';
   closeDialogue();
+  showMiniGameQuestion();
 }
 
-function buildQuizDOM(lesson) {
-  const container = document.getElementById('quizQuestions');
-  container.innerHTML = '';
-
-  lesson.quiz.forEach((q, qi) => {
-    const block = document.createElement('div');
-    block.className  = 'q-block';
-    block.dataset.qi = qi;
-
-    const qText = document.createElement('div');
-    qText.className   = 'q-text';
-    qText.textContent = `${qi + 1}. ${q.q}`;
-    block.appendChild(qText);
-
-    q.opts.forEach((opt, oi) => {
-      const row = document.createElement('div');
-      row.className  = 'opt';
-      row.dataset.oi = oi;
-
-      const radio = document.createElement('div');
-      radio.className = 'opt-radio';
-
-      const label = document.createElement('span');
-      label.className   = 'opt-label';
-      label.textContent = opt;
-
-      /* "Your pick" badge (shown after grading on wrong answers) */
-      const badge = document.createElement('span');
-      badge.className   = 'your-pick';
-      badge.textContent = 'Your pick';
-
-      row.appendChild(radio);
-      row.appendChild(label);
-      row.appendChild(badge);
-
-      row.addEventListener('click', () => {
-        if (graded) return;
-        selectedAns[qi] = oi;
-        /* Clear siblings, mark selected */
-        block.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
-        row.classList.add('sel');
-      });
-
-      block.appendChild(row);
-    });
-
-    /* Explanation (hidden until graded) */
-    const exp = document.createElement('div');
-    exp.className   = 'explanation';
-    exp.dataset.exp = q.exp;
-    block.appendChild(exp);
-
-    container.appendChild(block);
-  });
+function buildMiniGameDOM() {
+  document.getElementById('quizQuestions').innerHTML = `
+    <div id="mgHeader">
+      <div id="mgLives"></div>
+      <div class="mg-score-wrap">
+        <div id="mgScoreVal">0</div>
+        <div id="mgCombo"></div>
+      </div>
+      <div id="mgProgress"></div>
+    </div>
+    <div class="mg-timer-track"><div id="mgTimerBar"></div></div>
+    <div id="mgQWrap">
+      <div class="q-text" id="mgQText"></div>
+      <div id="mgOpts"></div>
+    </div>
+    <div id="mgFeedback"></div>
+  `;
 }
 
-/* Grade the quiz — applies visual state to every option */
-function gradeQuiz() {
-  if (graded) return;
-  graded = true;
+function updateMgHeader() {
+  const s = mgState;
+  document.getElementById('mgLives').textContent    = '❤️'.repeat(s.lives) + '🖤'.repeat(3 - s.lives);
+  document.getElementById('mgScoreVal').textContent = s.score;
+  document.getElementById('mgProgress').textContent = `Q ${Math.min(s.qi + 1, s.lesson.quiz.length)} / ${s.lesson.quiz.length}`;
+  document.getElementById('mgCombo').textContent    = s.combo >= 2 ? `🔥 ×${s.combo} combo` : '';
+}
 
-  const lesson   = currentNPC.data;
-  let score      = 0;
-  const blocks   = document.getElementById('quizQuestions').querySelectorAll('.q-block');
+function showMiniGameQuestion() {
+  const s = mgState;
+  if (s.done) return;
+  s.answered = false;
 
-  blocks.forEach(block => {
-    const qi      = parseInt(block.dataset.qi);
-    const q       = lesson.quiz[qi];
-    const chosen  = selectedAns[qi];          // undefined if unanswered
-    const opts    = block.querySelectorAll('.opt');
+  const q = s.lesson.quiz[s.qi];
+  updateMgHeader();
 
-    opts.forEach(opt => {
-      const oi = parseInt(opt.dataset.oi);
-      opt.classList.remove('sel');             // clear hover-selection style
-      opt.classList.add('locked');             // prevent further clicks
+  document.getElementById('mgQText').textContent = `${s.qi + 1}. ${q.q}`;
 
-      if (oi === q.ans) {
-        opt.classList.add('correct');          // always highlight the right answer green
-      } else if (oi === chosen && chosen !== q.ans) {
-        opt.classList.add('wrong');            // player's wrong pick → red + badge
-      }
-    });
-
-    if (chosen === q.ans) score++;
-
-    /* Show explanation under the correct answer */
-    const expEl = block.querySelector('.explanation');
-    expEl.textContent = q.exp;
-    expEl.classList.add('show');
+  const optsEl = document.getElementById('mgOpts');
+  optsEl.innerHTML = '';
+  q.opts.forEach((opt, oi) => {
+    const row = document.createElement('div');
+    row.className = 'opt';
+    row.dataset.oi = oi;
+    row.innerHTML = `<div class="opt-radio"></div><span class="opt-label">${opt}</span>`;
+    row.addEventListener('click', () => handleMiniGameAnswer(oi));
+    optsEl.appendChild(row);
   });
 
-  /* Score banner */
-  const banner = document.getElementById('scoreBanner');
-  banner.style.display = 'block';
+  /* Reset feedback */
+  const fb = document.getElementById('mgFeedback');
+  fb.className = '';
+  fb.style.display = 'none';
+  fb.innerHTML = '';
 
-  const total = lesson.quiz.length;
-  if (score === total) {
-    banner.className = 'perfect';
-    banner.textContent = `🎉 Perfect! ${score}/${total} — Excellent work!`;
-  } else if (score >= Math.ceil(total / 2)) {
-    banner.className = 'good';
-    banner.textContent = `📚 Good effort! ${score}/${total} — Review the explanations above.`;
+  /* Slide question in */
+  const wrap = document.getElementById('mgQWrap');
+  wrap.style.animation = 'none';
+  wrap.getBoundingClientRect();
+  wrap.style.animation = 'slideInQ 0.25s ease';
+
+  /* Restart timer bar animation */
+  const bar = document.getElementById('mgTimerBar');
+  bar.style.animation = 'none';
+  bar.getBoundingClientRect();
+  bar.style.animation = `mgTimerAnim ${MG_TIME}ms linear forwards`;
+
+  s.timerStart = Date.now();
+  mgTimer = setTimeout(() => handleMiniGameAnswer(null), MG_TIME);
+}
+
+function handleMiniGameAnswer(oi) {
+  const s = mgState;
+  if (s.answered || s.done) return;
+  s.answered = true;
+
+  if (mgTimer) { clearTimeout(mgTimer); mgTimer = null; }
+
+  /* Freeze timer bar at current position */
+  const bar = document.getElementById('mgTimerBar');
+  const pct = Math.max(0, 1 - (Date.now() - s.timerStart) / MG_TIME);
+  bar.style.animation = 'none';
+  bar.style.width     = (pct * 100).toFixed(1) + '%';
+
+  const q         = s.lesson.quiz[s.qi];
+  const isTimeout = (oi === null);
+  const isCorrect = !isTimeout && oi === q.ans;
+
+  /* Apply correct/wrong classes to options */
+  document.getElementById('mgOpts').querySelectorAll('.opt').forEach(opt => {
+    const optOi = parseInt(opt.dataset.oi);
+    opt.classList.add('locked');
+    if (optOi === q.ans)                 opt.classList.add('correct');
+    else if (optOi === oi && !isCorrect) opt.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('mgFeedback');
+  fb.style.display = 'block';
+
+  if (isCorrect) {
+    const speed      = Math.round(pct * 50);       // 0–50 speed bonus
+    const comboBonus = s.combo * 10;               // 10 pts per existing streak
+    s.combo++;
+    s.correct++;
+    const pts = 100 + speed + comboBonus;
+    s.score  += pts;
+    updateMgHeader();
+    fb.className = 'mg-fb-correct';
+    fb.innerHTML = `<span>✓ Correct! +${pts} pts</span>` +
+      (s.combo > 1 ? `<span class="mg-combo-tag">🔥 ×${s.combo} combo!</span>` : '') +
+      `<div class="mg-exp">${q.exp}</div>`;
   } else {
-    banner.className = 'retry';
-    banner.textContent = `💪 ${score}/${total} — Don't give up! Try again.`;
+    s.combo  = 0;
+    s.lives  = Math.max(0, s.lives - 1);
+    updateMgHeader();
+    const reason = isTimeout ? '⏱ Time\'s up!' : '✗ Wrong!';
+    fb.className = 'mg-fb-wrong';
+    fb.innerHTML = `<span>${reason} −1 ❤️</span>` +
+      `<div class="mg-exp">Correct: <b>${q.opts[q.ans]}</b> — ${q.exp}</div>`;
   }
 
-  document.getElementById('btnGrade').style.display = 'none';
+  s.qi++;
+  setTimeout(() => {
+    if (s.lives <= 0 || s.qi >= s.lesson.quiz.length) endMiniGame();
+    else showMiniGameQuestion();
+  }, 2200);
+}
+
+function endMiniGame() {
+  const s = mgState;
+  s.done  = true;
+  if (mgTimer) { clearTimeout(mgTimer); mgTimer = null; }
+
+  document.getElementById('mgQText').textContent        = '';
+  document.getElementById('mgOpts').innerHTML           = '';
+  document.getElementById('mgFeedback').style.display   = 'none';
+  document.getElementById('mgTimerBar').style.width     = '0';
+  document.getElementById('mgProgress').textContent     = 'Done!';
+
+  const banner = document.getElementById('scoreBanner');
+  const total  = s.lesson.quiz.length;
+  banner.style.display = 'block';
+
+  if (s.lives <= 0 && s.correct < total) {
+    banner.className  = 'retry';
+    banner.textContent = `💀 Game Over — ${s.correct}/${total} correct · Score: ${s.score} · Try again!`;
+  } else if (s.correct === total) {
+    banner.className  = 'perfect';
+    banner.textContent = `🏆 Perfect Run! ${s.correct}/${total} · Final Score: ${s.score} · Incredible!`;
+  } else if (s.correct >= Math.ceil(total / 2)) {
+    banner.className  = 'good';
+    banner.textContent = `⭐ Good job! ${s.correct}/${total} · Score: ${s.score} · Review the misses.`;
+  } else {
+    banner.className  = 'retry';
+    banner.textContent = `💪 ${s.correct}/${total} · Score: ${s.score} · Keep at it — try again!`;
+  }
+
   document.getElementById('btnRetry').style.display = 'inline-block';
 }
 
-/* Retry resets the quiz DOM without closing the modal */
-function retryQuiz() {
-  graded = false;
-  selectedAns = {};
-  document.getElementById('scoreBanner').style.display = 'none';
-  document.getElementById('btnRetry').style.display    = 'none';
-  document.getElementById('btnGrade').style.display    = 'inline-block';
-  buildQuizDOM(currentNPC.data);
+function retryMiniGame() {
+  if (currentNPC && currentNPC.type === 'lesson') openMiniGame(currentNPC.data);
 }
 
 function closeAll() {
@@ -856,7 +953,7 @@ document.getElementById('closeDialogue').addEventListener('click', closeDialogue
 document.getElementById('btnClose').addEventListener('click', closeDialogue);
 
 document.getElementById('btnQuiz').addEventListener('click', () => {
-  if (currentNPC && currentNPC.type === 'lesson') openQuiz(currentNPC.data);
+  if (currentNPC && currentNPC.type === 'lesson') openMiniGame(currentNPC.data);
 });
 
 document.getElementById('btnWizSend').addEventListener('click', sendWizardMessage);
@@ -873,8 +970,8 @@ document.getElementById('btnCloseQuiz').addEventListener('click', () => {
   document.getElementById('quizModal').style.display = 'none';
 });
 
-document.getElementById('btnGrade').addEventListener('click', gradeQuiz);
-document.getElementById('btnRetry').addEventListener('click', retryQuiz);
+document.getElementById('btnGrade').addEventListener('click', () => {});   // hidden in mini-game
+document.getElementById('btnRetry').addEventListener('click', retryMiniGame);
 
 /* ═══════════════════════════════════════════════════════════
    GAME LOOP

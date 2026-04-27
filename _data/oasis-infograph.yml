@@ -1,6 +1,12 @@
 # AutoTriage Capstone Infographic
 Title: "Oasis Pages Capstone"
 Description: "A community building game focused on growing individual relationships and creating a community from that. This project is in relation to the non profit San Diego Oasis"
+game:
+  title: "Live Community Demo"
+  subtitle: "Play the browser build while task progress mirrors the SQLite task table from `community-backend`."
+  embedUrl: "https://frogpants.github.io/community/index.html"
+  backendUrl: "http://localhost:8080"
+  embedHeight: 720
 
 
 Topics:
@@ -34,6 +40,5 @@ Topics:
    team:
      - "Spencer"
      - "Nora"
-
 
 
