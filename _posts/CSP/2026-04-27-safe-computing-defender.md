@@ -9,51 +9,67 @@ authors: Sprinters Capstone
 
 <style>
   .sc-wrap { font-family: "Segoe UI", Tahoma, sans-serif; max-width: 900px; margin: 0 auto; color:#0f172a; }
-  .sc-hero { background:linear-gradient(135deg,#0f172a,#1e3a8a 60%,#7c3aed); color:#fff; border-radius:18px; padding:22px 26px; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+  .sc-wrap p, .sc-wrap li, .sc-wrap ol, .sc-wrap ul, .sc-wrap small, .sc-wrap code, .sc-wrap i, .sc-wrap b, .sc-wrap span, .sc-wrap div { color: inherit; }
+  .sc-hero { background:linear-gradient(135deg,#0f172a,#1e3a8a 60%,#7c3aed); color:#ffffff !important; border-radius:18px; padding:22px 26px; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+  .sc-hero h1, .sc-hero p, .sc-hero span { color:#ffffff !important; }
   .sc-hero h1 { margin:0 0 6px; font-size:1.7rem; }
   .sc-hero p { margin:0; opacity:.95; }
   .sc-pills { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
-  .sc-pill { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:.85rem; }
-  .sc-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .sc-pill { background:rgba(255,255,255,.20); border:1px solid rgba(255,255,255,.55); padding:4px 12px; border-radius:999px; font-size:.85rem; color:#ffffff !important; }
+  .sc-intro { background:#0f172a; color:#f8fafc !important; border-radius:14px; padding:16px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.18); }
+  .sc-intro h2 { color:#fbbf24 !important; margin:0 0 8px; font-size:1.15rem; }
+  .sc-intro ul { margin:6px 0 0 20px; padding:0; }
+  .sc-intro li { color:#f8fafc !important; margin:4px 0; line-height:1.45; }
+  .sc-intro li b { color:#fbbf24 !important; }
+  .sc-card { background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.08); color:#0f172a; }
+  .sc-card h2, .sc-card h3, .sc-card h4, .sc-card p, .sc-card li, .sc-card ol, .sc-card small, .sc-card i, .sc-card b { color:#0f172a; }
+  .sc-card code { color:#1e293b; background:#f1f5f9; padding:1px 6px; border-radius:4px; }
   .sc-card h2 { margin:0 0 8px; font-size:1.2rem; }
   .key { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-top:8px; }
-  .key div { background:#f1f5f9; padding:10px 12px; border-radius:10px; font-size:.92rem; }
-  .key b { color:#1e3a8a; }
+  .key div { background:#f1f5f9; padding:10px 12px; border-radius:10px; font-size:.92rem; color:#0f172a !important; }
+  .key div * { color:#0f172a !important; }
+  .key b { color:#1e3a8a !important; }
   /* Phishing inbox */
   .inbox { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
-  .mail { border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; background:#fafafa; }
-  .mail .from { font-size:.85rem; color:#475569; }
-  .mail .subj { font-weight:700; margin:4px 0; }
-  .mail .body { font-size:.92rem; color:#334155; }
+  .mail { border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; background:#fafafa; color:#0f172a; }
+  .mail .from { font-size:.85rem; color:#475569 !important; }
+  .mail .subj { font-weight:700; margin:4px 0; color:#0f172a !important; }
+  .mail .body { font-size:.92rem; color:#334155 !important; }
   .mail .row { display:flex; gap:8px; margin-top:10px; }
   .mail button { padding:8px 14px; border:0; border-radius:8px; cursor:pointer; font-weight:700; }
-  .btn-phish { background:#ef4444; color:#fff; }
-  .btn-safe  { background:#10b981; color:#fff; }
+  .btn-phish { background:#ef4444; color:#ffffff !important; }
+  .btn-safe  { background:#10b981; color:#ffffff !important; }
   .mail.locked { opacity:.7; }
   .verdict { margin-top:8px; font-size:.9rem; padding:8px 10px; border-radius:8px; }
-  .verdict.ok { background:#ecfdf5; color:#065f46; }
-  .verdict.bad { background:#fef2f2; color:#991b1b; }
+  .verdict.ok { background:#ecfdf5; color:#065f46 !important; }
+  .verdict.ok b { color:#065f46 !important; }
+  .verdict.bad { background:#fef2f2; color:#991b1b !important; }
+  .verdict.bad b { color:#991b1b !important; }
   /* Password forge */
   .forge { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
-  .forge input { padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; font-family:monospace; }
+  .forge input { padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; font-family:monospace; background:#ffffff; color:#0f172a; }
   .strength { height:14px; border-radius:8px; background:#e5e7eb; overflow:hidden; }
   .strength > div { height:100%; width:0%; transition:width .25s, background .25s; background:#ef4444; }
   .checks { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:6px; font-size:.88rem; }
-  .check { padding:6px 10px; border-radius:8px; background:#f1f5f9; }
-  .check.ok { background:#dcfce7; color:#065f46; }
+  .check { padding:6px 10px; border-radius:8px; background:#f1f5f9; color:#334155 !important; }
+  .check.ok { background:#dcfce7; color:#065f46 !important; }
+  #pw-verdict { color:#0f172a !important; }
   /* Match game */
   .match { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
-  .col h4 { margin:0 0 6px; }
-  .item { padding:10px; background:#f1f5f9; border-radius:8px; margin-bottom:8px; cursor:pointer; user-select:none; transition:transform .1s; }
+  .col h4 { margin:0 0 6px; color:#0f172a !important; }
+  .item { padding:10px; background:#f1f5f9; border-radius:8px; margin-bottom:8px; cursor:pointer; user-select:none; transition:transform .1s; color:#0f172a !important; }
   .item:hover { transform:translateY(-1px); }
   .item.selected { outline:3px solid #fbbf24; }
-  .item.matched { background:#dcfce7; color:#065f46; cursor:default; }
-  .item.miss { background:#fee2e2; }
-  .scorebar { display:flex; gap:12px; align-items:center; margin-top:12px; font-size:.95rem; }
+  .item.matched { background:#dcfce7; color:#065f46 !important; cursor:default; }
+  .item.miss { background:#fee2e2; color:#991b1b !important; }
+  .scorebar { display:flex; gap:12px; align-items:center; margin-top:12px; font-size:.95rem; color:#0f172a; }
+  .scorebar span, .scorebar b { color:#0f172a !important; }
   .scorebar .meter { flex:1; height:10px; background:#e5e7eb; border-radius:6px; overflow:hidden; }
   .scorebar .fill { height:100%; background:linear-gradient(90deg,#10b981,#3b82f6,#7c3aed); width:0%; transition:width .3s; }
-  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#0f172a; color:#fff; font-weight:700; }
-  .ap-tip { background:#dbeafe; border-left:4px solid #3b82f6; padding:10px 14px; border-radius:8px; font-size:.92rem; margin-top:10px;}
+  .scorebar button { color:#0f172a !important; }
+  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#0f172a; color:#ffffff !important; font-weight:700; }
+  .ap-tip { background:#dbeafe; border-left:4px solid #3b82f6; padding:10px 14px; border-radius:8px; font-size:.92rem; margin-top:10px; color:#1e3a8a !important;}
+  .ap-tip b, .ap-tip i { color:#1e3a8a !important; }
   @media (max-width:640px){ .match { grid-template-columns:1fr; } }
 </style>
 
@@ -67,6 +83,16 @@ authors: Sprinters Capstone
     <span class="sc-pill">Earn a Defender Rank</span>
     <span class="sc-pill">Exam-ready</span>
   </div>
+</div>
+
+<div class="sc-intro">
+  <h2>What is Safe Computing?</h2>
+  <ul>
+    <li><b>Definition:</b> the habits and tech that keep your data, identity, and devices out of the wrong hands.</li>
+    <li><b>The big threats:</b> phishing, malware (viruses/worms/ransomware), weak passwords, and leaked PII.</li>
+    <li><b>The big defenses:</b> strong unique passwords, multi-factor authentication (MFA), encryption (HTTPS), and healthy skepticism of links and senders.</li>
+    <li><b>Why it's on the AP:</b> Big Idea 5 covers ethical/legal impacts and Big Idea 4 covers cybersecurity — both are tested every year.</li>
+  </ul>
 </div>
 
 <div class="sc-card">

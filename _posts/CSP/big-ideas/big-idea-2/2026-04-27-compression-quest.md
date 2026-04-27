@@ -8,50 +8,69 @@ authors: Sprinters Capstone
 ---
 
 <style>
-  .cq-wrap { font-family: "Segoe UI", Tahoma, sans-serif; max-width: 900px; margin: 0 auto; color: #1a1a1a; }
-  .cq-hero { background: linear-gradient(135deg,#0ea5e9,#7c3aed); color:#fff; border-radius:18px; padding:22px 26px; box-shadow:0 8px 24px rgba(0,0,0,.18); }
+  .cq-wrap { font-family: "Segoe UI", Tahoma, sans-serif; max-width: 900px; margin: 0 auto; color: #0f172a; }
+  .cq-wrap p, .cq-wrap li, .cq-wrap ol, .cq-wrap ul, .cq-wrap small, .cq-wrap code, .cq-wrap i, .cq-wrap b, .cq-wrap span, .cq-wrap div { color: inherit; }
+  .cq-hero { background: linear-gradient(135deg,#0ea5e9,#7c3aed); color:#ffffff !important; border-radius:18px; padding:22px 26px; box-shadow:0 8px 24px rgba(0,0,0,.18); }
+  .cq-hero h1, .cq-hero p, .cq-hero span { color:#ffffff !important; }
   .cq-hero h1 { margin:0 0 6px; font-size:1.7rem; }
   .cq-hero p { margin:0; opacity:.95; }
   .cq-pills { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
-  .cq-pill { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:4px 12px; border-radius:999px; font-size:.85rem; }
-  .cq-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .cq-pill { background:rgba(255,255,255,.22); border:1px solid rgba(255,255,255,.55); padding:4px 12px; border-radius:999px; font-size:.85rem; color:#ffffff !important; }
+  .cq-intro { background:#0f172a; color:#f8fafc !important; border-radius:14px; padding:16px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.18); }
+  .cq-intro h2 { color:#fbbf24 !important; margin:0 0 8px; font-size:1.15rem; }
+  .cq-intro ul { margin:6px 0 0 20px; padding:0; }
+  .cq-intro li { color:#f8fafc !important; margin:4px 0; line-height:1.45; }
+  .cq-intro li b { color:#fbbf24 !important; }
+  .cq-card { background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.08); color:#0f172a; }
+  .cq-card h2, .cq-card h3, .cq-card h4, .cq-card p, .cq-card li, .cq-card ol, .cq-card small, .cq-card i, .cq-card b { color:#0f172a; }
+  .cq-card code { color:#1e293b; background:#f1f5f9; padding:1px 6px; border-radius:4px; }
   .cq-card h2 { margin:0 0 8px; font-size:1.2rem; color:#0f172a; }
   .cq-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .cq-box { border-radius:12px; padding:14px; }
+  .cq-box { border-radius:12px; padding:14px; color:#0f172a; }
+  .cq-box * { color:#0f172a; }
   .cq-lossless { background:#ecfdf5; border:2px solid #10b981; }
+  .cq-lossless h3 { color:#065f46 !important; }
   .cq-lossy { background:#fff7ed; border:2px solid #f59e0b; }
+  .cq-lossy h3 { color:#9a3412 !important; }
   .cq-box h3 { margin:0 0 6px; }
-  .cq-box small { color:#475569; }
+  .cq-box small { color:#334155 !important; }
   /* Game 1 */
   .rle-row { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
-  .rle-row input { flex:1; min-width:200px; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; }
-  .rle-row button { background:#7c3aed; color:#fff; border:0; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
+  .rle-row input { flex:1; min-width:200px; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; background:#ffffff; color:#0f172a; }
+  .rle-row button { background:#7c3aed; color:#ffffff !important; border:0; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
   .rle-row button:hover { background:#6d28d9; }
-  .rle-out { margin-top:10px; padding:10px 12px; border-radius:8px; background:#f1f5f9; font-family:monospace; min-height:24px; }
-  .rle-stat { display:flex; gap:14px; margin-top:8px; font-size:.9rem; color:#334155; flex-wrap:wrap;}
-  .rle-stat span b { color:#0f172a; }
+  .rle-out { margin-top:10px; padding:10px 12px; border-radius:8px; background:#f1f5f9; font-family:monospace; min-height:24px; color:#0f172a !important; }
+  .rle-stat { display:flex; gap:14px; margin-top:8px; font-size:.9rem; color:#334155 !important; flex-wrap:wrap;}
+  .rle-stat span { color:#334155 !important; }
+  .rle-stat span b { color:#0f172a !important; }
   /* Game 2 */
   .files { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
-  .file { background:#1e293b; color:#fff; padding:8px 14px; border-radius:8px; cursor:pointer; user-select:none; transition:transform .1s; font-weight:600; }
+  .file { background:#1e293b; color:#ffffff !important; padding:8px 14px; border-radius:8px; cursor:pointer; user-select:none; transition:transform .1s; font-weight:600; }
   .file:hover { transform:translateY(-2px); }
   .file.placed { opacity:.35; cursor:default; pointer-events:none; }
   .bins { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
-  .bin { min-height:90px; border:2px dashed #94a3b8; border-radius:12px; padding:10px; }
+  .bin { min-height:90px; border:2px dashed #94a3b8; border-radius:12px; padding:10px; cursor:pointer; }
   .bin.l { border-color:#10b981; background:#f0fdf4; }
+  .bin.l h4 { color:#065f46 !important; }
   .bin.y { border-color:#f59e0b; background:#fffbeb; }
+  .bin.y h4 { color:#9a3412 !important; }
   .bin h4 { margin:0 0 6px; }
   .bin .tray { display:flex; flex-wrap:wrap; gap:6px; min-height:30px; }
   .chip { padding:6px 10px; border-radius:6px; font-size:.85rem; font-weight:600; }
-  .chip.ok { background:#10b981; color:#fff; }
-  .chip.bad { background:#ef4444; color:#fff; }
-  .scorebar { display:flex; gap:12px; align-items:center; margin-top:10px; font-size:.95rem; }
+  .chip.ok { background:#10b981; color:#ffffff !important; }
+  .chip.bad { background:#ef4444; color:#ffffff !important; }
+  .scorebar { display:flex; gap:12px; align-items:center; margin-top:10px; font-size:.95rem; color:#0f172a; }
+  .scorebar span, .scorebar b { color:#0f172a; }
   .scorebar .meter { flex:1; height:10px; background:#e5e7eb; border-radius:6px; overflow:hidden; }
   .scorebar .fill { height:100%; background:linear-gradient(90deg,#10b981,#7c3aed); width:0%; transition:width .3s; }
-  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#0f172a; color:#fff; font-weight:700; }
+  .scorebar button { color:#0f172a !important; }
+  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#0f172a; color:#ffffff !important; font-weight:700; }
   .picker { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
-  .picker button { background:#e2e8f0; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; font-weight:600; }
+  .picker span { color:#475569 !important; }
+  .picker button { background:#e2e8f0; color:#0f172a !important; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; font-weight:600; }
   .picker button:hover { background:#cbd5e1; }
-  .ap-tip { background:#fef3c7; border-left:4px solid #f59e0b; padding:10px 14px; border-radius:8px; font-size:.92rem; }
+  .ap-tip { background:#fef3c7; border-left:4px solid #f59e0b; padding:10px 14px; border-radius:8px; font-size:.92rem; color:#78350f !important; }
+  .ap-tip b, .ap-tip i { color:#78350f !important; }
   @media (max-width:640px){ .cq-grid2,.bins { grid-template-columns:1fr; } }
 </style>
 
@@ -65,6 +84,16 @@ authors: Sprinters Capstone
     <span class="cq-pill">2 mini-games</span>
     <span class="cq-pill">Exam-ready</span>
   </div>
+</div>
+
+<div class="cq-intro">
+  <h2>What is Compression?</h2>
+  <ul>
+    <li><b>Definition:</b> shrinking data so it takes less space and moves faster across the network.</li>
+    <li><b>Why care:</b> faster page loads, cheaper storage, less bandwidth — every photo, song, and video you stream is compressed.</li>
+    <li><b>Two flavors on the AP exam:</b> <b>lossless</b> (no data lost, fully reversible) and <b>lossy</b> (drops "less important" data for a smaller file).</li>
+    <li><b>Trade-off:</b> file size vs. quality. Pick the one that fits the use case — never use lossy on text, code, or legal records.</li>
+  </ul>
 </div>
 
 <div class="cq-card">
