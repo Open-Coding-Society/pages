@@ -9,14 +9,22 @@ import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 const CHALLENGE_PROMPT_TEXT = {
   QUESTION_ROLE: 'You are {{deskName}} in a classroom coding game.',
   QUESTION_FOCUS: 'Generate exactly one challenge question focused on: {{expertise}}.',
-  QUESTION_CONCISE: 'Use the provided desk context and keep the question concise (max 30 words).',
+  QUESTION_CONCISE: 'Use the provided desk context and keep the question concise (max 18 words).',
   QUESTION_SHORT_ANSWER: 'The challenge should require a short written answer from a student.',
+  QUESTION_BEGINNER_LEVEL: 'Target absolute beginners. Ask only one simple idea per question.',
+  QUESTION_PLAIN_WORDS: 'Use plain words a beginner would understand. Avoid jargon unless it is a basic class term.',
+  QUESTION_NO_TRICKS: 'Do not ask trick, edge-case, multi-step, or comparison-heavy questions.',
+  QUESTION_ALLOWED_SHAPES: 'Use one of these easy formats: "What command...", "What is...", "Which file...", or "Why do we...".',
   QUESTION_FORMAT: 'Do not include explanation, rubric, markdown, numbering, or extra text.',
   QUESTION_TOPIC_HEADER: 'Desk topic examples:\n{{sampleTopics}}',
   QUESTION_VARIETY_HEADER: 'Question style options:\n{{questionStyles}}',
   QUESTION_RECENT_HEADER: 'Recently used questions to avoid repeating:\n{{recentQuestions}}',
   QUESTION_ANTI_REPEAT: 'Do not repeat or closely paraphrase any recent question. Prefer a fresh angle each time.',
   QUESTION_UNIQUE_STYLE: 'Choose a different question style than the recent examples when possible.',
+  QUESTION_ADVANCED_MODE: 'Mission scoreboard is 4/4. Switch to advanced mode and make the question noticeably harder.',
+  QUESTION_ADVANCED_FOCUS: 'Ask for deeper understanding, not just a memorized fact.',
+  QUESTION_ADVANCED_RULES: 'Use a question that may combine two related ideas, require a comparison, or ask for a troubleshooting choice.',
+  QUESTION_ADVANCED_KEEP_SHORT: 'Keep the question concise, but more challenging than the earlier desk questions.',
 
   EVAL_ROLE: 'You are grading a student answer for {{deskName}}.',
   EVAL_EXPERTISE: 'Desk expertise: {{expertise}}.',
@@ -31,22 +39,25 @@ const CHALLENGE_PROMPT_TEXT = {
 
 
 const CHALLENGE_QUESTION_STYLES = [
-  'Ask for a definition in the desk topic area.',
-  'Ask for the best next step in a scenario.',
-  'Ask the student to compare two options.',
-  'Ask which tool, command, or process fits best.',
-  'Ask for a debugging or troubleshooting step.',
-  'Ask for a short explanation of why something works.',
-  'Ask the student to order steps in the correct sequence.',
-  'Ask what would happen if one part changed.',
-  'Ask for a practical example from the topic.',
-  'Ask the student to identify the most important concept.',
-  'Ask how to avoid a common mistake in the topic.',
-  'Ask for a simple decision between two approaches.',
-  'Ask for a real-world use case.',
-  'Ask for a short scenario response that needs a concise answer.',
-  'Ask for a best-practice recommendation.',
-  'Ask for a quick cause-and-effect explanation.',
+  'Ask for one basic command the student should memorize.',
+  'Ask what a single beginner term means.',
+  'Ask which file, tool, or button to use first.',
+  'Ask for one simple reason we do a basic step.',
+  'Ask for one short safety or setup check.',
+  'Ask for one small action before running code.',
+  'Ask for one clear yes/no understanding check with a short explanation.',
+  'Ask for one beginner-friendly definition using simple words.',
+];
+
+const CHALLENGE_ADVANCED_QUESTION_STYLES = [
+  'Ask for a two-step explanation that connects a command or concept to a result.',
+  'Ask which option is better and why, using one concrete reason.',
+  'Ask for a small troubleshooting decision with a likely fix.',
+  'Ask for a more specific command, file, or setting and what it changes.',
+  'Ask for a brief compare-and-contrast between two related terms.',
+  'Ask for one practical workflow step plus a short reason it matters.',
+  'Ask a scenario question that needs the student to choose the correct action.',
+  'Ask for a short explanation that uses at least two key terms correctly.',
 ];
 
 const CHALLENGE_RECENT_HISTORY_LIMIT = 12;
@@ -625,6 +636,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   _buildChallengePrompt(spriteData) {
     const expertise = spriteData?.expertise || 'general problem solving';
     const deskName = spriteData?.id || 'Desk Guide';
+    const advancedMode = (this._missionProgressCount || 0) >= 4;
     const sampleTopics = (spriteData?.knowledgeBase?.[deskName]?.questions || [])
       .slice(0, 8)
       .map((topic) => `- ${topic.question}`)
@@ -633,18 +645,23 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       .slice(-CHALLENGE_RECENT_HISTORY_LIMIT)
       .map((question) => `- ${question}`)
       .join('\n');
-    const questionStyles = CHALLENGE_QUESTION_STYLES
+    const questionStyles = (advancedMode ? CHALLENGE_ADVANCED_QUESTION_STYLES : CHALLENGE_QUESTION_STYLES)
       .map((style, index) => `${index + 1}. ${style}`)
       .join('\n');
 
     return [
       CHALLENGE_PROMPT_TEXT.QUESTION_ROLE.replace('{{deskName}}', deskName),
       CHALLENGE_PROMPT_TEXT.QUESTION_FOCUS.replace('{{expertise}}', expertise),
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_MODE : CHALLENGE_PROMPT_TEXT.QUESTION_BEGINNER_LEVEL,
       CHALLENGE_PROMPT_TEXT.QUESTION_CONCISE,
       CHALLENGE_PROMPT_TEXT.QUESTION_SHORT_ANSWER,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_FOCUS : CHALLENGE_PROMPT_TEXT.QUESTION_PLAIN_WORDS,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_RULES : CHALLENGE_PROMPT_TEXT.QUESTION_NO_TRICKS,
+      CHALLENGE_PROMPT_TEXT.QUESTION_ALLOWED_SHAPES,
       CHALLENGE_PROMPT_TEXT.QUESTION_FORMAT,
       CHALLENGE_PROMPT_TEXT.QUESTION_ANTI_REPEAT,
       CHALLENGE_PROMPT_TEXT.QUESTION_UNIQUE_STYLE,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_KEEP_SHORT : '',
       CHALLENGE_PROMPT_TEXT.QUESTION_VARIETY_HEADER.replace('{{questionStyles}}', questionStyles),
       recentQuestions ? CHALLENGE_PROMPT_TEXT.QUESTION_RECENT_HEADER.replace('{{recentQuestions}}', recentQuestions) : '',
       sampleTopics ? CHALLENGE_PROMPT_TEXT.QUESTION_TOPIC_HEADER.replace('{{sampleTopics}}', sampleTopics) : '',

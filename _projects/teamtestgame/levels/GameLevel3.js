@@ -1,5 +1,5 @@
-import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '../../../GameEnginev1.1/essentials/Player.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
