@@ -82,11 +82,31 @@ jobs:
         run: |
           source venv/bin/activate  # Activate virtual environment
           python scripts/split_multi_course_files.py  # Run course splitting
+      - name: Compute and apply baseurl
+        run: |
+
+          REPO="${{ github.repository }}"
+          OWNER=$(echo "$REPO" | cut -d'/' -f1)
+          NAME=$(echo "$REPO" | cut -d'/' -f2)
+
+          if [[ "$NAME" == "$OWNER.github.io" ]]; then
+            BASEURL=""
+          elif [[ "$REPO" == "open-coding-society/pages" ]]; then
+            BASEURL=""
+          else
+            BASEURL="/$NAME"
+          fi
+
+          echo "baseurl: \"$BASEURL\"" > _config.override.yml
+
       - name: Build with Jekyll
         run: |
-          bundle exec jekyll build  # Build your Jekyll site
+          bundle exec jekyll build --config _config.yml,_config.override.yml
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
 
   # Deployment job
   deploy:
