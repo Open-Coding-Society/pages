@@ -638,6 +638,9 @@
     const lessonData = JSON.parse(document.getElementById("errors-lesson-data").textContent);
     const levelOrder = lessonData.levels.map((level) => level.id);
     let activeLevelId = levelOrder[0];
+    let hasInitializedProgress = false;
+    let wasAllCleared = false;
+    let fireworksRunning = false;
     const state = {};
 
     function normalizeText(text) {
@@ -895,6 +898,104 @@
       container.dataset.complete = levelState.solvedType && levelState.solvedFix ? "true" : "false";
     }
 
+    function launchCompletionFireworks(durationMs = 10000) {
+      if (fireworksRunning) return;
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      fireworksRunning = true;
+
+      Object.assign(canvas.style, {
+        position: "fixed",
+        inset: "0",
+        width: "100vw",
+        height: "100vh",
+        pointerEvents: "none",
+        zIndex: "10001"
+      });
+
+      document.body.appendChild(canvas);
+
+      const particles = [];
+      const colors = ["#ffd166", "#06d6a0", "#118ab2", "#ef476f", "#f59e0b", "#a7f3d0"];
+      let endAt = performance.now() + durationMs;
+      let lastBurstAt = 0;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function spawnBurst() {
+        const centerX = 60 + Math.random() * (canvas.width - 120);
+        const centerY = 40 + Math.random() * (canvas.height * 0.45);
+        const count = 16 + Math.floor(Math.random() * 10);
+
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * i) / count + (Math.random() * 0.4 - 0.2);
+          const speed = 1.2 + Math.random() * 2.2;
+          particles.push({
+            x: centerX,
+            y: centerY,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 60 + Math.random() * 25,
+            size: 1.2 + Math.random() * 1.8,
+            color: colors[Math.floor(Math.random() * colors.length)]
+          });
+        }
+      }
+
+      function cleanup() {
+        window.removeEventListener("resize", resize);
+        canvas.remove();
+        fireworksRunning = false;
+      }
+
+      function frame(now) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (now < endAt && now - lastBurstAt > 320) {
+          spawnBurst();
+          lastBurstAt = now;
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.025;
+          p.vx *= 0.995;
+          p.life -= 1;
+
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+
+          ctx.globalAlpha = Math.max(0, p.life / 85);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+
+        if (now < endAt || particles.length > 0) {
+          requestAnimationFrame(frame);
+        } else {
+          cleanup();
+        }
+      }
+
+      resize();
+      window.addEventListener("resize", resize);
+      requestAnimationFrame(frame);
+    }
+
     function updateProgress() {
       let score = 0;
       lessonData.levels.forEach((level) => {
@@ -920,6 +1021,13 @@
           ? "Debug Arena cleared. You identified the bug type and corrected the code in all levels."
           : "Clear all levels to unlock the win message.";
       }
+
+      if (hasInitializedProgress && allCleared && !wasAllCleared) {
+        launchCompletionFireworks(10000);
+      }
+
+      wasAllCleared = allCleared;
+      hasInitializedProgress = true;
     }
 
     window.goToLevel = function goToLevel(levelId) {
