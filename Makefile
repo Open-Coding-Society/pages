@@ -201,6 +201,7 @@ convert-registered-notebooks:
 		done; \
 	fi
 
+# Convert only the files listed in Makefile.env (used by dev when Makefile.env is present)
 # Build documentation for all registered projects (serve mode only)
 build-registered-docs:
 	$(call run_projects,$(ALL_PROJECTS),Docs,docs)
@@ -271,110 +272,6 @@ scope: bundle-install
 	fi
 	@echo "✓ Scope build complete ($(_CORE_SCOPE))"
 
-# Convert a notebook/docx and serve only that post.
-# Usage: make specific <filename>   e.g. make specific fault_tolerance.ipynb
-ifeq (specific,$(firstword $(MAKECMDGOALS)))
-  _SPECIFIC_TARGET := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-  $(if $(_SPECIFIC_TARGET),$(eval $(_SPECIFIC_TARGET):;@:))
-endif
-specific: bundle-install
-	$(eval _SPECIFIC_TARGET := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS)))
-	@if [ -z "$(_SPECIFIC_TARGET)" ]; then \
-		echo "Usage: make specific <filename>"; \
-		exit 1; \
-	fi
-	@FOUND=$$(find . \
-		-not -path "./_site/*" \
-		-not -path "./.git/*" \
-		-not -path "./venv/*" \
-		-not -path "./_posts/*" \
-		\( -name "$(_SPECIFIC_TARGET)" -o -name "$(_SPECIFIC_TARGET).ipynb" -o -name "$(_SPECIFIC_TARGET).docx" \) \
-		2>/dev/null | head -1); \
-	if [ -n "$$FOUND" ]; then \
-		echo "Found: $$FOUND"; \
-		case "$$FOUND" in \
-			*.ipynb) $(MAKE) convert-single NOTEBOOK_FILE="$$FOUND" ;; \
-			*.docx)  $(MAKE) convert-docx-single DOCX_FILE="$$FOUND" ;; \
-			*)       echo "❌ Unsupported file type: $$FOUND"; exit 1 ;; \
-		esac; \
-	fi; \
-	BASE=$$(basename "$(_SPECIFIC_TARGET)" .ipynb); \
-	BASE=$$(basename "$$BASE" .docx); \
-	POST=$$(find _posts -name "*$$BASE*" 2>/dev/null | head -1); \
-	if [ -z "$$POST" ]; then \
-		echo "❌ Post not found in _posts: $$BASE"; \
-		exit 1; \
-	fi; \
-	POST_DIR=$$(dirname "$$POST"); \
-	printf 'exclude:\n' > /tmp/_jekyll_target.yml; \
-	while IFS= read -r d; do \
-		case "$$POST" in \
-			"$$d/"*) ;; \
-			*) printf '  - %s\n' "$$d" >> /tmp/_jekyll_target.yml ;; \
-		esac; \
-	done < <(find _posts -mindepth 1 -maxdepth 1 -type d | sort); \
-	while IFS= read -r f; do \
-		[ "$$f" != "$$POST" ] && printf '  - %s\n' "$$f" >> /tmp/_jekyll_target.yml; \
-	done < <(find "$$POST_DIR" -maxdepth 1 -name "*.md" -o -name "*.html" | sort); \
-	echo "Serving only: $$POST"; \
-	bundle exec jekyll serve -H $(HOST) -P $(PORT) --config _config.yml,/tmp/_jekyll_target.yml
-
-# Convert all notebooks listed in buildset.txt and serve only those posts.
-# Usage: make from-list
-from-list: bundle-install
-	@if [ ! -f buildset.txt ]; then \
-		echo "❌ buildset.txt not found"; exit 1; \
-	fi
-	@echo "--- Converting notebooks in buildset.txt ---"
-	@while IFS= read -r name || [ -n "$$name" ]; do \
-		[ -z "$$name" ] && continue; \
-		FOUND=$$(find . \
-			-not -path "./_site/*" \
-			-not -path "./.git/*" \
-			-not -path "./venv/*" \
-			-not -path "./_posts/*" \
-			\( -name "$$name" -o -name "$$name.ipynb" -o -name "$$name.docx" \) \
-			2>/dev/null | head -1); \
-		if [ -z "$$FOUND" ]; then \
-			echo "⚠  Source not found: $$name"; continue; \
-		fi; \
-		echo "Converting: $$FOUND"; \
-		case "$$FOUND" in \
-			*.ipynb) $(MAKE) convert-single NOTEBOOK_FILE="$$FOUND" ;; \
-			*.docx)  $(MAKE) convert-docx-single DOCX_FILE="$$FOUND" ;; \
-			*)       echo "⚠  Unsupported type: $$FOUND" ;; \
-		esac; \
-	done < buildset.txt
-	@rm -f /tmp/_jekyll_fromlist_posts.txt
-	@while IFS= read -r name || [ -n "$$name" ]; do \
-		[ -z "$$name" ] && continue; \
-		BASE=$$(basename "$$name" .ipynb); \
-		BASE=$$(basename "$$BASE" .docx); \
-		POST=$$(find _posts -name "*$$BASE*" 2>/dev/null | head -1); \
-		if [ -n "$$POST" ]; then \
-			echo "$$POST" >> /tmp/_jekyll_fromlist_posts.txt; \
-			echo "  ✓ $$POST"; \
-		else \
-			echo "  ⚠  No post found for: $$name"; \
-		fi; \
-	done < buildset.txt
-	@if [ ! -s /tmp/_jekyll_fromlist_posts.txt ]; then \
-		echo "❌ No posts resolved — aborting"; exit 1; \
-	fi
-	@printf 'exclude:\n' > /tmp/_jekyll_fromlist.yml
-	@find _posts -mindepth 1 -maxdepth 1 -type d | sort | while IFS= read -r dir; do \
-		if ! grep -q "^$$dir/" /tmp/_jekyll_fromlist_posts.txt 2>/dev/null; then \
-			printf '  - %s\n' "$$dir" >> /tmp/_jekyll_fromlist.yml; \
-		else \
-			find "$$dir" -maxdepth 1 \( -name "*.md" -o -name "*.html" \) | sort | while IFS= read -r f; do \
-				if ! grep -qF "$$f" /tmp/_jekyll_fromlist_posts.txt; then \
-					printf '  - %s\n' "$$f" >> /tmp/_jekyll_fromlist.yml; \
-				fi; \
-			done; \
-		fi; \
-	done
-	@echo "Serving: $$(tr '\n' ' ' < /tmp/_jekyll_fromlist_posts.txt)"
-	@bundle exec jekyll serve -H $(HOST) -P $(PORT) --config _config.yml,/tmp/_jekyll_fromlist.yml
 
 # Multi-course file splitting
 split-courses:
@@ -492,17 +389,100 @@ refresh:
 
 # Development mode: clean start, no conversion, converts files on save
 # Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
+# If Makefile.env exists, only converts files listed in that file (one per line, supports .ipynb and .docx)
 dev: stop clean
-	@echo "DEV Projects: $(ACTIVE_DEV_PROJECTS)"
-	@$(MAKE) build-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
-	@$(MAKE) convert-registered-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
-	@$(MAKE) jekyll-serve ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
-	@$(MAKE) watch-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
-	@$(MAKE) watch-files ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
-	@$(MAKE) watch-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
-	@echo "Dev server running in background on http://localhost:$(PORT)"
-	@echo "  View logs: tail -f $(LOG_FILE)"
-	@echo "  Stop: make stop"
+	@if [ -s Makefile.env ]; then \
+		$(MAKE) dev-from-env; \
+	else \
+		echo "DEV Projects: $(ACTIVE_DEV_PROJECTS)"; \
+		$(MAKE) build-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)"; \
+		$(MAKE) convert-registered-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)"; \
+		$(MAKE) jekyll-serve ORIGINAL_GOALS="$(ORIGINAL_GOALS)"; \
+		$(MAKE) watch-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)" & \
+		$(MAKE) watch-files ORIGINAL_GOALS="$(ORIGINAL_GOALS)" & \
+		$(MAKE) watch-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" & \
+		echo "Dev server running in background on http://localhost:$(PORT)"; \
+		echo "  View logs: tail -f $(LOG_FILE)"; \
+		echo "  Stop: make stop"; \
+	fi
+
+dev-from-env: bundle-install
+	@echo "--- Makefile.env detected: building listed files only ---"
+	@while IFS= read -r name || [ -n "$$name" ]; do \
+		[ -z "$$name" ] && continue; \
+		name=$$(echo "$$name" | sed 's|/*$$||'); \
+		if [ -d "$$name" ]; then \
+			while IFS= read -r FOUND; do \
+				echo "Converting: $$FOUND"; \
+				case "$$FOUND" in \
+					*.ipynb) $(MAKE) convert-single NOTEBOOK_FILE="$$FOUND" ;; \
+					*.docx)  $(MAKE) convert-docx-single DOCX_FILE="$$FOUND" ;; \
+				esac; \
+			done < <(find "$$name" \( -name "*.ipynb" -o -name "*.docx" \) 2>/dev/null); \
+		else \
+			FOUND=$$(find . \
+				-not -path "./_site/*" \
+				-not -path "./.git/*" \
+				-not -path "./venv/*" \
+				-not -path "./_posts/*" \
+				\( -name "$$name" -o -name "$$name.ipynb" -o -name "$$name.docx" \) \
+				2>/dev/null | head -1); \
+			if [ -z "$$FOUND" ]; then \
+				echo "⚠  Source not found: $$name"; continue; \
+			fi; \
+			echo "Converting: $$FOUND"; \
+			case "$$FOUND" in \
+				*.ipynb) $(MAKE) convert-single NOTEBOOK_FILE="$$FOUND" ;; \
+				*.docx)  $(MAKE) convert-docx-single DOCX_FILE="$$FOUND" ;; \
+				*)       echo "⚠  Unsupported type: $$FOUND" ;; \
+			esac; \
+		fi; \
+	done < Makefile.env
+	@rm -f /tmp/_jekyll_fromenv_posts.txt
+	@while IFS= read -r name || [ -n "$$name" ]; do \
+		[ -z "$$name" ] && continue; \
+		name=$$(echo "$$name" | sed 's|/*$$||'); \
+		if [ -d "$$name" ]; then \
+			while IFS= read -r src; do \
+				BASE=$$(basename "$$src" .ipynb); \
+				BASE=$$(basename "$$BASE" .docx); \
+				POST=$$(find _posts -name "*$$BASE*" 2>/dev/null | head -1); \
+				if [ -n "$$POST" ]; then \
+					echo "$$POST" >> /tmp/_jekyll_fromenv_posts.txt; \
+					echo "  ✓ $$POST"; \
+				else \
+					echo "  ⚠  No post found for: $$src"; \
+				fi; \
+			done < <(find "$$name" \( -name "*.ipynb" -o -name "*.docx" \) 2>/dev/null); \
+		else \
+			BASE=$$(basename "$$name" .ipynb); \
+			BASE=$$(basename "$$BASE" .docx); \
+			POST=$$(find _posts -name "*$$BASE*" 2>/dev/null | head -1); \
+			if [ -n "$$POST" ]; then \
+				echo "$$POST" >> /tmp/_jekyll_fromenv_posts.txt; \
+				echo "  ✓ $$POST"; \
+			else \
+				echo "  ⚠  No post found for: $$name"; \
+			fi; \
+		fi; \
+	done < Makefile.env
+	@if [ ! -s /tmp/_jekyll_fromenv_posts.txt ]; then \
+		echo "❌ No posts resolved — aborting"; exit 1; \
+	fi
+	@printf 'exclude:\n' > /tmp/_jekyll_fromenv.yml
+	@find _posts -mindepth 1 -maxdepth 1 -type d | sort | while IFS= read -r dir; do \
+		if ! grep -q "^$$dir/" /tmp/_jekyll_fromenv_posts.txt 2>/dev/null; then \
+			printf '  - %s\n' "$$dir" >> /tmp/_jekyll_fromenv.yml; \
+		else \
+			find "$$dir" -maxdepth 1 \( -name "*.md" -o -name "*.html" \) | sort | while IFS= read -r f; do \
+				if ! grep -qF "$$f" /tmp/_jekyll_fromenv_posts.txt; then \
+					printf '  - %s\n' "$$f" >> /tmp/_jekyll_fromenv.yml; \
+				fi; \
+			done; \
+		fi; \
+	done
+	@echo "Serving: $$(tr '\n' ' ' < /tmp/_jekyll_fromenv_posts.txt)"
+	@bundle exec jekyll serve -H $(HOST) -P $(PORT) --config _config.yml,/tmp/_jekyll_fromenv.yml
 
 # Watch notebooks directory for changes (since Jekyll excludes _notebooks)
 # Converts immediately (async), Jekyll serve handles regeneration batching
@@ -674,7 +654,7 @@ list-projects:
 		fi; \
 	done || echo "  None found"
 
-.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects
+.PHONY: list-projects build-registered-projects convert-registered-notebooks dev-from-env build-registered-docs watch-registered-projects clean-registered-projects
 
 ###########################################
 # Allow unknown targets (project selectors)
