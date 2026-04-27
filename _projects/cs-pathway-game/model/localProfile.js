@@ -84,6 +84,7 @@ const LocalProfile = {
         localId: generateLocalId(),
         createdAt: getTimestamp(),
         updatedAt: getTimestamp(),
+        eventId: 0,
         // Top-level identity fields
         name: data.name || '',
         email: data.email || '',
@@ -151,6 +152,8 @@ const LocalProfile = {
       const profile = {
         ...existing,
         updatedAt: getTimestamp(),
+        // Ever-increasing event counter for ordering (avoids clock-skew issues)
+        eventId: (existing.eventId || 0) + 1,
         // Top-level identity updates
         ...(updates.name !== undefined && { name: updates.name }),
         ...(updates.email !== undefined && { email: updates.email }),
@@ -245,6 +248,7 @@ const LocalProfile = {
       localId: profile.localId,
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt,
+      eventId: profile.eventId || 0,
       // Top-level identity
       name: profile.name,
       email: profile.email,

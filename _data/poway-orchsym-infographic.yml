@@ -14,6 +14,15 @@ Topics:
     backendLink: "http://wifighters.opencodingsociety.com"
     backendButtonLabel: "Administrator Site"
     aboutTitle: "Why This Is More Accessible"
+    organizationTitle: "About the Organization"
+    organizationSummary: >
+      The Poway Symphony Orchestra (PSO) is a semi-professional orchestra formed in 2004
+      that presents three symphonic concerts each year at the Poway Center for the Performing
+      Arts in Poway, CA. For over 20 years, the PSO has served San Diego's North County Inland
+      communities, performing classical, romantic, and contemporary repertoire with roughly
+      65-67 musicians under the direction of Conductor and Music Director John LoPiccolo.
+      The Poway Symphony Orchestra Foundation, a 501(c)(3) non-profit, was established in 2015
+      solely to support the orchestra.
 
     description: >
       The site adds accessible entry points for patrons, families, and musicians who want
@@ -110,43 +119,6 @@ Topics:
 
     impact:
       - "The redesign transforms a basic Google Sites page into a modern, engaging experience that's easier to navigate, more visually appealing, and actually gives visitors reasons to stay and explore rather than just look up a concert date."
-
-    organizationTitle: "About the Organization"
-    organizationSummary: >
-      The Poway Symphony Orchestra (PSO) is a semi-professional orchestra formed in 2004
-      that presents three symphonic concerts each year at the Poway Center for the Performing
-      Arts in Poway, CA. For over 20 years, the PSO has served San Diego's North County Inland
-      communities, performing classical, romantic, and contemporary repertoire with roughly
-      65-67 musicians under the direction of Conductor and Music Director John LoPiccolo.
-      The Poway Symphony Orchestra Foundation, a 501(c)(3) non-profit, was established in 2015
-      solely to support the orchestra.
-    organizationInfo:
-      - label: "Founded"
-        value: "2004"
-      - label: "Type"
-        value: "Semi-professional orchestra / 501(c)(3) non-profit"
-      - label: "Conductor & Music Director"
-        value: "John LoPiccolo (11th season)"
-      - label: "Venue"
-        value: "Poway Center for the Performing Arts, 15498 Espola Road, Poway, CA 92064"
-      - label: "Box Office Phone"
-        value: "(858) 748-0505"
-      - label: "Conductor Phone"
-        value: "(208) 757-1980"
-      - label: "Website (original)"
-        value: "powaysymphonyorchestra.org"
-        link: "https://www.powaysymphonyorchestra.org/"
-      - label: "YouTube"
-        value: "Poway Symphony Orchestra YouTube"
-        link: "https://youtube.com/channel/UCiqC2aUbjfNbMcLIr-oFifQ"
-      - label: "Facebook"
-        value: "facebook.com/powaysymphony"
-        link: "https://www.facebook.com/powaysymphony/"
-      - label: "Instagram"
-        value: "instagram.com/powaysymphonyorchestra"
-        link: "https://www.instagram.com/powaysymphonyorchestra/"
-
-status: "Research and Testing Phase (Deployed Prototype Complete)"
 
 team:
   - "Wi-Fighters"

@@ -763,7 +763,7 @@
     margin: 0.75rem auto 0;
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
   }
 
@@ -1062,6 +1062,7 @@
           <p class="sip-about sip-section-copy">{{ topic.description }}</p>
         </div>
 
+        {% if topic.organizationSummary %}
         <div class="sip-detail-pair">
           <div class="sip-panel-section sip-panel-section--soft">
             <div class="sip-panel-heading">
@@ -1073,7 +1074,6 @@
             <p class="sip-about sip-section-copy">{{ topic.description }}</p>
           </div>
 
-          {% if topic.organizationSummary %}
           <div class="sip-panel-section">
             <div class="sip-panel-heading">
               <div>
@@ -1083,8 +1083,18 @@
             </div>
             <p class="sip-about sip-section-copy">{{ topic.organizationSummary }}</p>
           </div>
-          {% endif %}
         </div>
+        {% else %}
+        <div class="sip-panel-section sip-panel-section--soft">
+          <div class="sip-panel-heading">
+            <div>
+              <div class="sip-panel-label">Accessibility</div>
+              <h3 class="sip-section-title">{{ topic.aboutTitle | default: 'About' }}</h3>
+            </div>
+          </div>
+          <p class="sip-about sip-section-copy">{{ topic.description }}</p>
+        </div>
+        {% endif %}
 
         <div class="sip-panel-section">
           <div class="sip-panel-heading">
@@ -1210,6 +1220,7 @@
 
       </div>
 
+      {% if topic.customerPitch or topic.futurePlans or topic.additions or topic.organizationInfo %}
       <!-- Right: About & Impact -->
       <div class="sip-details">
         {% if topic.customerPitch or topic.futurePlans %}
@@ -1291,6 +1302,7 @@
         {% endif %}
 
       </div>
+      {% endif %}
 
     </div>
   </div>

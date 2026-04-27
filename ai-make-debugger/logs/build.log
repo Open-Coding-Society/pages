@@ -1,0 +1,102 @@
+Stopping server...
+Stopping logging process...
+Stopping notebook watcher...
+Stopping project watchers...
+Cleaning converted IPYNB files...
+Cleaning Github Issue files...
+Cleaning converted DOCX files...
+Cleaning course-specific files...
+make[1]: Entering directory '/home/palra/nighthawk/pages-educators'
+🧹 Cleaning course-specific files...
+Multi-Course File Splitter
+========================================
+✅ Cleaned 62 generated files
+   - _posts/Foundation/2025-08-13-sprint1_.objectives_IPYNB_2__csse.md
+   - _posts/Foundation/2025-08-13-sprint1_.objectives_IPYNB_2__csp.md
+   - _posts/Foundation/2025-08-13-sprint1_.objectives_IPYNB_2__content.md
+   - _posts/Foundation/2025-08-13-sprint1_.objectives_IPYNB_2__csa.md
+   - _posts/Foundation/2025-08-13-sprint1_.objectives_IPYNB_2__cwgu.md
+   - _posts/Foundation/G-sprints/2025-08-13-sprints_home_csp.md
+   - _posts/Foundation/G-sprints/2025-08-13-sprints_home_csa.md
+   - _posts/Foundation/G-sprints/2025-08-13-sprints_home_content.md
+   - _posts/Foundation/G-sprints/2025-08-13-sprints_home_csse.md
+   - _posts/Foundation/C-github_pages/2026-01-03-code-runner-examples_csp.md
+   - _posts/Foundation/C-github_pages/2023-08-23-github_pages-intro_csse.md
+   - _posts/Foundation/C-github_pages/2025-12-27-code-runner_IPYNB_2__csa.md
+   - _posts/Foundation/C-github_pages/2023-08-23-github_pages-intro_content.md
+   - _posts/Foundation/C-github_pages/2023-08-23-github_pages-intro_csp.md
+   - _posts/Foundation/C-github_pages/2026-01-03-code-runner-examples_content.md
+   - _posts/Foundation/C-github_pages/2023-08-23-github_pages-intro_csa.md
+   - _posts/Foundation/C-github_pages/2025-12-30-about-builder-lesson_IPYNB_2__content.md
+   - _posts/Foundation/C-github_pages/2025-12-27-code-runner_IPYNB_2__csp.md
+   - _posts/Foundation/C-github_pages/2026-01-03-code-runner-examples_csa.md
+   - _posts/Foundation/C-github_pages/2025-12-30-about-builder-lesson_IPYNB_2__csse.md
+   - _posts/Foundation/C-github_pages/2026-01-03-code-runner-examples_csse.md
+   - _posts/Foundation/C-github_pages/2025-12-30-about-builder-lesson_IPYNB_2__csp.md
+   - _posts/Foundation/C-github_pages/2025-12-27-code-runner_IPYNB_2__csse.md
+   - _posts/Foundation/C-github_pages/2025-12-30-about-builder-lesson_IPYNB_2__csa.md
+   - _posts/Foundation/C-github_pages/2025-12-27-code-runner_IPYNB_2__content.md
+   - _posts/Foundation/A-agile_classroom/2025-04-15-agile_methodologies_practice_csp.md
+   - _posts/Foundation/A-agile_classroom/2025-04-15-agile_methodologies_practice_cwgu.md
+   - _posts/Foundation/A-agile_classroom/2025-04-15-agile_methodologies_practice_csse.md
+   - _posts/Foundation/A-agile_classroom/2025-04-15-agile_methodologies_practice_content.md
+   - _posts/Foundation/A-agile_classroom/2025-04-15-agile_methodologies_practice_csa.md
+   - _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_home_csse.md
+   - _posts/Foundation/B-tools_and_equipment/2025-12-03-javascript_oop_coder_cwgu.md
+   - _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_home_csp.md
+   - _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_home_cwgu.md
+   - _posts/Foundation/B-tools_and_equipment/2025-12-03-javascript_oop_coder_csp.md
+   - _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_home_csa.md
+   - _posts/Foundation/B-tools_and_equipment/2025-12-03-javascript_oop_coder_content.md
+   - _posts/Foundation/B-tools_and_equipment/2025-12-03-javascript_oop_coder_csse.md
+   - _posts/Foundation/B-tools_and_equipment/2025-04-15-tools_home_content.md
+   - _posts/Foundation/H-code/2026-03-15-srp-api-chaining_IPYNB_2__csp.md
+   - _posts/Foundation/H-code/2026-03-15-srp-api-chaining_IPYNB_2__csa.md
+   - _posts/Foundation/H-code/2026-03-15-srp-api-chaining_IPYNB_2__content.md
+   - _posts/CSP/flask/2025-11-08-flask-infograph_content.md
+   - _posts/CSP/flask/2025-11-08-flask-infograph_csp.md
+   - _posts/CSP/flask/2025-11-08-flask-infograph_csa.md
+   - _posts/CSSE/GameEngine/engine_essentials/2026-02-18-variables_instructor_IPYNB_2__csse.md
+   - _posts/CSSE/GameEngine/engine_essentials/2026-02-18-variables_instructor_IPYNB_2__content.md
+   - _posts/CSSE/GameEngine/engine_essentials/2026-02-18-variables_instructor_IPYNB_2__csp.md
+   - _notebooks/Foundation/2025-08-13-sprint1_.objectives_cwgu.ipynb
+   - _notebooks/Foundation/2025-08-13-sprint1_.objectives_csa.ipynb
+   - _notebooks/Foundation/2025-08-13-sprint1_.objectives_csp.ipynb
+   - _notebooks/Foundation/2025-08-13-sprint1_.objectives_csse.ipynb
+   - _notebooks/Foundation/C-github_pages/2025-12-30-about-builder-lesson_csp.ipynb
+   - _notebooks/Foundation/C-github_pages/2025-12-30-about-builder-lesson_csse.ipynb
+   - _notebooks/Foundation/C-github_pages/2025-12-27-code-runner_csa.ipynb
+   - _notebooks/Foundation/C-github_pages/2025-12-27-code-runner_csse.ipynb
+   - _notebooks/Foundation/C-github_pages/2025-12-27-code-runner_csp.ipynb
+   - _notebooks/Foundation/C-github_pages/2025-12-30-about-builder-lesson_csa.ipynb
+   - _notebooks/Foundation/H-code/2026-03-15-srp-api-chaining_csa.ipynb
+   - _notebooks/Foundation/H-code/2026-03-15-srp-api-chaining_csp.ipynb
+   - _notebooks/CSSE/GameEngine/engine_essentials/2026-02-18-variables_instructor_csp.ipynb
+   - _notebooks/CSSE/GameEngine/engine_essentials/2026-02-18-variables_instructor_csse.ipynb
+make[1]: Leaving directory '/home/palra/nighthawk/pages-educators'
+Cleaning project distributions...
+make[1]: Entering directory '/home/palra/nighthawk/pages-educators'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
+🧹 Cleaning cs-pathway-game distribution...
+✓ Distribution cleaned (source files preserved in _projects/cs-pathway-game)
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/gamify'
+🧹 Cleaning gamify distribution...
+✓ Distribution cleaned (source files preserved in _projects/gamify)
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/gamify'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/gamify'
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/gamify'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/make-helper'
+🧹 Cleaning make-helper helper artifacts...
+✓ cleaned
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/make-helper'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/make-helper'
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/make-helper'
+make[1]: Leaving directory '/home/palra/nighthawk/pages-educators'
+Cleaning extracted DOCX images...
+Cleaning DOCX index page...
+Removing empty directories in _posts...
+Removing _site directory...
+make: *** No rule to make target '_posts/Foundation/2025-08-13-sprint1_.objectives_cwgu_IPYNB_2_.md', needed by 'convert'.  Stop.

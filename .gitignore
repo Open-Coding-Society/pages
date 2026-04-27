@@ -53,7 +53,9 @@ _posts/**/*_csse.md
 # Project distributions (auto-generated from _projects/ source)
 _notebooks/projects/
 _posts/projects/
+_sass/projects/
 assets/js/projects/
+assets/css/projects/
 images/projects/
 
 # Post generations
@@ -70,3 +72,6 @@ _notebooks/**/*_csa.md
 _notebooks/**/*_csse.md
 _notebooks/**/*_cwgu.md
 _notebooks/**/*_content.md
+
+# remove all the .scss cache files
+*.scssc

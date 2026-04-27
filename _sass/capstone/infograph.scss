@@ -262,11 +262,12 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 }
 
 [class$="-infograph"] [class$="-tech-tag"] {
-  padding: 0.35rem 0.7rem;
+  padding: 0.45rem 0.9rem;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 // Details column
@@ -322,5 +323,6 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 [class$="-infograph"] [class$="-btn"]:hover {
   background: $infograph-btn-hover;
+  border-color: rgba(255, 255, 255, 0.28);
   transform: translateY(-1px);
 }

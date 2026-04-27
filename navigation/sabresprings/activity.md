@@ -258,26 +258,25 @@ description: Here are the activities. Hover over image for more details
       date: "Saturday May 23, 10-2 - Julian (John)"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Cloth_dodgeball.jpg",
-      title: "Modified Dodgeball",
-      shortDesc: "Team Sport",
-      hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!",
-      date: "June 9 - Church (Tiffany)"
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg/1280px-An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg",
+      title: "Air Rockets",
+      shortDesc: "Science & Launch",
+      hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics.",
+      date: "June 9 - Church (Bryan Akagi)"
     },
-
   ];
   
   // Summer Activities (June - August)
   const summerActivities = [
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg/1280px-An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg",
-      title: "Air Rockets",
-      shortDesc: "Science & Launch",
-      hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics.",
-      date: "June 23 - Church (Brian)"
+      image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Cloth_dodgeball.jpg",
+      title: "Modified Dodgeball",
+      shortDesc: "Team Sport",
+      hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!",
+      date: "June 23 - Church (Tiffany)"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Napa_Pool_Party.jpg/2560px-Napa_Pool_Party.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Ibiza_Rocks_Venue_2020.jpg/3840px-Ibiza_Rocks_Venue_2020.jpg",
       title: "Pool Party",
       shortDesc: "Water Fun",
       hoverDesc: "Beat the summer heat with swimming, pool games, and water safety lessons!",

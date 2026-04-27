@@ -1,30 +1,30 @@
 [
   {
     "name": "Fantasy",
-    "src": "analytics-observatory-fantasy.png",
-    "description": "Analytics Observatory with fantasy elements",
-    "previewText": "Fantasy Analytics",
+    "src": "assessment-observatory-fantasy.png",
+    "description": "Assessment Observatory with fantasy elements",
+    "previewText": "Fantasy Assessment",
     "compatibleSprites": ["Minimalist", "Fidelity Girl"]
   },
   {
     "name": "City",
-    "src": "analytics-observatory-city.png",
-    "description": "Analytics Observatory with urban backdrop",
-    "previewText": "Urban Analytics",
+    "src": "assessment-observatory-city.png",
+    "description": "Assessment Observatory with urban backdrop",
+    "previewText": "Urban Assessment",
     "compatibleSprites": ["Chill Guy", "Miku"]
   },
   {
     "name": "Space",
-    "src": "analytics-observatory-space.png",
-    "description": "Analytics Observatory in space",
-    "previewText": "Space Analytics",
+    "src": "assessment-observatory-space.png",
+    "description": "Assessment Observatory in space",
+    "previewText": "Space Assessment",
     "compatibleSprites": ["Astronaut", "Ufos", "Pew"]
   },
   {
     "name": "Clouds",
-    "src": "analytics-observatory-clouds.png",
-    "description": "Analytics Observatory in the clouds",
-    "previewText": "Cloud Analytics",
+    "src": "assessment-observatory-clouds.png",
+    "description": "Assessment Observatory in the clouds",
+    "previewText": "Cloud Assessment",
     "compatibleSprites": ["Kirby", "Slime"]
   }
 ]

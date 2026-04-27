@@ -506,6 +506,11 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                     <div class="text-3xl font-bold text-white mt-2">${(summary.averageScrollDepth || 0).toFixed(0)}%</div>
                     <p class="text-xs text-neutral-500 mt-2">average per lesson</p>
                 </div>
+                <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-6">
+                    <h3 class="text-neutral-300 font-medium">Bathroom Time</h3>
+                    <div class="text-3xl font-bold text-white mt-2">${summary.bathroomTimeFormatted || '0s'}</div>
+                    <p class="text-xs text-neutral-500 mt-2">${summary.bathroomTimeSeconds || 0} seconds total</p>
+                </div>
             </div>
         `;
     }
