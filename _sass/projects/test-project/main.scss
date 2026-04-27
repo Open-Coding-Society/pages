@@ -1,9 +1,0 @@
-$test-color: #ff00ff;
-
-.test-project-class {
-    color: $test-color;
-    background: darken($test-color, 10%);
-    padding: 20px;
-    border-radius: 5px;
-    font-weight: bold;
-}
