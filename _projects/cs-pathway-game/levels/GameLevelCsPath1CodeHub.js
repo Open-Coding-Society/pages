@@ -4,9 +4,480 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 
-// ── Shared panel shell ────────────────────────────────────────────────────────
-function createPanel(title, accentColor) {
+// ── Code Hub Progress (localStorage) ─────────────────────────────────────────
+const CH_KEY = 'code_hub_progress';
+function getCHProgress() {
+  try { return JSON.parse(localStorage.getItem(CH_KEY)) || {}; } catch { return {}; }
+}
+function saveCHProgress(updates) {
+  const p = getCHProgress();
+  Object.assign(p, updates);
+  localStorage.setItem(CH_KEY, JSON.stringify(p));
+}
+
+// ── CSS animations (injected once) ───────────────────────────────────────────
+function ensureCHStyles() {
+  if (document.getElementById('ch-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'ch-styles';
+  s.textContent = `
+    @keyframes chBounce    { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-10px)} }
+    @keyframes chFall      { 0%{top:-12px;opacity:1;transform:rotate(0deg)} 100%{top:110vh;opacity:0;transform:rotate(720deg)} }
+    @keyframes chLockPulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+    @keyframes chSlideIn   { 0%{opacity:0;transform:translateX(-50%) translateY(12px)} 100%{opacity:1;transform:translateX(-50%) translateY(0)} }
+    @keyframes chFadeOut   { 0%{opacity:1} 100%{opacity:0;transform:translateX(-50%) translateY(-12px)} }
+  `;
+  document.body.appendChild(s);
+}
+
+// ── Canvas-relative overlay positioning ───────────────────────────────────────
+// All overlays are positioned by reading the game canvas's bounding rect so they
+// stay glued to the robots regardless of window size or scroll position.
+let _chCanvas = null;
+const _chOverlayMap = {}; // id → { el, xPct, yPct }
+
+function _placeCHEl(el, xPct, yPct) {
+  if (!_chCanvas) return;
+  const r = _chCanvas.getBoundingClientRect();
+  el.style.left = `${r.left + r.width  * xPct}px`;
+  el.style.top  = `${r.top  + r.height * yPct}px`;
+}
+
+function _chResizeAll() {
+  Object.values(_chOverlayMap).forEach(({ el, xPct, yPct }) => {
+    if (document.body.contains(el)) _placeCHEl(el, xPct, yPct);
+  });
+  const sign = document.getElementById('ch-guide-sign');
+  if (sign && _chCanvas) {
+    const r = _chCanvas.getBoundingClientRect();
+    sign.style.left = `${r.left + r.width * 0.50}px`;
+    sign.style.top  = `${r.top  + r.height * 0.31}px`;
+  }
+}
+
+function initCHCanvas(canvas) {
+  _chCanvas = canvas;
+  window.removeEventListener('resize', _chResizeAll);
+  window.addEventListener('resize', _chResizeAll);
+}
+
+// ── Floating guide sign ───────────────────────────────────────────────────────
+function showGuideSign() {
+  ensureCHStyles();
+  if (document.getElementById('ch-guide-sign')) return;
+  const el = document.createElement('div');
+  el.id = 'ch-guide-sign';
+  el.className = 'ch-overlay';
+  el.innerHTML = `<div style="font-size:12px;letter-spacing:0.06em;">START HERE</div><div style="font-size:20px;margin-top:2px;">⬇</div>`;
+  Object.assign(el.style, {
+    position:'fixed', transform:'translateX(-50%)',
+    background:'linear-gradient(135deg,#ff6b35,#f7931e)',
+    color:'#1a0800', padding:'8px 18px', borderRadius:'10px',
+    fontWeight:'800', fontFamily:'system-ui,sans-serif',
+    zIndex:'8995', pointerEvents:'none', textAlign:'center',
+    animation:'chBounce 1.2s ease-in-out infinite',
+    boxShadow:'0 4px 20px rgba(255,107,53,0.6)',
+  });
+  document.body.appendChild(el);
+  _placeCHEl(el, 0.50, 0.31);
+}
+function removeGuideSign() { document.getElementById('ch-guide-sign')?.remove(); }
+
+// ── Lock overlays ─────────────────────────────────────────────────────────────
+function showLockOverlay(id, xPct, yPct, label) {
+  ensureCHStyles();
+  if (document.getElementById(`ch-lock-${id}`)) return;
+  const el = document.createElement('div');
+  el.id = `ch-lock-${id}`;
+  el.className = 'ch-overlay';
+  el.innerHTML = `
+    <div style="font-size:24px;line-height:1;">🔒</div>
+    <div style="font-size:8px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-top:3px;white-space:pre-line;text-align:center;">${label}</div>
+  `;
+  Object.assign(el.style, {
+    position:'fixed', transform:'translate(-50%,-50%)',
+    background:'rgba(8,12,24,0.92)', border:'2px solid rgba(100,116,139,0.35)',
+    borderRadius:'50%', width:'72px', height:'72px',
+    display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+    zIndex:'8994', pointerEvents:'none',
+    animation:'chLockPulse 2.5s ease-in-out infinite',
+    fontFamily:'system-ui,sans-serif', boxShadow:'0 0 0 6px rgba(100,116,139,0.12)',
+  });
+  document.body.appendChild(el);
+  _placeCHEl(el, xPct, yPct);
+  _chOverlayMap[id] = { el, xPct, yPct };
+}
+function removeLockOverlay(id) {
+  document.getElementById(`ch-lock-${id}`)?.remove();
+  delete _chOverlayMap[id];
+}
+function removeAllCHOverlays() {
+  document.querySelectorAll('.ch-overlay').forEach(el => el.remove());
+  Object.keys(_chOverlayMap).forEach(k => delete _chOverlayMap[k]);
+  window.removeEventListener('resize', _chResizeAll);
+  _chCanvas = null;
+}
+
+// ── Confetti burst ────────────────────────────────────────────────────────────
+function spawnConfetti() {
+  ensureCHStyles();
+  const colors = ['#4caef0','#86efac','#fbbf24','#c084fc','#f87171','#ffffff'];
+  for (let i = 0; i < 72; i++) {
+    const el = document.createElement('div');
+    const sz = Math.random() * 9 + 4;
+    el.className = 'ch-overlay';
+    Object.assign(el.style, {
+      position:'fixed', left:`${Math.random()*100}vw`, top:'-12px',
+      width:`${sz}px`, height:`${sz}px`,
+      background:colors[Math.floor(Math.random()*colors.length)],
+      borderRadius: Math.random()>0.5 ? '50%' : '2px',
+      zIndex:'99998', pointerEvents:'none',
+      animation:`chFall ${1.4+Math.random()*1.8}s ease-in forwards`,
+      animationDelay:`${Math.random()*0.7}s`,
+    });
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+}
+
+// ── Unlock badge toast ────────────────────────────────────────────────────────
+function showUnlockBadge(msg) {
+  ensureCHStyles();
+  const el = document.createElement('div');
+  el.className = 'ch-overlay';
+  el.textContent = msg;
+  Object.assign(el.style, {
+    position:'fixed', left:'50vw', top:'12vh', transform:'translateX(-50%)',
+    background:'linear-gradient(135deg,#86efac,#4caef0)',
+    color:'#0d1526', padding:'12px 28px', borderRadius:'12px',
+    fontWeight:'800', fontSize:'14px', fontFamily:'system-ui,sans-serif',
+    zIndex:'99997', pointerEvents:'none', letterSpacing:'0.04em',
+    animation:'chSlideIn 0.4s ease forwards',
+    boxShadow:'0 6px 24px rgba(134,239,172,0.5)',
+  });
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'chFadeOut 0.5s ease forwards';
+    el.addEventListener('animationend', () => el.remove());
+  }, 2500);
+}
+
+// ── Frontend Mini-Game ────────────────────────────────────────────────────────
+function openFrontendGame(gameControl, onWin) {
   document.getElementById('code-hub-panel')?.remove();
+  const body = createPanel('🎮 Frontend Challenge — Markdown Decoder', '#4caef0', gameControl);
+
+  const questions = [
+    {
+      html: '<strong style="color:#e2e8f0;font-size:17px;">Hello World</strong>',
+      prompt: 'Which Markdown produces this bold text?',
+      options: ['*Hello World*', '**Hello World**', '# Hello World', '> Hello World'],
+      answer: 1,
+    },
+    {
+      html: '<h1 style="color:#4caef0;font-size:22px;margin:0;">Big Title</h1>',
+      prompt: 'Which Markdown creates an H1 heading?',
+      options: ['## Big Title', '# Big Title', '### Big Title', '> Big Title'],
+      answer: 1,
+    },
+    {
+      html: '<ul style="margin:0;padding-left:18px;"><li style="color:#cbd5e1;">List item</li></ul>',
+      prompt: 'Which Markdown creates an unordered list item?',
+      options: ['1. List item', '> List item', '** List item **', '- List item'],
+      answer: 3,
+    },
+    {
+      html: '<blockquote style="border-left:3px solid #4caef0;padding:4px 10px;color:#94a3b8;background:rgba(76,175,239,0.06);margin:0;">Important note</blockquote>',
+      prompt: 'Which Markdown creates a blockquote?',
+      options: ['- Important note', '## Important note', '> Important note', '`Important note`'],
+      answer: 2,
+    },
+    {
+      html: '<code style="background:rgba(76,175,239,0.15);color:#4caef0;padding:2px 7px;border-radius:3px;font-size:14px;">myFunction()</code>',
+      prompt: 'Which Markdown creates inline code?',
+      options: ['*myFunction()*', '**myFunction()**', '> myFunction()', '`myFunction()`'],
+      answer: 3,
+    },
+  ];
+
+  let current = 0, score = 0;
+
+  const render = () => {
+    const q = questions[current];
+    body.innerHTML = `
+      <div style="text-align:center;margin-bottom:14px;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;">Question ${current+1} of ${questions.length} &nbsp;·&nbsp; Score: ${score}/${current}</div>
+        <div style="display:flex;gap:5px;justify-content:center;margin-top:8px;">
+          ${questions.map((_,i)=>`<div style="width:30px;height:5px;border-radius:3px;background:${i<current?'#4caef0':i===current?'rgba(76,175,239,0.3)':'rgba(255,255,255,0.08)'}"></div>`).join('')}
+        </div>
+      </div>
+      <div style="background:rgba(76,175,239,0.07);border:1px solid rgba(76,175,239,0.2);border-radius:10px;padding:22px;margin-bottom:16px;text-align:center;min-height:56px;display:flex;align-items:center;justify-content:center;">${q.html}</div>
+      <div style="font-size:13px;color:#94a3b8;margin-bottom:14px;text-align:center;">${q.prompt}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="fg-opts"></div>
+      <div id="fg-fb" style="margin-top:14px;min-height:28px;text-align:center;font-size:13px;font-weight:700;"></div>
+    `;
+    const grid = document.getElementById('fg-opts');
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.style.cssText = `background:rgba(76,175,239,0.06);border:1px solid rgba(76,175,239,0.2);border-radius:8px;color:#e2e8f0;padding:12px 14px;font-size:12px;cursor:pointer;font-family:'Fira Code',monospace;text-align:left;transition:background 0.12s,border-color 0.12s;`;
+      btn.textContent = opt;
+      btn.onmouseover = () => { btn.style.background='rgba(76,175,239,0.15)'; btn.style.borderColor='rgba(76,175,239,0.5)'; };
+      btn.onmouseout  = () => { btn.style.background='rgba(76,175,239,0.06)'; btn.style.borderColor='rgba(76,175,239,0.2)'; };
+      btn.onclick = () => {
+        const correct = i === q.answer;
+        if (correct) score++;
+        grid.querySelectorAll('button').forEach((b,j) => {
+          b.style.pointerEvents = 'none';
+          if (j === q.answer) { b.style.background='rgba(134,239,172,0.18)'; b.style.borderColor='#86efac'; b.style.color='#86efac'; }
+          else if (j === i && !correct) { b.style.background='rgba(248,113,113,0.18)'; b.style.borderColor='#f87171'; b.style.color='#f87171'; }
+        });
+        document.getElementById('fg-fb').innerHTML = correct
+          ? '<span style="color:#86efac;">✓ Correct!</span>'
+          : `<span style="color:#f87171;">✗ Answer: <code style="color:#4caef0;">${q.options[q.answer]}</code></span>`;
+        setTimeout(() => { current++; current < questions.length ? render() : showFGResult(); }, 1300);
+      };
+      grid.appendChild(btn);
+    });
+  };
+
+  const showFGResult = () => {
+    const passed = score >= 4;
+    body.innerHTML = `
+      <div style="text-align:center;padding:28px 16px;">
+        <div style="font-size:52px;margin-bottom:12px;">${passed?'🎉':'📚'}</div>
+        <div style="font-size:20px;font-weight:700;color:${passed?'#86efac':'#fbbf24'};margin-bottom:8px;">${passed?'Frontend Unlocked!':'Keep Practicing!'}</div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:6px;">Score: ${score} / ${questions.length}</div>
+        <div style="font-size:12px;color:${passed?'#86efac':'#64748b'};margin-bottom:22px;">${passed?'Markdown mastered — Backend Terminal is now open.':'You need 4/5 to unlock the Backend Terminal.'}</div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          ${!passed?`<button id="fg-retry" style="background:rgba(76,175,239,0.12);border:1px solid rgba(76,175,239,0.35);border-radius:8px;color:#4caef0;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;">↺ Try Again</button>`:''}
+          <button id="fg-done" style="background:${passed?'#4caef0':'rgba(255,255,255,0.06)'};border:1px solid ${passed?'#4caef0':'rgba(255,255,255,0.1)'};border-radius:8px;color:${passed?'#0d1526':'#aaa'};padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;">${passed?'→ Continue':'Back to Lesson'}</button>
+        </div>
+      </div>`;
+    if (passed) { onWin(); spawnConfetti(); }
+    document.getElementById('fg-retry')?.addEventListener('click', () => { current=0; score=0; render(); });
+    document.getElementById('fg-done').addEventListener('click', () => {
+      document.getElementById('code-hub-panel')?.remove();
+      gameControl?.resume?.();
+    });
+  };
+
+  render();
+}
+
+// ── Backend Mini-Game ─────────────────────────────────────────────────────────
+function openBackendGame(gameControl, onWin) {
+  document.getElementById('code-hub-panel')?.remove();
+  const body = createPanel('🎮 Backend Challenge — API Architect', '#86efac', gameControl);
+
+  const questions = [
+    { scenario:'Fetch all products from the database',     answer:'GET',    hint:'Reading data always uses GET.' },
+    { scenario:'Add a brand-new user account',             answer:'POST',   hint:'Creating resources uses POST.' },
+    { scenario:"Update a user's email address",            answer:'PUT',    hint:'Updating existing records uses PUT.' },
+    { scenario:'Remove an expired product listing',        answer:'DELETE', hint:'Deleting resources uses DELETE.' },
+    { scenario:'Retrieve a single order by its ID',        answer:'GET',    hint:'Even a single-record read uses GET.' },
+  ];
+  const methodColors = { GET:'#4caef0', POST:'#86efac', PUT:'#fbbf24', DELETE:'#f87171' };
+  let current = 0, score = 0;
+
+  const render = () => {
+    const q = questions[current];
+    body.innerHTML = `
+      <div style="text-align:center;margin-bottom:14px;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;">Question ${current+1} of ${questions.length} &nbsp;·&nbsp; Score: ${score}/${current}</div>
+        <div style="display:flex;gap:5px;justify-content:center;margin-top:8px;">
+          ${questions.map((_,i)=>`<div style="width:30px;height:5px;border-radius:3px;background:${i<current?'#86efac':i===current?'rgba(134,239,172,0.3)':'rgba(255,255,255,0.08)'}"></div>`).join('')}
+        </div>
+      </div>
+      <div style="background:rgba(10,15,30,0.55);border:1px solid rgba(134,239,172,0.2);border-radius:10px;padding:22px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Scenario</div>
+        <div style="font-size:16px;color:#e2e8f0;font-weight:600;">${q.scenario}</div>
+        <div style="font-family:'Fira Code',monospace;font-size:12px;color:#64748b;margin-top:10px;">??? /api/resource</div>
+      </div>
+      <div style="font-size:13px;color:#94a3b8;margin-bottom:14px;text-align:center;">Which HTTP method?</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="bg-opts"></div>
+      <div id="bg-fb" style="margin-top:14px;min-height:28px;text-align:center;font-size:13px;font-weight:700;"></div>
+    `;
+    const grid = document.getElementById('bg-opts');
+    ['GET','POST','PUT','DELETE'].forEach(method => {
+      const c = methodColors[method];
+      const btn = document.createElement('button');
+      btn.style.cssText = `background:${c}14;border:1px solid ${c}35;border-radius:8px;color:${c};padding:14px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.05em;transition:background 0.12s,border-color 0.12s;`;
+      btn.textContent = method;
+      btn.onmouseover = () => { btn.style.background=`${c}28`; btn.style.borderColor=`${c}80`; };
+      btn.onmouseout  = () => { btn.style.background=`${c}14`; btn.style.borderColor=`${c}35`; };
+      btn.onclick = () => {
+        const correct = method === q.answer;
+        if (correct) score++;
+        grid.querySelectorAll('button').forEach(b => { b.style.pointerEvents='none'; });
+        btn.style.background = correct ? 'rgba(134,239,172,0.22)' : 'rgba(248,113,113,0.18)';
+        btn.style.borderColor = correct ? '#86efac' : '#f87171';
+        btn.style.color = correct ? '#86efac' : '#f87171';
+        if (!correct) {
+          grid.querySelectorAll('button').forEach(b => {
+            if (b.textContent === q.answer) {
+              const ac = methodColors[q.answer];
+              b.style.background=`${ac}28`; b.style.borderColor=`${ac}80`; b.style.color=ac;
+            }
+          });
+        }
+        document.getElementById('bg-fb').innerHTML = correct
+          ? `<span style="color:#86efac;">✓ ${q.hint}</span>`
+          : `<span style="color:#f87171;">✗ ${q.hint}</span>`;
+        setTimeout(() => { current++; current < questions.length ? render() : showBGResult(); }, 1400);
+      };
+      grid.appendChild(btn);
+    });
+  };
+
+  const showBGResult = () => {
+    const passed = score >= 4;
+    body.innerHTML = `
+      <div style="text-align:center;padding:28px 16px;">
+        <div style="font-size:52px;margin-bottom:12px;">${passed?'🎉':'📚'}</div>
+        <div style="font-size:20px;font-weight:700;color:${passed?'#86efac':'#fbbf24'};margin-bottom:8px;">${passed?'Backend Unlocked!':'Keep Practicing!'}</div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:6px;">Score: ${score} / ${questions.length}</div>
+        <div style="font-size:12px;color:${passed?'#86efac':'#64748b'};margin-bottom:22px;">${passed?'REST API expert — Dataviz Terminal is now open.':'You need 4/5 to unlock the Dataviz Terminal.'}</div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          ${!passed?`<button id="bg-retry" style="background:rgba(134,239,172,0.12);border:1px solid rgba(134,239,172,0.35);border-radius:8px;color:#86efac;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;">↺ Try Again</button>`:''}
+          <button id="bg-done" style="background:${passed?'#86efac':'rgba(255,255,255,0.06)'};border:1px solid ${passed?'#86efac':'rgba(255,255,255,0.1)'};border-radius:8px;color:${passed?'#0d1526':'#aaa'};padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;">${passed?'→ Continue':'Back to Lesson'}</button>
+        </div>
+      </div>`;
+    if (passed) { onWin(); spawnConfetti(); }
+    document.getElementById('bg-retry')?.addEventListener('click', () => { current=0; score=0; render(); });
+    document.getElementById('bg-done').addEventListener('click', () => {
+      document.getElementById('code-hub-panel')?.remove();
+      gameControl?.resume?.();
+    });
+  };
+
+  render();
+}
+
+// ── Dataviz Mini-Game ─────────────────────────────────────────────────────────
+function openDatavizGame(gameControl, onWin) {
+  document.getElementById('code-hub-panel')?.remove();
+  const body = createPanel('🎮 Dataviz Challenge — Query Quest', '#c084fc', gameControl);
+
+  const fullSet = [
+    { name:'TechCorp',   industry:'Software',   location:'San Francisco', size:500 },
+    { name:'HealthPlus', industry:'Healthcare', location:'Boston',         size:120 },
+    { name:'EduWorld',   industry:'Education',  location:'San Diego',      size:80  },
+    { name:'DataStream', industry:'Software',   location:'Seattle',        size:340 },
+    { name:'GreenEnergy',industry:'Energy',     location:'Denver',         size:60  },
+    { name:'MediCare',   industry:'Healthcare', location:'Chicago',        size:210 },
+    { name:'CloudNine',  industry:'Software',   location:'Austin',         size:900 },
+    { name:'LearnFast',  industry:'Education',  location:'Boston',         size:45  },
+    { name:'PowerGrid',  industry:'Energy',     location:'Houston',        size:380 },
+    { name:'ByteWorks',  industry:'Software',   location:'San Francisco',  size:150 },
+    { name:'CareFirst',  industry:'Healthcare', location:'New York',       size:95  },
+    { name:'SolarTech',  industry:'Energy',     location:'Phoenix',        size:270 },
+  ];
+
+  const challenges = [
+    {
+      prompt: 'Find all Software companies',
+      endpoint: 'GET /api/companies?industry=???',
+      type: 'industry', answer: 'Software',
+      options: ['Software','Healthcare','Education','Energy'],
+      hint: 'Filter by industry = "Software"',
+      targets: fullSet.filter(r => r.industry === 'Software').map(r => r.name),
+    },
+    {
+      prompt: 'Find companies with more than 200 employees',
+      endpoint: 'GET /api/companies?minSize=???',
+      type: 'minSize', answer: '200',
+      options: ['50','100','200','400'],
+      hint: 'minSize = 200 keeps companies with size > 200',
+      targets: fullSet.filter(r => r.size > 200).map(r => r.name),
+    },
+    {
+      prompt: 'Find all companies located in Boston',
+      endpoint: 'GET /api/companies?location=???',
+      type: 'location', answer: 'Boston',
+      options: ['Boston','Seattle','Chicago','Austin'],
+      hint: 'Filter by location = "Boston"',
+      targets: fullSet.filter(r => r.location === 'Boston').map(r => r.name),
+    },
+  ];
+
+  let current = 0, score = 0;
+
+  const render = () => {
+    const ch = challenges[current];
+    body.innerHTML = `
+      <div style="text-align:center;margin-bottom:14px;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;">Challenge ${current+1} of ${challenges.length} &nbsp;·&nbsp; Score: ${score}/${current}</div>
+        <div style="display:flex;gap:5px;justify-content:center;margin-top:8px;">
+          ${challenges.map((_,i)=>`<div style="width:30px;height:5px;border-radius:3px;background:${i<current?'#c084fc':i===current?'rgba(192,132,252,0.3)':'rgba(255,255,255,0.08)'}"></div>`).join('')}
+        </div>
+      </div>
+      <div style="background:rgba(192,132,252,0.07);border:1px solid rgba(192,132,252,0.2);border-radius:10px;padding:16px 18px;margin-bottom:16px;">
+        <div style="font-size:15px;color:#e2e8f0;font-weight:600;margin-bottom:10px;">${ch.prompt}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${ch.targets.map(n=>`<span style="background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.25);border-radius:5px;padding:3px 9px;font-size:11px;color:#c084fc;">${n}</span>`).join('')}
+        </div>
+      </div>
+      <div style="font-family:'Fira Code',monospace;font-size:12px;color:#64748b;text-align:center;margin-bottom:14px;">${ch.endpoint}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="dg-opts"></div>
+      <div id="dg-fb" style="margin-top:14px;min-height:28px;text-align:center;font-size:13px;font-weight:700;"></div>
+    `;
+    const grid = document.getElementById('dg-opts');
+    ch.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.style.cssText = `background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.2);border-radius:8px;color:#e2e8f0;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Fira Code',monospace;transition:background 0.12s,border-color 0.12s;`;
+      btn.textContent = opt;
+      btn.onmouseover = () => { btn.style.background='rgba(192,132,252,0.16)'; btn.style.borderColor='rgba(192,132,252,0.5)'; };
+      btn.onmouseout  = () => { btn.style.background='rgba(192,132,252,0.06)'; btn.style.borderColor='rgba(192,132,252,0.2)'; };
+      btn.onclick = () => {
+        const correct = opt === ch.answer;
+        if (correct) score++;
+        grid.querySelectorAll('button').forEach(b => {
+          b.style.pointerEvents = 'none';
+          if (b.textContent === ch.answer) { b.style.background='rgba(134,239,172,0.18)'; b.style.borderColor='#86efac'; b.style.color='#86efac'; }
+          else if (b === btn && !correct) { b.style.background='rgba(248,113,113,0.18)'; b.style.borderColor='#f87171'; b.style.color='#f87171'; }
+        });
+        document.getElementById('dg-fb').innerHTML = correct
+          ? `<span style="color:#86efac;">✓ ${ch.hint}</span>`
+          : `<span style="color:#f87171;">✗ ${ch.hint}</span>`;
+        setTimeout(() => { current++; current < challenges.length ? render() : showDGResult(); }, 1400);
+      };
+      grid.appendChild(btn);
+    });
+  };
+
+  const showDGResult = () => {
+    const passed = score >= 2;
+    body.innerHTML = `
+      <div style="text-align:center;padding:28px 16px;">
+        <div style="font-size:52px;margin-bottom:12px;">${passed?'🏆':'📚'}</div>
+        <div style="font-size:20px;font-weight:700;color:${passed?'#86efac':'#fbbf24'};margin-bottom:8px;">${passed?'Code Hub Complete!':'Keep Practicing!'}</div>
+        <div style="font-size:13px;color:#94a3b8;margin-bottom:6px;">Score: ${score} / ${challenges.length}</div>
+        <div style="font-size:12px;color:${passed?'#86efac':'#64748b'};margin-bottom:22px;">${passed?'You\'ve mastered all three terminals!':'You need 2/3 to complete the Code Hub.'}</div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          ${!passed?`<button id="dg-retry" style="background:rgba(192,132,252,0.12);border:1px solid rgba(192,132,252,0.35);border-radius:8px;color:#c084fc;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;">↺ Try Again</button>`:''}
+          <button id="dg-done" style="background:${passed?'#c084fc':'rgba(255,255,255,0.06)'};border:1px solid ${passed?'#c084fc':'rgba(255,255,255,0.1)'};border-radius:8px;color:${passed?'#0d1526':'#aaa'};padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;">${passed?'→ Finish':'Back to Lesson'}</button>
+        </div>
+      </div>`;
+    if (passed) { onWin(); spawnConfetti(); }
+    document.getElementById('dg-retry')?.addEventListener('click', () => { current=0; score=0; render(); });
+    document.getElementById('dg-done').addEventListener('click', () => {
+      document.getElementById('code-hub-panel')?.remove();
+      gameControl?.resume?.();
+    });
+  };
+
+  render();
+}
+
+// ── Shared panel shell ────────────────────────────────────────────────────────
+// Pauses the game on open and resumes on close, matching DialogueSystem behavior.
+function createPanel(title, accentColor, gameControl) {
+  document.getElementById('code-hub-panel')?.remove();
+
+  // Pause the game while the panel is open
+  if (gameControl && typeof gameControl.pause === 'function' && !gameControl.isPaused) {
+    gameControl.pause();
+  }
 
   const panel = document.createElement('div');
   panel.id = 'code-hub-panel';
@@ -51,13 +522,22 @@ function createPanel(title, accentColor) {
   panel.appendChild(header);
   panel.appendChild(body);
   document.body.appendChild(panel);
-  document.getElementById('panel-close').onclick = () => panel.remove();
+
+  // Resume game when panel is closed
+  const closePanel = () => {
+    panel.remove();
+    if (gameControl && typeof gameControl.resume === 'function') {
+      gameControl.resume();
+    }
+  };
+  document.getElementById('panel-close').onclick = closePanel;
+
   return body;
 }
 
 // ── Frontend Panel — Markdown Converter + CSS Playground ─────────────────────
-function openFrontendPanel() {
-  const body = createPanel('⌨ Frontend Terminal — Markdown & CSS', '#4caef0');
+function openFrontendPanel(gameControl) {
+  const body = createPanel('⌨ Frontend Terminal — Markdown & CSS', '#4caef0', gameControl);
 
   body.innerHTML = `
     <!-- Reference box -->
@@ -212,11 +692,35 @@ Write your **Markdown** here and hit Convert.
     el.setAttribute('style', 'background:linear-gradient(135deg,#667eea,#764ba2);padding:32px 24px;border-radius:12px;color:white;text-align:center;font-size:18px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,0.4);transition:transform 0.3s ease;cursor:pointer;max-width:280px;margin:0 auto;');
     el.textContent = 'Hover over me ✨';
   };
+
+  // ── Challenge CTA ──────────────────────────────────────────────────────────
+  const feChallengeDiv = document.createElement('div');
+  feChallengeDiv.style.cssText = 'margin-top:20px;padding:16px 18px;background:rgba(76,175,239,0.06);border:1px solid rgba(76,175,239,0.2);border-radius:10px;text-align:center;';
+  const feP = getCHProgress();
+  if (feP.frontendCompleted) {
+    feChallengeDiv.innerHTML = `<div style="font-size:13px;color:#86efac;font-weight:700;">✓ Frontend Challenge Complete — Backend Terminal unlocked!</div>`;
+  } else {
+    feChallengeDiv.innerHTML = `
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">Reviewed the lesson? Prove your Markdown skills to unlock the Backend terminal.</div>
+      <button id="fe-challenge-btn" style="background:#4caef0;border:none;border-radius:8px;color:#0d1526;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;">🎮 Play Challenge</button>
+    `;
+    body.appendChild(feChallengeDiv);
+    document.getElementById('fe-challenge-btn').onclick = () => {
+      openFrontendGame(gameControl, () => {
+        saveCHProgress({ frontendCompleted: true });
+        removeLockOverlay('backend');
+        showUnlockBadge('🔓 Backend Terminal Unlocked!');
+        feChallengeDiv.innerHTML = `<div style="font-size:13px;color:#86efac;font-weight:700;">✓ Frontend Challenge Complete — Backend Terminal unlocked!</div>`;
+      });
+    };
+    return;
+  }
+  body.appendChild(feChallengeDiv);
 }
 
 // ── Backend Panel — REST API Simulator ───────────────────────────────────────
-function openBackendPanel() {
-  const body = createPanel('⌨ Backend Terminal — REST API Simulator', '#86efac');
+function openBackendPanel(gameControl) {
+  const body = createPanel('⌨ Backend Terminal — REST API Simulator', '#86efac', gameControl);
 
   const db = [
     { id:1, name:'TechCorp',    industry:'Software',  location:'San Francisco', size:150, skills:['Java','Spring'] },
@@ -372,11 +876,35 @@ function openBackendPanel() {
       log(200, '#f87171', `Deleted:\n${JSON.stringify(removed, null, 2)}`);
     }
   };
+
+  // ── Challenge CTA ──────────────────────────────────────────────────────────
+  const beChallengeDiv = document.createElement('div');
+  beChallengeDiv.style.cssText = 'margin-top:20px;padding:16px 18px;background:rgba(134,239,172,0.06);border:1px solid rgba(134,239,172,0.2);border-radius:10px;text-align:center;';
+  const beP = getCHProgress();
+  if (beP.backendCompleted) {
+    beChallengeDiv.innerHTML = `<div style="font-size:13px;color:#86efac;font-weight:700;">✓ Backend Challenge Complete — Dataviz Terminal unlocked!</div>`;
+  } else {
+    beChallengeDiv.innerHTML = `
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">Tested the API? Prove your REST knowledge to unlock the Dataviz terminal.</div>
+      <button id="be-challenge-btn" style="background:#86efac;border:none;border-radius:8px;color:#0d1526;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;">🎮 Play Challenge</button>
+    `;
+    body.appendChild(beChallengeDiv);
+    document.getElementById('be-challenge-btn').onclick = () => {
+      openBackendGame(gameControl, () => {
+        saveCHProgress({ backendCompleted: true });
+        removeLockOverlay('dataviz');
+        showUnlockBadge('🔓 Dataviz Terminal Unlocked!');
+        beChallengeDiv.innerHTML = `<div style="font-size:13px;color:#86efac;font-weight:700;">✓ Backend Challenge Complete — Dataviz Terminal unlocked!</div>`;
+      });
+    };
+    return;
+  }
+  body.appendChild(beChallengeDiv);
 }
 
 // ── Dataviz Panel — Filtering + Pagination + Query Builder ───────────────────
-function openDatavizPanel() {
-  const body = createPanel('⌨ Dataviz Terminal — Filtering, Pagination & Queries', '#c084fc');
+function openDatavizPanel(gameControl) {
+  const body = createPanel('⌨ Dataviz Terminal — Filtering, Pagination & Queries', '#c084fc', gameControl);
 
   const dataset = [
     { id:1,  name:'TechCorp',    industry:'Software',      location:'San Francisco', size:500,  skills:['Java','Spring'] },
@@ -525,6 +1053,29 @@ function openDatavizPanel() {
   document.getElementById('dv-next').onclick = () => {
     if (page < Math.ceil(filtered.length / PAGE_SIZE)) { page++; renderTable(); }
   };
+
+  // ── Challenge CTA ──────────────────────────────────────────────────────────
+  const dvChallengeDiv = document.createElement('div');
+  dvChallengeDiv.style.cssText = 'margin-top:20px;padding:16px 18px;background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.2);border-radius:10px;text-align:center;';
+  const dvP = getCHProgress();
+  if (dvP.datavizCompleted) {
+    dvChallengeDiv.innerHTML = `<div style="font-size:13px;color:#86efac;font-weight:700;">✓ Dataviz Challenge Complete — Code Hub mastered!</div>`;
+  } else {
+    dvChallengeDiv.innerHTML = `
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">Explored the data? Complete the final challenge to master the Code Hub!</div>
+      <button id="dv-challenge-btn" style="background:#c084fc;border:none;border-radius:8px;color:#0d1526;padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;">🎮 Play Challenge</button>
+    `;
+    body.appendChild(dvChallengeDiv);
+    document.getElementById('dv-challenge-btn').onclick = () => {
+      openDatavizGame(gameControl, () => {
+        saveCHProgress({ datavizCompleted: true });
+        showUnlockBadge('🏆 Code Hub Mastered!');
+        dvChallengeDiv.innerHTML = `<div style="font-size:13px;color:#86efac;font-weight:700;">✓ Dataviz Challenge Complete — Code Hub mastered!</div>`;
+      });
+    };
+    return;
+  }
+  body.appendChild(dvChallengeDiv);
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -586,7 +1137,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       SCALE_FACTOR:   SCALE,
       ANIMATION_RATE: 50,
       pixels:         { width: 1024, height: 1024 },
-      orientation:    { rows: 2, columns: 2 },
+      orientation:    { rows: 1, columns: 1 },
       down:           { row: 0, start: 0, columns: 1, wiggle: 0.005 },
       up:             { row: 0, start: 1, columns: 1 },
       left:           { row: 1, start: 0, columns: 1 },
@@ -607,17 +1158,34 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
     const npc_guide = {
       ...npcBase,
       id:            'CodeHubGuide',
-      greeting:      'Welcome to the Code Hub! Head to a terminal to start learning.',
+      greeting:      'Talk to me to unlock the terminals!',
       INIT_POSITION: { x: width * positions.center.x, y: height * positions.center.y },
       interact: function() {
         document.getElementById('code-hub-panel')?.remove();
-        this.dialogueSystem.dialogues = [
-          'Hey! Welcome to the Code Hub.',
-          'Head to the Frontend terminal (top-left) — HTML, CSS, and Markdown.',
-          'The Backend terminal (top-right) — REST APIs, databases, and CRUD.',
-          'Dataviz (bottom-right) — filtering, pagination, and queries.',
-          'Use the exit portal (bottom-left) to return to the Wayfinding World.',
-        ];
+        const p = getCHProgress();
+        if (!p.guideVisited) {
+          saveCHProgress({ guideVisited: true });
+          removeGuideSign();
+          removeLockOverlay('frontend');
+          this.dialogueSystem.dialogues = [
+            'Hey! Welcome to the Code Hub — I run this place.',
+            'Three terminals surround you: Frontend, Backend, and Dataviz.',
+            'They were locked — but since you talked to me, the Frontend terminal is now open!',
+            'Complete each terminal\'s challenge to unlock the next one.',
+            'Frontend (top-left) → Backend (top-right) → Dataviz (bottom-right).',
+            'Head to the Frontend terminal and start learning!',
+          ];
+        } else {
+          const unlocked = [
+            p.guideVisited    ? '✓ Frontend' : '🔒 Frontend',
+            p.frontendCompleted ? '✓ Backend'  : '🔒 Backend',
+            p.backendCompleted  ? '✓ Dataviz'  : '🔒 Dataviz',
+          ];
+          this.dialogueSystem.dialogues = [
+            `Progress: ${unlocked.join('  ·  ')}`,
+            'Complete each terminal\'s challenge to unlock the next one.',
+          ];
+        }
         this.dialogueSystem.lastShownIndex = -1;
         this.dialogueSystem.showRandomDialogue('Code Hub Guide');
       },
@@ -631,6 +1199,12 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       INIT_POSITION: { x: width * positions.frontend.x, y: height * positions.frontend.y },
       interact: function() {
         document.getElementById('code-hub-panel')?.remove();
+        if (!getCHProgress().guideVisited) {
+          this.dialogueSystem.dialogues = ['🔒 Terminal locked! Talk to the guide in the center first.'];
+          this.dialogueSystem.lastShownIndex = -1;
+          this.dialogueSystem.showRandomDialogue('Frontend Terminal');
+          return;
+        }
         this.dialogueSystem.dialogues = [
           'Frontend is everything the user sees.',
           'HTML gives the page structure — headings, divs, links, images.',
@@ -646,7 +1220,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: true,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openFrontendPanel();
+              openFrontendPanel(this.gameEnv.gameControl);
             },
           },
         ]);
@@ -661,6 +1235,12 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       INIT_POSITION: { x: width * positions.backend.x, y: height * positions.backend.y },
       interact: function() {
         document.getElementById('code-hub-panel')?.remove();
+        if (!getCHProgress().frontendCompleted) {
+          this.dialogueSystem.dialogues = ['🔒 Terminal locked! Complete the Frontend challenge first.'];
+          this.dialogueSystem.lastShownIndex = -1;
+          this.dialogueSystem.showRandomDialogue('Backend Terminal');
+          return;
+        }
         this.dialogueSystem.dialogues = [
           'The backend is everything the user does NOT see.',
           'REST APIs expose your data through URL endpoints.',
@@ -676,7 +1256,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: true,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openBackendPanel();
+              openBackendPanel(this.gameEnv.gameControl);
             },
           },
         ]);
@@ -691,6 +1271,12 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       INIT_POSITION: { x: width * positions.dataviz.x, y: height * positions.dataviz.y },
       interact: function() {
         document.getElementById('code-hub-panel')?.remove();
+        if (!getCHProgress().backendCompleted) {
+          this.dialogueSystem.dialogues = ['🔒 Terminal locked! Complete the Backend challenge first.'];
+          this.dialogueSystem.lastShownIndex = -1;
+          this.dialogueSystem.showRandomDialogue('Dataviz Terminal');
+          return;
+        }
         this.dialogueSystem.dialogues = [
           'Data visualization turns raw data into something humans can read.',
           'Every data API is built on CRUD — Create, Read, Update, Delete.',
@@ -706,7 +1292,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: true,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openDatavizPanel();
+              openDatavizPanel(this.gameEnv.gameControl);
             },
           },
         ]);
@@ -730,6 +1316,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: true,
             action:  () => {
               this.dialogueSystem.closeDialogue();
+              removeAllCHOverlays();
               const gc = this.gameEnv.gameControl;
               gc.levelClasses.splice(gc.currentLevelIndex, 1);
               gc.currentLevelIndex = Math.max(0, gc.currentLevelIndex - 1);
@@ -749,6 +1336,17 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
       { class: Npc,              data: npc_dataviz },
       { class: Npc,              data: npc_exit },
     ];
+
+    // ── Restore progress overlays ──────────────────────────────────────────
+    queueMicrotask(() => {
+      removeAllCHOverlays(); // clear any stale overlays from prior visit
+      initCHCanvas(this.gameEnv.canvas);
+      const p = getCHProgress();
+      if (!p.guideVisited)      showGuideSign();
+      if (!p.guideVisited)      showLockOverlay('frontend', positions.frontend.x, positions.frontend.y, 'TALK TO\nGUIDE FIRST');
+      if (!p.frontendCompleted) showLockOverlay('backend',  positions.backend.x,  positions.backend.y,  'COMPLETE\nFRONTEND FIRST');
+      if (!p.backendCompleted)  showLockOverlay('dataviz',  positions.dataviz.x,  positions.dataviz.y,  'COMPLETE\nBACKEND FIRST');
+    });
   }
 }
 

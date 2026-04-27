@@ -144,8 +144,10 @@ class ProfileManager {
       identityState: {
         // Identity Forge (includes avatar)
         identityUnlocked: profile.identityUnlocked || false,
+        avatarForgeDone: profile.avatarSelected || Boolean(profile.spriteMeta || profile.sprite),
         avatarSelected: profile.avatarSelected || false,
         // Wayfinding World
+        worldThemeDone: profile.worldThemeSelected || Boolean(profile.themeMeta || profile.theme),
         worldThemeSelected: profile.worldThemeSelected || false,
         navigationComplete: profile.navigationComplete || false,
         // Mission Tooling
