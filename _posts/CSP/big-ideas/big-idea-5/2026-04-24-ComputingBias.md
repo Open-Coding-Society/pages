@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: 5.3 - Computing Bias
-description: A fun interactive lesson about computing bias for AP CSP
+description: A fun interactive lesson about computing bias for AP CSP - Big idea 5
 permalink: /csp/ComputingBias/p3/lessons/
 breadcrumb: True
 Author: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe
