@@ -99,6 +99,20 @@ class GameLevelCsPath0Forge {
         if (restored.identityState) {
           Object.assign(identityState, restored.identityState);
         }
+
+        identityState.identityUnlocked = Boolean(identityState.identityUnlocked);
+        identityState.worldThemeDone = Boolean(
+          identityState.worldThemeDone ||
+          identityState.worldThemeSelected ||
+          this.profileData?.themeMeta ||
+          this.profileData?.theme
+        );
+        identityState.avatarForgeDone = Boolean(
+          identityState.avatarForgeDone ||
+          identityState.avatarSelected ||
+          this.profileData?.spriteMeta ||
+          this.profileData?.sprite
+        );
         
         console.log('GameLevel: profile restored', {
           name: this.profileData?.name,
@@ -417,7 +431,14 @@ await this.profileManager.saveIdentity(profile);
       identityState.avatarFlowActive = true;
 
       try {
-        if (!identityState.worldThemeDone) {
+        const hasSavedAvatar = Boolean(
+          identityState.avatarForgeDone ||
+          identityState.avatarSelected ||
+          this.profileData?.spriteMeta ||
+          this.profileData?.sprite
+        );
+
+        if (!identityState.worldThemeDone && !hasSavedAvatar) {
           await this.showDialogue('Avatar Forge Gatekeeper', [
             'The Avatar Forge is locked.',
             'Complete the World Theme Portal first.'
