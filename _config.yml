@@ -17,10 +17,10 @@
 
 title: Open Coding 
 description: "Class of 2026"
-owner_name: Open Coding Society 
-github_username: open-coding-society 
-github_repo: "pages" 
-baseurl: "" 
+owner_name: Sloane Sommers 
+github_username: sloanesom
+github_repo: "pages2lessonwork-deployers"
+baseurl: "/pages2lessonwork-deployers" 
 future: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
