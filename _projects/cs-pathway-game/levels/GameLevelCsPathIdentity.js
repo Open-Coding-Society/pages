@@ -1,5 +1,4 @@
 import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
-import Present from './Present.js';
 
 /**
  * Shared identity behavior for CS Path levels.
@@ -34,26 +33,6 @@ class GameLevelCsPathIdentity {
       hideTimer: null,
       overlay: null,
     };
-
-    this.present = new Present(this, {
-      toastDuration: 2200,
-      ignoreToasts: ['Press E to interact'],
-      isActiveLevel: () => this.isActiveLevel(),
-    });
-
-    this.showToast = (message) => this.present.toast(message);
-    this.setZoneAlert = (message) => this.present.alerts(message);
-    this.clearZoneAlert = () => this.present.clearAlerts();
-    this.panel = (message) => this.present.panel(message);
-    this.score = (message) => this.present.score(message);
-    this.clearPanel = () => this.present.clearPanel();
-    this.clearScore = () => this.present.clearScore();
-  }
-
-  isActiveLevel() {
-    const currentLevel = this.gameEnv?.currentLevel;
-    const gameLevel = this.gameEnv?.gameLevel;
-    return currentLevel === this || gameLevel === this;
   }
 
   getSharedProfileState(forceRefresh = false) {
@@ -423,13 +402,6 @@ class GameLevelCsPathIdentity {
     return null;
   }
 
-  destroy() {
-    if (this.profilePanelView) {
-      this.profilePanelView.destroy();
-    }
-    this.present?.destroy();
-  }
-
   applyBackgroundTheme(themeMeta, bgData) {
     return new Promise((resolve) => {
       // Safe background swap: preload first, then mutate scene state.
@@ -480,10 +452,6 @@ class GameLevelCsPathIdentity {
   }
 
   restoreIdentitySelections({ bgData, themeManifestUrl, themeAssetPrefix, delayMs = 0 }) {
-    if (typeof window._forgePanelCleanup === 'function') {
-      window._forgePanelCleanup();
-      window._forgePanelCleanup = null;
-    }
     // One shared restore pipeline for all inherited CS Path levels.
     this.queueLoadingWork();
 

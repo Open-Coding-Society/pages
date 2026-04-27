@@ -23,7 +23,7 @@
  * 
  * _game_profile JSON Structure:
  * {
- *   localId, createdAt, updatedAt, eventId,
+ *   localId, createdAt, updatedAt, lastModified,
  *   "identity-forge": { preferences, progress, completedAt },
  *   "wayfinding-world": { preferences, progress, completedAt },
  *   "mission-tooling": { progress, completedAt }
@@ -141,7 +141,7 @@ class PersistentProfile {
           localId: profileData.localId || null,  // Preserve if migrating
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          eventId: profileData.eventId || 0,
+          lastModified: Date.now(),
           'identity-forge': {
             preferences: {
               sprite: profileData.sprite || null,
@@ -223,7 +223,7 @@ class PersistentProfile {
         _uid: updates.githubID || existing._uid,
         _game_profile: {
           ...gameProfile,
-          eventId: updates.eventId !== undefined ? updates.eventId : (gameProfile.eventId || 0),
+          lastModified: Date.now(),
           updatedAt: new Date().toISOString(),
           'identity-forge': {
             preferences: {
@@ -308,7 +308,7 @@ class PersistentProfile {
           localId: existing._game_profile?.localId || null,  // Preserve for analytics
           createdAt: existing._game_profile?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          eventId: 0,
+          lastModified: Date.now(),
           'identity-forge': {
             preferences: {},
             progress: {
@@ -440,7 +440,6 @@ class PersistentProfile {
         localId: gameProfile.localId || null,
         createdAt: gameProfile.createdAt || '',
         updatedAt: gameProfile.updatedAt || '',
-        eventId: gameProfile.eventId || 0,
         version: gameProfile.version || VERSION,
       };
     } catch (error) {
