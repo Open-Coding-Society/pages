@@ -227,3 +227,173 @@ levels:
 closing:
   title: "Victory Check"
   prompt: "When all levels are green, you win."
+
+example_questions_title: "Example Multiple Choice Questions"
+
+example_questions:
+  - id: "q1-conditionals"
+    title: "Question 1 - Logic Error (Conditionals)"
+    code: |
+      IF (num > 0)
+      {
+        DISPLAY("Positive")
+      }
+      ELSE IF (num < 0)
+      {
+        DISPLAY("Negative")
+      }
+      ELSE
+      {
+        DISPLAY("Positive")
+      }
+    prompt: "What is the issue?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The program will crash when num = 0"
+      - id: "B"
+        text: "The program incorrectly labels 0 as positive"
+      - id: "C"
+        text: "The condition num > 0 is invalid"
+      - id: "D"
+        text: "There is no issue"
+
+  - id: "q2-off-by-one"
+    title: "Question 2 - Off-by-One Error (Loops)"
+    code: |
+      FOR i ← 1 TO LENGTH(list)
+      {
+        DISPLAY(list[i])
+      }
+    prompt: "Assume lists are indexed starting at 0. What is the problem?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The loop runs too many times"
+      - id: "B"
+        text: "The loop skips the first element"
+      - id: "C"
+        text: "The loop skips the last element"
+      - id: "D"
+        text: "The loop causes a syntax error"
+
+  - id: "q3-variable-update"
+    title: "Question 3 - Incorrect Variable Update"
+    code: |
+      total ← 0
+      FOR EACH item IN numbers
+      {
+        total ← item
+      }
+      DISPLAY(total)
+    prompt: "What does this code do incorrectly?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "It adds all numbers incorrectly"
+      - id: "B"
+        text: "It only stores the last value instead of the sum"
+      - id: "C"
+        text: "It creates an infinite loop"
+      - id: "D"
+        text: "It causes a runtime error"
+
+  - id: "q4-boolean-logic"
+    title: "Question 4 - Boolean Logic Error"
+    code: |
+      IF (score > 70 OR score < 90)
+      {
+        DISPLAY("Pass")
+      }
+      ELSE
+      {
+        DISPLAY("Fail")
+      }
+    prompt: "What is the issue?"
+    answer: "A"
+    options:
+      - id: "A"
+        text: "The condition is always true"
+      - id: "B"
+        text: "The condition is always false"
+      - id: "C"
+        text: "The program will crash"
+      - id: "D"
+        text: "The logic correctly checks for passing scores"
+
+  - id: "q5-list-index"
+    title: "Question 5 - List Index Error"
+    code: |
+      myList ← [10, 20, 30, 40]
+      DISPLAY(myList[4])
+    prompt: "What happens?"
+    answer: "C"
+    options:
+      - id: "A"
+        text: "Displays 40"
+      - id: "B"
+        text: "Displays 30"
+      - id: "C"
+        text: "Causes an error due to invalid index"
+      - id: "D"
+        text: "Displays 0"
+
+  - id: "q6-missing-initialization"
+    title: "Question 6 - Missing Initialization"
+    code: |
+      FOR i ← 1 TO 5
+      {
+        sum ← sum + i
+      }
+      DISPLAY(sum)
+    prompt: "What is the issue?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The loop runs too many times"
+      - id: "B"
+        text: "sum is never initialized"
+      - id: "C"
+        text: "The loop syntax is invalid"
+      - id: "D"
+        text: "The program outputs 15 correctly"
+
+  - id: "q7-infinite-loop"
+    title: "Question 7 - Infinite Loop"
+    code: |
+      i ← 1
+      WHILE (i < 10)
+      {
+        DISPLAY(i)
+      }
+    prompt: "What is the issue?"
+    answer: "C"
+    options:
+      - id: "A"
+        text: "The loop never runs"
+      - id: "B"
+        text: "The loop runs exactly 10 times"
+      - id: "C"
+        text: "The loop is infinite"
+      - id: "D"
+        text: "The loop skips values"
+
+  - id: "q8-function-return"
+    title: "Question 8 - Function Return Issue"
+    code: |
+      PROCEDURE add(a, b)
+      {
+        result ← a + b
+      }
+      DISPLAY(add(3, 4))
+    prompt: "What is the issue?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The function returns the wrong value"
+      - id: "B"
+        text: "The function does not return anything"
+      - id: "C"
+        text: "The function has invalid syntax"
+      - id: "D"
+        text: "The function causes a crash"
