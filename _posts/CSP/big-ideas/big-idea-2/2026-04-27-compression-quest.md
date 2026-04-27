@@ -21,56 +21,59 @@ authors: Sprinters Capstone
   .cq-intro ul { margin:6px 0 0 20px; padding:0; }
   .cq-intro li { color:#f8fafc !important; margin:4px 0; line-height:1.45; }
   .cq-intro li b { color:#fbbf24 !important; }
-  .cq-card { background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.08); color:#0f172a; }
-  .cq-card h2, .cq-card h3, .cq-card h4, .cq-card p, .cq-card li, .cq-card ol, .cq-card small, .cq-card i, .cq-card b { color:#0f172a; }
-  .cq-card code { color:#1e293b; background:#f1f5f9; padding:1px 6px; border-radius:4px; }
-  .cq-card h2 { margin:0 0 8px; font-size:1.2rem; color:#0f172a; }
+  .cq-card { background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.08); color:#000000 !important; }
+  .cq-card h2, .cq-card h3, .cq-card h4, .cq-card p, .cq-card li, .cq-card ol, .cq-card ul, .cq-card small, .cq-card i, .cq-card b, .cq-card span, .cq-card div, .cq-card label { color:#000000 !important; }
+  .cq-card code { color:#000000 !important; background:#e2e8f0; padding:1px 6px; border-radius:4px; font-weight:600; }
+  .cq-card h2 { margin:0 0 8px; font-size:1.25rem; font-weight:800; color:#000000 !important; border-bottom:2px solid #cbd5e1; padding-bottom:6px; }
   .cq-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .cq-box { border-radius:12px; padding:14px; color:#0f172a; }
-  .cq-box * { color:#0f172a; }
-  .cq-lossless { background:#ecfdf5; border:2px solid #10b981; }
-  .cq-lossless h3 { color:#065f46 !important; }
-  .cq-lossy { background:#fff7ed; border:2px solid #f59e0b; }
-  .cq-lossy h3 { color:#9a3412 !important; }
-  .cq-box h3 { margin:0 0 6px; }
-  .cq-box small { color:#334155 !important; }
+  .cq-box { border-radius:12px; padding:14px; color:#000000 !important; }
+  .cq-box, .cq-box * { color:#000000 !important; }
+  .cq-lossless { background:#d1fae5; border:2px solid #047857; }
+  .cq-lossless h3 { color:#064e3b !important; font-weight:800 !important; }
+  .cq-lossy { background:#fed7aa; border:2px solid #c2410c; }
+  .cq-lossy h3 { color:#7c2d12 !important; font-weight:800 !important; }
+  .cq-box h3 { margin:0 0 6px; font-size:1.1rem; }
+  .cq-box small { color:#000000 !important; font-weight:500; }
   /* Game 1 */
   .rle-row { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
-  .rle-row input { flex:1; min-width:200px; padding:10px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; background:#ffffff; color:#0f172a; }
-  .rle-row button { background:#7c3aed; color:#ffffff !important; border:0; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:600; }
-  .rle-row button:hover { background:#6d28d9; }
-  .rle-out { margin-top:10px; padding:10px 12px; border-radius:8px; background:#f1f5f9; font-family:monospace; min-height:24px; color:#0f172a !important; }
-  .rle-stat { display:flex; gap:14px; margin-top:8px; font-size:.9rem; color:#334155 !important; flex-wrap:wrap;}
-  .rle-stat span { color:#334155 !important; }
-  .rle-stat span b { color:#0f172a !important; }
+  .rle-row input { flex:1; min-width:200px; padding:10px; border:2px solid #475569; border-radius:8px; font-size:1rem; background:#ffffff; color:#000000 !important; font-weight:600; }
+  .rle-row button { background:#5b21b6; color:#ffffff !important; border:0; padding:10px 16px; border-radius:8px; cursor:pointer; font-weight:700; }
+  .rle-row button:hover { background:#4c1d95; }
+  .rle-out { margin-top:10px; padding:10px 12px; border-radius:8px; background:#e2e8f0; font-family:monospace; min-height:24px; color:#000000 !important; font-weight:700; border:1px solid #94a3b8; }
+  .rle-stat { display:flex; gap:14px; margin-top:8px; font-size:.92rem; color:#000000 !important; flex-wrap:wrap;}
+  .rle-stat span { color:#000000 !important; }
+  .rle-stat span b { color:#000000 !important; font-weight:800; }
   /* Game 2 */
   .files { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
-  .file { background:#1e293b; color:#ffffff !important; padding:8px 14px; border-radius:8px; cursor:pointer; user-select:none; transition:transform .1s; font-weight:600; }
+  .file { background:#000000; color:#ffffff !important; padding:8px 14px; border-radius:8px; cursor:pointer; user-select:none; transition:transform .1s; font-weight:700; }
   .file:hover { transform:translateY(-2px); }
   .file.placed { opacity:.35; cursor:default; pointer-events:none; }
   .bins { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
-  .bin { min-height:90px; border:2px dashed #94a3b8; border-radius:12px; padding:10px; cursor:pointer; }
-  .bin.l { border-color:#10b981; background:#f0fdf4; }
-  .bin.l h4 { color:#065f46 !important; }
-  .bin.y { border-color:#f59e0b; background:#fffbeb; }
-  .bin.y h4 { color:#9a3412 !important; }
-  .bin h4 { margin:0 0 6px; }
+  .bin { min-height:90px; border:2px dashed #475569; border-radius:12px; padding:10px; cursor:pointer; }
+  .bin.l { border-color:#047857; background:#d1fae5; }
+  .bin.l h4 { color:#064e3b !important; font-weight:800 !important; }
+  .bin.y { border-color:#c2410c; background:#fed7aa; }
+  .bin.y h4 { color:#7c2d12 !important; font-weight:800 !important; }
+  .bin h4 { margin:0 0 6px; font-size:1rem; }
   .bin .tray { display:flex; flex-wrap:wrap; gap:6px; min-height:30px; }
-  .chip { padding:6px 10px; border-radius:6px; font-size:.85rem; font-weight:600; }
-  .chip.ok { background:#10b981; color:#ffffff !important; }
-  .chip.bad { background:#ef4444; color:#ffffff !important; }
-  .scorebar { display:flex; gap:12px; align-items:center; margin-top:10px; font-size:.95rem; color:#0f172a; }
-  .scorebar span, .scorebar b { color:#0f172a; }
-  .scorebar .meter { flex:1; height:10px; background:#e5e7eb; border-radius:6px; overflow:hidden; }
-  .scorebar .fill { height:100%; background:linear-gradient(90deg,#10b981,#7c3aed); width:0%; transition:width .3s; }
-  .scorebar button { color:#0f172a !important; }
-  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#0f172a; color:#ffffff !important; font-weight:700; }
-  .picker { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
-  .picker span { color:#475569 !important; }
-  .picker button { background:#e2e8f0; color:#0f172a !important; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; font-weight:600; }
-  .picker button:hover { background:#cbd5e1; }
-  .ap-tip { background:#fef3c7; border-left:4px solid #f59e0b; padding:10px 14px; border-radius:8px; font-size:.92rem; color:#78350f !important; }
-  .ap-tip b, .ap-tip i { color:#78350f !important; }
+  .chip { padding:6px 10px; border-radius:6px; font-size:.85rem; font-weight:700; }
+  .chip.ok { background:#047857; color:#ffffff !important; }
+  .chip.bad { background:#b91c1c; color:#ffffff !important; }
+  .scorebar { display:flex; gap:12px; align-items:center; margin-top:10px; font-size:.95rem; color:#000000 !important; }
+  .scorebar span, .scorebar b { color:#000000 !important; font-weight:700; }
+  .scorebar .meter { flex:1; height:10px; background:#cbd5e1; border-radius:6px; overflow:hidden; }
+  .scorebar .fill { height:100%; background:linear-gradient(90deg,#047857,#5b21b6); width:0%; transition:width .3s; }
+  .scorebar button { background:#cbd5e1 !important; color:#000000 !important; font-weight:700; }
+  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#000000; color:#ffffff !important; font-weight:800; }
+  .picker { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; align-items:center; }
+  .picker span { color:#000000 !important; font-weight:600; }
+  .picker button { background:#cbd5e1; color:#000000 !important; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; font-weight:700; }
+  .picker button:hover { background:#94a3b8; }
+  .ap-tip { background:#fde68a; border-left:4px solid #b45309; padding:10px 14px; border-radius:8px; font-size:.95rem; color:#000000 !important; }
+  .ap-tip b, .ap-tip i { color:#000000 !important; }
+  .howto { background:#dbeafe; border-left:4px solid #1d4ed8; padding:10px 14px; border-radius:8px; font-size:.95rem; color:#000000 !important; margin:8px 0 12px; }
+  .howto b, .howto i { color:#000000 !important; }
+  .howto .label { display:inline-block; background:#1d4ed8; color:#ffffff !important; font-weight:800; font-size:.78rem; padding:2px 8px; border-radius:999px; margin-right:8px; vertical-align:middle; letter-spacing:.05em; }
   @media (max-width:640px){ .cq-grid2,.bins { grid-template-columns:1fr; } }
 </style>
 
@@ -89,10 +92,12 @@ authors: Sprinters Capstone
 <div class="cq-intro">
   <h2>What is Compression?</h2>
   <ul>
-    <li><b>Definition:</b> shrinking data so it takes less space and moves faster across the network.</li>
-    <li><b>Why care:</b> faster page loads, cheaper storage, less bandwidth — every photo, song, and video you stream is compressed.</li>
-    <li><b>Two flavors on the AP exam:</b> <b>lossless</b> (no data lost, fully reversible) and <b>lossy</b> (drops "less important" data for a smaller file).</li>
-    <li><b>Trade-off:</b> file size vs. quality. Pick the one that fits the use case — never use lossy on text, code, or legal records.</li>
+    <li><b>The core idea:</b> Compression is an algorithm that re-encodes data into <i>fewer bits</i> than the original. The encoded version takes less storage and travels faster across networks.</li>
+    <li><b>Why it exists:</b> Bandwidth and storage cost real money. Without compression, a 4-minute song would be ~40MB instead of ~4MB, and HD streaming would be impossible on most connections.</li>
+    <li><b>Lossless compression:</b> The original file can be <i>perfectly</i> reconstructed bit-for-bit. It works by spotting patterns (repeated characters, common byte sequences) and replacing them with shorter codes. Examples: ZIP, PNG, GIF, FLAC, run-length encoding, Huffman coding.</li>
+    <li><b>Lossy compression:</b> The algorithm <i>permanently discards</i> data the human eye/ear is least likely to notice (subtle color shifts, high-frequency sound). The result is much smaller but cannot be restored to the original. Examples: JPEG, MP3, MP4, AAC.</li>
+    <li><b>The big trade-off:</b> File size vs. fidelity. Lossy gives smaller files at the cost of detail; lossless guarantees fidelity but compresses less. Pick by use case — never use lossy on source code, text, financial records, or anything where every bit matters.</li>
+    <li><b>AP exam angle:</b> You'll be asked to identify <i>which</i> type fits a scenario, explain why a file might or might not compress well, and reason about trade-offs between size, quality, and processing time.</li>
   </ul>
 </div>
 
@@ -117,12 +122,16 @@ authors: Sprinters Capstone
 <div class="cq-card">
   <h2>Mini-game 1 — Run-Length Encoder</h2>
   <p>RLE is a classic <b>lossless</b> trick: replace runs of repeated chars with <code>char+count</code>. Try to make a string that compresses well!</p>
+  <div class="howto">
+    <span class="label">HOW TO PLAY</span>
+    Type any string into the box (or hit a <b>Quick load</b> sample), then click <b>Compress</b>. The output and savings % appear below — try to <b>beat 50% savings</b> by feeding it long repeated runs.
+  </div>
   <div class="rle-row">
     <input id="rle-in" maxlength="40" placeholder="Try: AAAAABBBCCDAA" />
     <button onclick="runRLE()">Compress</button>
   </div>
   <div class="picker">
-    <span style="font-size:.85rem;color:#475569;align-self:center;">Quick load:</span>
+    <span style="font-size:.9rem;color:#000000;align-self:center;font-weight:600;">Quick load:</span>
     <button onclick="loadRLE('AAAAABBBCCDAA')">AAAAABBBCCDAA</button>
     <button onclick="loadRLE('WWWWWWWWWWWWBWWWWWWWWWWWWBBB')">long run</button>
     <button onclick="loadRLE('ABCDEFG')">no repeats</button>
@@ -134,7 +143,11 @@ authors: Sprinters Capstone
 
 <div class="cq-card">
   <h2>Mini-game 2 — Sort the Files</h2>
-  <p>Click a file, then click the bin it belongs in. Get all 8 right to max your Cruncher Badge!</p>
+  <p>Decide whether each file format uses <b>lossless</b> or <b>lossy</b> compression and drop it into the matching bin.</p>
+  <div class="howto">
+    <span class="label">HOW TO PLAY</span>
+    <b>1.</b> Click a file tile (it gets a yellow outline). <b>2.</b> Click the <span style="color:#064e3b;font-weight:800;">🟢 Lossless</span> or <span style="color:#7c2d12;font-weight:800;">🟠 Lossy</span> bin to place it. Correct picks turn green ✓, wrong ones red ✗. <b>Goal:</b> all 8 right for the Master Cruncher badge.
+  </div>
   <div class="files" id="files"></div>
   <div class="bins">
     <div class="bin l">
@@ -149,7 +162,7 @@ authors: Sprinters Capstone
   <div class="scorebar">
     <span><b id="cq-score">0</b> / 8</span>
     <div class="meter"><div class="fill" id="cq-fill"></div></div>
-    <button onclick="resetSort()" style="background:#e2e8f0;border:0;padding:6px 12px;border-radius:6px;cursor:pointer;">Reset</button>
+    <button onclick="resetSort()" style="background:#cbd5e1;color:#000000;border:0;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:700;">Reset</button>
   </div>
   <div id="cq-badge"></div>
 </div>
@@ -174,7 +187,7 @@ authors: Sprinters Capstone
     const orig=s.length, comp=out.length;
     const ratio = orig ? Math.round((1 - comp/orig)*100) : 0;
     document.getElementById('rle-out').textContent = '→ ' + out;
-    const verdict = ratio>0 ? `<span style="color:#059669"><b>shrunk</b></span>` : ratio<0 ? `<span style="color:#dc2626"><b>got bigger!</b></span>` : `<span><b>no change</b></span>`;
+    const verdict = ratio>0 ? `<span style="color:#047857;font-weight:800;"><b>shrunk</b></span>` : ratio<0 ? `<span style="color:#b91c1c;font-weight:800;"><b>got bigger!</b></span>` : `<span style="color:#000000;font-weight:800;"><b>no change</b></span>`;
     document.getElementById('rle-stat').innerHTML =
       `<span>Original: <b>${orig}</b> chars</span>`+
       `<span>Compressed: <b>${comp}</b> chars</span>`+

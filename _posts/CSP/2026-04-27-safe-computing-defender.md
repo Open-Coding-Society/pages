@@ -21,55 +21,58 @@ authors: Sprinters Capstone
   .sc-intro ul { margin:6px 0 0 20px; padding:0; }
   .sc-intro li { color:#f8fafc !important; margin:4px 0; line-height:1.45; }
   .sc-intro li b { color:#fbbf24 !important; }
-  .sc-card { background:#ffffff; border:1px solid #e5e7eb; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.08); color:#0f172a; }
-  .sc-card h2, .sc-card h3, .sc-card h4, .sc-card p, .sc-card li, .sc-card ol, .sc-card small, .sc-card i, .sc-card b { color:#0f172a; }
-  .sc-card code { color:#1e293b; background:#f1f5f9; padding:1px 6px; border-radius:4px; }
-  .sc-card h2 { margin:0 0 8px; font-size:1.2rem; }
+  .sc-card { background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; padding:18px 20px; margin:16px 0; box-shadow:0 2px 10px rgba(0,0,0,.08); color:#000000 !important; }
+  .sc-card h2, .sc-card h3, .sc-card h4, .sc-card p, .sc-card li, .sc-card ol, .sc-card ul, .sc-card small, .sc-card i, .sc-card b, .sc-card span, .sc-card div, .sc-card label { color:#000000 !important; }
+  .sc-card code { color:#000000 !important; background:#e2e8f0; padding:1px 6px; border-radius:4px; font-weight:600; }
+  .sc-card h2 { margin:0 0 8px; font-size:1.25rem; font-weight:800; border-bottom:2px solid #cbd5e1; padding-bottom:6px; }
   .key { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-top:8px; }
-  .key div { background:#f1f5f9; padding:10px 12px; border-radius:10px; font-size:.92rem; color:#0f172a !important; }
-  .key div * { color:#0f172a !important; }
-  .key b { color:#1e3a8a !important; }
+  .key div { background:#e2e8f0; padding:10px 12px; border-radius:10px; font-size:.92rem; color:#000000 !important; border:1px solid #94a3b8; }
+  .key div * { color:#000000 !important; }
+  .key b { color:#1e3a8a !important; font-weight:800 !important; }
   /* Phishing inbox */
   .inbox { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
-  .mail { border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; background:#fafafa; color:#0f172a; }
-  .mail .from { font-size:.85rem; color:#475569 !important; }
-  .mail .subj { font-weight:700; margin:4px 0; color:#0f172a !important; }
-  .mail .body { font-size:.92rem; color:#334155 !important; }
+  .mail { border:1px solid #94a3b8; border-radius:10px; padding:12px 14px; background:#f1f5f9; color:#000000 !important; }
+  .mail .from { font-size:.88rem; color:#000000 !important; font-weight:600; }
+  .mail .subj { font-weight:800; margin:4px 0; color:#000000 !important; font-size:1.02rem; }
+  .mail .body { font-size:.95rem; color:#000000 !important; }
   .mail .row { display:flex; gap:8px; margin-top:10px; }
-  .mail button { padding:8px 14px; border:0; border-radius:8px; cursor:pointer; font-weight:700; }
-  .btn-phish { background:#ef4444; color:#ffffff !important; }
-  .btn-safe  { background:#10b981; color:#ffffff !important; }
-  .mail.locked { opacity:.7; }
-  .verdict { margin-top:8px; font-size:.9rem; padding:8px 10px; border-radius:8px; }
-  .verdict.ok { background:#ecfdf5; color:#065f46 !important; }
-  .verdict.ok b { color:#065f46 !important; }
-  .verdict.bad { background:#fef2f2; color:#991b1b !important; }
-  .verdict.bad b { color:#991b1b !important; }
+  .mail button { padding:8px 14px; border:0; border-radius:8px; cursor:pointer; font-weight:800; }
+  .btn-phish { background:#b91c1c; color:#ffffff !important; }
+  .btn-safe  { background:#047857; color:#ffffff !important; }
+  .mail.locked { opacity:.85; }
+  .verdict { margin-top:8px; font-size:.92rem; padding:8px 10px; border-radius:8px; font-weight:600; }
+  .verdict.ok { background:#a7f3d0; color:#064e3b !important; border:1px solid #047857; }
+  .verdict.ok b { color:#064e3b !important; font-weight:800; }
+  .verdict.bad { background:#fecaca; color:#7f1d1d !important; border:1px solid #b91c1c; }
+  .verdict.bad b { color:#7f1d1d !important; font-weight:800; }
   /* Password forge */
   .forge { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
-  .forge input { padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; font-family:monospace; background:#ffffff; color:#0f172a; }
-  .strength { height:14px; border-radius:8px; background:#e5e7eb; overflow:hidden; }
-  .strength > div { height:100%; width:0%; transition:width .25s, background .25s; background:#ef4444; }
-  .checks { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:6px; font-size:.88rem; }
-  .check { padding:6px 10px; border-radius:8px; background:#f1f5f9; color:#334155 !important; }
-  .check.ok { background:#dcfce7; color:#065f46 !important; }
-  #pw-verdict { color:#0f172a !important; }
+  .forge input { padding:10px 12px; border:2px solid #475569; border-radius:8px; font-size:1rem; font-family:monospace; background:#ffffff; color:#000000 !important; font-weight:600; }
+  .strength { height:14px; border-radius:8px; background:#cbd5e1; overflow:hidden; border:1px solid #94a3b8; }
+  .strength > div { height:100%; width:0%; transition:width .25s, background .25s; background:#b91c1c; }
+  .checks { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:6px; font-size:.9rem; }
+  .check { padding:6px 10px; border-radius:8px; background:#e2e8f0; color:#000000 !important; font-weight:600; border:1px solid #94a3b8; }
+  .check.ok { background:#a7f3d0; color:#064e3b !important; border-color:#047857; font-weight:700; }
+  #pw-verdict { color:#000000 !important; font-size:1.05rem; }
   /* Match game */
   .match { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
-  .col h4 { margin:0 0 6px; color:#0f172a !important; }
-  .item { padding:10px; background:#f1f5f9; border-radius:8px; margin-bottom:8px; cursor:pointer; user-select:none; transition:transform .1s; color:#0f172a !important; }
-  .item:hover { transform:translateY(-1px); }
-  .item.selected { outline:3px solid #fbbf24; }
-  .item.matched { background:#dcfce7; color:#065f46 !important; cursor:default; }
-  .item.miss { background:#fee2e2; color:#991b1b !important; }
-  .scorebar { display:flex; gap:12px; align-items:center; margin-top:12px; font-size:.95rem; color:#0f172a; }
-  .scorebar span, .scorebar b { color:#0f172a !important; }
-  .scorebar .meter { flex:1; height:10px; background:#e5e7eb; border-radius:6px; overflow:hidden; }
-  .scorebar .fill { height:100%; background:linear-gradient(90deg,#10b981,#3b82f6,#7c3aed); width:0%; transition:width .3s; }
-  .scorebar button { color:#0f172a !important; }
-  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#0f172a; color:#ffffff !important; font-weight:700; }
-  .ap-tip { background:#dbeafe; border-left:4px solid #3b82f6; padding:10px 14px; border-radius:8px; font-size:.92rem; margin-top:10px; color:#1e3a8a !important;}
-  .ap-tip b, .ap-tip i { color:#1e3a8a !important; }
+  .col h4 { margin:0 0 6px; color:#000000 !important; font-weight:800; font-size:1rem; }
+  .item { padding:10px; background:#e2e8f0; border-radius:8px; margin-bottom:8px; cursor:pointer; user-select:none; transition:transform .1s; color:#000000 !important; font-weight:600; border:1px solid #94a3b8; }
+  .item:hover { transform:translateY(-1px); background:#cbd5e1; }
+  .item.selected { outline:3px solid #f59e0b; background:#fef3c7; }
+  .item.matched { background:#a7f3d0; color:#064e3b !important; cursor:default; border-color:#047857; font-weight:700; }
+  .item.miss { background:#fecaca; color:#7f1d1d !important; border-color:#b91c1c; }
+  .scorebar { display:flex; gap:12px; align-items:center; margin-top:12px; font-size:.95rem; color:#000000 !important; }
+  .scorebar span, .scorebar b { color:#000000 !important; font-weight:700; }
+  .scorebar .meter { flex:1; height:10px; background:#cbd5e1; border-radius:6px; overflow:hidden; }
+  .scorebar .fill { height:100%; background:linear-gradient(90deg,#047857,#1d4ed8,#5b21b6); width:0%; transition:width .3s; }
+  .scorebar button { background:#cbd5e1 !important; color:#000000 !important; font-weight:700; }
+  .badge { display:inline-block; margin-top:8px; padding:6px 14px; border-radius:999px; background:#000000; color:#ffffff !important; font-weight:800; }
+  .ap-tip { background:#bfdbfe; border-left:4px solid #1d4ed8; padding:10px 14px; border-radius:8px; font-size:.95rem; margin-top:10px; color:#000000 !important;}
+  .ap-tip b, .ap-tip i { color:#000000 !important; }
+  .howto { background:#fde68a; border-left:4px solid #b45309; padding:10px 14px; border-radius:8px; font-size:.95rem; color:#000000 !important; margin:8px 0 12px; }
+  .howto b, .howto i { color:#000000 !important; }
+  .howto .label { display:inline-block; background:#b45309; color:#ffffff !important; font-weight:800; font-size:.78rem; padding:2px 8px; border-radius:999px; margin-right:8px; vertical-align:middle; letter-spacing:.05em; }
   @media (max-width:640px){ .match { grid-template-columns:1fr; } }
 </style>
 
@@ -88,10 +91,13 @@ authors: Sprinters Capstone
 <div class="sc-intro">
   <h2>What is Safe Computing?</h2>
   <ul>
-    <li><b>Definition:</b> the habits and tech that keep your data, identity, and devices out of the wrong hands.</li>
-    <li><b>The big threats:</b> phishing, malware (viruses/worms/ransomware), weak passwords, and leaked PII.</li>
-    <li><b>The big defenses:</b> strong unique passwords, multi-factor authentication (MFA), encryption (HTTPS), and healthy skepticism of links and senders.</li>
-    <li><b>Why it's on the AP:</b> Big Idea 5 covers ethical/legal impacts and Big Idea 4 covers cybersecurity — both are tested every year.</li>
+    <li><b>The core idea:</b> Safe computing is the combination of <i>habits</i> (skepticism, good passwords, careful sharing) and <i>technology</i> (encryption, MFA, anti-malware) that protects your data, identity, and devices from attackers.</li>
+    <li><b>PII (Personally Identifiable Information):</b> Any data that could uniquely identify you — full name, address, SSN, date of birth, school ID, biometric data. The fewer places it lives, the smaller the attack surface. Treat PII like cash: only share it when absolutely necessary.</li>
+    <li><b>Phishing:</b> Fake messages (email, text, DM) that impersonate trusted senders to trick you into clicking malicious links, entering credentials on fake sites, or sending money. Red flags: urgency, generic greetings, mismatched domains, unexpected attachments.</li>
+    <li><b>Malware:</b> Software designed to harm or exploit. <i>Viruses</i> attach to files, <i>worms</i> spread by themselves, <i>trojans</i> hide inside legit-looking apps, and <i>ransomware</i> encrypts your files and demands payment to unlock them.</li>
+    <li><b>Strong authentication:</b> Long unique passwords (12+ characters, mixed types) stop guessing. <b>MFA</b> (multi-factor authentication) adds a second proof — something you have (phone, key) or are (fingerprint) — and blocks ~99% of automated account attacks even if your password leaks.</li>
+    <li><b>Encryption:</b> Scrambles data so only the holder of the right key can read it. <i>Symmetric</i> uses one shared key (fast, used after a connection is set up). <i>Public-key (asymmetric)</i> uses a public key to encrypt and a private key to decrypt — this is what powers HTTPS, digital signatures, and secure messaging.</li>
+    <li><b>Why it's on the AP exam:</b> Big Idea 4 tests cybersecurity (HTTPS, encryption, authentication) and Big Idea 5 tests the ethical/legal/social impacts (privacy, PII, digital footprint). Expect MCQs on identifying threats and FRQs on explaining defenses.</li>
   </ul>
 </div>
 
@@ -111,13 +117,21 @@ authors: Sprinters Capstone
 
 <div class="sc-card">
   <h2>Mini-game 1 — Phish or Pass?</h2>
-  <p>Read each message. Tap <b>Phish</b> or <b>Safe</b>. Watch for urgency, weird links, mismatched senders, and "verify your account" demands.</p>
+  <p>Inspect 4 emails and decide which are scams.</p>
+  <div class="howto">
+    <span class="label">HOW TO PLAY</span>
+    For each email, read the <b>sender</b>, <b>subject</b>, and <b>body</b>. Click <span style="color:#7f1d1d;font-weight:800;">Phish</span> if it looks like a scam, or <span style="color:#064e3b;font-weight:800;">Safe</span> if legit. The verdict and explanation appear instantly. <b>Watch for:</b> urgency, weird domains, prize bait, "verify your account" demands.
+  </div>
   <div class="inbox" id="inbox"></div>
 </div>
 
 <div class="sc-card">
   <h2>Mini-game 2 — Password Forge</h2>
-  <p>Type a password. Hit every check to fill the bar.</p>
+  <p>Build a password that satisfies all 6 strength rules.</p>
+  <div class="howto">
+    <span class="label">HOW TO PLAY</span>
+    Type any password into the box. The <b>strength bar</b> grows from red → blue → green as you hit more rules. Each satisfied rule lights up. <b>Goal:</b> turn every check green for "Fortress-grade." Try a passphrase like <code>Pizza-Time-2026!</code>.
+  </div>
   <div class="forge">
     <input id="pw" placeholder="type a password..." autocomplete="off"/>
     <div class="strength"><div id="pw-fill"></div></div>
@@ -129,7 +143,11 @@ authors: Sprinters Capstone
 
 <div class="sc-card">
   <h2>Mini-game 3 — Match the Threat</h2>
-  <p>Click a threat on the left, then click its matching defense or definition on the right.</p>
+  <p>Pair each cyber threat with the right defense.</p>
+  <div class="howto">
+    <span class="label">HOW TO PLAY</span>
+    <b>1.</b> Click a threat on the <b>left</b> (yellow outline = selected). <b>2.</b> Click the matching defense on the <b>right</b>. Right answers turn green and lock in; wrong answers flash red. <b>Goal:</b> match all 6 to earn the Cyber Defender badge.
+  </div>
   <div class="match">
     <div class="col"><h4>Threats / Terms</h4><div id="left"></div></div>
     <div class="col"><h4>Defenses / Definitions</h4><div id="right"></div></div>
@@ -137,7 +155,7 @@ authors: Sprinters Capstone
   <div class="scorebar">
     <span><b id="m-score">0</b> / <span id="m-total">0</span></span>
     <div class="meter"><div class="fill" id="m-fill"></div></div>
-    <button onclick="resetMatch()" style="background:#e2e8f0;border:0;padding:6px 12px;border-radius:6px;cursor:pointer;">Reset</button>
+    <button onclick="resetMatch()" style="background:#cbd5e1;color:#000000;border:0;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:700;">Reset</button>
   </div>
   <div id="rank"></div>
 </div>
