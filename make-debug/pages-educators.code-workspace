@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../flask-educators"
+		},
+		{
+			"path": "../../spring"
+		}
+	],
+	"settings": {}
+}
