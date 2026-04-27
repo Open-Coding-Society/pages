@@ -67,7 +67,7 @@ ACTIVE_DEV_PROJECTS = $(sort $(DEV_PROJECTS) $(VALID_EXTRA_PROJECTS))
 define run_projects
 	@for proj in $(1); do \
 		if [ -f "_projects/$$proj/Makefile" ]; then \
-			echo "📦 $(2): $$proj"; \
+			echo "$(2): $$proj"; \
 			$(MAKE) -C "_projects/$$proj" $(3) 2>/dev/null || echo "  ⚠️  Failed: $$proj"; \
 		fi; \
 	done
@@ -189,7 +189,7 @@ build-registered-projects:
 	$(call run_projects,$(ALL_PROJECTS),Building,build)
 
 build-dev-projects:
-	@echo "📦 Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
+	@echo "Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Building,build)
 
 # Convert notebooks for all registered projects (dev mode initial build)
@@ -242,7 +242,7 @@ split-courses:
 	@python3 scripts/split_multi_course_files.py
 
 clean-courses:
-	@echo "🧹 Cleaning course-specific files..."
+	@echo "🧹Cleaning course-specific files..."
 	@python3 scripts/split_multi_course_files.py clean
 
 # Notebook and DOCX conversion
@@ -464,9 +464,11 @@ help:
 	@echo "  make update-colors         - Update local color map"
 	@echo "  make update-colors-preview - Update colors and start server"
 	@echo ""
-	@echo "Server Commands:"
+	@echo "Core Commands:"
 	@echo "  make              - Full conversion, serve, and watch for file changes (auto-convert on save)"
-	@echo "  make dev          - Fast dev mode: clean start, no conversion, file watching, only convert files on save (quick)"
+	@echo "  make dev          - Fast dev mode (auto-detect :dev projects)"
+	@echo "  make dev <proj>   - Dev mode + include additional project(s), replace <proj> with project: make dev gamify"
+	@echo "  make dev p1 p2    - Include multiple projects"
 	@echo "  make serve        - Convert and serve (no auto-convert watching)"
 	@echo "  make build        - Convert and build _site/ for deployment (no server)"
 	@echo "  make stop         - Stop server and logging"
@@ -510,7 +512,7 @@ convert-fix:
 
 # List all registered projects
 list-projects:
-	@echo "📦 Registered Projects:"
+	@echo "Registered Projects:"
 	@if [ -f _projects/.makeprojects ]; then \
 		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
 			if [ -f "_projects/$$proj/Makefile" ]; then \
