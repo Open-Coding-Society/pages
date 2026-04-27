@@ -1023,37 +1023,26 @@ Author: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe
 
     <div class="cb-card cb-reveal">
       <h2>Biased or Not? <span class="cb-hotkey">Click each one</span></h2>
-      <p>Tap each scenario. Is it biased or not? Watch the Bias-O-Meter move.</p>
       <div class="cb-qf-grid" id="qf-grid">
 
         <div class="cb-qf-item" id="qf-1" onclick="revealQF('qf-1','bias',10)">
-          <div class="cb-qf-text">A facial recognition system trained mostly on lighter-skinned faces performs worse on darker skin tones.</div>
+          <div class="cb-qf-text">Facial recognition works worse on darker skin tones.</div>
           <div class="cb-qf-verdict">Biased - Skewed training data</div>
         </div>
 
         <div class="cb-qf-item" id="qf-2" onclick="revealQF('qf-2','no-bias',10)">
-          <div class="cb-qf-text">A calculator correctly solves 2 + 2 = 4 for every single user, every single time.</div>
+          <div class="cb-qf-text">A calculator gives everyone the same answer.</div>
           <div class="cb-qf-verdict">Not biased - Pure logic, no data</div>
         </div>
 
         <div class="cb-qf-item" id="qf-3" onclick="revealQF('qf-3','no-bias',10)">
-          <div class="cb-qf-text">A weather model predicts temperature using physics equations. It gives the same forecast for the same inputs every time.</div>
-          <div class="cb-qf-verdict">Not biased - Deterministic physics model</div>
+          <div class="cb-qf-text">A weather app gives the same forecast every time.</div>
+          <div class="cb-qf-verdict">Not biased - Deterministic model</div>
         </div>
 
         <div class="cb-qf-item" id="qf-4" onclick="revealQF('qf-4','bias',10)">
-          <div class="cb-qf-text">A résumé-screening AI trained on 10 years of successful hires (mostly men) starts downranking women's applications.</div>
+          <div class="cb-qf-text">A hiring AI keeps rejecting women's resumes.</div>
           <div class="cb-qf-verdict">Biased - Historical data encoded bias</div>
-        </div>
-
-        <div class="cb-qf-item" id="qf-5" onclick="revealQF('qf-5','bias',10)">
-          <div class="cb-qf-text">A medical diagnosis AI trained mostly on data from male patients consistently misses heart attack symptoms in women.</div>
-          <div class="cb-qf-verdict">Biased - Under-represented group in data</div>
-        </div>
-
-        <div class="cb-qf-item" id="qf-6" onclick="revealQF('qf-6','no-bias',10)">
-          <div class="cb-qf-text">A sorting algorithm arranges a list of numbers in ascending order. It works identically regardless of who runs it.</div>
-          <div class="cb-qf-verdict">Not biased - Purely mathematical</div>
         </div>
 
       </div>
@@ -1099,9 +1088,7 @@ Author: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe
       </button>
       <div id="sample-answer" style="display:none; margin-top:18px;">
         <div class="cb-callout">
-          Computing bias matters because when algorithms make decisions about people's lives —
-          who gets hired, who gets into college, who receives medical treatment - biased systems
-          systematically disadvantage already-marginalized groups, reinforcing inequality at massive scale.
+          Computing bias matters because biased algorithms make real decisions about real people, and those decisions systematically hurt already-marginalized groups.
         </div>
       </div>
     </div>
@@ -1326,7 +1313,7 @@ function revealQF(id, result, pts) {
     addScore(pts);
   }
   // Check if all revealed
-  var ids = ['qf-1','qf-2','qf-3','qf-4','qf-5','qf-6'];
+  var ids = ['qf-1','qf-2','qf-3','qf-4'];
   if (ids.every(function(i){ return qfRevealed[i]; })) {
     confettiBurst(100);
   }
