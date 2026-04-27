@@ -15,7 +15,7 @@
  * 4. Support migration: temporary → persistent when user logs in
  * 
  * Usage in GameLevelCssePath (View/Controller):
- *   import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+ *   import ProfileManager from '@assets/js/projects/cs-pathway-game/model/ProfileManager.js';
  *   
  *   constructor(gameEnv) {
  *     this.profileManager = new ProfileManager();
@@ -27,8 +27,8 @@
  * @class ProfileManager
  */
 
-import LocalProfile from '/assets/js/projects/cs-pathway-game/model/localProfile.js';
-import PersistentProfile from '/assets/js/projects/cs-pathway-game/model/persistentProfile.js';
+import LocalProfile from '@assets/js/projects/cs-pathway-game/model/localProfile.js';
+import PersistentProfile from '@assets/js/projects/cs-pathway-game/model/persistentProfile.js';
 
 class ProfileManager {
   constructor() {
