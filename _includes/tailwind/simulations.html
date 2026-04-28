@@ -1,211 +1,244 @@
-<div class="sim-app">
-  <section class="top-nav">
-    <div class="brand">
-      <div class="brand-icon">🎮</div>
-      <div>
-        <h2>Wi-Fighters Simulation Lab</h2>
-        <p>AP CSP Topic 3.16</p>
-      </div>
-    </div>
+<div class="sim-page">
 
-    <div class="score-pill">
-      <span>🏆 Score</span>
-      <strong id="score">0</strong>
-    </div>
-  </section>
-
-  <section class="hero">
-    <div class="hero-text">
-      <span class="tag">Interactive CSP Lesson</span>
-      <h1>Learn Simulations Through Mini Games</h1>
+  <section class="sim-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">AP CSP Topic 3.16</p>
+      <h1>Simulation Flight Deck</h1>
       <p>
-        Make predictions, adjust variables, run models, and see how simulations help us test real-world systems safely.
+        Run interactive simulation games to explore models, randomness, trials, probability,
+        and limitations in AP Computer Science Principles.
       </p>
-
-      <div class="hero-actions">
-        <button onclick="scrollToGame('plane-game')">✈️ Start Crash Test</button>
-        <button onclick="scrollToGame('pi-game')" class="secondary">🎯 Try Monte Carlo</button>
-      </div>
     </div>
 
-    <div class="hero-panel">
-      <div class="panel-card">
-        <span>Concept</span>
-        <strong>Random Trials</strong>
+    <div class="hero-dashboard">
+      <div class="hero-stat">
+        <span id="totalSimulations">0</span>
+        <p>Simulations Run</p>
       </div>
-      <div class="panel-card">
-        <span>Concept</span>
-        <strong>Model Limits</strong>
+      <div class="hero-stat">
+        <span id="totalTrials">0</span>
+        <p>Total Trials</p>
       </div>
-      <div class="panel-card">
-        <span>Concept</span>
-        <strong>Approximation</strong>
+      <div class="hero-stat">
+        <span id="lessonScore">0</span>
+        <p>Score</p>
       </div>
     </div>
   </section>
 
-  <section class="info-grid">
-    <div class="info-card">
-      <span>01</span>
-      <h3>Predict</h3>
-      <p>Guess what the simulation will show before running it.</p>
-    </div>
-    <div class="info-card">
-      <span>02</span>
-      <h3>Modify</h3>
-      <p>Use sliders to change assumptions in the model.</p>
-    </div>
-    <div class="info-card">
-      <span>03</span>
-      <h3>Simulate</h3>
-      <p>Run many trials and compare the result.</p>
-    </div>
-  </section>
-
-  <section id="plane-game" class="game-section airplane">
-    <div class="game-title-row">
+  <section class="concept-card">
+    <h2>What are we learning?</h2>
+    <div class="concept-grid">
       <div>
-        <p class="mini-label">Game 1</p>
-        <h2>✈️ Airplane Crash Test Simulator</h2>
-        <p>
-          Real crash testing is dangerous and expensive. This game uses a simplified model to test airplane safety.
-        </p>
+        <strong>Simulation</strong>
+        <p>A program that imitates a real-world process.</p>
       </div>
-      <div class="difficulty">Modeling + Limitations</div>
-    </div>
-
-    <div class="game-layout">
-      <div class="control-card">
-        <h3>Step 1: Prediction</h3>
-        <p>If safety score increases, what should happen to crash risk?</p>
-
-        <div class="choice-row">
-          <button onclick="choosePrediction(this, true)">Crash risk decreases</button>
-          <button onclick="choosePrediction(this, false)">Crash risk increases</button>
-        </div>
-
-        <h3>Step 2: Adjust the Model</h3>
-
-        <div class="slider-block">
-          <label>Safety Score <strong id="safetyLabel">72</strong></label>
-          <input id="safetyScore" type="range" min="10" max="100" value="72" oninput="updateSafetyLabel()">
-        </div>
-
-        <div class="slider-block">
-          <label>Weather Difficulty <strong id="weatherLabel">35</strong></label>
-          <input id="weatherDifficulty" type="range" min="0" max="80" value="35" oninput="updateWeatherLabel()">
-        </div>
-
-        <div class="slider-block">
-          <label>Test Flights <strong id="flightLabel">150</strong></label>
-          <input id="flightCount" type="range" min="20" max="1000" step="10" value="150" oninput="updateFlightLabel()">
-        </div>
-
-        <button class="run-btn" onclick="runPlaneSim()">▶ Run Flight Tests</button>
-      </div>
-
-      <div class="visual-card">
-        <div class="plane-visual">
-          <div class="sky-orbit orbit-one"></div>
-          <div class="sky-orbit orbit-two"></div>
-          <div class="plane">✈️</div>
-        </div>
-
-        <div class="stats-grid">
-          <div>
-            <span id="safeFlights">0</span>
-            <p>Safe Flights</p>
-          </div>
-          <div>
-            <span id="crashes">0</span>
-            <p>Crashes</p>
-          </div>
-          <div>
-            <span id="riskLevel">—</span>
-            <p>Risk Level</p>
-          </div>
-        </div>
-
-        <div class="meter">
-          <div id="planeBar" class="meter-fill">0%</div>
-        </div>
-
-        <p id="planeFeedback" class="feedback">
-          Run the simulation to test the airplane model.
-        </p>
-      </div>
-    </div>
-
-    <div class="takeaway">
-      <strong>AP CSP Takeaway:</strong>
-      Simulations are useful when real testing is dangerous, expensive, slow, or impractical. But the result depends on the assumptions in the model.
-    </div>
-  </section>
-
-  <section id="pi-game" class="game-section pi">
-    <div class="game-title-row">
       <div>
-        <p class="mini-label">Game 2</p>
-        <h2>🎯 Monte Carlo Pi Simulator</h2>
-        <p>
-          Use random points to estimate π. More trials usually improve the estimate, but it still stays an approximation.
-        </p>
+        <strong>Model</strong>
+        <p>A simplified version of reality with assumptions.</p>
       </div>
-      <div class="difficulty">Randomness + Approximation</div>
-    </div>
-
-    <div class="game-layout reverse">
-      <div class="control-card">
-        <h3>Step 1: Prediction</h3>
-        <p>What usually happens when we use more random points?</p>
-
-        <div class="choice-row">
-          <button onclick="choosePrediction(this, true)">Estimate gets closer</button>
-          <button onclick="choosePrediction(this, false)">Estimate is always exact</button>
-        </div>
-
-        <h3>Step 2: Choose Trials</h3>
-
-        <div class="slider-block">
-          <label>Random Points <strong id="pointLabel">800</strong></label>
-          <input id="pointCount" type="range" min="100" max="6000" step="100" value="800" oninput="updatePointLabel()">
-        </div>
-
-        <button class="run-btn" onclick="runPiSim()">🎯 Estimate π</button>
-
-        <div class="mini-explain">
-          <p><strong>Formula used:</strong></p>
-          <p>π ≈ 4 × points inside circle ÷ total points</p>
-        </div>
+      <div>
+        <strong>Trial</strong>
+        <p>One run of a simulation or experiment.</p>
       </div>
-
-      <div class="visual-card">
-        <canvas id="piCanvas" width="340" height="340"></canvas>
-
-        <div class="stats-grid">
-          <div>
-            <span id="insideCount">0</span>
-            <p>Inside Circle</p>
-          </div>
-          <div>
-            <span id="totalPoints">0</span>
-            <p>Total Points</p>
-          </div>
-          <div>
-            <span id="piEstimate">0</span>
-            <p>Estimated π</p>
-          </div>
-        </div>
-
-        <p id="piFeedback" class="feedback">
-          Run the simulation to generate random points.
-        </p>
+      <div>
+        <strong>Randomness</strong>
+        <p>Used to model unpredictable outcomes.</p>
       </div>
-    </div>
-
-    <div class="takeaway">
-      <strong>AP CSP Takeaway:</strong>
-      A simulation can use random trials to approximate a result. More trials often make the result more reliable.
     </div>
   </section>
+
+  <section class="game-card" id="airplaneGame">
+    <div class="game-header">
+      <p class="game-number">Mini-Game 1</p>
+      <h2>Airplane Flight Test Simulator</h2>
+      <p>
+        Adjust the airplane design and test it in a simulated flight environment.
+        The plane will visually take off, fly, land, or crash based on the model.
+      </p>
+    </div>
+
+    <div class="how-box">
+      <span>HOW TO PLAY</span>
+      Enter values for the airplane model. Higher safety and engine power help the plane.
+      Bad weather, high weight, and low fuel make failure more likely.
+    </div>
+
+    <div class="airplane-layout">
+      <div class="input-panel">
+        <h3>Model Inputs</h3>
+
+        <label>
+          Safety Score
+          <input id="planeSafety" type="number" min="0" max="100" value="75">
+          <small>0 to 100. Higher means safer design.</small>
+        </label>
+
+        <label>
+          Engine Power
+          <input id="enginePower" type="number" min="0" max="100" value="80">
+          <small>0 to 100. Higher means stronger takeoff.</small>
+        </label>
+
+        <label>
+          Weather Difficulty
+          <input id="weatherRisk" type="number" min="0" max="100" value="35">
+          <small>0 to 100. Higher means harder conditions.</small>
+        </label>
+
+        <label>
+          Plane Weight
+          <input id="planeWeight" type="number" min="0" max="100" value="45">
+          <small>0 to 100. Higher means harder to fly.</small>
+        </label>
+
+        <label>
+          Fuel Level
+          <input id="fuelLevel" type="number" min="0" max="100" value="70">
+          <small>0 to 100. Lower fuel increases risk.</small>
+        </label>
+
+        <label>
+          Test Flights
+          <input id="flightTrials" type="number" min="1" max="1000" value="100">
+          <small>Number of trials in the simulation.</small>
+        </label>
+
+        <div class="button-row">
+          <button class="main-button" onclick="runAirplaneSimulation()">Run Flight Test</button>
+          <button class="ghost-button" onclick="resetAirplaneSimulation()">Reset</button>
+        </div>
+      </div>
+
+      <div class="animation-panel">
+        <div class="sky-scene" id="skyScene">
+          <div class="sun"></div>
+          <div class="cloud cloud-one"></div>
+          <div class="cloud cloud-two"></div>
+          <div class="runway"></div>
+
+          <div class="airplane" id="airplane">
+            <div class="plane-body"></div>
+            <div class="plane-nose"></div>
+            <div class="plane-tail"></div>
+            <div class="plane-wing top-wing"></div>
+            <div class="plane-wing bottom-wing"></div>
+            <div class="plane-window window-one"></div>
+            <div class="plane-window window-two"></div>
+            <div class="plane-window window-three"></div>
+          </div>
+
+          <div class="crash-flash" id="crashFlash"></div>
+        </div>
+
+        <div class="result-strip">
+          <div>
+            <span id="flightOutcome">Ready</span>
+            <p>Current Outcome</p>
+          </div>
+          <div>
+            <span id="successRate">0%</span>
+            <p>Success Rate</p>
+          </div>
+          <div>
+            <span id="crashRate">0%</span>
+            <p>Crash Rate</p>
+          </div>
+        </div>
+
+        <div class="progress-track">
+          <div id="flightProgress" class="progress-fill">0%</div>
+        </div>
+
+        <p id="airplaneFeedback" class="feedback">
+          Enter values and run the simulation to test the plane.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-note">
+      <strong>AP CSP Connection:</strong>
+      This simulation uses a simplified model. It can show risk patterns, but it does not include every real factor,
+      such as pilot skill, maintenance quality, exact aerodynamics, or air traffic.
+    </div>
+  </section>
+
+  <section class="game-card" id="diceGame">
+    <div class="game-header">
+      <p class="game-number">Mini-Game 2</p>
+      <h2>Dice Rolling Simulator</h2>
+      <p>
+        Choose how many times to roll two dice. Watch the dice animate, then compare which sums appear most often.
+      </p>
+    </div>
+
+    <div class="how-box">
+      <span>HOW TO PLAY</span>
+      Enter the number of rolls, press run, and observe how repeated trials create a distribution.
+      Sum 7 usually appears most often because it has the most combinations.
+    </div>
+
+    <div class="dice-layout">
+      <div class="input-panel">
+        <h3>Dice Inputs</h3>
+
+        <label>
+          Number of Rolls
+          <input id="diceTrials" type="number" min="1" max="10000" value="500">
+          <small>Try 10, 100, 500, 1000, or 5000.</small>
+        </label>
+
+        <label>
+          Prediction
+          <select id="dicePrediction">
+            <option value="7">7 will appear most often</option>
+            <option value="2">2 will appear most often</option>
+            <option value="6">6 will appear most often</option>
+            <option value="12">12 will appear most often</option>
+          </select>
+          <small>Make a prediction before running.</small>
+        </label>
+
+        <div class="button-row">
+          <button class="main-button" onclick="runDiceSimulation()">Roll Dice</button>
+          <button class="ghost-button" onclick="resetDiceSimulation()">Reset</button>
+        </div>
+      </div>
+
+      <div class="dice-panel">
+        <div class="dice-stage">
+          <div class="dice-cube" id="dieOne">1</div>
+          <div class="dice-cube" id="dieTwo">1</div>
+        </div>
+
+        <div class="result-strip">
+          <div>
+            <span id="mostCommonSum">—</span>
+            <p>Most Common Sum</p>
+          </div>
+          <div>
+            <span id="diceTotalRolls">0</span>
+            <p>Total Rolls</p>
+          </div>
+          <div>
+            <span id="predictionResult">—</span>
+            <p>Prediction</p>
+          </div>
+        </div>
+
+        <div id="diceBars" class="dice-bars"></div>
+
+        <p id="diceFeedback" class="feedback">
+          Run the dice simulation to see the distribution.
+        </p>
+      </div>
+    </div>
+
+    <div class="lesson-note">
+      <strong>AP CSP Connection:</strong>
+      A dice simulation uses random number generation and repeated trials.
+      More trials usually make the results closer to the expected probability distribution.
+    </div>
+  </section>
+
 </div>

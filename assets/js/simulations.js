@@ -1,138 +1,277 @@
-let score = 0;
+let totalSimulations = 0;
+let totalTrials = 0;
+let lessonScore = 0;
 
-function addScore(points) {
-    score += points;
-    document.getElementById("score").innerText = score;
+function clampValue(value, min, max) {
+    return Math.min(Math.max(value, min), max);
 }
 
-function scrollToGame(id) {
-    document.getElementById(id).scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-}
+function updateTopStats(trialsAdded, scoreAdded) {
+    totalSimulations += 1;
+    totalTrials += trialsAdded;
+    lessonScore += scoreAdded;
 
-function choosePrediction(button, correct) {
-    const siblings = button.parentElement.querySelectorAll("button");
-
-    siblings.forEach(btn => {
-        btn.classList.remove("correct", "wrong");
-    });
-
-    if (correct) {
-        button.classList.add("correct");
-        addScore(10);
-    } else {
-        button.classList.add("wrong");
-    }
+    document.getElementById("totalSimulations").innerText = totalSimulations;
+    document.getElementById("totalTrials").innerText = totalTrials;
+    document.getElementById("lessonScore").innerText = lessonScore;
 }
 
 function updateSafetyLabel() {
-    document.getElementById("safetyLabel").innerText =
-        document.getElementById("safetyScore").value;
+    const value = document.getElementById("planeSafety").value;
+    document.getElementById("safetyLabel").innerText = value;
 }
 
 function updateWeatherLabel() {
-    document.getElementById("weatherLabel").innerText =
-        document.getElementById("weatherDifficulty").value;
+    const value = document.getElementById("weatherRisk").value;
+    document.getElementById("weatherLabel").innerText = value;
 }
 
 function updateFlightLabel() {
-    document.getElementById("flightLabel").innerText =
-        document.getElementById("flightCount").value;
+    const value = document.getElementById("flightTrials").value;
+    document.getElementById("flightLabel").innerText = value;
 }
 
-function runPlaneSim() {
-    const safety = Number(document.getElementById("safetyScore").value);
-    const weather = Number(document.getElementById("weatherDifficulty").value);
-    const flights = Number(document.getElementById("flightCount").value);
+function resetAirplaneAnimation() {
+    const airplane = document.getElementById("airplane");
+    const crashFlash = document.getElementById("crashFlash");
 
+    airplane.classList.remove("takeoff", "land", "crash", "shake");
+    crashFlash.classList.remove("show");
+
+    void airplane.offsetWidth;
+    void crashFlash.offsetWidth;
+}
+
+function animateAirplane(outcome) {
+    const airplane = document.getElementById("airplane");
+    const crashFlash = document.getElementById("crashFlash");
+
+    resetAirplaneAnimation();
+
+    if (outcome === "Crash") {
+        airplane.classList.add("crash");
+        setTimeout(function () {
+            crashFlash.classList.add("show");
+        }, 1900);
+    } else if (outcome === "Rough Landing") {
+        airplane.classList.add("shake");
+        setTimeout(function () {
+            airplane.classList.remove("shake");
+            airplane.classList.add("land");
+        }, 1300);
+    } else {
+        airplane.classList.add("takeoff");
+    }
+}
+
+function calculateAirplaneRisk(safety, engine, weather, weight, fuel) {
+    const safetyBenefit = safety * 0.38;
+    const engineBenefit = engine * 0.27;
+    const fuelBenefit = fuel * 0.18;
+
+    const weatherPenalty = weather * 0.34;
+    const weightPenalty = weight * 0.24;
+
+    let successScore = 50 + safetyBenefit + engineBenefit + fuelBenefit - weatherPenalty - weightPenalty;
+
+    successScore = clampValue(successScore, 5, 98);
+
+    return successScore;
+}
+
+function runAirplaneSimulation() {
+    const safety = clampValue(Number(document.getElementById("planeSafety").value), 0, 100);
+    const engine = clampValue(Number(document.getElementById("enginePower").value), 0, 100);
+    const weather = clampValue(Number(document.getElementById("weatherRisk").value), 0, 100);
+    const weight = clampValue(Number(document.getElementById("planeWeight").value), 0, 100);
+    const fuel = clampValue(Number(document.getElementById("fuelLevel").value), 0, 100);
+    const trials = clampValue(Number(document.getElementById("flightTrials").value), 1, 1000);
+
+    const successProbability = calculateAirplaneRisk(safety, engine, weather, weight, fuel) / 100;
+
+    let safeFlights = 0;
     let crashes = 0;
-    let safe = 0;
 
-    let crashChance = (100 - safety + weather) / 140;
-    crashChance = Math.max(0.02, Math.min(crashChance, 0.9));
-
-    for (let i = 0; i < flights; i++) {
-        if (Math.random() < crashChance) {
+    for (let i = 0; i < trials; i++) {
+        if (Math.random() < successProbability) {
+            safeFlights++;
+        } else {
             crashes++;
-        } else {
-            safe++;
         }
     }
 
-    const safePercent = ((safe / flights) * 100).toFixed(1);
-    const crashPercent = ((crashes / flights) * 100).toFixed(1);
+    const safePercent = (safeFlights / trials) * 100;
+    const crashPercent = (crashes / trials) * 100;
 
-    document.getElementById("safeFlights").innerText = safe;
+    let outcome = "Successful Flight";
+    let riskLevel = "Low";
+
+    if (crashPercent >= 45) {
+        outcome = "Crash";
+        riskLevel = "High";
+    } else if (crashPercent >= 20) {
+        outcome = "Rough Landing";
+        riskLevel = "Medium";
+    }
+
+    document.getElementById("safeFlights").innerText = safeFlights;
     document.getElementById("crashes").innerText = crashes;
-    document.getElementById("planeBar").style.width = safePercent + "%";
-    document.getElementById("planeBar").innerText = safePercent + "% Safe";
+    document.getElementById("flightOutcome").innerText = outcome;
+    document.getElementById("successRate").innerText = safePercent.toFixed(1) + "%";
+    document.getElementById("crashRate").innerText = crashPercent.toFixed(1) + "%";
+    document.getElementById("flightProgress").style.width = safePercent.toFixed(1) + "%";
+    document.getElementById("flightProgress").innerText = safePercent.toFixed(1) + "% safe";
 
-    let risk = "Low";
-    if (crashPercent > 35) risk = "High";
-    else if (crashPercent > 15) risk = "Medium";
+    animateAirplane(outcome);
 
-    document.getElementById("riskLevel").innerText = risk;
+    document.getElementById("airplaneFeedback").innerText =
+        "Model result: " + outcome +
+        ". This simulation used safety, engine power, weather, weight, and fuel as simplified factors. " +
+        "A real airplane model would need much more data, so this is useful but limited.";
 
-    document.getElementById("planeFeedback").innerText =
-        `Crash rate: ${crashPercent}%. This model assumes safety score and weather difficulty are the main factors.`;
-
-    addScore(15);
+    updateTopStats(trials, 20);
 }
 
-function updatePointLabel() {
-    document.getElementById("pointLabel").innerText =
-        document.getElementById("pointCount").value;
+function resetAirplaneSimulation() {
+    resetAirplaneAnimation();
+
+    document.getElementById("safeFlights").innerText = "0";
+    document.getElementById("crashes").innerText = "0";
+    document.getElementById("flightOutcome").innerText = "Ready";
+    document.getElementById("successRate").innerText = "0%";
+    document.getElementById("crashRate").innerText = "0%";
+    document.getElementById("flightProgress").style.width = "0%";
+    document.getElementById("flightProgress").innerText = "0%";
+    document.getElementById("airplaneFeedback").innerText =
+        "Enter values and run the simulation to test the plane.";
 }
 
-function runPiSim() {
-    const points = Number(document.getElementById("pointCount").value);
-    const canvas = document.getElementById("piCanvas");
-    const ctx = canvas.getContext("2d");
+function getRandomDieValue() {
+    return Math.floor(Math.random() * 6) + 1;
+}
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function setDiceFace(element, value) {
+    element.innerText = value;
+}
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+function resetDiceSimulation() {
+    document.getElementById("dieOne").innerText = "1";
+    document.getElementById("dieTwo").innerText = "1";
+    document.getElementById("mostCommonSum").innerText = "—";
+    document.getElementById("diceTotalRolls").innerText = "0";
+    document.getElementById("predictionResult").innerText = "—";
+    document.getElementById("diceBars").innerHTML = "";
+    document.getElementById("diceFeedback").innerText =
+        "Run the dice simulation to see the distribution.";
+}
 
-    ctx.strokeStyle = "#7c3aed";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(0, 0, 340, 340);
+function buildDiceBars(counts, maxCount) {
+    let html = "";
 
-    ctx.beginPath();
-    ctx.arc(170, 170, 170, 0, Math.PI * 2);
-    ctx.stroke();
+    for (let sum = 2; sum <= 12; sum++) {
+        const count = counts[sum];
+        const width = maxCount === 0 ? 0 : (count / maxCount) * 100;
 
-    let inside = 0;
-
-    for (let i = 0; i < points; i++) {
-        const x = Math.random() * 2 - 1;
-        const y = Math.random() * 2 - 1;
-        const distance = x * x + y * y;
-
-        const canvasX = (x + 1) * 170;
-        const canvasY = (y + 1) * 170;
-
-        if (distance <= 1) {
-            inside++;
-            ctx.fillStyle = "#14b8a6";
-        } else {
-            ctx.fillStyle = "#fb7185";
-        }
-
-        ctx.fillRect(canvasX, canvasY, 2.5, 2.5);
+        html += `
+            <div class="dice-row">
+                <strong>${sum}</strong>
+                <div class="dice-bar-track">
+                    <div class="dice-bar-fill" style="width:${width}%"></div>
+                </div>
+                <span>${count}</span>
+            </div>
+        `;
     }
 
-    const estimate = (4 * inside / points).toFixed(5);
-    const error = Math.abs(Math.PI - Number(estimate)).toFixed(5);
-
-    document.getElementById("insideCount").innerText = inside;
-    document.getElementById("totalPoints").innerText = points;
-    document.getElementById("piEstimate").innerText = estimate;
-
-    document.getElementById("piFeedback").innerText =
-        `Error from actual π: ${error}. More points usually reduce error, but randomness still causes variation.`;
-
-    addScore(15);
+    return html;
 }
+
+function runDiceSimulation() {
+    const dieOne = document.getElementById("dieOne");
+    const dieTwo = document.getElementById("dieTwo");
+    const trials = clampValue(Number(document.getElementById("diceTrials").value), 1, 10000);
+    const prediction = Number(document.getElementById("dicePrediction").value);
+
+    dieOne.classList.add("rolling");
+    dieTwo.classList.add("rolling");
+
+    let animationTicks = 0;
+
+    const animationInterval = setInterval(function () {
+        setDiceFace(dieOne, getRandomDieValue());
+        setDiceFace(dieTwo, getRandomDieValue());
+
+        animationTicks++;
+
+        if (animationTicks >= 12) {
+            clearInterval(animationInterval);
+            finishDiceSimulation(trials, prediction);
+        }
+    }, 80);
+}
+
+function finishDiceSimulation(trials, prediction) {
+    const dieOne = document.getElementById("dieOne");
+    const dieTwo = document.getElementById("dieTwo");
+
+    dieOne.classList.remove("rolling");
+    dieTwo.classList.remove("rolling");
+
+    const counts = {};
+
+    for (let sum = 2; sum <= 12; sum++) {
+        counts[sum] = 0;
+    }
+
+    let lastDieOne = 1;
+    let lastDieTwo = 1;
+
+    for (let i = 0; i < trials; i++) {
+        const first = getRandomDieValue();
+        const second = getRandomDieValue();
+        const sum = first + second;
+
+        counts[sum]++;
+
+        lastDieOne = first;
+        lastDieTwo = second;
+    }
+
+    setDiceFace(dieOne, lastDieOne);
+    setDiceFace(dieTwo, lastDieTwo);
+
+    let maxCount = 0;
+    let mostCommon = 2;
+
+    for (let sum = 2; sum <= 12; sum++) {
+        if (counts[sum] > maxCount) {
+            maxCount = counts[sum];
+            mostCommon = sum;
+        }
+    }
+
+    const predictionText = prediction === mostCommon ? "Correct" : "Not this time";
+
+    document.getElementById("mostCommonSum").innerText = mostCommon;
+    document.getElementById("diceTotalRolls").innerText = trials;
+    document.getElementById("predictionResult").innerText = predictionText;
+    document.getElementById("diceBars").innerHTML = buildDiceBars(counts, maxCount);
+
+    let explanation = "The most common sum was " + mostCommon + ". ";
+
+    if (mostCommon === 7) {
+        explanation += "This matches the expected pattern because 7 has the most possible dice combinations.";
+    } else {
+        explanation += "With randomness, the most common result can vary, especially with fewer trials. Try increasing the number of rolls.";
+    }
+
+    document.getElementById("diceFeedback").innerText = explanation;
+
+    updateTopStats(trials, 20);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    updateSafetyLabel();
+    updateWeatherLabel();
+    updateFlightLabel();
+});
