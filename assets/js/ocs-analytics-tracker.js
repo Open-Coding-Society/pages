@@ -407,12 +407,21 @@
      * Submit analytics to backend
      */
     async function submitAnalytics() {
+        const javaURI = window.javaURI || '/api';
         try {
-            const javaURI = window.javaURI || '/api';
-            
             // Skip submission if no backend URI is configured (static site mode)
             if (!window.javaURI || javaURI === '/api') {
                 debug('Skipping analytics submission - no backend configured');
+                return;
+            }
+
+            // In local static development, avoid noisy failed requests unless explicitly enabled.
+            const isLocalStaticDev =
+                window.location.hostname === 'localhost' &&
+                String(javaURI).includes('localhost:8585') &&
+                window.ocsAnalyticsForceBackend !== true;
+            if (isLocalStaticDev) {
+                debug('Skipping analytics submission in local static dev mode');
                 return;
             }
             
@@ -462,6 +471,15 @@
                 console.warn('Failed to submit analytics:', response.status);
             }
         } catch (error) {
+            const isLocalDevBackendDown =
+                String(javaURI).includes('localhost:8585') &&
+                (String(error?.message || '').includes('Failed to fetch') || String(error).includes('ERR_CONNECTION_REFUSED'));
+
+            if (isLocalDevBackendDown) {
+                debug('Skipping analytics submission - localhost backend is not running');
+                return;
+            }
+
             console.warn('Error submitting analytics:', error);
             // Silently fail - don't interrupt user experience
         }
