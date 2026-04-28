@@ -1,8 +1,14 @@
 // Imports: Level objects and UI helpers.
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import PersonaTrial from './PersonaTrial.js';
+import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
+import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
+import SkillPassport from './SkillPassport.js';
+import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
+import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World

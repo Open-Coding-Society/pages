@@ -1,4 +1,5 @@
-import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+import ProfileManager from '@assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+import Present from './Present.js';
 
 /**
  * Shared identity behavior for CS Path levels.

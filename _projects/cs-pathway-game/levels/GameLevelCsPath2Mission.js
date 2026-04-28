@@ -1,16 +1,40 @@
-// Imports: Level objects and UI helpers.
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
-import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
+import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '@assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
+import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
-const CHALLENGE_ERROR_TYPES = {
-  HTTP_ERROR: 'HTTP_ERROR',
-  EMPTY_RESPONSE: 'EMPTY_RESPONSE',
-  INVALID_RESPONSE: 'INVALID_RESPONSE',
-  UNKNOWN: 'UNKNOWN',
+// Prompt templates for AI question generation and grading.
+const CHALLENGE_PROMPT_TEXT = {
+  QUESTION_ROLE: 'You are {{deskName}} in a classroom coding game.',
+  QUESTION_FOCUS: 'Generate exactly one challenge question focused on: {{expertise}}.',
+  QUESTION_CONCISE: 'Use the provided desk context and keep the question concise (max 18 words).',
+  QUESTION_SHORT_ANSWER: 'The challenge should require a short written answer from a student.',
+  QUESTION_BEGINNER_LEVEL: 'Target absolute beginners. Ask only one simple idea per question.',
+  QUESTION_PLAIN_WORDS: 'Use plain words a beginner would understand. Avoid jargon unless it is a basic class term.',
+  QUESTION_NO_TRICKS: 'Do not ask trick, edge-case, multi-step, or comparison-heavy questions.',
+  QUESTION_ALLOWED_SHAPES: 'Use one of these easy formats: "What command...", "What is...", "Which file...", or "Why do we...".',
+  QUESTION_FORMAT: 'Do not include explanation, rubric, markdown, numbering, or extra text.',
+  QUESTION_TOPIC_HEADER: 'Desk topic examples:\n{{sampleTopics}}',
+  QUESTION_VARIETY_HEADER: 'Question style options:\n{{questionStyles}}',
+  QUESTION_RECENT_HEADER: 'Recently used questions to avoid repeating:\n{{recentQuestions}}',
+  QUESTION_ANTI_REPEAT: 'Do not repeat or closely paraphrase any recent question. Prefer a fresh angle each time.',
+  QUESTION_UNIQUE_STYLE: 'Choose a different question style than the recent examples when possible.',
+  QUESTION_ADVANCED_MODE: 'Mission scoreboard is 4/4. Switch to advanced mode and make the question noticeably harder.',
+  QUESTION_ADVANCED_FOCUS: 'Ask for deeper understanding, not just a memorized fact.',
+  QUESTION_ADVANCED_RULES: 'Use a question that may combine two related ideas, require a comparison, or ask for a troubleshooting choice.',
+  QUESTION_ADVANCED_KEEP_SHORT: 'Keep the question concise, but more challenging than the earlier desk questions.',
+
+  EVAL_ROLE: 'You are grading a student answer for {{deskName}}.',
+  EVAL_EXPERTISE: 'Desk expertise: {{expertise}}.',
+  EVAL_SCOPE: 'Assess whether the student answer is correct, mostly correct, or incorrect.',
+  EVAL_QUESTION: 'Challenge question: {{question}}',
+  EVAL_ANSWER: 'Student answer: {{answer}}',
+  EVAL_FORMAT: 'Respond in exactly two lines and nothing else:',
+  EVAL_VERDICT: 'VERDICT: RIGHT or WRONG',
+  EVAL_FEEDBACK: 'FEEDBACK: one short sentence with actionable feedback.',
+  EVAL_RIGHT_RULE: 'Mark RIGHT for correct or mostly correct answers.',
 };
 
 const CHALLENGE_ERROR_MESSAGES = {
@@ -20,10 +44,91 @@ const CHALLENGE_ERROR_MESSAGES = {
   [CHALLENGE_ERROR_TYPES.UNKNOWN]: () => 'Challenge generation failed.',
 };
 
-// Grading is intentionally binary for student-facing feedback in this level.
-const CHALLENGE_VERDICTS = {
-  RIGHT: 'RIGHT',
-  WRONG: 'WRONG',
+const CHALLENGE_QUESTION_STYLES = [
+  'Ask for one basic command the student should memorize.',
+  'Ask what a single beginner term means.',
+  'Ask which file, tool, or button to use first.',
+  'Ask for one simple reason we do a basic step.',
+  'Ask for one short safety or setup check.',
+  'Ask for one small action before running code.',
+  'Ask for one clear yes/no understanding check with a short explanation.',
+  'Ask for one beginner-friendly definition using simple words.',
+];
+
+const CHALLENGE_ADVANCED_QUESTION_STYLES = [
+  'Ask for a two-step explanation that connects a command or concept to a result.',
+  'Ask which option is better and why, using one concrete reason.',
+  'Ask for a small troubleshooting decision with a likely fix.',
+  'Ask for a more specific command, file, or setting and what it changes.',
+  'Ask for a brief compare-and-contrast between two related terms.',
+  'Ask for one practical workflow step plus a short reason it matters.',
+  'Ask a scenario question that needs the student to choose the correct action.',
+  'Ask for a short explanation that uses at least two key terms correctly.',
+];
+
+const CHALLENGE_RECENT_HISTORY_LIMIT = 12;
+
+// ── Desk Knowledge Base ─────────────────────────────────────────────────────
+// Keyed by desk id. Each entry provides an expertise string (AI topic focus)
+// and sample Q&A pairs the AI uses for variety (not asked verbatim).
+const DESK_AI_KNOWLEDGE_BASE = {
+  'The Admin': {
+    expertise: 'Linux terminal usage, WSL setup for Windows, installing and managing tool versions with Brew (macOS) and Apt (Ubuntu/Kali/Mint), VSCode setup with extensions like GitLens and Jupyter, and verifying correct installation of Python, pip, Ruby, Bundler, Gem, Jupyter, and Git config',
+    questions: [
+      { question: 'What command checks which version of Python is active in your terminal?', answer: 'python --version — if it shows 2.x you may need python3 --version; your venv should point to the correct version.' },
+      { question: 'How do you verify pip is installed and see its version?', answer: 'pip --version — it also shows which Python it is linked to, so you can confirm it matches your active venv.' },
+      { question: 'What command confirms Ruby is installed and shows its version?', answer: 'ruby -v — on macOS use Brew (brew install ruby); on Ubuntu/Kali/Mint use apt (sudo apt install ruby-full).' },
+      { question: 'How do you check that Bundler and Gem are installed correctly?', answer: 'bundle -v and gem -v — Bundler manages Ruby gem dependencies per project the same way pip manages Python packages.' },
+      { question: 'What command verifies Jupyter is installed and shows its version?', answer: 'jupyter --version — also run jupyter kernelspec list to confirm the correct Python kernel is registered.' },
+      { question: 'How do you set your Git global username and email, and how do you verify them?', answer: 'git config --global user.name "Your Name" and git config --global user.email "you@example.com"; verify with git config --global user.name and git config --global user.email.' },
+      { question: 'How do you install a tool with Brew on macOS and keep it updated?', answer: 'brew install <tool> to install; brew upgrade <tool> to update a specific tool; brew update first to refresh the formula list.' },
+      { question: 'How do you install a tool with Apt on Ubuntu, Kali, or Mint?', answer: 'sudo apt update first to refresh the package list, then sudo apt install <package> — use apt list --installed | grep <name> to verify.' },
+      { question: 'What is WSL and why do Windows developers use it for this course?', answer: 'WSL (Windows Subsystem for Linux) runs a real Linux kernel inside Windows, giving access to Bash, Apt, and Linux-native tools so the dev environment matches macOS and Linux classmates.' },
+      { question: 'Which VSCode extensions should every student install for this course?', answer: 'GitLens (git history and blame), Python (ms-python.python), Jupyter (ms-toolsai.jupyter) — install via the VSCode Marketplace or code --install-extension <id> in the terminal.' },
+    ],
+  },
+  'The Archivist': {
+    expertise: 'file and folder creation, correct naming conventions, cloning teacher reference repos, managing individual and team repositories, creating and activating a venv per project, running make or local dev commands only within an active venv, and when to use a fork versus a template repository',
+    questions: [
+      { question: 'What naming convention should you use for files and folders in a project?', answer: 'Use lowercase letters, hyphens or underscores instead of spaces, and descriptive names that reflect content — e.g. game-engine.js, not myFile2.' },
+      { question: 'What command clones a remote repository to your local machine?', answer: 'git clone <url> — creates a local copy of the repo including all history and branches.' },
+      { question: 'How do you clone a teacher reference repo without mixing it with your own work?', answer: 'Clone it into a clearly named read-only folder (e.g. opencs/), never commit to it, and pull updates with git pull when the teacher publishes changes.' },
+      { question: 'What is the purpose of a virtual environment (venv) in a OpenCS project?', answer: 'A venv isolates project dependencies so each project has its own package versions that do not conflict with other projects or the system Python.' },
+      { question: 'What is the correct sequence to create and activate a venv for a new project?', answer: 'python3 -m venv venv, then source venv/bin/activate (macOS/Linux), use ./scripts/venv.sh to get Python and Ruby dependencies' },
+      { question: 'Why should you only run make or local dev commands inside an active venv?', answer: 'Without an active venv the command will fail on missing packages, produce failures, or pollute the global environment.' },
+      { question: 'How do you tell whether a venv is currently active in your terminal?', answer: 'The shell prompt shows the venv name in parentheses, e.g. (venv).' },
+      { question: 'What is the difference between a personal repo and a team (fork/org) repo, and how do you manage both?', answer: 'Your personal repo is the origin you push to; the team repo is upstream. Add it as a remote (git remote add upstream <url>), sync with git fetch upstream, and merge selectively.' },
+      { question: 'When should you fork a repo instead of using a template?', answer: 'Fork when you intend to contribute changes back to the original owner via a pull request — the fork keeps a live link to the upstream repo.' },
+      { question: 'When should you use a template repo instead of forking?', answer: 'Use a template when you want a clean starting point that is isolated from the original — you can still pull upstream updates manually but there is no automatic PR link.' },
+      { question: 'How do you pull upstream updates into a repo created from a template?', answer: 'Add the template as a remote (git remote add upstream <url>), fetch with git fetch upstream, then merge or cherry-pick the changes you want into your branch.' },
+    ],
+  },
+  'The SDLC Master': {
+    expertise: 'individual and team practices across the software development lifecycle: creating issues, writing code, building, testing, committing, and integrating — all in small increments using continuous integration and agile iteration',
+    questions: [
+      { question: 'Why should you create an issue before writing code?', answer: 'Issues document intent, allow team discussion, and link commits to requirements so changes are always traceable.' },
+      { question: 'What makes a good commit message?', answer: 'A short imperative summary line, a blank line, then a body explaining why — not what — the change was made.' },
+      { question: 'What is the purpose of a build step in the SDLC?', answer: 'It compiles or bundles code, catches compile-time errors early, and produces a reproducible artifact before testing.' },
+      { question: 'How small should an increment be in agile development?', answer: 'Small enough to complete, test, and integrate within a single sprint — ideally hours to a day, not weeks.' },
+      { question: 'What is continuous integration (CI) and why does it matter?', answer: 'CI automatically builds and tests every commit so integration bugs are caught immediately rather than at release time.' },
+      { question: 'What should you do before committing code to the main branch?', answer: 'Run local tests, review the diff, write a meaningful commit message, and confirm the build build with Make and passes in CI after Sync.' },
+      { question: 'What is the difference between unit testing and integration testing?', answer: 'Unit tests verify a single function or class in isolation; integration tests verify that multiple components work together correctly.' },
+      { question: 'How does branching support small-increment development?', answer: 'Short-lived feature branches let each increment be developed independently, reviewed via pull request, and merged only when passing all checks.' },
+    ],
+  },
+  'The Scrum Master': {
+    expertise: 'agile manifesto, scrum board setup, issue tracking, sprint ceremonies such as standups retrospectives and planning, and team collaboration practices',
+    questions: [
+      { question: 'What are the four values of the Agile Manifesto?', answer: 'Individuals over processes, working software over documentation, customer collaboration over contracts, and responding to change over following a plan.' },
+      { question: 'How do you set up a scrum board?', answer: 'Create columns for Backlog, In Progress, Review, and Done, then populate with user story cards prioritized by the product owner.' },
+      { question: 'What is the purpose of a daily standup?', answer: 'A short sync (≤15 min) where each team member shares what they did yesterday, what they will do today, and any blockers.' },
+      { question: 'How do you write a good user story?', answer: 'Use the format: As a [role], I want [feature], so that [benefit]. Include acceptance criteria.' },
+      { question: 'What happens in a sprint retrospective?', answer: 'The team reflects on what went well, what to improve, and agrees on one or two actionable changes for the next sprint.' },
+      { question: 'How do you track issues in a project?', answer: 'Create issues with a clear title, description, acceptance criteria, priority label, and assignee; link them to the relevant sprint or milestone.' },
+      { question: 'What is the difference between a product backlog and a sprint backlog?', answer: 'The product backlog is the full prioritized wish list; the sprint backlog is the subset committed to for the current sprint.' },
+      { question: 'What is the role of the scrum master?', answer: 'Facilitate ceremonies, remove blockers, protect the team from scope creep, and coach the team on agile practices.' },
+    ],
+  },
 };
 
 /**
@@ -41,6 +146,42 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const level = this;
 
     let { width, height, path } = this.getLevelDimensions();
+
+    this.profilePanelView = new StatusPanel({
+      id: 'csse-mission-panel',
+      title: 'MISSION TOOLS',
+      fields: [
+        { key: 'desk1', label: 'Workbench 1', emptyValue: '—' },
+        { key: 'desk2', label: 'Workbench 2', emptyValue: '—' },
+        { key: 'desk3', label: 'Workbench 3', emptyValue: '—' },
+        { key: 'desk4', label: 'Workbench 4', emptyValue: '—' },
+        { type: 'section', title: 'MISSION SCOREBOARD', marginTop: '10px' },
+        { key: 'missionScore', label: 'Score', emptyValue: '.55' },
+        { key: 'missionCleared', label: 'Cleared', emptyValue: '0/4' },
+      ],
+      theme: {
+        background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
+        borderColor: 'var(--ocs-game-accent, #4ecca3)',
+        textColor: 'var(--ocs-game-text, #e0e0e0)',
+        accentColor: 'var(--ocs-game-accent, #4ecca3)',
+        secondaryButtonBackground: 'var(--ocs-game-surface-alt, #1a1a2e)',
+        secondaryButtonTextColor: 'var(--ocs-game-text, #e0e0e0)',
+      },
+      position: { top: '16px', left: '16px' },
+      width: '260px',
+      padding: '12px 14px',
+      zIndex: '10000',
+      fontFamily: '"Courier New", monospace',
+    });
+    this.profilePanelView.render();
+    this.profilePanelView.update({
+      desk1: '—',
+      desk2: '—',
+      desk3: '—',
+      desk4: '—',
+      missionScore: '.55',
+      missionCleared: '0/4',
+    });
 
     /**
      * Section: Level objects.
@@ -437,7 +578,111 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     ].join('\n\n');
   }
 
-  // Parse AI grading output into app-level verdict and feedback fields.
+  /**
+   * History key. Returns a stable per-desk key so question history
+   * stays isolated between stations.
+   * @private
+   */
+  _getMissionQuestionHistoryKey(spriteData) {
+    return spriteData?.id || 'desk';
+  }
+
+  /**
+   * Normalize question. Strips punctuation and folds case so repeat
+   * comparisons are not sensitive to surface differences.
+   * @private
+   */
+  _normalizeMissionQuestion(question) {
+    return (question || '')
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[^a-z0-9 ]/g, '')
+      .trim();
+  }
+
+  /**
+   * Record question. Appends the question to the rolling per-desk history,
+   * capped at CHALLENGE_RECENT_HISTORY_LIMIT entries.
+   * @private
+   */
+  _recordMissionQuestion(spriteData, question) {
+    const key = this._getMissionQuestionHistoryKey(spriteData);
+    const normalized = this._normalizeMissionQuestion(question);
+    if (!normalized) return;
+
+    const existing = this._missionQuestionHistory.get(key) || [];
+    const nextHistory = [...existing, question].slice(-CHALLENGE_RECENT_HISTORY_LIMIT);
+    this._missionQuestionHistory.set(key, nextHistory);
+  }
+
+  /**
+   * Get history. Returns the recent question list for the given desk.
+   * @private
+   */
+  _getRecentMissionQuestions(spriteData) {
+    const key = this._getMissionQuestionHistoryKey(spriteData);
+    return this._missionQuestionHistory.get(key) || [];
+  }
+
+  /**
+   * Detect repeat. Returns true if the question matches any recent question
+   * at this station after normalization.
+   * @private
+   */
+  _isRepeatedMissionQuestion(spriteData, question) {
+    const normalizedQuestion = this._normalizeMissionQuestion(question);
+    if (!normalizedQuestion) return false;
+
+    return this._getRecentMissionQuestions(spriteData).some((recentQuestion) => {
+      return this._normalizeMissionQuestion(recentQuestion) === normalizedQuestion;
+    });
+  }
+
+  /**
+   * Build prompt. Assembles the question-generation prompt injecting
+   * expertise, style options, and recent questions to maximize variety.
+   * @private
+   */
+  _buildChallengePrompt(spriteData) {
+    const expertise = spriteData?.expertise || 'general problem solving';
+    const deskName = spriteData?.id || 'Desk Guide';
+    const advancedMode = (this._missionProgressCount || 0) >= 4;
+    const sampleTopics = (spriteData?.knowledgeBase?.[deskName]?.questions || [])
+      .slice(0, 8)
+      .map((topic) => `- ${topic.question}`)
+      .join('\n');
+    const recentQuestions = this._getRecentMissionQuestions(spriteData)
+      .slice(-CHALLENGE_RECENT_HISTORY_LIMIT)
+      .map((question) => `- ${question}`)
+      .join('\n');
+    const questionStyles = (advancedMode ? CHALLENGE_ADVANCED_QUESTION_STYLES : CHALLENGE_QUESTION_STYLES)
+      .map((style, index) => `${index + 1}. ${style}`)
+      .join('\n');
+
+    return [
+      CHALLENGE_PROMPT_TEXT.QUESTION_ROLE.replace('{{deskName}}', deskName),
+      CHALLENGE_PROMPT_TEXT.QUESTION_FOCUS.replace('{{expertise}}', expertise),
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_MODE : CHALLENGE_PROMPT_TEXT.QUESTION_BEGINNER_LEVEL,
+      CHALLENGE_PROMPT_TEXT.QUESTION_CONCISE,
+      CHALLENGE_PROMPT_TEXT.QUESTION_SHORT_ANSWER,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_FOCUS : CHALLENGE_PROMPT_TEXT.QUESTION_PLAIN_WORDS,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_RULES : CHALLENGE_PROMPT_TEXT.QUESTION_NO_TRICKS,
+      CHALLENGE_PROMPT_TEXT.QUESTION_ALLOWED_SHAPES,
+      CHALLENGE_PROMPT_TEXT.QUESTION_FORMAT,
+      CHALLENGE_PROMPT_TEXT.QUESTION_ANTI_REPEAT,
+      CHALLENGE_PROMPT_TEXT.QUESTION_UNIQUE_STYLE,
+      advancedMode ? CHALLENGE_PROMPT_TEXT.QUESTION_ADVANCED_KEEP_SHORT : '',
+      CHALLENGE_PROMPT_TEXT.QUESTION_VARIETY_HEADER.replace('{{questionStyles}}', questionStyles),
+      recentQuestions ? CHALLENGE_PROMPT_TEXT.QUESTION_RECENT_HEADER.replace('{{recentQuestions}}', recentQuestions) : '',
+      sampleTopics ? CHALLENGE_PROMPT_TEXT.QUESTION_TOPIC_HEADER.replace('{{sampleTopics}}', sampleTopics) : '',
+    ].filter(Boolean).join('\n\n');
+  }
+
+  /**
+   * Parse evaluation. Delegates verdict and feedback parsing to AiChallengeNpc.
+   * @private
+   */
   _parseChallengeEvaluation(raw) {
     // Accept strict format first, then gracefully fall back to first two lines.
     const lines = raw
@@ -651,7 +896,80 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     console.log('[MissionTools] challenge created:', entry);
   }
 
-  // Helper to locate the player object in active game objects.
+  /**
+   * Award progress. Increments the score counter. Repeat solves are locked
+   * until every station has been cleared at least once.
+   * @private
+   */
+  _awardMissionProgress(deskId) {
+    if (!deskId) return;
+
+    const stationTargetCount = this._missionDeskIds?.length || 4;
+    const alreadyCompleted = this._missionCompletedStations.has(deskId);
+    const allStationsCompleted = this._missionCompletedStations.size >= stationTargetCount;
+
+    if (!alreadyCompleted) {
+      this._missionCompletedStations.add(deskId);
+      this._missionProgressCount += 1;
+      this._syncMissionProgressBoard();
+
+      if (this._missionCompletedStations.size >= stationTargetCount) {
+        this.showToast?.('All stations cleared once. Repeat solves now count toward bonus progress.');
+      }
+      return;
+    }
+
+    if (!allStationsCompleted) {
+      this.showToast?.('Progress lock: clear each station once before repeats count.');
+      return;
+    }
+
+    this._missionProgressCount += 1;
+    this._syncMissionProgressBoard();
+  }
+
+  /**
+   * Sync scoreboard. Updates the mission scoreboard rows inside
+   * the top-left Mission Tools panel.
+   * @private
+   */
+  _syncMissionProgressBoard() {
+    const score = this._getMissionProgressScore(this._missionProgressCount);
+    const scoreText = score.toFixed(2).replace(/^0/, '');
+    const completedText = `${this._missionProgressCount}/4`;
+
+    // Keep scoreboard integrated with the mission tools panel and remove legacy detached HUD.
+    this.clearScore?.();
+    this.profilePanelView?.update({
+      desk1: '—',
+      desk2: '—',
+      desk3: '—',
+      desk4: '—',
+      missionScore: scoreText,
+      missionCleared: completedText,
+    });
+  }
+
+  /**
+   * Score ramp. Maps the completed station count to the assignment
+   * grade range (0.55 baseline → 0.89 at four stations, then bonus steps).
+   * @private
+   */
+  _getMissionProgressScore(completedCount) {
+    if (completedCount <= 0) return 0.55;
+    if (completedCount === 1) return 0.66;
+    if (completedCount === 2) return 0.77;
+    if (completedCount === 3) return 0.88;
+    if (completedCount === 4) return 0.89;
+
+    const bonusSteps = Math.min(completedCount - 4, 12);
+    return 0.89 + (bonusSteps * 0.0025);
+  }
+
+  /**
+   * Find player. Locates the Player instance in active game objects.
+   * @private
+   */
   _findPlayer() {
     return this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
   }
