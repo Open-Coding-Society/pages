@@ -1,0 +1,457 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Divide Challenge - AP CSP</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+    .page-content {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  .wrapper {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #1a472a 0%, #0e2a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1300px;
+            width: 100%;
+            background: #fef3d6;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255,245,215,0.6) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+            border-radius: 72px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4), inset 0 1px 4px rgba(255,255,200,0.8);
+            padding: 24px 28px 32px 28px;
+        }
+
+        .split-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        /* Left: Rural village area */
+        .rural-area {
+            flex: 1.2;
+            min-width: 280px;
+            background: #6b8c5c;
+            background-image: linear-gradient(135deg, #7f9f6e 0%, #5a7a48 100%);
+            border-radius: 64px;
+            padding: 25px 20px 30px 20px;
+            box-shadow: inset 0 0 0 3px #e9f5cf, inset 0 0 0 8px #c2da9b, 0 15px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .village-status {
+            font-size: 1.6rem;
+            background: #2c2e1ecc;
+            backdrop-filter: blur(8px);
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 60px;
+            color: #fffaec;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .house-display {
+            font-size: 10rem;
+            line-height: 1.2;
+            background: #ecd9b4;
+            border-radius: 80px;
+            padding: 20px 10px;
+            margin: 15px 0;
+            box-shadow: inset 0 0 0 5px #fbf5e3, 0 12px 20px rgba(0,0,0,0.2);
+            transition: all 0.25s ease;
+        }
+
+        .village-name {
+            font-size: 2rem;
+            font-weight: bold;
+            background: #2b3b1f;
+            display: inline-block;
+            padding: 8px 28px;
+            border-radius: 40px;
+            color: #f9e7b3;
+            margin-top: 20px;
+            box-shadow: inset 0 -2px 0 #5a7942, 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .progress-message {
+            margin-top: 20px;
+            background: #221c0eaa;
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 12px;
+            font-weight: bold;
+            color: #fff3cf;
+            font-size: 1.1rem;
+        }
+
+        /* Right: MCQ area */
+        .quiz-area {
+            flex: 1;
+            min-width: 320px;
+            background: #fff7e8;
+            border-radius: 56px;
+            padding: 25px 25px 35px 25px;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.2), inset 0 1px 0 #fffee8;
+        }
+
+        .question-box {
+            background: #2e3d28;
+            padding: 18px 20px;
+            border-radius: 50px;
+            color: #fef0c0;
+            font-size: 1.35rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 35px;
+            box-shadow: inset 0 -2px 0 #141f0e, 0 5px 12px rgba(0,0,0,0.2);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .option-btn {
+            background: #e7ddc0;
+            border: none;
+            border-radius: 60px;
+            padding: 16px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: inherit;
+            color: #2a3a1c;
+        }
+
+        .option-btn:hover {
+            transform: scale(0.98);
+            background: #fcf3dc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .prefix {
+            background: #5f7343;
+            color: white;
+            border-radius: 40px;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .feedback {
+            background: #f2e5ce;
+            border-radius: 40px;
+            padding: 14px 20px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            border-left: 8px solid #86a56d;
+            color: #2a3e1f;
+        }
+
+        .reset-btn {
+            background: #c49a6c;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 12px 20px;
+            border-radius: 40px;
+            margin-top: 20px;
+            width: 100%;
+            cursor: pointer;
+            color: #2d2b1c;
+            transition: 0.1s linear;
+            font-family: inherit;
+        }
+
+        .reset-btn:hover {
+            background: #b08758;
+            transform: scale(0.98);
+        }
+
+        .score-badge {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            background: #efe0c7;
+            padding: 8px 16px;
+            border-radius: 80px;
+        }
+        .score-badge span {
+    color: black !important;
+}
+
+        @media (max-width: 760px) {
+            .house-display { font-size: 5rem; }
+            .game-container { padding: 16px; }
+            .option-btn { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="split-layout">
+        <!-- Left: Dynamic Rural Village -->
+        <div class="rural-area">
+            <div class="village-status">📡 Connectivity · Rural Village</div>
+            <div class="house-display" id="houseIcon">🏠</div>
+            <div class="village-name">🌾 Brookvale</div>
+            <div class="progress-message" id="statusMessage">
+                Choose the RIGHT solution → Village improves ✨🏠✨<br>
+                Choose the WRONG solution → Village declines 🏚️
+            </div>
+        </div>
+
+        <!-- Right: Multiple Choice Questions -->
+        <div class="quiz-area">
+            <div class="question-box">
+                ❓ How can we bridge the digital divide here?
+            </div>
+            <div class="options" id="optionsContainer">
+                <!-- Options will be generated dynamically -->
+            </div>
+            <div class="feedback" id="feedbackMsg">
+                ✨ Click an option above to help the village connect ✨
+            </div>
+            <div class="score-badge">
+                <span>🏆 Correct (village improves ✨🏠✨):</span>
+                <span id="correctCount" style="font-weight:bold; background:#2e5c2a; padding:2px 16px; border-radius:40px; color:rgb(0, 0, 0)!important;">0</span>
+                <span>⚠️ Wrong (village worsens 🏚️):</span>
+                <span id="wrongCount" style="font-weight:bold; background:#964b2a; padding:2px 16px; border-radius:40px; color:rgb(0, 0, 0)!important;">0</span>
+            </div>
+            <button class="reset-btn" id="resetGame">🔄 Reset Village & Stats</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- Question Bank (AP CSP Digital Divide Topic) ----------
+    const questions = [
+        {
+            text: "The rural village has no stable internet, and students cannot attend online classes. What is the most effective first step?",
+            options: [
+                "A. Give every family a high-end laptop but do NOT fix internet access",
+                "B. Build community Wi-Fi hotspots + fiber connection to the village hub",
+                "C. Ban all electronic devices and return to paper-only teaching",
+                "D. Install high-speed broadband only in the village chief's house"
+            ],
+            correct: "B",
+            explanation: "✅ Correct! Community Wi-Fi and fiber access are sustainable ways to close the digital divide."
+        },
+        {
+            text: "Villagers cannot afford data plans, so their smartphones sit unused. Which policy works best?",
+            options: [
+                "A. Government-subsidized school broadband + free public Wi-Fi program",
+                "B. Force private ISPs to raise prices to create scarcity",
+                "C. Remove all cell towers and go back to messengers",
+                "D. Declare a ban on discussing internet prices"
+            ],
+            correct: "A",
+            explanation: "✅ Correct! Public subsidies and free hotspots directly lower economic barriers."
+        },
+        {
+            text: "The village is in a mountainous area where fiber optics are extremely expensive. What is the best technology solution?",
+            options: [
+                "A. Dig tunnels for fiber cables no matter the cost",
+                "B. Use fixed wireless (e.g., TV white space) or low-earth-orbit satellite internet",
+                "C. Abandon the village and move everyone to the city",
+                "D. Wait for private companies to build infrastructure in 50 years"
+            ],
+            correct: "B",
+            explanation: "✅ Correct! Wireless/satellite solutions effectively overcome geographic obstacles."
+        },
+        {
+            text: "Elderly villagers don't know how to use computers or the internet, causing digital exclusion. What should be done?",
+            options: [
+                "A. Hold weekly digital literacy workshops + provide simple interface training",
+                "B. Give up on digital services for the elderly",
+                "C. Tell elderly people 'if you can't use it, too bad'",
+                "D. Only teach young people and let the elderly depend entirely on them"
+            ],
+            correct: "A",
+            explanation: "✅ Correct! Digital literacy training is essential to closing the divide."
+        },
+        {
+            text: "The village lacks digital content in its local language, so residents find the internet useless. How to improve?",
+            options: [
+                "A. Encourage development of local-language education, farming, and health apps",
+                "B. Force everyone to learn advanced programming before going online",
+                "C. Ban minority language content entirely",
+                "D. Provide only English content"
+            ],
+            correct: "A",
+            explanation: "✅ Correct! Localized content increases the real value of internet access."
+        }
+    ];
+
+    // Game state
+    let currentQuestionIndex = 0;
+    let villageState = null;      // null = neutral 🏠, "good" = ✨🏠✨, "bad" = 🏚️
+    let correctTotal = 0;
+    let wrongTotal = 0;
+    let canAnswer = true;
+
+    // DOM elements
+    const houseIconSpan = document.getElementById("houseIcon");
+    const statusMsgDiv = document.getElementById("statusMessage");
+    const feedbackDiv = document.getElementById("feedbackMsg");
+    const correctCountSpan = document.getElementById("correctCount");
+    const wrongCountSpan = document.getElementById("wrongCount");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const resetBtn = document.getElementById("resetGame");
+
+    // Update the village display based on state
+    function updateVillageDisplay() {
+        if (villageState === "good") {
+            houseIconSpan.innerHTML = "✨🏠✨";
+            statusMsgDiv.innerHTML = "🌟 Village is thriving! Broadband access, schools online, telehealth available 🌟";
+        } else if (villageState === "bad") {
+            houseIconSpan.innerHTML = "🏚️";
+            statusMsgDiv.innerHTML = "⚠️ Village is declining: no internet, students falling behind, lost opportunities ⚠️";
+        } else {
+            houseIconSpan.innerHTML = "🏠";
+            statusMsgDiv.innerHTML = "🏠 A typical rural village waiting for the right digital divide solution 🏠";
+        }
+    }
+
+    function updateStats() {
+        correctCountSpan.innerText = correctTotal;
+        wrongCountSpan.innerText = wrongTotal;
+    }
+
+    function handleAnswer(selectedLetter, isCorrect, explanationMsg) {
+        if (!canAnswer) return;
+        canAnswer = false;
+
+        let feedbackText = "";
+
+        if (isCorrect) {
+            correctTotal++;
+            villageState = "good";
+            feedbackText = `🎉 Correct! ${explanationMsg} The village improves! 🎉`;
+        } else {
+            wrongTotal++;
+            villageState = "bad";
+            feedbackText = `❌ Wrong. ${explanationMsg} The village worsens.`;
+        }
+
+        updateVillageDisplay();
+        updateStats();
+        feedbackDiv.innerHTML = feedbackText;
+
+        // Move to next question (cycle through the bank)
+        currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+
+        // Reload next question after a short delay
+        setTimeout(() => {
+            loadCurrentQuestion();
+            canAnswer = true;
+        }, 500);
+    }
+
+    function loadCurrentQuestion() {
+        const q = questions[currentQuestionIndex];
+        if (!q) return;
+
+        optionsContainer.innerHTML = "";
+
+        q.options.forEach((optText, idx) => {
+            const letter = String.fromCharCode(65 + idx); // A, B, C, D
+            const isCorrectChoice = (letter === q.correct);
+
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+
+            const prefixSpan = document.createElement("span");
+            prefixSpan.className = "prefix";
+            prefixSpan.innerText = letter;
+
+            const textSpan = document.createElement("span");
+            textSpan.innerText = optText;
+
+            btn.appendChild(prefixSpan);
+            btn.appendChild(textSpan);
+
+            btn.addEventListener("click", () => {
+                let explanationFull = "";
+                if (isCorrectChoice) {
+                    explanationFull = q.explanation.replace("✅ Correct! ", "").trim();
+                } else {
+                    const correctLetter = q.correct;
+                    let correctText = "";
+                    for (let i = 0; i < q.options.length; i++) {
+                        if (String.fromCharCode(65 + i) === correctLetter) {
+                            correctText = q.options[i];
+                            break;
+                        }
+                    }
+                    explanationFull = `The correct answer is ${correctLetter}. ${correctText}. ${q.explanation.replace("✅ Correct! ", "").trim()}`;
+                }
+                handleAnswer(letter, isCorrectChoice, explanationFull);
+            });
+
+            optionsContainer.appendChild(btn);
+        });
+
+        if (canAnswer) {
+            feedbackDiv.innerHTML = `📖 New question: ${q.text} Choose the right way to help the village.`;
+        }
+    }
+
+    function resetGame() {
+        currentQuestionIndex = 0;
+        correctTotal = 0;
+        wrongTotal = 0;
+        villageState = null;
+        canAnswer = true;
+
+        houseIconSpan.innerHTML = "🏠";
+        updateVillageDisplay();
+        updateStats();
+        loadCurrentQuestion();
+        feedbackDiv.innerHTML = "🔄 Game reset! Help the village bridge the digital divide 🏠";
+    }
+
+    // Initialize
+    function init() {
+        resetGame();
+        resetBtn.addEventListener("click", resetGame);
+    }
+
+    init();
+</script>
+</body>
+</html>

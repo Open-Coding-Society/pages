@@ -1,10 +1,10 @@
-import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '../../../GameEnginev1.1/essentials/Player.js';
-import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
-import Coin from '../../../GameEnginev1.1/Coin.js';
-import Barrier from '../../../GameEnginev1.1/essentials/Barrier.js';
-import Leaderboard from '../../../GameEnginev1.1/essentials/Leaderboard.js';
-import DialogueSystem from '../../../GameEnginev1.1/essentials/DialogueSystem.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Coin from '@assets/js/GameEnginev1.1/Coin.js';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Leaderboard from '@assets/js/GameEnginev1.1/essentials/Leaderboard.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 
 class GameLevelBasketball {
   constructor(gameEnv) {
@@ -39,6 +39,10 @@ class GameLevelBasketball {
     this.lastShotAt = -Infinity; 
     this.lebronStunUntil = 0;
     this.lebronStunDurationMs = 3000;
+    this.levelCompleted = false;
+    this.completionTriggered = false;
+    this.targetSurvivalSeconds = 20;
+    this.firstStealScrollTriggered = false;
 
     const image_src_court = path + '/images/projects/characters/BaskCourt.png';
     const image_data_court = {
@@ -181,7 +185,6 @@ class GameLevelBasketball {
     this.startTime = 0;
     this.currentTime = 0;
     this.createHud();
-    this.createBottomNav();
     this.updateHud();
     this.initLeaderboard();
     this.showIntroDialogue();
@@ -200,6 +203,11 @@ class GameLevelBasketball {
     if (!this.caught) {
       this.currentTime = (now - this.startTime) / 1000;
       this.updateHud();
+
+      if (this.currentTime >= this.targetSurvivalSeconds) {
+        this.completeLevel();
+        return;
+      }
     }
 
     if (this.caught) {
@@ -241,6 +249,17 @@ class GameLevelBasketball {
       this.caught = true;
       this.caughtAt = now;
       this.bestTime = Math.max(this.bestTime, this.currentTime);
+
+      if (!this.firstStealScrollTriggered) {
+        this.firstStealScrollTriggered = true;
+        try {
+          window.dispatchEvent(new CustomEvent('characters:concept-focus', {
+            detail: { level: 'basketball', trigger: 'first-steal' }
+          }));
+        } catch (err) {
+          console.warn('Failed to emit basketball concept focus event:', err);
+        }
+      }
       this.bestCoins = Math.max(this.bestCoins, this.getCoinsCollected());
       this.saveBestTime();
       this.saveBestCoins();
@@ -526,8 +545,34 @@ class GameLevelBasketball {
   updateHud() {
     if (!this.timeHud) return;
     this.timeHud.textContent =
-      `Time: ${this.currentTime.toFixed(1)}s | Best: ${this.bestTime.toFixed(1)}s | ` +
+      `Time: ${this.currentTime.toFixed(1)}s/${this.targetSurvivalSeconds}s | Best: ${this.bestTime.toFixed(1)}s | ` +
       `Coins: ${this.getCoinsCollected()} | Best Coins: ${this.bestCoins}`;
+  }
+
+  completeLevel() {
+    if (this.completionTriggered) return;
+    this.completionTriggered = true;
+    this.levelCompleted = true;
+
+    if (this.messageHud) {
+      this.messageHud.innerHTML = 'Challenge complete!<br>Moving to lesson summary...';
+      this.messageHud.style.display = 'block';
+    }
+
+    try {
+      window.dispatchEvent(new CustomEvent('characters:level-complete', {
+        detail: { level: 'basketball' }
+      }));
+    } catch (err) {
+      console.warn('Failed to emit basketball completion event:', err);
+    }
+
+    const level = this.gameEnv?.gameControl?.currentLevel;
+    if (level) {
+      setTimeout(() => {
+        level.continue = false;
+      }, 500);
+    }
   }
 
   showCaughtMessage() {
@@ -596,6 +641,8 @@ class GameLevelBasketball {
     this.caughtAt             = 0;
     this.scoreSubmittedThisRound = false;
     this.lebronStunUntil      = 0;
+    this.completionTriggered  = false;
+    this.levelCompleted       = false;
     this.updateCoinSpawnBounds();
     this.applyCoinSpawnRules();
     this.startTime = performance.now();

@@ -10,12 +10,12 @@
 // 3) Ensure images exist and paths resolve via 'path' provided by the engine.
 // 4) You can add more objects to this.classes inside the constructor.
 
-import GameEnvBackground from '../../../GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '../../../GameEnginev1.1/essentials/Player.js';
-import Npc from '../../../GameEnginev1.1/essentials/Npc.js';
-import Barrier from '../../../GameEnginev1.1/essentials/Barrier.js';
-import Collectible from '../../../GameEnginev1.1/essentials/Collectible.js';
-import AiNpc from '../../../GameEnginev1.1/essentials/AiNpc.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
+import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
 
 class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
@@ -96,6 +96,7 @@ class GameLevelAquaticGameLevel {
                                 const level = gameControl?.currentLevel;
                                 if (level) {
                                     level.levelCompleted = true;
+                                    emitLevelComplete('aquatic');
                                     level.continue = false;
                                 }
                             }
@@ -341,16 +342,22 @@ class GameLevelAquaticGameLevel {
 
         // Prevent duplicate action rows when a dialogue updates in place.
         const clearDialogueActionButtons = (dialogueSystem) => {
-            if (!dialogueSystem?.dialogueBox) return;
+            if (!dialogueSystem) return;
 
-            const dialogueBox = dialogueSystem.dialogueBox;
-            const avatarElement = document.getElementById(`dialogue-avatar-${dialogueSystem.id}`);
-            const buttonContainers = dialogueBox.querySelectorAll('div[style*="display: flex"]');
+            // Keep the dialogue control row intact; only clear previously added action buttons.
+            if (dialogueSystem.actionButtonGroup) {
+                dialogueSystem.actionButtonGroup.innerHTML = '';
+            }
+        };
 
-            buttonContainers.forEach((container) => {
-                if (avatarElement && container.contains(avatarElement)) return;
-                container.remove();
-            });
+        const emitLevelComplete = (levelName) => {
+            try {
+                window.dispatchEvent(new CustomEvent('characters:level-complete', {
+                    detail: { level: levelName }
+                }));
+            } catch (err) {
+                console.warn('Failed to emit characters level completion event:', err);
+            }
         };
 
         const updateQuestHud = () => {
@@ -915,12 +922,20 @@ class GameLevelAquaticGameLevel {
         };
 
         const setBackground = (src) => {
-            const backgroundObject = this.gameEnv?.gameObjects?.find(
-                obj => obj?.constructor?.name === 'GameEnvBackground'
-            );
+            const backgroundObject = this.gameEnv?.gameObjects?.find((obj) => {
+                if (!obj) return false;
+                if (obj instanceof GameEnvBackground) return true;
+                if (obj?.constructor?.name === 'GameEnvBackground') return true;
+                return obj?.data?.name === 'custom_bg';
+            });
             if (!backgroundObject) return;
 
-            if (!backgroundObject.image) backgroundObject.image = new Image();
+            if (!backgroundObject.image) {
+                backgroundObject.image = new Image();
+            }
+            if (backgroundObject.data) {
+                backgroundObject.data.src = src;
+            }
             backgroundObject.image.src = src;
         };
 
@@ -975,11 +990,31 @@ class GameLevelAquaticGameLevel {
             player.direction = targetY < player.position.y ? 'up' : 'down';
 
             return new Promise((resolve) => {
+                const startTime = performance.now();
+                const maxDurationMs = 2800;
                 const step = () => {
-                    const current = player.position.y;
-                    const delta = targetY - current;
+                    if (!player?.position) {
+                        resolve();
+                        return;
+                    }
+
+                    const current = Number(player.position.y);
+                    const target = Number(targetY);
+                    if (!Number.isFinite(current) || !Number.isFinite(target)) {
+                        player.position.y = Number.isFinite(target) ? target : 0;
+                        resolve();
+                        return;
+                    }
+
+                    const delta = target - current;
+                    if (performance.now() - startTime > maxDurationMs) {
+                        player.position.y = target;
+                        resolve();
+                        return;
+                    }
+
                     if (Math.abs(delta) <= 2) {
-                        player.position.y = targetY;
+                        player.position.y = target;
                         resolve();
                         return;
                     }
@@ -1233,7 +1268,7 @@ class GameLevelAquaticGameLevel {
 
             const overlay = transitionOverlay('Swimming to the surface...');
             await animatePlayerSwim(14);
-            setBackground(path + '/images/projects/characters/Above the water.png');
+            setBackground(path + '/images/projects/characters/Above-the-water.png');
             setWorldNpcVisibility(false);
 
             const player = getPlayer();
