@@ -48,6 +48,10 @@ WASD to walk, E to interact with NPCs and read concept dialogues.
 3. Generate a variant, launch the test, and let the SDK bucket visitors.
 4. Review views and conversions in the engine dashboard before declaring a winner.
 
+## Reading Results
+
+Use views for exposure checks and conversions for click-goal tests. A healthy experiment should show traffic on both variants before the team declares a winner or opens a follow-up implementation PR.
+
 ## Notebook
 
 See the [project notebook](/ai-ab-engine/) for a full walkthrough with live demo links.
