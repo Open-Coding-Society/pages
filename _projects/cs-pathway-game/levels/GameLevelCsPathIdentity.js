@@ -1,4 +1,4 @@
-import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+import ProfileManager from '@assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 import Present from './Present.js';
 
 /**
