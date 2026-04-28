@@ -1,100 +1,211 @@
-<div class="sim-shell">
-  <section class="sim-hero">
-    <div>
-      <p class="kicker">AP CSP Topic 3.16</p>
-      <h1>Simulation Game Lab</h1>
-      <p>Play two guided simulation games to learn why simulations are useful, how randomness works, and why models have limitations.</p>
+<div class="sim-app">
+  <section class="top-nav">
+    <div class="brand">
+      <div class="brand-icon">🎮</div>
+      <div>
+        <h2>Wi-Fighters Simulation Lab</h2>
+        <p>AP CSP Topic 3.16</p>
+      </div>
     </div>
 
-    <div class="score-card">
-      <span id="score">0</span>
-      <p>Game Score</p>
+    <div class="score-pill">
+      <span>🏆 Score</span>
+      <strong id="score">0</strong>
     </div>
   </section>
 
-  <section class="game-card">
-    <div class="game-header">
-      <span class="game-icon">✈️</span>
-      <div>
-        <h2>Game 1: Airplane Crash Test Simulator</h2>
-        <p>Test a plane design safely using a simulation instead of real crashes.</p>
+  <section class="hero">
+    <div class="hero-text">
+      <span class="tag">Interactive CSP Lesson</span>
+      <h1>Learn Simulations Through Mini Games</h1>
+      <p>
+        Make predictions, adjust variables, run models, and see how simulations help us test real-world systems safely.
+      </p>
+
+      <div class="hero-actions">
+        <button onclick="scrollToGame('plane-game')">✈️ Start Crash Test</button>
+        <button onclick="scrollToGame('pi-game')" class="secondary">🎯 Try Monte Carlo</button>
       </div>
     </div>
 
-    <div class="step-box">
-      <h3>1. Make a prediction</h3>
-      <p>If the safety score is higher, what should happen?</p>
-      <button onclick="choosePlanePrediction(this, true)">Crash risk should go down</button>
-      <button onclick="choosePlanePrediction(this, false)">Crash risk should go up</button>
-    </div>
-
-    <div class="step-box">
-      <h3>2. Adjust the model</h3>
-
-      <label>Safety Score: <span id="safetyLabel">70</span></label>
-      <input id="safetyScore" type="range" min="10" max="100" value="70" oninput="updateSafetyLabel()">
-
-      <label>Number of Test Flights: <span id="flightLabel">100</span></label>
-      <input id="flightCount" type="range" min="10" max="1000" step="10" value="100" oninput="updateFlightLabel()">
-
-      <button class="primary-btn" onclick="runPlaneSim()">▶ Run Crash Test Simulation</button>
-    </div>
-
-    <div class="result-box">
-      <h3>3. Results</h3>
-      <p>Successful Flights: <strong id="safeFlights">0</strong></p>
-      <p>Crashes: <strong id="crashes">0</strong></p>
-
-      <div class="bar-track">
-        <div id="planeBar" class="bar-fill">0%</div>
+    <div class="hero-panel">
+      <div class="panel-card">
+        <span>Concept</span>
+        <strong>Random Trials</strong>
       </div>
-
-      <p id="planeFeedback" class="feedback">Run the simulation to see the result.</p>
-    </div>
-
-    <div class="takeaway">
-      <strong>AP CSP Takeaway:</strong> Simulations are useful when real testing is dangerous, expensive, slow, or impractical.
+      <div class="panel-card">
+        <span>Concept</span>
+        <strong>Model Limits</strong>
+      </div>
+      <div class="panel-card">
+        <span>Concept</span>
+        <strong>Approximation</strong>
+      </div>
     </div>
   </section>
 
-  <section class="game-card">
-    <div class="game-header">
-      <span class="game-icon">🎯</span>
+  <section class="info-grid">
+    <div class="info-card">
+      <span>01</span>
+      <h3>Predict</h3>
+      <p>Guess what the simulation will show before running it.</p>
+    </div>
+    <div class="info-card">
+      <span>02</span>
+      <h3>Modify</h3>
+      <p>Use sliders to change assumptions in the model.</p>
+    </div>
+    <div class="info-card">
+      <span>03</span>
+      <h3>Simulate</h3>
+      <p>Run many trials and compare the result.</p>
+    </div>
+  </section>
+
+  <section id="plane-game" class="game-section airplane">
+    <div class="game-title-row">
       <div>
-        <h2>Game 2: Monte Carlo Pi Simulator</h2>
-        <p>Use random points to estimate the value of π.</p>
+        <p class="mini-label">Game 1</p>
+        <h2>✈️ Airplane Crash Test Simulator</h2>
+        <p>
+          Real crash testing is dangerous and expensive. This game uses a simplified model to test airplane safety.
+        </p>
+      </div>
+      <div class="difficulty">Modeling + Limitations</div>
+    </div>
+
+    <div class="game-layout">
+      <div class="control-card">
+        <h3>Step 1: Prediction</h3>
+        <p>If safety score increases, what should happen to crash risk?</p>
+
+        <div class="choice-row">
+          <button onclick="choosePrediction(this, true)">Crash risk decreases</button>
+          <button onclick="choosePrediction(this, false)">Crash risk increases</button>
+        </div>
+
+        <h3>Step 2: Adjust the Model</h3>
+
+        <div class="slider-block">
+          <label>Safety Score <strong id="safetyLabel">72</strong></label>
+          <input id="safetyScore" type="range" min="10" max="100" value="72" oninput="updateSafetyLabel()">
+        </div>
+
+        <div class="slider-block">
+          <label>Weather Difficulty <strong id="weatherLabel">35</strong></label>
+          <input id="weatherDifficulty" type="range" min="0" max="80" value="35" oninput="updateWeatherLabel()">
+        </div>
+
+        <div class="slider-block">
+          <label>Test Flights <strong id="flightLabel">150</strong></label>
+          <input id="flightCount" type="range" min="20" max="1000" step="10" value="150" oninput="updateFlightLabel()">
+        </div>
+
+        <button class="run-btn" onclick="runPlaneSim()">▶ Run Flight Tests</button>
+      </div>
+
+      <div class="visual-card">
+        <div class="plane-visual">
+          <div class="sky-orbit orbit-one"></div>
+          <div class="sky-orbit orbit-two"></div>
+          <div class="plane">✈️</div>
+        </div>
+
+        <div class="stats-grid">
+          <div>
+            <span id="safeFlights">0</span>
+            <p>Safe Flights</p>
+          </div>
+          <div>
+            <span id="crashes">0</span>
+            <p>Crashes</p>
+          </div>
+          <div>
+            <span id="riskLevel">—</span>
+            <p>Risk Level</p>
+          </div>
+        </div>
+
+        <div class="meter">
+          <div id="planeBar" class="meter-fill">0%</div>
+        </div>
+
+        <p id="planeFeedback" class="feedback">
+          Run the simulation to test the airplane model.
+        </p>
       </div>
     </div>
 
-    <div class="step-box">
-      <h3>1. Make a prediction</h3>
-      <p>What happens when we use more random points?</p>
-      <button onclick="choosePiPrediction(this, true)">The estimate usually gets more accurate</button>
-      <button onclick="choosePiPrediction(this, false)">The estimate always becomes exactly π</button>
+    <div class="takeaway">
+      <strong>AP CSP Takeaway:</strong>
+      Simulations are useful when real testing is dangerous, expensive, slow, or impractical. But the result depends on the assumptions in the model.
+    </div>
+  </section>
+
+  <section id="pi-game" class="game-section pi">
+    <div class="game-title-row">
+      <div>
+        <p class="mini-label">Game 2</p>
+        <h2>🎯 Monte Carlo Pi Simulator</h2>
+        <p>
+          Use random points to estimate π. More trials usually improve the estimate, but it still stays an approximation.
+        </p>
+      </div>
+      <div class="difficulty">Randomness + Approximation</div>
     </div>
 
-    <div class="step-box">
-      <h3>2. Choose trials</h3>
+    <div class="game-layout reverse">
+      <div class="control-card">
+        <h3>Step 1: Prediction</h3>
+        <p>What usually happens when we use more random points?</p>
 
-      <label>Random Points: <span id="pointLabel">500</span></label>
-      <input id="pointCount" type="range" min="100" max="5000" step="100" value="500" oninput="updatePointLabel()">
+        <div class="choice-row">
+          <button onclick="choosePrediction(this, true)">Estimate gets closer</button>
+          <button onclick="choosePrediction(this, false)">Estimate is always exact</button>
+        </div>
 
-      <button class="primary-btn" onclick="runPiSim()">🎯 Estimate Pi</button>
-    </div>
+        <h3>Step 2: Choose Trials</h3>
 
-    <div class="result-box">
-      <h3>3. Results</h3>
-      <p>Points Inside Circle: <strong id="insideCount">0</strong></p>
-      <p>Total Points: <strong id="totalPoints">0</strong></p>
-      <p>Estimated π: <strong id="piEstimate">0</strong></p>
+        <div class="slider-block">
+          <label>Random Points <strong id="pointLabel">800</strong></label>
+          <input id="pointCount" type="range" min="100" max="6000" step="100" value="800" oninput="updatePointLabel()">
+        </div>
 
-      <canvas id="piCanvas" width="320" height="320"></canvas>
+        <button class="run-btn" onclick="runPiSim()">🎯 Estimate π</button>
 
-      <p id="piFeedback" class="feedback">Run the simulation to generate random points.</p>
+        <div class="mini-explain">
+          <p><strong>Formula used:</strong></p>
+          <p>π ≈ 4 × points inside circle ÷ total points</p>
+        </div>
+      </div>
+
+      <div class="visual-card">
+        <canvas id="piCanvas" width="340" height="340"></canvas>
+
+        <div class="stats-grid">
+          <div>
+            <span id="insideCount">0</span>
+            <p>Inside Circle</p>
+          </div>
+          <div>
+            <span id="totalPoints">0</span>
+            <p>Total Points</p>
+          </div>
+          <div>
+            <span id="piEstimate">0</span>
+            <p>Estimated π</p>
+          </div>
+        </div>
+
+        <p id="piFeedback" class="feedback">
+          Run the simulation to generate random points.
+        </p>
+      </div>
     </div>
 
     <div class="takeaway">
-      <strong>AP CSP Takeaway:</strong> Simulations can use random trials to approximate answers that are hard to calculate directly.
+      <strong>AP CSP Takeaway:</strong>
+      A simulation can use random trials to approximate a result. More trials often make the result more reliable.
     </div>
   </section>
 </div>
