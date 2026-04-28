@@ -31,7 +31,7 @@ Topics:
   - title: "Character"
     image: "/gamify/lessons/character.png"
     alt: "Character"
-    link: /game/essentials/characters
+    link: /characters-lesson/
     keyPoints:
       - "Movement"
       - "Animation"
