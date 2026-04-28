@@ -103,7 +103,7 @@ class localStorageDemo {
         // Leaderboard is already mounted above; omit it from classes to avoid a
         // second instantiation by the game engine.
         this.classes = [
-            { class: GamEnvBackground, data: image_data_desert },
+            { class: GameEnvBackground, data: image_data_desert },
             { class: Player,           data: sprite_data_chillguy },
             { class: Coin,             data: sprite_data_coin },
         ];
