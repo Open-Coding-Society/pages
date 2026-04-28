@@ -150,6 +150,11 @@ class GameLevelFuturesExchange {
             keepOpen: false
           },
           {
+            label: "Learn Coding Behind Futures",
+            action: () => openReusableModal("futuresLessonModal", "futuresLessonFrame", `${path}/gamify/fortuneFinders/futures-lesson`),
+            keepOpen: false
+          },
+          {
             label: "Quick tip",
             action: () => showDialogBox(
               "Quick tip",

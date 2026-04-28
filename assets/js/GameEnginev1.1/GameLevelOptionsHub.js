@@ -54,6 +54,7 @@ class GameLevelOptionsHub {
           'Options are contracts with expiration dates. Use calls when you expect upside and puts when you want downside protection. Ready to open the options challenge?',
           [
             { label: 'Open Options Challenge', action: () => window.open(`${path}/gamify/fortuneFinders/quante`, '_blank') },
+            { label: 'Learn Coding Behind Options', action: () => window.open(`${path}/gamify/fortuneFinders/options-lesson`, '_blank') },
             { label: 'Risk Tip', action: () => showDialogBox('Risk Tip', 'Keep position size small and always define max loss before entering an options trade.', [{ label: 'Back', action: () => {}, keepOpen: false }]), keepOpen: true },
             { label: 'Close', action: () => {}, keepOpen: false }
           ]
