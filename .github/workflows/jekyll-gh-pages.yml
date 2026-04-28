@@ -84,6 +84,8 @@ jobs:
           python scripts/split_multi_course_files.py  # Run course splitting
       - name: Inject fork config
         run: |
+          FORK_URL="${FORK_URL//[[:space:]]/}"
+          FORK_BASEURL="${FORK_BASEURL//[[:space:]]/}"
           if [ -n "$FORK_URL" ]; then
             printf "url: \"%s\"\nbaseurl: \"%s\"\n" "$FORK_URL" "$FORK_BASEURL" > _config.local.yml
             echo "Using fork config: url=$FORK_URL baseurl=$FORK_BASEURL"
