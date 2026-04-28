@@ -1,4 +1,4 @@
-import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+import GameEnvBackground from '/assets/js/GameEnginev1.1.1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Coin from '/assets/js/GameEnginev1.1/Coin.js';
 import Leaderboard from '/assets/js/GameEnginev1.1/essentials/Leaderboard.js';
