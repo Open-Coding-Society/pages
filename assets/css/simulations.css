@@ -1,137 +1,1286 @@
+/* assets/css/simulations.css */
+
+/* =========================
+   PASTEL SIMULATION LAB UI
+   Keep HTML + JS the same
+   Replace CSS only
+========================= */
+
 :root {
-  --bg: #f7f4ff;
-  --card: rgba(255, 255, 255, 0.7);
-  --pink: #ffcfe6;
-  --lavender: #dcd4ff;
-  --blue: #d9f0ff;
-  --mint: #dcffe9;
-  --text: #4a4453;
-  --soft: #7a7282;
-  --border: rgba(120, 100, 140, 0.15);
-  --shadow: 0 10px 30px rgba(120, 100, 140, 0.15);
+  --sim-cream: #fff9f1;
+  --sim-cream-deep: #fff0df;
+
+  --sim-pink: #ffd9ea;
+  --sim-pink-deep: #ff8fbd;
+
+  --sim-lavender: #e7ddff;
+  --sim-lavender-deep: #9f89ff;
+
+  --sim-blue: #dff2ff;
+  --sim-blue-deep: #78bde9;
+
+  --sim-mint: #dcffef;
+  --sim-mint-deep: #7dd9aa;
+
+  --sim-yellow: #fff2bd;
+  --sim-yellow-deep: #ffd36d;
+
+  --sim-text: #483d4f;
+  --sim-muted: #776c7e;
+
+  --sim-border: rgba(112, 85, 128, 0.18);
+  --sim-border-strong: rgba(112, 85, 128, 0.28);
+
+  --sim-shadow: 0 22px 60px rgba(108, 76, 130, 0.17);
+  --sim-small-shadow: 0 12px 28px rgba(108, 76, 130, 0.12);
+  --sim-button-shadow: 0 14px 30px rgba(160, 118, 230, 0.3);
+
+  --sim-radius-xl: 2rem;
+  --sim-radius-lg: 1.45rem;
+  --sim-radius-md: 1rem;
+  --sim-radius-sm: 0.75rem;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: linear-gradient(135deg, #fdfbff, #f3f7ff);
-  font-family: "Inter", sans-serif;
-  color: var(--text);
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(255, 217, 234, 0.95), transparent 28%),
+    radial-gradient(circle at 92% 10%, rgba(223, 242, 255, 0.95), transparent 30%),
+    radial-gradient(circle at 45% 20%, rgba(231, 221, 255, 0.78), transparent 32%),
+    radial-gradient(circle at 12% 85%, rgba(220, 255, 239, 0.7), transparent 28%),
+    linear-gradient(135deg, #fff9f1, #fbf3ff 48%, #f3fbff);
+  color: var(--sim-text);
 }
 
-/* Layout */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.36) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.36) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+  opacity: 0.55;
+  z-index: -1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .simulation-page-shell {
-  max-width: 1100px;
-  margin: auto;
-  padding: 2rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1rem 5rem;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Cards */
+/* =========================
+   HERO
+========================= */
+
+.lesson-hero-section {
+  position: relative;
+  min-height: 450px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  margin-bottom: 1.35rem;
+  border-radius: 2.6rem;
+}
+
+.hero-background-orb {
+  position: absolute;
+  border-radius: 999px;
+  opacity: 0.9;
+  filter: blur(1px);
+  animation: floatOrb 7s ease-in-out infinite;
+}
+
+.hero-orb-one {
+  width: 190px;
+  height: 190px;
+  background: var(--sim-pink);
+  top: 30px;
+  left: 28px;
+}
+
+.hero-orb-two {
+  width: 255px;
+  height: 255px;
+  background: var(--sim-blue);
+  bottom: 18px;
+  right: 42px;
+  animation-delay: 1.5s;
+}
+
+.hero-orb-three {
+  width: 145px;
+  height: 145px;
+  background: var(--sim-yellow);
+  right: 32%;
+  top: 48px;
+  animation-delay: 0.8s;
+}
+
+@keyframes floatOrb {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-18px) scale(1.05);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
 .hero-inner-card,
 .overview-card,
+.concept-strip-card,
 .simulation-card,
-.wrap-up-card,
-.concept-strip-card {
-  background: var(--card);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+.wrap-up-card {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.62));
+  border: 1px solid var(--sim-border);
+  box-shadow: var(--sim-shadow);
+  backdrop-filter: blur(18px);
 }
 
-/* Title */
-.lesson-title {
-  font-size: 3rem;
+.hero-inner-card {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  width: min(92%, 900px);
+  border-radius: 2.6rem;
+  padding: 3.4rem 2.1rem;
+  text-align: center;
+}
+
+.lesson-eyebrow {
+  margin: 0 0 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
   font-weight: 900;
-  background: linear-gradient(90deg, #ff9fc5, #a995ff, #82bde9);
+  font-size: 0.78rem;
+  color: #b26d96;
+}
+
+.lesson-title {
+  margin: 0;
+  font-size: clamp(2.55rem, 6vw, 5.2rem);
+  line-height: 0.95;
+  font-weight: 950;
+  letter-spacing: -0.065em;
+  background: linear-gradient(90deg, #e876a8, #9d86f5, #6dbbe6);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
 }
 
-/* Buttons (BIG upgrade) */
-button,
-.hero-button {
+.lesson-subtitle {
+  max-width: 730px;
+  margin: 1.1rem auto 0;
+  color: var(--sim-muted);
+  font-size: 1.15rem;
+  line-height: 1.65;
+}
+
+.hero-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.72rem;
+  margin-top: 1.45rem;
+}
+
+.hero-pill {
+  border: 1px solid var(--sim-border);
+  background: rgba(255, 255, 255, 0.75);
   border-radius: 999px;
-  padding: 0.7rem 1.2rem;
-  font-weight: 700;
+  padding: 0.6rem 0.92rem;
+  font-weight: 850;
+  color: #705575;
+  box-shadow: 0 8px 18px rgba(108, 76, 130, 0.08);
+}
+
+.hero-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 1.8rem;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.hero-button,
+.main-gradient-button,
+.secondary-gradient-button,
+.soft-action-button,
+.outline-action-button,
+.vocab-chip {
+  border-radius: 999px;
+  font-weight: 900;
   cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
-.main-gradient-button {
-  background: linear-gradient(135deg, #ffb6d9, #b7a6ff);
-  color: white;
-}
-
-.secondary-gradient-button {
-  background: linear-gradient(135deg, #d9f0ff, #dcffe9);
-}
-
+.hero-button,
+.main-gradient-button,
+.secondary-gradient-button,
+.soft-action-button,
 .outline-action-button {
-  background: white;
-  border: 1px solid var(--border);
+  border: 0;
+  padding: 0.82rem 1.26rem;
+}
+
+.hero-button:hover,
+.main-gradient-button:hover,
+.secondary-gradient-button:hover,
+.soft-action-button:hover,
+.outline-action-button:hover,
+.vocab-chip:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.03);
+}
+
+.hero-button:active,
+.main-gradient-button:active,
+.secondary-gradient-button:active,
+.soft-action-button:active,
+.outline-action-button:active,
+.vocab-chip:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.primary-hero-button,
+.main-gradient-button {
+  background: linear-gradient(135deg, var(--sim-pink-deep), var(--sim-lavender-deep));
+  color: white;
+  box-shadow: var(--sim-button-shadow);
+}
+
+.primary-hero-button:hover,
+.main-gradient-button:hover {
+  box-shadow: 0 18px 38px rgba(160, 118, 230, 0.38);
+}
+
+.secondary-hero-button,
+.secondary-gradient-button {
+  background: linear-gradient(135deg, var(--sim-blue), var(--sim-mint));
+  color: #50677a;
+  box-shadow: var(--sim-small-shadow);
 }
 
 .soft-action-button {
-  background: #fff2f7;
+  background: #fff1f7;
+  color: #9d5f81;
+  border: 1px solid rgba(157, 95, 129, 0.14);
+  box-shadow: 0 9px 20px rgba(157, 95, 129, 0.08);
 }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(120, 100, 140, 0.2);
+.outline-action-button {
+  background: rgba(255, 255, 255, 0.86);
+  color: #735e78;
+  border: 1px solid var(--sim-border);
+  box-shadow: var(--sim-small-shadow);
 }
 
-/* Inputs */
-input,
-select {
-  border-radius: 12px;
-  padding: 0.6rem;
-  border: 1px solid var(--border);
-  background: white;
+/* =========================
+   OVERVIEW CARDS
+========================= */
+
+.lesson-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.95rem;
+  margin-bottom: 1.4rem;
 }
 
-input:focus,
-select:focus {
-  outline: none;
-  border-color: #b997ff;
-  box-shadow: 0 0 0 3px rgba(185, 151, 255, 0.2);
+.overview-card {
+  border-radius: var(--sim-radius-xl);
+  padding: 1.38rem;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
-/* Dice box */
-.dice-visual-panel {
-  background: linear-gradient(135deg, #fff6fb, #f0edff);
-  border-radius: 20px;
+.overview-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -30px -60px auto;
+  width: 125px;
+  height: 125px;
+  border-radius: 999px;
+  background: rgba(255, 217, 234, 0.45);
+}
+
+.overview-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--sim-border-strong);
+  box-shadow: 0 24px 62px rgba(108, 76, 130, 0.2);
+}
+
+.overview-icon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 1.15rem;
+  background: linear-gradient(135deg, var(--sim-yellow), var(--sim-pink));
+  font-size: 1.55rem;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 10px 24px rgba(255, 160, 197, 0.22);
+}
+
+.overview-card h2,
+.concept-strip-card h2,
+.simulation-card h2,
+.wrap-up-card h2 {
+  margin: 0;
+  color: var(--sim-text);
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.overview-card p,
+.section-description,
+.wrap-up-card p,
+.concept-strip-card p {
+  color: var(--sim-muted);
+  line-height: 1.65;
+}
+
+/* =========================
+   VOCAB STRIP
+========================= */
+
+.concept-strip {
+  margin-bottom: 1.4rem;
+}
+
+.concept-strip-card {
+  border-radius: var(--sim-radius-xl);
+  padding: 1.5rem;
+}
+
+.vocab-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.vocab-chip {
+  border: 1px solid var(--sim-border);
+  background: linear-gradient(135deg, white, #fff7fb);
+  padding: 0.64rem 0.96rem;
+  color: #745575;
+}
+
+.vocab-chip:hover,
+.vocab-chip.active {
+  background: linear-gradient(135deg, var(--sim-pink), var(--sim-lavender));
+  box-shadow: 0 10px 22px rgba(160, 118, 230, 0.18);
+}
+
+.vocab-definition-box {
+  margin-top: 1rem;
   padding: 1rem;
+  border-radius: var(--sim-radius-lg);
+  background:
+    linear-gradient(135deg, rgba(255, 249, 237, 0.92), rgba(255, 247, 251, 0.92));
+  border: 1px solid var(--sim-border);
+  color: #6e6074;
+  font-weight: 750;
+  line-height: 1.55;
 }
 
-/* Flight scene softer */
-.flight-scene {
-  border-radius: 20px;
-  background: linear-gradient(to bottom, #eaf4ff, #fff8ef);
+/* =========================
+   MAIN SIMULATION CARDS
+========================= */
+
+.simulation-card {
+  border-radius: 2.35rem;
+  padding: 1.6rem;
+  margin-bottom: 1.55rem;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Tables */
+.simulation-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 6% 8%, rgba(255, 217, 234, 0.34), transparent 24%),
+    radial-gradient(circle at 96% 4%, rgba(223, 242, 255, 0.36), transparent 24%);
+}
+
+.simulation-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section-heading-row,
+.table-heading-row,
+.chart-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section-description {
+  margin-bottom: 0;
+}
+
+.section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.hidden-panel {
+  display: none;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: var(--sim-radius-lg);
+  background: linear-gradient(135deg, #fff7fb, #f8f2ff);
+  border: 1px solid var(--sim-border);
+  color: var(--sim-muted);
+  line-height: 1.6;
+}
+
+.hidden-panel.is-visible {
+  display: block;
+  animation: softSlideIn 0.22s ease;
+}
+
+@keyframes softSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hidden-panel h3 {
+  margin: 0 0 0.4rem;
+  color: var(--sim-text);
+  font-weight: 950;
+}
+
+/* =========================
+   DICE SIMULATION
+========================= */
+
+.dice-control-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(280px, 1fr);
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+.dice-visual-panel {
+  min-height: 315px;
+  border-radius: var(--sim-radius-xl);
+  border: 1px solid var(--sim-border);
+  background:
+    radial-gradient(circle at 25% 15%, rgba(255, 242, 189, 0.95), transparent 24%),
+    radial-gradient(circle at 85% 85%, rgba(223, 242, 255, 0.95), transparent 28%),
+    linear-gradient(135deg, #fff8fc, #f3edff);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.dice-visual-panel::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  filter: blur(2px);
+  top: -80px;
+  right: -70px;
+}
+
+.dice-cube {
+  width: 150px;
+  height: 150px;
+  border-radius: 2rem;
+  background: linear-gradient(135deg, #fff6c9, #ffdce8 58%, #e9ddff);
+  border: 5px solid white;
+  box-shadow:
+    0 24px 48px rgba(111, 76, 130, 0.24),
+    0 0 35px rgba(255, 143, 189, 0.28);
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.dice-cube::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 1.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.dice-cube.is-rolling {
+  animation: diceSpin 0.58s cubic-bezier(.25,.8,.25,1);
+}
+
+@keyframes diceSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  35% {
+    transform: rotate(16deg) scale(1.12);
+  }
+
+  70% {
+    transform: rotate(-12deg) scale(0.98);
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+.dice-face-front {
+  font-size: 4.45rem;
+  font-weight: 950;
+  color: #9d5f81;
+}
+
+.dice-sparkle {
+  position: absolute;
+  color: #c88ab0;
+  font-size: 1.8rem;
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+.dice-sparkle-one {
+  top: 42px;
+  left: 58px;
+}
+
+.dice-sparkle-two {
+  right: 68px;
+  top: 86px;
+  animation-delay: 0.7s;
+}
+
+.dice-sparkle-three {
+  bottom: 72px;
+  left: 34%;
+  animation-delay: 1.2s;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.22);
+  }
+}
+
+.dice-status-box {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid var(--sim-border);
+  border-radius: 1.35rem;
+  padding: 0.88rem;
+  z-index: 3;
+  box-shadow: 0 10px 24px rgba(108, 76, 130, 0.09);
+}
+
+.dice-status-box p {
+  margin: 0;
+  color: var(--sim-muted);
+  font-weight: 800;
+}
+
+.dice-status-box strong {
+  color: var(--sim-text);
+}
+
+.dice-button-panel {
+  border-radius: var(--sim-radius-xl);
+  border: 1px solid var(--sim-border);
+  background:
+    linear-gradient(135deg, rgba(255, 248, 252, 0.9), rgba(255, 255, 255, 0.72));
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.custom-roll-label,
+.pretty-label {
+  display: grid;
+  gap: 0.38rem;
+  color: #705e75;
+  font-weight: 900;
+}
+
+.custom-roll-label input,
+.pretty-label input,
+.pretty-label select {
+  width: 100%;
+  border: 1px solid var(--sim-border);
+  border-radius: 1rem;
+  padding: 0.76rem;
+  color: var(--sim-text);
+  background: rgba(255, 255, 255, 0.9);
+  outline: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.custom-roll-label input:focus,
+.pretty-label input:focus,
+.pretty-label select:focus {
+  border-color: #b997ff;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(185, 151, 255, 0.16);
+}
+
+.mini-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+}
+
+.mini-stat-card,
+.flight-score-card {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid var(--sim-border);
+  border-radius: 1.25rem;
+  padding: 0.92rem;
+  box-shadow: var(--sim-small-shadow);
+}
+
+.mini-stat-card span,
+.flight-score-card span {
+  display: block;
+  color: var(--sim-muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.mini-stat-card strong,
+.flight-score-card strong {
+  display: block;
+  color: var(--sim-text);
+  font-size: 1.36rem;
+  margin-top: 0.25rem;
+}
+
+/* =========================
+   CHARTS + TABLES
+========================= */
+
+.dice-chart-panel,
+.data-table-card,
+.reflection-card,
+.risk-breakdown-card {
+  margin-top: 1.2rem;
+  border: 1px solid var(--sim-border);
+  border-radius: var(--sim-radius-xl);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 10px 26px rgba(108, 76, 130, 0.08);
+}
+
+.dice-bar-chart {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.8rem;
+}
+
+.dice-bar-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 80px;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.dice-bar-label {
+  font-weight: 950;
+  color: #705575;
+}
+
+.dice-bar-track {
+  height: 22px;
+  background: #f1eaf7;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 5px rgba(108, 76, 130, 0.08);
+}
+
+.dice-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--sim-pink-deep), var(--sim-blue-deep));
+  transition: width 0.32s ease;
+}
+
+.dice-bar-percent {
+  font-weight: 900;
+  color: #705575;
+}
+
+.responsive-table-wrap {
+  overflow-x: auto;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 780px;
+  overflow: hidden;
+  border-radius: 1.25rem;
+}
+
 .results-table th {
-  background: #f2eaff;
+  background: #f3eaff;
+  color: #6c5576;
+  font-size: 0.9rem;
+}
+
+.results-table th,
+.results-table td {
+  text-align: left;
+  padding: 0.88rem;
+  border-bottom: 1px solid var(--sim-border);
 }
 
 .results-table td {
-  background: rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.52);
+  color: #605468;
 }
 
-/* Chips */
-.vocab-chip {
-  background: linear-gradient(135deg, white, #fff7fb);
+.table-mini-bar {
+  height: 14px;
+  background: #f2ecf7;
   border-radius: 999px;
-  padding: 0.5rem 0.9rem;
-  border: 1px solid var(--border);
+  overflow: hidden;
 }
 
-.vocab-chip:hover {
-  background: linear-gradient(135deg, #ffdce8, #e9ddff);
+.table-mini-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--sim-pink-deep), var(--sim-lavender-deep));
+  transition: width 0.3s ease;
 }
 
-/* Smooth spacing */
-.simulation-card {
-  margin-top: 1.5rem;
-  padding: 1.5rem;
+.reflection-card h3,
+.data-table-card h3,
+.risk-breakdown-card h3,
+.dice-chart-panel h3 {
+  margin: 0;
+  font-weight: 950;
+  color: var(--sim-text);
+}
+
+.reflection-card p {
+  color: var(--sim-muted);
+  line-height: 1.6;
+}
+
+/* =========================
+   FLIGHT SIMULATION
+========================= */
+
+.flight-main-layout {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+.flight-control-panel {
+  border: 1px solid var(--sim-border);
+  border-radius: var(--sim-radius-xl);
+  padding: 1rem;
+  background:
+    linear-gradient(135deg, rgba(255, 248, 252, 0.93), rgba(255, 255, 255, 0.72));
+  display: grid;
+  gap: 0.85rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.input-section-title {
+  margin-top: 0.2rem;
+  padding: 0.43rem 0.68rem;
+  background: linear-gradient(135deg, #fff2bd, #ffdce8);
+  border-radius: 999px;
+  font-weight: 950;
+  color: #7a5d70;
+  box-shadow: 0 8px 18px rgba(255, 160, 197, 0.12);
+}
+
+.flight-visual-column {
+  min-width: 0;
+}
+
+.flight-scene {
+  position: relative;
+  min-height: 430px;
+  border-radius: 2rem;
+  overflow: hidden;
+  border: 1px solid var(--sim-border);
+  background:
+    linear-gradient(to bottom, #dceeff 0%, #eaf6ff 52%, #fff8ef 100%);
+  box-shadow: inset 0 -30px 60px rgba(255, 255, 255, 0.3);
+}
+
+.flight-scene.stormy {
+  background:
+    linear-gradient(to bottom, #9ea8bb 0%, #cad3e4 58%, #fff1e5 100%);
+}
+
+.flight-scene.stormy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0 44%, rgba(255, 255, 255, 0.38) 45%, transparent 46% 100%),
+    linear-gradient(65deg, transparent 0 52%, rgba(255, 255, 255, 0.28) 53%, transparent 54% 100%);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.sun-or-moon {
+  position: absolute;
+  top: 34px;
+  right: 46px;
+  font-size: 2.75rem;
+  z-index: 1;
+}
+
+.scene-cloud {
+  position: absolute;
+  width: 120px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.84);
+  border-radius: 999px;
+  z-index: 1;
+  animation: cloudDrift 11s linear infinite;
+  box-shadow: 0 10px 18px rgba(120, 100, 140, 0.06);
+}
+
+.scene-cloud::before,
+.scene-cloud::after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border-radius: 999px;
+}
+
+.scene-cloud::before {
+  width: 55px;
+  height: 55px;
+  left: 16px;
+  top: -24px;
+}
+
+.scene-cloud::after {
+  width: 64px;
+  height: 64px;
+  left: 54px;
+  top: -34px;
+}
+
+.scene-cloud-one {
+  top: 70px;
+  left: 42px;
+}
+
+.scene-cloud-two {
+  top: 142px;
+  right: 82px;
+  animation-delay: 1s;
+}
+
+.scene-cloud-three {
+  top: 235px;
+  left: 46%;
+  animation-delay: 2.1s;
+}
+
+.scene-cloud-four {
+  top: 315px;
+  left: 18%;
+  animation-delay: 3.2s;
+}
+
+@keyframes cloudDrift {
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(18px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animated-plane {
+  position: absolute;
+  left: 34px;
+  bottom: 52px;
+  font-size: 4.6rem;
+  transform: rotate(-8deg);
+  z-index: 4;
+  transition:
+    left 2.1s ease-in-out,
+    bottom 2.1s ease-in-out,
+    transform 2.1s ease-in-out,
+    filter 0.2s ease;
+  filter: drop-shadow(0 14px 18px rgba(108, 76, 130, 0.2));
+}
+
+.animated-plane.takeoff-success {
+  left: calc(100% - 120px);
+  bottom: 292px;
+  transform: rotate(-18deg) scale(1.05);
+}
+
+.animated-plane.takeoff-fail {
+  left: calc(100% - 126px);
+  bottom: 52px;
+  transform: rotate(42deg) scale(1.03);
+}
+
+.animated-plane.shaking {
+  animation: planeShake 0.45s ease-in-out infinite;
+}
+
+@keyframes planeShake {
+  0% {
+    margin-left: 0;
+  }
+
+  25% {
+    margin-left: -5px;
+  }
+
+  50% {
+    margin-left: 5px;
+  }
+
+  75% {
+    margin-left: -4px;
+  }
+
+  100% {
+    margin-left: 0;
+  }
+}
+
+.runway-base {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: linear-gradient(90deg, #b5aa9d, #948779);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 2;
+}
+
+.runway-line {
+  width: 70px;
+  height: 6px;
+  background: #fff8ef;
+  border-radius: 999px;
+  opacity: 0.78;
+}
+
+.falling-people-container {
+  position: absolute;
+  top: 155px;
+  right: 110px;
+  display: flex;
+  gap: 0.3rem;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.falling-person {
+  display: inline-block;
+  font-size: 1.65rem;
+  animation: personFall 1.45s ease-in forwards;
+}
+
+.falling-person:nth-child(2) {
+  animation-delay: 0.13s;
+}
+
+.falling-person:nth-child(3) {
+  animation-delay: 0.23s;
+}
+
+.falling-person:nth-child(4) {
+  animation-delay: 0.34s;
+}
+
+@keyframes personFall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(175px) rotate(210deg);
+  }
+}
+
+.explosion-effect {
+  position: absolute;
+  right: 80px;
+  bottom: 58px;
+  font-size: 3rem;
+  opacity: 0;
+  transform: scale(0.3);
+  z-index: 6;
+}
+
+.explosion-effect.show-explosion {
+  animation: explodePop 0.65s ease-out forwards;
+}
+
+@keyframes explodePop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  55% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.flight-output-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.flight-result-box {
+  margin-top: 0.85rem;
+  border-radius: var(--sim-radius-lg);
+  padding: 1rem;
+  background: #fff3d7;
+  border: 1px solid var(--sim-border);
+  color: #6f6075;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.flight-result-box.success-result {
+  background: #dcffe9;
+  color: #47735a;
+}
+
+.flight-result-box.fail-result {
+  background: #ffdce8;
+  color: #8b4f6b;
+}
+
+.risk-breakdown-list {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.75rem;
+}
+
+.risk-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--sim-border);
+  box-shadow: 0 7px 16px rgba(108, 76, 130, 0.06);
+}
+
+.risk-item span:first-child {
+  color: #69576f;
+  font-weight: 800;
+}
+
+.risk-item strong {
+  color: #9d5f81;
+}
+
+/* =========================
+   WRAP UP
+========================= */
+
+.wrap-up-section {
+  margin-top: 1.4rem;
+}
+
+.wrap-up-card {
+  border-radius: 2.3rem;
+  padding: 1.6rem;
+}
+
+.wrap-up-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.95rem;
+  margin-top: 1rem;
+}
+
+.wrap-up-grid div {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--sim-border);
+  border-radius: var(--sim-radius-lg);
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(108, 76, 130, 0.07);
+}
+
+.wrap-up-grid h3 {
+  margin-top: 0;
+  color: var(--sim-text);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 980px) {
+  .lesson-overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dice-control-layout,
+  .flight-main-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .flight-control-panel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .input-section-title,
+  .flight-control-panel button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 650px) {
+  .simulation-page-shell {
+    padding: 1rem 0.75rem 4rem;
+  }
+
+  .hero-inner-card {
+    padding: 2.2rem 1rem;
+  }
+
+  .lesson-overview-grid,
+  .mini-stat-grid,
+  .flight-output-grid,
+  .wrap-up-grid,
+  .flight-control-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading-row,
+  .table-heading-row,
+  .chart-heading-row {
+    flex-direction: column;
+  }
+
+  .section-actions {
+    justify-content: flex-start;
+  }
+
+  .animated-plane {
+    font-size: 3.8rem;
+  }
+
+  .dice-bar-row {
+    grid-template-columns: 64px 1fr 62px;
+    gap: 0.55rem;
+  }
+
+  .lesson-title {
+    font-size: clamp(2.3rem, 13vw, 4rem);
+  }
 }
