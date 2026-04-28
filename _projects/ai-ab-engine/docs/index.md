@@ -41,6 +41,13 @@ The most advanced variant type. The LLM extracts key concepts → server assembl
 
 WASD to walk, E to interact with NPCs and read concept dialogues.
 
+## Experiment Flow
+
+1. Open any lesson page with `?ab_admin=true`.
+2. Select the element to test in the overlay.
+3. Generate a variant, launch the test, and let the SDK bucket visitors.
+4. Review views and conversions in the engine dashboard before declaring a winner.
+
 ## Notebook
 
 See the [project notebook](/ai-ab-engine/) for a full walkthrough with live demo links.
