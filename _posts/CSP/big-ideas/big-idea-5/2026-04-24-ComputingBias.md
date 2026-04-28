@@ -932,8 +932,7 @@ Author: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe
     <div class="cb-card cb-reveal">
       <h2>Here's the twist...</h2>
       <p>
-        Computers don't have opinions. They don't have feelings. They don't discriminate <em>on purpose</em>.
-        But they absolutely can, and do, produce unfair results. Here are two real examples:
+        That algorithm recommending your videos? It's not neutral. It was built by humans, trained on human data, and it reflects human bias — whether anyone meant it to or not. Here are two real examples of algorithms causing real harm:
       </p>
       <ul>
         <li><strong style="color:#d4a853;">Amazon</strong> built a hiring AI that learned to downrank resumes containing the word "women's" (like "women's chess club") because it was trained on 10 years of mostly male hires.</li>
@@ -960,9 +959,6 @@ Author: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe
         <strong style="color:#d4a853;">Computing bias</strong> = when a system produces unfair or skewed results
         because of flawed data or flawed design.
       </p>
-      <div class="cb-callout">
-        Garbage in → Garbage (or biased) out
-      </div>
       <p>Bias has three culprits. Every single time:</p>
       <div class="cb-badges">
         <span class="cb-badge"><span class="cb-dot"></span>Data - who &amp; what was included</span>
@@ -1050,65 +1046,6 @@ Author: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe
   </div>
 
   <div class="cb-divider"><div class="cb-divider-line"></div></div>
-
-  <!-- ══════════════════════════════════════════
-       SECTION 5 - FINAL BOSS CHALLENGE
-  ═══════════════════════════════════════════ -->
-  <div class="cb-section">
-    <div class="cb-tag cb-reveal">4:00 – 5:00 · Final Boss · +25 pts</div>
-
-    <div class="cb-big-q cb-reveal">
-      <h2>One Sentence. That's All We Need.</h2>
-      <p>
-        Why does computing bias matter in real systems like hiring, school admissions, or medical diagnosis?
-        Write your best one-sentence AP exam answer.
-      </p>
-    </div>
-
-    <div class="cb-card cb-reveal">
-      <h2>Your Answer</h2>
-      <div class="cb-callout">
-        AP Hint: Think <strong>fairness + real-world harm to real people</strong>.
-        Don't just say "it's unfair" - say <em>why</em> and <em>who gets hurt</em>.
-      </div>
-      <textarea class="cb-textarea" id="cb-final" placeholder="Computing bias matters because..."></textarea>
-      <br>
-      <button class="cb-submit-btn" onclick="submitFinal()">Submit for +25 pts</button>
-      <div class="cb-submit-msg" id="cb-final-msg"></div>
-    </div>
-
-    <!-- Answer reveal -->
-    <div class="cb-card cb-reveal">
-      <h2>A+ Sample Answer</h2>
-      <p style="color:rgba(255,255,255,0.3); font-style:italic; font-size:0.85rem;">
-        Reveal after students submit ↓
-      </p>
-      <button class="cb-submit-btn" style="background:transparent; border:1px solid rgba(212,168,83,0.3); color:#d4a853; margin-top: 0;" onclick="revealSample()">
-        Reveal Sample Answer
-      </button>
-      <div id="sample-answer" style="display:none; margin-top:18px;">
-        <div class="cb-callout">
-          Computing bias matters because biased algorithms make real decisions about real people, and those decisions systematically hurt already-marginalized groups.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       TAKEAWAY
-  ═══════════════════════════════════════════ -->
-  <div class="cb-section">
-    <div class="cb-takeaway cb-reveal">
-      <p class="cb-takeaway-lbl">The One Thing to Remember</p>
-      <div class="cb-takeaway-quote">
-        <p>
-          Computers aren't neutral. Bias enters through data and design decisions made by humans —
-          and its effects are felt by real people in the real world. That's why AP CSP calls this
-          a <em>societal</em> issue, not just a technical one.
-        </p>
-      </div>
-    </div>
-  </div>
 
   <div class="cb-footer-pad"></div>
 
