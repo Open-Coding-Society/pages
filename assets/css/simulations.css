@@ -1,199 +1,199 @@
-.sim-page {
-    max-width: 1000px;
-    margin: auto;
+.sim-shell {
+    max-width: 1050px;
+    margin: 0 auto;
     padding: 2rem;
-    color: #f4f4f5;
+    font-family: Inter, Arial, sans-serif;
+    color: #1f2937;
 }
 
-.hero-card {
-    background: linear-gradient(135deg, #1e1b4b, #312e81, #0f172a);
+.sim-hero {
+    background: linear-gradient(135deg, #e0f2fe, #ede9fe, #ecfdf5);
+    border: 1px solid #bfdbfe;
+    border-radius: 28px;
     padding: 2rem;
-    border-radius: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    box-shadow: 0 18px 40px rgba(59, 130, 246, 0.15);
 }
 
-.hero-card h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-}
-
-.eyebrow {
-    color: #93c5fd;
-    font-weight: 700;
+.kicker {
+    color: #2563eb;
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }
 
-.sim-card {
-    background: #18181b;
-    border: 1px solid #3f3f46;
-    border-radius: 1.25rem;
-    padding: 1.5rem;
+.sim-hero h1 {
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: #111827;
+    margin: 0.3rem 0;
+}
+
+.sim-hero p {
+    color: #4b5563;
+    max-width: 680px;
+}
+
+.score-card {
+    background: white;
+    border: 1px solid #dbeafe;
+    border-radius: 22px;
+    padding: 1.4rem;
+    min-width: 140px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12);
+}
+
+.score-card span {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #4f46e5;
+}
+
+.score-card p {
+    margin: 0;
+    font-weight: 700;
+}
+
+.game-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 26px;
+    padding: 1.7rem;
     margin-bottom: 2rem;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
 }
 
-.sim-card h2 {
+.game-header {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.2rem;
+}
+
+.game-icon {
+    font-size: 2.4rem;
+    background: #f0f9ff;
+    border-radius: 20px;
+    padding: 0.8rem;
+}
+
+.game-card h2 {
     font-size: 1.6rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
+    font-weight: 900;
+    color: #111827;
 }
 
-.sim-card p {
-    margin-bottom: 1rem;
-    color: #d4d4d8;
+.step-box,
+.result-box {
+    background: #f8fafc;
+    border: 1px solid #e0e7ff;
+    border-radius: 20px;
+    padding: 1.2rem;
+    margin: 1rem 0;
+}
+
+.step-box h3,
+.result-box h3 {
+    font-weight: 900;
+    color: #3730a3;
+    margin-bottom: 0.5rem;
 }
 
 button {
-    background: #2563eb;
-    color: white;
-    padding: 0.65rem 1rem;
-    border-radius: 0.8rem;
     border: none;
-    font-weight: 700;
-    margin: 0.3rem;
+    border-radius: 999px;
+    padding: 0.75rem 1.1rem;
+    margin: 0.35rem;
+    background: #dbeafe;
+    color: #1e3a8a;
+    font-weight: 800;
     cursor: pointer;
-    transition: transform 0.15s, background 0.15s;
+    transition: 0.18s;
 }
 
 button:hover {
     transform: translateY(-2px);
-    background: #1d4ed8;
+    background: #bfdbfe;
 }
 
-.choice-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 0.75rem;
+.primary-btn {
+    background: #4f46e5;
+    color: white;
     margin-top: 1rem;
 }
 
-.choice-grid button {
-    background: #27272a;
-    border: 1px solid #52525b;
+.primary-btn:hover {
+    background: #4338ca;
 }
 
-.choice-grid button.correct {
-    background: #15803d;
+button.correct {
+    background: #bbf7d0;
+    color: #166534;
 }
 
-.choice-grid button.wrong {
-    background: #b91c1c;
-}
-
-.feedback {
-    margin-top: 1rem;
-    font-weight: 700;
-    color: #fde68a;
+button.wrong {
+    background: #fecaca;
+    color: #991b1b;
 }
 
 input[type="range"] {
     width: 100%;
-    margin-top: 1rem;
+    margin: 0.7rem 0 1rem;
 }
 
-input[type="number"] {
-    background: #09090b;
-    color: white;
-    border: 1px solid #52525b;
-    border-radius: 0.5rem;
-    padding: 0.5rem;
-    width: 90px;
-}
-
-.slider-label {
-    color: #93c5fd;
-    font-weight: 700;
-}
-
-.button-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.result-box {
-    background: #09090b;
-    border: 1px solid #3f3f46;
-    padding: 1rem;
-    border-radius: 1rem;
-    margin-top: 1rem;
-}
-
-.bar-container {
-    background: #27272a;
-    border-radius: 1rem;
+.bar-track {
+    width: 100%;
+    height: 34px;
+    background: #e5e7eb;
+    border-radius: 999px;
     overflow: hidden;
     margin-top: 1rem;
-    height: 32px;
 }
 
-.bar {
-    background: linear-gradient(90deg, #22c55e, #06b6d4);
+.bar-fill {
     height: 100%;
     width: 0%;
+    background: linear-gradient(90deg, #6ee7b7, #3b82f6);
+    color: white;
+    font-weight: 900;
     text-align: center;
-    font-weight: 800;
-    line-height: 32px;
+    line-height: 34px;
     transition: width 0.4s;
 }
 
-.dice-results {
+.feedback {
     margin-top: 1rem;
+    font-weight: 800;
+    color: #4f46e5;
 }
 
-.dice-row {
-    display: grid;
-    grid-template-columns: 40px 1fr 70px;
-    gap: 0.75rem;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.dice-bar-wrap {
-    background: #27272a;
-    height: 22px;
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.dice-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #a855f7, #ec4899);
-    border-radius: 999px;
-}
-
-.prob-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem;
-    margin: 1rem 0;
-}
-
-.prob-grid label {
-    background: #09090b;
-    border: 1px solid #3f3f46;
-    border-radius: 1rem;
+.takeaway {
+    background: #ecfdf5;
+    border-left: 6px solid #34d399;
+    border-radius: 16px;
     padding: 1rem;
-}
-
-.weather-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
-    gap: 0.75rem;
     margin-top: 1rem;
+    color: #065f46;
 }
 
-.weather-day {
-    background: #09090b;
-    border: 1px solid #3f3f46;
-    border-radius: 1rem;
-    padding: 0.75rem;
-    text-align: center;
+#piCanvas {
+    margin-top: 1rem;
+    max-width: 100%;
+    border-radius: 18px;
+    background: white;
+    border: 1px solid #c7d2fe;
 }
 
-.final-card {
-    background: linear-gradient(135deg, #064e3b, #0f172a);
+@media (max-width: 750px) {
+    .sim-hero {
+        flex-direction: column;
+    }
+
+    .game-header {
+        align-items: flex-start;
+    }
 }

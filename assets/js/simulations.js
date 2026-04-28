@@ -1,191 +1,117 @@
-function checkScenario(button, isGoodSimulation) {
-    const feedback = document.getElementById("scenario-feedback");
+let score = 0;
 
-    if (isGoodSimulation) {
+function addScore(points) {
+    score += points;
+    document.getElementById("score").innerText = score;
+}
+
+function choosePlanePrediction(button, correct) {
+    if (correct) {
         button.classList.add("correct");
-        feedback.innerText = "✅ Yes! This is a good use of simulation because real testing could be dangerous, expensive, slow, or repetitive.";
+        addScore(10);
     } else {
         button.classList.add("wrong");
-        feedback.innerText = "❌ Not really. This situation is simple enough that a simulation is probably unnecessary.";
     }
 }
 
-function updateCoinLabel() {
-    document.getElementById("coinFlipsLabel").innerText = document.getElementById("coinFlips").value;
+function choosePiPrediction(button, correct) {
+    if (correct) {
+        button.classList.add("correct");
+        addScore(10);
+    } else {
+        button.classList.add("wrong");
+    }
 }
 
-function runCoinSim() {
-    const flips = Number(document.getElementById("coinFlips").value);
-    let heads = 0;
-    let tails = 0;
+function updateSafetyLabel() {
+    document.getElementById("safetyLabel").innerText =
+        document.getElementById("safetyScore").value;
+}
 
-    for (let i = 0; i < flips; i++) {
-        if (Math.random() < 0.5) {
-            heads++;
+function updateFlightLabel() {
+    document.getElementById("flightLabel").innerText =
+        document.getElementById("flightCount").value;
+}
+
+function runPlaneSim() {
+    const safety = Number(document.getElementById("safetyScore").value);
+    const flights = Number(document.getElementById("flightCount").value);
+
+    let safe = 0;
+    let crashes = 0;
+
+    const crashChance = (100 - safety) / 100;
+
+    for (let i = 0; i < flights; i++) {
+        if (Math.random() < crashChance) {
+            crashes++;
         } else {
-            tails++;
+            safe++;
         }
     }
 
-    const percent = ((heads / flips) * 100).toFixed(1);
+    const safePercent = ((safe / flights) * 100).toFixed(1);
 
-    document.getElementById("headsResult").innerText = heads;
-    document.getElementById("tailsResult").innerText = tails;
-    document.getElementById("headsPercent").innerText = percent + "%";
-    document.getElementById("coinBar").style.width = percent + "%";
-    document.getElementById("coinBar").innerText = percent + "% Heads";
+    document.getElementById("safeFlights").innerText = safe;
+    document.getElementById("crashes").innerText = crashes;
+    document.getElementById("planeBar").style.width = safePercent + "%";
+    document.getElementById("planeBar").innerText = safePercent + "% Safe";
+
+    document.getElementById("planeFeedback").innerText =
+        "Higher safety scores lower the crash probability, but randomness means results can still vary.";
+
+    addScore(15);
 }
 
-function resetCoin() {
-    document.getElementById("headsResult").innerText = "0";
-    document.getElementById("tailsResult").innerText = "0";
-    document.getElementById("headsPercent").innerText = "0%";
-    document.getElementById("coinBar").style.width = "0%";
-    document.getElementById("coinBar").innerText = "";
+function updatePointLabel() {
+    document.getElementById("pointLabel").innerText =
+        document.getElementById("pointCount").value;
 }
 
-function updateDiceLabel() {
-    document.getElementById("diceRollsLabel").innerText = document.getElementById("diceRolls").value;
-}
+function runPiSim() {
+    const points = Number(document.getElementById("pointCount").value);
+    const canvas = document.getElementById("piCanvas");
+    const ctx = canvas.getContext("2d");
 
-function runDiceSim() {
-    const rolls = Number(document.getElementById("diceRolls").value);
-    const counts = {};
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    for (let total = 2; total <= 12; total++) {
-        counts[total] = 0;
-    }
+    ctx.strokeStyle = "#6366f1";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(0, 0, 320, 320);
 
-    for (let i = 0; i < rolls; i++) {
-        const die1 = Math.floor(Math.random() * 6) + 1;
-        const die2 = Math.floor(Math.random() * 6) + 1;
-        counts[die1 + die2]++;
-    }
+    ctx.beginPath();
+    ctx.arc(160, 160, 160, 0, Math.PI * 2);
+    ctx.stroke();
 
-    let maxCount = 0;
-    let winner = 2;
+    let inside = 0;
 
-    for (let total = 2; total <= 12; total++) {
-        if (counts[total] > maxCount) {
-            maxCount = counts[total];
-            winner = total;
-        }
-    }
+    for (let i = 0; i < points; i++) {
+        const x = Math.random() * 2 - 1;
+        const y = Math.random() * 2 - 1;
 
-    let output = "";
+        const distance = x * x + y * y;
 
-    for (let total = 2; total <= 12; total++) {
-        const percent = (counts[total] / maxCount) * 100;
-        output += `
-            <div class="dice-row">
-                <span>${total}</span>
-                <div class="dice-bar-wrap">
-                    <div class="dice-bar" style="width:${percent}%"></div>
-                </div>
-                <span>${counts[total]}</span>
-            </div>
-        `;
-    }
+        const canvasX = (x + 1) * 160;
+        const canvasY = (y + 1) * 160;
 
-    document.getElementById("diceResults").innerHTML = output;
-    document.getElementById("diceWinner").innerText =
-        `🏆 Most common total: ${winner}. Usually, 7 wins because it has the most possible dice combinations.`;
-}
-
-function runWeatherSim() {
-    const sunny = Number(document.getElementById("sunnyProb").value);
-    const cloudy = Number(document.getElementById("cloudyProb").value);
-    const rainy = Number(document.getElementById("rainyProb").value);
-    const stormy = Number(document.getElementById("stormyProb").value);
-
-    const total = sunny + cloudy + rainy + stormy;
-
-    if (total !== 100) {
-        document.getElementById("weatherFeedback").innerText = "⚠️ Your probabilities must add up to 100%.";
-        return;
-    }
-
-    const options = [
-        { name: "☀️ Sunny", weight: sunny },
-        { name: "☁️ Cloudy", weight: cloudy },
-        { name: "🌧️ Rainy", weight: rainy },
-        { name: "⛈️ Stormy", weight: stormy }
-    ];
-
-    const counts = {
-        "☀️ Sunny": 0,
-        "☁️ Cloudy": 0,
-        "🌧️ Rainy": 0,
-        "⛈️ Stormy": 0
-    };
-
-    let html = "";
-
-    for (let day = 1; day <= 30; day++) {
-        const rand = Math.random() * 100;
-        let runningTotal = 0;
-
-        for (let i = 0; i < options.length; i++) {
-            runningTotal += options[i].weight;
-
-            if (rand <= runningTotal) {
-                counts[options[i].name]++;
-                html += `<div class="weather-day">Day ${day}<br>${options[i].name}</div>`;
-                break;
-            }
-        }
-    }
-
-    document.getElementById("weatherResults").innerHTML = html;
-
-    document.getElementById("weatherFeedback").innerText =
-        `Summary: Sunny ${counts["☀️ Sunny"]}, Cloudy ${counts["☁️ Cloudy"]}, Rainy ${counts["🌧️ Rainy"]}, Stormy ${counts["⛈️ Stormy"]}`;
-}
-
-function updateCarLabel() {
-    document.getElementById("carCountLabel").innerText = document.getElementById("carCount").value;
-}
-
-function runTrafficSim() {
-    const green = Number(document.getElementById("greenProb").value);
-    const yellow = Number(document.getElementById("yellowProb").value);
-    const red = Number(document.getElementById("redProb").value);
-    const total = green + yellow + red;
-
-    if (total !== 100) {
-        document.getElementById("trafficWait").innerText = "Error";
-        document.getElementById("trafficCounts").innerText = "⚠️ Probabilities must add up to 100%.";
-        return;
-    }
-
-    const cars = Number(document.getElementById("carCount").value);
-
-    const counts = {
-        Green: 0,
-        Yellow: 0,
-        Red: 0
-    };
-
-    let totalWait = 0;
-
-    for (let i = 0; i < cars; i++) {
-        const rand = Math.random() * 100;
-
-        if (rand < green) {
-            counts.Green++;
-            totalWait += 0;
-        } else if (rand < green + yellow) {
-            counts.Yellow++;
-            totalWait += 10;
+        if (distance <= 1) {
+            inside++;
+            ctx.fillStyle = "#22c55e";
         } else {
-            counts.Red++;
-            totalWait += 45;
+            ctx.fillStyle = "#f97316";
         }
+
+        ctx.fillRect(canvasX, canvasY, 3, 3);
     }
 
-    const averageWait = (totalWait / cars).toFixed(2);
+    const pi = (4 * inside / points).toFixed(4);
 
-    document.getElementById("trafficWait").innerText = averageWait;
-    document.getElementById("trafficCounts").innerText =
-        `Green: ${counts.Green}, Yellow: ${counts.Yellow}, Red: ${counts.Red}`;
+    document.getElementById("insideCount").innerText = inside;
+    document.getElementById("totalPoints").innerText = points;
+    document.getElementById("piEstimate").innerText = pi;
+
+    document.getElementById("piFeedback").innerText =
+        "More random points usually make the estimate closer to π, but it is still an approximation.";
+
+    addScore(15);
 }
