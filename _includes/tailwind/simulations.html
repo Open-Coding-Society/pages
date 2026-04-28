@@ -1,243 +1,386 @@
-<div class="sim-page">
+<!-- _includes/tailwind/simulations.html -->
 
-  <section class="sim-hero">
-    <div class="hero-copy">
-      <p class="eyebrow">AP CSP Topic 3.16</p>
-      <h1>Simulation Flight Deck</h1>
-      <p>
-        Run interactive simulation games to explore models, randomness, trials, probability,
-        and limitations in AP Computer Science Principles.
+<div id="simulationLessonApp" class="simulation-page-shell">
+
+  <section class="lesson-hero-section">
+    <div class="hero-background-orb hero-orb-one"></div>
+    <div class="hero-background-orb hero-orb-two"></div>
+    <div class="hero-background-orb hero-orb-three"></div>
+
+    <div class="hero-inner-card">
+      <p class="lesson-eyebrow">AP CSP • Big Idea: Algorithms and Programming</p>
+      <h1 class="lesson-title">Interactive Simulations Lab</h1>
+      <p class="lesson-subtitle">
+        Explore how simulations use inputs, randomness, repeated trials, and models to predict possible outcomes.
       </p>
-    </div>
 
-    <div class="hero-dashboard">
-      <div class="hero-stat">
-        <span id="totalSimulations">0</span>
-        <p>Simulations Run</p>
+      <div class="hero-pill-row">
+        <span class="hero-pill">🎲 Randomness</span>
+        <span class="hero-pill">✈️ Real-world models</span>
+        <span class="hero-pill">📊 Data tables</span>
+        <span class="hero-pill">🧠 CSP reasoning</span>
       </div>
-      <div class="hero-stat">
-        <span id="totalTrials">0</span>
-        <p>Total Trials</p>
-      </div>
-      <div class="hero-stat">
-        <span id="lessonScore">0</span>
-        <p>Score</p>
+
+      <div class="hero-button-row">
+        <a href="#diceSimulationCard" class="hero-button primary-hero-button">Start Dice Lab</a>
+        <a href="#flightSimulationCard" class="hero-button secondary-hero-button">Start Flight Lab</a>
       </div>
     </div>
   </section>
 
-  <section class="concept-card">
-    <h2>What are we learning?</h2>
-    <div class="concept-grid">
-      <div>
-        <strong>Simulation</strong>
-        <p>A program that imitates a real-world process.</p>
+  <section class="lesson-overview-grid">
+    <article class="overview-card">
+      <div class="overview-icon">🧪</div>
+      <h2>What is a simulation?</h2>
+      <p>
+        A simulation is a program that imitates a real-world process. It uses a model, accepts inputs, follows rules, and produces results.
+      </p>
+    </article>
+
+    <article class="overview-card">
+      <div class="overview-icon">🎯</div>
+      <h2>Why do programmers use them?</h2>
+      <p>
+        Simulations are useful when real testing would be expensive, dangerous, slow, or impossible to repeat many times.
+      </p>
+    </article>
+
+    <article class="overview-card">
+      <div class="overview-icon">🌦️</div>
+      <h2>What affects accuracy?</h2>
+      <p>
+        A simulation is only as good as its model. Missing variables, weak assumptions, or unrealistic data can make results less reliable.
+      </p>
+    </article>
+
+    <article class="overview-card">
+      <div class="overview-icon">📈</div>
+      <h2>What should we observe?</h2>
+      <p>
+        Look for patterns over many trials. One result can be random, but many results can reveal a trend.
+      </p>
+    </article>
+  </section>
+
+  <section class="concept-strip">
+    <div class="concept-strip-card">
+      <h2>Important AP CSP Simulation Vocabulary</h2>
+      <div class="vocab-chip-wrap">
+        <button class="vocab-chip" data-vocab="model">Model</button>
+        <button class="vocab-chip" data-vocab="input">Input</button>
+        <button class="vocab-chip" data-vocab="output">Output</button>
+        <button class="vocab-chip" data-vocab="trial">Trial</button>
+        <button class="vocab-chip" data-vocab="randomness">Randomness</button>
+        <button class="vocab-chip" data-vocab="assumption">Assumption</button>
+        <button class="vocab-chip" data-vocab="approximation">Approximation</button>
       </div>
-      <div>
-        <strong>Model</strong>
-        <p>A simplified version of reality with assumptions.</p>
-      </div>
-      <div>
-        <strong>Trial</strong>
-        <p>One run of a simulation or experiment.</p>
-      </div>
-      <div>
-        <strong>Randomness</strong>
-        <p>Used to model unpredictable outcomes.</p>
+      <div id="vocabDefinitionBox" class="vocab-definition-box">
+        Click a vocabulary word to see a quick AP CSP definition.
       </div>
     </div>
   </section>
 
-  <section class="game-card" id="airplaneGame">
-    <div class="game-header">
-      <p class="game-number">Mini-Game 1</p>
-      <h2>Airplane Flight Test Simulator</h2>
-      <p>
-        Adjust the airplane design and test it in a simulated flight environment.
-        The plane will visually take off, fly, land, or crash based on the model.
-      </p>
-    </div>
-
-    <div class="how-box">
-      <span>HOW TO PLAY</span>
-      Enter values for the airplane model. Higher safety and engine power help the plane.
-      Bad weather, high weight, and low fuel make failure more likely.
-    </div>
-
-    <div class="airplane-layout">
-      <div class="input-panel">
-        <h3>Model Inputs</h3>
-
-        <label>
-          Safety Score
-          <input id="planeSafety" type="number" min="0" max="100" value="75">
-          <small>0 to 100. Higher means safer design.</small>
-        </label>
-
-        <label>
-          Engine Power
-          <input id="enginePower" type="number" min="0" max="100" value="80">
-          <small>0 to 100. Higher means stronger takeoff.</small>
-        </label>
-
-        <label>
-          Weather Difficulty
-          <input id="weatherRisk" type="number" min="0" max="100" value="35">
-          <small>0 to 100. Higher means harder conditions.</small>
-        </label>
-
-        <label>
-          Plane Weight
-          <input id="planeWeight" type="number" min="0" max="100" value="45">
-          <small>0 to 100. Higher means harder to fly.</small>
-        </label>
-
-        <label>
-          Fuel Level
-          <input id="fuelLevel" type="number" min="0" max="100" value="70">
-          <small>0 to 100. Lower fuel increases risk.</small>
-        </label>
-
-        <label>
-          Test Flights
-          <input id="flightTrials" type="number" min="1" max="1000" value="100">
-          <small>Number of trials in the simulation.</small>
-        </label>
-
-        <div class="button-row">
-          <button class="main-button" onclick="runAirplaneSimulation()">Run Flight Test</button>
-          <button class="ghost-button" onclick="resetAirplaneSimulation()">Reset</button>
-        </div>
-      </div>
-
-      <div class="animation-panel">
-        <div class="sky-scene" id="skyScene">
-          <div class="sun"></div>
-          <div class="cloud cloud-one"></div>
-          <div class="cloud cloud-two"></div>
-          <div class="runway"></div>
-
-          <div class="airplane" id="airplane">
-            <div class="plane-body"></div>
-            <div class="plane-nose"></div>
-            <div class="plane-tail"></div>
-            <div class="plane-wing top-wing"></div>
-            <div class="plane-wing bottom-wing"></div>
-            <div class="plane-window window-one"></div>
-            <div class="plane-window window-two"></div>
-            <div class="plane-window window-three"></div>
-          </div>
-
-          <div class="crash-flash" id="crashFlash"></div>
-        </div>
-
-        <div class="result-strip">
-          <div>
-            <span id="flightOutcome">Ready</span>
-            <p>Current Outcome</p>
-          </div>
-          <div>
-            <span id="successRate">0%</span>
-            <p>Success Rate</p>
-          </div>
-          <div>
-            <span id="crashRate">0%</span>
-            <p>Crash Rate</p>
-          </div>
-        </div>
-
-        <div class="progress-track">
-          <div id="flightProgress" class="progress-fill">0%</div>
-        </div>
-
-        <p id="airplaneFeedback" class="feedback">
-          Enter values and run the simulation to test the plane.
+  <section id="diceSimulationCard" class="simulation-card dice-simulation-card">
+    <div class="section-heading-row">
+      <div>
+        <p class="lesson-eyebrow">Simulation 1</p>
+        <h2>Dice Probability Simulator</h2>
+        <p class="section-description">
+          Roll a die repeatedly and watch experimental probability move closer to theoretical probability.
         </p>
       </div>
+
+      <div class="section-actions">
+        <button id="diceHelpButton" class="soft-action-button">How this models CSP</button>
+        <button id="resetDiceButton" class="soft-action-button">Reset Dice</button>
+      </div>
     </div>
 
-    <div class="lesson-note">
-      <strong>AP CSP Connection:</strong>
-      This simulation uses a simplified model. It can show risk patterns, but it does not include every real factor,
-      such as pilot skill, maintenance quality, exact aerodynamics, or air traffic.
-    </div>
-  </section>
-
-  <section class="game-card" id="diceGame">
-    <div class="game-header">
-      <p class="game-number">Mini-Game 2</p>
-      <h2>Dice Rolling Simulator</h2>
+    <div id="diceExplanationPanel" class="hidden-panel">
+      <h3>How this is a simulation</h3>
       <p>
-        Choose how many times to roll two dice. Watch the dice animate, then compare which sums appear most often.
+        The die roll uses a random number generator. Each roll is one trial. The program stores results, calculates frequencies, and displays the output in a table.
       </p>
     </div>
 
-    <div class="how-box">
-      <span>HOW TO PLAY</span>
-      Enter the number of rolls, press run, and observe how repeated trials create a distribution.
-      Sum 7 usually appears most often because it has the most combinations.
-    </div>
+    <div class="dice-control-layout">
+      <div class="dice-visual-panel">
+        <div id="diceCube" class="dice-cube" aria-live="polite">
+          <div class="dice-face dice-face-front">
+            <span id="diceDisplayValue">?</span>
+          </div>
+        </div>
 
-    <div class="dice-layout">
-      <div class="input-panel">
-        <h3>Dice Inputs</h3>
+        <div class="dice-sparkle dice-sparkle-one">✦</div>
+        <div class="dice-sparkle dice-sparkle-two">✧</div>
+        <div class="dice-sparkle dice-sparkle-three">✦</div>
 
-        <label>
-          Number of Rolls
-          <input id="diceTrials" type="number" min="1" max="10000" value="500">
-          <small>Try 10, 100, 500, 1000, or 5000.</small>
+        <div class="dice-status-box">
+          <p>Last roll</p>
+          <strong id="lastRollText">No rolls yet</strong>
+        </div>
+      </div>
+
+      <div class="dice-button-panel">
+        <button id="rollOnceButton" class="main-gradient-button">Roll Once</button>
+        <button id="rollTenButton" class="secondary-gradient-button">Roll 10 Times</button>
+        <button id="rollHundredButton" class="secondary-gradient-button">Roll 100 Times</button>
+
+        <label class="custom-roll-label">
+          Custom number of rolls
+          <input id="customRollInput" type="number" min="1" max="10000" value="50">
         </label>
 
-        <label>
-          Prediction
-          <select id="dicePrediction">
-            <option value="7">7 will appear most often</option>
-            <option value="2">2 will appear most often</option>
-            <option value="6">6 will appear most often</option>
-            <option value="12">12 will appear most often</option>
+        <button id="customRollButton" class="outline-action-button">Run Custom Rolls</button>
+
+        <div class="mini-stat-grid">
+          <div class="mini-stat-card">
+            <span>Total Rolls</span>
+            <strong id="totalRollsText">0</strong>
+          </div>
+          <div class="mini-stat-card">
+            <span>Most Common</span>
+            <strong id="mostCommonText">N/A</strong>
+          </div>
+          <div class="mini-stat-card">
+            <span>Least Common</span>
+            <strong id="leastCommonText">N/A</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dice-chart-panel">
+      <div class="chart-heading-row">
+        <h3>Live Frequency Chart</h3>
+        <p>Theoretical probability for each side is about 16.7%.</p>
+      </div>
+
+      <div id="diceBarChart" class="dice-bar-chart"></div>
+    </div>
+
+    <div class="data-table-card">
+      <div class="table-heading-row">
+        <h3>Recorded Results</h3>
+        <button id="copyDiceSummaryButton" class="soft-action-button">Copy Summary</button>
+      </div>
+
+      <div class="responsive-table-wrap">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Dice Value</th>
+              <th>Frequency</th>
+              <th>Experimental Probability</th>
+              <th>Difference from 16.7%</th>
+              <th>Visual Bar</th>
+            </tr>
+          </thead>
+          <tbody id="diceResultsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="reflection-card">
+      <h3>Quick Discussion Prompt</h3>
+      <p id="diceReflectionPrompt">
+        Why do the results usually become more balanced after more trials?
+      </p>
+      <button id="newDicePromptButton" class="outline-action-button">New Prompt</button>
+    </div>
+  </section>
+
+  <section id="flightSimulationCard" class="simulation-card flight-simulation-card">
+    <div class="section-heading-row">
+      <div>
+        <p class="lesson-eyebrow">Simulation 2</p>
+        <h2>Flight Risk Simulator</h2>
+        <p class="section-description">
+          Change the input variables and run a flight model that calculates risk using rules plus randomness.
+        </p>
+      </div>
+
+      <div class="section-actions">
+        <button id="flightHelpButton" class="soft-action-button">How this models CSP</button>
+        <button id="resetFlightButton" class="soft-action-button">Reset Flight</button>
+      </div>
+    </div>
+
+    <div id="flightExplanationPanel" class="hidden-panel">
+      <h3>How this is a simulation</h3>
+      <p>
+        The flight model uses selected conditions as inputs. The algorithm converts them into a safety score, then uses random chance to decide the final outcome.
+      </p>
+    </div>
+
+    <div class="flight-main-layout">
+      <form id="flightControlForm" class="flight-control-panel">
+        <div class="input-section-title">Environment</div>
+
+        <label class="pretty-label">
+          Weather
+          <select id="weatherInput">
+            <option value="clear">Clear skies</option>
+            <option value="rain">Rain</option>
+            <option value="fog">Heavy fog</option>
+            <option value="storm">Thunderstorm</option>
           </select>
-          <small>Make a prediction before running.</small>
         </label>
 
-        <div class="button-row">
-          <button class="main-button" onclick="runDiceSimulation()">Roll Dice</button>
-          <button class="ghost-button" onclick="resetDiceSimulation()">Reset</button>
-        </div>
-      </div>
+        <label class="pretty-label">
+          Wind speed
+          <select id="windInput">
+            <option value="low">Low wind</option>
+            <option value="medium">Medium wind</option>
+            <option value="high">High wind</option>
+            <option value="extreme">Extreme wind</option>
+          </select>
+        </label>
 
-      <div class="dice-panel">
-        <div class="dice-stage">
-          <div class="dice-cube" id="dieOne">1</div>
-          <div class="dice-cube" id="dieTwo">1</div>
-        </div>
+        <label class="pretty-label">
+          Visibility
+          <select id="visibilityInput">
+            <option value="excellent">Excellent</option>
+            <option value="normal">Normal</option>
+            <option value="poor">Poor</option>
+            <option value="dangerous">Dangerous</option>
+          </select>
+        </label>
 
-        <div class="result-strip">
-          <div>
-            <span id="mostCommonSum">—</span>
-            <p>Most Common Sum</p>
+        <div class="input-section-title">Plane</div>
+
+        <label class="pretty-label">
+          Plane style
+          <select id="planeStyleInput">
+            <option value="modern">Modern passenger jet</option>
+            <option value="standard">Standard passenger plane</option>
+            <option value="small">Small regional plane</option>
+            <option value="cargo">Heavy cargo plane</option>
+            <option value="old">Older aircraft model</option>
+          </select>
+        </label>
+
+        <label class="pretty-label">
+          Plane age
+          <input id="planeAgeInput" type="number" min="0" max="70" value="8">
+        </label>
+
+        <label class="pretty-label">
+          Maintenance quality
+          <select id="maintenanceInput">
+            <option value="excellent">Excellent</option>
+            <option value="average">Average</option>
+            <option value="delayed">Delayed maintenance</option>
+            <option value="poor">Poor maintenance</option>
+          </select>
+        </label>
+
+        <div class="input-section-title">People</div>
+
+        <label class="pretty-label">
+          Passengers
+          <input id="passengerInput" type="number" min="1" max="400" value="120">
+        </label>
+
+        <label class="pretty-label">
+          Pilot experience
+          <select id="pilotInput">
+            <option value="expert">Expert pilot</option>
+            <option value="trained">Trained pilot</option>
+            <option value="new">New pilot</option>
+          </select>
+        </label>
+
+        <label class="pretty-label">
+          Copilot experience
+          <select id="copilotInput">
+            <option value="expert">Expert copilot</option>
+            <option value="trained">Trained copilot</option>
+            <option value="new">New copilot</option>
+          </select>
+        </label>
+
+        <button id="runFlightButton" type="button" class="main-gradient-button">Run Flight Simulation</button>
+        <button id="randomizeFlightButton" type="button" class="outline-action-button">Randomize Inputs</button>
+      </form>
+
+      <div class="flight-visual-column">
+        <div class="flight-scene" id="flightScene">
+          <div class="sun-or-moon" id="sunOrMoon">☀️</div>
+          <div class="scene-cloud scene-cloud-one"></div>
+          <div class="scene-cloud scene-cloud-two"></div>
+          <div class="scene-cloud scene-cloud-three"></div>
+          <div class="scene-cloud scene-cloud-four"></div>
+
+          <div id="animatedPlane" class="animated-plane">✈️</div>
+
+          <div id="fallingPeopleContainer" class="falling-people-container"></div>
+
+          <div id="explosionEffect" class="explosion-effect">💥</div>
+
+          <div class="runway-base">
+            <div class="runway-line"></div>
+            <div class="runway-line"></div>
+            <div class="runway-line"></div>
+            <div class="runway-line"></div>
           </div>
-          <div>
-            <span id="diceTotalRolls">0</span>
-            <p>Total Rolls</p>
+        </div>
+
+        <div class="flight-output-grid">
+          <div class="flight-score-card">
+            <span>Safety Score</span>
+            <strong id="safetyScoreText">--%</strong>
           </div>
-          <div>
-            <span id="predictionResult">—</span>
-            <p>Prediction</p>
+          <div class="flight-score-card">
+            <span>Random Roll</span>
+            <strong id="randomRollText">--</strong>
+          </div>
+          <div class="flight-score-card">
+            <span>Outcome</span>
+            <strong id="outcomeText">Waiting</strong>
           </div>
         </div>
 
-        <div id="diceBars" class="dice-bars"></div>
-
-        <p id="diceFeedback" class="feedback">
-          Run the dice simulation to see the distribution.
-        </p>
+        <div id="flightResultBox" class="flight-result-box">
+          Choose inputs and run the flight simulation.
+        </div>
       </div>
     </div>
 
-    <div class="lesson-note">
-      <strong>AP CSP Connection:</strong>
-      A dice simulation uses random number generation and repeated trials.
-      More trials usually make the results closer to the expected probability distribution.
+    <div class="risk-breakdown-card">
+      <div class="table-heading-row">
+        <h3>Risk Factor Breakdown</h3>
+        <p>These deductions show how the model is making decisions.</p>
+      </div>
+      <div id="riskBreakdownList" class="risk-breakdown-list"></div>
+    </div>
+
+    <div class="reflection-card">
+      <h3>Quick Discussion Prompt</h3>
+      <p id="flightReflectionPrompt">
+        Which input seems to affect the simulation the most, and why?
+      </p>
+      <button id="newFlightPromptButton" class="outline-action-button">New Prompt</button>
+    </div>
+  </section>
+
+  <section class="wrap-up-section">
+    <div class="wrap-up-card">
+      <h2>Lesson Wrap-Up</h2>
+      <p>
+        Both games show that simulations can help us test possibilities, but their results depend on the model, assumptions, data, and number of trials.
+      </p>
+
+      <div class="wrap-up-grid">
+        <div>
+          <h3>Dice Simulator</h3>
+          <p>Best for showing randomness, repeated trials, probability, and data collection.</p>
+        </div>
+        <div>
+          <h3>Flight Simulator</h3>
+          <p>Best for showing input variables, weighted conditions, assumptions, and limits of a model.</p>
+        </div>
+      </div>
     </div>
   </section>
 

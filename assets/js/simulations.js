@@ -1,277 +1,738 @@
-let totalSimulations = 0;
-let totalTrials = 0;
-let lessonScore = 0;
+// assets/js/simulations.js
 
-function clampValue(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const state = {
+    diceCounts: [0, 0, 0, 0, 0, 0],
+    totalRolls: 0,
+    lastRoll: null,
+    flightHistory: [],
+  };
 
-function updateTopStats(trialsAdded, scoreAdded) {
-    totalSimulations += 1;
-    totalTrials += trialsAdded;
-    lessonScore += scoreAdded;
+  const vocabDefinitions = {
+    model: "A model is a simplified version of a real-world system that a program can imitate.",
+    input: "An input is information given to the simulation before or during the run.",
+    output: "An output is the result produced by the simulation after the model is executed.",
+    trial: "A trial is one run of the simulation, such as one dice roll or one flight attempt.",
+    randomness: "Randomness means the program uses chance so the same inputs may not always produce the exact same output.",
+    assumption: "An assumption is a simplifying choice made by the programmer when the real system is too complex.",
+    approximation: "An approximation is an answer that is close enough to be useful, even if it is not perfectly exact.",
+  };
 
-    document.getElementById("totalSimulations").innerText = totalSimulations;
-    document.getElementById("totalTrials").innerText = totalTrials;
-    document.getElementById("lessonScore").innerText = lessonScore;
-}
+  const dicePrompts = [
+    "Why do the results usually become more balanced after more trials?",
+    "How is experimental probability different from theoretical probability?",
+    "Why might a small number of rolls give misleading results?",
+    "Where is randomness used in this simulation?",
+    "What data does this simulation collect after each trial?",
+    "How could you modify this simulation to model two dice instead of one?",
+    "Why is a table useful for understanding simulation results?",
+    "What is one limitation of this dice simulation?",
+  ];
 
-function updateSafetyLabel() {
-    const value = document.getElementById("planeSafety").value;
-    document.getElementById("safetyLabel").innerText = value;
-}
+  const flightPrompts = [
+    "Which input seems to affect the simulation the most, and why?",
+    "Why does the same set of inputs not always guarantee the same outcome?",
+    "Which parts of this simulation are realistic, and which parts are simplified?",
+    "What assumptions does this model make about flight safety?",
+    "How could real data improve this simulation?",
+    "Why would a flight simulation be safer than testing risky flights in real life?",
+    "What variables are missing from this model?",
+    "How does randomness make this simulation different from a normal calculator?",
+  ];
 
-function updateWeatherLabel() {
-    const value = document.getElementById("weatherRisk").value;
-    document.getElementById("weatherLabel").innerText = value;
-}
+  const elements = {
+    vocabDefinitionBox: document.getElementById("vocabDefinitionBox"),
+    vocabButtons: Array.from(document.querySelectorAll(".vocab-chip")),
 
-function updateFlightLabel() {
-    const value = document.getElementById("flightTrials").value;
-    document.getElementById("flightLabel").innerText = value;
-}
+    diceHelpButton: document.getElementById("diceHelpButton"),
+    diceExplanationPanel: document.getElementById("diceExplanationPanel"),
+    diceCube: document.getElementById("diceCube"),
+    diceDisplayValue: document.getElementById("diceDisplayValue"),
+    lastRollText: document.getElementById("lastRollText"),
+    rollOnceButton: document.getElementById("rollOnceButton"),
+    rollTenButton: document.getElementById("rollTenButton"),
+    rollHundredButton: document.getElementById("rollHundredButton"),
+    customRollInput: document.getElementById("customRollInput"),
+    customRollButton: document.getElementById("customRollButton"),
+    resetDiceButton: document.getElementById("resetDiceButton"),
+    totalRollsText: document.getElementById("totalRollsText"),
+    mostCommonText: document.getElementById("mostCommonText"),
+    leastCommonText: document.getElementById("leastCommonText"),
+    diceBarChart: document.getElementById("diceBarChart"),
+    diceResultsTableBody: document.getElementById("diceResultsTableBody"),
+    copyDiceSummaryButton: document.getElementById("copyDiceSummaryButton"),
+    diceReflectionPrompt: document.getElementById("diceReflectionPrompt"),
+    newDicePromptButton: document.getElementById("newDicePromptButton"),
 
-function resetAirplaneAnimation() {
-    const airplane = document.getElementById("airplane");
-    const crashFlash = document.getElementById("crashFlash");
+    flightHelpButton: document.getElementById("flightHelpButton"),
+    flightExplanationPanel: document.getElementById("flightExplanationPanel"),
+    resetFlightButton: document.getElementById("resetFlightButton"),
+    runFlightButton: document.getElementById("runFlightButton"),
+    randomizeFlightButton: document.getElementById("randomizeFlightButton"),
+    flightScene: document.getElementById("flightScene"),
+    animatedPlane: document.getElementById("animatedPlane"),
+    fallingPeopleContainer: document.getElementById("fallingPeopleContainer"),
+    explosionEffect: document.getElementById("explosionEffect"),
+    safetyScoreText: document.getElementById("safetyScoreText"),
+    randomRollText: document.getElementById("randomRollText"),
+    outcomeText: document.getElementById("outcomeText"),
+    flightResultBox: document.getElementById("flightResultBox"),
+    riskBreakdownList: document.getElementById("riskBreakdownList"),
+    flightReflectionPrompt: document.getElementById("flightReflectionPrompt"),
+    newFlightPromptButton: document.getElementById("newFlightPromptButton"),
 
-    airplane.classList.remove("takeoff", "land", "crash", "shake");
-    crashFlash.classList.remove("show");
+    weatherInput: document.getElementById("weatherInput"),
+    windInput: document.getElementById("windInput"),
+    visibilityInput: document.getElementById("visibilityInput"),
+    planeStyleInput: document.getElementById("planeStyleInput"),
+    planeAgeInput: document.getElementById("planeAgeInput"),
+    maintenanceInput: document.getElementById("maintenanceInput"),
+    passengerInput: document.getElementById("passengerInput"),
+    pilotInput: document.getElementById("pilotInput"),
+    copilotInput: document.getElementById("copilotInput"),
+  };
 
-    void airplane.offsetWidth;
-    void crashFlash.offsetWidth;
-}
+  function safeText(value) {
+    return String(value);
+  }
 
-function animateAirplane(outcome) {
-    const airplane = document.getElementById("airplane");
-    const crashFlash = document.getElementById("crashFlash");
+  function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
-    resetAirplaneAnimation();
+  function randomChoice(items) {
+    return items[Math.floor(Math.random() * items.length)];
+  }
 
-    if (outcome === "Crash") {
-        airplane.classList.add("crash");
-        setTimeout(function () {
-            crashFlash.classList.add("show");
-        }, 1900);
-    } else if (outcome === "Rough Landing") {
-        airplane.classList.add("shake");
-        setTimeout(function () {
-            airplane.classList.remove("shake");
-            airplane.classList.add("land");
-        }, 1300);
-    } else {
-        airplane.classList.add("takeoff");
+  function clampNumber(value, minimum, maximum) {
+    return Math.max(minimum, Math.min(maximum, value));
+  }
+
+  function formatPercent(value) {
+    return `${value.toFixed(1)}%`;
+  }
+
+  function togglePanel(panel) {
+    if (!panel) return;
+    panel.classList.toggle("is-visible");
+  }
+
+  function setVocabDefinition(key) {
+    if (!elements.vocabDefinitionBox) return;
+
+    const definition = vocabDefinitions[key] || "Choose a vocabulary word to see its meaning.";
+    elements.vocabDefinitionBox.textContent = definition;
+
+    elements.vocabButtons.forEach((button) => {
+      const isActive = button.dataset.vocab === key;
+      button.classList.toggle("active", isActive);
+    });
+  }
+
+  function initializeVocabularyButtons() {
+    elements.vocabButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        setVocabDefinition(button.dataset.vocab);
+      });
+    });
+  }
+
+  function rollDieOnce() {
+    const result = randomInteger(1, 6);
+    state.diceCounts[result - 1] += 1;
+    state.totalRolls += 1;
+    state.lastRoll = result;
+    return result;
+  }
+
+  function animateDice(result) {
+    if (!elements.diceCube || !elements.diceDisplayValue) return;
+
+    elements.diceCube.classList.remove("is-rolling");
+    void elements.diceCube.offsetWidth;
+    elements.diceCube.classList.add("is-rolling");
+    elements.diceDisplayValue.textContent = safeText(result);
+  }
+
+  function calculateDiceProbability(index) {
+    if (state.totalRolls === 0) return 0;
+    return state.diceCounts[index] / state.totalRolls;
+  }
+
+  function calculateDifferenceFromTheoretical(probability) {
+    const theoreticalProbability = 1 / 6;
+    return probability - theoreticalProbability;
+  }
+
+  function getMostCommonDiceValue() {
+    if (state.totalRolls === 0) return "N/A";
+
+    let highestCount = -1;
+    let highestValue = 1;
+
+    state.diceCounts.forEach((count, index) => {
+      if (count > highestCount) {
+        highestCount = count;
+        highestValue = index + 1;
+      }
+    });
+
+    return safeText(highestValue);
+  }
+
+  function getLeastCommonDiceValue() {
+    if (state.totalRolls === 0) return "N/A";
+
+    let lowestCount = Infinity;
+    let lowestValue = 1;
+
+    state.diceCounts.forEach((count, index) => {
+      if (count < lowestCount) {
+        lowestCount = count;
+        lowestValue = index + 1;
+      }
+    });
+
+    return safeText(lowestValue);
+  }
+
+  function renderDiceBarChart() {
+    if (!elements.diceBarChart) return;
+
+    elements.diceBarChart.innerHTML = "";
+
+    for (let value = 1; value <= 6; value += 1) {
+      const index = value - 1;
+      const probability = calculateDiceProbability(index);
+      const percent = probability * 100;
+
+      const row = document.createElement("div");
+      row.className = "dice-bar-row";
+
+      const label = document.createElement("div");
+      label.className = "dice-bar-label";
+      label.textContent = `Side ${value}`;
+
+      const track = document.createElement("div");
+      track.className = "dice-bar-track";
+
+      const fill = document.createElement("div");
+      fill.className = "dice-bar-fill";
+      fill.style.width = `${percent}%`;
+
+      const percentText = document.createElement("div");
+      percentText.className = "dice-bar-percent";
+      percentText.textContent = formatPercent(percent);
+
+      track.appendChild(fill);
+      row.appendChild(label);
+      row.appendChild(track);
+      row.appendChild(percentText);
+
+      elements.diceBarChart.appendChild(row);
     }
-}
+  }
 
-function calculateAirplaneRisk(safety, engine, weather, weight, fuel) {
-    const safetyBenefit = safety * 0.38;
-    const engineBenefit = engine * 0.27;
-    const fuelBenefit = fuel * 0.18;
+  function renderDiceTable() {
+    if (!elements.diceResultsTableBody) return;
 
-    const weatherPenalty = weather * 0.34;
-    const weightPenalty = weight * 0.24;
+    elements.diceResultsTableBody.innerHTML = "";
 
-    let successScore = 50 + safetyBenefit + engineBenefit + fuelBenefit - weatherPenalty - weightPenalty;
+    for (let value = 1; value <= 6; value += 1) {
+      const index = value - 1;
+      const count = state.diceCounts[index];
+      const probability = calculateDiceProbability(index);
+      const percent = probability * 100;
+      const difference = calculateDifferenceFromTheoretical(probability) * 100;
 
-    successScore = clampValue(successScore, 5, 98);
+      const row = document.createElement("tr");
 
-    return successScore;
-}
+      row.innerHTML = `
+        <td>${value}</td>
+        <td>${count}</td>
+        <td>${formatPercent(percent)}</td>
+        <td>${difference >= 0 ? "+" : ""}${difference.toFixed(1)}%</td>
+        <td>
+          <div class="table-mini-bar">
+            <div class="table-mini-fill" style="width: ${percent}%"></div>
+          </div>
+        </td>
+      `;
 
-function runAirplaneSimulation() {
-    const safety = clampValue(Number(document.getElementById("planeSafety").value), 0, 100);
-    const engine = clampValue(Number(document.getElementById("enginePower").value), 0, 100);
-    const weather = clampValue(Number(document.getElementById("weatherRisk").value), 0, 100);
-    const weight = clampValue(Number(document.getElementById("planeWeight").value), 0, 100);
-    const fuel = clampValue(Number(document.getElementById("fuelLevel").value), 0, 100);
-    const trials = clampValue(Number(document.getElementById("flightTrials").value), 1, 1000);
+      elements.diceResultsTableBody.appendChild(row);
+    }
+  }
 
-    const successProbability = calculateAirplaneRisk(safety, engine, weather, weight, fuel) / 100;
+  function renderDiceStats() {
+    if (elements.totalRollsText) {
+      elements.totalRollsText.textContent = safeText(state.totalRolls);
+    }
 
-    let safeFlights = 0;
-    let crashes = 0;
+    if (elements.mostCommonText) {
+      elements.mostCommonText.textContent = getMostCommonDiceValue();
+    }
 
-    for (let i = 0; i < trials; i++) {
-        if (Math.random() < successProbability) {
-            safeFlights++;
-        } else {
-            crashes++;
+    if (elements.leastCommonText) {
+      elements.leastCommonText.textContent = getLeastCommonDiceValue();
+    }
+
+    if (elements.lastRollText) {
+      elements.lastRollText.textContent = state.lastRoll === null ? "No rolls yet" : `Rolled a ${state.lastRoll}`;
+    }
+  }
+
+  function renderDiceSimulation() {
+    renderDiceStats();
+    renderDiceBarChart();
+    renderDiceTable();
+  }
+
+  function runDiceRolls(amount, animateLast = true) {
+    const safeAmount = clampNumber(Number(amount) || 1, 1, 10000);
+    let lastResult = null;
+
+    for (let index = 0; index < safeAmount; index += 1) {
+      lastResult = rollDieOnce();
+    }
+
+    if (animateLast && lastResult !== null) {
+      animateDice(lastResult);
+    }
+
+    renderDiceSimulation();
+  }
+
+  function runAnimatedDiceBatch(amount) {
+    const safeAmount = clampNumber(Number(amount) || 1, 1, 10000);
+
+    if (safeAmount > 25) {
+      runDiceRolls(safeAmount, true);
+      return;
+    }
+
+    let completedRolls = 0;
+
+    const intervalId = window.setInterval(() => {
+      const result = rollDieOnce();
+      animateDice(result);
+      renderDiceSimulation();
+
+      completedRolls += 1;
+
+      if (completedRolls >= safeAmount) {
+        window.clearInterval(intervalId);
+      }
+    }, 135);
+  }
+
+  function resetDiceSimulation() {
+    state.diceCounts = [0, 0, 0, 0, 0, 0];
+    state.totalRolls = 0;
+    state.lastRoll = null;
+
+    if (elements.diceDisplayValue) {
+      elements.diceDisplayValue.textContent = "?";
+    }
+
+    renderDiceSimulation();
+  }
+
+  function buildDiceSummaryText() {
+    const lines = [];
+    lines.push("Dice Simulation Summary");
+    lines.push(`Total rolls: ${state.totalRolls}`);
+
+    for (let value = 1; value <= 6; value += 1) {
+      const index = value - 1;
+      const count = state.diceCounts[index];
+      const probability = calculateDiceProbability(index) * 100;
+      lines.push(`Side ${value}: ${count} rolls, ${formatPercent(probability)}`);
+    }
+
+    return lines.join("\n");
+  }
+
+  async function copyDiceSummary() {
+    const summary = buildDiceSummaryText();
+
+    try {
+      await navigator.clipboard.writeText(summary);
+      if (elements.copyDiceSummaryButton) {
+        elements.copyDiceSummaryButton.textContent = "Copied!";
+        window.setTimeout(() => {
+          elements.copyDiceSummaryButton.textContent = "Copy Summary";
+        }, 1200);
+      }
+    } catch (error) {
+      alert(summary);
+    }
+  }
+
+  function setupDiceEvents() {
+    if (elements.diceHelpButton) {
+      elements.diceHelpButton.addEventListener("click", () => togglePanel(elements.diceExplanationPanel));
+    }
+
+    if (elements.rollOnceButton) {
+      elements.rollOnceButton.addEventListener("click", () => runAnimatedDiceBatch(1));
+    }
+
+    if (elements.rollTenButton) {
+      elements.rollTenButton.addEventListener("click", () => runAnimatedDiceBatch(10));
+    }
+
+    if (elements.rollHundredButton) {
+      elements.rollHundredButton.addEventListener("click", () => runDiceRolls(100, true));
+    }
+
+    if (elements.customRollButton) {
+      elements.customRollButton.addEventListener("click", () => {
+        runDiceRolls(elements.customRollInput.value, true);
+      });
+    }
+
+    if (elements.resetDiceButton) {
+      elements.resetDiceButton.addEventListener("click", resetDiceSimulation);
+    }
+
+    if (elements.copyDiceSummaryButton) {
+      elements.copyDiceSummaryButton.addEventListener("click", copyDiceSummary);
+    }
+
+    if (elements.newDicePromptButton) {
+      elements.newDicePromptButton.addEventListener("click", () => {
+        elements.diceReflectionPrompt.textContent = randomChoice(dicePrompts);
+      });
+    }
+  }
+
+  function getInputValue(element, fallback = "") {
+    if (!element) return fallback;
+    return element.value;
+  }
+
+  function getFlightInputs() {
+    return {
+      weather: getInputValue(elements.weatherInput, "clear"),
+      wind: getInputValue(elements.windInput, "low"),
+      visibility: getInputValue(elements.visibilityInput, "normal"),
+      planeStyle: getInputValue(elements.planeStyleInput, "standard"),
+      planeAge: Number(getInputValue(elements.planeAgeInput, "8")),
+      maintenance: getInputValue(elements.maintenanceInput, "average"),
+      passengers: Number(getInputValue(elements.passengerInput, "120")),
+      pilot: getInputValue(elements.pilotInput, "trained"),
+      copilot: getInputValue(elements.copilotInput, "trained"),
+    };
+  }
+
+  function addRiskDeduction(breakdown, label, amount) {
+    if (amount === 0) return;
+    breakdown.push({ label, amount });
+  }
+
+  function calculateFlightSafetyScore(inputs) {
+    const breakdown = [];
+    let score = 100;
+
+    const weatherPenalty = {
+      clear: 0,
+      rain: 12,
+      fog: 20,
+      storm: 34,
+    }[inputs.weather] ?? 0;
+
+    const windPenalty = {
+      low: 0,
+      medium: 10,
+      high: 24,
+      extreme: 38,
+    }[inputs.wind] ?? 0;
+
+    const visibilityPenalty = {
+      excellent: 0,
+      normal: 4,
+      poor: 18,
+      dangerous: 32,
+    }[inputs.visibility] ?? 0;
+
+    const planeStylePenalty = {
+      modern: 0,
+      standard: 5,
+      small: 12,
+      cargo: 10,
+      old: 20,
+    }[inputs.planeStyle] ?? 0;
+
+    let agePenalty = 0;
+    if (inputs.planeAge > 12) agePenalty += 8;
+    if (inputs.planeAge > 25) agePenalty += 12;
+    if (inputs.planeAge > 40) agePenalty += 16;
+
+    const maintenancePenalty = {
+      excellent: 0,
+      average: 7,
+      delayed: 18,
+      poor: 32,
+    }[inputs.maintenance] ?? 0;
+
+    let passengerPenalty = 0;
+    if (inputs.passengers > 180) passengerPenalty += 7;
+    if (inputs.passengers > 260) passengerPenalty += 9;
+    if (inputs.passengers > 340) passengerPenalty += 8;
+
+    const pilotPenalty = {
+      expert: 0,
+      trained: 7,
+      new: 24,
+    }[inputs.pilot] ?? 0;
+
+    const copilotPenalty = {
+      expert: 0,
+      trained: 5,
+      new: 16,
+    }[inputs.copilot] ?? 0;
+
+    addRiskDeduction(breakdown, "Weather condition", weatherPenalty);
+    addRiskDeduction(breakdown, "Wind speed", windPenalty);
+    addRiskDeduction(breakdown, "Visibility", visibilityPenalty);
+    addRiskDeduction(breakdown, "Plane style", planeStylePenalty);
+    addRiskDeduction(breakdown, "Plane age", agePenalty);
+    addRiskDeduction(breakdown, "Maintenance quality", maintenancePenalty);
+    addRiskDeduction(breakdown, "Passenger load", passengerPenalty);
+    addRiskDeduction(breakdown, "Pilot experience", pilotPenalty);
+    addRiskDeduction(breakdown, "Copilot experience", copilotPenalty);
+
+    breakdown.forEach((item) => {
+      score -= item.amount;
+    });
+
+    const clampedScore = clampNumber(score, 3, 98);
+
+    return {
+      score: clampedScore,
+      breakdown,
+    };
+  }
+
+  function renderRiskBreakdown(breakdown) {
+    if (!elements.riskBreakdownList) return;
+
+    elements.riskBreakdownList.innerHTML = "";
+
+    if (breakdown.length === 0) {
+      const item = document.createElement("div");
+      item.className = "risk-item";
+      item.innerHTML = `<span>No major risk deductions in this model.</span><strong>-0</strong>`;
+      elements.riskBreakdownList.appendChild(item);
+      return;
+    }
+
+    breakdown.forEach((risk) => {
+      const item = document.createElement("div");
+      item.className = "risk-item";
+      item.innerHTML = `<span>${risk.label}</span><strong>-${risk.amount}</strong>`;
+      elements.riskBreakdownList.appendChild(item);
+    });
+  }
+
+  function resetFlightAnimation() {
+    if (elements.animatedPlane) {
+      elements.animatedPlane.classList.remove("takeoff-success", "takeoff-fail", "shaking");
+    }
+
+    if (elements.fallingPeopleContainer) {
+      elements.fallingPeopleContainer.innerHTML = "";
+    }
+
+    if (elements.explosionEffect) {
+      elements.explosionEffect.classList.remove("show-explosion");
+    }
+
+    if (elements.flightResultBox) {
+      elements.flightResultBox.className = "flight-result-box";
+      elements.flightResultBox.textContent = "Choose inputs and run the flight simulation.";
+    }
+
+    if (elements.safetyScoreText) elements.safetyScoreText.textContent = "--%";
+    if (elements.randomRollText) elements.randomRollText.textContent = "--";
+    if (elements.outcomeText) elements.outcomeText.textContent = "Waiting";
+  }
+
+  function updateSceneWeather(weather) {
+    if (!elements.flightScene) return;
+
+    const isStormy = weather === "storm" || weather === "fog";
+    elements.flightScene.classList.toggle("stormy", isStormy);
+  }
+
+  function createFallingPeople() {
+    if (!elements.fallingPeopleContainer) return;
+
+    const people = ["🧍", "🧍‍♀️", "🧍‍♂️", "🧑"];
+    elements.fallingPeopleContainer.innerHTML = "";
+
+    people.forEach((person) => {
+      const span = document.createElement("span");
+      span.className = "falling-person";
+      span.textContent = person;
+      elements.fallingPeopleContainer.appendChild(span);
+    });
+  }
+
+  function describeFlightOutcome(success, score, randomRoll, inputs) {
+    if (success) {
+      return `
+        ✅ Flight succeeded in this simulation.<br>
+        Safety score: ${formatPercent(score)}<br>
+        Random roll: ${randomRoll.toFixed(1)}<br>
+        Because the random roll was lower than or equal to the safety score, the modeled flight succeeded.
+      `;
+    }
+
+    return `
+      ⚠️ Flight failed in this simulation.<br>
+      Safety score: ${formatPercent(score)}<br>
+      Random roll: ${randomRoll.toFixed(1)}<br>
+      The model treated the selected conditions as risky enough that the random roll caused a failed outcome.
+    `;
+  }
+
+  function runFlightSimulation() {
+    resetFlightAnimation();
+
+    const inputs = getFlightInputs();
+    updateSceneWeather(inputs.weather);
+
+    const result = calculateFlightSafetyScore(inputs);
+    const score = result.score;
+    const randomRoll = Math.random() * 100;
+    const success = randomRoll <= score;
+
+    renderRiskBreakdown(result.breakdown);
+
+    if (elements.safetyScoreText) elements.safetyScoreText.textContent = formatPercent(score);
+    if (elements.randomRollText) elements.randomRollText.textContent = randomRoll.toFixed(1);
+    if (elements.outcomeText) elements.outcomeText.textContent = success ? "Success" : "Failed";
+
+    if (elements.animatedPlane) {
+      elements.animatedPlane.classList.add("shaking");
+    }
+
+    window.setTimeout(() => {
+      if (elements.animatedPlane) {
+        elements.animatedPlane.classList.remove("shaking");
+        elements.animatedPlane.classList.add(success ? "takeoff-success" : "takeoff-fail");
+      }
+
+      if (!success) {
+        createFallingPeople();
+
+        if (elements.explosionEffect) {
+          elements.explosionEffect.classList.add("show-explosion");
         }
+      }
+
+      if (elements.flightResultBox) {
+        elements.flightResultBox.className = success ? "flight-result-box success-result" : "flight-result-box fail-result";
+        elements.flightResultBox.innerHTML = describeFlightOutcome(success, score, randomRoll, inputs);
+      }
+
+      state.flightHistory.push({
+        inputs,
+        score,
+        randomRoll,
+        success,
+      });
+    }, 140);
+  }
+
+  function randomizeFlightInputs() {
+    if (elements.weatherInput) elements.weatherInput.value = randomChoice(["clear", "rain", "fog", "storm"]);
+    if (elements.windInput) elements.windInput.value = randomChoice(["low", "medium", "high", "extreme"]);
+    if (elements.visibilityInput) elements.visibilityInput.value = randomChoice(["excellent", "normal", "poor", "dangerous"]);
+    if (elements.planeStyleInput) elements.planeStyleInput.value = randomChoice(["modern", "standard", "small", "cargo", "old"]);
+    if (elements.planeAgeInput) elements.planeAgeInput.value = randomInteger(1, 55);
+    if (elements.maintenanceInput) elements.maintenanceInput.value = randomChoice(["excellent", "average", "delayed", "poor"]);
+    if (elements.passengerInput) elements.passengerInput.value = randomInteger(30, 360);
+    if (elements.pilotInput) elements.pilotInput.value = randomChoice(["expert", "trained", "new"]);
+    if (elements.copilotInput) elements.copilotInput.value = randomChoice(["expert", "trained", "new"]);
+
+    const inputs = getFlightInputs();
+    updateSceneWeather(inputs.weather);
+    const preview = calculateFlightSafetyScore(inputs);
+
+    if (elements.safetyScoreText) elements.safetyScoreText.textContent = formatPercent(preview.score);
+    renderRiskBreakdown(preview.breakdown);
+  }
+
+  function setupFlightEvents() {
+    if (elements.flightHelpButton) {
+      elements.flightHelpButton.addEventListener("click", () => togglePanel(elements.flightExplanationPanel));
     }
 
-    const safePercent = (safeFlights / trials) * 100;
-    const crashPercent = (crashes / trials) * 100;
-
-    let outcome = "Successful Flight";
-    let riskLevel = "Low";
-
-    if (crashPercent >= 45) {
-        outcome = "Crash";
-        riskLevel = "High";
-    } else if (crashPercent >= 20) {
-        outcome = "Rough Landing";
-        riskLevel = "Medium";
+    if (elements.resetFlightButton) {
+      elements.resetFlightButton.addEventListener("click", resetFlightAnimation);
     }
 
-    document.getElementById("safeFlights").innerText = safeFlights;
-    document.getElementById("crashes").innerText = crashes;
-    document.getElementById("flightOutcome").innerText = outcome;
-    document.getElementById("successRate").innerText = safePercent.toFixed(1) + "%";
-    document.getElementById("crashRate").innerText = crashPercent.toFixed(1) + "%";
-    document.getElementById("flightProgress").style.width = safePercent.toFixed(1) + "%";
-    document.getElementById("flightProgress").innerText = safePercent.toFixed(1) + "% safe";
-
-    animateAirplane(outcome);
-
-    document.getElementById("airplaneFeedback").innerText =
-        "Model result: " + outcome +
-        ". This simulation used safety, engine power, weather, weight, and fuel as simplified factors. " +
-        "A real airplane model would need much more data, so this is useful but limited.";
-
-    updateTopStats(trials, 20);
-}
-
-function resetAirplaneSimulation() {
-    resetAirplaneAnimation();
-
-    document.getElementById("safeFlights").innerText = "0";
-    document.getElementById("crashes").innerText = "0";
-    document.getElementById("flightOutcome").innerText = "Ready";
-    document.getElementById("successRate").innerText = "0%";
-    document.getElementById("crashRate").innerText = "0%";
-    document.getElementById("flightProgress").style.width = "0%";
-    document.getElementById("flightProgress").innerText = "0%";
-    document.getElementById("airplaneFeedback").innerText =
-        "Enter values and run the simulation to test the plane.";
-}
-
-function getRandomDieValue() {
-    return Math.floor(Math.random() * 6) + 1;
-}
-
-function setDiceFace(element, value) {
-    element.innerText = value;
-}
-
-function resetDiceSimulation() {
-    document.getElementById("dieOne").innerText = "1";
-    document.getElementById("dieTwo").innerText = "1";
-    document.getElementById("mostCommonSum").innerText = "—";
-    document.getElementById("diceTotalRolls").innerText = "0";
-    document.getElementById("predictionResult").innerText = "—";
-    document.getElementById("diceBars").innerHTML = "";
-    document.getElementById("diceFeedback").innerText =
-        "Run the dice simulation to see the distribution.";
-}
-
-function buildDiceBars(counts, maxCount) {
-    let html = "";
-
-    for (let sum = 2; sum <= 12; sum++) {
-        const count = counts[sum];
-        const width = maxCount === 0 ? 0 : (count / maxCount) * 100;
-
-        html += `
-            <div class="dice-row">
-                <strong>${sum}</strong>
-                <div class="dice-bar-track">
-                    <div class="dice-bar-fill" style="width:${width}%"></div>
-                </div>
-                <span>${count}</span>
-            </div>
-        `;
+    if (elements.runFlightButton) {
+      elements.runFlightButton.addEventListener("click", runFlightSimulation);
     }
 
-    return html;
-}
+    if (elements.randomizeFlightButton) {
+      elements.randomizeFlightButton.addEventListener("click", randomizeFlightInputs);
+    }
 
-function runDiceSimulation() {
-    const dieOne = document.getElementById("dieOne");
-    const dieTwo = document.getElementById("dieTwo");
-    const trials = clampValue(Number(document.getElementById("diceTrials").value), 1, 10000);
-    const prediction = Number(document.getElementById("dicePrediction").value);
+    if (elements.newFlightPromptButton) {
+      elements.newFlightPromptButton.addEventListener("click", () => {
+        elements.flightReflectionPrompt.textContent = randomChoice(flightPrompts);
+      });
+    }
 
-    dieOne.classList.add("rolling");
-    dieTwo.classList.add("rolling");
+    [
+      elements.weatherInput,
+      elements.windInput,
+      elements.visibilityInput,
+      elements.planeStyleInput,
+      elements.planeAgeInput,
+      elements.maintenanceInput,
+      elements.passengerInput,
+      elements.pilotInput,
+      elements.copilotInput,
+    ].forEach((input) => {
+      if (!input) return;
 
-    let animationTicks = 0;
+      input.addEventListener("change", () => {
+        const inputs = getFlightInputs();
+        updateSceneWeather(inputs.weather);
+        const preview = calculateFlightSafetyScore(inputs);
 
-    const animationInterval = setInterval(function () {
-        setDiceFace(dieOne, getRandomDieValue());
-        setDiceFace(dieTwo, getRandomDieValue());
-
-        animationTicks++;
-
-        if (animationTicks >= 12) {
-            clearInterval(animationInterval);
-            finishDiceSimulation(trials, prediction);
+        if (elements.safetyScoreText) {
+          elements.safetyScoreText.textContent = formatPercent(preview.score);
         }
-    }, 80);
-}
 
-function finishDiceSimulation(trials, prediction) {
-    const dieOne = document.getElementById("dieOne");
-    const dieTwo = document.getElementById("dieTwo");
+        renderRiskBreakdown(preview.breakdown);
+      });
+    });
+  }
 
-    dieOne.classList.remove("rolling");
-    dieTwo.classList.remove("rolling");
+  function initializeFlightPreview() {
+    const inputs = getFlightInputs();
+    updateSceneWeather(inputs.weather);
+    const preview = calculateFlightSafetyScore(inputs);
+    renderRiskBreakdown(preview.breakdown);
 
-    const counts = {};
-
-    for (let sum = 2; sum <= 12; sum++) {
-        counts[sum] = 0;
+    if (elements.safetyScoreText) {
+      elements.safetyScoreText.textContent = formatPercent(preview.score);
     }
+  }
 
-    let lastDieOne = 1;
-    let lastDieTwo = 1;
+  function initializeApp() {
+    initializeVocabularyButtons();
+    setupDiceEvents();
+    setupFlightEvents();
+    renderDiceSimulation();
+    initializeFlightPreview();
+  }
 
-    for (let i = 0; i < trials; i++) {
-        const first = getRandomDieValue();
-        const second = getRandomDieValue();
-        const sum = first + second;
-
-        counts[sum]++;
-
-        lastDieOne = first;
-        lastDieTwo = second;
-    }
-
-    setDiceFace(dieOne, lastDieOne);
-    setDiceFace(dieTwo, lastDieTwo);
-
-    let maxCount = 0;
-    let mostCommon = 2;
-
-    for (let sum = 2; sum <= 12; sum++) {
-        if (counts[sum] > maxCount) {
-            maxCount = counts[sum];
-            mostCommon = sum;
-        }
-    }
-
-    const predictionText = prediction === mostCommon ? "Correct" : "Not this time";
-
-    document.getElementById("mostCommonSum").innerText = mostCommon;
-    document.getElementById("diceTotalRolls").innerText = trials;
-    document.getElementById("predictionResult").innerText = predictionText;
-    document.getElementById("diceBars").innerHTML = buildDiceBars(counts, maxCount);
-
-    let explanation = "The most common sum was " + mostCommon + ". ";
-
-    if (mostCommon === 7) {
-        explanation += "This matches the expected pattern because 7 has the most possible dice combinations.";
-    } else {
-        explanation += "With randomness, the most common result can vary, especially with fewer trials. Try increasing the number of rolls.";
-    }
-
-    document.getElementById("diceFeedback").innerText = explanation;
-
-    updateTopStats(trials, 20);
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    updateSafetyLabel();
-    updateWeatherLabel();
-    updateFlightLabel();
+  initializeApp();
 });
