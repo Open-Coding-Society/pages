@@ -1,0 +1,62 @@
+<div class="space-y-10">
+
+<!-- 🔥 Warm-Up -->
+<div class="bg-zinc-900 p-6 rounded-2xl shadow-lg">
+  <h2 class="text-2xl font-bold mb-4">🧠 Warm-Up</h2>
+  <p>Which of these should use a simulation?</p>
+  <ul class="list-disc ml-6 mt-2">
+    <li>Crash testing airplanes</li>
+    <li>Predicting wildfires</li>
+    <li>Rolling dice 10,000 times</li>
+    <li>Testing unsafe medicine</li>
+  </ul>
+
+  <button onclick="toggleAnswer()" class="mt-4 bg-blue-500 px-4 py-2 rounded-xl">
+    Show Answer
+  </button>
+
+  <p id="answer" class="hidden mt-3 text-green-400">
+    Simulations are used when things are dangerous, expensive, slow, or need repetition.
+  </p>
+</div>
+
+<!-- 🎲 Coin Flip -->
+<div class="bg-zinc-900 p-6 rounded-2xl">
+  <h2 class="text-2xl font-bold mb-4">🪙 Coin Flip Simulation</h2>
+
+  <p>Predict: Will 20 flips be exactly 50/50?</p>
+
+  <button onclick="runCoin()" class="bg-green-500 px-4 py-2 rounded-xl mt-3">
+    Run Simulation
+  </button>
+
+  <pre id="coinOutput" class="mt-4 bg-black p-3 rounded"></pre>
+</div>
+
+<!-- 🎲 Dice -->
+<div class="bg-zinc-900 p-6 rounded-2xl">
+  <h2 class="text-2xl font-bold mb-4">🎲 Dice Simulation</h2>
+
+  <p>Predict: Which total appears most?</p>
+
+  <button onclick="runDice()" class="bg-purple-500 px-4 py-2 rounded-xl mt-3">
+    Run Dice Simulation
+  </button>
+
+  <pre id="diceOutput" class="mt-4 bg-black p-3 rounded"></pre>
+</div>
+
+<!-- 🌦️ Weather -->
+<div class="bg-zinc-900 p-6 rounded-2xl">
+  <h2 class="text-2xl font-bold mb-4">🌦️ Weather Simulation</h2>
+
+  <p>Weighted probability example</p>
+
+  <button onclick="runWeather()" class="bg-yellow-500 px-4 py-2 rounded-xl mt-3">
+    Run Weather Simulation
+  </button>
+
+  <pre id="weatherOutput" class="mt-4 bg-black p-3 rounded"></pre>
+</div>
+
+</div>

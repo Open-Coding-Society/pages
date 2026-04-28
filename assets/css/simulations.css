@@ -1,0 +1,49 @@
+/* 🌙 Dark card style */
+.sim-card {
+    background-color: #18181b;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+/* 🧠 Section titles */
+.sim-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+/* 🎮 Buttons */
+.sim-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.sim-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Colors */
+.btn-blue { background: #3b82f6; }
+.btn-green { background: #22c55e; }
+.btn-purple { background: #a855f7; }
+.btn-yellow { background: #eab308; }
+
+/* 🧾 Output boxes */
+.sim-output {
+    background: black;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+/* Hidden toggle */
+.hidden {
+    display: none;
+}
