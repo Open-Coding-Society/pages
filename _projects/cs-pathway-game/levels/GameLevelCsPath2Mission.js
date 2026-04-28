@@ -161,6 +161,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         { key: 'desk2', label: 'Workbench 2', emptyValue: '—' },
         { key: 'desk3', label: 'Workbench 3', emptyValue: '—' },
         { key: 'desk4', label: 'Workbench 4', emptyValue: '—' },
+        { type: 'section', title: 'MISSION SCOREBOARD', marginTop: '10px' },
+        { key: 'missionScore', label: 'Score', emptyValue: '.55' },
+        { key: 'missionCleared', label: 'Cleared', emptyValue: '0/4' },
       ],
       theme: {
         background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
@@ -182,6 +185,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       desk2: '—',
       desk3: '—',
       desk4: '—',
+      missionScore: '.55',
+      missionCleared: '0/4',
     });
 
     /**
@@ -838,24 +843,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Sync scoreboard. Creates or updates the fixed score display
-   * in the bottom-right corner of the screen.
+   * Sync scoreboard. Updates the mission scoreboard rows inside
+   * the top-left Mission Tools panel.
    * @private
    */
   _syncMissionProgressBoard() {
     const score = this._getMissionProgressScore(this._missionProgressCount);
     const scoreText = score.toFixed(2).replace(/^0/, '');
     const completedText = `${this._missionProgressCount}/4`;
-    const progressRatio = Math.max(0, Math.min(1, (score - 0.55) / (0.92 - 0.55)));
 
-    this.score(`
-      <div class="present-score-title">Mission Scoreboard</div>
-      <div class="present-score-main mission-progress-score">${scoreText}</div>
-      <div class="present-score-sub mission-progress-count">${completedText}</div>
-      <div class="present-progress-track">
-        <div class="present-progress-bar mission-progress-bar" style="width: ${progressRatio * 100}%;"></div>
-      </div>
-    `);
+    // Keep scoreboard integrated with the mission tools panel and remove legacy detached HUD.
+    this.clearScore?.();
+    this.profilePanelView?.update({
+      desk1: '—',
+      desk2: '—',
+      desk3: '—',
+      desk4: '—',
+      missionScore: scoreText,
+      missionCleared: completedText,
+    });
   }
 
   /**
