@@ -1,49 +1,199 @@
-/* 🌙 Dark card style */
-.sim-card {
-    background-color: #18181b;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+.sim-page {
+    max-width: 1000px;
+    margin: auto;
+    padding: 2rem;
+    color: #f4f4f5;
 }
 
-/* 🧠 Section titles */
-.sim-title {
-    font-size: 1.5rem;
+.hero-card {
+    background: linear-gradient(135deg, #1e1b4b, #312e81, #0f172a);
+    padding: 2rem;
+    border-radius: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.hero-card h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.eyebrow {
+    color: #93c5fd;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.sim-card {
+    background: #18181b;
+    border: 1px solid #3f3f46;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+}
+
+.sim-card h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
     margin-bottom: 0.75rem;
 }
 
-/* 🎮 Buttons */
-.sim-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    transition: 0.2s;
+.sim-card p {
+    margin-bottom: 1rem;
+    color: #d4d4d8;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    padding: 0.65rem 1rem;
+    border-radius: 0.8rem;
+    border: none;
+    font-weight: 700;
+    margin: 0.3rem;
     cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
 }
 
-.sim-btn:hover {
-    transform: scale(1.05);
+button:hover {
+    transform: translateY(-2px);
+    background: #1d4ed8;
 }
 
-/* Colors */
-.btn-blue { background: #3b82f6; }
-.btn-green { background: #22c55e; }
-.btn-purple { background: #a855f7; }
-.btn-yellow { background: #eab308; }
-
-/* 🧾 Output boxes */
-.sim-output {
-    background: black;
-    padding: 1rem;
-    border-radius: 0.5rem;
+.choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
     margin-top: 1rem;
-    font-family: monospace;
-    white-space: pre-wrap;
 }
 
-/* Hidden toggle */
-.hidden {
-    display: none;
+.choice-grid button {
+    background: #27272a;
+    border: 1px solid #52525b;
+}
+
+.choice-grid button.correct {
+    background: #15803d;
+}
+
+.choice-grid button.wrong {
+    background: #b91c1c;
+}
+
+.feedback {
+    margin-top: 1rem;
+    font-weight: 700;
+    color: #fde68a;
+}
+
+input[type="range"] {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+input[type="number"] {
+    background: #09090b;
+    color: white;
+    border: 1px solid #52525b;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    width: 90px;
+}
+
+.slider-label {
+    color: #93c5fd;
+    font-weight: 700;
+}
+
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.result-box {
+    background: #09090b;
+    border: 1px solid #3f3f46;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-top: 1rem;
+}
+
+.bar-container {
+    background: #27272a;
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-top: 1rem;
+    height: 32px;
+}
+
+.bar {
+    background: linear-gradient(90deg, #22c55e, #06b6d4);
+    height: 100%;
+    width: 0%;
+    text-align: center;
+    font-weight: 800;
+    line-height: 32px;
+    transition: width 0.4s;
+}
+
+.dice-results {
+    margin-top: 1rem;
+}
+
+.dice-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 70px;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.dice-bar-wrap {
+    background: #27272a;
+    height: 22px;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.dice-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #a855f7, #ec4899);
+    border-radius: 999px;
+}
+
+.prob-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.prob-grid label {
+    background: #09090b;
+    border: 1px solid #3f3f46;
+    border-radius: 1rem;
+    padding: 1rem;
+}
+
+.weather-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.weather-day {
+    background: #09090b;
+    border: 1px solid #3f3f46;
+    border-radius: 1rem;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.final-card {
+    background: linear-gradient(135deg, #064e3b, #0f172a);
 }

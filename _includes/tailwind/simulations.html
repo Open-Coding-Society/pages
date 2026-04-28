@@ -1,62 +1,112 @@
-<div class="space-y-10">
+<div class="sim-page">
 
-<!-- 🔥 Warm-Up -->
-<div class="bg-zinc-900 p-6 rounded-2xl shadow-lg">
-  <h2 class="text-2xl font-bold mb-4">🧠 Warm-Up</h2>
-  <p>Which of these should use a simulation?</p>
-  <ul class="list-disc ml-6 mt-2">
-    <li>Crash testing airplanes</li>
-    <li>Predicting wildfires</li>
-    <li>Rolling dice 10,000 times</li>
-    <li>Testing unsafe medicine</li>
-  </ul>
+  <section class="hero-card">
+    <p class="eyebrow">AP CSP Topic 3.16</p>
+    <h1>🎲 Interactive Simulation Lab</h1>
+    <p>
+      Change variables, make predictions, run simulations, and compare results.
+      Simulations help us model real-world processes without testing them directly.
+    </p>
+  </section>
 
-  <button onclick="toggleAnswer()" class="mt-4 bg-blue-500 px-4 py-2 rounded-xl">
-    Show Answer
-  </button>
+  <section class="sim-card">
+    <h2>🧠 Quick Check: Should We Simulate It?</h2>
+    <p>Click each situation to decide if a simulation makes sense.</p>
 
-  <p id="answer" class="hidden mt-3 text-green-400">
-    Simulations are used when things are dangerous, expensive, slow, or need repetition.
-  </p>
-</div>
+    <div class="choice-grid">
+      <button onclick="checkScenario(this, true)">🚗 Crash testing cars</button>
+      <button onclick="checkScenario(this, false)">🍕 Choosing pizza toppings</button>
+      <button onclick="checkScenario(this, true)">🔥 Predicting wildfire spread</button>
+      <button onclick="checkScenario(this, true)">🎲 Rolling dice 10,000 times</button>
+    </div>
 
-<!-- 🎲 Coin Flip -->
-<div class="bg-zinc-900 p-6 rounded-2xl">
-  <h2 class="text-2xl font-bold mb-4">🪙 Coin Flip Simulation</h2>
+    <p id="scenario-feedback" class="feedback"></p>
+  </section>
 
-  <p>Predict: Will 20 flips be exactly 50/50?</p>
+  <section class="sim-card">
+    <h2>🪙 Coin Flip Simulator</h2>
+    <p>Choose how many flips to run. More trials usually gets closer to 50/50.</p>
 
-  <button onclick="runCoin()" class="bg-green-500 px-4 py-2 rounded-xl mt-3">
-    Run Simulation
-  </button>
+    <label>Number of flips:</label>
+    <input id="coinFlips" type="range" min="10" max="10000" step="10" value="100" oninput="updateCoinLabel()">
+    <p class="slider-label">Flips: <span id="coinFlipsLabel">100</span></p>
 
-  <pre id="coinOutput" class="mt-4 bg-black p-3 rounded"></pre>
-</div>
+    <div class="button-row">
+      <button onclick="runCoinSim()">Run Coin Simulation</button>
+      <button onclick="resetCoin()">Reset</button>
+    </div>
 
-<!-- 🎲 Dice -->
-<div class="bg-zinc-900 p-6 rounded-2xl">
-  <h2 class="text-2xl font-bold mb-4">🎲 Dice Simulation</h2>
+    <div class="result-box">
+      <p>Heads: <span id="headsResult">0</span></p>
+      <p>Tails: <span id="tailsResult">0</span></p>
+      <p>Heads Percent: <span id="headsPercent">0%</span></p>
+    </div>
 
-  <p>Predict: Which total appears most?</p>
+    <div class="bar-container">
+      <div id="coinBar" class="bar"></div>
+    </div>
+  </section>
 
-  <button onclick="runDice()" class="bg-purple-500 px-4 py-2 rounded-xl mt-3">
-    Run Dice Simulation
-  </button>
+  <section class="sim-card">
+    <h2>🎲 Dice Roll Simulator</h2>
+    <p>Roll two dice many times and see which total appears most often.</p>
 
-  <pre id="diceOutput" class="mt-4 bg-black p-3 rounded"></pre>
-</div>
+    <label>Number of rolls:</label>
+    <input id="diceRolls" type="range" min="10" max="5000" step="10" value="1000" oninput="updateDiceLabel()">
+    <p class="slider-label">Rolls: <span id="diceRollsLabel">1000</span></p>
 
-<!-- 🌦️ Weather -->
-<div class="bg-zinc-900 p-6 rounded-2xl">
-  <h2 class="text-2xl font-bold mb-4">🌦️ Weather Simulation</h2>
+    <button onclick="runDiceSim()">Roll Dice</button>
 
-  <p>Weighted probability example</p>
+    <div id="diceResults" class="dice-results"></div>
+    <p id="diceWinner" class="feedback"></p>
+  </section>
 
-  <button onclick="runWeather()" class="bg-yellow-500 px-4 py-2 rounded-xl mt-3">
-    Run Weather Simulation
-  </button>
+  <section class="sim-card">
+    <h2>🌦️ Weather Probability Simulator</h2>
+    <p>Adjust the probabilities, then simulate a month of weather.</p>
 
-  <pre id="weatherOutput" class="mt-4 bg-black p-3 rounded"></pre>
-</div>
+    <div class="prob-grid">
+      <label>Sunny % <input id="sunnyProb" type="number" value="50"></label>
+      <label>Cloudy % <input id="cloudyProb" type="number" value="25"></label>
+      <label>Rainy % <input id="rainyProb" type="number" value="15"></label>
+      <label>Stormy % <input id="stormyProb" type="number" value="10"></label>
+    </div>
+
+    <button onclick="runWeatherSim()">Simulate 30 Days</button>
+
+    <div id="weatherResults" class="weather-grid"></div>
+    <p id="weatherFeedback" class="feedback"></p>
+  </section>
+
+  <section class="sim-card">
+    <h2>🚦 Traffic Light Simulation</h2>
+    <p>Change the traffic light probabilities and calculate average wait time.</p>
+
+    <div class="prob-grid">
+      <label>Green % <input id="greenProb" type="number" value="30"></label>
+      <label>Yellow % <input id="yellowProb" type="number" value="10"></label>
+      <label>Red % <input id="redProb" type="number" value="60"></label>
+    </div>
+
+    <label>Cars simulated:</label>
+    <input id="carCount" type="range" min="10" max="1000" step="10" value="100" oninput="updateCarLabel()">
+    <p class="slider-label">Cars: <span id="carCountLabel">100</span></p>
+
+    <button onclick="runTrafficSim()">Run Traffic Simulation</button>
+
+    <div class="result-box">
+      <p>Average wait time: <span id="trafficWait">0</span> seconds</p>
+      <p id="trafficCounts"></p>
+    </div>
+  </section>
+
+  <section class="sim-card final-card">
+    <h2>✅ AP CSP Takeaway</h2>
+    <p>
+      A simulation uses a model to imitate a real-world process. Simulations are useful when real testing is unsafe,
+      expensive, slow, or impractical. However, simulations can be limited because they depend on assumptions,
+      data quality, and the accuracy of the model.
+    </p>
+  </section>
 
 </div>
