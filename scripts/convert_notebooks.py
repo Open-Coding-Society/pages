@@ -790,7 +790,14 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     lesson_key = _build_lesson_key(front_matter)
 
     ui_runner_cells, ui_runner_ids = UiRunner.collect_cells_and_source_ids(notebook)
-    code_cells = [cell for cell in notebook.cells if cell.cell_type == 'code']
+    code_runner_cells = [
+        cell for cell in notebook.cells
+        if cell.cell_type == 'code' and 'code_runner' in cell.get('metadata', {})
+    ]
+    game_runner_cells = [
+        cell for cell in notebook.cells
+        if cell.cell_type == 'code' and 'game_runner' in cell.get('metadata', {})
+    ]
     
     lines = markdown.split('\n')
     result = []
@@ -798,9 +805,10 @@ def inject_code_runners(markdown, notebook, front_matter=None):
     panel_order: list[str] = []
     in_code_block = False
     code_block_content = []
-    code_cell_count = 0
     code_runner_count = 0
     ui_runner_count = 0
+    code_runner_cell_count = 0
+    game_runner_cell_count = 0
     emitted_ui_cells: set[str] = set()
     in_ui_runner_output = False
     ui_runner_depth = 0
@@ -916,6 +924,20 @@ def inject_code_runners(markdown, notebook, front_matter=None):
             return queue_panel_runner(config, lines_to_queue)
         return lines_to_queue
 
+    def fence_has_code_runner_marker(body_lines: list[str]) -> bool:
+        for raw_line in body_lines:
+            stripped = raw_line.strip()
+            for pattern in CODE_RUNNER_PATTERNS.values():
+                if re.match(pattern, stripped, re.IGNORECASE):
+                    return True
+        return False
+
+    def fence_has_game_runner_marker(body_lines: list[str]) -> bool:
+        return any(
+            re.match(GAME_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
+            for line in body_lines
+        )
+
     while i < len(lines):
         line = lines[i]
         
@@ -959,15 +981,14 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                 in_code_block = False
                 code_block_content.append(line)
                 
-                # Check if this corresponds to a code cell with runner metadata
-                code_cell = code_cells[code_cell_count] if code_cell_count < len(code_cells) else None
-                
-                code_cell_count += 1
-                
-                # Add code-runner if metadata exists
-                if code_cell and 'code_runner' in code_cell.get('metadata', {}):
+                # Inject runners only when the current fence contains an explicit runner marker.
+                # This avoids positional drift when markdown lesson cells include normal fenced code.
+                code_fence = CodeFence.from_markdown_lines(code_block_content)
+                body_lines = code_fence.body_lines if code_fence else code_block_content[1:-1]
+
+                if fence_has_code_runner_marker(body_lines) and code_runner_cell_count < len(code_runner_cells):
+                    code_cell = code_runner_cells[code_runner_cell_count]
                     code_runner = CodeRunner.from_metadata(code_cell['metadata']['code_runner'])
-                    code_fence = CodeFence.from_markdown_lines(code_block_content)
                     code_fence_lines = code_fence.to_markdown_lines() if code_fence else code_block_content
                     code_lines = code_runner.liquid_lines(code_fence_lines, code_runner_count)
                     config = panel_config(code_runner.options, 'left')
@@ -975,14 +996,10 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                         result.extend(queue_panel_runner(config, code_lines))
                     else:
                         result.extend(code_lines)
+                    code_runner_cell_count += 1
                     code_runner_count += 1
-                # Add ui-runner if metadata exists
-                elif code_cell and 'ui_runner' in code_cell.get('metadata', {}):
-                    ui_runner = UiRunner.from_metadata(code_cell['metadata']['ui_runner'])
-                    ui_runner_lines = ui_runner.rendered_markup_lines()
-                    result.extend(queue_ui_runner_once(ui_runner, ui_runner_lines))
-                # Add game-runner if metadata exists
-                elif code_cell and 'game_runner' in code_cell.get('metadata', {}):
+                elif fence_has_game_runner_marker(body_lines) and game_runner_cell_count < len(game_runner_cells):
+                    code_cell = game_runner_cells[game_runner_cell_count]
                     game_runner = GameRunner.from_metadata(code_cell['metadata']['game_runner'])
                     game_lines = game_runner.liquid_lines(code_runner_count)
                     config = panel_config(game_runner.options, 'right')
@@ -990,12 +1007,11 @@ def inject_code_runners(markdown, notebook, front_matter=None):
                         result.extend(queue_panel_runner(config, game_lines))
                     else:
                         result.extend(game_lines)
+                    game_runner_cell_count += 1
                     code_runner_count += 1
                 else:
-                    # Regular code block without code-runner
+                    # Regular code block without runner marker.
                     # Suppress raw UI_RUNNER source fences from leaking into final markdown.
-                    code_fence = CodeFence.from_markdown_lines(code_block_content)
-                    body_lines = code_fence.body_lines if code_fence else code_block_content[1:-1]
                     is_ui_runner_fence = any(
                         re.match(UI_RUNNER_PATTERN, line.strip(), re.IGNORECASE)
                         for line in body_lines
