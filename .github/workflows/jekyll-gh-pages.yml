@@ -82,9 +82,23 @@ jobs:
         run: |
           source venv/bin/activate  # Activate virtual environment
           python scripts/split_multi_course_files.py  # Run course splitting
+      - name: Inject fork config
+        run: |
+          if [ -n "$FORK_URL" ]; then
+            printf "url: \"%s\"\nbaseurl: \"%s\"\n" "$FORK_URL" "$FORK_BASEURL" > _config.local.yml
+            echo "Using fork config: url=$FORK_URL baseurl=$FORK_BASEURL"
+          fi
+        env:
+          FORK_URL: ${{ vars.FORK_URL }}
+          FORK_BASEURL: ${{ vars.FORK_BASEURL }}
+
       - name: Build with Jekyll
         run: |
-          bundle exec jekyll build  # Build your Jekyll site
+          if [ -f _config.local.yml ]; then
+            bundle exec jekyll build --config _config.yml,_config.local.yml
+          else
+            bundle exec jekyll build
+          fi
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
