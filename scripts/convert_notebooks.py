@@ -641,9 +641,6 @@ def get_relative_output_path(notebook_file):
     relative_path = os.path.relpath(notebook_file, notebook_directory)
 
     markdown_filename = relative_path.replace(".ipynb", "_IPYNB_2_.md")
-    # Jekyll posts must start with YYYY-MM-DD-<slug>. Normalize notebook names
-    # that use an underscore after the date so the generated file is recognized.
-    markdown_filename = re.sub(r"(^|/)(\d{4}-\d{2}-\d{2})_", r"\1\2-", markdown_filename)
 
     return os.path.join(destination_directory, markdown_filename)
 
