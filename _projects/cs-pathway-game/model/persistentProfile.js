@@ -30,7 +30,7 @@
  * }
  */
 
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 
 const API_BASE = pythonURI + '/api/profile/game';
 const VERSION = '1.0';
