@@ -52,6 +52,10 @@ WASD to walk, E to interact with NPCs and read concept dialogues.
 
 Use views for exposure checks and conversions for click-goal tests. A healthy experiment should show traffic on both variants before the team declares a winner or opens a follow-up implementation PR.
 
+## Troubleshooting
+
+If a GameEngine variant does not render, confirm the script tag includes `data-site-baseurl`. The SDK uses that value to import the local `GameExecutor` assets from the Pages site.
+
 ## Notebook
 
 See the [project notebook](/ai-ab-engine/) for a full walkthrough with live demo links.
