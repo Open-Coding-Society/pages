@@ -1,9 +1,7 @@
-import GamEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
 import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Coin from '/assets/js/GameEnginev1.1/Coin.js';
 import Leaderboard from '/assets/js/GameEnginev1.1/essentials/Leaderboard.js';
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
-
 class localStorageDemo {
     constructor(gameEnv) {
         let width = gameEnv.innerWidth;
