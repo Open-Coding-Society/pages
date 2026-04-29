@@ -1,22 +1,29 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Simulation Lab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>Interactive Simulations Lab — AP CSP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Jura:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/simulations.css">
 </head>
 <body>
-  <!-- your simulation content here -->
-</body>
-</html>
+
 <div id="simulationLessonApp" class="simulation-page-shell">
 
+  <!-- ============================================================
+       HERO
+  ============================================================ -->
   <section class="lesson-hero-section">
     <div class="hero-background-orb hero-orb-one"></div>
     <div class="hero-background-orb hero-orb-two"></div>
     <div class="hero-background-orb hero-orb-three"></div>
 
     <div class="hero-inner-card">
-      <p class="lesson-eyebrow">AP CSP • Big Idea: Algorithms and Programming</p>
+      <p class="lesson-eyebrow">AP CSP · Big Idea: Algorithms and Programming</p>
       <h1 class="lesson-title">Interactive Simulations Lab</h1>
       <p class="lesson-subtitle">
         Explore how simulations use inputs, randomness, repeated trials, and models to predict possible outcomes.
@@ -36,6 +43,9 @@
     </div>
   </section>
 
+  <!-- ============================================================
+       QUICK NAV
+  ============================================================ -->
   <nav class="pastel-quick-nav" aria-label="Simulation shortcuts">
     <a href="#simulationLessonApp" class="quick-nav-logo">✨ Sim Lab</a>
     <div class="quick-nav-links">
@@ -45,41 +55,38 @@
     </div>
   </nav>
 
-
+  <!-- ============================================================
+       OVERVIEW GRID
+  ============================================================ -->
   <section class="lesson-overview-grid">
     <article class="overview-card">
-      <div class="overview-icon">🧪</div>
+      <span class="overview-icon">🧪</span>
       <h2>What is a simulation?</h2>
-      <p>
-        A simulation is a program that imitates a real-world process. It uses a model, accepts inputs, follows rules, and produces results.
-      </p>
+      <p>A simulation is a program that imitates a real-world process. It uses a model, accepts inputs, follows rules, and produces results.</p>
     </article>
 
     <article class="overview-card">
-      <div class="overview-icon">🎯</div>
+      <span class="overview-icon">🎯</span>
       <h2>Why do programmers use them?</h2>
-      <p>
-        Simulations are useful when real testing would be expensive, dangerous, slow, or impossible to repeat many times.
-      </p>
+      <p>Simulations are useful when real testing would be expensive, dangerous, slow, or impossible to repeat many times.</p>
     </article>
 
     <article class="overview-card">
-      <div class="overview-icon">🌦️</div>
+      <span class="overview-icon">🌦️</span>
       <h2>What affects accuracy?</h2>
-      <p>
-        A simulation is only as good as its model. Missing variables, weak assumptions, or unrealistic data can make results less reliable.
-      </p>
+      <p>A simulation is only as good as its model. Missing variables, weak assumptions, or unrealistic data can make results less reliable.</p>
     </article>
 
     <article class="overview-card">
-      <div class="overview-icon">📈</div>
+      <span class="overview-icon">📈</span>
       <h2>What should we observe?</h2>
-      <p>
-        Look for patterns over many trials. One result can be random, but many results can reveal a trend.
-      </p>
+      <p>Look for patterns over many trials. One result can be random, but many results can reveal a trend.</p>
     </article>
   </section>
 
+  <!-- ============================================================
+       VOCAB STRIP
+  ============================================================ -->
   <section class="concept-strip">
     <div class="concept-strip-card">
       <h2>Important AP CSP Simulation Vocabulary</h2>
@@ -98,6 +105,9 @@
     </div>
   </section>
 
+  <!-- ============================================================
+       SIMULATION 1 — DICE
+  ============================================================ -->
   <section id="diceSimulationCard" class="simulation-card dice-simulation-card">
     <div class="section-heading-row">
       <div>
@@ -173,7 +183,6 @@
         <h3>Live Frequency Chart</h3>
         <p>Theoretical probability for each side is about 16.7%.</p>
       </div>
-
       <div id="diceBarChart" class="dice-bar-chart"></div>
     </div>
 
@@ -201,13 +210,14 @@
 
     <div class="reflection-card">
       <h3>Quick Discussion Prompt</h3>
-      <p id="diceReflectionPrompt">
-        Why do the results usually become more balanced after more trials?
-      </p>
+      <p id="diceReflectionPrompt">Why do the results usually become more balanced after more trials?</p>
       <button id="newDicePromptButton" class="outline-action-button">New Prompt</button>
     </div>
   </section>
 
+  <!-- ============================================================
+       SIMULATION 2 — FLIGHT
+  ============================================================ -->
   <section id="flightSimulationCard" class="simulation-card flight-simulation-card">
     <div class="section-heading-row">
       <div>
@@ -368,25 +378,27 @@
     <div class="risk-breakdown-card">
       <div class="table-heading-row">
         <h3>Risk Factor Breakdown</h3>
-        <p>These deductions show how the model is making decisions.</p>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text-muted);margin:0;">These deductions show how the model is making decisions.</p>
       </div>
       <div id="riskBreakdownList" class="risk-breakdown-list"></div>
     </div>
 
     <div class="reflection-card">
       <h3>Quick Discussion Prompt</h3>
-      <p id="flightReflectionPrompt">
-        Which input seems to affect the simulation the most, and why?
-      </p>
+      <p id="flightReflectionPrompt">Which input seems to affect the simulation the most, and why?</p>
       <button id="newFlightPromptButton" class="outline-action-button">New Prompt</button>
     </div>
   </section>
 
+  <!-- ============================================================
+       WRAP-UP
+  ============================================================ -->
   <section id="lessonWrapUp" class="wrap-up-section">
     <div class="wrap-up-card">
       <h2>Lesson Wrap-Up</h2>
       <p>
-        Both games show that simulations can help us test possibilities, but their results depend on the model, assumptions, data, and number of trials.
+        Both simulations show that results depend on the model, assumptions, data, and number of trials —
+        not just randomness alone.
       </p>
 
       <div class="wrap-up-grid">
@@ -402,6 +414,10 @@
     </div>
   </section>
 
-
   <a href="#simulationLessonApp" class="floating-home-button" aria-label="Back to top">↑</a>
-</div>
+
+</div><!-- end #simulationLessonApp -->
+
+<script src="/assets/js/simulations.js"></script>
+</body>
+</html>
