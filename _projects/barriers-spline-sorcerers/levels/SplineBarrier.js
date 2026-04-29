@@ -1,4 +1,4 @@
-import GameObject from '/assets/js/GameEnginev1.1/essentials/GameObject.js';
+import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
 
 class SplineBarrier extends GameObject {
     constructor(data, gameEnv) {
