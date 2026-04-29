@@ -1,8 +1,6 @@
 import requests
-from prompt import SYSTEM_PROMPT
 
-BACKEND_URL = "http://localhost:8587/api/gemini/analyze-log"
-
+BACKEND_URL = "http://localhost:8585/api/make/analyze"
 
 def analyze_log(log: str) -> str:
     log = log[-8000:]  # prevent huge inputs
@@ -10,14 +8,10 @@ def analyze_log(log: str) -> str:
     try:
         response = requests.post(
             BACKEND_URL,
-            json={"log": log},
-            headers={"Content-Type": "application/json"}
+            data=log,
+            headers={"Content-Type": "text/plain"}
         )
         response.raise_for_status()
-        data = response.json()
-        if data.get("success"):
-            return data["analysis"]
-        else:
-            return f"Analysis failed: {data.get('message', 'Unknown error')}"
+        return response.text
     except requests.RequestException as e:
         return f"Backend request failed: {str(e)}"
