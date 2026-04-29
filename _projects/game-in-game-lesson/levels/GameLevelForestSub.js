@@ -6,8 +6,8 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelForestDeath from '/assets/js/projects/escape-game/levels/GameLevelForestDeath.js';
-import GameLevelForestWin from '/assets/js/projects/escape-game/levels/GameLevelForestWin.js';
+import GameLevelForestDeath from '/assets/js/projects/game-in-game-lesson/levels/GameLevelForestDeath.js';
+import GameLevelForestWin from '/assets/js/projects/game-in-game-lesson/levels/GameLevelForestWin.js';
 
 class GameLevelForestSub {
   constructor(gameEnv) {
@@ -66,7 +66,7 @@ class GameLevelForestSub {
     const image_data_bg = {
       name: 'fork',
       greeting: "Two paths stretch into the distance. The air is still. Which way?",
-      src: "/images/projects/escape-game/desert.png",
+      src: "/images/projects/game-in-game-lesson/desert.png",
       pixels: { height: 580, width: 1038 }
     };
 
@@ -75,7 +75,7 @@ class GameLevelForestSub {
     const sprite_data_player = {
       id: 'Octopus',
       greeting: "Two roads. One chance.",
-      src: "/images/projects/escape-game/octopus.png",
+      src: "/images/projects/game-in-game-lesson/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -100,7 +100,7 @@ class GameLevelForestSub {
     const sprite_data_guide = {
       id: 'The Guide',
       greeting: sprite_greet_guide,
-      src: "/images/projects/escape-game/tux.png",
+      src: "/images/projects/game-in-game-lesson/tux.png",
       SCALE_FACTOR: 8,
       ANIMATION_RATE: 50,
       pixels: { height: 256, width: 352 },
@@ -130,7 +130,7 @@ class GameLevelForestSub {
     const sprite_data_lost = {
       id: 'Lost Wanderer',
       greeting: sprite_greet_lost,
-      src: "/images/projects/escape-game/stockguy.png",
+      src: "/images/projects/game-in-game-lesson/stockguy.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 441, width: 339 },
@@ -160,7 +160,7 @@ class GameLevelForestSub {
     const sprite_data_left = {
       id: 'Strange Beckoner',
       greeting: sprite_greet_left,
-      src: "/images/projects/escape-game/chickenj.png",
+      src: "/images/projects/game-in-game-lesson/chickenj.png",
       SCALE_FACTOR: 9,
       ANIMATION_RATE: 100,
       pixels: { height: 255, width: 150 },
@@ -197,7 +197,7 @@ class GameLevelForestSub {
     const sprite_data_right = {
       id: 'R2D2',
       greeting: sprite_greet_right,
-      src: "/images/projects/escape-game/r2_idle.png",
+      src: "/images/projects/game-in-game-lesson/r2_idle.png",
       SCALE_FACTOR: 8,
       ANIMATION_RATE: 100,
       pixels: { height: 223, width: 505 },
