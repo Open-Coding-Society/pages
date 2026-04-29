@@ -162,8 +162,26 @@ permalink: /student/bathroom_pass
             ]);
             
             showToast({ message: "Fetching student face data...", duration: 2000 });
-            const resp = await fetch(`${javaURI}/api/person/faces`, fetchOptions);
+            const resp = await fetch(`${javaURI}/api/face/faces`, fetchOptions);
+            
+            if (resp.status === 403 || resp.status === 401) {
+                showToast({ message: "Access denied: Only teachers/admins can use the scanner. Please log in with the correct role.", style: { background: "#ef4444" }, duration: 7000 });
+                return;
+            }
+            
+            if (!resp.ok) {
+                showToast({ message: `Failed to fetch face data (HTTP ${resp.status}). Is the backend running?`, style: { background: "#ef4444" }, duration: 5000 });
+                return;
+            }
+            
             const faces = await resp.json();
+            
+            if (!Array.isArray(faces)) {
+                showToast({ message: "Unexpected response from server. Check backend logs.", style: { background: "#ef4444" }, duration: 5000 });
+                console.error("Expected array from /api/face/faces, got:", faces);
+                return;
+            }
+            
             console.log(`Fetched ${faces.length} faces from backend:`, faces);
             
             const labeledDescriptors = [];
@@ -188,11 +206,15 @@ permalink: /student/bathroom_pass
             }
             
             if (labeledDescriptors.length === 0) {
-                 showToast({ message: "No registered faces retrieved. Scanner will not work.", style: { background: "#ef4444" }, duration: 5000 });
+                if (faces.length === 0) {
+                    showToast({ message: "No faces have been registered yet. Students must register their face first.", style: { background: "#f59e0b" }, duration: 7000 });
+                } else {
+                    showToast({ message: "Faces were fetched but none could be processed. Check image quality of stored data.", style: { background: "#ef4444" }, duration: 5000 });
+                }
             } else {
                  faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
                  isFaceApiLoaded = true;
-                 showToast({ message: "Scanner Ready!", duration: 3000 });
+                 showToast({ message: `Scanner Ready! (${labeledDescriptors.length} faces loaded)`, duration: 3000 });
             }
         } catch (err) {
              console.error("Failed to initialize FaceAPI", err);
