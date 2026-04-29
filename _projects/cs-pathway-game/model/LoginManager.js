@@ -17,7 +17,7 @@
  *   GET  /api/id            - Auth status check
  */
 
-import { pythonURI, javaURI, fetchOptions, baseurl } from '/assets/js/api/config.js';
+import { pythonURI, javaURI, fetchOptions, baseurl } from '@assets/js/api/config.js';
 
 class LoginManager {
 

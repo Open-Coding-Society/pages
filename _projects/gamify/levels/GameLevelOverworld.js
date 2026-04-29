@@ -1,8 +1,8 @@
-import Background from '/assets/js/GameEnginev1.1/essentials/Background.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
-import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import Creeper from '/assets/js/GameEnginev1.1/Creeper.js';
+import Background from '@assets/js/GameEnginev1.1/essentials/Background.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
+import Creeper from '@assets/js/GameEnginev1.1/Creeper.js';
 import GameLevelDesert from './GameLevelDesert.js';
 
 class GameLevelOverworld {

@@ -1,16 +1,16 @@
 // Level objects and UI helpers.
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
-import FormPanel from '/assets/js/GameEnginev1.1/essentials/FormPanel.js';
-import Picker from '/assets/js/GameEnginev1.1/essentials/Picker.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
-import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
-import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
-import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import FormPanel from '@assets/js/GameEnginev1.1/essentials/FormPanel.js';
+import Picker from '@assets/js/GameEnginev1.1/essentials/Picker.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import ProfileManager from '@assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import Present from './Present.js';
-import LoginManager from '/assets/js/projects/cs-pathway-game/model/LoginManager.js';
+import LoginManager from '@assets/js/projects/cs-pathway-game/model/LoginManager.js';
 
 const PROFILE_PANEL_ID = 'csse-profile-panel';
 

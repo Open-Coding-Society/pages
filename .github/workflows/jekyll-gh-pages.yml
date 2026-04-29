@@ -82,27 +82,30 @@ jobs:
         run: |
           source venv/bin/activate  # Activate virtual environment
           python scripts/split_multi_course_files.py  # Run course splitting
-      - name: Inject fork config
+      - name: Compute and apply baseurl
         run: |
-          FORK_URL="${FORK_URL//[[:space:]]/}"
-          FORK_BASEURL="${FORK_BASEURL//[[:space:]]/}"
-          if [ -n "$FORK_URL" ]; then
-            printf "url: \"%s\"\nbaseurl: \"%s\"\n" "$FORK_URL" "$FORK_BASEURL" > _config.local.yml
-            echo "Using fork config: url=$FORK_URL baseurl=$FORK_BASEURL"
+          REPO="${{ github.repository }}"
+          OWNER=$(echo "$REPO" | cut -d'/' -f1)
+          NAME=$(echo "$REPO" | cut -d'/' -f2)
+
+          if [[ "$NAME" == "$OWNER.github.io" ]]; then
+            BASEURL=""
+          elif [[ "${{ github.repository }}" = "Open-Coding-Society/pages" ]]; then
+            BASEURL=""
+          else
+            BASEURL="/$NAME"
           fi
-        env:
-          FORK_URL: ${{ vars.FORK_URL }}
-          FORK_BASEURL: ${{ vars.FORK_BASEURL }}
+
+          echo "baseurl: \"$BASEURL\"" > _config.override.yml
 
       - name: Build with Jekyll
         run: |
-          if [ -f _config.local.yml ]; then
-            bundle exec jekyll build --config _config.yml,_config.local.yml
-          else
-            bundle exec jekyll build
-          fi
+          bundle exec jekyll build --config _config.yml,_config.override.yml
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
 
   # Deployment job
   deploy:
