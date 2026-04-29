@@ -1583,7 +1583,7 @@ active_tab: profile
             console.log("Image payload length:", base64Image.length);
 
             // Persist in Spring (used for bathroom pass identification)
-            const springResp = await fetch(`${javaURI}/api/person/update`, {
+            const springResp = await fetch(`${javaURI}/api/face/register`, {
                 ...fetchOptions,
                 method: 'POST',
                 body: JSON.stringify({
