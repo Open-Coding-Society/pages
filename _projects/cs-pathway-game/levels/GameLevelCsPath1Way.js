@@ -10,6 +10,7 @@ import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import SprintSuccessModule from './SprintSuccessModule.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -315,24 +316,45 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
   // ── Sprint Success ─────────────────────────────────────────────
   openSprintSuccess() {
-    this.panel?.(
-      'Sprint Success\n\nReflect on your current progress, review your goals, and prepare for your next sprint.'
-    );
+    if (this._sprintSuccessOpen) return;
+    this._sprintSuccessOpen = true;
 
-    this.showToast?.('Sprint Success opened');
+    const sprint = new SprintSuccessModule({
+      onComplete: async (result) => {
+        try {
+          await this.saveSprintSuccessResult(result);
+
+          this.showToast?.(`Sprint Success complete: ${result.title}`);
+
+          this.profilePanelView?.update?.({
+            skill: result.title,
+          });
+        } catch (error) {
+          console.error('Failed to save Sprint Success result:', error);
+          this.showToast?.('Sprint Success completed, but saving failed.');
+        } finally {
+          this._sprintSuccessOpen = false;
+        }
+      },
+
+      onClose: () => {
+        this._sprintSuccessOpen = false;
+      },
+    });
+
+    sprint.start();
   }
-  async savePersonaResult(result) {
+
+  async saveSprintSuccessResult(result) {
     const currentProfile = { ...(this.profileData || {}) };
 
     const updatedProfile = {
       ...currentProfile,
-      personaMeta: {
-        primaryPersona: result.primaryPersona,
+      sprintSuccessMeta: {
         title: result.title,
         summary: result.summary,
-        growth: result.growth,
-        percentages: result.percentages,
         scores: result.scores,
+        skills: result.skills,
         completedAt: result.completedAt,
       },
     };
@@ -360,7 +382,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     }
 
     console.warn(
-      'No known ProfileManager save method found. Persona result stored in this.profileData only.'
+      'No known ProfileManager save method found. Sprint Success result stored in this.profileData only.'
     );
   }
 
