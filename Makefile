@@ -28,7 +28,7 @@ KNOWN_TARGETS := \
 	serve-minima serve-cayman serve-yat serve-so-simple serve-hydejack \
 	build-minima build-cayman build-yat build-so-simple \
 	convert convert-docx convert-docx-config convert-single \
-	watch-notebooks watch-files bundle-install jekyll-serve \
+	watch-notebooks watch-projects watch-files bundle-install jekyll-serve \
 	build-registered-projects build-registered-docs \
 	watch-registered-projects clean-registered-projects \
 	list-projects split-courses clean-courses
@@ -76,6 +76,7 @@ endef
 default: serve-current
 	@touch /tmp/.notebook_watch_marker
 	@make watch-notebooks &
+	@make watch-projects &
 	@make watch-files &
 	@echo "Server running in background on http://localhost:$(PORT)"
 	@echo "  View logs: tail -f $(LOG_FILE)"
@@ -335,6 +336,7 @@ stop:
 	@@ps aux | awk -v log_file=$(LOG_FILE) '$$0 ~ "tail -f " log_file { print $$2 }' | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping notebook watcher..."
 	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "watch-projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping project watchers..."
 	@@ps aux | grep "fswatch.*_projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
@@ -358,6 +360,7 @@ dev: stop clean
 	@$(MAKE) convert-registered-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
 	@$(MAKE) jekyll-serve ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
 	@$(MAKE) watch-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
+	@$(MAKE) watch-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
 	@$(MAKE) watch-files ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
 	@$(MAKE) watch-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
 	@echo "Dev server running in background on http://localhost:$(PORT)"
@@ -375,6 +378,20 @@ watch-notebooks:
 			make convert-single NOTEBOOK_FILE="$$notebook" & \
 		done; \
 		touch /tmp/.notebook_watch_marker; \
+		sleep 2; \
+	done
+
+watch-projects:
+	@echo "Watching _projects for changes..."
+	@while true; do \
+		find _projects -type f -newer /tmp/.project_watch_marker 2>/dev/null | while read file; do \
+			echo "Project file changed: $$file"; \
+			proj=$$(echo "$$file" | cut -d/ -f2); \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				make -C "_projects/$$proj" build & \
+			fi; \
+		done; \
+		touch /tmp/.project_watch_marker; \
 		sleep 2; \
 	done
 
