@@ -1,7 +1,7 @@
 // CourseEnlistmentTrial.js
 
-import AiNpcSession from '/assets/js/GameEnginev1.1/essentials/AiNpcSession.js';
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import AiNpcSession from '@assets/js/GameEnginev1.1/essentials/AiNpcSession.js';
+import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 
 const ENLISTMENT_BG = '/images/vision-doors.png';
 

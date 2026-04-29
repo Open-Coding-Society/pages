@@ -1,4 +1,4 @@
-import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 
 class GameLevelVoidStriker {
   constructor(gameEnv) {

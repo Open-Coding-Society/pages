@@ -1,12 +1,12 @@
 // Imports: Level objects and UI helpers.
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
-import AiChallengeNpc from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
-import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
+import AiChallengeNpc from '@assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
-import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
-import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
+import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
 
 /**

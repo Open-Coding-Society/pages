@@ -1,4 +1,4 @@
-import Coin from '/assets/js/GameEnginev1.1/Coin.js';
+import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
 /**
  * SpriteSheetCoin extends the basic Coin class to support image/spritesheet rendering.
