@@ -157,10 +157,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       id: 'csse-mission-panel',
       title: 'MISSION TOOLS',
       fields: [
-        { key: 'desk1', label: 'Workbench 1', emptyValue: '—' },
-        { key: 'desk2', label: 'Workbench 2', emptyValue: '—' },
-        { key: 'desk3', label: 'Workbench 3', emptyValue: '—' },
-        { key: 'desk4', label: 'Workbench 4', emptyValue: '—' },
         { type: 'section', title: 'MISSION SCOREBOARD', marginTop: '10px' },
         { key: 'missionScore', label: 'Score', emptyValue: '.55' },
         { key: 'missionCleared', label: 'Cleared', emptyValue: '0/4' },
