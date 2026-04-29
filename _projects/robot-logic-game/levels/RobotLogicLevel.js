@@ -7,6 +7,7 @@
  */
 
 import { saveLevelStars } from './progress.js';
+import { levelConfigs } from './levelConfigs.js';
 
 const DIRS = [
   { dx: 1,  dy: 0  },
@@ -220,7 +221,7 @@ class RobotLogicLevel {
     header.appendChild(title);
 
     const backBtn = document.createElement('button');
-    backBtn.textContent = '← Back to Levels';
+    backBtn.textContent = '✕ Close';
     Object.assign(backBtn.style, {
       marginLeft: 'auto',
       background: 'rgba(255,255,255,0.06)',
@@ -1357,6 +1358,18 @@ class RobotLogicLevel {
 
 function easeInOutQuad(t) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+export function mountLevel({ levelId, onClose } = {}) {
+  const cfg = levelConfigs.find((c) => c.id === levelId);
+  if (!cfg) {
+    console.error(`[robot-logic-game] No level config for id ${levelId}`);
+    return null;
+  }
+  const level = new RobotLogicLevel(cfg);
+  if (typeof onClose === 'function') level.onExit = onClose;
+  level.start();
+  return level;
 }
 
 export default RobotLogicLevel;
