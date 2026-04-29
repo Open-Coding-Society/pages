@@ -63,7 +63,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     const bg_data = {
       name: GameLevelCsPath1Way.displayName,
       greeting:
-        "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll discover your course, uncover your strengths, and enrich your persona!",
+        "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll uncover your strengths, enrich your persona, and learn about planning and sprints!",
       src: image_src,
     };
 
