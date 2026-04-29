@@ -102,6 +102,56 @@ class LoginManager {
     }
   }
 
+  // ── Guest Methods ─────────────────────────────────────────────────────────
+
+  /**
+   * Create a local-only guest session using email as the uid.
+   * No API call is made — guest state is stored in localStorage only.
+   * Guests can later upgrade to a Student account via upgradeGuestToStudent().
+   *
+   * @param {{ name: string, email: string }} data
+   * @returns {{ success: boolean, code: number, body: object|null }}
+   */
+  static guestLogin({ name, email }) {
+    if (!name || !email) {
+      return { success: false, code: 400, body: { error: 'Name and email are required for guest access.' } };
+    }
+    const guestData = { name, uid: email, email, role: 'guest' };
+    try {
+      localStorage.setItem('ocs_guest_session', JSON.stringify(guestData));
+    } catch (_) {}
+    return { success: true, code: 200, body: guestData };
+  }
+
+  /**
+   * Check if the current session is a guest (local-only, no JWT).
+   * @returns {{ name: string, uid: string, email: string, role: 'guest' } | null}
+   */
+  static getGuestSession() {
+    try {
+      const raw = localStorage.getItem('ocs_guest_session');
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /**
+   * Upgrade a guest to a full student account.
+   * Clears the guest session after successful signup so the user
+   * is seamlessly transitioned to authenticated state.
+   *
+   * @param {{ name, uid, sid, school, email, password }} studentData
+   * @returns {Promise<{ success: boolean, code: number, body: object|null }>}
+   */
+  static async upgradeGuestToStudent(studentData) {
+    const result = await LoginManager.signup(studentData);
+    if (result.success) {
+      try { localStorage.removeItem('ocs_guest_session'); } catch (_) {}
+    }
+    return result;
+  }
+
   // ── Nav Update ────────────────────────────────────────────────────────────
 
   /**
@@ -264,21 +314,23 @@ class LoginManager {
 
         // ── Choose ───────────────────────────────────────────────────────
         if (view === 'choose') {
-          panel.appendChild(mkText('p', 'To register your identity, you need an account.', {
+          panel.appendChild(mkText('p', 'Sign in with your student account, or continue as a Guest.', {
             fontSize: '12px', color: muted, marginBottom: '16px', textAlign: 'center',
           }));
 
-          const loginBtn  = mkBtn('Log In',   true);
-          const signupBtn = mkBtn('Sign Up',  false);
-          const cancelBtn = mkBtn('Cancel',   false);
+          const loginBtn  = mkBtn('Log In',            true);
+          const signupBtn = mkBtn('Sign Up',            false);
+          const guestBtn  = mkBtn('Continue as Guest',  false);
+          const cancelBtn = mkBtn('Cancel',             false);
 
           loginBtn.addEventListener('click',  () => renderView('login'));
           signupBtn.addEventListener('click', () => renderView('signup'));
+          guestBtn.addEventListener('click',  () => renderView('guest'));
           cancelBtn.addEventListener('click', () => close({ success: false, code: 0, body: null }));
 
           const row = document.createElement('div');
           s(row, { display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', marginTop: '8px' });
-          [loginBtn, signupBtn, cancelBtn].forEach(b => row.appendChild(b));
+          [loginBtn, signupBtn, guestBtn, cancelBtn].forEach(b => row.appendChild(b));
           panel.appendChild(row);
         }
 
@@ -438,6 +490,54 @@ class LoginManager {
 
           [nameInput, uidInput, sidInput, schoolSel, emailInput, passInput, pass2Input, status]
             .forEach(el => panel.appendChild(el));
+          panel.appendChild(mkRow(backBtn, cancelBtn, submitBtn));
+          setTimeout(() => nameInput.focus(), 0);
+        }
+
+        // ── Guest ────────────────────────────────────────────────────────
+        if (view === 'guest') {
+          panel.appendChild(mkText('div', 'CONTINUE AS GUEST', {
+            color: accent, fontSize: '13px', letterSpacing: '1px',
+            marginBottom: '6px', marginTop: '8px',
+          }));
+          panel.appendChild(mkText('p', 'Your progress is saved locally. You can upgrade to a student account later.', {
+            fontSize: '11px', color: muted, marginBottom: '12px',
+          }));
+
+          const nameInput  = mkInput('text',  'Name',  'name');
+          const emailInput = mkInput('email', 'Email (used as your guest ID)', 'email');
+          const status     = mkStatus();
+
+          const submitBtn = mkBtn('Enter as Guest', true);
+          const backBtn   = mkBtn('← Back',         false);
+          const cancelBtn = mkBtn('Cancel',          false);
+
+          const doGuest = () => {
+            const name  = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            if (!name || !email) {
+              status.style.color = red;
+              status.textContent = 'Please enter your name and email.';
+              return;
+            }
+            const result = LoginManager.guestLogin({ name, email });
+            if (!result.success) {
+              status.style.color = red;
+              status.textContent = result.body?.error || 'Could not create guest session.';
+              return;
+            }
+            status.style.color = accent;
+            status.textContent = '✓ Entering as guest…';
+            setTimeout(() => close(result), 600);
+          };
+
+          submitBtn.addEventListener('click', doGuest);
+          nameInput.addEventListener('keydown',  e => { if (e.key === 'Enter') { e.preventDefault(); doGuest(); } });
+          emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doGuest(); } });
+          backBtn.addEventListener('click',   () => renderView('choose'));
+          cancelBtn.addEventListener('click', () => close({ success: false, code: 0, body: null }));
+
+          [nameInput, emailInput, status].forEach(el => panel.appendChild(el));
           panel.appendChild(mkRow(backBtn, cancelBtn, submitBtn));
           setTimeout(() => nameInput.focus(), 0);
         }

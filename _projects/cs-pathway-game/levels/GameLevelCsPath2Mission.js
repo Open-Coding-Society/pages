@@ -37,12 +37,6 @@ const CHALLENGE_PROMPT_TEXT = {
   EVAL_RIGHT_RULE: 'Mark RIGHT for correct or mostly correct answers.',
 };
 
-const CHALLENGE_ERROR_MESSAGES = {
-  [CHALLENGE_ERROR_TYPES.HTTP_ERROR]: (status) => `Challenge request failed (${status}).`,
-  [CHALLENGE_ERROR_TYPES.EMPTY_RESPONSE]: () => 'Challenge response was empty.',
-  [CHALLENGE_ERROR_TYPES.INVALID_RESPONSE]: () => 'Challenge response format was invalid.',
-  [CHALLENGE_ERROR_TYPES.UNKNOWN]: () => 'Challenge generation failed.',
-};
 
 const CHALLENGE_QUESTION_STYLES = [
   'Ask for one basic command the student should memorize.',
@@ -132,7 +126,19 @@ const DESK_AI_KNOWLEDGE_BASE = {
 };
 
 /**
- * GameLevel CS Pathway - Mission Tools
+ * GameLevelCsPath2Mission - Mission Tools Level
+ *
+ * Classroom game level where students visit four AI-powered desk stations.
+ * Each desk challenges the student with a generated question drawn from a
+ * topic defined in DESK_AI_KNOWLEDGE_BASE, grades their answer, and awards
+ * progress toward the mission scoreboard.
+ *
+ * Follows the same VIEW / CONTROLLER pattern as other CsPath levels.
+ * Data (knowledge base, prompt templates) lives in module-scope constants.
+ * Async challenge orchestration is delegated to AiChallengeNpc.
+ *
+ * @class GameLevelCsPath2Mission
+ * @extends GameLevelCsPathIdentity
  */
 class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   static levelId = 'mission-tools';
@@ -235,73 +241,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       backgroundSrc: bg_data.src,
     });
 
-    // Toast helper for zone prompts.
-    this.showToast = function(message) {
-      if (message === 'Press E to interact') {
-        return;
-      }
-
-      const host = document.body;
-      if (!host) return;
-
-      if (this._toastEl?.parentNode) {
-        this._toastEl.parentNode.removeChild(this._toastEl);
-      }
-      if (this._toastTimer) {
-        clearTimeout(this._toastTimer);
-      }
-
-      const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px;
-        z-index: 1200; pointer-events: none;
-        background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-        color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-        padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-        box-shadow: 0 0 20px rgba(78,204,163,0.25);
-        width: min(360px, 32vw); text-align: left;
-      `;
-      toast.textContent = message;
-      host.appendChild(toast);
-
-      this._toastEl = toast;
-      this._toastTimer = setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-        if (this._toastEl === toast) this._toastEl = null;
-        this._toastTimer = null;
-      }, 2200);
-    };
-
-    this.setZoneAlert = function(message) {
-      const host = document.body;
-      if (!host) return;
-
-      if (!this._zoneAlertEl) {
-        const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = `
-          position: fixed; top: 84px; right: 20px;
-          z-index: 1201; pointer-events: none;
-          background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-          color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-          padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-          box-shadow: 0 0 20px rgba(78,204,163,0.25);
-          width: min(360px, 32vw); text-align: left;
-        `;
-        document.body.appendChild(zoneAlert);
-        this._zoneAlertEl = zoneAlert;
-      }
-
-      this._zoneAlertEl.textContent = message;
-    };
-
-    this.clearZoneAlert = function() {
-      if (this._zoneAlertEl?.parentNode) {
-        this._zoneAlertEl.parentNode.removeChild(this._zoneAlertEl);
-      }
-      this._zoneAlertEl = null;
-    };
-
-
     const gatekeeperBaseData = {
       src: path + '/images/projects/cs-pathway-game/npc/gatekeeper2.png',
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
@@ -324,28 +263,37 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       reaction: function () {
         if (reaction) reaction.call(this);
         if (level?.showToast) {
-          level.showToast('Click desk to start challenge.');
+            level.showToast('Click desk or press E to start challenge.');
         }
       },
       ...(interact ? { interact } : {}),
     });
 
-    const deskAiKnowledgeBase = {
-      'debug-assistant': [
-        { question: 'How do I isolate a bug quickly?', answer: 'Reproduce, narrow the scope, inspect state changes, then retest.' },
+    // Desk knowledge base and expertise are defined at the top of the file in DESK_AI_KNOWLEDGE_BASE.
+    const deskDialoguePool = {
+      'The Admin': [
+        'Kernel check complete. Toolchain status: await your command.',
+        'Before heroes code, they configure. Show me your terminal wisdom.',
+        'Permissions granted. Your mission begins where setup meets precision.',
       ],
-      'design-assistant': [
-        { question: 'How can I improve the user flow?', answer: 'Remove friction points and make the next action obvious.' },
+      'The Archivist': [
+        'Every great build starts with organized files and clean history.',
+        'I guard naming, structure, and version trails. Can you keep order?',
+        'Chaos hides in bad folders. Bring me a tidy answer.',
       ],
-      'data-assistant': [
-        { question: 'How should I store this data?', answer: 'Pick structures based on retrieval and update patterns.' },
+      'The SDLC Master': [
+        'Small commits. Fast feedback. Strong systems. Prove you know the rhythm.',
+        'Plan, build, test, integrate. Tell me where discipline lives in code.',
+        'A product is forged in iteration, not luck. Ready for your trial?',
       ],
-      'planning-assistant': [
-        { question: 'How do I break down a feature?', answer: 'Split into milestones with clear outcomes and tests.' },
+      'The Scrum Master': [
+        'A team without cadence drifts. Show me you can steer a sprint.',
+        'Backlog to done is a story of focus. What chapter comes next?',
+        'Standup brief. Retrospective honest. Planning sharp. Your turn.',
       ],
     };
 
-    const createHiddenMissionDesk = ({ id, expertise, position, zonePrompt }) => ({
+    const createHiddenMissionDesk = ({ id, position, zonePrompt }) => ({
       zoneMessage: `${id}: ${zonePrompt}`,
       ...createGatekeeperData({
         id,
@@ -361,43 +309,39 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       hitbox: { widthPercentage: 0.35, heightPercentage: 0.35 },
       alertDistance: 0.30,
       dialogues: [
-        `${id} channel online.`,
-        'Ask your mission question and I will guide you.',
+        `${id} online. Challenge protocols ready.`,
+        ...(deskDialoguePool[id] || ['Prove yourself by answering my challenge question.']),
       ],
-      expertise,
+      expertise: DESK_AI_KNOWLEDGE_BASE[id]?.expertise || '',
       chatHistory: [],
-      knowledgeBase: deskAiKnowledgeBase,
+      knowledgeBase: DESK_AI_KNOWLEDGE_BASE,
       zoneUnlocked: true,
     });
 
     const missionDeskZones = [
       createHiddenMissionDesk({
         id: 'The Admin',
-        expertise: 'how to work different operating systems',
         position: { x: width * 0.20, y: height * 0.17 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Archivist',
-        expertise: 'how to manage files and folders',
         position: { x: width * 0.67, y: height * 0.17 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The SDLC Master',
-        expertise: 'what SDLC is',
         position: { x: width * 0.18, y: height * 0.60 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
       createHiddenMissionDesk({
         id: 'The Scrum Master',
-        expertise: 'how to set up a scrum board',
         position: { x: width * 0.62, y: height * 0.58 },
-        zonePrompt: 'Move to desk and click to start challenge.',
+        zonePrompt: 'Move to desk and click or press E to start challenge.',
       }),
     ];
 
-    // List of objects definitions for this level
+    // ── Level objects ─────────────────────────────────────────────
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
@@ -409,14 +353,26 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._deskChallengeBusy = new Set();
     this._deskChallengeEvalBusy = new Set();
     this._activeDeskChallenges = new Map();
+    this._missionQuestionHistory = new Map();
+    this._missionCompletedStations = new Set();
+    this._missionProgressCount = 0;
+    this._handleMissionDeskKeyDownBound = this._handleMissionDeskKeyDown.bind(this);
+    this._aiLoadingPending = 0;
+    this._aiLoadingToastTimer = null;
+    this._aiLoadingFrame = 0;
   }
 
-  // Find desk objects after engine instantiates them and apply runtime behavior patches.
+  /**
+   * Initialize level. Binds desk reactions, wires proximity click gates,
+   * and renders the initial mission scoreboard.
+   */
   initialize() {
     const objects = this.gameEnv?.gameObjects || [];
     const desks = objects.filter((obj) => this._missionDeskIds?.includes(obj?.spriteData?.id));
     this._rebindMissingDeskReactions(desks);
     this._wireDeskClickDistanceGate(desks);
+    document.addEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    this._syncMissionProgressBoard();
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
       id: d?.spriteData?.id,
@@ -428,12 +384,28 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._activeZoneDeskId = null;
   }
 
-  // Entry point when a desk is clicked in-range: generate one question and arm submission.
+  /**
+   * Start challenge. Opens the desk UI, generates one AI question,
+   * and arms the answer submission handler.
+   *
+   * @param {Object} desk - The desk game object.
+   * @param {string} deskId - The desk NPC id.
+   * @param {Object} [npcRef] - Optional explicit NPC reference.
+   */
   async startDeskChallenge(desk, deskId, npcRef = null) {
     const npc = npcRef || desk;
     if (!npc?.spriteData?.id) return;
 
     const npcId = npc.spriteData.id;
+    const historyPendingQuestion = this._getPendingQuestionFromChatHistory(npc);
+    const activeChallenge = this._activeDeskChallenges.get(npcId) || null;
+    const lockedQuestion = AiChallengeNpc.getPendingChallengeQuestion(deskId);
+    const stateQuestion = (AiChallengeNpc.getChallengeState(npc)?.question || '').toString().trim();
+    const hasPendingChallenge = Boolean(historyPendingQuestion || lockedQuestion) || AiChallengeNpc.hasPendingChallenge(npc, deskId) || (
+      Boolean(activeChallenge?.question) &&
+      !activeChallenge?.completedAt &&
+      activeChallenge?.lastEvaluation?.verdict !== CHALLENGE_VERDICTS.RIGHT
+    );
     // Orchestrator: open UI, generate one question, then arm answer submission.
     await this._runBusyTask({
       busySet: this._deskChallengeBusy,
@@ -441,11 +413,28 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       busyMessage: `${deskId}: challenge is already loading.`,
       task: async () => {
         try {
-          this.showToast?.(`${deskId}: challenge channel opened.`);
-          AiNpc.showInteraction(npc);
-          const challengeQuestion = await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData));
-          this._deliverChallengeToNpc(npc, challengeQuestion);
-          this._armChallengeSubmission(npc, deskId, challengeQuestion);
+          this.showToast?.(hasPendingChallenge ? `${deskId}: resuming your current challenge.` : `${deskId}: challenge channel opened.`);
+          AiChallengeNpc.showInteraction(npc, {
+            statusMessage: hasPendingChallenge ? null : 'Generating challenge question…',
+          });
+
+          const challengeQuestion = hasPendingChallenge
+            ? (historyPendingQuestion || lockedQuestion || stateQuestion || activeChallenge?.question)
+            : await this._runWithLoading(() => this._loadDeskChallengeQuestion(npc.spriteData, npc?.aiSession || null));
+
+          if (hasPendingChallenge) {
+            AiChallengeNpc.restoreQuestion(npc, challengeQuestion);
+          } else {
+            AiChallengeNpc.setPendingChallenge(npc, deskId, challengeQuestion);
+            this._appendDeskChatMessage(npc, 'ai', `Challenge Question: ${challengeQuestion}`);
+            AiChallengeNpc.deliverQuestion(npc, challengeQuestion);
+          }
+
+          AiChallengeNpc.armSubmission(
+            npc, deskId, challengeQuestion, this._activeDeskChallenges,
+            (answer, active, ui) => this._submitChallengeAnswer(npc, npcId, answer, active, ui),
+            this.showToast?.bind(this),
+          );
           this._logChallengeEvent({
             deskId,
             expertise: npc?.spriteData?.expertise || '',
@@ -453,128 +442,133 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
             createdAt: Date.now(),
           });
         } catch (error) {
-          this._handleChallengeFailure(npc, deskId, error);
+          this._appendDeskChatMessage(
+            npc,
+            'ai',
+            'Challenge Question: Challenge unavailable right now. Ask this: What is one practical step you would take for this desk topic?'
+          );
+          AiChallengeNpc.handleFailure(npc, deskId, error, this.showToast?.bind(this));
         }
       },
     });
   }
 
-  // Generic concurrency guard keyed per desk so duplicate async actions do not overlap.
-  async _runBusyTask({ busySet, key, busyMessage, task }) {
-    // Shared guard so generation/evaluation cannot overlap per desk instance.
-    if (busySet.has(key)) {
-      if (busyMessage) this.showToast?.(busyMessage);
-      return;
-    }
-
-    busySet.add(key);
-    try {
-      await task();
-    } finally {
-      busySet.delete(key);
-    }
+  /**
+   * Run busy-guard. Delegates concurrency control to AiChallengeNpc.
+   * @private
+   */
+  async _runBusyTask(opts) {
+    return AiChallengeNpc.runBusyTask({ ...opts, showToast: this.showToast?.bind(this) });
   }
 
-  // Wrap async work with level spinner lifecycle so loading UX stays consistent.
+  /**
+   * Wrap with loading. Uses in-world toast animation instead of full-screen overlay
+   * while AI question/evaluation requests are in flight.
+   * @private
+   */
   async _runWithLoading(task) {
-    // Keeps spinner lifecycle consistent for any async challenge operation.
-    this.queueLoadingWork();
+    this._startAiLoadingToast();
     try {
       return await task();
     } finally {
-      this.finishLoadingWork();
+      this._stopAiLoadingToast();
     }
   }
 
-  // Build and execute question-generation request, then normalize to one display line.
-  async _loadDeskChallengeQuestion(spriteData) {
-    const prompt = this._buildChallengePrompt(spriteData);
-    const raw = await this._requestChallengeAiText(spriteData, prompt);
-    return this._extractFirstChallengeLine(raw);
+  _startAiLoadingToast() {
+    this._aiLoadingPending += 1;
+    if (this._aiLoadingToastTimer) {
+      return;
+    }
+
+    const frames = ['◴', '◷', '◶', '◵'];
+    const renderFrame = () => {
+      const glyph = frames[this._aiLoadingFrame % frames.length];
+      this.showToast?.(`${glyph} Desk AI is thinking...`);
+      this._aiLoadingFrame += 1;
+    };
+
+    renderFrame();
+    this._aiLoadingToastTimer = setInterval(renderFrame, 420);
   }
 
-  // Build and execute answer-evaluation request, then parse verdict + feedback.
-  async _loadChallengeEvaluation(spriteData, question, answer) {
+  _stopAiLoadingToast() {
+    this._aiLoadingPending = Math.max(0, this._aiLoadingPending - 1);
+    if (this._aiLoadingPending > 0) {
+      return;
+    }
+
+    if (this._aiLoadingToastTimer) {
+      clearInterval(this._aiLoadingToastTimer);
+      this._aiLoadingToastTimer = null;
+    }
+
+    this._aiLoadingFrame = 0;
+    this.present?.clearToast?.();
+  }
+
+  /**
+   * Load question. Requests a unique AI question, retrying up to three times
+   * to avoid repeating a question already seen this session.
+   * @private
+   */
+  async _loadDeskChallengeQuestion(spriteData, session = null) {
+    let lastQuestion = '';
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const prompt = this._buildChallengePrompt(spriteData);
+      const raw = await this._requestChallengeAiText(spriteData, prompt, session);
+      const question = AiChallengeNpc.extractFirstLine(raw);
+      lastQuestion = question;
+
+      if (!this._isRepeatedMissionQuestion(spriteData, question)) {
+        this._recordMissionQuestion(spriteData, question);
+        return question;
+      }
+    }
+
+    this._recordMissionQuestion(spriteData, lastQuestion);
+    return lastQuestion;
+  }
+
+  /**
+   * Load evaluation. Sends the question and student answer to AI,
+   * then parses the graded verdict and feedback.
+   * @private
+   */
+  async _loadChallengeEvaluation(spriteData, question, answer, session = null) {
     const prompt = this._buildChallengeEvaluationPrompt(spriteData, question, answer);
-    const raw = await this._requestChallengeAiText(spriteData, prompt);
+    const raw = await this._requestChallengeAiText(spriteData, prompt, session);
     return this._parseChallengeEvaluation(raw);
   }
 
-  // Shared request chain used by both question generation and answer evaluation.
-  async _requestChallengeAiText(spriteData, prompt) {
-    // Unified request pipeline used by both question generation and answer grading.
-    const payload = this._buildChallengeRequestPayload(spriteData, prompt);
-    const response = await this._postChallengeRequest(payload);
-    const data = await this._parseChallengeResponseData(response);
-    return this._extractAiResponseText(data);
+  /**
+   * Request AI text. Routes the prompt through AiChallengeNpc.
+   * @private
+   */
+  async _requestChallengeAiText(spriteData, prompt, session = null) {
+    return AiChallengeNpc.requestAiText(spriteData, prompt, 'mission-challenge', 'Mission Tools challenge generation', session);
   }
 
-  // Create backend payload shape for this level's AI challenge requests.
-  _buildChallengeRequestPayload(spriteData, prompt) {
-    return {
-      prompt,
-      session_id: `mission-challenge-${spriteData?.id || 'desk'}`,
-      npc_type: spriteData?.expertise || 'challenge',
-      expertise: spriteData?.expertise || 'challenge',
-      knowledgeContext: 'Mission Tools challenge generation',
-    };
-  }
-
-  // Send request to AI backend and convert non-2xx status into typed error codes.
-  async _postChallengeRequest(payload) {
-    const pythonURL = `${pythonURI}/api/ainpc/prompt`;
-    const response = await fetch(pythonURL, {
-      ...fetchOptions,
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`${CHALLENGE_ERROR_TYPES.HTTP_ERROR}_${response.status}`);
-    }
-
-    return response;
-  }
-
-  // Parse JSON safely so malformed body maps to a known error category.
-  async _parseChallengeResponseData(response) {
-    try {
-      return await response.json();
-    } catch (_error) {
-      throw new Error(CHALLENGE_ERROR_TYPES.INVALID_RESPONSE);
-    }
-  }
-
-  // Keep generated question concise by taking first non-empty line only.
-  _extractFirstChallengeLine(raw) {
-    const firstLine = raw.split(/\r?\n/).find((line) => line.trim().length > 0) || raw;
-    return firstLine.trim();
-  }
-
-  // Standard extractor for model text response with empty-response validation.
-  _extractAiResponseText(data) {
-    const raw = (data?.response || '').toString().trim();
-    if (!raw) {
-      throw new Error(CHALLENGE_ERROR_TYPES.EMPTY_RESPONSE);
-    }
-    return raw;
-  }
-
-  // Prompt template that forces a strict 2-line grading format for easy parsing.
+  /**
+   * Build eval prompt. Assembles the grading prompt that requires a strict
+   * two-line VERDICT / FEEDBACK response from the AI.
+   * @private
+   */
   _buildChallengeEvaluationPrompt(spriteData, question, answer) {
     const expertise = spriteData?.expertise || 'general problem solving';
     const deskName = spriteData?.id || 'Desk Guide';
 
     return [
-      `You are grading a student answer for ${deskName}.`,
-      `Desk expertise: ${expertise}.`,
-      'Assess whether the student answer is correct, mostly correct, or incorrect.',
-      `Challenge question: ${question}`,
-      `Student answer: ${answer}`,
-      'Respond in exactly two lines and nothing else:',
-      'VERDICT: RIGHT or WRONG',
-      'FEEDBACK: one short sentence with actionable feedback.',
-      'Mark RIGHT for correct or mostly correct answers.',
+      CHALLENGE_PROMPT_TEXT.EVAL_ROLE.replace('{{deskName}}', deskName),
+      CHALLENGE_PROMPT_TEXT.EVAL_EXPERTISE.replace('{{expertise}}', expertise),
+      CHALLENGE_PROMPT_TEXT.EVAL_SCOPE,
+      CHALLENGE_PROMPT_TEXT.EVAL_QUESTION.replace('{{question}}', question),
+      CHALLENGE_PROMPT_TEXT.EVAL_ANSWER.replace('{{answer}}', answer),
+      CHALLENGE_PROMPT_TEXT.EVAL_FORMAT,
+      CHALLENGE_PROMPT_TEXT.EVAL_VERDICT,
+      CHALLENGE_PROMPT_TEXT.EVAL_FEEDBACK,
+      CHALLENGE_PROMPT_TEXT.EVAL_RIGHT_RULE,
     ].join('\n\n');
   }
 
@@ -684,79 +678,69 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
    * @private
    */
   _parseChallengeEvaluation(raw) {
-    // Accept strict format first, then gracefully fall back to first two lines.
-    const lines = raw
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
-
-    let verdictLine = lines.find((line) => /^VERDICT\s*:/i.test(line)) || lines[0] || '';
-    let feedbackLine = lines.find((line) => /^FEEDBACK\s*:/i.test(line)) || lines[1] || '';
-
-    const verdictText = verdictLine.replace(/^VERDICT\s*:/i, '').trim().toUpperCase();
-    const feedbackText = feedbackLine.replace(/^FEEDBACK\s*:/i, '').trim();
-
-    const verdict = verdictText.includes(CHALLENGE_VERDICTS.RIGHT)
-      ? CHALLENGE_VERDICTS.RIGHT
-      : CHALLENGE_VERDICTS.WRONG;
-
-    return {
-      verdict,
-      feedback: feedbackText || 'Review the desk topic and try again with a more specific answer.',
-    };
+    return AiChallengeNpc.parseEvaluation(raw);
   }
 
-  // Configure input box for mission mode: Enter submits answer for grading.
-  _armChallengeSubmission(npc, deskId, challengeQuestion) {
-    const ui = this._getChallengeUiElements(npc);
-    if (!ui?.input || !ui?.responseArea) return;
+  /**
+   * Append transcript message. Stores a single chat item on the NPC sprite data
+   * so the built-in history modal can render mission conversation context.
+   * @private
+   */
+  _appendDeskChatMessage(npc, role, message) {
+    if (!npc?.spriteData || !message) return;
+    if (!Array.isArray(npc.spriteData.chatHistory)) {
+      npc.spriteData.chatHistory = [];
+    }
 
-    const npcId = npc?.spriteData?.id || deskId;
-    this._activeDeskChallenges.set(npcId, {
-      deskId,
-      question: challengeQuestion,
-      startedAt: Date.now(),
+    npc.spriteData.chatHistory.push({
+      role: role === 'user' ? 'user' : 'ai',
+      message: String(message),
+      createdAt: Date.now(),
     });
 
-    ui.input.value = '';
-    ui.input.placeholder = 'Type your answer, then press Enter to submit...';
-    // Mission mode: Enter submits to evaluator, Shift+Enter remains newline.
-    ui.input.onkeypress = (event) => {
-      event.stopPropagation();
-      if (event.key !== 'Enter' || event.shiftKey) return;
+    if (npc.spriteData.chatHistory.length > 200) {
+      npc.spriteData.chatHistory = npc.spriteData.chatHistory.slice(-200);
+    }
+  }
 
-      event.preventDefault();
-      const answer = ui.input.value.trim();
-      if (!answer) {
-        this.showToast?.(`${deskId}: please type an answer first.`);
-        return;
+  /**
+   * Return the most recent unresolved challenge question from transcript history.
+   * A question is unresolved when no Result line appears after it.
+   * @private
+   */
+  _getPendingQuestionFromChatHistory(npc) {
+    const history = npc?.spriteData?.chatHistory;
+    if (!Array.isArray(history) || history.length === 0) return '';
+
+    let pending = '';
+    for (let i = history.length - 1; i >= 0; i -= 1) {
+      const entry = history[i];
+      const message = (entry?.message || '').toString().trim();
+      if (!message) continue;
+
+      if (/^Result\s*:/i.test(message)) {
+        return '';
       }
 
-      this._submitChallengeAnswer(npc, npcId, answer, ui);
-    };
+      if (/^Challenge Question\s*:/i.test(message)) {
+        pending = message.replace(/^Challenge Question\s*:\s*/i, '').trim();
+        break;
+      }
+    }
+
+    return pending;
   }
 
-  // Resolve current NPC dialogue DOM nodes needed for question/answer rendering.
-  _getChallengeUiElements(npc) {
-    const safeId = npc?.dialogueSystem?.safeId;
-    if (!safeId) return null;
-
-    const dialogueRoot = document.getElementById(`custom-dialogue-box-${safeId}`);
-    if (!dialogueRoot) return null;
-
-    return {
-      dialogueRoot,
-      input: dialogueRoot.querySelector('.ai-npc-input'),
-      responseArea: dialogueRoot.querySelector('.ai-npc-response-area'),
-    };
-  }
-
-  // Evaluate one submitted answer and update UI/TTS/log in a guarded async flow.
-  async _submitChallengeAnswer(npc, npcId, answer, ui) {
-    const active = this._activeDeskChallenges.get(npcId);
+  /**
+   * Submit answer. Evaluates the student answer, renders feedback, speaks
+   * the result, and awards progress if correct. Called via onSubmit callback.
+   * @private
+   */
+  async _submitChallengeAnswer(npc, npcId, answer, active, ui) {
     if (!active?.question) return;
+    AiChallengeNpc.markChallengeAnswered(npc, answer);
+    this._appendDeskChatMessage(npc, 'user', answer);
 
-    // Orchestrator: evaluate, render, speak, and log in one guarded flow.
     await this._runBusyTask({
       busySet: this._deskChallengeEvalBusy,
       key: npcId,
@@ -765,10 +749,25 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         try {
           ui.input.value = '';
           const evaluation = await this._runWithLoading(() =>
-            this._loadChallengeEvaluation(npc?.spriteData, active.question, answer)
+            this._loadChallengeEvaluation(npc?.spriteData, active.question, answer, npc?.aiSession || null)
           );
-          this._renderChallengeEvaluation(ui.responseArea, active.question, answer, evaluation);
-          this._speakChallengeEvaluation(npc, evaluation);
+          AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, evaluation);
+          AiChallengeNpc.speakEvaluation(npc, evaluation);
+          active.lastAnswer = answer;
+          active.lastEvaluation = evaluation || {
+            verdict: CHALLENGE_VERDICTS.WRONG,
+            feedback: 'No feedback provided.',
+          };
+          this._appendDeskChatMessage(
+            npc,
+            'ai',
+            `Result: ${evaluation?.verdict || CHALLENGE_VERDICTS.WRONG}. ${evaluation?.feedback || 'No feedback provided.'}`
+          );
+          if (evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT) {
+            active.status = 'completed';
+            active.completedAt = Date.now();
+            this._awardMissionProgress(active?.deskId || '');
+          }
           this._logChallengeEvent({
             deskId: active?.deskId || '',
             question: active?.question || '',
@@ -779,7 +778,17 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           });
         } catch (error) {
           console.warn('[MissionTools] challenge answer evaluation failed:', error);
-          this._renderChallengeEvaluation(ui.responseArea, active.question, answer, {
+          active.lastAnswer = answer;
+          active.lastEvaluation = {
+            verdict: CHALLENGE_VERDICTS.WRONG,
+            feedback: 'Could not evaluate right now. Please try submitting again.',
+          };
+          this._appendDeskChatMessage(
+            npc,
+            'ai',
+            'Result: WRONG. Could not evaluate right now. Please try submitting again.'
+          );
+          AiChallengeNpc.renderEvaluation(ui.responseArea, active.question, answer, {
             verdict: CHALLENGE_VERDICTS.WRONG,
             feedback: 'Could not evaluate right now. Please try submitting again.',
           });
@@ -789,105 +798,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  // Render full grading summary so learner sees question, answer, verdict, feedback.
-  _renderChallengeEvaluation(responseArea, question, answer, evaluation) {
-    if (!responseArea) return;
-
-    const verdictLabel = evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT ? 'RIGHT' : 'WRONG';
-    const icon = verdictLabel === 'RIGHT' ? '✅' : '❌';
-
-    responseArea.style.display = 'block';
-    responseArea.textContent = [
-      `Challenge Question: ${question}`,
-      `Your Answer: ${answer}`,
-      `${icon} Result: ${verdictLabel}`,
-      `Feedback: ${evaluation?.feedback || 'No feedback provided.'}`,
-    ].join('\n\n');
-  }
-
-  // Read verdict and feedback aloud for accessibility and reinforcement.
-  _speakChallengeEvaluation(npc, evaluation) {
-    if (!npc?.dialogueSystem?.speakText) return;
-
-    const verdict = evaluation?.verdict === CHALLENGE_VERDICTS.RIGHT ? 'Right' : 'Wrong';
-    const feedback = evaluation?.feedback || 'Please try again.';
-    npc.dialogueSystem.speakText(`${verdict}. ${feedback}`);
-  }
-
-  // Display and speak generated question when challenge starts.
-  _deliverChallengeToNpc(npc, challengeQuestion) {
-    this._renderChallengeQuestion(npc, challengeQuestion);
-    if (npc?.dialogueSystem?.speakText) {
-      npc.dialogueSystem.speakText(challengeQuestion);
-    }
-  }
-
-  // Fallback path when question generation fails: show safe default and keep flow usable.
-  _handleChallengeFailure(npc, deskId, error) {
-    const mappedMessage = this._getChallengeErrorMessage(error);
-    console.warn('[MissionTools] challenge generation failed:', mappedMessage, error);
-
-    const fallback = 'Challenge unavailable right now. Ask this: What is one practical step you would take for this desk topic?';
-    this._renderChallengeQuestion(npc, fallback);
-    this.showToast?.(`${deskId}: using fallback challenge.`);
-    if (npc?.dialogueSystem?.speakText) {
-      npc.dialogueSystem.speakText(fallback);
-    }
-  }
-
-  // Map internal error codes to user-readable messages for logs and diagnostics.
-  _getChallengeErrorMessage(error) {
-    const code = (error?.message || '').toString();
-
-    if (code.startsWith(`${CHALLENGE_ERROR_TYPES.HTTP_ERROR}_`)) {
-      const status = code.replace(`${CHALLENGE_ERROR_TYPES.HTTP_ERROR}_`, '');
-      return CHALLENGE_ERROR_MESSAGES[CHALLENGE_ERROR_TYPES.HTTP_ERROR](status);
-    }
-
-    const formatter = CHALLENGE_ERROR_MESSAGES[code] || CHALLENGE_ERROR_MESSAGES[CHALLENGE_ERROR_TYPES.UNKNOWN];
-    return formatter();
-  }
-
-  // Prompt template for producing a single desk-specific challenge question.
-  _buildChallengePrompt(spriteData) {
-    const expertise = spriteData?.expertise || 'general problem solving';
-    const deskName = spriteData?.id || 'Desk Guide';
-    const sampleTopics = (spriteData?.knowledgeBase?.[expertise] || [])
-      .slice(0, 4)
-      .map((topic) => `- ${topic.question}`)
-      .join('\n');
-
-    return [
-      `You are ${deskName} in a classroom coding game.`,
-      `Generate exactly one challenge question focused on: ${expertise}.`,
-      'Use the provided desk context and keep the question concise (max 30 words).',
-      'The challenge should require a short written answer from a student.',
-      'Do not include explanation, rubric, markdown, numbering, or extra text.',
-      sampleTopics ? `Desk topic examples:\n${sampleTopics}` : '',
-    ].filter(Boolean).join('\n\n');
-  }
-
-  // Inject generated question into the AI response area and prepare answer input.
-  _renderChallengeQuestion(npc, questionText) {
-    const safeId = npc?.dialogueSystem?.safeId;
-    if (!safeId) return;
-
-    const dialogueRoot = document.getElementById(`custom-dialogue-box-${safeId}`);
-    if (!dialogueRoot) return;
-
-    const responseArea = dialogueRoot.querySelector('.ai-npc-response-area');
-    if (responseArea) {
-      responseArea.style.display = 'block';
-      responseArea.textContent = `Challenge Question: ${questionText}`;
-    }
-
-    const input = dialogueRoot.querySelector('.ai-npc-input');
-    if (input) {
-      input.placeholder = 'Type your answer to the challenge question...';
-    }
-  }
-
-  // Keep a bounded in-memory challenge log for debugging and future persistence hooks.
+  /**
+   * Log event. Appends an entry to the bounded in-memory challenge log.
+   * @private
+   */
   _logChallengeEvent(entry) {
     this._challengeLog.push(entry);
     if (this._challengeLog.length > 100) {
@@ -974,12 +888,20 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
   }
 
-  // True when engine collision state reports player overlapping a desk.
+  /**
+   * Collision check. Returns true when the engine reports the player
+   * overlapping a desk's collision boundary.
+   * @private
+   */
   _deskIsColliding(player, desk) {
     return !!player?.state?.collisionEvents?.includes(desk?.spriteData?.id);
   }
 
-  // Enforce mission rule: desk clicks only work while player is near that desk.
+  /**
+   * Wire click gate. Patches each desk's click handler to enforce
+   * proximity before the challenge can be activated.
+   * @private
+   */
   _wireDeskClickDistanceGate(desks) {
     desks.forEach((desk) => {
       if (!desk || typeof desk.handleClick !== 'function') return;
@@ -1003,9 +925,37 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  // Runtime patch for engine quirk where reaction function may not bind automatically.
+  /**
+   * Handle keydown. Fires the nearest in-zone desk challenge when E is pressed,
+   * skipping the event when focus is inside a text input.
+   * @private
+   */
+  _handleMissionDeskKeyDown(event) {
+    if (event?.key !== 'e' && event?.key !== 'E' && event?.code !== 'KeyE') return;
+    if (event?.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+
+    const player = this._findPlayer();
+    if (!player || !Array.isArray(this._missionDeskObjects)) return;
+
+    const nearestDesk = this._findNearestDeskInZone(player, this._missionDeskObjects);
+    if (!nearestDesk) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const deskId = nearestDesk?.spriteData?.id;
+    if (!deskId) return;
+
+    this.startDeskChallenge(nearestDesk, deskId, nearestDesk);
+  }
+
+  /**
+   * Rebind reactions. Patches desks whose reaction function was not
+   * automatically assigned by the engine from spriteData.
+   * @private
+   */
   _rebindMissingDeskReactions(desks) {
-    // Runtime patch: Npc currently doesn't assign this.reaction from data.
+    // Engine quirk: FriendlyNpc does not copy spriteData.reaction to this.reaction.
     desks.forEach((desk) => {
       if (typeof desk?.reaction !== 'function' && typeof desk?.spriteData?.reaction === 'function') {
         desk.reaction = desk.spriteData.reaction;
@@ -1013,7 +963,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  // Compute center point for distance checks using current object position/size.
+  /**
+   * Object center. Returns the center pixel coordinate of a game object.
+   * @private
+   */
   _getObjectCenter(object) {
     return {
       x: (object?.position?.x || 0) + (object?.width || 0) / 2,
@@ -1021,7 +974,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     };
   }
 
-  // Alert radius in pixels used for zone prompts and nearest-desk detection.
+  /**
+   * Alert distance. Returns the zone-alert radius in pixels for a desk,
+   * falling back to interactDistance when the sprite has not yet rendered.
+   * @private
+   */
   _getDeskAlertDistancePx(desk) {
     const alertMultiplier = desk?._alertDistanceMultiplier ?? desk?.spriteData?.alertDistance ?? 1.25;
     if ((desk?.width || 0) > 0) {
@@ -1030,14 +987,22 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return (desk?.interactDistance || 120) * 1.5;
   }
 
-  // Click radius in pixels; at least alert distance, with interact-distance fallback.
+  /**
+   * Click distance. Returns the click-activation radius, at least as large
+   * as the alert distance so clicks never require closer approach than alerts.
+   * @private
+   */
   _getDeskClickDistancePx(desk) {
     const alertDistance = this._getDeskAlertDistancePx(desk);
     const interactDistance = desk?.interactDistance || 120;
     return Math.max(alertDistance, interactDistance * 1.5);
   }
 
-  // Return nearest desk currently within alert radius of player.
+  /**
+   * Nearest desk. Returns the closest desk currently within alert range
+   * of the player, or null if none qualify.
+   * @private
+   */
   _findNearestDeskInZone(player, desks) {
     const playerCenter = this._getObjectCenter(player);
 
@@ -1047,7 +1012,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     for (const desk of desks) {
       const deskCenter = this._getObjectCenter(desk);
       const distance = Math.hypot(playerCenter.x - deskCenter.x, playerCenter.y - deskCenter.y);
-      const inZone = distance < this._getDeskAlertDistancePx(desk);
+      const inCollision = this._deskIsColliding(player, desk);
+      const inZone = inCollision || distance < this._getDeskAlertDistancePx(desk);
 
       if (inZone && distance < nearestDistance) {
         nearestDesk = desk;
@@ -1058,7 +1024,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return nearestDesk;
   }
 
-  // Keep right-side zone alert banner in sync with current nearest desk.
+  /**
+   * Sync zone alert. Shows or clears the right-side proximity hint banner
+   * based on the current nearest desk.
+   * @private
+   */
   _syncDeskZoneAlert(nearestDesk) {
     if (nearestDesk) {
       const zoneMessage = nearestDesk.spriteData?.zoneMessage || 'Click to interact';
@@ -1073,7 +1043,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     }
   }
 
-  // Per-frame update: recompute nearest desk and refresh zone hint text.
+  /**
+   * Per-frame update. Recomputes the nearest desk and refreshes the zone
+   * alert hint on every game tick.
+   */
   update() {
     const player = this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
     if (!player || !Array.isArray(this._missionDeskObjects)) return;
@@ -1082,9 +1055,17 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._syncDeskZoneAlert(nearestDesk);
   }
 
-  // Cleanup transient UI owned by this level.
+  /**
+   * Cleanup level. Removes all transient UI elements (toast, zone alert,
+   * scoreboard) and detaches the keydown listener.
+   */
   destroy() {
-    this.clearZoneAlert();
+    document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
+    if (this._aiLoadingToastTimer) {
+      clearInterval(this._aiLoadingToastTimer);
+      this._aiLoadingToastTimer = null;
+    }
+    super.destroy();
   }
 
 }
