@@ -301,7 +301,7 @@ class GameLevelForestWin {
     const image_data_bg = {
       name: 'village',
       greeting: "Warm light. The smell of bread. You made it.",
-      src: "/images/projects/escape-game/village.jpg",
+      src: "/images/projects/game-in-game-lesson/village.jpg",
       pixels: { height: 580, width: 1038 }
     };
 
@@ -310,7 +310,7 @@ class GameLevelForestWin {
     const sprite_data_player = {
       id: 'Octopus',
       greeting: "I can't believe I made it...",
-      src: "/images/projects/escape-game/octopus.png",
+      src: "/images/projects/game-in-game-lesson/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -331,13 +331,13 @@ class GameLevelForestWin {
     };
 
     // ── NPC: R2D2 ─────────────────────────────────────────────────────────────
-    const r2d2Chat = new NpcAiChat('R2D2', PERSONA_R2D2, "/images/projects/escape-game/r2_idle.png");
+    const r2d2Chat = new NpcAiChat('R2D2', PERSONA_R2D2, "/images/projects/game-in-game-lesson/r2_idle.png");
 
     const sprite_greet_r2d2 = "Bweeeep! You made it! I knew you would!";
     const sprite_data_r2d2 = {
       id: 'R2D2',
       greeting: sprite_greet_r2d2,
-      src: "/images/projects/escape-game/r2_idle.png",
+      src: "/images/projects/game-in-game-lesson/r2_idle.png",
       SCALE_FACTOR: 7,
       ANIMATION_RATE: 80,
       pixels: { height: 223, width: 505 },
@@ -395,13 +395,13 @@ class GameLevelForestWin {
     };
 
     // ── NPC: Village Elder ────────────────────────────────────────────────────
-    const elderChat = new NpcAiChat('Village Elder', PERSONA_ELDER, "/images/projects/escape-game/tux.png");
+    const elderChat = new NpcAiChat('Village Elder', PERSONA_ELDER, "/images/projects/game-in-game-lesson/tux.png");
 
     const sprite_greet_elder = "We don't get many travellers who make it here. Welcome.";
     const sprite_data_elder = {
       id: 'Village Elder',
       greeting: sprite_greet_elder,
-      src: "/images/projects/escape-game/tux.png",
+      src: "/images/projects/game-in-game-lesson/tux.png",
       SCALE_FACTOR: 8,
       ANIMATION_RATE: 50,
       pixels: { height: 256, width: 352 },
@@ -429,13 +429,13 @@ class GameLevelForestWin {
     };
 
     // ── NPC: Villager ─────────────────────────────────────────────────────────
-    const villagerChat = new NpcAiChat('Villager', PERSONA_VILLAGER, "/images/projects/escape-game/octocat.png");
+    const villagerChat = new NpcAiChat('Villager', PERSONA_VILLAGER, "/images/projects/game-in-game-lesson/octocat.png");
 
     const sprite_greet_villager = "Oh! A new face! It's been so long!";
     const sprite_data_villager = {
       id: 'Villager',
       greeting: sprite_greet_villager,
-      src: "/images/projects/escape-game/octocat.png",
+      src: "/images/projects/game-in-game-lesson/octocat.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 301, width: 801 },
