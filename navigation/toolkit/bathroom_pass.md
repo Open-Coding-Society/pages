@@ -502,9 +502,22 @@ permalink: /student/bathroom_pass
     document.getElementById('emergencyCheckInBtn')?.addEventListener('click', emergencyCheckIn);
     document.getElementById('emergencyCheckOutBtn')?.addEventListener('click', emergencyCheckOut);
 
+    // Auto-reload at midnight to fetch new facial registrations
+    function scheduleMidnightReload() {
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+        const msUntilMidnight = tomorrow.getTime() - now.getTime();
+        
+        setTimeout(() => {
+            window.location.reload(true);
+        }, msUntilMidnight);
+    }
+
     // Polling for queue updates
     initializeCurrentUser();
     setInterval(refreshQueue, 5000);
+    scheduleMidnightReload();
+
     document.addEventListener('DOMContentLoaded', () => {
         refreshQueue();
         loadFaceData();
