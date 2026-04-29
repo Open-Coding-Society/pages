@@ -5,7 +5,7 @@ import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelForest from '/assets/js/projects/escape-game/levels/GameLevelForest.js';
+import GameLevelForest from '/assets/js/projects/game-in-game-lesson/levels/GameLevelForest.js';
 import Coin from '/assets/js/GameEnginev1.1/Coin.js';
 
 class GameLevelDoors {
@@ -23,31 +23,31 @@ class GameLevelDoors {
     const doorConfigs = [
         {
             id: 'Blue Door',
-            src: "/images/projects/escape-game/bluedoor.png",
+            src: "/images/projects/game-in-game-lesson/bluedoor.png",
             greeting: "A calm blue door hums with a gentle, inviting light...",
             deadEnd: "The blue light flickers and fades. Nothing lies beyond."
         },
         {
             id: 'Brown Door',
-            src: "/images/projects/escape-game/browndoor.png",
+            src: "/images/projects/game-in-game-lesson/browndoor.png",
             greeting: "A plain brown door, worn and splintered with age...",
             deadEnd: "Splinters and cobwebs. Nothing lies beyond this door."
         },
         {
             id: 'Green Door',
-            src: "/images/projects/escape-game/greendoor.png",
+            src: "/images/projects/game-in-game-lesson/greendoor.png",
             greeting: "A mossy green door covered in vines...",
             deadEnd: "Roots and earth block the way. Something ancient refuses you."
         },
         {
             id: 'Orange Door',
-            src: "/images/projects/escape-game/orangedoor.png",
+            src: "/images/projects/game-in-game-lesson/orangedoor.png",
             greeting: "A blazing orange door radiates heat...",
             deadEnd: "A wall of scorching heat forces you back. Not this one."
         },
         {
             id: 'Red Door',
-            src: "/images/projects/escape-game/reddoor.png",
+            src: "/images/projects/game-in-game-lesson/reddoor.png",
             greeting: "An ominous red door pulses with a dark energy...",
             deadEnd: "A cold dread seizes your hand. Every instinct screams: not this one."
         },
@@ -114,7 +114,7 @@ class GameLevelDoors {
     // ── Background ───────────────────────────────────────────────────────────
     const image_data_water = {
         id: 'Water',
-        src: "/images/projects/escape-game/windows.png",
+        src: "/images/projects/game-in-game-lesson/windows.png",
         pixels: { height: 597, width: 340 }
     };
 
@@ -123,7 +123,7 @@ class GameLevelDoors {
     const sprite_data_octopus = {
         id: 'Octopus',
         greeting: "Hi I am Octopus, the water wanderer. I am looking for wisdom and adventure!",
-        src: "/images/projects/escape-game/octopus.png",
+        src: "/images/projects/game-in-game-lesson/octopus.png",
         SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
@@ -156,7 +156,7 @@ class GameLevelDoors {
     const sprite_greet_wanderer = "I have stood before these doors before. Let me share what I know...";
     const sprite_data_wanderer = {
         id: 'Hooded Wanderer', greeting: sprite_greet_wanderer,
-        src: "/images/projects/escape-game/tux.png", SCALE_FACTOR: 8, ANIMATION_RATE: 50,
+        src: "/images/projects/game-in-game-lesson/tux.png", SCALE_FACTOR: 8, ANIMATION_RATE: 50,
         pixels: { height: 256, width: 352 }, INIT_POSITION: { x: 0.08, y: 0.4 },
         orientation: { rows: 8, columns: 11 }, down: { row: 5, start: 0, columns: 3 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -177,7 +177,7 @@ class GameLevelDoors {
     const sprite_greet_soul1 = "I chose wrong. Now I wander.";
     const sprite_data_soul1 = {
         id: 'Lost Soul', greeting: sprite_greet_soul1,
-        src: "/images/projects/escape-game/robot.png", SCALE_FACTOR: 12, ANIMATION_RATE: 100,
+        src: "/images/projects/game-in-game-lesson/robot.png", SCALE_FACTOR: 12, ANIMATION_RATE: 100,
         pixels: { height: 316, width: 627 }, INIT_POSITION: { x: 0.88, y: 0.25 },
         orientation: { rows: 3, columns: 6 }, down: { row: 1, start: 0, columns: 6 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
@@ -196,7 +196,7 @@ class GameLevelDoors {
     const sprite_greet_soul2 = "Don't end up like me.";
     const sprite_data_soul2 = {
         id: 'Forgotten One', greeting: sprite_greet_soul2,
-        src: "/images/projects/escape-game/octocat.png", SCALE_FACTOR: 12, ANIMATION_RATE: 50,
+        src: "/images/projects/game-in-game-lesson/octocat.png", SCALE_FACTOR: 12, ANIMATION_RATE: 50,
         pixels: { height: 301, width: 801 }, INIT_POSITION: { x: 0.88, y: 0.7 },
         orientation: { rows: 1, columns: 4 }, down: { row: 0, start: 0, columns: 3 },
         hitbox: { widthPercentage: 0.1, heightPercentage: 0.1 },
