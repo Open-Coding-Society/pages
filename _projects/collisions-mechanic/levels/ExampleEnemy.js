@@ -11,7 +11,6 @@ class ExampleEnemy extends Enemy {
 
         console.log("Collision has occurred, player has been destroyed.");
 
-        this.explode(player.position.x, player.position.y);
         player.destroy();
         this.playerDestroyed = true;
     }
