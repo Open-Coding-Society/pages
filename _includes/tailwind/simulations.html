@@ -1081,7 +1081,7 @@
 
     <div id="flightExplanationPanel" class="sim-explain">
       <h3>How this is a simulation</h3>
-      <p>The flight model uses selected conditions as inputs. The algorithm converts them into a safety score, then uses random chance to decide the final outcome.</p>
+      <p>The flight model uses selected conditions as inputs. The algorithm converts them into a safety score (the likelihood of success). An uncertainty factor — a random number simulating unpredictable real-world variables like bird strikes, turbulence, or equipment glitches — is then compared to that score. If the uncertainty exceeds the safety margin, the flight fails.</p>
     </div>
 
     <div class="flight-layout">
@@ -1173,7 +1173,7 @@
         </div>
         <div class="flight-output-grid">
           <div class="flight-score-card"><span>Safety Score</span><strong id="safetyScoreText">--%</strong></div>
-          <div class="flight-score-card"><span>Random Roll</span><strong id="randomRollText">--</strong></div>
+          <div class="flight-score-card"><span>Uncertainty Factor</span><strong id="randomRollText">--</strong></div>
           <div class="flight-score-card"><span>Outcome</span><strong id="outcomeText">Waiting</strong></div>
         </div>
         <div id="flightResultBox" class="flight-result-box">Choose inputs and run the flight simulation.</div>
@@ -1429,18 +1429,18 @@
     const bd=[];
     let score=100;
     const add=(lbl,amt)=>{ if(amt){ bd.push({lbl,amt}); score-=amt; } };
-    add("Weather condition",    {clear:0,rain:12,fog:20,storm:34}[inp.weather]??0);
-    add("Wind speed",           {low:0,medium:10,high:24,extreme:38}[inp.wind]??0);
-    add("Visibility",           {excellent:0,normal:4,poor:18,dangerous:32}[inp.visibility]??0);
-    add("Plane style",          {modern:0,standard:5,small:12,cargo:10,old:20}[inp.planeStyle]??0);
-    let age=0; if(inp.planeAge>12)age+=8; if(inp.planeAge>25)age+=12; if(inp.planeAge>40)age+=16;
+    add("Weather condition",    {clear:0,rain:5,fog:9,storm:14}[inp.weather]??0);
+    add("Wind speed",           {low:0,medium:4,high:10,extreme:16}[inp.wind]??0);
+    add("Visibility",           {excellent:0,normal:2,poor:8,dangerous:13}[inp.visibility]??0);
+    add("Plane style",          {modern:0,standard:2,small:5,cargo:4,old:8}[inp.planeStyle]??0);
+    let age=0; if(inp.planeAge>12)age+=3; if(inp.planeAge>25)age+=5; if(inp.planeAge>40)age+=7;
     add("Plane age",age);
-    add("Maintenance quality",  {excellent:0,average:7,delayed:18,poor:32}[inp.maintenance]??0);
-    let pax=0; if(inp.passengers>180)pax+=7; if(inp.passengers>260)pax+=9; if(inp.passengers>340)pax+=8;
+    add("Maintenance quality",  {excellent:0,average:3,delayed:8,poor:13}[inp.maintenance]??0);
+    let pax=0; if(inp.passengers>180)pax+=2; if(inp.passengers>260)pax+=3; if(inp.passengers>340)pax+=3;
     add("Passenger load",pax);
-    add("Pilot experience",     {expert:0,trained:7,new:24}[inp.pilot]??0);
-    add("Copilot experience",   {expert:0,trained:5,new:16}[inp.copilot]??0);
-    return { score: clamp(score,3,98), breakdown: bd };
+    add("Pilot experience",     {expert:0,trained:3,new:10}[inp.pilot]??0);
+    add("Copilot experience",   {expert:0,trained:2,new:7}[inp.copilot]??0);
+    return { score: clamp(score,18,98), breakdown: bd };
   }
 
   function renderRisk(bd) {
@@ -1511,8 +1511,8 @@
       }
       el.resultBox.className = ok ? "flight-result-box success-result" : "flight-result-box fail-result";
       el.resultBox.innerHTML = ok
-        ? `✅ Flight succeeded.<br>Safety score: ${pct(score)} · Random roll: ${roll.toFixed(1)}<br>The roll was ≤ the safety score, so the modeled flight succeeded.`
-        : `⚠️ Flight failed.<br>Safety score: ${pct(score)} · Random roll: ${roll.toFixed(1)}<br>The roll exceeded the safety score — the model produced a failed outcome.`;
+        ? `✅ Flight succeeded.<br>Safety score: ${pct(score)} · Uncertainty factor: ${roll.toFixed(1)}<br>Simulations include randomness to model unpredictable real-world factors. Here, uncertainty (${roll.toFixed(1)}) was within the safety margin, so the flight succeeded.`
+        : `⚠️ Flight failed.<br>Safety score: ${pct(score)} · Uncertainty factor: ${roll.toFixed(1)}<br>Simulations include randomness to model unpredictable real-world factors. Here, uncertainty (${roll.toFixed(1)}) exceeded the safety margin, so the flight failed.`;
       state.flightHistory.push({inp,score,roll,ok});
     },140);
   });
