@@ -1,20 +1,6 @@
-// Adventure Game Custom Level
-// Exported from GameBuilder on 2026-04-23T22:23:32.868Z
-// How to use this file:
-// 1) Save as assets/js/adventureGame/GameLevelCollisionMechanicsLessonLevel.js in your repo.
-// 2) Reference it in your runner or level selector. Examples:
-//    import GameLevelPlanets from '/assets/js/GameEnginev1/GameLevelPlanets.js';
-//    import GameLevelCollisionMechanicsLessonLevel from '/assets/js/adventureGame/GameLevelCollisionMechanicsLessonLevel.js';
-//    export const gameLevelClasses = [GameLevelPlanets, GameLevelCollisionMechanicsLessonLevel];
-//    // or pass it directly to your GameControl as the only level.
-// 3) Ensure images exist and paths resolve via 'path' provided by the engine.
-// 4) You can add more objects to this.classes inside the constructor.
-
 import GameEnvBackground from '@assets/js/GameEnginev1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1/essentials/Npc.js';
-import Barrier from '@assets/js/GameEnginev1/essentials/Barrier.js';
-import Shark from '@assets/js/GameEnginev1/Shark.js';
 import ExampleEnemy from '@assets/js/projects/collisions-mechanic/levels/ExampleEnemy.js';
 
 class GameLevelCollisionMechanicsLessonLevel {
