@@ -331,6 +331,530 @@ td:has(> img[src*="logo.png"]) {
 }
 
 // ===========================
+// Issues Dashboard Styles
+// ===========================
+// Replaces the old standalone issues stylesheet and keeps all issue UI
+// (create/list/kanban) themed through the same calendar SCSS pipeline.
+
+.calendar-dashboard-tabs {
+  display: inline-flex;
+  gap: 8px;
+  padding: 4px;
+  margin: 0 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ui-border);
+  background: var(--bg-1);
+}
+
+.dashboard-tab-btn {
+  @include text-button;
+  appearance: none;
+  height: auto;
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--bg-2);
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transform: none;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+
+  &:hover {
+    transform: none;
+    opacity: 1;
+    color: var(--text);
+    background: var(--panel-mid);
+    border-color: var(--pref-accent-color);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--pref-accent-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pref-accent-color) 28%, transparent 72%);
+  }
+
+  &.active {
+    color: var(--pref-bg-color);
+    border-color: var(--pref-accent-color);
+    background: color-mix(in srgb, var(--pref-accent-color) 84%, var(--bg-1) 16%);
+    box-shadow: none;
+  }
+}
+
+.calendar-issues-panel {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 75%, transparent 25%);
+  border-radius: 14px;
+  padding: 14px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg-2) 82%, var(--pref-accent-color) 18%),
+      color-mix(in srgb, var(--bg-1) 95%, var(--pref-accent-color) 5%)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 10%, transparent 90%),
+    0 12px 28px color-mix(in srgb, #000 28%, transparent 72%);
+  color: var(--text);
+}
+
+.calendar-issues-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.calendar-issues-title {
+  margin: 0;
+  color: var(--text-strong, var(--text));
+  letter-spacing: 0.01em;
+}
+
+.calendar-issues-subtitle {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.issues-controls-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) repeat(3, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.issues-controls-row input,
+.issues-controls-row select,
+.issue-form input,
+.issue-form textarea,
+.issue-form select,
+.issue-card-footer select,
+.kanban-item select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
+  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
+  color: var(--text);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+  &:focus {
+    border-color: color-mix(in srgb, var(--pref-accent-color) 60%, var(--ui-border) 40%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pref-accent-color) 20%, transparent 80%);
+  }
+}
+
+.issue-form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.issues-subtabs {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.issues-subtab-btn {
+  @include text-button;
+  height: auto;
+  min-height: 34px;
+  border-radius: 8px;
+  padding: 6px 14px;
+  background: var(--bg-2);
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transform: none;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+
+  &:hover {
+    transform: none;
+    opacity: 1;
+    background: var(--panel-mid);
+    border-color: var(--pref-accent-color);
+    color: var(--text);
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--pref-accent-color) 84%, var(--bg-1) 16%);
+    color: var(--pref-bg-color);
+    border-color: var(--pref-accent-color);
+    box-shadow: none;
+  }
+}
+
+.issues-subpanel {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 70%, transparent 30%);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-0) 78%, var(--pref-accent-color) 22%);
+  padding: 12px;
+}
+
+.issue-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.issue-form > div > label,
+.issue-form-grid label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  color: var(--text-strong, var(--text));
+}
+
+.issue-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.issue-markdown-preview {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 76%, transparent 24%);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-1) 86%, #000 14%);
+  min-height: 52px;
+  padding: 12px;
+  color: var(--text-muted);
+}
+
+.issue-markdown-empty {
+  margin: 0;
+  font-style: italic;
+}
+
+.issue-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.calendar-issue-action-btn {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 75%, transparent 25%);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+  color: var(--text);
+  background: var(--bg-2);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px color-mix(in srgb, #000 28%, transparent 72%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.primary {
+    border-color: color-mix(in srgb, var(--pref-accent-color) 75%, transparent 25%);
+    background: color-mix(in srgb, var(--pref-accent-color) 75%, var(--bg-2) 25%);
+    color: var(--pref-bg-color);
+  }
+
+  &.secondary {
+    background: color-mix(in srgb, var(--bg-3) 92%, #000 8%);
+    color: var(--text-strong, var(--text));
+  }
+
+  &.danger {
+    border-color: color-mix(in srgb, #ef4444 80%, transparent 20%);
+    background: color-mix(in srgb, #dc2626 85%, #0f172a 15%);
+    color: #fff;
+  }
+}
+
+.issues-list {
+  display: grid;
+  gap: 10px;
+}
+
+.issue-card {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  border-left: 3px solid color-mix(in srgb, var(--pref-accent-color) 78%, transparent 22%);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-1) 86%, var(--pref-accent-color) 14%);
+  padding: 12px;
+}
+
+.issue-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.issue-link-btn {
+  border: 0;
+  background: transparent;
+  color: var(--text-strong, var(--text));
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.issue-card-title {
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.issue-card-note,
+.issue-author,
+.issue-meta {
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.issue-card-badge-row,
+.issue-tags,
+.issue-card-action-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.issue-card-badge-row {
+  justify-content: flex-end;
+}
+
+.issue-tags {
+  margin-top: 10px;
+}
+
+.issue-tag {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 80%, transparent 20%);
+  background: color-mix(in srgb, var(--bg-2) 85%, #000 15%);
+  color: var(--text-muted);
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.issue-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.issue-card-footer select {
+  max-width: 180px;
+}
+
+.issue-pill {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 75%, transparent 25%);
+  background: color-mix(in srgb, var(--bg-2) 84%, #000 16%);
+  color: var(--text-strong, var(--text));
+}
+
+// Status colors
+.issue-pill.open {
+  background: color-mix(in srgb, var(--pref-accent-color) 46%, var(--bg-1) 54%);
+  border-color: color-mix(in srgb, var(--pref-accent-color) 66%, var(--ui-border) 34%);
+  color: var(--pref-bg-color);
+}
+
+.issue-pill.in-progress {
+  background: color-mix(in srgb, #3b82f6 70%, var(--bg-1) 30%);
+  border-color: color-mix(in srgb, #3b82f6 85%, var(--ui-border) 15%);
+  color: #fff;
+}
+
+.issue-pill.blocked {
+  background: color-mix(in srgb, #ef4444 74%, var(--bg-1) 26%);
+  border-color: color-mix(in srgb, #ef4444 85%, var(--ui-border) 15%);
+  color: #fff;
+}
+
+.issue-pill.done {
+  background: color-mix(in srgb, #22c55e 72%, var(--bg-1) 28%);
+  border-color: color-mix(in srgb, #22c55e 85%, var(--ui-border) 15%);
+  color: #fff;
+}
+
+// Priority colors based on the existing priority system.
+// Supported inputs from backend/UI: critical/high/medium/low and p0/p1/p2/p3.
+.issue-pill.critical,
+.issue-pill.p0 {
+  background: color-mix(in srgb, var(--priority-p0, #{$priority-p0}) 86%, var(--bg-0) 14%);
+  border-color: color-mix(in srgb, var(--priority-p0, #{$priority-p0}) 74%, var(--ui-border) 26%);
+  color: var(--pref-bg-color);
+}
+
+.issue-pill.high,
+.issue-pill.p1 {
+  background: color-mix(in srgb, var(--priority-p1, #{$priority-p1}) 86%, var(--bg-0) 14%);
+  border-color: color-mix(in srgb, var(--priority-p1, #{$priority-p1}) 74%, var(--ui-border) 26%);
+  color: var(--pref-bg-color);
+}
+
+.issue-pill.medium,
+.issue-pill.p2 {
+  background: color-mix(in srgb, var(--priority-p2, #{$priority-p2}) 86%, var(--bg-0) 14%);
+  border-color: color-mix(in srgb, var(--priority-p2, #{$priority-p2}) 74%, var(--ui-border) 26%);
+  color: var(--pref-bg-color);
+}
+
+.issue-pill.low,
+.issue-pill.p3 {
+  background: color-mix(in srgb, var(--priority-p3, #{$priority-p3}) 86%, var(--bg-0) 14%);
+  border-color: color-mix(in srgb, var(--priority-p3, #{$priority-p3}) 74%, var(--ui-border) 26%);
+  color: var(--pref-bg-color);
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.kanban-column {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg-1) 88%, var(--pref-accent-color) 12%);
+  padding: 10px;
+  min-height: 220px;
+}
+
+.kanban-column-title {
+  margin: 0 0 10px;
+  color: var(--text-strong, var(--text));
+  font-size: 1.06rem;
+}
+
+.kanban-item {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 74%, transparent 26%);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-0) 90%, var(--pref-accent-color) 10%);
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.issues-empty {
+  border: 1px dashed color-mix(in srgb, var(--ui-border) 70%, transparent 30%);
+  border-radius: 10px;
+  color: var(--text-muted);
+  padding: 16px;
+  text-align: center;
+}
+
+.issue-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, #000 55%, transparent 45%);
+  padding: 20px;
+
+  &.open {
+    display: flex;
+  }
+}
+
+.issue-modal-content {
+  width: min(760px, 95vw);
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 76%, transparent 24%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-1) 78%, var(--pref-accent-color) 22%),
+    color-mix(in srgb, var(--bg-0) 92%, var(--pref-accent-color) 8%)
+  );
+  padding: 14px;
+}
+
+.issue-modal-header,
+.issue-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.issue-modal-title {
+  margin: 0;
+}
+
+.issue-modal-close {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 1.7rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.issue-modal-meta {
+  margin: 8px 0 10px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1100px) {
+  .kanban-board {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .issues-controls-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .issue-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .issue-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .issue-card-footer select {
+    max-width: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .calendar-issues-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .issues-controls-row,
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+
+  .issues-subtabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// ===========================
 // Period Filter Dropdown
 // ===========================
 

@@ -7,6 +7,7 @@ permalink: /student/bathroom_pass
 <head>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 </head>
 
 <div class="max-w-7xl mx-auto px-4 py-8">
@@ -16,23 +17,8 @@ permalink: /student/bathroom_pass
             <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 tracking-tight mb-2">
                 BATHROOM PASS
             </h1>
-            <p class="text-neutral-400 font-medium">Scan your face to join the queue or check out.</p>
         </div>
         
-        <div class="flex items-center gap-6 bg-neutral-900/50 backdrop-blur-xl p-4 rounded-2xl border border-neutral-800 shadow-2xl">
-            <div class="text-center px-4 border-r border-neutral-800">
-                <span id="currentAway" class="block text-3xl font-bold text-indigo-400">0</span>
-                <span class="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Away</span>
-            </div>
-            <div class="text-center px-4">
-                <span id="maxCapacity" class="block text-3xl font-bold text-neutral-400">1</span>
-                <span class="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Limit</span>
-            </div>
-            <div id="statusIndicator" class="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span class="text-xs font-bold text-green-500 uppercase tracking-wider">Available</span>
-            </div>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -65,10 +51,21 @@ permalink: /student/bathroom_pass
                         </div>
                         <h2 class="text-2xl font-bold text-white mb-2">Ready to Scan</h2>
                         <p class="text-neutral-400 text-center max-w-xs mb-8">Position yourself clearly in front of the camera for identification.</p>
-                        <button onclick="startScanning()" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 flex items-center gap-3">
+                        <button id="initScannerBtn" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 flex items-center gap-3">
                             <span>Initialize Scanner</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
+                    </div>
+
+                    <!-- Cooldown Overlay -->
+                    <div id="cooldownOverlay" class="hidden absolute inset-0 bg-neutral-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 transition-opacity duration-500">
+                        <div class="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center mb-6 border border-amber-500/20">
+                            <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Scanner Cooldown</h2>
+                        <p class="text-neutral-400 text-center max-w-xs mb-8">Ready in <span id="cooldownTimer" class="font-bold text-amber-500">5</span> seconds...</p>
                     </div>
 
                     <!-- Identification Overlay -->
@@ -83,8 +80,8 @@ permalink: /student/bathroom_pass
                             </div>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="confirmIdentity()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all">Confirm</button>
-                            <button onclick="resetId()" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all">Not Me</button>
+                            <button id="confirmIdBtn" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-all">Confirm</button>
+                            <button id="notMeBtn" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all">Not Me</button>
                         </div>
                     </div>
                 </div>
@@ -140,10 +137,10 @@ permalink: /student/bathroom_pass
                     <input type="text" id="emergencyName" placeholder="Enter student name manually..." 
                            class="flex-1 bg-neutral-950 border border-neutral-800 rounded-2xl px-6 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium">
                     <div class="flex gap-3">
-                        <button onclick="emergencyCheckIn()" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
+                        <button id="emergencyCheckInBtn" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
                             Check In
                         </button>
-                        <button onclick="emergencyCheckOut()" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
+                        <button id="emergencyCheckOutBtn" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
                             Check Out
                         </button>
                     </div>
@@ -161,6 +158,82 @@ permalink: /student/bathroom_pass
     let scanStream = null;
     let identifiedPerson = null;
     let isProcessing = false;
+    let faceMatcher = null;
+    let isFaceApiLoaded = false;
+    let cooldownRemaining = 0;
+    let cooldownInterval = null;
+
+    async function loadFaceData() {
+        showToast({ message: "Loading Face AI models...", duration: 3000 });
+        
+        try {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+            await Promise.all([
+                faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+            ]);
+            
+            showToast({ message: "Fetching student face data...", duration: 2000 });
+            const resp = await fetch(`${javaURI}/api/face/faces`, fetchOptions);
+            
+            if (resp.status === 403 || resp.status === 401) {
+                showToast({ message: "Access denied: Only teachers/admins can use the scanner. Please log in with the correct role.", style: { background: "#ef4444" }, duration: 7000 });
+                return;
+            }
+            
+            if (!resp.ok) {
+                showToast({ message: `Failed to fetch face data (HTTP ${resp.status}). Is the backend running?`, style: { background: "#ef4444" }, duration: 5000 });
+                return;
+            }
+            
+            const faces = await resp.json();
+            
+            if (!Array.isArray(faces)) {
+                showToast({ message: "Unexpected response from server. Check backend logs.", style: { background: "#ef4444" }, duration: 5000 });
+                console.error("Expected array from /api/face/faces, got:", faces);
+                return;
+            }
+            
+            console.log(`Fetched ${faces.length} faces from backend:`, faces);
+            
+            const labeledDescriptors = [];
+            for (const face of faces) {
+                if (!face.faceData) continue;
+                try {
+                    const img = new Image();
+                    img.src = `data:image/jpeg;base64,${face.faceData}`;
+                    await new Promise((resolve) => { img.onload = resolve; });
+                    
+                    const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+                    if (detection) {
+                        const label = String(face.name || face.uid || "Unknown");
+                        console.log(`Processing face for: ${label}`);
+                        labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(label, [detection.descriptor]));
+                    } else {
+                        console.warn(`No face detected in stored image for: ${face.name || face.uid}`);
+                    }
+                } catch(e) {
+                    console.error("Failed to process face for", face.name, e);
+                }
+            }
+            
+            if (labeledDescriptors.length === 0) {
+                if (faces.length === 0) {
+                    showToast({ message: "No faces have been registered yet. Students must register their face first.", style: { background: "#f59e0b" }, duration: 7000 });
+                } else {
+                    showToast({ message: "Faces were fetched but none could be processed. Check image quality of stored data.", style: { background: "#ef4444" }, duration: 5000 });
+                }
+            } else {
+                 faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
+                 isFaceApiLoaded = true;
+                 showToast({ message: `Scanner Ready! (${labeledDescriptors.length} faces loaded)`, duration: 3000 });
+            }
+        } catch (err) {
+             console.error("Failed to initialize FaceAPI", err);
+             showToast({ message: "Face scanner initialization failed.", duration: 5000, style: { background: "#ef4444" } });
+        }
+    }
 
     // Fetch current user email on load
     async function initializeCurrentUser() {
@@ -206,63 +279,37 @@ permalink: /student/bathroom_pass
     }
 
     async function startIdentificationLoop() {
-        if (!scanStream || isProcessing) return;
+        if (!scanStream || !isFaceApiLoaded || identifiedPerson) {
+             if (!isFaceApiLoaded && scanStream && !identifiedPerson) {
+                 setTimeout(startIdentificationLoop, 1000);
+             }
+             return;
+        }
+        if (isProcessing) return;
         
+        isProcessing = true;
         const video = document.getElementById('scanVideo');
-        const canvas = document.getElementById('scanCanvas');
-        
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        
-        const base64Image = canvas.toDataURL('image/jpeg').split(',')[1];
-        
-        const threshold = document.getElementById('thresholdLimit').value;
-        
-        // Get JWT token from cookies (Spring token for backend calls)
-        const jwtToken = document.cookie.split(';').find(c => c.trim().startsWith('jwt_java_spring='))?.split('=')[1];
+        const threshold = parseFloat(document.getElementById('thresholdLimit').value);
         
         try {
-            const resp = await fetch(`${javaURI}/api/person/identify`, {
-                ...fetchOptions,
-                method: 'POST',
-                headers: {
-                    ...fetchOptions.headers,
-                    ...(jwtToken && { 'Authorization': `Bearer ${jwtToken}` })
-                },
-                body: JSON.stringify({ 
-                    image: base64Image,
-                    threshold: threshold
-                })
-            });
-
-            if (!resp.ok) {
-                console.error(`Face identify API returned ${resp.status}:`, resp.statusText);
-                const errorText = await resp.text();
-                console.error("Error response:", errorText);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-
-            let result;
-            try {
-                result = await resp.json();
-            } catch (parseErr) {
-                console.error("Failed to parse API response as JSON:", parseErr);
-                setTimeout(startIdentificationLoop, 3000);
-                return;
-            }
-            console.log("Identify result:", result);
-            
-            if (result.match) {
-                showIdentification(result.name);
-            } else {
-                setTimeout(startIdentificationLoop, 1000);
+            if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
+                const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                
+                if (detection) {
+                    const match = faceMatcher.findBestMatch(detection.descriptor);
+                    if (match.label !== 'unknown' && match.distance <= threshold) {
+                        showIdentification(match.label);
+                        isProcessing = false;
+                        return; // Wait for user action
+                    }
+                }
             }
         } catch (err) {
-            console.error("Identification error:", err);
-            setTimeout(startIdentificationLoop, 3000);
+            console.error("Identification loop error:", err);
         }
+        
+        isProcessing = false;
+        setTimeout(startIdentificationLoop, 500);
     }
 
     function showIdentification(name) {
@@ -276,8 +323,34 @@ permalink: /student/bathroom_pass
     function resetId() {
         identifiedPerson = null;
         document.getElementById('idOverlay').classList.add('hidden');
-        document.getElementById('scanLine').classList.remove('hidden');
-        startIdentificationLoop();
+        startCooldown();
+    }
+
+    function startCooldown() {
+        if (cooldownInterval) clearInterval(cooldownInterval);
+        cooldownRemaining = 5;
+        const overlay = document.getElementById('cooldownOverlay');
+        const timerText = document.getElementById('cooldownTimer');
+        const scanLine = document.getElementById('scanLine');
+        
+        if (!overlay || !timerText) return;
+        
+        overlay.classList.remove('hidden');
+        scanLine.classList.add('hidden');
+        timerText.textContent = cooldownRemaining;
+        
+        const interval = setInterval(() => {
+            cooldownRemaining--;
+            if (cooldownRemaining <= 0) {
+                clearInterval(interval);
+                cooldownInterval = null;
+                overlay.classList.add('hidden');
+                scanLine.classList.remove('hidden');
+                startIdentificationLoop();
+            } else {
+                timerText.textContent = cooldownRemaining;
+            }
+        }, 1000);
     }
 
     async function confirmIdentity() {
@@ -331,32 +404,8 @@ permalink: /student/bathroom_pass
     }
 
     function updateQueueUI(data) {
-        document.getElementById('currentAway').textContent = data.away;
-        document.getElementById('maxCapacity').textContent = data.maxOccupancy;
-        
         const list = document.getElementById('queueList');
         const total = document.getElementById('queueTotal');
-        const indicator = document.getElementById('statusIndicator');
-        const dot = indicator.querySelector('div');
-        const statusText = indicator.querySelector('span');
-
-        if (data.away >= data.maxOccupancy) {
-            indicator.classList.remove('bg-green-500/10', 'border-green-500/20');
-            indicator.classList.add('bg-red-500/10', 'border-red-500/20');
-            dot.classList.remove('bg-green-500');
-            dot.classList.add('bg-red-500');
-            statusText.textContent = "Full";
-            statusText.classList.remove('text-green-500');
-            statusText.classList.add('text-red-500');
-        } else {
-            indicator.classList.remove('bg-red-500/10', 'border-red-500/20');
-            indicator.classList.add('bg-green-500/10', 'border-green-500/20');
-            dot.classList.remove('bg-red-500');
-            dot.classList.add('bg-green-500');
-            statusText.textContent = "Available";
-            statusText.classList.remove('text-red-500');
-            statusText.classList.add('text-green-500');
-        }
 
         if (!data.peopleQueue) {
             list.innerHTML = `<p class="text-neutral-500 text-center py-8">Queue is empty</p>`;
@@ -485,8 +534,31 @@ permalink: /student/bathroom_pass
     window.emergencyCheckIn = emergencyCheckIn;
     window.emergencyCheckOut = emergencyCheckOut;
 
+    // Attach event listeners to buttons
+    document.getElementById('initScannerBtn')?.addEventListener('click', startScanning);
+    document.getElementById('confirmIdBtn')?.addEventListener('click', confirmIdentity);
+    document.getElementById('notMeBtn')?.addEventListener('click', resetId);
+    document.getElementById('emergencyCheckInBtn')?.addEventListener('click', emergencyCheckIn);
+    document.getElementById('emergencyCheckOutBtn')?.addEventListener('click', emergencyCheckOut);
+
+    // Auto-reload at midnight to fetch new facial registrations
+    function scheduleMidnightReload() {
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+        const msUntilMidnight = tomorrow.getTime() - now.getTime();
+        
+        setTimeout(() => {
+            window.location.reload(true);
+        }, msUntilMidnight);
+    }
+
     // Polling for queue updates
     initializeCurrentUser();
     setInterval(refreshQueue, 5000);
-    document.addEventListener('DOMContentLoaded', refreshQueue);
+    scheduleMidnightReload();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        refreshQueue();
+        loadFaceData();
+    });
 </script>
