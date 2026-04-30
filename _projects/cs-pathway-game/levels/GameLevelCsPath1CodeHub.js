@@ -1079,6 +1079,341 @@ function openDatavizPanel(gameControl) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Space Invaders — question banks (one per terminal) ───────────────────────
+const LESSON_QUESTIONS = {
+  frontend: [
+    { q: 'Which language gives a web page STRUCTURE?',     ans: 'HTML',                     wrong: ['CSS', 'JavaScript', 'Python'] },
+    { q: 'CSS stands for…?',                               ans: 'Cascading Style Sheets',    wrong: ['Creative Style System', 'Coded Style Syntax', 'Content Style Script'] },
+    { q: 'Which format converts plain text → HTML?',       ans: 'Markdown',                  wrong: ['TypeScript', 'Sass', 'Tailwind'] },
+    { q: 'CSS property for flexible row/column layout?',   ans: 'display: flex',             wrong: ['float: left', 'position: fixed', 'display: block'] },
+    { q: 'HTML stands for…?',                              ans: 'HyperText Markup Language', wrong: ['High Text Markup Language', 'HyperText Making Language', 'High Transfer Markup Link'] },
+  ],
+  backend: [
+    { q: 'HTTP method that CREATES a new resource?',       ans: 'POST',                      wrong: ['GET', 'PUT', 'DELETE'] },
+    { q: 'HTTP method that READS data?',                   ans: 'GET',                       wrong: ['POST', 'PUT', 'PATCH'] },
+    { q: 'HTTP method that REMOVES a resource?',           ans: 'DELETE',                    wrong: ['GET', 'REMOVE', 'DROP'] },
+    { q: 'ORM stands for…?',                               ans: 'Object Relational Mapping', wrong: ['Open REST Method', 'Output Response Model', 'Object Request Manager'] },
+    { q: 'CRUD stands for…?',                              ans: 'Create Read Update Delete', wrong: ['Copy Run Undo Deploy', 'Code Route Use Debug', 'Commit Read Undo Drop'] },
+  ],
+  dataviz: [
+    { q: 'Spring annotation for a REST controller?',       ans: '@RestController',                wrong: ['@Service', '@Component', '@Repository'] },
+    { q: 'JPA annotation that marks the primary key?',     ans: '@Id',                            wrong: ['@Primary', '@Key', '@PrimaryKey'] },
+    { q: 'JPQL stands for…?',                              ans: 'Java Persistence Query Language', wrong: ['Java Primary Query Layer', 'Java Package Query Logic', 'Java Persistence Quick Layer'] },
+    { q: 'Query param to paginate API results?',           ans: 'page=1&size=4',                  wrong: ['limit=4&offset=1', 'results=4&index=1', 'count=4&start=1'] },
+    { q: 'Spring JPA method to filter by minimum size?',   ans: 'findBySizeGreaterThan',           wrong: ['findWhereSize', 'querySizeAbove', 'getSizeMore'] },
+  ],
+};
+
+// ── Space Invaders game panel ─────────────────────────────────────────────────
+// Rules:
+//   • Shoot WRONG answer enemies  → +points
+//   • Let the CORRECT answer pass → +50 bonus
+//   • Shoot the CORRECT enemy     → −1 life
+//   • A WRONG enemy reaches you   → −1 life
+//   • 5 lives · score + per-lesson high score persisted in localStorage
+function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
+  const label = { frontend: 'Frontend', backend: 'Backend', dataviz: 'Dataviz' }[lessonKey];
+  const body  = createPanel(`🎮 ${label} — Space Invaders Challenge`, accentColor, gameControl);
+
+  const CW = 660, CH = 460;
+  const questions = LESSON_QUESTIONS[lessonKey];
+  const HI_KEY    = `si-hi-${lessonKey}`;
+
+  body.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                margin-bottom:8px;font-size:12px;">
+      <span style="color:#64748b;">
+        Shoot <span style="color:#f87171;font-weight:700;">WRONG</span> answers ·
+        Let the <span style="color:#86efac;font-weight:700;">CORRECT</span> answer pass
+      </span>
+      <div style="display:flex;gap:14px;font-size:13px;font-weight:700;">
+        <span id="si-lives"></span>
+        <span style="color:${accentColor};">Score:&nbsp;<span id="si-score">0</span></span>
+        <span style="color:#fbbf24;">Best:&nbsp;<span id="si-hi">${parseInt(localStorage.getItem(HI_KEY)) || 0}</span></span>
+      </div>
+    </div>
+    <canvas id="si-canvas" width="${CW}" height="${CH}"
+      style="display:block;width:100%;border-radius:10px;background:#060d1a;
+             border:1px solid ${accentColor}33;"></canvas>
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                margin-top:8px;font-size:11px;color:#475569;">
+      <span>← → / A D &nbsp;move &nbsp;·&nbsp; SPACE &nbsp;shoot</span>
+      <button id="si-restart"
+        style="background:${accentColor}22;border:1px solid ${accentColor}55;border-radius:6px;
+               color:${accentColor};padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;">
+        ↺ Restart</button>
+    </div>`;
+
+  const canvas = document.getElementById('si-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  /* ── state ── */
+  let lives = 5, score = 0, hi = parseInt(localStorage.getItem(HI_KEY)) || 0;
+  let qIdx  = 0;
+  let enemies = [], bullets = [], particles = [];
+  let player  = { x: CW / 2, speed: 290 };
+  const PY    = CH - 28;                // player Y
+  let keys    = {}, lastShot = 0;
+  let gameState = 'playing';
+  let toast     = { text: '', color: '#fff', alpha: 0 };
+
+  /* ── helpers ── */
+  const shuffled = arr => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const updateHUD = () => {
+    document.getElementById('si-lives').textContent = '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, 5 - lives));
+    document.getElementById('si-score').textContent = score;
+    document.getElementById('si-hi').textContent    = hi;
+  };
+
+  const showToast = (text, color) => { toast = { text, color, alpha: 1 }; };
+
+  const spawnParticles = (x, y, color, n = 12) => {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, s = 60 + Math.random() * 180;
+      particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+                       life: 0.55, maxLife: 0.55, size: 2 + Math.random() * 4, color });
+    }
+  };
+
+  const spawnWave = () => {
+    const q    = questions[qIdx];
+    const opts = shuffled([{ text: q.ans, correct: true }, ...q.wrong.map(w => ({ text: w, correct: false }))]);
+    const colW = CW / 4;
+    enemies = opts.map((opt, i) => ({
+      x: colW * i + colW / 2, y: -64,
+      w: colW - 14,           h: 46,
+      text: opt.text, correct: opt.correct,
+      vy: 52 + qIdx * 7,       // faster each wave
+      alive: true, passed: false,
+    }));
+  };
+
+  /* ── input — stopPropagation keeps the game-engine player frozen ── */
+  const onKeyDown = e => {
+    keys[e.code] = true;
+    if (['Space','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.code)) e.preventDefault();
+    e.stopPropagation();
+  };
+  const onKeyUp = e => { keys[e.code] = false; e.stopPropagation(); };
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('keyup',   onKeyUp);
+
+  /* ── loop ── */
+  let raf, lastTs = 0;
+
+  const loop = ts => {
+    if (!document.getElementById('si-canvas')) {       // panel removed externally
+      cancelAnimationFrame(raf);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup',   onKeyUp);
+      return;
+    }
+    raf = requestAnimationFrame(loop);
+    const dt = Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+
+    if (gameState === 'playing') {
+      if (keys['ArrowLeft']  || keys['KeyA']) player.x = Math.max(22,      player.x - player.speed * dt);
+      if (keys['ArrowRight'] || keys['KeyD']) player.x = Math.min(CW - 22, player.x + player.speed * dt);
+
+      if (keys['Space'] && ts - lastShot > 260) {
+        lastShot = ts;
+        bullets.push({ x: player.x, y: PY - 18 });
+      }
+
+      bullets.forEach(b => { b.y -= 560 * dt; });
+      bullets = bullets.filter(b => b.y > -10);
+
+      enemies.forEach(e => {
+        if (!e.alive || e.passed) return;
+        e.y += e.vy * dt;
+
+        /* bullet collision */
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          const b = bullets[i];
+          if (b.x >= e.x - e.w / 2 && b.x <= e.x + e.w / 2 &&
+              b.y >= e.y && b.y <= e.y + e.h) {
+            bullets.splice(i, 1);
+            e.alive = false;
+            if (e.correct) {
+              lives = Math.max(0, lives - 1);
+              showToast('❌ That was the right answer! −1 ❤️', '#f87171');
+              spawnParticles(e.x, e.y + 23, '#f87171');
+            } else {
+              const pts = 100 + qIdx * 10;
+              score += pts; hi = Math.max(hi, score);
+              localStorage.setItem(HI_KEY, hi);
+              showToast(`✓ +${pts}`, '#86efac');
+              spawnParticles(e.x, e.y + 23, '#86efac');
+            }
+            updateHUD();
+            if (lives <= 0) gameState = 'lose';
+            break;
+          }
+        }
+
+        /* enemy exits bottom */
+        if (e.y > CH + 24) {
+          e.passed = true;
+          if (!e.correct) {
+            lives = Math.max(0, lives - 1);
+            showToast('💥 Wrong answer got through! −1 ❤️', '#f87171');
+            spawnParticles(player.x, PY, '#f87171', 8);
+          } else {
+            score += 50; hi = Math.max(hi, score);
+            localStorage.setItem(HI_KEY, hi);
+            showToast('✓ Correct answer passed! +50', '#86efac');
+          }
+          updateHUD();
+          if (lives <= 0) gameState = 'lose';
+        }
+      });
+
+      if (enemies.every(e => !e.alive || e.passed)) {
+        qIdx++;
+        if (qIdx >= questions.length) gameState = 'win';
+        else spawnWave();
+      }
+    }
+
+    particles.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; });
+    particles = particles.filter(p => p.life > 0);
+    if (toast.alpha > 0) toast.alpha = Math.max(0, toast.alpha - dt * 1.1);
+
+    draw();
+  };
+
+  /* ── draw ── */
+  const draw = () => {
+    ctx.fillStyle = '#060d1a';
+    ctx.fillRect(0, 0, CW, CH);
+
+    /* scrolling stars */
+    const t = Date.now();
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    for (let i = 0; i < 75; i++)
+      ctx.fillRect((i * 137.5 + 11) % CW, ((i * 97.3 + t * 0.009) % CH + CH) % CH, 1, 1);
+
+    /* question */
+    if (gameState === 'playing' && qIdx < questions.length) {
+      ctx.save();
+      ctx.fillStyle = accentColor; ctx.font = 'bold 13px system-ui, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(`Q${qIdx + 1}/${questions.length}: ${questions[qIdx].q}`, CW / 2, 22);
+      ctx.restore();
+    }
+
+    /* ground line */
+    ctx.save();
+    ctx.strokeStyle = accentColor + '44'; ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+    ctx.beginPath(); ctx.moveTo(0, CH - 22); ctx.lineTo(CW, CH - 22); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+
+    /* player ship */
+    ctx.save();
+    ctx.fillStyle = accentColor; ctx.shadowColor = accentColor; ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.moveTo(player.x,      PY - 16);
+    ctx.lineTo(player.x - 20, PY + 8);
+    ctx.lineTo(player.x - 8,  PY + 2);
+    ctx.lineTo(player.x,      PY + 6);
+    ctx.lineTo(player.x + 8,  PY + 2);
+    ctx.lineTo(player.x + 20, PY + 8);
+    ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0; ctx.restore();
+
+    /* bullets */
+    ctx.save();
+    ctx.fillStyle = '#fff'; ctx.shadowColor = accentColor; ctx.shadowBlur = 8;
+    bullets.forEach(b => ctx.fillRect(b.x - 2, b.y - 10, 4, 10));
+    ctx.shadowBlur = 0; ctx.restore();
+
+    /* enemies — all same neutral colour so the label carries the information */
+    enemies.forEach(e => {
+      if (!e.alive || e.passed) return;
+      ctx.save();
+      ctx.fillStyle = 'rgba(18,28,54,0.94)'; ctx.strokeStyle = accentColor + '66'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(e.x - e.w / 2, e.y, e.w, e.h, 8); ctx.fill(); ctx.stroke();
+
+      /* robot face */
+      const fx = e.x, fy = e.y + 5;
+      ctx.fillStyle = accentColor + 'bb'; ctx.fillRect(fx - 7, fy, 14, 10);
+      ctx.fillStyle = '#060d1a';          ctx.fillRect(fx - 5, fy + 2, 3, 4); ctx.fillRect(fx + 2, fy + 2, 3, 4);
+      ctx.fillStyle = accentColor + '77'; ctx.fillRect(fx - 3, fy + 7, 6, 2);
+
+      /* answer label */
+      ctx.fillStyle = '#e2e8f0'; ctx.font = `bold ${Math.min(11, Math.floor(e.w / 9))}px system-ui, sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      let txt = e.text;
+      while (ctx.measureText(txt).width > e.w - 10 && txt.length > 4) txt = txt.slice(0, -2) + '…';
+      ctx.fillText(txt, e.x, e.y + e.h - 4);
+      ctx.restore();
+    });
+
+    /* particles */
+    ctx.save();
+    particles.forEach(p => {
+      ctx.globalAlpha = p.life / p.maxLife; ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (p.life / p.maxLife), 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1; ctx.restore();
+
+    /* toast */
+    if (toast.alpha > 0) {
+      ctx.save(); ctx.globalAlpha = toast.alpha;
+      ctx.font = 'bold 17px system-ui, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = toast.color; ctx.shadowColor = toast.color; ctx.shadowBlur = 12;
+      ctx.fillText(toast.text, CW / 2, CH * 0.42);
+      ctx.shadowBlur = 0; ctx.restore();
+    }
+
+    /* end screen */
+    if (gameState === 'win' || gameState === 'lose') {
+      ctx.save();
+      ctx.fillStyle = 'rgba(4,8,20,0.88)'; ctx.fillRect(0, 0, CW, CH);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = gameState === 'win' ? '#86efac' : '#f87171';
+      ctx.font = 'bold 34px system-ui';
+      ctx.fillText(gameState === 'win' ? '🏆 You Win!' : '💀 Game Over', CW / 2, CH / 2 - 44);
+      ctx.font = '15px system-ui'; ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`Score: ${score}   ·   Best: ${hi}`, CW / 2, CH / 2);
+      ctx.font = '12px system-ui'; ctx.fillStyle = '#475569';
+      ctx.fillText('Press ↺ Restart or close the panel', CW / 2, CH / 2 + 36);
+      ctx.restore();
+    }
+  };
+
+  /* ── init ── */
+  spawnWave(); updateHUD();
+  raf = requestAnimationFrame(loop);
+
+  document.getElementById('si-restart').onclick = () => {
+    lives = 5; score = 0; qIdx = 0;
+    enemies = []; bullets = []; particles = [];
+    player.x = CW / 2; gameState = 'playing';
+    toast = { text: '', color: '#fff', alpha: 0 };
+    spawnWave(); updateHUD();
+  };
+
+  /* override close so RAF + listeners are cleaned up first */
+  const panelEl  = document.getElementById('code-hub-panel');
+  const closeBtn = document.getElementById('panel-close');
+  closeBtn.onclick = () => {
+    cancelAnimationFrame(raf);
+    window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('keyup',   onKeyUp);
+    panelEl.remove();
+    gameControl?.resume?.();
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 
 /**
  * GameLevel — Code Hub
@@ -1223,6 +1558,14 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
               openFrontendPanel(this.gameEnv.gameControl);
             },
           },
+          {
+            text:    '🎮 Play Game',
+            primary: false,
+            action:  () => {
+              this.dialogueSystem.closeDialogue();
+              openSpaceInvadersGame('frontend', '#4caef0', this.gameEnv.gameControl);
+            },
+          },
         ]);
       },
     };
@@ -1259,6 +1602,14 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
               openBackendPanel(this.gameEnv.gameControl);
             },
           },
+          {
+            text:    '🎮 Play Game',
+            primary: false,
+            action:  () => {
+              this.dialogueSystem.closeDialogue();
+              openSpaceInvadersGame('backend', '#86efac', this.gameEnv.gameControl);
+            },
+          },
         ]);
       },
     };
@@ -1293,6 +1644,14 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             action:  () => {
               this.dialogueSystem.closeDialogue();
               openDatavizPanel(this.gameEnv.gameControl);
+            },
+          },
+          {
+            text:    '🎮 Play Game',
+            primary: false,
+            action:  () => {
+              this.dialogueSystem.closeDialogue();
+              openSpaceInvadersGame('dataviz', '#c084fc', this.gameEnv.gameControl);
             },
           },
         ]);
