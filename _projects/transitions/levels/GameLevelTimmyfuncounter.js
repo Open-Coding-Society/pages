@@ -12,7 +12,7 @@ class GameLevelTimmyfuncounter {
 
         const bgData = {
             name: "custom_bg",
-            src: path + "/images/gamebuilder/bg/TimmyFrameBg.png",
+            src: path + "/images/gamebuilder/bg/blackandwhite.jpg",
             pixels: { height: 720, width: 1280 }
         };
 
