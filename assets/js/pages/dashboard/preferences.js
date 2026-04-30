@@ -542,6 +542,7 @@ export class NodCursorCalibrationManager {
         status: null
     };
 
+    /** Provides the fallback calibration matrix centered optimally. */
     static _defaultCalibration() {
         return {
             centerX: 0.5,
@@ -554,6 +555,7 @@ export class NodCursorCalibrationManager {
         };
     }
 
+    /** Ensure input data remains within bounded numeric range to prevent mapping errors. */
     static _sanitize(data) {
         const d = NodCursorCalibrationManager._defaultCalibration();
         const num = (v, fallback) => {
@@ -572,23 +574,27 @@ export class NodCursorCalibrationManager {
         };
     }
 
+    /** Converts standard and undefined user ids to a consistent string identifier. */
     static _normalizeUserId(value) {
         if (value === null || value === undefined) return null;
         const normalized = String(value).trim();
         return normalized ? normalized : null;
     }
 
+    /** Bootstraps the calibration state and attaches the status UI element. */
     static init(statusRef) {
         NodCursorCalibrationManager.refs.status = statusRef || null;
         NodCursorCalibrationManager.loadLocal();
     }
 
+    /** Renders feedback messages to the UI panel during the calibration process. */
     static setStatus(message, isError = false) {
         if (!NodCursorCalibrationManager.refs.status) return;
         NodCursorCalibrationManager.refs.status.textContent = message;
         NodCursorCalibrationManager.refs.status.style.color = isError ? '#f87171' : '';
     }
 
+    /** Retrieves previously saved local calibration data or falls back to defaults. */
     static loadLocal() {
         try {
             const raw = localStorage.getItem(NodCursorCalibrationManager.STORAGE_KEY);
@@ -605,6 +611,7 @@ export class NodCursorCalibrationManager {
         }
     }
 
+    /** Commits current calibration bounds into the browser storage. */
     static saveLocal() {
         try {
             localStorage.setItem(NodCursorCalibrationManager.STORAGE_KEY, JSON.stringify(NodCursorCalibrationManager.data));
@@ -613,6 +620,7 @@ export class NodCursorCalibrationManager {
         }
     }
 
+    /** Records a specific extremum point for generating spatial movement bounds. */
     static capture(point, rawX, rawY) {
         if (!Number.isFinite(rawX) || !Number.isFinite(rawY)) {
             NodCursorCalibrationManager.setStatus('No face landmark found. Keep your face in frame and try again.', true);
@@ -644,12 +652,14 @@ export class NodCursorCalibrationManager {
         return true;
     }
 
+    /** Wipes existing tracking bounds to factory standards. */
     static reset() {
         NodCursorCalibrationManager.data = NodCursorCalibrationManager._defaultCalibration();
         NodCursorCalibrationManager.saveLocal();
         NodCursorCalibrationManager.setStatus('Calibration reset to defaults.');
     }
 
+    /** Translates raw webcam coordinate points into normalized screen viewport bounds. */
     static mapRawToViewport(rawX, rawY) {
         const x = Math.max(0, Math.min(1, rawX));
         const y = Math.max(0, Math.min(1, rawY));
@@ -674,6 +684,7 @@ export class NodCursorCalibrationManager {
         };
     }
 
+    /** Fetches the active authenticated user ID via the backend profile endpoint. */
     static async _getCurrentUserId() {
         if (!PreferencesAPI.javaURI || !PreferencesAPI.fetchOptions) return null;
         const res = await fetch(`${PreferencesAPI.javaURI}/api/person/get`, PreferencesAPI.fetchOptions);
@@ -684,6 +695,7 @@ export class NodCursorCalibrationManager {
         );
     }
 
+    /** Persists visual calibration matrix over the network for authenticated accounts. */
     static async saveToBackend() {
         try {
             const userId = NodCursorCalibrationManager._normalizeUserId(await NodCursorCalibrationManager._getCurrentUserId());
@@ -718,6 +730,7 @@ export class NodCursorCalibrationManager {
         }
     }
 
+    /** Syncs remote calibration payload down to the active device. */
     static async loadFromBackend() {
         try {
             const userId = NodCursorCalibrationManager._normalizeUserId(await NodCursorCalibrationManager._getCurrentUserId());
@@ -808,6 +821,7 @@ export class NodCursorController {
         lastClickAt: 0
     };
 
+        /** Binds UI elements and initializes the tracking environment. */
     static init() {
         NodCursorController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
         NodCursorController.refs.toggleTrack = document.getElementById('head-tracking-toggle-track');
@@ -879,6 +893,7 @@ export class NodCursorController {
         });
     }
 
+        /** Activates or suspends the camera stream and processing loop based on user toggle. */
     static async setEnabled(enabled) {
         NodCursorController.state.enabled = !!enabled;
         NodCursorController._saveState();
@@ -897,6 +912,7 @@ export class NodCursorController {
         await NodCursorController._startTracking();
     }
 
+        /** Hydrates tracking configuration from local storage. */
     static _loadState() {
         try {
             const raw = localStorage.getItem(NodCursorController.STORAGE_KEY);
@@ -912,6 +928,7 @@ export class NodCursorController {
         }
     }
 
+        /** Serializes the active tracking properties into local storage. */
     static _saveState() {
         try {
             localStorage.setItem(NodCursorController.STORAGE_KEY, JSON.stringify(NodCursorController.state));
@@ -920,11 +937,13 @@ export class NodCursorController {
         }
     }
 
+        /** Synchronizes the visual numeric label for hardware sensitivity tweaks. */
     static _updateSensitivityLabel() {
         if (!NodCursorController.refs.sensitivityLabel) return;
         NodCursorController.refs.sensitivityLabel.textContent = NodCursorController.state.sensitivity.toFixed(2);
     }
 
+        /** Emits a temporary informational notification into the tracking UI panel. */
     static _setStatus(message, isError = false) {
         if (!NodCursorController.refs.status) return;
         NodCursorController.refs.status.textContent = message;
