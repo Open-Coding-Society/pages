@@ -1,4 +1,4 @@
-import Enemy from '/assets/js/GameEnginev1.1/essentials/Enemy.js';
+import Enemy from '@assets/js/GameEnginev1.1/essentials/Enemy.js';
 
 class PeppaBossEnemy extends Enemy {
     constructor(data = null, gameEnv = null) {
