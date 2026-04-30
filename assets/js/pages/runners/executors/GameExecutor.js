@@ -291,33 +291,33 @@ export class GameExecutor {
         this.gameControl = this.gameCore?.gameControl || null;
 
         // Resolve the best level to restore to:
-        // 1. If the preserved class exists in the new level array, use its index there.
-        // 2. Otherwise (it was a dynamically-spliced level like Code Hub) fall back
-        //    to the last level in the permanent array that comes before it, so the
-        //    player lands at Wayfinding World / the hub rather than an unrelated level.
+        // 1. If the preserved class exists in the permanent array, use its index there.
+        // 2. If it was a dynamically-spliced level (e.g. Code Hub inserted by Wayfinding
+        //    World at runtime), re-splice it back into levelClasses at its original
+        //    position so the player returns exactly to that level after fullscreen toggle.
         let resolvedLevelIndex = preservedLevelIndex;
         if (preservedLevelClass && Array.isArray(gameLevelClasses)) {
           const classIndex = gameLevelClasses.indexOf(preservedLevelClass);
           if (classIndex >= 0) {
             // Class found in the permanent array — restore directly.
             resolvedLevelIndex = classIndex;
-          } else if (Number.isInteger(preservedLevelIndex)) {
-            // Dynamic level: clamp to the last valid index so we don't overshoot
-            // into an unrelated level (e.g. Mission Tools instead of Code Hub).
-            resolvedLevelIndex = Math.min(preservedLevelIndex, gameLevelClasses.length - 1);
+          } else if (Number.isInteger(preservedLevelIndex) && this.gameControl?.levelClasses) {
+            // Dynamic level: re-splice the class back at its original position.
+            // preservedLevelIndex is the index it held inside the runtime levelClasses
+            // array (e.g. 2 for Code Hub after Wayfinding World spliced it in).
+            const insertAt = Math.min(preservedLevelIndex, this.gameControl.levelClasses.length);
+            this.gameControl.levelClasses.splice(insertAt, 0, preservedLevelClass);
+            resolvedLevelIndex = insertAt;
           }
         }
 
         if (
           Number.isInteger(resolvedLevelIndex) &&
           this.gameControl &&
-          Array.isArray(gameLevelClasses) &&
-          preservedLevelIndex >= 0 &&
-          preservedLevelIndex < gameLevelClasses.length &&
-          preservedLevelIndex !== this.gameControl.currentLevelIndex &&
+          resolvedLevelIndex !== this.gameControl.currentLevelIndex &&
           typeof this.gameControl.transitionToLevel === 'function'
         ) {
-          this.gameControl.currentLevelIndex = preservedLevelIndex;
+          this.gameControl.currentLevelIndex = resolvedLevelIndex;
           this.gameControl.transitionToLevel();
         }
 
