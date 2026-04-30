@@ -1,5 +1,5 @@
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Barrier from '/assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 
 class PlatformerPlayer extends Player {
 	constructor(data = null, gameEnv = null) {
