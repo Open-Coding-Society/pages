@@ -14,6 +14,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1/essentials/GameEnvBackgro
 import Player from '@assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1/essentials/Barrier.js';
+import Enemy from '@assets/js/GameEnginev1/essentials/Enemy.js';
 
 class GameLevelCollisionMechanicsLessonLevel {
     constructor(gameEnv) {
@@ -93,13 +94,12 @@ class GameLevelCollisionMechanicsLessonLevel {
             reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
             interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
         };
-this.classes = [      { class: GameEnvBackground, data: bgData },
-      { class: Player, data: playerData },
-      { class: Npc, data: npcData1 },
-      { class: Npc, data: npcData2 }
-];
-
-        
+        this.classes = [      
+            { class: GameEnvBackground, data: bgData },
+            { class: Player, data: playerData },
+            { class: Enemy, data: npcData1 },
+            { class: Enemy, data: npcData2 }
+        ];
     }
 }
 
