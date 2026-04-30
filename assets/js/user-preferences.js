@@ -1,14 +1,46 @@
 /**
- * Global site-wide theme preferences — SRP + Class-based architecture.
+ * Global site-wide theme preferences — Single-Responsibility, class-based architecture.
  *
- * Classes use standard get/set naming where applicable:
- *   ColorUtils        – Pure color math (hex→rgb, luminance, adjust)
- *   CSSInjector       – Builds and injects the override <style> block
- *   ThemeEngine        – Reads prefs → sets CSS custom properties + injects overrides
- *   LanguageManager    – Google Translate integration
- *   TTSManager         – TTS wrapper: get() settings, speak(), stop()
- *   PreferencesStore   – localStorage: get() reads stored prefs
- *   SitePreferences    – Orchestrator: wires everything together, exposes public API
+ * This script runs on EVERY page (loaded from the layout). It restores the
+ * user's saved theme/language/TTS settings before any interactive UI mounts,
+ * and exposes a small public API (`window.SitePreferences`) for the dashboard
+ * preferences panel and other pages to call into.
+ *
+ * Each class has exactly one job (SRP) so that bugs and feature changes
+ * stay isolated to a single area:
+ *
+ *   ColorUtils                      – Pure color math (hex → rgb, luminance, lighten/darken).
+ *                                     Stateless. Used to derive panel/border/muted colors
+ *                                     from the user's chosen background.
+ *
+ *   TailwindOverrideStyleSheetInjector         – Builds and injects a single <style> block that
+ *                                     overrides Tailwind utility classes (bg-neutral-800,
+ *                                     text-neutral-400, etc.) so the user's theme wins
+ *                                     without editing every component.
+ *
+ *   ThemePreferencesEngine          – Reads a preferences object and applies it to the page:
+ *                                     sets CSS custom properties on <html>, derives panel
+ *                                     colors via ColorUtils, and calls the injector.
+ *                                     Also handles language application via TranslationLanguageManager.
+ *
+ *   TranslationLanguageManager      – Google Translate integration: sets googtrans cookies,
+ *                                     loads the Translate widget script, and toggles between
+ *                                     translated / original page state.
+ *
+ *   TextToSpeechManager             – Wrapper around the browser SpeechSynthesis API.
+ *                                     Reads voice/rate/pitch/volume from saved prefs.
+ *
+ *   LocalStoragePreferencesStore    – Read-only adapter over localStorage. Returns the
+ *                                     preferences object stored under 'sitePreferences'.
+ *                                     (The dashboard module owns writes; this file only reads.)
+ *
+ *   GlobalHeadTracking              – Optional accessibility feature: uses MediaPipe + webcam
+ *                                     to drive the cursor with head movement on non-dashboard
+ *                                     pages (the dashboard owns its own toggle UI).
+ *
+ *   SitePreferences (window global) – Public API surface. Thin facade that delegates to the
+ *                                     classes above. Consumed by dashboard.html and any page
+ *                                     that needs to apply / reset / translate / speak.
  */
 (function () {
 
@@ -128,7 +160,7 @@
   // ============================================
   // RESPONSIBILITY: Build & inject override CSS
   // ============================================
-  class CSSInjector {
+  class TailwindOverrideStyleSheetInjector {
     static STYLE_ID = 'user-theme-override-css';
 
     /**
@@ -139,10 +171,10 @@
       const { bg, text, font, size, accent, panel, uiBorder, textMuted,
               selectionColor, buttonStyle } = opts;
 
-      let style = document.getElementById(CSSInjector.STYLE_ID);
+      let style = document.getElementById(TailwindOverrideStyleSheetInjector.STYLE_ID);
       if (!style) {
         style = document.createElement('style');
-        style.id = CSSInjector.STYLE_ID;
+        style.id = TailwindOverrideStyleSheetInjector.STYLE_ID;
         document.head.appendChild(style);
       }
 
@@ -284,7 +316,7 @@
 
     /** Remove the injected override <style> element */
     static remove() {
-      const el = document.getElementById(CSSInjector.STYLE_ID);
+      const el = document.getElementById(TailwindOverrideStyleSheetInjector.STYLE_ID);
       if (el) el.remove();
     }
   }
@@ -292,7 +324,7 @@
   // ============================================
   // RESPONSIBILITY: Map prefs → CSS custom props
   // ============================================
-  class ThemeEngine {
+  class ThemePreferencesEngine {
     /**
      * Apply a preferences object to the document via CSS custom properties,
      * priority-color tokens, and the override stylesheet.
@@ -364,21 +396,21 @@
       root.classList.add('user-theme-active');
 
       // Inject Tailwind override stylesheet
-      CSSInjector.inject({
+      TailwindOverrideStyleSheetInjector.inject({
         bg, text, font, size, accent, panel, uiBorder, textMuted,
         selectionColor, buttonStyle,
       });
 
       // Apply language translation if set
       const lang = prefs?.language || '';
-      LanguageManager.apply(lang);
+      TranslationLanguageManager.apply(lang);
     }
 
     /** Remove all user-theme CSS custom properties and the override sheet */
     static reset() {
       const root = document.documentElement;
       root.classList.remove('user-theme-active');
-      CSSInjector.remove();
+      TailwindOverrideStyleSheetInjector.remove();
 
       const props = [
         '--pref-bg-color', '--pref-text-color', '--pref-font-family',
@@ -395,7 +427,7 @@
   // ============================================
   // RESPONSIBILITY: Google Translate integration
   // ============================================
-  class LanguageManager {
+  class TranslationLanguageManager {
     /** Inject the CSS that hides the Google Translate toolbar */
     static _injectHideCSS() {
       if (document.getElementById('google-translate-hide-css')) return;
@@ -422,7 +454,7 @@
 
     /** Attempt to revert Google Translate to the original page language */
     static _removeTranslation() {
-      LanguageManager.clearCookies();
+      TranslationLanguageManager.clearCookies();
 
       const select = document.querySelector('.goog-te-combo');
       if (select) {
@@ -452,11 +484,11 @@
      */
     static apply(langCode) {
       document.documentElement.setAttribute('data-translate-lang', langCode);
-      LanguageManager._injectHideCSS();
-      LanguageManager.clearCookies();
+      TranslationLanguageManager._injectHideCSS();
+      TranslationLanguageManager.clearCookies();
 
       if (!langCode) {
-        LanguageManager._removeTranslation();
+        TranslationLanguageManager._removeTranslation();
         return;
       }
 
@@ -511,10 +543,10 @@
   // ============================================
   // RESPONSIBILITY: Text-to-Speech wrapper
   // ============================================
-  class TTSManager {
+  class TextToSpeechManager {
     /** Get TTS settings from stored preferences */
     static get() {
-      const prefs = PreferencesStore.get() || {};
+      const prefs = LocalStoragePreferencesStore.get() || {};
       return {
         voice: prefs.ttsVoice || '',
         rate: parseFloat(prefs.ttsRate) || 1,
@@ -531,7 +563,7 @@
       }
       speechSynthesis.cancel();
 
-      const settings = TTSManager.get();
+      const settings = TextToSpeechManager.get();
       const utterance = new SpeechSynthesisUtterance(text);
 
       const voiceName = options.voice || settings.voice;
@@ -552,7 +584,7 @@
     static speakSelection() {
       const sel = window.getSelection();
       const text = sel ? sel.toString().trim() : '';
-      if (text) { TTSManager.speak(text); return true; }
+      if (text) { TextToSpeechManager.speak(text); return true; }
       return false;
     }
 
@@ -570,13 +602,13 @@
   // ============================================
   // RESPONSIBILITY: localStorage read / write
   // ============================================
-  class PreferencesStore {
+  class LocalStoragePreferencesStore {
     static KEY = 'sitePreferences';
 
     /** Get preferences from localStorage (returns object or null) */
     static get() {
       try {
-        const raw = window.localStorage.getItem(PreferencesStore.KEY);
+        const raw = window.localStorage.getItem(LocalStoragePreferencesStore.KEY);
         if (!raw) return null;
         return JSON.parse(raw);
       } catch (e) {
@@ -871,38 +903,91 @@
     }
   }
 
-  // ============================================
-  // ORCHESTRATOR: Wires classes, exposes public API, runs init
-  // ============================================
+  // ============================================================================
+  // ORCHESTRATOR
+  // ----------------------------------------------------------------------------
+  // Wires the SRP classes above into a single bootstrap (`init`) and exposes a
+  // small, stable public API on `window.SitePreferences`. Everything below this
+  // line is the only code that runs eagerly when the script loads on each page.
+  // ============================================================================
+
+  /**
+   * Page bootstrap. Runs once per page load, as early as possible (either
+   * immediately if the DOM is already parsed, or on `DOMContentLoaded`).
+   *
+   * Responsibilities:
+   *   1. Guard against non-browser environments (SSR / unit tests).
+   *   2. Honor the explicit "reset" sentinel — if the user clicked Reset on the
+   *      dashboard we leave the site at its built-in defaults and do nothing.
+   *   3. Read the saved preferences from localStorage and, if any exist, apply
+   *      them via ThemePreferencesEngine (sets CSS variables, injects override
+   *      stylesheet, switches Google Translate language).
+   *   4. Re-arm the optional global head-tracking feature on non-dashboard pages.
+   *      The dashboard owns its own toggle UI, so we skip there to avoid two
+   *      controllers fighting over the webcam stream.
+   */
   function init() {
+    // (1) Guard: bail out cleanly if loaded outside a browser (e.g. node tests).
     if (typeof window === 'undefined') return;
 
-    // If user explicitly reset, skip applying any prefs
+    // (2) Honor the dashboard's explicit "Reset to site defaults" action.
+    //     Set by the preferences panel; presence overrides any saved theme.
     const wasReset = window.localStorage.getItem('preferencesReset');
     if (wasReset === 'true') return;
 
-    const prefs = PreferencesStore.get();
-    if (prefs) ThemeEngine.apply(prefs);
+    // (3) Restore the user's saved theme (background, text color, font, accent,
+    //     selection color, button shape, language, etc.). No-op for guests.
+    const prefs = LocalStoragePreferencesStore.get();
+    if (prefs) ThemePreferencesEngine.apply(prefs);
 
-    // Keep head-tracking preference active on all non-dashboard pages.
+    // (4) Restart head-tracking on every navigation if the user has it enabled,
+    //     but only on pages that don't already render the dashboard's own toggle.
     GlobalHeadTracking.init();
   }
 
-  // Public API consumed by dashboard.html and other pages
+  // ----------------------------------------------------------------------------
+  // PUBLIC API — `window.SitePreferences`
+  // ----------------------------------------------------------------------------
+  // Stable facade that the dashboard preferences panel (and any other page)
+  // calls into. Keep these method names backwards-compatible: changing them
+  // requires updating every consumer (search the repo for "SitePreferences.").
+  // ----------------------------------------------------------------------------
   window.SitePreferences = {
-    applyPreferences: prefs => ThemeEngine.apply(prefs),
-    resetPreferences: () => ThemeEngine.reset(),
-    applyLanguage: langCode => LanguageManager.apply(langCode),
-    PRESETS,
-    LANGUAGES,
-    // TTS
-    speak: (text, opts) => TTSManager.speak(text, opts),
-    speakSelection: () => TTSManager.speakSelection(),
-    stopSpeaking: () => TTSManager.stop(),
-    isSpeaking: () => TTSManager.isSpeaking(),
-    getTTSSettings: () => TTSManager.get(),
+    // ── Theme application ──────────────────────────────────────────────────
+    /** Apply a full preferences object (live preview + persistent style). */
+    applyPreferences: prefs => ThemePreferencesEngine.apply(prefs),
+    /** Strip all user-theme CSS and revert to the site's built-in defaults. */
+    resetPreferences: () => ThemePreferencesEngine.reset(),
+
+    // ── Translation ────────────────────────────────────────────────────────
+    /** Switch the page language via Google Translate (empty string = English). */
+    applyLanguage: langCode => TranslationLanguageManager.apply(langCode),
+
+    // ── Read-only constants exposed for the dashboard's preset/lang menus ──
+    PRESETS,    // Built-in named themes (Site Default, Midnight, Light, ...)
+    LANGUAGES,  // Supported translation language codes for the dropdown.
+
+    // ── Text-to-Speech ─────────────────────────────────────────────────────
+    /** Speak arbitrary text using the user's saved TTS voice/rate/pitch. */
+    speak: (text, opts) => TextToSpeechManager.speak(text, opts),
+    /** Speak whatever text is currently highlighted on the page. */
+    speakSelection: () => TextToSpeechManager.speakSelection(),
+    /** Cancel any in-progress utterance immediately. */
+    stopSpeaking: () => TextToSpeechManager.stop(),
+    /** True while the browser is mid-utterance (useful for play/pause UI). */
+    isSpeaking: () => TextToSpeechManager.isSpeaking(),
+    /** Read the saved TTS settings (voice, rate, pitch, volume). */
+    getTTSSettings: () => TextToSpeechManager.get(),
   };
 
+  // ----------------------------------------------------------------------------
+  // BOOTSTRAP TRIGGER
+  // ----------------------------------------------------------------------------
+  // Run `init` as early as possible. If the DOM is already parsed (script was
+  // injected late, or `defer`/`async` finished after parsing) we run immediately
+  // so saved themes don't visibly "flash" in the default colors. Otherwise we
+  // wait for `DOMContentLoaded` so element queries inside init/Engine work.
+  // ----------------------------------------------------------------------------
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     init();
   } else {
