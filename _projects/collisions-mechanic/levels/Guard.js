@@ -4,11 +4,11 @@ import Player from '@assets/js/GameEnginev1/essentials/Player.js';
 class Guard extends Enemy {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
-        this.velocity.y = -3
+        this.velocity.y = -3 // Set an initial vertical velocity for the guard in the constructor. Because it is in the constructor, this velocity will be set as soon as the level starts.
     }
 
     /**
-     * Override the update method to handle collision detection and set a vertical velocity
+     * Override the update method to handle collision detection and update the vertical velocity
      */
     update() {
         // Update begins by drawing the object
@@ -22,7 +22,7 @@ class Guard extends Enemy {
             this.handleCollisionEvent();
         }
 
-        this.position.y += this.velocity.y;
+        this.position.y += this.velocity.y; // update position
 
         // Ensure the object stays within the canvas boundaries
         this.stayWithinCanvas();
@@ -30,6 +30,7 @@ class Guard extends Enemy {
 
     /**
      * stayWithinCanvas method ensures that the object stays within the boundaries of the canvas.
+     * With this override, we can also reverse the velocity whenever the guard hits the edges of the canvas.
      */
     stayWithinCanvas() {
         // Bottom of the canvas
