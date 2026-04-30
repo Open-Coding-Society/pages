@@ -587,9 +587,10 @@
   }
 
   // ============================================
-  // RESPONSIBILITY: Site-wide head-tracking runner
+  // RESPONSIBILITY: Site-wide head-tracking runner (GlobalNodCursor)
+  // Runs the NodCursor feature across all pages based on the user preferences.
   // ============================================
-  class GlobalHeadTracking {
+  class GlobalNodCursor {
     static STORAGE_KEY = 'headTrackingPreferences';
     static CALIBRATION_KEY = 'headTrackingCalibration';
     static state = {
@@ -618,27 +619,27 @@
       // Dashboard owns the toggle UI and tracking lifecycle there.
       if (document.getElementById('pref-head-tracking-enabled')) return;
 
-      GlobalHeadTracking._loadState();
-      GlobalHeadTracking._loadCalibration();
-      if (!GlobalHeadTracking.state.enabled) return;
+      GlobalNodCursor._loadState();
+      GlobalNodCursor._loadCalibration();
+      if (!GlobalNodCursor.state.enabled) return;
 
-      GlobalHeadTracking._createCursor();
-      GlobalHeadTracking._startTracking();
+      GlobalNodCursor._createCursor();
+      GlobalNodCursor._startTracking();
 
       window.addEventListener('beforeunload', () => {
-        GlobalHeadTracking._stopTracking();
+        GlobalNodCursor._stopTracking();
       });
     }
 
     static _loadState() {
       try {
-        const raw = localStorage.getItem(GlobalHeadTracking.STORAGE_KEY);
+        const raw = localStorage.getItem(GlobalNodCursor.STORAGE_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
-        GlobalHeadTracking.state.enabled = !!parsed.enabled;
+        GlobalNodCursor.state.enabled = !!parsed.enabled;
         const incomingSensitivity = Number(parsed.sensitivity);
         if (Number.isFinite(incomingSensitivity)) {
-          GlobalHeadTracking.state.sensitivity = Math.min(0.9, Math.max(0.1, incomingSensitivity));
+          GlobalNodCursor.state.sensitivity = Math.min(0.9, Math.max(0.1, incomingSensitivity));
         }
       } catch (e) {
         console.error('global head tracking load state error', e);
@@ -647,7 +648,7 @@
 
     static _saveState() {
       try {
-        localStorage.setItem(GlobalHeadTracking.STORAGE_KEY, JSON.stringify(GlobalHeadTracking.state));
+        localStorage.setItem(GlobalNodCursor.STORAGE_KEY, JSON.stringify(GlobalNodCursor.state));
       } catch (e) {
         console.error('global head tracking save state error', e);
       }
@@ -655,7 +656,7 @@
 
     static _loadCalibration() {
       try {
-        const raw = localStorage.getItem(GlobalHeadTracking.CALIBRATION_KEY);
+        const raw = localStorage.getItem(GlobalNodCursor.CALIBRATION_KEY);
         if (!raw) return;
         const parsed = JSON.parse(raw);
         const asNum = (v, fallback) => {
@@ -663,7 +664,7 @@
           if (!Number.isFinite(n)) return fallback;
           return Math.max(0, Math.min(1, n));
         };
-        GlobalHeadTracking.calibration = {
+        GlobalNodCursor.calibration = {
           centerX: asNum(parsed?.centerX, 0.5),
           centerY: asNum(parsed?.centerY, 0.5),
           leftX: asNum(parsed?.leftX, 0.3),
@@ -680,7 +681,7 @@
     static _mapRawToViewport(rawX, rawY) {
       const x = Math.max(0, Math.min(1, rawX));
       const y = Math.max(0, Math.min(1, rawY));
-      const c = GlobalHeadTracking.calibration;
+      const c = GlobalNodCursor.calibration;
 
       if (!c?.calibrated) {
         return { x, y };
@@ -700,7 +701,7 @@
     }
 
     static _createCursor() {
-      if (GlobalHeadTracking.cursorEl) return;
+      if (GlobalNodCursor.cursorEl) return;
 
       let el = document.getElementById('head-tracking-cursor');
       if (!el) {
@@ -719,38 +720,38 @@
         document.body.appendChild(el);
       }
 
-      GlobalHeadTracking.cursorEl = el;
+      GlobalNodCursor.cursorEl = el;
     }
 
     static _showCursor(x, y) {
-      if (!GlobalHeadTracking.cursorEl) return;
-      GlobalHeadTracking.cursorEl.style.transform = `translate(${Math.round(x - 9)}px, ${Math.round(y - 9)}px)`;
+      if (!GlobalNodCursor.cursorEl) return;
+      GlobalNodCursor.cursorEl.style.transform = `translate(${Math.round(x - 9)}px, ${Math.round(y - 9)}px)`;
     }
 
     static _hideCursor() {
-      if (!GlobalHeadTracking.cursorEl) return;
-      GlobalHeadTracking.cursorEl.style.transform = 'translate(-9999px, -9999px)';
+      if (!GlobalNodCursor.cursorEl) return;
+      GlobalNodCursor.cursorEl.style.transform = 'translate(-9999px, -9999px)';
     }
 
     static async _startTracking() {
-      if (GlobalHeadTracking.stream) return;
+      if (GlobalNodCursor.stream) return;
 
       if (!navigator.mediaDevices?.getUserMedia) {
-        GlobalHeadTracking.state.enabled = false;
-        GlobalHeadTracking._saveState();
+        GlobalNodCursor.state.enabled = false;
+        GlobalNodCursor._saveState();
         return;
       }
 
       try {
-        if (!GlobalHeadTracking.visionModule) {
-          GlobalHeadTracking.visionModule = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm');
+        if (!GlobalNodCursor.visionModule) {
+          GlobalNodCursor.visionModule = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm');
         }
 
-        if (!GlobalHeadTracking.faceLandmarker) {
-          const fileset = await GlobalHeadTracking.visionModule.FilesetResolver.forVisionTasks(
+        if (!GlobalNodCursor.faceLandmarker) {
+          const fileset = await GlobalNodCursor.visionModule.FilesetResolver.forVisionTasks(
             'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
           );
-          GlobalHeadTracking.faceLandmarker = await GlobalHeadTracking.visionModule.FaceLandmarker.createFromOptions(fileset, {
+          GlobalNodCursor.faceLandmarker = await GlobalNodCursor.visionModule.FaceLandmarker.createFromOptions(fileset, {
             baseOptions: {
               modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
             },
@@ -759,7 +760,7 @@
           });
         }
 
-        GlobalHeadTracking.stream = await navigator.mediaDevices.getUserMedia({
+        GlobalNodCursor.stream = await navigator.mediaDevices.getUserMedia({
           video: {
             width: { ideal: 640 },
             height: { ideal: 480 },
@@ -768,7 +769,7 @@
           audio: false,
         });
 
-        if (!GlobalHeadTracking.video) {
+        if (!GlobalNodCursor.video) {
           const v = document.createElement('video');
           v.autoplay = true;
           v.muted = true;
@@ -780,56 +781,56 @@
           v.style.pointerEvents = 'none';
           v.style.left = '-9999px';
           document.body.appendChild(v);
-          GlobalHeadTracking.video = v;
+          GlobalNodCursor.video = v;
         }
 
-        GlobalHeadTracking.video.srcObject = GlobalHeadTracking.stream;
-        await GlobalHeadTracking.video.play();
+        GlobalNodCursor.video.srcObject = GlobalNodCursor.stream;
+        await GlobalNodCursor.video.play();
 
-        GlobalHeadTracking.lastPoint = null;
-        GlobalHeadTracking._runLoop();
+        GlobalNodCursor.lastPoint = null;
+        GlobalNodCursor._runLoop();
       } catch (e) {
         console.error('global head tracking start error', e);
-        GlobalHeadTracking.state.enabled = false;
-        GlobalHeadTracking._saveState();
-        GlobalHeadTracking._stopTracking();
+        GlobalNodCursor.state.enabled = false;
+        GlobalNodCursor._saveState();
+        GlobalNodCursor._stopTracking();
       }
     }
 
     static _runLoop() {
-      if (!GlobalHeadTracking.state.enabled || !GlobalHeadTracking.faceLandmarker || !GlobalHeadTracking.video) {
+      if (!GlobalNodCursor.state.enabled || !GlobalNodCursor.faceLandmarker || !GlobalNodCursor.video) {
         return;
       }
 
       const tick = () => {
-        if (!GlobalHeadTracking.state.enabled || !GlobalHeadTracking.faceLandmarker || !GlobalHeadTracking.video) {
+        if (!GlobalNodCursor.state.enabled || !GlobalNodCursor.faceLandmarker || !GlobalNodCursor.video) {
           return;
         }
 
-        if (GlobalHeadTracking.video.readyState >= 2) {
-          const result = GlobalHeadTracking.faceLandmarker.detectForVideo(GlobalHeadTracking.video, performance.now());
+        if (GlobalNodCursor.video.readyState >= 2) {
+          const result = GlobalNodCursor.faceLandmarker.detectForVideo(GlobalNodCursor.video, performance.now());
           const landmarks = result?.faceLandmarks?.[0];
           const nose = landmarks?.[1];
 
           if (nose) {
             const rawX = 1 - nose.x;
             const rawY = nose.y;
-            const mapped = GlobalHeadTracking._mapRawToViewport(rawX, rawY);
+            const mapped = GlobalNodCursor._mapRawToViewport(rawX, rawY);
             const targetX = mapped.x * window.innerWidth;
             const targetY = mapped.y * window.innerHeight;
 
-            const alpha = Math.min(0.9, Math.max(0.1, GlobalHeadTracking.state.sensitivity));
-            if (!GlobalHeadTracking.lastPoint) {
-              GlobalHeadTracking.lastPoint = { x: targetX, y: targetY };
+            const alpha = Math.min(0.9, Math.max(0.1, GlobalNodCursor.state.sensitivity));
+            if (!GlobalNodCursor.lastPoint) {
+              GlobalNodCursor.lastPoint = { x: targetX, y: targetY };
             } else {
-              GlobalHeadTracking.lastPoint.x += (targetX - GlobalHeadTracking.lastPoint.x) * alpha;
-              GlobalHeadTracking.lastPoint.y += (targetY - GlobalHeadTracking.lastPoint.y) * alpha;
+              GlobalNodCursor.lastPoint.x += (targetX - GlobalNodCursor.lastPoint.x) * alpha;
+              GlobalNodCursor.lastPoint.y += (targetY - GlobalNodCursor.lastPoint.y) * alpha;
             }
 
-            const x = Math.max(0, Math.min(window.innerWidth - 1, GlobalHeadTracking.lastPoint.x));
-            const y = Math.max(0, Math.min(window.innerHeight - 1, GlobalHeadTracking.lastPoint.y));
+            const x = Math.max(0, Math.min(window.innerWidth - 1, GlobalNodCursor.lastPoint.x));
+            const y = Math.max(0, Math.min(window.innerHeight - 1, GlobalNodCursor.lastPoint.y));
 
-            GlobalHeadTracking._showCursor(x, y);
+            GlobalNodCursor._showCursor(x, y);
 
             const moveEvent = new MouseEvent('mousemove', {
               bubbles: true,
@@ -844,30 +845,30 @@
           }
         }
 
-        GlobalHeadTracking.rafId = requestAnimationFrame(tick);
+        GlobalNodCursor.rafId = requestAnimationFrame(tick);
       };
 
-      GlobalHeadTracking.rafId = requestAnimationFrame(tick);
+      GlobalNodCursor.rafId = requestAnimationFrame(tick);
     }
 
     static _stopTracking() {
-      if (GlobalHeadTracking.rafId) {
-        cancelAnimationFrame(GlobalHeadTracking.rafId);
-        GlobalHeadTracking.rafId = null;
+      if (GlobalNodCursor.rafId) {
+        cancelAnimationFrame(GlobalNodCursor.rafId);
+        GlobalNodCursor.rafId = null;
       }
 
-      if (GlobalHeadTracking.stream) {
-        GlobalHeadTracking.stream.getTracks().forEach(track => track.stop());
-        GlobalHeadTracking.stream = null;
+      if (GlobalNodCursor.stream) {
+        GlobalNodCursor.stream.getTracks().forEach(track => track.stop());
+        GlobalNodCursor.stream = null;
       }
 
-      if (GlobalHeadTracking.video) {
-        GlobalHeadTracking.video.pause();
-        GlobalHeadTracking.video.srcObject = null;
+      if (GlobalNodCursor.video) {
+        GlobalNodCursor.video.pause();
+        GlobalNodCursor.video.srcObject = null;
       }
 
-      GlobalHeadTracking.lastPoint = null;
-      GlobalHeadTracking._hideCursor();
+      GlobalNodCursor.lastPoint = null;
+      GlobalNodCursor._hideCursor();
     }
   }
 
@@ -885,7 +886,7 @@
     if (prefs) ThemeEngine.apply(prefs);
 
     // Keep head-tracking preference active on all non-dashboard pages.
-    GlobalHeadTracking.init();
+    GlobalNodCursor.init();
   }
 
   // Public API consumed by dashboard.html and other pages

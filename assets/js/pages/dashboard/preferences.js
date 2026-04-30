@@ -531,11 +531,13 @@ export class TTSPanel {
 }
 
 // ============================================
-// RESPONSIBILITY: Head calibration persistence + mapping
+// RESPONSIBILITY: NodCursor calibration persistence + mapping 
+// Used to handle calibration data for the NodCursor feature (head tracking mapped to cursor)
+// https://github.com/aadibhat09/NodCursor
 // ============================================
-export class HeadCalibrationManager {
+export class NodCursorCalibrationManager {
     static STORAGE_KEY = 'headTrackingCalibration';
-    static data = HeadCalibrationManager._defaultCalibration();
+    static data = NodCursorCalibrationManager._defaultCalibration();
     static refs = {
         status: null
     };
@@ -553,7 +555,7 @@ export class HeadCalibrationManager {
     }
 
     static _sanitize(data) {
-        const d = HeadCalibrationManager._defaultCalibration();
+        const d = NodCursorCalibrationManager._defaultCalibration();
         const num = (v, fallback) => {
             const n = Number(v);
             if (!Number.isFinite(n)) return fallback;
@@ -577,35 +579,35 @@ export class HeadCalibrationManager {
     }
 
     static init(statusRef) {
-        HeadCalibrationManager.refs.status = statusRef || null;
-        HeadCalibrationManager.loadLocal();
+        NodCursorCalibrationManager.refs.status = statusRef || null;
+        NodCursorCalibrationManager.loadLocal();
     }
 
     static setStatus(message, isError = false) {
-        if (!HeadCalibrationManager.refs.status) return;
-        HeadCalibrationManager.refs.status.textContent = message;
-        HeadCalibrationManager.refs.status.style.color = isError ? '#f87171' : '';
+        if (!NodCursorCalibrationManager.refs.status) return;
+        NodCursorCalibrationManager.refs.status.textContent = message;
+        NodCursorCalibrationManager.refs.status.style.color = isError ? '#f87171' : '';
     }
 
     static loadLocal() {
         try {
-            const raw = localStorage.getItem(HeadCalibrationManager.STORAGE_KEY);
+            const raw = localStorage.getItem(NodCursorCalibrationManager.STORAGE_KEY);
             if (!raw) {
-                HeadCalibrationManager.data = HeadCalibrationManager._defaultCalibration();
-                return HeadCalibrationManager.data;
+                NodCursorCalibrationManager.data = NodCursorCalibrationManager._defaultCalibration();
+                return NodCursorCalibrationManager.data;
             }
-            HeadCalibrationManager.data = HeadCalibrationManager._sanitize(JSON.parse(raw));
-            return HeadCalibrationManager.data;
+            NodCursorCalibrationManager.data = NodCursorCalibrationManager._sanitize(JSON.parse(raw));
+            return NodCursorCalibrationManager.data;
         } catch (e) {
             console.error('head calibration load local error', e);
-            HeadCalibrationManager.data = HeadCalibrationManager._defaultCalibration();
-            return HeadCalibrationManager.data;
+            NodCursorCalibrationManager.data = NodCursorCalibrationManager._defaultCalibration();
+            return NodCursorCalibrationManager.data;
         }
     }
 
     static saveLocal() {
         try {
-            localStorage.setItem(HeadCalibrationManager.STORAGE_KEY, JSON.stringify(HeadCalibrationManager.data));
+            localStorage.setItem(NodCursorCalibrationManager.STORAGE_KEY, JSON.stringify(NodCursorCalibrationManager.data));
         } catch (e) {
             console.error('head calibration save local error', e);
         }
@@ -613,45 +615,45 @@ export class HeadCalibrationManager {
 
     static capture(point, rawX, rawY) {
         if (!Number.isFinite(rawX) || !Number.isFinite(rawY)) {
-            HeadCalibrationManager.setStatus('No face landmark found. Keep your face in frame and try again.', true);
+            NodCursorCalibrationManager.setStatus('No face landmark found. Keep your face in frame and try again.', true);
             return false;
         }
 
         if (point === 'center') {
-            HeadCalibrationManager.data.centerX = rawX;
-            HeadCalibrationManager.data.centerY = rawY;
+            NodCursorCalibrationManager.data.centerX = rawX;
+            NodCursorCalibrationManager.data.centerY = rawY;
         } else if (point === 'left') {
-            HeadCalibrationManager.data.leftX = rawX;
+            NodCursorCalibrationManager.data.leftX = rawX;
         } else if (point === 'right') {
-            HeadCalibrationManager.data.rightX = rawX;
+            NodCursorCalibrationManager.data.rightX = rawX;
         } else if (point === 'up') {
-            HeadCalibrationManager.data.upY = rawY;
+            NodCursorCalibrationManager.data.upY = rawY;
         } else if (point === 'down') {
-            HeadCalibrationManager.data.downY = rawY;
+            NodCursorCalibrationManager.data.downY = rawY;
         }
 
         const complete = [
-            HeadCalibrationManager.data.leftX,
-            HeadCalibrationManager.data.rightX,
-            HeadCalibrationManager.data.upY,
-            HeadCalibrationManager.data.downY
+            NodCursorCalibrationManager.data.leftX,
+            NodCursorCalibrationManager.data.rightX,
+            NodCursorCalibrationManager.data.upY,
+            NodCursorCalibrationManager.data.downY
         ].every(Number.isFinite);
-        HeadCalibrationManager.data.calibrated = !!complete;
-        HeadCalibrationManager.saveLocal();
-        HeadCalibrationManager.setStatus(`Captured ${point}.`);
+        NodCursorCalibrationManager.data.calibrated = !!complete;
+        NodCursorCalibrationManager.saveLocal();
+        NodCursorCalibrationManager.setStatus(`Captured ${point}.`);
         return true;
     }
 
     static reset() {
-        HeadCalibrationManager.data = HeadCalibrationManager._defaultCalibration();
-        HeadCalibrationManager.saveLocal();
-        HeadCalibrationManager.setStatus('Calibration reset to defaults.');
+        NodCursorCalibrationManager.data = NodCursorCalibrationManager._defaultCalibration();
+        NodCursorCalibrationManager.saveLocal();
+        NodCursorCalibrationManager.setStatus('Calibration reset to defaults.');
     }
 
     static mapRawToViewport(rawX, rawY) {
         const x = Math.max(0, Math.min(1, rawX));
         const y = Math.max(0, Math.min(1, rawY));
-        const c = HeadCalibrationManager.data;
+        const c = NodCursorCalibrationManager.data;
 
         if (!c?.calibrated) {
             return { x, y };
@@ -677,23 +679,23 @@ export class HeadCalibrationManager {
         const res = await fetch(`${PreferencesAPI.javaURI}/api/person/get`, PreferencesAPI.fetchOptions);
         if (!res.ok) return null;
         const person = await res.json();
-        return HeadCalibrationManager._normalizeUserId(
+        return NodCursorCalibrationManager._normalizeUserId(
             person?.id || person?.uid || person?.username || person?.name || null
         );
     }
 
     static async saveToBackend() {
         try {
-            const userId = HeadCalibrationManager._normalizeUserId(await HeadCalibrationManager._getCurrentUserId());
+            const userId = NodCursorCalibrationManager._normalizeUserId(await NodCursorCalibrationManager._getCurrentUserId());
             if (!userId) {
-                HeadCalibrationManager.setStatus('You must be logged in to save calibration to backend.', true);
+                NodCursorCalibrationManager.setStatus('You must be logged in to save calibration to backend.', true);
                 return false;
             }
 
             const payload = {
                 userId,
                 body: `${userId}-calibration`,
-                metadata: HeadCalibrationManager._sanitize(HeadCalibrationManager.data)
+                metadata: NodCursorCalibrationManager._sanitize(NodCursorCalibrationManager.data)
             };
 
             const res = await fetch(`${PreferencesAPI.javaURI}/api/content/HEAD_CALIBRATION`, {
@@ -703,30 +705,30 @@ export class HeadCalibrationManager {
             });
 
             if (!res.ok) {
-                HeadCalibrationManager.setStatus(`Failed to save calibration (${res.status}).`, true);
+                NodCursorCalibrationManager.setStatus(`Failed to save calibration (${res.status}).`, true);
                 return false;
             }
 
-            HeadCalibrationManager.setStatus('Calibration saved to backend.');
+            NodCursorCalibrationManager.setStatus('Calibration saved to backend.');
             return true;
         } catch (e) {
             console.error('save calibration backend error', e);
-            HeadCalibrationManager.setStatus('Could not save calibration (network/server error).', true);
+            NodCursorCalibrationManager.setStatus('Could not save calibration (network/server error).', true);
             return false;
         }
     }
 
     static async loadFromBackend() {
         try {
-            const userId = HeadCalibrationManager._normalizeUserId(await HeadCalibrationManager._getCurrentUserId());
+            const userId = NodCursorCalibrationManager._normalizeUserId(await NodCursorCalibrationManager._getCurrentUserId());
             if (!userId) {
-                HeadCalibrationManager.setStatus('You must be logged in to load calibration.', true);
+                NodCursorCalibrationManager.setStatus('You must be logged in to load calibration.', true);
                 return false;
             }
 
             const res = await fetch(`${PreferencesAPI.javaURI}/api/content/HEAD_CALIBRATION`, PreferencesAPI.fetchOptions);
             if (!res.ok) {
-                HeadCalibrationManager.setStatus(`Failed to load calibration list (${res.status}).`, true);
+                NodCursorCalibrationManager.setStatus(`Failed to load calibration list (${res.status}).`, true);
                 return false;
             }
 
@@ -734,14 +736,14 @@ export class HeadCalibrationManager {
             const expectedBody = `${userId}-calibration`;
             const matches = Array.isArray(allRows)
                 ? allRows.filter(row => {
-                    const rowUserId = HeadCalibrationManager._normalizeUserId(row?.userId);
-                    const rowBody = HeadCalibrationManager._normalizeUserId(row?.body);
+                    const rowUserId = NodCursorCalibrationManager._normalizeUserId(row?.userId);
+                    const rowBody = NodCursorCalibrationManager._normalizeUserId(row?.body);
                     return rowUserId === userId || rowBody === expectedBody;
                 })
                 : [];
 
             if (!matches.length) {
-                HeadCalibrationManager.setStatus(`No saved calibration found for ${userId}.`, true);
+                NodCursorCalibrationManager.setStatus(`No saved calibration found for ${userId}.`, true);
                 return false;
             }
 
@@ -750,23 +752,24 @@ export class HeadCalibrationManager {
                 return Number(row?.id || 0) > Number(best?.id || 0) ? row : best;
             }, null);
 
-            HeadCalibrationManager.data = HeadCalibrationManager._sanitize(picked?.metadata || {});
-            HeadCalibrationManager.data.calibrated = true;
-            HeadCalibrationManager.saveLocal();
-            HeadCalibrationManager.setStatus(`Loaded calibration for ${userId}.`);
+            NodCursorCalibrationManager.data = NodCursorCalibrationManager._sanitize(picked?.metadata || {});
+            NodCursorCalibrationManager.data.calibrated = true;
+            NodCursorCalibrationManager.saveLocal();
+            NodCursorCalibrationManager.setStatus(`Loaded calibration for ${userId}.`);
             return true;
         } catch (e) {
             console.error('load calibration backend error', e);
-            HeadCalibrationManager.setStatus('Could not load calibration (network/server error).', true);
+            NodCursorCalibrationManager.setStatus('Could not load calibration (network/server error).', true);
             return false;
         }
     }
 }
 
 // ============================================
-// RESPONSIBILITY: Camera-based head tracking cursor
+// RESPONSIBILITY: Camera-based visual cursor (NodCursorController)
+// Maps physical head movements via webcam to an on-screen cursor.
 // ============================================
-export class HeadTrackingController {
+export class NodCursorController {
     static STORAGE_KEY = 'headTrackingPreferences';
     static BLINK_EAR_THRESHOLD = 0.15;
     static BLINK_COOLDOWN_MS = 550;
@@ -806,103 +809,103 @@ export class HeadTrackingController {
     };
 
     static init() {
-        HeadTrackingController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
-        HeadTrackingController.refs.toggleTrack = document.getElementById('head-tracking-toggle-track');
-        HeadTrackingController.refs.toggleDot = document.getElementById('head-tracking-toggle-dot');
-        HeadTrackingController.refs.sensitivity = document.getElementById('pref-head-tracking-sensitivity');
-        HeadTrackingController.refs.sensitivityLabel = document.getElementById('head-tracking-sensitivity-label');
-        HeadTrackingController.refs.status = document.getElementById('head-tracking-status');
-        HeadTrackingController.refs.calibrationStatus = document.getElementById('head-calibration-status');
-        HeadTrackingController.refs.captureCenterBtn = document.getElementById('head-calibrate-center');
-        HeadTrackingController.refs.captureLeftBtn = document.getElementById('head-calibrate-left');
-        HeadTrackingController.refs.captureRightBtn = document.getElementById('head-calibrate-right');
-        HeadTrackingController.refs.captureUpBtn = document.getElementById('head-calibrate-up');
-        HeadTrackingController.refs.captureDownBtn = document.getElementById('head-calibrate-down');
-        HeadTrackingController.refs.saveCalibrationBtn = document.getElementById('head-calibration-save');
-        HeadTrackingController.refs.loadCalibrationBtn = document.getElementById('head-calibration-load');
-        HeadTrackingController.refs.resetCalibrationBtn = document.getElementById('head-calibration-reset');
+        NodCursorController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
+        NodCursorController.refs.toggleTrack = document.getElementById('head-tracking-toggle-track');
+        NodCursorController.refs.toggleDot = document.getElementById('head-tracking-toggle-dot');
+        NodCursorController.refs.sensitivity = document.getElementById('pref-head-tracking-sensitivity');
+        NodCursorController.refs.sensitivityLabel = document.getElementById('head-tracking-sensitivity-label');
+        NodCursorController.refs.status = document.getElementById('head-tracking-status');
+        NodCursorController.refs.calibrationStatus = document.getElementById('head-calibration-status');
+        NodCursorController.refs.captureCenterBtn = document.getElementById('head-calibrate-center');
+        NodCursorController.refs.captureLeftBtn = document.getElementById('head-calibrate-left');
+        NodCursorController.refs.captureRightBtn = document.getElementById('head-calibrate-right');
+        NodCursorController.refs.captureUpBtn = document.getElementById('head-calibrate-up');
+        NodCursorController.refs.captureDownBtn = document.getElementById('head-calibrate-down');
+        NodCursorController.refs.saveCalibrationBtn = document.getElementById('head-calibration-save');
+        NodCursorController.refs.loadCalibrationBtn = document.getElementById('head-calibration-load');
+        NodCursorController.refs.resetCalibrationBtn = document.getElementById('head-calibration-reset');
 
-        if (!HeadTrackingController.refs.toggle || !HeadTrackingController.refs.status) return;
+        if (!NodCursorController.refs.toggle || !NodCursorController.refs.status) return;
 
-        HeadTrackingController._loadState();
-        HeadCalibrationManager.init(HeadTrackingController.refs.calibrationStatus);
-        HeadTrackingController._createCursor();
+        NodCursorController._loadState();
+        NodCursorCalibrationManager.init(NodCursorController.refs.calibrationStatus);
+        NodCursorController._createCursor();
 
-        HeadTrackingController.refs.toggle.checked = !!HeadTrackingController.state.enabled;
-        HeadTrackingController._syncToggleVisual();
-        if (HeadTrackingController.refs.sensitivity) {
-            HeadTrackingController.refs.sensitivity.value = String(HeadTrackingController.state.sensitivity);
+        NodCursorController.refs.toggle.checked = !!NodCursorController.state.enabled;
+        NodCursorController._syncToggleVisual();
+        if (NodCursorController.refs.sensitivity) {
+            NodCursorController.refs.sensitivity.value = String(NodCursorController.state.sensitivity);
         }
-        HeadTrackingController._updateSensitivityLabel();
+        NodCursorController._updateSensitivityLabel();
 
-        HeadTrackingController.refs.toggle.addEventListener('change', async (e) => {
-            await HeadTrackingController.setEnabled(!!e.target.checked);
+        NodCursorController.refs.toggle.addEventListener('change', async (e) => {
+            await NodCursorController.setEnabled(!!e.target.checked);
         });
 
-        if (HeadTrackingController.refs.sensitivity) {
-            HeadTrackingController.refs.sensitivity.addEventListener('input', () => {
-                const raw = Number(HeadTrackingController.refs.sensitivity.value);
-                HeadTrackingController.state.sensitivity = Number.isFinite(raw) ? raw : 0.45;
-                HeadTrackingController._updateSensitivityLabel();
-                HeadTrackingController._saveState();
+        if (NodCursorController.refs.sensitivity) {
+            NodCursorController.refs.sensitivity.addEventListener('input', () => {
+                const raw = Number(NodCursorController.refs.sensitivity.value);
+                NodCursorController.state.sensitivity = Number.isFinite(raw) ? raw : 0.45;
+                NodCursorController._updateSensitivityLabel();
+                NodCursorController._saveState();
             });
         }
 
         const capture = point => {
-            if (!HeadTrackingController.lastRawPoint) {
-                HeadCalibrationManager.setStatus('Start head tracking and keep your face visible before capturing.', true);
+            if (!NodCursorController.lastRawPoint) {
+                NodCursorCalibrationManager.setStatus('Start head tracking and keep your face visible before capturing.', true);
                 return;
             }
-            HeadCalibrationManager.capture(point, HeadTrackingController.lastRawPoint.x, HeadTrackingController.lastRawPoint.y);
+            NodCursorCalibrationManager.capture(point, NodCursorController.lastRawPoint.x, NodCursorController.lastRawPoint.y);
         };
 
-        HeadTrackingController.refs.captureCenterBtn?.addEventListener('click', () => capture('center'));
-        HeadTrackingController.refs.captureLeftBtn?.addEventListener('click', () => capture('left'));
-        HeadTrackingController.refs.captureRightBtn?.addEventListener('click', () => capture('right'));
-        HeadTrackingController.refs.captureUpBtn?.addEventListener('click', () => capture('up'));
-        HeadTrackingController.refs.captureDownBtn?.addEventListener('click', () => capture('down'));
-        HeadTrackingController.refs.saveCalibrationBtn?.addEventListener('click', () => HeadCalibrationManager.saveToBackend());
-        HeadTrackingController.refs.loadCalibrationBtn?.addEventListener('click', () => HeadCalibrationManager.loadFromBackend());
-        HeadTrackingController.refs.resetCalibrationBtn?.addEventListener('click', () => HeadCalibrationManager.reset());
+        NodCursorController.refs.captureCenterBtn?.addEventListener('click', () => capture('center'));
+        NodCursorController.refs.captureLeftBtn?.addEventListener('click', () => capture('left'));
+        NodCursorController.refs.captureRightBtn?.addEventListener('click', () => capture('right'));
+        NodCursorController.refs.captureUpBtn?.addEventListener('click', () => capture('up'));
+        NodCursorController.refs.captureDownBtn?.addEventListener('click', () => capture('down'));
+        NodCursorController.refs.saveCalibrationBtn?.addEventListener('click', () => NodCursorCalibrationManager.saveToBackend());
+        NodCursorController.refs.loadCalibrationBtn?.addEventListener('click', () => NodCursorCalibrationManager.loadFromBackend());
+        NodCursorController.refs.resetCalibrationBtn?.addEventListener('click', () => NodCursorCalibrationManager.reset());
 
-        if (HeadTrackingController.state.enabled) {
-            HeadTrackingController.setEnabled(true);
+        if (NodCursorController.state.enabled) {
+            NodCursorController.setEnabled(true);
         } else {
-            HeadTrackingController._setStatus('Head tracking is off.');
+            NodCursorController._setStatus('Head tracking is off.');
         }
 
         window.addEventListener('beforeunload', () => {
-            HeadTrackingController._stopTracking();
+            NodCursorController._stopTracking();
         });
     }
 
     static async setEnabled(enabled) {
-        HeadTrackingController.state.enabled = !!enabled;
-        HeadTrackingController._saveState();
+        NodCursorController.state.enabled = !!enabled;
+        NodCursorController._saveState();
 
-        if (HeadTrackingController.refs.toggle) {
-            HeadTrackingController.refs.toggle.checked = HeadTrackingController.state.enabled;
+        if (NodCursorController.refs.toggle) {
+            NodCursorController.refs.toggle.checked = NodCursorController.state.enabled;
         }
-        HeadTrackingController._syncToggleVisual();
+        NodCursorController._syncToggleVisual();
 
-        if (!HeadTrackingController.state.enabled) {
-            HeadTrackingController._stopTracking();
-            HeadTrackingController._setStatus('Head tracking disabled.');
+        if (!NodCursorController.state.enabled) {
+            NodCursorController._stopTracking();
+            NodCursorController._setStatus('Head tracking disabled.');
             return;
         }
 
-        await HeadTrackingController._startTracking();
+        await NodCursorController._startTracking();
     }
 
     static _loadState() {
         try {
-            const raw = localStorage.getItem(HeadTrackingController.STORAGE_KEY);
+            const raw = localStorage.getItem(NodCursorController.STORAGE_KEY);
             if (!raw) return;
             const parsed = JSON.parse(raw);
-            HeadTrackingController.state.enabled = !!parsed.enabled;
+            NodCursorController.state.enabled = !!parsed.enabled;
             const incomingSensitivity = Number(parsed.sensitivity);
             if (Number.isFinite(incomingSensitivity)) {
-                HeadTrackingController.state.sensitivity = Math.min(0.9, Math.max(0.1, incomingSensitivity));
+                NodCursorController.state.sensitivity = Math.min(0.9, Math.max(0.1, incomingSensitivity));
             }
         } catch (e) {
             console.error('head tracking load state error', e);
@@ -911,35 +914,35 @@ export class HeadTrackingController {
 
     static _saveState() {
         try {
-            localStorage.setItem(HeadTrackingController.STORAGE_KEY, JSON.stringify(HeadTrackingController.state));
+            localStorage.setItem(NodCursorController.STORAGE_KEY, JSON.stringify(NodCursorController.state));
         } catch (e) {
             console.error('head tracking save state error', e);
         }
     }
 
     static _updateSensitivityLabel() {
-        if (!HeadTrackingController.refs.sensitivityLabel) return;
-        HeadTrackingController.refs.sensitivityLabel.textContent = HeadTrackingController.state.sensitivity.toFixed(2);
+        if (!NodCursorController.refs.sensitivityLabel) return;
+        NodCursorController.refs.sensitivityLabel.textContent = NodCursorController.state.sensitivity.toFixed(2);
     }
 
     static _setStatus(message, isError = false) {
-        if (!HeadTrackingController.refs.status) return;
-        HeadTrackingController.refs.status.textContent = message;
-        HeadTrackingController.refs.status.style.color = isError ? '#f87171' : '';
+        if (!NodCursorController.refs.status) return;
+        NodCursorController.refs.status.textContent = message;
+        NodCursorController.refs.status.style.color = isError ? '#f87171' : '';
     }
 
     static _syncToggleVisual() {
-        const { toggleTrack, toggleDot } = HeadTrackingController.refs;
+        const { toggleTrack, toggleDot } = NodCursorController.refs;
         if (!toggleTrack || !toggleDot) return;
 
-        const enabled = !!HeadTrackingController.state.enabled;
+        const enabled = !!NodCursorController.state.enabled;
         toggleTrack.classList.toggle('bg-cyan-500', enabled);
         toggleTrack.classList.toggle('bg-neutral-600', !enabled);
         toggleDot.style.transform = enabled ? 'translateX(20px)' : 'translateX(0px)';
     }
 
     static _createCursor() {
-        if (HeadTrackingController.cursorEl) return;
+        if (NodCursorController.cursorEl) return;
         const el = document.createElement('div');
         el.id = 'head-tracking-cursor';
         el.style.position = 'fixed';
@@ -953,17 +956,17 @@ export class HeadTrackingController {
         el.style.transform = 'translate(-9999px, -9999px)';
         el.style.boxShadow = '0 0 12px rgba(34, 211, 238, 0.5)';
         document.body.appendChild(el);
-        HeadTrackingController.cursorEl = el;
+        NodCursorController.cursorEl = el;
     }
 
     static _showCursor(x, y) {
-        if (!HeadTrackingController.cursorEl) return;
-        HeadTrackingController.cursorEl.style.transform = `translate(${Math.round(x - 9)}px, ${Math.round(y - 9)}px)`;
+        if (!NodCursorController.cursorEl) return;
+        NodCursorController.cursorEl.style.transform = `translate(${Math.round(x - 9)}px, ${Math.round(y - 9)}px)`;
     }
 
     static _hideCursor() {
-        if (!HeadTrackingController.cursorEl) return;
-        HeadTrackingController.cursorEl.style.transform = 'translate(-9999px, -9999px)';
+        if (!NodCursorController.cursorEl) return;
+        NodCursorController.cursorEl.style.transform = 'translate(-9999px, -9999px)';
     }
 
     static _eyeAspectRatio(landmarks, topIndex, bottomIndex, leftIndex, rightIndex) {
@@ -1033,48 +1036,48 @@ export class HeadTrackingController {
     }
 
     static _handleBlinkClick(landmarks, x, y) {
-        const leftEar = HeadTrackingController._eyeAspectRatio(landmarks, 159, 145, 33, 133);
-        const rightEar = HeadTrackingController._eyeAspectRatio(landmarks, 386, 374, 362, 263);
+        const leftEar = NodCursorController._eyeAspectRatio(landmarks, 159, 145, 33, 133);
+        const rightEar = NodCursorController._eyeAspectRatio(landmarks, 386, 374, 362, 263);
         if (!Number.isFinite(leftEar) || !Number.isFinite(rightEar)) {
-            HeadTrackingController.blinkState.isClosed = false;
+            NodCursorController.blinkState.isClosed = false;
             return;
         }
 
         const avgEar = (leftEar + rightEar) / 2;
-        const isClosedNow = avgEar < HeadTrackingController.BLINK_EAR_THRESHOLD;
+        const isClosedNow = avgEar < NodCursorController.BLINK_EAR_THRESHOLD;
         const now = performance.now();
-        const canClick = now - HeadTrackingController.blinkState.lastClickAt > HeadTrackingController.BLINK_COOLDOWN_MS;
+        const canClick = now - NodCursorController.blinkState.lastClickAt > NodCursorController.BLINK_COOLDOWN_MS;
 
-        if (isClosedNow && !HeadTrackingController.blinkState.isClosed && canClick) {
-            HeadTrackingController._dispatchBlinkClick(x, y);
-            HeadTrackingController.blinkState.lastClickAt = now;
+        if (isClosedNow && !NodCursorController.blinkState.isClosed && canClick) {
+            NodCursorController._dispatchBlinkClick(x, y);
+            NodCursorController.blinkState.lastClickAt = now;
         }
 
-        HeadTrackingController.blinkState.isClosed = isClosedNow;
+        NodCursorController.blinkState.isClosed = isClosedNow;
     }
 
     static async _startTracking() {
         if (!navigator.mediaDevices?.getUserMedia) {
-            HeadTrackingController._setStatus('Camera API is not available in this browser.', true);
-            HeadTrackingController.state.enabled = false;
-            HeadTrackingController._saveState();
-            if (HeadTrackingController.refs.toggle) HeadTrackingController.refs.toggle.checked = false;
-            HeadTrackingController._syncToggleVisual();
+            NodCursorController._setStatus('Camera API is not available in this browser.', true);
+            NodCursorController.state.enabled = false;
+            NodCursorController._saveState();
+            if (NodCursorController.refs.toggle) NodCursorController.refs.toggle.checked = false;
+            NodCursorController._syncToggleVisual();
             return;
         }
 
-        HeadTrackingController._setStatus('Requesting camera access...');
+        NodCursorController._setStatus('Requesting camera access...');
 
         try {
-            if (!HeadTrackingController.visionModule) {
-                HeadTrackingController.visionModule = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm');
+            if (!NodCursorController.visionModule) {
+                NodCursorController.visionModule = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm');
             }
 
-            if (!HeadTrackingController.faceLandmarker) {
-                const fileset = await HeadTrackingController.visionModule.FilesetResolver.forVisionTasks(
+            if (!NodCursorController.faceLandmarker) {
+                const fileset = await NodCursorController.visionModule.FilesetResolver.forVisionTasks(
                     'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
                 );
-                HeadTrackingController.faceLandmarker = await HeadTrackingController.visionModule.FaceLandmarker.createFromOptions(fileset, {
+                NodCursorController.faceLandmarker = await NodCursorController.visionModule.FaceLandmarker.createFromOptions(fileset, {
                     baseOptions: {
                         modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task'
                     },
@@ -1083,7 +1086,7 @@ export class HeadTrackingController {
                 });
             }
 
-            HeadTrackingController.stream = await navigator.mediaDevices.getUserMedia({
+            NodCursorController.stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 640 },
                     height: { ideal: 480 },
@@ -1092,7 +1095,7 @@ export class HeadTrackingController {
                 audio: false
             });
 
-            if (!HeadTrackingController.video) {
+            if (!NodCursorController.video) {
                 const v = document.createElement('video');
                 v.autoplay = true;
                 v.muted = true;
@@ -1104,62 +1107,62 @@ export class HeadTrackingController {
                 v.style.pointerEvents = 'none';
                 v.style.left = '-9999px';
                 document.body.appendChild(v);
-                HeadTrackingController.video = v;
+                NodCursorController.video = v;
             }
 
-            HeadTrackingController.video.srcObject = HeadTrackingController.stream;
-            await HeadTrackingController.video.play();
+            NodCursorController.video.srcObject = NodCursorController.stream;
+            await NodCursorController.video.play();
 
-            HeadTrackingController.lastPoint = null;
-            HeadTrackingController._runLoop();
-            HeadTrackingController._setStatus('Head tracking active. Move your head to steer the cursor.');
+            NodCursorController.lastPoint = null;
+            NodCursorController._runLoop();
+            NodCursorController._setStatus('Head tracking active. Move your head to steer the cursor.');
         } catch (e) {
             console.error('head tracking start error', e);
-            HeadTrackingController._setStatus('Could not start head tracking. Check camera permission.', true);
-            HeadTrackingController.state.enabled = false;
-            HeadTrackingController._saveState();
-            if (HeadTrackingController.refs.toggle) HeadTrackingController.refs.toggle.checked = false;
-            HeadTrackingController._syncToggleVisual();
-            HeadTrackingController._stopTracking();
+            NodCursorController._setStatus('Could not start head tracking. Check camera permission.', true);
+            NodCursorController.state.enabled = false;
+            NodCursorController._saveState();
+            if (NodCursorController.refs.toggle) NodCursorController.refs.toggle.checked = false;
+            NodCursorController._syncToggleVisual();
+            NodCursorController._stopTracking();
         }
     }
 
     static _runLoop() {
-        if (!HeadTrackingController.state.enabled || !HeadTrackingController.faceLandmarker || !HeadTrackingController.video) {
+        if (!NodCursorController.state.enabled || !NodCursorController.faceLandmarker || !NodCursorController.video) {
             return;
         }
 
         const tick = () => {
-            if (!HeadTrackingController.state.enabled || !HeadTrackingController.faceLandmarker || !HeadTrackingController.video) {
+            if (!NodCursorController.state.enabled || !NodCursorController.faceLandmarker || !NodCursorController.video) {
                 return;
             }
 
-            if (HeadTrackingController.video.readyState >= 2) {
-                const result = HeadTrackingController.faceLandmarker.detectForVideo(HeadTrackingController.video, performance.now());
+            if (NodCursorController.video.readyState >= 2) {
+                const result = NodCursorController.faceLandmarker.detectForVideo(NodCursorController.video, performance.now());
                 const landmarks = result?.faceLandmarks?.[0];
                 const nose = landmarks?.[1];
 
                 if (nose) {
                     const rawX = 1 - nose.x;
                     const rawY = nose.y;
-                    HeadTrackingController.lastRawPoint = { x: rawX, y: rawY };
+                    NodCursorController.lastRawPoint = { x: rawX, y: rawY };
 
-                    const mapped = HeadCalibrationManager.mapRawToViewport(rawX, rawY);
+                    const mapped = NodCursorCalibrationManager.mapRawToViewport(rawX, rawY);
                     const targetX = mapped.x * window.innerWidth;
                     const targetY = mapped.y * window.innerHeight;
 
-                    const alpha = Math.min(0.9, Math.max(0.1, HeadTrackingController.state.sensitivity));
-                    if (!HeadTrackingController.lastPoint) {
-                        HeadTrackingController.lastPoint = { x: targetX, y: targetY };
+                    const alpha = Math.min(0.9, Math.max(0.1, NodCursorController.state.sensitivity));
+                    if (!NodCursorController.lastPoint) {
+                        NodCursorController.lastPoint = { x: targetX, y: targetY };
                     } else {
-                        HeadTrackingController.lastPoint.x += (targetX - HeadTrackingController.lastPoint.x) * alpha;
-                        HeadTrackingController.lastPoint.y += (targetY - HeadTrackingController.lastPoint.y) * alpha;
+                        NodCursorController.lastPoint.x += (targetX - NodCursorController.lastPoint.x) * alpha;
+                        NodCursorController.lastPoint.y += (targetY - NodCursorController.lastPoint.y) * alpha;
                     }
 
-                    const x = Math.max(0, Math.min(window.innerWidth - 1, HeadTrackingController.lastPoint.x));
-                    const y = Math.max(0, Math.min(window.innerHeight - 1, HeadTrackingController.lastPoint.y));
+                    const x = Math.max(0, Math.min(window.innerWidth - 1, NodCursorController.lastPoint.x));
+                    const y = Math.max(0, Math.min(window.innerHeight - 1, NodCursorController.lastPoint.y));
 
-                    HeadTrackingController._showCursor(x, y);
+                    NodCursorController._showCursor(x, y);
 
                     const moveEvent = new MouseEvent('mousemove', {
                         bubbles: true,
@@ -1172,36 +1175,36 @@ export class HeadTrackingController {
                     const target = document.elementFromPoint(x, y);
                     if (target) target.dispatchEvent(moveEvent);
 
-                    HeadTrackingController._handleBlinkClick(landmarks, x, y);
+                    NodCursorController._handleBlinkClick(landmarks, x, y);
                 }
             }
 
-            HeadTrackingController.rafId = requestAnimationFrame(tick);
+            NodCursorController.rafId = requestAnimationFrame(tick);
         };
 
-        HeadTrackingController.rafId = requestAnimationFrame(tick);
+        NodCursorController.rafId = requestAnimationFrame(tick);
     }
 
     static _stopTracking() {
-        if (HeadTrackingController.rafId) {
-            cancelAnimationFrame(HeadTrackingController.rafId);
-            HeadTrackingController.rafId = null;
+        if (NodCursorController.rafId) {
+            cancelAnimationFrame(NodCursorController.rafId);
+            NodCursorController.rafId = null;
         }
 
-        if (HeadTrackingController.stream) {
-            HeadTrackingController.stream.getTracks().forEach(t => t.stop());
-            HeadTrackingController.stream = null;
+        if (NodCursorController.stream) {
+            NodCursorController.stream.getTracks().forEach(t => t.stop());
+            NodCursorController.stream = null;
         }
 
-        if (HeadTrackingController.video) {
-            HeadTrackingController.video.pause();
-            HeadTrackingController.video.srcObject = null;
+        if (NodCursorController.video) {
+            NodCursorController.video.pause();
+            NodCursorController.video.srcObject = null;
         }
 
-        HeadTrackingController.lastPoint = null;
-        HeadTrackingController.lastRawPoint = null;
-        HeadTrackingController.blinkState.isClosed = false;
-        HeadTrackingController._hideCursor();
+        NodCursorController.lastPoint = null;
+        NodCursorController.lastRawPoint = null;
+        NodCursorController.blinkState.isClosed = false;
+        NodCursorController._hideCursor();
     }
 }
 
@@ -1298,7 +1301,7 @@ export class PreferencesController {
         FormManager.set(saved || PreferencesConfig.SITE_DEFAULT);
 
         // Step 4.5: Initialise camera-driven head-tracking cursor controls
-        HeadTrackingController.init();
+        NodCursorController.init();
 
         // Step 5: Login status hint
         if (PreferencesAPI.isLoggedIn) {
@@ -1360,13 +1363,13 @@ export class PreferencesController {
 
             localStorage.removeItem(PreferencesConfig.LOCAL_STORAGE_KEY);
             localStorage.removeItem(PreferencesConfig.LOCAL_THEMES_KEY);
-            localStorage.removeItem(HeadTrackingController.STORAGE_KEY);
-            localStorage.removeItem(HeadCalibrationManager.STORAGE_KEY);
+            localStorage.removeItem(NodCursorController.STORAGE_KEY);
+            localStorage.removeItem(NodCursorCalibrationManager.STORAGE_KEY);
             localStorage.setItem('preferencesReset', 'true');
             PreferencesStore.cachedPrefs = null;
             PreferencesAPI.backendPrefsExist = false;
 
-            await HeadTrackingController.setEnabled(false);
+            await NodCursorController.setEnabled(false);
 
             if (window.SitePreferences?.resetPreferences) {
                 window.SitePreferences.resetPreferences();
