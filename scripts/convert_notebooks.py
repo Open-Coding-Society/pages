@@ -122,6 +122,11 @@ def get_custom_cell_id(cell) -> str:
     return cell.get('metadata', {}).get('custom_cell', {}).get('id', '')
 
 
+def game_runner_placeholder(custom_cell_id: str) -> str:
+    """Build a stable placeholder token for exact game-runner placement."""
+    return f"[[[GAME_RUNNER:{custom_cell_id}]]]"
+
+
 #################################
 ### Section for Object Models ###
 #################################
@@ -769,6 +774,14 @@ def process_game_runner_cells(notebook, permalink):
                 # Clear outputs for cells with game-runner (outputs are redundant)
                 cell['outputs'] = []
                 cell['execution_count'] = None
+
+                # Replace code cell content with a placeholder so the final runner
+                # is emitted where the notebook cell actually appears.
+                placeholder_id = runner.custom_cell_id or runner.runner_id
+                cell['cell_type'] = 'markdown'
+                cell['source'] = game_runner_placeholder(placeholder_id)
+                cell.pop('outputs', None)
+                cell.pop('execution_count', None)
         
         processed_cells.append(cell)
     
@@ -791,6 +804,23 @@ def inject_code_runners(markdown, notebook, front_matter=None):
 
     ui_runner_cells, ui_runner_ids = UiRunner.collect_cells_and_source_ids(notebook)
     code_cells = [cell for cell in notebook.cells if cell.cell_type == 'code']
+    game_runner_placeholders: dict[str, list[str]] = {}
+    game_runner_count_seed = len([
+        cell for cell in notebook.cells
+        if cell.cell_type == 'code' and 'code_runner' in cell.get('metadata', {})
+    ])
+
+    for cell in notebook.cells:
+        game_runner_metadata = cell.get('metadata', {}).get('game_runner')
+        if not game_runner_metadata:
+            continue
+
+        game_runner = GameRunner.from_metadata(game_runner_metadata)
+        placeholder_id = game_runner.custom_cell_id or game_runner.runner_id
+        game_runner_placeholders[game_runner_placeholder(placeholder_id)] = (
+            game_runner.liquid_lines(game_runner_count_seed)
+        )
+        game_runner_count_seed += 1
     
     lines = markdown.split('\n')
     result = []
@@ -1006,7 +1036,11 @@ def inject_code_runners(markdown, notebook, front_matter=None):
         elif in_code_block:
             code_block_content.append(line)
         else:
-            result.append(line)
+            placeholder_lines = game_runner_placeholders.get(line.strip())
+            if placeholder_lines:
+                result.extend(placeholder_lines)
+            else:
+                result.append(line)
         
         i += 1
 
