@@ -531,7 +531,7 @@ export class TTSPanel {
 }
 
 // ============================================
-// RESPONSIBILITY: NodCursor calibration persistence + mapping 
+// RESPONSIBILITY: NodCursor calibration persistence + mapping
 // Used to handle calibration data for the NodCursor feature (head tracking mapped to cursor)
 // https://github.com/aadibhat09/NodCursor
 // ============================================
