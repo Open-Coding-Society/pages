@@ -1,12 +1,12 @@
 // Imports: Level objects and UI helpers.
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import FriendlyNpc from '/assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
-import AiChallengeNpc from '/assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
-import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
+import AiChallengeNpc from '@assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
-import { pythonURI, javaURI, fetchOptions } from '/assets/js/api/config.js';
-import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
+import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 
 
 /**
@@ -68,6 +68,28 @@ const createOrbSvgSrc = (fillColor, borderColor = '#f8fafc') => {
 class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   static levelId = 'assessment-observatory';
   static displayName = 'Assessment Observatory';
+
+  isEditableTarget(target) {
+    if (!target) return false;
+    const tagName = String(target.tagName || '').toLowerCase();
+    return target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select';
+  }
+
+  pauseGameForPopup() {
+    const gameControl = this.gameEnv?.gameControl;
+    if (gameControl && typeof gameControl.pause === 'function' && !gameControl.isPaused) {
+      gameControl.pause();
+      return true;
+    }
+    return false;
+  }
+
+  resumeGameAfterPopup(didPause) {
+    const gameControl = this.gameEnv?.gameControl;
+    if (didPause && gameControl && typeof gameControl.resume === 'function') {
+      gameControl.resume();
+    }
+  }
 
   constructor(gameEnv) {
     super(gameEnv, {
@@ -280,6 +302,10 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
   // ════════════════════════════════════════════════════════════════
   async showAnalyticsDashboard() {
     try {
+      if (document.getElementById('analytics-dashboard-modal')) {
+        return;
+      }
+
       await this.dataLoaded;
       const userData = this.cachedUserData || await this.fetchUserData();
 
@@ -296,12 +322,25 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
         justify-content: center; align-items: center; z-index: 10000; overflow-y: auto;
       `;
 
+      const didPauseGame = this.pauseGameForPopup();
+      const closeAnalyticsDashboard = () => {
+        modal.remove();
+        this.resumeGameAfterPopup(didPauseGame);
+      };
+      modal.addEventListener('keydown', (event) => event.stopPropagation(), true);
+      modal.addEventListener('keyup', (event) => event.stopPropagation(), true);
+      modal.addEventListener('keypress', (event) => event.stopPropagation(), true);
+      modal.addEventListener('click', (event) => event.stopPropagation());
+
       const container = document.createElement('div');
       container.style.cssText = `
         background: #0f172a; border: 2px solid #3b82f6; border-radius: 16px;
         padding: 40px; max-width: 1000px; max-height: 90vh; overflow-y: auto;
         color: #e5e7eb; margin: 20px auto;
       `;
+      container.addEventListener('keydown', (event) => event.stopPropagation(), true);
+      container.addEventListener('keyup', (event) => event.stopPropagation(), true);
+      container.addEventListener('keypress', (event) => event.stopPropagation(), true);
 
       // Header
       const titleBox = document.createElement('div');
@@ -377,7 +416,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
         margin-top: 30px; padding: 12px 30px; background: #64748b; color: white;
         border: none; border-radius: 8px; cursor: pointer; font-size: 14px; width: 100%;
       `;
-      closeBtn.onclick = () => modal.remove();
+      closeBtn.onclick = () => closeAnalyticsDashboard();
       container.appendChild(closeBtn);
 
       modal.appendChild(container);
@@ -754,8 +793,17 @@ Answer the student's question concisely and helpfully. Refer to their specific s
       chatHistory.scrollTop = chatHistory.scrollHeight;
     };
 
-    chatSendBtn.onclick = sendChatMessage;
-    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+    chatSendBtn.onclick = (event) => {
+      event.stopPropagation();
+      sendChatMessage();
+    };
+    chatInput.addEventListener('keydown', (event) => {
+      event.stopPropagation();
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        sendChatMessage();
+      }
+    });
 
     chatInputRow.appendChild(chatInput);
     chatInputRow.appendChild(chatSendBtn);
@@ -763,217 +811,204 @@ Answer the student's question concisely and helpfully. Refer to their specific s
     container.appendChild(chatSection);
   }
 
-  // ── Mini Challenges – Wordle only ───────────────────────────────
+  // ── Mini Challenges – Predict Your Next Sprint ────────────────
   async renderMiniChallenges(userData, container) {
-    const wordleBox = document.createElement('div');
-    wordleBox.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;`;
+    const predictionBox = document.createElement('div');
+    predictionBox.style.cssText = `background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;`;
 
-    const wordleTitle = document.createElement('h3');
-    wordleTitle.textContent = 'Learning Wordle';
-    wordleTitle.style.cssText = 'margin:0 0 4px 0;color:#60a5fa;font-size:20px;';
-    wordleBox.appendChild(wordleTitle);
+    const predictionTitle = document.createElement('h3');
+    predictionTitle.textContent = 'Predict Your Next Sprint';
+    predictionTitle.style.cssText = 'margin:0 0 6px 0;color:#60a5fa;font-size:20px;';
+    predictionBox.appendChild(predictionTitle);
 
-    const wordleSubtitle = document.createElement('div');
-    wordleSubtitle.textContent = 'Guess the 6-letter CS / analytics word in 6 tries.';
-    wordleSubtitle.style.cssText = 'color:#94a3b8;font-size:13px;margin-bottom:20px;';
-    wordleBox.appendChild(wordleSubtitle);
+    const predictionSubtitle = document.createElement('div');
+    predictionSubtitle.textContent = 'Forecast how your analytics will move next sprint, then compare your estimate to a projected outcome.';
+    predictionSubtitle.style.cssText = 'color:#94a3b8;font-size:13px;margin-bottom:18px;';
+    predictionBox.appendChild(predictionSubtitle);
 
-    // Word bank (all 6 letters)
-    const wordBank = ['COMMIT', 'SYNTAX', 'BRANCH', 'PYTHON', 'SPRINT', 'GITHUB', 'ARRAYS', 'BINARY', 'REBASE', 'STATIC', 'EXPORT', 'STRUCT', 'RETURN', 'IMPORT', 'OBJECT', 'MATRIX'];
-    const targetWord = wordBank[Math.floor(Math.random() * wordBank.length)];
-    const MAX_GUESSES = 6;
-    const WORD_LEN = 6;
+    const currentSummary = userData.analyticsSummary || {};
+    const currentMetrics = {
+      engagement: Number(currentSummary.interactionPercentage || 0),
+      scrollDepth: Number(currentSummary.averageScrollDepth || 0),
+      sessions: Number(currentSummary.totalSessions || 0),
+      lessons: Number(currentSummary.lessonsCompleted || 0),
+      timeMinutes: Math.round(Number(currentSummary.totalTimeSpentSeconds || 0) / 60),
+    };
 
-    let guesses = [];         // Array of submitted guess strings
-    let currentGuess = '';
-    let gameOver = false;
+    const projectedNextSprint = {
+      engagement: Math.min(100, currentMetrics.engagement + 4),
+      scrollDepth: Math.min(100, currentMetrics.scrollDepth + 3),
+      sessions: currentMetrics.sessions + 2,
+      lessons: currentMetrics.lessons + 1,
+      timeMinutes: Math.max(0, Math.round(currentMetrics.timeMinutes * 1.15) + 10),
+    };
 
-    // ── Grid ────────────────────────────────────────────────────
-    const grid = document.createElement('div');
-    grid.style.cssText = `display:grid;grid-template-columns:repeat(${WORD_LEN},52px);grid-template-rows:repeat(6,52px);gap:6px;margin:0 auto 20px auto;width:${WORD_LEN * 58}px;`;
-    const cells = [];
-    for (let row = 0; row < MAX_GUESSES; row++) {
-      const rowCells = [];
-      for (let col = 0; col < WORD_LEN; col++) {
-        const cell = document.createElement('div');
-        cell.style.cssText = `
-          width:48px;height:48px;border:2px solid #334155;border-radius:6px;
-          display:flex;align-items:center;justify-content:center;
-          font-size:22px;font-weight:bold;color:#e5e7eb;
-          text-transform:uppercase;transition:background 0.3s,border-color 0.3s;
-          background:#0f172a;
-        `;
-        grid.appendChild(cell);
-        rowCells.push(cell);
-      }
-      cells.push(rowCells);
-    }
-    wordleBox.appendChild(grid);
+    const intro = document.createElement('div');
+    intro.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:18px;';
+    const metricCard = (label, value, accent) => {
+      const card = document.createElement('div');
+      card.style.cssText = `background:#0f172a;border:1px solid ${accent};border-radius:10px;padding:12px;`;
+      card.innerHTML = `
+        <div style="color:#94a3b8;font-size:11px;margin-bottom:4px;">${label}</div>
+        <div style="color:${accent};font-size:22px;font-weight:bold;">${value}</div>
+      `;
+      return card;
+    };
 
-    // ── Keyboard ────────────────────────────────────────────────
-    const rows = [
-      ['Q','W','E','R','T','Y','U','I','O','P'],
-      ['A','S','D','F','G','H','J','K','L'],
-      ['ENTER','Z','X','C','V','B','N','M','⌫'],
+    intro.appendChild(metricCard('Current engagement', `${currentMetrics.engagement.toFixed(1)}%`, '#60a5fa'));
+    intro.appendChild(metricCard('Current scroll depth', `${currentMetrics.scrollDepth.toFixed(1)}%`, '#f59e0b'));
+    intro.appendChild(metricCard('Current sessions', `${currentMetrics.sessions}`, '#10b981'));
+    intro.appendChild(metricCard('Current lessons', `${currentMetrics.lessons}`, '#8b5cf6'));
+    predictionBox.appendChild(intro);
+
+    const form = document.createElement('div');
+    form.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;';
+
+    const fields = [
+      { key: 'engagement', label: 'Next engagement %', type: 'number', min: 0, max: 100, step: 0.1, placeholder: 'e.g. 78.5' },
+      { key: 'scrollDepth', label: 'Next scroll depth %', type: 'number', min: 0, max: 100, step: 0.1, placeholder: 'e.g. 66.0' },
+      { key: 'sessions', label: 'Next total sessions', type: 'number', min: 0, step: 1, placeholder: 'e.g. 14' },
+      { key: 'lessons', label: 'Next lessons completed', type: 'number', min: 0, step: 1, placeholder: 'e.g. 9' },
+      { key: 'timeMinutes', label: 'Next time spent (min)', type: 'number', min: 0, step: 1, placeholder: 'e.g. 320' },
     ];
 
-    const keyMap = {};
-    const keyboard = document.createElement('div');
-    keyboard.style.cssText = 'display:flex;flex-direction:column;gap:6px;align-items:center;margin-bottom:16px;';
-
-    rows.forEach(rowKeys => {
-      const rowEl = document.createElement('div');
-      rowEl.style.cssText = 'display:flex;gap:5px;';
-      rowKeys.forEach(key => {
-        const btn = document.createElement('button');
-        btn.textContent = key;
-        const isWide = key === 'ENTER' || key === '⌫';
-        btn.style.cssText = `
-          padding: 14px ${isWide ? '10px' : '12px'};
-          background:#334155;color:#e5e7eb;border:none;border-radius:6px;
-          cursor:pointer;font-size:${isWide ? '11px' : '14px'};font-weight:600;
-          min-width:${isWide ? '52px' : '36px'};transition:background 0.2s;
-        `;
-        btn.onclick = () => handleKey(key);
-        if (!isWide) keyMap[key] = btn;
-        rowEl.appendChild(btn);
-      });
-      keyboard.appendChild(rowEl);
+    const inputs = {};
+    fields.forEach((field) => {
+      const wrapper = document.createElement('label');
+      wrapper.style.cssText = 'display:flex;flex-direction:column;gap:6px;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;';
+      wrapper.innerHTML = `<span style="color:#cbd5e1;font-size:12px;font-weight:600;">${field.label}</span>`;
+      const input = document.createElement('input');
+      input.type = field.type;
+      input.min = String(field.min);
+      if (field.max !== undefined) input.max = String(field.max);
+      input.step = String(field.step);
+      input.placeholder = field.placeholder;
+      input.style.cssText = 'padding:10px;border-radius:8px;border:1px solid #475569;background:#020617;color:#e5e7eb;font-size:13px;';
+      wrapper.appendChild(input);
+      inputs[field.key] = input;
+      form.appendChild(wrapper);
     });
-    wordleBox.appendChild(keyboard);
+    predictionBox.appendChild(form);
 
-    // ── Message area ────────────────────────────────────────────
-    const message = document.createElement('div');
-    message.style.cssText = 'text-align:center;font-size:14px;color:#94a3b8;min-height:22px;margin-bottom:10px;';
-    wordleBox.appendChild(message);
+    const actions = document.createElement('div');
+    actions.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;';
 
-    // ── Current row display helper ───────────────────────────────
-    const updateCurrentRow = () => {
-      const rowIdx = guesses.length;
-      if (rowIdx >= MAX_GUESSES) return;
-      for (let c = 0; c < WORD_LEN; c++) {
-        cells[rowIdx][c].textContent = currentGuess[c] || '';
-        cells[rowIdx][c].style.borderColor = currentGuess[c] ? '#60a5fa' : '#334155';
-      }
+    const submitBtn = document.createElement('button');
+    submitBtn.textContent = 'Score Prediction';
+    submitBtn.style.cssText = 'padding:12px 18px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;';
+
+    const autoFillBtn = document.createElement('button');
+    autoFillBtn.textContent = 'Use Smart Forecast';
+    autoFillBtn.style.cssText = 'padding:12px 18px;background:#334155;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;';
+
+    const resetBtn = document.createElement('button');
+    resetBtn.textContent = 'Reset';
+    resetBtn.style.cssText = 'padding:12px 18px;background:#1f2937;color:#e5e7eb;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;';
+
+    actions.appendChild(submitBtn);
+    actions.appendChild(autoFillBtn);
+    actions.appendChild(resetBtn);
+    predictionBox.appendChild(actions);
+
+    const resultPanel = document.createElement('div');
+    resultPanel.style.cssText = 'background:#0f172a;border:1px solid #334155;border-radius:10px;padding:16px;min-height:120px;';
+    resultPanel.innerHTML = '<div style="color:#94a3b8;font-size:13px;">Make a prediction to see how close you are to the projected next sprint.</div>';
+    predictionBox.appendChild(resultPanel);
+
+    const normalizeNumber = (value, fallback = 0) => {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : fallback;
     };
 
-    // ── Colour a submitted row ───────────────────────────────────
-    const colourRow = (rowIdx, guess) => {
-      // Build per-position result
-      const result = Array(WORD_LEN).fill('absent');
-      const targetArr = targetWord.split('');
-      const guessArr  = guess.split('');
+    const scorePrediction = () => {
+      const prediction = {
+        engagement: normalizeNumber(inputs.engagement.value),
+        scrollDepth: normalizeNumber(inputs.scrollDepth.value),
+        sessions: normalizeNumber(inputs.sessions.value),
+        lessons: normalizeNumber(inputs.lessons.value),
+        timeMinutes: normalizeNumber(inputs.timeMinutes.value),
+      };
 
-      // First pass: correct positions
-      guessArr.forEach((ch, i) => {
-        if (ch === targetArr[i]) {
-          result[i] = 'correct';
-          targetArr[i] = null;
-        }
-      });
-      // Second pass: present but wrong position
-      guessArr.forEach((ch, i) => {
-        if (result[i] === 'correct') return;
-        const idx = targetArr.indexOf(ch);
-        if (idx !== -1) {
-          result[i] = 'present';
-          targetArr[idx] = null;
-        }
-      });
-
-      const colors = { correct: '#16a34a', present: '#d97706', absent: '#374151' };
-      const borders = { correct: '#22c55e', present: '#f59e0b', absent: '#4b5563' };
-      const keyColors = { correct: '#16a34a', present: '#d97706', absent: '#4b5563' };
-
-      result.forEach((state, i) => {
-        setTimeout(() => {
-          cells[rowIdx][i].style.background   = colors[state];
-          cells[rowIdx][i].style.borderColor  = borders[state];
-          cells[rowIdx][i].style.color        = '#ffffff';
-          // Update keyboard
-          const key = guess[i];
-          if (keyMap[key]) {
-            const current = keyMap[key].dataset.state;
-            // Correct > present > absent – don't downgrade
-            if (current !== 'correct' && (state === 'correct' || current !== 'present')) {
-              keyMap[key].dataset.state = state;
-              keyMap[key].style.background = keyColors[state];
-              keyMap[key].style.color = '#ffffff';
-            }
-          }
-        }, i * 120);
-      });
-
-      return result;
-    };
-
-    // ── Handle key input ─────────────────────────────────────────
-    const handleKey = (key) => {
-      if (gameOver) return;
-
-      if (key === '⌫' || key === 'Backspace') {
-        if (currentGuess.length > 0) {
-          currentGuess = currentGuess.slice(0, -1);
-          updateCurrentRow();
-        }
+      if (Object.values(prediction).some((value) => Number.isNaN(value))) {
+        resultPanel.innerHTML = '<div style="color:#f59e0b;font-size:13px;">Please fill in every prediction field first.</div>';
         return;
       }
 
-      if (key === 'ENTER' || key === 'Enter') {
-        if (currentGuess.length < WORD_LEN) {
-          message.textContent = `Word must be ${WORD_LEN} letters.`;
-          message.style.color = '#f59e0b';
-          return;
-        }
-        // Submit guess
-        const rowIdx = guesses.length;
-        guesses.push(currentGuess);
-        const result = colourRow(rowIdx, currentGuess);
+      const compare = [
+        { label: 'Engagement', actual: projectedNextSprint.engagement, predicted: prediction.engagement, unit: '%', tolerance: 8 },
+        { label: 'Scroll depth', actual: projectedNextSprint.scrollDepth, predicted: prediction.scrollDepth, unit: '%', tolerance: 8 },
+        { label: 'Sessions', actual: projectedNextSprint.sessions, predicted: prediction.sessions, unit: '', tolerance: 2 },
+        { label: 'Lessons', actual: projectedNextSprint.lessons, predicted: prediction.lessons, unit: '', tolerance: 1 },
+        { label: 'Time spent', actual: projectedNextSprint.timeMinutes, predicted: prediction.timeMinutes, unit: ' min', tolerance: 25 },
+      ];
 
-        const won = currentGuess === targetWord;
-        currentGuess = '';
-        message.textContent = '';
+      const scored = compare.map((item) => {
+        const error = Math.abs(item.actual - item.predicted);
+        const closeness = Math.max(0, 100 - ((error / item.tolerance) * 100));
+        return { ...item, error, closeness };
+      });
 
-        setTimeout(() => {
-          if (won) {
-            gameOver = true;
-            message.textContent = `You got it in ${guesses.length}! The word was ${targetWord}.`;
-            message.style.color = '#10b981';
-          } else if (guesses.length >= MAX_GUESSES) {
-            gameOver = true;
-            message.textContent = `Game over! The word was ${targetWord}.`;
-            message.style.color = '#ef4444';
-          }
-        }, WORD_LEN * 120 + 100);
+      const averageScore = scored.reduce((sum, item) => sum + item.closeness, 0) / scored.length;
+      const rating = averageScore >= 85 ? 'Spot on' : averageScore >= 70 ? 'Pretty close' : averageScore >= 50 ? 'Promising' : 'Way off the mark';
 
-        return;
-      }
-
-      if (/^[A-Za-z]$/.test(key) && currentGuess.length < WORD_LEN) {
-        currentGuess += key.toUpperCase();
-        updateCurrentRow();
-      }
+      resultPanel.innerHTML = `
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+          <div>
+            <div style="color:#94a3b8;font-size:11px;">Overall score</div>
+            <div style="color:#10b981;font-size:26px;font-weight:bold;">${Math.round(averageScore)}%</div>
+          </div>
+          <div>
+            <div style="color:#94a3b8;font-size:11px;">Rating</div>
+            <div style="color:#f59e0b;font-size:18px;font-weight:bold;">${rating}</div>
+          </div>
+        </div>
+        <div style="background:#020617;border-radius:8px;padding:10px 12px;border:1px solid #334155;">
+          ${scored.map((item) => `
+            <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(51,65,85,0.6);">
+              <span style="color:#cbd5e1;">${item.label}</span>
+              <span style="color:${item.error <= item.tolerance ? '#10b981' : '#f59e0b'};">Predicted ${item.predicted}${item.unit} | Projected ${item.actual}${item.unit}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div style="margin-top:12px;color:#94a3b8;font-size:12px;line-height:1.5;">
+          The projection is based on your current sprint trends: a modest lift in engagement, a small rise in scroll depth, a couple more sessions, one more lesson, and a slightly longer time investment.
+        </div>
+      `;
     };
 
-    // Physical keyboard listener
-    const keyListener = (e) => {
-      if (gameOver) return;
-      if (e.key === 'Backspace') { handleKey('⌫'); return; }
-      if (e.key === 'Enter')     { handleKey('ENTER'); return; }
-      if (/^[A-Za-z]$/.test(e.key)) handleKey(e.key);
+    const fillSmartForecast = () => {
+      inputs.engagement.value = projectedNextSprint.engagement.toFixed(1);
+      inputs.scrollDepth.value = projectedNextSprint.scrollDepth.toFixed(1);
+      inputs.sessions.value = String(projectedNextSprint.sessions);
+      inputs.lessons.value = String(projectedNextSprint.lessons);
+      inputs.timeMinutes.value = String(projectedNextSprint.timeMinutes);
     };
-    document.addEventListener('keydown', keyListener);
 
-    // Cleanup listener when modal closes (observe DOM removal)
-    const observer = new MutationObserver(() => {
-      if (!document.body.contains(wordleBox)) {
-        document.removeEventListener('keydown', keyListener);
-        observer.disconnect();
-      }
+    submitBtn.onclick = (event) => {
+      event.stopPropagation();
+      scorePrediction();
+    };
+    autoFillBtn.onclick = (event) => {
+      event.stopPropagation();
+      fillSmartForecast();
+    };
+    resetBtn.onclick = (event) => {
+      event.stopPropagation();
+      Object.values(inputs).forEach((input) => { input.value = ''; });
+      resultPanel.innerHTML = '<div style="color:#94a3b8;font-size:13px;">Make a prediction to see how close you are to the projected next sprint.</div>';
+    };
+
+    Object.values(inputs).forEach((input) => {
+      input.addEventListener('keydown', (event) => {
+        event.stopPropagation();
+      });
     });
-    observer.observe(document.body, { childList: true, subtree: true });
 
-    container.appendChild(wordleBox);
+    predictionBox.addEventListener('keydown', (event) => event.stopPropagation(), true);
+    predictionBox.addEventListener('keyup', (event) => event.stopPropagation(), true);
+    predictionBox.addEventListener('keypress', (event) => event.stopPropagation(), true);
+
+    container.appendChild(predictionBox);
   }
 
   // ════════════════════════════════════════════════════════════════

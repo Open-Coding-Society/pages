@@ -17,23 +17,8 @@ permalink: /student/bathroom_pass
             <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 tracking-tight mb-2">
                 BATHROOM PASS
             </h1>
-            <p class="text-neutral-400 font-medium">Scan your face to join the queue or check out.</p>
         </div>
         
-        <div class="flex items-center gap-6 bg-neutral-900/50 backdrop-blur-xl p-4 rounded-2xl border border-neutral-800 shadow-2xl">
-            <div class="text-center px-4 border-r border-neutral-800">
-                <span id="currentAway" class="block text-3xl font-bold text-indigo-400">0</span>
-                <span class="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Away</span>
-            </div>
-            <div class="text-center px-4">
-                <span id="maxCapacity" class="block text-3xl font-bold text-neutral-400">1</span>
-                <span class="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Limit</span>
-            </div>
-            <div id="statusIndicator" class="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20">
-                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                <span class="text-xs font-bold text-green-500 uppercase tracking-wider">Available</span>
-            </div>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -70,6 +55,17 @@ permalink: /student/bathroom_pass
                             <span>Initialize Scanner</span>
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
+                    </div>
+
+                    <!-- Cooldown Overlay -->
+                    <div id="cooldownOverlay" class="hidden absolute inset-0 bg-neutral-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-8 transition-opacity duration-500">
+                        <div class="w-20 h-20 rounded-full bg-amber-500/10 flex items-center justify-center mb-6 border border-amber-500/20">
+                            <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Scanner Cooldown</h2>
+                        <p class="text-neutral-400 text-center max-w-xs mb-8">Ready in <span id="cooldownTimer" class="font-bold text-amber-500">5</span> seconds...</p>
                     </div>
 
                     <!-- Identification Overlay -->
@@ -164,6 +160,8 @@ permalink: /student/bathroom_pass
     let isProcessing = false;
     let faceMatcher = null;
     let isFaceApiLoaded = false;
+    let cooldownRemaining = 0;
+    let cooldownInterval = null;
 
     async function loadFaceData() {
         showToast({ message: "Loading Face AI models...", duration: 3000 });
@@ -177,8 +175,26 @@ permalink: /student/bathroom_pass
             ]);
             
             showToast({ message: "Fetching student face data...", duration: 2000 });
-            const resp = await fetch(`${javaURI}/api/person/faces`, fetchOptions);
+            const resp = await fetch(`${javaURI}/api/face/faces`, fetchOptions);
+            
+            if (resp.status === 403 || resp.status === 401) {
+                showToast({ message: "Access denied: Only teachers/admins can use the scanner. Please log in with the correct role.", style: { background: "#ef4444" }, duration: 7000 });
+                return;
+            }
+            
+            if (!resp.ok) {
+                showToast({ message: `Failed to fetch face data (HTTP ${resp.status}). Is the backend running?`, style: { background: "#ef4444" }, duration: 5000 });
+                return;
+            }
+            
             const faces = await resp.json();
+            
+            if (!Array.isArray(faces)) {
+                showToast({ message: "Unexpected response from server. Check backend logs.", style: { background: "#ef4444" }, duration: 5000 });
+                console.error("Expected array from /api/face/faces, got:", faces);
+                return;
+            }
+            
             console.log(`Fetched ${faces.length} faces from backend:`, faces);
             
             const labeledDescriptors = [];
@@ -203,11 +219,15 @@ permalink: /student/bathroom_pass
             }
             
             if (labeledDescriptors.length === 0) {
-                 showToast({ message: "No registered faces retrieved. Scanner will not work.", style: { background: "#ef4444" }, duration: 5000 });
+                if (faces.length === 0) {
+                    showToast({ message: "No faces have been registered yet. Students must register their face first.", style: { background: "#f59e0b" }, duration: 7000 });
+                } else {
+                    showToast({ message: "Faces were fetched but none could be processed. Check image quality of stored data.", style: { background: "#ef4444" }, duration: 5000 });
+                }
             } else {
                  faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.6);
                  isFaceApiLoaded = true;
-                 showToast({ message: "Scanner Ready!", duration: 3000 });
+                 showToast({ message: `Scanner Ready! (${labeledDescriptors.length} faces loaded)`, duration: 3000 });
             }
         } catch (err) {
              console.error("Failed to initialize FaceAPI", err);
@@ -303,8 +323,34 @@ permalink: /student/bathroom_pass
     function resetId() {
         identifiedPerson = null;
         document.getElementById('idOverlay').classList.add('hidden');
-        document.getElementById('scanLine').classList.remove('hidden');
-        startIdentificationLoop();
+        startCooldown();
+    }
+
+    function startCooldown() {
+        if (cooldownInterval) clearInterval(cooldownInterval);
+        cooldownRemaining = 5;
+        const overlay = document.getElementById('cooldownOverlay');
+        const timerText = document.getElementById('cooldownTimer');
+        const scanLine = document.getElementById('scanLine');
+        
+        if (!overlay || !timerText) return;
+        
+        overlay.classList.remove('hidden');
+        scanLine.classList.add('hidden');
+        timerText.textContent = cooldownRemaining;
+        
+        const interval = setInterval(() => {
+            cooldownRemaining--;
+            if (cooldownRemaining <= 0) {
+                clearInterval(interval);
+                cooldownInterval = null;
+                overlay.classList.add('hidden');
+                scanLine.classList.remove('hidden');
+                startIdentificationLoop();
+            } else {
+                timerText.textContent = cooldownRemaining;
+            }
+        }, 1000);
     }
 
     async function confirmIdentity() {
@@ -358,32 +404,8 @@ permalink: /student/bathroom_pass
     }
 
     function updateQueueUI(data) {
-        document.getElementById('currentAway').textContent = data.away;
-        document.getElementById('maxCapacity').textContent = data.maxOccupancy;
-        
         const list = document.getElementById('queueList');
         const total = document.getElementById('queueTotal');
-        const indicator = document.getElementById('statusIndicator');
-        const dot = indicator.querySelector('div');
-        const statusText = indicator.querySelector('span');
-
-        if (data.away >= data.maxOccupancy) {
-            indicator.classList.remove('bg-green-500/10', 'border-green-500/20');
-            indicator.classList.add('bg-red-500/10', 'border-red-500/20');
-            dot.classList.remove('bg-green-500');
-            dot.classList.add('bg-red-500');
-            statusText.textContent = "Full";
-            statusText.classList.remove('text-green-500');
-            statusText.classList.add('text-red-500');
-        } else {
-            indicator.classList.remove('bg-red-500/10', 'border-red-500/20');
-            indicator.classList.add('bg-green-500/10', 'border-green-500/20');
-            dot.classList.remove('bg-red-500');
-            dot.classList.add('bg-green-500');
-            statusText.textContent = "Available";
-            statusText.classList.remove('text-red-500');
-            statusText.classList.add('text-green-500');
-        }
 
         if (!data.peopleQueue) {
             list.innerHTML = `<p class="text-neutral-500 text-center py-8">Queue is empty</p>`;
@@ -519,9 +541,22 @@ permalink: /student/bathroom_pass
     document.getElementById('emergencyCheckInBtn')?.addEventListener('click', emergencyCheckIn);
     document.getElementById('emergencyCheckOutBtn')?.addEventListener('click', emergencyCheckOut);
 
+    // Auto-reload at midnight to fetch new facial registrations
+    function scheduleMidnightReload() {
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+        const msUntilMidnight = tomorrow.getTime() - now.getTime();
+        
+        setTimeout(() => {
+            window.location.reload(true);
+        }, msUntilMidnight);
+    }
+
     // Polling for queue updates
     initializeCurrentUser();
     setInterval(refreshQueue, 5000);
+    scheduleMidnightReload();
+
     document.addEventListener('DOMContentLoaded', () => {
         refreshQueue();
         loadFaceData();

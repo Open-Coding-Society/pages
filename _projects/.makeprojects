@@ -6,7 +6,22 @@
 # Format: <project-name>
 # Example: cs-pathway-game
 
-cs-pathway-game
+cs-pathway-game:dev
+characters
 gamify
+main
+ocean
+game-lessons
+PeppaPigGame
+teamtestgame
+main
 student-management-groups
 test-project
+game-in-game-lesson
+red-riding
+barriers-spline-sorcerers
+platformer-gravity-sorcerers
+backgrounds
+multiplayer
+transitions
+parallelAndComputinglesson

@@ -34,12 +34,20 @@ export default class SkillPassport {
    * Fetches the current user's skill snapshots from the backend,
    * then hands them off to _render() to build the modal.
    */
-  async start() {
-    const resp = await fetch(`${this.pythonURI}/api/user/skill-snapshot`, this.fetchOptions);
-    const snapshots = await resp.json();
-    this._render(snapshots);
+async start() {
+  try {
+    const resp = await fetch(`${this.pythonURI}/api/user/skill-passport`, this.fetchOptions);
+    if (!resp.ok) throw new Error(`Server returned ${resp.status}`);
+    const data = await resp.json();
+    // The endpoint returns { history: [...], current_skills: {...}, ... }
+    // so we pull out the history array to pass to _render
+    this._render(data.history ?? []);
+  } catch (err) {
+    console.error('SkillPassport fetch failed:', err);
+    // Still open the modal so the player sees something instead of nothing
+    this._render([]);
   }
-
+}
   /**
    * _render(snapshots)
    * Builds and injects the passport-styled full-screen overlay into the page.
@@ -68,9 +76,7 @@ export default class SkillPassport {
 
     this.overlay.innerHTML = `
       <style>
-        .sp-passport { width: 520px; background: #1e3a2f; border-radius: 8px; overflow: hidden; border: 2px solid #2d5440; }
-        .sp-cover { background: #1e3a2f; padding: 24px 28px 16px; border-bottom: 3px solid #c9a84c; }
-        .sp-cover-row { display: flex; align-items: flex-start; justify-content: space-between; }
+        .sp-passport { width: 520px; background: #1e3a2f; border-radius: 8px; border: 2px solid #2d5440; margin: auto; }        .sp-cover-row { display: flex; align-items: flex-start; justify-content: space-between; }
         .sp-titles { text-align: center; flex: 1; }
         .sp-country { font-size: 10px; letter-spacing: 3px; color: #c9a84c; text-transform: uppercase; margin-bottom: 4px; }
         .sp-doctype { font-size: 20px; font-weight: bold; color: #e8dcc8; letter-spacing: 2px; margin-bottom: 2px; }
@@ -100,8 +106,6 @@ export default class SkillPassport {
         .sp-entry-project { font-size: 13px; color: #e8dcc8; margin-bottom: 3px; }
         .sp-entry-scores { font-size: 10px; color: #8fa898; font-family: 'Courier New', monospace; }
         .sp-empty { font-size: 12px; color: #4d7a60; text-align: center; padding: 16px 0; font-family: 'Courier New', monospace; }
-        .sp-mrz { background: #0f2318; padding: 10px 20px; border-top: 2px solid #2d5440; }
-        .sp-mrz-line { font-family: 'Courier New', monospace; font-size: 9px; color: #3d6b4f; letter-spacing: 1px; line-height: 1.7; word-break: break-all; }
         .sp-close-row { padding: 10px 20px; border-top: 1px solid #2d5440; text-align: center; }
         .sp-close-btn { background: none; border: 1px solid #2d5440; color: #8fa898; font-size: 11px; padding: 6px 28px; border-radius: 3px; cursor: pointer; font-family: 'Courier New', monospace; letter-spacing: 1px; transition: all 0.15s; }
         .sp-close-btn:hover { border-color: #c45c4a; color: #c45c4a; }
@@ -205,20 +209,16 @@ export default class SkillPassport {
                 }).join('')
             }
           </div>
-        </div>
 
-        <!-- Machine-readable zone (decorative, shows snapshot count) -->
-        <div class="sp-mrz">
-          <div class="sp-mrz-line">POCS&lt;&lt;ADVENTURER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-          <div class="sp-mrz-line">CSSE2026&lt;&lt;SKILL&lt;&lt;&lt;&lt;PASSPORT&lt;&lt;${String(snapshots.length).padStart(3, '0')}&lt;&lt;9</div>
-        </div>
+          </div>
 
         <!-- Close button -->
         <div class="sp-close-row">
-          <button class="sp-close-btn" id="sp-close">Close Passport</button>
+            <button class="sp-close-btn" id="sp-close">Close Passport</button>
         </div>
 
-      </div>
+        </div>
+
     `;
 
     document.body.appendChild(this.overlay);

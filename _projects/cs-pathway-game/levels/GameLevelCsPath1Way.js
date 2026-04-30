@@ -1,16 +1,16 @@
 // GameLevelCsPath1Way.js
 
 // Imports: Level objects and UI helpers.
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaTrial from './PersonaTrial.js';
-import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
-import StatusPanel from '/assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
+import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import SprintSuccessModule from './SprintSuccessModule.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -63,7 +63,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     const bg_data = {
       name: GameLevelCsPath1Way.displayName,
       greeting:
-        "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll discover your course, uncover your strengths, and enrich your persona!",
+        "Welcome to the CSSE pathway! This quest will establish your bearings in the Wayfinding World, where you'll uncover your strengths, enrich your persona, and learn about planning and sprints!",
       src: image_src,
     };
 
@@ -118,7 +118,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       y: height * 0.49,
     };
 
-    const courseEnlistGatekeeperPos = {
+    const sprintSuccessGatekeeperPos = {
       x: width * 0.24,
       y: height * 0.46,
     };
@@ -248,16 +248,15 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       },
     });
 
-    const npc_data_courseEnlistGatekeeper = createGatekeeperData({
-      id: 'CourseEnlistGatekeeper',
-      greeting: 'Welcome to Course Enlist! Choose your next class and map your pathway.',
-      position: courseEnlistGatekeeperPos,
+    const npc_data_sprintSuccessGatekeeper = createGatekeeperData({
+      id: 'SprintSuccessGatekeeper',
+      greeting: 'Welcome to Sprint Success! Review your goals, reflect on progress, and prepare for your next sprint.',
+      position: sprintSuccessGatekeeperPos,
       markerColor: '#ef4444',
       interact: () => {
-        this.openCourseEnlistment();
+        this.openSprintSuccess();
       },
     });
-
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
@@ -265,7 +264,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_codeHubGatekeeper },
       { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
       { class: Npc, data: npc_data_skillPassportGatekeeper },
-      { class: Npc, data: npc_data_courseEnlistGatekeeper },
+      { class: Npc, data: npc_data_sprintSuccessGatekeeper },
     ];
   }
 
@@ -314,57 +313,47 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     trial.start();
   }
 
-  // ── Course Enlistment Trial ──────────────────────────────────
-  openCourseEnlistment() {
-    if (this._courseEnlistmentOpen) return;
-    this._courseEnlistmentOpen = true;
+  // ── Sprint Success ─────────────────────────────────────────────
+  openSprintSuccess() {
+    if (this._sprintSuccessOpen) return;
+    this._sprintSuccessOpen = true;
 
-    const trial = new CourseEnlistmentTrial({
-      profileData: this.profileData || {},
+    const sprint = new SprintSuccessModule({
       onComplete: async (result) => {
         try {
-          await this.saveCoursePlanResult(result);
+          await this.saveSprintSuccessResult(result);
 
-          this.showToast?.(`Path unlocked: ${result.title}`);
+          this.showToast?.(`Sprint Success complete: ${result.title}`);
 
-          const classesText = Array.isArray(result.recommendedClasses)
-            ? result.recommendedClasses.map((item) => item.name).join(' → ')
-            : '';
-
-          const planText = Array.isArray(result.gamePlan)
-            ? result.gamePlan.map((step, index) => `${index + 1}. ${step.title}`).join('\n')
-            : '';
-
-          this.panel?.(
-            `${result.title}\n\n${result.summary}\n\nRecommended Classes: ${classesText}\n\nGame Plan:\n${planText}\n\nRedeemed Token: ${result.redeemToken?.label || result.redeemToken?.code || 'Unlocked'}`
-          );
+          this.profilePanelView?.update?.({
+            skill: result.title,
+          });
         } catch (error) {
-          console.error('Failed to save course enlistment result:', error);
-          this.showToast?.('Course plan completed, but saving failed.');
+          console.error('Failed to save Sprint Success result:', error);
+          this.showToast?.('Sprint Success completed, but saving failed.');
         } finally {
-          this._courseEnlistmentOpen = false;
+          this._sprintSuccessOpen = false;
         }
       },
+
       onClose: () => {
-        this._courseEnlistmentOpen = false;
+        this._sprintSuccessOpen = false;
       },
     });
 
-    trial.start();
+    sprint.start();
   }
 
-  async savePersonaResult(result) {
+  async saveSprintSuccessResult(result) {
     const currentProfile = { ...(this.profileData || {}) };
 
     const updatedProfile = {
       ...currentProfile,
-      personaMeta: {
-        primaryPersona: result.primaryPersona,
+      sprintSuccessMeta: {
         title: result.title,
         summary: result.summary,
-        growth: result.growth,
-        percentages: result.percentages,
         scores: result.scores,
+        skills: result.skills,
         completedAt: result.completedAt,
       },
     };
@@ -392,7 +381,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     }
 
     console.warn(
-      'No known ProfileManager save method found. Persona result stored in this.profileData only.'
+      'No known ProfileManager save method found. Sprint Success result stored in this.profileData only.'
     );
   }
 
