@@ -4,6 +4,7 @@ import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '@assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import ProfileManager from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 
 // Prompt templates for AI question generation and grading.
 const CHALLENGE_PROMPT_TEXT = {
@@ -356,18 +357,22 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._aiLoadingPending = 0;
     this._aiLoadingToastTimer = null;
     this._aiLoadingFrame = 0;
+    this._profileManager = new ProfileManager();
   }
 
   /**
    * Initialize level. Binds desk reactions, wires proximity click gates,
-   * and renders the initial mission scoreboard.
+   * restores saved score from profile, and renders the mission scoreboard.
    */
-  initialize() {
+  async initialize() {
     const objects = this.gameEnv?.gameObjects || [];
     const desks = objects.filter((obj) => this._missionDeskIds?.includes(obj?.spriteData?.id));
     this._rebindMissingDeskReactions(desks);
     this._wireDeskClickDistanceGate(desks);
     document.addEventListener('keydown', this._handleMissionDeskKeyDownBound);
+
+    // Restore persisted score before first render
+    await this._restoreMissionScore();
     this._syncMissionProgressBoard();
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
@@ -378,6 +383,31 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
     this._missionDeskObjects = desks;
     this._activeZoneDeskId = null;
+  }
+
+  /**
+   * Restore mission score from profile storage (localStorage → backend fallback).
+   * @private
+   */
+  async _restoreMissionScore() {
+    try {
+      await this._profileManager.initialize();
+      const profile = await this._profileManager.getProfile();
+      if (!profile) return;
+
+      const savedCount = profile.missionProgressCount;
+      const savedStations = profile.missionCompletedStations;
+
+      if (typeof savedCount === 'number' && savedCount > 0) {
+        this._missionProgressCount = savedCount;
+        console.log('[MissionTools] restored score:', savedCount);
+      }
+      if (Array.isArray(savedStations) && savedStations.length > 0) {
+        savedStations.forEach((id) => this._missionCompletedStations.add(id));
+      }
+    } catch (err) {
+      console.warn('[MissionTools] could not restore score:', err);
+    }
   }
 
   /**
@@ -822,6 +852,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._missionCompletedStations.add(deskId);
       this._missionProgressCount += 1;
       this._syncMissionProgressBoard();
+      this._saveMissionScore();
 
       if (this._missionCompletedStations.size >= stationTargetCount) {
         this.showToast?.('All stations cleared once. Repeat solves now count toward bonus progress.');
@@ -836,6 +867,21 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
     this._missionProgressCount += 1;
     this._syncMissionProgressBoard();
+    this._saveMissionScore();
+  }
+
+  /**
+   * Persist current mission score to localStorage (and async to backend if authenticated).
+   * @private
+   */
+  _saveMissionScore() {
+    const score = this._getMissionProgressScore(this._missionProgressCount);
+    this._profileManager.updateProgress('missionProgressCount', this._missionProgressCount).catch(() => {});
+    this._profileManager.updateProgress('missionScore', score).catch(() => {});
+    this._profileManager.updateProgress(
+      'missionCompletedStations',
+      Array.from(this._missionCompletedStations),
+    ).catch(() => {});
   }
 
   /**
