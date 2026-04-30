@@ -32,7 +32,7 @@ class localStorageDemo {
         });
 
         // Background data  (fixed: was referencing undefined image_src_forest)
-        const image_src_desert = path + "/_projects/local-storage/images/forest.png";
+        const image_src_desert = path + "/images/gamify/forest.png";
         const image_data_desert = {
             name: 'forest',
             src: image_src_desert,          // ← was image_src_forest (bug fix)
@@ -40,7 +40,7 @@ class localStorageDemo {
         };
 
         // Player data for Chillguy
-        const sprite_src_chillguy = path + "/_projects/local-storage/images/chillguy.png";
+        const sprite_src_chillguy = path + "/images/gamify/chillguy.png";
         const CHILLGUY_SCALE_FACTOR = 5;
         const sprite_data_chillguy = {
             id: 'Chill Guy',
