@@ -186,6 +186,19 @@ export class GameExecutor {
 
   async run() {
     try {
+      // Save both the index AND the actual class reference so we can find it
+      // in the freshly-imported gameLevelClasses after restart.  This handles
+      // dynamically-spliced levels (e.g. Code Hub inserted by Wayfinding World)
+      // whose original index no longer maps to the right class after a restart.
+      const preservedLevelClass = (() => {
+        const idx = this.gameControl?.currentLevelIndex;
+        const classes = this.gameControl?.levelClasses;
+        if (Number.isInteger(idx) && Array.isArray(classes) && idx >= 0 && idx < classes.length) {
+          return classes[idx];
+        }
+        return null;
+      })();
+
       const preservedLevelIndex = (() => {
         if (Number.isInteger(this.gameControl?.currentLevelIndex) && this.gameControl.currentLevelIndex >= 0) {
           return this.gameControl.currentLevelIndex;
@@ -224,13 +237,24 @@ export class GameExecutor {
       const selectedVersion = this.engineVersionSelect ? this.engineVersionSelect.value : 'GameEnginev1';
 
       code = code.replace(/GameEnginev1(?:\.1)?/g, selectedVersion);
-      code = code.replace(/from\s+['"](\/?[^'"]+)['"]/g, (match, importPath) => {
+      code = code.replace(/from\s+['"]([^'"]+)['"]/g, (match, importPath) => {
+        // Keep import-map aliases, relative paths, and explicit schemes untouched.
+        if (
+          importPath.startsWith('@') ||
+          importPath.startsWith('./') ||
+          importPath.startsWith('../') ||
+          /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(importPath)
+        ) {
+          return match;
+        }
+
         if (importPath.startsWith('/')) {
           return `from '${baseUrl}${importPath}'`;
         } else if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
           return `from '${baseUrl}/${importPath}'`;
         }
-        return match;
+
+        return `from '${baseUrl}/${importPath}'`;
       });
 
       const GameModule = await import(baseUrl + '/assets/js/' + selectedVersion + '/essentials/Game.js');
@@ -266,8 +290,26 @@ export class GameExecutor {
         this.gameCore = Game.main(environment, GameControl);
         this.gameControl = this.gameCore?.gameControl || null;
 
+        // Resolve the best level to restore to:
+        // 1. If the preserved class exists in the new level array, use its index there.
+        // 2. Otherwise (it was a dynamically-spliced level like Code Hub) fall back
+        //    to the last level in the permanent array that comes before it, so the
+        //    player lands at Wayfinding World / the hub rather than an unrelated level.
+        let resolvedLevelIndex = preservedLevelIndex;
+        if (preservedLevelClass && Array.isArray(gameLevelClasses)) {
+          const classIndex = gameLevelClasses.indexOf(preservedLevelClass);
+          if (classIndex >= 0) {
+            // Class found in the permanent array — restore directly.
+            resolvedLevelIndex = classIndex;
+          } else if (Number.isInteger(preservedLevelIndex)) {
+            // Dynamic level: clamp to the last valid index so we don't overshoot
+            // into an unrelated level (e.g. Mission Tools instead of Code Hub).
+            resolvedLevelIndex = Math.min(preservedLevelIndex, gameLevelClasses.length - 1);
+          }
+        }
+
         if (
-          Number.isInteger(preservedLevelIndex) &&
+          Number.isInteger(resolvedLevelIndex) &&
           this.gameControl &&
           Array.isArray(gameLevelClasses) &&
           preservedLevelIndex >= 0 &&

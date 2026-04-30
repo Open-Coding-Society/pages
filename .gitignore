@@ -53,7 +53,9 @@ _posts/**/*_csse.md
 # Project distributions (auto-generated from _projects/ source)
 _notebooks/projects/
 _posts/projects/
+_sass/projects/
 assets/js/projects/
+assets/css/projects/
 images/projects/
 
 # Post generations
@@ -73,3 +75,6 @@ _notebooks/**/*_content.md
 
 # remove all the .scss cache files
 *.scssc
+
+# Claude Code session artifacts
+.claude/

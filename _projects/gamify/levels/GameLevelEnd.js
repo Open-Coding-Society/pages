@@ -1,11 +1,11 @@
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import BackgroundParallax from '/assets/js/GameEnginev1.1/essentials/BackgroundParallax.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
-import Game from '/assets/js/GameEnginev1.1/essentials/Game.js';
-import Enemy from '/assets/js/GameEnginev1.1/essentials/Enemy.js';
-import Collectible from '/assets/js/GameEnginev1.1/essentials/Collectible.js';
-import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import BackgroundParallax from '@assets/js/GameEnginev1.1/essentials/BackgroundParallax.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Game from '@assets/js/GameEnginev1.1/essentials/Game.js';
+import Enemy from '@assets/js/GameEnginev1.1/essentials/Enemy.js';
+import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 
 class GameLevelEnd {
   constructor(gameEnv) {

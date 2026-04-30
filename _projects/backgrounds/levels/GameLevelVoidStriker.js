@@ -1,4 +1,4 @@
-import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 
 class GameLevelVoidStriker {
   constructor(gameEnv) {
@@ -39,6 +39,28 @@ const VoidStrikerGame = (() => {
 
   let ship, bullets = [], enemies = [], asteroids = [], particles = [];
   let enemyBullets = [];
+  let boss = null;
+  // While the Boss Alien is alive, all other moving objects (enemies, asteroids,
+  // enemy bullets) tick at this fraction of their normal speed. Restored to 1
+  // the instant the boss dies.
+  let worldSpeed = 1;
+  // Boss respawn loop: first boss on wave 3, then every 2 waves after each kill.
+  let bossesDefeated = 0;
+  let nextBossWave = 3;
+
+  // Rotating boss color palettes — each entry is one full re-skin cycled
+  // through as bosses are defeated and respawned.
+  const BOSS_PALETTES = [
+    { glow: '255,40,80',    bodyHi: '#ff7799', bodyLo: '#660022', tentacle: '#aa1144', eye: '#ffee44' }, // crimson
+    { glow: '120,255,140',  bodyHi: '#aaffaa', bodyLo: '#003322', tentacle: '#22aa44', eye: '#ddff66' }, // toxic green
+    { glow: '120,160,255',  bodyHi: '#99bbff', bodyLo: '#00224a', tentacle: '#3355cc', eye: '#88eeff' }, // void blue
+    { glow: '255,180,40',   bodyHi: '#ffd577', bodyLo: '#553300', tentacle: '#cc7722', eye: '#fff0aa' }, // solar
+    { glow: '220,80,255',   bodyHi: '#dd99ff', bodyLo: '#330044', tentacle: '#9933cc', eye: '#ffccff' }, // amethyst
+  ];
+
+  // Hue base for the small enemies — rotates with wave so each wave's mob
+  // color shifts. Combined with a randomized per-enemy spread for variety.
+  const ENEMY_HUE_BANDS = [0, 200, 120, 280, 40, 160, 320];
 
   const keys = {};
 
@@ -416,10 +438,11 @@ const VoidStrikerGame = (() => {
   }
 
   function updateShip() {
-    if (keys['ArrowLeft'] || keys['a'] || keys['A']) ship.x -= ship.speed;
-    if (keys['ArrowRight']|| keys['d'] || keys['D']) ship.x += ship.speed;
-    if (keys['ArrowUp']   || keys['w'] || keys['W']) ship.y -= ship.speed;
-    if (keys['ArrowDown'] || keys['s'] || keys['S']) ship.y += ship.speed;
+    // WASD = movement only
+    if (keys['a'] || keys['A']) ship.x -= ship.speed;
+    if (keys['d'] || keys['D']) ship.x += ship.speed;
+    if (keys['w'] || keys['W']) ship.y -= ship.speed;
+    if (keys['s'] || keys['S']) ship.y += ship.speed;
 
     ship.x = Math.max(ship.w, Math.min(W - ship.w, ship.x));
     ship.y = Math.max(ship.h, Math.min(H - ship.h, ship.y));
@@ -428,9 +451,19 @@ const VoidStrikerGame = (() => {
     if (ship.invincible    > 0) ship.invincible--;
     ship.thrustFlicker = (ship.thrustFlicker + 1) % 6;
 
-    if ((keys[' '] || keys['Space']) && ship.shootCooldown === 0) {
-      fireTripleShot();
-      ship.shootCooldown = 14;
+    // Arrow keys = directional shooting. Combine pressed arrows into a single
+    // direction vector so diagonals work too (e.g. Up+Right shoots up-right).
+    // This matters most once the Boss Alien gets behind the ship.
+    if (ship.shootCooldown === 0) {
+      let sx = 0, sy = 0;
+      if (keys['ArrowLeft'])  sx -= 1;
+      if (keys['ArrowRight']) sx += 1;
+      if (keys['ArrowUp'])    sy -= 1;
+      if (keys['ArrowDown'])  sy += 1;
+      if (sx !== 0 || sy !== 0) {
+        fireDirected(sx, sy);
+        ship.shootCooldown = 12;
+      }
     }
   }
 
@@ -479,9 +512,36 @@ const VoidStrikerGame = (() => {
     ctx.restore();
   }
 
-  function fireTripleShot() {
-    const spreads = [{ vx: -1.5, vy: -10 }, { vx: 0, vy: -11 }, { vx: 1.5, vy: -10 }];
-    spreads.forEach(s => bullets.push({ x: ship.x, y: ship.y - 20, ...s, life: 60 }));
+  function fireDirected(sx, sy) {
+    const len = Math.hypot(sx, sy) || 1;
+    const nx = sx / len, ny = sy / len;
+    const angle = Math.atan2(ny, nx);
+    // Three-way spread: center bullet at full speed, two side bullets fanned
+    // out by ~9° on each side at slightly slower speed (matches the old
+    // upward triple-shot feel, just rotated to fire whichever direction the
+    // player pressed).
+    const spread = 0.15;
+    // While the Boss Alien is alive the player's spread is nerfed to 2
+    // bullets (no center shot) — the boss is supposed to be hard.
+    const shots = boss
+      ? [
+          { a: angle - spread, speed: 10 },
+          { a: angle + spread, speed: 10 },
+        ]
+      : [
+          { a: angle - spread, speed: 10 },
+          { a: angle,          speed: 11 },
+          { a: angle + spread, speed: 10 },
+        ];
+    shots.forEach(s => {
+      bullets.push({
+        x: ship.x + nx * 18,
+        y: ship.y + ny * 18,
+        vx: Math.cos(s.a) * s.speed,
+        vy: Math.sin(s.a) * s.speed,
+        life: 60,
+      });
+    });
   }
 
   function updateBullets() {
@@ -502,8 +562,107 @@ const VoidStrikerGame = (() => {
     });
   }
 
+  // ── Boss Alien (peer lesson: chasing-enemy update() loop) ───────────────
+  // Adapted from the "ocean" lesson on Math.atan2-based pursuit. Each frame,
+  // compute the angle from the boss to the ship and step toward the ship along
+  // (cos, sin). The boss eats 30 hits and counts as 5 kills on death.
+  function spawnBoss() {
+    // Tier = how many bosses have been defeated already. Each return is
+    // tougher: more HP, slightly faster, and wears a new color palette.
+    const tier = bossesDefeated;
+    const hp = 55 + tier * 30;
+    boss = {
+      x: W / 2,
+      y: -80,
+      r: 40 + tier * 2,
+      hp,
+      maxHp: hp,
+      speed: 2.7 + tier * 0.45,
+      pulse: 0,
+      tier,
+      palette: BOSS_PALETTES[tier % BOSS_PALETTES.length],
+    };
+    worldSpeed = 0.4; // slow everything else while boss is loose
+    const bar = document.getElementById('vs-boss-bar');
+    if (bar) bar.style.display = 'block';
+    // Tint the bar to match the current boss
+    const fill = document.getElementById('vs-boss-fill');
+    if (fill) {
+      const p = boss.palette;
+      fill.style.background = `linear-gradient(90deg, rgba(${p.glow},1), ${p.bodyHi})`;
+    }
+  }
+
+  function updateBoss() {
+    if (!boss) return;
+    boss.pulse += 0.08;
+    // Distance + angle to player (peer lesson: distance/atan2)
+    const dx = ship.x - boss.x;
+    const dy = ship.y - boss.y;
+    const angle = Math.atan2(dy, dx); // dy first, then dx — easy to flip!
+    boss.x += Math.cos(angle) * boss.speed;
+    boss.y += Math.sin(angle) * boss.speed;
+    // Reflect health bar
+    const fill = document.getElementById('vs-boss-fill');
+    if (fill) fill.style.width = (Math.max(0, boss.hp) / boss.maxHp * 100) + '%';
+  }
+
+  function drawBoss() {
+    if (!boss) return;
+    const p = boss.palette;
+    const r = boss.r + Math.sin(boss.pulse) * 2.5;
+    ctx.save();
+    ctx.translate(boss.x, boss.y);
+    // Outer glow
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.8);
+    glow.addColorStop(0, `rgba(${p.glow},0.55)`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(0, 0, r * 1.8, 0, Math.PI * 2); ctx.fill();
+    // Body
+    const body = ctx.createRadialGradient(0, -r * 0.3, 2, 0, 0, r);
+    body.addColorStop(0, p.bodyHi);
+    body.addColorStop(1, p.bodyLo);
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+    // Tentacles
+    ctx.strokeStyle = p.tentacle;
+    ctx.lineWidth = 4;
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + Math.sin(boss.pulse + i) * 0.2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * r * 0.7, Math.sin(a) * r * 0.7);
+      ctx.lineTo(Math.cos(a) * r * 1.5, Math.sin(a) * r * 1.5);
+      ctx.stroke();
+    }
+    // Eye
+    ctx.fillStyle = p.eye;
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.42, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#220000';
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function killBoss() {
+    if (!boss) return;
+    spawnExplosion(boss.x, boss.y, `rgb(${boss.palette.glow})`);
+    spawnExplosion(boss.x, boss.y, boss.palette.eye);
+    // Boss is worth 5 kills toward the unlock counter
+    totalKills += 5;
+    window.dispatchEvent(new CustomEvent('vs-kills', { detail: { total: totalKills } }));
+    bossesDefeated++;
+    nextBossWave = wave + 2; // back in 2 waves, stronger
+    boss = null;
+    worldSpeed = 1; // resume full speed for everything else
+    const bar = document.getElementById('vs-boss-bar');
+    if (bar) bar.style.display = 'none';
+  }
+
   function spawnWave() {
+    if (wave === nextBossWave && !boss) spawnBoss();
     const count = 5 + wave * 3;
+    // Each wave gets its own hue band so the mob color rotates as you progress.
+    const hueBase = ENEMY_HUE_BANDS[wave % ENEMY_HUE_BANDS.length];
     for (let i = 0; i < count; i++) {
       enemies.push({
         x:         rand(40, W - 40),
@@ -512,7 +671,7 @@ const VoidStrikerGame = (() => {
         speed:     rand(1.0, 1.8 + wave * 0.25),
         vx:        rand(-0.8, 0.8),
         hp:        1 + Math.floor(wave / 2),
-        color:     `hsl(${randI(0,30)},90%,55%)`,
+        color:     `hsl(${(hueBase + randI(-15, 15) + 360) % 360},85%,55%)`,
         shootTimer: wave >= 5 ? randI(40, 120) : Infinity,
       });
     }
@@ -523,7 +682,12 @@ const VoidStrikerGame = (() => {
         x:     rand(40, W - 40),
         y:     -40 - i * 60,
         r:     rand(18, 34 + Math.min(wave * 1.5, 20)),
-        speed: rand(0.7, 1.4 + wave * 0.15),
+        // Gravity-driven fall (lesson: Gravity System).
+        // verticalVelocity is positive = up; gravityAcceleration is subtracted each frame.
+        // Seed slight upward velocity so asteroids accelerate from drift to fall.
+        verticalVelocity:    rand(0.2, 0.8),
+        gravityAcceleration: 0.05 + wave * 0.005,
+        terminalVelocity:    3.5 + wave * 0.15,
         vx:    rand(-0.6, 0.6),
         rot:   0,
         rotV:  rand(-0.03, 0.03),
@@ -536,13 +700,15 @@ const VoidStrikerGame = (() => {
   }
 
   function updateEnemies() {
+    // worldSpeed scales every non-player movement: 1 normally, 0.4 while the
+    // Boss Alien is alive. The instant the boss dies it snaps back to 1.
     enemies.forEach(e => {
-      e.y  += e.speed;
-      e.x  += e.vx;
+      e.y  += e.speed * worldSpeed;
+      e.x  += e.vx    * worldSpeed;
       if (e.x < 20 || e.x > W - 20) e.vx *= -1;
 
       if (e.shootTimer !== Infinity) {
-        e.shootTimer--;
+        e.shootTimer -= worldSpeed;
         if (e.shootTimer <= 0) {
           enemyBullets.push({ x: e.x, y: e.y + e.r, vx: 0, vy: 4 + wave * 0.3, life: 80 });
           e.shootTimer = randI(60, 140);
@@ -552,15 +718,23 @@ const VoidStrikerGame = (() => {
     enemies = enemies.filter(e => e.y < H + 60);
 
     asteroids.forEach(a => {
-      a.y   += a.speed;
-      a.x   += a.vx;
-      a.rot += a.rotV;
+      // Per-frame gravity loop (lesson: Gravity System):
+      // 1. Subtract gravity from vertical velocity (pulls asteroid down)
+      a.verticalVelocity -= a.gravityAcceleration;
+      // 2. Clamp at terminal velocity so asteroids don't fall infinitely fast
+      if (-a.verticalVelocity > a.terminalVelocity) {
+        a.verticalVelocity = -a.terminalVelocity;
+      }
+      // 3. Convert to engine velocity (flip sign): negative verticalVelocity = downward y motion
+      a.y   += -a.verticalVelocity * worldSpeed;
+      a.x   += a.vx                * worldSpeed;
+      a.rot += a.rotV               * worldSpeed;
       if (a.x < 20 || a.x > W - 20) a.vx *= -1;
     });
     asteroids = asteroids.filter(a => a.y < H + 80);
 
     enemyBullets = enemyBullets.filter(b => b.life-- > 0 && b.y < H + 20);
-    enemyBullets.forEach(b => { b.x += b.vx; b.y += b.vy; });
+    enemyBullets.forEach(b => { b.x += b.vx * worldSpeed; b.y += b.vy * worldSpeed; });
   }
 
   function drawEnemies() {
@@ -658,13 +832,26 @@ const VoidStrikerGame = (() => {
   }
 
   function checkCollisions() {
-    // ── bullet vs enemies / asteroids ────────────────────────────────────
+    // ── bullet vs enemies / asteroids / boss ─────────────────────────────
     // Iterate backwards so splicing doesn't skip elements
     for (let bi = bullets.length - 1; bi >= 0; bi--) {
       const b = bullets[bi];
       if (b.life <= 0) continue;
 
       let bulletConsumed = false;
+
+      // Check the boss first — it's the priority target
+      if (boss) {
+        const dx = b.x - boss.x, dy = b.y - boss.y;
+        if (Math.sqrt(dx * dx + dy * dy) < boss.r + 4) {
+          boss.hp--;
+          b.life = 0;
+          bulletConsumed = true;
+          if (boss.hp <= 0) killBoss();
+        }
+      }
+
+      if (bulletConsumed) continue;
 
       for (let ei = enemies.length - 1; ei >= 0; ei--) {
         const e = enemies[ei];
@@ -716,11 +903,12 @@ const VoidStrikerGame = (() => {
       }
     }
 
-    // ── contact collision (enemies / asteroids touching ship) ─────────────
+    // ── contact collision (enemies / asteroids / boss touching ship) ─────
     // Guard with the same invincible check — including any invincibility
     // just granted above in this same frame
     if (ship.invincible <= 0) {
-      for (const e of [...enemies, ...asteroids]) {
+      const contacts = boss ? [...enemies, ...asteroids, boss] : [...enemies, ...asteroids];
+      for (const e of contacts) {
         const dx = ship.x - e.x, dy = ship.y - e.y;
         if (Math.sqrt(dx * dx + dy * dy) < (e.r || 24) + 20) {
           lives--;
@@ -732,7 +920,8 @@ const VoidStrikerGame = (() => {
       }
     }
 
-    if (enemies.length === 0 && asteroids.length === 0 && gameState === 'playing') {
+    // Wave only advances when everything (including the boss) is cleared
+    if (enemies.length === 0 && asteroids.length === 0 && !boss && gameState === 'playing') {
       wave++;
       updateHUD();
       spawnWave();
@@ -740,7 +929,7 @@ const VoidStrikerGame = (() => {
   }
 
   function buildUI() {
-    ['vs-ui','vs-title','vs-dead','vs-lives'].forEach(id => {
+    ['vs-ui','vs-title','vs-dead','vs-lives','vs-boss-bar'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.remove();
     });
@@ -806,6 +995,45 @@ const VoidStrikerGame = (() => {
     livesEl.textContent = '▲ ▲ ▲';
     container.appendChild(livesEl);
 
+    // Boss Alien health bar — hidden until the boss spawns on wave 3
+    const bossBar = document.createElement('div');
+    bossBar.id = 'vs-boss-bar';
+    Object.assign(bossBar.style, {
+      position:      'absolute',
+      top:           '46px',
+      left:          '12%',
+      right:         '12%',
+      height:        '16px',
+      background:    'rgba(40,0,0,0.75)',
+      border:        '1px solid #ff4060',
+      borderRadius:  '3px',
+      boxShadow:     '0 0 12px rgba(255,40,80,0.5)',
+      display:       'none',
+      zIndex:        '10001',
+      pointerEvents: 'none',
+    });
+    bossBar.innerHTML = `
+      <div id="vs-boss-fill" style="
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #ff2040, #ff7090);
+        border-radius: 2px;
+        transition: width 0.1s linear;
+      "></div>
+      <span style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        letter-spacing: 3px;
+        color: #fff;
+        text-shadow: 0 0 6px #ff2040;
+      ">⚠ BOSS ALIEN</span>
+    `;
+    container.appendChild(bossBar);
+
     buildTitleScreen();
   }
 
@@ -834,7 +1062,7 @@ const VoidStrikerGame = (() => {
     });
     div.innerHTML = `
       <div style="font-size:40px; letter-spacing:8px; text-shadow:0 0 20px #00eeff; font-weight:bold; margin-bottom:10px;">VOID STRIKER</div>
-      <div style="font-size:14px; opacity:0.7; margin-bottom:28px; letter-spacing:2px;">Arrow keys / WASD to move &nbsp;•&nbsp; SPACE to shoot &nbsp;•&nbsp; P to pause</div>
+      <div style="font-size:14px; opacity:0.7; margin-bottom:28px; letter-spacing:2px;">WASD to move &nbsp;•&nbsp; Arrow keys to shoot (any direction) &nbsp;•&nbsp; P to pause</div>
       <button id="vs-launch" style="
         background: transparent;
         border: 2px solid #00eeff;
@@ -861,6 +1089,10 @@ const VoidStrikerGame = (() => {
     closeConsole();
     wave = 1; lives = 3; totalKills = 0;
     bullets = []; enemies = []; asteroids = []; particles = []; enemyBullets = [];
+    boss = null; worldSpeed = 1;
+    bossesDefeated = 0; nextBossWave = 3;
+    const bar = document.getElementById('vs-boss-bar');
+    if (bar) bar.style.display = 'none';
     buildShip();
     spawnWave();
     gameState = 'playing';
@@ -921,7 +1153,12 @@ const VoidStrikerGame = (() => {
       if (!consoleActive) {
         keys[e.key] = true;
       }
-      if (e.key === ' ') e.preventDefault();
+      // Stop arrow keys / space from scrolling the host page while the game
+      // has focus — they're game inputs, not navigation.
+      if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown' ||
+          e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+      }
     });
     window.addEventListener('keyup', e => { keys[e.key] = false; });
   }
@@ -936,11 +1173,13 @@ const VoidStrikerGame = (() => {
       updateShip();
       updateBullets();
       updateEnemies();
+      updateBoss();
       updateParticles();
       checkCollisions();
       updateHUD();
 
       drawEnemies();
+      drawBoss();
       drawBullets();
       drawParticles();
       drawShip();
@@ -952,6 +1191,7 @@ const VoidStrikerGame = (() => {
     } else if (gameState === 'playing' && consoleActive) {
       // Game paused — draw last frame frozen
       drawEnemies();
+      drawBoss();
       drawBullets();
       drawParticles();
       drawShip();
