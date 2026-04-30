@@ -1,0 +1,289 @@
+---
+layout: post
+title: Beneficial and Harmful Effects of Computing
+permalink: /effects/
+show_reading_time: false
+---
+<style>
+  .content-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    margin: 40px auto;
+    max-width: 600px;
+    text-align: center;
+  }
+  .flashcard {
+    background: #f8f8fa;
+    border-radius: 12px;
+    border: 1.5px solid #d0d0d0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 32px 24px;
+    margin: 32px auto 24px auto;
+    font-size: 1.18em;
+    min-height: 90px;
+    max-width: 480px;
+    transition: box-shadow 0.2s;
+  }
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 36px;
+    margin-top: 24px;
+    margin-bottom: 0;
+  }
+  .btn-choice {
+    padding: 16px 32px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    background: #7F77DD;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    min-width: 140px;
+  }
+  .btn-choice:hover {
+    background: #5b4fcf;
+  }
+  .feedback {
+    font-size: 1.1em;
+    margin: 18px 0 0 0;
+    min-height: 32px;
+  }
+  .score {
+    font-size: 1.2em;
+    margin: 24px 0 0 0;
+    color: #2a6d2a;
+    font-weight: bold;
+  }
+  .reset-btn {
+    margin-top: 24px;
+    padding: 12px 28px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+    background: #e0e0e0;
+    color: #333;
+    cursor: pointer;
+  }
+</style>
+<div class="content-wrapper">
+  <h1>Overview</h1>
+  <div style="text-align:left; max-width:600px; margin:0 auto 0 auto; font-size:1.08em;">
+    <p><b>Computing innovations have transformed modern life by improving how people communicate, work, and solve problems.</b><br>
+    However, these innovations can also create challenges and unintended consequences.<br>
+    This topic focuses on evaluating both the benefits and risks of technology in real-world contexts, rather than just memorizing definitions.</p>
+
+    <h2>What is a Computing Innovation?</h2>
+    <p>A computing innovation is any program, system, or device that uses computer science principles.<br>
+    Examples include apps, artificial intelligence, social media platforms, and the Internet.<br>
+    These innovations rely on algorithms, data, and computing systems to function.</p>
+
+    <h2>Beneficial Effects of Computing</h2>
+    <ul>
+      <li>Improve communication (Internet, protocols, bandwidth)</li>
+      <li>Increase access to information (World Wide Web, search algorithms, data storage)</li>
+      <li>Boost productivity (automation, algorithms, artificial intelligence)</li>
+      <li>Support advances in fields like healthcare (data analysis, simulations)</li>
+      <li>Encourage creativity and innovation (programming, digital media, computing platforms)</li>
+    </ul>
+
+    <h2>Harmful Effects of Computing</h2>
+    <ul>
+      <li>Privacy concerns (data collection, metadata, personally identifiable information (PII))</li>
+      <li>Security threats (malware, phishing, vulnerabilities, denial-of-service (DoS) attacks)</li>
+      <li>Spread of misinformation (bias in algorithms, data filtering, echo chambers)</li>
+      <li>Unequal access to technology (digital divide, infrastructure, socioeconomic factors)</li>
+      <li>Negative social impacts (overuse, human-computer interaction issues)</li>
+    </ul>
+
+    <h2>Data and Its Impact</h2>
+    <ul>
+      <li>Data plays a central role in computing innovations:</li>
+      <ul>
+        <li>Data is collected, stored, and analyzed to improve systems</li>
+        <li>Improper handling of data can lead to privacy and security issues</li>
+        <li>Bias in data can lead to unfair or inaccurate outcomes</li>
+      </ul>
+    </ul>
+
+    <h2>Evaluating Impacts (Key Skill)</h2>
+    <ul>
+      <li>When analyzing a computing innovation, consider:</li>
+      <ul>
+        <li>Who are the stakeholders (users, developers, society)?</li>
+        <li>What are the benefits vs. risks?</li>
+        <li>How is data used, stored, and shared?</li>
+        <li>Are there unintended consequences?</li>
+      </ul>
+    </ul>
+
+    <h2>Trade-Offs in Computing</h2>
+    <p>Most computing innovations involve trade-offs, meaning they have both positive and negative effects.<br>
+    For example:</p>
+    <ul>
+      <li>Social media improves communication but may increase misinformation</li>
+      <li>Data collection enables personalization but raises privacy concerns</li>
+    </ul>
+    <p>Understanding trade-offs is essential for making informed decisions about technology.</p>
+
+    <h2>Responsible Use of Computing</h2>
+    <ul>
+      <li>Both developers and users should consider:</li>
+      <ul>
+        <li>Minimizing harm to individuals and society</li>
+        <li>Protecting privacy and securing data</li>
+        <li>Reducing bias and promoting fairness</li>
+        <li>Being aware of the broader impact of technology</li>
+      </ul>
+    </ul>
+
+    <h2>What to Expect on the AP Exam</h2>
+    <ul>
+      <li>Questions are often scenario-based and require reasoning.</li>
+      <li>You may be asked to:</li>
+      <ul>
+        <li>Identify a beneficial or harmful effect</li>
+        <li>Know trade-offs of a computing innovation</li>
+        <li>Analyze how data impacts users or society</li>
+      </ul>
+      <li>Focus on applying concepts to real-world situations.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Game quiz at the very bottom, like legal_ethical_concerns_lesson.html -->
+<div class="content-wrapper">
+  <h2>Beneficial or Harmful? Card Quiz</h2>
+  <div id="flashcard-area"></div>
+  <div class="score" id="score-area"></div>
+  <button class="reset-btn" id="reset-btn" style="display:none;" onclick="resetGame()">Play Again</button>
+</div>
+<script>
+const scenarios = [
+  {
+    text: "Doctors use AI to diagnose diseases more accurately, saving lives.",
+    beneficial: true,
+    explanation: "AI can help doctors make better, faster diagnoses—this is a beneficial effect."
+  },
+  {
+    text: "A social media platform spreads false information rapidly to millions of users.",
+    beneficial: false,
+    explanation: "Misinformation can harm society—this is a harmful effect."
+  },
+  {
+    text: "Cloud storage allows people to access their files from anywhere in the world.",
+    beneficial: true,
+    explanation: "Cloud storage increases convenience and productivity."
+  },
+  {
+    text: "A company uses biased data in an algorithm, leading to unfair hiring decisions.",
+    beneficial: false,
+    explanation: "Algorithmic bias can cause discrimination—this is harmful."
+  },
+  {
+    text: "Open-source software lets programmers around the world collaborate and improve code.",
+    beneficial: true,
+    explanation: "Open-source encourages innovation and teamwork."
+  },
+  {
+    text: "A fitness app sells users' personal data to advertisers without their consent.",
+    beneficial: false,
+    explanation: "Sharing data without consent is a privacy violation—harmful effect."
+  },
+  {
+    text: "Online education platforms make learning accessible to more people.",
+    beneficial: true,
+    explanation: "Technology can help close education gaps—beneficial effect."
+  },
+  {
+    text: "Automation in factories leads to some workers losing their jobs.",
+    beneficial: false,
+    explanation: "Job loss due to automation is a harmful effect, even if automation also has benefits."
+  },
+  {
+    text: "Messaging apps allow friends and family to communicate instantly across the globe.",
+    beneficial: true,
+    explanation: "Instant communication is a major benefit of computing."
+  },
+  {
+    text: "Not everyone has access to high-speed internet, creating a digital divide.",
+    beneficial: false,
+    explanation: "The digital divide is a harmful societal impact."
+  }
+];
+
+let order = [];
+let current = 0;
+let score = 0;
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showFlashcard() {
+  const area = document.getElementById('flashcard-area');
+  area.innerHTML = '';
+  document.getElementById('score-area').textContent = '';
+  document.getElementById('reset-btn').style.display = 'none';
+  if (current >= order.length) {
+    area.innerHTML = '<div class="flashcard">Game Over!</div>';
+    document.getElementById('score-area').textContent = `You got ${score} out of ${order.length} correct!`;
+    document.getElementById('reset-btn').style.display = '';
+    return;
+  }
+  const idx = order[current];
+  const scenario = scenarios[idx];
+  const card = document.createElement('div');
+  card.className = 'flashcard';
+  card.textContent = scenario.text;
+  area.appendChild(card);
+  const btnRow = document.createElement('div');
+  btnRow.className = 'btn-row';
+  const btnB = document.createElement('button');
+  btnB.className = 'btn-choice';
+  btnB.textContent = 'Beneficial';
+  btnB.onclick = () => handleAnswer(true);
+  const btnH = document.createElement('button');
+  btnH.className = 'btn-choice';
+  btnH.textContent = 'Harmful';
+  btnH.onclick = () => handleAnswer(false);
+  btnRow.appendChild(btnB);
+  btnRow.appendChild(btnH);
+  area.appendChild(btnRow);
+  const feedback = document.createElement('div');
+  feedback.className = 'feedback';
+  feedback.id = 'feedback';
+  area.appendChild(feedback);
+}
+
+function handleAnswer(choice) {
+  const idx = order[current];
+  const scenario = scenarios[idx];
+  const feedback = document.getElementById('feedback');
+  if (choice === scenario.beneficial) {
+    feedback.innerHTML = `<span style='color: #2a6d2a; font-weight:600;'>Correct!</span> ${scenario.explanation}`;
+    score++;
+  } else {
+    feedback.innerHTML = `<span style='color: #c0392b; font-weight:600;'>Incorrect.</span> ${scenario.explanation}`;
+  }
+  setTimeout(() => {
+    current++;
+    showFlashcard();
+  }, 1400);
+}
+
+function resetGame() {
+  order = shuffle([...Array(scenarios.length).keys()]);
+  current = 0;
+  score = 0;
+  showFlashcard();
+}
+
+resetGame();
+</script>
