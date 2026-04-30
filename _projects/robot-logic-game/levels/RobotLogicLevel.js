@@ -27,7 +27,8 @@ const BLOCK_DEFS = {
 
 const MOVE_MS = 280;
 const TURN_MS = 220;
-const MAX_CANVAS = 480;
+const MIN_CELL = 48;
+const MAX_CELL = 140;
 
 const STYLE_ID = 'rlg-styles';
 const STYLE_SHEET = `
@@ -82,7 +83,7 @@ class RobotLogicLevel {
     this.levelId = config.id;
     this.levelName = config.name;
     this.gridSize = config.gridSize;
-    this.cellSize = Math.floor(MAX_CANVAS / this.gridSize);
+    this.cellSize = MIN_CELL;   // placeholder; resizeCanvas() picks the real value after DOM mounts
 
     this.walls = new Set((config.walls || []).map(([c, r]) => `${c},${r}`));
     this.startState = { ...config.start };
@@ -126,22 +127,80 @@ class RobotLogicLevel {
     if (this.isRunning) return;
     this.isRunning = true;
     this.injectStyles();
+    this.lockScroll();
     this.buildDOM();
     this.resetRobot();
-    this.draw();
     this.updateTutorial();
     this.setStatus('idle', 'Drag blocks into the Program panel, then press Run.');
+    this.resizeHandler = () => this.resizeCanvas();
+    window.addEventListener('resize', this.resizeHandler);
+    requestAnimationFrame(() => this.resizeCanvas());
+  }
+
+  lockScroll() {
+    this.scrollLock = {
+      bodyOverflow: document.body.style.overflow,
+      htmlOverflow: document.documentElement.style.overflow,
+      bodyTouchAction: document.body.style.touchAction,
+      keyHandler: (e) => {
+        // Block keys that would scroll the underlying page (Space, PgUp/Dn,
+        // Home/End, Arrows). Stay out of the way when the user is typing
+        // into a Repeat-count input.
+        const tag = (e.target && e.target.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return;
+        const blocked = [' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+                         'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+        if (blocked.includes(e.key)) e.preventDefault();
+      },
+    };
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    window.addEventListener('keydown', this.scrollLock.keyHandler, { passive: false });
+  }
+
+  unlockScroll() {
+    if (!this.scrollLock) return;
+    document.body.style.overflow = this.scrollLock.bodyOverflow;
+    document.documentElement.style.overflow = this.scrollLock.htmlOverflow;
+    document.body.style.touchAction = this.scrollLock.bodyTouchAction;
+    window.removeEventListener('keydown', this.scrollLock.keyHandler);
+    this.scrollLock = null;
+  }
+
+  resizeCanvas() {
+    if (!this.isRunning || !this.canvas || !this.canvasWrap) return;
+    const r = this.canvasWrap.getBoundingClientRect();
+    const side = Math.floor(Math.min(r.width, r.height));
+    if (side <= 0) return;
+    const cell = Math.max(MIN_CELL, Math.min(MAX_CELL, Math.floor(side / this.gridSize)));
+    if (cell === this.cellSize && this.canvas.width === cell * this.gridSize) {
+      this.draw();
+      return;
+    }
+    this.cellSize = cell;
+    const px = cell * this.gridSize;
+    this.canvas.width = px;
+    this.canvas.height = px;
+    this.snapDisplay();
+    this.draw();
   }
 
   stop() {
     if (!this.isRunning) return;
     this.isRunning = false;
     this.executing = false;
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+      this.resizeHandler = null;
+    }
+    this.unlockScroll();
     if (this.overlay?.parentNode) {
       this.overlay.parentNode.removeChild(this.overlay);
     }
     this.overlay = null;
     this.canvas = null;
+    this.canvasWrap = null;
     this.ctx = null;
     if (this.onExit) this.onExit();
   }
@@ -173,7 +232,7 @@ class RobotLogicLevel {
       position: 'fixed',
       inset: '0',
       zIndex: '10000',
-      backgroundColor: '#11162a',
+      background: 'radial-gradient(ellipse at top, #1a2046 0%, #11162a 50%, #0a0d1e 100%)',
       color: '#f2f2f2',
       fontFamily: 'system-ui, -apple-system, Segoe UI, sans-serif',
       display: 'flex',
@@ -207,18 +266,50 @@ class RobotLogicLevel {
   buildHeader() {
     const header = document.createElement('div');
     Object.assign(header.style, {
-      padding: '12px 20px',
+      padding: '14px 24px',
       borderBottom: '1px solid #2c3347',
       display: 'flex',
       alignItems: 'center',
+      gap: '14px',
       position: 'relative',
       zIndex: '1',
+      background: 'linear-gradient(180deg, rgba(38,45,80,0.5), rgba(38,45,80,0))',
     });
+
+    const numBadge = document.createElement('div');
+    numBadge.textContent = String(this.levelId);
+    Object.assign(numBadge.style, {
+      width: '34px',
+      height: '34px',
+      borderRadius: '10px',
+      background: 'linear-gradient(135deg, #4f9dff, #b78cff)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: '800',
+      fontSize: '17px',
+      color: '#0f1524',
+      boxShadow: '0 3px 10px rgba(79,157,255,0.35)',
+      flexShrink: '0',
+    });
+    header.appendChild(numBadge);
+
+    const titleCol = document.createElement('div');
+    Object.assign(titleCol.style, { display: 'flex', flexDirection: 'column', gap: '2px' });
+    const eyebrow = document.createElement('div');
+    eyebrow.textContent = 'ROBOT LOGIC';
+    Object.assign(eyebrow.style, {
+      fontSize: '10px',
+      letterSpacing: '0.18em',
+      opacity: '0.55',
+      fontWeight: '700',
+    });
+    titleCol.appendChild(eyebrow);
     const title = document.createElement('h2');
-    title.textContent = `Robot Logic — Level ${this.levelId}: ${this.levelName}`;
-    title.style.margin = '0';
-    title.style.fontSize = '18px';
-    header.appendChild(title);
+    title.textContent = this.levelName;
+    Object.assign(title.style, { margin: '0', fontSize: '19px', fontWeight: '700' });
+    titleCol.appendChild(title);
+    header.appendChild(titleCol);
 
     const backBtn = document.createElement('button');
     backBtn.textContent = '✕ Close';
@@ -227,17 +318,19 @@ class RobotLogicLevel {
       background: 'rgba(255,255,255,0.06)',
       color: '#f2f2f2',
       border: '1px solid #444c66',
-      borderRadius: '6px',
+      borderRadius: '8px',
       cursor: 'pointer',
-      padding: '7px 14px',
+      padding: '8px 16px',
       fontSize: '13px',
       fontWeight: '600',
     });
     backBtn.addEventListener('mouseenter', () => {
-      backBtn.style.background = 'rgba(255,255,255,0.12)';
+      backBtn.style.background = 'rgba(255,107,115,0.18)';
+      backBtn.style.borderColor = '#ff6b73';
     });
     backBtn.addEventListener('mouseleave', () => {
       backBtn.style.background = 'rgba(255,255,255,0.06)';
+      backBtn.style.borderColor = '#444c66';
     });
     backBtn.addEventListener('click', () => this.stop());
     header.appendChild(backBtn);
@@ -373,7 +466,7 @@ class RobotLogicLevel {
 
   buildPalette() {
     const panel = this.makePanel('Blocks');
-    panel.root.style.width = '170px';
+    panel.root.style.width = '190px';
     panel.root.style.flexShrink = '0';
     for (const key of this.availableBlocks) {
       panel.body.appendChild(this.makePaletteBlock(key));
@@ -408,7 +501,7 @@ class RobotLogicLevel {
 
   buildProgramPanel() {
     const panel = this.makePanel('Program');
-    panel.root.style.width = '260px';
+    panel.root.style.width = '280px';
     panel.root.style.flexShrink = '0';
 
     const dropZone = document.createElement('div');
@@ -738,39 +831,56 @@ class RobotLogicLevel {
 
   buildGridPanel() {
     const panel = this.makePanel('Grid');
-    panel.root.style.flex = '1';
-    const size = this.gridSize * this.cellSize;
+    Object.assign(panel.root.style, {
+      flex: '1',
+      minWidth: '0',
+      minHeight: '0',
+    });
+    Object.assign(panel.body.style, {
+      minWidth: '0',
+      minHeight: '0',
+    });
     this.canvas = document.createElement('canvas');
-    this.canvas.width = size;
-    this.canvas.height = size;
+    this.canvas.width = this.gridSize * this.cellSize;
+    this.canvas.height = this.gridSize * this.cellSize;
     Object.assign(this.canvas.style, {
       background: '#0f1524',
-      borderRadius: '6px',
-      alignSelf: 'center',
+      borderRadius: '12px',
+      border: '1px solid rgba(79,157,255,0.18)',
+      boxShadow: '0 12px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)',
+      display: 'block',
     });
     this.ctx = this.canvas.getContext('2d');
+
     const wrap = document.createElement('div');
     Object.assign(wrap.style, {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       flex: '1',
+      minWidth: '0',
+      minHeight: '0',
+      overflow: 'hidden',
     });
     wrap.appendChild(this.canvas);
     panel.body.appendChild(wrap);
+    this.canvasWrap = wrap;
     return panel.root;
   }
 
   makePanel(titleText) {
     const root = document.createElement('div');
     Object.assign(root.style, {
-      background: 'rgba(38, 45, 66, 0.85)',
-      backdropFilter: 'blur(4px)',
-      borderRadius: '8px',
-      padding: '14px',
+      background: 'linear-gradient(180deg, rgba(46,54,84,0.85), rgba(34,40,62,0.85))',
+      backdropFilter: 'blur(6px)',
+      WebkitBackdropFilter: 'blur(6px)',
+      borderRadius: '12px',
+      border: '1px solid rgba(255,255,255,0.06)',
+      padding: '16px',
       display: 'flex',
       flexDirection: 'column',
       minWidth: '150px',
+      boxShadow: '0 6px 24px rgba(0,0,0,0.3)',
     });
     const h = document.createElement('h3');
     h.textContent = titleText;
