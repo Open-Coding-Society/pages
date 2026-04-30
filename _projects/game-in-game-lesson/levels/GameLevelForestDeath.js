@@ -5,7 +5,7 @@ import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
-import GameLevelForestSub from '/assets/js/projects/escape-game/levels/GameLevelForestSub.js';
+import GameLevelForestSub from '/assets/js/projects/game-in-game-lesson/levels/GameLevelForestSub.js';
 
 class GameLevelForestDeath {
   constructor(gameEnv) {
@@ -20,7 +20,7 @@ class GameLevelForestDeath {
     const image_data_bg = {
       name: 'death_room',
       greeting: "The warmth you followed was never welcoming.",
-      src: "/images/projects/escape-game/cave.png",
+      src: "/images/projects/game-in-game-lesson/cave.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -29,7 +29,7 @@ class GameLevelForestDeath {
     const sprite_data_player = {
       id: 'Octopus',
       greeting: "What have I done...",
-      src: "/images/projects/escape-game/octopus.png",
+      src: "/images/projects/game-in-game-lesson/octopus.png",
       SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -54,7 +54,7 @@ class GameLevelForestDeath {
     const sprite_data_beckoner = {
       id: 'Strange Beckoner',
       greeting: sprite_greet_beckoner,
-      src: "/images/projects/escape-game/chickenj.png",
+      src: "/images/projects/game-in-game-lesson/chickenj.png",
       SCALE_FACTOR: 7,
       ANIMATION_RATE: 80,
       pixels: { height: 255, width: 150 },
@@ -139,7 +139,7 @@ class GameLevelForestDeath {
     const sprite_data_victim = {
       id: 'Another Victim',
       greeting: sprite_greet_victim,
-      src: "/images/projects/escape-game/stockguy.png",
+      src: "/images/projects/game-in-game-lesson/stockguy.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 441, width: 339 },
