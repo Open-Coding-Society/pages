@@ -92,7 +92,7 @@ authors: Sprinters Capstone
 <div class="cq-intro">
   <h2>What is Compression?</h2>
   <ul>
-    <li><b>The core idea:</b> Compression is an algorithm that re--encodes data into <i>fewer bits</i> than the original. The encoded version takes less storage and travels faster across networks.</li>
+    <li><b>The core idea:</b> Compression is an algorithm that re-encodes data into <i>fewer bits</i> than the original. The encoded version takes less storage and travels faster across networks.</li>
     <li><b>Why it exists:</b> Bandwidth and storage cost real money. Without compression, a 4-minute song would be ~40MB instead of ~4MB, and HD streaming would be impossible on most connections.</li>
     <li><b>Lossless compression:</b> The original file can be <i>perfectly</i> reconstructed bit-for-bit. It works by spotting patterns (repeated characters, common byte sequences) and replacing them with shorter codes. Examples: ZIP, PNG, GIF, FLAC, run-length encoding, Huffman coding.</li>
     <li><b>Lossy compression:</b> The algorithm <i>permanently discards</i> data the human eye/ear is least likely to notice (subtle color shifts, high-frequency sound). The result is much smaller but cannot be restored to the original. Examples: JPEG, MP3, MP4, AAC.</li>
