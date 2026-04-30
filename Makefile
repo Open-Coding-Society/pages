@@ -373,7 +373,7 @@ dev: stop clean
 watch-notebooks:
 	@echo "Watching _notebooks for changes..."
 	@while true; do \
-		find _notebooks -path "_notebooks/projects" -prune -o -name '*.ipynb' -newer /tmp/.notebook_watch_marker -print 2>/dev/null | while read notebook; do \
+		find _notebooks -name '*.ipynb' -newer /tmp/.notebook_watch_marker -print 2>/dev/null | while read notebook; do \
 			echo "Notebook changed: $$notebook"; \
 			make convert-single NOTEBOOK_FILE="$$notebook" & \
 		done; \
