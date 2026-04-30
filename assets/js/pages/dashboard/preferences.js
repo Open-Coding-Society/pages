@@ -821,7 +821,7 @@ export class NodCursorController {
         lastClickAt: 0
     };
 
-        /** Binds UI elements and initializes the tracking environment. */
+    /** Binds UI elements and initializes the tracking environment. */
     static init() {
         NodCursorController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
         NodCursorController.refs.toggleTrack = document.getElementById('head-tracking-toggle-track');
