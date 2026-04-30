@@ -1,8 +1,8 @@
-import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
-import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import Shark from '/assets/js/GameEnginev1.1/Shark.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
+import Shark from '@assets/js/GameEnginev1.1/Shark.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 
 class GameLevelWater {
