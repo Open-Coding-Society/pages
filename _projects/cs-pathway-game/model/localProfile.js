@@ -116,6 +116,9 @@ const LocalProfile = {
           'mission-tooling': {
             progress: {
               toolsUnlocked: data.toolsUnlocked || false,
+              missionProgressCount: data.missionProgressCount || 0,
+              missionScore: data.missionScore || 0.55,
+              missionCompletedStations: data.missionCompletedStations || [],
             },
             completedAt: null,
           },
@@ -123,7 +126,7 @@ const LocalProfile = {
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      console.log('LocalProfile: saved profile for', profile.identity.name);
+      console.log('LocalProfile: saved profile for', data.name);
       
       // Trigger analytics event if available
       this._trackEvent('profile_created', profile.localId);
@@ -190,6 +193,9 @@ const LocalProfile = {
             progress: {
               ...existing.game_profile?.['mission-tooling']?.progress,
               ...(updates.toolsUnlocked !== undefined && { toolsUnlocked: updates.toolsUnlocked }),
+              ...(updates.missionProgressCount !== undefined && { missionProgressCount: updates.missionProgressCount }),
+              ...(updates.missionScore !== undefined && { missionScore: updates.missionScore }),
+              ...(updates.missionCompletedStations !== undefined && { missionCompletedStations: updates.missionCompletedStations }),
             },
             completedAt: updates.missionToolingCompleted || existing.game_profile?.['mission-tooling']?.completedAt,
           },
@@ -267,6 +273,9 @@ const LocalProfile = {
       navigationComplete: wayfindingWorld.progress?.navigationComplete || false,
       // Mission Tooling
       toolsUnlocked: missionTooling.progress?.toolsUnlocked || false,
+      missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
+      missionScore: missionTooling.progress?.missionScore || 0.55,
+      missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
     };
   },
 
