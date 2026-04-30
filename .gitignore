@@ -75,3 +75,6 @@ _notebooks/**/*_content.md
 
 # remove all the .scss cache files
 *.scssc
+
+# Claude Code session artifacts
+.claude/
