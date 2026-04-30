@@ -9,9 +9,12 @@
 cs-pathway-game:dev
 characters
 gamify
+main
+ocean
 game-lessons
 PeppaPigGame
 teamtestgame
+main
 student-management-groups
 test-project
 game-in-game-lesson
@@ -22,3 +25,4 @@ backgrounds
 multiplayer
 transitions
 robot-logic-game
+parallelAndComputinglesson
