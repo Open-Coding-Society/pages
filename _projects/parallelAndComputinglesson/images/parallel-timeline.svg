@@ -1,0 +1,77 @@
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="taskGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Title -->
+  <text x="350" y="30" font-size="22" font-weight="bold" text-anchor="middle" fill="#333">
+    Timeline: Parallel Task Execution
+  </text>
+  
+  <!-- Timeline line -->
+  <line x1="50" y1="120" x2="650" y2="120" stroke="#ddd" stroke-width="2"/>
+  
+  <!-- Time markers -->
+  <text x="50" y="145" font-size="11" text-anchor="middle" fill="#999">0 min</text>
+  <line x1="50" y1="115" x2="50" y2="125" stroke="#999" stroke-width="1"/>
+  
+  <text x="200" y="145" font-size="11" text-anchor="middle" fill="#999">10 min</text>
+  <line x1="200" y1="115" x2="200" y2="125" stroke="#999" stroke-width="1"/>
+  
+  <text x="350" y="145" font-size="11" text-anchor="middle" fill="#999">20 min</text>
+  <line x1="350" y1="115" x2="350" y2="125" stroke="#999" stroke-width="1"/>
+  
+  <text x="500" y="145" font-size="11" text-anchor="middle" fill="#999">30 min</text>
+  <line x1="500" y1="115" x2="500" y2="125" stroke="#999" stroke-width="1"/>
+  
+  <!-- Worker 1 -->
+  <text x="20" y="195" font-size="12" font-weight="bold" fill="#333">👤 Worker 1:</text>
+  <rect x="50" y="180" width="200" height="40" fill="url(#taskGrad)" rx="5"/>
+  <text x="150" y="208" font-size="12" text-anchor="middle" fill="white" font-weight="bold">
+    📝 Write Report (30 min)
+  </text>
+  
+  <!-- Worker 2 -->
+  <text x="20" y="275" font-size="12" font-weight="bold" fill="#333">👤 Worker 2:</text>
+  <rect x="50" y="260" width="200" height="40" fill="url(#taskGrad)" rx="5"/>
+  <text x="150" y="288" font-size="12" text-anchor="middle" fill="white" font-weight="bold">
+    🎨 Design Graphics (30 min)
+  </text>
+  
+  <!-- Worker 3 -->
+  <text x="20" y="355" font-size="12" font-weight="bold" fill="#333">👤 Worker 3:</text>
+  <rect x="50" y="340" width="200" height="40" fill="url(#taskGrad)" rx="5"/>
+  <text x="150" y="368" font-size="12" text-anchor="middle" fill="white" font-weight="bold">
+    🔍 Debug Code (30 min)
+  </text>
+  
+  <!-- Summary -->
+  <rect x="300" y="170" width="300" height="200" fill="#f9f9f9" stroke="#ddd" stroke-width="2" rx="5"/>
+  
+  <text x="450" y="195" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">
+    Key Insights
+  </text>
+  
+  <text x="315" y="220" font-size="12" fill="#333">
+    ✓ All tasks run simultaneously
+  </text>
+  
+  <text x="315" y="245" font-size="12" fill="#333">
+    ✓ Total time = longest task (30 min)
+  </text>
+  
+  <text x="315" y="270" font-size="12" fill="#333">
+    ✓ NOT sum of all tasks (120 min)
+  </text>
+  
+  <text x="315" y="295" font-size="12" fill="#333">
+    ✓ 4x faster than sequential!
+  </text>
+  
+  <text x="315" y="340" font-size="12" font-weight="bold" fill="#51cf66">
+    Speedup = 120 min / 30 min = 4x 🚀
+  </text>
+</svg>
