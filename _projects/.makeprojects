@@ -11,7 +11,9 @@ characters
 gamify
 main
 ocean
-ocean
+game-lessons
+PeppaPigGame
+teamtestgame
 main
 student-management-groups
 test-project
@@ -23,3 +25,5 @@ backgrounds
 multiplayer
 transitions
 parallelAndComputinglesson
+collisions-mechanic
+local-storage
