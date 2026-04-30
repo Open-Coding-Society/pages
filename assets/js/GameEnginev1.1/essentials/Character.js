@@ -258,7 +258,7 @@ class Character extends GameObject {
         this.frameCounter++;
         if (this.frameCounter % this.animationRate === 0) {
             const directionData = this.spriteData[this.direction] || {};
-            const frames = directionData.columns || this.spriteData.orientation?.columns || 1;
+            const frames = directionData.columns || this.spriteData.orientation.columns || 1;
             this.frameIndex = (this.frameIndex + 1) % frames;
         }
     }

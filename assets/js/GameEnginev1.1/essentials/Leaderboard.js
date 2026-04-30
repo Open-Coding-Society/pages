@@ -150,15 +150,9 @@ export default class Leaderboard {
                 .map((v) => String(v))
         );
 
-        this.debugEnabled = window.ocsLeaderboardDebug === true;
-        this.usesLocalhostBackend = String(javaURI || '').includes('localhost:8585');
-        this.isLocalStaticDev = this.isLocalhost
-            && this.usesLocalhostBackend
-            && window.ocsLeaderboardForceBackend !== true;
-
         // Flag whether a backend URI is available; allow UI to mount even when
         // backend is unreachable so leaderboard can operate in offline/local mode.
-        this.hasBackend = Boolean(javaURI) && !this.isLocalStaticDev;
+        this.hasBackend = Boolean(javaURI);
 
         this.init();
     }
@@ -405,7 +399,7 @@ export default class Leaderboard {
         const list = document.getElementById('leaderboard-list');
         // If no backend is configured, show an offline message instead of fetching
         if (!this.hasBackend) {
-            this.fetchLeaderboard();
+            list.innerHTML = '<p class="error">Dynamic leaderboard unavailable (no backend).</p>';
             const backBtn = document.getElementById('back-btn');
             if (backBtn) backBtn.style.display = 'inline-block';
             return;
@@ -828,18 +822,6 @@ export default class Leaderboard {
                 this.displayLeaderboard(data);
             })
             .catch(err => {
-                const isLocalBackendDown = this.usesLocalhostBackend
-                    && (String(err?.message || '').includes('Failed to fetch') || String(err).includes('ERR_CONNECTION_REFUSED'));
-                if (isLocalBackendDown) {
-                    this.hasBackend = false;
-                    if (this.refreshInterval) {
-                        clearInterval(this.refreshInterval);
-                        this.refreshInterval = null;
-                    }
-                    this.fetchLeaderboard();
-                    return;
-                }
-
                 console.error('Error fetching dynamic leaderboard:', err);
                 // Check for authentication errors (401 or 403 status)
                 if (err.message && (err.message.includes('401') || err.message.includes('403'))) {
@@ -859,18 +841,14 @@ export default class Leaderboard {
      * @returns {Promise<Object>} The saved score entry
      */
     submitScore(username, score, gameName = null) {
-        if (this.debugEnabled) {
-            console.log('=== SUBMIT SCORE TO SCORE_COUNTER ===');
-        }
+        console.log('=== SUBMIT SCORE TO SCORE_COUNTER ===');
         
         if (!username || isNaN(score)) {
             return Promise.reject(new Error('Invalid username or score'));
         }
 
         const endpoint = '/api/events/SCORE_COUNTER';
-        if (this.debugEnabled) {
-            console.log('POST endpoint:', endpoint);
-        }
+        console.log('POST endpoint:', endpoint);
 
         // If backend unavailable, store locally and update display
         if (!this.hasBackend) {
@@ -889,9 +867,7 @@ export default class Leaderboard {
         }
 
         const url = `${javaURI}${endpoint}`;
-        if (this.debugEnabled) {
-            console.log('Full URL:', url);
-        }
+        console.log('Full URL:', url);
 
         // Create payload matching Java backend AlgorithmicEvent structure
         const requestBody = {
@@ -901,9 +877,7 @@ export default class Leaderboard {
                 gameName: gameName || this.gameName
             }
         };
-        if (this.debugEnabled) {
-            console.log('Payload:', JSON.stringify(requestBody));
-        }
+        console.log('Payload:', JSON.stringify(requestBody));
 
         // POST to backend using API chaining pattern
         return fetch(
@@ -924,9 +898,7 @@ export default class Leaderboard {
                 return res.json();
             })
             .then(savedEntry => {
-                if (this.debugEnabled) {
-                    console.log('Score saved successfully to SCORE_COUNTER:', savedEntry);
-                }
+                console.log('Score saved successfully to SCORE_COUNTER:', savedEntry);
 
                 // Refresh leaderboard if we're in dynamic mode
                 if (this.mode === 'dynamic') {
@@ -934,37 +906,6 @@ export default class Leaderboard {
                 }
 
                 return savedEntry;
-            })
-            .catch(err => {
-                const isLocalBackendDown = this.usesLocalhostBackend
-                    && (String(err?.message || '').includes('Failed to fetch') || String(err).includes('ERR_CONNECTION_REFUSED'));
-
-                if (!isLocalBackendDown) {
-                    throw err;
-                }
-
-                this.hasBackend = false;
-                const storageKey = `score_counter_${gameName || this.gameName}`;
-                const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
-                const entry = {
-                    id: `local-${Date.now()}`,
-                    payload: { user: username, score: score, gameName: gameName || this.gameName },
-                    timestamp: new Date().toISOString()
-                };
-
-                stored.push(entry);
-                localStorage.setItem(storageKey, JSON.stringify(stored));
-
-                if (this.refreshInterval) {
-                    clearInterval(this.refreshInterval);
-                    this.refreshInterval = null;
-                }
-
-                if (this.mode === 'dynamic') {
-                    this.fetchLeaderboard();
-                }
-
-                return entry;
             });
     }
 
