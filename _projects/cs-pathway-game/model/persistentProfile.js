@@ -146,6 +146,8 @@ class PersistentProfile {
             preferences: {
               sprite: profileData.sprite || null,
               spriteMeta: profileData.spriteMeta || null,
+              persona: profileData.persona || null,
+              personaId: profileData.personaId || null,
             },
             progress: {
               identityUnlocked: profileData.identityUnlocked || false,
@@ -233,6 +235,8 @@ class PersistentProfile {
               ...identityForge.preferences,
               ...(updates.sprite !== undefined && { sprite: updates.sprite }),
               ...(updates.spriteMeta !== undefined && { spriteMeta: updates.spriteMeta }),
+              ...(updates.persona !== undefined && { persona: updates.persona }),
+              ...(updates.personaId !== undefined && { personaId: updates.personaId }),
             },
             progress: {
               ...identityForge.progress,
@@ -429,6 +433,8 @@ class PersistentProfile {
         sprite: identityForge.preferences?.sprite || null,
         spriteMeta: identityForge.preferences?.spriteMeta || null,
         spriteSrc: identityForge.preferences?.spriteMeta?.src || null,
+        persona: identityForge.preferences?.persona || null,
+        personaId: identityForge.preferences?.personaId || null,
         identityUnlocked: identityForge.progress?.identityUnlocked || false,
         avatarSelected: identityForge.progress?.avatarSelected || false,
         

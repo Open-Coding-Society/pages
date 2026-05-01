@@ -95,8 +95,9 @@ const LocalProfile = {
             preferences: {
               sprite: data.sprite || null,
               spriteMeta: data.spriteMeta || null,
-            },
-            progress: {
+              persona: data.persona || null,
+              personaId: data.personaId || null,
+            },            progress: {
               identityUnlocked: data.identityUnlocked || false,
               avatarSelected: data.avatarSelected || false,
             },
@@ -168,8 +169,9 @@ const LocalProfile = {
               ...existing.game_profile?.['identity-forge']?.preferences,
               ...(updates.sprite !== undefined && { sprite: updates.sprite }),
               ...(updates.spriteMeta !== undefined && { spriteMeta: updates.spriteMeta }),
-            },
-            progress: {
+              ...(updates.persona !== undefined && { persona: updates.persona }),
+              ...(updates.personaId !== undefined && { personaId: updates.personaId }),
+            },            progress: {
               ...existing.game_profile?.['identity-forge']?.progress,
               ...(updates.identityUnlocked !== undefined && { identityUnlocked: updates.identityUnlocked }),
               ...(updates.avatarSelected !== undefined && { avatarSelected: updates.avatarSelected }),
@@ -263,6 +265,8 @@ const LocalProfile = {
       sprite: identityForge.preferences?.sprite || null,
       spriteMeta: identityForge.preferences?.spriteMeta || null,
       spriteSrc: identityForge.preferences?.spriteMeta?.src || null,
+      persona: identityForge.preferences?.persona || null,
+      personaId: identityForge.preferences?.personaId || null,
       identityUnlocked: identityForge.progress?.identityUnlocked || false,
       avatarSelected: identityForge.progress?.avatarSelected || false,
       // Wayfinding World
