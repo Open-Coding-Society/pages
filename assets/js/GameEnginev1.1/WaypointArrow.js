@@ -291,6 +291,7 @@ export default class WaypointArrow {
     }, 1000);
   }
 
+  
   createAdvancementParticles() {
     // Create burst of celebration particles
     const particleCount = 12;

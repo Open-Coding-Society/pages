@@ -1,13 +1,13 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js'; // game-in-game for minigames
-import GamEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
-import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
-import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import Clicker from '/assets/js/GameEnginev1.1/essentials/Clicker.js';
-import GameLevelMeteorBlaster from '/assets/js/GameEnginev1.1/GameLevelMeteorBlaster.js';
-import Coin from '/assets/js/GameEnginev1.1/Coin.js';
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js'; // game-in-game for minigames
+import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
+import Clicker from '@assets/js/GameEnginev1.1/essentials/Clicker.js';
+import GameLevelMeteorBlaster from '@assets/js/GameEnginev1.1/GameLevelMeteorBlaster.js';
+import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 import GameLevelStarWars from './GameLevelStarWars.js';
 import GameLevelEnd from './GameLevelEnd.js';
 import PlatformerMini from './PlatformerMini.js';
