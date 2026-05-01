@@ -148,6 +148,7 @@ class ProfileManager {
         identityUnlocked: profile.identityUnlocked || false,
         avatarForgeDone: profile.avatarSelected || Boolean(profile.spriteMeta || profile.sprite),
         avatarSelected: profile.avatarSelected || false,
+        identityForgeCompleted: profile.identityForgeCompleted || false,
         // Wayfinding World
         worldThemeDone: profile.worldThemeSelected || Boolean(profile.themeMeta || profile.theme),
         worldThemeSelected: profile.worldThemeSelected || false,

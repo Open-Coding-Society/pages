@@ -152,6 +152,7 @@ class PersistentProfile {
             progress: {
               identityUnlocked: profileData.identityUnlocked || false,
               avatarSelected: profileData.avatarSelected || false,
+              identityForgeCompleted: profileData.identityForgeCompleted || false,
             },
             completedAt: null,
           },
@@ -242,6 +243,7 @@ class PersistentProfile {
               ...identityForge.progress,
               ...(updates.identityUnlocked !== undefined && { identityUnlocked: updates.identityUnlocked }),
               ...(updates.avatarSelected !== undefined && { avatarSelected: updates.avatarSelected }),
+              ...(updates.identityForgeCompleted !== undefined && { identityForgeCompleted: updates.identityForgeCompleted }),
             },
             completedAt: updates.identityForgeCompleted || identityForge.completedAt,
           },
@@ -324,6 +326,7 @@ class PersistentProfile {
             progress: {
               identityUnlocked: false,
               avatarSelected: false,
+              identityForgeCompleted: false,
             },
             completedAt: null,
           },
@@ -437,6 +440,7 @@ class PersistentProfile {
         personaId: identityForge.preferences?.personaId || null,
         identityUnlocked: identityForge.progress?.identityUnlocked || false,
         avatarSelected: identityForge.progress?.avatarSelected || false,
+        identityForgeCompleted: identityForge.progress?.identityForgeCompleted || false,
         
         // Wayfinding World
         theme: wayfindingWorld.preferences?.theme || null,
