@@ -43,7 +43,7 @@ assets:
 	@mkdir -p $(JS_DEST)/model
 	@cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true
 	@mkdir -p $(IMAGES_DEST)
-	@cp -r images/* $(IMAGES_DEST)/ 2>/dev/null || true
+	@cp -R images/. $(IMAGES_DEST)/ 2>/dev/null || true
 
 # Clean distributed files (keeps source intact)
 clean:
