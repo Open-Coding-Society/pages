@@ -175,8 +175,10 @@ class GameLevelCsPath0Forge {
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
-      INIT_POSITION: { x: 0, y: height - (height / PLAYER_SCALE_FACTOR) },
-      pixels: { height: 1024, width: 1024 },
+      INIT_POSITION: { 
+        x: width * 0.18,  
+        y: height - (height / PLAYER_SCALE_FACTOR) 
+      },      pixels: { height: 1024, width: 1024 },
       orientation: { rows: 2, columns: 2 },
       down:      { row: 0, start: 0, columns: 1 },
       downRight: { row: 0, start: 0, columns: 1, rotate:  Math.PI / 16 },
@@ -203,27 +205,27 @@ class GameLevelCsPath0Forge {
     const level = this;
 
     const startGatekeeperPos = {
-      x: width * 0.14,
-      y: height * 0.78,
+      x: width * 0.10,
+      y: height * 0.90,
     };
 
     const identityGatekeeperPos = {
-      x: width * 0.48,
-      y: height * 0.74,
+      x: width * 0.22,   
+      y: height * 0.68,  
     };
-
+        
     const avatarGatekeeperPos = {
-      x: width * 0.50,
-      y: height * 0.20,
+      x: width * 0.45,   
+      y: height * 0.20,  
     };
 
     const worldThemeGatekeeperPos = {
-      x: width * 0.85,
-      y: height * 0.16,
-    };
+      x: width * 0.12,   
+      y: height * 0.30,  
+    };    
     const courseEnlistmentGatekeeperPos = {
-      x: width * 0.75,
-      y: height * 0.75,
+      x: width * 0.70,   
+      y: height * 0.73,  
     };
     const gatekeeperBaseData = {
       src: path + "/images/projects/cs-pathway-game/npc/gatekeeper2.png",
