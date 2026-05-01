@@ -1,0 +1,99 @@
+<!-- OCS Engine | Professional Edition -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCS Engine | Professional Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="project-launcher">
+        <div class="launcher-sidebar">
+            <div class="logo">OCS<span>Hub</span></div>
+            <button onclick="showHubSection('projects')" class="nav-btn active">📁 Projects</button>
+            <button onclick="showHubSection('docs')" class="nav-btn">📖 Documentation</button>
+        </div>
+        <div class="launcher-content">
+            <div id="hub-projects">
+                <div class="launcher-header">
+                    <h2>Your Projects</h2>
+                    <button onclick="createNewProject()" class="btn-run">+ New Project</button>
+                </div>
+                <div id="project-list"></div>
+            </div>
+
+            <div id="hub-docs" class="hidden">
+                <div class="launcher-header">
+                    <h2>Engine Documentation</h2>
+                </div>
+                <div id="docs-render-area" class="docs-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <div class="logo" onclick="location.reload()" style="cursor:pointer">OCS<span>Engine</span></div>
+        <div class="controls">
+            <button onclick="saveProject()" class="btn-save">💾 Save</button>
+            <button onclick="startTutorial()" class="btn-tut">🎓 Tutorial</button>
+            <button onclick="runGame()" class="btn-run">▶ Play Scene</button>
+        </div>
+    </div>
+
+    <div class="editor-layout">
+        <div class="dock">
+            <div class="dock-header">FileSystem</div>
+            <div class="asset-controls">
+                <button class="btn-tiny" onclick="createNewFolder()">+ Folder</button>
+                <button class="btn-tiny" onclick="document.getElementById('spriteInput').click()">+ Sprite</button>
+            </div>
+            <input type="file" id="spriteInput" style="display:none" accept="image/*">
+            <div id="file-tree"></div>
+        </div>
+
+        <div class="center-view">
+            <div class="viewport">
+                <canvas id="gameCanvas" tabindex="1"></canvas>
+            </div>
+            <div class="code-area">
+                <div class="tabs"><span id="active-project-name">main.js</span> <span id="save-status"></span></div>
+                <textarea id="codeEditor" spellcheck="false" placeholder="// Click 'Tutorial' or select a project!"></textarea>
+            </div>
+        </div>
+
+        <div class="dock">
+            <div class="dock-header">Scene Hierarchy</div>
+            <div id="hierarchy-list"></div>
+
+            <div class="dock-header">Inspector</div>
+            <div id="inspector-content">
+                <div class="inspector-section">
+                    <div class="prop-row"><span class="prop-label">State</span><span class="prop-value" id="live-status">Stopped</span></div>
+                    <div class="prop-row"><span class="prop-label">Objects</span><span class="prop-value" id="live-count">0</span></div>
+                </div>
+                <div class="inspector-section">
+                    <p class="section-title">LIVE TRANSFORM</p>
+                    <div class="prop-row"><span class="prop-label">X Pos</span><span class="prop-value" id="live-x">0</span></div>
+                    <div class="prop-row"><span class="prop-label">Y Pos</span><span class="prop-value" id="live-y">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tutorial-box" class="hidden">
+        <div class="tut-header">
+            <h3 id="tut-title">Step 1</h3>
+            <button onclick="document.getElementById('tutorial-box').classList.add('hidden')">×</button>
+        </div>
+        <div id="tut-text"></div>
+        <button onclick="nextStep()" class="btn-small">Next Lesson →</button>
+    </div>
+
+    <script src="engine.js"></script>
+    <script src="docs.js"></script>
+
+    
+
+</body>
+</html>
