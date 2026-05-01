@@ -500,14 +500,13 @@ active_tab: calendar
     }
 
     function getCalendarEventFilterValues() {
-        const el = getCalendarFilterElements();
         return {
-            query: (el.query?.value || '').trim().toLowerCase(),
-            source: el.source?.value || 'all',
-            type: el.type?.value || '',
-            group: (el.group?.value || '').trim().toLowerCase(),
-            start: el.start?.value || '',
-            end: el.end?.value || ''
+            query: (document.getElementById('calendar-filter-query')?.value || '').trim().toLowerCase(),
+            source: document.getElementById('calendar-filter-source')?.value || 'all',
+            type: document.getElementById('calendar-filter-type')?.value || '',
+            group: (document.getElementById('calendar-filter-group')?.value || '').trim().toLowerCase(),
+            start: document.getElementById('calendar-filter-start')?.value || '',
+            end: document.getElementById('calendar-filter-end')?.value || ''
         };
     }
 
