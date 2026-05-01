@@ -134,6 +134,8 @@ class ProfileManager {
         name: profile.name,
         email: profile.email,
         githubID: profile.githubID,
+        persona: profile.persona,
+        personaId: profile.personaId,
         sprite: profile.sprite,
         spriteMeta: profile.spriteMeta,
         spriteSrc: profile.spriteSrc,
