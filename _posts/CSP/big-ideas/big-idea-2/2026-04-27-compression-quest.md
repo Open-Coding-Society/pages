@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Compression Quest — Squeeze the Bits
-description: A 5-minute gamified AP CSP lesson on lossy and lossless compression. Compress strings with run-length encoding, then sort real-world file types into the right bin.
+description: A 5-minute gamified AP CSP lesson about lossy and lossless compression. Compress strings with run-length encoding, then sort real-world file types into the right bin.
 breadcrumbs: True
 permalink: /csp/big-idea-2/compression-quest
 authors: Sprinters Capstone
