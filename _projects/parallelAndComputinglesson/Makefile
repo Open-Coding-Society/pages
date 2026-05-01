@@ -24,7 +24,7 @@ JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
 IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
 NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
 DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
-HTML_DEST = $(WORKSPACE_ROOT)/assets/html/projects/$(PROJECT_NAME)
+LAYOUT_DEST = $(WORKSPACE_ROOT)/_layouts
 
 ###########################################
 # Build Targets
@@ -42,7 +42,7 @@ build:
 	@echo "   Notebooks: _notebooks/projects/$(PROJECT_NAME)/"
 	@echo "   JavaScript: assets/js/projects/$(PROJECT_NAME)/"
 	@echo "   Images: images/projects/$(PROJECT_NAME)/"
-	@echo "   HTML Lessons: assets/html/projects/$(PROJECT_NAME)/"
+	@echo "   Layouts: _layouts/parallelAndComputinglesson.html"
 
 # Copy only JS and image assets (not notebook) - for watch triggers
 assets:
@@ -52,9 +52,8 @@ assets:
 	@if [ -d model ] && [ "$$(ls -A model/*.js 2>/dev/null)" ]; then cp model/*.js $(JS_DEST)/model/ && echo "✓ Copied model JS"; fi
 	@mkdir -p $(IMAGES_DEST)
 	@if [ -d images ] && [ "$$(ls -A images 2>/dev/null)" ]; then cp -r images/* $(IMAGES_DEST)/ && echo "✓ Copied images"; fi
-	@mkdir -p $(HTML_DEST)
-	@if [ -f index.html ]; then cp index.html $(HTML_DEST)/ && echo "✓ Copied index.html"; fi
-	@if [ -f parallel.html ]; then cp parallel.html $(HTML_DEST)/ && echo "✓ Copied parallel.html"; fi
+	@mkdir -p $(LAYOUT_DEST)
+	@if [ -f parallelAndComputinglesson.html ]; then cp parallelAndComputinglesson.html $(LAYOUT_DEST)/parallelAndComputinglesson.html && echo "✓ Copied parallel computing lesson layout to _layouts"; fi
 
 # Clean distributed files (keeps source intact)
 clean:
@@ -62,7 +61,7 @@ clean:
 	@rm -rf $(NOTEBOOK_DEST)
 	@rm -rf $(JS_DEST)
 	@rm -rf $(IMAGES_DEST)
-	@rm -rf $(HTML_DEST)
+	@rm -f $(LAYOUT_DEST)/parallelAndComputinglesson.html
 	@echo "✓ Distribution cleaned (source files preserved in _projects/$(PROJECT_NAME))"
 
 ###########################################
@@ -102,6 +101,10 @@ watch:
 			elif echo "$$changed_file" | grep -q "/images/"; then \
 				echo "  🔄 Images changed - copying all images..."; \
 				$(MAKE) assets 2>&1 | grep -v "cp:" | head -1; \
+			elif echo "$$changed_file" | grep -q "parallelAndComputinglesson.html"; then \
+				echo "  🔄 Layout changed - copying to _layouts..."; \
+				mkdir -p $(LAYOUT_DEST); \
+				cp "$$changed_file" $(LAYOUT_DEST)/parallelAndComputinglesson.html 2>/dev/null || true; \
 			else \
 				echo "  🔄 File changed: $$changed_file (copying all assets)"; \
 				$(MAKE) assets 2>&1 | grep -v "cp:"; \
