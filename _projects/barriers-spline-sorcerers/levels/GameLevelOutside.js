@@ -1,10 +1,10 @@
 
-import GameEnvBackground  from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
-import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import SpriteSheetCoin from '/assets/js/projects/barriers-spline-sorcerers/levels/SpriteSheetCoin.js';
-import SplineBarrier from '/assets/js/projects/barriers-spline-sorcerers/levels/SplineBarrier.js';
+import GameEnvBackground  from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
+import SpriteSheetCoin from '@assets/js/projects/barriers-spline-sorcerers/levels/SpriteSheetCoin.js';
+import SplineBarrier from '@assets/js/projects/barriers-spline-sorcerers/levels/SplineBarrier.js';
 
 /**
  * GameLevelOutside

@@ -8,6 +8,10 @@ console.log('GameLevelSeek.js loaded:', new Date().toISOString());
 
 class GameLevelSeek {
     constructor(gameEnv) {
+        this.gameEnv = gameEnv;
+        this.levelCompleted = false;
+        this.completionTriggered = false;
+        this.spriteSwapScrollTriggered = false;
 
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -277,12 +281,14 @@ class GameLevelSeek {
         hint.style.border = '1px solid rgba(255, 209, 102, 0.8)';
         document.body.appendChild(hint);
 
-        document.addEventListener("keydown", (e) => {
+        this._menuKeyHandler = (e) => {
             if (e.key.toLowerCase() === "q") {
                 e.preventDefault();
                 toggleMenu();
             }
-        });
+        };
+        document.removeEventListener("keydown", this._menuKeyHandler);
+        document.addEventListener("keydown", this._menuKeyHandler);
         // =====================================================
 
         // ---------------- COIN SPRITE ----------------
@@ -344,6 +350,15 @@ class GameLevelSeek {
                     SCALE_FACTOR: 15,
                     INIT_POSITION: pos,
                     pixels: { height: 36, width: 36 },
+                    orientation: { rows: 1, columns: 1 },
+                    down: { row: 0, start: 0, columns: 1 },
+                    left: { row: 0, start: 0, columns: 1 },
+                    right: { row: 0, start: 0, columns: 1 },
+                    up: { row: 0, start: 0, columns: 1 },
+                    downRight: { row: 0, start: 0, columns: 1 },
+                    downLeft: { row: 0, start: 0, columns: 1 },
+                    upRight: { row: 0, start: 0, columns: 1 },
+                    upLeft: { row: 0, start: 0, columns: 1 },
                     interact: function () {
                         coinState.collected++;
                         this.destroy();
@@ -366,8 +381,71 @@ class GameLevelSeek {
             { class: Barrier, data: { id: 'b1', x: 100, y: 100, width: 50, height: 50 } }
         ];
 
+        this.coinState = coinState;
+        this.menuId = menuId;
+        this.hintId = hintId;
+
         // ---------------- START ----------------
         spawnCoins();
+    }
+
+    initialize() {
+        this.levelCompleted = false;
+        this.completionTriggered = false;
+
+        if (!this.spriteSwapScrollTriggered) {
+            this.spriteSwapScrollTriggered = true;
+            setTimeout(() => {
+                try {
+                    window.dispatchEvent(new CustomEvent('characters:concept-focus', {
+                        detail: { level: 'seek', trigger: 'level-start' }
+                    }));
+                } catch (err) {
+                    console.warn('Failed to emit seek concept focus event:', err);
+                }
+            }, 250);
+        }
+    }
+
+    update() {
+        if (this.completionTriggered) return;
+        if (!this.coinState) return;
+
+        if (this.coinState.collected >= this.coinState.total) {
+            this.completionTriggered = true;
+            this.levelCompleted = true;
+
+            try {
+                window.dispatchEvent(new CustomEvent('characters:level-complete', {
+                    detail: { level: 'seek' }
+                }));
+            } catch (err) {
+                console.warn('Failed to emit seek completion event:', err);
+            }
+
+            const level = this.gameEnv?.gameControl?.currentLevel;
+            if (level) {
+                setTimeout(() => {
+                    level.continue = false;
+                }, 350);
+            }
+        }
+    }
+
+    destroy() {
+        if (this.menuId) {
+            const menu = document.getElementById(this.menuId);
+            if (menu) menu.remove();
+        }
+
+        if (this.hintId) {
+            const hint = document.getElementById(this.hintId);
+            if (hint) hint.remove();
+        }
+
+        if (this._menuKeyHandler) {
+            document.removeEventListener("keydown", this._menuKeyHandler);
+        }
     }
 }
 

@@ -11,7 +11,8 @@ import ProfileManager from '@assets/js/projects/cs-pathway-game/model/ProfileMan
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import Present from './Present.js';
 import LoginManager from '@assets/js/projects/cs-pathway-game/model/LoginManager.js';
-
+import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
+import PersonaHallTrial from './PersonaHallTrial.js';
 const PROFILE_PANEL_ID = 'csse-profile-panel';
 
 // Track player progress and choices per session.
@@ -65,6 +66,12 @@ class GameLevelCsPath0Forge {
     this.finishLoadingWork = GameLevelCsPathIdentity.prototype.finishLoadingWork.bind(this);
     this.primeAssetGate = GameLevelCsPathIdentity.prototype.primeAssetGate.bind(this);
     this.preloadTrackedAsset = GameLevelCsPathIdentity.prototype.preloadTrackedAsset.bind(this);
+    this._getCompletion = GameLevelCsPathIdentity.prototype._getCompletion.bind(this);
+    this._saveCompletion = GameLevelCsPathIdentity.prototype._saveCompletion.bind(this);
+    this._getOverallScore = GameLevelCsPathIdentity.prototype._getOverallScore.bind(this);
+    this._getCompletionPanelValues = GameLevelCsPathIdentity.prototype._getCompletionPanelValues.bind(this);
+    this._syncCompletionPanel = GameLevelCsPathIdentity.prototype._syncCompletionPanel.bind(this);
+    this.markLevelComplete = GameLevelCsPathIdentity.prototype.markLevelComplete.bind(this);
 
     this.present = new Present(this, {
       toastDuration: 2200,
@@ -168,8 +175,10 @@ class GameLevelCsPath0Forge {
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
-      INIT_POSITION: { x: 0, y: height - (height / PLAYER_SCALE_FACTOR) },
-      pixels: { height: 1024, width: 1024 },
+      INIT_POSITION: { 
+        x: width * 0.18,  
+        y: height - (height / PLAYER_SCALE_FACTOR) 
+      },      pixels: { height: 1024, width: 1024 },
       orientation: { rows: 2, columns: 2 },
       down:      { row: 0, start: 0, columns: 1 },
       downRight: { row: 0, start: 0, columns: 1, rotate:  Math.PI / 16 },
@@ -196,25 +205,34 @@ class GameLevelCsPath0Forge {
     const level = this;
 
     const startGatekeeperPos = {
-      x: width * 0.14,
-      y: height * 0.78,
+      x: width * 0.10,
+      y: height * 0.90,
     };
 
     const identityGatekeeperPos = {
-      x: width * 0.48,
-      y: height * 0.74,
+      x: width * 0.22,   
+      y: height * 0.68,  
     };
-
+        
     const avatarGatekeeperPos = {
-      x: width * 0.50,
-      y: height * 0.20,
+      x: width * 0.45,   
+      y: height * 0.20,  
     };
 
     const worldThemeGatekeeperPos = {
-      x: width * 0.85,
-      y: height * 0.16,
+      x: width * 0.12,   
+      y: height * 0.30,  
+    };    
+    const courseEnlistmentGatekeeperPos = {
+      x: width * 0.70,   
+      y: height * 0.73,  
     };
 
+    const personaHallGatekeeperPos = {
+      x: width * 0.80,   // move RIGHT
+      y: height * 0.20,  // move UP
+    };
+    
     const gatekeeperBaseData = {
       src: path + "/images/projects/cs-pathway-game/npc/gatekeeper2.png",
       SCALE_FACTOR: PLAYER_SCALE_FACTOR,
@@ -296,7 +314,135 @@ class GameLevelCsPath0Forge {
         }
       },
     });
+    const npc_data_courseEnlistmentGatekeeper = createGatekeeperData({
+      id: 'CourseEnlistmentGatekeeper',
+      greeting: "Welcome to Course Enlistment.\nChoose your pathway and plan your journey.",
+      position: courseEnlistmentGatekeeperPos,
+      zoneMessage: 'Course Enlistment: Press E to plan your courses.',
+      alertDistance: 0.2,
     
+      reaction: function () {
+        void level.runCourseEnlistment(true, this);
+      },
+    
+      interact: async function () {
+        await level.showDialogue('Course Enlistment Gatekeeper', [
+          'Welcome to Course Enlistment.',
+          'Let’s map your pathway and future classes.',
+        ]);
+        await level.runCourseEnlistment(false, this);
+      },
+    });
+    const npc_data_personaHallGatekeeper = createGatekeeperData({
+      id: 'PersonaHallGatekeeper',
+      greeting: "Welcome to Persona Hall.\nChoose the CS persona that best matches you.",
+      position: personaHallGatekeeperPos,
+      zoneMessage: 'Persona Hall: Press E to choose your persona.',
+      alertDistance: 0.2,
+    
+      reaction: function () {
+        void level.runPersonaHall(true, this);
+      },
+    
+      interact: async function () {
+        await level.showDialogue('Persona Hall Guide', [
+          'Welcome to Persona Hall.',
+          'Choose the CS persona that best matches how you work.'
+        ]);
+        await level.runPersonaHall(false, this);
+      },
+    });
+    this.runCourseEnlistment = async function(showIntro = false, npc = null) {
+      if (this._courseEnlistmentOpen) return;
+      this._courseEnlistmentOpen = true;
+    
+      try {
+        if (showIntro) {
+          await this.showDialogue('Course Enlistment Gatekeeper', [
+            'This station helps you plan your learning journey.',
+            'Opening Course Enlistment...'
+          ]);
+        }
+    
+        const trial = new CourseEnlistmentTrial({
+          profileData: this.profileData || {},
+          onComplete: async (result) => {
+            try {
+              await this.saveCoursePlanResult(result);
+    
+              this.showToast(`Path unlocked: ${result.title}`);
+    
+              const classesText = Array.isArray(result.recommendedClasses)
+                ? result.recommendedClasses.map((c) => c.name).join(' → ')
+                : '';
+    
+              this.panel?.(
+                `${result.title}\n\n${result.summary}\n\nRecommended Classes: ${classesText}`
+              );
+    
+            } catch (err) {
+              console.error(err);
+            } finally {
+              this._courseEnlistmentOpen = false;
+            }
+          },
+          onClose: () => {
+            this._courseEnlistmentOpen = false;
+          },
+        });
+    
+        trial.start();
+    
+      } catch (err) {
+        console.error(err);
+        this._courseEnlistmentOpen = false;
+      }
+    };
+    this.runPersonaHall = async function(showIntro = false, npc = null) {
+      if (this._personaHallOpen) return;
+      this._personaHallOpen = true;
+    
+      try {
+        if (showIntro) {
+          await this.showDialogue('Persona Hall Guide', [
+            'Welcome to Persona Hall.',
+            'Choose the CS persona that best matches how you work.'
+          ]);
+        }
+    
+        const trial = new PersonaHallTrial({
+          profileData: this.profileData || {},
+    
+          onComplete: async (result) => {
+            this.profileData = {
+              ...this.profileData,
+              persona: result.title,
+              personaId: result.persona,
+            };
+    
+            this.updateProfilePanel(this.profileData);
+    
+            this.showToast(`Persona selected: ${result.title}`);
+    
+            this.panel?.(
+              `${result.title}\n\n${result.summary}`
+            );
+    
+            this._personaHallOpen = false;
+          },
+    
+          onClose: () => {
+            this._personaHallOpen = false;
+          },
+        });
+    
+        trial.start();
+    
+      } catch (err) {
+        console.error(err);
+        this._personaHallOpen = false;
+      }
+    };
     /**
      * Identity terminal flow. Run the authentication and identity registration wizard.
      * @private
@@ -476,6 +622,7 @@ await this.profileManager.saveIdentity(profile);
         ]);
 
         this.showToast('✦ Avatar Forge completed');
+        this.markLevelComplete('identityForge');
       } finally {
         identityState.avatarFlowActive = false;
       }
@@ -1259,10 +1406,17 @@ await this.profileManager.saveIdentity(profile);
         { key: 'name', label: 'Name', emptyValue: '—' },
         { key: 'email', label: 'Email', emptyValue: '—' },
         { key: 'githubID', label: 'GitHub ID', emptyValue: '—' },
+        { type: 'section', title: 'Persona Hall', marginTop: '8px' },
+        { key: 'persona', label: 'Persona', emptyValue: '—' },
         { type: 'section', title: 'Avatar Sprite', marginTop: '8px' },
         { key: 'sprite', label: 'Sprite', emptyValue: '—' },
         { type: 'section', title: 'World Theme', marginTop: '8px' },
         { key: 'worldTheme', label: 'Theme', emptyValue: '—' },
+        { type: 'section', title: 'Completion Status', marginTop: '10px' },
+        { key: 'completionIdentityForge',   label: 'Identity Forge',   emptyValue: '—' },
+        { key: 'completionWayfindingWorld', label: 'Wayfinding World', emptyValue: '—' },
+        { key: 'completionMissionTools',    label: 'Mission Tools',    emptyValue: '—' },
+        { key: 'completionOverallScore',    label: 'Overall Score',    emptyValue: '0.55' },
       ],
       actions: [
         {
@@ -1331,9 +1485,11 @@ await this.profileManager.saveIdentity(profile);
         name: profile.name || '—',
         email: profile.email || '—',
         githubID: profile.githubID || '—',
+        persona: profile.persona || '—',
         sprite: profile.sprite || '—',
         worldTheme: profile.worldTheme || '—',
       });
+      this._syncCompletionPanel();
     };
 
     /**
@@ -1359,6 +1515,8 @@ await this.profileManager.saveIdentity(profile);
       { class: FriendlyNpc,      data: npc_data_identityGatekeeper },
       { class: FriendlyNpc,      data: npc_data_avatarGatekeeper },
       { class: FriendlyNpc,      data: npc_data_worldThemeGatekeeper },
+      { class: FriendlyNpc, data: npc_data_courseEnlistmentGatekeeper },
+      { class: FriendlyNpc, data: npc_data_personaHallGatekeeper },
     ];
 
     this._forgeGatekeeperIds = [
@@ -1366,6 +1524,9 @@ await this.profileManager.saveIdentity(profile);
       'IdentityGatekeeper',
       'AvatarGatekeeper',
       'WorldThemeGatekeeper',
+      'CourseEnlistmentGatekeeper', 
+      'PersonaHallGatekeeper',
+
     ];
   }
 

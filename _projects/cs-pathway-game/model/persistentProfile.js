@@ -167,6 +167,9 @@ class PersistentProfile {
           'mission-tooling': {
             progress: {
               toolsUnlocked: profileData.toolsUnlocked || false,
+              missionProgressCount: profileData.missionProgressCount || 0,
+              missionScore: profileData.missionScore || 0.55,
+              missionCompletedStations: profileData.missionCompletedStations || [],
             },
             completedAt: null,
           },
@@ -255,6 +258,9 @@ class PersistentProfile {
             progress: {
               ...missionTooling.progress,
               ...(updates.toolsUnlocked !== undefined && { toolsUnlocked: updates.toolsUnlocked }),
+              ...(updates.missionProgressCount !== undefined && { missionProgressCount: updates.missionProgressCount }),
+              ...(updates.missionScore !== undefined && { missionScore: updates.missionScore }),
+              ...(updates.missionCompletedStations !== undefined && { missionCompletedStations: updates.missionCompletedStations }),
             },
             completedAt: updates.missionToolingCompleted || missionTooling.completedAt,
           },
@@ -435,7 +441,10 @@ class PersistentProfile {
         
         // Mission Tooling
         toolsUnlocked: missionTooling.progress?.toolsUnlocked || false,
-        
+        missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
+        missionScore: missionTooling.progress?.missionScore || 0.55,
+        missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
+
         // Metadata
         localId: gameProfile.localId || null,
         createdAt: gameProfile.createdAt || '',
