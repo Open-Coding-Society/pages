@@ -208,7 +208,6 @@ class GameLevelAirport {
             [
               { label: "Take me to the Stock Exchange", action: () => openInModal(`${path}/stocks/viewer`) },
               { label: "Teach me Quantitative Trading", action: () => openInModal(`${path}/gamify/fortuneFinders/quante`) },
-              { label: "Learn Coding Behind Quant Trading", action: () => openInModal(`${path}/gamify/fortuneFinders/quant-lesson`) },
               { label: "Remind me what stocks are", action: () => dialogFunctions.whatAreStocks(), keepOpen: true },
               { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
             ]
