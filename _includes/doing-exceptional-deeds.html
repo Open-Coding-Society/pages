@@ -1,111 +1,548 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+.ded-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--text, #e4e4e7);
+}
+
+.ded-meta {
+  font-size: 0.875rem;
+  color: var(--text-muted, #a1a1aa);
+  margin-bottom: 0.5rem;
+}
+
+.ded-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent, #06b6d4);
+  margin-bottom: 0.75rem;
+}
+
+.ded-wrap h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  color: var(--text, #e4e4e7);
+}
+
+.ded-lead {
+  font-size: 1.0625rem;
+  color: var(--text-muted, #a1a1aa);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+}
+
+.ded-team-line {
+  font-size: 0.875rem;
+  color: var(--text-muted, #a1a1aa);
+  margin-bottom: 2rem;
+}
+
+.ded-team-line strong {
+  color: var(--text, #e4e4e7);
+}
+
+/* === Cards === */
+.ded-card {
+  background: var(--card, #16161a);
+  border: 1px solid var(--card-border, #2a2a2e);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 1.75rem;
+}
+
+.ded-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ded-card h2 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--text, #e4e4e7);
+}
+
+.ded-subtitle {
+  font-size: 0.9375rem;
+  color: var(--accent, #06b6d4);
+  margin: 0;
+}
+
+.ded-status-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  background: var(--accent-soft, rgba(6,182,212,0.15));
+  color: var(--accent, #06b6d4);
+  border: 1px solid rgba(6,182,212,0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ded-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.ded-section-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #a1a1aa);
+  margin: 0 0 0.6rem;
+}
+
+.ded-keypoints {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ded-keypoints li {
+  display: flex;
+  gap: 0.6rem;
+  font-size: 0.9375rem;
+  color: var(--text-muted, #a1a1aa);
+  padding: 0.3rem 0;
+}
+
+.ded-keypoints li::before {
+  content: "✓";
+  color: var(--success, #22c55e);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.ded-impact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ded-impact-item {
+  font-size: 0.9rem;
+  color: var(--text-muted, #a1a1aa);
+  line-height: 1.5;
+}
+
+.ded-impact-item::before {
+  content: "→ ";
+  color: var(--accent, #06b6d4);
+  font-weight: 600;
+}
+
+.ded-tech-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.ded-tech-tag {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--tag, #27272a);
+  color: var(--text-muted, #a1a1aa);
+  border-radius: 0.375rem;
+  border: 1px solid var(--card-border, #2a2a2e);
+}
+
+.ded-card-img {
+  width: 100%;
+  border-radius: 0.625rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--card-border, #2a2a2e);
+  display: block;
+}
+
+/* === Feature Highlights (What's New) === */
+.ded-features {
+  background: var(--card, #16161a);
+  border: 1px solid var(--card-border, #2a2a2e);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 1.75rem;
+}
+
+.ded-features h2 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--text, #e4e4e7);
+}
+
+.ded-features > p {
+  font-size: 0.9375rem;
+  color: var(--text-muted, #a1a1aa);
+  margin-bottom: 1.5rem;
+}
+
+.ded-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.ded-feature-item {
+  border: 1px solid var(--card-border, #2a2a2e);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.ded-feature-img {
+  width: 100%;
+  display: block;
+  border-bottom: 1px solid var(--card-border, #2a2a2e);
+}
+
+.ded-feature-body {
+  padding: 0.875rem 1rem;
+}
+
+.ded-feature-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text, #e4e4e7);
+  margin: 0 0 0.35rem;
+}
+
+.ded-feature-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted, #a1a1aa);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* === Preview section === */
+.ded-preview {
+  background: var(--card, #16161a);
+  border: 1px solid var(--card-border, #2a2a2e);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 1.75rem;
+}
+
+.ded-preview h2 {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: var(--text, #e4e4e7);
+}
+
+.ded-preview > p {
+  font-size: 0.9375rem;
+  color: var(--text-muted, #a1a1aa);
+  margin-bottom: 1.25rem;
+  line-height: 1.65;
+}
+
+.ded-preview-img {
+  width: 100%;
+  border-radius: 0.625rem;
+  border: 1px solid var(--card-border, #2a2a2e);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.ded-preview-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ded-preview-step {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--text-muted, #a1a1aa);
+}
+
+.ded-step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent, #06b6d4);
+  background: var(--accent-soft, rgba(6,182,212,0.15));
+  border-radius: 9999px;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* === Links section === */
+.ded-links-section {
+  background: var(--card, #16161a);
+  border: 1px solid var(--card-border, #2a2a2e);
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ded-links-section p {
+  font-size: 0.9375rem;
+  color: var(--text-muted, #a1a1aa);
+  margin: 0;
+}
+
+.ded-links-section p strong {
+  color: var(--text, #e4e4e7);
+}
+
+.ded-links-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ded-link-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  background: var(--accent, #06b6d4);
+  color: #fff !important;
+}
+
+.ded-link-btn:hover {
+  opacity: 0.85;
+}
+
+.ded-link-btn.ded-link-outline {
+  background: transparent;
+  color: var(--accent, #06b6d4);
+  border: 1px solid rgba(6,182,212,0.4);
+}
+
+.ded-link-btn.ded-link-outline:hover {
+  background: var(--accent-soft, rgba(6,182,212,0.15));
+}
+
+@media (max-width: 620px) {
+  .ded-two-col,
+  .ded-feature-grid {
+    grid-template-columns: 1fr;
+  }
+  .ded-links-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+
 {% assign data = site.data.doingexceptionaldeeds %}
 
-<div class="ded-infograph">
-  <!-- Header Section -->
-  <div class="ded-header">
-    <div class="ded-badge">D.A.D. Website</div>
-    <h1 class="ded-title">Doing Exceptional Deeds (D.A.D.)</h1>
-    <p class="ded-description">We are AP Computer Science Principles students at Del Norte High School, excited to help revamp your Doing Exceptional Deeds (D.A.D.) page!</p>
+<div class="ded-wrap">
+
+  <p class="ded-meta">Capstone — Spring 2026</p>
+  <p class="ded-label">Design-Based Research Project</p>
+  <h1>D.A.D. — A Digital Extension</h1>
+
+  <p class="ded-lead">
+    For our capstone, we partnered with <strong>Doing Exceptional Deeds (D.A.D.)</strong>, a 501(c)(3) nonprofit in San Marcos, CA that supports youth, families, and seniors through character-first programs. Our team built a companion web platform to extend their digital presence — adding community-driven content, instant AI support, and direct communication between the organization and the people they serve.
+  </p>
+
+  <p class="ded-team-line"><strong>Team</strong> — William Windle · Ethan Wong · Nicolas Diaz</p>
+
+  <!-- Links -->
+  <div class="ded-links-section" style="margin-bottom:1.75rem;">
+    <p><strong>Live Project</strong><br>Frontend + backend deployed and accessible now</p>
+    <div class="ded-links-row">
+      <a href="https://deeds.opencodingsociety.com/dad" class="ded-link-btn" target="_blank" rel="noopener noreferrer">Open Frontend ↗</a>
+      <a href="https://dad.opencodingsociety.com/" class="ded-link-btn ded-link-outline" target="_blank" rel="noopener noreferrer">Backend API ↗</a>
+    </div>
   </div>
 
-  <!-- Mission Section -->
-  <div class="ded-mission">
-    <h2 class="ded-mission-title">Our Mission</h2>
-    <p class="ded-mission-text">We are AP Computer Science Principles students at Del Norte High School, excited to help revamp your Doing Exceptional Deeds (D.A.D.) page! Our improvements will include a redesigned and more engaging homepage, an AI assistant to provide quick and easy help, and a dynamic carousel system to showcase photos. We will also implement a feature that allows users to submit their own “exceptional deeds,” along with a chat system that enables direct communication between users and administrators for more in-depth questions and support.</p>
-  </div>
-
-  <!-- Program Cards -->
+  <!-- Overview Card -->
   {% for topic in data.Topics %}
   <div class="ded-card">
-    <div class="ded-card-grid">
 
-      <!-- Left: Image & Status -->
-      <div class="ded-visual">
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="ded-image-link">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="ded-image">
-          <div class="ded-overlay">
-            <span>Learn More</span>
-          </div>
-        </a>
-        <div class="ded-status">{{ topic.status }}</div>
-        <div class="ded-team">
-          <span class="ded-team-label">The Team</span>
-          <span class="ded-team-name">{{ topic.team | join: ", " }}</span>
-        </div>
-      </div>
-
-      <!-- Center: Key Points -->
-      <div class="ded-content">
-        <h2 class="ded-project-title">{{ topic.title }}</h2>
+    <div class="ded-card-header">
+      <div>
+        <h2>{{ topic.title }}</h2>
         <p class="ded-subtitle">{{ topic.subtitle }}</p>
+      </div>
+      <span class="ded-status-badge">{{ topic.status }}</span>
+    </div>
 
-        <div class="ded-keypoints">
+    <div class="ded-two-col">
+
+      <div>
+        <p class="ded-section-label">What We Built</p>
+        <ul class="ded-keypoints">
           {% for point in topic.keyPoints %}
-          <div class="ded-keypoint">
-            <span class="ded-check">✓</span>
-            <span>{{ point }}</span>
-          </div>
+          <li>{{ point }}</li>
           {% endfor %}
-        </div>
-
-        <div class="ded-tech-stack">
-          {% for tech in topic.tech %}
-          <span class="ded-tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
+        </ul>
       </div>
 
-      <!-- Right: Description & Impact -->
-      <div class="ded-details">
-        <h3 class="ded-section-title">About</h3>
-        <p class="ded-about">{{ topic.description }}</p>
-
-        <h3 class="ded-section-title">Impact</h3>
+      <div>
+        <p class="ded-section-label">Impact</p>
         <div class="ded-impact-list">
           {% for item in topic.impact %}
           <div class="ded-impact-item">{{ item }}</div>
           {% endfor %}
         </div>
+      </div>
 
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="ded-btn">Learn More</a>
+    </div>
+
+    <div class="ded-tech-row">
+      {% for tech in topic.tech %}
+      <span class="ded-tech-tag">{{ tech }}</span>
+      {% endfor %}
+      <span class="ded-tech-tag">Jekyll + Liquid</span>
+      <span class="ded-tech-tag">REST API</span>
+      <span class="ded-tech-tag">Python / Flask</span>
+    </div>
+
+  </div>
+  {% endfor %}
+
+  <!-- Feature Highlights -->
+  <div class="ded-features">
+    <h2>Feature Highlights</h2>
+    <p>Four core features built and shipped as part of the capstone, each targeting a real gap in the organization's digital reach.</p>
+
+    <div class="ded-feature-grid">
+
+      <div class="ded-feature-item">
+        <img src="{{ site.baseurl }}/images/home_programs.png" alt="Homepage redesign and community carousel" class="ded-feature-img">
+        <div class="ded-feature-body">
+          <p class="ded-feature-title">Homepage Redesign + Community Carousel</p>
+          <p class="ded-feature-desc">Programs displayed as numbered tiles (01–06) with clear hierarchy. Users submit community stories; admins curate which get featured on the homepage carousel.</p>
+        </div>
+      </div>
+
+      <div class="ded-feature-item">
+        <img src="{{ site.baseurl }}/images/deed_submit_new.png" alt="Submit a deed" class="ded-feature-img">
+        <div class="ded-feature-body">
+          <p class="ded-feature-title">Submit a Deed</p>
+          <p class="ded-feature-desc">Anyone can share a positive contribution with the community. Stories of impact build momentum and encourage others to get involved.</p>
+        </div>
+      </div>
+
+      <div class="ded-feature-item">
+        <img src="{{ site.baseurl }}/images/ai_dad_new.png" alt="AI assistant" class="ded-feature-img">
+        <div class="ded-feature-body">
+          <p class="ded-feature-title">AI Assistant</p>
+          <p class="ded-feature-desc">A scoped chatbot available site-wide — answers questions about D.A.D. programs and redirects or collects contact info when it can't help directly.</p>
+        </div>
+      </div>
+
+      <div class="ded-feature-item">
+        <img src="{{ site.baseurl }}/images/capstone/chat.png" alt="Admin chat" class="ded-feature-img">
+        <div class="ded-feature-body">
+          <p class="ded-feature-title">User–Admin Direct Chat</p>
+          <p class="ded-feature-desc">Users can open a direct conversation with D.A.D. staff. Admins see all active threads and choose who to respond to; users only see their own exchange.</p>
+        </div>
       </div>
 
     </div>
   </div>
-  {% endfor %}
 
-    <!-- Links Section -->
-  <div class="ded-links">
-    <h2 class="ded-links-title">Links</h2>
-    <p class="ded-link-item"><a href="https://deeds.opencodingsociety.com/dad">New DAD Frontend</a></p>
-    <p class="ded-link-item"><a href="https://dad.opencodingsociety.com/">New DAD Backend</a></p>
+  <!-- Preview Into Launch -->
+  <div class="ded-preview">
+    <h2>Preview Into Launch</h2>
+    <p>
+      The platform is built and live at <strong>deeds.opencodingsociety.com</strong>. Below is a look at the deployed homepage — the same layout that D.A.D. can hand off, extend, or adapt independently after the capstone wraps.
+    </p>
+
+    <img src="{{ site.baseurl }}/images/home_programs.png" alt="Live site preview" class="ded-preview-img">
+
+    <div class="ded-preview-steps">
+      <div class="ded-preview-step">
+        <span class="ded-step-num">1</span>
+        <span>Frontend deployed via GitHub Pages at <strong>deeds.opencodingsociety.com/dad</strong></span>
+      </div>
+      <div class="ded-preview-step">
+        <span class="ded-step-num">2</span>
+        <span>Backend API running at <strong>dad.opencodingsociety.com</strong> — handles submissions, chat, and AI queries</span>
+      </div>
+      <div class="ded-preview-step">
+        <span class="ded-step-num">3</span>
+        <span>All features tested end-to-end; admin dashboard functional for deed approval and chat management</span>
+      </div>
+      <div class="ded-preview-step">
+        <span class="ded-step-num">4</span>
+        <span>Codebase documented and transfer-ready for D.A.D. staff or future student developers</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Capstone Presentation Practice -->
+  <div class="ded-preview">
+    <h2>Capstone Presentation Practice</h2>
+    <p>Before presenting to the actual organizations, we did a practice run with our listener to get honest, direct feedback on both the project and our delivery.</p>
+
+    <div class="ded-two-col" style="margin-bottom:1.5rem;">
+      <div>
+        <p class="ded-section-label">What Went Well</p>
+        <div class="ded-impact-list">
+          <div class="ded-impact-item">The website design landed well — polished and visually clear</div>
+          <div class="ded-impact-item">Introducing ourselves up front set a personal tone before diving into the project</div>
+        </div>
+      </div>
+      <div>
+        <p class="ded-section-label">What We Need to Improve</p>
+        <div class="ded-impact-list">
+          <div class="ded-impact-item">Avoid "they" / "them" — speak directly to the audience, not about them</div>
+          <div class="ded-impact-item">Be navigated to the relevant feature on screen when describing it</div>
+          <div class="ded-impact-item">Keep the website front and center throughout — no jumping away</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="ded-section-label">Takeaways for the Real Presentation</p>
+    <div class="ded-preview-steps">
+      <div class="ded-preview-step">
+        <span class="ded-step-num">1</span>
+        <span>Speak directly to the audience — no "they" or "them" at any point</span>
+      </div>
+      <div class="ded-preview-step">
+        <span class="ded-step-num">2</span>
+        <span>Navigate to the relevant feature before describing it — show, don't tell</span>
+      </div>
+      <div class="ded-preview-step">
+        <span class="ded-step-num">3</span>
+        <span>Keep the website front and center for all commentary and transitions</span>
+      </div>
+      <div class="ded-preview-step">
+        <span class="ded-step-num">4</span>
+        <span>The design and intro already work — carry those forward unchanged</span>
+      </div>
+    </div>
   </div>
 
 </div>
-
-  <!-- What's New Section -->
-  <div class="ded-updates">
-    <h2 class="ded-updates-title">What's New</h2>
-
-    <h3 class="ded-update-heading">Site Redesign</h3>
-    <p class="ded-update-text">We revamped the look of the site with a cleaner, more dynamic card-based layout. Programs are now displayed as numbered tiles (01–06) on the landing page. Donate and Get Involved buttons appear directly on each program card. Sections are more compact and informational with clearer hierarchy.</p>
-    <img src="{{ site.baseurl }}/images/capstone/home_dad.png" alt="Site redesign screenshot" class="ded-update-img">
-
-    <h3 class="ded-update-heading">Community Carousel</h3>
-    <p class="ded-update-text">Users can submit stories and contributions to the site. Admins review submissions and select which ones get featured on the home page carousel, keeping the homepage filled with real community voices.</p>
-    <img src="{{ site.baseurl }}/images/capstone/deeds-carousel.png" alt="User chat view screenshot" class="ded-update-img">
-   
-        <h3 class="ded-update-heading">Submit Your Own Deed </h3>
-    <p class="ded-update-text">The “Submit an Exceptional Deed” feature allows users to easily share their own positive actions and contributions with the community. By giving people a platform to highlight good deeds, it encourages others to get involved and spread kindness. This feature helps build a more connected and inspiring environment centered around real stories of impact.</p>
-    <img src="{{ site.baseurl }}/images/capstone/deed-submit.png" alt="User chat view screenshot" class="ded-update-img">
-
-    <h3 class="ded-update-heading">AI Assistant</h3>
-    <p class="ded-update-text">A new AI chatbot is available on every page to help users find programs, learn about volunteering, and navigate D.A.D. services. It only answers questions related to D.A.D. — off-topic questions get a polite redirect. If it can't fully help, it collects the user's contact info for follow-up.</p>
-    <img src="{{ site.baseurl }}/images/capstone/ai_dad.png" alt="AI chatbot screenshot" class="ded-update-img">
-
-    <h3 class="ded-update-heading">User–Admin Direct Chat</h3>
-    <p class="ded-update-text">Users can now open a direct chat with a D.A.D. staff member for personalized help. Admins have a dashboard to see all incoming conversations and choose which users to respond to. Users only see their own conversation.</p>
-    <img src="{{ site.baseurl }}/images/capstone/chat.png" alt="User chat view screenshot" class="ded-update-img">
-
-  </div>
-

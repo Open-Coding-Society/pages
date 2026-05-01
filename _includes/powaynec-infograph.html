@@ -9,16 +9,16 @@
     border: none !important;
   }
 
-  .powaynec-description {
-    color: #ffcba4 !important;
-  }
-
   .powaynec-card {
     position: relative;
     overflow: hidden;
     background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
     border: 1px solid #ff4500 !important;
     box-shadow: 0 0 18px rgba(255, 80, 0, 0.3) !important;
+  }
+
+  .powaynec-card-grid {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) !important;
   }
 
   .powaynec-visual {
@@ -57,6 +57,13 @@
   .powaynec-keypoint span {
     color: #ffd4a8 !important;
     text-decoration: none !important;
+  }
+
+  .powaynec-feature-impact {
+    color: #ffcba4 !important;
+    font-size: 0.84rem !important;
+    line-height: 1.45 !important;
+    margin: 8px 0 0 !important;
   }
 
   .powaynec-org-summary {
@@ -99,15 +106,19 @@
     flex-direction: column !important;
   }
 
+  .powaynec-keypoints {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .powaynec-keypoint-heading {
+    grid-column: 1 / -1 !important;
+  }
+
   .powaynec-section-title {
     color: #ff6a00 !important;
     border-bottom: 1px solid #ff4500 !important;
-  }
-
-  .powaynec-impact-item {
-    background: linear-gradient(135deg, #2d1000, #1a0a00) !important;
-    border: 1px solid #ff4500 !important;
-    color: #ffd4a8 !important;
   }
 
   .powaynec-btn {
@@ -139,8 +150,10 @@
     background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
   }
 
-  .powaynec-details {
-    background: linear-gradient(160deg, #1a0a00, #2d1000) !important;
+  @media (max-width: 800px) {
+    .powaynec-keypoints {
+      grid-template-columns: 1fr !important;
+    }
   }
 
 </style>
@@ -149,8 +162,7 @@
 
 <div class="powaynec-infograph">
   <div class="powaynec-header">
-    <div class="powaynec-badge">Design-Based Research Capstone</div>
-    <p class="powaynec-description">{{ data.Description }}</p>
+    <div class="powaynec-badge">Design-Based Research Capstone Prototype</div>
   </div>
 
   {% for topic in data.Topics %}
@@ -171,7 +183,7 @@
         <p class="powaynec-org-summary">{{ topic.description }}</p>
         {% endif %}
         <div class="powaynec-team">
-          <span class="powaynec-team-label">Project Leads</span>
+          <span class="powaynec-team-label">Project Members</span>
           <span class="powaynec-team-name">{{ topic.team | join: ", " }}</span>
         </div>
       </div>
@@ -180,12 +192,16 @@
         <p class="powaynec-subtitle">{{ topic.subtitle }}</p>
         <div class="powaynec-keypoints">
           {% for point in topic.keyPoints %}
-          <div class="powaynec-keypoint">
             {% if point.title == "New Website Features:" %}
+          <div class="powaynec-keypoint powaynec-keypoint-heading">
             <h3 class="powaynec-section-title">{{ point.title }}</h3>
             {% else %}
+          <div class="powaynec-keypoint">
             <span class="powaynec-check">✓</span>
             <span>{{ point.title }}</span>
+            {% endif %}
+            {% if point.impact %}
+            <p class="powaynec-feature-impact">{{ point.impact }}</p>
             {% endif %}
             {% if point.link %}
             <div class="powaynec-feature-links">
@@ -211,20 +227,6 @@
         <div class="powaynec-tech-stack">
           {% for tech in topic.tech %}
           <span class="powaynec-tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="powaynec-details">
-        <h3 class="powaynec-section-title">Impacts:</h3>
-        <div class="powaynec-impact-list">
-          {% for item in topic.impact %}
-          <div class="powaynec-impact-item">
-            {{ item.title }}
-            {% if item.image %}
-            <img src="{{ site.baseurl }}/images/{{ item.image }}" alt="{{ item.title }}">
-            {% endif %}
-          </div>
           {% endfor %}
         </div>
       </div>

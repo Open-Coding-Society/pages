@@ -531,6 +531,707 @@ export class TTSPanel {
 }
 
 // ============================================
+// RESPONSIBILITY: Head calibration persistence + mapping
+// ============================================
+/** Manages the calibration coordinates for the nod-based cursor to map head movements to screen coordinates. */
+export class NodCursorCalibrationManager {
+    static STORAGE_KEY = 'headTrackingCalibration';
+    static data = NodCursorCalibrationManager._defaultCalibration();
+    static refs = {
+        status: null
+    };
+
+    /** Executes the static _defaultCalibration() { functionality for this class. */
+    static _defaultCalibration() {
+        return {
+            centerX: 0.5,
+            centerY: 0.5,
+            leftX: 0.3,
+            rightX: 0.7,
+            upY: 0.3,
+            downY: 0.7,
+            calibrated: false
+        };
+    }
+
+    /** Executes the static _sanitize(data) { functionality for this class. */
+    static _sanitize(data) {
+        const d = NodCursorCalibrationManager._defaultCalibration();
+        const num = (v, fallback) => {
+            const n = Number(v);
+            if (!Number.isFinite(n)) return fallback;
+            return Math.max(0, Math.min(1, n));
+        };
+        return {
+            centerX: num(data?.centerX, d.centerX),
+            centerY: num(data?.centerY, d.centerY),
+            leftX: num(data?.leftX, d.leftX),
+            rightX: num(data?.rightX, d.rightX),
+            upY: num(data?.upY, d.upY),
+            downY: num(data?.downY, d.downY),
+            calibrated: !!data?.calibrated
+        };
+    }
+
+    /** Executes the static _normalizeUserId(value) { functionality for this class. */
+    static _normalizeUserId(value) {
+        if (value === null || value === undefined) return null;
+        const normalized = String(value).trim();
+        return normalized ? normalized : null;
+    }
+
+    /** Executes the static init(statusRef) { functionality for this class. */
+    static init(statusRef) {
+        NodCursorCalibrationManager.refs.status = statusRef || null;
+        NodCursorCalibrationManager.loadLocal();
+    }
+
+    /** Executes the static setStatus(message, isError = false) { functionality for this class. */
+    static setStatus(message, isError = false) {
+        if (!NodCursorCalibrationManager.refs.status) return;
+        NodCursorCalibrationManager.refs.status.textContent = message;
+        NodCursorCalibrationManager.refs.status.style.color = isError ? '#f87171' : '';
+    }
+
+    /** Executes the static loadLocal() { functionality for this class. */
+    static loadLocal() {
+        try {
+            const raw = localStorage.getItem(NodCursorCalibrationManager.STORAGE_KEY);
+            if (!raw) {
+                NodCursorCalibrationManager.data = NodCursorCalibrationManager._defaultCalibration();
+                return NodCursorCalibrationManager.data;
+            }
+            NodCursorCalibrationManager.data = NodCursorCalibrationManager._sanitize(JSON.parse(raw));
+            return NodCursorCalibrationManager.data;
+        } catch (e) {
+            console.error('head calibration load local error', e);
+            NodCursorCalibrationManager.data = NodCursorCalibrationManager._defaultCalibration();
+            return NodCursorCalibrationManager.data;
+        }
+    }
+
+    /** Executes the static saveLocal() { functionality for this class. */
+    static saveLocal() {
+        try {
+            localStorage.setItem(NodCursorCalibrationManager.STORAGE_KEY, JSON.stringify(NodCursorCalibrationManager.data));
+        } catch (e) {
+            console.error('head calibration save local error', e);
+        }
+    }
+
+    /** Executes the static capture(point, rawX, rawY) { functionality for this class. */
+    static capture(point, rawX, rawY) {
+        if (!Number.isFinite(rawX) || !Number.isFinite(rawY)) {
+            NodCursorCalibrationManager.setStatus('No face landmark found. Keep your face in frame and try again.', true);
+            return false;
+        }
+
+        if (point === 'center') {
+            NodCursorCalibrationManager.data.centerX = rawX;
+            NodCursorCalibrationManager.data.centerY = rawY;
+        } else if (point === 'left') {
+            NodCursorCalibrationManager.data.leftX = rawX;
+        } else if (point === 'right') {
+            NodCursorCalibrationManager.data.rightX = rawX;
+        } else if (point === 'up') {
+            NodCursorCalibrationManager.data.upY = rawY;
+        } else if (point === 'down') {
+            NodCursorCalibrationManager.data.downY = rawY;
+        }
+
+        const complete = [
+            NodCursorCalibrationManager.data.leftX,
+            NodCursorCalibrationManager.data.rightX,
+            NodCursorCalibrationManager.data.upY,
+            NodCursorCalibrationManager.data.downY
+        ].every(Number.isFinite);
+        NodCursorCalibrationManager.data.calibrated = !!complete;
+        NodCursorCalibrationManager.saveLocal();
+        NodCursorCalibrationManager.setStatus(`Captured ${point}.`);
+        return true;
+    }
+
+    /** Executes the static reset() { functionality for this class. */
+    static reset() {
+        NodCursorCalibrationManager.data = NodCursorCalibrationManager._defaultCalibration();
+        NodCursorCalibrationManager.saveLocal();
+        NodCursorCalibrationManager.setStatus('Calibration reset to defaults.');
+    }
+
+    /** Executes the static mapRawToViewport(rawX, rawY) { functionality for this class. */
+    static mapRawToViewport(rawX, rawY) {
+        const x = Math.max(0, Math.min(1, rawX));
+        const y = Math.max(0, Math.min(1, rawY));
+        const c = NodCursorCalibrationManager.data;
+
+        if (!c?.calibrated) {
+            return { x, y };
+        }
+
+        const normalize = (value, min, max) => {
+            if (!Number.isFinite(min) || !Number.isFinite(max) || Math.abs(max - min) < 0.001) {
+                return 0.5;
+            }
+            return (value - min) / (max - min);
+        };
+
+        const nx = normalize(x, c.leftX, c.rightX);
+        const ny = normalize(y, c.upY, c.downY);
+        return {
+            x: Math.max(0, Math.min(1, nx)),
+            y: Math.max(0, Math.min(1, ny))
+        };
+    }
+
+    static async _getCurrentUserId() {
+        if (!PreferencesAPI.javaURI || !PreferencesAPI.fetchOptions) return null;
+        const res = await fetch(`${PreferencesAPI.javaURI}/api/person/get`, PreferencesAPI.fetchOptions);
+        if (!res.ok) return null;
+        const person = await res.json();
+        return NodCursorCalibrationManager._normalizeUserId(
+            person?.id || person?.uid || person?.username || person?.name || null
+        );
+    }
+
+    static async saveToBackend() {
+        try {
+            const userId = NodCursorCalibrationManager._normalizeUserId(await NodCursorCalibrationManager._getCurrentUserId());
+            if (!userId) {
+                NodCursorCalibrationManager.setStatus('You must be logged in to save calibration to backend.', true);
+                return false;
+            }
+
+            const payload = {
+                userId,
+                body: `${userId}-calibration`,
+                metadata: NodCursorCalibrationManager._sanitize(NodCursorCalibrationManager.data)
+            };
+
+            const res = await fetch(`${PreferencesAPI.javaURI}/api/content/HEAD_CALIBRATION`, {
+                ...PreferencesAPI.fetchOptions,
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                NodCursorCalibrationManager.setStatus(`Failed to save calibration (${res.status}).`, true);
+                return false;
+            }
+
+            NodCursorCalibrationManager.setStatus('Calibration saved to backend.');
+            return true;
+        } catch (e) {
+            console.error('save calibration backend error', e);
+            NodCursorCalibrationManager.setStatus('Could not save calibration (network/server error).', true);
+            return false;
+        }
+    }
+
+    static async loadFromBackend() {
+        try {
+            const userId = NodCursorCalibrationManager._normalizeUserId(await NodCursorCalibrationManager._getCurrentUserId());
+            if (!userId) {
+                NodCursorCalibrationManager.setStatus('You must be logged in to load calibration.', true);
+                return false;
+            }
+
+            const res = await fetch(`${PreferencesAPI.javaURI}/api/content/HEAD_CALIBRATION`, PreferencesAPI.fetchOptions);
+            if (!res.ok) {
+                NodCursorCalibrationManager.setStatus(`Failed to load calibration list (${res.status}).`, true);
+                return false;
+            }
+
+            const allRows = await res.json();
+            const expectedBody = `${userId}-calibration`;
+            const matches = Array.isArray(allRows)
+                ? allRows.filter(row => {
+                    const rowUserId = NodCursorCalibrationManager._normalizeUserId(row?.userId);
+                    const rowBody = NodCursorCalibrationManager._normalizeUserId(row?.body);
+                    return rowUserId === userId || rowBody === expectedBody;
+                })
+                : [];
+
+            if (!matches.length) {
+                NodCursorCalibrationManager.setStatus(`No saved calibration found for ${userId}.`, true);
+                return false;
+            }
+
+            const picked = matches.reduce((best, row) => {
+                if (!best) return row;
+                return Number(row?.id || 0) > Number(best?.id || 0) ? row : best;
+            }, null);
+
+            NodCursorCalibrationManager.data = NodCursorCalibrationManager._sanitize(picked?.metadata || {});
+            NodCursorCalibrationManager.data.calibrated = true;
+            NodCursorCalibrationManager.saveLocal();
+            NodCursorCalibrationManager.setStatus(`Loaded calibration for ${userId}.`);
+            return true;
+        } catch (e) {
+            console.error('load calibration backend error', e);
+            NodCursorCalibrationManager.setStatus('Could not load calibration (network/server error).', true);
+            return false;
+        }
+    }
+}
+
+// ============================================
+// RESPONSIBILITY: Camera-based head tracking cursor
+// ============================================
+/** Provides the main controller logic to start, stop, and process the webcam feed for the nod-based cursor. */
+export class NodCursorController {
+    static STORAGE_KEY = 'headTrackingPreferences';
+    static BLINK_EAR_THRESHOLD = 0.15;
+    static BLINK_COOLDOWN_MS = 550;
+    static state = {
+        enabled: false,
+        sensitivity: 0.45
+    };
+    static refs = {
+        toggle: null,
+        toggleTrack: null,
+        toggleDot: null,
+        sensitivity: null,
+        sensitivityLabel: null,
+        status: null,
+        calibrationStatus: null,
+        captureCenterBtn: null,
+        captureLeftBtn: null,
+        captureRightBtn: null,
+        captureUpBtn: null,
+        captureDownBtn: null,
+        saveCalibrationBtn: null,
+        loadCalibrationBtn: null,
+        resetCalibrationBtn: null
+    };
+
+    static stream = null;
+    static video = null;
+    static cursorEl = null;
+    static rafId = null;
+    static faceLandmarker = null;
+    static visionModule = null;
+    static lastPoint = null;
+    static lastRawPoint = null;
+    static blinkState = {
+        isClosed: false,
+        lastClickAt: 0
+    };
+
+    /** Executes the static init() { functionality for this class. */
+    static init() {
+        NodCursorController.refs.toggle = document.getElementById('pref-head-tracking-enabled');
+        NodCursorController.refs.toggleTrack = document.getElementById('head-tracking-toggle-track');
+        NodCursorController.refs.toggleDot = document.getElementById('head-tracking-toggle-dot');
+        NodCursorController.refs.sensitivity = document.getElementById('pref-head-tracking-sensitivity');
+        NodCursorController.refs.sensitivityLabel = document.getElementById('head-tracking-sensitivity-label');
+        NodCursorController.refs.status = document.getElementById('head-tracking-status');
+        NodCursorController.refs.calibrationStatus = document.getElementById('head-calibration-status');
+        NodCursorController.refs.captureCenterBtn = document.getElementById('head-calibrate-center');
+        NodCursorController.refs.captureLeftBtn = document.getElementById('head-calibrate-left');
+        NodCursorController.refs.captureRightBtn = document.getElementById('head-calibrate-right');
+        NodCursorController.refs.captureUpBtn = document.getElementById('head-calibrate-up');
+        NodCursorController.refs.captureDownBtn = document.getElementById('head-calibrate-down');
+        NodCursorController.refs.saveCalibrationBtn = document.getElementById('head-calibration-save');
+        NodCursorController.refs.loadCalibrationBtn = document.getElementById('head-calibration-load');
+        NodCursorController.refs.resetCalibrationBtn = document.getElementById('head-calibration-reset');
+
+        if (!NodCursorController.refs.toggle || !NodCursorController.refs.status) return;
+
+        NodCursorController._loadState();
+        NodCursorCalibrationManager.init(NodCursorController.refs.calibrationStatus);
+        NodCursorController._createCursor();
+
+        NodCursorController.refs.toggle.checked = !!NodCursorController.state.enabled;
+        NodCursorController._syncToggleVisual();
+        if (NodCursorController.refs.sensitivity) {
+            NodCursorController.refs.sensitivity.value = String(NodCursorController.state.sensitivity);
+        }
+        NodCursorController._updateSensitivityLabel();
+
+        NodCursorController.refs.toggle.addEventListener('change', async (e) => {
+            await NodCursorController.setEnabled(!!e.target.checked);
+        });
+
+        if (NodCursorController.refs.sensitivity) {
+            NodCursorController.refs.sensitivity.addEventListener('input', () => {
+                const raw = Number(NodCursorController.refs.sensitivity.value);
+                NodCursorController.state.sensitivity = Number.isFinite(raw) ? raw : 0.45;
+                NodCursorController._updateSensitivityLabel();
+                NodCursorController._saveState();
+            });
+        }
+
+        const capture = point => {
+            if (!NodCursorController.lastRawPoint) {
+                NodCursorCalibrationManager.setStatus('Start head tracking and keep your face visible before capturing.', true);
+                return;
+            }
+            NodCursorCalibrationManager.capture(point, NodCursorController.lastRawPoint.x, NodCursorController.lastRawPoint.y);
+        };
+
+        NodCursorController.refs.captureCenterBtn?.addEventListener('click', () => capture('center'));
+        NodCursorController.refs.captureLeftBtn?.addEventListener('click', () => capture('left'));
+        NodCursorController.refs.captureRightBtn?.addEventListener('click', () => capture('right'));
+        NodCursorController.refs.captureUpBtn?.addEventListener('click', () => capture('up'));
+        NodCursorController.refs.captureDownBtn?.addEventListener('click', () => capture('down'));
+        NodCursorController.refs.saveCalibrationBtn?.addEventListener('click', () => NodCursorCalibrationManager.saveToBackend());
+        NodCursorController.refs.loadCalibrationBtn?.addEventListener('click', () => NodCursorCalibrationManager.loadFromBackend());
+        NodCursorController.refs.resetCalibrationBtn?.addEventListener('click', () => NodCursorCalibrationManager.reset());
+
+        if (NodCursorController.state.enabled) {
+            NodCursorController.setEnabled(true);
+        } else {
+            NodCursorController._setStatus('Head tracking is off.');
+        }
+
+        window.addEventListener('beforeunload', () => {
+            NodCursorController._stopTracking();
+        });
+    }
+
+    static async setEnabled(enabled) {
+        NodCursorController.state.enabled = !!enabled;
+        NodCursorController._saveState();
+
+        if (NodCursorController.refs.toggle) {
+            NodCursorController.refs.toggle.checked = NodCursorController.state.enabled;
+        }
+        NodCursorController._syncToggleVisual();
+
+        if (!NodCursorController.state.enabled) {
+            NodCursorController._stopTracking();
+            NodCursorController._setStatus('Head tracking disabled.');
+            return;
+        }
+
+        await NodCursorController._startTracking();
+    }
+
+    /** Executes the static _loadState() { functionality for this class. */
+    static _loadState() {
+        try {
+            const raw = localStorage.getItem(NodCursorController.STORAGE_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            NodCursorController.state.enabled = !!parsed.enabled;
+            const incomingSensitivity = Number(parsed.sensitivity);
+            if (Number.isFinite(incomingSensitivity)) {
+                NodCursorController.state.sensitivity = Math.min(0.9, Math.max(0.1, incomingSensitivity));
+            }
+        } catch (e) {
+            console.error('head tracking load state error', e);
+        }
+    }
+
+    /** Executes the static _saveState() { functionality for this class. */
+    static _saveState() {
+        try {
+            localStorage.setItem(NodCursorController.STORAGE_KEY, JSON.stringify(NodCursorController.state));
+        } catch (e) {
+            console.error('head tracking save state error', e);
+        }
+    }
+
+    /** Executes the static _updateSensitivityLabel() { functionality for this class. */
+    static _updateSensitivityLabel() {
+        if (!NodCursorController.refs.sensitivityLabel) return;
+        NodCursorController.refs.sensitivityLabel.textContent = NodCursorController.state.sensitivity.toFixed(2);
+    }
+
+    /** Executes the static _setStatus(message, isError = false) { functionality for this class. */
+    static _setStatus(message, isError = false) {
+        if (!NodCursorController.refs.status) return;
+        NodCursorController.refs.status.textContent = message;
+        NodCursorController.refs.status.style.color = isError ? '#f87171' : '';
+    }
+
+    /** Executes the static _syncToggleVisual() { functionality for this class. */
+    static _syncToggleVisual() {
+        const { toggleTrack, toggleDot } = NodCursorController.refs;
+        if (!toggleTrack || !toggleDot) return;
+
+        const enabled = !!NodCursorController.state.enabled;
+        toggleTrack.classList.toggle('bg-cyan-500', enabled);
+        toggleTrack.classList.toggle('bg-neutral-600', !enabled);
+        toggleDot.style.transform = enabled ? 'translateX(20px)' : 'translateX(0px)';
+    }
+
+    /** Executes the static _createCursor() { functionality for this class. */
+    static _createCursor() {
+        if (NodCursorController.cursorEl) return;
+        const el = document.createElement('div');
+        el.id = 'head-tracking-cursor';
+        el.style.position = 'fixed';
+        el.style.width = '18px';
+        el.style.height = '18px';
+        el.style.border = '2px solid #22d3ee';
+        el.style.borderRadius = '9999px';
+        el.style.background = 'rgba(34, 211, 238, 0.15)';
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = '99999';
+        el.style.transform = 'translate(-9999px, -9999px)';
+        el.style.boxShadow = '0 0 12px rgba(34, 211, 238, 0.5)';
+        document.body.appendChild(el);
+        NodCursorController.cursorEl = el;
+    }
+
+    /** Executes the static _showCursor(x, y) { functionality for this class. */
+    static _showCursor(x, y) {
+        if (!NodCursorController.cursorEl) return;
+        NodCursorController.cursorEl.style.transform = `translate(${Math.round(x - 9)}px, ${Math.round(y - 9)}px)`;
+    }
+
+    /** Executes the static _hideCursor() { functionality for this class. */
+    static _hideCursor() {
+        if (!NodCursorController.cursorEl) return;
+        NodCursorController.cursorEl.style.transform = 'translate(-9999px, -9999px)';
+    }
+
+    /** Executes the static _eyeAspectRatio(landmarks, topIndex, bottomIndex, leftIndex, rightIndex) { functionality for this class. */
+    static _eyeAspectRatio(landmarks, topIndex, bottomIndex, leftIndex, rightIndex) {
+        const top = landmarks?.[topIndex];
+        const bottom = landmarks?.[bottomIndex];
+        const left = landmarks?.[leftIndex];
+        const right = landmarks?.[rightIndex];
+        if (!top || !bottom || !left || !right) return null;
+
+        const vertical = Math.abs(top.y - bottom.y);
+        const horizontal = Math.abs(left.x - right.x);
+        if (horizontal < 0.0001) return null;
+        return vertical / horizontal;
+    }
+
+    /** Executes the static _dispatchBlinkClick(x, y) { functionality for this class. */
+    static _dispatchBlinkClick(x, y) {
+        const target = document.elementFromPoint(x, y);
+        if (!target) return;
+
+        const pointerDown = new PointerEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0,
+            pointerType: 'mouse'
+        });
+        const pointerUp = new PointerEvent('pointerup', {
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0,
+            pointerType: 'mouse'
+        });
+
+        const mouseDown = new MouseEvent('mousedown', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        const mouseUp = new MouseEvent('mouseup', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        const click = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+
+        target.dispatchEvent(pointerDown);
+        target.dispatchEvent(mouseDown);
+        target.dispatchEvent(pointerUp);
+        target.dispatchEvent(mouseUp);
+        target.dispatchEvent(click);
+    }
+
+    /** Executes the static _handleBlinkClick(landmarks, x, y) { functionality for this class. */
+    static _handleBlinkClick(landmarks, x, y) {
+        const leftEar = NodCursorController._eyeAspectRatio(landmarks, 159, 145, 33, 133);
+        const rightEar = NodCursorController._eyeAspectRatio(landmarks, 386, 374, 362, 263);
+        if (!Number.isFinite(leftEar) || !Number.isFinite(rightEar)) {
+            NodCursorController.blinkState.isClosed = false;
+            return;
+        }
+
+        const avgEar = (leftEar + rightEar) / 2;
+        const isClosedNow = avgEar < NodCursorController.BLINK_EAR_THRESHOLD;
+        const now = performance.now();
+        const canClick = now - NodCursorController.blinkState.lastClickAt > NodCursorController.BLINK_COOLDOWN_MS;
+
+        if (isClosedNow && !NodCursorController.blinkState.isClosed && canClick) {
+            NodCursorController._dispatchBlinkClick(x, y);
+            NodCursorController.blinkState.lastClickAt = now;
+        }
+
+        NodCursorController.blinkState.isClosed = isClosedNow;
+    }
+
+    static async _startTracking() {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            NodCursorController._setStatus('Camera API is not available in this browser.', true);
+            NodCursorController.state.enabled = false;
+            NodCursorController._saveState();
+            if (NodCursorController.refs.toggle) NodCursorController.refs.toggle.checked = false;
+            NodCursorController._syncToggleVisual();
+            return;
+        }
+
+        NodCursorController._setStatus('Requesting camera access...');
+
+        try {
+            if (!NodCursorController.visionModule) {
+                NodCursorController.visionModule = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm');
+            }
+
+            if (!NodCursorController.faceLandmarker) {
+                const fileset = await NodCursorController.visionModule.FilesetResolver.forVisionTasks(
+                    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+                );
+                NodCursorController.faceLandmarker = await NodCursorController.visionModule.FaceLandmarker.createFromOptions(fileset, {
+                    baseOptions: {
+                        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task'
+                    },
+                    runningMode: 'VIDEO',
+                    numFaces: 1
+                });
+            }
+
+            NodCursorController.stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 640 },
+                    height: { ideal: 480 },
+                    facingMode: 'user'
+                },
+                audio: false
+            });
+
+            if (!NodCursorController.video) {
+                const v = document.createElement('video');
+                v.autoplay = true;
+                v.muted = true;
+                v.playsInline = true;
+                v.style.position = 'fixed';
+                v.style.width = '1px';
+                v.style.height = '1px';
+                v.style.opacity = '0';
+                v.style.pointerEvents = 'none';
+                v.style.left = '-9999px';
+                document.body.appendChild(v);
+                NodCursorController.video = v;
+            }
+
+            NodCursorController.video.srcObject = NodCursorController.stream;
+            await NodCursorController.video.play();
+
+            NodCursorController.lastPoint = null;
+            NodCursorController._runLoop();
+            NodCursorController._setStatus('Head tracking active. Move your head to steer the cursor.');
+        } catch (e) {
+            console.error('head tracking start error', e);
+            NodCursorController._setStatus('Could not start head tracking. Check camera permission.', true);
+            NodCursorController.state.enabled = false;
+            NodCursorController._saveState();
+            if (NodCursorController.refs.toggle) NodCursorController.refs.toggle.checked = false;
+            NodCursorController._syncToggleVisual();
+            NodCursorController._stopTracking();
+        }
+    }
+
+    /** Executes the static _runLoop() { functionality for this class. */
+    static _runLoop() {
+        if (!NodCursorController.state.enabled || !NodCursorController.faceLandmarker || !NodCursorController.video) {
+            return;
+        }
+
+        const tick = () => {
+            if (!NodCursorController.state.enabled || !NodCursorController.faceLandmarker || !NodCursorController.video) {
+                return;
+            }
+
+            if (NodCursorController.video.readyState >= 2) {
+                const result = NodCursorController.faceLandmarker.detectForVideo(NodCursorController.video, performance.now());
+                const landmarks = result?.faceLandmarks?.[0];
+                const nose = landmarks?.[1];
+
+                if (nose) {
+                    const rawX = 1 - nose.x;
+                    const rawY = nose.y;
+                    NodCursorController.lastRawPoint = { x: rawX, y: rawY };
+
+                    const mapped = NodCursorCalibrationManager.mapRawToViewport(rawX, rawY);
+                    const targetX = mapped.x * window.innerWidth;
+                    const targetY = mapped.y * window.innerHeight;
+
+                    const alpha = Math.min(0.9, Math.max(0.1, NodCursorController.state.sensitivity));
+                    if (!NodCursorController.lastPoint) {
+                        NodCursorController.lastPoint = { x: targetX, y: targetY };
+                    } else {
+                        NodCursorController.lastPoint.x += (targetX - NodCursorController.lastPoint.x) * alpha;
+                        NodCursorController.lastPoint.y += (targetY - NodCursorController.lastPoint.y) * alpha;
+                    }
+
+                    const x = Math.max(0, Math.min(window.innerWidth - 1, NodCursorController.lastPoint.x));
+                    const y = Math.max(0, Math.min(window.innerHeight - 1, NodCursorController.lastPoint.y));
+
+                    NodCursorController._showCursor(x, y);
+
+                    const moveEvent = new MouseEvent('mousemove', {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window,
+                        clientX: x,
+                        clientY: y
+                    });
+                    window.dispatchEvent(moveEvent);
+                    const target = document.elementFromPoint(x, y);
+                    if (target) target.dispatchEvent(moveEvent);
+
+                    NodCursorController._handleBlinkClick(landmarks, x, y);
+                }
+            }
+
+            NodCursorController.rafId = requestAnimationFrame(tick);
+        };
+
+        NodCursorController.rafId = requestAnimationFrame(tick);
+    }
+
+    /** Executes the static _stopTracking() { functionality for this class. */
+    static _stopTracking() {
+        if (NodCursorController.rafId) {
+            cancelAnimationFrame(NodCursorController.rafId);
+            NodCursorController.rafId = null;
+        }
+
+        if (NodCursorController.stream) {
+            NodCursorController.stream.getTracks().forEach(t => t.stop());
+            NodCursorController.stream = null;
+        }
+
+        if (NodCursorController.video) {
+            NodCursorController.video.pause();
+            NodCursorController.video.srcObject = null;
+        }
+
+        NodCursorController.lastPoint = null;
+        NodCursorController.lastRawPoint = null;
+        NodCursorController.blinkState.isClosed = false;
+        NodCursorController._hideCursor();
+    }
+}
+
+// ============================================
 // RESPONSIBILITY: Cookie cleanup & clean reload
 // ============================================
 export class TranslationHelper {
@@ -622,6 +1323,9 @@ export class PreferencesController {
         // Step 4: Set form values from saved prefs (or defaults)
         FormManager.set(saved || PreferencesConfig.SITE_DEFAULT);
 
+        // Step 4.5: Initialise camera-driven head-tracking cursor controls
+        NodCursorController.init();
+
         // Step 5: Login status hint
         if (PreferencesAPI.isLoggedIn) {
             StatusDisplay.set(saved ? 'Preferences synced from your account' : 'No saved preferences found - using defaults');
@@ -682,9 +1386,13 @@ export class PreferencesController {
 
             localStorage.removeItem(PreferencesConfig.LOCAL_STORAGE_KEY);
             localStorage.removeItem(PreferencesConfig.LOCAL_THEMES_KEY);
+            localStorage.removeItem(NodCursorController.STORAGE_KEY);
+            localStorage.removeItem(NodCursorCalibrationManager.STORAGE_KEY);
             localStorage.setItem('preferencesReset', 'true');
             PreferencesStore.cachedPrefs = null;
             PreferencesAPI.backendPrefsExist = false;
+
+            await NodCursorController.setEnabled(false);
 
             if (window.SitePreferences?.resetPreferences) {
                 window.SitePreferences.resetPreferences();

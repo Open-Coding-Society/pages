@@ -1,82 +1,1046 @@
 {% assign data = site.data.oasis-infograph %}
+{% assign task_data = site.data.oasis-community-tasks %}
 
+<style>
+  .wp-infograph {
+    --oasis-ink: #102126;
+    --oasis-muted: #55757d;
+    --oasis-line: rgba(16, 33, 38, 0.12);
+    --oasis-surface: rgba(255, 255, 255, 0.9);
+    --oasis-surface-strong: #ffffff;
+    --oasis-accent: #0f7c84;
+    --oasis-accent-deep: #0a5f65;
+    --oasis-highlight: #f4c95d;
+    --oasis-success: #1f9d68;
+    --oasis-pending: #d17a00;
+    --oasis-shadow: 0 28px 55px rgba(16, 33, 38, 0.12);
+    color: var(--oasis-ink);
+    margin: 2.5rem auto;
+    padding: 2rem 0 3rem;
+  }
+
+  .wp-infograph * {
+    box-sizing: border-box;
+  }
+
+  .wp-infograph a {
+    text-decoration: none;
+  }
+
+  .wp-header {
+    background:
+      radial-gradient(circle at top left, rgba(244, 201, 93, 0.35), transparent 28%),
+      linear-gradient(135deg, rgba(15, 124, 132, 0.12), rgba(255, 255, 255, 0.9));
+    border: 1px solid var(--oasis-line);
+    border-radius: 28px;
+    box-shadow: var(--oasis-shadow);
+    margin-bottom: 2rem;
+    padding: 2rem;
+  }
+
+  .wp-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(15, 124, 132, 0.12);
+    border: 1px solid rgba(15, 124, 132, 0.18);
+    border-radius: 999px;
+    color: var(--oasis-accent-deep);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    padding: 0.45rem 0.85rem;
+    text-transform: uppercase;
+  }
+
+  .wp-title {
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    line-height: 1.05;
+    margin: 0 0 0.85rem;
+  }
+
+  .wp-description {
+    color: var(--oasis-muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0;
+    max-width: 72ch;
+  }
+
+  .wp-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 250, 250, 0.94));
+    border: 1px solid var(--oasis-line);
+    border-radius: 28px;
+    box-shadow: var(--oasis-shadow);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .wp-card-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(260px, 0.95fr) minmax(300px, 1.15fr) minmax(260px, 0.9fr);
+    padding: 1.5rem;
+  }
+
+  .wp-visual,
+  .wp-content,
+  .wp-details,
+  .oasis-demo-card,
+  .oasis-task-card {
+    background: var(--oasis-surface);
+    border: 1px solid rgba(16, 33, 38, 0.08);
+    border-radius: 22px;
+    padding: 1.2rem;
+  }
+
+  .wp-image-link {
+    border-radius: 18px;
+    display: block;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .wp-image {
+    display: block;
+    height: auto;
+    width: 100%;
+  }
+
+  .wp-overlay {
+    align-items: flex-end;
+    background: linear-gradient(180deg, transparent 38%, rgba(16, 33, 38, 0.76));
+    color: #ffffff;
+    display: flex;
+    inset: 0;
+    opacity: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: absolute;
+    transition: opacity 180ms ease;
+  }
+
+  .wp-image-link:hover .wp-overlay,
+  .wp-image-link:focus-visible .wp-overlay {
+    opacity: 1;
+  }
+
+  .wp-status,
+  .wp-team {
+    border-radius: 16px;
+    margin-top: 1rem;
+    padding: 0.8rem 0.9rem;
+  }
+
+  .wp-status {
+    background: rgba(15, 124, 132, 0.1);
+    color: var(--oasis-accent-deep);
+    font-weight: 700;
+  }
+
+  .wp-team {
+    background: rgba(244, 201, 93, 0.18);
+    color: var(--oasis-ink);
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .wp-team-label,
+  .wp-section-kicker,
+  .oasis-mini-kicker {
+    color: var(--oasis-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .wp-team-name {
+    font-weight: 700;
+  }
+
+  .wp-project-title,
+  .oasis-demo-title,
+  .oasis-panel-title {
+    font-size: 1.5rem;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .wp-subtitle,
+  .oasis-demo-copy,
+  .oasis-panel-copy,
+  .wp-about {
+    color: var(--oasis-muted);
+    line-height: 1.7;
+  }
+
+  .wp-keypoints,
+  .wp-impact-list {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.1rem;
+  }
+
+  .wp-keypoint,
+  .wp-impact-item {
+    align-items: flex-start;
+    display: flex;
+    gap: 0.7rem;
+  }
+
+  .wp-check {
+    color: var(--oasis-success);
+    font-weight: 800;
+    margin-top: 0.05rem;
+  }
+
+  .wp-tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.3rem;
+  }
+
+  .wp-tech-tag {
+    background: rgba(16, 33, 38, 0.06);
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.5rem 0.8rem;
+  }
+
+  .wp-section-title {
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.7rem;
+    text-transform: uppercase;
+  }
+
+  .wp-btn {
+    align-items: center;
+    background: linear-gradient(135deg, var(--oasis-accent), var(--oasis-accent-deep));
+    border-radius: 999px;
+    color: #ffffff;
+    display: inline-flex;
+    font-weight: 700;
+    margin-top: 1.4rem;
+    padding: 0.8rem 1.1rem;
+  }
+
+  .oasis-live-section {
+    display: grid;
+    gap: 1.4rem;
+    grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.9fr);
+    margin-top: 2rem;
+  }
+
+  .oasis-demo-card,
+  .oasis-task-card {
+    box-shadow: var(--oasis-shadow);
+  }
+
+  .oasis-demo-header,
+  .oasis-panel-header {
+    display: grid;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .oasis-demo-embed {
+    border: 1px solid rgba(16, 33, 38, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .oasis-demo-embed iframe {
+    aspect-ratio: 16 / 10;
+    background: #101415;
+    border: 0;
+    display: block;
+    height: auto;
+    max-height: 620px;
+    min-height: 520px;
+    width: 100%;
+  }
+
+  .oasis-demo-meta,
+  .oasis-task-stats {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 1rem;
+  }
+
+  .oasis-demo-pill,
+  .oasis-stat {
+    background: rgba(16, 33, 38, 0.04);
+    border: 1px solid rgba(16, 33, 38, 0.06);
+    border-radius: 16px;
+    padding: 0.9rem;
+  }
+
+  .oasis-demo-pill strong,
+  .oasis-stat strong {
+    display: block;
+    font-size: 1.2rem;
+    line-height: 1.1;
+    margin-top: 0.25rem;
+  }
+
+  .oasis-task-controls {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: space-between;
+    margin: 1rem 0;
+  }
+
+  .oasis-backend-badge,
+  .oasis-sync-badge {
+    background: rgba(15, 124, 132, 0.08);
+    border: 1px solid rgba(15, 124, 132, 0.12);
+    border-radius: 999px;
+    color: var(--oasis-accent-deep);
+    font-size: 0.82rem;
+    font-weight: 700;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    padding: 0.45rem 0.8rem;
+  }
+
+  .oasis-leaderboard-tabs,
+  .oasis-task-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
+  }
+
+  .oasis-tab-button {
+    appearance: none;
+    background: rgba(16, 33, 38, 0.05);
+    border: 1px solid rgba(16, 33, 38, 0.08);
+    border-radius: 999px;
+    color: var(--oasis-ink);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.6rem 0.9rem;
+    transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+  }
+
+  .oasis-tab-button:hover,
+  .oasis-tab-button:focus-visible {
+    background: rgba(15, 124, 132, 0.12);
+    border-color: rgba(15, 124, 132, 0.22);
+    outline: none;
+  }
+
+  .oasis-tab-button.is-active {
+    background: linear-gradient(135deg, var(--oasis-accent), var(--oasis-accent-deep));
+    border-color: transparent;
+    color: #ffffff;
+  }
+
+  .oasis-task-filter-tabs[hidden] {
+    display: none;
+  }
+
+  .oasis-leaderboard-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .oasis-leaderboard-item {
+    align-items: center;
+    background: rgba(16, 33, 38, 0.04);
+    border: 1px solid rgba(16, 33, 38, 0.06);
+    border-radius: 16px;
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 0.85rem 0.95rem;
+  }
+
+  .oasis-leaderboard-rank {
+    align-items: center;
+    background: rgba(244, 201, 93, 0.26);
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 800;
+    height: 2rem;
+    justify-content: center;
+    width: 2rem;
+  }
+
+  .oasis-leaderboard-main {
+    min-width: 0;
+  }
+
+  .oasis-leaderboard-name {
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .oasis-leaderboard-meta {
+    color: var(--oasis-muted);
+    font-size: 0.84rem;
+    line-height: 1.4;
+    margin-top: 0.2rem;
+  }
+
+  .oasis-leaderboard-score {
+    color: var(--oasis-accent-deep);
+    font-size: 1rem;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .oasis-task-table-wrap {
+    border: 1px solid rgba(16, 33, 38, 0.08);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .oasis-task-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .oasis-task-table th,
+  .oasis-task-table td {
+    border-bottom: 1px solid rgba(16, 33, 38, 0.08);
+    padding: 0.78rem 0.8rem;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .oasis-task-table th {
+    background: rgba(16, 33, 38, 0.04);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .oasis-task-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .oasis-room-pill {
+    background: rgba(16, 33, 38, 0.07);
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.28rem 0.58rem;
+  }
+
+  .oasis-status-pill {
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .oasis-status-pill.is-complete {
+    background: rgba(31, 157, 104, 0.12);
+    color: var(--oasis-success);
+  }
+
+  .oasis-status-pill.is-pending {
+    background: rgba(209, 122, 0, 0.12);
+    color: var(--oasis-pending);
+  }
+
+  .oasis-task-empty,
+  .oasis-task-error {
+    color: var(--oasis-muted);
+    margin: 0;
+    padding: 1rem 0.2rem 0;
+  }
+
+  .oasis-task-error {
+    color: #a4442f;
+    white-space: pre-wrap;
+  }
+
+  @media (max-width: 1120px) {
+    .wp-card-grid,
+    .oasis-live-section {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .wp-header,
+    .wp-card-grid,
+    .oasis-demo-card,
+    .oasis-task-card {
+      padding: 1rem;
+    }
+
+    .oasis-demo-meta,
+    .oasis-task-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .oasis-demo-embed iframe {
+      aspect-ratio: 16 / 11;
+      max-height: none;
+      min-height: 420px;
+    }
+
+    .oasis-task-table {
+      font-size: 0.92rem;
+    }
+
+    .oasis-leaderboard-item {
+      grid-template-columns: auto 1fr;
+    }
+
+    .oasis-leaderboard-score {
+      grid-column: 2;
+    }
+
+    .oasis-task-table th:nth-child(3),
+    .oasis-task-table td:nth-child(3) {
+      display: none;
+    }
+  }
+</style>
 
 <div class="wp-infograph">
- <!-- Header Section -->
- <div class="wp-header">
-   <div class="wp-badge">Oasis Community Capstone</div>
-   <h1 class="wp-title">{{ data.Title }}</h1>
-   <p class="wp-description">{{ data.Description }}</p>
- </div>
+  <div class="wp-header">
+    <div class="wp-badge">Oasis Community Capstone</div>
+    <h1 class="wp-title">{{ data.Title }}</h1>
+    <p class="wp-description">{{ data.Description }}</p>
+  </div>
 
+  {% for topic in data.Topics %}
+  <div class="wp-card">
+    <div class="wp-card-grid">
+      <div class="wp-visual">
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
+          <img src="{{ site.baseurl }}/images/Oasis.png" alt="{{ topic.alt }}" class="wp-image">
+          <div class="wp-overlay">
+            <span>View Project</span>
+          </div>
+        </a>
+        <div class="wp-status">{{ topic.status }}</div>
+        <div class="wp-team">
+          <span class="wp-team-label">Project Leads</span>
+          <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
 
- <!-- Project Cards -->
- {% for topic in data.Topics %}
- <div class="wp-card">
-   <div class="wp-card-grid">
-    
-     <!-- Left: Image & Status -->
-     <div class="wp-visual">
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
-         <img src="{{ site.baseurl }}/images/Oasis.png" alt="{{ topic.alt }}" class="wp-image">
-         <div class="wp-overlay">
-           <span>View Project</span>
-         </div>
-       </a>
-       <div class="wp-status">{{ topic.status }}</div>
-       <div class="wp-team">
-         <span class="wp-team-label">Project Leads</span>
-         <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
-       </div>
-     </div>
+      <div class="wp-content">
+        <h2 class="wp-project-title">{{ topic.title }}</h2>
+        <p class="wp-subtitle">{{ topic.subtitle }}</p>
 
+        <div class="wp-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="wp-keypoint">
+            <span class="wp-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
 
-     <!-- Center: Key Points -->
-     <div class="wp-content">
-       <h2 class="wp-project-title">{{ topic.title }}</h2>
-       <p class="wp-subtitle">{{ topic.subtitle }}</p>
-      
-       <div class="wp-keypoints">
-         {% for point in topic.keyPoints %}
-         <div class="wp-keypoint">
-           <span class="wp-check">✓</span>
-           <span>{{ point }}</span>
-         </div>
-         {% endfor %}
-       </div>
+        <div class="wp-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="wp-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
 
+      <div class="wp-details">
+        <h3 class="wp-section-title">About</h3>
+        <p class="wp-about">{{ topic.description }}</p>
 
-       <div class="wp-tech-stack">
-         {% for tech in topic.tech %}
-         <span class="wp-tech-tag">{{ tech }}</span>
-         {% endfor %}
-       </div>
-     </div>
+        <h3 class="wp-section-title">Impact</h3>
+        <div class="wp-impact-list">
+          {% for item in topic.impact %}
+          <div class="wp-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
 
+        <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 
-     <!-- Right: Description & Impact -->
-     <div class="wp-details">
-       <h3 class="wp-section-title">About</h3>
-       <p class="wp-about">{{ topic.description }}</p>
-      
-       <h3 class="wp-section-title">Impact</h3>
-       <div class="wp-impact-list">
-         {% for item in topic.impact %}
-         <div class="wp-impact-item">{{ item }}</div>
-         {% endfor %}
-       </div>
+  <section class="oasis-live-section" aria-label="Community game and live SQLite task feed">
+    <div class="oasis-demo-card">
+      <div class="oasis-demo-header">
+        <span class="oasis-mini-kicker">Embedded Game</span>
+        <h2 class="oasis-demo-title">{{ data.game.title }}</h2>
+        <p class="oasis-demo-copy">{{ data.game.subtitle }}</p>
+      </div>
 
+      <div class="oasis-demo-embed">
+        <iframe
+          id="oasis-community-game"
+          src="{{ data.game.embedUrl }}"
+          title="Oasis community game"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+      </div>
 
-       <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
-     </div>
+      <div class="oasis-demo-meta">
+        <div class="oasis-demo-pill">
+          <span class="oasis-mini-kicker">Game Source</span>
+          <strong>community</strong>
+        </div>
+        <div class="oasis-demo-pill">
+          <span class="oasis-mini-kicker">Task Source</span>
+          <strong>SQLite</strong>
+        </div>
+        <div class="oasis-demo-pill">
+          <span class="oasis-mini-kicker">Backend Repo</span>
+          <strong>community-backend</strong>
+        </div>
+      </div>
+    </div>
 
+    <aside class="oasis-task-card">
+      <div class="oasis-panel-header">
+        <span class="oasis-mini-kicker">Live Leaderboards</span>
+        <h2 class="oasis-panel-title">Community Progress</h2>
+        <p class="oasis-panel-copy">
+          This panel stays empty until <code>community-backend</code> is running. Once it is live, these leaderboards and filters recalculate from the SQLite task rows every refresh.
+        </p>
+      </div>
 
-   </div>
- </div>
- {% endfor %}
+      <div class="oasis-task-stats">
+        <div class="oasis-stat">
+          <span class="oasis-mini-kicker">Rows</span>
+          <strong id="oasis-task-count">0</strong>
+        </div>
+        <div class="oasis-stat">
+          <span class="oasis-mini-kicker">Completed</span>
+          <strong id="oasis-task-complete-count">0</strong>
+        </div>
+        <div class="oasis-stat">
+          <span class="oasis-mini-kicker">Rooms</span>
+          <strong id="oasis-task-room-count">0</strong>
+        </div>
+      </div>
+
+      <div class="oasis-task-controls">
+        <div class="oasis-backend-badge" id="oasis-backend-url">Backend: {{ data.game.backendUrl }}</div>
+        <div class="oasis-sync-badge" id="oasis-sync-status">Backend not connected</div>
+      </div>
+
+      <div class="oasis-leaderboard-tabs" id="oasis-leaderboard-tabs">
+        <button class="oasis-tab-button is-active" type="button" data-view="players">Top Players</button>
+        <button class="oasis-tab-button" type="button" data-view="tasks">Task Leaders</button>
+        <button class="oasis-tab-button" type="button" data-view="rooms">Room Leaders</button>
+        <button class="oasis-tab-button" type="button" data-view="table">Live Table</button>
+      </div>
+
+      <div class="oasis-task-filter-tabs" id="oasis-task-filter-tabs" hidden></div>
+
+      <div class="oasis-task-table-wrap" id="oasis-table-wrap" hidden>
+        <table class="oasis-task-table">
+          <thead>
+            <tr>
+              <th scope="col">User</th>
+              <th scope="col">Task</th>
+              <th scope="col">Room</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody id="oasis-task-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="oasis-leaderboard-list" id="oasis-leaderboard-list"></div>
+
+      <p class="oasis-task-empty" id="oasis-task-empty">Start <code>community-backend</code> to load the live SQLite task table.</p>
+      <p class="oasis-task-error" id="oasis-task-error" hidden></p>
+    </aside>
+  </section>
 </div>
 
+<script>
+  (function() {
+    var backendBaseUrl = (window.COMMUNITY_BACKEND_URL || "{{ data.game.backendUrl }}").replace(/\/$/, "");
+    var tableBody = document.getElementById("oasis-task-table-body");
+    var taskCount = document.getElementById("oasis-task-count");
+    var completeCount = document.getElementById("oasis-task-complete-count");
+    var roomCount = document.getElementById("oasis-task-room-count");
+    var backendUrlEl = document.getElementById("oasis-backend-url");
+    var syncStatusEl = document.getElementById("oasis-sync-status");
+    var emptyEl = document.getElementById("oasis-task-empty");
+    var errorEl = document.getElementById("oasis-task-error");
+    var leaderboardListEl = document.getElementById("oasis-leaderboard-list");
+    var leaderboardTabsEl = document.getElementById("oasis-leaderboard-tabs");
+    var taskFilterTabsEl = document.getElementById("oasis-task-filter-tabs");
+    var tableWrapEl = document.getElementById("oasis-table-wrap");
+    var lastSerializedRows = "";
+    var pollHandle = null;
+    var activeView = "players";
+    var activeTaskFilter = "all";
+    var latestRows = [];
 
+    function normalizedBackendCandidates(baseUrl) {
+      var trimmed = String(baseUrl || "").replace(/\/$/, "");
+      if (!trimmed) {
+        return ["/tasks"];
+      }
 
+      if (trimmed.endsWith("/api")) {
+        return [trimmed + "/tasks", trimmed.replace(/\/api$/, "") + "/tasks"];
+      }
 
+      return [trimmed + "/tasks", trimmed + "/api/tasks"];
+    }
 
+    backendUrlEl.textContent = "Backend: " + backendBaseUrl;
+
+    function normalizeTask(row) {
+      return {
+        userName: row.userName || row.user_name || "(unknown user)",
+        taskName: row.taskName || row.name || row.task_name || "(unknown task)",
+        room: row.room != null ? row.room : row.room_number,
+        completed: Boolean(row.completed)
+      };
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function updateStats(rows) {
+      var completedRows = rows.filter(function(row) { return row.completed; }).length;
+      var uniqueRooms = new Set(rows.map(function(row) { return String(row.room); })).size;
+
+      taskCount.textContent = String(rows.length);
+      completeCount.textContent = String(completedRows);
+      roomCount.textContent = String(uniqueRooms);
+    }
+
+    function renderTableRows(rows) {
+      tableBody.innerHTML = rows.map(function(row) {
+        var statusClass = row.completed ? "is-complete" : "is-pending";
+        var statusText = row.completed ? "Complete" : "Pending";
+
+        return "" +
+          "<tr>" +
+            "<td>" + escapeHtml(row.userName) + "</td>" +
+            "<td>" + escapeHtml(row.taskName) + "</td>" +
+            "<td><span class=\"oasis-room-pill\">Room " + escapeHtml(row.room) + "</span></td>" +
+            "<td><span class=\"oasis-status-pill " + statusClass + "\">" + statusText + "</span></td>" +
+          "</tr>";
+      }).join("");
+    }
+
+    function pluralize(word, count) {
+      return count === 1 ? word : word + "s";
+    }
+
+    function aggregateCompletedByPlayer(rows) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed) {
+          return;
+        }
+
+        var current = counts.get(row.userName) || { name: row.userName, count: 0, rooms: new Set(), tasks: new Set() };
+        current.count += 1;
+        current.rooms.add(String(row.room));
+        current.tasks.add(row.taskName);
+        counts.set(row.userName, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+    }
+
+    function aggregateCompletedByRoom(rows) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed) {
+          return;
+        }
+
+        var key = String(row.room);
+        var current = counts.get(key) || { room: row.room, count: 0, players: new Set() };
+        current.count += 1;
+        current.players.add(row.userName);
+        counts.set(key, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || String(a.room).localeCompare(String(b.room)); });
+    }
+
+    function taskNamesFromRows(rows) {
+      return Array.from(new Set(rows.map(function(row) { return row.taskName; }).filter(Boolean)))
+        .sort(function(a, b) { return a.localeCompare(b); });
+    }
+
+    function aggregateCompletedByTask(rows, taskName) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed || row.taskName !== taskName) {
+          return;
+        }
+
+        var current = counts.get(row.userName) || { name: row.userName, count: 0, rooms: new Set() };
+        current.count += 1;
+        current.rooms.add(String(row.room));
+        counts.set(row.userName, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+    }
+
+    function aggregateCompletionsByTaskName(rows) {
+      var counts = new Map();
+
+      rows.forEach(function(row) {
+        if (!row.completed) {
+          return;
+        }
+
+        var taskName = row.taskName || "(unknown task)";
+        var current = counts.get(taskName) || { name: taskName, count: 0, players: new Set(), rooms: new Set() };
+        current.count += 1;
+        current.players.add(row.userName);
+        current.rooms.add(String(row.room));
+        counts.set(taskName, current);
+      });
+
+      return Array.from(counts.values())
+        .sort(function(a, b) { return b.count - a.count || a.name.localeCompare(b.name); });
+    }
+
+    function renderLeaderboardItems(items) {
+      leaderboardListEl.innerHTML = items.map(function(item, index) {
+        return "" +
+          "<div class=\"oasis-leaderboard-item\">" +
+            "<div class=\"oasis-leaderboard-rank\">" + (index + 1) + "</div>" +
+            "<div class=\"oasis-leaderboard-main\">" +
+              "<div class=\"oasis-leaderboard-name\">" + escapeHtml(item.name) + "</div>" +
+              "<div class=\"oasis-leaderboard-meta\">" + escapeHtml(item.meta) + "</div>" +
+            "</div>" +
+            "<div class=\"oasis-leaderboard-score\">" + escapeHtml(item.score) + "</div>" +
+          "</div>";
+      }).join("");
+    }
+
+    function setActiveButtons(container, activeValue, attributeName) {
+      Array.from(container.querySelectorAll(".oasis-tab-button")).forEach(function(button) {
+        button.classList.toggle("is-active", button.getAttribute(attributeName) === activeValue);
+      });
+    }
+
+    function renderTaskFilters(rows) {
+      var taskNames = taskNamesFromRows(rows);
+
+      if (activeView !== "tasks" || taskNames.length === 0) {
+        taskFilterTabsEl.hidden = true;
+        taskFilterTabsEl.innerHTML = "";
+        return;
+      }
+
+      if (activeTaskFilter === "all" || taskNames.indexOf(activeTaskFilter) === -1) {
+        activeTaskFilter = taskNames[0];
+      }
+
+      taskFilterTabsEl.hidden = false;
+      taskFilterTabsEl.innerHTML = taskNames.map(function(taskName) {
+        var activeClass = activeTaskFilter === taskName ? " is-active" : "";
+        return "<button class=\"oasis-tab-button" + activeClass + "\" type=\"button\" data-task-filter=\"" + escapeHtml(taskName) + "\">" + escapeHtml(taskName) + "</button>";
+      }).join("");
+    }
+
+    function renderActiveView(rows) {
+      tableWrapEl.hidden = activeView !== "table";
+      leaderboardListEl.hidden = activeView === "table";
+      renderTaskFilters(rows);
+
+      if (rows.length === 0) {
+        tableBody.innerHTML = "";
+        leaderboardListEl.innerHTML = "";
+        return;
+      }
+
+      emptyEl.hidden = true;
+
+      if (activeView === "table") {
+        renderTableRows(rows);
+        return;
+      }
+
+      var leaderboardItems = [];
+
+      if (activeView === "players") {
+        leaderboardItems = aggregateCompletedByPlayer(rows).map(function(entry) {
+          return {
+            name: entry.name,
+            meta: entry.tasks.size + " " + pluralize("task type", entry.tasks.size) + " across " + entry.rooms.size + " " + pluralize("room", entry.rooms.size),
+            score: entry.count + " completed"
+          };
+        });
+      } else if (activeView === "tasks") {
+        leaderboardItems = aggregateCompletedByTask(rows, activeTaskFilter).map(function(entry) {
+          return {
+            name: entry.name,
+            meta: entry.count + " " + pluralize("completion", entry.count) + " in " + entry.rooms.size + " " + pluralize("room", entry.rooms.size),
+            score: entry.count + " completed"
+          };
+        });
+      } else if (activeView === "rooms") {
+        leaderboardItems = aggregateCompletedByRoom(rows).map(function(entry) {
+          return {
+            name: "Room " + entry.room,
+            meta: entry.players.size + " " + pluralize("player", entry.players.size) + " contributed completions here",
+            score: entry.count + " completed"
+          };
+        });
+      }
+
+      if (leaderboardItems.length === 0) {
+        leaderboardListEl.innerHTML = "";
+        emptyEl.hidden = false;
+        emptyEl.textContent = "Backend is running, but there are no completed tasks for this leaderboard yet.";
+        return;
+      }
+
+      emptyEl.hidden = true;
+      renderLeaderboardItems(leaderboardItems);
+    }
+
+    function serializeRows(rows) {
+      return JSON.stringify(
+        rows
+          .map(normalizeTask)
+          .sort(function(a, b) {
+            return (String(a.room) + a.userName + a.taskName).localeCompare(String(b.room) + b.userName + b.taskName);
+          })
+      );
+    }
+
+    async function fetchTasksFromBackend() {
+      var candidates = normalizedBackendCandidates(backendBaseUrl);
+      var lastError = null;
+
+      for (var i = 0; i < candidates.length; i += 1) {
+        try {
+          var response = await fetch(candidates[i], {
+            method: "GET",
+            cache: "no-store",
+            headers: {
+              "Accept": "application/json"
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(response.status + " " + response.statusText);
+          }
+
+          var payload = await response.json();
+          return {
+            rows: Array.isArray(payload) ? payload : (Array.isArray(payload.tasks) ? payload.tasks : []),
+            endpoint: candidates[i]
+          };
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      throw lastError || new Error("Could not reach backend task endpoint");
+    }
+
+    async function refreshFromBackend() {
+      try {
+        var result = await fetchTasksFromBackend();
+        var normalizedRows = result.rows.map(normalizeTask);
+        var serializedRows = serializeRows(normalizedRows);
+        var hasChanged = serializedRows !== lastSerializedRows;
+
+        latestRows = normalizedRows;
+        updateStats(normalizedRows);
+        renderActiveView(normalizedRows);
+
+        if (normalizedRows.length === 0) {
+          emptyEl.hidden = false;
+          emptyEl.textContent = "Backend is running, but the task table is empty.";
+        }
+
+        if (hasChanged) {
+          syncStatusEl.textContent = "Live from " + result.endpoint;
+          lastSerializedRows = serializedRows;
+        } else {
+          syncStatusEl.textContent = "Live from " + result.endpoint;
+          errorEl.hidden = true;
+          if (normalizedRows.length > 0) {
+            emptyEl.hidden = true;
+          }
+        }
+      } catch (error) {
+        tableBody.innerHTML = "";
+        leaderboardListEl.innerHTML = "";
+        taskFilterTabsEl.hidden = true;
+        taskFilterTabsEl.innerHTML = "";
+        updateStats([]);
+        latestRows = [];
+        lastSerializedRows = "";
+        emptyEl.hidden = false;
+        emptyEl.innerHTML = "Start <code>community-backend</code> to load the live SQLite task table.";
+        errorEl.hidden = false;
+        errorEl.textContent = "Backend repo is not running or is not reachable.\n" + String(error);
+        syncStatusEl.textContent = "Backend not connected";
+      }
+    }
+
+    leaderboardTabsEl.addEventListener("click", function(event) {
+      var button = event.target.closest("[data-view]");
+      if (!button) {
+        return;
+      }
+
+      activeView = button.getAttribute("data-view");
+      setActiveButtons(leaderboardTabsEl, activeView, "data-view");
+      renderActiveView(latestRows);
+    });
+
+    taskFilterTabsEl.addEventListener("click", function(event) {
+      var button = event.target.closest("[data-task-filter]");
+      if (!button) {
+        return;
+      }
+
+      activeTaskFilter = button.getAttribute("data-task-filter");
+      setActiveButtons(taskFilterTabsEl, activeTaskFilter, "data-task-filter");
+      renderActiveView(latestRows);
+    });
+
+    refreshFromBackend();
+
+    if (pollHandle) {
+      window.clearInterval(pollHandle);
+    }
+
+    pollHandle = window.setInterval(refreshFromBackend, 2000);
+  })();
+</script>

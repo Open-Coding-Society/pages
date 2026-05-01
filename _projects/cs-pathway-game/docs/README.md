@@ -104,8 +104,8 @@ These logs are the quickest way to confirm `_projects` registration and distribu
 Use runtime absolute paths in code.
 
 ```javascript
-import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import { ProfileManager } from '/assets/js/projects/cs-pathway-game/model/ProfileManager.js';
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
+import { ProfileManager } from '@assets/js/projects/cs-pathway-game/model/ProfileManager.js';
 
 const bg = this.gameEnv.path + '/images/projects/cs-pathway-game/backgrounds/forest.png';
 ```

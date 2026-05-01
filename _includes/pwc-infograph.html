@@ -2,7 +2,7 @@
 
 <div class="pwc-infograph">
 
-  <!-- Intro: logo, title, and Who/What/Why merged -->
+  <!-- Intro: logo, title, description -->
   <section class="wp-section wp-intro">
     <div class="wp-intro-head">
       <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-header-logo-link">
@@ -14,55 +14,28 @@
         <a href="{{ data.SiteUrl }}" target="_blank" rel="noopener" class="wp-status">{{ data.Status }}</a>
       </div>
     </div>
-
-    <div class="wp-about-section">
-      <div class="wp-about-col">
-        <h2 class="wp-section-title">Who We Are</h2>
-        <p>{{ data.About.who }}</p>
-        <div class="wp-team-grid">
-          {% for member in data.Team %}
-          <div class="wp-team-card">
-            <div class="wp-team-name">{{ member.name }}</div>
-            <div class="wp-team-role">{{ member.role }}</div>
-            <div class="wp-team-bio">{{ member.bio }}</div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="wp-about-col">
-        <h2 class="wp-section-title">What We're Building</h2>
-        <p>{{ data.About.what }}</p>
-      </div>
-      <div class="wp-about-col">
-        <h2 class="wp-section-title">Why It Matters</h2>
-        <p>{{ data.About.why }}</p>
-      </div>
-    </div>
   </section>
 
-  <!-- Fixes -->
-  <section class="wp-section">
-    <h2 class="wp-section-title">Site Improvements</h2>
-    <div class="wp-keypoints">
-      {% for point in data.Fixes %}
-      <div class="wp-keypoint"><span class="wp-check">→</span><span>{{ point }}</span></div>
-      {% endfor %}
-    </div>
-  </section>
-
-  <!-- Features with screenshots -->
+  <!-- Features with titles above gifs -->
   <section class="wp-section">
     <h2 class="wp-section-title">Key Features</h2>
     <div class="wp-feature-grid">
       {% for feature in data.Features %}
       <a href="{{ feature.url | default: data.SiteUrl }}" target="_blank" rel="noopener" class="wp-feature-card">
-        <div class="wp-feature-image-wrap">
-          <img src="{{ site.baseurl }}/images/{{ feature.image }}" alt="{{ feature.title }}" class="wp-feature-image">
-        </div>
         <div class="wp-feature-body">
           <h3 class="wp-feature-title">{{ feature.title }}</h3>
           <p class="wp-feature-desc">{{ feature.description }}</p>
         </div>
+        <div class="wp-feature-image-wrap">
+          <img src="{{ site.baseurl }}/images/{{ feature.image }}" alt="{{ feature.title }}" class="wp-feature-image">
+        </div>
+        {% if feature.bullets %}
+        <ul class="wp-feature-bullets">
+          {% for bullet in feature.bullets %}
+          <li>{{ bullet }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
       </a>
       {% endfor %}
     </div>
@@ -84,6 +57,33 @@
         {% for item in data.Impact %}
         <div class="wp-impact-item">{{ item }}</div>
         {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Who We Are -->
+  <section class="wp-section">
+    <div class="wp-about-section">
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">Who We Are</h2>
+        <p>{{ data.About.who }}</p>
+        <div class="wp-team-grid">
+          {% for member in data.Team %}
+          <div class="wp-team-card">
+            <div class="wp-team-name">{{ member.name }}</div>
+            <div class="wp-team-role">{{ member.role }}</div>
+            <div class="wp-team-bio">{{ member.bio }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">What We Built</h2>
+        <p>{{ data.About.what }}</p>
+      </div>
+      <div class="wp-about-col">
+        <h2 class="wp-section-title">Why It Matters</h2>
+        <p>{{ data.About.why }}</p>
       </div>
     </div>
   </section>

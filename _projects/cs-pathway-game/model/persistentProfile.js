@@ -23,14 +23,14 @@
  * 
  * _game_profile JSON Structure:
  * {
- *   localId, createdAt, updatedAt, lastModified,
+ *   localId, createdAt, updatedAt, eventId,
  *   "identity-forge": { preferences, progress, completedAt },
  *   "wayfinding-world": { preferences, progress, completedAt },
  *   "mission-tooling": { progress, completedAt }
  * }
  */
 
-import { pythonURI, fetchOptions } from '/assets/js/api/config.js';
+import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 
 const API_BASE = pythonURI + '/api/profile/game';
 const VERSION = '1.0';
@@ -141,7 +141,7 @@ class PersistentProfile {
           localId: profileData.localId || null,  // Preserve if migrating
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          lastModified: Date.now(),
+          eventId: profileData.eventId || 0,
           'identity-forge': {
             preferences: {
               sprite: profileData.sprite || null,
@@ -167,6 +167,9 @@ class PersistentProfile {
           'mission-tooling': {
             progress: {
               toolsUnlocked: profileData.toolsUnlocked || false,
+              missionProgressCount: profileData.missionProgressCount || 0,
+              missionScore: profileData.missionScore || 0.55,
+              missionCompletedStations: profileData.missionCompletedStations || [],
             },
             completedAt: null,
           },
@@ -223,7 +226,7 @@ class PersistentProfile {
         _uid: updates.githubID || existing._uid,
         _game_profile: {
           ...gameProfile,
-          lastModified: Date.now(),
+          eventId: updates.eventId !== undefined ? updates.eventId : (gameProfile.eventId || 0),
           updatedAt: new Date().toISOString(),
           'identity-forge': {
             preferences: {
@@ -255,6 +258,9 @@ class PersistentProfile {
             progress: {
               ...missionTooling.progress,
               ...(updates.toolsUnlocked !== undefined && { toolsUnlocked: updates.toolsUnlocked }),
+              ...(updates.missionProgressCount !== undefined && { missionProgressCount: updates.missionProgressCount }),
+              ...(updates.missionScore !== undefined && { missionScore: updates.missionScore }),
+              ...(updates.missionCompletedStations !== undefined && { missionCompletedStations: updates.missionCompletedStations }),
             },
             completedAt: updates.missionToolingCompleted || missionTooling.completedAt,
           },
@@ -308,7 +314,7 @@ class PersistentProfile {
           localId: existing._game_profile?.localId || null,  // Preserve for analytics
           createdAt: existing._game_profile?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          lastModified: Date.now(),
+          eventId: 0,
           'identity-forge': {
             preferences: {},
             progress: {
@@ -435,11 +441,15 @@ class PersistentProfile {
         
         // Mission Tooling
         toolsUnlocked: missionTooling.progress?.toolsUnlocked || false,
-        
+        missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
+        missionScore: missionTooling.progress?.missionScore || 0.55,
+        missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
+
         // Metadata
         localId: gameProfile.localId || null,
         createdAt: gameProfile.createdAt || '',
         updatedAt: gameProfile.updatedAt || '',
+        eventId: gameProfile.eventId || 0,
         version: gameProfile.version || VERSION,
       };
     } catch (error) {

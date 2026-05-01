@@ -13,23 +13,23 @@
   <div class="pv-card">
     <div class="pv-card-grid">
 
-      <!-- Left: Logo + Power Features + Pitch Stats -->
+      <!-- Left: Logo + Power Features -->
       <div class="pv-visual">
         <div class="pv-left-block">
 
-          <!-- Logo banner at top -->
+          <!-- Logo banner -->
           <div class="pv-before-logo-wrap">
             <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-before-logo">
             <div class="pv-before-logo-overlay">
-              {% if topic.before_link %}
-              <a href="{{ topic.before_link }}" target="_blank" rel="noopener noreferrer" class="pv-before-title-link">
+              {% if topic.link %}
+              <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-before-title-link">
                 <span class="pv-before-label">LIVE SITE</span><span class="pv-before-arrow">↗</span>
               </a>
               {% endif %}
             </div>
           </div>
 
-          <!-- Power Features (glowing tech highlights) -->
+          <!-- Power Features -->
           {% if topic.powerFeatures %}
           <div class="pv-power-section">
             <div class="pv-power-eyebrow">✦ What We Brought to the Table</div>
@@ -45,28 +45,14 @@
           </div>
           {% endif %}
 
-          <!-- Pitch Stats -->
-          {% if topic.pitchStats %}
-          <div class="pv-pitch-section">
-            <div class="pv-pitch-eyebrow">📊 By the Numbers</div>
-            {% for stat in topic.pitchStats %}
-            <div class="pv-stat-item">
-              <div class="pv-stat-value">{{ stat.value }}</div>
-              <div class="pv-stat-label">{{ stat.label }}</div>
-              <div class="pv-stat-note">{{ stat.note }}</div>
-            </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-
         </div>
       </div>
 
-      <!-- Center: Key Points -->
+      <!-- Right: Title + Key Points (2 col) + GIF + Button -->
       <div class="pv-content">
         <h2 class="pv-project-title">{{ topic.title }}</h2>
         <p class="pv-subtitle">{{ topic.subtitle }}</p>
-        
+
         <div class="pv-keypoints">
           {% for point in topic.keyPoints %}
           <div class="pv-keypoint">
@@ -76,28 +62,18 @@
           {% endfor %}
         </div>
 
-        <div class="pv-tech-stack">
-          {% for tech in topic.tech %}
-          <span class="pv-tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Right: Description & GIF -->
-      <div class="pv-details">
-        <h3 class="pv-section-title">About</h3>
-        <p class="pv-about">{{ topic.description }}</p>
-
         {% if topic.gif %}
-        <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-gif-link">
+        <div class="pv-gif-wrap">
           <img src="{{ site.baseurl }}/images/{{ topic.gif }}" alt="{{ topic.alt }} preview" class="pv-gif">
-          <div class="pv-gif-overlay">
-            <span>Learn More →</span>
-          </div>
-        </a>
-        {% else %}
-        <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-btn">Learn More</a>
+        </div>
         {% endif %}
+
+        {% if topic.new %}
+        <a href="{{ topic.new }}" target="_blank" rel="noopener noreferrer" class="pv-learn-btn">
+          Learn More ↗
+        </a>
+        {% endif %}
+
       </div>
 
     </div>
@@ -106,6 +82,14 @@
 </div>
 
 <style>
+/* ── Card grid — wider left column ──────────────────────────── */
+.pv-card-grid {
+  display: grid !important;
+  grid-template-columns: 520px 1fr !important;
+  gap: 0 !important;
+  align-items: stretch !important;
+}
+
 /* ── Visual column reset ─────────────────────────────────────── */
 .pv-infograph .pv-visual {
   padding: 0;
@@ -130,7 +114,7 @@
 .pv-before-logo-wrap {
   position: relative;
   width: 100%;
-  height: 130px;
+  height: 220px;
   flex-shrink: 0;
   background: rgba(255, 255, 255, 0.06);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -180,28 +164,27 @@
 
 /* ── Power Features Section ──────────────────────────────────── */
 .pv-power-section {
-  padding: 0.7rem 0.85rem 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.1rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.65rem;
+  flex: 1;
 }
 
 .pv-power-eyebrow {
-  font-size: 0.58rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(255, 220, 100, 0.7);
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.3rem;
 }
 
-/* Each glowing pill */
 .pv-power-pill {
   background: linear-gradient(135deg, rgba(120, 80, 255, 0.18) 0%, rgba(0, 200, 255, 0.10) 100%);
   border: 1px solid rgba(160, 120, 255, 0.35);
   border-radius: 10px;
-  padding: 0.45rem 0.65rem;
+  padding: 0.75rem 1rem;
   box-shadow:
     0 0 10px rgba(140, 100, 255, 0.18),
     0 0 24px rgba(100, 180, 255, 0.08),
@@ -222,126 +205,112 @@
 .pv-power-top {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.2rem;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 
 .pv-power-icon {
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   line-height: 1;
-  filter: drop-shadow(0 0 6px rgba(180, 140, 255, 0.6));
 }
 
 .pv-power-label {
-  font-size: 0.7rem;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: rgba(220, 200, 255, 0.95);
-  text-shadow: 0 0 12px rgba(180, 140, 255, 0.5);
 }
 
 .pv-power-note {
-  font-size: 0.67rem;
-  line-height: 1.4;
+  font-size: 0.88rem;
+  line-height: 1.45;
   color: rgba(200, 190, 255, 0.65);
-  padding-left: 1.3rem;
+  padding-left: 1.7rem;
 }
 
-/* ── Pitch Stats Section ─────────────────────────────────────── */
-.pv-pitch-section {
-  padding: 0.6rem 0.85rem 0.7rem;
+/* ── Right content column ────────────────────────────────────── */
+.pv-content {
   display: flex;
   flex-direction: column;
   gap: 0;
-  flex: 1;
 }
 
-.pv-pitch-eyebrow {
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.38);
-  margin-bottom: 0.35rem;
-}
-
-.pv-stat-item {
-  padding: 0.55rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  transition: background 0.2s ease;
-}
-
-.pv-stat-item:last-child {
-  border-bottom: none;
-}
-
-.pv-stat-value {
-  font-size: 1.45rem;
+.pv-project-title {
+  font-size: 2.4rem;
   font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.02em;
   color: #fff;
-  margin-bottom: 0.1rem;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.02em;
 }
 
-.pv-stat-label {
-  font-size: 0.6rem;
+.pv-subtitle {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  margin: 0 0 1rem;
+}
+
+/* ── Key Points — 2 columns ──────────────────────────────────── */
+.pv-keypoints {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 1.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.pv-keypoint {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.93rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.pv-check {
+  color: rgba(100, 220, 160, 0.85);
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 0.2rem;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
-.pv-stat-note {
-  font-size: 0.68rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.55);
-}
 
-/* ── GIF with hover overlay ──────────────────────────────────── */
-.pv-gif-link {
-  display: block;
-  position: relative;
-  margin-top: 1rem;
-  border-radius: 8px;
+/* ── GIF ─────────────────────────────────────────────────────── */
+.pv-gif-wrap {
+  border-radius: 10px;
   overflow: hidden;
-  cursor: pointer;
+  margin-bottom: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .pv-gif {
   width: 100%;
   display: block;
+  border-radius: 10px;
+  min-height: 280px;
+  object-fit: cover;
+}
+
+/* ── Learn More button ───────────────────────────────────────── */
+.pv-learn-btn {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 8px;
-  transition: filter 0.25s ease;
+  padding: 0.55rem 1.2rem;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
-.pv-gif-link:hover .pv-gif {
-  filter: brightness(0.45);
-}
-
-.pv-gif-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-
-.pv-gif-link:hover .pv-gif-overlay {
-  opacity: 1;
-}
-
-.pv-gif-overlay span {
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  background: rgba(0, 0, 0, 0.55);
-  padding: 0.5rem 1.2rem;
-  border-radius: 6px;
-  border: 2px solid rgba(255, 255, 255, 0.7);
+.pv-learn-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
 }
 </style>
