@@ -398,6 +398,123 @@ td:has(> img[src*="logo.png"]) {
   color: var(--text);
 }
 
+.calendar-controls-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(2, minmax(150px, 1fr)) minmax(180px, 1fr) repeat(2, minmax(140px, 0.8fr));
+  gap: 10px;
+  margin: 14px 0 16px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg-2) 88%, var(--pref-accent-color) 12%),
+      color-mix(in srgb, var(--bg-1) 96%, var(--pref-accent-color) 4%)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 8%, transparent 92%),
+    0 10px 24px color-mix(in srgb, #000 22%, transparent 78%);
+}
+
+.calendar-controls-row input,
+.calendar-controls-row select,
+.issues-controls-row input,
+.issues-controls-row select,
+.issue-form input,
+.issue-form textarea,
+.issue-form select,
+.issue-card-footer select,
+.kanban-item select,
+#threads-list input,
+#threads-list select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
+  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
+  color: var(--text);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+
+  &:focus {
+    border-color: color-mix(in srgb, var(--pref-accent-color) 60%, var(--ui-border) 40%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pref-accent-color) 20%, transparent 80%);
+  }
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-left: 2px;
+}
+
+.filter-field--date input {
+  min-width: 0;
+}
+
+.calendar-controls-row input::placeholder,
+.issues-controls-row input::placeholder,
+.issue-form input::placeholder,
+.issue-form textarea::placeholder,
+#threads-list input::placeholder {
+  color: color-mix(in srgb, var(--text-muted) 82%, transparent 18%);
+}
+
+.calendar-issue-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
+  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.calendar-issue-filter-toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--pref-accent-color);
+}
+
+.calendar-issue-filter-toggle span {
+  white-space: nowrap;
+}
+
+.calendar-controls-row {
+  .calendar-issue-filter-toggle {
+    grid-column: span 2;
+  }
+}
+
+#calendar-threads-panel {
+  margin-top: 14px;
+}
+
+.threads-panel-empty,
+.issues-empty {
+  border: 1px dashed color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--bg-0) 92%, var(--pref-accent-color) 8%);
+  text-align: center;
+}
+
 .calendar-issues-header {
   display: flex;
   align-items: flex-start;
@@ -420,32 +537,9 @@ td:has(> img[src*="logo.png"]) {
 
 .issues-controls-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) repeat(3, minmax(140px, 1fr));
+  grid-template-columns: minmax(180px, 1fr) repeat(6, minmax(140px, 1fr));
   gap: 10px;
   margin-bottom: 12px;
-}
-
-.issues-controls-row input,
-.issues-controls-row select,
-.issue-form input,
-.issue-form textarea,
-.issue-form select,
-.issue-card-footer select,
-.kanban-item select {
-  width: 100%;
-  min-height: 42px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
-  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
-  color: var(--text);
-  padding: 10px 12px;
-  outline: none;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-
-  &:focus {
-    border-color: color-mix(in srgb, var(--pref-accent-color) 60%, var(--ui-border) 40%);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pref-accent-color) 20%, transparent 80%);
-  }
 }
 
 .issue-form textarea {
@@ -575,6 +669,11 @@ td:has(> img[src*="logo.png"]) {
 }
 
 .issues-list {
+  display: grid;
+  gap: 10px;
+}
+
+#threads-list {
   display: grid;
   gap: 10px;
 }
@@ -819,6 +918,7 @@ td:has(> img[src*="logo.png"]) {
 }
 
 @media (max-width: 900px) {
+  .calendar-controls-row,
   .issues-controls-row {
     grid-template-columns: 1fr 1fr;
   }
@@ -843,6 +943,7 @@ td:has(> img[src*="logo.png"]) {
     align-items: stretch;
   }
 
+  .calendar-controls-row,
   .issues-controls-row,
   .kanban-board {
     grid-template-columns: 1fr;
@@ -851,6 +952,10 @@ td:has(> img[src*="logo.png"]) {
   .issues-subtabs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .calendar-issue-filter-toggle {
+    grid-column: auto;
   }
 }
 

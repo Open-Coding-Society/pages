@@ -10,6 +10,7 @@ active_tab: calendar
 <div class="calendar-dashboard-tabs" role="tablist" aria-label="Calendar Dashboard Tabs">
     <button type="button" class="dashboard-tab-btn active" data-dashboard-tab="calendar" role="tab" aria-selected="true">Calendar</button>
     <button type="button" class="dashboard-tab-btn" data-dashboard-tab="issues" role="tab" aria-selected="false">Issues</button>
+    <button type="button" class="dashboard-tab-btn" data-dashboard-tab="threads" role="tab" aria-selected="false">Threads</button>
 </div>
 
 <section id="dashboard-panel-calendar" class="dashboard-panel" role="tabpanel" aria-label="Calendar Panel">
@@ -17,6 +18,31 @@ active_tab: calendar
     <div id="calendar-auth-banner" class="calendar-auth-banner">
         <i class="fas fa-exclamation-triangle calendar-auth-banner-icon"></i>
         <span>Your session has expired. <a href="{{site.baseurl}}/login" class="calendar-auth-banner-link">Log in again</a> to view and manage your calendar events.</span>
+    </div>
+    <div class="calendar-controls-row">
+        <input id="calendar-filter-query" type="search" placeholder="Search events, issues, or breaks" />
+        <select id="calendar-filter-source">
+            <option value="all">All sources</option>
+            <option value="events">Events</option>
+            <option value="issues">Issues</option>
+            <option value="breaks">Breaks</option>
+        </select>
+        <select id="calendar-filter-type">
+            <option value="">All types</option>
+            <option value="event">Event</option>
+            <option value="appointment">Appointment</option>
+            <option value="issue">Issue</option>
+            <option value="break">Break</option>
+        </select>
+        <input id="calendar-filter-group" type="search" placeholder="Filter by group/course" />
+        <label class="filter-field filter-field--date" for="calendar-filter-start">
+            <span class="filter-label">Start date</span>
+            <input id="calendar-filter-start" type="date" title="Filter from date" />
+        </label>
+        <label class="filter-field filter-field--date" for="calendar-filter-end">
+            <span class="filter-label">End date</span>
+            <input id="calendar-filter-end" type="date" title="Filter to date" />
+        </label>
     </div>
     <div id="calendar" class="box-border z-0"></div>
 </section>
@@ -46,7 +72,21 @@ active_tab: calendar
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
             </select>
-            <input id="issues-filter-date" type="date" title="Filter by due date" />
+            <input id="issues-filter-author" type="search" placeholder="Filter by author" />
+            <input id="issues-filter-tags" type="search" placeholder="Filter by tags" />
+            <input id="issues-filter-group" type="search" placeholder="Filter by group" />
+            <label class="filter-field filter-field--date" for="issues-filter-date">
+                <span class="filter-label">Due date</span>
+                <input id="issues-filter-date" type="date" title="Filter by due date" />
+            </label>
+            <label class="filter-field filter-field--date" for="issues-filter-start">
+                <span class="filter-label">Created after</span>
+                <input id="issues-filter-start" type="date" title="Created on or after" />
+            </label>
+            <label class="filter-field filter-field--date" for="issues-filter-end">
+                <span class="filter-label">Created before</span>
+                <input id="issues-filter-end" type="date" title="Created on or before" />
+            </label>
         </div>
 
         <div class="issues-subtabs" role="tablist" aria-label="Issue Views">
@@ -126,6 +166,38 @@ active_tab: calendar
         <div id="issues-subpanel-kanban" class="issues-subpanel hidden">
             <div id="issues-kanban" class="kanban-board"></div>
         </div>
+    </div>
+</section>
+
+<section id="dashboard-panel-threads" class="dashboard-panel hidden" role="tabpanel" aria-label="Message Threads Panel">
+    <div id="calendar-threads-panel" class="calendar-issues-panel">
+        <div class="calendar-issues-header">
+            <div>
+                <h2 class="calendar-issues-title">Message Threads</h2>
+                <p class="calendar-issues-subtitle">Open Coding Society Slack threads synced into a searchable frontend list.</p>
+            </div>
+        </div>
+
+        <div class="issues-controls-row">
+            <input id="threads-filter-query" type="search" placeholder="Search thread text, author, channel" />
+            <input id="threads-filter-channel" type="search" placeholder="Filter by channel" />
+            <input id="threads-filter-author" type="search" placeholder="Filter by author" />
+            <label class="filter-field filter-field--date" for="threads-filter-start">
+                <span class="filter-label">From time</span>
+                <input id="threads-filter-start" type="datetime-local" title="From timestamp" />
+            </label>
+            <label class="filter-field filter-field--date" for="threads-filter-end">
+                <span class="filter-label">To time</span>
+                <input id="threads-filter-end" type="datetime-local" title="To timestamp" />
+            </label>
+            <label class="calendar-issue-filter-toggle">
+                <input id="threads-filter-only-threads" type="checkbox" />
+                <span>Threads only</span>
+            </label>
+            <input id="threads-filter-limit" type="number" min="1" max="500" value="100" />
+        </div>
+
+        <div id="threads-list" class="issues-list"></div>
     </div>
 </section>
 <!-- Modal -->
@@ -240,6 +312,7 @@ active_tab: calendar
     let currentPersonId = null;
     // Filter mode: 'my-groups' (default) or 'all'
     let filterMode = 'my-groups';
+    let calendarSlackMessages = [];
 
     // Issue state
     let calendarIssues = [];
@@ -420,6 +493,137 @@ active_tab: calendar
         }, {});
     }
 
+    function parseCalendarFilterDate(value) {
+        if (!value) return null;
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function getCalendarEventFilterValues() {
+        const el = getCalendarFilterElements();
+        return {
+            query: (el.query?.value || '').trim().toLowerCase(),
+            source: el.source?.value || 'all',
+            type: el.type?.value || '',
+            group: (el.group?.value || '').trim().toLowerCase(),
+            start: el.start?.value || '',
+            end: el.end?.value || ''
+        };
+    }
+
+    function normalizeSlackMessage(message) {
+        const payload = message?.payload || {};
+        const timestamp = message?.timestamp || payload.ts || payload.thread_ts || '';
+        const threadId = payload.thread_ts || payload.ts || timestamp || `thread-${Math.random().toString(36).slice(2)}`;
+        const text = String(payload.text || '').trim();
+        return {
+            timestamp,
+            threadId,
+            channel: String(payload.channel || payload.channel_name || '').trim(),
+            author: String(payload.user || payload.username || payload.bot_profile?.name || '').trim(),
+            text,
+            raw: payload,
+            replyCount: Number(payload.reply_count || 0),
+            hasThread: Boolean(payload.thread_ts) || Number(payload.reply_count || 0) > 0
+        };
+    }
+
+    function buildSlackThreads(messages) {
+        const threads = new Map();
+        (messages || []).map(normalizeSlackMessage).forEach(message => {
+            const key = message.threadId;
+            if (!threads.has(key)) {
+                threads.set(key, {
+                    threadId: key,
+                    channel: message.channel,
+                    author: message.author,
+                    timestamp: message.timestamp,
+                    messages: []
+                });
+            }
+            const thread = threads.get(key);
+            if (!thread.channel && message.channel) thread.channel = message.channel;
+            if (!thread.author && message.author) thread.author = message.author;
+            if (!thread.timestamp || String(message.timestamp).localeCompare(String(thread.timestamp)) < 0) {
+                thread.timestamp = message.timestamp;
+            }
+            thread.messages.push(message);
+        });
+
+        return Array.from(threads.values()).sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')));
+    }
+
+    function getFilteredThreads() {
+        const el = getThreadElements();
+        const query = (el.query?.value || '').trim().toLowerCase();
+        const channel = (el.channel?.value || '').trim().toLowerCase();
+        const author = (el.author?.value || '').trim().toLowerCase();
+        const start = parseCalendarFilterDate(el.start?.value || '');
+        const end = parseCalendarFilterDate(el.end?.value || '');
+        const onlyThreads = Boolean(el.onlyThreads?.checked);
+
+        return (calendarSlackMessages || [])
+            .filter(thread => {
+                if (!thread) return false;
+                if (onlyThreads && !thread.hasThread && (thread.messages || []).length <= 1) return false;
+                const firstMessage = thread.messages?.[0] || {};
+                const haystack = [thread.channel, thread.author, firstMessage.text, ...(thread.messages || []).map(msg => msg.text)].join(' ').toLowerCase();
+                if (query && !haystack.includes(query)) return false;
+                if (channel && !(String(thread.channel || '').toLowerCase().includes(channel) || String(firstMessage.channel || '').toLowerCase().includes(channel))) return false;
+                if (author && !(String(thread.author || '').toLowerCase().includes(author) || (thread.messages || []).some(msg => String(msg.author || '').toLowerCase().includes(author)))) return false;
+                const stamp = new Date(String(thread.timestamp || firstMessage.timestamp || ''));
+                if (start && !Number.isNaN(stamp.getTime()) && stamp < start) return false;
+                if (end && !Number.isNaN(stamp.getTime()) && stamp > end) return false;
+                return true;
+            })
+            .sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')));
+    }
+
+    function renderThreadsList(threads) {
+        const el = getThreadElements();
+        if (!el.list) return;
+
+        if (!threads.length) {
+            el.list.innerHTML = '<div class="issues-empty">No message threads match current filters.</div>';
+            return;
+        }
+
+        el.list.innerHTML = threads.map(thread => {
+            const firstMessage = thread.messages?.[0] || {};
+            const replyCount = Math.max(0, (thread.messages || []).length - 1) + Number(firstMessage.replyCount || 0);
+            return `
+                <article class="issue-card">
+                    <div class="issue-card-top">
+                        <div class="issue-card-title">${escapeIssueText(firstMessage.text || 'Untitled thread')}</div>
+                        <div class="issue-card-badge-row">
+                            <span class="issue-pill medium">THREAD</span>
+                        </div>
+                    </div>
+                    <div class="issue-card-note">${escapeIssueText(thread.channel || 'Unknown channel')} · ${escapeIssueText(thread.author || 'Unknown author')}</div>
+                    <div class="issue-meta">${escapeIssueText(thread.timestamp || '')}${replyCount ? ` · ${replyCount} replies` : ''}</div>
+                    <div class="issue-tags">
+                        ${(thread.messages || []).slice(0, 3).map(message => `<span class="issue-tag">${escapeIssueText((message.text || '').slice(0, 60) || 'message')}</span>`).join('')}
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    function renderThreadsPanel() {
+        renderThreadsList(getFilteredThreads());
+    }
+
+    function renderCalendarFilters() {
+        if (activeDashboardTab !== 'calendar') return;
+        displayCalendar(filterEvents());
+    }
+
+    function applyCalendarFilterUI() {
+        renderCalendarFilters();
+        renderIssueViews();
+        renderThreadsPanel();
+    }
+
     function switchDashboardTab(tabName) {
         activeDashboardTab = tabName;
         document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
@@ -429,6 +633,11 @@ active_tab: calendar
         });
         document.getElementById('dashboard-panel-calendar')?.classList.toggle('hidden', tabName !== 'calendar');
         document.getElementById('dashboard-panel-issues')?.classList.toggle('hidden', tabName !== 'issues');
+        document.getElementById('dashboard-panel-threads')?.classList.toggle('hidden', tabName !== 'threads');
+
+        if (tabName === 'threads') {
+            renderThreadsPanel();
+        }
     }
 
     function switchIssuesSubtab(subtab) {
@@ -542,6 +751,48 @@ active_tab: calendar
                 });
         }
 
+        function requestMessages() {
+            const limitInput = document.getElementById('threads-filter-limit');
+            const limit = Math.max(1, Math.min(500, parseInt(limitInput?.value || '100', 10) || 100));
+            const queryUrl = new URL(`${javaURI}/slack/messages`);
+            queryUrl.searchParams.set('limit', String(limit));
+
+            return fetch(queryUrl.toString(), fetchOptions)
+                .then(r => {
+                    if (handleAuthError(r)) return [];
+                    if (!r.ok) return [];
+                    return r.json();
+                })
+                .catch(e => {
+                    handleFetchError(e);
+                    return [];
+                });
+        }
+
+        function getCalendarFilterElements() {
+            return {
+                query: document.getElementById('calendar-filter-query'),
+                source: document.getElementById('calendar-filter-source'),
+                type: document.getElementById('calendar-filter-type'),
+                group: document.getElementById('calendar-filter-group'),
+                start: document.getElementById('calendar-filter-start'),
+                end: document.getElementById('calendar-filter-end')
+            };
+        }
+
+        function getThreadElements() {
+            return {
+                query: document.getElementById('threads-filter-query'),
+                channel: document.getElementById('threads-filter-channel'),
+                author: document.getElementById('threads-filter-author'),
+                start: document.getElementById('threads-filter-start'),
+                end: document.getElementById('threads-filter-end'),
+                onlyThreads: document.getElementById('threads-filter-only-threads'),
+                limit: document.getElementById('threads-filter-limit'),
+                list: document.getElementById('threads-list')
+            };
+        }
+
         function getIssueElements() {
             return {
                 form: document.getElementById('issue-form'),
@@ -561,7 +812,12 @@ active_tab: calendar
                 filterQuery: document.getElementById('issues-filter-query'),
                 filterStatus: document.getElementById('issues-filter-status'),
                 filterPriority: document.getElementById('issues-filter-priority'),
-                filterDate: document.getElementById('issues-filter-date')
+                filterDate: document.getElementById('issues-filter-date'),
+                filterAuthor: document.getElementById('issues-filter-author'),
+                filterTags: document.getElementById('issues-filter-tags'),
+                filterGroup: document.getElementById('issues-filter-group'),
+                filterStart: document.getElementById('issues-filter-start'),
+                filterEnd: document.getElementById('issues-filter-end')
             };
         }
 
@@ -603,14 +859,24 @@ active_tab: calendar
             const statusFilter = el.filterStatus?.value || '';
             const priorityFilter = el.filterPriority?.value || '';
             const dateFilter = el.filterDate?.value || '';
+            const authorFilter = (el.filterAuthor?.value || '').trim().toLowerCase();
+            const tagsFilter = normalizeTags(el.filterTags?.value || '');
+            const groupFilter = (el.filterGroup?.value || '').trim().toLowerCase();
+            const startFilter = el.filterStart?.value || '';
+            const endFilter = el.filterEnd?.value || '';
 
             return (calendarIssues || [])
                 .filter(issue => !statusFilter || (issue.status || 'open') === statusFilter)
                 .filter(issue => !priorityFilter || (issue.priority || 'medium') === priorityFilter)
                 .filter(issue => !dateFilter || issue.dueDate === dateFilter)
+                .filter(issue => !startFilter || !issue.createdAt || issue.createdAt.slice(0, 10) >= startFilter)
+                .filter(issue => !endFilter || !issue.createdAt || issue.createdAt.slice(0, 10) <= endFilter)
+                .filter(issue => !authorFilter || String(issue.author || '').toLowerCase().includes(authorFilter))
+                .filter(issue => !groupFilter || String(issue.groupName || '').toLowerCase().includes(groupFilter))
+                .filter(issue => !tagsFilter.length || tagsFilter.every(tag => normalizeTags(issue.tags).some(item => item.toLowerCase().includes(tag.toLowerCase()))))
                 .filter(issue => {
                     if (!query) return true;
-                    const haystack = [issue.title, issue.description, issue.eventId, normalizeTags(issue.tags).join(' ')].join(' ').toLowerCase();
+                    const haystack = [issue.title, issue.description, issue.eventId, issue.author, issue.groupName, normalizeTags(issue.tags).join(' ')].join(' ').toLowerCase();
                     return haystack.includes(query);
                 })
                 .sort((a, b) => {
@@ -759,11 +1025,12 @@ active_tab: calendar
 
         // ── handleRequest: build allEvents, then render ─────────────
         function handleRequest() {
-            return Promise.all([request(), getBreaks(), requestIssues()])
-                .then(([calendarEvents, breaks, issues]) => {
+            return Promise.all([request(), getBreaks(), requestIssues(), requestMessages()])
+                .then(([calendarEvents, breaks, issues, messages]) => {
                     if (calendarEvents !== null) { javaAuthenticated = true; hideAuthBanner(); }
                     allEvents = [];
                     calendarIssues = Array.isArray(issues) ? issues : [];
+                    calendarSlackMessages = buildSlackThreads(Array.isArray(messages) ? messages : []);
                     issueCountsByDate = buildIssueCountMap(calendarIssues);
 
                     calendarIssues.forEach(issue => {
@@ -869,6 +1136,7 @@ active_tab: calendar
 
                     displayCalendar(filterEvents());
                     renderIssueViews();
+                    renderThreadsPanel();
                     if (typeof onIssuesRefreshedHook === 'function') {
                         onIssuesRefreshedHook();
                     }
@@ -878,6 +1146,7 @@ active_tab: calendar
                     console.error("handleRequest error:", error);
                     displayCalendar(filterEvents());
                     renderIssueViews();
+                    renderThreadsPanel();
                     if (typeof onIssuesRefreshedHook === 'function') {
                         onIssuesRefreshedHook();
                     }
@@ -892,6 +1161,7 @@ active_tab: calendar
         // "All": show everything.
         // Breaks & holidays always shown regardless.
         function filterEvents() {
+            const filterValues = getCalendarEventFilterValues();
             let filtered = allEvents;
 
             if (filterMode === 'my-groups' && userGroups.length > 0) {
@@ -911,6 +1181,33 @@ active_tab: calendar
                     return false;
                 });
             }
+
+            filtered = filtered.filter(event => {
+                const ext = event.extendedProps || {};
+                const eventType = String(ext.type || (event.isBreak || ext.isBreak ? 'break' : ext.isIssue ? 'issue' : 'event')).toLowerCase();
+                const eventSource = ext.isIssue ? 'issues' : eventType === 'break' ? 'breaks' : 'events';
+                const haystack = [
+                    event.title,
+                    event.description,
+                    ext.description,
+                    ext.author,
+                    ext.groupName,
+                    ext.period,
+                    ext.individual
+                ].join(' ').toLowerCase();
+                const eventDate = formatDate(event.start);
+
+                if (event.isBreak || ext.isBreak) return true;
+
+                if (filterValues.source !== 'all' && filterValues.source !== eventSource) return false;
+                if (filterValues.type && filterValues.type !== eventType) return false;
+                if (filterValues.group && !String(ext.groupName || event.groupName || ext.period || event.period || '').toLowerCase().includes(filterValues.group)) return false;
+                if (filterValues.start && eventDate && eventDate < filterValues.start) return false;
+                if (filterValues.end && eventDate && eventDate > filterValues.end) return false;
+                if (filterValues.query && !haystack.includes(filterValues.query)) return false;
+                return true;
+            });
+
             // else filterMode === 'all' → show everything
 
             // Sort: breaks first, then by priority
@@ -928,6 +1225,8 @@ active_tab: calendar
         // ── Render calendar ─────────────────────────────────────────
         function displayCalendar(events) {
             const calendarEl = document.getElementById('calendar');
+            const previousView = calendar?.view?.type || 'dayGridMonth';
+            const previousDate = calendar?.getDate ? calendar.getDate() : null;
             if (calendar) calendar.destroy();
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
@@ -1136,6 +1435,12 @@ active_tab: calendar
                 }
             });
             calendar.render();
+            if (previousView && typeof calendar.changeView === 'function') {
+                calendar.changeView(previousView);
+            }
+            if (previousDate && typeof calendar.gotoDate === 'function') {
+                calendar.gotoDate(previousDate);
+            }
         }
 
         // ── Utilities ───────────────────────────────────────────────
@@ -1322,6 +1627,18 @@ active_tab: calendar
                 });
             });
 
+            [
+                ...Object.values(getCalendarFilterElements()),
+                ...Object.values(getThreadElements())
+            ].forEach(control => {
+                control?.addEventListener('input', applyCalendarFilterUI);
+                control?.addEventListener('change', applyCalendarFilterUI);
+            });
+
+            document.getElementById('threads-filter-limit')?.addEventListener('change', async () => {
+                await handleRequest();
+            });
+
             switchDashboardTab('calendar');
             switchIssuesSubtab('create');
         }
@@ -1407,7 +1724,7 @@ active_tab: calendar
                 resetIssueForm(el.filterDate?.value || getLocalIsoDate());
             });
 
-            [el.filterQuery, el.filterStatus, el.filterPriority, el.filterDate].forEach(control => {
+            [el.filterQuery, el.filterStatus, el.filterPriority, el.filterDate, el.filterAuthor, el.filterTags, el.filterGroup, el.filterStart, el.filterEnd].forEach(control => {
                 control?.addEventListener('input', renderIssueViews);
                 control?.addEventListener('change', renderIssueViews);
             });
