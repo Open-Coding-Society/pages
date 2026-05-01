@@ -1069,4 +1069,3 @@ function showResults() {
 }
 </script>
 </body>
-</html>
