@@ -7,12 +7,12 @@
 
 
 import GameEnvBackground from '@asset/js/GameEnginv1.1/essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
-import Barrier from './essentials/Barrier.js';
-import AiNpc from './essentials/AiNpc.js';
-import GameStats from './essentials/GameStats.js';
-import Coin from './Coin.js';
+import Player from '@asset/js/GameEnginv1.1/essentials/Player.js';
+import Npc from '@asset/js/GameEnginv1.1/essentials/Npc.js';
+import Barrier from '@asset/js/GameEnginv1.1/essentials/Barrier.js';
+import AiNpc from '@asset/js/GameEnginv1.1/essentials/AiNpc.js';
+import GameStats from '@asset/js/GameEnginv1.1/essentials/GameStats.js';
+import Coin from '@asset/js/GameEnginv1.1/Coin.js';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
