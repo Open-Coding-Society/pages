@@ -30,8 +30,10 @@ authors: Sprinters Capstone
   .cq-box, .cq-box * { color:#000000 !important; }
   .cq-lossless { background:#d1fae5; border:2px solid #047857; }
   .cq-lossless h3 { color:#064e3b !important; font-weight:800 !important; }
+  .cq-lossless code { background:#ffffff !important; color:#064e3b !important; border:1px solid #047857; }
   .cq-lossy { background:#fed7aa; border:2px solid #c2410c; }
   .cq-lossy h3 { color:#7c2d12 !important; font-weight:800 !important; }
+  .cq-lossy code { background:#ffffff !important; color:#7c2d12 !important; border:1px solid #c2410c; }
   .cq-box h3 { margin:0 0 6px; font-size:1.1rem; }
   .cq-box small { color:#000000 !important; font-weight:500; }
   /* Game 1 */
@@ -45,8 +47,8 @@ authors: Sprinters Capstone
   .rle-stat span b { color:#000000 !important; font-weight:800; }
   /* Game 2 */
   .files { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
-  .file { background:#000000; color:#ffffff !important; padding:8px 14px; border-radius:8px; cursor:pointer; user-select:none; transition:transform .1s; font-weight:700; }
-  .file:hover { transform:translateY(-2px); }
+  .file { background:#e2e8f0; color:#0f172a !important; border:2px solid #475569; padding:8px 14px; border-radius:8px; cursor:pointer; user-select:none; transition:transform .1s; font-weight:700; }
+  .file:hover { transform:translateY(-2px); background:#cbd5e1; }
   .file.placed { opacity:.35; cursor:default; pointer-events:none; }
   .bins { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px; }
   .bin { min-height:90px; border:2px dashed #475569; border-radius:12px; padding:10px; cursor:pointer; }
