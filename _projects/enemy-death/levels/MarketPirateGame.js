@@ -1,5 +1,5 @@
-import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
+import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
 
 const LEVEL_XP = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200, 4000];
 const MAX_LEVEL = LEVEL_XP.length - 1;
@@ -1324,12 +1324,12 @@ class MarketPirateGame {
     this.classes=[
       { class:GameEnvBackground, data:{
         name:'marketplace',
-        src:path+'/images/MarketPlaceRPG.png',
+        src:path+'/images/projects/enemy-death/MarketPlaceRPG.png',
         pixels:{height:580,width:1038}
       }},
       { class:Player, data:{
         id:'McArchie',
-        src:path+'/images/gamebuilder/sprites/mcarchie.png',
+        src:path+'/images/projects/enemy-death/mcarchie.png',
         SCALE_FACTOR:8, STEP_FACTOR:1000, ANIMATION_RATE:30,
         INIT_POSITION:{x:150,y:height*0.75},
         pixels:{height:256,width:256},
