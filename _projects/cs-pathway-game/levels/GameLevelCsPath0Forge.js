@@ -66,6 +66,12 @@ class GameLevelCsPath0Forge {
     this.finishLoadingWork = GameLevelCsPathIdentity.prototype.finishLoadingWork.bind(this);
     this.primeAssetGate = GameLevelCsPathIdentity.prototype.primeAssetGate.bind(this);
     this.preloadTrackedAsset = GameLevelCsPathIdentity.prototype.preloadTrackedAsset.bind(this);
+    this._getCompletion = GameLevelCsPathIdentity.prototype._getCompletion.bind(this);
+    this._saveCompletion = GameLevelCsPathIdentity.prototype._saveCompletion.bind(this);
+    this._getOverallScore = GameLevelCsPathIdentity.prototype._getOverallScore.bind(this);
+    this._getCompletionPanelValues = GameLevelCsPathIdentity.prototype._getCompletionPanelValues.bind(this);
+    this._syncCompletionPanel = GameLevelCsPathIdentity.prototype._syncCompletionPanel.bind(this);
+    this.markLevelComplete = GameLevelCsPathIdentity.prototype.markLevelComplete.bind(this);
 
     this.present = new Present(this, {
       toastDuration: 2200,
@@ -544,6 +550,7 @@ await this.profileManager.saveIdentity(profile);
         ]);
 
         this.showToast('✦ Avatar Forge completed');
+        this.markLevelComplete('identityForge');
       } finally {
         identityState.avatarFlowActive = false;
       }
@@ -1331,6 +1338,11 @@ await this.profileManager.saveIdentity(profile);
         { key: 'sprite', label: 'Sprite', emptyValue: '—' },
         { type: 'section', title: 'World Theme', marginTop: '8px' },
         { key: 'worldTheme', label: 'Theme', emptyValue: '—' },
+        { type: 'section', title: 'Completion Status', marginTop: '10px' },
+        { key: 'completionIdentityForge',   label: 'Identity Forge',   emptyValue: '—' },
+        { key: 'completionWayfindingWorld', label: 'Wayfinding World', emptyValue: '—' },
+        { key: 'completionMissionTools',    label: 'Mission Tools',    emptyValue: '—' },
+        { key: 'completionOverallScore',    label: 'Overall Score',    emptyValue: '0.55' },
       ],
       actions: [
         {
@@ -1402,6 +1414,7 @@ await this.profileManager.saveIdentity(profile);
         sprite: profile.sprite || '—',
         worldTheme: profile.worldTheme || '—',
       });
+      this._syncCompletionPanel();
     };
 
     /**

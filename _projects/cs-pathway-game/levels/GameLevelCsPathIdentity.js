@@ -48,6 +48,8 @@ class GameLevelCsPathIdentity {
     this.score = (message) => this.present.score(message);
     this.clearPanel = () => this.present.clearPanel();
     this.clearScore = () => this.present.clearScore();
+    this._completionKeys = ['identityForge', 'wayfindingWorld', 'missionTools'];
+    this._completionStorageKey = 'cs_pathway_completion';
   }
 
   isActiveLevel() {
@@ -428,6 +430,50 @@ class GameLevelCsPathIdentity {
       this.profilePanelView.destroy();
     }
     this.present?.destroy();
+  }
+
+  _getCompletion() {
+    try {
+      return JSON.parse(localStorage.getItem(this._completionStorageKey)) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  _saveCompletion(updates) {
+    const current = this._getCompletion();
+    Object.assign(current, updates);
+    localStorage.setItem(this._completionStorageKey, JSON.stringify(current));
+  }
+
+  _getOverallScore() {
+    const c = this._getCompletion();
+    let score = 0.55;
+    if (c.identityForge) score += 0.1125;
+    if (c.wayfindingWorld) score += 0.1125;
+    if (c.missionTools) score += 0.1125;
+    return score;
+  }
+
+  _getCompletionPanelValues() {
+    const c = this._getCompletion();
+    return {
+      completionIdentityForge:   c.identityForge    ? '✓' : '—',
+      completionWayfindingWorld: c.wayfindingWorld  ? '✓' : '—',
+      completionMissionTools:    c.missionTools     ? '✓' : '—',
+      completionOverallScore:    this._getOverallScore().toFixed(4).replace(/0$/, ''),
+    };
+  }
+
+  _syncCompletionPanel() {
+    if (this.profilePanelView && typeof this.profilePanelView.update === 'function') {
+      this.profilePanelView.update(this._getCompletionPanelValues());
+    }
+  }
+
+  markLevelComplete(levelKey) {
+    this._saveCompletion({ [levelKey]: true });
+    this._syncCompletionPanel();
   }
 
   applyBackgroundTheme(themeMeta, bgData) {
