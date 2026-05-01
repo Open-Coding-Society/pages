@@ -39,6 +39,10 @@ class GameLevelBasketball {
     this.lastShotAt = -Infinity; 
     this.lebronStunUntil = 0;
     this.lebronStunDurationMs = 3000;
+    this.levelCompleted = false;
+    this.completionTriggered = false;
+    this.targetSurvivalSeconds = 20;
+    this.firstStealScrollTriggered = false;
 
     const image_src_court = path + '/images/projects/characters/BaskCourt.png';
     const image_data_court = {
@@ -53,7 +57,7 @@ class GameLevelBasketball {
       greeting: 'Ball handler ready.',
       src: sprite_src_player,
       SCALE_FACTOR: 11,
-      STEP_FACTOR: 1000,
+      STEP_FACTOR: 800,
       ANIMATION_RATE: 110,
       INIT_POSITION: { ...this.playerStart },
       pixels: { height: 770, width: 513 },
@@ -98,10 +102,16 @@ class GameLevelBasketball {
       }
     };
 
+    const coinHitbox = {
+      widthPercentage: 0.15,
+      heightPercentage: 0.15
+    };
+
     const coin_1 = {
       id: 'coin_1',
       INIT_POSITION: { x: Math.round(width * 0.25), y: Math.round(height * 0.35) },
       SCALE_FACTOR: 18,
+      hitbox: coinHitbox,
       value: 1
     };
 
@@ -109,6 +119,7 @@ class GameLevelBasketball {
       id: 'coin_2',
       INIT_POSITION: { x: Math.round(width * 0.50), y: Math.round(height * 0.65) },
       SCALE_FACTOR: 18,
+      hitbox: coinHitbox,
       value: 1
     };
 
@@ -116,6 +127,7 @@ class GameLevelBasketball {
       id: 'coin_3',
       INIT_POSITION: { x: Math.round(width * 0.72), y: Math.round(height * 0.28) },
       SCALE_FACTOR: 18,
+      hitbox: coinHitbox,
       value: 1
     };
 
@@ -181,7 +193,6 @@ class GameLevelBasketball {
     this.startTime = 0;
     this.currentTime = 0;
     this.createHud();
-    this.createBottomNav();
     this.updateHud();
     this.initLeaderboard();
     this.showIntroDialogue();
@@ -200,6 +211,11 @@ class GameLevelBasketball {
     if (!this.caught) {
       this.currentTime = (now - this.startTime) / 1000;
       this.updateHud();
+
+      if (this.currentTime >= this.targetSurvivalSeconds) {
+        this.completeLevel();
+        return;
+      }
     }
 
     if (this.caught) {
@@ -241,6 +257,17 @@ class GameLevelBasketball {
       this.caught = true;
       this.caughtAt = now;
       this.bestTime = Math.max(this.bestTime, this.currentTime);
+
+      if (!this.firstStealScrollTriggered) {
+        this.firstStealScrollTriggered = true;
+        try {
+          window.dispatchEvent(new CustomEvent('characters:concept-focus', {
+            detail: { level: 'basketball', trigger: 'first-steal' }
+          }));
+        } catch (err) {
+          console.warn('Failed to emit basketball concept focus event:', err);
+        }
+      }
       this.bestCoins = Math.max(this.bestCoins, this.getCoinsCollected());
       this.saveBestTime();
       this.saveBestCoins();
@@ -526,8 +553,34 @@ class GameLevelBasketball {
   updateHud() {
     if (!this.timeHud) return;
     this.timeHud.textContent =
-      `Time: ${this.currentTime.toFixed(1)}s | Best: ${this.bestTime.toFixed(1)}s | ` +
+      `Time: ${this.currentTime.toFixed(1)}s/${this.targetSurvivalSeconds}s | Best: ${this.bestTime.toFixed(1)}s | ` +
       `Coins: ${this.getCoinsCollected()} | Best Coins: ${this.bestCoins}`;
+  }
+
+  completeLevel() {
+    if (this.completionTriggered) return;
+    this.completionTriggered = true;
+    this.levelCompleted = true;
+
+    if (this.messageHud) {
+      this.messageHud.innerHTML = 'Challenge complete!<br>Moving to lesson summary...';
+      this.messageHud.style.display = 'block';
+    }
+
+    try {
+      window.dispatchEvent(new CustomEvent('characters:level-complete', {
+        detail: { level: 'basketball' }
+      }));
+    } catch (err) {
+      console.warn('Failed to emit basketball completion event:', err);
+    }
+
+    const level = this.gameEnv?.gameControl?.currentLevel;
+    if (level) {
+      setTimeout(() => {
+        level.continue = false;
+      }, 500);
+    }
   }
 
   showCaughtMessage() {
@@ -596,6 +649,8 @@ class GameLevelBasketball {
     this.caughtAt             = 0;
     this.scoreSubmittedThisRound = false;
     this.lebronStunUntil      = 0;
+    this.completionTriggered  = false;
+    this.levelCompleted       = false;
     this.updateCoinSpawnBounds();
     this.applyCoinSpawnRules();
     this.startTime = performance.now();
@@ -663,6 +718,11 @@ class GameLevelBasketball {
         const yMax = bounds.yMax;
         coin.position.x = xMin + Math.random() * Math.max(1, xMax - xMin);
         coin.position.y = yMin + Math.random() * Math.max(1, yMax - yMin);
+
+        // Keep the DOM hitbox aligned with the new spawn immediately.
+        if (typeof coin.setupCanvas === 'function') {
+          coin.setupCanvas();
+        }
       };
 
       coin.randomizePosition();

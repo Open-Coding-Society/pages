@@ -35,7 +35,7 @@ build:
 	@mkdir -p $(NOTEBOOK_DEST)
 	@if [ -f notebook.src.ipynb ]; then cp notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME); else echo "⚠️  notebook.src.ipynb not found (optional)"; fi
 	@if [ -f distributed_computing.ipynb ]; then cp distributed_computing.ipynb $(NOTEBOOK_DEST)/$(DISTRIBUTED_NOTEBOOK_FILENAME) && echo "✓ Copied distributed notebook"; fi
-	@if [ -f undecidable-problems.ipynb ]; then cp undecidable-problems.ipynb $(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME) && echo "✓ Copied undecidable notebook"; fi
+	@if [ -f undecidable.ipynb ]; then cp undecidable.ipynb $(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME) && echo "✓ Copied undecidable notebook"; fi
 	@$(MAKE) assets
 	@echo "✅ $(PROJECT_NAME) built successfully"
 	@echo "   Source: _projects/$(PROJECT_NAME)/"
@@ -84,10 +84,10 @@ watch:
 				mkdir -p $(NOTEBOOK_DEST); \
 				cp $(PROJECT_SRC)/distributed_computing.ipynb $(NOTEBOOK_DEST)/$(DISTRIBUTED_NOTEBOOK_FILENAME) 2>/dev/null || true; \
 				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(DISTRIBUTED_NOTEBOOK_FILENAME)" 2>&1; \
-			elif echo "$$changed_file" | grep -q "undecidable-problems.ipynb"; then \
+			elif echo "$$changed_file" | grep -q "undecidable.ipynb"; then \
 				echo "  🔄 Undecidable notebook changed - copying and converting..."; \
 				mkdir -p $(NOTEBOOK_DEST); \
-				cp $(PROJECT_SRC)/undecidable-problems.ipynb $(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME) 2>/dev/null || true; \
+				cp $(PROJECT_SRC)/undecidable.ipynb $(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME) 2>/dev/null || true; \
 				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME)" 2>&1; \
 			elif echo "$$changed_file" | grep -q "/levels/"; then \
 				filename=$$(basename "$$changed_file"); \
