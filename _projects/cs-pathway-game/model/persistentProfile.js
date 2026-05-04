@@ -146,10 +146,13 @@ class PersistentProfile {
             preferences: {
               sprite: profileData.sprite || null,
               spriteMeta: profileData.spriteMeta || null,
+              persona: profileData.persona || null,
+              personaId: profileData.personaId || null,
             },
             progress: {
               identityUnlocked: profileData.identityUnlocked || false,
               avatarSelected: profileData.avatarSelected || false,
+              identityForgeCompleted: profileData.identityForgeCompleted || false,
             },
             completedAt: null,
           },
@@ -233,11 +236,14 @@ class PersistentProfile {
               ...identityForge.preferences,
               ...(updates.sprite !== undefined && { sprite: updates.sprite }),
               ...(updates.spriteMeta !== undefined && { spriteMeta: updates.spriteMeta }),
+              ...(updates.persona !== undefined && { persona: updates.persona }),
+              ...(updates.personaId !== undefined && { personaId: updates.personaId }),
             },
             progress: {
               ...identityForge.progress,
               ...(updates.identityUnlocked !== undefined && { identityUnlocked: updates.identityUnlocked }),
               ...(updates.avatarSelected !== undefined && { avatarSelected: updates.avatarSelected }),
+              ...(updates.identityForgeCompleted !== undefined && { identityForgeCompleted: updates.identityForgeCompleted }),
             },
             completedAt: updates.identityForgeCompleted || identityForge.completedAt,
           },
@@ -320,6 +326,7 @@ class PersistentProfile {
             progress: {
               identityUnlocked: false,
               avatarSelected: false,
+              identityForgeCompleted: false,
             },
             completedAt: null,
           },
@@ -429,8 +436,11 @@ class PersistentProfile {
         sprite: identityForge.preferences?.sprite || null,
         spriteMeta: identityForge.preferences?.spriteMeta || null,
         spriteSrc: identityForge.preferences?.spriteMeta?.src || null,
+        persona: identityForge.preferences?.persona || null,
+        personaId: identityForge.preferences?.personaId || null,
         identityUnlocked: identityForge.progress?.identityUnlocked || false,
         avatarSelected: identityForge.progress?.avatarSelected || false,
+        identityForgeCompleted: identityForge.progress?.identityForgeCompleted || false,
         
         // Wayfinding World
         theme: wayfindingWorld.preferences?.theme || null,
