@@ -27,4 +27,6 @@ transitions
 robot-logic-game
 parallelAndComputinglesson
 collisions-mechanic
-local-storagenod-game
+local-storage
+nod-game
+enemy-death

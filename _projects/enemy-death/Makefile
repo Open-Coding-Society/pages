@@ -1,59 +1,49 @@
-# CS Pathway Game Project Makefile
+# Makefile
 # Generic targets: build, assets, clean, watch, docs, docs-clean
-# Called from main Makefile via: make -C _projects/cs-pathway-game <target>
+# Called from main Makefile via: make -C _projects/red-riding <target>
 
 ###########################################
-# CS Pathway Game Project Configuration
+# Red Riding Hood Game Project Configuration
 ###########################################
 
 # Project paths (relative to workspace root)
-DATE_OF_CREATION = 2026-04-24
+DATE_OF_CREATION = 2026-04-14
 PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
-# When producing a distributed notebook, include the project name for clarity
-DISTRIBUTED_NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME)-distributed.ipynb
-UNDECIDABLE_NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME)-undecidable.ipynb
 
 # Workspace root (main Makefile directory - two levels up from here)
-# Use an absolute path so targets resolve correctly whether called from top-level or via -C
-WORKSPACE_ROOT := $(abspath $(CURDIR)/../..)
+WORKSPACE_ROOT = ../..
 
 # Distribution destinations (relative to workspace root, in .gitignore)
 JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
 IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
 NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
 DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
-LAYOUT_DEST = $(WORKSPACE_ROOT)/_layouts
 
 ###########################################
 # Build Targets
 ###########################################
 
-# Main build target - copy notebooks and call assets
+# Main build target - copy notebook and call assets
 build:
 	@mkdir -p $(NOTEBOOK_DEST)
-	@if [ -f notebook.src.ipynb ]; then cp notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME); else echo "⚠️  notebook.src.ipynb not found (optional)"; fi
-	@if [ -f distributed_computing.ipynb ]; then cp distributed_computing.ipynb $(NOTEBOOK_DEST)/$(DISTRIBUTED_NOTEBOOK_FILENAME) && echo "✓ Copied distributed notebook"; fi
-	@if [ -f undecidable.ipynb ]; then cp undecidable.ipynb $(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME) && echo "✓ Copied undecidable notebook"; fi
+	@cp notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true
 	@$(MAKE) assets
 	@echo "✅ $(PROJECT_NAME) built successfully"
 	@echo "   Source: _projects/$(PROJECT_NAME)/"
-	@echo "   Notebooks: _notebooks/projects/$(PROJECT_NAME)/"
+	@echo "   Notebook: _notebooks/projects/$(PROJECT_NAME)/$(NOTEBOOK_FILENAME)"
 	@echo "   JavaScript: assets/js/projects/$(PROJECT_NAME)/"
 	@echo "   Images: images/projects/$(PROJECT_NAME)/"
-	@echo "   Layouts: _layouts/parallelAndComputinglesson.html"
 
 # Copy only JS and image assets (not notebook) - for watch triggers
 assets:
 	@mkdir -p $(JS_DEST)/levels
-	@if [ -d levels ] && [ "$$(ls -A levels/*.js 2>/dev/null)" ]; then cp levels/*.js $(JS_DEST)/levels/ && echo "✓ Copied levels JS"; fi
+	@cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true
 	@mkdir -p $(JS_DEST)/model
-	@if [ -d model ] && [ "$$(ls -A model/*.js 2>/dev/null)" ]; then cp model/*.js $(JS_DEST)/model/ && echo "✓ Copied model JS"; fi
+	@cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true
 	@mkdir -p $(IMAGES_DEST)
-	@if [ -d images ] && [ "$$(ls -A images 2>/dev/null)" ]; then cp -r images/* $(IMAGES_DEST)/ && echo "✓ Copied images"; fi
-	@mkdir -p $(LAYOUT_DEST)
-	@if [ -f parallelAndComputinglesson.html ]; then cp parallelAndComputinglesson.html $(LAYOUT_DEST)/parallelAndComputinglesson.html && echo "✓ Copied parallel computing lesson layout to _layouts"; fi
+	@cp -r images/* $(IMAGES_DEST)/ 2>/dev/null || true
 
 # Clean distributed files (keeps source intact)
 clean:
@@ -61,7 +51,6 @@ clean:
 	@rm -rf $(NOTEBOOK_DEST)
 	@rm -rf $(JS_DEST)
 	@rm -rf $(IMAGES_DEST)
-	@rm -f $(LAYOUT_DEST)/parallelAndComputinglesson.html
 	@echo "✓ Distribution cleaned (source files preserved in _projects/$(PROJECT_NAME))"
 
 ###########################################
@@ -78,16 +67,6 @@ watch:
 				mkdir -p $(NOTEBOOK_DEST); \
 				cp $(PROJECT_SRC)/notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
 				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)" 2>&1; \
-			elif echo "$$changed_file" | grep -q "distributed_computing.ipynb"; then \
-				echo "  🔄 Distributed notebook changed - copying and converting..."; \
-				mkdir -p $(NOTEBOOK_DEST); \
-				cp $(PROJECT_SRC)/distributed_computing.ipynb $(NOTEBOOK_DEST)/$(DISTRIBUTED_NOTEBOOK_FILENAME) 2>/dev/null || true; \
-				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(DISTRIBUTED_NOTEBOOK_FILENAME)" 2>&1; \
-			elif echo "$$changed_file" | grep -q "undecidable.ipynb"; then \
-				echo "  🔄 Undecidable notebook changed - copying and converting..."; \
-				mkdir -p $(NOTEBOOK_DEST); \
-				cp $(PROJECT_SRC)/undecidable.ipynb $(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME) 2>/dev/null || true; \
-				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(UNDECIDABLE_NOTEBOOK_FILENAME)" 2>&1; \
 			elif echo "$$changed_file" | grep -q "/levels/"; then \
 				filename=$$(basename "$$changed_file"); \
 				echo "  🔄 Level changed: $$filename"; \
@@ -101,10 +80,6 @@ watch:
 			elif echo "$$changed_file" | grep -q "/images/"; then \
 				echo "  🔄 Images changed - copying all images..."; \
 				$(MAKE) assets 2>&1 | grep -v "cp:" | head -1; \
-			elif echo "$$changed_file" | grep -q "parallelAndComputinglesson.html"; then \
-				echo "  🔄 Layout changed - copying to _layouts..."; \
-				mkdir -p $(LAYOUT_DEST); \
-				cp "$$changed_file" $(LAYOUT_DEST)/parallelAndComputinglesson.html 2>/dev/null || true; \
 			else \
 				echo "  🔄 File changed: $$changed_file (copying all assets)"; \
 				$(MAKE) assets 2>&1 | grep -v "cp:"; \
