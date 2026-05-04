@@ -16,7 +16,7 @@ NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
 WORKSPACE_ROOT = ../..
 
 # Distribution destinations (relative to workspace root, in .gitignore)
-JS_DEST = $(WORKSPACE_ROOT)@assets/js/projects/$(PROJECT_NAME)
+JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
 IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
 NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
 DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)

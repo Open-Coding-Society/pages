@@ -1,9 +1,9 @@
 // Cannonball Dodge Challenge
-import GameEnvBackground from '@asset/js/GameEnginv1.1/essentials/GameEnvBackground.js';
-import Player from '@asset/js/GameEnginv1.1/essentials/Player.js';
-import AiNpc from '@asset/js/GameEnginv1.1/essentials/AiNpc.js';
-import GameStats from '@asset/js/GameEnginv1.1/essentials/GameStats.js';
-import Coin from '@asset/js/GameEnginv1.1/Coin.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
+import GameStats from '@assets/js/GameEnginev1.1/GameStats.js';
+import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
 class GameLevelCannonball {
     constructor(gameEnv) {
