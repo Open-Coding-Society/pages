@@ -129,10 +129,10 @@ class PeppaBattleLevelBase {
         // Add Player 2 if 2-player mode
         if (this.gameMode === 'twoPlayer') {
             this.classes.push({ class: Player, data: sprite_data_player2 });
+        } else {
+            // Only add boss in single player
+            this.classes.push({ class: PeppaBossEnemy, data: sprite_data_enemy });
         }
-
-        // Always add boss
-        this.classes.push({ class: PeppaBossEnemy, data: sprite_data_enemy });
 
         this.boundKeyDown = this.handleKeyDown.bind(this);
     }
@@ -333,7 +333,7 @@ class PeppaBattleLevelBase {
         `;
     }
 
-    showLoseScreenAndRestart() {
+    showLoseScreenAndRestart(mainMessage = 'YOU LOST') {
         const existing = document.getElementById(`peppa-lose-overlay-${this.config.levelId}`);
         if (existing) existing.remove();
 
@@ -345,7 +345,7 @@ class PeppaBattleLevelBase {
             color: #fff; font-family: Arial, sans-serif; text-align: center;
         `;
         overlay.innerHTML = `
-            <div style="font-size:44px; font-weight:bold; margin-bottom:12px; color:#ff5b5b;">YOU LOST</div>
+            <div style="font-size:44px; font-weight:bold; margin-bottom:12px; color:#ff5b5b;">${mainMessage}</div>
             <div style="font-size:22px; margin-bottom:8px;">Try again.</div>
             <div style="font-size:14px; opacity:0.8;">Restarting level...</div>
         `;
@@ -393,7 +393,7 @@ class PeppaBattleLevelBase {
         return map[dir] || [s, 0];
     }
 
-    spawnLaser(fromX, fromY, targetX, targetY, isPlayerLaser) {
+    spawnLaser(fromX, fromY, targetX, targetY, isPlayerLaser, sourceId = 'boss') {
         const dx = targetX - fromX;
         const dy = targetY - fromY;
         const len = Math.hypot(dx, dy) || 1;
@@ -403,12 +403,13 @@ class PeppaBattleLevelBase {
             vx: (dx / len) * this.laserSpeed,
             vy: (dy / len) * this.laserSpeed,
             isPlayerLaser,
+            source: sourceId,
             life: 60,
             maxLife: 60
         });
     }
 
-    spawnLaserStraight(fromX, fromY, direction, isPlayerLaser) {
+    spawnLaserStraight(fromX, fromY, direction, isPlayerLaser, sourceId = 'player1') {
         const [vx, vy] = this.directionToVelocity(direction);
         this.lasers.push({
             x: fromX,
@@ -416,6 +417,7 @@ class PeppaBattleLevelBase {
             vx,
             vy,
             isPlayerLaser,
+            source: sourceId,
             life: 60,
             maxLife: 60
         });
@@ -487,6 +489,7 @@ class PeppaBattleLevelBase {
         this.laserLayer.style.height = `${this.gameEnv.innerHeight}px`;
 
         const player = this.getPlayer();
+        const player2 = this.getPlayer2();
         const boss = this.getBoss();
 
         // Draw and update coins first
@@ -513,7 +516,18 @@ class PeppaBattleLevelBase {
             ctx.translate(L.x, L.y);
             ctx.rotate(Math.atan2(L.vy, L.vx));
             const grad = ctx.createLinearGradient(-25, 0, 25, 0);
-            const color = L.isPlayerLaser ? 'rgba(0,255,255,0.9)' : 'rgba(255,50,50,0.9)';
+            
+            // Set laser color based on source
+            let color = 'rgba(255,50,50,0.9)'; // enemy/boss (red)
+            let shadowColor = 'red';
+            if (L.source === 'player1') {
+                color = 'rgba(0,255,255,0.9)'; // player 1 (cyan)
+                shadowColor = 'cyan';
+            } else if (L.source === 'player2') {
+                color = 'rgba(50,255,50,0.9)'; // player 2 (green)
+                shadowColor = 'lime';
+            }
+            
             grad.addColorStop(0, 'transparent');
             grad.addColorStop(0.3, color);
             grad.addColorStop(0.7, color);
@@ -521,7 +535,7 @@ class PeppaBattleLevelBase {
             ctx.globalAlpha = alpha;
             ctx.fillStyle = grad;
             ctx.fillRect(-25, -3, 50, 6);
-            ctx.shadowColor = L.isPlayerLaser ? 'cyan' : 'red';
+            ctx.shadowColor = shadowColor;
             ctx.shadowBlur = 8;
             ctx.fillRect(-25, -2, 50, 4);
             ctx.restore();
@@ -531,28 +545,60 @@ class PeppaBattleLevelBase {
             const hitLeft = L.x - hitW / 2;
             const hitTop = L.y - hitH / 2;
 
-            if (L.isPlayerLaser && boss && !boss.isDefeated) {
-                if (
-                    hitLeft < boss.position.x + boss.width &&
-                    hitLeft + hitW > boss.position.x &&
-                    hitTop < boss.position.y + boss.height &&
-                    hitTop + hitH > boss.position.y
-                ) {
-                    boss.takeDamage(playerLaserDamage);
-                    this.lasers.splice(i, 1);
-                }
-            } else if (!L.isPlayerLaser && player) {
-                if (
-                    hitLeft < player.position.x + player.width &&
-                    hitLeft + hitW > player.position.x &&
-                    hitTop < player.position.y + player.height &&
-                    hitTop + hitH > player.position.y
-                ) {
-                    if (Date.now() - this.lastPlayerHitAt >= this.playerDamageCooldownMs) {
-                        this.lastPlayerHitAt = Date.now();
-                        this.playerHealth = Math.max(0, this.playerHealth - 1);
+            if (this.gameMode === 'twoPlayer') {
+                // Two-player collision: P1 hits P2 or P2 hits P1
+                if (L.source === 'player1' && player2) {
+                    if (
+                        hitLeft < player2.position.x + player2.width &&
+                        hitLeft + hitW > player2.position.x &&
+                        hitTop < player2.position.y + player2.height &&
+                        hitTop + hitH > player2.position.y
+                    ) {
+                        if (Date.now() - this.lastPlayer2HitAt >= this.playerDamageCooldownMs) {
+                            this.lastPlayer2HitAt = Date.now();
+                            this.player2Health = Math.max(0, this.player2Health - 1);
+                        }
+                        this.lasers.splice(i, 1);
                     }
-                    this.lasers.splice(i, 1);
+                } else if (L.source === 'player2' && player) {
+                    if (
+                        hitLeft < player.position.x + player.width &&
+                        hitLeft + hitW > player.position.x &&
+                        hitTop < player.position.y + player.height &&
+                        hitTop + hitH > player.position.y
+                    ) {
+                        if (Date.now() - this.lastPlayerHitAt >= this.playerDamageCooldownMs) {
+                            this.lastPlayerHitAt = Date.now();
+                            this.playerHealth = Math.max(0, this.playerHealth - 1);
+                        }
+                        this.lasers.splice(i, 1);
+                    }
+                }
+            } else {
+                // Single-player collision: Player hits Boss or Boss hits Player
+                if (L.isPlayerLaser && boss && !boss.isDefeated) {
+                    if (
+                        hitLeft < boss.position.x + boss.width &&
+                        hitLeft + hitW > boss.position.x &&
+                        hitTop < boss.position.y + boss.height &&
+                        hitTop + hitH > boss.position.y
+                    ) {
+                        boss.takeDamage(playerLaserDamage);
+                        this.lasers.splice(i, 1);
+                    }
+                } else if (!L.isPlayerLaser && player) {
+                    if (
+                        hitLeft < player.position.x + player.width &&
+                        hitLeft + hitW > player.position.x &&
+                        hitTop < player.position.y + player.height &&
+                        hitTop + hitH > player.position.y
+                    ) {
+                        if (Date.now() - this.lastPlayerHitAt >= this.playerDamageCooldownMs) {
+                            this.lastPlayerHitAt = Date.now();
+                            this.playerHealth = Math.max(0, this.playerHealth - 1);
+                        }
+                        this.lasers.splice(i, 1);
+                    }
                 }
             }
         }
@@ -596,11 +642,12 @@ class PeppaBattleLevelBase {
 
     enforceFloorBarriers() {
         const player = this.getPlayer();
+        const player2 = this.getPlayer2();
         const boss = this.getBoss();
         const floorY = this.floorY;
         const height = this.gameEnv.innerHeight;
 
-        if (player) {
+        if (player && player.height) {
             if (player.position.y < floorY) {
                 player.position.y = floorY;
                 player.velocity.y = 0;
@@ -610,7 +657,17 @@ class PeppaBattleLevelBase {
                 player.velocity.y = 0;
             }
         }
-        if (boss) {
+        if (player2 && player2.height) {
+            if (player2.position.y < floorY) {
+                player2.position.y = floorY;
+                player2.velocity.y = 0;
+            }
+            if (player2.position.y + player2.height > height) {
+                player2.position.y = height - player2.height;
+                player2.velocity.y = 0;
+            }
+        }
+        if (boss && boss.height) {
             if (boss.position.y < floorY) {
                 boss.position.y = floorY;
                 boss.velocity.y = 0;
@@ -742,9 +799,9 @@ class PeppaBattleLevelBase {
         }
     }
 
-    enforceInitialSpawnPositions(player, boss) {
+    enforceInitialSpawnPositions(player, player2, boss) {
         if (this.initialPositionsSet) return;
-        if (!player || !boss) return;
+        if (!player || !player.height) return;
 
         const floorY = this.floorY;
         const height = this.gameEnv.innerHeight;
@@ -754,10 +811,21 @@ class PeppaBattleLevelBase {
         player.velocity.x = 0;
         player.velocity.y = 0;
 
-        boss.position.x = this.enemySpawn.x;
-        boss.position.y = Math.min(height - boss.height, Math.max(floorY, this.enemySpawn.y));
-        boss.velocity.x = 0;
-        boss.velocity.y = 0;
+        if (player2) {
+            if (!player2.height) return; // Wait until loaded
+            player2.position.x = this.player2Spawn.x;
+            player2.position.y = Math.min(height - player2.height, Math.max(floorY, this.player2Spawn.y));
+            player2.velocity.x = 0;
+            player2.velocity.y = 0;
+        }
+
+        if (boss) {
+            if (!boss.height) return; // Wait until loaded
+            boss.position.x = this.enemySpawn.x;
+            boss.position.y = Math.min(height - boss.height, Math.max(floorY, this.enemySpawn.y));
+            boss.velocity.x = 0;
+            boss.velocity.y = 0;
+        }
 
         this.initialPositionsSet = true;
     }
@@ -816,41 +884,44 @@ class PeppaBattleLevelBase {
         const player = this.getPlayer();
         const player2 = this.getPlayer2();
         const boss = this.getBoss();
-        if (!player || !boss) return;
 
-        this.enforceInitialSpawnPositions(player, boss);
-        if (player2) {
-            this.enforceInitialSpawnPositions(player2, boss);
+        if (this.gameMode === 'twoPlayer') {
+            if (!player || !player2) return;
+        } else {
+            if (!player || !boss) return;
         }
+
+        this.enforceInitialSpawnPositions(player, player2, boss);
 
         const now = Date.now();
 
         // Player 1 attack
         if (this.attackRequested) {
             this.attackRequested = false;
-            if (now - this.lastAttackAt >= this.attackCooldownMs && !boss.isDefeated) {
+            const isBossDefeated = boss ? boss.isDefeated : false;
+            if (now - this.lastAttackAt >= this.attackCooldownMs && !isBossDefeated) {
                 this.lastAttackAt = now;
                 const px = player.position.x + player.width / 2;
                 const py = player.position.y + player.height / 2;
                 const dir = player.direction || 'right';
-                this.spawnLaserStraight(px, py, dir, true);
+                this.spawnLaserStraight(px, py, dir, true, 'player1');
             }
         }
 
         // Player 2 attack (2-player mode only)
         if (player2 && this.player2AttackRequested) {
             this.player2AttackRequested = false;
-            if (now - this.lastPlayer2AttackAt >= this.attackCooldownMs && !boss.isDefeated) {
+            if (now - this.lastPlayer2AttackAt >= this.attackCooldownMs) {
                 this.lastPlayer2AttackAt = now;
                 const px = player2.position.x + player2.width / 2;
                 const py = player2.position.y + player2.height / 2;
                 const dir = player2.direction || 'right';
-                this.spawnLaserStraight(px, py, dir, true);
+                this.spawnLaserStraight(px, py, dir, true, 'player2');
             }
         }
 
         // Boss targets closest player
-        if (!boss.isDefeated && now - this.lastEnemyLaserAt >= this.enemyLaserIntervalMs) {
+        if (boss && !boss.isDefeated && now - this.lastEnemyLaserAt >= this.enemyLaserIntervalMs) {
             this.lastEnemyLaserAt = now;
             const closestPlayer = this.getClosestPlayer(boss);
             if (closestPlayer) {
@@ -858,23 +929,25 @@ class PeppaBattleLevelBase {
                 const by = boss.position.y + boss.height / 2;
                 const px = closestPlayer.position.x + closestPlayer.width / 2;
                 const py = closestPlayer.position.y + closestPlayer.height / 2;
-                this.spawnLaser(bx, by, px, py, false);
+                this.spawnLaser(bx, by, px, py, false, 'boss');
             }
         }
 
         this.updateLasers();
         this.enforceFloorBarriers();
 
-        // Collision detection for Player 1
-        if (!boss.isDefeated && this.areColliding(player, boss) && (now - this.lastPlayerHitAt >= this.playerDamageCooldownMs)) {
-            this.lastPlayerHitAt = now;
-            this.playerHealth = Math.max(0, this.playerHealth - 1);
-        }
-
-        // Collision detection for Player 2
-        if (player2 && !boss.isDefeated && this.areColliding(player2, boss) && (now - this.lastPlayer2HitAt >= this.playerDamageCooldownMs)) {
-            this.lastPlayer2HitAt = now;
-            this.player2Health = Math.max(0, this.player2Health - 1);
+        if (this.gameMode === 'twoPlayer') {
+            // Collision player 1 with player 2 directly? (Maybe physical collision doesn't hurt, only lasers)
+            // Or if you want physical collision:
+            if (this.areColliding(player, player2)) {
+                // Ignore or implement physical knockback
+            }
+        } else {
+            // Single player collision with Boss
+            if (boss && !boss.isDefeated && this.areColliding(player, boss) && (now - this.lastPlayerHitAt >= this.playerDamageCooldownMs)) {
+                this.lastPlayerHitAt = now;
+                this.playerHealth = Math.max(0, this.playerHealth - 1);
+            }
         }
 
         // Check if any player died
@@ -886,21 +959,20 @@ class PeppaBattleLevelBase {
             let lossMessage = 'You lost. Restarting level...';
             if (this.gameMode === 'twoPlayer') {
                 if (player1Dead && player2Dead) {
-                    lossMessage = 'Both players defeated! Restarting level...';
+                    lossMessage = 'Draw! Both players defeated! Restarting...';
                 } else if (player1Dead) {
-                    lossMessage = 'Player 1 defeated! Restarting level...';
+                    lossMessage = 'Player 2 Wins! Player 1 defeated. Restarting...';
                 } else {
-                    lossMessage = 'Player 2 defeated! Restarting level...';
+                    lossMessage = 'Player 1 Wins! Player 2 defeated. Restarting...';
                 }
             }
             this.updateHud(lossMessage);
-            this.showLoseScreenAndRestart();
+            this.showLoseScreenAndRestart(this.gameMode === 'twoPlayer' ? lossMessage : 'YOU LOST');
             return;
         }
 
-        if (boss.isDefeated && !this.battleEnded) {
+        if (this.gameMode !== 'twoPlayer' && boss && boss.isDefeated && !this.battleEnded) {
             this.battleEnded = true;
-            // In 2-player mode, use player 1's health for scoring
             const score = (this.playerHealth * 100) + (this.coinCount * this.coinValue);
             this.levelScore = score;
 
