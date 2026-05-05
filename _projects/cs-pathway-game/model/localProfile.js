@@ -95,12 +95,14 @@ const LocalProfile = {
             preferences: {
               sprite: data.sprite || null,
               spriteMeta: data.spriteMeta || null,
-            },
-            progress: {
+              persona: data.persona || null,
+              personaId: data.personaId || null,
+            },            progress: {
               identityUnlocked: data.identityUnlocked || false,
               avatarSelected: data.avatarSelected || false,
+              identityForgeCompleted: data.identityForgeCompleted || false,
             },
-            completedAt: null,
+            completedAt: data.identityForgeCompletedAt || null,
           },
           'wayfinding-world': {
             preferences: {
@@ -116,6 +118,9 @@ const LocalProfile = {
           'mission-tooling': {
             progress: {
               toolsUnlocked: data.toolsUnlocked || false,
+              missionProgressCount: data.missionProgressCount || 0,
+              missionScore: data.missionScore || 0.55,
+              missionCompletedStations: data.missionCompletedStations || [],
             },
             completedAt: null,
           },
@@ -123,7 +128,7 @@ const LocalProfile = {
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      console.log('LocalProfile: saved profile for', profile.identity.name);
+      console.log('LocalProfile: saved profile for', data.name);
       
       // Trigger analytics event if available
       this._trackEvent('profile_created', profile.localId);
@@ -165,11 +170,13 @@ const LocalProfile = {
               ...existing.game_profile?.['identity-forge']?.preferences,
               ...(updates.sprite !== undefined && { sprite: updates.sprite }),
               ...(updates.spriteMeta !== undefined && { spriteMeta: updates.spriteMeta }),
-            },
-            progress: {
+              ...(updates.persona !== undefined && { persona: updates.persona }),
+              ...(updates.personaId !== undefined && { personaId: updates.personaId }),
+            },            progress: {
               ...existing.game_profile?.['identity-forge']?.progress,
               ...(updates.identityUnlocked !== undefined && { identityUnlocked: updates.identityUnlocked }),
               ...(updates.avatarSelected !== undefined && { avatarSelected: updates.avatarSelected }),
+              ...(updates.identityForgeCompleted !== undefined && { identityForgeCompleted: updates.identityForgeCompleted }),
             },
             completedAt: updates.identityForgeCompleted || existing.game_profile?.['identity-forge']?.completedAt,
           },
@@ -190,6 +197,9 @@ const LocalProfile = {
             progress: {
               ...existing.game_profile?.['mission-tooling']?.progress,
               ...(updates.toolsUnlocked !== undefined && { toolsUnlocked: updates.toolsUnlocked }),
+              ...(updates.missionProgressCount !== undefined && { missionProgressCount: updates.missionProgressCount }),
+              ...(updates.missionScore !== undefined && { missionScore: updates.missionScore }),
+              ...(updates.missionCompletedStations !== undefined && { missionCompletedStations: updates.missionCompletedStations }),
             },
             completedAt: updates.missionToolingCompleted || existing.game_profile?.['mission-tooling']?.completedAt,
           },
@@ -257,8 +267,11 @@ const LocalProfile = {
       sprite: identityForge.preferences?.sprite || null,
       spriteMeta: identityForge.preferences?.spriteMeta || null,
       spriteSrc: identityForge.preferences?.spriteMeta?.src || null,
+      persona: identityForge.preferences?.persona || null,
+      personaId: identityForge.preferences?.personaId || null,
       identityUnlocked: identityForge.progress?.identityUnlocked || false,
       avatarSelected: identityForge.progress?.avatarSelected || false,
+      identityForgeCompleted: identityForge.progress?.identityForgeCompleted || false,
       // Wayfinding World
       theme: wayfindingWorld.preferences?.theme || null,
       themeMeta: wayfindingWorld.preferences?.themeMeta || null,
@@ -267,6 +280,9 @@ const LocalProfile = {
       navigationComplete: wayfindingWorld.progress?.navigationComplete || false,
       // Mission Tooling
       toolsUnlocked: missionTooling.progress?.toolsUnlocked || false,
+      missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
+      missionScore: missionTooling.progress?.missionScore || 0.55,
+      missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
     };
   },
 
