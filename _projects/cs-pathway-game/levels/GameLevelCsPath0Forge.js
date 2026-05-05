@@ -342,6 +342,7 @@ class GameLevelCsPath0Forge {
     
       reaction: function () {
         void level.runPersonaHall(true, this);
+        
       },
     
       interact: async function () {
@@ -350,6 +351,8 @@ class GameLevelCsPath0Forge {
           'Choose the CS persona that best matches how you work.'
         ]);
         await level.runPersonaHall(false, this);
+        await this.profileManager.updateProgress('persona', result.title);
+        await this.profileManager.updateProgress('personaId', result.persona);
       },
     });
     this.runCourseEnlistment = async function(showIntro = false, npc = null) {
@@ -420,6 +423,9 @@ class GameLevelCsPath0Forge {
               personaId: result.persona,
             };
     
+            await this.profileManager.updateProgress('persona', result.title);
+            await this.profileManager.updateProgress('personaId', result.persona);
+    
             this.updateProfilePanel(this.profileData);
     
             this.showToast(`Persona selected: ${result.title}`);
@@ -442,8 +448,7 @@ class GameLevelCsPath0Forge {
         console.error(err);
         this._personaHallOpen = false;
       }
-    };
-    /**
+    };    /**
      * Identity terminal flow. Run the authentication and identity registration wizard.
      * @private
      */

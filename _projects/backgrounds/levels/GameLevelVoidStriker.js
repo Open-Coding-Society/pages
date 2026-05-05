@@ -44,6 +44,16 @@ const VoidStrikerGame = (() => {
   // enemy bullets) tick at this fraction of their normal speed. Restored to 1
   // the instant the boss dies.
   let worldSpeed = 1;
+
+  // Character skins — swap via P menu
+  const SHIP_CHARS = [
+    { name: 'Striker',  body: '#a0d8ff', cockpit: '#00eeff', thrustRgb: '0,200,255',  bullet: '#00eeff', speed: 4.5 },
+    { name: 'Shadow',   body: '#bb99ee', cockpit: '#cc55ff', thrustRgb: '160,0,255',  bullet: '#cc55ff', speed: 5.2 },
+    { name: 'Inferno',  body: '#ffbb77', cockpit: '#ff5500', thrustRgb: '255,100,0',  bullet: '#ff6600', speed: 4.0 },
+    { name: 'Nova',     body: '#99ffcc', cockpit: '#00ff99', thrustRgb: '0,255,140',  bullet: '#00ff99', speed: 4.8 },
+  ];
+  let activeChar = 0;
+
   // Boss respawn loop: first boss on wave 3, then every 2 waves after each kill.
   let bossesDefeated = 0;
   let nextBossWave = 3;
@@ -117,6 +127,44 @@ const VoidStrikerGame = (() => {
     });
     unpauseBtn.addEventListener('click', closeConsole);
     overlay.appendChild(unpauseBtn);
+
+    // Character selection
+    const charLabel = document.createElement('div');
+    charLabel.textContent = 'SELECT SHIP';
+    charLabel.style.marginBottom = '8px';
+    overlay.appendChild(charLabel);
+
+    const charGrid = document.createElement('div');
+    Object.assign(charGrid.style, {
+      display:        'flex',
+      gap:            '8px',
+      justifyContent: 'center',
+      marginBottom:   '16px',
+    });
+    SHIP_CHARS.forEach((ch, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = ch.name;
+      const isActive = i === activeChar;
+      Object.assign(btn.style, {
+        background:    isActive ? `rgba(${ch.thrustRgb},0.25)` : 'transparent',
+        border:        `1px solid ${isActive ? ch.cockpit : 'rgba(0,200,255,0.3)'}`,
+        borderRadius:  '4px',
+        color:         ch.cockpit,
+        fontFamily:    '"Courier New", monospace',
+        fontSize:      '11px',
+        letterSpacing: '1px',
+        padding:       '5px 8px',
+        cursor:        'pointer',
+      });
+      btn.addEventListener('click', () => {
+        selectChar(i);
+        const ov = document.getElementById('vs-cheat');
+        if (ov) ov.remove();
+        consoleActive = false;
+      });
+      charGrid.appendChild(btn);
+    });
+    overlay.appendChild(charGrid);
 
     // Divider label
     const label = document.createElement('div');
@@ -430,11 +478,16 @@ const VoidStrikerGame = (() => {
     ship = {
       x: W / 2, y: H * 0.78,
       w: 28, h: 38,
-      speed: 4.5,
+      speed: SHIP_CHARS[activeChar].speed,
       shootCooldown: 0,
       invincible: 0,
       thrustFlicker: 0,
     };
+  }
+
+  function selectChar(idx) {
+    activeChar = idx;
+    if (ship) ship.speed = SHIP_CHARS[idx].speed;
   }
 
   function updateShip() {
@@ -473,10 +526,11 @@ const VoidStrikerGame = (() => {
     ctx.save();
     ctx.translate(x, y);
 
+    const ch = SHIP_CHARS[activeChar];
     if (thrustFlicker < 4) {
       const fl = h * 0.35 + rand(-4, 4);
       const tg = ctx.createLinearGradient(0, h * 0.4, 0, h * 0.4 + fl);
-      tg.addColorStop(0, 'rgba(0,200,255,0.9)');
+      tg.addColorStop(0, `rgba(${ch.thrustRgb},0.9)`);
       tg.addColorStop(1, 'transparent');
       ctx.fillStyle = tg;
       ctx.beginPath();
@@ -486,7 +540,7 @@ const VoidStrikerGame = (() => {
       ctx.fill();
     }
 
-    ctx.fillStyle = '#a0d8ff';
+    ctx.fillStyle = ch.body;
     ctx.beginPath();
     ctx.moveTo(0, -h / 2);
     ctx.lineTo(w / 2, h / 2);
@@ -495,12 +549,12 @@ const VoidStrikerGame = (() => {
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = '#00eeff';
+    ctx.fillStyle = ch.cockpit;
     ctx.beginPath();
     ctx.ellipse(0, -h * 0.1, w * 0.18, h * 0.22, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = 'rgba(0,200,255,0.5)';
+    ctx.strokeStyle = `rgba(${ch.thrustRgb},0.5)`;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(-w * 0.5, h * 0.3);
@@ -550,10 +604,11 @@ const VoidStrikerGame = (() => {
   }
 
   function drawBullets() {
+    const bColor = SHIP_CHARS[activeChar].bullet;
     bullets.forEach(b => {
       const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, 5);
       g.addColorStop(0, '#fff');
-      g.addColorStop(0.4, '#00eeff');
+      g.addColorStop(0.4, bColor);
       g.addColorStop(1, 'transparent');
       ctx.fillStyle = g;
       ctx.beginPath();
@@ -664,6 +719,7 @@ const VoidStrikerGame = (() => {
     // Each wave gets its own hue band so the mob color rotates as you progress.
     const hueBase = ENEMY_HUE_BANDS[wave % ENEMY_HUE_BANDS.length];
     for (let i = 0; i < count; i++) {
+      const isChaser = wave >= 2 && Math.random() < Math.min(0.45, 0.08 * wave);
       enemies.push({
         x:         rand(40, W - 40),
         y:         rand(-200, -30) - i * 35,
@@ -673,6 +729,9 @@ const VoidStrikerGame = (() => {
         hp:        1 + Math.floor(wave / 2),
         color:     `hsl(${(hueBase + randI(-15, 15) + 360) % 360},85%,55%)`,
         shootTimer: wave >= 5 ? randI(40, 120) : Infinity,
+        chaser:    isChaser,
+        chaseAcc:  0,
+        angle:     -Math.PI / 2,
       });
     }
 
@@ -703,9 +762,23 @@ const VoidStrikerGame = (() => {
     // worldSpeed scales every non-player movement: 1 normally, 0.4 while the
     // Boss Alien is alive. The instant the boss dies it snaps back to 1.
     enemies.forEach(e => {
-      e.y  += e.speed * worldSpeed;
-      e.x  += e.vx    * worldSpeed;
-      if (e.x < 20 || e.x > W - 20) e.vx *= -1;
+      if (e.chaser) {
+        // Direction vector chase: displacement ÷ distance isolates direction, × speed sets magnitude
+        const dx = ship.x - e.x;
+        const dy = ship.y - e.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        // Progressive speed: ramp up over time, cap at 2× base speed
+        e.chaseAcc = Math.min(e.speed, e.chaseAcc + 0.0006);
+        const spd = (e.speed + e.chaseAcc) * worldSpeed;
+        e.x += (dx / dist) * spd;
+        e.y += (dy / dist) * spd;
+        // Directional facing: store angle for draw rotation
+        e.angle = Math.atan2(dy, dx);
+      } else {
+        e.y  += e.speed * worldSpeed;
+        e.x  += e.vx    * worldSpeed;
+        if (e.x < 20 || e.x > W - 20) e.vx *= -1;
+      }
 
       if (e.shootTimer !== Infinity) {
         e.shootTimer -= worldSpeed;
@@ -715,7 +788,7 @@ const VoidStrikerGame = (() => {
         }
       }
     });
-    enemies = enemies.filter(e => e.y < H + 60);
+    enemies = enemies.filter(e => e.y < H + 60 && e.x > -60 && e.x < W + 60);
 
     asteroids.forEach(a => {
       // Per-frame gravity loop (lesson: Gravity System):
@@ -741,24 +814,46 @@ const VoidStrikerGame = (() => {
     enemies.forEach(e => {
       ctx.save();
       ctx.translate(e.x, e.y);
-      const g = ctx.createRadialGradient(0, -4, 2, 0, 0, e.r);
-      g.addColorStop(0, '#ff8888');
-      g.addColorStop(1, e.color);
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, e.r, e.r * 0.45, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#ff2020';
-      ctx.beginPath();
-      ctx.ellipse(0, -e.r * 0.25, e.r * 0.45, e.r * 0.3, 0, 0, Math.PI * 2);
-      ctx.fill();
-      const eg = ctx.createRadialGradient(0, e.r * 0.2, 0, 0, e.r * 0.2, e.r * 0.6);
-      eg.addColorStop(0, 'rgba(255,60,0,0.5)');
-      eg.addColorStop(1, 'transparent');
-      ctx.fillStyle = eg;
-      ctx.beginPath();
-      ctx.arc(0, e.r * 0.2, e.r * 0.6, 0, Math.PI * 2);
-      ctx.fill();
+      if (e.chaser) {
+        // Rotated arrow shape facing the player
+        ctx.rotate(e.angle + Math.PI / 2);
+        const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, e.r * 1.6);
+        cg.addColorStop(0, 'rgba(255,140,0,0.4)');
+        cg.addColorStop(1, 'transparent');
+        ctx.fillStyle = cg;
+        ctx.beginPath(); ctx.arc(0, 0, e.r * 1.6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ff8800';
+        ctx.beginPath();
+        ctx.moveTo(0, -e.r);
+        ctx.lineTo(e.r * 0.6,  e.r * 0.7);
+        ctx.lineTo(0,          e.r * 0.3);
+        ctx.lineTo(-e.r * 0.6, e.r * 0.7);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#ffdd44';
+        ctx.beginPath();
+        ctx.ellipse(0, -e.r * 0.2, e.r * 0.22, e.r * 0.28, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        const g = ctx.createRadialGradient(0, -4, 2, 0, 0, e.r);
+        g.addColorStop(0, '#ff8888');
+        g.addColorStop(1, e.color);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, e.r, e.r * 0.45, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ff2020';
+        ctx.beginPath();
+        ctx.ellipse(0, -e.r * 0.25, e.r * 0.45, e.r * 0.3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        const eg = ctx.createRadialGradient(0, e.r * 0.2, 0, 0, e.r * 0.2, e.r * 0.6);
+        eg.addColorStop(0, 'rgba(255,60,0,0.5)');
+        eg.addColorStop(1, 'transparent');
+        ctx.fillStyle = eg;
+        ctx.beginPath();
+        ctx.arc(0, e.r * 0.2, e.r * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
     });
 
@@ -1062,7 +1157,7 @@ const VoidStrikerGame = (() => {
     });
     div.innerHTML = `
       <div style="font-size:40px; letter-spacing:8px; text-shadow:0 0 20px #00eeff; font-weight:bold; margin-bottom:10px;">VOID STRIKER</div>
-      <div style="font-size:14px; opacity:0.7; margin-bottom:28px; letter-spacing:2px;">WASD to move &nbsp;•&nbsp; Arrow keys to shoot (any direction) &nbsp;•&nbsp; P to pause</div>
+      <div style="font-size:14px; opacity:0.7; margin-bottom:28px; letter-spacing:2px;">WASD to move &nbsp;•&nbsp; Arrow keys to shoot &nbsp;•&nbsp; P to pause / select ship</div>
       <button id="vs-launch" style="
         background: transparent;
         border: 2px solid #00eeff;
