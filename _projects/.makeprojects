@@ -1,31 +1,39 @@
 # Project Auto-Registration
-# List enabled projects (one per line, no paths needed)
-# Projects must have: _projects/<name>/Makefile
-# Each Makefile must provide generic targets: build, clean, docs, watch
+# List enabled projects (one per line)
+# Supports both flat and nested structures:
+#   - Flat: <project-name>
+#   - Nested: <category>/<project-name>
+# Projects with :dev suffix are auto-built in dev mode
 #
-# Format: <project-name>
-# Example: cs-pathway-game
+# Format: <project-path> or <project-path>:dev
+# Example: games/cs-pathway:dev
 
-cs-pathway-game:dev
-characters
-gamify
-main
-ocean
-game-lessons
-PeppaPigGame
-teamtestgame
-main
-student-management-groups
-test-project
-game-in-game-lesson
-red-riding
-barriers-spline-sorcerers
-platformer-gravity-sorcerers
-backgrounds
-multiplayer
-transitions
-robot-logic-game
-parallelAndComputinglesson
-collisions-mechanic
-local-storage
-enemy-death
+# === NESTED STRUCTURE (organized by category) ===
+# Games
+games/backgrounds
+games/barriers-spline-sorcerers
+games/characters
+games/collisions-mechanic
+games/cs-pathway:dev
+games/enemy-death
+games/game-in-game-lesson
+games/gamify
+games/local-storage
+games/multiplayer
+games/ocean
+games/peppa-pig
+games/platformer-gravity-sorcerers
+games/red-riding
+games/teamtestgame
+games/transitions
+
+# Lessons
+lessons/game-lessons
+lessons/parallelAndComputinglesson
+lessons/robot-logic-game
+
+# Systems
+systems/test-project
+systems/student-management-groups
+
+# === FLAT STRUCTURE (legacy/uncategorized) ===

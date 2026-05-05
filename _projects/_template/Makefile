@@ -12,8 +12,14 @@ PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
 
-# Workspace root (main Makefile directory - two levels up from here)
-WORKSPACE_ROOT = ../..
+# Workspace root - auto-detect depth (supports both flat and nested structures)
+# If in _projects/category/project → ../../.. 
+# If in _projects/project → ../..
+ifeq ($(wildcard ../../Makefile),)
+    WORKSPACE_ROOT = ../../..
+else
+    WORKSPACE_ROOT = ../..
+endif
 
 # Distribution destinations (relative to workspace root, in .gitignore)
 JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
@@ -66,37 +72,59 @@ assets:
 # Clean distributed files (keeps source intact)
 clean:
 	@echo "🧹 Cleaning $(PROJECT_NAME) distribution..."
-	@rm -rf $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)
+	@rm -rf $(NOTEBOOK_DEST)
 	@rm -rf $(JS_DEST)
 	@rm -rf $(CSS_DEST)
 	@rm -rf $(SASS_DEST)
 	@rm -rf $(IMAGES_DEST)
+	@rm -rf $(DOCS_DEST)
 	@echo "✓ Distribution cleaned (source files preserved in _projects/$(PROJECT_NAME))"
 
 ###########################################
 # Watch Target (for dev mode)
 ###########################################
 
-# Watch project files and auto-copy on change
+# Watch project files and auto-copy on change (timestamp-based, no fswatch needed)
 watch:
 	@echo "👀 Watching $(PROJECT_NAME) project (auto-copy on save)..."
-	@if command -v fswatch >/dev/null 2>&1; then \
-		fswatch -l 0.3 -r $(PROJECT_SRC) 2>/dev/null | while read changed_file; do \
-			if echo "$$changed_file" | grep -q "notebook.src.ipynb"; then \
-				echo "  🔄 Notebook changed - copying and converting..."; \
-				mkdir -p $(NOTEBOOK_DEST); \
-				cp $(PROJECT_SRC)/notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
-				cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)" 2>&1; \
-			else \
-				echo "  🔄 File changed: $$changed_file (updating assets)"; \
+	@mkdir -p /tmp
+	@touch /tmp/.project_$(PROJECT_NAME)_marker
+	@while true; do \
+		changed=0; \
+		if [ -f "$(PROJECT_SRC)/notebook.src.ipynb" ] && [ "$(PROJECT_SRC)/notebook.src.ipynb" -nt /tmp/.project_$(PROJECT_NAME)_marker ]; then \
+			echo "  🔄 Notebook changed - copying and converting..."; \
+			mkdir -p $(NOTEBOOK_DEST); \
+			cp $(PROJECT_SRC)/notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
+			cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)" 2>&1; \
+			changed=1; \
+		fi; \
+		if [ -d "$(PROJECT_SRC)/js" ]; then \
+			for file in $$(find $(PROJECT_SRC)/js -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
+				echo "  🔄 JS changed: $$file (updating assets)"; \
 				$(MAKE) assets 2>&1 | grep -v "cp:"; \
-			fi; \
-		done; \
-	else \
-		echo "⚠️  fswatch not installed (brew install fswatch for auto-watch)"; \
-		echo "   Falling back to manual: run 'make -C _projects/$(PROJECT_NAME) build' after edits"; \
-		while true; do sleep 3600; done; \
-	fi
+				changed=1; \
+				break; \
+			done; \
+		fi; \
+		if [ -d "$(PROJECT_SRC)/sass" ]; then \
+			for file in $$(find $(PROJECT_SRC)/sass -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
+				echo "  🔄 SASS changed: $$file (updating assets)"; \
+				$(MAKE) assets 2>&1 | grep -v "cp:"; \
+				changed=1; \
+				break; \
+			done; \
+		fi; \
+		if [ -d "$(PROJECT_SRC)/images" ]; then \
+			for file in $$(find $(PROJECT_SRC)/images -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
+				echo "  🔄 Image changed: $$file (updating assets)"; \
+				$(MAKE) assets 2>&1 | grep -v "cp:"; \
+				changed=1; \
+				break; \
+			done; \
+		fi; \
+		touch /tmp/.project_$(PROJECT_NAME)_marker; \
+		sleep 2; \
+	done
 
 ###########################################
 # Documentation Targets
