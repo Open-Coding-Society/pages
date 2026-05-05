@@ -164,7 +164,6 @@ class GameLevelOcean {
     const sprite_src_ocean = path + "/images/projects/ocean/npc/wizard.png";
     const sprite_data_ocean = {
       id: "Professor Ocean",
-      greeting: "Hello! I'm a wizard! ✨",
       src: sprite_src_ocean,
       SCALE_FACTOR: 3,
       ANIMATION_RATE: 10,
