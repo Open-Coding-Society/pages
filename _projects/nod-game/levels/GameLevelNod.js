@@ -50,12 +50,12 @@ class MazeRenderer {
       this.canvas = document.createElement('canvas');
       this.canvas.width = this.width;
       this.canvas.height = this.height;
-      this.canvas.style.position = 'fixed';
+      this.canvas.style.position = 'absolute'; 
       this.canvas.style.top = '0';
       this.canvas.style.left = '0';
       this.canvas.style.zIndex = '1';
       this.canvas.style.pointerEvents = 'none';
-      document.body.appendChild(this.canvas);
+      this.gameEnv.gameContainer.appendChild(this.canvas);
       this.ctx = this.canvas.getContext('2d');
     }
 
@@ -112,10 +112,10 @@ class GameHUD {
   }
 
   createHUD() {
-    this.statusEl = document.createElement('div');
+this.statusEl = document.createElement('div');
     this.statusEl.id = 'maze-status';
     this.statusEl.style.cssText = `
-      position: fixed;
+      position: absolute; 
       top: 20px;
       left: 20px;
       background: rgba(0,0,0,0.85);
@@ -129,7 +129,7 @@ class GameHUD {
       border: 2px solid #00ff00;
       min-width: 200px;
     `;
-    document.body.appendChild(this.statusEl);
+    this.gameEnv.gameContainer.appendChild(this.statusEl);
     this.update();
   }
 
@@ -184,15 +184,15 @@ class MazePlayer {
   }
 
   createCanvas() {
-    this.canvas = document.createElement('canvas');
+this.canvas = document.createElement('canvas');
     this.canvas.width = this.width;
     this.canvas.height = this.height;
-    this.canvas.style.position = 'fixed';
+    this.canvas.style.position = 'absolute';
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
     this.canvas.style.zIndex = '10';
     this.canvas.style.pointerEvents = 'none';
-    document.body.appendChild(this.canvas);
+    this.gameEnv.gameContainer.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d');
   }
 
