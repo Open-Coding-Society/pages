@@ -24,24 +24,15 @@ class MazeRenderer {
     // Simple maze layout: array of wall rectangles
     // Format: { x, y, w, h }
     // Outer boundaries
-    this.walls = [
-      // Outer walls
-      { x: 0, y: 0, w: this.width, h: 20 },           // Top
-      { x: 0, y: this.height - 20, w: this.width, h: 20 },  // Bottom
-      { x: 0, y: 0, w: 20, h: this.height },          // Left
-      { x: this.width - 20, y: 0, w: 20, h: this.height },  // Right
+this.walls = [
+        { x: 0, y: 0, w: this.width, h: 20 },
+        { x: 0, y: this.height - 20, w: this.width, h: 20 },
+        { x: 0, y: 0, w: 20, h: this.height },
+        { x: this.width - 20, y: 0, w: 20, h: this.height },
 
-      // Interior maze walls
-      { x: 150, y: 80, w: 200, h: 20 },     // Wall 1
-      { x: 300, y: 80, w: 20, h: 150 },     // Wall 2
-      { x: 80, y: 180, w: 200, h: 20 },     // Wall 3
-      { x: 80, y: 180, w: 20, h: 150 },     // Wall 4
-      { x: 250, y: 280, w: 150, h: 20 },    // Wall 5
-      { x: 150, y: 250, w: 20, h: 80 },     // Wall 6
-      { x: 350, y: 250, w: 20, h: 100 },    // Wall 7
-      { x: 80, y: 380, w: 300, h: 20 },     // Wall 8
-      { x: 450, y: 150, w: 20, h: 200 },    // Wall 9
-      { x: 200, y: 420, w: 200, h: 20 },    // Wall 10
+        { x: 20, y: 120, w: this.width - 150, h: 20 },   // Barrier 1
+        { x: 150, y: 240, w: this.width - 170, h: 20 },  // Barrier 2
+        { x: 20, y: 360, w: this.width - 150, h: 20 },   // Barrier 3
     ];
   }
 
@@ -102,71 +93,49 @@ class MazeRenderer {
 }
 
 class GameHUD {
-  constructor(gameEnv) {
-    this.gameEnv = gameEnv;
-    this.statusEl = null;
-    this.timerEl = null;
-    this.startTime = Date.now();
-    this.gameOver = false;
-    this.createHUD();
-  }
-
-  createHUD() {
-this.statusEl = document.createElement('div');
-    this.statusEl.id = 'maze-status';
-    this.statusEl.style.cssText = `
-      position: absolute; 
-      top: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.85);
-      color: #00ff00;
-      padding: 15px 20px;
-      border-radius: 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 16px;
-      font-weight: bold;
-      z-index: 1002;
-      border: 2px solid #00ff00;
-      min-width: 200px;
-    `;
-    this.gameEnv.gameContainer.appendChild(this.statusEl);
-    this.update();
-  }
-
-  update() {
-    if (this.gameOver) return;
-    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
-    this.statusEl.innerHTML = `
-      🎮 MAZE RUNNER<br>
-      ⏱️ Time: ${elapsed}s<br>
-      📍 Navigate to GREEN exit<br>
-      ⚠️ Avoid RED walls!
-    `;
-  }
-
-  setGameOver(won) {
-    this.gameOver = true;
-    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
-    if (won) {
-      this.statusEl.style.color = '#2ecc71';
-      this.statusEl.style.borderColor = '#2ecc71';
-      this.statusEl.innerHTML = `
-        🎮 MAZE RUNNER<br>
-        ✅ YOU WIN!<br>
-        ⏱️ Time: ${elapsed}s<br>
-        🔄 Refresh to play again
-      `;
-    } else {
-      this.statusEl.style.color = '#e74c3c';
-      this.statusEl.style.borderColor = '#e74c3c';
-      this.statusEl.innerHTML = `
-        🎮 MAZE RUNNER<br>
-        ❌ GAME OVER!<br>
-        Hit a wall after ${elapsed}s<br>
-        🔄 Refresh to try again
-      `;
+    constructor(gameEnv, onRestart) {
+        this.gameEnv = gameEnv;
+        this.onRestart = onRestart; // Callback function to reset the game
+        this.lives = 5;
+        this.statusEl = null;
+        this.startTime = Date.now();
+        this.gameOver = false;
+        this.createHUD();
     }
-  }
+
+    createHUD() {
+        this.statusEl = document.createElement('div');
+        this.statusEl.style.cssText = `
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(0,0,0,0.85); color: #00ff00;
+            padding: 15px; border-radius: 8px;
+            font-family: monospace; z-index: 1002;
+            border: 2px solid #00ff00; min-width: 200px;
+        `;
+        this.gameEnv.gameContainer.appendChild(this.statusEl);
+        this.update();
+    }
+
+    update() {
+        if (this.gameOver) return;
+        const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+        this.statusEl.innerHTML = `
+            🎮 MAZE RUNNER<br>
+            ❤️ Lives: ${this.lives}<br>
+            ⏱️ Time: ${elapsed}s<br>
+            <button id="restart-btn" style="margin-top:10px; cursor:pointer;">Restart Game</button>
+        `;
+        
+        // Attach listener to the button
+        document.getElementById('restart-btn').onclick = () => this.onRestart();
+    }
+
+    setGameOver(won) {
+        this.gameOver = true;
+        this.statusEl.innerHTML = won ? "✅ YOU WIN!" : "❌ GAME OVER!";
+        this.statusEl.innerHTML += `<br><button id="restart-btn" style="margin-top:10px;">Play Again</button>`;
+        document.getElementById('restart-btn').onclick = () => this.onRestart();
+    }
 }
 
 class MazePlayer {
@@ -238,10 +207,11 @@ this.canvas = document.createElement('canvas');
 // GAME LEVEL
 class GameLevelNod {
   constructor(gameEnv) {
+    this.gameEnv = gameEnv; // Store for cleanup
     const width = gameEnv.innerWidth;
     const height = gameEnv.innerHeight;
 
-    // Track mouse for head tracking
+    // 1. Setup Tracking
     window.targetMouseX = width * 0.5;
     window.targetMouseY = height * 0.5;
     if (!window.nodMouseTrackerEnabled) {
@@ -252,69 +222,78 @@ class GameLevelNod {
       });
     }
 
-    // Create maze
+    // 2. Initialize Game Objects
     const maze = new MazeRenderer(gameEnv, width, height);
     maze.render();
 
-    // Create player
     const player = new MazePlayer(gameEnv, width, height);
-    player.render();
+    
+    // Define the reset function BEFORE the HUD so the HUD can use it
+    const resetGame = () => {
+        // Reset player position
+        player.x = 50;
+        player.y = 50;
+        
+        // Reset HUD state
+        hud.lives = 5;
+        hud.gameOver = false;
+        hud.startTime = Date.now();
+        
+        // Resume game logic
+        gameActive = true;
+        
+        // Clear old loop and start a new one to prevent "double speed" bugs
+        if (this.gameEnv.mazeGameLoop) clearInterval(this.gameEnv.mazeGameLoop);
+        this.gameEnv.mazeGameLoop = setInterval(runLoop, 1000 / 60);
+    };
 
-    // Create HUD
-    const hud = new GameHUD(gameEnv);
+    // 3. Create HUD (Passing the resetGame function as a callback)
+    const hud = new GameHUD(gameEnv, resetGame);
 
-    // Game state
     let gameActive = true;
 
-    // Game loop
-    const gameLoop = setInterval(() => {
-      if (!gameActive) {
-        clearInterval(gameLoop);
-        return;
-      }
+    // 4. The Loop Logic
+    const runLoop = () => {
+      if (!gameActive) return;
 
-      // Update player position based on head tracking
       if (window.targetMouseX !== undefined && window.targetMouseY !== undefined) {
         player.update(window.targetMouseX, window.targetMouseY);
       }
 
       const pos = player.getPosition();
 
-      // Check collision with walls
+      // COLLISION LOGIC: 5 Hits instead of Game Over
       if (maze.checkCollision(pos.x, pos.y, player.radius)) {
-        gameActive = false;
-        hud.setGameOver(false);
-        clearInterval(gameLoop);
-        return;
+        hud.lives -= 1;
+        
+        if (hud.lives <= 0) {
+          gameActive = false;
+          hud.setGameOver(false);
+          return;
+        } else {
+          // Soft Reset: Send player back to start
+          player.x = 50;
+          player.y = 50;
+        }
       }
 
-      // Check if reached exit
       if (maze.checkExit(pos.x, pos.y, player.radius)) {
         gameActive = false;
         hud.setGameOver(true);
-        clearInterval(gameLoop);
         return;
       }
 
-      // Update HUD timer
       hud.update();
-
-      // Render
       player.render();
-    }, 1000 / 60); // 60 FPS
+    };
 
-    // Store reference for cleanup
-    gameEnv.mazeGameLoop = gameLoop;
+    // Start the loop
+    this.gameEnv.mazeGameLoop = setInterval(runLoop, 1000 / 60);
 
-    // Simplified classes array (GameControl still expects this)
     this.classes = [
       {
         class: GameEnvBackground,
-        data: {
-          id: 'MazeBackground',
-          src: '', // We're drawing our own
-          pixels: { height: height, width: width }
-        }
+        data: { id: 'MazeBackground', src: '', pixels: { height: height, width: width } }
       }
     ];
   }
