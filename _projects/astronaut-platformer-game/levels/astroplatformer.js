@@ -1,5 +1,28 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Coin from '@assets/js/GameEnginev1.1/Coin.js';
+import Leaderboard from '@assets/js/GameEnginev1.1/essentials/Leaderboard.js';
+
+class FixedPlatformerCoin extends Coin {
+  update() {
+    if (this.collected) return;
+    this.draw();
+  }
+
+  collect() {
+    if (this.collected) return;
+    if (typeof this.interact === 'function') {
+      this.interact.call(this);
+    } else {
+      this.collected = true;
+    }
+    if (this.canvas) {
+      this.canvas.style.opacity = '0';
+      this.canvas.style.transition = 'opacity 0.3s';
+      setTimeout(() => this.canvas?.remove(), 350);
+    }
+  }
+}
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,6 +99,7 @@ this._overlays         = [];
 this._styleEl          = null;
 this._hud              = null;
 this._deathScreen      = null;
+this._leaderboard      = null;
 this._isDead           = false;
 this._won              = false;
 
@@ -180,17 +204,28 @@ this._spikes = [
 
 // ── COINS ──────────────────────────────────────────────────────────────────
 this._coinPositions = [
-  { x:90,  y:268 },   // above p1
-  { x:240, y:208 },   // above p2
-  { x:375, y:178 },   // above moving platform zone
-  { x:525, y:133 },   // above p4
-  { x:385, y: 83 },   // above p5
-  { x:195, y: 38 },   // above p6
-  { x:555, y: 38 },   // on goal shelf
+  { id:'coin_p1', x:90,  y:268 },   // above p1
+  { id:'coin_p2', x:240, y:208 },   // above p2
+  { id:'coin_move', x:375, y:178 }, // above moving platform zone
+  { id:'coin_p4', x:525, y:133 },   // above p4
+  { id:'coin_p5', x:385, y: 83 },   // above p5
+  { id:'coin_p6', x:195, y: 38 },   // above p6
+  { id:'coin_goal', x:555, y: 38 }, // on goal shelf
 ].map(c => ({
+  id: c.id,
   x: c.x * scaleX, y: c.y * scaleY,
   w: 14 * scaleX,  h: 14 * scaleY,
+  value: 1,
   collected: false,
+  interact: function () {
+    if (!this.collected) {
+      this.collected = true;
+      const coinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
+      const newTotal = coinsCollected + this.value;
+      localStorage.setItem('coinsCollected', newTotal);
+      console.log(`Coin collected! Total coins: ${newTotal}`);
+    }
+  },
 }));
 
 // Flag position (on goal shelf)
@@ -227,9 +262,24 @@ const playerData = {
   keypress: { up:87, left:65, down:83, right:68 }
 };
 
+const coinClasses = this._coinPositions.map((coin) => ({
+  class: FixedPlatformerCoin,
+  data: {
+    id: coin.id,
+    INIT_POSITION: { x: coin.x, y: coin.y },
+    SCALE_FACTOR: 28.5,
+    hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+    zIndex: 11,
+    value: coin.value,
+    color: '#FFD700',
+    interact: coin.interact,
+  }
+}));
+
 this.classes = [
   { class: GameEnvBackground, data: bgData    },
   { class: Player,            data: playerData },
+  ...coinClasses,
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -238,6 +288,14 @@ this.classes = [
 this.initialize = () => {
   const container = gameEnv.container || gameEnv.gameContainer;
   if (!container) return;
+
+  gameEnv.stats = gameEnv.stats || {};
+  gameEnv.stats.coinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
+
+  this._leaderboard = window.leaderboardInstance || new Leaderboard(gameEnv.gameControl, {
+    gameName: 'astronaut-platformer-game',
+    initiallyHidden: false
+  });
 
   // CSS animations
   const style = document.createElement('style');
@@ -257,6 +315,7 @@ this.initialize = () => {
       50%    { box-shadow:0 0 20px rgba(255,68,170,1.0);}
     }
     .l3-mov { animation: movGlow 1.5s ease-in-out infinite; }
+    .l3-coin { animation: coinSpin 1.4s linear infinite; border-radius:50%; }
   `;
   document.head.appendChild(style);
   this._styleEl = style;
@@ -383,20 +442,17 @@ this.initialize = () => {
   container.appendChild(goalLbl);
   this._overlays.push(goalLbl);
 
-  // ── Draw coins ─────────────────────────────────────────────────────────
+  // ── Connect Coin.js objects to the custom platformer collision boxes ───
   for (const c of this._coinPositions) {
-    const el = document.createElement('div');
-    Object.assign(el.style, {
-      position:'absolute', left:c.x+'px', top:(top+c.y)+'px',
-      width:c.w+'px', height:c.h+'px',
-      background:'#FFD700', borderRadius:'50%', zIndex:'11',
-      pointerEvents:'none', boxShadow:'0 0 8px rgba(255,215,0,0.8)',
-      animation:'coinSpin 1.4s linear infinite',
-      border:'2px solid rgba(255,255,255,0.4)',
-    });
-    container.appendChild(el);
-    this._overlays.push(el);
-    c._el = el;
+    const coinObject = gameEnv.gameObjects.find(
+      obj => obj instanceof FixedPlatformerCoin && obj.spriteData?.id === c.id
+    );
+    c._coinObject = coinObject || null;
+    if (coinObject?.canvas) {
+      coinObject.canvas.classList.add('l3-coin');
+      coinObject.canvas.style.boxShadow = '0 0 8px rgba(255,215,0,0.8)';
+      coinObject.canvas.style.pointerEvents = 'none';
+    }
   }
 
   // ── HUD ────────────────────────────────────────────────────────────────
@@ -561,11 +617,14 @@ this.initialize = () => {
     for (const c of self._coinPositions) {
       if (c.collected) continue;
       if (pcx > c.x && pcx < c.x+c.w && pcy > c.y && pcy < c.y+c.h) {
+        if (c._coinObject) {
+          c._coinObject.collect();
+        } else {
+          c.interact();
+        }
         c.collected = true;
-        c._el.style.opacity = '0';
-        c._el.style.transition = 'opacity 0.3s';
-        setTimeout(()=>c._el.remove(), 350);
-        self._coins++;
+        self._coins += c.value;
+        gameEnv.stats.coinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
         self._updateHud();
       }
     }
@@ -591,9 +650,11 @@ this.initialize = () => {
 this._updateHud = () => {
   if (!this._hud) return;
   const hearts = '❤️'.repeat(this._lives) + '🖤'.repeat(Math.max(0,3-this._lives));
+  const totalCoinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
   this._hud.innerHTML = `
     <div>${hearts}</div>
     <div style="color:#FFD700">🪙 ${this._coins} / ${this._coinPositions.length}</div>
+    <div style="color:#ffe88a;font-size:0.7em">TOTAL ${totalCoinsCollected}</div>
     <div style="color:#aaffcc;font-size:0.7em;margin-top:2px">CRATER FALLS</div>`;
 };
 
@@ -654,12 +715,20 @@ this._winLevel = () => {
   const total = this._coinPositions.length;
   const pct   = Math.round((this._coins/total)*100);
   const grade = pct===100 ? '★ PERFECT ★' : pct>=70 ? 'GREAT!' : pct>=40 ? 'GOOD' : 'CLEAR';
+  const totalCoinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
+  const username = (gameEnv?.game?.uid && String(gameEnv.game.uid)) || 'Player';
+  if (this._leaderboard?.submitScore) {
+    this._leaderboard
+      .submitScore(username, totalCoinsCollected, 'astronaut-platformer-game')
+      .catch((error) => console.warn('Leaderboard score submit failed:', error));
+  }
   screen.innerHTML = `
     <div style="font-size:50px;margin-bottom:18px">🚀</div>
     <div style="font-size:16px;color:#00ff88;letter-spacing:4px;margin-bottom:14px">LEVEL CLEAR!</div>
     <div style="font-size:11px;color:#c8a84b;letter-spacing:2px;margin-bottom:20px">${grade}</div>
     <div style="font-size:9px;color:#88ccaa;line-height:2.6;margin-bottom:8px">
       Coins: ${this._coins} / ${total}<br>
+      Total Coins: ${totalCoinsCollected}<br>
       Lives: ${'❤️'.repeat(this._lives)}
     </div>
     <div style="font-size:8px;color:#334433;margin-top:16px">Proceeding...</div>`;
