@@ -3,6 +3,8 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
 import Gem from '@assets/js/heist-exe/Gem.js';
+//import heistMusic from '@assets/js/heist-exe/heistMusic';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 class HeistTemplate {
   constructor(gameEnv) {    
     this.gameEnv = gameEnv;
@@ -41,8 +43,15 @@ class HeistTemplate {
         keypress: {up: 87, left: 65, down: 83, right: 68}
     };
 
+     const barrier_1 = {
+            id: 'barrier_1', x: 116, y: 91, width: 211, height: 86, visible: true /* BUILDER_DEFAULT */,
+            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+            fromOverlay: true
+        };
+
     const gem_data_1 = {
         id: 'gem1',
+        spriteImagePath: '@assets/js/heist-exe/gem.png',
         value: 5,
         SCALE_FACTOR: 10,
         INIT_POSITION: { x: width * 0.05, y: height * 0.05 }
@@ -50,6 +59,7 @@ class HeistTemplate {
 
     const gem_data_2 = {
         id: 'gem2',
+        spriteImagePath: '@assets/js/heist-exe/gem.png',
         value: 5,
         SCALE_FACTOR: 10,
         INIT_POSITION: { x: width * 0.5, y: height * 0.5 }
@@ -59,7 +69,8 @@ class HeistTemplate {
       { class: GameEnvBackground, data: image_data_bg },
       { class: Player, data: sprite_data_mc },
       { class: Gem, data: gem_data_1 },
-      { class: Gem, data: gem_data_2 }
+      { class: Gem, data: gem_data_2},
+      { class: Barrier, data: barrier_1}
     ];
   }
 }

@@ -5,7 +5,7 @@ class heistMusic {
     this.audio = null;
     this.started = false;
     this.isPlaying = false;
-    this.endpoint = 'https://itunes.apple.com/search?term=oh+my+dis+side+travis+scott+quavo&entity=song&limit=10';
+    this.endpoint = 'https://itunes.apple.com/search?term=peppa%20pig%20theme&entity=song&limit=10';
     this.loopEndTime = 58;
     this.userActivated = false;
     this.activateFromUserGesture = this.activateFromUserGesture.bind(this);
