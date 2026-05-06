@@ -4,7 +4,7 @@ title: Adventure Game - Sample Level Documentation
 description: Example of how to document a level while building a team gamify project
 category: Gamify
 breadcrumb: true
-permalink: /gamify/gamelevelwater
+permalink: /kirby-minigames
 ---
 
 ## Why Document Your Work

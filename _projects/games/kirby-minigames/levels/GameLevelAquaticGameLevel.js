@@ -27,13 +27,13 @@ class GameLevelAquaticGameLevel {
 
         const bgData = {
             name: "custom_bg",
-            src: path + "/images/projects/characters/Aquatic.png",
+            src: path + "/images/Aquatic.png",
             pixels: { height: 1960, width: 2940 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: path + "/images/projects/characters/scubadiver.png",
+            src: path + "/images/scubadiver.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -56,7 +56,7 @@ class GameLevelAquaticGameLevel {
         const slimeNpc = {
             id: 'Random Slime',
             greeting: "I've been living under the sea for thousands of years, do you wonder why?",
-            src: path + "/images/projects/characters/slime.png",
+            src: path + "/images/slime.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 800, y: 128 },
@@ -87,18 +87,13 @@ class GameLevelAquaticGameLevel {
                     clearDialogueActionButtons(this.dialogueSystem);
                     this.dialogueSystem.addButtons([
                         {
-                            text: 'Complete Level',
+                            text: 'Continue Story',
                             primary: true,
-                            action: () => {
+                            action: async () => {
                                 q2.pendingSlimeCompletion = false;
                                 updateQuestHud();
-                                const gameControl = this.gameEnv?.gameControl;
-                                const level = gameControl?.currentLevel;
-                                if (level) {
-                                    level.levelCompleted = true;
-                                    emitLevelComplete('aquatic');
-                                    level.continue = false;
-                                }
+                                this.dialogueSystem.closeDialogue();
+                                await levelContext.startMegalodonEncounter?.();
                             }
                         },
                         {
@@ -229,7 +224,7 @@ class GameLevelAquaticGameLevel {
         const kirbyNpc = {
             id: 'Kirby',
             greeting: 'Poyo! Ask me anything about ocean cleanup and sea life.',
-            src: path + '/images/projects/characters/kirby.png',
+            src: path + '/images/kirby.png',
             SCALE_FACTOR: 10,
             ANIMATION_RATE: 6,
             INIT_POSITION: { x: 180, y: 140 },
@@ -335,29 +330,330 @@ class GameLevelAquaticGameLevel {
         this.playerLock = false;
         this.surfaceTrashIds = [];
         this.challengeStarfishIds = [];
+        this.bossState = {
+            active: false,
+            introPlayed: false,
+            combatReady: false,
+            megalodon: null,
+            hiddenNpcs: [],
+            hp: 420,
+            maxHp: 420,
+            playerHp: 120,
+            playerMaxHp: 120,
+            summonedAtQuarterHp: false,
+            summons: [],
+            projectiles: [],
+            enemyProjectiles: [],
+            laserBeam: null,
+            mouseX: width * 0.5,
+            mouseY: height * 0.5,
+            listenersBound: false,
+            lastShotAt: 0,
+            shotCooldownMs: 420,
+            meleeCooldownMs: 380,
+            lastMeleeAt: 0,
+            hud: null,
+            megalodonMoveSheet: path + '/images/megalodon.png',
+            megalodonMovePixels: { width: 513, height: 772 },
+            megalodonAttackSheet: path + '/images/megalodon attack.png',
+            megalodonAttackPixels: { width: 456, height: 688 },
+            rocketSprite: path + '/images/Rocket.png',
+            nextAbilityAt: 0,
+            abilityGlobalCooldownMs: 1900,
+            cooldowns: {
+                laser: 3400,
+                rockets: 5200,
+                bodySwing: 4300
+            },
+            lastAbilityAt: {
+                laser: 0,
+                rockets: 0,
+                bodySwing: 0
+            },
+            activeAbility: null,
+            abilityEndsAt: 0,
+            abilityCommitted: false,
+            swingHitsLeft: 0
+        };
+
+        const multiplayerRoom = new URLSearchParams(window.location.search).get('room') || 'aquatic-public';
+        this.multiplayer = {
+            enabled: true,
+            room: multiplayerRoom,
+            playerId: `aq_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+            channelName: `aquatic_multiplayer_${multiplayerRoom}`,
+            channel: null,
+            heartbeatTimer: null,
+            pruneTimer: null,
+            remotePlayers: new Map(),
+            uiPanel: null
+        };
 
         const getPlayer = () => this.gameEnv?.gameObjects?.find(
             obj => obj?.spriteData?.id === 'playerData'
         );
+        this.getLocalPlayer = getPlayer;
 
-        // Prevent duplicate action rows when a dialogue updates in place.
-        const clearDialogueActionButtons = (dialogueSystem) => {
-            if (!dialogueSystem) return;
+        const upsertRemotePlayer = (state) => {
+            if (!state || !state.playerId || state.playerId === this.multiplayer.playerId) return;
 
-            // Keep the dialogue control row intact; only clear previously added action buttons.
-            if (dialogueSystem.actionButtonGroup) {
-                dialogueSystem.actionButtonGroup.innerHTML = '';
+            const existing = this.multiplayer.remotePlayers.get(state.playerId) || {
+                id: state.playerId,
+                x: state.x,
+                y: state.y,
+                direction: state.direction || 'down',
+                name: state.name || `Diver-${state.playerId.slice(-4)}`,
+                color: state.color || '#80f4ff',
+                lastSeen: Date.now(),
+                element: null,
+                nameElement: null
+            };
+
+            existing.x = typeof state.x === 'number' ? state.x : existing.x;
+            existing.y = typeof state.y === 'number' ? state.y : existing.y;
+            existing.direction = state.direction || existing.direction;
+            existing.lastSeen = Date.now();
+            if (state.name) existing.name = state.name;
+            if (state.color) existing.color = state.color;
+
+            if (!existing.element) {
+                const el = document.createElement('div');
+                Object.assign(el.style, {
+                    position: 'absolute',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(255,255,255,0.85)',
+                    boxShadow: '0 0 12px rgba(0,0,0,0.35)',
+                    zIndex: '10019',
+                    pointerEvents: 'none',
+                    transform: 'translate(-50%, -50%)',
+                    transition: 'left 90ms linear, top 90ms linear'
+                });
+
+                const nameEl = document.createElement('div');
+                nameEl.textContent = existing.name;
+                Object.assign(nameEl.style, {
+                    position: 'absolute',
+                    top: '-20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    fontFamily: "'Press Start 2P', cursive, monospace",
+                    fontSize: '8px',
+                    color: '#ddf9ff',
+                    textShadow: '0 0 8px rgba(0,0,0,0.7)',
+                    whiteSpace: 'nowrap'
+                });
+
+                el.appendChild(nameEl);
+                document.body.appendChild(el);
+                existing.element = el;
+                existing.nameElement = nameEl;
+            }
+
+            this.multiplayer.remotePlayers.set(state.playerId, existing);
+        };
+
+        const removeRemotePlayer = (playerId) => {
+            const remote = this.multiplayer.remotePlayers.get(playerId);
+            if (!remote) return;
+            if (remote.element) remote.element.remove();
+            this.multiplayer.remotePlayers.delete(playerId);
+        };
+
+        const broadcastMultiplayerMessage = (message) => {
+            const payload = {
+                ...message,
+                room: this.multiplayer.room,
+                playerId: this.multiplayer.playerId,
+                timestamp: Date.now()
+            };
+
+            try {
+                if (this.multiplayer.channel) {
+                    this.multiplayer.channel.postMessage(payload);
+                    return;
+                }
+
+                const key = `${this.multiplayer.channelName}_signal`;
+                localStorage.setItem(key, JSON.stringify(payload));
+                localStorage.removeItem(key);
+            } catch (err) {
+                // Multiplayer transport is best-effort and should not break gameplay.
             }
         };
 
-        const emitLevelComplete = (levelName) => {
-            try {
-                window.dispatchEvent(new CustomEvent('characters:level-complete', {
-                    detail: { level: levelName }
-                }));
-            } catch (err) {
-                console.warn('Failed to emit characters level completion event:', err);
+        const handleMultiplayerMessage = (payload) => {
+            if (!payload || payload.room !== this.multiplayer.room) return;
+            if (payload.playerId === this.multiplayer.playerId) return;
+
+            if (payload.type === 'join') {
+                upsertRemotePlayer(payload);
+                const localPlayer = this.getLocalPlayer?.();
+                if (localPlayer) {
+                    broadcastMultiplayerMessage({
+                        type: 'state',
+                        x: localPlayer.position?.x || 0,
+                        y: localPlayer.position?.y || 0,
+                        direction: localPlayer.direction || 'down',
+                        name: this.multiplayer.displayName,
+                        color: this.multiplayer.playerColor
+                    });
+                }
+                return;
             }
+
+            if (payload.type === 'leave') {
+                removeRemotePlayer(payload.playerId);
+                return;
+            }
+
+            if (payload.type === 'state') {
+                upsertRemotePlayer(payload);
+            }
+        };
+
+        const updateRemotePlayerRender = () => {
+            const top = this.gameEnv?.top || 0;
+            this.multiplayer.remotePlayers.forEach((remote) => {
+                if (!remote.element) return;
+                remote.element.style.left = `${remote.x}px`;
+                remote.element.style.top = `${top + remote.y}px`;
+                remote.element.style.background = remote.color;
+                if (remote.nameElement) remote.nameElement.textContent = remote.name;
+            });
+        };
+
+        const startMultiplayer = () => {
+            if (!this.multiplayer.enabled) return;
+            if (this.multiplayer.heartbeatTimer) return;
+
+            const colorPalette = ['#7de2ff', '#ffd36e', '#ff9fba', '#9affb8', '#d6adff'];
+            this.multiplayer.playerColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            this.multiplayer.displayName = (localStorage.getItem('aquatic_multiplayer_name') || 'Diver').slice(0, 16);
+
+            const panel = document.createElement('div');
+            panel.id = 'aquatic-multiplayer-status';
+            Object.assign(panel.style, {
+                position: 'fixed',
+                right: '14px',
+                bottom: '14px',
+                zIndex: '10051',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: '1px solid rgba(138, 214, 249, 0.8)',
+                background: 'rgba(2, 24, 45, 0.9)',
+                color: '#d7f5ff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '9px',
+                lineHeight: '1.6',
+                minWidth: '240px',
+                maxWidth: 'min(90vw, 360px)'
+            });
+            panel.textContent = `Multiplayer room: ${this.multiplayer.room}`;
+            document.body.appendChild(panel);
+            this.multiplayer.uiPanel = panel;
+
+            if (typeof BroadcastChannel !== 'undefined') {
+                const channel = new BroadcastChannel(this.multiplayer.channelName);
+                channel.onmessage = (event) => handleMultiplayerMessage(event.data);
+                this.multiplayer.channel = channel;
+            } else {
+                this.multiplayer.storageHandler = (event) => {
+                    if (!event || event.key !== `${this.multiplayer.channelName}_signal` || !event.newValue) return;
+                    try {
+                        const payload = JSON.parse(event.newValue);
+                        handleMultiplayerMessage(payload);
+                    } catch (err) {
+                        return;
+                    }
+                };
+                window.addEventListener('storage', this.multiplayer.storageHandler);
+            }
+
+            this.multiplayer.heartbeatTimer = setInterval(() => {
+                const player = this.getLocalPlayer?.();
+                if (!player) return;
+                broadcastMultiplayerMessage({
+                    type: 'state',
+                    x: player.position?.x || 0,
+                    y: player.position?.y || 0,
+                    direction: player.direction || 'down',
+                    name: this.multiplayer.displayName,
+                    color: this.multiplayer.playerColor
+                });
+                updateRemotePlayerRender();
+            }, 120);
+
+            this.multiplayer.pruneTimer = setInterval(() => {
+                const now = Date.now();
+                this.multiplayer.remotePlayers.forEach((remote, id) => {
+                    if (now - remote.lastSeen > 3500) {
+                        removeRemotePlayer(id);
+                    }
+                });
+
+                if (this.multiplayer.uiPanel) {
+                    this.multiplayer.uiPanel.textContent = `Multiplayer room: ${this.multiplayer.room} | Players: ${this.multiplayer.remotePlayers.size + 1}`;
+                }
+            }, 700);
+
+            broadcastMultiplayerMessage({
+                type: 'join',
+                name: this.multiplayer.displayName,
+                color: this.multiplayer.playerColor
+            });
+        };
+
+        const stopMultiplayer = () => {
+            if (!this.multiplayer.enabled) return;
+
+            broadcastMultiplayerMessage({ type: 'leave' });
+
+            if (this.multiplayer.heartbeatTimer) {
+                clearInterval(this.multiplayer.heartbeatTimer);
+                this.multiplayer.heartbeatTimer = null;
+            }
+            if (this.multiplayer.pruneTimer) {
+                clearInterval(this.multiplayer.pruneTimer);
+                this.multiplayer.pruneTimer = null;
+            }
+
+            if (this.multiplayer.channel) {
+                this.multiplayer.channel.close();
+                this.multiplayer.channel = null;
+            }
+            if (this.multiplayer.storageHandler) {
+                window.removeEventListener('storage', this.multiplayer.storageHandler);
+                this.multiplayer.storageHandler = null;
+            }
+
+            this.multiplayer.remotePlayers.forEach((remote) => {
+                if (remote.element) remote.element.remove();
+            });
+            this.multiplayer.remotePlayers.clear();
+
+            if (this.multiplayer.uiPanel) {
+                this.multiplayer.uiPanel.remove();
+                this.multiplayer.uiPanel = null;
+            }
+        };
+
+        this.startMultiplayer = startMultiplayer;
+        this.stopMultiplayer = stopMultiplayer;
+
+        // Prevent duplicate action rows when a dialogue updates in place.
+        const clearDialogueActionButtons = (dialogueSystem) => {
+            if (!dialogueSystem?.dialogueBox) return;
+
+            const dialogueBox = dialogueSystem.dialogueBox;
+            const avatarElement = document.getElementById(`dialogue-avatar-${dialogueSystem.id}`);
+            const buttonContainers = dialogueBox.querySelectorAll('div[style*="display: flex"]');
+
+            buttonContainers.forEach((container) => {
+                if (avatarElement && container.contains(avatarElement)) return;
+                container.remove();
+            });
         };
 
         const updateQuestHud = () => {
@@ -922,20 +1218,12 @@ class GameLevelAquaticGameLevel {
         };
 
         const setBackground = (src) => {
-            const backgroundObject = this.gameEnv?.gameObjects?.find((obj) => {
-                if (!obj) return false;
-                if (obj instanceof GameEnvBackground) return true;
-                if (obj?.constructor?.name === 'GameEnvBackground') return true;
-                return obj?.data?.name === 'custom_bg';
-            });
+            const backgroundObject = this.gameEnv?.gameObjects?.find(
+                obj => obj?.constructor?.name === 'GameEnvBackground'
+            );
             if (!backgroundObject) return;
 
-            if (!backgroundObject.image) {
-                backgroundObject.image = new Image();
-            }
-            if (backgroundObject.data) {
-                backgroundObject.data.src = src;
-            }
+            if (!backgroundObject.image) backgroundObject.image = new Image();
             backgroundObject.image.src = src;
         };
 
@@ -990,31 +1278,17 @@ class GameLevelAquaticGameLevel {
             player.direction = targetY < player.position.y ? 'up' : 'down';
 
             return new Promise((resolve) => {
-                const startTime = performance.now();
-                const maxDurationMs = 2800;
+                let frameCount = 0;
                 const step = () => {
-                    if (!player?.position) {
+                    frameCount += 1;
+                    if (!player || !player.position || frameCount > 420) {
                         resolve();
                         return;
                     }
-
-                    const current = Number(player.position.y);
-                    const target = Number(targetY);
-                    if (!Number.isFinite(current) || !Number.isFinite(target)) {
-                        player.position.y = Number.isFinite(target) ? target : 0;
-                        resolve();
-                        return;
-                    }
-
-                    const delta = target - current;
-                    if (performance.now() - startTime > maxDurationMs) {
-                        player.position.y = target;
-                        resolve();
-                        return;
-                    }
-
+                    const current = player.position.y;
+                    const delta = targetY - current;
                     if (Math.abs(delta) <= 2) {
-                        player.position.y = target;
+                        player.position.y = targetY;
                         resolve();
                         return;
                     }
@@ -1025,6 +1299,55 @@ class GameLevelAquaticGameLevel {
                 requestAnimationFrame(step);
             });
         };
+
+        const createTridentFallbackSprite = () => {
+            const c = document.createElement('canvas');
+            c.width = 72;
+            c.height = 168;
+            const ctx = c.getContext('2d');
+            if (!ctx) return '';
+
+            ctx.clearRect(0, 0, c.width, c.height);
+            ctx.imageSmoothingEnabled = false;
+
+            ctx.fillStyle = '#6e5843';
+            ctx.fillRect(32, 28, 8, 118);
+            ctx.fillStyle = '#8bdfff';
+            ctx.strokeStyle = '#d9f8ff';
+            ctx.lineWidth = 2;
+
+            // Trident head (three prongs) drawn upright so the tip points toward -Y.
+            const drawProng = (offsetX, tipX, tipY) => {
+                ctx.beginPath();
+                ctx.moveTo(36 + offsetX, 34);
+                ctx.lineTo(tipX, tipY);
+                ctx.lineTo(36 + offsetX, 18);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            };
+
+            drawProng(-10, 18, 2);
+            drawProng(0, 36, 0);
+            drawProng(10, 54, 2);
+
+            ctx.fillStyle = '#8bdfff';
+            ctx.fillRect(24, 26, 24, 6);
+
+            ctx.fillStyle = 'rgba(215, 248, 255, 0.65)';
+            ctx.fillRect(35, 42, 2, 84);
+            return c.toDataURL();
+        };
+
+        let tridentSpriteSrc = createTridentFallbackSprite();
+        const tridentAssetPath = `${path}/images/trident.png`;
+        const tridentAsset = new Image();
+        tridentAsset.onload = () => {
+            tridentSpriteSrc = tridentAssetPath;
+        };
+        tridentAsset.onerror = () => {};
+        tridentAsset.src = tridentAssetPath;
+        const tridentAimOffset = Math.PI / 2;
 
         const createDetailedTrashSprites = () => {
             const makeCanvas = () => {
@@ -1267,23 +1590,28 @@ class GameLevelAquaticGameLevel {
             updateQuestHud();
 
             const overlay = transitionOverlay('Swimming to the surface...');
-            await animatePlayerSwim(14);
-            setBackground(path + '/images/projects/characters/Above-the-water.png');
-            setWorldNpcVisibility(false);
+            try {
+                await animatePlayerSwim(14);
+                setBackground(path + '/images/Above the water.png');
+                setWorldNpcVisibility(false);
 
-            const player = getPlayer();
-            if (player) {
-                player.position.x = Math.min(this.gameEnv.innerWidth - player.width - 20, Math.max(20, player.position.x));
-                player.position.y = Math.max(80, this.gameEnv.innerHeight * 0.32);
-            }
+                const player = getPlayer();
+                if (player) {
+                    player.position.x = Math.min(this.gameEnv.innerWidth - player.width - 20, Math.max(20, player.position.x));
+                    player.position.y = Math.max(80, this.gameEnv.innerHeight * 0.32);
+                }
 
-            spawnSurfaceTrash();
-            if (overlay) {
-                overlay.style.opacity = '0';
-                setTimeout(() => overlay.remove(), 350);
+                spawnSurfaceTrash();
+                updateQuestHud();
+            } catch (err) {
+                console.error('Surface transition failed:', err);
+            } finally {
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => overlay.remove(), 350);
+                }
+                this.playerLock = false;
             }
-            this.playerLock = false;
-            updateQuestHud();
         };
 
         // Story transition: return underwater and unlock Slime final turn-in.
@@ -1295,33 +1623,43 @@ class GameLevelAquaticGameLevel {
             updateQuestHud();
 
             const overlay = transitionOverlay('Diving back underwater...');
-            await animatePlayerSwim(12);
+            try {
+                const playerBeforeSwitch = getPlayer();
+                if (playerBeforeSwitch) {
+                    const diveTargetY = Math.min(
+                        this.gameEnv.innerHeight - 40,
+                        playerBeforeSwitch.position.y + 220
+                    );
+                    await animatePlayerSwim(diveTargetY);
+                }
 
-            setBackground(path + '/images/projects/characters/Aquatic.png');
-            setWorldNpcVisibility(true);
-            clearSurfaceTrash();
+                setBackground(path + '/images/Aquatic.png');
+                setWorldNpcVisibility(true);
+                clearSurfaceTrash();
 
-            const player = getPlayer();
-            if (player) {
-                player.position.x = 240;
-                player.position.y = 60;
+                const player = getPlayer();
+                if (player) {
+                    player.position.x = 240;
+                    player.position.y = 60;
+                }
+
+                await animatePlayerSwim(300);
+
+                q2.inSurface = false;
+                q2.completed = true;
+                q2.pendingSlimeCompletion = true;
+                hideKirbyAfterQuestTwo();
+                updateQuestHud();
+            } catch (err) {
+                console.error('Underwater return transition failed:', err);
+            } finally {
+                q2.returning = false;
+                this.playerLock = false;
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => overlay.remove(), 350);
+                }
             }
-
-            await animatePlayerSwim(300);
-
-            q2.inSurface = false;
-            q2.returning = false;
-            q2.completed = true;
-            q2.pendingSlimeCompletion = true;
-            hideKirbyAfterQuestTwo();
-            this.playerLock = false;
-
-            if (overlay) {
-                overlay.style.opacity = '0';
-                setTimeout(() => overlay.remove(), 350);
-            }
-
-            updateQuestHud();
         };
 
         this.updateQuestHud = updateQuestHud;
@@ -1340,6 +1678,25 @@ class GameLevelAquaticGameLevel {
         this.showSharkGameOver = () => {
             if (this.sharkGameOverShown) return;
             this.sharkGameOverShown = true;
+            const canRetryBossFight = !!(
+                this.bossState?.active ||
+                this.bossState?.combatReady ||
+                this.bossState?.introPlayed
+            );
+
+            // Freeze boss encounter immediately so no abilities continue after death.
+            if (this.bossState) {
+                this.bossState.combatReady = false;
+                this.bossState.activeAbility = null;
+                this.bossState.abilityCommitted = false;
+                if (this.bossState.laserBeam?.element) {
+                    this.bossState.laserBeam.element.remove();
+                }
+                this.bossState.laserBeam = null;
+                this.bossState.enemyProjectiles?.forEach((p) => p?.element?.remove());
+                this.bossState.enemyProjectiles = [];
+            }
+            this.playerLock = true;
 
             const existing = document.getElementById('aquatic-shark-gameover');
             if (existing) existing.remove();
@@ -1381,7 +1738,9 @@ class GameLevelAquaticGameLevel {
             const body = document.createElement('div');
             body.textContent = this.gameMode === 'challenge'
                 ? `You've been eaten by shark. Final score: ${challengeState.score}.`
-                : "You've been eaten by shark. You can replay.";
+                : (canRetryBossFight
+                    ? "You've been eaten by shark. You can retry the boss fight."
+                    : "You've been eaten by shark. You can replay.");
             Object.assign(body.style, {
                 fontSize: '12px',
                 lineHeight: '1.6',
@@ -1405,7 +1764,9 @@ class GameLevelAquaticGameLevel {
             });
 
             const restart = document.createElement('button');
-            restart.textContent = this.gameMode === 'challenge' ? 'Replay Challenge' : 'Replay';
+            restart.textContent = this.gameMode === 'challenge'
+                ? 'Replay Challenge'
+                : (canRetryBossFight ? 'Retry Boss Fight' : 'Replay');
             Object.assign(restart.style, {
                 width: '100%',
                 padding: '12px 16px',
@@ -1420,7 +1781,17 @@ class GameLevelAquaticGameLevel {
             });
 
             restart.onclick = () => {
-                window.location.reload();
+                if (this.gameMode === 'challenge') {
+                    window.location.reload();
+                    return;
+                }
+
+                overlay.remove();
+                if (canRetryBossFight) {
+                    this.retryBossEncounter?.();
+                } else {
+                    window.location.reload();
+                }
             };
 
             save.onclick = () => {
@@ -1434,6 +1805,1275 @@ class GameLevelAquaticGameLevel {
             overlay.appendChild(panel);
             document.body.appendChild(overlay);
         };
+
+        const getDirectionToward = (fromX, fromY, toX, toY) => {
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const absX = Math.abs(dx);
+            const absY = Math.abs(dy);
+            if (absX < 3 && absY < 3) return 'down';
+            if (absX > absY * 1.6) return dx >= 0 ? 'right' : 'left';
+            if (absY > absX * 1.6) return dy >= 0 ? 'down' : 'up';
+            if (dx >= 0 && dy >= 0) return 'downRight';
+            if (dx >= 0 && dy < 0) return 'upRight';
+            if (dx < 0 && dy >= 0) return 'downLeft';
+            return 'upLeft';
+        };
+
+        const ensureBossHud = () => {
+            if (!this.bossState.active || this.bossState.hud) return;
+
+            const hud = document.createElement('div');
+            hud.id = 'aquatic-boss-hud';
+            Object.assign(hud.style, {
+                position: 'fixed',
+            right: '14px',
+            top: '14px',
+                zIndex: '10060',
+            width: 'min(360px, 72vw)',
+                border: '2px solid rgba(255, 140, 140, 0.9)',
+                borderRadius: '12px',
+                background: 'rgba(33, 7, 13, 0.92)',
+                padding: '8px 10px',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                color: '#ffe8e8',
+                fontSize: '10px'
+            });
+
+            const title = document.createElement('div');
+            title.textContent = 'MEGALODON';
+            title.style.marginBottom = '6px';
+
+            const barWrap = document.createElement('div');
+            Object.assign(barWrap.style, {
+                width: '100%',
+                height: '14px',
+                borderRadius: '7px',
+                overflow: 'hidden',
+                background: 'rgba(255,255,255,0.12)'
+            });
+
+            const bar = document.createElement('div');
+            bar.id = 'aquatic-boss-hp-fill';
+            Object.assign(bar.style, {
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, #ff6161, #ffb347)',
+                transition: 'width 120ms linear'
+            });
+            barWrap.appendChild(bar);
+
+            const help = document.createElement('div');
+            help.textContent = 'Aim with mouse, Left Click: Shoot, Right Click: Trident Slash';
+            help.style.marginTop = '7px';
+            help.style.opacity = '0.92';
+            help.style.fontSize = '8px';
+
+            hud.appendChild(title);
+            hud.appendChild(barWrap);
+            hud.appendChild(help);
+            document.body.appendChild(hud);
+            this.bossState.hud = hud;
+
+            const playerHud = document.createElement('div');
+            playerHud.id = 'aquatic-player-hp-hud';
+            Object.assign(playerHud.style, {
+                position: 'fixed',
+                left: '14px',
+                bottom: '14px',
+                zIndex: '10060',
+                width: 'min(270px, 64vw)',
+                border: '2px solid rgba(102, 222, 255, 0.85)',
+                borderRadius: '12px',
+                background: 'rgba(3, 20, 38, 0.92)',
+                padding: '8px 10px',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                color: '#d9f7ff',
+                fontSize: '10px'
+            });
+
+            const pTitle = document.createElement('div');
+            pTitle.textContent = 'DIVER';
+            pTitle.style.marginBottom = '6px';
+
+            const pWrap = document.createElement('div');
+            Object.assign(pWrap.style, {
+                width: '100%',
+                height: '12px',
+                borderRadius: '6px',
+                overflow: 'hidden',
+                background: 'rgba(255,255,255,0.12)'
+            });
+
+            const pFill = document.createElement('div');
+            pFill.id = 'aquatic-player-hp-fill';
+            Object.assign(pFill.style, {
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, #66ffcc, #58bcff)',
+                transition: 'width 120ms linear'
+            });
+            pWrap.appendChild(pFill);
+
+            playerHud.appendChild(pTitle);
+            playerHud.appendChild(pWrap);
+            document.body.appendChild(playerHud);
+        };
+
+        const updateBossHud = () => {
+            if (!this.bossState.hud) return;
+            const fill = document.getElementById('aquatic-boss-hp-fill');
+            if (!fill) return;
+            const ratio = Math.max(0, Math.min(1, this.bossState.hp / this.bossState.maxHp));
+            fill.style.width = `${Math.round(ratio * 100)}%`;
+
+            const playerFill = document.getElementById('aquatic-player-hp-fill');
+            if (playerFill) {
+                const pRatio = Math.max(0, Math.min(1, this.bossState.playerHp / this.bossState.playerMaxHp));
+                playerFill.style.width = `${Math.round(pRatio * 100)}%`;
+            }
+        };
+
+        const showBottomStoryDialogue = async (speaker, text) => {
+            const existing = document.getElementById('aquatic-boss-dialogue');
+            if (existing) existing.remove();
+
+            const box = document.createElement('div');
+            box.id = 'aquatic-boss-dialogue';
+            Object.assign(box.style, {
+                position: 'fixed',
+                left: '50%',
+                bottom: '20px',
+                transform: 'translateX(-50%)',
+                zIndex: '10061',
+                width: 'min(860px, 92vw)',
+                background: 'rgba(4, 13, 30, 0.95)',
+                border: '2px solid rgba(136, 225, 255, 0.85)',
+                borderRadius: '12px',
+                padding: '12px',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                color: '#dff8ff',
+                fontSize: '13px',
+                lineHeight: '1.6',
+                boxShadow: '0 10px 22px rgba(0,0,0,0.4)'
+            });
+
+            const speakerEl = document.createElement('div');
+            speakerEl.textContent = speaker;
+            speakerEl.style.color = '#88e1ff';
+            speakerEl.style.marginBottom = '8px';
+            const textEl = document.createElement('div');
+            textEl.textContent = text;
+
+            box.appendChild(speakerEl);
+            box.appendChild(textEl);
+            document.body.appendChild(box);
+
+            await new Promise((resolve) => setTimeout(resolve, 2600));
+            box.remove();
+        };
+
+        const shakeWorld = async (ms = 900) => {
+            const bg = this.gameEnv?.gameObjects?.find(obj => obj?.constructor?.name === 'GameEnvBackground');
+            const target = bg?.canvas || document.body;
+            if (!target) return;
+
+            const animationName = 'aquatic-world-shake';
+            if (!document.getElementById('aquatic-shake-style')) {
+                const style = document.createElement('style');
+                style.id = 'aquatic-shake-style';
+                style.textContent = `
+                    @keyframes ${animationName} {
+                        0% { transform: translate(0,0); }
+                        20% { transform: translate(-6px, 4px); }
+                        40% { transform: translate(7px, -4px); }
+                        60% { transform: translate(-5px, -3px); }
+                        80% { transform: translate(5px, 3px); }
+                        100% { transform: translate(0,0); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            target.style.animation = `${animationName} 120ms linear infinite`;
+            await new Promise((resolve) => setTimeout(resolve, ms));
+            target.style.animation = '';
+        };
+
+        const spawnHitEffect = (x, y, color = '#9ef8ff') => {
+            const fx = document.createElement('div');
+            Object.assign(fx.style, {
+                position: 'absolute',
+                left: `${x}px`,
+                top: `${this.gameEnv.top + y}px`,
+                width: '20px',
+                height: '20px',
+                borderRadius: '50%',
+                border: `2px solid ${color}`,
+                boxShadow: `0 0 16px ${color}`,
+                transform: 'translate(-50%, -50%) scale(0.4)',
+                opacity: '1',
+                transition: 'transform 240ms ease, opacity 240ms ease',
+                pointerEvents: 'none',
+                zIndex: '10062'
+            });
+            document.body.appendChild(fx);
+            requestAnimationFrame(() => {
+                fx.style.transform = 'translate(-50%, -50%) scale(2.2)';
+                fx.style.opacity = '0';
+            });
+            setTimeout(() => fx.remove(), 260);
+        };
+
+        const applyBossDamage = (damage, hitX, hitY) => {
+            if (!this.bossState.active) return;
+            this.bossState.hp = Math.max(0, this.bossState.hp - damage);
+            updateBossHud();
+            spawnHitEffect(hitX, hitY, '#86f8ff');
+
+            if (this.bossState.megalodon?.canvas) {
+                this.bossState.megalodon.canvas.style.filter = 'brightness(1.55) saturate(1.2)';
+                setTimeout(() => {
+                    if (this.bossState.megalodon?.canvas) {
+                        this.bossState.megalodon.canvas.style.filter = '';
+                    }
+                }, 120);
+            }
+
+            const showBossVictoryWindow = () => {
+                const existing = document.getElementById('aquatic-boss-victory');
+                if (existing) existing.remove();
+
+                const overlay = document.createElement('div');
+                overlay.id = 'aquatic-boss-victory';
+                Object.assign(overlay.style, {
+                    position: 'fixed',
+                    inset: '0',
+                    zIndex: '10080',
+                    background: 'rgba(3, 10, 24, 0.78)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                });
+
+                const panel = document.createElement('div');
+                Object.assign(panel.style, {
+                    width: 'min(520px, 92vw)',
+                    borderRadius: '16px',
+                    padding: '22px',
+                    background: 'linear-gradient(180deg, rgba(8, 46, 74, 0.95), rgba(4, 18, 36, 0.95))',
+                    border: '2px solid rgba(110, 206, 255, 0.8)',
+                    boxShadow: '0 0 30px rgba(56, 183, 255, 0.35)',
+                    color: '#e6fbff',
+                    fontFamily: "'Press Start 2P', cursive, monospace",
+                    textAlign: 'center'
+                });
+
+                const title = document.createElement('div');
+                title.textContent = 'MEGALODON DEFEATED';
+                Object.assign(title.style, {
+                    fontSize: '16px',
+                    marginBottom: '14px',
+                    color: '#7de2ff',
+                    textShadow: '0 0 12px rgba(125, 226, 255, 0.7)'
+                });
+
+                const body = document.createElement('div');
+                body.textContent = 'The ocean is safe again. Continue to the next level.';
+                Object.assign(body.style, {
+                    fontSize: '11px',
+                    lineHeight: '1.7',
+                    marginBottom: '18px'
+                });
+
+                const nextButton = document.createElement('button');
+                nextButton.textContent = 'Next Level';
+                Object.assign(nextButton.style, {
+                    width: '100%',
+                    padding: '12px 16px',
+                    borderRadius: '12px',
+                    border: 'none',
+                    fontFamily: "'Press Start 2P', cursive, monospace",
+                    fontSize: '12px',
+                    background: 'linear-gradient(90deg, #35b9ff, #5cf0ff)',
+                    color: '#032030',
+                    cursor: 'pointer',
+                    boxShadow: '0 6px 18px rgba(53, 185, 255, 0.4)'
+                });
+
+                nextButton.onclick = () => {
+                    const gameControl = this.gameEnv?.gameControl;
+                    const game = this.gameEnv?.game;
+                    if (gameControl?.currentLevel) {
+                        gameControl.currentLevel.levelCompleted = true;
+                        gameControl.currentLevel.continue = false;
+                    }
+
+                    if (typeof gameControl?.nextLevel === 'function') {
+                        gameControl.nextLevel();
+                    } else if (typeof game?.loadNextLevel === 'function') {
+                        game.loadNextLevel();
+                    } else if (typeof gameControl?.goToNextLevel === 'function') {
+                        gameControl.goToNextLevel();
+                    }
+
+                    overlay.remove();
+                };
+
+                panel.appendChild(title);
+                panel.appendChild(body);
+                panel.appendChild(nextButton);
+                overlay.appendChild(panel);
+                document.body.appendChild(overlay);
+            };
+
+            if (this.bossState.hp <= 0) {
+                this.bossState.combatReady = false;
+                if (this.bossState.megalodon?.destroy) {
+                    this.bossState.megalodon.destroy();
+                }
+                this.bossState.megalodon = null;
+                this.bossState.active = false;
+                showBossVictoryWindow();
+            }
+        };
+
+        const applyPlayerDamage = (damage, hitX, hitY) => {
+            if (!this.bossState.active || !this.bossState.combatReady) return;
+            this.bossState.playerHp = Math.max(0, this.bossState.playerHp - damage);
+            if (typeof hitX === 'number' && typeof hitY === 'number') {
+                spawnHitEffect(hitX, hitY, '#ff9aa6');
+            }
+            updateBossHud();
+            if (this.bossState.playerHp <= 0) {
+                this.showSharkGameOver();
+            }
+        };
+
+        const fireTridentShot = () => {
+            if (!this.bossState.combatReady) return;
+            const player = getPlayer();
+            if (!player) return;
+
+            const now = Date.now();
+            if (now - this.bossState.lastShotAt < this.bossState.shotCooldownMs) return;
+            this.bossState.lastShotAt = now;
+
+            const px = player.position.x + player.width * 0.5;
+            const py = player.position.y + player.height * 0.5;
+            const dx = this.bossState.mouseX - px;
+            const dy = this.bossState.mouseY - py;
+            const mag = Math.max(1, Math.hypot(dx, dy));
+            const vx = (dx / mag) * 9.2;
+            const vy = (dy / mag) * 9.2;
+
+            const bolt = document.createElement('div');
+            Object.assign(bolt.style, {
+                position: 'absolute',
+                width: '52px',
+                height: '122px',
+                borderRadius: '0',
+                background: 'transparent',
+                pointerEvents: 'none',
+                zIndex: '10062',
+                transformOrigin: 'center center'
+            });
+            bolt.style.backgroundImage = `url(${tridentSpriteSrc})`;
+            bolt.style.backgroundSize = 'contain';
+            bolt.style.backgroundRepeat = 'no-repeat';
+            bolt.style.backgroundPosition = 'center';
+            bolt.style.filter = 'none';
+            document.body.appendChild(bolt);
+
+            this.bossState.projectiles.push({
+                x: px,
+                y: py,
+                vx,
+                vy,
+                angleOffset: tridentAimOffset,
+                life: 0,
+                element: bolt
+            });
+        };
+
+        const swingTrident = () => {
+            if (!this.bossState.combatReady) return;
+            const player = getPlayer();
+            const boss = this.bossState.megalodon;
+            if (!player || !boss) return;
+
+            const now = Date.now();
+            if (now - this.bossState.lastMeleeAt < this.bossState.meleeCooldownMs) return;
+            this.bossState.lastMeleeAt = now;
+
+            const px = player.position.x + player.width * 0.5;
+            const py = player.position.y + player.height * 0.5;
+            const angle = Math.atan2(this.bossState.mouseY - py, this.bossState.mouseX - px);
+
+            const arc = document.createElement('div');
+            Object.assign(arc.style, {
+                position: 'absolute',
+                left: `${px}px`,
+                top: `${this.gameEnv.top + py}px`,
+                width: '96px',
+                height: '96px',
+                borderRadius: '50%',
+                border: '3px solid transparent',
+                borderTopColor: '#b0fbff',
+                borderRightColor: '#b0fbff',
+                transform: `translate(-50%, -50%) rotate(${angle}rad)`,
+                boxShadow: '0 0 20px rgba(176,251,255,0.85)',
+                opacity: '0.95',
+                zIndex: '10063',
+                pointerEvents: 'none',
+                transition: 'transform 150ms ease, opacity 150ms ease'
+            });
+            document.body.appendChild(arc);
+
+            const tridentSwing = document.createElement('div');
+            Object.assign(tridentSwing.style, {
+                position: 'absolute',
+                left: `${px}px`,
+                top: `${this.gameEnv.top + py}px`,
+                width: '58px',
+                height: '152px',
+                transform: `translate(-50%, -66%) rotate(${angle + tridentAimOffset}rad)`,
+                transformOrigin: '50% 78%',
+                pointerEvents: 'none',
+                zIndex: '10064',
+                backgroundImage: `url(${tridentSpriteSrc})`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                filter: 'none',
+                opacity: '0.95',
+                transition: 'transform 150ms ease, opacity 150ms ease'
+            });
+            document.body.appendChild(tridentSwing);
+            requestAnimationFrame(() => {
+                arc.style.transform = `translate(-50%, -50%) rotate(${angle + 1.4}rad)`;
+                arc.style.opacity = '0';
+                tridentSwing.style.transform = `translate(-50%, -66%) rotate(${angle + tridentAimOffset + 1.35}rad)`;
+                tridentSwing.style.opacity = '0';
+            });
+            setTimeout(() => arc.remove(), 170);
+            setTimeout(() => tridentSwing.remove(), 170);
+
+            const bx = boss.position.x + boss.width * 0.5;
+            const by = boss.position.y + boss.height * 0.5;
+            const dist = Math.hypot(bx - px, by - py);
+            if (dist < 150) {
+                applyBossDamage(18, bx, by);
+            }
+
+            // Summoned sharks are intentionally fragile and die in one melee hit.
+            this.bossState.summons = this.bossState.summons.filter((minion) => {
+                const mx = (minion.obj?.position?.x || 0) + (minion.obj?.width || 0) * 0.5;
+                const my = (minion.obj?.position?.y || 0) + (minion.obj?.height || 0) * 0.5;
+                const mDist = Math.hypot(mx - px, my - py);
+                if (mDist < 140) {
+                    spawnHitEffect(mx, my, '#ffd18a');
+                    if (minion.obj?.destroy) minion.obj.destroy();
+                    return false;
+                }
+                return true;
+            });
+
+            const swingForwardX = Math.cos(angle);
+            const swingForwardY = Math.sin(angle);
+            this.bossState.enemyProjectiles = this.bossState.enemyProjectiles.filter((projectile) => {
+                if (projectile?.type !== 'rocket') return true;
+
+                const rocketDx = projectile.x - px;
+                const rocketDy = projectile.y - py;
+                const rocketDist = Math.hypot(rocketDx, rocketDy);
+                if (rocketDist > 148) return true;
+
+                const alignment = rocketDist > 0
+                    ? ((rocketDx / rocketDist) * swingForwardX + (rocketDy / rocketDist) * swingForwardY)
+                    : 1;
+                if (alignment < 0.12) return true;
+
+                const bossDx = bx - projectile.x;
+                const bossDy = by - projectile.y;
+                const bossMag = Math.max(1, Math.hypot(bossDx, bossDy));
+                const reflectedSpeed = Math.max(7.1, (projectile.speed || 5) + 1.9);
+                projectile.vx = (bossDx / bossMag) * reflectedSpeed;
+                projectile.vy = (bossDy / bossMag) * reflectedSpeed;
+                projectile.speed = reflectedSpeed;
+                projectile.homing = 0;
+                projectile.damage = 24;
+                projectile.life = 0;
+                projectile.angleOffset = projectile.angleOffset || 0;
+                if (projectile.element) {
+                    projectile.element.style.filter = 'brightness(1.08) hue-rotate(165deg)';
+                }
+                if (projectile.flameElement) {
+                    projectile.flameElement.style.background = 'linear-gradient(90deg, rgba(212,255,255,0.98) 0%, rgba(118,242,255,0.94) 38%, rgba(58,180,255,0.9) 72%, rgba(58,180,255,0) 100%)';
+                }
+                spawnHitEffect(projectile.x, projectile.y, '#8ff9ff');
+                this.bossState.projectiles.push(projectile);
+                return false;
+            });
+        };
+
+        const summonRushingSharks = () => {
+            if (!this.bossState.active || this.bossState.summonedAtQuarterHp) return;
+
+            this.bossState.summonedAtQuarterHp = true;
+            const summonCount = 3 + Math.floor(Math.random() * 2);
+
+            for (let i = 0; i < summonCount; i += 1) {
+                const minionData = {
+                    id: `MegalodonSummon_${Date.now()}_${i}`,
+                    greeting: false,
+                    src: path + '/images/Shark.png',
+                    SCALE_FACTOR: 6.4,
+                    STEP_FACTOR: 0,
+                    ANIMATION_RATE: 8,
+                    INIT_POSITION: {
+                        x: 90 + Math.random() * 120,
+                        y: this.gameEnv.innerHeight - 200 - Math.random() * 130
+                    },
+                    orientation: { rows: 1, columns: 1 },
+                    down: { row: 0, start: 0, columns: 1 },
+                    right: { row: 0, start: 0, columns: 1, mirror: true },
+                    left: { row: 0, start: 0, columns: 1 },
+                    up: { row: 0, start: 0, columns: 1 },
+                    upRight: { row: 0, start: 0, columns: 1, mirror: true },
+                    downRight: { row: 0, start: 0, columns: 1, mirror: true },
+                    upLeft: { row: 0, start: 0, columns: 1 },
+                    downLeft: { row: 0, start: 0, columns: 1 },
+                    hitbox: { widthPercentage: 0.22, heightPercentage: 0.24 },
+                    reaction: function() {}
+                };
+
+                const sharkMinion = new Npc(minionData, this.gameEnv);
+                this.gameEnv.gameObjects.push(sharkMinion);
+                this.bossState.summons.push({
+                    obj: sharkMinion,
+                    speed: 2.4 + Math.random() * 0.9,
+                    wobblePhase: Math.random() * Math.PI * 2
+                });
+            }
+        };
+
+        const updateBossCombat = () => {
+            if (!this.bossState.active || !this.bossState.combatReady) return;
+            const boss = this.bossState.megalodon;
+            const player = getPlayer();
+            if (!boss || !player) return;
+
+            const abilityDurations = {
+                laser: 1480,
+                rockets: 980,
+                bodySwing: 900
+            };
+
+            const top = this.gameEnv.top || 0;
+            const bx = boss.position.x + boss.width * 0.5;
+            const by = boss.position.y + boss.height * 0.5;
+
+            const dxPlayer = (player.position.x + player.width * 0.5) - bx;
+            const dyPlayer = (player.position.y + player.height * 0.5) - by;
+            const distanceToPlayer = Math.hypot(dxPlayer, dyPlayer);
+
+            if (!boss._bossAnim) {
+                boss._bossAnim = { attacking: false, attackUntil: 0 };
+            }
+
+            const state = this.bossState;
+
+            if (!state.summonedAtQuarterHp && state.hp <= state.maxHp * 0.25) {
+                summonRushingSharks();
+            }
+
+            const setBossSpriteSheet = (src, pixels) => {
+                if (!boss?.spriteSheet) return;
+
+                const sameSource = boss.spriteData?.src === src;
+                const samePixels =
+                    boss.spriteData?.pixels?.width === pixels.width &&
+                    boss.spriteData?.pixels?.height === pixels.height;
+
+                if (!samePixels) {
+                    boss.spriteData.pixels = { ...pixels };
+                    boss.resize();
+                }
+
+                if (!sameSource) {
+                    boss.spriteData.src = src;
+                    boss.frameIndex = 0;
+                    boss.frameCounter = 0;
+                    boss.spriteSheet.src = src;
+                }
+            };
+
+            const startAbility = (name, durationMs) => {
+                state.activeAbility = name;
+                state.abilityEndsAt = Date.now() + durationMs;
+                state.abilityCommitted = false;
+                state.lastAbilityAt[name] = Date.now();
+                state.nextAbilityAt = Date.now() + state.abilityGlobalCooldownMs;
+                setBossSpriteSheet(state.megalodonAttackSheet, state.megalodonAttackPixels);
+
+                if (name === 'laser') {
+                    boss.direction = 'laserAttack';
+                } else if (name === 'rockets') {
+                    boss.direction = 'rocketAttack';
+                } else {
+                    state.swingHitsLeft = 2;
+                    boss.direction = 'swingAttackA';
+                }
+                boss.frameIndex = 0;
+                boss.frameCounter = 0;
+            };
+
+            const distancePointToSegment = (px, py, x1, y1, x2, y2) => {
+                const vx = x2 - x1;
+                const vy = y2 - y1;
+                const wx = px - x1;
+                const wy = py - y1;
+                const vv = vx * vx + vy * vy;
+                const t = vv > 0 ? Math.max(0, Math.min(1, (wx * vx + wy * vy) / vv)) : 0;
+                const cx = x1 + t * vx;
+                const cy = y1 + t * vy;
+                return Math.hypot(px - cx, py - cy);
+            };
+
+            const commitLaser = () => {
+                const px = player.position.x + player.width * 0.5;
+                const py = player.position.y + player.height * 0.5;
+                const ang = Math.atan2(py - by, px - bx);
+                const length = Math.min(this.gameEnv.innerWidth, 580);
+
+                if (state.laserBeam?.element) state.laserBeam.element.remove();
+                const beam = document.createElement('div');
+                Object.assign(beam.style, {
+                    position: 'absolute',
+                    width: `${length}px`,
+                    height: '12px',
+                    borderRadius: '9px',
+                    background: 'linear-gradient(90deg, rgba(124,221,255,0.2), #33c8ff 35%, #7cf6ff 70%, rgba(164,245,255,0.32))',
+                    boxShadow: '0 0 20px rgba(51,200,255,0.95), 0 0 34px rgba(124,246,255,0.82)',
+                    pointerEvents: 'none',
+                    zIndex: '10062',
+                    transformOrigin: 'left center',
+                    opacity: '0.38'
+                });
+                document.body.appendChild(beam);
+
+                const endX = bx + Math.cos(ang) * length;
+                const endY = by + Math.sin(ang) * length;
+                state.laserBeam = {
+                    x1: bx,
+                    y1: by,
+                    x2: endX,
+                    y2: endY,
+                    angle: ang,
+                    until: Date.now() + 560,
+                    hitStartsAt: Date.now() + 180,
+                    hitWindowUntil: Date.now() + 280,
+                    element: beam
+                };
+            };
+
+            const commitRockets = () => {
+                const playerX = player.position.x + player.width * 0.5;
+                const playerY = player.position.y + player.height * 0.5;
+                const targetAngle = Math.atan2(playerY - by, playerX - bx);
+                const rocketArtAngleOffset = 0.58;
+                const spawnRocketBurst = (x, y) => {
+                    const burst = document.createElement('div');
+                    Object.assign(burst.style, {
+                        position: 'absolute',
+                        left: `${x}px`,
+                        top: `${top + y}px`,
+                        width: '18px',
+                        height: '18px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(255,243,168,0.98) 0%, rgba(255,156,74,0.95) 45%, rgba(255,110,43,0.28) 78%, rgba(255,110,43,0) 100%)',
+                        boxShadow: '0 0 14px rgba(255,170,84,0.85)',
+                        transform: 'translate(-50%, -50%) scale(0.45)',
+                        opacity: '0.96',
+                        pointerEvents: 'none',
+                        zIndex: '10063',
+                        transition: 'transform 180ms ease-out, opacity 180ms ease-out'
+                    });
+                    document.body.appendChild(burst);
+                    requestAnimationFrame(() => {
+                        burst.style.transform = 'translate(-50%, -50%) scale(2.2)';
+                        burst.style.opacity = '0';
+                    });
+                    setTimeout(() => burst.remove(), 200);
+                };
+
+                const rocketLaunches = [
+                    { angle: targetAngle - 0.54, spawnOffsetY: -22, homing: 0, speed: 5.1 },
+                    { angle: targetAngle - 0.18, spawnOffsetY: -8, homing: 0, speed: 5.5 },
+                    { angle: targetAngle + 0.16, spawnOffsetY: 10, homing: 0.09, speed: 5.2 },
+                    { angle: targetAngle + 0.48, spawnOffsetY: 24, homing: 0, speed: 4.9 }
+                ];
+
+                for (const launch of rocketLaunches) {
+                    const rocket = document.createElement('div');
+                    Object.assign(rocket.style, {
+                        position: 'absolute',
+                        width: '72px',
+                        height: '24px',
+                        borderRadius: '6px',
+                        background: 'transparent',
+                        pointerEvents: 'none',
+                        zIndex: '10062',
+                        transformOrigin: 'left center'
+                    });
+                    rocket.style.backgroundImage = `url(${state.rocketSprite})`;
+                    rocket.style.backgroundSize = 'contain';
+                    rocket.style.backgroundRepeat = 'no-repeat';
+                    rocket.style.backgroundPosition = 'center';
+                    rocket.style.filter = 'none';
+
+                    const flame = document.createElement('div');
+                    Object.assign(flame.style, {
+                        position: 'absolute',
+                        left: '-16px',
+                        top: '50%',
+                        width: '24px',
+                        height: '13px',
+                        borderRadius: '10px 0 0 10px',
+                        background: 'linear-gradient(90deg, rgba(255,244,184,0.98) 0%, rgba(255,194,92,0.95) 38%, rgba(255,125,44,0.92) 72%, rgba(255,84,28,0) 100%)',
+                        transform: 'translate(-10%, -50%) skewX(-12deg)',
+                        transformOrigin: 'right center',
+                        filter: 'drop-shadow(0 0 8px rgba(255,172,72,0.85))',
+                        pointerEvents: 'none',
+                        opacity: '0.95'
+                    });
+                    rocket.appendChild(flame);
+
+                    document.body.appendChild(rocket);
+
+                    const spawnX = bx - Math.cos(launch.angle) * 12;
+                    const spawnY = by + launch.spawnOffsetY - Math.sin(launch.angle) * 12;
+                    spawnRocketBurst(spawnX, spawnY);
+
+                    state.enemyProjectiles.push({
+                        type: 'rocket',
+                        x: bx,
+                        y: by + launch.spawnOffsetY,
+                        vx: Math.cos(launch.angle) * launch.speed,
+                        vy: Math.sin(launch.angle) * launch.speed,
+                        speed: launch.speed,
+                        homing: launch.homing,
+                        angleOffset: rocketArtAngleOffset,
+                        life: 0,
+                        damageRange: 26,
+                        element: rocket,
+                        flameElement: flame,
+                        flamePhase: Math.random() * Math.PI * 2
+                    });
+                }
+            };
+
+            const commitBodySwing = () => {
+                const px = player.position.x + player.width * 0.5;
+                const py = player.position.y + player.height * 0.5;
+                const dist = Math.hypot(px - bx, py - by);
+
+                const shock = document.createElement('div');
+                Object.assign(shock.style, {
+                    position: 'absolute',
+                    left: `${bx}px`,
+                    top: `${top + by}px`,
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '50%',
+                    border: '3px solid rgba(255,176,99,0.9)',
+                    transform: 'translate(-50%, -50%) scale(0.5)',
+                    opacity: '0.9',
+                    boxShadow: '0 0 22px rgba(255,176,99,0.85)',
+                    zIndex: '10063',
+                    pointerEvents: 'none',
+                    transition: 'transform 220ms ease, opacity 220ms ease'
+                });
+                document.body.appendChild(shock);
+                requestAnimationFrame(() => {
+                    shock.style.transform = 'translate(-50%, -50%) scale(2.6)';
+                    shock.style.opacity = '0';
+                });
+                setTimeout(() => shock.remove(), 230);
+
+                if (dist < 130) {
+                    applyPlayerDamage(48, px, py);
+                }
+            };
+
+            const chaseDistance = state.activeAbility === 'bodySwing' ? 118 : (state.activeAbility === 'rockets' ? 205 : 162);
+            const playerX = player.position.x + player.width * 0.5;
+            const playerY = player.position.y + player.height * 0.5;
+            const toPlayerX = playerX - bx;
+            const toPlayerY = playerY - by;
+            const toPlayerMag = Math.max(1, Math.hypot(toPlayerX, toPlayerY));
+            const normalizedX = toPlayerX / toPlayerMag;
+            const normalizedY = toPlayerY / toPlayerMag;
+            const orbitX = -normalizedY;
+            const orbitY = normalizedX;
+            const swimBob = Math.sin(performance.now() * 0.0032) * 24;
+            const desiredCenterX = playerX - normalizedX * chaseDistance + orbitX * 22;
+            const desiredCenterY = playerY - normalizedY * chaseDistance + orbitY * swimBob * 0.28;
+            const clampedCenterX = Math.max(boss.width * 0.55, Math.min(this.gameEnv.innerWidth - boss.width * 0.55, desiredCenterX));
+            const clampedCenterY = Math.max(boss.height * 0.55, Math.min(this.gameEnv.innerHeight - boss.height * 0.55, desiredCenterY));
+            const isLaserCharging = state.activeAbility === 'laser' && !state.abilityCommitted;
+            const moveLerp = state.activeAbility === 'bodySwing' ? 0.026 : 0.014;
+
+            if (!isLaserCharging) {
+                boss.position.x += (clampedCenterX - bx) * moveLerp;
+                boss.position.y += (clampedCenterY - by) * moveLerp;
+            }
+
+            if (!state.activeAbility) {
+                boss.direction = getDirectionToward(bx, by, playerX, playerY);
+            }
+
+            const now = Date.now();
+            const laserReady = now - state.lastAbilityAt.laser >= state.cooldowns.laser;
+            const rocketsReady = now - state.lastAbilityAt.rockets >= state.cooldowns.rockets;
+            const swingReady = now - state.lastAbilityAt.bodySwing >= state.cooldowns.bodySwing;
+
+            if (!state.activeAbility && now >= state.nextAbilityAt) {
+                if (distanceToPlayer < 170 && swingReady) {
+                    startAbility('bodySwing', abilityDurations.bodySwing);
+                } else if (distanceToPlayer >= 170 && rocketsReady) {
+                    startAbility('rockets', abilityDurations.rockets);
+                } else if (laserReady) {
+                    startAbility('laser', abilityDurations.laser);
+                }
+            }
+
+            if (state.activeAbility) {
+                const currentAbilityDuration = abilityDurations[state.activeAbility] || abilityDurations.laser;
+                const progress = 1 - Math.max(0, (state.abilityEndsAt - now) / Math.max(1, currentAbilityDuration));
+                const commitThreshold = state.activeAbility === 'laser' ? 0.78 : 0.56;
+
+                if (state.activeAbility === 'laser') {
+                    boss.direction = 'laserAttack';
+                } else if (state.activeAbility === 'rockets') {
+                    boss.direction = 'rocketAttack';
+                }
+
+                if (!state.abilityCommitted && progress > commitThreshold) {
+                    if (state.activeAbility === 'laser') {
+                        commitLaser();
+                    } else if (state.activeAbility === 'rockets') {
+                        commitRockets();
+                    } else if (state.activeAbility === 'bodySwing') {
+                        commitBodySwing();
+                    }
+                    state.abilityCommitted = true;
+                }
+
+                if (state.activeAbility === 'bodySwing' && progress > 0.46 && progress < 0.88) {
+                    boss.direction = progress < 0.67 ? 'swingAttackA' : 'swingAttackB';
+                }
+
+                if (now >= state.abilityEndsAt) {
+                    state.activeAbility = null;
+                    state.abilityCommitted = false;
+                    setBossSpriteSheet(state.megalodonMoveSheet, state.megalodonMovePixels);
+                }
+            }
+
+            state.projectiles = state.projectiles.filter((p) => {
+                p.life += 1;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.element) {
+                    p.element.style.left = `${p.x}px`;
+                    p.element.style.top = `${top + p.y}px`;
+                    p.element.style.transform = `translate(-50%, -50%) rotate(${Math.atan2(p.vy, p.vx) + (p.angleOffset || 0)}rad)`;
+                }
+
+                if (p.flameElement) {
+                    const flicker = 0.84 + Math.sin(p.life * 0.55 + (p.flamePhase || 0)) * 0.16;
+                    p.flameElement.style.width = `${24 * flicker}px`;
+                    p.flameElement.style.opacity = `${0.68 + flicker * 0.26}`;
+                    p.flameElement.style.filter = `drop-shadow(0 0 ${7 + flicker * 5}px rgba(255,172,72,0.9))`;
+                }
+
+                const hit = (
+                    p.x > boss.position.x &&
+                    p.x < boss.position.x + boss.width &&
+                    p.y > boss.position.y &&
+                    p.y < boss.position.y + boss.height
+                );
+
+                const hitSummon = state.summons.findIndex((minion) => {
+                    const obj = minion.obj;
+                    if (!obj || !obj.position) return false;
+                    return (
+                        p.x > obj.position.x &&
+                        p.x < obj.position.x + obj.width &&
+                        p.y > obj.position.y &&
+                        p.y < obj.position.y + obj.height
+                    );
+                });
+
+                if (hitSummon >= 0) {
+                    const minion = state.summons[hitSummon];
+                    const mx = (minion.obj?.position?.x || p.x) + (minion.obj?.width || 0) * 0.5;
+                    const my = (minion.obj?.position?.y || p.y) + (minion.obj?.height || 0) * 0.5;
+                    spawnHitEffect(mx, my, '#ffd18a');
+                    if (minion.obj?.destroy) minion.obj.destroy();
+                    state.summons.splice(hitSummon, 1);
+                    if (p.element) p.element.remove();
+                    return false;
+                }
+
+                if (hit) {
+                    if (p.element) p.element.remove();
+                    applyBossDamage(p.damage || 9, p.x, p.y);
+                    return false;
+                }
+
+                if (
+                    p.life > 120 ||
+                    p.x < -20 || p.x > this.gameEnv.innerWidth + 20 ||
+                    p.y < -20 || p.y > this.gameEnv.innerHeight + 20
+                ) {
+                    if (p.element) p.element.remove();
+                    return false;
+                }
+
+                return true;
+            });
+
+            state.summons = state.summons.filter((minion) => {
+                const obj = minion.obj;
+                if (!obj || !obj.canvas || !obj.position) return false;
+
+                const playerX = player.position.x + player.width * 0.5;
+                const playerY = player.position.y + player.height * 0.5;
+                const mx = obj.position.x + obj.width * 0.5;
+                const my = obj.position.y + obj.height * 0.5;
+
+                const dx = playerX - mx;
+                const dy = playerY - my;
+                const mag = Math.max(1, Math.hypot(dx, dy));
+                const wobble = Math.sin(performance.now() * 0.006 + minion.wobblePhase) * 0.75;
+
+                obj.position.x += (dx / mag) * minion.speed;
+                obj.position.y += (dy / mag) * minion.speed + wobble;
+                obj.direction = getDirectionToward(mx, my, playerX, playerY);
+                // Let the engine's normal update/draw cycle render this NPC once per frame.
+
+                if (obj.canvas) {
+                    obj.canvas.style.filter = 'brightness(1.18) saturate(1.1)';
+                }
+
+                if (Math.hypot(playerX - (obj.position.x + obj.width * 0.5), playerY - (obj.position.y + obj.height * 0.5)) < 55) {
+                    applyPlayerDamage(20, playerX, playerY);
+                }
+
+                return true;
+            });
+
+            state.enemyProjectiles = state.enemyProjectiles.filter((p) => {
+                p.life += 1;
+
+                const playerX = player.position.x + player.width * 0.5;
+                const playerY = player.position.y + player.height * 0.5;
+
+                if (p.type === 'rocket' && p.homing > 0) {
+                    const tx = playerX - p.x;
+                    const ty = playerY - p.y;
+                    const tMag = Math.max(1, Math.hypot(tx, ty));
+                    const desiredVX = (tx / tMag) * p.speed;
+                    const desiredVY = (ty / tMag) * p.speed;
+                    p.vx += (desiredVX - p.vx) * p.homing;
+                    p.vy += (desiredVY - p.vy) * p.homing;
+                }
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.element) {
+                    p.element.style.left = `${p.x}px`;
+                    p.element.style.top = `${top + p.y}px`;
+                    p.element.style.transform = `translate(-50%, -50%) rotate(${Math.atan2(p.vy, p.vx) + (p.angleOffset || 0)}rad)`;
+                }
+
+                if (p.flameElement) {
+                    const flicker = 0.86 + Math.sin(p.life * 0.72 + (p.flamePhase || 0)) * 0.18;
+                    p.flameElement.style.width = `${24 * flicker}px`;
+                    p.flameElement.style.opacity = `${0.7 + flicker * 0.22}`;
+                    p.flameElement.style.filter = `drop-shadow(0 0 ${8 + flicker * 6}px rgba(255,172,72,0.92))`;
+                }
+
+                const dToPlayer = Math.hypot(playerX - p.x, playerY - p.y);
+                if (dToPlayer < p.damageRange) {
+                    if (p.element) p.element.remove();
+                    applyPlayerDamage(p.type === 'rocket' ? 34 : 28, playerX, playerY);
+                    return false;
+                }
+
+                if (
+                    p.life > 200 ||
+                    p.x < -40 || p.x > this.gameEnv.innerWidth + 40 ||
+                    p.y < -40 || p.y > this.gameEnv.innerHeight + 40
+                ) {
+                    if (p.element) p.element.remove();
+                    return false;
+                }
+
+                return true;
+            });
+
+            if (state.laserBeam) {
+                const beam = state.laserBeam;
+                if (beam.element) {
+                    beam.element.style.left = `${beam.x1}px`;
+                    beam.element.style.top = `${top + beam.y1}px`;
+                    beam.element.style.transform = `translate(0, -50%) rotate(${beam.angle}rad)`;
+                    const now = Date.now();
+                    if (now < beam.hitStartsAt) {
+                        beam.element.style.opacity = '0.38';
+                        beam.element.style.filter = 'drop-shadow(0 0 8px rgba(124,246,255,0.65))';
+                    } else if (now <= beam.hitWindowUntil) {
+                        beam.element.style.opacity = '0.96';
+                        beam.element.style.filter = 'drop-shadow(0 0 18px rgba(51,200,255,0.92))';
+                    } else {
+                        beam.element.style.opacity = '0.72';
+                    }
+                }
+
+                const playerX = player.position.x + player.width * 0.5;
+                const playerY = player.position.y + player.height * 0.5;
+                const now = Date.now();
+                if (now >= beam.hitStartsAt && now <= beam.hitWindowUntil) {
+                    const dLine = distancePointToSegment(playerX, playerY, beam.x1, beam.y1, beam.x2, beam.y2);
+                    if (dLine < 20) {
+                        applyPlayerDamage(42, playerX, playerY);
+                    }
+                }
+
+                if (Date.now() > beam.until) {
+                    if (beam.element) beam.element.remove();
+                    state.laserBeam = null;
+                }
+            }
+
+            const px = player.position.x + player.width * 0.5;
+            const py = player.position.y + player.height * 0.5;
+            player.direction = getDirectionToward(px, py, bx, by);
+
+            if (!state.activeAbility) {
+                setBossSpriteSheet(state.megalodonMoveSheet, state.megalodonMovePixels);
+            }
+        };
+
+        const bindBossInput = () => {
+            if (this.bossState.listenersBound) return;
+            this.bossState.listenersBound = true;
+
+            this.bossState._onMouseMove = (event) => {
+                this.bossState.mouseX = event.clientX;
+                this.bossState.mouseY = event.clientY - (this.gameEnv.top || 0);
+            };
+
+            this.bossState._onMouseDown = (event) => {
+                if (!this.bossState.combatReady) return;
+                if (event.button === 0) {
+                    fireTridentShot();
+                } else if (event.button === 2) {
+                    event.preventDefault();
+                    swingTrident();
+                }
+            };
+
+            this.bossState._onContext = (event) => {
+                if (this.bossState.combatReady) event.preventDefault();
+            };
+
+            window.addEventListener('mousemove', this.bossState._onMouseMove);
+            window.addEventListener('mousedown', this.bossState._onMouseDown);
+            window.addEventListener('contextmenu', this.bossState._onContext);
+        };
+
+        const unbindBossInput = () => {
+            if (!this.bossState.listenersBound) return;
+            window.removeEventListener('mousemove', this.bossState._onMouseMove);
+            window.removeEventListener('mousedown', this.bossState._onMouseDown);
+            window.removeEventListener('contextmenu', this.bossState._onContext);
+            this.bossState.listenersBound = false;
+        };
+
+        this.startMegalodonEncounter = async () => {
+            if (this.bossState.active || this.bossState.introPlayed) return;
+            this.bossState.introPlayed = true;
+            this.bossState.active = true;
+            this.bossState.playerHp = this.bossState.playerMaxHp;
+            this.playerLock = true;
+
+            await shakeWorld(1050);
+
+            const bossData = {
+                id: 'MegalodonBoss',
+                greeting: false,
+                src: this.bossState.megalodonMoveSheet,
+                SCALE_FACTOR: 2.8,
+                STEP_FACTOR: 0,
+                ANIMATION_RATE: 10,
+                INIT_POSITION: { x: 120, y: this.gameEnv.innerHeight - 150 },
+                pixels: this.bossState.megalodonMovePixels,
+                orientation: { rows: 4, columns: 3 },
+                down: { row: 0, start: 0, columns: 3 },
+                right: { row: 1, start: 0, columns: 3, mirror: true },
+                left: { row: 2, start: 0, columns: 3 },
+                up: { row: 2, start: 0, columns: 3 },
+                upRight: { row: 2, start: 0, columns: 3, mirror: true },
+                downRight: { row: 0, start: 0, columns: 3, mirror: true },
+                upLeft: { row: 2, start: 0, columns: 3 },
+                downLeft: { row: 0, start: 0, columns: 3 },
+                laserAttack: { row: 0, start: 0, columns: 3 },
+                rocketAttack: { row: 1, start: 0, columns: 3 },
+                swingAttackA: { row: 2, start: 0, columns: 3 },
+                swingAttackB: { row: 3, start: 0, columns: 3 },
+                hitbox: { widthPercentage: 0.46, heightPercentage: 0.37 },
+                reaction: function() {}
+            };
+
+            const boss = new Npc(bossData, this.gameEnv);
+            this.bossState.megalodon = boss;
+            this.gameEnv.gameObjects.push(boss);
+
+            // Hide all non-boss NPCs during the megalodon encounter.
+            this.bossState.hiddenNpcs = [];
+            (this.gameEnv?.gameObjects || []).forEach((obj) => {
+                if (!obj || obj === boss) return;
+                if (obj?.constructor?.name !== 'Npc') return;
+                const id = obj?.spriteData?.id;
+                if (id === 'MegalodonBoss') return;
+
+                this.bossState.hiddenNpcs.push({
+                    obj,
+                    x: obj.position?.x,
+                    y: obj.position?.y,
+                    display: obj.canvas?.style?.display ?? ''
+                });
+
+                if (obj.canvas) obj.canvas.style.display = 'none';
+                if (obj.position) {
+                    obj.position.x = -10000;
+                    obj.position.y = -10000;
+                }
+            });
+
+            const player = getPlayer();
+            if (player) {
+                const bx = boss.position.x + boss.width * 0.5;
+                const by = boss.position.y + boss.height * 0.5;
+                const px = player.position.x + player.width * 0.5;
+                const py = player.position.y + player.height * 0.5;
+                player.direction = getDirectionToward(px, py, bx, by);
+            }
+
+            await showBottomStoryDialogue('Slime', 'Shoot, why is he here?');
+            await showBottomStoryDialogue('Slime', 'I got you the strongest power of the ocean so you can beat that stupid megalodon!');
+            await showBottomStoryDialogue('Slime', 'Listen carefully. Move your mouse to aim your trident.');
+            await showBottomStoryDialogue('Slime', 'Left Click throws a trident shot. Keep your distance and keep firing.');
+            await showBottomStoryDialogue('Slime', 'Right Click performs a close-range trident slash. Use it when the megalodon rushes you!');
+
+            ensureBossHud();
+            updateBossHud();
+            bindBossInput();
+            this.bossState.combatReady = true;
+            this.playerLock = false;
+        };
+
+        this.retryBossEncounter = async () => {
+            this.cleanupBossEncounter?.();
+
+            this.sharkGameOverShown = false;
+            this.playerLock = true;
+            this.bossState.introPlayed = false;
+            this.bossState.active = false;
+            this.bossState.combatReady = false;
+            this.bossState.hp = this.bossState.maxHp;
+            this.bossState.playerHp = this.bossState.playerMaxHp;
+            this.bossState.lastShotAt = 0;
+            this.bossState.lastMeleeAt = 0;
+            this.bossState.nextAbilityAt = 0;
+            this.bossState.lastAbilityAt = {
+                laser: 0,
+                rockets: 0,
+                bodySwing: 0
+            };
+
+            const overlay = document.getElementById('aquatic-shark-gameover');
+            if (overlay) overlay.remove();
+
+            const player = getPlayer();
+            if (player) {
+                const retryX = Math.max(28, Math.min(this.gameEnv.innerWidth * 0.28, this.gameEnv.innerWidth - player.width - 28));
+                const retryY = Math.max(52, Math.min(this.gameEnv.innerHeight * 0.3, this.gameEnv.innerHeight - player.height - 52));
+                player.position.x = retryX;
+                player.position.y = retryY;
+                player.velocity.x = 0;
+                player.velocity.y = 0;
+                if (player.pressedKeys) player.pressedKeys = {};
+                player.direction = 'right';
+            }
+
+            await this.startMegalodonEncounter?.();
+        };
+
+        this.cleanupBossEncounter = () => {
+            unbindBossInput();
+            if (this.bossState.megalodon?.destroy) this.bossState.megalodon.destroy();
+            this.bossState.megalodon = null;
+
+            if (Array.isArray(this.bossState.hiddenNpcs)) {
+                this.bossState.hiddenNpcs.forEach((entry) => {
+                    const obj = entry?.obj;
+                    if (!obj) return;
+                    if (obj.canvas) obj.canvas.style.display = entry.display ?? '';
+                    if (obj.position) {
+                        if (typeof entry.x === 'number') obj.position.x = entry.x;
+                        if (typeof entry.y === 'number') obj.position.y = entry.y;
+                    }
+                });
+            }
+            this.bossState.hiddenNpcs = [];
+
+            this.bossState.projectiles.forEach((p) => p?.element?.remove());
+            this.bossState.projectiles = [];
+            this.bossState.enemyProjectiles.forEach((p) => p?.element?.remove());
+            this.bossState.enemyProjectiles = [];
+            if (this.bossState.laserBeam?.element) this.bossState.laserBeam.element.remove();
+            this.bossState.laserBeam = null;
+            this.bossState.summons.forEach((minion) => {
+                if (minion?.obj?.destroy) minion.obj.destroy();
+            });
+            this.bossState.summons = [];
+            this.bossState.summonedAtQuarterHp = false;
+            this.bossState.activeAbility = null;
+            this.bossState.abilityCommitted = false;
+            if (this.bossState.hud) {
+                this.bossState.hud.remove();
+                this.bossState.hud = null;
+            }
+            const playerHud = document.getElementById('aquatic-player-hp-hud');
+            if (playerHud) playerHud.remove();
+            const d = document.getElementById('aquatic-boss-dialogue');
+            if (d) d.remove();
+            const w = document.getElementById('aquatic-boss-win');
+            if (w) w.remove();
+            const v = document.getElementById('aquatic-boss-victory');
+            if (v) v.remove();
+            this.bossState.active = false;
+            this.bossState.combatReady = false;
+        };
+        this.updateBossCombat = updateBossCombat;
 
         const createPixelStarfish = (primary, shadow) => {
             const size = 11;
@@ -1684,7 +3324,7 @@ class GameLevelAquaticGameLevel {
             id: 'Mermaid',
             greeting: "I've lost all my starfishes. Will you collect them? Be careful, a shark is patrolling these waters!",
             // Mermaid spritesheet
-            src: path + "/images/projects/characters/Mermaid Spritesheet.png",
+            src: path + "/images/Mermaid Spritesheet.png",
             SCALE_FACTOR: 6,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 520, y: 320 },
@@ -1785,7 +3425,7 @@ class GameLevelAquaticGameLevel {
         const sharkNpc = {
             id: 'Shark',
             greeting: false,
-            src: path + "/images/projects/characters/Shark.png",
+            src: path + "/images/Shark.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 200,
             ANIMATION_RATE: 8,
@@ -1838,6 +3478,7 @@ class GameLevelAquaticGameLevel {
     initialize() {
         // Runtime wiring: mount HUD/menu, apply locks, gate NPCs, and attach shark AI.
         this.ensureTopMenuBar?.();
+        this.startMultiplayer?.();
 
         if (this.gameMode === 'challenge') {
             this.ensureChallengeHud?.();
@@ -2056,10 +3697,17 @@ class GameLevelAquaticGameLevel {
                 }
             };
         }
+
+        if (!this._bossUpdateTimer) {
+            this._bossUpdateTimer = setInterval(() => {
+                this.updateBossCombat?.();
+            }, 16);
+        }
     }
 
     destroy() {
         // Remove level-owned overlays and temporary spawned objects.
+        this.stopMultiplayer?.();
         const topMenu = document.getElementById('aquatic-top-menubar');
         if (topMenu) topMenu.remove();
         const topMenuNotice = document.getElementById('aquatic-top-menu-notice');
@@ -2076,6 +3724,21 @@ class GameLevelAquaticGameLevel {
         if (waveComplete) waveComplete.remove();
         const transition = document.getElementById('aquatic-transition-overlay');
         if (transition) transition.remove();
+        const bossHud = document.getElementById('aquatic-boss-hud');
+        if (bossHud) bossHud.remove();
+        const playerBossHud = document.getElementById('aquatic-player-hp-hud');
+        if (playerBossHud) playerBossHud.remove();
+        const bossDialogue = document.getElementById('aquatic-boss-dialogue');
+        if (bossDialogue) bossDialogue.remove();
+        const bossWin = document.getElementById('aquatic-boss-win');
+        if (bossWin) bossWin.remove();
+        const bossVictory = document.getElementById('aquatic-boss-victory');
+        if (bossVictory) bossVictory.remove();
+        if (this._bossUpdateTimer) {
+            clearInterval(this._bossUpdateTimer);
+            this._bossUpdateTimer = null;
+        }
+        this.cleanupBossEncounter?.();
         document.querySelectorAll('.ai-npc-modal').forEach((modal) => modal.remove());
         document.querySelectorAll('.ai-npc-container').forEach((container) => container.remove());
         this.clearSurfaceTrash?.();
