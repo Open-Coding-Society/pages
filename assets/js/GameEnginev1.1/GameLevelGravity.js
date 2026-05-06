@@ -1,9 +1,9 @@
-import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
-import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 
-class GameLevelCustom {
+class GameLevelGravity {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -37,11 +37,22 @@ class GameLevelCustom {
             GRAVITY: false
         };
 
-        const platformData = {
+       /*  const platformData = {
             id: 'platform',
             x: 0,
             y: height * 0.6,
             width: width,
+            height: 20,
+            visible: true,
+            color: 'rgba(180, 120, 40, 0.9)',
+            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+            fromOverlay: true
+        }; */
+         const platformData2 = {
+            id: 'platform',
+            x: width * 0.2,
+            y: height * 0.6,
+            width: width * 0.2,
             height: 20,
             visible: true,
             color: 'rgba(180, 120, 40, 0.9)',
@@ -158,4 +169,4 @@ class GameLevelCustom {
     }
 }
 
-export const gameLevelClasses = [GameLevelCustom];
+export const gameLevelClasses = [GameLevelGravity];
