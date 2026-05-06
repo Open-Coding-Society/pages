@@ -44,7 +44,12 @@ class HeistTemplate {
     };
 
      const barrier_1 = {
-            id: 'barrier_1', x: 116, y: 91, width: 211, height: 86, visible: true /* BUILDER_DEFAULT */,
+            id: 'barrier_1',
+            x: width * 0.1,
+            y: width * 0.1,
+            width: width * 0.2,
+            height: width * 0.2, 
+            visible: true /* BUILDER_DEFAULT */,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };
