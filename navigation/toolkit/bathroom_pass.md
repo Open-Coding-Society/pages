@@ -133,16 +133,23 @@ permalink: /student/bathroom_pass
                     <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     Manual Override
                 </h3>
-                <div class="flex flex-col md:flex-row gap-4">
-                    <input type="text" id="emergencyName" placeholder="Enter student name manually..." 
-                           class="flex-1 bg-neutral-950 border border-neutral-800 rounded-2xl px-6 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium">
-                    <div class="flex gap-3">
-                        <button id="emergencyCheckInBtn" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
-                            Check In
-                        </button>
-                        <button id="emergencyCheckOutBtn" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
-                            Check Out
-                        </button>
+                <div class="relative">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="emergencyName" placeholder="Enter student name manually..." 
+                               class="flex-1 bg-neutral-950 border border-neutral-800 rounded-2xl px-6 py-4 text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 transition-all font-medium"
+                               autocomplete="off">
+                        <div class="flex gap-3">
+                            <button id="emergencyCheckInBtn" class="flex-1 md:flex-none px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-500/25 uppercase tracking-wider text-xs">
+                                Check In
+                            </button>
+                            <button id="emergencyCheckOutBtn" class="flex-1 md:flex-none px-10 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-bold transition-all border border-neutral-700 uppercase tracking-wider text-xs">
+                                Check Out
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Suggestions Dropdown -->
+                    <div id="emergencySuggestions" class="hidden absolute left-0 right-0 mt-2 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto">
+                        <!-- Results will be injected here -->
                     </div>
                 </div>
             </div>
@@ -162,6 +169,58 @@ permalink: /student/bathroom_pass
     let isFaceApiLoaded = false;
     let cooldownRemaining = 0;
     let cooldownInterval = null;
+    let searchTimeout = null;
+
+    async function searchPeople() {
+        const input = document.getElementById('emergencyName');
+        const query = input.value.trim();
+        const suggestionsBox = document.getElementById('emergencySuggestions');
+
+        if (query.length < 2) {
+            suggestionsBox.classList.add('hidden');
+            return;
+        }
+
+        try {
+            const resp = await fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(query)}`, fetchOptions);
+            if (resp.ok) {
+                const results = await resp.json();
+                if (results.length > 0) {
+                    suggestionsBox.innerHTML = results.map(person => `
+                        <div class="px-6 py-3 hover:bg-indigo-500/10 cursor-pointer border-b border-neutral-800 last:border-0 group select-none"
+                             onclick="selectPerson('${person.name}', '${person.uid}')">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-white font-medium group-hover:text-indigo-400 transition-colors">${person.name}</p>
+                                    <p class="text-xs text-neutral-500">@${person.uid}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-neutral-600 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </div>
+                        </div>
+                    `).join('');
+                    suggestionsBox.classList.remove('hidden');
+                } else {
+                    suggestionsBox.classList.add('hidden');
+                }
+            }
+        } catch (err) {
+            console.error("Search failed:", err);
+        }
+    }
+
+    function selectPerson(name, uid) {
+        const input = document.getElementById('emergencyName');
+        // Preferring name as it's more human readable, but the backend search also checks UID
+        input.value = name; 
+        document.getElementById('emergencySuggestions').classList.add('hidden');
+    }
+
+    function handleEmergencyInput() {
+        if (searchTimeout) clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(searchPeople, 300);
+    }
 
     async function loadFaceData() {
         showToast({ message: "Loading Face AI models...", duration: 3000 });
@@ -533,6 +592,7 @@ permalink: /student/bathroom_pass
     window.returnFromBathroom = returnFromBathroom;
     window.emergencyCheckIn = emergencyCheckIn;
     window.emergencyCheckOut = emergencyCheckOut;
+    window.selectPerson = selectPerson;
 
     // Attach event listeners to buttons
     document.getElementById('initScannerBtn')?.addEventListener('click', startScanning);
@@ -540,6 +600,14 @@ permalink: /student/bathroom_pass
     document.getElementById('notMeBtn')?.addEventListener('click', resetId);
     document.getElementById('emergencyCheckInBtn')?.addEventListener('click', emergencyCheckIn);
     document.getElementById('emergencyCheckOutBtn')?.addEventListener('click', emergencyCheckOut);
+    document.getElementById('emergencyName')?.addEventListener('input', handleEmergencyInput);
+    
+    // Close suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.relative')) {
+            document.getElementById('emergencySuggestions')?.classList.add('hidden');
+        }
+    });
 
     // Auto-reload at midnight to fetch new facial registrations
     function scheduleMidnightReload() {
