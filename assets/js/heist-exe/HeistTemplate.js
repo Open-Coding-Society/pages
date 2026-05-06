@@ -13,7 +13,7 @@ class HeistTemplate {
 
     const image_data_bg = {
         id: 'bg',
-        src: path + "/assets/js/heist-exe/heist-bg.png",
+        src: path + "/assets/js/heist-exe/images/heist-bg.png",
         pixels: {height: 597, width: 340}
     };
 
@@ -21,7 +21,7 @@ class HeistTemplate {
     const sprite_data_mc = {
         id: 'MC',
         name: 'mainplayer',
-        src: path + "/assets/js/heist-exe/heist-mc.png",
+        src: path + "/assets/js/heist-exe/images/heist-mc.png",
         SCALE_FACTOR: MC_SCALE_FACTOR,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
