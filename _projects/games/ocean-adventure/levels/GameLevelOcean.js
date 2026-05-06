@@ -76,7 +76,7 @@ class GameLevelOcean {
     // BACKGROUND
     const bgData = {
       id: "Water",
-      src: path + "/images/projects/ocean/bg/reef.png",
+      src: path + "/images/projects/ocean-adventure/bg/reef.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -84,7 +84,7 @@ class GameLevelOcean {
     const octopusData = {
       id: "Octopus",
       greeting: "Hi I am Octopus!",
-      src: path + "/images/projects/ocean/player/octopus.png",
+      src: path + "/images/projects/ocean-adventure/player/octopus.png",
       SCALE_FACTOR: 5,
       ANIMATION_RATE: 100,
       INIT_POSITION: { x: width * 0.7, y: height * 0.6 },
@@ -129,7 +129,7 @@ class GameLevelOcean {
 
     // GOLD FISH
     const goldfishBase = {
-      src: path + "/images/projects/ocean/npc/gold.png",
+      src: path + "/images/projects/ocean-adventure/npc/gold.png",
       SCALE_FACTOR: 6,
       ANIMATION_RATE: 50,
       pixels: { width: 200, height: 100 },
@@ -161,7 +161,7 @@ class GameLevelOcean {
     }));
 
     // AI NPC
-    const sprite_src_ocean = path + "/images/projects/ocean/npc/wizard.png";
+    const sprite_src_ocean = path + "/images/projects/ocean-adventure/npc/wizard.png";
     const sprite_data_ocean = {
       id: "Professor Ocean",
       src: sprite_src_ocean,
@@ -174,7 +174,7 @@ class GameLevelOcean {
     };
 
     // ENEMIES (NO MORE SCORING INSIDE THEM)
-    const sprite_src_enemy = path + "/images/projects/ocean/npc/elonMusk.png";
+    const sprite_src_enemy = path + "/images/projects/ocean-adventure/npc/elonMusk.png";
 
     const baseEnemy = {
       src: sprite_src_enemy,
@@ -225,7 +225,7 @@ class GameLevelOcean {
     const sprite_data_enemy4 = { ...baseEnemy, id: "EnemyElon4", INIT_POSITION: { x: width * 0.3, y: height * 0.7 } };
 
     // SHARK
-    const sprite_src_shark = path + "/images/projects/ocean/npc/shark.png";
+    const sprite_src_shark = path + "/images/projects/ocean-adventure/npc/shark.png";
 
     const sprite_data_shark = {
       id: "SharkEnemy",

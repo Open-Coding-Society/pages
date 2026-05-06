@@ -2,7 +2,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
-import SplineBarrier from '@assets/js/projects/ocean/levels/SplineBarrier.js';
+import SplineBarrier from '@assets/js/projects/ocean-adventure/levels/SplineBarrier.js';
 import Shark from '@assets/js/GameEnginev1.1/Shark.js';
 
 // Leaderboard Manager
@@ -125,14 +125,14 @@ class GameLevelOcean3 {
     // Background
     const bgData = {
         name: 'ocean',
-        src: path + "/images/projects/ocean/bg/space.png",
+        src: path + "/images/projects/ocean-adventure/bg/space.png",
         pixels: { height: 1200, width: 857 }
     };
 
     // Player (FIXED)
     const sprite_data_octopus = {
         id: 'Octopus',
-        src: path + "/images/projects/ocean/player/octopus.png",
+        src: path + "/images/projects/ocean-adventure/player/octopus.png",
 
         SCALE_FACTOR: 5,
         STEP_FACTOR: 400, // CRITICAL FIX
@@ -157,7 +157,7 @@ class GameLevelOcean3 {
     const sprite_data_goldfish = {
         id: 'Goldfish',
         greeting: "You escaped!",
-        src: path + "/images/projects/ocean/npc/gold.png",
+        src: path + "/images/projects/ocean-adventure/npc/gold.png",
 
         SCALE_FACTOR: 6,
         ANIMATION_RATE: 50,
@@ -175,7 +175,7 @@ class GameLevelOcean3 {
     // Coins (collectibles for points)
     const sprite_data_coin = {
         id: 'Coin',
-        src: path + "/images/projects/ocean/npc/gold.png", // Using gold image for coin
+        src: path + "/images/projects/ocean-adventure/npc/gold.png", // Using gold image for coin
         SCALE_FACTOR: 8,
         ANIMATION_RATE: 50,
         pixels: { width: 200, height: 100 },
@@ -197,7 +197,7 @@ class GameLevelOcean3 {
     // Shark
     const sprite_data_shark = {
         id: 'Shark',
-        src: path + "/images/projects/ocean/npc/shark.png",
+        src: path + "/images/projects/ocean-adventure/npc/shark.png",
 
         SCALE_FACTOR: 5,
         ANIMATION_RATE: 100,
