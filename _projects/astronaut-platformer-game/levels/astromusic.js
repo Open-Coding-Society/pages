@@ -1,5 +1,5 @@
-console.log("PeppaMusic.js loaded from _projects/PeppaPigGame/levels");
-class PeppaMusic {
+console.log("astromusic.js loaded from _projects/astronaut-platformer-game/levels");
+class AstroMusic {
   constructor() {
     this.audio = null;
     this.started = false;
@@ -128,4 +128,4 @@ class PeppaMusic {
   }
 }
 
-export default PeppaMusic;
+export default AstroMusic;

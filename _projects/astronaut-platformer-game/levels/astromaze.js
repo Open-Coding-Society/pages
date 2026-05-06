@@ -4,7 +4,7 @@ import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
-class GameLevel2 {
+class AstroMaze {
 
 constructor(gameEnv) {
 
@@ -383,5 +383,5 @@ this._mineInterval = setInterval(() => {
 
 }
 
-export const gameLevelClasses = [GameLevel2];
-export default GameLevel2;
+export const gameLevelClasses = [AstroMaze];
+export default AstroMaze;

@@ -5,7 +5,7 @@ import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
 import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
-class GameLevelprologue {
+class AstroStory {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -242,5 +242,5 @@ class GameLevelprologue {
     }
 }
 
-export const gameLevelClasses = [GameLevelprologue];
-export default GameLevelprologue;
+export const gameLevelClasses = [AstroStory];
+export default AstroStory;

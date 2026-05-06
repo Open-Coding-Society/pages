@@ -4,7 +4,7 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
-class GameLevelfinal {
+class AstroDeath {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const self = this;
@@ -346,5 +346,5 @@ class GameLevelfinal {
     }
 }
 
-export const gameLevelClasses = [GameLevelfinal];
-export default GameLevelfinal;
+export const gameLevelClasses = [AstroDeath];
+export default AstroDeath;

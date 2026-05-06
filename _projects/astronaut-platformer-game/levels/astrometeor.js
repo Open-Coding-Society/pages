@@ -3,7 +3,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
-class GameLeveltest {
+class AstroMeteor {
   constructor(gameEnv) {
     const path = gameEnv.path;
     const width = gameEnv.innerWidth;
@@ -403,4 +403,4 @@ class GameLeveltest {
   }
 }
 //hi
-export default GameLeveltest;
+export default AstroMeteor;

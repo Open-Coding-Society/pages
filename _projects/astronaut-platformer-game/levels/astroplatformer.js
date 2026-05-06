@@ -3,7 +3,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  GameLevel3 — "Crater Falls"
+//  AstroPlatformer - "Crater Falls"
 //
 //  HOW THE PLATFORM SYSTEM WORKS
 //  ─────────────────────────────
@@ -57,7 +57,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-class GameLevel3 {
+class AstroPlatformer {
 
 constructor(gameEnv) {
 
@@ -688,5 +688,5 @@ this.destroy = () => {
 } // end constructor
 } // end class
 
-export const gameLevelClasses = [GameLevel3];
-export default GameLevel3;
+export const gameLevelClasses = [AstroPlatformer];
+export default AstroPlatformer;

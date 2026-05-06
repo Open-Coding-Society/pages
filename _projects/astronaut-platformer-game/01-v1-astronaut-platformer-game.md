@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Our game
-permalink: /astronaut-platformer-game
+permalink: /astro-platgame
 ---
 
 <div id="gameContainer">
@@ -13,15 +13,15 @@ permalink: /astronaut-platformer-game
     // Adventure Game assets locations
     import Core from "@assets/js/GameEnginev1.1/essentials/Game.js";
     import GameControl from "@assets/js/GameEnginev1.1/essentials/GameControl.js";
-    import GameLevelprologue from "@assets/js/projects/astronaut-platformer-game/levels/GameLevelprologue.js";
-    import GameLeveltest from "@assets/js/projects/astronaut-platformer-game/levels/GameLeveltest.js";
-    import GameLevel2 from "@assets/js/projects/astronaut-platformer-game/levels/GameLevel2.js";
-    import GameLevelfinal from "@assets/js/projects/astronaut-platformer-game/levels/GameLevelfinal.js";
+    import AstroStory from "@assets/js/projects/astronaut-platformer-game/levels/astrostory.js";
+    import AstroMeteor from "@assets/js/projects/astronaut-platformer-game/levels/astrometeor.js";
+    import AstroMaze from "@assets/js/projects/astronaut-platformer-game/levels/astromaze.js";
+    import AstroDeath from "@assets/js/projects/astronaut-platformer-game/levels/astrodeath.js";
     import Leaderboard from "@assets/js/GameEnginev1.1/essentials/Leaderboard.js";
 
     import { pythonURI, javaURI, fetchOptions } from "@assets/js/api/config.js";
 
-    const gameLevelClasses = [GameLevelprologue, GameLeveltest, GameLevel2, GameLevelfinal];
+    const gameLevelClasses = [AstroStory, AstroMeteor, AstroMaze, AstroDeath];
 
     const environment = {
         path: "{{site.baseurl}}",
