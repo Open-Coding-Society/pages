@@ -95,7 +95,7 @@ this.walls = [
 class GameHUD {
     constructor(gameEnv, onRestart) {
         this.gameEnv = gameEnv;
-        this.onRestart = onRestart; // Callback function to reset the game
+        this.onRestart = onRestart;
         this.lives = 5;
         this.statusEl = null;
         this.startTime = Date.now();
@@ -106,11 +106,15 @@ class GameHUD {
     createHUD() {
         this.statusEl = document.createElement('div');
         this.statusEl.style.cssText = `
-            position: absolute; top: 20px; left: 20px;
-            background: rgba(0,0,0,0.85); color: #00ff00;
-            padding: 15px; border-radius: 8px;
-            font-family: monospace; z-index: 1002;
-            border: 2px solid #00ff00; min-width: 200px;
+            position: absolute; 
+            bottom: 20px; 
+            right: 20px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace; 
+            font-size: 14px;
+            text-align: right;
+            z-index: 1002;
+            pointer-events: none; /* Allows mouse to click 'through' the text */
         `;
         this.gameEnv.gameContainer.appendChild(this.statusEl);
         this.update();
@@ -119,21 +123,25 @@ class GameHUD {
     update() {
         if (this.gameOver) return;
         const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+        
+        // We use innerHTML but wrap the button in pointer-events: auto 
+        // so you can still click it even though the div is transparent.
         this.statusEl.innerHTML = `
-            🎮 MAZE RUNNER<br>
-            ❤️ Lives: ${this.lives}<br>
-            ⏱️ Time: ${elapsed}s<br>
-            <button id="restart-btn" style="margin-top:10px; cursor:pointer;">Restart Game</button>
+            LIVES: ${this.lives} | TIME: ${elapsed}s<br>
+            <span id="restart-btn" style="cursor:pointer; pointer-events: auto; text-decoration: underline; font-size: 12px;">[RESTART]</span>
         `;
         
-        // Attach listener to the button
-        document.getElementById('restart-btn').onclick = () => this.onRestart();
+        document.getElementById('restart-btn').onclick = (e) => {
+            e.stopPropagation();
+            this.onRestart();
+        };
     }
 
     setGameOver(won) {
         this.gameOver = true;
-        this.statusEl.innerHTML = won ? "✅ YOU WIN!" : "❌ GAME OVER!";
-        this.statusEl.innerHTML += `<br><button id="restart-btn" style="margin-top:10px;">Play Again</button>`;
+        this.statusEl.style.fontSize = '20px'; // Make the end message slightly pop
+        this.statusEl.innerHTML = won ? "WINNER!" : "GAME OVER";
+        this.statusEl.innerHTML += `<br><span id="restart-btn" style="cursor:pointer; pointer-events: auto; text-decoration: underline; font-size: 14px;">[PLAY AGAIN]</span>`;
         document.getElementById('restart-btn').onclick = () => this.onRestart();
     }
 }
@@ -146,7 +154,7 @@ class MazePlayer {
     this.x = 50;
     this.y = 50;
     this.radius = 12;
-    this.speed = 1.2;
+    this.speed = 1.8;
     this.canvas = null;
     this.ctx = null;
     this.createCanvas();
