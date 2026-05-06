@@ -39,4 +39,72 @@ The game follows Red on a journey through the digital woods. She must navigate c
 
 ---
 
+Game Objects & Entities
+
+Background: Forest scene using GameEnvBackground with a clipped image
+Player: ShooterPlayer (Red Riding Hood) with WASD movement and Q-key shooting
+Enemy: Wolf with 5 HP, positioned in upper-middle area
+NPC: Grandma with interactive dialogue and mouse click responses
+Core Mechanics
+Combat System:
+
+Player shoots bullets with Q key (500ms cooldown)
+Bullets damage wolf on collision
+Wolf has reduced collision box (70% of sprite size) for precise hit detection
+Hit markers appear on successful hits
+Wolf defeat triggers explosion effect and victory sequence
+Collision & Movement:
+
+Player movement blocked when overlapping wolf's collision area
+Pushback mechanics prevent player from getting stuck in wolf
+Grandma has zero collision dimensions (non-blocking)
+Interactive Features:
+
+Grandma Dialogue: Changes based on wolf defeat status
+Before defeat: Urges player to kill the wolf
+After defeat: Congratulatory message
+
+Mouse Click Interactions:
+Click on grandma sprite: "this level doesn't use a mouse deary, my life is currently in danger due to that cloud with bones"
+Click within interaction radius: "Deary. HURRY! Q to shoot WASD to move top down esq, figure out the rest #combos"
+
+Visual Effects & UI
+
+Explosion sprite displays for 1 second after wolf defeat
+Victory popup with styled message and replay button
+Hit markers for visual feedback on successful shots
+Console instructions for controls
+Technical Architecture
+Class Structure:
+Event Handling:
+
+Window mousedown listener for grandma interactions
+Proper cleanup in destroy method
+Coordinate conversion for accurate click detection
+Game Flow:
+
+Level initializes with all game objects
+Player moves and shoots to defeat wolf
+Wolf takes damage, shows hit markers
+On wolf defeat: explosion → grandma transformation → victory popup
+Grandma provides contextual dialogue throughout
+Key Features:
+
+Dynamic dialogue system that responds to game state
+Multiple interaction methods (collision, mouse clicks)
+Visual feedback for all actions
+Proper game object lifecycle management
+Responsive design with resize handling
+The level successfully combines action gameplay with narrative elements, creating an engaging confrontation scene with interactive NPC elements.
+
+class GameLevelRedRidingHood3
+    constructor(gameEnv)     // Initialize level objects
+    update()                 // Main game loop logic
+    showInstructions()       // Console logging
+    handleGrandmaClick()     // Mouse interaction handler
+    showGrandmaVictory()     // Victory screen
+    resize()                 // Handle window resizing
+    destroy()                // Cleanup event listeners
+
+
 *Created by Team RAM: Mateo, Rashi, and Anika.*
