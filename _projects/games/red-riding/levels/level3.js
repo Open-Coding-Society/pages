@@ -50,7 +50,7 @@ class GameLevelRedRidingHood3 {
         this.player = new ShooterPlayer(sprite_data_red, gameEnv);
 
           // Updated Wolf Enemy Data with wolffff.png
-       const wolfScale = 2;
+       const wolfScale = 3;
         const wolfPixels = { height: 395, width: 632 };
         
         const enemyData = {
@@ -73,6 +73,13 @@ class GameLevelRedRidingHood3 {
         };
 
         this.enemy = new Enemy(enemyData, gameEnv);
+
+        this.enemy.hp = enemyData.hp || 5; // Set initial health
+        this.enemy.takeDamage = function(amount) {
+            this.hp -= amount;
+            console.log("Wolf hit! Remaining HP:", this.hp);
+        };
+
         this.enemyDefeated = false;
 
         // Create Grandma NPC with dynamic dialogue based on wolf status
@@ -126,6 +133,25 @@ class GameLevelRedRidingHood3 {
         const enemy = this.gameEnv.gameObjects.find(obj => obj instanceof Enemy);
 
         if (!player || !enemy) return;
+
+        // This ensures that even if the engine created a new enemy, it knows how to take damage
+        if (typeof enemy.takeDamage !== 'function') {
+            enemy.hp = 5;
+            enemy.takeDamage = function(amount) {
+                this.hp -= amount;
+                console.log("Wolf hit! Remaining HP:", this.hp);
+            };
+        }
+        // -------------------------------------
+
+        // 2. Manual Bullet Fix
+        if (player.bullets) {
+            player.bullets.forEach(bullet => {
+                bullet.update();
+                bullet.draw();
+            });
+        }
+
 
         // Block player movement if overlapping wolf's sprite area
         const playerBox = {
