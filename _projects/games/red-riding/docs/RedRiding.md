@@ -39,4 +39,4 @@ The game follows Red on a journey through the digital woods. She must navigate c
 
 ---
 
-*Created by Team RAM: Mateo (Design), Rashi (Tech), and Anika (Scrum).*
+*Created by Team RAM: Mateo, Rashi, and Anika.*
