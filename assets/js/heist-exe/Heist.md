@@ -1,6 +1,6 @@
 ---
 layout: opencs
-title: Adventure Game
+title: H.E.I.S.T E.X.E.
 permalink: /gamify/heist
 ---
 
