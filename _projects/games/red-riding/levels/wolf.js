@@ -1,5 +1,5 @@
-import Character from '/assets/js/GameEnginev1.1/essentials/Character.js';
-import AiNpc from '/assets/js/GameEnginev1.1/essentials/AiNpc.js';
+import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
+import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
 
 class Wolf extends Character {
     constructor(data = null, gameEnv = null) {
