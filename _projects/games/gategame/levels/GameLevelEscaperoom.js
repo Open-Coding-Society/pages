@@ -32,14 +32,14 @@ class GameLevelEscaperoom {
         // ── Background ──────────────────────────────────────────────────────────
         const bgData = {
             name: "custom_bg",
-            src: path + "@assets/js/projects/gategame/images/bg/Slab.png",
+            src: path + "@projects/games/gategame/images/bg/Slab.png",
             pixels: { height: 772, width: 1134 }
         };
 
         // ── Player ──────────────────────────────────────────────────────────────
         const playerData = {
             id: 'playerData',
-            src: path + "@assets/js/projects/gategame/images/sprites/slime.png",
+            src: path + "@projects/games/gategame/images/sprites/slime.png",
             SCALE_FACTOR: 15,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -62,7 +62,7 @@ class GameLevelEscaperoom {
         const npcData1 = {
             id: 'Cannonball',
             greeting: 'Door Unlocked',
-            src: path + "@assets/js/projects/gategame/images/sprites/mastergate.png",
+            src: path + "@projects/games/gategame/images/sprites/mastergate.png",
             SCALE_FACTOR: 11,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 920, y: 600 },
@@ -184,7 +184,7 @@ class GameLevelEscaperoom {
 
         const spriteData = {
             id: 'Escape Room Guide',
-            src: path + "@assets/js/projects/gategame/images/sprites/mastergate.png",
+            src: path + "@projects/games/gategame/images/sprites/mastergate.png",
             pixels: { height: 512, width: 512 },
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },

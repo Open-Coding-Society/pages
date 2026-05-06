@@ -30,13 +30,13 @@ class GameLevelCannonball {
         // ── Scene objects ───────────────────────────────────────────────────
         const bgData = {
             name: "custom_bg",
-            src:  this.path + "@assets/js/projects/gategame/images/bg/CannonDefense.png",
+            src:  this.path + "@projects/games/gategame/images/bg/CannonDesert.png",
             pixels: { height: 772, width: 1134 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: this.path + "@assets/js/projects/gategame/images/sprites/slime.png",
+            src: this.path + "@projects/games/gategame/images/sprites/slime.png",
             SCALE_FACTOR:   5,
             STEP_FACTOR:    1000,
             ANIMATION_RATE: 50,
@@ -141,7 +141,7 @@ class GameLevelCannonball {
     showAiBriefing() {
         const spriteData = {
             id: 'Cannonball Coach',
-            src: this.path + "@assets/js/projects/gategame/images/sprites/mastergate.png",
+            src: this.path + "@projects/games/gategame/images/sprites/mastergate.png",
             // Sprite sheet hints (not required, used if avatar wants cropping)
             pixels: { height: 512, width: 512 },
             orientation: { rows: 1, columns: 1 },
@@ -190,7 +190,7 @@ class GameLevelCannonball {
 
         const img = document.createElement('img');
         img.id  = 'game-gate';
-        img.src = this.path + "@assets/js/projects/gategame/images/sprites/mastergate.png";
+        img.src = this.path + "@projects/games/gategame/images/sprites/mastergate.png";
         const size = Math.round(window.innerHeight * 0.20);
         Object.assign(img.style, {
             position:      'fixed',
@@ -263,7 +263,7 @@ class GameLevelCannonball {
 
         const img = document.createElement('img');
         img.id  = 'game-cannonball';
-        img.src = this.path + "/@assets/js/projects/gategame/images/sprites/Cannonball.png";
+        img.src = this.path + "/@projects/games/gategame/images/sprites/Cannonball.png";
         Object.assign(img.style, {
             position:      'fixed',
             width:         this.cannonballSize + 'px',
