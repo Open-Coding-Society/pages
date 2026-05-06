@@ -1,8 +1,9 @@
-import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
-import Barrier from './essentials/Barrier.js';
-import Shark from './Shark.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import SplineBarrier from '@assets/js/projects/ocean/levels/SplineBarrier.js';
+import Shark from '@assets/js/GameEnginev1.1/Shark.js';
 
 // Leaderboard Manager
 class LeaderboardManager {
@@ -28,7 +29,7 @@ class LeaderboardManager {
   displayLeaderboard() {
     const leaderboard = this.getLeaderboard();
     let html = '<div style="background: rgba(0,0,0,0.8); color: #FFD700; padding: 15px; border-radius: 8px; font-family: Arial, sans-serif;">';
-    html += '<h3 style="margin-top: 0; text-align: center;">🏆 LEADERBOARD 🏆</h3>';
+    html += '<h3 style="margin-top: 0; text-align: center;"> LEADERBOARD </h3>';
     if (leaderboard.length === 0) {
       html += '<p style="text-align: center;">No scores yet. Be the first!</p>';
     } else {
@@ -108,7 +109,7 @@ class GameScorer {
   }
 }
 
-class GameLevelOcean {
+class GameLevelOcean3 {
 
   constructor(gameEnv) {
 
@@ -116,20 +117,22 @@ class GameLevelOcean {
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
 
+    console.log("Initializing GameLevelOcean3 with dimensions:", width, height);
+
     // Initialize scoring system
     gameEnv.gameScorer = new GameScorer(gameEnv);
 
     // Background
     const bgData = {
         name: 'ocean',
-        src: path + "/images/gamify/water/space.png",
+        src: path + "/images/projects/ocean/bg/space.png",
         pixels: { height: 1200, width: 857 }
     };
 
     // Player (FIXED)
     const sprite_data_octopus = {
         id: 'Octopus',
-        src: path + "/images/gamify/water/octopus.png",
+        src: path + "/images/projects/ocean/player/octopus.png",
 
         SCALE_FACTOR: 5,
         STEP_FACTOR: 400, // CRITICAL FIX
@@ -154,7 +157,7 @@ class GameLevelOcean {
     const sprite_data_goldfish = {
         id: 'Goldfish',
         greeting: "You escaped!",
-        src: path + "/images/gamify/water/gold.png",
+        src: path + "/images/projects/ocean/npc/gold.png",
 
         SCALE_FACTOR: 6,
         ANIMATION_RATE: 50,
@@ -172,7 +175,7 @@ class GameLevelOcean {
     // Coins (collectibles for points)
     const sprite_data_coin = {
         id: 'Coin',
-        src: path + "/images/gamify/water/gold.png", // Using gold image for coin
+        src: path + "/images/projects/ocean/npc/gold.png", // Using gold image for coin
         SCALE_FACTOR: 8,
         ANIMATION_RATE: 50,
         pixels: { width: 200, height: 100 },
@@ -194,7 +197,7 @@ class GameLevelOcean {
     // Shark
     const sprite_data_shark = {
         id: 'Shark',
-        src: path + "/images/gamify/water/shark.png",
+        src: path + "/images/projects/ocean/npc/shark.png",
 
         SCALE_FACTOR: 5,
         ANIMATION_RATE: 100,
@@ -209,28 +212,149 @@ class GameLevelOcean {
         hitbox: { widthPercentage: 0.3, heightPercentage: 0.5 }
     };
 
-    // WALLS (REAL FIX APPLIED)
-    const wallStyle = {
-        color: 'rgba(0,150,255,0.5)',
-        visible: true,
-        collidable: true, //  IMPORTANT
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
-    };
-
-    const mazeWalls = [
-        { id:'top', x:0.2, y:0.15, width:0.6, height:0.02 },
-        { id:'bottom', x:0.2, y:0.83, width:0.6, height:0.02 },
-
-        { id:'leftTop', x:0.2, y:0.15, width:0.02, height:0.20 },
-        { id:'leftBottom', x:0.2, y:0.55, width:0.02, height:0.30 },
-        { id:'right', x:0.78, y:0.15, width:0.02, height:0.7 },
-
-        { id:'w1', x:0.3, y:0.25, width:0.02, height:0.3 },
-        { id:'w2', x:0.45, y:0.35, width:0.25, height:0.02 },
-        { id:'w3', x:0.45, y:0.55, width:0.02, height:0.2 },
-        { id:'w4', x:0.55, y:0.45, width:0.15, height:0.02 },
-        { id:'w5', x:0.6, y:0.25, width:0.02, height:0.35 }
-    ].map(w => ({ ...w, ...wallStyle }));
+    // SPLINE BARRIERS - Curved barriers around transparent blocks
+    const splineBarriers = [
+        // Top wall - horizontal curve
+        {
+            id: 'spline-top',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.2 * width, y: 0.15 * height },
+                { x: 0.4 * width, y: 0.12 * height },
+                { x: 0.6 * width, y: 0.13 * height },
+                { x: 0.8 * width, y: 0.15 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Bottom wall - horizontal curve
+        {
+            id: 'spline-bottom',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.2 * width, y: 0.83 * height },
+                { x: 0.4 * width, y: 0.86 * height },
+                { x: 0.6 * width, y: 0.85 * height },
+                { x: 0.8 * width, y: 0.83 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Left top wall - vertical curve
+        {
+            id: 'spline-leftTop',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.2 * width, y: 0.15 * height },
+                { x: 0.17 * width, y: 0.22 * height },
+                { x: 0.18 * width, y: 0.30 * height },
+                { x: 0.2 * width, y: 0.35 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Left bottom wall - vertical curve
+        {
+            id: 'spline-leftBottom',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.2 * width, y: 0.55 * height },
+                { x: 0.17 * width, y: 0.63 * height },
+                { x: 0.18 * width, y: 0.72 * height },
+                { x: 0.2 * width, y: 0.85 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Right wall - vertical curve
+        {
+            id: 'spline-right',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.78 * width, y: 0.15 * height },
+                { x: 0.81 * width, y: 0.30 * height },
+                { x: 0.81 * width, y: 0.50 * height },
+                { x: 0.78 * width, y: 0.85 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Interior wall w1 - vertical curve
+        {
+            id: 'spline-w1',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.3 * width, y: 0.25 * height },
+                { x: 0.27 * width, y: 0.32 * height },
+                { x: 0.28 * width, y: 0.42 * height },
+                { x: 0.3 * width, y: 0.55 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Interior wall w2 - horizontal curve
+        {
+            id: 'spline-w2',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.45 * width, y: 0.35 * height },
+                { x: 0.55 * width, y: 0.32 * height },
+                { x: 0.65 * width, y: 0.33 * height },
+                { x: 0.7 * width, y: 0.35 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Interior wall w3 - vertical curve
+        {
+            id: 'spline-w3',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.45 * width, y: 0.55 * height },
+                { x: 0.42 * width, y: 0.62 * height },
+                { x: 0.43 * width, y: 0.67 * height },
+                { x: 0.45 * width, y: 0.75 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Interior wall w4 - horizontal curve
+        {
+            id: 'spline-w4',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.55 * width, y: 0.45 * height },
+                { x: 0.60 * width, y: 0.42 * height },
+                { x: 0.65 * width, y: 0.43 * height },
+                { x: 0.7 * width, y: 0.45 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        },
+        // Interior wall w5 - vertical curve
+        {
+            id: 'spline-w5',
+            greeting: "This is a curved barrier, you cannot pass through it!",
+            splinePoints: [
+                { x: 0.6 * width, y: 0.25 * height },
+                { x: 0.57 * width, y: 0.35 * height },
+                { x: 0.58 * width, y: 0.45 * height },
+                { x: 0.6 * width, y: 0.6 * height }
+            ],
+            visible: true,
+            color: '#0096FF',
+            lineWidth: 8
+        }
+    ];
 
     this.classes = [
       { class: GameEnvBackground, data: bgData },
@@ -268,7 +392,8 @@ class GameLevelOcean {
         }
       })),
 
-      ...mazeWalls.map(w => ({ class: Barrier, data: w }))
+      // Add spline barriers around transparent blocks
+      ...splineBarriers.map(sb => ({ class: SplineBarrier, data: sb }))
     ];
 
     // Set total coins in the scoreboard
@@ -278,4 +403,4 @@ class GameLevelOcean {
   }
 }
 
-export default GameLevelOcean;
+export default GameLevelOcean3;

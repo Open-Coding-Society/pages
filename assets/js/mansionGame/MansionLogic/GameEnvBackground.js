@@ -7,13 +7,24 @@ export class GameEnvBackground extends GameObject {
     constructor(data = null, gameEnv = null) {
         super(gameEnv);
         this.image = null;
+        this.imageLoaded = false; // Track if image has loaded
         this.fillStyle = (data && data.fillStyle) ? data.fillStyle : '#063970';
         this.mode = (data && data.mode) ? data.mode : 'cover'; // cover | contain | repeat | stretch
         if (data && data.src) {
             this.image = new Image();
-            this.image.src = data.src;
+            // Set up load event before setting src
+            this.image.onload = () => {
+                this.imageLoaded = true;
+            };
+            // Handle errors gracefully
+            this.image.onerror = () => {
+                console.error(`Failed to load background image: ${data.src}`);
+                this.image = null;
+                this.imageLoaded = false;
+            };
             // allow cross-origin images if provided
             if (data.crossOrigin) this.image.crossOrigin = data.crossOrigin;
+            this.image.src = data.src;
         }
     }
 
@@ -28,7 +39,8 @@ export class GameEnvBackground extends GameObject {
         const width = this.gameEnv.innerWidth;
         const height = this.gameEnv.innerHeight;
 
-        if (this.image) {
+        // Only draw the image if it's loaded and valid
+        if (this.image && this.imageLoaded) {
             // Draw the background image according to mode
             if (this.mode === 'stretch') {
                 ctx.drawImage(this.image, 0, 0, width, height);
@@ -49,7 +61,7 @@ export class GameEnvBackground extends GameObject {
                 ctx.drawImage(this.image, dx, dy, drawW, drawH);
             }
         } else {
-            // Fill the canvas with fillstyle color if no image is provided
+            // Fill the canvas with fillstyle color if no image is provided or not yet loaded
             ctx.fillStyle = this.fillStyle;
             ctx.fillRect(0, 0, width, height);
         }
