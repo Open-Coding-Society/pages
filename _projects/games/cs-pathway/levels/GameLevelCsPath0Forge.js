@@ -100,6 +100,7 @@ class GameLevelCsPath0Forge {
         // Restore profile data
         if (restored.profileData) {
           this.profileData = { ...restored.profileData };
+          console.log('GameLevel: profileData set to:', this.profileData);
         }
         
         // Restore progress state
@@ -494,6 +495,12 @@ class GameLevelCsPath0Forge {
           }
         }
 
+        // Switch ProfileManager to authenticated user context if not guest
+        if (authBody && authBody.role !== 'guest') {
+          console.log('Switch ProfileManager to authenticated user:', authBody.uid);
+          await this.profileManager.switchToAuthenticatedUser(authBody);
+        }
+
         // Prefill identity form with auth data.
         // For students, also update the OCS nav menu.
         if (authBody) {
@@ -543,7 +550,7 @@ class GameLevelCsPath0Forge {
         ...profile,
       };
 
-await this.profileManager.saveIdentity(profile);
+      await this.profileManager.saveIdentity(profile);
       await this.profileManager.updateIdentityProgress(true);
 
       this.updateProfilePanel(this.profileData);
@@ -1424,6 +1431,52 @@ await this.profileManager.saveIdentity(profile);
         { key: 'completionOverallScore',    label: 'Overall Score',    emptyValue: '0.55' },
       ],
       actions: [
+        // Snapshot & Recover buttons (authenticated users only)
+        ...(level.profileManager.isAuthenticated ? [
+          {
+            label: 'Snapshot Progress',
+            title: 'Save current progress to server',
+            onClick: async () => {
+              try {
+                await level.profileManager.save();
+                level.showToast('✦ Progress saved to server!');
+              } catch (error) {
+                console.error('Failed to snapshot profile:', error);
+                alert('Failed to save snapshot. Check console for details.');
+              }
+            }
+          },
+          {
+            label: '🔄 Recover from Server',
+            title: 'Restore progress from last server snapshot',
+            onClick: async () => {
+              const confirmed = confirm(
+                'Recover from Server?\n\n' +
+                'This will replace your current progress with\n' +
+                'the last snapshot saved to the server.\n\n' +
+                'Current unsaved changes will be lost.\n\n' +
+                'Continue with recovery?'
+              );
+
+              if (confirmed) {
+                try {
+                  const result = await level.profileManager.recoverFromBackend();
+                  if (result.success) {
+                    console.log('Profile recovered from backend');
+                    level.showToast('✦ Progress recovered - reloading...');
+                    setTimeout(() => window.location.reload(), 1000);
+                  } else {
+                    alert(result.body?.error || 'Failed to recover from server.');
+                  }
+                } catch (error) {
+                  console.error('Failed to recover profile:', error);
+                  alert('Failed to recover from server. Check console for details.');
+                }
+              }
+            }
+          }
+        ] : []),
+        // Reset button (always visible)
         {
           label: '🔄 Reset Profile',
           title: 'Clear all profile data and start fresh',
@@ -1480,20 +1533,22 @@ await this.profileManager.saveIdentity(profile);
      * Update profile panel. Re-render profile panel fields with current profile data.
      */
     this.updateProfilePanel = function(profile = {}) {
+      console.log('updateProfilePanel called with:', profile);
       this.createProfilePanel();
       window._forgePanelCleanup = () => {
         if (this.profilePanelView) {
           this.profilePanelView.destroy();
         }
       };
-      this.profilePanelView.update({
+      const panelData = {
         name: profile.name || '—',
         email: profile.email || '—',
         githubID: profile.githubID || '—',
         persona: profile.persona || '—',
         sprite: profile.sprite || '—',
-        worldTheme: profile.worldTheme || '—',
-      });
+        worldTheme: profile.theme || profile.worldTheme || '—',  // Map 'theme' to 'worldTheme'
+      };
+      this.profilePanelView.update(panelData);
       this._syncCompletionPanel();
     };
 
