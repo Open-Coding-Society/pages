@@ -148,6 +148,165 @@ class GameLevelMaze {
       }
     };
 
+
+    // ── Character Swap Menu ───────────────────────────────────────────────────
+    const spriteOptions = [
+      {
+        label: "Octopus",
+        src: "/images/projects/escape-the-tower/octopus.png",
+        pixels: { height: 250, width: 167 },
+        orientation: { rows: 3, columns: 2 },
+        down:  { row: 0, start: 0, columns: 2 },
+        left:  { row: 1, start: 0, columns: 2, mirror: true },
+        right: { row: 1, start: 0, columns: 2 },
+        up:    { row: 0, start: 0, columns: 2 },
+        SCALE_FACTOR: 5,
+        ANIMATION_RATE: 50
+      },
+      {
+        label: "Tux",
+        src: "/images/projects/escape-the-tower/tux.png",
+        pixels: { height: 256, width: 352 },
+        orientation: { rows: 8, columns: 11 },
+        down:  { row: 5, start: 0, columns: 3 },
+        left:  { row: 5, start: 0, columns: 3, mirror: true },
+        right: { row: 5, start: 0, columns: 3 },
+        up:    { row: 5, start: 0, columns: 3 },
+        SCALE_FACTOR: 10,
+        ANIMATION_RATE: 50
+      },
+      {
+        label: "Octocat",
+        src: "/images/projects/escape-the-tower/octocat.png",
+        pixels: { height: 301, width: 801 },
+        orientation: { rows: 1, columns: 4 },
+        down:  { row: 0, start: 0, columns: 3 },
+        left:  { row: 0, start: 0, columns: 3, mirror: true },
+        right: { row: 0, start: 0, columns: 3 },
+        up:    { row: 0, start: 0, columns: 3 },
+        SCALE_FACTOR: 10,
+        ANIMATION_RATE: 50
+      },
+      {
+        label: "R2-D2",
+        src: "/images/projects/escape-the-tower/r2_idle.png",
+        pixels: { height: 223, width: 505 },
+        orientation: { rows: 1, columns: 3 },
+        down:  { row: 0, start: 0, columns: 3 },
+        left:  { row: 0, start: 0, columns: 3, mirror: true },
+        right: { row: 0, start: 0, columns: 3 },
+        up:    { row: 0, start: 0, columns: 3 },
+        SCALE_FACTOR: 8,
+        ANIMATION_RATE: 80
+      }
+    ];
+
+    const menuId = 'character-swap-menu-escape-tower';
+
+    const createSwapMenu = () => {
+      const existing = document.getElementById(menuId);
+      if (existing) existing.remove();
+      const menu = document.createElement('div');
+      menu.id = menuId;
+      Object.assign(menu.style, {
+        position: 'fixed', top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
+        border: '2px solid #fff', borderRadius: '10px',
+        padding: '20px', zIndex: '10000',
+        display: 'none', flexDirection: 'column',
+        alignItems: 'center', gap: '10px',
+        color: '#fff', fontFamily: 'monospace', minWidth: '200px'
+      });
+      const title = document.createElement('div');
+      title.textContent = '🎭 Choose Character';
+      title.style.cssText = 'font-size:16px; font-weight:bold; margin-bottom:8px;';
+      menu.appendChild(title);
+      spriteOptions.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option.label;
+        Object.assign(btn.style, {
+          width: '100%', padding: '8px 16px',
+          backgroundColor: '#333', color: '#fff',
+          border: '1px solid #666', borderRadius: '5px',
+          cursor: 'pointer', fontFamily: 'monospace', fontSize: '14px'
+        });
+        btn.onmouseover = () => btn.style.backgroundColor = '#555';
+        btn.onmouseout  = () => btn.style.backgroundColor = '#333';
+        btn.onclick = () => {
+          const player = gameEnv.gameObjects.find(
+            obj => obj?.constructor?.name === 'Player' ||
+                   obj?.spriteData?.id === 'Octopus' ||
+                   obj?.spriteData?.id === 'Player'
+          );
+          if (!player) return;
+          player.spriteData = { ...player.spriteData, ...option };
+          player.spriteReady = false;
+          player.spriteSheet = new Image();
+          player.spriteSheet.onload = () => {
+            player.spriteReady = true;
+            if (typeof player.resize === 'function') player.resize();
+          };
+          player.spriteSheet.src = option.src;
+          window._escapeTowerSelectedSprite = option;
+          setMenuVisibility(false);
+        };
+        menu.appendChild(btn);
+      });
+      const hint = document.createElement('div');
+      hint.textContent = 'Press Q to close';
+      hint.style.cssText = 'font-size:11px; color:#aaa; margin-top:8px;';
+      menu.appendChild(hint);
+      document.body.appendChild(menu);
+      return menu;
+    };
+
+    const setMenuVisibility = (visible) => {
+      const menu = document.getElementById(menuId);
+      if (menu) menu.style.display = visible ? 'flex' : 'none';
+    };
+
+    const toggleMenu = () => {
+      const menu = document.getElementById(menuId) || createSwapMenu();
+      const isOpen = menu.style.display === 'flex';
+      setMenuVisibility(!isOpen);
+    };
+
+    const swapMenuKeyHandler = (e) => {
+      if (e.key.toLowerCase() === 'q') {
+        e.preventDefault();
+        toggleMenu();
+      }
+    };
+
+    document.addEventListener('keydown', swapMenuKeyHandler);
+    createSwapMenu();
+
+    // Restore previously selected sprite if one was saved
+    const savedSprite = window._escapeTowerSelectedSprite;
+    if (savedSprite) {
+      const restoreSprite = () => {
+        const player = gameEnv.gameObjects.find(
+          obj => obj?.constructor?.name === 'Player' ||
+                 obj?.spriteData?.id === 'Octopus' ||
+                 obj?.spriteData?.id === 'Player'
+        );
+        if (player) {
+          player.spriteData = { ...player.spriteData, ...savedSprite };
+          player.spriteReady = false;
+          player.spriteSheet = new Image();
+          player.spriteSheet.onload = () => {
+            player.spriteReady = true;
+            if (typeof player.resize === 'function') player.resize();
+          };
+          player.spriteSheet.src = savedSprite.src;
+        } else {
+          setTimeout(restoreSprite, 100);
+        }
+      };
+      setTimeout(restoreSprite, 200);
+    }
+
     // ── Level class list ──────────────────────────────────────────────────────
     this.classes = [
       { class: GameEnvBackground, data: image_data_cave    },
