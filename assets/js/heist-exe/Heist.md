@@ -13,7 +13,7 @@ permalink: /gamify/heist
     // Adventure Game assets locations (use AdventureGame wrapper + GameControl)
     import Game from "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/Game.js";
     import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1.1/essentials/GameControl.js";
-    import HeistTemplate from "{{site.baseurl}}/assets/js/heist-exe/HeistTemplate.js";
+    import HeistL2 from "{{site.baseurl}}/assets/js/heist-exe/HeistL2.js";
     import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
     // Web Server Environment data
@@ -24,7 +24,7 @@ permalink: /gamify/heist
         fetchOptions: fetchOptions,
         gameContainer: document.getElementById("gameContainer"),
         gameCanvas: document.getElementById("gameCanvas"),
-        gameLevelClasses: [HeistTemplate]
+        gameLevelClasses: [HeistL2]
 
     }
     // Launch Adventure Game using the central core and adventure GameControl

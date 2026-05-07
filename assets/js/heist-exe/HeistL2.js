@@ -5,6 +5,7 @@ import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
 import Gem from '@assets/js/heist-exe/Gem.js';
 //import heistMusic from '@assets/js/heist-exe/heistMusic';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Guard from '@assets/js/heist-exe/Guard.js';
 class HeistTemplate {
   constructor(gameEnv) {    
     this.gameEnv = gameEnv;
@@ -41,108 +42,150 @@ class HeistTemplate {
         keypress: { up: 87, left: 65, down: 83, right: 68 }
     };
 
+    const sprite_data_guard1 = {
+        id: 'Guard1',
+        name: 'guard1',
+        src: path + "/assets/js/heist-exe/images/heist-guard.png",
+        SCALE_FACTOR: 10,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 50,
+        INIT_POSITION: { x: 220, y: 300 }, 
+        pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
+        orientation: { rows: 4, columns: 4 },
+        up:        { row: 3, start: 0, columns: 4 },
+        upLeft:    { row: 1, start: 0, columns: 4, mirror: true, rotate: -Math.PI/16 },
+        upRight:   { row: 0, start: 0, columns: 4, rotate: Math.PI/16 },
+        left:      { row: 1, start: 0, columns: 4 },
+        right:     { row: 0, start: 0, columns: 4 },
+        down:      { row: 2, start: 0, columns: 4 },
+        downLeft:  { row: 1, start: 0, columns: 4, mirror: true, rotate: Math.PI/16 },
+        downRight: { row: 0, start: 0, columns: 4, rotate: -Math.PI/16 },
+        hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 }
+    };
+
+    const sprite_data_guard2 = {
+        id: 'Guard2',
+        name: 'guard2',
+        src: path + "/assets/js/heist-exe/images/heist-guard.png",
+        SCALE_FACTOR: 10,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 50,
+        INIT_POSITION: { x: 520, y: 300 }, 
+        pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
+        orientation: { rows: 4, columns: 4 },
+        up:        { row: 3, start: 0, columns: 4 },
+        upLeft:    { row: 1, start: 0, columns: 4, mirror: true, rotate: -Math.PI/16 },
+        upRight:   { row: 0, start: 0, columns: 4, rotate: Math.PI/16 },
+        left:      { row: 1, start: 0, columns: 4 },
+        right:     { row: 0, start: 0, columns: 4 },
+        down:      { row: 2, start: 0, columns: 4 },
+        downLeft:  { row: 1, start: 0, columns: 4, mirror: true, rotate: Math.PI/16 },
+        downRight: { row: 0, start: 0, columns: 4, rotate: -Math.PI/16 },
+        hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 }
+    };
+
     const border_top = {
         id: 'border_top',
-        x: width * -0.0029, y: height * 0.0, width: width * 1.0029, height: height * 0.0587,
+        x: -0.0029, y: 0.0, width: 1.0029, height: 0.0587,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     } 
 
     const border_bottom = {
         id: 'border_bottom',
-        x: width * 0.0, y: height * 0.9371, width: width * 1.0, height: height * 0.0629,
+        x: 0.0, y: 0.9371, width: 1.0, height: 0.0629,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const border_left = {
         id: 'border_left',
-        x: width * 0.0, y: height * 0.0, width: width * 0.04, height: height * 1.0,
+        x: 0.0, y: 0.0, width: 0.04, height: 1.0,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const border_right = {
         id: 'border_right',
-        x: width * 0.96, y: height * 0.0, width: width * 0.04, height: height * 1.0,
+        x: 0.96, y: 0.0, width: 0.04, height: 1.0,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const green_zone = {
         id: 'green_zone',
-        x: width * 0.8559, y: height * 0.2983, width: width * 0.1055, height: height * 0.4033,
+        x: 0.8559, y: 0.2983, width: 0.1055, height: 0.4033,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_top_left = {
         id: 'wall_top_left',
-        x: width * 0.1406, y: height * 0.1521, width: width * 0.2111, height: height * 0.1583,
+        x: 0.1406, y: 0.1521, width: 0.2111, height: 0.1583,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_top_right = {
         id: 'wall_top_right',
-        x: width * 0.7224, y: height * 0.0979, width: width * 0.1467, height: height * 0.1204,
+        x: 0.7224, y: 0.0979, width: 0.1467, height: 0.1204,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_mid_lower_center = {
         id: 'wall_mid_lower_center',
-        x: width * 0.4107, y: height * 0.5425, width: width * 0.0826, height: height * 0.3167,
+        x: 0.4107, y: 0.5425, width: 0.0826, height: 0.3167,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_mid_upper_center = {
         id: 'wall_mid_upper_center',
-        x: width * 0.4107, y: height * 0.1487, width: width * 0.0806, height: height * 0.3058,
+        x: 0.4107, y: 0.1487, width: 0.0806, height: 0.3058,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_mid_upper_right = {
         id: 'wall_mid_upper_right',
-        x: width * 0.55, y: height * 0.3446, width: width * 0.2128, height: height * 0.1183,
+        x: 0.55, y: 0.3446, width: 0.2128, height: 0.1183,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_bot_left = {
         id: 'wall_bot_left',
-        x: width * 0.1391, y: height * 0.6908, width: width * 0.2154, height: height * 0.1646,
+        x: 0.1391, y: 0.6908, width: 0.2154, height: 0.1646,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_bot_right = {
         id: 'wall_bot_right',
-        x: width * 0.7206, y: height * 0.7908, width: width * 0.1482, height: height * 0.1121,
+        x: 0.7206, y: 0.7908, width: 0.1482, height: 0.1121,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
     const wall_mid_lower_right = {
         id: 'wall_mid_lower_right',
-        x: width * 0.5512, y: height * 0.5396, width: width * 0.2144, height: height * 0.1167,
+        x: 0.5512, y: 0.5396, width: 0.2144, height: 0.1167,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
+        hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 }
     }
 
 
@@ -179,7 +222,9 @@ class HeistTemplate {
         { class: Barrier, data: wall_mid_upper_right },
         { class: Barrier, data: wall_bot_left },
         { class: Barrier, data: wall_bot_right },
-        { class: Barrier, data: wall_mid_lower_right}
+        { class: Barrier, data: wall_mid_lower_right},
+        { class: Guard, data: sprite_data_guard1 },
+        { class: Guard, data: sprite_data_guard2 }
     ];
   }
 }
