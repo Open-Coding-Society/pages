@@ -21,7 +21,7 @@ games/gamify
 games/local-storage
 games/tag-game-multiplayer
 games/ocean
-games/peppa-pig
+games/peppa-pig:dev
 games/platformer:dev
 games/red-riding
 games/teamtestgame
