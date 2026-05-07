@@ -11,7 +11,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import GameStats from '@assets/js/GameEnginev1.1/essentials/GameStats.js';
+import GameStats from '@assets/js/GameEnginev1.1/GameStats.js';
 import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
 
@@ -32,14 +32,14 @@ class GameLevelEscaperoom {
         // ── Background ──────────────────────────────────────────────────────────
         const bgData = {
             name: "custom_bg",
-            src: path + "@projects/games/gategame/images/bg/Slab.png",
+            src: path + "/images/projects/gategame/bg/Slab.png",
             pixels: { height: 772, width: 1134 }
         };
 
         // ── Player ──────────────────────────────────────────────────────────────
         const playerData = {
             id: 'playerData',
-            src: path + "@projects/games/gategame/images/sprites/slime.png",
+            src: path + "/images/projects/gategame/sprites/slime.png",
             SCALE_FACTOR: 15,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -62,7 +62,7 @@ class GameLevelEscaperoom {
         const npcData1 = {
             id: 'Cannonball',
             greeting: 'Door Unlocked',
-            src: path + "@projects/games/gategame/images/sprites/mastergate.png",
+            src: path + "/images/projects/gategame/sprites/mastergate.png",
             SCALE_FACTOR: 11,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 920, y: 600 },
@@ -184,7 +184,7 @@ class GameLevelEscaperoom {
 
         const spriteData = {
             id: 'Escape Room Guide',
-            src: path + "@projects/games/gategame/images/sprites/mastergate.png",
+            src: path + "/images/projects/gategame/sprites/mastergate.png",
             pixels: { height: 512, width: 512 },
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
