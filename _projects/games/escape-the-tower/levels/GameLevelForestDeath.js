@@ -1,11 +1,71 @@
 // Forest Death Sublevel
 // Save as: assets/js/GameEnginev1.1/GameLevelForestDeath.js
 
-import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
-import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
-import GameLevelForestSub from '/assets/js/projects/game-in-game-lesson/levels/GameLevelForestSub.js';
+import GameEnvBackground from './essentials/GameEnvBackground.js';
+import Player from './essentials/Player.js';
+import Npc from './essentials/Npc.js';
+import DialogueSystem from './essentials/DialogueSystem.js';
+import GameLevelForestSub from './GameLevelForestSub.js';
+
+// ── Chase Controller ──────────────────────────────────────────────────────────
+class BeckonerChaseController {
+  constructor(data, gameEnv) {
+    this.gameEnv    = gameEnv;
+    this.chaseState = data.chaseState;
+    this.onCaught   = data.onCaught;
+    this.startTime  = Date.now();
+
+    if (gameEnv.gameObjects) gameEnv.gameObjects.push(this);
+  }
+
+  update() {
+    const { chaseState } = this;
+    if (chaseState.caught || chaseState.escaped) return;
+
+    const elapsed = (Date.now() - this.startTime) / 1000;
+    if (elapsed < 3) return;
+
+    const player   = this.gameEnv.gameObjects?.find(o => o?.spriteData?.id === 'Octopus');
+    const beckoner = this.gameEnv.gameObjects?.find(o => o?.spriteData?.id === 'Strange Beckoner');
+    if (!player || !beckoner) return;
+
+    if (beckoner.dialogueSystem?.isDialogueOpen?.()) return;
+
+    const speed = Math.min(1.2 + (elapsed - 3) * 0.025, 2.5);
+
+    const px = (player.position?.x   ?? 0) + (player.width    ?? 0) / 2;
+    const py = (player.position?.y   ?? 0) + (player.height   ?? 0) / 2;
+    const bx = (beckoner.position?.x ?? 0) + (beckoner.width  ?? 0) / 2;
+    const by = (beckoner.position?.y ?? 0) + (beckoner.height ?? 0) / 2;
+
+    const dx   = px - bx;
+    const dy   = py - by;
+    const dist = Math.hypot(dx, dy) || 1;
+
+    beckoner.position.x += (dx / dist) * speed;
+    beckoner.position.y += (dy / dist) * speed;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      beckoner.direction = dx >= 0 ? 'right' : 'left';
+    } else {
+      beckoner.direction = dy >= 0 ? 'down' : 'up';
+    }
+
+    if (dist < 50 && !chaseState.caught) {
+      chaseState.caught = true;
+      this.onCaught(beckoner, player);
+    }
+  }
+
+  draw()            {}
+  collisionChecks() {}
+  destroy() {
+    const idx = this.gameEnv?.gameObjects?.indexOf?.(this) ?? -1;
+    if (idx > -1) this.gameEnv.gameObjects.splice(idx, 1);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 class GameLevelForestDeath {
   constructor(gameEnv) {
@@ -13,24 +73,90 @@ class GameLevelForestDeath {
 
     this.gameEnv = gameEnv;
 
-    let height = gameEnv.innerHeight;
-    let path   = gameEnv.path;
+    let path = gameEnv.path;
+
+    // ── Shared chase state ────────────────────────────────────────────────────
+    const chaseState = {
+      caught:     false,
+      escaped:    false,
+      tauntIndex: 0
+    };
+
+    // ── Player freeze / unfreeze helpers ──────────────────────────────────────
+    // Saves the player's keypress map and replaces it with an empty object,
+    // making WASD do nothing. Also zeroes velocity so they slide to a stop.
+    function freezePlayer(player) {
+      if (!player) return;
+      player._savedKeypress    = player.spriteData?.keypress ?? {};
+      player._savedVelocity    = { ...(player.velocity ?? {}) };
+      if (player.spriteData)   player.spriteData.keypress = {};
+      if (player.velocity)     { player.velocity.x = 0; player.velocity.y = 0; }
+      // Belt-and-suspenders: also clear any keys the engine thinks are held down
+      if (player.keys)         player.keys = {};
+    }
+
+    function unfreezePlayer(player) {
+      if (!player) return;
+      if (player.spriteData && player._savedKeypress !== undefined) {
+        player.spriteData.keypress = player._savedKeypress;
+      }
+      // Don't restore old velocity — let the player start fresh
+      player._savedKeypress = undefined;
+    }
+
+    // ── Transition back to fork ───────────────────────────────────────────────
+    function returnToFork() {
+      if (chaseState.escaped) return;
+      chaseState.escaped = true;
+
+      const primaryGame = gameEnv.gameControl;
+      const fade = document.createElement('div');
+      Object.assign(fade.style, {
+        position: 'fixed', top: '0', left: '0',
+        width: '100%', height: '100%',
+        backgroundColor: '#000', opacity: '0',
+        transition: 'opacity 0.6s ease-in-out',
+        zIndex: '9999', pointerEvents: 'none'
+      });
+      document.body.appendChild(fade);
+
+      requestAnimationFrame(() => {
+        fade.style.opacity = '1';
+        setTimeout(() => {
+          const gameContainer = document.getElementById('gameContainer');
+          if (gameContainer) {
+            Array.from(gameContainer.children).forEach(child => {
+              if (child.id !== 'promptDropDown') gameContainer.removeChild(child);
+            });
+          }
+          if (primaryGame) {
+            primaryGame.levelClasses = [GameLevelForestSub];
+            primaryGame.currentLevelIndex = 0;
+            primaryGame.isPaused = false;
+            primaryGame.transitionToLevel();
+          }
+          setTimeout(() => {
+            fade.style.opacity = '0';
+            setTimeout(() => { if (fade.parentNode) fade.parentNode.removeChild(fade); }, 600);
+          }, 300);
+        }, 600);
+      });
+    }
 
     // ── Background ────────────────────────────────────────────────────────────
     const image_data_bg = {
       name: 'death_room',
       greeting: "The warmth you followed was never welcoming.",
-      src: "/images/projects/game-in-game-lesson/cave.png",
+      src: path + "/images/gamify/cave.png",
       pixels: { height: 597, width: 340 }
     };
 
-    // ── Player (Octopus) ──────────────────────────────────────────────────────
-    const OCTOPUS_SCALE_FACTOR = 5;
+    // ── Player ────────────────────────────────────────────────────────────────
     const sprite_data_player = {
       id: 'Octopus',
       greeting: "What have I done...",
-      src: "/images/projects/game-in-game-lesson/octopus.png",
-      SCALE_FACTOR: OCTOPUS_SCALE_FACTOR,
+      src: path + "/images/gamify/octopus.png",
+      SCALE_FACTOR: 5,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
       GRAVITY: false,
@@ -54,7 +180,7 @@ class GameLevelForestDeath {
     const sprite_data_beckoner = {
       id: 'Strange Beckoner',
       greeting: sprite_greet_beckoner,
-      src: "/images/projects/game-in-game-lesson/chickenj.png",
+      src: path + "/images/gamify/chickenj.png",
       SCALE_FACTOR: 7,
       ANIMATION_RATE: 80,
       pixels: { height: 255, width: 150 },
@@ -62,115 +188,147 @@ class GameLevelForestDeath {
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-      dialogues: [
-        "I genuinely cannot believe you fell for that.",
-        "BAWK! Do you know how many people I've sent down this path? All of them. Every single one.",
-        "You really thought a chicken was going to give you good advice? Really?",
-        "The look on your face right now. Priceless. Absolutely priceless.",
-        "I told you to go left and you WENT left. Outstanding."
-      ],
       reaction: function() {
         if (this.dialogueSystem) this.showReactionDialogue();
         else console.log(sprite_greet_beckoner);
       },
       interact: function() {
-        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) { this.dialogueSystem.closeDialogue(); return; }
+        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+          this.dialogueSystem.closeDialogue();
+          return;
+        }
         if (!this.dialogueSystem) this.dialogueSystem = new DialogueSystem();
-
-        this._tauntIndex = (this._tauntIndex || 0);
         const taunts = [
-          "Oh, you came back to talk to me? Interesting. That's really something.",
+          "Oh, you came to ME? Bold. Baffling, but bold.",
           "Still here? I'd have thought the shame would have driven you off by now.",
-          "You know the right path is still there. I mean, you won't take it, but it's there.",
           "BAWK BAWK. Classic. An absolute classic.",
-          "Fine, fine. You can leave if you want. The fork is back that way. Not that it'll help you."
+          "The portal is on the right. Not that I'm helping you."
         ];
-        const msg = taunts[this._tauntIndex % taunts.length];
-        this._tauntIndex++;
-
-        this.dialogueSystem.showDialogue(msg, "Strange Beckoner", this.spriteData.src);
+        this.dialogueSystem.showDialogue(
+          taunts[chaseState.tauntIndex % taunts.length],
+          "Strange Beckoner", this.spriteData.src
+        );
+        chaseState.tauntIndex++;
         this.dialogueSystem.addButtons([
-          {
-            text: "Go back to the fork",
-            action: () => {
-              this.dialogueSystem.closeDialogue();
-              const primaryGame = gameEnv.gameControl;
-
-              const fade = document.createElement('div');
-              Object.assign(fade.style, {
-                position: 'fixed', top: '0', left: '0',
-                width: '100%', height: '100%',
-                backgroundColor: '#000', opacity: '0',
-                transition: 'opacity 0.6s ease-in-out',
-                zIndex: '9999', pointerEvents: 'none'
-              });
-              document.body.appendChild(fade);
-
-              requestAnimationFrame(() => {
-                fade.style.opacity = '1';
-                setTimeout(() => {
-                  const gameContainer = document.getElementById('gameContainer');
-                  if (gameContainer) {
-                    Array.from(gameContainer.children).forEach(child => {
-                      if (child.id !== 'promptDropDown') gameContainer.removeChild(child);
-                    });
-                  }
-                  if (primaryGame) {
-                    primaryGame.levelClasses = [GameLevelForestSub];
-                    primaryGame.currentLevelIndex = 0;
-                    primaryGame.isPaused = false;
-                    primaryGame.transitionToLevel();
-                  }
-                  setTimeout(() => {
-                    fade.style.opacity = '0';
-                    setTimeout(() => { if (fade.parentNode) fade.parentNode.removeChild(fade); }, 600);
-                  }, 300);
-                }, 600);
-              });
-            }
-          },
           { text: "...", action: () => this.dialogueSystem.closeDialogue() }
         ]);
       }
     };
 
+    // ── Chase controller data ─────────────────────────────────────────────────
+    // onCaught now receives both beckoner and player so we can freeze/unfreeze.
+    const chase_data = {
+      chaseState,
+      onCaught: (beckoner, player) => {
+        // Freeze player immediately — no sneaking away while reading the taunt
+        freezePlayer(player);
+
+        const taunts = [
+          "BAWK! Got you! I genuinely cannot believe you fell for that.",
+          "Every. Single. Time. Every traveller. Every one.",
+          "You really thought a chicken was going to give you good advice?",
+          "The portal is on the right. Not that it saves your dignity.",
+          "You can still escape. But I'll be right behind you. BAWK."
+        ];
+        const msg = taunts[chaseState.tauntIndex % taunts.length];
+        chaseState.tauntIndex++;
+
+        if (!beckoner.dialogueSystem) beckoner.dialogueSystem = new DialogueSystem();
+        beckoner.dialogueSystem.showDialogue(msg, "Strange Beckoner", beckoner.spriteData.src);
+        beckoner.dialogueSystem.addButtons([
+          {
+            text: "Run!",
+            action: () => {
+              beckoner.dialogueSystem.closeDialogue();
+              // Unfreeze player only when they dismiss the dialogue
+              unfreezePlayer(player);
+              chaseState.caught = false;   // resume chase
+            }
+          }
+        ]);
+      }
+    };
+
     // ── NPC: Another Victim ───────────────────────────────────────────────────
-    const sprite_greet_victim = "Yeah. Me too.";
+    const sprite_greet_victim = "Run. Don't stop to talk to me. Run.";
     const sprite_data_victim = {
       id: 'Another Victim',
       greeting: sprite_greet_victim,
-      src: "/images/projects/game-in-game-lesson/stockguy.png",
+      src: path + "/images/gamify/stockguy.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 441, width: 339 },
-      INIT_POSITION: { x: 0.8, y: 0.6 },
+      INIT_POSITION: { x: 0.25, y: 0.6 },
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
       dialogues: [
-        "Yeah. Me too.",
+        "Run. Don't stop to talk to me. Run.",
+        "The portal — right side of the room. That's how you get back.",
         "The chicken got me six months ago. Still can't leave.",
-        "I should have known. A chicken jockey. I should have known.",
-        "At least you can still go back. I... couldn't figure out how.",
-        "Don't let it gloat too long. It feeds on that."
+        "Don't let it catch you. It gets faster the longer you stay."
       ],
       reaction: function() {
         if (this.dialogueSystem) this.showReactionDialogue();
         else console.log(sprite_greet_victim);
       },
       interact: function() {
-        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) { this.dialogueSystem.closeDialogue(); return; }
+        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+          this.dialogueSystem.closeDialogue();
+          return;
+        }
         if (!this.dialogueSystem) this.dialogueSystem = new DialogueSystem();
         this.showRandomDialogue();
       }
     };
 
+    // ── NPC: Escape Portal ────────────────────────────────────────────────────
+    const sprite_greet_portal = "This way. Quickly.";
+    const sprite_data_portal = {
+      id: 'Escape Portal',
+      greeting: sprite_greet_portal,
+      src: path + "/images/gamify/octocat.png",
+      SCALE_FACTOR: 8,
+      ANIMATION_RATE: 60,
+      pixels: { height: 301, width: 801 },
+      INIT_POSITION: { x: 0.88, y: 0.55 },
+      orientation: { rows: 1, columns: 4 },
+      down: { row: 0, start: 0, columns: 3 },
+      hitbox: { widthPercentage: 0.1, heightPercentage: 0.1 },
+      reaction: function() {
+        if (!chaseState.escaped) returnToFork();
+      },
+      interact: function() {
+        if (chaseState.escaped) return;
+        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+          this.dialogueSystem.closeDialogue();
+          returnToFork();
+          return;
+        }
+        if (!this.dialogueSystem) this.dialogueSystem = new DialogueSystem();
+        this.dialogueSystem.showDialogue(
+          "A shimmering tear in the air pulses with cool light. The fork is on the other side.",
+          "Escape Portal", this.spriteData.src
+        );
+        this.dialogueSystem.addButtons([
+          {
+            text: "Step through",
+            primary: true,
+            action: () => { this.dialogueSystem.closeDialogue(); returnToFork(); }
+          },
+          { text: "Wait", action: () => this.dialogueSystem.closeDialogue() }
+        ]);
+      }
+    };
+
     // ── Level class list ──────────────────────────────────────────────────────
     this.classes = [
-      { class: GameEnvBackground, data: image_data_bg       },
-      { class: Player,            data: sprite_data_player   },
-      { class: Npc,               data: sprite_data_beckoner },
-      { class: Npc,               data: sprite_data_victim   },
+      { class: GameEnvBackground,       data: image_data_bg       },
+      { class: Player,                  data: sprite_data_player   },
+      { class: Npc,                     data: sprite_data_beckoner },
+      { class: Npc,                     data: sprite_data_victim   },
+      { class: Npc,                     data: sprite_data_portal   },
+      { class: BeckonerChaseController, data: chase_data           },
     ];
   }
 }
