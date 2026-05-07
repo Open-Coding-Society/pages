@@ -5,6 +5,7 @@ import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
 import Gem from '@assets/js/heist-exe/Gem.js';
 //import heistMusic from '@assets/js/heist-exe/heistMusic';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Guard from '@assets/js/heist-exe/Guard.js';
 class HeistTemplate {
   constructor(gameEnv) {    
     this.gameEnv = gameEnv;
@@ -39,6 +40,48 @@ class HeistTemplate {
         downRight: { row: 0, start: 0, columns: 4, rotate: -Math.PI/16 },
         hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
         keypress: { up: 87, left: 65, down: 83, right: 68 }
+    };
+
+    const sprite_data_guard1 = {
+        id: 'Guard1',
+        name: 'guard1',
+        src: path + "/assets/js/heist-exe/images/heist-guard.png",
+        SCALE_FACTOR: 10,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 50,
+        INIT_POSITION: { x: 220, y: 300 }, 
+        pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
+        orientation: { rows: 4, columns: 4 },
+        up:        { row: 3, start: 0, columns: 4 },
+        upLeft:    { row: 1, start: 0, columns: 4, mirror: true, rotate: -Math.PI/16 },
+        upRight:   { row: 0, start: 0, columns: 4, rotate: Math.PI/16 },
+        left:      { row: 1, start: 0, columns: 4 },
+        right:     { row: 0, start: 0, columns: 4 },
+        down:      { row: 2, start: 0, columns: 4 },
+        downLeft:  { row: 1, start: 0, columns: 4, mirror: true, rotate: Math.PI/16 },
+        downRight: { row: 0, start: 0, columns: 4, rotate: -Math.PI/16 },
+        hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 }
+    };
+
+    const sprite_data_guard2 = {
+        id: 'Guard2',
+        name: 'guard2',
+        src: path + "/assets/js/heist-exe/images/heist-guard.png",
+        SCALE_FACTOR: 10,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 50,
+        INIT_POSITION: { x: 520, y: 300 }, 
+        pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
+        orientation: { rows: 4, columns: 4 },
+        up:        { row: 3, start: 0, columns: 4 },
+        upLeft:    { row: 1, start: 0, columns: 4, mirror: true, rotate: -Math.PI/16 },
+        upRight:   { row: 0, start: 0, columns: 4, rotate: Math.PI/16 },
+        left:      { row: 1, start: 0, columns: 4 },
+        right:     { row: 0, start: 0, columns: 4 },
+        down:      { row: 2, start: 0, columns: 4 },
+        downLeft:  { row: 1, start: 0, columns: 4, mirror: true, rotate: Math.PI/16 },
+        downRight: { row: 0, start: 0, columns: 4, rotate: -Math.PI/16 },
+        hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 }
     };
 
     const border_top = {
@@ -179,7 +222,9 @@ class HeistTemplate {
         { class: Barrier, data: wall_mid_upper_right },
         { class: Barrier, data: wall_bot_left },
         { class: Barrier, data: wall_bot_right },
-        { class: Barrier, data: wall_mid_lower_right}
+        { class: Barrier, data: wall_mid_lower_right},
+        { class: Guard, data: sprite_data_guard1 },
+        { class: Guard, data: sprite_data_guard2 }
     ];
   }
 }
