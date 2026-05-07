@@ -20,8 +20,10 @@ games/escape-the-tower
 games/pirate-hunt
 games/gamify
 games/local-storage
+main
+games/multiplayer
+games/ocean-adventure:dev
 games/tag-game-multiplayer
-games/ocean
 games/peppa-pig
 games/platformer
 games/red-riding
