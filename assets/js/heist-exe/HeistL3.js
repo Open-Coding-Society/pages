@@ -15,7 +15,7 @@ class HeistL3 {
 
     const image_data_bg = {
         id: 'bg',
-        src: path + "/assets/js/heist-exe/images/heist-bg.png",
+        src: path + "/assets/js/heist-exe/images/heist-bg2.png",
         pixels: {height: 597, width: 340}
     };
 
@@ -84,7 +84,7 @@ class HeistL3 {
 
     const wall_top_left = {
         id: 'wall_top_left',
-        x: width * 0.1406, y: height * 0.1521, width: width * 0.2111, height: height * 0.1583,
+        x: width * 0.0386, y: height * 0.3150, width: width * 0.1780, height: height * 0.0617,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
@@ -92,7 +92,7 @@ class HeistL3 {
 
     const wall_top_right = {
         id: 'wall_top_right',
-        x: width * 0.7224, y: height * 0.0979, width: width * 0.1467, height: height * 0.1204,
+        x: width * 0.7842, y: height * 0.3119, width: width * 0.1783, height: height * 0.0541,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
@@ -100,7 +100,7 @@ class HeistL3 {
 
     const wall_mid_lower_center = {
         id: 'wall_mid_lower_center',
-        x: width * 0.4107, y: height * 0.5425, width: width * 0.0826, height: height * 0.3167,
+        x: width * 0.4107, y: height * 0.7167, width: width * 0.3139, height: height * 0.2163,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
@@ -108,7 +108,7 @@ class HeistL3 {
 
     const wall_mid_upper_center = {
         id: 'wall_mid_upper_center',
-        x: width * 0.4107, y: height * 0.1487, width: width * 0.0806, height: height * 0.3058,
+        x: width * 0.4107, y: height * 0.1790, width: width * 0.1797, height: height * 0.0520,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
@@ -116,7 +116,7 @@ class HeistL3 {
 
     const wall_mid_upper_right = {
         id: 'wall_mid_upper_right',
-        x: width * 0.55, y: height * 0.3446, width: width * 0.2128, height: height * 0.1183,
+        x: width * 0.3071, y: height * 0.4033, width: width * 0.3881, height: height * 0.0975,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
@@ -124,7 +124,7 @@ class HeistL3 {
 
     const wall_bot_left = {
         id: 'wall_bot_left',
-        x: width * 0.1391, y: height * 0.6908, width: width * 0.2154, height: height * 0.1646,
+        x: width * 0.0371, y: height * 0.6321, width: width * 0.1780, height: height * 0.0585,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
@@ -132,19 +132,12 @@ class HeistL3 {
 
     const wall_bot_right = {
         id: 'wall_bot_right',
-        x: width * 0.7206, y: height * 0.7908, width: width * 0.1482, height: height * 0.1121,
+        x: width * 0.7867, y: height * 0.6336, width: width * 0.1755, height: height * 0.0515,
         color: 'rgba(0, 255, 136, 0.5)',
         visible: true,
         hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
     }
 
-    const wall_mid_lower_right = {
-        id: 'wall_mid_lower_right',
-        x: width * 0.5512, y: height * 0.5396, width: width * 0.2144, height: height * 0.1167,
-        color: 'rgba(0, 255, 136, 0.5)',
-        visible: true,
-        hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 }
-    }
 
 
     const gem_data_1 = {
@@ -152,7 +145,7 @@ class HeistL3 {
         spriteImagePath: '@assets/js/heist-exe/gem.png',
         value: 5,
         SCALE_FACTOR: 10,
-        INIT_POSITION: { x: width * 0.05, y: height * 0.05 }
+        INIT_POSITION: { x: width * 0.15, y: height * 0.45 }
     };
 
     const gem_data_2 = {
@@ -160,7 +153,7 @@ class HeistL3 {
         spriteImagePath: '@assets/js/heist-exe/gem.png',
         value: 5,
         SCALE_FACTOR: 10,
-        INIT_POSITION: { x: width * 0.5, y: height * 0.5 }
+        INIT_POSITION: { x: width * 8.5, y: height * 1.5 }
     };
 
     this.classes = [      
@@ -179,8 +172,7 @@ class HeistL3 {
         { class: Barrier, data: wall_mid_upper_center },
         { class: Barrier, data: wall_mid_upper_right },
         { class: Barrier, data: wall_bot_left },
-        { class: Barrier, data: wall_bot_right },
-        { class: Barrier, data: wall_mid_lower_right}
+        { class: Barrier, data: wall_bot_right }
     ];
   }
 }
