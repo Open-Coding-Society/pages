@@ -10,7 +10,7 @@
 
 # === NESTED STRUCTURE (organized by category) ===
 # Games
-games/backgrounds
+games/voidstriker
 games/spline-barriers:dev
 games/characters
 games/collisions-mechanic
