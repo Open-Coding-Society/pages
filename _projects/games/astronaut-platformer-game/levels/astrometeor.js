@@ -39,6 +39,9 @@ class AstroMeteor {
     let _survivalRemaining = 0;
     let _survivalTimeout = null;
     let _respawnInProgress = false;
+    let _projectileLoop = null;
+    let _shootCooldown = false;
+    const projectiles = [];
 
     const meteorPool = [];
     const POOL_SIZE = 5;
@@ -159,6 +162,117 @@ class AstroMeteor {
       if (m.canvas) m.canvas.style.display = 'block';
     };
 
+    const showMeteorExplosion = (x, y) => {
+      const explosion = document.createElement('div');
+      Object.assign(explosion.style, {
+        position: 'fixed',
+        left: `${x}px`,
+        top: `${(gameEnv.top || 0) + y}px`,
+        transform: 'translate(-50%, -50%)',
+        width: '42px',
+        height: '42px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, #fff 0%, #ffdd55 30%, #ff5a2a 62%, rgba(255,90,42,0) 72%)',
+        boxShadow: '0 0 22px rgba(255,120,30,0.9)',
+        pointerEvents: 'none',
+        zIndex: 100002,
+        opacity: '1',
+        transition: 'transform 0.25s ease-out, opacity 0.25s ease-out'
+      });
+      document.body.appendChild(explosion);
+      requestAnimationFrame(() => {
+        explosion.style.transform = 'translate(-50%, -50%) scale(1.9)';
+        explosion.style.opacity = '0';
+      });
+      setTimeout(() => explosion.remove(), 300);
+    };
+
+    const removeProjectile = (projectile) => {
+      projectile.el.remove();
+      const index = projectiles.indexOf(projectile);
+      if (index >= 0) projectiles.splice(index, 1);
+    };
+
+    const destroyMeteor = (meteor) => {
+      showMeteorExplosion(meteor.position.x + (meteor.width || 0) / 2, meteor.position.y + (meteor.height || 0) / 2);
+      hideMeteor(meteor);
+    };
+
+    const projectileHitsMeteor = (projectile, meteor) => {
+      if (!meteor.spriteData?.meteorActive) return false;
+
+      const meteorLeft = meteor.position.x;
+      const meteorTop = meteor.position.y;
+      const meteorRight = meteorLeft + (meteor.width || 0);
+      const meteorBottom = meteorTop + (meteor.height || 0);
+      const projectileRight = projectile.x + projectile.w;
+      const projectileBottom = projectile.y + projectile.h;
+
+      return projectileRight > meteorLeft &&
+        projectile.x < meteorRight &&
+        projectileBottom > meteorTop &&
+        projectile.y < meteorBottom;
+    };
+
+    const updateProjectiles = () => {
+      for (const projectile of [...projectiles]) {
+        projectile.x += projectile.speed;
+        projectile.el.style.left = `${projectile.x}px`;
+
+        const hitMeteor = meteorPool.find(meteor => projectileHitsMeteor(projectile, meteor));
+        if (hitMeteor) {
+          destroyMeteor(hitMeteor);
+          removeProjectile(projectile);
+          continue;
+        }
+
+        if (projectile.x > gameEnv.innerWidth + 60) {
+          removeProjectile(projectile);
+        }
+      }
+    };
+
+    const fireProjectile = () => {
+      if (_shootCooldown || _respawnInProgress) return;
+
+      const player = gameEnv.gameObjects.find(obj => obj instanceof Player);
+      if (!player || projectiles.length >= 6) return;
+
+      _shootCooldown = true;
+      setTimeout(() => { _shootCooldown = false; }, 180);
+
+      const projectile = {
+        x: player.position.x + (player.width || 40) * 0.72,
+        y: player.position.y + (player.height || 40) * 0.46,
+        w: 24,
+        h: 6,
+        speed: 16,
+        el: document.createElement('div')
+      };
+
+      Object.assign(projectile.el.style, {
+        position: 'fixed',
+        left: `${projectile.x}px`,
+        top: `${(gameEnv.top || 0) + projectile.y}px`,
+        width: `${projectile.w}px`,
+        height: `${projectile.h}px`,
+        borderRadius: '999px',
+        background: '#7df9ff',
+        boxShadow: '0 0 12px #7df9ff, 0 0 22px rgba(125,249,255,0.7)',
+        pointerEvents: 'none',
+        zIndex: 100001
+      });
+
+      document.body.appendChild(projectile.el);
+      projectiles.push(projectile);
+    };
+
+    const handleShootKey = (event) => {
+      if (event.code !== 'Space' && event.key !== 'Enter') return;
+      event.preventDefault();
+      fireProjectile();
+    };
+
     // ── Meteor update logic ───────────────────────────────────────────────────
     const meteorUpdate = function() {
       if (!this.spriteData?.meteorActive) return;
@@ -273,7 +387,7 @@ class AstroMeteor {
     // ── Player ────────────────────────────────────────────────────────────────
     const playerData = {
       id: 'player-test',
-      greeting: 'Press W to flap up, A/D to move sideways',
+      greeting: 'Press W to flap up, A/D to move sideways, Space or Enter to shoot',
       src: spriteSrc,
       SCALE_FACTOR: 8,
       STEP_FACTOR: 600,
@@ -351,6 +465,10 @@ class AstroMeteor {
       meteorPool.push(...found);
       meteorPool.forEach(m => hideMeteor(m));
 
+      document.addEventListener('keydown', handleShootKey);
+      if (_projectileLoop) clearInterval(_projectileLoop);
+      _projectileLoop = setInterval(updateProjectiles, 16);
+
       // Grab the player instance
       const player = gameEnv.gameObjects.find(obj => obj instanceof Player);
       if (!player) return;
@@ -399,6 +517,17 @@ class AstroMeteor {
         // undo our gravity next frame
         this.velocity.y = 0;
       };
+    };
+
+    this.destroy = () => {
+      clearSurvivalTimer();
+      if (_projectileLoop) {
+        clearInterval(_projectileLoop);
+        _projectileLoop = null;
+      }
+      document.removeEventListener('keydown', handleShootKey);
+      projectiles.forEach(projectile => projectile.el.remove());
+      projectiles.length = 0;
     };
   }
 }
