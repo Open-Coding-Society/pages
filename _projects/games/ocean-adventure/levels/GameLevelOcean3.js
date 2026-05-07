@@ -217,7 +217,6 @@ class GameLevelOcean3 {
         // Top wall - horizontal curve
         {
             id: 'spline-top',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.2 * width, y: 0.15 * height },
                 { x: 0.4 * width, y: 0.12 * height },
@@ -231,7 +230,6 @@ class GameLevelOcean3 {
         // Bottom wall - horizontal curve
         {
             id: 'spline-bottom',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.2 * width, y: 0.83 * height },
                 { x: 0.4 * width, y: 0.86 * height },
@@ -245,7 +243,6 @@ class GameLevelOcean3 {
         // Left top wall - vertical curve
         {
             id: 'spline-leftTop',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.2 * width, y: 0.15 * height },
                 { x: 0.17 * width, y: 0.22 * height },
@@ -259,7 +256,6 @@ class GameLevelOcean3 {
         // Left bottom wall - vertical curve
         {
             id: 'spline-leftBottom',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.2 * width, y: 0.55 * height },
                 { x: 0.17 * width, y: 0.63 * height },
@@ -273,7 +269,6 @@ class GameLevelOcean3 {
         // Right wall - vertical curve
         {
             id: 'spline-right',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.78 * width, y: 0.15 * height },
                 { x: 0.81 * width, y: 0.30 * height },
@@ -287,7 +282,6 @@ class GameLevelOcean3 {
         // Interior wall w1 - vertical curve
         {
             id: 'spline-w1',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.3 * width, y: 0.25 * height },
                 { x: 0.27 * width, y: 0.32 * height },
@@ -301,7 +295,6 @@ class GameLevelOcean3 {
         // Interior wall w2 - horizontal curve
         {
             id: 'spline-w2',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.45 * width, y: 0.35 * height },
                 { x: 0.55 * width, y: 0.32 * height },
@@ -315,7 +308,6 @@ class GameLevelOcean3 {
         // Interior wall w3 - vertical curve
         {
             id: 'spline-w3',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.45 * width, y: 0.55 * height },
                 { x: 0.42 * width, y: 0.62 * height },
@@ -329,7 +321,6 @@ class GameLevelOcean3 {
         // Interior wall w4 - horizontal curve
         {
             id: 'spline-w4',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.55 * width, y: 0.45 * height },
                 { x: 0.60 * width, y: 0.42 * height },
@@ -343,7 +334,6 @@ class GameLevelOcean3 {
         // Interior wall w5 - vertical curve
         {
             id: 'spline-w5',
-            greeting: "This is a curved barrier, you cannot pass through it!",
             splinePoints: [
                 { x: 0.6 * width, y: 0.25 * height },
                 { x: 0.57 * width, y: 0.35 * height },
