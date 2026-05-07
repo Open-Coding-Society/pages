@@ -3,6 +3,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
+import GameLevelBasketball from './GameLevelBasketball.js';
 
 console.log('GameLevelSeek.js loaded:', new Date().toISOString());
 
@@ -11,6 +12,7 @@ class GameLevelSeek {
         this.gameEnv = gameEnv;
         this.levelCompleted = false;
         this.completionTriggered = false;
+        this.basketballTransitionStarted = false;
         this.spriteSwapScrollTriggered = false;
 
         const path = gameEnv.path;
@@ -423,13 +425,72 @@ class GameLevelSeek {
                 console.warn('Failed to emit seek completion event:', err);
             }
 
-            const level = this.gameEnv?.gameControl?.currentLevel;
-            if (level) {
-                setTimeout(() => {
-                    level.continue = false;
-                }, 350);
-            }
+            this.transitionToBasketball();
         }
+    }
+
+    transitionToBasketball() {
+        if (this.basketballTransitionStarted) return;
+        this.basketballTransitionStarted = true;
+
+        const primaryGame = this.gameEnv?.gameControl;
+        const topGame = primaryGame?.parentControl || primaryGame;
+        if (!primaryGame || !topGame) {
+            console.warn('Seek could not transition to Basketball because the game control chain is missing.');
+            return;
+        }
+
+        const fade = document.createElement('div');
+        Object.assign(fade.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#000',
+            opacity: '0',
+            transition: 'opacity 0.8s ease-in-out',
+            zIndex: '9999',
+            pointerEvents: 'none'
+        });
+        document.body.appendChild(fade);
+
+        requestAnimationFrame(() => {
+            fade.style.opacity = '1';
+            setTimeout(() => {
+                try {
+                    if (primaryGame.currentLevel && typeof primaryGame.currentLevel.destroy === 'function') {
+                        primaryGame.currentLevel.destroy();
+                    }
+                    primaryGame.currentLevel = null;
+                    primaryGame._loopRunning = false;
+                    primaryGame.isPaused = true;
+                } catch (err) {
+                    console.warn('Seek could not fully tear down before Basketball transition:', err);
+                }
+
+                const gameContainer = document.getElementById('gameContainer');
+                if (gameContainer) {
+                    Array.from(gameContainer.children).forEach((child) => {
+                        if (child.id !== 'promptDropDown') {
+                            gameContainer.removeChild(child);
+                        }
+                    });
+                }
+
+                topGame.levelClasses = [GameLevelBasketball];
+                topGame.currentLevelIndex = 0;
+                topGame.isPaused = false;
+                topGame.transitionToLevel();
+
+                setTimeout(() => {
+                    fade.style.opacity = '0';
+                    setTimeout(() => {
+                        if (fade.parentNode) fade.parentNode.removeChild(fade);
+                    }, 800);
+                }, 400);
+            }, 800);
+        });
     }
 
     destroy() {

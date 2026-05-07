@@ -563,7 +563,7 @@ class GameLevelBasketball {
     this.levelCompleted = true;
 
     if (this.messageHud) {
-      this.messageHud.innerHTML = 'Challenge complete!<br>Moving to lesson summary...';
+      this.messageHud.innerHTML = 'Challenge complete!<br>You made it through Aquatic, Seek, and Basketball.';
       this.messageHud.style.display = 'block';
     }
 

@@ -16,14 +16,73 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
 import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
+import GameLevelSeek from './GameLevelSeek.js';
 
 class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
+        this.seekTransitionStarted = false;
         const levelContext = this;
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
+
+        const launchSeekLevel = () => {
+            if (this.seekTransitionStarted) return;
+
+            const primaryGame = this.gameEnv?.gameControl;
+            if (!primaryGame || typeof primaryGame.pause !== 'function') {
+                console.warn('Aquatic could not launch Seek because the parent game control is missing.');
+                return;
+            }
+
+            this.seekTransitionStarted = true;
+
+            const fade = document.createElement('div');
+            Object.assign(fade.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                backgroundColor: '#000',
+                opacity: '0',
+                transition: 'opacity 0.8s ease-in-out',
+                zIndex: '9999',
+                pointerEvents: 'none'
+            });
+            document.body.appendChild(fade);
+
+            requestAnimationFrame(() => {
+                fade.style.opacity = '1';
+                setTimeout(() => {
+                    primaryGame.pause();
+
+                    try {
+                        if (typeof primaryGame.hideCanvasState === 'function') {
+                            primaryGame.hideCanvasState();
+                        }
+                    } catch (err) {
+                        console.warn('Could not hide aquatic canvas state before launching Seek:', err);
+                    }
+
+                    const gameInGame = new GameControl(this.gameEnv.game, [GameLevelSeek], {
+                        parentControl: primaryGame
+                    });
+                    gameInGame.start();
+
+                    setTimeout(() => {
+                        fade.style.opacity = '0';
+                        setTimeout(() => {
+                            if (fade.parentNode) fade.parentNode.removeChild(fade);
+                        }, 800);
+                    }, 400);
+                }, 800);
+            });
+        };
+
+        this.launchSeekLevel = launchSeekLevel;
 
         const bgData = {
             name: "custom_bg",
@@ -93,7 +152,7 @@ class GameLevelAquaticGameLevel {
                                 q2.pendingSlimeCompletion = false;
                                 updateQuestHud();
                                 this.dialogueSystem.closeDialogue();
-                                await levelContext.startMegalodonEncounter?.();
+                                levelContext.launchSeekLevel?.();
                             }
                         },
                         {
