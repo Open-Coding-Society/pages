@@ -1,6 +1,6 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
-import PlatformerPlayer from './custom/PlatformerPlayer.js';
+import PlatformerPlayer from './PlatformerPlayer.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 
 
@@ -13,8 +13,8 @@ class GameLevelMario {
 		const height = gameEnv.innerHeight;
 		console.log('Initializing GameLevelMario with path:', path, 'width:', width, 'height:', height);
 
-		const marioJumpAudioSrc = path + '/images/projects/platformer-gravity-sorcerers/mario-jump.mp3';
-		const marioThemeAudioSrc = path + '/images/projects/platformer-gravity-sorcerers/mario-theme.mp3';
+		const marioJumpAudioSrc = path + '/images/projects/platformer/mario-jump.mp3';
+		const marioThemeAudioSrc = path + '/images/projects/platformer/mario-theme.mp3';
 		this.levelMusic = new Audio(marioThemeAudioSrc);
 		this.levelMusic.loop = true;
 		this.levelMusic.preload = 'auto';
@@ -39,7 +39,7 @@ class GameLevelMario {
 		window.addEventListener('keydown', startOnInteraction);
 		window.addEventListener('pointerdown', startOnInteraction);
 
-		const image_src_bg = path + "/images/projects/platformer-gravity-sorcerers/oldmariobg.png";
+		const image_src_bg = path + "/images/projects/platformer/oldmariobg.png";
 		const image_data_bg = {
 			id: 'MarioBG',
 			src: image_src_bg,
@@ -156,7 +156,7 @@ class GameLevelMario {
 			hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
 		}; 
 
-		const spriteSrc = path + '/images/projects/platformer-gravity-sorcerers/mario.png';
+		const spriteSrc = path + '/images/projects/platformer/mario.png';
 		const playerData = {
 			id: 'Mario',
 			greeting: 'Let\'s-a go!',
@@ -188,7 +188,7 @@ class GameLevelMario {
 			gravityAcceleration: 0.12,
 		};
 
-		const sprite_src_toad = path + "/images/projects/platformer-gravity-sorcerers/jumping-toad.png";
+		const sprite_src_toad = path + "/images/projects/platformer/jumping-toad.png";
         const sprite_greet_toad = "toad";
         const sprite_data_toad = {
             id: 'Toad',
