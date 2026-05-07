@@ -2,7 +2,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
-import Gem from '@assets/js/heist-exe/Gem.js';
+import Gem from '@assets/js/projects/heist-exe/levels/Gem.js';
 //import heistMusic from '@assets/js/heist-exe/heistMusic';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 class HeistL1 {
