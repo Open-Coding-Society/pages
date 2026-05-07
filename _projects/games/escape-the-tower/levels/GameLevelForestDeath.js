@@ -1,11 +1,11 @@
 // Forest Death Sublevel
 // Save as: assets/js/GameEnginev1.1/GameLevelForestDeath.js
 
-import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
-import DialogueSystem from './essentials/DialogueSystem.js';
-import GameLevelForestSub from './GameLevelForestSub.js';
+import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1.1/essentials/Npc.js';
+import DialogueSystem from '/assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import GameLevelForestSub from '/assets/js/projects/escape-the-tower/levels/GameLevelForestSub.js';
 
 // ── Chase Controller ──────────────────────────────────────────────────────────
 class BeckonerChaseController {
@@ -147,7 +147,7 @@ class GameLevelForestDeath {
     const image_data_bg = {
       name: 'death_room',
       greeting: "The warmth you followed was never welcoming.",
-      src: path + "/images/gamify/cave.png",
+      src: path + "/images/projects/escape-the-tower/cave.png",
       pixels: { height: 597, width: 340 }
     };
 
@@ -155,7 +155,7 @@ class GameLevelForestDeath {
     const sprite_data_player = {
       id: 'Octopus',
       greeting: "What have I done...",
-      src: path + "/images/gamify/octopus.png",
+      src: path + "/images/projects/escape-the-tower/octopus.png",
       SCALE_FACTOR: 5,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -180,7 +180,7 @@ class GameLevelForestDeath {
     const sprite_data_beckoner = {
       id: 'Strange Beckoner',
       greeting: sprite_greet_beckoner,
-      src: path + "/images/gamify/chickenj.png",
+      src: path + "/images/projects/escape-the-tower/chickenj.png",
       SCALE_FACTOR: 7,
       ANIMATION_RATE: 80,
       pixels: { height: 255, width: 150 },
@@ -254,7 +254,7 @@ class GameLevelForestDeath {
     const sprite_data_victim = {
       id: 'Another Victim',
       greeting: sprite_greet_victim,
-      src: path + "/images/gamify/stockguy.png",
+      src: path + "/images/projects/escape-the-tower/stockguy.png",
       SCALE_FACTOR: 10,
       ANIMATION_RATE: 50,
       pixels: { height: 441, width: 339 },
@@ -287,7 +287,7 @@ class GameLevelForestDeath {
     const sprite_data_portal = {
       id: 'Escape Portal',
       greeting: sprite_greet_portal,
-      src: path + "/images/gamify/octocat.png",
+      src: path + "/images/projects/escape-the-tower/octocat.png",
       SCALE_FACTOR: 8,
       ANIMATION_RATE: 60,
       pixels: { height: 301, width: 801 },
