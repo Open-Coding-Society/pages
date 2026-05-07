@@ -65,23 +65,23 @@ class PeppaBattleLevelBase {
         const image_data_background = {
             name: `peppa-${config.levelId}-arena`,
             greeting: config.levelIntro,
-            src: `${path}/images/projects/PeppaPigGame/PeppaPigBackground.jpg`,
+            src: `${path}/images/projects/peppa-pig/peppa-pig-background.jpg`,
             pixels: { height: 1229, width: 1920 }
         };
 
         // Read character selections saved by the welcome/character-select screen
-        const p1CharImage = localStorage.getItem('peppaPlayer1CharImage') || 'IshanJha.png';
+        const p1CharImage = localStorage.getItem('peppaPlayer1CharImage') || 'ishan-jha.png';
         const p1CharName  = localStorage.getItem('peppaPlayer1CharName')  || 'Ishan';
-        const p2CharImage = localStorage.getItem('peppaPlayer2CharImage') || 'IshanJha.png';
+        const p2CharImage = localStorage.getItem('peppaPlayer2CharImage') || 'ishan-jha.png';
         const p2CharName  = localStorage.getItem('peppaPlayer2CharName')  || 'Player 2';
 
-        const p1Image = this.gameMode === 'twoPlayer' ? p1CharImage : 'IshanJha.png';
+        const p1Image = this.gameMode === 'twoPlayer' ? p1CharImage : 'ishan-jha.png';
         const p1Name  = this.gameMode === 'twoPlayer' ? p1CharName  : 'Ishan';
 
         const sprite_data_ishan = {
             id: p1Name,
             greeting: `${p1Name} enters the ring. Press SPACE to attack.`,
-            src: `${path}/images/projects/PeppaPigGame/${p1Image}`,
+            src: `${path}/images/projects/peppa-pig/${p1Image}`,
             SCALE_FACTOR: 4,
             STEP_FACTOR: 1100,
             ANIMATION_RATE: 12,
@@ -97,7 +97,7 @@ class PeppaBattleLevelBase {
         const sprite_data_player2 = {
             id: p2CharName,
             greeting: `${p2CharName} joins the battle!`,
-            src: `${path}/images/projects/PeppaPigGame/${p2CharImage}`,
+            src: `${path}/images/projects/peppa-pig/${p2CharImage}`,
             SCALE_FACTOR: 4,
             STEP_FACTOR: 1100,
             ANIMATION_RATE: 12,
@@ -112,7 +112,7 @@ class PeppaBattleLevelBase {
         const sprite_data_enemy = {
             id: config.enemyName,
             greeting: config.enemyGreeting,
-            src: `${path}/images/projects/PeppaPigGame/${config.enemyImage}`,
+            src: `${path}/images/projects/peppa-pig/${config.enemyImage}`,
             SCALE_FACTOR: config.enemyScale ?? 4,
             ANIMATION_RATE: 18,
             INIT_POSITION: this.enemySpawn,

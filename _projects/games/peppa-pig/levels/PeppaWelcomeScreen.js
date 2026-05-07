@@ -1,8 +1,8 @@
 const CHARACTERS = [
-    { id: 'ishan',   name: 'Ishan',       image: 'IshanJha.png'    },
-    { id: 'peppa',   name: 'Peppa Pig',   image: 'peppapig.png'    },
-    { id: 'georgie', name: 'Georgie Pig', image: 'georgiepig.png'  },
-    { id: 'daddy',   name: 'Daddy Pig',   image: 'daddypig.png'    }
+    { id: 'ishan',   name: 'Ishan',       image: 'ishan-jha.png'    },
+    { id: 'peppa',   name: 'Peppa Pig',   image: 'peppa-pig.png'    },
+    { id: 'georgie', name: 'Georgie Pig', image: 'georgie-pig.png'  },
+    { id: 'daddy',   name: 'Daddy Pig',   image: 'daddy-pig.png'    }
 ];
 
 class PeppaWelcomeScreen {
@@ -21,7 +21,7 @@ class PeppaWelcomeScreen {
 
     getImagePath(imageFile) {
         const path = this.gameEnv.path || '';
-        return `${path}/images/projects/PeppaPigGame/${imageFile}`;
+        return `${path}/images/projects/peppa-pig/${imageFile}`;
     }
 
     injectStyles() {
