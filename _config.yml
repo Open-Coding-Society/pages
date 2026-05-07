@@ -32,7 +32,6 @@ exclude:
   - Makefile
   - _notebooks
   - _docx
-  - _projects
   - venv
 # Note: / auto-excluded by Jekyll (underscore prefix)
 
