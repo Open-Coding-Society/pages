@@ -150,4 +150,16 @@ $dt-leaderboard: #e85252;
   --white1: #{$white1};
   --white2: #{$white2};
   --white3: #{$white3};
+
+  // Game UI theme tokens (overridden by user preferences when theme is active)
+  --ocs-game-panel-bg: #{$game-panel-bg};
+  --ocs-game-accent: #{$game-accent};
+  --ocs-game-text: #{$game-text};
+  --ocs-game-muted: #{$game-muted};
+  --ocs-game-surface-alt: #{$game-surface-alt};
+  --ocs-game-surface-contrast: #{$game-surface-contrast};
+  --ocs-game-overlay: #{$game-overlay};
+  --ocs-game-panel-selected-bg: #{$game-panel-selected-bg};
+  --ocs-game-selected-border: #{$game-selected-border};
+  --ocs-game-score-accent: #{$game-score-accent};
 }
