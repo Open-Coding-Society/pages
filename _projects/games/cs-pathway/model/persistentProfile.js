@@ -7,27 +7,23 @@
  * Key Differences from Local Profile:
  * - Data stored in users table via Python Flask API
  * - Requires authentication (JWT cookies)
- * - clear() preserves identity (_name, _email, _uid)
- * - Identity changes require separate admin flow
- * - Supports full user management
+ * - Backend stores game_profile as opaque JSON blob
+ * - Backend never parses or itemizes game data structure
  * 
  * API Endpoints (Python Flask backend):
  * - GET    /api/profile/game     - Load game profile
- * - POST   /api/profile/game     - Create game profile
- * - PUT    /api/profile/game     - Update game profile
+ * - POST   /api/profile/game     - Create game profile (save entire profile)
+ * - PUT    /api/profile/game     - Update game profile (save entire profile)
  * - DELETE /api/profile/game     - Clear game data only
  * 
  * Users Table Structure (SQLAlchemy):
  *   id, _name, _email, _uid (githubID), _sid, _password, _role,
  *   _pfp, _grade_data, _ap_exam, _class, _school, _game_profile
  * 
- * _game_profile JSON Structure:
- * {
- *   localId, createdAt, updatedAt, eventId,
- *   "identity-forge": { preferences, progress, completedAt },
- *   "wayfinding-world": { preferences, progress, completedAt },
- *   "mission-tooling": { progress, completedAt }
- * }
+ * _game_profile: Complete opaque JSON blob
+ * - Frontend owns the structure completely
+ * - Backend just stores/retrieves without parsing
+ * - All structure knowledge remains in the game code
  */
 
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
@@ -120,8 +116,10 @@ class PersistentProfile {
 
   /**
    * Save new profile to backend
-   * Maps to users table structure
-   * @param {Object} profileData - Initial profile data
+   * Sends complete localStorage profile as opaque blob
+   * Backend stores without parsing or itemizing structure
+   * 
+   * @param {Object} profileData - Complete profile from localStorage
    * @returns {Promise<boolean>} Success status
    */
   static async save(profileData = {}) {
@@ -132,51 +130,10 @@ class PersistentProfile {
         return false;
       }
 
+      // Send complete profile as opaque blob
+      // Backend stores in _game_profile column without parsing
       const payload = {
-        _name: profileData.name || userInfo.name || '',
-        _email: profileData.email || userInfo.email || '',
-        _uid: profileData.githubID || userInfo.uid || '',  // githubID maps to _uid
-        _game_profile: {
-          version: VERSION,
-          localId: profileData.localId || null,  // Preserve if migrating
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          eventId: profileData.eventId || 0,
-          'identity-forge': {
-            preferences: {
-              sprite: profileData.sprite || null,
-              spriteMeta: profileData.spriteMeta || null,
-              persona: profileData.persona || null,
-              personaId: profileData.personaId || null,
-            },
-            progress: {
-              identityUnlocked: profileData.identityUnlocked || false,
-              avatarSelected: profileData.avatarSelected || false,
-              identityForgeCompleted: profileData.identityForgeCompleted || false,
-            },
-            completedAt: null,
-          },
-          'wayfinding-world': {
-            preferences: {
-              theme: profileData.theme || null,
-              themeMeta: profileData.themeMeta || null,
-            },
-            progress: {
-              worldThemeSelected: profileData.worldThemeSelected || false,
-              navigationComplete: profileData.navigationComplete || false,
-            },
-            completedAt: null,
-          },
-          'mission-tooling': {
-            progress: {
-              toolsUnlocked: profileData.toolsUnlocked || false,
-              missionProgressCount: profileData.missionProgressCount || 0,
-              missionScore: profileData.missionScore || 0.55,
-              missionCompletedStations: profileData.missionCompletedStations || [],
-            },
-            completedAt: null,
-          },
-        },
+        _game_profile: profileData  // Complete localStorage structure
       };
 
       const response = await fetch(API_BASE, {
@@ -205,72 +162,18 @@ class PersistentProfile {
 
   /**
    * Update existing profile
-   * Merges updates into _game_profile JSON column
-   * @param {Object} updates - Partial profile data to merge
+   * Sends complete localStorage profile as opaque blob
+   * Backend stores without parsing or itemizing structure
+   * 
+   * @param {Object} profileData - Complete profile from localStorage
    * @returns {Promise<boolean>} Success status
    */
-  static async update(updates = {}) {
+  static async update(profileData = {}) {
     try {
-      const existing = await this.load();
-      if (!existing) {
-        console.warn('PersistentProfile: no profile to update, creating new');
-        return await this.save(updates);
-      }
-
-      // Merge updates into existing _game_profile structure
-      const gameProfile = existing._game_profile || {};
-      const identityForge = gameProfile['identity-forge'] || { preferences: {}, progress: {} };
-      const wayfindingWorld = gameProfile['wayfinding-world'] || { preferences: {}, progress: {} };
-      const missionTooling = gameProfile['mission-tooling'] || { progress: {} };
-
+      // Send complete profile as opaque blob
+      // Backend stores in _game_profile column without parsing
       const payload = {
-        _name: updates.name || existing._name,
-        _email: updates.email || existing._email,
-        _uid: updates.githubID || existing._uid,
-        _game_profile: {
-          ...gameProfile,
-          eventId: updates.eventId !== undefined ? updates.eventId : (gameProfile.eventId || 0),
-          updatedAt: new Date().toISOString(),
-          'identity-forge': {
-            preferences: {
-              ...identityForge.preferences,
-              ...(updates.sprite !== undefined && { sprite: updates.sprite }),
-              ...(updates.spriteMeta !== undefined && { spriteMeta: updates.spriteMeta }),
-              ...(updates.persona !== undefined && { persona: updates.persona }),
-              ...(updates.personaId !== undefined && { personaId: updates.personaId }),
-            },
-            progress: {
-              ...identityForge.progress,
-              ...(updates.identityUnlocked !== undefined && { identityUnlocked: updates.identityUnlocked }),
-              ...(updates.avatarSelected !== undefined && { avatarSelected: updates.avatarSelected }),
-              ...(updates.identityForgeCompleted !== undefined && { identityForgeCompleted: updates.identityForgeCompleted }),
-            },
-            completedAt: updates.identityForgeCompleted || identityForge.completedAt,
-          },
-          'wayfinding-world': {
-            preferences: {
-              ...wayfindingWorld.preferences,
-              ...(updates.theme !== undefined && { theme: updates.theme }),
-              ...(updates.themeMeta !== undefined && { themeMeta: updates.themeMeta }),
-            },
-            progress: {
-              ...wayfindingWorld.progress,
-              ...(updates.worldThemeSelected !== undefined && { worldThemeSelected: updates.worldThemeSelected }),
-              ...(updates.navigationComplete !== undefined && { navigationComplete: updates.navigationComplete }),
-            },
-            completedAt: updates.wayfindingCompleted || wayfindingWorld.completedAt,
-          },
-          'mission-tooling': {
-            progress: {
-              ...missionTooling.progress,
-              ...(updates.toolsUnlocked !== undefined && { toolsUnlocked: updates.toolsUnlocked }),
-              ...(updates.missionProgressCount !== undefined && { missionProgressCount: updates.missionProgressCount }),
-              ...(updates.missionScore !== undefined && { missionScore: updates.missionScore }),
-              ...(updates.missionCompletedStations !== undefined && { missionCompletedStations: updates.missionCompletedStations }),
-            },
-            completedAt: updates.missionToolingCompleted || missionTooling.completedAt,
-          },
-        },
+        _game_profile: profileData  // Complete localStorage structure
       };
 
       const response = await fetch(API_BASE, {
@@ -291,7 +194,7 @@ class PersistentProfile {
       console.log('PersistentProfile: updated profile');
       return true;
     } catch (error) {
-      console.warn('PersistentProfile: update failed (network or auth error) - continuing with local storage', error.message);
+      console.warn('PersistentProfile: update failed (network error) - continuing with local storage', error.message);
       return false;
     }
   }
@@ -410,8 +313,8 @@ class PersistentProfile {
   }
 
   /**
-   * Get flat profile structure (for easy access)
-   * Maps users table back to flat structure
+   * Get flat profile structure (for UI/display)
+   * Backend stores opaque blob, but UI needs flattened structure
    * @returns {Promise<Object|null>}
    */
   static async getFlatProfile() {
@@ -421,17 +324,25 @@ class PersistentProfile {
         return null;
       }
 
-      const gameProfile = data._game_profile || {};
+      // Backend returns: { game_profile: { /* complete localStorage structure */ } }
+      const gameProfile = data.game_profile || data._game_profile || {};
+      
+      // Flatten nested structure for UI consumption
       const identityForge = gameProfile['identity-forge'] || { preferences: {}, progress: {} };
       const wayfindingWorld = gameProfile['wayfinding-world'] || { preferences: {}, progress: {} };
       const missionTooling = gameProfile['mission-tooling'] || { progress: {} };
 
       return {
-        // Identity (from users table columns)
-        name: data._name || '',
-        email: data._email || '',
-        githubID: data._uid || '',  // _uid maps back to githubID
-        
+        // Metadata
+        localId: gameProfile.localId || null,
+        createdAt: gameProfile.createdAt || '',
+        updatedAt: gameProfile.updatedAt || '',
+        eventId: gameProfile.eventId || 0,
+        version: gameProfile.version || VERSION,
+        // Top-level identity (may be in game_profile or at root)
+        name: gameProfile.name || data._name || '',
+        email: gameProfile.email || data._email || '',
+        githubID: gameProfile.githubID || data._uid || '',
         // Identity Forge (includes avatar)
         sprite: identityForge.preferences?.sprite || null,
         spriteMeta: identityForge.preferences?.spriteMeta || null,
@@ -441,26 +352,17 @@ class PersistentProfile {
         identityUnlocked: identityForge.progress?.identityUnlocked || false,
         avatarSelected: identityForge.progress?.avatarSelected || false,
         identityForgeCompleted: identityForge.progress?.identityForgeCompleted || false,
-        
         // Wayfinding World
         theme: wayfindingWorld.preferences?.theme || null,
         themeMeta: wayfindingWorld.preferences?.themeMeta || null,
         worldThemeSrc: wayfindingWorld.preferences?.themeMeta?.src || null,
         worldThemeSelected: wayfindingWorld.progress?.worldThemeSelected || false,
         navigationComplete: wayfindingWorld.progress?.navigationComplete || false,
-        
         // Mission Tooling
         toolsUnlocked: missionTooling.progress?.toolsUnlocked || false,
         missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
         missionScore: missionTooling.progress?.missionScore || 0.55,
         missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
-
-        // Metadata
-        localId: gameProfile.localId || null,
-        createdAt: gameProfile.createdAt || '',
-        updatedAt: gameProfile.updatedAt || '',
-        eventId: gameProfile.eventId || 0,
-        version: gameProfile.version || VERSION,
       };
     } catch (error) {
       console.error('PersistentProfile: getFlatProfile failed', error);
