@@ -134,7 +134,7 @@ class GameLevelOcean3 {
         id: 'Octopus',
         src: path + "/images/projects/ocean-adventure/player/octopus.png",
 
-        SCALE_FACTOR: 5,
+        SCALE_FACTOR: 7,
         STEP_FACTOR: 400, // CRITICAL FIX
         ANIMATION_RATE: 50,
 
