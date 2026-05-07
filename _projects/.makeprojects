@@ -10,23 +10,25 @@
 
 # === NESTED STRUCTURE (organized by category) ===
 # Games
-games/backgrounds
-games/spline-barriers:dev
+games/voidstriker
+games/spline-barriers
 games/characters
 games/collisions-mechanic
 games/cs-pathway:dev
 games/enemy-death
-games/game-in-game-lesson
+games/escape-the-tower
+games/pirate-hunt
 games/gamify
 games/local-storage
 games/tag-game-multiplayer
 games/ocean
 games/peppa-pig
-games/platformer:dev
+games/platformer
 games/red-riding
 games/teamtestgame
 games/transitions
 games/gategame
+games/heist-exe
 
 # Lessons
 lessons/game-lessons
