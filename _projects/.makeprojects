@@ -24,7 +24,7 @@ games/ocean
 games/peppa-pig
 games/platformer-gravity-sorcerers
 games/red-riding
-games/teamtestgame
+games/astronaut-platformer-game
 games/transitions
 
 # Lessons
@@ -37,4 +37,3 @@ systems/test-project
 systems/student-management-groups
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===
-astronaut-platformer-game

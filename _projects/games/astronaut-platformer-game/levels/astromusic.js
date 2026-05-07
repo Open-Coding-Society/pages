@@ -1,4 +1,4 @@
-console.log("astromusic.js loaded from _projects/astronaut-platformer-game/levels");
+console.log("astromusic.js loaded from _projects/games/astronaut-platformer-game/levels");
 class AstroMusic {
   constructor() {
     this.audio = null;
