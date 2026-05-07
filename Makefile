@@ -29,7 +29,7 @@ KNOWN_TARGETS := \
 	build-minima build-cayman build-yat build-so-simple \
 	convert convert-docx convert-docx-config convert-single convert-registered-notebooks \
 	watch-notebooks watch-projects watch-files bundle-install jekyll-serve \
-	build-registered-projects build-registered-docs build-dev-projects \
+	build-registered-projects build-registered-docs build-dev-projects build-dev-docs \
 	watch-registered-projects clean-registered-projects watch-dev-projects \
 	list-projects split-courses clean-courses use-minima use-cayman use-yat \
 	use-so-simple use-hydejack watch-rebuild
@@ -218,6 +218,11 @@ convert-registered-notebooks:
 build-registered-docs:
 	$(call run_projects,$(ALL_PROJECTS),Docs,docs)
 
+# Build documentation for active dev projects
+build-dev-docs:
+	@echo "Active DEV Docs: $(ACTIVE_DEV_PROJECTS)"
+	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Docs,docs)
+
 # Watch all registered projects for changes (dev mode)
 watch-registered-projects:
 	$(call run_projects,$(ALL_PROJECTS),Watching,watch)
@@ -393,6 +398,7 @@ watch-rebuild:
 dev: stop clean
 	@echo "DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	@$(MAKE) build-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
+	@$(MAKE) build-dev-docs ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
 	@$(MAKE) convert-registered-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
 	@$(MAKE) jekyll-serve ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
 	@echo "Initializing watch markers..."
@@ -595,7 +601,7 @@ list-projects:
 		fi; \
 	done || echo "  None found"
 
-.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects
+.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs build-dev-docs watch-registered-projects clean-registered-projects
 
 ###########################################
 # Allow unknown targets (project selectors)

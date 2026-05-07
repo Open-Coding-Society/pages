@@ -26,7 +26,7 @@ games/platformer-gravity-sorcerers
 games/red-riding
 games/teamtestgame
 games/transitions
-games/gategame
+games/gategame:dev
 
 # Lessons
 lessons/game-lessons
