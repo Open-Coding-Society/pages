@@ -19,27 +19,27 @@ class HeistTemplate {
         pixels: {height: 597, width: 340}
     };
 
-const sprite_data_mc = {
-    id: 'MC',
-    name: 'mainplayer',
-    src: path + "/assets/js/heist-exe/images/heist-mc.png",
-    SCALE_FACTOR: 10,
-    STEP_FACTOR: 1000,
-    ANIMATION_RATE: 50,
-    INIT_POSITION: { x: 0, y: 200 }, 
-    pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
-    orientation: { rows: 4, columns: 4 },
-    up:        { row: 0, start: 0, columns: 4 },
-    upLeft:    { row: 0, start: 0, columns: 4, mirror: true, rotate: -Math.PI/16 },
-    upRight:   { row: 0, start: 0, columns: 4, rotate: Math.PI/16 },
-    left:      { row: 1, start: 0, columns: 4 },
-    right:     { row: 3, start: 0, columns: 4 },
-    down:      { row: 2, start: 0, columns: 4 },
-    downLeft:  { row: 2, start: 0, columns: 4, mirror: true, rotate: Math.PI/16 },
-    downRight: { row: 2, start: 0, columns: 4, rotate: -Math.PI/16 },
-    hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-    keypress: { up: 87, left: 65, down: 83, right: 68 }
-};
+    const sprite_data_mc = {
+        id: 'MC',
+        name: 'mainplayer',
+        src: path + "/assets/js/heist-exe/images/heist-mc.png",
+        SCALE_FACTOR: 10,
+        STEP_FACTOR: 1000,
+        ANIMATION_RATE: 50,
+        INIT_POSITION: { x: 0, y: 200 }, 
+        pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
+        orientation: { rows: 4, columns: 4 },
+        up:        { row: 3, start: 0, columns: 4 },
+        upLeft:    { row: 1, start: 0, columns: 4, mirror: true, rotate: -Math.PI/16 },
+        upRight:   { row: 0, start: 0, columns: 4, rotate: Math.PI/16 },
+        left:      { row: 1, start: 0, columns: 4 },
+        right:     { row: 0, start: 0, columns: 4 },
+        down:      { row: 2, start: 0, columns: 4 },
+        downLeft:  { row: 1, start: 0, columns: 4, mirror: true, rotate: Math.PI/16 },
+        downRight: { row: 0, start: 0, columns: 4, rotate: -Math.PI/16 },
+        hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
+        keypress: { up: 87, left: 65, down: 83, right: 68 }
+    };
 
     const border_top = {
         id: 'border_top',
@@ -162,24 +162,24 @@ const sprite_data_mc = {
         INIT_POSITION: { x: width * 0.5, y: height * 0.5 }
     };
 
-this.classes = [      
-      { class: GameEnvBackground, data: image_data_bg },
-      { class: Player, data: sprite_data_mc },
-      { class: Gem, data: gem_data_1 },
-      { class: Gem, data: gem_data_2 },
-      { class: Barrier, data: border_top },
-      { class: Barrier, data: border_bottom },
-      { class: Barrier, data: border_left },
-      { class: Barrier, data: border_right },
-      { class: Barrier, data: green_zone },
-      { class: Barrier, data: wall_top_left },
-      { class: Barrier, data: wall_top_right },
-      { class: Barrier, data: wall_mid_lower_center },
-      { class: Barrier, data: wall_mid_upper_center },
-      { class: Barrier, data: wall_mid_upper_right },
-      { class: Barrier, data: wall_bot_left },
-      { class: Barrier, data: wall_bot_right },
-      { class: Barrier, data: wall_mid_lower_right}
+    this.classes = [      
+        { class: GameEnvBackground, data: image_data_bg },
+        { class: Player, data: sprite_data_mc },
+        { class: Gem, data: gem_data_1 },
+        { class: Gem, data: gem_data_2 },
+        { class: Barrier, data: border_top },
+        { class: Barrier, data: border_bottom },
+        { class: Barrier, data: border_left },
+        { class: Barrier, data: border_right },
+        { class: Barrier, data: green_zone },
+        { class: Barrier, data: wall_top_left },
+        { class: Barrier, data: wall_top_right },
+        { class: Barrier, data: wall_mid_lower_center },
+        { class: Barrier, data: wall_mid_upper_center },
+        { class: Barrier, data: wall_mid_upper_right },
+        { class: Barrier, data: wall_bot_left },
+        { class: Barrier, data: wall_bot_right },
+        { class: Barrier, data: wall_mid_lower_right}
     ];
   }
 }
