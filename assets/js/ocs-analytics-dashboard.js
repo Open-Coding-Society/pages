@@ -1033,6 +1033,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                 case 'sessions': aVal = a.totalSessions || 0; bVal = b.totalSessions || 0; break;
                 case 'lessons': aVal = a.totalLessonsViewed || 0; bVal = b.totalLessonsViewed || 0; break;
                 case 'accuracy': aVal = a.averageAccuracyPercentage || 0; bVal = b.averageAccuracyPercentage || 0; break;
+                case 'bathroom': aVal = a.bathroomTimeSeconds || 0; bVal = b.bathroomTimeSeconds || 0; break;
                 default: aVal = a.totalTimeSpentSeconds || 0; bVal = b.totalTimeSpentSeconds || 0;
             }
             return adminFilters.sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
@@ -1102,6 +1103,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                             <option value="sessions">Sessions</option>
                             <option value="lessons">Lessons</option>
                             <option value="accuracy">Accuracy</option>
+                            <option value="bathroom">Bathroom Time</option>
                         </select>
                     </div>
                     <div>
@@ -1198,6 +1200,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                                 <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Time Spent</th>
                                 <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Accuracy</th>
                                 <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Lessons</th>
+                                <th class="px-6 py-4 text-center text-neutral-300 font-semibold">Bathroom Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1226,6 +1229,7 @@ export async function initOCSAnalyticsDashboard(pythonURI, javaURI, fetchOptions
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-center text-white">${user.totalLessonsViewed || 0}</td>
+                                        <td class="px-6 py-4 text-center text-white">${user.bathroomTimeFormatted || '0s'}</td>
                                     </tr>
                                 `;
                             }).join('')}
