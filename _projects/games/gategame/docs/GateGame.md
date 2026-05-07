@@ -2,6 +2,7 @@
 layout: post
 title: Gate Game - Deep Dive into our 3 level Game
 description: This blog will be a full deep explanation into the aspects, mechanics, logic, and much more regarding our 3 levels.
+author: Kashyap Tubati
 category: Gamify
 breadcrumb: true
 permalink: /gamify/gategamex
