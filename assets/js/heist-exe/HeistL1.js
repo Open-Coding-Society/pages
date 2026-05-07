@@ -5,7 +5,7 @@ import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
 import Gem from '@assets/js/heist-exe/Gem.js';
 //import heistMusic from '@assets/js/heist-exe/heistMusic';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
-class HeistTemplate {
+class HeistL1 {
   constructor(gameEnv) {    
     this.gameEnv = gameEnv;
 
@@ -184,4 +184,4 @@ class HeistTemplate {
   }
 }
 
-export default HeistTemplate;
+export default HeistL1;
