@@ -6,23 +6,11 @@ import GameObject from './GameObject.js';
 export class GameEnvBackground extends GameObject {
     constructor(data = null, gameEnv = null) {
         super(gameEnv);
-        this.imageLoaded = false; // Track if image has loaded
         if (data.src) {
             this.image = new Image();
-            // Set up load event before setting src
-            this.image.onload = () => {
-                this.imageLoaded = true;
-            };
-            // Handle errors gracefully
-            this.image.onerror = () => {
-                console.error(`Failed to load background image: ${data.src}`);
-                this.image = null;
-                this.imageLoaded = false;
-            };
             this.image.src = data.src;
         } else {
             this.image = null;
-            this.imageLoaded = false;
         }
     }
 
@@ -37,12 +25,11 @@ export class GameEnvBackground extends GameObject {
         const width = this.gameEnv.innerWidth;
         const height = this.gameEnv.innerHeight;
 
-        // Only draw the image if it's loaded and valid
-        if (this.image && this.imageLoaded) {
+        if (this.image) {
             // Draw the background image scaled to the canvas size
             ctx.drawImage(this.image, 0, 0, width, height);
         } else {
-            // Fill the canvas with fillstyle color if no image is provided or not yet loaded
+            // Fill the canvas with fillstyle color if no image is provided
             ctx.fillStyle = '#063970';
             ctx.fillRect(0, 0, width, height);
         }
