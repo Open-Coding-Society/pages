@@ -6,6 +6,11 @@ PYTHON := venv/bin/python3
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
 
+# Ruby Sass + remote Minima use non-ASCII in SCSS; a US-ASCII locale makes Jekyll fail during
+# stylesheet conversion, so _site is incomplete and permalinks (e.g. lesson posts) 404.
+export LC_ALL := en_US.UTF-8
+export LANG := en_US.UTF-8
+
 NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
 DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
