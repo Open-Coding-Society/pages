@@ -236,26 +236,57 @@ export class GameExecutor {
       const baseUrl = window.location.origin + path;
       const selectedVersion = this.engineVersionSelect ? this.engineVersionSelect.value : 'GameEnginev1';
 
-      code = code.replace(/GameEnginev1(?:\.1)?/g, selectedVersion);
-      code = code.replace(/from\s+['"]([^'"]+)['"]/g, (match, importPath) => {
-        // Keep import-map aliases, relative paths, and explicit schemes untouched.
+      const rewriteImportPath = (importPath) => {
+        // Support repo alias paths used in notebooks.
+        if (importPath.startsWith('@assets/')) {
+          const aliasPath = importPath.replace('@assets', '/assets');
+          return `${baseUrl}${aliasPath}`;
+        }
+
+        // Blob modules do not have a hierarchical base URL, so relative imports
+        // (./, ../) fail at runtime. Normalize them to absolute site paths.
+        if (importPath.startsWith('./') || importPath.startsWith('../')) {
+          const normalizedPath = importPath.replace(/^(\.\/)+/, '').replace(/^(\.\.\/)+/, '');
+          return `${baseUrl}/${normalizedPath}`;
+        }
+
+        // Keep import-map aliases and explicit schemes untouched.
         if (
           importPath.startsWith('@') ||
-          importPath.startsWith('./') ||
-          importPath.startsWith('../') ||
           /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(importPath)
         ) {
-          return match;
+          return importPath;
         }
 
         if (importPath.startsWith('/')) {
-          return `from '${baseUrl}${importPath}'`;
+          return `${baseUrl}${importPath}`;
         } else if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
-          return `from '${baseUrl}/${importPath}'`;
+          return `${baseUrl}/${importPath}`;
         }
 
-        return `from '${baseUrl}/${importPath}'`;
+        return `${baseUrl}/${importPath}`;
+      };
+
+      code = code.replace(/GameEnginev1(?:\.1)?/g, selectedVersion);
+      code = code.replace(/from\s+['"]([^'"]+)['"]/g, (match, importPath) => {
+        const rewrittenPath = rewriteImportPath(importPath);
+        return `from '${rewrittenPath}'`;
       });
+
+      // Surface unresolved/bare imports before attempting blob import.
+      const unresolvedImports = [];
+      code.replace(/from\s+['"]([^'"]+)['"]/g, (_match, importPath) => {
+        const isAbsoluteHttp = importPath.startsWith('http://') || importPath.startsWith('https://');
+        const isAbsoluteRoot = importPath.startsWith('/');
+        if (!isAbsoluteHttp && !isAbsoluteRoot) {
+          unresolvedImports.push(importPath);
+        }
+        return _match;
+      });
+      if (unresolvedImports.length > 0) {
+        console.error('GameExecutor unresolved imports after rewrite:', unresolvedImports);
+        throw new Error(`Unresolved imports: ${unresolvedImports.join(', ')}`);
+      }
 
       const GameModule = await import(baseUrl + '/assets/js/' + selectedVersion + '/essentials/Game.js');
       const Game = GameModule.default;
@@ -330,6 +361,14 @@ export class GameExecutor {
             this.updateStatus('Running');
           }
         }, 200);
+      } catch (importError) {
+        const importLines = code
+          .split('\n')
+          .filter(line => line.trim().startsWith('import '))
+          .slice(0, 20);
+        console.error('GameExecutor blob import failed. Rewritten imports:', importLines);
+        console.error('GameExecutor blob import URL:', blobUrl);
+        throw importError;
       } finally {
         URL.revokeObjectURL(blobUrl);
       }

@@ -66,7 +66,7 @@
 </div>
 
 <script type="module">
-import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js?v=4';
 
 (function() {
   const container = document.getElementById('game-runner-{{ include.runner_id }}');
@@ -77,7 +77,9 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   const editorHeight = "{{ include.editor_height }}";
   const canvasHeight = "{{ include.height }}";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
-  const storageKey = container.dataset.storageKey;
+  // In hide_edit mode, always run the authored code (ignore localStorage).
+  // This avoids confusing stale saved code overriding the published runner.
+  const storageKey = hideEdit ? '' : (container.dataset.storageKey || '');
 
   function parseCssSizeToPixels(value, fallback) {
     const parsed = Number.parseFloat(value);

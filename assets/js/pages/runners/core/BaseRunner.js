@@ -11,7 +11,9 @@ export class BaseRunner {
 
     this.container = container;
     this.containerId = container.id;
-    this.storageKey = options.storageKey || container.dataset.storageKey || '';
+    this.storageKey = Object.prototype.hasOwnProperty.call(options, 'storageKey')
+      ? (options.storageKey || '')
+      : (container.dataset.storageKey || '');
     this.statusSelector = options.statusSelector || '.status-text';
 
     this.editor = null;

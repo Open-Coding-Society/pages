@@ -88,7 +88,9 @@ class AstroStory {
             interact: function() {
                 if (this.dialogueSystem) { this.showRandomDialogue(); }
                 setTimeout(() => {
-                    if (this.gameEnv?.gameControl?.currentLevel) {
+                    if (this.gameEnv?.gameControl?.endLevel) {
+                        this.gameEnv.gameControl.endLevel();
+                    } else if (this.gameEnv?.gameControl?.currentLevel) {
                         this.gameEnv.gameControl.currentLevel.continue = false;
                     }
                 }, 1500);

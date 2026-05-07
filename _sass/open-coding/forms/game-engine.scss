@@ -27,24 +27,24 @@
 //
 // Modal Structure:
 //   #cheatsModal, #infoModal
-//   ├── > div (modal content container)
-//       ├── .game-modal-title (h2)
-//       ├── .game-modal-container (main content)
-//       │   ├── .game-level-select-section (for level selection)
-//       │   │   ├── .game-section-title (h3)
-//       │   │   └── .game-level-grid
-//       │   │       └── .game-level-button (multiple)
-//       │   └── .game-info-section (for info content)
-//       └── .game-modal-close (button)
+//   |-- > div (modal content container)
+//       |-- .game-modal-title (h2)
+//       |-- .game-modal-container (main content)
+//       |   |-- .game-level-select-section (for level selection)
+//       |   |   |-- .game-section-title (h3)
+//       |   |   `-- .game-level-grid
+//       |   |       `-- .game-level-button (multiple)
+//       |   `-- .game-info-section (for info content)
+//       `-- .game-modal-close (button)
 //
 // Footer Layout:
 //   #masterFooter (auto-styled)
-//   ├── .game-footer-left
-//   ├── .game-footer-center
-//   │   ├── .game-controls-left (#mansion-game-controls-container)
-//   │   ├── #homeButton
-//   │   └── .game-controls-right
-//   └── .game-footer-right
+//   |-- .game-footer-left
+//   |-- .game-footer-center
+//   |   |-- .game-controls-left (#mansion-game-controls-container)
+//   |   |-- #homeButton
+//   |   `-- .game-controls-right
+//   `-- .game-footer-right
 //
 // HOW TO UPDATE cheats.js:
 // 1. Remove all inline `style.cssText` assignments

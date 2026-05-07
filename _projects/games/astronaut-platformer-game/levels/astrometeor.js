@@ -11,13 +11,13 @@ class AstroMeteor {
 
     const backgroundData = {
       name: "custom_bg",
-      src: path + "/images/gamify/bg/space.jpeg",
+      src: path + "/images/projects/astronaut-platformer-game/space.jpeg",
       pixels: { height: 772, width: 1134 }
     };
 
     const spriteSrc = path + '/images/gamebuilder/sprites/pew.png';
     const alienSpriteSrc = path + '/images/gamebuilder/sprites/ufos.png';
-    const meteorSpriteSrc = path + '/images/gamebuilder/sprites/meteorforgame.jpg';
+    const meteorSpriteSrc = path + '/images/projects/astronaut-platformer-game/meteorforgame.jpg';
 
     const _meteorImg = new Image();
     _meteorImg.src = meteorSpriteSrc;
@@ -127,7 +127,9 @@ class AstroMeteor {
             document.body.appendChild(msg);
             setTimeout(() => {
               if (msg.parentNode) msg.parentNode.removeChild(msg);
-              if (gameEnv?.gameControl?.currentLevel) {
+              if (gameEnv?.gameControl?.endLevel) {
+                gameEnv.gameControl.endLevel();
+              } else if (gameEnv?.gameControl?.currentLevel) {
                 gameEnv.gameControl.currentLevel.continue = false;
               }
             }, 3000);
@@ -196,6 +198,17 @@ class AstroMeteor {
     const destroyMeteor = (meteor) => {
       showMeteorExplosion(meteor.position.x + (meteor.width || 0) / 2, meteor.position.y + (meteor.height || 0) / 2);
       hideMeteor(meteor);
+      // Respawn destroyed meteors so the challenge stays continuous.
+      const respawnDelayMs = 900 + Math.floor(Math.random() * 900);
+      setTimeout(() => {
+        if (_respawnInProgress || _survivalRemaining <= 0 || !meteorPool.includes(meteor)) return;
+        const startX = gameEnv.innerWidth + 120 + Math.floor(Math.random() * 220);
+        const player = gameEnv.gameObjects.find(obj => obj instanceof Player);
+        const avoidY = player ? player.position.y : null;
+        const avoidRadius = player ? Math.max(player.height, player.width) * 1.5 : 80;
+        const startY = spawnY(avoidY, avoidRadius);
+        showMeteor(meteor, startX, startY);
+      }, respawnDelayMs);
     };
 
     const projectileHitsMeteor = (projectile, meteor) => {
@@ -359,7 +372,6 @@ class AstroMeteor {
       direction: -2.5,
       dialogues: ['I am a test meteor.'],
       reaction: meteorReaction,
-      interact: function() { if (this.dialogueSystem) this.showRandomDialogue(); },
       update: meteorUpdate
     });
 
@@ -464,6 +476,13 @@ class AstroMeteor {
       const found = gameEnv.gameObjects.filter(obj => obj?.spriteData?.isMeteor);
       meteorPool.push(...found);
       meteorPool.forEach(m => hideMeteor(m));
+      meteorPool.forEach(m => {
+        const originalNpcUpdate = m.update.bind(m);
+        m.update = function() {
+          meteorUpdate.call(this);
+          originalNpcUpdate();
+        };
+      });
 
       document.addEventListener('keydown', handleShootKey);
       if (_projectileLoop) clearInterval(_projectileLoop);
@@ -472,6 +491,11 @@ class AstroMeteor {
       // Grab the player instance
       const player = gameEnv.gameObjects.find(obj => obj instanceof Player);
       if (!player) return;
+
+      // Start meteor challenge immediately on level load so players don't need
+      // to discover/interact with the alien first.
+      activateMeteors(4);
+      resetSurvivalTimer();
 
       // Initialize gravity state on the instance
       player._gravityVelocity = 0;

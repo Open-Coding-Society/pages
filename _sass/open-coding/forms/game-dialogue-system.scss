@@ -161,7 +161,7 @@
   position: relative;
   
   &::before {
-    content: '👤';
+    content: 'U';
     position: absolute;
     left: -25px;
     top: 8px;
@@ -183,7 +183,7 @@
   position: relative;
   
   &::before {
-    content: '🤖';
+    content: 'AI';
     position: absolute;
     left: -25px;
     top: 8px;
@@ -316,7 +316,7 @@
   
   // Visual indicator for thinking/typing
   &:empty::before {
-    content: '💭';
+    content: '...';
     opacity: 0.3;
     margin-right: 8px;
   }
