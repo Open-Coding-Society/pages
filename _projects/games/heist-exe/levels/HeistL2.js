@@ -16,14 +16,14 @@ class HeistTemplate {
 
     const image_data_bg = {
         id: 'bg',
-        src: path + "/assets/js/projects/heist-exe/images/heist-bg.png",
+        src: path + "/images/projects/heist-exe/images/heist-bg.png",
         pixels: {height: 597, width: 340}
     };
 
     const sprite_data_mc = {
         id: 'MC',
         name: 'mainplayer',
-        src: path + "/assets/js/projects/heist-exe/images/heist-mc.png",
+        src: path + "/images/projects/heist-exe/images/heist-mc.png",
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
@@ -45,7 +45,7 @@ class HeistTemplate {
     const sprite_data_guard1 = {
         id: 'Guard1',
         name: 'guard1',
-        src: path + "/assets/js/projects/heist-exe/images/heist-guard.png",
+        src: path + "/images/projects/heist-exe/images/heist-guard.png",
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
@@ -66,7 +66,7 @@ class HeistTemplate {
     const sprite_data_guard2 = {
         id: 'Guard2',
         name: 'guard2',
-        src: path + "/assets/js/projects/heist-exe/images/heist-guard.png",
+        src: path + "/images/projects/heist-exe/images/heist-guard.png",
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
@@ -191,7 +191,7 @@ class HeistTemplate {
 
     const gem_data_1 = {
         id: 'gem1',
-        spriteImagePath: path + "/assets/js/projects/heist-exe/images/gem.png",
+        spriteImagePath: path + "/images/projects/heist-exe/images/gem.png",
         value: 5,
         SCALE_FACTOR: 10,
         INIT_POSITION: { x: width * 0.05, y: height * 0.05 }
@@ -199,7 +199,7 @@ class HeistTemplate {
 
     const gem_data_2 = {
         id: 'gem2',
-        spriteImagePath: path + "/assets/js/projects/heist-exe/images/gem.png",
+        spriteImagePath: path + "/images/projects/heist-exe/images/gem.png",
         value: 5,
         SCALE_FACTOR: 10,
         INIT_POSITION: { x: width * 0.5, y: height * 0.5 }
