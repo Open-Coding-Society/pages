@@ -149,7 +149,7 @@ class PeppaBattleLevelBase {
         
         // Different message for 2-player mode
         if (this.gameMode === 'twoPlayer') {
-            this.updateHud('2P Mode: P1 uses WASD+SPACE. P2 uses Arrows+Enter. Collect coins and defeat the boss!');
+            this.updateHud('2P Mode: Collect coins and defeat the boss!');
         } else {
             this.updateHud('Fight! Use WASD to move, SPACE to fire lasers, and collect coins.');
         }
@@ -701,7 +701,7 @@ class PeppaBattleLevelBase {
             top: '12px',
             right: '12px',
             zIndex: '9999',
-            width: this.gameMode === 'twoPlayer' ? '280px' : '240px',
+            width: this.gameMode === 'twoPlayer' ? '300px' : '240px',
             padding: '12px',
             borderRadius: '10px',
             background: 'rgba(0, 0, 0, 0.72)',
@@ -724,7 +724,19 @@ class PeppaBattleLevelBase {
         
         hudHtml += `
             <div id="peppa-coin-count-${this.config.levelId}" style="margin-bottom:4px;"></div>
-            <div id="peppa-enemy-hp-${this.config.levelId}" style="margin-bottom:6px;"></div>
+            <div id="peppa-enemy-hp-${this.config.levelId}" style="margin-bottom:6px;"></div>`;
+        
+        // Add controls display for 2-player mode
+        if (this.gameMode === 'twoPlayer') {
+            hudHtml += `
+            <div style="margin-bottom:8px; font-size:12px; border-top:1px solid rgba(255,255,255,0.2); padding-top:6px;">
+                <div style="font-weight:600; margin-bottom:4px;">Controls:</div>
+                <div>P1: WASD + SPACE</div>
+                <div>P2: Arrows + Enter</div>
+            </div>`;
+        }
+        
+        hudHtml += `
             <button id="peppa-change-name-${this.config.levelId}" style="margin-bottom:8px; padding:6px 10px; border:none; border-radius:6px; cursor:pointer;">Change Name</button>
             <div id="peppa-message-${this.config.levelId}" style="margin-top:6px; margin-bottom:10px; font-size:13px; min-height:18px;"></div>
             <div id="peppa-leaderboard-${this.config.levelId}" style="margin-top:8px; font-size:12px;"></div>
