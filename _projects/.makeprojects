@@ -11,7 +11,7 @@
 # === NESTED STRUCTURE (organized by category) ===
 # Games
 games/backgrounds
-games/barriers-spline-sorcerers
+games/spline-barriers:dev
 games/characters
 games/collisions-mechanic
 games/cs-pathway:dev
@@ -19,13 +19,14 @@ games/enemy-death
 games/game-in-game-lesson
 games/gamify
 games/local-storage
-games/multiplayer
+games/tag-game-multiplayer
 games/ocean
 games/peppa-pig
-games/platformer-gravity-sorcerers
+games/platformer:dev
 games/red-riding
 games/teamtestgame
 games/transitions
+games/gategame
 
 # Lessons
 lessons/game-lessons

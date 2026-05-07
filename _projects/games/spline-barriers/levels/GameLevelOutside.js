@@ -3,8 +3,8 @@ import GameEnvBackground  from '@assets/js/GameEnginev1.1/essentials/GameEnvBack
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import SpriteSheetCoin from '@assets/js/projects/barriers-spline-sorcerers/levels/SpriteSheetCoin.js';
-import SplineBarrier from '@assets/js/projects/barriers-spline-sorcerers/levels/SplineBarrier.js';
+import SpriteSheetCoin from '@assets/js/projects/spline-barriers/levels/SpriteSheetCoin.js';
+import SplineBarrier from '@assets/js/projects/spline-barriers/levels/SplineBarrier.js';
 
 /**
  * GameLevelOutside
@@ -37,7 +37,7 @@ class GameLevelOutside {
         const path = gameEnv.path;
 
         // --- Floor ---
-        const image_src_floor = path + "/images/projects/barriers-spline-sorcerers/castleOutside.png";
+        const image_src_floor = path + "/images/projects/spline-barriers/castleOutside.png";
         const image_data_floor = {
             name: 'floor',
             src: image_src_floor,
@@ -50,7 +50,7 @@ class GameLevelOutside {
          * Represents the main controllable character (knight)
          * The player can move around the map and interact with NPCs. It can also shoot arrows.
          */
-        const sprite_src_mc = path + "/images/projects/barriers-spline-sorcerers/playerSpritesheet.png";
+        const sprite_src_mc = path + "/images/projects/spline-barriers/playerSpritesheet.png";
         const MC_SCALE_FACTOR = 15;
         const sprite_data_mc = {
             id: 'Knight',
@@ -78,7 +78,7 @@ class GameLevelOutside {
         };
     
 
-        const sir_morty = path + "/images/projects/barriers-spline-sorcerers/mortyKnight.png";
+        const sir_morty = path + "/images/projects/spline-barriers/mortyKnight.png";
         const sir_morty_greeting = "Hello! I'm Sir Morty!";
         const sir_morty_data = {
         id: "Sir Morty",
@@ -168,7 +168,7 @@ class GameLevelOutside {
          * Acts as the  trigger to start the archery mini-game.
          * When the player interacts (presses E), a dialogue appears allowing the player to start or cancel the game.
          */
-        const sprite_src_darkKnight = path + "/images/projects/barriers-spline-sorcerers/darkKnight.png";
+        const sprite_src_darkKnight = path + "/images/projects/spline-barriers/darkKnight.png";
         const sprite_greet_darkKnight = "Start the game? Press E";
         const sprite_data_darkKnight = {
             id: 'DarkKnight',
@@ -237,7 +237,7 @@ class GameLevelOutside {
             INIT_POSITION: { x: 0.5, y: 0.5 },
             SCALE_FACTOR: 30,
             value: 5,
-            spriteImagePath: path + '/images/projects/barriers-spline-sorcerers/gems.png',
+            spriteImagePath: path + '/images/projects/spline-barriers/gems.png',
             spriteFrames: { rows: 2, columns: 4, frameIndex: Math.floor(Math.random() * 8) }     
         }
 
