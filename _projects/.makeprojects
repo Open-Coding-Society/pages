@@ -16,7 +16,8 @@ games/characters
 games/collisions-mechanic
 games/cs-pathway:dev
 games/enemy-death
-games/game-in-game-lesson
+games/escape-the-tower
+games/pirate-hunt
 games/gamify
 games/local-storage
 games/kirby-minigames
