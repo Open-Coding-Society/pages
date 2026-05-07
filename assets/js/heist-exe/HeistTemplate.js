@@ -24,7 +24,7 @@ const sprite_data_mc = {
     name: 'mainplayer',
     src: path + "/assets/js/heist-exe/images/heist-mc.png",
     SCALE_FACTOR: 10,
-    STEP_FACTOR: 1000,
+    STEP_FACTOR: 750,
     ANIMATION_RATE: 50,
     INIT_POSITION: { x: 100, y: 200 }, 
     pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
