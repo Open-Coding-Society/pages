@@ -15,8 +15,9 @@ games/spline-barriers
 games/characters
 games/collisions-mechanic
 games/cs-pathway:dev
+games/enemy-death
+games/escape-the-tower
 games/pirate-hunt
-games/game-in-game-lesson
 games/gamify
 games/local-storage
 games/tag-game-multiplayer
