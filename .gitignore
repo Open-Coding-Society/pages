@@ -58,6 +58,12 @@ assets/js/projects/
 assets/css/projects/
 images/projects/
 
+# Auto-generated project Makefiles (copied from _template at build time)
+_projects/*/Makefile
+_projects/*/*/Makefile
+# Except the template itself (single source of truth)
+!_projects/_template/Makefile
+
 # Post generations
 _posts/**/*_cwgu.md
 _posts/**/*_content.md

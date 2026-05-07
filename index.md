@@ -8,13 +8,13 @@ permalink: /
 ---
 
 <script>
-  window.location.replace("{{ site.baseurl }}/cs-pathway-game");
+  window.location.replace("{{ site.baseurl }}/cs-pathway");
 </script>
 
 <noscript>
-  <meta http-equiv="refresh" content="0; url={{ site.baseurl }}/cs-pathway-game">
+  <meta http-equiv="refresh" content="0; url={{ site.baseurl }}/cs-pathway">
 </noscript>
 
-[Continue to the Gamified Home Pilot]({{ site.baseurl }}/cs-pathway-game)
+[Continue to the Gamified Home Pilot]({{ site.baseurl }}/cs-pathway)
 
 [Need older materials? Open the Legacy Home Materials Hub]({{ site.baseurl }}/home-legacy)

@@ -392,6 +392,32 @@
         set('--priority-p3', '#22c55e');
       }
 
+      // Game-specific theme tokens (derived from user preferences)
+      // These allow game UI components to adapt to the user's chosen theme
+      const gamePanelBg = ColorUtils.adjustColor(bg, 18 * dir);
+      const gameSurfaceAlt = ColorUtils.adjustColor(bg, 28 * dir);
+      const gameSurfaceContrast = ColorUtils.adjustColor(bg, lightBg ? -80 : 8);
+      const gameOverlay = lightBg 
+        ? `rgba(${ColorUtils.hexToRgb(bg).r}, ${ColorUtils.hexToRgb(bg).g}, ${ColorUtils.hexToRgb(bg).b}, 0.72)`
+        : `rgba(${ColorUtils.hexToRgb(bg).r}, ${ColorUtils.hexToRgb(bg).g}, ${ColorUtils.hexToRgb(bg).b}, 0.72)`;
+      const gameSelectedBg = ColorUtils.adjustColor(bg, 48 * dir);
+      const gameSelectedBorder = ColorUtils.adjustColor(accent, lightBg ? -20 : 40);
+      const gameScoreAccent = lightBg ? '#d97706' : '#f59e0b';
+      const gameMuted = lightBg 
+        ? ColorUtils.adjustColor(accent, -40)
+        : ColorUtils.adjustColor(accent, 60);
+
+      set('--ocs-game-panel-bg', gamePanelBg);
+      set('--ocs-game-accent', accent);
+      set('--ocs-game-text', text);
+      set('--ocs-game-muted', gameMuted);
+      set('--ocs-game-surface-alt', gameSurfaceAlt);
+      set('--ocs-game-surface-contrast', gameSurfaceContrast);
+      set('--ocs-game-overlay', gameOverlay);
+      set('--ocs-game-panel-selected-bg', gameSelectedBg);
+      set('--ocs-game-selected-border', gameSelectedBorder);
+      set('--ocs-game-score-accent', gameScoreAccent);
+
       // Activate the theme class
       root.classList.add('user-theme-active');
 
@@ -419,6 +445,10 @@
         '--bg-0', '--bg-1', '--bg-2', '--bg-3',
         '--text', '--text-strong', '--text-muted', '--white1',
         '--panel', '--panel-mid', '--ui-bg', '--ui-border',
+        '--ocs-game-panel-bg', '--ocs-game-accent', '--ocs-game-text',
+        '--ocs-game-muted', '--ocs-game-surface-alt', '--ocs-game-surface-contrast',
+        '--ocs-game-overlay', '--ocs-game-panel-selected-bg', '--ocs-game-selected-border',
+        '--ocs-game-score-accent',
       ];
       props.forEach(name => root.style.removeProperty(name));
     }
