@@ -173,14 +173,14 @@ active_tab: calendar
     <div id="calendar-threads-panel" class="calendar-issues-panel">
         <div class="calendar-issues-header">
             <div>
-                <h2 class="calendar-issues-title">Message Threads</h2>
-                <p class="calendar-issues-subtitle">Open Coding Society Slack threads synced into a searchable frontend list.</p>
+                <h2 class="calendar-issues-title">Issue Threads</h2>
+                <p class="calendar-issues-subtitle">Replies, suggestions, and follow-ups attached directly to issues.</p>
             </div>
         </div>
 
         <div class="issues-controls-row">
-            <input id="threads-filter-query" type="search" placeholder="Search thread text, author, channel" />
-            <input id="threads-filter-channel" type="search" placeholder="Filter by channel" />
+            <input id="threads-filter-query" type="search" placeholder="Search issue title or reply text" />
+            <input id="threads-filter-channel" type="search" placeholder="Filter by issue" />
             <input id="threads-filter-author" type="search" placeholder="Filter by author" />
             <label class="filter-field filter-field--date" for="threads-filter-start">
                 <span class="filter-label">From time</span>
@@ -192,7 +192,7 @@ active_tab: calendar
             </label>
             <label class="calendar-issue-filter-toggle">
                 <input id="threads-filter-only-threads" type="checkbox" />
-                <span>Threads only</span>
+                <span>With replies only</span>
             </label>
             <input id="threads-filter-limit" type="number" min="1" max="500" value="100" />
         </div>
@@ -249,8 +249,21 @@ active_tab: calendar
         <div id="issue-modal-meta" class="issue-modal-meta"></div>
         <div id="issue-modal-description" class="issue-markdown-preview issue-modal-description"></div>
         <div id="issue-modal-tags" class="issue-tags"></div>
+        <div class="issue-thread-panel">
+            <div class="issue-thread-panel-header">
+                <h4 class="issue-thread-panel-title">Replies</h4>
+                <span id="issue-modal-comment-count" class="issue-thread-count"></span>
+            </div>
+            <div id="issue-comments-list" class="issue-comments-list"></div>
+            <label for="issue-comment-text" class="issue-comment-label">Add a reply</label>
+            <textarea id="issue-comment-text" class="issue-comment-textarea" rows="4" placeholder="Leave a suggestion or comment"></textarea>
+            <div class="issue-thread-composer-actions">
+                <button id="issue-comment-submit" type="button" class="calendar-issue-action-btn primary">Post Reply</button>
+            </div>
+        </div>
         <div class="issue-modal-actions">
             <button id="issue-modal-copy-link" type="button" class="calendar-issue-action-btn secondary">Copy Link</button>
+            <button id="issue-modal-star" type="button" class="calendar-issue-action-btn secondary">Star</button>
             <button id="issue-modal-edit" type="button" class="calendar-issue-action-btn secondary">Edit</button>
             <button id="issue-modal-delete" type="button" class="calendar-issue-action-btn danger">Delete</button>
         </div>
@@ -312,7 +325,8 @@ active_tab: calendar
     let currentPersonId = null;
     // Filter mode: 'my-groups' (default) or 'all'
     let filterMode = 'my-groups';
-    let calendarSlackMessages = [];
+    let calendarIssueThreads = [];
+    let calendarIssueComments = [];
 
     // Issue state
     let calendarIssues = [];
@@ -510,98 +524,130 @@ active_tab: calendar
         };
     }
 
-    function normalizeSlackMessage(message) {
-        const payload = message?.payload || {};
-        const timestamp = message?.timestamp || payload.ts || payload.thread_ts || '';
-        const threadId = payload.thread_ts || payload.ts || timestamp || `thread-${Math.random().toString(36).slice(2)}`;
-        const text = String(payload.text || '').trim();
+    function normalizeIssueComment(comment) {
+        const assignment = String(comment?.assignment || '').trim();
+        const isStar = assignment.endsWith('::star');
+        const issueAssignment = isStar ? assignment.replace(/::star$/, '') : assignment;
+        const issueMatch = issueAssignment.match(/^issue-(\d+)$/);
         return {
-            timestamp,
-            threadId,
-            channel: String(payload.channel || payload.channel_name || '').trim(),
-            author: String(payload.user || payload.username || payload.bot_profile?.name || '').trim(),
-            text,
-            raw: payload,
-            replyCount: Number(payload.reply_count || 0),
-            hasThread: Boolean(payload.thread_ts) || Number(payload.reply_count || 0) > 0
+            id: comment?.id,
+            issueId: issueMatch ? issueMatch[1] : '',
+            assignment,
+            author: String(comment?.author || '').trim(),
+            text: String(comment?.text || '').trim(),
+            timestamp: String(comment?.timestamp || '').trim(),
+            isStar,
+            raw: comment || {}
         };
     }
 
-    function buildSlackThreads(messages) {
+    function parseThreadTimestamp(value) {
+        if (!value) return new Date(0);
+        const normalized = String(value).includes('T') ? String(value) : String(value).replace(' ', 'T');
+        const parsed = new Date(normalized);
+        return Number.isNaN(parsed.getTime()) ? new Date(0) : parsed;
+    }
+
+    function buildIssueThreads(issues, comments) {
+        const issueMap = new Map((issues || []).map(issue => [String(issue.id), issue]));
         const threads = new Map();
-        (messages || []).map(normalizeSlackMessage).forEach(message => {
-            const key = message.threadId;
-            if (!threads.has(key)) {
-                threads.set(key, {
-                    threadId: key,
-                    channel: message.channel,
-                    author: message.author,
-                    timestamp: message.timestamp,
-                    messages: []
-                });
-            }
-            const thread = threads.get(key);
-            if (!thread.channel && message.channel) thread.channel = message.channel;
-            if (!thread.author && message.author) thread.author = message.author;
-            if (!thread.timestamp || String(message.timestamp).localeCompare(String(thread.timestamp)) < 0) {
-                thread.timestamp = message.timestamp;
-            }
-            thread.messages.push(message);
+
+        (issues || []).forEach(issue => {
+            if (!issue || issue.id == null) return;
+            threads.set(String(issue.id), {
+                issueId: String(issue.id),
+                issue,
+                comments: [],
+                latestComment: null
+            });
         });
 
-        return Array.from(threads.values()).sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')));
+        (comments || []).map(normalizeIssueComment).forEach(comment => {
+            if (!comment.issueId || comment.isStar) return;
+            if (!threads.has(comment.issueId)) {
+                threads.set(comment.issueId, {
+                    issueId: comment.issueId,
+                    issue: issueMap.get(comment.issueId) || null,
+                    comments: [],
+                    latestComment: null
+                });
+            }
+            threads.get(comment.issueId).comments.push(comment);
+        });
+
+        return Array.from(threads.values()).map(thread => {
+            thread.comments.sort((a, b) => parseThreadTimestamp(b.timestamp).getTime() - parseThreadTimestamp(a.timestamp).getTime());
+            thread.latestComment = thread.comments[0] || null;
+            return thread;
+        }).sort((a, b) => {
+            const aTime = parseThreadTimestamp(a.latestComment?.timestamp || a.issue?.updatedAt || a.issue?.createdAt).getTime();
+            const bTime = parseThreadTimestamp(b.latestComment?.timestamp || b.issue?.updatedAt || b.issue?.createdAt).getTime();
+            return bTime - aTime;
+        });
     }
 
     function getFilteredThreads() {
-        const el = getThreadElements();
+        const el = {
+            query: document.getElementById('threads-filter-query'),
+            channel: document.getElementById('threads-filter-channel'),
+            author: document.getElementById('threads-filter-author'),
+            start: document.getElementById('threads-filter-start'),
+            end: document.getElementById('threads-filter-end'),
+            onlyThreads: document.getElementById('threads-filter-only-threads')
+        };
         const query = (el.query?.value || '').trim().toLowerCase();
-        const channel = (el.channel?.value || '').trim().toLowerCase();
+        const issueQuery = (el.channel?.value || '').trim().toLowerCase();
         const author = (el.author?.value || '').trim().toLowerCase();
         const start = parseCalendarFilterDate(el.start?.value || '');
         const end = parseCalendarFilterDate(el.end?.value || '');
         const onlyThreads = Boolean(el.onlyThreads?.checked);
 
-        return (calendarSlackMessages || [])
+        return (calendarIssueThreads || [])
             .filter(thread => {
                 if (!thread) return false;
-                if (onlyThreads && !thread.hasThread && (thread.messages || []).length <= 1) return false;
-                const firstMessage = thread.messages?.[0] || {};
-                const haystack = [thread.channel, thread.author, firstMessage.text, ...(thread.messages || []).map(msg => msg.text)].join(' ').toLowerCase();
+                if (onlyThreads && (thread.comments || []).length === 0) return false;
+                const issue = thread.issue || {};
+                const haystack = [issue.title, issue.description, issue.tags, issue.ownerUid, ...(thread.comments || []).map(msg => msg.text), ...(thread.comments || []).map(msg => msg.author)].join(' ').toLowerCase();
                 if (query && !haystack.includes(query)) return false;
-                if (channel && !(String(thread.channel || '').toLowerCase().includes(channel) || String(firstMessage.channel || '').toLowerCase().includes(channel))) return false;
-                if (author && !(String(thread.author || '').toLowerCase().includes(author) || (thread.messages || []).some(msg => String(msg.author || '').toLowerCase().includes(author)))) return false;
-                const stamp = new Date(String(thread.timestamp || firstMessage.timestamp || ''));
-                if (start && !Number.isNaN(stamp.getTime()) && stamp < start) return false;
-                if (end && !Number.isNaN(stamp.getTime()) && stamp > end) return false;
+                if (issueQuery && !(String(issue.title || '').toLowerCase().includes(issueQuery) || String(thread.issueId || '').includes(issueQuery))) return false;
+                if (author && !(String(issue.ownerUid || '').toLowerCase().includes(author) || (thread.comments || []).some(msg => String(msg.author || '').toLowerCase().includes(author)))) return false;
+                const stamp = parseThreadTimestamp(thread.latestComment?.timestamp || issue.updatedAt || issue.createdAt || '');
+                if (start && stamp.getTime() && stamp < start) return false;
+                if (end && stamp.getTime() && stamp > end) return false;
                 return true;
             })
-            .sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')));
+            .slice(0, Math.max(1, Math.min(500, parseInt(document.getElementById('threads-filter-limit')?.value || '100', 10) || 100)));
     }
 
     function renderThreadsList(threads) {
-        const el = getThreadElements();
+        const el = {
+            list: document.getElementById('threads-list')
+        };
         if (!el.list) return;
 
         if (!threads.length) {
-            el.list.innerHTML = '<div class="issues-empty">No message threads match current filters.</div>';
+            el.list.innerHTML = '<div class="issues-empty">No issue threads match current filters.</div>';
             return;
         }
 
         el.list.innerHTML = threads.map(thread => {
-            const firstMessage = thread.messages?.[0] || {};
-            const replyCount = Math.max(0, (thread.messages || []).length - 1) + Number(firstMessage.replyCount || 0);
+            const issue = thread.issue || {};
+            const latestComment = thread.latestComment || null;
+            const replyCount = (thread.comments || []).length;
             return `
-                <article class="issue-card">
+                <article class="issue-card issue-thread-card" data-issue-id="${escapeIssueText(thread.issueId)}">
                     <div class="issue-card-top">
-                        <div class="issue-card-title">${escapeIssueText(firstMessage.text || 'Untitled thread')}</div>
+                        <button type="button" class="issue-link-btn issue-card-title" data-action="view" data-issue-id="${escapeIssueText(thread.issueId)}">${escapeIssueText(issue.title || 'Untitled issue')}</button>
                         <div class="issue-card-badge-row">
-                            <span class="issue-pill medium">THREAD</span>
+                            <span class="issue-pill medium">★ ${escapeIssueText(issue.starCount ?? 0)}</span>
+                            <span class="issue-pill medium">💬 ${escapeIssueText(replyCount)}</span>
                         </div>
                     </div>
-                    <div class="issue-card-note">${escapeIssueText(thread.channel || 'Unknown channel')} · ${escapeIssueText(thread.author || 'Unknown author')}</div>
-                    <div class="issue-meta">${escapeIssueText(thread.timestamp || '')}${replyCount ? ` · ${replyCount} replies` : ''}</div>
+                    <div class="issue-card-note">${escapeIssueText(issue.status || 'open')} · Due ${escapeIssueText(formatIssueDate(issue.dueDate))} · ${escapeIssueText(issue.author || 'Unknown author')}</div>
+                    <div class="issue-meta">${escapeIssueText(latestComment?.timestamp || issue.updatedAt || issue.createdAt || '')}${replyCount ? ` · ${replyCount} replies` : ''}</div>
+                    ${latestComment ? `<div class="issue-thread-latest">${escapeIssueText(latestComment.author || 'Unknown')} · ${escapeIssueText((latestComment.text || '').slice(0, 140))}</div>` : '<div class="issue-thread-latest">No replies yet. Start the discussion.</div>'}
                     <div class="issue-tags">
-                        ${(thread.messages || []).slice(0, 3).map(message => `<span class="issue-tag">${escapeIssueText((message.text || '').slice(0, 60) || 'message')}</span>`).join('')}
+                        ${(thread.comments || []).slice(0, 3).map(message => `<span class="issue-tag">${escapeIssueText((message.text || '').slice(0, 60) || 'reply')}</span>`).join('')}
                     </div>
                 </article>
             `;
@@ -614,12 +660,12 @@ active_tab: calendar
 
     function renderCalendarFilters() {
         if (activeDashboardTab !== 'calendar') return;
-        displayCalendar(filterEvents());
+        window.displayCalendar?.(window.filterEvents?.() || []);
     }
 
     function applyCalendarFilterUI() {
         renderCalendarFilters();
-        renderIssueViews();
+        window.renderIssueViews?.();
         renderThreadsPanel();
     }
 
@@ -750,13 +796,8 @@ active_tab: calendar
                 });
         }
 
-        function requestMessages() {
-            const limitInput = document.getElementById('threads-filter-limit');
-            const limit = Math.max(1, Math.min(500, parseInt(limitInput?.value || '100', 10) || 100));
-            const queryUrl = new URL(`${javaURI}/slack/messages`);
-            queryUrl.searchParams.set('limit', String(limit));
-
-            return fetch(queryUrl.toString(), fetchOptions)
+        function requestComments() {
+            return fetch(`${javaURI}/api/Comment/all`, fetchOptions)
                 .then(r => {
                     if (handleAuthError(r)) return [];
                     if (!r.ok) return [];
@@ -776,19 +817,6 @@ active_tab: calendar
                 group: document.getElementById('calendar-filter-group'),
                 start: document.getElementById('calendar-filter-start'),
                 end: document.getElementById('calendar-filter-end')
-            };
-        }
-
-        function getThreadElements() {
-            return {
-                query: document.getElementById('threads-filter-query'),
-                channel: document.getElementById('threads-filter-channel'),
-                author: document.getElementById('threads-filter-author'),
-                start: document.getElementById('threads-filter-start'),
-                end: document.getElementById('threads-filter-end'),
-                onlyThreads: document.getElementById('threads-filter-only-threads'),
-                limit: document.getElementById('threads-filter-limit'),
-                list: document.getElementById('threads-list')
             };
         }
 
@@ -908,6 +936,8 @@ active_tab: calendar
                             <div class="issue-card-badge-row">
                                 <span class="issue-pill ${escapeIssueText(status)}">${escapeIssueText(ISSUE_STATUS_LABELS[status] || status)}</span>
                                 <span class="issue-pill ${escapeIssueText(priority)}">${escapeIssueText(priority.toUpperCase())}</span>
+                                <span class="issue-pill medium">★ ${escapeIssueText(issue.starCount ?? 0)}</span>
+                                <span class="issue-pill medium">💬 ${escapeIssueText(issue.commentCount ?? 0)}</span>
                             </div>
                         </div>
                         <div class="issue-card-note">Description is hidden here. Press View to open the full issue modal.</div>
@@ -952,6 +982,8 @@ active_tab: calendar
                                 <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</div>
                                 <div class="issue-card-badge-row">
                                     <span class="issue-pill ${escapeIssueText(issue.priority || 'medium')}">${escapeIssueText((issue.priority || 'medium').toUpperCase())}</span>
+                                    <span class="issue-pill medium">★ ${escapeIssueText(issue.starCount ?? 0)}</span>
+                                    <span class="issue-pill medium">💬 ${escapeIssueText(issue.commentCount ?? 0)}</span>
                                 </div>
                                 <select data-action="status" data-issue-id="${escapeIssueText(issue.id)}">
                                     ${ISSUE_STATUS_OPTIONS.map(option => `<option value="${option}" ${option === (issue.status || 'open') ? 'selected' : ''}>${ISSUE_STATUS_LABELS[option]}</option>`).join('')}
@@ -1024,12 +1056,13 @@ active_tab: calendar
 
         // ── handleRequest: build allEvents, then render ─────────────
         function handleRequest() {
-            return Promise.all([request(), getBreaks(), requestIssues(), requestMessages()])
-                .then(([calendarEvents, breaks, issues, messages]) => {
+            return Promise.all([request(), getBreaks(), requestIssues(), requestComments()])
+                .then(([calendarEvents, breaks, issues, comments]) => {
                     if (calendarEvents !== null) { javaAuthenticated = true; hideAuthBanner(); }
                     allEvents = [];
                     calendarIssues = Array.isArray(issues) ? issues : [];
-                    calendarSlackMessages = buildSlackThreads(Array.isArray(messages) ? messages : []);
+                    calendarIssueComments = Array.isArray(comments) ? comments : [];
+                    calendarIssueThreads = buildIssueThreads(calendarIssues, calendarIssueComments);
                     issueCountsByDate = buildIssueCountMap(calendarIssues);
 
                     calendarIssues.forEach(issue => {
@@ -1628,7 +1661,13 @@ active_tab: calendar
 
             [
                 ...Object.values(getCalendarFilterElements()),
-                ...Object.values(getThreadElements())
+                document.getElementById('threads-filter-query'),
+                document.getElementById('threads-filter-channel'),
+                document.getElementById('threads-filter-author'),
+                document.getElementById('threads-filter-start'),
+                document.getElementById('threads-filter-end'),
+                document.getElementById('threads-filter-only-threads'),
+                document.getElementById('threads-filter-limit')
             ].forEach(control => {
                 control?.addEventListener('input', applyCalendarFilterUI);
                 control?.addEventListener('change', applyCalendarFilterUI);
@@ -1649,11 +1688,61 @@ active_tab: calendar
             const issueModalMeta = document.getElementById('issue-modal-meta');
             const issueModalDescription = document.getElementById('issue-modal-description');
             const issueModalTags = document.getElementById('issue-modal-tags');
+            const issueModalCommentCount = document.getElementById('issue-modal-comment-count');
+            const issueCommentsList = document.getElementById('issue-comments-list');
+            const issueCommentText = document.getElementById('issue-comment-text');
+            const issueCommentSubmit = document.getElementById('issue-comment-submit');
+            const issueModalStarBtn = document.getElementById('issue-modal-star');
             const issueModalCloseBtn = document.getElementById('issue-modal-close');
             const issueModalCopyLinkBtn = document.getElementById('issue-modal-copy-link');
             const issueModalEditBtn = document.getElementById('issue-modal-edit');
             const issueModalDeleteBtn = document.getElementById('issue-modal-delete');
             let activeModalIssueId = null;
+
+            function issueAssignmentKey(issueId) {
+                return `issue-${issueId}`;
+            }
+
+            function issueStarAssignmentKey(issueId) {
+                return `${issueAssignmentKey(issueId)}::star`;
+            }
+
+            function getIssueComments(issueId) {
+                return (calendarIssueComments || [])
+                    .map(normalizeIssueComment)
+                    .filter(comment => String(comment.issueId || '') === String(issueId) && !comment.isStar)
+                    .sort((a, b) => parseThreadTimestamp(b.timestamp).getTime() - parseThreadTimestamp(a.timestamp).getTime());
+            }
+
+            function renderIssueComments(issueId) {
+                if (!issueCommentsList) return;
+
+                const comments = getIssueComments(issueId);
+                if (issueModalCommentCount) {
+                    issueModalCommentCount.textContent = `${comments.length} repl${comments.length === 1 ? 'y' : 'ies'}`;
+                }
+
+                if (!comments.length) {
+                    issueCommentsList.innerHTML = '<div class="issues-empty">No replies yet. Add the first one below.</div>';
+                    return;
+                }
+
+                issueCommentsList.innerHTML = comments.map(comment => `
+                    <article class="issue-comment-card">
+                        <div class="issue-comment-card-top">
+                            <strong>${escapeIssueText(comment.author || 'Unknown')}</strong>
+                            <span class="issue-meta">${escapeIssueText(comment.timestamp || '')}</span>
+                        </div>
+                        <div class="issue-comment-body">${escapeIssueText(comment.text || '')}</div>
+                    </article>
+                `).join('');
+            }
+
+            function updateIssueStarButton(issue) {
+                if (!issueModalStarBtn || !issue) return;
+                const starCount = Number(issue.starCount || 0);
+                issueModalStarBtn.textContent = `${issue.starred ? 'Unstar' : 'Star'} (${starCount})`;
+            }
 
             function getIssueFromUrl() {
                 const params = new URLSearchParams(window.location.search);
@@ -1685,6 +1774,8 @@ active_tab: calendar
                 issueModalDescription.innerHTML = renderIssueMarkdown(issue.description || '');
                 const tags = normalizeTags(issue.tags);
                 issueModalTags.innerHTML = tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('');
+                renderIssueComments(issue.id);
+                updateIssueStarButton(issue);
                 const canDelete = !(issue.author && getCurrentIssueAuthor() && issue.author !== getCurrentIssueAuthor());
                 if (issueModalDeleteBtn) {
                     issueModalDeleteBtn.disabled = !canDelete;
@@ -1885,6 +1976,72 @@ active_tab: calendar
                 }
             });
 
+            issueCommentSubmit?.addEventListener('click', async () => {
+                if (!activeModalIssueId) return;
+                const text = issueCommentText?.value?.trim() || '';
+                if (!text) {
+                    showIssueToast('Comment text is required.', 'error');
+                    issueCommentText?.focus();
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${javaURI}/api/Comment/issue/${activeModalIssueId}`, {
+                        ...fetchOptions,
+                        method: 'POST',
+                        headers: {
+                            ...(fetchOptions.headers || {}),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ text })
+                    });
+
+                    if (handleAuthError(response)) throw new Error('AUTH');
+                    if (!response.ok) {
+                        const message = await response.text();
+                        throw new Error(message || 'Failed to save comment');
+                    }
+
+                    issueCommentText.value = '';
+                    showIssueToast('Reply posted.', 'success');
+                    await handleRequest();
+                    const refreshedIssue = calendarIssues.find(item => String(item.id) === String(activeModalIssueId));
+                    if (refreshedIssue) {
+                        openIssueModal(refreshedIssue, false, true);
+                    }
+                } catch (error) {
+                    console.error('Issue comment error:', error);
+                    showIssueToast(error.message === 'AUTH' ? 'Please log in again.' : 'Could not save comment.', 'error');
+                }
+            });
+
+            issueModalStarBtn?.addEventListener('click', async () => {
+                if (!activeModalIssueId) return;
+
+                try {
+                    const response = await fetch(`${javaURI}/api/Comment/issue/${activeModalIssueId}/star`, {
+                        ...fetchOptions,
+                        method: 'POST'
+                    });
+
+                    if (handleAuthError(response)) throw new Error('AUTH');
+                    if (!response.ok) {
+                        const message = await response.text();
+                        throw new Error(message || 'Failed to toggle star');
+                    }
+
+                    showIssueToast('Star updated.', 'success');
+                    await handleRequest();
+                    const refreshedIssue = calendarIssues.find(item => String(item.id) === String(activeModalIssueId));
+                    if (refreshedIssue) {
+                        openIssueModal(refreshedIssue, false, true);
+                    }
+                } catch (error) {
+                    console.error('Issue star error:', error);
+                    showIssueToast(error.message === 'AUTH' ? 'Please log in again.' : 'Could not update star.', 'error');
+                }
+            });
+
             window.addEventListener('popstate', () => {
                 const issueId = getIssueFromUrl();
                 if (!issueId) {
@@ -1914,6 +2071,11 @@ active_tab: calendar
 
         initializeDashboardControls();
         initializeIssueWorkspace();
+
+        window.displayCalendar = displayCalendar;
+        window.filterEvents = filterEvents;
+        window.renderIssueViews = renderIssueViews;
+        window.renderThreadsPanel = renderThreadsPanel;
 
         // ── GO! ─────────────────────────────────────────────────────
         handleRequest();
