@@ -18,6 +18,7 @@ import Collectible from "@assets/js/GameEnginev1.1/essentials/Collectible.js";
 import AiNpc from "@assets/js/GameEnginev1.1/essentials/AiNpc.js";
 import GameControl from "@assets/js/GameEnginev1.1/essentials/GameControl.js";
 import GameLevelSeek from "./GameLevelSeek.js";
+import KirbyLevelMusic from "./KirbyLevelMusic.js";
 
 const resolveKirbyMinigamesAssetPath = (basePath) => {
   const normalizedBasePath = String(basePath || "").replace(/\/$/, "");
@@ -4664,6 +4665,13 @@ class GameLevelAquaticGameLevel {
 
   initialize() {
     // Runtime wiring: mount HUD/menu, apply locks, gate NPCs, and attach shark AI.
+    if (!this.levelMusic) {
+      this.levelMusic = new KirbyLevelMusic({
+        levelName: "Aquatic",
+        buttonId: "kirby-aquatic-music-toggle",
+      }).attach();
+    }
+
     this.ensureTopMenuBar?.();
     this.startMultiplayer?.();
 
@@ -4931,6 +4939,8 @@ class GameLevelAquaticGameLevel {
 
   destroy() {
     // Remove level-owned overlays and temporary spawned objects.
+    this.levelMusic?.destroy?.();
+    this.levelMusic = null;
     this.stopMultiplayer?.();
     const topMenu = document.getElementById("aquatic-top-menubar");
     if (topMenu) topMenu.remove();

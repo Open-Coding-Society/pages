@@ -5,6 +5,7 @@ import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Leaderboard from '@assets/js/GameEnginev1.1/essentials/Leaderboard.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import KirbyLevelMusic from './KirbyLevelMusic.js';
 
 class GameLevelBasketball {
   constructor(gameEnv) {
@@ -186,6 +187,13 @@ class GameLevelBasketball {
   }
 
   initialize() {
+    if (!this.levelMusic) {
+      this.levelMusic = new KirbyLevelMusic({
+        levelName: 'Basketball',
+        buttonId: 'kirby-basketball-music-toggle'
+      }).attach();
+    }
+
     if (!this.gameEnv.stats) this.gameEnv.stats = {};
     this.gameEnv.stats.coinsCollected = 0;
     this.updateCoinSpawnBounds();
@@ -762,6 +770,8 @@ class GameLevelBasketball {
   }
 
   destroy() {
+    this.levelMusic?.destroy?.();
+    this.levelMusic = null;
     document.removeEventListener('keydown', this.handleRestartKey);
     document.removeEventListener('keydown', this.handleShootKey);
     if (this.timeHud)    this.timeHud.remove();

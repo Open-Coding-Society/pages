@@ -4,6 +4,7 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
 import GameLevelBasketball from './GameLevelBasketball.js';
+import KirbyLevelMusic from './KirbyLevelMusic.js';
 
 console.log('GameLevelSeek.js loaded:', new Date().toISOString());
 
@@ -468,6 +469,12 @@ class GameLevelSeek {
     initialize() {
         this.levelCompleted = false;
         this.completionTriggered = false;
+        if (!this.levelMusic) {
+            this.levelMusic = new KirbyLevelMusic({
+                levelName: 'Seek',
+                buttonId: 'kirby-seek-music-toggle'
+            }).attach();
+        }
 
         if (!this.spriteSwapScrollTriggered) {
             this.spriteSwapScrollTriggered = true;
@@ -568,6 +575,9 @@ class GameLevelSeek {
     }
 
     destroy() {
+        this.levelMusic?.destroy?.();
+        this.levelMusic = null;
+
         if (this.menuId) {
             const menu = document.getElementById(this.menuId);
             if (menu) menu.remove();
