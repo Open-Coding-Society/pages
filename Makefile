@@ -6,9 +6,7 @@ PYTHON := venv/bin/python3
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
 
-NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
 DESTINATION_DIRECTORY = _posts
-MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
 
 ###########################################
 # Project Selection Logic
@@ -240,7 +238,7 @@ build-cayman: use-cayman build-current
 build-so-simple: use-so-simple build-current
 build-yat: use-yat build-current
 
-build-current: clean convert split-courses
+build-current: clean build-registered-projects convert split-courses
 	@bundle install
 	@bundle exec jekyll clean
 	@bundle exec jekyll build
@@ -252,14 +250,22 @@ build: build-current
 # Multi-course file splitting
 split-courses:
 	@echo " ------ Splitting multi-course files... -------"
-	@python3 scripts/split_multi_course_files.py
+	@$(PYTHON) scripts/split_multi_course_files.py
 
 clean-courses:
 	@echo "🧹Cleaning course-specific files..."
-	@python3 scripts/split_multi_course_files.py clean
+	@$(PYTHON) scripts/split_multi_course_files.py clean
 
 # Notebook and DOCX conversion
-convert: $(MARKDOWN_FILES) convert-docx
+convert: convert-notebooks convert-docx
+
+convert-notebooks:
+	@if [ -d "_notebooks" ] && find _notebooks -name '*.ipynb' -print -quit | grep -q .; then \
+		$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"; \
+	else \
+		echo "No notebook files found in _notebooks directory"; \
+	fi
+
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
 	@$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
@@ -332,14 +338,14 @@ stop:
 	@echo "Stopping server..."
 	@@lsof -ti :$(PORT) | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping logging process..."
-	@@ps aux | awk -v log_file=$(LOG_FILE) '$$0 ~ "tail -f " log_file { print $$2 }' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux 2>/dev/null | awk -v log_file=$(LOG_FILE) '$$0 ~ "tail -f " log_file { print $$2 }' | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping notebook watcher..."
-	@@ps aux | grep "watch-rebuild" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@@ps aux | grep "watch-projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux 2>/dev/null | grep "watch-rebuild" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux 2>/dev/null | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux 2>/dev/null | grep "watch-projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux 2>/dev/null | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping project watchers..."
-	@@ps aux | grep "make -C _projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux 2>/dev/null | grep "make -C _projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.project_watch_marker /tmp/.jekyll_regenerating /tmp/.jekyll_rebuild_trigger /tmp/.jekyll_rebuild_done /tmp/.jekyll_rebuild_log
 	@rm -f /tmp/.project_*_marker 2>/dev/null || true
 

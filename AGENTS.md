@@ -54,6 +54,7 @@ while preserving all critical instructions. The agent must still communicate wit
 * **优先使用 SASS：** 使用 SASS (`.scss`) 进行样式设计，而不是标准 CSS 或内联样式。
 * **使用 `_projects`：** 利用 `_projects/` 目录中的模块化项目自动注册系统来创建新项目。
 * **系统扩展：** 在现有系统内工作并在需要时进行扩展，而不是创建全新的并行架构。
+* **项目构建模板：** 根 `make clean` 会删除项目本地 `Makefile`，之后从 `_projects/_template/Makefile` 重新生成；需要持久化构建行为时更新模板，项目专属值放入 `project.mk`。
 * **文档：** 必要时为困难或复杂的实现创建详细文档。
 * **注释：** 为非平凡的逻辑添加注释，但要保持简短，重点关注“为什么”而不是“是什么”。
 * **提问：** 如果系统级约束、需求或模式不清楚，请在继续之前暂停并向用户提问。

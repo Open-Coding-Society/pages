@@ -52,6 +52,7 @@ Split logic into clear layers:
 * **Prioritize SASS:** Use SASS (`.scss`) for styling instead of standard CSS or inline styles.
 * **Use `_projects`:** Leverage the modular project auto-registration system in the `_projects/` directory for new projects.
 * **System Expansion:** Work within the existing systems and expand them if needed, rather than creating completely new parallel architectures.
+* **Project Build Template:** Root `make clean` removes local project `Makefile`s and regenerates them from `_projects/_template/Makefile`; persist build behavior in the template and put project-specific values in `project.mk`.
 * **Documentation:** Create detailed documentation for difficult or complex implementations as necessary.
 * **Commenting:** Add comments for non-trivial logic, but keep them minimal and focused on *why* rather than *what*.
 * **Ask Questions:** If system-level constraints, requirements, or patterns are unclear, pause and ask the user questions before proceeding.

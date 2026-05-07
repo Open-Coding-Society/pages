@@ -11,6 +11,12 @@ DATE_OF_CREATION = 2026-04-15
 PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
+NOTEBOOK_SOURCE = $(firstword $(wildcard notebook.src.ipynb $(PROJECT_NAME).ipynb))
+NOTEBOOK_SOURCES = $(wildcard *.ipynb)
+MAIN_PAGE_SOURCE = $(firstword $(wildcard 01-v1-*.md))
+MAIN_PAGE_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).md
+
+-include project.mk
 
 # Workspace root - auto-detect depth (supports both flat and nested structures)
 # If in _projects/category/project → ../../.. 
@@ -28,20 +34,36 @@ SASS_DEST = $(WORKSPACE_ROOT)/_sass/projects/$(PROJECT_NAME)
 IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
 NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
 DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
+NOTEBOOK_DEST_REL = _notebooks/projects/$(PROJECT_NAME)
+DOCS_DEST_REL = _posts/projects/$(PROJECT_NAME)
 
 ###########################################
 # Build Targets
 ###########################################
 
-# Main build target - copy notebook and call assets
+# Main build target - copy notebooks, main page, and assets
 build:
 	@mkdir -p $(NOTEBOOK_DEST)
-	@if [ -f "notebook.src.ipynb" ]; then \
-		cp notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
+	@if [ -n "$(NOTEBOOK_SOURCES)" ]; then \
+		for notebook in $(NOTEBOOK_SOURCES); do \
+			base=$$(basename "$$notebook" .ipynb); \
+			if [ "$$notebook" = "$(NOTEBOOK_SOURCE)" ]; then \
+				dest="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)"; \
+			else \
+				dest="$(NOTEBOOK_DEST)/$(DATE_OF_CREATION)-$(PROJECT_NAME)-$$base.ipynb"; \
+			fi; \
+			cp "$$notebook" "$$dest" 2>/dev/null || true; \
+		done; \
+	fi
+	@mkdir -p $(DOCS_DEST)
+	@if [ -n "$(MAIN_PAGE_SOURCE)" ]; then \
+		cp "$(MAIN_PAGE_SOURCE)" "$(DOCS_DEST)/$(MAIN_PAGE_FILENAME)" 2>/dev/null || true; \
 	fi
 	@$(MAKE) assets
 	@echo "✅ $(PROJECT_NAME) built successfully"
 	@echo "   Source: _projects/$(PROJECT_NAME)/"
+	@echo "   Page: $(DOCS_DEST_REL)/$(MAIN_PAGE_FILENAME)"
+	@echo "   Notebooks: $(NOTEBOOK_DEST_REL)/"
 	@echo "   JavaScript: assets/js/projects/$(PROJECT_NAME)/"
 	@echo "   CSS/SASS: assets/css/projects/$(PROJECT_NAME)/ & _sass/projects/$(PROJECT_NAME)/"
 
