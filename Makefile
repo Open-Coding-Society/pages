@@ -44,12 +44,15 @@ else
   ORIGINAL_GOALS :=
 endif
 
-# Extract extra project names from ORIGINAL goals
+# Extract extra project names from ORIGINAL goals. A project selector can be
+# either its registered path (games/gamify) or its basename (gamify).
 EXTRA_PROJECTS_RAW = $(filter-out $(KNOWN_TARGETS),$(ORIGINAL_GOALS))
+EXTRA_PROJECTS_BY_BASENAME = $(foreach proj,$(EXTRA_PROJECTS_RAW),$(filter %/$(proj),$(ALL_PROJECTS)))
+REQUESTED_TARGETS = $(filter $(KNOWN_TARGETS),$(ORIGINAL_GOALS))
 
 # Validate extras (LAZY evaluation so order works)
-VALID_EXTRA_PROJECTS = $(filter $(ALL_PROJECTS),$(EXTRA_PROJECTS_RAW))
-INVALID_EXTRA_PROJECTS = $(filter-out $(ALL_PROJECTS),$(EXTRA_PROJECTS_RAW))
+VALID_EXTRA_PROJECTS = $(sort $(filter $(ALL_PROJECTS),$(EXTRA_PROJECTS_RAW)) $(EXTRA_PROJECTS_BY_BASENAME))
+INVALID_EXTRA_PROJECTS = $(foreach proj,$(EXTRA_PROJECTS_RAW),$(if $(filter $(proj),$(ALL_PROJECTS))$(filter %/$(proj),$(ALL_PROJECTS)),,$(proj)))
 
 # Warn only at top-level make
 ifeq ($(MAKELEVEL),0)
@@ -78,6 +81,22 @@ define run_projects
 			echo "⚠️  Project directory not found: $$proj"; \
 		fi; \
 	done
+endef
+
+define watch_projects
+	@for proj in $(1); do \
+		if [ -d "_projects/$$proj" ]; then \
+			if [ ! -f "_projects/$$proj/Makefile" ]; then \
+				echo "📋 Generating Makefile for $$proj (from template)"; \
+				cp "_projects/_template/Makefile" "_projects/$$proj/Makefile"; \
+			fi; \
+			echo "Watching: $$proj"; \
+			$(MAKE) -C "_projects/$$proj" watch 2>/dev/null & \
+		else \
+			echo "⚠️  Project directory not found: $$proj"; \
+		fi; \
+	done; \
+	wait
 endef
 
 default: serve-current
@@ -220,10 +239,10 @@ build-registered-docs:
 
 # Watch all registered projects for changes (dev mode)
 watch-registered-projects:
-	$(call run_projects,$(ALL_PROJECTS),Watching,watch)
+	$(call watch_projects,$(ALL_PROJECTS))
 
 watch-dev-projects:
-	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Watching,watch)
+	$(call watch_projects,$(ACTIVE_DEV_PROJECTS))
 
 # Clean all registered project distributions
 clean-registered-projects:
@@ -330,6 +349,9 @@ clean: stop
 
 stop:
 	@echo "Stopping server..."
+	@if [ -f /tmp/jekyll$(PORT).pid ]; then \
+		kill $$(cat /tmp/jekyll$(PORT).pid) >/dev/null 2>&1 || true; \
+	fi
 	@@lsof -ti :$(PORT) | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping logging process..."
 	@@ps aux | awk -v log_file=$(LOG_FILE) '$$0 ~ "tail -f " log_file { print $$2 }' | xargs kill >/dev/null 2>&1 || true
@@ -340,7 +362,7 @@ stop:
 	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping project watchers..."
 	@@ps aux | grep "make -C _projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
-	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.project_watch_marker /tmp/.jekyll_regenerating /tmp/.jekyll_rebuild_trigger /tmp/.jekyll_rebuild_done /tmp/.jekyll_rebuild_log
+	@rm -f $(LOG_FILE) /tmp/jekyll$(PORT).pid /tmp/.notebook_watch_marker /tmp/.project_watch_marker /tmp/.jekyll_regenerating /tmp/.jekyll_rebuild_trigger /tmp/.jekyll_rebuild_done /tmp/.jekyll_rebuild_log
 	@rm -f /tmp/.project_*_marker 2>/dev/null || true
 
 reload:
@@ -429,7 +451,15 @@ watch-projects:
 		find _projects -type f -newer /tmp/.project_watch_marker 2>/dev/null | \
 			grep -v "/Makefile$$" | while read file; do \
 			echo "Project file changed: $$file"; \
-			proj=$$(echo "$$file" | cut -d/ -f2); \
+			proj=""; \
+			for registered_project in $(ALL_PROJECTS); do \
+				case "$$file" in \
+					"_projects/$$registered_project/"*) proj="$$registered_project"; break ;; \
+				esac; \
+			done; \
+			if [ -z "$$proj" ]; then \
+				continue; \
+			fi; \
 			if [ -d "_projects/$$proj" ]; then \
 				if [ ! -f "_projects/$$proj/Makefile" ]; then \
 					echo "📋 Generating Makefile for $$proj (from template)"; \
@@ -461,17 +491,34 @@ bundle-install:
 jekyll-serve: bundle-install
 	@touch /tmp/.notebook_watch_marker
 	@rm -f /tmp/.jekyll_rebuild_trigger
-	bundle exec jekyll serve -H $(HOST) -P $(PORT) --no-watch > $(LOG_FILE) 2>&1 &
+	nohup bundle exec jekyll serve -H $(HOST) -P $(PORT) --no-watch > $(LOG_FILE) 2>&1 & echo $$! > /tmp/jekyll$(PORT).pid
 	@make wait-for-server
 
 # Common server wait logic
 wait-for-server:
-	@until [ -f $(LOG_FILE) ]; do sleep 1; done
 	@for ((COUNTER = 0; ; COUNTER++)); do \
+		if [ ! -f $(LOG_FILE) ]; then \
+			if [ -f /tmp/jekyll$(PORT).pid ] && ! kill -0 $$(cat /tmp/jekyll$(PORT).pid) >/dev/null 2>&1; then \
+				echo "Jekyll exited before creating $(LOG_FILE)."; \
+				exit 1; \
+			fi; \
+			if [ $$COUNTER -eq 300 ]; then \
+				echo "Server timed out before creating $(LOG_FILE)."; \
+				exit 1; \
+			fi; \
+			sleep 1; \
+			continue; \
+		fi; \
 		if grep -q "Server address:" $(LOG_FILE); then \
 			echo "Server started in $$COUNTER seconds"; \
 			grep "Server address:" $(LOG_FILE); \
 			break; \
+		fi; \
+		if [ -f /tmp/jekyll$(PORT).pid ] && ! kill -0 $$(cat /tmp/jekyll$(PORT).pid) >/dev/null 2>&1; then \
+			echo "Jekyll exited during startup."; \
+			echo "Review errors from $(LOG_FILE)."; \
+			cat $(LOG_FILE); \
+			exit 1; \
 		fi; \
 		if [ $$COUNTER -eq 300 ]; then \
 			echo "Server timed out after $$COUNTER seconds."; \
@@ -479,8 +526,8 @@ wait-for-server:
 			cat $(LOG_FILE); \
 			exit 1; \
 		fi; \
-		if [ $$COUNTER -gt 5 ] && grep -E -qi "\bfatal\b|\bexception\b" $(LOG_FILE); then \
-			echo "Fatal error detected during startup!"; \
+		if [ $$COUNTER -gt 5 ] && grep -E -qi "\bfatal\b|\bexception\b|(^|[[:space:]])Error:|SocketError" $(LOG_FILE); then \
+			echo "Startup error detected."; \
 			cat $(LOG_FILE); \
 			exit 1; \
 		fi; \
@@ -576,7 +623,8 @@ list-projects:
 	@echo "Registered Projects:"
 	@if [ -f _projects/.makeprojects ]; then \
 		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
-			if [ -f "_projects/$$proj/Makefile" ]; then \
+			project_path=$$(echo "$$proj" | cut -d: -f1); \
+			if [ -f "_projects/$$project_path/Makefile" ]; then \
 				echo "  ✅ $$proj (active)"; \
 			else \
 				echo "  ⚠️  $$proj (missing Makefile)"; \
@@ -602,4 +650,6 @@ list-projects:
 ###########################################
 
 %:
-	@:
+	@if [ -z "$(REQUESTED_TARGETS)" ] && [ -n "$(VALID_EXTRA_PROJECTS)" ]; then \
+		$(MAKE) dev ORIGINAL_GOALS="$(ORIGINAL_GOALS)"; \
+	fi
