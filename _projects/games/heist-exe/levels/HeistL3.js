@@ -15,19 +15,19 @@ class HeistL3 {
 
     const image_data_bg = {
         id: 'bg',
-        src: path + "/assets/js/heist-exe/images/heist-bg2.png",
+        src: path + "/images/projects/heist-exe/heist-bg2.png",
         pixels: {height: 597, width: 340}
     };
 
     const sprite_data_mc = {
         id: 'MC',
         name: 'mainplayer',
-        src: path + "/assets/js/heist-exe/images/heist-mc.png",
+        src: path + "/images/projects/heist-exe/heist-mc.png",
         GRAVITY: true,
         SCALE_FACTOR: 10,
         STEP_FACTOR: 1000,
         ANIMATION_RATE: 50,
-        INIT_POSITION: { x: 0, y: 200 }, 
+        INIT_POSITION: { x: 50, y: 200 }, 
         pixels: { height: 532, width: 400 },        // total spritesheet size, not per-frame
         orientation: { rows: 4, columns: 4 },
         up:        { row: 3, start: 0, columns: 4 },
@@ -142,7 +142,7 @@ class HeistL3 {
 
     const gem_data_1 = {
         id: 'gem1',
-        spriteImagePath: '@assets/js/heist-exe/gem.png',
+        spriteImagePath: '/images/projects/heist-exe/gem.png',
         value: 5,
         SCALE_FACTOR: 10,
         INIT_POSITION: { x: width * 0.15, y: height * 0.45 }
@@ -150,7 +150,7 @@ class HeistL3 {
 
     const gem_data_2 = {
         id: 'gem2',
-        spriteImagePath: '@assets/js/heist-exe/gem.png',
+        spriteImagePath: '/images/projects/heist-exe/gem.png',
         value: 5,
         SCALE_FACTOR: 10,
         INIT_POSITION: { x: width * 8.5, y: height * 1.5 }
