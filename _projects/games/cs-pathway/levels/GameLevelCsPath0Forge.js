@@ -129,8 +129,8 @@ class GameLevelCsPath0Forge {
           avatarForgeDone: identityState.avatarForgeDone,
         });
         
-        // Update the profile panel with restored data
-        this.updateProfilePanel(this.profileData);
+        // Update the profile panel with restored data (UI refresh only, no merge needed)
+        await this.updateProfilePanel({});
 
         const restoreTasks = [];
         
@@ -418,16 +418,10 @@ class GameLevelCsPath0Forge {
           profileData: this.profileData || {},
     
           onComplete: async (result) => {
-            this.profileData = {
-              ...this.profileData,
+            await this.updateProfilePanel({
               persona: result.title,
               personaId: result.persona,
-            };
-    
-            await this.profileManager.updateProgress('persona', result.title);
-            await this.profileManager.updateProgress('personaId', result.persona);
-    
-            this.updateProfilePanel(this.profileData);
+            });
     
             this.showToast(`Persona selected: ${result.title}`);
     
@@ -545,15 +539,7 @@ class GameLevelCsPath0Forge {
         return null;
       }
 
-      this.profileData = {
-        ...this.profileData,
-        ...profile,
-      };
-
-      await this.profileManager.saveIdentity(profile);
-      await this.profileManager.updateIdentityProgress(true);
-
-      this.updateProfilePanel(this.profileData);
+      await this.updateProfilePanel(profile, { updateIdentityProgress: true });
       return this.profileData;
     };
 
@@ -1145,14 +1131,12 @@ class GameLevelCsPath0Forge {
 
           playerObj.spriteSheet.src = newSpritePath;
 
-          this.profileData = {
-            ...this.profileData,
+          // Update profile asynchronously (no await needed in Promise callback)
+          this.updateProfilePanel({
             sprite: spriteMeta.name || 'Minimalist',
             spriteSrc: newSpritePath,
             spriteMeta,
-          };
-
-          this.updateProfilePanel(this.profileData);
+          });
         };
 
         attemptApply(remainingAttempts);
@@ -1357,14 +1341,12 @@ class GameLevelCsPath0Forge {
           console.log('World Theme Portal: setting background src to:', newSrc);
           bgObj.image.src = newSrc;
 
-          this.profileData = {
-            ...this.profileData,
+          // Update profile asynchronously (no await needed in Promise callback)
+          this.updateProfilePanel({
             worldTheme: themeMeta.name || 'Default',
             worldThemeSrc: newSrc,
             themeMeta,
-          };
-
-          this.updateProfilePanel(this.profileData);
+          });
 
           // Clear avatar catalog cache so it reloads with theme-compatible sprites
           this.avatarCatalog = null;
@@ -1395,7 +1377,7 @@ class GameLevelCsPath0Forge {
       }
  
       // Only apply the theme after user confirms selection.
-      this.applyWorldTheme(selectedTheme);
+      await this.applyWorldTheme(selectedTheme);
  
       return {
         theme: selectedTheme.name,
@@ -1532,26 +1514,59 @@ class GameLevelCsPath0Forge {
     /**
      * Update profile panel. Re-render profile panel fields with current profile data.
      */
-    this.updateProfilePanel = function(profile = {}) {
-      console.log('updateProfilePanel called with:', profile);
+    /**
+     * Update profile panel. Centralized profile update handler.
+     * Merges updates into profileData, handles persistence, and refreshes UI.
+     * @param {Object} updates - Fields to update (merged into existing profileData)
+     * @param {Object} options - Optional persistence hints
+     */
+    this.updateProfilePanel = async function(updates = {}, options = {}) {
+      console.log('updateProfilePanel called with updates:', updates);
+      console.log('Current this.profileData before merge:', this.profileData);
+      
+      // Merge updates into profile data (single source of truth)
+      this.profileData = {
+        ...this.profileData,
+        ...updates,
+      };
+      
+      console.log('this.profileData after merge:', this.profileData);
+      
+      // Handle persistence based on what fields were updated
+      if (updates.name || updates.email || updates.githubID) {
+        await this.profileManager.saveIdentity(this.profileData);
+        if (options.updateIdentityProgress) {
+          await this.profileManager.updateIdentityProgress(true);
+        }
+      }
+      
+      if (updates.persona) {
+        await this.profileManager.updateProgress('persona', updates.persona);
+      }
+      if (updates.personaId) {
+        await this.profileManager.updateProgress('personaId', updates.personaId);
+      }
+      
+      // Update UI panel with complete profile data
       this.createProfilePanel();
       window._forgePanelCleanup = () => {
         if (this.profilePanelView) {
           this.profilePanelView.destroy();
         }
       };
+      
       const panelData = {
-        name: profile.name || '—',
-        email: profile.email || '—',
-        githubID: profile.githubID || '—',
-        persona: profile.persona || '—',
-        sprite: profile.sprite || '—',
-        worldTheme: profile.theme || profile.worldTheme || '—',  // Map 'theme' to 'worldTheme'
-        // Merge completion values into the same update to avoid clearing identity fields
+        name: this.profileData.name || '—',
+        email: this.profileData.email || '—',
+        githubID: this.profileData.githubID || '—',
+        persona: this.profileData.persona || '—',
+        sprite: this.profileData.sprite || '—',
+        worldTheme: this.profileData.theme || this.profileData.worldTheme || '—',
         ...this._getCompletionPanelValues()
       };
+      
+      console.log('panelData being sent to panel.update:', panelData);
       this.profilePanelView.update(panelData);
-      // No longer need separate _syncCompletionPanel() call since completion data is merged above
     };
 
     /**
