@@ -1547,9 +1547,11 @@ class GameLevelCsPath0Forge {
         persona: profile.persona || '—',
         sprite: profile.sprite || '—',
         worldTheme: profile.theme || profile.worldTheme || '—',  // Map 'theme' to 'worldTheme'
+        // Merge completion values into the same update to avoid clearing identity fields
+        ...this._getCompletionPanelValues()
       };
       this.profilePanelView.update(panelData);
-      this._syncCompletionPanel();
+      // No longer need separate _syncCompletionPanel() call since completion data is merged above
     };
 
     /**
