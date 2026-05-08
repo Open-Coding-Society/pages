@@ -50,7 +50,7 @@ class MazeRenderer {
         { x: 20, y: 150, w: this.width - 250, h: 20 }, // Horizontal
         { x: this.width - 150, y: 150, w: 20, h: this.height - 300 }, // Vertical
         { x: 150, y: this.height - 150, w: this.width - 170, h: 20 }, // Horizontal
-        { x: 300, y: 150, w: 20, h: 250 } // Vertical blocker
+        { x: 300, y: 150, w: 20, h: 140 } // Vertical blocker
       );
     }
   }
@@ -260,13 +260,15 @@ class GameLevelNod {
     }
 
     // 2. Initialize Game Objects
-    const maze = new MazeRenderer(gameEnv, width, height);
+    let maze = new MazeRenderer(gameEnv, width, height);
     maze.render();
 
     const player = new MazePlayer(gameEnv, width, height);
 
     // Define the reset function BEFORE the HUD so the HUD can use it
     const resetGame = () => {
+
+      currentLevel = 1;
       // Reset player position
       player.x = 50;
       player.y = 50;
@@ -288,8 +290,6 @@ class GameLevelNod {
 
     // 3. Create HUD (Passing the resetGame function as a callback)
     const hud = new GameHUD(gameEnv, resetGame);
-
-    let gameActive = true;
 
     // 4. The Loop Logic
     const runLoop = () => {
@@ -322,14 +322,14 @@ class GameLevelNod {
           player.x = 50;
           player.y = 50;
           maze = new MazeRenderer(gameEnv, width, height, currentLevel);
-          maze.render(); // Redraw new walls
+          maze.render();
         } else {
           gameActive = false;
           hud.setGameOver(true);
         }
       }
 
-      hud.update();
+      hud.update(currentLevel);
       player.render();
     };
 
