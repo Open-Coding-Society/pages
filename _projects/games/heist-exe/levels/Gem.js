@@ -15,7 +15,7 @@ class Gem extends Coin {
     this.permanentlyCollected = false;
 
     this.gemImage = new Image();
-    this.gemImage.src = gameEnv.path + '/assets/js/heist-exe/images/gem.png';
+    this.gemImage.src = gameEnv.path + '/images/projects/heist-exe/gem.png';
 
     console.log('Gem created:', this.spriteData?.id, 'at position', this.position);
   }

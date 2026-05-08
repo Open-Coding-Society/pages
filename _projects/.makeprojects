@@ -20,15 +20,24 @@ games/escape-the-tower
 games/pirate-hunt
 games/gamify
 games/local-storage
+main
+games/multiplayer
+games/ocean-adventure:dev
 games/tag-game-multiplayer
+<<<<<<< main
 games/ocean
 games/peppa-pig:dev
 games/platformer:dev
+=======
+games/peppa-pig
+games/platformer
+>>>>>>> main
 games/red-riding
 games/teamtestgame
 games/transitions
 games/gategame
 games/heist-exe
+games/castle-game
 
 # Lessons
 lessons/game-lessons
