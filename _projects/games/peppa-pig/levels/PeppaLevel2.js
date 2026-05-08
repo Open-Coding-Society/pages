@@ -8,7 +8,7 @@ class PeppaLevel2 extends PeppaBattleLevelBase {
 			levelIntro: 'Round two starts. Peppa Pig steps into the ring.',
 			enemyName: 'Peppa Pig',
 			enemyGreeting: 'Snort! Peppa Pig is not going easy on you.',
-			enemyImage: 'peppapig.png',
+			enemyImage: 'peppa-pig.png',
 			enemyHealth: 5,
 			enemySpeed: 1.2,
 			enemyScale: 4,

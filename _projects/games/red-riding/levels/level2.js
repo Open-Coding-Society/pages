@@ -1,7 +1,9 @@
 // level2.js - Red Riding Hood Level 2: The Chase
-import GameEnvBackground from '/assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
-import Player from '/assets/js/GameEnginev1.1/essentials/Player.js';
-import Character from '/assets/js/GameEnginev1.1/essentials/Character.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
+import RedRidingMusic from './redmusic.js'; // Ensure the path is correct
+
 class SplineBarrier {
   constructor(leftPoints, rightPoints, gameEnv) {
       this.leftControlPoints = leftPoints;
@@ -208,6 +210,8 @@ class GameLevelRedRidingHood2 {
     let width = gameEnv.innerWidth;
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
+    this.music = new RedRidingMusic();
+
 
     this.continue = true;
     this.debugMode = false; // Set to true to see the green path and enable click logging
@@ -512,11 +516,17 @@ class GameLevelRedRidingHood2 {
 
   checkPlayerWolfCollision(player, wolf) {
     if (!player?.position || !wolf?.position) return false;
+
+    // Adjust these values to make the game easier or harder
+    // A higher padding means Red has to be closer to the CENTER of the wolf to lose
+    const wolfPadding = 60; // Shrinks the wolf's hitbox by 60 pixels on all sides
+    const playerPadding = 10; // Slightly shrinks Red's hitbox for fairness
+
     return (
-      player.position.x < wolf.position.x + wolf.width &&
-      player.position.x + player.width > wolf.position.x &&
-      player.position.y < wolf.position.y + wolf.height &&
-      player.position.y + player.height > wolf.position.y
+      player.position.x + playerPadding < wolf.position.x + wolf.width - wolfPadding &&
+      player.position.x + player.width - playerPadding > wolf.position.x + wolfPadding &&
+      player.position.y + playerPadding < wolf.position.y + wolf.height - wolfPadding &&
+      player.position.y + player.height - playerPadding > wolf.position.y + wolfPadding
     );
   }
 
@@ -559,6 +569,7 @@ class GameLevelRedRidingHood2 {
 
   draw() {
     this.splineBarrier.draw(this.debugMode);
+
   }
 
   resize() {}
@@ -566,6 +577,7 @@ class GameLevelRedRidingHood2 {
   destroy() {
     if (this.titleElement && this.titleElement.parentNode) this.titleElement.remove();
     if (this.winPopup && this.winPopup.parentNode) this.winPopup.remove();
+    if (this.music) this.music.destroy();
   }
 }
 

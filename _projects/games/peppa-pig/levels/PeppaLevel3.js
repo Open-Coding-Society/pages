@@ -8,7 +8,7 @@ class PeppaLevel3 extends PeppaBattleLevelBase {
 			levelIntro: 'Final round. Daddy Pig enters as the boss.',
 			enemyName: 'Daddy Pig',
 			enemyGreeting: 'Ho ho! Daddy Pig is the final boss of the ring.',
-			enemyImage: 'daddypig.png',
+			enemyImage: 'daddy-pig.png',
 			enemyHealth: 10,
 			enemySpeed: 1.4,
 			enemyScale: 4,

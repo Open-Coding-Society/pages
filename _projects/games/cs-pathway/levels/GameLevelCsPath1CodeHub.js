@@ -1079,6 +1079,679 @@ function openDatavizPanel(gameControl) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Space Invaders — question banks (one per terminal) ───────────────────────
+const LESSON_QUESTIONS = {
+  frontend: [
+    { q: 'Which language gives a web page STRUCTURE?',     ans: 'HTML',                     wrong: ['CSS', 'JavaScript', 'Python'] },
+    { q: 'CSS stands for…?',                               ans: 'Cascading Style Sheets',    wrong: ['Creative Style System', 'Coded Style Syntax', 'Content Style Script'] },
+    { q: 'Which format converts plain text → HTML?',       ans: 'Markdown',                  wrong: ['TypeScript', 'Sass', 'Tailwind'] },
+    { q: 'CSS property for flexible row/column layout?',   ans: 'display: flex',             wrong: ['float: left', 'position: fixed', 'display: block'] },
+    { q: 'HTML stands for…?',                              ans: 'HyperText Markup Language', wrong: ['High Text Markup Language', 'HyperText Making Language', 'High Transfer Markup Link'] },
+  ],
+  backend: [
+    { q: 'HTTP method that CREATES a new resource?',       ans: 'POST',                      wrong: ['GET', 'PUT', 'DELETE'] },
+    { q: 'HTTP method that READS data?',                   ans: 'GET',                       wrong: ['POST', 'PUT', 'PATCH'] },
+    { q: 'HTTP method that REMOVES a resource?',           ans: 'DELETE',                    wrong: ['GET', 'REMOVE', 'DROP'] },
+    { q: 'ORM stands for…?',                               ans: 'Object Relational Mapping', wrong: ['Open REST Method', 'Output Response Model', 'Object Request Manager'] },
+    { q: 'CRUD stands for…?',                              ans: 'Create Read Update Delete', wrong: ['Copy Run Undo Deploy', 'Code Route Use Debug', 'Commit Read Undo Drop'] },
+  ],
+  dataviz: [
+    { q: 'Spring annotation for a REST controller?',       ans: '@RestController',                wrong: ['@Service', '@Component', '@Repository'] },
+    { q: 'JPA annotation that marks the primary key?',     ans: '@Id',                            wrong: ['@Primary', '@Key', '@PrimaryKey'] },
+    { q: 'JPQL stands for…?',                              ans: 'Java Persistence Query Language', wrong: ['Java Primary Query Layer', 'Java Package Query Logic', 'Java Persistence Quick Layer'] },
+    { q: 'Query param to paginate API results?',           ans: 'page=1&size=4',                  wrong: ['limit=4&offset=1', 'results=4&index=1', 'count=4&start=1'] },
+    { q: 'Spring JPA method to filter by minimum size?',   ans: 'findBySizeGreaterThan',           wrong: ['findWhereSize', 'querySizeAbove', 'getSizeMore'] },
+  ],
+};
+
+// ── Space Invaders game panel ─────────────────────────────────────────────────
+// Scoring:  shoot WRONG → +pts (combo scales)  |  shoot CORRECT → −50 pts
+//           WRONG passes bottom → −75 pts, −1 life  |  CORRECT passes → +50 pts
+//           5 lives · score can go negative · hi-score per lesson in localStorage
+function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
+  const label = { frontend: 'Frontend', backend: 'Backend', dataviz: 'Dataviz' }[lessonKey];
+  const body  = createPanel(`🎮 ${label} — Space Invaders`, accentColor, gameControl);
+
+  /* expand panel for the larger play area */
+  const panelEl = document.getElementById('code-hub-panel');
+  Object.assign(panelEl.style, { width: 'min(940px, 94vw)', maxHeight: '93vh', top: '2%' });
+
+  const CW = 880, CH = 580;
+  const questions = LESSON_QUESTIONS[lessonKey];
+  const HI_KEY    = `si-hi-${lessonKey}`;
+
+  body.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                margin-bottom:8px;font-size:12px;">
+      <span style="color:#64748b;font-size:11px;">
+        Shoot <span style="color:#f87171;font-weight:700;">WRONG</span> ·
+        Let <span style="color:#86efac;font-weight:700;">CORRECT</span> pass
+      </span>
+      <div style="display:flex;gap:12px;font-size:13px;font-weight:700;align-items:center;">
+        <span id="si-lives"></span>
+        <span style="color:${accentColor};">Score: <span id="si-score">0</span></span>
+        <span style="color:#fbbf24;">Best: <span id="si-hi">${parseInt(localStorage.getItem(HI_KEY)) || 0}</span></span>
+        <button id="si-fullscreen"
+          style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
+                 border-radius:6px;color:#94a3b8;padding:4px 10px;font-size:11px;cursor:pointer;
+                 font-weight:600;">⛶ Fullscreen</button>
+      </div>
+    </div>
+    <canvas id="si-canvas" width="${CW}" height="${CH}"
+      style="display:block;width:100%;border-radius:10px;background:#060d1a;
+             border:1px solid ${accentColor}33;cursor:default;"></canvas>
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                margin-top:8px;font-size:11px;color:#475569;">
+      <span>← → / A D  move  ·  SPACE  shoot</span>
+      <button id="si-restart"
+        style="background:${accentColor}22;border:1px solid ${accentColor}55;border-radius:6px;
+               color:${accentColor};padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;">
+        ↺ Restart</button>
+    </div>`;
+
+  const canvas = document.getElementById('si-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  /* ── state ── */
+  let lives = 5, score = 0, hi = parseInt(localStorage.getItem(HI_KEY)) || 0;
+  let qIdx  = 0, combo = 0;
+  let enemies = [], bullets = [], particles = [], floaters = [];
+  let player  = { x: CW / 2, speed: 320, thruster: 0 };
+  const PY    = CH - 34;
+  let keys    = {}, lastShot = 0;
+  let gameState  = 'intro';
+  let waveBanner = { text: '', alpha: 0, timer: 0 };
+  let shake      = { x: 0, y: 0, timer: 0 };
+  let toast      = { text: '', color: '#fff', alpha: 0 };
+
+  /* ── helpers ── */
+  const shuffled = arr => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const updateHUD = () => {
+    document.getElementById('si-lives').textContent =
+      '❤️'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, 5 - lives));
+    document.getElementById('si-score').textContent = score;
+    document.getElementById('si-hi').textContent    = hi;
+  };
+
+  const showToast = (text, color) => { toast = { text, color, alpha: 1 }; };
+
+  const spawnParticles = (x, y, color, n = 14, burst = false) => {
+    for (let i = 0; i < n; i++) {
+      const angle = burst ? (Math.PI * 2 * i / n) : Math.random() * Math.PI * 2;
+      const spd   = burst ? (80 + Math.random() * 160) : (60 + Math.random() * 200);
+      particles.push({
+        x, y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd,
+        life: 0.7, maxLife: 0.7, size: burst ? (3 + Math.random() * 5) : (2 + Math.random() * 4), color,
+      });
+    }
+  };
+
+  const addFloater = (x, y, text, color) =>
+    floaters.push({ x, y: y - 10, text, color, life: 1.2, maxLife: 1.2, vy: -48 });
+
+  const doShake = (i = 6) => { shake = { x: 0, y: 0, timer: i * 0.016 }; };
+
+  const spawnWave = () => {
+    const q    = questions[qIdx];
+    const opts = shuffled([{ text: q.ans, correct: true }, ...q.wrong.map(w => ({ text: w, correct: false }))]);
+    const colW = CW / 4;
+    enemies = opts.map((opt, i) => ({
+      x: colW * i + colW / 2, y: -70 - i * 28,
+      w: colW - 18, h: 52,
+      text: opt.text, correct: opt.correct,
+      vy: 52 + qIdx * 8,
+      alive: true, passed: false,
+      phase: Math.random() * Math.PI * 2,
+    }));
+  };
+
+  const startNextWave = () => {
+    gameState  = 'wave-banner';
+    waveBanner = { text: `WAVE ${qIdx + 1}`, alpha: 1, timer: 1.2 };
+  };
+
+  /* ── input ── */
+  const onKeyDown = e => {
+    keys[e.code] = true;
+    if (['Space','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.code)) e.preventDefault();
+    e.stopPropagation();
+    if (e.code === 'Space' && gameState === 'intro') { gameState = 'playing'; spawnWave(); }
+  };
+  const onKeyUp = e => { keys[e.code] = false; e.stopPropagation(); };
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('keyup',   onKeyUp);
+
+  /* ── fullscreen toggle (CSS-based, keeps HUD visible) ── */
+  let isFullscreen = false;
+  document.getElementById('si-fullscreen').onclick = () => {
+    isFullscreen = !isFullscreen;
+    if (isFullscreen) {
+      Object.assign(panelEl.style, {
+        position: 'fixed', top: '0', left: '0', right: '0', bottom: '0',
+        width: '100vw', maxHeight: '100vh', borderRadius: '0',
+        transform: 'none', zIndex: '99999',
+      });
+      document.getElementById('si-fullscreen').textContent = '⛶ Exit';
+    } else {
+      Object.assign(panelEl.style, {
+        position: 'fixed', top: '2%', left: '50%', right: '', bottom: '',
+        width: 'min(940px,94vw)', maxHeight: '93vh',
+        borderRadius: '12px', transform: 'translateX(-50%)', zIndex: '9998',
+      });
+      document.getElementById('si-fullscreen').textContent = '⛶ Fullscreen';
+    }
+  };
+
+  /* ── game loop ── */
+  let raf, lastTs = 0;
+
+  const loop = ts => {
+    if (!document.getElementById('si-canvas')) {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup',   onKeyUp);
+      return;
+    }
+    raf = requestAnimationFrame(loop);
+    const dt = Math.min((ts - lastTs) / 1000, 0.05);
+    lastTs = ts;
+
+    /* wave banner countdown */
+    if (gameState === 'wave-banner') {
+      waveBanner.timer -= dt;
+      waveBanner.alpha  = Math.min(1, waveBanner.timer * 2.5);
+      if (waveBanner.timer <= 0) { gameState = 'playing'; spawnWave(); }
+    }
+
+    if (gameState === 'playing') {
+      /* player movement */
+      const moving = keys['ArrowLeft'] || keys['KeyA'] || keys['ArrowRight'] || keys['KeyD'];
+      player.thruster = moving
+        ? Math.min(1, player.thruster + dt * 5)
+        : Math.max(0, player.thruster - dt * 7);
+
+      if (keys['ArrowLeft']  || keys['KeyA']) player.x = Math.max(26,      player.x - player.speed * dt);
+      if (keys['ArrowRight'] || keys['KeyD']) player.x = Math.min(CW - 26, player.x + player.speed * dt);
+
+      /* shoot */
+      if (keys['Space'] && ts - lastShot > 240) {
+        lastShot = ts;
+        bullets.push({ x: player.x, y: PY - 20, trail: [] });
+      }
+
+      /* move bullets */
+      bullets.forEach(b => {
+        b.trail.unshift({ x: b.x, y: b.y });
+        if (b.trail.length > 7) b.trail.pop();
+        b.y -= 600 * dt;
+      });
+      bullets = bullets.filter(b => b.y > -12);
+
+      /* enemies */
+      enemies.forEach(e => {
+        if (!e.alive || e.passed) return;
+        e.y    += e.vy * dt;
+        e.phase += dt * 2.2;
+
+        /* bullet collision */
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          const b = bullets[i];
+          if (b.x >= e.x - e.w / 2 && b.x <= e.x + e.w / 2 &&
+              b.y >= e.y && b.y <= e.y + e.h) {
+            bullets.splice(i, 1);
+            e.alive = false;
+
+            if (e.correct) {
+              /* shot the right answer — lose points */
+              const pen = 50;
+              score -= pen; combo = 0;
+              showToast('❌ That was correct! −50 pts', '#f87171');
+              spawnParticles(e.x, e.y + 26, '#f87171', 16, true);
+              addFloater(e.x, e.y + 10, `−${pen}`, '#f87171');
+              doShake(5);
+            } else {
+              /* shot a wrong answer — gain points with combo */
+              const mult = 1 + Math.floor(combo / 3) * 0.5;
+              const pts  = Math.round((100 + qIdx * 12) * mult);
+              score += pts; combo++;
+              if (score > hi) { hi = score; localStorage.setItem(HI_KEY, hi); }
+              const tag = combo >= 3 ? ` 🔥×${combo}` : '';
+              showToast(`✓ +${pts}${tag}`, '#86efac');
+              spawnParticles(e.x, e.y + 26, '#86efac', 16, true);
+              addFloater(e.x, e.y + 10, `+${pts}`, '#86efac');
+            }
+            updateHUD();
+            break;
+          }
+        }
+
+        /* enemy exits bottom */
+        if (e.y > CH + 30) {
+          e.passed = true;
+          if (!e.correct) {
+            /* wrong answer got through — lose points AND a life */
+            const pen = 75;
+            score -= pen; combo = 0; lives = Math.max(0, lives - 1);
+            showToast('💥 Missed wrong answer! −75 pts −1 ❤️', '#f87171');
+            spawnParticles(player.x, PY, '#f87171', 12);
+            addFloater(player.x, PY - 24, `−${pen}`, '#f87171');
+            doShake(8);
+          } else {
+            /* correct answer passed through — gain points */
+            const pts = 50;
+            score += pts;
+            if (score > hi) { hi = score; localStorage.setItem(HI_KEY, hi); }
+            showToast('✓ Correct passed! +50 pts', '#86efac');
+            addFloater(CW / 2, CH - 70, '+50', '#86efac');
+          }
+          updateHUD();
+          if (lives <= 0) gameState = 'lose';
+        }
+      });
+
+      /* wave complete */
+      if (enemies.length > 0 && enemies.every(e => !e.alive || e.passed)) {
+        qIdx++;
+        if (qIdx >= questions.length) gameState = 'win';
+        else startNextWave();
+      }
+    }
+
+    /* shake decay */
+    if (shake.timer > 0) {
+      shake.timer -= dt;
+      const s = shake.timer * 28;
+      shake.x = (Math.random() - 0.5) * s;
+      shake.y = (Math.random() - 0.5) * s;
+    } else { shake.x = 0; shake.y = 0; }
+
+    /* particles */
+    particles.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; p.vy += 50 * dt; });
+    particles = particles.filter(p => p.life > 0);
+
+    /* floaters */
+    floaters.forEach(f => { f.y += f.vy * dt; f.life -= dt; });
+    floaters = floaters.filter(f => f.life > 0);
+
+    /* toast fade */
+    if (toast.alpha > 0) toast.alpha = Math.max(0, toast.alpha - dt * 0.85);
+
+    draw();
+  };
+
+  /* ── draw ── */
+  const draw = () => {
+    const t = Date.now();
+    ctx.save();
+    ctx.translate(shake.x, shake.y);
+
+    /* background */
+    ctx.fillStyle = '#060d1a';
+    ctx.fillRect(-4, -4, CW + 8, CH + 8);
+
+    /* nebula blobs */
+    [
+      { cx: CW * 0.15, cy: CH * 0.25, r: 180, col: accentColor + '0a' },
+      { cx: CW * 0.82, cy: CH * 0.65, r: 220, col: '#7c3aed0a' },
+      { cx: CW * 0.5,  cy: CH * 0.08, r: 140, col: accentColor + '07' },
+    ].forEach(nb => {
+      const g = ctx.createRadialGradient(nb.cx, nb.cy, 0, nb.cx, nb.cy, nb.r);
+      g.addColorStop(0, nb.col); g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, CW, CH);
+    });
+
+    /* two-layer parallax stars */
+    for (let i = 0; i < 110; i++) {
+      const near = i < 35;
+      const sx   = (i * 137.5 + 11) % CW;
+      const sy   = ((i * 97.3 + t * (near ? 0.018 : 0.007)) % CH + CH) % CH;
+      ctx.globalAlpha = near ? 0.65 : 0.28;
+      ctx.fillStyle   = near ? '#ffffff' : accentColor;
+      ctx.beginPath();
+      ctx.arc(sx, sy, near ? 1.3 : 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    /* ── intro screen ── */
+    if (gameState === 'intro') {
+      drawIntro(t);
+      ctx.restore();
+      return;
+    }
+
+    /* danger zone glow near bottom */
+    if (enemies.some(e => e.alive && !e.passed && e.y > CH * 0.55)) {
+      const dg = ctx.createLinearGradient(0, CH - 100, 0, CH);
+      dg.addColorStop(0, 'transparent');
+      dg.addColorStop(1, 'rgba(239,68,68,0.14)');
+      ctx.fillStyle = dg; ctx.fillRect(0, CH - 100, CW, 100);
+    }
+
+    /* question banner pill */
+    if (qIdx < questions.length) {
+      const q = questions[qIdx];
+      ctx.save();
+      ctx.font = 'bold 13px system-ui, sans-serif';
+      const qw = Math.min(CW - 32, ctx.measureText(q.q).width + 140);
+      ctx.fillStyle   = 'rgba(8,15,38,0.88)';
+      ctx.strokeStyle = accentColor + '55'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect((CW - qw) / 2, 7, qw, 28, 14); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = accentColor; ctx.textAlign = 'center';
+      ctx.fillText(`Q${qIdx + 1}/${questions.length}: ${q.q}`, CW / 2, 26);
+      ctx.restore();
+    }
+
+    /* ground line with gradient ends */
+    const gl = ctx.createLinearGradient(0, 0, CW, 0);
+    gl.addColorStop(0,   'transparent');
+    gl.addColorStop(0.2, accentColor + '66');
+    gl.addColorStop(0.8, accentColor + '66');
+    gl.addColorStop(1,   'transparent');
+    ctx.strokeStyle = gl; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, PY + 12); ctx.lineTo(CW, PY + 12); ctx.stroke();
+
+    /* player thruster flame */
+    if (player.thruster > 0.05) {
+      const fl  = (10 + Math.sin(t / 45) * 5) * player.thruster;
+      const tfg = ctx.createLinearGradient(player.x, PY + 10, player.x, PY + 10 + fl);
+      tfg.addColorStop(0, accentColor + 'dd');
+      tfg.addColorStop(1, 'transparent');
+      ctx.fillStyle = tfg;
+      ctx.beginPath();
+      ctx.moveTo(player.x - 6, PY + 10);
+      ctx.lineTo(player.x + 6, PY + 10);
+      ctx.lineTo(player.x, PY + 10 + fl);
+      ctx.closePath(); ctx.fill();
+    }
+
+    /* player ship */
+    ctx.save();
+    ctx.shadowColor = accentColor; ctx.shadowBlur = 20;
+    ctx.fillStyle   = accentColor;
+    ctx.beginPath();
+    ctx.moveTo(player.x,      PY - 20);
+    ctx.lineTo(player.x - 24, PY + 10);
+    ctx.lineTo(player.x - 10, PY + 3);
+    ctx.lineTo(player.x,      PY + 9);
+    ctx.lineTo(player.x + 10, PY + 3);
+    ctx.lineTo(player.x + 24, PY + 10);
+    ctx.closePath(); ctx.fill();
+    ctx.shadowBlur = 0;
+    /* cockpit highlight */
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.beginPath(); ctx.ellipse(player.x, PY - 7, 5, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    /* bullets with trails */
+    ctx.save();
+    bullets.forEach(b => {
+      b.trail.forEach((pt, i) => {
+        ctx.globalAlpha = (1 - i / b.trail.length) * 0.55;
+        ctx.fillStyle   = accentColor;
+        ctx.fillRect(pt.x - 2, pt.y, 4, 9);
+      });
+      ctx.globalAlpha = 1;
+      ctx.fillStyle   = '#ffffff';
+      ctx.shadowColor = accentColor; ctx.shadowBlur = 12;
+      ctx.fillRect(b.x - 2, b.y - 14, 4, 14);
+      ctx.shadowBlur = 0;
+    });
+    ctx.restore();
+
+    /* enemies */
+    enemies.forEach(e => {
+      if (!e.alive || e.passed) return;
+      ctx.save();
+
+      const dangerPct = Math.max(0, Math.min(1, (e.y - CH * 0.45) / (CH * 0.45)));
+      const glowSz    = 5 + dangerPct * 14 + Math.sin(e.phase) * 3;
+      ctx.shadowColor = dangerPct > 0.6 ? '#ef4444' : accentColor;
+      ctx.shadowBlur  = glowSz;
+
+      /* body */
+      ctx.fillStyle   = 'rgba(12,20,44,0.96)';
+      ctx.strokeStyle = dangerPct > 0.6
+        ? `rgba(239,68,68,${0.5 + dangerPct * 0.45})`
+        : accentColor + '88';
+      ctx.lineWidth   = 1.5;
+      ctx.beginPath(); ctx.roundRect(e.x - e.w / 2, e.y, e.w, e.h, 9);
+      ctx.fill(); ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      /* robot head */
+      const eyeColor = dangerPct > 0.6 ? '#ef4444' : accentColor;
+      const fx = e.x, fy = e.y + 6;
+      ctx.fillStyle = eyeColor + 'cc'; ctx.fillRect(fx - 9, fy, 18, 14);
+      ctx.fillStyle = '#060d1a';
+      ctx.fillRect(fx - 7, fy + 3, 5, 5);
+      ctx.fillRect(fx + 2,  fy + 3, 5, 5);
+      /* blinking danger eyes */
+      if (dangerPct > 0.6 && Math.sin(t / 100) > 0.2) {
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(fx - 7, fy + 3, 5, 5); ctx.fillRect(fx + 2, fy + 3, 5, 5);
+      }
+      ctx.fillStyle = eyeColor + '88'; ctx.fillRect(fx - 5, fy + 10, 10, 2);
+
+      /* antenna */
+      ctx.strokeStyle = eyeColor + 'aa'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 5); ctx.stroke();
+      ctx.beginPath(); ctx.arc(fx, fy - 7, 2, 0, Math.PI * 2);
+      ctx.fillStyle = eyeColor; ctx.fill();
+
+      /* answer label */
+      const fs = Math.min(11.5, Math.floor(e.w / 8));
+      ctx.font  = `bold ${fs}px system-ui, sans-serif`;
+      ctx.fillStyle    = dangerPct > 0.6 ? '#fca5a5' : '#e2e8f0';
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'bottom';
+      let txt = e.text;
+      while (ctx.measureText(txt).width > e.w - 14 && txt.length > 4) txt = txt.slice(0, -2) + '…';
+      ctx.fillText(txt, e.x, e.y + e.h - 4);
+
+      ctx.restore();
+    });
+
+    /* particles */
+    ctx.save();
+    particles.forEach(p => {
+      ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+      ctx.fillStyle   = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0.1, p.size * (p.life / p.maxLife)), 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.globalAlpha = 1; ctx.restore();
+
+    /* floating score text */
+    ctx.save();
+    floaters.forEach(f => {
+      ctx.globalAlpha = Math.min(1, f.life / f.maxLife * 1.8);
+      ctx.font        = 'bold 15px system-ui, sans-serif';
+      ctx.textAlign   = 'center';
+      ctx.fillStyle   = f.color;
+      ctx.shadowColor = f.color; ctx.shadowBlur = 8;
+      ctx.fillText(f.text, f.x, f.y);
+      ctx.shadowBlur = 0;
+    });
+    ctx.globalAlpha = 1; ctx.restore();
+
+    /* combo display */
+    if (combo >= 3) {
+      ctx.save();
+      ctx.font      = `bold ${Math.min(18, 12 + combo)}px system-ui`;
+      ctx.fillStyle = '#fbbf24';
+      ctx.textAlign = 'right';
+      ctx.shadowColor = '#fbbf24'; ctx.shadowBlur = 10;
+      ctx.fillText(`🔥 COMBO ×${combo}`, CW - 12, 26);
+      ctx.shadowBlur = 0; ctx.restore();
+    }
+
+    /* toast */
+    if (toast.alpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = toast.alpha;
+      ctx.font        = 'bold 15px system-ui, sans-serif';
+      ctx.textAlign   = 'center';
+      ctx.fillStyle   = toast.color;
+      ctx.shadowColor = toast.color; ctx.shadowBlur = 12;
+      ctx.fillText(toast.text, CW / 2, CH * 0.43);
+      ctx.shadowBlur = 0; ctx.restore();
+    }
+
+    /* wave-banner overlay */
+    if (gameState === 'wave-banner' && waveBanner.alpha > 0) {
+      ctx.save();
+      ctx.globalAlpha = waveBanner.alpha;
+      ctx.textAlign   = 'center';
+      ctx.fillStyle   = accentColor;
+      ctx.font        = 'bold 46px system-ui';
+      ctx.shadowColor = accentColor; ctx.shadowBlur = 34;
+      ctx.fillText(waveBanner.text, CW / 2, CH / 2 - 10);
+      ctx.shadowBlur  = 0;
+      ctx.font        = '15px system-ui'; ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`Score: ${score}   Lives: ${'❤️'.repeat(lives)}`, CW / 2, CH / 2 + 30);
+      ctx.restore();
+    }
+
+    /* end screen */
+    if (gameState === 'win' || gameState === 'lose') {
+      ctx.save();
+      ctx.fillStyle = 'rgba(3,6,18,0.92)'; ctx.fillRect(0, 0, CW, CH);
+      const ec = gameState === 'win' ? '#86efac' : '#f87171';
+      const eg = ctx.createRadialGradient(CW / 2, CH / 2, 10, CW / 2, CH / 2, 200);
+      eg.addColorStop(0, ec + '28'); eg.addColorStop(1, 'transparent');
+      ctx.fillStyle = eg; ctx.fillRect(0, 0, CW, CH);
+      ctx.textAlign   = 'center';
+      ctx.fillStyle   = ec; ctx.shadowColor = ec; ctx.shadowBlur = 30;
+      ctx.font = 'bold 46px system-ui';
+      ctx.fillText(gameState === 'win' ? '🏆 VICTORY!' : '💀 GAME OVER', CW / 2, CH / 2 - 55);
+      ctx.shadowBlur = 0;
+      ctx.font = '17px system-ui'; ctx.fillStyle = '#94a3b8';
+      ctx.fillText(`Final Score: ${score}   ·   Best: ${hi}`, CW / 2, CH / 2);
+      ctx.font = '13px system-ui'; ctx.fillStyle = '#475569';
+      ctx.fillText('Press ↺ Restart or close', CW / 2, CH / 2 + 40);
+      ctx.restore();
+    }
+
+    ctx.restore(); /* end shake */
+  };
+
+  /* ── intro screen drawn on canvas ── */
+  const drawIntro = t => {
+    ctx.textAlign = 'center';
+
+    /* title */
+    ctx.fillStyle = accentColor; ctx.shadowColor = accentColor; ctx.shadowBlur = 24;
+    ctx.font = 'bold 38px system-ui, sans-serif';
+    ctx.fillText(`⚡ ${label.toUpperCase()} INVADERS`, CW / 2, 72);
+    ctx.shadowBlur = 0;
+    ctx.font = '14px system-ui'; ctx.fillStyle = '#475569';
+    ctx.fillText('Knowledge-based Space Shooter', CW / 2, 100);
+
+    /* rule cards */
+    const rules = [
+      { icon: '🎯', line1: 'Shoot WRONG answers',    line2: '+100 pts (scales + combo)', col: '#86efac' },
+      { icon: '✓',        line1: 'Let CORRECT pass',       line2: '+50 pts bonus',             col: '#86efac' },
+      { icon: '❌',        line1: 'Shoot CORRECT answer',   line2: '−50 pts penalty',      col: '#f87171' },
+      { icon: '💥', line1: 'Miss WRONG answer',      line2: '−75 pts + −1 ❤', col: '#f87171' },
+    ];
+    const cw2 = 182, ch2 = 80, gap2 = 12;
+    const rx0  = CW / 2 - (rules.length * (cw2 + gap2) - gap2) / 2;
+
+    rules.forEach((r, i) => {
+      const rx = rx0 + i * (cw2 + gap2), ry = 126;
+      ctx.fillStyle   = r.col + '14';
+      ctx.strokeStyle = r.col + '55'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(rx, ry, cw2, ch2, 10); ctx.fill(); ctx.stroke();
+
+      ctx.font = '22px serif'; ctx.fillStyle = '#fff';
+      ctx.fillText(r.icon, rx + cw2 / 2, ry + 26);
+
+      ctx.font = 'bold 11px system-ui'; ctx.fillStyle = r.col;
+      ctx.fillText(r.line1, rx + cw2 / 2, ry + 46);
+
+      ctx.font = '10px system-ui'; ctx.fillStyle = '#64748b';
+      ctx.fillText(r.line2, rx + cw2 / 2, ry + 62);
+    });
+
+    /* controls box */
+    const bx = CW / 2 - 250, by = 232, bw = 500, bh = 80;
+    ctx.fillStyle   = 'rgba(10,18,40,0.75)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 10); ctx.fill(); ctx.stroke();
+
+    ctx.font = 'bold 11px system-ui'; ctx.fillStyle = '#64748b';
+    ctx.fillText('CONTROLS', CW / 2, by + 17);
+
+    [
+      { label: '← → or A D', desc: 'Move ship', ox: -118 },
+      { label: 'SPACE',                desc: 'Shoot',     ox:  118 },
+    ].forEach(c => {
+      const kx = CW / 2 + c.ox;
+      ctx.fillStyle   = accentColor + '22';
+      ctx.strokeStyle = accentColor + '55'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(kx - 80, by + 28, 160, 36, 7); ctx.fill(); ctx.stroke();
+      ctx.font = 'bold 12px system-ui'; ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(c.label, kx, by + 43);
+      ctx.font = '10px system-ui'; ctx.fillStyle = '#64748b';
+      ctx.fillText(c.desc, kx, by + 57);
+    });
+
+    /* extra info */
+    ctx.font = '12px system-ui'; ctx.fillStyle = '#f87171';
+    ctx.fillText('You start with 5 ❤️  —  lose one each time a WRONG answer reaches you', CW / 2, by + 100);
+    ctx.fillStyle = '#475569';
+    ctx.fillText(`${questions.length} waves · enemies speed up each wave · chain kills for a combo bonus`, CW / 2, by + 118);
+
+    /* blinking start prompt */
+    if (Math.sin(t / 380) > 0) {
+      ctx.fillStyle   = accentColor; ctx.shadowColor = accentColor; ctx.shadowBlur = 16;
+      ctx.font        = 'bold 17px system-ui';
+      ctx.fillText('▶  PRESS SPACE OR CLICK TO START', CW / 2, by + 148);
+      ctx.shadowBlur = 0;
+    }
+  };
+
+  /* ── init ── */
+  updateHUD();
+  raf = requestAnimationFrame(loop);
+
+  /* canvas click starts game from intro */
+  canvas.addEventListener('click', () => {
+    if (gameState === 'intro') { gameState = 'playing'; spawnWave(); }
+  });
+
+  /* restart */
+  document.getElementById('si-restart').onclick = () => {
+    lives = 5; score = 0; qIdx = 0; combo = 0;
+    enemies = []; bullets = []; particles = []; floaters = [];
+    player.x = CW / 2; player.thruster = 0;
+    gameState  = 'intro';
+    toast      = { text: '', color: '#fff', alpha: 0 };
+    shake      = { x: 0, y: 0, timer: 0 };
+    waveBanner = { text: '', alpha: 0, timer: 0 };
+    updateHUD();
+  };
+
+  /* clean up on close */
+  const closeBtn = document.getElementById('panel-close');
+  closeBtn.onclick = () => {
+    cancelAnimationFrame(raf);
+    window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('keyup',   onKeyUp);
+    panelEl.remove();
+    gameControl?.resume?.();
+  };
+}
+// ─────────────────────────────────────────────────────────────────────────────────
+
 
 /**
  * GameLevel — Code Hub
@@ -1223,6 +1896,14 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
               openFrontendPanel(this.gameEnv.gameControl);
             },
           },
+          {
+            text:    '🎮 Play Game',
+            primary: false,
+            action:  () => {
+              this.dialogueSystem.closeDialogue();
+              openSpaceInvadersGame('frontend', '#4caef0', this.gameEnv.gameControl);
+            },
+          },
         ]);
       },
     };
@@ -1259,6 +1940,14 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
               openBackendPanel(this.gameEnv.gameControl);
             },
           },
+          {
+            text:    '🎮 Play Game',
+            primary: false,
+            action:  () => {
+              this.dialogueSystem.closeDialogue();
+              openSpaceInvadersGame('backend', '#86efac', this.gameEnv.gameControl);
+            },
+          },
         ]);
       },
     };
@@ -1293,6 +1982,14 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             action:  () => {
               this.dialogueSystem.closeDialogue();
               openDatavizPanel(this.gameEnv.gameControl);
+            },
+          },
+          {
+            text:    '🎮 Play Game',
+            primary: false,
+            action:  () => {
+              this.dialogueSystem.closeDialogue();
+              openSpaceInvadersGame('dataviz', '#c084fc', this.gameEnv.gameControl);
             },
           },
         ]);
