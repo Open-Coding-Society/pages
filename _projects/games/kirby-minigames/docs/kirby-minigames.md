@@ -67,7 +67,7 @@ This project also adds replay systems and technical features beyond a basic leve
 
 ## Feature Breakdown
 
-### Game-in-Game transitions
+### Game-in-Game transitions (Group of Three)
 
 One of the biggest features we added was a real game-in-game transition flow instead of leaving each minigame isolated.
 
@@ -105,7 +105,7 @@ topGame.transitionToLevel();
 
 This matches the game-in-game lesson pattern because the project is not just changing scenes visually. It is actually creating, pausing, destroying, and replacing active game levels in a controlled sequence.
 
-### Collision system
+### Collision system (Triple Chocolate)
 
 We used more than one kind of collision logic depending on the minigame.
 
@@ -150,7 +150,7 @@ if (shark.collisionData?.hit) {
 
 This gave us multiple collision styles in one project: collectibles, enemy contact, and projectile combat.
 
-### NPC chasing behavior
+### NPC chasing behavior (Team Ocean and Space)
 
 The Basketball minigame includes active enemy pursuit instead of a static NPC.
 
@@ -171,7 +171,7 @@ We also clamp Kirby back into the visible court so the chase stays fair and read
 
 Aquatic also has shark movement and collision pressure, but Basketball is the clearest example of a direct chasing system.
 
-### Multiplayer system
+### Multiplayer system (Sprinting Snails)
 
 The aquatic level supports optional two-player story play by reading a `room` query parameter from the URL:
 
@@ -218,7 +218,7 @@ this.multiplayer.heartbeatTimer = setInterval(() => {
 
 Beyond movement syncing, the aquatic level also broadcasts quest and scene events such as starting quests, collecting objectives, and switching between underwater and surface scenes.
 
-### Music system
+### Music system (Team Pranigas)
 
 We added music only to the Kirby minigame levels by creating `KirbyLevelMusic.js`.
 
@@ -260,7 +260,7 @@ this.levelMusic = new KirbyLevelMusic({
 
 This same pattern is also used in Seek and Basketball.
 
-### Sprite swapping and UI systems
+### Sprite swapping and UI systems (Team Space)
 
 Seek includes a full sprite menu that lets the player swap characters while the game is running. That is more advanced than a single fixed player sprite because it updates the player's sprite sheet data, animation settings, and image source on the fly.
 
