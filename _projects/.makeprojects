@@ -24,14 +24,9 @@ main
 games/multiplayer
 games/ocean-adventure:dev
 games/tag-game-multiplayer
-<<<<<<< main
 games/ocean
-games/peppa-pig:dev
-games/platformer:dev
-=======
 games/peppa-pig
 games/platformer
->>>>>>> main
 games/red-riding
 games/teamtestgame
 games/transitions
