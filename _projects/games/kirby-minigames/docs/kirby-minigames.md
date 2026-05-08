@@ -45,6 +45,8 @@ This project also adds replay systems and technical features beyond a basic leve
 - A boss fight against the Megalodon with separate combat rules and UI
 - A challenge mode with its own score tracking and leaderboard
 
+The Megalodon boss fight acts like a final combat phase for the aquatic level instead of a normal NPC interaction. When the fight starts, the game switches to a separate boss HUD with boss health, player health, and combat-only rules. The Megalodon can attack with different abilities, summon sharks during the fight, and become more dangerous at low health. The player can fight back using the aquatic combat system, collect helpful orbs during the battle, and win by fully depleting the boss health bar.
+
 ### Seek minigame
 
 - A coin-collection minigame with a playground background
@@ -65,7 +67,117 @@ This project also adds replay systems and technical features beyond a basic leve
 - Optional two-player aquatic multiplayer
 - Level-specific music with a reusable controller
 
-## Feature Breakdown
+## Implementing Enemies (Team Ocean)
+
+### Megalodon boss fight
+
+The boss fight is mainly controlled through a shared `bossState` object in `GameLevelAquaticGameLevel.js`. This object stores the boss health, player combat health, cooldowns, summons, projectiles, and orb buffs in one place so the rest of the fight logic can read and update the same combat state.
+
+```javascript
+this.bossState = {
+  active: false,
+  combatReady: false,
+  hp: 2100,
+  maxHp: 2100,
+  playerHp: 165,
+  playerMaxHp: 165,
+  summons: [],
+  projectiles: [],
+  enemyProjectiles: [],
+  laserBeam: null,
+  cooldowns: {
+    laser: 3400,
+    rockets: 5200,
+    bodySwing: 4300
+  },
+  lowHealthSummonStartedAt: 0,
+  nextOrbSpawnAt: 0,
+  orbs: [],
+  buffs: createBossOrbBuffState()
+};
+```
+
+This matters because the fight is not handled by one giant attack sequence. Instead, the game keeps boss data in one state object and updates that state every frame.
+
+The phase logic is handled in `handleBossHealthPhases()`. This function checks the Megalodon's remaining health and unlocks new behavior as the fight goes on.
+
+```javascript
+const thresholds = [0.75, 0.5, 0.25];
+thresholds.forEach((threshold) => {
+  if (
+    this.bossState.hp <= this.bossState.maxHp * threshold &&
+    !this.bossState.summonThresholdsTriggered.includes(threshold)
+  ) {
+    this.bossState.summonThresholdsTriggered.push(threshold);
+    summonRushingSharks(threshold > 0.5 ? 2 : 4);
+  }
+});
+
+if (this.bossState.hp <= this.bossState.maxHp * 0.25) {
+  summonWeakenedMegalodon();
+}
+
+if (this.bossState.hp <= this.bossState.maxHp * 0.1) {
+  const now = Date.now();
+  if (!this.bossState.lowHealthSummonStartedAt) {
+    this.bossState.lowHealthSummonStartedAt = now;
+  } else if (now - this.bossState.lowHealthSummonStartedAt >= 1000) {
+    summonRushingSharks(1);
+    this.bossState.lowHealthSummonStartedAt = now;
+  }
+}
+```
+
+This code means the fight escalates in phases instead of staying flat. At different health percentages, the boss summons extra sharks, gains a weakened Megalodon support enemy, and at very low health starts summoning sharks repeatedly.
+
+The boss attack loop is updated in `updateBossCombat()`. That function decides which ability is active and swaps the boss animation sheet to match the current attack.
+
+```javascript
+const startAbility = (name, durationMs) => {
+  state.activeAbility = name;
+  state.abilityEndsAt = Date.now() + durationMs;
+  state.abilityCommitted = false;
+  state.lastAbilityAt[name] = Date.now();
+  state.nextAbilityAt = Date.now() + state.abilityGlobalCooldownMs;
+  setBossSpriteSheet(state.megalodonAttackSheet, state.megalodonAttackPixels);
+
+  if (name === 'laser') {
+    boss.direction = 'laserAttack';
+  } else if (name === 'rockets') {
+    boss.direction = 'rocketAttack';
+  } else {
+    state.swingHitsLeft = 2;
+    boss.direction = 'swingAttackA';
+  }
+};
+```
+
+This is the part that makes the boss feel like a real encounter instead of a sprite with contact damage. The Megalodon can switch between multiple attacks, and each attack changes timing, animation, and damage behavior.
+
+The fight also includes orb pickups that help the player survive. `spawnCombatOrb()` creates floating collectible buffs during the battle and applies the selected orb effect when the player touches it.
+
+```javascript
+const spawnCombatOrb = () => {
+  if (!this.bossState.active || !this.bossState.combatReady) return;
+
+  const definition = getOrbWeightedSelection();
+  const spawn = getSafeSpawnPoint();
+  const orb = new Collectible({
+    id: `aquatic_orb_${definition.key}_${Date.now()}`,
+    src: definition.sprite,
+    INIT_POSITION: spawn,
+    greeting: definition.message,
+    dialogues: [definition.message],
+    interact: function() {
+      activateOrb(definition);
+      levelContext.bossState.orbs = (levelContext.bossState.orbs || []).filter((entry) => entry.obj !== this);
+      this.destroy();
+    }
+  }, gameEnv);
+};
+```
+
+That gives the boss fight a second layer beyond just dodging attacks. The player is also reacting to timed power-up spawns and using those buffs to handle laser hits, shark bites, speed boosts, and counterplay.
 
 ### Game-in-Game transitions (Group of Three)
 
