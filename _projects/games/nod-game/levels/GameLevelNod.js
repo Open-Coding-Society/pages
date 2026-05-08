@@ -10,10 +10,11 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
  */
 
 class MazeRenderer {
-  constructor(gameEnv, width, height) {
+  constructor(gameEnv, width, height, level = 1) {
     this.gameEnv = gameEnv;
     this.width = width;
     this.height = height;
+    this.level = level;
     this.canvas = null;
     this.ctx = null;
     this.walls = [];
@@ -21,19 +22,37 @@ class MazeRenderer {
   }
 
   generateMaze() {
-    // Simple maze layout: array of wall rectangles
-    // Format: { x, y, w, h }
-    // Outer boundaries
-this.walls = [
-        { x: 0, y: 0, w: this.width, h: 20 },
-        { x: 0, y: this.height - 20, w: this.width, h: 20 },
-        { x: 0, y: 0, w: 20, h: this.height },
-        { x: this.width - 20, y: 0, w: 20, h: this.height },
-
-        { x: 20, y: 120, w: this.width - 150, h: 20 },   // Barrier 1
-        { x: 150, y: 240, w: this.width - 170, h: 20 },  // Barrier 2
-        { x: 20, y: 360, w: this.width - 150, h: 20 },   // Barrier 3
+    // Standard Outer Boundaries for all levels
+    this.walls = [
+      { x: 0, y: 0, w: this.width, h: 20 },
+      { x: 0, y: this.height - 20, w: this.width, h: 20 },
+      { x: 0, y: 0, w: 20, h: this.height },
+      { x: this.width - 20, y: 0, w: 20, h: this.height },
     ];
+
+    if (this.level === 1) {
+      // Level 1: Horizontal Barriers
+      this.walls.push(
+        { x: 20, y: 150, w: this.width - 150, h: 20 },
+        { x: 150, y: 300, w: this.width - 170, h: 20 },
+        { x: 20, y: 450, w: this.width - 150, h: 20 }
+      );
+    } else if (this.level === 2) {
+      // Level 2: Vertical Barriers (Requires moving left/right)
+      this.walls.push(
+        { x: this.width * 0.25, y: 20, w: 20, h: this.height - 150 },
+        { x: this.width * 0.50, y: 130, w: 20, h: this.height - 150 },
+        { x: this.width * 0.75, y: 20, w: 20, h: this.height - 150 }
+      );
+    } else if (this.level === 3) {
+      // Level 3: The Mix (Hardest)
+      this.walls.push(
+        { x: 20, y: 150, w: this.width - 250, h: 20 }, // Horizontal
+        { x: this.width - 150, y: 150, w: 20, h: this.height - 300 }, // Vertical
+        { x: 150, y: this.height - 150, w: this.width - 170, h: 20 }, // Horizontal
+        { x: 300, y: 150, w: 20, h: 250 } // Vertical blocker
+      );
+    }
   }
 
   render() {
@@ -41,7 +60,7 @@ this.walls = [
       this.canvas = document.createElement('canvas');
       this.canvas.width = this.width;
       this.canvas.height = this.height;
-      this.canvas.style.position = 'absolute'; 
+      this.canvas.style.position = 'absolute';
       this.canvas.style.top = '0';
       this.canvas.style.left = '0';
       this.canvas.style.zIndex = '1';
@@ -60,12 +79,12 @@ this.walls = [
       this.ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
     }
 
-    // Draw exit zone (top right corner)
+    // Draw exit zone (Bottom Right)
     this.ctx.fillStyle = '#2ecc71';
-    this.ctx.fillRect(this.width - 80, 20, 60, 60);
+    this.ctx.fillRect(this.width - 80, this.height - 80, 60, 60);
     this.ctx.fillStyle = '#fff';
     this.ctx.font = 'bold 12px Arial';
-    this.ctx.fillText('EXIT', this.width - 70, 55);
+    this.ctx.fillText(`EXIT L${this.level}`, this.width - 75, this.height - 45);
   }
 
   checkCollision(x, y, radius) {
@@ -85,7 +104,7 @@ this.walls = [
 
   checkExit(x, y, radius) {
     const exitX = this.width - 50;
-    const exitY = 50;
+    const exitY = this.height - 50;
     const exitRadius = 40;
     const dist = Math.sqrt((x - exitX) ** 2 + (y - exitY) ** 2);
     return dist < radius + exitRadius;
@@ -93,57 +112,64 @@ this.walls = [
 }
 
 class GameHUD {
-    constructor(gameEnv, onRestart) {
-        this.gameEnv = gameEnv;
-        this.onRestart = onRestart;
-        this.lives = 5;
-        this.statusEl = null;
-        this.startTime = Date.now();
-        this.gameOver = false;
-        this.createHUD();
-    }
+  constructor(gameEnv, onRestart) {
+    this.gameEnv = gameEnv;
+    this.onRestart = onRestart;
+    this.lives = 5;
+    this.statusEl = null;
+    this.startTime = Date.now();
+    this.gameOver = false;
+    this.createHUD();
+  }
 
-    createHUD() {
-        this.statusEl = document.createElement('div');
-        this.statusEl.style.cssText = `
+  createHUD() {
+    this.statusEl = document.createElement('div');
+    this.statusEl.style.cssText = `
             position: absolute; 
             bottom: 20px; 
-            right: 20px;
+            left: 20px;
             color: #00ff00;
             font-family: 'Courier New', monospace; 
             font-size: 14px;
-            text-align: right;
+            text-align: left;
             z-index: 1002;
-            pointer-events: none; /* Allows mouse to click 'through' the text */
+            pointer-events: none; /* Mouse moves 'through' the text */
         `;
-        this.gameEnv.gameContainer.appendChild(this.statusEl);
-        this.update();
-    }
+    this.gameEnv.gameContainer.appendChild(this.statusEl);
+    this.update(1); // Initialize with Level 1
+  }
 
-    update() {
-        if (this.gameOver) return;
-        const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
-        
-        // We use innerHTML but wrap the button in pointer-events: auto 
-        // so you can still click it even though the div is transparent.
-        this.statusEl.innerHTML = `
-            LIVES: ${this.lives} | TIME: ${elapsed}s<br>
-            <span id="restart-btn" style="cursor:pointer; pointer-events: auto; text-decoration: underline; font-size: 12px;">[RESTART]</span>
+  update(level = 1) {
+    if (this.gameOver) return;
+    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+
+    this.statusEl.innerHTML = `
+            L1-L3 | LEVEL: ${level} | LIVES: ${this.lives} | TIME: ${elapsed}s<br>
+            <span id="restart-btn" style="cursor:pointer; pointer-events: auto; text-decoration: underline; font-size: 12px;">[RESTART GAME]</span>
         `;
-        
-        document.getElementById('restart-btn').onclick = (e) => {
-            e.stopPropagation();
-            this.onRestart();
-        };
-    }
 
-    setGameOver(won) {
-        this.gameOver = true;
-        this.statusEl.style.fontSize = '20px'; // Make the end message slightly pop
-        this.statusEl.innerHTML = won ? "WINNER!" : "GAME OVER";
-        this.statusEl.innerHTML += `<br><span id="restart-btn" style="cursor:pointer; pointer-events: auto; text-decoration: underline; font-size: 14px;">[PLAY AGAIN]</span>`;
-        document.getElementById('restart-btn').onclick = () => this.onRestart();
+    const btn = document.getElementById('restart-btn');
+    if (btn) {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        this.onRestart();
+      };
     }
+  }
+
+  setGameOver(won) {
+    this.gameOver = true;
+    this.statusEl.style.fontSize = '20px';
+    this.statusEl.innerHTML = won ? "🏆 MISSION COMPLETE!" : "❌ GAME OVER";
+    this.statusEl.innerHTML += `
+            <br><span id="restart-btn" style="cursor:pointer; pointer-events: auto; text-decoration: underline; font-size: 14px;">[PLAY AGAIN]</span>
+        `;
+
+    const btn = document.getElementById('restart-btn');
+    if (btn) {
+      btn.onclick = () => this.onRestart();
+    }
+  }
 }
 
 class MazePlayer {
@@ -154,14 +180,14 @@ class MazePlayer {
     this.x = 50;
     this.y = 50;
     this.radius = 12;
-    this.speed = 1.8;
+    this.speed = 2.5;
     this.canvas = null;
     this.ctx = null;
     this.createCanvas();
   }
 
   createCanvas() {
-this.canvas = document.createElement('canvas');
+    this.canvas = document.createElement('canvas');
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.canvas.style.position = 'absolute';
@@ -219,6 +245,9 @@ class GameLevelNod {
     const width = gameEnv.innerWidth;
     const height = gameEnv.innerHeight;
 
+    let currentLevel = 1;
+    let gameActive = true;
+
     // 1. Setup Tracking
     window.targetMouseX = width * 0.5;
     window.targetMouseY = height * 0.5;
@@ -235,24 +264,26 @@ class GameLevelNod {
     maze.render();
 
     const player = new MazePlayer(gameEnv, width, height);
-    
+
     // Define the reset function BEFORE the HUD so the HUD can use it
     const resetGame = () => {
-        // Reset player position
-        player.x = 50;
-        player.y = 50;
-        
-        // Reset HUD state
-        hud.lives = 5;
-        hud.gameOver = false;
-        hud.startTime = Date.now();
-        
-        // Resume game logic
-        gameActive = true;
-        
-        // Clear old loop and start a new one to prevent "double speed" bugs
-        if (this.gameEnv.mazeGameLoop) clearInterval(this.gameEnv.mazeGameLoop);
-        this.gameEnv.mazeGameLoop = setInterval(runLoop, 1000 / 60);
+      // Reset player position
+      player.x = 50;
+      player.y = 50;
+
+      // Reset HUD state
+      hud.lives = 5;
+      hud.gameOver = false;
+      hud.startTime = Date.now();
+
+      // Resume game logic
+      maze = new MazeRenderer(gameEnv, width, height, currentLevel);
+      maze.render();
+      gameActive = true;
+
+      // Clear old loop and start a new one to prevent "double speed" bugs
+      if (this.gameEnv.mazeGameLoop) clearInterval(this.gameEnv.mazeGameLoop);
+      this.gameEnv.mazeGameLoop = setInterval(runLoop, 1000 / 60);
     };
 
     // 3. Create HUD (Passing the resetGame function as a callback)
@@ -270,10 +301,10 @@ class GameLevelNod {
 
       const pos = player.getPosition();
 
-      // COLLISION LOGIC: 5 Hits instead of Game Over
+      // COLLISION
       if (maze.checkCollision(pos.x, pos.y, player.radius)) {
         hud.lives -= 1;
-        
+
         if (hud.lives <= 0) {
           gameActive = false;
           hud.setGameOver(false);
@@ -286,9 +317,16 @@ class GameLevelNod {
       }
 
       if (maze.checkExit(pos.x, pos.y, player.radius)) {
-        gameActive = false;
-        hud.setGameOver(true);
-        return;
+        if (currentLevel < 3) {
+          currentLevel++;
+          player.x = 50;
+          player.y = 50;
+          maze = new MazeRenderer(gameEnv, width, height, currentLevel);
+          maze.render(); // Redraw new walls
+        } else {
+          gameActive = false;
+          hud.setGameOver(true);
+        }
       }
 
       hud.update();
