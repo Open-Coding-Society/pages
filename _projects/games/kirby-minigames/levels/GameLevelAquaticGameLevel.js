@@ -16,18 +16,16 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
 import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
-
-const resolveCharactersAssetPath = (basePath) => {
-    const normalizedBasePath = String(basePath || '').replace(/\/$/, '');
-    return `${normalizedBasePath}/images/projects/characters`;
-};
+import {
+    getKirbyAudioUrl,
+    getKirbyImageDirectoryUrl
+} from './kirbyAssetPaths.js';
 
 class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
         const levelContext = this;
-        const path = gameEnv.path;
-        const assetPath = resolveCharactersAssetPath(path);
+        const assetPath = getKirbyImageDirectoryUrl();
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
 
@@ -344,9 +342,9 @@ class GameLevelAquaticGameLevel {
         this.playerLock = false;
         this.surfaceTrashIds = [];
         this.challengeStarfishIds = [];
-        this.underwaterMusicSrc = `${String(path || '').replace(/\/$/, '')}/assets/audio/projects/kirby-minigames/Underwater%20Soundtrack.mp3`;
-        this.bossMusicSrc = `${String(path || '').replace(/\/$/, '')}/assets/audio/projects/kirby-minigames/21-the-sea.mp3`;
-        this.bossMusicPhaseTwoSrc = `${String(path || '').replace(/\/$/, '')}/assets/audio/projects/kirby-minigames/Megalodon%20Boss%20Fight%20%232.mp3`;
+        this.underwaterMusicSrc = getKirbyAudioUrl('Underwater Soundtrack.mp3');
+        this.bossMusicSrc = getKirbyAudioUrl('Megalodon Boss Fight.mp3');
+        this.bossMusicPhaseTwoSrc = getKirbyAudioUrl('Megalodon Boss Fight #2.mp3');
         this.storyUiState = {
             hiddenElements: []
         };
@@ -1536,8 +1534,17 @@ class GameLevelAquaticGameLevel {
             );
             if (!backgroundObject) return;
 
-            if (!backgroundObject.image) backgroundObject.image = new Image();
-            backgroundObject.image.src = src;
+            const nextImage = new Image();
+            nextImage.onload = () => {
+                backgroundObject.image = nextImage;
+                if (backgroundObject.spriteData) {
+                    backgroundObject.spriteData.src = src;
+                }
+            };
+            nextImage.onerror = () => {
+                console.warn('Aquatic background asset failed to load:', src);
+            };
+            nextImage.src = src;
         };
 
         // Shared cinematic overlay for scene changes.
