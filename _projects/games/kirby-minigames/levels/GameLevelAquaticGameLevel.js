@@ -330,28 +330,50 @@ class GameLevelAquaticGameLevel {
             leaderboardKey: 'aquatic_challenge_leaderboard_v1'
         };
 
+        const createBossOrbBuffState = () => ({
+            criticalOrbReady: false,
+            bloodThirstUntil: 0,
+            mirrorReady: false,
+            shieldUntil: 0,
+            sonicUntil: 0
+        });
+
         this.questState = questState;
         this.challengeState = challengeState;
         this.levelCompleted = false;
         this.playerLock = false;
         this.surfaceTrashIds = [];
         this.challengeStarfishIds = [];
+        this.underwaterMusicSrc = `${String(path || '').replace(/\/$/, '')}/assets/audio/projects/kirby-minigames/Underwater%20Soundtrack.mp3`;
         this.bossMusicSrc = `${String(path || '').replace(/\/$/, '')}/assets/audio/projects/kirby-minigames/21-the-sea.mp3`;
+        this.bossMusicPhaseTwoSrc = `${String(path || '').replace(/\/$/, '')}/assets/audio/projects/kirby-minigames/Megalodon%20Boss%20Fight%20%232.mp3`;
+        this.storyUiState = {
+            hiddenElements: []
+        };
+        this.pauseSyncState = {
+            wasPaused: false,
+            pausedAt: 0,
+            resumeUnderwaterTheme: false,
+            resumeBossTheme: false,
+            underwaterThemeAudio: null
+        };
         this.bossState = {
             active: false,
             introPlayed: false,
             combatReady: false,
             megalodon: null,
             hiddenNpcs: [],
-            hp: 420,
-            maxHp: 420,
-            playerHp: 120,
-            playerMaxHp: 120,
-            summonedAtQuarterHp: false,
+            hp: 2100,
+            maxHp: 2100,
+            playerHp: 165,
+            playerMaxHp: 165,
+            summonThresholdsTriggered: [],
+            weakenedMegalodonSpawned: false,
             summons: [],
             projectiles: [],
             enemyProjectiles: [],
             laserBeam: null,
+            critChance: 0.15,
             mouseX: width * 0.5,
             mouseY: height * 0.5,
             listenersBound: false,
@@ -381,7 +403,15 @@ class GameLevelAquaticGameLevel {
             abilityEndsAt: 0,
             abilityCommitted: false,
             swingHitsLeft: 0,
-            themeAudio: null
+            themeAudio: null,
+            themeAudioPhaseTwo: null,
+            activeThemeAudio: null,
+            lowHealthSummonStartedAt: 0,
+            nextOrbSpawnAt: 0,
+            orbs: [],
+            orbAuras: {},
+            orbAnnouncementTimeout: null,
+            buffs: createBossOrbBuffState()
         };
 
         const multiplayerRoom = new URLSearchParams(window.location.search).get('room') || sessionStorage.getItem('aquatic_multiplayer_room') || '';
@@ -843,34 +873,67 @@ class GameLevelAquaticGameLevel {
         this.lockPageScroll = lockPageScroll;
         this.unlockPageScroll = unlockPageScroll;
 
-        const requestRunnerFullscreen = (attempt = 0) => {
-            if (this._requestedRunnerFullscreen) return;
-            if (sessionStorage.getItem('aquatic_runner_fullscreen_seen') === '1') return;
+        const requestRunnerFullscreen = () => {};
 
-            const gameOutput = this.gameEnv?.container?.closest?.('.game-output');
-            if (!gameOutput) return;
-            if (document.querySelector('.game-fullscreen-overlay')) return;
+        this.requestRunnerFullscreen = requestRunnerFullscreen;
 
-            const runnerRoot = gameOutput.closest('.game-runner-container') || gameOutput.parentElement;
-            const fullscreenButton = Array.from(runnerRoot?.querySelectorAll('button') || []).find((button) => {
+        const isRunnerFullscreenActive = () => !!document.querySelector('.game-fullscreen-overlay');
+
+        const syncRunnerFullscreenState = () => {
+            const isFullscreen = isRunnerFullscreenActive();
+            if (this._runnerFullscreenActive === isFullscreen) return;
+
+            this._runnerFullscreenActive = isFullscreen;
+            if (isFullscreen) {
+                lockPageScroll();
+            } else {
+                unlockPageScroll();
+            }
+        };
+
+        const exitRunnerFullscreen = () => {
+            const fullscreenButton = Array.from(document.querySelectorAll('button')).find((button) => {
                 const label = `${button.textContent || ''} ${button.title || ''}`.toLowerCase();
-                return label.includes('fullscreen') && !label.includes('minimize');
+                return label.includes('minimize') || label.includes('exit fullscreen');
             });
 
-            if (!fullscreenButton) return;
+            fullscreenButton?.click();
+        };
 
-            if (fullscreenButton.disabled) {
-                if (attempt >= 8) return;
-                setTimeout(() => requestRunnerFullscreen(attempt + 1), 150);
+        const restartCurrentLevel = () => {
+            const gameControl = this.gameEnv?.gameControl;
+            if (!gameControl?.transitionToLevel) return;
+
+            gameControl.isPaused = false;
+            gameControl.transitionToLevel();
+        };
+
+        const handleRunnerFullscreenKeydown = (event) => {
+            if (!isRunnerFullscreenActive()) return;
+
+            const targetTag = event.target?.tagName;
+            const isTextInput = (!!targetTag && /INPUT|TEXTAREA|SELECT/.test(targetTag)) || event.target?.isContentEditable;
+
+            if (["Space", "PageUp", "PageDown", "End", "Home", "ArrowUp", "ArrowDown"].includes(event.code) && !isTextInput) {
+                event.preventDefault();
+            }
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                exitRunnerFullscreen();
                 return;
             }
 
-            this._requestedRunnerFullscreen = true;
-            sessionStorage.setItem('aquatic_runner_fullscreen_seen', '1');
-            setTimeout(() => fullscreenButton.click(), 0);
+            if (!isTextInput && event.code === 'KeyR') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                restartCurrentLevel();
+            }
         };
 
-        this.requestRunnerFullscreen = requestRunnerFullscreen;
+        this.syncRunnerFullscreenState = syncRunnerFullscreenState;
+        this.handleRunnerFullscreenKeydown = handleRunnerFullscreenKeydown;
 
         // DialogueSystem owns a persistent controls row; only clear the button group.
         const clearDialogueActionButtons = (dialogueSystem) => {
@@ -924,6 +987,8 @@ class GameLevelAquaticGameLevel {
         const ensureQuestHud = () => {
             if (this.gameMode === 'challenge') return;
 
+            const compactUi = isCompactGameUi();
+
             const existing = document.getElementById('aquatic-quest-hud');
             if (existing) {
                 updateQuestHud();
@@ -934,13 +999,13 @@ class GameLevelAquaticGameLevel {
             hud.id = 'aquatic-quest-hud';
             Object.assign(hud.style, {
                 position: 'absolute',
-                top: '14px',
-                left: '14px',
+                top: compactUi ? '10px' : '14px',
+                left: compactUi ? '10px' : '14px',
                 zIndex: '10020',
-                minWidth: '290px',
-                maxWidth: 'min(92vw, 420px)',
-                padding: '14px 16px',
-                borderRadius: '14px',
+                minWidth: compactUi ? '190px' : '290px',
+                maxWidth: compactUi ? 'min(54vw, 250px)' : 'min(92vw, 420px)',
+                padding: compactUi ? '9px 10px' : '14px 16px',
+                borderRadius: compactUi ? '10px' : '14px',
                 color: '#e9fbff',
                 fontFamily: "'Press Start 2P', cursive, monospace",
                 background: 'linear-gradient(160deg, rgba(8, 45, 72, 0.92), rgba(3, 16, 34, 0.92))',
@@ -951,23 +1016,23 @@ class GameLevelAquaticGameLevel {
             const title = document.createElement('div');
             title.id = 'aquatic-quest-hud-title';
             Object.assign(title.style, {
-                fontSize: '11px',
+                fontSize: compactUi ? '8px' : '11px',
                 color: '#86e6ff',
-                marginBottom: '8px'
+                marginBottom: compactUi ? '6px' : '8px'
             });
 
             const progress = document.createElement('div');
             progress.id = 'aquatic-quest-hud-progress';
             Object.assign(progress.style, {
-                fontSize: '12px',
-                marginBottom: '8px',
+                fontSize: compactUi ? '8px' : '12px',
+                marginBottom: compactUi ? '6px' : '8px',
                 lineHeight: '1.4'
             });
 
             const status = document.createElement('div');
             status.id = 'aquatic-quest-hud-status';
             Object.assign(status.style, {
-                fontSize: '10px',
+                fontSize: compactUi ? '7px' : '10px',
                 color: '#b8f2ff',
                 lineHeight: '1.5'
             });
@@ -1034,26 +1099,35 @@ class GameLevelAquaticGameLevel {
             progress.textContent = `Collected: ${challengeState.collectedThisWave} / ${challengeState.waveTarget}`;
         };
 
+        const isCompactGameUi = () => {
+            const containerWidth = this.gameEnv?.container?.clientWidth || 0;
+            const viewportWidth = window.innerWidth || 0;
+            const effectiveWidth = containerWidth || viewportWidth;
+            return effectiveWidth > 0 && effectiveWidth <= 980;
+        };
+
         const showTopMenuNotice = (message) => {
             const existing = document.getElementById('aquatic-top-menu-notice');
             if (existing) existing.remove();
+
+            const compactUi = isCompactGameUi();
 
             const note = document.createElement('div');
             note.id = 'aquatic-top-menu-notice';
             note.textContent = message;
             Object.assign(note.style, {
                 position: 'absolute',
-                top: '64px',
-                right: '14px',
+                top: compactUi ? '54px' : '64px',
+                right: compactUi ? '10px' : '14px',
                 zIndex: '10051',
-                maxWidth: 'min(88vw, 360px)',
-                padding: '10px 12px',
-                borderRadius: '10px',
+                maxWidth: compactUi ? 'min(92vw, 280px)' : 'min(88vw, 360px)',
+                padding: compactUi ? '7px 9px' : '10px 12px',
+                borderRadius: compactUi ? '8px' : '10px',
                 border: '1px solid rgba(138, 214, 249, 0.8)',
                 background: 'rgba(2, 24, 45, 0.92)',
                 color: '#d7f5ff',
                 fontFamily: "'Press Start 2P', cursive, monospace",
-                fontSize: '10px',
+                fontSize: compactUi ? '8px' : '10px',
                 lineHeight: '1.5',
                 boxShadow: '0 8px 18px rgba(0, 0, 0, 0.35)',
                 opacity: '0',
@@ -1145,7 +1219,7 @@ class GameLevelAquaticGameLevel {
             Object.assign(overlay.style, {
                 position: 'fixed',
                 inset: '0',
-                background: 'rgba(2, 10, 25, 0.72)',
+                background: 'transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1352,21 +1426,23 @@ class GameLevelAquaticGameLevel {
             const existing = document.getElementById('aquatic-top-menubar');
             if (existing) return;
 
+            const compactUi = isCompactGameUi();
+
             const bar = document.createElement('div');
             bar.id = 'aquatic-top-menubar';
             Object.assign(bar.style, {
                 position: 'absolute',
-                top: '12px',
-                right: '14px',
+                top: compactUi ? '8px' : '12px',
+                right: compactUi ? '10px' : '14px',
                 zIndex: '10050',
                 display: 'flex',
-                gap: '8px',
+                gap: compactUi ? '6px' : '8px',
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 justifyContent: 'flex-end',
-                maxWidth: 'min(95vw, 560px)',
-                padding: '8px',
-                borderRadius: '12px',
+                maxWidth: compactUi ? 'min(62vw, 420px)' : 'min(95vw, 560px)',
+                padding: compactUi ? '6px' : '8px',
+                borderRadius: compactUi ? '10px' : '12px',
                 border: '1px solid rgba(130, 220, 255, 0.6)',
                 background: 'rgba(1, 20, 40, 0.82)',
                 backdropFilter: 'blur(4px)'
@@ -1376,15 +1452,15 @@ class GameLevelAquaticGameLevel {
                 const btn = document.createElement('button');
                 btn.textContent = label;
                 Object.assign(btn.style, {
-                    padding: '8px 10px',
-                    borderRadius: '9px',
+                    padding: compactUi ? '6px 8px' : '8px 10px',
+                    borderRadius: compactUi ? '7px' : '9px',
                     border: isPrimary ? 'none' : '1px solid rgba(138, 214, 249, 0.75)',
                     background: isPrimary
                         ? 'linear-gradient(90deg, #35b9ff, #5cf0ff)'
                         : 'rgba(6, 40, 67, 0.82)',
                     color: isPrimary ? '#032030' : '#c7f3ff',
                     fontFamily: "'Press Start 2P', cursive, monospace",
-                    fontSize: '9px',
+                    fontSize: compactUi ? '8px' : '9px',
                     cursor: 'pointer',
                     whiteSpace: 'nowrap'
                 });
@@ -1466,41 +1542,8 @@ class GameLevelAquaticGameLevel {
 
         // Shared cinematic overlay for scene changes.
         const transitionOverlay = (label) => {
-            const existing = document.getElementById('aquatic-transition-overlay');
-            if (existing) existing.remove();
-
-            const overlay = document.createElement('div');
-            overlay.id = 'aquatic-transition-overlay';
-            Object.assign(overlay.style, {
-                position: 'fixed',
-                inset: '0',
-                background: 'radial-gradient(circle at center, rgba(167, 241, 255, 0.18), rgba(1, 8, 18, 0.88))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: '10030',
-                opacity: '0',
-                transition: 'opacity 320ms ease'
-            });
-
-            const text = document.createElement('div');
-            text.textContent = label;
-            Object.assign(text.style, {
-                color: '#cbf6ff',
-                fontFamily: "'Press Start 2P', cursive, monospace",
-                fontSize: '12px',
-                textAlign: 'center',
-                textShadow: '0 0 10px rgba(148, 245, 255, 0.9)'
-            });
-
-            overlay.appendChild(text);
-            document.body.appendChild(overlay);
-
-            requestAnimationFrame(() => {
-                overlay.style.opacity = '1';
-            });
-
-            return overlay;
+            showTopMenuNotice?.(label);
+            return null;
         };
 
         // Locks input while moving the player vertically for transition scenes.
@@ -1707,6 +1750,8 @@ class GameLevelAquaticGameLevel {
             (this.gameEnv?.gameObjects || []).forEach((obj) => {
                 if (!obj?.spriteData?.id || !ids.includes(obj.spriteData.id) || !obj.canvas) return;
                 obj.canvas.style.display = visible ? 'block' : 'none';
+                obj.canvas.style.opacity = '1';
+                obj.canvas.style.filter = '';
             });
         };
 
@@ -1829,6 +1874,7 @@ class GameLevelAquaticGameLevel {
             const overlay = transitionOverlay('Swimming to the surface...');
             try {
                 await animatePlayerSwim(14);
+                stopUnderwaterTheme();
                 setBackground(assetPath + '/Above the water.png');
                 setWorldNpcVisibility(false);
 
@@ -1873,6 +1919,7 @@ class GameLevelAquaticGameLevel {
                 setBackground(assetPath + '/Aquatic.png');
                 setWorldNpcVisibility(true);
                 clearSurfaceTrash();
+                playUnderwaterTheme(true);
 
                 const player = getPlayer();
                 if (player) {
@@ -1943,7 +1990,7 @@ class GameLevelAquaticGameLevel {
             Object.assign(overlay.style, {
                 position: 'fixed',
                 inset: '0',
-                background: 'rgba(4, 14, 28, 0.8)',
+                background: 'transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -2184,7 +2231,7 @@ class GameLevelAquaticGameLevel {
                 transform: 'translateX(-50%)',
                 zIndex: '10061',
                 width: 'min(860px, 92vw)',
-                background: 'rgba(4, 13, 30, 0.95)',
+                background: 'linear-gradient(180deg, rgba(8, 56, 96, 0.88), rgba(5, 29, 58, 0.78))',
                 border: '2px solid rgba(136, 225, 255, 0.85)',
                 borderRadius: '12px',
                 padding: '12px',
@@ -2192,7 +2239,8 @@ class GameLevelAquaticGameLevel {
                 color: '#dff8ff',
                 fontSize: '13px',
                 lineHeight: '1.6',
-                boxShadow: '0 10px 22px rgba(0,0,0,0.4)'
+                boxShadow: '0 10px 22px rgba(0, 26, 51, 0.28)',
+                backdropFilter: 'blur(1.5px)'
             });
 
             const speakerEl = document.createElement('div');
@@ -2206,7 +2254,8 @@ class GameLevelAquaticGameLevel {
             box.appendChild(textEl);
             document.body.appendChild(box);
 
-            await new Promise((resolve) => setTimeout(resolve, 2600));
+            const durationMs = Number.isFinite(arguments[2]) ? arguments[2] : 2600;
+            await new Promise((resolve) => setTimeout(resolve, durationMs));
             box.remove();
         };
 
@@ -2219,7 +2268,7 @@ class GameLevelAquaticGameLevel {
 
         const shakeWorld = async (ms = 900) => {
             const bg = this.gameEnv?.gameObjects?.find(obj => obj?.constructor?.name === 'GameEnvBackground');
-            const target = bg?.canvas || document.body;
+            const target = this.gameEnv?.container || bg?.canvas || document.body;
             if (!target) return;
 
             const animationName = 'aquatic-world-shake';
@@ -2229,19 +2278,25 @@ class GameLevelAquaticGameLevel {
                 style.textContent = `
                     @keyframes ${animationName} {
                         0% { transform: translate(0,0); }
-                        20% { transform: translate(-6px, 4px); }
-                        40% { transform: translate(7px, -4px); }
-                        60% { transform: translate(-5px, -3px); }
-                        80% { transform: translate(5px, 3px); }
+                        20% { transform: translate(-6px, 4px) scale(1.04); }
+                        40% { transform: translate(7px, -4px) scale(1.04); }
+                        60% { transform: translate(-5px, -3px) scale(1.04); }
+                        80% { transform: translate(5px, 3px) scale(1.04); }
                         100% { transform: translate(0,0); }
                     }
                 `;
                 document.head.appendChild(style);
             }
 
+            const previousOverflow = target.style.overflow;
+            const previousTransformOrigin = target.style.transformOrigin;
             target.style.animation = `${animationName} 120ms linear infinite`;
+            target.style.overflow = 'hidden';
+            target.style.transformOrigin = 'center center';
             await new Promise((resolve) => setTimeout(resolve, ms));
             target.style.animation = '';
+            target.style.overflow = previousOverflow;
+            target.style.transformOrigin = previousTransformOrigin;
         };
 
         const spawnHitEffect = (x, y, color = '#9ef8ff') => {
@@ -2273,17 +2328,48 @@ class GameLevelAquaticGameLevel {
             if (this.bossState.themeAudio) return this.bossState.themeAudio;
 
             const audio = new Audio(this.bossMusicSrc);
-            audio.loop = true;
+            audio.loop = false;
             audio.preload = 'auto';
             audio.volume = 0.55;
             this.bossState.themeAudio = audio;
             return audio;
         };
 
+        const getBossThemeAudioPhaseTwo = () => {
+            if (this.bossState.themeAudioPhaseTwo) return this.bossState.themeAudioPhaseTwo;
+
+            const audio = new Audio(this.bossMusicPhaseTwoSrc);
+            audio.loop = true;
+            audio.preload = 'auto';
+            audio.volume = 0.55;
+            this.bossState.themeAudioPhaseTwo = audio;
+            return audio;
+        };
+
         const playBossTheme = async () => {
             const audio = getBossThemeAudio();
+            const phaseTwoAudio = getBossThemeAudioPhaseTwo();
+
+            audio.onended = null;
+            phaseTwoAudio.onended = null;
             audio.pause();
+            phaseTwoAudio.pause();
             audio.currentTime = 0;
+            phaseTwoAudio.currentTime = 0;
+            this.bossState.activeThemeAudio = audio;
+
+            audio.onended = async () => {
+                if (!this.bossState.active || !this.bossState.combatReady) return;
+
+                this.bossState.activeThemeAudio = phaseTwoAudio;
+                phaseTwoAudio.currentTime = 0;
+                try {
+                    await phaseTwoAudio.play();
+                } catch (err) {
+                    console.warn('Unable to play aquatic boss phase-two theme', err);
+                }
+            };
+
             try {
                 await audio.play();
             } catch (err) {
@@ -2291,13 +2377,597 @@ class GameLevelAquaticGameLevel {
             }
         };
 
+        const resumeBossTheme = async () => {
+            const audio = this.bossState.activeThemeAudio || getBossThemeAudio();
+            if (!audio.paused) return;
+            try {
+                await audio.play();
+            } catch (err) {
+                console.warn('Unable to resume aquatic boss theme', err);
+            }
+        };
+
         const stopBossTheme = (resetPlayback = true) => {
-            const audio = this.bossState.themeAudio;
+            [this.bossState.themeAudio, this.bossState.themeAudioPhaseTwo].forEach((audio) => {
+                if (!audio) return;
+                audio.onended = null;
+                audio.pause();
+                if (resetPlayback) {
+                    audio.currentTime = 0;
+                }
+            });
+            this.bossState.activeThemeAudio = null;
+        };
+
+        const getUnderwaterThemeAudio = () => {
+            if (this.pauseSyncState.underwaterThemeAudio) return this.pauseSyncState.underwaterThemeAudio;
+
+            const audio = new Audio(this.underwaterMusicSrc);
+            audio.loop = true;
+            audio.preload = 'auto';
+            audio.volume = 0.48;
+            this.pauseSyncState.underwaterThemeAudio = audio;
+            return audio;
+        };
+
+        const shouldPlayUnderwaterTheme = () => {
+            const q2 = questState.secondQuest;
+            return !this.bossState.active && !q2?.inSurface && !q2?.returning;
+        };
+
+        const playUnderwaterTheme = async (restartPlayback = false) => {
+            if (!shouldPlayUnderwaterTheme()) return;
+
+            stopBossTheme(false);
+            const audio = getUnderwaterThemeAudio();
+            if (restartPlayback) {
+                audio.pause();
+                audio.currentTime = 0;
+            } else if (!audio.paused) {
+                return;
+            }
+
+            try {
+                await audio.play();
+            } catch (err) {
+                console.warn('Unable to play aquatic underwater theme', err);
+            }
+        };
+
+        const stopUnderwaterTheme = (resetPlayback = true) => {
+            const audio = this.pauseSyncState.underwaterThemeAudio;
             if (!audio) return;
             audio.pause();
             if (resetPlayback) {
                 audio.currentTime = 0;
             }
+        };
+
+        const setStorySceneUiVisibility = (visible) => {
+            const ids = ['aquatic-top-menubar', 'aquatic-top-menu-notice', 'aquatic-quest-hud'];
+
+            if (!visible) {
+                this.storyUiState.hiddenElements = ids.map((id) => {
+                    const element = document.getElementById(id);
+                    if (!element) return null;
+
+                    const previousDisplay = element.style.display;
+                    element.style.display = 'none';
+                    return { id, previousDisplay };
+                }).filter(Boolean);
+                return;
+            }
+
+            (this.storyUiState.hiddenElements || []).forEach((entry) => {
+                const element = document.getElementById(entry.id);
+                if (!element) return;
+                element.style.display = entry.previousDisplay ?? '';
+            });
+            this.storyUiState.hiddenElements = [];
+        };
+
+        const shiftBossPauseTimers = (elapsedMs) => {
+            if (!elapsedMs) return;
+
+            const shiftTimestamp = (value) => (typeof value === 'number' && value > 0 ? value + elapsedMs : value);
+            this.bossState.nextAbilityAt = shiftTimestamp(this.bossState.nextAbilityAt);
+            this.bossState.abilityEndsAt = shiftTimestamp(this.bossState.abilityEndsAt);
+            this.bossState.lastShotAt = shiftTimestamp(this.bossState.lastShotAt);
+            this.bossState.lastMeleeAt = shiftTimestamp(this.bossState.lastMeleeAt);
+
+            Object.keys(this.bossState.lastAbilityAt || {}).forEach((key) => {
+                this.bossState.lastAbilityAt[key] = shiftTimestamp(this.bossState.lastAbilityAt[key]);
+            });
+
+            if (this.bossState.laserBeam) {
+                this.bossState.laserBeam.until = shiftTimestamp(this.bossState.laserBeam.until);
+                this.bossState.laserBeam.hitStartsAt = shiftTimestamp(this.bossState.laserBeam.hitStartsAt);
+                this.bossState.laserBeam.hitWindowUntil = shiftTimestamp(this.bossState.laserBeam.hitWindowUntil);
+            }
+
+            if (this.bossState.megalodon?._bossAnim?.attackUntil) {
+                this.bossState.megalodon._bossAnim.attackUntil = shiftTimestamp(this.bossState.megalodon._bossAnim.attackUntil);
+            }
+
+            this.bossState.lowHealthSummonStartedAt = shiftTimestamp(this.bossState.lowHealthSummonStartedAt);
+            this.bossState.nextOrbSpawnAt = shiftTimestamp(this.bossState.nextOrbSpawnAt);
+
+            Object.keys(this.bossState.buffs || {}).forEach((key) => {
+                if (key.endsWith('Until')) {
+                    this.bossState.buffs[key] = shiftTimestamp(this.bossState.buffs[key]);
+                }
+            });
+
+            this.bossState.summons.forEach((minion) => {
+                minion.lastHitAt = shiftTimestamp(minion.lastHitAt);
+            });
+        };
+
+        const syncAquaticPauseState = () => {
+            const isPaused = !!this.gameEnv?.gameControl?.isPaused;
+            if (isPaused === this.pauseSyncState.wasPaused) return isPaused;
+
+            this.pauseSyncState.wasPaused = isPaused;
+            if (isPaused) {
+                this.pauseSyncState.pausedAt = Date.now();
+                this.pauseSyncState.resumeBossTheme = !!this.bossState.themeAudio && !this.bossState.themeAudio.paused;
+                this.pauseSyncState.resumeUnderwaterTheme = !!this.pauseSyncState.underwaterThemeAudio && !this.pauseSyncState.underwaterThemeAudio.paused;
+                stopBossTheme(false);
+                stopUnderwaterTheme(false);
+                return true;
+            }
+
+            const elapsedMs = this.pauseSyncState.pausedAt ? Math.max(0, Date.now() - this.pauseSyncState.pausedAt) : 0;
+            this.pauseSyncState.pausedAt = 0;
+            shiftBossPauseTimers(elapsedMs);
+
+            if (this.pauseSyncState.resumeBossTheme && this.bossState.active) {
+                resumeBossTheme();
+            } else if (this.pauseSyncState.resumeUnderwaterTheme && shouldPlayUnderwaterTheme()) {
+                playUnderwaterTheme(false);
+            }
+
+            this.pauseSyncState.resumeBossTheme = false;
+            this.pauseSyncState.resumeUnderwaterTheme = false;
+            return false;
+        };
+
+        this.playUnderwaterTheme = playUnderwaterTheme;
+        this.stopUnderwaterTheme = stopUnderwaterTheme;
+        this.syncAquaticPauseState = syncAquaticPauseState;
+        this.setStorySceneUiVisibility = setStorySceneUiVisibility;
+
+        const orbDefinitions = {
+            critical: {
+                key: 'critical',
+                label: 'Critical Orb',
+                color: '#ff9738',
+                border: '#ffbe6d',
+                shadow: 'rgba(255, 151, 56, 0.6)',
+                message: 'You have obtained the Critical Orb, your next attack deals 500% more damage!',
+                auraType: 'critical'
+            },
+            blood: {
+                key: 'blood',
+                label: 'Blood Thirst Orb',
+                color: '#8b0b16',
+                border: '#d12e3a',
+                shadow: 'rgba(139, 11, 22, 0.7)',
+                message: 'You have obtained the Blood Thirst Orb, 50% life steal!',
+                auraType: 'blood'
+            },
+            mirror: {
+                key: 'mirror',
+                color: '#4ba8ff',
+                label: 'Mirror Orb',
+                border: '#a0dbff',
+                shadow: 'rgba(75, 168, 255, 0.7)',
+                message: 'You have obtained the Mirror Orb, the next laser will be reflected!',
+                auraType: 'mirror'
+            },
+            shield: {
+                key: 'shield',
+                label: 'Shield Orb',
+                color: '#ffd34d',
+                border: '#fff1a1',
+                shadow: 'rgba(255, 211, 77, 0.62)',
+                message: 'You have obtained the Shield Orb, shark bites are blocked and explosives are softened!',
+                auraType: 'shield'
+            },
+            sonic: {
+                key: 'sonic',
+                label: 'Sonic Orb',
+                color: '#4fefff',
+                border: '#a7fbff',
+                shadow: 'rgba(79, 239, 255, 0.66)',
+                message: 'You have obtained the Sonic Orb, 20% speed and 10% evasion!',
+                auraType: 'sonic'
+            }
+        };
+
+        const createOrbSprite = (primary, secondary, core) => {
+            const size = 16;
+            const scale = 4;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+
+            const pixel = (x, y, color) => {
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y, 1, 1);
+            };
+
+            const glow = [
+                [7, 1], [6, 2], [7, 2], [8, 2], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3],
+                [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4],
+                [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5],
+                [3, 6], [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6],
+                [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7],
+                [3, 8], [4, 8], [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8],
+                [3, 9], [4, 9], [5, 9], [6, 9], [7, 9], [8, 9], [9, 9], [10, 9], [11, 9],
+                [4, 10], [5, 10], [6, 10], [7, 10], [8, 10], [9, 10], [10, 10],
+                [5, 11], [6, 11], [7, 11], [8, 11], [9, 11], [6, 12], [7, 12], [8, 12], [7, 13]
+            ];
+            glow.forEach(([x, y]) => pixel(x, y, secondary));
+
+            const body = [
+                [7, 3], [6, 4], [7, 4], [8, 4], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5],
+                [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7],
+                [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [5, 9], [6, 9], [7, 9], [8, 9], [9, 9],
+                [6, 10], [7, 10], [8, 10], [7, 11]
+            ];
+            body.forEach(([x, y]) => pixel(x, y, primary));
+            [[7, 5], [6, 6], [8, 6], [7, 7], [7, 8]].forEach(([x, y]) => pixel(x, y, core));
+
+            const scaled = document.createElement('canvas');
+            scaled.width = size * scale;
+            scaled.height = size * scale;
+            const sctx = scaled.getContext('2d');
+            sctx.imageSmoothingEnabled = false;
+            sctx.drawImage(canvas, 0, 0, scaled.width, scaled.height);
+            return scaled.toDataURL();
+        };
+
+        orbDefinitions.critical.sprite = createOrbSprite('#ff9738', '#783500', '#ffe0a6');
+        orbDefinitions.blood.sprite = createOrbSprite('#bf1f28', '#4b0208', '#ff9a9a');
+        orbDefinitions.mirror.sprite = createOrbSprite('#4ba8ff', '#0f3270', '#d4f4ff');
+        orbDefinitions.shield.sprite = createOrbSprite('#ffd34d', '#6d5600', '#fff8c7');
+        orbDefinitions.sonic.sprite = createOrbSprite('#4fefff', '#0d4a63', '#e0fdff');
+
+        const getOrbWeightedSelection = () => {
+            const roll = Math.random();
+            if (roll < 0.15) return orbDefinitions.critical;
+            if (roll < 0.45) return orbDefinitions.blood;
+            if (roll < 0.65) return orbDefinitions.mirror;
+            if (roll < 0.8) return orbDefinitions.shield;
+            return orbDefinitions.sonic;
+        };
+
+        const isBuffActive = (key) => {
+            const value = this.bossState.buffs?.[key];
+            return typeof value === 'number' ? value > Date.now() : !!value;
+        };
+
+        this.isBossBuffActive = isBuffActive;
+
+        const clearOrbAnnouncement = () => {
+            const existing = document.getElementById('aquatic-orb-announcement');
+            if (existing) existing.remove();
+            if (this.bossState.orbAnnouncementTimeout) {
+                clearTimeout(this.bossState.orbAnnouncementTimeout);
+                this.bossState.orbAnnouncementTimeout = null;
+            }
+        };
+
+        const showOrbAnnouncement = (definition, message = definition.message) => {
+            clearOrbAnnouncement();
+
+            const banner = document.createElement('div');
+            banner.id = 'aquatic-orb-announcement';
+            Object.assign(banner.style, {
+                position: 'fixed',
+                left: '50%',
+                top: '24%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: '10090',
+                minWidth: 'min(620px, 90vw)',
+                maxWidth: '90vw',
+                padding: '16px 20px',
+                borderRadius: '14px',
+                border: `2px solid ${definition.border}`,
+                background: 'rgba(8, 16, 28, 0.9)',
+                color: definition.color,
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '12px',
+                lineHeight: '1.7',
+                textAlign: 'center',
+                boxShadow: `0 0 26px ${definition.shadow}`,
+                textShadow: `0 0 12px ${definition.shadow}`
+            });
+            banner.textContent = message;
+            document.body.appendChild(banner);
+            this.bossState.orbAnnouncementTimeout = setTimeout(() => {
+                banner.remove();
+                this.bossState.orbAnnouncementTimeout = null;
+            }, 2600);
+        };
+
+        const healPlayer = (amount, color = '#77ffbf') => {
+            if (!amount) return;
+            this.bossState.playerHp = Math.min(this.bossState.playerMaxHp, this.bossState.playerHp + amount);
+            updateBossHud();
+
+            const player = getPlayer();
+            if (!player) return;
+            const px = player.position.x + player.width * 0.5;
+            const py = player.position.y + player.height * 0.5;
+            spawnHitEffect(px, py, color);
+        };
+
+        const consumePlayerAttackDamage = (baseDamage, options = {}) => {
+            let damage = baseDamage;
+            let accentColor = '#86f8ff';
+            let isCritical = false;
+
+            if (this.bossState.buffs.criticalOrbReady) {
+                this.bossState.buffs.criticalOrbReady = false;
+                damage = Math.round(baseDamage * 6);
+                accentColor = orbDefinitions.critical.color;
+                isCritical = true;
+                showOrbAnnouncement(orbDefinitions.critical, 'Critical Orb unleashed! The next attack hits for 500% more damage!');
+            } else if (options.allowCrit && Math.random() < this.bossState.critChance) {
+                damage = Math.round(baseDamage * 2);
+                accentColor = orbDefinitions.critical.color;
+                isCritical = true;
+            }
+
+            return { damage, accentColor, isCritical };
+        };
+
+        const applyLifestealFromDamage = (damageDealt) => {
+            if (!isBuffActive('bloodThirstUntil')) return;
+            healPlayer(Math.max(1, Math.round(damageDealt * 0.5)), '#c62630');
+        };
+
+        const clearCombatOrbs = () => {
+            (this.bossState.orbs || []).forEach((entry) => {
+                if (entry?.obj?.destroy) entry.obj.destroy();
+            });
+            this.bossState.orbs = [];
+        };
+
+        const clearOrbAuras = () => {
+            Object.values(this.bossState.orbAuras || {}).forEach((element) => element?.remove?.());
+            this.bossState.orbAuras = {};
+            clearOrbAnnouncement();
+        };
+
+        const getActiveAuraKeys = () => {
+            const keys = [];
+            if (this.bossState.buffs.criticalOrbReady) keys.push('critical');
+            if (isBuffActive('bloodThirstUntil')) keys.push('blood');
+            if (this.bossState.buffs.mirrorReady) keys.push('mirror');
+            if (isBuffActive('shieldUntil')) keys.push('shield');
+            if (isBuffActive('sonicUntil')) keys.push('sonic');
+            return keys;
+        };
+
+        const ensureAuraElement = (type, color, border) => {
+            if (this.bossState.orbAuras[type]) return this.bossState.orbAuras[type];
+
+            const aura = document.createElement('div');
+            aura.id = `aquatic-orb-aura-${type}`;
+            Object.assign(aura.style, {
+                position: 'absolute',
+                pointerEvents: 'none',
+                zIndex: '10067',
+                imageRendering: 'pixelated',
+                border: `2px solid ${border}`,
+                background: color,
+                opacity: '0.7',
+                transformOrigin: 'center center',
+                mixBlendMode: 'screen'
+            });
+            appendBossOverlay(aura);
+            this.bossState.orbAuras[type] = aura;
+            return aura;
+        };
+
+        const syncOrbAuras = () => {
+            const player = getPlayer();
+            if (!player) {
+                clearOrbAuras();
+                return;
+            }
+
+            const activeKeys = new Set(getActiveAuraKeys());
+            Object.entries(this.bossState.orbAuras || {}).forEach(([key, element]) => {
+                if (!activeKeys.has(key)) {
+                    element.remove();
+                    delete this.bossState.orbAuras[key];
+                }
+            });
+
+            const centerX = player.position.x + player.width * 0.5;
+            const centerY = getBossOverlayTopOffset() + player.position.y + player.height * 0.5;
+            const baseSize = Math.max(player.width, player.height) * 1.28;
+            const time = performance.now() * 0.0022;
+
+            const configs = {
+                critical: {
+                    color: 'repeating-linear-gradient(90deg, rgba(255,151,56,0.18) 0 6px, rgba(255,198,100,0.48) 6px 12px)',
+                    border: '#ffbe6d',
+                    shadow: '0 0 18px rgba(255,151,56,0.75), inset 0 0 18px rgba(255,198,100,0.32)',
+                    size: 1.18,
+                    radius: '12px',
+                    rotation: 14
+                },
+                blood: {
+                    color: 'repeating-linear-gradient(90deg, rgba(84,0,8,0.12) 0 5px, rgba(139,11,22,0.5) 5px 10px)',
+                    border: '#d12e3a',
+                    shadow: '0 0 22px rgba(139,11,22,0.88), inset 0 0 24px rgba(209,46,58,0.28)',
+                    size: 1.24,
+                    radius: '10px',
+                    rotation: -18
+                },
+                mirror: {
+                    color: 'repeating-linear-gradient(135deg, rgba(28,87,182,0.1) 0 7px, rgba(75,168,255,0.42) 7px 14px)',
+                    border: '#9edcff',
+                    shadow: '0 0 20px rgba(75,168,255,0.76), inset 0 0 18px rgba(212,244,255,0.26)',
+                    size: 1.2,
+                    radius: '14px',
+                    rotation: 22
+                },
+                shield: {
+                    color: 'repeating-linear-gradient(0deg, rgba(255,211,77,0.08) 0 4px, rgba(255,241,161,0.4) 4px 8px)',
+                    border: '#fff1a1',
+                    shadow: '0 0 18px rgba(255,211,77,0.75), inset 0 0 16px rgba(255,241,161,0.26)',
+                    size: 1.32,
+                    radius: '18px',
+                    rotation: 0
+                },
+                sonic: {
+                    color: 'repeating-linear-gradient(90deg, rgba(0,83,95,0.08) 0 4px, rgba(79,239,255,0.42) 4px 10px)',
+                    border: '#a7fbff',
+                    shadow: '0 0 22px rgba(79,239,255,0.82), inset 0 0 18px rgba(167,251,255,0.26)',
+                    size: 1.16,
+                    radius: '16px',
+                    rotation: -28
+                }
+            };
+
+            activeKeys.forEach((key) => {
+                const config = configs[key];
+                const element = ensureAuraElement(key, config.color, config.border);
+                const pulse = 1 + Math.sin(time * 3.2 + key.length) * 0.06;
+                const rotate = config.rotation * Math.sin(time * 1.5 + key.length);
+                const size = baseSize * config.size * pulse;
+                Object.assign(element.style, {
+                    left: `${centerX}px`,
+                    top: `${centerY}px`,
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    borderRadius: config.radius,
+                    boxShadow: config.shadow,
+                    transform: `translate(-50%, -50%) rotate(${rotate}deg)`
+                });
+            });
+        };
+
+        const activateOrb = (definition) => {
+            const now = Date.now();
+            if (definition.key === 'critical') {
+                this.bossState.buffs.criticalOrbReady = true;
+            } else if (definition.key === 'blood') {
+                this.bossState.buffs.bloodThirstUntil = now + 30000;
+            } else if (definition.key === 'mirror') {
+                this.bossState.buffs.mirrorReady = true;
+            } else if (definition.key === 'shield') {
+                this.bossState.buffs.shieldUntil = now + 10000;
+            } else if (definition.key === 'sonic') {
+                this.bossState.buffs.sonicUntil = now + 15000;
+            }
+
+            showOrbAnnouncement(definition);
+            syncOrbAuras();
+        };
+
+        const getSafeSpawnPoint = (minDistanceFromPlayer = 220, minDistanceFromBoss = 190, minDistanceFromOrbs = 120) => {
+            const player = getPlayer();
+            const boss = this.bossState.megalodon;
+            const corners = [
+                { xMin: 34, xMax: 180, yMin: 34, yMax: 180 },
+                { xMin: Math.max(34, this.gameEnv.innerWidth - 180), xMax: Math.max(50, this.gameEnv.innerWidth - 34), yMin: 34, yMax: 180 },
+                { xMin: 34, xMax: 180, yMin: Math.max(40, this.gameEnv.innerHeight - 180), yMax: Math.max(70, this.gameEnv.innerHeight - 34) },
+                { xMin: Math.max(34, this.gameEnv.innerWidth - 180), xMax: Math.max(50, this.gameEnv.innerWidth - 34), yMin: Math.max(40, this.gameEnv.innerHeight - 180), yMax: Math.max(70, this.gameEnv.innerHeight - 34) }
+            ];
+
+            const playerCenter = player ? {
+                x: player.position.x + player.width * 0.5,
+                y: player.position.y + player.height * 0.5
+            } : null;
+            const bossCenter = boss ? {
+                x: boss.position.x + boss.width * 0.5,
+                y: boss.position.y + boss.height * 0.5
+            } : null;
+
+            for (let attempt = 0; attempt < 30; attempt += 1) {
+                const zone = corners[Math.floor(Math.random() * corners.length)];
+                const x = zone.xMin + Math.random() * Math.max(1, zone.xMax - zone.xMin);
+                const y = zone.yMin + Math.random() * Math.max(1, zone.yMax - zone.yMin);
+
+                const farEnoughFromPlayer = !playerCenter || Math.hypot(playerCenter.x - x, playerCenter.y - y) >= minDistanceFromPlayer;
+                const farEnoughFromBoss = !bossCenter || Math.hypot(bossCenter.x - x, bossCenter.y - y) >= minDistanceFromBoss;
+                const farEnoughFromOrbs = (this.bossState.orbs || []).every((entry) => {
+                    const orb = entry?.obj;
+                    if (!orb?.position) return true;
+                    return Math.hypot((orb.position.x + orb.width * 0.5) - x, (orb.position.y + orb.height * 0.5) - y) >= minDistanceFromOrbs;
+                });
+
+                if (farEnoughFromPlayer && farEnoughFromBoss && farEnoughFromOrbs) {
+                    return { x, y };
+                }
+            }
+
+            return { x: this.gameEnv.innerWidth * 0.12, y: this.gameEnv.innerHeight * 0.18 };
+        };
+
+        const spawnCombatOrb = () => {
+            if (!this.bossState.active || !this.bossState.combatReady) return;
+
+            const definition = getOrbWeightedSelection();
+            const spawn = getSafeSpawnPoint();
+            const orbId = `aquatic_orb_${definition.key}_${Date.now()}`;
+            const orbData = {
+                id: orbId,
+                src: definition.sprite,
+                SCALE_FACTOR: 18,
+                STEP_FACTOR: 0,
+                ANIMATION_RATE: 1,
+                INIT_POSITION: spawn,
+                pixels: { height: 64, width: 64 },
+                orientation: { rows: 1, columns: 1 },
+                hitbox: { widthPercentage: 0.42, heightPercentage: 0.42 },
+                greeting: definition.message,
+                dialogues: [definition.message],
+                reaction: function() {},
+                interact: function() {
+                    activateOrb(definition);
+                    levelContext.bossState.orbs = (levelContext.bossState.orbs || []).filter((entry) => entry.obj !== this);
+                    this.destroy();
+                }
+            };
+
+            const orb = new Collectible(orbData, gameEnv);
+            orb.removeInteractKeyListeners?.();
+            const baseX = spawn.x;
+            const baseY = spawn.y;
+            const phase = Math.random() * Math.PI * 2;
+            const originalUpdate = orb.update.bind(orb);
+            orb.update = function() {
+                originalUpdate();
+                if (this.gameEnv?.gameControl?.isPaused) return;
+
+                const t = performance.now() * 0.0026 + phase;
+                this.position.y = baseY + Math.sin(t * 1.8) * 8;
+                if (this.canvas) {
+                    this.canvas.style.transformOrigin = 'center center';
+                    this.canvas.style.transform = `rotate(${Math.sin(t) * 14}deg) scale(${1 + Math.sin(t * 2.6) * 0.06})`;
+                    this.canvas.style.filter = `drop-shadow(0 0 14px ${definition.shadow})`;
+                }
+
+                const player = getPlayer();
+                if (!player) return;
+                this.isCollision?.(player);
+                if (this.collisionData?.hit) {
+                    this.interact?.();
+                }
+            };
+
+            this.gameEnv.gameObjects.push(orb);
+            this.bossState.orbs.push({ obj: orb, definition });
         };
 
         const applyBossDamage = (damage, hitX, hitY) => {
@@ -2325,7 +2995,7 @@ class GameLevelAquaticGameLevel {
                     position: 'fixed',
                     inset: '0',
                     zIndex: '10080',
-                    background: 'rgba(3, 10, 24, 0.78)',
+                    background: 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -2405,6 +3075,7 @@ class GameLevelAquaticGameLevel {
             if (this.bossState.hp <= 0) {
                 this.bossState.combatReady = false;
                 stopBossTheme();
+                stopUnderwaterTheme();
                 if (this.bossState.megalodon?.destroy) {
                     this.bossState.megalodon.destroy();
                 }
@@ -2414,15 +3085,54 @@ class GameLevelAquaticGameLevel {
             }
         };
 
-        const applyPlayerDamage = (damage, hitX, hitY) => {
+        const applyPlayerDamage = (damage, hitX, hitY, sourceType = 'generic') => {
             if (!this.bossState.active || !this.bossState.combatReady) return;
-            this.bossState.playerHp = Math.max(0, this.bossState.playerHp - damage);
+
+            if (sourceType === 'laser' && this.bossState.buffs.mirrorReady) {
+                this.bossState.buffs.mirrorReady = false;
+                showOrbAnnouncement(orbDefinitions.mirror, 'Mirror Orb reflected the laser!');
+                syncOrbAuras();
+                if (this.bossState.laserBeam?.element) {
+                    this.bossState.laserBeam.element.style.filter = 'drop-shadow(0 0 18px rgba(120, 208, 255, 0.95))';
+                    this.bossState.laserBeam.element.remove();
+                }
+                this.bossState.laserBeam = null;
+                if (this.bossState.megalodon) {
+                    const bossX = this.bossState.megalodon.position.x + this.bossState.megalodon.width * 0.5;
+                    const bossY = this.bossState.megalodon.position.y + this.bossState.megalodon.height * 0.5;
+                    applyBossDamage(72, bossX, bossY);
+                }
+                return;
+            }
+
+            if (isBuffActive('sonicUntil') && Math.random() < 0.1) {
+                if (typeof hitX === 'number' && typeof hitY === 'number') {
+                    spawnHitEffect(hitX, hitY, '#5ef9ff');
+                }
+                return;
+            }
+
+            let finalDamage = damage;
+            if (isBuffActive('shieldUntil')) {
+                if (sourceType === 'sharkBite') {
+                    if (typeof hitX === 'number' && typeof hitY === 'number') {
+                        spawnHitEffect(hitX, hitY, '#ffe46f');
+                    }
+                    return;
+                }
+                if (sourceType === 'rocket' || sourceType === 'laser') {
+                    finalDamage *= 0.5;
+                }
+            }
+
+            this.bossState.playerHp = Math.max(0, this.bossState.playerHp - finalDamage);
             if (typeof hitX === 'number' && typeof hitY === 'number') {
                 spawnHitEffect(hitX, hitY, '#ff9aa6');
             }
             updateBossHud();
             if (this.bossState.playerHp <= 0) {
                 stopBossTheme();
+                stopUnderwaterTheme();
                 this.showSharkGameOver();
             }
         };
@@ -2443,6 +3153,7 @@ class GameLevelAquaticGameLevel {
             const mag = Math.max(1, Math.hypot(dx, dy));
             const vx = (dx / mag) * 9.2;
             const vy = (dy / mag) * 9.2;
+            const shotCritical = Math.random() < this.bossState.critChance;
 
             const bolt = document.createElement('div');
             Object.assign(bolt.style, {
@@ -2459,7 +3170,7 @@ class GameLevelAquaticGameLevel {
             bolt.style.backgroundSize = 'contain';
             bolt.style.backgroundRepeat = 'no-repeat';
             bolt.style.backgroundPosition = 'center';
-            bolt.style.filter = 'none';
+            bolt.style.filter = shotCritical ? 'brightness(1.12) drop-shadow(0 0 10px rgba(255,151,56,0.92))' : 'none';
             appendBossOverlay(bolt);
 
             this.bossState.projectiles.push({
@@ -2467,6 +3178,8 @@ class GameLevelAquaticGameLevel {
                 y: py,
                 vx,
                 vy,
+                baseDamage: 9,
+                shotCritical,
                 angleOffset: tridentAimOffset,
                 life: 0,
                 element: bolt
@@ -2540,7 +3253,9 @@ class GameLevelAquaticGameLevel {
             const by = boss.position.y + boss.height * 0.5;
             const dist = Math.hypot(bx - px, by - py);
             if (dist < 150) {
-                applyBossDamage(18, bx, by);
+                const attack = consumePlayerAttackDamage(18);
+                applyBossDamage(attack.damage, bx, by);
+                applyLifestealFromDamage(attack.damage);
             }
 
             // Summoned sharks are intentionally fragile and die in one melee hit.
@@ -2550,6 +3265,7 @@ class GameLevelAquaticGameLevel {
                 const mDist = Math.hypot(mx - px, my - py);
                 if (mDist < 140) {
                     spawnHitEffect(mx, my, '#ffd18a');
+                    applyLifestealFromDamage(18);
                     if (minion.obj?.destroy) minion.obj.destroy();
                     return false;
                 }
@@ -2594,13 +3310,12 @@ class GameLevelAquaticGameLevel {
             });
         };
 
-        const summonRushingSharks = () => {
-            if (!this.bossState.active || this.bossState.summonedAtQuarterHp) return;
-
-            this.bossState.summonedAtQuarterHp = true;
-            const summonCount = 3 + Math.floor(Math.random() * 2);
+        const summonRushingSharks = (summonCount = 4) => {
+            if (!this.bossState.active) return;
 
             for (let i = 0; i < summonCount; i += 1) {
+                const spawnFromCorner = getSafeSpawnPoint(320, 260, 140);
+
                 const minionData = {
                     id: `MegalodonSummon_${Date.now()}_${i}`,
                     greeting: false,
@@ -2608,10 +3323,7 @@ class GameLevelAquaticGameLevel {
                     SCALE_FACTOR: 6.4,
                     STEP_FACTOR: 0,
                     ANIMATION_RATE: 8,
-                    INIT_POSITION: {
-                        x: 90 + Math.random() * 120,
-                        y: this.gameEnv.innerHeight - 200 - Math.random() * 130
-                    },
+                    INIT_POSITION: spawnFromCorner,
                     orientation: { rows: 1, columns: 1 },
                     down: { row: 0, start: 0, columns: 1 },
                     right: { row: 0, start: 0, columns: 1, mirror: true },
@@ -2629,9 +3341,98 @@ class GameLevelAquaticGameLevel {
                 this.gameEnv.gameObjects.push(sharkMinion);
                 this.bossState.summons.push({
                     obj: sharkMinion,
+                    kind: 'shark',
+                    hp: 9,
                     speed: 2.4 + Math.random() * 0.9,
-                    wobblePhase: Math.random() * Math.PI * 2
+                    wobblePhase: Math.random() * Math.PI * 2,
+                    damage: 18,
+                    contactRange: 55,
+                    contactCooldownMs: 760,
+                    lastHitAt: 0
                 });
+            }
+        };
+
+        const summonWeakenedMegalodon = () => {
+            if (!this.bossState.active || this.bossState.weakenedMegalodonSpawned) return;
+
+            this.bossState.weakenedMegalodonSpawned = true;
+
+            const minionData = {
+                id: `WeakenedMegalodon_${Date.now()}`,
+                greeting: false,
+                src: this.bossState.megalodonMoveSheet,
+                SCALE_FACTOR: 4.4,
+                STEP_FACTOR: 0,
+                ANIMATION_RATE: 8,
+                INIT_POSITION: {
+                    x: this.gameEnv.innerWidth - 260,
+                    y: Math.max(90, this.gameEnv.innerHeight * 0.18)
+                },
+                pixels: this.bossState.megalodonMovePixels,
+                orientation: { rows: 4, columns: 3 },
+                down: { row: 0, start: 0, columns: 3 },
+                right: { row: 1, start: 0, columns: 3, mirror: true },
+                left: { row: 2, start: 0, columns: 3 },
+                up: { row: 2, start: 0, columns: 3 },
+                upRight: { row: 2, start: 0, columns: 3, mirror: true },
+                downRight: { row: 0, start: 0, columns: 3, mirror: true },
+                upLeft: { row: 2, start: 0, columns: 3 },
+                downLeft: { row: 0, start: 0, columns: 3 },
+                hitbox: { widthPercentage: 0.38, heightPercentage: 0.32 },
+                reaction: function() {}
+            };
+
+            const weakenedMegalodon = new Npc(minionData, this.gameEnv);
+            this.gameEnv.gameObjects.push(weakenedMegalodon);
+            this.bossState.summons.push({
+                obj: weakenedMegalodon,
+                kind: 'miniMegalodon',
+                hp: 150,
+                speed: 1.55,
+                wobblePhase: Math.random() * Math.PI * 2,
+                damage: 14,
+                contactRange: 78,
+                contactCooldownMs: 900,
+                lastHitAt: 0
+            });
+        };
+
+        const handleBossHealthPhases = () => {
+            if (!this.bossState.active) return;
+
+            if (!this.bossState.nextOrbSpawnAt) {
+                this.bossState.nextOrbSpawnAt = Date.now() + 10000;
+            }
+
+            const thresholds = [0.75, 0.5, 0.25];
+            thresholds.forEach((threshold) => {
+                if (
+                    this.bossState.hp <= this.bossState.maxHp * threshold &&
+                    !this.bossState.summonThresholdsTriggered.includes(threshold)
+                ) {
+                    this.bossState.summonThresholdsTriggered.push(threshold);
+                    summonRushingSharks(threshold > 0.5 ? 2 : 4);
+                }
+            });
+
+            if (this.bossState.hp <= this.bossState.maxHp * 0.25) {
+                summonWeakenedMegalodon();
+            }
+
+            if (this.bossState.hp <= this.bossState.maxHp * 0.1) {
+                const now = Date.now();
+                if (!this.bossState.lowHealthSummonStartedAt) {
+                    this.bossState.lowHealthSummonStartedAt = now;
+                } else if (now - this.bossState.lowHealthSummonStartedAt >= 10000) {
+                    summonRushingSharks(1);
+                    this.bossState.lowHealthSummonStartedAt = now;
+                }
+            }
+
+            if (Date.now() >= this.bossState.nextOrbSpawnAt) {
+                spawnCombatOrb();
+                this.bossState.nextOrbSpawnAt = Date.now() + 10000;
             }
         };
 
@@ -2661,9 +3462,7 @@ class GameLevelAquaticGameLevel {
 
             const state = this.bossState;
 
-            if (!state.summonedAtQuarterHp && state.hp <= state.maxHp * 0.25) {
-                summonRushingSharks();
-            }
+            handleBossHealthPhases();
 
             const setBossSpriteSheet = (src, pixels) => {
                 if (!boss?.spriteSheet) return;
@@ -2721,7 +3520,21 @@ class GameLevelAquaticGameLevel {
             const commitLaser = () => {
                 const px = player.position.x + player.width * 0.5;
                 const py = player.position.y + player.height * 0.5;
-                const ang = Math.atan2(py - by, px - bx);
+                const shouldMiss = Math.random() < 0.5;
+                let targetX = px;
+                let targetY = py;
+
+                if (shouldMiss) {
+                    const toPlayerMag = Math.max(1, Math.hypot(px - bx, py - by));
+                    const missDirection = Math.random() < 0.5 ? -1 : 1;
+                    const missOffset = 56 + Math.random() * 40;
+                    const perpendicularX = -((py - by) / toPlayerMag) * missDirection;
+                    const perpendicularY = ((px - bx) / toPlayerMag) * missDirection;
+                    targetX += perpendicularX * missOffset;
+                    targetY += perpendicularY * missOffset;
+                }
+
+                const ang = Math.atan2(targetY - by, targetX - bx);
                 const length = Math.min(this.gameEnv.innerWidth, 580);
 
                 if (state.laserBeam?.element) state.laserBeam.element.remove();
@@ -2999,16 +3812,35 @@ class GameLevelAquaticGameLevel {
                     const minion = state.summons[hitSummon];
                     const mx = (minion.obj?.position?.x || p.x) + (minion.obj?.width || 0) * 0.5;
                     const my = (minion.obj?.position?.y || p.y) + (minion.obj?.height || 0) * 0.5;
+                    const attack = consumePlayerAttackDamage(p.baseDamage || p.damage || 9, { allowCrit: !!p.shotCritical });
                     spawnHitEffect(mx, my, '#ffd18a');
-                    if (minion.obj?.destroy) minion.obj.destroy();
-                    state.summons.splice(hitSummon, 1);
+                    minion.hp = Math.max(0, (minion.hp ?? 1) - attack.damage);
+                    if (minion.obj?.canvas) {
+                        minion.obj.canvas.style.filter = attack.isCritical
+                            ? 'brightness(1.45) saturate(1.18) hue-rotate(-12deg)'
+                            : 'brightness(1.35) saturate(1.1)';
+                        setTimeout(() => {
+                            if (minion.obj?.canvas) {
+                                minion.obj.canvas.style.filter = minion.kind === 'miniMegalodon'
+                                    ? 'brightness(0.92) saturate(0.95) hue-rotate(-12deg)'
+                                    : 'brightness(1.18) saturate(1.1)';
+                            }
+                        }, 120);
+                    }
+                    if (minion.hp <= 0) {
+                        if (minion.obj?.destroy) minion.obj.destroy();
+                        state.summons.splice(hitSummon, 1);
+                    }
+                    applyLifestealFromDamage(attack.damage);
                     if (p.element) p.element.remove();
                     return false;
                 }
 
                 if (hit) {
                     if (p.element) p.element.remove();
-                    applyBossDamage(p.damage || 9, p.x, p.y);
+                    const attack = consumePlayerAttackDamage(p.baseDamage || p.damage || 9, { allowCrit: !!p.shotCritical });
+                    applyBossDamage(attack.damage, p.x, p.y);
+                    applyLifestealFromDamage(attack.damage);
                     return false;
                 }
 
@@ -3027,6 +3859,10 @@ class GameLevelAquaticGameLevel {
             state.summons = state.summons.filter((minion) => {
                 const obj = minion.obj;
                 if (!obj || !obj.canvas || !obj.position) return false;
+                if ((minion.hp ?? 1) <= 0) {
+                    if (obj.destroy) obj.destroy();
+                    return false;
+                }
 
                 const playerX = player.position.x + player.width * 0.5;
                 const playerY = player.position.y + player.height * 0.5;
@@ -3038,17 +3874,28 @@ class GameLevelAquaticGameLevel {
                 const mag = Math.max(1, Math.hypot(dx, dy));
                 const wobble = Math.sin(performance.now() * 0.006 + minion.wobblePhase) * 0.75;
 
-                obj.position.x += (dx / mag) * minion.speed;
-                obj.position.y += (dy / mag) * minion.speed + wobble;
-                obj.direction = getDirectionToward(mx, my, playerX, playerY);
-                // Let the engine's normal update/draw cycle render this NPC once per frame.
-
-                if (obj.canvas) {
+                if (minion.kind === 'miniMegalodon') {
+                    const orbitX = -(dy / mag);
+                    const orbitY = dx / mag;
+                    obj.position.x += (dx / mag) * minion.speed + orbitX * 0.55;
+                    obj.position.y += (dy / mag) * minion.speed + orbitY * 0.35 + wobble * 0.35;
+                    obj.canvas.style.filter = 'brightness(0.92) saturate(0.95) hue-rotate(-12deg)';
+                } else {
+                    obj.position.x += (dx / mag) * minion.speed;
+                    obj.position.y += (dy / mag) * minion.speed + wobble;
                     obj.canvas.style.filter = 'brightness(1.18) saturate(1.1)';
                 }
 
-                if (Math.hypot(playerX - (obj.position.x + obj.width * 0.5), playerY - (obj.position.y + obj.height * 0.5)) < 55) {
-                    applyPlayerDamage(20, playerX, playerY);
+                obj.direction = getDirectionToward(mx, my, playerX, playerY);
+
+                const playerDistance = Math.hypot(playerX - (obj.position.x + obj.width * 0.5), playerY - (obj.position.y + obj.height * 0.5));
+                const nowMs = Date.now();
+                if (
+                    playerDistance < (minion.contactRange || 55) &&
+                    nowMs - (minion.lastHitAt || 0) >= (minion.contactCooldownMs || 800)
+                ) {
+                    minion.lastHitAt = nowMs;
+                    applyPlayerDamage(minion.damage || 20, playerX, playerY, minion.kind === 'shark' ? 'sharkBite' : 'miniMegalodon');
                 }
 
                 return true;
@@ -3089,7 +3936,7 @@ class GameLevelAquaticGameLevel {
                 const dToPlayer = Math.hypot(playerX - p.x, playerY - p.y);
                 if (dToPlayer < p.damageRange) {
                     if (p.element) p.element.remove();
-                    applyPlayerDamage(p.type === 'rocket' ? 34 : 28, playerX, playerY);
+                    applyPlayerDamage(p.type === 'rocket' ? 34 : 28, playerX, playerY, p.type === 'rocket' ? 'rocket' : 'projectile');
                     return false;
                 }
 
@@ -3129,7 +3976,7 @@ class GameLevelAquaticGameLevel {
                 if (now >= beam.hitStartsAt && now <= beam.hitWindowUntil) {
                     const dLine = distancePointToSegment(playerX, playerY, beam.x1, beam.y1, beam.x2, beam.y2);
                     if (dLine < 20) {
-                        applyPlayerDamage(42, playerX, playerY);
+                        applyPlayerDamage(42, playerX, playerY, 'laser');
                     }
                 }
 
@@ -3142,6 +3989,7 @@ class GameLevelAquaticGameLevel {
             const px = player.position.x + player.width * 0.5;
             const py = player.position.y + player.height * 0.5;
             player.direction = getDirectionToward(px, py, bx, by);
+            syncOrbAuras();
 
             if (!state.activeAbility) {
                 setBossSpriteSheet(state.megalodonMoveSheet, state.megalodonMovePixels);
@@ -3198,7 +4046,15 @@ class GameLevelAquaticGameLevel {
             if (this.bossState.active || this.bossState.introPlayed) return;
             this.bossState.introPlayed = true;
             this.bossState.active = true;
+            this.bossState.hp = this.bossState.maxHp;
             this.bossState.playerHp = this.bossState.playerMaxHp;
+            this.bossState.summonThresholdsTriggered = [];
+            this.bossState.weakenedMegalodonSpawned = false;
+            this.bossState.lowHealthSummonStartedAt = 0;
+            this.bossState.nextOrbSpawnAt = 0;
+            this.bossState.buffs = createBossOrbBuffState();
+            clearCombatOrbs();
+            clearOrbAuras();
             this.playerLock = true;
 
             await shakeWorld(1050);
@@ -3232,7 +4088,9 @@ class GameLevelAquaticGameLevel {
             const boss = new Npc(bossData, this.gameEnv);
             this.bossState.megalodon = boss;
             this.gameEnv.gameObjects.push(boss);
+            stopUnderwaterTheme();
             playBossTheme();
+            setStorySceneUiVisibility(false);
 
             // Hide all non-boss NPCs during the megalodon encounter.
             this.bossState.hiddenNpcs = [];
@@ -3265,11 +4123,11 @@ class GameLevelAquaticGameLevel {
                 player.direction = getDirectionToward(px, py, bx, by);
             }
 
-            await showBottomStoryDialogue('Slime', 'Shoot, why is he here?');
-            await showBottomStoryDialogue('Slime', 'I got you the strongest power of the ocean so you can beat that stupid megalodon!');
-            await showBottomStoryDialogue('Slime', 'Listen carefully. Move your mouse to aim your trident.');
-            await showBottomStoryDialogue('Slime', 'Left Click throws a trident shot. Keep your distance and keep firing.');
-            await showBottomStoryDialogue('Slime', 'Right Click performs a close-range trident slash. Use it when the megalodon rushes you!');
+            await showBottomStoryDialogue('Slime', 'Shoot, why is he here?', 3400);
+            await showBottomStoryDialogue('Slime', 'I got you the strongest power of the ocean so you can beat that stupid megalodon!', 3800);
+            await showBottomStoryDialogue('Slime', 'Listen carefully. Move your mouse to aim your trident.', 4000);
+            await showBottomStoryDialogue('Slime', 'Left Click throws a trident shot. Keep your distance and keep firing.', 4200);
+            await showBottomStoryDialogue('Slime', 'Right Click performs a close-range trident slash. Use it when the megalodon rushes you!', 4400);
 
             ensureBossHud();
             updateBossHud();
@@ -3296,6 +4154,13 @@ class GameLevelAquaticGameLevel {
                 rockets: 0,
                 bodySwing: 0
             };
+            this.bossState.summonThresholdsTriggered = [];
+            this.bossState.weakenedMegalodonSpawned = false;
+            this.bossState.lowHealthSummonStartedAt = 0;
+            this.bossState.nextOrbSpawnAt = 0;
+            this.bossState.buffs = createBossOrbBuffState();
+            clearCombatOrbs();
+            clearOrbAuras();
 
             const overlay = document.getElementById('aquatic-shark-gameover');
             if (overlay) overlay.remove();
@@ -3318,6 +4183,7 @@ class GameLevelAquaticGameLevel {
         this.cleanupBossEncounter = () => {
             unbindBossInput();
             stopBossTheme();
+            setStorySceneUiVisibility(true);
             if (this.bossState.megalodon?.destroy) this.bossState.megalodon.destroy();
             this.bossState.megalodon = null;
 
@@ -3344,9 +4210,15 @@ class GameLevelAquaticGameLevel {
                 if (minion?.obj?.destroy) minion.obj.destroy();
             });
             this.bossState.summons = [];
-            this.bossState.summonedAtQuarterHp = false;
+            this.bossState.summonThresholdsTriggered = [];
+            this.bossState.weakenedMegalodonSpawned = false;
+            this.bossState.lowHealthSummonStartedAt = 0;
+            this.bossState.nextOrbSpawnAt = 0;
+            this.bossState.buffs = createBossOrbBuffState();
             this.bossState.activeAbility = null;
             this.bossState.abilityCommitted = false;
+            clearCombatOrbs();
+            clearOrbAuras();
             if (this.bossState.hud) {
                 this.bossState.hud.remove();
                 this.bossState.hud = null;
@@ -3536,7 +4408,7 @@ class GameLevelAquaticGameLevel {
             Object.assign(overlay.style, {
                 position: 'fixed',
                 inset: '0',
-                background: 'rgba(2, 10, 25, 0.65)',
+                background: 'transparent',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -3766,7 +4638,17 @@ class GameLevelAquaticGameLevel {
 
     initialize() {
         // Runtime wiring: mount HUD/menu, gate NPCs, and attach shark AI.
-        this.requestRunnerFullscreen?.();
+        this.syncRunnerFullscreenState?.();
+        if (!this._runnerFullscreenObserver && document.body) {
+            this._runnerFullscreenObserver = new MutationObserver(() => {
+                this.syncRunnerFullscreenState?.();
+            });
+            this._runnerFullscreenObserver.observe(document.body, { childList: true });
+        }
+        if (!this._runnerFullscreenKeyListenerAttached) {
+            document.addEventListener('keydown', this.handleRunnerFullscreenKeydown, true);
+            this._runnerFullscreenKeyListenerAttached = true;
+        }
         this.ensureTopMenuBar?.();
         if (this.multiplayer.enabled && this.multiplayer.room) {
             this.startMultiplayer?.();
@@ -3776,6 +4658,7 @@ class GameLevelAquaticGameLevel {
             this.ensureChallengeHud?.();
         } else {
             this.ensureQuestHud?.();
+            this.playUnderwaterTheme?.(true);
         }
 
         const player = this.gameEnv?.gameObjects?.find(
@@ -3783,6 +4666,26 @@ class GameLevelAquaticGameLevel {
         );
         if (player && !player._aquaticLockWrapped) {
             const originalUpdate = player.update.bind(player);
+            const applyAquaticVerticalBoost = () => {
+                const sonicBoost = this.isBossBuffActive?.('sonicUntil') ? 1.2 : 1;
+                player.xVelocity = (player._aquaticBaseXVelocity || player.xVelocity || 0) * sonicBoost;
+                player.yVelocity = (player._aquaticBaseYVelocity || player.yVelocity || 0) * 1.35 * sonicBoost;
+            };
+
+            player._aquaticBaseXVelocity = player.xVelocity;
+            player._aquaticBaseYVelocity = player.yVelocity;
+            applyAquaticVerticalBoost();
+            if (!player._aquaticVerticalResizeWrapped) {
+                const originalResize = player.resize.bind(player);
+                player.resize = () => {
+                    originalResize();
+                    player._aquaticBaseXVelocity = player.xVelocity;
+                    player._aquaticBaseYVelocity = player.yVelocity;
+                    applyAquaticVerticalBoost();
+                };
+                player._aquaticVerticalResizeWrapped = true;
+            }
+
             player.update = () => {
                 if (this.playerLock) {
                     player.velocity.x = 0;
@@ -3790,6 +4693,10 @@ class GameLevelAquaticGameLevel {
                     player.pressedKeys = {};
                     player.draw();
                     return;
+                }
+                applyAquaticVerticalBoost();
+                if (typeof player.updateVelocity === 'function') {
+                    player.updateVelocity();
                 }
                 originalUpdate();
             };
@@ -3992,6 +4899,7 @@ class GameLevelAquaticGameLevel {
 
         if (!this._bossUpdateTimer) {
             this._bossUpdateTimer = setInterval(() => {
+                if (this.syncAquaticPauseState?.()) return;
                 this.updateBossCombat?.();
             }, 16);
         }
@@ -4000,6 +4908,16 @@ class GameLevelAquaticGameLevel {
     destroy() {
         // Remove level-owned overlays and temporary spawned objects.
         this.stopMultiplayer?.();
+        if (this._runnerFullscreenObserver) {
+            this._runnerFullscreenObserver.disconnect();
+            this._runnerFullscreenObserver = null;
+        }
+        if (this._runnerFullscreenKeyListenerAttached) {
+            document.removeEventListener('keydown', this.handleRunnerFullscreenKeydown, true);
+            this._runnerFullscreenKeyListenerAttached = false;
+        }
+        this._runnerFullscreenActive = false;
+        this.unlockPageScroll?.();
         const topMenu = document.getElementById('aquatic-top-menubar');
         if (topMenu) topMenu.remove();
         const topMenuNotice = document.getElementById('aquatic-top-menu-notice');
@@ -4030,6 +4948,7 @@ class GameLevelAquaticGameLevel {
             clearInterval(this._bossUpdateTimer);
             this._bossUpdateTimer = null;
         }
+        this.stopUnderwaterTheme?.();
         this.cleanupBossEncounter?.();
         document.querySelectorAll('.ai-npc-modal').forEach((modal) => modal.remove());
         document.querySelectorAll('.ai-npc-container').forEach((container) => container.remove());
