@@ -466,7 +466,11 @@ class GameLevelCsPathIdentity {
   }
 
   _syncCompletionPanel() {
-    if (this.profilePanelView && typeof this.profilePanelView.update === 'function') {
+    // Use centralized updateProfilePanel if available (GameLevelCsPath0Forge),
+    // otherwise fall back to direct panel update (other levels)
+    if (typeof this.updateProfilePanel === 'function') {
+      this.updateProfilePanel({});  // Refresh with no new updates, just sync completion
+    } else if (this.profilePanelView && typeof this.profilePanelView.update === 'function') {
       this.profilePanelView.update(this._getCompletionPanelValues());
     }
   }
