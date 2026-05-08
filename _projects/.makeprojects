@@ -21,6 +21,9 @@ games/pirate-hunt
 games/gamify
 games/local-storage
 games/kirby-minigames
+main
+games/multiplayer
+games/ocean-adventure:dev
 games/tag-game-multiplayer
 games/ocean
 games/peppa-pig
@@ -28,8 +31,10 @@ games/platformer
 games/red-riding
 games/teamtestgame
 games/transitions
+games/nod-game
 games/gategame
 games/heist-exe
+games/castle-game
 
 # Lessons
 lessons/game-lessons
