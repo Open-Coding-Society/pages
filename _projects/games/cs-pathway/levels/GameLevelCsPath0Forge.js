@@ -315,6 +315,10 @@ class GameLevelCsPath0Forge {
         }
       },
     });
+
+    /**
+     * Enlistment gatekeeper NPC. Guards the Course Enlistment station.
+     */
     const npc_data_courseEnlistmentGatekeeper = createGatekeeperData({
       id: 'CourseEnlistmentGatekeeper',
       greeting: "Welcome to Course Enlistment.\nChoose your pathway and plan your journey.",
@@ -334,6 +338,10 @@ class GameLevelCsPath0Forge {
         await level.runCourseEnlistment(false, this);
       },
     });
+
+    /**
+     * Persona Hall gatekeeper NPC.
+     */
     const npc_data_personaHallGatekeeper = createGatekeeperData({
       id: 'PersonaHallGatekeeper',
       greeting: "Welcome to Persona Hall.\nChoose the CS persona that best matches you.",
@@ -356,6 +364,10 @@ class GameLevelCsPath0Forge {
         await this.profileManager.updateProgress('personaId', result.persona);
       },
     });
+
+    /**
+     * Course Enlistment flow. Run the course enlistment wizard and persist the result.
+     */ 
     this.runCourseEnlistment = async function(showIntro = false, npc = null) {
       if (this._courseEnlistmentOpen) return;
       this._courseEnlistmentOpen = true;
@@ -402,6 +414,10 @@ class GameLevelCsPath0Forge {
         this._courseEnlistmentOpen = false;
       }
     };
+
+    /**
+     * Persona Hall flow. Run the persona selection wizard and persist the result.
+     */
     this.runPersonaHall = async function(showIntro = false, npc = null) {
       if (this._personaHallOpen) return;
       this._personaHallOpen = true;
@@ -443,7 +459,9 @@ class GameLevelCsPath0Forge {
         console.error(err);
         this._personaHallOpen = false;
       }
-    };    /**
+    };    
+    
+    /**
      * Identity terminal flow. Run the authentication and identity registration wizard.
      * @private
      */
@@ -542,8 +560,6 @@ class GameLevelCsPath0Forge {
       await this.updateProfilePanel(profile, { updateIdentityProgress: true });
       return this.profileData;
     };
-
-
 
     /**
      * Avatar gatekeeper NPC. Guards the Avatar Forge station.
@@ -782,6 +798,23 @@ class GameLevelCsPath0Forge {
 
 
     /**
+     * Create notification style. Shared styling for toast and zone alert overlays.
+     * @private
+     */
+    const createNotificationStyle = (top, zIndex) => `
+      position: fixed; top: ${top}; right: 20px;
+      z-index: ${zIndex}; pointer-events: none;
+      background: ${uiTheme.background}; 
+      border: 2px solid ${uiTheme.borderColor};
+      color: ${uiTheme.accentColor}; 
+      font-family: ${uiTheme.fontFamily || "'Courier New', monospace"}; 
+      font-size: 13px;
+      padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
+      box-shadow: ${uiTheme.boxShadow};
+      width: min(360px, 32vw); text-align: left;
+    `;
+
+    /**
      * Show toast. Display a timed status overlay at the top-right of the screen.
      */
     this.showToast = function(message) {
@@ -803,15 +836,7 @@ class GameLevelCsPath0Forge {
       }
 
       const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px;
-        z-index: 1200; pointer-events: none;
-        background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-        color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-        padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-        box-shadow: 0 0 20px rgba(78,204,163,0.25);
-        width: min(360px, 32vw); text-align: left;
-      `;
+      toast.style.cssText = createNotificationStyle('20px', 1200);
       toast.textContent = message;
       host.appendChild(toast);
 
@@ -835,15 +860,7 @@ class GameLevelCsPath0Forge {
 
       if (!this._zoneAlertEl) {
         const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = `
-          position: fixed; top: 84px; right: 20px;
-          z-index: 1201; pointer-events: none;
-          background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-          color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-          padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-          box-shadow: 0 0 20px rgba(78,204,163,0.25);
-          width: min(360px, 32vw); text-align: left;
-        `;
+        zoneAlert.style.cssText = createNotificationStyle('84px', 1201);
         document.body.appendChild(zoneAlert);
         this._zoneAlertEl = zoneAlert;
       }
