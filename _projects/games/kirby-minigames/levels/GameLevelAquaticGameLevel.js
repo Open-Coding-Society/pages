@@ -3424,7 +3424,7 @@ class GameLevelAquaticGameLevel {
                 const now = Date.now();
                 if (!this.bossState.lowHealthSummonStartedAt) {
                     this.bossState.lowHealthSummonStartedAt = now;
-                } else if (now - this.bossState.lowHealthSummonStartedAt >= 10000) {
+                } else if (now - this.bossState.lowHealthSummonStartedAt >= 1000) {
                     summonRushingSharks(1);
                     this.bossState.lowHealthSummonStartedAt = now;
                 }
