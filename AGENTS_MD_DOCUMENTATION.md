@@ -45,6 +45,8 @@ Split logic into clear layers:
 * **Prioritize SASS:** Use SASS (`.scss`) for styling instead of standard CSS or inline styles.
 * **Use `_projects`:** Leverage the modular project auto-registration system in the `_projects/` directory for new projects.
 * **System Expansion:** Work within the existing systems and expand them if needed, rather than creating completely new parallel architectures.
+* **Calendar pages:** Keep layout and modal styling out of `navigation/calendar.md`; use semantic classes and SCSS instead of utility-heavy inline markup.
+* **Cross-origin APIs:** Spring endpoints consumed from `pages.opencodingsociety.com` should explicitly allow credentialed cross-origin requests.
 * **Documentation:** Create detailed documentation for difficult or complex implementations as necessary.
 * **Commenting:** Add comments for non-trivial logic, but keep them minimal and focused on *why* rather than *what*.
 * **Ask Questions:** If system-level constraints, requirements, or patterns are unclear, pause and ask the user questions before proceeding.
@@ -104,7 +106,3 @@ Names should:
 
 ### Hidden Side Effects
 * Ensure predictability by keeping side effects explicit and well-documented.
-
-### Over-engineering
-* **YAGNI (You Aren’t Gonna Need It):** Don’t build features unless required now. Avoid speculative generalization.
-* Optimize only after correctness is guaranteed (Profile before optimizing).

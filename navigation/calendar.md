@@ -44,7 +44,7 @@ active_tab: calendar
             <input id="calendar-filter-end" type="date" title="Filter to date" />
         </label>
     </div>
-    <div id="calendar" class="box-border z-0"></div>
+    <div id="calendar" class="calendar-stage"></div>
 </section>
 
 <section id="dashboard-panel-issues" class="dashboard-panel hidden" role="tabpanel" aria-label="Issues Panel">
@@ -201,41 +201,41 @@ active_tab: calendar
     </div>
 </section>
 <!-- Modal -->
-<div id="eventModal" class="fixed z-[99999] inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm py-4 overflow-y-auto hidden">
-    <div class="relative mx-auto my-4 p-8 rounded-2xl shadow-2xl max-w-xl max-h-[90vh] overflow-y-auto w-full font-sans modal-content">
-        <span class="text-gray-400 absolute right-8 top-6 text-3xl font-bold cursor-pointer transition-colors duration-300 hover:text-red-600" id="closeModal">&times;</span>
-        <div class="modal-body">
-            <h2 id="eventTitle" class="text-4xl font-bold mb-6"></h2>
-            <label for="editEventType" class="block mt-2 mb-1 text-lg font-semibold">Type:</label>
-            <select id="editEventType" disabled class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
+<div id="eventModal" class="calendar-event-modal">
+    <div class="calendar-event-modal-content modal-content">
+        <span class="calendar-event-modal-close" id="closeModal">&times;</span>
+        <div class="calendar-event-modal-body">
+            <h2 id="eventTitle" class="calendar-event-modal-title"></h2>
+            <label for="editEventType" class="calendar-event-modal-label">Type:</label>
+            <select id="editEventType" disabled class="calendar-event-modal-field">
                 <option value="event">Event</option>
                 <option value="appointment">Appointment</option>
             </select>
-            <label for="editDate" class="block mt-2 mb-1 text-lg font-semibold">Date:</label>
-            <p id="editDateDisplay" contentEditable='false' class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4"></p>
-            <input type="date" id="editDate" class="issue-form-date-hidden w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
-            <label for="editTitle" class="block mt-2 mb-1 text-lg font-semibold">Title:</label>
-            <p id="editTitle" contentEditable='false' class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4"></p>
-            <label for="editDescription" class="block mt-2 mb-1 text-lg font-semibold">Description:</label>
-            <p id="editDescription" contentEditable='false' class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4 whitespace-pre-wrap"></p>
-            <label for="editPriority" class="block mt-2 mb-1 text-lg font-semibold">Priority:</label>
-            <select id="editPriority" disabled class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
-                <option value="P0" class="bg-red-200 text-red-900">P0 - Critical</option>
-                <option value="P1" class="bg-orange-200 text-orange-900">P1 - High</option>
-                <option value="P2" class="bg-yellow-200 text-yellow-900" selected>P2 - Medium</option>
-                <option value="P3" class="bg-green-200 text-green-900">P3 - Low</option>
+            <label for="editDate" class="calendar-event-modal-label">Date:</label>
+            <p id="editDateDisplay" contentEditable='false' class="calendar-event-modal-field calendar-event-modal-display"></p>
+            <input type="date" id="editDate" class="calendar-event-modal-field issue-form-date-hidden">
+            <label for="editTitle" class="calendar-event-modal-label">Title:</label>
+            <p id="editTitle" contentEditable='false' class="calendar-event-modal-field calendar-event-modal-display"></p>
+            <label for="editDescription" class="calendar-event-modal-label">Description:</label>
+            <p id="editDescription" contentEditable='false' class="calendar-event-modal-field calendar-event-modal-display calendar-event-modal-description"></p>
+            <label for="editPriority" class="calendar-event-modal-label">Priority:</label>
+            <select id="editPriority" disabled class="calendar-event-modal-field">
+                <option value="P0">P0 - Critical</option>
+                <option value="P1">P1 - High</option>
+                <option value="P2" selected>P2 - Medium</option>
+                <option value="P3">P3 - Low</option>
             </select>
-            <label for="editGroupName" class="block mt-2 mb-1 text-lg font-semibold">Group:</label>
-            <select id="editGroupName" disabled class="w-full p-3 rounded-xl border border-gray-700 text-base box-border mb-4">
+            <label for="editGroupName" class="calendar-event-modal-label">Group:</label>
+            <select id="editGroupName" disabled class="calendar-event-modal-field">
                 <option value="">-- Select Group --</option>
                 <!-- Options populated dynamically from user's groups -->
             </select>
         </div>
-        <div class="modal-actions">
-            <button id="saveButton" class="w-full p-3 bg-red-700 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-red-900 mt-2 hidden">Save Changes</button>
-            <button id="makeBreakButton" class="w-full p-3 bg-yellow-600 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-yellow-800 mt-2 hidden">Make Break</button>
-            <button id="deleteButton" class="w-full p-3 bg-red-700 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-red-900 mt-2">Delete Event</button>
-            <button id="editButton" class="w-full p-3 bg-red-700 rounded-xl text-base font-bold cursor-pointer transition duration-200 hover:bg-red-900 mt-2">Edit Event</button>
+        <div class="calendar-event-modal-actions modal-actions">
+            <button id="saveButton" class="calendar-event-modal-button primary hidden">Save Changes</button>
+            <button id="makeBreakButton" class="calendar-event-modal-button warning hidden">Make Break</button>
+            <button id="deleteButton" class="calendar-event-modal-button danger">Delete Event</button>
+            <button id="editButton" class="calendar-event-modal-button primary">Edit Event</button>
         </div>
     </div>
 </div>
@@ -680,13 +680,19 @@ active_tab: calendar
         document.getElementById('dashboard-panel-issues')?.classList.toggle('hidden', tabName !== 'issues');
         document.getElementById('dashboard-panel-threads')?.classList.toggle('hidden', tabName !== 'threads');
 
-        if (tabName === 'threads') {
+        if (tabName === 'calendar' && calendar) {
+            setTimeout(() => { 
+                const calendarEl = document.getElementById('calendar');
+                if (calendarEl && calendarEl.offsetWidth > 0) {
+                    calendar.render();
+                }
+            }, 100);
+        } else if (tabName === 'threads') {
             renderThreadsPanel();
         }
     }
 
     function switchIssuesSubtab(subtab) {
-        activeIssuesSubtab = subtab;
         document.querySelectorAll('.issues-subtab-btn').forEach(btn => {
             const isActive = btn.dataset.issuesSubtab === subtab;
             btn.classList.toggle('active', isActive);
@@ -1326,7 +1332,8 @@ active_tab: calendar
                     }
                     if (isIssue && !isBreak) {
                         let html = '<div class="fc-event-issue">';
-                        html += '<div class="fc-event-title-custom">' + (event.title || 'Issue') + '</div>';
+                        const titleText = (event.title || 'Issue').replace(/^Issue:\s*/, '');
+                        html += '<div class="fc-event-title-custom" title="' + titleText + '" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + titleText + '</div>';
                         if (ext.author) html += '<div class="fc-event-individual">' + ext.author + '</div>';
                         html += '</div>';
                         return { html };
@@ -1338,8 +1345,8 @@ active_tab: calendar
                     currentEvent = info.event;
                     isAddingNewEvent = false;
                     const isBreak = (currentEvent.extendedProps && currentEvent.extendedProps.isBreak === true) || currentEvent.isBreak === true;
-                    document.getElementById('eventTitle').textContent = currentEvent.title;
-                    document.getElementById('editTitle').innerHTML = isBreak
+                    const isIssue = currentEvent.extendedProps && currentEvent.extendedProps.isIssue === true;
+                    document.getElementById('eventTitle').textContent = isBreak
                         ? ((currentEvent.extendedProps && currentEvent.extendedProps.breakName) || currentEvent.breakName || currentEvent.title)
                         : currentEvent.title;
                     document.getElementById('editDescription').innerHTML = slackToHtml(currentEvent.extendedProps.description || "");
@@ -1351,7 +1358,8 @@ active_tab: calendar
                     document.getElementById("editEventType").disabled = true;
                     document.getElementById("editGroupName").value = currentEvent.extendedProps.groupName || "";
                     document.getElementById("editGroupName").disabled = true;
-                    document.getElementById("eventModal").style.display = "block";
+                    document.getElementById("eventModal")?.classList.add('open');
+                    document.getElementById("eventModal").dataset.isIssue = isIssue ? "true" : "false";
                     const isSchoolHoliday = currentEvent.extendedProps && currentEvent.extendedProps.isSchoolHoliday === true;
                     if (isBreak) {
                         document.getElementById("makeBreakButton").style.display = "none";
@@ -1363,6 +1371,10 @@ active_tab: calendar
                             document.getElementById("deleteButton").style.display = "inline-block";
                             document.getElementById("editButton").style.display = "inline-block";
                         }
+                    } else if (isIssue) {
+                        document.getElementById("deleteButton").style.display = "inline-block";
+                        document.getElementById("editButton").style.display = "none";
+                        document.getElementById("eventModal").dataset.isBreak = "false";
                     } else {
                         document.getElementById("deleteButton").style.display = "inline-block";
                         document.getElementById("editButton").style.display = "inline-block";
@@ -1403,7 +1415,7 @@ active_tab: calendar
                     document.getElementById("editGroupName").value = "";
                     document.getElementById('editDateDisplay').textContent = formatDisplayDate(info.date);
                     document.getElementById('editDate').value = selectedDate;
-                    document.getElementById("eventModal").style.display = "block";
+                    document.getElementById("eventModal")?.classList.add('open');
                     document.getElementById("deleteButton").style.display = "none";
                     document.getElementById("editButton").style.display = "none";
                     document.getElementById("saveButton").style.display = "inline-block";
@@ -1445,7 +1457,7 @@ active_tab: calendar
                             type: selectedType,
                             individual: selectedType === 'appointment' ? currentUserName : ''
                         };
-                        document.getElementById("eventModal").style.display = "none";
+                        document.getElementById("eventModal")?.classList.remove('open');
                         fetch(`${javaURI}/api/calendar/add_event`, {
                             ...fetchOptions,
                             method: "POST",
@@ -1488,7 +1500,7 @@ active_tab: calendar
             document.getElementById('editDateDisplay').style.display = 'block';
             document.getElementById('editDate').style.display = 'none';
             document.getElementById("saveButton").style.display = "none";
-            document.getElementById("eventModal").style.display = "none";
+            document.getElementById("eventModal")?.classList.remove('open');
             document.getElementById("editTitle").contentEditable = false;
             document.getElementById("editDescription").contentEditable = false;
             document.getElementById("editPriority").disabled = true;
@@ -1531,7 +1543,7 @@ active_tab: calendar
                     body: JSON.stringify({ name: updatedTitle, description: updatedDescription }),
                 })
                 .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error(`Failed: ${r.status}`); return r.json(); })
-                .then(d => { if (!d) return; document.getElementById("eventModal").style.display = "none"; handleRequest(); })
+                .then(d => { if (!d) return; document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
                 .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to update break.\n\n" + e.message); } });
             } else {
                 const updatedPriority = document.getElementById("editPriority").value;
@@ -1555,7 +1567,7 @@ active_tab: calendar
                         ...fetchOptions, method: "POST", body: JSON.stringify(payload),
                     })
                     .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error(`Failed: ${r.status}`); return r.json(); })
-                    .then(d => { if (!d) return; document.getElementById("eventModal").style.display = "none"; handleRequest(); })
+                    .then(d => { if (!d) return; document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
                     .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to add event.\n\n" + e.message); } });
                 } else {
                     // Derive period (course) from the selected group so backend validation passes
@@ -1584,7 +1596,7 @@ active_tab: calendar
                         ...fetchOptions, method: "PUT", body: JSON.stringify(payload),
                     })
                     .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error(`Failed: ${r.status}`); return r.text(); })
-                    .then(d => { if (d === undefined) return; document.getElementById("eventModal").style.display = "none"; handleRequest(); })
+                    .then(d => { if (d === undefined) return; document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
                     .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to update event.\n\n" + e.message); } });
                 }
             }
@@ -1612,12 +1624,14 @@ active_tab: calendar
         document.getElementById("deleteButton").onclick = function () {
             if (!currentEvent) return;
             const isBreak = document.getElementById("eventModal").dataset.isBreak === "true";
-            const id = currentEvent.id;
+            const isIssue = currentEvent.extendedProps && currentEvent.extendedProps.isIssue === true;
+            let id = currentEvent.id;
+            if (isIssue) id = id.replace(/^issue-/, '');
             if (!confirm(`Are you sure you want to delete "${currentEvent.title}"?`)) return;
-            const endpoint = isBreak ? `${javaURI}/api/calendar/breaks/${id}` : `${javaURI}/api/calendar/delete/${id}`;
+            const endpoint = isBreak ? `${javaURI}/api/calendar/breaks/${id}` : isIssue ? `${javaURI}/api/calendar/issues/${id}` : `${javaURI}/api/calendar/delete/${id}`;
             fetch(endpoint, { ...fetchOptions, method: "DELETE" })
             .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error(`Failed: ${r.status}`); return r.text(); })
-            .then(d => { if (d === undefined) return; currentEvent.remove(); document.getElementById("eventModal").style.display = "none"; handleRequest(); })
+            .then(d => { if (d === undefined) return; currentEvent.remove(); document.getElementById("eventModal")?.classList.remove('open'); handleRequest(); })
             .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to delete.\n\n" + e.message); } });
         };
 
@@ -1640,7 +1654,7 @@ active_tab: calendar
             .then(result => {
                 if (!result) return;
                 alert("Break day created. Events moved to next non-break day.");
-                document.getElementById("eventModal").style.display = "none";
+                document.getElementById("eventModal")?.classList.remove('open');
                 handleRequest();
             })
             .catch(e => { if (!handleFetchError(e)) { console.error(e); alert("Failed to create break.\n\n" + e.message); } });
@@ -1929,6 +1943,7 @@ active_tab: calendar
 
             wireContainerActions(el.list);
             wireContainerActions(el.kanban);
+            wireContainerActions(document.getElementById('threads-list'));
 
             issueModalCloseBtn?.addEventListener('click', () => closeIssueModal(true));
             issueModal?.addEventListener('click', (event) => {
