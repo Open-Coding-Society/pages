@@ -184,7 +184,6 @@ export default class GameUI {
         // Check if modal already exists
         if (document.getElementById("cheatsModal")) {
             document.getElementById("cheatsModal").style.display = "flex";
-            this._hideControlPanel();
             return;
         }
         
@@ -254,22 +253,13 @@ export default class GameUI {
         modalContent.appendChild(closeButton);
         modal.appendChild(modalContent);
         
-        // Add modal to game container
-        const gameContainer = this._getGameContainer();
-        if (gameContainer) {
-            gameContainer.appendChild(modal);
-        } else {
-            document.body.appendChild(modal);
-        }
-        
-        // Hide control panel text
-        this._hideControlPanel();
+        // Add modal to document
+        document.body.appendChild(modal);
         
         // Close modal when clicking outside
         modal.onclick = (e) => {
             if (e.target === modal) {
                 modal.style.display = "none";
-                this._showControlPanel();
             }
         };
         
@@ -283,7 +273,6 @@ export default class GameUI {
         // Check if modal already exists
         if (document.getElementById("infoModal")) {
             document.getElementById("infoModal").style.display = "flex";
-            this._hideControlPanel();
             return;
         }
 
@@ -331,22 +320,13 @@ export default class GameUI {
         modalContent.appendChild(closeButton);
         modal.appendChild(modalContent);
         
-        // Add modal to game container
-        const gameContainer = this._getGameContainer();
-        if (gameContainer) {
-            gameContainer.appendChild(modal);
-        } else {
-            document.body.appendChild(modal);
-        }
-        
-        // Hide control panel text
-        this._hideControlPanel();
+        // Add modal to document
+        document.body.appendChild(modal);
         
         // Close modal when clicking outside
         modal.onclick = (e) => {
             if (e.target === modal) {
                 modal.style.display = "none";
-                this._showControlPanel();
             }
         };
         
@@ -358,38 +338,5 @@ export default class GameUI {
      */
     getControlsContainer() {
         return this.controlsContainer;
-    }
-
-    /**
-     * Find the game container element
-     * @private
-     */
-    _getGameContainer() {
-        // Try to find game container - look for elements with gameContainer class
-        // or any div that's a parent of canvas elements
-        const containers = document.querySelectorAll('.gameContainer, [id*="game-container"]');
-        return containers.length > 0 ? containers[0] : null;
-    }
-
-    /**
-     * Hide the control panel text
-     * @private
-     */
-    _hideControlPanel() {
-        const controlPanel = document.querySelector('.control-panel');
-        if (controlPanel) {
-            controlPanel.style.display = 'none';
-        }
-    }
-
-    /**
-     * Show the control panel text
-     * @private
-     */
-    _showControlPanel() {
-        const controlPanel = document.querySelector('.control-panel');
-        if (controlPanel) {
-            controlPanel.style.display = '';
-        }
     }
 }
