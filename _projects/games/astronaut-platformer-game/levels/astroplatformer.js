@@ -112,10 +112,103 @@ this._movingPlatVelX = 0;       // moving platform's velocity this frame
 this._lives          = 3;
 this._coins          = 0;
 
-const GRAVITY    = 0.52  * scaleY;
-const JUMP_FORCE = -11   * scaleY;
-const MOVE_SPEED = 3.8   * scaleX;
-const MAX_FALL   = 15    * scaleY;
+const baseLayout = {
+  width:  baseWidth,
+  height: baseHeight,
+  playerStart: { x: 30, y: 320 },
+  flag: { x: 540, y: 18 },
+  movingPlat: { id:'p3_move', x:310, y:200, w:80, h:12, color:'#ff44aa', minX:300, maxX:470, spd:1.4 },
+  platforms: [
+    { id:'ground',  x:0,   y:370, w:650, h:30, color:'#2a5a2a' },
+    { id:'wall_l',  x:0,   y:0,   w:10,  h:400, color:'#1a3a1a' },
+    { id:'wall_r',  x:640, y:0,   w:10,  h:400, color:'#1a3a1a' },
+    { id:'ceil',    x:0,   y:0,   w:650, h:8,   color:'#1a3a1a' },
+    { id:'p1',      x:40,  y:290, w:120, h:12,  color:'#4a9eff' },
+    { id:'p2',      x:190, y:230, w:120, h:12,  color:'#4a9eff' },
+    { id:'p4',      x:490, y:155, w:100, h:12,  color:'#ff9944' },
+    { id:'p5',      x:330, y:105, w:130, h:12,  color:'#4a9eff' },
+    { id:'p6',      x:150, y:60,  w:130, h:12,  color:'#ff9944' },
+    { id:'goal',    x:500, y:60,  w:125, h:12,  color:'#c8a84b' },
+  ],
+  spikes: [
+    { x:355, y:350, w:20, h:20 },
+    { x:385, y:350, w:20, h:20 },
+    { x:415, y:350, w:20, h:20 },
+    { x:445, y:350, w:20, h:20 },
+    { x:475, y:350, w:20, h:20 },
+  ],
+  coins: [
+    { id:'coin_p1',   x:90,  y:268 },
+    { id:'coin_p2',   x:240, y:208 },
+    { id:'coin_move', x:375, y:178 },
+    { id:'coin_p4',   x:525, y:133 },
+    { id:'coin_p5',   x:385, y:83  },
+    { id:'coin_p6',   x:195, y:38  },
+    { id:'coin_goal', x:555, y:38  },
+  ],
+};
+
+const scalePlatform = (source, sx, sy) => ({
+  id: source.id,
+  color: source.color,
+  sx: source.x * sx,
+  sy: source.y * sy,
+  sw: source.w * sx,
+  sh: source.h * sy,
+  base: source,
+});
+const scaleSpike = (source, sx, sy) => ({
+  x: source.x * sx,
+  y: source.y * sy,
+  w: source.w * sx,
+  h: source.h * sy,
+  killY: (source.y + source.h * 0.4) * sy,
+  base: source,
+});
+const scaleCoin = (source, sx, sy) => ({
+  id: source.id,
+  x: source.x * sx,
+  y: source.y * sy,
+  w: 14 * sx,
+  h: 14 * sy,
+  value: 1,
+  collected: false,
+  interact: function () {
+    if (!this.collected) {
+      this.collected = true;
+      const savedCoins = parseInt(localStorage.getItem('coinsCollected') || '0') || 0;
+      const newTotal = savedCoins + this.value;
+      localStorage.setItem('coinsCollected', newTotal);
+      if (!gameEnv.stats) gameEnv.stats = {};
+      gameEnv.stats.coinsCollected = newTotal;
+      console.log(`Coin collected! Total coins: ${newTotal}`);
+    }
+  },
+  base: source,
+});
+
+const rebuildLayout = (sx, sy) => {
+  this._scaleX = sx;
+  this._scaleY = sy;
+  this._gravity   = 0.52 * sy;
+  this._jumpForce = -11 * sy;
+  this._moveSpeed = 3.8 * sx;
+  this._maxFall   = 15 * sy;
+
+  this._platforms = baseLayout.platforms.map(p => scalePlatform(p, sx, sy));
+  this._movingPlat = scalePlatform(baseLayout.movingPlat, sx, sy);
+  this._movingDir = this._movingDir || 1;
+  this._movingMinX = baseLayout.movingPlat.minX * sx;
+  this._movingMaxX = baseLayout.movingPlat.maxX * sx;
+  this._movingSpd = baseLayout.movingPlat.spd * sx;
+  this._spikes = baseLayout.spikes.map(s => scaleSpike(s, sx, sy));
+  this._coinPositions = baseLayout.coins.map(c => scaleCoin(c, sx, sy));
+  this._flagX = baseLayout.flag.x * sx;
+  this._flagY = baseLayout.flag.y * sy;
+  this._playerStart = { x: baseLayout.playerStart.x * sx, y: baseLayout.playerStart.y * sy };
+};
+
+rebuildLayout(scaleX, scaleY);
 
 // ── Key state ─────────────────────────────────────────────────────────────
 const keys = { w:false, a:false, d:false, space:false };
@@ -134,13 +227,6 @@ this._keyUp = e => {
 document.addEventListener('keydown', this._keyDown);
 document.addEventListener('keyup',   this._keyUp);
 
-// ── Platform builder ───────────────────────────────────────────────────────
-const plat = (id, x, y, w, h=12, color='#4a9eff') => ({
-  id, color,
-  sx: x*scaleX, sy: y*scaleY,
-  sw: w*scaleX, sh: h*scaleY,
-});
-
 // ── STATIC PLATFORMS ───────────────────────────────────────────────────────
 //  Route flows: START → p1 → p2 → moving p3 → p4 → p5 → p6 → GOAL
 //  Every jump gap is ≤ 120px on base grid (very jumpable).
@@ -157,79 +243,19 @@ const plat = (id, x, y, w, h=12, color='#4a9eff') => ({
 //    goal:   500–625  jump right from p6: ~220px — requires a running jump!
 //            (this is the skill challenge at the end)
 
-this._platforms = [
-  plat('ground', 0,   370, 650, 30, '#2a5a2a'),   // full floor
-  plat('wall_l', 0,   0,   10,  400,'#1a3a1a'),   // left wall
-  plat('wall_r', 640, 0,   10,  400,'#1a3a1a'),   // right wall
-  plat('ceil',   0,   0,   650, 8,  '#1a3a1a'),   // ceiling
-
-  plat('p1',   40,  290, 120, 12, '#4a9eff'),     // first step up
-  plat('p2',  190,  230, 120, 12, '#4a9eff'),     // second step
-  // p3 is the moving platform — defined separately below
-  plat('p4',  490,  155, 100, 12, '#ff9944'),     // after moving plat
-  plat('p5',  330,  105, 130, 12, '#4a9eff'),     // step back left and up
-  plat('p6',  150,   60, 130, 12, '#ff9944'),     // high left
-  plat('goal',500,   60, 125, 12, '#c8a84b'),     // goal shelf (right side)
-];
-
 // ── MOVING PLATFORM ────────────────────────────────────────────────────────
 // Oscillates between x=300 and x=470 (base grid)
-this._movingPlat = plat('p3_move', 310, 200, 80, 12, '#ff44aa');
-this._movingDir  = 1;
-this._movingMinX = 300 * scaleX;
-this._movingMaxX = 470 * scaleX;
-this._movingSpd  = 1.4 * scaleX;  // px per frame
 
 // ── SPIKES ─────────────────────────────────────────────────────────────────
 // All on the ground between the pit and p4.
 // Player MUST platform over this zone — no walking through.
 // Stored in scaled pixels. Hitbox is the bottom 60% of the triangle
 // (the wide base) — that's what actually stabs you.
-this._spikes = [
-  { x:355, y:350, w:20, h:20 },
-  { x:385, y:350, w:20, h:20 },
-  { x:415, y:350, w:20, h:20 },
-  { x:445, y:350, w:20, h:20 },
-  { x:475, y:350, w:20, h:20 },
-].map(s => ({
-  x: s.x * scaleX,
-  // hitbox top = bottom 60% of the triangle (pointy tip is at top, base at bottom)
-  y: s.y * scaleY,
-  w: s.w * scaleX,
-  h: s.h * scaleY,
-  // The actual kill zone is just the bottom half — tip is cosmetic
-  killY: (s.y + s.h * 0.4) * scaleY,
-}));
 
 // ── COINS ──────────────────────────────────────────────────────────────────
-this._coinPositions = [
-  { id:'coin_p1', x:90,  y:268 },   // above p1
-  { id:'coin_p2', x:240, y:208 },   // above p2
-  { id:'coin_move', x:375, y:178 }, // above moving platform zone
-  { id:'coin_p4', x:525, y:133 },   // above p4
-  { id:'coin_p5', x:385, y: 83 },   // above p5
-  { id:'coin_p6', x:195, y: 38 },   // above p6
-  { id:'coin_goal', x:555, y: 38 }, // on goal shelf
-].map(c => ({
-  id: c.id,
-  x: c.x * scaleX, y: c.y * scaleY,
-  w: 14 * scaleX,  h: 14 * scaleY,
-  value: 1,
-  collected: false,
-  interact: function () {
-    if (!this.collected) {
-      this.collected = true;
-      const coinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
-      const newTotal = coinsCollected + this.value;
-      localStorage.setItem('coinsCollected', newTotal);
-      console.log(`Coin collected! Total coins: ${newTotal}`);
-    }
-  },
-}));
 
 // Flag position (on goal shelf)
-this._flagX = 540 * scaleX;
-this._flagY =  18 * scaleY;
+// _flagX and _flagY are set by rebuildLayout()
 
 // ── Background ────────────────────────────────────────────────────────────
 const bgData = {
@@ -289,7 +315,9 @@ this.initialize = () => {
   if (!container) return;
 
   gameEnv.stats = gameEnv.stats || {};
-  gameEnv.stats.coinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
+  const storedCoins = parseInt(localStorage.getItem('coinsCollected') || '0') || 0;
+  gameEnv.stats.coinsCollected = storedCoins;
+  this._coins = 0;
 
   this._leaderboard = window.leaderboardInstance || new Leaderboard(gameEnv.gameControl, {
     gameName: 'astronaut-platformer-game',
@@ -301,7 +329,8 @@ this.initialize = () => {
     gameEnv
       .initScoreManager()
       .then((sm) => {
-        if (sm && typeof sm.toggleScoreDisplay === 'function') {
+        if (sm && typeof sm.updateScoreDisplay === 'function') {
+          sm.updateScoreDisplay(gameEnv.stats.coinsCollected);
           sm.toggleScoreDisplay();
         }
       })
@@ -410,6 +439,7 @@ this.initialize = () => {
   });
   container.appendChild(pitEl);
   this._overlays.push(pitEl);
+  this._pitEl = pitEl;
 
   // ── Draw flag ──────────────────────────────────────────────────────────
   const pole = document.createElement('div');
@@ -422,6 +452,7 @@ this.initialize = () => {
   });
   container.appendChild(pole);
   this._overlays.push(pole);
+  this._flagPoleEl = pole;
 
   const banner = document.createElement('div');
   Object.assign(banner.style, {
@@ -437,6 +468,7 @@ this.initialize = () => {
   });
   container.appendChild(banner);
   this._overlays.push(banner);
+  this._flagBannerEl = banner;
 
   const goalLbl = document.createElement('div');
   Object.assign(goalLbl.style, {
@@ -452,6 +484,7 @@ this.initialize = () => {
   goalLbl.textContent = 'GOAL';
   container.appendChild(goalLbl);
   this._overlays.push(goalLbl);
+  this._flagGoalLabelEl = goalLbl;
 
   // ── Connect Coin.js objects to the custom platformer collision boxes ───
   for (const c of this._coinPositions) {
@@ -465,6 +498,113 @@ this.initialize = () => {
       coinObject.canvas.style.pointerEvents = 'none';
     }
   }
+
+  this.resize = () => {
+    const newScaleX = gameEnv.innerWidth / baseWidth;
+    const newScaleY = gameEnv.innerHeight / baseHeight;
+    if (newScaleX === this._scaleX && newScaleY === this._scaleY) return;
+
+    const ratioX = newScaleX / this._scaleX;
+    const ratioY = newScaleY / this._scaleY;
+    rebuildLayout(newScaleX, newScaleY);
+
+    const top = gameEnv.top || 0;
+
+    for (const p of this._platforms) {
+      if (p._el) {
+        Object.assign(p._el.style, {
+          left: p.sx + 'px',
+          top: (top + p.sy) + 'px',
+          width: p.sw + 'px',
+          height: p.sh + 'px',
+        });
+      }
+    }
+
+    if (this._movingPlat._el) {
+      Object.assign(this._movingPlat._el.style, {
+        left: this._movingPlat.sx + 'px',
+        top: (top + this._movingPlat.sy) + 'px',
+        width: this._movingPlat.sw + 'px',
+        height: this._movingPlat.sh + 'px',
+      });
+    }
+    if (this._movingPlat._lblEl) {
+      this._movingPlat._lblEl.style.left = this._movingPlat.sx + 'px';
+      this._movingPlat._lblEl.style.top = (top + this._movingPlat.sy - 18 * this._scaleY) + 'px';
+    }
+
+    for (const sp of this._spikes) {
+      if (sp._el) {
+        Object.assign(sp._el.style, {
+          left: sp.x + 'px',
+          top: (top + sp.y) + 'px',
+          width: sp.w + 'px',
+          height: sp.h + 'px',
+        });
+      }
+    }
+
+    if (this._pitEl) {
+      Object.assign(this._pitEl.style, {
+        left: (250 * this._scaleX) + 'px',
+        top: (top + 340 * this._scaleY) + 'px',
+        width: (80 * this._scaleX) + 'px',
+        height: (32 * this._scaleY) + 'px',
+      });
+    }
+
+    if (this._flagPoleEl) {
+      Object.assign(this._flagPoleEl.style, {
+        left: this._flagX + 'px',
+        top: (top + this._flagY) + 'px',
+        width: (3 * this._scaleX) + 'px',
+        height: (42 * this._scaleY) + 'px',
+      });
+    }
+    if (this._flagBannerEl) {
+      Object.assign(this._flagBannerEl.style, {
+        left: (this._flagX + 3 * this._scaleX) + 'px',
+        top: (top + this._flagY) + 'px',
+        width: (24 * this._scaleX) + 'px',
+        height: (16 * this._scaleY) + 'px',
+      });
+    }
+    if (this._flagGoalLabelEl) {
+      Object.assign(this._flagGoalLabelEl.style, {
+        left: (this._flagX - 8 * this._scaleX) + 'px',
+        top: (top + this._flagY + 46 * this._scaleY) + 'px',
+        width: (50 * this._scaleX) + 'px',
+        fontSize: Math.round(7 * Math.min(this._scaleX, this._scaleY)) + 'px',
+      });
+    }
+
+    if (this._hud) {
+      this._hud.style.fontSize = Math.round(10 * Math.min(this._scaleX, this._scaleY)) + 'px';
+    }
+    if (this._movingPlat._lblEl) {
+      this._movingPlat._lblEl.style.fontSize = Math.round(6 * Math.min(this._scaleX, this._scaleY)) + 'px';
+    }
+
+    for (const c of this._coinPositions) {
+      if (c._coinObject) {
+        c._coinObject.position.x = c.x;
+        c._coinObject.position.y = c.y;
+        if (typeof c._coinObject.resize === 'function') {
+          c._coinObject.resize();
+        }
+      }
+    }
+
+    const player = gameEnv.gameObjects.find(o => o instanceof Player);
+    if (player) {
+      player.position.x *= ratioX;
+      player.position.y *= ratioY;
+      if (typeof player.resize === 'function') {
+        player.resize();
+      }
+    }
+  };
 
   // ── HUD ────────────────────────────────────────────────────────────────
   const hud = document.createElement('div');
@@ -529,20 +669,20 @@ this.initialize = () => {
     }
 
     // ── 2. Horizontal input ─────────────────────────────────────────────────
-    if      (keys.a) self._vx = -MOVE_SPEED;
-    else if (keys.d) self._vx =  MOVE_SPEED;
+    if      (keys.a) self._vx = -this._moveSpeed;
+    else if (keys.d) self._vx =  this._moveSpeed;
     else             self._vx =  0;
 
     // ── 3. Jump ─────────────────────────────────────────────────────────────
     if ((keys.w || keys.space) && self._onGround && self._canJump) {
-      self._vy     = JUMP_FORCE;
+      self._vy     = this._jumpForce;
       self._onGround = false;
       self._canJump  = false;
     }
     if (!keys.w && !keys.space) self._canJump = true;
 
     // ── 4. Gravity ──────────────────────────────────────────────────────────
-    self._vy = Math.min(self._vy + GRAVITY, MAX_FALL);
+    self._vy = Math.min(self._vy + this._gravity, this._maxFall);
 
     // ── 5. Proposed position ────────────────────────────────────────────────
     let nx = px + self._vx;
@@ -629,19 +769,15 @@ this.initialize = () => {
       if (c.collected) continue;
       if (pcx > c.x && pcx < c.x+c.w && pcy > c.y && pcy < c.y+c.h) {
         c.collected = true;
-        // Call the coin's interact function to update localStorage
-        if (typeof c.interact === 'function') {
+        if (c._coinObject) {
+          c._coinObject.collect();
+        } else if (typeof c.interact === 'function') {
           c.interact();
         }
-        // Visual feedback from the coin object if it exists
-        if (c._coinObject) {
-          c._coinObject.collected = true;
-          c._coinObject.collect();
-        }
         self._coins += c.value;
-        gameEnv.stats.coinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
+        const totalCoins = gameEnv.stats.coinsCollected || 0;
         if (gameEnv.scoreManager?.updateScoreDisplay) {
-          gameEnv.scoreManager.updateScoreDisplay(gameEnv.stats.coinsCollected);
+          gameEnv.scoreManager.updateScoreDisplay(totalCoins);
         }
         self._updateHud();
       }
@@ -649,7 +785,7 @@ this.initialize = () => {
 
     // ── 11. Goal flag ────────────────────────────────────────────────────────
     const fx = self._flagX, fy = self._flagY;
-    if (pcx > fx-14*scaleX && pcx < fx+30*scaleX && pcy > fy && pcy < fy+58*scaleY) {
+    if (pcx > fx-14*this._scaleX && pcx < fx+30*this._scaleX && pcy > fy && pcy < fy+58*this._scaleY) {
       self._winLevel();
       return;
     }
@@ -714,7 +850,10 @@ this._die = (reason) => {
   setTimeout(()=>{ flash.remove(); }, 500);
 
   const player = gameEnv.gameObjects.find(o => o instanceof Player);
-  if (player) { player.position.x = 30*scaleX; player.position.y = 320*scaleY; }
+  if (player) {
+    player.position.x = this._playerStart?.x ?? player.position.x;
+    player.position.y = this._playerStart?.y ?? player.position.y;
+  }
   this._vy = 0; this._vx = 0; this._onGround = false;
 };
 
