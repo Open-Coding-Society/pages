@@ -11,10 +11,9 @@ class FixedPlatformerCoin extends Coin {
 
   collect() {
     if (this.collected) return;
+    this.collected = true;  // Mark as collected first to prevent re-triggering
     if (typeof this.interact === 'function') {
       this.interact.call(this);
-    } else {
-      this.collected = true;
     }
     if (this.canvas) {
       this.canvas.style.opacity = '0';
@@ -629,12 +628,16 @@ this.initialize = () => {
     for (const c of self._coinPositions) {
       if (c.collected) continue;
       if (pcx > c.x && pcx < c.x+c.w && pcy > c.y && pcy < c.y+c.h) {
-        if (c._coinObject) {
-          c._coinObject.collect();
-        } else {
+        c.collected = true;
+        // Call the coin's interact function to update localStorage
+        if (typeof c.interact === 'function') {
           c.interact();
         }
-        c.collected = true;
+        // Visual feedback from the coin object if it exists
+        if (c._coinObject) {
+          c._coinObject.collected = true;
+          c._coinObject.collect();
+        }
         self._coins += c.value;
         gameEnv.stats.coinsCollected = parseInt(localStorage.getItem('coinsCollected') || '0');
         if (gameEnv.scoreManager?.updateScoreDisplay) {
