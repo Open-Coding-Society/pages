@@ -516,62 +516,24 @@ class GameLevelSeek {
 
         const primaryGame = this.gameEnv?.gameControl;
         const topGame = primaryGame?.parentControl || primaryGame;
-        if (!primaryGame || !topGame) {
+        if (!topGame?.transitionToLevel) {
             console.warn('Seek could not transition to Basketball because the game control chain is missing.');
             return;
         }
 
-        const fade = document.createElement('div');
-        Object.assign(fade.style, {
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: '#000',
-            opacity: '0',
-            transition: 'opacity 0.8s ease-in-out',
-            zIndex: '9999',
-            pointerEvents: 'none'
-        });
-        document.body.appendChild(fade);
+        const basketballIndex = Array.isArray(topGame.levelClasses)
+            ? topGame.levelClasses.findIndex((LevelClass) => LevelClass === GameLevelBasketball)
+            : -1;
 
-        requestAnimationFrame(() => {
-            fade.style.opacity = '1';
-            setTimeout(() => {
-                try {
-                    if (primaryGame.currentLevel && typeof primaryGame.currentLevel.destroy === 'function') {
-                        primaryGame.currentLevel.destroy();
-                    }
-                    primaryGame.currentLevel = null;
-                    primaryGame._loopRunning = false;
-                    primaryGame.isPaused = true;
-                } catch (err) {
-                    console.warn('Seek could not fully tear down before Basketball transition:', err);
-                }
+        if (basketballIndex >= 0) {
+            topGame.currentLevelIndex = basketballIndex;
+        } else {
+            topGame.levelClasses = [GameLevelBasketball];
+            topGame.currentLevelIndex = 0;
+        }
 
-                const gameContainer = document.getElementById('gameContainer');
-                if (gameContainer) {
-                    Array.from(gameContainer.children).forEach((child) => {
-                        if (child.id !== 'promptDropDown') {
-                            gameContainer.removeChild(child);
-                        }
-                    });
-                }
-
-                topGame.levelClasses = [GameLevelBasketball];
-                topGame.currentLevelIndex = 0;
-                topGame.isPaused = false;
-                topGame.transitionToLevel();
-
-                setTimeout(() => {
-                    fade.style.opacity = '0';
-                    setTimeout(() => {
-                        if (fade.parentNode) fade.parentNode.removeChild(fade);
-                    }, 800);
-                }, 400);
-            }, 800);
-        });
+        topGame.isPaused = false;
+        topGame.transitionToLevel();
     }
 
     destroy() {
