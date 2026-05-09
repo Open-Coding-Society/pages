@@ -241,7 +241,7 @@ description: Here are the activities. Hover over image for more details
       title: "Yard Cleanup/Backpacking",
       shortDesc: "Bless Your Fellow Man, Outdoor Skills",
       hoverDesc: "Help someone in the community with spring yard cleanup. Learn backpacking skills",
-      date: "May 12 - Claudia Hernandex (John), Backpacking (Justin)"
+      date: "May 12 - 6:45pm Claudia Hernandez (John), Backpacking (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/A_simple_campfire.jpg/2560px-A_simple_campfire.jpg",
@@ -249,7 +249,7 @@ description: Here are the activities. Hover over image for more details
       title: "Hiking & Outdoors Activities",
       shortDesc: "Outdoor Adventure",
       hoverDesc: "Setup camp, learn campfire safety, how to cook delicious meals in nature, hiking, milling, offroad, and how to enjoy the great outdoors under the stars!",
-      date: "Saturday May 23, 10-2 - Julian (John)"
+      date: "Saturday May 23, 10-2:30 - Julian (John)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg/1280px-An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg",
