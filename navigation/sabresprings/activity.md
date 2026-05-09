@@ -233,7 +233,7 @@ description: Here are the activities. Hover over image for more details
       title: "Compass Navigation",
       shortDesc: "Find Your Way",
       hoverDesc: "Learn to use a compass and map! Discover navigation skills for hiking and outdoor adventures.",
-      date: "Apr 28 - Church (Justin)"
+      date: "Apr 28 - South Creek Park (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/6/61/Overgrown_yard_-_geograph.org.uk_-_964505.jpg",
