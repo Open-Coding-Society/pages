@@ -237,17 +237,11 @@ description: Here are the activities. Hover over image for more details
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/6/61/Overgrown_yard_-_geograph.org.uk_-_964505.jpg",
-      title: "Yard Cleanup",
-      shortDesc: "Bless Your Fellow Man",
-      hoverDesc: "Help someone in the community with spring yard cleanup. Service project with lunch included!",
-      date: "May 12 - Mara Ogle (John)"
-    },
-    {
-      image: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Backpacking_supplies_%28pack%2C_tent%2C_sleeping_pad%2C_and_bear_box%29_at_Panhandle_Gap.jpg",
-      title: "Backpacking Prep",
-      shortDesc: "Outdoor Skills",
-      hoverDesc: "Learn essential backpacking and hiking skills. Perfect time to prepare for summer adventures!",
-      date: "May 12 - Backpacking (Justin)"
+      image2: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Backpacking_supplies_%28pack%2C_tent%2C_sleeping_pad%2C_and_bear_box%29_at_Panhandle_Gap.jpg",
+      title: "Yard Cleanup/Backpacking",
+      shortDesc: "Bless Your Fellow Man, Outdoor Skills",
+      hoverDesc: "Help someone in the community with spring yard cleanup. Learn backpacking skills",
+      date: "May 12 - Claudia Hernandex (John), Backpacking (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/A_simple_campfire.jpg/2560px-A_simple_campfire.jpg",
