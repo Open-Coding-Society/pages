@@ -32,8 +32,8 @@
  *   GameStats.completeGame(zoneCatchRound);
  */
 
-import NameEntry from '@assets/js/GameEnginev1.1/essentials/NameEntry.js';
-import GameLeaderboard from '@assets/js/GameEnginev1.1/essentials/GameLeaderboard.js';
+import NameEntry from '@assets/js/GameEnginev1.1/NameEntry.js';
+import GameLeaderboard from '@assets/js/GameEnginev1.1/GameLeaderboard.js';
 
 const MAX_LIVES = 3;
 const STORAGE_KEY_NAME = 'gategame_player_name';

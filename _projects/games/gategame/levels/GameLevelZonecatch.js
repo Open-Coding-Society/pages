@@ -4,7 +4,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
-import GameStats from '@assets/js/GameEnginev1.1/essentials/GameStats.js';
+import GameStats from '@assets/js/GameEnginev1.1/GameStats.js';
 import Coin from '@assets/js/GameEnginev1.1/Coin.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -153,7 +153,7 @@ class ZoneCatchOverlay {
 
         const spriteData = {
             id: 'Zone Catch Referee',
-            src: path + "@assets/js/projects/gategame/images/sprites/mastergate.png",
+            src: path + "/images/projects/gategame/sprites/mastergate.png",
             pixels: { height: 512, width: 512 },
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
@@ -1174,13 +1174,13 @@ class GameLevelZonecatch {
 
         const bgData = {
             name: "custom_bg",
-            src:  path + "@assets/js/projects/gategame/images/bg/SciFiConsole.png",
+            src:  path + "/images/projects/gategame/bg/SciFiConsole.png",
             pixels: { height: 772, width: 1134 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: path + "@assets/js/projects/gategame/images/sprites/slime.png",
+            src: path + "/images/projects/gategame/sprites/slime.png",
             SCALE_FACTOR: 7, 
             STEP_FACTOR: 1400,
             ANIMATION_RATE: 50,
@@ -1204,7 +1204,7 @@ class GameLevelZonecatch {
 
         const t = 48;
         const makeWall = (name, x, y, w, h) => ({
-            name, src: path + "@assets/js/projects/gategame/images/bg/SciFiConsole.png",
+            name, src: path + "/images/projects/gategame/bg/SciFiConsole.png",
             SCALE_FACTOR: 1, pixels: { height: 1, width: 1 },
             INIT_POSITION: { x, y }, width: w, height: h, isBarrier: true
         });
