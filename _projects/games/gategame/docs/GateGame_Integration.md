@@ -5,7 +5,17 @@ permalink: /gamify/gategame-integration
 description: A breakdown of how localStorage, collision mechanics, and platformer gravity were integrated across all three Gate Game levels, plus the full ZoneCatch Platformer Edition revamp.
 type: plans
 ---
-
+```javascript
+// GAME_RUNNER: CSSE Zone Game | hide_edit: true, width: 100%, height: 500px
+ 
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
+import GameLevelCannonball from '@assets/js/projects/gategame/levels/GameLevelCannonball.js';
+import GameLevelEscaperoom from '@assets/js/projects/gategame/levels/GameLevelEscaperoom.js';
+import GameLevelZonecatch from '@assets/js/projects/gategame/levels/GameLevelZonecatch.js';
+ 
+export const gameLevelClasses = [GameLevelCannonball, GameLevelEscaperoom, GameLevelZonecatch];
+export { GameControl };
+```
 <div id="gameContainer">
   <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
 </div>
