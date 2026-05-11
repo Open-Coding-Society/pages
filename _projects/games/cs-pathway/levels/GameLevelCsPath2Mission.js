@@ -405,6 +405,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       if (Array.isArray(savedStations) && savedStations.length > 0) {
         savedStations.forEach((id) => this._missionCompletedStations.add(id));
       }
+
+      const stationTargetCount = this._missionDeskIds?.length || 4;
+      if (this._missionCompletedStations.size >= stationTargetCount && typeof this.markLevelComplete === 'function') {
+        this.markLevelComplete('missionTools');
+      }
     } catch (err) {
       console.warn('[MissionTools] could not restore score:', err);
     }
@@ -855,6 +860,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._saveMissionScore();
 
       if (this._missionCompletedStations.size >= stationTargetCount) {
+        if (typeof this.markLevelComplete === 'function') {
+          this.markLevelComplete('missionTools');
+        }
         this.showToast?.('All stations cleared once. Repeat solves now count toward bonus progress.');
       }
       return;
