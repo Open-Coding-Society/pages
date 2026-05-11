@@ -24,10 +24,125 @@ import {
 class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
+        this.frontMenuActive = false;
         const levelContext = this;
         const assetPath = getKirbyImageDirectoryUrl();
+    const kirbyMinigamesAssetPath = assetPath;
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
+        const aquaticSpriteStorageKey = 'aquatic_selected_sprite_v1';
+        const scubaLeftFrames = [
+            { x: 37, width: 146 },
+            { x: 208, width: 151 },
+            { x: 378, width: 154 },
+            { x: 553, width: 167 },
+            { x: 775, width: 135 },
+            { x: 929, width: 140 }
+        ];
+        const scubaThrowFrames = [
+            { x: 15, width: 134 },
+            { x: 178, width: 121 },
+            { x: 316, width: 105 },
+            { x: 436, width: 119 },
+            { x: 578, width: 118 }
+        ];
+        const scubaIdleFrames = [
+            { x: 25, width: 84 },
+            { x: 131, width: 84 },
+            { x: 249, width: 65 },
+            { x: 342, width: 55 },
+            { x: 445, width: 72 },
+            { x: 541, width: 71 },
+            { x: 640, width: 66 },
+            { x: 720, width: 74 },
+            { x: 807, width: 74 },
+            { x: 904, width: 72 },
+            { x: 999, width: 83 }
+        ];
+        const aquaticSpriteOptions = [
+            {
+                key: 'scuba-diver',
+                label: 'Scuba Diver',
+                src: kirbyMinigamesAssetPath + '/scubadiver.png',
+                pixels: { height: 948, width: 632 },
+                SCALE_FACTOR: 5,
+                ANIMATION_RATE: 8,
+                orientation: { rows: 4, columns: 3 },
+                down: { row: 0, start: 0, columns: 3 },
+                downRight: { row: 1, start: 0, columns: 3 },
+                downLeft: { row: 1, start: 0, columns: 3, mirror: true },
+                left: { row: 1, start: 0, columns: 3, mirror: true },
+                right: { row: 1, start: 0, columns: 3 },
+                up: { row: 3, start: 0, columns: 3 },
+                upLeft: { row: 2, start: 0, columns: 3, mirror: true },
+                upRight: { row: 2, start: 0, columns: 3 },
+                customAnimator: {
+                    movementRight: {
+                        src: kirbyMinigamesAssetPath + '/Scuba Diver Row 3.png',
+                        pixels: { height: 127, width: 1105 },
+                        orientation: { rows: 1, columns: 1 },
+                        frames: scubaLeftFrames
+                    },
+                    movementLeft: {
+                        src: kirbyMinigamesAssetPath + '/Scuba Diver Row 3.png',
+                        pixels: { height: 127, width: 1105 },
+                        orientation: { rows: 1, columns: 1 },
+                        frames: scubaLeftFrames
+                    },
+                    throw: {
+                        src: kirbyMinigamesAssetPath + '/Scuba Diver Row 2.png',
+                        pixels: { height: 151, width: 712 },
+                        orientation: { rows: 1, columns: 1 },
+                        frames: scubaThrowFrames
+                    },
+                    idle: {
+                        src: kirbyMinigamesAssetPath + '/Scuba Diver Row 4.png',
+                        pixels: { height: 154, width: 1117 },
+                        orientation: { rows: 1, columns: 1 },
+                        frames: scubaIdleFrames
+                    }
+                }
+            },
+            {
+                key: 'boy',
+                label: 'Boy',
+                src: assetPath + '/boysprite.png',
+                pixels: { height: 612, width: 408 },
+                SCALE_FACTOR: 5,
+                ANIMATION_RATE: 50,
+                orientation: { rows: 4, columns: 3 },
+                down: { row: 0, start: 0, columns: 3 },
+                downRight: { row: 1, start: 0, columns: 3 },
+                downLeft: { row: 0, start: 0, columns: 3 },
+                left: { row: 2, start: 0, columns: 3 },
+                right: { row: 1, start: 0, columns: 3 },
+                up: { row: 3, start: 0, columns: 3 },
+                upLeft: { row: 2, start: 0, columns: 3 },
+                upRight: { row: 3, start: 0, columns: 3 }
+            },
+            {
+                key: 'astro',
+                label: 'Astro',
+                src: assetPath + '/astro.png',
+                pixels: { height: 770, width: 513 },
+                SCALE_FACTOR: 11,
+                ANIMATION_RATE: 110,
+                orientation: { rows: 4, columns: 4 },
+                down: { row: 0, start: 0, columns: 4 },
+                left: { row: 1, start: 0, columns: 4 },
+                right: { row: 2, start: 0, columns: 4 },
+                up: { row: 3, start: 0, columns: 4 },
+                downRight: { row: 2, start: 0, columns: 4 },
+                downLeft: { row: 1, start: 0, columns: 4 },
+                upRight: { row: 2, start: 0, columns: 4 },
+                upLeft: { row: 1, start: 0, columns: 4 }
+            }
+        ];
+        const selectedAquaticSprite = aquaticSpriteOptions.find((option) => option.key === localStorage.getItem(aquaticSpriteStorageKey))
+            || aquaticSpriteOptions[0];
+        const bubbleSpriteSrc = kirbyMinigamesAssetPath + '/Bubble.png';
+        const menuMegalodonSpriteSrc = assetPath + '/megalodon.png';
+        const megalodonDeathSheetSrc = kirbyMinigamesAssetPath + '/Megalodon Death.png';
 
         const bgData = {
             name: "custom_bg",
@@ -37,22 +152,22 @@ class GameLevelAquaticGameLevel {
 
         const playerData = {
             id: 'playerData',
-            src: assetPath + "/scubadiver.png",
-            SCALE_FACTOR: 5,
+            src: selectedAquaticSprite.src,
+            SCALE_FACTOR: selectedAquaticSprite.SCALE_FACTOR,
             STEP_FACTOR: 1000,
-            ANIMATION_RATE: 50,
+            ANIMATION_RATE: selectedAquaticSprite.ANIMATION_RATE,
             // Start near the mermaid with no walls between
             INIT_POSITION: { x: 180, y: 300 },
-            pixels: { height: 948, width: 632 },
-            orientation: { rows: 4, columns: 3 },
-            down: { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
-            downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI / 16 },
-            left: { row: 2, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 3, start: 0, columns: 3 },
-            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI / 16 },
-            upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI / 16 },
+            pixels: { ...selectedAquaticSprite.pixels },
+            orientation: { ...selectedAquaticSprite.orientation },
+            down: { ...selectedAquaticSprite.down },
+            downRight: { ...selectedAquaticSprite.downRight },
+            downLeft: { ...selectedAquaticSprite.downLeft },
+            left: { ...selectedAquaticSprite.left },
+            right: { ...selectedAquaticSprite.right },
+            up: { ...selectedAquaticSprite.up },
+            upLeft: { ...selectedAquaticSprite.upLeft },
+            upRight: { ...selectedAquaticSprite.upRight },
             hitbox: { widthPercentage: 0, heightPercentage: 0 },
             keypress: { up: 87, left: 65, down: 83, right: 68 }
         };
@@ -814,6 +929,469 @@ class GameLevelAquaticGameLevel {
 
         this.startMultiplayer = startMultiplayer;
         this.stopMultiplayer = stopMultiplayer;
+
+        const getAquaticPlayer = () => this.gameEnv?.gameObjects?.find(
+            (obj) => obj?.spriteData?.id === 'playerData'
+        );
+
+        const applyAquaticPlayerSprite = (spriteOption) => {
+            const player = getAquaticPlayer();
+            if (!player || !spriteOption) return;
+
+            player.data = player.data || player.spriteData || {};
+            player.data.src = spriteOption.src;
+            player.data.pixels = { ...spriteOption.pixels };
+            player.data.SCALE_FACTOR = spriteOption.SCALE_FACTOR;
+            player.data.ANIMATION_RATE = spriteOption.ANIMATION_RATE;
+            player.data.orientation = { ...spriteOption.orientation };
+
+            ['down', 'downRight', 'downLeft', 'left', 'right', 'up', 'upLeft', 'upRight'].forEach((direction) => {
+                player.data[direction] = spriteOption[direction]
+                    ? { ...spriteOption[direction] }
+                    : { row: 0, start: 0, columns: 1 };
+            });
+
+            player.spriteData = player.data;
+            player.scaleFactor = spriteOption.SCALE_FACTOR;
+            player.animationRate = spriteOption.ANIMATION_RATE;
+            player.frameIndex = 0;
+            player.frameCounter = 0;
+            player.direction = 'down';
+            player._aquaticFacingDirection = 'down';
+            player._aquaticSpriteOption = spriteOption;
+            player._aquaticThrowUntil = 0;
+            player.resize?.();
+
+            if (!player.spriteSheet) {
+                player.spriteSheet = new Image();
+            }
+
+            player.spriteReady = false;
+            player.spriteSheet.onload = () => {
+                player.spriteReady = true;
+                player.resize?.();
+            };
+            player.spriteSheet.src = spriteOption.src;
+        };
+
+        const setAquaticPlayerSheet = (player, sheetConfig, directionConfig, directionName) => {
+            if (!player || !sheetConfig || !directionConfig) return;
+
+            const signature = JSON.stringify({
+                src: sheetConfig.src,
+                pixels: sheetConfig.pixels,
+                orientation: sheetConfig.orientation,
+                frames: sheetConfig.frames,
+                direction: directionName,
+                config: directionConfig
+            });
+
+            if (player._aquaticSheetSignature === signature) {
+                player._aquaticRenderDirection = directionName;
+                return;
+            }
+
+            player.data = player.data || player.spriteData || {};
+            player.data.src = sheetConfig.src;
+            player.data.pixels = { ...sheetConfig.pixels };
+            player.data.orientation = { ...sheetConfig.orientation };
+            player.data[directionName] = {
+                ...directionConfig,
+                frames: directionConfig.frames || sheetConfig.frames || undefined
+            };
+            player.spriteData = player.data;
+            player._aquaticRenderDirection = directionName;
+            player.frameIndex = 0;
+            player.frameCounter = 0;
+            player._aquaticSheetSignature = signature;
+
+            if (!player.spriteSheet) {
+                player.spriteSheet = new Image();
+            }
+
+            player.spriteReady = false;
+            player.spriteSheet.onload = () => {
+                player.spriteReady = true;
+                player.resize?.();
+            };
+            player.spriteSheet.src = sheetConfig.src;
+        };
+
+        const syncCustomAquaticScubaAnimation = (player) => {
+            const spriteOption = player?._aquaticSpriteOption;
+            const animator = spriteOption?.customAnimator;
+            if (!player || !animator) return;
+
+            const now = Date.now();
+            const resolveFacingDirection = () => {
+                const keypress = player.keypress || {};
+                const pressedKeys = player.pressedKeys || {};
+                const goingLeft = !!pressedKeys[keypress.left];
+                const goingRight = !!pressedKeys[keypress.right];
+                const goingUp = !!pressedKeys[keypress.up];
+                const goingDown = !!pressedKeys[keypress.down];
+
+                if (goingLeft && goingUp) return 'upLeft';
+                if (goingLeft && goingDown) return 'downLeft';
+                if (goingRight && goingUp) return 'upRight';
+                if (goingRight && goingDown) return 'downRight';
+                if (goingLeft) return 'left';
+                if (goingRight) return 'right';
+                if (goingUp) return 'up';
+                if (goingDown) return 'down';
+
+                return player._aquaticFacingDirection || 'down';
+            };
+
+            const currentDirection = resolveFacingDirection();
+            player._aquaticFacingDirection = currentDirection;
+            const facing = player._aquaticFacingDirection || 'down';
+            const moving = !!player.moved
+                || Math.abs(player.velocity?.x || 0) > 0.01
+                || Math.abs(player.velocity?.y || 0) > 0.01;
+
+            if (player._aquaticThrowUntil && now < player._aquaticThrowUntil) {
+                const throwLeft = facing === 'left' || facing === 'upLeft' || facing === 'downLeft';
+                player.animationRate = 5;
+                setAquaticPlayerSheet(
+                    player,
+                    animator.throw,
+                    {
+                        row: 0,
+                        start: 0,
+                        frames: animator.throw.frames,
+                        mirror: throwLeft
+                    },
+                    throwLeft ? 'throwLeft' : 'throwRight'
+                );
+                return;
+            }
+
+            if (moving) {
+                const useLeftStrip = ['left', 'upLeft', 'downLeft'].includes(facing);
+                player.animationRate = spriteOption.ANIMATION_RATE || 8;
+                const rotateByDirection = {
+                    up: -Math.PI / 7,
+                    down: Math.PI / 9,
+                    upRight: -Math.PI / 11,
+                    downRight: Math.PI / 11,
+                    upLeft: Math.PI / 11,
+                    downLeft: -Math.PI / 11,
+                    left: 0,
+                    right: 0
+                };
+                const movementDirection = useLeftStrip ? 'swimLeft' : 'swimRight';
+                setAquaticPlayerSheet(
+                    player,
+                    useLeftStrip ? animator.movementLeft : animator.movementRight,
+                    {
+                        row: 0,
+                        start: 0,
+                        frames: (useLeftStrip ? animator.movementLeft : animator.movementRight).frames,
+                        mirror: !useLeftStrip,
+                        rotate: rotateByDirection[facing] || 0
+                    },
+                    useLeftStrip ? 'swimLeft' : 'swimRight'
+                );
+                return;
+            }
+
+            player.animationRate = 8;
+            let idleFrames = animator.idle.frames.slice(0, 2);
+            const idleDirection = ['right', 'upRight', 'downRight'].includes(facing)
+                ? 'idleRight'
+                : ['left', 'upLeft', 'downLeft'].includes(facing)
+                    ? 'idleLeft'
+                    : facing === 'up'
+                        ? 'idleUp'
+                        : 'idleDown';
+
+            if (idleDirection === 'idleRight') {
+                idleFrames = animator.idle.frames.slice(3, 6);
+            } else if (idleDirection === 'idleLeft') {
+                idleFrames = animator.idle.frames.slice(6, 8);
+            } else if (idleDirection === 'idleUp') {
+                idleFrames = animator.idle.frames.slice(8, 11);
+            }
+
+            setAquaticPlayerSheet(
+                player,
+                animator.idle,
+                {
+                    row: 0,
+                    start: 0,
+                    frames: idleFrames
+                },
+                idleDirection
+            );
+            if (idleFrames.length > 1) {
+                player.frameIndex = Math.floor(now / 220) % idleFrames.length;
+            } else {
+                player.frameIndex = 0;
+            }
+        };
+
+        this.syncCustomAquaticScubaAnimation = syncCustomAquaticScubaAnimation;
+
+        const ensureFrontMenuKeyframes = () => {
+            if (document.getElementById('aquatic-front-menu-keyframes')) return;
+
+            const style = document.createElement('style');
+            style.id = 'aquatic-front-menu-keyframes';
+            style.textContent = `
+                @keyframes aquaticBubbleDriftSlow {
+                    from { transform: translate3d(0, 0, 0); }
+                    to { transform: translate3d(-140px, -80px, 0); }
+                }
+                @keyframes aquaticBubbleDriftFast {
+                    from { transform: translate3d(0, 0, 0); }
+                    to { transform: translate3d(-240px, -140px, 0); }
+                }
+                @keyframes aquaticMenuGlow {
+                    0%, 100% { filter: drop-shadow(0 0 16px rgba(76, 245, 255, 0.35)); }
+                    50% { filter: drop-shadow(0 0 28px rgba(76, 245, 255, 0.65)); }
+                }
+                @keyframes aquaticMegalodonFloat {
+                    0%, 100% { transform: translateY(0px); }
+                    50% { transform: translateY(-16px); }
+                }
+            `;
+            document.head.appendChild(style);
+        };
+
+        const hideFrontMenu = () => {
+            if (this._frontMenuSpriteTimer) {
+                clearInterval(this._frontMenuSpriteTimer);
+                this._frontMenuSpriteTimer = null;
+            }
+            const menu = document.getElementById('aquatic-front-menu');
+            if (menu) menu.remove();
+            this.frontMenuActive = false;
+        };
+
+        const showFrontMenu = () => {
+            const existing = document.getElementById('aquatic-front-menu');
+            if (existing) existing.remove();
+            ensureFrontMenuKeyframes();
+
+            const root = getGameUiRoot();
+            this.frontMenuActive = true;
+            this.playerLock = true;
+            setStorySceneUiVisibility(false);
+            stopUnderwaterTheme(false);
+
+            const overlay = document.createElement('div');
+            overlay.id = 'aquatic-front-menu';
+            Object.assign(overlay.style, {
+                position: root === document.body ? 'fixed' : 'absolute',
+                inset: '0',
+                zIndex: '10090',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'stretch',
+                justifyContent: 'space-between',
+                backgroundColor: '#031826',
+                backgroundImage: 'radial-gradient(circle at 18% 18%, #0f5f7d 0%, #08364d 24%, #041d2e 52%, #020d17 100%)'
+            });
+
+            const makeBubbleLayer = (opacity, duration, size, animationName) => {
+                const layer = document.createElement('div');
+                Object.assign(layer.style, {
+                    position: 'absolute',
+                    inset: '-12%',
+                    backgroundImage: `url('${bubbleSpriteSrc}')`,
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: `${size}px ${size}px`,
+                    opacity: String(opacity),
+                    mixBlendMode: 'screen',
+                    filter: 'drop-shadow(0 0 8px rgba(124, 245, 255, 0.28))',
+                    animation: `${animationName} ${duration}s linear infinite`,
+                    pointerEvents: 'none'
+                });
+                return layer;
+            };
+
+            overlay.appendChild(makeBubbleLayer(0.26, 24, 88, 'aquaticBubbleDriftSlow'));
+            overlay.appendChild(makeBubbleLayer(0.34, 15, 126, 'aquaticBubbleDriftFast'));
+            overlay.appendChild(makeBubbleLayer(0.18, 32, 166, 'aquaticBubbleDriftSlow'));
+
+            const content = document.createElement('div');
+            Object.assign(content.style, {
+                position: 'relative',
+                zIndex: '2',
+                width: 'min(560px, 58vw)',
+                padding: '28px 22px 28px 26px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start'
+            });
+
+            const title = document.createElement('div');
+            title.textContent = 'Aquatic Quest';
+            Object.assign(title.style, {
+                color: '#76fbff',
+                fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+                fontSize: 'clamp(44px, 7vw, 86px)',
+                lineHeight: '0.9',
+                letterSpacing: '1px',
+                textShadow: '0 0 10px rgba(118, 251, 255, 0.65), 0 0 28px rgba(51, 217, 255, 0.5)',
+                marginBottom: '18px',
+                animation: 'aquaticMenuGlow 2.8s ease-in-out infinite'
+            });
+
+            const createMenuButton = (label, isPrimary = false) => {
+                const button = document.createElement('button');
+                button.textContent = label;
+                Object.assign(button.style, {
+                    width: 'min(320px, 80vw)',
+                    padding: '14px 18px',
+                    marginBottom: '12px',
+                    borderRadius: '14px',
+                    border: isPrimary ? 'none' : '1px solid rgba(120, 242, 255, 0.55)',
+                    background: isPrimary
+                        ? 'linear-gradient(90deg, rgba(33, 197, 255, 0.95), rgba(92, 240, 255, 0.95))'
+                        : 'rgba(3, 28, 48, 0.66)',
+                    color: isPrimary ? '#042b3c' : '#d7fbff',
+                    fontFamily: "'Press Start 2P', cursive, monospace",
+                    fontSize: '11px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    boxShadow: isPrimary
+                        ? '0 10px 24px rgba(61, 210, 255, 0.34)'
+                        : '0 8px 20px rgba(0, 0, 0, 0.22)'
+                });
+                return button;
+            };
+
+            const diveButton = createMenuButton('Dive', true);
+            const changeButton = createMenuButton('Change your character');
+            const spritePanel = document.createElement('div');
+            Object.assign(spritePanel.style, {
+                display: 'block',
+                marginTop: '2px',
+                marginBottom: '8px',
+                padding: '10px 0 0 2px'
+            });
+
+            const spriteLabel = document.createElement('div');
+            spriteLabel.textContent = 'Player Sprites include:';
+            Object.assign(spriteLabel.style, {
+                color: '#91f6ff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '10px',
+                lineHeight: '1.7',
+                marginBottom: '10px'
+            });
+            spritePanel.appendChild(spriteLabel);
+
+            const selectedSpriteName = document.createElement('div');
+            selectedSpriteName.textContent = `Current: ${selectedAquaticSprite.label}`;
+            Object.assign(selectedSpriteName.style, {
+                color: '#d3fbff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '9px',
+                marginBottom: '10px'
+            });
+            spritePanel.appendChild(selectedSpriteName);
+
+            aquaticSpriteOptions.forEach((option) => {
+                const spriteButton = createMenuButton(option.label);
+                spriteButton.style.width = 'min(280px, 76vw)';
+                spriteButton.style.fontSize = '10px';
+                spriteButton.style.padding = '11px 14px';
+                spriteButton.style.marginBottom = '10px';
+
+                const syncSelectedState = () => {
+                    const selected = selectedSpriteName.textContent === `Current: ${option.label}`;
+                    spriteButton.style.border = selected
+                        ? '1px solid rgba(118, 251, 255, 0.9)'
+                        : '1px solid rgba(120, 242, 255, 0.38)';
+                    spriteButton.style.background = selected
+                        ? 'rgba(9, 78, 111, 0.72)'
+                        : 'rgba(3, 28, 48, 0.58)';
+                };
+
+                syncSelectedState();
+                spriteButton.onclick = () => {
+                    localStorage.setItem(aquaticSpriteStorageKey, option.key);
+                    selectedSpriteName.textContent = `Current: ${option.label}`;
+                    applyAquaticPlayerSprite(option);
+                    Array.from(spritePanel.querySelectorAll('button')).forEach((button) => {
+                        button.style.border = '1px solid rgba(120, 242, 255, 0.38)';
+                        button.style.background = 'rgba(3, 28, 48, 0.58)';
+                    });
+                    syncSelectedState();
+                };
+
+                spritePanel.appendChild(spriteButton);
+            });
+
+            changeButton.onclick = () => {
+                spritePanel.style.display = spritePanel.style.display === 'none' ? 'block' : 'none';
+            };
+
+            diveButton.onclick = () => {
+                hideFrontMenu();
+                setStorySceneUiVisibility(true);
+                this.playerLock = false;
+                if (this.gameMode === 'story') {
+                    playUnderwaterTheme?.(true);
+                }
+            };
+
+            content.appendChild(title);
+            content.appendChild(diveButton);
+            content.appendChild(changeButton);
+            content.appendChild(spritePanel);
+
+            const heroPanel = document.createElement('div');
+            Object.assign(heroPanel.style, {
+                position: 'relative',
+                zIndex: '2',
+                flex: '1',
+                minWidth: '320px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                padding: '24px min(5vw, 48px) 24px 12px',
+                pointerEvents: 'none'
+            });
+
+            const megalodonFrameWidth = 190;
+            const megalodonFrameHeight = Math.round(megalodonFrameWidth * (772 / 513));
+            const megalodon = document.createElement('div');
+            megalodon.setAttribute('aria-label', 'Megalodon');
+            Object.assign(megalodon.style, {
+                width: `${megalodonFrameWidth}px`,
+                height: `${megalodonFrameHeight}px`,
+                minWidth: `${megalodonFrameWidth}px`,
+                backgroundImage: `url('${menuMegalodonSpriteSrc}')`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: `${megalodonFrameWidth * 3}px ${megalodonFrameHeight * 4}px`,
+                backgroundPosition: '0px 0px',
+                imageRendering: 'pixelated',
+                filter: 'drop-shadow(0 18px 32px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 26px rgba(71, 214, 255, 0.22))',
+                animation: 'aquaticMegalodonFloat 4.2s ease-in-out infinite',
+                transformOrigin: 'center center',
+                scale: '1.6'
+            });
+
+            let menuFrame = 0;
+            this._frontMenuSpriteTimer = setInterval(() => {
+                if (!document.body.contains(megalodon)) return;
+                const column = menuFrame % 3;
+                const row = Math.floor(menuFrame / 3) % 4;
+                megalodon.style.backgroundPosition = `-${column * megalodonFrameWidth}px -${row * megalodonFrameHeight}px`;
+                menuFrame = (menuFrame + 1) % 12;
+            }, 120);
+
+            heroPanel.appendChild(megalodon);
+            overlay.appendChild(content);
+            overlay.appendChild(heroPanel);
+            appendGameUi(overlay);
+        };
+
+        this.showFrontMenu = showFrontMenu;
 
         const lockPageScroll = () => {
             if (this._pageScrollLock) return;
@@ -3079,16 +3657,58 @@ class GameLevelAquaticGameLevel {
                 document.body.appendChild(overlay);
             };
 
+            const playMegalodonDeathAnimation = async () => {
+                const boss = this.bossState.megalodon;
+                if (!boss) return;
+
+                const overlay = document.createElement('div');
+                overlay.id = 'aquatic-boss-death';
+                Object.assign(overlay.style, {
+                    position: 'absolute',
+                    left: `${boss.position.x}px`,
+                    top: `${getBossOverlayTopOffset() + boss.position.y}px`,
+                    width: `${boss.width}px`,
+                    height: `${boss.height}px`,
+                    pointerEvents: 'none',
+                    zIndex: '10067',
+                    backgroundImage: `url('${megalodonDeathSheetSrc}')`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: `${boss.width * 4}px ${boss.height * 3}px`,
+                    backgroundPosition: '0px 0px',
+                    imageRendering: 'pixelated',
+                    filter: 'drop-shadow(0 0 18px rgba(137, 229, 255, 0.4))'
+                });
+                appendBossOverlay(overlay);
+
+                if (boss.canvas) boss.canvas.style.display = 'none';
+
+                const totalFrames = 12;
+                for (let frame = 0; frame < totalFrames; frame += 1) {
+                    const row = Math.floor(frame / 4);
+                    const column = frame % 4;
+                    overlay.style.backgroundPosition = `-${column * boss.width}px -${row * boss.height}px`;
+                    await new Promise((resolve) => setTimeout(resolve, 110));
+                }
+
+                overlay.remove();
+            };
+
             if (this.bossState.hp <= 0) {
                 this.bossState.combatReady = false;
                 stopBossTheme();
                 stopUnderwaterTheme();
-                if (this.bossState.megalodon?.destroy) {
-                    this.bossState.megalodon.destroy();
-                }
-                this.bossState.megalodon = null;
                 this.bossState.active = false;
-                showBossVictoryWindow();
+                const boss = this.bossState.megalodon;
+                Promise.all([
+                    playMegalodonDeathAnimation(),
+                    shakeWorld(950)
+                ]).finally(() => {
+                    if (boss?.destroy) {
+                        boss.destroy();
+                    }
+                    this.bossState.megalodon = null;
+                    showBossVictoryWindow();
+                });
             }
         };
 
@@ -3152,6 +3772,9 @@ class GameLevelAquaticGameLevel {
             const now = Date.now();
             if (now - this.bossState.lastShotAt < this.bossState.shotCooldownMs) return;
             this.bossState.lastShotAt = now;
+            if (player._aquaticSpriteOption?.customAnimator) {
+                player._aquaticThrowUntil = now + 520;
+            }
 
             const px = player.position.x + player.width * 0.5;
             const py = player.position.y + player.height * 0.5;
@@ -3616,8 +4239,8 @@ class GameLevelAquaticGameLevel {
                     const rocket = document.createElement('div');
                     Object.assign(rocket.style, {
                         position: 'absolute',
-                        width: '72px',
-                        height: '24px',
+                        width: '108px',
+                        height: '36px',
                         borderRadius: '6px',
                         background: 'transparent',
                         pointerEvents: 'none',
@@ -3633,10 +4256,10 @@ class GameLevelAquaticGameLevel {
                     const flame = document.createElement('div');
                     Object.assign(flame.style, {
                         position: 'absolute',
-                        left: '-16px',
+                        left: '-24px',
                         top: '50%',
-                        width: '24px',
-                        height: '13px',
+                        width: '36px',
+                        height: '20px',
                         borderRadius: '10px 0 0 10px',
                         background: 'linear-gradient(90deg, rgba(255,244,184,0.98) 0%, rgba(255,194,92,0.95) 38%, rgba(255,125,44,0.92) 72%, rgba(255,84,28,0) 100%)',
                         transform: 'translate(-10%, -50%) skewX(-12deg)',
@@ -4665,8 +5288,9 @@ class GameLevelAquaticGameLevel {
             this.ensureChallengeHud?.();
         } else {
             this.ensureQuestHud?.();
-            this.playUnderwaterTheme?.(true);
         }
+
+        this.showFrontMenu?.();
 
         const player = this.gameEnv?.gameObjects?.find(
             obj => obj?.spriteData?.id === 'playerData'
@@ -4698,14 +5322,22 @@ class GameLevelAquaticGameLevel {
                     player.velocity.x = 0;
                     player.velocity.y = 0;
                     player.pressedKeys = {};
+                    this.syncCustomAquaticScubaAnimation?.(player);
+                    const previousDirection = player.direction;
+                    player.direction = player._aquaticRenderDirection || previousDirection;
                     player.draw();
+                    player.direction = player._aquaticFacingDirection || previousDirection;
                     return;
                 }
                 applyAquaticVerticalBoost();
                 if (typeof player.updateVelocity === 'function') {
                     player.updateVelocity();
                 }
+                this.syncCustomAquaticScubaAnimation?.(player);
+                const previousDirection = player.direction;
+                player.direction = player._aquaticRenderDirection || previousDirection;
                 originalUpdate();
+                player.direction = player._aquaticFacingDirection || previousDirection;
             };
             player._aquaticLockWrapped = true;
         }
@@ -4860,6 +5492,11 @@ class GameLevelAquaticGameLevel {
 
                 if (shark.canvas) shark.canvas.style.display = 'block';
 
+                if (this.frontMenuActive) {
+                    if (shark.canvas) shark.canvas.style.display = 'none';
+                    return;
+                }
+
                 const now = performance.now();
                 if (now >= shark._motion.nextTurnAt) {
                     shark._motion.vector = randomDirection();
@@ -4951,6 +5588,10 @@ class GameLevelAquaticGameLevel {
         if (bossWin) bossWin.remove();
         const bossVictory = document.getElementById('aquatic-boss-victory');
         if (bossVictory) bossVictory.remove();
+        const bossDeath = document.getElementById('aquatic-boss-death');
+        if (bossDeath) bossDeath.remove();
+        const frontMenu = document.getElementById('aquatic-front-menu');
+        if (frontMenu) frontMenu.remove();
         if (this._bossUpdateTimer) {
             clearInterval(this._bossUpdateTimer);
             this._bossUpdateTimer = null;
