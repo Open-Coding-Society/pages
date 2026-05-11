@@ -13,6 +13,7 @@ import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import AiNpc from '@assets/js/GameEnginev1.1/essentials/AiNpc.js';
 import GameStats from '@assets/js/GameEnginev1.1/GameStats.js';
 import Coin from '@assets/js/GameEnginev1.1/Coin.js';
+import Clicker from '@assets/js/GameEnginev1.1/essentials/Clicker.js';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -131,11 +132,48 @@ class GameLevelEscaperoom {
         GameStats.bootstrap();
         GameStats.onLevelStart();
 
+        // ── CLICKER: Hidden Treasure Chest (cookie-clicker mechanic) ───────────
+        // Hidden in the dungeon behind the fog. Player must find it, then mouse-click
+        // to harvest bonus coins. Every 3 clicks = +1 coin, cap of 15 bonus coins.
+        const treasureClickerData = {
+            id: 'HiddenTreasure',
+            greeting: false,
+            src: path + "/images/projects/gategame/sprites/mastergate.png",
+            SCALE_FACTOR: 22,
+            ANIMATION_RATE: 100,
+            INIT_POSITION: { x: 340, y: 620 },  // tucked in bottom-left of the dungeon
+            pixels: { height: 512, width: 512 },
+            orientation: { rows: 1, columns: 1 },
+            down:      { row: 0, start: 0, columns: 1 },
+            right:     { row: 0, start: 0, columns: 1 },
+            left:      { row: 0, start: 0, columns: 1 },
+            up:        { row: 0, start: 0, columns: 1 },
+            upRight:   { row: 0, start: 0, columns: 1 },
+            downRight: { row: 0, start: 0, columns: 1 },
+            upLeft:    { row: 0, start: 0, columns: 1 },
+            downLeft:  { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+            zIndex: 400,
+            interact: function (clicks) {
+                const CLICKS_PER_COIN = 3;
+                const MAX_BONUS       = 15;
+                if (typeof this._bonusCoinsGiven !== 'number') this._bonusCoinsGiven = 0;
+                if (this._bonusCoinsGiven >= MAX_BONUS) return;
+                if (clicks % CLICKS_PER_COIN === 0) {
+                    if (gameEnv?.stats) {
+                        gameEnv.stats.coinsCollected = (gameEnv.stats.coinsCollected || 0) + 1;
+                    }
+                    this._bonusCoinsGiven++;
+                }
+            }
+        };
+
         // ── Class list ──────────────────────────────────────────────────────────
         this.classes = [
             { class: GameEnvBackground, data: bgData },
             { class: Player,   data: playerData },
             { class: Npc,      data: npcData1 },
+            { class: Clicker,  data: treasureClickerData },
             { class: Barrier,  data: barrier1  },
             { class: Barrier,  data: barrier2  },
             { class: Barrier,  data: barrier3  },
@@ -192,7 +230,7 @@ class GameLevelEscaperoom {
             expertise: 'escape room fog dungeon',
             chatHistory: [],
             dialogues: [
-                "🔦 Welcome to the Escape Room! You're trapped in a dark dungeon and can only see a small circle of light around you. Use W, A, S, D to move through the walls and find the gate. Grab coins on the way — they're scattered across the map. When you reach the gate (bottom-right), interact with it to escape to the next level. Ask me anything, then hit Start Level when you're ready!"
+                "🔦 Welcome to the Escape Room! You're trapped in a dark dungeon and can only see a small circle of light around you. Use W, A, S, D to move through the walls and find the gate. Grab coins on the way, and keep your eyes open — a HIDDEN TREASURE chest is somewhere in the fog. Click it with your mouse to harvest bonus coins (every 3 clicks = +1 coin). When you reach the gate (bottom-right), interact with it to escape. Ask me anything, then hit Start Level when you're ready!"
             ],
             knowledgeBase: {
                 'escape room fog dungeon': [
