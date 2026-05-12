@@ -195,8 +195,20 @@ class GameLevelEscaperoom {
         ];
 
         this._gameEnv     = gameEnv;
+
+        // ── Local-Storage coin counter ────────────────────────────────────────
+        localStorage.setItem('escaperoom_coinsCollected', '0');
+        this._buildCoinCounter();
+
         this._hudInterval = setInterval(() => {
-            GameStats.trackLevelCoins(this._gameEnv?.stats?.coinsCollected ?? 0);
+            const coins = this._gameEnv?.stats?.coinsCollected ?? 0;
+            GameStats.trackLevelCoins(coins);
+            // Persist to localStorage (visible in DevTools → Application → Local Storage)
+            localStorage.setItem('escaperoom_coinsCollected', String(coins));
+            // Keep the on-screen counter in sync
+            if (this._coinCounterValue) {
+                this._coinCounterValue.textContent = coins;
+            }
         }, 250);
 
         // ── Fog-of-war ───────────────────────────────────────────────────────────
@@ -230,12 +242,12 @@ class GameLevelEscaperoom {
             expertise: 'escape room fog dungeon',
             chatHistory: [],
             dialogues: [
-                "🔦 Welcome to the Escape Room! You're trapped in a dark dungeon and can only see a small circle of light around you. Use W, A, S, D to move through the walls and find the gate. Grab coins on the way, and keep your eyes open — a HIDDEN TREASURE chest is somewhere in the fog. Click it with your mouse to harvest bonus coins (every 3 clicks = +1 coin). When you reach the gate (bottom-right), interact with it to escape. Ask me anything, then hit Start Level when you're ready!"
+                "\uD83D\uDD26 Welcome to the Escape Room! You're trapped in a dark dungeon and can only see a small circle of light around you. Use W, A, S, D to move through the walls and find the gate. Grab coins on the way, and keep your eyes open \u2014 a HIDDEN TREASURE chest is somewhere in the fog. Click it with your mouse to harvest bonus coins (every 3 clicks = +1 coin). When you reach the gate (bottom-right), interact with it to escape. Ask me anything, then hit Start Level when you're ready!"
             ],
             knowledgeBase: {
                 'escape room fog dungeon': [
                     { question: 'How do I see in the dark?',
-                      answer:   'You have a small circle of light around you. Walk to explore — the fog lifts wherever you go, revealing walls and coins.' },
+                      answer:   'You have a small circle of light around you. Walk to explore \u2014 the fog lifts wherever you go, revealing walls and coins.' },
                     { question: 'How do I move around?',
                       answer:   'Use W, A, S, D to move in all four directions. The walls in the dungeon will block you, so navigate carefully.' },
                     { question: 'Where is the exit gate?',
@@ -251,19 +263,54 @@ class GameLevelEscaperoom {
         AiNpc.showLevelBriefing({
             spriteData,
             gameControl: this._gameEnv?.gameControl || null,
-            startButtonText: '▶  Enter the Dungeon',
+            startButtonText: '\u25B6  Enter the Dungeon',
             onStart: () => {
-                // DialogueSystem auto-resumes the game on close — nothing else needed
-                console.log('[EscapeRoom] Briefing closed — gameplay resumed.');
+                // DialogueSystem auto-resumes the game on close \u2014 nothing else needed
+                console.log('[EscapeRoom] Briefing closed \u2014 gameplay resumed.');
             }
         });
     }
 
 
     // ════════════════════════════════════════════════════════════════════════════
+    // COIN COUNTER (Local Storage)
+    // ════════════════════════════════════════════════════════════════════════════
+
+    _buildCoinCounter() {
+        // Remove any stale counter from a previous load
+        document.getElementById('escaperoom-coin-counter')?.remove();
+
+        const container = document.createElement('div');
+        container.id = 'escaperoom-coin-counter';
+        Object.assign(container.style, {
+            position: 'fixed',
+            top: '8px',
+            right: '8px',
+            background: 'rgba(0,0,0,0.7)',
+            color: '#ffd700',
+            fontFamily: 'monospace',
+            fontSize: '14px',
+            padding: '4px 10px',
+            borderRadius: '6px',
+            zIndex: '9999',
+            pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+        });
+
+        container.innerHTML = '\uD83E\uDE99 Coins: <span id="escaperoom-coin-value">0</span>';
+        document.body.appendChild(container);
+
+        this._coinCounter      = container;
+        this._coinCounterValue = document.getElementById('escaperoom-coin-value');
+    }
+
+
+    // ════════════════════════════════════════════════════════════════════════════
     // COIN HUD
     // ════════════════════════════════════════════════════════════════════════════
-    // (Removed — the global GameStats HUD at the top of the screen handles this now.)
+    // (Removed \u2014 the global GameStats HUD at the top of the screen handles this now.)
 
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -458,6 +505,11 @@ class GameLevelEscaperoom {
     destroy() {
         // Coin tracking interval (feeds the global GameStats HUD)
         if (this._hudInterval) clearInterval(this._hudInterval);
+
+        // Coin counter overlay
+        this._coinCounter?.remove();
+        this._coinCounter      = null;
+        this._coinCounterValue = null;
 
         // Fog overlay
         this._fogRunning = false;
