@@ -514,31 +514,65 @@ class GameLevelSeek {
         if (this.basketballTransitionStarted) return;
         this.basketballTransitionStarted = true;
 
-        const primaryGame = this.gameEnv?.gameControl;
-        const topGame = primaryGame?.parentControl || primaryGame;
-        if (!topGame?.transitionToLevel) {
-            console.warn('Seek could not transition to Basketball because the game control chain is missing.');
-            return;
-        }
+        const transitionOverlay = document.createElement('div');
+        transitionOverlay.id = 'seek-to-basketball-transition';
+        transitionOverlay.style.position = 'fixed';
+        transitionOverlay.style.inset = '0';
+        transitionOverlay.style.background = '#000000';
+        transitionOverlay.style.opacity = '0';
+        transitionOverlay.style.pointerEvents = 'none';
+        transitionOverlay.style.zIndex = '10000';
+        transitionOverlay.style.transition = 'opacity 900ms ease';
+        document.body.appendChild(transitionOverlay);
+        this.transitionOverlayId = transitionOverlay.id;
 
-        const basketballIndex = Array.isArray(topGame.levelClasses)
-            ? topGame.levelClasses.findIndex((LevelClass) => LevelClass === GameLevelBasketball)
-            : -1;
+        const startLevelTransition = () => {
+            const primaryGame = this.gameEnv?.gameControl;
+            const topGame = primaryGame?.parentControl || primaryGame;
+            if (!topGame?.transitionToLevel) {
+                console.warn('Seek could not transition to Basketball because the game control chain is missing.');
+                if (transitionOverlay.parentNode) {
+                    transitionOverlay.remove();
+                }
+                return;
+            }
 
-        if (basketballIndex >= 0) {
-            topGame.currentLevelIndex = basketballIndex;
-        } else {
-            topGame.levelClasses = [GameLevelBasketball];
-            topGame.currentLevelIndex = 0;
-        }
+            const basketballIndex = Array.isArray(topGame.levelClasses)
+                ? topGame.levelClasses.findIndex((LevelClass) => LevelClass === GameLevelBasketball)
+                : -1;
 
-        topGame.isPaused = false;
-        topGame.transitionToLevel();
+            if (basketballIndex >= 0) {
+                topGame.currentLevelIndex = basketballIndex;
+            } else {
+                topGame.levelClasses = [GameLevelBasketball];
+                topGame.currentLevelIndex = 0;
+            }
+
+            topGame.isPaused = false;
+            topGame.transitionToLevel();
+
+            window.setTimeout(() => {
+                if (transitionOverlay.parentNode) {
+                    transitionOverlay.remove();
+                }
+            }, 300);
+        };
+
+        window.requestAnimationFrame(() => {
+            transitionOverlay.style.opacity = '1';
+        });
+
+        window.setTimeout(startLevelTransition, 950);
     }
 
     destroy() {
         this.levelMusic?.destroy?.();
         this.levelMusic = null;
+
+        if (this.transitionOverlayId) {
+            const overlay = document.getElementById(this.transitionOverlayId);
+            if (overlay) overlay.remove();
+        }
 
         if (this.menuId) {
             const menu = document.getElementById(this.menuId);
