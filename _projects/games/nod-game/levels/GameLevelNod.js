@@ -57,6 +57,9 @@ class MazeRenderer {
 
   render() {
     if (!this.canvas) {
+      const oldCanvas = this.gameEnv.gameContainer.querySelector('.maze-canvas');
+      if (oldCanvas) oldCanvas.remove();
+      
       this.canvas = document.createElement('canvas');
       this.canvas.width = this.width;
       this.canvas.height = this.height;
