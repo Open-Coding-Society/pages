@@ -168,7 +168,7 @@ class MazePlayer {
     this.x = 50;
     this.y = 50;
     this.radius = 12;
-    this.speed = 2.5;
+    this.speed = 3.5;
     this.canvas = null;
     this.ctx = null;
     this.createCanvas();
@@ -333,6 +333,43 @@ class GameLevelNod {
         data: { id: 'MazeBackground', src: '', pixels: { height: height, width: width } }
       }
     ];
+  }
+  update() {
+    if (!this.gameActive) return;
+
+    // 1. Move Player
+    this.player.update(window.targetMouseX, window.targetMouseY);
+    const pos = this.player.getPosition();
+
+    // 2. Check Collisions
+    if (this.maze.checkCollision(pos.x, pos.y, this.player.radius)) {
+      this.hud.lives -= 1;
+      if (this.hud.lives <= 0) {
+        this.gameActive = false;
+        this.hud.setGameOver(false);
+      } else {
+        this.player.x = 50;
+        this.player.y = 50;
+      }
+    }
+
+    // 3. Check Exit
+    if (this.maze.checkExit(pos.x, pos.y, this.player.radius)) {
+      if (this.currentLevel < 3) {
+        this.currentLevel++;
+        this.player.x = 50;
+        this.player.y = 50;
+        this.maze = new MazeRenderer(this.gameEnv, this.gameEnv.innerWidth, this.gameEnv.innerHeight, this.currentLevel);
+        this.maze.render();
+      } else {
+        this.gameActive = false;
+        this.hud.setGameOver(true);
+      }
+    }
+
+    // 4. Render Frame
+    this.hud.update(this.currentLevel);
+    this.player.render();
   }
   destroy() {
     if (this.gameEnv.mazeGameLoop) {
