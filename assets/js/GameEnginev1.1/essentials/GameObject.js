@@ -215,33 +215,37 @@ class GameObject {
         const thisRect = this.canvas.getBoundingClientRect();
         const otherRect = other.canvas.getBoundingClientRect();
 
-        // Calculate hitbox constants for this object
-        const thisWidthReduction = thisRect.width * (this.hitbox?.widthPercentage || 0.0);
-        const thisHeightReduction = thisRect.height * (this.hitbox?.heightPercentage || 0.0);
+        // Calculate hitbox reductions for this object (applied symmetrically from all sides)
+        const thisWidthReduction = thisRect.width * (this.hitbox?.widthPercentage || 0.0) / 2;
+        const thisHeightReduction = thisRect.height * (this.hitbox?.heightPercentage || 0.0) / 2;
 
-        // Calculate hitbox constants for other object
-        const otherWidthReduction = otherRect.width * (other.hitbox?.widthPercentage || 0.0);
-        const otherHeightReduction = otherRect.height * (other.hitbox?.heightPercentage || 0.0);
+        // Calculate hitbox reductions for other object (applied symmetrically from all sides)
+        const otherWidthReduction = otherRect.width * (other.hitbox?.widthPercentage || 0.0) / 2;
+        const otherHeightReduction = otherRect.height * (other.hitbox?.heightPercentage || 0.0) / 2;
 
-        // Build hitbox by subtracting reductions from the left, right, and top
+        // Build symmetric hitbox by subtracting reductions from all sides
         const thisLeft = thisRect.left + thisWidthReduction;
         const thisTop = thisRect.top + thisHeightReduction;
         const thisRight = thisRect.right - thisWidthReduction;
-        const thisBottom = thisRect.bottom;
+        const thisBottom = thisRect.bottom - thisHeightReduction;
 
         const otherLeft = otherRect.left + otherWidthReduction;
         const otherTop = otherRect.top + otherHeightReduction;
         const otherRight = otherRect.right - otherWidthReduction;
-        const otherBottom = otherRect.bottom;
+        const otherBottom = otherRect.bottom - otherHeightReduction;
 
-        // Determine hit and touch points of hit
-        const hit = (
-            thisLeft < otherRight &&
-            thisRight > otherLeft &&
-            thisTop < otherBottom &&
-            thisBottom > otherTop
-        );
-
+        // Circular collision detection (default and only option)
+        const thisCenterX = (thisLeft + thisRight) / 2;
+        const thisCenterY = (thisTop + thisBottom) / 2;
+        const otherCenterX = (otherLeft + otherRight) / 2;
+        const otherCenterY = (otherTop + otherBottom) / 2;
+        const thisRadiusPercent = this.hitbox?.radiusPercentage ?? 0.5;
+        const otherRadiusPercent = other.hitbox?.radiusPercentage ?? 0.5;
+        const thisRadius = Math.min(thisRight - thisLeft, thisBottom - thisTop) * thisRadiusPercent;
+        const otherRadius = Math.min(otherRight - otherLeft, otherBottom - otherTop) * otherRadiusPercent;
+        const distance = Math.hypot(thisCenterX - otherCenterX, thisCenterY - otherCenterY);
+        const hit = distance < thisRadius + otherRadius;
+      
         const touchPoints = {
             this: {
                 id: this.canvas.id,
@@ -368,6 +372,40 @@ class GameObject {
                 }
             }
         }
+    }
+
+    /**
+     * Debug method: Draw collision circle on canvas context
+     * Call this in your game loop for objects you want to debug
+     */
+    debugDrawCollisionCircle(ctx) {
+        if (!this.canvas) return;
+        
+        const thisRect = this.canvas.getBoundingClientRect();
+        const thisWidthReduction = thisRect.width * (this.hitbox?.widthPercentage || 0.0) / 2;
+        const thisHeightReduction = thisRect.height * (this.hitbox?.heightPercentage || 0.0) / 2;
+        
+        const thisLeft = thisRect.left + thisWidthReduction;
+        const thisTop = thisRect.top + thisHeightReduction;
+        const thisRight = thisRect.right - thisWidthReduction;
+        const thisBottom = thisRect.bottom - thisHeightReduction;
+        
+        const centerX = (thisLeft + thisRight) / 2;
+        const centerY = (thisTop + thisBottom) / 2;
+        const radius = this.hitbox?.radius || Math.min(thisRight - thisLeft, thisBottom - thisTop) / 2;
+        
+        // Draw the collision circle
+        ctx.strokeStyle = '#FF0000';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Draw center point
+        ctx.fillStyle = '#FF0000';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+        ctx.fill();
     }
 }
 

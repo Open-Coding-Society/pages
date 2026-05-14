@@ -1,4 +1,6 @@
 {
+  "_comment": "This devcontainer is configured for GitHub Codespaces to run a Jekyll site with Python support.",
+
   "name": "Pages Jekyll Site",
   "image": "mcr.microsoft.com/devcontainers/ruby:3.2",
   "features": {

@@ -63,6 +63,9 @@
 </script>
 <!-- OCS Analytics Tracking Script (loaded on every page) -->
 <script src="{{ site.baseurl }}/assets/js/ocs-analytics-tracker.js" defer></script>
+{%- if page.socket_io -%}
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+{%- endif -%}
 <!-- Keyboard Shortcuts (Alt+Shift+key navigation, loaded on every page) -->
 <script>window.baseurl = "{{ site.baseurl }}";</script>
 <script src="{{ site.baseurl }}/assets/js/keyboard-shortcuts.js" defer></script>
