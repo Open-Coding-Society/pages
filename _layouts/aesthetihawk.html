@@ -16,7 +16,7 @@
 </head>
 
 
-<body class="min-h-screen flex flex-col flex-auto flex-shrink-0 transition-colors user-theme-root">
+<body class="min-h-screen flex flex-col flex-auto flex-shrink-0 transition-colors user-theme-root page-{{ page.active_tab | default: 'aesthetihawk' | slugify }}">
     <!-- navbar -->
     {%- include aesthetihawk/header.html -%}
 
