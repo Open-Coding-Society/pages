@@ -59,7 +59,7 @@ class MazeRenderer {
     if (!this.canvas) {
       const oldCanvas = this.gameEnv.gameContainer.querySelector('.maze-canvas');
       if (oldCanvas) oldCanvas.remove();
-      
+
       this.canvas = document.createElement('canvas');
       this.canvas.width = this.width;
       this.canvas.height = this.height;
@@ -127,37 +127,22 @@ class GameHUD {
 
   createHUD() {
     this.statusEl = document.createElement('div');
-    this.statusEl.style.cssText = `
-            position: absolute; 
-            bottom: 20px; 
-            left: 20px;
-            color: #00ff00;
-            font-family: 'Courier New', monospace; 
-            font-size: 14px;
-            text-align: left;
-            z-index: 1002;
-            pointer-events: none; /* Mouse moves 'through' the text */
-        `;
+    this.statusEl.innerHTML = `
+        L1-L3 | LEVEL: <span id="hud-level">1</span> | 
+        LIVES: <span id="hud-lives">5</span> | 
+        TIME: <span id="hud-time">0</span>s<br>
+        <span id="restart-btn" style="cursor:pointer; pointer-events:auto; text-decoration:underline;">[RESTART]</span>
+    `;
     this.gameEnv.gameContainer.appendChild(this.statusEl);
-    this.update(1); // Initialize with Level 1
   }
 
   update(level = 1) {
     if (this.gameOver) return;
     const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
 
-    this.statusEl.innerHTML = `
-            L1-L3 | LEVEL: ${level} | LIVES: ${this.lives} | TIME: ${elapsed}s<br>
-            <span id="restart-btn" style="cursor:pointer; pointer-events: auto; text-decoration: underline; font-size: 12px;">[RESTART GAME]</span>
-        `;
-
-    const btn = document.getElementById('restart-btn');
-    if (btn) {
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        this.onRestart();
-      };
-    }
+    document.getElementById('hud-level').innerText = level;
+    document.getElementById('hud-lives').innerText = this.lives;
+    document.getElementById('hud-time').innerText = elapsed;
   }
 
   setGameOver(won) {
@@ -253,9 +238,9 @@ class GameLevelNod {
 
     // 1. Setup Tracking
     this.mouseHandler = (e) => {
-        const rect = this.gameEnv.gameContainer.getBoundingClientRect();
-        window.targetMouseX = e.clientX - rect.left;
-        window.targetMouseY = e.clientY - rect.top;
+      const rect = this.gameEnv.gameContainer.getBoundingClientRect();
+      window.targetMouseX = e.clientX - rect.left;
+      window.targetMouseY = e.clientY - rect.top;
     };
     if (!window.nodMouseTrackerEnabled) {
       window.nodMouseTrackerEnabled = true;
@@ -351,13 +336,13 @@ class GameLevelNod {
   }
   destroy() {
     if (this.gameEnv.mazeGameLoop) {
-        clearInterval(this.gameEnv.mazeGameLoop);
+      clearInterval(this.gameEnv.mazeGameLoop);
     }
     window.removeEventListener('mousemove', this.mouseHandler);
     if (this.maze && this.maze.canvas) this.maze.canvas.remove();
     if (this.player && this.player.canvas) this.player.canvas.remove();
     if (this.hud && this.hud.statusEl) this.hud.statusEl.remove();
-}
+  }
 }
 
 
