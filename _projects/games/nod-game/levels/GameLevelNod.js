@@ -343,6 +343,15 @@ class GameLevelNod {
       }
     ];
   }
+  destroy() {
+    if (this.gameEnv.mazeGameLoop) {
+        clearInterval(this.gameEnv.mazeGameLoop);
+    }
+    window.removeEventListener('mousemove', this.mouseHandler);
+    if (this.maze && this.maze.canvas) this.maze.canvas.remove();
+    if (this.player && this.player.canvas) this.player.canvas.remove();
+    if (this.hud && this.hud.statusEl) this.hud.statusEl.remove();
+}
 }
 
 
