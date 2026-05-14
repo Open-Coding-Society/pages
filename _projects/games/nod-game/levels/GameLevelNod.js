@@ -249,8 +249,11 @@ class GameLevelNod {
     let gameActive = true;
 
     // 1. Setup Tracking
-    window.targetMouseX = width * 0.5;
-    window.targetMouseY = height * 0.5;
+    this.mouseHandler = (e) => {
+        const rect = this.gameEnv.gameContainer.getBoundingClientRect();
+        window.targetMouseX = e.clientX - rect.left;
+        window.targetMouseY = e.clientY - rect.top;
+    };
     if (!window.nodMouseTrackerEnabled) {
       window.nodMouseTrackerEnabled = true;
       window.addEventListener('mousemove', (e) => {
