@@ -46,3 +46,109 @@
 .site-header .wrapper {
     max-width: fit-content !important;
 }
+
+body.user-theme-root {
+    @media screen and (min-width: 600px) {
+        .site-header {
+            background: color-mix(in srgb, var(--panel) 92%, transparent) !important;
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--ui-border) !important;
+        }
+
+        .site-header .wrapper {
+            width: fit-content !important;
+            max-width: fit-content !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0;
+            min-height: 56px;
+        }
+
+        .site-title,
+        .site-title:visited {
+            color: var(--pref-text-color) !important;
+            float: none;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .site-title img {
+            height: 42px;
+            margin-right: 0 !important;
+        }
+
+        .site-nav {
+            position: static !important;
+            top: auto !important;
+            right: auto !important;
+            display: block;
+            flex: 0 1 auto;
+            width: auto;
+            background: transparent !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            text-align: initial;
+        }
+
+        .site-nav label[for="nav-trigger"] {
+            display: none !important;
+        }
+
+        .site-nav input~.trigger,
+        .site-nav input:checked~.trigger {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            flex-direction: row;
+            gap: 0;
+            width: auto;
+            clear: none;
+            padding-bottom: 0;
+            background: none;
+            box-shadow: none;
+        }
+
+        .site-nav .page-link,
+        #loginArea {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px !important;
+            margin-left: 20px !important;
+            line-height: 1.5 !important;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+        }
+
+        .site-nav .page-link {
+            color: var(--pref-accent-color) !important;
+        }
+
+        #loginArea {
+            position: static;
+            min-width: max-content;
+            margin-left: 0;
+            color: var(--pref-accent-color) !important;
+            text-decoration: none;
+            transform: none;
+        }
+
+        .site-nav .page-link:hover,
+        .site-nav .page-link:focus-visible,
+        #loginArea:hover,
+        #loginArea:focus-visible {
+            color: color-mix(in srgb, var(--pref-accent-color) 70%, var(--pref-text-color) 30%) !important;
+        }
+    }
+
+    @media screen and (min-width: 600px) and (max-width: 1120px) {
+        .site-nav input~.trigger,
+        .site-nav input:checked~.trigger {
+            gap: 0;
+        }
+
+    }
+}
