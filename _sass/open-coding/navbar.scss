@@ -131,10 +131,8 @@ body.user-theme-root {
             position: static;
             min-width: max-content;
             margin-left: 0;
-            color: var(--pref-text-color) !important;
-            text-decoration: underline;
-            text-decoration-thickness: 2px;
-            text-underline-offset: 0.22em;
+            color: var(--pref-accent-color) !important;
+            text-decoration: none;
             transform: none;
         }
 
