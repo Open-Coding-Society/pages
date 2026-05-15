@@ -13,6 +13,10 @@
     <!--Keyboard Shortcuts (Alt+Shift+key navigation)-->
     <script>window.baseurl = "{{ site.baseurl }}";</script>
     <script src="{{ site.baseurl }}/assets/js/keyboard-shortcuts.js" defer></script>
+    {% if page.active_tab == 'dashboard' %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
+    <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
+    {% endif %}
 </head>
 
 
