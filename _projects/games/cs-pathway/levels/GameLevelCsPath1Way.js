@@ -34,10 +34,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         { key: 'persona', label: 'Persona', emptyValue: '—' },
         { key: 'skill', label: 'Skill', emptyValue: '—' },
         { type: 'section', title: 'Completion Status', marginTop: '10px' },
-        { key: 'completionIdentityForge',   label: 'Identity Forge',   emptyValue: '—' },
+        { key: 'completionIdentityForge',   label: 'Identity Forge',   emptyValue: '✓' },
         { key: 'completionWayfindingWorld', label: 'Wayfinding World', emptyValue: '—' },
         { key: 'completionMissionTools',    label: 'Mission Tools',    emptyValue: '—' },
-        { key: 'completionOverallScore',    label: 'Overall Score',    emptyValue: '0.55' },
+        { key: 'completionOverallScore',    label: 'Overall Score',    emptyValue: '0.66' },
       ],
       theme: {
         background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
