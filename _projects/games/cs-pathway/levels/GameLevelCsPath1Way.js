@@ -59,8 +59,6 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       persona: '—',
       skill: '—',
       ...this._getCompletionPanelValues(),
-      completionIdentityForge: '✓',
-      completionOverallScore: '0.66',
     });
     /**
      * Section: Level objects.

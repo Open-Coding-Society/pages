@@ -451,7 +451,7 @@ class GameLevelCsPathIdentity {
     let score = 0.55;
     if (c.identityForge) score += 0.11;
     if (c.wayfindingWorld) score += 0.11;
-    if (c.missionTools) score += 0.01;
+    if (c.missionTools) score += 0.11;
     return score;
   }
 
