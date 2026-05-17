@@ -449,9 +449,9 @@ class GameLevelCsPathIdentity {
   _getOverallScore() {
     const c = this._getCompletion();
     let score = 0.55;
-    if (c.identityForge) score += 0.1125;
-    if (c.wayfindingWorld) score += 0.1125;
-    if (c.missionTools) score += 0.1125;
+    if (c.identityForge) score += 0.11;
+    if (c.wayfindingWorld) score += 0.11;
+    if (c.missionTools) score += 0.01;
     return score;
   }
 
