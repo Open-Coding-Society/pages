@@ -27,6 +27,7 @@
         <option value="python">Python</option>
         <option value="java">Java</option>
         <option value="javascript">JavaScript</option>
+        <option value="pseudocode">Pseudocode</option>
       </select>
       <select class="fontSizeSelect">
         <option value="14">14px</option>
@@ -55,8 +56,59 @@
   </div>
 </div>
 
+<script>
+// AP CSP Pseudocode syntax highlighting mode for CodeMirror 5
+if (typeof CodeMirror !== 'undefined' && !CodeMirror.modes['pseudocode']) {
+  CodeMirror.defineMode('pseudocode', function() {
+    const KW  = new Set(['IF','ELSE','REPEAT','TIMES','UNTIL','FOR','EACH','IN','PROCEDURE','RETURN','AND','OR','NOT','MOD']);
+    const BI  = new Set(['DISPLAY','INPUT','APPEND','INSERT','REMOVE','LENGTH']);
+    const BOOL= new Set(['TRUE','FALSE']);
+    return {
+      token: function(stream) {
+        if (stream.eatSpace()) return null;
+
+        // Comments
+        if (stream.match('//')) { stream.skipToEnd(); return 'comment'; }
+
+        // Strings — handles curly and straight quotes
+        const q = stream.peek();
+        if (q === '"' || q === '“' || q === '”' || q === "'") {
+          stream.next();
+          const close = (q === '“') ? '”' : q;
+          while (!stream.eol() && stream.peek() !== close) stream.next();
+          if (!stream.eol()) stream.next();
+          return 'string';
+        }
+
+        // Numbers
+        if (stream.match(/^-?\d+(\.\d*)?/)) return 'number';
+
+        // Words: keywords / builtins / booleans / identifiers
+        if (stream.match(/^[a-zA-Z_][a-zA-Z0-9_]*/)) {
+          const w = stream.current().toUpperCase();
+          if (KW.has(w))   return 'keyword';
+          if (BI.has(w))   return 'builtin';
+          if (BOOL.has(w)) return 'atom';
+          return 'variable';
+        }
+
+        // AP CSP symbolic operators
+        if (stream.match('←') || stream.match('≠') ||
+            stream.match('≥') || stream.match('≤')) return 'operator';
+
+        // ASCII operators
+        if (stream.match(/^[+\-*\/=<>]/)) return 'operator';
+
+        stream.next();
+        return null;
+      }
+    };
+  });
+}
+</script>
+
 <script type="module">
-import { BaseRunner, CodeExecutor } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
+import { BaseRunner, CodeExecutor, PseudocodeExecutor } from '{{site.baseurl}}/assets/js/pages/runners/index.js';
 import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
 (function() {
@@ -78,7 +130,8 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
       mode: initialLang === "java" ? "text/x-java" : (initialLang || "python"),
       theme: "darcula",
       indentUnit: 4,
-      tabSize: 4
+      tabSize: 4,
+      styleSelectedText: true
     }
   });
 
@@ -94,6 +147,11 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     pythonURI,
     javaURI,
     fetchOptions,
+  });
+
+  const pseudoExecutor = new PseudocodeExecutor({
+    outputElement: outputDiv,
+    execTimeElement: execTimeSpan,
   });
 
   // Set initial language selection
@@ -116,6 +174,22 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     editor.refresh();
   });
 
+  // Auto-substitute pseudocode shorthand as the user types
+  const pseudoSubs = [['<--','←',3],['!=','≠',2],['>=','≥',2],['<=','≤',2]];
+  editor.on('change', (cm, change) => {
+    if (langSelect.value !== 'pseudocode') return;
+    if (change.origin !== '+input') return;
+    const cursor = cm.getCursor();
+    const line   = cm.getLine(cursor.line);
+    const pos    = cursor.ch;
+    for (const [find, rep, len] of pseudoSubs) {
+      if (line.slice(0, pos).endsWith(find)) {
+        cm.replaceRange(rep, {line: cursor.line, ch: pos - len}, {line: cursor.line, ch: pos});
+        break;
+      }
+    }
+  });
+
   // Language switcher
   langSelect.addEventListener("change", () => {
     const lang = langSelect.value;
@@ -125,6 +199,8 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
       editor.setOption("mode", "text/x-java");
     } else if (lang === "javascript") {
       editor.setOption("mode", "javascript");
+    } else if (lang === "pseudocode") {
+      editor.setOption("mode", "pseudocode");
     }
   });
 
@@ -132,6 +208,9 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
 
   // Run button logic
   function runCode() {
+    if (langSelect.value === "pseudocode") {
+      return pseudoExecutor.run(editor.getValue());
+    }
     return codeExecutor.run();
   }
 

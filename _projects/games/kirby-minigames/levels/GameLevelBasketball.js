@@ -6,13 +6,13 @@ import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Leaderboard from '@assets/js/GameEnginev1.1/essentials/Leaderboard.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import KirbyLevelMusic from './KirbyLevelMusic.js';
+import { getKirbyImageUrl } from './kirbyAssetPaths.js';
 
 class GameLevelBasketball {
   constructor(gameEnv) {
     this.gameEnv = gameEnv;
     const width = gameEnv.innerWidth;
     const height = gameEnv.innerHeight;
-    const path = gameEnv.path;
     this.playerStart = { x: Math.round(width * 0.12), y: Math.round(height * 0.68) };
     this.chaserStart = { x: Math.round(width * 0.72), y: Math.round(height * 0.55) };
 
@@ -45,14 +45,14 @@ class GameLevelBasketball {
     this.targetSurvivalSeconds = 20;
     this.firstStealScrollTriggered = false;
 
-    const image_src_court = path + '/images/projects/characters/BaskCourt.png';
+    const image_src_court = getKirbyImageUrl('BaskCourt.png');
     const image_data_court = {
       id: 'BasketballCourt',
       src: image_src_court,
       pixels: { height: 720, width: 1478 }
     };
 
-    const sprite_src_player = path + '/images/projects/characters/astro.png';
+    const sprite_src_player = getKirbyImageUrl('astro.png');
     const sprite_data_player = {
       id: 'BasketballPlayer',
       greeting: 'Ball handler ready.',
@@ -75,7 +75,7 @@ class GameLevelBasketball {
       keypress: { up: 87, left: 65, down: 83, right: 68 }
     };
 
-    const sprite_src_chaser = path + '/images/projects/characters/kirby.png';
+    const sprite_src_chaser = getKirbyImageUrl('kirby.png');
     const sprite_data_chaser = {
       id: 'LeBron',
       greeting: 'You reached LeBron.',

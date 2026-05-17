@@ -19,6 +19,8 @@ This project also adds replay systems and technical features beyond a basic leve
 - `_projects/games/kirby-minigames/levels/GameLevelSeek.js`
 - `_projects/games/kirby-minigames/levels/GameLevelBasketball.js`
 - `_projects/games/kirby-minigames/levels/KirbyLevelMusic.js`
+- `_projects/games/kirby-minigames/levels/kirbyAssetPaths.js`
+- `_projects/games/kirby-minigames/notebook.src.ipynb`
 - `_projects/games/kirby-minigames/images/Aquatic.png`
 - `_projects/games/kirby-minigames/images/Above the water.png`
 - `_projects/games/kirby-minigames/images/Mermaid Spritesheet.png`
@@ -203,19 +205,400 @@ This works because the aquatic level first pauses the parent game and hides the 
 Seek then transitions forward by tearing down its current level and handing control back up the chain:
 
 ```javascript
+const transitionOverlay = document.createElement('div');
+transitionOverlay.style.opacity = '0';
+transitionOverlay.style.transition = 'opacity 900ms ease';
+document.body.appendChild(transitionOverlay);
+
+requestAnimationFrame(() => {
+  transitionOverlay.style.opacity = '1';
+});
+
+setTimeout(() => {
+  topGame.currentLevelIndex = basketballIndex;
+  topGame.transitionToLevel();
+}, 950);
+```
+
+This matches the game-in-game lesson pattern because the project is not just changing scenes visually. It is creating, fading, destroying, and replacing active game levels in a controlled sequence.
+
+## Code Breakdown
+
+### Megalodon boss fight breakdown
+
+## PART 1 - Storing the whole fight in one state object
+
+The aquatic level keeps the full boss fight inside one shared object instead of scattering combat data across random variables.
+
+```js
+this.bossState = {
+  active: false,
+  hp: 2100,
+  playerHp: 165,
+  summons: [],
+  projectiles: [],
+  enemyProjectiles: [],
+  buffs: createBossOrbBuffState()
+};
+```
+
+- `active` = whether the boss fight is currently running
+- `hp` = Megalodon health
+- `playerHp` = player combat health for the boss phase
+- `summons` and `projectiles` = extra combat objects spawned during the fight
+- `buffs` = temporary orb effects that change combat behavior
+
+## PART 2 - Unlocking new boss behavior by health thresholds
+
+The fight becomes harder by checking health percentages instead of running one flat attack pattern.
+
+```js
+if (
+  this.bossState.hp <= this.bossState.maxHp * threshold &&
+  !this.bossState.summonThresholdsTriggered.includes(threshold)
+) {
+  this.bossState.summonThresholdsTriggered.push(threshold);
+  summonRushingSharks(threshold > 0.5 ? 2 : 4);
+}
+```
+
+- `hp <= maxHp * threshold` = checks whether the boss crossed a phase breakpoint
+- `summonThresholdsTriggered` = prevents the same phase from firing twice
+- `summonRushingSharks(...)` = adds pressure as the fight escalates
+
+## PART 3 - Spawning orb power-ups during combat
+
+The boss fight is not only about dodging. It also drops timed buffs the player can collect.
+
+```js
+const orb = new Collectible({
+  id: `aquatic_orb_${definition.key}_${Date.now()}`,
+  src: definition.sprite,
+  interact: function() {
+    activateOrb(definition);
+    this.destroy();
+  }
+}, gameEnv);
+```
+
+- `Collectible` = reuses the engine's collectible system for combat buffs
+- `definition.sprite` = decides what the orb looks like
+- `activateOrb(definition)` = applies the orb effect
+- `this.destroy()` = removes the orb after pickup
+
+### Game-in-game transition breakdown
+
+## PART 1 - Starting a nested minigame from Aquatic
+
+The aquatic level launches Seek as a new `GameControl` instead of treating it like a simple cutscene.
+
+```js
+const gameInGame = new GameControl(this.gameEnv.game, [GameLevelSeek], {
+  parentControl: primaryGame,
+});
+gameInGame.start();
+```
+
+- `new GameControl(...)` = creates a fresh game controller for the subgame
+- `[GameLevelSeek]` = tells that controller which level to run
+- `parentControl` = keeps a link back to the main game
+- `start()` = begins the nested level
+
+## PART 2 - Fading from Seek into Basketball
+
+Seek does not swap instantly anymore. It creates an overlay and waits before transitioning.
+
+```js
+const transitionOverlay = document.createElement('div');
+transitionOverlay.style.opacity = '0';
+transitionOverlay.style.transition = 'opacity 900ms ease';
+document.body.appendChild(transitionOverlay);
+```
+
+- `createElement('div')` = builds the fullscreen fade layer
+- `opacity = '0'` = starts invisible
+- `transition` = tells the browser to animate the opacity change
+- `appendChild()` = places the overlay on the page
+
+## PART 3 - Handing control back up the chain
+
+After the fade starts, Seek finds the top controller and tells it to load Basketball.
+
+```js
 const primaryGame = this.gameEnv?.gameControl;
 const topGame = primaryGame?.parentControl || primaryGame;
-
-if (primaryGame.currentLevel && typeof primaryGame.currentLevel.destroy === 'function') {
-  primaryGame.currentLevel.destroy();
-}
-
-topGame.levelClasses = [GameLevelBasketball];
-topGame.currentLevelIndex = 0;
+topGame.currentLevelIndex = basketballIndex;
 topGame.transitionToLevel();
 ```
 
-This matches the game-in-game lesson pattern because the project is not just changing scenes visually. It is actually creating, pausing, destroying, and replacing active game levels in a controlled sequence.
+- `primaryGame` = the current Seek controller
+- `parentControl` = the original game that launched Seek
+- `currentLevelIndex` = points to the Basketball level
+- `transitionToLevel()` = performs the actual level swap
+
+### Collision logic breakdown
+
+## PART 1 - Building hitbox rectangles
+
+Basketball first turns sprite positions into smaller collision rectangles.
+
+```js
+return {
+  left:   pos.x + widthReduction,
+  right:  pos.x + width - widthReduction,
+  top:    pos.y + heightReduction,
+  bottom: pos.y + height
+};
+```
+
+- `left/right/top/bottom` = the edges of the hitbox
+- `widthReduction` and `heightReduction` = shrink the hitbox to feel fairer
+- smaller hitboxes = less frustrating collision detection
+
+## PART 2 - Detecting when Kirby catches the player
+
+The round ends when the two hitboxes overlap.
+
+```js
+if (this.isHitboxCollision(player, lebron)) {
+  this.caught = true;
+  this.caughtAt = now;
+  this.showCaughtMessage();
+}
+```
+
+- `isHitboxCollision()` = checks rectangle overlap
+- `caught = true` = switches the game into the caught state
+- `caughtAt` = stores when the collision happened
+- `showCaughtMessage()` = shows the reset warning on screen
+
+## PART 3 - Projectile collision uses a different shape
+
+Thrown basketballs use circle-to-rectangle collision instead of player-to-player overlap.
+
+```js
+const nearestX = Math.max(rect.left, Math.min(projectile.x, rect.right));
+const nearestY = Math.max(rect.top,  Math.min(projectile.y, rect.bottom));
+const dx = projectile.x - nearestX;
+const dy = projectile.y - nearestY;
+```
+
+- `nearestX` and `nearestY` = closest point on the target hitbox
+- `dx` and `dy` = distance from the projectile center to that point
+- this method works better for round projectiles than plain rectangle overlap
+
+### NPC chasing behavior breakdown
+
+## PART 1 - Measuring direction toward the player
+
+Kirby needs to know where the player is every frame before it can chase.
+
+```js
+const dx = player.position.x - lebron.position.x;
+const dy = player.position.y - lebron.position.y;
+const dist = Math.hypot(dx, dy);
+if (dist < 1) return;
+```
+
+- `dx` = horizontal difference
+- `dy` = vertical difference
+- `Math.hypot(dx, dy)` = true distance between the two characters
+- `return` = stops jitter when the distance is tiny
+
+## PART 2 - Converting distance into controlled movement
+
+The chaser uses the direction to move a little each frame instead of teleporting.
+
+```js
+const speed = Math.min(2.1 + this.currentTime * 0.03, 2.8);
+lebron.position.x += (dx / dist) * speed;
+lebron.position.y += (dy / dist) * speed;
+```
+
+- `dx / dist` and `dy / dist` = normalized direction
+- `speed` = chase speed for that frame
+- `currentTime * 0.03` = slowly ramps up the difficulty
+- `Math.min(..., 2.8)` = keeps the chase capped
+
+## PART 3 - Pointing the sprite the right way
+
+The code also changes Kirby's facing direction so the chase reads visually.
+
+```js
+if (Math.abs(dx) > Math.abs(dy)) {
+  lebron.direction = dx >= 0 ? 'right' : 'left';
+} else {
+  lebron.direction = dy >= 0 ? 'down' : 'up';
+}
+```
+
+- compares horizontal and vertical pressure
+- picks the stronger axis
+- updates the sprite direction to match movement
+
+### Multiplayer system breakdown
+
+## PART 1 - Turning a URL room into multiplayer state
+
+Aquatic enables co-op by reading a `room` value and using it to build a shared channel name.
+
+```js
+const multiplayerRoom = new URLSearchParams(window.location.search).get('room') || '';
+this.multiplayer = {
+  enabled: Boolean(multiplayerRoom),
+  room: multiplayerRoom,
+  channelName: `aquatic_multiplayer_${multiplayerRoom}`,
+};
+```
+
+- `URLSearchParams(...)` = reads query string settings from the page URL
+- `enabled` = flips multiplayer on or off
+- `room` = the lobby name
+- `channelName` = the communication key for that lobby
+
+## PART 2 - Choosing a transport layer
+
+The level prefers `BroadcastChannel`, but falls back to browser storage events if needed.
+
+```js
+if (typeof BroadcastChannel !== 'undefined') {
+  const channel = new BroadcastChannel(this.multiplayer.channelName);
+  channel.onmessage = (event) => handleMultiplayerMessage(event.data);
+  this.multiplayer.channel = channel;
+}
+```
+
+- `BroadcastChannel` = direct tab-to-tab communication
+- `channelName` = makes sure only the same room shares messages
+- `onmessage` = receives updates from the other player
+- fallback logic exists for browsers that do not support the channel API
+
+## PART 3 - Sending heartbeat updates
+
+The local player broadcasts position updates on a timer so the other client can draw them.
+
+```js
+this.multiplayer.heartbeatTimer = setInterval(() => {
+  broadcastMultiplayerMessage({
+    type: "state",
+    x: player.position?.x || 0,
+    y: player.position?.y || 0,
+    direction: player.direction || "down",
+  });
+}, 120);
+```
+
+- `setInterval(..., 120)` = sends updates about every 120ms
+- `type: "state"` = marks this as a movement packet
+- `x`, `y`, `direction` = enough data to mirror the other player
+
+### Music system breakdown
+
+## PART 1 - Reusing an existing audio class
+
+Instead of writing a new system from scratch, Kirby music extends the Peppa music controller.
+
+```js
+import PeppaMusic from "../../peppa-pig/levels/PeppaMusic.js";
+
+class KirbyLevelMusic extends PeppaMusic {
+```
+
+- `import PeppaMusic` = reuses an existing music system
+- `extends` = inherits the old behavior
+- `KirbyLevelMusic` = customizes it for this project
+
+## PART 2 - Attaching music per level
+
+Each level creates its own music controller during setup.
+
+```js
+this.levelMusic = new KirbyLevelMusic({
+  levelName: 'Seek',
+  buttonId: 'kirby-seek-music-toggle'
+}).attach();
+```
+
+- `levelName` = tells the controller which track/context it is serving
+- `buttonId` = unique DOM ID for the music toggle button
+- `attach()` = mounts the controller and its listeners
+
+## PART 3 - Cleaning up when a level ends
+
+The level destroys the controller in `destroy()` so buttons and audio do not leak between minigames.
+
+```js
+this.levelMusic?.destroy?.();
+this.levelMusic = null;
+```
+
+- `destroy()` = removes listeners and stops leftover audio state
+- `?.` = safely calls cleanup only if the controller exists
+- `null` = clears the reference after teardown
+
+### Sprite swapping and UI system breakdown
+
+## PART 1 - Defining sprite options in one list
+
+Seek stores all playable sprite choices in one configuration array.
+
+```js
+const spriteOptions = [
+  { label: "Boy", src: getKirbyImageUrl('boysprite.png') },
+  { label: "Scuba Diver", src: getKirbyImageUrl('scubadiver.png') },
+  { label: "Astro", src: getKirbyImageUrl('astro.png') },
+];
+```
+
+- `spriteOptions` = one place for character data
+- `label` = what the button shows
+- `src` = which sprite sheet to load
+- this makes the menu easy to expand without rewriting swap logic
+
+## PART 2 - Updating the current player without respawning
+
+The menu changes the existing player's sprite data in place.
+
+```js
+player.data.src = spriteOption.src;
+player.data.pixels = { ...spriteOption.pixels };
+player.scaleFactor = spriteOption.SCALE_FACTOR;
+player.spriteSheet.src = spriteOption.src;
+```
+
+- `player.data.src` = switches the image file
+- `pixels` = updates sprite sheet dimensions
+- `scaleFactor` = changes how large the character is drawn
+- no new player object is created
+
+## PART 3 - Building HUD elements directly in JavaScript
+
+Basketball creates its timer and message HUD from code instead of static HTML.
+
+```js
+this.timeHud = document.createElement('div');
+this.messageHud = document.createElement('div');
+container.appendChild(this.timeHud);
+container.appendChild(this.messageHud);
+```
+
+- `timeHud` = shows survival time and score info
+- `messageHud` = shows caught/win messages
+- `appendChild()` = inserts the UI into the live game container
+
+## PART 4 - Updating on-screen UI based on game state
+
+The HUD text changes as the round progresses.
+
+```js
+this.timeHud.textContent =
+  `Time: ${this.currentTime.toFixed(1)}s/${this.targetSurvivalSeconds}s | Best: ${this.bestTime.toFixed(1)}s`;
+```
+
+- `textContent` = replaces the HUD text directly
+- `currentTime` = live survival timer
+- `targetSurvivalSeconds` = win condition goal
+- `bestTime` = saved personal best
 
 ### Collision system (Triple Chocolate)
 
