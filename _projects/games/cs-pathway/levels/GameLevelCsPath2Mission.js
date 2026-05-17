@@ -161,7 +161,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         { type: 'section', title: 'MISSION SCOREBOARD', marginTop: '10px' },
         { key: 'missionScore', label: 'Score', emptyValue: '.55' },
         { key: 'missionCleared', label: 'Cleared', emptyValue: '0/4' },
-        { key: 'missionComplete', label: 'Complete', emptyValue: '—' },
       ],
       theme: {
         background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
@@ -185,7 +184,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       desk4: '—',
       missionScore: '.55',
       missionCleared: '0/4',
-      missionComplete: '—',
     });
 
     /**
@@ -406,11 +404,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       }
       if (Array.isArray(savedStations) && savedStations.length > 0) {
         savedStations.forEach((id) => this._missionCompletedStations.add(id));
-      }
-
-      const stationTargetCount = this._missionDeskIds?.length || 4;
-      if (this._missionCompletedStations.size >= stationTargetCount && typeof this.markLevelComplete === 'function') {
-        this.markLevelComplete('missionTools');
       }
     } catch (err) {
       console.warn('[MissionTools] could not restore score:', err);
@@ -862,9 +855,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._saveMissionScore();
 
       if (this._missionCompletedStations.size >= stationTargetCount) {
-        if (typeof this.markLevelComplete === 'function') {
-          this.markLevelComplete('missionTools');
-        }
         this.showToast?.('All stations cleared once. Repeat solves now count toward bonus progress.');
       }
       return;
@@ -903,8 +893,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     const score = this._getMissionProgressScore(this._missionProgressCount);
     const scoreText = score.toFixed(2).replace(/^0/, '');
     const completedText = `${this._missionProgressCount}/4`;
-    const stationTargetCount = this._missionDeskIds?.length || 4;
-    const completeMark = this._missionCompletedStations.size >= stationTargetCount ? '✓' : '—';
 
     // Keep scoreboard integrated with the mission tools panel and remove legacy detached HUD.
     this.clearScore?.();
@@ -915,7 +903,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       desk4: '—',
       missionScore: scoreText,
       missionCleared: completedText,
-      missionComplete: completeMark,
     });
   }
 
