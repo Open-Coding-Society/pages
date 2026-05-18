@@ -29,13 +29,13 @@ function parseSource(src) {
   for (const raw of src.split('\n')) {
     const line = raw.trim();
 
-    const mMap = line.match(/^from\s+tilemaps\s+import\s+(\d+)$/i);
+    const mMap = line.match(/^FROM\s+TILEMAPS\s+IMPORT\s+(\d+)$/);
     if (mMap) { tilemapId = parseInt(mMap[1], 10); continue; }
 
-    const mSpawn = line.match(/^spawn\s+character\s+at\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+    const mSpawn = line.match(/^SPAWN\s+CHARACTER\s+AT\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)$/);
     if (mSpawn) { spawnCol = parseInt(mSpawn[1], 10) - 1; spawnRow = parseInt(mSpawn[2], 10) - 1; continue; }
 
-    const mGoal = line.match(/^spawn\s+goal\s+at\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+    const mGoal = line.match(/^SPAWN\s+GOAL\s+AT\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)$/);
     if (mGoal) { goalCol = parseInt(mGoal[1], 10) - 1; goalRow = parseInt(mGoal[2], 10) - 1; continue; }
 
     codeLines.push(raw);
@@ -253,10 +253,10 @@ export class RobotExecutor {
   }
 
   static detect(src) {
-    return /^\s*from\s+tilemaps\s+import\s+\d+/im.test(src) ||
-           /^\s*spawn\s+character\s+at/im.test(src)         ||
-           /^\s*spawn\s+goal\s+at/im.test(src)              ||
-           /\bRENDER\s*\(/i.test(src);
+    return /^\s*FROM\s+TILEMAPS\s+IMPORT\s+\d+/m.test(src) ||
+           /^\s*SPAWN\s+CHARACTER\s+AT/m.test(src)         ||
+           /^\s*SPAWN\s+GOAL\s+AT/m.test(src)              ||
+           /\bRENDER\s*\(/.test(src);
   }
 
   run(src) {

@@ -28,8 +28,7 @@ function tokenize(src) {
     }
     if (/[a-zA-Z_]/.test(c)) {
       let s = ''; while (i < n && /[a-zA-Z0-9_]/.test(src[i])) s += src[i++];
-      const u = s.toUpperCase();
-      out.push({t: KW.has(u) ? 'K' : 'I', v: KW.has(u) ? u : s}); continue;
+      out.push({t: KW.has(s) ? 'K' : 'I', v: s}); continue;
     }
     const sl = src.slice(i);
     if (sl.slice(0,3) === '<--') { out.push({t:'O',v:'←'}); i+=3; continue; }
