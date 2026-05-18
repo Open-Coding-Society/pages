@@ -759,18 +759,25 @@ Check if this is a course lesson and determine which course context to use
       
       if (createRes.ok) {
         const result = await createRes.json();
-        // Set global ASSIGNMENT_ID for use in submission forms
+        // Set global ASSIGNMENT_ID and ASSIGNMENT_NAME for use in submission forms
         window.ASSIGNMENT_ID = result.id;
         window.ASSIGNMENT_NAME = result.name;
-        console.log('Assignment auto-created with ID:', result.id);
-      } else if (createRes.status === 200) {
-        // Assignment already exists
-        const result = await createRes.json();
-        window.ASSIGNMENT_ID = result.id;
-        window.ASSIGNMENT_NAME = result.name;
-        console.log('Assignment already exists with ID:', result.id);
+        
+        // Distinguish between newly created (201) and already existing (200)
+        if (createRes.status === 201) {
+          console.log('✓ Assignment auto-created with ID:', result.id);
+        } else if (createRes.status === 200) {
+          console.log('ℹ Assignment already exists with ID:', result.id, '- reusing for this session');
+        } else {
+          console.log('Assignment resolved with ID:', result.id);
+        }
+      } else if (createRes.status === 403) {
+        console.warn('Not authenticated - assignment creation skipped. Please log in to enable assignments.');
+      } else if (createRes.status === 400) {
+        const error = await createRes.json();
+        console.error('Bad request for auto-create assignment:', error.error);
       } else {
-        console.error('Failed to auto-create assignment:', createRes.statusText);
+        console.error('Failed to auto-create assignment:', createRes.status, createRes.statusText);
       }
     } catch (error) {
       console.error('Error auto-creating assignment:', error);
