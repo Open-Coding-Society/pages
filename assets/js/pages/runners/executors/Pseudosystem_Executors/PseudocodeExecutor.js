@@ -250,7 +250,7 @@ function gen(ast) {
   return stmts(ast);
 }
 
-function compile(src) {
+export function compile(src) {
   return gen(new Parser(tokenize(src)).parse());
 }
 
