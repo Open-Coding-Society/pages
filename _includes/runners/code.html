@@ -64,8 +64,9 @@ if (typeof CodeMirror !== 'undefined' && !CodeMirror.modes['pseudocode']) {
     const BI         = new Set(['DISPLAY','INPUT','APPEND','INSERT','REMOVE','LENGTH']);
     const BOOL       = new Set(['TRUE','FALSE']);
     // Robot commands folded into existing token types for colour consistency
-    const BI_EXTRA = new Set(['MOVE_FORWARD','ROTATE_LEFT','ROTATE_RIGHT','CAN_MOVE','RENDER']);
-    const KW_EXTRA = new Set(['SPAWN','CHARACTER','GOAL','AT','FROM','TILEMAPS','IMPORT']);
+    const BI_EXTRA     = new Set(['MOVE_FORWARD','ROTATE_LEFT','ROTATE_RIGHT','CAN_MOVE','RENDER']);
+    const ROBOT_BLUE   = new Set(['FROM','TILEMAPS','IMPORT','SPAWN']);
+    const ROBOT_YELLOW = new Set(['CHARACTER','GOAL']);
     return {
       token: function(stream) {
         if (stream.eatSpace()) return null;
@@ -89,9 +90,11 @@ if (typeof CodeMirror !== 'undefined' && !CodeMirror.modes['pseudocode']) {
         // Words: robot commands take priority, then pseudocode keywords
         if (stream.match(/^[a-zA-Z_][a-zA-Z0-9_]*/)) {
           const w = stream.current();
-          if (KW.has(w) || KW_EXTRA.has(w)) return 'keyword';
+          if (KW.has(w))                     return 'keyword';
           if (BI.has(w) || BI_EXTRA.has(w)) return 'builtin';
           if (BOOL.has(w))                  return 'atom';
+          if (ROBOT_BLUE.has(w))            return 'attribute';
+          if (ROBOT_YELLOW.has(w))          return 'property';
           return 'variable';
         }
 
