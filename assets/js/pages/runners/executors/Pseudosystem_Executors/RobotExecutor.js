@@ -84,8 +84,13 @@ function simulate(pseudoSrc, initialGrid, startCol, startRow) {
   };
 
   const CAN_MOVE = (dirName) => {
-    const d = DIR_NAMES.indexOf(String(dirName).toLowerCase());
-    if (d === -1) throw new Error(`AP CSP Robot Error: CAN_MOVE got unknown direction "${dirName}"`);
+    const rel = String(dirName).toLowerCase();
+    let d;
+    if      (rel === 'forward')  d = dir;
+    else if (rel === 'backward') d = (dir + 2) % 4;
+    else if (rel === 'left')     d = (dir + 3) % 4;
+    else if (rel === 'right')    d = (dir + 1) % 4;
+    else throw new Error(`AP CSP Robot Error: CAN_MOVE got unknown direction "${dirName}" — use "forward", "backward", "left", or "right"`);
     const { dr, dc } = DIR_DELTA[d];
     const nr = row + dr, nc = col + dc;
     return !(nr < 0 || nr >= GRID || nc < 0 || nc >= GRID || grid[nr][nc] === 1);
