@@ -14,6 +14,11 @@
   --ui-bg: rgba(0,0,0,0.06);
   --ui-border: rgba(255,255,255,0.06);
   --emoji-bg: rgba(255,255,255,0.9);
+  --glass-tint: color-mix(in srgb, var(--panel) 68%, transparent);
+  --navbar-surface: color-mix(in srgb, var(--panel) 96%, var(--pref-text-color) 4%);
+  --navbar-border: color-mix(in srgb, var(--pref-text-color) 12%, transparent);
+  --navbar-shadow: color-mix(in srgb, var(--pref-text-color) 14%, transparent);
+  --navbar-muted: color-mix(in srgb, var(--pref-text-color) 62%, var(--pref-bg-color) 38%);
 }
 
 /* Scope the user theme */

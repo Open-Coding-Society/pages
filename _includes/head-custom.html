@@ -22,6 +22,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<!-- CodeMirror selection highlighting addon -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/mark-selection.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/mark-selection.min.css">
 {%- endif -%}
 
 {%- if page.tailwind -%}
@@ -71,3 +74,10 @@
 <script src="https://ai-ab-test-engine.vercel.app/sdk.js"
   data-site-baseurl="{{ site.baseurl }}"
   data-project-id="cmnfour780000f63gu69kg2v8"></script>
+<script type="importmap">
+{
+  "imports": {
+    "@assets/": "{{ site.baseurl }}/assets/"
+  }
+}
+</script>
