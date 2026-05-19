@@ -58,6 +58,7 @@ class GameEnv {
      */
     setCanvas() {
         this.canvas = document.getElementById('gameCanvas');
+        if (!this.canvas) { console.error('Canvas is absolutely null in GameEnv!'); }
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     }
 

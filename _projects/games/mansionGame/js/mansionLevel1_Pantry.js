@@ -31,7 +31,7 @@ class MansionLevel1_Pantry {
     }
 
     // Background data
-    const image_background = path + "/images/mansionGame/kitchen_pantry.png"; // be sure to include the path
+    const image_background = path + "/images/projects/mansionGame/kitchen_pantry.png"; // be sure to include the path
     const image_data_background = {
         name: 'background',
         greeting: "This is the pantry, you will search for ingredients and create a potion.",
@@ -175,7 +175,7 @@ class MansionLevel1_Pantry {
               dsFinal.closeDialogue();
             // create the skeleton key image element
               const keyImg = document.createElement('img');
-              keyImg.src = '/images/mansionGame/skeleton_key.png'; // <-- change this to your actual image path
+              keyImg.src = '/images/projects/mansionGame/skeleton_key.png'; // <-- change this to your actual image path
               keyImg.alt = 'Skeleton Key';
               keyImg.style.position = 'fixed';
               keyImg.style.top = '50%';
@@ -256,7 +256,7 @@ class MansionLevel1_Pantry {
       return {
         id,
         greeting: `Collectable: ${id}`,
-        src: path + '/images/mansionGame/' + filename,
+        src: path + '/images/projects/mansionGame/' + filename,
         // Scale factor is adjustable per item
         SCALE_FACTOR: scaleFactor,
         ANIMATION_RATE: 100,

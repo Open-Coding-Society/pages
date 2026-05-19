@@ -50,7 +50,7 @@ class MansionLevel2 {
         };
 
         // Invisible cemetery entrance door (like Level 6)
-        const sprite_src_cemetery_door = path + "/images/mansionGame/invisDoorCollisionSprite.png";
+        const sprite_src_cemetery_door = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
         const sprite_data_cemetery_door = {
             id: 'CemeteryDoor',
             greeting: "Enter the cemetery? Press E",

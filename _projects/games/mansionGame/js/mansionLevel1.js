@@ -33,7 +33,7 @@ class MansionLevel1 {
   }
 
     // Background data
-    const image_background = path + "/images/mansionGame/kitchen_lvl1.png"; // be sure to include the path
+    const image_background = path + "/images/projects/mansionGame/kitchen_lvl1.png"; // be sure to include the path
     const image_data_background = {
         name: 'background',
         greeting: "This is the kitchen, you will search for ingredients and create a potion.",

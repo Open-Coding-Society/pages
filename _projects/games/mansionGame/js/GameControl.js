@@ -1,5 +1,6 @@
 // GameControl.js with improved level transition handling
 import GameLevel from "./MansionLogic/GameLevel.js";
+import { initCheats } from "./cheats.js";
 
 class GameControl {
     /**
@@ -19,6 +20,7 @@ class GameControl {
         this.gameLoopCounter = 0;
     this.isPaused = false;
     this.animFrameId = null;
+        initCheats(this.game);
     // Optional reference to a PauseMenu instance. If set, Escape will toggle it.
     this.pauseMenu = null;
     // Optional per-game PauseMenu configuration (passed to the shared PauseMenu by Game.js)

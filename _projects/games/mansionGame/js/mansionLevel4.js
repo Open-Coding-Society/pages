@@ -28,7 +28,7 @@ class MansionLevel4 {
         this.promptVisible = false;
 
         // Background data
-        const image_background = path + "/images/mansionGame/image_lvl4.png";
+        const image_background = path + "/images/projects/mansionGame/image_lvl4.png";
         const image_data_background = {
             name: 'background',
             greeting: "This is the casino, you will try to gamble your way out of the level, survive as long as possible.",
@@ -189,7 +189,7 @@ class MansionLevel4 {
         dialogueSystem.showDialogue(
             'You won $10,000 at the casino and earned the golden key! Congratulations!',
             'Victory!',
-            this.gameEnv.path + '/images/mansionGame/key_lvl3.png'
+            this.gameEnv.path + '/images/projects/mansionGame/key_lvl3.png'
         );
         
         dialogueSystem.addButtons([
