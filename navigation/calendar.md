@@ -34,7 +34,9 @@ active_tab: calendar
             <option value="issue">Issue</option>
             <option value="break">Break</option>
         </select>
-        <input id="calendar-filter-group" type="search" placeholder="Filter by group/course" />
+        <select id="calendar-filter-group" class="filter-field">
+            <option value="">All groups</option>
+        </select>
         <label class="filter-field filter-field--date" for="calendar-filter-start">
             <span class="filter-label">Start date</span>
             <input id="calendar-filter-start" type="date" title="Filter from date" />
@@ -74,7 +76,9 @@ active_tab: calendar
             </select>
             <input id="issues-filter-author" type="search" placeholder="Filter by author" />
             <input id="issues-filter-tags" type="search" placeholder="Filter by tags" />
-            <input id="issues-filter-group" type="search" placeholder="Filter by group" />
+            <select id="issues-filter-group" class="filter-field">
+                <option value="">All groups</option>
+            </select>
             <label class="filter-field filter-field--date" for="issues-filter-date">
                 <span class="filter-label">Due date</span>
                 <input id="issues-filter-date" type="date" title="Filter by due date" />
@@ -150,6 +154,14 @@ active_tab: calendar
                 <div>
                     <label for="issue-tags">Tags (comma-separated)</label>
                     <input id="issue-tags" type="text" placeholder="frontend, sprint-9" />
+                </div>
+
+                <div>
+                    <label for="issue-assigned-groups">Assign to Groups (select multiple)</label>
+                    <select id="issue-assigned-groups" class="filter-field issue-assigned-select" multiple size="4" title="Hold Ctrl/Cmd to select multiple groups">
+                        <option value="">-- Select groups --</option>
+                    </select>
+                    <small>Groups will be automatically assigned to these class periods</small>
                 </div>
 
                 <div class="issue-form-actions">
@@ -266,6 +278,22 @@ active_tab: calendar
             <button id="issue-modal-star" type="button" class="calendar-issue-action-btn secondary">Star</button>
             <button id="issue-modal-edit" type="button" class="calendar-issue-action-btn secondary">Edit</button>
             <button id="issue-modal-delete" type="button" class="calendar-issue-action-btn danger">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal (for nested replies) -->
+<div id="replyModal" class="reply-modal" aria-hidden="true" role="dialog" aria-label="Reply to Comment" style="display:none;">
+    <div class="reply-modal-content">
+        <div class="reply-modal-header">
+            <h4 id="reply-modal-title">Reply</h4>
+            <button id="reply-modal-close" class="issue-modal-close" type="button" aria-label="Close Reply Modal">&times;</button>
+        </div>
+        <div id="reply-parent-preview" class="reply-parent-preview" style="padding:8px;background:#f8f8f8;border-radius:6px;margin:8px 0;color:#222;"></div>
+        <textarea id="reply-modal-text" rows="4" placeholder="Write your reply"></textarea>
+        <div class="reply-modal-actions" style="margin-top:8px;">
+            <button id="reply-modal-submit" class="calendar-issue-action-btn primary" type="button">Post Reply</button>
+            <button id="reply-modal-cancel" class="calendar-issue-action-btn secondary" type="button">Cancel</button>
         </div>
     </div>
 </div>
@@ -575,7 +603,9 @@ active_tab: calendar
             threads.get(comment.issueId).comments.push(comment);
         });
 
-        return Array.from(threads.values()).map(thread => {
+        return Array.from(threads.values())
+            .filter(thread => thread.issue != null)  // Skip orphaned comments with no matching issue
+            .map(thread => {
             thread.comments.sort((a, b) => parseThreadTimestamp(b.timestamp).getTime() - parseThreadTimestamp(a.timestamp).getTime());
             thread.latestComment = thread.comments[0] || null;
             return thread;
@@ -634,6 +664,20 @@ active_tab: calendar
             const issue = thread.issue || {};
             const latestComment = thread.latestComment || null;
             const replyCount = (thread.comments || []).length;
+            
+            // Prefer assignedGroupLabels from server, fallback to parsing assignedGroups
+            let assignedGroupsLabel = '';
+            if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length > 0) {
+                assignedGroupsLabel = `<span class="issue-assigned-groups">📍 Assigned to: ${issue.assignedGroupLabels.join(', ')}</span>`;
+            } else if (issue.assignedGroups) {
+                try {
+                    const groups = JSON.parse(issue.assignedGroups);
+                    if (groups && groups.length > 0) {
+                        assignedGroupsLabel = `<span class="issue-assigned-groups">📍 Assigned to: ${groups.join(', ')}</span>`;
+                    }
+                } catch (e) { /* Skip if not valid JSON */ }
+            }
+            
             return `
                 <article class="issue-card issue-thread-card" data-issue-id="${escapeIssueText(thread.issueId)}">
                     <div class="issue-card-top">
@@ -643,6 +687,7 @@ active_tab: calendar
                             <span class="issue-pill medium">💬 ${escapeIssueText(replyCount)}</span>
                         </div>
                     </div>
+                    ${assignedGroupsLabel}
                     <div class="issue-card-note">${escapeIssueText(issue.status || 'open')} · Due ${escapeIssueText(formatIssueDate(issue.dueDate))} · ${escapeIssueText(issue.author || 'Unknown author')}</div>
                     <div class="issue-meta">${escapeIssueText(latestComment?.timestamp || issue.updatedAt || issue.createdAt || '')}${replyCount ? ` · ${replyCount} replies` : ''}</div>
                     ${latestComment ? `<div class="issue-thread-latest">${escapeIssueText(latestComment.author || 'Unknown')} · ${escapeIssueText((latestComment.text || '').slice(0, 140))}</div>` : '<div class="issue-thread-latest">No replies yet. Start the discussion.</div>'}
@@ -701,6 +746,13 @@ active_tab: calendar
         document.getElementById('issues-subpanel-create')?.classList.toggle('hidden', subtab !== 'create');
         document.getElementById('issues-subpanel-list')?.classList.toggle('hidden', subtab !== 'list');
         document.getElementById('issues-subpanel-kanban')?.classList.toggle('hidden', subtab !== 'kanban');
+        // When switching to Kanban, clear the status filter so all columns show items
+        if (subtab === 'kanban') {
+            const statusFilterEl = document.getElementById('issues-filter-status');
+            if (statusFilterEl) statusFilterEl.value = '';
+            // Re-render views to reflect cleared filter immediately
+            renderIssueViews();
+        }
     }
 
     function showIssueToast(message, type = 'success') {
@@ -863,6 +915,8 @@ active_tab: calendar
             if (el.priority) el.priority.value = 'medium';
             if (el.dueDate) el.dueDate.value = preserveDate || el.filterDate?.value || getLocalIsoDate();
             if (el.saveBtn) el.saveBtn.textContent = 'Create Issue';
+            const groupSelect = document.getElementById('issue-assigned-groups');
+            if (groupSelect) groupSelect.selectedIndex = 0;  // Reset group selection
             updateIssueDescriptionPreview();
             renderIssueViews();
         }
@@ -878,6 +932,22 @@ active_tab: calendar
             if (el.dueDate) el.dueDate.value = issue.dueDate || '';
             if (el.eventId) el.eventId.value = issue.eventId || '';
             if (el.tags) el.tags.value = normalizeTags(issue.tags).join(', ');
+            
+            // Set assigned groups if available
+            const groupSelect = document.getElementById('issue-assigned-groups');
+            if (groupSelect && issue.assignedGroups) {
+                try {
+                    const assignedGroups = JSON.parse(issue.assignedGroups);
+                    if (Array.isArray(assignedGroups)) {
+                        Array.from(groupSelect.options).forEach(opt => {
+                            opt.selected = assignedGroups.includes(opt.value);
+                        });
+                    }
+                } catch (e) { /* Skip if not valid JSON */ }
+            } else if (groupSelect) {
+                groupSelect.selectedIndex = 0;
+            }
+            
             if (el.saveBtn) el.saveBtn.textContent = 'Update Issue';
             updateIssueDescriptionPreview();
             switchIssuesSubtab('create');
@@ -935,6 +1005,23 @@ active_tab: calendar
                 const priority = issue.priority || 'medium';
                 const tags = normalizeTags(issue.tags);
                 const canMove = ISSUE_STATUS_FLOW[status] || ISSUE_STATUS_OPTIONS;
+                // Inject assigned groups label if present
+                const assignedLabel = (() => {
+                    try {
+                        if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length) {
+                            return `<div class="issue-assigned-groups">📍 ${issue.assignedGroupLabels.join(', ')}</div>`;
+                        }
+                        if (issue.assignedGroups) {
+                            const ag = typeof issue.assignedGroups === 'string' ? JSON.parse(issue.assignedGroups) : issue.assignedGroups;
+                            if (Array.isArray(ag) && ag.length) {
+                                const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
+                                return `<div class="issue-assigned-groups">📍 ${labels.join(', ')}</div>`;
+                            }
+                        }
+                    } catch (e) { }
+                    return '';
+                })();
+
                 return `
                     <article class="issue-card" data-issue-id="${escapeIssueText(issue.id)}">
                         <div class="issue-card-top">
@@ -947,6 +1034,7 @@ active_tab: calendar
                             </div>
                         </div>
                         <div class="issue-card-note">Description is hidden here. Press View to open the full issue modal.</div>
+                        ${assignedLabel}
                         <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
                         <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}${issue.eventId ? ` · Event ${escapeIssueText(issue.eventId)}` : ''}</div>
                         ${tags.length ? `<div class="issue-tags">${tags.map(tag => `<span class="issue-tag">${escapeIssueText(tag)}</span>`).join('')}</div>` : ''}
@@ -978,6 +1066,20 @@ active_tab: calendar
 
             el.kanban.innerHTML = ISSUE_STATUS_OPTIONS.map(status => {
                 const statusIssues = groups[status] || [];
+                // assigned groups label for kanban item
+                const assignedLabel = (() => {
+                    try {
+                        if (issue.assignedGroups) {
+                            const ag = typeof issue.assignedGroups === 'string' ? JSON.parse(issue.assignedGroups) : issue.assignedGroups;
+                            if (Array.isArray(ag) && ag.length) {
+                                const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
+                                return `<div class="issue-assigned-groups">📍 ${labels.join(', ')}</div>`;
+                            }
+                        }
+                    } catch (e) { }
+                    return '';
+                })();
+
                 return `
                     <section class="kanban-column">
                         <h3 class="kanban-column-title">${ISSUE_STATUS_LABELS[status]} (${statusIssues.length})</h3>
@@ -986,6 +1088,7 @@ active_tab: calendar
                                 <button type="button" class="issue-link-btn issue-card-title" data-action="view" data-issue-id="${escapeIssueText(issue.id)}">${escapeIssueText(issue.title || 'Untitled issue')}</button>
                                 <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
                                 <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</div>
+                                ${assignedLabel}
                                 <div class="issue-card-badge-row">
                                     <span class="issue-pill ${escapeIssueText(issue.priority || 'medium')}">${escapeIssueText((issue.priority || 'medium').toUpperCase())}</span>
                                     <span class="issue-pill medium">★ ${escapeIssueText(issue.starCount ?? 0)}</span>
@@ -1088,7 +1191,8 @@ active_tab: calendar
                                 description: issue.description || '',
                                 status: issue.status || 'open',
                                 priority: issue.priority || 'medium',
-                                dueDate: issue.dueDate || ''
+                                dueDate: issue.dueDate || '',
+                                assignedGroups: issue.assignedGroups || null
                             }
                         });
                     });
@@ -1205,12 +1309,21 @@ active_tab: calendar
             if (filterMode === 'my-groups' && userGroups.length > 0) {
                 const myGroupNames = getUserGroupNames();
                 const myCourses = getUserCourses();
+                const myGroupIds = new Set(userGroups.map(g => String(g.id)));
                 filtered = filtered.filter(event => {
                     // Always show breaks/holidays
                     if (event.isBreak || (event.extendedProps && event.extendedProps.isBreak)) return true;
                     // Match by group name
                     const evtGroup = event.groupName || (event.extendedProps && event.extendedProps.groupName) || '';
                     if (evtGroup && myGroupNames.has(evtGroup)) return true;
+                    // Match by assignedGroups (array of ids)
+                    try {
+                        const agRaw = (event.extendedProps && event.extendedProps.assignedGroups) || event.assignedGroups || null;
+                        if (agRaw) {
+                            const ag = typeof agRaw === 'string' ? JSON.parse(agRaw) : agRaw;
+                            if (Array.isArray(ag) && ag.map(String).some(a => myGroupIds.has(a))) return true;
+                        }
+                    } catch (e) { /* ignore */ }
                     // Match by course (for sprint-synced events that have period=CSA/CSP/CSSE)
                     const evtCourse = event.period || (event.extendedProps && event.extendedProps.period) || '';
                     if (evtCourse && myCourses.has(evtCourse.toUpperCase())) return true;
@@ -1239,7 +1352,20 @@ active_tab: calendar
 
                 if (filterValues.source !== 'all' && filterValues.source !== eventSource) return false;
                 if (filterValues.type && filterValues.type !== eventType) return false;
-                if (filterValues.group && !String(ext.groupName || event.groupName || ext.period || event.period || '').toLowerCase().includes(filterValues.group)) return false;
+                if (filterValues.group) {
+                    const fv = String(filterValues.group);
+                    // Check assignedGroups JSON array (by id) OR fallback to matching groupName/period text
+                    let assignedOk = false;
+                    try {
+                        const agRaw = ext.assignedGroups || event.assignedGroups || null;
+                        if (agRaw) {
+                            const ag = typeof agRaw === 'string' ? JSON.parse(agRaw) : agRaw;
+                            if (Array.isArray(ag)) assignedOk = ag.map(String).includes(fv);
+                        }
+                    } catch (e) { assignedOk = false; }
+                    const groupText = String(ext.groupName || event.groupName || ext.period || event.period || '').toLowerCase();
+                    if (!(assignedOk || groupText.includes(fv.toLowerCase()))) return false;
+                }
                 if (filterValues.start && eventDate && eventDate < filterValues.start) return false;
                 if (filterValues.end && eventDate && eventDate > filterValues.end) return false;
                 if (filterValues.query && !haystack.includes(filterValues.query)) return false;
@@ -1335,6 +1461,21 @@ active_tab: calendar
                         const titleText = (event.title || 'Issue').replace(/^Issue:\s*/, '');
                         html += '<div class="fc-event-title-custom" title="' + titleText + '" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + titleText + '</div>';
                         if (ext.author) html += '<div class="fc-event-individual">' + ext.author + '</div>';
+                        // Show assigned groups if available (use lookup map if present)
+                                try {
+                                    if (Array.isArray(ext.assignedGroupLabels) && ext.assignedGroupLabels.length) {
+                                        html += '<div class="fc-event-group">' + ext.assignedGroupLabels.join(', ') + '</div>';
+                                    } else {
+                                        const agRaw = ext.assignedGroups || event.assignedGroups || null;
+                                        if (agRaw) {
+                                            const ag = typeof agRaw === 'string' ? JSON.parse(agRaw) : agRaw;
+                                            if (Array.isArray(ag) && ag.length) {
+                                                const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
+                                                html += '<div class="fc-event-group">' + labels.join(', ') + '</div>';
+                                            }
+                                        }
+                                    }
+                                } catch (e) { /* ignore parse errors */ }
                         html += '</div>';
                         return { html };
                     }
@@ -1432,10 +1573,7 @@ active_tab: calendar
                             alert("Title, Description, and Date cannot be empty!");
                             return;
                         }
-                        if (!selectedGroup) {
-                            alert("Please select a Group for this event.");
-                            return;
-                        }
+                        // Group selection is optional; allow events without group
 
                         const currentUserName = (window.user && window.user.name) ? window.user.name : '';
                         // Derive period (course) from the selected group so backend validation passes
@@ -1742,15 +1880,111 @@ active_tab: calendar
                 }
 
                 issueCommentsList.innerHTML = comments.map(comment => `
-                    <article class="issue-comment-card">
+                    <article class="issue-comment-card" data-comment-id="${escapeIssueText(comment.id)}">
                         <div class="issue-comment-card-top">
                             <strong>${escapeIssueText(comment.author || 'Unknown')}</strong>
                             <span class="issue-meta">${escapeIssueText(comment.timestamp || '')}</span>
+                            <button type="button" class="issue-comment-reply-btn" data-action="reply" data-comment-id="${escapeIssueText(comment.id)}" title="Reply to this comment">↳ Reply</button>
                         </div>
                         <div class="issue-comment-body">${escapeIssueText(comment.text || '')}</div>
+                        <div class="issue-comment-replies" id="replies-${escapeIssueText(comment.id)}" style="margin-left: 20px; margin-top: 10px;"></div>
                     </article>
                 `).join('');
+
+                // Load and display replies for each comment
+                comments.forEach(comment => {
+                    loadRepliesForComment(comment.id);
+                });
+
+                // Attach reply button handlers
+                document.querySelectorAll('.issue-comment-reply-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const commentId = btn.getAttribute('data-comment-id');
+                        const parentComment = comments.find(c => String(c.id) === commentId);
+                        if (parentComment) {
+                            showReplyComposer(commentId, parentComment.author, parentComment.text);
+                        }
+                    });
+                });
             }
+
+            function loadRepliesForComment(commentId) {
+                fetch(`${javaURI}/api/Comment/replies/${commentId}`, { ...fetchOptions })
+                    .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error('Failed to load replies'); return r.json(); })
+                    .then(replies => {
+                        if (!replies || replies.length === 0) return;
+                        const repliesContainer = document.getElementById(`replies-${commentId}`);
+                        if (!repliesContainer) return;
+                        
+                        repliesContainer.innerHTML = replies.map(reply => `
+                            <article class="issue-comment-reply" style="border-left: 3px solid #ccc; padding-left: 12px;">
+                                <div class="issue-comment-card-top">
+                                    <strong>${escapeIssueText(reply.author || 'Unknown')}</strong>
+                                    <span class="issue-meta">${escapeIssueText(reply.timestamp || '')}</span>
+                                    <button type="button" class="issue-comment-reply-btn" data-action="reply" data-comment-id="${escapeIssueText(reply.id)}" title="Reply to this reply">↳ Reply</button>
+                                </div>
+                                <div class="issue-comment-body">${escapeIssueText(reply.text || '')}</div>
+                            </article>
+                        `).join('');
+
+                        // Attach reply handlers for nested replies (sub-replies)
+                        try {
+                            const nestedBtns = repliesContainer.querySelectorAll('.issue-comment-reply-btn');
+                            nestedBtns.forEach(btn => {
+                                btn.addEventListener('click', () => {
+                                    const cid = btn.getAttribute('data-comment-id');
+                                    const r = replies.find(rr => String(rr.id) === cid);
+                                    if (r) showReplyComposer(cid, r.author, r.text);
+                                });
+                            });
+                        } catch (e) {
+                            console.warn('Failed to attach nested reply handlers', e);
+                        }
+                    })
+                    .catch(e => { console.warn('Failed to load replies:', e); });
+            }
+
+            // Reply modal handling
+            let _activeReplyParentId = null;
+            function showReplyComposer(parentCommentId, parentAuthor, parentText) {
+                const replyModal = document.getElementById('replyModal');
+                const preview = document.getElementById('reply-parent-preview');
+                const textarea = document.getElementById('reply-modal-text');
+                if (!replyModal || !preview || !textarea) return;
+                _activeReplyParentId = parentCommentId;
+                preview.innerHTML = `<strong>${escapeIssueText(parentAuthor || 'Unknown')}</strong><div style="margin-top:6px;">${escapeIssueText((parentText || '').slice(0,300))}</div>`;
+                textarea.value = '';
+                replyModal.style.display = 'block';
+                replyModal.setAttribute('aria-hidden', 'false');
+                textarea.focus();
+            }
+
+            // Reply modal submit/close wiring
+            document.getElementById('reply-modal-close')?.addEventListener('click', () => {
+                const m = document.getElementById('replyModal'); if (!m) return; m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); _activeReplyParentId = null;
+            });
+            document.getElementById('reply-modal-cancel')?.addEventListener('click', () => {
+                const m = document.getElementById('replyModal'); if (!m) return; m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); _activeReplyParentId = null;
+            });
+            document.getElementById('reply-modal-submit')?.addEventListener('click', async () => {
+                const parentId = _activeReplyParentId;
+                const textarea = document.getElementById('reply-modal-text');
+                if (!parentId || !textarea) return;
+                const text = (textarea.value || '').trim();
+                if (!text) return;
+                try {
+                    const resp = await fetch(`${javaURI}/api/Comment/reply/${parentId}`, { ...fetchOptions, method: 'POST', headers: { ...(fetchOptions.headers||{}), 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) });
+                    if (handleAuthError(resp)) return;
+                    if (!resp.ok) throw new Error('Failed to post reply');
+                    // reload replies for parent
+                    loadRepliesForComment(parentId);
+                    // close modal
+                    const m = document.getElementById('replyModal'); if (m) { m.style.display='none'; m.setAttribute('aria-hidden','true'); }
+                    _activeReplyParentId = null;
+                } catch (e) {
+                    if (!handleFetchError(e)) console.error('Failed to post reply:', e);
+                }
+            });
 
             function updateIssueStarButton(issue) {
                 if (!issueModalStarBtn || !issue) return;
@@ -1835,6 +2069,12 @@ active_tab: calendar
 
             el.form?.addEventListener('submit', async (event) => {
                 event.preventDefault();
+                
+                // Get selected groups
+                const groupSelect = document.getElementById('issue-assigned-groups');
+                const selectedOptions = Array.from(groupSelect?.selectedOptions || []);
+                const assignedGroups = selectedOptions.filter(opt => opt.value).map(opt => opt.value);
+                
                 const payload = {
                     title: (el.title?.value || '').trim(),
                     description: (el.description?.value || '').trim(),
@@ -1842,7 +2082,8 @@ active_tab: calendar
                     priority: el.priority?.value || 'medium',
                     dueDate: el.dueDate?.value || '',
                     eventId: (el.eventId?.value || '').trim() || null,
-                    tags: normalizeTags(el.tags?.value || '')
+                    tags: normalizeTags(el.tags?.value || ''),
+                    assignedGroups: assignedGroups.length > 0 ? JSON.stringify(assignedGroups) : null
                 };
 
                 if (!payload.title) {
@@ -2092,8 +2333,122 @@ active_tab: calendar
         window.renderIssueViews = renderIssueViews;
         window.renderThreadsPanel = renderThreadsPanel;
 
+        // ── Populate groups select and handle auto-starring ─────────
+        async function populateGroupsSelect() {
+            const issueGroupSelect = document.getElementById('issue-assigned-groups');
+            const calendarFilter = document.getElementById('calendar-filter-group');
+            const issuesFilter = document.getElementById('issues-filter-group');
+            try {
+                const r = await fetch(`${javaURI}/api/groups`, { ...fetchOptions });
+                if (handleAuthError(r)) return;
+                if (!r.ok) throw new Error('Failed to load groups');
+                const groups = await r.json();
+                if (!Array.isArray(groups) || groups.length === 0) return;
+
+                // Populate issue-assigned-groups select (clear existing options except placeholder)
+                if (issueGroupSelect) {
+                    while (issueGroupSelect.options.length > 1) issueGroupSelect.remove(1);
+                }
+
+                // Populate calendar and issues filter selects (clear existing options except 'All groups')
+                if (calendarFilter) {
+                    while (calendarFilter.options.length > 1) calendarFilter.remove(1);
+                }
+                if (issuesFilter) {
+                    while (issuesFilter.options.length > 1) issuesFilter.remove(1);
+                }
+
+                // Build a lookup for group labels by id for display elsewhere
+                window.allGroupsById = {};
+                groups.forEach(group => {
+                    const value = String(group.id || group.name || '');
+                    const label = `Period ${group.period || ''} - ${group.name || ''}`;
+                    window.allGroupsById[value] = label;
+
+                    if (issueGroupSelect) {
+                        const opt = document.createElement('option');
+                        opt.value = value;
+                        opt.textContent = label;
+                        issueGroupSelect.appendChild(opt);
+                    }
+                    if (calendarFilter) {
+                        const opt = document.createElement('option');
+                        opt.value = value;
+                        opt.textContent = label;
+                        calendarFilter.appendChild(opt);
+                    }
+                    if (issuesFilter) {
+                        const opt = document.createElement('option');
+                        opt.value = value;
+                        opt.textContent = label;
+                        issuesFilter.appendChild(opt);
+                    }
+                    // Also populate the event modal's group select so events can be assigned
+                    const editGroupSelect = document.getElementById('editGroupName');
+                    if (editGroupSelect) {
+                        const opt2 = document.createElement('option');
+                        opt2.value = value;
+                        opt2.textContent = label;
+                        editGroupSelect.appendChild(opt2);
+                    }
+                });
+            } catch (e) {
+                console.warn('Failed to populate groups:', e);
+            }
+        }
+
+        async function autoStarIssuesForUserGroups() {
+            if (!calendarIssues || calendarIssues.length === 0) return;
+            // Fetch groups current user belongs to
+            const userGroups = await fetchUserGroups();
+            console.debug('autoStar: fetched userGroups', userGroups);
+            if (!Array.isArray(userGroups) || userGroups.length === 0) {
+                console.debug('autoStar: no user groups, aborting');
+                return;
+            }
+            const userGroupIds = new Set(userGroups.map(g => String(g.id)));
+
+            // For each issue, if assignedGroups contains any of user's group ids and user hasn't starred it, star it
+            for (const issue of calendarIssues) {
+                if (!issue || !issue.assignedGroups) continue;
+                let assigned = [];
+                try { assigned = JSON.parse(issue.assignedGroups); } catch (e) { assigned = []; }
+                if (!Array.isArray(assigned) || assigned.length === 0) continue;
+
+                const matches = assigned.map(String).some(a => userGroupIds.has(a));
+                if (!matches) continue;
+
+                // If already starred by user, skip
+                console.debug('autoStar: issue', issue.id, 'assigned', assigned, 'matchesUserGroups=', matches, 'starred=', issue.starred);
+                if (issue.starred) continue;
+
+                // Attempt to star silently
+                try {
+                    const resp = await fetch(`${javaURI}/api/Comment/issue/${issue.id}/star/ensure`, {
+                        ...fetchOptions,
+                        method: 'POST'
+                    });
+                    if (handleAuthError(resp)) break; // stop if auth problem
+                    if (!resp.ok) {
+                        // ignore failures for auto-star
+                        console.warn('Auto-star failed for issue', issue.id, resp.status);
+                        continue;
+                    }
+                    // refresh issues after successful star
+                    await handleRequest();
+                } catch (e) {
+                    console.warn('Auto-star error for issue', issue.id, e);
+                }
+            }
+        }
+
         // ── GO! ─────────────────────────────────────────────────────
-        handleRequest();
+        // Ensure groups are loaded before rendering issues/calendar so labels and filters work
+        await populateGroupsSelect();
+        console.debug('populateGroupsSelect complete, groups loaded:', window.allGroupsById);
+        await handleRequest();
+        await autoStarIssuesForUserGroups();
+        renderThreadsPanel();
     });
 
     // ── Text formatting helpers ─────────────────────────────────────
