@@ -26,4 +26,7 @@ jobs:
           PAGES_BOT_UID: toby
           PAGES_BOT_PASSWORD: ${{ secrets.PAGES_BOT_PASSWORD }}
         run: |
-          python3 pages-tracking/scripts/create_assignments_from_frontmatter.py --root pages-tracking --base-url "$BASE_URL" --uid "$PAGES_BOT_UID" --password "$PAGES_BOT_PASSWORD"
+          # Run the script using repository-relative paths. Use --root . so
+          # this workflow works whether the repo is named `pages-tracking`
+          # (checkout path duplication) or contains a `pages-tracking/` folder.
+          python3 scripts/create_assignments_from_frontmatter.py --root . --base-url "$BASE_URL" --uid "$PAGES_BOT_UID" --password "$PAGES_BOT_PASSWORD"
