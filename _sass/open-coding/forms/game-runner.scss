@@ -155,7 +155,15 @@
   z-index: 99;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden;
+
+  &:fullscreen,
+  &:-webkit-full-screen {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
 }
 
 .fullscreen-control-header {

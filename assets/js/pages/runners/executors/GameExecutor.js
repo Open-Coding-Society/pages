@@ -497,10 +497,10 @@ export class GameExecutor {
       gameOutput.style.zIndex = '1';
       document.body.appendChild(this.fullscreenOverlay);
 
-      // Update canvas height to account for control header
-      const headerHeight = controlHeader.offsetHeight || 60;
-      const viewportHeight = window.innerHeight - headerHeight - 20; // Leave some padding
-      this.configuredCanvasHeight = viewportHeight;
+      // Request native fullscreen for true immersive mode
+      const reqFS = this.fullscreenOverlay.requestFullscreen?.bind(this.fullscreenOverlay)
+        || this.fullscreenOverlay.webkitRequestFullscreen?.bind(this.fullscreenOverlay);
+      if (reqFS) reqFS().catch(() => {});
 
       // Update button text
       if (this.fullscreenBtn) {
@@ -510,10 +510,27 @@ export class GameExecutor {
 
       this.isFullscreen = true;
 
-      // Resize the active level in place so fullscreen does not replay startup dialogue.
-      this._resizeGameForViewport(gameOutput, viewportHeight);
+      // Resize now (fallback) and again after native fullscreen is confirmed
+      const doResize = () => {
+        const headerHeight = controlHeader.offsetHeight || 60;
+        const viewportHeight = window.innerHeight - headerHeight - 20;
+        this.configuredCanvasHeight = viewportHeight;
+        this._resizeGameForViewport(gameOutput, viewportHeight);
+      };
+      doResize();
 
-      // Handle ESC key to exit fullscreen
+      // Sync exit when browser exits native fullscreen (e.g. user presses ESC)
+      this.fullscreenChangeHandler = () => {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (this.isFullscreen) this.toggleFullscreen();
+        } else {
+          doResize();
+        }
+      };
+      document.addEventListener('fullscreenchange', this.fullscreenChangeHandler);
+      document.addEventListener('webkitfullscreenchange', this.fullscreenChangeHandler);
+
+      // Handle ESC key to exit fullscreen (non-native fallback)
       this.escapeHandler = (e) => {
         if (e.key === 'Escape' && this.isFullscreen) {
           this.toggleFullscreen();
@@ -523,6 +540,26 @@ export class GameExecutor {
 
     } else {
       // Exit fullscreen mode
+      this.isFullscreen = false;
+
+      // Exit native fullscreen if active
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        (document.exitFullscreen || document.webkitExitFullscreen)?.call(document).catch(() => {});
+      }
+
+      // Remove fullscreen change handler
+      if (this.fullscreenChangeHandler) {
+        document.removeEventListener('fullscreenchange', this.fullscreenChangeHandler);
+        document.removeEventListener('webkitfullscreenchange', this.fullscreenChangeHandler);
+        this.fullscreenChangeHandler = null;
+      }
+
+      // Remove ESC key handler
+      if (this.escapeHandler) {
+        document.removeEventListener('keydown', this.escapeHandler);
+        this.escapeHandler = null;
+      }
+
       if (this.fullscreenOverlay) {
         // Move game-output back to original parent
         if (this.originalGameOutput && this.originalGameOutput.parent) {
@@ -535,6 +572,7 @@ export class GameExecutor {
       }
 
       // Restore original height
+      const restoredHeight = this.originalGameOutput?.height || this.configuredCanvasHeight;
       if (this.originalGameOutput) {
         this.configuredCanvasHeight = this.originalGameOutput.height;
         this.originalGameOutput = null;
@@ -546,16 +584,8 @@ export class GameExecutor {
         this.fullscreenBtn.title = 'Enter Fullscreen';
       }
 
-      this.isFullscreen = false;
-
-      // Remove ESC key handler
-      if (this.escapeHandler) {
-        document.removeEventListener('keydown', this.escapeHandler);
-        this.escapeHandler = null;
-      }
-
       // Restore the active level size without reinitializing the level.
-      this._resizeGameForViewport(gameOutput, this.originalGameOutput?.height || this.configuredCanvasHeight);
+      this._resizeGameForViewport(gameOutput, restoredHeight);
     }
   }
 }
