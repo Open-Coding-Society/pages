@@ -1,6 +1,6 @@
 # Docker — server-side build only
 
-Everything runs on your **Linux server** in Docker. Your Mac/laptop is not part of the build or deploy path (only SSH if you want to view the site).
+Everything runs on your **Linux server** in Docker. Build, convert, serve, and auto-update all happen inside the container — not on a developer laptop.
 
 - **Port 8450** only — does not bind host 80/443 or install Ruby/Python on the host
 - **Project name `opencs-pages`** — isolated from other Docker stacks
