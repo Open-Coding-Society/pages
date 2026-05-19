@@ -111,25 +111,25 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
-      x: width * 0.76,
-      y: height * 0.26,
+      x: width * 0.83,  
+      y: height * 0.28,
     };
 
     const personalEnrichmentGatekeeperPos = {
-      x: width * 0.23,
-      y: height * 0.23,
+      x: width * 0.23,   
+      y: height * 0.25,  
     };
 
     const skillPassportGatekeeperPos = {
-      x: width * 0.77,
-      y: height * 0.49,
+      x: width * 0.82,  
+      y: height * 0.56, 
     };
 
     const sprintSuccessGatekeeperPos = {
-      x: width * 0.24,
-      y: height * 0.46,
+      x: width * 0.23,   
+      y: height * 0.53,  
     };
-
+    
     const createDiscMarkerSrc = (fillColor, borderColor = '#f8fafc') => {
       const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
       const discFrames = frameOpacity
@@ -200,7 +200,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       src: createDiscMarkerSrc(markerColor),
       id,
       greeting,
-      INIT_POSITION: { ...position },
+      INIT_POSITION: {
+        x: position.x - (width / gatekeeperBaseData.SCALE_FACTOR / 2),
+        y: position.y - (height / gatekeeperBaseData.SCALE_FACTOR / 2),
+      },
       interactDistance: interactDistance || 120,
       ...(reaction ? { reaction } : {}),
       ...(interact ? { interact } : {}),
@@ -237,7 +240,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     const npc_data_personalEnrichmentGatekeeper = createGatekeeperData({
       id: 'PersonalEnrichmentGatekeeper',
-      greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
+      greeting: 'Welcome to Team Formation! Build habits, curiosity, and real-world growth.',
       position: personalEnrichmentGatekeeperPos,
       markerColor: '#3b82f6',
       interact: () => {
@@ -247,7 +250,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     const npc_data_skillPassportGatekeeper = createGatekeeperData({
       id: 'SkillPassportGatekeeper',
-      greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
+      greeting: 'Welcome to About Me! Track your progress and collect your coding milestones.',
       position: skillPassportGatekeeperPos,
       markerColor: '#f59e0b',
       interact: () => {
