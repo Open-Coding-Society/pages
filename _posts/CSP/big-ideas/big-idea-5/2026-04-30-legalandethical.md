@@ -216,7 +216,6 @@ body::after {
   .match-divider { width: 100%; height: 2px; margin: 8px 0; }
 }
 </style>
-</head>
 <body>
  
 <section id="home-screen" class="screen active">
