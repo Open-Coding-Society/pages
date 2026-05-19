@@ -73,6 +73,10 @@ class GameLevelCsPath0Forge {
     this._syncCompletionPanel = GameLevelCsPathIdentity.prototype._syncCompletionPanel.bind(this);
     this.markLevelComplete = GameLevelCsPathIdentity.prototype.markLevelComplete.bind(this);
 
+    // Ensure Identity Forge uses the shared completion storage key so reads
+    // and writes are consistent with other levels.
+    this._completionStorageKey = 'cs_pathway_completion';
+
     this.present = new Present(this, {
       toastDuration: 2200,
       ignoreToasts: ['Press E to interact'],
@@ -1507,6 +1511,17 @@ class GameLevelCsPath0Forge {
       theme: uiTheme,
     };
     this.profilePanelView = new StatusPanel(profilePanelConfig);
+    // Render and seed the panel immediately (mirror other levels).
+    this.profilePanelView.render();
+    this.profilePanelView.update({
+      name: this.profileData?.name || '—',
+      email: this.profileData?.email || '—',
+      githubID: this.profileData?.githubID || '—',
+      persona: this.profileData?.persona || '—',
+      sprite: this.profileData?.sprite || '—',
+      worldTheme: this.profileData?.theme || this.profileData?.worldTheme || '—',
+      ...this._getCompletionPanelValues(),
+    });
 
     /**
      * Identity form config. FormPanel config for the Identity Terminal input fields.

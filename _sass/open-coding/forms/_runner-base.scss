@@ -30,6 +30,13 @@
     border: 1px solid var(--ui-border);
   }
 
+  // CodeMirror selection highlighting - use CodeMirror's proper API
+  // When styleSelectedText: true is enabled, CodeMirror adds .CodeMirror-selectedtext
+  .CodeMirror-selectedtext {
+    background: var(--pref-accent-color, #3b82f6) !important;
+    color: #ffffff !important;
+  }
+
   // Output section
   .output-container {
     @include sub-container;
