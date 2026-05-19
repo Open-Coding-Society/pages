@@ -1,31 +1,16 @@
-# Isolated Pages stack — does not use host ports 80/443 or install host packages.
-# Project name keeps containers/volumes separate from other compose projects.
+# Isolated Pages stack — build and serve on the SERVER only (Docker).
+# Does not use host ports 80/443 or install Ruby/Python on the host.
 name: opencs-pages
 
 services:
-  # Serves a static copy of _site/ from ./site (sync from your Mac or make build).
-  static:
-    image: nginx:1.27-alpine
-    container_name: opencs-pages-static
-    restart: unless-stopped
-    ports:
-      - "${PAGES_BIND:-127.0.0.1}:${PAGES_HOST_PORT:-8450}:80"
-    volumes:
-      - ${PAGES_SITE_DIR:-./site}:/usr/share/nginx/html:ro
-      - ./nginx-static.conf:/etc/nginx/conf.d/default.conf:ro
-    networks:
-      - pages-net
-
-  # Full dev server with auto-update (make dev) — optional profile.
-  dev:
-    profiles: ["dev"]
+  pages:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: opencs-pages-dev
+    container_name: opencs-pages
     restart: unless-stopped
     ports:
-      - "${PAGES_BIND:-127.0.0.1}:${PAGES_DEV_PORT:-8451}:4500"
+      - "${PAGES_BIND:-127.0.0.1}:${PAGES_PORT:-8450}:4500"
     volumes:
       - ..:/app
       - opencs-bundle:/usr/local/bundle
@@ -33,7 +18,10 @@ services:
     environment:
       HOST: "0.0.0.0"
       PORT: "4500"
-      MODE: "${MODE:-dev}"
+      # make = full build + auto-update on save (default)
+      # dev  = faster dev mode (only :dev projects in .makeprojects)
+      # serve = convert + serve, no file watchers
+      MODE: "${MODE:-make}"
     networks:
       - pages-net
 

@@ -14,11 +14,11 @@ bundle check >/dev/null 2>&1 || bundle install
 
 make stop 2>/dev/null || true
 
-case "${MODE:-dev}" in
+case "${MODE:-make}" in
   serve) make serve ;;
-  make)  make ;;
-  dev|*) make dev ;;
+  dev)   make dev ;;
+  make|*) make ;;
 esac
 
-echo "Pages dev server started (MODE=${MODE:-dev}). Tailing logs..."
+echo "Pages server running on 0.0.0.0:${PORT:-4500} (MODE=${MODE:-make}). Tailing logs..."
 exec tail -f "/tmp/jekyll${PORT:-4500}.log"

@@ -1,102 +1,97 @@
-# Docker (isolated Pages stack)
+# Docker — server-side build only
 
-Runs on **ports 8450/8451 only** — does not install packages on the host or bind to 80/443.
+Everything runs on your **Linux server** in Docker. Your Mac/laptop is not part of the build or deploy path (only SSH if you want to view the site).
 
-| Service | Port (host) | Purpose |
-|---------|-------------|---------|
-| `static` | 8450 | Serves `./site/` (sync `_site/` from your Mac) |
-| `dev` | 8451 | Full `make dev` inside container (optional) |
+- **Port 8450** only — does not bind host 80/443 or install Ruby/Python on the host
+- **Project name `opencs-pages`** — isolated from other Docker stacks
+- **`make` inside the container** — converts notebooks, builds projects, serves Jekyll, auto-updates on file changes
 
-Project name `opencs-pages` keeps containers/volumes separate from other Docker projects.
-
-## Quick start — static (build on Mac, serve in Docker)
-
-### Mac (branch `test_engine`)
+## One-time server setup
 
 ```bash
-cd /path/to/pages
-git checkout test_engine
-# one-time setup if needed: scripts/activate_macos.sh, python3 -m venv venv, bundle install, pip install -r requirements.txt
+# Docker only (if not installed)
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker "$USER"
+newgrp docker
 
-make build
-./docker/sync-from-mac.sh YOUR_USER@YOUR_LINUX_SERVER
-```
-
-Re-run `make build` + `sync-from-mac.sh` after changes (or automate with `fswatch`).
-
-### Linux server (nothing installed except Docker)
-
-```bash
 mkdir -p ~/opencs-pages-docker && cd ~/opencs-pages-docker
-git clone -b test_engine https://github.com/open-coding-society/pages.git pages
+git clone -b test_engine https://github.com/Open-Coding-Society/pages.git pages
 cd pages/docker
 cp .env.example .env
-# optional: echo 'PAGES_BIND=0.0.0.0' >> .env   # allow http://SERVER_IP:8450/
+```
 
-docker compose up -d static
-docker compose ps
+## Start (build + serve + auto-update on the server)
+
+```bash
+cd ~/opencs-pages-docker/pages/docker
+docker compose up -d --build
+docker compose logs -f pages
+```
+
+First start can take several minutes (bundle install, conversions, Jekyll). Watch logs until you see `Server address:`.
+
+```bash
 curl -sI http://127.0.0.1:8450/ | head -5
 ```
 
-Access without touching host nginx:
+## View from your browser
+
+**SSH tunnel** (recommended — no changes to host nginx):
 
 ```bash
-# From your laptop (tunnel — recommended)
 ssh -L 8450:127.0.0.1:8450 YOUR_USER@YOUR_LINUX_SERVER
-# Browser: http://127.0.0.1:8450/
 ```
 
-Or if `PAGES_BIND=0.0.0.0`: `http://YOUR_SERVER_IP:8450/`
+Then open **http://127.0.0.1:8450/**
 
-## Quick start — dev in Docker (auto-update on server)
+**Or** expose on the server IP (edit `docker/.env`):
+
+```bash
+echo 'PAGES_BIND=0.0.0.0' >> .env
+docker compose up -d
+```
+
+Visit **http://YOUR_SERVER_IP:8450/**
+
+## Edit content on the server
+
+Repo is bind-mounted into the container. After you change files on the server (git pull, vim, etc.), the container’s `make` watchers rebuild automatically. Refresh the browser after logs show a rebuild.
+
+```bash
+cd ~/opencs-pages-docker/pages
+git pull
+# watchers pick up changes; or restart:
+cd docker && docker compose restart pages
+```
+
+## Useful commands
 
 ```bash
 cd ~/opencs-pages-docker/pages/docker
-cp .env.example .env
-docker compose --profile dev up -d --build dev
-docker compose logs -f dev
+
+docker compose ps
+docker compose logs -f pages
+docker compose restart pages
+docker compose down
+
+# Faster dev mode (only :dev projects)
+echo 'MODE=dev' >> .env && docker compose up -d
+
+# Full reset rebuild
+docker compose down
+docker compose up -d --build
 ```
 
-Site: `http://127.0.0.1:8451/` (or tunnel `ssh -L 8451:127.0.0.1:8451 ...`).
+## DNS (optional)
 
-## Commands reference
+`x.opencodingsociety.com` → A record to server IP, `PAGES_BIND=0.0.0.0` → **http://x.opencodingsociety.com:8450/**
 
-```bash
-cd ~/opencs-pages-docker/pages/docker
-
-# Static
-docker compose up -d static
-docker compose restart static
-docker compose logs -f static
-
-# Dev (profile)
-docker compose --profile dev up -d --build dev
-docker compose --profile dev logs -f dev
-docker compose --profile dev stop dev
-
-# Stop everything for this project
-docker compose --profile dev down
-
-# Update repo + rebuild dev image
-cd ~/opencs-pages-docker/pages && git pull && cd docker
-docker compose --profile dev up -d --build dev
-```
-
-## DNS (optional) — `x.opencodingsociety.com`
-
-Does **not** require changing the host’s main web server if you use a high port:
-
-1. DNS: `x` A record → server public IP  
-2. `PAGES_BIND=0.0.0.0` in `docker/.env`  
-3. Visit `http://x.opencodingsociety.com:8450/`
-
-For HTTPS on 443 without conflicting with an existing vhost, ask infra for a **separate** reverse-proxy route, or use a second IP. This stack intentionally avoids binding 80/443.
+No host Apache/nginx changes required.
 
 ## Troubleshooting
 
 ```bash
-docker compose ps
-docker compose logs static
-ls -la site/ | head    # static: should contain index.html
+docker compose logs --tail=100 pages
+docker exec -it opencs-pages bash -c 'tail -50 /tmp/jekyll4500.log'
 curl -v http://127.0.0.1:8450/
 ```

@@ -1,4 +1,4 @@
-# Dev/build image for Open Coding Society Pages (Jekyll + Python converters)
+# Build and run Open Coding Society Pages entirely inside Docker (server-side).
 FROM ruby:3.2-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,14 +16,15 @@ COPY requirements.txt ./
 RUN python3 -m venv /app/venv \
     && /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 
-COPY docker/entrypoint-dev.sh /entrypoint-dev.sh
-RUN chmod +x /entrypoint-dev.sh
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENV PYTHON=/app/venv/bin/python3
 ENV PATH="/app/venv/bin:${PATH}"
 ENV HOST=0.0.0.0
 ENV PORT=4500
+ENV MODE=make
 
 EXPOSE 4500
 
-ENTRYPOINT ["/entrypoint-dev.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
