@@ -217,7 +217,7 @@
     row-gap: 1.6rem;
     max-width: 980px;
     margin: 0 auto;
-    padding: 0 0.25rem;
+    padding: 0 0 3rem;
   }
   .acs-feature-card {
     background: rgba(255,255,255,0.06);
@@ -234,7 +234,6 @@
   }
   .acs-feature-card img {
     width: 100%;
-    height: 100%;
     object-fit: cover;
     display: block;
   }
@@ -246,15 +245,16 @@
     margin: 0 auto;
   }
   .acs-feature-card--wide img {
-    box-sizing: border-box;
+    box-sizing: fit-content;
     padding: 0.45rem 0.45rem 0;
     border-radius: 12px;
   }
   .acs-feature-body {
-    padding: 0.68rem 0.78rem 0.76rem;
+    padding: 12rem 0.78rem 0.76rem;
   }
   .acs-feature-card:not(.acs-feature-card--wide) .acs-feature-body {
     padding: 0.64rem 0.74rem 0.7rem;
+    align-content: end;
   }
   .acs-feature-title {
     font-size: 0.68rem;
@@ -400,43 +400,11 @@
       </div>
 
     </div>
-    
-      <div class="acs-feature-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/lab_acs.png" alt="Cell Cycle Lab">
-        <div class="acs-feature-body">
-          <div class="acs-feature-title">Cell Lab</div>
-          <div class="acs-feature-desc">Interactive lab experience that walks users through each cell-cycle phase, demonstrates where regulatory checkpoints fail, and shows how DNA mutations can accumulate into cancer over time.</div>
-          <a href="https://acs.opencodingsociety.com/celllab" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Cell Lab →</a>
-        </div>
-      </div>
- 
-      <div class="acs-feature-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/cellgame.gif" alt="Cell Game Demonstration">
-        <div class="acs-feature-body">
-          <div class="acs-feature-title">Cell Game Demo</div>
-          <div class="acs-feature-desc">Real-time visualization showing the cell cycle phases, checkpoints, and DNA damage accumulation. Watch as different disruptors affect the cell's ability to progress through each phase safely.</div>
-        </div>
-      </div>
- 
-      <div class="acs-feature-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/game_acs.png" alt="Cell Game">
-        <div class="acs-feature-body">
-          <div class="acs-feature-title">Cell Game</div>
-          <div class="acs-feature-desc">Story-driven RPG module where players make decisions inside a cellular world, reinforcing core biology concepts and cancer mechanisms through quests, dialogue, and interactive checkpoints.</div>
-          <a href="https://acs.opencodingsociety.com/cellgame" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Cell Game →</a>
-        </div>
-      </div>
- 
-      <div class="acs-feature-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/risk_acs.png" alt="Risk Calculator">
-        <div class="acs-feature-body">
-          <div class="acs-feature-title">Risk Calculator</div>
-          <div class="acs-feature-desc">Machine-learning risk calculator that combines age, medical history, and lifestyle factors to generate personalized risk insights with follow-up recommendations in clear language.</div>
-          <a href="https://acs.opencodingsociety.com/cancerrisk" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Risk Calculator →</a>
-        </div>
-      </div>
- 
-      <div class="acs-feature-card">
+
+    <div class="acs-section-label">Demonstrations</div>
+    <div class="acs-features-grid">
+
+      <div class="acs-feature-card acs-feature-card--wide">
         <img src="{{ site.baseurl }}/images/capstone/acs/medication.gif" alt="Medication Tracker Demonstration">
         <div class="acs-feature-body">
           <div class="acs-feature-title">Medication Tracker</div>
@@ -444,29 +412,11 @@
         </div>
       </div>
  
-      <div class="acs-feature-card">
-        <img src="{{ site.baseurl }}/images/capstone/acs/map_acs.png" alt="Body Map">
-        <div class="acs-feature-body">
-          <div class="acs-feature-title">Body Map</div>
-          <div class="acs-feature-desc">Interactive anatomical map that links each body region to related cancer types, symptoms, risk factors, and trusted ACS resources, with built-in AI support for plain-English guidance.</div>
-          <a href="https://acs.opencodingsociety.com/map" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Body Map →</a>
-        </div>
-      </div>
- 
-      <div class="acs-feature-card">
+      <div class="acs-feature-card acs-feature-card--wide">
         <img src="{{ site.baseurl }}/images/capstone/acs/map.gif" alt="Interactive Body Map Demonstration">
         <div class="acs-feature-body">
           <div class="acs-feature-title">Body Map Demo</div>
           <div class="acs-feature-desc">Visual exploration of the interactive body map showing how users can click on body regions to discover cancer types affecting that area. Includes descriptions, risk factors, and direct links to resources.</div>
-        </div>
-      </div>
- 
-      <div class="acs-feature-card acs-feature-card--wide">
-        <img src="{{ site.baseurl }}/images/capstone/acs/blog_acs.png" alt="Community Blog">
-        <div class="acs-feature-body">
-          <div class="acs-feature-title">Community Blog</div>
-          <div class="acs-feature-desc">Community blog hub for updates, patient stories, awareness campaigns, and educational content that keeps families, learners, and supporters connected to ongoing ACS initiatives.</div>
-          <a href="https://acs.opencodingsociety.com/blog/" target="_blank" rel="noopener noreferrer" class="acs-btn">Open Community Blog →</a>
         </div>
       </div>
  
@@ -481,9 +431,8 @@
       <div class="acs-feature-card acs-feature-card--wide">
         <img src="{{ site.baseurl }}/images/capstone/acs/medication_notes.gif" alt="Medication Tracker Demonstration">
         <div class="acs-feature-body">
-          <div class="acs-feature-title">Medication Tracker Demo</div>
+          <div class="acs-feature-title">Med Notes Demo</div>
           <div class="acs-feature-desc">Patient-facing tool for managing treatment journeys. Log daily medications, track adherence patterns, monitor symptoms over time, and generate reports for doctor visits. Includes a digital notebook for recording side effects and observations.</div>
         </div>
       </div>
-
-  </div>
+    </div>
