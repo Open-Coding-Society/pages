@@ -32,7 +32,7 @@ class MansionLevel2_Cemetery {
     };
 
     // === BACKGROUND SETUP ===
-    const backgroundImage = path + "/images/mansionGame/CemeteryMainBackground.png";
+    const backgroundImage = path + "/images/projects/mansionGame/CemeteryMainBackground.png";
     const backgroundData = {
         name: 'background',
         greeting: "This is the cemetery, explore the spooky graveyard.",
@@ -44,7 +44,7 @@ class MansionLevel2_Cemetery {
     // === GRAVESTONE SETUP ===
     // Get paths to all 6 gravestone images
     const gravestoneImagePaths = [1, 2, 3, 4, 5, 6].map(num => 
-      path + `/images/mansionGame/gravestone_${num}.png`
+      path + `/images/projects/mansionGame/gravestone_${num}.png`
     );
 
     /**
@@ -468,7 +468,7 @@ class MansionLevel2_Cemetery {
     // Create key image
     const keyImage = document.createElement('img');
     const path = this.gameEnv.path || '';
-    keyImage.src = path + '/images/mansionGame/key_lvl3.png';
+    keyImage.src = path + '/images/projects/mansionGame/key_lvl3.png';
     Object.assign(keyImage.style, {
       width: '300px',
       height: 'auto',

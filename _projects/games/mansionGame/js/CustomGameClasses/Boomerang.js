@@ -29,7 +29,7 @@ class Boomerang extends Character {
         // Load scythe image
         this.spriteSheet = new Image();
         this.spriteSheet.onload = () => this.imageLoaded = true;
-        this.spriteSheet.src = (gameEnv?.path || "") + "/images/mansionGame/scythe.png";
+        this.spriteSheet.src = (gameEnv?.path || "") + "/images/projects/mansionGame/scythe.png";
 
         // Logical display size (scale down 300x280 px to reasonable in-game size)
         this.width = 64;  // adjust to fit game world

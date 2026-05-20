@@ -27,7 +27,7 @@ export default function showEndScreen(gameEnv) {
 
     const img = document.createElement('img');
     const path = (gameEnv && gameEnv.path) ? gameEnv.path : '';
-    img.src = path + '/images/mansionGame/MansionGameEndScreen.png';
+    img.src = path + '/images/projects/mansionGame/MansionGameEndScreen.png';
     img.alt = 'Victory';
     img.style.maxWidth = '95%';
     img.style.maxHeight = '95%';

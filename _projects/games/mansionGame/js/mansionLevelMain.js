@@ -2,6 +2,7 @@
 import GamEnvBackground from './MansionLogic/GameEnvBackground.js';
 import Player from './MansionLogic/Player.js';
 import Npc from './MansionLogic/Npc.js';
+import DialogueSystem from './MansionLogic/DialogueSystem.js';
 // import GameControl from '../MansionLogic/GameControl.js';
 import GameLevel1 from './mansionLevel1.js';
 import GameLevel2 from './mansionLevel2.js';
@@ -17,7 +18,7 @@ class MansionLevelMain {
     let path = gameEnv.path;
 
     // Background data
-    const image_src_mainworld = path + "/images/mansionGame/mansion_lobby.png"; // be sure to include the path
+    const image_src_mainworld = path + "/images/projects/mansionGame/mansion_lobby.png"; // be sure to include the path
     const image_data_mainworld = {
         name: 'mainworld',
         greeting: "Welcome to the main lobby!",
@@ -27,7 +28,7 @@ class MansionLevelMain {
     };
 
     // Player data for MC
-    const sprite_src_mc = path + "/images/gamify/spookMcWalk.png"; // be sure to include the path
+    const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png"; // be sure to include the path
         const MC_SCALE_FACTOR = 6;
         const sprite_data_mc = {
             id: 'Spook',
@@ -51,7 +52,7 @@ class MansionLevelMain {
             keypress: {up: 87, left: 65, down: 83, right: 68} // W, A, S, D
         };
 
-    const sprite_src_level1door = path + "/images/gamify/lineDoorCollisionSprite.png"; // replace with your door sprite if needed
+    const sprite_src_level1door = path + "/images/projects/mansionGame/lineDoorCollisionSprite.png"; // replace with your door sprite if needed
       const sprite_greet_level1door = "Would you like to enter the first level? Press E";
       const sprite_data_level1door = {
         id: 'Level1Door',
@@ -121,7 +122,7 @@ class MansionLevelMain {
       };
       
       // Level 3 door - duplicate of earlier doors
-      const sprite_src_level3door = path + "/images/gamify/lineDoorCollisionSprite.png";
+      const sprite_src_level3door = path + "/images/projects/mansionGame/lineDoorCollisionSprite.png";
       const sprite_greet_level3door = "Would you like to enter the third level? Press E";
       const sprite_data_level3door = {
         id: 'Level3Door',
@@ -160,7 +161,7 @@ class MansionLevelMain {
       };
 
       // Level 4 door
-      const sprite_src_level4door = path + "/images/gamify/lineDoorCollisionSprite.png";
+      const sprite_src_level4door = path + "/images/projects/mansionGame/lineDoorCollisionSprite.png";
       const sprite_greet_level4door = "Would you like to enter the fourth level? Press E";
       const sprite_data_level4door = {
         id: 'Level4Door',
@@ -197,7 +198,7 @@ class MansionLevelMain {
       };
 
       // Level 5 door
-      const sprite_src_level5door = path + "/images/gamify/lineDoorCollisionSprite.png";
+      const sprite_src_level5door = path + "/images/projects/mansionGame/lineDoorCollisionSprite.png";
       const sprite_greet_level5door = "Would you like to enter the fifth level? Press E";
       const sprite_data_level5door = {
         id: 'Level5Door',
@@ -234,7 +235,7 @@ class MansionLevelMain {
       };
 
       // Level 6 door
-      const sprite_src_level6door = path + "/images/gamify/lineDoorCollisionSprite.png";
+      const sprite_src_level6door = path + "/images/projects/mansionGame/lineDoorCollisionSprite.png";
       const sprite_greet_level6door = "Would you like to enter the sixth level? Press E";
       const sprite_data_level6door = {
         id: 'Level6Door',
@@ -271,7 +272,7 @@ class MansionLevelMain {
       };
 
       // Level 2 door
-      const sprite_src_level2door = path + "/images/gamify/lineDoorCollisionSprite.png";
+      const sprite_src_level2door = path + "/images/projects/mansionGame/lineDoorCollisionSprite.png";
       const sprite_greet_level2door = "Would you like to enter the second level? Press E";
       const sprite_data_level2door = {
         id: 'Level2Door',

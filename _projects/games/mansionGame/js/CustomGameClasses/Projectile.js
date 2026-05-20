@@ -41,7 +41,7 @@ class Projectile extends Character {
             this.width = 60; // scale down if needed
             this.height = 25;
             this.spriteSheet.onload = () => this.imageLoaded = true;
-            this.spriteSheet.src = path + "/images/mansionGame/arrow.png";
+            this.spriteSheet.src = path + "/images/projects/mansionGame/arrow.png";
         } else if (type === "FIREBALL") {
             // Fireball is a single-frame static image (178x123 source). Use a scaled size preserving aspect ratio.
             this.spriteSheet = new Image();
@@ -51,7 +51,7 @@ class Projectile extends Character {
             this.width = 64;
             this.height = 44; // keep aspect roughly (64 * 123 / 178 ≈ 44)
             this.spriteSheet.onload = () => this.imageLoaded = true;
-            this.spriteSheet.src = path + "/images/mansionGame/staticfireball.png";
+            this.spriteSheet.src = path + "/images/projects/mansionGame/staticfireball.png";
         }
         this.isAnimated = false;
 

@@ -61,7 +61,11 @@ class Character extends GameObject {
         this.canvas.height = data.pixels?.height || PIXELS.height;
         this.hitbox = data?.hitbox || {};
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
-        document.getElementById("gameContainer").appendChild(this.canvas);
+        const parent = this.gameEnv?.gameContainer || document.getElementById("gameContainer") || this.gameEnv?.canvas?.parentElement;
+        if (!parent) {
+            throw new Error(`Cannot create ${this.canvas.id}: missing Mansion Game container`);
+        }
+        parent.appendChild(this.canvas);
         this.canvas.style = "image-rendering: pixelated;";
 
         // Set initial object properties 
