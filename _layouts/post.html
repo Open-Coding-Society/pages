@@ -733,6 +733,63 @@ Check if this is a course lesson and determine which course context to use
 
   /**
    * ============================================
+   * AUTO-CREATE ASSIGNMENT FROM FRONTMATTER
+   * ============================================
+   */
+  async function autoCreateAssignmentIfNeeded() {
+    // Only proceed if assignment: true but assignment_id is not set
+    const hasAssignment = {{ page.assignment | default: false }};
+    const hasAssignmentId = ASSIGNMENT_ID !== null;
+    
+    if (!hasAssignment || hasAssignmentId) {
+      return; // Already has ID or not an assignment page
+    }
+    
+    try {
+      // Call the Spring API to auto-create assignment
+      // This endpoint allows any authenticated user (student, person, teacher, admin)
+      const createRes = await fetch(`${javaURI}/api/assignments/auto-create`, {
+        ...fetchOptions,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          name: PAGE_TITLE || '{{ page.title }}',
+          contentUrl: CURRENT_LESSON_ID,
+          description: '{{ page.description | default: "" }}'
+        })
+      });
+      
+      if (createRes.ok) {
+        const result = await createRes.json();
+        // Set global ASSIGNMENT_ID and ASSIGNMENT_NAME for use in submission forms
+        window.ASSIGNMENT_ID = result.id;
+        window.ASSIGNMENT_NAME = result.name;
+        
+        // Distinguish between newly created (201) and already existing (200)
+        if (createRes.status === 201) {
+          console.log('✓ Assignment auto-created with ID:', result.id);
+        } else if (createRes.status === 200) {
+          console.log('ℹ Assignment already exists with ID:', result.id, '- reusing for this session');
+        } else {
+          console.log('Assignment resolved with ID:', result.id);
+        }
+      } else if (createRes.status === 403) {
+        console.warn('Not authenticated - assignment creation skipped. Please log in to enable assignments.');
+      } else if (createRes.status === 400) {
+        const error = await createRes.json();
+        console.error('Bad request for auto-create assignment:', error.error);
+      } else {
+        console.error('Failed to auto-create assignment:', createRes.status, createRes.statusText);
+      }
+    } catch (error) {
+      console.error('Error auto-creating assignment:', error);
+    }
+  }
+
+  /**
+   * ============================================
    * MASTER INITIALIZATION
    * ============================================
    */
@@ -746,6 +803,9 @@ Check if this is a course lesson and determine which course context to use
     // Mobile enhancements
     setupMobileModal();
     window.addEventListener('resize', () => setupMobileModal());
+    
+    // Auto-create assignment if needed
+    autoCreateAssignmentIfNeeded();
     
     // Assignment submission
     setupSubmissionForms();
