@@ -4,6 +4,7 @@ import GameEnv from "./GameEnv.js"
 class GameLevel {
 
   constructor(gameControl) {
+    this.resizeHandler = this.resize.bind(this)
     this.gameEnv = new GameEnv()
     this.gameEnv.game = gameControl.game
     this.gameEnv.path = gameControl.path
@@ -33,7 +34,7 @@ class GameLevel {
         this.gameLevel.initialize()
     }
 
-    window.addEventListener("resize", this.resize.bind(this))
+    window.addEventListener("resize", this.resizeHandler)
   }
 
   destroy() {
@@ -50,7 +51,7 @@ class GameLevel {
     // Clear out the game objects array
     this.gameEnv.gameObjects = [];
     
-    window.removeEventListener("resize", this.resize.bind(this))
+    window.removeEventListener("resize", this.resizeHandler)
   }
 
   update() {

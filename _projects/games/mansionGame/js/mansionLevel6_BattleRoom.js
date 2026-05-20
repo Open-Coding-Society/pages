@@ -11,7 +11,7 @@ class MansionLevel6_BattleRoom {
         const path = gameEnv.path;
 
         // --- Floor ---
-        const image_src_floor = path + "/images/mansionGame/bossFloorPattern.png";
+        const image_src_floor = path + "/images/projects/mansionGame/bossFloorPattern.png";
         const image_data_floor = {
             name: 'floor',
             src: image_src_floor,
@@ -19,7 +19,7 @@ class MansionLevel6_BattleRoom {
         };
 
         // --- Player ---
-        const sprite_src_mc = path + "/images/mansionGame/spookMcWalk.png";
+        const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
         const MC_SCALE_FACTOR = 7;
         const sprite_data_mc = {
             id: 'Spook',
@@ -48,7 +48,7 @@ class MansionLevel6_BattleRoom {
         };
 
         // Add the Reaper
-        const sprite_src_enemy = path + "/images/mansionGame/Reaper.png";
+        const sprite_src_enemy = path + "/images/projects/mansionGame/Reaper.png";
         const sprite_data_enemy = {
             id: 'Reaper',
             greeting: "You feel a dark presence...",
@@ -168,7 +168,7 @@ class MansionLevel6_BattleRoom {
         // --- Reaper Boss ---
         /*
         const BOSS_SCALE_FACTOR = 2;
-        const sprite_src_body = path + "/images/mansionGame/ReaperMainBody.png";
+        const sprite_src_body = path + "/images/projects/mansionGame/ReaperMainBody.png";
         const sprite_boss_data = {
             id: 'reaper',
             src: sprite_src_body,
@@ -187,7 +187,7 @@ class MansionLevel6_BattleRoom {
 
         // Reaper Enemy
         const REAPER_SCALE_FACTOR = 2;
-        const sprite_reaper_src = path + "/images/mansionGame/ReaperMainBody.png";
+        const sprite_reaper_src = path + "/images/projects/mansionGame/ReaperMainBody.png";
         const sprite_reaper_data = {
             id: 'reaperboss',
             src: sprite_reaper_src,
@@ -202,10 +202,10 @@ class MansionLevel6_BattleRoom {
 
         // --- Reaper Arms ---
         const ARM_SCALE_FACTOR = 2;
-        const sprite_arm_left_empty = path + "/images/mansionGame/ReaperLeftHandEmpty.png";
-        const sprite_arm_left_scythe = path + "/images/mansionGame/ReaperLeftHandScythe.png";
-        const sprite_arm_right_empty = path + "/images/mansionGame/ReaperRightHandEmpty.png";
-        const sprite_arm_right_scythe = path + "/images/mansionGame/ReaperRightHandScythe.png";
+        const sprite_arm_left_empty = path + "/images/projects/mansionGame/ReaperLeftHandEmpty.png";
+        const sprite_arm_left_scythe = path + "/images/projects/mansionGame/ReaperLeftHandScythe.png";
+        const sprite_arm_right_empty = path + "/images/projects/mansionGame/ReaperRightHandEmpty.png";
+        const sprite_arm_right_scythe = path + "/images/projects/mansionGame/ReaperRightHandScythe.png";
 
         const leftArmData = {
             id: 'leftArm',
@@ -243,7 +243,7 @@ class MansionLevel6_BattleRoom {
 
         // Test -- add a projectile
         const SCYTHE_SCALE_FACTOR = 4;
-        const sprite_scythe_src = path + "/images/mansionGame/fireball.png";
+        const sprite_scythe_src = path + "/images/projects/mansionGame/fireball.png";
         const sprite_scythe_data = {
             id: 'Scythe',
             src: sprite_scythe_src,

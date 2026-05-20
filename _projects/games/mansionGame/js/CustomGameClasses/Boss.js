@@ -66,16 +66,16 @@ class Boss extends Enemy {
         this.leftArm = new Arm({
             xOffset: -60,
             yOffset: 20,
-            weaponSrc: "../../images/mansionGame/ReaperLeftHandScythe.png",
-            emptySrc: "../../images/mansionGame/ReaperLeftHandEmpty.png",
+            weaponSrc: "../../images/projects/mansionGame/ReaperLeftHandScythe.png",
+            emptySrc: "../../images/projects/mansionGame/ReaperLeftHandEmpty.png",
             hasWeapon: true
         }, gameEnv);
 
         this.rightArm = new Arm({
             xOffset: 60,
             yOffset: 20,
-            weaponSrc: "../../images/mansionGame/ReaperRightHandScythe.png",
-            emptySrc: "../../images/mansionGame/ReaperRightHandEmpty.png",
+            weaponSrc: "../../images/projects/mansionGame/ReaperRightHandScythe.png",
+            emptySrc: "../../images/projects/mansionGame/ReaperRightHandEmpty.png",
             hasWeapon: true
         }, gameEnv);
         
