@@ -353,6 +353,7 @@ active_tab: calendar
     let currentPersonId = null;
     // Filter mode: 'my-groups' (default) or 'all'
     let filterMode = 'my-groups';
+    let activeToolbarGroupId = '';
     let calendarIssueThreads = [];
     let calendarIssueComments = [];
 
@@ -956,10 +957,11 @@ active_tab: calendar
             renderIssueViews();
         }
 
-        function getFilteredIssues() {
+        function getFilteredIssues(options = {}) {
+            const ignoreStatus = options.ignoreStatus === true;
             const el = getIssueElements();
             const query = (el.filterQuery?.value || '').trim().toLowerCase();
-            const statusFilter = el.filterStatus?.value || '';
+            const statusFilter = ignoreStatus ? '' : (el.filterStatus?.value || '');
             const priorityFilter = el.filterPriority?.value || '';
             const dateFilter = el.filterDate?.value || '';
             const authorFilter = (el.filterAuthor?.value || '').trim().toLowerCase();
@@ -1066,29 +1068,33 @@ active_tab: calendar
 
             el.kanban.innerHTML = ISSUE_STATUS_OPTIONS.map(status => {
                 const statusIssues = groups[status] || [];
-                // assigned groups label for kanban item
-                const assignedLabel = (() => {
-                    try {
-                        if (issue.assignedGroups) {
-                            const ag = typeof issue.assignedGroups === 'string' ? JSON.parse(issue.assignedGroups) : issue.assignedGroups;
-                            if (Array.isArray(ag) && ag.length) {
-                                const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
-                                return `<div class="issue-assigned-groups">📍 ${labels.join(', ')}</div>`;
-                            }
-                        }
-                    } catch (e) { }
-                    return '';
-                })();
 
                 return `
                     <section class="kanban-column">
                         <h3 class="kanban-column-title">${ISSUE_STATUS_LABELS[status]} (${statusIssues.length})</h3>
-                        ${statusIssues.length ? statusIssues.map(issue => `
+                        ${statusIssues.length ? statusIssues.map(issue => {
+                            const assignedLabelInner = (() => {
+                                try {
+                                    if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length) {
+                                        return `<div class="issue-assigned-groups">📍 ${issue.assignedGroupLabels.join(', ')}</div>`;
+                                    }
+                                    if (issue.assignedGroups) {
+                                        const ag = typeof issue.assignedGroups === 'string' ? JSON.parse(issue.assignedGroups) : issue.assignedGroups;
+                                        if (Array.isArray(ag) && ag.length) {
+                                            const labels = ag.map(id => (window.allGroupsById && window.allGroupsById[String(id)]) || String(id));
+                                            return `<div class="issue-assigned-groups">📍 ${labels.join(', ')}</div>`;
+                                        }
+                                    }
+                                } catch (e) { }
+                                return '';
+                            })();
+
+                            return `
                             <article class="kanban-item" data-issue-id="${escapeIssueText(issue.id)}">
                                 <button type="button" class="issue-link-btn issue-card-title" data-action="view" data-issue-id="${escapeIssueText(issue.id)}">${escapeIssueText(issue.title || 'Untitled issue')}</button>
                                 <div class="issue-author">Author: ${escapeIssueText(issue.author || 'Unknown')}</div>
                                 <div class="issue-meta">Due ${escapeIssueText(formatIssueDate(issue.dueDate))}</div>
-                                ${assignedLabel}
+                                ${assignedLabelInner}
                                 <div class="issue-card-badge-row">
                                     <span class="issue-pill ${escapeIssueText(issue.priority || 'medium')}">${escapeIssueText((issue.priority || 'medium').toUpperCase())}</span>
                                     <span class="issue-pill medium">★ ${escapeIssueText(issue.starCount ?? 0)}</span>
@@ -1098,7 +1104,7 @@ active_tab: calendar
                                     ${ISSUE_STATUS_OPTIONS.map(option => `<option value="${option}" ${option === (issue.status || 'open') ? 'selected' : ''}>${ISSUE_STATUS_LABELS[option]}</option>`).join('')}
                                 </select>
                             </article>
-                        `).join('') : '<div class="issues-empty">No issues.</div>'}
+                        `; }).join('') : '<div class="issues-empty">No issues.</div>'}
                     </section>
                 `;
             }).join('');
@@ -1107,7 +1113,7 @@ active_tab: calendar
         function renderIssueViews() {
             const filteredIssues = getFilteredIssues();
             renderIssueList(filteredIssues);
-            renderKanban(filteredIssues);
+            renderKanban(getFilteredIssues({ ignoreStatus: true }));
             updateIssueDescriptionPreview();
         }
 
@@ -1306,7 +1312,26 @@ active_tab: calendar
             const filterValues = getCalendarEventFilterValues();
             let filtered = allEvents;
 
-            if (filterMode === 'my-groups' && userGroups.length > 0) {
+            if (filterMode === 'group' && activeToolbarGroupId) {
+                const selectedGroupId = String(activeToolbarGroupId);
+                const selectedGroup = userGroups.find(group => String(group.id) === selectedGroupId);
+                filtered = filtered.filter(event => {
+                    if (event.isBreak || (event.extendedProps && event.extendedProps.isBreak)) return true;
+                    try {
+                        const ext = event.extendedProps || {};
+                        const agRaw = ext.assignedGroups || event.assignedGroups || null;
+                        if (agRaw) {
+                            const ag = typeof agRaw === 'string' ? JSON.parse(agRaw) : agRaw;
+                            if (Array.isArray(ag) && ag.map(String).includes(selectedGroupId)) return true;
+                        }
+                    } catch (e) { }
+                    const evtGroup = String(event.groupName || (event.extendedProps && event.extendedProps.groupName) || '').toLowerCase();
+                    const evtPeriod = String(event.period || (event.extendedProps && event.extendedProps.period) || '').toLowerCase();
+                    const groupName = String(selectedGroup?.name || '').toLowerCase();
+                    const groupCourse = String(selectedGroup?.course || '').toLowerCase();
+                    return evtGroup.includes(groupName) || evtPeriod.includes(groupCourse) || evtGroup.includes(selectedGroupId.toLowerCase());
+                });
+            } else if (filterMode === 'my-groups' && userGroups.length > 0) {
                 const myGroupNames = getUserGroupNames();
                 const myCourses = getUserCourses();
                 const myGroupIds = new Set(userGroups.map(g => String(g.id)));
@@ -1392,10 +1417,24 @@ active_tab: calendar
             const previousView = calendar?.view?.type || 'dayGridMonth';
             const previousDate = calendar?.getDate ? calendar.getDate() : null;
             if (calendar) calendar.destroy();
+            const toolbarGroupButtons = Array.isArray(userGroups) ? userGroups.map(group => {
+                const buttonName = `groupButton${String(group.id).replace(/[^a-zA-Z0-9_-]/g, '')}`;
+                return {
+                    buttonName,
+                    text: filterMode === 'group' && String(activeToolbarGroupId) === String(group.id)
+                        ? `● ${group.name}`
+                        : group.name,
+                    click: function () {
+                        filterMode = 'group';
+                        activeToolbarGroupId = String(group.id);
+                        displayCalendar(filterEvents());
+                    }
+                };
+            }) : [];
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: {
-                    left: 'prev,next today myGroupsButton,allButton',
+                    left: ['prev,next today myGroupsButton,allButton'].concat(toolbarGroupButtons.map(btn => btn.buttonName)).join(','),
                     center: 'title',
                     right: 'dayGridMonth,dayGridWeek,dayGridDay'
                 },
@@ -1411,9 +1450,17 @@ active_tab: calendar
                         text: filterMode === 'all' ? '● All' : 'All',
                         click: function () {
                             filterMode = 'all';
+                            activeToolbarGroupId = '';
                             displayCalendar(filterEvents());
                         }
-                    }
+                    },
+                    ...toolbarGroupButtons.reduce((buttons, button) => {
+                        buttons[button.buttonName] = {
+                            text: button.text,
+                            click: button.click
+                        };
+                        return buttons;
+                    }, {})
                 },
                 views: {
                     dayGridMonth: { buttonText: 'Month' },
@@ -1481,12 +1528,21 @@ active_tab: calendar
                     }
                 },
                 eventClick: function (info) {
-                    document.getElementById("saveButton").style.display = "none";
-                    document.getElementById("makeBreakButton").style.display = "none";
                     currentEvent = info.event;
                     isAddingNewEvent = false;
                     const isBreak = (currentEvent.extendedProps && currentEvent.extendedProps.isBreak === true) || currentEvent.isBreak === true;
                     const isIssue = currentEvent.extendedProps && currentEvent.extendedProps.isIssue === true;
+                    if (isIssue) {
+                        const issueId = String(currentEvent.id || '').replace(/^issue-/, '');
+                        const issue = calendarIssues.find(item => String(item.id) === issueId);
+                        if (issue) {
+                            switchDashboardTab('issues');
+                            openIssueModal(issue, true, false);
+                            return;
+                        }
+                    }
+                    document.getElementById("saveButton").style.display = "none";
+                    document.getElementById("makeBreakButton").style.display = "none";
                     document.getElementById('eventTitle').textContent = isBreak
                         ? ((currentEvent.extendedProps && currentEvent.extendedProps.breakName) || currentEvent.breakName || currentEvent.title)
                         : currentEvent.title;
@@ -1989,7 +2045,15 @@ active_tab: calendar
             function updateIssueStarButton(issue) {
                 if (!issueModalStarBtn || !issue) return;
                 const starCount = Number(issue.starCount || 0);
+                if (issue.starLocked) {
+                    issueModalStarBtn.textContent = `Starred (${starCount})`;
+                    issueModalStarBtn.disabled = true;
+                    issueModalStarBtn.title = 'Auto-starred because this issue is assigned to one of your groups.';
+                    return;
+                }
                 issueModalStarBtn.textContent = `${issue.starred ? 'Unstar' : 'Star'} (${starCount})`;
+                issueModalStarBtn.disabled = false;
+                issueModalStarBtn.title = '';
             }
 
             function getIssueFromUrl() {
@@ -2294,7 +2358,7 @@ active_tab: calendar
                     }
                 } catch (error) {
                     console.error('Issue star error:', error);
-                    showIssueToast(error.message === 'AUTH' ? 'Please log in again.' : 'Could not update star.', 'error');
+                    showIssueToast(error.message === 'AUTH' ? 'Please log in again.' : (error.message?.includes('auto-starred') ? 'This issue is locked to your group.' : 'Could not update star.'), 'error');
                 }
             });
 
