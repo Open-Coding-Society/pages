@@ -179,7 +179,7 @@ createDialogueBox() {
     fontSize: "14px",
     textAlign: "center",
     borderRadius: "12px",
-    zIndex: "9999",
+    zIndex: "100050",
     display: "none"
   });
 
