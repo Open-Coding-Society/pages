@@ -37,7 +37,11 @@ export class Background extends GameObject {
             this.alignCanvas();
 
             // Append the canvas to the DOM
-            document.getElementById("gameContainer").appendChild(this.canvas);
+            const parent = this.gameEnv?.gameContainer || document.getElementById("gameContainer") || this.gameEnv?.canvas?.parentElement;
+            if (!parent) {
+                throw new Error(`Cannot create ${this.canvas.id}: missing Mansion Game container`);
+            }
+            parent.appendChild(this.canvas);
             this.isInitialized = true; // Mark as initialized
         };
     }
@@ -47,7 +51,7 @@ export class Background extends GameObject {
      */
     alignCanvas() {
         // align the canvas to the gameCanvas, Layered
-        const gameCanvas = document.getElementById("gameCanvas");
+        const gameCanvas = this.gameEnv?.canvas || this.gameEnv?.gameCanvas || document.getElementById("gameCanvas");
         if (!gameCanvas) {
             console.error("Game canvas not found");
             return;

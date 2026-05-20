@@ -5,6 +5,7 @@ import Enemy from './MansionLogic/Enemy.js';
 import GameControl from './GameControl.js';
 import Character from './MansionLogic/Character.js';
 import Npc from './MansionLogic/Npc.js';
+import DialogueSystem from './MansionLogic/DialogueSystem.js';
 import GameLevel6 from './mansionLevel6.js';
 
 
@@ -25,7 +26,7 @@ class MansionLevel5 {
         });
     } catch (e) { /* ignore */ }
 	// Background data
-	const image_background = path + "/images/mansionGame/background_lvl5.png"; // be sure to include the path
+	const image_background = path + "/images/projects/mansionGame/background_lvl5.png"; // be sure to include the path
 	const image_data_background = {
 		name: 'background',
 		greeting: "This is the library, you will fight hordes of enemies, survive as long as possible.",
@@ -35,7 +36,7 @@ class MansionLevel5 {
 	};
 
 	//data for player
-	const sprite_player = path + "/images/mansionGame/full_anims_spook.png"; // be sure to include the path
+	const sprite_player = path + "/images/projects/mansionGame/full_anims_spook.png"; // be sure to include the path
 	const player_scale_factor = 5;
 	const sprite_data_player = {
         id: 'Player',
@@ -65,7 +66,7 @@ class MansionLevel5 {
     // add player to game
     this.gameEnv.gameObjects.push(player);
 
-    const sprite_src_zombie = path + "/images/mansionGame/zombieNpc.png";
+    const sprite_src_zombie = path + "/images/projects/mansionGame/zombieNpc.png";
 
 	const sprite_data_enemy = {
         id: 'ZombieEnemy',
@@ -216,7 +217,7 @@ class MansionLevel5 {
     };
 
     // Level 6 door
-    const sprite_src_level6door = path + "/images/mansionGame/door_lvl5.png";
+    const sprite_src_level6door = path + "/images/projects/mansionGame/door_lvl5.png";
     const sprite_greet_level6door = "You beat level 5! Would you like to enter level 6? Press E";
     const sprite_data_level6door = {
         id: 'Level6Door',
@@ -254,7 +255,7 @@ class MansionLevel5 {
 
     this.finishDoorData = sprite_data_level6door;
 
-    const laser_image = path + "/images/gamify/laser_bolt.png"  // be sure to include the path
+    const laser_image = path + "/images/projects/mansionGame/laser_bolt.png"  // be sure to include the path
     this.laserData = {
       id: "Laser",
       src: laser_image,

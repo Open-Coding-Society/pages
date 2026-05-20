@@ -33,7 +33,7 @@ class MansionLevel1 {
   }
 
     // Background data
-    const image_background = path + "/images/mansionGame/kitchen_lvl1.png"; // be sure to include the path
+    const image_background = path + "/images/projects/mansionGame/kitchen_lvl1.png"; // be sure to include the path
     const image_data_background = {
         name: 'background',
         greeting: "This is the kitchen, you will search for ingredients and create a potion.",
@@ -47,7 +47,7 @@ class MansionLevel1 {
     const objective_sprite_data = {
         id: 'ObjectiveIcon',
         greeting: "Objective Icon: Find ingredients!",
-        src: path + "/images/gamify/objective.png",
+        src: path + "/images/projects/mansionGame/objective.png",
         
         // Npc/Sprite required properties
         SCALE_FACTOR: 2, 
@@ -69,7 +69,7 @@ class MansionLevel1 {
 
     ////////// new code end
     
-    const sprite_src_mc = path + "/images/gamify/spookMcWalk.png"; // be sure to include the path
+    const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png"; // be sure to include the path
         const MC_SCALE_FACTOR = 6;
         const sprite_data_mc = {
             id: 'Spook',
@@ -95,7 +95,7 @@ class MansionLevel1 {
 
       // Pantry door (collision object) placed on the left side of the screen.
       // Position: 1/4 from left, slightly below the middle vertically
-      const sprite_src_pantrydoor = path + "/images/gamify/invisDoorCollisionSprite.png"; // replace with your door sprite if needed
+      const sprite_src_pantrydoor = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png"; // replace with your door sprite if needed
       const sprite_greet_pantrydoor = "Would you like to enter the pantry? Press E";
       const sprite_data_pantrydoor = {
         id: 'PantryDoor',

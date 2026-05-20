@@ -197,7 +197,7 @@ class MansionLevel3 {
 
     // Background - scrolling staircase
     this.backgroundY = 0;
-    const image_background = path + "/images/mansionGame/stairs_lvl3.png";
+    const image_background = path + "/images/projects/mansionGame/stairs_lvl3.png";
     const image_data_background = {
         name: 'background',
         greeting: `LIVES: ${'❤️'.repeat(this.lives) + '🖤'.repeat(3 - this.lives)} | Distance: ${this.score} | Dodge skeletons, get the key!`,
@@ -207,7 +207,7 @@ class MansionLevel3 {
     };
 
     // Player setup - MUST match exact format from mansionLevel1
-    const sprite_src_mc = path + "/images/gamify/spookMcWalk.png";
+    const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
     const MC_SCALE_FACTOR = 6;
     const playerData = {
       id: 'Spook',
@@ -502,7 +502,7 @@ class MansionLevel3 {
       scrollSpeed: this.scrollSpeed,
       level: this,
       isKey: false,
-      imageSrc: this.gameEnv.path + "/images/mansionGame/skeleton_lvl3.png"
+      imageSrc: this.gameEnv.path + "/images/projects/mansionGame/skeleton_lvl3.png"
     };
 
     const skeleton = new Skeleton(skeletonData, this.gameEnv);
@@ -516,7 +516,7 @@ class MansionLevel3 {
       scrollSpeed: this.scrollSpeed,
       level: this,
       isKey: true,
-      imageSrc: this.gameEnv.path + "/images/mansionGame/key_lvl3.png"
+      imageSrc: this.gameEnv.path + "/images/projects/mansionGame/key_lvl3.png"
     };
 
     const key = new Skeleton(keyData, this.gameEnv);
@@ -553,7 +553,7 @@ class MansionLevel3 {
     dialogueSystem.showDialogue(
       'You collected the golden key! Moving to next level...',
       'Victory!',
-      this.gameEnv.path + '/images/mansionGame/key_lvl3.png'
+      this.gameEnv.path + '/images/projects/mansionGame/key_lvl3.png'
     );
     
     dialogueSystem.addButtons([
@@ -592,7 +592,7 @@ class MansionLevel3 {
     dialogueSystem.showDialogue(
       'You ran out of lives! Try again?',
       'Game Over',
-      this.gameEnv.path + '/images/mansionGame/skeleton_lvl3.png'
+      this.gameEnv.path + '/images/projects/mansionGame/skeleton_lvl3.png'
     );
     
     dialogueSystem.addButtons([
