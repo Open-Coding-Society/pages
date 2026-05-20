@@ -1916,9 +1916,16 @@ active_tab: calendar
             }
 
             function getIssueComments(issueId) {
+                const seen = new Set();
                 return (calendarIssueComments || [])
                     .map(normalizeIssueComment)
-                    .filter(comment => String(comment.issueId || '') === String(issueId) && !comment.isStar)
+                    .filter(comment => {
+                        if (String(comment.issueId || '') !== String(issueId) || comment.isStar) return false;
+                        const commentId = String(comment.id);
+                        if (seen.has(commentId)) return false;
+                        seen.add(commentId);
+                        return true;
+                    })
                     .sort((a, b) => parseThreadTimestamp(b.timestamp).getTime() - parseThreadTimestamp(a.timestamp).getTime());
             }
 
@@ -1933,6 +1940,12 @@ active_tab: calendar
                 if (!comments.length) {
                     issueCommentsList.innerHTML = '<div class="issues-empty">No replies yet. Add the first one below.</div>';
                     return;
+                }
+
+                // Cancel any pending reply fetches from previous modal views
+                if (window._activeReplyFetches) {
+                    window._activeReplyFetches.forEach(controller => controller.abort());
+                    window._activeReplyFetches.clear();
                 }
 
                 issueCommentsList.innerHTML = comments.map(comment => `
@@ -1965,7 +1978,22 @@ active_tab: calendar
             }
 
             function loadRepliesForComment(commentId) {
-                fetch(`${javaURI}/api/Comment/replies/${commentId}`, { ...fetchOptions })
+                // Initialize the set if it doesn't exist
+                if (!window._activeReplyFetches) {
+                    window._activeReplyFetches = new Map();
+                }
+
+                // Abort any existing fetch for this comment
+                const existingController = window._activeReplyFetches.get(commentId);
+                if (existingController) {
+                    existingController.abort();
+                }
+
+                // Create new abort controller for this fetch
+                const controller = new AbortController();
+                window._activeReplyFetches.set(commentId, controller);
+
+                fetch(`${javaURI}/api/Comment/replies/${commentId}`, { ...fetchOptions, signal: controller.signal })
                     .then(r => { if (handleAuthError(r)) return; if (!r.ok) throw new Error('Failed to load replies'); return r.json(); })
                     .then(replies => {
                         if (!replies || replies.length === 0) return;
@@ -1981,8 +2009,16 @@ active_tab: calendar
                                 <div class="issue-comment-body">${escapeIssueText(reply.text || '')}</div>
                             </article>
                         `).join('');
+                        
+                        // Clean up the controller from the map
+                        window._activeReplyFetches.delete(commentId);
                     })
-                    .catch(e => { console.warn('Failed to load replies:', e); });
+                    .catch(e => { 
+                        if (e.name !== 'AbortError') {
+                            console.warn('Failed to load replies:', e);
+                        }
+                        window._activeReplyFetches.delete(commentId);
+                    });
             }
 
             // Reply modal handling
