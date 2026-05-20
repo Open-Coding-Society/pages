@@ -502,10 +502,22 @@ destroy() {
       try { this.closeDialogue(); } catch (_) { /* ignore */ }
     }
 
-    // Remove the dialogue box from wherever it was mounted.
-    if (this.dialogueBox?.parentNode) {
-      this.dialogueBox.parentNode.removeChild(this.dialogueBox);
+    // Remove the dialogue box from document.body forcibly.
+    try {
+      if (this.dialogueBox) {
+        // Try parentNode removal first
+        if (this.dialogueBox.parentNode) {
+          this.dialogueBox.parentNode.removeChild(this.dialogueBox);
+        }
+        // If element is still in document, remove it directly
+        if (document.body.contains(this.dialogueBox)) {
+          document.body.removeChild(this.dialogueBox);
+        }
+      }
+    } catch (e) {
+      console.warn('DialogueSystem: error removing dialogueBox', e);
     }
+
     this.dialogueBox = null;
     this.dialogueText = null;
     this.closeBtn = null;
@@ -513,9 +525,17 @@ destroy() {
     this.actionButtonGroup = null;
 
     // Remove the injected <style> animation block.
-    const styleEl = document.getElementById('dialogue-animations-' + this.safeId);
-    if (styleEl?.parentNode) {
-      styleEl.parentNode.removeChild(styleEl);
+    try {
+      const styleEl = document.getElementById('dialogue-animations-' + this.safeId);
+      if (styleEl) {
+        if (styleEl.parentNode) {
+          styleEl.parentNode.removeChild(styleEl);
+        } else if (document.head.contains(styleEl)) {
+          document.head.removeChild(styleEl);
+        }
+      }
+    } catch (e) {
+      console.warn('DialogueSystem: error removing style element', e);
     }
   }
 

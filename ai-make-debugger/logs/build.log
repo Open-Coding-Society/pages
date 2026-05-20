@@ -76,12 +76,12 @@ Multi-Course File Splitter
 make[1]: Leaving directory '/home/palra/nighthawk/pages-educators'
 Cleaning project distributions...
 make[1]: Entering directory '/home/palra/nighthawk/pages-educators'
-make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
-🧹 Cleaning cs-pathway-game distribution...
-✓ Distribution cleaned (source files preserved in _projects/cs-pathway-game)
-make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
-make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
-make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway-game'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway'
+🧹 Cleaning cs-pathway distribution...
+✓ Distribution cleaned (source files preserved in _projects/cs-pathway)
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway'
+make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway'
+make[2]: Leaving directory '/home/palra/nighthawk/pages-educators/_projects/cs-pathway'
 make[2]: Entering directory '/home/palra/nighthawk/pages-educators/_projects/gamify'
 🧹 Cleaning gamify distribution...
 ✓ Distribution cleaned (source files preserved in _projects/gamify)

@@ -1,0 +1,1524 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Jura:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg-void:     #050709;
+  --bg-base:     #090c13;
+  --bg-surface:  #0e1220;
+  --bg-raised:   #141928;
+  --bg-elevated: #1c2338;
+
+  --green:        #3ddc84;
+  --green-dim:    rgba(61,220,132,0.12);
+  --green-glow:   rgba(61,220,132,0.28);
+  --green-border: rgba(61,220,132,0.28);
+
+  --cyan:         #00e5ff;
+  --cyan-dim:     rgba(0,229,255,0.10);
+  --cyan-border:  rgba(0,229,255,0.25);
+
+  --amber:        #ffb84d;
+  --amber-dim:    rgba(255,184,77,0.12);
+  --amber-border: rgba(255,184,77,0.30);
+
+  --red:          #ff5252;
+  --red-dim:      rgba(255,82,82,0.12);
+  --red-border:   rgba(255,82,82,0.30);
+
+  --text-primary:   #d8e8f8;
+  --text-secondary: #7e97b4;
+  --text-muted:     #3d5268;
+
+  --border:        rgba(80,130,180,0.12);
+  --border-bright: rgba(80,130,180,0.22);
+
+  --shadow-green: 0 0 20px rgba(61,220,132,0.2);
+  --shadow-amber: 0 0 20px rgba(255,184,77,0.2);
+
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --r-2xl: 28px;
+}
+
+.sim-shell *,
+.sim-shell *::before,
+.sim-shell *::after { box-sizing: border-box; }
+
+.sim-shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 2rem 1.2rem 6rem;
+  font-family: 'Jura', system-ui, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-void);
+  border-radius: var(--r-xl);
+  position: relative;
+}
+
+.sim-shell button,
+.sim-shell input,
+.sim-shell select {
+  font-family: 'Jura', system-ui, sans-serif;
+}
+
+/* ── HERO ─────────────────────────────────────── */
+.sim-hero {
+  position: relative;
+  min-height: 400px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border-radius: var(--r-2xl);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+.sim-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(61,220,132,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61,220,132,0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  pointer-events: none;
+}
+.sim-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), var(--cyan), transparent);
+  opacity: 0.6;
+}
+.sim-hero-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 2rem;
+  max-width: 780px;
+  width: 100%;
+}
+.sim-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin: 0 0 0.9rem;
+}
+.sim-eyebrow::before { content: '// '; opacity: 0.5; }
+.sim-title {
+  font-family: 'Oxanium', sans-serif;
+  font-size: clamp(2.4rem, 6vw, 4.6rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  background: linear-gradient(130deg, #ffffff 0%, var(--cyan) 45%, var(--green) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+}
+.sim-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 580px;
+  margin: 1rem auto 0;
+}
+.sim-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+}
+.sim-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--green-border);
+  border-radius: var(--r-xs);
+  background: var(--green-dim);
+  color: var(--green);
+}
+.sim-hero-btns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.8rem;
+}
+
+/* ── BUTTONS ──────────────────────────────────── */
+.btn, .btn-sec, .btn-soft, .btn-ghost {
+  font-family: 'Oxanium', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.62rem 1.3rem;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.18s ease;
+}
+.btn {
+  background: var(--green);
+  color: #030d07;
+  border-color: var(--green);
+  box-shadow: var(--shadow-green);
+}
+.btn:hover {
+  background: #52f598;
+  box-shadow: 0 0 28px var(--green-glow), 0 0 56px rgba(61,220,132,0.12);
+  transform: translateY(-2px);
+}
+.btn-sec {
+  background: transparent;
+  color: var(--cyan);
+  border-color: var(--cyan-border);
+}
+.btn-sec:hover {
+  background: var(--cyan-dim);
+  transform: translateY(-2px);
+}
+.btn-soft {
+  background: var(--bg-raised);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+.btn-soft:hover {
+  border-color: var(--border-bright);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--green);
+  border-color: var(--green-border);
+}
+.btn-ghost:hover {
+  background: var(--green-dim);
+  transform: translateY(-1px);
+}
+.btn:active, .btn-sec:active, .btn-soft:active, .btn-ghost:active {
+  transform: scale(0.97) !important;
+}
+.btn:focus-visible, .btn-sec:focus-visible, .btn-soft:focus-visible, .btn-ghost:focus-visible {
+  box-shadow: 0 0 0 3px rgba(61,220,132,0.4);
+}
+
+/* ── QUICK NAV ────────────────────────────────── */
+.sim-nav {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1.3rem;
+  background: rgba(9,12,19,0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: 1.8rem;
+}
+.sim-nav-logo {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--green);
+  text-decoration: none;
+}
+.sim-nav-links { display: flex; gap: 1.5rem; }
+.sim-nav-links a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: color 0.15s;
+}
+.sim-nav-links a:hover { color: var(--green); }
+
+/* ── OVERVIEW GRID ────────────────────────────── */
+.sim-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+.sim-overview-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.4rem;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.sim-overview-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 16px; height: 16px;
+  border-top: 2px solid var(--green);
+  border-left: 2px solid var(--green);
+  border-radius: var(--r-xs) 0 0 0;
+  opacity: 0.7;
+}
+.sim-overview-card:hover { border-color: var(--green-border); transform: translateY(-2px); }
+.sim-overview-card .icon { font-size: 1.6rem; display: block; margin-bottom: 0.7rem; }
+.sim-overview-card h2 {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+.sim-overview-card p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.65; margin: 0; }
+
+/* ── VOCAB STRIP ──────────────────────────────── */
+.sim-vocab-strip {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 1.6rem 1.8rem;
+  margin-bottom: 1.8rem;
+}
+.sim-vocab-strip h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  margin: 0 0 0.9rem;
+}
+.vocab-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.vocab-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  padding: 0.42rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  background: var(--bg-raised);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.vocab-chip:hover, .vocab-chip.active {
+  background: var(--green-dim);
+  color: var(--green);
+  border-color: var(--green-border);
+  box-shadow: var(--shadow-green);
+}
+.vocab-chip:focus-visible { box-shadow: 0 0 0 3px rgba(61,220,132,0.35); outline: none; }
+.vocab-def {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.79rem;
+  line-height: 1.65;
+  color: var(--green);
+  background: var(--bg-void);
+  border: 1px solid var(--green-border);
+  border-left: 3px solid var(--green);
+  border-radius: var(--r-sm);
+  padding: 0.85rem 1rem;
+  min-height: 42px;
+}
+
+/* ── SIM CARD SHELL ───────────────────────────── */
+.sim-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2xl);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+.sim-card-dice::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), transparent 60%);
+}
+.sim-card-flight::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--green), var(--amber), transparent 60%);
+}
+.sim-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.sim-card-header h2 {
+  font-family: 'Oxanium', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.02em;
+}
+.sim-card-header p { color: var(--text-secondary); font-size: 0.87rem; margin: 0; max-width: 520px; line-height: 1.6; }
+.sim-card-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: flex-start; flex-shrink: 0; }
+
+.sim-explain {
+  display: none;
+  background: var(--bg-void);
+  border: 1px solid var(--green-border);
+  border-left: 3px solid var(--green);
+  border-radius: var(--r-md);
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 1.4rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.sim-explain.is-visible { display: block; }
+.sim-explain h3 {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--green);
+  margin: 0 0 0.5rem;
+}
+
+/* ── DICE ─────────────────────────────────────── */
+.dice-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.4rem;
+}
+.dice-visual {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+.dice-visual::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(61,220,132,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61,220,132,0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+.dice-cube {
+  width: 124px; height: 124px;
+  border-radius: var(--r-lg);
+  background: var(--bg-surface);
+  border: 2px solid var(--green-border);
+  box-shadow: var(--shadow-green), inset 0 0 20px rgba(61,220,132,0.04);
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 2;
+}
+.dice-cube.is-rolling {
+  animation: diceSpin 0.55s cubic-bezier(.25,.8,.25,1), diceGlow 0.55s ease;
+}
+@keyframes diceGlow {
+  0%   { box-shadow: var(--shadow-green); }
+  50%  { box-shadow: 0 0 48px var(--green-glow), 0 0 80px rgba(61,220,132,0.1); }
+  100% { box-shadow: var(--shadow-green); }
+}
+@keyframes diceSpin {
+  0%   { transform: rotate(0deg) scale(1); }
+  35%  { transform: rotate(18deg) scale(1.12); }
+  70%  { transform: rotate(-12deg) scale(0.97); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.dice-face { width: 100%; height: 100%; display: grid; place-items: center; }
+#diceDisplayValue {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--green);
+  text-shadow: 0 0 22px var(--green-glow);
+}
+.dice-sparkle { display: none; }
+.dice-status {
+  background: var(--bg-surface);
+  border: 1px solid var(--green-border);
+  border-radius: var(--r-sm);
+  padding: 0.5rem 1.1rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.dice-status p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  margin: 0 0 0.18rem;
+}
+.dice-status strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--green);
+}
+.dice-controls {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.custom-roll-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.custom-roll-label input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-primary);
+  padding: 0.52rem 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.83rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.custom-roll-label input:focus { border-color: var(--green-border); box-shadow: 0 0 0 2px var(--green-dim); }
+.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; margin-top: 0.2rem; }
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 0.65rem 0.4rem;
+  text-align: center;
+  display: flex; flex-direction: column; gap: 0.22rem;
+}
+.stat-card span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.stat-card strong {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--amber);
+}
+.chart-panel {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 1.4rem;
+  margin-bottom: 1.4rem;
+}
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+.panel-header h3 {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  margin: 0;
+}
+.panel-header p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.dice-bar-chart { display: flex; flex-direction: column; gap: 0.5rem; }
+.dice-bar-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  gap: 0.75rem;
+}
+.dice-bar-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-align: right;
+}
+.dice-bar-track {
+  height: 7px;
+  background: var(--bg-surface);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.dice-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  border-radius: 999px;
+  box-shadow: 0 0 6px var(--green-glow);
+  transition: width 0.45s cubic-bezier(.25,1,.5,1);
+}
+.dice-bar-percent {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--green);
+}
+.table-panel {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 1.4rem;
+  margin-bottom: 1.4rem;
+  overflow-x: auto;
+}
+.results-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.77rem; }
+.results-table th {
+  text-align: left;
+  padding: 0.52rem 0.85rem;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.results-table td {
+  padding: 0.52rem 0.85rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(80,130,180,0.05);
+  white-space: nowrap;
+}
+.results-table tr:hover td { background: var(--bg-surface); color: var(--text-primary); }
+.mini-bar { width: 72px; height: 5px; background: var(--bg-surface); border-radius: 999px; overflow: hidden; }
+.mini-bar-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); border-radius: 999px; transition: width 0.4s; }
+
+/* ── REFLECTION ───────────────────────────────── */
+.reflection-box {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--r-lg);
+  padding: 1.3rem;
+}
+.reflection-box h3 {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--amber);
+  margin: 0 0 0.55rem;
+}
+.reflection-box p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.65; margin: 0 0 0.9rem; }
+
+/* ── FLIGHT ───────────────────────────────────── */
+.flight-layout {
+  display: grid;
+  grid-template-columns: 285px 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.4rem;
+  align-items: start;
+}
+.flight-controls {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 1.3rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+.input-section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--green);
+  border-bottom: 1px solid var(--green-border);
+  padding-bottom: 0.35rem;
+  margin-top: 0.15rem;
+}
+.pretty-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.pretty-label select,
+.pretty-label input[type="number"] {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-primary);
+  padding: 0.48rem 0.65rem;
+  font-family: 'Jura', sans-serif;
+  font-size: 0.8rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.pretty-label select:focus,
+.pretty-label input[type="number"]:focus { border-color: var(--green-border); box-shadow: 0 0 0 2px var(--green-dim); }
+.flight-visual-col { display: flex; flex-direction: column; gap: 0.9rem; }
+.flight-scene {
+  position: relative;
+  height: 220px;
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+.flight-scene::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0,229,255,0.04), transparent 60%);
+  pointer-events: none;
+}
+.flight-scene.stormy::before { background: radial-gradient(ellipse at 50% 0%, rgba(255,82,82,0.06), transparent 60%); }
+.scene-cloud { display: none; }
+.sun-or-moon { position: absolute; top: 12px; right: 18px; font-size: 1.5rem; opacity: 0.5; z-index: 1; }
+.runway-base {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 26px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 22px;
+}
+.runway-line { flex: 1; height: 3px; background: var(--amber); border-radius: 999px; opacity: 0.3; }
+.animated-plane {
+  position: absolute;
+  left: 34px; bottom: 38px;
+  font-size: 3rem;
+  transform: rotate(-8deg);
+  z-index: 4;
+  transition: left 2.1s cubic-bezier(.5,1.7,.5,1), bottom 2.1s cubic-bezier(.5,1.7,.5,1), transform 2.1s cubic-bezier(.5,1.7,.5,1);
+  filter: drop-shadow(0 0 8px rgba(61,220,132,0.28));
+  will-change: left,bottom,transform;
+}
+.animated-plane.takeoff-success {
+  left: calc(100% - 105px); bottom: 192px;
+  transform: rotate(-18deg) scale(1.05);
+  animation: planeBounce 0.7s cubic-bezier(.5,1.7,.5,1) 0.1s 1;
+}
+@keyframes planeBounce {
+  0%   { transform: rotate(-8deg) scale(1); }
+  45%  { transform: rotate(-14deg) scale(1.1) translateY(-14px); }
+  100% { transform: rotate(-18deg) scale(1.05); }
+}
+.animated-plane.takeoff-fail {
+  left: calc(100% - 115px); bottom: 30px;
+  transform: rotate(42deg) scale(1.03);
+  animation: planeCrash 0.6s cubic-bezier(.5,1.7,.5,1) 0.1s 1;
+}
+@keyframes planeCrash {
+  0%  { transform: rotate(-8deg) scale(1); }
+  30% { transform: rotate(18deg) scale(1.1) translateY(-10px); }
+  60% { transform: rotate(42deg) scale(1.03); }
+  80% { transform: rotate(38deg) scale(1.06) translateY(4px); }
+  100%{ transform: rotate(42deg) scale(1.03); }
+}
+.animated-plane.shaking { animation: planeShake 0.42s ease-in-out infinite; }
+@keyframes planeShake {
+  0%,100%{ margin-left:0; } 20%{ margin-left:-7px; } 40%{ margin-left:7px; }
+  60%{ margin-left:-5px; } 80%{ margin-left:5px; }
+}
+.falling-people-container { position: absolute; right: 105px; top: 18px; display: flex; gap: 5px; z-index: 5; }
+.falling-person { font-size: 1.05rem; animation: fallDown 1.3s ease-in forwards; }
+@keyframes fallDown {
+  0%  { transform: translateY(0) rotate(0); opacity: 1; }
+  100%{ transform: translateY(135px) rotate(200deg); opacity: 0; }
+}
+.explosion-effect {
+  position: absolute; right: 60px; bottom: 34px;
+  font-size: 2.2rem; opacity: 0; transform: scale(0.3); z-index: 6;
+  filter: drop-shadow(0 0 14px var(--red));
+}
+.explosion-effect.show-explosion { animation: explodePop 0.65s cubic-bezier(.5,1.7,.5,1) forwards; }
+@keyframes explodePop {
+  0%  { opacity:0; transform:scale(0.3); }
+  55% { opacity:1; transform:scale(1.35) rotate(-8deg); }
+  80% { opacity:1; transform:scale(1.1) rotate(5deg); }
+  100%{ opacity:1; transform:scale(1) rotate(0); }
+}
+.flight-output-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.65rem; }
+.flight-score-card {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.8rem 0.7rem;
+  display: flex; flex-direction: column; gap: 0.28rem;
+}
+.flight-score-card span { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-muted); }
+.flight-score-card strong { font-family: 'Oxanium', sans-serif; font-size: 1.35rem; font-weight: 700; color: var(--amber); }
+.flight-result-box {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.9rem 1.1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.77rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.flight-result-box.success-result { background: var(--green-dim); border-color: var(--green-border); color: var(--green); }
+.flight-result-box.fail-result    { background: var(--red-dim);   border-color: var(--red-border);   color: var(--red); }
+.risk-breakdown-panel {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 1.4rem;
+  margin-bottom: 1.4rem;
+}
+.risk-list { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.5rem; }
+.risk-item {
+  display: flex; align-items: center; gap: 0.55rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  transition: border-color 0.15s;
+}
+.risk-item:hover { border-color: var(--red-border); }
+.risk-item span { font-family: 'Jura', sans-serif; color: var(--text-secondary); }
+.risk-item strong { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--red); }
+
+/* ── WRAP-UP ──────────────────────────────────── */
+.wrap-up-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2xl);
+  padding: 2.4rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.wrap-up-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), var(--cyan), transparent);
+  opacity: 0.5;
+}
+.wrap-up-card h2 {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 1.5rem; font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem;
+}
+.wrap-up-card > p { color: var(--text-secondary); margin: 0 0 1.4rem; line-height: 1.7; font-size: 0.88rem; }
+.wrap-up-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.wrap-up-grid > div {
+  background: var(--bg-void);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.2rem;
+}
+.wrap-up-grid h3 {
+  font-family: 'Oxanium', sans-serif;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--green);
+  margin: 0 0 0.45rem;
+}
+.wrap-up-grid p { font-size: 0.83rem; color: var(--text-secondary); margin: 0; line-height: 1.6; }
+
+/* ── BACK TO TOP ──────────────────────────────── */
+.sim-top-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-surface);
+  color: var(--green);
+  border: 1px solid var(--green-border);
+  border-radius: var(--r-md);
+  width: 42px; height: 42px;
+  font-size: 1rem; font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-green);
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  z-index: 100;
+  transition: all 0.18s;
+}
+.sim-top-btn:hover { background: var(--green); color: #030d07; transform: translateY(-3px); }
+
+/* ── RESPONSIVE ───────────────────────────────── */
+@media (max-width: 980px) {
+  .sim-overview-grid { grid-template-columns: repeat(2,1fr); }
+  .dice-layout, .flight-layout { grid-template-columns: 1fr; }
+  .flight-controls { grid-template-columns: repeat(2,1fr); }
+  .input-section-title, .flight-controls > button { grid-column: 1 / -1; }
+}
+@media (max-width: 650px) {
+  .sim-shell { padding: 1rem 0.75rem 4.5rem; }
+  .sim-overview-grid, .stat-grid, .flight-output-grid, .wrap-up-grid, .flight-controls { grid-template-columns: 1fr; }
+  .sim-card-header, .panel-header { flex-direction: column; }
+  .sim-card-actions { justify-content: flex-start; }
+  .dice-bar-row { grid-template-columns: 56px 1fr 56px; gap: 0.45rem; }
+  .sim-title { font-size: clamp(2.1rem,11vw,3.4rem); }
+  .sim-top-btn { bottom: 1rem; right: 1rem; }
+}
+</style>
+
+<div id="simulationLessonApp" class="sim-shell">
+
+  <!-- HERO -->
+  <section class="sim-hero">
+    <div class="sim-hero-inner">
+      <p class="sim-eyebrow">AP CSP · Big Idea: Algorithms and Programming</p>
+      <h1 class="sim-title">Interactive Simulations Lab</h1>
+      <p class="sim-subtitle">Explore how simulations use inputs, randomness, repeated trials, and models to predict possible outcomes.</p>
+      <div class="sim-pills">
+        <span class="sim-pill">🎲 Randomness</span>
+        <span class="sim-pill">✈️ Real-world models</span>
+        <span class="sim-pill">📊 Data tables</span>
+        <span class="sim-pill">🧠 CSP reasoning</span>
+      </div>
+      <div class="sim-hero-btns">
+        <a href="#diceSimulationCard" class="btn">Start Dice Lab</a>
+        <a href="#flightSimulationCard" class="btn-sec">Start Flight Lab</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK NAV -->
+  <nav class="sim-nav" aria-label="Simulation shortcuts">
+    <a href="#simulationLessonApp" class="sim-nav-logo">✨ Sim Lab</a>
+    <div class="sim-nav-links">
+      <a href="#diceSimulationCard">🎲 Dice Lab</a>
+      <a href="#flightSimulationCard">✈️ Flight Lab</a>
+      <a href="#lessonWrapUp">📝 Wrap-Up</a>
+    </div>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <section class="sim-overview-grid">
+    <article class="sim-overview-card">
+      <span class="icon">🧪</span>
+      <h2>What is a simulation?</h2>
+      <p>A simulation imitates a real-world process using a model, inputs, rules, and outputs.</p>
+    </article>
+    <article class="sim-overview-card">
+      <span class="icon">🎯</span>
+      <h2>Why use simulations?</h2>
+      <p>When real testing would be expensive, dangerous, slow, or impossible to repeat.</p>
+    </article>
+    <article class="sim-overview-card">
+      <span class="icon">🌦️</span>
+      <h2>What affects accuracy?</h2>
+      <p>Missing variables, weak assumptions, or bad data make simulation results less reliable.</p>
+    </article>
+    <article class="sim-overview-card">
+      <span class="icon">📈</span>
+      <h2>What to observe?</h2>
+      <p>Look for patterns over many trials. One result can be random — many reveal a trend.</p>
+    </article>
+  </section>
+
+  <!-- VOCAB -->
+  <section class="sim-vocab-strip">
+    <h2>AP CSP Simulation Vocabulary</h2>
+    <div class="vocab-chips">
+      <button class="vocab-chip" data-vocab="model">Model</button>
+      <button class="vocab-chip" data-vocab="input">Input</button>
+      <button class="vocab-chip" data-vocab="output">Output</button>
+      <button class="vocab-chip" data-vocab="trial">Trial</button>
+      <button class="vocab-chip" data-vocab="randomness">Randomness</button>
+      <button class="vocab-chip" data-vocab="assumption">Assumption</button>
+      <button class="vocab-chip" data-vocab="approximation">Approximation</button>
+    </div>
+    <div id="vocabDefinitionBox" class="vocab-def">Click a vocabulary word to see a quick AP CSP definition.</div>
+  </section>
+
+  <!-- DICE SIM -->
+  <section id="diceSimulationCard" class="sim-card sim-card-dice">
+    <div class="sim-card-header">
+      <div>
+        <p class="sim-eyebrow">Simulation 1</p>
+        <h2>Dice Probability Simulator</h2>
+        <p>Roll a die repeatedly and watch experimental probability move closer to theoretical probability.</p>
+      </div>
+      <div class="sim-card-actions">
+        <button id="diceHelpButton" class="btn-soft">How this models CSP</button>
+        <button id="resetDiceButton" class="btn-soft">Reset Dice</button>
+      </div>
+    </div>
+
+    <div id="diceExplanationPanel" class="sim-explain">
+      <h3>How this is a simulation</h3>
+      <p>The die roll uses a random number generator. Each roll is one trial. The program stores results, calculates frequencies, and displays the output in a table.</p>
+    </div>
+
+    <div class="dice-layout">
+      <div class="dice-visual">
+        <div id="diceCube" class="dice-cube" aria-live="polite">
+          <div class="dice-face"><span id="diceDisplayValue">?</span></div>
+        </div>
+        <div class="dice-sparkle dice-sparkle-one">✦</div>
+        <div class="dice-sparkle dice-sparkle-two">✧</div>
+        <div class="dice-sparkle dice-sparkle-three">✦</div>
+        <div class="dice-status">
+          <p>Last roll</p>
+          <strong id="lastRollText">No rolls yet</strong>
+        </div>
+      </div>
+      <div class="dice-controls">
+        <button id="rollOnceButton" class="btn">Roll Once</button>
+        <button id="rollTenButton" class="btn-sec">Roll 10 Times</button>
+        <button id="rollHundredButton" class="btn-sec">Roll 100 Times</button>
+        <label class="custom-roll-label">
+          Custom number of rolls
+          <input id="customRollInput" type="number" min="1" max="10000" value="50">
+        </label>
+        <button id="customRollButton" class="btn-ghost">Run Custom Rolls</button>
+        <div class="stat-grid">
+          <div class="stat-card"><span>Total Rolls</span><strong id="totalRollsText">0</strong></div>
+          <div class="stat-card"><span>Most Common</span><strong id="mostCommonText">N/A</strong></div>
+          <div class="stat-card"><span>Least Common</span><strong id="leastCommonText">N/A</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <div class="panel-header">
+        <h3>Live Frequency Chart</h3>
+        <p>Theoretical probability per side ≈ 16.7%</p>
+      </div>
+      <div id="diceBarChart" class="dice-bar-chart"></div>
+    </div>
+
+    <div class="table-panel">
+      <div class="panel-header">
+        <h3>Recorded Results</h3>
+        <button id="copyDiceSummaryButton" class="btn-soft">Copy Summary</button>
+      </div>
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Dice Value</th><th>Frequency</th><th>Exp. Probability</th><th>Diff from 16.7%</th><th>Bar</th>
+          </tr>
+        </thead>
+        <tbody id="diceResultsTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="reflection-box">
+      <h3>Quick Discussion Prompt</h3>
+      <p id="diceReflectionPrompt">Why do the results usually become more balanced after more trials?</p>
+      <button id="newDicePromptButton" class="btn-ghost">New Prompt</button>
+    </div>
+  </section>
+
+  <!-- FLIGHT SIM -->
+  <section id="flightSimulationCard" class="sim-card sim-card-flight">
+    <div class="sim-card-header">
+      <div>
+        <p class="sim-eyebrow">Simulation 2</p>
+        <h2>Flight Risk Simulator</h2>
+        <p>Change the input variables and run a flight model that calculates risk using rules plus randomness.</p>
+      </div>
+      <div class="sim-card-actions">
+        <button id="flightHelpButton" class="btn-soft">How this models CSP</button>
+        <button id="resetFlightButton" class="btn-soft">Reset Flight</button>
+      </div>
+    </div>
+
+    <div id="flightExplanationPanel" class="sim-explain">
+      <h3>How this is a simulation</h3>
+      <p>The flight model uses selected conditions as inputs. The algorithm converts them into a safety score (the likelihood of success). An uncertainty factor — a random number simulating unpredictable real-world variables like bird strikes, turbulence, or equipment glitches — is then compared to that score. If the uncertainty exceeds the safety margin, the flight fails.</p>
+    </div>
+
+    <div class="flight-layout">
+      <form id="flightControlForm" class="flight-controls">
+        <div class="input-section-title">Environment</div>
+        <label class="pretty-label">Weather
+          <select id="weatherInput">
+            <option value="clear">Clear skies</option>
+            <option value="rain">Rain</option>
+            <option value="fog">Heavy fog</option>
+            <option value="storm">Thunderstorm</option>
+          </select>
+        </label>
+        <label class="pretty-label">Wind speed
+          <select id="windInput">
+            <option value="low">Low wind</option>
+            <option value="medium">Medium wind</option>
+            <option value="high">High wind</option>
+            <option value="extreme">Extreme wind</option>
+          </select>
+        </label>
+        <label class="pretty-label">Visibility
+          <select id="visibilityInput">
+            <option value="excellent">Excellent</option>
+            <option value="normal">Normal</option>
+            <option value="poor">Poor</option>
+            <option value="dangerous">Dangerous</option>
+          </select>
+        </label>
+        <div class="input-section-title">Plane</div>
+        <label class="pretty-label">Plane style
+          <select id="planeStyleInput">
+            <option value="modern">Modern passenger jet</option>
+            <option value="standard">Standard passenger plane</option>
+            <option value="small">Small regional plane</option>
+            <option value="cargo">Heavy cargo plane</option>
+            <option value="old">Older aircraft model</option>
+          </select>
+        </label>
+        <label class="pretty-label">Plane age
+          <input id="planeAgeInput" type="number" min="0" max="70" value="8">
+        </label>
+        <label class="pretty-label">Maintenance quality
+          <select id="maintenanceInput">
+            <option value="excellent">Excellent</option>
+            <option value="average">Average</option>
+            <option value="delayed">Delayed maintenance</option>
+            <option value="poor">Poor maintenance</option>
+          </select>
+        </label>
+        <div class="input-section-title">People</div>
+        <label class="pretty-label">Passengers
+          <input id="passengerInput" type="number" min="1" max="400" value="120">
+        </label>
+        <label class="pretty-label">Pilot experience
+          <select id="pilotInput">
+            <option value="expert">Expert pilot</option>
+            <option value="trained">Trained pilot</option>
+            <option value="new">New pilot</option>
+          </select>
+        </label>
+        <label class="pretty-label">Copilot experience
+          <select id="copilotInput">
+            <option value="expert">Expert copilot</option>
+            <option value="trained">Trained copilot</option>
+            <option value="new">New copilot</option>
+          </select>
+        </label>
+        <button id="runFlightButton" type="button" class="btn">Run Flight Simulation</button>
+        <button id="randomizeFlightButton" type="button" class="btn-ghost">Randomize Inputs</button>
+      </form>
+
+      <div class="flight-visual-col">
+        <div class="flight-scene" id="flightScene">
+          <div class="sun-or-moon" id="sunOrMoon">☀️</div>
+          <div class="scene-cloud scene-cloud-one"></div>
+          <div class="scene-cloud scene-cloud-two"></div>
+          <div class="scene-cloud scene-cloud-three"></div>
+          <div class="scene-cloud scene-cloud-four"></div>
+          <div id="animatedPlane" class="animated-plane">✈️</div>
+          <div id="fallingPeopleContainer" class="falling-people-container"></div>
+          <div id="explosionEffect" class="explosion-effect">💥</div>
+          <div class="runway-base">
+            <div class="runway-line"></div>
+            <div class="runway-line"></div>
+            <div class="runway-line"></div>
+            <div class="runway-line"></div>
+          </div>
+        </div>
+        <div class="flight-output-grid">
+          <div class="flight-score-card"><span>Safety Score</span><strong id="safetyScoreText">--%</strong></div>
+          <div class="flight-score-card"><span>Uncertainty Factor</span><strong id="randomRollText">--</strong></div>
+          <div class="flight-score-card"><span>Outcome</span><strong id="outcomeText">Waiting</strong></div>
+        </div>
+        <div id="flightResultBox" class="flight-result-box">Choose inputs and run the flight simulation.</div>
+      </div>
+    </div>
+
+    <div class="risk-breakdown-panel">
+      <div class="panel-header">
+        <h3>Risk Factor Breakdown</h3>
+        <p>These deductions show how the model makes decisions.</p>
+      </div>
+      <div id="riskBreakdownList" class="risk-list"></div>
+    </div>
+
+    <div class="reflection-box">
+      <h3>Quick Discussion Prompt</h3>
+      <p id="flightReflectionPrompt">Which input seems to affect the simulation the most, and why?</p>
+      <button id="newFlightPromptButton" class="btn-ghost">New Prompt</button>
+    </div>
+  </section>
+
+  <!-- WRAP UP -->
+  <section id="lessonWrapUp">
+    <div class="wrap-up-card">
+      <h2>Lesson Wrap-Up</h2>
+      <p>Both simulations show that results depend on the model, assumptions, data, and number of trials — not just randomness alone.</p>
+      <div class="wrap-up-grid">
+        <div>
+          <h3>Dice Simulator</h3>
+          <p>Best for showing randomness, repeated trials, probability, and data collection.</p>
+        </div>
+        <div>
+          <h3>Flight Simulator</h3>
+          <p>Best for showing input variables, weighted conditions, assumptions, and limits of a model.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <a href="#simulationLessonApp" class="sim-top-btn" aria-label="Back to top">↑</a>
+</div>
+
+<script>
+(function() {
+  const state = {
+    diceCounts: [0,0,0,0,0,0],
+    totalRolls: 0,
+    lastRoll: null,
+    flightHistory: [],
+  };
+
+  const vocabDefs = {
+    model: "A model is a simplified version of a real-world system that a program can imitate.",
+    input: "An input is information given to the simulation before or during the run.",
+    output: "An output is the result produced by the simulation after the model is executed.",
+    trial: "A trial is one run of the simulation, such as one dice roll or one flight attempt.",
+    randomness: "Randomness means the program uses chance so the same inputs may not always produce the exact same output.",
+    assumption: "An assumption is a simplifying choice made by the programmer when the real system is too complex.",
+    approximation: "An approximation is an answer that is close enough to be useful, even if it is not perfectly exact.",
+  };
+
+  const dicePrompts = [
+    "Why do the results usually become more balanced after more trials?",
+    "How is experimental probability different from theoretical probability?",
+    "Why might a small number of rolls give misleading results?",
+    "Where is randomness used in this simulation?",
+    "What data does this simulation collect after each trial?",
+    "How could you modify this simulation to model two dice instead of one?",
+    "Why is a table useful for understanding simulation results?",
+    "What is one limitation of this dice simulation?",
+  ];
+
+  const flightPrompts = [
+    "Which input seems to affect the simulation the most, and why?",
+    "Why does the same set of inputs not always guarantee the same outcome?",
+    "Which parts of this simulation are realistic, and which parts are simplified?",
+    "What assumptions does this model make about flight safety?",
+    "How could real data improve this simulation?",
+    "Why would a flight simulation be safer than testing risky flights in real life?",
+    "What variables are missing from this model?",
+    "How does randomness make this simulation different from a normal calculator?",
+  ];
+
+  const $ = id => document.getElementById(id);
+  const el = {
+    vocabBox:       $("vocabDefinitionBox"),
+    vocabChips:     Array.from(document.querySelectorAll(".vocab-chip")),
+    diceHelpBtn:    $("diceHelpButton"),
+    dicePanel:      $("diceExplanationPanel"),
+    diceCube:       $("diceCube"),
+    diceVal:        $("diceDisplayValue"),
+    lastRoll:       $("lastRollText"),
+    rollOnce:       $("rollOnceButton"),
+    rollTen:        $("rollTenButton"),
+    rollHundred:    $("rollHundredButton"),
+    customInput:    $("customRollInput"),
+    customBtn:      $("customRollButton"),
+    resetDice:      $("resetDiceButton"),
+    totalRolls:     $("totalRollsText"),
+    mostCommon:     $("mostCommonText"),
+    leastCommon:    $("leastCommonText"),
+    barChart:       $("diceBarChart"),
+    tableBody:      $("diceResultsTableBody"),
+    copyBtn:        $("copyDiceSummaryButton"),
+    dicePrompt:     $("diceReflectionPrompt"),
+    newDicePrompt:  $("newDicePromptButton"),
+    flightHelpBtn:  $("flightHelpButton"),
+    flightPanel:    $("flightExplanationPanel"),
+    resetFlight:    $("resetFlightButton"),
+    runFlight:      $("runFlightButton"),
+    randomize:      $("randomizeFlightButton"),
+    flightScene:    $("flightScene"),
+    plane:          $("animatedPlane"),
+    peopleCont:     $("fallingPeopleContainer"),
+    explosion:      $("explosionEffect"),
+    safeScore:      $("safetyScoreText"),
+    randRoll:       $("randomRollText"),
+    outcome:        $("outcomeText"),
+    resultBox:      $("flightResultBox"),
+    riskList:       $("riskBreakdownList"),
+    flightPrompt:   $("flightReflectionPrompt"),
+    newFlightPr:    $("newFlightPromptButton"),
+    weatherIn:      $("weatherInput"),
+    windIn:         $("windInput"),
+    visIn:          $("visibilityInput"),
+    planeStyleIn:   $("planeStyleInput"),
+    planeAgeIn:     $("planeAgeInput"),
+    maintIn:        $("maintenanceInput"),
+    passIn:         $("passengerInput"),
+    pilotIn:        $("pilotInput"),
+    copilotIn:      $("copilotInput"),
+  };
+
+  const rndInt  = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+  const pick    = arr  => arr[Math.floor(Math.random()*arr.length)];
+  const clamp   = (v,a,b) => Math.max(a,Math.min(b,v));
+  const pct     = v    => `${v.toFixed(1)}%`;
+
+  /* ── VOCAB ── */
+  el.vocabChips.forEach(btn => btn.addEventListener("click", () => {
+    el.vocabBox.textContent = vocabDefs[btn.dataset.vocab] || "";
+    el.vocabChips.forEach(b => b.classList.toggle("active", b===btn));
+  }));
+
+  /* ── DICE ── */
+  function rollOnce() {
+    const r = rndInt(1,6);
+    state.diceCounts[r-1]++;
+    state.totalRolls++;
+    state.lastRoll = r;
+    return r;
+  }
+
+  function animDice(r) {
+    el.diceCube.classList.remove("is-rolling");
+    void el.diceCube.offsetWidth;
+    el.diceCube.classList.add("is-rolling");
+    el.diceVal.textContent = r;
+  }
+
+  function prob(i) { return state.totalRolls ? state.diceCounts[i]/state.totalRolls : 0; }
+
+  function renderDice() {
+    el.totalRolls.textContent = state.totalRolls;
+    if (state.totalRolls > 0) {
+      const max = state.diceCounts.indexOf(Math.max(...state.diceCounts));
+      const min = state.diceCounts.indexOf(Math.min(...state.diceCounts));
+      el.mostCommon.textContent  = max+1;
+      el.leastCommon.textContent = min+1;
+    } else {
+      el.mostCommon.textContent = el.leastCommon.textContent = "N/A";
+    }
+    el.lastRoll.textContent = state.lastRoll ? `Rolled a ${state.lastRoll}` : "No rolls yet";
+    renderChart(); renderTable();
+  }
+
+  function renderChart() {
+    el.barChart.innerHTML = "";
+    for (let v=1;v<=6;v++) {
+      const p = prob(v-1)*100;
+      const row = document.createElement("div"); row.className="dice-bar-row";
+      row.innerHTML = `<div class="dice-bar-label">Side ${v}</div>
+        <div class="dice-bar-track"><div class="dice-bar-fill" style="width:${p}%"></div></div>
+        <div class="dice-bar-percent">${pct(p)}</div>`;
+      el.barChart.appendChild(row);
+    }
+  }
+
+  function renderTable() {
+    el.tableBody.innerHTML = "";
+    for (let v=1;v<=6;v++) {
+      const p = prob(v-1)*100;
+      const diff = p - 100/6;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${v}</td><td>${state.diceCounts[v-1]}</td><td>${pct(p)}</td>
+        <td>${diff>=0?"+":""}${diff.toFixed(1)}%</td>
+        <td><div class="mini-bar"><div class="mini-bar-fill" style="width:${p}%"></div></div></td>`;
+      el.tableBody.appendChild(tr);
+    }
+  }
+
+  function runRolls(n, anim=true) {
+    n = clamp(Number(n)||1,1,10000);
+    let last=null;
+    for(let i=0;i<n;i++) last=rollOnce();
+    if(anim&&last) animDice(last);
+    renderDice();
+  }
+
+  function runAnimBatch(n) {
+    n = clamp(Number(n)||1,1,10000);
+    if(n>25){ runRolls(n,true); return; }
+    let done=0;
+    const iv = setInterval(()=>{
+      const r=rollOnce(); animDice(r); renderDice();
+      if(++done>=n) clearInterval(iv);
+    },135);
+  }
+
+  el.diceHelpBtn.addEventListener("click",()=>el.dicePanel.classList.toggle("is-visible"));
+  el.rollOnce.addEventListener("click",()=>runAnimBatch(1));
+  el.rollTen.addEventListener("click",()=>runAnimBatch(10));
+  el.rollHundred.addEventListener("click",()=>runRolls(100,true));
+  el.customBtn.addEventListener("click",()=>runRolls(el.customInput.value,true));
+  el.resetDice.addEventListener("click",()=>{
+    state.diceCounts=[0,0,0,0,0,0]; state.totalRolls=0; state.lastRoll=null;
+    el.diceVal.textContent="?"; renderDice();
+  });
+  el.copyBtn.addEventListener("click", async ()=>{
+    let txt=`Dice Simulation Summary\nTotal rolls: ${state.totalRolls}\n`;
+    for(let v=1;v<=6;v++) txt+=`Side ${v}: ${state.diceCounts[v-1]} rolls, ${pct(prob(v-1)*100)}\n`;
+    try{ await navigator.clipboard.writeText(txt); el.copyBtn.textContent="Copied!"; setTimeout(()=>el.copyBtn.textContent="Copy Summary",1200); }
+    catch(e){ alert(txt); }
+  });
+  el.newDicePrompt.addEventListener("click",()=>el.dicePrompt.textContent=pick(dicePrompts));
+
+  /* ── FLIGHT ── */
+  function getInputs() {
+    return {
+      weather:    el.weatherIn.value,
+      wind:       el.windIn.value,
+      visibility: el.visIn.value,
+      planeStyle: el.planeStyleIn.value,
+      planeAge:   Number(el.planeAgeIn.value),
+      maintenance:el.maintIn.value,
+      passengers: Number(el.passIn.value),
+      pilot:      el.pilotIn.value,
+      copilot:    el.copilotIn.value,
+    };
+  }
+
+  function calcScore(inp) {
+    const bd=[];
+    let score=100;
+    const add=(lbl,amt)=>{ if(amt){ bd.push({lbl,amt}); score-=amt; } };
+    add("Weather condition",    {clear:0,rain:5,fog:9,storm:14}[inp.weather]??0);
+    add("Wind speed",           {low:0,medium:4,high:10,extreme:16}[inp.wind]??0);
+    add("Visibility",           {excellent:0,normal:2,poor:8,dangerous:13}[inp.visibility]??0);
+    add("Plane style",          {modern:0,standard:2,small:5,cargo:4,old:8}[inp.planeStyle]??0);
+    let age=0; if(inp.planeAge>12)age+=3; if(inp.planeAge>25)age+=5; if(inp.planeAge>40)age+=7;
+    add("Plane age",age);
+    add("Maintenance quality",  {excellent:0,average:3,delayed:8,poor:13}[inp.maintenance]??0);
+    let pax=0; if(inp.passengers>180)pax+=2; if(inp.passengers>260)pax+=3; if(inp.passengers>340)pax+=3;
+    add("Passenger load",pax);
+    add("Pilot experience",     {expert:0,trained:3,new:10}[inp.pilot]??0);
+    add("Copilot experience",   {expert:0,trained:2,new:7}[inp.copilot]??0);
+    return { score: clamp(score,18,98), breakdown: bd };
+  }
+
+  function renderRisk(bd) {
+    el.riskList.innerHTML = "";
+    if(!bd.length){ el.riskList.innerHTML='<div class="risk-item"><span>No major risk deductions.</span><strong>-0</strong></div>'; return; }
+    bd.forEach(r=>{ const d=document.createElement("div"); d.className="risk-item"; d.innerHTML=`<span>${r.lbl}</span><strong>-${r.amt}</strong>`; el.riskList.appendChild(d); });
+  }
+
+  function resetFlightAnim() {
+    el.plane.classList.remove("takeoff-success","takeoff-fail","shaking");
+    el.peopleCont.innerHTML="";
+    el.explosion.classList.remove("show-explosion");
+    el.resultBox.className="flight-result-box";
+    el.resultBox.textContent="Choose inputs and run the flight simulation.";
+    el.safeScore.textContent="--%";
+    el.randRoll.textContent="--";
+    el.outcome.textContent="Waiting";
+  }
+
+  function updateWeather(w) {
+    el.flightScene.classList.toggle("stormy", w==="storm"||w==="fog");
+  }
+
+  function previewFlight() {
+    const inp=getInputs(); updateWeather(inp.weather);
+    const r=calcScore(inp); renderRisk(r.breakdown);
+    el.safeScore.textContent=pct(r.score);
+  }
+
+  el.flightHelpBtn.addEventListener("click",()=>el.flightPanel.classList.toggle("is-visible"));
+  el.resetFlight.addEventListener("click", resetFlightAnim);
+  el.newFlightPr.addEventListener("click",()=>el.flightPrompt.textContent=pick(flightPrompts));
+  el.randomize.addEventListener("click",()=>{
+    el.weatherIn.value    = pick(["clear","rain","fog","storm"]);
+    el.windIn.value       = pick(["low","medium","high","extreme"]);
+    el.visIn.value        = pick(["excellent","normal","poor","dangerous"]);
+    el.planeStyleIn.value = pick(["modern","standard","small","cargo","old"]);
+    el.planeAgeIn.value   = rndInt(1,55);
+    el.maintIn.value      = pick(["excellent","average","delayed","poor"]);
+    el.passIn.value       = rndInt(30,360);
+    el.pilotIn.value      = pick(["expert","trained","new"]);
+    el.copilotIn.value    = pick(["expert","trained","new"]);
+    previewFlight();
+  });
+
+  [el.weatherIn,el.windIn,el.visIn,el.planeStyleIn,el.planeAgeIn,el.maintIn,el.passIn,el.pilotIn,el.copilotIn]
+    .forEach(i=>i&&i.addEventListener("change", previewFlight));
+
+  el.runFlight.addEventListener("click",()=>{
+    resetFlightAnim();
+    const inp=getInputs(); updateWeather(inp.weather);
+    const {score,breakdown}=calcScore(inp);
+    const roll=Math.random()*100;
+    const ok=roll<=score;
+    renderRisk(breakdown);
+    el.safeScore.textContent=pct(score);
+    el.randRoll.textContent=roll.toFixed(1);
+    el.outcome.textContent=ok?"Success":"Failed";
+    el.plane.classList.add("shaking");
+    setTimeout(()=>{
+      el.plane.classList.remove("shaking");
+      el.plane.classList.add(ok?"takeoff-success":"takeoff-fail");
+      if(!ok){
+        const people=["🧍","🧍‍♀️","🧍‍♂️","🧑"];
+        el.peopleCont.innerHTML="";
+        people.forEach(p=>{ const s=document.createElement("span"); s.className="falling-person"; s.textContent=p; el.peopleCont.appendChild(s); });
+        el.explosion.classList.add("show-explosion");
+      }
+      el.resultBox.className = ok ? "flight-result-box success-result" : "flight-result-box fail-result";
+      el.resultBox.innerHTML = ok
+        ? `✅ Flight succeeded.<br>Safety score: ${pct(score)} · Uncertainty factor: ${roll.toFixed(1)}<br>Simulations include randomness to model unpredictable real-world factors. Here, uncertainty (${roll.toFixed(1)}) was within the safety margin, so the flight succeeded.`
+        : `⚠️ Flight failed.<br>Safety score: ${pct(score)} · Uncertainty factor: ${roll.toFixed(1)}<br>Simulations include randomness to model unpredictable real-world factors. Here, uncertainty (${roll.toFixed(1)}) exceeded the safety margin, so the flight failed.`;
+      state.flightHistory.push({inp,score,roll,ok});
+    },140);
+  });
+
+  /* ── INIT ── */
+  renderDice();
+  previewFlight();
+})();
+</script>

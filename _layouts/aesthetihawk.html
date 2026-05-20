@@ -13,12 +13,16 @@
     <!--Keyboard Shortcuts (Alt+Shift+key navigation)-->
     <script>window.baseurl = "{{ site.baseurl }}";</script>
     <script src="{{ site.baseurl }}/assets/js/keyboard-shortcuts.js" defer></script>
+    {% if page.active_tab == 'dashboard' %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css" />
+    <link rel="stylesheet" href="https://preline.co/assets/css/main.min.css" />
+    {% endif %}
 </head>
 
 
-<body class="min-h-screen flex flex-col flex-auto flex-shrink-0 transition-colors user-theme-root">
+<body class="min-h-screen flex flex-col flex-auto flex-shrink-0 transition-colors user-theme-root page-{{ page.active_tab | default: 'aesthetihawk' | slugify }}">
     <!-- navbar -->
-    {%- include aesthetihawk/header.html -%}
+    {%- include aesthetihawk/header-shared.html -%}
 
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased mt-[53px] theme-inner">
 

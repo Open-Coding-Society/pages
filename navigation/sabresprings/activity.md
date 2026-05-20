@@ -233,21 +233,15 @@ description: Here are the activities. Hover over image for more details
       title: "Compass Navigation",
       shortDesc: "Find Your Way",
       hoverDesc: "Learn to use a compass and map! Discover navigation skills for hiking and outdoor adventures.",
-      date: "Apr 28 - Church (Justin)"
+      date: "Apr 28 - South Creek Park (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/6/61/Overgrown_yard_-_geograph.org.uk_-_964505.jpg",
-      title: "Yard Cleanup",
-      shortDesc: "Bless Your Fellow Man",
-      hoverDesc: "Help someone in the community with spring yard cleanup. Service project with lunch included!",
-      date: "May 12 - Mara Ogle (John)"
-    },
-    {
-      image: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Backpacking_supplies_%28pack%2C_tent%2C_sleeping_pad%2C_and_bear_box%29_at_Panhandle_Gap.jpg",
-      title: "Backpacking Prep",
-      shortDesc: "Outdoor Skills",
-      hoverDesc: "Learn essential backpacking and hiking skills. Perfect time to prepare for summer adventures!",
-      date: "May 12 - Backpacking (Justin)"
+      image2: "https://upload.wikimedia.org/wikipedia/commons/2/2d/Backpacking_supplies_%28pack%2C_tent%2C_sleeping_pad%2C_and_bear_box%29_at_Panhandle_Gap.jpg",
+      title: "Yard Cleanup/Backpacking",
+      shortDesc: "Bless Your Fellow Man, Outdoor Skills",
+      hoverDesc: "Help someone in the community with spring yard cleanup. Learn backpacking skills",
+      date: "May 12 - 6:45pm Claudia Hernandez (John), Backpacking (Justin)"
     },
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/A_simple_campfire.jpg/2560px-A_simple_campfire.jpg",
@@ -255,29 +249,28 @@ description: Here are the activities. Hover over image for more details
       title: "Hiking & Outdoors Activities",
       shortDesc: "Outdoor Adventure",
       hoverDesc: "Setup camp, learn campfire safety, how to cook delicious meals in nature, hiking, milling, offroad, and how to enjoy the great outdoors under the stars!",
-      date: "Saturday May 23, 10-2 - Julian (John)"
+      date: "Saturday May 23, 10-2:30 - Julian (John)"
     },
-    {
-      image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Cloth_dodgeball.jpg",
-      title: "Modified Dodgeball",
-      shortDesc: "Team Sport",
-      hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!",
-      date: "June 9 - Church (Tiffany)"
-    },
-
-  ];
-  
-  // Summer Activities (June - August)
-  const summerActivities = [
     {
       image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg/1280px-An_photograph_of_a_model_rocket_being_launched%2C_taken_in_2019.jpg",
       title: "Air Rockets",
       shortDesc: "Science & Launch",
       hoverDesc: "Build and launch air-powered rockets! Learn about physics, pressure, and aerodynamics.",
-      date: "June 23 - Church (Brian)"
+      date: "June 9 - Church (Bryan Akagi)"
+    },
+  ];
+  
+  // Summer Activities (June - August)
+  const summerActivities = [
+    {
+      image: "https://upload.wikimedia.org/wikipedia/commons/5/5b/Cloth_dodgeball.jpg",
+      title: "Modified Dodgeball",
+      shortDesc: "Team Sport",
+      hoverDesc: "Fun, safe version of dodgeball with soft balls. Great for teamwork and exercise!",
+      date: "June 23 - Church (Tiffany)"
     },
     {
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Napa_Pool_Party.jpg/2560px-Napa_Pool_Party.jpg",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Ibiza_Rocks_Venue_2020.jpg/3840px-Ibiza_Rocks_Venue_2020.jpg",
       title: "Pool Party",
       shortDesc: "Water Fun",
       hoverDesc: "Beat the summer heat with swimming, pool games, and water safety lessons!",
