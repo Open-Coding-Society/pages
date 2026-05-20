@@ -255,9 +255,17 @@ active_tab: submissions
         }
     }
 
+    function renderContent(content) {
+        if (!content) return '<em style="color:#6b7280">No content</em>';
+        if (typeof content === 'string') return escapeHtml(content);
+        if (content.url) return `<a href="${escapeHtml(content.url)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;">${escapeHtml(content.url)}</a>`;
+        if (content.text) return escapeHtml(content.text);
+        return escapeHtml(JSON.stringify(content));
+    }
+
     function displayUserSubmissions() {
         const container = document.getElementById('my-submissions-container');
-        
+
         if (!allSubmissions || allSubmissions.length === 0) {
             console.log('No submissions to display');
             container.innerHTML = '<div class="no-submissions">No submissions yet.</div>';
@@ -265,13 +273,14 @@ active_tab: submissions
         }
 
         console.log('Displaying', allSubmissions.length, 'user submissions');
-        
+
         try {
             const tableHTML = `
                 <table class="submissions-table">
                     <thead>
                         <tr>
                             <th>Assignment</th>
+                            <th>Submission</th>
                             <th>Status</th>
                             <th>Grade</th>
                             <th>Feedback</th>
@@ -283,20 +292,21 @@ active_tab: submissions
                                 return `
                                     <tr>
                                         <td><strong>${escapeHtml(submission.assignmentName || 'Unknown')}</strong></td>
+                                        <td>${renderContent(submission.content)}</td>
                                         <td>${getStatusBadge(submission)}</td>
                                         <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
-                                        <td>${submission.feedback ? escapeHtml(submission.feedback.substring(0, 50)) + '...' : 'No feedback'}</td>
+                                        <td>${submission.feedback ? escapeHtml(submission.feedback) : '<em style="color:#6b7280">No feedback yet</em>'}</td>
                                     </tr>
                                 `;
                             } catch (rowError) {
                                 console.error('Error rendering row', idx, ':', rowError);
-                                return `<tr><td colspan="4" style="color: red;">Error rendering submission</td></tr>`;
+                                return `<tr><td colspan="5" style="color: red;">Error rendering submission</td></tr>`;
                             }
                         }).join('')}
                     </tbody>
                 </table>
             `;
-            
+
             container.innerHTML = tableHTML;
             console.log('Successfully rendered submissions table');
         } catch (error) {
@@ -307,7 +317,7 @@ active_tab: submissions
 
     function displayAllSubmissions() {
         const container = document.getElementById('all-submissions-container');
-        
+
         if (!allSubmissions || allSubmissions.length === 0) {
             container.innerHTML = '<div class="no-submissions">No submissions found.</div>';
             return;
@@ -320,6 +330,7 @@ active_tab: submissions
                         <tr>
                             <th>Student</th>
                             <th>Assignment</th>
+                            <th>Submission</th>
                             <th>Status</th>
                             <th>Grade</th>
                             <th>Comment</th>
@@ -332,20 +343,21 @@ active_tab: submissions
                                     <tr>
                                         <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
                                         <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
+                                        <td>${renderContent(submission.content)}</td>
                                         <td>${getStatusBadge(submission)}</td>
                                         <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
-                                        <td>${submission.comment ? escapeHtml(submission.comment.substring(0, 50)) + '...' : 'No comment'}</td>
+                                        <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
                                     </tr>
                                 `;
                             } catch (rowError) {
                                 console.error('Error rendering admin row', idx, ':', rowError);
-                                return `<tr><td colspan="5" style="color: red;">Error rendering submission</td></tr>`;
+                                return `<tr><td colspan="6" style="color: red;">Error rendering submission</td></tr>`;
                             }
                         }).join('')}
                     </tbody>
                 </table>
             `;
-            
+
             container.innerHTML = tableHTML;
             console.log('Successfully rendered all submissions table');
         } catch (error) {
@@ -443,6 +455,7 @@ active_tab: submissions
                     <tr>
                         <th>Student</th>
                         <th>Assignment</th>
+                        <th>Submission</th>
                         <th>Status</th>
                         <th>Grade</th>
                         <th>Comment</th>
@@ -453,9 +466,10 @@ active_tab: submissions
                         <tr>
                             <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
                             <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
+                            <td>${renderContent(submission.content)}</td>
                             <td>${getStatusBadge(submission)}</td>
                             <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
-                            <td>${submission.comment ? escapeHtml(submission.comment.substring(0, 50)) + '...' : 'No comment'}</td>
+                            <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
                         </tr>
                     `).join('')}
                 </tbody>
