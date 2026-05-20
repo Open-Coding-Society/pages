@@ -164,8 +164,7 @@ class GameLevelCsPath0Forge {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-fantasy.png";
-    const bg_data = {
+    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-default.png";    const bg_data = {
         name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
         src: image_src,
@@ -1250,12 +1249,12 @@ class GameLevelCsPath0Forge {
  
       const fallbackCatalog = [
         {
-          name: 'Identity Forge',
-          src: image_src,
-          previewText: 'Default theme',
+          name: 'Default',
+          src: `${path}/images/projects/cs-pathway/bg/identity-forge-default.png`,
+          previewText: 'Unactivated world',
         },
       ];
- 
+
       try {
         const response = await fetch(`${path}/images/projects/cs-pathway/bg/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
