@@ -104,8 +104,20 @@ def authenticate(session: requests.Session, base_url: str, uid: str, password: s
         raise RuntimeError("Authentication succeeded but jwt cookie not present")
 
 
-def create_assignment(session: requests.Session, base_url: str, name: str, content_url: str, description: str = "auto-created on deploy"):
+def create_assignment(
+    session: requests.Session,
+    base_url: str,
+    name: str,
+    content_url: str,
+    description: str = "auto-created on deploy",
+    points=None,
+    due_date=None,
+):
     payload = {"name": name, "contentUrl": content_url, "description": description}
+    if points is not None:
+        payload["points"] = points
+    if due_date:
+        payload["dueDate"] = due_date
     # Use form-encoded to match frontend
     resp = session.post(f"{base_url}/api/assignments/auto-create", data=payload, timeout=30)
     return resp
@@ -156,14 +168,16 @@ def main():
             content_url = determine_content_url(root, f, fm)
             name = fm.get("title") or fm.get("name") or f.stem
             description = fm.get("description") or "auto-created from frontmatter"
-            candidates.append((f, content_url, name, description))
+            points = fm.get("points")
+            due_date = fm.get("dueDate") or fm.get("due_date") or fm.get("due")
+            candidates.append((f, content_url, name, description, points, due_date))
 
     if not candidates:
         print("No pages with assignment: true found.")
         return 0
 
     print(f"Found {len(candidates)} pages with assignment: true")
-    for path, content_url, name, description in candidates:
+    for path, content_url, name, description, points, due_date in candidates:
         print(f"-> {path} -> contentUrl={content_url} name={name}")
         if args.dry_run and not args.create:
             continue
@@ -205,7 +219,7 @@ def main():
             if args.dry_run:
                 continue
             try:
-                resp = create_assignment(session, args.base_url, name, content_url, description)
+                resp = create_assignment(session, args.base_url, name, content_url, description, points, due_date)
                 print(f"  {resp.status_code} {resp.text[:200]}")
             except Exception as e:
                 print(f"  ERROR: {e}")
