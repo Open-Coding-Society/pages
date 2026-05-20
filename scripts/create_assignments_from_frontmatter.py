@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Scan the repo for Markdown/HTML pages with YAML frontmatter containing
+Scan the repo for Markdown/HTML/notebook pages with YAML frontmatter containing
 assignment: true and POST to the Spring `auto-create` API for each page.
 
 Usage (CI / local):
@@ -12,6 +12,7 @@ Usage (CI / local):
 The script is idempotent: the server will return 200 for existing contentUrl.
 """
 import argparse
+import json
 import os
 import re
 import sys
@@ -28,14 +29,13 @@ DEFAULT_PASSWORD = os.getenv("PAGES_BOT_PASSWORD", "")
 
 
 def find_files(root: Path):
-    exts = {".md", ".markdown", ".html", ".htm"}
+    exts = {".md", ".markdown", ".html", ".htm", ".ipynb"}
     for p in root.rglob("*"):
         if p.is_file() and p.suffix.lower() in exts:
             yield p
 
 
-def read_frontmatter(path: Path):
-    text = path.read_text(encoding="utf-8")
+def parse_frontmatter_text(text: str):
     m = FRONTMATTER_RE.match(text)
     if not m:
         return None
@@ -44,6 +44,32 @@ def read_frontmatter(path: Path):
         return data or {}
     except Exception:
         return None
+
+
+def read_frontmatter(path: Path):
+    if path.suffix.lower() == ".ipynb":
+        try:
+            notebook = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+        for cell in notebook.get("cells", []):
+            source = cell.get("source")
+            if isinstance(source, list):
+                text = "".join(source)
+            elif isinstance(source, str):
+                text = source
+            else:
+                continue
+
+            data = parse_frontmatter_text(text)
+            if data is not None:
+                return data
+
+        return None
+
+    text = path.read_text(encoding="utf-8")
+    return parse_frontmatter_text(text)
 
 
 def determine_content_url(root: Path, path: Path, fm: dict):
@@ -55,7 +81,7 @@ def determine_content_url(root: Path, path: Path, fm: dict):
     rel = path.relative_to(root).as_posix()
     # Remove leading index filenames and extensions
     rel = re.sub(r"(^|/)index\.(md|markdown|html)$", r"\1", rel, flags=re.I)
-    rel = re.sub(r"\.(md|markdown|html)$", "", rel, flags=re.I)
+    rel = re.sub(r"\.(md|markdown|html|ipynb)$", "", rel, flags=re.I)
     # Prefix with pages/ if the file is under pages/ or _posts
     if rel.startswith("pages/"):
         return rel
