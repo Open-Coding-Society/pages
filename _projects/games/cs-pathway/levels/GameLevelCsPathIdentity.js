@@ -449,9 +449,9 @@ class GameLevelCsPathIdentity {
   _getOverallScore() {
     const c = this._getCompletion();
     let score = 0.55;
-    if (c.identityForge) score += 0.1125;
-    if (c.wayfindingWorld) score += 0.1125;
-    if (c.missionTools) score += 0.1125;
+    if (c.identityForge) score += 0.11;
+    if (c.wayfindingWorld) score += 0.11;
+    if (c.missionTools) score += 0.11;
     return score;
   }
 
@@ -476,8 +476,39 @@ class GameLevelCsPathIdentity {
   }
 
   markLevelComplete(levelKey) {
-    this._saveCompletion({ [levelKey]: true });
-    this._syncCompletionPanel();
+    // Write completion in a robust way so callers that lose `this` do not
+    // accidentally write to localStorage with key 'undefined'. Prefer the
+    // instance helper when available, otherwise fall back to the known
+    // stable storage key literal.
+    try {
+      const key = (this && typeof this._getCompletionStorageKey === 'function')
+        ? this._getCompletionStorageKey()
+        : 'cs_pathway_completion';
+
+      let current = {};
+      try {
+        current = JSON.parse(localStorage.getItem(key)) || {};
+      } catch (e) {
+        current = {};
+      }
+
+      current[levelKey] = true;
+      localStorage.setItem(key, JSON.stringify(current));
+    } catch (err) {
+      console.warn(`${this?.logPrefix || 'GameLevel'}: failed to persist completion`, err);
+    }
+
+    // Attempt to refresh the UI using instance method if available.
+    try {
+      if (this && typeof this._syncCompletionPanel === 'function') {
+        this._syncCompletionPanel();
+      } else {
+        // Last resort: call the prototype implementation with this context.
+        GameLevelCsPathIdentity.prototype._syncCompletionPanel.call(this);
+      }
+    } catch (err) {
+      console.warn(`${this?.logPrefix || 'GameLevel'}: failed to sync completion panel`, err);
+    }
   }
 
   applyBackgroundTheme(themeMeta, bgData) {
