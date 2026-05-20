@@ -10,7 +10,7 @@ import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
-import SprintSuccessModule from './SprintSuccessModule.js';
+import AboutMeBuilder from './AboutMeBuilder.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -249,12 +249,12 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     });
 
     const npc_data_skillPassportGatekeeper = createGatekeeperData({
-      id: 'SkillPassportGatekeeper',
-      greeting: 'Welcome to About Me! Track your progress and collect your coding milestones.',
+      id: 'AboutMeGatekeeper',
+      greeting: 'Welcome to the About Me Builder! Create your personal markdown profile page.',
       position: skillPassportGatekeeperPos,
       markerColor: '#f59e0b',
       interact: () => {
-        this.openSkillPassport();
+        this.openAboutMeBuilder();
       },
     });
 
@@ -279,20 +279,77 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
   }
 
   // ── Skill Passport ───────────────────────────────────────────
-  openSkillPassport() {
-    if (this._skillPassportOpen) return;
-    this._skillPassportOpen = true;
+  openAboutMeBuilder() {
+    if (this._aboutMeOpen) return;
+    this._aboutMeOpen = true;
 
-    const passport = new SkillPassport({
-      pythonURI,
-      fetchOptions,
+    const builder = new AboutMeBuilder({
+      profileData: this.profileData || {},
+      onComplete: async (result) => {
+        try {
+          await this.saveAboutMeResult(result);
+
+          this.showToast?.(`About Me complete: ${result.title}`);
+
+          this.profilePanelView?.update?.({
+            skill: 'About Me Builder',
+            persona: result.persona || '—',
+          });
+
+          this.markLevelComplete('wayfindingWorld');
+        } catch (error) {
+          console.error('Failed to save About Me result:', error);
+          this.showToast?.('About Me completed, but saving failed.');
+        } finally {
+          this._aboutMeOpen = false;
+        }
+      },
       onClose: () => {
-        this._skillPassportOpen = false;
-        this.markLevelComplete('wayfindingWorld');
+        this._aboutMeOpen = false;
       },
     });
 
-    passport.start();
+    builder.start();
+  }
+
+  async saveAboutMeResult(result) {
+    const currentProfile = { ...(this.profileData || {}) };
+
+    const updatedProfile = {
+      ...currentProfile,
+      aboutMeMeta: {
+        title: result.title,
+        markdown: result.markdown,
+        score: result.score,
+        persona: result.persona,
+        interests: result.interests,
+        completedAt: result.completedAt,
+      },
+    };
+
+    this.profileData = updatedProfile;
+
+    if (typeof this.profileManager?.updateProfileData === 'function') {
+      await this.profileManager.updateProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfileData === 'function') {
+      await this.profileManager.saveProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfile === 'function') {
+      await this.profileManager.saveProfile(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.setProfileData === 'function') {
+      await this.profileManager.setProfileData(updatedProfile);
+      return;
+    }
+
+    console.warn('No known ProfileManager save method found. About Me result stored locally only.');
   }
 
   // ── Persona Trial ────────────────────────────────────────────

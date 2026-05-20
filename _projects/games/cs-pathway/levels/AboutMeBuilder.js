@@ -14,6 +14,7 @@ export default class AboutMeBuilder {
     this.onComplete = onComplete || (() => {});
     this.onClose = onClose || (() => {});
     this.overlay = null;
+    this.usedBuilder = false;
 
     const persona =
       profileData?.personaMeta?.title ||
@@ -34,28 +35,31 @@ export default class AboutMeBuilder {
     this._render();
   }
 
-  _defaultMarkdown() {
-    return `# About Me
+   _defaultMarkdown() {
+    return `# About Me: <!-- Add your name here -->
 
-## Identity
-Hi! My name is **${this.state.name || 'Your Name'}**.
+    ## Identity
+    <!-- Write 2-3 sentences about who you are. Include your persona, but explain it in your own words. -->
 
-My current CS persona is **${this.state.persona || 'Your Persona'}**.
+    ## My CS Interests
+    <!-- Replace these comments with 3-5 bullet points about your real CS interests. -->
+    - 
+    - 
+    - 
 
-## CS Interests
-- Web design
-- Game development
-- Creative coding
+    ## Fun Facts
+    <!-- Add 3 fun facts. Make them specific. -->
+    - 
+    - 
+    - 
 
-## Fun Facts
-- I like learning through projects.
-- I enjoy building things that help people.
-- One thing I want to improve is my confidence with code.
+    ## Markdown Skills I Used
+    <!-- Show that you know markdown. Use bold, a link, and inline code somewhere in this page. -->
 
-## My CS Goal
-This year, I want to build projects that show my personality and help me grow as a computer science student.
-`;
-  }
+    ## My CS Goal
+    <!-- Write one specific goal for this class/project. -->
+    `;
+    }
 
   _render() {
     this.overlay = document.createElement('div');
@@ -182,31 +186,46 @@ This year, I want to build projects that show my personality and help me grow as
         }
 
         .amb-preview {
-          min-height: 430px;
-          background: #f8fafc;
-          color: #0f172a;
-          border-radius: 12px;
-          padding: 16px;
-          font-family: Arial, sans-serif;
-          overflow: auto;
-          line-height: 1.5;
+            min-height: 430px;
+            background: #020617;
+            color: #e5e7eb;
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: Arial, sans-serif;
+            overflow: auto;
+            line-height: 1.5;
         }
 
         .amb-preview h1 {
-          margin-top: 0;
-          color: #92400e;
+            margin-top: 0;
+            color: #fbbf24;
         }
 
         .amb-preview h2 {
-          color: #b45309;
-          border-bottom: 1px solid #fed7aa;
-          padding-bottom: 4px;
+            color: #f59e0b;
+            border-bottom: 1px solid rgba(251, 191, 36, 0.35);
+            padding-bottom: 4px;
+        }
+
+        .amb-preview h3 {
+            color: #fde68a;
+        }
+
+        .amb-preview p,
+        .amb-preview li {
+            color: #e5e7eb;
+        }
+
+        .amb-preview a {
+            color: #38bdf8;
         }
 
         .amb-preview code {
-          background: #e2e8f0;
-          padding: 2px 5px;
-          border-radius: 5px;
+            background: #111827;
+            color: #facc15;
+            padding: 2px 5px;
+            border-radius: 5px;
         }
 
         .amb-quest {
@@ -382,105 +401,97 @@ This year, I want to build projects that show my personality and help me grow as
     this._update();
   }
 
-  _generateFromInputs() {
-    const name = this.overlay.querySelector('#amb-name').value.trim() || 'Your Name';
-    const persona = this.overlay.querySelector('#amb-persona').value.trim() || 'CS Explorer';
-
-    const interests = this.overlay.querySelector('#amb-interests').value
-      .split(',')
-      .map(x => x.trim())
-      .filter(Boolean);
-
-    const facts = this.overlay.querySelector('#amb-facts').value
-      .split(',')
-      .map(x => x.trim())
-      .filter(Boolean);
-
-    const interestLines = interests.length
-      ? interests.map(x => `- ${x}`).join('\n')
-      : '- Frontend development\n- Game design\n- Creative coding';
-
-    const factLines = facts.length
-      ? facts.map(x => `- ${x}`).join('\n')
-      : '- I enjoy learning through projects.\n- I like solving creative problems.\n- I want to keep improving as a coder.';
+ _generateFromInputs() {
+    const name = this.overlay.querySelector('#amb-name').value.trim() || '<!-- Add your name -->';
+    const persona = this.overlay.querySelector('#amb-persona').value.trim() || '<!-- Add your persona -->';
 
     this.editor.value = `# About Me: ${name}
 
-## Identity
-Hi! My name is **${name}**.
+    ## Identity
+    <!-- Explain who you are in 2-3 sentences. Do NOT leave this as a comment. -->
+    My CS persona is **${persona}**, which means...
 
-My current CS persona is **${persona}**. This means I am learning how to understand my strengths, my working style, and the kind of role I naturally take in a project.
+    ## My CS Interests
+    <!-- Add at least 3 real CS interests. -->
+    - 
+    - 
+    - 
 
-## My CS Interests
-${interestLines}
+    ## Fun Facts
+    <!-- Add at least 3 specific fun facts. -->
+    - 
+    - 
+    - 
 
-## Fun Facts
-${factLines}
+    ## Markdown Skills I Used
+    <!-- Add one bold phrase, one link, and one inline code example. -->
 
-## My Builder Skills
-In Code Hub, I practiced using markdown to structure information clearly. I can use:
+    ## My CS Goal
+    <!-- Write one specific goal. -->
+    `;
 
-- headings
-- bullet lists
-- **bold text**
-- links like [Open Coding Society](https://opencodingsociety.com)
-
-## My CS Goal
-This year, I want to build projects that connect my identity, interests, and technical skills.
-`;
-
+    this.usedBuilder = true;
     this._update();
-  }
+    }
 
   _getQuests(markdown) {
-    const name = this.overlay.querySelector('#amb-name').value.trim();
-    const persona = this.overlay.querySelector('#amb-persona').value.trim();
-    const interests = this.overlay.querySelector('#amb-interests').value.trim();
-    const facts = this.overlay.querySelector('#amb-facts').value.trim();
+    const visibleMarkdown = markdown
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .trim();
 
-    return [
-      {
-        label: 'Add your name or personal intro',
+    const bulletMatches = visibleMarkdown.match(/^[-*]\s+\S+/gm) || [];
+    const headingMatches = visibleMarkdown.match(/^#{1,3}\s+\S+/gm) || [];
+
+    const builderPenalty = this.usedBuilder ? 0.5 : 1;
+
+    const quests = [
+        {
+        label: 'Write a real personal intro, not just the template',
         points: 15,
-        done: Boolean(name) || /my name is|about me/i.test(markdown),
-      },
-      {
-        label: 'Include your persona',
+        done: visibleMarkdown.length >= 250 && !/do not leave this as a comment/i.test(visibleMarkdown),
+        },
+        {
+        label: 'Explain your persona in your own words',
         points: 15,
-        done: Boolean(persona) || /persona|technologist|scrummer|planner|finisher/i.test(markdown),
-      },
-      {
-        label: 'Include CS interests',
+        done: /persona/i.test(visibleMarkdown) && visibleMarkdown.split(/\s+/).length >= 80,
+        },
+        {
+        label: 'Add at least 3 filled-in CS interest bullets',
         points: 15,
-        done: Boolean(interests) || /cs interests|frontend|backend|game|data|ai|cyber/i.test(markdown),
-      },
-      {
-        label: 'Include fun facts',
+        done: bulletMatches.length >= 3 && /frontend|backend|game|data|ai|cyber|web|design|java|python|coding/i.test(visibleMarkdown),
+        },
+        {
+        label: 'Add at least 3 filled-in fun fact bullets',
         points: 15,
-        done: Boolean(facts) || /fun facts|hobbies|favorite|outside of code/i.test(markdown),
-      },
-      {
-        label: 'Use at least three markdown headings',
-        points: 15,
-        done: (markdown.match(/^#{1,3}\s+/gm) || []).length >= 3,
-      },
-      {
-        label: 'Use a bullet list',
+        done: bulletMatches.length >= 6,
+        },
+        {
+        label: 'Use at least 4 markdown headings',
         points: 10,
-        done: /^[-*]\s+/m.test(markdown),
-      },
-      {
-        label: 'Use bold markdown',
-        points: 5,
-        done: /\*\*.+?\*\*/.test(markdown),
-      },
-      {
-        label: 'Add at least one markdown link',
+        done: headingMatches.length >= 4,
+        },
+        {
+        label: 'Use bold markdown meaningfully',
         points: 10,
-        done: /\[.+?\]\(.+?\)/.test(markdown),
-      },
+        done: /\*\*[A-Za-z0-9].+?\*\*/.test(visibleMarkdown),
+        },
+        {
+        label: 'Add a real markdown link',
+        points: 10,
+        done: /\[[^\]]+\]\(https?:\/\/[^)]+\)/.test(visibleMarkdown),
+        },
+        {
+        label: 'Use inline code formatting',
+        points: 10,
+        done: /`[^`]+`/.test(visibleMarkdown),
+        },
     ];
-  }
+
+    return quests.map(q => ({
+        ...q,
+        points: this.usedBuilder ? Math.ceil(q.points * builderPenalty) : q.points,
+    }));
+    }
 
   _update() {
     const markdown = this.editor.value;
