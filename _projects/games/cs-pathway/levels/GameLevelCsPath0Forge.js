@@ -841,7 +841,7 @@ class GameLevelCsPath0Forge {
       }
 
       const toast = document.createElement('div');
-      toast.style.cssText = createNotificationStyle('20px', 1200);
+      toast.style.cssText = createNotificationStyle('20px', 100020);
       toast.textContent = message;
       host.appendChild(toast);
 
@@ -865,7 +865,7 @@ class GameLevelCsPath0Forge {
 
       if (!this._zoneAlertEl) {
         const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = createNotificationStyle('84px', 1201);
+        zoneAlert.style.cssText = createNotificationStyle('84px', 100010);
         document.body.appendChild(zoneAlert);
         this._zoneAlertEl = zoneAlert;
       }
