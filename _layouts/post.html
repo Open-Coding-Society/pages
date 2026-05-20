@@ -82,6 +82,10 @@ Check if this is a course lesson and determine which course context to use
           {% if page.assignment %}
           {% include lesson-submission-form.html %}
           {% endif %}
+
+          {% if page.chat %}
+          {% include lesson_chat.html %}
+          {% endif %}
         </div>
 
         {%- if page.comments -%}
@@ -1457,6 +1461,10 @@ Check if this is a course lesson and determine which course context to use
         }
       }
     </script>
+    {% endif %}
+
+    {% if page.chat %}
+    {% include lesson_chat.html %}
     {% endif %}
   </div>
   {%- if page.comments -%}
