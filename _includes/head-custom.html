@@ -43,6 +43,10 @@
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {%- endif -%}
 
+{%- if page.socket_io -%}
+  	<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+{%- endif -%}
+
 {%- comment -%}
   Global user preference system
   - CSS and JS are loaded after theme styles so that user-selected

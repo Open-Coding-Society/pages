@@ -10,7 +10,8 @@ import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
-import SprintSuccessModule from './SprintSuccessModule.js';
+import AboutMeBuilder from './AboutMeBuilder.js';
+import MissionTools from './GameLevelCsPath2Mission.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -111,25 +112,36 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
-      x: width * 0.76,
-      y: height * 0.26,
+      x: width * 0.83,  
+      y: height * 0.28,
     };
 
     const personalEnrichmentGatekeeperPos = {
-      x: width * 0.23,
-      y: height * 0.23,
+      x: width * 0.23,   
+      y: height * 0.25,  
     };
 
     const skillPassportGatekeeperPos = {
-      x: width * 0.77,
-      y: height * 0.49,
+      x: width * 0.82,  
+      y: height * 0.56, 
     };
 
     const sprintSuccessGatekeeperPos = {
-      x: width * 0.24,
-      y: height * 0.46,
+      x: width * 0.23,   
+      y: height * 0.53,  
     };
 
+    // ── NEW: Mission Tools gatekeeper position (upper-center portal) ──
+    // Tweak x/y if it doesn't land on the portal on your screen.
+    const missionToolsGatekeeperPos = {
+      x: width * 0.53,   // moved right — nudge further if needed
+      y: height * 0.21,
+    };
+
+    // Capture GameLevel 'this' — inside interact: function(){}, 'this' is the NPC
+    // so this.openMissionTools() would fail. levelInstance points to the right object.
+    const levelInstance = this;
+    
     const createDiscMarkerSrc = (fillColor, borderColor = '#f8fafc') => {
       const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
       const discFrames = frameOpacity
@@ -200,7 +212,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       src: createDiscMarkerSrc(markerColor),
       id,
       greeting,
-      INIT_POSITION: { ...position },
+      INIT_POSITION: {
+        x: position.x - (width / gatekeeperBaseData.SCALE_FACTOR / 2),
+        y: position.y - (height / gatekeeperBaseData.SCALE_FACTOR / 2),
+      },
       interactDistance: interactDistance || 120,
       ...(reaction ? { reaction } : {}),
       ...(interact ? { interact } : {}),
@@ -237,7 +252,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     const npc_data_personalEnrichmentGatekeeper = createGatekeeperData({
       id: 'PersonalEnrichmentGatekeeper',
-      greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
+      greeting: 'Welcome to Team Formation! Build habits, curiosity, and real-world growth.',
       position: personalEnrichmentGatekeeperPos,
       markerColor: '#3b82f6',
       interact: () => {
@@ -246,12 +261,12 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     });
 
     const npc_data_skillPassportGatekeeper = createGatekeeperData({
-      id: 'SkillPassportGatekeeper',
-      greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
+      id: 'AboutMeGatekeeper',
+      greeting: 'Welcome to the About Me Builder! Create your personal markdown profile page.',
       position: skillPassportGatekeeperPos,
       markerColor: '#f59e0b',
       interact: () => {
-        this.openSkillPassport();
+        this.openAboutMeBuilder();
       },
     });
 
@@ -264,6 +279,34 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         this.openSprintSuccess();
       },
     });
+
+    // ── NEW: Mission Tools gatekeeper ──────────────────────────
+    const npc_data_missionToolsGatekeeper = createGatekeeperData({
+      id: 'MissionToolsGatekeeper',
+      greeting: 'Welcome to Mission Tools! Plan your path and gear up for every sprint.',
+      position: missionToolsGatekeeperPos,
+      markerColor: '#8b5cf6',
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to Mission Tools!',
+          'This is your command center for planning sprints and tracking goals.',
+          'A great coder always has a plan — let\'s build yours.',
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Mission Tools');
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Open Mission Tools',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              levelInstance.openMissionTools();
+            },
+          },
+        ]);
+      },
+    });
+
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
@@ -272,24 +315,82 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_sprintSuccessGatekeeper },
+      { class: Npc, data: npc_data_missionToolsGatekeeper },  // NEW
     ];
   }
 
   // ── Skill Passport ───────────────────────────────────────────
-  openSkillPassport() {
-    if (this._skillPassportOpen) return;
-    this._skillPassportOpen = true;
+  openAboutMeBuilder() {
+    if (this._aboutMeOpen) return;
+    this._aboutMeOpen = true;
 
-    const passport = new SkillPassport({
-      pythonURI,
-      fetchOptions,
+    const builder = new AboutMeBuilder({
+      profileData: this.profileData || {},
+      onComplete: async (result) => {
+        try {
+          await this.saveAboutMeResult(result);
+
+          this.showToast?.(`About Me complete: ${result.title}`);
+
+          this.profilePanelView?.update?.({
+            skill: 'About Me Builder',
+            persona: result.persona || '—',
+          });
+
+          this.markLevelComplete('wayfindingWorld');
+        } catch (error) {
+          console.error('Failed to save About Me result:', error);
+          this.showToast?.('About Me completed, but saving failed.');
+        } finally {
+          this._aboutMeOpen = false;
+        }
+      },
       onClose: () => {
-        this._skillPassportOpen = false;
-        this.markLevelComplete('wayfindingWorld');
+        this._aboutMeOpen = false;
       },
     });
 
-    passport.start();
+    builder.start();
+  }
+
+  async saveAboutMeResult(result) {
+    const currentProfile = { ...(this.profileData || {}) };
+
+    const updatedProfile = {
+      ...currentProfile,
+      aboutMeMeta: {
+        title: result.title,
+        markdown: result.markdown,
+        score: result.score,
+        persona: result.persona,
+        interests: result.interests,
+        completedAt: result.completedAt,
+      },
+    };
+
+    this.profileData = updatedProfile;
+
+    if (typeof this.profileManager?.updateProfileData === 'function') {
+      await this.profileManager.updateProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfileData === 'function') {
+      await this.profileManager.saveProfileData(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.saveProfile === 'function') {
+      await this.profileManager.saveProfile(updatedProfile);
+      return;
+    }
+
+    if (typeof this.profileManager?.setProfileData === 'function') {
+      await this.profileManager.setProfileData(updatedProfile);
+      return;
+    }
+
+    console.warn('No known ProfileManager save method found. About Me result stored locally only.');
   }
 
   // ── Persona Trial ────────────────────────────────────────────
@@ -350,6 +451,19 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     });
 
     sprint.start();
+  }
+    // ── Mission Tools ─────────────────────────────────────────────
+  openMissionTools() {
+    const gc = this.gameEnv.gameControl;
+
+    gc.levelClasses.splice(
+      gc.currentLevelIndex + 1,
+      0,
+      MissionTools
+    );
+
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
   }
 
   async saveSprintSuccessResult(result) {

@@ -19,6 +19,7 @@ games/enemy-death
 games/escape-the-tower
 games/pirate-hunt
 games/gamify
+games/mansionGame:dev
 games/local-storage
 games/kirby-minigames
 main
