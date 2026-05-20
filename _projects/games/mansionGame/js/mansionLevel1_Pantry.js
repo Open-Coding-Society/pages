@@ -44,7 +44,7 @@ class MansionLevel1_Pantry {
     const objective_sprite_data = {
         id: 'ObjectiveIcon',
         greeting: "Objective Icon: Find ingredients!",
-        src: path + "/images/gamify/objective.png",
+        src: path + "/images/projects/mansionGame/objective.png",
         
         // Npc/Sprite required properties
         SCALE_FACTOR: 2, 
@@ -384,7 +384,7 @@ class MansionLevel1_Pantry {
 
     ////////// new code end
 
-    const sprite_src_mc = path + "/images/gamify/spookMcWalk.png"; // be sure to include the path
+    const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png"; // be sure to include the path
         const MC_SCALE_FACTOR = 6;
         const sprite_data_mc = {
             id: 'Spook',

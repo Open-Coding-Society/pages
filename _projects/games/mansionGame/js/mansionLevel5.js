@@ -5,6 +5,7 @@ import Enemy from './MansionLogic/Enemy.js';
 import GameControl from './GameControl.js';
 import Character from './MansionLogic/Character.js';
 import Npc from './MansionLogic/Npc.js';
+import DialogueSystem from './MansionLogic/DialogueSystem.js';
 import GameLevel6 from './mansionLevel6.js';
 
 
@@ -254,7 +255,7 @@ class MansionLevel5 {
 
     this.finishDoorData = sprite_data_level6door;
 
-    const laser_image = path + "/images/gamify/laser_bolt.png"  // be sure to include the path
+    const laser_image = path + "/images/projects/mansionGame/laser_bolt.png"  // be sure to include the path
     this.laserData = {
       id: "Laser",
       src: laser_image,

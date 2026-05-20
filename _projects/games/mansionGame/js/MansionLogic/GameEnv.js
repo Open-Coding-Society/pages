@@ -57,8 +57,15 @@ class GameEnv {
      * Sets the canvas element and its 2D rendering context.
      */
     setCanvas() {
-        this.canvas = document.getElementById('gameCanvas');
-        if (!this.canvas) { console.error('Canvas is absolutely null in GameEnv!'); }
+        this.canvas = this.gameCanvas || this.gameContainer?.querySelector('#gameCanvas') || document.getElementById('gameCanvas');
+        if (!this.canvas) {
+            this.canvas = document.createElement('canvas');
+            this.canvas.id = 'gameCanvas';
+            const parent = this.gameContainer || document.getElementById('gameContainer') || document.body;
+            parent.appendChild(this.canvas);
+            this.gameCanvas = this.canvas;
+            this.gameContainer = parent;
+        }
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     }
 

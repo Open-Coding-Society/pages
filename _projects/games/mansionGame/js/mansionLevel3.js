@@ -207,7 +207,7 @@ class MansionLevel3 {
     };
 
     // Player setup - MUST match exact format from mansionLevel1
-    const sprite_src_mc = path + "/images/gamify/spookMcWalk.png";
+    const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
     const MC_SCALE_FACTOR = 6;
     const playerData = {
       id: 'Spook',

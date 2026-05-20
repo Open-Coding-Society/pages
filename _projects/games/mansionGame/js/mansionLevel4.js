@@ -36,7 +36,7 @@ class MansionLevel4 {
             pixels: {height: 1280, width: 720}
         };
 
-        const sprite_src_mc = path + "/images/gamify/spookMcWalk.png";
+        const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
         const MC_SCALE_FACTOR = 6;
         const sprite_data_chillguy = {
             id: 'Spook',
@@ -103,7 +103,7 @@ class MansionLevel4 {
         this.gameEnv = gameEnv;
         
         // Adding Music
-        this.backgroundMusic = new Audio(path + '/audio/mansionGame/SpookieDookie.mp3');
+        this.backgroundMusic = new Audio(path + '/assets/sounds/mansionGame/SpookieDookie.mp3');
         this.backgroundMusic.loop = true;
         this.backgroundMusic.volume = 0.3;
         this.backgroundMusic.play();

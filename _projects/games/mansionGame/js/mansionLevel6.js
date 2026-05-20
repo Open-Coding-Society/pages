@@ -1,6 +1,7 @@
 import GameEnvBackground  from "./MansionLogic/GameEnvBackground.js";
 import Player from "./MansionLogic/Player.js";
 import Npc from './MansionLogic/Npc.js';
+import DialogueSystem from './MansionLogic/DialogueSystem.js';
 import MansionLevel6_BattleRoom from './mansionLevel6_BattleRoom.js';
 
 class MansionLevel6 {

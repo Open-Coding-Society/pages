@@ -12,7 +12,7 @@ class MansionLevel2 {
         let path = gameEnv.path;
 
         // Background data - TEMPORARILY USING LEVEL 4 BACKGROUND FOR TESTING
-        const image_background = path + "/images/gamify/MansionLevel2MainBackground.jpeg";
+        const image_background = path + "/images/projects/mansionGame/MansionLevel2MainBackground.jpeg";
         const image_data_background = {
             name: 'background',
             greeting: "You have entered the haunted graveyard. Beware!",
@@ -20,7 +20,7 @@ class MansionLevel2 {
             pixels: {height: 1280, width: 720}
         };
 
-        const sprite_src_mc = path + "/images/gamify/spookMcWalk.png";
+        const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
         const MC_SCALE_FACTOR = 6;
         const sprite_data_player = {
             id: 'Spook',
