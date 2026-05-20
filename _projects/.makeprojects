@@ -45,5 +45,8 @@ lessons/robot-logic-game
 # Systems
 systems/test-project
 systems/student-management-groups
+systems/ai-ab-engine
+systems/auto-generator
+systems/auto-generator-ui
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===
