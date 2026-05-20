@@ -283,15 +283,15 @@ active_tab: calendar
 </div>
 
 <!-- Reply Modal (for nested replies) -->
-<div id="replyModal" class="reply-modal" aria-hidden="true" role="dialog" aria-label="Reply to Comment" style="display:none;">
+<div id="replyModal" class="reply-modal" aria-hidden="true" role="dialog" aria-label="Reply to Comment">
     <div class="reply-modal-content">
         <div class="reply-modal-header">
             <h4 id="reply-modal-title">Reply</h4>
-            <button id="reply-modal-close" class="issue-modal-close" type="button" aria-label="Close Reply Modal">&times;</button>
+            <button id="reply-modal-close" class="reply-modal-close" type="button" aria-label="Close Reply Modal">&times;</button>
         </div>
-        <div id="reply-parent-preview" class="reply-parent-preview" style="padding:8px;background:#f8f8f8;border-radius:6px;margin:8px 0;color:#222;"></div>
-        <textarea id="reply-modal-text" rows="4" placeholder="Write your reply"></textarea>
-        <div class="reply-modal-actions" style="margin-top:8px;">
+        <div id="reply-parent-preview" class="reply-parent-preview"></div>
+        <textarea id="reply-modal-text" placeholder="Write your reply"></textarea>
+        <div class="reply-modal-actions">
             <button id="reply-modal-submit" class="calendar-issue-action-btn primary" type="button">Post Reply</button>
             <button id="reply-modal-cancel" class="calendar-issue-action-btn secondary" type="button">Cancel</button>
         </div>
@@ -1954,17 +1954,16 @@ active_tab: calendar
                 _activeReplyParentId = parentCommentId;
                 preview.innerHTML = `<strong>${escapeIssueText(parentAuthor || 'Unknown')}</strong><div style="margin-top:6px;">${escapeIssueText((parentText || '').slice(0,300))}</div>`;
                 textarea.value = '';
-                replyModal.style.display = 'block';
                 replyModal.setAttribute('aria-hidden', 'false');
                 textarea.focus();
             }
 
             // Reply modal submit/close wiring
             document.getElementById('reply-modal-close')?.addEventListener('click', () => {
-                const m = document.getElementById('replyModal'); if (!m) return; m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); _activeReplyParentId = null;
+                const m = document.getElementById('replyModal'); if (!m) return; m.setAttribute('aria-hidden', 'true'); _activeReplyParentId = null;
             });
             document.getElementById('reply-modal-cancel')?.addEventListener('click', () => {
-                const m = document.getElementById('replyModal'); if (!m) return; m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); _activeReplyParentId = null;
+                const m = document.getElementById('replyModal'); if (!m) return; m.setAttribute('aria-hidden', 'true'); _activeReplyParentId = null;
             });
             document.getElementById('reply-modal-submit')?.addEventListener('click', async () => {
                 const parentId = _activeReplyParentId;
@@ -1979,10 +1978,20 @@ active_tab: calendar
                     // reload replies for parent
                     loadRepliesForComment(parentId);
                     // close modal
-                    const m = document.getElementById('replyModal'); if (m) { m.style.display='none'; m.setAttribute('aria-hidden','true'); }
+                    const m = document.getElementById('replyModal'); if (m) { m.setAttribute('aria-hidden','true'); }
                     _activeReplyParentId = null;
                 } catch (e) {
                     if (!handleFetchError(e)) console.error('Failed to post reply:', e);
+                }
+            });
+
+            // Close reply modal when clicking outside the content
+            document.getElementById('replyModal')?.addEventListener('click', (event) => {
+                const replyModal = document.getElementById('replyModal');
+                const replyContent = document.querySelector('.reply-modal-content');
+                if (event.target === replyModal && replyContent && event.target !== replyContent) {
+                    replyModal.setAttribute('aria-hidden', 'true');
+                    _activeReplyParentId = null;
                 }
             });
 
