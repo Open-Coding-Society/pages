@@ -5,6 +5,7 @@ import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
 import Collectible from '@assets/js/GameEnginev1.1/essentials/Collectible.js';
 import GameLevelBasketball from './GameLevelBasketball.js';
 import KirbyLevelMusic from './KirbyLevelMusic.js';
+import { getKirbyImageUrl } from './kirbyAssetPaths.js';
 
 console.log('GameLevelSeek.js loaded:', new Date().toISOString());
 
@@ -74,14 +75,13 @@ class GameLevelSeek {
         this.basketballTransitionStarted = false;
         this.spriteSwapScrollTriggered = false;
 
-        const path = gameEnv.path;
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
 
         // ---------------- BACKGROUND ----------------
         const bgData = {
             name: "custom_bg",
-            src: path + "/images/projects/characters/tagplayground.png",
+            src: getKirbyImageUrl('tagplayground.png'),
             pixels: { height: 400, width: 560 },
             layers: [
                 {
@@ -104,7 +104,7 @@ class GameLevelSeek {
         // ---------------- PLAYER ----------------
         const playerData = {
             id: 'playerData',
-            src: path + "/images/projects/characters/boysprite.png",
+            src: getKirbyImageUrl('boysprite.png'),
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
@@ -136,7 +136,7 @@ class GameLevelSeek {
         const spriteOptions = [
             {
                 label: "Boy",
-                src: path + "/images/projects/characters/boysprite.png",
+                src: getKirbyImageUrl('boysprite.png'),
                 pixels: { height: 612, width: 408 },
                 SCALE_FACTOR: 5,
                 ANIMATION_RATE: 50,
@@ -152,7 +152,7 @@ class GameLevelSeek {
             },
             {
                 label: "Scuba Diver",
-                src: path + "/images/projects/characters/scubadiver.png",
+                src: getKirbyImageUrl('scubadiver.png'),
                 pixels: { height: 948, width: 632 },
                 SCALE_FACTOR: 5,
                 ANIMATION_RATE: 50,
@@ -168,7 +168,7 @@ class GameLevelSeek {
             },
             {
                 label: "Astro",
-                src: path + "/images/projects/characters/astro.png",
+                src: getKirbyImageUrl('astro.png'),
                 pixels: { height: 770, width: 513 },
                 SCALE_FACTOR: 11,
                 ANIMATION_RATE: 110,
@@ -184,7 +184,7 @@ class GameLevelSeek {
             },
             {
                 label: "Kirby",
-                src: path + "/images/projects/characters/kirby.png",
+                src: getKirbyImageUrl('kirby.png'),
                 pixels: { height: 36, width: 569 },
                 SCALE_FACTOR: 7,
                 ANIMATION_RATE: 8,
@@ -514,31 +514,65 @@ class GameLevelSeek {
         if (this.basketballTransitionStarted) return;
         this.basketballTransitionStarted = true;
 
-        const primaryGame = this.gameEnv?.gameControl;
-        const topGame = primaryGame?.parentControl || primaryGame;
-        if (!topGame?.transitionToLevel) {
-            console.warn('Seek could not transition to Basketball because the game control chain is missing.');
-            return;
-        }
+        const transitionOverlay = document.createElement('div');
+        transitionOverlay.id = 'seek-to-basketball-transition';
+        transitionOverlay.style.position = 'fixed';
+        transitionOverlay.style.inset = '0';
+        transitionOverlay.style.background = '#000000';
+        transitionOverlay.style.opacity = '0';
+        transitionOverlay.style.pointerEvents = 'none';
+        transitionOverlay.style.zIndex = '10000';
+        transitionOverlay.style.transition = 'opacity 900ms ease';
+        document.body.appendChild(transitionOverlay);
+        this.transitionOverlayId = transitionOverlay.id;
 
-        const basketballIndex = Array.isArray(topGame.levelClasses)
-            ? topGame.levelClasses.findIndex((LevelClass) => LevelClass === GameLevelBasketball)
-            : -1;
+        const startLevelTransition = () => {
+            const primaryGame = this.gameEnv?.gameControl;
+            const topGame = primaryGame?.parentControl || primaryGame;
+            if (!topGame?.transitionToLevel) {
+                console.warn('Seek could not transition to Basketball because the game control chain is missing.');
+                if (transitionOverlay.parentNode) {
+                    transitionOverlay.remove();
+                }
+                return;
+            }
 
-        if (basketballIndex >= 0) {
-            topGame.currentLevelIndex = basketballIndex;
-        } else {
-            topGame.levelClasses = [GameLevelBasketball];
-            topGame.currentLevelIndex = 0;
-        }
+            const basketballIndex = Array.isArray(topGame.levelClasses)
+                ? topGame.levelClasses.findIndex((LevelClass) => LevelClass === GameLevelBasketball)
+                : -1;
 
-        topGame.isPaused = false;
-        topGame.transitionToLevel();
+            if (basketballIndex >= 0) {
+                topGame.currentLevelIndex = basketballIndex;
+            } else {
+                topGame.levelClasses = [GameLevelBasketball];
+                topGame.currentLevelIndex = 0;
+            }
+
+            topGame.isPaused = false;
+            topGame.transitionToLevel();
+
+            window.setTimeout(() => {
+                if (transitionOverlay.parentNode) {
+                    transitionOverlay.remove();
+                }
+            }, 300);
+        };
+
+        window.requestAnimationFrame(() => {
+            transitionOverlay.style.opacity = '1';
+        });
+
+        window.setTimeout(startLevelTransition, 950);
     }
 
     destroy() {
         this.levelMusic?.destroy?.();
         this.levelMusic = null;
+
+        if (this.transitionOverlayId) {
+            const overlay = document.getElementById(this.transitionOverlayId);
+            if (overlay) overlay.remove();
+        }
 
         if (this.menuId) {
             const menu = document.getElementById(this.menuId);

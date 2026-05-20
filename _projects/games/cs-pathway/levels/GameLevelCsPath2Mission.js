@@ -161,6 +161,11 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         { type: 'section', title: 'MISSION SCOREBOARD', marginTop: '10px' },
         { key: 'missionScore', label: 'Score', emptyValue: '.55' },
         { key: 'missionCleared', label: 'Cleared', emptyValue: '0/4' },
+        { type: 'section', title: 'COMPLETION STATUS', marginTop: '10px' },
+        { key: 'completionIdentityForge',   label: 'Identity Forge',   emptyValue: '—' },
+        { key: 'completionWayfindingWorld', label: 'Wayfinding World', emptyValue: '—' },
+        { key: 'completionMissionTools',    label: 'Mission Tools',    emptyValue: '—' },
+        { key: 'completionOverallScore',    label: 'Overall Score',    emptyValue: '0.55' },
       ],
       theme: {
         background: 'var(--ocs-game-panel-bg, rgba(13,13,26,0.92))',
@@ -184,6 +189,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       desk4: '—',
       missionScore: '.55',
       missionCleared: '0/4',
+      ...this._getCompletionPanelValues(),
     });
 
     /**
@@ -855,6 +861,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       this._saveMissionScore();
 
       if (this._missionCompletedStations.size >= stationTargetCount) {
+        this.markLevelComplete?.('missionTools');
+        this._syncMissionProgressBoard();
         this.showToast?.('All stations cleared once. Repeat solves now count toward bonus progress.');
       }
       return;
@@ -903,6 +911,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       desk4: '—',
       missionScore: scoreText,
       missionCleared: completedText,
+      ...this._getCompletionPanelValues(),
     });
   }
 
