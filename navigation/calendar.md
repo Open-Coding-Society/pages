@@ -1977,25 +1977,10 @@ active_tab: calendar
                                 <div class="issue-comment-card-top">
                                     <strong>${escapeIssueText(reply.author || 'Unknown')}</strong>
                                     <span class="issue-meta">${escapeIssueText(reply.timestamp || '')}</span>
-                                    <button type="button" class="issue-comment-reply-btn" data-action="reply" data-comment-id="${escapeIssueText(reply.id)}" title="Reply to this reply">↳ Reply</button>
                                 </div>
                                 <div class="issue-comment-body">${escapeIssueText(reply.text || '')}</div>
                             </article>
                         `).join('');
-
-                        // Attach reply handlers for nested replies (sub-replies)
-                        try {
-                            const nestedBtns = repliesContainer.querySelectorAll('.issue-comment-reply-btn');
-                            nestedBtns.forEach(btn => {
-                                btn.addEventListener('click', () => {
-                                    const cid = btn.getAttribute('data-comment-id');
-                                    const r = replies.find(rr => String(rr.id) === cid);
-                                    if (r) showReplyComposer(cid, r.author, r.text);
-                                });
-                            });
-                        } catch (e) {
-                            console.warn('Failed to attach nested reply handlers', e);
-                        }
                     })
                     .catch(e => { console.warn('Failed to load replies:', e); });
             }
