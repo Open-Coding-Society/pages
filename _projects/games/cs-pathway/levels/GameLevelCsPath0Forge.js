@@ -8,6 +8,7 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '@assets/js/projects/cs-pathway/model/ProfileManager.js';
+import LocalProfile from '@assets/js/projects/cs-pathway/model/localProfile.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import Present from './Present.js';
 import LoginManager from '@assets/js/projects/cs-pathway/model/LoginManager.js';
@@ -1482,30 +1483,9 @@ class GameLevelCsPath0Forge {
         // Reset button (always visible)
         {
           label: '🔄 Reset Profile',
-          title: 'Clear all profile data and start fresh',
+          title: 'Clear profile data and start fresh',
           danger: true,
-          onClick: async () => {
-            const confirmed = confirm(
-              '🔄 Reset Profile?\n\n' +
-              'This will clear:\n' +
-              '• Your identity (name, email, GitHub ID)\n' +
-              '• All progress (terminals, forges, portals)\n' +
-              '• Avatar and world theme selections\n\n' +
-              'Are you sure you want to start fresh?'
-            );
-
-            if (confirmed) {
-              try {
-                await level.profileManager.clear();
-                console.log('Profile cleared successfully');
-                level.showToast('✦ Profile reset - reloading...');
-                setTimeout(() => window.location.reload(), 1000);
-              } catch (error) {
-                console.error('Failed to reset profile:', error);
-                alert('Failed to reset profile. Check console for details.');
-              }
-            }
-          }
+          onClick: () => level._showResetModal(),
         }
       ],
       theme: uiTheme,
@@ -1749,6 +1729,89 @@ class GameLevelCsPath0Forge {
 
     const nearestGatekeeper = this._findNearestGatekeeperInZone(player, this._forgeGatekeeperObjects);
     this._syncGatekeeperZoneAlert(nearestGatekeeper);
+  }
+
+  /**
+   * Show the reset profile modal with three choices:
+   *   • Clear Local Only  — wipes localStorage, preserves server data
+   *   • Clear All         — wipes localStorage + server game profile
+   *   • Cancel            — dismisses with no action
+   */
+  _showResetModal() {
+    const level = this;
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = [
+      'position:fixed', 'inset:0', 'z-index:99999',
+      'background:rgba(0,0,0,0.72)',
+      'display:flex', 'align-items:center', 'justify-content:center',
+    ].join(';');
+
+    const btnBase = [
+      'display:block', 'width:100%', 'padding:10px 0',
+      'border-radius:6px', 'border:1px solid var(--ocs-game-accent,#4ecca3)',
+      'font-family:"Courier New",monospace', 'font-size:0.92em',
+      'cursor:pointer', 'transition:opacity 0.15s',
+    ].join(';');
+
+    const box = document.createElement('div');
+    box.style.cssText = [
+      'background:var(--ocs-game-panel-bg,#0d0d1a)',
+      'border:1.5px solid var(--ocs-game-accent,#4ecca3)',
+      'padding:28px 32px', 'border-radius:10px',
+      'font-family:"Courier New",monospace',
+      'color:var(--ocs-game-text,#e0e0e0)',
+      'max-width:380px', 'width:90%', 'box-sizing:border-box',
+    ].join(';');
+
+    box.innerHTML = `
+      <div style="font-size:1.1em;font-weight:bold;margin-bottom:12px;">🔄 Reset Profile</div>
+      <div style="font-size:0.88em;line-height:1.6;margin-bottom:20px;">
+        <b>Clear Local Only</b> — removes data on this device.<br>
+        Server backup is preserved for recovery on next login.<br><br>
+        <b>Clear All</b> — removes local data <em>and</em> server data.<br>
+        This cannot be undone.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button id="ocs-reset-local"
+          style="${btnBase}background:var(--ocs-game-surface-alt,#1a1a2e);color:var(--ocs-game-text,#e0e0e0);">
+          Clear Local Only
+        </button>
+        <button id="ocs-reset-all"
+          style="${btnBase}background:#3d0000;color:#ff6b6b;border-color:#ff6b6b;">
+          Clear All (Local + Server)
+        </button>
+        <button id="ocs-reset-cancel"
+          style="${btnBase}background:transparent;color:var(--ocs-game-text,#aaa);border-color:#444;">
+          Cancel
+        </button>
+      </div>`;
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    box.querySelector('#ocs-reset-local').onclick = () => {
+      overlay.remove();
+      LocalProfile.clearAll();
+      GameLevelCsPathIdentity.clearSharedState();
+      level.showToast('✦ Local profile cleared — reloading...');
+      setTimeout(() => window.location.reload(), 1000);
+    };
+
+    box.querySelector('#ocs-reset-all').onclick = async () => {
+      overlay.remove();
+      try {
+        await level.profileManager.clear(); // clears local + backend + dispatches ocs:profile-cleared
+        level.showToast('✦ Full profile reset — reloading...');
+      } catch (err) {
+        console.error('ProfileManager: full clear failed', err);
+        level.showToast('Reset failed — check console.');
+        return;
+      }
+      setTimeout(() => window.location.reload(), 1000);
+    };
+
+    box.querySelector('#ocs-reset-cancel').onclick = () => overlay.remove();
   }
 
   /**

@@ -11,6 +11,13 @@ class GameLevelCsPathIdentity {
   static sharedProfileStateValue = null;
   static sharedProfileStateLoaded = false;
 
+  static clearSharedState() {
+    GameLevelCsPathIdentity.sharedProfileStateReady = null;
+    GameLevelCsPathIdentity.sharedProfileStateValue = null;
+    GameLevelCsPathIdentity.sharedProfileStateLoaded = false;
+    GameLevelCsPathIdentity.themeCatalogCache.clear();
+  }
+
   constructor(gameEnv, { levelDisplayName, logPrefix }) {
     // Keep a single source of environment truth for subclasses.
     this.gameEnv = gameEnv;
@@ -615,5 +622,11 @@ class GameLevelCsPathIdentity {
   }
 
 }
+
+// When ProfileManager dispatches a clear event, invalidate the shared state cache
+// so the next level load re-reads from the now-empty localStorage/backend.
+window.addEventListener('ocs:profile-cleared', () => {
+  GameLevelCsPathIdentity.clearSharedState();
+});
 
 export default GameLevelCsPathIdentity;
