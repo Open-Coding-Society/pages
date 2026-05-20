@@ -11,6 +11,7 @@ import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import AboutMeBuilder from './AboutMeBuilder.js';
+import MissionTools from './GameLevelCsPath2Mission.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -129,6 +130,17 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       x: width * 0.23,   
       y: height * 0.53,  
     };
+
+    // ── NEW: Mission Tools gatekeeper position (upper-center portal) ──
+    // Tweak x/y if it doesn't land on the portal on your screen.
+    const missionToolsGatekeeperPos = {
+      x: width * 0.53,   // moved right — nudge further if needed
+      y: height * 0.21,
+    };
+
+    // Capture GameLevel 'this' — inside interact: function(){}, 'this' is the NPC
+    // so this.openMissionTools() would fail. levelInstance points to the right object.
+    const levelInstance = this;
     
     const createDiscMarkerSrc = (fillColor, borderColor = '#f8fafc') => {
       const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
@@ -267,6 +279,34 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         this.openSprintSuccess();
       },
     });
+
+    // ── NEW: Mission Tools gatekeeper ──────────────────────────
+    const npc_data_missionToolsGatekeeper = createGatekeeperData({
+      id: 'MissionToolsGatekeeper',
+      greeting: 'Welcome to Mission Tools! Plan your path and gear up for every sprint.',
+      position: missionToolsGatekeeperPos,
+      markerColor: '#8b5cf6',
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to Mission Tools!',
+          'This is your command center for planning sprints and tracking goals.',
+          'A great coder always has a plan — let\'s build yours.',
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Mission Tools');
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Open Mission Tools',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              levelInstance.openMissionTools();
+            },
+          },
+        ]);
+      },
+    });
+
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
@@ -275,6 +315,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_sprintSuccessGatekeeper },
+      { class: Npc, data: npc_data_missionToolsGatekeeper },  // NEW
     ];
   }
 
@@ -410,6 +451,19 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     });
 
     sprint.start();
+  }
+    // ── Mission Tools ─────────────────────────────────────────────
+  openMissionTools() {
+    const gc = this.gameEnv.gameControl;
+
+    gc.levelClasses.splice(
+      gc.currentLevelIndex + 1,
+      0,
+      MissionTools
+    );
+
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
   }
 
   async saveSprintSuccessResult(result) {
