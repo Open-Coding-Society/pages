@@ -61,4 +61,4 @@ gem "execjs", "~> 2.8"
 # See: ./liquid_ruby4_patch.rb
 #      https://github.com/tzinfo/tzinfo/issues/145
 #
-require_relative "liquid_ruby4_patch"
+require_relative "Gemfile_Patch"
