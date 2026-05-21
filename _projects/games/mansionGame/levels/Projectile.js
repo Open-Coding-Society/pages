@@ -1,4 +1,4 @@
-import Character from '../MansionLogic/Character.js';
+import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import showDeathScreen from './DeathScreen.js';
 import { updatePlayerHealthBar } from './HealthBars.js';
 import showEndScreen from './EndScreen.js';

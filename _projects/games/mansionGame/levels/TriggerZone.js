@@ -1,19 +1,26 @@
-import GameObject from '../MansionLogic/GameObject.js';
-import Player from '../MansionLogic/Player.js';
+import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 
-//cool comment
-class Barrier extends GameObject {
+class TriggerZone extends GameObject {
     constructor(data, gameEnv) {
         super(gameEnv);
         this.x = data.x;
         this.y = data.y;
         this.width = data.width;
         this.height = data.height;
-        this.color = data.color || 'rgba(255, 0, 0, 0.3)';
-        this.visible = data.visible !== undefined ? data.visible : false; // Back to invisible
+        this.color = data.color || 'rgba(255, 215, 0, 0.3)';
+        this.visible = data.visible !== undefined ? data.visible : true;
+        this.triggered = false;
+        this.onEnter = data.onEnter || (() => {});
+        this.message = data.message || '';
     }
 
     update() {
+        // Check for player in the game environment
+        const player = this.gameEnv.gameObjects.find(obj => obj instanceof Player);
+        if (player) {
+            this.checkTrigger(player);
+        }
         this.draw();
     }
 
@@ -23,21 +30,21 @@ class Barrier extends GameObject {
         const ctx = this.gameEnv.ctx;
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.strokeStyle = 'rgba(225, 0, 0, 0.8)';
+        ctx.strokeStyle = 'rgba(255, 215, 0, 0.8)';
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 
     resize() {
-        // Barriers are positioned relative to canvas size
+        // Trigger zones are positioned relative to canvas size
         // Resizing handled by level reconstruction
     }
 
     destroy() {
-        // No cleanup needed for barriers
+        // No cleanup needed for trigger zones
     }
 
-    checkCollision(player) {
+    checkTrigger(player) {
         // Safety checks
         if (!player || !player.position || !player.width || !player.height) {
             return false;
@@ -51,13 +58,22 @@ class Barrier extends GameObject {
         const hitboxX = player.position.x + (player.width - hitboxWidth) / 2;
         const hitboxY = player.position.y + (player.height - hitboxHeight);
         
-        return !(
+        const isInside = !(
             hitboxX > this.x + this.width ||
             hitboxX + hitboxWidth < this.x ||
             hitboxY > this.y + this.height ||
             hitboxY + hitboxHeight < this.y
         );
+
+        if (isInside && !this.triggered) {
+            this.triggered = true;
+            this.onEnter();
+        } else if (!isInside) {
+            this.triggered = false;
+        }
+
+        return isInside;
     }
 }
 
-export default Barrier;
+export default TriggerZone;

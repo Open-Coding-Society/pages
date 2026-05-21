@@ -1,7 +1,7 @@
-import GameEnvBackground from './MansionLogic/GameEnvBackground.js'
-import Player from './MansionLogic/Player.js'
-import Npc from './MansionLogic/Npc.js'
-import DialogueSystem from './MansionLogic/DialogueSystem.js'
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import MansionLevel2_Cemetery from './mansionLevel2_Cemetery.js'
 
 // Mansion Level 2 Game with WASD character movement.

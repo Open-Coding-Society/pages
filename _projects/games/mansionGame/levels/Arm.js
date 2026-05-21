@@ -1,4 +1,4 @@
-import Character from '../MansionLogic/Character.js';
+import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 
 /*
     Arm class for the Reaper boss.
