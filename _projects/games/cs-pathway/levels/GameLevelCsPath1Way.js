@@ -5,7 +5,7 @@ import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackgr
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
-import PersonaTrial from './PersonaTrial.js';
+import PersonaHallTrial from './PersonaHallTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
@@ -316,6 +316,42 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     ];
   }
 
+  // ── Sync level dropdown ───────────────────────────────────────
+  _syncLevelDropdown() {
+    requestAnimationFrame(() => {
+      const allSelects = Array.from(document.querySelectorAll('select'));
+      const levelSelect = allSelects.find((sel) =>
+        Array.from(sel.options).some((opt) =>
+          opt.textContent.trim() === 'Wayfinding World' ||
+          opt.textContent.trim() === 'Identity Forge' ||
+          opt.textContent.trim() === 'Mission Tools'
+        )
+      );
+      if (!levelSelect) return;
+
+      const targetName = GameLevelCsPath1Way.displayName; // 'Wayfinding World'
+
+      let targetOption = Array.from(levelSelect.options).find(
+        (opt) => opt.textContent.trim() === targetName
+      );
+
+      if (!targetOption) {
+        targetOption = document.createElement('option');
+        targetOption.textContent = targetName;
+        targetOption.value = targetName;
+        levelSelect.appendChild(targetOption);
+      }
+
+      levelSelect.value = targetOption.value;
+    });
+  }
+
+  // ── Initialize ───────────────────────────────────────────────
+  initialize() {
+    this._syncLevelDropdown();
+    if (typeof super.initialize === 'function') super.initialize();
+  }
+
   // ── About Me Builder ─────────────────────────────────────────
   openAboutMeBuilder() {
     if (this._aboutMeOpen) return;
@@ -389,14 +425,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     if (this._personaTrialOpen) return;
     this._personaTrialOpen = true;
 
-    const trial = new PersonaTrial({
+    const trial = new PersonaHallTrial({
+      profileData: this.profileData || {},
       onComplete: async (result) => {
         try {
           await this.savePersonaResult(result);
           this.showToast?.(`Persona updated: ${result.title}`);
-          this.panel?.(
-            `${result.title}\n\n${result.summary}\n\nTechnologist ${result.percentages.technologist}% | Scrummer ${result.percentages.scrummer}% | Planner ${result.percentages.planner}% | Finisher ${result.percentages.finisher}%`
-          );
+          this.profilePanelView?.update?.({ persona: result.title });
         } catch (error) {
           console.error('Failed to save persona result:', error);
           this.showToast?.('Persona trial completed, but saving failed.');
