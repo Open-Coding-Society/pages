@@ -1,57 +1,68 @@
 ---
 layout: post
-codemirror: true
-title: Real Estate Tycoon
-description: >
-  A three-level OCS GameEngine adventure — brokerage, open house, and closing — with NPC dialogues,
-  clicker kiosks, coins, and scripted level transitions.
-author: OCS Pages
-permalink: /real-estate-tycoon
-toc: false
-comments: true
+title: Real Estate Tycoon - Overview
+description: Project documentation and how-to-play guide for Real Estate Tycoon
+category: Real Estate Tycoon
+breadcrumb: true
+permalink: /real-estate-tycoon/overview
 ---
 
+## How to Play
 
-## Play
+Use **WASD** to move your investor around the city. Walk up to any NPC and press **E** to interact.
 
-Use **WASD** to move. Walk into characters and press **E** to interact.
+**Goal:** Grow your net worth from $500,000 to $5,000,000 to win.
 
-- **Level 1 — Brokerage:** Talk to the mentor and loan officer, collect earnest-money coins, tap the **Lead Gen** kiosk, then take the **Town Car** to the listing.
-- **Level 2 — Open House:** Meet the seller and inspector, grab the bonus coin, tap refreshments, then take **Escrow** to closing.
-- **Level 3 — Closing:** Celebrate with the closer and collect the commission coin.
+### NPCs on the Map
 
-Use the **level dropdown** in the runner anytime to jump back and practice.
+| Character | Role |
+| --- | --- |
+| 🏠 Sarah — Residential Broker | Browse homes, condos, and apartments |
+| 📋 Alex — Property Manager | View portfolio, collect rent, upgrade properties |
+| 🏢 Marcus — Commercial Broker | Unlocks after owning 3+ properties |
+| 💎 Victoria — Luxury Broker | Unlocks after owning 6+ properties |
+| 🏦 First National Bank | Take loans or repay debt |
 
-{% capture challenge %}
-Ship a full deal cycle: office → showing → closing. Every mechanic here maps to the GameEngine stack — `GameEnvBackground`, `Player`, `Npc` (DialogueSystem buttons), `Clicker`, `Coin`, and multi-level `GameControl` transitions wired in `GameLevelMarketHub.js`.
-{% endcapture %}
+### Property Deal Battles
 
-{% capture code %}
-import GameControl from '/assets/js/GameEnginev1.1/essentials/GameControl.js';
-import GameLevelMarketHub from '/assets/js/projects/real-estate-tycoon/levels/GameLevelMarketHub.js';
+When you enter a deal level, press **SPACE** to fire offers at the seller. Collect 📄 inspection documents to discount the final price (each doc = -1%). The seller fires counter-offers back — avoid them or lose negotiation shields. Reduce the seller's stubbornness bar to zero to close the deal.
 
-export { GameControl };
-export const gameLevelClasses = [GameLevelMarketHub];
-{% endcapture %}
+### Market System
 
-{% include runners/game.html
-   runner_id="real-estate-tycoon"
-   challenge=challenge
-   code=code
-   height="520px"
-   editor_height="220px"
-%}
+Prices update in real time via Brownian motion and random market events (housing boom, recession, tech boom, etc.). Watch the market ticker at the bottom and the HUD in the top-right corner.
 
-## Framework map
+---
 
-| Piece | Role in this game |
-| ----- | ----------------- |
-| `GameEnvBackground` | Office / mansion / title backdrops |
-| `Player` | Your agent (`chillguy` sprite) |
-| `Npc` | Broker, banker, town car, seller, inspector, escrow portal, closer |
-| `DialogueSystem` (via `Npc`) | Branching buttons to advance levels |
-| `Clicker` | Lead-gen kiosk + refreshment table |
-| `Coin` | Earnest money + commission pickups |
-| `GameControl` + 3 level classes | Hub → open house → closing |
+## Directory Structure
 
-Source: `assets/js/projects/real-estate-tycoon/levels/`.
+```text
+_projects/games/real-estate-tycoon/
+├── notebook.src.ipynb            ← Main game page at /real-estate-tycoon
+├── levels/
+│   ├── GameLevelMarketHub.js     ← City hub: player, NPCs, HUD, ticker, coins
+│   ├── GameLevelPropertyDeal.js  ← Base class for negotiation battle levels
+│   ├── GameLevelResidential.js   ← Residential deal (10 HP seller)
+│   ├── GameLevelCommercial.js    ← Commercial deal (15 HP, unlocks at 3 props)
+│   ├── GameLevelLuxury.js        ← Luxury deal (20 HP, unlocks at 6 props)
+│   └── GameLevelWinScreen.js     ← Win screen: leaderboard + market price chart
+├── model/
+│   ├── MarketEngine.js           ← Brownian motion + market events (singleton)
+│   ├── PortfolioManager.js       ← Cash, properties, loans (localStorage)
+│   └── PropertyDatabase.js       ← 17 property definitions across 3 tiers
+├── images/                       ← SVG sprites for all characters and backgrounds
+└── docs/                         ← This documentation
+```
+
+## Framework Map
+
+| Engine Piece | Role in this game |
+| --- | --- |
+| `GameEnvBackground` | City hub and deal-room backgrounds |
+| `Player` | The investor character (WASD movement) |
+| `Npc` | All 5 city NPCs with interact callbacks |
+| `GameControl` | Hub → deal sub-levels → win screen transitions |
+| `MarketEngine` | Singleton managing live price multipliers + events |
+| `PortfolioManager` | Singleton persisting all player financials to localStorage |
+| `PropertyDatabase` | Static data store for all 17 purchasable properties |
+
+Source: `_projects/games/real-estate-tycoon/`
