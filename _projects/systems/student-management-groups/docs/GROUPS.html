@@ -1,0 +1,734 @@
+---
+layout: aesthetihawk
+active_tab: groups
+title: Groups Management
+type: issues
+permalink: /student/groups/
+comments: false
+---
+<div class="min-h-screen bg-neutral-900 py-10">
+  <div class="max-w-6xl mx-auto px-4">
+    <!-- Subtle Loading Indicator - inline badge style -->
+    <div id="loadingOverlay"
+      class="hidden fixed bottom-4 right-4 z-40 bg-neutral-800/90 backdrop-blur-sm border border-neutral-700 rounded-full px-3 py-1.5 flex items-center gap-2 shadow-md text-xs">
+      <div class="loading-spinner"></div>
+      <span id="loadingText" class="text-gray-400">Loading...</span>
+    </div>
+
+    <!-- Page Title -->
+    <h2 class="text-2xl font-semibold text-white mb-6">Groups Management</h2>
+
+    <!-- Unified Filter Bar -->
+    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-4 mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="text-sm text-gray-300">
+          <span class="font-semibold text-white">Filters</span> · Narrow groups by period and class
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <!-- Period filter dropdown -->
+          <div class="relative" id="periodFilterWrapper">
+            <button id="periodFilterButton" type="button"
+              class="flex items-center gap-2 px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg text-sm border border-neutral-600 hover:bg-neutral-600 transition-colors"
+              onclick="toggleDropdown('period')">
+              <span id="periodFilterLabel">All Periods</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div id="periodDropdown"
+              class="hidden absolute right-0 mt-2 w-56 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-20">
+              <div class="p-3 space-y-2 text-sm text-gray-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input id="periodAllCheckbox" type="checkbox" class="accent-indigo-500" checked
+                    onchange="onPeriodAllChange(this)" />
+                  <span>All Periods</span>
+                </label>
+                <div class="border-t border-neutral-700 my-2"></div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="1"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 1</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="2"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 2</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="3"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 3</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="4"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 4</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 period-checkbox" value="5"
+                    onchange="onPeriodCheckboxChange(this)" />
+                  <span>Period 5</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Class filter dropdown -->
+          <div class="relative" id="classFilterWrapper">
+            <button id="classFilterButton" type="button"
+              class="flex items-center gap-2 px-4 py-2 bg-neutral-700 text-gray-200 rounded-lg text-sm border border-neutral-600 hover:bg-neutral-600 transition-colors"
+              onclick="toggleDropdown('class')">
+              <span id="classFilterLabel">All Classes</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div id="classDropdown"
+              class="hidden absolute right-0 mt-2 w-56 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-20">
+              <div class="p-3 space-y-2 text-sm text-gray-200">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input id="classAllCheckbox" type="checkbox" class="accent-indigo-500" checked
+                    onchange="onClassAllChange(this)" />
+                  <span>All Classes</span>
+                </label>
+                <div class="border-t border-neutral-700 my-2"></div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 class-checkbox" value="CSSE"
+                    onchange="onClassCheckboxChange(this)" />
+                  <span>CSSE</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 class-checkbox" value="CSP"
+                    onchange="onClassCheckboxChange(this)" />
+                  <span>CSP</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" class="accent-indigo-500 class-checkbox" value="CSA"
+                    onchange="onClassCheckboxChange(this)" />
+                  <span>CSA</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clear filters -->
+          <button type="button"
+            class="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-neutral-700 rounded-lg border border-neutral-700 transition-colors"
+            onclick="clearAllFilters()">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Groups Display Area -->
+    <div class="bg-neutral-800 border border-neutral-700 rounded-lg shadow-md p-6">
+      <!-- Search bar -->
+      <div class="flex gap-2 mb-6">
+        <input type="text" id="searchInput" placeholder="Search by Group Name"
+          class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-400 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          onkeydown="if(event.key==='Enter') searchGroups()" />
+        <button onclick="searchGroups()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium">
+          Search
+        </button>
+      </div>
+
+      <!-- Groups List -->
+      <div id="groupsContainer" class="space-y-3 mb-6">
+        <!-- Groups will be injected here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-12 text-gray-400 mb-6">
+        <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+          </path>
+        </svg>
+        <p class="text-lg">No groups found</p>
+      </div>
+
+      <!-- Add Group Section -->
+      <div id="addGroupSection" class="mb-6 bg-neutral-700 border-2 border-dashed border-neutral-600 rounded-lg p-6">
+        <div id="addGroupCollapsed" class="cursor-pointer" onclick="toggleAddGroup()">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-white">Add New Group</h3>
+                <p class="text-sm text-gray-400">Click to create a new group</p>
+              </div>
+            </div>
+            <svg id="addGroupChevron" class="w-6 h-6 text-gray-400 transition-transform" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div id="addGroupExpanded" class="mt-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Group Name</label>
+            <input type="text" id="newGroupName" placeholder="Enter group name"
+              class="w-full px-4 py-2 bg-neutral-600 text-white placeholder-gray-400 border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Period</label>
+            <select id="newGroupPeriod"
+              class="w-full px-4 py-2 bg-neutral-600 text-white border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">Select period</option>
+              <option value="1">Period 1</option>
+              <option value="2">Period 2</option>
+              <option value="3">Period 3</option>
+              <option value="4">Period 4</option>
+              <option value="5">Period 5</option>
+            </select>
+          </div>
+
+          <!-- Class selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Class</label>
+            <select id="newGroupClass"
+              class="w-full px-4 py-2 bg-neutral-600 text-white border border-neutral-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">Select class</option>
+              <option value="CSSE">CSSE</option>
+              <option value="CSP">CSP</option>
+              <option value="CSA">CSA</option>
+            </select>
+          </div>
+
+          <div class="flex gap-3 justify-end">
+            <button onclick="cancelAddGroup()"
+              class="px-4 py-2 bg-neutral-600 hover:bg-neutral-500 text-white rounded-lg transition-colors">
+              Cancel
+            </button>
+            <button onclick="saveNewGroup()"
+              class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
+              Create Group
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="mb-6 bg-gradient-to-r from-indigo-900/30 to-purple-900/30 border-2 border-indigo-500/50 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
+                </path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">AI-Powered Group Formation</h3>
+              <p class="text-sm text-gray-400">Create balanced groups based on student personas and team compatibility
+              </p>
+            </div>
+          </div>
+          <button onclick="openSmartGroupFormation()"
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z">
+              </path>
+            </svg>
+            Form Smart Groups
+          </button>
+        </div>
+      </div>
+
+      <!-- Groups List -->
+      <div id="groupsContainer" class="space-y-3">
+        <!-- Groups will be injected here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden text-center py-12 text-gray-400">
+        <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+          </path>
+        </svg>
+        <p class="text-lg">No groups found</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Modal -->
+<div id="chatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeGroupChat()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col" style="height: 600px;">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+      <div>
+        <h3 id="chatModalTitle" class="text-xl font-semibold text-white">Group Chat</h3>
+        <p id="chatModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+      </div>
+      <button onclick="closeGroupChat()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex items-center gap-2 px-4 py-2 border-b border-neutral-700">
+      <button id="chatTabButton" class="px-3 py-1.5 text-sm rounded-lg bg-indigo-600 text-white"
+        onclick="showChatTab()">Chat</button>
+      <button id="filesTabButton" class="px-3 py-1.5 text-sm rounded-lg text-gray-300 hover:bg-neutral-700"
+        onclick="showFilesTab()">Shared Files</button>
+    </div>
+
+    <div class="flex-1 flex flex-col min-h-0">
+      <!-- Chat Panel -->
+      <div id="chatPanel" class="flex-1 flex flex-col min-h-0">
+        <!-- Chat Messages Area -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+          <div id="chatEmptyState" class="text-center text-gray-500 text-sm py-6">No messages yet.</div>
+        </div>
+
+        <!-- Message Input Area -->
+        <div class="p-4 border-t border-neutral-700 relative">
+          <!-- Slash Command Popup -->
+          <div id="slashCommandPopup"
+            class="hidden absolute bottom-full left-4 right-4 mb-2 bg-neutral-700 border border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+            <div class="p-2 text-xs text-gray-400 border-b border-neutral-600">Commands</div>
+            <div id="slashCommandList">
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3"
+                onclick="selectSlashCommand('/calendar')">
+                <span class="text-lg">📅</span>
+                <div>
+                  <div class="text-white text-sm font-medium">/calendar</div>
+                  <div class="text-gray-400 text-xs">Add event: create a task in the calendar</div>
+                </div>
+              </div>
+              <div class="slash-command-item px-3 py-2 hover:bg-neutral-600 cursor-pointer flex items-center gap-3"
+                onclick="selectSlashCommand('/adduser')">
+                <span class="text-lg">👤</span>
+                <div>
+                  <div class="text-white text-sm font-medium">/adduser</div>
+                  <div class="text-gray-400 text-xs">Add a user to the conversation</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="imageMessageBox" class="mt-4 mb-4"></div>
+          <div class="flex items-center gap-2">
+            <input type="text" id="chatInput" placeholder="Message #group-name"
+              class="flex-1 px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              onkeydown="handleChatInputKeydown(event)" oninput="handleChatInputChange(event)" />
+            <input id="chatImageInput" type="file" accept="image/*" class="hidden"
+              onchange="handleChatImageSelected(event)" />
+            <button
+              class="w-12 h-12 flex items-center justify-center bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors"
+              title="Attach image" onclick="triggerChatImagePicker()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828L18 9a4 4 0 10-5.657-5.657L6.343 9.343a6 6 0 108.485 8.485L20 12">
+                </path>
+              </svg>
+            </button>
+            <button
+              class="w-12 h-12 flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+              title="Send message" onclick="sendChatMessage()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Files Panel -->
+      <div id="filesPanel" class="hidden flex-1 flex flex-col min-h-0">
+        <div id="sharedFilesList" class="flex-1 overflow-y-auto p-4 space-y-3">
+          <div id="filesEmptyState" class="text-center text-gray-500 text-sm py-6">No files uploaded yet.</div>
+        </div>
+        <div class="p-4 border-t border-neutral-700">
+          <div class="flex items-center gap-2">
+            <input id="sharedFileInput" type="file"
+              class="flex-1 px-3 py-2 bg-neutral-700 text-white placeholder-gray-500 rounded-lg border border-neutral-600" />
+            <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+              onclick="uploadSharedFile()">Upload</button>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Uploads are shared with all group members.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Smart Group Formation Modal -->
+<div id="smartGroupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeSmartGroupModal()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-neutral-700">
+      <div>
+        <h3 class="text-2xl font-semibold text-white">AI-Powered Group Formation</h3>
+        <p class="text-sm text-gray-400 mt-1">Create balanced groups using persona compatibility</p>
+      </div>
+      <button onclick="closeSmartGroupModal()" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Form -->
+    <div class="p-6 space-y-6">
+      <!-- Period Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Select Period</label>
+        <select id="smartGroupPeriod"
+          class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">Choose a period...</option>
+          <option value="1">Period 1</option>
+          <option value="2">Period 2</option>
+          <option value="3">Period 3</option>
+          <option value="4">Period 4</option>
+          <option value="5">Period 5</option>
+        </select>
+      </div>
+
+      <!-- Class Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Select Class</label>
+        <select id="smartGroupClass"
+          class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">Choose a class...</option>
+          <option value="CSSE">CSSE</option>
+          <option value="CSP">CSP</option>
+          <option value="CSA">CSA</option>
+        </select>
+      </div>
+
+      <!-- Group Size -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Group Size</label>
+        <input type="number" id="smartGroupSize" value="4" min="2" max="10"
+          class="w-full px-4 py-3 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p class="text-xs text-gray-400 mt-1">Recommended: 3-5 students per group</p>
+      </div>
+
+      <!-- Group Name Prefix -->
+      <div>
+        <label class="block text-sm font-medium text-gray-200 mb-2">Group Name Prefix (Optional)</label>
+        <input type="text" id="smartGroupPrefix" placeholder="e.g., 'Team', 'Squad', 'Group'"
+          class="w-full px-4 py-3 bg-neutral-700 text-white placeholder-gray-500 border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <p class="text-xs text-gray-400 mt-1">Groups will be named like "Team A", "Team B", etc.</p>
+      </div>
+
+      <!-- Prior Experiences Toggle -->
+      <div class="bg-neutral-700/60 border border-neutral-600 rounded-lg p-4">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-100">
+              Would you like to incorporate your prior experiences?
+            </label>
+            <p class="text-xs text-gray-400 mt-1">
+              If yes, we’ll use your past group outcomes (ratings + persona mix) to bias future team formation.
+            </p>
+          </div>
+
+          <label class="inline-flex items-center cursor-pointer select-none">
+            <input id="usePriorExpToggle" type="checkbox" class="sr-only" onchange="togglePriorExperience()" />
+            <div class="w-11 h-6 bg-neutral-600 rounded-full relative transition-colors">
+              <div id="usePriorExpKnob"
+                class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"></div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Prior Experience Form (hidden until toggle on) -->
+        <div id="priorExperienceForm" class="hidden mt-4 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">How many members were in your previous
+                group?</label>
+              <input id="priorGroupSize" type="number" min="2" max="10" value="4"
+                class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+                <input id="priorStudentRating" type="number" min="1" max="5" value="4"
+                  class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+                <input id="priorTeacherRating" type="number" min="1" max="5" value="4"
+                  class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">
+              Personas of members in that group (select all that applied)
+            </label>
+            <div id="priorPersonaChoices" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
+            <p class="text-xs text-gray-400 mt-2">
+              Tip: choose the persona mix that best matches the group you’re describing.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">One-line note (optional)</label>
+            <input id="priorNote" type="text" maxlength="160"
+              placeholder="e.g., Great role balance, clear communication"
+              class="w-full px-4 py-2 bg-neutral-800 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400">
+              We’ll also include any saved group feedback already stored locally on this device.
+            </p>
+            <button type="button"
+              class="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-gray-200 rounded-lg text-xs border border-neutral-600"
+              onclick="previewPriorFeedbackCount()">
+              Preview stored feedback
+            </button>
+          </div>
+
+          <div id="priorFeedbackStatus" class="text-xs text-gray-300"></div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 justify-end pt-4 border-t border-neutral-700">
+        <button onclick="closeSmartGroupModal()"
+          class="px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+          Cancel
+        </button>
+        <button onclick="generateSmartGroups()"
+          class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Generate Groups
+        </button>
+      </div>
+    </div>
+
+    <!-- Results Section (hidden initially) -->
+    <div id="smartGroupResults" class="hidden border-t border-neutral-700 bg-neutral-900/50">
+      <!-- Staging toolbar -->
+      <div class="flex items-center justify-between px-6 pt-5 pb-3">
+        <div>
+          <h4 class="text-lg font-semibold text-white">Staging Area</h4>
+          <p class="text-xs text-gray-400 mt-0.5">Lock groups you're happy with · Drag students between groups ·
+            Regenerate the rest</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="regenerateUnlocked()"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors font-medium flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+              </path>
+            </svg>
+            Regenerate Unlocked
+          </button>
+          <button onclick="saveSmartGroups()"
+            class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg transition-colors font-semibold">
+            Save All Groups
+          </button>
+          <button onclick="closeSmartGroupModal()"
+            class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white text-sm rounded-lg transition-colors">
+            Discard
+          </button>
+        </div>
+      </div>
+
+      <!-- Method badge -->
+      <div id="stagingMethodBadge" class="px-6 pb-3"></div>
+
+      <!-- Groups grid -->
+      <div id="smartGroupResultsContent" class="px-6 pb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        <!-- Group cards injected here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black bg-opacity-75" onclick="closeFeedbackModal()"></div>
+
+      <!-- Modal Content -->
+      <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4 flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+          <div>
+            <h3 id="feedbackModalTitle" class="text-xl font-semibold text-white">Group Feedback</h3>
+            <p id="feedbackModalSubtitle" class="text-sm text-gray-400">Period · Class · Members</p>
+          </div>
+          <button type="button" onclick="closeFeedbackModal()" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-4 space-y-4">
+          <!-- Course Category (CSA/CSP/CSSE) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Course Category</label>
+            <select id="fbCourse"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="CSA">CSA</option>
+              <option value="CSP">CSP</option>
+              <option value="CSSE">CSSE</option>
+            </select>
+          </div>
+
+          <!-- Student feedback -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Student Rating (1–5)</label>
+              <input id="fbStudentRating" type="number" min="1" max="5" value="4"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              <p class="text-xs text-gray-400 mt-1">How well did the group work together?</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Teacher Rating (1–5)</label>
+              <input id="fbTeacherRating" type="number" min="1" max="5" value="4"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              <p class="text-xs text-gray-400 mt-1">Teacher assessment of effectiveness.</p>
+            </div>
+          </div>
+
+          <!-- One-line explanation -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">One-line explanation</label>
+            <input id="fbNote" type="text" maxlength="160" placeholder="e.g., Clear roles + everyone contributed"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <!-- Status -->
+          <div id="fbStatus" class="text-sm text-gray-300"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+          <button type="button" onclick="closeFeedbackModal()"
+            class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button type="button" onclick="submitGroupFeedback()"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors">
+            Submit Feedback
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Calendar Event Modal -->
+    <div id="calendarEventModal" class="hidden fixed inset-0 flex items-center justify-center" style="z-index: 60;">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black bg-opacity-75" onclick="calendarModalController.close()"></div>
+
+      <!-- Modal Content -->
+      <div class="relative bg-neutral-800 rounded-lg shadow-2xl w-full max-w-md mx-4 flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-neutral-700">
+          <h3 class="text-xl font-semibold text-white">Add Calendar Event</h3>
+          <button onclick="calendarModalController.close()" class="text-gray-400 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-4 space-y-4">
+          <!-- Linked Group Indicator -->
+          <div id="calEventGroupContainer" class="hidden mb-4 p-3 bg-indigo-900/30 border border-indigo-500/30 rounded-lg flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span class="text-sm text-indigo-200">Linking to group: <strong id="calEventGroupName" class="text-white"></strong></span>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Title</label>
+            <input id="calEventTitle" type="text" placeholder="Event Title"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Date</label>
+              <input id="calEventDate" type="date"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-200 mb-2">Period</label>
+              <input id="calEventPeriod" type="text" placeholder="e.g. CSA"
+                class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Description</label>
+            <textarea id="calEventDesc" rows="3" placeholder="Optional description..."
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+          </div>
+
+          <!-- Priority -->
+          <div>
+            <label class="block text-sm font-medium text-gray-200 mb-2">Priority</label>
+            <select id="calEventPriority"
+              class="w-full px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="P2" selected>P2 (Normal)</option>
+              <option value="P0">P0 (Highest)</option>
+              <option value="P1">P1 (High)</option>
+              <option value="P3">P3 (Low)</option>
+            </select>
+          </div>
+
+          <div id="calEventStatus" class="text-sm mt-2"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-2 p-4 border-t border-neutral-700">
+          <button onclick="calendarModalController.close()"
+            class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button id="calEventSubmitBtn" onclick="calendarModalController.submit()"
+            class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-semibold flex items-center">
+            Create Event
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat JS moved to module script below -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+    <script type="module" src="{{site.baseurl}}/assets/js/projects/student-management-groups/js/groups.js"></script>

@@ -310,6 +310,26 @@ score += gists * 0.5
                         <h3 class="text-sm font-medium text-neutral-400 uppercase mb-4">Growth Over Time</h3>
                         <div id="chart-line"></div>
                     </div>
+
+                   <!-- Skill Recommendation Card -->
+                <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6 mt-6">
+
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-medium text-neutral-400 uppercase">
+                            AI Skill Recommendation
+                        </h3>
+
+                        <!-- Badge -->
+                        <span class="text-xs bg-blue-600 px-2 py-1 rounded-full text-white">
+                            Personalized Insight
+                        </span>
+                    </div>
+
+                    <div id="skill-recommendation" class="text-neutral-300">
+                        Loading recommendation...
+                    </div>
+
+                </div>
                 </div>
             </div>                
 
@@ -692,6 +712,30 @@ score += gists * 0.5
             loading.classList.add('hidden');
             empty.classList.remove('hidden');
         }
+        // fetch recommendation
+        try {
+            const recRes = await fetch(`${pythonURI}/api/user/skill-recommendation`, fetchOptions);
+            if (recRes.ok) {
+                const recData = await recRes.json();
+
+                const recEl = document.getElementById("skill-recommendation");
+                if (recEl && recData.recommendation) {
+                    recEl.innerHTML = `
+                        <p class="text-lg font-semibold text-blue-400 mb-2">
+                            Focus Area: ${recData.recommendation.focus}
+                        </p>
+                        <p class="text-sm text-neutral-300">
+                            ${recData.recommendation.advice}
+                        </p>
+                        <p class="text-xs text-neutral-500 mt-2">
+                            Current score: ${recData.recommendation.score}/6
+                        </p>
+                    `;
+                }
+            }
+        } catch (e) {
+            console.warn("Recommendation failed:", e);
+    }
     }
     // Modal code
     const dataModal = document.getElementById("dataModal");

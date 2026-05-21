@@ -1,0 +1,16 @@
+---
+layout: aesthetihawk
+title: Group Dashboard
+type: issues
+permalink: /student/groups/dashboard/
+comments: false
+---
+
+<!-- 
+  This page serves as a dynamic dashboard for individual groups.
+  The group name is passed via URL query parameter: /student/groups/dashboard?group=group-name
+-->
+
+{% include group_dashboard.html %}
+
+<script type="module" src="{{site.baseurl}}/assets/js/projects/student-management-groups/js/dashboard.js"></script>

@@ -29,7 +29,7 @@ Features:
       - "Rebecca, Cyrus, Rishabh"
 
   - title: "Online Reservation & Booking System"
-    image: "/images/capstone/rcr/Management Portal.png"
+    image: "/images/capstone/rcr/management.png"
     link: "https://rcr.opencodingsociety.com/book"
     alt: "Online booking form with ticket selection and confirmation code"
     keyPoints:
@@ -54,7 +54,7 @@ Features:
       - "Rebecca, Cyrus, Rishabh"
 
   - title: "ML-Powered Visitor Forecast"
-    image: "/images/capstone/rcr/tracking.png"
+    image: "/images/capstone/rcr/forecast.png"
     link: "https://rcr.opencodingsociety.com/forecast"
     alt: "Machine learning visitor forecast with weather and calendar data"
     keyPoints:

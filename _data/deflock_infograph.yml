@@ -15,7 +15,7 @@ Topics:
     description: "DeFlock Sd is regional chapter of deflock.org focused on documenting and exposing the spread of ALPRs in San Diego. The platform allows community members to report camera locations, visualize surveillance infrastructure, and access resources to understand the privacy and civil liberties risks of ALPR systems."
     tech:
       - "Backend: Flask RESTful API"
-      - "Frontend: Vue.js"
+      - "Frontend: Jekyll"
       - "Geospatial data and map analysis"
       - "Path routing using above data"
     impact:

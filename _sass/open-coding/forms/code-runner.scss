@@ -23,4 +23,9 @@
   .copyOutputBtn {
     @include icon-button(38px, 0);
   }
+
+  // Override Darcula's green comment colour with gray
+  .cm-comment {
+    color: #7f849c !important;
+  }
 }

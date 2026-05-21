@@ -1,4 +1,5 @@
 ---
+microblog: true
 layout: post
 categories: Capstone 
 tags: [pvo, redesign, infographic, veterans, poway]
