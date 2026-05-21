@@ -61,6 +61,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       skill: '—',
       ...this._getCompletionPanelValues(),
     });
+
     /**
      * Section: Level objects.
      */
@@ -112,36 +113,32 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
-      x: width * 0.83,  
+      x: width * 0.83,
       y: height * 0.28,
     };
 
     const personalEnrichmentGatekeeperPos = {
-      x: width * 0.23,   
-      y: height * 0.25,  
+      x: width * 0.23,
+      y: height * 0.25,
     };
 
     const skillPassportGatekeeperPos = {
-      x: width * 0.82,  
-      y: height * 0.56, 
+      x: width * 0.82,
+      y: height * 0.56,
     };
 
     const sprintSuccessGatekeeperPos = {
-      x: width * 0.23,   
-      y: height * 0.53,  
+      x: width * 0.23,
+      y: height * 0.53,
     };
 
-    // ── NEW: Mission Tools gatekeeper position (upper-center portal) ──
-    // Tweak x/y if it doesn't land on the portal on your screen.
     const missionToolsGatekeeperPos = {
-      x: width * 0.53,   // moved right — nudge further if needed
+      x: width * 0.53,
       y: height * 0.21,
     };
 
-    // Capture GameLevel 'this' — inside interact: function(){}, 'this' is the NPC
-    // so this.openMissionTools() would fail. levelInstance points to the right object.
     const levelInstance = this;
-    
+
     const createDiscMarkerSrc = (fillColor, borderColor = '#f8fafc') => {
       const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
       const discFrames = frameOpacity
@@ -280,7 +277,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       },
     });
 
-    // ── NEW: Mission Tools gatekeeper ──────────────────────────
+    // ── Mission Tools gatekeeper ──────────────────────────
     const npc_data_missionToolsGatekeeper = createGatekeeperData({
       id: 'MissionToolsGatekeeper',
       greeting: 'Welcome to Mission Tools! Plan your path and gear up for every sprint.',
@@ -290,7 +287,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         this.dialogueSystem.dialogues = [
           'Welcome to Mission Tools!',
           'This is your command center for planning sprints and tracking goals.',
-          'A great coder always has a plan — let\'s build yours.',
+          "A great coder always has a plan — let's build yours.",
         ];
         this.dialogueSystem.lastShownIndex = -1;
         this.dialogueSystem.showRandomDialogue('Mission Tools');
@@ -315,11 +312,11 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_sprintSuccessGatekeeper },
-      { class: Npc, data: npc_data_missionToolsGatekeeper },  // NEW
+      { class: Npc, data: npc_data_missionToolsGatekeeper },
     ];
   }
 
-  // ── Skill Passport ───────────────────────────────────────────
+  // ── About Me Builder ─────────────────────────────────────────
   openAboutMeBuilder() {
     if (this._aboutMeOpen) return;
     this._aboutMeOpen = true;
@@ -329,14 +326,11 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       onComplete: async (result) => {
         try {
           await this.saveAboutMeResult(result);
-
           this.showToast?.(`About Me complete: ${result.title}`);
-
           this.profilePanelView?.update?.({
             skill: 'About Me Builder',
             persona: result.persona || '—',
           });
-
           this.markLevelComplete('wayfindingWorld');
         } catch (error) {
           console.error('Failed to save About Me result:', error);
@@ -374,17 +368,14 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       await this.profileManager.updateProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfileData === 'function') {
       await this.profileManager.saveProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfile === 'function') {
       await this.profileManager.saveProfile(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.setProfileData === 'function') {
       await this.profileManager.setProfileData(updatedProfile);
       return;
@@ -402,7 +393,6 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       onComplete: async (result) => {
         try {
           await this.savePersonaResult(result);
-
           this.showToast?.(`Persona updated: ${result.title}`);
           this.panel?.(
             `${result.title}\n\n${result.summary}\n\nTechnologist ${result.percentages.technologist}% | Scrummer ${result.percentages.scrummer}% | Planner ${result.percentages.planner}% | Finisher ${result.percentages.finisher}%`
@@ -431,9 +421,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       onComplete: async (result) => {
         try {
           await this.saveSprintSuccessResult(result);
-
           this.showToast?.(`Sprint Success complete: ${result.title}`);
-
           this.profilePanelView?.update?.({
             skill: result.title,
           });
@@ -444,7 +432,6 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
           this._sprintSuccessOpen = false;
         }
       },
-
       onClose: () => {
         this._sprintSuccessOpen = false;
       },
@@ -452,16 +439,11 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     sprint.start();
   }
-    // ── Mission Tools ─────────────────────────────────────────────
+
+  // ── Mission Tools ─────────────────────────────────────────────
   openMissionTools() {
     const gc = this.gameEnv.gameControl;
-
-    gc.levelClasses.splice(
-      gc.currentLevelIndex + 1,
-      0,
-      MissionTools
-    );
-
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, MissionTools);
     gc.currentLevelIndex++;
     gc.transitionToLevel();
   }
@@ -486,17 +468,14 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       await this.profileManager.updateProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfileData === 'function') {
       await this.profileManager.saveProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfile === 'function') {
       await this.profileManager.saveProfile(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.setProfileData === 'function') {
       await this.profileManager.setProfileData(updatedProfile);
       return;
@@ -533,17 +512,14 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       await this.profileManager.updateProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfileData === 'function') {
       await this.profileManager.saveProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfile === 'function') {
       await this.profileManager.saveProfile(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.setProfileData === 'function') {
       await this.profileManager.setProfileData(updatedProfile);
       return;
