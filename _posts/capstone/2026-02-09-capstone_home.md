@@ -1179,6 +1179,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
 })();
 </script>
+<script src="/assets/js/capstone-like-buttons.js"></script>
 
 
 

@@ -26,6 +26,58 @@
   box-shadow: 0 18px 34px rgba(37, 99, 235, 0.46);
 }
 
+.capstone-like-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.capstone-like-button {
+  appearance: none;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 9999px;
+  padding: 0.35rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.capstone-like-button:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.capstone-like-button.liked {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+}
+
+.capstone-like-button .like-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.capstone-like-button .like-count {
+  min-width: 1.5rem;
+  text-align: right;
+  font-size: 0.95rem;
+}
+
 /* ── Modal overlay — display toggled entirely by JS style.display ── */
 /* (no class tricks, no [hidden] attribute, no transitions on the overlay) */
 
