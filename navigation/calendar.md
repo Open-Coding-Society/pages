@@ -669,12 +669,12 @@ active_tab: calendar
             // Prefer assignedGroupLabels from server, fallback to parsing assignedGroups
             let assignedGroupsLabel = '';
             if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length > 0) {
-                assignedGroupsLabel = `<span class="issue-assigned-groups">📍 Assigned to: ${issue.assignedGroupLabels.join(', ')}</span>`;
+                assignedGroupsLabel = `<span class="issue-assigned-groups">📍 Assigned to: ${issue.assignedGroupLabels.map(label => escapeIssueText(label)).join(', ')}</span>`;
             } else if (issue.assignedGroups) {
                 try {
                     const groups = JSON.parse(issue.assignedGroups);
                     if (groups && groups.length > 0) {
-                        assignedGroupsLabel = `<span class="issue-assigned-groups">📍 Assigned to: ${groups.join(', ')}</span>`;
+                        assignedGroupsLabel = `<span class="issue-assigned-groups">📍 Assigned to: ${groups.map(group => escapeIssueText(group)).join(', ')}</span>`;
                     }
                 } catch (e) { /* Skip if not valid JSON */ }
             }
