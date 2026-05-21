@@ -1,0 +1,21 @@
+# Run from repository root on EC2:
+#   docker compose -f deploy/ec2-staging/docker-compose.yml up -d --build
+
+name: pages-staging
+
+services:
+  jekyll:
+    build:
+      context: .
+      dockerfile: deploy/ec2-staging/Dockerfile
+    container_name: pages-staging-jekyll
+    restart: unless-stopped
+    working_dir: /site
+    volumes:
+      - .:/site
+    ports:
+      - "127.0.0.1:4500:4500"
+    environment:
+      - PORT=4500
+      - STAGING_SKIP_NOTEBOOK_CONVERT=${STAGING_SKIP_NOTEBOOK_CONVERT:-1}
+    mem_limit: 1400m
