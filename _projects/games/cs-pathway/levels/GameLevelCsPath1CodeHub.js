@@ -1080,29 +1080,29 @@ function openDatavizPanel(gameControl) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── Space Invaders — question banks (one per terminal) ───────────────────────
-// Week 1-3 CSSE entry-level questions — Markdown, HTML basics, GitHub Pages
-// Answers are kept short (1-3 words) so they fit clearly on enemy ships
+// Entry-level questions (Week 1-3) for each Code Hub terminal
+// Answers are short (1-4 words) so they fit clearly on enemy ships
 const LESSON_QUESTIONS = {
-  markdown: [
-    { q: 'What does  #  at the start of a line create?',      ans: 'Heading',     wrong: ['Bold text', 'A link', 'A list'] },
-    { q: 'What does  **text**  do to text?',                   ans: 'Makes it bold', wrong: ['Makes italic', 'Makes a link', 'Adds color'] },
-    { q: 'What does  -  or  *  at the start of a line make?', ans: 'List item',   wrong: ['Heading', 'Bold text', 'A link'] },
-    { q: 'What does  [text](url)  create in Markdown?',        ans: 'A link',      wrong: ['An image', 'A button', 'Bold text'] },
-    { q: 'What file extension does Markdown use?',             ans: '.md',         wrong: ['.html', '.py', '.css'] },
+  frontend: [
+    { q: 'Which tag creates the biggest heading?',   ans: '<h1>',        wrong: ['<p>', '<div>', '<head>'] },
+    { q: 'What does CSS stand for?',                 ans: 'Cascading Style', wrong: ['Computer Style', 'Creative Script', 'Coded Styling'] },
+    { q: 'HTML is used to add __ to a webpage.',    ans: 'structure',    wrong: ['color', 'animation', 'data'] },
+    { q: 'Which tag creates a paragraph?',           ans: '<p>',          wrong: ['<text>', '<div>', '<span>'] },
+    { q: 'Where does CSS usually go in HTML?',      ans: '<head>',       wrong: ['<body>', '<footer>', '<html>'] },
   ],
-  html: [
-    { q: 'What does the  <h1>  tag create?',    ans: 'Heading',    wrong: ['Paragraph', 'A link', 'A list'] },
-    { q: 'What does the  <p>  tag create?',     ans: 'Paragraph',  wrong: ['Heading', 'An image', 'A list'] },
-    { q: 'What does  <a href="...">  create?',  ans: 'A link',     wrong: ['An image', 'A heading', 'A button'] },
-    { q: 'What does  <img src="...">  display?', ans: 'An image',  wrong: ['A video', 'A link', 'Bold text'] },
-    { q: 'What does HTML stand for?',            ans: 'HyperText Markup', wrong: ['High Text Make', 'Hyper Tool Main', 'How Tags Mark'] },
+  backend: [
+    { q: 'A server SENDS data to a ___.',            ans: 'client',       wrong: ['database', 'router', 'cable'] },
+    { q: 'What does a URL stand for?',               ans: 'web address',  wrong: ['user link', 'upload route', 'unit request'] },
+    { q: 'HTTP is used to ___ data on the web.',    ans: 'transfer',     wrong: ['delete', 'store', 'encrypt'] },
+    { q: 'A backend sends back a ___.',              ans: 'response',     wrong: ['render', 'request', 'react'] },
+    { q: 'Data sent to a server is called a ___.',  ans: 'request',      wrong: ['response', 'render', 'route'] },
   ],
-  github: [
-    { q: 'GitHub Pages hosts your...?',              ans: 'Website',     wrong: ['Database', 'Email', 'Game server'] },
-    { q: 'What is your home page file called?',      ans: 'index.md',    wrong: ['home.html', 'main.py', 'start.md'] },
-    { q: 'A GitHub repository stores your...?',      ans: 'Code',        wrong: ['Emails', 'Photos', 'Passwords'] },
-    { q: 'Jekyll converts .md files into...?',       ans: 'HTML pages',  wrong: ['Python code', 'CSS only', 'JavaScript'] },
-    { q: '"Commit and push" means...?',              ans: 'Save & upload', wrong: ['Delete files', 'Download code', 'Run tests'] },
+  dataviz: [
+    { q: 'Charts and graphs show ___.',              ans: 'data',         wrong: ['code', 'styles', 'routes'] },
+    { q: 'A bar chart compares things using ___.',  ans: 'bars',         wrong: ['dots', 'lines', 'boxes'] },
+    { q: 'A pie chart shows parts of a ___.',       ans: 'whole',        wrong: ['list', 'loop', 'table'] },
+    { q: 'What library is used for JS charts?',     ans: 'Chart.js',     wrong: ['React', 'Bootstrap', 'Node.js'] },
+    { q: 'A line chart is best for showing ___.',   ans: 'trends',       wrong: ['totals', 'colors', 'sizes'] },
   ],
 };
 
@@ -1111,49 +1111,62 @@ const LESSON_QUESTIONS = {
 //           WRONG passes bottom → −75 pts, −1 life  |  CORRECT passes → +50 pts
 //           5 lives · score can go negative · hi-score per lesson in localStorage
 function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
-  const label = { markdown: 'Markdown', html: 'HTML', github: 'GitHub Pages' }[lessonKey] || lessonKey;
+  const label = { frontend: 'Frontend', backend: 'Backend', dataviz: 'Dataviz' }[lessonKey] || lessonKey;
   const body  = createPanel(`🎮 ${label} — Space Invaders`, accentColor, gameControl);
 
-  /* expand panel for the larger play area */
+  /* size panel to fit viewport without clipping */
   const panelEl = document.getElementById('code-hub-panel');
-  Object.assign(panelEl.style, { width: 'min(940px, 94vw)', maxHeight: '93vh', top: '2%' });
+  /* overhead = panel header(38) + body-padding(24) + HUD(28) + q-bar(46) + controls(26) + margins(24) */
+  const OVERHEAD = 186;
+  const panelW   = Math.min(860, Math.round(window.innerWidth  * 0.95));
+  const panelH   = Math.round(window.innerHeight * 0.93);
+  Object.assign(panelEl.style, {
+    width:     panelW + 'px',
+    maxHeight: panelH + 'px',
+    top:       '1%',
+    overflowY: 'hidden',
+  });
+  /* body padding reduced so canvas gets more room */
+  document.getElementById('panel-body').style.padding = '10px';
 
-  const CW = 880, CH = 580;
+  /* canvas logical size — width fills panel, height fits remaining space */
+  const CW = panelW - 20;  /* 10px body padding each side */
+  const CH = Math.max(340, panelH - OVERHEAD);
   const questions = LESSON_QUESTIONS[lessonKey];
   const HI_KEY    = `si-hi-${lessonKey}`;
 
   body.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;
-                margin-bottom:6px;font-size:12px;">
+                margin-bottom:4px;font-size:12px;flex-wrap:wrap;gap:4px;">
       <span style="color:#64748b;font-size:11px;">
-        Shoot <span style="color:#f87171;font-weight:700;">WRONG</span> answers ·
+        Shoot <span style="color:#f87171;font-weight:700;">WRONG</span> answers \xb7
         Let <span style="color:#86efac;font-weight:700;">CORRECT</span> pass through
       </span>
-      <div style="display:flex;gap:12px;font-size:13px;font-weight:700;align-items:center;">
+      <div style="display:flex;gap:10px;font-size:13px;font-weight:700;align-items:center;">
         <span id="si-lives"></span>
         <span style="color:${accentColor};">Score: <span id="si-score">0</span></span>
         <span style="color:#fbbf24;">Best: <span id="si-hi">${parseInt(localStorage.getItem(HI_KEY)) || 0}</span></span>
         <button id="si-fullscreen"
           style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
-                 border-radius:6px;color:#94a3b8;padding:4px 10px;font-size:11px;cursor:pointer;
+                 border-radius:6px;color:#94a3b8;padding:3px 8px;font-size:11px;cursor:pointer;
                  font-weight:600;">⛶ Fullscreen</button>
       </div>
     </div>
     <div id="si-question-bar"
       style="background:rgba(8,15,38,0.92);border:1.5px solid ${accentColor}55;border-radius:8px;
-             padding:9px 16px;margin-bottom:6px;font-size:14px;font-weight:700;
-             color:#f1f5f9;text-align:center;min-height:36px;letter-spacing:0.01em;">
+             padding:6px 14px;margin-bottom:4px;font-size:13px;font-weight:700;
+             color:#f1f5f9;text-align:center;line-height:1.4;">
       Press SPACE or click to start
     </div>
     <canvas id="si-canvas" width="${CW}" height="${CH}"
       style="display:block;width:100%;border-radius:10px;background:#060d1a;
              border:1px solid ${accentColor}33;cursor:default;"></canvas>
     <div style="display:flex;justify-content:space-between;align-items:center;
-                margin-top:8px;font-size:11px;color:#475569;">
-      <span>← → / A D  move  ·  SPACE  shoot</span>
+                margin-top:6px;font-size:11px;color:#475569;">
+      <span>← → / A D  move  \xb7  SPACE  shoot</span>
       <button id="si-restart"
         style="background:${accentColor}22;border:1px solid ${accentColor}55;border-radius:6px;
-               color:${accentColor};padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;">
+               color:${accentColor};padding:3px 12px;font-size:11px;font-weight:700;cursor:pointer;">
         ↺ Restart</button>
     </div>`;
 
@@ -1260,9 +1273,10 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
       document.getElementById('si-fullscreen').textContent = '⛶ Exit';
     } else {
       Object.assign(panelEl.style, {
-        position: 'fixed', top: '2%', left: '50%', right: '', bottom: '',
-        width: 'min(940px,94vw)', maxHeight: '93vh',
+        position: 'fixed', top: '1%', left: '50%', right: '', bottom: '',
+        width: panelW + 'px', maxHeight: panelH + 'px',
         borderRadius: '12px', transform: 'translateX(-50%)', zIndex: '9998',
+        overflowY: 'hidden',
       });
       document.getElementById('si-fullscreen').textContent = '⛶ Fullscreen';
     }
@@ -1920,7 +1934,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('markdown', '#4caef0', this.gameEnv.gameControl);
+              openSpaceInvadersGame('frontend', '#4caef0', this.gameEnv.gameControl);
             },
           },
         ]);
@@ -1964,7 +1978,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('html', '#86efac', this.gameEnv.gameControl);
+              openSpaceInvadersGame('backend', '#86efac', this.gameEnv.gameControl);
             },
           },
         ]);
@@ -2008,7 +2022,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('github', '#c084fc', this.gameEnv.gameControl);
+              openSpaceInvadersGame('dataviz', '#c084fc', this.gameEnv.gameControl);
             },
           },
         ]);
