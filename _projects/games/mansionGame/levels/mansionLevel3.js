@@ -1,7 +1,7 @@
-import GameEnvBackground from './MansionLogic/GameEnvBackground.js';
-import Player from './MansionLogic/Player.js';
-import GameObject from './MansionLogic/GameObject.js';
-import DialogueSystem from './MansionLogic/DialogueSystem.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import MansionLevel4 from './mansionLevel4.js';
 
 console.log("🎮 mansionLevel3.js loaded!");

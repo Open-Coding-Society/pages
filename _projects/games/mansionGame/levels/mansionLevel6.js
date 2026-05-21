@@ -1,7 +1,7 @@
-import GameEnvBackground  from "./MansionLogic/GameEnvBackground.js";
-import Player from "./MansionLogic/Player.js";
-import Npc from './MansionLogic/Npc.js';
-import DialogueSystem from './MansionLogic/DialogueSystem.js';
+import GameEnvBackground from "@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js";
+import Player from "@assets/js/GameEnginev1.1/essentials/Player.js";
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import MansionLevel6_BattleRoom from './mansionLevel6_BattleRoom.js';
 
 class MansionLevel6 {
@@ -351,12 +351,16 @@ class MansionLevel6 {
                                             gameControl.currentLevel.destroy();
                                             
                                             // Force cleanup of any remaining canvases
-                                            const gameContainer = document.getElementById('gameContainer');
-                                            const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
-                                            oldCanvases.forEach(canvas => {
-                                                console.log("Removing old canvas:", canvas.id);
-                                                canvas.parentNode.removeChild(canvas);
-                                            });
+                                            const gameContainer = gameControl.gameContainer || document.getElementById('gameContainer');
+                                            if (gameContainer && gameContainer.querySelectorAll) {
+                                                const oldCanvases = gameContainer.querySelectorAll('canvas:not(#gameCanvas)');
+                                                oldCanvases.forEach(canvas => {
+                                                    console.log("Removing old canvas:", canvas.id);
+                                                    canvas.parentNode.removeChild(canvas);
+                                                });
+                                            } else {
+                                                console.warn('gameContainer not found; skipping canvas cleanup');
+                                            }
                                         }
                                         
                                         console.log("Setting up battle room level...");

@@ -1,11 +1,10 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameEnvBackground from './MansionLogic/GameEnvBackground.js';
-import Player from './MansionLogic/Player.js';
-import Enemy from './MansionLogic/Enemy.js';
-import GameControl from './GameControl.js';
-import Character from './MansionLogic/Character.js';
-import Npc from './MansionLogic/Npc.js';
-import DialogueSystem from './MansionLogic/DialogueSystem.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import Enemy from '@assets/js/GameEnginev1.1/essentials/Enemy.js';
+import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevel6 from './mansionLevel6.js';
 
 
