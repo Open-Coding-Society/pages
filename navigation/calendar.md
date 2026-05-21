@@ -842,12 +842,29 @@ active_tab: calendar
                 .catch(e => { handleFetchError(e); return []; });
         }
 
+        function normalizeIssueStatus(status) {
+            // Convert backend status formats to frontend format
+            // Backend may return: in_progress, inProgress, etc.
+            // Frontend expects: in-progress
+            if (!status) return 'open';
+            return String(status)
+                .replace(/_/g, '-')           // in_progress -> in-progress
+                .replace(/([a-z])([A-Z])/g, '$1-$2')  // inProgress -> in-Progress (then lowercase)
+                .toLowerCase();
+        }
+
         function requestIssues() {
             return fetch(`${javaURI}/api/calendar/issues`, fetchOptions)
                 .then(r => {
                     if (handleAuthError(r)) return [];
                     if (!r.ok) return [];
-                    return r.json();
+                    return r.json().then(issues => {
+                        // Normalize status values from backend to frontend format
+                        return Array.isArray(issues) ? issues.map(issue => ({
+                            ...issue,
+                            status: normalizeIssueStatus(issue.status)
+                        })) : [];
+                    });
                 })
                 .catch(e => {
                     handleFetchError(e);
