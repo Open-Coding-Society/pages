@@ -20,9 +20,9 @@ class MansionLevelMain {
     const image_src_mainworld = path + "/images/projects/mansionGame/background.jpg"; // be sure to include the path
     const image_data_mainworld = {
         name: 'mainworld',
-        greeting: "Welcome to the main lobby!",
+        greeting: "Welcome to the main world!",
         src: image_src_mainworld,
-        pixels: {height: 550, width: 1038},
+        pixels: {height: 1024, width: 559},
         mode: 'contain'
     };
 
