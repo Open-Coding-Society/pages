@@ -26,7 +26,7 @@ class CourseEnlistmentTrial {
       },
       {
         id: "CSH",
-        title: "CS Honors",
+        title: "CSH",
         summary: "Advanced honors-level computer science after CSA.",
         color: "#34d399",
       },
