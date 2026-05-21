@@ -17,7 +17,7 @@ class MansionLevelMain {
     let path = gameEnv.path;
 
     // Background data
-    const image_src_mainworld = path + "/images/projects/mansionGame/mansion_lobby.png"; // be sure to include the path
+    const image_src_mainworld = path + "/images/projects/mansionGame/background.jpg"; // be sure to include the path
     const image_data_mainworld = {
         name: 'mainworld',
         greeting: "Welcome to the main lobby!",
