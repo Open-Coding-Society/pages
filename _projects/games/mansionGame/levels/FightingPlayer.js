@@ -1,4 +1,4 @@
-import Player from '../MansionLogic/Player.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Projectile from './Projectile.js';
 
 class FightingPlayer extends Player {

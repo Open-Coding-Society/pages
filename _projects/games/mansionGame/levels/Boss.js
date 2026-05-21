@@ -1,9 +1,9 @@
-import Enemy from '../MansionLogic/Enemy.js';
+import Enemy from '@assets/js/GameEnginev1.1/essentials/Enemy.js';
 import Boomerang from './Boomerang.js';
 import Projectile from './Projectile.js';
 import Arm from './Arm.js';
 import showEndScreen from './EndScreen.js';
-import Player from '../MansionLogic/Player.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import { updateBossHealthBar } from './HealthBars.js';
 
 /*
