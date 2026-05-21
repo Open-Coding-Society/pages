@@ -1,15 +1,15 @@
-{% assign data = site.data.assignment_tracker_infograph %}
+{% assign data = site.data.slack_messaging_infograph %}
 
 <div class="dd-infograph">
   <!-- Header Section -->
   <div class="dd-header">
-    <div class="dd-badge">OCS Gradebook System</div>
+    <div class="dd-badge">OCS Messaging Platform</div>
     <h1 class="dd-title">{{ data.Title }}</h1>
     <p class="dd-description">{{ data.Description }}</p>
   </div>
 
   <!-- Feature Cards -->
-  {% for topic in data.Features %}
+  {% for topic in data.Topics %}
   <div class="dd-card">
     <div class="dd-card-grid">
 
@@ -55,7 +55,7 @@
 
         <h3 class="dd-section-title">Security</h3>
         <div class="dd-impact-list">
-          {% for item in topic.security %}
+          {% for item in topic.impact %}
           <div class="dd-impact-item">{{ item }}</div>
           {% endfor %}
         </div>

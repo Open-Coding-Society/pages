@@ -18,6 +18,7 @@ sticky_rank: 1
 
 
 <div class="capstone-action-buttons">
+ <button id="deleteCapstoneFab" class="new-capstone-fab" title="Delete capstone" aria-label="Delete capstone" style="bottom: 160px;">🗑</button>
  <button id="editCapstoneFab" class="new-capstone-fab" title="Edit capstone" aria-label="Edit capstone" style="bottom: 100px;">✎</button>
  <button id="ncFab" class="new-capstone-fab" title="Create new capstone" aria-label="Create new capstone">+</button>
 </div>
@@ -760,6 +761,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
 </div>
 
 
+<!-- Delete Capstone Modal -->
+<div id="deleteCapstoneModal" style="display:none;position:fixed;inset:0;z-index:99000;background:rgba(0,0,0,0.82);overflow-y:auto;padding:28px 14px 56px;">
+ <div class="nc-modal__panel">
+   <button id="deleteCapstoneModalClose" class="nc-modal__close" aria-label="Close modal">×</button>
+   <h2 class="nc-modal__title">Delete a Capstone Project</h2>
+   <p class="nc-modal__sub">Permanently removes the project from the database.</p>
+   <div id="deleteProjectList" style="display:flex;flex-direction:column;gap:8px;margin-top:16px;"></div>
+   <div id="deleteStatus" class="nc-status" style="margin-top:12px;"></div>
+ </div>
+</div>
+
+
 <!-- Edit Capstone Modal -->
 <div id="editCapstoneModal" style="display:none;position:fixed;inset:0;z-index:99000;background:rgba(0,0,0,0.82);overflow-y:auto;padding:28px 14px 56px;">
  <div class="nc-modal__panel">
@@ -985,6 +998,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    var course=(p.courseCode||'CSA').toUpperCase();
    var div=document.createElement('div');
    div.className='flex items-start space-x-4 p-4 border rounded-lg capstone-item relative '+course;
+   if(p.id) div.dataset.capstoneId=String(p.id);
    div.innerHTML='<a href="'+esc(href)+'">'+imgHtml+'</a><div><h3 class="text-lg font-semibold"><a href="'+esc(href)+'">'+esc(p.title)+'</a></h3><p class="text-sm text-gray-700">'+esc(p.description||'')+'</p><p class="text-xs text-gray-500 mt-2">Team: '+esc(team)+'</p></div>';
    grid.prepend(div);
    div.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -992,6 +1006,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
 
  /* ── form submit ── */
+ var JAVA_URI = window.javaURI || 'http://localhost:8585';
  document.getElementById('ncForm').addEventListener('submit', function(e){
    e.preventDefault();
    var title=this.querySelector('[name="title"]').value.trim();
@@ -1002,7 +1017,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
    var form=this;
    function finish(imgUrl){
      var p={
-       id:'local_'+Date.now(),
        title:title,
        subtitle:form.querySelector('[name="subtitle"]').value.trim(),
        description:form.querySelector('[name="description"]').value.trim(),
@@ -1017,15 +1031,32 @@ Below are the capstone infographic pages created by student groups. Click an ima
        frontendUrl:form.querySelector('[name="frontendUrl"]').value.trim(),
        imageUrl:imgUrl
      };
-     try{var all=JSON.parse(sessionStorage.getItem('ncLP')||'[]');all.push(p);sessionStorage.setItem('ncLP',JSON.stringify(all));}catch(er){}
-     injectCard(p);
-     statusEl.textContent='✓ Project added!';statusEl.className='nc-status nc-status--ok';
-     form.reset();
-     document.getElementById('ncTeamChips').innerHTML='';document.getElementById('ncTeamHidden').value='';
-     document.getElementById('ncTechChips').innerHTML='';document.getElementById('ncTechHidden').value='';
-     var prev=document.getElementById('ncImgPrev');prev.style.backgroundImage='';prev.classList.remove('nc-image-preview--loaded');
-     btn.disabled=false;btn.textContent='Create Project';
-     setTimeout(closeModal,1100);
+     fetch(JAVA_URI+'/api/capstones',{
+       method:'POST',
+       credentials:'include',
+       headers:{'Content-Type':'application/json'},
+       body:JSON.stringify(p)
+     }).then(function(res){
+       if(res.status===401||res.status===403){throw new Error('Not logged in — visit '+JAVA_URI+' and log in first.');}
+       if(!res.ok){throw new Error('Server error '+res.status);}
+       var ct=res.headers.get('content-type')||'';
+       if(!ct.includes('application/json')){throw new Error('Not logged in — visit '+JAVA_URI+' and log in first.');}
+       return res.json();
+     }).then(function(saved){
+       p.id=String(saved.id);
+       injectCard(p);
+       statusEl.textContent='✓ Saved to backend!';statusEl.className='nc-status nc-status--ok';
+       form.reset();
+       document.getElementById('ncTeamChips').innerHTML='';document.getElementById('ncTeamHidden').value='';
+       document.getElementById('ncTechChips').innerHTML='';document.getElementById('ncTechHidden').value='';
+       var prev=document.getElementById('ncImgPrev');prev.style.backgroundImage='';prev.classList.remove('nc-image-preview--loaded');
+       btn.disabled=false;btn.textContent='Create Project';
+       setTimeout(closeModal,1100);
+     }).catch(function(err){
+       statusEl.textContent='✗ '+err.message;
+       statusEl.className='nc-status nc-status--err';
+       btn.disabled=false;btn.textContent='Create Project';
+     });
    }
    var imgFile=document.getElementById('ncImage').files[0];
    if(imgFile){resizeImg(imgFile,finish);}else{finish(null);}
@@ -1175,6 +1206,65 @@ Below are the capstone infographic pages created by student groups. Click an ima
      statusEl.textContent='';statusEl.className='nc-status';
    },2000);
  });
+
+
+ // ── Delete Modal ──
+ function openDeleteModal(){
+   var modal=document.getElementById('deleteCapstoneModal');
+   modal.style.display='flex';modal.style.alignItems='flex-start';modal.style.justifyContent='center';document.body.style.overflow='hidden';
+   loadDeleteList();
+ }
+ function closeDeleteModal(){
+   document.getElementById('deleteCapstoneModal').style.display='none';
+   document.body.style.overflow='';
+ }
+ function loadDeleteList(){
+   var list=document.getElementById('deleteProjectList');
+   var statusEl=document.getElementById('deleteStatus');
+   list.innerHTML='<p style="color:#9ca3af;font-size:.85rem;">Loading…</p>';
+   statusEl.textContent='';
+   fetch(JAVA_URI+'/api/capstones',{credentials:'include'})
+     .then(function(r){
+       var ct=r.headers.get('content-type')||'';
+       if(!ct.includes('application/json')){throw new Error('Not logged in — visit '+JAVA_URI+' and log in first.');}
+       if(!r.ok){throw new Error('Server returned '+r.status);}
+       return r.json();
+     })
+     .then(function(projects){
+       if(!projects.length){list.innerHTML='<p style="color:#9ca3af;">No projects in the database.</p>';return;}
+       list.innerHTML='';
+       projects.forEach(function(p){
+         var row=document.createElement('div');
+         row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.05);border-radius:6px;gap:8px;';
+         row.innerHTML='<span style="color:#e5e7eb;font-size:.9rem;flex:1;">'+esc(p.title)+'</span>'
+           +'<button data-id="'+p.id+'" style="background:#dc2626;color:#fff;border:none;padding:5px 14px;border-radius:4px;cursor:pointer;font-size:.8rem;white-space:nowrap;">🗑 Delete</button>';
+         row.querySelector('button').addEventListener('click',function(){
+           var btn=this;
+           var id=btn.dataset.id;
+           btn.disabled=true;btn.textContent='Deleting…';
+           fetch(JAVA_URI+'/api/capstones/'+id,{method:'DELETE',credentials:'include'})
+             .then(function(r){
+               if(!r.ok)throw new Error(r.status);
+               row.remove();
+               var card=document.querySelector('[data-capstone-id="'+id+'"]');
+               if(card)card.remove();
+               statusEl.textContent='Deleted.';statusEl.className='nc-status nc-status--ok';
+             })
+             .catch(function(err){
+               btn.disabled=false;btn.textContent='🗑 Delete';
+               statusEl.textContent='Delete failed ('+err.message+')';statusEl.className='nc-status nc-status--err';
+             });
+         });
+         list.appendChild(row);
+       });
+     })
+     .catch(function(err){
+       list.innerHTML='<p style="color:#ef4444;">Could not load projects: '+err.message+'</p>';
+     });
+ }
+ document.getElementById('deleteCapstoneFab').addEventListener('click',openDeleteModal);
+ document.getElementById('deleteCapstoneModalClose').addEventListener('click',closeDeleteModal);
+ document.getElementById('deleteCapstoneModal').addEventListener('click',function(e){if(e.target===this)closeDeleteModal();});
 
 
 })();

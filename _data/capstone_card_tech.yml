@@ -5,6 +5,7 @@
 "Slack Messaging Platform":
   - "Spring Boot 3.5 / Java 21"
   - "Flask Socket.IO"
+  - "Jekyll + Static JS"
   - "Claude API (Anthropic)"
   - "Amazon S3 / Aurora"
   - "JWT Cookie Auth"
@@ -12,77 +13,89 @@
 
 "Educators":
   - "GitHub Pages"
-  - "JavaScript / React"
   - "Interactive Tutorials"
+  - "JavaScript/React"
   - "Git Workflows"
+  - "VSCode Integration"
+  - "Markdown Lessons"
   - "Progress Analytics"
+  - "Interactive Code Playgrounds"
 
 "Hunger Heroes":
   - "Python Flask Backend"
-  - "Spring Boot Java"
+  - "Spring Boot Java Backend"
   - "JavaScript Frontend"
+  - "RESTful API Design"
   - "Graph Data Structures"
-  - "PostgreSQL Database"
+  - "SQLite/PostgreSQL Database"
 
 "Quantitative Trading Bot":
   - "Python"
   - "Machine Learning"
-  - "NLP Sentiment Analysis"
+  - "NLP Sentiment"
   - "Web Scraping"
   - "SQL Database"
-  - "Backtesting Engine"
+  - "Graphs"
+  - "Backtesting"
+  - "Alpaca API (planned)"
 
 "Bud-E":
-  - "Manifest V3 Extension"
-  - "Background Service Worker"
-  - "Chrome Storage API"
-  - "Content Script Injection"
-  - "CSS Animations"
+  - "Manifest V3 Browser Extension"
+  - "Content Script for Widget Injection"
+  - "Background Service Worker for Tab Monitoring"
+  - "Chrome Storage API for Persistence"
+  - "CSS Animations for Growth/Degradation Transitions"
+  - "Cross-browser compatible (Chrome, Firefox, Edge)"
 
 "Granolaa":
-  - "Java Client (JavaCV/OpenCV)"
-  - "Node.js Backend"
-  - "MJPEG Streaming"
-  - "WebSocket Manager"
-  - "Stream Multiplexing"
+  - "Java Client (Maven, JavaCV/OpenCV)"
+  - "Node.js Backend (WebSocket Manager)"
+  - "Browser-based Web Interface"
+  - "MJPEG Streaming over HTTP"
+  - "Stream Multiplexing & Quality Adjustment"
+  - "Auto-reconnect Protocol"
 
 "Wayfinding Pages":
   - "Spring Boot Backend"
-  - "React / JavaScript"
-  - "PostgreSQL Database"
+  - "RESTful API Design"
   - "GitHub API Integration"
+  - "React/JavaScript Frontend"
+  - "PostgreSQL Database"
   - "Team Formation Algorithms"
 
 "NodCursor":
   - "React + TypeScript + Vite"
-  - "MediaPipe FaceLandmarker"
-  - "Web Worker"
-  - "Exponential Smoothing"
-  - "Gesture Dispatch Hooks"
+  - "MediaPipe Tasks Vision (FaceLandmarker)"
+  - "Web Worker (trackingWorker.ts)"
+  - "Exponential Smoothing Pipeline"
+  - "Tailwind CSS"
+  - "Gesture Dispatch (useGestureControls)"
 
 "Pirna":
   - "WebSockets (Real-Time)"
   - "Hashing & Encryption"
-  - "Graphs & Machine Learning"
-  - "Sorting Algorithms"
+  - "Trees, Graphs & Machine Learning"
+  - "Stacks, Queues & Sorting Algorithms"
   - "OOP & Design Patterns"
 
 "College Bound":
   - "Jekyll"
-  - "Spring Boot (Java)"
-  - "JavaScript"
-  - "College Scorecard API"
   - "HTML / CSS"
+  - "JavaScript"
+  - "Spring Boot (Java)"
+  - "College Scorecard API"
 
 "HawkHub":
   - "JWT Authentication"
   - "RESTful API Architecture"
+  - "Responsive UI/UX"
+  - "Sorting Feature"
   - "Club Recommendation System"
   - "Real-time Notifications"
 
 "DeFlock SD":
-  - "Flask RESTful API"
-  - "Vue.js Frontend"
+  - "Flask RESTful API (Backend)"
+  - "Jekyll (Frontend)"
   - "Geospatial Data Analysis"
   - "Path Routing Algorithms"
 
@@ -101,40 +114,49 @@
 "DSA Website Redesign":
   - "WordPress REST API"
   - "React Dashboard UI"
-  - "Fuse.js Fuzzy Search"
-  - "Push Notifications"
   - "Authentication Integration"
+  - "Calendar Widget"
+  - "Fuzzy Search (Fuse.js)"
+  - "Push Notifications"
+  - "CSS Animations"
 
 "D.A.D. Website Redesign":
   - "Wix Custom Components"
   - "CSS Grid / Flexbox"
   - "Animated Counters JS"
   - "Testimonial Carousel"
+  - "Responsive Breakpoints"
   - "SEO Optimization"
+  - "Wix Payments / PayPal"
+  - "Progress Bar Component"
 
 "RCR: Poway-Midland Railroad":
-  - "HTML / CSS / JavaScript"
-  - "YAML Data Storage"
-  - "Jekyll Liquid Templates"
-  - "360° Image Processing"
-  - "Local Storage API"
+  - "Flask / Python Backend"
+  - "SQLite Database"
+  - "REST API"
+  - "Jekyll Frontend"
+  - "Flask Reservations API"
+  - "Seat Conflict Detection"
 
 "SD Auto":
   - "Flask & Python Backend"
-  - "Scikit-learn ML Models"
+  - "TailwindCSS & JavaScript Frontend"
   - "Leaflet Interactive Maps"
+  - "Scikit-learn ML Models"
   - "SQLAlchemy & REST APIs"
   - "Pandas Data Processing"
 
 "UESL Foundation":
-  - "AI Coach Chatbot (Groq / LLaMA)"
-  - "Accessible Game Engine"
-  - "Tournament Platform"
+  - "Esports Competitions"
+  - "Multi-Location Gaming Arenas"
+  - "STEM Career Pathway Programs"
   - "Bilingual Outreach Tools"
-  - "Jekyll / Spring Boot"
+  - "Year-Round Scheduling Platform"
 
 "Oasis":
-  - "Spring Boot Backend"
-  - "JavaScript Frontend"
-  - "PostgreSQL Database"
-  - "REST APIs"
+  - "JavaScript/HTML5 Game Engine"
+  - "Web-based Platform (Browser Compatible)"
+  - "Responsive Design for Accessibility"
+  - "Database for Relationship Tracking"
+  - "Progressive Web App (PWA) Support"
+  - "User Authentication and Progress Saving"

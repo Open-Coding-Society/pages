@@ -8,4 +8,4 @@ permalink: /capstone/assignment-submission/
 sticky_rank: 1
 ---
 
-{% include assignment-tracker-infograph.html %}
+{% include slack-messaging-infograph.html %}
