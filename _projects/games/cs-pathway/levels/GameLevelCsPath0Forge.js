@@ -164,8 +164,7 @@ class GameLevelCsPath0Forge {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-fantasy.png";
-    const bg_data = {
+    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-default.png";    const bg_data = {
         name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
         src: image_src,
@@ -841,7 +840,7 @@ class GameLevelCsPath0Forge {
       }
 
       const toast = document.createElement('div');
-      toast.style.cssText = createNotificationStyle('20px', 1200);
+      toast.style.cssText = createNotificationStyle('20px', 100020);
       toast.textContent = message;
       host.appendChild(toast);
 
@@ -865,7 +864,7 @@ class GameLevelCsPath0Forge {
 
       if (!this._zoneAlertEl) {
         const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = createNotificationStyle('84px', 1201);
+        zoneAlert.style.cssText = createNotificationStyle('84px', 100010);
         document.body.appendChild(zoneAlert);
         this._zoneAlertEl = zoneAlert;
       }
@@ -1250,12 +1249,12 @@ class GameLevelCsPath0Forge {
  
       const fallbackCatalog = [
         {
-          name: 'Identity Forge',
-          src: image_src,
-          previewText: 'Default theme',
+          name: 'Default',
+          src: `${path}/images/projects/cs-pathway/bg/identity-forge-default.png`,
+          previewText: 'Unactivated world',
         },
       ];
- 
+
       try {
         const response = await fetch(`${path}/images/projects/cs-pathway/bg/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
