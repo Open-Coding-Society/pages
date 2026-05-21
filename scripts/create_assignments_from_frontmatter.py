@@ -85,6 +85,19 @@ def create_assignment(session: requests.Session, base_url: str, name: str, conte
     return resp
 
 
+def create_assignment_full(session: requests.Session, base_url: str, name: str, atype: str, description: str, points: float, dueDate: str):
+    # This calls the admin/teacher create endpoint which requires role privileges
+    payload = {
+        "name": name,
+        "type": atype,
+        "description": description,
+        "points": str(points),
+        "dueDate": dueDate,
+    }
+    resp = session.post(f"{base_url}/api/assignments/create", data=payload, timeout=30)
+    return resp
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
@@ -92,6 +105,7 @@ def main():
     parser.add_argument("--uid", default=DEFAULT_UID)
     parser.add_argument("--password", default=DEFAULT_PASSWORD)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--create", action="store_true", help="Use POST /api/assignments/create with full params from frontmatter (requires teacher/admin)")
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
@@ -125,13 +139,50 @@ def main():
     print(f"Found {len(candidates)} pages with assignment: true")
     for path, content_url, name, description in candidates:
         print(f"-> {path} -> contentUrl={content_url} name={name}")
-        if args.dry_run:
+        if args.dry_run and not args.create:
             continue
-        try:
-            resp = create_assignment(session, args.base_url, name, content_url, description)
-            print(f"  {resp.status_code} {resp.text[:200]}")
-        except Exception as e:
-            print(f"  ERROR: {e}")
+
+        if args.create:
+            # For full create, require frontmatter to contain full params
+            fm = read_frontmatter(path)
+            missing = []
+            # name already present
+            atype = None
+            if fm is not None:
+                atype = fm.get("type") or fm.get("assignment_type")
+            if not atype:
+                missing.append("type")
+            points = None
+            if fm is not None and fm.get("points") is not None:
+                try:
+                    points = float(fm.get("points"))
+                except Exception:
+                    missing.append("points (invalid number)")
+            else:
+                missing.append("points")
+            dueDate = None
+            if fm is not None:
+                dueDate = fm.get("dueDate") or fm.get("due_date") or fm.get("due")
+            if not dueDate:
+                missing.append("dueDate")
+
+            if missing:
+                print(f"  SKIP: missing frontmatter fields for full create: {', '.join(missing)}")
+                continue
+
+            try:
+                resp = create_assignment_full(session, args.base_url, name, atype, description, points, str(dueDate))
+                print(f"  {resp.status_code} {resp.text[:200]}")
+            except Exception as e:
+                print(f"  ERROR: {e}")
+        else:
+            if args.dry_run:
+                continue
+            try:
+                resp = create_assignment(session, args.base_url, name, content_url, description)
+                print(f"  {resp.status_code} {resp.text[:200]}")
+            except Exception as e:
+                print(f"  ERROR: {e}")
 
     return 0
 
