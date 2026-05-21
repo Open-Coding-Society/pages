@@ -1,6 +1,6 @@
 // Collectible.js with DialogueSystem integration
-import Character from "./Character.js";
-import DialogueSystem from "./DialogueSystem.js";
+import Character from "@assets/js/GameEnginev1.1/essentials/Character.js";
+import DialogueSystem from "@assets/js/GameEnginev1.1/essentials/DialogueSystem.js";
 
 class Collectible extends Character {
     constructor(data = null, gameEnv = null) {
