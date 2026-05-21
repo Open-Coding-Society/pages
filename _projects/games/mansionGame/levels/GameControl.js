@@ -1,5 +1,5 @@
 // GameControl.js with improved level transition handling
-import GameLevel from "./MansionLogic/GameLevel.js";
+import GameLevel from "@assets/js/GameEnginev1.1/essentials/GameLevel.js";
 import { initCheats } from "./cheats.js";
 
 class GameControl {

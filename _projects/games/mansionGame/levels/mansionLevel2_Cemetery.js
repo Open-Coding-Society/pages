@@ -1,6 +1,6 @@
-import GameEnvBackground  from "./MansionLogic/GameEnvBackground.js";
+import GameEnvBackground from "@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js";
 import MansionLevel1 from './mansionLevel1.js';
-import Npc from './MansionLogic/Npc.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 
 /**
  * Cemetery Memory Game Level
