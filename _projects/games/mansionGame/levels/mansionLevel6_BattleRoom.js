@@ -1,8 +1,8 @@
-import GameEnvBackground from "./MansionLogic/GameEnvBackground.js";
-import FightingPlayer from "./CustomGameClasses/FightingPlayer.js";
-import Boss from './CustomGameClasses/Boss.js';
-import showDeathScreen from './CustomGameClasses/DeathScreen.js';
-import { createBossHealthBar, createPlayerHealthBar, updatePlayerHealthBar } from './CustomGameClasses/HealthBars.js';
+import GameEnvBackground from "@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js";
+import FightingPlayer from "./FightingPlayer.js";
+import Boss from './Boss.js';
+import showDeathScreen from './DeathScreen.js';
+import { createBossHealthBar, createPlayerHealthBar, updatePlayerHealthBar } from './HealthBars.js';
 
 class MansionLevel6_BattleRoom {
     constructor(gameEnv) {
