@@ -1080,27 +1080,29 @@ function openDatavizPanel(gameControl) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── Space Invaders — question banks (one per terminal) ───────────────────────
+// Week 1-3 CSSE entry-level questions — Markdown, HTML basics, GitHub Pages
+// Answers are kept short (1-3 words) so they fit clearly on enemy ships
 const LESSON_QUESTIONS = {
-  frontend: [
-    { q: 'Which language gives a web page STRUCTURE?',     ans: 'HTML',                     wrong: ['CSS', 'JavaScript', 'Python'] },
-    { q: 'CSS stands for…?',                               ans: 'Cascading Style Sheets',    wrong: ['Creative Style System', 'Coded Style Syntax', 'Content Style Script'] },
-    { q: 'Which format converts plain text → HTML?',       ans: 'Markdown',                  wrong: ['TypeScript', 'Sass', 'Tailwind'] },
-    { q: 'CSS property for flexible row/column layout?',   ans: 'display: flex',             wrong: ['float: left', 'position: fixed', 'display: block'] },
-    { q: 'HTML stands for…?',                              ans: 'HyperText Markup Language', wrong: ['High Text Markup Language', 'HyperText Making Language', 'High Transfer Markup Link'] },
+  markdown: [
+    { q: 'What does  #  at the start of a line create?',      ans: 'Heading',     wrong: ['Bold text', 'A link', 'A list'] },
+    { q: 'What does  **text**  do to text?',                   ans: 'Makes it bold', wrong: ['Makes italic', 'Makes a link', 'Adds color'] },
+    { q: 'What does  -  or  *  at the start of a line make?', ans: 'List item',   wrong: ['Heading', 'Bold text', 'A link'] },
+    { q: 'What does  [text](url)  create in Markdown?',        ans: 'A link',      wrong: ['An image', 'A button', 'Bold text'] },
+    { q: 'What file extension does Markdown use?',             ans: '.md',         wrong: ['.html', '.py', '.css'] },
   ],
-  backend: [
-    { q: 'HTTP method that CREATES a new resource?',       ans: 'POST',                      wrong: ['GET', 'PUT', 'DELETE'] },
-    { q: 'HTTP method that READS data?',                   ans: 'GET',                       wrong: ['POST', 'PUT', 'PATCH'] },
-    { q: 'HTTP method that REMOVES a resource?',           ans: 'DELETE',                    wrong: ['GET', 'REMOVE', 'DROP'] },
-    { q: 'ORM stands for…?',                               ans: 'Object Relational Mapping', wrong: ['Open REST Method', 'Output Response Model', 'Object Request Manager'] },
-    { q: 'CRUD stands for…?',                              ans: 'Create Read Update Delete', wrong: ['Copy Run Undo Deploy', 'Code Route Use Debug', 'Commit Read Undo Drop'] },
+  html: [
+    { q: 'What does the  <h1>  tag create?',    ans: 'Heading',    wrong: ['Paragraph', 'A link', 'A list'] },
+    { q: 'What does the  <p>  tag create?',     ans: 'Paragraph',  wrong: ['Heading', 'An image', 'A list'] },
+    { q: 'What does  <a href="...">  create?',  ans: 'A link',     wrong: ['An image', 'A heading', 'A button'] },
+    { q: 'What does  <img src="...">  display?', ans: 'An image',  wrong: ['A video', 'A link', 'Bold text'] },
+    { q: 'What does HTML stand for?',            ans: 'HyperText Markup', wrong: ['High Text Make', 'Hyper Tool Main', 'How Tags Mark'] },
   ],
-  dataviz: [
-    { q: 'Spring annotation for a REST controller?',       ans: '@RestController',                wrong: ['@Service', '@Component', '@Repository'] },
-    { q: 'JPA annotation that marks the primary key?',     ans: '@Id',                            wrong: ['@Primary', '@Key', '@PrimaryKey'] },
-    { q: 'JPQL stands for…?',                              ans: 'Java Persistence Query Language', wrong: ['Java Primary Query Layer', 'Java Package Query Logic', 'Java Persistence Quick Layer'] },
-    { q: 'Query param to paginate API results?',           ans: 'page=1&size=4',                  wrong: ['limit=4&offset=1', 'results=4&index=1', 'count=4&start=1'] },
-    { q: 'Spring JPA method to filter by minimum size?',   ans: 'findBySizeGreaterThan',           wrong: ['findWhereSize', 'querySizeAbove', 'getSizeMore'] },
+  github: [
+    { q: 'GitHub Pages hosts your...?',              ans: 'Website',     wrong: ['Database', 'Email', 'Game server'] },
+    { q: 'What is your home page file called?',      ans: 'index.md',    wrong: ['home.html', 'main.py', 'start.md'] },
+    { q: 'A GitHub repository stores your...?',      ans: 'Code',        wrong: ['Emails', 'Photos', 'Passwords'] },
+    { q: 'Jekyll converts .md files into...?',       ans: 'HTML pages',  wrong: ['Python code', 'CSS only', 'JavaScript'] },
+    { q: '"Commit and push" means...?',              ans: 'Save & upload', wrong: ['Delete files', 'Download code', 'Run tests'] },
   ],
 };
 
@@ -1109,7 +1111,7 @@ const LESSON_QUESTIONS = {
 //           WRONG passes bottom → −75 pts, −1 life  |  CORRECT passes → +50 pts
 //           5 lives · score can go negative · hi-score per lesson in localStorage
 function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
-  const label = { frontend: 'Frontend', backend: 'Backend', dataviz: 'Dataviz' }[lessonKey];
+  const label = { markdown: 'Markdown', html: 'HTML', github: 'GitHub Pages' }[lessonKey] || lessonKey;
   const body  = createPanel(`🎮 ${label} — Space Invaders`, accentColor, gameControl);
 
   /* expand panel for the larger play area */
@@ -1122,27 +1124,33 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
 
   body.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;
-                margin-bottom:8px;font-size:12px;">
+                margin-bottom:6px;font-size:12px;">
       <span style="color:#64748b;font-size:11px;">
-        Shoot <span style="color:#f87171;font-weight:700;">WRONG</span> ·
-        Let <span style="color:#86efac;font-weight:700;">CORRECT</span> pass
+        Shoot <span style="color:#f87171;font-weight:700;">WRONG</span> answers ·
+        Let <span style="color:#86efac;font-weight:700;">CORRECT</span> pass through
       </span>
       <div style="display:flex;gap:12px;font-size:13px;font-weight:700;align-items:center;">
         <span id="si-lives"></span>
-        <span style="color:${accentColor};">Score: <span id="si-score">0</span></span>
-        <span style="color:#fbbf24;">Best: <span id="si-hi">${parseInt(localStorage.getItem(HI_KEY)) || 0}</span></span>
+        <span style="color:${accentColor};">Score: <span id="si-score">0</span></span>
+        <span style="color:#fbbf24;">Best: <span id="si-hi">${parseInt(localStorage.getItem(HI_KEY)) || 0}</span></span>
         <button id="si-fullscreen"
           style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
                  border-radius:6px;color:#94a3b8;padding:4px 10px;font-size:11px;cursor:pointer;
                  font-weight:600;">⛶ Fullscreen</button>
       </div>
     </div>
+    <div id="si-question-bar"
+      style="background:rgba(8,15,38,0.92);border:1.5px solid ${accentColor}55;border-radius:8px;
+             padding:9px 16px;margin-bottom:6px;font-size:14px;font-weight:700;
+             color:#f1f5f9;text-align:center;min-height:36px;letter-spacing:0.01em;">
+      Press SPACE or click to start
+    </div>
     <canvas id="si-canvas" width="${CW}" height="${CH}"
       style="display:block;width:100%;border-radius:10px;background:#060d1a;
              border:1px solid ${accentColor}33;cursor:default;"></canvas>
     <div style="display:flex;justify-content:space-between;align-items:center;
                 margin-top:8px;font-size:11px;color:#475569;">
-      <span>← → / A D  move  ·  SPACE  shoot</span>
+      <span>← → / A D  move  ·  SPACE  shoot</span>
       <button id="si-restart"
         style="background:${accentColor}22;border:1px solid ${accentColor}55;border-radius:6px;
                color:${accentColor};padding:4px 14px;font-size:11px;font-weight:700;cursor:pointer;">
@@ -1199,18 +1207,28 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
 
   const doShake = (i = 6) => { shake = { x: 0, y: 0, timer: i * 0.016 }; };
 
+  const updateQuestionBar = () => {
+    const bar = document.getElementById('si-question-bar');
+    if (!bar) return;
+    if (qIdx < questions.length && gameState === 'playing') {
+      const q = questions[qIdx];
+      bar.innerHTML = `<span style="color:#94a3b8;font-size:12px;font-weight:600;">Q${qIdx + 1}/${questions.length}</span>&nbsp;&nbsp;${q.q}`;
+    }
+  };
+
   const spawnWave = () => {
     const q    = questions[qIdx];
     const opts = shuffled([{ text: q.ans, correct: true }, ...q.wrong.map(w => ({ text: w, correct: false }))]);
     const colW = CW / 4;
     enemies = opts.map((opt, i) => ({
-      x: colW * i + colW / 2, y: -70 - i * 28,
-      w: colW - 18, h: 52,
+      x: colW * i + colW / 2, y: -90 - i * 36,
+      w: colW - 14, h: 64,
       text: opt.text, correct: opt.correct,
       vy: 52 + qIdx * 8,
       alive: true, passed: false,
       phase: Math.random() * Math.PI * 2,
     }));
+    updateQuestionBar();
   };
 
   const startNextWave = () => {
@@ -1353,15 +1371,24 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
             addFloater(CW / 2, CH - 70, '+50', '#86efac');
           }
           updateHUD();
-          if (lives <= 0) gameState = 'lose';
+          if (lives <= 0) {
+            gameState = 'lose';
+            const bar = document.getElementById('si-question-bar');
+            if (bar) bar.innerHTML = '<span style="color:#f87171;">Game over! Hit ↺ to try again.</span>';
+          }
         }
       });
 
       /* wave complete */
       if (enemies.length > 0 && enemies.every(e => !e.alive || e.passed)) {
         qIdx++;
-        if (qIdx >= questions.length) gameState = 'win';
-        else startNextWave();
+        if (qIdx >= questions.length) {
+          gameState = 'win';
+          const bar = document.getElementById('si-question-bar');
+          if (bar) bar.innerHTML = '<span style="color:#86efac;">All questions cleared — great job!</span>';
+        } else {
+          startNextWave();
+        }
       }
     }
 
@@ -1436,19 +1463,7 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
       ctx.fillStyle = dg; ctx.fillRect(0, CH - 100, CW, 100);
     }
 
-    /* question banner pill */
-    if (qIdx < questions.length) {
-      const q = questions[qIdx];
-      ctx.save();
-      ctx.font = 'bold 13px system-ui, sans-serif';
-      const qw = Math.min(CW - 32, ctx.measureText(q.q).width + 140);
-      ctx.fillStyle   = 'rgba(8,15,38,0.88)';
-      ctx.strokeStyle = accentColor + '55'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.roundRect((CW - qw) / 2, 7, qw, 28, 14); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = accentColor; ctx.textAlign = 'center';
-      ctx.fillText(`Q${qIdx + 1}/${questions.length}: ${q.q}`, CW / 2, 26);
-      ctx.restore();
-    }
+    /* question shown in DOM bar above canvas — no canvas drawing needed */
 
     /* ground line with gradient ends */
     const gl = ctx.createLinearGradient(0, 0, CW, 0);
@@ -1547,15 +1562,17 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
       ctx.beginPath(); ctx.arc(fx, fy - 7, 2, 0, Math.PI * 2);
       ctx.fillStyle = eyeColor; ctx.fill();
 
-      /* answer label */
-      const fs = Math.min(11.5, Math.floor(e.w / 8));
-      ctx.font  = `bold ${fs}px system-ui, sans-serif`;
-      ctx.fillStyle    = dangerPct > 0.6 ? '#fca5a5' : '#e2e8f0';
+      /* answer label — large, high-contrast, centred in body */
+      ctx.font         = 'bold 14px system-ui, sans-serif';
+      ctx.fillStyle    = dangerPct > 0.6 ? '#fca5a5' : '#ffffff';
       ctx.textAlign    = 'center';
-      ctx.textBaseline = 'bottom';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor  = dangerPct > 0.6 ? '#ef4444' : accentColor;
+      ctx.shadowBlur   = 6;
       let txt = e.text;
-      while (ctx.measureText(txt).width > e.w - 14 && txt.length > 4) txt = txt.slice(0, -2) + '…';
-      ctx.fillText(txt, e.x, e.y + e.h - 4);
+      while (ctx.measureText(txt).width > e.w - 16 && txt.length > 4) txt = txt.slice(0, -2) + '…';
+      ctx.fillText(txt, e.x, e.y + e.h * 0.72);
+      ctx.shadowBlur = 0;
 
       ctx.restore();
     });
@@ -1737,6 +1754,8 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
     toast      = { text: '', color: '#fff', alpha: 0 };
     shake      = { x: 0, y: 0, timer: 0 };
     waveBanner = { text: '', alpha: 0, timer: 0 };
+    const bar  = document.getElementById('si-question-bar');
+    if (bar) bar.innerHTML = 'Press SPACE or click to start';
     updateHUD();
   };
 
@@ -1901,7 +1920,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('frontend', '#4caef0', this.gameEnv.gameControl);
+              openSpaceInvadersGame('markdown', '#4caef0', this.gameEnv.gameControl);
             },
           },
         ]);
@@ -1945,7 +1964,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('backend', '#86efac', this.gameEnv.gameControl);
+              openSpaceInvadersGame('html', '#86efac', this.gameEnv.gameControl);
             },
           },
         ]);
@@ -1989,7 +2008,7 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('dataviz', '#c084fc', this.gameEnv.gameControl);
+              openSpaceInvadersGame('github', '#c084fc', this.gameEnv.gameControl);
             },
           },
         ]);
