@@ -164,6 +164,8 @@ active_tab: submissions
     
     let allSubmissions = [];
     let isAdmin = false;
+    let currentUserId = null;
+    let currentUsername = '';
 
     async function init() {
         try {
@@ -186,7 +188,22 @@ active_tab: submissions
             if (response.ok) {
                 const userInfo = await response.json();
                 isAdmin = userInfo.isAdmin;
+                currentUsername = userInfo.username || '';
                 console.log('User is admin:', isAdmin);
+
+                if (currentUsername) {
+                    try {
+                        const personResponse = await fetch(`${javaURI}/api/person/uid/${encodeURIComponent(currentUsername)}`, fetchOptions);
+                        if (personResponse.ok) {
+                            const person = await personResponse.json();
+                            currentUserId = person.id;
+                        } else {
+                            console.warn('Could not resolve current user id, status:', personResponse.status);
+                        }
+                    } catch (personError) {
+                        console.error('Error resolving current user id:', personError);
+                    }
+                }
                 
                 // Show admin tab only for admins
                 if (isAdmin) {
@@ -265,6 +282,15 @@ active_tab: submissions
 
     function displayUserSubmissions() {
         const container = document.getElementById('my-submissions-container');
+        const mySubmissions = allSubmissions.filter(submission => {
+            if (currentUserId !== null && submission.submitterId !== undefined && submission.submitterId !== null) {
+                return submission.submitterId === currentUserId;
+            }
+            if (currentUsername) {
+                return (submission.submitterName || '').toLowerCase() === currentUsername.toLowerCase();
+            }
+            return false;
+        });
 
         if (!allSubmissions || allSubmissions.length === 0) {
             console.log('No submissions to display');
@@ -272,7 +298,12 @@ active_tab: submissions
             return;
         }
 
-        console.log('Displaying', allSubmissions.length, 'user submissions');
+        console.log('Displaying', mySubmissions.length, 'user submissions');
+
+        if (mySubmissions.length === 0) {
+            container.innerHTML = '<div class="no-submissions">No submissions yet.</div>';
+            return;
+        }
 
         try {
             const tableHTML = `
@@ -287,7 +318,7 @@ active_tab: submissions
                         </tr>
                     </thead>
                     <tbody>
-                        ${allSubmissions.map((submission, idx) => {
+                        ${mySubmissions.map((submission, idx) => {
                             try {
                                 return `
                                     <tr>
