@@ -8,6 +8,7 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import ProfileManager from '@assets/js/projects/cs-pathway/model/ProfileManager.js';
+import LocalProfile from '@assets/js/projects/cs-pathway/model/localProfile.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import Present from './Present.js';
 import LoginManager from '@assets/js/projects/cs-pathway/model/LoginManager.js';
@@ -73,6 +74,10 @@ class GameLevelCsPath0Forge {
     this._syncCompletionPanel = GameLevelCsPathIdentity.prototype._syncCompletionPanel.bind(this);
     this.markLevelComplete = GameLevelCsPathIdentity.prototype.markLevelComplete.bind(this);
 
+    // Ensure Identity Forge uses the shared completion storage key so reads
+    // and writes are consistent with other levels.
+    this._completionStorageKey = 'cs_pathway_completion';
+
     this.present = new Present(this, {
       toastDuration: 2200,
       ignoreToasts: ['Press E to interact'],
@@ -129,8 +134,8 @@ class GameLevelCsPath0Forge {
           avatarForgeDone: identityState.avatarForgeDone,
         });
         
-        // Update the profile panel with restored data
-        this.updateProfilePanel(this.profileData);
+        // Update the profile panel with restored data (UI refresh only, no merge needed)
+        await this.updateProfilePanel({});
 
         const restoreTasks = [];
         
@@ -159,8 +164,7 @@ class GameLevelCsPath0Forge {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-fantasy.png";
-    const bg_data = {
+    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-default.png";    const bg_data = {
         name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
         src: image_src,
@@ -315,6 +319,10 @@ class GameLevelCsPath0Forge {
         }
       },
     });
+
+    /**
+     * Enlistment gatekeeper NPC. Guards the Course Enlistment station.
+     */
     const npc_data_courseEnlistmentGatekeeper = createGatekeeperData({
       id: 'CourseEnlistmentGatekeeper',
       greeting: "Welcome to Course Enlistment.\nChoose your pathway and plan your journey.",
@@ -334,6 +342,10 @@ class GameLevelCsPath0Forge {
         await level.runCourseEnlistment(false, this);
       },
     });
+
+    /**
+     * Persona Hall gatekeeper NPC.
+     */
     const npc_data_personaHallGatekeeper = createGatekeeperData({
       id: 'PersonaHallGatekeeper',
       greeting: "Welcome to Persona Hall.\nChoose the CS persona that best matches you.",
@@ -356,6 +368,10 @@ class GameLevelCsPath0Forge {
         await this.profileManager.updateProgress('personaId', result.persona);
       },
     });
+
+    /**
+     * Course Enlistment flow. Run the course enlistment wizard and persist the result.
+     */ 
     this.runCourseEnlistment = async function(showIntro = false, npc = null) {
       if (this._courseEnlistmentOpen) return;
       this._courseEnlistmentOpen = true;
@@ -402,6 +418,10 @@ class GameLevelCsPath0Forge {
         this._courseEnlistmentOpen = false;
       }
     };
+
+    /**
+     * Persona Hall flow. Run the persona selection wizard and persist the result.
+     */
     this.runPersonaHall = async function(showIntro = false, npc = null) {
       if (this._personaHallOpen) return;
       this._personaHallOpen = true;
@@ -418,16 +438,10 @@ class GameLevelCsPath0Forge {
           profileData: this.profileData || {},
     
           onComplete: async (result) => {
-            this.profileData = {
-              ...this.profileData,
+            await this.updateProfilePanel({
               persona: result.title,
               personaId: result.persona,
-            };
-    
-            await this.profileManager.updateProgress('persona', result.title);
-            await this.profileManager.updateProgress('personaId', result.persona);
-    
-            this.updateProfilePanel(this.profileData);
+            });
     
             this.showToast(`Persona selected: ${result.title}`);
     
@@ -449,7 +463,9 @@ class GameLevelCsPath0Forge {
         console.error(err);
         this._personaHallOpen = false;
       }
-    };    /**
+    };    
+    
+    /**
      * Identity terminal flow. Run the authentication and identity registration wizard.
      * @private
      */
@@ -545,19 +561,9 @@ class GameLevelCsPath0Forge {
         return null;
       }
 
-      this.profileData = {
-        ...this.profileData,
-        ...profile,
-      };
-
-      await this.profileManager.saveIdentity(profile);
-      await this.profileManager.updateIdentityProgress(true);
-
-      this.updateProfilePanel(this.profileData);
+      await this.updateProfilePanel(profile, { updateIdentityProgress: true });
       return this.profileData;
     };
-
-
 
     /**
      * Avatar gatekeeper NPC. Guards the Avatar Forge station.
@@ -796,6 +802,23 @@ class GameLevelCsPath0Forge {
 
 
     /**
+     * Create notification style. Shared styling for toast and zone alert overlays.
+     * @private
+     */
+    const createNotificationStyle = (top, zIndex) => `
+      position: fixed; top: ${top}; right: 20px;
+      z-index: ${zIndex}; pointer-events: none;
+      background: ${uiTheme.background}; 
+      border: 2px solid ${uiTheme.borderColor};
+      color: ${uiTheme.accentColor}; 
+      font-family: ${uiTheme.fontFamily || "'Courier New', monospace"}; 
+      font-size: 13px;
+      padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
+      box-shadow: ${uiTheme.boxShadow};
+      width: min(360px, 32vw); text-align: left;
+    `;
+
+    /**
      * Show toast. Display a timed status overlay at the top-right of the screen.
      */
     this.showToast = function(message) {
@@ -817,15 +840,7 @@ class GameLevelCsPath0Forge {
       }
 
       const toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed; top: 20px; right: 20px;
-        z-index: 1200; pointer-events: none;
-        background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-        color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-        padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-        box-shadow: 0 0 20px rgba(78,204,163,0.25);
-        width: min(360px, 32vw); text-align: left;
-      `;
+      toast.style.cssText = createNotificationStyle('20px', 100020);
       toast.textContent = message;
       host.appendChild(toast);
 
@@ -849,15 +864,7 @@ class GameLevelCsPath0Forge {
 
       if (!this._zoneAlertEl) {
         const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = `
-          position: fixed; top: 84px; right: 20px;
-          z-index: 1201; pointer-events: none;
-          background: rgba(13,13,26,0.95); border: 2px solid #4ecca3;
-          color: #4ecca3; font-family: 'Courier New', monospace; font-size: 13px;
-          padding: 10px 16px; border-radius: 8px; letter-spacing: 0.6px;
-          box-shadow: 0 0 20px rgba(78,204,163,0.25);
-          width: min(360px, 32vw); text-align: left;
-        `;
+        zoneAlert.style.cssText = createNotificationStyle('84px', 100010);
         document.body.appendChild(zoneAlert);
         this._zoneAlertEl = zoneAlert;
       }
@@ -1145,14 +1152,12 @@ class GameLevelCsPath0Forge {
 
           playerObj.spriteSheet.src = newSpritePath;
 
-          this.profileData = {
-            ...this.profileData,
+          // Update profile asynchronously (no await needed in Promise callback)
+          this.updateProfilePanel({
             sprite: spriteMeta.name || 'Minimalist',
             spriteSrc: newSpritePath,
             spriteMeta,
-          };
-
-          this.updateProfilePanel(this.profileData);
+          });
         };
 
         attemptApply(remainingAttempts);
@@ -1244,12 +1249,12 @@ class GameLevelCsPath0Forge {
  
       const fallbackCatalog = [
         {
-          name: 'Identity Forge',
-          src: image_src,
-          previewText: 'Default theme',
+          name: 'Default',
+          src: `${path}/images/projects/cs-pathway/bg/identity-forge-default.png`,
+          previewText: 'Unactivated world',
         },
       ];
- 
+
       try {
         const response = await fetch(`${path}/images/projects/cs-pathway/bg/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
@@ -1357,14 +1362,12 @@ class GameLevelCsPath0Forge {
           console.log('World Theme Portal: setting background src to:', newSrc);
           bgObj.image.src = newSrc;
 
-          this.profileData = {
-            ...this.profileData,
+          // Update profile asynchronously (no await needed in Promise callback)
+          this.updateProfilePanel({
             worldTheme: themeMeta.name || 'Default',
             worldThemeSrc: newSrc,
             themeMeta,
-          };
-
-          this.updateProfilePanel(this.profileData);
+          });
 
           // Clear avatar catalog cache so it reloads with theme-compatible sprites
           this.avatarCatalog = null;
@@ -1395,7 +1398,7 @@ class GameLevelCsPath0Forge {
       }
  
       // Only apply the theme after user confirms selection.
-      this.applyWorldTheme(selectedTheme);
+      await this.applyWorldTheme(selectedTheme);
  
       return {
         theme: selectedTheme.name,
@@ -1479,35 +1482,25 @@ class GameLevelCsPath0Forge {
         // Reset button (always visible)
         {
           label: '🔄 Reset Profile',
-          title: 'Clear all profile data and start fresh',
+          title: 'Clear profile data and start fresh',
           danger: true,
-          onClick: async () => {
-            const confirmed = confirm(
-              '🔄 Reset Profile?\n\n' +
-              'This will clear:\n' +
-              '• Your identity (name, email, GitHub ID)\n' +
-              '• All progress (terminals, forges, portals)\n' +
-              '• Avatar and world theme selections\n\n' +
-              'Are you sure you want to start fresh?'
-            );
-
-            if (confirmed) {
-              try {
-                await level.profileManager.clear();
-                console.log('Profile cleared successfully');
-                level.showToast('✦ Profile reset - reloading...');
-                setTimeout(() => window.location.reload(), 1000);
-              } catch (error) {
-                console.error('Failed to reset profile:', error);
-                alert('Failed to reset profile. Check console for details.');
-              }
-            }
-          }
+          onClick: () => level._showResetModal(),
         }
       ],
       theme: uiTheme,
     };
     this.profilePanelView = new StatusPanel(profilePanelConfig);
+    // Render and seed the panel immediately (mirror other levels).
+    this.profilePanelView.render();
+    this.profilePanelView.update({
+      name: this.profileData?.name || '—',
+      email: this.profileData?.email || '—',
+      githubID: this.profileData?.githubID || '—',
+      persona: this.profileData?.persona || '—',
+      sprite: this.profileData?.sprite || '—',
+      worldTheme: this.profileData?.theme || this.profileData?.worldTheme || '—',
+      ...this._getCompletionPanelValues(),
+    });
 
     /**
      * Identity form config. FormPanel config for the Identity Terminal input fields.
@@ -1532,24 +1525,59 @@ class GameLevelCsPath0Forge {
     /**
      * Update profile panel. Re-render profile panel fields with current profile data.
      */
-    this.updateProfilePanel = function(profile = {}) {
-      console.log('updateProfilePanel called with:', profile);
+    /**
+     * Update profile panel. Centralized profile update handler.
+     * Merges updates into profileData, handles persistence, and refreshes UI.
+     * @param {Object} updates - Fields to update (merged into existing profileData)
+     * @param {Object} options - Optional persistence hints
+     */
+    this.updateProfilePanel = async function(updates = {}, options = {}) {
+      console.log('updateProfilePanel called with updates:', updates);
+      console.log('Current this.profileData before merge:', this.profileData);
+      
+      // Merge updates into profile data (single source of truth)
+      this.profileData = {
+        ...this.profileData,
+        ...updates,
+      };
+      
+      console.log('this.profileData after merge:', this.profileData);
+      
+      // Handle persistence based on what fields were updated
+      if (updates.name || updates.email || updates.githubID) {
+        await this.profileManager.saveIdentity(this.profileData);
+        if (options.updateIdentityProgress) {
+          await this.profileManager.updateIdentityProgress(true);
+        }
+      }
+      
+      if (updates.persona) {
+        await this.profileManager.updateProgress('persona', updates.persona);
+      }
+      if (updates.personaId) {
+        await this.profileManager.updateProgress('personaId', updates.personaId);
+      }
+      
+      // Update UI panel with complete profile data
       this.createProfilePanel();
       window._forgePanelCleanup = () => {
         if (this.profilePanelView) {
           this.profilePanelView.destroy();
         }
       };
+      
       const panelData = {
-        name: profile.name || '—',
-        email: profile.email || '—',
-        githubID: profile.githubID || '—',
-        persona: profile.persona || '—',
-        sprite: profile.sprite || '—',
-        worldTheme: profile.theme || profile.worldTheme || '—',  // Map 'theme' to 'worldTheme'
+        name: this.profileData.name || '—',
+        email: this.profileData.email || '—',
+        githubID: this.profileData.githubID || '—',
+        persona: this.profileData.persona || '—',
+        sprite: this.profileData.sprite || '—',
+        worldTheme: this.profileData.theme || this.profileData.worldTheme || '—',
+        ...this._getCompletionPanelValues()
       };
+      
+      console.log('panelData being sent to panel.update:', panelData);
       this.profilePanelView.update(panelData);
-      this._syncCompletionPanel();
     };
 
     /**
@@ -1700,6 +1728,89 @@ class GameLevelCsPath0Forge {
 
     const nearestGatekeeper = this._findNearestGatekeeperInZone(player, this._forgeGatekeeperObjects);
     this._syncGatekeeperZoneAlert(nearestGatekeeper);
+  }
+
+  /**
+   * Show the reset profile modal with three choices:
+   *   • Clear Local Only  — wipes localStorage, preserves server data
+   *   • Clear All         — wipes localStorage + server game profile
+   *   • Cancel            — dismisses with no action
+   */
+  _showResetModal() {
+    const level = this;
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = [
+      'position:fixed', 'inset:0', 'z-index:99999',
+      'background:rgba(0,0,0,0.72)',
+      'display:flex', 'align-items:center', 'justify-content:center',
+    ].join(';');
+
+    const btnBase = [
+      'display:block', 'width:100%', 'padding:10px 0',
+      'border-radius:6px', 'border:1px solid var(--ocs-game-accent,#4ecca3)',
+      'font-family:"Courier New",monospace', 'font-size:0.92em',
+      'cursor:pointer', 'transition:opacity 0.15s',
+    ].join(';');
+
+    const box = document.createElement('div');
+    box.style.cssText = [
+      'background:var(--ocs-game-panel-bg,#0d0d1a)',
+      'border:1.5px solid var(--ocs-game-accent,#4ecca3)',
+      'padding:28px 32px', 'border-radius:10px',
+      'font-family:"Courier New",monospace',
+      'color:var(--ocs-game-text,#e0e0e0)',
+      'max-width:380px', 'width:90%', 'box-sizing:border-box',
+    ].join(';');
+
+    box.innerHTML = `
+      <div style="font-size:1.1em;font-weight:bold;margin-bottom:12px;">🔄 Reset Profile</div>
+      <div style="font-size:0.88em;line-height:1.6;margin-bottom:20px;">
+        <b>Clear Local Only</b> — removes data on this device.<br>
+        Server backup is preserved for recovery on next login.<br><br>
+        <b>Clear All</b> — removes local data <em>and</em> server data.<br>
+        This cannot be undone.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button id="ocs-reset-local"
+          style="${btnBase}background:var(--ocs-game-surface-alt,#1a1a2e);color:var(--ocs-game-text,#e0e0e0);">
+          Clear Local Only
+        </button>
+        <button id="ocs-reset-all"
+          style="${btnBase}background:#3d0000;color:#ff6b6b;border-color:#ff6b6b;">
+          Clear All (Local + Server)
+        </button>
+        <button id="ocs-reset-cancel"
+          style="${btnBase}background:transparent;color:var(--ocs-game-text,#aaa);border-color:#444;">
+          Cancel
+        </button>
+      </div>`;
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    box.querySelector('#ocs-reset-local').onclick = () => {
+      overlay.remove();
+      LocalProfile.clearAll();
+      GameLevelCsPathIdentity.clearSharedState();
+      level.showToast('✦ Local profile cleared — reloading...');
+      setTimeout(() => window.location.reload(), 1000);
+    };
+
+    box.querySelector('#ocs-reset-all').onclick = async () => {
+      overlay.remove();
+      try {
+        await level.profileManager.clear(); // clears local + backend + dispatches ocs:profile-cleared
+        level.showToast('✦ Full profile reset — reloading...');
+      } catch (err) {
+        console.error('ProfileManager: full clear failed', err);
+        level.showToast('Reset failed — check console.');
+        return;
+      }
+      setTimeout(() => window.location.reload(), 1000);
+    };
+
+    box.querySelector('#ocs-reset-cancel').onclick = () => overlay.remove();
   }
 
   /**

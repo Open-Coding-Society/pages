@@ -19,7 +19,12 @@ games/enemy-death
 games/escape-the-tower
 games/pirate-hunt
 games/gamify
+games/mansionGame:dev
 games/local-storage
+games/kirby-minigames
+main
+games/multiplayer
+games/ocean-adventure:dev
 games/tag-game-multiplayer
 games/ocean
 games/peppa-pig
@@ -27,8 +32,11 @@ games/platformer
 games/red-riding
 games/teamtestgame
 games/transitions
+games/nod-game
 games/gategame
 games/heist-exe
+games/castle-game
+games/astronaut-platformer-game
 
 # Lessons
 lessons/game-lessons
@@ -38,5 +46,8 @@ lessons/robot-logic-game
 # Systems
 systems/test-project
 systems/student-management-groups
+systems/ai-ab-engine
+systems/auto-generator
+systems/auto-generator-ui
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===

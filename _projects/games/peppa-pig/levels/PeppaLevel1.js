@@ -8,7 +8,7 @@ class PeppaLevel1 extends PeppaBattleLevelBase {
 			levelIntro: 'Ishan Jha enters the fighting ring for round one against George Pig.',
 			enemyName: 'George Pig',
 			enemyGreeting: 'Dinosaur roar! George Pig is ready to fight!',
-			enemyImage: 'georgiepig.png',
+			enemyImage: 'georgie-pig.png',
 			enemyHealth: 5,
 			enemySpeed: 1.0,
 			enemyScale: 4,

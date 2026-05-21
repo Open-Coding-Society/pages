@@ -38,6 +38,29 @@ class FriendlyNpc extends Npc {
         return this._alertDistancePx ?? this.interactDistance * 1.5;
     }
 
+    _resolveClickDistance() {
+        // Use the same interaction distance as E-key so clicks work at matching range
+        return this.interactDistance || 120;
+    }
+
+    _getPlayerForInteraction() {
+        return this.gameEnv?.gameObjects?.find(
+            obj => obj && obj.constructor && obj.constructor.name === "Player"
+        ) || null;
+    }
+
+    _isPlayerCloseEnoughToClick(player) {
+        if (!player) return false;
+
+        const npcCx = (this.position?.x || 0) + (this.width || 0) / 2;
+        const npcCy = (this.position?.y || 0) + (this.height || 0) / 2;
+        const plrCx = (player.position?.x || 0) + (player.width || 0) / 2;
+        const plrCy = (player.position?.y || 0) + (player.height || 0) / 2;
+        const distance = Math.hypot(plrCx - npcCx, plrCy - npcCy);
+
+        return distance <= this._resolveClickDistance();
+    }
+
     update() {
         super.update(); // handles patrol, draw, base key listeners
 
@@ -114,6 +137,11 @@ class FriendlyNpc extends Npc {
 
     handleClick(event) {
         if (typeof this.interact !== 'function') return;
+
+        const player = this._getPlayerForInteraction();
+        if (!this._isPlayerCloseEnoughToClick(player)) {
+            return;
+        }
 
         this.clicks += 1;
         this.interact(this.clicks, this.spriteData?.id || this.uniqueId || 'unknown', this, event);

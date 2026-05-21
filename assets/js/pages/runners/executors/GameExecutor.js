@@ -349,6 +349,39 @@ export class GameExecutor {
     }
   }
 
+  _resizeGameForViewport(gameOutput, viewportHeight) {
+    const currentLevel = this.gameControl?.currentLevel;
+    const gameEnv = currentLevel?.gameEnv || this.gameControl?.gameEnv;
+    const canvas = gameEnv?.canvas;
+
+    if (!gameEnv || !canvas) {
+      return;
+    }
+
+    const resolvedWidth = gameOutput?.parentElement?.clientWidth || gameOutput?.clientWidth || window.innerWidth;
+    const resolvedHeight = Math.max(1, viewportHeight);
+
+    if (this.gameCore?.environment) {
+      this.gameCore.environment.innerWidth = resolvedWidth;
+      this.gameCore.environment.innerHeight = resolvedHeight;
+    }
+
+    gameEnv.innerWidth = resolvedWidth;
+    gameEnv.innerHeight = resolvedHeight;
+    gameEnv.size();
+
+    const gameObjects = Array.isArray(gameEnv.gameObjects) ? gameEnv.gameObjects : [];
+    for (const gameObject of gameObjects) {
+      if (gameObject && typeof gameObject.resize === 'function') {
+        try {
+          gameObject.resize();
+        } catch (error) {
+          console.warn('Failed to resize game object for fullscreen:', error);
+        }
+      }
+    }
+  }
+
   toggleFullscreen() {
     if (!this.getGameOutput) return;
 
@@ -365,10 +398,14 @@ export class GameExecutor {
       // Create fullscreen overlay
       this.fullscreenOverlay = document.createElement('div');
       this.fullscreenOverlay.className = 'game-fullscreen-overlay';
+      this.fullscreenOverlay.style.zIndex = '9999';
 
       // Create collapsible control panel header
       const controlHeader = document.createElement('div');
       controlHeader.className = 'fullscreen-control-header';
+      controlHeader.style.position = 'relative';
+      controlHeader.style.zIndex = '2';
+      controlHeader.style.flexShrink = '0';
 
       // Add collapse toggle button
       const collapseBtn = document.createElement('button');
@@ -378,6 +415,7 @@ export class GameExecutor {
 
       const controlsContainer = document.createElement('div');
       controlsContainer.className = 'fullscreen-controls-container';
+      controlsContainer.style.flexWrap = 'wrap';
 
       // Clone control buttons
       const clonedRunBtn = this.runBtn ? this.runBtn.cloneNode(true) : null;
@@ -452,6 +490,11 @@ export class GameExecutor {
       // Assemble fullscreen overlay
       this.fullscreenOverlay.appendChild(controlHeader);
       this.fullscreenOverlay.appendChild(gameOutput);
+      gameOutput.style.position = 'relative';
+      gameOutput.style.flex = '1 1 auto';
+      gameOutput.style.minHeight = '0';
+      gameOutput.style.width = '100%';
+      gameOutput.style.zIndex = '1';
       document.body.appendChild(this.fullscreenOverlay);
 
       // Update canvas height to account for control header
@@ -467,8 +510,8 @@ export class GameExecutor {
 
       this.isFullscreen = true;
 
-      // Restart game with new dimensions
-      this.run();
+      // Resize the active level in place so fullscreen does not replay startup dialogue.
+      this._resizeGameForViewport(gameOutput, viewportHeight);
 
       // Handle ESC key to exit fullscreen
       this.escapeHandler = (e) => {
@@ -511,8 +554,8 @@ export class GameExecutor {
         this.escapeHandler = null;
       }
 
-      // Restart game with original dimensions
-      this.run();
+      // Restore the active level size without reinitializing the level.
+      this._resizeGameForViewport(gameOutput, this.originalGameOutput?.height || this.configuredCanvasHeight);
     }
   }
 }
