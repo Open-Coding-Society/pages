@@ -149,19 +149,35 @@ class PersonaHallTrial {
         button.style.boxShadow = "none";
       };
 
-      button.onclick = () => this.selectPersona(persona);
+      // Save persona immediately on card click, then show confirmation
+      button.onclick = async () => {
+        const payload = {
+          persona: persona.id,
+          title: persona.title,
+          summary: persona.summary,
+          image: persona.img,
+        };
+
+        // Disable all cards to prevent double-clicks while saving
+        options.querySelectorAll('button').forEach(b => b.disabled = true);
+
+        await this.onComplete?.(payload);
+
+        this.showConfirmation(persona, payload);
+      };
+
       options.appendChild(button);
     });
 
     this.overlay.querySelector("#persona-close").onclick = () => this.close();
   }
 
-  selectPersona(persona) {
+  showConfirmation(persona, payload) {
     const container = this.overlay.querySelector("#persona-container");
 
     container.innerHTML = `
-      <h2 style="margin:0 0 8px; color:#4ecca3; text-align:center;">Persona Selected</h2>
-      <p style="text-align:center; margin:0 0 20px; color:#a0aec0;">You have chosen your path.</p>
+      <h2 style="margin:0 0 8px; color:#4ecca3; text-align:center;">Persona Saved</h2>
+      <p style="text-align:center; margin:0 0 20px; color:#a0aec0;">Your persona has been updated.</p>
 
       <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
         <img src="${persona.img}" alt="${persona.title}" style="
@@ -209,25 +225,16 @@ class PersonaHallTrial {
       </div>
     `;
 
-    const payload = {
-      persona: persona.id,
-      title: persona.title,
-      summary: persona.summary,
-      image: persona.img,
-    };
-
     const teleportBtn = container.querySelector("#btn-teleport");
     if (teleportBtn) {
       teleportBtn.onclick = () => {
         this.close();
-        this.onComplete?.(payload);
         this.onTeleport?.(payload);
       };
     }
 
     container.querySelector("#btn-stay").onclick = () => {
       this.close();
-      this.onComplete?.(payload);
     };
   }
 

@@ -349,6 +349,17 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
   // ── Initialize ───────────────────────────────────────────────
   initialize() {
     this._syncLevelDropdown();
+
+    // Refresh panel with restored profile data (e.g. persona saved in Identity Forge)
+    if (this.profileData) {
+      this.profilePanelView?.update?.({
+        persona: this.profileData.persona || '—',
+        course: this.profileData.course || '—',
+        skill: this.profileData.skill || '—',
+        ...this._getCompletionPanelValues(),
+      });
+    }
+
     if (typeof super.initialize === 'function') super.initialize();
   }
 

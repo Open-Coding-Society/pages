@@ -365,8 +365,6 @@ class GameLevelCsPath0Forge {
           'Choose the CS persona that best matches how you work.'
         ]);
         await level.runPersonaHall(false, this);
-        await this.profileManager.updateProgress('persona', result.title);
-        await this.profileManager.updateProgress('personaId', result.persona);
       },
     });
 
@@ -481,6 +479,7 @@ class GameLevelCsPath0Forge {
         this._personaHallOpen = false;
       }
     };
+
     /**
      * Identity terminal flow. Run the authentication and identity registration wizard.
      * @private
