@@ -81,6 +81,9 @@ Check if this is a course lesson and determine which course context to use
 
           {% if page.assignment %}
           {% include lesson-submission-form.html %}
+          <p style="margin-top: 12px; color: #9ca3af; font-size: 0.95rem;">
+            Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #60a5fa; text-decoration: underline;">submissions dashboard</a>.
+          </p>
           {% endif %}
 
           {% if page.chat %}
@@ -141,7 +144,7 @@ Check if this is a course lesson and determine which course context to use
   const STATUS_AUTO_HIDE_MS = 5000;
   const FILE_SIZE_LIMIT_MB = 10;
   const ASSIGNMENT_ID = {{ page.assignment_id | default: 'null' }};
-  const ASSIGNMENT_NAME = {{ page.assignment_name | default: 'null' | jsonify }};
+  const ASSIGNMENT_NAME = {{ page.assignment_name | default: nil | jsonify }};
 
   /**
    * ============================================
@@ -486,7 +489,10 @@ Check if this is a course lesson and determine which course context to use
   }
 
   async function resolveAssignmentName() {
-    if (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) return ASSIGNMENT_NAME;
+    if (typeof ASSIGNMENT_NAME === 'string') {
+      const normalized = ASSIGNMENT_NAME.trim().toLowerCase();
+      if (normalized && normalized !== 'null' && normalized !== 'undefined') return ASSIGNMENT_NAME;
+    }
     const res = await fetch(`${javaURI}/api/assignments/${ASSIGNMENT_ID}`, fetchOptions);
     if (!res.ok) throw new Error('Assignment not found on server.');
     return await res.text();
@@ -529,6 +535,7 @@ Check if this is a course lesson and determine which course context to use
       const content = { type: 'file', filename: file.name, notes: notes || '' };
       const fd = new FormData();
       fd.append('assignmentName', assignmentName);
+      fd.append('assignmentId', String(ASSIGNMENT_ID));
       fd.append('userId', personId);
       fd.append('username', uid);
       fd.append('file', file);
@@ -1290,10 +1297,13 @@ Check if this is a course lesson and determine which course context to use
 
       <div class="submission-status" id="submission-status-blog"></div>
     </div>
+    <p style="margin-top: 12px; color: #6b7280; font-size: 0.95rem;">
+      Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #2563eb; text-decoration: underline;">submissions dashboard</a>.
+    </p>
 
     <script>
       const ASSIGNMENT_ID = {{ page.assignment_id | default: 'null' }};
-      const ASSIGNMENT_NAME = {{ page.assignment_name | default: 'null' | jsonify }};
+      const ASSIGNMENT_NAME = {{ page.assignment_name | default: nil | jsonify }};
 
       // Submission type switching
       function switchSubmissionType(type) {
@@ -1463,7 +1473,13 @@ Check if this is a course lesson and determine which course context to use
         try {
           const { uid, personId } = await resolveCurrentUserBlog();
           // Resolve assignment name for the file upload endpoint
-          let assignmentName = (typeof ASSIGNMENT_NAME === 'string' && ASSIGNMENT_NAME) ? ASSIGNMENT_NAME : null;
+          let assignmentName = null;
+          if (typeof ASSIGNMENT_NAME === 'string') {
+            const normalized = ASSIGNMENT_NAME.trim().toLowerCase();
+            if (normalized && normalized !== 'null' && normalized !== 'undefined') {
+              assignmentName = ASSIGNMENT_NAME;
+            }
+          }
           if (!assignmentName) {
             const nameRes = await fetch(`${javaURI}/api/assignments/${ASSIGNMENT_ID}`, { ...fetchOptions });
             if (!nameRes.ok) throw new Error('Assignment not found on server.');
@@ -1474,6 +1490,7 @@ Check if this is a course lesson and determine which course context to use
             const content = { type: 'file', filename: file.name, notes: notes || '' };
             const fd = new FormData();
             fd.append('assignmentName', assignmentName);
+            fd.append('assignmentId', String(ASSIGNMENT_ID));
             fd.append('userId', personId);
             fd.append('username', uid);
             fd.append('file', file);
