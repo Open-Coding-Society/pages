@@ -39,11 +39,11 @@ permalink: /gamify/fortuneFindersv1-1
     (async () => {
         try {
             const [{ default: FinTech }, { default: GameLevelAirport }, { default: GameLevelFuturesExchange }, { default: GameLevelOptionsHub }, { default: GameLevelWallstreet }, config] = await Promise.all([
-                import("{{site.baseurl}}/assets/js/GameEnginev1.1/FinTech.js"),
-                import("{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelAirport.js"),
-                import("{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelFuturesExchange.js"),
-                import("{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelOptionsHub.js"),
-                import("{{site.baseurl}}/assets/js/GameEnginev1.1/GameLevelWallstreet.js"),
+                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/FinTech.js"),
+                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelAirport.js"),
+                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelFuturesExchange.js"),
+                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelOptionsHub.js"),
+                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelWallstreet.js"),
                 import("{{site.baseurl}}/assets/js/api/config.js"),
             ]);
 
