@@ -52,7 +52,7 @@ class GameLevelMummy1 {
     // Player configuration data (Mort or default explorer sprite)
     const sprite_data_player = {
       id: 'player', 
-      src: gameEnv.path + "/images/projects/mummy/explorer.png", // Replace with your main player character path
+      src: gameEnv.path + "/images/projects/mummy/spookMcWalk.png", // Replace with your main player character path
       SCALE_FACTOR: 5, STEP_FACTOR: 1000, ANIMATION_RATE: 50,
       INIT_POSITION: { x: 50, y: height - 150 },
       pixels: { height: 192, width: 144 }, orientation: { rows: 4, columns: 3 },
