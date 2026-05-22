@@ -51,16 +51,16 @@ class MansionLevelMain {
       keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
     };
 
-    // Template object for door data
-    const sprite_src_level_door = path + "/images/projects/mansionGame/lineDoorCollisionSprite.png";
+    // Template object for base door data
+    const sprite_src_level_door = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
     const sprite_data_leveldoor = {
       SCALE_FACTOR: 6,
       ANIMATION_RATE: 100,
       src: sprite_src_level_door,
       greeting: "Would you like to enter through this door? Press E to enter.",
-      pixels: { width: 256, height: 256 },
+      pixels: { width: 70, height: 90 },
       orientation: { rows: 1, columns: 1 },
-      down: { row: 0, start: 0, columns: 1, rotate: Math.PI / 3 },
+      down: { row: 0, start: 0, columns: 1},
       hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
       dialogues: [
         "I am a door. Press E to enter."
@@ -103,7 +103,7 @@ class MansionLevelMain {
       id: 'Level1Door',
       greeting: sprite_greet_level1door,
       level: GameLevel1,
-      INIT_POSITION: { x: (width * 0.58), y: (height * 0.8) },
+      INIT_POSITION: { x: (width * 0.1), y: (height * 0.65) },
       dialogues: [
         "Level 1 awaits. Do you wish to enter?"
       ]
@@ -116,7 +116,7 @@ class MansionLevelMain {
       id: 'Level2Door',
       greeting: sprite_greet_level2door,
       level: GameLevel2,
-      INIT_POSITION: { x: (width * 0.635), y: (height * 0.62) },
+      INIT_POSITION: { x: (width * 0.27), y: (height * 0.34) },
       dialogues: [
         "Level 2 awaits. Do you wish to enter?"
       ]
@@ -129,8 +129,7 @@ class MansionLevelMain {
       id: 'Level3Door',
       greeting: sprite_greet_level3door,
       level: GameLevel3,
-      INIT_POSITION: { x: (width * 0.61), y: (height * 0.41) },
-      down: { row: 0, start: 0, columns: 1, rotate: -Math.PI / 3 },
+      INIT_POSITION: { x: (width * 0.87), y: (height * 0.61) },
       dialogues: [
         "Level 3 awaits. Do you wish to enter?"
       ]
@@ -143,8 +142,7 @@ class MansionLevelMain {
       id: 'Level4Door',
       greeting: sprite_greet_level4door,
       level: GameLevel4,
-      INIT_POSITION: { x: (width * 0.35), y: (height * 0.62) },
-      down: { row: 0, start: 0, columns: 1 },
+      INIT_POSITION: { x: (width * 0.77), y: (height * 0.47) },
       dialogues: [
         "Level 4 awaits. Do you wish to enter?"
       ]
@@ -157,8 +155,7 @@ class MansionLevelMain {
       id: 'Level5Door',
       greeting: sprite_greet_level5door,
       level: GameLevel5,
-      INIT_POSITION: { x: (width * 0.35), y: (height * 0.53) },
-      down: { row: 0, start: 0, columns: 1, rotate: Math.PI / 3 },
+      INIT_POSITION: { x: (width * 0.69), y: (height * 0.32) },
       dialogues: [
         "Level 5 awaits. Do you wish to enter?"
       ]
@@ -171,8 +168,7 @@ class MansionLevelMain {
       id: 'Level6Door',
       greeting: sprite_greet_level6door,
       level: GameLevel6,
-      INIT_POSITION: { x: (width * 0.46), y: (height * 0.42) },
-      down: { row: 0, start: 0, columns: 1, rotate: Math.PI / 2 },
+      INIT_POSITION: { x: (width * 0.43), y: (height * 0.28) },
       dialogues: [
         "Level 6 awaits. Do you wish to enter?"
       ]
