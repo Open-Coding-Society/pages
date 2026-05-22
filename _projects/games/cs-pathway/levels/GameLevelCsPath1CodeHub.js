@@ -1084,25 +1084,25 @@ function openDatavizPanel(gameControl) {
 // Answers are short (1-4 words) so they fit clearly on enemy ships
 const LESSON_QUESTIONS = {
   frontend: [
-    { q: 'Which tag creates the biggest heading?',   ans: '<h1>',        wrong: ['<p>', '<div>', '<head>'] },
-    { q: 'What does CSS stand for?',                 ans: 'Cascading Style', wrong: ['Computer Style', 'Creative Script', 'Coded Styling'] },
-    { q: 'HTML is used to add __ to a webpage.',    ans: 'structure',    wrong: ['color', 'animation', 'data'] },
-    { q: 'Which tag creates a paragraph?',           ans: '<p>',          wrong: ['<text>', '<div>', '<span>'] },
-    { q: 'Where does CSS usually go in HTML?',      ans: '<head>',       wrong: ['<body>', '<footer>', '<html>'] },
+    { q: 'In Markdown, `**text**` makes text ___.', ans: 'bold',        wrong: ['italic', 'code', 'big'] },
+    { q: 'In Markdown, `*text*` makes text ___.',   ans: 'italic',      wrong: ['bold', 'code', 'linked'] },
+    { q: 'In Markdown, `- item` creates a ___.',    ans: 'list',        wrong: ['heading', 'blockquote', 'link'] },
+    { q: 'In Markdown, `> text` creates a ___.',    ans: 'blockquote',  wrong: ['list', 'heading', 'link'] },
+    { q: 'CSS `display:flex` is called ___.',        ans: 'Flexbox',     wrong: ['Grid', 'Float', 'Block'] },
   ],
   backend: [
-    { q: 'A server SENDS data to a ___.',            ans: 'client',       wrong: ['database', 'router', 'cable'] },
-    { q: 'What does a URL stand for?',               ans: 'web address',  wrong: ['user link', 'upload route', 'unit request'] },
-    { q: 'HTTP is used to ___ data on the web.',    ans: 'transfer',     wrong: ['delete', 'store', 'encrypt'] },
-    { q: 'A backend sends back a ___.',              ans: 'response',     wrong: ['render', 'request', 'react'] },
-    { q: 'Data sent to a server is called a ___.',  ans: 'request',      wrong: ['response', 'render', 'route'] },
+    { q: 'POST is used to ___ a resource.',          ans: 'create',      wrong: ['read', 'update', 'delete'] },
+    { q: 'GET is used to ___ data.',                 ans: 'read',        wrong: ['create', 'update', 'delete'] },
+    { q: 'PUT is used to ___ a resource.',           ans: 'update',      wrong: ['create', 'read', 'delete'] },
+    { q: 'DELETE is used to ___ data.',              ans: 'remove',      wrong: ['create', 'read', 'update'] },
+    { q: 'To fetch all records, use ___.',           ans: 'GET',         wrong: ['POST', 'PUT', 'DELETE'] },
   ],
   dataviz: [
-    { q: 'Charts and graphs show ___.',              ans: 'data',         wrong: ['code', 'styles', 'routes'] },
-    { q: 'A bar chart compares things using ___.',  ans: 'bars',         wrong: ['dots', 'lines', 'boxes'] },
-    { q: 'A pie chart shows parts of a ___.',       ans: 'whole',        wrong: ['list', 'loop', 'table'] },
-    { q: 'What library is used for JS charts?',     ans: 'Chart.js',     wrong: ['React', 'Bootstrap', 'Node.js'] },
-    { q: 'A line chart is best for showing ___.',   ans: 'trends',       wrong: ['totals', 'colors', 'sizes'] },
+    { q: '?industry=Software ___ by industry.',      ans: 'filters',     wrong: ['sorts', 'pages', 'deletes'] },
+    { q: '?minSize=100 finds companies ___ 100.',    ans: 'over',        wrong: ['under', 'exactly', 'without'] },
+    { q: '?page=1&size=4 is called ___.',            ans: 'pagination',  wrong: ['filtering', 'sorting', 'routing'] },
+    { q: 'JPQL queries begin with ___.',             ans: 'SELECT',      wrong: ['FIND', 'GET', 'FETCH'] },
+    { q: 'WHERE in JPQL is used to ___ results.',   ans: 'filter',      wrong: ['sort', 'count', 'group'] },
   ],
 };
 
