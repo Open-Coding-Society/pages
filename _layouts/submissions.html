@@ -74,6 +74,69 @@ active_tab: submissions
     </div>
 </div>
 
+<div id="submission-edit-modal" class="edit-modal hidden" aria-hidden="true">
+    <div class="edit-modal-backdrop" data-close-edit-modal></div>
+    <div class="edit-modal-panel" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+        <div class="edit-modal-header">
+            <div>
+                <p class="edit-modal-kicker">Edit submission</p>
+                <h3 id="edit-modal-title">Update your submission</h3>
+                <p id="edit-modal-subtitle" class="edit-modal-subtitle"></p>
+            </div>
+            <button type="button" class="edit-modal-close" data-close-edit-modal aria-label="Close edit dialog">&times;</button>
+        </div>
+
+        <form id="submission-edit-form">
+            <input type="hidden" id="edit-submission-id">
+            <input type="hidden" id="edit-content-type">
+
+            <div class="edit-modal-grid">
+                <div class="edit-readonly-field">
+                    <span class="edit-field-label">Assignment</span>
+                    <div id="edit-assignment-name" class="edit-field-value"></div>
+                </div>
+                <div class="edit-readonly-field">
+                    <span class="edit-field-label">Submission type</span>
+                    <div id="edit-submission-type" class="edit-field-value"></div>
+                </div>
+                <label class="edit-checkbox-row">
+                    <input type="checkbox" id="edit-is-late">
+                    <span>Mark as late</span>
+                </label>
+            </div>
+
+            <div id="edit-link-fields" class="edit-section">
+                <label class="edit-field-label" for="edit-url">Submission URL</label>
+                <input type="url" id="edit-url" class="edit-input" placeholder="https://...">
+            </div>
+
+            <div id="edit-file-fields" class="edit-section hidden">
+                <div class="edit-current-file" id="edit-current-file"></div>
+                <label class="edit-field-label" for="edit-file">Replace file</label>
+                <input type="file" id="edit-file" class="edit-input">
+            </div>
+
+            <div class="edit-section">
+                <label class="edit-field-label" for="edit-notes">Submission notes</label>
+                <textarea id="edit-notes" class="edit-textarea" rows="4" placeholder="Add or update the notes shown with the submission"></textarea>
+            </div>
+
+            <div class="edit-section">
+                <label class="edit-field-label" for="edit-comment">Comment</label>
+                <textarea id="edit-comment" class="edit-textarea" rows="4" placeholder="Add or update the submission comment"></textarea>
+            </div>
+
+            <div id="edit-modal-status" class="edit-modal-status" aria-live="polite"></div>
+
+            <div class="edit-modal-actions">
+                <button type="button" class="edit-secondary-btn" data-close-edit-modal>Cancel</button>
+                <button type="submit" class="edit-primary-btn">Save changes</button>
+            </div>
+            <p class="edit-modal-note">Saving clears the current grade and feedback so the updated submission can be reviewed again.</p>
+        </form>
+    </div>
+</div>
+
 <style>
     .submissions-table {
         width: 100%;
@@ -154,6 +217,245 @@ active_tab: submissions
         border-radius: 6px;
         margin: 20px 0;
     }
+
+    .submission-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .submission-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 1px solid rgb(59, 130, 246);
+        border-radius: 8px;
+        background: rgba(37, 99, 235, 0.14);
+        color: rgb(191, 219, 254);
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .submission-action-btn:hover {
+        background: rgba(37, 99, 235, 0.26);
+        transform: translateY(-1px);
+    }
+
+    .edit-modal.hidden {
+        display: none;
+    }
+
+    .edit-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .edit-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(3, 7, 18, 0.72);
+        backdrop-filter: blur(8px);
+    }
+
+    .edit-modal-panel {
+        position: relative;
+        width: min(720px, 100%);
+        max-height: calc(100vh - 48px);
+        overflow: auto;
+        background: rgb(17, 24, 39);
+        border: 1px solid rgb(55, 65, 81);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    .edit-modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .edit-modal-kicker {
+        margin: 0 0 6px 0;
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgb(96, 165, 250);
+    }
+
+    .edit-modal-header h3,
+    .edit-modal-header h4 {
+        margin: 0;
+        color: rgb(243, 244, 246);
+    }
+
+    .edit-modal-subtitle {
+        margin: 6px 0 0 0;
+        color: rgb(156, 163, 175);
+        font-size: 0.95rem;
+    }
+
+    .edit-modal-close {
+        border: none;
+        background: transparent;
+        color: rgb(209, 213, 219);
+        font-size: 2rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .edit-modal-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-bottom: 16px;
+    }
+
+    .edit-readonly-field,
+    .edit-section {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .edit-field-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: rgb(191, 219, 254);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .edit-field-value {
+        color: rgb(243, 244, 246);
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .edit-checkbox-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: rgb(229, 231, 235);
+        font-weight: 600;
+        margin-top: 24px;
+    }
+
+    .edit-input,
+    .edit-textarea {
+        width: 100%;
+        border: 1px solid rgb(75, 85, 99);
+        border-radius: 12px;
+        background: rgb(31, 41, 55);
+        color: rgb(243, 244, 246);
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        font-family: inherit;
+    }
+
+    .edit-input:focus,
+    .edit-textarea:focus {
+        outline: none;
+        border-color: rgb(96, 165, 250);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    .edit-textarea {
+        resize: vertical;
+        min-height: 112px;
+    }
+
+    .edit-current-file {
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgb(15, 23, 42);
+        border: 1px solid rgb(51, 65, 85);
+        color: rgb(226, 232, 240);
+        font-size: 0.92rem;
+    }
+
+    .edit-modal-status {
+        min-height: 24px;
+        margin-top: 12px;
+        color: rgb(252, 211, 77);
+        font-size: 0.95rem;
+    }
+
+    .edit-modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .edit-secondary-btn,
+    .edit-primary-btn {
+        padding: 10px 16px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .edit-secondary-btn {
+        background: transparent;
+        border-color: rgb(75, 85, 99);
+        color: rgb(229, 231, 235);
+    }
+
+    .edit-primary-btn {
+        background: rgb(37, 99, 235);
+        color: white;
+    }
+
+    .edit-secondary-btn:hover,
+    .edit-primary-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .edit-modal-note {
+        margin: 12px 0 0 0;
+        color: rgb(156, 163, 175);
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+        .edit-modal {
+            padding: 12px;
+        }
+
+        .edit-modal-panel {
+            padding: 18px;
+            border-radius: 16px;
+        }
+
+        .edit-modal-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .edit-modal-actions {
+            flex-direction: column-reverse;
+        }
+
+        .edit-secondary-btn,
+        .edit-primary-btn {
+            width: 100%;
+        }
+    }
 </style>
 
 <script type="module">
@@ -164,6 +466,9 @@ active_tab: submissions
     
     let allSubmissions = [];
     let isAdmin = false;
+    let currentUserId = null;
+    let currentUsername = '';
+    let activeEditSubmissionId = null;
 
     async function init() {
         try {
@@ -171,6 +476,7 @@ active_tab: submissions
             await loadSubmissions();
             setupTabSwitcher();
             setupFilters();
+            setupEditModal();
             hideLoadingSpinners();
         } catch (error) {
             console.error('Error initializing submissions:', error);
@@ -186,7 +492,22 @@ active_tab: submissions
             if (response.ok) {
                 const userInfo = await response.json();
                 isAdmin = userInfo.isAdmin;
+                currentUsername = userInfo.username || '';
                 console.log('User is admin:', isAdmin);
+
+                if (currentUsername) {
+                    try {
+                        const personResponse = await fetch(`${javaURI}/api/person/uid/${encodeURIComponent(currentUsername)}`, fetchOptions);
+                        if (personResponse.ok) {
+                            const person = await personResponse.json();
+                            currentUserId = person.id;
+                        } else {
+                            console.warn('Could not resolve current user id, status:', personResponse.status);
+                        }
+                    } catch (personError) {
+                        console.error('Error resolving current user id:', personError);
+                    }
+                }
                 
                 // Show admin tab only for admins
                 if (isAdmin) {
@@ -258,13 +579,201 @@ active_tab: submissions
     function renderContent(content) {
         if (!content) return '<em style="color:#6b7280">No content</em>';
         if (typeof content === 'string') return escapeHtml(content);
-        if (content.url) return `<a href="${escapeHtml(content.url)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;">${escapeHtml(content.url)}</a>`;
+        if (content.type === 'file' || content.filename) {
+            const fileName = content.filename || content.storedFilename || 'File submission';
+            const notes = content.notes ? `<div style="color:#9ca3af;margin-top:6px;">${escapeHtml(content.notes)}</div>` : '';
+            const extra = content.contentType ? `<div style="color:#6b7280;margin-top:4px;">${escapeHtml(content.contentType)} · ${escapeHtml(String(content.size || ''))}</div>` : '';
+            return `<div><strong>${escapeHtml(fileName)}</strong>${extra}${notes}</div>`;
+        }
+        if (content.type === 'link' || content.url) return `<a href="${escapeHtml(content.url)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;">${escapeHtml(content.url)}</a>`;
         if (content.text) return escapeHtml(content.text);
         return escapeHtml(JSON.stringify(content));
     }
 
+    function getSubmissionContentType(submission) {
+        const content = submission.content || {};
+        const type = (content.type || (content.filename ? 'file' : 'link') || '').toString().toLowerCase();
+        return type === 'file' ? 'file' : 'link';
+    }
+
+    function getSubmissionById(submissionId) {
+        return allSubmissions.find(submission => String(submission.id) === String(submissionId));
+    }
+
+    function setEditModalStatus(message, type = 'info') {
+        const status = document.getElementById('edit-modal-status');
+        if (!status) return;
+        status.textContent = message || '';
+        status.style.color = type === 'error' ? 'rgb(248, 113, 113)' : type === 'success' ? 'rgb(134, 239, 172)' : 'rgb(252, 211, 77)';
+    }
+
+    function toggleEditSections(contentType) {
+        const linkFields = document.getElementById('edit-link-fields');
+        const fileFields = document.getElementById('edit-file-fields');
+        if (!linkFields || !fileFields) return;
+
+        if (contentType === 'file') {
+            linkFields.classList.add('hidden');
+            fileFields.classList.remove('hidden');
+        } else {
+            fileFields.classList.add('hidden');
+            linkFields.classList.remove('hidden');
+        }
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('submission-edit-modal');
+        const form = document.getElementById('submission-edit-form');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        if (form) form.reset();
+        activeEditSubmissionId = null;
+        setEditModalStatus('');
+    }
+
+    function openEditModal(submissionId) {
+        const submission = getSubmissionById(submissionId);
+        if (!submission) {
+            showErrorMessage('Could not find that submission to edit.');
+            return;
+        }
+
+        const modal = document.getElementById('submission-edit-modal');
+        const form = document.getElementById('submission-edit-form');
+        const assignmentName = document.getElementById('edit-assignment-name');
+        const submissionType = document.getElementById('edit-submission-type');
+        const subtitle = document.getElementById('edit-modal-subtitle');
+        const submissionIdInput = document.getElementById('edit-submission-id');
+        const contentTypeInput = document.getElementById('edit-content-type');
+        const urlInput = document.getElementById('edit-url');
+        const notesInput = document.getElementById('edit-notes');
+        const commentInput = document.getElementById('edit-comment');
+        const fileInput = document.getElementById('edit-file');
+        const currentFile = document.getElementById('edit-current-file');
+        const isLateInput = document.getElementById('edit-is-late');
+
+        const contentType = getSubmissionContentType(submission);
+        const content = submission.content || {};
+
+        activeEditSubmissionId = submission.id;
+        submissionIdInput.value = submission.id;
+        contentTypeInput.value = contentType;
+        assignmentName.textContent = submission.assignmentName || 'Unknown assignment';
+        submissionType.textContent = contentType === 'file' ? 'File upload' : 'Link submission';
+        subtitle.textContent = `Editing submission #${submission.id}`;
+        isLateInput.checked = Boolean(submission.isLate);
+
+        urlInput.value = content.url || '';
+        notesInput.value = content.notes || submission.comment || '';
+        commentInput.value = submission.comment || content.notes || '';
+        if (fileInput) fileInput.value = '';
+        currentFile.textContent = content.filename
+            ? `Current file: ${content.filename}`
+            : 'No file attached yet.';
+
+        toggleEditSections(contentType);
+        setEditModalStatus('');
+
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        if (form) {
+            const focusTarget = contentType === 'file' ? fileInput : urlInput;
+            setTimeout(() => focusTarget?.focus(), 0);
+        }
+    }
+
+    window.openEditModal = openEditModal;
+    window.closeEditModal = closeEditModal;
+
+    async function saveSubmissionEdit(event) {
+        event.preventDefault();
+
+        if (!activeEditSubmissionId) {
+            return;
+        }
+
+        const submission = getSubmissionById(activeEditSubmissionId);
+        if (!submission) {
+            setEditModalStatus('The submission could not be found.', 'error');
+            return;
+        }
+
+        const contentType = document.getElementById('edit-content-type').value;
+        const url = document.getElementById('edit-url').value.trim();
+        const notes = document.getElementById('edit-notes').value.trim();
+        const comment = document.getElementById('edit-comment').value.trim();
+        const isLate = document.getElementById('edit-is-late').checked;
+        const fileInput = document.getElementById('edit-file');
+        const submitButton = document.querySelector('#submission-edit-form .edit-primary-btn');
+
+        const formData = new FormData();
+        formData.append('contentType', contentType);
+        formData.append('notes', notes);
+        formData.append('comment', comment);
+        formData.append('isLate', isLate ? 'true' : 'false');
+
+        if (contentType === 'link') {
+            if (!url) {
+                setEditModalStatus('A URL is required for link submissions.', 'error');
+                return;
+            }
+            formData.append('url', url);
+        } else if (fileInput?.files?.length) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        try {
+            submitButton.disabled = true;
+            setEditModalStatus('Saving changes...');
+
+            const response = await fetch(`${javaURI}/api/submissions/${encodeURIComponent(activeEditSubmissionId)}`, {
+                method: 'PUT',
+                mode: 'cors',
+                credentials: 'include',
+                headers: {
+                    'X-Origin': 'client'
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                let message = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.error) message = errorData.error;
+                } catch (parseError) {
+                    console.warn('Could not parse edit error response');
+                }
+                throw new Error(message);
+            }
+
+            setEditModalStatus('Submission updated successfully.', 'success');
+            await loadSubmissions();
+            closeEditModal();
+        } catch (error) {
+            console.error('Error updating submission:', error);
+            setEditModalStatus(error.message, 'error');
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
     function displayUserSubmissions() {
         const container = document.getElementById('my-submissions-container');
+        const mySubmissions = allSubmissions.filter(submission => {
+            if (currentUserId !== null && submission.submitterId !== undefined && submission.submitterId !== null) {
+                return submission.submitterId === currentUserId;
+            }
+            if (currentUsername) {
+                return (submission.submitterName || '').toLowerCase() === currentUsername.toLowerCase();
+            }
+            return false;
+        });
 
         if (!allSubmissions || allSubmissions.length === 0) {
             console.log('No submissions to display');
@@ -272,7 +781,12 @@ active_tab: submissions
             return;
         }
 
-        console.log('Displaying', allSubmissions.length, 'user submissions');
+        console.log('Displaying', mySubmissions.length, 'user submissions');
+
+        if (mySubmissions.length === 0) {
+            container.innerHTML = '<div class="no-submissions">No submissions yet.</div>';
+            return;
+        }
 
         try {
             const tableHTML = `
@@ -284,10 +798,11 @@ active_tab: submissions
                             <th>Status</th>
                             <th>Grade</th>
                             <th>Feedback</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${allSubmissions.map((submission, idx) => {
+                        ${mySubmissions.map((submission, idx) => {
                             try {
                                 return `
                                     <tr>
@@ -296,11 +811,16 @@ active_tab: submissions
                                         <td>${getStatusBadge(submission)}</td>
                                         <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
                                         <td>${submission.feedback ? escapeHtml(submission.feedback) : '<em style="color:#6b7280">No feedback yet</em>'}</td>
+                                        <td>
+                                            <div class="submission-actions">
+                                                <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 `;
                             } catch (rowError) {
                                 console.error('Error rendering row', idx, ':', rowError);
-                                return `<tr><td colspan="5" style="color: red;">Error rendering submission</td></tr>`;
+                                return `<tr><td colspan="6" style="color: red;">Error rendering submission</td></tr>`;
                             }
                         }).join('')}
                     </tbody>
@@ -334,6 +854,7 @@ active_tab: submissions
                             <th>Status</th>
                             <th>Grade</th>
                             <th>Comment</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -347,11 +868,16 @@ active_tab: submissions
                                         <td>${getStatusBadge(submission)}</td>
                                         <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
                                         <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
+                                        <td>
+                                            <div class="submission-actions">
+                                                <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 `;
                             } catch (rowError) {
                                 console.error('Error rendering admin row', idx, ':', rowError);
-                                return `<tr><td colspan="6" style="color: red;">Error rendering submission</td></tr>`;
+                                return `<tr><td colspan="7" style="color: red;">Error rendering submission</td></tr>`;
                             }
                         }).join('')}
                     </tbody>
@@ -459,6 +985,7 @@ active_tab: submissions
                         <th>Status</th>
                         <th>Grade</th>
                         <th>Comment</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -470,6 +997,11 @@ active_tab: submissions
                             <td>${getStatusBadge(submission)}</td>
                             <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
                             <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
+                            <td>
+                                <div class="submission-actions">
+                                    <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>
+                                </div>
+                            </td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -502,6 +1034,27 @@ active_tab: submissions
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    function setupEditModal() {
+        const modal = document.getElementById('submission-edit-modal');
+        const form = document.getElementById('submission-edit-form');
+
+        if (form) {
+            form.addEventListener('submit', saveSubmissionEdit);
+        }
+
+        if (modal) {
+            modal.querySelectorAll('[data-close-edit-modal]').forEach(button => {
+                button.addEventListener('click', closeEditModal);
+            });
+
+            modal.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeEditModal();
+                }
+            });
+        }
     }
 
     // Initialize on load
