@@ -4,137 +4,16 @@
 <!-- is achieved by tagging messages with a [[lesson:<url>]] marker and filtering -->
 <!-- on the client. All lessons share a single backbone group named "lessons". -->
 
-<section id="lessonChat" class="lesson-chat" data-lesson-key="{{ page.url }}">
-  <button type="button" id="lessonChatToggle" class="lesson-chat__toggle" aria-expanded="false" aria-controls="lessonChatPanel">
-    <span class="lesson-chat__toggle-label">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-      </svg>
-      Lesson Chat
-    </span>
-    <span id="lessonChatStatus" class="lesson-chat__status" data-state="idle">Click to open</span>
-  </button>
-
-  <div id="lessonChatPanel" class="lesson-chat__panel" hidden>
-    <div id="lessonChatMessages" class="lesson-chat__messages" aria-live="polite">
-      <div class="lesson-chat__empty">No messages yet. Start the discussion.</div>
-    </div>
-    <div id="lessonChatTyping" class="lesson-chat__typing"></div>
-    <form id="lessonChatForm" class="lesson-chat__input-row" autocomplete="off">
-      <input
-        id="lessonChatInput"
-        type="text"
-        class="lesson-chat__input"
-        placeholder="Message this lesson…"
-        maxlength="2000"
-        disabled
-      />
-      <button type="submit" id="lessonChatSend" class="lesson-chat__send" disabled>Send</button>
-    </form>
+<details id="lessonChat" data-lesson-key="{{ page.url }}" style="margin-top:2em">
+  <summary>Lesson Chat — <span id="lessonChatStatus">click to open</span></summary>
+  <div id="lessonChatMessages" aria-live="polite" style="height:18em;overflow-y:auto;border:1px solid;padding:.5em;margin:.5em 0">
+    <p id="lessonChatEmpty"><em>No messages yet.</em></p>
   </div>
-</section>
-
-<style>
-  .lesson-chat {
-    margin: 48px 0 24px;
-    border-top: 1px solid #2a2a2a;
-    padding-top: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  .lesson-chat__toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 16px;
-    background: #262626;
-    color: #fff;
-    border: 1px solid #3a3a3a;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.15s ease;
-  }
-  .lesson-chat__toggle:hover { background: #2f2f2f; }
-  .lesson-chat__toggle-label { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
-  .lesson-chat__status {
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 999px;
-    background: #404040;
-    color: #d4d4d4;
-  }
-  .lesson-chat__status[data-state="connecting"] { background: rgba(217, 119, 6, 0.2); color: #fcd34d; }
-  .lesson-chat__status[data-state="connected"] { background: rgba(5, 150, 105, 0.2); color: #6ee7b7; }
-  .lesson-chat__status[data-state="error"] { background: rgba(220, 38, 38, 0.2); color: #fca5a5; }
-
-  .lesson-chat__panel {
-    margin-top: 12px;
-    background: #1f1f1f;
-    border: 1px solid #3a3a3a;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    min-height: 320px;
-    max-height: 480px;
-    overflow: hidden;
-  }
-  .lesson-chat__messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .lesson-chat__messages::-webkit-scrollbar { width: 8px; }
-  .lesson-chat__messages::-webkit-scrollbar-track { background: #262626; }
-  .lesson-chat__messages::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 4px; }
-  .lesson-chat__messages::-webkit-scrollbar-thumb:hover { background: #5a5a5a; }
-
-  .lesson-chat__empty { color: #888; font-size: 13px; text-align: center; padding: 24px 0; }
-  .lesson-chat__msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
-  .lesson-chat__msg-name { color: #fff; font-weight: 600; font-size: 13px; }
-  .lesson-chat__msg-time { color: #777; font-size: 11px; }
-  .lesson-chat__msg-body { color: #e0e0e0; font-size: 14px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
-  .lesson-chat__system { color: #888; font-size: 12px; font-style: italic; }
-
-  .lesson-chat__typing { padding: 0 16px; min-height: 18px; font-size: 11px; color: #a5b4fc; }
-
-  .lesson-chat__input-row {
-    display: flex;
-    gap: 8px;
-    padding: 12px;
-    border-top: 1px solid #2a2a2a;
-    background: #1a1a1a;
-  }
-  .lesson-chat__input {
-    flex: 1;
-    padding: 10px 12px;
-    background: #404040;
-    color: #fff;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-  }
-  .lesson-chat__input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3); }
-  .lesson-chat__input:disabled { opacity: 0.5; cursor: not-allowed; }
-  .lesson-chat__send {
-    padding: 10px 18px;
-    background: #4f46e5;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: background 0.15s ease;
-  }
-  .lesson-chat__send:hover:not(:disabled) { background: #4338ca; }
-  .lesson-chat__send:disabled { opacity: 0.5; cursor: not-allowed; }
-</style>
+  <form id="lessonChatForm" autocomplete="off" style="display:flex;gap:.5em">
+    <input id="lessonChatInput" type="text" placeholder="Message this lesson…" maxlength="2000" disabled style="flex:1">
+    <button id="lessonChatSend" type="submit" disabled>Send</button>
+  </form>
+</details>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -160,23 +39,20 @@
     stompClient: null,
     subscription: null,
     connected: false,
-    connecting: false,
     initialized: false,
     currentUserDisplayName: 'You',
     seenKeys: new Set(),
   };
 
-  const toggleBtn = document.getElementById('lessonChatToggle');
-  const panel = document.getElementById('lessonChatPanel');
+  const detailsEl = document.getElementById('lessonChat');
   const statusEl = document.getElementById('lessonChatStatus');
   const messagesEl = document.getElementById('lessonChatMessages');
   const inputEl = document.getElementById('lessonChatInput');
   const sendBtn = document.getElementById('lessonChatSend');
   const formEl = document.getElementById('lessonChatForm');
 
-  function setStatus(text, type = 'idle') {
+  function setStatus(text) {
     statusEl.textContent = text;
-    statusEl.dataset.state = type;
   }
 
   function formatTimestamp(isoString) {
@@ -187,35 +63,28 @@
   }
 
   function clearEmpty() {
-    const empty = messagesEl.querySelector('.lesson-chat__empty');
+    const empty = document.getElementById('lessonChatEmpty');
     if (empty) empty.remove();
   }
 
   function appendMessage({ sender, message, date }) {
     clearEmpty();
-    const wrapper = document.createElement('div');
-    const header = document.createElement('div');
-    header.className = 'lesson-chat__msg-header';
-    const nameEl = document.createElement('span');
-    nameEl.className = 'lesson-chat__msg-name';
-    nameEl.textContent = sender === state.currentUserDisplayName ? 'You' : (sender || 'Unknown');
-    const timeEl = document.createElement('span');
-    timeEl.className = 'lesson-chat__msg-time';
-    timeEl.textContent = formatTimestamp(date);
-    header.append(nameEl, timeEl);
-    const body = document.createElement('p');
-    body.className = 'lesson-chat__msg-body';
-    body.textContent = message;
-    wrapper.append(header, body);
-    messagesEl.appendChild(wrapper);
+    const who = sender === state.currentUserDisplayName ? 'You' : (sender || 'Unknown');
+    const when = formatTimestamp(date);
+    const line = document.createElement('p');
+    const strong = document.createElement('strong');
+    strong.textContent = who;
+    line.append(strong, document.createTextNode(when ? ` · ${when}: ` : ': '), document.createTextNode(message));
+    messagesEl.appendChild(line);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function appendSystem(text) {
     clearEmpty();
-    const el = document.createElement('div');
-    el.className = 'lesson-chat__system';
-    el.textContent = text;
+    const el = document.createElement('p');
+    const em = document.createElement('em');
+    em.textContent = text;
+    el.appendChild(em);
     messagesEl.appendChild(el);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -319,11 +188,10 @@
     return new Promise((resolve) => {
       if (state.connected) return resolve(true);
       if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
-        setStatus('Unavailable', 'error');
+        setStatus('unavailable');
         return resolve(false);
       }
-      state.connecting = true;
-      setStatus('Connecting…', 'connecting');
+      setStatus('connecting…');
       const socket = new SockJS(buildChatSocketEndpoint());
       const client = Stomp.over(socket);
       client.debug = null;
@@ -331,8 +199,7 @@
 
       client.connect({}, () => {
         state.connected = true;
-        state.connecting = false;
-        setStatus('Connected', 'connected');
+        setStatus('connected');
         state.subscription = client.subscribe(`/topic/group/${state.backboneGroupId}`, (frame) => {
           try { handleIncoming(JSON.parse(frame.body)); }
           catch (err) { console.warn('Lesson chat: bad frame', err); }
@@ -341,15 +208,14 @@
       }, (err) => {
         console.warn('Lesson chat: connection failed', err);
         state.connected = false;
-        state.connecting = false;
-        setStatus('Disconnected', 'error');
+        setStatus('disconnected');
         resolve(false);
       });
 
       socket.onclose = () => {
         if (!state.connected) return;
         state.connected = false;
-        setStatus('Disconnected', 'error');
+        setStatus('disconnected');
         inputEl.disabled = true;
         sendBtn.disabled = true;
       };
@@ -378,12 +244,12 @@
   async function initOnce() {
     if (state.initialized) return;
     state.initialized = true;
-    setStatus('Loading…', 'connecting');
+    setStatus('loading…');
     await resolveCurrentUser();
     const ok = await resolveBackboneGroup();
     if (!ok) {
       console.warn('Lesson chat: backbone group could not be resolved; see prior warnings for cause');
-      setStatus('Unavailable', 'error');
+      setStatus('unavailable');
       appendSystem('Lesson chat is not available right now.');
       return;
     }
@@ -396,16 +262,8 @@
     }
   }
 
-  toggleBtn.addEventListener('click', async () => {
-    const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-    if (expanded) {
-      toggleBtn.setAttribute('aria-expanded', 'false');
-      panel.hidden = true;
-      return;
-    }
-    toggleBtn.setAttribute('aria-expanded', 'true');
-    panel.hidden = false;
-    await initOnce();
+  detailsEl.addEventListener('toggle', () => {
+    if (detailsEl.open) initOnce();
   });
 
   formEl.addEventListener('submit', (e) => {
