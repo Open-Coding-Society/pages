@@ -91,10 +91,10 @@ class MansionLevel5 {
         return {
             id: 'WheelTable',
             greeting: "Press E to play Mansion Wheel.",
-            src: this.path + "/images/projects/mansionGame/objective.png",
-            SCALE_FACTOR: 7,
+            src: this.path + "/images/projects/mansionGame/arrow.png", 
+            SCALE_FACTOR: 4,
             ANIMATION_RATE: 100,
-            pixels: { width: 256, height: 256 },
+            pixels: { width: 476, height: 197 },
             INIT_POSITION: { x: this.width * 0.45, y: this.height * 0.28 },
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
@@ -156,6 +156,22 @@ class MansionLevel5 {
 
     initialize() {
         this.showPrompt();
+
+        // Add a glowing pulse effect to the WheelTable to make it stand out
+        if (!document.getElementById('wheel-marker-style')) {
+            const style = document.createElement('style');
+            style.id = 'wheel-marker-style';
+            style.innerHTML = `
+                canvas#WheelTable {
+                    animation: pulse-table-glow 1.5s infinite alternate !important;
+                }
+                @keyframes pulse-table-glow {
+                    0% { filter: drop-shadow(0 0 5px rgba(214, 179, 95, 0.4)); transform: translateY(0px); }
+                    100% { filter: drop-shadow(0 0 15px rgba(214, 179, 95, 0.9)); transform: translateY(-10px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
     }
 
     showPrompt() {
