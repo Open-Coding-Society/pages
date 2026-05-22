@@ -1,7 +1,7 @@
-import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Npc from './essentials/Npc.js';
-import Player from './essentials/Player.js';
-import showDialogBox from './essentials/DialogBox.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import showDialogBox from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
 
 class GameLevelWallstreet {
   constructor(gameEnv) {

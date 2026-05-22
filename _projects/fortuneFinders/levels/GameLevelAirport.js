@@ -1,9 +1,9 @@
-import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Npc from './essentials/Npc.js';
-import Player from './essentials/Player.js';
-import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, getSatoshiQuestions } from './essentials/DialogBox.js';
-import WaypointArrow from './WaypointArrow.js';
-import NpcProgressSystem from './NpcProgressSystem.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, getSatoshiQuestions } from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
+import WaypointArrow from '@assets/js/GameEnginev1.1/WaypointArrow.js';
+import NpcProgressSystem from '@assets/js/GameEnginev1.1/NpcProgressSystem.js';
 
 let socketURI
 let javaURI

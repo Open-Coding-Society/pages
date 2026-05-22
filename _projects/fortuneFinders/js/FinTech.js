@@ -1,8 +1,8 @@
-import { GameCore as Game } from './essentials/Game.js';
-import GameControl from './essentials/GameControl.js';
-import Quiz from './Quiz.js';
-import Inventory from "./Inventory.js";
-import { defaultItems } from "./items.js";
+import { GameCore as Game } from '@assets/js/GameEnginev1.1/essentials/Game.js';
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
+import Quiz from '@assets/js/GameEnginev1.1/Quiz.js';
+import Inventory from "@assets/js/GameEnginev1.1/Inventory.js";
+import { defaultItems } from "@assets/js/GameEnginev1.1/items.js";
 
 class StatsManager {
     constructor(game) {
