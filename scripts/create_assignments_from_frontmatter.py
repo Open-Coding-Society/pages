@@ -21,7 +21,8 @@ from pathlib import Path
 import requests
 import yaml
 
-FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
+# Support frontmatter blocks with or without a trailing newline after closing ---.
+FRONTMATTER_RE = re.compile(r"^\ufeff?\s*---\s*\n(.*?)\n---\s*(?:\n|$)", re.S)
 
 DEFAULT_BASE_URL = os.getenv("BASE_URL", "https://spring.opencodingsociety.com")
 DEFAULT_UID = os.getenv("PAGES_BOT_UID", "pages-bot")
@@ -36,6 +37,9 @@ def find_files(root: Path):
 
 
 def parse_frontmatter_text(text: str):
+    # Notebook sources are inconsistent about newline preservation; normalize
+    # line endings before attempting regex extraction.
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     m = FRONTMATTER_RE.match(text)
     if not m:
         return None
@@ -56,7 +60,10 @@ def read_frontmatter(path: Path):
         for cell in notebook.get("cells", []):
             source = cell.get("source")
             if isinstance(source, list):
-                text = "".join(source)
+                # Each array entry is a logical line in many notebooks.
+                # Join with newlines so YAML frontmatter stays parseable even
+                # when individual items do not include trailing "\n".
+                text = "\n".join([str(s).rstrip("\n") for s in source])
             elif isinstance(source, str):
                 text = source
             else:
