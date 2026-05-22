@@ -15,6 +15,7 @@ import LoginManager from '@assets/js/projects/cs-pathway/model/LoginManager.js';
 import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
 import PersonaHallTrial from './PersonaHallTrial.js';
 const PROFILE_PANEL_ID = 'csse-profile-panel';
+import GameLevelCsPath1Way from './GameLevelCsPath1Way.js';
 
 // Track player progress and choices per session.
 const identityState = {
@@ -164,8 +165,7 @@ class GameLevelCsPath0Forge {
      */
 
     // ── Background ──────────────────────────────────────────────
-    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-fantasy.png";
-    const bg_data = {
+    const image_src = path + "/images/projects/cs-pathway/bg/identity-forge-default.png";    const bg_data = {
         name: GameLevelCsPath0Forge.displayName,
         greeting: "Welcome to the CSSE pathway!  This quest will identify your profile and personna!",
         src: image_src,
@@ -365,8 +365,6 @@ class GameLevelCsPath0Forge {
           'Choose the CS persona that best matches how you work.'
         ]);
         await level.runPersonaHall(false, this);
-        await this.profileManager.updateProgress('persona', result.title);
-        await this.profileManager.updateProgress('personaId', result.persona);
       },
     });
 
@@ -426,7 +424,7 @@ class GameLevelCsPath0Forge {
     this.runPersonaHall = async function(showIntro = false, npc = null) {
       if (this._personaHallOpen) return;
       this._personaHallOpen = true;
-    
+
       try {
         if (showIntro) {
           await this.showDialogue('Persona Hall Guide', [
@@ -434,38 +432,54 @@ class GameLevelCsPath0Forge {
             'Choose the CS persona that best matches how you work.'
           ]);
         }
-    
+
         const trial = new PersonaHallTrial({
           profileData: this.profileData || {},
-    
+
           onComplete: async (result) => {
             await this.updateProfilePanel({
               persona: result.title,
               personaId: result.persona,
             });
-    
             this.showToast(`Persona selected: ${result.title}`);
-    
-            this.panel?.(
-              `${result.title}\n\n${result.summary}`
-            );
-    
+            this.panel?.(`${result.title}\n\n${result.summary}`);
             this._personaHallOpen = false;
           },
-    
+
+          onTeleport: () => {
+            const gc = this.gameEnv?.gameControl;
+            if (!gc) {
+              console.error('[Teleport] gameControl not found');
+              return;
+            }
+
+            const wayfindingIndex = gc.levelClasses?.findIndex(
+              (lc) => lc.levelId === 'wayfinding-world'
+            );
+
+            if (wayfindingIndex !== -1 && wayfindingIndex !== undefined) {
+              gc.currentLevelIndex = wayfindingIndex;
+            } else {
+              gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1Way);
+              gc.currentLevelIndex++;
+            }
+
+            gc.transitionToLevel();
+          },
+
           onClose: () => {
             this._personaHallOpen = false;
           },
         });
-    
+
         trial.start();
-    
+
       } catch (err) {
         console.error(err);
         this._personaHallOpen = false;
       }
-    };    
-    
+    };
+
     /**
      * Identity terminal flow. Run the authentication and identity registration wizard.
      * @private
@@ -841,7 +855,7 @@ class GameLevelCsPath0Forge {
       }
 
       const toast = document.createElement('div');
-      toast.style.cssText = createNotificationStyle('20px', 1200);
+      toast.style.cssText = createNotificationStyle('20px', 100020);
       toast.textContent = message;
       host.appendChild(toast);
 
@@ -865,7 +879,7 @@ class GameLevelCsPath0Forge {
 
       if (!this._zoneAlertEl) {
         const zoneAlert = document.createElement('div');
-        zoneAlert.style.cssText = createNotificationStyle('84px', 1201);
+        zoneAlert.style.cssText = createNotificationStyle('84px', 100010);
         document.body.appendChild(zoneAlert);
         this._zoneAlertEl = zoneAlert;
       }
@@ -1250,12 +1264,12 @@ class GameLevelCsPath0Forge {
  
       const fallbackCatalog = [
         {
-          name: 'Identity Forge',
-          src: image_src,
-          previewText: 'Default theme',
+          name: 'Default',
+          src: `${path}/images/projects/cs-pathway/bg/identity-forge-default.png`,
+          previewText: 'Unactivated world',
         },
       ];
- 
+
       try {
         const response = await fetch(`${path}/images/projects/cs-pathway/bg/index.json`, { cache: 'no-cache' });
         if (!response.ok) {
@@ -1552,12 +1566,6 @@ class GameLevelCsPath0Forge {
         }
       }
       
-      if (updates.persona) {
-        await this.profileManager.updateProgress('persona', updates.persona);
-      }
-      if (updates.personaId) {
-        await this.profileManager.updateProgress('personaId', updates.personaId);
-      }
       
       // Update UI panel with complete profile data
       this.createProfilePanel();
