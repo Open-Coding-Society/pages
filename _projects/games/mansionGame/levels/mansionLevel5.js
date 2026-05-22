@@ -91,10 +91,11 @@ class MansionLevel5 {
         return {
             id: 'WheelTable',
             greeting: "Press E to play Mansion Wheel.",
-            src: this.path + "/images/projects/mansionGame/arrow.png", 
-            SCALE_FACTOR: 4,
+            // Using the skeleton key sprite as an inviting "prize" marker over the table
+            src: this.path + "/images/projects/mansionGame/skeleton_key.png", 
+            SCALE_FACTOR: 8,
             ANIMATION_RATE: 100,
-            pixels: { width: 476, height: 197 },
+            pixels: { width: 680, height: 362 },
             INIT_POSITION: { x: this.width * 0.45, y: this.height * 0.28 },
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
