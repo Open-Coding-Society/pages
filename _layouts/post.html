@@ -81,6 +81,9 @@ Check if this is a course lesson and determine which course context to use
 
           {% if page.assignment %}
           {% include lesson-submission-form.html %}
+          <p style="margin-top: 12px; color: #9ca3af; font-size: 0.95rem;">
+            Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #60a5fa; text-decoration: underline;">submissions dashboard</a>.
+          </p>
           {% endif %}
         </div>
 
@@ -1286,6 +1289,9 @@ Check if this is a course lesson and determine which course context to use
 
       <div class="submission-status" id="submission-status-blog"></div>
     </div>
+    <p style="margin-top: 12px; color: #6b7280; font-size: 0.95rem;">
+      Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #2563eb; text-decoration: underline;">submissions dashboard</a>.
+    </p>
 
     <script>
       const ASSIGNMENT_ID = {{ page.assignment_id | default: 'null' }};
