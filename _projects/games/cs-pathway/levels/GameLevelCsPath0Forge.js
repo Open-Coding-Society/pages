@@ -1438,6 +1438,8 @@ class GameLevelCsPath0Forge {
         { key: 'githubID', label: 'GitHub ID', emptyValue: '—' },
         { type: 'section', title: 'Persona Hall', marginTop: '8px' },
         { key: 'persona', label: 'Persona', emptyValue: '—' },
+        { type: 'section', title: 'Course Enlistment', marginTop: '8px' },
+        { key: 'courseClass', label: 'Class', emptyValue: '—' },
         { type: 'section', title: 'Avatar Sprite', marginTop: '8px' },
         { key: 'sprite', label: 'Sprite', emptyValue: '—' },
         { type: 'section', title: 'World Theme', marginTop: '8px' },
@@ -1514,6 +1516,7 @@ class GameLevelCsPath0Forge {
       persona: this.profileData?.persona || '—',
       sprite: this.profileData?.sprite || '—',
       worldTheme: this.profileData?.theme || this.profileData?.worldTheme || '—',
+      courseName: this.profileData?.courseName || '—',
       ...this._getCompletionPanelValues(),
     });
 
@@ -1582,11 +1585,36 @@ class GameLevelCsPath0Forge {
         persona: this.profileData.persona || '—',
         sprite: this.profileData.sprite || '—',
         worldTheme: this.profileData.theme || this.profileData.worldTheme || '—',
+        courseName: this.profileData.courseName || '—',
+        courseClass: this.profileData.courseClass || '—',
         ...this._getCompletionPanelValues()
       };
       
       console.log('panelData being sent to panel.update:', panelData);
       this.profilePanelView.update(panelData);
+    };
+
+    /**
+     * Save Course Plan Result
+     * Mirrors how persona/profile data is persisted.
+     * @param {Object} result
+     */
+    this.saveCoursePlanResult = async function(result = {}) {
+      console.log('saveCoursePlanResult called with:', result);
+
+      const courseClass =
+        result.class ||
+        result.courseClass ||
+        result.selectedClass ||
+        result.recommendedClass ||
+        result.recommendedClasses?.[0]?.name ||
+        result.recommendedClasses?.[0]?.title ||
+        result.recommendedClasses?.[0] ||
+        '—';
+
+      await this.updateProfilePanel({
+        courseClass,
+      });
     };
 
     /**
