@@ -27,7 +27,7 @@ active_tab: submissions
 
         <!-- tab content container -->
         <div id="tab-content-container" class="relative min-h-[400px]">
-            
+
             <!-- My Submissions tab content -->
             <div id="tab-content-my-submissions" class="tab-content block px-6 py-4 text-neutral-200">
                 <div id="my-submissions-loading" class="flex items-center justify-center min-h-[400px]">
@@ -463,12 +463,13 @@ active_tab: submissions
 
     const apiUrl = `${javaURI}/api/assignment-submission-view/list`;
     const userInfoUrl = `${javaURI}/api/assignment-submission-view/user-info`;
-    
+
     let allSubmissions = [];
     let isAdmin = false;
     let currentUserId = null;
     let currentUsername = '';
     let activeEditSubmissionId = null;
+    let synergyGradeMap = {}; // assignmentId (string) → grade (number) for current user
 
     async function init() {
         try {
@@ -488,7 +489,7 @@ active_tab: submissions
         try {
             console.log('Checking admin status from:', userInfoUrl);
             const response = await fetch(userInfoUrl, fetchOptions);
-            
+
             if (response.ok) {
                 const userInfo = await response.json();
                 isAdmin = userInfo.isAdmin;
@@ -508,7 +509,7 @@ active_tab: submissions
                         console.error('Error resolving current user id:', personError);
                     }
                 }
-                
+
                 // Show admin tab only for admins
                 if (isAdmin) {
                     document.getElementById('tab-all-submissions').style.display = 'block';
@@ -531,7 +532,7 @@ active_tab: submissions
 
             if (!response.ok) {
                 console.error(`HTTP error! status: ${response.status}`);
-                
+
                 // Try to parse error message from response
                 let errorMsg = `HTTP ${response.status}`;
                 try {
@@ -543,7 +544,7 @@ active_tab: submissions
                 } catch (parseError) {
                     console.warn('Could not parse error response');
                 }
-                
+
                 throw new Error(`Failed to fetch submissions: ${errorMsg}`);
             }
 
@@ -561,17 +562,29 @@ active_tab: submissions
             allSubmissions = Array.isArray(data) ? data : [];
             console.log('Set allSubmissions to', allSubmissions.length, 'items');
 
+            // Fetch synergy grades for the current user so "My Submissions" shows real grades
+            if (currentUserId) {
+                try {
+                    const gradeResp = await fetch(`${javaURI}/api/synergy/grades/map/${currentUserId}`, fetchOptions);
+                    if (gradeResp.ok) {
+                        synergyGradeMap = await gradeResp.json(); // { "assignmentId": grade, ... }
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch synergy grades:', e);
+                }
+            }
+
             displayUserSubmissions();
             if (isAdmin) {
                 displayAllSubmissions();
             }
-            
+
         } catch (error) {
             console.error('Error in loadSubmissions:', error);
             console.error('Error type:', error.constructor.name);
             console.error('Error message:', error.message);
             console.error('Full error:', error);
-            
+
             showErrorMessage(`Error loading submissions: ${error.message}`);
         }
     }
@@ -804,12 +817,21 @@ active_tab: submissions
                     <tbody>
                         ${mySubmissions.map((submission, idx) => {
                             try {
+                                // Prefer the real SynergyGrade over the legacy grade field
+                                const synergyGrade = submission.assignmentId != null
+                                    ? synergyGradeMap[String(submission.assignmentId)]
+                                    : undefined;
+                                const gradeDisplay = synergyGrade != null
+                                    ? `<span class="grade-display">${synergyGrade}/100</span>`
+                                    : (submission.grade != null
+                                        ? `<span class="grade-display">${submission.grade}/100</span>`
+                                        : '<em style="color:#6b7280">Not graded</em>');
                                 return `
                                     <tr>
                                         <td><strong>${escapeHtml(submission.assignmentName || 'Unknown')}</strong></td>
                                         <td>${renderContent(submission.content)}</td>
-                                        <td>${getStatusBadge(submission)}</td>
-                                        <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                                        <td>${getStatusBadge(submission, synergyGrade)}</td>
+                                        <td>${gradeDisplay}</td>
                                         <td>${submission.feedback ? escapeHtml(submission.feedback) : '<em style="color:#6b7280">No feedback yet</em>'}</td>
                                         <td>
                                             <div class="submission-actions">
@@ -860,13 +882,29 @@ active_tab: submissions
                     <tbody>
                         ${allSubmissions.map((submission, idx) => {
                             try {
+                                const gradeVal = submission.grade != null ? submission.grade : '';
                                 return `
-                                    <tr>
+                                    <tr id="sub-row-${idx}">
                                         <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
                                         <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
                                         <td>${renderContent(submission.content)}</td>
                                         <td>${getStatusBadge(submission)}</td>
-                                        <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                                        <td>
+                                            <div style="display:flex;align-items:center;gap:6px;">
+                                                <input
+                                                    type="number" min="0" max="100" step="0.5"
+                                                    value="${escapeHtml(String(gradeVal))}"
+                                                    id="grade-input-${idx}"
+                                                    style="width:70px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;"
+                                                    placeholder="0–100"
+                                                >
+                                                <button
+                                                    onclick="saveGrade(${idx}, ${submission.assignmentId ?? 'null'}, ${submission.submitterId ?? 'null'})"
+                                                    style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
+                                                >Save</button>
+                                                <span id="grade-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
+                                            </div>
+                                        </td>
                                         <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
                                         <td>
                                             <div class="submission-actions">
@@ -892,8 +930,58 @@ active_tab: submissions
         }
     }
 
-    function getStatusBadge(submission) {
-        if (submission.grade !== null && submission.grade !== undefined) {
+    window.saveGrade = async function(idx, assignmentId, studentId) {
+        const input = document.getElementById(`grade-input-${idx}`);
+        const status = document.getElementById(`grade-status-${idx}`);
+        const gradeValue = parseFloat(input.value);
+
+        if (isNaN(gradeValue) || gradeValue < 0 || gradeValue > 100) {
+            status.textContent = '⚠ Enter 0–100';
+            status.style.color = '#f59e0b';
+            return;
+        }
+        if (assignmentId == null || studentId == null) {
+            status.textContent = '⚠ Missing IDs';
+            status.style.color = '#f59e0b';
+            return;
+        }
+
+        status.textContent = 'Saving…';
+        status.style.color = '#9ca3af';
+
+        try {
+            const resp = await fetch(`${javaURI}/api/synergy/grade`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    grade: gradeValue,
+                    assignment: { id: assignmentId },
+                    student: { id: studentId }
+                })
+            });
+
+            if (resp.ok) {
+                status.textContent = '✓ Saved';
+                status.style.color = '#34d399';
+                input.style.borderColor = '#34d399';
+                // Update the submission in allSubmissions so status badge refreshes on next filter
+                const sub = allSubmissions.find(s => s.assignmentId === assignmentId && s.submitterId === studentId);
+                if (sub) sub.grade = gradeValue;
+            } else {
+                const err = await resp.json().catch(() => ({}));
+                status.textContent = `✗ ${err.message || resp.status}`;
+                status.style.color = '#f87171';
+            }
+        } catch (e) {
+            status.textContent = '✗ Network error';
+            status.style.color = '#f87171';
+        }
+    };
+
+    // synergyGrade (optional) — if provided, takes precedence over submission.grade for the Graded check
+    function getStatusBadge(submission, synergyGrade) {
+        const isGraded = synergyGrade != null || (submission.grade !== null && submission.grade !== undefined);
+        if (isGraded) {
             return '<span class="status-badge status-graded">Graded</span>';
         } else if (submission.isLate) {
             return '<span class="status-badge status-late">Late</span>';
@@ -906,7 +994,7 @@ active_tab: submissions
         const myContainer = document.getElementById('my-submissions-container');
         const allContainer = document.getElementById('all-submissions-container');
         const errorHTML = `<div class="error-message">${escapeHtml(message)}</div>`;
-        
+
         if (myContainer) myContainer.innerHTML = errorHTML;
         if (allContainer) allContainer.innerHTML = errorHTML;
     }
@@ -929,11 +1017,11 @@ active_tab: submissions
                 tabs.forEach(t => t.classList.remove('active', 'text-blue-500', 'border-blue-500'));
                 tabContents.forEach(c => c.classList.add('hidden'));
                 tabContents.forEach(c => c.classList.remove('block'));
-                
+
                 const targetId = `tab-content-${tab.id.replace('tab-', '')}`;
                 document.getElementById(targetId).classList.remove('hidden');
                 document.getElementById(targetId).classList.add('block');
-                
+
                 tab.classList.add('active', 'text-blue-500', 'border-blue-500');
                 setUnderline(tab);
             });
@@ -965,12 +1053,12 @@ active_tab: submissions
             const assignmentMatch = (sub.assignmentName || '').toLowerCase().includes(assignmentFilter);
             const studentMatch = (sub.submitterName || '').toLowerCase().includes(studentFilter);
             const statusMatch = !statusFilter || getFilterStatus(sub) === statusFilter;
-            
+
             return assignmentMatch && studentMatch && statusMatch;
         });
 
         if (filtered.length === 0) {
-            document.getElementById('all-submissions-container').innerHTML = 
+            document.getElementById('all-submissions-container').innerHTML =
                 '<div class="no-submissions">No submissions match the filters.</div>';
             return;
         }
@@ -989,13 +1077,29 @@ active_tab: submissions
                     </tr>
                 </thead>
                 <tbody>
-                    ${filtered.map(submission => `
+                    ${filtered.map((submission, idx) => {
+                        const gradeVal = submission.grade != null ? submission.grade : '';
+                        const fIdx = `f${idx}`;
+                        return `
                         <tr>
                             <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
                             <td>${escapeHtml(submission.assignmentName || 'Unknown')}</td>
                             <td>${renderContent(submission.content)}</td>
                             <td>${getStatusBadge(submission)}</td>
-                            <td>${submission.grade ? `<span class="grade-display">${submission.grade}/100</span>` : 'Not graded'}</td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <input type="number" min="0" max="100" step="0.5"
+                                        value="${escapeHtml(String(gradeVal))}"
+                                        id="grade-input-${fIdx}"
+                                        style="width:70px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;"
+                                        placeholder="0–100">
+                                    <button
+                                        onclick="saveGrade('${fIdx}', ${submission.assignmentId ?? 'null'}, ${submission.submitterId ?? 'null'})"
+                                        style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
+                                    >Save</button>
+                                    <span id="grade-status-${fIdx}" style="font-size:0.75rem;color:#6b7280;"></span>
+                                </div>
+                            </td>
                             <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
                             <td>
                                 <div class="submission-actions">
@@ -1003,11 +1107,12 @@ active_tab: submissions
                                 </div>
                             </td>
                         </tr>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </tbody>
             </table>
         `;
-        
+
         document.getElementById('all-submissions-container').innerHTML = tableHTML;
     }
 
@@ -1024,7 +1129,7 @@ active_tab: submissions
     function hideLoadingSpinners() {
         const myLoading = document.getElementById('my-submissions-loading');
         const allLoading = document.getElementById('all-submissions-loading');
-        
+
         if (myLoading) myLoading.style.display = 'none';
         if (allLoading) allLoading.style.display = 'none';
     }
