@@ -71,33 +71,17 @@ class MansionLevel6 {
             keypress: {up: 87, left: 65, down: 83, right: 68} // W, A, S, D
         };
 
-        // This is the zombie npc
+        // Thiss is the base zombie data
         const sprite_src_zombie = path + "/images/projects/mansionGame/zombieNpc.png";
         const sprite_greet_zombie = "Hi, I'm a zombie.";
-        const sprite_data_zombie1 = {
-            id: 'ZombieNPC1',
+        const zombie_base_data = {
             greeting: sprite_greet_zombie,
             src: sprite_src_zombie,
             SCALE_FACTOR: 4,
             ANIMATION_RATE: 30,
             pixels: {width: 3600, height: 1200},
-            INIT_POSITION: {x: (width * 0.53), y: (height * 0.25)},
             orientation: {rows: 1, columns: 3 },
-            down: {row: 0, start: 0, columns: 3 },
-            hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
-            // Add dialogues array for random messages
-            dialogues: [
-                "I heard the boss is waiting for you...",
-                "Enter if you dare... he's waiting for you...",
-                "I heard the Reaper himself was in there.",
-                "You have no chance... his power is unstoppable...",
-                "No one has survived a battle against the Reaper.",
-                "Haha! You want to battle my boss? You'll die within the first minute...",
-                "Go ahead. I aint stoppin' you. The Reaper'll finish you clean.",
-                "You are a fool to challenge the Reaper.",
-                "You will end up like me once you face the Reaper.",
-                "Are you the next opponent for my master? That's unfortunate for you.",
-            ],
+            hitbox: {widthPercentage: 0.4, heightPercentage: 0.2},
             reaction: function() {},
             interact: function() {
                 // Clear any existing dialogue first to prevent duplicates
@@ -118,20 +102,37 @@ class MansionLevel6 {
                     this.spriteData.src
                 );
             }
+        }
+
+        // This is the zombie npc
+        const sprite_data_zombie1 = {
+            ...zombie_base_data,
+            id: 'ZombieNPC1',
+            zombie_name: 'Zombie',
+            INIT_POSITION: {x: (width * 0.53), y: (height * 0.25)},
+            down: {row: 0, start: 0, columns: 3 },
+            // Add dialogues array for random messages
+            dialogues: [
+                "I heard the boss is waiting for you...",
+                "Enter if you dare... he's waiting for you...",
+                "I heard the Reaper himself was in there.",
+                "You have no chance... his power is unstoppable...",
+                "No one has survived a battle against the Reaper.",
+                "Haha! You want to battle my boss? You'll die within the first minute...",
+                "Go ahead. I aint stoppin' you. The Reaper'll finish you clean.",
+                "You are a fool to challenge the Reaper.",
+                "You will end up like me once you face the Reaper.",
+                "Are you the next opponent for my master? That's unfortunate for you.",
+            ]
         };
 
         // Data for the coding god zombie
         const sprite_data_zombie2 = {
+            ...zombie_base_data,
             id: 'ZombieNPC2',
-            greeting: sprite_greet_zombie,
-            src: sprite_src_zombie,
-            SCALE_FACTOR: 4,
-            ANIMATION_RATE: 30,
-            pixels: {width: 3600, height: 1200},
+            zombie_name: 'Coding God Zombie',
             INIT_POSITION: {x: (width * 0.28), y: (height * 0.25)},
-            orientation: {rows: 1, columns: 3 },
             down: {row: 0, start: 0, columns: 3 , mirror: true},
-            hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
             // Add dialogues array for random messages
             dialogues: [
                 "Boss.js inherits and extends Enemy.js to add more danger.",
@@ -144,30 +145,7 @@ class MansionLevel6 {
                 "If I ever freeze, check the console. I might've thrown an error.",
                 "The Reaper's attack is so powerful, it takes a Desmos graph to understand its power.", // reference to the desmos graph we used to calculate the scythe path!
                 "*brains*"
-            ],
-            reaction: function() {
-                // Don't do anything on touch
-                // The Zombie only speaks when interacted with
-            },
-            interact: function() {
-                // Clear any existing dialogue first to prevent duplicates
-                if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-                    this.dialogueSystem.closeDialogue();
-                }
-                
-                // Create a new dialogue system if needed
-                if (!this.dialogueSystem) {
-                    this.dialogueSystem = new DialogueSystem();
-                }
-                
-                // Show portal dialogue with buttons
-                const whattosay = this.data.dialogues[Math.floor(Math.random() * this.data.dialogues.length)];
-                this.dialogueSystem.showDialogue(
-                    whattosay,
-                    "Coding God Zombie",
-                    this.spriteData.src
-                );
-            }
+            ]
         }; 
         
 
