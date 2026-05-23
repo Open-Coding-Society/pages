@@ -45,6 +45,24 @@ class MansionLevel6 {
             pixels: {height: 580, width: 1038},
             mode: 'stretch'
         };
+
+        const fullscreenMessage = document.createElement('div');
+        fullscreenMessage.id = 'fullscreen-recommended-message';
+        fullscreenMessage.textContent = 'Fullscreen recommended';
+        Object.assign(fullscreenMessage.style, {
+            position: 'absolute',
+            top: '18px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            color: '#ffffff',
+            fontFamily: "'Press Start 2P', sans-serif",
+            fontSize: '14px',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.6)',
+            zIndex: '100'
+        });
+
+        const chamberContainer = document.querySelector('canvas')?.parentElement || document.body;
+        chamberContainer.appendChild(fullscreenMessage);
         
         // This is the data for the player
         const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png"; // be sure to include the path
@@ -195,6 +213,11 @@ class MansionLevel6 {
                         primary: true,
                         action: () => {
                             this.dialogueSystem.closeDialogue();
+
+                            const fullscreenBanner = document.getElementById('fullscreen-recommended-message');
+                            if (fullscreenBanner && fullscreenBanner.parentNode) {
+                                fullscreenBanner.parentNode.removeChild(fullscreenBanner);
+                            }
                             
                             // Clean up the current game state
                             if (gameEnv && gameEnv.gameControl) {

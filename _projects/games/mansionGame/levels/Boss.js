@@ -5,6 +5,7 @@ import Arm from './Arm.js';
 import showEndScreen from './EndScreen.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import { updateBossHealthBar } from './HealthBars.js';
+import Zombie from './Zombie.js';
 
 /*
     Boss class to define the Reaper
@@ -21,7 +22,7 @@ class Boss extends Enemy {
         this._bossHealthFill = null;
 
         this.stage = 1;
-        this.fullHealth = data?.initialHealth || 1500;
+        this.fullHealth = data?.initialHealth || 10000;
         this.healthPoints = this.fullHealth;
 
         this.arrows = [];
@@ -31,6 +32,10 @@ class Boss extends Enemy {
         this.attackInterval = data?.attackInterval || 2000;
         this.angerModifier = 1;
         this.attackProbShift = 0.05;
+
+        this.lastZombieWaveTime = 0;
+        this.zombieWaveSize = data?.zombieWaveSize || 3;
+        this.maxZombiesAlive = data?.maxZombiesAlive || 8;
 
         // Debug/cheat key code - uncomment to enable
         // Add a debug/cheat key ('p') that instantly defeats this boss
@@ -130,6 +135,10 @@ class Boss extends Enemy {
         this.stage = healthRatio < 0.33 ? 3 : (healthRatio < 0.66 ? 2 : 1);
         this.attackInterval = this.stage === 3 ? 1000 : this.stage === 2 ? 1500 : 2000;
         this.angerModifier = this.stage === 3 ? 2 : 1;
+
+        if (this.stage >= 2) {
+            this.spawnZombieWaveIfReady();
+        }
 
         // Update projectiles
         [...this.fireballs, ...this.arrows].forEach(p => {
@@ -238,6 +247,42 @@ class Boss extends Enemy {
     arrowAttack(target) {
         //this.rightArm.shoot();
         this.arrows.push(new Projectile(this.gameEnv, target.position.x, target.position.y, this.position.x, this.position.y, "ARROW"));
+    }
+
+    spawnZombieWaveIfReady() {
+        const now = Date.now();
+        const cooldownMs = this.stage === 3 ? 3500 : 5000;
+        if (now - this.lastZombieWaveTime < cooldownMs) return;
+
+        const zombiesAlive = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Zombie').length;
+        if (zombiesAlive >= this.maxZombiesAlive) return;
+
+        const spawnCount = Math.min(this.zombieWaveSize, this.maxZombiesAlive - zombiesAlive);
+        for (let i = 0; i < spawnCount; i += 1) {
+            const spawn = this.getZombieSpawnPoint();
+            const zombieData = {
+                id: `Zombie-${now}-${i}`,
+                INIT_POSITION: spawn,
+                healthPoints: 40,
+                damage: 6,
+                speed: 0.5
+            };
+            this.gameEnv.gameObjects.push(new Zombie(zombieData, this.gameEnv));
+        }
+
+        this.lastZombieWaveTime = now;
+    }
+
+    getZombieSpawnPoint() {
+        const w = this.gameEnv.innerWidth;
+        const h = this.gameEnv.innerHeight;
+        const edge = Math.floor(Math.random() * 4);
+        const margin = 20;
+
+        if (edge === 0) return { x: Math.random() * w, y: margin };
+        if (edge === 1) return { x: Math.random() * w, y: h - margin };
+        if (edge === 2) return { x: margin, y: Math.random() * h };
+        return { x: w - margin, y: Math.random() * h };
     }
 
     /*

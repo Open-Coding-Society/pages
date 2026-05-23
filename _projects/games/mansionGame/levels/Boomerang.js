@@ -158,7 +158,7 @@ class Boomerang extends Character {
 
         // If the player is too close...
         const HIT_DISTANCE = 50;
-        const SCYTHE_DAMAGE = Math.round(15 * ATTACK_MODIFIER);
+        const SCYTHE_DAMAGE = Math.round(18 * ATTACK_MODIFIER);
         
         const players = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer');
         if (players.length === 0) return null;
@@ -185,7 +185,7 @@ class Boomerang extends Character {
         if (distanceFromPlayer <= HIT_DISTANCE) {
             this.revComplete = true;
             this.destroy();
-            if (!nearest.data) nearest.data = { health: 100 }; // Initialize health if not exists
+            if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 }; // Initialize health if not exists
             nearest.data.health -= SCYTHE_DAMAGE;
             console.log("Player Health:", nearest.data.health);
             if (nearest.data.health <= 0) {
@@ -198,7 +198,8 @@ class Boomerang extends Character {
         // Update the player health bar to accurately show the new health (if available)
         try {
             if (nearest && nearest.data && typeof updatePlayerHealthBar === 'function') {
-                const pct = Math.max(0, Math.min(100, nearest.data.health || 0));
+                const maxHealth = nearest.data.maxHealth || 100;
+                const pct = Math.max(0, Math.min(100, (nearest.data.health / maxHealth) * 100));
                 updatePlayerHealthBar(pct);
             }
         } catch (e) {

@@ -8,18 +8,31 @@ class FightingPlayer extends Player {
         this.projectiles = [];
         this.lastAttackTime = Date.now();
         this.attackCooldown = 500; // 500ms between shots
+        this.lastPumpkinTime = Date.now();
+        this.pumpkinCooldown = 900; // 900ms between pumpkin throws
+        this.shockwaveCooldown = 30000; // 30 seconds
+        this.lastShockwaveTime = Date.now();
+        this.shockwaveBossDamage = 20;
         this.currentDirection = 'right'; // track facing direction
 
-        // Bind attack to keyboard controls
+        // Bind attacks to keyboard controls
         if (typeof window !== 'undefined') {
             this._attackHandler = (event) => {
-                if (this.isAttackKey(event)) {
+                if (this.isArrowKey(event)) {
                     event.preventDefault();
-                    this.attack();
+                    this.attackArrow();
+                } else if (this.isPumpkinKey(event)) {
+                    event.preventDefault();
+                    this.attackPumpkin();
+                } else if (this.isShockwaveKey(event)) {
+                    event.preventDefault();
+                    this.triggerShockwave();
                 }
             };
             window.addEventListener('keydown', this._attackHandler);
         }
+
+        this.ensureShockwaveUI();
     }
 
     // Update spook and the projectiles
@@ -27,23 +40,33 @@ class FightingPlayer extends Player {
         super.update(...args);  // Do normal player updating
         
         this.updateCurrentDirection();
+        this.updateShockwaveUI();
         
         // Update and clean up projectiles
         this.projectiles = this.projectiles.filter(p => !p.revComplete);
         this.projectiles.forEach(p => p.update());
     }
 
-    // Execute an attack
-    attack() {
+    // Execute an arrow attack
+    attackArrow() {
         const now = Date.now();
         if (now - this.lastAttackTime < this.attackCooldown) return;
         
         const sourceX = this.position.x + this.width / 2;
         const sourceY = this.position.y + this.height / 2;
-        const attackVector = this.getAttackVector();
-        const attackDistance = 500;
-        const targetX = sourceX + attackVector.x * attackDistance;
-        const targetY = sourceY + attackVector.y * attackDistance;
+        const target = this.getNearestEnemyTarget();
+        let targetX;
+        let targetY;
+
+        if (target) {
+            targetX = target.x;
+            targetY = target.y;
+        } else {
+            const attackVector = this.getAttackVector();
+            const attackDistance = 500;
+            targetX = sourceX + attackVector.x * attackDistance;
+            targetY = sourceY + attackVector.y * attackDistance;
+        }
         
         // Create arrow projectile
         this.projectiles.push(
@@ -61,47 +84,302 @@ class FightingPlayer extends Player {
         this.lastAttackTime = now;
     }
 
-    isAttackKey(event) {
-        return event.code === 'Space' || event.key === ' ' || event.code === 'KeyM' || event.key?.toLowerCase() === 'm';
+    // Execute a pumpkin splash attack
+    attackPumpkin() {
+        const now = Date.now();
+        if (now - this.lastPumpkinTime < this.pumpkinCooldown) return;
+
+        const sourceX = this.position.x + this.width / 2;
+        const sourceY = this.position.y + this.height / 2;
+        const target = this.getNearestEnemyTarget();
+        let targetX;
+        let targetY;
+
+        if (target) {
+            targetX = target.x;
+            targetY = target.y;
+        } else {
+            const attackVector = this.getAttackVector();
+            const attackDistance = 420;
+            targetX = sourceX + attackVector.x * attackDistance;
+            targetY = sourceY + attackVector.y * attackDistance;
+        }
+
+        this.projectiles.push(
+            new Projectile(
+                this.gameEnv,
+                targetX,
+                targetY,
+                sourceX,
+                sourceY,
+                "PUMPKIN"
+            )
+        );
+
+        this.lastPumpkinTime = now;
+    }
+
+    isArrowKey(event) {
+        return event.code === 'KeyJ' || event.key?.toLowerCase() === 'j';
+    }
+
+    isPumpkinKey(event) {
+        return event.code === 'KeyK' || event.key?.toLowerCase() === 'k';
+    }
+
+    isShockwaveKey(event) {
+        return event.code === 'Space' || event.key === ' ';
     }
 
     updateCurrentDirection() {
         if (this.velocity.x === 0 && this.velocity.y === 0) return;
 
-        const horizontal = this.velocity.x > 0 ? 'Right' : this.velocity.x < 0 ? 'Left' : '';
-        const vertical = this.velocity.y > 0 ? 'down' : this.velocity.y < 0 ? 'up' : '';
+        const absX = Math.abs(this.velocity.x);
+        const absY = Math.abs(this.velocity.y);
 
-        if (vertical && horizontal) {
-            this.currentDirection = `${vertical}${horizontal}`;
-            return;
+        if (absX >= absY) {
+            this.currentDirection = this.velocity.x >= 0 ? 'right' : 'left';
+        } else {
+            this.currentDirection = this.velocity.y >= 0 ? 'down' : 'up';
         }
-
-        this.currentDirection = vertical || horizontal.toLowerCase();
     }
 
     getAttackVector() {
-        if (this.velocity.x !== 0 || this.velocity.y !== 0) {
-            return this.normalizeVector(this.velocity.x, this.velocity.y);
-        }
-
         const directionVectors = {
             up: { x: 0, y: -1 },
             down: { x: 0, y: 1 },
             left: { x: -1, y: 0 },
-            right: { x: 1, y: 0 },
-            upLeft: { x: -1, y: -1 },
-            upRight: { x: 1, y: -1 },
-            downLeft: { x: -1, y: 1 },
-            downRight: { x: 1, y: 1 }
+            right: { x: 1, y: 0 }
         };
 
         const directionVector = directionVectors[this.currentDirection] || directionVectors.right;
-        return this.normalizeVector(directionVector.x, directionVector.y);
+        return directionVector;
     }
 
-    normalizeVector(x, y) {
-        const length = Math.hypot(x, y) || 1;
-        return { x: x / length, y: y / length };
+    getNearestEnemyTarget() {
+        const enemies = this.gameEnv.gameObjects.filter(obj =>
+            obj.constructor.name === 'Boss' || obj.constructor.name === 'Zombie'
+        );
+        if (enemies.length === 0) return null;
+
+        const sourceX = this.position.x + this.width / 2;
+        const sourceY = this.position.y + this.height / 2;
+        let nearestBoss = null;
+        let nearestZombie = null;
+        let bossDist = Infinity;
+        let zombieDist = Infinity;
+
+        for (const enemy of enemies) {
+            const enemyX = enemy.position.x + enemy.width / 2;
+            const enemyY = enemy.position.y + enemy.height / 2;
+            const dx = enemyX - sourceX;
+            const dy = enemyY - sourceY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (enemy.constructor.name === 'Boss') {
+                if (dist < bossDist) {
+                    bossDist = dist;
+                    nearestBoss = enemy;
+                }
+            } else if (enemy.constructor.name === 'Zombie') {
+                if (dist < zombieDist) {
+                    zombieDist = dist;
+                    nearestZombie = enemy;
+                }
+            }
+        }
+
+        if (nearestBoss && nearestZombie) {
+            const bossBias = 15;
+            const favored = bossDist <= zombieDist + bossBias ? nearestBoss : nearestZombie;
+            return {
+                x: favored.position.x + favored.width / 2,
+                y: favored.position.y + favored.height / 2
+            };
+        }
+
+        const chosen = nearestBoss || nearestZombie;
+        return {
+            x: chosen.position.x + chosen.width / 2,
+            y: chosen.position.y + chosen.height / 2
+        };
+    }
+
+    triggerShockwave() {
+        if (!this.isShockwaveReady()) return;
+
+        const enemies = this.gameEnv.gameObjects.filter(obj =>
+            obj.constructor.name === 'Boss' || obj.constructor.name === 'Zombie'
+        );
+
+        enemies.forEach(enemy => {
+            if (enemy.constructor.name === 'Zombie') {
+                if (typeof enemy.takeDamage === 'function') {
+                    enemy.takeDamage(9999);
+                } else if (enemy.destroy) {
+                    enemy.destroy();
+                }
+            }
+        });
+
+        const boss = enemies.find(enemy => enemy.constructor.name === 'Boss');
+        if (boss) {
+            boss.healthPoints -= this.shockwaveBossDamage;
+        }
+
+        this.spawnShockwaveEffect();
+
+        this.lastShockwaveTime = Date.now();
+        this.updateShockwaveUI(true);
+    }
+
+    isShockwaveReady() {
+        return Date.now() - this.lastShockwaveTime >= this.shockwaveCooldown;
+    }
+
+    ensureShockwaveUI() {
+        if (typeof document === 'undefined') return;
+        if (document.getElementById('shockwave-container')) return;
+
+        const container = document.createElement('div');
+        container.id = 'shockwave-container';
+        Object.assign(container.style, {
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            gap: '6px',
+            width: '16%',
+            zIndex: '100'
+        });
+
+        const label = document.createElement('div');
+        label.textContent = 'SHOCKWAVE';
+        Object.assign(label.style, {
+            color: '#FFD066',
+            fontFamily: "'Press Start 2P', sans-serif",
+            fontSize: '12px',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.6)'
+        });
+
+        const bar = document.createElement('div');
+        bar.id = 'shockwave-bar';
+        Object.assign(bar.style, {
+            width: '100%',
+            height: '16px',
+            backgroundColor: '#222',
+            border: '2px solid #FFD066',
+            borderRadius: '8px',
+            boxShadow: '0 0 8px rgba(255, 208, 102, 0.5)'
+        });
+
+        const fill = document.createElement('div');
+        fill.id = 'shockwave-fill';
+        Object.assign(fill.style, {
+            height: '100%',
+            width: '0%',
+            backgroundColor: '#FF9A00',
+            borderRadius: '6px',
+            transition: 'width 0.2s ease'
+        });
+
+        bar.appendChild(fill);
+        container.appendChild(label);
+        container.appendChild(bar);
+
+        const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
+        gameContainer.appendChild(container);
+
+        if (!document.getElementById('shockwave-style')) {
+            const style = document.createElement('style');
+            style.id = 'shockwave-style';
+            style.textContent = `
+                @keyframes shockwave-shake {
+                    0% { transform: translate(0, 0); }
+                    20% { transform: translate(-2px, 1px); }
+                    40% { transform: translate(2px, -1px); }
+                    60% { transform: translate(-1px, -2px); }
+                    80% { transform: translate(1px, 2px); }
+                    100% { transform: translate(0, 0); }
+                }
+                #shockwave-container.shockwave-ready {
+                    animation: shockwave-shake 0.2s infinite;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    updateShockwaveUI(forceRefresh = false) {
+        if (typeof document === 'undefined') return;
+        const container = document.getElementById('shockwave-container');
+        const fill = document.getElementById('shockwave-fill');
+        if (!container || !fill) return;
+
+        const elapsed = Date.now() - this.lastShockwaveTime;
+        const pct = Math.max(0, Math.min(1, elapsed / this.shockwaveCooldown));
+        if (forceRefresh || pct < 1) {
+            fill.style.width = `${Math.floor(pct * 100)}%`;
+        }
+
+        if (pct >= 1) {
+            container.classList.add('shockwave-ready');
+        } else {
+            container.classList.remove('shockwave-ready');
+        }
+    }
+
+    spawnShockwaveEffect() {
+        if (!this.gameEnv || !this.gameEnv.container) return;
+
+        const shockwave = document.createElement('div');
+        Object.assign(shockwave.style, {
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            background: 'radial-gradient(circle, rgba(255, 245, 220, 0.95) 0%, rgba(255, 190, 80, 0.9) 45%, rgba(255, 120, 30, 0.6) 70%, rgba(0, 0, 0, 0) 100%)',
+            boxShadow: '0 0 120px 60px rgba(255, 200, 120, 0.9) inset',
+            pointerEvents: 'none',
+            zIndex: '200'
+        });
+
+        this.gameEnv.container.appendChild(shockwave);
+        shockwave.animate(
+            [
+                { opacity: 1 },
+                { opacity: 0 }
+            ],
+            { duration: 520, easing: 'ease-out', fill: 'forwards' }
+        );
+
+        setTimeout(() => shockwave.remove(), 560);
+
+        this.shakeScreen();
+    }
+
+    shakeScreen() {
+        const canvas = document.querySelector('canvas');
+        if (!canvas) return;
+
+        const originalTransform = canvas.style.transform;
+        canvas.style.transition = 'transform 0.05s ease-in-out';
+
+        let shakes = 0;
+        const maxShakes = 6;
+        const shakeInterval = setInterval(() => {
+            const offsetX = (Math.random() * 2 - 1) * 6;
+            const offsetY = (Math.random() * 2 - 1) * 6;
+            canvas.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            shakes += 1;
+            if (shakes >= maxShakes) {
+                clearInterval(shakeInterval);
+                canvas.style.transform = originalTransform || '';
+            }
+        }, 50);
     }
 
     // Clean up event listeners when destroyed

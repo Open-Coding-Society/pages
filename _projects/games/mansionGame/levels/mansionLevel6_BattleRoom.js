@@ -44,7 +44,8 @@ class MansionLevel6_BattleRoom {
             upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
             keypress: { up: 87, left: 65, down: 83, right: 68 }, // W, A, S, D
-            health: 100  // We define the health here
+            health: 300,  // We define the health here
+            maxHealth: 300
         };
 
         // Add the Reaper
@@ -174,30 +175,36 @@ class MansionLevel6_BattleRoom {
         if (typeof window !== 'undefined' && !window.__mansionLevelEnded) {
             createBossHealthBar();
             createPlayerHealthBar();
+            updatePlayerHealthBar(100);
         }
 
-        // Create instructions
-        const container = document.createElement('div');
-        container.id = 'instructions-container';
-        Object.assign(container.style, {
-            position: 'absolute',
-            bottom: '80px',  // Moved further down in the battle room
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '5px',
-            width: '60%',
-            zIndex: '100'  // Lower z-index to keep it in the battle room
+        // Create instructions under the boss bar (fade after 15 seconds)
+        const instruction = document.createElement('div');
+        instruction.id = 'instructions-container';
+        instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, SPACE for shockwave';
+        Object.assign(instruction.style, {
+            color: '#00ffffff',
+            fontFamily: "'Press Start 2P', sans-serif",
+            fontSize: '16px',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+            opacity: '1',
+            transition: 'opacity 1.2s ease',
+            marginTop: '6px',
+            whiteSpace: 'nowrap'
         });
-        container.textContent = "WASD to move, SPACE or M to shoot";
-        container.style.color = '#00ffffff';
-        container.style.fontFamily = "'Press Start 2P', sans-serif";
-        container.style.fontSize = '16px';
-        container.style.textShadow = '2px 2px 4px rgba(0, 0, 0, 0.5)';
-        const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
-        gameContainer.appendChild(container);
+
+        const bossContainer = document.getElementById('boss-health-container');
+        if (bossContainer) {
+            bossContainer.appendChild(instruction);
+        } else {
+            const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
+            gameContainer.appendChild(instruction);
+        }
+
+        setTimeout(() => {
+            instruction.style.opacity = '0';
+            setTimeout(() => instruction.remove(), 1400);
+        }, 15000);
     }
 }
 

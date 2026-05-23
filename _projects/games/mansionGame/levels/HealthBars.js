@@ -89,12 +89,13 @@ export function createPlayerHealthBar() {
     Object.assign(container.style, {
         position: 'absolute',
         bottom: '20px',
-        right: '20px',
+        left: '25%',
+        transform: 'translateX(-50%)',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         gap: '5px',
-        width: '8%',
+        width: '26%',
         zIndex: '100'
     });
 
