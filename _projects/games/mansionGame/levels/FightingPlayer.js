@@ -10,10 +10,11 @@ class FightingPlayer extends Player {
         this.attackCooldown = 500; // 500ms between shots
         this.currentDirection = 'right'; // track facing direction
 
-        // Bind attack to spacebar
+        // Bind attack to keyboard controls
         if (typeof window !== 'undefined') {
             this._attackHandler = (event) => {
-                if (event.code === 'Space' || event.key === ' ') {
+                if (this.isAttackKey(event)) {
+                    event.preventDefault();
                     this.attack();
                 }
             };
@@ -25,9 +26,7 @@ class FightingPlayer extends Player {
     update(...args) {
         super.update(...args);  // Do normal player updating
         
-        // Track facing direction based on movement
-        if (this.velocity.x > 0) this.currentDirection = 'right';
-        else if (this.velocity.x < 0) this.currentDirection = 'left';
+        this.updateCurrentDirection();
         
         // Update and clean up projectiles
         this.projectiles = this.projectiles.filter(p => !p.revComplete);
@@ -39,11 +38,12 @@ class FightingPlayer extends Player {
         const now = Date.now();
         if (now - this.lastAttackTime < this.attackCooldown) return;
         
-        // Calculate target point in direction player is facing
-        const facingRight = this.currentDirection === 'right';
-        // Shoot arrow 500 pixels in facing direction
-        const targetX = this.position.x + (facingRight ? 500 : -500);
-        const targetY = this.position.y;
+        const sourceX = this.position.x + this.width / 2;
+        const sourceY = this.position.y + this.height / 2;
+        const attackVector = this.getAttackVector();
+        const attackDistance = 500;
+        const targetX = sourceX + attackVector.x * attackDistance;
+        const targetY = sourceY + attackVector.y * attackDistance;
         
         // Create arrow projectile
         this.projectiles.push(
@@ -52,13 +52,56 @@ class FightingPlayer extends Player {
                 targetX, 
                 targetY,
                 // Offset source position to start at player center
-                this.position.x + this.width/2,
-                this.position.y + this.height/2,
+                sourceX,
+                sourceY,
                 "PLAYER"  // Special type for player projectiles
             )
         );
         
         this.lastAttackTime = now;
+    }
+
+    isAttackKey(event) {
+        return event.code === 'Space' || event.key === ' ' || event.code === 'KeyM' || event.key?.toLowerCase() === 'm';
+    }
+
+    updateCurrentDirection() {
+        if (this.velocity.x === 0 && this.velocity.y === 0) return;
+
+        const horizontal = this.velocity.x > 0 ? 'Right' : this.velocity.x < 0 ? 'Left' : '';
+        const vertical = this.velocity.y > 0 ? 'down' : this.velocity.y < 0 ? 'up' : '';
+
+        if (vertical && horizontal) {
+            this.currentDirection = `${vertical}${horizontal}`;
+            return;
+        }
+
+        this.currentDirection = vertical || horizontal.toLowerCase();
+    }
+
+    getAttackVector() {
+        if (this.velocity.x !== 0 || this.velocity.y !== 0) {
+            return this.normalizeVector(this.velocity.x, this.velocity.y);
+        }
+
+        const directionVectors = {
+            up: { x: 0, y: -1 },
+            down: { x: 0, y: 1 },
+            left: { x: -1, y: 0 },
+            right: { x: 1, y: 0 },
+            upLeft: { x: -1, y: -1 },
+            upRight: { x: 1, y: -1 },
+            downLeft: { x: -1, y: 1 },
+            downRight: { x: 1, y: 1 }
+        };
+
+        const directionVector = directionVectors[this.currentDirection] || directionVectors.right;
+        return this.normalizeVector(directionVector.x, directionVector.y);
+    }
+
+    normalizeVector(x, y) {
+        const length = Math.hypot(x, y) || 1;
+        return { x: x / length, y: y / length };
     }
 
     // Clean up event listeners when destroyed
