@@ -81,7 +81,7 @@ class MansionLevel6 {
             SCALE_FACTOR: 4,
             ANIMATION_RATE: 30,
             pixels: {width: 3600, height: 1200},
-            INIT_POSITION: {x: (width * 9 / 16), y: (height * 1 / 4)},
+            INIT_POSITION: {x: (width * 0.53), y: (height * 0.25)},
             orientation: {rows: 1, columns: 3 },
             down: {row: 0, start: 0, columns: 3 },
             hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
@@ -98,10 +98,7 @@ class MansionLevel6 {
                 "You will end up like me once you face the Reaper.",
                 "Are you the next opponent for my master? That's unfortunate for you.",
             ],
-            reaction: function() {
-                // Don't do anything on touch
-                // The Zombie only speaks when interacted with
-            },
+            reaction: function() {},
             interact: function() {
                 // Clear any existing dialogue first to prevent duplicates
                 if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
@@ -123,6 +120,7 @@ class MansionLevel6 {
             }
         };
 
+        // Data for the coding god zombie
         const sprite_data_zombie2 = {
             id: 'ZombieNPC2',
             greeting: sprite_greet_zombie,
@@ -130,7 +128,7 @@ class MansionLevel6 {
             SCALE_FACTOR: 4,
             ANIMATION_RATE: 30,
             pixels: {width: 3600, height: 1200},
-            INIT_POSITION: {x: (width * 5.5 / 16), y: (height * 1 / 4)},
+            INIT_POSITION: {x: (width * 0.28), y: (height * 0.25)},
             orientation: {rows: 1, columns: 3 },
             down: {row: 0, start: 0, columns: 3 , mirror: true},
             hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
@@ -183,7 +181,7 @@ class MansionLevel6 {
             SCALE_FACTOR: 6,
             ANIMATION_RATE: 100,
             pixels: {width: 2029, height: 2025},
-            INIT_POSITION: {x: (width * 37 / 80), y: (height / 8)},
+            INIT_POSITION: {x: (width * 0.44), y: (height * 0.17)},
             orientation: {rows: 1, columns: 1},
             down: {row: 0, start: 0, columns: 1},
             hitbox: {widthPercentage: 0.1, heightPercentage: 0.2},
@@ -192,10 +190,7 @@ class MansionLevel6 {
                 "Dangerous things await you beyond this door..",
                 "Prepare yourself. The journey beyond won't be easy."
             ],
-            reaction: function() {
-                // Don't show any reaction dialogue - this prevents the first alert
-                // The interact function will handle all dialogue instead
-            },
+            reaction: function() {},
             // Ask the player whether they want to enter the doors-- if they do, move to the battle room
             interact: function() {
                 // Clear any existing dialogue first to prevent duplicates
@@ -426,29 +421,28 @@ class MansionLevel6 {
             }
         };
 
-        const sprite_src_chair = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
+        const sprite_src_chairs = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
         const sprite_data_chair = {
             id: 'Chair',
             greeting: "Don't sit on me!",
-            src: sprite_src_chair,
+            src: sprite_src_chairs,
             SCALE_FACTOR: 6,
             ANIMATION_RATE: 100,
             pixels: {width: 2029, height: 2025},
-            INIT_POSITION: {x: (width * 8 / 80), y: (height * 1 / 4)},
+            INIT_POSITION: {x: (width * 0.07), y: (height * 0.36)},
             orientation: {rows: 1, columns: 1},
             down: {row: 0, start: 0, columns: 1},
             hitbox: {widthPercentage: 0.1, heightPercentage: 0.2}
         };
 
-        const sprite_src_chair2 = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
         const sprite_data_chair2 = {
             id: 'Chair 2',
             greeting: "Don't sit on me!",
-            src: sprite_src_chair2,
+            src: sprite_src_chairs,
             SCALE_FACTOR: 6,
             ANIMATION_RATE: 100,
             pixels: {width: 2029, height: 2025},
-            INIT_POSITION: {x: (width * 71 / 80), y: (height * 9 / 40)},
+            INIT_POSITION: {x: (width * 0.86), y: (height * 0.36)},
             orientation: {rows: 1, columns: 1},
             down: {row: 0, start: 0, columns: 1},
             hitbox: {widthPercentage: 0.1, heightPercentage: 0.2}
