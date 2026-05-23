@@ -305,6 +305,85 @@
     border-color: var(--gold);
     background: var(--gold-light);
   }
+
+  /* ── Contact Row ── */
+  .sip-contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .sip-contact-btn {
+    font-size: 11.5px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    padding: 7px 14px;
+    border-radius: 2px;
+    transition: border-color .2s, color .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .sip-contact-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .sip-contact-icon {
+    width: 13px;
+    height: 13px;
+    opacity: .55;
+    flex-shrink: 0;
+  }
+
+  /* ── Future Ideas ── */
+  .sip-future-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 6px;
+    padding: 36px;
+    margin-top: 24px;
+  }
+
+  .sip-future-idea {
+    padding: 16px 18px;
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .sip-future-idea:last-child { margin-bottom: 0; }
+
+  .sip-future-idea-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .sip-future-num {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    color: var(--gold);
+    background: var(--gold-light);
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+
+  .sip-future-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .sip-future-desc {
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--muted);
+    margin: 0;
+  }
 </style>
 
 <div class="sip">
@@ -406,6 +485,35 @@
     </div>
 
     <a href="https://www.sipoway.com/" class="sip-btn" target="_blank" rel="noopener">Visit Original Site</a>
+
+    <!-- ── Contact ── -->
+    <p class="sip-section-label" style="margin-top:28px;">Contact &amp; Social</p>
+    <div class="sip-contact-row">
+      <a href="https://www.instagram.com/soroptimistpoway/" class="sip-contact-btn" target="_blank" rel="noopener">
+        <!-- Instagram icon -->
+        <svg class="sip-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="5"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        @soroptimistpoway
+      </a>
+      <a href="https://www.facebook.com/sipoway" class="sip-contact-btn" target="_blank" rel="noopener">
+        <!-- Facebook icon -->
+        <svg class="sip-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+        </svg>
+        facebook.com/sipoway
+      </a>
+      <a href="mailto:SIPoway@Soroptimist.net" class="sip-contact-btn">
+        <!-- Email icon -->
+        <svg class="sip-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M2 7l10 7 10-7"/>
+        </svg>
+        SIPoway@Soroptimist.net
+      </a>
+    </div>
   </div>
 
   <!-- ── What We Built ── -->
@@ -429,7 +537,7 @@
       </div>
       <div class="sip-change">
         <p class="sip-change-title"><a href="https://sip.opencodingsociety.com/sip/garden">Community Garden</a></p>
-        <p class="sip-change-desc">Choose a sprite to represent yourself in the community garden, which saves your choice and shows everyone's sprites when you visit.</p>
+        <p class="sip-change-desc">Choose a sprite to represent yourself in the community garden, which saves your choice and shows everyone's sprites when you visit. A real-time chat system — built with WebSockets — lets users send and receive messages instantly, fostering conversation and community right in the garden. Donors are rewarded with the ability to place a new emoji in the garden, giving supporters a visible, lasting mark in the shared space and creating an ongoing incentive to give.</p>
       </div>
       <div class="sip-change">
         <p class="sip-change-title"><a href="https://sip.opencodingsociety.com/sip/contact">Contact Page</a></p>
@@ -449,4 +557,39 @@
       </div>
     </div>
   </div>
+
+  <!-- ── Future Ideas ── -->
+  <div class="sip-future-card">
+    <h2 class="sip-project-title">Future Ideas</h2>
+    <p class="sip-subtitle">What's Next on the Roadmap</p>
+
+    <div style="margin-top: 20px;">
+
+      <div class="sip-future-idea">
+        <div class="sip-future-idea-header">
+          <span class="sip-future-num">01</span>
+          <p class="sip-future-title">Social Media Embeds on the Blog Page</p>
+        </div>
+        <p class="sip-future-desc">Since SIP Poway is very active on both Instagram and Facebook, embedding live feeds directly into the blog page of the prototype would let visitors see the latest posts and updates without leaving the site — keeping the community informed and the page feeling fresh at all times.</p>
+      </div>
+
+      <div class="sip-future-idea">
+        <div class="sip-future-idea-header">
+          <span class="sip-future-num">02</span>
+          <p class="sip-future-title">Program-Specific Private Chat Channels</p>
+        </div>
+        <p class="sip-future-desc">Expanding the Community Garden's WebSocket chat into dedicated private channels for each program (e.g. Live Your Dream, STAT!, Transitional Housing) would let users connect with others who share their specific interests and circumstances — building deeper, more meaningful peer communities around each cause.</p>
+      </div>
+
+      <div class="sip-future-idea">
+        <div class="sip-future-idea-header">
+          <span class="sip-future-num">03</span>
+          <p class="sip-future-title">Donation Rewards in the Community Garden</p>
+        </div>
+        <p class="sip-future-desc">To encourage ongoing giving, donors would unlock the ability to permanently place a new emoji or sprite into the shared garden — turning each donation into a visible, lasting contribution to the community space. Tiered rewards (e.g. a flower for $10, a tree for $50) would give supporters both recognition and a reason to keep coming back.</p>
+      </div>
+
+    </div>
+  </div>
+
 </div>
