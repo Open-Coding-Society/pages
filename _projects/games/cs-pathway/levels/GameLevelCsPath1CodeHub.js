@@ -1084,33 +1084,55 @@ function openDatavizPanel(gameControl) {
 // Answers are short (1-4 words) so they fit clearly on enemy ships
 const LESSON_QUESTIONS = {
   frontend: [
-    { q: 'In Markdown, `**text**` makes text ___.', ans: 'bold',        wrong: ['italic', 'code', 'big'] },
-    { q: 'In Markdown, `*text*` makes text ___.',   ans: 'italic',      wrong: ['bold', 'code', 'linked'] },
-    { q: 'In Markdown, `- item` creates a ___.',    ans: 'list',        wrong: ['heading', 'blockquote', 'link'] },
-    { q: 'In Markdown, `> text` creates a ___.',    ans: 'blockquote',  wrong: ['list', 'heading', 'link'] },
-    { q: 'CSS `display:flex` is called ___.',        ans: 'Flexbox',     wrong: ['Grid', 'Float', 'Block'] },
+    { q: 'In Markdown, **text** makes text ___.',    ans: 'bold',        wrong: ['italic', 'code', 'big'] },
+    { q: 'In Markdown, *text* makes text ___.',      ans: 'italic',      wrong: ['bold', 'code', 'linked'] },
+    { q: 'In Markdown, - item creates a ___.',       ans: 'list',        wrong: ['heading', 'blockquote', 'link'] },
+    { q: 'In Markdown, > text creates a ___.',       ans: 'blockquote',  wrong: ['list', 'heading', 'link'] },
+    { q: 'CSS display:flex is called ___.',           ans: 'Flexbox',     wrong: ['Grid', 'Float', 'Block'] },
+    { q: 'In Markdown, [text](url) creates a ___.',  ans: 'link',        wrong: ['image', 'heading', 'list'] },
+    { q: 'In Markdown, # H1 creates a heading level ___.',  ans: '1',   wrong: ['2', '3', '6'] },
+    { q: 'CSS transition is used to ___ changes.',   ans: 'animate',     wrong: ['delete', 'hide', 'copy'] },
+    { q: 'CSS box model: margin, border, ___, content.', ans: 'padding', wrong: ['margin', 'color', 'flex'] },
+    { q: '## in Markdown creates a heading level ___.',   ans: '2',      wrong: ['1', '3', '4'] },
   ],
   backend: [
-    { q: 'POST is used to ___ a resource.',          ans: 'create',      wrong: ['read', 'update', 'delete'] },
-    { q: 'GET is used to ___ data.',                 ans: 'read',        wrong: ['create', 'update', 'delete'] },
-    { q: 'PUT is used to ___ a resource.',           ans: 'update',      wrong: ['create', 'read', 'delete'] },
-    { q: 'DELETE is used to ___ data.',              ans: 'remove',      wrong: ['create', 'read', 'update'] },
-    { q: 'To fetch all records, use ___.',           ans: 'GET',         wrong: ['POST', 'PUT', 'DELETE'] },
+    { q: 'POST is used to ___ a resource.',           ans: 'create',      wrong: ['read', 'update', 'delete'] },
+    { q: 'GET is used to ___ data.',                  ans: 'read',        wrong: ['create', 'update', 'delete'] },
+    { q: 'PUT is used to ___ a resource.',            ans: 'update',      wrong: ['create', 'read', 'delete'] },
+    { q: 'DELETE is used to ___ data.',               ans: 'remove',      wrong: ['create', 'read', 'update'] },
+    { q: 'To fetch all records, use ___.',            ans: 'GET',         wrong: ['POST', 'PUT', 'DELETE'] },
+    { q: 'To add a new record, use ___.',             ans: 'POST',        wrong: ['GET', 'PUT', 'DELETE'] },
+    { q: 'To remove a record, use ___.',              ans: 'DELETE',      wrong: ['GET', 'POST', 'PUT'] },
+    { q: 'To change an existing record, use ___.',    ans: 'PUT',         wrong: ['GET', 'POST', 'DELETE'] },
+    { q: 'Which method reads data from a server?',    ans: 'GET',         wrong: ['POST', 'PUT', 'DELETE'] },
+    { q: 'Which method creates new data?',            ans: 'POST',        wrong: ['GET', 'PUT', 'DELETE'] },
   ],
   dataviz: [
-    { q: '?industry=Software ___ by industry.',      ans: 'filters',     wrong: ['sorts', 'pages', 'deletes'] },
-    { q: '?minSize=100 finds companies ___ 100.',    ans: 'over',        wrong: ['under', 'exactly', 'without'] },
-    { q: '?page=1&size=4 is called ___.',            ans: 'pagination',  wrong: ['filtering', 'sorting', 'routing'] },
-    { q: 'JPQL queries begin with ___.',             ans: 'SELECT',      wrong: ['FIND', 'GET', 'FETCH'] },
-    { q: 'WHERE in JPQL is used to ___ results.',   ans: 'filter',      wrong: ['sort', 'count', 'group'] },
+    { q: '?industry=Software ___ by industry.',       ans: 'filters',     wrong: ['sorts', 'pages', 'deletes'] },
+    { q: '?minSize=100 is the ___ size filter.',      ans: 'minimum',     wrong: ['maximum', 'average', 'total'] },
+    { q: '?page=1&size=4 is called ___.',             ans: 'pagination',  wrong: ['filtering', 'sorting', 'routing'] },
+    { q: 'JPQL queries begin with ___.',              ans: 'SELECT',      wrong: ['FIND', 'GET', 'FETCH'] },
+    { q: 'WHERE in JPQL is used to ___ results.',     ans: 'filter',      wrong: ['sort', 'count', 'group'] },
+    { q: 'findBySizeGreaterThan is a ___ JPA method.',ans: 'Spring',      wrong: ['Java', 'Python', 'SQL'] },
+    { q: '?page=1&size=4 shows ___ items per page.',  ans: '4',           wrong: ['1', '10', '100'] },
+    { q: 'JPQL: SELECT c FROM ___ c WHERE ...',       ans: 'Company',     wrong: ['SELECT', 'WHERE', 'FROM'] },
   ],
 };
+
+function pickQuestions(lessonKey, n) {
+  var pool = LESSON_QUESTIONS[lessonKey].slice();
+  for (var i = pool.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  return pool.slice(0, n || 5);
+}
 
 // ── Space Invaders game panel ─────────────────────────────────────────────────
 // Scoring:  shoot WRONG → +pts (combo scales)  |  shoot CORRECT → −50 pts
 //           WRONG passes bottom → −75 pts, −1 life  |  CORRECT passes → +50 pts
 //           5 lives · score can go negative · hi-score per lesson in localStorage
-function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
+function openSpaceInvadersGame(lessonKey, accentColor, gameControl, onWin) {
   const label = { frontend: 'Frontend', backend: 'Backend', dataviz: 'Dataviz' }[lessonKey] || lessonKey;
   const body  = createPanel(`🎮 ${label} — Space Invaders`, accentColor, gameControl);
 
@@ -1132,7 +1154,7 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
   /* canvas logical size — width fills panel, height fits remaining space */
   const CW = panelW - 20;  /* 10px body padding each side */
   const CH = Math.max(340, panelH - OVERHEAD);
-  const questions = LESSON_QUESTIONS[lessonKey];
+  let questions = pickQuestions(lessonKey);
   const HI_KEY    = `si-hi-${lessonKey}`;
 
   body.innerHTML = `
@@ -1400,6 +1422,7 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
           gameState = 'win';
           const bar = document.getElementById('si-question-bar');
           if (bar) bar.innerHTML = '<span style="color:#86efac;">All questions cleared — great job!</span>';
+          if (onWin) onWin();
         } else {
           startNextWave();
         }
@@ -1667,7 +1690,7 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
       ctx.font = '17px system-ui'; ctx.fillStyle = '#94a3b8';
       ctx.fillText(`Final Score: ${score}   ·   Best: ${hi}`, CW / 2, CH / 2);
       ctx.font = '13px system-ui'; ctx.fillStyle = '#475569';
-      ctx.fillText('Press ↺ Restart or close', CW / 2, CH / 2 + 40);
+      ctx.fillText(gameState === 'win' && onWin ? 'Next lesson unlocked! Press Restart to play again or close.' : 'Press Restart or close', CW / 2, CH / 2 + 40);
       ctx.restore();
     }
 
@@ -1761,6 +1784,7 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl) {
 
   /* restart */
   document.getElementById('si-restart').onclick = () => {
+    questions = pickQuestions(lessonKey);
     lives = 5; score = 0; qIdx = 0; combo = 0;
     enemies = []; bullets = []; particles = []; floaters = [];
     player.x = CW / 2; player.thruster = 0;
@@ -1934,7 +1958,11 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('frontend', '#4caef0', this.gameEnv.gameControl);
+              openSpaceInvadersGame('frontend', '#4caef0', this.gameEnv.gameControl, function() {
+                saveCHProgress({ frontendCompleted: true });
+                removeLockOverlay('backend');
+                showUnlockBadge('Backend Terminal Unlocked!');
+              });
             },
           },
         ]);
@@ -1978,7 +2006,11 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('backend', '#86efac', this.gameEnv.gameControl);
+              openSpaceInvadersGame('backend', '#86efac', this.gameEnv.gameControl, function() {
+                saveCHProgress({ backendCompleted: true });
+                removeLockOverlay('dataviz');
+                showUnlockBadge('Dataviz Terminal Unlocked!');
+              });
             },
           },
         ]);
@@ -2022,7 +2054,10 @@ class GameLevelCsPath1CodeHub extends GameLevelCsPathIdentity {
             primary: false,
             action:  () => {
               this.dialogueSystem.closeDialogue();
-              openSpaceInvadersGame('dataviz', '#c084fc', this.gameEnv.gameControl);
+              openSpaceInvadersGame('dataviz', '#c084fc', this.gameEnv.gameControl, function() {
+                saveCHProgress({ datavizCompleted: true });
+                showUnlockBadge('Code Hub Mastered!');
+              });
             },
           },
         ]);
