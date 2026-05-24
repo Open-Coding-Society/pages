@@ -12,8 +12,10 @@ import { spawnPlayerDamageEffect } from './DamageEffects.js';
 */
 
 class Projectile extends Character {
+    static spriteCache = new Map();
+
     constructor(gameEnv = null, targetx, targety, sourcex, sourcey, type) {
-        super({id: type}, gameEnv);
+        super({ id: type }, gameEnv);
 
         this.source_coords = { x: sourcex, y: sourcey };
         this.target_coords = { x: targetx, y: targety };
@@ -42,37 +44,52 @@ class Projectile extends Character {
         this.revComplete = false;
 
         // Load sprite/image based on type
+        this.frameIndex = 0;
+        this.frameCount = 1; // single frame
+
         if (type === "ARROW" || type === "PLAYER") {
-            this.spriteSheet = new Image();
-            this.frameIndex = 0;
-            this.frameCount = 1; // single frame
-            this.width = 60; // scale down if needed
+            this.width = 60;
             this.height = 25;
-            this.spriteSheet.onload = () => this.imageLoaded = true;
-            this.spriteSheet.src = path + "/images/projects/mansionGame/arrow.png";
+            this.setSprite(path + "/images/projects/mansionGame/arrow.png");
         } else if (type === "PUMPKIN") {
-            this.spriteSheet = new Image();
-            this.frameIndex = 0;
-            this.frameCount = 1; // single frame
             this.width = 48;
             this.height = 48;
-            this.spriteSheet.onload = () => this.imageLoaded = true;
-            this.spriteSheet.src = path + "/images/projects/mansionGame/pumpkin.png";
+            this.setSprite(path + "/images/projects/mansionGame/pumpkin.png");
         } else if (type === "FIREBALL") {
-            // Fireball is a single-frame static image (178x123 source). Use a scaled size preserving aspect ratio.
-            this.spriteSheet = new Image();
-            this.frameIndex = 0;
-            this.frameCount = 1; // single frame
-            // source aspect ~ 178 / 123 => width is larger; scale to a reasonable in-game size
             this.width = 64;
-            this.height = 44; // keep aspect roughly (64 * 123 / 178 ≈ 44)
-            this.spriteSheet.onload = () => this.imageLoaded = true;
-            this.spriteSheet.src = path + "/images/projects/mansionGame/staticfireball.png";
+            this.height = 44;
+            this.setSprite(path + "/images/projects/mansionGame/staticfireball.png");
         }
         this.isAnimated = false;
 
         // Start at source position
         this.position = { x: sourcex, y: sourcey };
+
+        // These projectile canvases stay the same size for their whole lifetime.
+        this.canvas.width = Math.max(1, Math.floor(this.width));
+        this.canvas.height = Math.max(1, Math.floor(this.height));
+    }
+
+    setSprite(src) {
+        const cachedSprite = Projectile.spriteCache.get(src);
+        if (cachedSprite) {
+            this.spriteSheet = cachedSprite;
+            this.imageLoaded = cachedSprite.complete;
+            if (!this.imageLoaded) {
+                cachedSprite.addEventListener('load', () => {
+                    this.imageLoaded = true;
+                }, { once: true });
+            }
+            return;
+        }
+
+        const sprite = new Image();
+        sprite.onload = () => {
+            this.imageLoaded = true;
+        };
+        sprite.src = src;
+        Projectile.spriteCache.set(src, sprite);
+        this.spriteSheet = sprite;
     }
 
     update() {
@@ -146,10 +163,6 @@ class Projectile extends Character {
             const dstW = Math.max(1, Math.floor(this.width));
             const dstH = Math.max(1, Math.floor(this.height));
 
-            // Resize canvas to destination size
-            this.canvas.width = dstW;
-            this.canvas.height = dstH;
-
             // Draw rotated frame centered
             ctx.save();
             ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -170,10 +183,6 @@ class Projectile extends Character {
             const srcH = this.spriteSheet.naturalHeight || this.spriteSheet.height;
             const dstW = Math.max(1, Math.floor(this.width));
             const dstH = Math.max(1, Math.floor(this.height));
-
-            // Resize canvas to destination size
-            this.canvas.width = dstW;
-            this.canvas.height = dstH;
 
             // Draw rotated image centered on canvas
             ctx.save();
@@ -353,12 +362,12 @@ class Projectile extends Character {
     // Function to execute death
     die() {
         // Find all player objects
-        const players = this.gameEnv.gameObjects.filter(obj => 
+        const players = this.gameEnv.gameObjects.filter(obj =>
             obj.constructor.name === 'Player'
         );
-        
+
         if (players.length === 0) return;
-        
+
         // Find nearest player
         let nearest = players[0];
         let minDist = Infinity;
@@ -366,7 +375,7 @@ class Projectile extends Character {
         for (const player of players) {
             const dx = player.position.x - this.position.x;
             const dy = player.position.y - this.position.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
+            const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < minDist) {
                 minDist = dist;
                 nearest = player;
