@@ -1,6 +1,7 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import showDeathScreen from './DeathScreen.js';
 import { updatePlayerHealthBar } from "./HealthBars.js";
+import { spawnPlayerDamageEffect } from './DamageEffects.js';
 
 class Boomerang extends Character {
     constructor(gameEnv = null, sourcex, sourcey, targetx, targety) {
@@ -187,6 +188,7 @@ class Boomerang extends Character {
             this.destroy();
             if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 }; // Initialize health if not exists
             nearest.data.health -= SCYTHE_DAMAGE;
+            spawnPlayerDamageEffect(this.gameEnv, nearest);
             console.log("Player Health:", nearest.data.health);
             if (nearest.data.health <= 0) {
                 console.log("Game over -- the player has been defeated!");

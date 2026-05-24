@@ -1,6 +1,7 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import { updatePlayerHealthBar } from './HealthBars.js';
 import showDeathScreen from './DeathScreen.js';
+import { spawnPlayerDamageEffect } from './DamageEffects.js';
 
 class Zombie extends Character {
     constructor(data = null, gameEnv = null) {
@@ -95,6 +96,7 @@ class Zombie extends Character {
             this._lastHitTime = now;
             if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 };
             nearest.data.health -= this.damage;
+            spawnPlayerDamageEffect(this.gameEnv, nearest);
             if (nearest.data.health <= 0) {
                 showDeathScreen(nearest);
             }

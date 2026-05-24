@@ -263,7 +263,7 @@ class Boss extends Enemy {
             const zombieData = {
                 id: `Zombie-${now}-${i}`,
                 INIT_POSITION: spawn,
-                healthPoints: 40,
+                healthPoints: 1,
                 damage: 6,
                 speed: 0.5
             };
