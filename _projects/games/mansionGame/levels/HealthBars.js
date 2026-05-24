@@ -54,7 +54,7 @@ export function createBossHealthBar() {
     barContainer.appendChild(fill);
     container.appendChild(label);
     container.appendChild(barContainer);
-    
+
     // Find the game canvas/container and append our health bar to it
     const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
     gameContainer.appendChild(container);
@@ -137,7 +137,7 @@ export function createPlayerHealthBar() {
     barContainer.appendChild(fill);
     container.appendChild(label);
     container.appendChild(barContainer);
-    
+
     // Find the game canvas/container and append our health bar to it
     const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
     gameContainer.appendChild(container);

@@ -39,17 +39,20 @@ class Zombie extends Character {
             this.draw();
         }
         if (this._tick === 0) {
-            this.moveTowardPlayer();
-            this.tryDamagePlayer();
+            const target = this.getNearestPlayer();
+            if (!target) return;
+
+            this.moveTowardPlayer(target.player);
+            this.tryDamagePlayer(target.player, target.distanceSquared);
             this.stayWithinCanvas();
         }
     }
 
-    moveTowardPlayer() {
+    getNearestPlayer() {
         const players = this.gameEnv.gameObjects.filter(obj =>
             obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer'
         );
-        if (players.length === 0) return;
+        if (players.length === 0) return null;
 
         let nearest = players[0];
         let minDist = Infinity;
@@ -63,47 +66,34 @@ class Zombie extends Character {
             }
         }
 
-        const dx = nearest.position.x - this.position.x;
-        const dy = nearest.position.y - this.position.y;
+        return { player: nearest, distanceSquared: minDist };
+    }
+
+    moveTowardPlayer(player) {
+        const dx = player.position.x - this.position.x;
+        const dy = player.position.y - this.position.y;
         const angle = Math.atan2(dy, dx);
         this.position.x += Math.cos(angle) * this.speed;
         this.position.y += Math.sin(angle) * this.speed;
     }
 
-    tryDamagePlayer() {
+    tryDamagePlayer(player, distanceSquared) {
         const now = Date.now();
         if (now - this._lastHitTime < this.hitCooldownMs) return;
 
-        const players = this.gameEnv.gameObjects.filter(obj =>
-            obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer'
-        );
-        if (players.length === 0) return;
-
-        let nearest = players[0];
-        let minDist = Infinity;
-        for (const player of players) {
-            const dx = player.position.x - this.position.x;
-            const dy = player.position.y - this.position.y;
-            const dist = dx * dx + dy * dy;
-            if (dist < minDist) {
-                minDist = dist;
-                nearest = player;
-            }
-        }
-
         const HIT_DISTANCE = 45;
-        if (minDist <= HIT_DISTANCE * HIT_DISTANCE) {
+        if (distanceSquared <= HIT_DISTANCE * HIT_DISTANCE) {
             this._lastHitTime = now;
-            if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 };
-            nearest.data.health -= this.damage;
-            spawnPlayerDamageEffect(this.gameEnv, nearest);
-            if (nearest.data.health <= 0) {
-                showDeathScreen(nearest);
+            if (!player.data) player.data = { health: 100, maxHealth: 100 };
+            player.data.health -= this.damage;
+            spawnPlayerDamageEffect(this.gameEnv, player);
+            if (player.data.health <= 0) {
+                showDeathScreen(player);
             }
 
             try {
-                const maxHealth = nearest.data.maxHealth || 100;
-                const pct = Math.max(0, Math.min(100, (nearest.data.health / maxHealth) * 100));
+                const maxHealth = player.data.maxHealth || 100;
+                const pct = Math.max(0, Math.min(100, (player.data.health / maxHealth) * 100));
                 updatePlayerHealthBar(pct);
             } catch (e) {
                 console.warn('Failed to update player health bar:', e);
