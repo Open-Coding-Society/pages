@@ -37,33 +37,6 @@ class Boss extends Enemy {
         this.zombieWaveSize = data?.zombieWaveSize || 3;
         this.maxZombiesAlive = data?.maxZombiesAlive || 8;
 
-        // Debug/cheat key code - uncomment to enable
-        // Add a debug/cheat key ('p') that instantly defeats this boss
-        this._killKeyHandler = (event) => {
-            try {
-                if (!event || !event.key) return;
-                if (event.key === 'p' || event.key === 'P') {
-                    console.log("[Boss] Kill key pressed: forcing boss death.");
-                    this.healthPoints = 0;
-                     window.__mansionLevelEnded = true;
-                    // Show victory screen immediately
-                    try { showEndScreen(this.gameEnv); } catch (e) { console.warn('Error showing victory screen:', e); }
-                    // Remove the boss graphic and objects from the game
-                    try { this.destroy(); } catch (e) { console.warn('Error destroying boss:', e); }
-                    // End the current level so game control can transition
-                    try {
-                        if (this.gameEnv && this.gameEnv.gameControl && this.gameEnv.gameControl.currentLevel) {
-                            this.gameEnv.gameControl.currentLevel.continue = false;
-                        }
-                    } catch (e) { console.warn('Error ending level after boss kill:', e); }
-                }
-            } catch (e) { console.error('Kill key handler error:', e); }
-        };
-
-        // Attach the listener to window so it's active while the boss exists
-        if (typeof window !== 'undefined') window.addEventListener('keydown', this._killKeyHandler);
-        
-
         this.projectileTypes = data?.projectileTypes || ['FIREBALL', 'ARROW'];
 
         // Initialize arms
@@ -133,7 +106,7 @@ class Boss extends Enemy {
         // Update stage & attack speed
         const healthRatio = this.healthPoints / this.fullHealth;
         this.stage = healthRatio < 0.33 ? 3 : (healthRatio < 0.66 ? 2 : 1);
-        this.attackInterval = this.stage === 3 ? 1000 : this.stage === 2 ? 1500 : 2000;
+        this.attackInterval = this.stage === 3 ? 500 : this.stage === 2 ? 750 : 1000;
         this.angerModifier = this.stage === 3 ? 2 : 1;
 
         if (this.stage >= 2) {

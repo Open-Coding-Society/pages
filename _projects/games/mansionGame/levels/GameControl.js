@@ -50,7 +50,6 @@ class GameControl {
         // Don't add exit key listener - Game.js handles it via _setupEscapeKey()
         // Add listener for opening the pause menu (toggle with 'p') and skip key (L)
         document.addEventListener('keydown', this.pauseKeyListener);
-        this.addSkipKeyListener();
         // PauseMenu is initialized by the shared Game core (optional dynamic import).
         this.transitionToLevel();
     }
@@ -304,15 +303,7 @@ class GameControl {
         // Don't interfere with typing in inputs
         const tag = event.target && event.target.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA' || event.defaultPrevented) return;
-
-        if (event.key === 'l' || event.key === 'L') {
-            // Call the public API to end/skip the level
-            try {
-                this.endLevel();
-            } catch (e) {
-                console.warn('Error skipping level via L key:', e);
-            }
-        }
+        return;
     }
 
     addSkipKeyListener() {
