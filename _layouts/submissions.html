@@ -126,6 +126,14 @@ active_tab: submissions
                 <textarea id="edit-comment" class="edit-textarea" rows="4" placeholder="Add or update the submission comment"></textarea>
             </div>
 
+                <div id="edit-admin-fields" class="edit-section hidden">
+                    <label class="edit-field-label" for="edit-grade">Grade</label>
+                    <input type="number" id="edit-grade" class="edit-input" min="0" max="100" step="0.5" placeholder="0–100">
+
+                    <label class="edit-field-label" for="edit-feedback">Feedback</label>
+                    <textarea id="edit-feedback" class="edit-textarea" rows="3" placeholder="Provide feedback for the student"></textarea>
+                </div>
+
             <div id="edit-modal-status" class="edit-modal-status" aria-live="polite"></div>
 
             <div class="edit-modal-actions">
@@ -681,6 +689,19 @@ active_tab: submissions
         urlInput.value = content.url || '';
         notesInput.value = content.notes || submission.comment || '';
         commentInput.value = submission.comment || content.notes || '';
+            // Populate admin-only grade/feedback fields when available
+            const adminFields = document.getElementById('edit-admin-fields');
+            const gradeInput = document.getElementById('edit-grade');
+            const feedbackInput = document.getElementById('edit-feedback');
+            if (gradeInput) gradeInput.value = submission.grade != null ? String(submission.grade) : '';
+            if (feedbackInput) feedbackInput.value = submission.feedback || '';
+            if (adminFields) {
+                if (isAdmin) {
+                    adminFields.classList.remove('hidden');
+                } else {
+                    adminFields.classList.add('hidden');
+                }
+            }
         if (fileInput) fileInput.value = '';
         currentFile.textContent = content.filename
             ? `Current file: ${content.filename}`
@@ -766,6 +787,35 @@ active_tab: submissions
             }
 
             setEditModalStatus('Submission updated successfully.', 'success');
+
+                // If the current user is an admin/teacher, optionally save a grade and feedback
+                try {
+                    const gradeInput = document.getElementById('edit-grade');
+                    const feedbackInput = document.getElementById('edit-feedback');
+                    const gradeValRaw = gradeInput ? gradeInput.value.trim() : '';
+                    if (isAdmin && gradeValRaw !== '') {
+                        const gradeNum = parseFloat(gradeValRaw);
+                        if (!isNaN(gradeNum)) {
+                            setEditModalStatus('Saving grade...', 'info');
+                            const gradeUrl = `${javaURI}/api/submissions/grade/${encodeURIComponent(activeEditSubmissionId)}?grade=${encodeURIComponent(gradeNum)}&feedback=${encodeURIComponent(feedbackInput ? feedbackInput.value : '')}`;
+                            const gradeResp = await fetch(gradeUrl, {
+                                method: 'POST',
+                                mode: 'cors',
+                                credentials: 'include',
+                                headers: {
+                                    'X-Origin': 'client'
+                                }
+                            });
+
+                            if (!gradeResp.ok) {
+                                console.warn('Grade save failed', gradeResp.status);
+                            }
+                        }
+                    }
+                } catch (gradeErr) {
+                    console.warn('Error saving grade:', gradeErr);
+                }
+
             await loadSubmissions();
             closeEditModal();
         } catch (error) {
