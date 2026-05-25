@@ -227,10 +227,50 @@ class FightingPlayer extends Player {
             boss.healthPoints -= this.shockwaveBossDamage;
         }
 
+        this.clearActiveProjectiles();
+
         this.spawnShockwaveEffect();
 
         this.lastShockwaveTime = Date.now();
         this.updateShockwaveUI(true);
+    }
+
+    clearActiveProjectiles() {
+        const bosses = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Boss');
+        bosses.forEach(boss => {
+            if (Array.isArray(boss.fireballs)) {
+                boss.fireballs.forEach(p => {
+                    p.revComplete = true;
+                    if (typeof p.destroy === 'function') p.destroy();
+                });
+                boss.fireballs = [];
+            }
+            if (Array.isArray(boss.arrows)) {
+                boss.arrows.forEach(p => {
+                    p.revComplete = true;
+                    if (typeof p.destroy === 'function') p.destroy();
+                });
+                boss.arrows = [];
+            }
+            if (Array.isArray(boss.scythes)) {
+                boss.scythes.forEach(p => {
+                    p.revComplete = true;
+                    if (typeof p.destroy === 'function') p.destroy();
+                });
+                boss.scythes = [];
+            }
+        });
+
+        this.gameEnv.gameObjects = this.gameEnv.gameObjects.filter(obj => {
+            const name = obj?.constructor?.name;
+            const type = obj?.type;
+            const isPlayerShot = type === 'PLAYER' || type === 'PUMPKIN';
+            if ((name === 'Projectile' || name === 'Boomerang') && !isPlayerShot) {
+                if (typeof obj.destroy === 'function') obj.destroy();
+                return false;
+            }
+            return true;
+        });
     }
 
     isShockwaveReady() {

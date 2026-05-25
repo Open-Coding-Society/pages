@@ -106,7 +106,7 @@ class Boss extends Enemy {
         // Update stage & attack speed
         const healthRatio = this.healthPoints / this.fullHealth;
         this.stage = healthRatio < 0.33 ? 3 : (healthRatio < 0.66 ? 2 : 1);
-        this.attackInterval = this.stage === 3 ? 500 : this.stage === 2 ? 750 : 1000;
+        this.attackInterval = this.stage === 3 ? 750 : this.stage === 2 ? 1000 : 1000;
         this.angerModifier = this.stage === 3 ? 2 : 1;
 
         if (this.stage >= 2) {
