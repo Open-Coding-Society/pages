@@ -128,7 +128,7 @@ class FightingPlayer extends Player {
     }
 
     isShockwaveKey(event) {
-        return event.code === 'Space' || event.key === ' ';
+        return event.code === 'KeyL' || event.key?.toLowerCase() === 'l';
     }
 
     updateCurrentDirection() {
@@ -245,22 +245,25 @@ class FightingPlayer extends Player {
         container.id = 'shockwave-container';
         Object.assign(container.style, {
             position: 'absolute',
-            bottom: '20px',
-            right: '20px',
+            bottom: '32px',
+            right: '0',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: '6px',
-            width: '16%',
+            width: '50%',
+            padding: '0 24px',
+            boxSizing: 'border-box',
             zIndex: '100'
         });
 
         const label = document.createElement('div');
+        label.id = 'shockwave-label';
         label.textContent = 'SHOCKWAVE';
         Object.assign(label.style, {
             color: '#FFD066',
             fontFamily: "'Press Start 2P', sans-serif",
-            fontSize: '12px',
+            fontSize: '16px',
             textShadow: '2px 2px 4px rgba(0, 0, 0, 0.6)'
         });
 
@@ -268,7 +271,7 @@ class FightingPlayer extends Player {
         bar.id = 'shockwave-bar';
         Object.assign(bar.style, {
             width: '100%',
-            height: '16px',
+            height: '25px',
             backgroundColor: '#222',
             border: '2px solid #FFD066',
             borderRadius: '8px',
@@ -296,16 +299,17 @@ class FightingPlayer extends Player {
             const style = document.createElement('style');
             style.id = 'shockwave-style';
             style.textContent = `
-                @keyframes shockwave-shake {
-                    0% { transform: translate(0, 0); }
-                    20% { transform: translate(-2px, 1px); }
-                    40% { transform: translate(2px, -1px); }
-                    60% { transform: translate(-1px, -2px); }
-                    80% { transform: translate(1px, 2px); }
-                    100% { transform: translate(0, 0); }
+                @keyframes shockwave-ready-pulse {
+                    0% { filter: brightness(1); box-shadow: 0 0 6px rgba(255, 190, 80, 0.4); }
+                    50% { filter: brightness(1.4); box-shadow: 0 0 16px rgba(255, 230, 140, 0.9); }
+                    100% { filter: brightness(1); box-shadow: 0 0 6px rgba(255, 190, 80, 0.4); }
                 }
-                #shockwave-container.shockwave-ready {
-                    animation: shockwave-shake 0.2s infinite;
+                #shockwave-container.shockwave-ready #shockwave-bar {
+                    border-color: #FFE3A3;
+                }
+                #shockwave-container.shockwave-ready #shockwave-fill {
+                    animation: shockwave-ready-pulse 0.6s ease-in-out infinite;
+                    background-color: #FFE07A;
                 }
             `;
             document.head.appendChild(style);
@@ -316,6 +320,7 @@ class FightingPlayer extends Player {
         if (typeof document === 'undefined') return;
         const container = document.getElementById('shockwave-container');
         const fill = document.getElementById('shockwave-fill');
+        const label = document.getElementById('shockwave-label');
         if (!container || !fill) return;
 
         const elapsed = Date.now() - this.lastShockwaveTime;
@@ -326,8 +331,10 @@ class FightingPlayer extends Player {
 
         if (pct >= 1) {
             container.classList.add('shockwave-ready');
+            if (label) label.textContent = 'SHOCKWAVE - READY';
         } else {
             container.classList.remove('shockwave-ready');
+            if (label) label.textContent = 'SHOCKWAVE';
         }
     }
 
@@ -335,6 +342,7 @@ class FightingPlayer extends Player {
         if (!this.gameEnv || !this.gameEnv.container) return;
 
         const shockwave = document.createElement('div');
+        shockwave.className = 'shockwave-overlay';
         Object.assign(shockwave.style, {
             position: 'absolute',
             left: '0',

@@ -181,7 +181,7 @@ class MansionLevel6_BattleRoom {
         // Create instructions under the boss bar (fade after 15 seconds)
         const instruction = document.createElement('div');
         instruction.id = 'instructions-container';
-        instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, SPACE for shockwave';
+        instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, L for shockwave';
         Object.assign(instruction.style, {
             color: '#00ffffff',
             fontFamily: "'Press Start 2P', sans-serif",

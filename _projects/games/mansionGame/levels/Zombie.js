@@ -9,13 +9,13 @@ class Zombie extends Character {
         const spriteData = {
             id: data?.id || 'Zombie',
             src: data?.src || (path + '/images/projects/mansionGame/zombieNpc.png'),
-            SCALE_FACTOR: data?.SCALE_FACTOR || 4,
+            SCALE_FACTOR: data?.SCALE_FACTOR || 5,
             ANIMATION_RATE: data?.ANIMATION_RATE || 30,
             INIT_POSITION: data?.INIT_POSITION || { x: 0, y: 0 },
             pixels: data?.pixels || { width: 3600, height: 1200 },
             orientation: data?.orientation || { rows: 1, columns: 3 },
             down: data?.down || { row: 0, start: 0, columns: 3 },
-            hitbox: data?.hitbox || { widthPercentage: 0.4, heightPercentage: 0.2 }
+            hitbox: data?.hitbox || { widthPercentage: 0.35, heightPercentage: 0.5 }
         };
 
         super(spriteData, gameEnv);
@@ -26,11 +26,18 @@ class Zombie extends Character {
         this.hitCooldownMs = data?.hitCooldownMs || 800;
         this._lastHitTime = 0;
         this._tick = 0;
+        this._recoilUntil = 0;
     }
 
     update() {
         if (typeof window !== 'undefined' && window.__battleRoomFadeComplete === false) {
             this.draw();
+            return;
+        }
+
+        if (Date.now() < this._recoilUntil) {
+            this.draw();
+            this.stayWithinCanvas();
             return;
         }
         this._tick = (this._tick + 1) % 3;
@@ -91,6 +98,8 @@ class Zombie extends Character {
                 showDeathScreen(player);
             }
 
+            this.applyRecoil(player);
+
             try {
                 const maxHealth = player.data.maxHealth || 100;
                 const pct = Math.max(0, Math.min(100, (player.data.health / maxHealth) * 100));
@@ -99,6 +108,17 @@ class Zombie extends Character {
                 console.warn('Failed to update player health bar:', e);
             }
         }
+    }
+
+    applyRecoil(player) {
+        const dx = this.position.x - player.position.x;
+        const dy = this.position.y - player.position.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const recoilDistance = 18;
+
+        this.position.x += (dx / dist) * recoilDistance;
+        this.position.y += (dy / dist) * recoilDistance;
+        this._recoilUntil = Date.now() + 200;
     }
 
     stayWithinCanvas() {

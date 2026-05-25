@@ -1,5 +1,22 @@
+// THIS IS FOR THE FINAL BOSS LEVEL.
+// Please do not use this for any other levels, it respawns the player to MansionLevel6 which is the level right before the boss fight.
+
+import MansionLevel6 from './mansionLevel6.js';
+
+let respawnScheduled = false;
+
 // Define the death screen
 function showDeathScreen(player) {
+    if (respawnScheduled) return;
+    respawnScheduled = true;
+
+    const gameControl = player?.gameEnv?.gameControl;
+    const gameEnv = player?.gameEnv;
+    if (gameControl) {
+        gameControl.isPaused = true;
+    }
+
+    cleanupBattleRoomUi(gameEnv);
 
     // === PLAYER DEATH: ALL FUNCTIONALITY INLINE ===
 
@@ -79,16 +96,72 @@ function showDeathScreen(player) {
         }
     }, 2000);
 
-    // 3. Reset the level after a short delay using page reload for reliability
+    // 3. Reset to MansionLevel6 (outside the battle room)
     setTimeout(() => {
-        // Clean up any lingering resources before reload
-        if (self && self.timerInterval) {
-            clearInterval(self.timerInterval);
+        try {
+            if (self && self.timerInterval) {
+                clearInterval(self.timerInterval);
+            }
+        } catch (e) {
+            console.warn('DeathScreen cleanup failed:', e);
         }
 
-        // Force a complete page reload - most reliable way to reset
-        location.reload();
+        if (gameControl && typeof gameControl.transitionToLevel === 'function') {
+            try {
+                gameControl.levelClasses = [MansionLevel6];
+                gameControl.currentLevelIndex = 0;
+                gameControl.isPaused = false;
+                gameControl.transitionToLevel();
+            } catch (e) {
+                console.warn('Failed to respawn to MansionLevel6:', e);
+            }
+        }
+
+        respawnScheduled = false;
     }, 3000); // 3 second delay before reset
+}
+
+function cleanupBattleRoomUi(gameEnv) {
+    if (typeof document === 'undefined') return;
+
+    const selectors = [
+        '#boss-health-container',
+        '#player-health-container',
+        '#shockwave-container',
+        '#instructions-container',
+        '#low-health-overlay',
+        '#damage-flash-overlay',
+        '.shockwave-overlay'
+    ];
+
+    selectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+        });
+    });
+
+    const cleanupStyles = ['low-health-style', 'shockwave-style'];
+    cleanupStyles.forEach(id => {
+        const styleEl = document.getElementById(id);
+        if (styleEl && styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
+    });
+
+    if (gameEnv && Array.isArray(gameEnv.gameObjects)) {
+        gameEnv.gameObjects.forEach(obj => {
+            if (!obj) return;
+            const name = obj.constructor?.name;
+            if (name === 'Projectile' || name === 'Boomerang') {
+                if (typeof obj.destroy === 'function') {
+                    obj.destroy();
+                }
+            }
+        });
+
+        gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
+            const name = obj?.constructor?.name;
+            return name !== 'Projectile' && name !== 'Boomerang';
+        });
+    }
 }
 
 export default showDeathScreen;
