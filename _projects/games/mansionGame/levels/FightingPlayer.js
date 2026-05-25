@@ -190,8 +190,9 @@ class FightingPlayer extends Player {
         }
 
         if (nearestBoss && nearestZombie) {
-            const bossBias = 15;
-            const favored = bossDist <= zombieDist + bossBias ? nearestBoss : nearestZombie;
+            const bossDistanceWeight = 0.7;
+            const weightedBossDist = bossDist * bossDistanceWeight;
+            const favored = weightedBossDist <= zombieDist ? nearestBoss : nearestZombie;
             return {
                 x: favored.position.x + favored.width / 2,
                 y: favored.position.y + favored.height / 2
