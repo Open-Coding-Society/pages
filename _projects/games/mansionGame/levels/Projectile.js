@@ -1,7 +1,6 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import showDeathScreen from './DeathScreen.js';
 import { updatePlayerHealthBar } from './HealthBars.js';
-import showEndScreen from './EndScreen.js';
 import { spawnPlayerDamageEffect } from './DamageEffects.js';
 
 /*
@@ -312,10 +311,6 @@ class Projectile extends Character {
         if (enemy.constructor.name === 'Boss') {
             enemy.healthPoints -= amount;
             console.log("Reaper Health:", enemy.healthPoints);
-            if (enemy.healthPoints <= 0) {
-                console.log("Game over -- the player has won!");
-                try { showEndScreen(this.gameEnv); } catch (e) { console.warn('Error showing victory screen:', e); }
-            }
             return;
         }
 
