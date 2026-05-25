@@ -10,6 +10,13 @@ import GameLevel4 from './mansionLevel4.js';
 import GameLevel5 from './mansionLevel5.js';
 import GameLevel6 from './mansionLevel6.js';
 import Barrier from '@assets/js/GameEnginev1.1/essentials/Barrier.js';
+import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
+
+class ArrowIndicator extends Character {
+  update() {
+    this.draw();
+  }
+}
 
 class MansionLevelMain {
   constructor(gameEnv) {
@@ -250,6 +257,48 @@ class MansionLevelMain {
         }
     }
 
+    const doorPositions = {
+      1: { x: 74 / 1113 * width, y: 204 / 906 * height, locked: false },
+      2: { x: 170 / 1113 * width, y: 204 / 906 * height, locked: true },
+      3: { x: 270 / 1113 * width, y: 204 / 906 * height, locked: true },
+      4: { x: 755 / 1113 * width, y: 204 / 906 * height, locked: true },
+      5: { x: 875 / 1113 * width, y: 204 / 906 * height, locked: true },
+      6: { x: 520 / 1113 * width, y: 204 / 906 * height, locked: true }
+    };
+
+    const isLevelUnlocked = (levelNum) => {
+      const localStorageKey = `mansionGame_level${levelNum}_unlocked`;
+      return localStorage.getItem(localStorageKey) === 'true';
+    };
+
+    let latestUnlockedLevel = 1;
+    for (let i = 1; i <= 6; i++) {
+      const door = doorPositions[i];
+      if (!door.locked || isLevelUnlocked(i)) {
+        latestUnlockedLevel = i;
+      }
+    }
+
+    const arrowSize = 50;
+    const arrowScaleFactor = Math.max(1, height / arrowSize);
+    const doorSize = height / 10;
+    const latestDoor = doorPositions[latestUnlockedLevel];
+    const arrowData = {
+      id: 'LatestUnlockedArrow',
+      src: path + "/images/projects/mansionGame/redArrowDown.png",
+      SCALE_FACTOR: arrowScaleFactor,
+      ANIMATION_RATE: 100,
+      INIT_POSITION: {
+        x: latestDoor.x + doorSize / 2 - arrowSize / 2,
+        y: latestDoor.y - arrowSize
+      },
+      pixels: { width: 1200, height: 1200 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+      zIndex: 20
+    };
+
 
     // List of objects definitions for this level (doors for levels 1..6)
     this.classes = [
@@ -266,12 +315,13 @@ class MansionLevelMain {
       { class: Barrier, data: barrier_9 },
       { class: Barrier, data: barrier_10 },
       { class: Barrier, data: barrier_11 },
-      { class: Npc, data: getDoorData(1, GameLevel1, 98 / 1113 * width, 204 / 906 * height, false)},
-      { class: Npc, data: getDoorData(2, GameLevel2, 194 / 1113 * width, 204 / 906 * height, true) },
-      { class: Npc, data: getDoorData(3, GameLevel3, 294 / 1113 * width, 204 / 906 * height, true) },
-      { class: Npc, data: getDoorData(4, GameLevel4, 755 / 1113 * width, 204 / 906 * height, true) },
-      { class: Npc, data: getDoorData(5, GameLevel5, 875 / 1113 * width, 204 / 906 * height, true) },
-      { class: Npc, data: getDoorData(6, GameLevel6, 520 / 1113 * width, 204 / 906 * height, true) },
+      { class: Npc, data: getDoorData(1, GameLevel1, doorPositions[1].x, doorPositions[1].y, doorPositions[1].locked) },
+      { class: Npc, data: getDoorData(2, GameLevel2, doorPositions[2].x, doorPositions[2].y, doorPositions[2].locked) },
+      { class: Npc, data: getDoorData(3, GameLevel3, doorPositions[3].x, doorPositions[3].y, doorPositions[3].locked) },
+      { class: Npc, data: getDoorData(4, GameLevel4, doorPositions[4].x, doorPositions[4].y, doorPositions[4].locked) },
+      { class: Npc, data: getDoorData(5, GameLevel5, doorPositions[5].x, doorPositions[5].y, doorPositions[5].locked) },
+      { class: Npc, data: getDoorData(6, GameLevel6, doorPositions[6].x, doorPositions[6].y, doorPositions[6].locked) },
+      { class: ArrowIndicator, data: arrowData },
     ];
   }
 
