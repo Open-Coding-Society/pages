@@ -123,6 +123,36 @@ class MansionLevel6_EndingCutscene {
         if (this._creditsStarted || typeof document === 'undefined') return;
         this._creditsStarted = true;
 
+        const assetBase = this.gameEnv?.path || '';
+        if (!this._creditsMusic) {
+            this._creditsMusic = new Audio(assetBase + '/images/projects/mansionGame/mario-spooky.mp3');
+            this._creditsMusic.loop = true;
+            this._creditsMusic.volume = 0.7;
+        }
+
+        if (!this._lightningSfx) {
+            this._lightningSfx = new Audio(assetBase + '/images/projects/mansionGame/lightning.mp3');
+            this._lightningSfx.volume = 1;
+        }
+
+        const fadeAudio = (audioElement, targetVolume, durationMs) => {
+            if (!audioElement) return;
+            const startVolume = audioElement.volume;
+            const delta = targetVolume - startVolume;
+            const startTime = Date.now();
+
+            const step = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(1, elapsed / durationMs);
+                audioElement.volume = startVolume + (delta * progress);
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            };
+
+            requestAnimationFrame(step);
+        };
+
         const overlay = document.createElement('div');
         overlay.id = 'mansion-credits-overlay';
         Object.assign(overlay.style, {
@@ -171,6 +201,52 @@ class MansionLevel6_EndingCutscene {
         ];
         credits.textContent = lines.join('\n');
 
+        const reaperImage = document.createElement('img');
+        reaperImage.id = 'mansion-reaper-shadow';
+        reaperImage.src = assetBase + '/images/projects/mansionGame/reaperShadow.png';
+        Object.assign(reaperImage.style, {
+            position: 'fixed',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            maxWidth: '70vw',
+            maxHeight: '80vh',
+            opacity: '0',
+            transition: 'opacity 120ms ease',
+            zIndex: '10002',
+            pointerEvents: 'none'
+        });
+
+        const playAgainButton = document.createElement('button');
+        playAgainButton.id = 'mansion-play-again';
+        playAgainButton.type = 'button';
+        playAgainButton.textContent = 'PLAY AGAIN?';
+        Object.assign(playAgainButton.style, {
+            position: 'fixed',
+            left: '50%',
+            bottom: '10%',
+            transform: 'translateX(-50%)',
+            padding: '14px 26px',
+            fontFamily: "'Press Start 2P', sans-serif",
+            fontSize: '18px',
+            letterSpacing: '1px',
+            color: '#ffffff',
+            backgroundColor: '#111111',
+            border: '2px solid #ffffff',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            opacity: '0',
+            transition: 'opacity 2000ms ease',
+            zIndex: '10003'
+        });
+
+        playAgainButton.addEventListener('click', () => {
+            for (let i = 1; i <= 6; i += 1) {
+                localStorage.setItem(`mansionGame_level${i}_unlocked`, 'false');
+            }
+            window.location.reload();
+        });
+
         if (!document.getElementById('mansion-credits-style')) {
             const style = document.createElement('style');
             style.id = 'mansion-credits-style';
@@ -185,11 +261,49 @@ class MansionLevel6_EndingCutscene {
 
         document.body.appendChild(overlay);
         document.body.appendChild(credits);
+        document.body.appendChild(reaperImage);
+        document.body.appendChild(playAgainButton);
 
         requestAnimationFrame(() => {
             overlay.style.opacity = '1';
             credits.style.animation = 'mansion-credits-roll 24s linear forwards';
+            this._creditsMusic.play().catch(() => {});
         });
+
+        const creditsDurationMs = 24000;
+        setTimeout(() => {
+            fadeAudio(this._creditsMusic, 0, 2000);
+        }, Math.max(0, creditsDurationMs - 2000));
+
+        const startLightningSequence = () => {
+            if (credits.parentNode) {
+                credits.parentNode.removeChild(credits);
+            }
+
+            this._lightningSfx.currentTime = 0;
+            this._lightningSfx.play().catch(() => {});
+
+            const reaperDelayMs = 200;
+            const flashDurationMs = 200;
+
+            setTimeout(() => {
+                overlay.style.backgroundColor = '#ffffff';
+                reaperImage.style.opacity = '1';
+            }, reaperDelayMs);
+
+            setTimeout(() => {
+                reaperImage.style.opacity = '0';
+                overlay.style.backgroundColor = '#000';
+                overlay.style.pointerEvents = 'auto';
+                fadeAudio(this._creditsMusic, 0.7, 2000);
+                setTimeout(() => {
+                    playAgainButton.style.opacity = '1';
+                }, 2000);
+            }, reaperDelayMs + flashDurationMs);
+        };
+
+        const lightningLeadMs = 10000;
+        setTimeout(startLightningSequence, Math.max(0, creditsDurationMs - lightningLeadMs));
     }
 }
 

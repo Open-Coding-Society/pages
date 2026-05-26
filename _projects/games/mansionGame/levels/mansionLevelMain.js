@@ -250,7 +250,7 @@ class MansionLevelMain {
       return sprite_data_leveldoor;
       }
 
-    if (!localStorage.getItem('mansionGame_level1_unlocked') !== null) {
+    if (localStorage.getItem('mansionGame_level1_unlocked') === null) {
         // Key does not exist
         for (let i = 1; i <= 6; i++) {
           localStorage.setItem(`mansionGame_level${i}_unlocked`, 'false');

@@ -61,6 +61,17 @@ class Boss extends Enemy {
         //this.arms = [this.leftArm, this.rightArm];
 
         this.isThrowingScythe = false;
+
+        if (typeof window !== 'undefined') {
+            this._oneHpKeyHandler = (event) => {
+                if (event.key !== '1') return;
+                this.healthPoints = 1;
+                const full = this.fullHealth || 1;
+                const percent = Math.max(0, Math.min(100, (this.healthPoints / full) * 100));
+                updateBossHealthBar(percent, this.stage);
+            };
+            window.addEventListener('keydown', this._oneHpKeyHandler);
+        }
     }
 
     // Update function for the Boss
@@ -399,19 +410,16 @@ class Boss extends Enemy {
     }
     */
 
-    /* Debug/cheat destroy override - uncomment with key handler above
-    // Ensure we clean up the key listener when the boss is destroyed
     destroy() {
         try {
-            if (typeof window !== 'undefined' && this._killKeyHandler) {
-                window.removeEventListener('keydown', this._killKeyHandler);
+            if (typeof window !== 'undefined' && this._oneHpKeyHandler) {
+                window.removeEventListener('keydown', this._oneHpKeyHandler);
             }
         } catch (e) { console.warn('Failed to remove boss key listener:', e); }
 
         // Call parent destroy if available (Character -> GameObject)
         if (super.destroy) super.destroy();
     }
-    */
 }
 
 export default Boss;
