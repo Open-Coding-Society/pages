@@ -1,8 +1,11 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import showDeathScreen from './DeathScreen.js';
 import { updatePlayerHealthBar } from "./HealthBars.js";
+import { spawnPlayerDamageEffect } from './DamageEffects.js';
 
 class Boomerang extends Character {
+    static spriteCache = new Map();
+
     constructor(gameEnv = null, sourcex, sourcey, targetx, targety) {
         // Use minimal placeholder data; sprite will override it
         super({ id: 'scythe' }, gameEnv);
@@ -27,9 +30,7 @@ class Boomerang extends Character {
         this.revComplete = false;
 
         // Load scythe image
-        this.spriteSheet = new Image();
-        this.spriteSheet.onload = () => this.imageLoaded = true;
-        this.spriteSheet.src = (gameEnv?.path || "") + "/images/projects/mansionGame/scythe.png";
+        this.setSprite((gameEnv?.path || "") + "/images/projects/mansionGame/scythe.png");
 
         // Logical display size (scale down 300x280 px to reasonable in-game size)
         this.width = 64;  // adjust to fit game world
@@ -37,6 +38,30 @@ class Boomerang extends Character {
         this.isAnimated = false;
 
         this.position = { x: sourcex, y: sourcey };
+        this.canvas.width = Math.max(1, Math.floor(this.width));
+        this.canvas.height = Math.max(1, Math.floor(this.height));
+    }
+
+    setSprite(src) {
+        const cachedSprite = Boomerang.spriteCache.get(src);
+        if (cachedSprite) {
+            this.spriteSheet = cachedSprite;
+            this.imageLoaded = cachedSprite.complete;
+            if (!this.imageLoaded) {
+                cachedSprite.addEventListener('load', () => {
+                    this.imageLoaded = true;
+                }, { once: true });
+            }
+            return;
+        }
+
+        const sprite = new Image();
+        sprite.onload = () => {
+            this.imageLoaded = true;
+        };
+        sprite.src = src;
+        Boomerang.spriteCache.set(src, sprite);
+        this.spriteSheet = sprite;
     }
 
     update() {
@@ -79,13 +104,13 @@ class Boomerang extends Character {
             const cosTilt = Math.cos(this.ellipse_tilt);
             const sinTilt = Math.sin(this.ellipse_tilt);
 
-            const x_coord = this.ellipse_center.x + 
-                            (this.ellipse_width / 2) * cosProg * cosTilt - 
-                            this.ellipse_height * sinProg * sinTilt;
+            const x_coord = this.ellipse_center.x +
+                (this.ellipse_width / 2) * cosProg * cosTilt -
+                this.ellipse_height * sinProg * sinTilt;
 
-            const y_coord = this.ellipse_center.y + 
-                            (this.ellipse_width / 2) * cosProg * sinTilt + 
-                            this.ellipse_height * sinProg * cosTilt;
+            const y_coord = this.ellipse_center.y +
+                (this.ellipse_width / 2) * cosProg * sinTilt +
+                this.ellipse_height * sinProg * cosTilt;
 
             this.position.x = x_coord;
             this.position.y = y_coord;
@@ -105,9 +130,6 @@ class Boomerang extends Character {
 
         const dstW = Math.max(1, Math.floor(this.width));
         const dstH = Math.max(1, Math.floor(this.height));
-
-        this.canvas.width = dstW;
-        this.canvas.height = dstH;
 
         ctx.save();
         ctx.translate(dstW / 2, dstH / 2);
@@ -141,7 +163,7 @@ class Boomerang extends Character {
         }
 
         // Find all enemies
-        const enemies = this.gameEnv.gameObjects.filter(obj => 
+        const enemies = this.gameEnv.gameObjects.filter(obj =>
             obj.constructor.name === 'Boss' || obj.constructor.name === 'Enemy'
         );
         let ATTACK_MODIFIER;
@@ -158,8 +180,8 @@ class Boomerang extends Character {
 
         // If the player is too close...
         const HIT_DISTANCE = 50;
-        const SCYTHE_DAMAGE = Math.round(15 * ATTACK_MODIFIER);
-        
+        const SCYTHE_DAMAGE = Math.round(18 * ATTACK_MODIFIER);
+
         const players = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer');
         if (players.length === 0) return null;
 
@@ -185,8 +207,12 @@ class Boomerang extends Character {
         if (distanceFromPlayer <= HIT_DISTANCE) {
             this.revComplete = true;
             this.destroy();
-            if (!nearest.data) nearest.data = { health: 100 }; // Initialize health if not exists
+            if (nearest && typeof nearest.isShieldActive === 'function' && nearest.isShieldActive()) {
+                return;
+            }
+            if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 }; // Initialize health if not exists
             nearest.data.health -= SCYTHE_DAMAGE;
+            spawnPlayerDamageEffect(this.gameEnv, nearest);
             console.log("Player Health:", nearest.data.health);
             if (nearest.data.health <= 0) {
                 console.log("Game over -- the player has been defeated!");
@@ -198,23 +224,24 @@ class Boomerang extends Character {
         // Update the player health bar to accurately show the new health (if available)
         try {
             if (nearest && nearest.data && typeof updatePlayerHealthBar === 'function') {
-                const pct = Math.max(0, Math.min(100, nearest.data.health || 0));
+                const maxHealth = nearest.data.maxHealth || 100;
+                const pct = Math.max(0, Math.min(100, (nearest.data.health / maxHealth) * 100));
                 updatePlayerHealthBar(pct);
             }
         } catch (e) {
             console.warn('Failed to update player health bar:', e);
         }
-        
+
     }
 
     die() {
         // Find all player objects
-        const players = this.gameEnv.gameObjects.filter(obj => 
+        const players = this.gameEnv.gameObjects.filter(obj =>
             obj.constructor.name === 'Player'
         );
-        
+
         if (players.length === 0) return;
-        
+
         // Find nearest player
         let nearest = players[0];
         let minDist = Infinity;
@@ -222,7 +249,7 @@ class Boomerang extends Character {
         for (const player of players) {
             const dx = player.position.x - this.position.x;
             const dy = player.position.y - this.position.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
+            const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < minDist) {
                 minDist = dist;
                 nearest = player;
