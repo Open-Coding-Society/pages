@@ -3,6 +3,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
+import Enemy from '@assets/js/GameEnginev1.1/essentials/Enemy.js';
 
 //Import custom classes from select files
 import Barrier from './Barrier.js';
@@ -28,12 +29,12 @@ class MansionLevel4 {
         this.promptVisible = false;
 
         // Background data
-        const image_background = path + "/images/projects/mansionGame/image_lvl4.png";
+        const image_background = path + "/images/projects/mansionGame/background.jpg";
         const image_data_background = {
             name: 'background',
             greeting: "This is the casino, you will try to gamble your way out of the level, survive as long as possible.",
             src: image_background,
-            pixels: {height: 1280, width: 720}
+            pixels: {height: 1600, width: 1600}
         };
 
         const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
@@ -59,6 +60,33 @@ class MansionLevel4 {
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
             keypress: {up: 87, left: 65, down: 83, right: 68} // W, A, S, D
         };
+
+        // Enemy data - Static reaper enemies
+        const sprite_src_enemy = path + "/images/projects/mansionGame/ReaperMainBody.png";
+        const ENEMY_SCALE_FACTOR = 3;
+        
+        // Create enemy sprite data template
+        const createEnemyData = (id, x, y) => ({
+            id: id,
+            src: sprite_src_enemy,
+            SCALE_FACTOR: ENEMY_SCALE_FACTOR,
+            STEP_FACTOR: 0, // No movement
+            ANIMATION_RATE: 5,
+            INIT_POSITION: { x: x, y: y },
+            pixels: {height: 1024, width: 1024},
+            orientation: {rows: 1, columns: 1},
+            down: {row: 0, start: 0, columns: 1},
+            left: {row: 0, start: 0, columns: 1},
+            right: {row: 0, start: 0, columns: 1},
+            up: {row: 0, start: 0, columns: 1},
+            velocity: { x: 0, y: 0 }, // Static - no movement
+            hitbox: { widthPercentage: 0.6, heightPercentage: 0.6 }
+        });
+
+        // Create three enemy positions
+        const enemy1Data = createEnemyData('Reaper1', width * 0.15, height * 0.25);
+        const enemy2Data = createEnemyData('Reaper2', width * 0.75, height * 0.35);
+        const enemy3Data = createEnemyData('Reaper3', width * 0.5, height * 0.55);
 
         // Store reference to blackjack manager for use in trigger zone
         const blackjackManager = this.blackjackManager;
@@ -96,6 +124,9 @@ class MansionLevel4 {
         this.classes = [
             { class: GameEnvBackground, data: image_data_background },
             { class: Player, data: sprite_data_chillguy },
+            { class: Enemy, data: enemy1Data },
+            { class: Enemy, data: enemy2Data },
+            { class: Enemy, data: enemy3Data },
             { class: TriggerZone, data: triggerZoneData },
             ...barrierData.map(data => ({ class: Barrier, data }))
         ];
