@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: DSA Website Redesign — TheSprinters
-description: A redesign pitch for the Deputy Sheriffs' Association of San Diego County — fixing broken search, non-functional login, and cluttered navigation with a modern full-stack portal.
+description: A redesign pitch for the Deputy Sheriffs Association of San Diego County — fixing broken search, non-functional login, and cluttered navigation with a modern full-stack portal.
 permalink: /capstone/dsa-redesign/
 sticky_rank: 8
 ---
