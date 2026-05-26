@@ -3,12 +3,29 @@
  * Manages localStorage-based local profiles for home-gamified experiences.
  * Provides persistence without requiring full authentication.
  * 
+ * Supports user-namespaced storage to prevent data collision:
+ * - Guest: 'ocs_profile_guest'
+ * - Authenticated: 'ocs_profile_{uid}' (e.g., 'ocs_profile_jm1021')
+ * 
  * @module localProfile
  * @author OpenCS Team
  */
 
-const STORAGE_KEY = 'ocs_local_profile';
+const GUEST_STORAGE_KEY = 'ocs_profile_guest';
+const USER_KEY_PREFIX = 'ocs_profile_';
 const STORAGE_VERSION = '1.0';
+
+/**
+ * Get storage key for a specific user context
+ * @param {string|null} uid - User ID (null for guest)
+ * @returns {string} localStorage key
+ */
+function getStorageKey(uid = null) {
+  if (uid) {
+    return `${USER_KEY_PREFIX}${uid}`;
+  }
+  return GUEST_STORAGE_KEY;
+}
 
 /**
  * Generate a unique local ID for analytics tracking
@@ -31,12 +48,30 @@ function getTimestamp() {
  */
 const LocalProfile = {
   /**
+   * Set current user context for subsequent operations
+   * @param {string|null} uid - User ID (null for guest)
+   */
+  setUserContext(uid = null) {
+    this._currentUid = uid;
+  },
+
+  /**
+   * Get current storage key based on user context
+   * @private
+   */
+  _getKey() {
+    return getStorageKey(this._currentUid);
+  },
+
+  /**
    * Check if a local profile exists
+   * @param {string|null} uid - Optional: check specific user (defaults to current context)
    * @returns {boolean}
    */
-  exists() {
+  exists(uid = undefined) {
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
+      const key = uid !== undefined ? getStorageKey(uid) : this._getKey();
+      const data = localStorage.getItem(key);
       return data !== null;
     } catch (error) {
       console.warn('LocalProfile: localStorage access failed', error);
@@ -45,12 +80,37 @@ const LocalProfile = {
   },
 
   /**
+   * List all profile keys in localStorage
+   * @returns {Array<{uid: string|null, key: string}>} Array of profile identifiers
+   */
+  listProfiles() {
+    try {
+      const profiles = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key === GUEST_STORAGE_KEY) {
+          profiles.push({ uid: null, key, label: 'Guest' });
+        } else if (key?.startsWith(USER_KEY_PREFIX)) {
+          const uid = key.substring(USER_KEY_PREFIX.length);
+          profiles.push({ uid, key, label: uid });
+        }
+      }
+      return profiles;
+    } catch (error) {
+      console.warn('LocalProfile: failed to list profiles', error);
+      return [];
+    }
+  },
+
+  /**
    * Load the local profile from localStorage
+   * @param {string|null} uid - Optional: load specific user (defaults to current context)
    * @returns {Object|null} Profile data or null if none exists
    */
-  load() {
+  load(uid = undefined) {
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
+      const key = uid !== undefined ? getStorageKey(uid) : this._getKey();
+      const data = localStorage.getItem(key);
       if (!data) return null;
 
       const profile = JSON.parse(data);
@@ -58,7 +118,7 @@ const LocalProfile = {
       // Validate version
       if (profile.version !== STORAGE_VERSION) {
         console.warn('LocalProfile: version mismatch, clearing old profile');
-        this.clear();
+        this.clear(uid);
         return null;
       }
 
@@ -127,8 +187,9 @@ const LocalProfile = {
         },
       };
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      console.log('LocalProfile: saved profile for', data.name);
+      const key = this._getKey();
+      localStorage.setItem(key, JSON.stringify(profile));
+      console.log(`LocalProfile: saved profile for ${data.name} (key: ${key})`);
       
       // Trigger analytics event if available
       this._trackEvent('profile_created', profile.localId);
@@ -206,8 +267,9 @@ const LocalProfile = {
         },
       };
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-      console.log('LocalProfile: updated profile');
+      const key = this._getKey();
+      localStorage.setItem(key, JSON.stringify(profile));
+      console.log(`LocalProfile: updated profile (key: ${key})`);
       
       // Trigger analytics event if available
       this._trackEvent('profile_updated', profile.localId);
@@ -221,13 +283,15 @@ const LocalProfile = {
 
   /**
    * Clear the local profile (start fresh)
+   * @param {string|null} uid - Optional: clear specific user (defaults to current context)
    * @returns {boolean} Success status
    */
-  clear() {
+  clear(uid = undefined) {
     try {
-      const existing = this.load();
-      localStorage.removeItem(STORAGE_KEY);
-      console.log('LocalProfile: cleared profile');
+      const existing = this.load(uid);
+      const key = uid !== undefined ? getStorageKey(uid) : this._getKey();
+      localStorage.removeItem(key);
+      console.log(`LocalProfile: cleared profile (key: ${key})`);
       
       // Trigger analytics event if available
       if (existing) {
@@ -239,6 +303,18 @@ const LocalProfile = {
       console.error('LocalProfile: failed to clear profile', error);
       return false;
     }
+  },
+
+  /**
+   * Clear everything: profile key + companion localStorage keys that survive a normal clear.
+   * Use this for a full local reset (profile reset button, stopGame on auth'd users).
+   * @returns {boolean} Success status
+   */
+  clearAll(uid = undefined) {
+    const result = this.clear(uid);
+    try { localStorage.removeItem('cs_pathway_completion'); } catch (_) {}
+    try { localStorage.removeItem('ocs_guest_session'); } catch (_) {}
+    return result;
   },
 
   /**
@@ -308,11 +384,39 @@ const LocalProfile = {
         console.warn('LocalProfile: import version mismatch');
         return false;
       }
-      localStorage.setItem(STORAGE_KEY, jsonString);
-      console.log('LocalProfile: imported profile');
+      const key = this._getKey();
+      localStorage.setItem(key, jsonString);
+      console.log(`LocalProfile: imported profile (key: ${key})`);
       return true;
     } catch (error) {
       console.error('LocalProfile: failed to import profile', error);
+      return false;
+    }
+  },
+
+  /**
+   * Move profile from one key to another (for migration)
+   * @param {string|null} fromUid - Source user ID (null for guest)
+   * @param {string|null} toUid - Target user ID (null for guest)
+   * @returns {boolean} Success status
+   */
+  moveProfile(fromUid, toUid) {
+    try {
+      const fromKey = getStorageKey(fromUid);
+      const toKey = getStorageKey(toUid);
+      
+      const data = localStorage.getItem(fromKey);
+      if (!data) {
+        console.warn(`LocalProfile: no profile to move from ${fromKey}`);
+        return false;
+      }
+      
+      localStorage.setItem(toKey, data);
+      localStorage.removeItem(fromKey);
+      console.log(`LocalProfile: moved profile ${fromKey} → ${toKey}`);
+      return true;
+    } catch (error) {
+      console.error('LocalProfile: failed to move profile', error);
       return false;
     }
   },

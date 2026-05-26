@@ -343,15 +343,26 @@
     background: rgba(255, 248, 234, 0.08);
   }
 
-  .pso-infograph .sip-site-highlights .sip-keypoint:nth-child(3) .sip-keypoint-image {
+  .pso-infograph .sip-site-highlights .sip-keypoint--admin-dashboard .sip-keypoint-image {
     object-position: center 24%;
   }
 
-  .pso-infograph .sip-site-highlights .sip-keypoint:nth-child(5) .sip-keypoint-image {
+  .pso-infograph .sip-site-highlights .sip-keypoint--admin-chat .sip-keypoint-image {
+    object-position: center 14%;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint--join .sip-keypoint-image {
     object-fit: contain;
     object-position: center;
-    padding: 0.85rem;
+    padding: 0.75rem;
     background: #fff;
+  }
+
+  .pso-infograph .sip-site-highlights .sip-keypoint--musicians .sip-keypoint-image {
+    object-fit: cover;
+    object-position: center;
+    padding: 0;
+    background: rgba(255, 248, 234, 0.08);
   }
 
   .pso-infograph .sip-keypoint-eyebrow {
@@ -1109,7 +1120,7 @@
           </div>
           <div class="sip-keypoints sip-site-highlights">
             {% for point in topic.keyPoints %}
-            <div class="sip-keypoint">
+            <div class="sip-keypoint{% if point.previewLabel == 'Join' %} sip-keypoint--join{% endif %}{% if point.previewLabel == 'Admin Dashboard' %} sip-keypoint--admin-dashboard{% endif %}{% if point.previewLabel == 'Admin Chat' %} sip-keypoint--admin-chat{% endif %}{% if point.previewLabel == 'Musicians' %} sip-keypoint--musicians{% endif %}">
               <div class="sip-keypoint-body">
                 {% if point.previewImage %}
                 <a href="{{ point.link | default: '#' }}" class="sip-keypoint-image-link" target="_blank" rel="noopener">

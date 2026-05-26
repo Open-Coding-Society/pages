@@ -11,6 +11,13 @@ class GameLevelCsPathIdentity {
   static sharedProfileStateValue = null;
   static sharedProfileStateLoaded = false;
 
+  static clearSharedState() {
+    GameLevelCsPathIdentity.sharedProfileStateReady = null;
+    GameLevelCsPathIdentity.sharedProfileStateValue = null;
+    GameLevelCsPathIdentity.sharedProfileStateLoaded = false;
+    GameLevelCsPathIdentity.themeCatalogCache.clear();
+  }
+
   constructor(gameEnv, { levelDisplayName, logPrefix }) {
     // Keep a single source of environment truth for subclasses.
     this.gameEnv = gameEnv;
@@ -449,9 +456,9 @@ class GameLevelCsPathIdentity {
   _getOverallScore() {
     const c = this._getCompletion();
     let score = 0.55;
-    if (c.identityForge) score += 0.1125;
-    if (c.wayfindingWorld) score += 0.1125;
-    if (c.missionTools) score += 0.1125;
+    if (c.identityForge) score += 0.11;
+    if (c.wayfindingWorld) score += 0.11;
+    if (c.missionTools) score += 0.11;
     return score;
   }
 
@@ -466,14 +473,49 @@ class GameLevelCsPathIdentity {
   }
 
   _syncCompletionPanel() {
-    if (this.profilePanelView && typeof this.profilePanelView.update === 'function') {
+    // Use centralized updateProfilePanel if available (GameLevelCsPath0Forge),
+    // otherwise fall back to direct panel update (other levels)
+    if (typeof this.updateProfilePanel === 'function') {
+      this.updateProfilePanel({});  // Refresh with no new updates, just sync completion
+    } else if (this.profilePanelView && typeof this.profilePanelView.update === 'function') {
       this.profilePanelView.update(this._getCompletionPanelValues());
     }
   }
 
   markLevelComplete(levelKey) {
-    this._saveCompletion({ [levelKey]: true });
-    this._syncCompletionPanel();
+    // Write completion in a robust way so callers that lose `this` do not
+    // accidentally write to localStorage with key 'undefined'. Prefer the
+    // instance helper when available, otherwise fall back to the known
+    // stable storage key literal.
+    try {
+      const key = (this && typeof this._getCompletionStorageKey === 'function')
+        ? this._getCompletionStorageKey()
+        : 'cs_pathway_completion';
+
+      let current = {};
+      try {
+        current = JSON.parse(localStorage.getItem(key)) || {};
+      } catch (e) {
+        current = {};
+      }
+
+      current[levelKey] = true;
+      localStorage.setItem(key, JSON.stringify(current));
+    } catch (err) {
+      console.warn(`${this?.logPrefix || 'GameLevel'}: failed to persist completion`, err);
+    }
+
+    // Attempt to refresh the UI using instance method if available.
+    try {
+      if (this && typeof this._syncCompletionPanel === 'function') {
+        this._syncCompletionPanel();
+      } else {
+        // Last resort: call the prototype implementation with this context.
+        GameLevelCsPathIdentity.prototype._syncCompletionPanel.call(this);
+      }
+    } catch (err) {
+      console.warn(`${this?.logPrefix || 'GameLevel'}: failed to sync completion panel`, err);
+    }
   }
 
   applyBackgroundTheme(themeMeta, bgData) {
@@ -580,5 +622,11 @@ class GameLevelCsPathIdentity {
   }
 
 }
+
+// When ProfileManager dispatches a clear event, invalidate the shared state cache
+// so the next level load re-reads from the now-empty localStorage/backend.
+window.addEventListener('ocs:profile-cleared', () => {
+  GameLevelCsPathIdentity.clearSharedState();
+});
 
 export default GameLevelCsPathIdentity;
