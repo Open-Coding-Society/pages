@@ -61,4 +61,8 @@ gem "execjs", "~> 2.8"
 # See: ./liquid_ruby4_patch.rb
 #      https://github.com/tzinfo/tzinfo/issues/145
 #
+<<<<<<< HEAD
 require_relative "Gemfile_Patch"
+=======
+require_relative "liquid_ruby4_patch"
+>>>>>>> 261d6d9c1 (update: deflock capstone)
