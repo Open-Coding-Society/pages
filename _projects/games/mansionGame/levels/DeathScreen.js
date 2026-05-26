@@ -124,6 +124,25 @@ function showDeathScreen(player) {
 function cleanupBattleRoomUi(gameEnv) {
     if (typeof document === 'undefined') return;
 
+    try {
+        if (typeof window !== 'undefined') {
+            if (window._battleMusic && typeof window._battleMusic.pause === 'function') {
+                window._battleMusic.pause();
+                window._battleMusic.currentTime = 0;
+            }
+            if (window._levelMusic && typeof window._levelMusic.pause === 'function') {
+                window._levelMusic.pause();
+                window._levelMusic.currentTime = 0;
+            }
+            if (window._endMusic && typeof window._endMusic.pause === 'function') {
+                window._endMusic.pause();
+                window._endMusic.currentTime = 0;
+            }
+        }
+    } catch (e) {
+        console.warn('DeathScreen music cleanup failed:', e);
+    }
+
     const selectors = [
         '#boss-health-container',
         '#player-health-container',
@@ -166,13 +185,20 @@ function cleanupBattleRoomUi(gameEnv) {
                 }
             }
 
+            const spriteId = obj?.spriteData?.id?.toLowerCase?.() || '';
+            const spriteSrc = obj?.spriteData?.src?.toLowerCase?.() || '';
+            const isZombieLike = name === 'Zombie'
+                || name === 'Npc'
+                && spriteId.includes('zombie')
+                || spriteSrc.includes('zombienpc');
+
             if (
                 name === 'Projectile' ||
                 name === 'Boomerang' ||
                 name === 'PlayerScythe' ||
                 name === 'PowerUp' ||
                 name === 'PowerUpSpawner' ||
-                name === 'Zombie'
+                isZombieLike
             ) {
                 if (typeof obj.destroy === 'function') {
                     obj.destroy();
@@ -182,12 +208,18 @@ function cleanupBattleRoomUi(gameEnv) {
 
         gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
             const name = obj?.constructor?.name;
+            const spriteId = obj?.spriteData?.id?.toLowerCase?.() || '';
+            const spriteSrc = obj?.spriteData?.src?.toLowerCase?.() || '';
+            const isZombieLike = name === 'Zombie'
+                || name === 'Npc'
+                && spriteId.includes('zombie')
+                || spriteSrc.includes('zombienpc');
             return name !== 'Projectile'
                 && name !== 'Boomerang'
                 && name !== 'PlayerScythe'
                 && name !== 'PowerUp'
                 && name !== 'PowerUpSpawner'
-                && name !== 'Zombie';
+                && !isZombieLike;
         });
     }
 }
