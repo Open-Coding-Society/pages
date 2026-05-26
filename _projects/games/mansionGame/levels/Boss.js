@@ -62,6 +62,7 @@ class Boss extends Enemy {
 
         this.isThrowingScythe = false;
 
+        /*
         if (typeof window !== 'undefined') {
             this._oneHpKeyHandler = (event) => {
                 if (event.key !== '1') return;
@@ -72,6 +73,7 @@ class Boss extends Enemy {
             };
             window.addEventListener('keydown', this._oneHpKeyHandler);
         }
+        */
     }
 
     // Update function for the Boss
