@@ -172,6 +172,100 @@ permalink: /capstone/sentri/
         opacity: 0;
     }
 }
+
+/* NEW HANDOFF STYLES */
+.handoff-container {
+    margin-top: 100px;
+    border-top: 2px dashed var(--glass-border);
+    padding-top: 60px;
+}
+
+.handoff-header {
+    margin-bottom: 40px;
+}
+
+.handoff-header h2 {
+    font-size: 2rem;
+    color: var(--accent-light);
+    margin-bottom: 10px;
+}
+
+.feedback-section {
+    background: rgba(0,0,0,0.2);
+    padding: 30px;
+    border-radius: 24px;
+    margin-bottom: 40px;
+}
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.feedback-item h4 {
+    color: var(--accent-light);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.feedback-item ul {
+    list-style: none;
+    padding: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.feedback-item li {
+    margin-bottom: 8px;
+    padding-left: 15px;
+    position: relative;
+}
+
+.feedback-item li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+}
+
+.github-cta {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent-green);
+    color: white;
+    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin: 20px 0;
+    transition: 0.3s;
+}
+
+.github-cta:hover {
+    background: var(--accent-light);
+    transform: scale(1.05);
+}
+
+.team-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.contact-card {
+    background: var(--glass);
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    border: 1px solid var(--glass-border);
+}
+
+.contact-card a {
+    color: var(--accent-light);
+    text-decoration: none;
+}
 </style>
 
 <!-- HERO -->
@@ -220,6 +314,71 @@ permalink: /capstone/sentri/
     <div class="stat"><strong>Smart</strong> AI-supported</div>
     <div class="stat"><strong>Organized</strong> Clean data system</div>
 </section>
+
+<!-- HANDOFF SECTION -->
+<div class="handoff-container">
+    <div class="handoff-header">
+        <h2>PUSD CTE Expo Handoff</h2>
+        <p>Post-presentation feedback and development roadmap for Poway Recovery Center.</p>
+        
+        <a href="https://github.com/Debuggers-CSP/Sentri-PRC" target="_blank" class="github-cta">
+            <span>View Source Code on GitHub</span>
+        </a>
+    </div>
+
+    <div class="feedback-section">
+        <h3>Expo Feedback & Future Pivots</h3>
+        <div class="feedback-grid">
+            <div class="feedback-item">
+                <h4>✅ Validated Wins</h4>
+                <ul>
+                    <li><strong>AI Finder:</strong> High praise for reducing "choice paralysis."</li>
+                    <li><strong>The Sobriety Garden:</strong> Standout gamification feature for psychological incentive.</li>
+                    <li><strong>Integrated Ecosystem:</strong> Seamless transition from finding to tracking.</li>
+                </ul>
+            </div>
+            <div class="feedback-item">
+                <h4>🛠 Design Pivots</h4>
+                <ul>
+                    <li><strong>Privacy:</strong> Implementing "Ghost Mode" & pseudonym handles.</li>
+                    <li><strong>UI Palette:</strong> Shifting to "Serene Blue" for mental health tranquility.</li>
+                    <li><strong>Accessibility:</strong> Refactoring for Mobile-First crisis response.</li>
+                </ul>
+            </div>
+            <div class="feedback-item">
+                <h4>🚀 Governance & Access</h4>
+                <ul>
+                    <li><strong>Open Landing:</strong> Creating a "Before-Login" info wall to remove entry barriers.</li>
+                    <li><strong>Admin UI:</strong> Moderation tools for staff to ensure community safety.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback-section">
+        <h3>Future Outlook</h3>
+        <p style="font-size: 0.95rem; color: var(--text-muted);">
+            Sentri has established a partnership with <strong>Damon Dong</strong> at the Poway Recovery Center. 
+            Moving forward, this project will transition into a live Service-Learning tool, 
+            potentially revamping the Center's digital infrastructure using our blueprint.
+        </p>
+        
+        <div class="team-contact">
+            <div class="contact-card">
+                <strong>Anika Marathe</strong><br>
+                <a href="mailto:anika.marathe@gmail.com">anika.marathe@gmail.com</a>
+            </div>
+            <div class="contact-card">
+                <strong>Lilian Wu</strong><br>
+                <a href="mailto:lilianwu08@gmail.com">lilianwu08@gmail.com</a>
+            </div>
+            <div class="contact-card">
+                <strong>Jayneea Chauhan</strong><br>
+                <a href="mailto:chauhanjayneea@gmail.com">chauhanjayneea@gmail.com</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- FOOTER -->
 <footer class="sentri-footer">
