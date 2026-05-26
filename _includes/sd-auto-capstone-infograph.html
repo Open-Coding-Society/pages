@@ -283,6 +283,216 @@
   font-size: 1.1rem;
 }
 
+/* Contacts Section */
+.sd-auto-contacts {
+  background: var(--sd-card);
+  border: 1px solid var(--sd-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.sd-auto-contacts h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.sd-auto-contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.sd-auto-contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.875rem 1.1rem;
+  background: var(--sd-tag);
+  border: 1px solid var(--sd-card-border);
+  border-radius: 0.5rem;
+}
+
+.sd-auto-contact-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--sd-text);
+}
+
+.sd-auto-contact-org {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--sd-accent);
+}
+
+.sd-auto-contact-email {
+  font-size: 0.8125rem;
+  color: var(--sd-text-muted);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  transition: color 0.2s;
+}
+
+.sd-auto-contact-email:hover {
+  color: var(--sd-accent);
+}
+
+.sd-auto-contact-phone {
+  font-size: 0.8125rem;
+  color: var(--sd-text-muted);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  transition: color 0.2s;
+}
+
+.sd-auto-contact-phone:hover {
+  color: var(--sd-accent);
+}
+
+/* Expo Reflection Section */
+.sd-auto-expo {
+  background: var(--sd-card);
+  border: 1px solid var(--sd-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.sd-auto-expo-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.sd-auto-expo h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0;
+}
+
+.sd-auto-expo-date {
+  font-size: 0.75rem;
+  color: var(--sd-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.sd-auto-expo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.sd-auto-expo-block {
+  background: var(--sd-tag);
+  border: 1px solid var(--sd-card-border);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+}
+
+.sd-auto-expo-block-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sd-accent);
+  margin-bottom: 0.5rem;
+}
+
+.sd-auto-expo-block ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sd-auto-expo-block ul li {
+  font-size: 0.85rem;
+  color: var(--sd-text-muted);
+  padding-left: 0.9rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.sd-auto-expo-block ul li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--sd-accent);
+  font-size: 0.75rem;
+}
+
+.sd-auto-expo-panelists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.sd-auto-expo-panelist {
+  display: flex;
+  flex-direction: column;
+  background: var(--sd-accent-soft);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.sd-auto-expo-panelist-name {
+  font-weight: 600;
+  color: var(--sd-text);
+}
+
+.sd-auto-expo-panelist-org {
+  font-size: 0.7rem;
+  color: var(--sd-accent);
+}
+
+.sd-auto-expo-feedback {
+  background: rgba(34,197,94,0.07);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  color: var(--sd-text-muted);
+  line-height: 1.6;
+  margin-top: 1rem;
+}
+
+.sd-auto-expo-feedback-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sd-success);
+  margin-bottom: 0.35rem;
+}
+
+.sd-auto-expo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--sd-accent);
+  text-decoration: none;
+  margin-top: 1rem;
+}
+
+.sd-auto-expo-link:hover {
+  text-decoration: underline;
+}
+
 /* Status Badge */
 .sd-auto-status {
   display: inline-flex;
@@ -414,5 +624,84 @@
       </a>
     </div>
   </div>
+
+  <!-- Interested Contacts -->
+  {% if data.Contacts %}
+  <div class="sd-auto-contacts">
+    <h3>Interested Contacts</h3>
+    <div class="sd-auto-contacts-grid">
+      {% for contact in data.Contacts %}
+      <div class="sd-auto-contact-card">
+        <span class="sd-auto-contact-name">{{ contact.name }}</span>
+        {% if contact.org and contact.org != "" %}<span class="sd-auto-contact-org">{{ contact.org }}</span>{% endif %}
+        {% if contact.email %}<a href="mailto:{{ contact.email }}" class="sd-auto-contact-email">{{ contact.email }}</a>{% endif %}
+        {% if contact.phone %}<a href="tel:{{ contact.phone | remove: '-' }}" class="sd-auto-contact-phone">{{ contact.phone }}</a>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- CTE Expo Reflection -->
+  {% if data.ExpoReflection %}
+  {% assign expo = data.ExpoReflection %}
+  <div class="sd-auto-expo">
+    <div class="sd-auto-expo-header">
+      <h3>CTE Expo Reflection</h3>
+      <span class="sd-auto-expo-date">{{ expo.date }}</span>
+    </div>
+
+    <div class="sd-auto-expo-grid">
+      <div class="sd-auto-expo-block">
+        <div class="sd-auto-expo-block-title">Preparation</div>
+        <p style="font-size:0.85rem;color:var(--sd-text-muted);line-height:1.6;margin:0;">{{ expo.preparation }}</p>
+      </div>
+
+      <div class="sd-auto-expo-block">
+        <div class="sd-auto-expo-block-title">Goals</div>
+        <ul>
+          {% for want in expo.wants %}
+          <li>{{ want }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="sd-auto-expo-block">
+        <div class="sd-auto-expo-block-title">Key Results</div>
+        <ul>
+          {% for result in expo.results %}
+          <li>{{ result }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="sd-auto-expo-block">
+        <div class="sd-auto-expo-block-title">Takeaways</div>
+        <ul>
+          {% for takeaway in expo.takeaways %}
+          <li>{{ takeaway }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="sd-auto-expo-block-title" style="margin-bottom:0.5rem;">Panelists</div>
+    <div class="sd-auto-expo-panelists">
+      {% for panelist in expo.panelists %}
+      <div class="sd-auto-expo-panelist">
+        <span class="sd-auto-expo-panelist-name">{{ panelist.name }}</span>
+        <span class="sd-auto-expo-panelist-org">{{ panelist.affiliation }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="sd-auto-expo-feedback">
+      <div class="sd-auto-expo-feedback-label">Instructor Feedback</div>
+      {{ expo.teacherFeedback }}
+    </div>
+
+    <a href="{{ expo.link }}" target="_blank" class="sd-auto-expo-link">↗ View full reflection on GitHub</a>
+  </div>
+  {% endif %}
 
 </div>

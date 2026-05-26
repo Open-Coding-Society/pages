@@ -61,6 +61,30 @@
     transform: translateY(0);
     box-shadow: 0 5px 14px rgba(255, 149, 186, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.48);
   }
+  .acs-head-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+  .acs-issue-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #f6f8ff;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 999px;
+    padding: 0.44rem 1rem;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .acs-issue-link:hover {
+    background: rgba(255,255,255,0.16);
+    transform: translateY(-1px);
+  }
   .acs-title {
     font-size: 1.95rem;
     font-weight: 800;
@@ -217,7 +241,7 @@
     row-gap: 1.6rem;
     max-width: 980px;
     margin: 0 auto;
-    padding: 0 0.25rem;
+    padding: 0 0 3rem;
   }
   .acs-feature-card {
     background: rgba(255,255,255,0.06);
@@ -234,7 +258,6 @@
   }
   .acs-feature-card img {
     width: 100%;
-    height: 100%;
     object-fit: cover;
     display: block;
   }
@@ -246,15 +269,16 @@
     margin: 0 auto;
   }
   .acs-feature-card--wide img {
-    box-sizing: border-box;
+    box-sizing: fit-content;
     padding: 0.45rem 0.45rem 0;
     border-radius: 12px;
   }
   .acs-feature-body {
-    padding: 0.68rem 0.78rem 0.76rem;
+    padding: 12rem 0.78rem 0.76rem;
   }
   .acs-feature-card:not(.acs-feature-card--wide) .acs-feature-body {
-    padding: 0.64rem 0.74rem 0.7rem;
+    padding: 5rem 0.74rem 0.7rem;
+    align-content: end;
   }
   .acs-feature-title {
     font-size: 0.68rem;
@@ -325,7 +349,10 @@
     <div class="acs-header">
       <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="ACS Logo" class="acs-logo">
       <p class="acs-tagline">𝖮𝗇𝖾 𝖣𝗂𝖺𝗀𝗋𝖺𝗆. 𝖤𝗏𝖾𝗋𝗒 𝖢𝖺𝗇𝖼𝖾𝗋. 𝖨𝗇𝗌𝗍𝖺𝗇𝗍𝗅𝗒.</p>
-      <a href="https://acs.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" class="acs-site-link">𝖵𝗂𝖾𝗐 𝖲𝗂𝗍𝖾</a>
+      <div class="acs-head-links">
+        <a href="https://acs.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" class="acs-site-link">𝖵𝗂𝖾𝗐 ACS Prototype</a>
+        <a href="https://github.com/ACS404/ACSmap_frontend/issues/4" target="_blank" rel="noopener noreferrer" class="acs-issue-link">Handover Issue</a>
+      </div>
     </div>
 
     <div class="acs-overview-grid">
@@ -401,4 +428,38 @@
 
     </div>
 
-  </div>
+    <div class="acs-section-label">Demonstrations</div>
+    <div class="acs-features-grid">
+
+      <div class="acs-feature-card acs-feature-card--wide">
+        <img src="{{ site.baseurl }}/images/capstone/acs/medication.gif" alt="Medication Tracker Demonstration">
+        <div class="acs-feature-body">
+          <div class="acs-feature-title">Medication Tracker</div>
+          <div class="acs-feature-desc">Interactive demonstration of the medication tracking system. Users can log their medications, set reminders, and view detailed information about each drug's effects and potential interactions.</div>
+        </div>
+      </div>
+ 
+      <div class="acs-feature-card acs-feature-card--wide">
+        <img src="{{ site.baseurl }}/images/capstone/acs/map.gif" alt="Interactive Body Map Demonstration">
+        <div class="acs-feature-body">
+          <div class="acs-feature-title">Body Map Demo</div>
+          <div class="acs-feature-desc">Visual exploration of the interactive body map showing how users can click on body regions to discover cancer types affecting that area. Includes descriptions, risk factors, and direct links to resources.</div>
+        </div>
+      </div>
+ 
+      <div class="acs-feature-card acs-feature-card--wide">
+        <img src="{{ site.baseurl }}/images/capstone/acs/blog.gif" alt="Community Forum Demonstration">
+        <div class="acs-feature-body">
+          <div class="acs-feature-title">Community Forum Demo</div>
+          <div class="acs-feature-desc">Safe, moderated community space where patients, survivors, and caregivers connect. Features discussion categories for introductions, treatment experiences, advice seeking, research sharing, and resource access with built-in safety guidelines.</div>
+        </div>
+      </div>
+ 
+      <div class="acs-feature-card acs-feature-card--wide">
+        <img src="{{ site.baseurl }}/images/capstone/acs/medication_notes.gif" alt="Medication Tracker Demonstration">
+        <div class="acs-feature-body">
+          <div class="acs-feature-title">Med Notes Demo</div>
+          <div class="acs-feature-desc">Patient-facing tool for managing treatment journeys. Log daily medications, track adherence patterns, monitor symptoms over time, and generate reports for doctor visits. Includes a digital notebook for recording side effects and observations.</div>
+        </div>
+      </div>
+    </div>

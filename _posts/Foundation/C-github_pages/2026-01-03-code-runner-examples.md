@@ -7,136 +7,176 @@ description: Build a lesson using multiple code runners on a page.  This modular
 permalink: /code
 ---
 
-## Python Lesson: Fix the Syntax Error
+## Introduction to Code Runners
 
-{% capture challenge1 %}
-Fix the syntax error. Run the code to get a hint!
-{% endcapture %}
+In this post, we will explore how to use code runners to create interactive lessons. Code runners allow you to embed code snippets that can be executed directly on the page, providing an engaging learning experience for students. We support 4 languages: Python, Java, JavaScript, and AP CSP Pseudocode.
 
-{% capture code1 %}
-print('Hello World'
-{% endcapture %}
 
-{% include runners/code.html
-   runner_id="exercise1"
-   language="python"
-   challenge=challenge1
-   code=code1
-%}
+### Python Code Runner 
+{% capture python_example %} 
+print("Hello, World!")
+for i in range(5):
+    print(i)
+{% endcapture %} 
+{% include runners/code.html runner_id="python-main" language="python" code=python_example%}
 
----
+The following code snippet demonstrates a simple Python code runner. You can run this code directly on the page to see the output.
 
-## Python Lesson: Complete the Function
-
-{% capture challenge2 %}
-Complete the function to calculate the area of a rectangle. Replace the ??? with the correct calculation.
-{% endcapture %}
-
-{% capture code2 %}
-def calculate_area(length, width):
-    # Replace ??? with the correct formula
-    area = ???
-    return area
-''' Test calculate area function '''
-print(calculate_area(5, 3))
-print(calculate_area(10, 2))
-{% endcapture %}
-
-{% include runners/code.html
-   runner_id="exercise2"
-   language="python"
-   challenge=challenge2
-   code=code2
-   height="350px"
-%}
-
----
-
-## Java Lesson: Fix the Compilation Error
-
-{% capture challenge3 %}
-The code has a compilation error. Fix it!
-{% endcapture %}
-
-{% capture code3 %}
+### Java Code Runner
+{% capture java_example %} 
 public class Main {
-  public static void main(String[] args) {
-    System.out.println("Hello, Java")
-  }
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+        for (int i = 0; i < 5; i++) {
+            System.out.println(i);
+        }
+    }
 }
-{% endcapture %}
+{% endcapture %} 
+{% include runners/code.html runner_id="java-main" language="java" code=java_example %}
 
-{% include runners/code.html
-   runner_id="exercise3"
-   language="java"
-   challenge=challenge3
-   code=code3
-%}
+The Java code runner allows you to execute Java code snippets. The example above prints "Hello, World!" and counts from 0 to 4.
 
----
-
-## JavaScript Lesson: Complete the Loop
-
-{% capture challenge4 %}
-Complete the for loop to print numbers 1 through 5. Fill in the missing parts of the loop.
-{% endcapture %}
-
-{% capture code4 %}
-// Complete the for loop
-for (let i = ???; i <= ???; i++) {
-  console.log(i);
+### JavaScript Code Runner
+{% capture js_example %} 
+console.log("Hello, World!");
+for (let i = 0; i < 5; i++) {
+    console.log(i);
 }
+{% endcapture %} 
+{% include runners/code.html runner_id="js-main" language="javascript" code=js_example %}
+
+The JavaScript code runner lets you run JavaScript code snippets. The example provided logs "Hello, World!" and counts from 0 to 4 in the console.
+
+### AP CSP Pseudocode Runner
+
+Context: AP Computer Science Principles has a standardized pseudocode language that is used in the AP CSP exam. Our code runner supports this pseudocode, allowing students to practice and execute their pseudocode snippets directly on the page.
+
+
+{% capture csp_example %} 
+num1 ← INPUT("Enter first number:")
+op ← INPUT("Enter operator (+, -, *, /):")
+num2 ← INPUT("Enter second number:")
+result ← 0
+IF (op = "+")
+{
+    result ← num1 + num2
+}
+ELSE
+{
+    IF (op = "-")
+    {
+        result ← num1 - num2
+    }
+    ELSE
+    {
+        IF (op = "*")
+        {
+            result ← num1 * num2
+        }
+        ELSE
+        {
+            IF (op = "/")
+            {
+                IF (num2 ≠ 0)
+                {
+                    result ← num1 / num2
+                }
+                ELSE
+                {
+                    DISPLAY("Error: Division by zero")
+                    result ← "undefined"
+                }
+            }
+            ELSE
+            {
+                DISPLAY("Invalid operator")
+                result ← "undefined"
+            }
+        }
+    }
+}
+
+DISPLAY("Result: "+ result)
+{% endcapture %} 
+{% include runners/code.html runner_id="csp-main" language="pseudocode" code=csp_example %}
+
+The AP CSP Pseudocode runner allows you to execute pseudocode snippets. The example above is a simple calculator that takes two numbers and an operator as input and displays the result.
+
+
+### Embedding Code Runners in YOUR notebooks
+
+To embed code runners in your notebooks, you can use the following syntax:
+
+{% raw %}
+```liquid
+{% include runners/code.html runner_id="your-runner-id" language="your-language" code=your_code_variable %}
+```
+{% endraw %}
+
+Example Embedding a Python Code Runner:
+
+{% raw %}
+```liquid
+{% include runners/code.html runner_id="python-main" language="python" code=python_example %}
+```
+{% endraw %}
+
+This modular approach allows you to create interactive lessons with more code and less text, making it easier for students to learn by doing. You can customize the code snippets and languages to fit the needs of your lesson.
+
+Example Embedding a Pseudocode Code Runner with preset code:
+
+{% raw %}
+```liquid
+{% capture csp_example %}
+num1 ← INPUT("Enter first number:")
+op ← INPUT("Enter operator (+, -, *, /):")
+num2 ← INPUT("Enter second number:")
+result ← 0
+IF (op = "+")
+{
+    result ← num1 + num2
+}
+ELSE
+{
+    IF (op = "-")
+    {
+        result ← num1 - num2
+    }
+    ELSE
+    {
+        IF (op = "*")
+        {
+            result ← num1 * num2
+        }
+        ELSE
+        {
+            IF (op = "/")
+            {
+                IF (num2 ≠ 0)
+                {
+                    result ← num1 / num2
+                }
+                ELSE
+                {
+                    DISPLAY("Error: Division by zero")
+                    result ← "undefined"
+                }
+            }
+            ELSE
+            {
+                DISPLAY("Invalid operator")
+                result ← "undefined"
+            }
+        }
+    }
+}
+
+DISPLAY("Result: "+ result)
 {% endcapture %}
+{% include runners/code.html runner_id="csp-main" language="pseudocode" code=csp_example %}
+```
+{% endraw %}
 
-{% include runners/code.html
-   runner_id="exercise4"
-   language="javascript"
-   challenge=challenge4
-   code=code4
-%}
+Notice the capture block that allows you to define the code snippet in a variable, which can then be passed to the code runner. This makes it easy to manage and update your code snippets without having to modify the HTML structure of your page.
 
----
-
-## Code Runner Reference
-
-Code runner requires defining and passing liquid variables for **challenge** and **code** to the include file `runners/code.html`. Study the source of this markdown file to see how the liquid variables are defined for each example above.
-
-### Parameters
-
-- **runner_id** (required): Unique ID for each runner on the page (e.g., "exercise1", "exercise2")
-- **language** (optional): "python", "java", or "javascript" (defaults to "python")
-- **challenge**: Variable containing the challenge/instruction text
-- **code**: Variable containing the starter code
-- **height** (optional): Editor height (defaults to "300px")
-
-### Code Runner Architecture
-
-#### HTML Component
-
-- File: `_includes/runners/code.html`
-- Reusable component with parameters for customization
-- Uses CodeMirror for syntax highlighting
-
-#### SCSS Styling
-
-- Main file: `_sass/open-coding/forms/code-runner.scss`
-- Uses mixins for consistent styling across lessons:
-  - `@mixin control-panel` - Top/bottom toolbars with buttons
-  - `@mixin sub-container` - Groups editor/output sections
-  - `@mixin info-panel` - Challenge box styling
-  - `@mixin output-panel` - Code output display
-  - `@mixin icon-button` - Consistent button styling
-  - `@mixin select-control` - Dropdown menus
-
-#### Color Variables
-
-- File: `_sass/open-coding/user-preferences.scss`
-- Uses colors that correspond to user preferences
-
-- `--pref-bg-color` - Background color
-- `--pref-text-color` - Text color
-- `--pref-accent-color` - Accent/emphasis color
-- `--ui-border` - Border color
-- `--panel` - Panel background
-
----
