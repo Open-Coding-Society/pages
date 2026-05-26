@@ -91,6 +91,10 @@ class Zombie extends Character {
         const HIT_DISTANCE = 45;
         if (distanceSquared <= HIT_DISTANCE * HIT_DISTANCE) {
             this._lastHitTime = now;
+            if (player && typeof player.isShieldActive === 'function' && player.isShieldActive()) {
+                this.applyRecoil(player);
+                return;
+            }
             if (!player.data) player.data = { health: 100, maxHealth: 100 };
             player.data.health -= this.damage;
             spawnPlayerDamageEffect(this.gameEnv, player);

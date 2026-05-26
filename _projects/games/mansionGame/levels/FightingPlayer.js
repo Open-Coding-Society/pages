@@ -1,5 +1,19 @@
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Projectile from './Projectile.js';
+import PlayerScythe from './PlayerScythe.js';
+
+const POWER_UP_DURATION_MS = {
+    shield: 8000,
+    damageBoost: 10000,
+    scythes: 12000
+};
+
+const POWER_UP_LABELS = {
+    shield: 'Shield',
+    charge: 'Shockwave charged',
+    damageBoost: 'Damage boost',
+    scythes: 'Scythes'
+};
 
 class FightingPlayer extends Player {
     // Construct the class, with a list of stored projectiles
@@ -14,6 +28,10 @@ class FightingPlayer extends Player {
         this.lastShockwaveTime = Date.now();
         this.shockwaveBossDamage = 20;
         this.currentDirection = 'right'; // track facing direction
+        this.shieldUntil = 0;
+        this.damageBoostUntil = 0;
+        this.orbitingScythes = [];
+        this.baseDamageMultiplier = 1;
 
         // Bind attacks to keyboard controls
         if (typeof window !== 'undefined') {
@@ -41,10 +59,12 @@ class FightingPlayer extends Player {
         
         this.updateCurrentDirection();
         this.updateShockwaveUI();
+        this.updatePowerUpEffects();
         
         // Update and clean up projectiles
         this.projectiles = this.projectiles.filter(p => !p.revComplete);
         this.projectiles.forEach(p => p.update());
+        this.orbitingScythes = this.orbitingScythes.filter(s => !s.revComplete);
     }
 
     // Execute an arrow attack
@@ -77,7 +97,8 @@ class FightingPlayer extends Player {
                 // Offset source position to start at player center
                 sourceX,
                 sourceY,
-                "PLAYER"  // Special type for player projectiles
+                "PLAYER",  // Special type for player projectiles
+                { owner: this }
             )
         );
         
@@ -112,7 +133,8 @@ class FightingPlayer extends Player {
                 targetY,
                 sourceX,
                 sourceY,
-                "PUMPKIN"
+                "PUMPKIN",
+                { owner: this }
             )
         );
 
@@ -225,7 +247,7 @@ class FightingPlayer extends Player {
 
         const boss = enemies.find(enemy => enemy.constructor.name === 'Boss');
         if (boss) {
-            boss.healthPoints -= this.shockwaveBossDamage;
+            boss.healthPoints -= Math.round(this.shockwaveBossDamage * this.getDamageMultiplier());
         }
 
         this.clearActiveProjectiles();
@@ -234,6 +256,102 @@ class FightingPlayer extends Player {
 
         this.lastShockwaveTime = Date.now();
         this.updateShockwaveUI(true);
+    }
+
+    applyPowerUp(type) {
+        const now = Date.now();
+
+        if (type === 'shield') {
+            this.shieldUntil = Math.max(this.shieldUntil, now) + POWER_UP_DURATION_MS.shield;
+            this.showPowerUpMessage(type);
+            return;
+        }
+
+        if (type === 'charge') {
+            this.chargeShockwave();
+            this.showPowerUpMessage(type);
+            return;
+        }
+
+        if (type === 'damageBoost') {
+            this.damageBoostUntil = Math.max(this.damageBoostUntil, now) + POWER_UP_DURATION_MS.damageBoost;
+            this.showPowerUpMessage(type);
+            return;
+        }
+
+        if (type === 'scythes') {
+            this.activateScythes();
+            this.showPowerUpMessage(type);
+        }
+    }
+
+    isShieldActive() {
+        return Date.now() < this.shieldUntil;
+    }
+
+    getDamageMultiplier() {
+        return Date.now() < this.damageBoostUntil ? 2 : this.baseDamageMultiplier;
+    }
+
+    chargeShockwave() {
+        this.lastShockwaveTime = Date.now() - this.shockwaveCooldown;
+        this.updateShockwaveUI(true);
+    }
+
+    activateScythes() {
+        this.orbitingScythes.forEach(scythe => {
+            scythe.revComplete = true;
+            if (typeof scythe.destroy === 'function') scythe.destroy();
+        });
+        this.orbitingScythes = [];
+
+        const scytheCount = 2;
+        for (let i = 0; i < scytheCount; i += 1) {
+            const scythe = new PlayerScythe(this.gameEnv, this, {
+                angle: (Math.PI * 2 / scytheCount) * i,
+                durationMs: POWER_UP_DURATION_MS.scythes
+            });
+            this.orbitingScythes.push(scythe);
+            this.gameEnv.gameObjects.push(scythe);
+        }
+    }
+
+    updatePowerUpEffects() {
+        const shieldActive = this.isShieldActive();
+        const damageBoostActive = Date.now() < this.damageBoostUntil;
+        this.data.canvasFilter = shieldActive ? 'drop-shadow(0 0 12px #4CC9F0)' :
+            damageBoostActive ? 'drop-shadow(0 0 12px #EF476F)' : 'none';
+    }
+
+    showPowerUpMessage(type) {
+        if (typeof document === 'undefined' || !this.gameEnv?.container) return;
+
+        let message = document.getElementById('power-up-message');
+        if (!message) {
+            message = document.createElement('div');
+            message.id = 'power-up-message';
+            Object.assign(message.style, {
+                position: 'absolute',
+                left: '50%',
+                top: '90px',
+                transform: 'translateX(-50%)',
+                color: '#FFFFFF',
+                fontFamily: "'Press Start 2P', sans-serif",
+                fontSize: '14px',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.75)',
+                pointerEvents: 'none',
+                zIndex: '250',
+                transition: 'opacity 0.25s ease'
+            });
+            this.gameEnv.container.appendChild(message);
+        }
+
+        message.textContent = POWER_UP_LABELS[type] || 'Power up';
+        message.style.opacity = '1';
+        clearTimeout(this._powerUpMessageTimer);
+        this._powerUpMessageTimer = setTimeout(() => {
+            message.style.opacity = '0';
+        }, 1400);
     }
 
     clearActiveProjectiles() {
@@ -436,6 +554,11 @@ class FightingPlayer extends Player {
         if (typeof window !== 'undefined' && this._attackHandler) {
             window.removeEventListener('keydown', this._attackHandler);
         }
+        clearTimeout(this._powerUpMessageTimer);
+        this.orbitingScythes.forEach(scythe => {
+            scythe.revComplete = true;
+            if (typeof scythe.destroy === 'function') scythe.destroy();
+        });
         super.destroy();
     }
 }

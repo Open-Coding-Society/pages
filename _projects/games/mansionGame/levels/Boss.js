@@ -350,6 +350,7 @@ class Boss extends Enemy {
             '#player-health-container',
             '#shockwave-container',
             '#instructions-container',
+            '#power-up-message',
             '#low-health-overlay',
             '#damage-flash-overlay',
             '.shockwave-overlay'
@@ -371,7 +372,7 @@ class Boss extends Enemy {
             gameEnv.gameObjects.forEach(obj => {
                 if (!obj) return;
                 const name = obj.constructor?.name;
-                if (name === 'Projectile' || name === 'Boomerang') {
+                if (name === 'Projectile' || name === 'Boomerang' || name === 'PlayerScythe' || name === 'PowerUp') {
                     if (typeof obj.destroy === 'function') {
                         obj.destroy();
                     }
@@ -380,7 +381,7 @@ class Boss extends Enemy {
 
             gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
                 const name = obj?.constructor?.name;
-                return name !== 'Projectile' && name !== 'Boomerang';
+                return name !== 'Projectile' && name !== 'Boomerang' && name !== 'PlayerScythe' && name !== 'PowerUp';
             });
         }
     }

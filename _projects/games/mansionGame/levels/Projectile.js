@@ -13,12 +13,13 @@ import { spawnPlayerDamageEffect } from './DamageEffects.js';
 class Projectile extends Character {
     static spriteCache = new Map();
 
-    constructor(gameEnv = null, targetx, targety, sourcex, sourcey, type) {
+    constructor(gameEnv = null, targetx, targety, sourcex, sourcey, type, options = {}) {
         super({ id: type }, gameEnv);
 
         this.source_coords = { x: sourcex, y: sourcey };
         this.target_coords = { x: targetx, y: targety };
         this.type = type;
+        this.owner = options.owner || null;
 
         // Get the main path
         const path = gameEnv.path;
@@ -219,7 +220,12 @@ class Projectile extends Character {
         const FIREBALL_DAMAGE = 20;
         const PUMPKIN_DAMAGE = 20;
         const PUMPKIN_SPLASH_DAMAGE = 20;
-        const DAMAGE_DEALT = this.type == "FIREBALL" ? FIREBALL_DAMAGE : this.type == "ARROW" ? ARROW_DAMAGE : this.type == "PUMPKIN" ? PUMPKIN_DAMAGE : PLAYER_DAMAGE;
+        const baseDamage = this.type == "FIREBALL" ? FIREBALL_DAMAGE : this.type == "ARROW" ? ARROW_DAMAGE : this.type == "PUMPKIN" ? PUMPKIN_DAMAGE : PLAYER_DAMAGE;
+        const damageMultiplier = this.owner && typeof this.owner.getDamageMultiplier === 'function'
+            ? this.owner.getDamageMultiplier()
+            : 1;
+        const DAMAGE_DEALT = Math.round(baseDamage * damageMultiplier);
+        const pumpkinSplashDamage = Math.round(PUMPKIN_SPLASH_DAMAGE * damageMultiplier);
 
         const isPlayerProjectile = this.type === 'PLAYER' || this.type === 'PUMPKIN';
 
@@ -250,7 +256,7 @@ class Projectile extends Character {
                     const dy = (enemy.position.y + enemy.height / 2) - this.position.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist <= splashRadius) {
-                        this.applyDamageToEnemy(enemy, PUMPKIN_SPLASH_DAMAGE);
+                        this.applyDamageToEnemy(enemy, pumpkinSplashDamage);
                     }
                 });
             } else {
@@ -283,6 +289,9 @@ class Projectile extends Character {
             if (distanceFromPlayer <= PLAYER_HIT_DISTANCE) {
                 this.revComplete = true;
                 this.destroy();
+                if (nearest && typeof nearest.isShieldActive === 'function' && nearest.isShieldActive()) {
+                    return;
+                }
                 if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 }; // Initialize health if not exists
                 nearest.data.health -= DAMAGE_DEALT;
                 spawnPlayerDamageEffect(this.gameEnv, nearest);

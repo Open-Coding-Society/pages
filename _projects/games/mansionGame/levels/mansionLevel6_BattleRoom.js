@@ -3,6 +3,7 @@ import FightingPlayer from "./FightingPlayer.js";
 import Boss from './Boss.js';
 import showDeathScreen from './DeathScreen.js';
 import { createBossHealthBar, createPlayerHealthBar, updatePlayerHealthBar } from './HealthBars.js';
+import PowerUp from './PowerUp.js';
 
 class MansionLevel6_BattleRoom {
     constructor(gameEnv) {
@@ -124,6 +125,15 @@ class MansionLevel6_BattleRoom {
                         this.width * this.hitbox.widthPercentage) / 2;
 
                     if (distance < collisionThreshold) {
+                        if (player && typeof player.isShieldActive === 'function' && player.isShieldActive()) {
+                            const pushX = playerX - enemyX;
+                            const pushY = playerY - enemyY;
+                            const pushDistance = Math.sqrt(pushX * pushX + pushY * pushY) || 1;
+                            this.position.x -= (pushX / pushDistance) * 28;
+                            this.position.y -= (pushY / pushDistance) * 28;
+                            continue;
+                        }
+
                         // Set killing flag to prevent repeated kills
                         this.isKilling = true;
                         // Disable player input/movement without modifying the engine:
@@ -165,10 +175,34 @@ class MansionLevel6_BattleRoom {
             }
         };
 
+        const powerUps = [
+            {
+                id: 'PowerUp-Shield',
+                powerType: 'shield',
+                INIT_POSITION: { x: width * 0.25, y: height * 0.52 }
+            },
+            {
+                id: 'PowerUp-Charge',
+                powerType: 'charge',
+                INIT_POSITION: { x: width * 0.62, y: height * 0.52 }
+            },
+            {
+                id: 'PowerUp-DamageBoost',
+                powerType: 'damageBoost',
+                INIT_POSITION: { x: width * 0.25, y: height * 0.76 }
+            },
+            {
+                id: 'PowerUp-Scythes',
+                powerType: 'scythes',
+                INIT_POSITION: { x: width * 0.62, y: height * 0.76 }
+            }
+        ];
+
         this.classes = [
             { class: GameEnvBackground, data: image_data_floor },
             { class: FightingPlayer, data: sprite_data_mc },
-            { class: Boss, data: sprite_data_enemy }
+            { class: Boss, data: sprite_data_enemy },
+            ...powerUps.map(data => ({ class: PowerUp, data }))
         ];
 
         // Create health bar when battle room loads
@@ -181,7 +215,7 @@ class MansionLevel6_BattleRoom {
         // Create instructions under the boss bar (fade after 15 seconds)
         const instruction = document.createElement('div');
         instruction.id = 'instructions-container';
-        instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, L for shockwave';
+        instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, L for shockwave, touch power ups to collect';
         Object.assign(instruction.style, {
             color: '#00ffffff',
             fontFamily: "'Press Start 2P', sans-serif",

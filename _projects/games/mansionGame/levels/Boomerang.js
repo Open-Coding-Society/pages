@@ -207,6 +207,9 @@ class Boomerang extends Character {
         if (distanceFromPlayer <= HIT_DISTANCE) {
             this.revComplete = true;
             this.destroy();
+            if (nearest && typeof nearest.isShieldActive === 'function' && nearest.isShieldActive()) {
+                return;
+            }
             if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 }; // Initialize health if not exists
             nearest.data.health -= SCYTHE_DAMAGE;
             spawnPlayerDamageEffect(this.gameEnv, nearest);
