@@ -1,36 +1,42 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 
-const POWER_UP_TYPES = ['shield', 'charge', 'damageBoost', 'scythes'];
+const POWER_UP_TYPES = ['shield', 'charge', 'damageBoost', 'scythes', 'heal'];
 
-const POWER_UP_DISPLAY = {
-    shield: { label: 'SHIELD', icon: 'S', color: '#4CC9F0', glow: 'rgba(76, 201, 240, 0.9)' },
-    charge: { label: 'CHARGE', icon: 'C', color: '#FFD166', glow: 'rgba(255, 209, 102, 0.95)' },
-    damageBoost: { label: 'DAMAGE', icon: 'D', color: '#EF476F', glow: 'rgba(239, 71, 111, 0.9)' },
-    scythes: { label: 'SCYTHE', icon: 'X', color: '#B8F2E6', glow: 'rgba(184, 242, 230, 0.85)' }
+const POWER_UP_SPRITES = {
+    shield: 'powerupShield.png',
+    charge: 'powerupCharge.png',
+    damageBoost: 'powerupDamageBoost.png',
+    scythes: 'powerupScythe.png',
+    heal: 'powerupHeal.png'
 };
+
+const DEFAULT_SIZE = 40;
 
 class PowerUp extends Character {
     constructor(data = null, gameEnv = null) {
         const powerType = data?.powerType || PowerUp.randomType();
-        const display = POWER_UP_DISPLAY[powerType] || POWER_UP_DISPLAY.shield;
+        const spritePath = PowerUp.getSpritePath(powerType, gameEnv);
+        const targetSize = data?.targetSize || DEFAULT_SIZE;
+        const scaleFactor = data?.SCALE_FACTOR || (gameEnv?.innerHeight ? (gameEnv.innerHeight / targetSize) : 11);
         const spriteData = {
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
             id: data?.id || `PowerUp-${powerType}`,
             greeting: data?.greeting || 'Power up collected.',
-            SCALE_FACTOR: data?.SCALE_FACTOR || 11,
+            src: data?.src || spritePath,
+            SCALE_FACTOR: scaleFactor,
             INIT_POSITION: data?.INIT_POSITION || { x: 0, y: 0 },
-            pixels: data?.pixels || { width: 128, height: 128 },
-            hitbox: data?.hitbox || { radiusPercentage: 0.65 },
-            zIndex: data?.zIndex || 90,
-            fillStyle: display.color
+            pixels: data?.pixels || { width: 100, height: 100 },
+            hitbox: data?.hitbox || { radiusPercentage: 0.5 },
+            zIndex: data?.zIndex || 90
         };
 
         super(spriteData, gameEnv);
 
         this.powerType = powerType;
-        this.display = display;
         this.collected = false;
-        this.pulse = 0;
         this.spriteData.reaction = () => this.collect();
+        this.direction = 'down';
     }
 
     static randomType() {
@@ -39,48 +45,16 @@ class PowerUp extends Character {
 
     update() {
         if (this.collected) return;
-        this.pulse = (this.pulse + 0.06) % (Math.PI * 2);
-        this.draw();
+        if (!this.spriteData?.orientation) {
+            this.spriteData.orientation = { rows: 1, columns: 1 };
+        }
+        super.update();
     }
 
-    draw() {
-        this.clearCanvas();
-
-        const ctx = this.ctx;
-        const size = Math.min(this.canvas.width, this.canvas.height);
-        const center = size / 2;
-        const pulseScale = 0.88 + Math.sin(this.pulse) * 0.08;
-        const radius = center * 0.68 * pulseScale;
-
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(Math.PI / 4);
-        ctx.fillStyle = this.display.color;
-        ctx.shadowColor = this.display.glow;
-        ctx.shadowBlur = 28;
-        ctx.fillRect(-radius / 2, -radius / 2, radius, radius);
-        ctx.restore();
-
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = Math.max(4, size * 0.04);
-        ctx.beginPath();
-        ctx.arc(center, center, center * 0.43 * pulseScale, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.fillStyle = '#111';
-        ctx.font = `bold ${Math.floor(size * 0.34)}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.display.icon, center, center - size * 0.03);
-
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = `bold ${Math.floor(size * 0.12)}px sans-serif`;
-        ctx.strokeStyle = '#111';
-        ctx.lineWidth = Math.max(2, size * 0.015);
-        ctx.strokeText(this.display.label, center, size * 0.86);
-        ctx.fillText(this.display.label, center, size * 0.86);
-
-        this.setupCanvas();
+    static getSpritePath(powerType, gameEnv) {
+        const assetBase = gameEnv?.path || '';
+        const filename = POWER_UP_SPRITES[powerType] || POWER_UP_SPRITES.shield;
+        return `${assetBase}/images/projects/mansionGame/${filename}`;
     }
 
     collect() {

@@ -372,7 +372,29 @@ class Boss extends Enemy {
             gameEnv.gameObjects.forEach(obj => {
                 if (!obj) return;
                 const name = obj.constructor?.name;
-                if (name === 'Projectile' || name === 'Boomerang' || name === 'PlayerScythe' || name === 'PowerUp') {
+                if (name === 'FightingPlayer') {
+                    if (Array.isArray(obj.projectiles)) {
+                        obj.projectiles.forEach(projectile => {
+                            if (projectile && typeof projectile.destroy === 'function') projectile.destroy();
+                        });
+                        obj.projectiles = [];
+                    }
+                    if (Array.isArray(obj.orbitingScythes)) {
+                        obj.orbitingScythes.forEach(scythe => {
+                            if (scythe && typeof scythe.destroy === 'function') scythe.destroy();
+                        });
+                        obj.orbitingScythes = [];
+                    }
+                }
+
+                if (
+                    name === 'Projectile' ||
+                    name === 'Boomerang' ||
+                    name === 'PlayerScythe' ||
+                    name === 'PowerUp' ||
+                    name === 'PowerUpSpawner' ||
+                    name === 'Zombie'
+                ) {
                     if (typeof obj.destroy === 'function') {
                         obj.destroy();
                     }
@@ -381,7 +403,12 @@ class Boss extends Enemy {
 
             gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
                 const name = obj?.constructor?.name;
-                return name !== 'Projectile' && name !== 'Boomerang' && name !== 'PlayerScythe' && name !== 'PowerUp';
+                return name !== 'Projectile'
+                    && name !== 'Boomerang'
+                    && name !== 'PlayerScythe'
+                    && name !== 'PowerUp'
+                    && name !== 'PowerUpSpawner'
+                    && name !== 'Zombie';
             });
         }
     }

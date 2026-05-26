@@ -302,7 +302,7 @@ class MansionLevel6_EndingCutscene {
             }, reaperDelayMs + flashDurationMs);
         };
 
-        const lightningLeadMs = 10000;
+        const lightningLeadMs = 8000;
         setTimeout(startLightningSequence, Math.max(0, creditsDurationMs - lightningLeadMs));
     }
 }
