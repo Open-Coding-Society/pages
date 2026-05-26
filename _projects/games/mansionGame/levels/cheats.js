@@ -423,7 +423,8 @@ function openCheatsMenu(gameInstance) {
         { name: "Level 4: Casino", id: "mansionLevel4" },
         { name: "Level 5", id: "mansionLevel5" },
         { name: "Level 6: Battle Room", id: "mansionLevel6_BattleRoom" },
-        { name: "Level 6", id: "mansionLevel6" }
+        { name: "Level 6", id: "mansionLevel6" },
+        { name: "Ending Cutscene", id: "mansionLevel6_EndingCutscene" }
     ];
     
     // Create level buttons grid
@@ -482,7 +483,8 @@ function openCheatsMenu(gameInstance) {
                 "mansionLevel4": () => import('./mansionLevel4.js'),
                 "mansionLevel5": () => import('./mansionLevel5.js'),
                 "mansionLevel6_BattleRoom": () => import('./mansionLevel6_BattleRoom.js'),
-                "mansionLevel6": () => import('./mansionLevel6.js')
+                "mansionLevel6": () => import('./mansionLevel6.js'),
+                "mansionLevel6_EndingCutscene": () => import('./mansionLevel6_EndingCutscene.js')
             };
             
             if (levelMap[level.id]) {
