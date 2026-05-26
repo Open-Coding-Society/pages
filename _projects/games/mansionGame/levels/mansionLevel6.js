@@ -5,7 +5,7 @@ import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.
 import MansionLevel6_BattleRoom from './mansionLevel6_BattleRoom.js';
 
 class MansionLevel6 {
-   constructor(gameEnv){
+    constructor(gameEnv) {
 
         // upon mansion level6 construction, 
 
@@ -21,20 +21,20 @@ class MansionLevel6 {
         try {
             const audioElements = document.querySelectorAll('audio'); // Selects all <audio> elements
             audioElements.forEach(audio => {
-                try { if (!audio.paused) audio.pause(); } catch (e) {}
+                try { if (!audio.paused) audio.pause(); } catch (e) { }
             });
         } catch (e) { /* ignore */ }
 
         // Level music: play Legend of Zelda theme when entering this level
         // update: now changed to mario castle theme
         // Will be stopped when transitioning to the battle room below
-        let randomSong = ["marioCastle.mp3", "legendZelda.mp3"][Math.floor(Math.random()*2)]
+        let randomSong = ["marioCastle.mp3", "legendZelda.mp3"][Math.floor(Math.random() * 2)]
         const levelMusic = new Audio(path + `/assets/sounds/mansionGame/${randomSong}`);
         levelMusic.loop = true;
         levelMusic.volume = 0.3;
         levelMusic.play().catch(err => console.warn('Level music failed to play:', err));
         // Expose the level music so other modules (end screen, etc.) can stop it
-        try { if (typeof window !== 'undefined') window._levelMusic = levelMusic; } catch (e) {}
+        try { if (typeof window !== 'undefined') window._levelMusic = levelMusic; } catch (e) { }
 
         // This is the background image data
         const image_src_chamber = path + "/images/projects/mansionGame/bgBossIntroChamber.png"
@@ -42,10 +42,28 @@ class MansionLevel6 {
             name: 'bossintro',
             greeting: "You hear a faint echo from behind the ebony doors.",
             src: image_src_chamber,
-            pixels: {height: 580, width: 1038},
+            pixels: { height: 580, width: 1038 },
             mode: 'stretch'
         };
-        
+
+        const fullscreenMessage = document.createElement('div');
+        fullscreenMessage.id = 'fullscreen-recommended-message';
+        fullscreenMessage.textContent = 'Fullscreen recommended';
+        Object.assign(fullscreenMessage.style, {
+            position: 'absolute',
+            top: '18px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            color: '#ffffff',
+            fontFamily: "'Press Start 2P', sans-serif",
+            fontSize: '14px',
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.6)',
+            zIndex: '100'
+        });
+
+        const chamberContainer = document.querySelector('canvas')?.parentElement || document.body;
+        chamberContainer.appendChild(fullscreenMessage);
+
         // This is the data for the player
         const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png"; // be sure to include the path
         const MC_SCALE_FACTOR = 6;
@@ -56,35 +74,61 @@ class MansionLevel6 {
             SCALE_FACTOR: MC_SCALE_FACTOR,
             STEP_FACTOR: 300,
             ANIMATION_RATE: 10,
-            INIT_POSITION: { x: (width / 2 - width / (5 * MC_SCALE_FACTOR)), y: height - (height / MC_SCALE_FACTOR)}, 
-            pixels: {height: 2400, width: 3600},
-            orientation: {rows: 2, columns: 3},
-            down: {row: 1, start: 0, columns: 3},
-            downRight: {row: 1, start: 0, columns: 3, rotate: Math.PI/16},
-            downLeft: {row: 0, start: 0, columns: 3, rotate: -Math.PI/16},
-            left: {row: 0, start: 0, columns: 3},
-            right: {row: 1, start: 0, columns: 3},
-            up: {row: 1, start: 0, columns: 3},
-            upLeft: {row: 0, start: 0, columns: 3, rotate: Math.PI/16},
-            upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
-            hitbox: {widthPercentage: 0.45, heightPercentage: 0.2},
-            keypress: {up: 87, left: 65, down: 83, right: 68} // W, A, S, D
+            INIT_POSITION: { x: (width / 2 - width / (5 * MC_SCALE_FACTOR)), y: height - (height / MC_SCALE_FACTOR) },
+            pixels: { height: 2400, width: 3600 },
+            orientation: { rows: 2, columns: 3 },
+            down: { row: 1, start: 0, columns: 3 },
+            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
+            downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI / 16 },
+            left: { row: 0, start: 0, columns: 3 },
+            right: { row: 1, start: 0, columns: 3 },
+            up: { row: 1, start: 0, columns: 3 },
+            upLeft: { row: 0, start: 0, columns: 3, rotate: Math.PI / 16 },
+            upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
+            hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
+            keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
         };
 
-        // This is the zombie npc
+        // Thiss is the base zombie data
         const sprite_src_zombie = path + "/images/projects/mansionGame/zombieNpc.png";
         const sprite_greet_zombie = "Hi, I'm a zombie.";
-        const sprite_data_zombie1 = {
-            id: 'ZombieNPC1',
+        const zombie_base_data = {
             greeting: sprite_greet_zombie,
             src: sprite_src_zombie,
             SCALE_FACTOR: 4,
             ANIMATION_RATE: 30,
-            pixels: {width: 3600, height: 1200},
-            INIT_POSITION: {x: (width * 9 / 16), y: (height * 1 / 4)},
-            orientation: {rows: 1, columns: 3 },
-            down: {row: 0, start: 0, columns: 3 },
-            hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
+            pixels: { width: 3600, height: 1200 },
+            orientation: { rows: 1, columns: 3 },
+            hitbox: { widthPercentage: 0.4, heightPercentage: 0.2 },
+            reaction: function () { },
+            interact: function () {
+                // Clear any existing dialogue first to prevent duplicates
+                if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
+                    this.dialogueSystem.closeDialogue();
+                }
+
+                // Create a new dialogue system if needed
+                if (!this.dialogueSystem) {
+                    this.dialogueSystem = new DialogueSystem();
+                }
+
+                // Show portal dialogue with buttons
+                const whattosay = this.data.dialogues[Math.floor(Math.random() * this.data.dialogues.length)];
+                this.dialogueSystem.showDialogue(
+                    whattosay,
+                    "Zombie",
+                    this.spriteData.src
+                );
+            }
+        }
+
+        // This is the zombie npc
+        const sprite_data_zombie1 = {
+            ...zombie_base_data,
+            id: 'ZombieNPC1',
+            zombie_name: 'Zombie',
+            INIT_POSITION: { x: (width * 0.53), y: (height * 0.25) },
+            down: { row: 0, start: 0, columns: 3 },
             // Add dialogues array for random messages
             dialogues: [
                 "I heard the boss is waiting for you...",
@@ -97,43 +141,16 @@ class MansionLevel6 {
                 "You are a fool to challenge the Reaper.",
                 "You will end up like me once you face the Reaper.",
                 "Are you the next opponent for my master? That's unfortunate for you.",
-            ],
-            reaction: function() {
-                // Don't do anything on touch
-                // The Zombie only speaks when interacted with
-            },
-            interact: function() {
-                // Clear any existing dialogue first to prevent duplicates
-                if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-                    this.dialogueSystem.closeDialogue();
-                }
-                
-                // Create a new dialogue system if needed
-                if (!this.dialogueSystem) {
-                    this.dialogueSystem = new DialogueSystem();
-                }
-                
-                // Show portal dialogue with buttons
-                const whattosay = this.data.dialogues[Math.floor(Math.random() * this.data.dialogues.length)];
-                this.dialogueSystem.showDialogue(
-                    whattosay,
-                    "Zombie",
-                    this.spriteData.src
-                );
-            }
+            ]
         };
 
+        // Data for the coding god zombie
         const sprite_data_zombie2 = {
+            ...zombie_base_data,
             id: 'ZombieNPC2',
-            greeting: sprite_greet_zombie,
-            src: sprite_src_zombie,
-            SCALE_FACTOR: 4,
-            ANIMATION_RATE: 30,
-            pixels: {width: 3600, height: 1200},
-            INIT_POSITION: {x: (width * 5.5 / 16), y: (height * 1 / 4)},
-            orientation: {rows: 1, columns: 3 },
-            down: {row: 0, start: 0, columns: 3 , mirror: true},
-            hitbox: {widthPercentage: 0.2, heightPercentage: 0.2},
+            zombie_name: 'Coding God Zombie',
+            INIT_POSITION: { x: (width * 0.28), y: (height * 0.25) },
+            down: { row: 0, start: 0, columns: 3, mirror: true },
             // Add dialogues array for random messages
             dialogues: [
                 "Boss.js inherits and extends Enemy.js to add more danger.",
@@ -146,32 +163,9 @@ class MansionLevel6 {
                 "If I ever freeze, check the console. I might've thrown an error.",
                 "The Reaper's attack is so powerful, it takes a Desmos graph to understand its power.", // reference to the desmos graph we used to calculate the scythe path!
                 "*brains*"
-            ],
-            reaction: function() {
-                // Don't do anything on touch
-                // The Zombie only speaks when interacted with
-            },
-            interact: function() {
-                // Clear any existing dialogue first to prevent duplicates
-                if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-                    this.dialogueSystem.closeDialogue();
-                }
-                
-                // Create a new dialogue system if needed
-                if (!this.dialogueSystem) {
-                    this.dialogueSystem = new DialogueSystem();
-                }
-                
-                // Show portal dialogue with buttons
-                const whattosay = this.data.dialogues[Math.floor(Math.random() * this.data.dialogues.length)];
-                this.dialogueSystem.showDialogue(
-                    whattosay,
-                    "Coding God Zombie",
-                    this.spriteData.src
-                );
-            }
-        }; 
-        
+            ]
+        };
+
 
         // invisible sprite for door collision that handles going to lv6 battle room
         const sprite_src_bossdoor = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
@@ -182,39 +176,36 @@ class MansionLevel6 {
             src: sprite_src_bossdoor,
             SCALE_FACTOR: 6,
             ANIMATION_RATE: 100,
-            pixels: {width: 2029, height: 2025},
-            INIT_POSITION: {x: (width * 37 / 80), y: (height / 8)},
-            orientation: {rows: 1, columns: 1},
-            down: {row: 0, start: 0, columns: 1},
-            hitbox: {widthPercentage: 0.1, heightPercentage: 0.2},
+            pixels: { width: 2029, height: 2025 },
+            INIT_POSITION: { x: (width * 0.44), y: (height * 0.17) },
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
             dialogues: [
                 "Many have entered. Few have returned.",
                 "Dangerous things await you beyond this door..",
                 "Prepare yourself. The journey beyond won't be easy."
             ],
-            reaction: function() {
-                // Don't show any reaction dialogue - this prevents the first alert
-                // The interact function will handle all dialogue instead
-            },
+            reaction: function () { },
             // Ask the player whether they want to enter the doors-- if they do, move to the battle room
-            interact: function() {
+            interact: function () {
                 // Clear any existing dialogue first to prevent duplicates
                 if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
                     this.dialogueSystem.closeDialogue();
                 }
-                
+
                 // Create a new dialogue system if needed
                 if (!this.dialogueSystem) {
                     this.dialogueSystem = new DialogueSystem();
                 }
-                
+
                 // Show portal dialogue with buttons
                 this.dialogueSystem.showDialogue(
                     "Are you ready to battle the Reaper?",
                     "Door",
                     this.spriteData.src
                 );
-                
+
                 // Add buttons directly to the dialogue
                 this.dialogueSystem.addButtons([
                     {
@@ -222,12 +213,17 @@ class MansionLevel6 {
                         primary: true,
                         action: () => {
                             this.dialogueSystem.closeDialogue();
-                            
+
+                            const fullscreenBanner = document.getElementById('fullscreen-recommended-message');
+                            if (fullscreenBanner && fullscreenBanner.parentNode) {
+                                fullscreenBanner.parentNode.removeChild(fullscreenBanner);
+                            }
+
                             // Clean up the current game state
                             if (gameEnv && gameEnv.gameControl) {
                                 // Store reference to the current game control
                                 const gameControl = gameEnv.gameControl;
-                                
+
                                 // Create fade overlay for transition
                                 const fadeOverlay = document.createElement('div');
                                 const fadeInMs = 2000; // longer fade in
@@ -279,7 +275,7 @@ class MansionLevel6 {
                                 audio.loop = true;
                                 audio.volume = 0.4;
                                 // Expose battle music so end screen can stop it later
-                                try { if (typeof window !== 'undefined') window._battleMusic = audio; } catch (e) {}
+                                try { if (typeof window !== 'undefined') window._battleMusic = audio; } catch (e) { }
                                 audio.play().catch(error => console.error('Failed to play audio:', error));
 
                                 console.log("Starting battle level transition...");
@@ -292,7 +288,7 @@ class MansionLevel6 {
                                     // This flag will be set to true once the overlay is fully removed
                                     // so enemies in the battle room can wait for the screen to finish
                                     // fading before they begin moving/attacking.
-                                    try { window.__battleRoomFadeComplete = false; } catch(e) {}
+                                    try { window.__battleRoomFadeComplete = false; } catch (e) { }
 
                                     // Create a centered transition text that will type itself
                                     const transitionText = document.createElement('div');
@@ -349,7 +345,7 @@ class MansionLevel6 {
                                             // Properly destroy the current level
                                             console.log("Destroying current level...");
                                             gameControl.currentLevel.destroy();
-                                            
+
                                             // Force cleanup of any remaining canvases
                                             const gameContainer = gameControl.gameContainer || document.getElementById('gameContainer');
                                             if (gameContainer && gameContainer.querySelectorAll) {
@@ -362,20 +358,20 @@ class MansionLevel6 {
                                                 console.warn('gameContainer not found; skipping canvas cleanup');
                                             }
                                         }
-                                        
+
                                         console.log("Setting up battle room level...");
-                                        
+
                                         // IMPORTANT: Store the original level classes for return journey
                                         gameControl._originalLevelClasses = gameControl.levelClasses;
-                                        
+
                                         // Change the level classes to GameLevelEnd
                                         gameControl.levelClasses = [MansionLevel6_BattleRoom];
                                         gameControl.currentLevelIndex = 0;
-                                        
+
                                         // Make sure game is not paused
                                         gameControl.isPaused = false;
-                                    
-                                        
+
+
                                         // Fade out overlay after transition (with untype animation)
                                         setTimeout(() => {
                                             const untypeSpeed = 50; // ms per character removal
@@ -396,11 +392,11 @@ class MansionLevel6 {
 
                                                     // Remove both elements after fade-out completes
                                                     setTimeout(() => {
-                                                        try { document.body.removeChild(fadeOverlay); } catch (e) {}
-                                                        try { document.body.removeChild(transitionText); } catch (e) {}
+                                                        try { document.body.removeChild(fadeOverlay); } catch (e) { }
+                                                        try { document.body.removeChild(transitionText); } catch (e) { }
                                                         // Now the battle room visuals have finished fading in for the player.
                                                         // Signal to in-level enemies that it's OK to start moving.
-                                                        try { window.__battleRoomFadeComplete = true; } catch (e) {}
+                                                        try { window.__battleRoomFadeComplete = true; } catch (e) { }
                                                     }, fadeOutMs + 150);
                                                 }
                                             }, untypeSpeed);
@@ -426,43 +422,42 @@ class MansionLevel6 {
             }
         };
 
-        const sprite_src_chair = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
+        const sprite_src_chairs = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
         const sprite_data_chair = {
             id: 'Chair',
             greeting: "Don't sit on me!",
-            src: sprite_src_chair,
+            src: sprite_src_chairs,
             SCALE_FACTOR: 6,
             ANIMATION_RATE: 100,
-            pixels: {width: 2029, height: 2025},
-            INIT_POSITION: {x: (width * 8 / 80), y: (height * 1 / 4)},
-            orientation: {rows: 1, columns: 1},
-            down: {row: 0, start: 0, columns: 1},
-            hitbox: {widthPercentage: 0.1, heightPercentage: 0.2}
+            pixels: { width: 2029, height: 2025 },
+            INIT_POSITION: { x: (width * 0.07), y: (height * 0.36) },
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 }
         };
 
-        const sprite_src_chair2 = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
         const sprite_data_chair2 = {
             id: 'Chair 2',
             greeting: "Don't sit on me!",
-            src: sprite_src_chair2,
+            src: sprite_src_chairs,
             SCALE_FACTOR: 6,
             ANIMATION_RATE: 100,
-            pixels: {width: 2029, height: 2025},
-            INIT_POSITION: {x: (width * 71 / 80), y: (height * 9 / 40)},
-            orientation: {rows: 1, columns: 1},
-            down: {row: 0, start: 0, columns: 1},
-            hitbox: {widthPercentage: 0.1, heightPercentage: 0.2}
+            pixels: { width: 2029, height: 2025 },
+            INIT_POSITION: { x: (width * 0.86), y: (height * 0.36) },
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 }
         };
 
         // This is every sprite we want the game engine to render, and with whatever data
         this.classes = [
-            {class: GameEnvBackground, data: image_data_chamber},
-            {class: Player, data: sprite_data_mc},
-            {class: Npc, data: sprite_data_zombie1},
-            {class: Npc, data: sprite_data_zombie2}, // The second zombie is the one that talks about the code
-            {class: Npc, data: sprite_data_bossdoor},
-            {class: Npc, data: sprite_data_chair},
-            {class: Npc, data: sprite_data_chair2}
+            { class: GameEnvBackground, data: image_data_chamber },
+            { class: Player, data: sprite_data_mc },
+            { class: Npc, data: sprite_data_zombie1 },
+            { class: Npc, data: sprite_data_zombie2 }, // The second zombie is the one that talks about the code
+            { class: Npc, data: sprite_data_bossdoor },
+            { class: Npc, data: sprite_data_chair },
+            { class: Npc, data: sprite_data_chair2 }
         ];
 
     };
