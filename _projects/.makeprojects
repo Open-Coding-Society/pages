@@ -24,7 +24,7 @@ games/local-storage
 games/kirby-minigames
 main
 games/multiplayer
-games/ocean-adventure
+games/ocean-adventure:dev
 games/tag-game-multiplayer
 games/ocean
 games/peppa-pig
