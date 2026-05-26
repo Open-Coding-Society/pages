@@ -401,6 +401,238 @@
 
   .fopl-ig-footer a { color: rgba(255,255,255,0.9) !important; text-decoration: underline; }
   .fopl-ig-footer a:hover { color: #fff !important; }
+
+  /* ── Shared panel wrapper ─────────────────────────────────── */
+  .fopl-panel-wrap {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    font-family: 'Lato', sans-serif;
+  }
+  .fopl-panel-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 3rem;
+  }
+
+  /* ── Section heading ─────────────────────────────────────── */
+  .fopl-section-heading {
+    font-family: 'Cabin', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 6px;
+    border-bottom: 2px solid rgba(255,255,255,0.15);
+  }
+
+  /* ── Cards ───────────────────────────────────────────────── */
+  .fopl-card {
+    background: #1e2a1e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-top: 4px solid #1a7a2e;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    padding: 20px 24px;
+    margin-bottom: 1rem;
+  }
+  .fopl-card-gold {
+    border-top-color: #c8a030;
+  }
+
+  /* ── Survey row ──────────────────────────────────────────── */
+  .fopl-survey-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .fopl-rating-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #243424;
+    border: 1px solid rgba(26,122,46,0.35);
+    border-radius: 6px;
+    padding: 10px 16px;
+    flex: 1;
+    min-width: 220px;
+  }
+  .fopl-rating-score {
+    font-family: 'Cabin', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #5dde7a !important;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .fopl-rating-label {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text) !important;
+    opacity: 0.85;
+  }
+  .fopl-rating-count {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    margin-bottom: 2px;
+  }
+
+  /* ── Sub-label ───────────────────────────────────────────── */
+  .fopl-sub-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text) !important;
+    opacity: 0.5;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 3px;
+    margin: 0 0 10px;
+  }
+
+  /* ── Pill list (favorite features) ──────────────────────── */
+  .fopl-pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0 0 4px;
+    padding: 0;
+    list-style: none;
+  }
+  .fopl-pill {
+    padding: 4px 12px;
+    background: rgba(26,122,46,0.18);
+    border: 1px solid rgba(26,122,46,0.45);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text) !important;
+  }
+
+  /* ── Suggestion cards ────────────────────────────────────── */
+  .fopl-suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 640px) { .fopl-suggestions-grid { grid-template-columns: 1fr; } }
+
+  .fopl-suggestion-card {
+    background: #1e2e1e;
+    border: 1px solid rgba(200,160,48,0.25);
+    border-left: 4px solid #c8a030;
+    border-radius: 5px;
+    padding: 12px 14px;
+  }
+  .fopl-suggestion-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #c8a030 !important;
+    margin: 0 0 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .fopl-suggestion-desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text) !important;
+    opacity: 0.82;
+    margin: 0;
+  }
+
+  /* ── Future students section ─────────────────────────────── */
+  .fopl-future-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 700px) { .fopl-future-grid { grid-template-columns: 1fr; } }
+
+  .fopl-future-card {
+    background: #1e2a1e;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-top: 3px solid #1a7a2e;
+    border-radius: 5px;
+    padding: 14px 16px;
+  }
+  .fopl-future-card-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 8px;
+  }
+  .fopl-future-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .fopl-future-list li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text) !important;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    opacity: 0.88;
+  }
+  .fopl-future-list li:last-child { border-bottom: none; }
+  .fopl-future-dot {
+    flex-shrink: 0;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #1a7a2e;
+    margin-top: 7px;
+  }
+  .fopl-future-dot-gold {
+    background: #c8a030;
+  }
+
+  .fopl-link-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .fopl-link-btn {
+    display: inline-block;
+    padding: 7px 14px;
+    background: #023b0f;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    text-decoration: none;
+    transition: background 0.18s;
+  }
+  .fopl-link-btn:hover { background: #0d5c1e; }
+
+  .fopl-note-box {
+    background: rgba(200,160,48,0.07);
+    border: 1px solid rgba(200,160,48,0.3);
+    border-left: 4px solid #c8a030;
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text) !important;
+    opacity: 0.88;
+    margin-top: 10px;
+  }
 </style>
 
 {% for topic in data.Topics %}
@@ -575,3 +807,159 @@
 
 </div>
 {% endfor %}
+
+<!-- ════════════════════════════════════════════════════════════
+     PRESENTATION FEEDBACK
+     ═══════════════════════════════════════════════════════════ -->
+<div class="fopl-panel-wrap">
+  <div class="fopl-panel-inner">
+
+    <h2 class="fopl-section-heading">Stakeholder Presentation Feedback</h2>
+    <p style="font-size:0.85rem; color:var(--text); opacity:0.75; margin:0 0 1.2rem; font-family:'Lato',sans-serif;">
+      Feedback collected from Friends of the Poway Library representatives and Poway community members who attended our capstone presentation.
+    </p>
+
+    <!-- Survey results -->
+    <div class="fopl-card">
+      <div class="fopl-sub-label">Post-Presentation Survey &mdash; 3 Respondents &middot; Rated out of 5</div>
+      <div class="fopl-survey-row">
+        <div class="fopl-rating-chip">
+          <div class="fopl-rating-score">5</div>
+          <div class="fopl-rating-label">
+            <span class="fopl-rating-count">1 respondent</span>
+            "Amazing, and really worth attending."
+          </div>
+        </div>
+        <div class="fopl-rating-chip">
+          <div class="fopl-rating-score" style="color:#c8a030 !important;">4</div>
+          <div class="fopl-rating-label">
+            <span class="fopl-rating-count">2 respondents</span>
+            "Very interesting, and a great experience."
+          </div>
+        </div>
+      </div>
+
+      <div class="fopl-sub-label">Favorite Features (from responses)</div>
+      <ul class="fopl-pill-list">
+        <li class="fopl-pill">Flip tiles → linked pages</li>
+        <li class="fopl-pill">Volunteer application system</li>
+        <li class="fopl-pill">Gamification Hub</li>
+        <li class="fopl-pill">Used book catalog</li>
+      </ul>
+    </div>
+
+    <!-- Stakeholder suggestions -->
+    <div class="fopl-sub-label" style="margin-top:1.2rem;">Suggestions &amp; Requests from Stakeholders</div>
+    <div class="fopl-suggestions-grid">
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">DVD Catalog Support</p>
+        <p class="fopl-suggestion-desc">
+          The library sells many DVDs alongside books. Stakeholders asked whether DVDs could be added to the catalog system. We explained that this is achievable if a standardized identifier (similar to ISBN for books) is adopted for DVDs — UPC codes are the natural candidate.
+        </p>
+      </div>
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">Social Media Integration</p>
+        <p class="fopl-suggestion-desc">
+          Stakeholders would like updates posted on their Instagram (and similar platforms) to automatically surface somewhere on the site — for example, displaying pinned posts or a live feed so visitors always see the latest announcements without the library team manually duplicating content.
+        </p>
+      </div>
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">Email Notifications for Admin Applications</p>
+        <p class="fopl-suggestion-desc">
+          We walked through our admin application flow — submissions are currently saved to the admin user profile on the site. Stakeholders asked for emails to also be sent to their personal inboxes when a new application arrives, so they don't have to log in to check.
+        </p>
+      </div>
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">Games as a Gateway to Reading</p>
+        <p class="fopl-suggestion-desc">
+          Stakeholders loved the gamification hub as a way to get kids interested in books. They emphasized the value of small, engaging steps — building curiosity before presenting a book — rather than direct recommendations. The games accomplish exactly this and should be expanded.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     FOR FUTURE STUDENTS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="fopl-panel-wrap">
+  <div class="fopl-panel-inner">
+
+    <h2 class="fopl-section-heading" style="border-bottom-color:#c8a030;">Future Students</h2>
+    <p style="font-size:0.85rem; color:var(--text); opacity:0.75; margin:0 0 1.2rem; font-family:'Lato',sans-serif;">
+      This project was built by the Boolean-Boyz team (2025–2026 cohort). We're handing it off so the next CSP team can keep building. The infograph above covers what features exist — this section is everything you actually need to pick it up and run.
+    </p>
+
+    <div class="fopl-future-grid">
+
+      <!-- Getting started -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">Getting Started</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot"></span>Clone <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener" style="color:#5dde7a;">bb-pages</a> (frontend) and <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener" style="color:#5dde7a;">bb-flask</a> (backend) — both repos needed</li>
+          <li><span class="fopl-future-dot"></span>Frontend runs with <code style="font-size:0.75rem;">bundle exec jekyll serve</code> — requires Ruby + Bundler</li>
+          <li><span class="fopl-future-dot"></span>Backend runs with <code style="font-size:0.75rem;">python main.py</code> — create a <code style="font-size:0.75rem;">.env</code> file for secrets (ask your teacher for the existing env vars)</li>
+          <li><span class="fopl-future-dot"></span>Live site: <a href="https://fopl.opencodingsociety.com/home" target="_blank" rel="noopener" style="color:#5dde7a;">fopl.opencodingsociety.com</a></li>
+        </ul>
+        <div class="fopl-link-row">
+          <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener" class="fopl-link-btn">Frontend</a>
+          <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener" class="fopl-link-btn">Backend</a>
+          <a href="https://github.com/orgs/Boolean-Boyz/repositories" target="_blank" rel="noopener" class="fopl-link-btn">All Repos</a>
+        </div>
+      </div>
+
+      <!-- Architecture -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">How It's Structured</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot"></span>Frontend is Jekyll + plain HTML/JS — pages live in <code style="font-size:0.75rem;">_posts/</code> and <code style="font-size:0.75rem;">pages/</code></li>
+          <li><span class="fopl-future-dot"></span>Backend is Python/Flask — API routes in <code style="font-size:0.75rem;">api/</code>, models in <code style="font-size:0.75rem;">model/</code></li>
+          <li><span class="fopl-future-dot"></span>Frontend calls the backend via fetch — look for <code style="font-size:0.75rem;">pythonURI</code> in the JS files</li>
+          <li><span class="fopl-future-dot"></span>Admin application data is stored on the admin user model — extending it to send emails means adding Flask-Mail (or SendGrid) to the submission route in the backend</li>
+          <li><span class="fopl-future-dot"></span>The catalog uses ISBN lookups via Open Library — a DVD equivalent would use UPC + upcitemdb.com</li>
+        </ul>
+      </div>
+
+      <!-- Lessons learned -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">Lessons from Our Team</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot"></span>Get stakeholder feedback early — we only presented once and got a lot of ideas we didn't have time to build</li>
+          <li><span class="fopl-future-dot"></span>CORS was a frequent issue between frontend and backend — make sure the Flask CORS config covers your local dev URL</li>
+          <li><span class="fopl-future-dot"></span>Keep the catalog data consistent — if someone adds a book manually vs. via scan, the schema needs to match or filtering breaks</li>
+          <li><span class="fopl-future-dot"></span>The games were the crowd-pleaser — if you have time for only one new feature, the stakeholders said expanding those would matter most</li>
+          <li><span class="fopl-future-dot"></span>Document your API endpoints as you go — we had to reverse-engineer some of our own routes by the end</li>
+        </ul>
+      </div>
+
+      <!-- Stakeholder re-engagement -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">Re-engaging with FOPL</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot"></span>Ask your teacher for the Friends of the Poway Library contact — they were very receptive and open to continued collaboration</li>
+          <li><span class="fopl-future-dot"></span>Introduce yourselves and reference the 2025–2026 Boolean-Boyz project — they know it and already have opinions on what to build next</li>
+          <li><span class="fopl-future-dot"></span>Their top requests (from our presentation): DVD catalog, Instagram feed on the site, email alerts for admin applications — see the Feedback section above for full context</li>
+          <li><span class="fopl-future-dot"></span>They sell books and DVDs at the library on Poway Rd — visiting in person is a great way to understand the actual workflow you're supporting</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="fopl-note-box">
+      <strong>Where to focus first:</strong> The stakeholders specifically loved the games and said expanding them is a priority. The email notification for admin applications is a small backend change with high impact for them. Social media integration and DVD catalog are longer projects but clearly wanted. The planned features in the infograph above (donation flow, book scan, AI chatbot) are fully scoped — pick one and run with it.
+    </div>
+
+  </div>
+</div>
+
+<p style="text-align:center; margin-top: 2rem; margin-bottom: 2rem; font-family:'Lato',sans-serif; font-size:0.85rem; opacity:0.7;">
+  <a href="https://github.com/orgs/Boolean-Boyz/repositories" target="_blank" rel="noopener noreferrer">
+    Boolean-Boyz GitHub Organization
+  </a>
+</p>
