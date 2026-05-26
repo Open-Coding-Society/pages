@@ -308,6 +308,18 @@ const LocalProfile = {
   },
 
   /**
+   * Clear everything: profile key + companion localStorage keys that survive a normal clear.
+   * Use this for a full local reset (profile reset button, stopGame on auth'd users).
+   * @returns {boolean} Success status
+   */
+  clearAll(uid = undefined) {
+    const result = this.clear(uid);
+    try { localStorage.removeItem('cs_pathway_completion'); } catch (_) {}
+    try { localStorage.removeItem('ocs_guest_session'); } catch (_) {}
+    return result;
+  },
+
+  /**
    * Get a flattened version of the profile for easy consumption
    * @returns {Object|null} Flattened profile data
    */

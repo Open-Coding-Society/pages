@@ -604,14 +604,16 @@ class ProfileManager {
    */
   async clear() {
     try {
-      // Always clear localStorage (full wipe for local reset)
-      LocalProfile.clear();
+      // Clear localStorage including companion keys (completion, guest session)
+      LocalProfile.clearAll();
       // Also clear backend game data (preserves identity columns server-side)
       if (this.isAuthenticated) {
         PersistentProfile.clear().catch(() => {});
       }
 
       this.initialized = false;
+      // Signal all level classes to drop their shared profile state cache
+      window.dispatchEvent(new CustomEvent('ocs:profile-cleared'));
       this._updateWidget();
       console.log('ProfileManager: profile cleared');
       return { success: true, code: 200, body: null };
