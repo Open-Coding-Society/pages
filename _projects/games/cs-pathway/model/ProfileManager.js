@@ -239,6 +239,8 @@ class ProfileManager {
         name: profile.name,
         email: profile.email,
         githubID: profile.githubID,
+        course: profile.course || profile.coursePlanMeta?.selectedClass || null,
+        coursePlanMeta: profile.coursePlanMeta || null,
         persona: profile.persona,
         personaId: profile.personaId,
         sprite: profile.sprite,
