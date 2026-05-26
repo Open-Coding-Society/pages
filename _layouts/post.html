@@ -85,6 +85,10 @@ Check if this is a course lesson and determine which course context to use
             Need to update a submission later? Open the <a href="{{ site.baseurl }}/submissions" style="color: #60a5fa; text-decoration: underline;">submissions dashboard</a>.
           </p>
           {% endif %}
+
+          {% if page.chat %}
+          {% include lesson_chat.html %}
+          {% endif %}
         </div>
 
         {%- if page.comments -%}
@@ -1574,6 +1578,10 @@ Check if this is a course lesson and determine which course context to use
         }
       }
     </script>
+    {% endif %}
+
+    {% if page.chat %}
+    {% include lesson_chat.html %}
     {% endif %}
   </div>
   {%- if page.comments -%}
