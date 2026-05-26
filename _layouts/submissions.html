@@ -477,7 +477,6 @@ active_tab: submissions
     let currentUserId = null;
     let currentUsername = '';
     let activeEditSubmissionId = null;
-    let synergyGradeMap = {}; // assignmentId (string) → grade (number) for current user
 
     async function init() {
         try {
@@ -569,18 +568,6 @@ active_tab: submissions
             // Handle both array and null responses
             allSubmissions = Array.isArray(data) ? data : [];
             console.log('Set allSubmissions to', allSubmissions.length, 'items');
-
-            // Fetch synergy grades for the current user so "My Submissions" shows real grades
-            if (currentUserId) {
-                try {
-                    const gradeResp = await fetch(`${javaURI}/api/synergy/grades/map/${currentUserId}`, fetchOptions);
-                    if (gradeResp.ok) {
-                        synergyGradeMap = await gradeResp.json(); // { "assignmentId": grade, ... }
-                    }
-                } catch (e) {
-                    console.warn('Could not fetch synergy grades:', e);
-                }
-            }
 
             displayUserSubmissions();
             if (isAdmin) {
@@ -867,20 +854,14 @@ active_tab: submissions
                     <tbody>
                         ${mySubmissions.map((submission, idx) => {
                             try {
-                                // Prefer the real SynergyGrade over the legacy grade field
-                                const synergyGrade = submission.assignmentId != null
-                                    ? synergyGradeMap[String(submission.assignmentId)]
-                                    : undefined;
-                                const gradeDisplay = synergyGrade != null
-                                    ? `<span class="grade-display">${synergyGrade}/100</span>`
-                                    : (submission.grade != null
-                                        ? `<span class="grade-display">${submission.grade}/100</span>`
-                                        : '<em style="color:#6b7280">Not graded</em>');
+                                const gradeDisplay = submission.grade != null
+                                    ? `<span class="grade-display">${submission.grade}/100</span>`
+                                    : '<em style="color:#6b7280">Not graded</em>';
                                 return `
                                     <tr>
                                         <td><strong>${escapeHtml(submission.assignmentName || 'Unknown')}</strong></td>
                                         <td>${renderContent(submission.content)}</td>
-                                        <td>${getStatusBadge(submission, synergyGrade)}</td>
+                                        <td>${getStatusBadge(submission)}</td>
                                         <td>${gradeDisplay}</td>
                                         <td>${submission.feedback ? escapeHtml(submission.feedback) : '<em style="color:#6b7280">No feedback yet</em>'}</td>
                                         <td>
@@ -925,6 +906,7 @@ active_tab: submissions
                             <th>Submission</th>
                             <th>Status</th>
                             <th>Grade</th>
+                            <th>Feedback</th>
                             <th>Comment</th>
                             <th>Actions</th>
                         </tr>
@@ -933,6 +915,7 @@ active_tab: submissions
                         ${allSubmissions.map((submission, idx) => {
                             try {
                                 const gradeVal = submission.grade != null ? submission.grade : '';
+                                const feedbackVal = submission.feedback != null ? submission.feedback : '';
                                 return `
                                     <tr id="sub-row-${idx}">
                                         <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
@@ -948,24 +931,32 @@ active_tab: submissions
                                                     style="width:70px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;"
                                                     placeholder="0–100"
                                                 >
-                                                <button
-                                                    onclick="saveGrade(${idx}, ${submission.assignmentId ?? 'null'}, ${submission.submitterId ?? 'null'})"
-                                                    style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
-                                                >Save</button>
-                                                <span id="grade-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <textarea
+                                                id="feedback-input-${idx}"
+                                                rows="2"
+                                                style="width:100%;min-width:180px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;resize:vertical;"
+                                                placeholder="Feedback"
+                                            >${escapeHtml(String(feedbackVal))}</textarea>
                                         </td>
                                         <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
                                         <td>
-                                            <div class="submission-actions">
+                                            <div class="submission-actions" style="flex-direction:column;align-items:flex-start;">
+                                                <button
+                                                    onclick="saveGrade(${idx}, ${submission.id})"
+                                                    style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
+                                                >Save Grade</button>
                                                 <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>
+                                                <span id="grade-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
                                             </div>
                                         </td>
                                     </tr>
                                 `;
                             } catch (rowError) {
                                 console.error('Error rendering admin row', idx, ':', rowError);
-                                return `<tr><td colspan="7" style="color: red;">Error rendering submission</td></tr>`;
+                                return `<tr><td colspan="8" style="color: red;">Error rendering submission</td></tr>`;
                             }
                         }).join('')}
                     </tbody>
@@ -980,18 +971,14 @@ active_tab: submissions
         }
     }
 
-    window.saveGrade = async function(idx, assignmentId, studentId) {
+    window.saveGrade = async function(idx, submissionId) {
         const input = document.getElementById(`grade-input-${idx}`);
         const status = document.getElementById(`grade-status-${idx}`);
+        const feedbackInput = document.getElementById(`feedback-input-${idx}`);
         const gradeValue = parseFloat(input.value);
 
         if (isNaN(gradeValue) || gradeValue < 0 || gradeValue > 100) {
             status.textContent = '⚠ Enter 0–100';
-            status.style.color = '#f59e0b';
-            return;
-        }
-        if (assignmentId == null || studentId == null) {
-            status.textContent = '⚠ Missing IDs';
             status.style.color = '#f59e0b';
             return;
         }
@@ -1000,23 +987,22 @@ active_tab: submissions
         status.style.color = '#9ca3af';
 
         try {
-            const resp = await fetch(`${javaURI}/api/synergy/grade`, {
+            const url = `${javaURI}/api/submissions/grade/${encodeURIComponent(submissionId)}?grade=${encodeURIComponent(gradeValue)}&feedback=${encodeURIComponent(feedbackInput ? feedbackInput.value : '')}`;
+            const resp = await fetch(url, {
                 ...fetchOptions,
-                method: 'POST',
-                body: JSON.stringify({
-                    grade: gradeValue,
-                    assignment: { id: assignmentId },
-                    student: { id: studentId }
-                })
+                method: 'POST'
             });
 
             if (resp.ok) {
                 status.textContent = '✓ Saved';
                 status.style.color = '#34d399';
                 input.style.borderColor = '#34d399';
-                // Update the submission in allSubmissions so status badge refreshes on next filter
-                const sub = allSubmissions.find(s => s.assignmentId === assignmentId && s.submitterId === studentId);
-                if (sub) sub.grade = gradeValue;
+                const updated = allSubmissions.find(s => String(s.id) === String(submissionId));
+                if (updated) {
+                    updated.grade = gradeValue;
+                    updated.feedback = feedbackInput ? feedbackInput.value : '';
+                }
+                await loadSubmissions();
             } else {
                 const err = await resp.json().catch(() => ({}));
                 status.textContent = `✗ ${err.message || resp.status}`;
@@ -1028,9 +1014,8 @@ active_tab: submissions
         }
     };
 
-    // synergyGrade (optional) — if provided, takes precedence over submission.grade for the Graded check
-    function getStatusBadge(submission, synergyGrade) {
-        const isGraded = synergyGrade != null || (submission.grade !== null && submission.grade !== undefined);
+    function getStatusBadge(submission) {
+        const isGraded = submission.grade !== null && submission.grade !== undefined;
         if (isGraded) {
             return '<span class="status-badge status-graded">Graded</span>';
         } else if (submission.isLate) {
@@ -1122,6 +1107,7 @@ active_tab: submissions
                         <th>Submission</th>
                         <th>Status</th>
                         <th>Grade</th>
+                        <th>Feedback</th>
                         <th>Comment</th>
                         <th>Actions</th>
                     </tr>
@@ -1129,7 +1115,7 @@ active_tab: submissions
                 <tbody>
                     ${filtered.map((submission, idx) => {
                         const gradeVal = submission.grade != null ? submission.grade : '';
-                        const fIdx = `f${idx}`;
+                        const feedbackVal = submission.feedback != null ? submission.feedback : '';
                         return `
                         <tr>
                             <td><strong>${escapeHtml(submission.submitterName || 'Unknown')}</strong></td>
@@ -1140,20 +1126,28 @@ active_tab: submissions
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <input type="number" min="0" max="100" step="0.5"
                                         value="${escapeHtml(String(gradeVal))}"
-                                        id="grade-input-${fIdx}"
+                                        id="grade-input-${idx}"
                                         style="width:70px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;"
                                         placeholder="0–100">
-                                    <button
-                                        onclick="saveGrade('${fIdx}', ${submission.assignmentId ?? 'null'}, ${submission.submitterId ?? 'null'})"
-                                        style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
-                                    >Save</button>
-                                    <span id="grade-status-${fIdx}" style="font-size:0.75rem;color:#6b7280;"></span>
                                 </div>
+                            </td>
+                            <td>
+                                <textarea
+                                    id="feedback-input-${idx}"
+                                    rows="2"
+                                    style="width:100%;min-width:180px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;resize:vertical;"
+                                    placeholder="Feedback"
+                                >${escapeHtml(String(feedbackVal))}</textarea>
                             </td>
                             <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
                             <td>
-                                <div class="submission-actions">
+                                <div class="submission-actions" style="flex-direction:column;align-items:flex-start;">
+                                    <button
+                                        onclick="saveGrade(${idx}, ${submission.id})"
+                                        style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
+                                    >Save Grade</button>
                                     <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>
+                                    <span id="grade-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
                                 </div>
                             </td>
                         </tr>
