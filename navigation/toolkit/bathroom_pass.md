@@ -127,6 +127,19 @@ permalink: /student/bathroom_pass
                 <p class="text-[10px] text-neutral-500 mt-2 italic">Lower = Stricter, Higher = More Lenient</p>
             </div>
 
+            <!-- Class Bell Auto-Clear -->
+            <div class="bg-neutral-900/50 backdrop-blur-xl p-8 rounded-3xl border border-neutral-800 shadow-2xl">
+                <h3 class="text-sm font-black text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span class="text-amber-400">🔔</span>
+                    Class Bell Auto-Clear
+                    <span id="bellStatus" class="ml-auto text-xs font-bold text-neutral-500 normal-case tracking-normal">Off</span>
+                </h3>
+                <p class="text-xs text-neutral-500 mb-4">Listens for an 800 Hz school bell for ~400ms and clears the entire queue automatically.</p>
+                <button id="bellToggleBtn" class="px-8 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-amber-500/25 uppercase tracking-wider text-xs">
+                    Enable Bell Detection
+                </button>
+            </div>
+
             <!-- Manual Override -->
             <div class="bg-neutral-900/50 backdrop-blur-xl p-8 rounded-3xl border border-neutral-800 shadow-2xl">
                 <h3 class="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2">
@@ -584,6 +597,141 @@ permalink: /student/bathroom_pass
             showToast({ message: "Server connection failed", duration: 5000, style: { background: "#ef4444" }});
         }
     }
+
+    // Clear the entire queue (called by bell detection on class-bell)
+    async function clearEntireQueue() {
+        if (!currentUserEmail) return;
+        try {
+            const resp = await fetch(`${javaURI}/api/bathroom/queue/${currentUserEmail}`, fetchOptions);
+            if (!resp.ok) return;
+            const data = await resp.json();
+            if (!data.peopleQueue) return;
+            const students = data.peopleQueue.split(',').map(s => s.trim()).filter(Boolean);
+            for (const name of students) {
+                await fetch(`${javaURI}/api/bathroom/remove`, {
+                    ...fetchOptions,
+                    method: 'DELETE',
+                    body: JSON.stringify({ teacherEmail: currentUserEmail, studentName: name })
+                });
+            }
+            refreshQueue();
+        } catch (err) {
+            console.error('Error clearing queue on bell:', err);
+        }
+    }
+
+    // Bell detection: listen for an 800 Hz tone (±30 Hz) sustained for 400 ms,
+    // then automatically clear the entire queue.
+    const bellToggleBtn = document.getElementById('bellToggleBtn');
+    const bellStatusEl = document.getElementById('bellStatus');
+    let bellAudioCtx = null;
+    let bellStream = null;
+    let bellAnalyser = null;
+    let bellRafId = null;
+    let bellStartedAt = null;
+    let bellCooldownUntil = 0;
+
+    function setBellStatus(text) {
+        if (bellStatusEl) bellStatusEl.textContent = text;
+    }
+
+    async function startBellDetection() {
+        try {
+            bellStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (err) {
+            console.error('Mic permission denied or unavailable:', err);
+            setBellStatus('Mic unavailable');
+            showToast({ message: 'Microphone access denied', duration: 4000, style: { background: '#ef4444' } });
+            return false;
+        }
+
+        bellAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = bellAudioCtx.createMediaStreamSource(bellStream);
+        bellAnalyser = bellAudioCtx.createAnalyser();
+        bellAnalyser.fftSize = 4096;
+        bellAnalyser.smoothingTimeConstant = 0.3;
+        source.connect(bellAnalyser);
+
+        const freqData = new Uint8Array(bellAnalyser.frequencyBinCount);
+        const binHz = bellAudioCtx.sampleRate / bellAnalyser.fftSize;
+        const loBin = Math.max(0, Math.floor(770 / binHz));
+        const hiBin = Math.min(freqData.length - 1, Math.ceil(830 / binHz));
+
+        bellStartedAt = null;
+        setBellStatus('Listening…');
+
+        const tick = async () => {
+            if (!bellAnalyser) return;
+            bellAnalyser.getByteFrequencyData(freqData);
+
+            let bellPeak = 0;
+            for (let i = loBin; i <= hiBin; i++) {
+                if (freqData[i] > bellPeak) bellPeak = freqData[i];
+            }
+
+            let sum = 0;
+            let count = 0;
+            for (let i = 0; i < freqData.length; i++) {
+                if (i < loBin || i > hiBin) {
+                    sum += freqData[i];
+                    count++;
+                }
+            }
+            const otherAvg = count > 0 ? sum / count : 0;
+
+            const present = bellPeak > 180 && bellPeak > otherAvg * 2;
+            const now = performance.now();
+
+            if (present) {
+                if (bellStartedAt === null) bellStartedAt = now;
+                if (now - bellStartedAt >= 400 && now > bellCooldownUntil) {
+                    bellCooldownUntil = now + 5000;
+                    bellStartedAt = null;
+                    setBellStatus('Bell detected! Clearing…');
+                    try {
+                        await clearEntireQueue();
+                    } catch (err) {
+                        console.error('Error clearing queue on bell:', err);
+                    }
+                    if (bellAnalyser) setBellStatus('Listening…');
+                }
+            } else {
+                bellStartedAt = null;
+            }
+
+            bellRafId = requestAnimationFrame(tick);
+        };
+
+        bellRafId = requestAnimationFrame(tick);
+        return true;
+    }
+
+    function stopBellDetection() {
+        if (bellRafId) cancelAnimationFrame(bellRafId);
+        bellRafId = null;
+        bellAnalyser = null;
+        if (bellStream) {
+            bellStream.getTracks().forEach(t => t.stop());
+            bellStream = null;
+        }
+        if (bellAudioCtx) {
+            bellAudioCtx.close().catch(() => {});
+            bellAudioCtx = null;
+        }
+        bellStartedAt = null;
+        setBellStatus('Off');
+    }
+
+    bellToggleBtn?.addEventListener('click', async () => {
+        if (bellAnalyser) {
+            stopBellDetection();
+            bellToggleBtn.textContent = 'Enable Bell Detection';
+        } else {
+            bellToggleBtn.textContent = 'Starting…';
+            const ok = await startBellDetection();
+            bellToggleBtn.textContent = ok ? 'Disable Bell Detection' : 'Enable Bell Detection';
+        }
+    });
 
     // Export to window
     window.startScanning = startScanning;
