@@ -3,6 +3,77 @@ import Player from "@assets/js/GameEnginev1.1/essentials/Player.js";
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import MansionLevel6_BattleRoom from './mansionLevel6_BattleRoom.js';
+import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
+
+class DoorPrompt extends GameObject {
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        this.doorId = data?.doorId || 'Door';
+        this.size = data?.size || 36;
+        this.offsetY = data?.offsetY || -18;
+        this.icon = null;
+        this._cachedDoor = null;
+        this._cachedPlayer = null;
+    }
+
+    update() {
+        if (!this.gameEnv || typeof document === 'undefined') return;
+        if (!this.icon) {
+            this.icon = document.createElement('img');
+            this.icon.src = `${this.gameEnv.path}/images/projects/mansionGame/eKey.png`;
+            this.icon.alt = 'Press E';
+            Object.assign(this.icon.style, {
+                position: 'absolute',
+                width: `${this.size}px`,
+                height: `${this.size}px`,
+                display: 'none',
+                pointerEvents: 'none',
+                zIndex: '250'
+            });
+            const container = document.querySelector('canvas')?.parentElement || document.body;
+            container.appendChild(this.icon);
+        }
+
+        if (!this._cachedDoor) {
+            this._cachedDoor = this.gameEnv.gameObjects.find(obj => obj?.spriteData?.id === this.doorId);
+        }
+        if (!this._cachedPlayer) {
+            this._cachedPlayer = this.gameEnv.gameObjects.find(obj => obj?.constructor?.name === 'Player');
+        }
+
+        const door = this._cachedDoor;
+        const player = this._cachedPlayer;
+        if (!door || !player) {
+            this.icon.style.display = 'none';
+            return;
+        }
+
+        const touchingDoor = !!player?.state?.collisionEvents?.includes(this.doorId);
+        if (!touchingDoor) {
+            this.icon.style.display = 'none';
+            return;
+        }
+
+        const doorCenterX = door.position.x + (door.width || 0) / 2;
+        const doorTopY = door.position.y;
+        const left = doorCenterX - (this.size / 2);
+        const top = this.gameEnv.top + doorTopY + this.offsetY;
+
+        this.icon.style.left = `${left}px`;
+        this.icon.style.top = `${top}px`;
+        this.icon.style.display = 'block';
+    }
+
+    draw() {}
+
+    resize() {}
+
+    destroy() {
+        if (this.icon && this.icon.parentNode) {
+            this.icon.parentNode.removeChild(this.icon);
+        }
+    }
+}
 
 class MansionLevel6 {
     constructor(gameEnv) {
@@ -456,6 +527,7 @@ class MansionLevel6 {
             { class: Npc, data: sprite_data_zombie1 },
             { class: Npc, data: sprite_data_zombie2 }, // The second zombie is the one that talks about the code
             { class: Npc, data: sprite_data_bossdoor },
+            { class: DoorPrompt, data: { doorId: 'Door', size: 36, offsetY: -22 } },
             { class: Npc, data: sprite_data_chair },
             { class: Npc, data: sprite_data_chair2 }
         ];

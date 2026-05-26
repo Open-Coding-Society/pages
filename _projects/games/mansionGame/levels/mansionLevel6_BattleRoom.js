@@ -256,7 +256,7 @@ class MansionLevel6_BattleRoom {
             updatePlayerHealthBar(100);
         }
 
-        // Create instructions under the boss bar (fade after 15 seconds)
+        // Create instructions under the boss bar (persistent)
         const instruction = document.createElement('div');
         instruction.id = 'instructions-container';
         instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, L for shockwave, touch power ups to collect';
@@ -266,7 +266,6 @@ class MansionLevel6_BattleRoom {
             fontSize: '16px',
             textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
             opacity: '1',
-            transition: 'opacity 1.2s ease',
             marginTop: '6px',
             whiteSpace: 'nowrap'
         });
@@ -279,10 +278,7 @@ class MansionLevel6_BattleRoom {
             gameContainer.appendChild(instruction);
         }
 
-        setTimeout(() => {
-            instruction.style.opacity = '0';
-            setTimeout(() => instruction.remove(), 1400);
-        }, 15000);
+        instruction.style.opacity = '1';
     }
 }
 
