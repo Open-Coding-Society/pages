@@ -21,7 +21,7 @@ Over the past several months I built and integrated features across two reposito
 
 The project connects **personal finance education** to **real software engineering**: students explore stocks, futures, and quantitative trading inside a game world, while the backend exposes the same APIs a professional fintech stack would use.
 
-**Live demos**
+**Live demo**
 
 - Fortune Finders game: [/gamify/fortuneFindersv1-1](https://applicatorscsa.github.io/finalpages/gamify/fortuneFindersv1-1)
 - Quant trading bot: [/gamify/fortuneFinders/quant](https://applicatorscsa.github.io/finalpages/gamify/fortuneFinders/quant)
