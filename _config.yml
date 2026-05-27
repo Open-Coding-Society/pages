@@ -34,12 +34,7 @@ exclude:
   - _docx
   - _projects
   - venv
-  - _projects/games/fortuneFinders/Makefile
 # Note: / auto-excluded by Jekyll (underscore prefix)
-
-# Fortune Finders: entire project served from one folder (no _posts/gamify copies)
-include:
-  - _projects/games/fortuneFinders
 
 
 # Build settings
