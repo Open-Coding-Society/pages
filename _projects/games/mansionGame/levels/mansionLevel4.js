@@ -19,7 +19,7 @@ class MansionLevel4 {
         const image_data_background = {
             name: 'background',
             greeting: "Wave Defense! Defeat all enemies to proceed!",
-            src: path + "/images/projects/mansionGame/background.jpg",
+            src: path + "/images/projects/mansionGame/lvl4.png",
             pixels: { height: 1600, width: 1600 }
         };
 

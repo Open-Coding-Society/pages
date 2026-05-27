@@ -123,7 +123,7 @@ class WaveManager {
         const width  = this.gameEnv.innerWidth;
         const height = this.gameEnv.innerHeight;
         const path   = this.gameEnv.path;
-        const sprite_src = path + "/_projects/games/mansionGame/images/ghost.png";
+        const sprite_src = path + "/images/projects/mansionGame/ghost.png";
 
         // Player starts at width*0.1, height/2 — reject spawns closer than half the screen
         const playerStartX = width * 0.1;
@@ -333,7 +333,7 @@ class WaveManager {
         const npcData = {
             id: 'VictoryNPC',
             greeting: "You have defeated all the waves! Well done!",
-            src: path + "/_projects/games/mansionGame/images/pumpkin.png",
+            src: path + "/images/projects/mansionGame/pumpkin.png",
             SCALE_FACTOR: 6,
             STEP_FACTOR: 0,
             ANIMATION_RATE: 10,
@@ -350,6 +350,7 @@ class WaveManager {
         const npc = new Npc(npcData, this.gameEnv);
         this.gameEnv.gameObjects.push(npc);
         console.log("Victory NPC spawned");
+        localStorage.setItem('mansionGame_level5_unlocked', 'true');
     }
 
     playerShoot(direction = null) {
