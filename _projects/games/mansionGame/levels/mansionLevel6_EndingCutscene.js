@@ -217,6 +217,22 @@ class MansionLevel6_EndingCutscene {
             pointerEvents: 'none'
         });
 
+        const spookImage = document.createElement('img');
+        spookImage.id = 'mansion-spook-hero';
+        spookImage.src = assetBase + '/images/projects/mansionGame/spookWalking.gif';
+        spookImage.alt = 'Spook walking';
+        Object.assign(spookImage.style, {
+            position: 'fixed',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -180%)',
+            width: '400px',
+            height: '400px',
+            opacity: '0',
+            zIndex: '10002',
+            pointerEvents: 'none'
+        });
+
         const playAgainButton = document.createElement('button');
         playAgainButton.id = 'mansion-play-again';
         playAgainButton.type = 'button';
@@ -255,6 +271,10 @@ class MansionLevel6_EndingCutscene {
                     from { transform: translate(-50%, 120%); }
                     to { transform: translate(-50%, -220%); }
                 }
+                @keyframes mansion-spook-drop {
+                    from { transform: translate(-50%, -180%); opacity: 0; }
+                    to { transform: translate(-50%, -50%); opacity: 1; }
+                }
             `;
             document.head.appendChild(style);
         }
@@ -262,6 +282,7 @@ class MansionLevel6_EndingCutscene {
         document.body.appendChild(overlay);
         document.body.appendChild(credits);
         document.body.appendChild(reaperImage);
+        document.body.appendChild(spookImage);
         document.body.appendChild(playAgainButton);
 
         requestAnimationFrame(() => {
@@ -296,13 +317,17 @@ class MansionLevel6_EndingCutscene {
                 overlay.style.backgroundColor = '#000';
                 overlay.style.pointerEvents = 'auto';
                 fadeAudio(this._creditsMusic, 0.7, 2000);
+                const spookDropDelayMs = 500;
+                setTimeout(() => {
+                    spookImage.style.animation = 'mansion-spook-drop 900ms ease-out forwards';
+                }, spookDropDelayMs);
                 setTimeout(() => {
                     playAgainButton.style.opacity = '1';
                 }, 2000);
             }, reaperDelayMs + flashDurationMs);
         };
 
-        const lightningLeadMs = 10000;
+        const lightningLeadMs = 6000;
         setTimeout(startLightningSequence, Math.max(0, creditsDurationMs - lightningLeadMs));
     }
 }

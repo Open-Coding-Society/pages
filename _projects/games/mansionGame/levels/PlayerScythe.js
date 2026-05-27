@@ -64,6 +64,7 @@ class PlayerScythe extends Character {
         this.position.y = ownerCenterY + Math.sin(this.angle) * this.radius - this.height / 2;
 
         this.killTouchedZombies();
+        this.destroyEnemyProjectiles();
         this.draw();
     }
 
@@ -110,6 +111,34 @@ class PlayerScythe extends Character {
                     zombie.takeDamage(9999);
                 } else if (typeof zombie.destroy === 'function') {
                     zombie.destroy();
+                }
+            }
+        });
+    }
+
+    destroyEnemyProjectiles() {
+        const killDistance = 48;
+        const scytheCenterX = this.position.x + this.width / 2;
+        const scytheCenterY = this.position.y + this.height / 2;
+
+        const projectiles = this.gameEnv.gameObjects.filter(obj => {
+            const name = obj?.constructor?.name;
+            if (name === 'Boomerang') return true;
+            if (name === 'Projectile') {
+                return obj?.type !== 'PLAYER' && obj?.type !== 'PUMPKIN';
+            }
+            return false;
+        });
+
+        projectiles.forEach(projectile => {
+            const projCenterX = projectile.position.x + projectile.width / 2;
+            const projCenterY = projectile.position.y + projectile.height / 2;
+            const dx = projCenterX - scytheCenterX;
+            const dy = projCenterY - scytheCenterY;
+            if (Math.sqrt(dx * dx + dy * dy) <= killDistance) {
+                projectile.revComplete = true;
+                if (typeof projectile.destroy === 'function') {
+                    projectile.destroy();
                 }
             }
         });

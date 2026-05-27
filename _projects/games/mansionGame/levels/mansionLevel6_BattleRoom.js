@@ -4,6 +4,186 @@ import Boss from './Boss.js';
 import showDeathScreen from './DeathScreen.js';
 import { createBossHealthBar, createPlayerHealthBar, updatePlayerHealthBar } from './HealthBars.js';
 import PowerUp from './PowerUp.js';
+import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
+import Barrier from './Barrier.js';
+
+class BarrierManager extends GameObject {
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        
+        const width = gameEnv?.innerWidth || 800;
+        const height = gameEnv?.innerHeight || 600;
+        
+        this.barriers = [];
+        this.lastBossHealthPercent = 100;
+        
+        // Track which thresholds have been triggered
+        this.triggeredThresholds = {
+            75: false,
+            50: false,
+            25: false
+        };
+        
+        // Barrier configuration for each threshold
+        this.barrierConfigs = {
+            75: {
+                count: 1,
+                size: 80,
+                positions: [(w, h) => ({ x: w / 2, y: h * 0.3 })]
+            },
+            50: {
+                count: 2,
+                size: 100,
+                positions: [
+                    (w, h) => ({ x: w * 0.25, y: h * 0.4 }),
+                    (w, h) => ({ x: w * 0.75, y: h * 0.4 })
+                ]
+            },
+            25: {
+                count: 4,
+                size: 120,
+                positions: [
+                    (w, h) => ({ x: w * 0.25, y: h * 0.3 }),
+                    (w, h) => ({ x: w * 0.75, y: h * 0.3 }),
+                    (w, h) => ({ x: w * 0.25, y: h * 0.6 }),
+                    (w, h) => ({ x: w * 0.75, y: h * 0.6 })
+                ]
+            }
+        };
+        
+        // Store game area dimensions
+        this.gameWidth = width;
+        this.gameHeight = height;
+    }
+
+    update() {
+        if (!this.gameEnv || !this.gameEnv.gameObjects) return;
+        if (this.gameEnv.gameControl?.isPaused) return;
+        if (typeof window !== 'undefined' && window.__battleRoomFadeComplete === false) return;
+
+        // Find the boss
+        const boss = this.gameEnv.gameObjects.find(obj => obj?.constructor?.name === 'Boss');
+        if (!boss) return;
+
+        // Calculate current boss health percentage
+        const fullHealth = boss.fullHealth || 1;
+        const currentHealthPercent = Math.max(0, Math.min(100, (boss.healthPoints / fullHealth) * 100));
+        
+        // Check for threshold crossings (75%, 50%, 25%)
+        for (const threshold of [75, 50, 25]) {
+            // Only trigger once per threshold
+            if (!this.triggeredThresholds[threshold] && currentHealthPercent <= threshold) {
+                this.triggeredThresholds[threshold] = true;
+                this.spawnBarriersForThreshold(threshold);
+            }
+        }
+
+        // Handle collision detection with all barriers and player
+        const player = this.gameEnv.gameObjects.find(obj => 
+            obj?.constructor?.name === 'FightingPlayer' || obj?.constructor?.name === 'Player'
+        );
+        
+        if (player && this.barriers.length > 0) {
+            for (const barrier of this.barriers) {
+                barrier.checkCollision(player);
+            }
+        }
+
+        this.lastBossHealthPercent = currentHealthPercent;
+    }
+
+    spawnBarriersForThreshold(threshold) {
+        const config = this.barrierConfigs[threshold];
+        if (!config) return;
+
+        for (let i = 0; i < config.count; i++) {
+            const positionCalculator = config.positions[i];
+            if (!positionCalculator) continue;
+
+            const pos = positionCalculator(this.gameWidth, this.gameHeight);
+            
+            const barrier = new Barrier({
+                x: pos.x - config.size / 2,
+                y: pos.y - config.size / 2,
+                width: config.size,
+                height: config.size,
+                color: `rgba(150, 50, 200, 0.7)`
+            }, this.gameEnv);
+            
+            barrier.visible = true;
+            
+            // Add to both barrier manager tracking and game objects
+            this.barriers.push(barrier);
+            this.gameEnv.gameObjects.push(barrier);
+        }
+    }
+
+    draw() { }
+
+    resize() { }
+
+    destroy() {
+        // Clean up barriers if needed
+        for (const barrier of this.barriers) {
+            if (barrier.destroy) barrier.destroy();
+        }
+        this.barriers = [];
+    }
+}
+
+class PowerUpSpawner extends GameObject {
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        this.spawnIntervalMs = data?.spawnIntervalMs ?? 9000;
+        this.spawnDelayMs = data?.spawnDelayMs ?? 2500;
+        this.powerUpSize = data?.powerUpSize ?? 25;
+        this.spawnPadding = data?.spawnPadding ?? 40;
+        this.topPadding = data?.topPadding ?? 150;
+        this.powerTypes = data?.powerTypes || ['shield', 'charge', 'damageBoost', 'scythes', 'heal'];
+        this.maxActivePowerUps = data?.maxActivePowerUps ?? 3;
+        this.nextSpawnAt = Date.now() + this.spawnDelayMs;
+    }
+
+    update() {
+        if (!this.gameEnv || !this.gameEnv.gameObjects) return;
+        if (this.gameEnv.gameControl?.isPaused) return;
+        if (typeof window !== 'undefined' && window.__battleRoomFadeComplete === false) return;
+
+        const activePowerUpCount = this.gameEnv.gameObjects.filter(obj => obj?.constructor?.name === 'PowerUp').length;
+        if (activePowerUpCount >= this.maxActivePowerUps) return;
+
+        const now = Date.now();
+        if (now < this.nextSpawnAt) return;
+
+        const powerType = this.powerTypes[Math.floor(Math.random() * this.powerTypes.length)];
+        const powerUp = new PowerUp({
+            id: `PowerUp-${powerType}-${now}`,
+            powerType,
+            INIT_POSITION: this.getRandomPowerUpPosition(),
+            targetSize: this.powerUpSize
+        }, this.gameEnv);
+
+        this.gameEnv.gameObjects.push(powerUp);
+        this.nextSpawnAt = now + this.spawnIntervalMs;
+    }
+
+    getRandomPowerUpPosition() {
+        const width = this.gameEnv.innerWidth;
+        const height = this.gameEnv.innerHeight;
+        const maxX = Math.max(this.spawnPadding, width - this.spawnPadding - this.powerUpSize);
+        const maxY = Math.max(this.topPadding, height - this.spawnPadding - this.powerUpSize);
+        return {
+            x: this.spawnPadding + Math.random() * (maxX - this.spawnPadding),
+            y: this.topPadding + Math.random() * (maxY - this.topPadding)
+        };
+    }
+
+    draw() { }
+
+    resize() { }
+
+    destroy() { }
+}
 
 class MansionLevel6_BattleRoom {
     constructor(gameEnv) {
@@ -65,6 +245,9 @@ class MansionLevel6_BattleRoom {
             zIndex: 10,
             isKilling: false, // Flag to prevent multiple kills
 
+            // Explicitly disable the reaction function
+            reaction: function () { },
+
             // The update method with all functionality inline
             update: function () {
                 // Skip update if already in killing process
@@ -99,7 +282,7 @@ class MansionLevel6_BattleRoom {
                 }
 
                 // Move towards nearest player
-                const speed = 0.3; // Adjust speed as needed
+                const speed = 0.45; // Increased by 1.5x from 0.3
                 const dx = nearest.position.x - this.position.x;
                 const dy = nearest.position.y - this.position.y;
                 const angle = Math.atan2(dy, dx);
@@ -175,34 +358,17 @@ class MansionLevel6_BattleRoom {
             }
         };
 
-        const powerUps = [
-            {
-                id: 'PowerUp-Shield',
-                powerType: 'shield',
-                INIT_POSITION: { x: width * 0.25, y: height * 0.52 }
-            },
-            {
-                id: 'PowerUp-Charge',
-                powerType: 'charge',
-                INIT_POSITION: { x: width * 0.62, y: height * 0.52 }
-            },
-            {
-                id: 'PowerUp-DamageBoost',
-                powerType: 'damageBoost',
-                INIT_POSITION: { x: width * 0.25, y: height * 0.76 }
-            },
-            {
-                id: 'PowerUp-Scythes',
-                powerType: 'scythes',
-                INIT_POSITION: { x: width * 0.62, y: height * 0.76 }
-            }
-        ];
+        const powerUpSize = 25;
+        const spawnPadding = 40;
+        const topPadding = 150;
+        const maxActivePowerUps = 3;
 
         this.classes = [
             { class: GameEnvBackground, data: image_data_floor },
             { class: FightingPlayer, data: sprite_data_mc },
             { class: Boss, data: sprite_data_enemy },
-            ...powerUps.map(data => ({ class: PowerUp, data }))
+            { class: BarrierManager, data: {} },
+            { class: PowerUpSpawner, data: { powerUpSize, spawnPadding, topPadding, maxActivePowerUps } }
         ];
 
         // Create health bar when battle room loads
@@ -212,33 +378,31 @@ class MansionLevel6_BattleRoom {
             updatePlayerHealthBar(100);
         }
 
-        // Create instructions under the boss bar (fade after 15 seconds)
+        // Create instructions as a tiny fixed bar at the top
         const instruction = document.createElement('div');
         instruction.id = 'instructions-container';
         instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, L for shockwave, touch power ups to collect';
         Object.assign(instruction.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            textAlign: 'center',
             color: '#00ffffff',
             fontFamily: "'Press Start 2P', sans-serif",
-            fontSize: '16px',
+            fontSize: '12px',
             textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
             opacity: '1',
-            transition: 'opacity 1.2s ease',
-            marginTop: '6px',
-            whiteSpace: 'nowrap'
+            padding: '4px 0',
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            zIndex: '9999',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
         });
 
-        const bossContainer = document.getElementById('boss-health-container');
-        if (bossContainer) {
-            bossContainer.appendChild(instruction);
-        } else {
-            const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
-            gameContainer.appendChild(instruction);
-        }
-
-        setTimeout(() => {
-            instruction.style.opacity = '0';
-            setTimeout(() => instruction.remove(), 1400);
-        }, 15000);
+        document.body.appendChild(instruction);
+        instruction.style.opacity = '1';
     }
 }
 
