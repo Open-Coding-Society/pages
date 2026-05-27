@@ -291,33 +291,33 @@ export class GameExecutor {
         this.gameControl = this.gameCore?.gameControl || null;
 
         // Resolve the best level to restore to:
-        // 1. If the preserved class exists in the new level array, use its index there.
-        // 2. Otherwise (it was a dynamically-spliced level like Code Hub) fall back
-        //    to the last level in the permanent array that comes before it, so the
-        //    player lands at Wayfinding World / the hub rather than an unrelated level.
+        // 1. If the preserved class exists in the permanent array, use its index there.
+        // 2. If it was a dynamically-spliced level (e.g. Code Hub inserted by Wayfinding
+        //    World at runtime), re-splice it back into levelClasses at its original
+        //    position so the player returns exactly to that level after fullscreen toggle.
         let resolvedLevelIndex = preservedLevelIndex;
         if (preservedLevelClass && Array.isArray(gameLevelClasses)) {
           const classIndex = gameLevelClasses.indexOf(preservedLevelClass);
           if (classIndex >= 0) {
             // Class found in the permanent array — restore directly.
             resolvedLevelIndex = classIndex;
-          } else if (Number.isInteger(preservedLevelIndex)) {
-            // Dynamic level: clamp to the last valid index so we don't overshoot
-            // into an unrelated level (e.g. Mission Tools instead of Code Hub).
-            resolvedLevelIndex = Math.min(preservedLevelIndex, gameLevelClasses.length - 1);
+          } else if (Number.isInteger(preservedLevelIndex) && this.gameControl?.levelClasses) {
+            // Dynamic level: re-splice the class back at its original position.
+            // preservedLevelIndex is the index it held inside the runtime levelClasses
+            // array (e.g. 2 for Code Hub after Wayfinding World spliced it in).
+            const insertAt = Math.min(preservedLevelIndex, this.gameControl.levelClasses.length);
+            this.gameControl.levelClasses.splice(insertAt, 0, preservedLevelClass);
+            resolvedLevelIndex = insertAt;
           }
         }
 
         if (
           Number.isInteger(resolvedLevelIndex) &&
           this.gameControl &&
-          Array.isArray(gameLevelClasses) &&
-          preservedLevelIndex >= 0 &&
-          preservedLevelIndex < gameLevelClasses.length &&
-          preservedLevelIndex !== this.gameControl.currentLevelIndex &&
+          resolvedLevelIndex !== this.gameControl.currentLevelIndex &&
           typeof this.gameControl.transitionToLevel === 'function'
         ) {
-          this.gameControl.currentLevelIndex = preservedLevelIndex;
+          this.gameControl.currentLevelIndex = resolvedLevelIndex;
           this.gameControl.transitionToLevel();
         }
 
@@ -349,6 +349,39 @@ export class GameExecutor {
     }
   }
 
+  _resizeGameForViewport(gameOutput, viewportHeight) {
+    const currentLevel = this.gameControl?.currentLevel;
+    const gameEnv = currentLevel?.gameEnv || this.gameControl?.gameEnv;
+    const canvas = gameEnv?.canvas;
+
+    if (!gameEnv || !canvas) {
+      return;
+    }
+
+    const resolvedWidth = gameOutput?.parentElement?.clientWidth || gameOutput?.clientWidth || window.innerWidth;
+    const resolvedHeight = Math.max(1, viewportHeight);
+
+    if (this.gameCore?.environment) {
+      this.gameCore.environment.innerWidth = resolvedWidth;
+      this.gameCore.environment.innerHeight = resolvedHeight;
+    }
+
+    gameEnv.innerWidth = resolvedWidth;
+    gameEnv.innerHeight = resolvedHeight;
+    gameEnv.size();
+
+    const gameObjects = Array.isArray(gameEnv.gameObjects) ? gameEnv.gameObjects : [];
+    for (const gameObject of gameObjects) {
+      if (gameObject && typeof gameObject.resize === 'function') {
+        try {
+          gameObject.resize();
+        } catch (error) {
+          console.warn('Failed to resize game object for fullscreen:', error);
+        }
+      }
+    }
+  }
+
   toggleFullscreen() {
     if (!this.getGameOutput) return;
 
@@ -365,10 +398,14 @@ export class GameExecutor {
       // Create fullscreen overlay
       this.fullscreenOverlay = document.createElement('div');
       this.fullscreenOverlay.className = 'game-fullscreen-overlay';
+      this.fullscreenOverlay.style.zIndex = '9999';
 
       // Create collapsible control panel header
       const controlHeader = document.createElement('div');
       controlHeader.className = 'fullscreen-control-header';
+      controlHeader.style.position = 'relative';
+      controlHeader.style.zIndex = '2';
+      controlHeader.style.flexShrink = '0';
 
       // Add collapse toggle button
       const collapseBtn = document.createElement('button');
@@ -378,6 +415,7 @@ export class GameExecutor {
 
       const controlsContainer = document.createElement('div');
       controlsContainer.className = 'fullscreen-controls-container';
+      controlsContainer.style.flexWrap = 'wrap';
 
       // Clone control buttons
       const clonedRunBtn = this.runBtn ? this.runBtn.cloneNode(true) : null;
@@ -452,6 +490,11 @@ export class GameExecutor {
       // Assemble fullscreen overlay
       this.fullscreenOverlay.appendChild(controlHeader);
       this.fullscreenOverlay.appendChild(gameOutput);
+      gameOutput.style.position = 'relative';
+      gameOutput.style.flex = '1 1 auto';
+      gameOutput.style.minHeight = '0';
+      gameOutput.style.width = '100%';
+      gameOutput.style.zIndex = '1';
       document.body.appendChild(this.fullscreenOverlay);
 
       // Update canvas height to account for control header
@@ -467,8 +510,8 @@ export class GameExecutor {
 
       this.isFullscreen = true;
 
-      // Restart game with new dimensions
-      this.run();
+      // Resize the active level in place so fullscreen does not replay startup dialogue.
+      this._resizeGameForViewport(gameOutput, viewportHeight);
 
       // Handle ESC key to exit fullscreen
       this.escapeHandler = (e) => {
@@ -511,8 +554,8 @@ export class GameExecutor {
         this.escapeHandler = null;
       }
 
-      // Restart game with original dimensions
-      this.run();
+      // Restore the active level size without reinitializing the level.
+      this._resizeGameForViewport(gameOutput, this.originalGameOutput?.height || this.configuredCanvasHeight);
     }
   }
 }

@@ -1,87 +1,407 @@
 ---
 microblog: true
 toc: false
-layout: post
 title: "Sentri: The AI-Driven Recovery Ecosystem"
-description: A comprehensive digital platform for the Poway Recovery Center featuring automated program matching, personalized meeting scheduling, and integrated sentiment-aware chat history.
 permalink: /capstone/sentri/
 ---
 
-{% include sentri-infographic.html %}
-
-<br>
-
-### Project Overview
-Sentri is a full-stack recovery management system built for the **Poway Recovery Center**. Moving beyond simple sobriety clocks, Sentri serves as a "Digital Sponsor." 
-
-The platform utilizes a multi-step **PRC Guide**—an AI-driven onboarding system—to analyze a user's specific needs (Substance, Family, or Behavioral support) and match them with the ideal recovery program (AA, NA, GA, etc.). Once matched, Sentri generates a personalized **Meeting Calendar** and a **Live Recovery Dashboard** that tracks saved meetings and **Integrated Chat History**, providing users with a comprehensive view of their emotional journey in a HIPAA-compliant environment.
-
-### Core Ecosystem Features
-*   **The PRC Guide (AI Matcher):** A diagnostic onboarding flow that calculates "Match Percentages" between users and programs like ACA, Alateen, or SA based on behavioral input.
-*   **Dynamic Meeting Calendar:** A personalized scheduling interface that pulls real-time recovery meetings into a clean, weekly view tailored to the user’s selected programs and saved to a relational database.
-*   **Integrated Chat History & Sentiment Logging:** A secure messaging interface that logs AI-driven support conversations, allowing users to review past check-ins and monitor emotional trends over time.
-*   **HIPAA-Compliant Architecture:** A secure authentication system ensuring that sensitive recovery data and chat logs remain strictly confidential.
-*   **Program Discovery Hub:** A centralized library of 8+ specialized recovery programs, providing users with the definitions and differences between "Open" and "Closed" meetings.
-
-### Project Interfaces
-*   ** Sentri Client-Facing Application** — *The primary user dashboard, PRC Guide, and personalized meeting schedule.*
-*   ** Sentri Administrator & Counselor Portal** — *The backend management system for Poway Recovery Center staff to oversee program health.*
-
+<div id="sentri-showcase" class="sentri-root">
 <style>
-/* (Keep your existing CSS styles here - they are great) */
-.sentri-container {
-    background-color: #020617; 
-    color: #f1f5f9;
-    font-family: 'Inter', sans-serif;
-    padding: 20px;
-    border-radius: 24px;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+.sentri-root {
+    --bg-dark: #04130c;
+    --accent-green: #4CAF50;
+    --accent-dark: #1b5e20;
+    --accent-light: #81c784;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+    --text-white: #ffffff;
+    --text-muted: #a7c4a0;
+
+    background: radial-gradient(circle at top, rgba(76,175,80,0.08), transparent 60%), #04130c;
+    color: var(--text-white);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 60px 20px;
+    border-radius: 40px;
+    max-width: 1100px;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
 }
-/* ... [Rest of your CSS] ... */
+
+/* HERO */
+.sentri-hero {
+    text-align: center;
+    margin-bottom: 70px;
+}
+
+.sentri-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--accent-light);
+    color: var(--accent-light);
+    font-size: 0.75rem;
+    margin-bottom: 15px;
+}
+
+.sentri-hero h1 {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    margin: 0;
+    font-weight: 800;
+}
+
+.sentri-hero p {
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 15px auto;
+    font-size: 1.1rem;
+}
+
+/* PILLARS */
+.pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+    gap: 20px;
+    margin-bottom: 70px;
+}
+
+.pillar-card {
+    display: block;
+    text-decoration: none;
+    color: white;
+    padding: 25px;
+    border-radius: 20px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    transition: 0.25s;
+}
+
+.pillar-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent-green);
+    box-shadow: 0 8px 25px rgba(76,175,80,0.25);
+}
+
+.pillar-card h3, .pillar-card p {
+    margin: 0;
+}
+
+/* EMOJI NAV */
+.logo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+    gap: 20px;
+    margin-bottom: 70px;
+}
+
+.logo-card {
+    text-align: center;
+    padding: 30px;
+    border-radius: 20px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    text-decoration: none;
+    color: white;
+    transition: 0.25s;
+}
+
+.logo-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--accent-green);
+    box-shadow: 0 8px 25px rgba(76,175,80,0.25);
+}
+
+.logo-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* STATS */
+.trust-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+    background: var(--glass);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+}
+
+.stat {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.stat strong {
+    display: block;
+    color: white;
+    font-size: 1rem;
+}
+
+/* FOOTER */
+.sentri-footer {
+    margin-top: 60px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 25px;
+}
+
+.footer-note {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* CONFETTI */
+.confetti {
+    position: absolute;
+    width: 6px;
+    height: 10px;
+    background: var(--accent-light);
+    top: -10px;
+    opacity: 0.8;
+    animation: fall 2.5s linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(600px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* NEW HANDOFF STYLES */
+.handoff-container {
+    margin-top: 100px;
+    border-top: 2px dashed var(--glass-border);
+    padding-top: 60px;
+}
+
+.handoff-header {
+    margin-bottom: 40px;
+}
+
+.handoff-header h2 {
+    font-size: 2rem;
+    color: var(--accent-light);
+    margin-bottom: 10px;
+}
+
+.feedback-section {
+    background: rgba(0,0,0,0.2);
+    padding: 30px;
+    border-radius: 24px;
+    margin-bottom: 40px;
+}
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.feedback-item h4 {
+    color: var(--accent-light);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.feedback-item ul {
+    list-style: none;
+    padding: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.feedback-item li {
+    margin-bottom: 8px;
+    padding-left: 15px;
+    position: relative;
+}
+
+.feedback-item li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+}
+
+.github-cta {
+    display: inline-flex;
+    align-items: center;
+    background: var(--accent-green);
+    color: white;
+    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin: 20px 0;
+    transition: 0.3s;
+}
+
+.github-cta:hover {
+    background: var(--accent-light);
+    transform: scale(1.05);
+}
+
+.team-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.contact-card {
+    background: var(--glass);
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    border: 1px solid var(--glass-border);
+}
+
+.contact-card a {
+    color: var(--accent-light);
+    text-decoration: none;
+}
 </style>
 
-<div class="sentri-container">
-    <div class="sentri-info-box">
-        <div class="sentri-badge">Ecosystem Status: Active Deployment</div>
-        <p style="color: #94a3b8; max-width: 800px; margin: 0 auto; font-size: 1.1em;">
-            Integrating the <strong>Poway Recovery Center</strong> mission with algorithmic precision. Sentri maps user needs to recovery programs, ensuring no one walks the path to sobriety alone.
+<!-- HERO -->
+<header class="sentri-hero">
+    <span class="sentri-badge">LIVE PLATFORM</span>
+    <h1>SENTRI</h1>
+    <p>Find the right program. Stay on track. See your progress.</p>
+</header>
+
+<!-- PILLARS -->
+<section class="pillar-grid">
+    <div class="pillar-card" onclick="triggerConfetti()">
+        <h3>🎯 Smart Matching</h3>
+        <p>Quick questions → best-fit recovery path.</p>
+    </div>
+    <div class="pillar-card" onclick="triggerConfetti()">
+        <h3>📅 Easy Scheduling</h3>
+        <p>Find and save meetings fast.</p>
+    </div>
+    <div class="pillar-card" onclick="triggerConfetti()">
+        <h3>📊 Progress Tracking</h3>
+        <p>Track mood, patterns, and growth.</p>
+    </div>
+</section>
+
+<!-- EMOJI NAV -->
+<section class="logo-grid">
+    <a href="https://sentri-prc.opencodingsociety.com/" class="logo-card" target="_blank">
+        <span class="logo-emoji">🏠</span>
+        <span>Homepage</span>
+    </a>
+    <a href="https://sentri-prc.opencodingsociety.com/" class="logo-card" target="_blank">
+        <span class="logo-emoji">📋</span>
+        <span>Programs</span>
+    </a>
+    <a href="https://sentri-prc.opencodingsociety.com/" class="logo-card" target="_blank">
+        <span class="logo-emoji">📅</span>
+        <span>Meetings</span>
+    </a>
+</section>
+
+<!-- TRUST -->
+<section class="trust-strip">
+    <div class="stat"><strong>Secure</strong> HIPAA-ready</div>
+    <div class="stat"><strong>Reliable</strong> Always available</div>
+    <div class="stat"><strong>Smart</strong> AI-supported</div>
+    <div class="stat"><strong>Organized</strong> Clean data system</div>
+</section>
+
+<!-- HANDOFF SECTION -->
+<div class="handoff-container">
+    <div class="handoff-header">
+        <h2>PUSD CTE Expo Handoff</h2>
+        <p>Post-presentation feedback and development roadmap for Poway Recovery Center.</p>
+        
+        <a href="https://github.com/Debuggers-CSP/Sentri-PRC" target="_blank" class="github-cta">
+            <span>View Source Code on GitHub</span>
+        </a>
+    </div>
+
+    <div class="feedback-section">
+        <h3>Expo Feedback & Future Pivots</h3>
+        <div class="feedback-grid">
+            <div class="feedback-item">
+                <h4>✅ Validated Wins</h4>
+                <ul>
+                    <li><strong>AI Finder:</strong> High praise for reducing "choice paralysis."</li>
+                    <li><strong>The Sobriety Garden:</strong> Standout gamification feature for psychological incentive.</li>
+                    <li><strong>Integrated Ecosystem:</strong> Seamless transition from finding to tracking.</li>
+                </ul>
+            </div>
+            <div class="feedback-item">
+                <h4>🛠 Design Pivots</h4>
+                <ul>
+                    <li><strong>Privacy:</strong> Implementing "Ghost Mode" & pseudonym handles.</li>
+                    <li><strong>UI Palette:</strong> Shifting to "Serene Blue" for mental health tranquility.</li>
+                    <li><strong>Accessibility:</strong> Refactoring for Mobile-First crisis response.</li>
+                </ul>
+            </div>
+            <div class="feedback-item">
+                <h4>🚀 Governance & Access</h4>
+                <ul>
+                    <li><strong>Open Landing:</strong> Creating a "Before-Login" info wall to remove entry barriers.</li>
+                    <li><strong>Admin UI:</strong> Moderation tools for staff to ensure community safety.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback-section">
+        <h3>Future Outlook</h3>
+        <p style="font-size: 0.95rem; color: var(--text-muted);">
+            Sentri has established a partnership with <strong>Damon Dong</strong> at the Poway Recovery Center. 
+            Moving forward, this project will transition into a live Service-Learning tool, 
+            potentially revamping the Center's digital infrastructure using our blueprint.
         </p>
-    </div>
-
-    <div class="sentri-grid">
-        <!-- Sidebar with Links -->
-        <div class="col-left">
-            <div class="sentri-logo-box">
-                <img src="{{site.baseurl}}/images/capstone/sentri.png" alt="Sentri Logo" style="max-height: 80%; filter: drop-shadow(0 0 8px #3b82f655);">
+        
+        <div class="team-contact">
+            <div class="contact-card">
+                <strong>Anika Marathe</strong><br>
+                <a href="mailto:anika.marathe@gmail.com">anika.marathe@gmail.com</a>
             </div>
-            
-            <div class="ui-links">
-                <a href="https://sentri-prc.opencodingsociety.com/" class="ui-btn btn-fe">Sentri User UI</a>
-                <a href="https://sentri.opencodingsociety.com/" class="ui-btn btn-admin">Sentri Admin UI</a>
+            <div class="contact-card">
+                <strong>Lilian Wu</strong><br>
+                <a href="mailto:lilianwu08@gmail.com">lilianwu08@gmail.com</a>
             </div>
-            <p style="font-size: 10px; color: #64748b; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px;">Build v3.1.0-Stable</p>
-        </div>
-
-        <!-- Middle: Core Features -->
-        <div class="col-mid">
-            <h1 class="proj-title">SENTRI</h1>
-            <p class="proj-subtitle">Recovery Matching & Tracking</p>
-
-            <div class="feature-item"><span class="ai-icon">✓</span><span><strong>PRC Guide matching:</strong> Multi-step onboarding quiz to identify the best-fit recovery program.</span></div>
-            <div class="feature-item"><span class="ai-icon">✓</span><span><strong>Personalized Calendar:</strong> Dynamic storage and retrieval of AA, NA, and GA meetings.</span></div>
-            <div class="feature-item"><span class="ai-icon">✓</span><span><strong>Integrated Chat History:</strong> Real-time logging of AI support conversations to track emotional stability.</span></div>
-            <div class="feature-item"><span class="ai-icon">✓</span><span><strong>Database Persistence:</strong> All user milestones and history are saved to a secure relational SQLite backend.</span></div>
-        </div>
-
-        <!-- Right: Technical Logic -->
-        <div class="col-right">
-            <div class="section-header">Backend Intelligence</div>
-            <p style="font-size: 0.85em; color: #94a3b8; line-height: 1.6;">
-                The <strong>Matching Algorithm</strong> determines compatibility scores for 12-step programs. The <strong>Data Engine</strong> manages a complex relational schema to link user IDs with specific meeting registrations and <strong>Chat Log</strong> history for long-term progress tracking.
-            </p>
-            <div class="section-header" style="margin-top:20px;">Security Standard</div>
-            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid #3b82f6; padding: 15px; border-radius: 12px; font-size: 0.8em; color: #3b82f6; font-weight: 600;">
-                All chat history and recovery data is encrypted and HIPAA-compliant, protecting identity across the entire PRC network.
+            <div class="contact-card">
+                <strong>Jayneea Chauhan</strong><br>
+                <a href="mailto:chauhanjayneea@gmail.com">chauhanjayneea@gmail.com</a>
             </div>
         </div>
     </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="sentri-footer">
+    <p class="footer-note">Poway Recovery Center × Open Coding Society</p>
+</footer>
+
+<script>
+function triggerConfetti() {
+    const container = document.getElementById("sentri-showcase");
+
+    for (let i = 0; i < 60; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+
+        confetti.style.left = Math.random() * 100 + "%";
+        confetti.style.animationDuration = (Math.random() * 1.5 + 1.5) + "s";
+        confetti.style.background = ["#4CAF50","#81c784","#a5d6a7"][Math.floor(Math.random()*3)];
+
+        container.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), 3000);
+    }
+}
+</script>
+
 </div>

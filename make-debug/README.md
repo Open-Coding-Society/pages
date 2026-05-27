@@ -1,10 +1,10 @@
 # Make Debug
 
-A lightweight helper to run `make`, read `/tmp/jekyll4500.log`, and send the log to Gemini AI for analysis using Spring Boot backend.
+A lightweight helper to run `make`, read `/tmp/jekyll4500.log`, and send the log to Gemini AI for analysis using the Flask backend.
 
 ## Setup
 
-1. **Spring Backend**: Ensure the Spring Boot application is running on port 8585 with Gemini API key configured in `.env`
+1. **Flask Backend**: Ensure the Flask application is running on port 8587 with `GEMINI_API_KEY` configured in `flask-educators/.env` or in the environment.
 
 2. **Frontend Dependencies**: Install Python dependencies in your active environment or local venv:
 
@@ -15,33 +15,33 @@ pip install -r make-debug/requirements.txt
 ## HOW TO RUN PROGRAM
 
 ```bash
-python make-debug/run.py
+python make-debug/analyze.py
 ```
 
 This will:
 - run `make`
 - wait for `/tmp/jekyll4500.log`
-- send the log to the Spring Boot Gemini AI analyzer
+- send the log to the Flask Gemini AI analyzer
 - print a short recommendation to the terminal
 
 If you want to run a different command instead of `make`, use:
 
 ```bash
-python make-debug/run.py --cmd "make build"
+python make-debug/analyze.py --cmd "make deploy"
 ```
 
 ## Backend Configuration
 
-The Spring Boot backend (`PersonService.java`) handles the Gemini AI integration:
+The Flask backend (`flask-educators`) handles the Gemini AI integration:
 
-- API Key: Configured in `spring/.env` as `GEMINI_API_KEY`
+- API Key: Configured in `flask-educators/.env` as `GEMINI_API_KEY`
 - Endpoint: `POST /api/gemini/analyze-log`
-- Port: 8585 (configured in `application.properties`)
+- Port: 8587
 
 ## Architecture
 
 - **Frontend**: Python script that runs make commands and captures logs
-- **Backend**: Spring Boot REST API with Gemini AI integration
+- **Backend**: Flask REST API with Gemini AI integration
 - **AI Analysis**: Jekyll build log analysis with actionable recommendations
 
 

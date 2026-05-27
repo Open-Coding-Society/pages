@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: DSA Website Redesign — TheSprinters
-description: A redesign pitch for the Deputy Sheriffs' Association of San Diego County — fixing broken search, non-functional login, and cluttered navigation with a modern full-stack portal.
+description: A redesign pitch for the Deputy Sheriffs Association of San Diego County — fixing broken search, non-functional login, and cluttered navigation with a modern full-stack portal.
 permalink: /capstone/dsa-redesign/
 sticky_rank: 8
 ---
@@ -144,10 +144,120 @@ sticky_rank: 8
   .cta-btn.gold { background: linear-gradient(135deg,#fbbf24,#d97706); color: #1e3a5f !important; box-shadow: 0 4px 16px rgba(251,191,36,0.3); }
   .cta-btn.outline { border: 1px solid rgba(96,165,250,0.4); color: #60a5fa !important; margin-left: 12px; }
 
+  /* ===== CTE Expo Reflection ===== */
+  .cte-section {
+    margin: 2.5rem 0 1.5rem;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, #0d2137 0%, #12314d 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(251,191,36,0.25);
+  }
+  .cte-eyebrow {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fbbf24;
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.3);
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .cte-title {
+    font-size: 1.9rem !important;
+    font-weight: 800 !important;
+    margin: 0 0 0.5rem !important;
+    background: linear-gradient(135deg,#fbbf24,#f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+  }
+  .cte-lead { color: #cbd5e1; font-size: 0.92rem; line-height: 1.6; max-width: 720px; margin: 0 0 1.5rem; }
+  .cte-lead strong { color: #fff; }
+
+  .cte-panel-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 1rem 0 1.5rem;
+  }
+  .cte-panelist {
+    background: rgba(22,42,70,0.6);
+    border: 1px solid #1e3352;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .cte-panelist:hover { transform: translateY(-2px); border-color: rgba(251,191,36,0.4); }
+  .cte-avatar {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg,#fbbf24,#d97706);
+    color: #1e3a5f;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem;
+    margin: 0 auto 8px;
+  }
+  .cte-panelist-name { color: #fff; font-weight: 700; font-size: 0.92rem; margin-bottom: 6px; }
+  .cte-linkedin {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: #60a5fa !important;
+    text-decoration: none !important;
+    padding: 4px 10px;
+    background: rgba(96,165,250,0.08);
+    border: 1px solid rgba(96,165,250,0.25);
+    border-radius: 8px;
+  }
+  .cte-linkedin:hover { background: rgba(96,165,250,0.15); }
+  .cte-linkedin svg { width: 14px; height: 14px; fill: #60a5fa; }
+
+  .cte-quad {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 1rem 0;
+  }
+  .cte-card {
+    background: rgba(11,26,46,0.55);
+    border: 1px solid #1e3352;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .cte-card-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .cte-card-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem;
+    color: #1e3a5f;
+    background: linear-gradient(135deg,#fbbf24,#d97706);
+  }
+  .cte-card h4 {
+    font-size: 0.95rem !important;
+    color: #fbbf24 !important;
+    margin: 0 !important;
+    font-weight: 800 !important;
+  }
+  .cte-card ul { padding-left: 18px; margin: 0; }
+  .cte-card li {
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+  .cte-card li strong { color: #fbbf24; }
+
   @media (max-width: 700px) {
     .ba-grid, .summary-grid { grid-template-columns: 1fr; }
     .mock-tiles { grid-template-columns: repeat(2, 1fr); }
     .stat-bar { gap: 8px; }
+    .cte-panel-grid { grid-template-columns: 1fr; }
+    .cte-quad { grid-template-columns: 1fr; }
+    .cte-title { font-size: 1.5rem !important; }
   }
 </style>
 
@@ -440,8 +550,6 @@ sticky_rank: 8
   </div>
 </div>
 
-<div class="divider"></div>
-
 </div>
 
 <!-- ===== REPO LINKS ===== -->
@@ -457,3 +565,102 @@ sticky_rank: 8
 </div>
 
 {% include dsa-redesign-infograph.html %}
+
+<!-- ===== CTE EXPO REFLECTION ===== -->
+<div class="pitch">
+<section class="cte-section">
+  <span class="cte-eyebrow">CTE EXPO REFLECTION</span>
+  <h2 class="cte-title">CTE Expo Reflection</h2>
+  <p class="cte-lead">The DSA team couldn't make it to our presentation, so we pitched the redesign to <strong>three industry professionals</strong> at the CTE Expo. Their outside perspective sharpened our direction.</p>
+
+  <h3 style="color:#e2e8f0 !important;font-size:1rem !important;margin:1rem 0 0.5rem !important;">Who We Presented To</h3>
+  <div class="cte-panel-grid">
+    <div class="cte-panelist">
+      <div class="cte-avatar">EJ</div>
+      <div class="cte-panelist-name">Elijah Johnson</div>
+      <a class="cte-linkedin" href="https://www.linkedin.com/in/elijah-johnson-42224b269/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M19 0H5a5 5 0 0 0-5 5v14a5 5 0 0 0 5 5h14a5 5 0 0 0 5-5V5a5 5 0 0 0-5-5zM8 19H5V8h3v11zM6.5 6.7a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zM20 19h-3v-5.6c0-3.37-4-3.12-4 0V19h-3V8h3v1.77c1.4-2.59 7-2.78 7 2.48V19z"/></svg>
+        LinkedIn
+      </a>
+    </div>
+    <div class="cte-panelist">
+      <div class="cte-avatar">DS</div>
+      <div class="cte-panelist-name">David Sikute</div>
+      <a class="cte-linkedin" href="https://www.linkedin.com/in/david-sikute-061942/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M19 0H5a5 5 0 0 0-5 5v14a5 5 0 0 0 5 5h14a5 5 0 0 0 5-5V5a5 5 0 0 0-5-5zM8 19H5V8h3v11zM6.5 6.7a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zM20 19h-3v-5.6c0-3.37-4-3.12-4 0V19h-3V8h3v1.77c1.4-2.59 7-2.78 7 2.48V19z"/></svg>
+        LinkedIn
+      </a>
+    </div>
+    <div class="cte-panelist">
+      <div class="cte-avatar">JM</div>
+      <div class="cte-panelist-name">Jeffrey Morales</div>
+      <a class="cte-linkedin" href="https://www.linkedin.com/in/jmorales-csusm/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M19 0H5a5 5 0 0 0-5 5v14a5 5 0 0 0 5 5h14a5 5 0 0 0 5-5V5a5 5 0 0 0-5-5zM8 19H5V8h3v11zM6.5 6.7a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zM20 19h-3v-5.6c0-3.37-4-3.12-4 0V19h-3V8h3v1.77c1.4-2.59 7-2.78 7 2.48V19z"/></svg>
+        LinkedIn
+      </a>
+    </div>
+  </div>
+
+  <div class="cte-quad">
+    <div class="cte-card">
+      <div class="cte-card-head">
+        <span class="cte-card-icon">1</span>
+        <h4>Preparation</h4>
+      </div>
+      <ul>
+        <li>Rehearsed the pitch as a team to keep it tight</li>
+        <li>Locked in our 3 headline fixes: <strong>search, login, hub</strong></li>
+        <li>Built before/after mockups so the story was visual</li>
+        <li>Prepped a short live demo of the polished portal</li>
+      </ul>
+    </div>
+
+    <div class="cte-card">
+      <div class="cte-card-head">
+        <span class="cte-card-icon">2</span>
+        <h4>Goals</h4>
+      </div>
+      <ul>
+        <li>Pitch the <strong>centralized hub</strong> as our flagship idea</li>
+        <li>Highlight the <strong>fixed sticky search bar</strong></li>
+        <li>Get honest, outside feedback on UX clarity</li>
+        <li>Open the door to <strong>future connection with DSA</strong></li>
+      </ul>
+    </div>
+
+    <div class="cte-card">
+      <div class="cte-card-head">
+        <span class="cte-card-icon">3</span>
+        <h4>Key Feedback</h4>
+      </div>
+      <ul>
+        <li>Cut down the <strong>emojis</strong> on the homepage</li>
+        <li>Lean harder into the <strong>"hub"</strong> story up front</li>
+        <li>Trim the <strong>menus</strong> even further for clarity</li>
+        <li>Keep the search bar — it's the standout feature</li>
+      </ul>
+    </div>
+
+    <div class="cte-card">
+      <div class="cte-card-head">
+        <span class="cte-card-icon">4</span>
+        <h4>Takeaways</h4>
+      </div>
+      <ul>
+        <li>Outside eyes caught clutter we'd stopped seeing</li>
+        <li>Less is more — fewer icons, fewer menus, more focus</li>
+        <li>The hub concept resonated and is worth doubling down on</li>
+        <li>Hoping to <strong>present directly to DSA</strong> next round</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(251,191,36,0.2);">
+    <p style="color:#cbd5e1;font-size:0.95rem;margin:0 0 0.75rem;">Full Reflection on Github Can be Viewed Here</p>
+    <a href="https://github.com/TheSprinters/Sheriff-FE/issues/10" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.7rem 1.4rem;background:linear-gradient(135deg,#12314d 0%,#175d84 100%);color:#ffffff !important;font-weight:700;font-size:0.92rem;border-radius:12px;text-decoration:none !important;border:1px solid rgba(251,191,36,0.3);box-shadow:0 4px 16px rgba(4,14,24,0.22);">
+      <svg viewBox="0 0 16 16" style="width:18px;height:18px;fill:#ffffff;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      View Full Reflection on GitHub
+    </a>
+  </div>
+</section>
+</div>

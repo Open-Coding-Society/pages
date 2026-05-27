@@ -89,7 +89,12 @@ h2 {
   margin-left: 20px;
   box-sizing: border-box;
   z-index: 0;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.calendar-stage {
+  box-sizing: border-box;
+  z-index: 0;
 }
 
 .fc-scroller {
@@ -398,6 +403,134 @@ td:has(> img[src*="logo.png"]) {
   color: var(--text);
 }
 
+.calendar-controls-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-auto-rows: minmax(0, auto);
+  align-items: start;
+  gap: 10px;
+  margin: 14px 0 16px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg-2) 88%, var(--pref-accent-color) 12%),
+      color-mix(in srgb, var(--bg-1) 96%, var(--pref-accent-color) 4%)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 8%, transparent 92%),
+    0 10px 24px color-mix(in srgb, #000 22%, transparent 78%);
+}
+
+.calendar-controls-row input,
+.calendar-controls-row select,
+.issues-controls-row input,
+.issues-controls-row select,
+.issue-form input,
+.issue-form textarea,
+.issue-form select,
+.issue-card-footer select,
+.kanban-item select,
+#threads-list input,
+#threads-list select {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
+  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
+  color: var(--text);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+
+  &:focus {
+    border-color: color-mix(in srgb, var(--pref-accent-color) 60%, var(--ui-border) 40%);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pref-accent-color) 20%, transparent 80%);
+  }
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+}
+
+.filter-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-left: 2px;
+}
+
+.filter-field--date input {
+  min-width: 0;
+  width: 100%;
+}
+
+.calendar-controls-row input::placeholder,
+.issues-controls-row input::placeholder,
+.issue-form input::placeholder,
+.issue-form textarea::placeholder,
+#threads-list input::placeholder {
+  color: color-mix(in srgb, var(--text-muted) 82%, transparent 18%);
+}
+
+.calendar-issue-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
+  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.calendar-issue-filter-toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--pref-accent-color);
+}
+
+.calendar-issue-filter-toggle span {
+  white-space: nowrap;
+}
+
+.calendar-controls-row {
+  .calendar-issue-filter-toggle {
+    grid-column: span 2;
+  }
+}
+
+.calendar-stage {
+  box-sizing: border-box;
+  z-index: 0;
+  width: 100%;
+}
+
+#calendar-threads-panel {
+  margin-top: 14px;
+}
+
+.threads-panel-empty,
+.issues-empty {
+  border: 1px dashed color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--bg-0) 92%, var(--pref-accent-color) 8%);
+  text-align: center;
+}
+
 .calendar-issues-header {
   display: flex;
   align-items: flex-start;
@@ -420,32 +553,11 @@ td:has(> img[src*="logo.png"]) {
 
 .issues-controls-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) repeat(3, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-auto-rows: minmax(0, auto);
+  align-items: start;
   gap: 10px;
   margin-bottom: 12px;
-}
-
-.issues-controls-row input,
-.issues-controls-row select,
-.issue-form input,
-.issue-form textarea,
-.issue-form select,
-.issue-card-footer select,
-.kanban-item select {
-  width: 100%;
-  min-height: 42px;
-  border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
-  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
-  color: var(--text);
-  padding: 10px 12px;
-  outline: none;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-
-  &:focus {
-    border-color: color-mix(in srgb, var(--pref-accent-color) 60%, var(--ui-border) 40%);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pref-accent-color) 20%, transparent 80%);
-  }
 }
 
 .issue-form textarea {
@@ -493,6 +605,7 @@ td:has(> img[src*="logo.png"]) {
   border-radius: 12px;
   background: color-mix(in srgb, var(--bg-0) 78%, var(--pref-accent-color) 22%);
   padding: 12px;
+  overflow: visible;
 }
 
 .issue-form {
@@ -501,6 +614,88 @@ td:has(> img[src*="logo.png"]) {
   gap: 10px;
 }
 
+.issue-thread-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--pref-accent-color) 20%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg-0) 88%, var(--pref-accent-color) 12%);
+}
+
+.issue-thread-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.issue-thread-panel-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.issue-thread-count {
+  font-size: 0.9rem;
+  color: var(--text-2);
+}
+
+.issue-comments-list {
+  display: grid;
+  gap: 10px;
+}
+
+.issue-comment-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-0) 72%, var(--pref-accent-color) 28%);
+  border: 1px solid color-mix(in srgb, var(--pref-accent-color) 18%, transparent);
+}
+
+.issue-comment-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.issue-comment-body {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.issue-comment-label {
+  font-weight: 700;
+}
+
+.issue-comment-textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--pref-accent-color) 20%, transparent);
+  padding: 12px;
+  background: color-mix(in srgb, var(--bg-0) 84%, var(--pref-accent-color) 16%);
+  color: inherit;
+}
+
+.issue-thread-composer-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.issue-thread-latest {
+  color: var(--text-2);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.issue-thread-card {
+  border-left: 4px solid color-mix(in srgb, var(--pref-accent-color) 70%, transparent);
+}
 .issue-form > div > label,
 .issue-form-grid label {
   display: block;
@@ -579,19 +774,36 @@ td:has(> img[src*="logo.png"]) {
   gap: 10px;
 }
 
+#threads-list {
+  display: grid;
+  gap: 12px;
+}
+
 .issue-card {
-  border: 1px solid color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
-  border-left: 3px solid color-mix(in srgb, var(--pref-accent-color) 78%, transparent 22%);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--bg-1) 86%, var(--pref-accent-color) 14%);
-  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 70%, transparent 30%);
+  border-left: 4px solid color-mix(in srgb, var(--pref-accent-color) 82%, transparent 18%);
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg-1) 90%, var(--pref-accent-color) 10%),
+      color-mix(in srgb, var(--bg-0) 94%, var(--pref-accent-color) 6%)
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 8%, transparent 92%),
+    0 10px 24px color-mix(in srgb, #000 18%, transparent 82%);
+  padding: 14px;
+}
+
+.issue-thread-card {
+  border-left-color: color-mix(in srgb, #60a5fa 72%, var(--pref-accent-color) 28%);
 }
 
 .issue-card-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
 }
 
 .issue-link-btn {
@@ -604,8 +816,11 @@ td:has(> img[src*="logo.png"]) {
 }
 
 .issue-card-title {
-  font-size: 1.12rem;
-  font-weight: 800;
+  font-size: 1.08rem;
+  font-weight: 850;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
 }
 
 .issue-card-note,
@@ -613,6 +828,17 @@ td:has(> img[src*="logo.png"]) {
 .issue-meta {
   color: var(--text-muted);
   margin-top: 8px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.issue-card-note {
+  color: color-mix(in srgb, var(--text-muted) 88%, var(--text) 12%);
+}
+
+.issue-author,
+.issue-meta {
+  font-size: 0.85rem;
 }
 
 .issue-card-badge-row,
@@ -629,17 +855,19 @@ td:has(> img[src*="logo.png"]) {
 }
 
 .issue-tags {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .issue-tag {
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--ui-border) 80%, transparent 20%);
-  background: color-mix(in srgb, var(--bg-2) 85%, #000 15%);
-  color: var(--text-muted);
-  padding: 2px 8px;
-  font-size: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 78%, transparent 22%);
+  background: color-mix(in srgb, var(--bg-2) 88%, #000 12%);
+  color: color-mix(in srgb, var(--text-muted) 88%, var(--text) 12%);
+  padding: 4px 10px;
+  font-size: 0.76rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 
 .issue-card-footer {
@@ -647,7 +875,7 @@ td:has(> img[src*="logo.png"]) {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .issue-card-footer select {
@@ -656,13 +884,13 @@ td:has(> img[src*="logo.png"]) {
 
 .issue-pill {
   border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 0.76rem;
-  font-weight: 800;
+  padding: 5px 11px;
+  font-size: 0.74rem;
+  font-weight: 850;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   border: 1px solid color-mix(in srgb, var(--ui-border) 75%, transparent 25%);
-  background: color-mix(in srgb, var(--bg-2) 84%, #000 16%);
+  background: color-mix(in srgb, var(--bg-2) 82%, #000 18%);
   color: var(--text-strong, var(--text));
 }
 
@@ -812,6 +1040,286 @@ td:has(> img[src*="logo.png"]) {
   color: var(--text-muted);
 }
 
+.calendar-event-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: color-mix(in srgb, #000 55%, transparent 45%);
+  backdrop-filter: blur(8px);
+
+  &.open {
+    display: flex;
+  }
+}
+
+.calendar-event-modal-content {
+  position: relative;
+  width: min(760px, 95vw);
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 76%, transparent 24%);
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-1) 78%, var(--pref-accent-color) 22%),
+    color-mix(in srgb, var(--bg-0) 92%, var(--pref-accent-color) 8%)
+  );
+  padding: 14px;
+}
+
+.calendar-event-modal-body {
+  display: grid;
+  gap: 10px;
+}
+
+.calendar-event-modal-title {
+  margin: 0 0 8px;
+  color: var(--text-strong, var(--text));
+  font-size: 1.8rem;
+  line-height: 1.25;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+}
+
+.calendar-event-modal-label {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-strong, var(--text));
+}
+
+.calendar-event-modal-field {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 82%, transparent 18%);
+  background: color-mix(in srgb, var(--bg-1) 88%, #000 12%);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.calendar-event-modal-display {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.calendar-event-modal-description {
+  min-height: 110px;
+}
+
+.calendar-event-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.18s ease;
+
+  &:hover {
+    color: var(--pref-accent-color);
+  }
+}
+
+.calendar-event-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.calendar-event-modal-button {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 75%, transparent 25%);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+  color: var(--text);
+  background: var(--bg-2);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px color-mix(in srgb, #000 28%, transparent 72%);
+  }
+
+  &.primary {
+    border-color: color-mix(in srgb, var(--pref-accent-color) 75%, transparent 25%);
+    background: color-mix(in srgb, var(--pref-accent-color) 75%, var(--bg-2) 25%);
+    color: var(--pref-bg-color);
+  }
+
+  &.warning {
+    border-color: color-mix(in srgb, #f59e0b 70%, transparent 30%);
+    background: color-mix(in srgb, #f59e0b 80%, var(--bg-2) 20%);
+    color: #111827;
+  }
+
+  &.danger {
+    border-color: color-mix(in srgb, #ef4444 80%, transparent 20%);
+    background: color-mix(in srgb, #dc2626 85%, #0f172a 15%);
+    color: #fff;
+  }
+}
+
+// ===========================
+// Reply Modal Styles
+// ===========================
+// Reply modal for nested comment replies, positioned above issue modal.
+// Uses fixed positioning with high z-index to appear on top of all modals.
+
+.reply-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: color-mix(in srgb, #000 55%, transparent 45%);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease-in-out;
+
+  // Show when aria-hidden is false
+  &:not([aria-hidden="true"]) {
+    display: flex;
+  }
+}
+
+.reply-modal-content {
+  position: relative;
+  width: min(600px, 95vw);
+  max-height: 85vh;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 76%, transparent 24%);
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-1) 78%, var(--pref-accent-color) 22%),
+    color-mix(in srgb, var(--bg-0) 92%, var(--pref-accent-color) 8%)
+  );
+  padding: 16px;
+  box-shadow: 0 20px 40px color-mix(in srgb, #000 32%, transparent 68%);
+}
+
+.reply-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ui-border) 50%, transparent 50%);
+}
+
+#reply-modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-strong, var(--text));
+}
+
+.reply-modal-close {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.7rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.18s ease;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: var(--pref-accent-color);
+  }
+}
+
+#reply-parent-preview {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 65%, transparent 35%);
+  border-radius: 10px;
+  padding: 12px;
+  background: color-mix(in srgb, var(--bg-0) 88%, var(--pref-accent-color) 12%);
+  margin-bottom: 12px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+
+  strong {
+    display: block;
+    color: var(--text-strong, var(--text));
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+}
+
+#reply-modal-text {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
+  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
+  color: var(--text);
+  padding: 12px;
+  font-family: var(--pref-font-family);
+  font-size: var(--pref-font-size);
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  margin-bottom: 12px;
+
+  &:focus {
+    border-color: var(--pref-accent-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--pref-accent-color) 25%, transparent 75%);
+  }
+
+  &::placeholder {
+    color: color-mix(in srgb, var(--text-muted) 82%, transparent 18%);
+  }
+}
+
+.reply-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--ui-border) 50%, transparent 50%);
+}
+
+// ===========================
+// Animations
+// ===========================
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @media (max-width: 1100px) {
   .kanban-board {
     grid-template-columns: repeat(2, minmax(220px, 1fr));
@@ -819,6 +1327,7 @@ td:has(> img[src*="logo.png"]) {
 }
 
 @media (max-width: 900px) {
+  .calendar-controls-row,
   .issues-controls-row {
     grid-template-columns: 1fr 1fr;
   }
@@ -843,6 +1352,7 @@ td:has(> img[src*="logo.png"]) {
     align-items: stretch;
   }
 
+  .calendar-controls-row,
   .issues-controls-row,
   .kanban-board {
     grid-template-columns: 1fr;
@@ -851,6 +1361,10 @@ td:has(> img[src*="logo.png"]) {
   .issues-subtabs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .calendar-issue-filter-toggle {
+    grid-column: auto;
   }
 }
 

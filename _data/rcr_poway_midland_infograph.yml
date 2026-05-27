@@ -279,11 +279,6 @@ Features:
 
 FutureFeatures:
 
-  - title: "Real-Time GPS Train Tracker"
-    icon: "GPS"
-    description: "Requires a GPS unit mounted on the locomotive. Would replace our simulated tracker with live position data — showing visitors exactly where the train is and when it returns to the station."
-    needs: "Hardware: GPS module + cellular data on locomotive"
-
   - title: "Live Camera Feed"
     icon: "CAM"
     description: "A live video stream from the station platform so visitors can watch operations remotely. Requires a camera and stable network connection installed at Old Poway Park."

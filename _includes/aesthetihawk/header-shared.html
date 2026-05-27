@@ -1,0 +1,117 @@
+{%- include themes/minima/header.html -%}
+
+<script>
+  (function () {
+    function findCardAncestor(element) {
+      while (element && element !== document.documentElement) {
+        var className = element.className || '';
+        if (/(^|\s)[a-z0-9_-]*-card(\s|$)/i.test(className) || /(^|\s)card(\s|$)/i.test(className)) {
+          return element;
+        }
+        element = element.parentElement;
+      }
+      return null;
+    }
+
+    function gatherTechText(stackElement) {
+      if (!stackElement) {
+        return '';
+      }
+
+      var chips = Array.from(stackElement.querySelectorAll('span, .tag, .tech-tag, .sd-auto-tag'))
+        .map(function (chip) { return chip.textContent.trim(); })
+        .filter(Boolean);
+
+      if (chips.length) {
+        return chips.join(' · ');
+      }
+
+      return stackElement.textContent.trim().replace(/\s+/g, ' ').slice(0, 300);
+    }
+
+    function attachTooltips() {
+      var stacks = Array.from(document.querySelectorAll('[class*="tech-stack"], .tech-tags, .tags'));
+      stacks.forEach(function (stack) {
+        try {
+          var techText = gatherTechText(stack);
+          if (!techText) {
+            return;
+          }
+
+          var card = findCardAncestor(stack);
+          if (!card || card.querySelector('.project-tooltip')) {
+            return;
+          }
+
+          card.classList.add('project-tooltip-anchor');
+
+          var tooltip = document.createElement('div');
+          tooltip.className = 'project-tooltip';
+          tooltip.setAttribute('role', 'status');
+          tooltip.textContent = techText;
+          card.appendChild(tooltip);
+
+          card.addEventListener('mouseenter', function () { tooltip.classList.add('visible'); });
+          card.addEventListener('mouseleave', function () { tooltip.classList.remove('visible'); });
+          card.addEventListener('focusin', function () { tooltip.classList.add('visible'); });
+          card.addEventListener('focusout', function () { tooltip.classList.remove('visible'); });
+          card.addEventListener('touchstart', function () {
+            tooltip.classList.add('visible');
+            setTimeout(function () { tooltip.classList.remove('visible'); }, 2500);
+          }, { passive: true });
+        } catch (error) {
+          console.warn('tooltip attach failed', error);
+        }
+      });
+    }
+
+    function showNudgeToast() {
+      var wrap = document.querySelector('.site-toast-wrap');
+      if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.className = 'site-toast-wrap';
+        document.body.appendChild(wrap);
+      }
+
+      var toast = document.createElement('div');
+      toast.className = 'site-toast';
+      toast.innerHTML = '<span>Got thoughts on a project? Drop a comment.</span>';
+
+      var closeButton = document.createElement('button');
+      closeButton.className = 'toast-close';
+      closeButton.setAttribute('aria-label', 'Dismiss');
+      closeButton.textContent = '✕';
+
+      toast.appendChild(closeButton);
+      wrap.appendChild(toast);
+
+      requestAnimationFrame(function () { toast.classList.add('show'); });
+
+      function dismiss() {
+        toast.classList.remove('show');
+        setTimeout(function () {
+          try {
+            toast.remove();
+          } catch (error) {
+            console.warn('toast removal failed', error);
+          }
+        }, 350);
+      }
+
+      closeButton.addEventListener('click', dismiss);
+      var autoDismiss = setTimeout(dismiss, 6000);
+      toast.addEventListener('mouseenter', function () { clearTimeout(autoDismiss); });
+    }
+
+    function initHeaderEnhancements() {
+      attachTooltips();
+      setTimeout(showNudgeToast, 3000);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHeaderEnhancements);
+    } else {
+      initHeaderEnhancements();
+    }
+  })();
+</script>
