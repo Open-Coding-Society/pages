@@ -150,7 +150,7 @@ class WaveManager {
             const enemyData = {
                 id: `waveEnemy_${this.currentWave}_${i}`,
                 src: sprite_src,
-                SCALE_FACTOR: 1.5,
+                SCALE_FACTOR: 5,
                 STEP_FACTOR: 0,
                 ANIMATION_RATE: 8,
                 INIT_POSITION: { x: xPos, y: yPos },
@@ -172,28 +172,37 @@ class WaveManager {
     }
 
     update() {
-        if (!this.waveActive) return;
+        // Always update projectiles and check collisions during waves
+        if (this.waveActive) {
+            // Update and cull dead projectiles
+            this.projectiles = this.projectiles.filter(p => !p.revComplete);
+            this.projectiles.forEach(p => p.update());
 
-        // Update and cull dead projectiles
-        this.projectiles = this.projectiles.filter(p => !p.revComplete);
-        this.projectiles.forEach(p => p.update());
+            // Collision checks
+            this.checkProjectileCollisions();
+            this.checkPlayerCollisions();
 
-        // Collision checks
-        this.checkProjectileCollisions();
-        this.checkPlayerCollisions();
+            // Cull destroyed enemies
+            this.waveEnemies = this.waveEnemies.filter(e => !e.isDestroyed());
 
-        // Cull destroyed enemies
-        this.waveEnemies = this.waveEnemies.filter(e => !e.isDestroyed());
+            // Keep UI counter live
+            this.updateWaveDisplay();
 
-        // Keep UI counter live
-        this.updateWaveDisplay();
-
-        // Check wave completion (1s grace period after wave starts)
-        if (this.waveEnemies.length === 0 && this.waveStartTime > 0) {
-            if (Date.now() - this.waveStartTime > 1000) {
-                this.completeWave();
+            // Check wave completion (1s grace period after wave starts)
+            if (this.waveEnemies.length === 0 && this.waveStartTime > 0) {
+                if (Date.now() - this.waveStartTime > 1000) {
+                    this.completeWave();
+                }
             }
         }
+
+        // Update all NPCs that have been spawned (including victory pumpkin)
+        const npcs = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Npc');
+        npcs.forEach(npc => {
+            if (npc && typeof npc.update === 'function') {
+                npc.update();
+            }
+        });
     }
 
     checkProjectileCollisions() {
@@ -334,23 +343,42 @@ class WaveManager {
             id: 'VictoryNPC',
             greeting: "You have defeated all the waves! Well done!",
             src: path + "/images/projects/mansionGame/pumpkin.png",
-            SCALE_FACTOR: 6,
+            SCALE_FACTOR: 4,
             STEP_FACTOR: 0,
             ANIMATION_RATE: 10,
-            INIT_POSITION: { x: width / 2, y: height / 2 },
-            pixels: { height: 2400, width: 3600 },
-            orientation: { rows: 2, columns: 3 },
-            down:  { row: 1, start: 0, columns: 3 },
-            left:  { row: 0, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up:    { row: 1, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 }
+            INIT_POSITION: { x: 0.5, y: 0.5 },
+            pixels: { height: 256, width: 256 },
+            orientation: { rows: 1, columns: 1 },
+            down:  { row: 0, start: 0, columns: 1 },
+            left:  { row: 0, start: 0, columns: 1 },
+            right: { row: 0, start: 0, columns: 1 },
+            up:    { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
+            zIndex: 100,
+            interact: function() {
+                localStorage.setItem('mansionGame_level5_unlocked', 'true');
+                console.log("Level 5 unlocked!");
+
+                // Transition back to lobby
+                const gameControl = this.gameEnv.gameControl;
+                if (gameControl && typeof gameControl.transitionToLevel === 'function') {
+                    import('./mansionLevelMain.js').then(({ default: MansionLevelMain }) => {
+                        gameControl.levelClasses = [MansionLevelMain];
+                        gameControl.currentLevelIndex = 0;
+                        gameControl.transitionToLevel();
+                    }).catch(err => {
+                        console.error("Failed to load lobby:", err);
+                        location.reload();
+                    });
+                } else {
+                    location.reload();
+                }
+            }
         };
 
         const npc = new Npc(npcData, this.gameEnv);
         this.gameEnv.gameObjects.push(npc);
         console.log("Victory NPC spawned");
-        localStorage.setItem('mansionGame_level5_unlocked', 'true');
     }
 
     playerShoot(direction = null) {
