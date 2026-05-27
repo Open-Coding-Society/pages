@@ -369,11 +369,27 @@ class MansionLevel2 {
             isKilling: false,
         };
 
+        const sprite_data_reaper_medium = {
+            id: "Reaper3",
+            greeting: "",          // silenced
+            src: sprite_src_reaper,
+            SCALE_FACTOR: 5,
+            ANIMATION_RATE: 0,
+            speed: 0.7,
+            pixels: { height: 256, width: 256 },
+            INIT_POSITION: { x: width * 0.5, y: height * 0.7 },
+            orientation: { rows: 1, columns: 1 },
+            hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+            zIndex: 10,
+            isKilling: false,
+        };
+
         this.classes = [
             { class: GameEnvBackground, data: image_data_background },
             { class: HealthPlayer, data: sprite_data_player },
             { class: Reaper, data: sprite_data_reaper },
-            { class: Reaper, data: sprite_data_reaper_slow }
+            { class: Reaper, data: sprite_data_reaper_slow },
+            { class: Reaper, data: sprite_data_reaper_medium },
         ];
 
         // Survival timer state
