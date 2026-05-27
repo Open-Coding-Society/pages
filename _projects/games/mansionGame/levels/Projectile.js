@@ -28,7 +28,7 @@ class Projectile extends Character {
         const dx = targetx - sourcex;
         const dy = targety - sourcey;
         const distance = Math.sqrt(dx * dx + dy * dy) || 1;
-        this.speed = type === "PUMPKIN" ? 4 : 5; // adjust as needed
+        this.speed = type === "PUMPKIN" ? 4 : 7.5; // Fireball speed increased by 1.5x from 5
         this.velocity = {
             x: (dx / distance) * this.speed,
             y: (dy / distance) * this.speed
