@@ -615,7 +615,8 @@ active_tab: submissions
 
         const uid = storagePath.slice(0, slashIndex);
         const filename = storagePath.slice(slashIndex + 1);
-        return `${javaURI}/api/files/download/${encodeURIComponent(uid)}/${encodeURIComponent(filename)}`;
+        const params = new URLSearchParams({ uid, filename });
+        return `${javaURI}/api/files/download?${params.toString()}`;
     }
 
     function getSubmissionContentType(submission) {
