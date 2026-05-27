@@ -231,6 +231,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
       position: codeHubGatekeeperPos,
       interact: function () {
+        // "this" here refers to the NPC, which has access to its own dialogueSystem
         this.dialogueSystem.dialogues = [
           'Welcome to the Code Hub!',
           'Here you can explore Frontend, Backend, and Data Viz.',
@@ -244,7 +245,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
             primary: true,
             action: () => {
               this.dialogueSystem.closeDialogue();
-              const gc = this.gameEnv.gameControl;
+              
+              const gc = levelInstance.gameEnv?.gameControl || levelInstance.gameEnv;
+              if (!gc) {
+                console.error('[Teleport] Game control engine context missing.');
+                return;
+              }
+              
               gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1CodeHub);
               gc.currentLevelIndex++;
               gc.transitionToLevel();
