@@ -38,12 +38,13 @@ permalink: /gamify/fortuneFindersv1-1
 
     (async () => {
         try {
-            const [{ default: FinTech }, { default: GameLevelAirport }, { default: GameLevelFuturesExchange }, { default: GameLevelOptionsHub }, { default: GameLevelWallstreet }, config] = await Promise.all([
-                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/FinTech.js"),
-                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelAirport.js"),
-                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelFuturesExchange.js"),
-                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelOptionsHub.js"),
-                import("{{site.baseurl}}/assets/js/projects/fortuneFinders/levels/GameLevelWallstreet.js"),
+            const [{ default: FinTech }, { default: GameLevelAirport }, { default: GameLevelFuturesExchange }, { default: GameLevelOptionsHub }, { default: GameLevelWallstreet }, { FF_ROUTES, ffUrl }, config] = await Promise.all([
+                import("@fortuneFinders/js/FinTech.js"),
+                import("@fortuneFinders/levels/GameLevelAirport.js"),
+                import("@fortuneFinders/levels/GameLevelFuturesExchange.js"),
+                import("@fortuneFinders/levels/GameLevelOptionsHub.js"),
+                import("@fortuneFinders/levels/GameLevelWallstreet.js"),
+                import("@fortuneFinders/js/routes.js"),
                 import("{{site.baseurl}}/assets/js/api/config.js"),
             ]);
 
@@ -132,15 +133,15 @@ permalink: /gamify/fortuneFindersv1-1
 
                             if (titleText.includes('J.P. Morgan') && dialogText.includes('opportunity and risk')) {
                                 addButton('Learn Coding Behind Quant Trading', () => {
-                                    openLessonModal('quantLessonModal', 'quantLessonFrame', `${path}/gamify/fortuneFinders/quant-lesson`);
+                                    openLessonModal('quantLessonModal', 'quantLessonFrame', ffUrl(path, FF_ROUTES.quantLesson));
                                 });
                             } else if (titleText.includes('Options Trading NPC')) {
                                 addButton('Learn Coding Behind Options', () => {
-                                    window.open(`${path}/gamify/fortuneFinders/options-lesson`, '_blank');
+                                    window.open(ffUrl(path, FF_ROUTES.optionsLesson), '_blank');
                                 });
                             } else if (titleText.includes('Futures Trader') && dialogText.includes('Futures = a contract')) {
                                 addButton('Learn Coding Behind Futures', () => {
-                                    openLessonModal('futuresLessonModal', 'futuresLessonFrame', `${path}/gamify/fortuneFinders/futures-lesson`);
+                                    openLessonModal('futuresLessonModal', 'futuresLessonFrame', ffUrl(path, FF_ROUTES.futuresLesson));
                                 });
                             }
                         }

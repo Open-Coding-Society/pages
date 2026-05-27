@@ -7,6 +7,19 @@ breadcrumb: true
 permalink: /gamify/fortuneFinders/quant/overview
 ---
 
+## Fortune Finders pages
+
+| Page | Link |
+|------|------|
+| Game | [Fortune Finders v1.1](/gamify/fortuneFindersv1-1) |
+| Quant bot | [Trading bot](/gamify/fortuneFinders/quant) |
+| Quant lesson | [Coding behind quant](/gamify/fortuneFinders/quant-lesson) |
+| Futures mini-game | [Futures](/gamify/fortuneFinders/futures) |
+| Futures lesson | [Coding behind futures](/gamify/fortuneFinders/futures-lesson) |
+| Options lesson | [Coding behind options](/gamify/fortuneFinders/options-lesson) |
+
+Route definitions: `js/routes.js` in this project.
+
 ## Directory Structure
 
 Project-facing source is embedded as a web application with modular frontend + backend API integration.

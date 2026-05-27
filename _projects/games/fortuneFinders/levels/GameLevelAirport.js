@@ -2,8 +2,9 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, getSatoshiQuestions } from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
-import WaypointArrow from '@assets/js/projects/fortuneFinders/levels/WaypointArrow.js';
-import NpcProgressSystem from '@assets/js/projects/fortuneFinders/levels/NpcProgressSystem.js';
+import WaypointArrow from '@fortuneFinders/levels/WaypointArrow.js';
+import NpcProgressSystem from '@fortuneFinders/levels/NpcProgressSystem.js';
+import { FF_ROUTES, ffUrl } from '@fortuneFinders/js/routes.js';
 
 let socketURI
 let javaURI
@@ -207,7 +208,7 @@ class GameLevelAirport {
             "The stock market is a place of opportunity and risk. You can buy shares in companies and watch your investments grow—or shrink.\nWould you like to proceed to the Stock Exchange and begin your investment journey?",
             [
               { label: "Take me to the Stock Exchange", action: () => openInModal(`${path}/stocks/viewer`) },
-              { label: "Teach me Quantitative Trading", action: () => openInModal(`${path}/gamify/fortuneFinders/quant`) },
+              { label: "Teach me Quantitative Trading", action: () => openInModal(ffUrl(path, FF_ROUTES.quant)) },
               { label: "Remind me what stocks are", action: () => dialogFunctions.whatAreStocks(), keepOpen: true },
               { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
             ]

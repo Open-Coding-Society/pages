@@ -7,6 +7,11 @@ type: tangibles
 permalink: /gamify/fortuneFinders/futures-lesson
 ---
 
+<p>
+  <a href="{{ site.baseurl }}/gamify/fortuneFindersv1-1">Game</a> ·
+  <a href="{{ site.baseurl }}/gamify/fortuneFinders/futures">Futures mini-game</a>
+</p>
+
 <div id="App" class="quant-lesson-container">
   <div class="app-header">
     <div class="header-content">

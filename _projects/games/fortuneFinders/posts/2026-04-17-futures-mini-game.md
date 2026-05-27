@@ -4,6 +4,11 @@ title: Futures Mini-Game
 permalink: /gamify/fortuneFinders/futures
 ---
 
+<p>
+  <a href="{{ site.baseurl }}/gamify/fortuneFindersv1-1">Game</a> ·
+  <a href="{{ site.baseurl }}/gamify/fortuneFinders/futures-lesson">Futures lesson</a>
+</p>
+
 <style>
   :root{
     --bg:#070f16;

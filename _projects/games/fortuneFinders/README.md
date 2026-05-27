@@ -1,19 +1,29 @@
+---
+published: false
+---
+
 # Fortune Finders
 
-Gamified financial literacy: canvas game (v1.1 engine), quant trading bot, futures mini-game, and coding lessons.
+**Single folder:** everything lives here. No copies to `_posts/gamify/` or `assets/js/projects/`.
 
-## Source layout
+## How it is served
 
-| Path | Purpose |
-|------|---------|
-| `02-v1-FortuneFinders.md` | Game entry page (`/gamify/fortuneFindersv1-1`) |
-| `js/FinTech.js` | Fortune Finders game class |
-| `levels/` | Map levels (Airport, Futures Exchange, Options, Wall Street) + `WaypointArrow`, `NpcProgressSystem` |
-| `posts/` | Quant bot, futures mini-game, quant/futures/options lessons |
-| `docs/` | Quant bot API overview |
-| `images/` | Futures map, trader NPC, level gate |
+- **Jekyll** — `_config.yml` includes `_projects/games/fortuneFinders` (markdown pages + static JS/images).
+- **Import map** — `@fortuneFinders/` → `/_projects/games/fortuneFinders/` (see `_includes/head-custom.html`).
+- **URLs** — `js/routes.js` (`FF_ROUTES`) must match each file’s `permalink:` (see [LINKS.md](LINKS.md)).
 
-Shared engine code stays in `assets/js/GameEnginev1.1/essentials/` (not duplicated here).
+## Layout
+
+| Path | Role |
+|------|------|
+| `02-v1-FortuneFinders.md` | Main game |
+| `js/FinTech.js`, `js/routes.js`, `js/paths.js` | Game logic + URL/asset helpers |
+| `levels/` | Map levels |
+| `posts/` | Quant bot, futures mini-game, lessons |
+| `docs/README.md` | Quant API overview |
+| `images/` | Futures-specific SVGs |
+
+Shared engine only: `assets/js/GameEnginev1.1/essentials/`.
 
 ## Build
 
@@ -21,11 +31,4 @@ Shared engine code stays in `assets/js/GameEnginev1.1/essentials/` (not duplicat
 make -C _projects/games/fortuneFinders build
 ```
 
-Copies to:
-
-- `assets/js/projects/fortuneFinders/`
-- `images/projects/fortuneFinders/`
-- `_posts/gamify/` (quant, futures, lessons)
-- `assets/js/projects/fortuneFinders/02-v1-FortuneFinders.md` (Jekyll game page)
-
-Registered in `_projects/.makeprojects` as `games/fortuneFinders:dev`.
+No file copies — confirms config only.

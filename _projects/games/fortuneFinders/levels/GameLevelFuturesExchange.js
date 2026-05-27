@@ -2,7 +2,9 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import showDialogBox from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
-import NpcProgressSystem from '@assets/js/projects/fortuneFinders/levels/NpcProgressSystem.js';
+import NpcProgressSystem from '@fortuneFinders/levels/NpcProgressSystem.js';
+import { FF_ROUTES, ffUrl } from '@fortuneFinders/js/routes.js';
+import { ffImage } from '@fortuneFinders/js/paths.js';
 
 class GameLevelFuturesExchange {
   constructor(gameEnv) {
@@ -12,7 +14,7 @@ class GameLevelFuturesExchange {
 
     const bg = {
       id: 'Futures-Exchange-Background',
-      src: `${path}/images/projects/fortuneFinders/futures-map.svg`,
+      src: ffImage(path, 'futures-map.svg'),
       pixels: { height: 1024, width: 1024 }
     };
 
@@ -121,7 +123,7 @@ class GameLevelFuturesExchange {
     const futuresNpc = {
       id: 'Futures-NPC',
       greeting: 'Step into the pit. This is futures trading.',
-      src: `${path}/images/projects/fortuneFinders/futures-trader.svg`,
+      src: ffImage(path, 'futures-trader.svg'),
       zIndex: 12,
       SCALE_FACTOR: 4.2,
       ANIMATION_RATE: 50,
@@ -135,7 +137,7 @@ class GameLevelFuturesExchange {
         const allowed = await npcProgressSystem.checkNpcProgress(gameEnv.game, futuresNpc.id);
         if (!allowed) return;
 
-        const url = `${path}/gamify/fortuneFinders/futures`;
+        const url = ffUrl(path, FF_ROUTES.futures);
         const teach = [
           "Futures = a contract to buy/sell a product later at a price agreed today.",
           "LONG means you profit if price goes up. SHORT means you profit if price goes down.",
@@ -167,7 +169,7 @@ class GameLevelFuturesExchange {
       id: 'Futures-Gate',
       greeting: 'Complete the futures mini-game to unlock the next map.',
       // Use the dedicated gate asset; if it ever fails to load, don't render a huge red fallback.
-      src: `${path}/images/projects/fortuneFinders/level-gate.svg`,
+      src: ffImage(path, 'level-gate.svg'),
       zIndex: 11,
       // If the SVG fails to load, Character falls back to a solid square.
       // Make it visible (so progression isn't "invisible") but subtle.

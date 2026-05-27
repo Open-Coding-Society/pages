@@ -2,6 +2,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import showDialogBox from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
+import { FF_ROUTES, ffUrl } from '@fortuneFinders/js/routes.js';
 
 class GameLevelOptionsHub {
   constructor(gameEnv) {
@@ -53,7 +54,7 @@ class GameLevelOptionsHub {
           'Options Trading NPC',
           'Options are contracts with expiration dates. Use calls when you expect upside and puts when you want downside protection. Ready to open the options challenge?',
           [
-            { label: 'Open Options Challenge', action: () => window.open(`${path}/gamify/fortuneFinders/quant`, '_blank') },
+            { label: 'Open Options Lesson', action: () => window.open(ffUrl(path, FF_ROUTES.optionsLesson), '_blank') },
             { label: 'Risk Tip', action: () => showDialogBox('Risk Tip', 'Keep position size small and always define max loss before entering an options trade.', [{ label: 'Back', action: () => {}, keepOpen: false }]), keepOpen: true },
             { label: 'Close', action: () => {}, keepOpen: false }
           ]

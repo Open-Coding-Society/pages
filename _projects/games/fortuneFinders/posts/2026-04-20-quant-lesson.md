@@ -7,6 +7,12 @@ type: tangibles
 permalink: /gamify/fortuneFinders/quant-lesson
 ---
 
+<p>
+  <a href="{{ site.baseurl }}/gamify/fortuneFindersv1-1">Game</a> ·
+  <a href="{{ site.baseurl }}/gamify/fortuneFinders/quant">Quant bot</a> ·
+  <a href="{{ site.baseurl }}/gamify/fortuneFinders/quant/overview">Overview</a>
+</p>
+
 <div id="App" class="quant-lesson-container">
   <div class="app-header">
     <div class="header-content">

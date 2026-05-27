@@ -2,6 +2,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import showDialogBox from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
+import { FF_ROUTES, ffUrl } from '@fortuneFinders/js/routes.js';
 
 class GameLevelWallstreet {
   constructor(gameEnv) {
@@ -128,7 +129,7 @@ class GameLevelWallstreet {
               "The stock market is a place of opportunity and risk. You can buy shares in companies and watch your investments grow—or shrink.\nWould you like to proceed to the Stock Exchange, or learn the coding behind quant trading?",
               [
                 { label: "Proceed to Stock Exchange", action: () => window.open(gameEnv.path + '/stocks/viewer', '_blank') },
-                { label: "Learn the coding behind quant trading", action: () => window.open(gameEnv.path + '/gamify/fortuneFinders/quant-lesson', '_blank') },
+                { label: "Learn the coding behind quant trading", action: () => window.open(ffUrl(gameEnv.path, FF_ROUTES.quantLesson), '_blank') },
                 { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
               ]
             );
