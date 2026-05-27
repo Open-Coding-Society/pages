@@ -4,6 +4,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import MansionLevel2_Cemetery from './mansionLevel2_Cemetery.js';
+import MansionLevelMain from './mansionLevelMain.js';
 
 // ─── Reaper ────────────────────────────────────────────────────────────────────
 class Reaper extends Npc {
@@ -369,11 +370,27 @@ class MansionLevel2 {
             isKilling: false,
         };
 
+        const sprite_data_reaper_medium = {
+            id: "Reaper3",
+            greeting: "",          // silenced
+            src: sprite_src_reaper,
+            SCALE_FACTOR: 5,
+            ANIMATION_RATE: 0,
+            speed: 0.7,
+            pixels: { height: 256, width: 256 },
+            INIT_POSITION: { x: width * 0.5, y: height * 0.7 },
+            orientation: { rows: 1, columns: 1 },
+            hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+            zIndex: 10,
+            isKilling: false,
+        };
+
         this.classes = [
             { class: GameEnvBackground, data: image_data_background },
             { class: HealthPlayer, data: sprite_data_player },
             { class: Reaper, data: sprite_data_reaper },
-            { class: Reaper, data: sprite_data_reaper_slow }
+            { class: Reaper, data: sprite_data_reaper_slow },
+            { class: Reaper, data: sprite_data_reaper_medium },
         ];
 
         // Survival timer state
@@ -387,6 +404,7 @@ class MansionLevel2 {
     initialize() {
         this._injectGlobalStyles();
         this.setupHUD();
+        this._showInstructions();
 
         // Expose game-over callback on gameEnv so HealthPlayer can call it
         this.gameEnv._triggerGameOver = () => this._showGameOver();
@@ -451,6 +469,13 @@ class MansionLevel2 {
             @keyframes hudSlideIn {
                 from { opacity: 0; transform: translateY(-12px); }
                 to   { opacity: 1; transform: translateY(0); }
+            }
+
+            @keyframes instructionToast {
+                0%   { opacity: 0; transform: translateY(-10px); }
+                12%  { opacity: 1; transform: translateY(0); }
+                70%  { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-6px); }
             }
 
             .mansion-overlay {
@@ -556,8 +581,80 @@ class MansionLevel2 {
                 min-width: 96px;
                 transition: color 0.3s;
             }
+
+            .mansion-instruction-toast {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                z-index: 9999;
+                pointer-events: none;
+                animation: instructionToast 5s ease-in-out forwards;
+                font-family: 'Raleway', sans-serif;
+                background: rgba(0, 0, 0, 0.72);
+                border: 1px solid rgba(167, 139, 250, 0.55);
+                border-radius: 8px;
+                padding: 12px 18px;
+                backdrop-filter: blur(6px);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 0 18px rgba(139, 92, 246, 0.25);
+            }
+
+            .mansion-instruction-icon {
+                font-size: 22px;
+                line-height: 1;
+            }
+
+            .mansion-instruction-text {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .mansion-instruction-headline {
+                font-size: 13px;
+                font-weight: 700;
+                color: #e2e8f0;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+            }
+
+            .mansion-instruction-detail {
+                font-size: 11px;
+                color: #a78bfa;
+                letter-spacing: 1px;
+            }
         `;
         document.head.appendChild(style);
+    }
+
+    // ── Instruction toast ──────────────────────────────────────────────────────
+    _showInstructions() {
+        const toast = document.createElement('div');
+        toast.className = 'mansion-instruction-toast';
+
+        const icon = document.createElement('div');
+        icon.className = 'mansion-instruction-icon';
+        icon.textContent = '👻';
+
+        const textWrap = document.createElement('div');
+        textWrap.className = 'mansion-instruction-text';
+
+        const headline = document.createElement('div');
+        headline.className = 'mansion-instruction-headline';
+        headline.textContent = 'Press [SPACE] to push';
+
+        const detail = document.createElement('div');
+        detail.className = 'mansion-instruction-detail';
+        detail.textContent = 'Repels nearby Reapers · 5s cooldown';
+
+        textWrap.append(headline, detail);
+        toast.append(icon, textWrap);
+        this.gameEnv.container.appendChild(toast);
+
+        // Remove from DOM after animation completes
+        setTimeout(() => toast.remove(), 5100);
     }
 
     // ── HUD ────────────────────────────────────────────────────────────────────
@@ -759,41 +856,58 @@ class MansionLevel2 {
         sub.style.color = '#bbf7d0';
         sub.textContent = 'Against all odds, you endured 30 seconds in the haunted graveyard. The Reapers retreat… for now.';
 
-        const btn = document.createElement('button');
-        btn.className = 'mansion-overlay-btn';
-        btn.style.color = '#4ade80';
-        btn.textContent = 'NEXT LEVEL';
-        btn.addEventListener('mouseenter', () => {
-            btn.style.background = '#4ade80';
-            btn.style.color = '#000';
+        const replayBtn = document.createElement('button');
+        replayBtn.className = 'mansion-overlay-btn';
+        replayBtn.style.color = '#4ade80';
+        replayBtn.textContent = 'REPLAY LEVEL';
+        replayBtn.addEventListener('mouseenter', () => {
+            replayBtn.style.background = '#4ade80';
+            replayBtn.style.color = '#000';
         });
-        btn.addEventListener('mouseleave', () => {
-            btn.style.background = 'transparent';
-            btn.style.color = '#4ade80';
+        replayBtn.addEventListener('mouseleave', () => {
+            replayBtn.style.background = 'transparent';
+            replayBtn.style.color = '#4ade80';
         });
-        btn.addEventListener('click', () => {
+        replayBtn.addEventListener('click', () => {
             this._removeOverlay();
             const gc = this.gameEnv?.gameControl;
             if (!gc) return;
 
             gc.isPaused = false;
-
-            const hasNextLevel = gc.currentLevelIndex < gc.levelClasses.length - 1;
-            if (hasNextLevel) {
-                // Advance to the next level in GameControl's ordered list,
-                // then call transitionToLevel() which destroys the current
-                // level, creates the next one, and restarts the game loop —
-                // exactly what GameControl.handleLevelEnd() does internally.
-                gc.currentLevelIndex++;
-                gc.transitionToLevel();
-            } else {
-                // This was the last level — signal normal game completion so
-                // GameControl.handleLevelEnd() can fire the gameOver callback.
-                if (gc.currentLevel) gc.currentLevel.continue = false;
-            }
+            gc.transitionToLevel();
         });
 
-        overlay.append(title, sub, btn);
+        const lobbyBtn = document.createElement('button');
+        lobbyBtn.className = 'mansion-overlay-btn';
+        lobbyBtn.style.color = '#82aaff';
+        lobbyBtn.textContent = 'BACK TO LOBBY';
+        lobbyBtn.addEventListener('mouseenter', () => {
+            lobbyBtn.style.background = '#82aaff';
+            lobbyBtn.style.color = '#000';
+        });
+        lobbyBtn.addEventListener('mouseleave', () => {
+            lobbyBtn.style.background = 'transparent';
+            lobbyBtn.style.color = '#82aaff';
+        });
+        lobbyBtn.addEventListener('click', () => {
+            this._removeOverlay();
+            const gc = this.gameEnv?.gameControl;
+            if (!gc) return;
+
+            gc.levelClasses = [MansionLevelMain];
+            gc.currentLevelIndex = 0;
+            gc.isPaused = false;
+            gc.transitionToLevel();
+        });
+
+        const buttonRow = document.createElement('div');
+        buttonRow.style.display = 'flex';
+        buttonRow.style.gap = '12px';
+        buttonRow.style.flexWrap = 'wrap';
+        buttonRow.style.justifyContent = 'center';
+        buttonRow.append(replayBtn, lobbyBtn);
+
+        overlay.append(title, sub, buttonRow);
         this.gameEnv.container.appendChild(overlay);
     }
 
