@@ -62,16 +62,16 @@ class Boss extends Enemy {
 
         this.isThrowingScythe = false;
 
-        if (typeof window !== 'undefined') {
-            this._oneHpKeyHandler = (event) => {
-                if (event.key !== '1') return;
-                this.healthPoints = 1;
-                const full = this.fullHealth || 1;
-                const percent = Math.max(0, Math.min(100, (this.healthPoints / full) * 100));
-                updateBossHealthBar(percent, this.stage);
-            };
-            window.addEventListener('keydown', this._oneHpKeyHandler);
-        }
+        // if (typeof window !== 'undefined') {
+        //     this._oneHpKeyHandler = (event) => {
+        //         if (event.key !== '1') return;
+        //         this.healthPoints = 1;
+        //         const full = this.fullHealth || 1;
+        //         const percent = Math.max(0, Math.min(100, (this.healthPoints / full) * 100));
+        //         updateBossHealthBar(percent, this.stage);
+        //     };
+        //     window.addEventListener('keydown', this._oneHpKeyHandler);
+        // }
     }
 
     // Update function for the Boss

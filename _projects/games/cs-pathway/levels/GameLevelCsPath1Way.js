@@ -7,6 +7,7 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaHallTrial from './PersonaHallTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
+import GameLevelEmpathyEpic from './GameLevelEmpathyEpic.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
@@ -14,7 +15,7 @@ import AboutMeBuilder from './AboutMeBuilder.js';
 import MissionTools from './GameLevelCsPath2Mission.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 import SprintSuccessModule from './SprintSuccessModule.js';
-import PersonaTrial from './personaTrial.js';
+import PersonaTrial from './PersonaTrial.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -341,9 +342,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
             primary: true,
             action: () => {
               this.dialogueSystem.closeDialogue();
-
-              // replace with your actual level/module
-              levelInstance.showToast?.('Empathy Epic coming soon!');
+              levelInstance.openEmpathyEpic();
             },
           },
         ]);
@@ -537,6 +536,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
   openMissionTools() {
     const gc = this.gameEnv.gameControl;
     gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, MissionTools);
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
+  }
+
+  openEmpathyEpic() {
+    const gc = this.gameEnv.gameControl;
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelEmpathyEpic);
     gc.currentLevelIndex++;
     gc.transitionToLevel();
   }

@@ -253,7 +253,11 @@ class MansionLevel6_EndingCutscene {
             cursor: 'pointer',
             opacity: '0',
             transition: 'opacity 2000ms ease',
-            zIndex: '10003'
+            zIndex: '10003',
+
+            // Wobble Effect
+            animation: 'mansion-button-wobble 2.5s ease-in-out infinite',
+            animationDelay: '2s'
         });
 
         playAgainButton.addEventListener('click', () => {
@@ -271,9 +275,20 @@ class MansionLevel6_EndingCutscene {
                     from { transform: translate(-50%, 120%); }
                     to { transform: translate(-50%, -220%); }
                 }
+
                 @keyframes mansion-spook-drop {
                     from { transform: translate(-50%, -180%); opacity: 0; }
                     to { transform: translate(-50%, -50%); opacity: 1; }
+                }
+
+                @keyframes mansion-button-wobble {
+                    0%   { transform: translateX(-50%) rotate(0deg) scale(1); }
+                    15%  { transform: translateX(-50%) rotate(-2deg) scale(1.02); }
+                    30%  { transform: translateX(-50%) rotate(2deg) scale(1.02); }
+                    45%  { transform: translateX(-50%) rotate(-1.5deg) scale(1.01); }
+                    60%  { transform: translateX(-50%) rotate(1.5deg) scale(1.01); }
+                    75%  { transform: translateX(-50%) rotate(-1deg) scale(1); }
+                    100% { transform: translateX(-50%) rotate(0deg) scale(1); }
                 }
             `;
             document.head.appendChild(style);
@@ -288,7 +303,7 @@ class MansionLevel6_EndingCutscene {
         requestAnimationFrame(() => {
             overlay.style.opacity = '1';
             credits.style.animation = 'mansion-credits-roll 24s linear forwards';
-            this._creditsMusic.play().catch(() => {});
+            this._creditsMusic.play().catch(() => { });
         });
 
         const creditsDurationMs = 24000;
@@ -302,7 +317,7 @@ class MansionLevel6_EndingCutscene {
             }
 
             this._lightningSfx.currentTime = 0;
-            this._lightningSfx.play().catch(() => {});
+            this._lightningSfx.play().catch(() => { });
 
             const reaperDelayMs = 200;
             const flashDurationMs = 200;
