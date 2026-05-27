@@ -12,7 +12,7 @@ class MansionLevel2 {
         let path = gameEnv.path;
 
         // Background data - TEMPORARILY USING LEVEL 4 BACKGROUND FOR TESTING
-        const image_background = path + "/images/projects/mansionGame/MansionLevel2MainBackground.jpeg";
+        const image_background = path + "/images/projects/mansionGame/background.jpg";
         const image_data_background = {
             name: 'background',
             greeting: "You have entered the haunted graveyard. Beware!",
