@@ -80,7 +80,7 @@ class MansionLevel1 {
         const mummyData = {
             id: "Temple Mummy",
             greeting: "Bring me the offerings and I will reveal the tomb key.",
-            src: path + "/images/projects/mansionGame/mummy_boy.png",
+            src: path + "/images/projects/mansionGame/sphinxclear.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 0,
             ANIMATION_RATE: 0,
