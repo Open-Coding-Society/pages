@@ -167,28 +167,21 @@
                 blockId: blockId,
                 codeLength: code.length
             });
-        }
-                
-                // Track copy events within editor
-                editor.addEventListener('copy', (e) => {
-                    const selected = window.getSelection().toString();
-                    if (selected.length > 0) {
-                        this.trackCopy(selected, {
-                            language: this.currentLanguage,
-                            codeLength: selected.length
-                        });
-                    }
-                });
-                
-                // Track paste events within editor
-                editor.addEventListener('paste', (e) => {
-                    const pastedText = e.clipboardData.getData('text/plain');
-                    this.trackPaste(pastedText, {
-                        language: this.currentLanguage,
-                        codeLength: pastedText.length
-                    });
+        },
+
+        /**
+         * Track copy events (legacy hook support)
+         */
+        trackCopy: function(code, metadata = {}) {
+            if (window.OCSEnhancedAnalytics) {
+                window.OCSEnhancedAnalytics.recordEvent('code_copy', {
+                    source: 'code_runner_editor',
+                    codeLength: code.length,
+                    ...metadata,
+                    codePreview: code.substring(0, 100)
                 });
             }
+            console.log('📋 Code copied in editor:', code.length, 'characters');
         },
         
         /**
@@ -209,21 +202,6 @@
         hookIntoResults: function() {
             // This would need to be called after execution completes
             // with results passed in
-        },
-        
-        /**
-         * Track code copy in CODE_RUNNER
-         */
-        trackCopy: function(code, metadata = {}) {
-            if (window.OCSEnhancedAnalytics) {
-                window.OCSEnhancedAnalytics.recordEvent('code_copy', {
-                    source: 'code_runner_editor',
-                    codeLength: code.length,
-                    ...metadata,
-                    codePreview: code.substring(0, 100) // First 100 chars
-                });
-            }
-            console.log('📋 Code copied in editor:', code.length, 'characters');
         },
         
         /**
