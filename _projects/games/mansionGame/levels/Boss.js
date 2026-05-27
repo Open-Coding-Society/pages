@@ -423,6 +423,22 @@ class Boss extends Enemy {
                     && name !== 'PowerUpSpawner'
                     && !isZombieLike;
             });
+
+            // Hard-stop any remaining renderables during the victory transition.
+            const remaining = [...gameEnv.gameObjects];
+            remaining.forEach(obj => {
+                if (obj && typeof obj.destroy === 'function') {
+                    obj.destroy();
+                }
+            });
+            gameEnv.gameObjects = [];
+        }
+
+        if (this.leftArm && typeof this.leftArm.destroy === 'function') {
+            this.leftArm.destroy();
+        }
+        if (this.rightArm && typeof this.rightArm.destroy === 'function') {
+            this.rightArm.destroy();
         }
     }
 
