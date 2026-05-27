@@ -134,7 +134,7 @@ docs:
 	@if [ -d "docs" ]; then \
 		echo "📚 Publishing $(PROJECT_NAME) documentation..."; \
 		mkdir -p $(DOCS_DEST); \
-		for doc in docs/*.md; do \
+		for doc in docs/*.md docs/*.html; do \
 			if [ -f "$$doc" ]; then \
 				filename=$$(basename "$$doc"); \
 				cp "$$doc" "$(DOCS_DEST)/$(DATE_OF_CREATION)-$(PROJECT_NAME)-$$filename" 2>/dev/null || true; \
