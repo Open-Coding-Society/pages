@@ -221,6 +221,15 @@ function cleanupBattleRoomUi(gameEnv) {
                 && name !== 'PowerUpSpawner'
                 && !isZombieLike;
         });
+
+        // Hard-stop any remaining renderables during the death transition.
+        const remaining = [...gameEnv.gameObjects];
+        remaining.forEach(obj => {
+            if (obj && typeof obj.destroy === 'function') {
+                obj.destroy();
+            }
+        });
+        gameEnv.gameObjects = [];
     }
 }
 
