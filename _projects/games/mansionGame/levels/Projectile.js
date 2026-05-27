@@ -1,7 +1,7 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import showDeathScreen from './DeathScreen.js';
 import { updatePlayerHealthBar } from './HealthBars.js';
-import showEndScreen from './EndScreen.js';
+import { spawnPlayerDamageEffect } from './DamageEffects.js';
 
 /*
     Projectile class for the Reaper boss fireball & arrow attacks + player attack
@@ -11,12 +11,15 @@ import showEndScreen from './EndScreen.js';
 */
 
 class Projectile extends Character {
-    constructor(gameEnv = null, targetx, targety, sourcex, sourcey, type) {
-        super({id: type}, gameEnv);
+    static spriteCache = new Map();
+
+    constructor(gameEnv = null, targetx, targety, sourcex, sourcey, type, options = {}) {
+        super({ id: type }, gameEnv);
 
         this.source_coords = { x: sourcex, y: sourcey };
         this.target_coords = { x: targetx, y: targety };
         this.type = type;
+        this.owner = options.owner || null;
 
         // Get the main path
         const path = gameEnv.path;
@@ -24,45 +27,91 @@ class Projectile extends Character {
         // Calculate angle and velocity to move in a straight line
         const dx = targetx - sourcex;
         const dy = targety - sourcey;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        this.speed = 5; // adjust as needed
+        const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+        this.speed = type === "PUMPKIN" ? 4 : 7.5; // Fireball speed increased by 1.5x from 5
         this.velocity = {
             x: (dx / distance) * this.speed,
             y: (dy / distance) * this.speed
         };
 
+        if (type === "PUMPKIN") {
+            this.flightProgress = 0;
+            this.flightDuration = Math.max(16, Math.floor(distance / this.speed));
+            this.arcHeight = Math.min(220, distance * 0.35);
+            this.spinAngle = 0;
+        }
+
         this.revComplete = false;
 
         // Load sprite/image based on type
+        this.frameIndex = 0;
+        this.frameCount = 1; // single frame
+
         if (type === "ARROW" || type === "PLAYER") {
-            this.spriteSheet = new Image();
-            this.frameIndex = 0;
-            this.frameCount = 1; // single frame
-            this.width = 60; // scale down if needed
+            this.width = 60;
             this.height = 25;
-            this.spriteSheet.onload = () => this.imageLoaded = true;
-            this.spriteSheet.src = path + "/images/projects/mansionGame/arrow.png";
+            this.setSprite(path + "/images/projects/mansionGame/arrow.png");
+        } else if (type === "PUMPKIN") {
+            this.width = 48;
+            this.height = 48;
+            this.setSprite(path + "/images/projects/mansionGame/pumpkin.png");
         } else if (type === "FIREBALL") {
-            // Fireball is a single-frame static image (178x123 source). Use a scaled size preserving aspect ratio.
-            this.spriteSheet = new Image();
-            this.frameIndex = 0;
-            this.frameCount = 1; // single frame
-            // source aspect ~ 178 / 123 => width is larger; scale to a reasonable in-game size
             this.width = 64;
-            this.height = 44; // keep aspect roughly (64 * 123 / 178 ≈ 44)
-            this.spriteSheet.onload = () => this.imageLoaded = true;
-            this.spriteSheet.src = path + "/images/projects/mansionGame/staticfireball.png";
+            this.height = 44;
+            this.setSprite(path + "/images/projects/mansionGame/staticfireball.png");
         }
         this.isAnimated = false;
 
         // Start at source position
         this.position = { x: sourcex, y: sourcey };
+
+        // These projectile canvases stay the same size for their whole lifetime.
+        this.canvas.width = Math.max(1, Math.floor(this.width));
+        this.canvas.height = Math.max(1, Math.floor(this.height));
+    }
+
+    setSprite(src) {
+        const cachedSprite = Projectile.spriteCache.get(src);
+        if (cachedSprite) {
+            this.spriteSheet = cachedSprite;
+            this.imageLoaded = cachedSprite.complete;
+            if (!this.imageLoaded) {
+                cachedSprite.addEventListener('load', () => {
+                    this.imageLoaded = true;
+                }, { once: true });
+            }
+            return;
+        }
+
+        const sprite = new Image();
+        sprite.onload = () => {
+            this.imageLoaded = true;
+        };
+        sprite.src = src;
+        Projectile.spriteCache.set(src, sprite);
+        this.spriteSheet = sprite;
     }
 
     update() {
         // Move projectile
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+        if (this.type === 'PUMPKIN') {
+            this.flightProgress = Math.min(1, this.flightProgress + 1 / this.flightDuration);
+            const t = this.flightProgress;
+            const baseX = this.source_coords.x + (this.target_coords.x - this.source_coords.x) * t;
+            const baseY = this.source_coords.y + (this.target_coords.y - this.source_coords.y) * t;
+            const arcOffset = Math.sin(Math.PI * t) * this.arcHeight;
+            this.position.x = baseX;
+            this.position.y = baseY - arcOffset;
+
+            if (t >= 1) {
+                this.revComplete = true;
+                this.destroy();
+                return;
+            }
+        } else {
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
+        }
 
         // Check if offscreen
         if (
@@ -97,7 +146,12 @@ class Projectile extends Character {
         const baseAngle = (this.type === 'ARROW' || this.type === 'PLAYER') ? Math.PI : 0;
 
         // Angle to rotate the sprite so it faces travel direction
-        const drawAngle = travelAngle - baseAngle;
+        let drawAngle = travelAngle - baseAngle;
+
+        if (this.type === 'PUMPKIN') {
+            this.spinAngle = (this.spinAngle + 0.25) % (Math.PI * 2);
+            drawAngle = this.spinAngle;
+        }
 
         if (this.isAnimated && this.spriteSheet.complete) {
             const frameWidth = Math.floor(this.spriteSheet.width / this.frameCols);
@@ -108,10 +162,6 @@ class Projectile extends Character {
             // Use logical display dimensions for rotation to avoid clipping
             const dstW = Math.max(1, Math.floor(this.width));
             const dstH = Math.max(1, Math.floor(this.height));
-
-            // Resize canvas to destination size
-            this.canvas.width = dstW;
-            this.canvas.height = dstH;
 
             // Draw rotated frame centered
             ctx.save();
@@ -133,10 +183,6 @@ class Projectile extends Character {
             const srcH = this.spriteSheet.naturalHeight || this.spriteSheet.height;
             const dstW = Math.max(1, Math.floor(this.width));
             const dstH = Math.max(1, Math.floor(this.height));
-
-            // Resize canvas to destination size
-            this.canvas.width = dstW;
-            this.canvas.height = dstH;
 
             // Draw rotated image centered on canvas
             ctx.save();
@@ -169,42 +215,52 @@ class Projectile extends Character {
         const REAPER_HORIZONTAL_HIT_DISTANCE = 75;
         const REAPER_VERTICAL_HIT_DISTANCE = 100;
 
-        const ARROW_DAMAGE = 10;
-        const PLAYER_DAMAGE = 75;  // Control how much damage per hit the player does
-        const FIREBALL_DAMAGE = 15;
-        const DAMAGE_DEALT = this.type == "FIREBALL" ? FIREBALL_DAMAGE : this.type == "ARROW" ? ARROW_DAMAGE : PLAYER_DAMAGE;
-        if (this.type === 'PLAYER') {
-            const reapers = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Boss');
-            if (reapers.length === 0) return null;
-            let nearestBoss = reapers[0];
-            let minDist = Infinity;
+        const ARROW_DAMAGE = 20;
+        const PLAYER_DAMAGE = 120;  // Control how much damage per hit the player does
+        const FIREBALL_DAMAGE = 20;
+        const PUMPKIN_DAMAGE = 20;
+        const PUMPKIN_SPLASH_DAMAGE = 20;
+        const baseDamage = this.type == "FIREBALL" ? FIREBALL_DAMAGE : this.type == "ARROW" ? ARROW_DAMAGE : this.type == "PUMPKIN" ? PUMPKIN_DAMAGE : PLAYER_DAMAGE;
+        const damageMultiplier = this.owner && typeof this.owner.getDamageMultiplier === 'function'
+            ? this.owner.getDamageMultiplier()
+            : 1;
+        const DAMAGE_DEALT = Math.round(baseDamage * damageMultiplier);
+        const pumpkinSplashDamage = Math.round(PUMPKIN_SPLASH_DAMAGE * damageMultiplier);
 
-            // Find the closest boss
-            for (const reaper of reapers) {
-                const dx = reaper.position.x - this.position.x;
-                const dy = reaper.position.y - this.position.y;
+        const isPlayerProjectile = this.type === 'PLAYER' || this.type === 'PUMPKIN';
+
+        if (isPlayerProjectile) {
+            const enemies = this.gameEnv.gameObjects.filter(obj =>
+                obj.constructor.name === 'Boss' || obj.constructor.name === 'Zombie'
+            );
+            if (enemies.length === 0) return null;
+
+            const hitEnemy = enemies.find(enemy => {
+                const dx = (enemy.position.x + enemy.width / 2) - this.position.x;
+                const dy = (enemy.position.y + enemy.height / 2) - this.position.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearestBoss = reaper;
-                }
-            }
+                const threshold = enemy.constructor.name === 'Boss' ? 95 : 45;
+                return dist <= threshold;
+            });
 
-            // Do distance formula calculation and return
-            const xDiff = Math.abs(nearestBoss.position.x - this.position.x);
-            const yDiff = Math.abs((nearestBoss.position.y + 85) - this.position.y); // +50 accounts for the center of the boss being offset
-            // console.log(`Boss Y: ${nearestBoss.position.y}, Projectile Y: ${this.position.y}, YDiff: ${yDiff}`);
+            if (!hitEnemy) return null;
 
-            if (xDiff <= REAPER_HORIZONTAL_HIT_DISTANCE && yDiff <= REAPER_VERTICAL_HIT_DISTANCE) {
-                this.revComplete = true;
-                this.destroy();
-                nearestBoss.healthPoints -= DAMAGE_DEALT;
-                console.log("Reaper Health:", nearestBoss.healthPoints);
-                if (nearestBoss.data.health <= 0) {
-                    console.log("Game over -- the player has won!");
-                    // Show victory screen
-                    try { showEndScreen(this.gameEnv); } catch (e) { console.warn('Error showing victory screen:', e); }
-                }
+            this.revComplete = true;
+            this.destroy();
+
+            if (this.type === 'PUMPKIN') {
+                this.spawnPumpkinExplosion(this.position.x, this.position.y);
+                const splashRadius = 220;
+                enemies.forEach(enemy => {
+                    const dx = (enemy.position.x + enemy.width / 2) - this.position.x;
+                    const dy = (enemy.position.y + enemy.height / 2) - this.position.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist <= splashRadius) {
+                        this.applyDamageToEnemy(enemy, pumpkinSplashDamage);
+                    }
+                });
+            } else {
+                this.applyDamageToEnemy(hitEnemy, DAMAGE_DEALT);
             }
 
         } else {
@@ -233,8 +289,12 @@ class Projectile extends Character {
             if (distanceFromPlayer <= PLAYER_HIT_DISTANCE) {
                 this.revComplete = true;
                 this.destroy();
-                if (!nearest.data) nearest.data = { health: 100 }; // Initialize health if not exists
+                if (nearest && typeof nearest.isShieldActive === 'function' && nearest.isShieldActive()) {
+                    return;
+                }
+                if (!nearest.data) nearest.data = { health: 100, maxHealth: 100 }; // Initialize health if not exists
                 nearest.data.health -= DAMAGE_DEALT;
+                spawnPlayerDamageEffect(this.gameEnv, nearest);
                 console.log("Player Health:", nearest.data.health);
                 if (nearest.data.health <= 0) {
                     console.log("Game over -- the player has been defeated!");
@@ -246,7 +306,8 @@ class Projectile extends Character {
             // Update the player health bar to accurately show the new health (if available)
             try {
                 if (nearest && nearest.data && typeof updatePlayerHealthBar === 'function') {
-                    const pct = Math.max(0, Math.min(100, nearest.data.health || 0));
+                    const maxHealth = nearest.data.maxHealth || 100;
+                    const pct = Math.max(0, Math.min(100, (nearest.data.health / maxHealth) * 100));
                     updatePlayerHealthBar(pct);
                 }
             } catch (e) {
@@ -255,15 +316,62 @@ class Projectile extends Character {
         }
     }
 
+    applyDamageToEnemy(enemy, amount) {
+        if (enemy.constructor.name === 'Boss') {
+            enemy.healthPoints -= amount;
+            console.log("Reaper Health:", enemy.healthPoints);
+            return;
+        }
+
+        if (enemy.constructor.name === 'Zombie') {
+            if (typeof enemy.takeDamage === 'function') {
+                enemy.takeDamage(amount);
+            } else if (typeof enemy.healthPoints === 'number') {
+                enemy.healthPoints -= amount;
+                if (enemy.healthPoints <= 0 && enemy.destroy) enemy.destroy();
+            }
+        }
+    }
+
+    spawnPumpkinExplosion(x, y) {
+        if (!this.gameEnv || !this.gameEnv.container) return;
+
+        const burst = document.createElement('div');
+        Object.assign(burst.style, {
+            position: 'absolute',
+            left: `${x}px`,
+            top: `${y}px`,
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            background: 'rgba(255, 140, 0, 0.9)',
+            boxShadow: '0 0 30px 15px rgba(255, 140, 0, 0.7), 0 0 60px 25px rgba(255, 80, 0, 0.5)',
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+            zIndex: '200'
+        });
+
+        this.gameEnv.container.appendChild(burst);
+        burst.animate(
+            [
+                { transform: 'translate(-50%, -50%) scale(0.7)', opacity: 1 },
+                { transform: 'translate(-50%, -50%) scale(2.2)', opacity: 0 }
+            ],
+            { duration: 420, easing: 'ease-out', fill: 'forwards' }
+        );
+
+        setTimeout(() => burst.remove(), 460);
+    }
+
     // Function to execute death
     die() {
         // Find all player objects
-        const players = this.gameEnv.gameObjects.filter(obj => 
+        const players = this.gameEnv.gameObjects.filter(obj =>
             obj.constructor.name === 'Player'
         );
-        
+
         if (players.length === 0) return;
-        
+
         // Find nearest player
         let nearest = players[0];
         let minDist = Infinity;
@@ -271,7 +379,7 @@ class Projectile extends Character {
         for (const player of players) {
             const dx = player.position.x - this.position.x;
             const dy = player.position.y - this.position.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
+            const dist = Math.sqrt(dx * dx + dy * dy);
             if (dist < minDist) {
                 minDist = dist;
                 nearest = player;

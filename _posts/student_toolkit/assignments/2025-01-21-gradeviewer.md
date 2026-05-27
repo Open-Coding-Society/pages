@@ -17,9 +17,11 @@ comments: false
             <tr>
               <th class="px-4 py-2 text-left font-bold text-base">Assignment</th>
               <th class="px-4 py-2 text-left font-bold text-base">Grade</th>
+              <th class="px-4 py-2 text-left font-bold text-base">Feedback</th>
+              <th class="px-4 py-2 text-left font-bold text-base">Status</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-neutral-700">
+          <tbody id="gradesTableBody" class="divide-y divide-neutral-700">
             <!-- Grade rows will be dynamically added here -->
           </tbody>
         </table>
@@ -28,73 +30,103 @@ comments: false
   </div>
 </div>
 
+<style>
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .status-graded  { background: rgb(30,64,175);  color: rgb(219,234,254); }
+  .status-late    { background: rgb(153,27,27);  color: rgb(254,226,226); }
+  .status-pending { background: rgb(120,53,15);  color: rgb(254,243,199); }
+</style>
+
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
 
-    function populateTable(rows) {
-        const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
-        tableBody.innerHTML = "";
+    const tableBody = document.getElementById('gradesTableBody');
 
-        rows.forEach(([grade, assignmentName]) => {
-            let row = tableBody.insertRow();
-            let cell1 = row.insertCell(0);
-            cell1.className = "border border-white px-4 py-2";
-            cell1.textContent = assignmentName;
-            let cell2 = row.insertCell(1);
-            cell2.className = "border border-white px-4 py-2";
-            cell2.textContent = grade;
-        });
+    function statusBadge(submission) {
+        if (submission.grade != null) return '<span class="status-badge status-graded">Graded</span>';
+        if (submission.isLate)        return '<span class="status-badge status-late">Late</span>';
+        return '<span class="status-badge status-pending">Pending Review</span>';
+    }
 
-        if (rows.length > 0) {
-            const total = rows.reduce((sum, [g]) => sum + parseFloat(g), 0);
-            const average = (total / rows.length).toFixed(2);
-            let avgRow = tableBody.insertRow();
-            avgRow.classList.add("border", "border-white");
-            let c1 = avgRow.insertCell(0);
-            c1.className = "border border-white px-4 py-2 font-bold";
-            c1.textContent = "Average";
-            let c2 = avgRow.insertCell(1);
-            c2.className = "border border-white px-4 py-2 font-bold";
-            c2.textContent = average;
-        }
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
     }
 
     async function loadGrades() {
         try {
-            // Get current user's ID
-            const personResp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
-            if (!personResp.ok) throw new Error(`Could not get user: ${personResp.status}`);
+            // Step 1: get username from user-info endpoint
+            const userInfoResp = await fetch(`${javaURI}/api/assignment-submission-view/user-info`, fetchOptions);
+            if (!userInfoResp.ok) throw new Error(`Could not get user info: ${userInfoResp.status}`);
+            const { username } = await userInfoResp.json();
+
+            if (!username) throw new Error('Not logged in');
+
+            // Step 2: resolve userId from username
+            const personResp = await fetch(`${javaURI}/api/person/uid/${encodeURIComponent(username)}`, fetchOptions);
+            if (!personResp.ok) throw new Error(`Could not resolve user: ${personResp.status}`);
             const person = await personResp.json();
             const userId = person.id;
 
-            // Fetch grade map for this user: { assignmentId: grade }
-            const gradeResp = await fetch(`${javaURI}/api/synergy/grades/map/${userId}`, fetchOptions);
-            if (!gradeResp.ok) throw new Error(`Could not get grades: ${gradeResp.status}`);
-            const gradeMap = await gradeResp.json(); // { "42": 0.95, "7": 0.88, ... }
+            // Step 3: fetch all submissions (backend filters to current user when not admin)
+            const listResp = await fetch(`${javaURI}/api/assignment-submission-view/list`, fetchOptions);
+            if (!listResp.ok) throw new Error(`Could not get submissions: ${listResp.status}`);
+            const submissions = await listResp.json();
 
-            const assignmentIds = Object.keys(gradeMap);
-            if (assignmentIds.length === 0) {
-                const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
-                tableBody.innerHTML = '<tr><td colspan="2" class="px-4 py-4 text-center text-gray-400">No grades yet.</td></tr>';
+            // Step 4: keep only this user's submissions
+            const mine = (Array.isArray(submissions) ? submissions : [])
+                .filter(s => s.submitterId === userId);
+
+            if (mine.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-gray-400">No submissions yet.</td></tr>';
                 return;
             }
 
-            // Resolve assignment names in parallel
-            const rows = await Promise.all(assignmentIds.map(async (aId) => {
-                try {
-                    const aResp = await fetch(`${javaURI}/api/assignments/${aId}`, fetchOptions);
-                    const name = aResp.ok ? await aResp.text() : `Assignment ${aId}`;
-                    return [gradeMap[aId], name.replace(/^"|"$/g, '')];
-                } catch {
-                    return [gradeMap[aId], `Assignment ${aId}`];
-                }
-            }));
+            // Step 5: render rows
+            tableBody.innerHTML = '';
+            mine.forEach(submission => {
+                const gradeDisplay = submission.grade != null
+                    ? `<span style="font-weight:600;color:rgb(134,239,172);">${submission.grade}/100</span>`
+                    : '<em style="color:#6b7280">—</em>';
+                const feedbackDisplay = submission.feedback
+                    ? escapeHtml(submission.feedback)
+                    : '<em style="color:#6b7280">No feedback yet</em>';
 
-            populateTable(rows);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="border border-neutral-600 px-4 py-2"><strong>${escapeHtml(submission.assignmentName || 'Unknown')}</strong></td>
+                    <td class="border border-neutral-600 px-4 py-2">${gradeDisplay}</td>
+                    <td class="border border-neutral-600 px-4 py-2">${feedbackDisplay}</td>
+                    <td class="border border-neutral-600 px-4 py-2">${statusBadge(submission)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Step 6: average row over graded submissions only
+            const graded = mine.filter(s => s.grade != null);
+            if (graded.length > 0) {
+                const avg = (graded.reduce((sum, s) => sum + s.grade, 0) / graded.length).toFixed(2);
+                const avgRow = document.createElement('tr');
+                avgRow.innerHTML = `
+                    <td class="border border-neutral-600 px-4 py-2 font-bold">Average (${graded.length} graded)</td>
+                    <td class="border border-neutral-600 px-4 py-2 font-bold" style="color:rgb(134,239,172);">${avg}/100</td>
+                    <td class="border border-neutral-600 px-4 py-2" colspan="2"></td>
+                `;
+                tableBody.appendChild(avgRow);
+            }
+
         } catch (error) {
             console.error('Error loading grades:', error);
-            const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
-            tableBody.innerHTML = '<tr><td colspan="2" class="px-4 py-4 text-center text-red-400">Failed to load grades. Please log in and try again.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="4" class="px-4 py-4 text-center text-red-400">Failed to load grades. Please log in and try again.</td></tr>';
         }
     }
 
