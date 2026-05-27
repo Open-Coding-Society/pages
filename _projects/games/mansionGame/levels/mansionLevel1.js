@@ -1,84 +1,43 @@
 import GameEnvBackground from "@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js";
 import Player from "@assets/js/GameEnginev1.1/essentials/Player.js";
-import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Npc from "@assets/js/GameEnginev1.1/essentials/Npc.js";
 import DialogueSystem from "@assets/js/GameEnginev1.1/essentials/DialogueSystem.js";
-import MansionLevel1_Pantry from "./mansionLevel1_Pantry.js";
 
 
-class MansionLevel1 {
-  constructor(gameEnv) {
-    let width = gameEnv.innerWidth;
-    let height = gameEnv.innerHeight;
-    let path = gameEnv.path;
+class mansionLevel1 {
+    constructor(gameEnv) {
+        const width = gameEnv.innerWidth;
+        const height = gameEnv.innerHeight;
+        const path = gameEnv.path;
 
-    // Level music: play shadow theme when entering this level
-    // Will be stopped when transitioning to the pantry below
-    // Ensure a single, persistent level music instance on the game controller
-  if (gameEnv && gameEnv.gameControl) {
-    const gc = gameEnv.gameControl;
-    if (!gc.levelMusic) {
-      gc.levelMusic = new Audio(path + "/assets/sounds/mansionGame/shadow_music_level1.mp3");
-      gc.levelMusic.loop = false;
-      gc.levelMusic.volume = 0.2;
-      // Play and ignore promise rejection (browser may block autoplay until user gesture)
-      gc.levelMusic.play().catch(err => console.warn('Level music play blocked or failed:', err));
-    } else {
-      // if previously created, ensure volume/loop are set
-      gc.levelMusic.loop = false;
-      gc.levelMusic.volume = gc.levelMusic.volume || 0.3;
-      if (gc.levelMusic.paused) {
-        gc.levelMusic.play().catch(err => console.warn('Resuming music failed:', err));
-      }
-    }
-  }
 
-    // Background data
-    const image_background = path + "/images/projects/mansionGame/kitchen_lvl1.png"; // be sure to include the path
-    const image_data_background = {
-        name: 'background',
-        greeting: "This is the kitchen, you will search for ingredients and create a potion.",
-        src: image_background,
-        pixels: {height: 580, width: 1038},
-        mode: 'contain',
-    };
+        this.gameEnv = gameEnv;
+        this.levelState = {
+            collectedArtifacts: new Set(),
+            artifactIds: ["sun_idol", "ancient_scroll", "desert_gem"],
+            rewardClaimed: false
+        };
 
-    //////////new code start
-    // Update your objective_sprite_data to be more compatible with a Sprite/Npc class:
-    const objective_sprite_data = {
-        id: 'ObjectiveIcon',
-        greeting: "Objective Icon: Find ingredients!",
-        src: path + "/images/projects/mansionGame/objective.png",
-        
-        // Npc/Sprite required properties
-        SCALE_FACTOR: 2, 
-        STEP_FACTOR: 0, 
-        ANIMATION_RATE: 0, 
-    
-        // Positioning
-        INIT_POSITION: { x: 300, y: 50 }, 
-    
-        // Image info
-        pixels: {height: 606, width: 671}, 
-        orientation: {rows: 1, columns: 1}, 
-        down: {row: 0, start: 0, columns: 1}, // Required for Npc/Sprite animation initialization
-        hitbox: {widthPercentage: 1.0, heightPercentage: 1.0}, // Basic hitbox
 
-        // keypress (optional, but good to set if the Npc class expects it)
-        keypress: {} 
-    };
+        const backgroundData = {
+            name: "mummy_tomb",
+            greeting: "Search the tomb for offerings to trade with the mummy.",
+            src: path + "/images/projects/mansionGame/mummy1.png",
+            pixels: { height: 580, width: 1038 },
+            mode: "contain"
+        };
 
-    ////////// new code end
-    
-    const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png"; // be sure to include the path
+       
+        const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
         const MC_SCALE_FACTOR = 6;
-        const sprite_data_mc = {
+        const sprite_data_player = {
             id: 'Spook',
             greeting: "Hi, I am Spook.",
             src: sprite_src_mc,
             SCALE_FACTOR: MC_SCALE_FACTOR,
             STEP_FACTOR: 800,
             ANIMATION_RATE: 10,
-            INIT_POSITION: { x: (width / 2 - width / (5 * MC_SCALE_FACTOR)), y: height - (height / MC_SCALE_FACTOR)}, 
+            INIT_POSITION: { x: 50, y: height - (height / MC_SCALE_FACTOR)},
             pixels: {height: 2400, width: 3600},
             orientation: {rows: 2, columns: 3},
             down: {row: 1, start: 0, columns: 3},
@@ -89,119 +48,396 @@ class MansionLevel1 {
             up: {row: 1, start: 0, columns: 3},
             upLeft: {row: 0, start: 0, columns: 3, rotate: Math.PI/16},
             upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
-            hitbox: {widthPercentage: 0.45, heightPercentage: 0.2},
-            keypress: {up: 87, left: 65, down: 83, right: 68} // W, A, S, D
+            hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
+            keypress: { 
+                up: 87,    // W key
+                left: 65,  // A key
+                down: 83,  // S key
+                right: 68  // D key
+            }
         };
 
-      // Pantry door (collision object) placed on the left side of the screen.
-      // Position: 1/4 from left, slightly below the middle vertically
-      const sprite_src_pantrydoor = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png"; // replace with your door sprite if needed
-      const sprite_greet_pantrydoor = "Would you like to enter the pantry? Press E";
-      const sprite_data_pantrydoor = {
-        id: 'PantryDoor',
-        greeting: sprite_greet_pantrydoor,
-        src: sprite_src_pantrydoor,
-        SCALE_FACTOR: 6,
-        ANIMATION_RATE: 100,
-        pixels: {width: 256, height: 256},
-  // Move the door slightly higher (approx. half an inch ~48px)
-        INIT_POSITION: { x: (width * 1 / 4), y: (height / 2 + height * 0.1 - 48) },
-        orientation: {rows: 1, columns: 1},
-        down: {row: 0, start: 0, columns: 1},
-        hitbox: {widthPercentage: 0.2, heightPercentage: 0.3},
-        dialogues: [
-          "The pantry awaits. Do you wish to enter?"
-        ],
-        reaction: function() {
-          // no immediate reaction; interaction handled in interact()
-        },
-        interact: function() {
-          // show a simple dialogue asking the player to enter the pantry
-          if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-            this.dialogueSystem.closeDialogue();
-          }
-
-          if (!this.dialogueSystem) {
-            this.dialogueSystem = new DialogueSystem();
-          }
-
-          this.dialogueSystem.showDialogue(
-            "Would you like to enter the pantry?",
-            "Pantry",
-            this.spriteData.src
-          );
-
-          this.dialogueSystem.addButtons([
-            {
-              text: "Enter",
-              primary: true,
-              action: () => {
-                this.dialogueSystem.closeDialogue();
-
-                // transition to new level — replace THIS_FILE_HERE with your level class
-                if (gameEnv && gameEnv.gameControl) {
-                  const gameControl = gameEnv.gameControl;
-
-                  // Store original classes so you can return later if desired
-                  gameControl._originalLevelClasses = gameControl.levelClasses;
-
-                  // TODO: Replace THIS_FILE_HERE with your pantry level import at top:
-                  // import THIS_FILE_HERE from './path/to/yourPantryLevel.js'
-                  // For now we set a placeholder so the developer will replace it.
-                  gameControl.levelClasses = [MansionLevel1_Pantry];
-                  gameControl.currentLevelIndex = 0;
-                  gameControl.isPaused = false;
-                  gameControl.transitionToLevel();
-                }
-              }
-            },
-            {
-              text: "Not Now",
-              action: () => {
-                this.dialogueSystem.closeDialogue();
-              }
+        const createArtifactData = ({ id, label, src, x, y, scaleFactor = 12, pixels }) => ({
+            id,
+            greeting: `Press E to collect the ${label}.`,
+            src,
+            SCALE_FACTOR: scaleFactor,
+            STEP_FACTOR: 0,
+            ANIMATION_RATE: 0,
+            INIT_POSITION: { x, y },
+            pixels,
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.55, heightPercentage: 0.55 },
+            keypress: {},
+            itemLabel: label,
+            interact: function() {
+                this.parentLevel?.collectArtifact(this.spriteData.id, this.spriteData.itemLabel);
             }
-          ]);
+        });
+
+
+        const mummyData = {
+            id: "Temple Mummy",
+            greeting: "Bring me the offerings and I will reveal the tomb key.",
+            src: path + "/images/projects/mansionGame/mummy_boy.png",
+            SCALE_FACTOR: 5,
+            STEP_FACTOR: 0,
+            ANIMATION_RATE: 0,
+            INIT_POSITION: { x: width * 0.73, y: height * 0.42 },
+            pixels: { height: 255, width: 198 },
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            up: { row: 0, start: 0, columns: 1 },
+            left: { row: 0, start: 0, columns: 1 },
+            right: { row: 0, start: 0, columns: 1 },
+            downLeft: { row: 0, start: 0, columns: 1 },
+            downRight: { row: 0, start: 0, columns: 1 },
+            upLeft: { row: 0, start: 0, columns: 1 },
+            upRight: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.4, heightPercentage: 0.75 },
+            keypress: {},
+            interact: function() {
+                this.parentLevel?.talkToMummy(this);
+            }
+        };
+
+
+        const artifactSprites = [
+            createArtifactData({
+                id: "sun_idol",
+                label: "Sun Idol",
+                src: path + "/images/projects/mansionGame/Watch.png",
+                x: width * 0.2,
+                y: height * 0.35,
+                scaleFactor: 13,
+                pixels: { height: 279, width: 291 }
+            }),
+            createArtifactData({
+                id: "ancient_scroll",
+                label: "Ancient Scroll",
+                src: path + "/images/projects/mansionGame/Paper.png",
+                x: width * 0.48,
+                y: height * 0.27,
+                scaleFactor: 14,
+                pixels: { height: 102, width: 128 }
+            }),
+            createArtifactData({
+                id: "desert_gem",
+                label: "Desert Gem",
+                src: path + "/images/projects/mansionGame/Gem.png",
+                x: width * 0.62,
+                y: height * 0.72,
+                scaleFactor: 12,
+                pixels: { height: 236, width: 370 }
+            })
+        ];
+
+
+        this.classes = [
+            { class: GameEnvBackground, data: backgroundData },
+            { class: Player, data: playerData },
+            ...artifactSprites.map((data) => ({ class: Npc, data })),
+            { class: Npc, data: mummyData }
+        ];
+    }
+
+
+    initialize() {
+        this.createUserInterface();
+
+
+        const gameObjects = this.gameEnv.gameObjects || [];
+        this.artifactObjects = gameObjects.filter((object) =>
+            this.levelState.artifactIds.includes(object?.spriteData?.id)
+        );
+
+
+        this.artifactObjects.forEach((artifact) => {
+            artifact.parentLevel = this;
+        });
+
+
+        this.mummyNpc = gameObjects.find((object) => object?.spriteData?.id === "Temple Mummy");
+        if (this.mummyNpc) {
+            this.mummyNpc.parentLevel = this;
         }
-      };
 
-    // List of objects definitions for this level
-    this.classes = [
-      { class: GameEnvBackground, data: image_data_background },
-      { class: Npc, data: objective_sprite_data },
-      { class: Player, data: sprite_data_mc },
-      { class: Npc, data: sprite_data_pantrydoor }
-    ];
 
-    // Show a simple kitchen intro using the game's DialogueSystem 5s after the MC spawns.
-    // This polls for the player object (id 'Spook') then waits 5s and shows the dialog.
-    (function showKitchenIntro() {
-      const findSpook = () => (gameEnv && gameEnv.gameObjects) ? gameEnv.gameObjects.find(o => o && o.spriteData && o.spriteData.id === 'Spook') : null;
+        this.showIntroDialogue();
+    }
 
-      const startWhenReady = () => {
-        const player = findSpook();
-        if (player) {
-          setTimeout(() => {
+
+    createUserInterface() {
+        this.removeUserInterface();
+
+
+        this.uiContainer = document.createElement("div");
+        this.uiContainer.id = "mummy-level-ui";
+        Object.assign(this.uiContainer.style, {
+            position: "fixed",
+            top: "20px",
+            right: "20px",
+            zIndex: "1000",
+            background: "rgba(23, 16, 8, 0.88)",
+            border: "2px solid #d2b36c",
+            borderRadius: "12px",
+            padding: "14px 18px",
+            color: "#f6e9c8",
+            fontFamily: "Georgia, serif",
+            minWidth: "220px",
+            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.35)"
+        });
+
+
+        this.titleDisplay = document.createElement("div");
+        this.titleDisplay.textContent = "Tomb Offerings";
+        Object.assign(this.titleDisplay.style, {
+            fontSize: "18px",
+            fontWeight: "bold",
+            marginBottom: "10px"
+        });
+
+
+        this.itemsDisplay = document.createElement("div");
+        this.statusDisplay = document.createElement("div");
+        Object.assign(this.statusDisplay.style, {
+            marginTop: "10px",
+            fontSize: "14px",
+            color: "#f3d98b"
+        });
+
+
+        this.uiContainer.appendChild(this.titleDisplay);
+        this.uiContainer.appendChild(this.itemsDisplay);
+        this.uiContainer.appendChild(this.statusDisplay);
+        document.body.appendChild(this.uiContainer);
+
+
+        this.refreshUserInterface("Collect the offerings, then press E near the mummy.");
+    }
+
+
+    refreshUserInterface(statusText = null) {
+        if (this.itemsDisplay) {
+            const labels = {
+                sun_idol: "Sun Idol",
+                ancient_scroll: "Ancient Scroll",
+                desert_gem: "Desert Gem"
+            };
+
+
+            this.itemsDisplay.innerHTML = this.levelState.artifactIds
+                .map((artifactId) => {
+                    const collected = this.levelState.collectedArtifacts.has(artifactId);
+                    return `<div style="margin: 6px 0; color: ${collected ? "#9be38d" : "#f6e9c8"};">${collected ? "☑" : "☐"} ${labels[artifactId]}</div>`;
+                })
+                .join("");
+        }
+
+
+        if (statusText && this.statusDisplay) {
+            this.statusDisplay.textContent = statusText;
+        }
+    }
+
+
+    showIntroDialogue() {
+        const introDialogue = new DialogueSystem({
+            id: `mummy_intro_${Date.now()}`
+        });
+
+
+        introDialogue.showDialogue(
+            "Search the tomb for three offerings. Bring them to the mummy to earn the key.",
+            "Explorer",
+            this.gameEnv.path + "/images/projects/mansionGame/mummy_boy.png"
+        );
+
+
+        introDialogue.addButtons([
+            {
+                text: "Start",
+                primary: true,
+                action: () => introDialogue.closeDialogue()
+            }
+        ]);
+    }
+
+
+    collectArtifact(artifactId, artifactLabel) {
+        if (this.levelState.collectedArtifacts.has(artifactId)) {
+            this.refreshUserInterface(`${artifactLabel} is already in your bag.`);
+            return;
+        }
+
+
+        const artifactObject = this.gameEnv.gameObjects.find((object) => object?.spriteData?.id === artifactId);
+        if (artifactObject) {
             try {
-              const ds = new DialogueSystem({ id: 'kitchen_intro_' + Date.now() });
-              ds.showDialogue('Go to the pantry and collect the required ingredients to beat this level!', 'Spook', sprite_data_mc.src);
-              ds.addButtons([{ text: 'Got it', primary: true, action: () => ds.closeDialogue() }]);
-            } catch (e) { console.warn('kitchen intro dialog failed', e); }
-          }, 1000);
-        } else {
-          // poll until player exists
-          const poll = setInterval(() => {
-            if (findSpook()) {
-              clearInterval(poll);
-              startWhenReady();
+                artifactObject.destroy();
+            } catch (error) {
+                console.warn(`Failed to remove ${artifactId}`, error);
             }
-          }, 200);
         }
-      };
 
-      startWhenReady();
-    })();
-  }
+
+        this.levelState.collectedArtifacts.add(artifactId);
+        this.refreshUserInterface(`Collected ${artifactLabel}.`);
+
+
+        const collectDialogue = new DialogueSystem({
+            id: `mummy_collect_${artifactId}_${Date.now()}`
+        });
+
+
+        collectDialogue.showDialogue(
+            `You collected the ${artifactLabel}.`,
+            "Artifact",
+            this.gameEnv.path + "/images/projects/mansionGame/mummy_boy.png"
+        );
+
+
+        collectDialogue.addButtons([
+            {
+                text: "Close",
+                primary: true,
+                action: () => collectDialogue.closeDialogue()
+            }
+        ]);
+    }
+
+
+    talkToMummy(mummyNpc) {
+        const remainingArtifacts = this.levelState.artifactIds.length - this.levelState.collectedArtifacts.size;
+
+
+        if (this.levelState.rewardClaimed) {
+            mummyNpc.dialogueSystem?.showDialogue(
+                "The tomb key is already yours. Use this level as a template for the next puzzle.",
+                "Temple Mummy",
+                mummyNpc.spriteData.src
+            );
+            return;
+        }
+
+
+        if (remainingArtifacts > 0) {
+            mummyNpc.dialogueSystem?.showDialogue(
+                `You still owe me ${remainingArtifacts} offering${remainingArtifacts === 1 ? "" : "s"}.`,
+                "Temple Mummy",
+                mummyNpc.spriteData.src
+            );
+            this.refreshUserInterface("The mummy wants every offering before trading the key.");
+            return;
+        }
+
+
+        this.levelState.rewardClaimed = true;
+        this.refreshUserInterface("All offerings delivered. The mummy reveals the key.");
+
+
+        mummyNpc.dialogueSystem?.showDialogue(
+            "You have honored the tomb. Take this key and continue deeper into the ruins.",
+            "Temple Mummy",
+            mummyNpc.spriteData.src
+        );
+
+
+        this.showKeyReward();
+    }
+
+
+    showKeyReward() {
+        if (this.keyPopup?.parentNode) {
+            this.keyPopup.parentNode.removeChild(this.keyPopup);
+        }
+
+
+        this.keyPopup = document.createElement("div");
+        Object.assign(this.keyPopup.style, {
+            position: "fixed",
+            inset: "0",
+            zIndex: "2000",
+            background: "rgba(0, 0, 0, 0.78)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "#f5e9b5",
+            fontFamily: "Georgia, serif"
+        });
+
+
+        const keyImage = document.createElement("div");
+        keyImage.textContent = "🗝️";
+        Object.assign(keyImage.style, {
+            fontSize: "96px",
+            marginBottom: "18px",
+            textShadow: "0 0 20px gold",
+            transform: "translateY(-4px)"
+        });
+
+
+        const rewardText = document.createElement("div");
+        rewardText.textContent = "You earned the Tomb Key";
+        Object.assign(rewardText.style, {
+            fontSize: "30px",
+            fontWeight: "bold",
+            marginBottom: "10px"
+        });
+
+
+        const rewardSubtext = document.createElement("div");
+        rewardSubtext.textContent = "This level is ready to branch into the next mummy puzzle.";
+        Object.assign(rewardSubtext.style, {
+            fontSize: "16px",
+            textAlign: "center",
+            padding: "0 20px"
+        });
+
+
+        this.keyPopup.appendChild(keyImage);
+        this.keyPopup.appendChild(rewardText);
+        this.keyPopup.appendChild(rewardSubtext);
+        document.body.appendChild(this.keyPopup);
+
+
+        this.keyPopupTimer = window.setTimeout(() => {
+            if (this.keyPopup?.parentNode) {
+                this.keyPopup.parentNode.removeChild(this.keyPopup);
+            }
+            this.keyPopup = null;
+        }, 3000);
+    }
+
+
+    removeUserInterface() {
+        if (this.uiContainer?.parentNode) {
+            this.uiContainer.parentNode.removeChild(this.uiContainer);
+        }
+        this.uiContainer = null;
+    }
+
+
+    destroy() {
+        if (this.keyPopupTimer) {
+            window.clearTimeout(this.keyPopupTimer);
+            this.keyPopupTimer = null;
+        }
+
+
+        if (this.keyPopup?.parentNode) {
+            this.keyPopup.parentNode.removeChild(this.keyPopup);
+        }
+        this.keyPopup = null;
+
+
+        this.removeUserInterface();
+    }
 }
 
-export default MansionLevel1;
+
+export default mansionLevel1;
+
+
