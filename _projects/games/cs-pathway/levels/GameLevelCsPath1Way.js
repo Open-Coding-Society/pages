@@ -13,6 +13,8 @@ import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import AboutMeBuilder from './AboutMeBuilder.js';
 import MissionTools from './GameLevelCsPath2Mission.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
+import SprintSuccessModule from './SprintSuccessModule.js';
+import PersonaTrial from './personaTrial.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -474,7 +476,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     if (this._personaTrialOpen) return;
     this._personaTrialOpen = true;
 
-    const trial = new PersonaHallTrial({
+    const trial = new PersonaTrial({
       profileData: this.profileData || {},
       onComplete: async (result) => {
         try {

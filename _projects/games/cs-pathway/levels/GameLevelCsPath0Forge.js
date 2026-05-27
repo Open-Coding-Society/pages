@@ -427,6 +427,8 @@ class GameLevelCsPath0Forge {
       if (this._personaHallOpen) return;
       this._personaHallOpen = true;
 
+      let trialRef = null; // keep ref so onTeleport can destroy the overlay
+
       try {
         if (showIntro) {
           await this.showDialogue('Persona Hall Guide', [
@@ -449,12 +451,23 @@ class GameLevelCsPath0Forge {
           },
 
           onTeleport: () => {
+            // 1. Destroy the Persona Hall modal overlay immediately
+            trialRef?.destroy();
+            trialRef = null;
+            this._personaHallOpen = false;
+
             const gc = this.gameEnv?.gameControl;
             if (!gc) {
               console.error('[Teleport] gameControl not found');
               return;
             }
 
+            // 2. CRITICAL: Run cleanup/destroy on this level instance before moving on
+            if (typeof this.destroy === 'function') {
+              this.destroy();
+            }
+
+            // 3. Resolve target level indices safely
             const wayfindingIndex = gc.levelClasses?.findIndex(
               (lc) => lc.levelId === 'wayfinding-world'
             );
@@ -462,10 +475,12 @@ class GameLevelCsPath0Forge {
             if (wayfindingIndex !== -1 && wayfindingIndex !== undefined) {
               gc.currentLevelIndex = wayfindingIndex;
             } else {
+              // If it doesn't exist, inject it right after the current active level
               gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1Way);
               gc.currentLevelIndex++;
             }
 
+            // 4. Smoothly switch rendering environments
             gc.transitionToLevel();
           },
 
@@ -474,6 +489,7 @@ class GameLevelCsPath0Forge {
           },
         });
 
+        trialRef = trial; // wire up the ref now that the object exists
         trial.start();
 
       } catch (err) {
@@ -1750,6 +1766,40 @@ class GameLevelCsPath0Forge {
     this._activeZoneGatekeeperId = null;
   }
 
+  destroy() {
+    console.log(`[${this.logPrefix}] Executing full level teardown...`);
+
+    // 1. Remove the custom profile status panel from the DOM
+    if (this.profilePanelView) {
+      if (typeof this.profilePanelView.destroy === 'function') {
+        this.profilePanelView.destroy();
+      } else if (this.profilePanelView.element) {
+        this.profilePanelView.element.remove();
+      }
+    }
+
+    // 2. Close and teardown the shared Dialogue System
+    if (this.levelDialogueSystem) {
+      if (typeof this.levelDialogueSystem.destroy === 'function') {
+        this.levelDialogueSystem.destroy();
+      } else {
+        this.levelDialogueSystem.closeDialogue?.();
+      }
+    }
+
+    // 3. Clear any active global presentation layers
+    this.clearZoneAlert?.();
+    this.clearPanel?.();
+    this.clearScore?.();
+
+    // 4. Force reset state safety flags
+    this._personaHallOpen = false;
+    this._courseEnlistmentOpen = false;
+    identityState.identityFlowActive = false;
+    identityState.avatarFlowActive = false;
+    identityState.worldThemeFlowActive = false;
+  }
+  
   /**
    * Rebind reactions. Copy spriteData.reaction onto gatekeeper if the engine dropped the binding.
    * @private
@@ -1932,6 +1982,7 @@ class GameLevelCsPath0Forge {
    */
   destroy() {
     this.clearZoneAlert();
+    this.levelDialogueSystem?.closeDialogue?.(); // close any open dialogue before leaving
     this.present?.destroy();
     if (this.profilePanelView) {
       this.profilePanelView.destroy();
