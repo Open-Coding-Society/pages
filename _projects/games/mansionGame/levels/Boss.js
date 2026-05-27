@@ -372,7 +372,36 @@ class Boss extends Enemy {
             gameEnv.gameObjects.forEach(obj => {
                 if (!obj) return;
                 const name = obj.constructor?.name;
-                if (name === 'Projectile' || name === 'Boomerang' || name === 'PlayerScythe' || name === 'PowerUp') {
+                if (name === 'FightingPlayer') {
+                    if (Array.isArray(obj.projectiles)) {
+                        obj.projectiles.forEach(projectile => {
+                            if (projectile && typeof projectile.destroy === 'function') projectile.destroy();
+                        });
+                        obj.projectiles = [];
+                    }
+                    if (Array.isArray(obj.orbitingScythes)) {
+                        obj.orbitingScythes.forEach(scythe => {
+                            if (scythe && typeof scythe.destroy === 'function') scythe.destroy();
+                        });
+                        obj.orbitingScythes = [];
+                    }
+                }
+
+                const spriteId = obj?.spriteData?.id?.toLowerCase?.() || '';
+                const spriteSrc = obj?.spriteData?.src?.toLowerCase?.() || '';
+                const isZombieLike = name === 'Zombie'
+                    || name === 'Npc'
+                    && spriteId.includes('zombie')
+                    || spriteSrc.includes('zombienpc');
+
+                if (
+                    name === 'Projectile' ||
+                    name === 'Boomerang' ||
+                    name === 'PlayerScythe' ||
+                    name === 'PowerUp' ||
+                    name === 'PowerUpSpawner' ||
+                    isZombieLike
+                ) {
                     if (typeof obj.destroy === 'function') {
                         obj.destroy();
                     }
@@ -381,8 +410,35 @@ class Boss extends Enemy {
 
             gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
                 const name = obj?.constructor?.name;
-                return name !== 'Projectile' && name !== 'Boomerang' && name !== 'PlayerScythe' && name !== 'PowerUp';
+                const spriteId = obj?.spriteData?.id?.toLowerCase?.() || '';
+                const spriteSrc = obj?.spriteData?.src?.toLowerCase?.() || '';
+                const isZombieLike = name === 'Zombie'
+                    || name === 'Npc'
+                    && spriteId.includes('zombie')
+                    || spriteSrc.includes('zombienpc');
+                return name !== 'Projectile'
+                    && name !== 'Boomerang'
+                    && name !== 'PlayerScythe'
+                    && name !== 'PowerUp'
+                    && name !== 'PowerUpSpawner'
+                    && !isZombieLike;
             });
+
+            // Hard-stop any remaining renderables during the victory transition.
+            const remaining = [...gameEnv.gameObjects];
+            remaining.forEach(obj => {
+                if (obj && typeof obj.destroy === 'function') {
+                    obj.destroy();
+                }
+            });
+            gameEnv.gameObjects = [];
+        }
+
+        if (this.leftArm && typeof this.leftArm.destroy === 'function') {
+            this.leftArm.destroy();
+        }
+        if (this.rightArm && typeof this.rightArm.destroy === 'function') {
+            this.rightArm.destroy();
         }
     }
 
