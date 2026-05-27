@@ -17,14 +17,6 @@ class MansionLevel5 {
 
         this.pauseDomAudio();
         this.wheelManager = new WheelOfFortuneGameManager(gameEnv, {
-            phraseBank: [
-                "SECRET PASSAGE",
-                "HIDDEN STAIRCASE",
-                "MIRROR CHAMBER",
-                "BENEATH THE STAIRS",
-                "LOCKED PANEL",
-                "DUSTY ARCHWAY"
-            ],
             category: "Mansion Mystery",
             onWin: () => this.winLevel()
         });
