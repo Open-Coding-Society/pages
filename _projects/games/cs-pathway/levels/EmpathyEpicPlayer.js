@@ -59,8 +59,25 @@ export default class EmpathyEpicPlayer extends Player {
             this.moved = false;
         }
 
-        // Call the parent Character/GameObject update for collisions and animation tick
         super.update();
+
+        // Check for collisions and auto-interact with NPCs
+        if (this.state.collisionEvents && this.state.collisionEvents.length > 0) {
+            for (let npcId of this.state.collisionEvents) {
+                const npcObj = this.gameEnv.gameObjects.find(obj => obj.id === npcId || (obj.data && obj.data.id === npcId));
+                // Only auto-open if not already open, preventing rapid spamming
+                if (npcObj && npcObj.interact && (!npcObj.dialogueSystem || !npcObj.dialogueSystem.isOpen) && !npcObj.isInteracting && !npcObj._quizCompleted) {
+                    npcObj.isInteracting = true;
+                    npcObj.interact();
+                    
+                    // Pause player input slightly to avoid bouncing
+                    this.targetMouseX = this.x;
+                    this.targetMouseY = this.y;
+                    this.velocity.x = 0;
+                    this.velocity.y = 0;
+                }
+            }
+        }
     }
 
     destroy() {

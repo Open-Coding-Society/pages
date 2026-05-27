@@ -27,7 +27,9 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
       playerSrc: player_src,
       backgroundSrc: bg_src,
     });
-    this.preloadTrackedAsset('npc_marker', 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2240%22%20fill%3D%22%233b82f6%22%2F%3E%3C%2Fsvg%3E');
+    const stationMarkerSrc = path + "/images/projects/cs-pathway/npc/gatekeeper2.png";
+
+    this.preloadTrackedAsset('npc_marker', stationMarkerSrc);
 
     // ── Setup Background ─────────────────────────────────────────
     const bg_data = {
@@ -58,10 +60,11 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
     };
 
     // ── Helper to build Quiz Interaction ─────────────────────────
+    const levelInstance = this;
     const buildStationData = (id, displayName, pos, dialogSystemIntro, quizTitle, correctText, distractors) => {
       const npcData = {
         id: id,
-        src: 'data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2240%22%20fill%3D%22%233b82f6%22%2F%3E%3C%2Fsvg%3E',
+        src: stationMarkerSrc,
         SCALE_FACTOR: 16,
         ANIMATION_RATE: 50,
         pixels: { height: 100, width: 100 },
@@ -71,79 +74,137 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
         interactDistance: 120,
         greeting: `Welcome to the ${displayName} station!`,
         interact: function () {
-            this.dialogueSystem.dialogues = dialogSystemIntro;
-            const ds = this.dialogueSystem;
-            ds.lastShownIndex = -1;
-            ds.showRandomDialogue(displayName);
+          this.dialogueSystem.dialogues = dialogSystemIntro;
+          const ds = this.dialogueSystem;
+          ds.lastShownIndex = -1;
+          ds.showRandomDialogue(displayName);
 
-            // Fisher-Yates shuffle the answers
-            const answers = [
-                { text: correctText, isCorrect: true, action: () => { ds.panel(`🎉 That's correct! ${correctText}`); ds.closeDialogue(); } },
-                ...distractors.map(d => ({ text: d, isCorrect: false, action: () => { ds.panel(`Try again... ${d} might not be the most empathetic approach.`); ds.closeDialogue(); } }))
-            ];
-            for (let i = answers.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [answers[i], answers[j]] = [answers[j], answers[i]];
-            }
+          // Capture NPC reference so closures work after a small timeout
+          const npcSelf = this;
 
-            // Assign standard UI button fields mapping
+          const completeStation = () => {
+            // Swap to a different in-repo marker so completion stays visible without inline SVG.
+            const greenSrc = path + '/images/projects/cs-pathway/npc/gatekeeper.png';
+            npcSelf.image = new Image();
+            npcSelf.image.src = greenSrc;
+            if (npcSelf.spriteData) npcSelf.spriteData.src = greenSrc;
+
+            npcSelf._quizCompleted = true;
+            ds.closeDialogue();
+            npcSelf.isInteracting = false;
+            levelInstance.showToast(`Correct! ${displayName} station completed.`);
+          };
+
+          const failStation = (distractorText) => {
+            ds.closeDialogue();
+            npcSelf.isInteracting = false;
+            levelInstance.showToast(`Not quite! Take a moment to reflect on empathetic choices.`);
+          };
+
+          // Fisher-Yates shuffle the answers
+          const answers = [
+            { text: correctText, isCorrect: true, action: completeStation },
+            ...distractors.map(d => ({ text: d, isCorrect: false, action: () => failStation(d) }))
+          ];
+          for (let i = answers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [answers[i], answers[j]] = [answers[j], answers[i]];
+          }
+
+          // Delay adding buttons slightly to ensure the dialogue is rendered and open
+          setTimeout(() => {
+            if (!ds || !ds.isOpen) return;
             ds.addButtons(answers.map(ans => ({
-                text: ans.text,
-                primary: ans.isCorrect,
-                action: ans.action
+              text: ans.text,
+              primary: true,
+              action: ans.action
             })));
+          }, 60);
         }
       };
       return npcData;
     };
 
     // ── Define the 5 Stations ─────────────────────────────────────
+    
+    // 1. Top left
     const activeListener = buildStationData(
       'ActiveListener', 'Active Listener', { x: width * 0.2, y: height * 0.2 },
-      ['Listen closely and respond thoughtfully.', 'What is the best way to show you are actively listening?'],
+      [
+          'You are pair programming and your partner suggests a different approach.', 
+          'What is the best way to respond as an Active Listener?'
+      ],
       'Active Listening Quiz',
-      'Make eye contact and summarize what you heard.',
-      ['Interrupt with your own tangentially related story.', 'Nod while looking at your phone.', 'Wait in silence just so you can speak next.']
+      'Listen to their explanation fully and discuss the pros and cons of both methods.',
+      [
+          'Quickly interrupt them to explain why your code is already perfect.', 
+          'Nod but just keep typing your own code anyway.', 
+          'Tell them you will do it their way but complain to others later.'
+      ]
     );
 
+    // 2. Top right
     const perspectiveTaker = buildStationData(
         'PerspectiveTaker', 'Perspective Taker', { x: width * 0.8, y: height * 0.2 },
-        ['Empathy requires seeing the world through their eyes.', 'How can you practice perspective taking?'],
-        'Perspective Taking Quiz',
-        'Ask questions to understand their feelings and experiences deeply.',
-        ['Assume you know exactly how they feel.', 'Tell them what you would have done.', 'Dismiss their feelings since it has never happened to you.']
-    );
-
-    const supportiveCollaborator = buildStationData(
-        'SupportiveCollaborator', 'Supportive Collaborator', { x: width * 0.2, y: height * 0.8 },
-        ['Teams thrive when everyone supports each other.', 'How do you foster supportive collaboration?'],
-        'Supportive Collaborator Quiz',
-        'Offer your help and appreciate their unique contributions.',
-        ['Take all the credit for group success.', 'Only do the bare minimum assigned to you.', 'Point out their mistakes in front of the group.']
-    );
-
-    const inclusiveThinker = buildStationData(
-        'InclusiveThinker', 'Inclusive Thinker', { x: width * 0.8, y: height * 0.8 },
         [
-            'A team member seems quiet and hasn’t contributed much.',
-            'What is an empathetic way to address this?',
-            'How can you be an inclusive thinker?'
+            'A user reports your UI is confusing, but you think it is perfectly clear.', 
+            'How do you show you are a Perspective Taker?'
         ],
-        'Inclusive Thinker Quiz',
-        'Ask, "We haven’t heard from you yet. What are your thoughts on this?"',
+        'Perspective Taking Quiz',
+        'Ask the user to walk you through their experience to understand where they get stuck.',
         [
-            'Assume they have nothing useful to say.',
-            'Call them out in front of the whole team: "Why are you being so quiet?"',
-            'Take over their tasks so they don’t have to do anything.'
+            'Close the ticket because "works on my machine".', 
+            'Tell them to read the documentation more carefully.', 
+            'Redesign the whole app without asking for any more feedback.'
         ]
     );
 
+    // 3. Bottom left
+    const supportiveCollaborator = buildStationData(
+        'SupportiveCollaborator', 'Supportive Collaborator', { x: width * 0.2, y: height * 0.8 },
+        [
+            'Your teammate is struggling to debug a persistent error and feels discouraged.', 
+            'How can you be a Supportive Collaborator?'
+        ],
+        'Supportive Collaborator Quiz',
+        'Offer to pair program and help them step through the logic together.',
+        [
+            'Fix the bug for them quickly so you do not slow down the project.', 
+            'Tell them that bugs are easy if they just studied more.', 
+            'Assign the task to someone else.'
+        ]
+    );
+
+    // 4. Bottom right
     const respectfulCommunicator = buildStationData(
-        'RespectfulCommunicator', 'Respectful Communicator', { x: width * 0.5, y: height * 0.5 },
-        ['Communication should always remain respectful, even during disagreements.', 'What signifies respectful communication?'],
+        'RespectfulCommunicator', 'Respectful Communicator', { x: width * 0.8, y: height * 0.8 },
+        [
+            'You find a serious security flaw in a fellow developers pull request.', 
+            'What is the best way to be a Respectful Communicator?'
+        ],
         'Respectful Communicator Quiz',
-        'Use "I" statements to express your feelings without attacking the person.',
-        ['Use "You always" or "You never" to list their flaws.', 'Raise your voice to ensure you are heard.', 'Ignore their emails until they apologize first.']
+        'Leave a constructive comment explaining the vulnerability and suggest a secure alternative.',
+        [
+            'Publicly mock their code in the team chat.', 
+            'Merge it anyway, it is their problem if it gets hacked.', 
+            'Rewrite their whole PR without telling them why.'
+        ]
+    );
+
+    // 5. Middle bottom (lowered)
+    const inclusiveThinker = buildStationData(
+        'InclusiveThinker', 'Inclusive Thinker', { x: width * 0.5, y: height * 0.85 },
+        [
+            'A user of your web app has accessibility needs.', 
+            'What feature would best make your app accessible to more people?'
+        ],
+        'Inclusive Thinker Quiz',
+        'A cursor controlled with head tracking.',
+        [
+            'A fancy color scheme with low contrast text.', 
+            'Removing all keyboard shortcuts so they have to use a mouse.', 
+            'Adding more text and removing all visual diagrams.'
+        ]
     );
 
     this.classes = [
@@ -152,8 +213,8 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
       { class: Npc, data: activeListener },
       { class: Npc, data: perspectiveTaker },
       { class: Npc, data: supportiveCollaborator },
-      { class: Npc, data: inclusiveThinker },
-      { class: Npc, data: respectfulCommunicator }
+      { class: Npc, data: respectfulCommunicator },
+      { class: Npc, data: inclusiveThinker }
     ];
   }
 }
