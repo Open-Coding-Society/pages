@@ -4,7 +4,7 @@ import Npc from "@assets/js/GameEnginev1.1/essentials/Npc.js";
 import DialogueSystem from "@assets/js/GameEnginev1.1/essentials/DialogueSystem.js";
 
 
-class gameLevel1 {
+class MansionLevel1 {
     constructor(gameEnv) {
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
@@ -107,7 +107,7 @@ class gameLevel1 {
             createArtifactData({
                 id: "sun_idol",
                 label: "Sun Idol",
-                src: path + "/images/projects/mansionGame/Watch.png",
+                src: path + "/images/projects/mansionGame/gold.png",
                 x: width * 0.2,
                 y: height * 0.35,
                 scaleFactor: 13,
@@ -116,7 +116,7 @@ class gameLevel1 {
             createArtifactData({
                 id: "ancient_scroll",
                 label: "Ancient Scroll",
-                src: path + "/images/projects/mansionGame/Paper.png",
+                src: path + "/images/projects/mansionGame/map.png",
                 x: width * 0.48,
                 y: height * 0.27,
                 scaleFactor: 14,
@@ -125,7 +125,7 @@ class gameLevel1 {
             createArtifactData({
                 id: "desert_gem",
                 label: "Desert Gem",
-                src: path + "/images/projects/mansionGame/Gem.png",
+                src: path + "/images/projects/mansionGame/ruby.png",
                 x: width * 0.62,
                 y: height * 0.72,
                 scaleFactor: 12,
@@ -136,7 +136,7 @@ class gameLevel1 {
 
         this.classes = [
             { class: GameEnvBackground, data: backgroundData },
-            { class: Player, data: playerData },
+            { class: Player, data: sprite_data_player },
             ...artifactSprites.map((data) => ({ class: Npc, data })),
             { class: Npc, data: mummyData }
         ];
@@ -438,6 +438,6 @@ class gameLevel1 {
 }
 
 
-export default gameLevel1;
+export default MansionLevel1;
 
 
