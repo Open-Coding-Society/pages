@@ -114,28 +114,33 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
-      x: width * 0.83,
-      y: height * 0.28,
+      x: width * 0.81,
+      y: height * 0.27,
     };
 
     const personalEnrichmentGatekeeperPos = {
       x: width * 0.23,
-      y: height * 0.25,
+      y: height * 0.22,
     };
 
     const skillPassportGatekeeperPos = {
-      x: width * 0.82,
-      y: height * 0.56,
+      x: width * 0.84,
+      y: height * 0.51,
     };
 
     const sprintSuccessGatekeeperPos = {
-      x: width * 0.23,
-      y: height * 0.53,
+      x: width * 0.19,
+      y: height * 0.5,
     };
 
     const missionToolsGatekeeperPos = {
-      x: width * 0.53,
-      y: height * 0.21,
+      x: width * 0.525,
+      y: height * 0.19,
+    };
+
+    const empathyEpicGatekeeperPos = {
+      x: width * 0.75,
+      y: height * 0.78,
     };
 
     const levelInstance = this;
@@ -305,6 +310,36 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       },
     });
 
+    // ── Empathy Epic gatekeeper ──────────────────────────
+    const npc_data_empathyEpicGatekeeper = createGatekeeperData({
+      id: 'EmpathyEpicGatekeeper',
+      greeting: 'Welcome to Empathy Epic! Strengthen communication, collaboration, and empathy skills.',
+      position: empathyEpicGatekeeperPos,
+      markerColor: '#60a5fa',
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to Empathy Epic!',
+          'Here you will practice empathy, teamwork, and leadership.',
+          'Great innovators understand both people and technology.',
+        ];
+
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Empathy Epic');
+
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Enter Empathy Epic',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+
+              // replace with your actual level/module
+              levelInstance.showToast?.('Empathy Epic coming soon!');
+            },
+          },
+        ]);
+      },
+    });
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
@@ -314,8 +349,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_sprintSuccessGatekeeper },
       { class: Npc, data: npc_data_missionToolsGatekeeper },
+      { class: Npc, data: npc_data_empathyEpicGatekeeper },
     ];
   }
+
 
   // ── Sync level dropdown ───────────────────────────────────────
   _syncLevelDropdown() {
