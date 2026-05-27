@@ -60,6 +60,26 @@ while preserving all critical instructions. The agent must still communicate wit
 * **注释：** 为非平凡的逻辑添加注释，但要保持简短，重点关注“为什么”而不是“是什么”。
 * **提问：** 如果系统级约束、需求或模式不清楚，请在继续之前暂停并向用户提问。
 
+### 项目工作流
+
+* 以 [Makefile](Makefile) 为唯一指令来源；常用目标 `make`/`make serve-current`、`make dev`、`make stop`、`make convert`、`make convert-single`（细节见 [README.md](README.md)）。
+* 顺序很关键：stop → build projects → convert notebooks/docx → split courses → jekyll serve（以 [Makefile](Makefile) 为准）。
+
+### 源文件与生成文件
+
+* 源文件在 [notebook sources](_notebooks/) 与 [docx sources](_docx/)；转换后的 Markdown 输出到 [generated posts](_posts/)（生成物，不要手工改）。
+* 多课程拆分文件（`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`）为生成物，禁止手改；规则见 [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py)。
+* Notebook/DOCX 转换规则见 [scripts/convert_notebooks.py](scripts/convert_notebooks.py) 与 [scripts/convert_docx.py](scripts/convert_docx.py)。
+
+### 项目注册与样式
+
+* 新项目遵循 [_projects/REGISTRATION.md](_projects/REGISTRATION.md) 注册/构建约定；架构示例见 [_projects/ARCHITECTURE.md](_projects/ARCHITECTURE.md)。
+* 样式优先使用 SCSS；主题切换与样式约定见 [README.md](README.md)。
+
+### 后端边界
+
+* 后端服务位于 [node_backend/README.md](node_backend/README.md)，与站点构建流程分离；改动前先阅读该文档。
+
 ## 编码标准
 
 ### 命名规范

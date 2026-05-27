@@ -5,13 +5,14 @@ import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackgr
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
-import PersonaTrial from './PersonaTrial.js';
+import PersonaHallTrial from './PersonaHallTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import AboutMeBuilder from './AboutMeBuilder.js';
 import MissionTools from './GameLevelCsPath2Mission.js';
+import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -316,6 +317,53 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     ];
   }
 
+  // ── Sync level dropdown ───────────────────────────────────────
+  _syncLevelDropdown() {
+    requestAnimationFrame(() => {
+      const allSelects = Array.from(document.querySelectorAll('select'));
+      const levelSelect = allSelects.find((sel) =>
+        Array.from(sel.options).some((opt) =>
+          opt.textContent.trim() === 'Wayfinding World' ||
+          opt.textContent.trim() === 'Identity Forge' ||
+          opt.textContent.trim() === 'Mission Tools'
+        )
+      );
+      if (!levelSelect) return;
+
+      const targetName = GameLevelCsPath1Way.displayName; // 'Wayfinding World'
+
+      let targetOption = Array.from(levelSelect.options).find(
+        (opt) => opt.textContent.trim() === targetName
+      );
+
+      if (!targetOption) {
+        targetOption = document.createElement('option');
+        targetOption.textContent = targetName;
+        targetOption.value = targetName;
+        levelSelect.appendChild(targetOption);
+      }
+
+      levelSelect.value = targetOption.value;
+    });
+  }
+
+  // ── Initialize ───────────────────────────────────────────────
+  initialize() {
+    this._syncLevelDropdown();
+
+    // Refresh panel with restored profile data (e.g. persona saved in Identity Forge)
+    if (this.profileData) {
+      this.profilePanelView?.update?.({
+        persona: this.profileData.persona || '—',
+        course: this.profileData.course || '—',
+        skill: this.profileData.skill || '—',
+        ...this._getCompletionPanelValues(),
+      });
+    }
+
+    if (typeof super.initialize === 'function') super.initialize();
+  }
+
   // ── About Me Builder ─────────────────────────────────────────
   openAboutMeBuilder() {
     if (this._aboutMeOpen) return;
@@ -389,14 +437,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     if (this._personaTrialOpen) return;
     this._personaTrialOpen = true;
 
-    const trial = new PersonaTrial({
+    const trial = new PersonaHallTrial({
+      profileData: this.profileData || {},
       onComplete: async (result) => {
         try {
           await this.savePersonaResult(result);
           this.showToast?.(`Persona updated: ${result.title}`);
-          this.panel?.(
-            `${result.title}\n\n${result.summary}\n\nTechnologist ${result.percentages.technologist}% | Scrummer ${result.percentages.scrummer}% | Planner ${result.percentages.planner}% | Finisher ${result.percentages.finisher}%`
-          );
+          this.profilePanelView?.update?.({ persona: result.title });
         } catch (error) {
           console.error('Failed to save persona result:', error);
           this.showToast?.('Persona trial completed, but saving failed.');
@@ -487,10 +534,24 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
   }
 
   async saveCoursePlanResult(result) {
+    const recommendedClasses = Array.isArray(result?.recommendedClasses)
+      ? result.recommendedClasses
+      : result?.recommendedClass
+        ? [result.recommendedClass]
+        : [];
+
+    const normalizedClassNames = [...new Set(
+      recommendedClasses
+        .map((entry) => entry?.name || entry)
+        .filter(Boolean)
+    )];
+    const selectedClass = normalizedClassNames[0] || null;
+
     const currentProfile = { ...(this.profileData || {}) };
 
     const updatedProfile = {
       ...currentProfile,
+      course: selectedClass || currentProfile.course || '—',
       coursePlanMeta: {
         title: result.title,
         summary: result.summary,
@@ -499,7 +560,9 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         learningStyle: result.learningStyle,
         percentages: result.percentages,
         scores: result.scores,
-        recommendedClasses: result.recommendedClasses,
+        recommendedClass: result.recommendedClass || recommendedClasses[0] || null,
+        recommendedClasses,
+        selectedClass,
         gamePlan: result.gamePlan,
         redeemToken: result.redeemToken,
         completedAt: result.completedAt,
@@ -508,26 +571,40 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     this.profileData = updatedProfile;
 
-    if (typeof this.profileManager?.updateProfileData === 'function') {
-      await this.profileManager.updateProfileData(updatedProfile);
-      return;
-    }
-    if (typeof this.profileManager?.saveProfileData === 'function') {
-      await this.profileManager.saveProfileData(updatedProfile);
-      return;
-    }
-    if (typeof this.profileManager?.saveProfile === 'function') {
-      await this.profileManager.saveProfile(updatedProfile);
-      return;
-    }
-    if (typeof this.profileManager?.setProfileData === 'function') {
-      await this.profileManager.setProfileData(updatedProfile);
-      return;
+    if (typeof this.profileManager?.updateProgress === 'function') {
+      await this.profileManager.updateProgress('coursePlanMeta', updatedProfile.coursePlanMeta);
     }
 
-    console.warn(
-      'No known ProfileManager save method found. Course plan result stored in this.profileData only.'
-    );
+    if (selectedClass) {
+      try {
+        const currentResponse = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
+        if (currentResponse.ok) {
+          const currentData = await currentResponse.json();
+          const currentClasses = Array.isArray(currentData?.class) ? currentData.class : [];
+
+          if (!currentClasses.includes(selectedClass)) {
+            const method = currentClasses.length > 0 ? 'PUT' : 'POST';
+            const body = method === 'PUT'
+              ? { class: [...currentClasses, selectedClass] }
+              : { class: selectedClass };
+
+            const saveResponse = await fetch(`${pythonURI}/api/user/class`, {
+              ...fetchOptions,
+              method,
+              body: JSON.stringify(body),
+            });
+
+            if (!saveResponse.ok) {
+              throw new Error(`Failed to save class selection (${saveResponse.status})`);
+            }
+          }
+
+          await refreshCourseNavigation(true);
+        }
+      } catch (error) {
+        console.warn('Wayfinding World: failed to sync class selection', error);
+      }
+    }
   }
 }
 

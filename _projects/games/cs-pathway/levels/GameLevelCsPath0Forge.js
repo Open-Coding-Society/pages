@@ -14,7 +14,10 @@ import Present from './Present.js';
 import LoginManager from '@assets/js/projects/cs-pathway/model/LoginManager.js';
 import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
 import PersonaHallTrial from './PersonaHallTrial.js';
+import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
+import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 const PROFILE_PANEL_ID = 'csse-profile-panel';
+import GameLevelCsPath1Way from './GameLevelCsPath1Way.js';
 
 // Track player progress and choices per session.
 const identityState = {
@@ -364,8 +367,6 @@ class GameLevelCsPath0Forge {
           'Choose the CS persona that best matches how you work.'
         ]);
         await level.runPersonaHall(false, this);
-        await this.profileManager.updateProgress('persona', result.title);
-        await this.profileManager.updateProgress('personaId', result.persona);
       },
     });
 
@@ -393,8 +394,8 @@ class GameLevelCsPath0Forge {
               this.showToast(`Path unlocked: ${result.title}`);
     
               const classesText = Array.isArray(result.recommendedClasses)
-                ? result.recommendedClasses.map((c) => c.name).join(' → ')
-                : '';
+                ? result.recommendedClasses.map((c) => c.name || c).join(' → ')
+                : (result.recommendedClass?.name || result.recommendedClass || '');
     
               this.panel?.(
                 `${result.title}\n\n${result.summary}\n\nRecommended Classes: ${classesText}`
@@ -425,7 +426,7 @@ class GameLevelCsPath0Forge {
     this.runPersonaHall = async function(showIntro = false, npc = null) {
       if (this._personaHallOpen) return;
       this._personaHallOpen = true;
-    
+
       try {
         if (showIntro) {
           await this.showDialogue('Persona Hall Guide', [
@@ -433,38 +434,54 @@ class GameLevelCsPath0Forge {
             'Choose the CS persona that best matches how you work.'
           ]);
         }
-    
+
         const trial = new PersonaHallTrial({
           profileData: this.profileData || {},
-    
+
           onComplete: async (result) => {
             await this.updateProfilePanel({
               persona: result.title,
               personaId: result.persona,
             });
-    
             this.showToast(`Persona selected: ${result.title}`);
-    
-            this.panel?.(
-              `${result.title}\n\n${result.summary}`
-            );
-    
+            this.panel?.(`${result.title}\n\n${result.summary}`);
             this._personaHallOpen = false;
           },
-    
+
+          onTeleport: () => {
+            const gc = this.gameEnv?.gameControl;
+            if (!gc) {
+              console.error('[Teleport] gameControl not found');
+              return;
+            }
+
+            const wayfindingIndex = gc.levelClasses?.findIndex(
+              (lc) => lc.levelId === 'wayfinding-world'
+            );
+
+            if (wayfindingIndex !== -1 && wayfindingIndex !== undefined) {
+              gc.currentLevelIndex = wayfindingIndex;
+            } else {
+              gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1Way);
+              gc.currentLevelIndex++;
+            }
+
+            gc.transitionToLevel();
+          },
+
           onClose: () => {
             this._personaHallOpen = false;
           },
         });
-    
+
         trial.start();
-    
+
       } catch (err) {
         console.error(err);
         this._personaHallOpen = false;
       }
-    };    
-    
+    };
+
     /**
      * Identity terminal flow. Run the authentication and identity registration wizard.
      * @private
@@ -563,6 +580,81 @@ class GameLevelCsPath0Forge {
 
       await this.updateProfilePanel(profile, { updateIdentityProgress: true });
       return this.profileData;
+    };
+
+    /**
+     * Persist course-plan results and sync the shared Courses navigation.
+     */
+    this.saveCoursePlanResult = async function(result) {
+      const recommendedClasses = Array.isArray(result?.recommendedClasses)
+        ? result.recommendedClasses
+        : result?.recommendedClass
+          ? [result.recommendedClass]
+          : [];
+
+      const normalizedClassNames = [...new Set(
+        recommendedClasses
+          .map((entry) => entry?.name || entry)
+          .filter(Boolean)
+      )];
+      const selectedClass = normalizedClassNames[0] || null;
+
+      const currentProfile = { ...(this.profileData || {}) };
+      const updatedProfile = {
+        ...currentProfile,
+        coursePlanMeta: {
+          title: result?.title || '',
+          summary: result?.summary || '',
+          primaryPath: result?.primaryPath || '',
+          secondaryPath: result?.secondaryPath || '',
+          learningStyle: result?.learningStyle || '',
+          percentages: result?.percentages || {},
+          scores: result?.scores || {},
+          recommendedClass: result?.recommendedClass || recommendedClasses[0] || null,
+          recommendedClasses,
+          selectedClass,
+          gamePlan: result?.gamePlan || result?.successPlan || [],
+          redeemToken: result?.redeemToken || null,
+          completedAt: result?.completedAt || new Date().toISOString(),
+        },
+      };
+
+      this.profileData = updatedProfile;
+
+      if (typeof this.profileManager?.updateProgress === 'function') {
+        await this.profileManager.updateProgress('coursePlanMeta', updatedProfile.coursePlanMeta);
+      }
+
+      if (selectedClass) {
+        try {
+          const currentResponse = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
+          if (currentResponse.ok) {
+            const currentData = await currentResponse.json();
+            const currentClasses = Array.isArray(currentData?.class) ? currentData.class : [];
+
+            if (!currentClasses.includes(selectedClass)) {
+              const method = currentClasses.length > 0 ? 'PUT' : 'POST';
+              const body = method === 'PUT'
+                ? { class: [...currentClasses, selectedClass] }
+                : { class: selectedClass };
+
+              const saveResponse = await fetch(`${pythonURI}/api/user/class`, {
+                ...fetchOptions,
+                method,
+                body: JSON.stringify(body),
+              });
+
+              if (!saveResponse.ok) {
+                throw new Error(`Failed to save class selection (${saveResponse.status})`);
+              }
+            }
+
+            await refreshCourseNavigation(true);
+          }
+        } catch (error) {
+          console.warn('Course Enlistment: failed to sync class selection', error);
+        }
+      }
     };
 
     /**
@@ -1423,6 +1515,8 @@ class GameLevelCsPath0Forge {
         { key: 'githubID', label: 'GitHub ID', emptyValue: '—' },
         { type: 'section', title: 'Persona Hall', marginTop: '8px' },
         { key: 'persona', label: 'Persona', emptyValue: '—' },
+        { type: 'section', title: 'Course Enlistment', marginTop: '8px' },
+        { key: 'courseClass', label: 'Class', emptyValue: '—' },
         { type: 'section', title: 'Avatar Sprite', marginTop: '8px' },
         { key: 'sprite', label: 'Sprite', emptyValue: '—' },
         { type: 'section', title: 'World Theme', marginTop: '8px' },
@@ -1499,6 +1593,7 @@ class GameLevelCsPath0Forge {
       persona: this.profileData?.persona || '—',
       sprite: this.profileData?.sprite || '—',
       worldTheme: this.profileData?.theme || this.profileData?.worldTheme || '—',
+      courseName: this.profileData?.courseName || '—',
       ...this._getCompletionPanelValues(),
     });
 
@@ -1551,12 +1646,6 @@ class GameLevelCsPath0Forge {
         }
       }
       
-      if (updates.persona) {
-        await this.profileManager.updateProgress('persona', updates.persona);
-      }
-      if (updates.personaId) {
-        await this.profileManager.updateProgress('personaId', updates.personaId);
-      }
       
       // Update UI panel with complete profile data
       this.createProfilePanel();
@@ -1573,11 +1662,36 @@ class GameLevelCsPath0Forge {
         persona: this.profileData.persona || '—',
         sprite: this.profileData.sprite || '—',
         worldTheme: this.profileData.theme || this.profileData.worldTheme || '—',
+        courseName: this.profileData.courseName || '—',
+        courseClass: this.profileData.courseClass || '—',
         ...this._getCompletionPanelValues()
       };
       
       console.log('panelData being sent to panel.update:', panelData);
       this.profilePanelView.update(panelData);
+    };
+
+    /**
+     * Save Course Plan Result
+     * Mirrors how persona/profile data is persisted.
+     * @param {Object} result
+     */
+    this.saveCoursePlanResult = async function(result = {}) {
+      console.log('saveCoursePlanResult called with:', result);
+
+      const courseClass =
+        result.class ||
+        result.courseClass ||
+        result.selectedClass ||
+        result.recommendedClass ||
+        result.recommendedClasses?.[0]?.name ||
+        result.recommendedClasses?.[0]?.title ||
+        result.recommendedClasses?.[0] ||
+        '—';
+
+      await this.updateProfilePanel({
+        courseClass,
+      });
     };
 
     /**

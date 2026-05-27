@@ -215,7 +215,7 @@ function loadUsers() {
 // Flush Queue
 document.getElementById('flush').addEventListener('click', async function() {
     const currentAway = document.getElementById('current-away').textContent.trim();
-    
+
     if (currentAway !== 'Nobody') {
         // Remove current user from queue
         await removeFromQueue();
