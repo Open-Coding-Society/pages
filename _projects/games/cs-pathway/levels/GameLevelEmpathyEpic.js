@@ -91,7 +91,7 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
         src: stationMarkerColors.blue,
         SCALE_FACTOR: 18,
         ANIMATION_RATE: 50,
-        pixels: { height: 100, width: 100 },
+        pixels: { height: 128, width: 128 },
         INIT_POSITION: { x: pos.x - (stationSize / 2), y: pos.y - (stationSize / 2) },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
