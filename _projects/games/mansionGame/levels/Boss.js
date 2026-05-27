@@ -2,9 +2,10 @@ import Enemy from '@assets/js/GameEnginev1.1/essentials/Enemy.js';
 import Boomerang from './Boomerang.js';
 import Projectile from './Projectile.js';
 import Arm from './Arm.js';
-import showEndScreen from './EndScreen.js';
+import MansionLevel6_EndingCutscene from './mansionLevel6_EndingCutscene.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import { updateBossHealthBar } from './HealthBars.js';
+import Zombie from './Zombie.js';
 
 /*
     Boss class to define the Reaper
@@ -21,7 +22,7 @@ class Boss extends Enemy {
         this._bossHealthFill = null;
 
         this.stage = 1;
-        this.fullHealth = data?.initialHealth || 1500;
+        this.fullHealth = data?.initialHealth || 10000;
         this.healthPoints = this.fullHealth;
 
         this.arrows = [];
@@ -32,32 +33,9 @@ class Boss extends Enemy {
         this.angerModifier = 1;
         this.attackProbShift = 0.05;
 
-        // Debug/cheat key code - uncomment to enable
-        // Add a debug/cheat key ('p') that instantly defeats this boss
-        this._killKeyHandler = (event) => {
-            try {
-                if (!event || !event.key) return;
-                if (event.key === 'p' || event.key === 'P') {
-                    console.log("[Boss] Kill key pressed: forcing boss death.");
-                    this.healthPoints = 0;
-                     window.__mansionLevelEnded = true;
-                    // Show victory screen immediately
-                    try { showEndScreen(this.gameEnv); } catch (e) { console.warn('Error showing victory screen:', e); }
-                    // Remove the boss graphic and objects from the game
-                    try { this.destroy(); } catch (e) { console.warn('Error destroying boss:', e); }
-                    // End the current level so game control can transition
-                    try {
-                        if (this.gameEnv && this.gameEnv.gameControl && this.gameEnv.gameControl.currentLevel) {
-                            this.gameEnv.gameControl.currentLevel.continue = false;
-                        }
-                    } catch (e) { console.warn('Error ending level after boss kill:', e); }
-                }
-            } catch (e) { console.error('Kill key handler error:', e); }
-        };
-
-        // Attach the listener to window so it's active while the boss exists
-        if (typeof window !== 'undefined') window.addEventListener('keydown', this._killKeyHandler);
-        
+        this.lastZombieWaveTime = 0;
+        this.zombieWaveSize = data?.zombieWaveSize || 3;
+        this.maxZombiesAlive = data?.maxZombiesAlive || 8;
 
         this.projectileTypes = data?.projectileTypes || ['FIREBALL', 'ARROW'];
 
@@ -83,6 +61,17 @@ class Boss extends Enemy {
         //this.arms = [this.leftArm, this.rightArm];
 
         this.isThrowingScythe = false;
+
+        if (typeof window !== 'undefined') {
+            this._oneHpKeyHandler = (event) => {
+                if (event.key !== '1') return;
+                this.healthPoints = 1;
+                const full = this.fullHealth || 1;
+                const percent = Math.max(0, Math.min(100, (this.healthPoints / full) * 100));
+                updateBossHealthBar(percent, this.stage);
+            };
+            window.addEventListener('keydown', this._oneHpKeyHandler);
+        }
     }
 
     // Update function for the Boss
@@ -116,8 +105,8 @@ class Boss extends Enemy {
             if (!this._victoryShown) {
                 this._victoryShown = true;
                 try {
-                    showEndScreen(this.gameEnv);
-                } catch (e) { console.error('Error showing end screen:', e); }
+                    this.triggerVictoryCutscene();
+                } catch (e) { console.error('Error starting ending cutscene:', e); }
             }
             return;
         }
@@ -128,8 +117,12 @@ class Boss extends Enemy {
         // Update stage & attack speed
         const healthRatio = this.healthPoints / this.fullHealth;
         this.stage = healthRatio < 0.33 ? 3 : (healthRatio < 0.66 ? 2 : 1);
-        this.attackInterval = this.stage === 3 ? 1000 : this.stage === 2 ? 1500 : 2000;
+        this.attackInterval = this.stage === 3 ? 750 : this.stage === 2 ? 1000 : 1000;
         this.angerModifier = this.stage === 3 ? 2 : 1;
+
+        if (this.stage >= 2) {
+            this.spawnZombieWaveIfReady();
+        }
 
         // Update projectiles
         [...this.fireballs, ...this.arrows].forEach(p => {
@@ -240,25 +233,194 @@ class Boss extends Enemy {
         this.arrows.push(new Projectile(this.gameEnv, target.position.x, target.position.y, this.position.x, this.position.y, "ARROW"));
     }
 
+    spawnZombieWaveIfReady() {
+        const now = Date.now();
+        const cooldownMs = this.stage === 3 ? 3500 : 5000;
+        if (now - this.lastZombieWaveTime < cooldownMs) return;
+
+        const zombiesAlive = this.gameEnv.gameObjects.filter(obj => obj.constructor.name === 'Zombie').length;
+        if (zombiesAlive >= this.maxZombiesAlive) return;
+
+        const spawnCount = Math.min(this.zombieWaveSize, this.maxZombiesAlive - zombiesAlive);
+        for (let i = 0; i < spawnCount; i += 1) {
+            const spawn = this.getZombieSpawnPoint();
+            const zombieData = {
+                id: `Zombie-${now}-${i}`,
+                INIT_POSITION: spawn,
+                healthPoints: 1,
+                damage: 6,
+                speed: 0.5
+            };
+            this.gameEnv.gameObjects.push(new Zombie(zombieData, this.gameEnv));
+        }
+
+        this.lastZombieWaveTime = now;
+    }
+
+    getZombieSpawnPoint() {
+        const w = this.gameEnv.innerWidth;
+        const h = this.gameEnv.innerHeight;
+        const edge = Math.floor(Math.random() * 4);
+        const margin = 20;
+
+        if (edge === 0) return { x: Math.random() * w, y: margin };
+        if (edge === 1) return { x: Math.random() * w, y: h - margin };
+        if (edge === 2) return { x: margin, y: Math.random() * h };
+        return { x: w - margin, y: Math.random() * h };
+    }
+
+    triggerVictoryCutscene() {
+        const gameEnv = this.gameEnv;
+        const gameControl = gameEnv?.gameControl;
+
+        this.clearBossProjectiles();
+        this.cleanupBattleRoomUi(gameEnv);
+
+        try {
+            if (typeof window !== 'undefined') {
+                if (window._battleMusic && typeof window._battleMusic.pause === 'function') {
+                    window._battleMusic.pause();
+                    window._battleMusic.currentTime = 0;
+                }
+                if (window._levelMusic && typeof window._levelMusic.pause === 'function') {
+                    window._levelMusic.pause();
+                    window._levelMusic.currentTime = 0;
+                }
+                if (window._endMusic && typeof window._endMusic.pause === 'function') {
+                    window._endMusic.pause();
+                    window._endMusic.currentTime = 0;
+                }
+            }
+        } catch (e) { /* ignore */ }
+
+        if (typeof document === 'undefined' || !gameControl) return;
+
+        const existingOverlay = document.getElementById('mansion-victory-fade');
+        if (existingOverlay && existingOverlay.parentNode) {
+            existingOverlay.parentNode.removeChild(existingOverlay);
+        }
+
+        const fadeOverlay = document.createElement('div');
+        fadeOverlay.id = 'mansion-victory-fade';
+        const fadeInMs = 1200;
+        const fadeOutMs = 1200;
+        Object.assign(fadeOverlay.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#ffffff',
+            opacity: '0',
+            transition: `opacity ${fadeInMs}ms ease-in-out`,
+            zIndex: '10000'
+        });
+
+        document.body.appendChild(fadeOverlay);
+
+        requestAnimationFrame(() => {
+            fadeOverlay.style.opacity = '1';
+
+            setTimeout(() => {
+                try {
+                    gameControl.levelClasses = [MansionLevel6_EndingCutscene];
+                    gameControl.currentLevelIndex = 0;
+                    gameControl.isPaused = false;
+                    gameControl.transitionToLevel();
+                } catch (e) {
+                    console.warn('Failed to transition to ending cutscene:', e);
+                }
+
+                setTimeout(() => {
+                    fadeOverlay.style.transition = `opacity ${fadeOutMs}ms ease-in-out`;
+                    fadeOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        if (fadeOverlay.parentNode) fadeOverlay.parentNode.removeChild(fadeOverlay);
+                    }, fadeOutMs + 100);
+                }, 1500);
+            }, fadeInMs + 100);
+        });
+    }
+
+    cleanupBattleRoomUi(gameEnv) {
+        if (typeof document === 'undefined') return;
+
+        const selectors = [
+            '#boss-health-container',
+            '#player-health-container',
+            '#shockwave-container',
+            '#instructions-container',
+            '#power-up-message',
+            '#low-health-overlay',
+            '#damage-flash-overlay',
+            '.shockwave-overlay'
+        ];
+
+        selectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => {
+                if (el && el.parentNode) el.parentNode.removeChild(el);
+            });
+        });
+
+        const cleanupStyles = ['low-health-style', 'shockwave-style'];
+        cleanupStyles.forEach(id => {
+            const styleEl = document.getElementById(id);
+            if (styleEl && styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
+        });
+
+        if (gameEnv && Array.isArray(gameEnv.gameObjects)) {
+            gameEnv.gameObjects.forEach(obj => {
+                if (!obj) return;
+                const name = obj.constructor?.name;
+                if (name === 'Projectile' || name === 'Boomerang' || name === 'PlayerScythe' || name === 'PowerUp') {
+                    if (typeof obj.destroy === 'function') {
+                        obj.destroy();
+                    }
+                }
+            });
+
+            gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
+                const name = obj?.constructor?.name;
+                return name !== 'Projectile' && name !== 'Boomerang' && name !== 'PlayerScythe' && name !== 'PowerUp';
+            });
+        }
+    }
+
+    clearBossProjectiles() {
+        const destroyProjectile = (projectile) => {
+            if (!projectile) return;
+            projectile.revComplete = true;
+            if (typeof projectile.destroy === 'function') {
+                projectile.destroy();
+            }
+        };
+
+        this.fireballs.forEach(destroyProjectile);
+        this.arrows.forEach(destroyProjectile);
+        this.scythes.forEach(destroyProjectile);
+
+        this.fireballs = [];
+        this.arrows = [];
+        this.scythes = [];
+        this.isThrowingScythe = false;
+    }
+
     /*
     addArm(arm) {
         this.arms.push(arm);
     }
     */
 
-    /* Debug/cheat destroy override - uncomment with key handler above
-    // Ensure we clean up the key listener when the boss is destroyed
     destroy() {
         try {
-            if (typeof window !== 'undefined' && this._killKeyHandler) {
-                window.removeEventListener('keydown', this._killKeyHandler);
+            if (typeof window !== 'undefined' && this._oneHpKeyHandler) {
+                window.removeEventListener('keydown', this._oneHpKeyHandler);
             }
         } catch (e) { console.warn('Failed to remove boss key listener:', e); }
 
         // Call parent destroy if available (Character -> GameObject)
         if (super.destroy) super.destroy();
     }
-    */
 }
 
 export default Boss;
