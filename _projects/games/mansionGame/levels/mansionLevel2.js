@@ -4,6 +4,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import MansionLevel2_Cemetery from './mansionLevel2_Cemetery.js';
+import MansionLevelMain from './mansionLevelMain.js';
 
 // ─── Reaper ────────────────────────────────────────────────────────────────────
 class Reaper extends Npc {
@@ -855,41 +856,58 @@ class MansionLevel2 {
         sub.style.color = '#bbf7d0';
         sub.textContent = 'Against all odds, you endured 30 seconds in the haunted graveyard. The Reapers retreat… for now.';
 
-        const btn = document.createElement('button');
-        btn.className = 'mansion-overlay-btn';
-        btn.style.color = '#4ade80';
-        btn.textContent = 'NEXT LEVEL';
-        btn.addEventListener('mouseenter', () => {
-            btn.style.background = '#4ade80';
-            btn.style.color = '#000';
+        const replayBtn = document.createElement('button');
+        replayBtn.className = 'mansion-overlay-btn';
+        replayBtn.style.color = '#4ade80';
+        replayBtn.textContent = 'REPLAY LEVEL';
+        replayBtn.addEventListener('mouseenter', () => {
+            replayBtn.style.background = '#4ade80';
+            replayBtn.style.color = '#000';
         });
-        btn.addEventListener('mouseleave', () => {
-            btn.style.background = 'transparent';
-            btn.style.color = '#4ade80';
+        replayBtn.addEventListener('mouseleave', () => {
+            replayBtn.style.background = 'transparent';
+            replayBtn.style.color = '#4ade80';
         });
-        btn.addEventListener('click', () => {
+        replayBtn.addEventListener('click', () => {
             this._removeOverlay();
             const gc = this.gameEnv?.gameControl;
             if (!gc) return;
 
             gc.isPaused = false;
-
-            const hasNextLevel = gc.currentLevelIndex < gc.levelClasses.length - 1;
-            if (hasNextLevel) {
-                // Advance to the next level in GameControl's ordered list,
-                // then call transitionToLevel() which destroys the current
-                // level, creates the next one, and restarts the game loop —
-                // exactly what GameControl.handleLevelEnd() does internally.
-                gc.currentLevelIndex++;
-                gc.transitionToLevel();
-            } else {
-                // This was the last level — signal normal game completion so
-                // GameControl.handleLevelEnd() can fire the gameOver callback.
-                if (gc.currentLevel) gc.currentLevel.continue = false;
-            }
+            gc.transitionToLevel();
         });
 
-        overlay.append(title, sub, btn);
+        const lobbyBtn = document.createElement('button');
+        lobbyBtn.className = 'mansion-overlay-btn';
+        lobbyBtn.style.color = '#82aaff';
+        lobbyBtn.textContent = 'BACK TO LOBBY';
+        lobbyBtn.addEventListener('mouseenter', () => {
+            lobbyBtn.style.background = '#82aaff';
+            lobbyBtn.style.color = '#000';
+        });
+        lobbyBtn.addEventListener('mouseleave', () => {
+            lobbyBtn.style.background = 'transparent';
+            lobbyBtn.style.color = '#82aaff';
+        });
+        lobbyBtn.addEventListener('click', () => {
+            this._removeOverlay();
+            const gc = this.gameEnv?.gameControl;
+            if (!gc) return;
+
+            gc.levelClasses = [MansionLevelMain];
+            gc.currentLevelIndex = 0;
+            gc.isPaused = false;
+            gc.transitionToLevel();
+        });
+
+        const buttonRow = document.createElement('div');
+        buttonRow.style.display = 'flex';
+        buttonRow.style.gap = '12px';
+        buttonRow.style.flexWrap = 'wrap';
+        buttonRow.style.justifyContent = 'center';
+        buttonRow.append(replayBtn, lobbyBtn);
+
+        overlay.append(title, sub, buttonRow);
         this.gameEnv.container.appendChild(overlay);
     }
 
