@@ -1,64 +1,59 @@
-// To build GameLevels, each contains GameObjects from below imports
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 
-//Import custom classes from select files
 import Barrier from './Barrier.js';
 import { WaveManager } from './waveManager.js';
 
 class MansionLevel4 {
     constructor(gameEnv) {
-        let width = gameEnv.innerWidth;
+        let width  = gameEnv.innerWidth;
         let height = gameEnv.innerHeight;
-        let path = gameEnv.path;
+        let path   = gameEnv.path;
 
         // Initialize wave manager
         this.waveManager = new WaveManager(gameEnv);
 
-        // Background data
-        const image_background = path + "/images/projects/mansionGame/background.jpg";
+        // Background
         const image_data_background = {
             name: 'background',
             greeting: "Wave Defense! Defeat all enemies to proceed!",
-            src: image_background,
+            src: path + "/images/projects/mansionGame/background.jpg",
             pixels: { height: 1600, width: 1600 }
         };
 
-        const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
-        const MC_SCALE_FACTOR = 6;
+        // Player
         const sprite_data_player = {
             id: 'Spook',
             greeting: "Hi, I am Spook.",
-            src: sprite_src_mc,
-            SCALE_FACTOR: MC_SCALE_FACTOR,
+            src: path + "/images/projects/mansionGame/spookMcWalk.png",
+            SCALE_FACTOR: 6,
             STEP_FACTOR: 800,
             ANIMATION_RATE: 10,
             INIT_POSITION: { x: width * 0.1, y: height / 2 },
             pixels: { height: 2400, width: 3600 },
             orientation: { rows: 2, columns: 3 },
-            down: { row: 1, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI / 16 },
-            downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI / 16 },
-            left: { row: 0, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 1, start: 0, columns: 3 },
-            upLeft: { row: 0, start: 0, columns: 3, rotate: Math.PI / 16 },
-            upRight: { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
+            down:      { row: 1, start: 0, columns: 3 },
+            downRight: { row: 1, start: 0, columns: 3, rotate:  Math.PI / 16 },
+            downLeft:  { row: 0, start: 0, columns: 3, rotate: -Math.PI / 16 },
+            left:      { row: 0, start: 0, columns: 3 },
+            right:     { row: 1, start: 0, columns: 3 },
+            up:        { row: 1, start: 0, columns: 3 },
+            upLeft:    { row: 0, start: 0, columns: 3, rotate:  Math.PI / 16 },
+            upRight:   { row: 1, start: 0, columns: 3, rotate: -Math.PI / 16 },
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
-            keypress: { up: 87, left: 65, down: 83, right: 68 } // W, A, S, D
+            keypress: { up: 87, left: 65, down: 83, right: 68 } // W A S D
         };
 
-        // Define barrier locations - boundary walls
+        // Boundary walls
         const barrierData = [
-            { x: 0, y: 0, width: width, height: 20, visible: true },                    // Top wall
-            { x: 0, y: height - 20, width: width, height: 20, visible: true },          // Bottom wall
-            { x: 0, y: 0, width: 20, height: height, visible: true },                   // Left wall
-            { x: width - 20, y: 0, width: 20, height: height, visible: true }           // Right wall
+            { x: 0,          y: 0,           width: width,  height: 20,     visible: true }, // top
+            { x: 0,          y: height - 20, width: width,  height: 20,     visible: true }, // bottom
+            { x: 0,          y: 0,           width: 20,     height: height,  visible: true }, // left
+            { x: width - 20, y: 0,           width: 20,     height: height,  visible: true }  // right
         ];
 
-        // Initialize game objects
         this.classes = [
             { class: GameEnvBackground, data: image_data_background },
             { class: Player, data: sprite_data_player },
@@ -67,33 +62,48 @@ class MansionLevel4 {
 
         this.gameEnv = gameEnv;
 
-        // Adding Music
+        // Background music
         this.backgroundMusic = new Audio(path + '/assets/sounds/mansionGame/SpookieDookie.mp3');
-        this.backgroundMusic.loop = true;
+        this.backgroundMusic.loop   = true;
         this.backgroundMusic.volume = 0.3;
         this.backgroundMusic.play();
 
-        // Setup input listeners for shooting and starting waves
         this.setupInputListener();
-
-        // Show starting UI
         this.showStartUI();
     }
 
     setupInputListener() {
-        this.inputHandler = (e) => {
-            // Space key to shoot
+        this.keysHeld = new Set();
+
+        this.keydownHandler = (e) => {
+            this.keysHeld.add(e.code);
+
             if (e.code === 'Space') {
                 e.preventDefault();
-                this.waveManager.playerShoot();
+
+                // Build direction vector from held WASD keys
+                let dx = 0, dy = 0;
+                if (this.keysHeld.has('KeyW')) dy -= 1;
+                if (this.keysHeld.has('KeyS')) dy += 1;
+                if (this.keysHeld.has('KeyA')) dx -= 1;
+                if (this.keysHeld.has('KeyD')) dx += 1;
+
+                // Default to shooting right if standing still
+                if (dx === 0 && dy === 0) dx = 1;
+
+                this.waveManager.playerShoot({ dx, dy });
             }
         };
 
-        document.addEventListener('keydown', this.inputHandler);
+        this.keyupHandler = (e) => {
+            this.keysHeld.delete(e.code);
+        };
+
+        document.addEventListener('keydown', this.keydownHandler);
+        document.addEventListener('keyup',   this.keyupHandler);
     }
 
     showStartUI() {
-        // Create start prompt
         const startElement = document.createElement('div');
         startElement.id = 'wave-start-prompt';
         startElement.style.cssText = `
@@ -111,14 +121,16 @@ class MansionLevel4 {
         `;
 
         startElement.innerHTML = `
-            <h1 style="color: #ff6b6b; font-size: 48px; margin: 0 0 20px 0;">WAVE DEFENSE</h1>
-            <div style="color: white; font-size: 24px; margin: 20px 0;">
+            <h1 style="color:#ff6b6b;font-size:48px;margin:0 0 20px 0;">WAVE DEFENSE</h1>
+            <div style="color:white;font-size:24px;margin:20px 0;">
                 <p>Defeat 3 waves of enemies!</p>
-                <p style="font-size: 18px; opacity: 0.8;">Wave 1: 5 enemies | Wave 2: 10 enemies | Wave 3: 15 enemies</p>
+                <p style="font-size:18px;opacity:0.8;">
+                    Wave 1: 5 enemies &nbsp;|&nbsp; Wave 2: 10 enemies &nbsp;|&nbsp; Wave 3: 15 enemies
+                </p>
             </div>
-            <div style="margin-top: 30px; padding: 20px; background: #ff6b6b; border-radius: 10px;">
-                <p style="color: white; font-size: 26px; margin: 0; font-weight: bold;">Press SPACE to Shoot</p>
-                <p style="color: white; font-size: 20px; margin: 10px 0 0 0;">Use WASD to Move</p>
+            <div style="margin-top:30px;padding:20px;background:#ff6b6b;border-radius:10px;">
+                <p style="color:white;font-size:26px;margin:0;font-weight:bold;">SPACE to Shoot (hold WASD to aim)</p>
+                <p style="color:white;font-size:20px;margin:10px 0 0 0;">WASD to Move</p>
             </div>
             <button id="start-wave-btn" style="
                 margin-top: 30px;
@@ -135,19 +147,15 @@ class MansionLevel4 {
 
         document.body.appendChild(startElement);
 
-        // Add button click handler
-        const startBtn = document.getElementById('start-wave-btn');
-        startBtn.addEventListener('click', () => {
+        document.getElementById('start-wave-btn').addEventListener('click', () => {
             startElement.remove();
             this.waveManager.startFirstWave();
         });
     }
 
     update() {
-        // Update wave manager
         this.waveManager.update();
 
-        // Check if all waves are complete
         if (this.waveManager.isComplete()) {
             this.winLevel();
         }
@@ -159,7 +167,6 @@ class MansionLevel4 {
 
         console.log("🎉 Level 4 Won!");
 
-        // Show victory message
         const dialogueSystem = new DialogueSystem();
         dialogueSystem.showDialogue(
             'You have defeated all waves! You are a true warrior!',
@@ -173,16 +180,15 @@ class MansionLevel4 {
                 primary: true,
                 action: () => {
                     dialogueSystem.closeDialogue();
-                    // TODO: Transition to next level
                     alert("Level 4 Complete!");
                 }
             }
         ]);
     }
 
-    // Clean up when level is destroyed
     destroy() {
-        document.removeEventListener('keydown', this.inputHandler);
+        document.removeEventListener('keydown', this.keydownHandler);
+        document.removeEventListener('keyup',   this.keyupHandler);
         this.waveManager.destroy();
         if (this.backgroundMusic) {
             this.backgroundMusic.pause();

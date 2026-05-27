@@ -1,13 +1,14 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import Projectile from './Projectile.js';
-
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 class WaveEnemy extends Character {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
         this.healthPoints = data?.healthPoints || 1;
-        this.speed = data?.speed || 3;
+        this.speed = data?.speed || 2;
         this.maxHealth = data?.healthPoints || 1;
         this._isDestroyed = false;
+        this._facingRight = true;
     }
 
     update() {
@@ -26,6 +27,15 @@ class WaveEnemy extends Character {
             if (distance > 0) {
                 this.position.x += (dx / distance) * this.speed;
                 this.position.y += (dy / distance) * this.speed;
+
+                // Flip animation row based on horizontal movement direction
+                if (dx > 0 && !this._facingRight) {
+                    this._facingRight = true;
+                    if (this.spriteData?.right) this.currentAnimation = this.spriteData.right;
+                } else if (dx < 0 && this._facingRight) {
+                    this._facingRight = false;
+                    if (this.spriteData?.left) this.currentAnimation = this.spriteData.left;
+                }
             }
         }
 
@@ -43,7 +53,7 @@ class WaveEnemy extends Character {
         if (this._isDestroyed) return;
         this._isDestroyed = true;
 
-        // Required: Character.destroy() removes the canvas from the DOM
+        // Critical: Character.destroy() removes the canvas element from the DOM
         super.destroy();
 
         if (this.gameEnv && this.gameEnv.gameObjects) {
@@ -59,13 +69,16 @@ class WaveEnemy extends Character {
     }
 }
 
+/**
+ * WaveManager - Handles wave logic, enemy spawning, projectiles, and progression
+ */
 class WaveManager {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
         this.waves = [
-            { count: 5,  speed: 3 },
-            { count: 10, speed: 5 },
-            { count: 15, speed: 7 }
+            { count: 5,  speed: 2   },  // Wave 1
+            { count: 10, speed: 3.5 },  // Wave 2
+            { count: 15, speed: 5   }   // Wave 3
         ];
 
         this.currentWave = 0;
@@ -75,9 +88,10 @@ class WaveManager {
         this.npcSpawned = false;
         this._playerDead = false;
 
+        // Projectile system
         this.projectiles = [];
         this.lastAttackTime = Date.now();
-        this.attackCooldown = 400;
+        this.attackCooldown = 250; // 0.25s between shots
 
         this.waveDisplay = null;
     }
@@ -105,59 +119,76 @@ class WaveManager {
         console.log(`Wave ${this.currentWave + 1} started — ${wave.count} enemies at speed ${wave.speed}`);
     }
 
-spawnWaveEnemies(count, speed) {
-    const width  = this.gameEnv.innerWidth;
-    const height = this.gameEnv.innerHeight;
-    const path   = this.gameEnv.path;
-    const sprite_src = path + "/_projects/games/mansionGame/images/ghost.png"; // ← updated
+    spawnWaveEnemies(count, speed) {
+        const width  = this.gameEnv.innerWidth;
+        const height = this.gameEnv.innerHeight;
+        const path   = this.gameEnv.path;
+        const sprite_src = path + "/_projects/games/mansionGame/images/ghost.png";
 
-    for (let i = 0; i < count; i++) {
-        // Spawn from all 4 edges
-        const edge = Math.floor(Math.random() * 4);
-        let xPos, yPos;
-        switch (edge) {
-            case 0: xPos = Math.random() * width;  yPos = -60;          break; // top
-            case 1: xPos = Math.random() * width;  yPos = height + 60;  break; // bottom
-            case 2: xPos = -60;                    yPos = Math.random() * height; break; // left
-            default: xPos = width + 60;            yPos = Math.random() * height; break; // right
+        // Player starts at width*0.1, height/2 — reject spawns closer than half the screen
+        const playerStartX = width * 0.1;
+        const playerStartY = height / 2;
+        const minSpawnDist = Math.min(width, height) * 0.5;
+
+        for (let i = 0; i < count; i++) {
+            let xPos, yPos;
+
+            // Re-roll until spawn is far enough from the player start position
+            do {
+                const edge = Math.floor(Math.random() * 4);
+                switch (edge) {
+                    case 0: xPos = Math.random() * width;  yPos = -80;          break; // top
+                    case 1: xPos = Math.random() * width;  yPos = height + 80;  break; // bottom
+                    case 2: xPos = -80;                    yPos = Math.random() * height; break; // left
+                    default: xPos = width + 80;            yPos = Math.random() * height; break; // right
+                }
+                const dx = xPos - playerStartX;
+                const dy = yPos - playerStartY;
+                if (Math.sqrt(dx * dx + dy * dy) >= minSpawnDist) break;
+            } while (true);
+
+            const enemyData = {
+                id: `waveEnemy_${this.currentWave}_${i}`,
+                src: sprite_src,
+                SCALE_FACTOR: 3,
+                STEP_FACTOR: 0,
+                ANIMATION_RATE: 8,
+                INIT_POSITION: { x: xPos, y: yPos },
+                pixels: { height: 1000, width: 3000 }, // full spritesheet dimensions
+                orientation: { rows: 2, columns: 6 },
+                left:  { row: 0, start: 0, columns: 6 }, // top row = ghost leaning left
+                right: { row: 1, start: 0, columns: 6 }, // bottom row = ghost leaning right
+                up:    { row: 0, start: 0, columns: 6 },
+                down:  { row: 1, start: 0, columns: 6 },
+                hitbox: { widthPercentage: 0.4, heightPercentage: 0.5 },
+                healthPoints: 1,
+                speed: speed
+            };
+
+            const enemy = new WaveEnemy(enemyData, this.gameEnv);
+            this.waveEnemies.push(enemy);
+            this.gameEnv.gameObjects.push(enemy);
         }
-
-        const enemyData = {
-            id: `waveEnemy_${this.currentWave}_${i}`,
-            src: sprite_src,
-            SCALE_FACTOR: 3,
-            STEP_FACTOR: 0,
-            ANIMATION_RATE: 8,
-            INIT_POSITION: { x: xPos, y: yPos },
-            pixels: { height: 1000, width: 3000 }, // full spritesheet: 6 cols × 2 rows × 500px each
-            orientation: { rows: 2, columns: 6 },
-            left:  { row: 0, start: 0, columns: 6 }, // top row = ghost leaning left
-            right: { row: 1, start: 0, columns: 6 }, // bottom row = ghost leaning right
-            up:    { row: 0, start: 0, columns: 6 },
-            down:  { row: 1, start: 0, columns: 6 },
-            hitbox: { widthPercentage: 0.4, heightPercentage: 0.5 },
-            healthPoints: 1,
-            speed: speed
-        };
-
-        const enemy = new WaveEnemy(enemyData, this.gameEnv);
-        this.waveEnemies.push(enemy);
-        this.gameEnv.gameObjects.push(enemy);
     }
-}
 
     update() {
         if (!this.waveActive) return;
 
+        // Update and cull dead projectiles
         this.projectiles = this.projectiles.filter(p => !p.revComplete);
         this.projectiles.forEach(p => p.update());
 
+        // Collision checks
         this.checkProjectileCollisions();
         this.checkPlayerCollisions();
 
+        // Cull destroyed enemies
         this.waveEnemies = this.waveEnemies.filter(e => !e.isDestroyed());
+
+        // Keep UI counter live
         this.updateWaveDisplay();
 
+        // Check wave completion (1s grace period after wave starts)
         if (this.waveEnemies.length === 0 && this.waveStartTime > 0) {
             if (Date.now() - this.waveStartTime > 1000) {
                 this.completeWave();
@@ -176,9 +207,8 @@ spawnWaveEnemies(count, speed) {
 
                 const dx = (enemy.position.x + (enemy.width  || 50) / 2) - projectile.position.x;
                 const dy = (enemy.position.y + (enemy.height || 50) / 2) - projectile.position.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance <= 45) {
+                if (Math.sqrt(dx * dx + dy * dy) <= 45) {
                     enemy.takeDamage(1);
                     projectile.revComplete = true;
                     if (projectile.destroy) projectile.destroy();
@@ -196,17 +226,15 @@ spawnWaveEnemies(count, speed) {
         );
         if (players.length === 0) return;
 
-        const player = players[0];
+        const player   = players[0];
         const playerCX = player.position.x + (player.width  || 50) / 2;
         const playerCY = player.position.y + (player.height || 50) / 2;
 
         for (const enemy of this.waveEnemies) {
             if (enemy.isDestroyed()) continue;
 
-            const enemyCX = enemy.position.x + (enemy.width  || 50) / 2;
-            const enemyCY = enemy.position.y + (enemy.height || 50) / 2;
-            const dx = playerCX - enemyCX;
-            const dy = playerCY - enemyCY;
+            const dx = playerCX - (enemy.position.x + (enemy.width  || 50) / 2);
+            const dy = playerCY - (enemy.position.y + (enemy.height || 50) / 2);
 
             if (Math.sqrt(dx * dx + dy * dy) <= 40) {
                 this.killPlayer(player);
@@ -219,27 +247,66 @@ spawnWaveEnemies(count, speed) {
         if (this._playerDead) return;
         this._playerDead = true;
 
-        // Use the existing death screen system from Projectile/DeathScreen.js
-        import('./DeathScreen.js').then(({ default: showDeathScreen }) => {
-            showDeathScreen(player);
-        }).catch(() => {
-            // Fallback if import fails
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position:fixed;inset:0;background:rgba(0,0,0,0.85);
-                display:flex;flex-direction:column;align-items:center;
-                justify-content:center;z-index:99999;
-            `;
-            overlay.innerHTML = `
-                <h1 style="color:#ff4444;font-size:64px;margin:0 0 20px">GAME OVER</h1>
-                <p style="color:white;font-size:24px;margin:0 0 40px">An enemy reached you on Wave ${this.currentWave + 1}</p>
-                <button onclick="location.reload()" style="
-                    padding:15px 40px;font-size:22px;background:#4CAF50;
-                    color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;
-                ">Try Again</button>
-            `;
-            document.body.appendChild(overlay);
+        const gameControl = player?.gameEnv?.gameControl;
+        if (gameControl) gameControl.isPaused = true;
+
+        // Particle burst at player position
+        const playerCX = player.position.x + player.width  / 2;
+        const playerCY = player.position.y + player.height / 2;
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            Object.assign(particle.style, {
+                position: 'absolute',
+                width: '5px', height: '5px',
+                backgroundColor: 'red',
+                left: `${playerCX}px`, top: `${playerCY}px`,
+                zIndex: '9999'
+            });
+            document.body.appendChild(particle);
+
+            const angle    = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 100 + 50;
+            particle.animate(
+                [{ transform: 'translate(0,0)', opacity: 1 },
+                 { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`, opacity: 0 }],
+                { duration: 1000, easing: 'ease-out', fill: 'forwards' }
+            );
+            setTimeout(() => particle.remove(), 1000);
+        }
+
+        // Death dialog
+        const deathMessage = document.createElement('div');
+        Object.assign(deathMessage.style, {
+            position: 'fixed', top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0,0,0,0.8)', color: '#FF0000',
+            padding: '30px', borderRadius: '10px',
+            fontFamily: "'Press Start 2P', sans-serif",
+            fontSize: '24px', textAlign: 'center',
+            zIndex: '10000', border: '3px solid #FF0000',
+            boxShadow: '0 0 20px rgba(255,0,0,0.5)', width: '400px'
         });
+        deathMessage.innerHTML = `
+            <div style="margin-bottom:20px">☠️ YOU DIED ☠️</div>
+            <div style="font-size:16px;margin-bottom:20px">The ghosts got you!</div>
+            <div style="font-size:14px">Respawning in 3 seconds...</div>
+        `;
+        document.body.appendChild(deathMessage);
+        setTimeout(() => deathMessage.remove(), 2000);
+
+        // Restart MansionLevel4
+        setTimeout(() => {
+            import('./mansionLevel4.js').then(({ default: MansionLevel4 }) => {
+                if (gameControl && typeof gameControl.transitionToLevel === 'function') {
+                    gameControl.levelClasses = [MansionLevel4];
+                    gameControl.currentLevelIndex = 0;
+                    gameControl.isPaused = false;
+                    gameControl.transitionToLevel();
+                } else {
+                    location.reload();
+                }
+            }).catch(() => location.reload());
+        }, 3000);
     }
 
     completeWave() {
@@ -248,6 +315,7 @@ spawnWaveEnemies(count, speed) {
         this.currentWave++;
 
         if (this.currentWave >= this.waves.length) {
+            console.log("All waves done! Spawning NPC...");
             this.spawnNPC();
         } else {
             setTimeout(() => this.startWave(), 1500);
@@ -265,7 +333,7 @@ spawnWaveEnemies(count, speed) {
         const npcData = {
             id: 'VictoryNPC',
             greeting: "You have defeated all the waves! Well done!",
-            src: path + "/images/projects/mansionGame/spookMcWalk.png",
+            src: path + "/_projects/games/mansionGame/images/pumpkin.png",
             SCALE_FACTOR: 6,
             STEP_FACTOR: 0,
             ANIMATION_RATE: 10,
@@ -279,17 +347,12 @@ spawnWaveEnemies(count, speed) {
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 }
         };
 
-        const Npc = this.getNpcClass();
-        if (Npc) {
-            this.gameEnv.gameObjects.push(new Npc(npcData, this.gameEnv));
-        }
+        const npc = new Npc(npcData, this.gameEnv);
+        this.gameEnv.gameObjects.push(npc);
+        console.log("Victory NPC spawned");
     }
 
-    getNpcClass() {
-        return null;
-    }
-
-    playerShoot(targetPosition = null) {
+    playerShoot(direction = null) {
         const now = Date.now();
         if (now - this.lastAttackTime < this.attackCooldown) return;
 
@@ -303,10 +366,14 @@ spawnWaveEnemies(count, speed) {
         const sourceY = player.position.y + player.height / 2;
 
         let targetX, targetY;
-        if (targetPosition) {
-            targetX = targetPosition.x;
-            targetY = targetPosition.y;
+
+        if (direction?.dx !== undefined) {
+            // Shoot in the direction the player is moving
+            const len = Math.sqrt(direction.dx ** 2 + direction.dy ** 2) || 1;
+            targetX = sourceX + (direction.dx / len) * 1000;
+            targetY = sourceY + (direction.dy / len) * 1000;
         } else {
+            // Fallback: aim at nearest enemy, or shoot right
             const nearest = this.getNearestEnemy(player);
             targetX = nearest ? nearest.position.x + (nearest.width  || 50) / 2 : sourceX + 500;
             targetY = nearest ? nearest.position.y + (nearest.height || 50) / 2 : sourceY;
@@ -339,9 +406,17 @@ spawnWaveEnemies(count, speed) {
             this.waveDisplay = document.createElement('div');
             this.waveDisplay.id = 'wave-display';
             this.waveDisplay.style.cssText = `
-                position:fixed;top:20px;left:20px;background:rgba(0,0,0,0.7);
-                color:white;padding:15px 25px;border:2px solid #ff6b6b;
-                border-radius:8px;font-size:20px;font-weight:bold;z-index:1000;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                padding: 15px 25px;
+                border: 2px solid #ff6b6b;
+                border-radius: 8px;
+                font-size: 20px;
+                font-weight: bold;
+                z-index: 1000;
             `;
             document.body.appendChild(this.waveDisplay);
         }
