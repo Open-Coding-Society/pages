@@ -1,0 +1,75 @@
+{
+"title": "Plagiarism Quest Prototype Feedback Survey",
+"settings": {
+"collect_name": true,
+"allow_edit_after_submit": true
+},
+"sections": [
+{
+"title": "Introduction & Identification",
+"description": "Please enter your name and group. Spend about 2 minutes.",
+"fields": [
+{"type": "short_answer", "title": "Name", "required": true},
+{"type": "short_answer", "title": "Team Members", "required": true},
+{"type": "short_answer", "title": "Grade / Period", "required": true}
+]
+},
+{
+"title": "C1 – Cases",
+"description": "Spend less than 5 minutes exploring the case studies and reflecting on what stood out to you.",
+"fields": [
+{"type": "multiple_choice", "title": "What UI element did you like best?", "options": ["Page layout", "Audio", "Video", "Other"], "required": true},
+{"type": "short_answer", "title": "Why did you choose that UI element?", "required": true},
+{"type": "paragraph", "title": "What was your biggest plagiarism takeaway or surprise from the cases?", "required": true},
+{"type": "multiple_choice", "title": "What was your least favorite UI element?", "options": ["Page layout", "Audio", "Video", "Other"], "required": true},
+{"type": "short_answer", "title": "Why was that your least favorite?", "required": true},
+{"type": "linear_scale", "title": "Rate the difficulty of this section", "min_value": 0, "max_value": 5, "min_label": "Very Hard", "max_label": "Very Easy", "required": true}
+]
+},
+{
+"title": "C2 – APA Reference & Citation Training",
+"description": "Spend 5-7 minutes on APA reference and citation exercises.",
+"fields": [
+{"type": "multiple_choice", "title": "What UI element was most helpful?", "options": ["Page layout", "Quote Finder", "Building your own reference/citation", "Test Fill"], "required": true},
+{"type": "checkboxes", "title": "Was anything too hard?", "options": ["Coming up with a quote", "Building reference/citation", "No, everything was fine", "Other"], "required": true},
+{"type": "paragraph", "title": "Explain what made it difficult or easy.", "required": true}
+]
+},
+{
+"title": "C3 – Correct Errors",
+"description": "Spend 5 minutes correcting errors and reflecting on clarity.",
+"fields": [
+{"type": "multiple_choice", "title": "Did you like this page?", "options": ["Yes", "No"], "required": true},
+{"type": "multiple_choice", "title": "Did it feel like something was missing?", "options": ["Yes", "No"], "required": true},
+{"type": "short_answer", "title": "If yes, what do you think was missing?"},
+{"type": "linear_scale", "title": "Rate the difficulty of this section", "min_value": 0, "max_value": 5, "min_label": "Very Hard", "max_label": "Very Easy", "required": true}
+]
+},
+{
+"title": "C4 – Build Your Own Document",
+"description": "Spend 5 minutes creating your own document and reflecting on the process.",
+"fields": [
+{"type": "paragraph", "title": "What did you like best in this activity?", "required": true},
+{"type": "paragraph", "title": "Did you find anything hard? If yes, what?", "required": true}
+]
+},
+{
+"title": "Main Page, C5 & C6 Reviews",
+"description": "Reflect on the overall quest structure and progress tracking.",
+"fields": [
+{"type": "multiple_choice", "title": "Did the status on the main page help you understand how to progress?", "options": ["Yes", "Somewhat", "No"], "required": true},
+{"type": "multiple_choice", "title": "Did this help you understand the idea of a 'quest'?", "options": ["Yes", "Somewhat", "No"], "required": true},
+{"type": "multiple_choice", "title": "After completing the teacher and student review, did you better understand how data is accumulated in the quest?", "options": ["Yes", "Somewhat", "No"], "required": true},
+{"type": "paragraph", "title": "Any additional thoughts or suggestions for improving the system?"}
+]
+},
+{
+"title": "Reflection",
+"description": "Optional section: Think about how this experience will influence your own quest design.",
+"fields": [
+{"type": "paragraph", "title": "If you were to improve one part of this system, what would it be and why?"},
+{"type": "paragraph", "title": "What did you learn from observing this system that could help you design your own quest?"}
+]
+}
+]
+}
