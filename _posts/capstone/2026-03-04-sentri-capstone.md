@@ -173,15 +173,17 @@ permalink: /capstone/sentri/
     }
 }
 
-/* NEW HANDOFF STYLES */
+/* HANDOFF STYLES */
 .handoff-container {
     margin-top: 100px;
     border-top: 2px dashed var(--glass-border);
     padding-top: 60px;
+    text-align: left;
 }
 
 .handoff-header {
     margin-bottom: 40px;
+    text-align: center;
 }
 
 .handoff-header h2 {
@@ -192,41 +194,41 @@ permalink: /capstone/sentri/
 
 .feedback-section {
     background: rgba(0,0,0,0.2);
-    padding: 30px;
+    padding: 40px;
     border-radius: 24px;
     margin-bottom: 40px;
+    border: 1px solid var(--glass-border);
 }
 
 .feedback-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
+    gap: 40px;
 }
 
 .feedback-item h4 {
     color: var(--accent-light);
-    margin-bottom: 10px;
-    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 10px;
 }
 
-.feedback-item ul {
-    list-style: none;
-    padding: 0;
+.feedback-item p {
     font-size: 0.9rem;
     color: var(--text-muted);
+    line-height: 1.6;
 }
 
-.feedback-item li {
-    margin-bottom: 8px;
-    padding-left: 15px;
-    position: relative;
-}
-
-.feedback-item li::before {
-    content: "→";
-    position: absolute;
-    left: 0;
-    color: var(--accent-green);
+.tech-stack-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--accent-dark);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: white;
+    margin-right: 5px;
+    margin-bottom: 10px;
 }
 
 .github-cta {
@@ -252,6 +254,7 @@ permalink: /capstone/sentri/
     flex-wrap: wrap;
     gap: 20px;
     margin-top: 30px;
+    justify-content: center;
 }
 
 .contact-card {
@@ -318,49 +321,72 @@ permalink: /capstone/sentri/
 <!-- HANDOFF SECTION -->
 <div class="handoff-container">
     <div class="handoff-header">
-        <h2>PUSD CTE Expo Handoff</h2>
-        <p>Post-presentation feedback and development roadmap for Poway Recovery Center.</p>
+        <h2>Technical Handoff & Development Roadmap</h2>
+        <p>Strategic plan for the Poway Recovery Center digital infrastructure revamp.</p>
         
         <a href="https://github.com/Debuggers-CSP/Sentri-PRC" target="_blank" class="github-cta">
-            <span>View Source Code on GitHub</span>
+            <span>🚀 Access GitHub Repository</span>
         </a>
     </div>
 
     <div class="feedback-section">
-        <h3>Expo Feedback & Future Pivots</h3>
+        <h3>Development Strategy: Addressing Expo Feedback</h3>
         <div class="feedback-grid">
+            
+            <!-- PRIVACY & BACKEND -->
             <div class="feedback-item">
-                <h4>✅ Validated Wins</h4>
-                <ul>
-                    <li><strong>AI Finder:</strong> High praise for reducing "choice paralysis."</li>
-                    <li><strong>The Sobriety Garden:</strong> Standout gamification feature for psychological incentive.</li>
-                    <li><strong>Integrated Ecosystem:</strong> Seamless transition from finding to tracking.</li>
-                </ul>
+                <h4>🔒 Privacy & Data Architecture</h4>
+                <div class="tech-stack-tag">Node.js</div><div class="tech-stack-tag">PostgreSQL</div><div class="tech-stack-tag">JWT</div>
+                <p>
+                    <strong>The Gameplan:</strong> To ensure anonymity, we are shifting to a persistent backend. 
+                    User identities will be decoupled from activity logs using a <em>UUID system</em>.
+                </p>
+                <p>
+                    <strong>CRUD Operations:</strong> We will implement a RESTful API to manage the "Sobriety Garden" and journal entries. 
+                    Users will have full control over their data, including an "Account Purge" feature to permanently Delete all database entries, satisfying privacy requirements.
+                </p>
             </div>
+
+            <!-- UI/UX PIVOT -->
             <div class="feedback-item">
-                <h4>🛠 Design Pivots</h4>
-                <ul>
-                    <li><strong>Privacy:</strong> Implementing "Ghost Mode" & pseudonym handles.</li>
-                    <li><strong>UI Palette:</strong> Shifting to "Serene Blue" for mental health tranquility.</li>
-                    <li><strong>Accessibility:</strong> Refactoring for Mobile-First crisis response.</li>
-                </ul>
+                <h4>🎨 Psychological UI Refactor</h4>
+                <div class="tech-stack-tag">CSS Grid</div><div class="tech-stack-tag">Mobile-First</div>
+                <p>
+                    <strong>Visual Pivot:</strong> Transitioning from the clinical "High-Alert Green" to a "Serene Blue" and neutral palette (#E3F2FD, #F5F5F5) to reduce user anxiety during crisis.
+                </p>
+                <p>
+                    <strong>Mobile-First:</strong> Refactoring the Information Architecture for 320px–480px viewports. This ensures that users in transition—who often rely solely on smartphones—can access the AI Program Finder with zero friction.
+                </p>
             </div>
+
+            <!-- GOVERNANCE -->
             <div class="feedback-item">
-                <h4>🚀 Governance & Access</h4>
-                <ul>
-                    <li><strong>Open Landing:</strong> Creating a "Before-Login" info wall to remove entry barriers.</li>
-                    <li><strong>Admin UI:</strong> Moderation tools for staff to ensure community safety.</li>
-                </ul>
+                <h4>🛡️ Admin Moderation System</h4>
+                <div class="tech-stack-tag">RBAC</div><div class="tech-stack-tag">Dashboard</div>
+                <p>
+                    <strong>The Solution:</strong> A dedicated Admin UI with Role-Based Access Control (RBAC) for PRC staff. 
+                </p>
+                <p>
+                    <strong>Functionality:</strong> Staff will be able to Read flagged community posts, Update community bulletin content in real-time, and Delete inappropriate interactions to maintain a safe, recovery-focused environment.
+                </p>
             </div>
+
+            <!-- IA PIVOT -->
+            <div class="feedback-item">
+                <h4>🚪 "Before-Login" Landing</h4>
+                <div class="tech-stack-tag">Routing</div><div class="tech-stack-tag">SEO</div>
+                <p>
+                    <strong>Entry Barriers:</strong> Currently, features are gated. Our plan includes a "Public Hope" landing page that allows users to utilize the AI Program Finder <em>anonymously</em> before committing to an account. This builds trust before data collection.
+                </p>
+            </div>
+
         </div>
     </div>
 
-    <div class="feedback-section">
-        <h3>Future Outlook</h3>
-        <p style="font-size: 0.95rem; color: var(--text-muted);">
-            Sentri has established a partnership with <strong>Damon Dong</strong> at the Poway Recovery Center. 
-            Moving forward, this project will transition into a live Service-Learning tool, 
-            potentially revamping the Center's digital infrastructure using our blueprint.
+    <div class="feedback-section" style="text-align: center;">
+        <h3>Future Partnership: Poway Recovery Center</h3>
+        <p style="font-size: 1rem; color: var(--text-muted); max-width: 800px; margin: auto; line-height: 1.8;">
+            Following our connection with <strong>Damon Dong</strong>, Sentri is moving from a prototype to a "Service Learning" project. Our immediate next steps include scheduling a requirements-gathering call to align our SQL schema with the Center’s existing operational data.
         </p>
         
         <div class="team-contact">
@@ -373,7 +399,7 @@ permalink: /capstone/sentri/
                 <a href="mailto:lilianwu08@gmail.com">lilianwu08@gmail.com</a>
             </div>
             <div class="contact-card">
-                <strong>Jayneea Chauhan</strong><br>
+                <strong>Jaynee Chauhan</strong><br>
                 <a href="mailto:chauhanjayneea@gmail.com">chauhanjayneea@gmail.com</a>
             </div>
         </div>
