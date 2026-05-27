@@ -8,7 +8,7 @@ description: Build a lesson using multiple code runners on a page.  This modular
 permalink: /cpt/code
 ---
 
-## CPT Guide - Code Runner
+## CPT Guide Code Runner
 The Create Performance Task (CPT) requires a program that demonstrates core computational thinking concepts.
 
 Your program must include:
