@@ -53,11 +53,11 @@ class PowerUpSpawner extends GameObject {
         };
     }
 
-    draw() {}
+    draw() { }
 
-    resize() {}
+    resize() { }
 
-    destroy() {}
+    destroy() { }
 }
 
 class MansionLevel6_BattleRoom {
@@ -119,6 +119,9 @@ class MansionLevel6_BattleRoom {
             hitbox: { widthPercentage: 0.4, heightPercentage: 0 },
             zIndex: 10,
             isKilling: false, // Flag to prevent multiple kills
+
+            // Explicitly disable the reaction function
+            reaction: function () { },
 
             // The update method with all functionality inline
             update: function () {
