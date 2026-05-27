@@ -48,10 +48,10 @@ class MansionLevel4 {
 
         // Boundary walls
         const barrierData = [
-            { x: 0,          y: 0,           width: width,  height: 20,     visible: true }, // top
-            { x: 0,          y: height - 20, width: width,  height: 20,     visible: true }, // bottom
-            { x: 0,          y: 0,           width: 20,     height: height,  visible: true }, // left
-            { x: width - 20, y: 0,           width: 20,     height: height,  visible: true }  // right
+            { x: width * 0,          y: height * 0,           width: width * width,  height: height * 20,     visible: true }, // top
+            { x: width * 0,          y: height * height - 20, width: width * width,  height: height * 20,     visible: true }, // bottom
+            { x: width * 0,          y: height * 0,           width: width * 20,     height: height * height,  visible: true }, // left
+            { x: width * width - 20,         y: height * 0,           width: width * 20,     height: height * height,  visible: true }  // right
         ];
 
         this.classes = [
