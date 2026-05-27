@@ -2,6 +2,7 @@ import GameEnvBackground from "@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Player from "@assets/js/GameEnginev1.1/essentials/Player.js";
 import Npc from "@assets/js/GameEnginev1.1/essentials/Npc.js";
 import DialogueSystem from "@assets/js/GameEnginev1.1/essentials/DialogueSystem.js";
+import MansionLevelMain from "./mansionLevelMain.js";
 
 
 class MansionLevel1 {
@@ -12,6 +13,7 @@ class MansionLevel1 {
 
 
         this.gameEnv = gameEnv;
+        this.nextUnlockedLevelKey = "mansionGame_level2_unlocked";
         this.levelState = {
             collectedArtifacts: new Set(),
             artifactIds: ["sun_idol", "ancient_scroll", "desert_gem"],
@@ -313,11 +315,7 @@ class MansionLevel1 {
 
 
         if (this.levelState.rewardClaimed) {
-            mummyNpc.dialogueSystem?.showDialogue(
-                "The tomb key is already yours. Use this level as a template for the next puzzle.",
-                "Temple Mummy",
-                mummyNpc.spriteData.src
-            );
+            this.showReturnDialogue(mummyNpc);
             return;
         }
 
@@ -334,6 +332,7 @@ class MansionLevel1 {
 
 
         this.levelState.rewardClaimed = true;
+        this.unlockNextLevel();
         this.refreshUserInterface("All offerings delivered. The mummy reveals the key.");
 
 
@@ -345,6 +344,54 @@ class MansionLevel1 {
 
 
         this.showKeyReward();
+    }
+
+    showReturnDialogue(mummyNpc) {
+        if (!mummyNpc?.dialogueSystem) {
+            this.returnToLobby();
+            return;
+        }
+
+        mummyNpc.dialogueSystem.showDialogue(
+            "You beat Level 1. Return to the mansion lobby when you are ready.",
+            "Temple Mummy",
+            mummyNpc.spriteData.src
+        );
+
+        mummyNpc.dialogueSystem.addButtons([
+            {
+                text: "Return to Lobby",
+                primary: true,
+                action: () => {
+                    mummyNpc.dialogueSystem.closeDialogue();
+                    this.returnToLobby();
+                }
+            },
+            {
+                text: "Stay Here",
+                action: () => mummyNpc.dialogueSystem.closeDialogue()
+            }
+        ]);
+    }
+
+    unlockNextLevel() {
+        try {
+            window.localStorage.setItem(this.nextUnlockedLevelKey, "true");
+        } catch (error) {
+            console.warn(`Failed to save ${this.nextUnlockedLevelKey}`, error);
+        }
+    }
+
+    returnToLobby() {
+        const gameControl = this.gameEnv?.gameControl;
+        if (!gameControl) {
+            return;
+        }
+
+        gameControl.levelClasses = [MansionLevelMain];
+        gameControl.currentLevelIndex = 0;
+        gameControl.isPaused = false;
+        gameControl.transitionToLevel();
     }
 
 
@@ -393,22 +440,58 @@ class MansionLevel1 {
         Object.assign(rewardSubtext.style, {
             fontSize: "16px",
             textAlign: "center",
-            padding: "0 20px"
+            padding: "0 20px",
+            marginBottom: "18px"
         });
+
+        const buttonRow = document.createElement("div");
+        Object.assign(buttonRow.style, {
+            display: "flex",
+            gap: "12px",
+            flexWrap: "wrap",
+            justifyContent: "center"
+        });
+
+        const returnButton = document.createElement("button");
+        returnButton.textContent = "Return to Lobby";
+        Object.assign(returnButton.style, {
+            padding: "10px 18px",
+            borderRadius: "999px",
+            border: "none",
+            background: "#d2b36c",
+            color: "#221508",
+            fontWeight: "bold",
+            cursor: "pointer"
+        });
+        returnButton.addEventListener("click", () => this.returnToLobby());
+
+        const stayButton = document.createElement("button");
+        stayButton.textContent = "Keep Exploring";
+        Object.assign(stayButton.style, {
+            padding: "10px 18px",
+            borderRadius: "999px",
+            border: "1px solid #d2b36c",
+            background: "transparent",
+            color: "#f5e9b5",
+            fontWeight: "bold",
+            cursor: "pointer"
+        });
+        stayButton.addEventListener("click", () => {
+            if (this.keyPopup?.parentNode) {
+                this.keyPopup.parentNode.removeChild(this.keyPopup);
+            }
+            this.keyPopup = null;
+        });
+
+        buttonRow.appendChild(returnButton);
+        buttonRow.appendChild(stayButton);
 
 
         this.keyPopup.appendChild(keyImage);
         this.keyPopup.appendChild(rewardText);
         this.keyPopup.appendChild(rewardSubtext);
+        this.keyPopup.appendChild(buttonRow);
         document.body.appendChild(this.keyPopup);
-
-
-        this.keyPopupTimer = window.setTimeout(() => {
-            if (this.keyPopup?.parentNode) {
-                this.keyPopup.parentNode.removeChild(this.keyPopup);
-            }
-            this.keyPopup = null;
-        }, 3000);
     }
 
 
@@ -439,5 +522,4 @@ class MansionLevel1 {
 
 
 export default MansionLevel1;
-
 
