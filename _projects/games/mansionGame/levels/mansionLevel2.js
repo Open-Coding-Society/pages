@@ -36,7 +36,7 @@ class Reaper extends Npc {
                 }
             }
 
-            const speed = 1.1;
+            const speed = this.spriteData?.speed ?? 1.1;
             const dx = nearest.position.x - this.position.x;
             const dy = nearest.position.y - this.position.y;
             const angle = Math.atan2(dy, dx);
@@ -64,7 +64,8 @@ class HealthPlayer extends Player {
     }
 
     handleCollisionReaction(other) {
-        if (other?.id === 'Reaper' && !this.reaperCollisionActive) {
+        const hitReaper = other?.id === 'Reaper' || other?.id === 'Reaper2';
+        if (hitReaper && !this.reaperCollisionActive) {
             this.reaperCollisionActive = true;
             this.health = Math.max(0, this.health - 10);
             this.updateHealthDisplay();
@@ -74,13 +75,13 @@ class HealthPlayer extends Player {
 
     update() {
         super.update();
-        if (this.reaperCollisionActive && !this.state.collisionEvents.includes('Reaper')) {
+        if (this.reaperCollisionActive && !this.state.collisionEvents.includes('Reaper') && !this.state.collisionEvents.includes('Reaper2')) {
             this.reaperCollisionActive = false;
         }
     }
 
     handleCollisionState() {
-        if (this.state.collisionEvents.includes('Reaper')) {
+        if (this.state.collisionEvents.includes('Reaper') || this.state.collisionEvents.includes('Reaper2')) {
             this.state.movement = { up: true, down: true, left: true, right: true };
             return;
         }
@@ -162,6 +163,7 @@ class MansionLevel2 {
 
             SCALE_FACTOR: 5,
             ANIMATION_RATE: 0,
+            speed: 1.1,
 
             pixels: {
                 height: 256,
@@ -187,11 +189,45 @@ class MansionLevel2 {
             isKilling: false,
         };
 
-        // Background + player + reaper
+        const sprite_data_reaper_slow = {
+            id: "Reaper2",
+            greeting: "A second reaper stalks you...",
+            src: sprite_src_reaper,
+
+            SCALE_FACTOR: 5,
+            ANIMATION_RATE: 0,
+            speed: 0.3,
+
+            pixels: {
+                height: 256,
+                width: 256
+            },
+
+            INIT_POSITION: {
+                x: width * 0.2,
+                y: height * 0.5
+            },
+
+            orientation: {
+                rows: 1,
+                columns: 1
+            },
+
+            hitbox: {
+                widthPercentage: 0.4,
+                heightPercentage: 0.4
+            },
+
+            zIndex: 10,
+            isKilling: false,
+        };
+
+        // Background + player + reapers
         this.classes = [
             { class: GameEnvBackground, data: image_data_background },
             { class: HealthPlayer, data: sprite_data_player },
-            { class: Reaper, data: sprite_data_reaper }
+            { class: Reaper, data: sprite_data_reaper },
+            { class: Reaper, data: sprite_data_reaper_slow }
         ];
     }
 
