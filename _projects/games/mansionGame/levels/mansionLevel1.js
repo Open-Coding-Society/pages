@@ -4,7 +4,7 @@ import Npc from "@assets/js/GameEnginev1.1/essentials/Npc.js";
 import DialogueSystem from "@assets/js/GameEnginev1.1/essentials/DialogueSystem.js";
 
 
-class mansionLevel1 {
+class gameLevel1 {
     constructor(gameEnv) {
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
@@ -438,6 +438,6 @@ class mansionLevel1 {
 }
 
 
-export default mansionLevel1;
+export default gameLevel1;
 
 
