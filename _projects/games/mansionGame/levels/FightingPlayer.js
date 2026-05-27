@@ -348,7 +348,7 @@ class FightingPlayer extends Player {
             Object.assign(message.style, {
                 position: 'absolute',
                 left: '50%',
-                top: '90px',
+                bottom: '112px',
                 transform: 'translateX(-50%)',
                 color: '#FFFFFF',
                 fontFamily: "'Press Start 2P', sans-serif",

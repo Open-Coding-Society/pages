@@ -317,14 +317,17 @@ class MansionLevel6_EndingCutscene {
                 overlay.style.backgroundColor = '#000';
                 overlay.style.pointerEvents = 'auto';
                 fadeAudio(this._creditsMusic, 0.7, 2000);
-                spookImage.style.animation = 'mansion-spook-drop 900ms ease-out forwards';
+                const spookDropDelayMs = 500;
+                setTimeout(() => {
+                    spookImage.style.animation = 'mansion-spook-drop 900ms ease-out forwards';
+                }, spookDropDelayMs);
                 setTimeout(() => {
                     playAgainButton.style.opacity = '1';
                 }, 2000);
             }, reaperDelayMs + flashDurationMs);
         };
 
-        const lightningLeadMs = 8000;
+        const lightningLeadMs = 6000;
         setTimeout(startLightningSequence, Math.max(0, creditsDurationMs - lightningLeadMs));
     }
 }

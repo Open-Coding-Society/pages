@@ -10,7 +10,7 @@ const POWER_UP_SPRITES = {
     heal: 'powerupHeal.png'
 };
 
-const DEFAULT_SIZE = 40;
+const DEFAULT_SIZE = 70;
 
 class PowerUp extends Character {
     constructor(data = null, gameEnv = null) {
