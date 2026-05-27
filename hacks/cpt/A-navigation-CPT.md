@@ -67,7 +67,7 @@ lxdData:
 }
 </style>
 
-<a href="https://davidmadnhs.github.io/CPTGuidePages/cpt/code"
+<a href="https://pages.opencodingsociety.com/cpt/code"
    class="code-runner-toggle">
     CODE RUNNER GUIDE
 </a>

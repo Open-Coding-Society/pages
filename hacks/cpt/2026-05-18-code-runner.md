@@ -22,7 +22,7 @@ Your program must include:
 ## CPT Guide Home
 
 <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-  <a href="https://davidmadnhs.github.io/CPTGuidePages/cpt" style="text-decoration: none;">
+  <a href="https://pages.opencodingsociety.com/cpt" style="text-decoration: none;">
     <div style="background-color: rgb(32, 122, 201); color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
       Code Runner Guide
     </div>
@@ -38,7 +38,7 @@ Your program must include:
 
 {% include code-runner.html
    runner_id="runner_components"
-   language="python"
+   language="pseudocode"
    challenge=challenge_components
    code=code_components
 %}
@@ -52,7 +52,7 @@ Your program must include:
 
 {% include code-runner.html
    runner_id="runner_input"
-   language="python"
+   language="pseudocode"
    challenge=challenge_input
    code=code_input
    height="350px"
@@ -67,7 +67,7 @@ Your program must include:
 
 {% include code-runner.html
    runner_id="runner_output"
-   language="python"
+   language="pseudocode"
    challenge=challenge_output
    code=code_output
    height="350px"
@@ -82,7 +82,7 @@ Your program must include:
 
 {% include code-runner.html
    runner_id="runner_list"
-   language="python"
+   language="pseudocode"
    challenge=challenge_list
    code=code_list
    height="350px"
@@ -97,7 +97,7 @@ Your program must include:
 
 {% include code-runner.html
    runner_id="runner_procedure"
-   language="python"
+   language="pseudocode"
    challenge=challenge_procedure
    code=code_procedure
    height="350px"
@@ -112,7 +112,7 @@ Your program must include:
 
 {% include code-runner.html
    runner_id="runner_algorithm"
-   language="python"
+   language="pseudocode"
    challenge=challenge_algorithm
    code=code_algorithm
    height="350px"
@@ -127,7 +127,7 @@ Your program must include:
 
 {% include code-runner.html
    runner_id="runner_backend"
-   language="python"
+   language="pseudocode"
    challenge=challenge_backend
    code=code_backend
 %}
