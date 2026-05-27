@@ -403,6 +403,7 @@ class MansionLevel2 {
     initialize() {
         this._injectGlobalStyles();
         this.setupHUD();
+        this._showInstructions();
 
         // Expose game-over callback on gameEnv so HealthPlayer can call it
         this.gameEnv._triggerGameOver = () => this._showGameOver();
@@ -467,6 +468,13 @@ class MansionLevel2 {
             @keyframes hudSlideIn {
                 from { opacity: 0; transform: translateY(-12px); }
                 to   { opacity: 1; transform: translateY(0); }
+            }
+
+            @keyframes instructionToast {
+                0%   { opacity: 0; transform: translateY(-10px); }
+                12%  { opacity: 1; transform: translateY(0); }
+                70%  { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-6px); }
             }
 
             .mansion-overlay {
@@ -572,8 +580,80 @@ class MansionLevel2 {
                 min-width: 96px;
                 transition: color 0.3s;
             }
+
+            .mansion-instruction-toast {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                z-index: 9999;
+                pointer-events: none;
+                animation: instructionToast 5s ease-in-out forwards;
+                font-family: 'Raleway', sans-serif;
+                background: rgba(0, 0, 0, 0.72);
+                border: 1px solid rgba(167, 139, 250, 0.55);
+                border-radius: 8px;
+                padding: 12px 18px;
+                backdrop-filter: blur(6px);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 0 18px rgba(139, 92, 246, 0.25);
+            }
+
+            .mansion-instruction-icon {
+                font-size: 22px;
+                line-height: 1;
+            }
+
+            .mansion-instruction-text {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .mansion-instruction-headline {
+                font-size: 13px;
+                font-weight: 700;
+                color: #e2e8f0;
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+            }
+
+            .mansion-instruction-detail {
+                font-size: 11px;
+                color: #a78bfa;
+                letter-spacing: 1px;
+            }
         `;
         document.head.appendChild(style);
+    }
+
+    // ── Instruction toast ──────────────────────────────────────────────────────
+    _showInstructions() {
+        const toast = document.createElement('div');
+        toast.className = 'mansion-instruction-toast';
+
+        const icon = document.createElement('div');
+        icon.className = 'mansion-instruction-icon';
+        icon.textContent = '👻';
+
+        const textWrap = document.createElement('div');
+        textWrap.className = 'mansion-instruction-text';
+
+        const headline = document.createElement('div');
+        headline.className = 'mansion-instruction-headline';
+        headline.textContent = 'Press [SPACE] to push';
+
+        const detail = document.createElement('div');
+        detail.className = 'mansion-instruction-detail';
+        detail.textContent = 'Repels nearby Reapers · 5s cooldown';
+
+        textWrap.append(headline, detail);
+        toast.append(icon, textWrap);
+        this.gameEnv.container.appendChild(toast);
+
+        // Remove from DOM after animation completes
+        setTimeout(() => toast.remove(), 5100);
     }
 
     // ── HUD ────────────────────────────────────────────────────────────────────
