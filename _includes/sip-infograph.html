@@ -33,9 +33,7 @@
     height: auto;
     object-fit: contain;
     border-radius: 6px;
-    margin: 0 auto 28px;
-    display: block;
-    object-position: center;
+    margin-bottom: 28px;
   }
 
   .sip-title {
@@ -269,12 +267,12 @@
     text-transform: uppercase;
     text-decoration: none;
     color: var(--bg);
-    background: var(--gold);
+    background: var(--text);
     padding: 9px 20px;
     border-radius: 2px;
     transition: background .2s;
   }
-  .sip-btn:hover { filter: brightness(0.95); }
+  .sip-btn:hover { background: var(--gold); color: var(--bg); }
   .sip-prog-links {
     display: flex;
     gap: 8px;
@@ -385,6 +383,27 @@
     line-height: 1.75;
     color: var(--muted);
     margin: 0;
+  }
+
+  /* ── Documentation ── */
+  .sip-doc-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    font-weight: 400;
+    text-decoration: none;
+    color: var(--muted);
+    padding: 10px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: rgba(255,255,255,0.02);
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .sip-doc-link:hover {
+    border-color: var(--gold);
+    color: var(--text);
+    background: var(--gold-light);
   }
 </style>
 
@@ -563,6 +582,80 @@
         <p class="sip-change-title"><a href="https://sipoway.opencodingsociety.com/" target="_blank" rel="noopener">Admin Panel</a></p>
         <p class="sip-change-desc">An admin panel has been added to allow for easier management and updates of program information. It also allows admins to approve user requests to become a volunteer.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Documentation ── -->
+  <div class="sip-card">
+    <h2 class="sip-project-title">Documentation</h2>
+    <p class="sip-subtitle">Planning & Feedback from Mr. John Mortensen</p>
+
+    <p class="sip-section-label">GitHub Issues</p>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/19" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #19
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/18" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #18
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/16" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #16
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/15" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #15
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/14" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #14
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/12" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #12
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/11" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #11
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/1" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Issue #1
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
     </div>
   </div>
 
