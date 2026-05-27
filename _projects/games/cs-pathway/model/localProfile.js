@@ -221,11 +221,13 @@ const LocalProfile = {
         updatedAt: getTimestamp(),
         // Ever-increasing event counter for ordering (avoids clock-skew issues)
         eventId: (existing.eventId || 0) + 1,
-        ...(updates.coursePlanMeta !== undefined && { coursePlanMeta: updates.coursePlanMeta }),
         // Top-level identity updates
         ...(updates.name !== undefined && { name: updates.name }),
         ...(updates.email !== undefined && { email: updates.email }),
         ...(updates.githubID !== undefined && { githubID: updates.githubID }),
+        ...(updates.course !== undefined && { course: updates.course }),
+        ...(updates.coursePlanMeta !== undefined && { coursePlanMeta: updates.coursePlanMeta }),
+        ...(updates.pathwayCalendarMeta !== undefined && { pathwayCalendarMeta: updates.pathwayCalendarMeta }),
         // Game profile updates
         game_profile: {
           'identity-forge': {
@@ -363,6 +365,8 @@ const LocalProfile = {
       missionProgressCount: missionTooling.progress?.missionProgressCount || 0,
       missionScore: missionTooling.progress?.missionScore || 0.55,
       missionCompletedStations: missionTooling.progress?.missionCompletedStations || [],
+      coursePlanMeta: profile.coursePlanMeta || null,
+      pathwayCalendarMeta: profile.pathwayCalendarMeta || null,
     };
   },
 

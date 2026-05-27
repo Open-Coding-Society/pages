@@ -545,7 +545,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         .map((entry) => entry?.name || entry)
         .filter(Boolean)
     )];
-    const selectedClass = normalizedClassNames[0] || null;
+    const selectedClass = result.course || normalizedClassNames[0] || null;
 
     const currentProfile = { ...(this.profileData || {}) };
 
@@ -553,6 +553,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       ...currentProfile,
       course: selectedClass || currentProfile.course || '—',
       coursePlanMeta: {
+        course: selectedClass,
         title: result.title,
         summary: result.summary,
         primaryPath: result.primaryPath,
@@ -565,13 +566,14 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         selectedClass,
         gamePlan: result.gamePlan,
         redeemToken: result.redeemToken,
-        completedAt: result.completedAt,
+        completedAt: result.completedAt || new Date().toISOString(),
       },
     };
 
     this.profileData = updatedProfile;
 
     if (typeof this.profileManager?.updateProgress === 'function') {
+      await this.profileManager.updateProgress('course', selectedClass || currentProfile.course);
       await this.profileManager.updateProgress('coursePlanMeta', updatedProfile.coursePlanMeta);
     }
 
@@ -604,6 +606,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       } catch (error) {
         console.warn('Wayfinding World: failed to sync class selection', error);
       }
+    }
+
+    if (this.profileManager?.isAuthenticated) {
+      await this.syncPathwayCalendar({ force: true, includeDrills: false });
     }
   }
 }

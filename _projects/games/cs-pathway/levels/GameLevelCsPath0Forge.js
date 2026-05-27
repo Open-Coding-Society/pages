@@ -76,6 +76,8 @@ class GameLevelCsPath0Forge {
     this._getCompletionPanelValues = GameLevelCsPathIdentity.prototype._getCompletionPanelValues.bind(this);
     this._syncCompletionPanel = GameLevelCsPathIdentity.prototype._syncCompletionPanel.bind(this);
     this.markLevelComplete = GameLevelCsPathIdentity.prototype.markLevelComplete.bind(this);
+    this.saveCoursePlanResult = GameLevelCsPathIdentity.prototype.saveCoursePlanResult.bind(this);
+    this.syncPathwayCalendar = GameLevelCsPathIdentity.prototype.syncPathwayCalendar.bind(this);
 
     // Ensure Identity Forge uses the shared completion storage key so reads
     // and writes are consistent with other levels.
@@ -394,7 +396,7 @@ class GameLevelCsPath0Forge {
               this.showToast(`Path unlocked: ${result.title}`);
     
               const classesText = Array.isArray(result.recommendedClasses)
-                ? result.recommendedClasses.map((c) => c.name || c).join(' → ')
+                ? result.recommendedClasses.map((c) => (typeof c === 'string' ? c : c?.name || c)).filter(Boolean).join(' → ')
                 : (result.recommendedClass?.name || result.recommendedClass || '');
     
               this.panel?.(
@@ -560,6 +562,10 @@ class GameLevelCsPath0Forge {
         ]);
 
         this.showToast('✦ Identity Terminal unlocked');
+
+        if (authBody?.role !== 'guest' && this.profileManager?.isAuthenticated) {
+          void this.syncPathwayCalendar({ force: false, includeDrills: true });
+        }
       } finally {
         identityState.identityFlowActive = false;
       }

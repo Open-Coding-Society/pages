@@ -1,5 +1,10 @@
 import ProfileManager from '@assets/js/projects/cs-pathway/model/ProfileManager.js';
+import LocalProfile from '@assets/js/projects/cs-pathway/model/localProfile.js';
 import Present from './Present.js';
+import {
+  ensurePathwayCalendarTimeline,
+  syncPathwayCalendarAfterCoursePlan,
+} from '@assets/js/projects/cs-pathway/services/PathwayCalendarCoordinator.js';
 
 /**
  * Shared identity behavior for CS Path levels.
@@ -619,6 +624,66 @@ class GameLevelCsPathIdentity {
       console.warn(`${this.logPrefix}: ProfileManager initialization failed`, err);
       this.finishLoadingWork();
     });
+  }
+
+  async syncPathwayCalendar({ force = false, includeDrills = true } = {}) {
+    await this.getSharedProfileState();
+    const profileData = this.profileData || LocalProfile.getFlatProfile() || {};
+    const outcome = await ensurePathwayCalendarTimeline({
+      profileData,
+      isAuthenticated: Boolean(this.profileManager?.isAuthenticated),
+      force,
+      includeDrills,
+      onStatus: (message) => {
+        if (message && typeof this.showToast === 'function') {
+          this.showToast(message);
+        }
+      },
+    });
+    if (outcome?.profileData) {
+      this.profileData = { ...this.profileData, ...outcome.profileData };
+    }
+    return outcome;
+  }
+
+  async saveCoursePlanResult(result) {
+    const coursePlanMeta = {
+      course: result.course || result.title || '',
+      title: result.title,
+      summary: result.summary,
+      primaryPath: result.primaryPath,
+      secondaryPath: result.secondaryPath,
+      learningStyle: result.learningStyle,
+      percentages: result.percentages,
+      scores: result.scores,
+      recommendedClasses: result.recommendedClasses,
+      gamePlan: result.gamePlan,
+      redeemToken: result.redeemToken,
+      completedAt: result.completedAt || new Date().toISOString(),
+    };
+
+    this.profileData = {
+      ...(this.profileData || {}),
+      coursePlanMeta,
+    };
+
+    LocalProfile.update({ coursePlanMeta });
+
+    if (typeof this.updateProfilePanel === 'function') {
+      await this.updateProfilePanel({ coursePlanMeta });
+    }
+
+    if (this.profileManager?.isAuthenticated) {
+      await syncPathwayCalendarAfterCoursePlan({
+        profileData: this.profileData,
+        isAuthenticated: true,
+        onStatus: (message) => {
+          if (message && typeof this.showToast === 'function') {
+            this.showToast(message);
+          }
+        },
+      });
+    }
   }
 
 }
