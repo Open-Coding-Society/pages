@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#071226"/>
+      <stop offset="1" stop-color="#0b1f1d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="35%" r="60%">
+      <stop offset="0" stop-color="#39ffb6" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#39ffb6" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#1b3a44" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#sky)"/>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+  <rect width="1024" height="1024" fill="url(#grid)" opacity="0.35"/>
+
+  <!-- runway / exchange floor -->
+  <path d="M120,900 C280,760 380,700 512,700 C644,700 744,760 904,900 L904,1024 L120,1024 Z"
+        fill="#0d2b2a" stroke="#1ee3a4" stroke-opacity="0.35" stroke-width="3"/>
+  <path d="M512,720 L512,1024" stroke="#39ffb6" stroke-opacity="0.35" stroke-width="10" stroke-dasharray="30 24"/>
+
+  <!-- futures pits -->
+  <g opacity="0.95">
+    <circle cx="320" cy="780" r="86" fill="#0b162a" stroke="#39ffb6" stroke-width="4"/>
+    <circle cx="704" cy="780" r="86" fill="#0b162a" stroke="#39ffb6" stroke-width="4"/>
+    <circle cx="512" cy="830" r="110" fill="#0b162a" stroke="#39ffb6" stroke-width="4"/>
+  </g>
+
+  <!-- labels (non-gameplay) -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace" fill="#c7fff0">
+    <text x="80" y="92" font-size="28" opacity="0.85">FUTURES EXCHANGE</text>
+    <text x="80" y="126" font-size="14" opacity="0.65">hedge " speculate " margin</text>
+  </g>
+
+  <!-- subtle price tape -->
+  <g opacity="0.55" stroke="#8fffe0" stroke-width="2" fill="none">
+    <path d="M60,260 C220,210 300,300 420,250 C560,195 650,320 780,265 C890,220 940,240 980,230"/>
+    <path d="M60,310 C220,260 300,350 420,300 C560,245 650,370 780,315 C890,270 940,290 980,280"/>
+  </g>
+</svg>

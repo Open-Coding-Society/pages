@@ -1,9 +1,9 @@
-import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Npc from './essentials/Npc.js';
-import Player from './essentials/Player.js';
-import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, getSatoshiQuestions } from './DialogBox.js';
-import WaypointArrow from './WaypointArrow.js';
-import NpcProgressSystem from './NpcProgressSystem.js';
+import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
+import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, getSatoshiQuestions } from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
+import WaypointArrow from '@assets/js/projects/fortuneFinders/levels/WaypointArrow.js';
+import NpcProgressSystem from '@assets/js/projects/fortuneFinders/levels/NpcProgressSystem.js';
 
 let socketURI
 let javaURI
@@ -11,7 +11,7 @@ let pagesURI;
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
     javaURI = "http://localhost:8585";
     socketURI = "ws://localhost:8585/websocket";
-    pagesURI = "http://127.0.0.1:4500";
+    pagesURI = "http://127.0.0.1:4500/finalpages";
 } else {
     javaURI = "https://spring.opencodingsociety.com";
     socketURI = "wss://spring.opencodingsociety.com/websocket";
@@ -28,6 +28,8 @@ class GameLevelAirport {
     const image_data_desert = {
       id: 'Airport-Background',
       src: image_src_desert,
+      // Fallback so the level doesn't render broken if map.png is missing.
+      fallbackSrc: path + "/images/gamify/map.svg",
       pixels: { height: 580, width: 386 }
     };
 
@@ -85,7 +87,7 @@ class GameLevelAirport {
                   gameEnv.game.updateNpcProgress(gameEnv.game.id, sprite_data_casino.id);
                   gameEnv.game.giveNpcCookie(sprite_data_casino.id, "casino_visited", "Try your luck at the casino games! Play responsibly and remember - the house always has an edge.");
                 }
-                openInModal(`${pagesURI}/gamify/casinohomepage`);
+                openInModal(`${path}/gamify/casinohomepage`);
               }},
               { label: "No thanks", action: () => {} }
             ]
@@ -106,7 +108,7 @@ class GameLevelAirport {
                   gameEnv.game.giveNpcCookie(sprite_data_casino.id, "casino_visited", "Try your luck at the casino games! Play responsibly and remember - the house always has an edge.");
                 }
 
-                openInModal(`${pagesURI}/gamify/casinohomepage`);
+                openInModal(`${path}/gamify/casinohomepage`);
               }},
               { label: "Another tip", action: () => dialogFunctions.giveAdvice(), keepOpen: true },
               { label: "Maybe later", action: () => {} }
@@ -136,7 +138,7 @@ class GameLevelAirport {
                   gameEnv.game.updateNpcProgress(gameEnv.game.id, sprite_data_casino.id);
                   gameEnv.game.giveNpcCookie(sprite_data_casino.id, "casino_visited", "Try your luck at the casino games! Play responsibly and remember - the house always has an edge.");
                 }
-                openInModal(`${pagesURI}/gamify/casinohomepage`);
+                openInModal(`${path}/gamify/casinohomepage`);
               }},
               { label: "Back to advice", action: () => dialogFunctions.giveAdvice(), keepOpen: true },
               { label: "Thanks, Frank!", action: () => {
@@ -204,7 +206,8 @@ class GameLevelAirport {
             "J.P. Morgan",
             "The stock market is a place of opportunity and risk. You can buy shares in companies and watch your investments grow—or shrink.\nWould you like to proceed to the Stock Exchange and begin your investment journey?",
             [
-              { label: "Take me to the Stock Exchange", action: () => openInModal(`${pagesURI}/stocks/viewer`) },
+              { label: "Take me to the Stock Exchange", action: () => openInModal(`${path}/stocks/viewer`) },
+              { label: "Teach me Quantitative Trading", action: () => openInModal(`${path}/gamify/fortuneFinders/quant`) },
               { label: "Remind me what stocks are", action: () => dialogFunctions.whatAreStocks(), keepOpen: true },
               { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
             ]
@@ -217,7 +220,7 @@ class GameLevelAirport {
             "J.P. Morgan",
             fact + "\nWould you like to try investing now?",
             [
-              { label: "Yes, let's invest", action: () => openInModal(`${pagesURI}/stocks/viewer`) },
+              { label: "Yes, let's invest", action: () => openInModal(`${path}/stocks/viewer`) },
               { label: "Back", action: () => dialogFunctions.explainStocks(), keepOpen: true }
             ]
           );
@@ -268,7 +271,7 @@ class GameLevelAirport {
             "Greetings, seeker. I am Satoshi Nakamoto, architect of decentralized currency.\nAre you curious about Bitcoin or ready to explore the Crypto Hub?",
             [
                 { label: "Tell me about Bitcoin", action: () => dialogFunctions.aboutBitcoin(), keepOpen: true },
-              { label: "Go to Crypto Hub", action: () => openInModal(`${pagesURI}/crypto/portfolio`) },
+              { label: "Go to Crypto Hub", action: () => openInModal(`${path}/crypto/portfolio`) },
               { label: "Thank you, Satoshi", action: () => {
                 // Give NPC cookie for completing the dialogue
                 if (gameEnv.game && gameEnv.game.giveNpcCookie) {
@@ -294,7 +297,7 @@ class GameLevelAirport {
             "Satoshi Nakamoto",
             "To buy Bitcoin, you need a digital wallet and access to a crypto exchange. You can purchase fractions of a Bitcoin.\nWould you like to visit the Crypto Hub to start your journey?",
             [
-              { label: "Yes, take me there", action: () => openInModal(`${pagesURI}/crypto/portfolio`) },
+              { label: "Yes, take me there", action: () => openInModal(`${path}/crypto/portfolio`) },
               { label: "Back", action: () => dialogFunctions.aboutBitcoin(), keepOpen: true }
             ]
           );
@@ -339,7 +342,7 @@ class GameLevelAirport {
               "Hey there! I'm Max, your friendly neighborhood crypto miner. I've been mining Bitcoin since the early days!\nWant to learn about mining or try your hand at it?",
               [
                 { label: "Tell me about mining", action: () => dialogFunctions.explainMining(), keepOpen: true },
-                { label: "Try Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Try Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "What's your setup?", action: () => dialogFunctions.mySetup(), keepOpen: true },
                 { label: "Thank you, Max", action: () => {
                   // Give NPC cookie for completing the dialogue
@@ -357,7 +360,7 @@ class GameLevelAirport {
               "Mining is like solving complex puzzles to verify transactions on the blockchain. Miners use powerful computers to compete for rewards in cryptocurrency.\nThe more computing power you have, the better your chances of winning!\nWould you like to know more about the technical side?",
               [
                 { label: "Technical Details", action: () => dialogFunctions.technicalDetails(), keepOpen: true },
-                { label: "Try Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Try Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
               ]
             );
@@ -367,7 +370,7 @@ class GameLevelAirport {
               "Max the Miner",
               "Here's the cool stuff:\n• Mining uses SHA-256 hashing algorithm\n• Difficulty adjusts automatically\n• You need specialized hardware (ASICs) for Bitcoin\n• Electricity costs are crucial\n• Mining pools help small miners compete\n\nReady to try mining yourself?",
               [
-                { label: "Start Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Start Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "Back", action: () => dialogFunctions.explainMining(), keepOpen: true }
               ]
             );
@@ -377,7 +380,7 @@ class GameLevelAirport {
               "Max the Miner",
               "I've got a sweet setup:\n• 10 ASIC miners running 24/7\n• Custom cooling system to keep them frosty\n• Solar panels to offset electricity costs\n• Mining pool connection for consistent rewards\n\nWant to see how it all works?",
               [
-                { label: "Try Mining", action: () => openInModal(`${pagesURI}/crypto/mining`) },
+                { label: "Try Mining", action: () => openInModal(`${path}/crypto/mining`) },
                 { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
               ]
             );
@@ -459,15 +462,15 @@ class GameLevelAirport {
       }
     };
 
-    const sprite_src_computer = path + "/images/gamify/stockupdatepc.png";
+    const sprite_src_computer = path + "/images/gamify/stockupdatepc.svg";
     const sprite_greet_computer = "*Computer Fan Whirs* Let me show you the latest market news!";
     const sprite_data_computer = {
       id: 'Market Computer',
       greeting: sprite_greet_computer,
       src: sprite_src_computer,
-      SCALE_FACTOR: 1.5,
+      SCALE_FACTOR: 5.5,
       ANIMATION_RATE: 50,
-      pixels: { height: 1068, width: 1078 },
+      pixels: { height: 512, width: 512 },
       INIT_POSITION: { x: width * 0.9, y: height * 0.65 },
       orientation: { rows: 1, columns: 1 },
       down: { row: 0, start: 0, columns: 1 },
@@ -527,8 +530,8 @@ class GameLevelAirport {
                 { label: "Learn about the Bank", action: () => dialogFunctions.explainBank(), keepOpen: true },
                 { label: "Review Analytics", action: () => dialogFunctions.analyticsIntro(), keepOpen: true },
                 { label: "Financial Tip", action: () => dialogFunctions.financialTip(), keepOpen: true },
-                { label: "Loans", action: () => openInModal(`${pagesURI}/gamify/loan`)},
-                { label: "Overall Leaderboard", action: () => openInModal(`${pagesURI}/leaderboard/overall-leaderboard`) },
+                { label: "Loans", action: () => openInModal(`${path}/gamify/loan`)},
+                { label: "Overall Leaderboard", action: () => openInModal(`${path}/leaderboard/overall-leaderboard`) },
                 { label: "Thank you, Ms. Yellen", action: () => {
                   // Give NPC cookie for completing the dialogue
                   if (gameEnv.game && gameEnv.game.giveNpcCookie) {
@@ -556,7 +559,7 @@ class GameLevelAirport {
             "Janet Yellen",
             "Bank Analytics provides a detailed overview of your spending, investments, and savings.\nWould you like to proceed to the analytics dashboard?",
             [
-              { label: "Open Analytics", action: () => showYellenModal(`${pagesURI}/gamify/bankanalytics`) },
+              { label: "Open Analytics", action: () => showYellenModal(`${path}/gamify/bankanalytics`) },
                 { label: "Back", action: () => dialogFunctions.intro(), keepOpen: true }
             ]
           );
@@ -596,6 +599,82 @@ class GameLevelAirport {
       }
     };
 
+    const requiredAirportNpcIds = [
+      'Stock-NPC',
+      'Fidelity',
+      'Schwab',
+      'Casino-NPC',
+      'Crypto-NPC',
+      'Bank-NPC'
+    ];
+
+    const areAirportInteractionsComplete = async () => {
+      const game = gameEnv.game;
+      if (!game || !game.statsManager || !game.id) return false;
+
+      try {
+        const npcProgress = await game.statsManager.getNpcProgress(game.id);
+        if (!npcProgress) return false;
+        return requiredAirportNpcIds.every((npcId) => npcProgress[npcId] === true);
+      } catch (error) {
+        console.error('Could not verify airport NPC completion:', error);
+        return false;
+      }
+    };
+
+    const sprite_data_options_gate = {
+      id: 'Options-Gate-NPC',
+      greeting: 'Complete the airport NPC interactions to unlock the next map.',
+      src: path + "/images/gamify/level-gate.svg",
+      SCALE_FACTOR: 2.2,
+      ANIMATION_RATE: 50,
+      pixels: { height: 512, width: 512 },
+      // Center-ish so it's obvious where to go next
+      INIT_POSITION: { x: width * 0.52, y: height * 0.48 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      hitbox: { widthPercentage: 0.05, heightPercentage: 0.08 },
+      interact: async function () {
+        const unlocked = await areAirportInteractionsComplete();
+        if (!unlocked) {
+          showDialogBox(
+            "Map Locked",
+            "Finish all core Airport NPC interactions first: Stock, Fidelity, Schwab, Casino, Crypto, and Bank.",
+            [
+              { label: "Got it", action: () => {}, keepOpen: false },
+              {
+                label: "Skip to Map 2 anyway",
+                action: () => {
+                  if (gameEnv?.game?.gameControl?.endLevel) {
+                    gameEnv.game.gameControl.endLevel();
+                  }
+                },
+                keepOpen: false
+              }
+            ]
+          );
+          return;
+        }
+
+        showDialogBox(
+          "New Map Unlocked",
+          "Great work. You unlocked the Futures Exchange. Ready to travel?",
+          [
+            {
+              label: "Travel to Futures Exchange",
+              action: () => {
+                if (gameEnv?.game?.gameControl?.endLevel) {
+                  gameEnv.game.gameControl.endLevel();
+                }
+              },
+              keepOpen: false
+            },
+            { label: "Not yet", action: () => {}, keepOpen: false }
+          ]
+        );
+      }
+    };
+
     this.classes = [
       { class: GameEnvBackground, data: image_data_desert },
       { class: Player, data: sprite_data_chillguy },
@@ -606,7 +685,7 @@ class GameLevelAirport {
       { class: Npc, data: sprite_data_fidelity },
       { class: Npc, data: sprite_data_schwab },
       { class: Npc, data: sprite_data_bank},
-      { class: Npc, data: sprite_data_mining}
+      { class: Npc, data: sprite_data_options_gate },
     ];
     this.npcProgressSystem = new NpcProgressSystem();
   }
@@ -626,7 +705,15 @@ window.addEventListener('DOMContentLoaded', function() {
   if (!gameContainer) return;
 
   // Initialize the waypoint arrow
-  new WaypointArrow(gameCanvas, window.gamePath);
+  if (!window.waypointArrow) {
+    new WaypointArrow(gameCanvas, window.gamePath);
+  } else {
+    try {
+      window.waypointArrow.gameCanvas = gameCanvas;
+      window.waypointArrow.gamePath = window.gamePath;
+      window.waypointArrow.refresh?.();
+    } catch (_) {}
+  }
 });
 
 // Utility function to create and open a reusable modal with an iframe
