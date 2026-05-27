@@ -157,6 +157,16 @@ class FormPanel {
           continue;
         }
 
+        if (field.type === 'custom') {
+          if (typeof field.render === 'function') {
+            const customEl = field.render(form, inputs, initialValues, this);
+            if (customEl) {
+              form.appendChild(customEl);
+            }
+          }
+          continue;
+        }
+
         const label = document.createElement('label');
         label.textContent = field.label;
         Object.assign(label.style, {

@@ -14,7 +14,7 @@ import Present from './Present.js';
 import LoginManager from '@assets/js/projects/cs-pathway/model/LoginManager.js';
 import CourseEnlistmentTrial from './CourseEnlistmentTrial.js';
 import PersonaHallTrial from './PersonaHallTrial.js';
-import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
+import { pythonURI, javaURI, fetchOptions } from '@assets/js/api/config.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 const PROFILE_PANEL_ID = 'csse-profile-panel';
 import GameLevelCsPath1Way from './GameLevelCsPath1Way.js';
@@ -1603,14 +1603,425 @@ class GameLevelCsPath0Forge {
     const identityFormConfig = {
       id: 'csse-identity-terminal',
       title: '⚔ Identity Terminal Setup',
-      description: "You're logged in. Enter your profile info below to register your identity.",
+      description: "Enter your Student ID (barcode) or GitHub ID. If not logged in, you can fast-track register your face below.",
       submitLabel: 'Unlock Identity Terminal',
       showCancel: true,
       cancelLabel: 'Cancel',
       fields: [
+        { name: 'studentID', label: 'Student ID (Barcode):', type: 'text', placeholder: 'Enter 7-digit ID (autofills Name)', required: false, autocomplete: 'off' },
         { name: 'name', label: 'Name:', type: 'text', required: true, autocomplete: 'name' },
         { name: 'email', label: 'Email:', type: 'email', required: true, autocomplete: 'email' },
         { name: 'githubID', label: 'GitHub ID:', type: 'text', required: true, autocomplete: 'username' },
+        {
+          name: 'suggestions',
+          type: 'custom',
+          render: (form, inputs, initialValues, formPanel) => {
+            const container = document.createElement('div');
+            container.style.position = 'relative';
+            container.style.width = '100%';
+
+            const suggestionsList = document.createElement('div');
+            Object.assign(suggestionsList.style, {
+              position: 'absolute',
+              top: '-8px',
+              left: '0',
+              right: '0',
+              zIndex: '10002',
+              background: 'rgba(13, 13, 26, 0.96)',
+              border: '1px solid #4ecca3',
+              borderRadius: '4px',
+              maxHeight: '150px',
+              overflowY: 'auto',
+              display: 'none',
+              boxShadow: '0 4px 12px rgba(78, 204, 163, 0.25)',
+            });
+            container.appendChild(suggestionsList);
+
+            // Function to fetch and display autocomplete suggestions
+            let debounceTimer = null;
+            const handleSearch = (term) => {
+              clearTimeout(debounceTimer);
+              if (!term || term.trim().length < 2) {
+                suggestionsList.style.display = 'none';
+                return;
+              }
+              debounceTimer = setTimeout(async () => {
+                try {
+                  const res = await fetch(`${javaURI}/api/people/search?query=${encodeURIComponent(term)}`, fetchOptions);
+                  if (res.ok) {
+                    const people = await res.json();
+                    if (people && people.length > 0) {
+                      suggestionsList.innerHTML = '';
+                      people.slice(0, 5).forEach(person => {
+                        const item = document.createElement('div');
+                        item.textContent = `${person.name} (${person.uid})`;
+                        Object.assign(item.style, {
+                          padding: '8px 12px',
+                          cursor: 'pointer',
+                          borderBottom: '1px solid rgba(78, 204, 163, 0.15)',
+                          color: '#e0e0e0',
+                          fontSize: '11px',
+                          fontFamily: '"Courier New", monospace',
+                        });
+                        item.addEventListener('mouseenter', () => {
+                          item.style.background = 'rgba(78, 204, 163, 0.15)';
+                          item.style.color = '#4ecca3';
+                        });
+                        item.addEventListener('mouseleave', () => {
+                          item.style.background = 'none';
+                          item.style.color = '#e0e0e0';
+                        });
+                        item.addEventListener('click', () => {
+                          if (inputs['name']) inputs['name'].value = person.name || '';
+                          if (inputs['githubID']) inputs['githubID'].value = person.uid || '';
+                          if (inputs['email']) inputs['email'].value = person.email || '';
+                          if (inputs['studentID'] && person.sid) inputs['studentID'].value = person.sid || '';
+                          suggestionsList.style.display = 'none';
+                        });
+                        suggestionsList.appendChild(item);
+                      });
+                      suggestionsList.style.display = 'block';
+                    } else {
+                      suggestionsList.style.display = 'none';
+                    }
+                  }
+                } catch (err) {
+                  console.error('Suggestions lookup failed:', err);
+                }
+              }, 200);
+            };
+
+            // Attach listeners to githubID and name fields
+            if (inputs['githubID']) {
+              inputs['githubID'].addEventListener('input', (e) => handleSearch(e.target.value));
+            }
+            if (inputs['name']) {
+              inputs['name'].addEventListener('input', (e) => handleSearch(e.target.value));
+            }
+
+            // Attach Student ID change keyup/change auto-fill listener
+            if (inputs['studentID']) {
+              inputs['studentID'].addEventListener('input', async (e) => {
+                const sid = e.target.value.trim();
+                if (sid.length === 7) {
+                  inputs['studentID'].style.borderColor = '#e67e22'; // loading color
+                  try {
+                    const res = await fetch(`${javaURI}/api/${sid}`);
+                    if (res.ok) {
+                      const name = await res.text();
+                      if (name && name !== 'Not a valid barcode') {
+                        inputs['name'].value = name;
+                        inputs['studentID'].style.borderColor = '#4ecca3'; // success
+                        inputs['name'].style.boxShadow = '0 0 8px rgba(78, 204, 163, 0.4)';
+                        setTimeout(() => {
+                          inputs['name'].style.boxShadow = 'none';
+                        }, 1500);
+                      } else {
+                        inputs['studentID'].style.borderColor = '#ff6b6b'; // invalid
+                      }
+                    } else {
+                      inputs['studentID'].style.borderColor = '#ff6b6b';
+                    }
+                  } catch (err) {
+                    console.error('SID lookup failed:', err);
+                    inputs['studentID'].style.borderColor = '#ff6b6b';
+                  }
+                } else {
+                  inputs['studentID'].style.borderColor = '';
+                }
+              });
+            }
+
+            // Hide suggestions if clicking outside
+            document.addEventListener('pointerdown', (e) => {
+              if (!container.contains(e.target) && (!inputs['githubID'] || !inputs['githubID'].contains(e.target)) && (!inputs['name'] || !inputs['name'].contains(e.target))) {
+                suggestionsList.style.display = 'none';
+              }
+            });
+
+            return container;
+          }
+        },
+        {
+          name: 'faceScanner',
+          type: 'custom',
+          render: (form, inputs, initialValues, formPanel) => {
+            // Style setup
+            const style = document.createElement('style');
+            style.textContent = `
+              .scanner-widget {
+                border: 1px dashed rgba(78, 204, 163, 0.4);
+                border-radius: 8px;
+                padding: 16px;
+                margin-top: 8px;
+                background: rgba(26, 26, 46, 0.4);
+                font-family: "Courier New", monospace;
+              }
+              .webcam-box {
+                position: relative;
+                width: 100%;
+                max-width: 240px;
+                height: 180px;
+                margin: 12px auto;
+                border: 2px solid #4ecca3;
+                border-radius: 6px;
+                overflow: hidden;
+                background: #080811;
+                display: none;
+                box-shadow: 0 0 15px rgba(78, 204, 163, 0.35);
+              }
+              .webcam-video-feed {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+              .scanner-laser-line {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: rgba(78, 204, 163, 0.85);
+                box-shadow: 0 0 8px #4ecca3, 0 0 12px #4ecca3;
+                animation: scanLaserAnim 2s linear infinite;
+                pointer-events: none;
+              }
+              @keyframes scanLaserAnim {
+                0% { top: 0%; }
+                50% { top: 100%; }
+                100% { top: 0%; }
+              }
+              .scanner-corner {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                border: 2px solid #4ecca3;
+                pointer-events: none;
+              }
+              .c-tl { top: 4px; left: 4px; border-right: none; border-bottom: none; }
+              .c-tr { top: 4px; right: 4px; border-left: none; border-bottom: none; }
+              .c-bl { bottom: 4px; left: 4px; border-right: none; border-top: none; }
+              .c-br { bottom: 4px; right: 4px; border-left: none; border-top: none; }
+              
+              .scanner-btn {
+                background: rgba(78, 204, 163, 0.1);
+                color: #4ecca3;
+                border: 1px solid #4ecca3;
+                padding: 6px 12px;
+                font-size: 11px;
+                font-family: "Courier New", monospace;
+                cursor: pointer;
+                border-radius: 4px;
+                transition: all 0.2s ease;
+                display: block;
+                width: 100%;
+                margin-top: 8px;
+                text-align: center;
+              }
+              .scanner-btn:hover {
+                background: #4ecca3;
+                color: #0d0d1a;
+                box-shadow: 0 0 10px rgba(78, 204, 163, 0.4);
+              }
+              .scanner-btn:disabled {
+                border-color: #555;
+                color: #555;
+                background: none;
+                cursor: not-allowed;
+                box-shadow: none;
+              }
+              .scanner-status-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                display: inline-block;
+                margin-right: 6px;
+                background: #888;
+              }
+            `;
+            document.head.appendChild(style);
+
+            const widget = document.createElement('div');
+            widget.className = 'scanner-widget';
+
+            // Top Status Panel
+            const statusRow = document.createElement('div');
+            statusRow.style.display = 'flex';
+            statusRow.style.alignItems = 'center';
+            statusRow.style.fontSize = '11px';
+            statusRow.style.color = '#c7f2d4';
+            statusRow.style.marginBottom = '8px';
+
+            const dot = document.createElement('span');
+            dot.className = 'scanner-status-dot';
+            statusRow.appendChild(dot);
+
+            const statusText = document.createElement('span');
+            statusText.textContent = 'Biometric Scan: Ready';
+            statusRow.appendChild(statusText);
+            widget.appendChild(statusRow);
+
+            // Webcam Box
+            const webcamBox = document.createElement('div');
+            webcamBox.className = 'webcam-box';
+
+            const video = document.createElement('video');
+            video.className = 'webcam-video-feed';
+            video.autoplay = true;
+            video.playsInline = true;
+            webcamBox.appendChild(video);
+
+            const laser = document.createElement('div');
+            laser.className = 'scanner-laser-line';
+            webcamBox.appendChild(laser);
+
+            const tl = document.createElement('div'); tl.className = 'scanner-corner c-tl'; webcamBox.appendChild(tl);
+            const tr = document.createElement('div'); tr.className = 'scanner-corner c-tr'; webcamBox.appendChild(tr);
+            const bl = document.createElement('div'); bl.className = 'scanner-corner c-bl'; webcamBox.appendChild(bl);
+            const br = document.createElement('div'); br.className = 'scanner-corner c-br'; webcamBox.appendChild(br);
+            
+            widget.appendChild(webcamBox);
+
+            // Hidden Canvas
+            const canvas = document.createElement('canvas');
+            canvas.style.display = 'none';
+            widget.appendChild(canvas);
+
+            // Action Buttons
+            const startBtn = document.createElement('button');
+            startBtn.type = 'button';
+            startBtn.className = 'scanner-btn';
+            startBtn.textContent = '⚙ START FACE SCANNER';
+            widget.appendChild(startBtn);
+
+            const captureBtn = document.createElement('button');
+            captureBtn.type = 'button';
+            captureBtn.className = 'scanner-btn';
+            captureBtn.textContent = '📸 CAPTURE & REGISTER FACE';
+            captureBtn.disabled = true;
+            captureBtn.style.display = 'none';
+            widget.appendChild(captureBtn);
+
+            // Webcam state tracking
+            let stream = null;
+
+            const stopWebcam = () => {
+              if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+              }
+              video.srcObject = null;
+              webcamBox.style.display = 'none';
+              startBtn.style.display = 'block';
+              captureBtn.style.display = 'none';
+              captureBtn.disabled = true;
+            };
+
+            const startWebcam = async () => {
+              statusText.textContent = 'Requesting camera permissions...';
+              dot.style.background = '#e67e22';
+              try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
+                video.srcObject = stream;
+                webcamBox.style.display = 'block';
+                startBtn.style.display = 'none';
+                captureBtn.style.display = 'block';
+                captureBtn.disabled = false;
+                statusText.textContent = 'Camera Active. Position your face in frame.';
+                dot.style.background = '#4ecca3';
+              } catch (err) {
+                console.error('Camera access failed:', err);
+                statusText.textContent = 'Camera access denied. Please try again.';
+                dot.style.background = '#ff6b6b';
+              }
+            };
+
+            startBtn.addEventListener('click', startWebcam);
+
+            captureBtn.addEventListener('click', async () => {
+              const sid = inputs['studentID'] ? inputs['studentID'].value.trim() : '';
+              const githubID = inputs['githubID'] ? inputs['githubID'].value.trim() : '';
+              
+              if (!sid && !githubID) {
+                statusText.textContent = 'Error: Student ID or GitHub ID is required to register.';
+                dot.style.background = '#ff6b6b';
+                return;
+              }
+
+              statusText.textContent = 'Capturing frame...';
+              dot.style.background = '#e67e22';
+              captureBtn.disabled = true;
+
+              try {
+                canvas.width = video.videoWidth || 320;
+                canvas.height = video.videoHeight || 240;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+
+                const dataUrl = canvas.toDataURL('image/jpeg');
+                const base64Image = dataUrl.split(',')[1];
+
+                statusText.textContent = 'Sending biometric payload to core...';
+                
+                const guest = LoginManager.getGuestSession();
+                const ocs_session = window.user;
+                const isAuthenticated = ocs_session && ocs_session.role !== 'guest';
+
+                let response;
+                if (isAuthenticated) {
+                  response = await fetch(`${javaURI}/api/face/register`, {
+                    ...fetchOptions,
+                    method: 'POST',
+                    body: JSON.stringify({ faceData: base64Image })
+                  });
+                } else {
+                  response = await fetch(`${javaURI}/api/face/register/public`, {
+                    ...fetchOptions,
+                    method: 'POST',
+                    body: JSON.stringify({
+                      sid: sid,
+                      uid: githubID,
+                      faceData: base64Image
+                    })
+                  });
+                }
+
+                if (response.ok) {
+                  statusText.textContent = 'Registration Complete! Face Synced.';
+                  dot.style.background = '#4ecca3';
+                  
+                  webcamBox.style.borderColor = '#2ecc71';
+                  laser.style.background = '#2ecc71';
+                  laser.style.boxShadow = '0 0 10px #2ecc71';
+                  
+                  setTimeout(() => {
+                    stopWebcam();
+                  }, 1800);
+                } else {
+                  const errText = await response.text();
+                  statusText.textContent = `Sync Error: ${errText || 'Update failed'}`;
+                  dot.style.background = '#ff6b6b';
+                  captureBtn.disabled = false;
+                }
+              } catch (err) {
+                console.error('Registration failed:', err);
+                statusText.textContent = 'Sync Error: Core rejected registration.';
+                dot.style.background = '#ff6b6b';
+                captureBtn.disabled = false;
+              }
+            });
+
+            const cleanupInterval = setInterval(() => {
+              if (!widget.isConnected) {
+                clearInterval(cleanupInterval);
+                if (stream) {
+                  stream.getTracks().forEach(track => track.stop());
+                }
+              }
+            }, 500);
+
+            return widget;
+          }
+        }
       ],
       theme: uiTheme,
     };
