@@ -15,8 +15,8 @@ class PowerUpSpawner extends GameObject {
         this.spawnPadding = data?.spawnPadding ?? 40;
         this.topPadding = data?.topPadding ?? 150;
         this.powerTypes = data?.powerTypes || ['shield', 'charge', 'damageBoost', 'scythes', 'heal'];
+        this.maxActivePowerUps = data?.maxActivePowerUps ?? 3;
         this.nextSpawnAt = Date.now() + this.spawnDelayMs;
-        this.wasActive = false;
     }
 
     update() {
@@ -24,16 +24,8 @@ class PowerUpSpawner extends GameObject {
         if (this.gameEnv.gameControl?.isPaused) return;
         if (typeof window !== 'undefined' && window.__battleRoomFadeComplete === false) return;
 
-        const hasActive = this.gameEnv.gameObjects.some(obj => obj?.constructor?.name === 'PowerUp');
-        if (hasActive) {
-            this.wasActive = true;
-            return;
-        }
-
-        if (this.wasActive) {
-            this.wasActive = false;
-            this.nextSpawnAt = Date.now() + this.spawnIntervalMs;
-        }
+        const activePowerUpCount = this.gameEnv.gameObjects.filter(obj => obj?.constructor?.name === 'PowerUp').length;
+        if (activePowerUpCount >= this.maxActivePowerUps) return;
 
         const now = Date.now();
         if (now < this.nextSpawnAt) return;
@@ -241,12 +233,13 @@ class MansionLevel6_BattleRoom {
         const powerUpSize = 25;
         const spawnPadding = 40;
         const topPadding = 150;
+        const maxActivePowerUps = 3;
 
         this.classes = [
             { class: GameEnvBackground, data: image_data_floor },
             { class: FightingPlayer, data: sprite_data_mc },
             { class: Boss, data: sprite_data_enemy },
-            { class: PowerUpSpawner, data: { powerUpSize, spawnPadding, topPadding } }
+            { class: PowerUpSpawner, data: { powerUpSize, spawnPadding, topPadding, maxActivePowerUps } }
         ];
 
         // Create health bar when battle room loads
