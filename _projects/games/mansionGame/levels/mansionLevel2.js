@@ -1,4 +1,5 @@
 import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
+import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
@@ -35,7 +36,7 @@ class Reaper extends Npc {
                 }
             }
 
-            const speed = 1.4;
+            const speed = 1.1;
             const dx = nearest.position.x - this.position.x;
             const dy = nearest.position.y - this.position.y;
             const angle = Math.atan2(dy, dx);
@@ -47,14 +48,52 @@ class Reaper extends Npc {
         super.update();
     }
 
-    showReactionDialogue() {
-        // Prevent the reaper from displaying a dialogue message on touch.
+}
+
+class HealthPlayer extends Player {
+    constructor(data = null, gameEnv = null) {
+        super(data, gameEnv);
+        this.health = 100;
+        this.reaperCollisionActive = false;
+    }
+
+    updateHealthDisplay() {
+        if (this.healthDisplayElement) {
+            this.healthDisplayElement.textContent = `Health: ${Math.max(0, this.health)}`;
+        }
+    }
+
+    handleCollisionReaction(other) {
+        if (other?.id === 'Reaper' && !this.reaperCollisionActive) {
+            this.reaperCollisionActive = true;
+            this.health = Math.max(0, this.health - 10);
+            this.updateHealthDisplay();
+        }
+        super.handleCollisionReaction(other);
+    }
+
+    update() {
+        super.update();
+        if (this.reaperCollisionActive && !this.state.collisionEvents.includes('Reaper')) {
+            this.reaperCollisionActive = false;
+        }
+    }
+
+    handleCollisionState() {
+        if (this.state.collisionEvents.includes('Reaper')) {
+            this.state.movement = { up: true, down: true, left: true, right: true };
+            return;
+        }
+        if (typeof super.handleCollisionState === 'function') {
+            super.handleCollisionState();
+        }
     }
 }
 
 // Mansion Level 2 Game with WASD character movement.
 class MansionLevel2 {
     constructor(gameEnv) {
+        this.gameEnv = gameEnv;
         let width = gameEnv.innerWidth;
         let height = gameEnv.innerHeight;
         let path = gameEnv.path;
@@ -146,19 +185,48 @@ class MansionLevel2 {
 
             zIndex: 10,
             isKilling: false,
-            dialogues: [],
         };
 
         // Background + player + reaper
         this.classes = [
             { class: GameEnvBackground, data: image_data_background },
-            { class: Player, data: sprite_data_player },
+            { class: HealthPlayer, data: sprite_data_player },
             { class: Reaper, data: sprite_data_reaper }
         ];
     }
 
     initialize() {
+        this.setupHealthDisplay();
         console.log("MansionLevel2 initialized");
+    }
+
+    setupHealthDisplay() {
+        const player = this.gameEnv.gameObjects.find(obj => obj instanceof HealthPlayer);
+        if (!player) return;
+
+        const healthElement = document.createElement('div');
+        healthElement.style.position = 'absolute';
+        healthElement.style.top = '16px';
+        healthElement.style.left = '16px';
+        healthElement.style.padding = '8px 12px';
+        healthElement.style.color = '#fff';
+        healthElement.style.background = 'rgba(0, 0, 0, 0.65)';
+        healthElement.style.borderRadius = '8px';
+        healthElement.style.fontFamily = 'sans-serif';
+        healthElement.style.fontSize = '16px';
+        healthElement.style.zIndex = '9999';
+        healthElement.style.pointerEvents = 'none';
+        healthElement.textContent = `Health: ${player.health}`;
+
+        this.gameEnv.container.appendChild(healthElement);
+        player.healthDisplayElement = healthElement;
+        this.healthDisplayElement = healthElement;
+    }
+
+    destroy() {
+        if (this.gameEnv && this.gameEnv.container && this.gameEnv.container.contains(this.healthDisplayElement)) {
+            this.gameEnv.container.removeChild(this.healthDisplayElement);
+        }
     }
 }
 
