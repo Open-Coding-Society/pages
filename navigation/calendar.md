@@ -19,7 +19,6 @@ active_tab: calendar
         <i class="fas fa-exclamation-triangle calendar-auth-banner-icon"></i>
         <span>Your session has expired. <a href="{{site.baseurl}}/login" class="calendar-auth-banner-link">Log in again</a> to view and manage your calendar events.</span>
     </div>
-    <p class="calendar-private-note">When you are signed in, the calendar shows your account's events. CS Pathway can publish a personal learning timeline into the Spring calendar database without exposing it to other users.</p>
     <div class="calendar-controls-row">
         <input id="calendar-filter-query" type="search" placeholder="Search events, issues, or breaks" />
         <select id="calendar-filter-source">
@@ -666,7 +665,7 @@ active_tab: calendar
             const issue = thread.issue || {};
             const latestComment = thread.latestComment || null;
             const replyCount = (thread.comments || []).length;
-
+            
             // Prefer assignedGroupLabels from server, fallback to parsing assignedGroups
             let assignedGroupsLabel = '';
             if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length > 0) {
@@ -679,7 +678,7 @@ active_tab: calendar
                     }
                 } catch (e) { /* Skip if not valid JSON */ }
             }
-
+            
             return `
                 <article class="issue-card issue-thread-card" data-issue-id="${escapeIssueText(thread.issueId)}">
                     <div class="issue-card-top">
@@ -728,7 +727,7 @@ active_tab: calendar
         document.getElementById('dashboard-panel-threads')?.classList.toggle('hidden', tabName !== 'threads');
 
         if (tabName === 'calendar' && calendar) {
-            setTimeout(() => {
+            setTimeout(() => { 
                 const calendarEl = document.getElementById('calendar');
                 if (calendarEl && calendarEl.offsetWidth > 0) {
                     calendar.render();
@@ -951,7 +950,7 @@ active_tab: calendar
             if (el.dueDate) el.dueDate.value = issue.dueDate || '';
             if (el.eventId) el.eventId.value = issue.eventId || '';
             if (el.tags) el.tags.value = normalizeTags(issue.tags).join(', ');
-
+            
             // Set assigned groups if available
             const groupSelect = document.getElementById('issue-assigned-groups');
             if (groupSelect && issue.assignedGroups) {
@@ -966,7 +965,7 @@ active_tab: calendar
             } else if (groupSelect) {
                 groupSelect.selectedIndex = 0;
             }
-
+            
             if (el.saveBtn) el.saveBtn.textContent = 'Update Issue';
             updateIssueDescriptionPreview();
             switchIssuesSubtab('create');
@@ -2017,7 +2016,7 @@ active_tab: calendar
                         if (!replies || replies.length === 0) return;
                         const repliesContainer = document.getElementById(`replies-${commentId}`);
                         if (!repliesContainer) return;
-
+                        
                         repliesContainer.innerHTML = replies.map(reply => `
                             <article class="issue-comment-reply" style="border-left: 3px solid #ccc; padding-left: 12px;">
                                 <div class="issue-comment-card-top">
@@ -2027,11 +2026,11 @@ active_tab: calendar
                                 <div class="issue-comment-body">${escapeIssueText(reply.text || '')}</div>
                             </article>
                         `).join('');
-
+                        
                         // Clean up the controller from the map
                         window._activeReplyFetches.delete(commentId);
                     })
-                    .catch(e => {
+                    .catch(e => { 
                         if (e.name !== 'AbortError') {
                             console.warn('Failed to load replies:', e);
                         }
@@ -2181,12 +2180,12 @@ active_tab: calendar
 
             el.form?.addEventListener('submit', async (event) => {
                 event.preventDefault();
-
+                
                 // Get selected groups
                 const groupSelect = document.getElementById('issue-assigned-groups');
                 const selectedOptions = Array.from(groupSelect?.selectedOptions || []);
                 const assignedGroups = selectedOptions.filter(opt => opt.value).map(opt => opt.value);
-
+                
                 const payload = {
                     title: (el.title?.value || '').trim(),
                     description: (el.description?.value || '').trim(),
