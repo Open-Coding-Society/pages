@@ -204,7 +204,7 @@ class MansionLevel4 {
     // Show message between Wave 1 and Wave 2
     if (
         this.waveManager.currentWave === 1 &&
-        this.waveManager.enemiesRemaining === 0 &&
+        this.waveManager.enemies.length === 0 &&
         !this.wave2MessageShown
     ) {
         this.wave2MessageShown = true;
@@ -219,8 +219,8 @@ class MansionLevel4 {
 
     if (this.waveManager.isComplete()) {
         this.winLevel();
-    }  
     }
+}
 
     winLevel() {
         if (this.levelWon) return;
