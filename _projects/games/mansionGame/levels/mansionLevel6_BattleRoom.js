@@ -157,7 +157,7 @@ class MansionLevel6_BattleRoom {
                 }
 
                 // Move towards nearest player
-                const speed = 0.3; // Adjust speed as needed
+                const speed = 0.45; // Increased by 1.5x from 0.3
                 const dx = nearest.position.x - this.position.x;
                 const dy = nearest.position.y - this.position.y;
                 const angle = Math.atan2(dy, dx);
@@ -252,28 +252,30 @@ class MansionLevel6_BattleRoom {
             updatePlayerHealthBar(100);
         }
 
-        // Create instructions under the boss bar (persistent)
+        // Create instructions as a tiny fixed bar at the top
         const instruction = document.createElement('div');
         instruction.id = 'instructions-container';
         instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, L for shockwave, touch power ups to collect';
         Object.assign(instruction.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            textAlign: 'center',
             color: '#00ffffff',
             fontFamily: "'Press Start 2P', sans-serif",
-            fontSize: '16px',
+            fontSize: '12px',
             textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
             opacity: '1',
-            marginTop: '6px',
-            whiteSpace: 'nowrap'
+            padding: '4px 0',
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            zIndex: '9999',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
         });
 
-        const bossContainer = document.getElementById('boss-health-container');
-        if (bossContainer) {
-            bossContainer.appendChild(instruction);
-        } else {
-            const gameContainer = document.querySelector('canvas')?.parentElement || document.body;
-            gameContainer.appendChild(instruction);
-        }
-
+        document.body.appendChild(instruction);
         instruction.style.opacity = '1';
     }
 }
