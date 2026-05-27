@@ -78,8 +78,8 @@ class WaveManager {
         this.gameEnv = gameEnv;
         this.waves = [
             { count: 5,  speed: 1.5  },  // Wave 1
-            { count: 10, speed: 2  },  // Wave 2
-            { count: 15, speed: 3  }   // Wave 3
+            { count: 9, speed: 2.5  },  // Wave 2
+            { count: 17,speed: 3.5  }   // Wave 3
         ];
 
         this.currentWave = 0;
