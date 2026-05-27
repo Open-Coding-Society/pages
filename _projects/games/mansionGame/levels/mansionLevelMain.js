@@ -181,6 +181,15 @@ class MansionLevelMain {
       ...shared_barrier_data
     };
 
+    const barrier_12 = {
+      id: 'dbarrier_12', 
+      x: 869 / 1113 * width,
+      y: 489 / 906 * height,
+      width: 109 / 1113 * width,
+      height: 245 / 906 * height,
+      ...shared_barrier_data
+    };
+
 
     function getDoorData(levelNum, levelClass, x, y, localStorageLocked = false) {
       const sprite_src_level_door = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
@@ -315,6 +324,7 @@ class MansionLevelMain {
       { class: Barrier, data: barrier_9 },
       { class: Barrier, data: barrier_10 },
       { class: Barrier, data: barrier_11 },
+      { class: Barrier, data: barrier_12 },
       { class: Npc, data: getDoorData(1, GameLevel1, doorPositions[1].x, doorPositions[1].y, doorPositions[1].locked) },
       { class: Npc, data: getDoorData(2, GameLevel2, doorPositions[2].x, doorPositions[2].y, doorPositions[2].locked) },
       { class: Npc, data: getDoorData(3, GameLevel3, doorPositions[3].x, doorPositions[3].y, doorPositions[3].locked) },

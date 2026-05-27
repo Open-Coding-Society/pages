@@ -1,6 +1,7 @@
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Projectile from './Projectile.js';
 import PlayerScythe from './PlayerScythe.js';
+import { updatePlayerHealthBar } from './HealthBars.js';
 
 const POWER_UP_DURATION_MS = {
     shield: 8000,
@@ -12,7 +13,8 @@ const POWER_UP_LABELS = {
     shield: 'Shield',
     charge: 'Shockwave charged',
     damageBoost: 'Damage boost',
-    scythes: 'Scythes'
+    scythes: 'Scythes',
+    heal: 'Healed +10%'
 };
 
 class FightingPlayer extends Player {
@@ -282,6 +284,19 @@ class FightingPlayer extends Player {
         if (type === 'scythes') {
             this.activateScythes();
             this.showPowerUpMessage(type);
+            return;
+        }
+
+        if (type === 'heal') {
+            const maxHealth = this.data?.maxHealth ?? 100;
+            const currentHealth = this.data?.health ?? maxHealth;
+            const healedHealth = Math.min(maxHealth, currentHealth + maxHealth * 0.1);
+            this.data.health = healedHealth;
+            if (typeof updatePlayerHealthBar === 'function') {
+                const percent = Math.max(0, Math.min(100, (healedHealth / maxHealth) * 100));
+                updatePlayerHealthBar(percent);
+            }
+            this.showPowerUpMessage(type);
         }
     }
 
@@ -333,7 +348,7 @@ class FightingPlayer extends Player {
             Object.assign(message.style, {
                 position: 'absolute',
                 left: '50%',
-                top: '90px',
+                bottom: '112px',
                 transform: 'translateX(-50%)',
                 color: '#FFFFFF',
                 fontFamily: "'Press Start 2P', sans-serif",
