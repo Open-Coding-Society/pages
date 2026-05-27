@@ -102,7 +102,52 @@ class MansionLevel4 {
         document.addEventListener('keydown', this.keydownHandler);
         document.addEventListener('keyup',   this.keyupHandler);
     }
+    showWaveMessage(message, callback) {
+    const msg = document.createElement('div');
 
+    msg.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.95);
+        color: white;
+        padding: 40px 60px;
+        border-radius: 15px;
+        border: 3px solid #ff6b6b;
+        z-index: 10000;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(255, 107, 107, 0.9);
+    `;
+
+    msg.innerHTML = `
+        <h1 style="color:#ff6b6b;font-size:42px;margin-bottom:20px;">
+            ${message}
+        </h1>
+
+        <button id="continue-wave-btn" style="
+            padding: 15px 35px;
+            font-size: 22px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        ">
+            Continue
+        </button>
+    `;
+
+    document.body.appendChild(msg);
+
+    document.getElementById('continue-wave-btn')
+        .addEventListener('click', () => {
+            msg.remove();
+
+            if (callback) callback();
+        });
+    }
     showStartUI() {
         const startElement = document.createElement('div');
         startElement.id = 'wave-start-prompt';
@@ -154,11 +199,27 @@ class MansionLevel4 {
     }
 
     update() {
-        this.waveManager.update();
+    this.waveManager.update();
 
-        if (this.waveManager.isComplete()) {
-            this.winLevel();
-        }
+    // Show message between Wave 1 and Wave 2
+    if (
+        this.waveManager.currentWave === 1 &&
+        this.waveManager.enemiesRemaining === 0 &&
+        !this.wave2MessageShown
+    ) {
+        this.wave2MessageShown = true;
+
+        this.showWaveMessage(
+            "Wave 1 Complete! Wave 2 Incoming...",
+            () => {
+                this.waveManager.startWave(2);
+            }
+        );
+    }
+
+    if (this.waveManager.isComplete()) {
+        this.winLevel();
+    }  
     }
 
     winLevel() {
@@ -180,7 +241,7 @@ class MansionLevel4 {
                 primary: true,
                 action: () => {
                     dialogueSystem.closeDialogue();
-                    alert("Level 4 Complete!");
+                    alert("Level 4 Complete! Key Recieved!");
                 }
             }
         ]);
