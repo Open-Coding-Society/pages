@@ -145,6 +145,7 @@ const LocalProfile = {
         createdAt: getTimestamp(),
         updatedAt: getTimestamp(),
         eventId: 0,
+        coursePlanMeta: data.coursePlanMeta || null,
         // Top-level identity fields
         name: data.name || '',
         email: data.email || '',
@@ -220,6 +221,7 @@ const LocalProfile = {
         updatedAt: getTimestamp(),
         // Ever-increasing event counter for ordering (avoids clock-skew issues)
         eventId: (existing.eventId || 0) + 1,
+        ...(updates.coursePlanMeta !== undefined && { coursePlanMeta: updates.coursePlanMeta }),
         // Top-level identity updates
         ...(updates.name !== undefined && { name: updates.name }),
         ...(updates.email !== undefined && { email: updates.email }),
@@ -306,6 +308,18 @@ const LocalProfile = {
   },
 
   /**
+   * Clear everything: profile key + companion localStorage keys that survive a normal clear.
+   * Use this for a full local reset (profile reset button, stopGame on auth'd users).
+   * @returns {boolean} Success status
+   */
+  clearAll(uid = undefined) {
+    const result = this.clear(uid);
+    try { localStorage.removeItem('cs_pathway_completion'); } catch (_) {}
+    try { localStorage.removeItem('ocs_guest_session'); } catch (_) {}
+    return result;
+  },
+
+  /**
    * Get a flattened version of the profile for easy consumption
    * @returns {Object|null} Flattened profile data
    */
@@ -323,10 +337,12 @@ const LocalProfile = {
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt,
       eventId: profile.eventId || 0,
+        coursePlanMeta: profile.coursePlanMeta || null,
       // Top-level identity
       name: profile.name,
       email: profile.email,
       githubID: profile.githubID,
+      course: profile.course || profile.coursePlanMeta?.selectedClass || null,
       // Identity Forge (includes avatar)
       sprite: identityForge.preferences?.sprite || null,
       spriteMeta: identityForge.preferences?.spriteMeta || null,

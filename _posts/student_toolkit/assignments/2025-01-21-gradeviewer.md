@@ -30,126 +30,73 @@ comments: false
 
 <script type="module">
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    let userId = -1;
-    let grades = [];
 
-    function populateTable(grades) {
+    function populateTable(rows) {
         const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
         tableBody.innerHTML = "";
 
-        grades.forEach(stugrade => {
+        rows.forEach(([grade, assignmentName]) => {
             let row = tableBody.insertRow();
-
             let cell1 = row.insertCell(0);
             cell1.className = "border border-white px-4 py-2";
-            cell1.textContent = stugrade[1];
-
+            cell1.textContent = assignmentName;
             let cell2 = row.insertCell(1);
             cell2.className = "border border-white px-4 py-2";
-            cell2.textContent = stugrade[0];
+            cell2.textContent = grade;
         });
 
-        displayAverage(grades);
-    }
-
-    function displayAverage(grades) {
-        let total = 0;
-        let count = grades.length;
-
-        grades.forEach(stugrade => {
-            total += parseFloat(stugrade[0]); 
-        });
-
-        let average = (total / count).toFixed(2); 
-
-        const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
-        let averageRow = tableBody.insertRow();
-        averageRow.classList.add("border", "border-white");
-
-        let cell1 = averageRow.insertCell(0);
-        cell1.className = "border border-white px-4 py-2 font-bold";
-        cell1.textContent = "Average";
-
-        let cell2 = averageRow.insertCell(1);
-        cell2.className = "border border-white px-4 py-2 font-bold";
-        cell2.textContent = average;
-    }
-
-    async function getUserId() {
-        const url_persons = `${javaURI}/api/person/get`;
-        await fetch(url_persons, fetchOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Spring server response: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                userId = data.id;
-            })
-            .catch(error => {
-                console.error("Java Database Error:", error);
-            });
-    }
-
-    async function fetchAssignmentbyId(assignmentId) {
-        try {
-            const response = await fetch(javaURI + "/api/assignments/" + String(assignmentId), {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch assignments: ${response.statusText}`);
-            }
-
-            const assignment = await response.text();
-            return assignment;  
-
-        } catch (error) {
-            console.error('Error fetching assignments:', error);
+        if (rows.length > 0) {
+            const total = rows.reduce((sum, [g]) => sum + parseFloat(g), 0);
+            const average = (total / rows.length).toFixed(2);
+            let avgRow = tableBody.insertRow();
+            avgRow.classList.add("border", "border-white");
+            let c1 = avgRow.insertCell(0);
+            c1.className = "border border-white px-4 py-2 font-bold";
+            c1.textContent = "Average";
+            let c2 = avgRow.insertCell(1);
+            c2.className = "border border-white px-4 py-2 font-bold";
+            c2.textContent = average;
         }
     }
 
-    async function getGrades() {
-        const urlGrade = javaURI + '/api/synergy/grades';
-
+    async function loadGrades() {
         try {
-            const response = await fetch(urlGrade, {
-                method: 'GET',
-                credentials: 'include',
-            });
+            // Get current user's ID
+            const personResp = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            if (!personResp.ok) throw new Error(`Could not get user: ${personResp.status}`);
+            const person = await personResp.json();
+            const userId = person.id;
 
-            if (!response.ok) {
-                throw new Error('Failed to get data: ' + response.statusText);
+            // Fetch grade map for this user: { assignmentId: grade }
+            const gradeResp = await fetch(`${javaURI}/api/synergy/grades/map/${userId}`, fetchOptions);
+            if (!gradeResp.ok) throw new Error(`Could not get grades: ${gradeResp.status}`);
+            const gradeMap = await gradeResp.json(); // { "42": 0.95, "7": 0.88, ... }
+
+            const assignmentIds = Object.keys(gradeMap);
+            if (assignmentIds.length === 0) {
+                const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
+                tableBody.innerHTML = '<tr><td colspan="2" class="px-4 py-4 text-center text-gray-400">No grades yet.</td></tr>';
+                return;
             }
 
-            const data = await response.json();
-            await getUserId();  
-
-            for (const grade of data) {
-                if (grade.studentId == userId) {
-                    let stugrade = [];
-                    stugrade.push(grade.grade);
-                    
-                    const assignmentDetails = await fetchAssignmentbyId(grade.assignmentId);
-                    stugrade.push(assignmentDetails);
-                    
-                    grades.push(stugrade);
+            // Resolve assignment names in parallel
+            const rows = await Promise.all(assignmentIds.map(async (aId) => {
+                try {
+                    const aResp = await fetch(`${javaURI}/api/assignments/${aId}`, fetchOptions);
+                    const name = aResp.ok ? await aResp.text() : `Assignment ${aId}`;
+                    return [gradeMap[aId], name.replace(/^"|"$/g, '')];
+                } catch {
+                    return [gradeMap[aId], `Assignment ${aId}`];
                 }
-            }
+            }));
 
-            populateTable(grades);
-
+            populateTable(rows);
         } catch (error) {
-            console.error('Error fetching grades:', error);
+            console.error('Error loading grades:', error);
+            const tableBody = document.getElementById("gradesTable").getElementsByTagName("tbody")[0];
+            tableBody.innerHTML = '<tr><td colspan="2" class="px-4 py-4 text-center text-red-400">Failed to load grades. Please log in and try again.</td></tr>';
         }
     }
 
-    window.onload = async function() {
-        await getUserId();
-        await getGrades(); 
-    };
+    window.onload = loadGrades;
 </script>

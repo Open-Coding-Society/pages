@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Scan the repo for Markdown/HTML pages with YAML frontmatter containing
+Scan the repo for Markdown/HTML/notebook pages with YAML frontmatter containing
 assignment: true and POST to the Spring `auto-create` API for each page.
 
 Usage (CI / local):
@@ -12,6 +12,7 @@ Usage (CI / local):
 The script is idempotent: the server will return 200 for existing contentUrl.
 """
 import argparse
+import json
 import os
 import re
 import sys
@@ -20,7 +21,8 @@ from pathlib import Path
 import requests
 import yaml
 
-FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.S)
+# Support frontmatter blocks with or without a trailing newline after closing ---.
+FRONTMATTER_RE = re.compile(r"^\ufeff?\s*---\s*\n(.*?)\n---\s*(?:\n|$)", re.S)
 
 DEFAULT_BASE_URL = os.getenv("BASE_URL", "https://spring.opencodingsociety.com")
 DEFAULT_UID = os.getenv("PAGES_BOT_UID", "pages-bot")
@@ -28,14 +30,16 @@ DEFAULT_PASSWORD = os.getenv("PAGES_BOT_PASSWORD", "")
 
 
 def find_files(root: Path):
-    exts = {".md", ".markdown", ".html", ".htm"}
+    exts = {".md", ".markdown", ".html", ".htm", ".ipynb"}
     for p in root.rglob("*"):
         if p.is_file() and p.suffix.lower() in exts:
             yield p
 
 
-def read_frontmatter(path: Path):
-    text = path.read_text(encoding="utf-8")
+def parse_frontmatter_text(text: str):
+    # Notebook sources are inconsistent about newline preservation; normalize
+    # line endings before attempting regex extraction.
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     m = FRONTMATTER_RE.match(text)
     if not m:
         return None
@@ -44,6 +48,35 @@ def read_frontmatter(path: Path):
         return data or {}
     except Exception:
         return None
+
+
+def read_frontmatter(path: Path):
+    if path.suffix.lower() == ".ipynb":
+        try:
+            notebook = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+        for cell in notebook.get("cells", []):
+            source = cell.get("source")
+            if isinstance(source, list):
+                # Each array entry is a logical line in many notebooks.
+                # Join with newlines so YAML frontmatter stays parseable even
+                # when individual items do not include trailing "\n".
+                text = "\n".join([str(s).rstrip("\n") for s in source])
+            elif isinstance(source, str):
+                text = source
+            else:
+                continue
+
+            data = parse_frontmatter_text(text)
+            if data is not None:
+                return data
+
+        return None
+
+    text = path.read_text(encoding="utf-8")
+    return parse_frontmatter_text(text)
 
 
 def determine_content_url(root: Path, path: Path, fm: dict):
@@ -55,7 +88,7 @@ def determine_content_url(root: Path, path: Path, fm: dict):
     rel = path.relative_to(root).as_posix()
     # Remove leading index filenames and extensions
     rel = re.sub(r"(^|/)index\.(md|markdown|html)$", r"\1", rel, flags=re.I)
-    rel = re.sub(r"\.(md|markdown|html)$", "", rel, flags=re.I)
+    rel = re.sub(r"\.(md|markdown|html|ipynb)$", "", rel, flags=re.I)
     # Prefix with pages/ if the file is under pages/ or _posts
     if rel.startswith("pages/"):
         return rel
@@ -78,8 +111,20 @@ def authenticate(session: requests.Session, base_url: str, uid: str, password: s
         raise RuntimeError("Authentication succeeded but jwt cookie not present")
 
 
-def create_assignment(session: requests.Session, base_url: str, name: str, content_url: str, description: str = "auto-created on deploy"):
+def create_assignment(
+    session: requests.Session,
+    base_url: str,
+    name: str,
+    content_url: str,
+    description: str = "auto-created on deploy",
+    points=None,
+    due_date=None,
+):
     payload = {"name": name, "contentUrl": content_url, "description": description}
+    if points is not None:
+        payload["points"] = points
+    if due_date:
+        payload["dueDate"] = due_date
     # Use form-encoded to match frontend
     resp = session.post(f"{base_url}/api/assignments/auto-create", data=payload, timeout=30)
     return resp
@@ -130,14 +175,16 @@ def main():
             content_url = determine_content_url(root, f, fm)
             name = fm.get("title") or fm.get("name") or f.stem
             description = fm.get("description") or "auto-created from frontmatter"
-            candidates.append((f, content_url, name, description))
+            points = fm.get("points")
+            due_date = fm.get("dueDate") or fm.get("due_date") or fm.get("due")
+            candidates.append((f, content_url, name, description, points, due_date))
 
     if not candidates:
         print("No pages with assignment: true found.")
         return 0
 
     print(f"Found {len(candidates)} pages with assignment: true")
-    for path, content_url, name, description in candidates:
+    for path, content_url, name, description, points, due_date in candidates:
         print(f"-> {path} -> contentUrl={content_url} name={name}")
         if args.dry_run and not args.create:
             continue
@@ -179,7 +226,7 @@ def main():
             if args.dry_run:
                 continue
             try:
-                resp = create_assignment(session, args.base_url, name, content_url, description)
+                resp = create_assignment(session, args.base_url, name, content_url, description, points, due_date)
                 print(f"  {resp.status_code} {resp.text[:200]}")
             except Exception as e:
                 print(f"  ERROR: {e}")
