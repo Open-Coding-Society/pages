@@ -66,7 +66,7 @@ export default class EmpathyEpicPlayer extends Player {
             for (let npcId of this.state.collisionEvents) {
                 const npcObj = this.gameEnv.gameObjects.find(obj => obj.id === npcId || (obj.data && obj.data.id === npcId));
                 // Only auto-open if not already open, preventing rapid spamming
-                if (npcObj && npcObj.interact && (!npcObj.dialogueSystem || !npcObj.dialogueSystem.isOpen) && !npcObj.isInteracting && !npcObj._quizCompleted) {
+                if (npcObj && npcObj.interact && (!npcObj.dialogueSystem || !npcObj.dialogueSystem.isOpen) && !npcObj.isInteracting && !npcObj._quizCompleted && !npcObj._quizRetryPending) {
                     npcObj.isInteracting = true;
                     npcObj.interact();
                     

@@ -27,9 +27,22 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
       playerSrc: player_src,
       backgroundSrc: bg_src,
     });
-    const stationMarkerSrc = path + "/images/projects/cs-pathway/npc/gatekeeper2.png";
 
-    this.preloadTrackedAsset('npc_marker', stationMarkerSrc);
+    const createStationMarkerSrc = (fillColor, strokeColor = '#e2e8f0') => {
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+          <circle cx="64" cy="64" r="54" fill="${fillColor}" stroke="${strokeColor}" stroke-width="10"/>
+          <circle cx="64" cy="64" r="24" fill="rgba(255,255,255,0.16)"/>
+        </svg>
+      `;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    };
+
+    const stationMarkerColors = {
+      blue: createStationMarkerSrc('#3b82f6'),
+      green: createStationMarkerSrc('#22c55e'),
+      red: createStationMarkerSrc('#ef4444'),
+    };
 
     // ── Setup Background ─────────────────────────────────────────
     const bg_data = {
@@ -62,18 +75,31 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
     // ── Helper to build Quiz Interaction ─────────────────────────
     const levelInstance = this;
     const buildStationData = (id, displayName, pos, dialogSystemIntro, quizTitle, correctText, distractors) => {
+      const stationSize = height / 18;
+      const setStationColor = (npcSelf, colorName) => {
+        const src = stationMarkerColors[colorName] || stationMarkerColors.blue;
+        npcSelf.spriteReady = false;
+        if (npcSelf.spriteSheet) npcSelf.spriteSheet.src = src;
+        if (npcSelf.spriteData) npcSelf.spriteData.src = src;
+        if (npcSelf.data) npcSelf.data.src = src;
+        npcSelf.frameIndex = 0;
+        npcSelf.frameCounter = 0;
+      };
+
       const npcData = {
         id: id,
-        src: stationMarkerSrc,
-        SCALE_FACTOR: 16,
+        src: stationMarkerColors.blue,
+        SCALE_FACTOR: 18,
         ANIMATION_RATE: 50,
         pixels: { height: 100, width: 100 },
-        INIT_POSITION: { x: pos.x, y: pos.y },
+        INIT_POSITION: { x: pos.x - (stationSize / 2), y: pos.y - (stationSize / 2) },
         orientation: { rows: 1, columns: 1 },
         down: { row: 0, start: 0, columns: 1 },
-        interactDistance: 120,
+        hitbox: { radiusPercentage: 0.45 },
         greeting: `Welcome to the ${displayName} station!`,
         interact: function () {
+          this._quizRetryPending = false;
+          setStationColor(this, 'blue');
           this.dialogueSystem.dialogues = dialogSystemIntro;
           const ds = this.dialogueSystem;
           ds.lastShownIndex = -1;
@@ -83,19 +109,17 @@ export default class GameLevelEmpathyEpic extends GameLevelCsPathIdentity {
           const npcSelf = this;
 
           const completeStation = () => {
-            // Swap to a different in-repo marker so completion stays visible without inline SVG.
-            const greenSrc = path + '/images/projects/cs-pathway/npc/gatekeeper.png';
-            npcSelf.image = new Image();
-            npcSelf.image.src = greenSrc;
-            if (npcSelf.spriteData) npcSelf.spriteData.src = greenSrc;
-
+            setStationColor(npcSelf, 'green');
             npcSelf._quizCompleted = true;
+            npcSelf._quizRetryPending = false;
             ds.closeDialogue();
             npcSelf.isInteracting = false;
             levelInstance.showToast(`Correct! ${displayName} station completed.`);
           };
 
           const failStation = (distractorText) => {
+            setStationColor(npcSelf, 'red');
+            npcSelf._quizRetryPending = true;
             ds.closeDialogue();
             npcSelf.isInteracting = false;
             levelInstance.showToast(`Not quite! Take a moment to reflect on empathetic choices.`);
