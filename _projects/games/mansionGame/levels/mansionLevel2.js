@@ -63,12 +63,36 @@ class HealthPlayer extends Player {
         }
     }
 
+    triggerScreenShake() {
+        const container = this.gameEnv?.container;
+        if (!container || this.shakeInProgress) return;
+
+        this.shakeInProgress = true;
+        const intensity = 8;
+        const frames = 8;
+        let count = 0;
+
+        const originalTransform = container.style.transform || '';
+        const intervalId = setInterval(() => {
+            const offsetX = Math.round((Math.random() - 0.5) * intensity);
+            const offsetY = Math.round((Math.random() - 0.5) * intensity);
+            container.style.transform = `${originalTransform} translate(${offsetX}px, ${offsetY}px)`;
+            count += 1;
+            if (count >= frames) {
+                clearInterval(intervalId);
+                container.style.transform = originalTransform;
+                this.shakeInProgress = false;
+            }
+        }, 16);
+    }
+
     handleCollisionReaction(other) {
         const hitReaper = other?.id === 'Reaper' || other?.id === 'Reaper2';
         if (hitReaper && !this.reaperCollisionActive) {
             this.reaperCollisionActive = true;
             this.health = Math.max(0, this.health - 10);
             this.updateHealthDisplay();
+            this.triggerScreenShake();
         }
         super.handleCollisionReaction(other);
     }
