@@ -46,6 +46,10 @@ class Reaper extends Npc {
 
         super.update();
     }
+
+    showReactionDialogue() {
+        // Prevent the reaper from displaying a dialogue message on touch.
+    }
 }
 
 // Mansion Level 2 Game with WASD character movement.
@@ -142,6 +146,7 @@ class MansionLevel2 {
 
             zIndex: 10,
             isKilling: false,
+            dialogues: [],
         };
 
         // Background + player + reaper
