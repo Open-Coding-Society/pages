@@ -2,6 +2,76 @@ document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("scraper-app");
   if (!container) return;
 
+  const payloadTemplates = {
+    books: {
+      url: "https://books.toscrape.com/",
+      pagination: {
+        type: "nextLink",
+        selector: "li.next a",
+        attr: "href"
+      },
+      itemsSelector: "article.product_pod",
+      fields: {
+        title: { selector: "h3 a", mode: "attr", attr: "title" },
+        link: { selector: "h3 a", mode: "attr", attr: "href" },
+        price: { selector: ".price_color", mode: "text" },
+        availability: { selector: ".instock.availability", mode: "text" },
+        ratingClass: { selector: "p.star-rating", mode: "attr", attr: "class" }
+      },
+      limits: {
+        maxPages: 3,
+        maxItems: 60,
+        maxConcurrency: 6,
+        timeoutMs: 15000
+      }
+    },
+    music: {
+      url: "https://books.toscrape.com/catalogue/category/books/music_14/index.html",
+      pagination: {
+        type: "nextLink",
+        selector: "li.next a",
+        attr: "href"
+      },
+      itemsSelector: "article.product_pod",
+      fields: {
+        title: { selector: "h3 a", mode: "attr", attr: "title" },
+        detailLink: { selector: "h3 a", mode: "attr", attr: "href" },
+        price: { selector: ".price_color", mode: "text" },
+        stock: { selector: ".instock.availability", mode: "text" }
+      },
+      limits: {
+        maxPages: 2,
+        maxItems: 30,
+        maxConcurrency: 4,
+        timeoutMs: 15000
+      }
+    },
+    vacation: {
+      url: "https://books.toscrape.com/catalogue/category/books/travel_2/index.html",
+      pagination: {
+        type: "nextLink",
+        selector: "li.next a",
+        attr: "href"
+      },
+      itemsSelector: "article.product_pod",
+      fields: {
+        destinationTitle: { selector: "h3 a", mode: "attr", attr: "title" },
+        listingLink: { selector: "h3 a", mode: "attr", attr: "href" },
+        budgetPrice: { selector: ".price_color", mode: "text" },
+        status: { selector: ".instock.availability", mode: "text" }
+      },
+      limits: {
+        maxPages: 2,
+        maxItems: 30,
+        maxConcurrency: 4,
+        timeoutMs: 15000
+      }
+    }
+  };
+
+  const templateName = (container.dataset.template || "books").toLowerCase();
+  const selectedTemplate = payloadTemplates[templateName] || payloadTemplates.books;
+
   container.innerHTML = `
     <div class="scraper-card">
       <h2 class="scraper-title">Spring Scraper Runner</h2>
@@ -43,29 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorEl = document.getElementById("scraper-request-error");
   const runButton = document.getElementById("scraper-run");
   const exampleButton = document.getElementById("scraper-load-example");
-
-  const examplePayload = {
-    url: "https://books.toscrape.com/",
-    pagination: {
-      type: "nextLink",
-      selector: "li.next a",
-      attr: "href"
-    },
-    itemsSelector: "article.product_pod",
-    fields: {
-      title: { selector: "h3 a", mode: "attr", attr: "title" },
-      link: { selector: "h3 a", mode: "attr", attr: "href" },
-      price: { selector: ".price_color", mode: "text" },
-      availability: { selector: ".instock.availability", mode: "text" },
-      ratingClass: { selector: "p.star-rating", mode: "attr", attr: "class" }
-    },
-    limits: {
-      maxPages: 3,
-      maxItems: 60,
-      maxConcurrency: 6,
-      timeoutMs: 15000
-    }
-  };
+  const examplePayload = selectedTemplate;
 
   if (exampleButton) {
     exampleButton.addEventListener("click", () => {
@@ -74,6 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
         errorEl.textContent = "";
       }
     });
+  }
+
+  if (requestInput) {
+    requestInput.value = JSON.stringify(examplePayload, null, 2);
   }
 
   async function runScraper() {

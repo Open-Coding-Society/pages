@@ -15,6 +15,11 @@ This `_projects/systems/scraper` project provides a **barebones frontend UI** to
 
 The UI lives on this docs page and is rendered into the `#scraper-app` container by `assets/js/projects/scraper/scraper.js`.
 
+## Lessons
+
+- [Lesson 1: Music JSON Builder]({{ '/scraper/lessons/music-json/' | relative_url }})
+- [Lesson 2: Vacation JSON Builder]({{ '/scraper/lessons/vacation-json/' | relative_url }})
+
 ## Using the Scraper UI
 
 1. **Log in** to the Spring-backed site (so your JWT cookie is present).
