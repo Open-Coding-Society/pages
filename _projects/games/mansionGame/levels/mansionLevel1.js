@@ -87,7 +87,7 @@ class MansionLevel1 {
             STEP_FACTOR: 0,
             ANIMATION_RATE: 0,
             INIT_POSITION: { x: width * 0.73, y: height * 0.42 },
-            pixels: { height: 255, width: 198 },
+            pixels: { height: 545, width: 506 },
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
             up: { row: 0, start: 0, columns: 1 },
@@ -253,7 +253,7 @@ class MansionLevel1 {
         introDialogue.showDialogue(
             "Search the tomb for three offerings. Bring them to the mummy to earn the key.",
             "Explorer",
-            this.gameEnv.path + "/images/projects/mansionGame/mummy_boy.png"
+            this.gameEnv.path + "/images/projects/mansionGame/sphinxclear.png"
         );
 
 
