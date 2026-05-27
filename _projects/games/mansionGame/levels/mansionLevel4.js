@@ -48,10 +48,10 @@ class MansionLevel4 {
 
         // Boundary walls
         const barrierData = [
-            { x: width * 0,          y: height * 0,           width: width * width,  height: height * 20,     visible: true }, // top
-            { x: width * 0,          y: height * height - 20, width: width * width,  height: height * 20,     visible: true }, // bottom
-            { x: width * 0,          y: height * 0,           width: width * 20,     height: height * height,  visible: true }, // left
-            { x: width * width - 20,         y: height * 0,           width: width * 20,     height: height * height,  visible: true }  // right
+            { x: width * 0,          y: height * 0,           width: width * width,  height: height * 20,     visible: false }, // top
+            { x: width * 0,          y: height * height - 20, width: width * width,  height: height * 20,     visible: false }, // bottom
+            { x: width * 0,          y: height * 0,           width: width * 20,     height: height * height,  visible: false }, // left
+            { x: width * width - 20,         y: height * 0,           width: width * 20,     height: height * height,  visible: false }  // right
         ];
 
         this.classes = [
@@ -65,7 +65,7 @@ class MansionLevel4 {
         // Background music
         this.backgroundMusic = new Audio(path + '/assets/sounds/mansionGame/SpookieDookie.mp3');
         this.backgroundMusic.loop   = true;
-        this.backgroundMusic.volume = 0.3;
+        this.backgroundMusic.volume = 0.4;
         this.backgroundMusic.play();
 
         this.setupInputListener();
