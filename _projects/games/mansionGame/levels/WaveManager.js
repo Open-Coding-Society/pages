@@ -1,6 +1,7 @@
 import Character from '@assets/js/GameEnginev1.1/essentials/Character.js';
 import Projectile from './Projectile.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
+import MansionLevelMain from './mansionLevelMain.js';
 class WaveEnemy extends Character {
     constructor(data = null, gameEnv = null) {
         super(data, gameEnv);
@@ -356,23 +357,19 @@ class WaveManager {
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
             zIndex: 100,
             interact: function() {
-                localStorage.setItem('mansionGame_level5_unlocked', 'true');
-                console.log("Level 5 unlocked!");
+                const gameControl = this.gameEnv?.gameControl;
+                if (!gameControl) {
+                    console.error("gameControl not found");
+                    return;
+                }
 
                 // Transition back to lobby
-                const gameControl = this.gameEnv.gameControl;
-                if (gameControl && typeof gameControl.transitionToLevel === 'function') {
-                    import('./mansionLevelMain.js').then(({ default: MansionLevelMain }) => {
-                        gameControl.levelClasses = [MansionLevelMain];
-                        gameControl.currentLevelIndex = 0;
-                        gameControl.transitionToLevel();
-                    }).catch(err => {
-                        console.error("Failed to load lobby:", err);
-                        location.reload();
-                    });
-                } else {
-                    location.reload();
-                }
+                gameControl.levelClasses = [MansionLevelMain];
+                gameControl.currentLevelIndex = 0;
+                gameControl.isPaused = false;
+                gameControl.transitionToLevel();
+
+                localStorage.setItem('mansionGame_level5_unlocked', 'true');
             }
         };
 
