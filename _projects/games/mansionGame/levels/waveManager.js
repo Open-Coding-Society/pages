@@ -76,9 +76,9 @@ class WaveManager {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
         this.waves = [
-            { count: 5,  speed: 2   },  // Wave 1
-            { count: 10, speed: 3.5 },  // Wave 2
-            { count: 15, speed: 5   }   // Wave 3
+            { count: 5,  speed: 1  },  // Wave 1
+            { count: 10, speed: 1.5  },  // Wave 2
+            { count: 15, speed: 2  }   // Wave 3
         ];
 
         this.currentWave = 0;
@@ -150,7 +150,7 @@ class WaveManager {
             const enemyData = {
                 id: `waveEnemy_${this.currentWave}_${i}`,
                 src: sprite_src,
-                SCALE_FACTOR: 3,
+                SCALE_FACTOR: 1.5,
                 STEP_FACTOR: 0,
                 ANIMATION_RATE: 8,
                 INIT_POSITION: { x: xPos, y: yPos },
