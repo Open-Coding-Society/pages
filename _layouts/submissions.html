@@ -591,11 +591,31 @@ active_tab: submissions
             const fileName = content.filename || content.storedFilename || 'File submission';
             const notes = content.notes ? `<div style="color:#9ca3af;margin-top:6px;">${escapeHtml(content.notes)}</div>` : '';
             const extra = content.contentType ? `<div style="color:#6b7280;margin-top:4px;">${escapeHtml(content.contentType)} · ${escapeHtml(String(content.size || ''))}</div>` : '';
-            return `<div><strong>${escapeHtml(fileName)}</strong>${extra}${notes}</div>`;
+            const downloadUrl = getSubmissionFileDownloadUrl(content);
+            const downloadLink = downloadUrl
+                ? `<div style="margin-top:8px;"><a href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;font-weight:600;">Download file</a></div>`
+                : '';
+            return `<div><strong>${escapeHtml(fileName)}</strong>${extra}${notes}${downloadLink}</div>`;
         }
         if (content.type === 'link' || content.url) return `<a href="${escapeHtml(content.url)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;">${escapeHtml(content.url)}</a>`;
         if (content.text) return escapeHtml(content.text);
         return escapeHtml(JSON.stringify(content));
+    }
+
+    function getSubmissionFileDownloadUrl(content) {
+        if (!content || !content.storagePath) {
+            return '';
+        }
+
+        const storagePath = String(content.storagePath);
+        const slashIndex = storagePath.indexOf('/');
+        if (slashIndex <= 0 || slashIndex >= storagePath.length - 1) {
+            return '';
+        }
+
+        const uid = storagePath.slice(0, slashIndex);
+        const filename = storagePath.slice(slashIndex + 1);
+        return `${javaURI}/api/files/download/${encodeURIComponent(uid)}/${encodeURIComponent(filename)}`;
     }
 
     function getSubmissionContentType(submission) {
