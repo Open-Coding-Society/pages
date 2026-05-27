@@ -224,6 +224,7 @@ class PersistentProfile {
           createdAt: existing._game_profile?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           eventId: 0,
+          coursePlanMeta: null,
           'identity-forge': {
             preferences: {},
             progress: {
