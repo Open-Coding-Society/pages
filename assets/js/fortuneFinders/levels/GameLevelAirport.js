@@ -628,12 +628,19 @@ class GameLevelAirport {
     const transitionToNextMap = () => {
       if (isTransitioning) return;
       const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
-      if (!control || typeof control.transitionToLevel !== 'function') return;
+      if (!control) return;
 
-      const maxIndex = Math.max(0, (control.levelClasses?.length || 1) - 1);
-      control.currentLevelIndex = Math.min((control.currentLevelIndex ?? 0) + 1, maxIndex);
       isTransitioning = true;
-      control.transitionToLevel();
+      // endLevel() sets currentLevel.continue = false, which causes the game loop
+      // to call handleLevelEnd(), which increments currentLevelIndex and transitions
+      // cleanly — preventing duplicate sprites from both levels rendering at once.
+      if (typeof control.endLevel === 'function') {
+        control.endLevel();
+      } else if (typeof control.transitionToLevel === 'function') {
+        const maxIndex = Math.max(0, (control.levelClasses?.length || 1) - 1);
+        control.currentLevelIndex = Math.min((control.currentLevelIndex ?? 0) + 1, maxIndex);
+        control.transitionToLevel();
+      }
       setTimeout(() => { isTransitioning = false; }, 250);
     };
 
