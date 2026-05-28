@@ -151,6 +151,7 @@ permalink: /gamify/fortuneFindersv1-1
             observer.observe(document.body, { childList: true });
         } catch (error) {
             console.error("Fortune Finders startup error:", error);
+            showStartupError(error);
         }
     })();
 </script>

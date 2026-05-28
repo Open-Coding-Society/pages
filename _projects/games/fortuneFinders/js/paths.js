@@ -1,5 +1,5 @@
-/** Static assets under this project folder (served via Jekyll include, no copies). */
-export const FF_PROJECT = '/_projects/games/fortuneFinders';
+/** Static images copied to `images/projects/fortuneFinders/` at build time. */
+export const FF_PROJECT = '/images/projects/fortuneFinders';
 
 /** @param {string} siteBase @param {string} file - filename under `images/` */
 export function ffImage(siteBase, file) {
