@@ -12,22 +12,22 @@ permalink: /gamify/fortuneFinders
 
 <script>
     (function () {
-        const liquidBase = "{{ site.baseurl }}";
-        let base = liquidBase;
-        if (!base) {
+        function resolveSiteBase() {
+            const liquidBase = "{{ site.baseurl }}";
+            if (liquidBase) return liquidBase;
             const parts = window.location.pathname.split("/").filter(Boolean);
-            if (parts.length && parts[0] !== "gamify") {
-                base = "/" + parts[0];
-            }
+            if (parts.length && parts[0] !== "gamify") return "/" + parts[0];
+            return "";
         }
-        const imports = {
-            "@assets/": base + "/assets/",
-            "@fortuneFinders/": base + "/assets/js/fortuneFinders/"
+        window.__FF_SITE_BASE__ = resolveSiteBase();
+        const base = window.__FF_SITE_BASE__;
+        const map = {
+            imports: {
+                "@assets/": base + "/assets/",
+                "@fortuneFinders/": base + "/assets/js/fortuneFinders/"
+            }
         };
-        const tag = document.createElement("script");
-        tag.type = "importmap";
-        tag.textContent = JSON.stringify({ imports });
-        document.head.appendChild(tag);
+        document.write('<script type="importmap">' + JSON.stringify(map).replace(/</g, "\\u003c") + "<\/script>");
     })();
 </script>
 
@@ -60,21 +60,16 @@ permalink: /gamify/fortuneFinders
 
     (async () => {
         try {
-            let siteBase = "{{ site.baseurl }}";
-            if (!siteBase) {
-                const parts = window.location.pathname.split("/").filter(Boolean);
-                if (parts.length && parts[0] !== "gamify") {
-                    siteBase = "/" + parts[0];
-                }
-            }
+            const siteBase = window.__FF_SITE_BASE__ || "{{ site.baseurl }}";
+            const ff = (file) => import(`${siteBase}/assets/js/fortuneFinders/${file}`);
 
             const [{ default: FinTech }, { default: GameLevelAirport }, { default: GameLevelFuturesExchange }, { default: GameLevelOptionsHub }, { default: GameLevelWallstreet }, { FF_ROUTES, ffUrl }, config] = await Promise.all([
-                import("@fortuneFinders/js/FinTech.js"),
-                import("@fortuneFinders/levels/GameLevelAirport.js"),
-                import("@fortuneFinders/levels/GameLevelFuturesExchange.js"),
-                import("@fortuneFinders/levels/GameLevelOptionsHub.js"),
-                import("@fortuneFinders/levels/GameLevelWallstreet.js"),
-                import("@fortuneFinders/js/routes.js"),
+                ff("js/FinTech.js"),
+                ff("levels/GameLevelAirport.js"),
+                ff("levels/GameLevelFuturesExchange.js"),
+                ff("levels/GameLevelOptionsHub.js"),
+                ff("levels/GameLevelWallstreet.js"),
+                ff("js/routes.js"),
                 import(`${siteBase}/assets/js/api/config.js`),
             ]);
 

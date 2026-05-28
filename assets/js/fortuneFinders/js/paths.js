@@ -1,8 +1,8 @@
-/** Static images copied to `images/projects/fortuneFinders/` at build time. */
+/** Static images under `images/fortuneFinders/` (committed deploy copy). */
 export const FF_PROJECT = '/images/fortuneFinders';
 
-/** @param {string} siteBase @param {string} file - filename under `images/` */
+/** @param {string} siteBase @param {string} file - filename under `images/fortuneFinders/` */
 export function ffImage(siteBase, file) {
   const base = (siteBase || '').replace(/\/$/, '');
-  return `${base}${FF_PROJECT}/images/${file}`;
+  return `${base}${FF_PROJECT}/${file}`;
 }
