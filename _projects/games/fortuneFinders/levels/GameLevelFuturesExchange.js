@@ -105,19 +105,20 @@ class GameLevelFuturesExchange {
     let isTransitioning = false;
     const transitionToNextMap = () => {
       if (isTransitioning) return;
-      const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
+      const control = gameEnv?.gameControl;
       if (!control) return;
 
       isTransitioning = true;
-      // endLevel() sets currentLevel.continue = false, which causes the game loop
-      // to call handleLevelEnd(), which increments currentLevelIndex and transitions
-      // cleanly — preventing duplicate sprites from both levels rendering at once.
-      if (typeof control.endLevel === 'function') {
+      // Cancel the running animation loop first so it can't fire again mid-transition
+      control._loopRunning = false;
+
+      // handleLevelEnd() does the full cleanup synchronously:
+      // destroy current level -> increment index -> transitionToLevel()
+      // This prevents both levels rendering simultaneously.
+      if (typeof control.handleLevelEnd === 'function') {
+        control.handleLevelEnd();
+      } else if (typeof control.endLevel === 'function') {
         control.endLevel();
-      } else if (typeof control.transitionToLevel === 'function') {
-        const maxIndex = Math.max(0, (control.levelClasses?.length || 1) - 1);
-        control.currentLevelIndex = Math.min((control.currentLevelIndex ?? 0) + 1, maxIndex);
-        control.transitionToLevel();
       }
       setTimeout(() => { isTransitioning = false; }, 250);
     };
