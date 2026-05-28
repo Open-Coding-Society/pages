@@ -2,46 +2,75 @@
 
 <style>
   .fops{max-width:900px;margin:0 auto;padding:1.5rem 1rem;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#111;color:#e0e0e0;border-radius:12px}
-  .fops h1{font-size:20px;font-weight:500;color:#fff;margin:0 0 10px}
-  .fops-desc{font-size:13px;color:#888;line-height:1.6;margin-bottom:16px}
+  .fops h1{font-size:24px;font-weight:500;color:#fff;margin:0 0 10px}
+  .fops-desc{font-size:15px;color:#888;line-height:1.6;margin-bottom:16px}
   .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-  .btn{font-size:12px;padding:6px 14px;border-radius:6px;text-decoration:none}
+  .btn{font-size:13px;padding:6px 14px;border-radius:6px;text-decoration:none}
   .btn-g{background:#1a3a1a;color:#6fcf6f;border:0.5px solid #2d5a2d}
   .btn-d{background:#1e1e1e;color:#999;border:0.5px solid #333}
-  .meta{font-size:12px;color:#555;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid #222}
+  .meta{font-size:13px;color:#555;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid #222}
   .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
   .card{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:12px;padding:14px}
-  .card-tag{font-size:10px;letter-spacing:1px;color:#4caf50;text-transform:uppercase;margin-bottom:6px}
-  .card-name{font-size:14px;font-weight:500;color:#fff;margin-bottom:6px}
-  .card-desc{font-size:12px;color:#ccc;line-height:1.5;margin-bottom:10px}
+  .card-tag{font-size:11px;letter-spacing:1px;color:#4caf50;text-transform:uppercase;margin-bottom:6px}
+  .card-name{font-size:16px;font-weight:500;color:#fff;margin-bottom:6px}
+  .card-desc{font-size:13px;color:#ccc;line-height:1.5;margin-bottom:10px}
   .card-links{display:flex;gap:10px;flex-wrap:wrap}
-  .card-link{font-size:12px;color:#4caf50;text-decoration:none}
+  .card-link{font-size:13px;color:#4caf50;text-decoration:none}
   .card-link.orange{color:#e07030}
   .comparison{border-radius:12px;overflow:hidden;margin-bottom:24px;border:0.5px solid #2a2a2a}
   .cmp-header{display:grid;grid-template-columns:1fr 1fr 1fr;background:#1a1a1a;border-bottom:0.5px solid #2a2a2a}
-  .cmp-header div{font-size:11px;font-weight:500;padding:10px 14px;letter-spacing:.5px;text-transform:uppercase}
+  .cmp-header div{font-size:12px;font-weight:500;padding:10px 14px;letter-spacing:.5px;text-transform:uppercase}
   .cmp-header .col-label{color:#555}
   .cmp-header .col-before{color:#c0392b}
   .cmp-header .col-after{color:#4caf50}
   .cmp-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:0.5px solid #1e1e1e}
   .cmp-row:last-child{border-bottom:none}
-  .cmp-row div{font-size:12px;padding:10px 14px;line-height:1.5}
+  .cmp-row div{font-size:13px;padding:10px 14px;line-height:1.5}
   .cmp-row:nth-child(odd){background:#181818}
   .cmp-row:nth-child(even){background:#141414}
   .col-label{color:#888;font-weight:500}
   .col-before{color:#e57373}
   .col-after{color:#81c784}
   .highlights{background:#161f16;border:0.5px solid #2a3a2a;border-radius:12px;padding:16px;margin-bottom:24px}
-  .hl-title{font-size:14px;font-weight:500;color:#fff;margin-bottom:4px}
-  .hl-sub{font-size:12px;color:#666;margin-bottom:12px}
+  .hl-title{font-size:16px;font-weight:500;color:#fff;margin-bottom:4px}
+  .hl-sub{font-size:13px;color:#666;margin-bottom:12px}
   .hl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
-  .hl-item{font-size:12px;color:#999}
-  .section-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  .hl-item{font-size:13px;color:#999}
+  .section-label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:8px}
+  
+  /* Feedback section styles */
+  .feedback-section{background:#1a1420;border:0.5px solid #3a2a4a;border-radius:12px;padding:16px;margin-top:24px}
+  .feedback-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .feedback-header svg{width:18px;height:18px;color:#b87333}
+  .feedback-header h3{font-size:16px;font-weight:500;color:#fff;margin:0}
+  .feedback-stats{font-size:12px;color:#888;margin-bottom:12px;padding-bottom:10px;border-bottom:0.5px solid #2a2a2a}
+  .feedback-grid{display:flex;flex-direction:column;gap:12px}
+  .feedback-card{background:#111;border-radius:10px;padding:12px;border-left:3px solid #b87333}
+  .feedback-name{font-size:13px;font-weight:600;color:#e0b070;margin-bottom:6px}
+  .feedback-text{font-size:13px;color:#bbb;line-height:1.5;margin-bottom:6px}
+  .feedback-text strong{color:#e0b070;font-weight:600}
+  .feedback-meta{font-size:11px;color:#555}
+  
+  /* Future plans section */
+  .roadmap-section{background:#0f1a1a;border:0.5px solid #2a4a4a;border-radius:12px;padding:16px;margin-top:24px}
+  .roadmap-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+  .roadmap-header svg{width:18px;height:18px;color:#4caf50}
+  .roadmap-header h3{font-size:16px;font-weight:500;color:#fff;margin:0}
+  .roadmap-grid{display:flex;flex-direction:column;gap:10px}
+  .roadmap-item{background:#0a1515;border-radius:10px;padding:12px;border-left:3px solid #4caf50;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .roadmap-priority{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:#1a3a2a;color:#6fcf6f;white-space:nowrap}
+  .roadmap-content{flex:1}
+  .roadmap-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px}
+  .roadmap-title strong{color:#4caf50}
+  .roadmap-desc{font-size:13px;color:#999;margin-bottom:4px}
+  .roadmap-attribution{font-size:11px;color:#4caf50;opacity:0.7}
+  
   @media(max-width:700px){
     .tools{grid-template-columns:1fr}
     .hl-grid{grid-template-columns:1fr}
     .cmp-header,.cmp-row{grid-template-columns:1fr}
     .cmp-header .col-before,.cmp-header .col-after,.cmp-row .col-before,.cmp-row .col-after{display:none}
+    .roadmap-item{flex-direction:column;gap:6px}
   }
 </style>
 
@@ -100,6 +129,75 @@
       </div>
     </div>
     {% endfor %}
+  </div>
+
+  <!-- User Feedback Section - with bolded key concepts -->
+  <div class="feedback-section">
+    <div class="feedback-header">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+      <h3>User Feedback & Suggestions</h3>
+    </div>
+    <div class="feedback-stats">4 responses · Feedback collected May 21, 2026</div>
+    <div class="feedback-grid">
+      <div class="feedback-card">
+        <div class="feedback-name">Scott Vandervort</div>
+        <div class="feedback-text">"Great job! I love how you consolidated the confusing landing page into easier-to-manage menus. The scheduling predictor was a nice touch, too. The white on green scheme makes the website pop. Three suggestions: 1) make <strong>'bingo' more accessible</strong> since it's the most used, 2) need to <strong>obscure admin functionality</strong> to a password protected page, 3) the <strong>round logo crops</strong> the logo. Overall great work. You should be proud!"</div>
+        <div class="feedback-meta">Submitted 5/21/26, 5:23 PM</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-name">Aadit Mathur</div>
+        <div class="feedback-text">"Perhaps a way to <strong>update the bingo schedule</strong>?"</div>
+        <div class="feedback-meta">Submitted 5/21/26, 5:24 PM</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-name">Nia Stefani</div>
+        <div class="feedback-text">"Great re-design! I love the chat bot you added and the bingo solo game is super innovative and since you mentioned that it is the most used feature, it's insightful that you added it. The site is much more clean, user friendly and certainly an improvement! Very well done!"</div>
+        <div class="feedback-meta">Submitted 5/21/26, 5:25 PM</div>
+      </div>
+      <div class="feedback-card">
+        <div class="feedback-name">Dorothy Carlson</div>
+        <div class="feedback-text">"Consider a <strong>page to celebrate earnings or winners</strong>"</div>
+        <div class="feedback-meta">Submitted 5/21/26, 5:25 PM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Future Plans & Roadmap Section -->
+  <div class="roadmap-section">
+    <div class="roadmap-header">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+      </svg>
+      <h3>Future Plans & Roadmap</h3>
+    </div>
+    <div class="roadmap-grid">
+      <div class="roadmap-item">
+        <span class="roadmap-priority">HIGH PRIORITY</span>
+        <div class="roadmap-content">
+          <div class="roadmap-title"><strong>Admin functionality protection</strong> — Password-protected admin panel</div>
+          <div class="roadmap-desc">Implement secure authentication for all administrative features to prevent unauthorized access.</div>
+          <div class="roadmap-attribution">— Suggested by Scott Vandervort</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <span class="roadmap-priority">HIGH PRIORITY</span>
+        <div class="roadmap-content">
+          <div class="roadmap-title"><strong>Bingo accessibility & schedule updates</strong> — Make bingo more prominent and editable</div>
+          <div class="roadmap-desc">Add prominent bingo navigation from homepage, implement inline bingo schedule editor for admins.</div>
+          <div class="roadmap-attribution">— Suggested by Scott Vandervort & Aadit Mathur</div>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <span class="roadmap-priority">MEDIUM PRIORITY</span>
+        <div class="roadmap-content">
+          <div class="roadmap-title"><strong>Celebration & winners page</strong> — Showcase earnings and achievements</div>
+          <div class="roadmap-desc">Create a dedicated page to highlight bingo winners, donation milestones, and volunteer recognition.</div>
+          <div class="roadmap-attribution">— Suggested by Dorothy Carlson</div>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
