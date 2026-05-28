@@ -167,7 +167,8 @@ function cleanupBattleRoomUi(gameEnv) {
     });
 
     if (gameEnv && Array.isArray(gameEnv.gameObjects)) {
-        gameEnv.gameObjects.forEach(obj => {
+        const objects = [...gameEnv.gameObjects];
+        objects.forEach(obj => {
             if (!obj) return;
             const name = obj.constructor?.name;
             if (name === 'FightingPlayer') {
@@ -206,21 +207,14 @@ function cleanupBattleRoomUi(gameEnv) {
             }
         });
 
-        gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
-            const name = obj?.constructor?.name;
-            const spriteId = obj?.spriteData?.id?.toLowerCase?.() || '';
-            const spriteSrc = obj?.spriteData?.src?.toLowerCase?.() || '';
-            const isZombieLike = name === 'Zombie'
-                || name === 'Npc'
-                && spriteId.includes('zombie')
-                || spriteSrc.includes('zombienpc');
-            return name !== 'Projectile'
-                && name !== 'Boomerang'
-                && name !== 'PlayerScythe'
-                && name !== 'PowerUp'
-                && name !== 'PowerUpSpawner'
-                && !isZombieLike;
+        // Hard-stop any remaining renderables during the death transition.
+        const remaining = [...gameEnv.gameObjects];
+        remaining.forEach(obj => {
+            if (obj && typeof obj.destroy === 'function') {
+                obj.destroy();
+            }
         });
+        gameEnv.gameObjects = [];
     }
 }
 
