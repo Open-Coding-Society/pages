@@ -290,22 +290,6 @@ class MansionLevel4 {
 
         this.waveManager.update();
 
-        // Show message between Wave 1 and Wave 2
-        if (
-            this.waveManager.currentWave === 1 &&
-            this.waveManager.enemies.length === 0 &&
-            !this.wave2MessageShown
-        ) {
-            this.wave2MessageShown = true;
-
-            this.showWaveMessage(
-                "Wave 1 Complete! Wave 2 Incoming...",
-                () => {
-                    this.waveManager.startWave(2);
-                }
-            );
-        }
-
         if (this.waveManager.isComplete()) {
             this.winLevel();
         }
