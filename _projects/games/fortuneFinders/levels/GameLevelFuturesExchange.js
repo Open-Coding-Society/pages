@@ -102,6 +102,18 @@ class GameLevelFuturesExchange {
 
     const FUTURES_COMPLETE_EVENT = "ff:futures:complete";
     const completionState = { done: false };
+    let isTransitioning = false;
+    const transitionToNextMap = () => {
+      if (isTransitioning) return;
+      const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
+      if (!control || typeof control.transitionToLevel !== 'function') return;
+
+      const maxIndex = Math.max(0, (control.levelClasses?.length || 1) - 1);
+      control.currentLevelIndex = Math.min((control.currentLevelIndex ?? 0) + 1, maxIndex);
+      isTransitioning = true;
+      control.transitionToLevel();
+      setTimeout(() => { isTransitioning = false; }, 250);
+    };
 
     this._onMessage = (event) => {
       if (!event || !event.data) return;
@@ -189,7 +201,7 @@ class GameLevelFuturesExchange {
           return;
         }
         showDialogBox("Unlocked", "Next map unlocked. Travel now?", [
-          { label: "Travel", action: () => gameEnv?.game?.gameControl?.endLevel?.(), keepOpen: false },
+          { label: "Travel", action: () => transitionToNextMap(), keepOpen: false },
           { label: "Later", action: () => {}, keepOpen: false }
         ]);
       }

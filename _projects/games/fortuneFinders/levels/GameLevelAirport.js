@@ -624,6 +624,19 @@ class GameLevelAirport {
       }
     };
 
+    let isTransitioning = false;
+    const transitionToNextMap = () => {
+      if (isTransitioning) return;
+      const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
+      if (!control || typeof control.transitionToLevel !== 'function') return;
+
+      const maxIndex = Math.max(0, (control.levelClasses?.length || 1) - 1);
+      control.currentLevelIndex = Math.min((control.currentLevelIndex ?? 0) + 1, maxIndex);
+      isTransitioning = true;
+      control.transitionToLevel();
+      setTimeout(() => { isTransitioning = false; }, 250);
+    };
+
     const sprite_data_options_gate = {
       id: 'Options-Gate-NPC',
       greeting: 'Complete the airport NPC interactions to unlock the next map.',
@@ -647,10 +660,7 @@ class GameLevelAirport {
               {
                 label: "Skip to Map 2 anyway",
                 action: () => {
-                  const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
-                  if (control?.currentLevel) {
-                    control.currentLevel.continue = false;
-                  }
+                  transitionToNextMap();
                 },
                 keepOpen: false
               }
@@ -666,10 +676,7 @@ class GameLevelAirport {
             {
               label: "Travel to Futures Exchange",
               action: () => {
-                const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
-                if (control?.currentLevel) {
-                  control.currentLevel.continue = false;
-                }
+                transitionToNextMap();
               },
               keepOpen: false
             },
