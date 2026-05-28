@@ -759,6 +759,11 @@
         <p class="fopl-ig-feature-desc">Find hours, location, and ways to get involved all in one place.</p>
       </a>
 
+      <a href="https://fopl.opencodingsociety.com/catalog" target="_blank" rel="noopener" class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Book Scan: Add to Catalog</h3>
+        <p class="fopl-ig-feature-desc">Scan a barcode to instantly add a book — title, author, and cover pulled automatically via ISBN lookup.</p>
+      </a>
+
     </div>
 
     <!-- Planned Features -->
@@ -770,12 +775,6 @@
         <span class="fopl-ig-planned-badge">Coming Soon</span>
         <h3 class="fopl-ig-feature-title">Donation Flow</h3>
         <p class="fopl-ig-feature-desc">Choose a preset amount and donate directly from the site, no redirects or third-party forms.</p>
-      </div>
-
-      <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
-        <span class="fopl-ig-planned-badge">Coming Soon</span>
-        <h3 class="fopl-ig-feature-title">Book Scan: Add to Catalog</h3>
-        <p class="fopl-ig-feature-desc">Scan a barcode to instantly add a book. Title, author, and cover pulled automatically.</p>
       </div>
 
       <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
@@ -901,23 +900,23 @@
         </div>
       </div>
 
-      <!-- Architecture -->
+      <!-- Site audit -->
       <div class="fopl-future-card">
-        <p class="fopl-future-card-title">How It’s Structured</p>
+        <p class="fopl-future-card-title">How We Found Features to Build</p>
         <ul class="fopl-future-list">
-          <li><span class="fopl-future-dot"></span>Frontend: Jekyll + plain HTML/JS — pages in <code style="font-size:0.75rem;">_posts/</code> and <code style="font-size:0.75rem;">pages/</code></li>
-          <li><span class="fopl-future-dot"></span>Backend: Python/Flask — API routes in <code style="font-size:0.75rem;">api/</code>, models in <code style="font-size:0.75rem;">model/</code></li>
-          <li><span class="fopl-future-dot"></span>Frontend calls backend via fetch — look for <code style="font-size:0.75rem;">pythonURI</code> in JS files</li>
+          <li><span class="fopl-future-dot"></span>Start by going through the live FOPL site page by page — note anything missing, confusing, or incomplete compared to what a real library site should offer</li>
+          <li><span class="fopl-future-dot"></span>Compare their original site to ours and identify gaps that still exist — that’s your backlog</li>
+          <li><span class="fopl-future-dot"></span>Talk to a volunteer or librarian directly — their daily pain points will surface features no amount of browsing will reveal</li>
         </ul>
       </div>
 
-      <!-- Lessons learned -->
+      <!-- Iterate with teacher -->
       <div class="fopl-future-card">
-        <p class="fopl-future-card-title">Lessons from Our Team</p>
+        <p class="fopl-future-card-title">Iterate with Your Teacher</p>
         <ul class="fopl-future-list">
-          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Get stakeholder feedback early — we got ideas at the end we didn't have time to build</li>
-          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>CORS was frequent between frontend and backend — make sure Flask CORS covers your local dev URL</li>
-          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Document API endpoints as you go — we had to reverse-engineer our own routes by the end</li>
+          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Don’t build for weeks in isolation — show your teacher progress every sprint and adjust direction early</li>
+          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Use live reviews to validate that what you’re building actually solves the stakeholder’s problem, not just what sounded good in planning</li>
+          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Treat teacher feedback the same as stakeholder feedback — it’s the fastest way to catch scope creep before it costs you a sprint</li>
         </ul>
       </div>
 
@@ -934,7 +933,7 @@
     </div>
 
     <div class="fopl-note-box">
-      <strong>Where to focus first:</strong> Expand games (top stakeholder request), then add email notifications for admin applications. Donation flow, book scan, and AI chatbot are fully scoped in the infograph above.
+      <strong>Where to focus first:</strong> Walk through the live site, identify what’s still rough, and bring a prioritized list to your teacher at the start of sprint 1. The stakeholder top requests (games, email alerts, DVD catalog) are good starting points — but what you find in a real site audit may surface something more impactful.
     </div>
 
   </div>
