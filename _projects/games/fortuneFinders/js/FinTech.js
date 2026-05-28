@@ -1883,6 +1883,10 @@ class FinTech extends Game {
         this.initFinTechGame(environment);
     }
 
+    _initializeGameControlAsync(gameLevelClasses) {
+        // Do nothing. FinTech initializes its own GameControl synchronously in initFinTechGame.
+    }
+
     static main(environment) {
         return new FinTech(environment);
     }
@@ -2675,6 +2679,26 @@ class FinTech extends Game {
         });
         const gameLevelClasses = environment.gameLevelClasses;
         this.gameControl = new GameControl(this, gameLevelClasses);
+        
+        // Wrap transitionToLevel to robustly clean up all DOM canvas elements in the gameContainer
+        const originalTransitionToLevel = this.gameControl.transitionToLevel.bind(this.gameControl);
+        this.gameControl.transitionToLevel = () => {
+            const container = this.gameControl.gameContainer || this.gameContainer;
+            if (container) {
+                try {
+                    const canvases = container.querySelectorAll('canvas');
+                    canvases.forEach(canvas => {
+                        if (canvas && canvas.id !== 'gameCanvas') {
+                            canvas.remove();
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Failed to robustly remove stale canvases:', e);
+                }
+            }
+            originalTransitionToLevel();
+        };
+
         this.gameControl.start();
     }
 }
