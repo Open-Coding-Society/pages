@@ -130,12 +130,16 @@ class WaveManager {
         const playerStartX = width * 0.1;
         const playerStartY = height / 2;
         const minSpawnDist = Math.min(width, height) * 0.5;
+        const minGhostSpacing = 150; // Minimum distance between ghosts
+
+        const spawnedPositions = []; // Track all spawned ghost positions
 
         for (let i = 0; i < count; i++) {
             let xPos, yPos;
+            let validSpawn = false;
 
-            // Re-roll until spawn is far enough from the player start position
-            do {
+            // Re-roll until spawn is far enough from the player start position and other ghosts
+            while (!validSpawn) {
                 const edge = Math.floor(Math.random() * 4);
                 switch (edge) {
                     case 0: xPos = Math.random() * width;  yPos = -80;          break; // top
@@ -143,10 +147,32 @@ class WaveManager {
                     case 2: xPos = -80;                    yPos = Math.random() * height; break; // left
                     default: xPos = width + 80;            yPos = Math.random() * height; break; // right
                 }
-                const dx = xPos - playerStartX;
-                const dy = yPos - playerStartY;
-                if (Math.sqrt(dx * dx + dy * dy) >= minSpawnDist) break;
-            } while (true);
+                
+                // Check distance from player
+                const dxPlayer = xPos - playerStartX;
+                const dyPlayer = yPos - playerStartY;
+                const distFromPlayer = Math.sqrt(dxPlayer * dxPlayer + dyPlayer * dyPlayer);
+                
+                if (distFromPlayer < minSpawnDist) continue;
+
+                // Check distance from all previously spawned ghosts
+                let tooCloseToGhost = false;
+                for (const pos of spawnedPositions) {
+                    const dxGhost = xPos - pos.x;
+                    const dyGhost = yPos - pos.y;
+                    const distFromGhost = Math.sqrt(dxGhost * dxGhost + dyGhost * dyGhost);
+                    if (distFromGhost < minGhostSpacing) {
+                        tooCloseToGhost = true;
+                        break;
+                    }
+                }
+
+                if (!tooCloseToGhost) {
+                    validSpawn = true;
+                }
+            }
+
+            spawnedPositions.push({ x: xPos, y: yPos });
 
             const enemyData = {
                 id: `waveEnemy_${this.currentWave}_${i}`,
