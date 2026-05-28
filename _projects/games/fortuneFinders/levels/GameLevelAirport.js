@@ -5,6 +5,7 @@ import showDialogBox, { showYellenModal, getFrankAdviceList, getMorganFacts, get
 import WaypointArrow from '@fortuneFinders/levels/WaypointArrow.js';
 import NpcProgressSystem from '@fortuneFinders/levels/NpcProgressSystem.js';
 import { FF_ROUTES, ffUrl } from '@fortuneFinders/js/routes.js';
+import { ffImage } from '@fortuneFinders/js/paths.js';
 
 let socketURI
 let javaURI
@@ -626,7 +627,7 @@ class GameLevelAirport {
     const sprite_data_options_gate = {
       id: 'Options-Gate-NPC',
       greeting: 'Complete the airport NPC interactions to unlock the next map.',
-      src: path + "/images/gamify/level-gate.svg",
+      src: ffImage(path, 'level-gate.svg'),
       SCALE_FACTOR: 2.2,
       ANIMATION_RATE: 50,
       pixels: { height: 512, width: 512 },
@@ -646,8 +647,9 @@ class GameLevelAirport {
               {
                 label: "Skip to Map 2 anyway",
                 action: () => {
-                  if (gameEnv?.game?.gameControl?.endLevel) {
-                    gameEnv.game.gameControl.endLevel();
+                  const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
+                  if (control?.currentLevel) {
+                    control.currentLevel.continue = false;
                   }
                 },
                 keepOpen: false
@@ -664,8 +666,9 @@ class GameLevelAirport {
             {
               label: "Travel to Futures Exchange",
               action: () => {
-                if (gameEnv?.game?.gameControl?.endLevel) {
-                  gameEnv.game.gameControl.endLevel();
+                const control = gameEnv?.gameControl || gameEnv?.game?.gameControl;
+                if (control?.currentLevel) {
+                  control.currentLevel.continue = false;
                 }
               },
               keepOpen: false

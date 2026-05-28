@@ -32,7 +32,13 @@ permalink: /gamify/fortuneFindersv1-1
 </script>
 
 <script type="module">
+    function isStartupModuleError(error) {
+        const message = (error?.message || String(error || "")).toLowerCase();
+        return message.includes("failed to fetch dynamically imported module");
+    }
+
     function showStartupError(error) {
+        if (!isStartupModuleError(error)) return;
         const container = document.getElementById("gameContainer");
         if (!container) return;
 
@@ -55,6 +61,9 @@ permalink: /gamify/fortuneFindersv1-1
 
     window.addEventListener("unhandledrejection", (event) => {
         console.error("Unhandled startup rejection:", event.reason);
+        if (isStartupModuleError(event.reason)) {
+            showStartupError(event.reason);
+        }
     });
 
     (async () => {
