@@ -105,21 +105,13 @@ class GameLevelFuturesExchange {
     let isTransitioning = false;
     const transitionToNextMap = () => {
       if (isTransitioning) return;
-      const control = gameEnv?.gameControl;
-      if (!control) return;
+
+      const control = gameEnv?.game?.gameControl || gameEnv?.gameControl;
+      if (!control || typeof control.endLevel !== 'function') return;
 
       isTransitioning = true;
-      // Cancel the running animation loop first so it can't fire again mid-transition
       control._loopRunning = false;
-
-      // handleLevelEnd() does the full cleanup synchronously:
-      // destroy current level -> increment index -> transitionToLevel()
-      // This prevents both levels rendering simultaneously.
-      if (typeof control.handleLevelEnd === 'function') {
-        control.handleLevelEnd();
-      } else if (typeof control.endLevel === 'function') {
-        control.endLevel();
-      }
+      control.endLevel();
       setTimeout(() => { isTransitioning = false; }, 250);
     };
 
