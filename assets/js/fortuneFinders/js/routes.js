@@ -3,7 +3,7 @@
  * Use ffUrl(gameEnv.path, FF_ROUTES.*) in level scripts.
  */
 export const FF_ROUTES = {
-  game: '/gamify/fortuneFinders',
+  game: '/gamify/fortuneFindersv1-1',
   quant: '/gamify/fortuneFinders/quant',
   quantOverview: '/gamify/fortuneFinders/quant/overview',
   quantLesson: '/gamify/fortuneFinders/quant-lesson',

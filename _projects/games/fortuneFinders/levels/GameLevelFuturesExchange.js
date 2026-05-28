@@ -21,10 +21,7 @@ class GameLevelFuturesExchange {
     const player = {
       id: 'Chill Guy',
       greeting: 'New venue unlocked: Futures Exchange.',
-      // chillguy.png is not present in this repo; use the committed futures trader art
-      // so map 2 never falls back to the default red square.
-      src: ffImage(path, 'futures-trader.svg'),
-      fillStyle: '#39ffb6',
+      src: `${path}/images/gamify/chillguy.png`,
       SCALE_FACTOR: 5,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
