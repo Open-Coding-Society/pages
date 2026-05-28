@@ -12,6 +12,7 @@ class TriggerZone extends GameObject {
         this.visible = data.visible !== undefined ? data.visible : true;
         this.triggered = false;
         this.onEnter = data.onEnter || (() => {});
+        this.onExit  = data.onExit  || (() => {});
         this.message = data.message || '';
     }
 
@@ -68,6 +69,9 @@ class TriggerZone extends GameObject {
         if (isInside && !this.triggered) {
             this.triggered = true;
             this.onEnter();
+        } else if (!isInside && this.triggered) {
+            this.triggered = false;
+            this.onExit();
         } else if (!isInside) {
             this.triggered = false;
         }

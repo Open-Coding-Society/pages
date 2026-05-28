@@ -10,6 +10,7 @@
 
 # === NESTED STRUCTURE (organized by category) ===
 # Games
+games/real-estate-tycoon
 games/voidstriker
 games/spline-barriers
 games/characters
@@ -37,6 +38,8 @@ games/gategame
 games/heist-exe
 games/castle-game
 games/astronaut-platformer-game
+games/fortuneFinders:dev
+
 
 # Lessons
 lessons/game-lessons
