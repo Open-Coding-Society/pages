@@ -403,6 +403,15 @@ active_tab: calendar
     let activeIssuesSubtab = 'create';
     let onIssuesRefreshedHook = null;
     let currentUserName = '';
+    let calendar = null;
+
+    function formatDate(dateInput) {
+        const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+        return date.toLocaleDateString();
+    }
 
     function isCsPathwayEvent(event) {
         if (!event) return false;
