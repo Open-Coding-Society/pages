@@ -18,8 +18,14 @@ class MansionLevel1 {
             collectedArtifacts: new Set(),
             artifactIds: ["sun_idol", "ancient_scroll", "desert_gem"],
             rewardClaimed: false,
-            timeLeft: 45 // 45-second limit to find artifacts
+            timeLeft: 45 
         };
+
+        this.gameStarted = false; 
+
+        this.bgMusic = null; 
+        this.audioVolume = 2.0; 
+        this.fetchSpookyMusic();
 
 
         const backgroundData = {
@@ -33,6 +39,9 @@ class MansionLevel1 {
        
         const sprite_src_mc = path + "/images/projects/mansionGame/spookMcWalk.png";
         const MC_SCALE_FACTOR = 6;
+        
+        this.playerStartPosition = { x: 50, y: height - (height / MC_SCALE_FACTOR) };
+
         const sprite_data_player = {
             id: 'Spook',
             greeting: "Hi, I am Spook.",
@@ -40,7 +49,7 @@ class MansionLevel1 {
             SCALE_FACTOR: MC_SCALE_FACTOR,
             STEP_FACTOR: 800,
             ANIMATION_RATE: 10,
-            INIT_POSITION: { x: 50, y: height - (height / MC_SCALE_FACTOR)},
+            INIT_POSITION: { x: this.playerStartPosition.x, y: this.playerStartPosition.y },
             pixels: {height: 2400, width: 3600},
             orientation: {rows: 2, columns: 3},
             down: {row: 1, start: 0, columns: 3},
@@ -53,10 +62,10 @@ class MansionLevel1 {
             upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
             keypress: { 
-                up: 87,    // W key
-                left: 65,  // A key
-                down: 83,  // S key
-                right: 68  // D key
+                up: 87,    
+                left: 65,  
+                down: 83,  
+                right: 68  
             }
         };
 
@@ -108,6 +117,22 @@ class MansionLevel1 {
             }
         };
 
+        // UPDATED: Spider setup has no interaction greeting or E-key binds now
+        const spiderEnemyData = {
+            id: "Tomb Spider",
+            greeting: "", 
+            src: path + "/images/projects/mansionGame/spider.png", 
+            SCALE_FACTOR: 8,
+            STEP_FACTOR: 0,
+            ANIMATION_RATE: 0,
+            INIT_POSITION: { x: width * 0.85, y: height * 0.75 }, 
+            pixels: { height: 256, width: 256 }, 
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.7, heightPercentage: 0.7 },
+            keypress: {}
+        };
+
 
         const artifactSprites = [
             createArtifactData({
@@ -144,34 +169,106 @@ class MansionLevel1 {
             { class: GameEnvBackground, data: backgroundData },
             { class: Player, data: sprite_data_player },
             ...artifactSprites.map((data) => ({ class: Npc, data })),
-            { class: Npc, data: mummyData }
+            { class: Npc, data: mummyData },
+            { class: Npc, data: spiderEnemyData } 
         ];
+    }
+
+    async fetchSpookyMusic() {
+        try {
+            const searchTerm = encodeURIComponent("egyptian tomb mystery");
+            const url = `https://itunes.apple.com/search?term=${searchTerm}&media=music&limit=5`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.results && data.results.length > 0) {
+                const randomTrack = data.results[Math.floor(Math.random() * data.results.length)];
+                if (randomTrack.previewUrl) {
+                    this.bgMusic = new Audio(randomTrack.previewUrl);
+                    this.bgMusic.loop = true;
+                    this.bgMusic.volume = this.audioVolume;
+
+                    if (this.gameStarted) {
+                        this.bgMusic.play().catch(err => console.log("Audio update blocked:", err));
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn("iTunes Music API failed to fetch audio context:", error);
+        }
     }
 
 
     initialize() {
         this.createUserInterface();
 
-
         const gameObjects = this.gameEnv.gameObjects || [];
         this.artifactObjects = gameObjects.filter((object) =>
             this.levelState.artifactIds.includes(object?.spriteData?.id)
         );
 
-
         this.artifactObjects.forEach((artifact) => {
             artifact.parentLevel = this;
         });
-
 
         this.mummyNpc = gameObjects.find((object) => object?.spriteData?.id === "Temple Mummy");
         if (this.mummyNpc) {
             this.mummyNpc.parentLevel = this;
         }
 
+        this.spiderEnemy = gameObjects.find((object) => object?.spriteData?.id === "Tomb Spider");
+        this.playerInstance = gameObjects.find((object) => object instanceof Player);
 
         this.showIntroDialogue();
-        this.startTimer(); // Guarantees the clock starts running immediately upon level load
+        this.startTimer(); 
+        this.startCollisionTracking(); // Kicks off the dynamic touch loop
+    }
+
+    // NEW: Background looping thread to calculate distance collisions continuously
+    startCollisionTracking() {
+        this.stopCollisionTracking();
+        
+        this.collisionInterval = window.setInterval(() => {
+            if (!this.playerInstance || !this.spiderEnemy || !this.gameStarted || this.levelState.rewardClaimed) return;
+
+            // Get exact centers/positions of player and spider
+            const px = this.playerInstance.x;
+            const py = this.playerInstance.y;
+            const sx = this.spiderEnemy.x;
+            const sy = this.spiderEnemy.y;
+
+            // Use simple bounding circle/distance threshold to verify a touch collision
+            const distance = Math.sqrt(Math.pow(px - sx, 2) + Math.pow(py - sy, 2));
+            
+            // Adjust 65 to make the hit box tighter or looser depending on asset size
+            if (distance < 65) {
+                this.handleHazardCollision();
+            }
+        }, 100); // Checks 10 times a second for lightning-fast detection
+    }
+
+    stopCollisionTracking() {
+        if (this.collisionInterval) {
+            window.clearInterval(this.collisionInterval);
+            this.collisionInterval = null;
+        }
+    }
+
+    handleHazardCollision() {
+        if (this.playerInstance) {
+            this.playerInstance.x = this.playerStartPosition.x;
+            this.playerInstance.y = this.playerStartPosition.y;
+        }
+
+        this.levelState.timeLeft = Math.max(0, this.levelState.timeLeft - 5);
+        this.refreshUserInterface("⚠️ You touched a tomb spider! Position reset (-5s)!");
+
+        if (this.statusDisplay) {
+            this.statusDisplay.style.color = "#ff4444";
+            setTimeout(() => {
+                if (this.statusDisplay) this.statusDisplay.style.color = "#f3d98b";
+            }, 1200);
+        }
     }
 
 
@@ -264,7 +361,6 @@ class MansionLevel1 {
 
     startTimer() {
         this.stopTimer();
-        // Bind to window to prevent engine scope conflicts
         this.timerInterval = window.setInterval(() => {
             if (this.levelState.rewardClaimed) {
                 this.stopTimer();
@@ -289,6 +385,11 @@ class MansionLevel1 {
     }
 
     handleTimeOut() {
+        this.stopCollisionTracking();
+        if (this.bgMusic) {
+            this.bgMusic.pause();
+        }
+
         const timeoutDialogue = new DialogueSystem({
             id: `mummy_timeout_${Date.now()}`
         });
@@ -312,6 +413,10 @@ class MansionLevel1 {
     }
 
     restartLevel() {
+        if (this.bgMusic) {
+            this.bgMusic.currentTime = 0;
+        }
+
         const gameControl = this.gameEnv?.gameControl;
         if (!gameControl) return;
         
@@ -327,7 +432,7 @@ class MansionLevel1 {
 
 
         introDialogue.showDialogue(
-            "Search the tomb for three offerings. Bring them to the mummy to earn the key.",
+            "Search the tomb for three offerings. Bring them to the mummy to earn the key. Beware of the crawling tomb spiders!",
             "Explorer",
             this.gameEnv.path + "/images/projects/mansionGame/sphinxclear.png"
         );
@@ -340,6 +445,12 @@ class MansionLevel1 {
                 action: () => {
                     introDialogue.closeDialogue();
                     this.startTimer();
+                    
+                    this.gameStarted = true; 
+
+                    if (this.bgMusic) {
+                        this.bgMusic.play().catch(err => console.log("Audio play blocked:", err));
+                    }
                 }
             }
         ]);
@@ -410,6 +521,7 @@ class MansionLevel1 {
         }
 
         this.stopTimer();
+        this.stopCollisionTracking();
         this.levelState.rewardClaimed = true;
         this.unlockNextLevel();
         this.refreshUserInterface("All offerings delivered. The mummy reveals the key.");
@@ -462,6 +574,12 @@ class MansionLevel1 {
     }
 
     returnToLobby() {
+        this.stopCollisionTracking();
+        if (this.bgMusic) {
+            this.bgMusic.pause();
+            this.bgMusic.currentTime = 0;
+        }
+
         const gameControl = this.gameEnv?.gameControl;
         if (!gameControl) {
             return;
@@ -584,6 +702,13 @@ class MansionLevel1 {
 
     destroy() {
         this.stopTimer();
+        this.stopCollisionTracking();
+
+        if (this.bgMusic) {
+            this.bgMusic.pause();
+            this.bgMusic.currentTime = 0;
+            this.bgMusic = null;
+        }
 
         if (this.keyPopupTimer) {
             window.clearTimeout(this.keyPopupTimer);
