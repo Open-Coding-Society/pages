@@ -21,7 +21,10 @@ class GameLevelFuturesExchange {
     const player = {
       id: 'Chill Guy',
       greeting: 'New venue unlocked: Futures Exchange.',
-      src: `${path}/images/gamify/chillguy.png`,
+      // chillguy.png is not present in this repo; use the committed futures trader art
+      // so map 2 never falls back to the default red square.
+      src: ffImage(path, 'futures-trader.svg'),
+      fillStyle: '#39ffb6',
       SCALE_FACTOR: 5,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 50,
@@ -107,11 +110,19 @@ class GameLevelFuturesExchange {
       if (isTransitioning) return;
 
       const control = gameEnv?.game?.gameControl || gameEnv?.gameControl;
-      if (!control || typeof control.endLevel !== 'function') return;
+      if (!control || typeof control.transitionToLevel !== 'function') return;
+
+      const nextIndex = Number(control.currentLevelIndex) + 1;
+      if (!Number.isFinite(nextIndex) || nextIndex >= control.levelClasses.length) {
+        showDialogBox("No Further Map", "You're already at the final available map.", [
+          { label: "OK", action: () => {}, keepOpen: false }
+        ]);
+        return;
+      }
 
       isTransitioning = true;
-      control._loopRunning = false;
-      control.endLevel();
+      control.currentLevelIndex = nextIndex;
+      control.transitionToLevel();
       setTimeout(() => { isTransitioning = false; }, 250);
     };
 
@@ -136,6 +147,7 @@ class GameLevelFuturesExchange {
       id: 'Futures-NPC',
       greeting: 'Step into the pit. This is futures trading.',
       src: ffImage(path, 'futures-trader.svg'),
+      fillStyle: '#00c2ff',
       zIndex: 12,
       SCALE_FACTOR: 4.2,
       ANIMATION_RATE: 50,

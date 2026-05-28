@@ -629,11 +629,19 @@ class GameLevelAirport {
       if (isTransitioning) return;
 
       const control = gameEnv?.game?.gameControl || gameEnv?.gameControl;
-      if (!control || typeof control.endLevel !== 'function') return;
+      if (!control || typeof control.transitionToLevel !== 'function') return;
+
+      const nextIndex = Number(control.currentLevelIndex) + 1;
+      if (!Number.isFinite(nextIndex) || nextIndex >= control.levelClasses.length) {
+        showDialogBox("No Further Map", "You're already at the final available map.", [
+          { label: "OK", action: () => {}, keepOpen: false }
+        ]);
+        return;
+      }
 
       isTransitioning = true;
-      control._loopRunning = false;
-      control.endLevel();
+      control.currentLevelIndex = nextIndex;
+      control.transitionToLevel();
       setTimeout(() => { isTransitioning = false; }, 250);
     };
 

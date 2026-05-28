@@ -22,7 +22,7 @@
         fill="#0d2b2a" stroke="#1ee3a4" stroke-opacity="0.35" stroke-width="3"/>
   <path d="M512,720 L512,1024" stroke="#39ffb6" stroke-opacity="0.35" stroke-width="10" stroke-dasharray="30 24"/>
 
-  <!-- futures pits -->
+  <!-- futures pits -->
   <g opacity="0.95">
     <circle cx="320" cy="780" r="86" fill="#0b162a" stroke="#39ffb6" stroke-width="4"/>
     <circle cx="704" cy="780" r="86" fill="#0b162a" stroke="#39ffb6" stroke-width="4"/>
