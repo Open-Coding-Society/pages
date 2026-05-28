@@ -3,8 +3,7 @@ import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 
-import Barrier from './Barrier.js';
-import { WaveManager } from './waveManager.js';
+import { WaveManager } from './WaveManager.js';
 
 class MansionLevel4 {
     constructor(gameEnv) {
@@ -46,18 +45,9 @@ class MansionLevel4 {
             keypress: { up: 87, left: 65, down: 83, right: 68 } // W A S D
         };
 
-        // Boundary walls
-        const barrierData = [
-            { x: width * 0,          y: height * 0,           width: width * width,  height: height * 20,     visible: false }, // top
-            { x: width * 0,          y: height * height - 20, width: width * width,  height: height * 20,     visible: false }, // bottom
-            { x: width * 0,          y: height * 0,           width: width * 20,     height: height * height,  visible: false }, // left
-            { x: width * width - 20,         y: height * 0,           width: width * 20,     height: height * height,  visible: false }  // right
-        ];
-
         this.classes = [
             { class: GameEnvBackground, data: image_data_background },
-            { class: Player, data: sprite_data_player },
-            ...barrierData.map(data => ({ class: Barrier, data }))
+            { class: Player, data: sprite_data_player }
         ];
 
         this.gameEnv = gameEnv;
@@ -72,13 +62,26 @@ class MansionLevel4 {
         this.showStartUI();
     }
 
+    initialize() {
+        const player = this.getPlayer();
+        if (!player) return;
+
+        // Level 4 has lots of overlapping combat objects. Keep held WASD keys
+        // alive across incidental collisions so the player cannot get stuck.
+        player.clearPressedKeysOnCollision = false;
+    }
+
     setupInputListener() {
         this.keysHeld = new Set();
+        this.lastHorizontalAim = 'KeyD';
+        this.lastVerticalAim = null;
+        this.lastAimDirection = { dx: 1, dy: 0 };
         this.lastShootTime = 0;
         this.shootCooldown = 250; // milliseconds between shots
 
         this.keydownHandler = (e) => {
             this.keysHeld.add(e.code);
+            this.updateAimIntent(e.code);
 
             if (e.code === 'Space') {
                 e.preventDefault();
@@ -87,11 +90,95 @@ class MansionLevel4 {
 
         this.keyupHandler = (e) => {
             this.keysHeld.delete(e.code);
+            this.refreshAimIntent(e.code);
         };
 
         document.addEventListener('keydown', this.keydownHandler);
         document.addEventListener('keyup',   this.keyupHandler);
     }
+
+    updateAimIntent(code) {
+        if (code === 'KeyA' || code === 'KeyD') {
+            this.lastHorizontalAim = code;
+        }
+
+        if (code === 'KeyW' || code === 'KeyS') {
+            this.lastVerticalAim = code;
+        }
+    }
+
+    refreshAimIntent(releasedCode) {
+        if (releasedCode === this.lastHorizontalAim) {
+            if (this.keysHeld.has('KeyA')) {
+                this.lastHorizontalAim = 'KeyA';
+            } else if (this.keysHeld.has('KeyD')) {
+                this.lastHorizontalAim = 'KeyD';
+            } else {
+                this.lastHorizontalAim = null;
+            }
+        }
+
+        if (releasedCode === this.lastVerticalAim) {
+            if (this.keysHeld.has('KeyW')) {
+                this.lastVerticalAim = 'KeyW';
+            } else if (this.keysHeld.has('KeyS')) {
+                this.lastVerticalAim = 'KeyS';
+            } else {
+                this.lastVerticalAim = null;
+            }
+        }
+    }
+
+    getShootDirection() {
+        let dx = 0;
+        let dy = 0;
+
+        if (this.lastHorizontalAim && this.keysHeld.has(this.lastHorizontalAim)) {
+            dx = this.lastHorizontalAim === 'KeyA' ? -1 : 1;
+        } else if (this.keysHeld.has('KeyA') !== this.keysHeld.has('KeyD')) {
+            dx = this.keysHeld.has('KeyA') ? -1 : 1;
+        }
+
+        if (this.lastVerticalAim && this.keysHeld.has(this.lastVerticalAim)) {
+            dy = this.lastVerticalAim === 'KeyW' ? -1 : 1;
+        } else if (this.keysHeld.has('KeyW') !== this.keysHeld.has('KeyS')) {
+            dy = this.keysHeld.has('KeyW') ? -1 : 1;
+        }
+
+        if (dx !== 0 || dy !== 0) {
+            this.lastAimDirection = { dx, dy };
+        }
+
+        return this.lastAimDirection;
+    }
+
+    getPlayer() {
+        return this.gameEnv.gameObjects.find(obj => obj instanceof Player);
+    }
+
+    syncPlayerMovementInput() {
+        const player = this.getPlayer();
+        if (!player || !player.pressedKeys) return;
+
+        const movementKeys = [
+            ['KeyW', player.keypress.up],
+            ['KeyA', player.keypress.left],
+            ['KeyS', player.keypress.down],
+            ['KeyD', player.keypress.right]
+        ];
+
+        for (const [code, keyCode] of movementKeys) {
+            if (this.keysHeld.has(code)) {
+                player.pressedKeys[keyCode] = true;
+            } else {
+                delete player.pressedKeys[keyCode];
+            }
+        }
+
+        player.updateVelocity();
+        player.updateDirection();
+    }
+
     showWaveMessage(message, callback) {
     const msg = document.createElement('div');
 
@@ -189,23 +276,15 @@ class MansionLevel4 {
     }
 
     update() {
+        this.syncPlayerMovementInput();
+
         // Handle continuous shooting while Space is held
         if (this.keysHeld.has('Space')) {
             const now = Date.now();
             if (now - this.lastShootTime >= this.shootCooldown) {
                 this.lastShootTime = now;
 
-                // Build direction vector from held WASD keys
-                let dx = 0, dy = 0;
-                if (this.keysHeld.has('KeyW')) dy -= 1;
-                if (this.keysHeld.has('KeyS')) dy += 1;
-                if (this.keysHeld.has('KeyA')) dx -= 1;
-                if (this.keysHeld.has('KeyD')) dx += 1;
-
-                // Default to shooting right if standing still
-                if (dx === 0 && dy === 0) dx = 1;
-
-                this.waveManager.playerShoot({ dx, dy });
+                this.waveManager.playerShoot(this.getShootDirection());
             }
         }
 
