@@ -7,12 +7,15 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaHallTrial from './PersonaHallTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
+import GameLevelEmpathyEpic from './GameLevelEmpathyEpic.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import AboutMeBuilder from './AboutMeBuilder.js';
 import MissionTools from './GameLevelCsPath2Mission.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
+import SprintSuccessModule from './SprintSuccessModule.js';
+import PersonaTrial from './PersonaTrial.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -114,28 +117,33 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
-      x: width * 0.83,
-      y: height * 0.28,
+      x: width * 0.81,
+      y: height * 0.27,
     };
 
     const personalEnrichmentGatekeeperPos = {
       x: width * 0.23,
-      y: height * 0.25,
+      y: height * 0.22,
     };
 
     const skillPassportGatekeeperPos = {
-      x: width * 0.82,
-      y: height * 0.56,
+      x: width * 0.84,
+      y: height * 0.51,
     };
 
     const sprintSuccessGatekeeperPos = {
-      x: width * 0.23,
-      y: height * 0.53,
+      x: width * 0.19,
+      y: height * 0.5,
     };
 
     const missionToolsGatekeeperPos = {
-      x: width * 0.53,
-      y: height * 0.21,
+      x: width * 0.525,
+      y: height * 0.19,
+    };
+
+    const empathyEpicGatekeeperPos = {
+      x: width * 0.75,
+      y: height * 0.78,
     };
 
     const levelInstance = this;
@@ -224,6 +232,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
       position: codeHubGatekeeperPos,
       interact: function () {
+        // "this" here refers to the NPC, which has access to its own dialogueSystem
         this.dialogueSystem.dialogues = [
           'Welcome to the Code Hub!',
           'Here you can explore Frontend, Backend, and Data Viz.',
@@ -237,7 +246,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
             primary: true,
             action: () => {
               this.dialogueSystem.closeDialogue();
-              const gc = this.gameEnv.gameControl;
+              
+              const gc = levelInstance.gameEnv?.gameControl || levelInstance.gameEnv;
+              if (!gc) {
+                console.error('[Teleport] Game control engine context missing.');
+                return;
+              }
+              
               gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1CodeHub);
               gc.currentLevelIndex++;
               gc.transitionToLevel();
@@ -305,6 +320,34 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       },
     });
 
+    // ── Empathy Epic gatekeeper ──────────────────────────
+    const npc_data_empathyEpicGatekeeper = createGatekeeperData({
+      id: 'EmpathyEpicGatekeeper',
+      greeting: 'Welcome to Empathy Epic! Strengthen communication, collaboration, and empathy skills.',
+      position: empathyEpicGatekeeperPos,
+      markerColor: '#60a5fa',
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to Empathy Epic!',
+          'Here you will practice empathy, teamwork, and leadership.',
+          'Great innovators understand both people and technology.',
+        ];
+
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Empathy Epic');
+
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Enter Empathy Epic',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              levelInstance.openEmpathyEpic();
+            },
+          },
+        ]);
+      },
+    });
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
@@ -314,8 +357,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_sprintSuccessGatekeeper },
       { class: Npc, data: npc_data_missionToolsGatekeeper },
+      { class: Npc, data: npc_data_empathyEpicGatekeeper },
     ];
   }
+
 
   // ── Sync level dropdown ───────────────────────────────────────
   _syncLevelDropdown() {
@@ -437,7 +482,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     if (this._personaTrialOpen) return;
     this._personaTrialOpen = true;
 
-    const trial = new PersonaHallTrial({
+    const trial = new PersonaTrial({
       profileData: this.profileData || {},
       onComplete: async (result) => {
         try {
@@ -491,6 +536,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
   openMissionTools() {
     const gc = this.gameEnv.gameControl;
     gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, MissionTools);
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
+  }
+
+  openEmpathyEpic() {
+    const gc = this.gameEnv.gameControl;
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelEmpathyEpic);
     gc.currentLevelIndex++;
     gc.transitionToLevel();
   }
