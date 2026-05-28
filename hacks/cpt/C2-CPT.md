@@ -2,7 +2,7 @@
 layout: post
 microblog: True
 title: CPT Project Layout Builder
-description: A structured AP CSP CPT drafting tool for manually building components.
+description: A structured AP CSP CPT drafting tool to learn the foundations and building required components.
 author: David M, Sloane S
 permalink: /cpt/2
 breadcrumb: True
