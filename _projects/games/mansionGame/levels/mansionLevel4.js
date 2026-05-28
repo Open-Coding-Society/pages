@@ -4,7 +4,7 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 
 import { WaveManager } from './WaveManager.js';
-
+ 
 class MansionLevel4 {
     constructor(gameEnv) {
         let width  = gameEnv.innerWidth;
