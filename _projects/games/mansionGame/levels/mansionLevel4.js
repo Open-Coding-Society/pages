@@ -130,23 +130,21 @@ class MansionLevel4 {
     }
 
     getShootDirection() {
-        let dx = 0;
-        let dy = 0;
+        const directionVectors = {
+            up: { dx: 0, dy: -1 },
+            down: { dx: 0, dy: 1 },
+            left: { dx: -1, dy: 0 },
+            right: { dx: 1, dy: 0 },
+            upLeft: { dx: -1, dy: -1 },
+            upRight: { dx: 1, dy: -1 },
+            downLeft: { dx: -1, dy: 1 },
+            downRight: { dx: 1, dy: 1 }
+        };
+        const player = this.getPlayer();
+        const facedDirection = directionVectors[player?.direction];
 
-        if (this.lastHorizontalAim && this.keysHeld.has(this.lastHorizontalAim)) {
-            dx = this.lastHorizontalAim === 'KeyA' ? -1 : 1;
-        } else if (this.keysHeld.has('KeyA') !== this.keysHeld.has('KeyD')) {
-            dx = this.keysHeld.has('KeyA') ? -1 : 1;
-        }
-
-        if (this.lastVerticalAim && this.keysHeld.has(this.lastVerticalAim)) {
-            dy = this.lastVerticalAim === 'KeyW' ? -1 : 1;
-        } else if (this.keysHeld.has('KeyW') !== this.keysHeld.has('KeyS')) {
-            dy = this.keysHeld.has('KeyW') ? -1 : 1;
-        }
-
-        if (dx !== 0 || dy !== 0) {
-            this.lastAimDirection = { dx, dy };
+        if (facedDirection) {
+            this.lastAimDirection = facedDirection;
         }
 
         return this.lastAimDirection;
