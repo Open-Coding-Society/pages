@@ -1,8 +1,8 @@
-import Game from './essentials/Game.js';
-import GameControl from './essentials/GameControl.js';
-import Quiz from './Quiz.js';
-import Inventory from "./Inventory.js";
-import { defaultItems } from "./items.js";
+import { GameCore as Game } from '@assets/js/GameEnginev1.1/essentials/Game.js';
+import GameControl from '@assets/js/GameEnginev1.1/essentials/GameControl.js';
+import Quiz from '@assets/js/GameEnginev1.1/Quiz.js';
+import Inventory from "@assets/js/GameEnginev1.1/Inventory.js";
+import { defaultItems } from "@assets/js/GameEnginev1.1/items.js";
 
 class StatsManager {
     constructor(game) {
@@ -1883,6 +1883,10 @@ class FinTech extends Game {
         this.initFinTechGame(environment);
     }
 
+    _initializeGameControlAsync(gameLevelClasses) {
+        // Do nothing. FinTech initializes its own GameControl synchronously in initFinTechGame.
+    }
+
     static main(environment) {
         return new FinTech(environment);
     }
@@ -2675,6 +2679,26 @@ class FinTech extends Game {
         });
         const gameLevelClasses = environment.gameLevelClasses;
         this.gameControl = new GameControl(this, gameLevelClasses);
+        
+        // Wrap transitionToLevel to robustly clean up all DOM canvas elements in the gameContainer
+        const originalTransitionToLevel = this.gameControl.transitionToLevel.bind(this.gameControl);
+        this.gameControl.transitionToLevel = () => {
+            const container = this.gameControl.gameContainer || this.gameContainer;
+            if (container) {
+                try {
+                    const canvases = container.querySelectorAll('canvas');
+                    canvases.forEach(canvas => {
+                        if (canvas && canvas.id !== 'gameCanvas') {
+                            canvas.remove();
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Failed to robustly remove stale canvases:', e);
+                }
+            }
+            originalTransitionToLevel();
+        };
+
         this.gameControl.start();
     }
 }
