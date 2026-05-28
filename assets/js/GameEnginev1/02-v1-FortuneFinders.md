@@ -10,6 +10,27 @@ permalink: /gamify/fortuneFinders
     <canvas id='gameCanvas' style="display:none"></canvas>
 </div>
 
+<script>
+    (function () {
+        const liquidBase = "{{ site.baseurl }}";
+        let base = liquidBase;
+        if (!base) {
+            const parts = window.location.pathname.split("/").filter(Boolean);
+            if (parts.length && parts[0] !== "gamify") {
+                base = "/" + parts[0];
+            }
+        }
+        const imports = {
+            "@assets/": base + "/assets/",
+            "@fortuneFinders/": base + "/assets/js/fortuneFinders/"
+        };
+        const tag = document.createElement("script");
+        tag.type = "importmap";
+        tag.textContent = JSON.stringify({ imports });
+        document.head.appendChild(tag);
+    })();
+</script>
+
 <script type="module">
     function showStartupError(error) {
         const container = document.getElementById("gameContainer");
@@ -39,6 +60,14 @@ permalink: /gamify/fortuneFinders
 
     (async () => {
         try {
+            let siteBase = "{{ site.baseurl }}";
+            if (!siteBase) {
+                const parts = window.location.pathname.split("/").filter(Boolean);
+                if (parts.length && parts[0] !== "gamify") {
+                    siteBase = "/" + parts[0];
+                }
+            }
+
             const [{ default: FinTech }, { default: GameLevelAirport }, { default: GameLevelFuturesExchange }, { default: GameLevelOptionsHub }, { default: GameLevelWallstreet }, { FF_ROUTES, ffUrl }, config] = await Promise.all([
                 import("@fortuneFinders/js/FinTech.js"),
                 import("@fortuneFinders/levels/GameLevelAirport.js"),
@@ -46,13 +75,13 @@ permalink: /gamify/fortuneFinders
                 import("@fortuneFinders/levels/GameLevelOptionsHub.js"),
                 import("@fortuneFinders/levels/GameLevelWallstreet.js"),
                 import("@fortuneFinders/js/routes.js"),
-                import("{{site.baseurl}}/assets/js/api/config.js"),
+                import(`${siteBase}/assets/js/api/config.js`),
             ]);
 
             const gameLevelClasses = [GameLevelAirport, GameLevelFuturesExchange, GameLevelOptionsHub, GameLevelWallstreet];
 
             const environment = {
-                path: "{{site.baseurl}}",
+                path: siteBase,
                 pythonURI: config.pythonURI,
                 javaURI: config.javaURI,
                 fetchOptions: config.fetchOptions,
