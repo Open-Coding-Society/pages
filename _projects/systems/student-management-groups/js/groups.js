@@ -549,13 +549,7 @@
             💬
           </button>
 
-          <!-- Feedback button -->
-          <button
-            class="w-9 h-9 flex items-center justify-center rounded bg-neutral-600 hover:bg-indigo-600 text-gray-300 hover:text-white transition-colors"
-            title="Submit feedback for this group"
-            onclick="openFeedbackModal(${group.id})">
-            📝
-          </button>
+
 
           <!-- Trash (admin only) -->
           ${isAdmin ? `

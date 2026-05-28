@@ -2,7 +2,7 @@ import GameEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackg
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
-import MansionLevel6 from './mansionLevel6.js';
+import MansionLevelMain from './mansionLevelMain.js';
 import WheelOfFortuneGameManager from './WheelOfFortune.js';
 
 class MansionLevel5 {
@@ -17,7 +17,6 @@ class MansionLevel5 {
 
         this.pauseDomAudio();
         this.wheelManager = new WheelOfFortuneGameManager(gameEnv, {
-            phrase: "SECRET PASSAGE",
             category: "Mansion Mystery",
             onWin: () => this.winLevel()
         });
@@ -117,8 +116,8 @@ class MansionLevel5 {
         const levelGameEnv = this.gameEnv;
 
         return {
-            id: 'Level6Door',
-            greeting: "You found the Level 5 key. Press E to enter Level 6.",
+            id: 'MainWorldDoor',
+            greeting: "You found the Level 5 key. Press E to return to the main world.",
             src: this.path + "/images/projects/mansionGame/door_lvl5.png",
             SCALE_FACTOR: 1,
             ANIMATION_RATE: 100,
@@ -127,22 +126,21 @@ class MansionLevel5 {
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
             hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
-            dialogues: ["Level 6 awaits. Do you wish to enter?"],
+            dialogues: ["Return to the main world?"],
             reaction: () => {},
             interact: function() {
                 if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) this.dialogueSystem.closeDialogue();
                 if (!this.dialogueSystem) this.dialogueSystem = new DialogueSystem();
-                this.dialogueSystem.showDialogue("Would you like to enter Level 6?", "Level 6", this.spriteData.src);
+                this.dialogueSystem.showDialogue("Would you like to return to the main world?", "Main World", this.spriteData.src);
                 this.dialogueSystem.addButtons([
                     {
-                        text: "Enter",
+                        text: "Return",
                         primary: true,
                         action: () => {
                             this.dialogueSystem.closeDialogue();
                             if (levelGameEnv?.gameControl) {
                                 const gameControl = levelGameEnv.gameControl;
-                                gameControl._originalLevelClasses = gameControl.levelClasses;
-                                gameControl.levelClasses = [MansionLevel6];
+                                gameControl.levelClasses = [MansionLevelMain];
                                 gameControl.currentLevelIndex = 0;
                                 gameControl.isPaused = false;
                                 gameControl.transitionToLevel();
@@ -230,7 +228,13 @@ class MansionLevel5 {
                 primary: true,
                 action: () => {
                     dialogueSystem.closeDialogue();
-                    this.spawnFinishDoor();
+                    if (this.gameEnv?.gameControl) {
+                        const gameControl = this.gameEnv.gameControl;
+                        gameControl.levelClasses = [MansionLevelMain];
+                        gameControl.currentLevelIndex = 0;
+                        gameControl.isPaused = false;
+                        gameControl.transitionToLevel();
+                    }
                 }
             }
         ]);

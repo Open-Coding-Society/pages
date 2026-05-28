@@ -403,6 +403,115 @@ td:has(> img[src*="logo.png"]) {
   color: var(--text);
 }
 
+.calendar-source-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.calendar-source-chip {
+  border: 1px solid color-mix(in srgb, var(--ui-border) 85%, transparent 15%);
+  background: color-mix(in srgb, var(--bg-1) 90%, #000 10%);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+
+  &.active,
+  &:hover {
+    color: var(--text);
+    border-color: color-mix(in srgb, var(--pref-accent-color) 55%, var(--ui-border) 45%);
+    background: color-mix(in srgb, var(--pref-accent-color) 18%, var(--bg-1) 82%);
+  }
+}
+
+.calendar-cs-pathway-panel {
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 72%, transparent 28%);
+  background: color-mix(in srgb, var(--bg-2) 92%, var(--pref-accent-color) 8%);
+}
+
+.calendar-cs-pathway-header {
+  margin-bottom: 14px;
+}
+
+.calendar-cs-pathway-title {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+}
+
+.calendar-cs-pathway-subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.calendar-cs-pathway-empty {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+}
+
+.calendar-cs-pathway-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  max-height: min(52vh, 520px);
+  overflow: auto;
+}
+
+.calendar-cs-pathway-task {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ui-border) 80%, transparent 20%);
+  background: color-mix(in srgb, var(--bg-1) 94%, #000 6%);
+}
+
+.calendar-cs-pathway-task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.calendar-cs-pathway-task-priority {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.calendar-cs-pathway-task-title {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.calendar-cs-pathway-task-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.calendar-cs-pathway-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.fc-event-cs-pathway {
+  border-left: 3px solid #4ecca3 !important;
+}
+
 .calendar-controls-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

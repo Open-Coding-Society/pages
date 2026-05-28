@@ -1,4 +1,4 @@
-import showDialogBox from './essentials/DialogBox.js';
+import showDialogBox from '@assets/js/GameEnginev1.1/essentials/DialogBox.js';
 
 class NpcProgressSystem {
     constructor() {
