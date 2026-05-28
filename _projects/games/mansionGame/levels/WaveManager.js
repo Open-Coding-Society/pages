@@ -78,8 +78,9 @@ class WaveManager {
         this.gameEnv = gameEnv;
         this.waves = [
             { count: 5,  speed: 1.5  },  // Wave 1
-            { count: 9,  speed: 2.0  },  // Wave 2
-            { count: 17, speed: 2.7  }   // Wave 3
+            { count: 8,  speed: 2.0  },  // Wave 2
+            { count: 12, speed: 2.7  },   // Wave 3
+            { count: 16, speed: 3.0  }   // Wave 4
         ];
 
         this.currentWave = 0;
@@ -92,7 +93,7 @@ class WaveManager {
         // Projectile system
         this.projectiles = [];
         this.lastAttackTime = Date.now();
-        this.attackCooldown = 250; // 0.25s between shots
+        this.attackCooldown = 500; // 0.25s between shots
 
         this.waveDisplay = null;
     }

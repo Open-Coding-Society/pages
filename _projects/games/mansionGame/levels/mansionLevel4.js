@@ -247,7 +247,7 @@ class MansionLevel4 {
             <div style="color:white;font-size:24px;margin:20px 0;">
                 <p>Defeat 3 waves of enemies!</p>
                 <p style="font-size:18px;opacity:0.8;">
-                    Wave 1: 5 enemies &nbsp;|&nbsp; Wave 2: 9 enemies &nbsp;|&nbsp; Wave 3: 17 enemies
+                    Wave 1: 5 enemies &nbsp;|&nbsp; Wave 2: 8 enemies &nbsp;|&nbsp; Wave 3: 12 enemies;|&nbsp; Wave 4: 16 enemies
                 </p>
             </div>
             <div style="margin-top:30px;padding:20px;background:#ff6b6b;border-radius:10px;">
