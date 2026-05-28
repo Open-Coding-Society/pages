@@ -17,7 +17,8 @@ class MansionLevel1 {
         this.levelState = {
             collectedArtifacts: new Set(),
             artifactIds: ["sun_idol", "ancient_scroll", "desert_gem"],
-            rewardClaimed: false
+            rewardClaimed: false,
+            timeLeft: 45 // 45-second limit to find artifacts
         };
 
 
@@ -167,6 +168,7 @@ class MansionLevel1 {
 
 
         this.showIntroDialogue();
+        this.startTimer(); // Guarantees the clock starts running immediately upon level load
     }
 
 
@@ -197,6 +199,15 @@ class MansionLevel1 {
         Object.assign(this.titleDisplay.style, {
             fontSize: "18px",
             fontWeight: "bold",
+            marginBottom: "4px"
+        });
+
+
+        this.timerDisplay = document.createElement("div");
+        Object.assign(this.timerDisplay.style, {
+            fontSize: "15px",
+            fontWeight: "bold",
+            color: "#ff7070",
             marginBottom: "10px"
         });
 
@@ -211,6 +222,7 @@ class MansionLevel1 {
 
 
         this.uiContainer.appendChild(this.titleDisplay);
+        this.uiContainer.appendChild(this.timerDisplay);
         this.uiContainer.appendChild(this.itemsDisplay);
         this.uiContainer.appendChild(this.statusDisplay);
         document.body.appendChild(this.uiContainer);
@@ -221,6 +233,10 @@ class MansionLevel1 {
 
 
     refreshUserInterface(statusText = null) {
+        if (this.timerDisplay) {
+            this.timerDisplay.textContent = `⏳ Time Left: ${this.levelState.timeLeft}s`;
+        }
+
         if (this.itemsDisplay) {
             const labels = {
                 sun_idol: "Sun Idol",
@@ -243,6 +259,63 @@ class MansionLevel1 {
         }
     }
 
+    startTimer() {
+        this.stopTimer();
+        // Bind to window to prevent engine scope conflicts
+        this.timerInterval = window.setInterval(() => {
+            if (this.levelState.rewardClaimed) {
+                this.stopTimer();
+                return;
+            }
+
+            this.levelState.timeLeft -= 1;
+            this.refreshUserInterface();
+
+            if (this.levelState.timeLeft <= 0) {
+                this.stopTimer();
+                this.handleTimeOut();
+            }
+        }, 1000);
+    }
+
+    stopTimer() {
+        if (this.timerInterval) {
+            window.clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+
+    handleTimeOut() {
+        const timeoutDialogue = new DialogueSystem({
+            id: `mummy_timeout_${Date.now()}`
+        });
+
+        timeoutDialogue.showDialogue(
+            "The tomb doors slammed shut! You ran out of time to assemble the offerings.",
+            "Tomb Trap",
+            this.gameEnv.path + "/images/projects/mansionGame/sphinxclear.png"
+        );
+
+        timeoutDialogue.addButtons([
+            {
+                text: "Retry Level",
+                primary: true,
+                action: () => {
+                    timeoutDialogue.closeDialogue();
+                    this.restartLevel();
+                }
+            }
+        ]);
+    }
+
+    restartLevel() {
+        const gameControl = this.gameEnv?.gameControl;
+        if (!gameControl) return;
+        
+        gameControl.isPaused = false;
+        gameControl.transitionToLevel(); 
+    }
+
 
     showIntroDialogue() {
         const introDialogue = new DialogueSystem({
@@ -261,7 +334,10 @@ class MansionLevel1 {
             {
                 text: "Start",
                 primary: true,
-                action: () => introDialogue.closeDialogue()
+                action: () => {
+                    introDialogue.closeDialogue();
+                    this.startTimer();
+                }
             }
         ]);
     }
@@ -330,7 +406,7 @@ class MansionLevel1 {
             return;
         }
 
-
+        this.stopTimer();
         this.levelState.rewardClaimed = true;
         this.unlockNextLevel();
         this.refreshUserInterface("All offerings delivered. The mummy reveals the key.");
@@ -504,6 +580,8 @@ class MansionLevel1 {
 
 
     destroy() {
+        this.stopTimer();
+
         if (this.keyPopupTimer) {
             window.clearTimeout(this.keyPopupTimer);
             this.keyPopupTimer = null;
@@ -522,4 +600,3 @@ class MansionLevel1 {
 
 
 export default MansionLevel1;
-
