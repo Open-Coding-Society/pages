@@ -17,13 +17,13 @@ lxdData:
       Description: "Explore CPT requirements and simply ideas to start the project."
       Lessons: "/cpt/1"
       Image: "/images/cpt/c1.webp"
-    - Title: "C2: Draft the CPT Project Layout"
+    - Title: "C2: Learn and draft the Foundations"
       Genre: "Drafting"
       Level: 2
       Description: "Fully understand Collegeboard CPT requirements and draft the project to be polished later"
       Lessons: "/cpt/2"
       Image: "/images/cpt/c2.jpg"
-    - Title: "C3: Trace the Program"
+    - Title: "C3: Trace the CPT Project Layout"
       Genre: "Practice"
       Level: 3
       Description: "Trace and explain the purpose and phases of the project to be used to practice answer AP exam questions later about the CPT"
