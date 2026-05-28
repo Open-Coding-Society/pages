@@ -124,6 +124,25 @@ function showDeathScreen(player) {
 function cleanupBattleRoomUi(gameEnv) {
     if (typeof document === 'undefined') return;
 
+    try {
+        if (typeof window !== 'undefined') {
+            if (window._battleMusic && typeof window._battleMusic.pause === 'function') {
+                window._battleMusic.pause();
+                window._battleMusic.currentTime = 0;
+            }
+            if (window._levelMusic && typeof window._levelMusic.pause === 'function') {
+                window._levelMusic.pause();
+                window._levelMusic.currentTime = 0;
+            }
+            if (window._endMusic && typeof window._endMusic.pause === 'function') {
+                window._endMusic.pause();
+                window._endMusic.currentTime = 0;
+            }
+        }
+    } catch (e) {
+        console.warn('DeathScreen music cleanup failed:', e);
+    }
+
     const selectors = [
         '#boss-health-container',
         '#player-health-container',
@@ -148,20 +167,54 @@ function cleanupBattleRoomUi(gameEnv) {
     });
 
     if (gameEnv && Array.isArray(gameEnv.gameObjects)) {
-        gameEnv.gameObjects.forEach(obj => {
+        const objects = [...gameEnv.gameObjects];
+        objects.forEach(obj => {
             if (!obj) return;
             const name = obj.constructor?.name;
-            if (name === 'Projectile' || name === 'Boomerang' || name === 'PlayerScythe' || name === 'PowerUp') {
+            if (name === 'FightingPlayer') {
+                if (Array.isArray(obj.projectiles)) {
+                    obj.projectiles.forEach(projectile => {
+                        if (projectile && typeof projectile.destroy === 'function') projectile.destroy();
+                    });
+                    obj.projectiles = [];
+                }
+                if (Array.isArray(obj.orbitingScythes)) {
+                    obj.orbitingScythes.forEach(scythe => {
+                        if (scythe && typeof scythe.destroy === 'function') scythe.destroy();
+                    });
+                    obj.orbitingScythes = [];
+                }
+            }
+
+            const spriteId = obj?.spriteData?.id?.toLowerCase?.() || '';
+            const spriteSrc = obj?.spriteData?.src?.toLowerCase?.() || '';
+            const isZombieLike = name === 'Zombie'
+                || name === 'Npc'
+                && spriteId.includes('zombie')
+                || spriteSrc.includes('zombienpc');
+
+            if (
+                name === 'Projectile' ||
+                name === 'Boomerang' ||
+                name === 'PlayerScythe' ||
+                name === 'PowerUp' ||
+                name === 'PowerUpSpawner' ||
+                isZombieLike
+            ) {
                 if (typeof obj.destroy === 'function') {
                     obj.destroy();
                 }
             }
         });
 
-        gameEnv.gameObjects = gameEnv.gameObjects.filter(obj => {
-            const name = obj?.constructor?.name;
-            return name !== 'Projectile' && name !== 'Boomerang' && name !== 'PlayerScythe' && name !== 'PowerUp';
+        // Hard-stop any remaining renderables during the death transition.
+        const remaining = [...gameEnv.gameObjects];
+        remaining.forEach(obj => {
+            if (obj && typeof obj.destroy === 'function') {
+                obj.destroy();
+            }
         });
+        gameEnv.gameObjects = [];
     }
 }
 

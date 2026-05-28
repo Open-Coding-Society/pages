@@ -24,6 +24,21 @@ class MansionLevelMain {
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
 
+    try {
+      if (typeof window !== 'undefined' && window._mainLevelAmbience) {
+        if (typeof window._mainLevelAmbience.pause === 'function') {
+          window._mainLevelAmbience.pause();
+        }
+        window._mainLevelAmbience.currentTime = 0;
+      }
+    } catch (e) { }
+
+    const mainAmbience = new Audio(path + '/images/projects/mansionGame/main-level-ambience.mp3');
+    mainAmbience.loop = true;
+    mainAmbience.volume = 0.25;
+    mainAmbience.play().catch(err => console.warn('Main ambience failed to play:', err));
+    try { if (typeof window !== 'undefined') window._mainLevelAmbience = mainAmbience; } catch (e) { }
+
     // Background data
     const image_src_mainworld = path + "/images/projects/mansionGame/newMansionInterior.png"; // be sure to include the path
     const image_data_mainworld = {
@@ -181,6 +196,15 @@ class MansionLevelMain {
       ...shared_barrier_data
     };
 
+    const barrier_12 = {
+      id: 'dbarrier_12', 
+      x: 869 / 1113 * width,
+      y: 489 / 906 * height,
+      width: 109 / 1113 * width,
+      height: 245 / 906 * height,
+      ...shared_barrier_data
+    };
+
 
     function getDoorData(levelNum, levelClass, x, y, localStorageLocked = false) {
       const sprite_src_level_door = path + "/images/projects/mansionGame/invisDoorCollisionSprite.png";
@@ -235,6 +259,14 @@ class MansionLevelMain {
                   text: "Enter", primary: true, action: () => {
                     this.dialogueSystem.closeDialogue();
                     if (gameEnv && gameEnv.gameControl) {
+                      try {
+                        if (typeof window !== 'undefined' && window._mainLevelAmbience) {
+                          if (typeof window._mainLevelAmbience.pause === 'function') {
+                            window._mainLevelAmbience.pause();
+                          }
+                          window._mainLevelAmbience.currentTime = 0;
+                        }
+                      } catch (e) { }
                       const gameControl = gameEnv.gameControl;
                       gameControl._originalLevelClasses = gameControl.levelClasses;
                       gameControl.levelClasses = [levelClass];
@@ -315,6 +347,7 @@ class MansionLevelMain {
       { class: Barrier, data: barrier_9 },
       { class: Barrier, data: barrier_10 },
       { class: Barrier, data: barrier_11 },
+      { class: Barrier, data: barrier_12 },
       { class: Npc, data: getDoorData(1, GameLevel1, doorPositions[1].x, doorPositions[1].y, doorPositions[1].locked) },
       { class: Npc, data: getDoorData(2, GameLevel2, doorPositions[2].x, doorPositions[2].y, doorPositions[2].locked) },
       { class: Npc, data: getDoorData(3, GameLevel3, doorPositions[3].x, doorPositions[3].y, doorPositions[3].locked) },
