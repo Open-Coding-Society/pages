@@ -24,6 +24,21 @@ class MansionLevelMain {
     let height = gameEnv.innerHeight;
     let path = gameEnv.path;
 
+    try {
+      if (typeof window !== 'undefined' && window._mainLevelAmbience) {
+        if (typeof window._mainLevelAmbience.pause === 'function') {
+          window._mainLevelAmbience.pause();
+        }
+        window._mainLevelAmbience.currentTime = 0;
+      }
+    } catch (e) { }
+
+    const mainAmbience = new Audio(path + '/images/projects/mansionGame/main-level-ambience.mp3');
+    mainAmbience.loop = true;
+    mainAmbience.volume = 0.25;
+    mainAmbience.play().catch(err => console.warn('Main ambience failed to play:', err));
+    try { if (typeof window !== 'undefined') window._mainLevelAmbience = mainAmbience; } catch (e) { }
+
     // Background data
     const image_src_mainworld = path + "/images/projects/mansionGame/newMansionInterior.png"; // be sure to include the path
     const image_data_mainworld = {
@@ -244,6 +259,14 @@ class MansionLevelMain {
                   text: "Enter", primary: true, action: () => {
                     this.dialogueSystem.closeDialogue();
                     if (gameEnv && gameEnv.gameControl) {
+                      try {
+                        if (typeof window !== 'undefined' && window._mainLevelAmbience) {
+                          if (typeof window._mainLevelAmbience.pause === 'function') {
+                            window._mainLevelAmbience.pause();
+                          }
+                          window._mainLevelAmbience.currentTime = 0;
+                        }
+                      } catch (e) { }
                       const gameControl = gameEnv.gameControl;
                       gameControl._originalLevelClasses = gameControl.levelClasses;
                       gameControl.levelClasses = [levelClass];
