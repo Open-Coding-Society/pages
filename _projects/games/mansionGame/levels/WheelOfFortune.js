@@ -8,7 +8,7 @@ class WheelOfFortuneGameManager {
         this.overlay = null;
         this.gameActive = false;
         this.coins = 500;
-        this.vowelCost = 250;
+        this.vowelCost = 200;
         this.currentSpinValue = null;
         this.guessedLetters = new Set();
         this.solved = false;
