@@ -74,24 +74,14 @@ class MansionLevel4 {
 
     setupInputListener() {
         this.keysHeld = new Set();
+        this.lastShootTime = 0;
+        this.shootCooldown = 250; // milliseconds between shots
 
         this.keydownHandler = (e) => {
             this.keysHeld.add(e.code);
 
             if (e.code === 'Space') {
                 e.preventDefault();
-
-                // Build direction vector from held WASD keys
-                let dx = 0, dy = 0;
-                if (this.keysHeld.has('KeyW')) dy -= 1;
-                if (this.keysHeld.has('KeyS')) dy += 1;
-                if (this.keysHeld.has('KeyA')) dx -= 1;
-                if (this.keysHeld.has('KeyD')) dx += 1;
-
-                // Default to shooting right if standing still
-                if (dx === 0 && dy === 0) dx = 1;
-
-                this.waveManager.playerShoot({ dx, dy });
             }
         };
 
@@ -199,28 +189,48 @@ class MansionLevel4 {
     }
 
     update() {
-    this.waveManager.update();
+        // Handle continuous shooting while Space is held
+        if (this.keysHeld.has('Space')) {
+            const now = Date.now();
+            if (now - this.lastShootTime >= this.shootCooldown) {
+                this.lastShootTime = now;
 
-    // Show message between Wave 1 and Wave 2
-    if (
-        this.waveManager.currentWave === 1 &&
-        this.waveManager.enemies.length === 0 &&
-        !this.wave2MessageShown
-    ) {
-        this.wave2MessageShown = true;
+                // Build direction vector from held WASD keys
+                let dx = 0, dy = 0;
+                if (this.keysHeld.has('KeyW')) dy -= 1;
+                if (this.keysHeld.has('KeyS')) dy += 1;
+                if (this.keysHeld.has('KeyA')) dx -= 1;
+                if (this.keysHeld.has('KeyD')) dx += 1;
 
-        this.showWaveMessage(
-            "Wave 1 Complete! Wave 2 Incoming...",
-            () => {
-                this.waveManager.startWave(2);
+                // Default to shooting right if standing still
+                if (dx === 0 && dy === 0) dx = 1;
+
+                this.waveManager.playerShoot({ dx, dy });
             }
-        );
-    }
+        }
 
-    if (this.waveManager.isComplete()) {
-        this.winLevel();
+        this.waveManager.update();
+
+        // Show message between Wave 1 and Wave 2
+        if (
+            this.waveManager.currentWave === 1 &&
+            this.waveManager.enemies.length === 0 &&
+            !this.wave2MessageShown
+        ) {
+            this.wave2MessageShown = true;
+
+            this.showWaveMessage(
+                "Wave 1 Complete! Wave 2 Incoming...",
+                () => {
+                    this.waveManager.startWave(2);
+                }
+            );
+        }
+
+        if (this.waveManager.isComplete()) {
+            this.winLevel();
+        }
     }
-}
 
     winLevel() {
         if (this.levelWon) return;
