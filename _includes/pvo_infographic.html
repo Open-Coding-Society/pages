@@ -10,90 +10,154 @@
 
   <!-- Project Cards -->
   {% for topic in data.Topics %}
-  <div class="pv-card{% if topic.title == 'Future Features' %} pv-card--future{% endif %}">
+{% if topic.type == "expo" %}
+<div class="pv-card pv-card--expo" style="max-width: 720px; margin: 2rem auto 0;">
 
-    {% if topic.title == 'Future Features' %}
-    <div class="pv-future-banner">
-      <span class="pv-future-badge">🚀 Coming Soon</span>
-      <span class="pv-future-tagline">On the Roadmap</span>
+  <div class="pv-future-banner" style="width: 100%; box-sizing: border-box;">
+    <span class="pv-future-badge" style="background: rgba(100,200,160,0.15); border-color: rgba(100,220,160,0.3); color: rgba(140,230,180,0.9);">🎖️ CTE Expo</span>
+    <span class="pv-future-tagline">{{ topic.date }}</span>
+  </div>
+
+  <div style="padding: 1.8rem 2rem; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1rem;">
+
+    <h2 class="pv-project-title" style="font-size: 1.9rem; margin: 0;">{{ topic.title }}</h2>
+    <p class="pv-subtitle" style="margin: 0;">{{ topic.subtitle }}</p>
+
+    <p style="font-size: 0.95rem; color: rgba(255,255,255,0.75); line-height: 1.7; max-width: 540px; margin: 0;">
+      {{ topic.description }}
+    </p>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem;">
+      {% for person in topic.stakeholders %}
+        {% if person.linkedin %}
+        <a href="{{ person.linkedin }}" target="_blank" rel="noopener noreferrer" class="pv-expo-person">
+          👤 {{ person.name }}{% if person.org %} <span style="opacity:0.5;">· {{ person.org }}</span>{% endif %}
+        </a>
+        {% else %}
+        <div class="pv-expo-person">
+          👤 {{ person.name }}{% if person.org %} <span style="opacity:0.5;">· {{ person.org }}</span>{% endif %}
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <a href="{{ topic.summaryLink }}" class="pv-learn-btn" style="font-size: 0.8rem; padding: 0.65rem 1.6rem; background: rgba(100,220,160,0.1); border-color: rgba(100,220,160,0.35); color: rgba(160,240,200,0.95);">
+      Read Our Full Summary ↗
+    </a>
+
+    {% if topic.repos %}
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 0.25rem;">
+      {% for repo in topic.repos %}
+      <a href="{{ repo.url }}" target="_blank" rel="noopener noreferrer" class="pv-expo-person pv-repo-btn">
+        <span>{{ repo.icon }}</span> {{ repo.label }}
+      </a>
+      {% endfor %}
     </div>
     {% endif %}
 
-    <div class="pv-card-grid">
+  </div>
+</div>
 
-      <!-- Left: Logo + Power Features -->
-      <div class="pv-visual">
-        <div class="pv-left-block{% if topic.title == 'Future Features' %} pv-left-block--future{% endif %}">
+    {% elsif topic.title == 'Future Features' %}
+    <div class="pv-card pv-card--future">
 
-          <!-- Logo banner -->
-          <div class="pv-before-logo-wrap">
-            <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-before-logo">
-            <div class="pv-before-logo-overlay">
-              {% if topic.link %}
-              <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-before-title-link">
-                <span class="pv-before-label">LIVE SITE</span><span class="pv-before-arrow">↗</span>
-              </a>
-              {% endif %}
+      <div class="pv-future-banner">
+        <span class="pv-future-badge">🚀 Coming Soon</span>
+        <span class="pv-future-tagline">On the Roadmap</span>
+      </div>
+
+      <div class="pv-card-grid">
+        <div class="pv-visual">
+          <div class="pv-left-block pv-left-block--future">
+            <div class="pv-before-logo-wrap">
+              <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-before-logo">
             </div>
-          </div>
-
-          <!-- Power Features -->
-          {% if topic.powerFeatures %}
-          <div class="pv-power-section">
-            <div class="pv-power-eyebrow">
-              {% if topic.title == 'Future Features' %}
-              🔭 What We're Building Next
-              {% else %}
-              ✦ What We Brought to the Table
-              {% endif %}
-            </div>
-            {% for feat in topic.powerFeatures %}
-            <div class="pv-power-pill{% if topic.title == 'Future Features' %} pv-power-pill--future{% endif %}">
-              <div class="pv-power-top">
-                <span class="pv-power-icon">{{ feat.icon }}</span>
-                <span class="pv-power-label">{{ feat.label }}</span>
+            {% if topic.powerFeatures %}
+            <div class="pv-power-section">
+              <div class="pv-power-eyebrow">🔭 What We're Building Next</div>
+              {% for feat in topic.powerFeatures %}
+              <div class="pv-power-pill pv-power-pill--future">
+                <div class="pv-power-top">
+                  <span class="pv-power-icon">{{ feat.icon }}</span>
+                  <span class="pv-power-label">{{ feat.label }}</span>
+                </div>
+                <div class="pv-power-note">{{ feat.note }}</div>
               </div>
-              <div class="pv-power-note">{{ feat.note }}</div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="pv-content">
+          <h2 class="pv-project-title pv-project-title--future">{{ topic.title }}</h2>
+          <p class="pv-subtitle">{{ topic.subtitle }}</p>
+          <div class="pv-keypoints">
+            {% for point in topic.keyPoints %}
+            <div class="pv-keypoint">
+              <span class="pv-check pv-check--future">◇</span>
+              <span>{{ point }}</span>
             </div>
             {% endfor %}
           </div>
-          {% endif %}
-
         </div>
       </div>
-
-      <!-- Right: Title + Key Points (2 col) + GIF + Button -->
-      <div class="pv-content">
-        <h2 class="pv-project-title{% if topic.title == 'Future Features' %} pv-project-title--future{% endif %}">{{ topic.title }}</h2>
-        <p class="pv-subtitle">{{ topic.subtitle }}</p>
-
-        <div class="pv-keypoints">
-          {% for point in topic.keyPoints %}
-          <div class="pv-keypoint">
-            <span class="pv-check{% if topic.title == 'Future Features' %} pv-check--future{% endif %}">
-              {% if topic.title == 'Future Features' %}◇{% else %}✓{% endif %}
-            </span>
-            <span>{{ point }}</span>
-          </div>
-          {% endfor %}
-        </div>
-
-        {% if topic.gif %}
-        <div class="pv-gif-wrap">
-          <img src="{{ site.baseurl }}/images/{{ topic.gif }}" alt="{{ topic.alt }} preview" class="pv-gif">
-        </div>
-        {% endif %}
-
-        {% if topic.new %}
-        <a href="{{ topic.new }}" target="_blank" rel="noopener noreferrer" class="pv-learn-btn">
-          Learn More ↗
-        </a>
-        {% endif %}
-
-      </div>
-
     </div>
-  </div>
+
+    {% else %}
+    <div class="pv-card">
+      <div class="pv-card-grid">
+        <div class="pv-visual">
+          <div class="pv-left-block">
+            <div class="pv-before-logo-wrap">
+              <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="pv-before-logo">
+              <div class="pv-before-logo-overlay">
+                {% if topic.link %}
+                <a href="{{ topic.link }}" target="_blank" rel="noopener noreferrer" class="pv-before-title-link">
+                  <span class="pv-before-label">LIVE SITE</span><span class="pv-before-arrow">↗</span>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+            {% if topic.powerFeatures %}
+            <div class="pv-power-section">
+              <div class="pv-power-eyebrow">✦ What We Brought to the Table</div>
+              {% for feat in topic.powerFeatures %}
+              <div class="pv-power-pill">
+                <div class="pv-power-top">
+                  <span class="pv-power-icon">{{ feat.icon }}</span>
+                  <span class="pv-power-label">{{ feat.label }}</span>
+                </div>
+                <div class="pv-power-note">{{ feat.note }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="pv-content">
+          <h2 class="pv-project-title">{{ topic.title }}</h2>
+          <p class="pv-subtitle">{{ topic.subtitle }}</p>
+          <div class="pv-keypoints">
+            {% for point in topic.keyPoints %}
+            <div class="pv-keypoint">
+              <span class="pv-check">✓</span>
+              <span>{{ point }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% if topic.gif %}
+          <div class="pv-gif-wrap">
+            <img src="{{ site.baseurl }}/images/{{ topic.gif }}" alt="{{ topic.alt }} preview" class="pv-gif">
+          </div>
+          {% endif %}
+          {% if topic.new %}
+          <a href="{{ topic.new }}" target="_blank" rel="noopener noreferrer" class="pv-learn-btn">Learn More ↗</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
   {% endfor %}
 </div>
 
@@ -310,6 +374,52 @@
 /* ── Future card border ──────────────────────────────────────── */
 .pv-card--future {
   border-color: rgba(255, 200, 80, 0.2) !important;
+}
+
+/* ── Expo card border and banner ────────────────────────────── */
+.pv-card--expo {
+  border-color: rgba(100, 220, 160, 0.2) !important;
+}
+
+.pv-card--expo .pv-future-banner {
+  background: linear-gradient(90deg, rgba(100, 220, 160, 0.15) 0%, rgba(100, 220, 160, 0.04) 60%, transparent 100%);
+  border-bottom: 1px solid rgba(100, 220, 160, 0.18);
+}
+
+/* ── Repo buttons ────────────────────────────────────────────── */
+.pv-repo-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.82rem;
+}
+
+.pv-repo-btn:hover {
+  background: rgba(100, 220, 160, 0.1);
+  border-color: rgba(100, 220, 160, 0.3);
+  color: rgba(160, 240, 200, 0.9);
+}
+
+/* ── Expo person chips ───────────────────────────────────────── */
+.pv-expo-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+a.pv-expo-person:hover {
+  background: rgba(100, 220, 160, 0.12);
+  border-color: rgba(100, 220, 160, 0.35);
+  color: rgba(160, 240, 200, 0.95);
 }
 
 /* ── Right content column ────────────────────────────────────── */
