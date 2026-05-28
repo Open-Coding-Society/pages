@@ -237,15 +237,14 @@ class WaveManager {
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const projectile = this.projectiles[i];
             if (projectile.revComplete) continue;
+            const projectileHitbox = this.getObjectHitbox(projectile, 1, 1);
 
             for (let j = this.waveEnemies.length - 1; j >= 0; j--) {
                 const enemy = this.waveEnemies[j];
                 if (enemy.isDestroyed()) continue;
+                const enemyHitbox = this.getObjectHitbox(enemy);
 
-                const dx = (enemy.position.x + (enemy.width  || 50) / 2) - projectile.position.x;
-                const dy = (enemy.position.y + (enemy.height || 50) / 2) - projectile.position.y;
-
-                if (Math.sqrt(dx * dx + dy * dy) <= 45) {
+                if (this.hitboxesOverlap(projectileHitbox, enemyHitbox)) {
                     enemy.takeDamage(1);
                     projectile.revComplete = true;
                     if (projectile.destroy) projectile.destroy();
@@ -253,6 +252,29 @@ class WaveManager {
                 }
             }
         }
+    }
+
+    getObjectHitbox(object, defaultWidthPercentage = 0.5, defaultHeightPercentage = 0.5) {
+        const width = object.width || 50;
+        const height = object.height || 50;
+        const hitboxWidth = width * (object.hitbox?.widthPercentage ?? defaultWidthPercentage);
+        const hitboxHeight = height * (object.hitbox?.heightPercentage ?? defaultHeightPercentage);
+
+        return {
+            left: object.position.x + (width - hitboxWidth) / 2,
+            top: object.position.y + (height - hitboxHeight) / 2,
+            right: object.position.x + (width + hitboxWidth) / 2,
+            bottom: object.position.y + (height + hitboxHeight) / 2
+        };
+    }
+
+    hitboxesOverlap(first, second) {
+        return (
+            first.left <= second.right &&
+            first.right >= second.left &&
+            first.top <= second.bottom &&
+            first.bottom >= second.top
+        );
     }
 
     checkPlayerCollisions() {
