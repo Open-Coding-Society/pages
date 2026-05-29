@@ -54,6 +54,21 @@
         <h3 class="hh-section-title">About</h3>
         <p class="hh-about">{{ topic.description }}</p>
         
+        {% if topic.videos %}
+        <h3 class="hh-section-title">Videos</h3>
+        <div class="hh-videos">
+          {% for video in topic.videos %}
+          <div class="hh-video-item">
+            <p class="hh-video-title">{{ video.title }}</p>
+            <video width="100%" height="auto" controls class="hh-video-player">
+              <source src="{{ site.baseurl }}{{ video.path }}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
         <h3 class="hh-section-title">Impact</h3>
         <div class="hh-impact-list">
           {% for item in topic.impact %}

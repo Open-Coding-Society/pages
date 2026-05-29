@@ -53,12 +53,69 @@
           {% endfor %}
         </div>
 
+        {% if topic.technical %}
+        <h3 class="dec-section-title">Technical</h3>
+        <div class="dec-impact-list">
+          {% for item in topic.technical %}
+          <div class="dec-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if data.feedback %}
+        <h3 class="dec-section-title">Feedback</h3>
+        <div class="dec-impact-list">
+          {% for item in data.feedback %}
+          <div class="dec-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if data.Experience %}
+        <h3 class="dec-section-title">Our Experience</h3>
+        <p class="dec-about">{{ data.Experience }}</p>
+        {% endif %}
+
+        {% if topic.repoLinks %}
+        <h3 class="dec-section-title">Link to Repository</h3>
+        <div class="dec-impact-list">
+          {% for link in topic.repoLinks %}
+          <div class="dec-impact-item">
+            <a href="{{ link }}" target="_blank" rel="noopener noreferrer">{{ link }}</a>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
         <a href="{{ site.baseurl }}{{ topic.link }}" class="dec-btn">Learn More</a>
       </div>
 
     </div>
   </div>
   {% endfor %}
+
+  <!-- Feedback Card -->
+  <div class="dec-card" style="max-width: 70%; margin: 0 auto;">
+    <div class="dec-video-gallery">
+      <h2 class="dec-video-section-title">Feedback</h2>
+      <div class="dec-keypoints">
+        {% for item in data.feedback %}
+        <div class="dec-keypoint">
+          <span class="dec-check">✓</span>
+          <span>{{ item }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Experience Card -->
+  <div class="dec-card" style="max-width: 70%; margin: 0 auto;">
+    <div class="dec-video-gallery">
+      <h2 class="dec-video-section-title">Our Experience</h2>
+      <p>{{ data.Experience }}</p>
+    </div>
+  </div>
 
   <!-- Video Gallery Card -->
   <div class="dec-card" style="max-width: 70%; margin: 0 auto;">
