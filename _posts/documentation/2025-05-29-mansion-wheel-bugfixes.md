@@ -10,48 +10,31 @@ author: Aryan Malik
 
 ## Overview
 
-Working on Level 5 of the Mansion Game meant building a fully playable Wheel of Fortune minigame from scratch inside a game engine. Once the core gameplay was in, a round of playtesting and QA surfaced a bunch of bugs, some of which were embarrassing and some of which were genuinely tricky. Here is a rundown of everything that got fixed, plus two bugs that are still sitting in the backlog.
+This post covers the bugs I found and fixed while building the Wheel of Fortune minigame for Level 5 of the Mansion Game, plus two bugs that are still open.
 
 ---
 
 ## Fixed Bugs
 
-### Bug 1: Solving the Wheel Opened It Again After Winning
+### Bug 1: Wheel Reopened After Already Winning
 
-**What was happening:**
+Once you solved the phrase, you could walk back to the Wheel Table and press E again. The overlay reopened with everything still working, and hitting Solve a second time duplicated the "Level 5 Complete" dialogue on screen.
 
-After you solved the phrase and got the win message, you could walk back up to the Wheel Table and press E again. The overlay would reopen with the board fully revealed but all the buttons still working. If you hit Solve a second time, it triggered the "Level 5 Complete" dialogue all over again, duplicating it on screen.
-
-**Why it happened:**
-
-The `startGame()` function had a check that said "don't open if the game is already active." But once you won, the game was no longer "active" because the `close()` function had reset that flag. So the guard passed and the game opened like nothing had happened.
-
-**The fix:**
-
-Added a second condition to that early check. Now it also looks at `this.solved`, which stays `true` permanently after a win. If you've already solved it, `startGame()` just exits immediately.
+The issue was that `close()` reset the `gameActive` flag to false, so the guard in `startGame()` thought the game had never been played. Adding a check for `this.solved` fixed it since that flag never resets.
 
 ```js
 startGame() {
   if (this.gameActive || this.solved) return;
-  ...
 }
 ```
 
 ---
 
-### Bug 2: Clicking Continue More Than Once Spawned Multiple Doors
+### Bug 2: Double-Clicking Continue Spawned Multiple Doors
 
-**What was happening:**
+Clicking Continue more than once in the win dialogue spawned multiple Level 6 door NPCs stacked in the same spot. Each door registered its own keypress listener, so pressing E fired the level transition multiple times and crashed the game.
 
-The "Level 5 Complete" dialogue had a Continue button. If you clicked it more than once (double-click, impatient clicking, whatever), the game spawned multiple Level 6 door NPCs stacked on top of each other in the exact same spot. Each one registered its own keypress listener, so pressing E near the door fired the level transition multiple times and crashed the game.
-
-**Why it happened:**
-
-The `spawnFinishDoor()` function had no protection against being called twice. Every time it ran, it created a brand new NPC and shoved it into the game objects list, no questions asked.
-
-**The fix:**
-
-Added a guard at the top of `spawnFinishDoor()` that checks if a door already exists. If it does, the function returns immediately and nothing gets spawned.
+`spawnFinishDoor()` had no guard, it just created a new NPC every single call. A simple check at the top stopped that.
 
 ```js
 spawnFinishDoor() {
@@ -63,19 +46,11 @@ spawnFinishDoor() {
 
 ---
 
-### Bug 3: Coins Could Go Negative
+### Bug 3: Coins Went Negative
 
-**What was happening:**
+A wrong solve attempt cost $100. If you only had $50, your coins dropped to -$50. The display showed negative numbers and Bankrupt on top of that produced values like "-$150."
 
-Every wrong solve attempt cost $100. If you had, say, $50 left and guessed wrong, your coin total dropped to -$50. The display showed a negative number, and when Bankrupt hit on top of that you would see nonsense like "-$150."
-
-**Why it happened:**
-
-The deduction was just a plain subtraction with no floor. If the result went below zero, the code did not care.
-
-**The fix:**
-
-Wrapped the subtraction in `Math.max(0, ...)` so the result can never go below zero.
+The deduction had no floor. Wrapping it in `Math.max` fixed it.
 
 ```js
 this.coins = Math.max(0, this.coins - 100);
@@ -83,19 +58,9 @@ this.coins = Math.max(0, this.coins - 100);
 
 ---
 
-### Bug 4: Background Music Crashed the Level on Some Browsers
+### Bug 4: Background Music Crashed the Level on Safari
 
-**What was happening:**
-
-On Safari, and occasionally Chrome with strict autoplay settings, the call to play the background music threw an error. Without any error handling on that promise, the whole level load was treated as failed and the player got a black screen with no message.
-
-**Why it happened:**
-
-Browsers block audio autoplay unless the user has interacted with the page first. The music was set up to play immediately on level load with no fallback if the browser rejected it.
-
-**The fix:**
-
-Chained a `.catch()` onto the play call so that if the browser blocks it, the error gets logged as a warning and the game keeps going normally.
+On Safari and some Chrome settings, the browser blocks audio autoplay. Without a `.catch()`, that rejection bubbled up and caused the entire level to fail, leaving the player on a black screen.
 
 ```js
 this.backgroundMusic.play().catch((error) =>
@@ -105,19 +70,11 @@ this.backgroundMusic.play().catch((error) =>
 
 ---
 
-### Bug 5: Winning the Level Could Trigger Twice From a Double-Click
+### Bug 5: Win Dialogue Appeared Twice From Rapid Clicking
 
-**What was happening:**
+Solving the phrase queued `onWin` inside a 900ms timeout. If you pressed Solve twice before the timeout fired, two calls to `winLevel()` went through and stacked the win dialogue.
 
-When you solved the phrase, `onWin` was queued inside a 900ms `setTimeout`. If you somehow triggered the solve function twice before that timeout fired (like pressing Solve twice very fast), two separate calls to `winLevel()` went through. The result was two "Level 5 Complete" dialogues stacking on screen, and `spawnFinishDoor()` getting called before its own guard existed.
-
-**Why it happened:**
-
-`winLevel()` had no protection against being called more than once. The first call ran through the whole win sequence, but if a second call came in during that same window, it ran the same thing all over again.
-
-**The fix:**
-
-Added an idempotency guard at the very top of `winLevel()`. The first call sets `puzzleSolved` to `true`. Any call after that returns immediately.
+Adding a guard at the top of `winLevel()` made it so only the first call ever runs.
 
 ```js
 winLevel() {
@@ -131,23 +88,13 @@ winLevel() {
 
 ## Known Issues (Not Yet Fixed)
 
-### Bug 6: The Game Can Reach an Unwinnable State
+### Bug 6: Game Can Become Unwinnable
 
-**What is happening:**
+If all consonants are revealed and you land on Bankrupt, you are stuck. Spinning does nothing since no consonants remain, and vowels cost $250 you no longer have. There is no way out.
 
-If you reveal all the consonants in the phrase and then land on Bankrupt, you end up with $0 and no way forward. Spinning does nothing because there are no consonants left to guess. Buying a vowel requires $250. You are completely stuck with no escape.
+**To reproduce:** guess every consonant, land on Bankrupt, then try to buy a vowel or spin. Neither works.
 
-**Steps to reproduce:**
-
-1. Guess every consonant until none are left
-2. Land on Bankrupt (coins drop to $0)
-3. Try to buy a vowel, blocked, need $250
-4. Try to spin, every spin is useless since all consonants are already revealed
-5. The game is stuck with no way out
-
-**The planned fix:**
-
-In `buyVowel()`, check if any consonants are still left in the phrase. If there are none and the player cannot afford a vowel, skip the coin check and give the vowel for free as a soft-lock fallback.
+**Planned fix:** In `buyVowel()`, check if any consonants are left. If there are none and you cannot afford a vowel, give it for free.
 
 ```js
 const consonantsLeft = [...this.phrase].some(
@@ -167,35 +114,16 @@ if (this.coins < this.vowelCost) {
 
 ---
 
-### Bug 7: The Guess Button Has a Brief Window Where It Accepts Free Guesses After Bankrupt
+### Bug 7: Guess Button Briefly Accepts Input After Bankrupt
 
-**What is happening:**
+When Bankrupt lands, there is a short window before the UI updates where the Guess button still looks active. A fast click during that window lets a consonant guess go through with no spin on record.
 
-When you land on Bankrupt, `currentSpinValue` gets set to `null` and then `render()` is called to update the UI. On a slow frame or a very fast click, there is a tiny window between those two things where the Guess button still appears enabled. If you click it during that window, a consonant guess goes through with no spin on record.
+**To reproduce:** land on Bankrupt and click the Guess button as fast as possible before the message renders.
 
-**Steps to reproduce:**
-
-1. Spin and land on Bankrupt
-2. Click the Guess consonant button as fast as possible before the UI updates
-3. A consonant guess registers even though you have no active spin
-
-**The planned fix:**
-
-Update the render logic so the Guess button is disabled any time `currentSpinValue` is null OR the puzzle is already solved. Right now it only checks for the spin value.
+**Planned fix:** The render logic should also check `this.solved` before enabling the button, not just the spin value.
 
 ```js
-// before
-consonantButton.disabled = !this.currentSpinValue;
-consonantButton.style.opacity = this.currentSpinValue ? "1" : "0.55";
-
-// after
 const canGuess = !!this.currentSpinValue && !this.solved;
 consonantButton.disabled = !canGuess;
 consonantButton.style.opacity = canGuess ? "1" : "0.55";
 ```
-
----
-
-## Wrap Up
-
-Most of these bugs came down to the same root cause: functions that could be called more than once without any protection. Adding simple guard conditions at the top of the relevant methods fixed most of them. The two remaining bugs are understood and have clear solutions written out, they just have not been merged into the codebase yet.
