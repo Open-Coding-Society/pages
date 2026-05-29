@@ -53,5 +53,6 @@ systems/student-management-groups
 systems/ai-ab-engine
 systems/auto-generator
 systems/auto-generator-ui
+systems/scraper
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===
