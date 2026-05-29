@@ -49,7 +49,7 @@ class MansionLevel1 {
             SCALE_FACTOR: MC_SCALE_FACTOR,
             STEP_FACTOR: 800,
             ANIMATION_RATE: 10,
-            INIT_POSITION: { x: this.playerStartPosition.x, y: this.playerStartPosition.y },
+            INIT_POSITION: { x: 50, y: height - (height / MC_SCALE_FACTOR)},
             pixels: {height: 2400, width: 3600},
             orientation: {rows: 2, columns: 3},
             down: {row: 1, start: 0, columns: 3},
@@ -62,10 +62,10 @@ class MansionLevel1 {
             upRight: {row: 1, start: 0, columns: 3, rotate: -Math.PI/16},
             hitbox: { widthPercentage: 0.45, heightPercentage: 0.2 },
             keypress: { 
-                up: 87,    
-                left: 65,  
-                down: 83,  
-                right: 68  
+                up: 87,    // W key
+                left: 65,  // A key
+                down: 83,  // S key
+                right: 68  // D key
             }
         };
 
@@ -92,24 +92,21 @@ class MansionLevel1 {
         const mummyData = {
             id: "Temple Mummy",
             greeting: "Bring me the offerings and I will reveal the tomb key.",
-            src: path + "/images/projects/mansionGame/mummy-boi.png",
+            src: path + "/images/projects/mansionGame/sphinxclear.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 0,
-            // Enable a simple looping animation (frames laid out left-to-right)
-            ANIMATION_RATE: 8,
+            ANIMATION_RATE: 0,
             INIT_POSITION: { x: width * 0.73, y: height * 0.42 },
             pixels: { height: 545, width: 506 },
-            // Assume the mummy sprite sheet has multiple frames in a single row
-            orientation: { rows: 1, columns: 4 },
-            // Define directional frame ranges that loop left->right across the sheet
-            down: { row: 0, start: 0, columns: 4 },
-            up: { row: 0, start: 0, columns: 4 },
-            left: { row: 0, start: 0, columns: 4 },
-            right: { row: 0, start: 0, columns: 4 },
-            downLeft: { row: 0, start: 0, columns: 4 },
-            downRight: { row: 0, start: 0, columns: 4 },
-            upLeft: { row: 0, start: 0, columns: 4 },
-            upRight: { row: 0, start: 0, columns: 4 },
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            up: { row: 0, start: 0, columns: 1 },
+            left: { row: 0, start: 0, columns: 1 },
+            right: { row: 0, start: 0, columns: 1 },
+            downLeft: { row: 0, start: 0, columns: 1 },
+            downRight: { row: 0, start: 0, columns: 1 },
+            upLeft: { row: 0, start: 0, columns: 1 },
+            upRight: { row: 0, start: 0, columns: 1 },
             hitbox: { widthPercentage: 0.4, heightPercentage: 0.75 },
             keypress: {},
             interact: function() {
@@ -117,7 +114,6 @@ class MansionLevel1 {
             }
         };
 
-        // UPDATED: Spider setup has no interaction greeting or E-key binds now
         const spiderEnemyData = {
             id: "Tomb Spider",
             greeting: "", 
@@ -219,32 +215,74 @@ class MansionLevel1 {
         this.spiderEnemy = gameObjects.find((object) => object?.spriteData?.id === "Tomb Spider");
         this.playerInstance = gameObjects.find((object) => object instanceof Player);
 
+
         this.showIntroDialogue();
         this.startTimer(); 
-        this.startCollisionTracking(); // Kicks off the dynamic touch loop
+        this.startCollisionTracking(); 
+        this.startFlashlightTracking(); 
     }
 
-    // NEW: Background looping thread to calculate distance collisions continuously
+    startFlashlightTracking() {
+        this.stopFlashlightTracking();
+        
+        this.flashlightOverlay = document.createElement("div");
+        Object.assign(this.flashlightOverlay.style, {
+            position: "fixed",
+            top: "0",
+            left: "0",
+            width: "100vw",
+            height: "100vh",
+            pointerEvents: "none",
+            zIndex: "900", 
+            background: "rgba(8, 5, 2, 0.95)"
+        });
+        document.body.appendChild(this.flashlightOverlay);
+
+        this.flashlightInterval = window.setInterval(() => {
+            if (this.flashlightOverlay && this.playerInstance) {
+                
+                let centerX = Number(this.playerInstance.x) + 100; 
+                let centerY = Number(this.playerInstance.y) + 100;
+                
+                if (this.playerInstance.canvas) {
+                    const rect = this.playerInstance.canvas.getBoundingClientRect();
+                    centerX = rect.left + (rect.width / 2);
+                    centerY = rect.top + (rect.height / 2);
+                }
+                
+                this.flashlightOverlay.style.background = `radial-gradient(circle 220px at ${centerX}px ${centerY}px, transparent 10%, rgba(8, 5, 2, 0.95) 80%)`;
+            }
+        }, 16); 
+    }
+
+    stopFlashlightTracking() {
+        if (this.flashlightInterval) {
+            window.clearInterval(this.flashlightInterval);
+            this.flashlightInterval = null;
+        }
+        if (this.flashlightOverlay?.parentNode) {
+            this.flashlightOverlay.parentNode.removeChild(this.flashlightOverlay);
+        }
+        this.flashlightOverlay = null;
+    }
+
     startCollisionTracking() {
         this.stopCollisionTracking();
         
         this.collisionInterval = window.setInterval(() => {
             if (!this.playerInstance || !this.spiderEnemy || !this.gameStarted || this.levelState.rewardClaimed) return;
 
-            // Get exact centers/positions of player and spider
             const px = this.playerInstance.x;
             const py = this.playerInstance.y;
             const sx = this.spiderEnemy.x;
             const sy = this.spiderEnemy.y;
 
-            // Use simple bounding circle/distance threshold to verify a touch collision
             const distance = Math.sqrt(Math.pow(px - sx, 2) + Math.pow(py - sy, 2));
             
-            // Adjust 65 to make the hit box tighter or looser depending on asset size
             if (distance < 65) {
                 this.handleHazardCollision();
             }
-        }, 100); // Checks 10 times a second for lightning-fast detection
+        }, 100); 
     }
 
     stopCollisionTracking() {
@@ -302,7 +340,6 @@ class MansionLevel1 {
             marginBottom: "4px"
         });
 
-
         this.timerDisplay = document.createElement("div");
         Object.assign(this.timerDisplay.style, {
             fontSize: "15px",
@@ -310,7 +347,6 @@ class MansionLevel1 {
             color: "#ff7070",
             marginBottom: "10px"
         });
-
 
         this.itemsDisplay = document.createElement("div");
         this.statusDisplay = document.createElement("div");
@@ -386,6 +422,8 @@ class MansionLevel1 {
 
     handleTimeOut() {
         this.stopCollisionTracking();
+        this.stopFlashlightTracking();
+        
         if (this.bgMusic) {
             this.bgMusic.pause();
         }
@@ -432,7 +470,7 @@ class MansionLevel1 {
 
 
         introDialogue.showDialogue(
-            "Search the tomb for three offerings. Bring them to the mummy to earn the key. Beware of the crawling tomb spiders!",
+            "Search the tomb for three offerings. Bring them to the mummy to earn the key.",
             "Explorer",
             this.gameEnv.path + "/images/projects/mansionGame/sphinxclear.png"
         );
@@ -445,7 +483,6 @@ class MansionLevel1 {
                 action: () => {
                     introDialogue.closeDialogue();
                     this.startTimer();
-                    
                     this.gameStarted = true; 
 
                     if (this.bgMusic) {
@@ -522,6 +559,7 @@ class MansionLevel1 {
 
         this.stopTimer();
         this.stopCollisionTracking();
+        this.stopFlashlightTracking();
         this.levelState.rewardClaimed = true;
         this.unlockNextLevel();
         this.refreshUserInterface("All offerings delivered. The mummy reveals the key.");
@@ -575,6 +613,7 @@ class MansionLevel1 {
 
     returnToLobby() {
         this.stopCollisionTracking();
+        this.stopFlashlightTracking();
         if (this.bgMusic) {
             this.bgMusic.pause();
             this.bgMusic.currentTime = 0;
@@ -703,6 +742,7 @@ class MansionLevel1 {
     destroy() {
         this.stopTimer();
         this.stopCollisionTracking();
+        this.stopFlashlightTracking();
 
         if (this.bgMusic) {
             this.bgMusic.pause();
