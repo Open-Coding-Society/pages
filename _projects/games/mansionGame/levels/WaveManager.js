@@ -12,15 +12,10 @@ class WaveEnemy extends Character {
         this._facingRight = true;
     }
 
-    update() {
+    update(player = null) {
         if (this._isDestroyed) return;
 
-        const players = this.gameEnv.gameObjects.filter(obj =>
-            obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer'
-        );
-
-        if (players.length > 0) {
-            const player = players[0];
+        if (player) {
             const dx = player.position.x - this.position.x;
             const dy = player.position.y - this.position.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -97,6 +92,8 @@ class WaveManager {
         this.attackCooldown = 1000; // 1s between shots
 
         this.waveDisplay = null;
+        this.lastDisplayedWave = -1;
+        this.lastDisplayedEnemyCount = -1;
     }
 
     startFirstWave() {
@@ -208,6 +205,9 @@ class WaveManager {
 
         // Always update projectiles and check collisions during waves
         if (this.waveActive) {
+            // Update enemies with cached player reference
+            this.waveEnemies.forEach(enemy => enemy.update(this.player));
+
             // Update and cull dead projectiles
             this.projectiles = this.projectiles.filter(p => !p.revComplete);
             this.projectiles.forEach(p => p.update());
@@ -492,11 +492,19 @@ class WaveManager {
         }
 
         const waveIndex = Math.min(this.currentWave, this.waves.length - 1);
-        const wave      = this.waves[waveIndex];
-        this.waveDisplay.innerHTML = `
-            <div>Wave ${Math.min(this.currentWave + 1, this.waves.length)}/${this.waves.length}</div>
-            <div>Enemies remaining: ${this.waveEnemies.length}/${wave.count}</div>
-        `;
+        const wave = this.waves[waveIndex];
+        const currentEnemyCount = this.waveEnemies.length;
+        const displayWave = Math.min(this.currentWave + 1, this.waves.length);
+
+        // Only update DOM if values changed
+        if (this.lastDisplayedWave !== displayWave || this.lastDisplayedEnemyCount !== currentEnemyCount) {
+            this.waveDisplay.innerHTML = `
+                <div>Wave ${displayWave}/${this.waves.length}</div>
+                <div>Enemies remaining: ${currentEnemyCount}/${wave.count}</div>
+            `;
+            this.lastDisplayedWave = displayWave;
+            this.lastDisplayedEnemyCount = currentEnemyCount;
+        }
     }
 
     isComplete() {
