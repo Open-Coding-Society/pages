@@ -237,24 +237,38 @@ export class GameExecutor {
       const selectedVersion = this.engineVersionSelect ? this.engineVersionSelect.value : 'GameEnginev1';
 
       code = code.replace(/GameEnginev1(?:\.1)?/g, selectedVersion);
-      code = code.replace(/from\s+['"]([^'"]+)['"]/g, (match, importPath) => {
-        // Keep import-map aliases, relative paths, and explicit schemes untouched.
-        if (
-          importPath.startsWith('@') ||
-          importPath.startsWith('./') ||
-          importPath.startsWith('../') ||
-          /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(importPath)
-        ) {
-          return match;
+
+      // Blob modules cannot resolve relative specifiers (./, ../) correctly,
+      // so normalize all import specifiers to absolute URLs before execution.
+      const moduleBase = `${baseUrl}/assets/js/${selectedVersion}/`;
+      const normalizeImportPath = (importPath) => {
+        if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(importPath)) {
+          return importPath;
+        }
+
+        if (importPath.startsWith('@')) {
+          return importPath;
         }
 
         if (importPath.startsWith('/')) {
-          return `from '${baseUrl}${importPath}'`;
-        } else if (!importPath.startsWith('http://') && !importPath.startsWith('https://')) {
-          return `from '${baseUrl}/${importPath}'`;
+          return `${baseUrl}${importPath}`;
         }
 
-        return `from '${baseUrl}/${importPath}'`;
+        if (importPath.startsWith('./') || importPath.startsWith('../')) {
+          return new URL(importPath, moduleBase).href;
+        }
+
+        return `${baseUrl}/${importPath}`;
+      };
+
+      code = code.replace(/from\s+(['"])([^'"]+)\1/g, (match, quote, importPath) => {
+        const normalizedPath = normalizeImportPath(importPath);
+        return `from ${quote}${normalizedPath}${quote}`;
+      });
+
+      code = code.replace(/import\s*\(\s*(['"])([^'"]+)\1\s*\)/g, (match, quote, importPath) => {
+        const normalizedPath = normalizeImportPath(importPath);
+        return `import(${quote}${normalizedPath}${quote})`;
       });
 
       const GameModule = await import(baseUrl + '/assets/js/' + selectedVersion + '/essentials/Game.js');

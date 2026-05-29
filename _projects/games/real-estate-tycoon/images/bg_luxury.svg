@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#006064"/>
+      <stop offset="100%" stop-color="#00838F"/>
+    </linearGradient>
+    <linearGradient id="sky4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF8F00"/>
+      <stop offset="40%" stop-color="#FF6F00"/>
+      <stop offset="80%" stop-color="#E65100"/>
+      <stop offset="100%" stop-color="#4E342E"/>
+    </linearGradient>
+    <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F9A825"/>
+      <stop offset="100%" stop-color="#F57F17"/>
+    </linearGradient>
+  </defs>
+  <!-- Sunset sky -->
+  <rect width="1200" height="600" fill="url(#sky4)"/>
+  <!-- Sun on horizon -->
+  <circle cx="600" cy="380" r="70" fill="#FFF176" opacity="0.9"/>
+  <!-- Sun reflection -->
+  <ellipse cx="600" cy="430" rx="30" ry="120" fill="#FFF176" opacity="0.3"/>
+  <!-- Horizon clouds -->
+  <g fill="#FF8F00" opacity="0.4">
+    <ellipse cx="150" cy="200" rx="100" ry="35"/>
+    <ellipse cx="400" cy="180" rx="130" ry="40"/>
+    <ellipse cx="900" cy="190" rx="110" ry="38"/>
+    <ellipse cx="1100" cy="210" rx="80" ry="30"/>
+  </g>
+  <!-- Ocean -->
+  <rect x="0" y="380" width="1200" height="220" fill="url(#ocean)"/>
+  <!-- Ocean waves -->
+  <g fill="none" stroke="#00BCD4" stroke-width="2" opacity="0.4">
+    <path d="M 0 410 Q 150 400 300 410 Q 450 420 600 410 Q 750 400 900 410 Q 1050 420 1200 410"/>
+    <path d="M 0 430 Q 120 422 240 430 Q 360 438 480 430 Q 600 422 720 430 Q 840 438 960 430 Q 1080 422 1200 430"/>
+    <path d="M 0 455 Q 160 447 320 455 Q 480 463 640 455 Q 800 447 960 455 Q 1080 463 1200 455"/>
+  </g>
+  <!-- Beach/sand -->
+  <ellipse cx="600" cy="490" rx="700" ry="80" fill="url(#sand)" opacity="0.9"/>
+  <!-- Ground -->
+  <rect x="0" y="500" width="1200" height="100" fill="#3E2723"/>
+  <!-- Path/walkway -->
+  <rect x="0" y="490" width="1200" height="12" fill="#E0E0E0" opacity="0.8"/>
+  <!-- Palm trees -->
+  <g>
+    <rect x="80" y="300" width="16" height="180" fill="#5D4037" rx="6"/>
+    <ellipse cx="88" cy="295" rx="50" ry="28" fill="#2E7D32" transform="rotate(-15 88 295)"/>
+    <ellipse cx="75" cy="288" rx="50" ry="22" fill="#388E3C" transform="rotate(10 75 288)"/>
+    <ellipse cx="105" cy="280" rx="50" ry="22" fill="#2E7D32" transform="rotate(-20 105 280)"/>
+    <!-- Coconuts -->
+    <circle cx="88" cy="302" r="8" fill="#6D4C41"/>
+    <circle cx="76" cy="296" r="7" fill="#5D4037"/>
+
+    <rect x="1100" y="310" width="16" height="170" fill="#5D4037" rx="6"/>
+    <ellipse cx="1108" cy="305" rx="50" ry="28" fill="#1B5E20" transform="rotate(20 1108 305)"/>
+    <ellipse cx="1090" cy="296" rx="50" ry="22" fill="#2E7D32" transform="rotate(-10 1090 296)"/>
+    <ellipse cx="1122" cy="290" rx="50" ry="22" fill="#388E3C" transform="rotate(15 1122 290)"/>
+    <circle cx="1108" cy="312" r="8" fill="#6D4C41"/>
+    <circle cx="1120" cy="305" r="7" fill="#5D4037"/>
+
+    <rect x="300" y="340" width="14" height="150" fill="#5D4037" rx="5"/>
+    <ellipse cx="307" cy="335" rx="40" ry="24" fill="#388E3C" transform="rotate(-10 307 335)"/>
+    <ellipse cx="292" cy="328" rx="40" ry="20" fill="#2E7D32" transform="rotate(15 292 328)"/>
+
+    <rect x="880" y="330" width="14" height="160" fill="#5D4037" rx="5"/>
+    <ellipse cx="887" cy="325" rx="42" ry="25" fill="#2E7D32" transform="rotate(10 887 325)"/>
+    <ellipse cx="900" cy="318" rx="42" ry="20" fill="#1B5E20" transform="rotate(-15 900 318)"/>
+  </g>
+  <!-- Luxury Villa -->
+  <g>
+    <rect x="370" y="220" width="460" height="260" fill="#ECEFF1"/>
+    <!-- Columns -->
+    <g fill="#B0BEC5">
+      <rect x="385" y="220" width="20" height="260"/>
+      <rect x="435" y="220" width="20" height="260"/>
+      <rect x="545" y="220" width="20" height="260"/>
+      <rect x="645" y="220" width="20" height="260"/>
+      <rect x="755" y="220" width="20" height="260"/>
+      <rect x="805" y="220" width="20" height="260"/>
+    </g>
+    <!-- Roof -->
+    <rect x="365" y="200" width="470" height="30" fill="#546E7A"/>
+    <rect x="355" y="195" width="490" height="12" fill="#455A64"/>
+    <!-- Upper windows -->
+    <g fill="#80DEEA" opacity="0.8">
+      <rect x="395" y="240" width="60" height="50" rx="3"/>
+      <rect x="475" y="240" width="60" height="50" rx="3"/>
+      <rect x="565" y="240" width="60" height="50" rx="3"/>
+      <rect x="665" y="240" width="60" height="50" rx="3"/>
+      <rect x="755" y="240" width="60" height="50" rx="3"/>
+    </g>
+    <!-- Front door (grand) -->
+    <rect x="540" y="350" width="120" height="130" fill="#5D4037" rx="6"/>
+    <ellipse cx="600" cy="352" rx="60" ry="20" fill="#5D4037"/>
+    <rect x="555" y="355" width="15" height="125" fill="#4E342E"/>
+    <rect x="630" y="355" width="15" height="125" fill="#4E342E"/>
+    <!-- Door handles -->
+    <circle cx="577" cy="420" r="6" fill="#ffd700"/>
+    <circle cx="623" cy="420" r="6" fill="#ffd700"/>
+    <!-- Lower windows -->
+    <g fill="#B3E5FC" opacity="0.7">
+      <rect x="395" y="310" width="120" height="80" rx="3"/>
+      <rect x="685" y="310" width="120" height="80" rx="3"/>
+    </g>
+    <!-- Balcony -->
+    <rect x="500" y="300" width="200" height="12" fill="#B0BEC5"/>
+    <g fill="#90A4AE">
+      <rect x="505" y="278" width="6" height="22"/><rect x="520" y="278" width="6" height="22"/>
+      <rect x="535" y="278" width="6" height="22"/><rect x="550" y="278" width="6" height="22"/>
+      <rect x="565" y="278" width="6" height="22"/><rect x="580" y="278" width="6" height="22"/>
+      <rect x="595" y="278" width="6" height="22"/><rect x="610" y="278" width="6" height="22"/>
+      <rect x="625" y="278" width="6" height="22"/><rect x="640" y="278" width="6" height="22"/>
+      <rect x="655" y="278" width="6" height="22"/><rect x="670" y="278" width="6" height="22"/>
+      <rect x="685" y="278" width="6" height="22"/>
+    </g>
+    <!-- Villa name -->
+    <text x="600" y="218" fill="#ffd700" font-size="14" text-anchor="middle" font-family="Arial" font-weight="bold">VICTORIA ESTATES</text>
+    <!-- Pool outline -->
+    <rect x="420" y="475" width="360" height="20" fill="#00ACC1" opacity="0.6" rx="4"/>
+    <text x="600" y="488" fill="white" font-size="10" text-anchor="middle" font-family="Arial">∿ INFINITY POOL ∿</text>
+  </g>
+  <!-- Yacht in ocean -->
+  <g>
+    <ellipse cx="1000" cy="420" rx="80" ry="15" fill="#1565C0" opacity="0.8"/>
+    <rect x="950" y="400" width="100" height="22" fill="#f5f5f5"/>
+    <rect x="1000" y="360" width="4" height="42" fill="#888"/>
+    <polygon points="1004,362 1004,395 1040,390" fill="white" opacity="0.8"/>
+  </g>
+  <!-- Stars (partial visible at top) -->
+  <g fill="white" opacity="0.5">
+    <circle cx="50" cy="30" r="1.5"/><circle cx="180" cy="20" r="1"/>
+    <circle cx="700" cy="15" r="1.5"/><circle cx="1150" cy="25" r="2"/>
+    <circle cx="1000" cy="12" r="1"/><circle cx="450" cy="10" r="1.5"/>
+  </g>
+</svg>
