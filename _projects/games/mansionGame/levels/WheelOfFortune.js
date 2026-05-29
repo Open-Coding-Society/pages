@@ -69,6 +69,11 @@ class WheelOfFortuneGameManager {
 
                         <div id="wheel-puzzle" style="display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 120px; padding: 16px; margin-bottom: 14px; background: #0f2f29; border: 3px solid #58a572; border-radius: 8px;"></div>
 
+                        <div style="background: #211a29; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
+                            <div style="margin-bottom: 6px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #a89bbf;">Used Letters</div>
+                            <div id="wheel-used-letters" style="display: flex; flex-wrap: wrap; gap: 5px;"></div>
+                        </div>
+
                         <div id="wheel-message" style="min-height: 44px; margin-bottom: 14px; color: #f2d98b; font-size: 16px; line-height: 1.4;"></div>
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
@@ -96,6 +101,7 @@ class WheelOfFortuneGameManager {
                                 <button id="wheel-solve-btn" style="padding: 12px 18px; border: 0; border-radius: 6px; background: #58a572; color: #06120b; font-weight: 900; cursor: pointer;">Solve</button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -288,6 +294,28 @@ class WheelOfFortuneGameManager {
         const consonantButton = this.overlay.querySelector("#wheel-consonant-btn");
         consonantButton.disabled = !this.currentSpinValue;
         consonantButton.style.opacity = this.currentSpinValue ? "1" : "0.55";
+
+        const usedLettersContainer = this.overlay.querySelector("#wheel-used-letters");
+        usedLettersContainer.innerHTML = "";
+        for (const letter of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+            const chip = document.createElement("span");
+            chip.textContent = letter;
+            const isVowel = /[AEIOU]/.test(letter);
+            const wasGuessed = this.guessedLetters.has(letter);
+            const isInPhrase = [...this.phrase].includes(letter);
+
+            let bg, color, border;
+            if (!wasGuessed) {
+                bg = "#2e2740"; color = "#7a6f8a"; border = "1px solid #3e3554";
+            } else if (isInPhrase) {
+                bg = isVowel ? "#4a2b7a" : "#1a4a6a"; color = "#e8d5ff"; border = `1px solid ${isVowel ? "#8c63c7" : "#5387d6"}`;
+            } else {
+                bg = "#3a1a1a"; color = "#7a4444"; border = "1px solid #5a2a2a";
+            }
+
+            chip.style.cssText = `display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;border-radius:4px;font-size:13px;font-weight:700;background:${bg};color:${color};border:${border};`;
+            usedLettersContainer.appendChild(chip);
+        }
     }
 
     setMessage(message) {
