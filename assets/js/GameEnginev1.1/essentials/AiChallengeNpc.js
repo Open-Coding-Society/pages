@@ -37,7 +37,7 @@
 
 import AiNpc from './AiNpc.js';
 import DialogueSystem from './DialogueSystem.js';
-import { pythonURI, fetchOptions } from '../../api/config.js';
+import { pythonURI, javaURI, fetchOptions } from '../../api/config.js';
 
 // ── Shared error codes ────────────────────────────────────────────────────────
 
@@ -183,7 +183,48 @@ class AiChallengeNpc extends AiNpc {
       feedback: feedbackText || 'Review the topic and try again with a more specific answer.',
     };
   }
+  static async uploadScreenshotToSpring(file) {
+    const url = `${javaURI}/api/make/upload`;
 
+    // Try to resolve current user profile from Spring so we can attach username/github
+    let username = null;
+    let github = null;
+    try {
+      const profileRes = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+      if (profileRes.ok) {
+        const profile = await profileRes.json().catch(() => null) || {};
+        username = profile.uid || profile.username || profile.name || null;
+        github = profile.github || profile.githubUsername || profile.github_username || null;
+      }
+    } catch (e) {
+      console.debug('[AiChallengeNpc] could not fetch user profile', e);
+    }
+
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    if (username) formData.append('username', username);
+    if (github) formData.append('github', github);
+
+    const headers = { ...(fetchOptions.headers || {}) };
+    if (headers['Content-Type']) {
+      delete headers['Content-Type'];
+    }
+
+    const options = {
+      ...fetchOptions,
+      method: 'POST',
+      headers,
+      body: formData,
+    };
+
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      const message = await response.text().catch(() => response.statusText || 'Upload failed');
+      throw new Error(`HTTP ${response.status}: ${message}`);
+    }
+
+    return await response.text();
+  }
   // ── DOM helpers ─────────────────────────────────────────────────────────────
 
   /**
@@ -197,9 +238,12 @@ class AiChallengeNpc extends AiNpc {
    *
    * @param {Object} npc - Live NPC game object.
    */
-  static showInteraction(npc) {
+  static showInteraction(npc, options = {}) {
     const data = npc?.spriteData;
     if (!data) return;
+    const statusMessage = options?.statusMessage !== undefined
+      ? options.statusMessage
+      : 'Generating challenge question…';
 
     // Close any already-open dialogue for this NPC.
     if (npc.dialogueSystem?.isDialogueOpen()) {
@@ -221,7 +265,7 @@ class AiChallengeNpc extends AiNpc {
 
     // Show the dialogue box using the NPC name / avatar but with a fixed
     // challenge-mode title rather than cycling through the dialogues array.
-    npc.dialogueSystem?.showRandomDialogue(data.id, data.src, data);
+    npc.dialogueSystem?.showRandomDialogue(data.id, null, data);
 
     // Build the shared AiNpc chat UI shell (input + response area).
     const ui = AiNpc.createChatUI(data);
@@ -246,9 +290,130 @@ class AiChallengeNpc extends AiNpc {
       ui.responseArea.style.padding = '8px';
       ui.responseArea.style.position = 'relative';
       AiChallengeNpc.ensureModeLabel(ui.container, 'Challenge Question');
+      // Add a small purple help button in the corner only for The SDLC Master desk.
+      try {
+        if (data?.id === 'The SDLC Master') {
+          ui.container.style.position = ui.container.style.position || 'relative';
+          if (!ui.container.querySelector('.ai-challenge-help-btn')) {
+            const helpBtn = document.createElement('button');
+            helpBtn.className = 'ai-challenge-help-btn';
+            helpBtn.type = 'button';
+            helpBtn.title = 'Quick make checker';
+            helpBtn.textContent = 'Run checker';
+            helpBtn.style.position = 'absolute';
+            helpBtn.style.top = '8px';
+            helpBtn.style.right = '8px';
+            helpBtn.style.background = '#000000';
+            helpBtn.style.color = '#ffffff';
+            helpBtn.style.border = '1px solid rgba(255,255,255,0.14)';
+            helpBtn.style.padding = '10px 14px';
+            helpBtn.style.borderRadius = '8px';
+            helpBtn.style.cursor = 'pointer';
+            helpBtn.style.fontWeight = '700';
+            helpBtn.style.fontSize = '14px';
+            helpBtn.style.minWidth = '120px';
+            helpBtn.style.minHeight = '40px';
+            helpBtn.style.zIndex = '10002';
+
+            const infoBox = document.createElement('div');
+            infoBox.className = 'ai-challenge-help-info';
+            infoBox.style.display = 'none';
+            infoBox.style.position = 'absolute';
+            infoBox.style.top = '50px';
+            infoBox.style.right = '8px';
+            infoBox.style.background = 'rgba(8, 4, 4, 0.98)';
+            infoBox.style.color = '#111';
+            infoBox.style.padding = '12px 14px';
+            infoBox.style.borderRadius = '8px';
+            infoBox.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+            infoBox.style.maxWidth = '360px';
+            infoBox.style.fontSize = '13px';
+            infoBox.innerHTML = 'to start, run a quick make checker by typing this command in your terminal: <code>make-debug/analyze.py</code>. *make sure that you have flask running in the back';
+
+            helpBtn.onclick = (ev) => {
+              ev.stopPropagation();
+              if (infoBox.style.display === 'none') {
+                infoBox.style.display = 'block'; 
+              } else {
+                infoBox.style.display = 'none';
+              }
+            };
+
+            ui.container.appendChild(helpBtn);
+            ui.container.appendChild(infoBox);
+
+            // Add a small inline screenshot button next to the challenge label (sibling, not inside label)
+            try {
+              const label = ui.container.querySelector('.ai-challenge-mode-label');
+              if (label && !ui.container.querySelector('.ai-challenge-screenshot-btn-inline')) {
+                const inlineBtn = document.createElement('button');
+                inlineBtn.className = 'ai-challenge-screenshot-btn-inline';
+                inlineBtn.type = 'button';
+                inlineBtn.textContent = 'Submit screenshot';
+                // Hover tooltip as requested
+                inlineBtn.title = 'use this to submit your make working. make sure to include the make message';
+                inlineBtn.style.marginLeft = '8px';
+                inlineBtn.style.padding = '6px 10px';
+                inlineBtn.style.borderRadius = '6px';
+                inlineBtn.style.border = '1px solid rgba(255,255,255,0.12)';
+                inlineBtn.style.background = '#4f46e5';
+                inlineBtn.style.color = '#fff';
+                inlineBtn.style.cursor = 'pointer';
+                inlineBtn.style.fontSize = '12px';
+                inlineBtn.style.fontWeight = '600';
+
+                const fileInputInline = document.createElement('input');
+                fileInputInline.type = 'file';
+                fileInputInline.accept = 'image/png,image/jpeg,image/jpg,image/webp';
+                fileInputInline.style.display = 'none';
+
+                const statusNodeInline = document.createElement('span');
+                statusNodeInline.className = 'ai-challenge-screenshot-inline-status';
+                statusNodeInline.style.marginLeft = '8px';
+                statusNodeInline.style.fontSize = '12px';
+                statusNodeInline.style.color = '#ddd';
+
+                inlineBtn.onclick = (ev) => {
+                  ev.stopPropagation();
+                  fileInputInline.click();
+                };
+
+                fileInputInline.addEventListener('change', async () => {
+                  const file = fileInputInline.files?.[0];
+                  if (!file) return;
+                  statusNodeInline.textContent = 'Uploading...';
+                  try {
+                    const result = await AiChallengeNpc.uploadScreenshotToSpring(file);
+                    statusNodeInline.textContent = 'Uploaded';
+                    console.info('[AiChallengeNpc] screenshot upload response:', result);
+                  } catch (err) {
+                    statusNodeInline.textContent = 'Upload failed';
+                    console.warn('[AiChallengeNpc] upload failed', err);
+                  } finally {
+                    fileInputInline.value = '';
+                  }
+                });
+
+                // insert inline button after the label element
+                if (label.parentNode) {
+                  label.parentNode.insertBefore(inlineBtn, label.nextSibling);
+                  label.parentNode.insertBefore(fileInputInline, inlineBtn.nextSibling);
+                  label.parentNode.insertBefore(statusNodeInline, fileInputInline.nextSibling);
+                }
+              }
+            } catch (e) {
+              console.debug('[AiChallengeNpc] could not add inline upload button', e);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[AiChallengeNpc] failed to add help button', e);
+      }
       AiChallengeNpc.ensureJumpToLatestButton(ui.responseArea);
       AiChallengeNpc.renderChatHistory(ui.responseArea, data?.chatHistory || []);
-      AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', 'Generating challenge question…');
+      if (statusMessage) {
+        AiChallengeNpc.appendChatMessage(ui.responseArea, 'ai', statusMessage);
+      }
     }
 
     AiNpc.attachToDialogue(npc.dialogueSystem, ui.container);
@@ -321,6 +486,116 @@ class AiChallengeNpc extends AiNpc {
     }
   }
 
+  /**
+   * Restore an already-issued challenge question after the dialogue is reopened.
+   * This keeps the existing question on screen without generating a new one.
+   */
+  static restoreQuestion(npc, questionText) {
+    if (!AiNpc.isSessionActive(npc?.aiSession)) return;
+
+    const ui = AiChallengeNpc.getUiElements(npc);
+    if (!ui) return;
+
+    if (ui.input) {
+      ui.input.disabled = false;
+      ui.input.placeholder = 'Type your answer to the challenge question...';
+    }
+
+    if (ui.responseArea) {
+      ui.responseArea.style.display = 'block';
+      ui.responseArea.scrollTop = ui.responseArea.scrollHeight;
+      AiChallengeNpc.updateJumpToLatestVisibility(ui.responseArea);
+    }
+  }
+
+  /**
+   * Return the current challenge lock state stored on the live NPC object.
+   */
+  static getChallengeState(npc) {
+    return npc?._aiChallengeState || null;
+  }
+
+  /**
+   * Shared lock registry so pending questions survive object churn.
+   */
+  static getChallengeLocks() {
+    if (!AiChallengeNpc._challengeLocks) {
+      AiChallengeNpc._challengeLocks = new Map();
+    }
+    return AiChallengeNpc._challengeLocks;
+  }
+
+  /**
+   * Read the current pending challenge question for a desk, if any.
+   */
+  static getPendingChallengeQuestion(deskId = '') {
+    const key = (deskId || '').toString().trim();
+    if (!key) return '';
+    return (AiChallengeNpc.getChallengeLocks().get(key) || '').toString().trim();
+  }
+
+  /**
+   * Set or clear the pending challenge question lock for a desk.
+   */
+  static setPendingChallengeQuestion(deskId = '', questionText = '') {
+    const key = (deskId || '').toString().trim();
+    if (!key) return;
+
+    const value = (questionText || '').toString().trim();
+    const locks = AiChallengeNpc.getChallengeLocks();
+    if (!value) {
+      locks.delete(key);
+      return;
+    }
+    locks.set(key, value);
+  }
+
+  /**
+   * True when the NPC has an issued challenge question that has not been answered yet.
+   */
+  static hasPendingChallenge(npc, deskId = '') {
+    const lockedQuestion = AiChallengeNpc.getPendingChallengeQuestion(deskId);
+    if (lockedQuestion) return true;
+
+    const state = AiChallengeNpc.getChallengeState(npc);
+    if (!state?.question || state?.answeredAt) return false;
+    if (!deskId) return true;
+    return state.deskId === deskId;
+  }
+
+  /**
+   * Lock a freshly-issued challenge question on the NPC until a player submits an answer.
+   */
+  static setPendingChallenge(npc, deskId, questionText) {
+    if (!npc || !questionText) return;
+
+    AiChallengeNpc.setPendingChallengeQuestion(deskId, questionText);
+
+    npc._aiChallengeState = {
+      deskId: deskId || npc?.spriteData?.id || 'desk',
+      question: String(questionText),
+      issuedAt: Date.now(),
+      answeredAt: null,
+      lastAnswer: '',
+    };
+  }
+
+  /**
+   * Mark the current locked challenge as answered so reopening can generate a new one.
+   */
+  static markChallengeAnswered(npc, answerText = '') {
+    const state = AiChallengeNpc.getChallengeState(npc);
+    if (!npc || !state?.question || state?.answeredAt) return;
+
+    AiChallengeNpc.setPendingChallengeQuestion(state.deskId, '');
+
+    npc._aiChallengeState = {
+      ...state,
+      answeredAt: Date.now(),
+      lastAnswer: (answerText || '').toString(),
+    };
+  }
+
   // ── Answer submission ───────────────────────────────────────────────────────
 
   /**
@@ -343,6 +618,7 @@ class AiChallengeNpc extends AiNpc {
       deskId,
       question: challengeQuestion,
       startedAt: Date.now(),
+      status: 'pending',
     });
 
     ui.input.value = '';

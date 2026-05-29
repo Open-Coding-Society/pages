@@ -64,6 +64,9 @@ class Npc extends Character {
         if (players.length === 0 && this.isInteracting) {
             this.isInteracting = false;
         }
+        if (players.length === 0 && this._quizRetryPending) {
+            this._quizRetryPending = false;
+        }
     }
 
     /**
@@ -220,7 +223,13 @@ class Npc extends Character {
         if (this.gameEnv && this.gameEnv.gameControl) {
             this.gameEnv.gameControl.unregisterInteractionHandler(this);
         }
-        
+
+        // Remove per-NPC dialogue DOM elements from document.body.
+        if (this.dialogueSystem && typeof this.dialogueSystem.destroy === 'function') {
+            try { this.dialogueSystem.destroy(); } catch (_) { /* ignore */ }
+            this.dialogueSystem = null;
+        }
+
         this.removeInteractKeyListeners();
         super.destroy();
     }

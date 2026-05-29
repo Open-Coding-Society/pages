@@ -14,21 +14,15 @@ sticky_rank: 8
   <div style="display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
 
     <div style="flex-shrink: 0; text-align: center;">
-      <img src="/images/capstone/uesl_foundation.svg" alt="UESL Foundation logo" style="width: 110px; height: 110px; display: block; margin-bottom: 0.6rem;">
-      <div style="background: rgba(124,58,237,0.25); border: 1px solid rgba(124,58,237,0.5); border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.7rem; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Active 501(c)(3)</div>
+      <img src="/images/capstone/uesl_foundation.svg" alt="UESL Foundation logo" style="width: 110px; height: 110px; display: block;">
     </div>
 
     <div style="flex: 1; min-width: 240px;">
       <div style="display: inline-block; background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4); border-radius: 9999px; padding: 0.2rem 0.9rem; font-size: 0.7rem; color: #a78bfa; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.6rem;">CSP Capstone Project</div>
-      <h2 style="color: #f5f3ff; font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">Building for UESL Foundation</h2>
+      <h2 style="color: #f5f3ff; font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem;">UESL Foundation Platform</h2>
       <p style="color: #a78bfa; margin: 0 0 0.75rem; font-size: 0.9rem;">Sathwik Kintada &nbsp;·&nbsp; Rudra B Joshi &nbsp;·&nbsp; Darshan</p>
-      <p style="color: #c4b5fd; font-size: 0.9rem; line-height: 1.6; margin: 0 0 1rem;">We partnered with the Unified Esports League Foundation — a 501(c)(3) nonprofit serving individuals with intellectual and developmental disabilities — to build an integrated digital platform that extends their mission beyond in-person programming across San Diego and Imperial Counties.</p>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 1rem;">
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Serves San Diego &amp; Imperial Counties year-round</div>
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Career &amp; college pathways in STEM and gaming</div>
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Gaming arenas open independent of school calendars</div>
-        <div style="color: #ddd6fe; font-size: 0.8rem;">Spanish-language programming for broader access</div>
-      </div>
+      <p style="color: #c4b5fd; font-size: 0.9rem; line-height: 1.6; margin: 0 0 1rem;">A working prototype built for UESL Foundation — a nonprofit supporting individuals with intellectual and developmental disabilities through esports and STEM. The platform consists of three live components: an AI chatbot, an accessible game engine, and a social hub, all backed by a shared user management system.</p>
+      <a href="https://ueslhub.opencodingsociety.com" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; font-size: 0.78rem; font-weight: 700; padding: 0.35rem 1rem; border-radius: 9999px; text-decoration: none;">View Live Platform ↗</a>
     </div>
 
   </div>
@@ -73,8 +67,11 @@ sticky_rank: 8
     </div>
   </div>
 
+  <!-- Dropdowns Row -->
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+
   <!-- Extended Info Dropdown -->
-  <details style="margin-bottom: 2rem;">
+  <details style="flex: 1; min-width: 200px;">
     <summary style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4); border-radius: 9999px; padding: 0.65rem 2rem; color: #a78bfa; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.03em; cursor: pointer; list-style: none; width: fit-content; margin: 0 auto;">
       <span>Extended Information</span>
       <span style="font-size: 0.75rem; transition: transform 0.2s;">▼</span>
@@ -87,6 +84,7 @@ sticky_rank: 8
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
           <div style="background: rgba(124,58,237,0.25); border: 1px solid rgba(124,58,237,0.5); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.7rem; color: #a78bfa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Component 01</div>
           <h3 style="color: #f5f3ff; font-size: 1.05rem; font-weight: 700; margin: 0;">UESL Coach — AI Chatbot</h3>
+          <a href="https://ueslhub.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #a78bfa; text-decoration: none; border: 1px solid rgba(124,58,237,0.4); border-radius: 9999px; padding: 0.15rem 0.6rem; white-space: nowrap;">Try it ↗</a>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,100,100,0.2); border-radius: 12px; padding: 1.1rem;">
@@ -102,17 +100,17 @@ sticky_rank: 8
           <div style="background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 1.1rem;">
             <div style="color: #a78bfa; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem;">Our Platform</div>
             <ul style="color: #ddd6fe; font-size: 0.82rem; line-height: 1.75; margin: 0; padding-left: 1.1rem;">
-              <li>Powered by Groq (LLaMA 3.3-70b), pre-loaded with full UESL context</li>
-              <li>Instant answers to program, eligibility, location, and scheduling questions</li>
+              <li><strong>UESLCoach</strong> — in-game AI enemy (Gemini 2.5 Flash) that chases the player and generates live trash-talk taunts every ~4.5 s based on real-time game context</li>
+              <li><strong>AI NPCs</strong> — conversational characters (Gemini 2.5 Flash) with personality templates and full multi-turn conversation history</li>
+              <li><strong>General chat</strong> — Groq LLaMA 3.3-70b pre-loaded with UESL context for instant program, eligibility, and scheduling answers</li>
               <li>Available 24/7 — no staff required for common inquiries</li>
               <li>Bilingual support in English and Spanish</li>
-              <li>Conversational tone designed for IDD participants and their families</li>
             </ul>
           </div>
         </div>
         <div style="background: rgba(124,58,237,0.07); border-left: 3px solid #7c3aed; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin-top: 0.75rem;">
           <span style="color: #a78bfa; font-size: 0.75rem; font-weight: 700;">Why it matters: </span>
-          <span style="color: #c4b5fd; font-size: 0.82rem;">For families navigating IDD services, a 48-hour wait for a basic answer is a barrier that ends participation before it begins. The chatbot removes that barrier entirely.</span>
+          <span style="color: #c4b5fd; font-size: 0.82rem;">Three separate AI models working together: Gemini 2.5 Flash drives in-game characters and the hostile AI coach, while Groq LLaMA 3.3-70b handles low-latency general chat. For families, a 48-hour wait for a basic answer ends participation before it begins — the chatbot removes that barrier entirely.</span>
         </div>
       </div>
 
@@ -121,6 +119,7 @@ sticky_rank: 8
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
           <div style="background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.4); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.7rem; color: #67e8f9; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Component 02</div>
           <h3 style="color: #f5f3ff; font-size: 1.05rem; font-weight: 700; margin: 0;">Accessible Game Engine &amp; Maker</h3>
+          <a href="https://ueslhub.opencodingsociety.com/play/" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #67e8f9; text-decoration: none; border: 1px solid rgba(6,182,212,0.4); border-radius: 9999px; padding: 0.15rem 0.6rem; white-space: nowrap;">Play now ↗</a>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.75rem;">
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,100,100,0.2); border-radius: 12px; padding: 1.1rem;">
@@ -135,10 +134,11 @@ sticky_rank: 8
           <div style="background: rgba(6,182,212,0.06); border: 1px solid rgba(6,182,212,0.25); border-radius: 12px; padding: 1.1rem;">
             <div style="color: #67e8f9; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem;">Our Platform</div>
             <ul style="color: #ddd6fe; font-size: 0.82rem; line-height: 1.75; margin: 0; padding-left: 1.1rem;">
-              <li>Fully playable game engine accessible from any browser</li>
-              <li>Drag-and-drop Game Maker — participants build their own levels</li>
-              <li>8 IDD-specific accessibility modes built into the engine</li>
-              <li>Designed from the ground up for neurodiverse players — not adapted after the fact</li>
+              <li>Fully playable browser game engine — pure ES modules on HTML Canvas, zero external framework</li>
+              <li>Drag-and-drop Game Maker — place platforms, enemies, coins, and goals; save to server by name, re-save overwrites cleanly</li>
+              <li>Community gallery (<code>/api/game/shared</code>) — browse and launch anyone's published game, no login required</li>
+              <li>Per-game top-10 leaderboard (best-score-only enforcement) + live session scoreboard via Socket.IO</li>
+              <li>4 input modes + 8 IDD-specific accessibility settings built into the engine from the ground up</li>
             </ul>
           </div>
         </div>
@@ -166,6 +166,7 @@ sticky_rank: 8
         <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
           <div style="background: rgba(124,58,237,0.25); border: 1px solid rgba(124,58,237,0.5); border-radius: 8px; padding: 0.3rem 0.7rem; font-size: 0.7rem; color: #a78bfa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap;">Component 03</div>
           <h3 style="color: #f5f3ff; font-size: 1.05rem; font-weight: 700; margin: 0;">Community Hub — Social Platform</h3>
+          <a href="https://ueslhub.opencodingsociety.com/" target="_blank" rel="noopener noreferrer" style="font-size: 0.72rem; color: #a78bfa; text-decoration: none; border: 1px solid rgba(124,58,237,0.4); border-radius: 9999px; padding: 0.15rem 0.6rem; white-space: nowrap;">View community ↗</a>
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,100,100,0.2); border-radius: 12px; padding: 1.1rem;">
@@ -181,17 +182,17 @@ sticky_rank: 8
           <div style="background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 1.1rem;">
             <div style="color: #a78bfa; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem;">Our Platform</div>
             <ul style="color: #ddd6fe; font-size: 0.82rem; line-height: 1.75; margin: 0; padding-left: 1.1rem;">
-              <li>Microblog feed — participants post, reply, and react</li>
-              <li>Per-level leaderboards surfaced directly in the social feed</li>
-              <li>Real-time co-op multiplayer rooms via WebSocket</li>
-              <li>Persistent profiles that track game progress and community activity</li>
-              <li>Year-round engagement independent of scheduled sessions</li>
+              <li>Friends system with live online presence via heartbeat (green dot = active in last 5 min)</li>
+              <li>Direct messages with text, emoji, and base64 image attachments</li>
+              <li>2-player co-op multiplayer — WebSocket rooms sync position every frame, relay star/level events in real time</li>
+              <li>Per-game comments (max 500 chars, owner or Admin can delete) and top-10 leaderboards</li>
+              <li>Auth: password + 6-digit SMTP OTP (10-min TTL) or Google OAuth; JWT HS256 cookie with role-based access</li>
             </ul>
           </div>
         </div>
         <div style="background: rgba(124,58,237,0.07); border-left: 3px solid #7c3aed; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; margin-top: 0.75rem;">
           <span style="color: #a78bfa; font-size: 0.75rem; font-weight: 700;">Why it matters: </span>
-          <span style="color: #c4b5fd; font-size: 0.82rem;">Social connection is core to UESL's mission — but currently that connection only exists when participants are physically in the same room. The community hub makes it permanent and distance-independent.</span>
+          <span style="color: #c4b5fd; font-size: 0.82rem;">Social connection is core to UESL's mission — but currently that connection only exists when participants are physically in the same room. Friends, DMs, real-time co-op, and leaderboards make it permanent and distance-independent.</span>
         </div>
       </div>
 
@@ -217,6 +218,85 @@ sticky_rank: 8
     </div>
   </details>
 
+  <!-- Known Bugs Dropdown -->
+  <details style="flex: 1; min-width: 200px;">
+    <summary style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.4); border-radius: 9999px; padding: 0.65rem 2rem; color: #f87171; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.03em; cursor: pointer; list-style: none; width: fit-content; margin: 0 auto;">
+      <span>⚠ Known Bugs (8 open)</span>
+      <span style="font-size: 0.75rem; transition: transform 0.2s;">▼</span>
+    </summary>
+    <div style="margin-top: 1.25rem; border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 1.25rem; background: rgba(239,68,68,0.04);">
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem;">
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Face tracking calibration drift</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Head-movement baseline drifts during long sessions causing unintended inputs; requires manual page reload to reset</p>
+        </div>
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Game Builder mobile scroll</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Touch-scroll vs. tile-place disambiguation broken on small screens — editor misreads scrolls as tile placements</p>
+        </div>
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Voice command false positives</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Ambient noise occasionally triggers jump/move commands while the microphone is open</p>
+        </div>
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Hero counter animation skip</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Counters jump straight to their final value instead of animating up on slow connections</p>
+        </div>
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Iframe embed height clip</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Game Builder iframe clips at viewport widths between 768–900px</p>
+        </div>
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Language selector resets to Hindi</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Google Translate widget doesn't persist user selection — defaults back to Hindi on every page load</p>
+        </div>
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Game Builder splines glitchy</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Spline-based enemy paths behave erratically with tight curves or many control points</p>
+        </div>
+
+        <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.18); border-radius: 10px; padding: 0.875rem 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span style="color: #f5f3ff; font-size: 0.875rem; font-weight: 700;">Character not changeable</span>
+            <span style="background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); border-radius: 9999px; padding: 0.1rem 0.55rem; font-size: 0.68rem; font-weight: 700; white-space: nowrap;">Frontend</span>
+          </div>
+          <p style="color: #94a3b8; font-size: 0.8rem; line-height: 1.55; margin: 0;">Player sprite is locked to one character in the level editor despite the code supporting multiple options</p>
+        </div>
+
+      </div>
+    </div>
+  </details>
+
+  </div><!-- end dropdowns row -->
+
   <!-- Impact Metrics -->
   <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem;">
     <div style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 10px; padding: 1rem; text-align: center;">
@@ -232,8 +312,8 @@ sticky_rank: 8
       <div style="color: #c4b5fd; font-size: 0.72rem; line-height: 1.4; margin-top: 0.3rem;">Days of digital community vs. seasonal sessions</div>
     </div>
     <div style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 10px; padding: 1rem; text-align: center;">
-      <div style="color: #f5f3ff; font-size: 1.1rem; font-weight: 700; line-height: 1.2;">Group Chats</div>
-      <div style="color: #c4b5fd; font-size: 0.72rem; line-height: 1.4; margin-top: 0.3rem;">Users can socialize through group chats</div>
+      <div style="color: #f5f3ff; font-size: 1.1rem; font-weight: 700; line-height: 1.2;">3 AI Models</div>
+      <div style="color: #c4b5fd; font-size: 0.72rem; line-height: 1.4; margin-top: 0.3rem;">Gemini 2.5 Flash (coach + NPCs) · Groq LLaMA 3.3-70b (chat)</div>
     </div>
   </div>
 
@@ -241,5 +321,6 @@ sticky_rank: 8
   <div style="background: rgba(255,255,255,0.04); border-left: 3px solid #7c3aed; border-radius: 0 8px 8px 0; padding: 1rem 1.25rem;">
     <p style="color: #e9d5ff; font-size: 0.9rem; margin: 0; line-height: 1.7;">The three components are one connected system — users onboard through the chatbot, engage through gameplay, and stay through community. Together they remove the ceiling on UESL's impact: no venue limits, no language barriers, no off-season disengagement.</p>
   </div>
+
 
 </div>
