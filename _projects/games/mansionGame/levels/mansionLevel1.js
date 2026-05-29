@@ -114,14 +114,31 @@ class MansionLevel1 {
             }
         };
 
+        // Spider 1: Bottom Right Corner
         const spiderEnemyData = {
-            id: "Tomb Spider",
+            id: "Tomb Spider 1",
             greeting: "", 
             src: path + "/images/projects/mansionGame/spider.png", 
             SCALE_FACTOR: 8,
             STEP_FACTOR: 0,
             ANIMATION_RATE: 0,
             INIT_POSITION: { x: width * 0.85, y: height * 0.75 }, 
+            pixels: { height: 256, width: 256 }, 
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.7, heightPercentage: 0.7 },
+            keypress: {}
+        };
+
+        // NEW: Spider 2: Top Left Corner
+        const spiderTopLeftData = {
+            id: "Tomb Spider 2",
+            greeting: "", 
+            src: path + "/images/projects/mansionGame/spider.png", 
+            SCALE_FACTOR: 8,
+            STEP_FACTOR: 0,
+            ANIMATION_RATE: 0,
+            INIT_POSITION: { x: width * 0.2, y: height * 0.15 }, 
             pixels: { height: 256, width: 256 }, 
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
@@ -166,7 +183,8 @@ class MansionLevel1 {
             { class: Player, data: sprite_data_player },
             ...artifactSprites.map((data) => ({ class: Npc, data })),
             { class: Npc, data: mummyData },
-            { class: Npc, data: spiderEnemyData } 
+            { class: Npc, data: spiderEnemyData },
+            { class: Npc, data: spiderTopLeftData } // Injects Top-Left Spider
         ];
     }
 
@@ -212,7 +230,11 @@ class MansionLevel1 {
             this.mummyNpc.parentLevel = this;
         }
 
-        this.spiderEnemy = gameObjects.find((object) => object?.spriteData?.id === "Tomb Spider");
+        // UPDATED: Finds all gameObjects whose IDs contain the word "Spider"
+        this.spiderEnemies = gameObjects.filter((object) => 
+            object?.spriteData?.id && object.spriteData.id.includes("Spider")
+        );
+        
         this.playerInstance = gameObjects.find((object) => object instanceof Player);
 
 
@@ -266,22 +288,26 @@ class MansionLevel1 {
         this.flashlightOverlay = null;
     }
 
+    // UPDATED: Iterates through the active spiders array dynamically
     startCollisionTracking() {
         this.stopCollisionTracking();
         
         this.collisionInterval = window.setInterval(() => {
-            if (!this.playerInstance || !this.spiderEnemy || !this.gameStarted || this.levelState.rewardClaimed) return;
+            if (!this.playerInstance || !this.spiderEnemies || !this.gameStarted || this.levelState.rewardClaimed) return;
 
             const px = this.playerInstance.x;
             const py = this.playerInstance.y;
-            const sx = this.spiderEnemy.x;
-            const sy = this.spiderEnemy.y;
 
-            const distance = Math.sqrt(Math.pow(px - sx, 2) + Math.pow(py - sy, 2));
-            
-            if (distance < 65) {
-                this.handleHazardCollision();
-            }
+            this.spiderEnemies.forEach((spider) => {
+                const sx = spider.x;
+                const sy = spider.y;
+
+                const distance = Math.sqrt(Math.pow(px - sx, 2) + Math.pow(py - sy, 2));
+                
+                if (distance < 65) {
+                    this.handleHazardCollision();
+                }
+            });
         }, 100); 
     }
 
