@@ -9,13 +9,6 @@
  */
 
 (function() {
-    function buildApiUrl(base, path) {
-        if (base && typeof base === 'string' && base.trim().length > 0) {
-            return `${base}${path}`;
-        }
-        return path;
-    }
-
     // Configuration
     const ENHANCED_CONFIG = {
         eventTrackingEnabled: true,
@@ -270,7 +263,7 @@
         };
         
         try {
-            const response = await fetch(buildApiUrl(window.javaURI, '/api/ocs-analytics/events/batch'), {
+            const response = await fetch(`${window.javaURI}/api/ocs-analytics/events/batch`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -297,7 +290,7 @@
      */
     async function sendLessonCompletion(lessonId, questName, moduleName) {
         try {
-            const response = await fetch(buildApiUrl(window.javaURI, '/api/ocs-analytics/lesson-complete'), {
+            const response = await fetch(`${window.javaURI}/api/ocs-analytics/lesson-complete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -369,8 +362,7 @@
      */
     async function fetchUserUID() {
         try {
-            const identityBase = window.pythonURI || window.javaURI || '';
-            const response = await fetch(buildApiUrl(identityBase, '/api/id'), {
+            const response = await fetch(`${window.pythonURI}/api/id`, {
                 credentials: 'include'
             });
             

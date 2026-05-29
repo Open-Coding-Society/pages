@@ -1,93 +1,42 @@
 ---
 layout: post
-title: Spring Scraper — Systems Project
-description: Frontend runner for the generic Spring scraper API
+title: Scraper System
+description: Hub for scraper lessons and the live JSON runner
 permalink: /scraper/
 ---
 
-## Overview
+<p>
+  <strong>Scraper</strong> ·
+  <a href="{{ '/scraper/' | relative_url }}">Home</a> ·
+  <a href="{{ '/scraper/lesson-music/' | relative_url }}">Lesson 1 — Music</a> ·
+  <a href="{{ '/scraper/lesson-vacation/' | relative_url }}">Lesson 2 — Vacation</a>
+</p>
 
-This `_projects/systems/scraper` project provides a **barebones frontend UI** to call the Spring Boot scraper API at `POST /api/scraper/run`.
+## What this system does
 
-- **Backend**: `ScraperController` in the Spring repo (`/api/scraper/run`, `ScrapeRequest` / `ScrapeResponse`)
-- **Frontend**: Small Jekyll-driven page plus a vanilla JS runner
-- **Auth**: Requires a logged-in user so the JWT cookie is sent with the request
+The Spring scraper API accepts a JSON `ScrapeRequest` and returns scraped items. This project is the **frontend + lessons** for building those JSON files and testing them live.
 
-The UI lives on this docs page and is rendered into the `#scraper-app` container by `assets/js/projects/scraper/scraper.js`.
+| Piece | Location |
+| --- | --- |
+| Backend API | `POST /api/scraper/run` (Spring, port `8585` locally) |
+| Runner UI | Below on this page |
+| Lessons | [Music]({{ '/scraper/lesson-music/' | relative_url }}) · [Vacation]({{ '/scraper/lesson-vacation/' | relative_url }}) |
 
-## Lessons
+## JSON request shape
 
-- [Lesson 1: Music JSON Builder]({{ '/scraper/lessons/music-json/' | relative_url }})
-- [Lesson 2: Vacation JSON Builder]({{ '/scraper/lessons/vacation-json/' | relative_url }})
+Every payload uses the same five sections:
 
-## Using the Scraper UI
+| Key | Purpose |
+| --- | --- |
+| `url` | Start page to scrape |
+| `pagination` | How to follow “next page” links |
+| `itemsSelector` | CSS selector for each repeated item on the page |
+| `fields` | Named outputs (`selector`, `mode`, optional `attr`) |
+| `limits` | `maxPages`, `maxItems`, `maxConcurrency`, `timeoutMs` |
 
-1. **Log in** to the Spring-backed site (so your JWT cookie is present).
-2. Visit this page: `/scraper/`.
-3. In the **Request JSON** box, paste a `ScrapeRequest` payload or click **Load Example**.
-4. Click **Run Scraper**.
-5. The **Response** panel will show the JSON returned by `ScrapeResponse` or an error payload.
+Log in first so your JWT cookie is sent with the request.
 
-The default example uses the books demo:
+## Runner (books example)
 
-```json
-{
-  "url": "https://books.toscrape.com/",
-  "pagination": {
-    "type": "nextLink",
-    "selector": "li.next a",
-    "attr": "href"
-  },
-  "itemsSelector": "article.product_pod",
-  "fields": {
-    "title": { "selector": "h3 a", "mode": "attr", "attr": "title" },
-    "link": { "selector": "h3 a", "mode": "attr", "attr": "href" },
-    "price": { "selector": ".price_color", "mode": "text" },
-    "availability": { "selector": ".instock.availability", "mode": "text" },
-    "ratingClass": { "selector": "p.star-rating", "mode": "attr", "attr": "class" }
-  },
-  "limits": {
-    "maxPages": 3,
-    "maxItems": 60,
-    "maxConcurrency": 6,
-    "timeoutMs": 15000
-  }
-}
-```
-
-## How the Frontend Calls Spring Boot
-
-The runner script uses a simple `fetch` call:
-
-```javascript
-fetch("/api/scraper/run", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  credentials: "include",              // send JWT cookie
-  body: JSON.stringify(scrapeRequest)  // your JSON payload
-});
-```
-
-- **Path**: relative `/api/scraper/run` so it works on localhost and production.
-- **Method**: `POST`.
-- **Body**: A `ScrapeRequest` JSON payload like the example above.
-- **Auth**: `credentials: "include"` ensures the existing JWT cookie is attached.
-
-The backend `SecurityConfig` restricts `/api/scraper/**` to authenticated roles (`ROLE_USER`, `ROLE_STUDENT`, etc.), so you must be logged in for the call to succeed.
-
-## Embedded UI Container
-
-The docs page includes a minimal container that the JS runner mounts into:
-
-<div id="scraper-app"></div>
+<div id="scraper-app" data-template="books"></div>
 <script src="{{ '/assets/js/projects/scraper/scraper.js' | relative_url }}"></script>
-
-Reference snippet:
-
-```html
-<div id="scraper-app"></div>
-<script src="{{ '/assets/js/projects/scraper/scraper.js' | relative_url }}"></script>
-```
-
-The `_projects` build system copies `js/scraper.js` to `assets/js/projects/scraper/scraper.js`, and the `docs` target publishes this page to `_posts/projects/scraper/`.
-
