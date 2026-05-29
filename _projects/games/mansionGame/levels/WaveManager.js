@@ -89,6 +89,7 @@ class WaveManager {
         this.waveStartTime = 0;
         this.npcSpawned = false;
         this._playerDead = false;
+        this.player = null; // Cached player reference
 
         // Projectile system
         this.projectiles = [];
@@ -200,6 +201,11 @@ class WaveManager {
     }
 
     update() {
+        // Cache player reference once per frame
+        this.player = this.gameEnv.gameObjects.find(obj =>
+            obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer'
+        ) || null;
+
         // Always update projectiles and check collisions during waves
         if (this.waveActive) {
             // Update and cull dead projectiles
@@ -278,16 +284,10 @@ class WaveManager {
     }
 
     checkPlayerCollisions() {
-        if (this._playerDead) return;
+        if (this._playerDead || !this.player) return;
 
-        const players = this.gameEnv.gameObjects.filter(obj =>
-            obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer'
-        );
-        if (players.length === 0) return;
-
-        const player   = players[0];
-        const playerCX = player.position.x + (player.width  || 50) / 2;
-        const playerCY = player.position.y + (player.height || 50) / 2;
+        const playerCX = this.player.position.x + (this.player.width  || 50) / 2;
+        const playerCY = this.player.position.y + (this.player.height || 50) / 2;
 
         for (const enemy of this.waveEnemies) {
             if (enemy.isDestroyed()) continue;
@@ -296,7 +296,7 @@ class WaveManager {
             const dy = playerCY - (enemy.position.y + (enemy.height || 50) / 2);
 
             if (Math.sqrt(dx * dx + dy * dy) <= 40) {
-                this.killPlayer(player);
+                this.killPlayer(this.player);
                 return;
             }
         }
@@ -430,15 +430,10 @@ class WaveManager {
     playerShoot(direction = null) {
         const now = Date.now();
         if (now - this.lastAttackTime < this.attackCooldown) return;
+        if (!this.player) return;
 
-        const players = this.gameEnv.gameObjects.filter(obj =>
-            obj.constructor.name === 'Player' || obj.constructor.name === 'FightingPlayer'
-        );
-        if (players.length === 0) return;
-
-        const player  = players[0];
-        const sourceX = player.position.x + player.width  / 2;
-        const sourceY = player.position.y + player.height / 2;
+        const sourceX = this.player.position.x + this.player.width  / 2;
+        const sourceY = this.player.position.y + this.player.height / 2;
 
         let targetX, targetY;
 
@@ -449,7 +444,7 @@ class WaveManager {
             targetY = sourceY + (direction.dy / len) * 1000;
         } else {
             // Fallback: aim at nearest enemy, or shoot right
-            const nearest = this.getNearestEnemy(player);
+            const nearest = this.getNearestEnemy(this.player);
             targetX = nearest ? nearest.position.x + (nearest.width  || 50) / 2 : sourceX + 500;
             targetY = nearest ? nearest.position.y + (nearest.height || 50) / 2 : sourceY;
         }
