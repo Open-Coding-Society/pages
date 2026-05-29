@@ -9,6 +9,7 @@ Solution: "A working prototype of what an SFI-run system could look like: sign-i
 Organization: "SFI Foundation"
 Team: "Aditya Srivastava, Dhyan Soni, Aaryav Lal"
 BackendUrl: "https://github.com/TheGreppers/greppers"
+HandoffIssueUrl: "https://github.com/TheGreppers/greppers/issues/23"
 
 FeatureCards:
   - title: "Plain-English Search"
