@@ -93,7 +93,7 @@ class WaveManager {
         // Projectile system
         this.projectiles = [];
         this.lastAttackTime = Date.now();
-        this.attackCooldown = 500; // 0.25s between shots
+        this.attackCooldown = 1000; // 1s between shots
 
         this.waveDisplay = null;
     }

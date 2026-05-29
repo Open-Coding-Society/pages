@@ -77,7 +77,7 @@ class MansionLevel4 {
         this.lastVerticalAim = null;
         this.lastAimDirection = { dx: 1, dy: 0 };
         this.lastShootTime = 0;
-        this.shootCooldown = 250; // milliseconds between shots
+        this.shootCooldown = 1000; // milliseconds between shots
 
         this.keydownHandler = (e) => {
             this.keysHeld.add(e.code);
