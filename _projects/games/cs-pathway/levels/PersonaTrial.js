@@ -152,41 +152,19 @@ export default class PersonaTrial {
     this.allGroups        = [];   // fetched from backend for member lookup
   }
 
-  /* ── public ─────────────────────────────── */
   async start() {
     this._buildShell();
-    this._showLoading('Reading your record from the Archive…');
-
-    try {
-      const [personaRes, groupsRes] = await Promise.all([
-        fetch(`${this.pythonURI}/api/persona/my`, this.fetchOptions).catch(() => null),
-        fetch(`${this.javaURI}/api/groups`,       this.fetchOptions).catch(() => null),
-      ]);
-
-      if (groupsRes?.ok) this.allGroups = await groupsRes.json();
-
-      if (personaRes?.ok) {
-        const data = await personaRes.json();
-        if (data?.primaryPersona) {
-          this.savedPersona = data.primaryPersona;
-        }
-      }
-    } catch (_) { /* silently fall through to quiz */ }
-
-    this._hideLoading();
-
+  
     if (this.savedPersona) {
       this._renderSavedPersonaGate();
     } else {
       this._renderQuizScene();
     }
   }
-
   destroy() {
     if (this.overlay?.parentNode) this.overlay.parentNode.removeChild(this.overlay);
     this.overlay = null;
   }
-
   /* ── shell ──────────────────────────────── */
   _buildShell() {
     this.destroy();
@@ -606,327 +584,151 @@ export default class PersonaTrial {
   ──────────────────────────────────────────────────── */
   _renderGroupFormation(primaryPersona) {
     const meta = PERSONA_META[primaryPersona] || PERSONA_META.technologist;
-
+  
     this._setContent(`
-      <style>
-        @keyframes ptFadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
-        .pt-form-card { animation: ptFadeUp .45s ease both; }
-        .pt-form-input {
-          width:100%;padding:11px 14px;box-sizing:border-box;
-          background:rgba(255,255,255,.06);
-          border:1px solid rgba(255,255,255,.18);
-          border-radius:10px;color:#f4ead6;
-          font-family:Georgia,'Times New Roman',serif;font-size:15px;
-          outline:none;transition:border-color .2s,box-shadow .2s;
-          appearance:none;-webkit-appearance:none;
-        }
-        .pt-form-input:focus { border-color:${meta.color}; box-shadow:0 0 0 3px ${meta.glow}; }
-        .pt-form-input option { background:#0d1523;color:#f4ead6; }
-        .pt-label { font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#8fc0ff;margin-bottom:7px;display:block; }
-        .pt-gen-btn { transition:filter .15s,transform .15s; }
-        .pt-gen-btn:hover { filter:brightness(1.1);transform:translateY(-2px); }
-      </style>
-      <div class="pt-form-card" style="
-        width:min(720px,92vw);
-        border-radius:22px;overflow:hidden;
+      <div style="
+        width:min(620px,92vw);
+        border-radius:22px;
+        overflow:hidden;
         border:1px solid ${meta.color}55;
         box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 50px ${meta.glow};
         background:
           linear-gradient(180deg,rgba(3,10,25,.93),rgba(4,11,28,.98)),
           url('${VISION_BG}') center/cover no-repeat;
         color:#f7f1de;
+        padding:30px;
+        text-align:center;
       ">
-        <!-- Header -->
-        <div style="padding:20px 26px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:14px;">
-          <div style="font-size:34px;color:${meta.color};">${meta.icon}</div>
-          <div>
-            <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#8fc0ff;margin-bottom:4px;">Group Formation Chamber</div>
-            <div style="font-size:20px;color:#f4ead6;">Forming as a ${meta.title}</div>
-          </div>
+        <div style="font-size:42px;color:${meta.color};margin-bottom:10px;">${meta.icon}</div>
+  
+        <div style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#8fc0ff;margin-bottom:8px;">
+          Team Simulation
         </div>
-
-        <!-- Form body -->
-        <div style="padding:24px 26px;display:grid;grid-template-columns:1fr 1fr;gap:18px 22px;">
-          <!-- Period -->
-          <div>
-            <label class="pt-label">Period</label>
-            <select id="pt-period" class="pt-form-input">
-              <option value="">Choose period…</option>
-              ${[1,2,3,4,5].map(n => `<option value="${n}">Period ${n}</option>`).join('')}
-            </select>
-          </div>
-
-          <!-- Class -->
-          <div>
-            <label class="pt-label">Class</label>
-            <select id="pt-course" class="pt-form-input">
-              <option value="">Choose class…</option>
-              <option value="CSSE">CSSE</option>
-              <option value="CSP">CSP</option>
-              <option value="CSA">CSA</option>
-            </select>
-          </div>
-
-          <!-- Group size -->
-          <div>
-            <label class="pt-label">Group Size</label>
-            <input id="pt-size" type="number" value="4" min="2" max="10" class="pt-form-input" />
-            <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:5px;">Recommended: 3–5 students</div>
-          </div>
-
-          <!-- Prefix -->
-          <div>
-            <label class="pt-label">Name Prefix <span style="opacity:.5;">(optional)</span></label>
-            <input id="pt-prefix" type="text" placeholder="Team, Squad, Group…" class="pt-form-input" />
-            <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:5px;">Groups named like "Team A", "Team B"…</div>
-          </div>
-
-          <!-- Prior experience toggle — full width -->
-          <div style="grid-column:1/-1;">
-            <div style="
-              padding:14px 16px;
-              border:1px solid rgba(255,255,255,.12);
-              border-radius:12px;
-              background:rgba(255,255,255,.04);
-            ">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;">
-                <div>
-                  <div style="font-size:14px;color:#f4ead6;margin-bottom:4px;">Incorporate prior group experiences?</div>
-                  <div style="font-size:12px;color:rgba(255,255,255,.50);">Biases AI using past ratings and persona mix.</div>
-                </div>
-                <label style="display:flex;align-items:center;cursor:pointer;user-select:none;gap:0;">
-                  <input id="pt-prior-toggle" type="checkbox" style="display:none;" />
-                  <div id="pt-prior-track" style="
-                    width:44px;height:24px;border-radius:999px;
-                    background:rgba(255,255,255,.15);
-                    position:relative;transition:background .25s;cursor:pointer;
-                  ">
-                    <div id="pt-prior-knob" style="
-                      position:absolute;top:3px;left:3px;
-                      width:18px;height:18px;border-radius:999px;
-                      background:#fff;transition:transform .25s;
-                    "></div>
-                  </div>
-                </label>
-              </div>
-
-              <div id="pt-prior-form" style="display:none;margin-top:14px;display:none;">
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
-                  <div>
-                    <label class="pt-label">Prev. Group Size</label>
-                    <input id="pt-prev-size" type="number" min="2" max="10" value="4" class="pt-form-input" />
-                  </div>
-                  <div>
-                    <label class="pt-label">Student Rating (1–5)</label>
-                    <input id="pt-student-rating" type="number" min="1" max="5" value="4" class="pt-form-input" />
-                  </div>
-                  <div>
-                    <label class="pt-label">Teacher Rating (1–5)</label>
-                    <input id="pt-teacher-rating" type="number" min="1" max="5" value="4" class="pt-form-input" />
-                  </div>
-                </div>
-                <div style="margin-bottom:10px;">
-                  <label class="pt-label">Personas in that group</label>
-                  <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                    ${Object.entries(PERSONA_META).map(([k, m]) => `
-                      <label style="
-                        display:flex;align-items:center;gap:7px;
-                        padding:7px 12px;border-radius:9px;
-                        border:1px solid ${m.color}55;
-                        background:rgba(0,0,0,.28);cursor:pointer;font-size:13px;
-                      ">
-                        <input type="checkbox" class="pt-prior-persona" value="${k}"
-                          style="accent-color:${m.color};" />
-                        <span style="color:${m.color};">${m.icon}</span>
-                        <span style="color:#ddd6c0;">${m.title}</span>
-                      </label>
-                    `).join('')}
-                  </div>
-                </div>
-                <div>
-                  <label class="pt-label">One-line note <span style="opacity:.5;">(optional)</span></label>
-                  <input id="pt-prior-note" type="text" maxlength="160"
-                    placeholder="e.g. Clear roles, good communication"
-                    class="pt-form-input" />
-                </div>
-              </div>
-            </div>
-          </div>
+  
+        <div style="font-size:28px;color:#f4ead6;margin-bottom:10px;">
+          You belong as a ${meta.title}
         </div>
-
-        <!-- Status -->
-        <div id="pt-form-status" style="padding:0 26px;font-size:13px;color:#f87171;min-height:20px;"></div>
-
-        <!-- Footer -->
-        <div style="padding:18px 26px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;gap:14px;">
+  
+        <div style="font-size:14px;line-height:1.6;color:#ddd6c0;max-width:460px;margin:0 auto 24px;">
+          The chamber will now place you into a simulated team with other mock builders.
+        </div>
+  
+        <div style="margin-bottom:18px;text-align:left;">
+          <label style="font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#8fc0ff;margin-bottom:7px;display:block;">
+            Group Size
+          </label>
+          <input id="pt-size" type="number" value="4" min="2" max="6" style="
+            width:100%;
+            padding:11px 14px;
+            box-sizing:border-box;
+            background:rgba(255,255,255,.06);
+            border:1px solid rgba(255,255,255,.18);
+            border-radius:10px;
+            color:#f4ead6;
+            font-family:Georgia,'Times New Roman',serif;
+            font-size:15px;
+            outline:none;
+          " />
+        </div>
+  
+        <div id="pt-form-status" style="font-size:13px;color:#f87171;min-height:20px;margin-bottom:12px;"></div>
+  
+        <div style="display:flex;justify-content:space-between;gap:12px;">
           <button id="pt-back-btn" style="
-            padding:11px 18px;border-radius:11px;
-            border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.3);
-            color:#ddd6c0;font-family:inherit;font-size:13px;cursor:pointer;
+            padding:11px 18px;
+            border-radius:11px;
+            border:1px solid rgba(255,255,255,.18);
+            background:rgba(0,0,0,.3);
+            color:#ddd6c0;
+            font-family:inherit;
+            font-size:13px;
+            cursor:pointer;
           ">← Back</button>
-
-          <button id="pt-generate-btn" class="pt-gen-btn" style="
-            padding:13px 28px;border:none;border-radius:12px;
+  
+          <button id="pt-generate-btn" style="
+            padding:13px 28px;
+            border:none;
+            border-radius:12px;
             background:linear-gradient(135deg,${meta.color},${meta.color}aa);
-            color:#0a0e1a;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
-            display:flex;align-items:center;gap:10px;
-          ">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
-            Generate Groups
-          </button>
+            color:#0a0e1a;
+            font-family:inherit;
+            font-size:15px;
+            font-weight:700;
+            cursor:pointer;
+          ">Find My Team →</button>
         </div>
       </div>
     `);
-
-    /* Toggle prior experience form */
-    const track  = this.overlay.querySelector('#pt-prior-track');
-    const knob   = this.overlay.querySelector('#pt-prior-knob');
-    const chk    = this.overlay.querySelector('#pt-prior-toggle');
-    const form   = this.overlay.querySelector('#pt-prior-form');
-
-    track.addEventListener('click', () => {
-      chk.checked = !chk.checked;
-      const on = chk.checked;
-      track.style.background = on ? meta.color : 'rgba(255,255,255,.15)';
-      knob.style.transform   = on ? 'translateX(20px)' : 'translateX(0)';
-      form.style.display     = on ? 'block' : 'none';
-    });
-
+  
     this.overlay.querySelector('#pt-back-btn').addEventListener('click', () => {
-      if (this.savedPersona) {
-        this._renderSavedPersonaGate();
-      } else {
-        this.currentScene = Math.max(0, this.currentScene - 1);
-        this._renderQuizResults();
-      }
+      this._renderQuizResults();
     });
-
+  
     this.overlay.querySelector('#pt-generate-btn').addEventListener('click', () => {
       this._handleGenerate(primaryPersona);
     });
   }
-
   /* ────────────────────────────────────────────────────
      PHASE 3 — Generate + Reveal
   ──────────────────────────────────────────────────── */
   async _handleGenerate(primaryPersona) {
-    const period    = this.overlay.querySelector('#pt-period')?.value;
-    const course    = this.overlay.querySelector('#pt-course')?.value;
     const groupSize = parseInt(this.overlay.querySelector('#pt-size')?.value || '4', 10);
-    const prefix    = this.overlay.querySelector('#pt-prefix')?.value.trim() || 'Team';
-    const status    = this.overlay.querySelector('#pt-form-status');
-
-    if (!period || !course) {
-      status.textContent = '⚠ Please select both period and class before generating.';
+    const status = this.overlay.querySelector('#pt-form-status');
+  
+    if (groupSize < 2 || groupSize > 6) {
+      status.textContent = '⚠ Group size must be between 2 and 6.';
       return;
     }
-    if (groupSize < 2 || groupSize > 10) {
-      status.textContent = '⚠ Group size must be between 2 and 10.';
-      return;
-    }
-    status.textContent = '';
-
-    /* Collect students */
-    const students = this._getStudentsForClass(period, course);
-    if (students.length < groupSize) {
-      status.textContent = `⚠ Not enough students in Period ${period} ${course}. Found ${students.length}, need at least ${groupSize}.`;
-      return;
-    }
-
-    /* Collect prior experience rows */
-    const usePrior    = this.overlay.querySelector('#pt-prior-toggle')?.checked;
-    const feedbackRows = usePrior ? this._readPriorExperience() : [];
-
-    this._chapterTransition('WEAVING THE TEAMS', 'The chamber reads the personas and begins to bind compatible threads together…', async () => {
-      this._showLoading('Summoning AI to form optimal groups…');
-
-      try {
-        const user_uids = students.map(s => s.uid);
-
-        /* Check persona coverage */
-        let useAI = false;
-        try {
-          const checkRes = await fetch(`${this.pythonURI}/api/persona/evaluate-group`, {
-            ...this.fetchOptions, method: 'POST',
-            body: JSON.stringify({ user_uids }),
-          });
-          if (checkRes.ok) {
-            const check = await checkRes.json();
-            const withPersonas = check.members.filter(m => m.personas?.length > 0).length;
-            useAI = withPersonas >= Math.max(groupSize * 2, Math.ceil(students.length * 0.5));
-          }
-        } catch (_) { /* fall through to random */ }
-
-        let result;
-        if (useAI) {
-          const aiRes = await fetch(`${this.pythonURI}/api/persona/form-groups`, {
-            ...this.fetchOptions, method: 'POST',
-            body: JSON.stringify({
-              user_uids,
-              group_size: groupSize,
-              incorporate_prior_experiences: feedbackRows.length > 0,
-              feedback_rows: feedbackRows,
-            }),
-          });
-          if (!aiRes.ok) throw new Error('AI group formation failed');
-          result = await aiRes.json();
-          result.method = 'ai';
-        } else {
-          result = this._randomGroups(students, groupSize);
-          result.method = 'random';
-        }
-
-        /* Build named group objects */
-        const namedGroups = result.groups.map((g, i) => {
-          const letter  = String.fromCharCode(65 + i);
-          const members = g.user_uids.map(uid => {
-            const p = students.find(s => s.uid === uid);
-            return { id: p?.id, uid, name: p?.name || uid };
-          });
-          return {
-            name: `${prefix} ${letter}`,
-            period,
-            course,
-            team_score: g.team_score ?? null,
-            memberIds: members.map(m => m.id),
-            members,
-          };
-        });
-
-        this._renderReveal(namedGroups, result.method, primaryPersona);
-      } catch (err) {
-        console.error(err);
-        this._showLoading('');
-        this.overlay.innerHTML = `
-          <div style="color:#f87171;font-size:16px;text-align:center;max-width:400px;">
-            <div style="font-size:32px;margin-bottom:12px;">⚠</div>
-            ${err.message || 'Something went wrong generating groups.'}
-            <br><br>
-            <button id="pt-err-back" style="
-              margin-top:8px;padding:10px 20px;border-radius:10px;
-              border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);
-              color:#ddd6c0;font-family:inherit;cursor:pointer;
-            ">← Go Back</button>
-          </div>
-        `;
-        this.overlay.querySelector('#pt-err-back').addEventListener('click', () => {
-          this._renderGroupFormation(primaryPersona);
-        });
+  
+    const meta = PERSONA_META[primaryPersona] || PERSONA_META.technologist;
+  
+    const currentUser = {
+      id: 0,
+      uid: 'you',
+      name: 'You',
+      persona: primaryPersona,
+      role: meta.title,
+    };
+  
+    const mockUsers = [
+      { id: 1, uid: 'indy', name: 'Indy', persona: 'technologist', role: 'Technologist' },
+      { id: 2, uid: 'salem', name: 'Salem', persona: 'scrummer', role: 'Scrummer' },
+      { id: 3, uid: 'phoenix', name: 'Phoenix', persona: 'planner', role: 'Planner' },
+      { id: 4, uid: 'cody', name: 'Cody', persona: 'finisher', role: 'Finisher' },
+      { id: 5, uid: 'pixel', name: 'Pixel', persona: 'technologist', role: 'Technologist' },
+      { id: 6, uid: 'cadence', name: 'Cadence', persona: 'scrummer', role: 'Scrummer' },
+      { id: 7, uid: 'ace', name: 'Ace', persona: 'finisher', role: 'Finisher' },
+      { id: 8, uid: 'marco', name: 'Marco', persona: 'planner', role: 'Planner' },
+    ];
+  
+    const shuffled = [...mockUsers].sort(() => Math.random() - 0.5);
+    const yourTeam = [currentUser, ...shuffled.slice(0, groupSize - 1)];
+  
+    const namedGroups = [
+      {
+        name: `Your ${meta.title} Team`,
+        period: 'simulation',
+        course: 'simulation',
+        team_score: Math.floor(72 + Math.random() * 22),
+        memberIds: [],
+        members: yourTeam,
       }
-    });
-  }
-
-  /* ────────────────────────────────────────────────────
+    ];
+  
+    this._chapterTransition(
+      'YOUR TEAM IS FORMING',
+      `The chamber recognizes you as a ${meta.title} and places you with a simulated team.`,
+      () => {
+        this._renderReveal(namedGroups, 'simulation', primaryPersona);
+      }
+    );
+  }/* ────────────────────────────────────────────────────
      PHASE 4 — Group Reveal Screen
   ──────────────────────────────────────────────────── */
   _renderReveal(namedGroups, method, primaryPersona) {
     const meta     = PERSONA_META[primaryPersona] || PERSONA_META.technologist;
-    const isAI     = method === 'ai';
-    const badgeLabel = isAI ? '✨ AI-Optimized' : '🎲 Random Assignment';
-    const badgeBg    = isAI ? '#4f46e5' : '#374151';
-
+    const badgeLabel = ' Simulated Team';
+    const badgeBg = '#4f46e5';
     const groupCards = namedGroups.map((g, i) => {
       const scoreHtml = g.team_score !== null
         ? `<span style="
@@ -993,9 +795,8 @@ export default class PersonaTrial {
         ">
           <div>
             <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#8fc0ff;margin-bottom:5px;">
-              Groups Ready — Staging Area
-            </div>
-            <div style="font-size:20px;color:#f4ead6;">${namedGroups.length} groups formed</div>
+Your Simulated Team            </div>
+            <div style="font-size:20px;color:#f4ead6;">Your simulated team has been formed</div>
           </div>
           <span style="
             display:inline-flex;padding:6px 14px;border-radius:999px;
@@ -1015,8 +816,7 @@ export default class PersonaTrial {
           display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
         ">
           <div style="font-size:13px;color:rgba(255,255,255,.55);">
-            Drag students between groups on the next screen.
-          </div>
+This is a simulated team preview created by the chamber.          </div>
           <div style="display:flex;gap:12px;flex-wrap:wrap;">
             <button id="pt-reveal-back" class="pt-reveal-btn" style="
               padding:11px 18px;border-radius:11px;
@@ -1033,8 +833,7 @@ export default class PersonaTrial {
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
-              Send to Staging Area
-            </button>
+Continue →            </button>
           </div>
         </div>
       </div>
@@ -1047,52 +846,8 @@ export default class PersonaTrial {
     this.overlay.querySelector('#pt-reveal-confirm').addEventListener('click', async () => {
       await fadeOut(this.overlay, 320);
       this.destroy();
-      this.onGroupsGenerated({
-        groups: namedGroups,
-        method,
-        primaryPersona,
-      });
+      this.onClose();
     });
-  }
-
-  /* ── helpers ─────────────────────────────── */
-  _getStudentsForClass(period, course) {
-    const seen = new Set();
-    const out  = [];
-    this.allGroups
-      .filter(g => String(g.period) === String(period) && g.course === course)
-      .forEach(g => (g.members || []).forEach(m => {
-        if (!seen.has(m.id)) { seen.add(m.id); out.push(m); }
-      }));
-    return out;
-  }
-
-  _randomGroups(students, groupSize) {
-    const shuffled = [...students].sort(() => Math.random() - 0.5);
-    const groups = [];
-    for (let i = 0; i < shuffled.length; i += groupSize) {
-      groups.push({ user_uids: shuffled.slice(i, i + groupSize).map(s => s.uid), team_score: null });
-    }
-    return { groups, average_score: null };
-  }
-
-  _readPriorExperience() {
-    try {
-      const prevSize     = parseInt(this.overlay.querySelector('#pt-prev-size')?.value || '0', 10);
-      const studentRating = parseInt(this.overlay.querySelector('#pt-student-rating')?.value || '0', 10);
-      const teacherRating = parseInt(this.overlay.querySelector('#pt-teacher-rating')?.value || '0', 10);
-      const note          = this.overlay.querySelector('#pt-prior-note')?.value.trim() || '';
-      const personas      = [...this.overlay.querySelectorAll('.pt-prior-persona:checked')].map(c => c.value);
-
-      if (prevSize < 2 || prevSize > 10) throw new Error('Prior group size must be 2–10.');
-      if (studentRating < 1 || studentRating > 5) throw new Error('Student rating must be 1–5.');
-      if (teacherRating < 1 || teacherRating > 5) throw new Error('Teacher rating must be 1–5.');
-      if (!personas.length) throw new Error('Select at least 1 persona for the prior group.');
-
-      return [{ ts: Date.now(), source: 'inline_prior_experience', prev_group_size: prevSize, personas, student_rating_1to5: studentRating, teacher_rating_1to5: teacherRating, note }];
-    } catch (err) {
-      console.warn('Prior experience read error:', err.message);
-      return [];
-    }
-  }
+  } 
+  
 }
