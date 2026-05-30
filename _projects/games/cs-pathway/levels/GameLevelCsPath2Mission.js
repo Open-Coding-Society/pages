@@ -326,14 +326,66 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     ];
 
     // ── Assessment Observatory Portal ────────────────────────────
-    const assessmentObservatoryPortalData = createGatekeeperData({
+    const createDiscMarkerSrc = (fillColor, borderColor = '#f8fafc') => {
+      const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
+      const discFrames = frameOpacity.map((opacity, index) => {
+        const cx = 128 + (index * 256);
+        const ringAngle = index * 45;
+        const angleRad = (ringAngle * Math.PI) / 180;
+        const oppositeAngleRad = angleRad + Math.PI;
+        const orbitRadius = 112;
+        const markerX = cx + (Math.cos(angleRad) * orbitRadius);
+        const markerY = 128 + (Math.sin(angleRad) * orbitRadius);
+        const marker2X = cx + (Math.cos(oppositeAngleRad) * orbitRadius);
+        const marker2Y = 128 + (Math.sin(oppositeAngleRad) * orbitRadius);
+        const markerShadowX = cx + (Math.cos(angleRad) * (orbitRadius + 4));
+        const markerShadowY = 128 + (Math.sin(angleRad) * (orbitRadius + 4));
+        const marker2ShadowX = cx + (Math.cos(oppositeAngleRad) * (orbitRadius + 4));
+        const marker2ShadowY = 128 + (Math.sin(oppositeAngleRad) * (orbitRadius + 4));
+        return `
+          <g opacity='${opacity}'>
+            <circle cx='${cx}' cy='128' r='114' fill='none' stroke='rgba(0,0,0,0.5)' stroke-width='20'/>
+            <circle cx='${cx}' cy='128' r='106' fill='${fillColor}' stroke='${borderColor}' stroke-width='18'/>
+            <circle cx='${cx}' cy='128' r='98' fill='none' stroke='rgba(255,255,255,0.34)' stroke-width='6'/>
+            <circle cx='${cx}' cy='128' r='104' fill='url(#shine)' />
+            <circle cx='${cx}' cy='128' r='112' fill='none' stroke='rgba(255,255,255,0.92)' stroke-width='11' stroke-linecap='round' stroke-dasharray='190 500' transform='rotate(${ringAngle} ${cx} 128)'/>
+            <circle cx='${markerShadowX}' cy='${markerShadowY}' r='12' fill='rgba(0,0,0,0.45)' />
+            <circle cx='${markerX}' cy='${markerY}' r='10' fill='#ffffff' />
+            <circle cx='${marker2ShadowX}' cy='${marker2ShadowY}' r='10' fill='rgba(0,0,0,0.35)' />
+            <circle cx='${marker2X}' cy='${marker2Y}' r='8' fill='#fde047' />
+          </g>`;
+      }).join('');
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='2048' height='256' viewBox='0 0 2048 256'>
+        <defs>
+          <radialGradient id='shine' cx='35%' cy='30%' r='70%'>
+            <stop offset='0%' stop-color='#ffffff' stop-opacity='0.45' />
+            <stop offset='45%' stop-color='#ffffff' stop-opacity='0.14' />
+            <stop offset='100%' stop-color='#000000' stop-opacity='0.22' />
+          </radialGradient>
+        </defs>
+        ${discFrames}
+      </svg>`;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    };
+
+    const assessmentObservatoryPortalData = {
+      src: createDiscMarkerSrc('#a855f7'),  // purple orb — change color here if you want
+      SCALE_FACTOR: 12,
+      ANIMATION_RATE: 6,
+      pixels: { width: 2048, height: 256 },
+      orientation: { rows: 1, columns: 8 },
+      down: { row: 0, start: 0, columns: 8, wiggle: { angle: Math.PI / 60, speed: 0.08 } },
+      up: { row: 0, start: 0, columns: 8 },
+      left: { row: 0, start: 0, columns: 8 },
+      right: { row: 0, start: 0, columns: 8 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
       id: 'AssessmentObservatoryPortal',
       greeting: 'Assessment Observatory: explore your learning analytics, sprint history, and skill radar.',
-      position: { x: width * 0.92, y: height * 0.50 },
+      INIT_POSITION: { x: width * 0.48, y: height * 0.25 },
       interactDistance: 140,
       interact: function () {
         this.dialogueSystem.dialogues = [
-          'Welcome to the Assessment Observatory portal!',
+          'Welcome to the Assessment Observatory!',
           'Here you can review your performance metrics, sprint history, and skill radar.',
           'Step through to explore your learning journey in depth.',
         ];
@@ -350,7 +402,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
           },
         ]);
       },
-    });
+    };
 
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
