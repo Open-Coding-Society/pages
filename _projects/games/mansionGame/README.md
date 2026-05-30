@@ -10,7 +10,7 @@ permalink: /Kanbans2026
 # Team's kanban boards (contributions)
 Each Kanban board is linked to each team emember's issue.
 
-(Level 1):
+Samaghna, Anika, Rohit, Rashi, Aashi, Mateo (Level 1): https://github.com/orgs/csse2-game/projects/1
 Salma, Sophia, Isha, Joshika (Level 2): https://github.com/orgs/undergroundrapclub/projects/1/views/1
 (Level 3):
 (Level 4):
