@@ -409,34 +409,15 @@ class Character extends GameObject {
         this.scale = newScale;
 
         // Recalculate the object's size based on the new scale
-
-        this.size = this.scale.height / this.scaleFactor;
+        this.size = this.scale.height / this.scaleFactor; 
 
         // Recalculate the object's velocity steps based on the new scale (3x faster)
         this.xVelocity = (this.scale.width / this.stepFactor) * 3;
         this.yVelocity = (this.scale.height / this.stepFactor) * 3;
 
-        // By default, use square sizing based on size, but if a sprite sheet is present
-        // and frame dimensions can be calculated, preserve the sprite's natural aspect
-        // ratio by keeping the computed height and adjusting width accordingly.
+        // Set the object's width and height to the new size (object is a square)
+        this.width = this.size;
         this.height = this.size;
-        this.width = this.size; // fallback
-        try {
-            if (this.spriteData && this.spriteData.pixels && this.spriteData.orientation) {
-                const pixels = this.spriteData.pixels;
-                const orientation = this.spriteData.orientation;
-                const frameW = Math.max(1, Math.round(pixels.width / (orientation.columns || 1)));
-                const frameH = Math.max(1, Math.round(pixels.height / (orientation.rows || 1)));
-                // Preserve height (based on scaleFactor) and compute width from aspect ratio
-                const aspect = frameW / frameH;
-                this.height = this.size;
-                this.width = Math.max(1, Math.round(this.height * aspect));
-            }
-        } catch (err) {
-            // If anything goes wrong, fall back to square sizing
-            this.width = this.size;
-            this.height = this.size;
-        }
 
         // Ensure the object stays fully on screen after resize
         // Clamp position to keep character visible

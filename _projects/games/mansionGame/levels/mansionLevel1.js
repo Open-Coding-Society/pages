@@ -92,21 +92,21 @@ class MansionLevel1 {
         const mummyData = {
             id: "Temple Mummy",
             greeting: "Bring me the offerings and I will reveal the tomb key.",
-            src: path + "/images/projects/mansionGame/mummy-boi.png",
+            src: path + "/images/projects/mansionGame/sphinxclear.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 0,
-            ANIMATION_RATE: 10,
+            ANIMATION_RATE: 0,
             INIT_POSITION: { x: width * 0.73, y: height * 0.42 },
-            pixels: { height: 192, width: 144 },
-            orientation: { rows: 1, columns: 4 },
-            down: { row: 0, start: 0, columns: 4 },
-            up: { row: 0, start: 0, columns: 4 },
-            left: { row: 0, start: 0, columns: 4 },
-            right: { row: 0, start: 0, columns: 4 },
-            downLeft: { row: 0, start: 0, columns: 4 },
-            downRight: { row: 0, start: 0, columns: 4 },
-            upLeft: { row: 0, start: 0, columns: 4 },
-            upRight: { row: 0, start: 0, columns: 4 },
+            pixels: { height: 545, width: 506 },
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            up: { row: 0, start: 0, columns: 1 },
+            left: { row: 0, start: 0, columns: 1 },
+            right: { row: 0, start: 0, columns: 1 },
+            downLeft: { row: 0, start: 0, columns: 1 },
+            downRight: { row: 0, start: 0, columns: 1 },
+            upLeft: { row: 0, start: 0, columns: 1 },
+            upRight: { row: 0, start: 0, columns: 1 },
             hitbox: { widthPercentage: 0.4, heightPercentage: 0.75 },
             keypress: {},
             interact: function() {
@@ -549,7 +549,7 @@ class MansionLevel1 {
         collectDialogue.showDialogue(
             `You collected the ${artifactLabel}.`,
             "Artifact",
-            this.gameEnv.path + "/images/projects/mansionGame/mummy-boi.png"
+            this.gameEnv.path + "/images/projects/mansionGame/mummy_boy.png"
         );
 
 
