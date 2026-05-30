@@ -227,8 +227,8 @@ class Present {
         zIndex: '1200',
       },
       alerts: {
-        top: compact ? '72px' : '84px',
-        zIndex: '1201',
+          top: compact ? '72px' : '84px',
+          zIndex: '14001',
       },
       panel: {
         top: compact ? '132px' : '148px',
