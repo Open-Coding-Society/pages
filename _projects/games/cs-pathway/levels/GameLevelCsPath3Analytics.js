@@ -2,7 +2,6 @@
 import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackground.js';
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import FriendlyNpc from '@assets/js/GameEnginev1.1/essentials/FriendlyNpc.js';
-import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import AiChallengeNpc from '@assets/js/GameEnginev1.1/essentials/AiChallengeNpc.js';
 import DialogueSystem from '@assets/js/GameEnginev1.1/essentials/DialogueSystem.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
@@ -56,87 +55,6 @@ const createOrbSvgSrc = (fillColor, borderColor = '#f8fafc') => {
     </defs>
     ${orbFrames}
   </svg>`;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-};
-
-const createPortalSvgSrc = (label = 'Mission Tools') => {
-  const escapeXml = (value) => String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-
-  const portalLabel = escapeXml(label);
-  const sparkles = [
-    { x: 180, y: 180, r: 8, d: '0s' },
-    { x: 330, y: 110, r: 6, d: '0.6s' },
-    { x: 690, y: 120, r: 7, d: '1.2s' },
-    { x: 860, y: 210, r: 5, d: '0.3s' },
-    { x: 780, y: 760, r: 8, d: '1.0s' },
-    { x: 250, y: 760, r: 6, d: '1.5s' },
-  ];
-
-  const sparkleMarkup = sparkles.map(({ x, y, r, d }) => `
-    <circle cx='${x}' cy='${y}' r='${r}' fill='rgba(255,255,255,0.95)'>
-      <animate attributeName='opacity' values='0.15;1;0.15' dur='2.8s' begin='${d}' repeatCount='indefinite' />
-      <animate attributeName='r' values='${r * 0.8};${r};${r * 0.8}' dur='2.8s' begin='${d}' repeatCount='indefinite' />
-    </circle>
-  `).join('');
-
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1024' height='1024' viewBox='0 0 1024 1024'>
-    <defs>
-      <radialGradient id='portalGlow' cx='50%' cy='45%' r='60%'>
-        <stop offset='0%' stop-color='#f8fafc' stop-opacity='0.95' />
-        <stop offset='22%' stop-color='#60a5fa' stop-opacity='0.9' />
-        <stop offset='52%' stop-color='#0f172a' stop-opacity='0.12' />
-        <stop offset='100%' stop-color='#020617' stop-opacity='0' />
-      </radialGradient>
-      <radialGradient id='portalCore' cx='50%' cy='50%' r='50%'>
-        <stop offset='0%' stop-color='#e0f2fe' stop-opacity='1' />
-        <stop offset='35%' stop-color='#38bdf8' stop-opacity='0.92' />
-        <stop offset='70%' stop-color='#0ea5e9' stop-opacity='0.55' />
-        <stop offset='100%' stop-color='#1e3a8a' stop-opacity='0.05' />
-      </radialGradient>
-      <filter id='portalBlur' x='-40%' y='-40%' width='180%' height='180%'>
-        <feGaussianBlur stdDeviation='10' />
-      </filter>
-    </defs>
-    <rect width='1024' height='1024' fill='none' />
-    <circle cx='512' cy='512' r='280' fill='url(#portalGlow)' filter='url(#portalBlur)'>
-      <animate attributeName='r' values='245;290;245' dur='3.2s' repeatCount='indefinite' />
-      <animate attributeName='opacity' values='0.65;1;0.65' dur='3.2s' repeatCount='indefinite' />
-    </circle>
-    <circle cx='512' cy='512' r='205' fill='#020617' opacity='0.92' />
-    <g transform='translate(512 512)'>
-      <circle r='238' fill='none' stroke='rgba(191,219,254,0.34)' stroke-width='18' stroke-dasharray='52 18'>
-        <animateTransform attributeName='transform' type='rotate' from='0' to='360' dur='11s' repeatCount='indefinite' />
-      </circle>
-      <circle r='214' fill='none' stroke='rgba(96,165,250,0.85)' stroke-width='22' stroke-dasharray='150 34'>
-        <animateTransform attributeName='transform' type='rotate' from='360' to='0' dur='8s' repeatCount='indefinite' />
-      </circle>
-      <circle r='168' fill='none' stroke='rgba(255,255,255,0.88)' stroke-width='10' stroke-dasharray='18 16'>
-        <animateTransform attributeName='transform' type='rotate' from='0' to='360' dur='5s' repeatCount='indefinite' />
-      </circle>
-      <circle r='128' fill='url(#portalCore)'>
-        <animate attributeName='r' values='118;132;118' dur='2.6s' repeatCount='indefinite' />
-      </circle>
-      <circle r='88' fill='none' stroke='rgba(255,255,255,0.9)' stroke-width='5' stroke-dasharray='10 8'>
-        <animateTransform attributeName='transform' type='rotate' from='0' to='-360' dur='4s' repeatCount='indefinite' />
-      </circle>
-    </g>
-    <path d='M180 512 C280 420, 350 364, 430 332' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='12' stroke-linecap='round'>
-      <animate attributeName='stroke-opacity' values='0.12;0.42;0.12' dur='3.1s' repeatCount='indefinite' />
-    </path>
-    <path d='M844 512 C744 420, 674 364, 594 332' fill='none' stroke='rgba(255,255,255,0.2)' stroke-width='12' stroke-linecap='round'>
-      <animate attributeName='stroke-opacity' values='0.12;0.42;0.12' dur='3.1s' repeatCount='indefinite' />
-    </path>
-    ${sparkleMarkup}
-    <text x='512' y='860' text-anchor='middle' font-family='Courier New, monospace' font-size='72' font-weight='800' fill='#e0f2fe' stroke='#020617' stroke-width='7' paint-order='stroke'>${portalLabel}</text>
-    <text x='512' y='918' text-anchor='middle' font-family='Courier New, monospace' font-size='34' font-weight='800' fill='#93c5fd' stroke='#020617' stroke-width='5' paint-order='stroke'>Return Portal</text>
-    <text x='512' y='962' text-anchor='middle' font-family='Courier New, monospace' font-size='28' font-weight='800' fill='#f8fafc' stroke='#020617' stroke-width='4' paint-order='stroke'>Press E to go back</text>
-  </svg>`;
-
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 };
 
@@ -266,43 +184,30 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
       gc.transitionToLevel();
     };
 
-    const missionPortalPos = {
-      x: width * 0.08,
-      y: height - (height / 5) - 60,
-    };
-
     const missionPortalData = {
+      src: createOrbSvgSrc('#a855f7'),
+      SCALE_FACTOR: 12,
+      ANIMATION_RATE: 6,
+      pixels: { width: 2048, height: 256 },
+      orientation: { rows: 1, columns: 8 },
+      down: { row: 0, start: 0, columns: 8, wiggle: { angle: Math.PI / 60, speed: 0.08 } },
+      up: { row: 0, start: 0, columns: 8 },
+      left: { row: 0, start: 0, columns: 8 },
+      right: { row: 0, start: 0, columns: 8 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
       id: 'Mission Tools Portal',
-      greeting: 'Mission Tools Portal: step through to return to Mission Tools.',
-      src: createPortalSvgSrc('Mission Tools'),
-      SCALE_FACTOR: 6.25,
-      ANIMATION_RATE: 8,
-      pixels: { width: 1024, height: 1024 },
-      orientation: { rows: 1, columns: 1 },
-      down: { row: 0, start: 0, columns: 1, wiggle: { angle: Math.PI / 80, speed: 0.08 } },
-      up: { row: 0, start: 0, columns: 1 },
-      left: { row: 0, start: 0, columns: 1 },
-      right: { row: 0, start: 0, columns: 1 },
-      hitbox: { widthPercentage: 0.42, heightPercentage: 0.42 },
-      INIT_POSITION: { ...missionPortalPos },
+      greeting: 'Return to Mission Tools.',
+      INIT_POSITION: { x: width * 0.42, y: height * 0.44 },
       interactDistance: 140,
-      expertise: 'A shimmering return portal to Mission Tools.',
-      dialogues: [
-        'This portal returns you to Mission Tools.',
-        'Use it to review your mission stations and pick up where you left off.'
-      ],
+      expertise: 'A portal back to Mission Tools.',
+      chatHistory: [],
       interact: async function() {
-        if (this.dialogueSystem && this.dialogueSystem.isDialogueOpen()) {
-          this.dialogueSystem.closeDialogue();
-          return;
-        }
-
-        this.dialogueSystem.showDialogue(
-          'Return to Mission Tools?',
-          'Mission Tools Portal',
-          this.spriteData?.src || null,
-          this.spriteData
-        );
+        this.dialogueSystem.dialogues = [
+          'This orb returns you to Mission Tools.',
+          'Use it to review your mission stations and pick up where you left off.',
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Mission Tools Portal');
         this.dialogueSystem.addButtons([
           {
             text: '↩ Back to Mission Tools',
@@ -323,9 +228,9 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     };
 
     // ── NPC Positions ──────────────────────────────────────────────
-    const analyticsGuidePos = { x: width * 0.20, y: height * 0.65 };
-    const githubMetricsPos  = { x: width * 0.80, y: height * 0.65 };
-    const selfEvalPos       = { x: width * 0.48, y: height * 0.44 };
+    const analyticsGuidePos = { x: width * 0.17, y: height * 0.66 };
+    const githubMetricsPos  = { x: width * 0.67, y: height * 0.60 };
+    const selfEvalPos       = { x: width * 0.83, y: height * 0.68 };
 
     const createOrbNpcData = ({ id, greeting, position, color, expertise, interact }) => ({
       src: createOrbSvgSrc(color),
@@ -388,7 +293,7 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
-      { class: Npc, data: missionPortalData },
+      { class: FriendlyNpc, data: missionPortalData },
       { class: FriendlyNpc, data: npc_data_analyticsGuide },
       { class: FriendlyNpc, data: npc_data_githubGuide },
       { class: FriendlyNpc, data: npc_data_selfEval },
