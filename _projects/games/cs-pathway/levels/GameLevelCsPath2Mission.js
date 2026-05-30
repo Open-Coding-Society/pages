@@ -5,6 +5,7 @@ import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '@asse
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import ProfileManager from '@assets/js/projects/cs-pathway/model/ProfileManager.js';
+import GameLevelCsPath3Analytics from './GameLevelCsPath3Analytics.js';
 
 // Prompt templates for AI question generation and grading.
 const CHALLENGE_PROMPT_TEXT = {
@@ -324,10 +325,38 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       }),
     ];
 
+    // ── Assessment Observatory Portal ────────────────────────────
+    const assessmentObservatoryPortalData = createGatekeeperData({
+      id: 'AssessmentObservatoryPortal',
+      greeting: 'Assessment Observatory: explore your learning analytics, sprint history, and skill radar.',
+      position: { x: width * 0.92, y: height * 0.50 },
+      interactDistance: 140,
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to the Assessment Observatory portal!',
+          'Here you can review your performance metrics, sprint history, and skill radar.',
+          'Step through to explore your learning journey in depth.',
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Assessment Observatory');
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Enter Assessment Observatory',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              level.openAssessmentObservatory();
+            },
+          },
+        ]);
+      },
+    });
+
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
       ...missionDeskZones.map((zone) => ({ class: FriendlyNpc, data: zone })),
+      { class: FriendlyNpc, data: assessmentObservatoryPortalData },
     ];
 
     this._missionDeskIds = missionDeskZones.map((zone) => zone.id);
@@ -345,17 +374,22 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._profileManager = new ProfileManager();
   }
 
+  // ── Open Assessment Observatory ──────────────────────────────
+  openAssessmentObservatory() {
+    const gc = this.gameEnv.gameControl;
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath3Analytics);
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
+  }
+
   /**
    * Sync the level selector dropdown to show Mission Tools.
-   * The dropdown is built at page load from the initial levelClasses list,
-   * so dynamically spliced levels need to be added and selected manually.
    * @private
    */
   _syncLevelDropdown() {
     requestAnimationFrame(() => {
       const allSelects = Array.from(document.querySelectorAll('select'));
 
-      // Find the level selector by checking if it contains known level names
       const levelSelect = allSelects.find((sel) =>
         Array.from(sel.options).some((opt) =>
           opt.textContent.trim() === 'Wayfinding World' ||
@@ -365,9 +399,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
       if (!levelSelect) return;
 
-      const targetName = GameLevelCsPath2Mission.displayName; // 'Mission Tools'
+      const targetName = GameLevelCsPath2Mission.displayName;
 
-      // Add the option if it doesn't already exist
       let targetOption = Array.from(levelSelect.options).find(
         (opt) => opt.textContent.trim() === targetName
       );
@@ -379,15 +412,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         levelSelect.appendChild(targetOption);
       }
 
-      // Select it
       levelSelect.value = targetOption.value;
     });
   }
 
   /**
-   * Initialize level. Binds desk reactions, wires proximity click gates,
-   * restores saved score from profile, renders the mission scoreboard,
-   * and syncs the level dropdown.
+   * Initialize level.
    */
   async initialize() {
     const objects = this.gameEnv?.gameObjects || [];
@@ -399,7 +429,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     await this._restoreMissionScore();
     this._syncMissionProgressBoard();
 
-    // ── FIX: update the level dropdown to show "Mission Tools" ──
     this._syncLevelDropdown();
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
@@ -438,8 +467,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Start challenge. Opens the desk UI, generates one AI question,
-   * and arms the answer submission handler.
+   * Start challenge.
    */
   async startDeskChallenge(desk, deskId, npcRef = null) {
     const npc = npcRef || desk;

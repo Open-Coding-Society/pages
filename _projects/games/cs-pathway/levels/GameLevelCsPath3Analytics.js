@@ -454,6 +454,42 @@ class GameLevelCsPath3Analytics extends GameLevelCsPathIdentity {
     }.bind(this);
   }
 
+  // ── Sync level dropdown ───────────────────────────────────────
+  _syncLevelDropdown() {
+    requestAnimationFrame(() => {
+      const allSelects = Array.from(document.querySelectorAll('select'));
+      const levelSelect = allSelects.find((sel) =>
+        Array.from(sel.options).some((opt) =>
+          opt.textContent.trim() === 'Wayfinding World' ||
+          opt.textContent.trim() === 'Mission Tools' ||
+          opt.textContent.trim() === 'Identity Forge'
+        )
+      );
+      if (!levelSelect) return;
+
+      const targetName = GameLevelCsPath3Analytics.displayName; // 'Assessment Observatory'
+
+      let targetOption = Array.from(levelSelect.options).find(
+        (opt) => opt.textContent.trim() === targetName
+      );
+
+      if (!targetOption) {
+        targetOption = document.createElement('option');
+        targetOption.textContent = targetName;
+        targetOption.value = targetName;
+        levelSelect.appendChild(targetOption);
+      }
+
+      levelSelect.value = targetOption.value;
+    });
+  }
+
+  // ── Initialize ───────────────────────────────────────────────
+  initialize() {
+    this._syncLevelDropdown();
+    if (typeof super.initialize === 'function') super.initialize();
+  }
+
   // ════════════════════════════════════════════════════════════════
   //  NPC 1 – ANALYTICS DASHBOARD
   //  Tabs: Performance Analytics | Sprint Comparison | AI Recommendations | Mini Challenges
@@ -907,7 +943,6 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       if (!userMsg) return;
       chatInput.value = '';
 
-      // Add user message to display
       const userBubble = document.createElement('div');
       userBubble.style.cssText = 'margin-bottom:8px;';
       userBubble.innerHTML = `<span style="color:#60a5fa;font-weight:bold;">You:</span> ${userMsg}`;
@@ -917,7 +952,6 @@ Do not include any other text. Generate exactly 3 recommendations.`;
       chatSendBtn.disabled = true;
       chatSendBtn.textContent = '...';
 
-      // Build full prompt with stats + conversation context
       conversationHistory.push({ role: 'user', content: userMsg });
 
       const systemPrompt = `You are an expert learning coach in a CS education game. 
@@ -1420,35 +1454,32 @@ Answer the student's question concisely and helpfully. Refer to their specific s
 
   /**
    * Draw a skill radar on a canvas element.
-   * @param {HTMLCanvasElement} canvas
-   * @param {Object} skills  e.g. { Attendance: 4, "Work Habits": 3, ... }
-   * @param {number} dpr     device pixel ratio (default 1)
    */
   drawSkillRadarOnCanvas(canvas, skills, dpr = 1) {
     const ctx = canvas.getContext('2d');
-    const W = canvas.width;   // already multiplied by dpr
+    const W = canvas.width;
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-    ctx.scale(dpr, dpr);      // scale once so all coords are in CSS pixels
+    ctx.scale(dpr, dpr);
 
     const cssW = W / dpr;
     const cssH = H / dpr;
     const cx = cssW / 2;
     const cy = cssH / 2;
-    const radius = Math.min(cx, cy) * 0.60;   // 60% of half-size → leaves room for labels
+    const radius = Math.min(cx, cy) * 0.60;
 
     const labels  = Object.keys(skills);
-    const values  = Object.values(skills);     // 1–5
+    const values  = Object.values(skills);
     const n = labels.length;
     if (n === 0) return;
 
     const angleStep = (2 * Math.PI) / n;
-    const startAngle = -Math.PI / 2;           // start at top
+    const startAngle = -Math.PI / 2;
 
     const ptX = (i, r) => cx + r * Math.cos(startAngle + i * angleStep);
     const ptY = (i, r) => cy + r * Math.sin(startAngle + i * angleStep);
 
-    // ── Grid rings (1–5) ────────────────────────────────────────
+    // Grid rings (1–5)
     for (let ring = 1; ring <= 5; ring++) {
       const r = (radius / 5) * ring;
       ctx.beginPath();
@@ -1463,7 +1494,7 @@ Answer the student's question concisely and helpfully. Refer to their specific s
       ctx.stroke();
     }
 
-    // ── Spokes ───────────────────────────────────────────────────
+    // Spokes
     ctx.strokeStyle = 'rgba(251,191,36,0.2)';
     ctx.lineWidth = 1;
     for (let i = 0; i < n; i++) {
@@ -1473,7 +1504,7 @@ Answer the student's question concisely and helpfully. Refer to their specific s
       ctx.stroke();
     }
 
-    // ── Data polygon ─────────────────────────────────────────────
+    // Data polygon
     ctx.beginPath();
     labels.forEach((label, i) => {
       const r = (values[i] / 5) * radius;
@@ -1488,7 +1519,7 @@ Answer the student's question concisely and helpfully. Refer to their specific s
     ctx.fill();
     ctx.stroke();
 
-    // ── Data points ──────────────────────────────────────────────
+    // Data points
     labels.forEach((label, i) => {
       const r = (values[i] / 5) * radius;
       ctx.beginPath();
@@ -1500,7 +1531,7 @@ Answer the student's question concisely and helpfully. Refer to their specific s
       ctx.stroke();
     });
 
-    // ── Labels ───────────────────────────────────────────────────
+    // Labels
     const LABEL_PADDING = 22;
     ctx.font = `bold ${Math.round(cssW * 0.028)}px Arial`;
     ctx.textAlign = 'center';
@@ -1512,14 +1543,12 @@ Answer the student's question concisely and helpfully. Refer to their specific s
       ctx.fillStyle = '#e5e7eb';
       ctx.fillText(label, lx, ly);
 
-      // Score below label
       ctx.font = `${Math.round(cssW * 0.024)}px Arial`;
       ctx.fillStyle = '#f59e0b';
       ctx.fillText(`${values[i]}/5`, lx, ly + 14);
       ctx.font = `bold ${Math.round(cssW * 0.028)}px Arial`;
     });
 
-    // Reset scale for future redraws
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
@@ -1530,7 +1559,6 @@ Answer the student's question concisely and helpfully. Refer to their specific s
     try {
       console.log('Assessment Observatory: Starting data fetch...');
 
-      // Check for debug test data flag
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('debug-test-data')) {
         console.log('Assessment Observatory: Using debug test data');
