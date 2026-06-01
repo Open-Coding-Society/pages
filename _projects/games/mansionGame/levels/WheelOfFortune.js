@@ -19,28 +19,28 @@ class WheelOfFortuneGameManager {
             {
                 id: "hint",
                 name: "Hint Scroll",
-                price: 300,
+                price: 500,
                 description: "Reveals one random hidden letter in the phrase.",
                 owned: 0
             },
             {
                 id: "shield",
                 name: "Bankrupt Shield",
-                price: 450,
+                price: 700,
                 description: "Protects your coins one time when you land on Bankrupt.",
                 owned: 0
             },
             {
                 id: "bonus",
                 name: "Coin Charm",
-                price: 600,
+                price: 800,
                 description: "Adds a $100 bonus to your next correct consonant guess.",
                 owned: 0
             },
             {
                 id: "solveProtection",
                 name: "Guess Guard",
-                price: 250,
+                price: 400,
                 description: "Blocks the $100 penalty from one wrong solve attempt.",
                 owned: 0
             }
