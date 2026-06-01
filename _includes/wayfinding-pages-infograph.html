@@ -1,70 +1,709 @@
 {% assign data = site.data.wayfinding_pages_infograph %}
-
-<div class="wp-infograph">
-  <!-- Header Section -->
+ 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+ 
+<style>
+:root {
+  --wp-bg: #0f0f12;
+  --wp-card: #16161a;
+  --wp-card-border: #2a2a2e;
+  --wp-text: #e4e4e7;
+  --wp-text-muted: #a1a1aa;
+  --wp-accent: #3b82f6;
+  --wp-accent-soft: rgba(59, 130, 246, 0.15);
+  --wp-success: #22c55e;
+  --wp-tag: #27272a;
+  --wp-gradient-start: #3b82f6;
+  --wp-gradient-end: #06b6d4;
+  --wp-purple: #a855f7;
+  --wp-purple-soft: rgba(168, 85, 247, 0.12);
+  --wp-amber: #f59e0b;
+  --wp-amber-soft: rgba(245, 158, 11, 0.12);
+}
+ 
+* { box-sizing: border-box; }
+ 
+.wp-container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--wp-text);
+}
+ 
+/* ── Header ── */
+.wp-header {
+  text-align: center;
+  margin-bottom: 2.75rem;
+}
+ 
+.wp-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 9999px;
+  background: var(--wp-accent-soft);
+  color: var(--wp-accent);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  margin-bottom: 1rem;
+}
+ 
+.wp-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--wp-gradient-start), var(--wp-gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+ 
+.wp-description {
+  font-size: 1.0625rem;
+  color: var(--wp-text-muted);
+  line-height: 1.7;
+  max-width: 640px;
+  margin: 0 auto;
+}
+ 
+/* ── Level Flow Diagram ── */
+.wp-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 2rem 0 2.75rem;
+}
+ 
+.wp-flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.1rem;
+  background: var(--wp-card);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 0.75rem;
+  min-width: 120px;
+  text-align: center;
+  position: relative;
+}
+ 
+.wp-flow-node-icon {
+  font-size: 1.5rem;
+}
+ 
+.wp-flow-node-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--wp-text);
+  line-height: 1.3;
+}
+ 
+.wp-flow-node-sub {
+  font-size: 0.65rem;
+  color: var(--wp-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+ 
+.wp-flow-arrow {
+  font-size: 1rem;
+  color: var(--wp-accent);
+  padding: 0 0.25rem;
+  flex-shrink: 0;
+}
+ 
+.wp-flow-node.active {
+  border-color: var(--wp-accent);
+  background: var(--wp-accent-soft);
+}
+ 
+.wp-flow-node.active .wp-flow-node-label {
+  color: var(--wp-accent);
+}
+ 
+/* ── Section Label ── */
+.wp-section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wp-text-muted);
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--wp-card-border);
+}
+ 
+/* ── Project Card ── */
+.wp-card {
+  background: var(--wp-card);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.2s;
+}
+ 
+.wp-card:hover {
+  border-color: rgba(59,130,246,0.4);
+}
+ 
+.wp-card-header {
+  padding: 1.75rem 1.75rem 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+ 
+.wp-card-title-group {
+  flex: 1;
+}
+ 
+.wp-card-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+ 
+.wp-card-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.01em;
+}
+ 
+.wp-card-subtitle {
+  font-size: 0.9375rem;
+  color: var(--wp-accent);
+  margin: 0;
+}
+ 
+.wp-card-body {
+  padding: 1.25rem 1.75rem 1.75rem;
+}
+ 
+/* Key points */
+.wp-keypoints {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+ 
+.wp-keypoints li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.45rem 0;
+  font-size: 0.9375rem;
+  color: var(--wp-text);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+ 
+.wp-keypoints li:last-child {
+  border-bottom: none;
+}
+ 
+.wp-check {
+  color: var(--wp-success);
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+ 
+/* Tech tags */
+.wp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+ 
+.wp-tag {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--wp-tag);
+  color: var(--wp-text-muted);
+  border-radius: 0.35rem;
+  border: 1px solid var(--wp-card-border);
+}
+ 
+/* About + Impact two-col */
+.wp-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding: 0 1.75rem 1.75rem;
+  border-top: 1px solid var(--wp-card-border);
+  padding-top: 1.25rem;
+}
+ 
+.wp-two-col h4 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wp-text-muted);
+  margin: 0 0 0.6rem;
+}
+ 
+.wp-two-col p {
+  font-size: 0.9rem;
+  color: var(--wp-text-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+ 
+.wp-impact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ 
+.wp-impact-list li {
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+  color: var(--wp-text-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+ 
+.wp-impact-list li::before {
+  content: "→";
+  color: var(--wp-accent);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+ 
+/* Card footer: team + link */
+.wp-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.75rem;
+  border-top: 1px solid var(--wp-card-border);
+  background: rgba(255,255,255,0.015);
+}
+ 
+.wp-team {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+ 
+.wp-team-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wp-text-muted);
+}
+ 
+.wp-team-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--wp-text);
+}
+ 
+.wp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--wp-success);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+ 
+.wp-status::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--wp-success);
+  animation: wp-pulse 2s infinite;
+}
+ 
+@keyframes wp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+ 
+.wp-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.45rem;
+  background: var(--wp-accent);
+  color: #fff;
+  transition: background 0.2s;
+}
+ 
+.wp-btn:hover {
+  background: #2563eb;
+}
+ 
+/* ── Key Learnings Card ── */
+.wp-learnings {
+  background: var(--wp-card);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+ 
+.wp-learnings h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wp-text);
+  margin: 0 0 1rem;
+}
+ 
+.wp-learnings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+ 
+.wp-learning-item {
+  background: var(--wp-tag);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+ 
+.wp-learning-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--wp-accent);
+  margin-bottom: 0.3rem;
+}
+ 
+.wp-learning-desc {
+  font-size: 0.8125rem;
+  color: var(--wp-text-muted);
+  line-height: 1.55;
+}
+ 
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .wp-two-col { grid-template-columns: 1fr; }
+  .wp-title { font-size: 1.75rem; }
+  .wp-flow { gap: 0.25rem; }
+  .wp-flow-node { min-width: 80px; padding: 0.6rem 0.75rem; }
+  .wp-flow-node-label { font-size: 0.65rem; }
+}
+</style>
+ 
+<div class="wp-container">
+ 
+  <!-- Header -->
   <div class="wp-header">
     <div class="wp-badge">Design-Based Research Capstone</div>
     <h1 class="wp-title">{{ data.Title }}</h1>
     <p class="wp-description">{{ data.Description }}</p>
   </div>
-
+ 
+  <!-- Level Flow -->
+  <div class="wp-flow">
+    <div class="wp-flow-node">
+      <span class="wp-flow-node-label">Identity Forge</span>
+      <span class="wp-flow-node-sub">Persona Hall</span>
+    </div>
+    <span class="wp-flow-arrow">→</span>
+    <div class="wp-flow-node active">
+      <span class="wp-flow-node-label">Wayfinding World</span>
+      <span class="wp-flow-node-sub">Hub</span>
+    </div>
+    <span class="wp-flow-arrow">→</span>
+    <div class="wp-flow-node">
+      <span class="wp-flow-node-label">Mission Tools</span>
+      <span class="wp-flow-node-sub">Sprint + Code Hub</span>
+    </div>
+    <span class="wp-flow-arrow">→</span>
+    <div class="wp-flow-node">
+      <span class="wp-flow-node-label">Assessment Observatory</span>
+      <span class="wp-flow-node-sub">Analytics</span>
+    </div>
+  </div>
+ 
   <!-- Project Cards -->
+  <div class="wp-section-label">Levels & Features</div>
+ 
   {% for topic in data.Topics %}
   <div class="wp-card">
-    <div class="wp-card-grid">
-      
-      <!-- Left: Image & Status -->
-      <div class="wp-visual">
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-image-link">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="wp-image">
-          <div class="wp-overlay">
-            <span>View Project</span>
-          </div>
-        </a>
-        <div class="wp-status">{{ topic.status }}</div>
+ 
+    <div class="wp-card-header">
+      <div class="wp-card-title-group">
+        <h2 class="wp-card-title">{{ topic.title }}</h2>
+        <p class="wp-card-subtitle">{{ topic.subtitle }}</p>
+      </div>
+      {% if topic.icon %}<span class="wp-card-icon">{{ topic.icon }}</span>{% endif %}
+    </div>
+ 
+    <div class="wp-card-body">
+      <ul class="wp-keypoints">
+        {% for point in topic.keyPoints %}
+        <li>
+          <span class="wp-check">✓</span>
+          <span>{{ point }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+ 
+      <div class="wp-tags">
+        {% for tech in topic.tech %}
+        <span class="wp-tag">{{ tech }}</span>
+        {% endfor %}
+      </div>
+    </div>
+ 
+    <div class="wp-two-col">
+      <div>
+        <h4>About</h4>
+        <p>{{ topic.description }}</p>
+      </div>
+      <div>
+        <h4>Impact</h4>
+        <ul class="wp-impact-list">
+          {% for item in topic.impact %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+ 
+    <div class="wp-card-footer">
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
         <div class="wp-team">
           <span class="wp-team-label">Project Leads</span>
           <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
         </div>
+        <span class="wp-status">{{ topic.status }}</span>
       </div>
-
-      <!-- Center: Key Points -->
-      <div class="wp-content">
-        <h2 class="wp-project-title">{{ topic.title }}</h2>
-        <p class="wp-subtitle">{{ topic.subtitle }}</p>
-        
-        <div class="wp-keypoints">
-          {% for point in topic.keyPoints %}
-          <div class="wp-keypoint">
-            <span class="wp-check">✓</span>
-            <span>{{ point }}</span>
-          </div>
-          {% endfor %}
-        </div>
-
-        <div class="wp-tech-stack">
-          {% for tech in topic.tech %}
-          <span class="wp-tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Right: Description & Impact -->
-      <div class="wp-details">
-        <h3 class="wp-section-title">About</h3>
-        <p class="wp-about">{{ topic.description }}</p>
-        
-        <h3 class="wp-section-title">Impact</h3>
-        <div class="wp-impact-list">
-          {% for item in topic.impact %}
-          <div class="wp-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
-
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
-      </div>
-
+      {% if topic.link %}
+      <a href="{{ site.baseurl }}{{ topic.link }}" class="wp-btn">Learn More</a>
+      {% endif %}
     </div>
+ 
   </div>
   {% endfor %}
+ 
+  <!-- Hardcoded new features not yet in data file -->
+  <!-- Identity Forge: Persona Hall -->
+  <div class="wp-card">
+    <div class="wp-card-header">
+      <div class="wp-card-title-group">
+        <h2 class="wp-card-title">Identity Forge — Persona Hall</h2>
+        <p class="wp-card-subtitle">Choose your archetype. Start your journey.</p>
+      </div>
+    </div>
+    <div class="wp-card-body">
+      <ul class="wp-keypoints">
+        <li><span class="wp-check">✓</span><span>Multi-category persona selection (student, social, achievement, fantasy)</span></li>
+        <li><span class="wp-check">✓</span><span>Central hub with a unique symbol for each persona</span></li>
+        <li><span class="wp-check">✓</span><span>Selected persona persists and is displayed during gameplay</span></li>
+        <li><span class="wp-check">✓</span><span>Teleport gate to Wayfinding World after selection</span></li>
+      </ul>
+      <div class="wp-tags">
+        <span class="wp-tag">JavaScript</span>
+        <span class="wp-tag">Canvas RPG</span>
+        <span class="wp-tag">NPC Dialogue</span>
+        <span class="wp-tag">Persona API</span>
+      </div>
+    </div>
+    <div class="wp-two-col">
+      <div>
+        <h4>About</h4>
+        <p>Students enter the Persona Hall and choose an initial archetype from multiple categories. Each persona has a distinct visual symbol and drives personalization across the rest of the platform — from group formation to AI suggestions.</p>
+      </div>
+      <div>
+        <h4>Impact</h4>
+        <ul class="wp-impact-list">
+          <li>Grounds students in self-reflection from the first moment of play</li>
+          <li>Enables backend grouping by persona compatibility</li>
+          <li>Provides teachers with real signal for intentional team formation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="wp-card-footer">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span class="wp-status">Live</span>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Wayfinding World: Personality Quiz -->
+  <div class="wp-card">
+    <div class="wp-card-header">
+      <div class="wp-card-title-group">
+        <h2 class="wp-card-title">Wayfinding World — Personality Quiz</h2>
+        <p class="wp-card-subtitle">Confirm your persona. Let data guide your team.</p>
+      </div>
+    </div>
+    <div class="wp-card-body">
+      <ul class="wp-keypoints">
+        <li><span class="wp-check">✓</span><span>Interactive in-game quiz validates the student's initial persona choice</span></li>
+        <li><span class="wp-check">✓</span><span>Quiz results surfaced to teachers for data-driven group formation</span></li>
+        <li><span class="wp-check">✓</span><span>Backend stores personality snapshot via Skills Passport API</span></li>
+        <li><span class="wp-check">✓</span><span>Gatekeeper NPCs guide students through each section of the hub</span></li>
+      </ul>
+      <div class="wp-tags">
+        <span class="wp-tag">JavaScript</span>
+        <span class="wp-tag">Flask API</span>
+        <span class="wp-tag">NPC Dialogue</span>
+        <span class="wp-tag">Analytics</span>
+      </div>
+    </div>
+    <div class="wp-two-col">
+      <div>
+        <h4>About</h4>
+        <p>After arriving from Identity Forge, students explore Wayfinding World and complete an interactive personality quiz. The quiz cross-validates their persona selection and feeds real data to the teacher dashboard for intelligent group formation on future projects.</p>
+      </div>
+      <div>
+        <h4>Impact</h4>
+        <ul class="wp-impact-list">
+          <li>Replaces guesswork with evidence-based team construction</li>
+          <li>Students gain self-awareness through reflective prompts</li>
+          <li>Teacher gets actionable grouping data without manual surveys</li>
+        </ul>
+      </div>
+    </div>
+    <div class="wp-card-footer">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span class="wp-status">Live</span>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Wayfinding World: Code Hub -->
+  <div class="wp-card">
+    <div class="wp-card-header">
+      <div class="wp-card-title-group">
+        <h2 class="wp-card-title">Wayfinding World — Code Hub</h2>
+        <p class="wp-card-subtitle">Learn HTML through play. Build your About Me page.</p>
+      </div>
+    </div>
+    <div class="wp-card-body">
+      <ul class="wp-keypoints">
+        <li><span class="wp-check">✓</span><span>In-game coding challenges teach HTML fundamentals through gameplay</span></li>
+        <li><span class="wp-check">✓</span><span>Scaffolded skill progression leading to the About Me final project</span></li>
+        <li><span class="wp-check">✓</span><span>Students apply skills in a real HTML About Me page submission</span></li>
+        <li><span class="wp-check">✓</span><span>Skills tracked and added to the Skill Passport</span></li>
+      </ul>
+      <div class="wp-tags">
+        <span class="wp-tag">HTML</span>
+        <span class="wp-tag">JavaScript</span>
+        <span class="wp-tag">Canvas RPG</span>
+        <span class="wp-tag">Skill Passport API</span>
+      </div>
+    </div>
+    <div class="wp-two-col">
+      <div>
+        <h4>About</h4>
+        <p>The Code Hub embeds HTML learning directly into the game loop. Students play through coding challenges that teach real markup skills, building toward a final deliverable — an HTML About Me page — that demonstrates their proficiency in a personally meaningful context.</p>
+      </div>
+      <div>
+        <h4>Impact</h4>
+        <ul class="wp-impact-list">
+          <li>Bridges game engagement with transferable technical skills</li>
+          <li>Students arrive at the About Me project with foundational HTML confidence</li>
+          <li>Progress is logged to the Skill Passport for trimester review</li>
+        </ul>
+      </div>
+    </div>
+    <div class="wp-card-footer">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span class="wp-status">Live</span>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Wayfinding World: Sprint Success -->
+  <div class="wp-card">
+    <div class="wp-card-header">
+      <div class="wp-card-title-group">
+        <h2 class="wp-card-title">Wayfinding World — Sprint Success</h2>
+        <p class="wp-card-subtitle">Agile planning, gamified. Build a real mini sprint.</p>
+      </div>
+    </div>
+    <div class="wp-card-body">
+      <ul class="wp-keypoints">
+        <li><span class="wp-check">✓</span><span>Interactive missions teach agile planning concepts hands-on</span></li>
+        <li><span class="wp-check">✓</span><span>Students build an actual mini sprint — backlog, tasks, review</span></li>
+        <li><span class="wp-check">✓</span><span>Mirrors real-world scrum workflows used in industry</span></li>
+        <li><span class="wp-check">✓</span><span>Sprint data captured for teacher visibility and assessment</span></li>
+      </ul>
+      <div class="wp-tags">
+        <span class="wp-tag">JavaScript</span>
+        <span class="wp-tag">Agile / Scrum</span>
+        <span class="wp-tag">NPC Missions</span>
+        <span class="wp-tag">Canvas RPG</span>
+      </div>
+    </div>
+    <div class="wp-two-col">
+      <div>
+        <h4>About</h4>
+        <p>Sprint Success teaches agile methodology through a series of in-game missions. Students don't just learn what a sprint is — they build one: defining goals, breaking down tasks, and reflecting on outcomes, all within the game world.</p>
+      </div>
+      <div>
+        <h4>Impact</h4>
+        <ul class="wp-impact-list">
+          <li>Students internalize agile vocabulary through doing, not reading</li>
+          <li>Prepares students for collaborative project work later in the course</li>
+          <li>Teachers gain insight into student planning maturity</li>
+        </ul>
+      </div>
+    </div>
+    <div class="wp-card-footer">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <span class="wp-status">Live</span>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Key Learnings -->
+  <div class="wp-section-label">Key Engineering Takeaways</div>
+  <div class="wp-learnings">
+    <div class="wp-learnings-grid">
+      <div class="wp-learning-item">
+        <div class="wp-learning-title">Level Injection Pattern</div>
+        <div class="wp-learning-desc">Splicing a level at <code style="font-family:'JetBrains Mono',monospace;">currentLevelIndex + 1</code> then incrementing is the right way to add sub-levels dynamically without breaking the level list.</div>
+      </div>
+      <div class="wp-learning-item">
+        <div class="wp-learning-title">Fetch Error Handling</div>
+        <div class="wp-learning-desc">A mismatched API path is silent without try/catch. Always wrap fetches, check <code style="font-family:'JetBrains Mono',monospace;">res.ok</code>, and log the status code before rendering UI.</div>
+      </div>
+      <div class="wp-learning-item">
+        <div class="wp-learning-title">SVG Sprite Sheets</div>
+        <div class="wp-learning-desc">Animated game sprites don't need image files — generate them as data URIs with inline SVG. Each animation frame is a side-by-side <code style="font-family:'JetBrains Mono',monospace;">&lt;g&gt;</code> group.</div>
+      </div>
+      <div class="wp-learning-item">
+        <div class="wp-learning-title">DOM Timing</div>
+        <div class="wp-learning-desc">UI updates that depend on DOM elements (like dropdown sync) need <code style="font-family:'JetBrains Mono',monospace;">requestAnimationFrame</code> to avoid running before elements exist.</div>
+      </div>
+    </div>
+  </div>
+ 
 </div>
+ 
