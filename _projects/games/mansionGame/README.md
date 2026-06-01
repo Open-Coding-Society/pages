@@ -15,4 +15,4 @@ Salma, Sophia, Isha, Joshika (Level 2): https://github.com/orgs/undergroundrapcl
 Dhruv, Siddharth, Pranav, Lance, Yiming, Arjun (Level 3): https://github.com/users/dhruvA207/projects/2 
 (Level 4):
 Pranay, Ishan, Aadi, Aryan, Chet, Kash (Level 5): https://github.com/users/Jupiterian/projects/5
-Anish, Samarth, Rohan, Aarav, Ahmad, Finn (Level:6): https://github.com/orgs/CompSciSorcerers/projects/7/views/1
+Anish, Samarth, Rohan, Aarav, Ahmad, Finn (Level 6): https://github.com/orgs/CompSciSorcerers/projects/7/views/1
