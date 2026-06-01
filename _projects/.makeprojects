@@ -10,6 +10,7 @@
 
 # === NESTED STRUCTURE (organized by category) ===
 # Games
+games/real-estate-tycoon
 games/voidstriker
 games/spline-barriers
 games/characters
@@ -20,6 +21,7 @@ games/escape-the-tower
 games/pirate-hunt
 games/gamify
 games/mansionGame:dev
+games/mansionGame-old
 games/local-storage
 games/kirby-minigames
 main
@@ -37,6 +39,7 @@ games/gategame
 games/heist-exe
 games/castle-game
 games/astronaut-platformer-game
+games/fortuneFinders:dev
 
 
 # Lessons
@@ -50,5 +53,6 @@ systems/student-management-groups
 systems/ai-ab-engine
 systems/auto-generator
 systems/auto-generator-ui
+systems/scraper
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===

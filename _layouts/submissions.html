@@ -99,10 +99,6 @@ active_tab: submissions
                     <span class="edit-field-label">Submission type</span>
                     <div id="edit-submission-type" class="edit-field-value"></div>
                 </div>
-                <label class="edit-checkbox-row">
-                    <input type="checkbox" id="edit-is-late">
-                    <span>Mark as late</span>
-                </label>
             </div>
 
             <div id="edit-link-fields" class="edit-section">
@@ -127,6 +123,11 @@ active_tab: submissions
             </div>
 
                 <div id="edit-admin-fields" class="edit-section hidden">
+                    <label class="edit-checkbox-row">
+                        <input type="checkbox" id="edit-is-late">
+                        <span>Mark as late</span>
+                    </label>
+
                     <label class="edit-field-label" for="edit-grade">Grade</label>
                     <input type="number" id="edit-grade" class="edit-input" min="0" max="100" step="0.5" placeholder="0–100">
 
@@ -615,7 +616,8 @@ active_tab: submissions
 
         const uid = storagePath.slice(0, slashIndex);
         const filename = storagePath.slice(slashIndex + 1);
-        return `${javaURI}/api/files/download/${encodeURIComponent(uid)}/${encodeURIComponent(filename)}`;
+        const params = new URLSearchParams({ uid, filename });
+        return `${javaURI}/api/files/download?${params.toString()}`;
     }
 
     function getSubmissionContentType(submission) {
@@ -748,7 +750,6 @@ active_tab: submissions
         const url = document.getElementById('edit-url').value.trim();
         const notes = document.getElementById('edit-notes').value.trim();
         const comment = document.getElementById('edit-comment').value.trim();
-        const isLate = document.getElementById('edit-is-late').checked;
         const fileInput = document.getElementById('edit-file');
         const submitButton = document.querySelector('#submission-edit-form .edit-primary-btn');
 
@@ -756,7 +757,10 @@ active_tab: submissions
         formData.append('contentType', contentType);
         formData.append('notes', notes);
         formData.append('comment', comment);
-        formData.append('isLate', isLate ? 'true' : 'false');
+        if (isAdmin) {
+            const isLate = document.getElementById('edit-is-late').checked;
+            formData.append('isLate', isLate ? 'true' : 'false');
+        }
 
         if (contentType === 'link') {
             if (!url) {

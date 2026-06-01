@@ -7,6 +7,7 @@ import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import PersonaHallTrial from './PersonaHallTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
+import GameLevelEmpathyEpic from './GameLevelEmpathyEpic.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
@@ -14,7 +15,7 @@ import AboutMeBuilder from './AboutMeBuilder.js';
 import MissionTools from './GameLevelCsPath2Mission.js';
 import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 import SprintSuccessModule from './SprintSuccessModule.js';
-import PersonaTrial from './personaTrial.js';
+import PersonaTrial from './PersonaTrial.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -341,9 +342,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
             primary: true,
             action: () => {
               this.dialogueSystem.closeDialogue();
-
-              // replace with your actual level/module
-              levelInstance.showToast?.('Empathy Epic coming soon!');
+              levelInstance.openEmpathyEpic();
             },
           },
         ]);
@@ -541,6 +540,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     gc.transitionToLevel();
   }
 
+  openEmpathyEpic() {
+    const gc = this.gameEnv.gameControl;
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelEmpathyEpic);
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
+  }
+
   async saveSprintSuccessResult(result) {
     const currentProfile = { ...(this.profileData || {}) };
 
@@ -591,7 +597,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         .map((entry) => entry?.name || entry)
         .filter(Boolean)
     )];
-    const selectedClass = normalizedClassNames[0] || null;
+    const selectedClass = result.course || normalizedClassNames[0] || null;
 
     const currentProfile = { ...(this.profileData || {}) };
 
@@ -599,6 +605,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       ...currentProfile,
       course: selectedClass || currentProfile.course || '—',
       coursePlanMeta: {
+        course: selectedClass,
         title: result.title,
         summary: result.summary,
         primaryPath: result.primaryPath,
@@ -611,13 +618,14 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         selectedClass,
         gamePlan: result.gamePlan,
         redeemToken: result.redeemToken,
-        completedAt: result.completedAt,
+        completedAt: result.completedAt || new Date().toISOString(),
       },
     };
 
     this.profileData = updatedProfile;
 
     if (typeof this.profileManager?.updateProgress === 'function') {
+      await this.profileManager.updateProgress('course', selectedClass || currentProfile.course);
       await this.profileManager.updateProgress('coursePlanMeta', updatedProfile.coursePlanMeta);
     }
 
@@ -650,6 +658,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       } catch (error) {
         console.warn('Wayfinding World: failed to sync class selection', error);
       }
+    }
+
+    if (this.profileManager?.isAuthenticated) {
+      await this.syncPathwayCalendar({ force: true, includeDrills: false });
     }
   }
 }

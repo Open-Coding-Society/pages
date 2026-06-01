@@ -1,7 +1,8 @@
 class WheelOfFortuneGameManager {
     constructor(gameEnv, options = {}) {
         this.gameEnv = gameEnv;
-        this.phrase = (options.phrase || "SECRET PASSAGE").toUpperCase();
+        this.phraseBank = this.normalizePhraseBank(options.phraseBank);
+        this.phrase = this.normalizePhrase(options.phrase || this.pickPhraseFromBank(this.phraseBank));
         this.category = options.category || "Mansion Mystery";
         this.onWin = options.onWin || (() => {});
         this.overlay = null;
@@ -66,7 +67,7 @@ class WheelOfFortuneGameManager {
                             <div style="background: #211a29; border-radius: 6px; padding: 10px 14px;">Vowels: <strong>$250</strong></div>
                         </div>
 
-                        <div id="wheel-puzzle" style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 78px; padding: 16px; margin-bottom: 14px; background: #0f2f29; border: 3px solid #58a572; border-radius: 8px;"></div>
+                        <div id="wheel-puzzle" style="display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 120px; padding: 16px; margin-bottom: 14px; background: #0f2f29; border: 3px solid #58a572; border-radius: 8px;"></div>
 
                         <div id="wheel-message" style="min-height: 44px; margin-bottom: 14px; color: #f2d98b; font-size: 16px; line-height: 1.4;"></div>
 
@@ -206,7 +207,7 @@ class WheelOfFortuneGameManager {
 
         this.solved = true;
         this.revealPhrase();
-        this.setMessage("Correct. The hidden key is yours.");
+        this.setMessage(`Correct. ${this.phrase} is yours.`);
         setTimeout(() => {
             this.close();
             this.onWin();
@@ -254,21 +255,34 @@ class WheelOfFortuneGameManager {
         const puzzle = this.overlay.querySelector("#wheel-puzzle");
         puzzle.innerHTML = "";
 
-        for (const character of this.phrase) {
-            const tile = document.createElement("span");
-            tile.style.cssText = `
-                width: 38px;
-                height: 46px;
-                display: grid;
-                place-items: center;
-                border-radius: 4px;
-                background: ${character === " " ? "transparent" : "#f4ead1"};
-                color: #16120b;
-                font-size: 24px;
-                font-weight: 900;
+        for (const word of this.phrase.split(" ")) {
+            const wordRow = document.createElement("div");
+            wordRow.style.cssText = `
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                width: 100%;
             `;
-            tile.textContent = character === " " ? "" : (this.guessedLetters.has(character) ? character : "");
-            puzzle.appendChild(tile);
+
+            for (const character of word) {
+                const tile = document.createElement("span");
+                tile.style.cssText = `
+                    width: 38px;
+                    height: 46px;
+                    display: grid;
+                    place-items: center;
+                    border-radius: 4px;
+                    background: #f4ead1;
+                    color: #16120b;
+                    font-size: 24px;
+                    font-weight: 900;
+                `;
+                tile.textContent = this.guessedLetters.has(character) ? character : "";
+                wordRow.appendChild(tile);
+            }
+
+            puzzle.appendChild(wordRow);
         }
 
         const consonantButton = this.overlay.querySelector("#wheel-consonant-btn");
@@ -287,6 +301,28 @@ class WheelOfFortuneGameManager {
 
     normalizePhrase(value) {
         return String(value || "").trim().replace(/\s+/g, " ").toUpperCase();
+    }
+
+    normalizePhraseBank(phrases) {
+        const fallbackPhrases = [
+            "SECRET PASSAGE",
+            "HIDDEN STAIRCASE",
+            "MIRROR CHAMBER",
+            "BENEATH THE STAIRS",
+            "LOCKED PANEL",
+            "DUSTY ARCHWAY"
+        ];
+        const source = Array.isArray(phrases) && phrases.length ? phrases : fallbackPhrases;
+
+        return source.map((phrase) => this.normalizePhrase(phrase)).filter(Boolean);
+    }
+
+    pickPhraseFromBank(phrases) {
+        if (!phrases.length) {
+            return "SECRET PASSAGE";
+        }
+
+        return phrases[Math.floor(Math.random() * phrases.length)];
     }
 
     isVowel(letter) {

@@ -9,6 +9,7 @@ active_tab: calendar
 
 <div class="calendar-dashboard-tabs" role="tablist" aria-label="Calendar Dashboard Tabs">
     <button type="button" class="dashboard-tab-btn active" data-dashboard-tab="calendar" role="tab" aria-selected="true">Calendar</button>
+    <button type="button" class="dashboard-tab-btn" data-dashboard-tab="cs-pathway" role="tab" aria-selected="false">CS Pathway</button>
     <button type="button" class="dashboard-tab-btn" data-dashboard-tab="issues" role="tab" aria-selected="false">Issues</button>
     <button type="button" class="dashboard-tab-btn" data-dashboard-tab="threads" role="tab" aria-selected="false">Threads</button>
 </div>
@@ -19,24 +20,46 @@ active_tab: calendar
         <i class="fas fa-exclamation-triangle calendar-auth-banner-icon"></i>
         <span>Your session has expired. <a href="{{site.baseurl}}/login" class="calendar-auth-banner-link">Log in again</a> to view and manage your calendar events.</span>
     </div>
+    <p class="calendar-private-note">When you are signed in, the calendar shows your account's events. Use the <strong>CS Pathway</strong> tab or source filter for game tasks synced from your pathway start date (stored per user in Spring).</p>
+    <div class="calendar-source-chips" role="group" aria-label="Calendar source filters">
+        <button type="button" class="calendar-source-chip active" data-source-filter="all">All</button>
+        <button type="button" class="calendar-source-chip" data-source-filter="events">Events</button>
+        <button type="button" class="calendar-source-chip" data-source-filter="cs-pathway">CS Pathway</button>
+        <button type="button" class="calendar-source-chip" data-source-filter="issues">Issues</button>
+        <button type="button" class="calendar-source-chip" data-source-filter="breaks">Breaks</button>
+    </div>
     <div class="calendar-controls-row">
-        <input id="calendar-filter-query" type="search" placeholder="Search events, issues, or breaks" />
-        <select id="calendar-filter-source">
-            <option value="all">All sources</option>
-            <option value="events">Events</option>
-            <option value="issues">Issues</option>
-            <option value="breaks">Breaks</option>
-        </select>
-        <select id="calendar-filter-type">
+        <label class="filter-field" for="calendar-filter-query">
+            <span class="filter-label">Search</span>
+            <input id="calendar-filter-query" type="search" placeholder="Search events, issues, or breaks" />
+        </label>
+        <label class="filter-field" for="calendar-filter-source">
+            <span class="filter-label">Source</span>
+            <select id="calendar-filter-source">
+                <option value="all">All sources</option>
+                <option value="events">Events</option>
+                <option value="cs-pathway">CS Pathway (game tasks)</option>
+                <option value="issues">Issues</option>
+                <option value="breaks">Breaks</option>
+            </select>
+        </label>
+        <label class="filter-field" for="calendar-filter-type">
+            <span class="filter-label">Type</span>
+            <select id="calendar-filter-type">
             <option value="">All types</option>
             <option value="event">Event</option>
             <option value="appointment">Appointment</option>
             <option value="issue">Issue</option>
             <option value="break">Break</option>
-        </select>
-        <select id="calendar-filter-group" class="filter-field">
-            <option value="">All groups</option>
-        </select>
+            </select>
+        </label>
+        <label class="filter-field" for="calendar-filter-group">
+            <span class="filter-label">Group</span>
+            <select id="calendar-filter-group">
+                <option value="">All groups</option>
+                <option value="cs pathway">CS Pathway</option>
+            </select>
+        </label>
         <label class="filter-field filter-field--date" for="calendar-filter-start">
             <span class="filter-label">Start date</span>
             <input id="calendar-filter-start" type="date" title="Filter from date" />
@@ -47,6 +70,21 @@ active_tab: calendar
         </label>
     </div>
     <div id="calendar" class="calendar-stage"></div>
+</section>
+
+<section id="dashboard-panel-cs-pathway" class="dashboard-panel hidden" role="tabpanel" aria-label="CS Pathway Tasks Panel">
+    <div class="calendar-cs-pathway-panel">
+        <div class="calendar-cs-pathway-header">
+            <h2 class="calendar-cs-pathway-title">CS Pathway learning timeline</h2>
+            <p class="calendar-cs-pathway-subtitle">Personal game tasks from the CS Pathway quest. Only your account can see these on the calendar (Spring <code>calendar_events.individual</code> = your GitHub ID).</p>
+        </div>
+        <p id="cs-pathway-empty" class="calendar-cs-pathway-empty hidden">No CS Pathway tasks yet. Log in, play the pathway game, and complete Identity Terminal or Course Enlistment to auto-publish your timeline.</p>
+        <ul id="cs-pathway-task-list" class="calendar-cs-pathway-task-list" aria-live="polite"></ul>
+        <div class="calendar-cs-pathway-actions">
+            <button type="button" id="cs-pathway-show-calendar" class="calendar-issue-action-btn primary">Show on calendar</button>
+            <button type="button" id="cs-pathway-clear-filters" class="calendar-issue-action-btn secondary">Show all events</button>
+        </div>
+    </div>
 </section>
 
 <section id="dashboard-panel-issues" class="dashboard-panel hidden" role="tabpanel" aria-label="Issues Panel">
@@ -364,6 +402,74 @@ active_tab: calendar
     let activeDashboardTab = 'calendar';
     let activeIssuesSubtab = 'create';
     let onIssuesRefreshedHook = null;
+    let currentUserName = '';
+    let calendar = null;
+
+    function formatDate(dateInput) {
+        const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+        return date.toLocaleDateString();
+    }
+
+    function isCsPathwayEvent(event) {
+        if (!event) return false;
+        const ext = event.extendedProps || {};
+        if (ext.isCsPathway || ext.source === 'cs-pathway') return true;
+        const titleText = String(event.title || '').toLowerCase();
+        const groupText = String(event.groupName || ext.groupName || '').toLowerCase();
+        const periodText = String(event.period || ext.period || '').toLowerCase();
+        return titleText.includes('cs pathway') || groupText === 'cs pathway' || periodText === 'cs pathway';
+    }
+
+    function getCsPathwayEvents() {
+        return allEvents.filter(event => isCsPathwayEvent(event) && !event.isBreak && !(event.extendedProps && event.extendedProps.isBreak));
+    }
+
+    function setSourceFilter(value) {
+        const select = document.getElementById('calendar-filter-source');
+        if (select) select.value = value;
+        document.querySelectorAll('.calendar-source-chip').forEach(chip => {
+            chip.classList.toggle('active', chip.dataset.sourceFilter === value);
+        });
+    }
+
+    function renderCsPathwayPanel() {
+        const listEl = document.getElementById('cs-pathway-task-list');
+        const emptyEl = document.getElementById('cs-pathway-empty');
+        if (!listEl || !emptyEl) return;
+
+        const tasks = getCsPathwayEvents().sort((a, b) => {
+            const da = formatDate(a.start) || '';
+            const db = formatDate(b.start) || '';
+            return da.localeCompare(db);
+        });
+
+        if (tasks.length === 0) {
+            listEl.innerHTML = '';
+            emptyEl.classList.remove('hidden');
+            return;
+        }
+
+        emptyEl.classList.add('hidden');
+        listEl.innerHTML = tasks.map(task => {
+            const ext = task.extendedProps || {};
+            const due = formatDate(task.start) || '—';
+            const priority = task.priority || ext.priority || 'P2';
+            const levelMatch = String(task.title || '').match(/\|\s*([^|]+)\s*\|/);
+            const level = levelMatch ? levelMatch[1].trim() : 'CS Pathway';
+            return `<li class="calendar-cs-pathway-task">
+                <div class="calendar-cs-pathway-task-meta">
+                    <span class="calendar-cs-pathway-task-priority priority-${String(priority).toLowerCase()}">${priority}</span>
+                    <span class="calendar-cs-pathway-task-date">${due}</span>
+                    <span class="calendar-cs-pathway-task-level">${level}</span>
+                </div>
+                <strong class="calendar-cs-pathway-task-title">${task.title || 'Untitled task'}</strong>
+                <p class="calendar-cs-pathway-task-desc">${(task.description || ext.description || '').replace(/\n/g, '<br>')}</p>
+            </li>`;
+        }).join('');
+    }
 
     const ISSUE_STATUS_OPTIONS = ['open', 'in-progress', 'blocked', 'done'];
     const ISSUE_STATUS_LABELS = {
@@ -665,7 +771,7 @@ active_tab: calendar
             const issue = thread.issue || {};
             const latestComment = thread.latestComment || null;
             const replyCount = (thread.comments || []).length;
-            
+
             // Prefer assignedGroupLabels from server, fallback to parsing assignedGroups
             let assignedGroupsLabel = '';
             if (Array.isArray(issue.assignedGroupLabels) && issue.assignedGroupLabels.length > 0) {
@@ -678,7 +784,7 @@ active_tab: calendar
                     }
                 } catch (e) { /* Skip if not valid JSON */ }
             }
-            
+
             return `
                 <article class="issue-card issue-thread-card" data-issue-id="${escapeIssueText(thread.issueId)}">
                     <div class="issue-card-top">
@@ -705,8 +811,12 @@ active_tab: calendar
     }
 
     function renderCalendarFilters() {
-        if (activeDashboardTab !== 'calendar') return;
-        window.displayCalendar?.(window.filterEvents?.() || []);
+        if (activeDashboardTab === 'calendar') {
+            window.displayCalendar?.(window.filterEvents?.() || []);
+        }
+        if (activeDashboardTab === 'cs-pathway') {
+            renderCsPathwayPanel();
+        }
     }
 
     function applyCalendarFilterUI() {
@@ -723,11 +833,17 @@ active_tab: calendar
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
         });
         document.getElementById('dashboard-panel-calendar')?.classList.toggle('hidden', tabName !== 'calendar');
+        document.getElementById('dashboard-panel-cs-pathway')?.classList.toggle('hidden', tabName !== 'cs-pathway');
         document.getElementById('dashboard-panel-issues')?.classList.toggle('hidden', tabName !== 'issues');
         document.getElementById('dashboard-panel-threads')?.classList.toggle('hidden', tabName !== 'threads');
 
+        if (tabName === 'cs-pathway') {
+            setSourceFilter('cs-pathway');
+            renderCsPathwayPanel();
+        }
+
         if (tabName === 'calendar' && calendar) {
-            setTimeout(() => { 
+            setTimeout(() => {
                 const calendarEl = document.getElementById('calendar');
                 if (calendarEl && calendarEl.offsetWidth > 0) {
                     calendar.render();
@@ -950,7 +1066,7 @@ active_tab: calendar
             if (el.dueDate) el.dueDate.value = issue.dueDate || '';
             if (el.eventId) el.eventId.value = issue.eventId || '';
             if (el.tags) el.tags.value = normalizeTags(issue.tags).join(', ');
-            
+
             // Set assigned groups if available
             const groupSelect = document.getElementById('issue-assigned-groups');
             if (groupSelect && issue.assignedGroups) {
@@ -965,7 +1081,7 @@ active_tab: calendar
             } else if (groupSelect) {
                 groupSelect.selectedIndex = 0;
             }
-            
+
             if (el.saveBtn) el.saveBtn.textContent = 'Update Issue';
             updateIssueDescriptionPreview();
             switchIssuesSubtab('create');
@@ -1228,6 +1344,10 @@ active_tab: calendar
                                 let displayTitle = event.title || '';
                                 const pm = displayTitle.match(/^\[(P[0-3])\]\s*/);
                                 if (pm) { priority = pm[1]; displayTitle = displayTitle.replace(/^\[(P[0-3])\]\s*/, ''); }
+                                const rawTitle = event.title || '';
+                                const csPathway = rawTitle.includes('CS Pathway')
+                                    || String(event.groupName || '').toLowerCase() === 'cs pathway'
+                                    || String(event.period || '').toLowerCase() === 'cs pathway';
                                 allEvents.push({
                                     id: event.id,
                                     priority: priority,
@@ -1235,17 +1355,20 @@ active_tab: calendar
                                     description: event.description,
                                     start: formatDate(event.date),
                                     isBreak: false,
+                                    isCsPathway: csPathway,
                                     // Group-based fields
                                     groupName: event.groupName || '',
                                     period: event.period || null,   // course name (CSA/CSP/CSSE) from sprint sync
-                                    classNames: [`priority-${priority.toLowerCase()}`],
+                                    classNames: [`priority-${priority.toLowerCase()}`].concat(csPathway ? ['fc-event-cs-pathway'] : []),
                                     extendedProps: {
                                         type: event.type || 'event',
                                         groupName: event.groupName || '',
                                         individual: event.individual || '',
                                         description: event.description,
                                         period: event.period || null,
-                                        priority: priority
+                                        priority: priority,
+                                        isCsPathway: csPathway,
+                                        source: csPathway ? 'cs-pathway' : (event.type || 'event')
                                     }
                                 });
                             } catch (err) { console.error("Error loading event:", event, err); }
@@ -1302,6 +1425,7 @@ active_tab: calendar
                     displayCalendar(filterEvents());
                     renderIssueViews();
                     renderThreadsPanel();
+                    renderCsPathwayPanel();
                     if (typeof onIssuesRefreshedHook === 'function') {
                         onIssuesRefreshedHook();
                     }
@@ -1312,6 +1436,7 @@ active_tab: calendar
                     displayCalendar(filterEvents());
                     renderIssueViews();
                     renderThreadsPanel();
+                    renderCsPathwayPanel();
                     if (typeof onIssuesRefreshedHook === 'function') {
                         onIssuesRefreshedHook();
                     }
@@ -1355,6 +1480,8 @@ active_tab: calendar
                 filtered = filtered.filter(event => {
                     // Always show breaks/holidays
                     if (event.isBreak || (event.extendedProps && event.extendedProps.isBreak)) return true;
+                    // CS Pathway tasks are personal (individual column in Spring) — always visible to owner
+                    if (isCsPathwayEvent(event)) return true;
                     // Match by group name
                     const evtGroup = event.groupName || (event.extendedProps && event.extendedProps.groupName) || '';
                     if (evtGroup && myGroupNames.has(evtGroup)) return true;
@@ -1392,7 +1519,11 @@ active_tab: calendar
 
                 if (event.isBreak || ext.isBreak) return true;
 
-                if (filterValues.source !== 'all' && filterValues.source !== eventSource) return false;
+                if (filterValues.source === 'cs-pathway') {
+                    if (!isCsPathwayEvent(event)) return false;
+                } else if (filterValues.source !== 'all' && filterValues.source !== eventSource) {
+                    return false;
+                }
                 if (filterValues.type && filterValues.type !== eventType) return false;
                 if (filterValues.group) {
                     const fv = String(filterValues.group);
@@ -1902,6 +2033,38 @@ active_tab: calendar
                 await handleRequest();
             });
 
+            document.querySelectorAll('.calendar-source-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const value = chip.dataset.sourceFilter || 'all';
+                    setSourceFilter(value);
+                    applyCalendarFilterUI();
+                    if (value === 'cs-pathway') {
+                        switchDashboardTab('cs-pathway');
+                    } else if (activeDashboardTab === 'cs-pathway') {
+                        switchDashboardTab('calendar');
+                    }
+                });
+            });
+
+            document.getElementById('calendar-filter-source')?.addEventListener('change', () => {
+                const value = document.getElementById('calendar-filter-source')?.value || 'all';
+                setSourceFilter(value);
+            });
+
+            document.getElementById('cs-pathway-show-calendar')?.addEventListener('click', () => {
+                setSourceFilter('cs-pathway');
+                switchDashboardTab('calendar');
+                applyCalendarFilterUI();
+            });
+
+            document.getElementById('cs-pathway-clear-filters')?.addEventListener('click', () => {
+                setSourceFilter('all');
+                const groupSelect = document.getElementById('calendar-filter-group');
+                if (groupSelect) groupSelect.value = '';
+                switchDashboardTab('calendar');
+                applyCalendarFilterUI();
+            });
+
             switchDashboardTab('calendar');
             switchIssuesSubtab('create');
         }
@@ -2016,7 +2179,7 @@ active_tab: calendar
                         if (!replies || replies.length === 0) return;
                         const repliesContainer = document.getElementById(`replies-${commentId}`);
                         if (!repliesContainer) return;
-                        
+
                         repliesContainer.innerHTML = replies.map(reply => `
                             <article class="issue-comment-reply" style="border-left: 3px solid #ccc; padding-left: 12px;">
                                 <div class="issue-comment-card-top">
@@ -2026,11 +2189,11 @@ active_tab: calendar
                                 <div class="issue-comment-body">${escapeIssueText(reply.text || '')}</div>
                             </article>
                         `).join('');
-                        
+
                         // Clean up the controller from the map
                         window._activeReplyFetches.delete(commentId);
                     })
-                    .catch(e => { 
+                    .catch(e => {
                         if (e.name !== 'AbortError') {
                             console.warn('Failed to load replies:', e);
                         }
@@ -2180,12 +2343,12 @@ active_tab: calendar
 
             el.form?.addEventListener('submit', async (event) => {
                 event.preventDefault();
-                
+
                 // Get selected groups
                 const groupSelect = document.getElementById('issue-assigned-groups');
                 const selectedOptions = Array.from(groupSelect?.selectedOptions || []);
                 const assignedGroups = selectedOptions.filter(opt => opt.value).map(opt => opt.value);
-                
+
                 const payload = {
                     title: (el.title?.value || '').trim(),
                     description: (el.description?.value || '').trim(),
