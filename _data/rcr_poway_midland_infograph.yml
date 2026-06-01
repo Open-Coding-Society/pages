@@ -303,3 +303,10 @@ FutureFeatures:
     icon: "GRP"
     description: "A dedicated booking flow for schools and community groups with custom pricing tiers, group size management, and direct coordinator communication — replacing the current phone-based group process."
     needs: "Coordination with PMRR booking staff"
+
+  - title: "Staff Login & Management Dashboard"
+    tech:
+    - "Flask-Login authentication framework — manages staff sessions, protects restricted routes, and prevents unauthorized access to administrative tools"
+    - "SQLite user credential store — maintains staff account records and verifies login credentials during authentication"
+    - "Reservation management interface — queries the reservations database and displays customer booking records, ticket quantities, departure details, and confirmation codes"
+    - "Volunteer records dashboard — retrieves volunteer sign-up data from the database and presents staffing information for upcoming operating days"
