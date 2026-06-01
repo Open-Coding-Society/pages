@@ -13,6 +13,40 @@ class WheelOfFortuneGameManager {
         this.guessedLetters = new Set();
         this.solved = false;
         this.wheelSegments = [100, 150, 200, 250, 300, 400, 500, "Lose Turn", "Bankrupt"];
+
+        // Shop items players can buy with coins earned from the wheel
+        this.shopItems = [
+            {
+                id: "hint",
+                name: "Hint Scroll",
+                price: 300,
+                description: "Reveals one random hidden letter in the phrase.",
+                owned: 0
+            },
+            {
+                id: "shield",
+                name: "Bankrupt Shield",
+                price: 450,
+                description: "Protects your coins one time when you land on Bankrupt.",
+                owned: 0
+            },
+            {
+                id: "bonus",
+                name: "Coin Charm",
+                price: 600,
+                description: "Adds a $100 bonus to your next correct consonant guess.",
+                owned: 0
+            },
+            {
+                id: "solveProtection",
+                name: "Guess Guard",
+                price: 250,
+                description: "Blocks the $100 penalty from one wrong solve attempt.",
+                owned: 0
+            }
+        ];
+
+        this.activeBonus = 0;
     }
 
     startGame() {
@@ -43,7 +77,7 @@ class WheelOfFortuneGameManager {
         `;
 
         this.overlay.innerHTML = `
-            <div style="width: min(980px, 100%); max-height: 94vh; overflow: auto; background: #17131d; border: 3px solid #d6b35f; border-radius: 8px; box-shadow: 0 0 28px rgba(214, 179, 95, 0.45); padding: 22px;">
+            <div style="width: min(1080px, 100%); max-height: 94vh; overflow: auto; background: #17131d; border: 3px solid #d6b35f; border-radius: 8px; box-shadow: 0 0 28px rgba(214, 179, 95, 0.45); padding: 22px;">
                 <div style="display: flex; justify-content: space-between; gap: 16px; align-items: start; flex-wrap: wrap; margin-bottom: 18px;">
                     <div>
                         <p style="margin: 0 0 6px 0; color: #d6b35f; font-size: 14px; font-weight: 700; text-transform: uppercase;">Level 5 Challenge</p>
@@ -52,7 +86,7 @@ class WheelOfFortuneGameManager {
                     <button id="wheel-close-btn" style="padding: 10px 14px; border: 0; border-radius: 6px; background: #3c3448; color: white; cursor: pointer;">Exit</button>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; align-items: start;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; align-items: start;">
                     <div style="background: #211a29; border: 1px solid #6e5931; border-radius: 8px; padding: 18px; text-align: center;">
                         <div id="wheel-display" style="width: 210px; height: 210px; margin: 0 auto 14px auto; border-radius: 50%; border: 10px solid #d6b35f; background: conic-gradient(#7f1d1d 0 40deg, #234f36 40deg 80deg, #1d4f7f 80deg 120deg, #7f6b1d 120deg 160deg, #4b2b6f 160deg 200deg, #6b2b4c 200deg 240deg, #355f2a 240deg 280deg, #513131 280deg 320deg, #222 320deg 360deg); display: grid; place-items: center; transition: transform 0.7s ease-out;">
                             <span id="wheel-result" style="display: inline-block; max-width: 150px; padding: 10px; background: rgba(0,0,0,0.72); border-radius: 6px; font-size: 22px; font-weight: 800;">Spin</span>
@@ -101,7 +135,17 @@ class WheelOfFortuneGameManager {
                                 <button id="wheel-solve-btn" style="padding: 12px 18px; border: 0; border-radius: 6px; background: #58a572; color: #06120b; font-weight: 900; cursor: pointer;">Solve</button>
                             </div>
                         </div>
+                    </div>
 
+                    <div style="background: #211a29; border: 1px solid #6e5931; border-radius: 8px; padding: 16px;">
+                        <div style="display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <p style="margin: 0 0 4px 0; color: #d6b35f; font-size: 13px; font-weight: 800; text-transform: uppercase;">Coin Shop</p>
+                                <h3 style="margin: 0; font-size: 22px;">Buy Helpful Items</h3>
+                            </div>
+                        </div>
+                        <p style="margin: 0 0 12px 0; color: #c8bed8; line-height: 1.4;">Earn coins by guessing letters, then spend them here for boosts.</p>
+                        <div id="wheel-shop-items" style="display: flex; flex-direction: column; gap: 10px;"></div>
                     </div>
                 </div>
             </div>
@@ -141,9 +185,17 @@ class WheelOfFortuneGameManager {
         wheel.style.transform = `rotate(${720 + Math.floor(Math.random() * 360)}deg)`;
 
         if (segment === "Bankrupt") {
-            this.coins = 0;
-            this.currentSpinValue = null;
-            this.setMessage("Bankrupt. Your coins are gone, but you can keep playing.");
+            const shield = this.getShopItem("shield");
+
+            if (shield && shield.owned > 0) {
+                shield.owned -= 1;
+                this.currentSpinValue = null;
+                this.setMessage("Your Bankrupt Shield protected your coins.");
+            } else {
+                this.coins = 0;
+                this.currentSpinValue = null;
+                this.setMessage("Bankrupt. Your coins are gone, but you can keep playing.");
+            }
         } else if (segment === "Lose Turn") {
             this.currentSpinValue = null;
             this.setMessage("Lose Turn. Spin again and hope for a better result.");
@@ -169,7 +221,8 @@ class WheelOfFortuneGameManager {
             return;
         }
 
-        this.applyLetterGuess(letter, this.currentSpinValue);
+        this.applyLetterGuess(letter, this.currentSpinValue + this.activeBonus);
+        this.activeBonus = 0;
         this.currentSpinValue = null;
         input.value = "";
         this.render();
@@ -205,8 +258,16 @@ class WheelOfFortuneGameManager {
         }
 
         if (guess !== this.normalizePhrase(this.phrase)) {
-            this.coins = Math.max(0, this.coins - 100);
-            this.setMessage("Not quite. Wrong solves cost $100, so use the board clues.");
+            const solveProtection = this.getShopItem("solveProtection");
+
+            if (solveProtection && solveProtection.owned > 0) {
+                solveProtection.owned -= 1;
+                this.setMessage("Wrong solve, but your Guess Guard blocked the $100 penalty.");
+            } else {
+                this.coins = Math.max(0, this.coins - 100);
+                this.setMessage("Not quite. Wrong solves cost $100, so use the board clues.");
+            }
+
             this.render();
             return;
         }
@@ -240,6 +301,55 @@ class WheelOfFortuneGameManager {
         } else {
             this.setMessage(`${letter} appears ${count} time(s).`);
         }
+    }
+
+    buyShopItem(itemId) {
+        const item = this.getShopItem(itemId);
+
+        if (!item) {
+            this.setMessage("That shop item does not exist.");
+            return;
+        }
+
+        if (this.coins < item.price) {
+            this.setMessage(`You need $${item.price} to buy ${item.name}.`);
+            return;
+        }
+
+        this.coins -= item.price;
+
+        if (item.id === "hint") {
+            this.useHintItem();
+            this.setMessage(`You bought ${item.name}. One hidden letter was revealed.`);
+        } else if (item.id === "bonus") {
+            this.activeBonus += 100;
+            item.owned += 1;
+            this.setMessage(`You bought ${item.name}. Your next correct consonant has a $100 bonus.`);
+        } else {
+            item.owned += 1;
+            this.setMessage(`You bought ${item.name}.`);
+        }
+
+        this.render();
+    }
+
+    useHintItem() {
+        const hiddenLetters = [...new Set([...this.phrase].filter((character) => {
+            return /[A-Z]/.test(character) && !this.guessedLetters.has(character);
+        }))];
+
+        if (!hiddenLetters.length) {
+            this.coins += this.getShopItem("hint").price;
+            this.setMessage("No hidden letters left, so your coins were refunded.");
+            return;
+        }
+
+        const randomLetter = hiddenLetters[Math.floor(Math.random() * hiddenLetters.length)];
+        this.guessedLetters.add(randomLetter);
+    }
+
+    getShopItem(itemId) {
+        return this.shopItems.find((item) => item.id === itemId);
     }
 
     revealPhrase() {
@@ -316,6 +426,48 @@ class WheelOfFortuneGameManager {
             chip.style.cssText = `display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;border-radius:4px;font-size:13px;font-weight:700;background:${bg};color:${color};border:${border};`;
             usedLettersContainer.appendChild(chip);
         }
+
+        this.renderShop();
+    }
+
+    renderShop() {
+        const shopContainer = this.overlay.querySelector("#wheel-shop-items");
+        if (!shopContainer) return;
+
+        shopContainer.innerHTML = "";
+
+        for (const item of this.shopItems) {
+            const itemCard = document.createElement("div");
+            itemCard.style.cssText = `
+                background: #17131d;
+                border: 1px solid #4f435f;
+                border-radius: 8px;
+                padding: 12px;
+            `;
+
+            const disabled = this.coins < item.price;
+            const ownedText = item.id === "hint" ? "Instant use" : `Owned: ${item.owned}`;
+
+            itemCard.innerHTML = `
+                <div style="display: flex; justify-content: space-between; gap: 10px; align-items: start; margin-bottom: 8px;">
+                    <div>
+                        <div style="font-weight: 900; color: #ffffff;">${item.name}</div>
+                        <div style="font-size: 12px; color: #a89bbf;">${ownedText}</div>
+                    </div>
+                    <div style="font-weight: 900; color: #d6b35f;">$${item.price}</div>
+                </div>
+                <p style="margin: 0 0 10px 0; color: #c8bed8; font-size: 13px; line-height: 1.35;">${item.description}</p>
+                <button data-shop-item="${item.id}" style="width: 100%; padding: 9px 10px; border: 0; border-radius: 6px; background: ${disabled ? "#3c3448" : "#d6b35f"}; color: ${disabled ? "#8b809c" : "#20160a"}; font-weight: 900; cursor: ${disabled ? "not-allowed" : "pointer"};" ${disabled ? "disabled" : ""}>
+                    Buy
+                </button>
+            `;
+
+            shopContainer.appendChild(itemCard);
+        }
+
+        shopContainer.querySelectorAll("[data-shop-item]").forEach((button) => {
+            button.addEventListener("click", () => this.buyShopItem(button.dataset.shopItem));
+        });
     }
 
     setMessage(message) {
