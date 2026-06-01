@@ -6,7 +6,7 @@ Description: "Improve communication, security, and student movement tracking on 
 Topics:
   - title: "Groups Messaging & Bathroom/Hall Pass System (OCS)"
     image: "capstone/pirna_visual.png"
-    link: "https://github.com/Open-Coding-Society/pages/pull/630"
+    link: "https://github.com/users/adikatre/projects/7"
     alt: "Pirna Groups Messaging & Bathroom System Interface"
     keyPoints:
       - "Real-Time Groups Chat & File Upload (WebSockets & AWS S3)"
