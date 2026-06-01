@@ -1,0 +1,284 @@
+<!-- Lesson Chat: collapsible WebSocket chat at the bottom of a lesson page. -->
+<!-- Opt-in via `chat: true` in lesson frontmatter. -->
+<!-- Reuses the STOMP/SockJS backend from group_dashboard.html. Per-lesson scope -->
+<!-- is achieved by tagging messages with a [[lesson:<url>]] marker and filtering -->
+<!-- on the client. All lessons share a single backbone group named "lessons". -->
+
+<details id="lessonChat" data-lesson-key="{{ page.url }}" style="margin-top:2em">
+  <summary>Lesson Chat — <span id="lessonChatStatus">click to open</span></summary>
+  <div id="lessonChatMessages" aria-live="polite" style="height:18em;overflow-y:auto;border:1px solid;padding:.5em;margin:.5em 0">
+    <p id="lessonChatEmpty"><em>No messages yet.</em></p>
+  </div>
+  <form id="lessonChatForm" autocomplete="off" style="display:flex;gap:.5em">
+    <input id="lessonChatInput" type="text" placeholder="Message this lesson…" maxlength="2000" disabled style="flex:1">
+    <button id="lessonChatSend" type="submit" disabled>Send</button>
+  </form>
+</details>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+<script type="module">
+  import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+  const LESSON_KEY = {{ page.url | jsonify }};
+  const LESSON_MARKER = `[[lesson:${LESSON_KEY}]]`;
+  const LESSON_MARKER_RE = /^\s*\[\[lesson:([^\]]+)\]\]\s?/;
+  const CHAT_SOCKET_PORT = 8589;
+
+  function buildChatSocketEndpoint() {
+    const uri = new URL(javaURI);
+    if (uri.hostname === 'localhost' || uri.hostname === '127.0.0.1') {
+      return `${uri.protocol}//${uri.hostname}:${CHAT_SOCKET_PORT}/ws-chat`;
+    }
+    return javaURI + '/ws-chat';
+  }
+
+  const state = {
+    backboneGroupId: null,
+    stompClient: null,
+    subscription: null,
+    connected: false,
+    initialized: false,
+    currentUserDisplayName: 'You',
+    seenKeys: new Set(),
+  };
+
+  const detailsEl = document.getElementById('lessonChat');
+  const statusEl = document.getElementById('lessonChatStatus');
+  const messagesEl = document.getElementById('lessonChatMessages');
+  const inputEl = document.getElementById('lessonChatInput');
+  const sendBtn = document.getElementById('lessonChatSend');
+  const formEl = document.getElementById('lessonChatForm');
+
+  function setStatus(text) {
+    statusEl.textContent = text;
+  }
+
+  function formatTimestamp(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+
+  function clearEmpty() {
+    const empty = document.getElementById('lessonChatEmpty');
+    if (empty) empty.remove();
+  }
+
+  function appendMessage({ sender, message, date }) {
+    clearEmpty();
+    const who = sender === state.currentUserDisplayName ? 'You' : (sender || 'Unknown');
+    const when = formatTimestamp(date);
+    const line = document.createElement('p');
+    const strong = document.createElement('strong');
+    strong.textContent = who;
+    line.append(strong, document.createTextNode(when ? ` · ${when}: ` : ': '), document.createTextNode(message));
+    messagesEl.appendChild(line);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function appendSystem(text) {
+    clearEmpty();
+    const el = document.createElement('p');
+    const em = document.createElement('em');
+    em.textContent = text;
+    el.appendChild(em);
+    messagesEl.appendChild(el);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function eventKey(event) {
+    return [event?.sender || '', event?.date || '', event?.message || ''].join('|');
+  }
+
+  function matchesLesson(rawMessage) {
+    const m = LESSON_MARKER_RE.exec(rawMessage || '');
+    if (!m) return null;
+    if (m[1] !== LESSON_KEY) return null;
+    return (rawMessage || '').replace(LESSON_MARKER_RE, '');
+  }
+
+  async function resolveCurrentUser() {
+    try {
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (!res.ok) {
+        console.warn('Lesson chat: /api/id HTTP', res.status);
+        return;
+      }
+      const user = await res.json();
+      state.currentUserDisplayName = user?.name || user?.uid || user?.github || 'You';
+    } catch (err) {
+      console.warn('Lesson chat: user lookup failed', err);
+    }
+  }
+
+  async function resolveBackboneGroup() {
+    if (window.__lessonChatGroupId) {
+      state.backboneGroupId = window.__lessonChatGroupId;
+      return true;
+    }
+    const url = `${javaURI}/api/groups/search?name=lessons`;
+    let res;
+    try {
+      res = await fetch(url, fetchOptions);
+    } catch (err) {
+      console.warn('Lesson chat: group lookup network error', err);
+      return false;
+    }
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      console.warn('Lesson chat: group lookup HTTP', res.status, text);
+      return false;
+    }
+    let body;
+    try {
+      body = await res.json();
+    } catch (err) {
+      console.warn('Lesson chat: group lookup non-JSON response', err);
+      return false;
+    }
+    const match = Array.isArray(body)
+      ? (body.find((g) => (g?.name || '').toLowerCase() === 'lessons') || body[0])
+      : body;
+    const id = Number(match?.id);
+    if (!id) {
+      console.warn('Lesson chat: no group named "lessons" in response', body);
+      return false;
+    }
+    state.backboneGroupId = id;
+    window.__lessonChatGroupId = id;
+    return true;
+  }
+
+  async function loadHistory() {
+    if (!state.backboneGroupId) return;
+    try {
+      const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, fetchOptions);
+      if (!res.ok) {
+        console.warn('Lesson chat: history HTTP', res.status);
+        return;
+      }
+      const messages = await res.json();
+      (messages || []).forEach((msg) => {
+        const stripped = matchesLesson(msg.message);
+        if (stripped === null) return;
+        const key = eventKey({ sender: msg.name, date: msg.date, message: msg.message });
+        if (state.seenKeys.has(key)) return;
+        state.seenKeys.add(key);
+        appendMessage({ sender: msg.name, message: stripped, date: msg.date });
+      });
+    } catch (err) {
+      console.warn('Lesson chat: history load failed', err);
+    }
+  }
+
+  function handleIncoming(event) {
+    if (!event || event.context !== 'sendMessageServer') return;
+    const stripped = matchesLesson(event.message);
+    if (stripped === null) return;
+    const key = eventKey(event);
+    if (state.seenKeys.has(key)) return;
+    state.seenKeys.add(key);
+    appendMessage({ sender: event.sender, message: stripped, date: event.date });
+  }
+
+  function connect() {
+    return new Promise((resolve) => {
+      if (state.connected) return resolve(true);
+      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+        setStatus('unavailable');
+        return resolve(false);
+      }
+      setStatus('connecting…');
+      const socket = new SockJS(buildChatSocketEndpoint());
+      const client = Stomp.over(socket);
+      client.debug = null;
+      state.stompClient = client;
+
+      client.connect({}, () => {
+        state.connected = true;
+        setStatus('connected');
+        state.subscription = client.subscribe(`/topic/group/${state.backboneGroupId}`, (frame) => {
+          try { handleIncoming(JSON.parse(frame.body)); }
+          catch (err) { console.warn('Lesson chat: bad frame', err); }
+        });
+        resolve(true);
+      }, (err) => {
+        console.warn('Lesson chat: connection failed', err);
+        state.connected = false;
+        setStatus('disconnected');
+        resolve(false);
+      });
+
+      socket.onclose = () => {
+        if (!state.connected) return;
+        state.connected = false;
+        setStatus('disconnected');
+        inputEl.disabled = true;
+        sendBtn.disabled = true;
+      };
+    });
+  }
+
+  function sendMessage(text) {
+    if (!state.connected || !state.stompClient || !state.backboneGroupId) return false;
+    const payload = {
+      context: 'sendMessage',
+      groupId: state.backboneGroupId,
+      sender: state.currentUserDisplayName || 'anonymous',
+      message: `${LESSON_MARKER} ${text}`,
+      image: null,
+      date: new Date().toISOString(),
+    };
+    try {
+      state.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload));
+      return true;
+    } catch (err) {
+      console.error('Lesson chat: send failed', err);
+      return false;
+    }
+  }
+
+  async function initOnce() {
+    if (state.initialized) return;
+    state.initialized = true;
+    setStatus('loading…');
+    await resolveCurrentUser();
+    const ok = await resolveBackboneGroup();
+    if (!ok) {
+      console.warn('Lesson chat: backbone group could not be resolved; see prior warnings for cause');
+      setStatus('unavailable');
+      appendSystem('Lesson chat is not available right now.');
+      return;
+    }
+    await loadHistory();
+    const connected = await connect();
+    if (connected) {
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  detailsEl.addEventListener('toggle', () => {
+    if (detailsEl.open) initOnce();
+  });
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = inputEl.value.trim();
+    if (!text) return;
+    if (sendMessage(text)) {
+      inputEl.value = '';
+    }
+  });
+
+  window.addEventListener('beforeunload', () => {
+    try {
+      if (state.subscription) state.subscription.unsubscribe();
+      if (state.stompClient && state.connected) state.stompClient.disconnect();
+    } catch (_) { /* ignore */ }
+  });
+</script>

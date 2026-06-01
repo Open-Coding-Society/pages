@@ -148,7 +148,8 @@ class CourseEnlistmentTrial {
       course: course.id,
       title: course.title,
       summary: course.summary,
-      recommendedClasses: [course.title],
+      recommendedClasses: [{ id: course.id, name: course.title }],
+      completedAt: new Date().toISOString(),
     });
   }
 

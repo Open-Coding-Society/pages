@@ -5,7 +5,7 @@ import GameControl from './essentials/GameControl.js';
 import GameLevelMeteorBlaster from './GameLevelMeteorBlaster.js';
 
 import Game from './Game.js';
-import GameLevelWallstreet from './GameLevelWallstreet.js';
+import GameLevelWallstreet from '@fortuneFinders/levels/GameLevelWallstreet.js';
 class GameLevelRetro {
   /**
    * Properties and methods to define a game level

@@ -305,6 +305,35 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   color: $infograph-muted;
 }
 
+[class$="-infograph"] [class$="-videos"] {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+[class$="-infograph"] [class$="-video-item"] {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  overflow: hidden;
+}
+
+[class$="-infograph"] [class$="-video-title"] {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  color: $infograph-foreground;
+}
+
+[class$="-infograph"] [class$="-video-player"] {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  display: block;
+}
+
 [class$="-infograph"] [class$="-btn"] {
   display: inline-flex;
   align-items: center;

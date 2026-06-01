@@ -64,6 +64,9 @@ class Npc extends Character {
         if (players.length === 0 && this.isInteracting) {
             this.isInteracting = false;
         }
+        if (players.length === 0 && this._quizRetryPending) {
+            this._quizRetryPending = false;
+        }
     }
 
     /**
