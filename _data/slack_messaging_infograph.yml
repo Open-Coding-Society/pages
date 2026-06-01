@@ -1,21 +1,21 @@
-# CyberLord09 Slack Messaging Platform Capstone Infographic
-Title: "Slack Messaging Platform Capstone"
-Description: "A Design-Based Research capstone building a Slack-style messaging platform using pages-tracking for the frontend and spring-tracking for the backend — featuring real-time chat, message threading, admin controls, and AI-powered task extraction."
+# Assignment Resources Platform Capstone Infographic
+Title: "Assignment Resources Platform Capstone"
+Description: "A Design-Based Research capstone building an Assignment Resources platform using pages-tracking for the frontend and spring-tracking for the backend — featuring assignment-scoped URL/file resources, uploader metadata, and AI-assisted task extraction."
 
 Topics:
-  - title: "Slack Messaging Platform"
+  - title: "Assignment Resources Platform"
     image: "capstone/database_defenders.png"
     link: "/capstone/assignment-submission/"
-    alt: "Slack Messaging Platform - Real-Time Collaborative Chat"
+    alt: "Assignment Resources Platform - Assignment-scoped File & URL Resources"
     keyPoints:
-      - "Create/join channels with real-time Socket.IO message delivery"
-      - "Reply-to-message threading with contextual inline previews"
-      - "AI-powered task extraction from channel conversations (Claude API)"
-      - "Admin moderation: delete messages, lock channels, manage roles"
-      - "JWT cookie auth across Spring backend and Flask Socket.IO layer"
-      - "Deployed to messaging.opencodingsociety.com"
-    subtitle: "Recreating Slack with Spring Boot + Flask Socket.IO"
-    description: "A full-stack Slack-style messaging platform targeting messaging.opencodingsociety.com. The frontend (pages-tracking Jekyll) provides a channel sidebar, message timeline, and composer wired to Spring REST APIs via shared config.js auth cookies. Flask Socket.IO handles low-latency live message fanout while Spring Boot remains the source of truth for persistence and permissions. Message threading, AI task extraction via Claude API, and admin moderation round out the feature set."
+      - "Attach URL or file resources directly to an assignment by ID"
+      - "Resources record uploader metadata and storage path (S3-compatible)"
+      - "URL-only resources remain visible and auditable in the assignment view"
+      - "File uploads are stored with assignment-scoped paths and access controls"
+      - "API endpoints enforce assignment ID binding for all resource uploads"
+      - "Front-end tracker shows Uploaded By, Resource Type, and Download links"
+    subtitle: "Assignment-Focused Resource Management (Spring Boot + Jekyll)"
+    description: "A full-stack assignment resource management feature built on pages-tracking (Jekyll) and spring-tracking (Spring Boot). Teachers and students can attach URL or file resources to a specific assignment ID; uploads persist to S3-style storage and metadata (including uploader) is recorded for auditing and display. The server enforces assignment-scoped uploads and exposes MVC views and APIs for secure access."
     tech:
       - "Spring Boot 3.5 / Java 21"
       - "Flask Socket.IO"

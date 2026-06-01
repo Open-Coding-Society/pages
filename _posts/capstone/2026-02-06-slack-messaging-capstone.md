@@ -2,8 +2,8 @@
 microblog: true
 toc: false
 layout: post
-title: Slack Messaging Platform Capstone
-description: A Design-Based Research capstone building a Slack-style messaging platform using pages-tracking for the frontend and spring-tracking for the backend — featuring real-time chat, message threading, admin controls, and AI-powered task extraction.
+title: Assignment Resources Platform Capstone
+description: A Design-Based Research capstone building an Assignment Resources platform using pages-tracking for the frontend and spring-tracking for the backend — featuring assignment-scoped URL/file uploads, uploader metadata, and secure assignment binding.
 permalink: /capstone/assignment-submission/
 sticky_rank: 1
 ---
