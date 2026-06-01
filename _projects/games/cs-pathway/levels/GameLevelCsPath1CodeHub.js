@@ -1416,7 +1416,7 @@ function openSpaceInvadersGame(lessonKey, accentColor, gameControl, onWin) {
       });
 
       /* wave complete */
-      if (enemies.length > 0 && enemies.every(e => !e.alive || e.passed)) {
+      if (gameState === 'playing' && enemies.length > 0 && enemies.every(e => !e.alive || e.passed)) {
         qIdx++;
         if (qIdx >= questions.length) {
           gameState = 'win';
