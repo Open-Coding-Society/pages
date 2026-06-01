@@ -349,7 +349,7 @@ class FinancialAdvisor extends Npc {
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0);
-            z-index: 9998;
+            z-index: 13999;
             transition: background-color 0.5s ease;
             backdrop-filter: blur(0px);
         `;
@@ -436,7 +436,7 @@ class FinancialAdvisor extends Npc {
             max-width: 850px;
             max-height: 85%;
             overflow-y: auto;
-            z-index: 9999;
+            z-index: 14000;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             border: 4px solid #4a4a4a;
             padding: 0;

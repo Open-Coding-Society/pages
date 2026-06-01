@@ -18,16 +18,36 @@ Topics:
         url: "https://ruchikak19.github.io/flaskandfurious/recovery/"
       - text: "User interacts with various characters (eg. trusted adults, therapist, counselor, domestic violence hotline) in the simulation which walk the user through the process, step by step"
       - text: "The user also can take short diagnostic quizzes along the path for personalized suggestions, and they can talk to a confidential AI assistant for questions"
-
     description: "A two-part web platform built for Safe Passage Heals. The Dynamic Event Calendar centralizes all upcoming workshops, support groups, and community events in an interactive monthly view — with a secure admin dashboard for staff to add, edit, and delete events in real time. Path to Recovery is an interactive neighborhood simulation where users learn the domestic violence response process step by step, meet characters like counselors and hotline advocates, take personalized diagnostic quizzes, and consult a confidential AI assistant."
     impact:
-    - "Eliminates scattered event information by centralizing all Safe Passage Heals events into one calendar with instant detail access and registration"
-    - "A secure admin dashboard makes event management effortless — add, edit, and delete events from one centralized place in just a few clicks"
-    - "Turns passive awareness into active learning through an interactive simulation that personalizes the recovery journey for each user"
-    - "Makes education on domestic violence response accessible and engaging through a confidential AI assistant, diagnostic quizzes, and character-driven interactive storytelling"    
+      - "Eliminates scattered event information by centralizing all Safe Passage Heals events into one calendar with instant detail access and registration"
+      - "A secure admin dashboard makes event management effortless — add, edit, and delete events from one centralized place in just a few clicks"
+      - "Turns passive awareness into active learning through an interactive simulation that personalizes the recovery journey for each user"
+      - "Makes education on domestic violence response accessible and engaging through a confidential AI assistant, diagnostic quizzes, and character-driven interactive storytelling"
+    technical:
+      - "Built with Flask and SQLAlchemy"
+      - "REST API with JWT authentication"
+      - "Deployed on Render with PostgreSQL"
+    futurePlans:
+      - "AI-Powered Emotional Support Enhancement — enhance the confidential AI assistant with more advanced natural language processing so it can provide more empathetic, personalized, and resource-focused responses while maintaining privacy and safety standards."
+      - "Data-Driven Wellness Scale System — replace multiple-choice quizzes with 1–5 scale assessments to better measure user emotions, confidence, and recovery progress. Aggregated data can help identify common challenges and improve support resources."
+      - "Machine Learning Risk & Resource Recommendation — use machine learning to analyze quiz and interaction patterns to recommend personalized resources, support strategies, or next steps based on user needs and recovery stage."
+      - "Recovery Progress Tracking Dashboard — develop an optional private dashboard where users can monitor their progress over time through quiz trends, completed modules, and personal wellness indicators."
+      - "Predictive Event Planning Analytics — collect anonymous event attendance and engagement data to help Safe Passage Heals predict which workshops or support events are most needed, improving scheduling and outreach."
+      - "Multilingual AI and Accessibility Expansion — expand the platform with multilingual support and accessibility tools such as voice assistance, translation, and screen-reader optimization to reach more diverse communities."
+      - "Expanded Interactive Simulation Paths — add more scenarios and branching storylines to Path to Recovery, allowing users to experience different domestic violence situations and support pathways for more realistic and personalized learning."
+      - "Community Impact & Research Insights — use anonymized platform data from quizzes and interactions to generate reports and visual insights for Safe Passage Heals, helping the organization better understand community needs and evaluate program impact over time."
     status: "Working Prototype"
     team:
       - "Ruchika Kench"
       - "Akshara Shankar"
       - "Avantika Chittari"
+    repoLinks:
+      - "https://github.com/ruchikak19/flaskandfurious"
 
+feedback:
+  - "Feedback indicated that we should change the quizzes from multiple choice to scales where we can have users select on scales from 1 to 5, and collect data."
+  - "Feedback indicated that users would benefit from being able to fully access and use the Path to Recovery Simulation on mobile devices."
+  - "Fix the data when adding location to be added on the correct date."
+
+Experience: "We found this experience very beneficial because it gave us the opportunity to understand what it feels like to present to real professionals and receive valuable feedback on how we could improve our work. Presenting our Safe Passage Heals project, which we had spent about a month and a half developing, made the experience even more meaningful because we were able to share something we had worked hard on with people who were genuinely interested in what we accomplished. It felt rewarding to explain the purpose of our project and the impact we hoped it could have on helping others. We also felt proud of ourselves for creating something that could make a positive difference in our community, especially by spreading awareness and providing support for people affected by domestic abuse. Overall, the experience helped us grow in confidence, communication, and teamwork while reminding us that the work we do can have a real and positive impact on others."
