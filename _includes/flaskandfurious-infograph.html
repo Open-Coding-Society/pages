@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <!-- Center: Key Points -->
+      <!-- Center: Key Points & Future Plans -->
       <div class="dec-content">
         <h2 class="dec-project-title">{{ topic.title }}</h2>
         <p class="dec-subtitle">{{ topic.subtitle }}</p>
@@ -39,9 +39,21 @@
           </div>
           {% endfor %}
         </div>
+
+        {% if topic.futurePlans %}
+        <h3 class="dec-section-title">Future Plans</h3>
+        <div class="dec-keypoints">
+          {% for item in topic.futurePlans %}
+          <div class="dec-keypoint">
+            <span class="dec-check">✓</span>
+            <span>{{ item }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
 
-      <!-- Right: Description & Impact -->
+      <!-- Right: Description, Impact, Technical, Feedback, Experience, Repo -->
       <div class="dec-details">
         <h3 class="dec-section-title">About</h3>
         <p class="dec-about">{{ topic.description }}</p>
@@ -93,29 +105,6 @@
     </div>
   </div>
   {% endfor %}
-
-  <!-- Feedback Card -->
-  <div class="dec-card" style="max-width: 70%; margin: 0 auto;">
-    <div class="dec-video-gallery">
-      <h2 class="dec-video-section-title">Feedback</h2>
-      <div class="dec-keypoints">
-        {% for item in data.feedback %}
-        <div class="dec-keypoint">
-          <span class="dec-check">✓</span>
-          <span>{{ item }}</span>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-
-  <!-- Experience Card -->
-  <div class="dec-card" style="max-width: 70%; margin: 0 auto;">
-    <div class="dec-video-gallery">
-      <h2 class="dec-video-section-title">Our Experience</h2>
-      <p>{{ data.Experience }}</p>
-    </div>
-  </div>
 
   <!-- Video Gallery Card -->
   <div class="dec-card" style="max-width: 70%; margin: 0 auto;">

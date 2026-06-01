@@ -589,7 +589,6 @@ export default class PersonaTrial {
       <div style="
         width:min(620px,92vw);
         border-radius:22px;
-        overflow:hidden;
         border:1px solid ${meta.color}55;
         box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 50px ${meta.glow};
         background:
@@ -609,26 +608,12 @@ export default class PersonaTrial {
           You belong as a ${meta.title}
         </div>
   
-        <div style="font-size:14px;line-height:1.6;color:#ddd6c0;max-width:460px;margin:0 auto 24px;">
-          The chamber will now place you into a simulated team with other mock builders.
+        <div style="font-size:14px;line-height:1.6;color:#ddd6c0;max-width:460px;margin:0 auto 18px;">
+          The chamber will create a balanced simulated team of 6 members around your persona.
         </div>
   
-        <div style="margin-bottom:18px;text-align:left;">
-          <label style="font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#8fc0ff;margin-bottom:7px;display:block;">
-            Group Size
-          </label>
-          <input id="pt-size" type="number" value="4" min="2" max="6" style="
-            width:100%;
-            padding:11px 14px;
-            box-sizing:border-box;
-            background:rgba(255,255,255,.06);
-            border:1px solid rgba(255,255,255,.18);
-            border-radius:10px;
-            color:#f4ead6;
-            font-family:Georgia,'Times New Roman',serif;
-            font-size:15px;
-            outline:none;
-          " />
+        <div style="font-size:13px;color:rgba(255,255,255,.55);margin-bottom:24px;">
+          No roster, class period, or backend data is used.
         </div>
   
         <div id="pt-form-status" style="font-size:13px;color:#f87171;min-height:20px;margin-bottom:12px;"></div>
@@ -655,7 +640,7 @@ export default class PersonaTrial {
             font-size:15px;
             font-weight:700;
             cursor:pointer;
-          ">Find My Team →</button>
+          ">Generate My Team →</button>
         </div>
       </div>
     `);
@@ -667,18 +652,11 @@ export default class PersonaTrial {
     this.overlay.querySelector('#pt-generate-btn').addEventListener('click', () => {
       this._handleGenerate(primaryPersona);
     });
-  }
-  /* ────────────────────────────────────────────────────
+  }  /* ────────────────────────────────────────────────────
      PHASE 3 — Generate + Reveal
   ──────────────────────────────────────────────────── */
   async _handleGenerate(primaryPersona) {
-    const groupSize = parseInt(this.overlay.querySelector('#pt-size')?.value || '4', 10);
-    const status = this.overlay.querySelector('#pt-form-status');
-  
-    if (groupSize < 2 || groupSize > 6) {
-      status.textContent = '⚠ Group size must be between 2 and 6.';
-      return;
-    }
+    const groupSize = 6;
   
     const meta = PERSONA_META[primaryPersona] || PERSONA_META.technologist;
   
@@ -701,9 +679,29 @@ export default class PersonaTrial {
       { id: 8, uid: 'marco', name: 'Marco', persona: 'planner', role: 'Planner' },
     ];
   
-    const shuffled = [...mockUsers].sort(() => Math.random() - 0.5);
-    const yourTeam = [currentUser, ...shuffled.slice(0, groupSize - 1)];
+    const otherPersonas = ['technologist', 'scrummer', 'planner', 'finisher']
+    .filter(p => p !== primaryPersona);
   
+    const balancedPool = [];
+    
+    otherPersonas.forEach(persona => {
+      const candidates = mockUsers.filter(u => u.persona === persona);
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      if (picked) balancedPool.push(picked);
+    });
+    
+    const remainingPool = mockUsers
+      .filter(u => !balancedPool.some(p => p.uid === u.uid))
+      .sort(() => Math.random() - 0.5);
+    
+    const needed = groupSize - 1;
+    
+    const teammates = [
+      ...balancedPool,
+      ...remainingPool,
+    ].slice(0, needed);
+    
+    const yourTeam = [currentUser, ...teammates];  
     const namedGroups = [
       {
         name: `Your ${meta.title} Team`,
@@ -726,60 +724,81 @@ export default class PersonaTrial {
      PHASE 4 — Group Reveal Screen
   ──────────────────────────────────────────────────── */
   _renderReveal(namedGroups, method, primaryPersona) {
-    const meta     = PERSONA_META[primaryPersona] || PERSONA_META.technologist;
-    const badgeLabel = ' Simulated Team';
+    const meta = PERSONA_META[primaryPersona] || PERSONA_META.technologist;
+    const badgeLabel = 'Simulated Team';
     const badgeBg = '#4f46e5';
-    const groupCards = namedGroups.map((g, i) => {
-      const scoreHtml = g.team_score !== null
-        ? `<span style="
-            font-size:12px;font-weight:700;
-            color:${g.team_score >= 70 ? '#4ade80' : g.team_score >= 60 ? '#facc15' : '#fb923c'};
-          ">${g.team_score.toFixed(1)}</span>`
-        : `<span style="font-size:12px;color:#6b7280;">random</span>`;
-
-      const memberPills = g.members.map(m => `
-        <span style="
-          display:inline-flex;align-items:center;gap:5px;
-          padding:4px 10px;border-radius:999px;
-          background:rgba(255,255,255,.07);
-          border:1px solid rgba(255,255,255,.12);
-          font-size:12px;color:#ddd6c0;
-        ">
-          ${m.name}
-          <span style="color:rgba(255,255,255,.4);">@${m.uid}</span>
-        </span>
-      `).join('');
-
+    const strengths = {
+      technologist: 'deep technical problem solving',
+      scrummer: 'team coordination and momentum',
+      planner: 'structure and strategic direction',
+      finisher: 'execution and follow-through',
+    };
+  
+    const team = namedGroups[0];
+    const counts = { technologist: 0, scrummer: 0, planner: 0, finisher: 0 };
+  
+    team.members.forEach(m => {
+      if (counts[m.persona] !== undefined) counts[m.persona]++;
+    });
+  
+    const total = team.members.length || 1;
+  
+    const compositionBars = Object.entries(counts).map(([key, count]) => {
+      const p = PERSONA_META[key];
+      const percent = Math.round((count / total) * 100);
+  
       return `
-        <div style="
-          border-radius:14px;
-          border:1px solid rgba(255,255,255,.12);
-          background:rgba(255,255,255,.04);
-          padding:14px 16px;
-          animation:ptFadeUp .4s ease both;
-          animation-delay:${i * 0.07}s;
-        ">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <div style="font-size:16px;font-weight:700;color:#f4ead6;">${g.name}</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:12px;color:rgba(255,255,255,.45);">${g.members.length} members</span>
-              ${scoreHtml}
-            </div>
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+            <span style="color:#f4ead6;">${p.icon} ${p.title}</span>
+            <span style="color:${p.color};font-weight:700;">${percent}%</span>
           </div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;">${memberPills}</div>
+          <div style="height:9px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;">
+            <div style="
+              width:${percent}%;
+              height:100%;
+              border-radius:999px;
+              background:linear-gradient(90deg,${p.color},${p.color}99);
+            "></div>
+          </div>
         </div>
       `;
     }).join('');
-
+  
+    const memberPills = team.members.map(m => {
+      const p = PERSONA_META[m.persona] || PERSONA_META.technologist;
+  
+      return `
+        <span style="
+          display:inline-flex;
+          align-items:center;
+          gap:6px;
+          padding:6px 11px;
+          border-radius:999px;
+          background:rgba(255,255,255,.07);
+          border:1px solid ${p.color}66;
+          font-size:12px;
+          color:#ddd6c0;
+        ">
+          <span style="color:${p.color};">${p.icon}</span>
+          ${m.name}
+          <span style="color:rgba(255,255,255,.45);">${p.title}</span>
+        </span>
+      `;
+    }).join('');
+  
     this._setContent(`
       <style>
         @keyframes ptFadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
         .pt-reveal-btn { transition:filter .15s,transform .15s; }
         .pt-reveal-btn:hover { filter:brightness(1.1);transform:translateY(-2px); }
       </style>
+  
       <div style="
-        width:min(900px,92vw);max-height:88vh;overflow-y:auto;
-        border-radius:22px;overflow:hidden;
+        width:min(920px,92vw);
+        max-height:88vh;
+        overflow-y:auto;
+        border-radius:22px;
         border:1px solid ${meta.color}55;
         box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 50px ${meta.glow};
         background:
@@ -787,67 +806,142 @@ export default class PersonaTrial {
           url('${VISION_BG}') center/cover no-repeat;
         color:#f7f1de;
       ">
-        <!-- Header -->
         <div style="
           padding:20px 26px;
           border-bottom:1px solid rgba(255,255,255,.08);
-          display:flex;justify-content:space-between;align-items:center;
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
         ">
           <div>
             <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#8fc0ff;margin-bottom:5px;">
-Your Simulated Team            </div>
-            <div style="font-size:20px;color:#f4ead6;">Your simulated team has been formed</div>
+              Your Simulated Team
+            </div>
+            <div style="font-size:22px;color:#f4ead6;">${team.name}</div>
           </div>
+  
           <span style="
-            display:inline-flex;padding:6px 14px;border-radius:999px;
-            background:${badgeBg};color:#fff;font-size:12px;font-weight:700;
+            display:inline-flex;
+            padding:6px 14px;
+            border-radius:999px;
+            background:${badgeBg};
+            color:#fff;
+            font-size:12px;
+            font-weight:700;
           ">${badgeLabel}</span>
         </div>
-
-        <!-- Group grid -->
-        <div style="padding:20px 26px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          ${groupCards}
+  
+        <div style="padding:22px 26px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+          <div style="
+            border-radius:16px;
+            border:1px solid ${meta.color}55;
+            background:rgba(255,255,255,.045);
+            padding:18px;
+          ">
+            <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8fc0ff;margin-bottom:10px;">
+              Your Persona Contribution
+            </div>
+  
+            <div style="font-size:38px;color:${meta.color};margin-bottom:6px;">${meta.icon}</div>
+            <div style="font-size:24px;color:#f4ead6;margin-bottom:8px;">${meta.title}</div>
+            <div style="font-size:13px;line-height:1.55;color:#ddd6c0;">
+              ${meta.role}
+            </div>
+          </div>
+  
+          <div style="
+            border-radius:16px;
+            border:1px solid rgba(255,255,255,.12);
+            background:rgba(255,255,255,.045);
+            padding:18px;
+          ">
+            <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8fc0ff;margin-bottom:14px;">
+              Group Persona Composition
+            </div>
+  
+            ${compositionBars}
+          </div>
+  
+          <div style="
+            grid-column:1/-1;
+            border-radius:16px;
+            border:1px solid rgba(255,255,255,.12);
+            background:rgba(255,255,255,.04);
+            padding:18px;
+          ">
+            <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8fc0ff;margin-bottom:12px;">
+              Simulated Teammates
+            </div>
+  
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              ${memberPills}
+            </div>
+          </div>
+  
+          <div style="
+            grid-column:1/-1;
+            border-radius:16px;
+            border:1px solid ${meta.color}44;
+            background:rgba(0,0,0,.22);
+            padding:16px;
+            font-size:14px;
+            line-height:1.6;
+            color:#ddd6c0;
+          ">
+<span style="color:${meta.color};font-weight:700;">Why this team works:</span>
+Your ${meta.title} perspective contributes ${strengths[primaryPersona]}.
+Your teammates add different strengths, so the group has a stronger mix of solving, organizing, communicating, and finishing.          </div>
         </div>
-
-        <!-- Footer actions -->
+  
         <div style="
           padding:18px 26px;
           border-top:1px solid rgba(255,255,255,.08);
-          display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:14px;
+          flex-wrap:wrap;
         ">
           <div style="font-size:13px;color:rgba(255,255,255,.55);">
-This is a simulated team preview created by the chamber.          </div>
+            This is a simulated team preview created by the chamber.
+          </div>
+  
           <div style="display:flex;gap:12px;flex-wrap:wrap;">
             <button id="pt-reveal-back" class="pt-reveal-btn" style="
-              padding:11px 18px;border-radius:11px;
-              border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.3);
-              color:#ddd6c0;font-family:inherit;font-size:13px;cursor:pointer;
+              padding:11px 18px;
+              border-radius:11px;
+              border:1px solid rgba(255,255,255,.18);
+              background:rgba(0,0,0,.3);
+              color:#ddd6c0;
+              font-family:inherit;
+              font-size:13px;
+              cursor:pointer;
             ">← Adjust Settings</button>
-
+  
             <button id="pt-reveal-confirm" class="pt-reveal-btn" style="
-              padding:12px 26px;border:none;border-radius:12px;
+              padding:12px 26px;
+              border:none;
+              border-radius:12px;
               background:linear-gradient(135deg,${meta.color},${meta.color}aa);
-              color:#0a0e1a;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;
-              display:flex;align-items:center;gap:9px;
-            ">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-Continue →            </button>
+              color:#0a0e1a;
+              font-family:inherit;
+              font-size:15px;
+              font-weight:700;
+              cursor:pointer;
+            ">Continue →</button>
           </div>
         </div>
       </div>
     `);
-
+  
     this.overlay.querySelector('#pt-reveal-back').addEventListener('click', () => {
       this._renderGroupFormation(primaryPersona);
     });
-
+  
     this.overlay.querySelector('#pt-reveal-confirm').addEventListener('click', async () => {
       await fadeOut(this.overlay, 320);
       this.destroy();
       this.onClose();
     });
-  } 
-  
+  }
 }
