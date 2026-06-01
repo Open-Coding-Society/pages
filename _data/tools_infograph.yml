@@ -11,7 +11,7 @@ Topics:
       - "Protect PII"
       - "Collaborate online"
     subtitle: "Social Computing"
-    description: "Manage accounts like GitHub and Slack to collaborate and build a professional digital presence while safeguarding PII."
+    description: "Manage accounts like GitHub and the Assignment system to collaborate and build a professional digital presence while safeguarding PII."
   - title: "GitHub"
     image: "/tools/github.png"
     link: "/tools/github"
