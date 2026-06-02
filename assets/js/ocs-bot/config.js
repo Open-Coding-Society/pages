@@ -40,3 +40,8 @@ export const FETCH_TIMEOUT = 45000;
 
 // Allow disabling the optional backend sync entirely.
 export const ENABLE_BACKEND_SYNC = overrides.backendSync !== false;
+
+// Where navigation chips open: '_self' (default — same tab, correct for the
+// real same-origin site) or '_blank' (new tab; handy for local previews that
+// serve unbuilt source).
+export const NAV_TARGET = overrides.navTarget === '_blank' ? '_blank' : '_self';

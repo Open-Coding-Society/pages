@@ -12,7 +12,7 @@ import { renderMarkdown } from './render.js';
 import { parseActions, hrefFor } from './tools.js';
 import { starterSuggestions } from './suggestions.js';
 import { NAV_INDEX } from './knowledge.js';
-import { DEFAULT_MODEL } from './config.js';
+import { DEFAULT_MODEL, NAV_TARGET } from './config.js';
 
 const $ = (id) => document.getElementById(id);
 const HISTORY_TURNS = 16; // messages of context sent to the model
@@ -161,7 +161,14 @@ function delegatedClick(e) {
   if (fu && bot.el['ocsb-panel'].contains(fu)) { bot.el['ocsb-input'].value = fu.dataset.text || fu.textContent.trim(); onInput(); submit(); return; }
   // Navigation chip
   const nav = e.target.closest('.ocsb-nav-chip');
-  if (nav && bot.el['ocsb-panel'].contains(nav)) { const href = nav.getAttribute('data-href'); if (href) window.location.href = href; return; }
+  if (nav && bot.el['ocsb-panel'].contains(nav)) {
+    const href = nav.getAttribute('data-href');
+    if (href) {
+      if (NAV_TARGET === '_blank') window.open(href, '_blank', 'noopener');
+      else window.location.href = href;
+    }
+    return;
+  }
   // Copy code button
   const copy = e.target.closest('.ocsb-copy');
   if (copy) { const code = copy.parentElement.querySelector('code'); copyText(code ? code.textContent : '', copy); return; }
