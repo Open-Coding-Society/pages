@@ -81,6 +81,11 @@ export const NAV_INDEX = [
   { name: 'API Documentation (Java/Spring)', path: '/java/apidocumentation', group: 'Tools', keywords: ['api docs', 'api documentation', 'endpoints', 'spring api'], desc: 'Documentation for the Java/Spring backend APIs.' },
   { name: 'RPG Game', path: '/rpg/latest', group: 'Tools', keywords: ['rpg', 'role playing', 'adventure game'], desc: 'The OCS RPG learning game.' },
   { name: 'Mansion Game', path: '/gamify/mansionGame', group: 'Tools', keywords: ['mansion', 'gamify', 'adventure'], desc: 'The gamified Mansion learning game.' },
+
+  // ---- Teacher / staff (only relevant to signed-in teachers & admins) ----
+  { name: 'Teacher Tools', path: '/teacher', group: 'Teacher', keywords: ['teacher', 'staff', 'class', 'roster', 'students', 'grade book'], desc: 'Teacher tools — manage classes, students, and grading (teachers/admins only).' },
+  { name: 'Analytics Dashboard', path: '/analytics-dashboard', group: 'Teacher', keywords: ['analytics', 'class analytics', 'progress', 'metrics', 'reports', 'insights'], desc: 'Class analytics and student-progress dashboards (teachers/admins).' },
+  { name: 'Grade Predictor', path: '/grade-predictor', group: 'Teacher', keywords: ['grade predictor', 'grades', 'predict'], desc: 'Grade prediction tool.' },
 ];
 
 // High-level course facts the model can answer from directly (no link needed).

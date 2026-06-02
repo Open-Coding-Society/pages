@@ -252,6 +252,23 @@ body.ocsb-open.ocsb-expanded.ocsb-rail-open #ocsb-panel { grid-template-columns:
 .ocsb-danger-btn { width: 100%; padding: 9px; border: 1px solid rgba(255,107,120,0.32); border-radius: 10px; background: var(--ocsb-red-soft); color: var(--ocsb-red); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: background 150ms ease; }
 .ocsb-danger-btn:hover { background: rgba(255,107,120,0.16); }
 
+/* Toggle switches */
+.ocsb-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; }
+.ocsb-toggle-row + .ocsb-toggle-row { border-top: 1px solid var(--ocsb-border); }
+.ocsb-toggle-text { font-size: 0.82rem; font-weight: 600; color: var(--ocsb-fg); display: flex; flex-direction: column; gap: 2px; }
+.ocsb-toggle-text em { font-style: normal; font-size: 0.72rem; font-weight: 500; color: var(--ocsb-fg-faint); }
+.ocsb-toggle { flex: none; width: 42px; height: 24px; border-radius: 999px; border: 1px solid var(--ocsb-border-strong); background: var(--ocsb-bg-input); cursor: pointer; position: relative; padding: 0; transition: background 160ms ease, border-color 160ms ease; }
+.ocsb-toggle .ocsb-toggle-knob { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--ocsb-fg-muted); transition: transform 180ms cubic-bezier(.22,1,.36,1), background 160ms ease; }
+.ocsb-toggle[aria-checked="true"] { background: var(--ocsb-brand); border-color: var(--ocsb-brand); }
+.ocsb-toggle[aria-checked="true"] .ocsb-toggle-knob { transform: translateX(18px); background: #fff; }
+.ocsb-toggle:focus-visible { outline: 2px solid var(--ocsb-brand); outline-offset: 2px; }
+.ocsb-set-note { margin-top: 8px; font-size: 0.74rem; color: var(--ocsb-fg-muted); line-height: 1.5; }
+.ocsb-set-note[hidden] { display: none; }
+.ocsb-set-note b { color: var(--ocsb-fg); }
+
+/* "Deselected" state — hide the launcher entirely (recover with Cmd/Ctrl+K) */
+body.ocsb-disabled #ocsb-fab { display: none !important; }
+
 /* ─── Mobile ───────────────────────────────────────────────────── */
 @media (max-width: 560px) {
   #ocsb-fab .ocsb-fab-label { display: none; }

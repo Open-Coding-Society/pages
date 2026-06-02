@@ -22,7 +22,13 @@ const POOL = [
 
 export function starterSuggestions(user) {
   const picks = [];
-  if (!user) picks.push({ icon: 'user', text: 'How do I sign up for an OCS account?' });
+  if (user && (user.isTeacher || user.isAdmin)) {
+    // Signed-in teachers/admins get staff-only shortcuts first.
+    picks.push({ icon: 'grid', text: 'Open the teacher dashboard' });
+    picks.push({ icon: 'trophy', text: 'Show me class analytics' });
+  } else if (!user) {
+    picks.push({ icon: 'user', text: 'How do I sign up for an OCS account?' });
+  }
   // Stable rotation within a session (don't reshuffle on every render).
   const start = (new Date().getHours() * 3) % POOL.length;
   for (let i = 0; picks.length < 5 && i < POOL.length; i++) {

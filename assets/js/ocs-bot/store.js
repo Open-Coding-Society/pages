@@ -162,7 +162,14 @@ export function searchConversations(query) {
 }
 
 // ─── Preferences (global, cross-user) ────────────────────────────────────────
-const DEFAULT_PREFS = { style: 'balanced', model: 'llama-3.3-70b-versatile', railOpen: false };
+const DEFAULT_PREFS = {
+  style: 'balanced',
+  model: 'llama-3.3-70b-versatile',
+  railOpen: false,
+  enabled: true,      // user can turn the whole assistant off on this device
+  autoOpen: true,     // greet on first visit
+  autoOpenedAt: 0,    // timestamp of the last auto-open (rate-limits it)
+};
 
 export function getPrefs() {
   let raw;

@@ -62,6 +62,7 @@ function boot() {
     'ocsb-welcome', 'ocsb-welcome-greeting', 'ocsb-suggestions', 'ocsb-followups',
     'ocsb-settings', 'ocsb-set-style', 'ocsb-set-model', 'ocsb-account',
     'ocsb-account-text', 'ocsb-clear', 'ocsb-form', 'ocsb-input', 'ocsb-send',
+    'ocsb-set-autoopen', 'ocsb-set-enabled', 'ocsb-disabled-note',
   ].forEach((id) => { el[id] = $(id); });
   if (!el['ocsb-fab'] || !el['ocsb-panel']) return; // markup missing — bail safely
   bot.booted = true;
@@ -75,6 +76,9 @@ function boot() {
 
   // Detect the signed-in user (async, non-blocking).
   detectUser();
+
+  // Gently auto-open on first visit (respects the user's settings).
+  maybeAutoOpen();
 }
 
 // ─── User / scope ────────────────────────────────────────────────────────
@@ -87,6 +91,7 @@ async function detectUser() {
   renderRail();
   renderActiveConversation();
   updateAccountUI();
+  renderSuggestions(); // re-render starter prompts now that we know the user + role
   if (user) {
     bot.el['ocsb-welcome-greeting'].textContent = `Hey ${user.firstName}! I'm the OCS Assistant 👋`;
     syncFromRemote(); // pull server-side history if available
@@ -127,6 +132,8 @@ function wireEvents() {
   // Settings segmented controls
   el['ocsb-set-style'].addEventListener('click', (e) => segmented(e, 'set-style', 'style', 'data-style'));
   el['ocsb-set-model'].addEventListener('click', (e) => segmented(e, 'set-model', 'model', 'data-model'));
+  el['ocsb-set-autoopen'].addEventListener('click', () => setAutoOpen(el['ocsb-set-autoopen'].getAttribute('aria-checked') !== 'true'));
+  el['ocsb-set-enabled'].addEventListener('click', () => setEnabled(el['ocsb-set-enabled'].getAttribute('aria-checked') !== 'true'));
 
   // Delegated clicks: suggestions, nav chips, copy buttons, convo items, followups
   document.addEventListener('click', delegatedClick);
@@ -139,6 +146,7 @@ function wireEvents() {
     }
     if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
       e.preventDefault();
+      if (store.getPrefs().enabled === false) setEnabled(true); // bring it back if hidden
       document.body.classList.contains('ocsb-open') ? el['ocsb-input'].focus() : open();
     }
   });
@@ -223,6 +231,32 @@ function applyPrefs() {
     bot.el[groupId].querySelectorAll('button').forEach((b) => b.classList.toggle('is-active', b.getAttribute(attr) === value));
   markActive('ocsb-set-style', 'data-style', prefs.style);
   markActive('ocsb-set-model', 'data-model', prefs.model);
+
+  bot.el['ocsb-set-autoopen'].setAttribute('aria-checked', String(prefs.autoOpen !== false));
+  bot.el['ocsb-set-enabled'].setAttribute('aria-checked', String(prefs.enabled !== false));
+  document.body.classList.toggle('ocsb-disabled', prefs.enabled === false);
+  bot.el['ocsb-disabled-note'].hidden = prefs.enabled !== false;
+}
+
+// Enable/disable the whole assistant on this device + the auto-open behavior.
+function setAutoOpen(on) {
+  store.setPref('autoOpen', on);
+  bot.el['ocsb-set-autoopen'].setAttribute('aria-checked', String(on));
+}
+function setEnabled(on) {
+  store.setPref('enabled', on);
+  bot.el['ocsb-set-enabled'].setAttribute('aria-checked', String(on));
+  document.body.classList.toggle('ocsb-disabled', !on);
+  bot.el['ocsb-disabled-note'].hidden = on;
+}
+function maybeAutoOpen() {
+  const prefs = store.getPrefs();
+  if (prefs.enabled === false || prefs.autoOpen === false) return;
+  if (window.innerWidth <= 560) return;                 // never auto-open on phones
+  const now = Date.now();
+  if (now - (prefs.autoOpenedAt || 0) < 7 * 24 * 60 * 60 * 1000) return; // greeted recently
+  store.setPref('autoOpenedAt', now);
+  setTimeout(() => { if (!document.body.classList.contains('ocsb-open')) open(); }, 900);
 }
 
 // ─── Composer ───────────────────────────────────────────────────────────────
