@@ -2,4 +2,9 @@
 <!-- Minima start custom head snippets -->
 {% include head-custom.html %}
 <!-- Minima end custom head snippets -->
+
+{%- unless page.disable_ocs_bot -%}
+<!-- OCS Assistant (global chatbot) styles -->
+<link rel="stylesheet" href="{{ '/assets/css/ocs-bot.css' | relative_url }}">
+{%- endunless -%}
  
