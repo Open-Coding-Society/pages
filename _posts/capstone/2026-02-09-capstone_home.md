@@ -300,8 +300,21 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
-     <!-- Assignment Resources Platform -->
-     <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <!-- Big Six & Code Hub -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url capstone/2026-03-04-big6-capstone %}">
+           <img src="/images/capstone/backend.png" alt="Big Six & Code Hub — Interactive CS Learning Modules" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-03-04-big6-capstone %}">Big Six & Code Hub</a></h3>
+           <p class="text-sm text-gray-700">The Big Six is a suite of six interactive CS lessons (Frontend, Backend, Data Visualization, Resume, AI, Analytics). Code Hub is the RPG game level where students walk up to three robot terminals — each teaching a core discipline — with a Space Invaders quiz gating progression to the next terminal.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Alex, Travis</p>
+       </div>
+   </div>
+
+
+   <!-- Assignment Resources Platform -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">
          <img src="/images/capstone/database_defenders.png" alt="Assignment Resources Platform - Assignment-scoped File & URL Resources" class="w-28 h-28 object-cover rounded" />
        </a>
