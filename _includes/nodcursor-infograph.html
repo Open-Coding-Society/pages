@@ -1,70 +1,570 @@
 {% assign data = site.data.nodcursor_infograph %}
 
-<div class="nc-infograph">
-  <!-- Header Section -->
-  <div class="nc-header">
-    <div class="nc-badge">Design-Based Research Capstone</div>
-    <h1 class="nc-title">{{ data.Title }}</h1>
-    <p class="nc-description">{{ data.Description }}</p>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --wp-bg: #0f0f12;
+  --wp-card: #16161a;
+  --wp-card-border: #2a2a2e;
+  --wp-text: #e4e4e7;
+  --wp-text-muted: #a1a1aa;
+  --wp-accent: #3b82f6;
+  --wp-accent-soft: rgba(59, 130, 246, 0.15);
+  --wp-success: #22c55e;
+  --wp-tag: #27272a;
+  --wp-gradient-start: #3b82f6;
+  --wp-gradient-end: #06b6d4;
+  --wp-purple: #a855f7;
+  --wp-purple-soft: rgba(168, 85, 247, 0.12);
+  --wp-amber: #f59e0b;
+  --wp-amber-soft: rgba(245, 158, 11, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+.wp-container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--wp-text);
+}
+
+/* ── Header ── */
+.wp-header {
+  text-align: center;
+  margin-bottom: 2.75rem;
+}
+
+.wp-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 9999px;
+  background: var(--wp-accent-soft);
+  color: var(--wp-accent);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  margin-bottom: 1rem;
+}
+
+.wp-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--wp-gradient-start), var(--wp-gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wp-description {
+  font-size: 1.0625rem;
+  color: var(--wp-text-muted);
+  line-height: 1.7;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── Section Label ── */
+.wp-section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wp-text-muted);
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--wp-card-border);
+}
+
+/* ── Project Card ── */
+.wp-card {
+  background: var(--wp-card);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.2s;
+}
+
+.wp-card:hover {
+  border-color: rgba(59,130,246,0.4);
+}
+
+.wp-card-header {
+  padding: 1.75rem 1.75rem 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.wp-card-title-group {
+  flex: 1;
+}
+
+.wp-card-icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.wp-card-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.01em;
+}
+
+.wp-card-subtitle {
+  font-size: 0.9375rem;
+  color: var(--wp-accent);
+  margin: 0;
+}
+
+.wp-card-body {
+  padding: 1.25rem 1.75rem 1.75rem;
+}
+
+/* Key points */
+.wp-keypoints {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+
+.wp-keypoints li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.45rem 0;
+  font-size: 0.9375rem;
+  color: var(--wp-text);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.wp-keypoints li:last-child {
+  border-bottom: none;
+}
+
+.wp-check {
+  color: var(--wp-success);
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* Tech tags */
+.wp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.wp-tag {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--wp-tag);
+  color: var(--wp-text-muted);
+  border-radius: 0.35rem;
+  border: 1px solid var(--wp-card-border);
+}
+
+/* About + Impact two-col */
+.wp-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  padding: 0 1.75rem 1.75rem;
+  border-top: 1px solid var(--wp-card-border);
+  padding-top: 1.25rem;
+}
+
+.wp-two-col h4 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wp-text-muted);
+  margin: 0 0 0.6rem;
+}
+
+.wp-two-col p {
+  font-size: 0.9rem;
+  color: var(--wp-text-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.wp-impact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wp-impact-list li {
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+  color: var(--wp-text-muted);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.wp-impact-list li::before {
+  content: "→";
+  color: var(--wp-accent);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Card footer: team + link */
+.wp-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.75rem;
+  border-top: 1px solid var(--wp-card-border);
+  background: rgba(255,255,255,0.015);
+}
+
+.wp-team {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.wp-team-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--wp-text-muted);
+  font-weight: 600;
+}
+
+.wp-team-name {
+  font-size: 0.9rem;
+  color: var(--wp-text);
+  font-weight: 600;
+}
+
+.wp-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  background: var(--wp-accent-soft);
+  color: var(--wp-accent);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wp-btn {
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(135deg, var(--wp-gradient-start), var(--wp-gradient-end));
+  color: white;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.wp-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ── Issues Section ── */
+.wp-issues {
+  background: var(--wp-card);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.wp-issues-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.wp-issues-header h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wp-text);
+  margin: 0;
+}
+
+.wp-issues-count {
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--wp-text-muted);
+  background: var(--wp-tag);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 9999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.wp-issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--wp-tag);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 0.5rem;
+  margin-bottom: 0.6rem;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.wp-issue-item:hover {
+  border-color: var(--wp-accent);
+  background: var(--wp-accent-soft);
+}
+
+.wp-issue-item:last-child {
+  margin-bottom: 0;
+}
+
+.wp-issue-icon {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.1rem;
+  color: var(--wp-success);
+}
+
+.wp-issue-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wp-issue-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--wp-text);
+  margin-bottom: 0.2rem;
+}
+
+.wp-issue-meta {
+  font-size: 0.75rem;
+  color: var(--wp-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.wp-issue-label {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.wp-issue-label-bug {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.wp-issue-label-enhancement {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.wp-issue-label-feature {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.wp-issue-label-research {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.wp-issue-label-proposal {
+  background: rgba(6, 182, 212, 0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .wp-two-col {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div class="wp-container">
+  <!-- Header -->
+  <div class="wp-header">
+    <div class="wp-badge">Design-Based Research Capstone</div>
+    <h1 class="wp-title">{{ data.Title }}</h1>
+    <p class="wp-description">{{ data.Description }}</p>
   </div>
 
-  <!-- Project Cards -->
+  <!-- Core NodCursor Section -->
+  <div class="wp-section-label">Core System</div>
+
   {% for topic in data.Topics %}
-  <div class="nc-card">
-    <div class="nc-card-grid">
-      
-      <!-- Left: Image & Status -->
-      <div class="nc-visual">
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="nc-image-link">
-          <img src="{{ site.baseurl }}/images/{{ topic.image }}" alt="{{ topic.alt }}" class="nc-image">
-          <div class="nc-overlay">
-            <span>View Project</span>
-          </div>
-        </a>
-        <div class="nc-status">{{ topic.status }}</div>
-        <div class="nc-team">
-          <span class="nc-team-label">Project Leads</span>
-          <span class="nc-team-name">{{ topic.team | join: ", " }}</span>
+    {% if forloop.index <= 2 %}
+    <div class="wp-card">
+      <div class="wp-card-header">
+        <div class="wp-card-title-group">
+          <h2 class="wp-card-title">{{ topic.title }}</h2>
+          <p class="wp-card-subtitle">{{ topic.subtitle }}</p>
         </div>
+        {% if topic.icon %}<span class="wp-card-icon">{{ topic.icon }}</span>{% endif %}
       </div>
 
-      <!-- Center: Key Points -->
-      <div class="nc-content">
-        <h2 class="nc-project-title">{{ topic.title }}</h2>
-        <p class="nc-subtitle">{{ topic.subtitle }}</p>
-        
-        <div class="nc-keypoints">
+      <div class="wp-card-body">
+        <ul class="wp-keypoints">
           {% for point in topic.keyPoints %}
-          <div class="nc-keypoint">
-            <span class="nc-check">✓</span>
+          <li>
+            <span class="wp-check">✓</span>
             <span>{{ point }}</span>
-          </div>
+          </li>
           {% endfor %}
-        </div>
+        </ul>
 
-        <div class="nc-tech-stack">
+        <div class="wp-tags">
           {% for tech in topic.tech %}
-          <span class="nc-tech-tag">{{ tech }}</span>
+          <span class="wp-tag">{{ tech }}</span>
           {% endfor %}
         </div>
       </div>
 
-      <!-- Right: Description & Impact -->
-      <div class="nc-details">
-        <h3 class="nc-section-title">About</h3>
-        <p class="nc-about">{{ topic.description }}</p>
-        
-        <h3 class="nc-section-title">Impact</h3>
-        <div class="nc-impact-list">
-          {% for item in topic.impact %}
-          <div class="nc-impact-item">{{ item }}</div>
-          {% endfor %}
+      <div class="wp-two-col">
+        <div>
+          <h4>About</h4>
+          <p>{{ topic.description }}</p>
         </div>
-
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="nc-btn">Learn More</a>
+        <div>
+          <h4>Impact</h4>
+          <ul class="wp-impact-list">
+            {% for item in topic.impact %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
 
+      <div class="wp-card-footer">
+        <div class="wp-team">
+          <span class="wp-team-label">Project Leads</span>
+          <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+        <span class="wp-status">{{ topic.status }}</span>
+      </div>
     </div>
-  </div>
+    {% endif %}
   {% endfor %}
+
+  <!-- Gamification Section -->
+  <div class="wp-section-label">Gamification & Learning Experiences</div>
+
+  {% for topic in data.Topics %}
+    {% if forloop.index > 2 %}
+    <div class="wp-card">
+      <div class="wp-card-header">
+        <div class="wp-card-title-group">
+          <h2 class="wp-card-title">{{ topic.title }}</h2>
+          <p class="wp-card-subtitle">{{ topic.subtitle }}</p>
+        </div>
+        {% if topic.icon %}<span class="wp-card-icon">{{ topic.icon }}</span>{% endif %}
+      </div>
+
+      <div class="wp-card-body">
+        <ul class="wp-keypoints">
+          {% for point in topic.keyPoints %}
+          <li>
+            <span class="wp-check">✓</span>
+            <span>{{ point }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <div class="wp-tags">
+          {% for tech in topic.tech %}
+          <span class="wp-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="wp-two-col">
+        <div>
+          <h4>About</h4>
+          <p>{{ topic.description }}</p>
+        </div>
+        <div>
+          <h4>Impact</h4>
+          <ul class="wp-impact-list">
+            {% for item in topic.impact %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <div class="wp-card-footer">
+        <div class="wp-team">
+          <span class="wp-team-label">Project Leads</span>
+          <span class="wp-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+        <span class="wp-status">{{ topic.status }}</span>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+  <!-- Issues Section -->
+  {% if data.Issues %}
+  <div class="wp-issues">
+    <div class="wp-issues-header">
+      <h3>Linked Issues & Roadmap</h3>
+      <span class="wp-issues-count">{{ data.Issues | size }} issues</span>
+    </div>
+    {% for issue in data.Issues %}
+    <a href="{{ issue.url }}" class="wp-issue-item" target="_blank" rel="noopener noreferrer">
+      <span class="wp-issue-icon">📋</span>
+      <div class="wp-issue-body">
+        <div class="wp-issue-title">
+          #{{ issue.id }}: {{ issue.title }}
+          <span class="wp-issue-label wp-issue-label-{{ issue.type }}">{{ issue.type }}</span>
+        </div>
+        <div class="wp-issue-meta">github.com/aadibhat09/aadi_2025</div>
+        <div style="font-size: 0.85rem; color: var(--wp-text-muted); margin-top: 0.35rem;">{{ issue.description }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
 </div>
