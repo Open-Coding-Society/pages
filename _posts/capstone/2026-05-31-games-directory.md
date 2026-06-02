@@ -718,6 +718,7 @@ function conceptSearch(query) {
   var q = query.trim().toLowerCase();
   var clearBtn = document.getElementById('concept-clear');
   var resultEl = document.getElementById('concept-result-count');
+  var countEl  = document.getElementById('game-count');
   var cards = document.querySelectorAll('#games-grid .game-card');
 
   document.querySelectorAll('.concept-snippet').forEach(function(el) { el.remove(); });
@@ -727,9 +728,22 @@ function conceptSearch(query) {
     clearBtn.classList.remove('visible');
     resultEl.textContent = '';
     resultEl.classList.remove('has-results');
+    document.getElementById('concept-share').classList.remove('visible');
+    // Restore whatever category filter is currently active
+    var activeBtn = document.querySelector('.filter-btn.active');
+    var activeCat = activeBtn ? activeBtn.dataset.filter : 'all';
+    cards.forEach(function(c) {
+      c.style.display = (activeCat === 'all' || c.dataset.category === activeCat) ? 'flex' : 'none';
+    });
     updateCount();
+    var url = new URL(window.location.href);
+    url.searchParams.delete('concept');
+    history.replaceState(null, '', url.toString());
     return;
   }
+
+  // Concept search overrides the category filter — reveal every card so matches are visible
+  cards.forEach(function(c) { c.style.display = 'flex'; });
 
   clearBtn.classList.add('visible');
   var matchCount = 0;
@@ -738,8 +752,9 @@ function conceptSearch(query) {
   cards.forEach(function(card) {
     var key = card.dataset.game;
     var data = GAME_DATA[key];
-    var searchText = (data ? data.concept : '') + ' ' +
-      (card.querySelector('.game-learn') ? card.querySelector('.game-learn').textContent : '');
+    var conceptText = data ? data.concept : '';
+    var learnText = card.querySelector('.game-learn') ? card.querySelector('.game-learn').textContent : '';
+    var searchText = conceptText + ' ' + learnText;
 
     if (searchText.toLowerCase().includes(q)) {
       card.classList.add('card-matched');
@@ -765,8 +780,10 @@ function conceptSearch(query) {
   resultEl.textContent = matchCount > 0
     ? matchCount + ' game' + (matchCount !== 1 ? 's' : '') + ' teach this concept'
     : 'No matches — try a broader term';
+  countEl.textContent = matchCount > 0
+    ? matchCount + ' concept match' + (matchCount !== 1 ? 'es' : '')
+    : '';
 
-  // Keep URL in sync so back/forward works and the address bar is always shareable
   var url = new URL(window.location.href);
   if (q) { url.searchParams.set('concept', q); } else { url.searchParams.delete('concept'); }
   history.replaceState(null, '', url.toString());
