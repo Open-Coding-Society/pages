@@ -404,6 +404,131 @@
   color: var(--wp-text-muted);
   line-height: 1.55;
 }
+
+/* ── Issues Section ── */
+.wp-issues {
+  background: var(--wp-card);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+ 
+.wp-issues-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+ 
+.wp-issues-header h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wp-text);
+  margin: 0;
+}
+ 
+.wp-issues-count {
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--wp-text-muted);
+  background: var(--wp-tag);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 9999px;
+  padding: 0.2rem 0.6rem;
+}
+ 
+.wp-issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--wp-tag);
+  border: 1px solid var(--wp-card-border);
+  border-radius: 0.5rem;
+  margin-bottom: 0.6rem;
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+ 
+.wp-issue-item:hover {
+  border-color: var(--wp-accent);
+  background: var(--wp-accent-soft);
+}
+ 
+.wp-issue-item:last-child {
+  margin-bottom: 0;
+}
+ 
+.wp-issue-icon {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.1rem;
+  color: var(--wp-success);
+}
+ 
+.wp-issue-body {
+  flex: 1;
+  min-width: 0;
+}
+ 
+.wp-issue-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--wp-text);
+  margin-bottom: 0.2rem;
+}
+ 
+.wp-issue-meta {
+  font-size: 0.75rem;
+  color: var(--wp-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+ 
+.wp-issue-label {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+ 
+.wp-issue-label-bug {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+ 
+.wp-issue-label-enhancement {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+ 
+.wp-issue-label-feature {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+ 
+.wp-issue-label-research {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+ 
+.wp-issue-label-proposal {
+  background: rgba(6, 182, 212, 0.15);
+  color: #22d3ee;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
  
 /* ── Responsive ── */
 @media (max-width: 600px) {
@@ -446,9 +571,9 @@
       <span class="wp-flow-node-sub">Analytics</span>
     </div>
   </div>
- 
+  
   <!-- Project Cards -->
-  <div class="wp-section-label">Levels & Features</div>
+  <div class="wp-section-label">Levels &amp; Features</div>
  
   {% for topic in data.Topics %}
   <div class="wp-card">
@@ -596,11 +721,11 @@
     </div>
   </div>
  
-  <!-- Wayfinding World: Code Hub -->
+  <!-- Mission Tools: Code Hub -->
   <div class="wp-card">
     <div class="wp-card-header">
       <div class="wp-card-title-group">
-        <h2 class="wp-card-title">Wayfinding World — Code Hub</h2>
+        <h2 class="wp-card-title">Mission Tools — Code Hub</h2>
         <p class="wp-card-subtitle">Learn HTML through play. Build your About Me page.</p>
       </div>
     </div>
@@ -609,13 +734,11 @@
         <li><span class="wp-check">✓</span><span>In-game coding challenges teach HTML fundamentals through gameplay</span></li>
         <li><span class="wp-check">✓</span><span>Scaffolded skill progression leading to the About Me final project</span></li>
         <li><span class="wp-check">✓</span><span>Students apply skills in a real HTML About Me page submission</span></li>
-        <li><span class="wp-check">✓</span><span>Skills tracked and added to the Skill Passport</span></li>
       </ul>
       <div class="wp-tags">
         <span class="wp-tag">HTML</span>
         <span class="wp-tag">JavaScript</span>
         <span class="wp-tag">Canvas RPG</span>
-        <span class="wp-tag">Skill Passport API</span>
       </div>
     </div>
     <div class="wp-two-col">
@@ -628,7 +751,6 @@
         <ul class="wp-impact-list">
           <li>Bridges game engagement with transferable technical skills</li>
           <li>Students arrive at the About Me project with foundational HTML confidence</li>
-          <li>Progress is logged to the Skill Passport for trimester review</li>
         </ul>
       </div>
     </div>
@@ -639,11 +761,11 @@
     </div>
   </div>
  
-  <!-- Wayfinding World: Sprint Success -->
+  <!-- Mission Tools: Sprint Success -->
   <div class="wp-card">
     <div class="wp-card-header">
       <div class="wp-card-title-group">
-        <h2 class="wp-card-title">Wayfinding World — Sprint Success</h2>
+        <h2 class="wp-card-title">Mission Tools — Sprint Success</h2>
         <p class="wp-card-subtitle">Agile planning, gamified. Build a real mini sprint.</p>
       </div>
     </div>
@@ -681,6 +803,72 @@
       </div>
     </div>
   </div>
+  
+  <!-- Open Issues -->
+  <div class="wp-section-label">Open Issues</div>
+  <div class="wp-issues">
+    <div class="wp-issues-header">
+      <h3>Tracked on GitHub</h3>
+      <span class="wp-issues-count">4 issues</span>
+    </div>
+ 
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/11" target="_blank" class="wp-issue-item">
+      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
+      </svg>
+      <div class="wp-issue-body">
+        <div class="wp-issue-title">
+          Outside Research Conducted When Ideating
+          <span class="wp-issue-label wp-issue-label-enhancement">research</span>
+        </div>
+        <div class="wp-issue-meta">#11 · blackstar3092/wayfinding_pages</div>
+      </div>
+    </a>
+ 
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/4" target="_blank" class="wp-issue-item">
+      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
+      </svg>
+      <div class="wp-issue-body">
+        <div class="wp-issue-title">
+          Wayfinding World Initial Ideation and Proposal
+          <span class="wp-issue-label wp-issue-label-feature">proposal</span>
+        </div>
+        <div class="wp-issue-meta">#4 · blackstar3092/wayfinding_pages</div>
+      </div>
+    </a>
+ 
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/13" target="_blank" class="wp-issue-item">
+      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
+      </svg>
+      <div class="wp-issue-body">
+        <div class="wp-issue-title">
+          Outside Feedback Received
+          <span class="wp-issue-label wp-issue-label-research">feedback</span>
+        </div>
+        <div class="wp-issue-meta">#13 · blackstar3092/wayfinding_pages</div>
+      </div>
+    </a>
+ 
+    <a href="https://github.com/ruta-sir/student/issues/16" target="_blank" class="wp-issue-item">
+      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
+      </svg>
+      <div class="wp-issue-body">
+        <div class="wp-issue-title">
+          Future Improvements for Wayfinding World
+          <span class="wp-issue-label wp-issue-label-enhancement">enhancement</span>
+        </div>
+        <div class="wp-issue-meta">#16 · ruta-sir/student</div>
+      </div>
+    </a>
+ 
+  </div>
  
   <!-- Key Learnings -->
   <div class="wp-section-label">Key Engineering Takeaways</div>
@@ -706,4 +894,3 @@
   </div>
  
 </div>
- 
