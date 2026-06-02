@@ -17,10 +17,31 @@ import { DEFAULT_MODEL } from './config.js';
 const $ = (id) => document.getElementById(id);
 const HISTORY_TURNS = 16; // messages of context sent to the model
 
-const BOT_AVATAR =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1.4" fill="currentColor"/></svg>';
-const ARROW =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+const SVG = (body, w = 2) =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+
+const BOT_AVATAR = SVG('<rect x="3" y="8" width="18" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1.4" fill="currentColor"/><circle cx="9" cy="14" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.2" fill="currentColor" stroke="none"/>');
+const USER_AVATAR = SVG('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>');
+const ARROW = SVG('<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>', 2.4);
+const CHEVRON = SVG('<polyline points="9 18 15 12 9 6"/>', 2.2);
+
+// Monoline SVG icon set for suggestion chips (keyed by ids in suggestions.js).
+const ICONS = {
+  compass: SVG('<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>'),
+  book: SVG('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>'),
+  java: SVG('<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>'),
+  gamepad: SVG('<line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><rect x="2" y="6" width="20" height="12" rx="4"/>'),
+  layers: SVG('<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>'),
+  grid: SVG('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>'),
+  trophy: SVG('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22"/><path d="M14 14.7V17c0 .6.5 1 1 1.2 1.2.5 2 2 2 3.8"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>'),
+  search: SVG('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+  calendar: SVG('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'),
+  rocket: SVG('<path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/><path d="M12 15l-3-3a22 22 0 0 1 2-4 12.9 12.9 0 0 1 11-6c0 2.7-.8 7.5-6 11a22 22 0 0 1-4 2z"/><path d="M9 12H4s.6-3 2-4c1.6-1 5 0 5 0"/><path d="M12 15v5s3-.6 4-2c1-1.6 0-5 0-5"/>'),
+  cap: SVG('<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.7 9 2.7 12 0v-5"/>'),
+  terminal: SVG('<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>'),
+  user: USER_AVATAR,
+  spark: SVG('<path d="M12 3l1.6 4.9L18.5 9.5l-4.9 1.6L12 16l-1.6-4.9L5.5 9.5l4.9-1.6z"/>'),
+};
 
 const bot = {
   el: {},
@@ -258,7 +279,7 @@ function renderSuggestions() {
     b.type = 'button';
     b.className = 'ocsb-suggestion';
     b.dataset.text = s.text;
-    b.innerHTML = `<span class="ocsb-suggestion-ico" aria-hidden="true">${s.icon}</span><span class="ocsb-suggestion-txt">${escapeText(s.text)}</span>`;
+    b.innerHTML = `<span class="ocsb-suggestion-ico" aria-hidden="true">${ICONS[s.icon] || ICONS.spark}</span><span class="ocsb-suggestion-txt">${escapeText(s.text)}</span><span class="ocsb-suggestion-go" aria-hidden="true">${CHEVRON}</span>`;
     wrap.appendChild(b);
   });
 }
@@ -309,7 +330,7 @@ function renderActiveConversation() {
 function addUserBubble(text) {
   const node = document.createElement('div');
   node.className = 'ocsb-msg user';
-  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">🧑‍💻</span><div class="ocsb-bubble"></div>`;
+  node.innerHTML = `<span class="ocsb-msg-avatar">${USER_AVATAR}</span><div class="ocsb-bubble"></div>`;
   node.querySelector('.ocsb-bubble').textContent = text;
   bot.el['ocsb-messages'].appendChild(node);
   return node;
