@@ -70,7 +70,7 @@ body.ocsb-open.ocsb-modal #ocsb-backdrop { opacity: 1; visibility: visible; }
 /* ─── Panel ────────────────────────────────────────────────────── */
 #ocsb-panel {
   position: fixed; right: 22px; bottom: 22px; z-index: var(--ocsb-z-panel);
-  width: 384px; height: 600px; max-height: calc(100vh - 48px);
+  width: min(384px, calc(100vw - 44px)); height: 600px; max-height: calc(100vh - 48px);
   display: grid; grid-template-columns: 0fr 1fr;
   background: var(--ocsb-bg-panel); border: 1px solid var(--ocsb-border);
   border-radius: var(--ocsb-radius-panel); box-shadow: var(--ocsb-shadow-panel);
@@ -79,7 +79,10 @@ body.ocsb-open.ocsb-modal #ocsb-backdrop { opacity: 1; visibility: visible; }
   transition: opacity 200ms ease, transform 240ms cubic-bezier(.22,1,.36,1), visibility 200ms ease, width 260ms ease, height 260ms ease;
 }
 body.ocsb-open #ocsb-panel { opacity: 1; visibility: visible; transform: none; }
-body.ocsb-open.ocsb-rail-open #ocsb-panel { grid-template-columns: 184px 1fr; }
+/* Opening the rail WIDENS the panel (clamped to the viewport) instead of
+   stealing width from the chat — otherwise the main column is squished and
+   its content overflows / clips on the right. */
+body.ocsb-open.ocsb-rail-open #ocsb-panel { width: min(580px, calc(100vw - 44px)); grid-template-columns: 184px 1fr; }
 body.ocsb-open.ocsb-expanded #ocsb-panel { width: min(740px, calc(100vw - 48px)); height: min(760px, calc(100vh - 48px)); }
 body.ocsb-open.ocsb-expanded.ocsb-rail-open #ocsb-panel { grid-template-columns: 232px 1fr; }
 
