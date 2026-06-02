@@ -718,7 +718,9 @@ function conceptSearch(query) {
   var q = query.trim().toLowerCase();
   var clearBtn = document.getElementById('concept-clear');
   var resultEl = document.getElementById('concept-result-count');
-  var cards = document.querySelectorAll('#games-grid .game-card');
+  var countEl  = document.getElementById('game-count');
+  var shareBtn = document.getElementById('concept-share');
+  var cards    = document.querySelectorAll('#games-grid .game-card');
 
   document.querySelectorAll('.concept-snippet').forEach(function(el) { el.remove(); });
   cards.forEach(function(c) { c.classList.remove('card-matched', 'card-dimmed'); });
@@ -727,48 +729,47 @@ function conceptSearch(query) {
     clearBtn.classList.remove('visible');
     resultEl.textContent = '';
     resultEl.classList.remove('has-results');
+    shareBtn.classList.remove('visible');
+    var activeBtn = document.querySelector('.filter-btn.active');
+    var activeCat = activeBtn ? activeBtn.dataset.filter : 'all';
+    cards.forEach(function(c) {
+      c.style.display = (activeCat === 'all' || c.dataset.category === activeCat) ? 'flex' : 'none';
+    });
     updateCount();
+    var url = new URL(window.location.href);
+    url.searchParams.delete('concept');
+    history.replaceState(null, '', url.toString());
     return;
   }
 
   clearBtn.classList.add('visible');
   var matchCount = 0;
-  var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
 
   cards.forEach(function(card) {
-    var key = card.dataset.game;
+    var key  = card.dataset.game;
     var data = GAME_DATA[key];
-    var searchText = (data ? data.concept : '') + ' ' +
-      (card.querySelector('.game-learn') ? card.querySelector('.game-learn').textContent : '');
+    var text = (data ? data.concept : '') + ' ' +
+               (card.querySelector('.game-learn') ? card.querySelector('.game-learn').textContent : '');
 
-    if (searchText.toLowerCase().includes(q)) {
-      card.classList.add('card-matched');
+    if (text.toLowerCase().includes(q)) {
+      card.style.display = 'flex';
       matchCount++;
-      if (data) {
-        var sentences = data.concept.replace(/([.!?])\s+/g, '$1|').split('|');
-        var best = sentences.find(function(s) { return s.toLowerCase().includes(q); }) || sentences[0];
-        var snippet = document.createElement('div');
-        snippet.className = 'concept-snippet';
-        snippet.innerHTML = best.replace(re, '<mark>$1</mark>');
-        card.insertBefore(snippet, card.querySelector('.game-drawer'));
-      }
     } else {
-      card.classList.add('card-dimmed');
+      card.style.display = 'none';
     }
   });
 
-  var shareBtn = document.getElementById('concept-share');
-  resultEl.classList.toggle('has-results', matchCount > 0);
   shareBtn.classList.toggle('visible', matchCount > 0);
   shareBtn.classList.remove('copied');
   shareBtn.textContent = '🔗 Copy Link';
+  resultEl.classList.toggle('has-results', matchCount > 0);
   resultEl.textContent = matchCount > 0
     ? matchCount + ' game' + (matchCount !== 1 ? 's' : '') + ' teach this concept'
     : 'No matches — try a broader term';
+  countEl.textContent = 'Showing ' + matchCount + ' game' + (matchCount !== 1 ? 's' : '');
 
-  // Keep URL in sync so back/forward works and the address bar is always shareable
   var url = new URL(window.location.href);
-  if (q) { url.searchParams.set('concept', q); } else { url.searchParams.delete('concept'); }
+  url.searchParams.set('concept', q);
   history.replaceState(null, '', url.toString());
 }
 
