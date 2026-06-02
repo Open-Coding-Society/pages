@@ -81,7 +81,7 @@ sticky_rank: 1
    <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
    <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
    <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
-   <a href="pages/_posts/capstone/2026-06-01-README-capstone.md" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
+   <a href="{% post_url 2026-06-01-README-capstone %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
      <span class="mr-2">📄</span>README
    </a>
    <a href="/capstone/games/" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-indigo-500 rounded text-sm text-white hover:bg-indigo-500 font-semibold" title="Browse all OCS Games">
