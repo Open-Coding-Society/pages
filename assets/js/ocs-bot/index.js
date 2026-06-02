@@ -316,13 +316,14 @@ function renderActiveConversation() {
   const id = store.getActiveId();
   const convo = id ? store.getConversation(id) : null;
   const msgsEl = bot.el['ocsb-messages'];
-  // Remove rendered message nodes (keep the welcome node).
   msgsEl.querySelectorAll('.ocsb-msg').forEach((n) => n.remove());
   bot.el['ocsb-followups'].hidden = true;
   bot.el['ocsb-followups'].innerHTML = '';
 
+  // Welcome and transcript are mutually-exclusive sibling regions.
   const hasMsgs = convo && convo.messages.length > 0;
   bot.el['ocsb-welcome'].hidden = hasMsgs;
+  bot.el['ocsb-messages'].hidden = !hasMsgs;
   bot.el['ocsb-status-text'].textContent = 'Ready to help';
 
   if (hasMsgs) {
@@ -337,7 +338,7 @@ function renderActiveConversation() {
 function addUserBubble(text) {
   const node = document.createElement('div');
   node.className = 'ocsb-msg user';
-  node.innerHTML = `<span class="ocsb-msg-avatar">${USER_AVATAR}</span><div class="ocsb-bubble"></div>`;
+  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">${USER_AVATAR}</span><div class="ocsb-msg-body"><div class="ocsb-bubble"></div></div>`;
   node.querySelector('.ocsb-bubble').textContent = text;
   bot.el['ocsb-messages'].appendChild(node);
   return node;
@@ -346,7 +347,7 @@ function addUserBubble(text) {
 function addBotBubble(text) {
   const node = document.createElement('div');
   node.className = 'ocsb-msg bot';
-  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">${BOT_AVATAR}</span><div class="ocsb-bubble"></div>`;
+  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">${BOT_AVATAR}</span><div class="ocsb-msg-body"><div class="ocsb-bubble"></div></div>`;
   const bubble = node.querySelector('.ocsb-bubble');
   const { clean, actions } = parseActions(text);
   bubble.innerHTML = renderMarkdown(clean);
@@ -367,7 +368,7 @@ function appendActionChips(bubble, actions) {
     chip.innerHTML = `${escapeText(a.label)} ${ARROW}`;
     wrap.appendChild(chip);
   });
-  bubble.appendChild(wrap);
+  (bubble.closest('.ocsb-msg-body') || bubble).appendChild(wrap);
 }
 
 // ─── The chat turn ───────────────────────────────────────────────────────────
@@ -384,6 +385,7 @@ async function submit() {
   ta.value = '';
   onInput();
   bot.el['ocsb-welcome'].hidden = true;
+  bot.el['ocsb-messages'].hidden = false;
   addUserBubble(text);
   scrollToBottom();
   store.appendMessage(convoId, { role: 'user', content: text });
@@ -436,7 +438,7 @@ function finishGenerating() {
 function addTyping() {
   const node = document.createElement('div');
   node.className = 'ocsb-msg bot';
-  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">${BOT_AVATAR}</span><div class="ocsb-bubble"><span class="ocsb-typing"><span></span><span></span><span></span></span></div>`;
+  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">${BOT_AVATAR}</span><div class="ocsb-msg-body"><div class="ocsb-bubble"><span class="ocsb-typing"><span></span><span></span><span></span></span></div></div>`;
   bot.el['ocsb-messages'].appendChild(node);
   return node;
 }
@@ -444,7 +446,7 @@ function addTyping() {
 function addBotBubbleStreaming() {
   const node = document.createElement('div');
   node.className = 'ocsb-msg bot';
-  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">${BOT_AVATAR}</span><div class="ocsb-bubble"></div>`;
+  node.innerHTML = `<span class="ocsb-msg-avatar" aria-hidden="true">${BOT_AVATAR}</span><div class="ocsb-msg-body"><div class="ocsb-bubble"></div></div>`;
   bot.el['ocsb-messages'].appendChild(node);
   return node;
 }
