@@ -11,16 +11,57 @@ categories: Capstone
 permalink: /capstone-home-documentation/
 ---
 
+<style>
+.capstone-glow-title {
+  text-shadow: 0 0 10px rgba(30, 58, 138, 0.55), 0 0 28px rgba(30, 58, 138, 0.22);
+}
+.ts-btn {
+  display: block;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  transition: opacity 0.2s, transform 0.1s;
+  text-align: left;
+  width: 100%;
+}
+.ts-btn:hover { opacity: 0.85; transform: translateX(2px); }
+</style>
 
-## Capstone Infographics Home Page Documentation
+## <span class="capstone-glow-title">Capstone Infographics Home Page Documentation</span>
 
 
 This document explains how to use the capstone home page located at `_posts/capstone/2026-02-09-capstone_home.md`.
 
+<div style="display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap;">
+  <video id="capstone-video" width="640" height="360" controls style="flex-shrink:0;">
+    <source src="/assets/capstoneguide.mp4" type="video/mp4">
+  </video>
+  <div style="display:flex; flex-direction:column; justify-content:center; gap:14px; padding-top:6px; min-width:220px;">
+    <button class="ts-btn" onclick="seekCapstoneVideo(30)"
+      style="background:linear-gradient(135deg,#f97316,#fbbf24); box-shadow:0 3px 10px rgba(249,115,22,0.45);">
+      0:30 &mdash; Capstone Navigation
+    </button>
+    <button class="ts-btn" onclick="seekCapstoneVideo(45)"
+      style="background:linear-gradient(135deg,#06b6d4,#67e8f9); box-shadow:0 3px 10px rgba(6,182,212,0.45);">
+      0:45 &mdash; Filter Navigation
+    </button>
+    <button class="ts-btn" onclick="seekCapstoneVideo(120)"
+      style="background:linear-gradient(135deg,#a855f7,#f472b6); box-shadow:0 3px 10px rgba(168,85,247,0.45);">
+      2:00 &mdash; Project Creation &amp; Editing
+    </button>
+  </div>
+</div>
 
-<video width="640" height="360" controls>
- <source src="/assets/capstoneguide.mp4" type="video/mp4">
-</video>
+<script>
+function seekCapstoneVideo(seconds) {
+  var v = document.getElementById('capstone-video');
+  if (v) { v.currentTime = seconds; v.play(); }
+}
+</script>
 
 
 
