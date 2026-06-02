@@ -30,6 +30,11 @@
           <span class="rcr-pmr-team-label">Project Leads</span>
           <span class="rcr-pmr-team-name">{{ feature.team | join: ", " }}</span>
         </div>
+        {% if feature.reflection %}
+        <div class="rcr-pmr-feature-reflection">
+          <span>❗️Comments from CTE: </span> {{ feature.reflection }}
+        </div>
+        {% endif %}
       </div>
 
       <!-- Center: Key Points -->
@@ -73,9 +78,70 @@
   </div>
   {% endfor %}
 
-      <a href="https://github.com/Rishabh-da-best/RCR-Dominators-Frontend-/issues/12" class="rcr-pmr-btn">
-    ↗ Our review of CTE Expo on GitHub
-  </a>
+  <!-- GitHub Review Link -->
+  <div style="text-align: center; margin-top: 32px;">
+    <a href="https://github.com/Rishabh-da-best/RCR-Dominators-Frontend-/issues/12" class="rcr-pmr-btn">
+      ↗ Our review of CTE Expo on GitHub
+    </a>
+  </div>
+
+<!-- Team Reflection Summary -->
+<div class="rcr-pmr-reflection-summary">
+  <div class="rcr-reflection-grid">
+    <div class="rcr-reflection-card">
+      <h3>👍 What Went Well</h3>
+      <ul>
+        {% for item in data.TeamReflection.whatWentWell %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="rcr-reflection-card">
+      <h3>📝 What Needs Improvement</h3>
+      <ul>
+        {% for item in data.TeamReflection.whatNeedsImprovement %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="rcr-reflection-card">
+      <h3>💬 Key Feedback Received</h3>
+      <ul>
+        {% for lesson in data.LessonsLearned %}
+        <li><strong>{{ lesson.source }}:</strong> 
+          {% for point in lesson.points %}
+            {{ point }}{% unless forloop.last %}; {% endunless %}
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Future Plan -->
+<div class="rcr-reflection-card">
+  <h3>📋 Future Plan for Our Website</h3>
+  <ul>
+    {% for item in data.FuturePlan %}
+    <li>
+      {% if item contains "Remove" %}
+        ❌ {{ item }}
+      {% elsif item contains "Add" or item contains "Regularly" %}
+        ✅ {{ item }}
+      {% else %}
+        {{ item }}
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<!-- Conclusion -->
+<div class="rcr-reflection-card">
+  <h3>🎯 Conclusion</h3>
+  <p>{{ data.Conclusion }}</p>
+</div>
 
   <!-- Part 2 Label -->
   <div class="rcr-section-label" style="margin-top: 56px;">
@@ -96,6 +162,9 @@
         <h3>{{ item.title }}</h3>
         <p>{{ item.description }}</p>
         <div class="rcr-pmr-future-needs">Requires: {{ item.needs }}</div>
+        {% if item.reflection %}
+        <div class="rcr-future-reflection">❗️Comments from CTE:  {{ item.reflection }}</div>
+        {% endif %}
       </div>
       {% endfor %}
     </div>
