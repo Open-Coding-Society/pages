@@ -5,12 +5,17 @@ import GamEnvBackground from '@assets/js/GameEnginev1.1/essentials/GameEnvBackgr
 import Player from '@assets/js/GameEnginev1.1/essentials/Player.js';
 import Npc from '@assets/js/GameEnginev1.1/essentials/Npc.js';
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
-import PersonaTrial from './PersonaTrial.js';
+import PersonaHallTrial from './PersonaHallTrial.js';
 import GameLevelCsPath1CodeHub from './GameLevelCsPath1CodeHub.js';
+import GameLevelEmpathyEpic from './GameLevelEmpathyEpic.js';
 import SkillPassport from './SkillPassport.js';
 import { pythonURI, fetchOptions } from '@assets/js/api/config.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
+import AboutMeBuilder from './AboutMeBuilder.js';
+import MissionTools from './GameLevelCsPath2Mission.js';
+import { refreshCourseNavigation } from '@assets/js/projects/cs-pathway/model/courseNavigation.js';
 import SprintSuccessModule from './SprintSuccessModule.js';
+import PersonaTrial from './PersonaTrial.js';
 
 /**
  * GameLevel CS Pathway - Wayfinding World
@@ -60,6 +65,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       skill: '—',
       ...this._getCompletionPanelValues(),
     });
+
     /**
      * Section: Level objects.
      */
@@ -111,24 +117,36 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     // ── Gatekeepers ────────────────────────────────────────────
     const codeHubGatekeeperPos = {
-      x: width * 0.76,
-      y: height * 0.26,
+      x: width * 0.81,
+      y: height * 0.27,
     };
 
     const personalEnrichmentGatekeeperPos = {
       x: width * 0.23,
-      y: height * 0.23,
+      y: height * 0.22,
     };
 
     const skillPassportGatekeeperPos = {
-      x: width * 0.77,
-      y: height * 0.49,
+      x: width * 0.84,
+      y: height * 0.51,
     };
 
     const sprintSuccessGatekeeperPos = {
-      x: width * 0.24,
-      y: height * 0.46,
+      x: width * 0.19,
+      y: height * 0.5,
     };
+
+    const missionToolsGatekeeperPos = {
+      x: width * 0.525,
+      y: height * 0.19,
+    };
+
+    const empathyEpicGatekeeperPos = {
+      x: width * 0.75,
+      y: height * 0.78,
+    };
+
+    const levelInstance = this;
 
     const createDiscMarkerSrc = (fillColor, borderColor = '#f8fafc') => {
       const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
@@ -200,7 +218,10 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       src: createDiscMarkerSrc(markerColor),
       id,
       greeting,
-      INIT_POSITION: { ...position },
+      INIT_POSITION: {
+        x: position.x - (width / gatekeeperBaseData.SCALE_FACTOR / 2),
+        y: position.y - (height / gatekeeperBaseData.SCALE_FACTOR / 2),
+      },
       interactDistance: interactDistance || 120,
       ...(reaction ? { reaction } : {}),
       ...(interact ? { interact } : {}),
@@ -211,6 +232,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       greeting: 'Welcome to the Code Hub! Choose what you want to explore first!',
       position: codeHubGatekeeperPos,
       interact: function () {
+        // "this" here refers to the NPC, which has access to its own dialogueSystem
         this.dialogueSystem.dialogues = [
           'Welcome to the Code Hub!',
           'Here you can explore Frontend, Backend, and Data Viz.',
@@ -224,7 +246,13 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
             primary: true,
             action: () => {
               this.dialogueSystem.closeDialogue();
-              const gc = this.gameEnv.gameControl;
+              
+              const gc = levelInstance.gameEnv?.gameControl || levelInstance.gameEnv;
+              if (!gc) {
+                console.error('[Teleport] Game control engine context missing.');
+                return;
+              }
+              
               gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath1CodeHub);
               gc.currentLevelIndex++;
               gc.transitionToLevel();
@@ -237,7 +265,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
 
     const npc_data_personalEnrichmentGatekeeper = createGatekeeperData({
       id: 'PersonalEnrichmentGatekeeper',
-      greeting: 'Welcome to Personal Enrichment! Build habits, curiosity, and real-world growth.',
+      greeting: 'Welcome to Team Formation! Build habits, curiosity, and real-world growth.',
       position: personalEnrichmentGatekeeperPos,
       markerColor: '#3b82f6',
       interact: () => {
@@ -246,12 +274,12 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     });
 
     const npc_data_skillPassportGatekeeper = createGatekeeperData({
-      id: 'SkillPassportGatekeeper',
-      greeting: 'Welcome to Skill Passport! Track your progress and collect your coding milestones.',
+      id: 'AboutMeGatekeeper',
+      greeting: 'Welcome to the About Me Builder! Create your personal markdown profile page.',
       position: skillPassportGatekeeperPos,
       markerColor: '#f59e0b',
       interact: () => {
-        this.openSkillPassport();
+        this.openAboutMeBuilder();
       },
     });
 
@@ -264,6 +292,62 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         this.openSprintSuccess();
       },
     });
+
+    // ── Mission Tools gatekeeper ──────────────────────────
+    const npc_data_missionToolsGatekeeper = createGatekeeperData({
+      id: 'MissionToolsGatekeeper',
+      greeting: 'Welcome to Mission Tools! Plan your path and gear up for every sprint.',
+      position: missionToolsGatekeeperPos,
+      markerColor: '#8b5cf6',
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to Mission Tools!',
+          'This is your command center for planning sprints and tracking goals.',
+          "A great coder always has a plan — let's build yours.",
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Mission Tools');
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Open Mission Tools',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              levelInstance.openMissionTools();
+            },
+          },
+        ]);
+      },
+    });
+
+    // ── Empathy Epic gatekeeper ──────────────────────────
+    const npc_data_empathyEpicGatekeeper = createGatekeeperData({
+      id: 'EmpathyEpicGatekeeper',
+      greeting: 'Welcome to Empathy Epic! Strengthen communication, collaboration, and empathy skills.',
+      position: empathyEpicGatekeeperPos,
+      markerColor: '#60a5fa',
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to Empathy Epic!',
+          'Here you will practice empathy, teamwork, and leadership.',
+          'Great innovators understand both people and technology.',
+        ];
+
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Empathy Epic');
+
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Enter Empathy Epic',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              levelInstance.openEmpathyEpic();
+            },
+          },
+        ]);
+      },
+    });
     // List of objects definitions for this level
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
@@ -272,24 +356,125 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       { class: Npc, data: npc_data_personalEnrichmentGatekeeper },
       { class: Npc, data: npc_data_skillPassportGatekeeper },
       { class: Npc, data: npc_data_sprintSuccessGatekeeper },
+      { class: Npc, data: npc_data_missionToolsGatekeeper },
+      { class: Npc, data: npc_data_empathyEpicGatekeeper },
     ];
   }
 
-  // ── Skill Passport ───────────────────────────────────────────
-  openSkillPassport() {
-    if (this._skillPassportOpen) return;
-    this._skillPassportOpen = true;
 
-    const passport = new SkillPassport({
-      pythonURI,
-      fetchOptions,
+  // ── Sync level dropdown ───────────────────────────────────────
+  _syncLevelDropdown() {
+    requestAnimationFrame(() => {
+      const allSelects = Array.from(document.querySelectorAll('select'));
+      const levelSelect = allSelects.find((sel) =>
+        Array.from(sel.options).some((opt) =>
+          opt.textContent.trim() === 'Wayfinding World' ||
+          opt.textContent.trim() === 'Identity Forge' ||
+          opt.textContent.trim() === 'Mission Tools'
+        )
+      );
+      if (!levelSelect) return;
+
+      const targetName = GameLevelCsPath1Way.displayName; // 'Wayfinding World'
+
+      let targetOption = Array.from(levelSelect.options).find(
+        (opt) => opt.textContent.trim() === targetName
+      );
+
+      if (!targetOption) {
+        targetOption = document.createElement('option');
+        targetOption.textContent = targetName;
+        targetOption.value = targetName;
+        levelSelect.appendChild(targetOption);
+      }
+
+      levelSelect.value = targetOption.value;
+    });
+  }
+
+  // ── Initialize ───────────────────────────────────────────────
+  initialize() {
+    this._syncLevelDropdown();
+
+    // Refresh panel with restored profile data (e.g. persona saved in Identity Forge)
+    if (this.profileData) {
+      this.profilePanelView?.update?.({
+        persona: this.profileData.persona || '—',
+        course: this.profileData.course || '—',
+        skill: this.profileData.skill || '—',
+        ...this._getCompletionPanelValues(),
+      });
+    }
+
+    if (typeof super.initialize === 'function') super.initialize();
+  }
+
+  // ── About Me Builder ─────────────────────────────────────────
+  openAboutMeBuilder() {
+    if (this._aboutMeOpen) return;
+    this._aboutMeOpen = true;
+
+    const builder = new AboutMeBuilder({
+      profileData: this.profileData || {},
+      onComplete: async (result) => {
+        try {
+          await this.saveAboutMeResult(result);
+          this.showToast?.(`About Me complete: ${result.title}`);
+          this.profilePanelView?.update?.({
+            skill: 'About Me Builder',
+            persona: result.persona || '—',
+          });
+          this.markLevelComplete('wayfindingWorld');
+        } catch (error) {
+          console.error('Failed to save About Me result:', error);
+          this.showToast?.('About Me completed, but saving failed.');
+        } finally {
+          this._aboutMeOpen = false;
+        }
+      },
       onClose: () => {
-        this._skillPassportOpen = false;
-        this.markLevelComplete('wayfindingWorld');
+        this._aboutMeOpen = false;
       },
     });
 
-    passport.start();
+    builder.start();
+  }
+
+  async saveAboutMeResult(result) {
+    const currentProfile = { ...(this.profileData || {}) };
+
+    const updatedProfile = {
+      ...currentProfile,
+      aboutMeMeta: {
+        title: result.title,
+        markdown: result.markdown,
+        score: result.score,
+        persona: result.persona,
+        interests: result.interests,
+        completedAt: result.completedAt,
+      },
+    };
+
+    this.profileData = updatedProfile;
+
+    if (typeof this.profileManager?.updateProfileData === 'function') {
+      await this.profileManager.updateProfileData(updatedProfile);
+      return;
+    }
+    if (typeof this.profileManager?.saveProfileData === 'function') {
+      await this.profileManager.saveProfileData(updatedProfile);
+      return;
+    }
+    if (typeof this.profileManager?.saveProfile === 'function') {
+      await this.profileManager.saveProfile(updatedProfile);
+      return;
+    }
+    if (typeof this.profileManager?.setProfileData === 'function') {
+      await this.profileManager.setProfileData(updatedProfile);
+      return;
+    }
+
+    console.warn('No known ProfileManager save method found. About Me result stored locally only.');
   }
 
   // ── Persona Trial ────────────────────────────────────────────
@@ -298,14 +483,12 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
     this._personaTrialOpen = true;
 
     const trial = new PersonaTrial({
+      profileData: this.profileData || {},
       onComplete: async (result) => {
         try {
           await this.savePersonaResult(result);
-
           this.showToast?.(`Persona updated: ${result.title}`);
-          this.panel?.(
-            `${result.title}\n\n${result.summary}\n\nTechnologist ${result.percentages.technologist}% | Scrummer ${result.percentages.scrummer}% | Planner ${result.percentages.planner}% | Finisher ${result.percentages.finisher}%`
-          );
+          this.profilePanelView?.update?.({ persona: result.title });
         } catch (error) {
           console.error('Failed to save persona result:', error);
           this.showToast?.('Persona trial completed, but saving failed.');
@@ -330,9 +513,7 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       onComplete: async (result) => {
         try {
           await this.saveSprintSuccessResult(result);
-
           this.showToast?.(`Sprint Success complete: ${result.title}`);
-
           this.profilePanelView?.update?.({
             skill: result.title,
           });
@@ -343,13 +524,27 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
           this._sprintSuccessOpen = false;
         }
       },
-
       onClose: () => {
         this._sprintSuccessOpen = false;
       },
     });
 
     sprint.start();
+  }
+
+  // ── Mission Tools ─────────────────────────────────────────────
+  openMissionTools() {
+    const gc = this.gameEnv.gameControl;
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, MissionTools);
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
+  }
+
+  openEmpathyEpic() {
+    const gc = this.gameEnv.gameControl;
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelEmpathyEpic);
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
   }
 
   async saveSprintSuccessResult(result) {
@@ -372,17 +567,14 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
       await this.profileManager.updateProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfileData === 'function') {
       await this.profileManager.saveProfileData(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.saveProfile === 'function') {
       await this.profileManager.saveProfile(updatedProfile);
       return;
     }
-
     if (typeof this.profileManager?.setProfileData === 'function') {
       await this.profileManager.setProfileData(updatedProfile);
       return;
@@ -394,11 +586,26 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
   }
 
   async saveCoursePlanResult(result) {
+    const recommendedClasses = Array.isArray(result?.recommendedClasses)
+      ? result.recommendedClasses
+      : result?.recommendedClass
+        ? [result.recommendedClass]
+        : [];
+
+    const normalizedClassNames = [...new Set(
+      recommendedClasses
+        .map((entry) => entry?.name || entry)
+        .filter(Boolean)
+    )];
+    const selectedClass = result.course || normalizedClassNames[0] || null;
+
     const currentProfile = { ...(this.profileData || {}) };
 
     const updatedProfile = {
       ...currentProfile,
+      course: selectedClass || currentProfile.course || '—',
       coursePlanMeta: {
+        course: selectedClass,
         title: result.title,
         summary: result.summary,
         primaryPath: result.primaryPath,
@@ -406,38 +613,56 @@ class GameLevelCsPath1Way extends GameLevelCsPathIdentity {
         learningStyle: result.learningStyle,
         percentages: result.percentages,
         scores: result.scores,
-        recommendedClasses: result.recommendedClasses,
+        recommendedClass: result.recommendedClass || recommendedClasses[0] || null,
+        recommendedClasses,
+        selectedClass,
         gamePlan: result.gamePlan,
         redeemToken: result.redeemToken,
-        completedAt: result.completedAt,
+        completedAt: result.completedAt || new Date().toISOString(),
       },
     };
 
     this.profileData = updatedProfile;
 
-    if (typeof this.profileManager?.updateProfileData === 'function') {
-      await this.profileManager.updateProfileData(updatedProfile);
-      return;
+    if (typeof this.profileManager?.updateProgress === 'function') {
+      await this.profileManager.updateProgress('course', selectedClass || currentProfile.course);
+      await this.profileManager.updateProgress('coursePlanMeta', updatedProfile.coursePlanMeta);
     }
 
-    if (typeof this.profileManager?.saveProfileData === 'function') {
-      await this.profileManager.saveProfileData(updatedProfile);
-      return;
+    if (selectedClass) {
+      try {
+        const currentResponse = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
+        if (currentResponse.ok) {
+          const currentData = await currentResponse.json();
+          const currentClasses = Array.isArray(currentData?.class) ? currentData.class : [];
+
+          if (!currentClasses.includes(selectedClass)) {
+            const method = currentClasses.length > 0 ? 'PUT' : 'POST';
+            const body = method === 'PUT'
+              ? { class: [...currentClasses, selectedClass] }
+              : { class: selectedClass };
+
+            const saveResponse = await fetch(`${pythonURI}/api/user/class`, {
+              ...fetchOptions,
+              method,
+              body: JSON.stringify(body),
+            });
+
+            if (!saveResponse.ok) {
+              throw new Error(`Failed to save class selection (${saveResponse.status})`);
+            }
+          }
+
+          await refreshCourseNavigation(true);
+        }
+      } catch (error) {
+        console.warn('Wayfinding World: failed to sync class selection', error);
+      }
     }
 
-    if (typeof this.profileManager?.saveProfile === 'function') {
-      await this.profileManager.saveProfile(updatedProfile);
-      return;
+    if (this.profileManager?.isAuthenticated) {
+      await this.syncPathwayCalendar({ force: true, includeDrills: false });
     }
-
-    if (typeof this.profileManager?.setProfileData === 'function') {
-      await this.profileManager.setProfileData(updatedProfile);
-      return;
-    }
-
-    console.warn(
-      'No known ProfileManager save method found. Course plan result stored in this.profileData only.'
-    );
   }
 }
 

@@ -50,6 +50,8 @@ assets:
 	@# Legacy level/model JS parsing
 	@if [ -d "levels" ]; then mkdir -p $(JS_DEST)/levels; cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true; fi
 	@if [ -d "model" ]; then mkdir -p $(JS_DEST)/model; cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true; fi
+	@if [ -d "services" ]; then mkdir -p $(JS_DEST)/services; cp services/*.js $(JS_DEST)/services/ 2>/dev/null || true; fi
+	@if [ -d "data" ]; then mkdir -p $(JS_DEST)/data; cp data/*.js $(JS_DEST)/data/ 2>/dev/null || true; fi
 	@
 	@# General JS parsing
 	@if [ -d "js" ]; then mkdir -p $(JS_DEST); cp -r js/* $(JS_DEST)/ 2>/dev/null || true; fi
@@ -106,6 +108,22 @@ watch:
 				break; \
 			done; \
 		fi; \
+		if [ -d "$(PROJECT_SRC)/data" ]; then \
+			for file in $$(find $(PROJECT_SRC)/data -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
+				echo "  🔄 Data changed: $$file (updating assets)"; \
+				$(MAKE) assets 2>&1 | grep -v "cp:"; \
+				changed=1; \
+				break; \
+			done; \
+		fi; \
+		if [ -d "$(PROJECT_SRC)/services" ]; then \
+           for file in $$(find $(PROJECT_SRC)/services -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
+               echo "  🔄 Services changed: $$file (updating assets)"; \
+               $(MAKE) assets 2>&1 | grep -v "cp:"; \
+               changed=1; \
+               break; \
+           done; \
+       	fi; \
 		if [ -d "$(PROJECT_SRC)/sass" ]; then \
 			for file in $$(find $(PROJECT_SRC)/sass -type f -newer /tmp/.project_$(PROJECT_NAME)_marker 2>/dev/null); do \
 				echo "  🔄 SASS changed: $$file (updating assets)"; \
@@ -134,7 +152,7 @@ docs:
 	@if [ -d "docs" ]; then \
 		echo "📚 Publishing $(PROJECT_NAME) documentation..."; \
 		mkdir -p $(DOCS_DEST); \
-		for doc in docs/*.md; do \
+		for doc in docs/*.md docs/*.html; do \
 			if [ -f "$$doc" ]; then \
 				filename=$$(basename "$$doc"); \
 				cp "$$doc" "$(DOCS_DEST)/$(DATE_OF_CREATION)-$(PROJECT_NAME)-$$filename" 2>/dev/null || true; \

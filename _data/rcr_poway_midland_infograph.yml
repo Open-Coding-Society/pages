@@ -1,8 +1,8 @@
 Title: "RCR: Poway-Midland Railroad Digital Experience"
 Description: "Transforming the Poway-Midland Railroad from a static informational website into a dynamic, data-driven visitor platform — built by the RCR team as a Design-Based Research capstone."
 
+# ========== FEATURES ==========
 Features:
-
   - title: "Live Train Schedule & Departure Board"
     image: "/images/capstone/rcr/schedule.png"
     link: "https://rcr.opencodingsociety.com/schedule"
@@ -26,7 +26,9 @@ Features:
       - "Gave staff operational data they never had before"
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "Online Reservation & Booking System"
     image: "/images/capstone/rcr/management.png"
@@ -49,9 +51,12 @@ Features:
       - "Created PMRR's first-ever online reservation capability"
       - "Eliminates risk of visitors arriving to a full train"
       - "Provides a digital record of every booking for staff"
+    reflection: "We invested significant effort in preparing the schedule system, but our guests showed more interest in other functions of the website. We might reduce this part if Poway-Midland Railroad's users prefer just buy the tickets at the office. We will put more attention on our user's real needs."
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "ML-Powered Visitor Forecast"
     image: "/images/capstone/rcr/forecast.png"
@@ -74,9 +79,12 @@ Features:
       - "Entirely new feature — nothing like it on original site"
       - "First data tool for visitor planning at PMRR"
       - "Model accuracy grows significantly with real park data"
+    reflection: "The woker shows a good interest in the ML forecast feature. We just need their information to complete this."
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "Interactive Fleet Encyclopedia"
     image: "/images/capstone/rcr/RCR-inforgraph.png"
@@ -101,7 +109,9 @@ Features:
       - "Created a permanent digital archive of the collection"
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "Interactive History Timeline"
     image: "/images/capstone/rcr/history.png"
@@ -126,7 +136,9 @@ Features:
       - "Structured educational resource for schools"
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "Volunteer Crew Scheduling Portal"
     image: "/images/capstone/rcr/crew.png"
@@ -149,9 +161,12 @@ Features:
       - "First-ever digital volunteer scheduling tool for PMRR"
       - "Eliminates manual phone and paper coordination"
       - "Gives coordinators a live view of all shift coverage"
+    reflection: "Our visitor said this is useful for volunteers to check the schedule and sign up for shifts. We should reach out to PMRR volunteers to get more feedback on this feature and make it more user-friendly for them."
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "Events & Announcements Board"
     image: "/images/capstone/rcr/news.png"
@@ -175,7 +190,9 @@ Features:
       - "Faster visitor access to relevant announcements"
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "360° Panorama & Interactive Route Map"
     image: "/images/capstone/rcr/360.png"
@@ -200,7 +217,9 @@ Features:
       - "Drives park interest from online audiences"
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "Visitor Notes & Community Board"
     image: "images/capstone/rcr/community.png"
@@ -223,9 +242,12 @@ Features:
       - "First community and social feature for PMRR"
       - "Generates user content that promotes the railroad organically"
       - "Gives PMRR a living visitor memory archive"
+    reflection: "The vistor suggested us to check more comments from google to make the website more user-friendly. We should read what real users say to improve our website community."
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "AI Visitor Assistant"
     image: "/images/capstone/rcr/AI.png"
@@ -248,9 +270,12 @@ Features:
       - "First visitor help system on any PMRR digital property"
       - "Reduces basic inquiry volume for volunteers"
       - "Available 24/7 with no staff required"
+    reflection: "A PMRR worker told us the AI is really useful because a lot of people ask many questions every day, and it takes a lot of the workers' time. We should put more attention on improving the AI of our website."
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
   - title: "Membership & Donation System"
     image: "/images/capstone/rcr/donate.png"
@@ -275,19 +300,43 @@ Features:
       - "Creates a recurring revenue stream for the non-profit"
     status: "Prototype"
     team:
-      - "Rebecca, Cyrus, Rishabh"
+      - "Rebecca"
+      - "Cyrus"
+      - "Rishabh"
 
+# ========== TEAM REFLECTION & LESSONS LEARNED ==========
+TeamReflection:
+  whatWentWell:
+    - "We did well in having conversations with our guests — engaging with them in a friendly and natural way, which created a positive atmosphere."
+    - "We managed our time effectively throughout the presentation and interaction, ensuring smooth transitions between topics and respecting the overall schedule."
+  whatNeedsImprovement:
+    - "We didn't prepare enough on organizing our words when presenting or explaining features."
+    - "Although we invested significant effort in preparing the schedule system, our guests showed more interest in other functions of the website. This taught us that we should better align our preparation with user expectations."
+
+LessonsLearned:
+  - source: "PMRR Worker Feedback"
+    points:
+      - "GPS tracking feature may not be necessary — site is small and visitors can easily see the train coming."
+      - "AI is really useful because a lot of people ask many questions every day, taking up workers' time. We should put more attention on improving the AI."
+  - source: "Google Reviews of Poway-Midland RR"
+    points:
+      - "Reading what real users say helps make the website more user-friendly."
+      - "Examples: make the news easier to update, so the worker and visitors can work and have fun more convenient."
+
+FuturePlan:
+  - "Add functionality on admin page to easily update train schedules and news."
+  - "Remove the planned GPS tracking system — not needed for this context."
+  - "Regularly check online comments and reviews of PMRR to guide future improvements."
+
+Conclusion: "Overall, we had a great time with our guests. The experience was not only enjoyable but also highly educational. We learned to listen more closely to user needs, to validate technical ideas before building them, and to use real feedback — from both workers and online reviews — to build a simpler, more useful website."
+
+# ========== FUTURE FEATURES ==========
 FutureFeatures:
-
-  - title: "Real-Time GPS Train Tracker"
-    icon: "GPS"
-    description: "Requires a GPS unit mounted on the locomotive. Would replace our simulated tracker with live position data — showing visitors exactly where the train is and when it returns to the station."
-    needs: "Hardware: GPS module + cellular data on locomotive"
-
   - title: "Live Camera Feed"
     icon: "CAM"
     description: "A live video stream from the station platform so visitors can watch operations remotely. Requires a camera and stable network connection installed at Old Poway Park."
     needs: "Hardware: IP camera + park network access"
+    reflection: "John Brock says they are going to add a web cam based off of our input. We should conduct an on-site inspection."
 
   - title: "ML Forecast with Real Attendance Data"
     icon: "ML"
@@ -298,13 +347,15 @@ FutureFeatures:
     icon: "AI"
     description: "Upgrade our rule-based assistant to a live language model connected to real park data — answering complex questions about schedules, history, and accessibility with accurate, up-to-date answers."
     needs: "LLM API key + live park data feed"
-
-  - title: "Push Departure Notifications"
-    icon: "PUSH"
-    description: "Visitors scan a QR code at the station and receive a phone alert when the train is 5 minutes from returning — eliminating blind waiting at the platform."
-    needs: "GPS tracker + notification infrastructure"
+    reflection: "Based on worker feedback that AI saves significant staff time, this upgrade is a top priority."
 
   - title: "School & Group Booking Portal"
     icon: "GRP"
     description: "A dedicated booking flow for schools and community groups with custom pricing tiers, group size management, and direct coordinator communication — replacing the current phone-based group process."
     needs: "Coordination with PMRR booking staff"
+
+  - title: "Staff Login & Management Dashboard"
+    icon: "DASH"
+    description: "Flask-Login authentication framework — manages staff sessions, protects restricted routes, and prevents unauthorized access to administrative tools. SQLite user credential store — maintains staff account records and verifies login credentials during authentication. Reservation management interface — queries the reservations database and displays customer booking records, ticket quantities, departure details, and confirmation codes. Volunteer records dashboard — retrieves volunteer sign-up data from the database and presents staffing information for upcoming operating days."
+    needs: "PMRR staff database + administrative approval"
+    reflection: "Add functionality on the admin page to easily update train schedules and news."

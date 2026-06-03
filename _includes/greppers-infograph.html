@@ -147,7 +147,9 @@
 }
 
 .sfi-metrics {
-  background: #080502;
+  background: #ffffff;
+  border-top: 1px solid #cec8bc;
+  border-bottom: 1px solid #cec8bc;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -159,15 +161,15 @@
   align-items: center;
   gap: 0.3rem;
   padding: 2rem 3.5rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid #cec8bc;
 }
 .sfi-metric:last-child { border-right: none; }
 @media (max-width: 600px) {
   .sfi-metric {
     padding: 1.5rem 2rem;
     flex: 1 1 33%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid #cec8bc;
+    border-right: 1px solid #cec8bc;
   }
 }
 
@@ -175,7 +177,7 @@
   font-family: "Cormorant Garamond", serif;
   font-size: 1.85rem;
   font-weight: 700;
-  color: #ffffff !important;
+  color: #080502 !important;
   line-height: 1;
 }
 
@@ -184,7 +186,7 @@
   font-size: 0.6rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: #3d3830 !important;
 }
 
 .sfi-builds {
@@ -468,16 +470,16 @@
   gap: 0.9rem;
 }
 .sfi-journey-col--admin {
-  background: #080502;
-  border-color: #080502;
-  color: #ffffff !important;
+  background: #f5f1eb;
+  border-color: #cec8bc;
+  color: #080502 !important;
 }
-.sfi-journey-col--admin .sfi-journey-eyebrow,
+.sfi-journey-col--admin .sfi-journey-eyebrow { color: #8b1c1c !important; }
 .sfi-journey-col--admin .sfi-journey-h,
-.sfi-journey-col--admin .sfi-journey-item-t,
-.sfi-journey-col--admin .sfi-journey-item-d { color: #ffffff !important; }
-.sfi-journey-col--admin .sfi-journey-item { border-color: rgba(255,255,255,0.15); }
-.sfi-journey-col--admin .sfi-journey-icon { color: #f5f1eb; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+.sfi-journey-col--admin .sfi-journey-item-t { color: #080502 !important; }
+.sfi-journey-col--admin .sfi-journey-item-d { color: #3d3830 !important; }
+.sfi-journey-col--admin .sfi-journey-item { border-color: #cec8bc; background: #ffffff; }
+.sfi-journey-col--admin .sfi-journey-icon { color: #8b1c1c; border-color: #cec8bc; background: #f5f1eb; }
 
 .sfi-journey-eyebrow {
   font-family: "DM Mono", monospace;
@@ -622,6 +624,73 @@
   color: #080502 !important;
   transform: translateY(-1px);
 }
+
+/* ── Transition band + final features ─────────────── */
+.sfi-transition {
+  background: #ffffff;
+  color: #080502 !important;
+  padding: 5rem clamp(1.5rem, 5vw, 3.5rem) 4rem;
+  text-align: center;
+  border-top: 1px solid #cec8bc;
+  border-bottom: 1px solid #cec8bc;
+}
+.sfi-transition .sfi-transition-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.sfi-transition .sfi-eyebrow { color: #8b1c1c !important; display: block; margin-bottom: 1.25rem; }
+.sfi-transition-h {
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(2rem, 4.5vw, 2.9rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: #080502 !important;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+}
+.sfi-transition-lede {
+  font-family: "Lora", serif;
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.85;
+  color: #3d3830 !important;
+  margin: 0 auto 2.25rem;
+  max-width: 580px;
+}
+.sfi-transition-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #8b1c1c;
+  color: #ffffff !important;
+  padding: 1rem 2.1rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+.sfi-transition-cta:hover {
+  background: #a32020;
+  transform: translateY(-1px);
+  color: #ffffff !important;
+  text-decoration: none;
+}
+.sfi-transition-url {
+  display: block;
+  margin-top: 1.4rem;
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: #3d3830 !important;
+}
+
+.sfi-features--final {
+  border-top: none;
+  padding-top: 3.5rem;
+}
 </style>
 
 {% assign data = site.data["greppers-infograph"] %}
@@ -730,102 +799,6 @@
         </div>
       </div>
       {% endfor %}
-    </div>
-  </section>
-
-  <!-- PROTOTYPE IN PRACTICE -->
-  <section class="sfi-features">
-    <p class="sfi-section-tag" data-reveal>Prototype in Practice</p>
-    <div class="sfi-features-intro" data-reveal>
-      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Three moments, three people.</h2>
-      <p class="sfi-feat-subtext">What the prototype feels like in the hands of a driver, an inspector, and your own staff.</p>
-    </div>
-
-    <div class="sfi-feat-grid">
-
-      <!-- Card 01: Plain-English Search -->
-      <div class="sfi-feat-card" data-reveal>
-        <div class="sfi-feat-illust">
-          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="20" y="26" width="240" height="34" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
-            <circle cx="36" cy="43" r="6" fill="none" stroke="#8b1c1c" stroke-width="1.5"/>
-            <line x1="40" y1="47" x2="46" y2="53" stroke="#8b1c1c" stroke-width="1.5" stroke-linecap="round"/>
-            <text x="60" y="48" font-family="Lora, serif" font-style="italic" font-size="12" fill="#3d3830">fire suit for my son</text>
-            <path d="M140 64 L140 82 M134 76 L140 82 L146 76" stroke="#8b1c1c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M105 94 L175 94 L175 128 C175 136 150 146 140 149 C130 146 105 136 105 128 Z" fill="#ffffff" stroke="#8b1c1c" stroke-width="1.5"/>
-            <text x="140" y="115" font-family="Cormorant Garamond, serif" font-weight="700" font-size="15" text-anchor="middle" fill="#080502">SFI 3.2A/1</text>
-            <text x="140" y="128" font-family="Lora, serif" font-size="8.5" text-anchor="middle" fill="#3d3830">Driver Suit — Junior</text>
-            <text x="140" y="140" font-family="DM Mono, monospace" font-size="7" fill="#8b1c1c" text-anchor="middle" letter-spacing="1.5">CERTIFIED</text>
-          </svg>
-        </div>
-        <div class="sfi-feat-body">
-          <h3 class="sfi-feat-title">Type it the way you'd say it.</h3>
-          <p class="sfi-feat-copy">A driver's parent types "fire suit for my son" — not a standard number. The right junior rating comes up first, with close alternatives right behind it.</p>
-        </div>
-        <div class="sfi-feat-cta-wrap">
-          <a href="https://sfifoundation.opencodingsociety.com/sfi-specs/" target="_blank" class="sfi-feat-link">Open the search &rarr;</a>
-        </div>
-      </div>
-
-      <!-- Card 02: Photo Identification -->
-      <div class="sfi-feat-card" data-reveal>
-        <div class="sfi-feat-illust">
-          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="80" y="14" width="120" height="132" rx="10" fill="#080502" stroke="#3d3830" stroke-width="1.2"/>
-            <rect x="88" y="26" width="104" height="96" fill="#f5f1eb"/>
-            <path d="M108 104 Q124 74 140 92 Q156 104 172 88 L172 122 L108 122 Z" fill="#cec8bc"/>
-            <circle cx="152" cy="54" r="8" fill="#e8c468"/>
-            <circle cx="140" cy="74" r="22" fill="none" stroke="#8b1c1c" stroke-width="2" stroke-dasharray="3 3"/>
-            <rect x="112" y="128" width="56" height="12" rx="1" fill="#ffffff" stroke="#cec8bc" stroke-width="0.8"/>
-            <text x="140" y="137" font-family="DM Mono, monospace" font-weight="600" font-size="7" text-anchor="middle" fill="#8b1c1c" letter-spacing="1.2">HELMET · SFI 24.1</text>
-            <circle cx="140" cy="16" r="2" fill="#3d3830"/>
-            <rect x="131" y="142" width="18" height="1.5" rx="0.75" fill="#3d3830"/>
-          </svg>
-        </div>
-        <div class="sfi-feat-body">
-          <h3 class="sfi-feat-title">Point the phone at the gear.</h3>
-          <p class="sfi-feat-copy">An inspector at the track aims a phone at a helmet, suit, or harness. The prototype names the standard it's meant to meet — without sending a photo anywhere.</p>
-        </div>
-        <div class="sfi-feat-cta-wrap">
-          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">See the identifier &rarr;</a>
-        </div>
-      </div>
-
-      <!-- Card 03: Staff Dashboard -->
-      <div class="sfi-feat-card" data-reveal>
-        <div class="sfi-feat-illust">
-          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="20" y="16" width="240" height="128" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
-            <rect x="20" y="16" width="240" height="22" fill="#080502"/>
-            <text x="32" y="31" font-family="DM Mono, monospace" font-size="9" fill="#f5f1eb" letter-spacing="1">SFI STANDARDS · ADMIN</text>
-            <text x="32" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STANDARD</text>
-            <text x="168" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STATUS</text>
-            <line x1="20" y1="62" x2="260" y2="62" stroke="#cec8bc" stroke-width="1"/>
-
-            <text x="32" y="82" font-family="Lora, serif" font-size="10" fill="#080502">SFI 16.1 — Restraints</text>
-            <rect x="168" y="73" width="48" height="13" rx="1.5" fill="#27ae60"/>
-            <text x="192" y="82" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
-
-            <text x="32" y="104" font-family="Lora, serif" font-size="10" fill="#080502">SFI 28.1 — Fuel Cells</text>
-            <rect x="168" y="95" width="48" height="13" rx="1.5" fill="#27ae60"/>
-            <text x="192" y="104" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
-
-            <text x="32" y="126" font-family="Lora, serif" font-size="10" fill="#080502">SFI 45.1 — Roll Cages</text>
-            <rect x="168" y="117" width="48" height="13" rx="1.5" fill="#8b1c1c"/>
-            <text x="192" y="126" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">UPDATED</text>
-
-            <text x="32" y="140" font-family="DM Mono, monospace" font-size="7" fill="#707068">+ add new standard</text>
-          </svg>
-        </div>
-        <div class="sfi-feat-body">
-          <h3 class="sfi-feat-title">Your staff, in charge.</h3>
-          <p class="sfi-feat-copy">A staff member updates a standard from a simple dashboard. The site reflects the change the same day — no email to a developer, no waiting, no deploy.</p>
-        </div>
-        <div class="sfi-feat-cta-wrap">
-          <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-feat-link">Preview the admin &rarr;</a>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -966,6 +939,115 @@
     </div>
   </section>
 
+  <!-- TRANSITION BANNER → SFI Foundation site -->
+  <section class="sfi-transition">
+    <div class="sfi-transition-inner" data-reveal>
+      <span class="sfi-eyebrow">From this page, it's live</span>
+      <h2 class="sfi-transition-h">Everything you're about to see is already running on the SFI Foundation prototype site.</h2>
+      <p class="sfi-transition-lede">Each of the three features below opens the real, working version — search a standard, identify a piece of gear by photo, or step into the staff dashboard.</p>
+      <a href="https://sfifoundation.opencodingsociety.com" target="_blank" class="sfi-transition-cta">
+        Visit sfifoundation.opencodingsociety.com &rarr;
+      </a>
+      <span class="sfi-transition-url">or scroll on to preview each feature</span>
+    </div>
+  </section>
+
+  <!-- PROTOTYPE IN PRACTICE (final section — handoff to the live site) -->
+  <section class="sfi-features sfi-features--final" id="prototype-in-practice">
+    <p class="sfi-section-tag" data-reveal>The Features — Live Today</p>
+    <div class="sfi-features-intro" data-reveal>
+      <h2 class="sfi-col-heading" style="font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:0.4rem;">Three moments, three people.</h2>
+      <p class="sfi-feat-subtext">What the prototype feels like in the hands of a driver, an inspector, and your own staff. Every card links straight to the live feature.</p>
+    </div>
+
+    <div class="sfi-feat-grid">
+
+      <!-- Card 01: Plain-English Search -->
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="20" y="26" width="240" height="34" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
+            <circle cx="36" cy="43" r="6" fill="none" stroke="#8b1c1c" stroke-width="1.5"/>
+            <line x1="40" y1="47" x2="46" y2="53" stroke="#8b1c1c" stroke-width="1.5" stroke-linecap="round"/>
+            <text x="60" y="48" font-family="Lora, serif" font-style="italic" font-size="12" fill="#3d3830">fire suit for my son</text>
+            <path d="M140 64 L140 82 M134 76 L140 82 L146 76" stroke="#8b1c1c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M105 94 L175 94 L175 128 C175 136 150 146 140 149 C130 146 105 136 105 128 Z" fill="#ffffff" stroke="#8b1c1c" stroke-width="1.5"/>
+            <text x="140" y="115" font-family="Cormorant Garamond, serif" font-weight="700" font-size="15" text-anchor="middle" fill="#080502">SFI 3.2A/1</text>
+            <text x="140" y="128" font-family="Lora, serif" font-size="8.5" text-anchor="middle" fill="#3d3830">Driver Suit — Junior</text>
+            <text x="140" y="140" font-family="DM Mono, monospace" font-size="7" fill="#8b1c1c" text-anchor="middle" letter-spacing="1.5">CERTIFIED</text>
+          </svg>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title">Type it the way you'd say it.</h3>
+          <p class="sfi-feat-copy">A driver's parent types "fire suit for my son" — not a standard number. The right junior rating comes up first, with close alternatives right behind it.</p>
+        </div>
+        <div class="sfi-feat-cta-wrap">
+          <a href="https://sfifoundation.opencodingsociety.com/sfi-specs/" target="_blank" class="sfi-feat-link">Open the search &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Card 02: Photo Identification -->
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="80" y="14" width="120" height="132" rx="10" fill="#080502" stroke="#3d3830" stroke-width="1.2"/>
+            <rect x="88" y="26" width="104" height="96" fill="#f5f1eb"/>
+            <path d="M108 104 Q124 74 140 92 Q156 104 172 88 L172 122 L108 122 Z" fill="#cec8bc"/>
+            <circle cx="152" cy="54" r="8" fill="#e8c468"/>
+            <circle cx="140" cy="74" r="22" fill="none" stroke="#8b1c1c" stroke-width="2" stroke-dasharray="3 3"/>
+            <rect x="112" y="128" width="56" height="12" rx="1" fill="#ffffff" stroke="#cec8bc" stroke-width="0.8"/>
+            <text x="140" y="137" font-family="DM Mono, monospace" font-weight="600" font-size="7" text-anchor="middle" fill="#8b1c1c" letter-spacing="1.2">HELMET · SFI 24.1</text>
+            <circle cx="140" cy="16" r="2" fill="#3d3830"/>
+            <rect x="131" y="142" width="18" height="1.5" rx="0.75" fill="#3d3830"/>
+          </svg>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title">Point the phone at the gear.</h3>
+          <p class="sfi-feat-copy">An inspector at the track aims a phone at a helmet, suit, or harness. The prototype names the standard it's meant to meet — and now saves it straight to their <strong>My Gear</strong> locker.</p>
+        </div>
+        <div class="sfi-feat-cta-wrap">
+          <a href="https://sfifoundation.opencodingsociety.com/detect/" target="_blank" class="sfi-feat-link">Try the detector &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Card 03: Staff Dashboard -->
+      <div class="sfi-feat-card" data-reveal>
+        <div class="sfi-feat-illust">
+          <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="20" y="16" width="240" height="128" rx="3" fill="#ffffff" stroke="#cec8bc" stroke-width="1.2"/>
+            <rect x="20" y="16" width="240" height="22" fill="#080502"/>
+            <text x="32" y="31" font-family="DM Mono, monospace" font-size="9" fill="#f5f1eb" letter-spacing="1">SFI STANDARDS · ADMIN</text>
+            <text x="32" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STANDARD</text>
+            <text x="168" y="56" font-family="DM Mono, monospace" font-size="7.5" fill="#3d3830" letter-spacing="1">STATUS</text>
+            <line x1="20" y1="62" x2="260" y2="62" stroke="#cec8bc" stroke-width="1"/>
+
+            <text x="32" y="82" font-family="Lora, serif" font-size="10" fill="#080502">SFI 16.1 — Restraints</text>
+            <rect x="168" y="73" width="48" height="13" rx="1.5" fill="#27ae60"/>
+            <text x="192" y="82" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
+
+            <text x="32" y="104" font-family="Lora, serif" font-size="10" fill="#080502">SFI 28.1 — Fuel Cells</text>
+            <rect x="168" y="95" width="48" height="13" rx="1.5" fill="#27ae60"/>
+            <text x="192" y="104" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">LIVE</text>
+
+            <text x="32" y="126" font-family="Lora, serif" font-size="10" fill="#080502">SFI 45.1 — Roll Cages</text>
+            <rect x="168" y="117" width="48" height="13" rx="1.5" fill="#8b1c1c"/>
+            <text x="192" y="126" font-family="DM Mono, monospace" font-weight="500" font-size="7" text-anchor="middle" fill="#ffffff" letter-spacing="1.2">UPDATED</text>
+
+            <text x="32" y="140" font-family="DM Mono, monospace" font-size="7" fill="#707068">+ add new standard</text>
+          </svg>
+        </div>
+        <div class="sfi-feat-body">
+          <h3 class="sfi-feat-title">Your staff, in charge.</h3>
+          <p class="sfi-feat-copy">Administrators update standards, approve member submissions, and run groups and permissions — all from a dashboard the foundation owns. No developer in the loop.</p>
+        </div>
+        <div class="sfi-feat-cta-wrap">
+          <a href="https://sfifoundation.opencodingsociety.com/admin/" target="_blank" class="sfi-feat-link">Open the admin portal &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- Scroll reveal + metric counter -->
   <script>
   (function () {
@@ -1006,6 +1088,19 @@
     });
   })();
   </script>
+
+  <!-- HANDOFF BANNER → project handoff issue -->
+  <section class="sfi-transition">
+    <div class="sfi-transition-inner" data-reveal>
+      <span class="sfi-eyebrow">For the next team</span>
+      <h2 class="sfi-transition-h">Picking up where we left off.</h2>
+      <p class="sfi-transition-lede">Everything needed to continue this project — the frontend, the Flask backend, deployment, and the open roadmap — is written up in the project handoff issue.</p>
+      <a href="{{ data.HandoffIssueUrl }}" target="_blank" class="sfi-transition-cta">
+        Read the project handoff issue &rarr;
+      </a>
+      <span class="sfi-transition-url">github.com/TheGreppers/greppers</span>
+    </div>
+  </section>
 
   <!-- FOOTER -->
   <footer class="sfi-foot" data-reveal>

@@ -33,11 +33,28 @@ One line in `_includes/head-custom.html`:
 
 `data-site-baseurl` is rendered by Liquid and passed to the SDK so GameEngine asset paths resolve correctly on GitHub Pages.
 
+The global include now points at the deployed Vercel engine, so production pages fetch the same SDK that the dashboard manages.
+
 ## Game Variant
 
 The most advanced variant type. The LLM extracts key concepts → server assembles a verified `GameEnginev1.1` ES module with NPC characters → SDK imports `GameExecutor` from this site's own `/assets/js/pages/runners/index.js` and auto-runs the level.
 
 WASD to walk, E to interact with NPCs and read concept dialogues.
+
+## Experiment Flow
+
+1. Open any lesson page with `?ab_admin=true`.
+2. Select the element to test in the overlay.
+3. Generate a variant, launch the test, and let the SDK bucket visitors.
+4. Review views and conversions in the engine dashboard before declaring a winner.
+
+## Reading Results
+
+Use views for exposure checks and conversions for click-goal tests. A healthy experiment should show traffic on both variants before the team declares a winner or opens a follow-up implementation PR.
+
+## Troubleshooting
+
+If a GameEngine variant does not render, confirm the script tag includes `data-site-baseurl`. The SDK uses that value to import the local `GameExecutor` assets from the Pages site.
 
 ## Notebook
 

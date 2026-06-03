@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Victoria - Luxury Broker, elegant purple gown, crown, glamorous -->
+  <ellipse cx="32" cy="62" rx="14" ry="3" fill="#000" opacity="0.2"/>
+  <!-- Gown / dress - wide at bottom -->
+  <path d="M18 44 Q14 64 26 64 L38 64 Q50 64 46 44 Z" fill="#4a148c"/>
+  <path d="M20 44 Q16 56 24 60 L40 60 Q48 56 44 44 Z" fill="#6a1b9a"/>
+  <!-- Dress bodice -->
+  <rect x="19" y="28" width="26" height="18" rx="3" fill="#4a148c"/>
+  <!-- Gold trim on bodice -->
+  <rect x="19" y="44" width="26" height="3" fill="#ffd700"/>
+  <!-- Décolletage - pearl necklace -->
+  <ellipse cx="32" cy="31" rx="9" ry="4" fill="#7b1fa2"/>
+  <!-- Pearl strand -->
+  <circle cx="25" cy="30" r="2" fill="#fff" opacity="0.9"/>
+  <circle cx="28.5" cy="28.5" r="2" fill="#fff" opacity="0.9"/>
+  <circle cx="32" cy="28" r="2" fill="#fff" opacity="0.9"/>
+  <circle cx="35.5" cy="28.5" r="2" fill="#fff" opacity="0.9"/>
+  <circle cx="39" cy="30" r="2" fill="#fff" opacity="0.9"/>
+  <!-- Left arm - gloved -->
+  <rect x="8" y="28" width="11" height="6" rx="3" fill="#6a1b9a"/>
+  <ellipse cx="11" cy="36" rx="4" ry="4" fill="#ffe082"/>
+  <!-- Right arm - holding wine/champagne -->
+  <rect x="45" y="28" width="11" height="6" rx="3" fill="#6a1b9a"/>
+  <!-- Champagne flute -->
+  <polygon points="55,28 61,28 58,40 56,40" fill="#a5d6a7" opacity="0.7"/>
+  <rect x="56.5" y="40" width="3" height="5" fill="#9e9e9e"/>
+  <rect x="54" y="45" width="8" height="2" rx="1" fill="#9e9e9e"/>
+  <!-- Bubbles -->
+  <circle cx="57" cy="32" r="1" fill="#fff" opacity="0.7"/>
+  <circle cx="59" cy="36" r="1" fill="#fff" opacity="0.6"/>
+  <!-- Neck -->
+  <rect x="27" y="22" width="10" height="8" fill="#FFECB3"/>
+  <!-- Head -->
+  <circle cx="32" cy="15" r="13" fill="#FFECB3"/>
+  <!-- Crown / tiara -->
+  <rect x="20" y="4" width="24" height="4" fill="#ffd700"/>
+  <polygon points="20,4 23,0 26,4" fill="#ffd700"/>
+  <polygon points="29,4 32,0 35,4" fill="#ffd700"/>
+  <polygon points="38,4 41,0 44,4" fill="#ffd700"/>
+  <!-- Crown gems -->
+  <circle cx="23" cy="2" r="2" fill="#e91e63"/>
+  <circle cx="32" cy="1" r="2.5" fill="#80deea"/>
+  <circle cx="41" cy="2" r="2" fill="#e91e63"/>
+  <!-- Elegant hair - dark updo -->
+  <ellipse cx="32" cy="9" rx="12" ry="7" fill="#1a0a00"/>
+  <ellipse cx="32" cy="7" rx="9" ry="5" fill="#0d0500"/>
+  <!-- Side hair wisps -->
+  <ellipse cx="19" cy="12" rx="3" ry="6" fill="#1a0a00"/>
+  <ellipse cx="45" cy="12" rx="3" ry="6" fill="#1a0a00"/>
+  <!-- Ears with earrings -->
+  <ellipse cx="19" cy="16" rx="3" ry="4" fill="#e8c48a"/>
+  <ellipse cx="45" cy="16" rx="3" ry="4" fill="#e8c48a"/>
+  <circle cx="19" cy="20" r="2.5" fill="#ffd700"/>
+  <circle cx="45" cy="20" r="2.5" fill="#ffd700"/>
+  <!-- Eyes - almond shaped, dramatic -->
+  <ellipse cx="27" cy="16" rx="3.5" ry="2.5" fill="#1a0a00"/>
+  <ellipse cx="37" cy="16" rx="3.5" ry="2.5" fill="#1a0a00"/>
+  <circle cx="28" cy="15.5" r="1.2" fill="#fff"/>
+  <circle cx="38" cy="15.5" r="1.2" fill="#fff"/>
+  <!-- Lashes -->
+  <path d="M23.5 14 Q27 12 30.5 14" stroke="#0d0500" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M33.5 14 Q37 12 40.5 14" stroke="#0d0500" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Eyebrows - arched elegant -->
+  <path d="M23 11 Q27 8.5 31 11" stroke="#1a0a00" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M33 11 Q37 8.5 41 11" stroke="#1a0a00" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Lips - red -->
+  <path d="M27 21.5 Q29.5 24 32 22 Q34.5 24 37 21.5" stroke="#c62828" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M27 21.5 Q32 20 37 21.5" stroke="#c62828" stroke-width="1.5" fill="none"/>
+  <!-- Cheek glow -->
+  <ellipse cx="24" cy="19" rx="4" ry="2.5" fill="#ffab91" opacity="0.35"/>
+  <ellipse cx="40" cy="19" rx="4" ry="2.5" fill="#ffab91" opacity="0.35"/>
+</svg>

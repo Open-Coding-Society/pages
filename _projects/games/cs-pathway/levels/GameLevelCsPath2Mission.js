@@ -5,6 +5,7 @@ import AiChallengeNpc, { CHALLENGE_ERROR_TYPES, CHALLENGE_VERDICTS } from '@asse
 import GameLevelCsPathIdentity from './GameLevelCsPathIdentity.js';
 import StatusPanel from '@assets/js/GameEnginev1.1/essentials/StatusPanel.js';
 import ProfileManager from '@assets/js/projects/cs-pathway/model/ProfileManager.js';
+import GameLevelCsPath3Analytics from './GameLevelCsPath3Analytics.js';
 
 // Prompt templates for AI question generation and grading.
 const CHALLENGE_PROMPT_TEXT = {
@@ -64,8 +65,6 @@ const CHALLENGE_ADVANCED_QUESTION_STYLES = [
 const CHALLENGE_RECENT_HISTORY_LIMIT = 12;
 
 // ── Desk Knowledge Base ─────────────────────────────────────────────────────
-// Keyed by desk id. Each entry provides an expertise string (AI topic focus)
-// and sample Q&A pairs the AI uses for variety (not asked verbatim).
 const DESK_AI_KNOWLEDGE_BASE = {
   'The Admin': {
     expertise: 'Linux terminal usage, WSL setup for Windows, installing and managing tool versions with Brew (macOS) and Apt (Ubuntu/Kali/Mint), VSCode setup with extensions like GitLens and Jupyter, and verifying correct installation of Python, pip, Ruby, Bundler, Gem, Jupyter, and Git config',
@@ -128,18 +127,6 @@ const DESK_AI_KNOWLEDGE_BASE = {
 
 /**
  * GameLevelCsPath2Mission - Mission Tools Level
- *
- * Classroom game level where students visit four AI-powered desk stations.
- * Each desk challenges the student with a generated question drawn from a
- * topic defined in DESK_AI_KNOWLEDGE_BASE, grades their answer, and awards
- * progress toward the mission scoreboard.
- *
- * Follows the same VIEW / CONTROLLER pattern as other CsPath levels.
- * Data (knowledge base, prompt templates) lives in module-scope constants.
- * Async challenge orchestration is delegated to AiChallengeNpc.
- *
- * @class GameLevelCsPath2Mission
- * @extends GameLevelCsPathIdentity
  */
 class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   static levelId = 'mission-tools';
@@ -192,10 +179,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       ...this._getCompletionPanelValues(),
     });
 
-    /**
-     * Section: Level objects.
-     */
-
     // ── Background ──────────────────────────────────────────────
     const image_src = path + "/images/projects/cs-pathway/bg2/mission-tools-fantasy.png";
     const bg_data = {
@@ -210,10 +193,9 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       themeAssetPrefix: `${path}/images/projects/cs-pathway/bg2/`,
     });
 
-    // FriendlyNpc looks up toast via gameEnv.currentLevel/gameLevel in this engine build.
     this.gameEnv.currentLevel = this;
     this.gameEnv.gameLevel = this;
-    
+
     // ── Player ───────────────────────────────────────────────────
     const player_src = path + "/images/projects/cs-pathway/player/minimalist.png";
     const PLAYER_SCALE_FACTOR = 5;
@@ -272,7 +254,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       ...(interact ? { interact } : {}),
     });
 
-    // Desk knowledge base and expertise are defined at the top of the file in DESK_AI_KNOWLEDGE_BASE.
     const deskDialoguePool = {
       'The Admin': [
         'Kernel check complete. Toolchain status: await your command.',
@@ -344,11 +325,90 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       }),
     ];
 
-    // ── Level objects ─────────────────────────────────────────────
+    // ── Assessment Observatory Portal ────────────────────────────
+    const createDiscMarkerSrc = (fillColor, borderColor = '#f8fafc') => {
+      const frameOpacity = [0.7, 0.78, 0.86, 0.94, 1, 0.94, 0.86, 0.78];
+      const discFrames = frameOpacity.map((opacity, index) => {
+        const cx = 128 + (index * 256);
+        const ringAngle = index * 45;
+        const angleRad = (ringAngle * Math.PI) / 180;
+        const oppositeAngleRad = angleRad + Math.PI;
+        const orbitRadius = 112;
+        const markerX = cx + (Math.cos(angleRad) * orbitRadius);
+        const markerY = 128 + (Math.sin(angleRad) * orbitRadius);
+        const marker2X = cx + (Math.cos(oppositeAngleRad) * orbitRadius);
+        const marker2Y = 128 + (Math.sin(oppositeAngleRad) * orbitRadius);
+        const markerShadowX = cx + (Math.cos(angleRad) * (orbitRadius + 4));
+        const markerShadowY = 128 + (Math.sin(angleRad) * (orbitRadius + 4));
+        const marker2ShadowX = cx + (Math.cos(oppositeAngleRad) * (orbitRadius + 4));
+        const marker2ShadowY = 128 + (Math.sin(oppositeAngleRad) * (orbitRadius + 4));
+        return `
+          <g opacity='${opacity}'>
+            <circle cx='${cx}' cy='128' r='114' fill='none' stroke='rgba(0,0,0,0.5)' stroke-width='20'/>
+            <circle cx='${cx}' cy='128' r='106' fill='${fillColor}' stroke='${borderColor}' stroke-width='18'/>
+            <circle cx='${cx}' cy='128' r='98' fill='none' stroke='rgba(255,255,255,0.34)' stroke-width='6'/>
+            <circle cx='${cx}' cy='128' r='104' fill='url(#shine)' />
+            <circle cx='${cx}' cy='128' r='112' fill='none' stroke='rgba(255,255,255,0.92)' stroke-width='11' stroke-linecap='round' stroke-dasharray='190 500' transform='rotate(${ringAngle} ${cx} 128)'/>
+            <circle cx='${markerShadowX}' cy='${markerShadowY}' r='12' fill='rgba(0,0,0,0.45)' />
+            <circle cx='${markerX}' cy='${markerY}' r='10' fill='#ffffff' />
+            <circle cx='${marker2ShadowX}' cy='${marker2ShadowY}' r='10' fill='rgba(0,0,0,0.35)' />
+            <circle cx='${marker2X}' cy='${marker2Y}' r='8' fill='#fde047' />
+          </g>`;
+      }).join('');
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='2048' height='256' viewBox='0 0 2048 256'>
+        <defs>
+          <radialGradient id='shine' cx='35%' cy='30%' r='70%'>
+            <stop offset='0%' stop-color='#ffffff' stop-opacity='0.45' />
+            <stop offset='45%' stop-color='#ffffff' stop-opacity='0.14' />
+            <stop offset='100%' stop-color='#000000' stop-opacity='0.22' />
+          </radialGradient>
+        </defs>
+        ${discFrames}
+      </svg>`;
+      return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    };
+
+    const assessmentObservatoryPortalData = {
+      src: createDiscMarkerSrc('#a855f7'),  // purple orb — change color here if you want
+      SCALE_FACTOR: 12,
+      ANIMATION_RATE: 6,
+      pixels: { width: 2048, height: 256 },
+      orientation: { rows: 1, columns: 8 },
+      down: { row: 0, start: 0, columns: 8, wiggle: { angle: Math.PI / 60, speed: 0.08 } },
+      up: { row: 0, start: 0, columns: 8 },
+      left: { row: 0, start: 0, columns: 8 },
+      right: { row: 0, start: 0, columns: 8 },
+      hitbox: { widthPercentage: 0.4, heightPercentage: 0.4 },
+      id: 'AssessmentObservatoryPortal',
+      greeting: 'Assessment Observatory: explore your learning analytics, sprint history, and skill radar.',
+      INIT_POSITION: { x: width * 0.48, y: height * 0.25 },
+      interactDistance: 140,
+      interact: function () {
+        this.dialogueSystem.dialogues = [
+          'Welcome to the Assessment Observatory!',
+          'Here you can review your performance metrics, sprint history, and skill radar.',
+          'Step through to explore your learning journey in depth.',
+        ];
+        this.dialogueSystem.lastShownIndex = -1;
+        this.dialogueSystem.showRandomDialogue('Assessment Observatory');
+        this.dialogueSystem.addButtons([
+          {
+            text: '▶ Enter Assessment Observatory',
+            primary: true,
+            action: () => {
+              this.dialogueSystem.closeDialogue();
+              level.openAssessmentObservatory();
+            },
+          },
+        ]);
+      },
+    };
+
     this.classes = [
       { class: GamEnvBackground, data: bg_data },
       { class: Player, data: player_data },
       ...missionDeskZones.map((zone) => ({ class: FriendlyNpc, data: zone })),
+      { class: FriendlyNpc, data: assessmentObservatoryPortalData },
     ];
 
     this._missionDeskIds = missionDeskZones.map((zone) => zone.id);
@@ -366,9 +426,50 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._profileManager = new ProfileManager();
   }
 
+  // ── Open Assessment Observatory ──────────────────────────────
+  openAssessmentObservatory() {
+    const gc = this.gameEnv.gameControl;
+    gc.levelClasses.splice(gc.currentLevelIndex + 1, 0, GameLevelCsPath3Analytics);
+    gc.currentLevelIndex++;
+    gc.transitionToLevel();
+  }
+
   /**
-   * Initialize level. Binds desk reactions, wires proximity click gates,
-   * restores saved score from profile, and renders the mission scoreboard.
+   * Sync the level selector dropdown to show Mission Tools.
+   * @private
+   */
+  _syncLevelDropdown() {
+    requestAnimationFrame(() => {
+      const allSelects = Array.from(document.querySelectorAll('select'));
+
+      const levelSelect = allSelects.find((sel) =>
+        Array.from(sel.options).some((opt) =>
+          opt.textContent.trim() === 'Wayfinding World' ||
+          opt.textContent.trim() === 'Identity Forge'
+        )
+      );
+
+      if (!levelSelect) return;
+
+      const targetName = GameLevelCsPath2Mission.displayName;
+
+      let targetOption = Array.from(levelSelect.options).find(
+        (opt) => opt.textContent.trim() === targetName
+      );
+
+      if (!targetOption) {
+        targetOption = document.createElement('option');
+        targetOption.textContent = targetName;
+        targetOption.value = targetName;
+        levelSelect.appendChild(targetOption);
+      }
+
+      levelSelect.value = targetOption.value;
+    });
+  }
+
+  /**
+   * Initialize level.
    */
   async initialize() {
     const objects = this.gameEnv?.gameObjects || [];
@@ -377,9 +478,10 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._wireDeskClickDistanceGate(desks);
     document.addEventListener('keydown', this._handleMissionDeskKeyDownBound);
 
-    // Restore persisted score before first render
     await this._restoreMissionScore();
     this._syncMissionProgressBoard();
+
+    this._syncLevelDropdown();
 
     console.log('[MissionTools] desk reactions rebound:', desks.map((d) => ({
       id: d?.spriteData?.id,
@@ -392,7 +494,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Restore mission score from profile storage (localStorage → backend fallback).
+   * Restore mission score from profile storage.
    * @private
    */
   async _restoreMissionScore() {
@@ -417,12 +519,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
   }
 
   /**
-   * Start challenge. Opens the desk UI, generates one AI question,
-   * and arms the answer submission handler.
-   *
-   * @param {Object} desk - The desk game object.
-   * @param {string} deskId - The desk NPC id.
-   * @param {Object} [npcRef] - Optional explicit NPC reference.
+   * Start challenge.
    */
   async startDeskChallenge(desk, deskId, npcRef = null) {
     const npc = npcRef || desk;
@@ -438,7 +535,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       !activeChallenge?.completedAt &&
       activeChallenge?.lastEvaluation?.verdict !== CHALLENGE_VERDICTS.RIGHT
     );
-    // Orchestrator: open UI, generate one question, then arm answer submission.
+
     await this._runBusyTask({
       busySet: this._deskChallengeBusy,
       key: npcId,
@@ -485,19 +582,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  /**
-   * Run busy-guard. Delegates concurrency control to AiChallengeNpc.
-   * @private
-   */
+  /** @private */
   async _runBusyTask(opts) {
     return AiChallengeNpc.runBusyTask({ ...opts, showToast: this.showToast?.bind(this) });
   }
 
-  /**
-   * Wrap with loading. Uses in-world toast animation instead of full-screen overlay
-   * while AI question/evaluation requests are in flight.
-   * @private
-   */
+  /** @private */
   async _runWithLoading(task) {
     this._startAiLoadingToast();
     try {
@@ -509,9 +599,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
   _startAiLoadingToast() {
     this._aiLoadingPending += 1;
-    if (this._aiLoadingToastTimer) {
-      return;
-    }
+    if (this._aiLoadingToastTimer) return;
 
     const frames = ['◴', '◷', '◶', '◵'];
     const renderFrame = () => {
@@ -526,9 +614,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
 
   _stopAiLoadingToast() {
     this._aiLoadingPending = Math.max(0, this._aiLoadingPending - 1);
-    if (this._aiLoadingPending > 0) {
-      return;
-    }
+    if (this._aiLoadingPending > 0) return;
 
     if (this._aiLoadingToastTimer) {
       clearInterval(this._aiLoadingToastTimer);
@@ -539,11 +625,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this.present?.clearToast?.();
   }
 
-  /**
-   * Load question. Requests a unique AI question, retrying up to three times
-   * to avoid repeating a question already seen this session.
-   * @private
-   */
+  /** @private */
   async _loadDeskChallengeQuestion(spriteData, session = null) {
     let lastQuestion = '';
 
@@ -563,30 +645,19 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return lastQuestion;
   }
 
-  /**
-   * Load evaluation. Sends the question and student answer to AI,
-   * then parses the graded verdict and feedback.
-   * @private
-   */
+  /** @private */
   async _loadChallengeEvaluation(spriteData, question, answer, session = null) {
     const prompt = this._buildChallengeEvaluationPrompt(spriteData, question, answer);
     const raw = await this._requestChallengeAiText(spriteData, prompt, session);
     return this._parseChallengeEvaluation(raw);
   }
 
-  /**
-   * Request AI text. Routes the prompt through AiChallengeNpc.
-   * @private
-   */
+  /** @private */
   async _requestChallengeAiText(spriteData, prompt, session = null) {
     return AiChallengeNpc.requestAiText(spriteData, prompt, 'mission-challenge', 'Mission Tools challenge generation', session);
   }
 
-  /**
-   * Build eval prompt. Assembles the grading prompt that requires a strict
-   * two-line VERDICT / FEEDBACK response from the AI.
-   * @private
-   */
+  /** @private */
   _buildChallengeEvaluationPrompt(spriteData, question, answer) {
     const expertise = spriteData?.expertise || 'general problem solving';
     const deskName = spriteData?.id || 'Desk Guide';
@@ -604,20 +675,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     ].join('\n\n');
   }
 
-  /**
-   * History key. Returns a stable per-desk key so question history
-   * stays isolated between stations.
-   * @private
-   */
+  /** @private */
   _getMissionQuestionHistoryKey(spriteData) {
     return spriteData?.id || 'desk';
   }
 
-  /**
-   * Normalize question. Strips punctuation and folds case so repeat
-   * comparisons are not sensitive to surface differences.
-   * @private
-   */
+  /** @private */
   _normalizeMissionQuestion(question) {
     return (question || '')
       .toString()
@@ -627,11 +690,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       .trim();
   }
 
-  /**
-   * Record question. Appends the question to the rolling per-desk history,
-   * capped at CHALLENGE_RECENT_HISTORY_LIMIT entries.
-   * @private
-   */
+  /** @private */
   _recordMissionQuestion(spriteData, question) {
     const key = this._getMissionQuestionHistoryKey(spriteData);
     const normalized = this._normalizeMissionQuestion(question);
@@ -642,20 +701,13 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._missionQuestionHistory.set(key, nextHistory);
   }
 
-  /**
-   * Get history. Returns the recent question list for the given desk.
-   * @private
-   */
+  /** @private */
   _getRecentMissionQuestions(spriteData) {
     const key = this._getMissionQuestionHistoryKey(spriteData);
     return this._missionQuestionHistory.get(key) || [];
   }
 
-  /**
-   * Detect repeat. Returns true if the question matches any recent question
-   * at this station after normalization.
-   * @private
-   */
+  /** @private */
   _isRepeatedMissionQuestion(spriteData, question) {
     const normalizedQuestion = this._normalizeMissionQuestion(question);
     if (!normalizedQuestion) return false;
@@ -665,11 +717,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  /**
-   * Build prompt. Assembles the question-generation prompt injecting
-   * expertise, style options, and recent questions to maximize variety.
-   * @private
-   */
+  /** @private */
   _buildChallengePrompt(spriteData) {
     const expertise = spriteData?.expertise || 'general problem solving';
     const deskName = spriteData?.id || 'Desk Guide';
@@ -705,19 +753,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     ].filter(Boolean).join('\n\n');
   }
 
-  /**
-   * Parse evaluation. Delegates verdict and feedback parsing to AiChallengeNpc.
-   * @private
-   */
+  /** @private */
   _parseChallengeEvaluation(raw) {
     return AiChallengeNpc.parseEvaluation(raw);
   }
 
-  /**
-   * Append transcript message. Stores a single chat item on the NPC sprite data
-   * so the built-in history modal can render mission conversation context.
-   * @private
-   */
+  /** @private */
   _appendDeskChatMessage(npc, role, message) {
     if (!npc?.spriteData || !message) return;
     if (!Array.isArray(npc.spriteData.chatHistory)) {
@@ -735,11 +776,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     }
   }
 
-  /**
-   * Return the most recent unresolved challenge question from transcript history.
-   * A question is unresolved when no Result line appears after it.
-   * @private
-   */
+  /** @private */
   _getPendingQuestionFromChatHistory(npc) {
     const history = npc?.spriteData?.chatHistory;
     if (!Array.isArray(history) || history.length === 0) return '';
@@ -750,9 +787,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
       const message = (entry?.message || '').toString().trim();
       if (!message) continue;
 
-      if (/^Result\s*:/i.test(message)) {
-        return '';
-      }
+      if (/^Result\s*:/i.test(message)) return '';
 
       if (/^Challenge Question\s*:/i.test(message)) {
         pending = message.replace(/^Challenge Question\s*:\s*/i, '').trim();
@@ -763,11 +798,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return pending;
   }
 
-  /**
-   * Submit answer. Evaluates the student answer, renders feedback, speaks
-   * the result, and awards progress if correct. Called via onSubmit callback.
-   * @private
-   */
+  /** @private */
   async _submitChallengeAnswer(npc, npcId, answer, active, ui) {
     if (!active?.question) return;
     AiChallengeNpc.markChallengeAnswered(npc, answer);
@@ -830,23 +861,14 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  /**
-   * Log event. Appends an entry to the bounded in-memory challenge log.
-   * @private
-   */
+  /** @private */
   _logChallengeEvent(entry) {
     this._challengeLog.push(entry);
-    if (this._challengeLog.length > 100) {
-      this._challengeLog.shift();
-    }
+    if (this._challengeLog.length > 100) this._challengeLog.shift();
     console.log('[MissionTools] challenge created:', entry);
   }
 
-  /**
-   * Award progress. Increments the score counter. Repeat solves are locked
-   * until every station has been cleared at least once.
-   * @private
-   */
+  /** @private */
   _awardMissionProgress(deskId) {
     if (!deskId) return;
 
@@ -878,10 +900,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._saveMissionScore();
   }
 
-  /**
-   * Persist current mission score to localStorage (and async to backend if authenticated).
-   * @private
-   */
+  /** @private */
   _saveMissionScore() {
     const score = this._getMissionProgressScore(this._missionProgressCount);
     this._profileManager.updateProgress('missionProgressCount', this._missionProgressCount).catch(() => {});
@@ -892,17 +911,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     ).catch(() => {});
   }
 
-  /**
-   * Sync scoreboard. Updates the mission scoreboard rows inside
-   * the top-left Mission Tools panel.
-   * @private
-   */
+  /** @private */
   _syncMissionProgressBoard() {
     const score = this._getMissionProgressScore(this._missionProgressCount);
     const scoreText = score.toFixed(2).replace(/^0/, '');
     const completedText = `${this._missionProgressCount}/4`;
 
-    // Keep scoreboard integrated with the mission tools panel and remove legacy detached HUD.
     this.clearScore?.();
     this.profilePanelView?.update({
       desk1: '—',
@@ -915,11 +929,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  /**
-   * Score ramp. Maps the completed station count to the assignment
-   * grade range (0.55 baseline → 0.89 at four stations, then bonus steps).
-   * @private
-   */
+  /** @private */
   _getMissionProgressScore(completedCount) {
     if (completedCount <= 0) return 0.55;
     if (completedCount === 1) return 0.66;
@@ -931,28 +941,17 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return 0.89 + (bonusSteps * 0.0025);
   }
 
-  /**
-   * Find player. Locates the Player instance in active game objects.
-   * @private
-   */
+  /** @private */
   _findPlayer() {
     return this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
   }
 
-  /**
-   * Collision check. Returns true when the engine reports the player
-   * overlapping a desk's collision boundary.
-   * @private
-   */
+  /** @private */
   _deskIsColliding(player, desk) {
     return !!player?.state?.collisionEvents?.includes(desk?.spriteData?.id);
   }
 
-  /**
-   * Wire click gate. Patches each desk's click handler to enforce
-   * proximity before the challenge can be activated.
-   * @private
-   */
+  /** @private */
   _wireDeskClickDistanceGate(desks) {
     desks.forEach((desk) => {
       if (!desk || typeof desk.handleClick !== 'function') return;
@@ -970,17 +969,12 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
         const inZone = inCollision || distance < clickDistance;
 
         if (!inZone) return;
-
         originalHandleClick(event);
       };
     });
   }
 
-  /**
-   * Handle keydown. Fires the nearest in-zone desk challenge when E is pressed,
-   * skipping the event when focus is inside a text input.
-   * @private
-   */
+  /** @private */
   _handleMissionDeskKeyDown(event) {
     if (event?.key !== 'e' && event?.key !== 'E' && event?.code !== 'KeyE') return;
     if (event?.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
@@ -1000,13 +994,8 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this.startDeskChallenge(nearestDesk, deskId, nearestDesk);
   }
 
-  /**
-   * Rebind reactions. Patches desks whose reaction function was not
-   * automatically assigned by the engine from spriteData.
-   * @private
-   */
+  /** @private */
   _rebindMissingDeskReactions(desks) {
-    // Engine quirk: FriendlyNpc does not copy spriteData.reaction to this.reaction.
     desks.forEach((desk) => {
       if (typeof desk?.reaction !== 'function' && typeof desk?.spriteData?.reaction === 'function') {
         desk.reaction = desk.spriteData.reaction;
@@ -1014,10 +1003,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     });
   }
 
-  /**
-   * Object center. Returns the center pixel coordinate of a game object.
-   * @private
-   */
+  /** @private */
   _getObjectCenter(object) {
     return {
       x: (object?.position?.x || 0) + (object?.width || 0) / 2,
@@ -1025,38 +1011,23 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     };
   }
 
-  /**
-   * Alert distance. Returns the zone-alert radius in pixels for a desk,
-   * falling back to interactDistance when the sprite has not yet rendered.
-   * @private
-   */
+  /** @private */
   _getDeskAlertDistancePx(desk) {
     const alertMultiplier = desk?._alertDistanceMultiplier ?? desk?.spriteData?.alertDistance ?? 1.25;
-    if ((desk?.width || 0) > 0) {
-      return desk.width * alertMultiplier;
-    }
+    if ((desk?.width || 0) > 0) return desk.width * alertMultiplier;
     return (desk?.interactDistance || 120) * 1.5;
   }
 
-  /**
-   * Click distance. Returns the click-activation radius, at least as large
-   * as the alert distance so clicks never require closer approach than alerts.
-   * @private
-   */
+  /** @private */
   _getDeskClickDistancePx(desk) {
     const alertDistance = this._getDeskAlertDistancePx(desk);
     const interactDistance = desk?.interactDistance || 120;
     return Math.max(alertDistance, interactDistance * 1.5);
   }
 
-  /**
-   * Nearest desk. Returns the closest desk currently within alert range
-   * of the player, or null if none qualify.
-   * @private
-   */
+  /** @private */
   _findNearestDeskInZone(player, desks) {
     const playerCenter = this._getObjectCenter(player);
-
     let nearestDesk = null;
     let nearestDistance = Infinity;
 
@@ -1075,11 +1046,7 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     return nearestDesk;
   }
 
-  /**
-   * Sync zone alert. Shows or clears the right-side proximity hint banner
-   * based on the current nearest desk.
-   * @private
-   */
+  /** @private */
   _syncDeskZoneAlert(nearestDesk) {
     if (nearestDesk) {
       const zoneMessage = nearestDesk.spriteData?.zoneMessage || 'Click to interact';
@@ -1094,10 +1061,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     }
   }
 
-  /**
-   * Per-frame update. Recomputes the nearest desk and refreshes the zone
-   * alert hint on every game tick.
-   */
   update() {
     const player = this.gameEnv?.gameObjects?.find((obj) => obj?.constructor?.name === 'Player');
     if (!player || !Array.isArray(this._missionDeskObjects)) return;
@@ -1106,10 +1069,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     this._syncDeskZoneAlert(nearestDesk);
   }
 
-  /**
-   * Cleanup level. Removes all transient UI elements (toast, zone alert,
-   * scoreboard) and detaches the keydown listener.
-   */
   destroy() {
     document.removeEventListener('keydown', this._handleMissionDeskKeyDownBound);
     if (this._aiLoadingToastTimer) {
@@ -1118,7 +1077,6 @@ class GameLevelCsPath2Mission extends GameLevelCsPathIdentity {
     }
     super.destroy();
   }
-
 }
 
 export default GameLevelCsPath2Mission;

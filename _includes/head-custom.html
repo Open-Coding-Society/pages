@@ -43,6 +43,10 @@
 	<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {%- endif -%}
 
+{%- if page.socket_io -%}
+  	<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+{%- endif -%}
+
 {%- comment -%}
   Global user preference system
   - CSS and JS are loaded after theme styles so that user-selected
@@ -71,13 +75,14 @@
 <script src="{{ site.baseurl }}/assets/js/keyboard-shortcuts.js" defer></script>
 
 <!-- AI A/B Test Engine SDK (passes site.baseurl for asset resolution) -->
-<script src="http://localhost:3000/sdk.js"
+<script src="https://ai-ab-test-engine.vercel.app/sdk.js"
   data-site-baseurl="{{ site.baseurl }}"
   data-project-id="cmnfour780000f63gu69kg2v8"></script>
 <script type="importmap">
 {
   "imports": {
-    "@assets/": "{{ site.baseurl }}/assets/"
+    "@assets/": "{{ site.baseurl }}/assets/",
+    "@fortuneFinders/": "{{ site.baseurl }}/assets/js/fortuneFinders/"
   }
 }
 </script>

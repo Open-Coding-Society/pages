@@ -35,3 +35,41 @@ Topics:
     team:
       - "Ahaan"
       - "Arnav"
+
+Contacts:
+  - name: "Arlene Mordeno"
+    email: "arlene.mordeno@accenture.com"
+    org: "Accenture"
+  - name: "Bhanu Karuturi"
+    email: "bkaruturi@modrailsystems.com"
+    org: "Mod Rail Systems"
+  - name: "Dr. Douglas Fenner"
+    phone: "858-207-7948"
+    org: ""
+
+ExpoReflection:
+  event: "CTE Expo 2026 Project Presentation"
+  date: "May 21, 2026 — Room A101"
+  author: "Arnav"
+  link: "https://github.com/Ahaanv19/SD_Auto_Frontend/issues/47"
+  preparation: "Before attending, we expected a more formal demo presentation. We organized our files, made a script, and rehearsed, including practice going through each feature in an organized way."
+  wants:
+    - "Showcase the project and receive meaningful feedback"
+    - "Gather new ideas to improve the platform"
+    - "Form connections with industry experts"
+  panelists:
+    - name: "Arlene Mordeno"
+      affiliation: "Accenture & CCOE"
+    - name: "Bhanu Karuturi"
+      affiliation: "Women in Transportation"
+    - name: "Dr. Douglass Fenner"
+      affiliation: "Modern Railway Systems"
+  results:
+    - "Try to partner with San Diego County"
+    - "Use traffic data to inform people of dangerous roads and intersections"
+    - "Improve website security, especially for future expansion"
+  takeaways:
+    - "Joint presentation experience is valuable for team growth"
+    - "Presentations were conversational and discussion-like rather than formal"
+    - "Time management during presentations is an area for future improvement"
+  teacherFeedback: "The project needs to be more future-thinking and integrated with Infotainment in future vehicles. Consider what hardware would be needed in a future car."

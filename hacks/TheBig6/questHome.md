@@ -1,74 +1,76 @@
 ---
 layout: post 
 tailwind: True
-title: The Big 6 Modules For Computer Science
+title: Code Hub — CS Pathway Learning Terminals
 description: >
-  Understand how to ideate, develop, and describe computer science projects for future career success!
+  Three interactive terminals teach Frontend, Backend, and Dataviz — each with a Space Invaders quiz game to prove mastery and unlock the next terminal.
 author: CSA 2025-26
 permalink: /bigsix
 lxdData:
-  Title: "Learning Modules"
-  Description: "Build critical project development skills and earn a certificate upon completion!"
+  Title: "Code Hub Terminals"
+  Description: "Master each terminal's challenge to unlock the next — Frontend → Backend → Dataviz."
   Topics:
-    - Title: "C1: Frontend Development"
-      Genre: "Project Creation"
+    - Title: "C1: Frontend Terminal"
+      Genre: "Interactive Tool"
       Level: 1
-      Description: "Learn how to develop blogs and projects that convey information effectively and are visually appealing"
-      Categories: ["Frontend", "HTML", "CSS","Javascript"]
+      Description: "Markdown-to-HTML converter and CSS playground — learn how pages are built and styled"
+      Categories: ["Markdown", "HTML", "CSS"]
       Lessons: "/bigsix/frontend_lesson"
       LessonCount: 6
       Image: "/images/cs-portfolio-quest/frontend/mainpage.png"
-      Alt: "CS Portfolio Quest Frontend"
-    - Title: "C2: Backend Development"
-      Genre: "Project Creation"
+      Alt: "Code Hub Frontend Terminal"
+    - Title: "C2: Backend Terminal"
+      Genre: "Interactive Tool"
       Level: 2
-      Description: "Learn about database structures, types, and integration with frontend for real-world full-stack development"
-      Categories: ["Backend", "Flask", "Spring", "Databases"]
+      Description: "Live REST API simulator — create, read, update, and delete records using real HTTP methods"
+      Categories: ["REST", "HTTP", "CRUD", "JSON"]
       Lessons: "/bigsix/backend_lesson"
       LessonCount: 6
       Image: "/images/cs-portfolio-quest/backend/backendmain.png"
-      Alt: "CS Portfolio Quest Backend"
-    - Title: "C3: Data Visualization"
-      Genre: "Practice"
+      Alt: "Code Hub Backend Terminal"
+    - Title: "C3: Dataviz Terminal"
+      Genre: "Interactive Tool"
       Level: 3
-      Description: "Learn about how to visualize data from various sources for effective representation and application, such as machine learning"
-      Categories: ["Visualization", "ML", "Collation"]
+      Description: "Filter, paginate, and query a 12-company dataset with live-generated JPQL"
+      Categories: ["JPQL", "Spring JPA", "Pagination", "Filtering"]
       Lessons: "/bigsix/dataviz_lesson"
       LessonCount: 2
       Image: "/images/cs-portfolio-quest/datavisualization/data_visualization_main.png"
-      Alt: "CS Portfolio Quest Data Visualization"
-    - Title: "C4: Resume Building"
-      Genre: "Application"
+      Alt: "Code Hub Dataviz Terminal"
+    - Title: "C4: Frontend Invaders"
+      Genre: "Quiz Game"
       Level: 4
-      Description: "Learn to write about your CS projects for inclusion on your resume, both in technical and non-technical terms"
-      Categories: ["CV", "Resume", "Blogging"]
-      Lessons: "/bigsix/resume_lesson"
-      Image: "/images/cs-portfolio-quest/resume/ModuleBackground.png"
-      Alt: "CS Portfolio Quest Resume"
-    - Title: "C5: AI Usage"
-      Genre: "Assessment"
+      Description: "Space Invaders quiz on Markdown and CSS — shoot wrong answers, let correct ones pass"
+      Categories: ["Canvas", "Game", "Markdown"]
+      Lessons: "/bigsix/frontend_lesson"
+      LessonCount: 6
+      Image: "/images/cs-portfolio-quest/frontend/mainpage.png"
+      Alt: "Frontend Invaders Game"
+    - Title: "C5: Backend Invaders"
+      Genre: "Quiz Game"
       Level: 5
-      Description: "Learn to prompt AI to streamline frontend and backend development, data visualization, and resume building"
-      Categories: ["ChatGPT", "Prompting", "Vibe Coding"]
-      Lessons: "/bigsix/ai_lesson"
-      LessonCount: 4
-      Image: "/images/cs-portfolio-quest/ai/aimain.png"
-      Alt: "CS Portfolio Quest AI"
-    - Title: "C6: Analytics and Mastery Certificate"
-      Genre: "Integration"
-      Level: 3
-      Description: "Analytics and Mastery Certificate"
-      Categories: ["Certificate", "Integration", "Achievement"]
-      Lessons: "/bigsix/analytics_lesson"
+      Description: "Space Invaders quiz on REST methods — identify GET, POST, PUT, DELETE from API scenarios"
+      Categories: ["Canvas", "Game", "REST"]
+      Lessons: "/bigsix/backend_lesson"
+      LessonCount: 6
+      Image: "/images/cs-portfolio-quest/backend/backendmain.png"
+      Alt: "Backend Invaders Game"
+    - Title: "C6: Dataviz Invaders — Code Hub Mastered"
+      Genre: "Quiz Game"
+      Level: 6
+      Description: "Final challenge on filtering, pagination, and JPQL — clear all waves to master the Code Hub"
+      Categories: ["Canvas", "Game", "JPQL", "Mastery"]
+      Lessons: "/bigsix/dataviz_lesson"
+      LessonCount: 2
       Image: "/images/cs-portfolio-quest/analytics/analytics_main.png"
-      Alt: "CS Portfolio Quest Mastery Certificate"
-    - Title: "Big Six Game"
+      Alt: "Dataviz Invaders — Code Hub Mastered"
+    - Title: "Code Hub Game"
       Genre: "Game"
       Level: 3
-      Description: "Gamify Big Six games to help user have fun while learning"
-      Categories: ["Big Six", "Game", "Lessons"]
+      Description: "Play all three Code Hub Space Invaders challenges — shoot wrong answers to prove mastery"
+      Categories: ["Code Hub", "Game", "Space Invaders"]
       Lessons: "/bigsix/game"
       Image: "/images/cs-portfolio-quest/analytics/analytics_main.png"
-      Alt: "Big Six Game"
+      Alt: "Code Hub Game"
 ---
 {%- include tailwind/cs-portfolio-big6_info.html -%}

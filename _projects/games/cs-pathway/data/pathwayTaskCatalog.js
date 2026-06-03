@@ -1,0 +1,187 @@
+/**
+ * Auto-assigned CS Pathway milestones (one row per game task).
+ * dayOffset is measured from the student's pathway start date.
+ */
+
+export const PATHWAY_MILESTONE_TASKS = Object.freeze([
+  {
+    id: 'pathway-start',
+    dayOffset: 0,
+    level: 'Identity Forge',
+    title: 'Start the CS Pathway quest',
+    description: 'Open the Identity Forge level and begin your onboarding journey.',
+    priority: 'P0',
+  },
+  {
+    id: 'identity-terminal',
+    dayOffset: 0,
+    level: 'Identity Forge',
+    title: 'Register at the Identity Terminal',
+    description: 'Create or sign in to your student account so progress syncs across devices.',
+    priority: 'P0',
+  },
+  {
+    id: 'avatar-forge',
+    dayOffset: 1,
+    level: 'Identity Forge',
+    title: 'Customize your avatar',
+    description: 'Visit the Avatar Forge and choose a sprite that represents you in the game.',
+    priority: 'P1',
+  },
+  {
+    id: 'world-theme',
+    dayOffset: 1,
+    level: 'Identity Forge',
+    title: 'Choose your world theme',
+    description: 'Select a theme at the World Theme Portal to personalize your environment.',
+    priority: 'P1',
+  },
+  {
+    id: 'course-enlistment',
+    dayOffset: 2,
+    level: 'Identity Forge',
+    title: 'Complete Course Enlistment',
+    description: 'Pick your CS course track so the pathway can recommend the right classes.',
+    priority: 'P0',
+  },
+  {
+    id: 'persona-hall',
+    dayOffset: 2,
+    level: 'Identity Forge',
+    title: 'Select your CS persona',
+    description: 'Visit Persona Hall and lock in the work style that fits you best.',
+    priority: 'P1',
+  },
+  {
+    id: 'wayfinding-enter',
+    dayOffset: 3,
+    level: 'Wayfinding World',
+    title: 'Enter Wayfinding World',
+    description: 'Travel to the next level and connect with your classroom community.',
+    priority: 'P0',
+  },
+  {
+    id: 'about-me',
+    dayOffset: 4,
+    level: 'Wayfinding World',
+    title: 'Build your About Me page',
+    description: 'Use the About Me builder to publish your first coding portfolio page.',
+    priority: 'P1',
+  },
+  {
+    id: 'persona-trial',
+    dayOffset: 4,
+    level: 'Wayfinding World',
+    title: 'Complete the Persona Trial',
+    description: 'Finish the persona challenge to document your strengths and growth areas.',
+    priority: 'P1',
+  },
+  {
+    id: 'sprint-success',
+    dayOffset: 5,
+    level: 'Wayfinding World',
+    title: 'Finish Sprint Success training',
+    description: 'Practice breaking goals into tasks, ordering a sprint timeline, and Kanban flow.',
+    priority: 'P1',
+  },
+  {
+    id: 'skill-passport',
+    dayOffset: 6,
+    level: 'Wayfinding World',
+    title: 'Earn your Skill Passport checkpoint',
+    description: 'Complete the Skill Passport review to unlock Mission Tools.',
+    priority: 'P0',
+  },
+  {
+    id: 'mission-tools-start',
+    dayOffset: 7,
+    level: 'Mission Tools',
+    title: 'Begin Mission Tools',
+    description: 'Meet each mission desk NPC and learn the developer toolchain.',
+    priority: 'P0',
+  },
+  {
+    id: 'mission-admin',
+    dayOffset: 8,
+    level: 'Mission Tools',
+    title: 'Mission desk: The Admin',
+    description: 'Verify terminal, Brew/Apt, VSCode extensions, Python, Ruby, Jupyter, and Git config.',
+    priority: 'P1',
+  },
+  {
+    id: 'mission-archivist',
+    dayOffset: 9,
+    level: 'Mission Tools',
+    title: 'Mission desk: The Archivist',
+    description: 'Practice repos, venvs, naming conventions, forks, and templates.',
+    priority: 'P1',
+  },
+  {
+    id: 'mission-sdlc',
+    dayOffset: 10,
+    level: 'Mission Tools',
+    title: 'Mission desk: The SDLC Master',
+    description: 'Work through issues, commits, builds, tests, and CI habits.',
+    priority: 'P1',
+  },
+  {
+    id: 'mission-scrum',
+    dayOffset: 11,
+    level: 'Mission Tools',
+    title: 'Mission desk: The Scrum Master',
+    description: 'Apply agile values, scrum boards, standups, and sprint ceremonies.',
+    priority: 'P1',
+  },
+  {
+    id: 'assessment-observatory',
+    dayOffset: 14,
+    level: 'Assessment Observatory',
+    title: 'Visit the Assessment Observatory',
+    description: 'Review analytics, reflection prompts, and your overall pathway score.',
+    priority: 'P2',
+  },
+]);
+
+/** Extra milestones keyed by course id from Course Enlistment. */
+export const PATHWAY_COURSE_TASKS = Object.freeze({
+  CSSE: Object.freeze([
+    {
+      id: 'csse-capstone-prep',
+      dayOffset: 21,
+      level: 'CSSE Track',
+      title: 'Preview CSSE capstone expectations',
+      description: 'Review software engineering project milestones for your CSSE track.',
+      priority: 'P2',
+    },
+  ]),
+  CSP: Object.freeze([
+    {
+      id: 'csp-ap-prep',
+      dayOffset: 21,
+      level: 'CSP Track',
+      title: 'Map AP CSP portfolio deadlines',
+      description: 'Align your pathway timeline with AP CSP create and performance tasks.',
+      priority: 'P2',
+    },
+  ]),
+  CSA: Object.freeze([
+    {
+      id: 'csa-java-prep',
+      dayOffset: 21,
+      level: 'CSA Track',
+      title: 'Schedule CSA Java practice sprints',
+      description: 'Block time for FRQ practice, unit projects, and GitHub classroom sync.',
+      priority: 'P2',
+    },
+  ]),
+  CSH: Object.freeze([
+    {
+      id: 'csh-thesis-prep',
+      dayOffset: 21,
+      level: 'CSH Track',
+      title: 'Outline your CSH thesis milestones',
+      description: 'Plan research, design, and presentation checkpoints for the honors capstone.',
+      priority: 'P2',
+    },
+  ]),
+});

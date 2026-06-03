@@ -42,6 +42,7 @@
 
 import LocalProfile from '@assets/js/projects/cs-pathway/model/localProfile.js';
 import PersistentProfile from '@assets/js/projects/cs-pathway/model/persistentProfile.js';
+import { ensurePathwayCalendarTimeline } from '@assets/js/projects/cs-pathway/services/PathwayCalendarCoordinator.js';
 
 class ProfileManager {
   constructor() {
@@ -121,6 +122,7 @@ class ProfileManager {
             console.warn('ProfileManager: background sync failed (non-blocking)');
           });
         }
+        this._schedulePathwayCalendarSync(this.restoredState.profileData);
         return this.restoredState;
 
       } else {
@@ -133,10 +135,12 @@ class ProfileManager {
           console.log(`ProfileManager: recovered profile from backend for ${currentUid}`);
           LocalProfile.save(backendData);
           this.restoredState = this._buildState(backendData);
+          this._schedulePathwayCalendarSync(this.restoredState.profileData);
           return this.restoredState;
         }
 
         console.log(`ProfileManager: no profile found for ${currentUid} (new authenticated user)`);
+        this._schedulePathwayCalendarSync({ pathwayCalendarMeta: null });
         return null;
       }
 
@@ -211,6 +215,7 @@ class ProfileManager {
     if (localData) {
       console.log(`ProfileManager: loaded existing profile for ${currentUid}`);
       this.restoredState = this._buildState(localData);
+      this._schedulePathwayCalendarSync(this.restoredState.profileData);
       return this.restoredState;
     } else {
       // Try backend recovery
@@ -239,6 +244,8 @@ class ProfileManager {
         name: profile.name,
         email: profile.email,
         githubID: profile.githubID,
+        course: profile.course || profile.coursePlanMeta?.selectedClass || null,
+        coursePlanMeta: profile.coursePlanMeta || null,
         persona: profile.persona,
         personaId: profile.personaId,
         sprite: profile.sprite,
@@ -248,6 +255,8 @@ class ProfileManager {
         worldTheme: profile.theme,  // Alias for UI compatibility
         themeMeta: profile.themeMeta,
         worldThemeSrc: profile.worldThemeSrc,
+        coursePlanMeta: profile.coursePlanMeta || null,
+        pathwayCalendarMeta: profile.pathwayCalendarMeta || null,
       },
       identityState: {
         // Identity Forge (includes avatar)
@@ -279,6 +288,31 @@ class ProfileManager {
    * @private
    * @param {string} uid - Authenticated user ID
    */
+  /**
+   * Publish personal CS Pathway tasks to Spring calendar (non-blocking).
+   * @private
+   */
+  _schedulePathwayCalendarSync(profileData, { force = false } = {}) {
+    if (!this.isAuthenticated || !profileData) {
+      return;
+    }
+
+    ensurePathwayCalendarTimeline({
+      profileData,
+      isAuthenticated: true,
+      force,
+    }).then((outcome) => {
+      if (outcome?.profileData?.pathwayCalendarMeta) {
+        const meta = outcome.profileData.pathwayCalendarMeta;
+        if (this.restoredState?.profileData) {
+          this.restoredState.profileData.pathwayCalendarMeta = meta;
+        }
+      }
+    }).catch((error) => {
+      console.warn('ProfileManager: pathway calendar sync failed', error);
+    });
+  }
+
   async _handleGuestMigration(uid) {
     try {
       const guestData = LocalProfile.load(null); // Check guest profile
@@ -602,14 +636,16 @@ class ProfileManager {
    */
   async clear() {
     try {
-      // Always clear localStorage (full wipe for local reset)
-      LocalProfile.clear();
+      // Clear localStorage including companion keys (completion, guest session)
+      LocalProfile.clearAll();
       // Also clear backend game data (preserves identity columns server-side)
       if (this.isAuthenticated) {
         PersistentProfile.clear().catch(() => {});
       }
 
       this.initialized = false;
+      // Signal all level classes to drop their shared profile state cache
+      window.dispatchEvent(new CustomEvent('ocs:profile-cleared'));
       this._updateWidget();
       console.log('ProfileManager: profile cleared');
       return { success: true, code: 200, body: null };
