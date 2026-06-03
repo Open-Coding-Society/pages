@@ -4,7 +4,11 @@
 <!-- Minima end custom head snippets -->
 
 {%- unless page.disable_ocs_bot -%}
-<!-- OCS Assistant (global chatbot) styles -->
+<!-- OCS Assistant — global chatbot. Loaded from the universal <head> include so
+     it appears on EVERY page regardless of layout. The script injects its own
+     markup into <body>. Opt a page out with `disable_ocs_bot: true`. -->
 <link rel="stylesheet" href="{{ '/assets/css/ocs-bot.css' | relative_url }}">
+<script>window.OCS_BASEURL = {{ site.baseurl | jsonify }};</script>
+<script type="module" src="{{ '/assets/js/ocs-bot/index.js' | relative_url }}"></script>
 {%- endunless -%}
  

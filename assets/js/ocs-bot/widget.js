@@ -1,11 +1,13 @@
-<!-- =========================================================================
-     OCS Assistant — global chatbot widget markup.
-     Injected once per page by _includes/themes/minima/base.html (guarded by
-     `page.disable_ocs_bot`). All behaviour lives in /assets/js/ocs-bot/*.
-     IDs/classes are namespaced ocsb- and styled by /assets/css/ocs-bot.css.
-     ========================================================================= -->
+// assets/js/ocs-bot/widget.js
+// -----------------------------------------------------------------------------
+// The OCS Assistant widget markup, as a string so index.js can inject it into
+// <body> on ANY page. The chatbot is loaded from the universal <head> include
+// (custom-head.html), which reaches every layout — including pages that don't
+// route through the shared base layout (e.g. the gamified /home). IDs/classes
+// are namespaced ocsb- and styled by /assets/css/ocs-bot.css.
+// -----------------------------------------------------------------------------
 
-<!-- Launcher -->
+export const WIDGET_HTML = `
 <button id="ocsb-fab" type="button" aria-label="Open the OCS Assistant" aria-expanded="false" aria-controls="ocsb-panel">
   <span class="ocsb-fab-pulse" aria-hidden="true"></span>
   <span class="ocsb-fab-icon" aria-hidden="true">
@@ -14,13 +16,9 @@
   <span class="ocsb-fab-label">Ask OCS</span>
 </button>
 
-<!-- Backdrop (modal / mobile) -->
 <div id="ocsb-backdrop" aria-hidden="true"></div>
 
-<!-- Panel -->
 <section id="ocsb-panel" role="dialog" aria-modal="false" aria-label="OCS Assistant" aria-hidden="true">
-
-  <!-- Conversation rail -->
   <nav id="ocsb-rail" aria-label="Your conversations">
     <div class="ocsb-rail-head">
       <button id="ocsb-new" type="button">
@@ -34,9 +32,7 @@
     <ul id="ocsb-convos" aria-label="Saved conversations"></ul>
   </nav>
 
-  <!-- Main column -->
   <div class="ocsb-main">
-
     <header id="ocsb-head">
       <button id="ocsb-rail-toggle" class="ocsb-icon-btn" type="button" aria-label="Toggle conversation list" aria-pressed="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -63,14 +59,13 @@
 
     <div id="ocsb-error" class="ocsb-error" role="alert" hidden></div>
 
-    <!-- Welcome / empty state (mutually exclusive with the transcript) -->
     <section id="ocsb-welcome">
       <div class="ocsb-welcome-hero">
         <span class="ocsb-welcome-badge" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         </span>
         <h3 id="ocsb-welcome-greeting">Hey! I'm the OCS Assistant 👋</h3>
-        <p id="ocsb-welcome-sub">Ask me about courses, lessons, and projects — or tell me where to go and I'll take you there.</p>
+        <p id="ocsb-welcome-sub">Ask me about courses, lessons, and projects, or tell me where to go and I'll take you there.</p>
       </div>
       <p class="ocsb-suggest-label">Try asking</p>
       <div id="ocsb-suggestions"></div>
@@ -90,12 +85,10 @@
       </div>
     </section>
 
-    <!-- Conversation transcript -->
     <section id="ocsb-messages" role="log" aria-live="polite" aria-relevant="additions text" hidden></section>
 
     <div id="ocsb-followups" role="list" hidden></div>
 
-    <!-- Settings drawer -->
     <div id="ocsb-settings" hidden>
       <div class="ocsb-set-row">
         <p class="ocsb-set-label">Answer style</p>
@@ -122,7 +115,7 @@
           <span class="ocsb-toggle-text">Show the assistant<em>Turn the launcher off on this device</em></span>
           <button id="ocsb-set-enabled" class="ocsb-toggle" type="button" role="switch" aria-checked="true" aria-label="Show the assistant launcher"><span class="ocsb-toggle-knob"></span></button>
         </div>
-        <p id="ocsb-disabled-note" class="ocsb-set-note" hidden>Hidden on this device. Press <b>⌘ / Ctrl + K</b> to bring it back anytime.</p>
+        <p id="ocsb-disabled-note" class="ocsb-set-note" hidden>Hidden on this device. Press <b>Cmd / Ctrl + K</b> to bring it back anytime.</p>
       </div>
       <div class="ocsb-set-row">
         <p class="ocsb-set-label">Account</p>
@@ -136,7 +129,6 @@
       </div>
     </div>
 
-    <!-- Composer -->
     <form id="ocsb-form" autocomplete="off">
       <div class="ocsb-composer-row">
         <textarea id="ocsb-input" rows="1" placeholder="Ask anything about Open Coding Society…" enterkeyhint="send" aria-label="Message"></textarea>
@@ -148,6 +140,5 @@
         <span class="ocsb-composer-hint"><b>Enter</b> to send · <b>Shift+Enter</b> for a new line</span>
       </div>
     </form>
-
   </div>
-</section>
+</section>`;

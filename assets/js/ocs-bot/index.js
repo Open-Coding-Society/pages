@@ -13,6 +13,7 @@ import { parseActions, hrefFor } from './tools.js';
 import { starterSuggestions } from './suggestions.js';
 import { NAV_INDEX } from './knowledge.js';
 import { DEFAULT_MODEL, NAV_TARGET } from './config.js';
+import { WIDGET_HTML } from './widget.js';
 
 const $ = (id) => document.getElementById(id);
 const HISTORY_TURNS = 16; // messages of context sent to the model
@@ -54,6 +55,15 @@ const bot = {
 // ─── Boot ─────────────────────────────────────────────────────────────────
 function boot() {
   if (bot.booted) return;
+  // Inject the widget markup if the page didn't already include it. This lets
+  // the assistant load from the universal <head> include and work on every
+  // page regardless of layout (incl. pages that skip the shared base layout).
+  if (document.body && !document.getElementById('ocsb-fab')) {
+    const root = document.createElement('div');
+    root.id = 'ocsb-root';
+    root.innerHTML = WIDGET_HTML;
+    document.body.appendChild(root);
+  }
   const el = bot.el;
   [
     'ocsb-fab', 'ocsb-backdrop', 'ocsb-panel', 'ocsb-rail', 'ocsb-new',

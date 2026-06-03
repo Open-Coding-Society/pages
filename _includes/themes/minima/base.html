@@ -40,12 +40,5 @@
         {%- include themes/minima/footer.html -%}
 
         {%- include mermaid.html -%}
-
-        {%- unless page.disable_ocs_bot -%}
-        <!-- OCS Assistant — global AI chatbot (navigation + Q&A) -->
-        {%- include chatbot/ocs-bot.html -%}
-        <script>window.OCS_BASEURL = {{ site.baseurl | jsonify }};</script>
-        <script type="module" src="{{ '/assets/js/ocs-bot/index.js' | relative_url }}"></script>
-        {%- endunless -%}
     </body>
 </html>
