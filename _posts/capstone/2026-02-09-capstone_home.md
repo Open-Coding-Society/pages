@@ -457,6 +457,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+   <!-- AP CSA Exam Simulator -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url capstone/2026-05-19-exam-simulator-capstone %}">
+           <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #4CAFEF, #667eea);">FRQ</div>
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-05-19-exam-simulator-capstone %}">AP CSA Exam Simulator</a></h3>
+           <p class="text-sm text-gray-700">A timed AP CSA Section II (Free Response) exam simulator with 19 official FRQ sets (2005–2025), integrated Java code editors, 90–105 min timed sessions, and AI-powered Gemini grading.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Kush Shah</p>
+       </div>
+   </div>
+
    <!-- Poway Symphonic Orchestra Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{{ '/capstone/powayorchestra/' | relative_url }}">
