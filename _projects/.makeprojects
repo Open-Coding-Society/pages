@@ -39,6 +39,7 @@ games/castle-game
 games/astronaut-platformer-game
 
 # Lessons
+lessons/ap-frq-simulator
 lessons/game-lessons
 lessons/parallelAndComputinglesson
 lessons/robot-logic-game
