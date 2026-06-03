@@ -1,0 +1,312 @@
+{% assign d = site.data.exam_simulator_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+.esi-root {
+  --esi-bg: #0f0f12;
+  --esi-card: #16161a;
+  --esi-card-border: #2a2a2e;
+  --esi-text: #e4e4e7;
+  --esi-text-muted: #a1a1aa;
+  --esi-accent: #4CAFEF;
+  --esi-accent-soft: rgba(76, 175, 239, 0.15);
+  --esi-success: #4ADE80;
+  --esi-tag-bg: #27272a;
+}
+
+.esi-root * { box-sizing: border-box; }
+
+.esi-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--esi-text);
+}
+
+.esi-meta {
+  font-size: 0.875rem;
+  color: var(--esi-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.esi-subtitle {
+  font-size: 1rem;
+  color: var(--esi-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.esi-container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+  color: var(--esi-text);
+}
+
+.esi-lead {
+  font-size: 1.0625rem;
+  color: var(--esi-text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+
+.esi-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.esi-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.esi-btn-primary {
+  background: linear-gradient(135deg, #4CAFEF 0%, #2e86d4 100%);
+  color: #000;
+  padding: 0.65rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(76, 175, 239, 0.45);
+  border: 1px solid rgba(76, 175, 239, 0.6);
+  letter-spacing: 0.01em;
+}
+.esi-btn-primary:hover {
+  background: linear-gradient(135deg, #5dbcf7 0%, #3a9fe0 100%);
+  box-shadow: 0 0 24px rgba(76, 175, 239, 0.65);
+  transform: translateY(-1px);
+}
+
+.esi-badge {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 9999px;
+  background: var(--esi-accent-soft);
+  color: var(--esi-accent);
+  border: 1px solid rgba(76, 175, 239, 0.3);
+}
+
+.esi-leads {
+  font-size: 0.875rem;
+  color: var(--esi-text-muted);
+  margin-bottom: 2rem;
+}
+
+.esi-infographic {
+  background: var(--esi-card);
+  border: 1px solid var(--esi-card-border);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.esi-infographic h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.25rem;
+  color: var(--esi-text);
+}
+
+.esi-tagline {
+  font-size: 1rem;
+  color: var(--esi-accent);
+  margin-bottom: 1.5rem;
+}
+
+.esi-features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.esi-features li {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  color: var(--esi-text);
+}
+
+.esi-features li::before {
+  content: "✓";
+  color: var(--esi-success);
+  font-weight: bold;
+}
+
+.esi-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.esi-tag {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--esi-tag-bg);
+  color: var(--esi-text-muted);
+  border-radius: 0.375rem;
+  border: 1px solid var(--esi-card-border);
+}
+
+.esi-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.esi-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--esi-text);
+}
+
+.esi-section p,
+.esi-section ul {
+  font-size: 0.9375rem;
+  color: var(--esi-text-muted);
+}
+
+.esi-section ul {
+  padding-left: 1.25rem;
+}
+
+.esi-section ul li {
+  margin-bottom: 0.35rem;
+}
+
+.esi-learn-more {
+  color: var(--esi-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.esi-learn-more:hover { text-decoration: underline; }
+
+.esi-demo-preview {
+  background: var(--esi-card);
+  border: 1px solid var(--esi-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.esi-demo-preview h3 {
+  font-size: 1.125rem;
+  margin: 0 0 1rem;
+  color: var(--esi-text);
+}
+
+.esi-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.esi-demo-stat {
+  background: rgba(76, 175, 239, 0.08);
+  border: 1px solid rgba(76, 175, 239, 0.2);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.esi-demo-stat .val {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--esi-accent);
+}
+
+.esi-demo-stat .lbl {
+  font-size: 0.6875rem;
+  color: var(--esi-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+@media (max-width: 600px) {
+  .esi-two-col { grid-template-columns: 1fr; }
+  .esi-demo-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+
+<div class="esi-root">
+<div class="esi-container">
+
+<p class="esi-meta">CSA Sprint 7 &bull; AP Exam Prep</p>
+
+<p class="esi-subtitle">{{ d.badge }}</p>
+
+<h1>{{ d.title }}</h1>
+
+<p class="esi-lead">{{ d.description }}</p>
+
+<div class="esi-actions">
+  <a href="{{ d.links.project }}" class="esi-btn esi-btn-primary">Launch Simulator</a>
+  <span class="esi-badge">{{ d.status }}</span>
+</div>
+
+<p class="esi-leads"><strong>Project Lead: {{ d.team.size | minus: 1 | at_least: 0 | times: 1 }}{% if d.team.size > 1 %}s{% endif %}</strong> {{ d.team | join: ', ' }}</p>
+
+<!-- Stats -->
+<div class="esi-demo-preview">
+  <h3>By the Numbers</h3>
+  <div class="esi-demo-grid">
+    <div class="esi-demo-stat"><div class="val">19</div><div class="lbl">Exam Years</div></div>
+    <div class="esi-demo-stat"><div class="val">4</div><div class="lbl">FRQ Questions</div></div>
+    <div class="esi-demo-stat"><div class="val">90–105m</div><div class="lbl">Timed Sessions</div></div>
+  </div>
+</div>
+
+<!-- Infographic Card -->
+<div class="esi-infographic">
+  <h2>{{ d.title }}</h2>
+  <p class="esi-tagline">{{ d.subtitle }}</p>
+
+  <ul class="esi-features">
+    {% for feature in d.features %}
+    <li>{{ feature }}</li>
+    {% endfor %}
+  </ul>
+
+  <div class="esi-tags">
+    {% for tech in d.tech %}
+    <span class="esi-tag">{{ tech }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Two Column: About + Impact -->
+<div class="esi-two-col">
+
+  <div class="esi-section">
+    <h3>About</h3>
+    <p>{{ d.about }}</p>
+  </div>
+
+  <div class="esi-section">
+    <h3>Impact</h3>
+    <ul>
+      {% for item in d.impact %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+</div>
+
+</div>
+</div>

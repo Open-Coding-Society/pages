@@ -43,6 +43,7 @@ games/fortuneFinders:dev
 
 
 # Lessons
+lessons/ap-frq-simulator
 lessons/game-lessons
 lessons/parallelAndComputinglesson
 lessons/robot-logic-game
