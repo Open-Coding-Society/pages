@@ -166,9 +166,25 @@ body.ocsb-open.ocsb-expanded.ocsb-rail-open #ocsb-panel { grid-template-columns:
 .ocsb-suggestion-go { color: var(--ocsb-fg-faint); flex-shrink: 0; display: grid; place-items: center; transition: color 160ms ease, transform 160ms ease; }
 .ocsb-suggestion-go svg { width: 15px; height: 15px; }
 .ocsb-suggestion:hover .ocsb-suggestion-go { color: var(--ocsb-brand); transform: translateX(2px); }
-.ocsb-tips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--ocsb-border); width: 100%; }
-.ocsb-tip { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 600; color: var(--ocsb-fg-faint); }
-.ocsb-tip svg { width: 13px; height: 13px; }
+/* Vibrant "sign in to save your chats" call-to-action (guests only) */
+.ocsb-signin-cta {
+  display: inline-flex; align-items: center; gap: 8px; align-self: center;
+  margin: 4px 0 16px; padding: 11px 20px; border-radius: 999px;
+  background: var(--ocsb-bg-fab); color: #fff; font-size: 0.86rem; font-weight: 700;
+  letter-spacing: -0.01em; text-decoration: none; white-space: nowrap;
+  box-shadow: 0 8px 22px rgba(20, 80, 200, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transition: transform 160ms cubic-bezier(.22,1,.36,1), filter 160ms ease, box-shadow 220ms ease;
+  animation: ocsb-cta-pulse 2.6s ease-in-out infinite;
+}
+.ocsb-signin-cta:hover { transform: translateY(-2px); filter: brightness(1.07); box-shadow: 0 12px 30px rgba(20, 80, 200, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.32); }
+.ocsb-signin-cta:active { transform: translateY(0); }
+.ocsb-signin-cta:focus-visible { outline: 3px solid var(--ocsb-brand-cyan, #38e2c2); outline-offset: 2px; }
+.ocsb-signin-cta svg { width: 15px; height: 15px; }
+.ocsb-signin-cta[hidden] { display: none; }
+@keyframes ocsb-cta-pulse {
+  0%, 100% { box-shadow: 0 8px 22px rgba(20, 80, 200, 0.45), 0 0 0 0 rgba(76, 175, 239, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.28); }
+  50%      { box-shadow: 0 10px 26px rgba(20, 80, 200, 0.6), 0 0 0 9px rgba(76, 175, 239, 0), inset 0 1px 0 rgba(255, 255, 255, 0.28); }
+}
 
 /* ─── Transcript (unified avatar-left thread) ──────────────────── */
 #ocsb-messages { padding: 18px 16px; overflow-y: auto; scroll-behavior: smooth; display: flex; flex-direction: column; gap: 14px; }
@@ -281,6 +297,6 @@ body.ocsb-disabled #ocsb-fab { display: none !important; }
 /* ─── Reduced motion ───────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   #ocsb-fab, #ocsb-panel, .ocsb-msg, .ocsb-nav-chip, #ocsb-send, .ocsb-suggestion { transition: none !important; animation: none !important; }
-  .ocsb-fab-pulse, .ocsb-status-dot, .ocsb-typing span { animation: none !important; }
+  .ocsb-fab-pulse, .ocsb-status-dot, .ocsb-typing span, .ocsb-signin-cta { animation: none !important; }
   #ocsb-messages { scroll-behavior: auto; }
 }

@@ -67,22 +67,12 @@ export const WIDGET_HTML = `
         <h3 id="ocsb-welcome-greeting">Hey! I'm the OCS Assistant 👋</h3>
         <p id="ocsb-welcome-sub">Ask me about courses, lessons, and projects, or tell me where to go and I'll take you there.</p>
       </div>
+      <a id="ocsb-signin-cta" class="ocsb-signin-cta" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Sign in to save your chats
+      </a>
       <p class="ocsb-suggest-label">Try asking</p>
       <div id="ocsb-suggestions"></div>
-      <div class="ocsb-tips" aria-hidden="true">
-        <span class="ocsb-tip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Saved when signed in
-        </span>
-        <span class="ocsb-tip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1 1"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1-1"/></svg>
-          Real OCS links
-        </span>
-        <span class="ocsb-tip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Fast Groq AI
-        </span>
-      </div>
     </section>
 
     <section id="ocsb-messages" role="log" aria-live="polite" aria-relevant="additions text" hidden></section>

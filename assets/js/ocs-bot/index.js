@@ -72,7 +72,7 @@ function boot() {
     'ocsb-welcome', 'ocsb-welcome-greeting', 'ocsb-suggestions', 'ocsb-followups',
     'ocsb-settings', 'ocsb-set-style', 'ocsb-set-model', 'ocsb-account',
     'ocsb-account-text', 'ocsb-clear', 'ocsb-form', 'ocsb-input', 'ocsb-send',
-    'ocsb-set-autoopen', 'ocsb-set-enabled', 'ocsb-disabled-note',
+    'ocsb-set-autoopen', 'ocsb-set-enabled', 'ocsb-disabled-note', 'ocsb-signin-cta',
   ].forEach((id) => { el[id] = $(id); });
   if (!el['ocsb-fab'] || !el['ocsb-panel']) return; // markup missing — bail safely
   bot.booted = true;
@@ -80,6 +80,7 @@ function boot() {
   wireEvents();
   applyPrefs();
   positionLauncher();
+  if (bot.el['ocsb-signin-cta']) bot.el['ocsb-signin-cta'].href = hrefFor('/login');
   renderSuggestions();
   ensureActiveConversation();
   renderRail();
@@ -113,6 +114,8 @@ async function detectUser() {
 }
 
 function updateAccountUI() {
+  // The "sign in to save your chats" CTA only makes sense for guests.
+  if (bot.el['ocsb-signin-cta']) bot.el['ocsb-signin-cta'].hidden = !!bot.user;
   const dot = bot.el['ocsb-account'].querySelector('.ocsb-dot2');
   if (bot.user) {
     bot.el['ocsb-account-text'].innerHTML = `Signed in as <b style="color:var(--ocsb-fg)">${escapeText(bot.user.name)}</b> · chats saved to your account`;
