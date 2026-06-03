@@ -10,7 +10,7 @@
 // -----------------------------------------------------------------------------
 
 import {
-  GROQ_ENDPOINT, WHOAMI_ENDPOINT, CHAT_API_BASE,
+  GROQ_ENDPOINT, WHOAMI_ENDPOINT, CHAT_API_BASE, SLACK_ENDPOINT, SLACK_ENABLED,
   DEFAULT_MODEL, FETCH_TIMEOUT, ENABLE_BACKEND_SYNC,
 } from './config.js';
 
@@ -88,6 +88,26 @@ export async function whoAmI() {
     };
   } catch (_e) {
     return null;
+  }
+}
+
+// ─── Live class Slack context (course-aware, fail-safe) ──────────────────────
+// Returns recent relevant posts from the OCS class Slack, or [] on any failure.
+// Dormant unless SLACK_ENABLED (the backend + bot token must be deployed first),
+// so this is a complete no-op until an OCS admin turns it on. Never throws.
+export async function fetchSlack({ query, course, signal } = {}) {
+  if (!SLACK_ENABLED || !query) return [];
+  try {
+    const u = new URL(SLACK_ENDPOINT);
+    u.searchParams.set('q', query);
+    u.searchParams.set('limit', '6');
+    if (course) u.searchParams.set('course', course);
+    const r = await safeJson(fetch(u.toString(), {
+      method: 'GET', credentials: 'include', headers: credHeaders, signal,
+    }));
+    return (r.ok && r.data && Array.isArray(r.data.messages)) ? r.data.messages : [];
+  } catch (_e) {
+    return [];
   }
 }
 

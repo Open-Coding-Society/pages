@@ -12,7 +12,11 @@ import { renderMarkdown } from './render.js';
 import { parseActions, hrefFor } from './tools.js';
 import { starterSuggestions } from './suggestions.js';
 import { NAV_INDEX } from './knowledge.js';
-import { DEFAULT_MODEL, NAV_TARGET } from './config.js';
+import { resolveCourse } from './identity.js';
+import { looksLikePractice } from './collegeboard.js';
+import { looksClassRelated, formatSlackContext, SLACK_REQUEST_RE } from './slack.js';
+import { scrubOutput } from './guardrails.js';
+import { DEFAULT_MODEL, NAV_TARGET, SLACK_ENABLED } from './config.js';
 import { WIDGET_HTML } from './widget.js';
 
 const $ = (id) => document.getElementById(id);
@@ -47,6 +51,7 @@ const ICONS = {
 const bot = {
   el: {},
   user: null,
+  course: null,
   generating: false,
   abort: null,
   booted: false,
@@ -100,6 +105,7 @@ function boot() {
 async function detectUser() {
   const user = await api.whoAmI();
   bot.user = user;
+  bot.course = resolveCourse(user, location.pathname); // course from account, page fallback
   // Re-scope storage to this user and re-render (migrating the current view).
   store.setScope(user ? user.id : 'guest');
   ensureActiveConversation();
@@ -480,18 +486,51 @@ async function submit() {
   const prefs = store.getPrefs();
   const convo = store.getConversation(convoId);
   const history = convo.messages.slice(-HISTORY_TURNS).map((m) => ({ role: m.role, content: m.content }));
-  const messages = [{ role: 'system', content: buildSystemPrompt({ user: bot.user, prefs }) }, ...history];
+  const model = prefs.model || DEFAULT_MODEL;
+  const course = bot.course || resolveCourse(bot.user, location.pathname);
+  const practice = looksLikePractice(text);
 
   bot.abort = new AbortController();
+
+  // Pre-fetch class Slack for obvious class questions (no-op unless SLACK_ENABLED
+  // and the backend is deployed). The model can also self-request via [[SLACK:]].
+  let slackCtx = [];
+  if (SLACK_ENABLED && !practice && looksClassRelated(text)) {
+    bot.el['ocsb-status-text'].textContent = 'Checking class Slack…';
+    slackCtx = await api.fetchSlack({ query: text, course, signal: bot.abort.signal });
+  }
+  const sysContent = () => buildSystemPrompt({ user: bot.user, prefs, course, slack: slackCtx, practice, slackEnabled: SLACK_ENABLED });
+
   let answer = '';
   try {
-    answer = await api.chat({ messages, model: prefs.model || DEFAULT_MODEL, signal: bot.abort.signal });
+    answer = await api.chat({ messages: [{ role: 'system', content: sysContent() }, ...history], model, signal: bot.abort.signal });
+
+    // The model can ask to look something up itself via a [[SLACK: query]] line.
+    if (SLACK_ENABLED && !practice) {
+      const m = answer.match(SLACK_REQUEST_RE);
+      if (m) {
+        bot.el['ocsb-status-text'].textContent = 'Searching class Slack…';
+        const more = await api.fetchSlack({ query: m[1].trim(), course, signal: bot.abort.signal });
+        slackCtx = dedupeSlack(slackCtx.concat(more));
+        answer = await api.chat({
+          messages: [
+            { role: 'system', content: sysContent() }, ...history,
+            { role: 'assistant', content: answer },
+            { role: 'user', content: 'Matching class Slack posts:\n' + (formatSlackContext(more) || '(none found)') + '\n\nNow answer my question directly and cite the channel. Do not output another [[SLACK:]] request.' },
+          ],
+          model, signal: bot.abort.signal,
+        });
+      }
+    }
   } catch (err) {
     typingNode.remove();
     finishGenerating();
     showError(err && err.message ? err.message : 'Something went wrong reaching the assistant.');
     return;
   }
+
+  // Confidentiality safety net + strip any leftover retrieval token before display.
+  answer = scrubOutput(answer.replace(/\[\[SLACK:[^\]\n]*\]\]/gi, '').trim());
 
   // 4) render with typewriter, then persist
   typingNode.remove();
@@ -632,6 +671,14 @@ function showError(msg) {
   bot.el['ocsb-error'].hidden = false;
 }
 function hideError() { bot.el['ocsb-error'].hidden = true; }
+function dedupeSlack(list) {
+  const seen = new Set(), out = [];
+  for (const m of (list || [])) {
+    const k = (m.channel || '') + (m.text || '');
+    if (!seen.has(k)) { seen.add(k); out.push(m); }
+  }
+  return out;
+}
 function escapeText(s) {
   const d = document.createElement('div');
   d.textContent = String(s == null ? '' : s);

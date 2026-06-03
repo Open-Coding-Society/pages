@@ -17,6 +17,7 @@ const POOL = [
   { icon: 'calendar', text: "Where's the course calendar?" },
   { icon: 'rocket', text: "What is 'Night at the Museum'?" },
   { icon: 'cap', text: 'Help me prep for the AP CSA exam' },
+  { icon: 'spark', text: 'Give me a practice FRQ for my course' },
   { icon: 'terminal', text: 'Open the Linux CTF challenges' },
 ];
 

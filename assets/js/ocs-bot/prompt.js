@@ -8,6 +8,10 @@
 // -----------------------------------------------------------------------------
 
 import { SITE, NAV_INDEX, COURSE_FACTS } from './knowledge.js';
+import { confidentialityPrompt } from './guardrails.js';
+import { capabilityPrompt, formatSlackContext } from './slack.js';
+import { practicePrompt } from './collegeboard.js';
+import { COURSE_LABEL } from './identity.js';
 
 function directory() {
   const byGroup = {};
@@ -26,12 +30,27 @@ const STYLE = {
   detailed: 'Give a thorough answer with steps, context, and examples when useful. Use headings/lists for structure.',
 };
 
-export function buildSystemPrompt({ user, prefs } = {}) {
+export function buildSystemPrompt({ user, prefs, course, slack, practice, slackEnabled } = {}) {
   const style = STYLE[prefs?.style] || STYLE.balanced;
 
   const userBlock = user
     ? `\nSIGNED-IN USER: ${user.name}${user.role ? ` (role: ${user.role})` : ''}. You may greet them by first name ("${user.firstName}") when natural. ${user.isTeacher || user.isAdmin ? 'This user is a teacher/admin — you can mention teacher tools and the dashboard.' : 'This is a student.'}`
     : `\nThe user is NOT signed in. If they want to save chats across sessions/devices, track progress, or submit work, suggest they sign in (navigate them to /login) — but only when relevant, never naggingly.`;
+
+  // Always-on: confidentiality + (when known) the student's course. Then either
+  // exam-practice mode, or the live-Slack capability (only when SLACK_ENABLED).
+  const courseLine = course
+    ? `\n\nThe signed-in student is enrolled in ${COURSE_LABEL[course] || course.toUpperCase()}. When a question is course-specific, prefer that course.`
+    : '';
+  let featureBlocks = `\n\n${confidentialityPrompt()}${courseLine}`;
+  if (practice && course) {
+    featureBlocks += `\n\n${practicePrompt(course)}`;
+  } else if (slackEnabled) {
+    featureBlocks += `\n\n${capabilityPrompt()}`;
+    if (slack && slack.length) {
+      featureBlocks += `\n\n${formatSlackContext(slack)}\n\nUse that context to answer and cite the channel (e.g. "per #announcements"). If it does not contain the answer, you may request more with [[SLACK: query]].`;
+    }
+  }
 
   return `You are the **OCS Assistant**, the friendly built-in helper on ${SITE.name}'s website (${SITE.url}). You appear on every page of the site.
 
@@ -60,5 +79,5 @@ STYLE: ${style}
 - Format with Markdown (short paragraphs, **bold**, bullet lists, and \`code\`/code blocks for code).
 - If you're unsure or the answer isn't about OCS, say so briefly and point to /search/ or /navigation/blogs/.
 - Never fabricate lesson names, deadlines, or grades. Stick to what's in this prompt; for specifics you don't know, suggest where on the site to look.
-${userBlock}`;
+${userBlock}${featureBlocks}`;
 }

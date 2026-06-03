@@ -31,6 +31,13 @@ export const WHOAMI_ENDPOINT = `${API_BASE}/api/id`;
 // Optional server-side chat history (graceful: silently unused if not deployed).
 export const CHAT_API_BASE = `${API_BASE}/api/chat`;
 
+// Live class-Slack context (course-aware). DORMANT by default: SLACK_ENABLED is
+// false until an OCS admin deploys /api/slack/csp + the Slack bot token, then turns
+// it on via `window.OCS_BOT_CONFIG = { slack: true }`. While off, the assistant
+// never mentions or calls Slack — every other feature works unchanged.
+export const SLACK_ENDPOINT = `${API_BASE}/api/slack/csp`;
+export const SLACK_ENABLED = overrides.slack === true;
+
 // Default + available models (kept in sync with the Flask groq_api).
 export const DEFAULT_MODEL = overrides.model || 'llama-3.3-70b-versatile';
 export const FAST_MODEL = 'llama-3.1-8b-instant';
