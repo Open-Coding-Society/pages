@@ -919,6 +919,59 @@ Check if this is a course lesson and determine which course context to use
     margin-bottom: 1rem;
   }
 
+  .post-header-actions {
+    margin-top: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .post-primary-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.78rem;
+    border: 1px solid #1d4ed8;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.83rem;
+    font-weight: 700;
+    line-height: 1.2;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .post-primary-link:hover,
+  .post-primary-link:focus-visible {
+    background: #1d4ed8;
+    border-color: #1e40af;
+    color: #ffffff;
+  }
+
+  .post-secondary-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .post-secondary-link:hover,
+  .post-secondary-link:focus-visible {
+    background: #eef2f7;
+    border-color: #9ca3af;
+    color: #1f2937;
+  }
+
   .post-header a.category-tags-link {
     margin-right: 0.3rem;
   }

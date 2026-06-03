@@ -2,9 +2,9 @@
 # All data sourced directly from _data/*_infograph.yml files.
 # Projects without a real tech array are omitted (no tooltip > wrong tooltip).
 
-"Slack Messaging Platform":
+"Assignment Resources Platform":
   - "Spring Boot 3.5 / Java 21"
-  - "Flask Socket.IO"
+  - "Jekyll + Static JS"
   - "Claude API (Anthropic)"
   - "Amazon S3 / Aurora"
   - "JWT Cookie Auth"

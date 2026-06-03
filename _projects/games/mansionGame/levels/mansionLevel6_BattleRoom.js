@@ -4,6 +4,61 @@ import Boss from './Boss.js';
 import showDeathScreen from './DeathScreen.js';
 import { createBossHealthBar, createPlayerHealthBar, updatePlayerHealthBar } from './HealthBars.js';
 import PowerUp from './PowerUp.js';
+import GameObject from '@assets/js/GameEnginev1.1/essentials/GameObject.js';
+
+class PowerUpSpawner extends GameObject {
+    constructor(data = null, gameEnv = null) {
+        super(gameEnv);
+        this.spawnIntervalMs = data?.spawnIntervalMs ?? 9000;
+        this.spawnDelayMs = data?.spawnDelayMs ?? 2500;
+        this.powerUpSize = data?.powerUpSize ?? 25;
+        this.spawnPadding = data?.spawnPadding ?? 40;
+        this.topPadding = data?.topPadding ?? 150;
+        this.powerTypes = data?.powerTypes || ['shield', 'charge', 'damageBoost', 'scythes', 'heal'];
+        this.maxActivePowerUps = data?.maxActivePowerUps ?? 3;
+        this.nextSpawnAt = Date.now() + this.spawnDelayMs;
+    }
+
+    update() {
+        if (!this.gameEnv || !this.gameEnv.gameObjects) return;
+        if (this.gameEnv.gameControl?.isPaused) return;
+        if (typeof window !== 'undefined' && window.__battleRoomFadeComplete === false) return;
+
+        const activePowerUpCount = this.gameEnv.gameObjects.filter(obj => obj?.constructor?.name === 'PowerUp').length;
+        if (activePowerUpCount >= this.maxActivePowerUps) return;
+
+        const now = Date.now();
+        if (now < this.nextSpawnAt) return;
+
+        const powerType = this.powerTypes[Math.floor(Math.random() * this.powerTypes.length)];
+        const powerUp = new PowerUp({
+            id: `PowerUp-${powerType}-${now}`,
+            powerType,
+            INIT_POSITION: this.getRandomPowerUpPosition(),
+            targetSize: this.powerUpSize
+        }, this.gameEnv);
+
+        this.gameEnv.gameObjects.push(powerUp);
+        this.nextSpawnAt = now + this.spawnIntervalMs;
+    }
+
+    getRandomPowerUpPosition() {
+        const width = this.gameEnv.innerWidth;
+        const height = this.gameEnv.innerHeight;
+        const maxX = Math.max(this.spawnPadding, width - this.spawnPadding - this.powerUpSize);
+        const maxY = Math.max(this.topPadding, height - this.spawnPadding - this.powerUpSize);
+        return {
+            x: this.spawnPadding + Math.random() * (maxX - this.spawnPadding),
+            y: this.topPadding + Math.random() * (maxY - this.topPadding)
+        };
+    }
+
+    draw() { }
+
+    resize() { }
+
+    destroy() { }
+}
 
 class MansionLevel6_BattleRoom {
     constructor(gameEnv) {
@@ -64,6 +119,9 @@ class MansionLevel6_BattleRoom {
             hitbox: { widthPercentage: 0.4, heightPercentage: 0 },
             zIndex: 10,
             isKilling: false, // Flag to prevent multiple kills
+
+            // Explicitly disable the reaction function
+            reaction: function () { },
 
             // The update method with all functionality inline
             update: function () {
@@ -175,34 +233,16 @@ class MansionLevel6_BattleRoom {
             }
         };
 
-        const powerUps = [
-            {
-                id: 'PowerUp-Shield',
-                powerType: 'shield',
-                INIT_POSITION: { x: width * 0.25, y: height * 0.52 }
-            },
-            {
-                id: 'PowerUp-Charge',
-                powerType: 'charge',
-                INIT_POSITION: { x: width * 0.62, y: height * 0.52 }
-            },
-            {
-                id: 'PowerUp-DamageBoost',
-                powerType: 'damageBoost',
-                INIT_POSITION: { x: width * 0.25, y: height * 0.76 }
-            },
-            {
-                id: 'PowerUp-Scythes',
-                powerType: 'scythes',
-                INIT_POSITION: { x: width * 0.62, y: height * 0.76 }
-            }
-        ];
+        const powerUpSize = 25;
+        const spawnPadding = 40;
+        const topPadding = 150;
+        const maxActivePowerUps = 3;
 
         this.classes = [
             { class: GameEnvBackground, data: image_data_floor },
             { class: FightingPlayer, data: sprite_data_mc },
             { class: Boss, data: sprite_data_enemy },
-            ...powerUps.map(data => ({ class: PowerUp, data }))
+            { class: PowerUpSpawner, data: { powerUpSize, spawnPadding, topPadding, maxActivePowerUps } }
         ];
 
         // Create health bar when battle room loads
@@ -212,7 +252,7 @@ class MansionLevel6_BattleRoom {
             updatePlayerHealthBar(100);
         }
 
-        // Create instructions under the boss bar (fade after 15 seconds)
+        // Create instructions under the boss bar (persistent)
         const instruction = document.createElement('div');
         instruction.id = 'instructions-container';
         instruction.textContent = 'WASD to move, J to shoot, K to throw pumpkin, L for shockwave, touch power ups to collect';
@@ -222,7 +262,6 @@ class MansionLevel6_BattleRoom {
             fontSize: '16px',
             textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
             opacity: '1',
-            transition: 'opacity 1.2s ease',
             marginTop: '6px',
             whiteSpace: 'nowrap'
         });
@@ -235,10 +274,7 @@ class MansionLevel6_BattleRoom {
             gameContainer.appendChild(instruction);
         }
 
-        setTimeout(() => {
-            instruction.style.opacity = '0';
-            setTimeout(() => instruction.remove(), 1400);
-        }, 15000);
+        instruction.style.opacity = '1';
     }
 }
 

@@ -397,10 +397,247 @@
     padding: 20px 24px;
     margin-top: 2.5rem;
     font-size: 0.82rem;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
   }
 
   .fopl-ig-footer a { color: rgba(255,255,255,0.9) !important; text-decoration: underline; }
   .fopl-ig-footer a:hover { color: #fff !important; }
+
+  /* ── Shared panel wrapper ─────────────────────────────────── */
+  .fopl-panel-wrap {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    font-family: 'Lato', sans-serif;
+  }
+  .fopl-panel-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 3rem;
+  }
+
+  /* ── Section heading ─────────────────────────────────────── */
+  .fopl-section-heading {
+    font-family: 'Cabin', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 2.5rem 0 1rem;
+    padding: 2px 0 2px 14px;
+    border: none;
+    border-left: 4px solid #1a7a2e;
+  }
+
+  /* ── Cards ───────────────────────────────────────────────── */
+  .fopl-card {
+    background: #1e2a1e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-top: 4px solid #1a7a2e;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    padding: 20px 24px;
+    margin-bottom: 1rem;
+  }
+  .fopl-card-gold {
+    border-top-color: #c8a030;
+  }
+
+  /* ── Survey row ──────────────────────────────────────────── */
+  .fopl-survey-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .fopl-rating-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #243424;
+    border: 1px solid rgba(26,122,46,0.35);
+    border-radius: 6px;
+    padding: 10px 16px;
+    flex: 1;
+    min-width: 220px;
+  }
+  .fopl-rating-score {
+    font-family: 'Cabin', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #5dde7a !important;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .fopl-rating-label {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text) !important;
+    opacity: 0.85;
+  }
+  .fopl-rating-count {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    margin-bottom: 2px;
+  }
+
+  /* ── Sub-label ───────────────────────────────────────────── */
+  .fopl-sub-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text) !important;
+    opacity: 0.5;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 3px;
+    margin: 0 0 10px;
+  }
+
+  /* ── Pill list (favorite features) ──────────────────────── */
+  .fopl-pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin: 0 0 4px;
+    padding: 0;
+    list-style: none;
+  }
+  .fopl-pill {
+    padding: 4px 12px;
+    background: rgba(26,122,46,0.18);
+    border: 1px solid rgba(26,122,46,0.45);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text) !important;
+  }
+
+  /* ── Suggestion cards ────────────────────────────────────── */
+  .fopl-suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 640px) { .fopl-suggestions-grid { grid-template-columns: 1fr; } }
+
+  .fopl-suggestion-card {
+    background: #1e2e1e;
+    border: 1px solid rgba(200,160,48,0.25);
+    border-left: 4px solid #c8a030;
+    border-radius: 5px;
+    padding: 12px 14px;
+  }
+  .fopl-suggestion-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #c8a030 !important;
+    margin: 0 0 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .fopl-suggestion-desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text) !important;
+    opacity: 0.82;
+    margin: 0;
+  }
+
+  /* ── Future students section ─────────────────────────────── */
+  .fopl-future-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (max-width: 700px) { .fopl-future-grid { grid-template-columns: 1fr; } }
+
+  .fopl-future-card {
+    background: #1e2a1e;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-top: 3px solid #1a7a2e;
+    border-radius: 5px;
+    padding: 14px 16px;
+  }
+  .fopl-future-card-title {
+    font-family: 'Cabin', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 8px;
+  }
+  .fopl-future-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .fopl-future-list li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text) !important;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    opacity: 0.88;
+  }
+  .fopl-future-list li:last-child { border-bottom: none; }
+  .fopl-future-dot {
+    flex-shrink: 0;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #5dde7a;
+    margin-top: 6px;
+  }
+  .fopl-future-dot-gold {
+    background: #c8a030;
+  }
+
+  .fopl-link-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .fopl-link-btn {
+    display: inline-block;
+    padding: 7px 14px;
+    background: #023b0f;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text) !important;
+    text-decoration: none;
+    transition: background 0.18s;
+  }
+  .fopl-link-btn:hover { background: #0d5c1e; }
+
+  .fopl-note-box {
+    background: rgba(200,160,48,0.07);
+    border: 1px solid rgba(200,160,48,0.3);
+    border-left: 4px solid #c8a030;
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--text) !important;
+    opacity: 0.88;
+    margin-top: 10px;
+  }
 </style>
 
 {% for topic in data.Topics %}
@@ -522,6 +759,11 @@
         <p class="fopl-ig-feature-desc">Find hours, location, and ways to get involved all in one place.</p>
       </a>
 
+      <a href="https://fopl.opencodingsociety.com/catalog" target="_blank" rel="noopener" class="fopl-ig-feature-card">
+        <h3 class="fopl-ig-feature-title">Book Scan: Add to Catalog</h3>
+        <p class="fopl-ig-feature-desc">Scan a barcode to instantly add a book — title, author, and cover pulled automatically via ISBN lookup.</p>
+      </a>
+
     </div>
 
     <!-- Planned Features -->
@@ -533,12 +775,6 @@
         <span class="fopl-ig-planned-badge">Coming Soon</span>
         <h3 class="fopl-ig-feature-title">Donation Flow</h3>
         <p class="fopl-ig-feature-desc">Choose a preset amount and donate directly from the site, no redirects or third-party forms.</p>
-      </div>
-
-      <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
-        <span class="fopl-ig-planned-badge">Coming Soon</span>
-        <h3 class="fopl-ig-feature-title">Book Scan: Add to Catalog</h3>
-        <p class="fopl-ig-feature-desc">Scan a barcode to instantly add a book. Title, author, and cover pulled automatically.</p>
       </div>
 
       <div class="fopl-ig-feature-card" style="border-left:4px solid #c8a030;">
@@ -563,15 +799,150 @@
 
   </div>
 
-  <!-- Footer -->
-  <div class="fopl-ig-footer">
-    <strong>Boolean-Boyz · Friends of the Poway Library Capstone</strong><br>
-    <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener">Frontend</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener">Backend</a>
-    &nbsp;·&nbsp;
-    13137 Poway Rd, Poway CA 92064
-  </div>
 
 </div>
 {% endfor %}
+
+<!-- ════════════════════════════════════════════════════════════
+     PRESENTATION FEEDBACK
+     ═══════════════════════════════════════════════════════════ -->
+<div class="fopl-panel-wrap">
+  <div class="fopl-panel-inner">
+
+    <h2 class="fopl-section-heading">Stakeholder Presentation Feedback</h2>
+    <p style="font-size:0.85rem; color:var(--text); opacity:0.75; margin:0 0 1.2rem; font-family:'Lato',sans-serif;">
+      Collected from FOPL representatives and community members at our capstone presentation.
+    </p>
+
+    <!-- Survey results -->
+    <div class="fopl-card">
+      <div class="fopl-sub-label">Post-Presentation Survey &mdash; 3 Respondents &middot; Rated out of 5</div>
+      <div class="fopl-survey-row">
+        <div class="fopl-rating-chip">
+          <div class="fopl-rating-score">5</div>
+          <div class="fopl-rating-label">
+            <span class="fopl-rating-count">1 respondent</span>
+            "Amazing, and really worth attending."
+          </div>
+        </div>
+        <div class="fopl-rating-chip">
+          <div class="fopl-rating-score" style="color:#c8a030 !important;">4</div>
+          <div class="fopl-rating-label">
+            <span class="fopl-rating-count">2 respondents</span>
+            "Very interesting, and a great experience."
+          </div>
+        </div>
+      </div>
+
+      <div class="fopl-sub-label">Favorite Features (from responses)</div>
+      <ul class="fopl-ig-keypoints">
+        <li><span class="fopl-ig-check">✓</span><span>Flip tiles → linked pages</span></li>
+        <li><span class="fopl-ig-check">✓</span><span>Volunteer application system</span></li>
+        <li><span class="fopl-ig-check">✓</span><span>Gamification Hub</span></li>
+        <li><span class="fopl-ig-check">✓</span><span>Used book catalog</span></li>
+      </ul>
+    </div>
+
+    <!-- Stakeholder suggestions -->
+    <div class="fopl-sub-label" style="margin-top:1.2rem;">Suggestions &amp; Requests from Stakeholders</div>
+    <div class="fopl-suggestions-grid">
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">DVD Catalog Support</p>
+        <p class="fopl-suggestion-desc">Extend the catalog to include DVDs using UPC codes as the identifier, similar to ISBN for books.</p>
+      </div>
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">Social Media Integration</p>
+        <p class="fopl-suggestion-desc">Pull Instagram posts automatically so visitors see the latest announcements without manual duplication.</p>
+      </div>
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">Email Notifications for Admin Applications</p>
+        <p class="fopl-suggestion-desc">Send an email when a volunteer application is submitted, rather than requiring a site login to check.</p>
+      </div>
+
+      <div class="fopl-suggestion-card">
+        <p class="fopl-suggestion-title">Games as a Gateway to Reading</p>
+        <p class="fopl-suggestion-desc">Expand the gamification hub — stakeholders want more games to build curiosity before presenting books.</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     FOR FUTURE STUDENTS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="fopl-panel-wrap">
+  <div class="fopl-panel-inner">
+
+    <h2 class="fopl-section-heading" style="border-left-color:#c8a030;">Future Students</h2>
+    <p style="font-size:0.85rem; color:var(--text); opacity:0.75; margin:0 0 1.2rem; font-family:'Lato',sans-serif;">
+      Built by Boolean-Boyz (2025–2026). Here’s what the next team needs to pick it up and keep building.
+    </p>
+
+    <div class="fopl-future-grid">
+
+      <!-- Getting started -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">Getting Started</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot"></span>Clone <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener" style="color:#5dde7a;">bb-pages</a> (frontend) and <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener" style="color:#5dde7a;">bb-flask</a> (backend)</li>
+          <li><span class="fopl-future-dot"></span>Frontend: <code style="font-size:0.75rem;">bundle exec jekyll serve</code> &mdash; requires Ruby + Bundler</li>
+          <li><span class="fopl-future-dot"></span>Backend: <code style="font-size:0.75rem;">python main.py</code> locally &mdash; deployed on AWS EC2 via Docker Compose with Nginx as a reverse proxy</li>
+        </ul>
+        <div class="fopl-link-row">
+          <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener" class="fopl-link-btn">Frontend</a>
+          <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener" class="fopl-link-btn">Backend</a>
+          <a href="https://github.com/orgs/Boolean-Boyz/repositories" target="_blank" rel="noopener" class="fopl-link-btn">All Repos</a>
+        </div>
+      </div>
+
+      <!-- Site audit -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">How We Found Features to Build</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot"></span>Start by going through the live FOPL site page by page — note anything missing, confusing, or incomplete compared to what a real library site should offer</li>
+          <li><span class="fopl-future-dot"></span>Compare their original site to ours and identify gaps that still exist — that’s your backlog</li>
+        </ul>
+      </div>
+
+      <!-- Iterate with teacher -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">Iterate with Your Teacher</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Don’t build for weeks in isolation — show your teacher progress every sprint and adjust direction early</li>
+          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Use live reviews to validate that what you’re building actually solves the stakeholder’s problem, not just what sounded good in planning</li>
+          <li><span class="fopl-future-dot fopl-future-dot-gold"></span>Treat teacher feedback the same as stakeholder feedback — it’s the fastest way to catch scope creep before it costs you a sprint</li>
+        </ul>
+      </div>
+
+      <!-- Stakeholder re-engagement -->
+      <div class="fopl-future-card">
+        <p class="fopl-future-card-title">Re-engaging with FOPL</p>
+        <ul class="fopl-future-list">
+          <li><span class="fopl-future-dot"></span>Find FOPL contacts directly through their website or by visiting the library at 13137 Poway Rd, Poway CA 92064</li>
+          <li><span class="fopl-future-dot"></span>Reference the 2025–2026 Boolean-Boyz project — they know it and have opinions on what to build next</li>
+          <li><span class="fopl-future-dot"></span>Top requests: DVD catalog, Instagram feed, email alerts for admin applications</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="fopl-note-box">
+      <strong>Where to focus first:</strong> Walk through the live site, identify what’s still rough, and bring a prioritized list to your teacher at the start of sprint 1. The stakeholder top requests (games, email alerts, DVD catalog) are good starting points — but what you find in a real site audit may surface something more impactful.
+    </div>
+
+  </div>
+</div>
+
+<div class="fopl-ig-footer">
+  <strong>Boolean-Boyz · Friends of the Poway Library Capstone</strong><br>
+  <a href="https://github.com/Boolean-Boyz/bb-pages" target="_blank" rel="noopener">Frontend</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Boolean-Boyz/bb-flask" target="_blank" rel="noopener">Backend</a>
+  &nbsp;·&nbsp;
+  13137 Poway Rd, Poway CA 92064
+</div>

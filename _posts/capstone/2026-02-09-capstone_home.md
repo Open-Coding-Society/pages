@@ -77,18 +77,24 @@ sticky_rank: 1
 </style>
 
 <div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
-  <div class="flex flex-wrap gap-2">
-    <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
-    <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
-    <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
-    <a href="{% post_url 2026-04-13-capstone_home_documentation %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
-      <span class="mr-2">📄</span>Documentation
-    </a>
-  </div>
-  <div class="flex flex-col items-start sm:items-end">
-    <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="w-full min-w-[240px] rounded-lg border border-gray-300 bg-white/90 px-4 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-    <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
-  </div>
+ <div class="flex flex-wrap gap-2">
+   <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
+   <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
+   <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
+   <a href="{% post_url 2026-06-01-README-capstone %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
+     <span class="mr-2">📄</span>README
+   </a>
+   <a href="/capstone/games/" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-indigo-500 rounded text-sm text-white hover:bg-indigo-500 font-semibold" title="Browse all OCS Games">
+     <span class="mr-2">🎮</span>Games Directory
+   </a>
+   <select id="year-select" class="ml-4 px-2 py-1 rounded border border-gray-300 bg-white text-sm">
+     <option value="2025-2026" selected>2025/2026</option>
+   </select>
+ </div>
+ <div class="flex flex-col items-start sm:items-end">
+   <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="w-full min-w-[240px] rounded-lg border border-gray-300 bg-white/90 px-4 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+   <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
+ </div>
 </div>
 
 
@@ -142,11 +148,6 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/hunger-heroes/",
       frontendUrl: "https://github.com/Ahaanv19/hunger_heroes",
       backendUrl: "https://github.com/Ahaanv19/hunger_heroes_backend"
-    },
-    "College Bound": {
-      pageUrl: "https://pages.opencodingsociety.com/capstone/college-bound/",
-      frontendUrl: "https://github.com/collegeboundacademy/college-bound",
-      backendUrl: "https://github.com/collegeboundacademy/college-bound-backend"
     },
     "Educators": {
       pageUrl: "https://pages.opencodingsociety.com/capstone/educators/",
@@ -305,17 +306,30 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
-   <!-- Slack Messaging Platform -->
+   <!-- Big Six & Code Hub -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">
-           <img src="/images/capstone/database_defenders.png" alt="Slack Messaging Platform - Real-Time Collaborative Chat" class="w-28 h-28 object-cover rounded" />
+       <a href="{% post_url capstone/2026-03-04-big6-capstone %}">
+           <img src="/images/capstone/backend.png" alt="Big Six & Code Hub — Interactive CS Learning Modules" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">Slack Messaging Platform</a></h3>
-           <p class="text-sm text-gray-700">A full-stack Slack-style messaging platform with real-time channels, message threading, AI-powered task extraction, and admin moderation — deployed to messaging.opencodingsociety.com.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Anvay Vahia, Mihir Bapat, Yash Parikh</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-03-04-big6-capstone %}">Big Six & Code Hub</a></h3>
+           <p class="text-sm text-gray-700">The Big Six is a suite of six interactive CS lessons (Frontend, Backend, Data Visualization, Resume, AI, Analytics). Code Hub is the RPG game level where students walk up to three robot terminals — each teaching a core discipline — with a Space Invaders quiz gating progression to the next terminal.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Alex, Travis</p>
        </div>
    </div>
+
+
+   <!-- Assignment Resources Platform -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">
+         <img src="/images/capstone/database_defenders.png" alt="Assignment Resources Platform - Assignment-scoped File & URL Resources" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">Assignment Resources Platform</a></h3>
+         <p class="text-sm text-gray-700">A full-stack assignment resource platform with assignment-scoped URL/file uploads, uploader metadata, auditing, and secure download links — integrated with spring-tracking assignment APIs.</p>
+         <p class="text-xs text-gray-500 mt-2">Team: Anvay Vahia, Mihir Bapat, Yash Parikh</p>
+       </div>
+     </div>
 
 
    <!-- Educators Capstone -->
@@ -408,18 +422,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
 
-   <!-- AutoTriage Pages -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-08-autotriage-capstone %}">
-           <img src="/images/capstone/autotriage_logo.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-08-autotriage-capstone %}">AutoTriage</a></h3>
-           <p class="text-sm text-gray-700">A GitHub-native dev companion that builds issues for you, keeps your team aligned, and gives teachers a 30-second pulse on every group — without feeling like surveillance.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Neil, Nikhil, Shriya</p>
-       </div>
-   </div>
- <!-- Oasis Capstone -->
+  <!-- Oasis Capstone -->
   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
       <a href="{% post_url 2026-03-04-oasis-community-capstone %}">
           <img src="/images/capstone/oasis-logo.png" alt="Oasis Capstone" class="w-28 h-28 object-cover rounded" />
@@ -495,18 +498,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- College Bound Capstone -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url 2026-02-06-college-bound-capstone %}">
-           <img src="/images/capstone/college_bound.jpeg" alt="College Bound Capstone" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-college-bound-capstone %}">College Bound</a></h3>
-           <p class="text-sm text-gray-700">A website designed to provide a comprehensive guide to helping students prepare for college and effectively go through high school in preparation for the next stage of their educational career.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Xavier, Aranya, Trevor</p>
-       </div>
-   </div>
-
    <!-- HawkHub -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url 2026-02-06-hawkhub %}">
@@ -530,7 +521,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: William Windle, Ethan Wong, Nicolas Diaz</p>
        </div>
    </div>
-
+                                    
    <!-- ACS Cancer Infograph (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
        <a href="{% post_url 2026-03-05-acs-cancer-infograph %}">

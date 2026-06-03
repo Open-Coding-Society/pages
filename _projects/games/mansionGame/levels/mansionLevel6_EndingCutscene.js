@@ -217,6 +217,22 @@ class MansionLevel6_EndingCutscene {
             pointerEvents: 'none'
         });
 
+        const spookImage = document.createElement('img');
+        spookImage.id = 'mansion-spook-hero';
+        spookImage.src = assetBase + '/images/projects/mansionGame/spookWalking.gif';
+        spookImage.alt = 'Spook walking';
+        Object.assign(spookImage.style, {
+            position: 'fixed',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -180%)',
+            width: '400px',
+            height: '400px',
+            opacity: '0',
+            zIndex: '10002',
+            pointerEvents: 'none'
+        });
+
         const playAgainButton = document.createElement('button');
         playAgainButton.id = 'mansion-play-again';
         playAgainButton.type = 'button';
@@ -237,7 +253,11 @@ class MansionLevel6_EndingCutscene {
             cursor: 'pointer',
             opacity: '0',
             transition: 'opacity 2000ms ease',
-            zIndex: '10003'
+            zIndex: '10003',
+
+            // Wobble Effect
+            animation: 'mansion-button-wobble 2.5s ease-in-out infinite',
+            animationDelay: '2s'
         });
 
         playAgainButton.addEventListener('click', () => {
@@ -255,6 +275,21 @@ class MansionLevel6_EndingCutscene {
                     from { transform: translate(-50%, 120%); }
                     to { transform: translate(-50%, -220%); }
                 }
+
+                @keyframes mansion-spook-drop {
+                    from { transform: translate(-50%, -180%); opacity: 0; }
+                    to { transform: translate(-50%, -50%); opacity: 1; }
+                }
+
+                @keyframes mansion-button-wobble {
+                    0%   { transform: translateX(-50%) rotate(0deg) scale(1); }
+                    15%  { transform: translateX(-50%) rotate(-2deg) scale(1.02); }
+                    30%  { transform: translateX(-50%) rotate(2deg) scale(1.02); }
+                    45%  { transform: translateX(-50%) rotate(-1.5deg) scale(1.01); }
+                    60%  { transform: translateX(-50%) rotate(1.5deg) scale(1.01); }
+                    75%  { transform: translateX(-50%) rotate(-1deg) scale(1); }
+                    100% { transform: translateX(-50%) rotate(0deg) scale(1); }
+                }
             `;
             document.head.appendChild(style);
         }
@@ -262,12 +297,13 @@ class MansionLevel6_EndingCutscene {
         document.body.appendChild(overlay);
         document.body.appendChild(credits);
         document.body.appendChild(reaperImage);
+        document.body.appendChild(spookImage);
         document.body.appendChild(playAgainButton);
 
         requestAnimationFrame(() => {
             overlay.style.opacity = '1';
             credits.style.animation = 'mansion-credits-roll 24s linear forwards';
-            this._creditsMusic.play().catch(() => {});
+            this._creditsMusic.play().catch(() => { });
         });
 
         const creditsDurationMs = 24000;
@@ -281,7 +317,7 @@ class MansionLevel6_EndingCutscene {
             }
 
             this._lightningSfx.currentTime = 0;
-            this._lightningSfx.play().catch(() => {});
+            this._lightningSfx.play().catch(() => { });
 
             const reaperDelayMs = 200;
             const flashDurationMs = 200;
@@ -296,13 +332,17 @@ class MansionLevel6_EndingCutscene {
                 overlay.style.backgroundColor = '#000';
                 overlay.style.pointerEvents = 'auto';
                 fadeAudio(this._creditsMusic, 0.7, 2000);
+                const spookDropDelayMs = 500;
+                setTimeout(() => {
+                    spookImage.style.animation = 'mansion-spook-drop 900ms ease-out forwards';
+                }, spookDropDelayMs);
                 setTimeout(() => {
                     playAgainButton.style.opacity = '1';
                 }, 2000);
             }, reaperDelayMs + flashDurationMs);
         };
 
-        const lightningLeadMs = 10000;
+        const lightningLeadMs = 6000;
         setTimeout(startLightningSequence, Math.max(0, creditsDurationMs - lightningLeadMs));
     }
 }

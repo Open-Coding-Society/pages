@@ -22,6 +22,7 @@ class PlayerScythe extends Character {
         this.speed = options.speed || 0.08;
         this.expiresAt = Date.now() + (options.durationMs || 12000);
         this.revComplete = false;
+        this._lastBossHitAt = 0;
         this.setSprite((gameEnv?.path || '') + '/images/projects/mansionGame/scythe.png');
     }
 
@@ -64,6 +65,8 @@ class PlayerScythe extends Character {
         this.position.y = ownerCenterY + Math.sin(this.angle) * this.radius - this.height / 2;
 
         this.killTouchedZombies();
+        this.damageBoss();
+        this.destroyEnemyProjectiles();
         this.draw();
     }
 
@@ -113,6 +116,94 @@ class PlayerScythe extends Character {
                 }
             }
         });
+    }
+
+    damageBoss() {
+        const hitCooldownMs = 500;
+        const now = Date.now();
+        if (now - this._lastBossHitAt < hitCooldownMs) return;
+
+        const boss = this.gameEnv.gameObjects.find(obj => obj?.constructor?.name === 'Boss');
+        if (!boss) return;
+
+        const hitDistance = 70;
+        const scytheCenterX = this.position.x + this.width / 2;
+        const scytheCenterY = this.position.y + this.height / 2;
+        const bossCenterX = boss.position.x + boss.width / 2;
+        const bossCenterY = boss.position.y + boss.height / 2;
+        const dx = bossCenterX - scytheCenterX;
+        const dy = bossCenterY - scytheCenterY;
+        if (Math.sqrt(dx * dx + dy * dy) > hitDistance) return;
+
+        const baseDamage = 20;
+        const damageMultiplier = this.owner && typeof this.owner.getDamageMultiplier === 'function'
+            ? this.owner.getDamageMultiplier()
+            : 1;
+        const damage = Math.round(baseDamage * damageMultiplier);
+
+        boss.healthPoints -= damage;
+        this._lastBossHitAt = now;
+    }
+
+    destroyEnemyProjectiles() {
+        const killDistance = 48;
+        const scytheCenterX = this.position.x + this.width / 2;
+        const scytheCenterY = this.position.y + this.height / 2;
+
+        const projectiles = this.gameEnv.gameObjects.filter(obj => {
+            const name = obj?.constructor?.name;
+            if (name === 'Boomerang') return true;
+            if (name === 'Projectile') {
+                return obj?.type !== 'PLAYER' && obj?.type !== 'PUMPKIN';
+            }
+            return false;
+        });
+
+        projectiles.forEach(projectile => {
+            const projCenterX = projectile.position.x + projectile.width / 2;
+            const projCenterY = projectile.position.y + projectile.height / 2;
+            const dx = projCenterX - scytheCenterX;
+            const dy = projCenterY - scytheCenterY;
+            if (Math.sqrt(dx * dx + dy * dy) <= killDistance) {
+                projectile.revComplete = true;
+                if (typeof projectile.destroy === 'function') {
+                    projectile.destroy();
+                }
+            }
+        });
+
+        const boss = this.gameEnv.gameObjects.find(obj => obj?.constructor?.name === 'Boss');
+        if (!boss) return;
+
+        const bossProjectiles = [
+            ...(Array.isArray(boss.fireballs) ? boss.fireballs : []),
+            ...(Array.isArray(boss.arrows) ? boss.arrows : []),
+            ...(Array.isArray(boss.scythes) ? boss.scythes : [])
+        ];
+
+        bossProjectiles.forEach(projectile => {
+            if (!projectile) return;
+            const projCenterX = projectile.position.x + projectile.width / 2;
+            const projCenterY = projectile.position.y + projectile.height / 2;
+            const dx = projCenterX - scytheCenterX;
+            const dy = projCenterY - scytheCenterY;
+            if (Math.sqrt(dx * dx + dy * dy) <= killDistance) {
+                projectile.revComplete = true;
+                if (typeof projectile.destroy === 'function') {
+                    projectile.destroy();
+                }
+            }
+        });
+
+        if (Array.isArray(boss.fireballs)) {
+            boss.fireballs = boss.fireballs.filter(p => !p?.revComplete);
+        }
+        if (Array.isArray(boss.arrows)) {
+            boss.arrows = boss.arrows.filter(p => !p?.revComplete);
+        }
+        if (Array.isArray(boss.scythes)) {
+            boss.scythes = boss.scythes.filter(p => !p?.revComplete);
+        }
     }
 }
 

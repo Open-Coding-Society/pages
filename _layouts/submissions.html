@@ -99,10 +99,6 @@ active_tab: submissions
                     <span class="edit-field-label">Submission type</span>
                     <div id="edit-submission-type" class="edit-field-value"></div>
                 </div>
-                <label class="edit-checkbox-row">
-                    <input type="checkbox" id="edit-is-late">
-                    <span>Mark as late</span>
-                </label>
             </div>
 
             <div id="edit-link-fields" class="edit-section">
@@ -127,6 +123,11 @@ active_tab: submissions
             </div>
 
                 <div id="edit-admin-fields" class="edit-section hidden">
+                    <label class="edit-checkbox-row">
+                        <input type="checkbox" id="edit-is-late">
+                        <span>Mark as late</span>
+                    </label>
+
                     <label class="edit-field-label" for="edit-grade">Grade</label>
                     <input type="number" id="edit-grade" class="edit-input" min="0" max="100" step="0.5" placeholder="0–100">
 
@@ -591,11 +592,32 @@ active_tab: submissions
             const fileName = content.filename || content.storedFilename || 'File submission';
             const notes = content.notes ? `<div style="color:#9ca3af;margin-top:6px;">${escapeHtml(content.notes)}</div>` : '';
             const extra = content.contentType ? `<div style="color:#6b7280;margin-top:4px;">${escapeHtml(content.contentType)} · ${escapeHtml(String(content.size || ''))}</div>` : '';
-            return `<div><strong>${escapeHtml(fileName)}</strong>${extra}${notes}</div>`;
+            const downloadUrl = getSubmissionFileDownloadUrl(content);
+            const downloadLink = downloadUrl
+                ? `<div style="margin-top:8px;"><a href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;font-weight:600;">Download file</a></div>`
+                : '';
+            return `<div><strong>${escapeHtml(fileName)}</strong>${extra}${notes}${downloadLink}</div>`;
         }
         if (content.type === 'link' || content.url) return `<a href="${escapeHtml(content.url)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;">${escapeHtml(content.url)}</a>`;
         if (content.text) return escapeHtml(content.text);
         return escapeHtml(JSON.stringify(content));
+    }
+
+    function getSubmissionFileDownloadUrl(content) {
+        if (!content || !content.storagePath) {
+            return '';
+        }
+
+        const storagePath = String(content.storagePath);
+        const slashIndex = storagePath.indexOf('/');
+        if (slashIndex <= 0 || slashIndex >= storagePath.length - 1) {
+            return '';
+        }
+
+        const uid = storagePath.slice(0, slashIndex);
+        const filename = storagePath.slice(slashIndex + 1);
+        const params = new URLSearchParams({ uid, filename });
+        return `${javaURI}/api/files/download?${params.toString()}`;
     }
 
     function getSubmissionContentType(submission) {
@@ -728,7 +750,6 @@ active_tab: submissions
         const url = document.getElementById('edit-url').value.trim();
         const notes = document.getElementById('edit-notes').value.trim();
         const comment = document.getElementById('edit-comment').value.trim();
-        const isLate = document.getElementById('edit-is-late').checked;
         const fileInput = document.getElementById('edit-file');
         const submitButton = document.querySelector('#submission-edit-form .edit-primary-btn');
 
@@ -736,7 +757,10 @@ active_tab: submissions
         formData.append('contentType', contentType);
         formData.append('notes', notes);
         formData.append('comment', comment);
-        formData.append('isLate', isLate ? 'true' : 'false');
+        if (isAdmin) {
+            const isLate = document.getElementById('edit-is-late').checked;
+            formData.append('isLate', isLate ? 'true' : 'false');
+        }
 
         if (contentType === 'link') {
             if (!url) {
@@ -948,8 +972,9 @@ active_tab: submissions
                                                     onclick="saveGrade(${idx}, ${submission.id})"
                                                     style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
                                                 >Save Grade</button>
-                                                <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>
+                                                <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>                                                <button type="button" class="submission-action-btn" style="border-color:rgb(220,38,38);background:rgba(185,28,28,0.18);color:rgb(254,202,202);" onclick="deleteSubmission(${submission.id}, ${idx})">Delete</button>
                                                 <span id="grade-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
+                                                <span id="delete-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
                                             </div>
                                         </td>
                                     </tr>
@@ -972,6 +997,10 @@ active_tab: submissions
     }
 
     window.saveGrade = async function(idx, submissionId) {
+        if (!isAdmin) {
+            return;
+        }
+
         const input = document.getElementById(`grade-input-${idx}`);
         const status = document.getElementById(`grade-status-${idx}`);
         const feedbackInput = document.getElementById(`feedback-input-${idx}`);
@@ -1011,6 +1040,50 @@ active_tab: submissions
         } catch (e) {
             status.textContent = '✗ Network error';
             status.style.color = '#f87171';
+        }
+    };
+
+    window.deleteSubmission = async function(submissionId, idx) {
+        if (!isAdmin) {
+            return;
+        }
+
+        const confirmed = window.confirm('Delete this submission? This cannot be undone.');
+        if (!confirmed) {
+            return;
+        }
+
+        const status = document.getElementById(`delete-status-${idx}`);
+        if (status) {
+            status.textContent = 'Deleting…';
+            status.style.color = '#9ca3af';
+        }
+
+        try {
+            const resp = await fetch(`${javaURI}/api/submissions/${encodeURIComponent(submissionId)}`, {
+                ...fetchOptions,
+                method: 'DELETE'
+            });
+
+            if (resp.ok) {
+                if (status) {
+                    status.textContent = 'Deleted';
+                    status.style.color = '#34d399';
+                }
+                await loadSubmissions();
+            } else {
+                const err = await resp.json().catch(() => ({}));
+                const message = err.error || err.message || `HTTP ${resp.status}`;
+                if (status) {
+                    status.textContent = `✗ ${message}`;
+                    status.style.color = '#f87171';
+                }
+            }
+        } catch (error) {
+            if (status) {
+                status.textContent = '✗ Network error';
+                status.style.color = '#f87171';
+            }
         }
     };
 
@@ -1147,7 +1220,9 @@ active_tab: submissions
                                         style="padding:4px 10px;border-radius:4px;background:#2563eb;color:#fff;font-size:0.8rem;border:none;cursor:pointer;"
                                     >Save Grade</button>
                                     <button type="button" class="submission-action-btn" onclick="openEditModal(${submission.id})">Edit</button>
+                                    <button type="button" class="submission-action-btn" style="border-color:rgb(220,38,38);background:rgba(185,28,28,0.18);color:rgb(254,202,202);" onclick="deleteSubmission(${submission.id}, ${idx})">Delete</button>
                                     <span id="grade-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
+                                    <span id="delete-status-${idx}" style="font-size:0.75rem;color:#6b7280;"></span>
                                 </div>
                             </td>
                         </tr>
