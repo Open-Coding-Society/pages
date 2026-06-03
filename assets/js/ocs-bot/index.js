@@ -79,6 +79,7 @@ function boot() {
 
   wireEvents();
   applyPrefs();
+  positionLauncher();
   renderSuggestions();
   ensureActiveConversation();
   renderRail();
@@ -89,6 +90,9 @@ function boot() {
 
   // Gently auto-open on first visit (respects the user's settings).
   maybeAutoOpen();
+
+  // Re-check launcher placement after layout/fonts settle.
+  setTimeout(positionLauncher, 500);
 }
 
 // ─── User / scope ────────────────────────────────────────────────────────
@@ -148,6 +152,10 @@ function wireEvents() {
   // Delegated clicks: suggestions, nav chips, copy buttons, convo items, followups
   document.addEventListener('click', delegatedClick);
 
+  // Re-stack the launcher above other fixed corner buttons when the page resizes.
+  let _rzTimer;
+  window.addEventListener('resize', () => { clearTimeout(_rzTimer); _rzTimer = setTimeout(positionLauncher, 150); });
+
   // Esc closes; Cmd/Ctrl-K opens
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && document.body.classList.contains('ocsb-open')) {
@@ -198,6 +206,28 @@ function delegatedClick(e) {
 }
 
 // ─── Open / close / layout ───────────────────────────────────────────────
+// Keep the launcher from covering other fixed bottom-right buttons (e.g. the
+// OCS "Issue" feedback button). If one shares the corner, stack the launcher
+// just above it instead of on top of it.
+function positionLauncher() {
+  const fab = bot.el['ocsb-fab'];
+  if (!fab) return;
+  let raise = 0;
+  ['#feedback-btn'].forEach((sel) => {
+    document.querySelectorAll(sel).forEach((node) => {
+      if (node === fab || (bot.el['ocsb-panel'] && bot.el['ocsb-panel'].contains(node))) return;
+      const cs = getComputedStyle(node);
+      if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden' || !node.offsetHeight) return;
+      const r = node.getBoundingClientRect();
+      // Only count buttons sharing the launcher's bottom-right corner.
+      if (r.right > window.innerWidth - 240 && r.bottom > window.innerHeight - 180) {
+        raise = Math.max(raise, window.innerHeight - r.top + 12);
+      }
+    });
+  });
+  fab.style.bottom = raise ? raise + 'px' : '';
+}
+
 function open() {
   document.body.classList.add('ocsb-open');
   if (window.innerWidth <= 560) document.body.classList.add('ocsb-modal');
