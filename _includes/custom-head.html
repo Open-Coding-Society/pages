@@ -3,12 +3,19 @@
 {% include head-custom.html %}
 <!-- Minima end custom head snippets -->
 
-{%- unless page.disable_ocs_bot -%}
-<!-- OCS Assistant — global chatbot. Loaded from the universal <head> include so
-     it appears on EVERY page regardless of layout. The script injects its own
-     markup into <body>. Opt a page out with `disable_ocs_bot: true`. -->
+{%- comment -%}
+  OCS Assistant — loaded CONDITIONALLY per page (not force-embedded everywhere).
+  A page loads the floating assistant when `ocs_bot: true` is in its front matter,
+  or it inherits the site-wide default `ocs_bot` from _config.yml. Turn it off on a
+  single page with `ocs_bot: false`, or flip the whole site from _config.yml. The
+  legacy `disable_ocs_bot: true` opt-out is still honored.
+{%- endcomment -%}
+{%- assign ocs_bot_on = site.ocs_bot -%}
+{%- unless page.ocs_bot == nil -%}{%- assign ocs_bot_on = page.ocs_bot -%}{%- endunless -%}
+{%- if page.disable_ocs_bot -%}{%- assign ocs_bot_on = false -%}{%- endif -%}
+{%- if ocs_bot_on -%}
 <link rel="stylesheet" href="{{ '/assets/css/ocs-bot.css' | relative_url }}">
 <script>window.OCS_BASEURL = {{ site.baseurl | jsonify }};</script>
 <script type="module" src="{{ '/assets/js/ocs-bot/index.js' | relative_url }}"></script>
-{%- endunless -%}
+{%- endif -%}
  

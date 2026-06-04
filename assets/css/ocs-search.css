@@ -1,0 +1,184 @@
+/* assets/css/ocs-search.css
+   OCS Learning Guide — AI search hub. A premium dark-glass "information hub":
+   calm deep canvas, one electric accent that signals AI, generously rounded
+   glass surfaces, and a course-style learning path. Namespaced .ocss-*.        */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700;9..40,800&display=swap');
+
+.ocss, .ocss * { box-sizing: border-box; }
+:root {
+  --ocss-void: #0c1019;
+  --ocss-fg: #e8edf6;
+  --ocss-muted: #9fb0c8;
+  --ocss-faint: #6b7a93;
+  --ocss-line: rgba(255,255,255,0.09);
+  --ocss-glass: rgba(255,255,255,0.045);
+  --ocss-glass-2: rgba(255,255,255,0.07);
+  --ocss-accent-1: #5b8cff;
+  --ocss-accent-2: #7c5bff;
+  --ocss-grad: linear-gradient(135deg, #5b8cff 0%, #7c5bff 100%);
+  --ocss-glow: 0 8px 30px -8px rgba(91,140,255,0.55);
+}
+
+/* ── Bright "Ask AI" entry in the search bar ───────────────────────────────── */
+.ocss-has-ai { position: relative; }
+.ocss-has-ai .js-search-input,
+.ocss-has-ai .search-input { padding-right: 134px !important; }
+
+.ocss-ask-btn {
+  position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 38px; padding: 0 16px 0 13px;
+  font-family: 'DM Sans', system-ui, sans-serif; font-weight: 700; font-size: 14px;
+  color: #fff; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--ocss-grad);
+  box-shadow: var(--ocss-glow);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.ocss-ask-btn svg { width: 17px; height: 17px; }
+.ocss-ask-btn::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,.45) 50%, transparent 80%);
+  background-size: 220% 100%; opacity: .0; animation: ocss-shimmer 3.4s ease-in-out infinite;
+  mix-blend-mode: overlay; pointer-events: none;
+}
+@keyframes ocss-shimmer { 0%,100%{background-position:120% 0;opacity:0} 45%{opacity:.9} 60%{background-position:-40% 0;opacity:0} }
+.ocss-ask-btn:hover { transform: translateY(-50%) scale(1.04); filter: brightness(1.07); box-shadow: 0 12px 36px -8px rgba(124,91,255,.7); }
+.ocss-ask-btn:active { transform: translateY(-50%) scale(.98); }
+@media (max-width: 560px) {
+  .ocss-ask-btn span { display: none; }
+  .ocss-ask-btn { padding: 0 12px; right: 6px; height: 34px; }
+  .ocss-has-ai .js-search-input, .ocss-has-ai .search-input { padding-right: 56px !important; }
+}
+
+/* ── Panel ─────────────────────────────────────────────────────────────────── */
+.ocss {
+  margin: 18px 0 8px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .24s ease, transform .24s cubic-bezier(.2,.8,.2,1);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+.ocss.is-open { opacity: 1; transform: none; }
+.ocss-card {
+  max-width: 780px; margin: 0 auto;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(91,140,255,.10) 0%, transparent 55%),
+    radial-gradient(120% 80% at 100% 0%, rgba(124,91,255,.10) 0%, transparent 55%),
+    rgba(16,20,30,0.86);
+  border: 1px solid var(--ocss-line);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px -24px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter: blur(14px) saturate(1.2);
+  overflow: hidden;
+  color: var(--ocss-fg);
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.ocss-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--ocss-line); }
+.ocss-badge {
+  flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center;
+  border-radius: 12px; background: var(--ocss-grad); color: #fff; box-shadow: var(--ocss-glow);
+}
+.ocss-badge svg { width: 22px; height: 22px; }
+.ocss-head-meta { flex: 1; min-width: 0; }
+.ocss-head-meta h3 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -0.3px; color: var(--ocss-fg); }
+.ocss-head-meta p { margin: 2px 0 0; font-size: 12.5px; color: var(--ocss-muted); line-height: 1.4; }
+.ocss-close {
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--ocss-line);
+  background: transparent; color: var(--ocss-muted); font-size: 20px; line-height: 1; cursor: pointer; transition: .15s;
+}
+.ocss-close:hover { background: var(--ocss-glass-2); color: var(--ocss-fg); }
+
+/* ── Thread ────────────────────────────────────────────────────────────────── */
+.ocss-thread { max-height: 460px; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; scrollbar-width: thin; }
+.ocss-thread::-webkit-scrollbar { width: 8px; }
+.ocss-thread::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 8px; }
+.ocss-msg { display: flex; gap: 10px; align-items: flex-start; animation: ocss-rise .3s ease both; }
+@keyframes ocss-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ocss-msg.user { flex-direction: row-reverse; }
+.ocss-av { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: var(--ocss-grad); color: #fff; }
+.ocss-av svg { width: 16px; height: 16px; }
+.ocss-bubble { max-width: 82%; padding: 12px 14px; border-radius: 15px; font-size: 14.5px; line-height: 1.6; color: var(--ocss-fg); }
+.ocss-msg.bot .ocss-bubble { background: var(--ocss-glass); border: 1px solid var(--ocss-line); border-top-left-radius: 5px; }
+.ocss-msg.user .ocss-bubble { background: var(--ocss-grad); color: #fff; border-top-right-radius: 5px; }
+.ocss-bubble.ocss-err { background: rgba(255,90,90,.10); border-color: rgba(255,90,90,.3); color: #ffd7d7; }
+.ocss-bubble p { margin: 0 0 8px; } .ocss-bubble p:last-child { margin-bottom: 0; }
+.ocss-bubble strong { color: #fff; font-weight: 700; }
+.ocss-bubble a { color: #9fbcff; }
+.ocss-bubble code { background: rgba(0,0,0,.32); padding: 1px 6px; border-radius: 6px; font-size: 13px; }
+.ocss-bubble pre { background: rgba(0,0,0,.34); padding: 12px; border-radius: 10px; overflow-x: auto; }
+.ocss-bubble pre code { background: none; padding: 0; }
+
+/* ── Learning path (course timeline) ───────────────────────────────────────── */
+.ocss-path { margin-top: 12px; display: flex; flex-direction: column; }
+.ocss-step { display: flex; gap: 14px; position: relative; padding-bottom: 14px; }
+.ocss-step:last-child { padding-bottom: 0; }
+.ocss-step-rail { flex: 0 0 30px; display: flex; flex-direction: column; align-items: center; }
+.ocss-step-num {
+  width: 30px; height: 30px; flex: 0 0 30px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 800; font-size: 14px; color: #fff; background: var(--ocss-grad); box-shadow: var(--ocss-glow); z-index: 1;
+}
+.ocss-step:not(:last-child) .ocss-step-rail::after {
+  content: ""; flex: 1; width: 2px; margin-top: 4px;
+  background: linear-gradient(var(--ocss-accent-2), rgba(124,91,255,.12));
+}
+.ocss-step-card {
+  flex: 1; background: var(--ocss-glass-2); border: 1px solid var(--ocss-line); border-radius: 14px;
+  padding: 12px 14px; transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+.ocss-step-card:hover { transform: translateX(2px); border-color: rgba(124,91,255,.45); background: rgba(124,91,255,.07); }
+.ocss-step-title { font-weight: 700; font-size: 14.5px; color: var(--ocss-fg); }
+.ocss-step-why { font-size: 12.8px; color: var(--ocss-muted); margin: 3px 0 9px; line-height: 1.5; }
+.ocss-step-open {
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+  font-size: 13px; font-weight: 700; color: #cdd9ee;
+  background: rgba(91,140,255,.12); border: 1px solid rgba(91,140,255,.3); padding: 6px 12px; border-radius: 999px; transition: .15s;
+}
+.ocss-step-open svg { width: 14px; height: 14px; }
+.ocss-step-open:hover { background: var(--ocss-grad); border-color: transparent; color: #fff; box-shadow: var(--ocss-glow); }
+
+/* discovery links (for "where is X") */
+.ocss-links { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+.ocss-link-chip {
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 13px; font-weight: 700;
+  color: #cdd9ee; background: rgba(91,140,255,.12); border: 1px solid rgba(91,140,255,.3); padding: 7px 13px; border-radius: 999px; transition: .15s;
+}
+.ocss-link-chip svg { width: 14px; height: 14px; }
+.ocss-link-chip:hover { background: var(--ocss-grad); border-color: transparent; color: #fff; box-shadow: var(--ocss-glow); }
+
+/* ── Quick / survey chips ──────────────────────────────────────────────────── */
+.ocss-quick { padding: 0 18px; }
+.ocss-quick:empty { display: none; }
+.ocss-quick-label { margin: 0 0 9px; font-size: 13px; font-weight: 600; color: var(--ocss-muted); }
+.ocss-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ocss-chip {
+  font-family: inherit; font-size: 13.5px; font-weight: 600; color: #d6e0f2; cursor: pointer;
+  background: rgba(120,160,230,.10); border: 1px solid rgba(140,170,230,.26); padding: 9px 14px; border-radius: 12px;
+  transition: transform .14s ease, background .14s ease, border-color .14s ease;
+}
+.ocss-chip:hover { transform: translateY(-1px); background: rgba(124,91,255,.16); border-color: rgba(124,91,255,.5); color: #fff; }
+
+/* ── Composer ──────────────────────────────────────────────────────────────── */
+.ocss-form { display: flex; gap: 9px; align-items: center; padding: 14px 18px 18px; }
+.ocss-input {
+  flex: 1; font-family: inherit; font-size: 14.5px; color: var(--ocss-fg);
+  background: rgba(0,0,0,.28); border: 1px solid var(--ocss-line); border-radius: 13px; padding: 12px 14px; outline: none; transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ocss-input::placeholder { color: var(--ocss-faint); }
+.ocss-input:focus { border-color: rgba(124,91,255,.6); box-shadow: 0 0 0 3px rgba(124,91,255,.16); }
+.ocss-send {
+  flex: 0 0 44px; width: 44px; height: 44px; border: 0; border-radius: 13px; cursor: pointer;
+  background: var(--ocss-grad); color: #fff; display: grid; place-items: center; box-shadow: var(--ocss-glow); transition: transform .15s ease, filter .15s ease;
+}
+.ocss-send svg { width: 19px; height: 19px; }
+.ocss-send:hover { transform: translateY(-1px); filter: brightness(1.08); }
+
+/* ── Typing dots ───────────────────────────────────────────────────────────── */
+.ocss-typing { display: inline-flex; gap: 5px; padding: 3px 2px; }
+.ocss-typing i { width: 7px; height: 7px; border-radius: 50%; background: #7e9bd0; animation: ocss-blink 1s infinite; }
+.ocss-typing i:nth-child(2) { animation-delay: .15s; }
+.ocss-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes ocss-blink { 0%,60%,100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ocss, .ocss-msg, .ocss-ask-btn::after { animation: none !important; transition: none !important; }
+}

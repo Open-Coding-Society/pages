@@ -20,8 +20,12 @@ description: "Class of 2026"
 owner_name: Open Coding Society 
 github_username: open-coding-society 
 github_repo: "pages" 
-baseurl: "" 
+baseurl: ""
 future: true
+
+# OCS Assistant: load the floating chatbot site-wide by default. Any page can
+# override per-page with `ocs_bot: false` (or `true`) in its front matter.
+ocs_bot: true
 
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
