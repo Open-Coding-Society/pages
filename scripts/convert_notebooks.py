@@ -595,12 +595,33 @@ class PseudocodeRunner:
 
     @staticmethod
     def clean_code(cell_source: str) -> str:
-        """Remove pseudocode runner directives from content."""
+        """Remove pseudocode runner directives and code fences from content."""
+        lines = cell_source.split('\n')
         cleaned_lines = []
-        for line in cell_source.split('\n'):
+        in_code_fence = False
+        fence_started = False
+        
+        for line in lines:
+            # Skip PSEUDOCODE_RUNNER directive
             if re.match(PSEUDOCODE_RUNNER_PATTERN, line.strip(), re.IGNORECASE):
                 continue
-            cleaned_lines.append(line)
+            
+            # Detect code fence start/end
+            if line.strip().startswith('```'):
+                if not fence_started:
+                    fence_started = True
+                    in_code_fence = True
+                    continue  # Skip opening fence
+                else:
+                    in_code_fence = False
+                    continue  # Skip closing fence
+            
+            # Only include lines inside code fence (or all if no fence)
+            if fence_started:
+                if in_code_fence:
+                    cleaned_lines.append(line)
+            else:
+                cleaned_lines.append(line)
 
         result = '\n'.join(cleaned_lines).rstrip()
         while result.startswith('\n'):
@@ -790,6 +811,9 @@ def classify_custom_cell_type(cell) -> Optional[str]:
         source = cell.get('source', '')
         if UiRunner.extract_description(source):
             return 'ui_runner'
+    
+    if cell.cell_type == 'markdown':
+        source = cell.get('source', '')
         if PseudocodeRunner.extract_challenge_and_options(source):
             return 'pseudocode_runner'
 
@@ -902,7 +926,7 @@ def process_pseudocode_runner_cells(notebook, permalink):
     processed_cells = []
     
     for cell in notebook.cells:
-        if cell.cell_type == 'raw' or cell.cell_type == 'markdown':
+        if cell.cell_type == 'markdown':
             runner = PseudocodeRunner.from_cell(cell, permalink, runner_index)
 
             if runner:
@@ -910,10 +934,8 @@ def process_pseudocode_runner_cells(notebook, permalink):
                 cell['metadata']['pseudocode_runner'] = runner.to_metadata()
                 runner_index += 1
                 
-                # For markdown cells, replace content with a placeholder marker
-                if cell.cell_type == 'markdown':
-                    # Use a unique marker that we can find in the markdown output
-                    cell['source'] = f'<!-- PSEUDOCODE_RUNNER_PLACEHOLDER_{runner_index-1} -->'
+                # Replace markdown cell content with a placeholder marker for injection later
+                cell['source'] = f'<!-- PSEUDOCODE_RUNNER_PLACEHOLDER_{runner_index-1} -->'
         
         processed_cells.append(cell)
     
