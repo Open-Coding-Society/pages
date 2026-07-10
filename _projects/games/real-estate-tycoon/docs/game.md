@@ -2,7 +2,6 @@
 layout: post
 title: Real Estate Tycoon - Overview
 description: Project documentation and how-to-play guide for Real Estate Tycoon
-category: Real Estate Tycoon
 breadcrumb: true
 permalink: /real-estate-tycoon/overview
 ---

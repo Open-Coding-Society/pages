@@ -2,7 +2,6 @@
 layout: post
 title: Real Estate Tycoon - Design Notes
 description: Architecture and design document for the Real Estate Tycoon game
-category: Real Estate Tycoon
 breadcrumb: true
 permalink: /real-estate-tycoon/docs
 ---
