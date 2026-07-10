@@ -2,7 +2,7 @@
 layout: post
 title: CS Pathway Game - Team Contributions
 description: An overview of our mansion game, behind the scenes
-category: gamify
+category: Gamify
 breadcrumb: true
 permalink: /kanbans2026
 ---
