@@ -36,10 +36,12 @@ _projects/systems/calendar/
 ### Distribution
 
 When built via `make build`, files are copied to:
-- **Page**: `projects/calendar.md` (outside version control)
-- **JavaScript**: `assets/js/projects/calendar/`
-- **SASS**: `_sass/projects/calendar/`
-- **CSS**: `assets/css/projects/calendar/`
+- **JavaScript**: `assets/js/projects/calendar/` (first)
+- **SASS**: `_sass/projects/calendar/` (second)
+- **CSS**: `assets/css/projects/calendar/` (third)
+- **Page**: `_posts/projects/calendar.md` (LAST - triggers Jekyll rebuild)
+
+**Build Order is Critical**: The page is copied LAST to ensure all assets (JS/CSS/SASS) are in place before Jekyll processes the page. This prevents timing issues where Jekyll might try to build a page before its dependencies are ready.
 
 **Note**: All distribution files are in `.gitignore` and regenerated during builds.
 
@@ -126,7 +128,9 @@ make -C _projects/systems/calendar clean
 **Note**: 
 - Direct project builds (`make -C _projects/systems/calendar build`) require the Makefile to exist
 - `make dev` automatically generates Makefiles for all dev projects, so manual generation is only needed for standalone builds
-- Project pages deploy to `projects/` directory (not version controlled), where Jekyll processes them
+- Project pages deploy to `_posts/projects/` directory (not version controlled)
+- Jekyll watches `_posts/` and automatically triggers incremental rebuilds when pages change
+- The page is copied LAST in the build chain to ensure all JS/CSS assets are ready first
 
 ### Dev Mode Control
 
@@ -148,18 +152,14 @@ The `CalendarTests.js` file contains comprehensive test suites for all calendar 
 
 ### Adding Features
 
-1. **New date utilities**: Add to `CalendarData.js`
-2. **New event builders**: Add to `EventBuilder.js`
-3. **New API endpoints**: Add to `CalendarApi.js`
-4. **New UI components**: Add to `CalendarUI.js`
-5. **Orchestration changes**: Modify `calendar.js`
-
 ## Page Deployment
 
 The calendar page is deployed to `/student/calendar` via:
 1. **Source**: `_projects/systems/calendar/calendar.md`
-2. **Build**: Makefile copies to `projects/calendar.md` (outside version control)
-3. **Jekyll**: Processes the page from `projects/` directory with `aesthetihawk` layout
+2. **Build**: Makefile copies to `_posts/projects/calendar.md` (LAST operation after all assets)
+3. **Jekyll**: Detects new file in `_posts/` and triggers incremental rebuild with `aesthetihawk` layout
+
+**Timing is Critical**: The page file is copied LAST to prevent Jekyll from building the page before JavaScript and CSS assets are ready.
 
 The page requires:
 - `permalink: /student/calendar` for the URL path

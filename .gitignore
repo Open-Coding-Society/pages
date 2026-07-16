@@ -64,8 +64,8 @@ _projects/*/*/Makefile
 # Except the template itself (single source of truth)
 !_projects/_template/Makefile
 
-# Project pages (deployed from _projects/ at build time)
-projects/
+# Project pages (deployed from _projects/ at build time to _posts/)
+_posts/projects/
 
 # Post generations
 _posts/**/*_cwgu.md

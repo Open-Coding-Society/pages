@@ -56,6 +56,6 @@ systems/ai-ab-engine
 systems/auto-generator
 systems/auto-generator-ui
 systems/scraper
-systems/calendar:dev
+systems/calendar
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===

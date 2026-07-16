@@ -129,6 +129,17 @@ This creates Makefiles for all registered projects listed in `_projects/.makepro
 **Build Workflows:**
 - **Coordinated builds** (e.g., `make build-registered-projects`, `make dev`) auto-generate Makefiles as needed
 - **Direct project builds** (e.g., `make -C _projects/systems/calendar build`) require Makefiles to exist first
+- **Incremental builds**: Project pages deploy to `_posts/projects/` which Jekyll watches for automatic incremental rebuilds
+
+**Build Timing & Order:**
+The template Makefile copies assets in a specific order to prevent timing issues:
+1. **JavaScript files** → `assets/js/projects/<name>/`
+2. **SASS files** → `_sass/projects/<name>/`
+3. **CSS entry point** → `assets/css/projects/<name>/`
+4. **Images** → `images/projects/<name>/`
+5. **Page files (LAST)** → `_posts/projects/<name>.md`
+
+**Why LAST?** The page is copied LAST to ensure all dependencies (JS, CSS, images) are in place before Jekyll detects the new page and triggers a rebuild. This prevents "404" or broken styling issues during incremental builds.
 
 ### JS and SASS Deployment (Native Pipeline)
 
