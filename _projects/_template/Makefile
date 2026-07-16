@@ -12,6 +12,7 @@ PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
 MARKDOWN_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).md
+# Convention: source files are index.ipynb and index.md in project directory
 
 # Workspace root - auto-detect depth (supports both flat and nested structures)
 # If in _projects/category/project → ../../.. 
@@ -34,13 +35,8 @@ DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
 # Build Targets
 ###########################################
 
-# Main build target - copy notebook and call assets
-build:
-	@mkdir -p $(NOTEBOOK_DEST)
-	@if [ -f "notebook.src.ipynb" ]; then \
-		cp notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
-	fi
-	@$(MAKE) assets
+# Main build target - depends on index (which depends on assets)
+build: index
 	@echo "✅ $(PROJECT_NAME) built successfully"
 	@echo "   Source: _projects/$(PROJECT_NAME)/"
 	@echo "   JavaScript: assets/js/projects/$(PROJECT_NAME)/"
@@ -72,11 +68,19 @@ assets:
 			echo "@import \"projects/$(PROJECT_NAME)/main\";" >> $(CSS_DEST)/main.scss; \
 		fi; \
 	fi
-	@
-	@# Copy index file LAST (to _posts/projects/ for Jekyll processing)
-	@# This ensures all assets (JS/CSS/SASS) are in place before Jekyll sees the page
-	@# Convention: source file should be named "index.md" in project directory
-	@if [ -f "index.md" ]; then \
+
+# Index target - copy either index.ipynb or index.md (not both) AFTER assets are ready
+# This triggers Jekyll rebuild, so it must run last
+index: assets
+	@if [ -f "index.ipynb" ] && [ -f "index.md" ]; then \
+		echo "❌ Error: Project has both index.ipynb and index.md - only one allowed"; \
+		exit 1; \
+	fi
+	@if [ -f "index.ipynb" ]; then \
+		mkdir -p $(NOTEBOOK_DEST); \
+		cp index.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
+		touch /tmp/.jekyll_rebuild_trigger 2>/dev/null || true; \
+	elif [ -f "index.md" ]; then \
 		mkdir -p $(WORKSPACE_ROOT)/_posts/projects; \
 		cp index.md $(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME) 2>/dev/null || true; \
 		touch /tmp/.jekyll_rebuild_trigger 2>/dev/null || true; \
@@ -110,10 +114,10 @@ watch:
 	@touch /tmp/.project_$(PROJECT_NAME)_marker
 	@while true; do \
 		changed=0; \
-		if [ -f "$(PROJECT_SRC)/notebook.src.ipynb" ] && [ "$(PROJECT_SRC)/notebook.src.ipynb" -nt /tmp/.project_$(PROJECT_NAME)_marker ]; then \
+		if [ -f "$(PROJECT_SRC)/index.ipynb" ] && [ "$(PROJECT_SRC)/index.ipynb" -nt /tmp/.project_$(PROJECT_NAME)_marker ]; then \
 			echo "  🔄 Notebook changed - copying and converting..."; \
 			mkdir -p $(NOTEBOOK_DEST); \
-			cp $(PROJECT_SRC)/notebook.src.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
+			cp $(PROJECT_SRC)/index.ipynb $(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME) 2>/dev/null || true; \
 			cd $(WORKSPACE_ROOT) && make convert-single NOTEBOOK_FILE="$(NOTEBOOK_DEST)/$(NOTEBOOK_FILENAME)" 2>&1; \
 			changed=1; \
 		fi; \
@@ -181,4 +185,4 @@ docs:
 docs-clean:
 	@rm -rf $(DOCS_DEST)
 
-.PHONY: build assets clean watch docs docs-clean
+.PHONY: build index assets clean watch docs docs-clean
