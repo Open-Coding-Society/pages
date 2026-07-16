@@ -200,6 +200,8 @@ build-registered-projects:
 build-dev-projects:
 	@echo "Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
 	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Building,build)
+	@echo "Generating dynamic SASS imports..."
+	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
 
 # Convert notebooks for dev projects only (dev mode initial build)
 convert-registered-notebooks:
@@ -242,6 +244,8 @@ build-yat: use-yat build-current
 
 build-current: clean convert split-courses
 	@bundle install
+	@echo "Generating dynamic SASS imports..."
+	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
 	@bundle exec jekyll clean
 	@bundle exec jekyll build
 

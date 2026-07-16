@@ -12,9 +12,13 @@
 //   --text, --text-strong, --text-muted, --accent, --ui-border
 // ===========================
 
-@import "mixins/buttons";
-@import "mixins/modals";
-@import "mixins/panel";
+// Import SASS variables first (required by mixins)
+@import "root-color-map";
+
+// Import mixins
+@import "open-coding/mixins/buttons";
+@import "open-coding/mixins/modals";
+@import "open-coding/mixins/panel";
 
 // ===========================
 // Priority Color Palette
