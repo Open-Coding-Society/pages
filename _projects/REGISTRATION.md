@@ -119,6 +119,17 @@ _projects/games/<project-name>/
 3. ✅ Consistent build behavior across all projects
 4. ✅ Simpler git diffs (only source code changes)
 
+**First-Time Setup:**
+Before building individual projects directly, generate their Makefiles:
+```bash
+make generate-makefiles
+```
+This creates Makefiles for all registered projects listed in `_projects/.makeprojects`.
+
+**Build Workflows:**
+- **Coordinated builds** (e.g., `make build-registered-projects`, `make dev`) auto-generate Makefiles as needed
+- **Direct project builds** (e.g., `make -C _projects/systems/calendar build`) require Makefiles to exist first
+
 ### JS and SASS Deployment (Native Pipeline)
 
 Projects can seamlessly deploy standard styles and scripts to the global `assets/` and `_sass` directories:

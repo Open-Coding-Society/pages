@@ -47,9 +47,9 @@ build:
 
 # Copy JS, SASS, and image assets
 assets:
-	@# Copy page files to navigation directory
-	@if [ -f "calendar.md" ]; then mkdir -p $(WORKSPACE_ROOT)/navigation; cp calendar.md $(WORKSPACE_ROOT)/navigation/calendar.md 2>/dev/null || true; fi
-	@if [ -f "page.md" ]; then mkdir -p $(WORKSPACE_ROOT)/navigation; cp page.md $(WORKSPACE_ROOT)/navigation/$(PROJECT_NAME).md 2>/dev/null || true; fi
+	@# Copy page files to projects directory (outside version control)
+	@if [ -f "calendar.md" ]; then mkdir -p $(WORKSPACE_ROOT)/projects; cp calendar.md $(WORKSPACE_ROOT)/projects/calendar.md 2>/dev/null || true; fi
+	@if [ -f "page.md" ]; then mkdir -p $(WORKSPACE_ROOT)/projects; cp page.md $(WORKSPACE_ROOT)/projects/$(PROJECT_NAME).md 2>/dev/null || true; fi
 	@
 	@# Legacy level/model JS parsing
 	@if [ -d "levels" ]; then mkdir -p $(JS_DEST)/levels; cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true; fi
@@ -78,8 +78,8 @@ assets:
 # Clean distributed files (keeps source intact)
 clean:
 	@echo "🧹 Cleaning $(PROJECT_NAME) distribution..."
-	@rm -f $(WORKSPACE_ROOT)/navigation/calendar.md
-	@rm -f $(WORKSPACE_ROOT)/navigation/$(PROJECT_NAME).md
+	@rm -f $(WORKSPACE_ROOT)/projects/calendar.md
+	@rm -f $(WORKSPACE_ROOT)/projects/$(PROJECT_NAME).md
 	@rm -rf $(NOTEBOOK_DEST)
 	@rm -rf $(JS_DEST)
 	@rm -rf $(CSS_DEST)

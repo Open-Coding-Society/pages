@@ -36,7 +36,7 @@ _projects/systems/calendar/
 ### Distribution
 
 When built via `make build`, files are copied to:
-- **Page**: `navigation/calendar.md`
+- **Page**: `projects/calendar.md` (outside version control)
 - **JavaScript**: `assets/js/projects/calendar/`
 - **SASS**: `_sass/projects/calendar/`
 - **CSS**: `assets/css/projects/calendar/`
@@ -107,6 +107,9 @@ Priority colors also use CSS custom properties:
 ### Building
 
 ```bash
+# First-time setup: generate Makefiles for all registered projects
+make generate-makefiles
+
 # Build calendar project (from workspace root)
 make -C _projects/systems/calendar build
 
@@ -119,6 +122,11 @@ make -C _projects/systems/calendar watch
 # Clean distribution files (removes page and assets)
 make -C _projects/systems/calendar clean
 ```
+
+**Note**: 
+- Direct project builds (`make -C _projects/systems/calendar build`) require the Makefile to exist
+- `make dev` automatically generates Makefiles for all dev projects, so manual generation is only needed for standalone builds
+- Project pages deploy to `projects/` directory (not version controlled), where Jekyll processes them
 
 ### Dev Mode Control
 
@@ -140,15 +148,27 @@ The `CalendarTests.js` file contains comprehensive test suites for all calendar 
 
 ### Adding Features
 
-1. **New date utdeployed to `/student/calendar` via:
+1. **New date utilities**: Add to `CalendarData.js`
+2. **New event builders**: Add to `EventBuilder.js`
+3. **New API endpoints**: Add to `CalendarApi.js`
+4. **New UI components**: Add to `CalendarUI.js`
+5. **Orchestration changes**: Modify `calendar.js`
+
+## Page Deployment
+
+The calendar page is deployed to `/student/calendar` via:
 1. **Source**: `_projects/systems/calendar/calendar.md`
-2. **Build**: Makefile copies to `navigation/calendar.md`
-3. **Jekyll**: Processes the page with `aesthetihawk` layout
+2. **Build**: Makefile copies to `projects/calendar.md` (outside version control)
+3. **Jekyll**: Processes the page from `projects/` directory with `aesthetihawk` layout
 
 The page requires:
+- `permalink: /student/calendar` for the URL path
 - `tailwind: true` for utility classes
 - `active_tab: calendar` for sidebar highlighting
 - Scripts loaded via `_includes/calendar.html`
+
+## Backend Integration
+
 The calendar communicates with the Spring Boot backend at:
 - **Events**: `/api/calendar/events`
 - **Issues**: `/api/Comment/issue`
