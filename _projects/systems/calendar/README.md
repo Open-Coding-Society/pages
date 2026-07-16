@@ -19,7 +19,7 @@ The Calendar System is a full-featured dashboard that integrates:
 _projects/systems/calendar/
 ├── README.md                   # This file
 ├── Makefile                    # Build and deploy configuration (auto-generated)
-├── calendar.md                 # Main calendar page (deployed to navigation/)
+├── index.md                    # Main calendar page (deployed to _posts/projects/)
 ├── js/                         # JavaScript modules
 │   ├── CalendarData.js        # School calendar data + date utilities
 │   ├── EventBuilder.js        # Event construction helpers
@@ -39,7 +39,7 @@ When built via `make build`, files are copied to:
 - **JavaScript**: `assets/js/projects/calendar/` (first)
 - **SASS**: `_sass/projects/calendar/` (second)
 - **CSS**: `assets/css/projects/calendar/` (third)
-- **Page**: `_posts/projects/calendar.md` (LAST - triggers Jekyll rebuild)
+- **Page**: `_posts/projects/2026-04-15-calendar.md` (LAST - triggers Jekyll rebuild)
 
 **Build Order is Critical**: The page is copied LAST to ensure all assets (JS/CSS/SASS) are in place before Jekyll processes the page. This prevents timing issues where Jekyll might try to build a page before its dependencies are ready.
 

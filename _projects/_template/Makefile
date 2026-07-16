@@ -73,12 +73,12 @@ assets:
 		fi; \
 	fi
 	@
-	@# Copy page file LAST (to _posts/projects/ for Jekyll processing)
+	@# Copy index file LAST (to _posts/projects/ for Jekyll processing)
 	@# This ensures all assets (JS/CSS/SASS) are in place before Jekyll sees the page
-	@# Convention: source file should be named "page.md" in project directory
-	@if [ -f "page.md" ]; then \
+	@# Convention: source file should be named "index.md" in project directory
+	@if [ -f "index.md" ]; then \
 		mkdir -p $(WORKSPACE_ROOT)/_posts/projects; \
-		cp page.md $(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME) 2>/dev/null || true; \
+		cp index.md $(WORKSPACE_ROOT)/_posts/projects/$(MARKDOWN_FILENAME) 2>/dev/null || true; \
 		touch /tmp/.jekyll_rebuild_trigger 2>/dev/null || true; \
 	fi
 
