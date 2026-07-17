@@ -24,7 +24,6 @@ else
 endif
 
 # Distribution destinations (relative to workspace root, in .gitignore)
-NAV_DEST = $(WORKSPACE_ROOT)/navigation/$(PROJECT_NAME)
 JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
 CSS_DEST = $(WORKSPACE_ROOT)/assets/css/projects/$(PROJECT_NAME)
 SASS_DEST = $(WORKSPACE_ROOT)/_sass/projects/$(PROJECT_NAME)
@@ -44,8 +43,16 @@ build: index
 	@echo "   CSS/SASS: assets/css/projects/$(PROJECT_NAME)/ & _sass/projects/$(PROJECT_NAME)/"
 	@echo "   Page: _posts/projects/ (triggers Jekyll rebuild)"
 
-# Copy JS, SASS, and image assets
+# Copy DOCS, JS, SASS, and more assets
 assets:
+	@if [ -d "navigation" ]; then \
+		mkdir -p $(DOCS_DEST); \
+		for file in navigation/*.md; do \
+ 	       [ -f "$$file" ] || continue; \
+ 	       filename=$$(basename "$$file"); \
+			cp "$$file" "$(DOCS_DEST)/$(DATE_OF_CREATION)-$$filename"; \
+		done; \
+	fi
 	@if [ -d "navigation" ]; then mkdir -p $(NAV_DEST); cp navigation/*.md $(NAV_DEST)/ 2>/dev/null || true; fi
 	@if [ -d "levels" ]; then mkdir -p $(JS_DEST)/levels; cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true; fi
 	@if [ -d "model" ]; then mkdir -p $(JS_DEST)/model; cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true; fi
