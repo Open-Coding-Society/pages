@@ -24,6 +24,7 @@ else
 endif
 
 # Distribution destinations (relative to workspace root, in .gitignore)
+NAV_DEST = $(WORKSPACE_ROOT)/navigation/$(PROJECT_NAME)
 JS_DEST = $(WORKSPACE_ROOT)/assets/js/projects/$(PROJECT_NAME)
 CSS_DEST = $(WORKSPACE_ROOT)/assets/css/projects/$(PROJECT_NAME)
 SASS_DEST = $(WORKSPACE_ROOT)/_sass/projects/$(PROJECT_NAME)
@@ -45,7 +46,7 @@ build: index
 
 # Copy JS, SASS, and image assets
 assets:
-	@# Legacy level/model JS parsing
+	@if [ -d "navigation" ]; then mkdir -p $(NAV_DEST); cp navigation/*.md $(NAV_DEST)/ 2>/dev/null || true; fi
 	@if [ -d "levels" ]; then mkdir -p $(JS_DEST)/levels; cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true; fi
 	@if [ -d "model" ]; then mkdir -p $(JS_DEST)/model; cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true; fi
 	@if [ -d "services" ]; then mkdir -p $(JS_DEST)/services; cp services/*.js $(JS_DEST)/services/ 2>/dev/null || true; fi

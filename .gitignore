@@ -45,11 +45,6 @@ _posts/**/*_DOCX_.md
 _docx/~$*
 *.tmp
 
-# Auto-generated course-specific files (build-time only)
-_posts/**/*_csp.md
-_posts/**/*_csa.md
-_posts/**/*_csse.md
-
 # Project distributions (auto-generated from _projects/ source)
 _notebooks/projects/
 _posts/projects/

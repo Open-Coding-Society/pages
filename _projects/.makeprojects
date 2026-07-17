@@ -57,5 +57,6 @@ systems/auto-generator
 systems/auto-generator-ui
 systems/scraper
 systems/calendar
+systems/courses:dev
 
 # === FLAT STRUCTURE (legacy/uncategorized) ===
