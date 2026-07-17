@@ -67,14 +67,15 @@ _posts/**/*_cwgu.md
 _posts/**/*_content.md
 
 # Multiple formats of the same content (auto-generated)
+# Auto-generated course-specific files (build-time only)
+_posts/**/*_csp.md
+_posts/**/*_csa.md
+_posts/**/*_csse.md
+_posts/**/*_cwgu.md
 _notebooks/**/*_csp.ipynb
 _notebooks/**/*_csa.ipynb
 _notebooks/**/*_csse.ipynb
 _notebooks/**/*_cwgu.ipynb
-_notebooks/**/*_csp.md
-_notebooks/**/*_csa.md
-_notebooks/**/*_csse.md
-_notebooks/**/*_cwgu.md
 _notebooks/**/*_content.md
 
 # remove all the .scss cache files
