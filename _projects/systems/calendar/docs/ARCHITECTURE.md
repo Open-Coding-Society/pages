@@ -1,13 +1,6 @@
----
-toc: true
-layout: post
-title: Calendar System Architecture (SRP)
-description: Documentation for the calendar sync system's Single Responsibility Principle (SRP) module architecture — module dependency graph, function inventory, data flows, error handling, and how to extend the system.
-type: coding
-comments: true
-permalink: /calendar/architecture
-author: Arnav Nadar
----
+# Calendar System Architecture (SRP)
+
+Documentation for the calendar sync system's Single Responsibility Principle (SRP) module architecture — module dependency graph, function inventory, data flows, error handling, and how to extend the system.
 
 ## Overview
 

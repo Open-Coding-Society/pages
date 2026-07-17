@@ -30,7 +30,7 @@ _projects/systems/calendar/
 ├── sass/                      # Stylesheets
 │   └── main.scss             # Calendar styles (theme-aware)
 └── docs/                      # Documentation
-    └── MIGRATION.md          # Migration notes
+    └── ARCHITECTURE.md       # Detailed module documentation
 ```
 
 ### Distribution
@@ -54,6 +54,29 @@ The calendar JavaScript modules are loaded via `_includes/calendar.html` in this
 3. `CalendarApi.js` — Backend communication + error types
 4. `CalendarUI.js` — DOM rendering + modals
 5. `calendar.js` — Main orchestrator
+
+### Interface Layer
+
+**`_includes/calendar.html` is NOT part of this project:**
+- It's the **interface layer** between sprint pages and the calendar system
+- Lives in `_includes/` (standard Jekyll location for reusable components)
+- Used by `_layouts/sprint.html` to provide "Sync to Calendar" UI
+- Loads deployed calendar JS modules from `assets/js/projects/calendar/`
+- **Belongs to the courses/sprint system** - it's a consumer of this calendar API
+
+**Architecture Flow:**
+```
+Sprint Pages (_layouts/sprint.html)
+  ↓
+Interface Layer (_includes/calendar.html)
+  ↓
+Calendar System (this project)
+  ├─ JS Modules (assets/js/projects/calendar/)
+  ├─ Styles (_sass/projects/calendar/)
+  └─ Backend API (Spring Boot)
+```
+
+For detailed module documentation, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Features
 
