@@ -1,4 +1,4 @@
-# School Calendar 2025-2026
+# School Calendar 2026-2027
 # Poway Unified School District Calendar
 # 180 Student Days
 # 
@@ -10,189 +10,168 @@
 #
 # Note: Checkpoints for assessments are typically on Tuesday of the NEXT week
 
-school_year: "2025-2026"
-first_day: "2025-08-13"  # First day of school (Wednesday)
-last_day: "2026-06-04"   # Last day of school
+school_year: "2026-2027"
+first_day: "2026-08-13"  # First day of school (Wednesday)
+last_day: "2027-06-04"   # Last day of school
 
 # Define each of the school weeks
 # Week 0 starts with the first full week of school
 weeks:
   0:
-    monday: "2025-08-18"
-    friday: "2025-08-22"
-    theme: "Onboarding Week 1"
-    notes: "First full week (school started Wed Aug 13)"
+    monday: "2026-08-10"
+    friday: "2026-08-14"
+    holiday_adjustment: "thursday"
+    thursday: "2026-08-13"
+    theme: "Trimester 1 Start"
   1:
-    monday: "2025-08-25"
-    friday: "2025-08-29"
-    theme: "Onboarding Week 2"
+    monday: "2026-08-17"
+    friday: "2026-08-21"
+    notes: "Sprint 1 Start"
   2:
-    monday: "2025-09-01"
-    friday: "2025-09-05"
+    monday: "2026-08-24"
+    friday: "2026-08-28"
+  3:
+    monday: "2026-08-31"
+    friday: "2026-09-04"
+  4:
+    monday: "2026-09-07"
+    friday: "2026-09-12"
     holidays: ["Labor Day"]
     holiday_adjustment: "tuesday"
-    tuesday: "2025-09-02"
-    theme: "Onboarding Week 3"
-  3:
-    monday: "2025-09-08"
-    friday: "2025-09-12"
-  4:
-    monday: "2025-09-15"
-    friday: "2025-09-19"
+    tuesday: "2026-09-08"
+    notes: "Sprint 1 Retrospective"
   5:
-    monday: "2025-09-22"
-    friday: "2025-09-26"
+    monday: "2026-09-14"
+    friday: "2026-09-18"
+    notes: "Sprint 2 Start"
   6:
-    monday: "2025-09-29"
-    friday: "2025-10-03"
-    holidays: ["Non-Student Day"]
-    holiday_adjustment: "tuesday"
-    tuesday: "2025-09-30"
-    notes: "9/29 Non-Student Day"
+    monday: "2026-09-21"
+    friday: "2026-09-25"
   7:
-    monday: "2025-10-06"
-    friday: "2025-10-10"
+    monday: "2026-09-28"
+    friday: "2026-10-02"
+    notes: "9/29 Non-Student Day"
   8:
-    monday: "2025-10-13"
-    friday: "2025-10-17"
+    monday: "2026-10-05"
+    friday: "2026-10-09"
+    notes: "Sprint 2 Retrospective"
   9:
-    monday: "2025-10-20"
-    friday: "2025-10-24"
+    monday: "2026-10-12"
+    friday: "2026-10-16"
+    notes: "Sprint 3 Start"
   10:
-    monday: "2025-10-27"
-    friday: "2025-10-31"
+    monday: "2026-10-19"
+    friday: "2026-10-23"
   11:
-    monday: "2025-11-03"
-    friday: "2025-11-07"
+    monday: "2026-10-26"
+    friday: "2026-10-30"
   12:
-    monday: "2025-11-10"
-    friday: "2025-11-14"
-    holidays: ["Veterans Day"]
-    holiday_adjustment: "tuesday"
-    tuesday: "2025-11-11"
-    notes: "11/11 Veterans Day"
+    monday: "2026-11-02"
+    friday: "2026-11-06"
+    theme: "Finals Week"
+    notes: "Sprint 3 Retrospective"
   13:
-    monday: "2025-11-17"
-    friday: "2025-11-21"
+    monday: "2026-11-09"
+    friday: "2026-11-13"
+    theme: "Trimester 2 Start"
+    notes: "Sprint 4 Start"
+  14:
+    monday: "2026-11-16"
+    friday: "2026-11-20"
     holidays: ["Non-Student Day"]
     holiday_adjustment: "tuesday"
-    tuesday: "2025-11-18"
-    notes: "11/17 Non-Student Day"
-  14:
-    monday: "2025-11-24"
-    friday: "2025-11-28"
-    holidays: ["District Recess", "Thanksgiving"]
-    notes: "11/24-11/28 District Recess, Thanksgiving Week"
-    skip_week: true
+    tuesday: "2026-11-17"
   15:
-    monday: "2025-12-01"
-    friday: "2025-12-05"
+    monday: "2026-11-30"
+    friday: "2026-12-04"
   16:
-    monday: "2025-12-08"
-    friday: "2025-12-12"
+    monday: "2026-12-07"
+    friday: "2026-12-11"
+    notes: "Sprint 4 Retrospective"
   17:
-    monday: "2025-12-15"
-    friday: "2025-12-19"
+    monday: "2026-12-14"
+    friday: "2026-12-18"
+    notes: "Sprint 5 Start"
   18:
-    monday: "2025-12-22"
-    friday: "2025-12-26"
-    holidays: ["Winter Break"]
-    notes: "12/22-1/2 District Recess"
-    skip_week: true
+    monday: "2027-01-04"
+    friday: "2027-01-08"
   19:
-    monday: "2025-12-29"
-    friday: "2026-01-02"
-    holidays: ["Winter Break", "New Year's Day"]
-    notes: "12/22-1/2 District Recess"
-    skip_week: true
+    monday: "2027-01-11"
+    friday: "2027-01-15"
   20:
-    monday: "2026-01-05"
-    friday: "2026-01-09"
-    notes: "Return from winter break"
-  21:
-    monday: "2026-01-12"
-    friday: "2026-01-16"
-  22:
-    monday: "2026-01-19"
-    friday: "2026-01-23"
+    monday: "2027-01-18"
+    friday: "2027-01-22"
     holidays: ["MLK Day"]
     holiday_adjustment: "tuesday"
-    tuesday: "2026-01-20"
-    notes: "1/19 Dr. Martin Luther King Jr. Day"
-  23:
-    monday: "2026-01-26"
-    friday: "2026-01-30"
+    tuesday: "2027-01-19"
+    notes: "Sprint 5 Retrospective"
+  21:
+    monday: "2027-01-25"
+    friday: "2027-01-29"
     holidays: ["Non-Student Day"]
     holiday_adjustment: "tuesday"
-    tuesday: "2026-01-27"
-    notes: "1/26 Non-Student Day"
+    tuesday: "2027-01-26"
+    notes: "Sprint 6 Start"
+  22:
+    monday: "2027-02-01"
+    friday: "2027-02-05"
+  23:
+    monday: "2027-02-08"
+    friday: "2027-02-12"
   24:
-    monday: "2026-02-02"
-    friday: "2026-02-06"
+    monday: "2027-02-22"
+    friday: "2027-02-26"
+    theme: "Finals Week"
+    notes: "Sprint 6 Retrospective"
   25:
-    monday: "2026-02-09"
-    friday: "2026-02-13"
+    monday: "2027-03-01"
+    friday: "2027-03-05"
+    theme: "Trimester 3"
+    notes: "Sprint 7 Start"
   26:
-    monday: "2026-02-16"
-    friday: "2026-02-20"
-    holidays: ["Presidents Day Week"]
-    notes: "2/16-2/20 District Recess"
-    skip_week: true
+    monday: "2027-03-08"
+    friday: "2027-03-12"
   27:
-    monday: "2026-02-23"
-    friday: "2026-02-27"
+    monday: "2027-03-15"
+    friday: "2027-03-19"
   28:
-    monday: "2026-03-02"
-    friday: "2026-03-06"
+    monday: "2027-03-22"
+    friday: "2027-03-26"
+    notes: "Sprint 7 Retrospective"
   29:
-    monday: "2026-03-09"
-    friday: "2026-03-13"
+    monday: "2027-03-29"
+    friday: "2027-04-02"
+    notes: "Sprint 8 Start"
   30:
-    monday: "2026-03-16"
-    friday: "2026-03-20"
+    monday: "2027-04-05"
+    friday: "2027-04-09"
   31:
-    monday: "2026-03-23"
-    friday: "2026-03-27"
+    monday: "2027-04-19"
+    friday: "2027-04-23"
   32:
-    monday: "2026-03-30"
-    friday: "2026-04-03"
+    monday: "2027-04-26"
+    friday: "2027-04-30"
+    notes: "Sprint 8 Retrospective"
   33:
-    monday: "2026-04-06"
-    friday: "2026-04-10"
-    holidays: ["Spring Break"]
-    notes: "4/6-4/10 District Recess"
-    skip_week: true
+    monday: "2027-05-03"
+    friday: "2027-05-07"
+    notes: "AP Exams Start"
   34:
-    monday: "2026-04-13"
-    friday: "2026-04-17"
-    notes: "Return from spring break"
+    monday: "2027-05-10"
+    friday: "2027-05-14"
+    notes: "AP Exams End"
   35:
-    monday: "2026-04-20"
-    friday: "2026-04-24"
+    monday: "2027-05-17"
+    friday: "2027-05-21"
+    notes: "Sprint 9 Final"
   36:
-    monday: "2026-04-27"
-    friday: "2026-05-01"
+    monday: "2027-05-24"
+    friday: "2027-05-28"
+    notes: "Senior Check-out"
   37:
-    monday: "2026-05-04"
-    friday: "2026-05-08"
-    notes: "AP Exam week"
-  38:
-    monday: "2026-05-11"
-    friday: "2026-05-15"
-  39:
-    monday: "2026-05-18"
-    friday: "2026-05-22"
-  40:
-    monday: "2026-05-25"
-    friday: "2026-05-29"
-    holidays: ["Memorial Day"]
-    holiday_adjustment: "tuesday"
-    tuesday: "2026-05-26"
-    notes: "5/25 Memorial Day"
-  41:
-    monday: "2026-06-01"
-    friday: "2026-06-04"
-    notes: "Last week - school ends Thursday 6/4"
+    monday: "2027-05-31"
+    friday: "2027-06-04"
+    notes: "Last Week of School"
 
 # Assessment types that get placed on Fridays
 assessment_types:
