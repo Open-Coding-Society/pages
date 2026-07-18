@@ -165,16 +165,16 @@
     // Save the let-scoped SCHOOL_CALENDAR directly (not window — let vars aren't on window)
     const originalCalendar = SCHOOL_CALENDAR;
     SCHOOL_CALENDAR = {
-      schoolYear: '2025-2026',
-      firstDay: '2025-08-18',
-      lastDay: '2026-06-05',
+      schoolYear: '2026-2027',
+      firstDay: '2026-08-13',
+      lastDay: '2027-06-04',
       weeks: {
-        1: { monday: '2025-08-18', friday: '2025-08-22', tuesday: '2025-08-19', holidays: null, holidayAdjustment: null, skipWeek: false, theme: 'Welcome Week', notes: null },
-        2: { monday: '2025-08-25', friday: '2025-08-29', tuesday: '2025-08-26', holidays: null, holidayAdjustment: null, skipWeek: false, theme: null, notes: null },
-        3: { monday: '2025-09-01', friday: '2025-09-05', tuesday: '2025-09-02', holidays: ['Labor Day'], holidayAdjustment: 'tuesday', skipWeek: false, theme: null, notes: null },
-        4: { monday: '2025-09-08', friday: '2025-09-12', tuesday: '2025-09-09', holidays: null, holidayAdjustment: null, skipWeek: false, theme: null, notes: null },
-        5: { monday: '2025-09-15', friday: '2025-09-19', tuesday: '2025-09-16', holidays: ['Fall Break'], holidayAdjustment: null, skipWeek: true, theme: 'Fall Break', notes: null },
-        6: { monday: '2025-09-22', friday: '2025-09-26', tuesday: '2025-09-23', holidays: null, holidayAdjustment: null, skipWeek: false, theme: null, notes: null }
+        1: { monday: '2026-08-17', friday: '2026-08-21', tuesday: '2026-08-18', holidays: null, holidayAdjustment: null, skipWeek: false, theme: 'Welcome Week', notes: null },
+        2: { monday: '2026-08-24', friday: '2026-08-28', tuesday: '2026-08-25', holidays: null, holidayAdjustment: null, skipWeek: false, theme: null, notes: null },
+        3: { monday: '2026-08-31', friday: '2026-09-04', tuesday: '2026-09-01', holidays: ['Labor Day'], holidayAdjustment: 'tuesday', skipWeek: false, theme: null, notes: null },
+        4: { monday: '2026-09-07', friday: '2026-09-11', tuesday: '2026-09-08', holidays: null, holidayAdjustment: null, skipWeek: false, theme: null, notes: null },
+        5: { monday: '2026-09-14', friday: '2026-09-18', tuesday: '2026-09-15', holidays: ['Fall Break'], holidayAdjustment: null, skipWeek: true, theme: 'Fall Break', notes: null },
+        6: { monday: '2026-09-21', friday: '2026-09-25', tuesday: '2026-09-22', holidays: null, holidayAdjustment: null, skipWeek: false, theme: null, notes: null }
       }
     };
 
@@ -310,8 +310,8 @@
         response: {
           status: 200,
           body: [
-            { id: 101, title: '[P2] 📚 Week 1 Formative - CSA', date: '2025-08-18', period: 'CSA', description: 'Test event' },
-            { id: 102, title: '[P2] 📝 Week 1 Summative - CSA', date: '2025-08-22', period: 'CSA', description: 'Test event' }
+            { id: 101, title: '[P2] 📚 Week 1 Formative - CSA', date: '2026-08-17', period: 'CSA', description: 'Test event' },
+            { id: 102, title: '[P2] 📝 Week 1 Summative - CSA', date: '2026-08-21', period: 'CSA', description: 'Test event' }
           ]
         }
       },
@@ -373,8 +373,8 @@
       // getCalendarWeek
       const week1 = getCalendarWeek(1);
       assert(week1 !== null, 'getCalendarWeek(1) returns data');
-      assertEqual(week1.monday, '2025-08-18', 'getCalendarWeek(1).monday is correct');
-      assertEqual(week1.friday, '2025-08-22', 'getCalendarWeek(1).friday is correct');
+      assertEqual(week1.monday, '2026-08-17', 'getCalendarWeek(1).monday is correct');
+      assertEqual(week1.friday, '2026-08-21', 'getCalendarWeek(1).friday is correct');
 
       const weekNull = getCalendarWeek(99);
       assertEqual(weekNull, null, 'getCalendarWeek(99) returns null for missing week');
@@ -396,10 +396,10 @@
       assertEqual(getNextValidSchoolWeek(99), null, 'getNextValidSchoolWeek(99) returns null');
 
       // getReadingDate — normal week
-      assertEqual(getReadingDate(1), '2025-08-18', 'getReadingDate(1) returns Monday');
+      assertEqual(getReadingDate(1), '2026-08-17', 'getReadingDate(1) returns Monday');
 
       // getReadingDate — holiday-adjusted week
-      assertEqual(getReadingDate(3), '2025-09-02', 'getReadingDate(3) returns Tuesday (Labor Day adjustment)');
+      assertEqual(getReadingDate(3), '2026-09-02', 'getReadingDate(3) returns Tuesday (Labor Day adjustment)');
 
       // getReadingDate — skip week
       assertEqual(getReadingDate(5), null, 'getReadingDate(5) returns null (skip week)');
@@ -408,37 +408,37 @@
       assertEqual(getReadingDate(99), null, 'getReadingDate(99) returns null');
 
       // getAssessmentDate
-      assertEqual(getAssessmentDate(1), '2025-08-22', 'getAssessmentDate(1) returns Friday');
+      assertEqual(getAssessmentDate(1), '2026-08-22', 'getAssessmentDate(1) returns Friday');
       assertEqual(getAssessmentDate(5), null, 'getAssessmentDate(5) returns null (skip week)');
       assertEqual(getAssessmentDate(99), null, 'getAssessmentDate(99) returns null');
 
       // getCheckpointDate — gets Tuesday of next valid school week
       const checkpoint1 = getCheckpointDate(1);
       assert(checkpoint1 !== null, 'getCheckpointDate(1) returns a date');
-      // Week 2 Monday is 2025-08-25, so Tuesday is 2025-08-26
-      assertEqual(checkpoint1, '2025-08-26', 'getCheckpointDate(1) is Tuesday of week 2');
+      // Week 2 Monday is 2026-08-25, so Tuesday is 2026-08-26
+      assertEqual(checkpoint1, '2026-08-26', 'getCheckpointDate(1) is Tuesday of week 2');
 
       // getCheckpointDate — skips break week
       const checkpoint4 = getCheckpointDate(4);
-      // Week 5 is skip, so should jump to week 6 Tuesday (2025-09-22 + 1 = 2025-09-23)
-      assertEqual(checkpoint4, '2025-09-23', 'getCheckpointDate(4) skips week 5 → Tuesday of week 6');
+      // Week 5 is skip, so should jump to week 6 Tuesday (2026-09-22 + 1 = 2026-09-23)
+      assertEqual(checkpoint4, '2026-09-23', 'getCheckpointDate(4) skips week 5 → Tuesday of week 6');
 
       // getSprintDateRange
       const range = getSprintDateRange(1, 4);
-      assertEqual(range.start, '2025-08-18', 'getSprintDateRange start is week 1 Monday');
-      assertEqual(range.end, '2025-09-12', 'getSprintDateRange end is week 4 Friday');
+      assertEqual(range.start, '2026-08-18', 'getSprintDateRange start is week 1 Monday');
+      assertEqual(range.end, '2026-09-12', 'getSprintDateRange end is week 4 Friday');
 
       const badRange = getSprintDateRange(1, 99);
       assertEqual(badRange.start, null, 'getSprintDateRange with invalid end returns null start');
       assertEqual(badRange.end, null, 'getSprintDateRange with invalid end returns null end');
 
       // formatDateDisplay
-      assertEqual(formatDateDisplay('2025-08-18'), 'Aug 18, 2025', 'formatDateDisplay formats correctly');
+      assertEqual(formatDateDisplay('2026-08-18'), 'Aug 18, 2026', 'formatDateDisplay formats correctly');
       assertEqual(formatDateDisplay(''), '', 'formatDateDisplay handles empty string');
       assertEqual(formatDateDisplay(null), '', 'formatDateDisplay handles null');
 
       // formatDateShort
-      assertEqual(formatDateShort('2025-08-18'), 'Aug 18', 'formatDateShort formats correctly');
+      assertEqual(formatDateShort('2026-08-18'), 'Aug 18', 'formatDateShort formats correctly');
       assertEqual(formatDateShort(''), '', 'formatDateShort handles empty string');
 
       // SPRINT_DATES_STORAGE_KEY
@@ -510,9 +510,9 @@
       assert(events[0].title.includes('[P2]'), 'Formative event title includes priority');
       assert(events[0].title.includes('📚'), 'Formative event title includes book emoji');
       assert(events[0].title.includes('CSA'), 'Formative event title includes course name');
-      assertEqual(events[0].date, '2025-08-18', 'Formative event uses reading date');
+      assertEqual(events[0].date, '2026-08-18', 'Formative event uses reading date');
       assert(events[1].title.includes('📝'), 'Summative event title includes clipboard emoji');
-      assertEqual(events[1].date, '2025-08-22', 'Summative event uses assessment date');
+      assertEqual(events[1].date, '2026-08-22', 'Summative event uses assessment date');
 
       // buildEventsFromSelection — empty
       const emptyEvents = buildEventsFromSelection({}, 'P1', 'CSA');
@@ -520,22 +520,22 @@
 
       // generateICSFile
       const icsEvents = [
-        { title: 'Test Event', description: 'A test', date: '2025-08-18', period: 'CSA' }
+        { title: 'Test Event', description: 'A test', date: '2026-08-18', period: 'CSA' }
       ];
       const icsContent = generateICSFile(icsEvents);
       assert(icsContent.includes('BEGIN:VCALENDAR'), 'ICS contains VCALENDAR begin');
       assert(icsContent.includes('END:VCALENDAR'), 'ICS contains VCALENDAR end');
       assert(icsContent.includes('BEGIN:VEVENT'), 'ICS contains VEVENT');
       assert(icsContent.includes('SUMMARY:Test Event'), 'ICS contains event title');
-      assert(icsContent.includes('DTSTART;VALUE=DATE:20250818'), 'ICS date formatted correctly');
+      assert(icsContent.includes('DTSTART;VALUE=DATE:20260818'), 'ICS date formatted correctly');
       assert(icsContent.includes('CATEGORIES:CSA'), 'ICS contains category');
 
       // formatICSDate
-      assertEqual(formatICSDate('2025-08-18'), '20250818', 'formatICSDate formats correctly');
-      assertEqual(formatICSDate('2025-12-31'), '20251231', 'formatICSDate handles year end');
+      assertEqual(formatICSDate('2026-08-17'), '20260817', 'formatICSDate formats correctly');
+      assertEqual(formatICSDate('2026-12-31'), '20261231', 'formatICSDate handles year end');
 
       // formatICSDateTime
-      const testDate = new Date('2025-08-18T12:00:00Z');
+      const testDate = new Date('2026-08-17T12:00:00Z');
       const icsDateTime = formatICSDateTime(testDate);
       assert(icsDateTime.endsWith('Z'), 'formatICSDateTime ends with Z');
       assert(icsDateTime.includes('T'), 'formatICSDateTime contains T separator');
@@ -629,14 +629,14 @@
       assert(events1[0].title.includes('📚'), 'Formative event has book emoji');
       assert(events1[0].title.includes('Intro to Java'), 'Event title has item title');
       assert(events1[0].title.includes('CSA'), 'Event title has course name');
-      assertEqual(events1[0].date, '2025-08-18', 'Formative event uses reading date when no custom date');
+      assertEqual(events1[0].date, '2026-08-18', 'Formative event uses reading date when no custom date');
 
       // buildSyncEvents — custom date overrides default
       const items2 = [
-        { weekNum: 1, type: 'formative', title: 'Custom', url: '', priority: 'P0', customDate: '2025-12-25' }
+        { weekNum: 1, type: 'formative', title: 'Custom', url: '', priority: 'P0', customDate: '2026-12-25' }
       ];
       const events2 = buildSyncEvents(items2, 'CSA');
-      assertEqual(events2[0].date, '2025-12-25', 'Custom date overrides default reading date');
+      assertEqual(events2[0].date, '2026-12-25', 'Custom date overrides default reading date');
 
       // buildSyncEvents — summative
       const items3 = [
@@ -644,7 +644,7 @@
       ];
       const events3 = buildSyncEvents(items3, 'CSA');
       assert(events3[0].title.includes('📝'), 'Summative event has clipboard emoji');
-      assertEqual(events3[0].date, '2025-08-29', 'Summative event uses assessment date');
+      assertEqual(events3[0].date, '2026-08-29', 'Summative event uses assessment date');
 
       // buildSyncEvents — skip week returns no events
       const items4 = [
@@ -683,8 +683,8 @@
       mockLoggedInUser();
 
       const events = [
-        { title: '[P2] 📚 Week 1 Formative - CSA', description: 'Test', date: '2025-08-18', period: 'CSA', priority: 'P2' },
-        { title: '[P2] 📝 Week 1 Summative - CSA', description: 'Test', date: '2025-08-22', period: 'CSA', priority: 'P2' }
+        { title: '[P2] 📚 Week 1 Formative - CSA', description: 'Test', date: '2026-08-17', period: 'CSA', priority: 'P2' },
+        { title: '[P2] 📝 Week 1 Summative - CSA', description: 'Test', date: '2026-08-21', period: 'CSA', priority: 'P2' }
       ];
 
       const result = await syncEventsToBackend(events);
@@ -711,7 +711,7 @@
       mockLoggedOutUser();
 
       const events = [
-        { title: '[P2] 📚 Week 1 Formative - CSA', description: 'Test', date: '2025-08-18', period: 'CSA', priority: 'P2' }
+        { title: '[P2] 📚 Week 1 Formative - CSA', description: 'Test', date: '2026-08-17', period: 'CSA', priority: 'P2' }
       ];
 
       const result = await syncEventsToBackend(events);
@@ -738,7 +738,7 @@
       mockFetchNetworkError();
 
       const events = [
-        { title: '[P2] 📚 Week 1 Formative - CSA', description: 'Test', date: '2025-08-18', period: 'CSA', priority: 'P2' }
+        { title: '[P2] 📚 Week 1 Formative - CSA', description: 'Test', date: '2026-08-17', period: 'CSA', priority: 'P2' }
       ];
 
       const result = await syncEventsToBackend(events);
@@ -1026,8 +1026,8 @@
       populateSprintDatePreview('sprint1', 1, 4);
       const previewEl = document.querySelector('.sprint-date-preview[data-sprint="sprint1"]');
       assert(previewEl.innerHTML !== '', 'populateSprintDatePreview renders content');
-      assert(previewEl.innerHTML.includes('Aug 18, 2025'), 'Preview shows start date');
-      assert(previewEl.innerHTML.includes('Sep 12, 2025'), 'Preview shows end date');
+      assert(previewEl.innerHTML.includes('Aug 17, 2026'), 'Preview shows start date');
+      assert(previewEl.innerHTML.includes('Sep 11, 2026'), 'Preview shows end date');
 
       // Test with break weeks
       populateSprintDatePreview('sprint1', 1, 6);
@@ -1288,9 +1288,9 @@
 
       // Multiple events
       const multiEvents = [
-        { title: 'Event A', description: 'Desc A', date: '2025-08-18', period: 'CSA' },
-        { title: 'Event B', description: 'Desc B', date: '2025-08-19', period: 'CSP' },
-        { title: 'Event C', description: 'Desc C', date: '2025-08-20', period: '' }
+        { title: 'Event A', description: 'Desc A', date: '2026-08-17', period: 'CSA' },
+        { title: 'Event B', description: 'Desc B', date: '2026-08-18', period: 'CSP' },
+        { title: 'Event C', description: 'Desc C', date: '2026-08-19', period: '' }
       ];
       const multiICS = generateICSFile(multiEvents);
       const veventCount = (multiICS.match(/BEGIN:VEVENT/g) || []).length;
@@ -1301,7 +1301,7 @@
 
       // Special characters in title/description
       const specialEvents = [
-        { title: 'Meeting, Important; Urgent', description: 'Line1\nLine2\nLine3', date: '2025-01-01', period: 'Test' }
+        { title: 'Meeting, Important; Urgent', description: 'Line1\nLine2\nLine3', date: '2026-01-01', period: 'Test' }
       ];
       const specialICS = generateICSFile(specialEvents);
       assert(specialICS.includes('SUMMARY:Meeting\\, Important\\; Urgent'), 'Commas and semicolons escaped in SUMMARY');
@@ -1368,8 +1368,8 @@
       const leapYear = formatDateDisplay('2024-02-29');
       assert(leapYear !== '', 'formatDateDisplay handles leap year date');
 
-      const yearEnd = formatDateDisplay('2025-12-31');
-      assertEqual(yearEnd, 'Dec 31, 2025', 'formatDateDisplay handles year end');
+      const yearEnd = formatDateDisplay('2026-12-31');
+      assertEqual(yearEnd, 'Dec 31, 2026', 'formatDateDisplay handles year end');
 
       // formatDateShort with year boundary
       const janFirst = formatDateShort('2026-01-01');
