@@ -3,19 +3,21 @@ Sprint1:
   shared: "Onboarding"
   help: "/navigation/sprint1-help"  # Add help for this sprint
   start: 0
-  end: 3
+  end: 4
   0:
     theme: "Getting Started"
     goals:
-      - "Tool Mastery"
-      - "Project-Based Learning"
-      - "Team Collaboration"
+      - "Play Games"
+      - "Account Setup"
+      - "Code Builder"
+      - "PBL Introduction"
   1:
     theme: "Essential Tools Setup"
     goals:
       - "Hardware & Workspace Setup"
       - "VSCode, Linux, GitHub"
-      - "GitHub Pages Launch"
+      - "GitHub Pages 1st Coding"
+      - "Team Collaboration"
   2:
     theme: "Agile Development" 
     goals:
@@ -29,17 +31,17 @@ Sprint1:
       - "Gamified Coding Tasks"
       - "JavaScript"
       - "Retrospective Reflection"
-Sprint2:
-  title: JavaScript Foundations & Student Teaching
-  description: A key focus of this course is to make Web Games using JavaScript. Understanding fundamentals like control structures, data types, input/output, operators, classes, methods and parameters, basic inheritance, and documentation practices are essentiial. Students will be teaching lessons on these topics to their peers.  Each student will be responsible for a portion of the lesson, a popcorn hack, and homework.  Students will be graded on their teaching, the popcorn hack, and the homework they assign.  Students will also be graded on their participation in learning from their peers.
-  start: 4
-  end: 7
   4:
     theme: "JavaScript Foundations and LxD"
     goals:
       - "LxD Principles"
       - "Classroom Teaching"
       - "Feedback and Grading"
+Sprint2:
+  title: JavaScript Foundations & Student Teaching
+  description: A key focus of this course is to make Web Games using JavaScript. Understanding fundamentals like control structures, data types, input/output, operators, classes, methods and parameters, basic inheritance, and documentation practices are essentiial. Students will be teaching lessons on these topics to their peers.  Each student will be responsible for a portion of the lesson, a popcorn hack, and homework.  Students will be graded on their teaching, the popcorn hack, and the homework they assign.  Students will also be graded on their participation in learning from their peers.
+  start: 5
+  end: 8
   5:
     theme: "Draft Learning Experience" 
     goals:
@@ -57,6 +59,12 @@ Sprint2:
   7:
     theme: "Receive Learning and Reflect"
     goals:
+      - "Review Homework Progress"
+      - "Adjust Plans"
+      - "Peer Feedback"
+  8:
+    theme: "Sprint Retrospective"
+    goals:
       - "Reflect on Teaching"
       - "Be a Learner"
       - "Provide Learner Feedback"
@@ -64,15 +72,36 @@ Sprint2:
 Sprint3:
   title: Creating a game for N@tM
   description: Part of the process of becoming technically proficient is going beyond fundamentals by taking on a project challenge while coding. A challenge with some vision, questions, AI research, and more allow amazing things to be accomplished. Our goal is to participate in N@tM with the other CS classes and other classes from the Electives Department.  We should have a blog, progress in a game, and a series of lesson hacks to show off.
-  start: 8
+  start: 9
   end: 12
-  8:
+  9:
     theme: "Game Development Basics"
     goals:
       - "Build Game Elements"
       - "Backgrounds"
       - "Sprites and Animation"
       - "Player and NPCs"
+  10:
+    theme: "Game Development Mechanics"
+    goals:
+      - "Classroom Development Plan"
+      - "Kanban Board Assignments"
+      - "Add Levels and Challenges"
+      - "Add new Game Mechanics"
+  11:
+    theme: "Game Polishing and Presentation"
+    goals:
+      - "Deploy Game"
+      - "Test Game"
+      - "Polish Game Features"
+      - "Prepare for Presentation"
+  12:
+    theme: "Game Deployment and Feedback"
+    goals:
+      - "Crossover Reviews"
+      - "Present at N@tM"
+      - "Collect Feedback"
+      - "Plan Next Steps on Game Design"
 Sprint4:
   title: Ideating, Tinkering, Building and OOP
   description: Explore the OCS GameEngine—a platform designed to make learning computer science both fun and accesible. You will work collaboratively, build games, and apply key programming concepts in a creative, team-based environment.
@@ -82,9 +111,9 @@ Sprint5:
   title: Advanced Features
   description: The Teacher will be providing topics such as local storage, leaderboard APIs, websockets, platformer and more to add to the game.  Students will be expected to learn these topics and implement them into to OCS game.  
   start: 17
-  end: 18
+  end: 20
 Sprint6:
   title: An RPG/Platformer game.
   description: Trimester 2 concludes with students presenting their project at N@tM. Each person within "Student Teams" will have their own specialty within the student project. Students should be able to talk about design, make a plan, code, blog, and present features of their portion of the system.
-  start: 19
-  end: 25
+  start: 21
+  end: 24
