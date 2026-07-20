@@ -35,197 +35,347 @@ web_dev_layers: &web_dev_layers |
 Sprint1:
   shared: "Onboarding"
   start: 0
-  end: 3
+  end: 4
+
   0:
-    theme: "Getting Started"
+    theme: "Code Runner Review"
     goals:
-      - "Tool Mastery"
-      - "Team Collaboration"
-      - "Project-Based Learning"
+      - "Data Types: Strings, Numbers, and Booleans"
+      - "Control Structures: Selection and Iteration"
+      - "Modularization: Functions and Classes"
+
   1:
-    theme: "Essential Tools Setup"
+    theme: "Development Essentials"
     goals:
-      - "Hardware & Workspace Setup"
-      - "VSCode, Linux, GitHub"
-      - "GitHub Pages Launch"
+      - "Computing Environment: Operating Systems, Tools, and Projects"
+      - "SDLC: Build, Test, Commit, and Deploy"
+      - "GitHub Pages: Overview and Deployment"
+
   2:
-    theme: "Agile Development" 
+    theme: "Agile Development"
     goals:
-      - "Scrum + Standups"
-      - "Kanban Boards + Burndown"
-      - "Repository Management"
-      - "Coding"
+      - "Coding Challenge: Team Programming"
+      - "Sprints: Planning, Execution, and Iteration"
+      - "Tracking: Kanban Boards and Burndown Charts"
+
   3:
-    theme: "Summative Coding Challenge"
+    theme: "CPT: 30% of the AP CSP Exam"
     goals:
-      - "Gamified Coding Tasks"
-      - "JavaScript"
-      - "Python"
-      - "Retrospective Reflection"
-Sprint2:
-  title: JavaScript and Python Foundations 
-  description: During these weeks, students will learn fundamentals of programming and blog their learnings.  There will be several student-led lectures (student teaching) that provide foundational concepts and help students learn programming and key principles required by the College Board.
-  start: 4
-  end: 7
+      - "Challenge: Build a Full Stack Project"
+      - "Frontend: JavaScript and Jekyll"
+      - "Backend: Python and Flask"
+
   4:
-    theme: "Lesson Planning and Creation"
+    theme: "Team Programming"
     goals:
-      - "Python and JavaScript Basics"
-      - "APCSP Big Ideaa 3 Topics"
-      - "Using Code Runner and Jupyter Notebooks"
+      - "Coordination: Scrum and Standups"
+      - "Version Control: Repositories, Branching, and Pull Requests"
+      - "Retrospective: Reflection and Improvement"
+
+
+Sprint2:
+  title: "Full Stack Foundations"
+  description: >
+    During this Sprint, students will explore the architecture of a Full Stack
+    application and develop the technical foundations needed to build one.
+    Students will blog their learning and participate in student-led lectures
+    that reinforce programming concepts, AP CSP Big Ideas, and the technical
+    principles required by the College Board.
+  start: 5
+  end: 8
+
   5:
-    theme: "Programming Basics"
+    theme: "Full Stack Architecture"
     goals:
-      - "Student Teaching Sessions"
-      - "Data Types: Strings, Numbers, Booleans"
-      - "Control Structures: Selection, Iteration"
+      - "AP CSP: Big Ideas and Essential Concepts"
+      - "Frontend: User Interface Design"
+      - "Backend: APIs and Databases"
+
   6:
-    theme: "Functions and Data Structures"
+    theme: "Frontend Development Foundations"
     goals:
-      - "Defining and Calling Functions"
-      - "Lists/Arrays and Dictionaries/Objects"
-      - "Problem-Solving with Functions"
+      - "HTML, JavaScript, and the DOM"
+      - "User Input and DOM Manipulation"
+      - "APIs and Asynchronous Fetch"
+
   7:
-    theme: "APCSP Topics"
+    theme: "Backend and Data Foundations"
+    goals:
+      - "Data Serialization: JSON and Python Dictionaries"
+      - "API Design: Defining Endpoints and Data Contracts"
+      - "Data Modeling: SQLAlchemy and Relational Databases"
+
+  8:
+    theme: "CPT Checkpoint"
     goals:
       - "Algorithms and Efficiency"
       - "Randomization and Simulation"
-      - "Unsolvable Problems"
+      - "CPT Technical Review"
+      - "Reflection and Improvement"
+
+
 Sprint3:
-  title: Creating a Web Application for N@tM
-  description: The team Website should include real-world interests but also requires the use of a JavaScript frontend including use of Local Storage for persistent data. By the end of the Sprint, students will be ready to start many of the technical coding aspects of Web Development; having established a Website with a learning purpose. In November, the Trimester will end by presenting the team project at the Electives Department "Night at the Museum" (N@tM). 
+  title: "Building a Full Stack Web Application"
+  description: >
+    During this Sprint, teams will apply their Full Stack knowledge to build
+    a web application for a real audience and purpose. Each team will develop
+    a website around a real-world interest while incorporating a JavaScript
+    frontend, user interaction, and localStorage for persistent client-side
+    data. By the end of the Sprint, students will have progressed from learning
+    the architecture of a Full Stack application to building and presenting a
+    working product at the Electives Department's Night at the Museum (N@tM).
   illustration: *web_dev_layers
-  start: 8
+  start: 9
   end: 12
-  8:
-    theme: "Frontend Development Foundations"
-    goals:
-      - "JavaScript Fundamentals"
-      - "DOM Manipulation & Events"
-      - "User Interface Design"
+
   9:
-    theme: "Interactive Features & Data"
+    theme: "Interactive Features and Data"
     goals:
-      - "Local Storage & Persistence"
-      - "Fetch API & Async JavaScript"
-      - "Form Handling & Validation"
+      - "Forms: Input Handling and Validation"
+      - "Client-Side State: localStorage and User Preferences"
+      - "APIs: Fetching and Working with Application Data"
+
   10:
-    theme: "Team Integration & Testing"
+    theme: "Integration and Testing"
     goals:
-      - "Feature Integration"
-      - "User Experience (UX) Refinement"
-      - "Cross-Browser Testing"
+      - "Integration: Combining Team Contributions"
+      - "User Experience: UX Refinement"
+      - "Testing: End-to-End Application Testing"
+
   11:
-    theme: "Project Polish & Presentation Prep"
+    theme: "Project Polish and Presentation"
     goals:
-      - "Code Review & Debugging"
-      - "Documentation & README"
+      - "Code Review and Debugging"
+      - "Documentation: README, Setup, and Usage"
       - "N@tM Presentation Practice"
+
   12:
     theme: "Night at the Museum (N@tM)"
     goals:
       - "Live Project Demonstration"
-      - "Peer & Community Feedback"
+      - "Peer and Community Feedback"
       - "Sprint Retrospective"
+
 Sprint4:
-  title: Create Performance Task (CPT) Full Stack
-  description: Trimester 2 will begin with advancement of the Web Project.  Using CPT learning requirements, personal interests for ideation, and PBL advancements with Python/Flask students will make a Full Stack Project. Great projects contain frontend style and backend persistent data, database. Ideation for your CPT project should contain frontend styling; JavaScript interacting with user requests; and a database with personal data structures.
+  title: "CPT Passion Project: Full Stack Development"
+  description: >
+    Trimester 2 will begin with the development of a Full Stack project
+    designed for the Create Performance Task. Students will use CPT requirements,
+    personal interests, ideation, and Project-Based Learning to develop a
+    project using Python and Flask. Strong Full Stack projects combine a
+    styled frontend, JavaScript interaction, backend APIs, and persistent data
+    stored in a database. CPT project ideation should identify a meaningful
+    problem or interest and describe how the frontend, backend, and database
+    will work together to create a complete application.
   start: 13
   end: 16
+
   13:
-    theme: "Flask Introduction & Security"
+    theme: "Flask Foundations and Security"
     goals:
-      - "JWT Authentication, Login, Cookies"
-      - "Simple RESTful APIs with Flask"
-      - "Data Access & Security"
+      - "Flask: Routes, Requests, and Responses"
+      - "Authentication: Login, Sessions, and Cookies"
+      - "Data Access and Security"
+
   14:
     theme: "Backend API Development"
     goals:
-      - "Postman, Debugging, Errors & Testing"
-      - "Frontend Consuming Backend APIs"
-      - "CPT Ideation with Full Stack"
+      - "API Development: RESTful Endpoints with Flask"
+      - "Development Tools: Postman, Debugging, and Error Handling"
+      - "CPT Ideation: Designing a Full Stack Project"
+
   15:
-    theme: "Full Stack Achievement"
+    theme: "Database and Data Models"
     goals:
-      - "Python/Flask CORS Handling"
+      - "Database Models: SQLite and SQLAlchemy"
+      - "Data Operations: CRUD and API Endpoints"
+      - "Data Modeling: Designing Persistent Application Data"
+
+  16:
+    theme: "Full Stack Integration"
+    goals:
+      - "CORS: Connecting Frontend and Backend"
       - "REST API Design Principles"
       - "Frontend-Backend Integration"
-  16:
-    theme: "Database & Data Models"
-    goals:
-      - "SQLite/Database Model Creation"
-      - "CRUD Operations & Endpoints"
       - "Full Stack Localhost Pipeline"
+
 Sprint5:
-  title: CPT final Design and Development
-  description: Data Abstraction, Computer Systems, Networks, Impact of Computing. Trimester 2 continues with CPT project design and development. The big focus is on frontend/backend completion using data, databases, and leveraging login.  Backend project will be deployed on AWS.  Students should be able to talk about data structures, data abstraction, and how their system works from frontend to backend including networks and systems. To aid in talking, there will be student-led lectures (student teaching) that provide foundational concepts and help students learn key principles required by the College Board.
+  title: "CPT Completion and Industry Transition"
+  description: >
+    Students will complete and document their Create Performance Task project
+    while beginning the transition from student-owned development to professional
+    client engagement. Students will deploy, test, document, and explain their
+    applications while developing the technical vocabulary needed to describe
+    how their systems work. Industry partners will provide feedback on student
+    development practices and help students prepare for the transition to
+    working directly with non-profit clients.
   start: 17
-  end: 21
+  end: 20
+
   17:
-    theme: "Teacher Feedback Integration"
+    theme: "Full Stack Deployment and Testing"
     goals:
-      - "Feature Refinement"
-      - "Kanban Review & Improvement Plans"
-      - "Start Issue Burndown"
-  18:
-    theme: "Deployment & AWS Infrastructure"
-    goals:
-      - "AWS EC2 Setup & Configuration"
-      - "Full Stack Deployment Pipeline"
+      - "AWS EC2 Setup and Configuration"
       - "Database Backup and Restore"
+      - "Full Stack Testing and Debugging"
+
+  18:
+    theme: "CPT Completion and Documentation"
+    goals:
+      - "Feature Refinement and Issue Burndown"
+      - "Kanban Review and Improvement Planning"
+      - "CPT Project Documentation"
+
   19:
-    theme: "Full Stack Realization"
-    goals:
-      - "Student Teaching Plan: Big Ideas"
-      - "System Architecture Understanding"
-      - "Database Review & Optimization"
-  20:
-    theme: "College Board Big Ideas Integration"
-    goals:
-      - "Algorithmic Thinking & Analysis"
-      - "Impact of Computing Discussion"
-      - "Networks & Internet Concepts"
-  21:
-    theme: "CPT Project Completion"
-    goals:
-      - "Comprehensive Testing Plans"
-      - "Final Feature Refinement"
-      - "Documentation & Video Making"
-Sprint6:
-  title: N@tM Presentations and AP Exam Prep
-  description: Trimester 2 concludes with students presenting their CPT project at N@tM. Each person within "Student Teams" will have their own specialty within the student project that satisfies all their Create Performance Task requirements. Students should be able to talk about design, coding, iteration, and present features of their portion of the system. There will be an MCQ Exam Practice during finals week.
-  start: 22
-  end: 24
-  22:
-    theme: "CPT Video & Documentation"
+    theme: "CPT Video and Written Response"
     goals:
       - "Create CPT Video Recording"
       - "Written Response Preparation"
-      - "Code Commenting & Portfolio"
+      - "Code Commenting and Portfolio"
+
+  20:
+    theme: "Industry Partner Engagement and Transition"
+    goals:
+      - "Technical Project Demonstration"
+      - "Teacher and Industry Feedback Integration"
+      - "Professional Communication and Collaboration"
+
+Sprint6:
+  title: "Non-Profit Exploration and Ideation"
+  description: >
+    Students will transition from student-owned CPT projects to real-world
+    non-profit engagement. Through ideation, prototyping, presentations, and
+    conversations with non-profit partners, students will explore meaningful
+    problems and possible technical solutions. Students will use low- and
+    high-fidelity prototypes to communicate ideas, gather feedback, and prepare
+    for future client development.
+  start: 21
+  end: 24
+
+  21:
+    theme: "Non-Profit Problem Discovery"
+    goals:
+      - "Understanding Non-Profit Needs"
+      - "Brainstorming Project Ideas"
+      - "Low-Fidelity Prototyping"
+
+  22:
+    theme: "Solution Exploration and Prototyping"
+    goals:
+      - "High-Fidelity Prototyping"
+      - "Exploratory Development and Debugging"
+      - "Preparation for Implementation"
+
   23:
-    theme: "Professional Presentation Prep"
+    theme: "Professional Presentation Preparation"
     goals:
       - "N@tM Booth Setup Planning"
-      - "Presentation Script & Practice"
-      - "External Feedback Collection"
+      - "Presentation Script and Practice"
+      - "Crossover Peer Reviews and Feedback"
+
   24:
-    theme: "N@tM Showcase & Reflection"
+    theme: "N@tM Showcase and Non-Profit Engagement"
     goals:
       - "Live Project Demonstration"
-      - "Community & Industry Feedback"
-      - "CPT Submission & Finals Prep"
-Sprint7: 
-  title: Data Structures and Data Science
-  description: This is the beginning of a college course following the outline of CS113 Data Structures from Mira Costa CC. Topics, using Python, include searching, sorting, hashing, algorithms, analysis, object-oriented design, collections, lists, stacks, queues, trees, sets, dictionaries, and graphs.
+      - "Community and Industry Feedback"
+      - "Meetings with Non-Profit Partners"
+
+Sprint7:
+  title: "AI, Data, and Emerging Technology"
+  description: >
+    Students will explore artificial intelligence, machine learning, data
+    processing, and emerging technologies as potential tools for solving
+    real-world problems. Students will investigate how these technologies can
+    be applied responsibly in non-profit contexts and will begin developing
+    technical solutions based on identified needs and opportunities.
   start: 25
-  end: 29
+  end: 28
+
+  25:
+    theme: "AI and Machine Learning Foundations"
+    goals:
+      - "Algorithms and Data Processing"
+      - "Machine Learning Concepts"
+      - "AI Applications and Limitations"
+
+  26:
+    theme: "Data for Real-World Problems"
+    goals:
+      - "Data Collection and Preparation"
+      - "Data Structures and Data Modeling"
+      - "Data Analysis and Visualization"
+
+  27:
+    theme: "AI and Full Stack Integration"
+    goals:
+      - "AI APIs and Model Integration"
+      - "Backend Services and Data Pipelines"
+      - "Prototype Development"
+
+  28:
+    theme: "Technology Solutions and Client Planning"
+    goals:
+      - "Solution Demonstration"
+      - "Client Feedback"
+      - "Project Planning for Non-Profit Development"
+
 Sprint8:
-  title: AP Weeks
-  description: Activities will be focused on supporting students in test preparations, including student teaching. Days that are not focused on test preparation will be focused on planning for year-end project/portfolio.
-  start: 30
-  end: 33
+  title: "AP Review and Non-Profit Project Planning"
+  description: >
+    Students will complete targeted AP CSP review while continuing to prepare
+    for non-profit project development. Student-led teaching will reinforce
+    College Board concepts through examples drawn from the systems and projects
+    students have built during the year. Remaining project time will be used to
+    finalize requirements, technical plans, and development priorities for
+    non-profit engagement.
+  start: 29
+  end: 32
+
 Sprint9:
-  title: Passion Project and N@tM
-  description: Presenting accomplishments for the year by creating a passion project for N@tM. This project will serve as the year-end final exam.
-  start: 34
-  end: 36
+  title: "Non-Profit Development and Delivery"
+  description: >
+    Students will work with non-profit partners to develop, refine, and
+    present technology solutions based on real-world needs. Teams will apply
+    requirements gathering, Full Stack development, data management, testing,
+    deployment, and professional communication throughout the development
+    process. The year will conclude with final client demonstrations,
+    documentation, reflection, and presentations of the work completed for
+    non-profit partners.
+  start: 33
+  end: 37
+
+  33:
+    theme: "Non-Profit Development Sprint"
+    goals:
+      - "Core Feature Development"
+      - "Client Communication"
+      - "Iterative Testing"
+
+  34:
+    theme: "Full Stack Solution Development"
+    goals:
+      - "Frontend and Backend Integration"
+      - "Database and Data Management"
+      - "Feature Development"
+
+  35:
+    theme: "Client Feedback and Iteration"
+    goals:
+      - "Client Demonstration"
+      - "Feedback Integration"
+      - "Feature Refinement"
+
+  36:
+    theme: "Non-Profit Showcase and Reflection"
+    goals:
+      - "Final Client Demonstration"
+      - "Community and Industry Feedback"
+      - "N@tM Community Presentation"
+
+  37:
+    theme: "Final Delivery Preparation"
+    goals:
+      - "Production Testing"
+      - "Documentation and Training"
+      - "Final Client Delivery"
+
