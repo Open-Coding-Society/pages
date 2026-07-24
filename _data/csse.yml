@@ -32,11 +32,11 @@ Sprint1:
       - "JavaScript"
       - "Retrospective Reflection"
   4:
-    theme: "JavaScript Foundations and LxD"
+    theme: "Retrospective and Assessment"
     goals:
-      - "LxD Principles"
-      - "Classroom Teaching"
-      - "Feedback and Grading"
+      - "Reflect on Sprint"
+      - "Self-Assessment"
+      - "Peer and Teacher Feedback"
 Sprint2:
   title: JavaScript Foundations & Student Teaching
   description: A key focus of this course is to make Web Games using JavaScript. Understanding fundamentals like control structures, data types, input/output, operators, classes, methods and parameters, basic inheritance, and documentation practices are essentiial. Students will be teaching lessons on these topics to their peers.  Each student will be responsible for a portion of the lesson, a popcorn hack, and homework.  Students will be graded on their teaching, the popcorn hack, and the homework they assign.  Students will also be graded on their participation in learning from their peers.
@@ -45,17 +45,15 @@ Sprint2:
   5:
     theme: "Draft Learning Experience" 
     goals:
-      - "JavaScript Fundamentals"
-      - "Pick Technical Topic"
-      - "Learner Empathy"
+      - "LxD Principles"
+      - "Pick JavaScript Topic"
       - "Design a Lesson Plan"
   6: 
     theme: "Deliver Learning Experiences"
     goals:
       - "Develop Lesson Plan"
-      - "Teach a Lesson"
-      - "Homework Delivery"
-      - "Prepare for Grading"
+      - "Classroom Teaching Plan"
+      - "Homework and Grading Plan"
   7:
     theme: "Receive Learning and Reflect"
     goals:
