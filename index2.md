@@ -41,7 +41,10 @@ Hi! My name is [Your Full Name]
     <a class="ocs__btn" href="{{site.baseurl}}/github/pages/about_sass_buttons/">
         Buttons Lesson
     </a>
-    <a class="ocs__btn ocs" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_buttons.scss" target="_blank" rel="noopener noreferrer">
+    <a class="ocs__btn iridescent" href="{{site.baseurl}}/github/pages/about_sass_buttons/">
+        <span>Iridescent Sample</span>
+    </a>
+    <a class="ocs__btn" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_buttons.scss" target="_blank" rel="noopener noreferrer">
         Button Mixins
     </a>
     <a class="ocs__btn" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_container.scss" target="_blank" rel="noopener noreferrer">

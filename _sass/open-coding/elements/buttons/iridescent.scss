@@ -2,10 +2,18 @@
 // Provides a shimmer animation effect for interactive elements
 
 .iridescent {
+  @extend .ocs__btn;
+
   position: relative;
   overflow: hidden;
-  background: blue; /* base blue */
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--pref-accent-color, var(--accent)),
+    var(--accent-700, var(--pref-accent-color, var(--accent)))
+  );
+  color: var(--pref-bg-color, var(--white1, #ffffff));
+  border-color: var(--pref-accent-color, var(--accent));
+  transition: filter 0.2s ease, opacity 0.2s ease;
   
   // Shimmer overlay effect
   &::before {
@@ -21,6 +29,15 @@
     background-size: 200% 200%;
     animation: shimmer 3s infinite linear;
     z-index: 0;
+    pointer-events: none;
+  }
+
+  &:hover {
+    filter: brightness(1.06);
+  }
+
+  &:active {
+    filter: brightness(0.94);
   }
   
   // Ensure content stays above the shimmer effect
