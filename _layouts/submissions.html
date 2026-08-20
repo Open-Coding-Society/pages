@@ -55,6 +55,12 @@ active_tab: submissions
                         <option value="graded">Graded</option>
                         <option value="late">Late</option>
                     </select>
+                    <button
+                        type="button"
+                        id="summarize-batch-btn"
+                        style="padding:8px 16px;border-radius:8px;background:#4f46e5;color:#fff;font-size:0.875rem;border:none;cursor:pointer;"
+                    >Summarize next 10 with AI</button>
+                    <span id="summarize-batch-status" style="align-self:center;font-size:0.8rem;color:#9ca3af;"></span>
                 </div>
                 <div id="all-submissions-loading" class="flex items-center justify-center min-h-[400px]">
                     <div class="text-center">
@@ -147,8 +153,16 @@ active_tab: submissions
 </div>
 
 <style>
+    #my-submissions-container,
+    #all-submissions-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .submissions-table {
         width: 100%;
+        min-width: 960px;
         border-collapse: collapse;
         border-radius: 8px;
         overflow: hidden;
@@ -468,10 +482,12 @@ active_tab: submissions
 </style>
 
 <script type="module">
-    import { javaURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
+    import { javaURI, pythonURI, fetchOptions } from '{{ site.baseurl }}/assets/js/api/config.js';
 
     const apiUrl = `${javaURI}/api/assignment-submission-view/list`;
     const userInfoUrl = `${javaURI}/api/assignment-submission-view/user-info`;
+    const summarizeUrl = `${pythonURI}/api/gemini/summarize-submissions`;
+    const MAX_SUMMARY_BATCH_ITEMS = 10;
 
     let allSubmissions = [];
     let isAdmin = false;
@@ -486,6 +502,7 @@ active_tab: submissions
             setupTabSwitcher();
             setupFilters();
             setupEditModal();
+            setupSummarizeButton();
             hideLoadingSpinners();
         } catch (error) {
             console.error('Error initializing submissions:', error);
@@ -601,6 +618,13 @@ active_tab: submissions
         if (content.type === 'link' || content.url) return `<a href="${escapeHtml(content.url)}" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;">${escapeHtml(content.url)}</a>`;
         if (content.text) return escapeHtml(content.text);
         return escapeHtml(JSON.stringify(content));
+    }
+
+    function renderAiSummary(submission) {
+        if (submission.aiSummary) {
+            return `<span style="color:#d1d5db;">${escapeHtml(submission.aiSummary)}</span>`;
+        }
+        return '<em style="color:#6b7280">Not summarized yet</em>';
     }
 
     function getSubmissionFileDownloadUrl(content) {
@@ -932,6 +956,7 @@ active_tab: submissions
                             <th>Grade</th>
                             <th>Feedback</th>
                             <th>Comment</th>
+                            <th>AI Summary</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -966,6 +991,7 @@ active_tab: submissions
                                             >${escapeHtml(String(feedbackVal))}</textarea>
                                         </td>
                                         <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
+                                        <td style="max-width:260px;">${renderAiSummary(submission)}</td>
                                         <td>
                                             <div class="submission-actions" style="flex-direction:column;align-items:flex-start;">
                                                 <button
@@ -993,6 +1019,148 @@ active_tab: submissions
         } catch (error) {
             console.error('Error rendering all submissions table:', error);
             container.innerHTML = '<div class="error-message">Error rendering submissions table. Please try again.</div>';
+        }
+    }
+
+    function setSummarizeStatus(message, type = 'info') {
+        const status = document.getElementById('summarize-batch-status');
+        if (!status) return;
+        status.textContent = message || '';
+        status.style.color = type === 'error' ? 'rgb(248, 113, 113)' : type === 'success' ? 'rgb(134, 239, 172)' : '#9ca3af';
+    }
+
+    function getNextSummaryBatch() {
+        return allSubmissions.filter(submission => !submission.aiSummary).slice(0, MAX_SUMMARY_BATCH_ITEMS);
+    }
+
+    async function buildSummaryFormData(batch) {
+        const formData = new FormData();
+
+        for (let i = 0; i < batch.length; i++) {
+            const submission = batch[i];
+            const content = submission.content;
+            const contentIsString = typeof content === 'string';
+            const isFile = !contentIsString && content && (content.type === 'file' || content.filename);
+            const isLink = !contentIsString && content && (content.type === 'link' || content.url);
+
+            formData.append(`id_${i}`, String(submission.id));
+            formData.append(`assignmentName_${i}`, submission.assignmentName || 'Unknown');
+            formData.append(`submitterName_${i}`, submission.submitterName || 'Unknown');
+
+            if (isFile) {
+                formData.append(`type_${i}`, 'file');
+                const filename = content.filename || content.storedFilename || 'submission-file';
+                formData.append(`filename_${i}`, filename);
+                const downloadUrl = getSubmissionFileDownloadUrl(content);
+                if (downloadUrl) {
+                    try {
+                        const fileResponse = await fetch(downloadUrl, fetchOptions);
+                        if (fileResponse.ok) {
+                            const blob = await fileResponse.blob();
+                            formData.append(`file_${i}`, blob, filename);
+                        }
+                    } catch (fileError) {
+                        console.warn(`Could not fetch file for submission ${submission.id}:`, fileError);
+                    }
+                }
+            } else if (isLink) {
+                formData.append(`type_${i}`, 'link');
+                formData.append(`text_${i}`, content.url || '');
+            } else {
+                formData.append(`type_${i}`, 'text');
+                const text = contentIsString ? content : (content && content.text) || submission.comment || '';
+                formData.append(`text_${i}`, text || '');
+            }
+        }
+
+        return formData;
+    }
+
+    async function runSummarizeBatch() {
+        const button = document.getElementById('summarize-batch-btn');
+        const batch = getNextSummaryBatch();
+
+        if (batch.length === 0) {
+            setSummarizeStatus('All submissions already have a summary.', 'success');
+            return;
+        }
+
+        button.disabled = true;
+        setSummarizeStatus(`Summarizing ${batch.length} submission${batch.length === 1 ? '' : 's'} (1 AI request)...`);
+
+        try {
+            const formData = await buildSummaryFormData(batch);
+
+            const response = await fetch(summarizeUrl, {
+                method: 'POST',
+                mode: 'cors',
+                credentials: 'include',
+                headers: { 'X-Origin': 'client' },
+                body: formData
+            });
+
+            if (!response.ok) {
+                let message = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.message) message = errorData.message;
+                } catch (parseError) {
+                    console.warn('Could not parse summarize error response');
+                }
+                throw new Error(message);
+            }
+
+            const data = await response.json();
+            const summaries = Array.isArray(data.summaries) ? data.summaries : [];
+
+            let savedCount = 0;
+            for (const item of summaries) {
+                const submission = getSubmissionById(item.id);
+                if (!submission || !item.summary) continue;
+
+                try {
+                    const saveUrl = `${javaURI}/api/submissions/summary/${encodeURIComponent(submission.id)}?summary=${encodeURIComponent(item.summary)}`;
+                    const saveResponse = await fetch(saveUrl, {
+                        method: 'POST',
+                        mode: 'cors',
+                        credentials: 'include',
+                        headers: { 'X-Origin': 'client' }
+                    });
+
+                    if (saveResponse.ok) {
+                        submission.aiSummary = item.summary;
+                        savedCount++;
+                    } else {
+                        console.warn(`Failed to persist summary for submission ${submission.id}:`, saveResponse.status);
+                    }
+                } catch (saveError) {
+                    console.warn(`Error persisting summary for submission ${submission.id}:`, saveError);
+                }
+            }
+
+            displayAllSubmissions();
+            const hasActiveFilter = ['admin-filter-assignment', 'admin-filter-student', 'admin-filter-status']
+                .some(id => document.getElementById(id) && document.getElementById(id).value);
+            if (hasActiveFilter) applyFilters();
+
+            const failedCount = batch.length - savedCount;
+            if (failedCount > 0) {
+                setSummarizeStatus(`Summarized ${savedCount}/${batch.length}. ${failedCount} could not be saved — try again.`, 'error');
+            } else {
+                setSummarizeStatus(`Summarized ${savedCount} submission${savedCount === 1 ? '' : 's'}.`, 'success');
+            }
+        } catch (error) {
+            console.error('Error summarizing submissions:', error);
+            setSummarizeStatus(`Summarization failed: ${error.message}`, 'error');
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    function setupSummarizeButton() {
+        const button = document.getElementById('summarize-batch-btn');
+        if (button) {
+            button.addEventListener('click', runSummarizeBatch);
         }
     }
 
@@ -1182,6 +1350,7 @@ active_tab: submissions
                         <th>Grade</th>
                         <th>Feedback</th>
                         <th>Comment</th>
+                        <th>AI Summary</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -1213,6 +1382,7 @@ active_tab: submissions
                                 >${escapeHtml(String(feedbackVal))}</textarea>
                             </td>
                             <td>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</td>
+                            <td style="max-width:260px;">${renderAiSummary(submission)}</td>
                             <td>
                                 <div class="submission-actions" style="flex-direction:column;align-items:flex-start;">
                                     <button
