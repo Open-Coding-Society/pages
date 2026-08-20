@@ -5,6 +5,9 @@ $sizes: (
     large: (50px, 14px, 20px, 12px, 17px, 22px, -0.43px)
 );
 
+@import "../../mixins/container";
+@import "../../mixins/buttons";
+
 
 @mixin button-style($height, $paddingVertical, $paddingHorizontal, $borderRadius_, $fontSize, $lineHeight, $letterSpacing) {
     height: $height;
@@ -25,4 +28,17 @@ $sizes: (
     .#{$name} {
         @include button-style($values...);
     }
+}
+
+// Shared OCS lesson link/button utilities
+// Keep these in elements/buttons so pages can reuse them without page-specific form files.
+.ocs__links {
+    @include inline-container(flex, 0.75rem);
+    flex-wrap: wrap;
+}
+
+.ocs__btn {
+    @include text-button;
+    border-color: var(--pref-accent-color);
+    text-decoration: none;
 }

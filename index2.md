@@ -38,17 +38,14 @@ Hi! My name is [Your Full Name]
 > Mixins-first examples for building display sections with reusable containers and buttons.
 
 <div class="ocs__links">
-    <a class="ocs__btn" href="{{site.baseurl}}/github/pages/data_about_sass_buttons/">
-        About Lesson
+    <a class="ocs__btn" href="{{site.baseurl}}/github/pages/about_sass_buttons/">
+        Buttons Lesson
     </a>
-    <a class="ocs__btn ocs__btn" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_buttons.scss" target="_blank" rel="noopener noreferrer">
+    <a class="ocs__btn ocs" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_buttons.scss" target="_blank" rel="noopener noreferrer">
         Button Mixins
     </a>
     <a class="ocs__btn" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/mixins/_container.scss" target="_blank" rel="noopener noreferrer">
         Container Mixins
-    </a>
-    <a class="ocs__btn" href="https://github.com/Open-Coding-Society/pages/blob/main/_sass/open-coding/forms/sass-builder.scss" target="_blank" rel="noopener noreferrer">
-        SASS Builder
     </a>
 </div>
 
