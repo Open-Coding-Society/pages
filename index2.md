@@ -78,7 +78,7 @@ Hi! My name is [Your Full Name]
 
 ### Class Progress
 
-> Here is my game progress through coding, click multicolor buttons to see these in the browser
+> Here is my game progress through coding, click multicolor and size buttons to see these in the browser
 
 <div class="ocs__links">
     <a href="{{site.baseurl}}/snake" class="ocs__btn pill alert-green fill">
