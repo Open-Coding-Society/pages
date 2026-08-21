@@ -1,0 +1,32 @@
+// Legacy class compatibility while utility grammar is adopted incrementally.
+@each $name, $tone in $ocs-alert-buttons {
+    .ocs__btn--alert-#{$name} {
+        --ocs-btn-tone: #{$tone};
+        background: transparent;
+        border-width: 2px;
+        border-color: $tone;
+        color: $tone;
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: transparent;
+            border-color: $tone;
+            color: $tone;
+        }
+    }
+
+    .ocs__btn.alert-#{$name}.ocs__btn--alert-fill,
+    .ocs__btn--alert-#{$name}.fill,
+    .ocs__btn--alert-#{$name}.ocs__btn--alert-fill {
+        background: color-mix(in srgb, $tone 20%, var(--pref-bg-color));
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: color-mix(in srgb, $tone 30%, var(--pref-bg-color));
+            border-color: $tone;
+            color: $tone;
+        }
+    }
+}
