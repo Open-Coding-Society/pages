@@ -1,4 +1,4 @@
-// Iridescent Button Component
+// Iridescent Button Variant
 // Provides a shimmer animation effect for interactive elements
 
 .iridescent {
@@ -15,7 +15,7 @@
   color: var(--pref-bg-color, var(--white1, #ffffff));
   border-color: var(--ocs-btn-tone);
   transition: filter 0.2s ease, opacity 0.2s ease;
-  
+
   // Shimmer overlay effect
   &::before {
     content: "";
@@ -50,7 +50,7 @@
     );
     filter: brightness(0.94);
   }
-  
+
   // Ensure content stays above the shimmer effect
   span,
   a {
@@ -61,10 +61,10 @@
 
 // Shimmer animation keyframes
 @keyframes shimmer {
-  0% { 
-    background-position: 0% 50%; 
+  0% {
+    background-position: 0% 50%;
   }
-  100% { 
-    background-position: 100% 50%; 
+  100% {
+    background-position: 100% 50%;
   }
 }
