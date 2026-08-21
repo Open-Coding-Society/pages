@@ -81,10 +81,10 @@ Hi! My name is [Your Full Name]
 > Here is my game progress through coding, click multicolor buttons to see these in the browser
 
 <div class="ocs__links">
-    <a href="{{site.baseurl}}/snake" class="ocs__btn small alert-green fill">
+    <a href="{{site.baseurl}}/snake" class="ocs__btn pill alert-green fill">
         Snake
     </a>
-    <a href="{{site.baseurl}}/gamify/parallax" class="ocs__btn alert-yellow fill">
+    <a href="{{site.baseurl}}/gamify/parallax" class="ocs__btn small alert-yellow fill">
         Fish
     </a>
     <a href="{{site.baseurl}}/gamify" class="ocs__btn alert-red fill">
