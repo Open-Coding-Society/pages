@@ -55,6 +55,15 @@ active_tab: submissions
                         <option value="graded">Graded</option>
                         <option value="late">Late</option>
                     </select>
+                    <select id="admin-filter-quality" class="px-4 py-2 rounded-lg border border-neutral-600 bg-neutral-700 text-neutral-50 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">All Quality Scores</option>
+                        <option value="5">5 - Exemplar</option>
+                        <option value="4">4 - High Quality</option>
+                        <option value="3">3 - Moderate Quality</option>
+                        <option value="2">2 - Basic Quality</option>
+                        <option value="1">1 - Minimal Quality</option>
+                        <option value="none">Not scored yet</option>
+                    </select>
                     <button
                         type="button"
                         id="summarize-batch-btn"
@@ -645,6 +654,23 @@ active_tab: submissions
         return '<em style="color:#6b7280">Not summarized yet</em>';
     }
 
+    const QUALITY_SCORE_COLORS = {
+        5: '#16a34a',
+        4: '#65a30d',
+        3: '#d97706',
+        2: '#ea580c',
+        1: '#dc2626'
+    };
+
+    function renderQualityScore(submission) {
+        const score = submission.qualityScore;
+        if (!score) {
+            return '<em style="color:#6b7280">—</em>';
+        }
+        const color = QUALITY_SCORE_COLORS[score] || '#6b7280';
+        return `<span style="display:inline-block;padding:2px 10px;border-radius:12px;background:${color}22;color:${color};font-weight:600;">${score}/5</span>`;
+    }
+
     function cellTitle(text) {
         return text ? ` title="${escapeHtml(text)}"` : '';
     }
@@ -979,6 +1005,7 @@ active_tab: submissions
                             <th>Feedback</th>
                             <th>Comment</th>
                             <th>AI Summary</th>
+                            <th>Quality Score</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1014,6 +1041,7 @@ active_tab: submissions
                                         </td>
                                         <td><div class="cell-clamp"${cellTitle(submission.comment)}>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</div></td>
                                         <td><div class="cell-clamp"${cellTitle(submission.aiSummary)}>${renderAiSummary(submission)}</div></td>
+                                        <td>${renderQualityScore(submission)}</td>
                                         <td>
                                             <div class="submission-actions" style="flex-direction:column;align-items:flex-start;">
                                                 <button
@@ -1129,7 +1157,9 @@ active_tab: submissions
             if (!submission || !item.summary) continue;
 
             try {
-                const saveUrl = `${javaURI}/api/submissions/summary/${encodeURIComponent(submission.id)}?summary=${encodeURIComponent(item.summary)}`;
+                const params = new URLSearchParams({ summary: item.summary });
+                if (item.quality_score) params.set('qualityScore', item.quality_score);
+                const saveUrl = `${javaURI}/api/submissions/summary/${encodeURIComponent(submission.id)}?${params.toString()}`;
                 const saveResponse = await fetch(saveUrl, {
                     method: 'POST',
                     mode: 'cors',
@@ -1139,6 +1169,7 @@ active_tab: submissions
 
                 if (saveResponse.ok) {
                     submission.aiSummary = item.summary;
+                    if (item.quality_score) submission.qualityScore = item.quality_score;
                     savedCount++;
                 } else {
                     console.warn(`Failed to persist summary for submission ${submission.id}:`, saveResponse.status);
@@ -1168,7 +1199,7 @@ active_tab: submissions
 
         const rerender = () => {
             displayAllSubmissions();
-            const hasActiveFilter = ['admin-filter-assignment', 'admin-filter-student', 'admin-filter-status']
+            const hasActiveFilter = ['admin-filter-assignment', 'admin-filter-student', 'admin-filter-status', 'admin-filter-quality']
                 .some(id => document.getElementById(id) && document.getElementById(id).value);
             if (hasActiveFilter) applyFilters();
         };
@@ -1371,8 +1402,9 @@ active_tab: submissions
         const filterAssignment = document.getElementById('admin-filter-assignment');
         const filterStudent = document.getElementById('admin-filter-student');
         const filterStatus = document.getElementById('admin-filter-status');
+        const filterQuality = document.getElementById('admin-filter-quality');
 
-        [filterAssignment, filterStudent, filterStatus].forEach(filter => {
+        [filterAssignment, filterStudent, filterStatus, filterQuality].forEach(filter => {
             if (filter) {
                 filter.addEventListener('input', applyFilters);
             }
@@ -1383,13 +1415,16 @@ active_tab: submissions
         const assignmentFilter = (document.getElementById('admin-filter-assignment').value || '').toLowerCase();
         const studentFilter = (document.getElementById('admin-filter-student').value || '').toLowerCase();
         const statusFilter = document.getElementById('admin-filter-status').value;
+        const qualityFilter = document.getElementById('admin-filter-quality').value;
 
         const filtered = allSubmissions.filter(sub => {
             const assignmentMatch = (sub.assignmentName || '').toLowerCase().includes(assignmentFilter);
             const studentMatch = (sub.submitterName || '').toLowerCase().includes(studentFilter);
             const statusMatch = !statusFilter || getFilterStatus(sub) === statusFilter;
+            const qualityMatch = !qualityFilter
+                || (qualityFilter === 'none' ? !sub.qualityScore : sub.qualityScore === Number(qualityFilter));
 
-            return assignmentMatch && studentMatch && statusMatch;
+            return assignmentMatch && studentMatch && statusMatch && qualityMatch;
         });
 
         if (filtered.length === 0) {
@@ -1410,6 +1445,7 @@ active_tab: submissions
                         <th>Feedback</th>
                         <th>Comment</th>
                         <th>AI Summary</th>
+                        <th>Quality Score</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -1442,6 +1478,7 @@ active_tab: submissions
                             </td>
                             <td><div class="cell-clamp"${cellTitle(submission.comment)}>${submission.comment ? escapeHtml(submission.comment) : '<em style="color:#6b7280">No comment</em>'}</div></td>
                             <td><div class="cell-clamp"${cellTitle(submission.aiSummary)}>${renderAiSummary(submission)}</div></td>
+                            <td>${renderQualityScore(submission)}</td>
                             <td>
                                 <div class="submission-actions" style="flex-direction:column;align-items:flex-start;">
                                     <button
