@@ -1,3 +1,6 @@
+// Calculator Button Variant (legacy "hacks button" styles)
+// Originally created for calculator-specific sizing, colors, and responsive layout.
+
 // STYLING PREFERNCES for SITE
 // mixin used as a template for buttons
 @mixin button {
@@ -16,7 +19,7 @@
     grid-row: span 1;
 
     // Creates smooth animation effect
-    transition: all 0.5s; 
+    transition: all 0.5s;
   }
 
   /* define class for redifined button */
@@ -40,7 +43,7 @@
     flex: 16.66%;
     padding: 3px;
   }
-  
+
 // ==========================================
 // MODERN RESPONSIVE CALCULATOR STYLING
 // ==========================================
@@ -55,16 +58,17 @@
 }
 
 /* Calculator container - modern grid layout */
-.calculator-container { 
+.calculator-container {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
   padding: 1.5rem;
   background: rgba(30, 30, 30, 0.95);
   border-radius: 20px;
-  box-shadow: 
+  box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 
   display: grid;
@@ -105,6 +109,7 @@
   justify-content: center;
   align-items: center;
   transition: all 0.15s ease;
+  -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -114,21 +119,21 @@
   @include calc-button;
   background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
   color: #fff;
-  box-shadow: 
+  box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
   &:hover {
     background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       0 6px 12px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   &:active {
     transform: translateY(0);
-    box-shadow: 
+    box-shadow:
       0 2px 4px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
@@ -146,14 +151,14 @@
   @include calc-button;
   background: linear-gradient(145deg, #ff9500, #e68a00);
   color: #fff;
-  box-shadow: 
+  box-shadow:
     0 4px 6px rgba(255, 149, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
   &:hover {
     background: linear-gradient(145deg, #ffaa33, #ff9500);
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       0 6px 12px rgba(255, 149, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
@@ -168,7 +173,7 @@
   @include calc-button;
   background: linear-gradient(145deg, #636366, #48484a);
   color: #fff;
-  box-shadow: 
+  box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   font-size: clamp(1rem, 3vw, 1.2rem);
@@ -188,7 +193,7 @@
   @include calc-button;
   background: linear-gradient(145deg, #636366, #48484a);
   color: #fff;
-  box-shadow: 
+  box-shadow:
     0 4px 6px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
@@ -207,14 +212,14 @@
   @include calc-button;
   background: linear-gradient(145deg, #34c759, #28a745);
   color: #fff;
-  box-shadow: 
+  box-shadow:
     0 4px 6px rgba(52, 199, 89, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
   &:hover {
     background: linear-gradient(145deg, #4cd964, #34c759);
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
       0 6px 12px rgba(52, 199, 89, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
@@ -249,7 +254,7 @@
   .calculator-container {
     max-width: 400px;
   }
-  
+
   .calculator-number,
   .calculator-operation,
   .calculator-clear,
@@ -263,5 +268,3 @@
 canvas {
   filter: none;
 }
-
-

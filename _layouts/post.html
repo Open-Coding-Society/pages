@@ -79,6 +79,11 @@ Check if this is a course lesson and determine which course context to use
           {% include gist-export-button.html %}
           {% endif %}
 
+          {% if page.grading_modules %}
+          {% comment %} Render the grading/submission module at the bottom of the lesson content (not above it) {% endcomment %}
+          {% include grading_modules.html %}
+          {% endif %}
+
           {% if page.assignment %}
           {% include lesson-submission-form.html %}
           <p style="margin-top: 12px; color: #9ca3af; font-size: 0.95rem;">
@@ -1314,6 +1319,11 @@ Check if this is a course lesson and determine which course context to use
     {%- endif -%}
 
     {{ content }}
+
+    {% if page.grading_modules %}
+    {% comment %} Grading/submission module at the bottom of the content (non-course-lesson pages) {% endcomment %}
+    {% include grading_modules.html %}
+    {% endif %}
 
     {% if page.assignment %}
     <div class="assignment-submission">

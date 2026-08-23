@@ -1,0 +1,24 @@
+@import "../mixins/container";
+@import "../mixins/buttons";
+
+.ocs {
+  @include main-container(2rem);
+
+  &__card {
+    @include sub-container(1rem);
+    padding: 1rem;
+    border: 1px solid var(--ui-border);
+    border-radius: 10px;
+    background: var(--panel-mid);
+  }
+
+  &__card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  &__card p {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+  }
+}

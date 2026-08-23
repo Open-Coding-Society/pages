@@ -5,7 +5,6 @@ $sizes: (
     large: (50px, 14px, 20px, 12px, 17px, 22px, -0.43px)
 );
 
-
 @mixin button-style($height, $paddingVertical, $paddingHorizontal, $borderRadius_, $fontSize, $lineHeight, $letterSpacing) {
     height: $height;
 
@@ -21,8 +20,8 @@ $sizes: (
     cursor: pointer;
 }
 
-@each $name, $values in $sizes {
-    .#{$name} {
-        @include button-style($values...);
-    }
-}
+$ocs-alert-buttons: (
+    red: var(--red),
+    yellow: var(--warn),
+    green: var(--green)
+);

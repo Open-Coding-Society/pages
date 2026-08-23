@@ -2,14 +2,14 @@
  * Runner Control Buttons
  * Standardized button styles for code/UI/game runner interfaces
  * These classes provide semantic, theme-aware buttons for common runner actions
- * 
+ *
  * Uses colors from root-color-map.scss - single source of truth
  */
 
 @import "../../../root-color-map";
 @import "../../materials/main.scss";
-@import "common.scss";
-@import "states.scss";
+@import "includes";
+@import "states";
 
 // ===========================
 // Semantic Color References
@@ -27,21 +27,21 @@
 .danger-button {
   @extend .medium;
   @extend .primary;
-  
+
   background-color: $status-indicator-error-color !important;
   border-color: $status-indicator-error-color !important;
   color: $white1 !important;
-  
+
   &:hover {
     background-color: darken($status-indicator-error-color, 8%) !important;
     border-color: darken($status-indicator-error-color, 8%) !important;
     opacity: 0.95;
   }
-  
+
   &:active {
     background-color: darken($status-indicator-error-color, 15%) !important;
   }
-  
+
   &:disabled {
     background-color: $status-indicator-error-bg !important;
     cursor: not-allowed;
@@ -56,21 +56,21 @@
 .warning-button {
   @extend .medium;
   @extend .primary;
-  
+
   background-color: $warn !important;
   border-color: $warn !important;
   color: #000 !important; // Dark text for better contrast on yellow
-  
+
   &:hover {
     background-color: darken($warn, 8%) !important;
     border-color: darken($warn, 8%) !important;
     opacity: 0.95;
   }
-  
+
   &:active {
     background-color: darken($warn, 15%) !important;
   }
-  
+
   &:disabled {
     background-color: $warn-bg !important;
     color: rgba(#000, 0.5) !important;
@@ -86,21 +86,21 @@
 .success-button {
   @extend .medium;
   @extend .primary;
-  
+
   background-color: $validation-success-color !important;
   border-color: $validation-success-color !important;
   color: $white1 !important;
-  
+
   &:hover {
     background-color: darken($validation-success-color, 8%) !important;
     border-color: darken($validation-success-color, 8%) !important;
     opacity: 0.95;
   }
-  
+
   &:active {
     background-color: darken($validation-success-color, 15%) !important;
   }
-  
+
   &:disabled {
     background-color: $status-indicator-success-bg !important;
     cursor: not-allowed;
@@ -115,21 +115,21 @@
 .info-button {
   @extend .medium;
   @extend .primary;
-  
+
   background-color: $blue !important;
   border-color: $blue !important;
   color: $white1 !important;
-  
+
   &:hover {
     background-color: darken($blue, 8%) !important;
     border-color: darken($blue, 8%) !important;
     opacity: 0.95;
   }
-  
+
   &:active {
     background-color: darken($blue, 15%) !important;
   }
-  
+
   &:disabled {
     background-color: rgba($blue, 0.2) !important;
     cursor: not-allowed;
@@ -151,7 +151,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  
+
   @media (max-width: 768px) {
     width: 44px;
     min-width: 44px;

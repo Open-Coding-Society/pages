@@ -1,7 +1,7 @@
 // button master file
-@import "common.scss";
-@import "filled.scss";
-@import "states.scss";
-@import "hacks-button.scss";
-@import "iridescent.scss";
-@import "runner-buttons.scss";
+@import "includes";
+@import "variant-filled";
+@import "states";
+@import "variant-calculator";
+@import "variant-iridescent";
+@import "variant-runner";
