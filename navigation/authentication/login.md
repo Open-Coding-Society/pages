@@ -25,6 +25,9 @@ show_reading_time: false
                 <button type="submit" class="large primary submit-button">Login</button>
             </p>
             <p id="message" style="color: red;"></p>
+            <p style="text-align: center;">
+                <a href="{{site.baseurl}}/support?topic=reset">Forgot your password?</a>
+            </p>
         </form>
     </div>
     <div class="signup-card">
