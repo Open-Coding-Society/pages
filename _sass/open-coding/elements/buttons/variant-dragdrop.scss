@@ -1,0 +1,189 @@
+/**
+ * Drag and Drop Buttons
+ * Reusable classes for drag-source / drop-target button pairs used by
+ * assembly, matching, and sorting activities (see the PC Assembly Bench).
+ *
+ * Markup contract:
+ *   .ocs__dnd                     board wrapper
+ *     .ocs__dnd-header            title / controls row
+ *     .ocs__dnd-status            aria-live status line
+ *     .ocs__dnd-progress          secondary progress line
+ *     .ocs__dnd-layout            responsive two panel grid
+ *       .ocs__dnd-panel           a tray or a target area
+ *         .ocs__dnd-panel-title   panel heading
+ *         .ocs__drag-btn          draggable source button  (draggable="true")
+ *         .ocs__drop-btn          drop target button
+ *
+ * State classes (toggle from JS, no inline styles needed):
+ *   .is-selected  source picked, waiting for a destination
+ *   .is-over      pointer is dragging over this drop target
+ *   .is-filled    drop target accepted its correct item
+ *   [disabled]    consumed source or completed target
+ */
+
+// ===========================
+// Palette
+// ===========================
+
+.ocs__dnd,
+.ocs__drag-btn,
+.ocs__drop-btn {
+  --dnd-surface: #111827;
+  --dnd-panel: #0f172a;
+  --dnd-control: #1e293b;
+  --dnd-border: #334155;
+  --dnd-accent: #3b82f6;
+  --dnd-accent-strong: #1d4ed8;
+  --dnd-accent-soft: #60a5fa;
+  --dnd-select: #fbbf24;
+  --dnd-success: #22c55e;
+  --dnd-success-bg: #14532d;
+  --dnd-text: #f8fafc;
+  --dnd-muted: #93c5fd;
+  --dnd-radius: 8px;
+}
+
+// ===========================
+// Board
+// ===========================
+
+.ocs__dnd {
+  color: #e5e7eb;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  padding: 18px;
+  font-family: system-ui, sans-serif;
+}
+
+.ocs__dnd-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.ocs__dnd-status {
+  font-weight: 700;
+  min-height: 24px;
+}
+
+.ocs__dnd-progress {
+  color: var(--dnd-muted);
+}
+
+.ocs__dnd-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 14px;
+}
+
+.ocs__dnd-panel {
+  background: var(--dnd-panel);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.ocs__dnd-panel-title {
+  margin-top: 0;
+}
+
+// ===========================
+// Supporting controls
+// ===========================
+
+.ocs__dnd-input {
+  display: block;
+  width: min(100%, 320px);
+  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #64748b;
+  border-radius: 7px;
+  background: var(--dnd-panel);
+  color: var(--dnd-text);
+}
+
+.ocs__dnd-reset {
+  padding: 10px 14px;
+  border: 1px solid var(--dnd-accent-soft);
+  border-radius: 7px;
+  background: var(--dnd-accent-strong);
+  color: #ffffff;
+  cursor: pointer;
+
+  &:hover {
+    background: darken(#1d4ed8, 6%);
+  }
+}
+
+// ===========================
+// Drag sources and drop targets
+// ===========================
+
+.ocs__drag-btn,
+.ocs__drop-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 8px 0;
+  padding: 11px;
+  border: 1px solid var(--dnd-accent);
+  border-radius: var(--dnd-radius);
+  background: var(--dnd-control);
+  color: var(--dnd-text);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s, border-color 0.2s, outline-color 0.2s, opacity 0.2s;
+
+  &:hover:not([disabled]) {
+    background: lighten(#1e293b, 6%);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--dnd-accent-soft);
+    outline-offset: 2px;
+  }
+
+  &[disabled] {
+    cursor: default;
+  }
+}
+
+.ocs__drag-btn {
+  cursor: grab;
+
+  &:active:not([disabled]) {
+    cursor: grabbing;
+  }
+
+  // picked up, waiting on a destination
+  &.is-selected {
+    outline: 3px solid var(--dnd-select);
+  }
+
+  // already installed / consumed
+  &[disabled] {
+    opacity: 0.35;
+    cursor: default;
+  }
+}
+
+.ocs__drop-btn {
+  // a drag is hovering this target
+  &.is-over {
+    border-color: var(--dnd-select);
+    background: lighten(#1e293b, 10%);
+  }
+
+  // correct item landed here
+  &.is-filled,
+  &.is-filled[disabled] {
+    border-color: var(--dnd-success);
+    background: var(--dnd-success-bg);
+    opacity: 1;
+  }
+}
