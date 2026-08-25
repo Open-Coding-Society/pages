@@ -139,6 +139,13 @@ while preserving all critical instructions. The agent must still communicate wit
 
 * **同步更新文档：** 随着你在迭代中犯错、学习新的系统模式或约束，主动用重要的注意事项更新 `AGENTS.md`，并确保同步更新 `AGENTS_MD_DOCUMENTATION.md`（英文说明版本），以便系统随时间不断改进。
 
+## 群组与实时聊天（Groups & realtime chat）
+
+* **架构：** 群聊客户端使用 SockJS + STOMP.js（CDN 加载），连接 Spring 后端（Pirna-spring）的 `/ws-chat` 端点。发送到 `/app/groups.chat`，订阅 `/topic/group/${groupId}`；事件含 message/joinGroup/typing/heartbeat(25s)/文件图片，用 JSON event-key 集合去重并自动重连。
+* **端点分支：** localhost 直连 `${protocol}//${host}:8589/ws-chat`，生产环境走 `javaURI + '/ws-chat'`（nginx 转发 8589）。注意：`groups.js` 与 `lesson_chat.html` 中 8589 端口是硬编码的（代码注释标记为待迁移到 config.js）；`assets/js/api/config.js` 已导出 `javaWebSocketURI` 但聊天代码尚未使用。
+* **代码重复警告：** 聊天逻辑存在于多处——规范源是 [assets/js/projects/student-management-groups/groups.js](assets/js/projects/student-management-groups/groups.js)（"CHAT FUNCTIONALITY" 段），但 [_includes/group_dashboard.html](_includes/group_dashboard.html) 与 [_includes/lesson_chat.html](_includes/lesson_chat.html) 内嵌了副本；修改后必须手动同步这些 include，否则行为不一致。
+* **课程聊天约定：** lesson 页面通过 frontmatter `chat: true` 启用，共享 backbone 群组 `"lessons"`，以 `[[lesson:<url>]]` 标记按页面隔离。
+
 ## 反模式
 
 ### 上帝函数
