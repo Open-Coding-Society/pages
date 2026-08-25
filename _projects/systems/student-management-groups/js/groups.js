@@ -19,6 +19,7 @@
       // Chat state
       let activeChatGroupId = null;
       let activeChatGroupName = '';
+      let chatOpenOperationSequence = 0;
       const groupChatState = {
         stompClient: null,
         subscription: null,
@@ -321,6 +322,7 @@
           return;
         }
 
+        const openOperationToken = ++chatOpenOperationSequence;
         activeChatGroupId = groupId;
         activeChatGroupName = groupName;
 
@@ -347,8 +349,12 @@
 
         try {
           await fetchChatMessages();
+          if (!isCurrentChatOpenOperation(openOperationToken, groupId)) return;
+
           await fetchSharedFiles();
-          await startChatPolling();
+          if (!isCurrentChatOpenOperation(openOperationToken, groupId)) return;
+
+          await startChatPolling(openOperationToken, groupId);
         } catch (err) {
           console.error('Failed to open chat', err);
         }
@@ -356,6 +362,7 @@
 
       // Close group chat modal
       window.closeGroupChat = function () {
+        chatOpenOperationSequence += 1;
         if (activeChatGroupId && groupChatState.connected) {
           sendGroupEvent('leaveGroup', {}, true);
         }
@@ -1979,7 +1986,13 @@
         sendGroupEvent('typingStop', {}, true);
       };
 
-      async function startChatPolling() {
+      function isCurrentChatOpenOperation(openOperationToken, groupId) {
+        return chatOpenOperationSequence === openOperationToken && activeChatGroupId === groupId;
+      }
+
+      async function startChatPolling(openOperationToken, groupId) {
+        if (!isCurrentChatOpenOperation(openOperationToken, groupId)) return;
+
         groupChatState.allowReconnect = true;
         if (groupChatState.connected) {
           subscribeToActiveGroup();
