@@ -4,23 +4,30 @@
 <!-- _includes/group_dashboard.html (Open-Coding-Society/spring's /api/groups + -->
 <!-- /ws-chat). The group is created automatically on first use if it doesn't -->
 <!-- exist yet, so no manual DB seeding is required. -->
+<!-- -->
+<!-- Signed-out visitors still get the full UI: the chat drops into a local -->
+<!-- "preview" mode backed by localStorage, matching _includes/week_chat.html, -->
+<!-- so the feature is visible and testable without a login. -->
 
-<div id="announcementChat" class="announcement-chat" data-course="{{ page.course }}" style="margin: 1.5em 0; border: 1px solid; border-radius: 8px; padding: 1em;">
-  <div style="display:flex; align-items:center; justify-content:space-between; gap:.5em; flex-wrap:wrap;">
-    <h2 style="margin:0; font-size:1.1em;">📢 {{ page.course | upcase }} Announcements <span id="announcementChatStatus" style="font-weight:normal; font-size:.8em;">loading…</span></h2>
+<div id="announcementChat" class="announcement-chat" data-course="{{ page.course }}">
+  <div class="chat-header">
+    <h2 class="chat-title">📢 {{ page.course | upcase }} Announcements</h2>
+    <span class="chat-status" id="announcementChatStatus">loading…</span>
   </div>
-  <p style="margin:.25em 0 0; font-size:.85em; opacity:.75;">Class-wide chat for this course — announcements, questions, anything that isn't week-specific.</p>
-  <div id="announcementChatMessages" aria-live="polite" style="height:16em;overflow-y:auto;border:1px solid;padding:.5em;margin:.75em 0;border-radius:4px;">
-    <p id="announcementChatEmpty"><em>No messages sent yet.</em></p>
+  <p class="chat-subtitle">Class-wide chat for this course — announcements, questions, anything that isn't week-specific.</p>
+  <p class="chat-preview-note" id="announcementChatNote" hidden>
+    <i class="fas fa-flask"></i><span id="announcementChatNoteText"></span>
+  </p>
+  <div class="chat-messages" id="announcementChatMessages" aria-live="polite">
+    <p class="chat-empty" id="announcementChatEmpty">No messages sent yet.</p>
   </div>
-  <form id="announcementChatForm" autocomplete="off" style="display:flex;gap:.5em">
-    <input id="announcementChatInput" type="text" placeholder="Message the class…" maxlength="2000" disabled style="flex:1">
-    <button id="announcementChatSend" type="submit" disabled>Send</button>
+  <form class="chat-form" id="announcementChatForm" autocomplete="off">
+    <input class="chat-input" id="announcementChatInput" type="text" placeholder="Message the class…" maxlength="2000" disabled>
+    <button class="chat-send" id="announcementChatSend" type="submit" disabled>
+      <i class="fas fa-paper-plane"></i><span>Send</span>
+    </button>
   </form>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -28,6 +35,32 @@
   const COURSE = {{ page.course | jsonify }};
   const GROUP_NAME = `${COURSE}-announcements`;
   const CHAT_SOCKET_PORT = 8589;
+  const PREVIEW_KEY = `ocs-chat-preview:${GROUP_NAME}`;
+  const PREVIEW_LIMIT = 100;
+
+  const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
+  const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
+
+  // Shared with the per-week chats: load the chat libraries once per page,
+  // and only when a chat actually needs a live connection.
+  function loadScriptOnce(src) {
+    window.__ocsChatScripts = window.__ocsChatScripts || {};
+    if (!window.__ocsChatScripts[src]) {
+      window.__ocsChatScripts[src] = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = resolve;
+        el.onerror = () => reject(new Error(`failed to load ${src}`));
+        document.head.appendChild(el);
+      });
+    }
+    return window.__ocsChatScripts[src];
+  }
+
+  async function loadChatLibraries() {
+    await loadScriptOnce(SOCKJS_SRC);
+    await loadScriptOnce(STOMP_SRC);
+  }
 
   function buildChatSocketEndpoint() {
     const uri = new URL(javaURI);
@@ -43,17 +76,34 @@
     subscription: null,
     connected: false,
     initialized: false,
+    mode: 'live', // 'live' once connected to the backend, 'preview' when local-only
     currentUserDisplayName: 'You',
     seenKeys: new Set(),
   };
 
   const statusEl = document.getElementById('announcementChatStatus');
+  const noteEl = document.getElementById('announcementChatNote');
+  const noteTextEl = document.getElementById('announcementChatNoteText');
   const messagesEl = document.getElementById('announcementChatMessages');
   const inputEl = document.getElementById('announcementChatInput');
   const sendBtn = document.getElementById('announcementChatSend');
   const formEl = document.getElementById('announcementChatForm');
 
-  function setStatus(text) { statusEl.textContent = text; }
+  function setStatus(text, tone) {
+    statusEl.textContent = text;
+    statusEl.classList.remove('is-live', 'is-preview', 'is-error');
+    if (tone) statusEl.classList.add(tone);
+  }
+
+  function showNote(text) {
+    noteTextEl.textContent = text;
+    noteEl.hidden = false;
+  }
+
+  function setComposerEnabled(enabled) {
+    inputEl.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+  }
 
   function formatTimestamp(isoString) {
     if (!isoString) return '';
@@ -71,10 +121,28 @@
     clearEmpty();
     const who = sender === state.currentUserDisplayName ? 'You' : (sender || 'Unknown');
     const when = formatTimestamp(date);
-    const line = document.createElement('p');
-    const strong = document.createElement('strong');
-    strong.textContent = who;
-    line.append(strong, document.createTextNode(when ? ` · ${when}: ` : ': '), document.createTextNode(message));
+
+    const line = document.createElement('div');
+    line.className = who === 'You' ? 'chat-msg is-self' : 'chat-msg';
+
+    const meta = document.createElement('div');
+    meta.className = 'chat-msg-meta';
+    const senderEl = document.createElement('span');
+    senderEl.className = 'chat-msg-sender';
+    senderEl.textContent = who;
+    meta.appendChild(senderEl);
+    if (when) {
+      const timeEl = document.createElement('span');
+      timeEl.className = 'chat-msg-time';
+      timeEl.textContent = when;
+      meta.appendChild(timeEl);
+    }
+
+    const body = document.createElement('span');
+    body.className = 'chat-msg-body';
+    body.textContent = message;
+
+    line.append(meta, body);
     messagesEl.appendChild(line);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -82,9 +150,8 @@
   function appendSystem(text) {
     clearEmpty();
     const el = document.createElement('p');
-    const em = document.createElement('em');
-    em.textContent = text;
-    el.appendChild(em);
+    el.className = 'chat-system';
+    el.textContent = text;
     messagesEl.appendChild(el);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -93,14 +160,60 @@
     return [event?.sender || '', event?.date || '', event?.message || ''].join('|');
   }
 
+  /* ── Local preview mode ─────────────────────────────────────────────
+     Used when nobody is signed in (or the backbone is unreachable) so the
+     announcements panel stays visible and usable. Messages are kept in
+     localStorage for this browser only. */
+
+  function readPreviewMessages() {
+    try {
+      const raw = window.localStorage.getItem(PREVIEW_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn('Announcement chat: preview history unavailable', err);
+      return [];
+    }
+  }
+
+  function writePreviewMessage(entry) {
+    try {
+      const messages = readPreviewMessages();
+      messages.push(entry);
+      window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(messages.slice(-PREVIEW_LIMIT)));
+    } catch (err) {
+      console.warn('Announcement chat: could not save preview message', err);
+    }
+  }
+
+  function enterPreviewMode(reason) {
+    state.mode = 'preview';
+    state.currentUserDisplayName = 'You';
+    setStatus('preview', 'is-preview');
+    showNote(`${reason} This is a local preview — messages stay in this browser and are not sent to the class.`);
+
+    readPreviewMessages().forEach((msg) => {
+      const key = eventKey(msg);
+      if (state.seenKeys.has(key)) return;
+      state.seenKeys.add(key);
+      appendMessage(msg);
+    });
+
+    setComposerEnabled(true);
+  }
+
   async function resolveCurrentUser() {
     try {
       const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
-      if (!res.ok) { console.warn('Announcement chat: /api/id HTTP', res.status); return; }
+      if (!res.ok) { console.warn('Announcement chat: /api/id HTTP', res.status); return false; }
       const user = await res.json();
-      state.currentUserDisplayName = user?.name || user?.uid || user?.github || 'You';
+      const name = user?.name || user?.uid || user?.github;
+      if (!name) return false;
+      state.currentUserDisplayName = name;
+      return true;
     } catch (err) {
       console.warn('Announcement chat: user lookup failed', err);
+      return false;
     }
   }
 
@@ -186,7 +299,7 @@
   function connect() {
     return new Promise((resolve) => {
       if (state.connected) return resolve(true);
-      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') { setStatus('unavailable'); return resolve(false); }
+      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') { return resolve(false); }
       setStatus('connecting…');
       const socket = new SockJS(buildChatSocketEndpoint());
       const client = Stomp.over(socket);
@@ -195,7 +308,7 @@
 
       client.connect({}, () => {
         state.connected = true;
-        setStatus('connected');
+        setStatus('connected', 'is-live');
         state.subscription = client.subscribe(`/topic/group/${state.backboneGroupId}`, (frame) => {
           try { handleIncoming(JSON.parse(frame.body)); }
           catch (err) { console.warn('Announcement chat: bad frame', err); }
@@ -204,21 +317,29 @@
       }, (err) => {
         console.warn('Announcement chat: connection failed', err);
         state.connected = false;
-        setStatus('disconnected');
         resolve(false);
       });
 
       socket.onclose = () => {
         if (!state.connected) return;
         state.connected = false;
-        setStatus('disconnected');
-        inputEl.disabled = true;
-        sendBtn.disabled = true;
+        setStatus('disconnected', 'is-error');
+        setComposerEnabled(false);
       };
     });
   }
 
   function sendMessage(text) {
+    const date = new Date().toISOString();
+
+    if (state.mode === 'preview') {
+      const entry = { sender: state.currentUserDisplayName || 'You', message: text, date };
+      state.seenKeys.add(eventKey(entry));
+      writePreviewMessage(entry);
+      appendMessage(entry);
+      return true;
+    }
+
     if (!state.connected || !state.stompClient || !state.backboneGroupId) return false;
     const payload = {
       context: 'sendMessage',
@@ -226,7 +347,7 @@
       sender: state.currentUserDisplayName || 'anonymous',
       message: text,
       image: null,
-      date: new Date().toISOString(),
+      date,
     };
     try { state.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload)); return true; }
     catch (err) { console.error('Announcement chat: send failed', err); return false; }
@@ -236,18 +357,31 @@
     if (state.initialized) return;
     state.initialized = true;
     setStatus('loading…');
-    await resolveCurrentUser();
-    const ok = await resolveBackboneGroup();
-    if (!ok) {
-      setStatus('unavailable');
-      appendSystem('Announcements chat is not available right now.');
+
+    const signedIn = await resolveCurrentUser();
+    if (!signedIn) {
+      enterPreviewMode('You are not signed in.');
       return;
     }
+
+    const ok = await resolveBackboneGroup();
+    if (!ok) {
+      enterPreviewMode('The class chat service is unreachable.');
+      return;
+    }
+
     await loadHistory();
+
+    try { await loadChatLibraries(); }
+    catch (err) { console.warn('Announcement chat: library load failed', err); }
+
     const connected = await connect();
     if (connected) {
-      inputEl.disabled = false;
-      sendBtn.disabled = false;
+      state.mode = 'live';
+      setComposerEnabled(true);
+    } else {
+      appendSystem('Live updates are unavailable right now.');
+      enterPreviewMode('The class chat service is unreachable.');
     }
   }
 

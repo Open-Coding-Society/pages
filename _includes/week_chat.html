@@ -4,21 +4,35 @@
 <!-- `unitKey` (e.g. "Sprint1") in scope. Reuses the same STOMP/SockJS backend -->
 <!-- as _includes/lesson_chat.html and _includes/announcement_chat.html. The -->
 <!-- group is created automatically on first use if it doesn't exist yet. -->
+<!-- -->
+<!-- Signed-out visitors still get the full UI: the chat drops into a local -->
+<!-- "preview" mode backed by localStorage so the feature can be seen and -->
+<!-- exercised on every week card without a login. Preview messages never -->
+<!-- leave the browser and are clearly labelled as such. -->
 {% assign wc_id = unitKey | append: '-' | append: index %}
 
-<details class="week-chat" data-week-key="{{ wc_id }}" style="margin-top:1em">
-  <summary>💬 Week {{ index }} Chat — <span id="weekChatStatus-{{ wc_id }}">click to open</span></summary>
-  <div id="weekChatMessages-{{ wc_id }}" aria-live="polite" style="height:14em;overflow-y:auto;border:1px solid;padding:.5em;margin:.5em 0;border-radius:4px;">
-    <p id="weekChatEmpty-{{ wc_id }}"><em>No messages yet.</em></p>
+<details class="week-chat" data-week-key="{{ wc_id }}">
+  <summary class="chat-summary">
+    <span class="chat-summary-icon"><i class="fas fa-comments"></i></span>
+    <span class="chat-summary-title">Week {{ index }} Chat</span>
+    <span class="chat-status" id="weekChatStatus-{{ wc_id }}">click to open</span>
+    <span class="chat-summary-caret"><i class="fas fa-chevron-down"></i></span>
+  </summary>
+  <div class="chat-body">
+    <p class="chat-preview-note" id="weekChatNote-{{ wc_id }}" hidden>
+      <i class="fas fa-flask"></i><span id="weekChatNoteText-{{ wc_id }}"></span>
+    </p>
+    <div class="chat-messages" id="weekChatMessages-{{ wc_id }}" aria-live="polite">
+      <p class="chat-empty" id="weekChatEmpty-{{ wc_id }}">No messages yet.</p>
+    </div>
+    <form class="chat-form" id="weekChatForm-{{ wc_id }}" autocomplete="off">
+      <input class="chat-input" id="weekChatInput-{{ wc_id }}" type="text" placeholder="Ask a question about Week {{ index }}…" maxlength="2000" disabled>
+      <button class="chat-send" id="weekChatSend-{{ wc_id }}" type="submit" disabled>
+        <i class="fas fa-paper-plane"></i><span>Send</span>
+      </button>
+    </form>
   </div>
-  <form id="weekChatForm-{{ wc_id }}" autocomplete="off" style="display:flex;gap:.5em">
-    <input id="weekChatInput-{{ wc_id }}" type="text" placeholder="Ask a question about Week {{ index }}…" maxlength="2000" disabled style="flex:1">
-    <button id="weekChatSend-{{ wc_id }}" type="submit" disabled>Send</button>
-  </form>
 </details>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
@@ -28,6 +42,32 @@
   const WC_ID = {{ wc_id | jsonify }};
   const GROUP_NAME = `${COURSE}-week-${WEEK_INDEX}`;
   const CHAT_SOCKET_PORT = 8589;
+  const PREVIEW_KEY = `ocs-chat-preview:${GROUP_NAME}`;
+  const PREVIEW_LIMIT = 100;
+
+  const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
+  const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
+
+  // Every week card includes this file, so load the chat libraries once per
+  // page and only when someone actually opens a chat.
+  function loadScriptOnce(src) {
+    window.__ocsChatScripts = window.__ocsChatScripts || {};
+    if (!window.__ocsChatScripts[src]) {
+      window.__ocsChatScripts[src] = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = resolve;
+        el.onerror = () => reject(new Error(`failed to load ${src}`));
+        document.head.appendChild(el);
+      });
+    }
+    return window.__ocsChatScripts[src];
+  }
+
+  async function loadChatLibraries() {
+    await loadScriptOnce(SOCKJS_SRC);
+    await loadScriptOnce(STOMP_SRC);
+  }
 
   function buildChatSocketEndpoint() {
     const uri = new URL(javaURI);
@@ -43,18 +83,35 @@
     subscription: null,
     connected: false,
     initialized: false,
+    mode: 'live', // 'live' once connected to the backend, 'preview' when local-only
     currentUserDisplayName: 'You',
     seenKeys: new Set(),
   };
 
   const detailsEl = document.querySelector(`details.week-chat[data-week-key="${WC_ID}"]`);
   const statusEl = document.getElementById(`weekChatStatus-${WC_ID}`);
+  const noteEl = document.getElementById(`weekChatNote-${WC_ID}`);
+  const noteTextEl = document.getElementById(`weekChatNoteText-${WC_ID}`);
   const messagesEl = document.getElementById(`weekChatMessages-${WC_ID}`);
   const inputEl = document.getElementById(`weekChatInput-${WC_ID}`);
   const sendBtn = document.getElementById(`weekChatSend-${WC_ID}`);
   const formEl = document.getElementById(`weekChatForm-${WC_ID}`);
 
-  function setStatus(text) { statusEl.textContent = text; }
+  function setStatus(text, tone) {
+    statusEl.textContent = text;
+    statusEl.classList.remove('is-live', 'is-preview', 'is-error');
+    if (tone) statusEl.classList.add(tone);
+  }
+
+  function showNote(text) {
+    noteTextEl.textContent = text;
+    noteEl.hidden = false;
+  }
+
+  function setComposerEnabled(enabled) {
+    inputEl.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+  }
 
   function formatTimestamp(isoString) {
     if (!isoString) return '';
@@ -72,10 +129,28 @@
     clearEmpty();
     const who = sender === state.currentUserDisplayName ? 'You' : (sender || 'Unknown');
     const when = formatTimestamp(date);
-    const line = document.createElement('p');
-    const strong = document.createElement('strong');
-    strong.textContent = who;
-    line.append(strong, document.createTextNode(when ? ` · ${when}: ` : ': '), document.createTextNode(message));
+
+    const line = document.createElement('div');
+    line.className = who === 'You' ? 'chat-msg is-self' : 'chat-msg';
+
+    const meta = document.createElement('div');
+    meta.className = 'chat-msg-meta';
+    const senderEl = document.createElement('span');
+    senderEl.className = 'chat-msg-sender';
+    senderEl.textContent = who;
+    meta.appendChild(senderEl);
+    if (when) {
+      const timeEl = document.createElement('span');
+      timeEl.className = 'chat-msg-time';
+      timeEl.textContent = when;
+      meta.appendChild(timeEl);
+    }
+
+    const body = document.createElement('span');
+    body.className = 'chat-msg-body';
+    body.textContent = message;
+
+    line.append(meta, body);
     messagesEl.appendChild(line);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -83,9 +158,8 @@
   function appendSystem(text) {
     clearEmpty();
     const el = document.createElement('p');
-    const em = document.createElement('em');
-    em.textContent = text;
-    el.appendChild(em);
+    el.className = 'chat-system';
+    el.textContent = text;
     messagesEl.appendChild(el);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -94,14 +168,61 @@
     return [event?.sender || '', event?.date || '', event?.message || ''].join('|');
   }
 
+  /* ── Local preview mode ─────────────────────────────────────────────
+     Used when nobody is signed in (or the backbone is unreachable) so the
+     week chat is still visible and usable on every card. Messages are kept
+     in localStorage for this browser only. */
+
+  function readPreviewMessages() {
+    try {
+      const raw = window.localStorage.getItem(PREVIEW_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn('Week chat: preview history unavailable', err);
+      return [];
+    }
+  }
+
+  function writePreviewMessage(entry) {
+    try {
+      const messages = readPreviewMessages();
+      messages.push(entry);
+      window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(messages.slice(-PREVIEW_LIMIT)));
+    } catch (err) {
+      console.warn('Week chat: could not save preview message', err);
+    }
+  }
+
+  function enterPreviewMode(reason) {
+    state.mode = 'preview';
+    state.currentUserDisplayName = 'You';
+    setStatus('preview', 'is-preview');
+    showNote(`${reason} This is a local preview — messages stay in this browser and are not sent to the class.`);
+
+    readPreviewMessages().forEach((msg) => {
+      const key = eventKey(msg);
+      if (state.seenKeys.has(key)) return;
+      state.seenKeys.add(key);
+      appendMessage(msg);
+    });
+
+    setComposerEnabled(true);
+    inputEl.focus();
+  }
+
   async function resolveCurrentUser() {
     try {
       const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
-      if (!res.ok) { console.warn('Week chat: /api/id HTTP', res.status); return; }
+      if (!res.ok) { console.warn('Week chat: /api/id HTTP', res.status); return false; }
       const user = await res.json();
-      state.currentUserDisplayName = user?.name || user?.uid || user?.github || 'You';
+      const name = user?.name || user?.uid || user?.github;
+      if (!name) return false;
+      state.currentUserDisplayName = name;
+      return true;
     } catch (err) {
       console.warn('Week chat: user lookup failed', err);
+      return false;
     }
   }
 
@@ -185,7 +306,7 @@
   function connect() {
     return new Promise((resolve) => {
       if (state.connected) return resolve(true);
-      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') { setStatus('unavailable'); return resolve(false); }
+      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') { return resolve(false); }
       setStatus('connecting…');
       const socket = new SockJS(buildChatSocketEndpoint());
       const client = Stomp.over(socket);
@@ -194,7 +315,7 @@
 
       client.connect({}, () => {
         state.connected = true;
-        setStatus('connected');
+        setStatus('connected', 'is-live');
         state.subscription = client.subscribe(`/topic/group/${state.backboneGroupId}`, (frame) => {
           try { handleIncoming(JSON.parse(frame.body)); }
           catch (err) { console.warn('Week chat: bad frame', err); }
@@ -203,21 +324,29 @@
       }, (err) => {
         console.warn('Week chat: connection failed', err);
         state.connected = false;
-        setStatus('disconnected');
         resolve(false);
       });
 
       socket.onclose = () => {
         if (!state.connected) return;
         state.connected = false;
-        setStatus('disconnected');
-        inputEl.disabled = true;
-        sendBtn.disabled = true;
+        setStatus('disconnected', 'is-error');
+        setComposerEnabled(false);
       };
     });
   }
 
   function sendMessage(text) {
+    const date = new Date().toISOString();
+
+    if (state.mode === 'preview') {
+      const entry = { sender: state.currentUserDisplayName || 'You', message: text, date };
+      state.seenKeys.add(eventKey(entry));
+      writePreviewMessage(entry);
+      appendMessage(entry);
+      return true;
+    }
+
     if (!state.connected || !state.stompClient || !state.backboneGroupId) return false;
     const payload = {
       context: 'sendMessage',
@@ -225,7 +354,7 @@
       sender: state.currentUserDisplayName || 'anonymous',
       message: text,
       image: null,
-      date: new Date().toISOString(),
+      date,
     };
     try { state.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload)); return true; }
     catch (err) { console.error('Week chat: send failed', err); return false; }
@@ -235,19 +364,32 @@
     if (state.initialized) return;
     state.initialized = true;
     setStatus('loading…');
-    await resolveCurrentUser();
-    const ok = await resolveBackboneGroup();
-    if (!ok) {
-      setStatus('unavailable');
-      appendSystem('This week\'s chat is not available right now.');
+
+    const signedIn = await resolveCurrentUser();
+    if (!signedIn) {
+      enterPreviewMode('You are not signed in.');
       return;
     }
+
+    const ok = await resolveBackboneGroup();
+    if (!ok) {
+      enterPreviewMode('The class chat service is unreachable.');
+      return;
+    }
+
     await loadHistory();
+
+    try { await loadChatLibraries(); }
+    catch (err) { console.warn('Week chat: library load failed', err); }
+
     const connected = await connect();
     if (connected) {
-      inputEl.disabled = false;
-      sendBtn.disabled = false;
+      state.mode = 'live';
+      setComposerEnabled(true);
       inputEl.focus();
+    } else {
+      appendSystem('Live updates are unavailable right now.');
+      enterPreviewMode('The class chat service is unreachable.');
     }
   }
 
