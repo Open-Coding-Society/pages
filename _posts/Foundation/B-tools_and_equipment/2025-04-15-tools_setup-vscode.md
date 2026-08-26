@@ -38,7 +38,6 @@ For example, if your GitHub organization is **jm1021** and your repo is ****port
    cd portfolio # Move to your personal project directory
    ./scripts/venv.sh # Activate the virtual environment (observe the prompt change)
    source venv/bin/activate # Prefix (venv) in path
-   bundle install # Ensure Ruby gems for GitHub Pages is installed in (venv)
    code . # Open the project in VS Code
    ```
 
