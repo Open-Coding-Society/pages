@@ -99,26 +99,25 @@ Hi! My name is [Your Full Name]
 
 ### Drag and Drop Buttons
 
-> Markup only, no inline styles. Drag a part onto a slot, or click a part and then a slot. Styles come from `_sass/open-coding/elements/buttons/variant-dragdrop.scss`.
+> This advanced example exercises generated controls, click and drag input, progress, accuracy, completion, and reset states without inline styles or repeated button markup.
 
 <section class="ocs__dnd" id="dnd-demo">
+    <h4 class="ocs__dnd-panel-title">PC Assembly Bench</h4>
     <div class="ocs__dnd-header">
-        <h4 class="ocs__dnd-panel-title">Mini Assembly Bench</h4>
-        <button type="button" class="ocs__dnd-reset" data-dnd-reset>Reset</button>
+        <label for="dnd-builder-name">
+            Builder name
+            <input class="ocs__dnd-input" id="dnd-builder-name" type="text" autocomplete="name" placeholder="Optional">
+        </label>
+        <button type="button" class="ocs__dnd-reset" data-dnd-reset>Reset build</button>
     </div>
-    <p class="ocs__dnd-status" role="status" aria-live="polite">Drag a part to its slot.</p>
+    <p class="ocs__dnd-status" role="status" aria-live="polite">Choose a part, then choose its connection point.</p>
+    <p class="ocs__dnd-progress">Installed: 0/5 | Attempts: 0 | Accuracy: 100%</p>
     <div class="ocs__dnd-layout">
-        <div class="ocs__dnd-panel">
+        <div class="ocs__dnd-panel" data-dnd-parts>
             <h4 class="ocs__dnd-panel-title">Parts tray</h4>
-            <button type="button" class="ocs__drag-btn" draggable="true" data-part="CPU">CPU</button>
-            <button type="button" class="ocs__drag-btn" draggable="true" data-part="RAM">RAM</button>
-            <button type="button" class="ocs__drag-btn" draggable="true" data-part="GPU">Graphics card</button>
         </div>
-        <div class="ocs__dnd-panel">
+        <div class="ocs__dnd-panel" data-dnd-slots>
             <h4 class="ocs__dnd-panel-title">Connection points</h4>
-            <button type="button" class="ocs__drop-btn" data-slot="CPU">CPU socket</button>
-            <button type="button" class="ocs__drop-btn" data-slot="RAM">RAM slots</button>
-            <button type="button" class="ocs__drop-btn" data-slot="GPU">PCIe slot</button>
         </div>
     </div>
 </section>
@@ -127,75 +126,160 @@ Hi! My name is [Your Full Name]
 (function() {
   const board = document.getElementById('dnd-demo');
   const status = board.querySelector('.ocs__dnd-status');
-  const parts = Array.from(board.querySelectorAll('.ocs__drag-btn'));
-  const slots = Array.from(board.querySelectorAll('.ocs__drop-btn'));
-  let selected = null;
+  const progress = board.querySelector('.ocs__dnd-progress');
+  const builderName = board.querySelector('#dnd-builder-name');
+  const partTray = board.querySelector('[data-dnd-parts]');
+  const slotTray = board.querySelector('[data-dnd-slots]');
+  const buildParts = [
+    { id: 'cpu', name: 'CPU', slot: 'CPU socket' },
+    { id: 'ram', name: 'RAM', slot: 'RAM slots' },
+    { id: 'ssd', name: 'M.2 SSD', slot: 'M.2 slot' },
+    { id: 'gpu', name: 'Graphics card', slot: 'PCIe slot' },
+    { id: 'psu', name: 'Power supply', slot: 'PSU bay' }
+  ];
+  const partButtons = [];
+  const slotButtons = [];
+  let selectedPartId = null;
+  let installedCount = 0;
+  let attempts = 0;
+  let correctAttempts = 0;
 
-  function select(part) {
-    selected = part;
-    parts.forEach(function(other) {
-      other.classList.toggle('is-selected', other === part);
+  function setStatus(message) {
+    const name = builderName.value.trim();
+    status.textContent = name === '' ? message : name + ': ' + message;
+  }
+
+  function updateProgress() {
+    const accuracy = attempts === 0 ? 100 : Math.round((correctAttempts / attempts) * 100);
+    progress.textContent = 'Installed: ' + installedCount + '/' + buildParts.length +
+      ' | Attempts: ' + attempts + ' | Accuracy: ' + accuracy + '%';
+  }
+
+  function selectPart(partId) {
+    const selectedButton = partButtons.find(function(button) {
+      return button.dataset.part === partId;
     });
-    status.textContent = part.textContent + ' selected. Choose its slot.';
-  }
-
-  function place(part, slot) {
-    if (part === null || part.disabled || slot.disabled) {
+    if (selectedButton === undefined || selectedButton.disabled) {
       return;
     }
-    if (part.dataset.part !== slot.dataset.slot) {
-      status.textContent = 'Incorrect. ' + part.textContent + ' does not belong in ' + slot.textContent + '.';
-      return;
-    }
-    part.disabled = true;
-    part.draggable = false;
-    part.classList.remove('is-selected');
-    slot.disabled = true;
-    slot.classList.add('is-filled');
-    slot.textContent = '✓ ' + part.textContent;
-    selected = null;
-    status.textContent = 'Installed ' + part.textContent + '.';
+
+    selectedPartId = partId;
+    partButtons.forEach(function(button) {
+      const isSelected = button === selectedButton;
+      button.classList.toggle('is-selected', isSelected);
+      button.setAttribute('aria-pressed', String(isSelected));
+    });
+    setStatus(selectedButton.textContent + ' selected. Choose its connection point.');
   }
 
-  parts.forEach(function(part) {
-    part.addEventListener('click', function() { select(part); });
-    part.addEventListener('dragstart', function(event) {
-      select(part);
-      event.dataTransfer.setData('text/plain', part.dataset.part);
+  function placePart(partId, slotButton) {
+    const partButton = partButtons.find(function(button) {
+      return button.dataset.part === partId;
+    });
+    if (partButton === undefined || partButton.disabled) {
+      setStatus('Choose an available part from the tray first.');
+      return;
+    }
+
+    attempts += 1;
+    if (partId !== slotButton.dataset.slot) {
+      setStatus('Incorrect. ' + partButton.textContent + ' does not belong in ' + slotButton.dataset.label + '.');
+      updateProgress();
+      return;
+    }
+
+    correctAttempts += 1;
+    installedCount += 1;
+    partButton.disabled = true;
+    partButton.draggable = false;
+    partButton.classList.remove('is-selected');
+    partButton.setAttribute('aria-pressed', 'false');
+    slotButton.disabled = true;
+    slotButton.classList.add('is-filled');
+    slotButton.textContent = '✓ ' + partButton.textContent + ' → ' + slotButton.dataset.label;
+    slotButton.setAttribute('aria-label', partButton.textContent + ' installed in ' + slotButton.dataset.label);
+    selectedPartId = null;
+    updateProgress();
+
+    if (installedCount === buildParts.length) {
+      setStatus('PC assembly complete.');
+    } else {
+      setStatus('Installed ' + partButton.textContent + '. Choose another part.');
+    }
+  }
+
+  buildParts.forEach(function(part) {
+    const partButton = document.createElement('button');
+    partButton.type = 'button';
+    partButton.className = 'ocs__drag-btn';
+    partButton.textContent = part.name;
+    partButton.draggable = true;
+    partButton.dataset.part = part.id;
+    partButton.setAttribute('aria-label', 'Select ' + part.name);
+    partButton.setAttribute('aria-pressed', 'false');
+    partButton.addEventListener('click', function() {
+      selectPart(part.id);
+    });
+    partButton.addEventListener('dragstart', function(event) {
+      selectPart(part.id);
+      event.dataTransfer.setData('text/plain', part.id);
       event.dataTransfer.effectAllowed = 'move';
     });
-  });
+    partButton.addEventListener('dragend', function() {
+      slotButtons.forEach(function(slotButton) {
+        slotButton.classList.remove('is-over');
+      });
+    });
+    partButtons.push(partButton);
+    partTray.appendChild(partButton);
 
-  slots.forEach(function(slot) {
-    slot.addEventListener('click', function() { place(selected, slot); });
-    slot.addEventListener('dragover', function(event) {
+    const slotButton = document.createElement('button');
+    slotButton.type = 'button';
+    slotButton.className = 'ocs__drop-btn';
+    slotButton.textContent = part.slot;
+    slotButton.dataset.slot = part.id;
+    slotButton.dataset.label = part.slot;
+    slotButton.setAttribute('aria-label', 'Install selected part in ' + part.slot);
+    slotButton.addEventListener('click', function() {
+      placePart(selectedPartId, slotButton);
+    });
+    slotButton.addEventListener('dragover', function(event) {
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
-      slot.classList.add('is-over');
+      slotButton.classList.add('is-over');
     });
-    slot.addEventListener('dragleave', function() { slot.classList.remove('is-over'); });
-    slot.addEventListener('drop', function(event) {
+    slotButton.addEventListener('dragleave', function() {
+      slotButton.classList.remove('is-over');
+    });
+    slotButton.addEventListener('drop', function(event) {
       event.preventDefault();
-      slot.classList.remove('is-over');
-      place(selected, slot);
+      slotButton.classList.remove('is-over');
+      const droppedPartId = event.dataTransfer.getData('text/plain');
+      placePart(droppedPartId, slotButton);
     });
+    slotButtons.push(slotButton);
+    slotTray.appendChild(slotButton);
   });
 
   board.querySelector('[data-dnd-reset]').addEventListener('click', function() {
-    selected = null;
-    parts.forEach(function(part) {
-      part.disabled = false;
-      part.draggable = true;
-      part.classList.remove('is-selected');
+    selectedPartId = null;
+    installedCount = 0;
+    attempts = 0;
+    correctAttempts = 0;
+    partButtons.forEach(function(partButton) {
+      partButton.disabled = false;
+      partButton.draggable = true;
+      partButton.classList.remove('is-selected');
+      partButton.setAttribute('aria-pressed', 'false');
     });
-    slots.forEach(function(slot) {
-      slot.disabled = false;
-      slot.classList.remove('is-filled', 'is-over');
+    slotButtons.forEach(function(slotButton) {
+      slotButton.disabled = false;
+      slotButton.textContent = slotButton.dataset.label;
+      slotButton.setAttribute('aria-label', 'Install selected part in ' + slotButton.dataset.label);
+      slotButton.classList.remove('is-filled', 'is-over');
     });
-    slots[0].textContent = 'CPU socket';
-    slots[1].textContent = 'RAM slots';
-    slots[2].textContent = 'PCIe slot';
-    status.textContent = 'Drag a part to its slot.';
+    setStatus('Choose a part, then choose its connection point.');
+    updateProgress();
   });
 })();
 </script>
