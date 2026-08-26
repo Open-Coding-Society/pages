@@ -89,11 +89,11 @@ Run these commands to set up your developer tools for the first time.
 ```bash
 mkdir opencs
 cd opencs
-git clone https://github.com/Open-Coding-Society/student.git
-cd student/
+git clone https://github.com/Open-Coding-Society/portfolio.git
+cd portfolio/
 ./scripts/activate_ubuntu.sh # all Linux variants can use Ubuntu script
 ./scripts/activate.sh # prompts for Git UID and Personal Email
-./scripts/venv.sh
+./scripts/venv.sh # configure tools for project
 ```
 
 #### System Checks (Optional)
@@ -115,10 +115,10 @@ git config --global --list
 
 Open New Terminal, close existing terminal
 
-Each time you open a new terminal session, run these commands to activate your environment and start working on the student project in VS Code.
+Each time you open a new Terminal to work, run:
 
 ```bash
-cd opencs/student
+cd opencs/portfolio
 source venv/bin/activate
 code .
 ```
