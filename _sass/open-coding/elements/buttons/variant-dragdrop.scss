@@ -22,64 +22,72 @@
  */
 
 // ===========================
+// Palette
+// ===========================
+
+.ocs__dnd,
+.ocs__drag-btn,
+.ocs__drop-btn {
+  --dnd-surface: #111827;
+  --dnd-panel: #0f172a;
+  --dnd-control: #1e293b;
+  --dnd-border: #334155;
+  --dnd-accent: #3b82f6;
+  --dnd-accent-strong: #1d4ed8;
+  --dnd-accent-soft: #60a5fa;
+  --dnd-select: #fbbf24;
+  --dnd-success: #22c55e;
+  --dnd-success-bg: #14532d;
+  --dnd-text: #f8fafc;
+  --dnd-muted: #93c5fd;
+  --dnd-radius: 8px;
+}
+
+// ===========================
 // Board
 // ===========================
 
 .ocs__dnd {
-    --dnd-surface: var(--pref-bg-color, var(--bg-1, #1f2020));
-    --dnd-panel: color-mix(in srgb, var(--dnd-surface) 88%, var(--pref-text-color, #f0f0f0) 12%);
-    --dnd-control: color-mix(in srgb, var(--dnd-surface) 82%, var(--pref-text-color, #f0f0f0) 18%);
-    --dnd-border: color-mix(in srgb, var(--pref-text-color, #f0f0f0) 20%, transparent);
-    --dnd-accent: var(--pref-accent-color, var(--accent, #4cafef));
-    --dnd-accent-strong: color-mix(in srgb, var(--dnd-accent) 80%, #000000);
-    --dnd-accent-soft: color-mix(in srgb, var(--dnd-accent) 72%, #ffffff);
-    --dnd-select: var(--warn, #fbbf24);
-    --dnd-success: var(--status-indicator-success-color, var(--green, #4ade80));
-    --dnd-success-bg: color-mix(in srgb, var(--dnd-success) 24%, var(--dnd-panel));
-    --dnd-text: var(--pref-text-color, #f0f0f0);
-    --dnd-muted: color-mix(in srgb, var(--dnd-text) 72%, var(--dnd-surface));
-    --dnd-radius: 8px;
-
-    color: var(--dnd-text);
-    background: var(--dnd-surface);
-    border: 1px solid var(--dnd-border);
-    border-radius: 12px;
-    padding: 18px;
-    font-family: var(--pref-font-family, system-ui, sans-serif);
+  color: #e5e7eb;
+  background: var(--dnd-surface);
+  border: 1px solid var(--dnd-border);
+  border-radius: 12px;
+  padding: 18px;
+  font-family: system-ui, sans-serif;
 }
 
 .ocs__dnd-header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 12px;
-    align-items: end;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
 }
 
 .ocs__dnd-status {
-    font-weight: 700;
-    min-height: 24px;
+  font-weight: 700;
+  min-height: 24px;
 }
 
 .ocs__dnd-progress {
-    color: var(--dnd-muted);
+  color: var(--dnd-muted);
 }
 
 .ocs__dnd-layout {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-    gap: 18px;
-    margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 14px;
 }
 
 .ocs__dnd-panel {
-    background: var(--dnd-panel);
-    border: 1px solid var(--dnd-border);
-    border-radius: 10px;
-    padding: 14px;
+  background: var(--dnd-panel);
+  border: 1px solid var(--dnd-border);
+  border-radius: 10px;
+  padding: 14px;
 }
 
 .ocs__dnd-panel-title {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 // ===========================
@@ -87,36 +95,28 @@
 // ===========================
 
 .ocs__dnd-input {
-    display: block;
-    width: min(100%, 320px);
-    min-height: 44px;
-    box-sizing: border-box;
-    margin-top: 6px;
-    padding: 10px;
-    border: 1px solid var(--dnd-border);
-    border-radius: 7px;
-    background: var(--dnd-panel);
-    color: var(--dnd-text);
+  display: block;
+  width: min(100%, 320px);
+  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 10px;
+  border: 1px solid #64748b;
+  border-radius: 7px;
+  background: var(--dnd-panel);
+  color: var(--dnd-text);
 }
 
 .ocs__dnd-reset {
-    min-height: 44px;
-    padding: 10px 14px;
-    border: 1px solid var(--dnd-accent-soft);
-    border-radius: 7px;
-    background: var(--dnd-accent-strong);
-    color: var(--dnd-text);
-    cursor: pointer;
+  padding: 10px 14px;
+  border: 1px solid var(--dnd-accent-soft);
+  border-radius: 7px;
+  background: var(--dnd-accent-strong);
+  color: #ffffff;
+  cursor: pointer;
 
-    &:hover {
-        background: color-mix(in srgb, var(--dnd-accent-strong) 88%, var(--dnd-text));
-    }
-}
-
-.ocs__dnd-input:focus-visible,
-.ocs__dnd-reset:focus-visible {
-    outline: 3px solid var(--dnd-accent-soft);
-    outline-offset: 2px;
+  &:hover {
+    background: darken(#1d4ed8, 6%);
+  }
 }
 
 // ===========================
@@ -125,76 +125,65 @@
 
 .ocs__drag-btn,
 .ocs__drop-btn {
-    display: block;
-    width: 100%;
-    min-height: 44px;
-    box-sizing: border-box;
-    margin: 8px 0;
-    padding: 11px;
-    border: 1px solid var(--dnd-accent);
-    border-radius: var(--dnd-radius);
-    background: var(--dnd-control);
-    color: var(--dnd-text);
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, outline-color 0.2s, opacity 0.2s;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 8px 0;
+  padding: 11px;
+  border: 1px solid var(--dnd-accent);
+  border-radius: var(--dnd-radius);
+  background: var(--dnd-control);
+  color: var(--dnd-text);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s, border-color 0.2s, outline-color 0.2s, opacity 0.2s;
 
-    &:hover:not([disabled]) {
-        background: color-mix(in srgb, var(--dnd-control) 88%, var(--dnd-text));
-    }
+  &:hover:not([disabled]) {
+    background: lighten(#1e293b, 6%);
+  }
 
-    &:focus-visible {
-        outline: 3px solid var(--dnd-accent-soft);
-        outline-offset: 2px;
-    }
+  &:focus-visible {
+    outline: 3px solid var(--dnd-accent-soft);
+    outline-offset: 2px;
+  }
 
-    &[disabled] {
-        cursor: default;
-    }
+  &[disabled] {
+    cursor: default;
+  }
 }
 
 .ocs__drag-btn {
-    cursor: grab;
+  cursor: grab;
 
-    &:active:not([disabled]) {
-        cursor: grabbing;
-    }
+  &:active:not([disabled]) {
+    cursor: grabbing;
+  }
 
-    // picked up, waiting on a destination
-    &.is-selected {
-        outline: 3px solid var(--dnd-select);
-        outline-offset: 2px;
-    }
+  // picked up, waiting on a destination
+  &.is-selected {
+    outline: 3px solid var(--dnd-select);
+  }
 
-    // already installed / consumed
-    &[disabled] {
-        opacity: 0.35;
-        cursor: default;
-    }
+  // already installed / consumed
+  &[disabled] {
+    opacity: 0.35;
+    cursor: default;
+  }
 }
 
 .ocs__drop-btn {
-    // a drag is hovering this target
-    &.is-over {
-        border-color: var(--dnd-select);
-        background: color-mix(in srgb, var(--dnd-control) 78%, var(--dnd-select));
-    }
+  // a drag is hovering this target
+  &.is-over {
+    border-color: var(--dnd-select);
+    background: lighten(#1e293b, 10%);
+  }
 
-    // correct item landed here
-    &.is-filled,
-    &.is-filled[disabled] {
-        border-color: var(--dnd-success);
-        background: var(--dnd-success-bg);
-        opacity: 1;
-    }
-}
-
-@media (max-width: 480px) {
-    .ocs__dnd-header {
-        grid-template-columns: 1fr;
-    }
-
-    .ocs__dnd-reset {
-        width: 100%;
-    }
+  // correct item landed here
+  &.is-filled,
+  &.is-filled[disabled] {
+    border-color: var(--dnd-success);
+    background: var(--dnd-success-bg);
+    opacity: 1;
+  }
 }
