@@ -206,3 +206,25 @@ Hi! My name is [Your Full Name]
   });
 })();
 </script>
+
+#### Size Classes
+
+> The same classes at three scales. Put `ocs__dnd--small`, `--medium`, or `--large` on the board to resize everything inside it, or the same suffix on a single `ocs__drag-btn` / `ocs__drop-btn`.
+
+<div class="ocs__dnd-layout">
+    <div class="ocs__dnd ocs__dnd--small">
+        <p class="ocs__dnd-progress">ocs__dnd--small</p>
+        <button type="button" class="ocs__drag-btn" draggable="true">CPU</button>
+        <button type="button" class="ocs__drop-btn is-filled" disabled>✓ CPU socket</button>
+    </div>
+    <div class="ocs__dnd ocs__dnd--medium">
+        <p class="ocs__dnd-progress">ocs__dnd--medium</p>
+        <button type="button" class="ocs__drag-btn is-selected" draggable="true">CPU</button>
+        <button type="button" class="ocs__drop-btn is-over">CPU socket</button>
+    </div>
+    <div class="ocs__dnd ocs__dnd--large">
+        <p class="ocs__dnd-progress">ocs__dnd--large</p>
+        <button type="button" class="ocs__drag-btn" draggable="true">CPU</button>
+        <button type="button" class="ocs__drop-btn">CPU socket</button>
+    </div>
+</div>
