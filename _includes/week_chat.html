@@ -15,7 +15,10 @@
   <summary class="chat-summary">
     <span class="chat-summary-icon"><i class="fas fa-comments"></i></span>
     <span class="chat-summary-title">Week {{ index }} Chat</span>
-    <span class="chat-status" id="weekChatStatus-{{ wc_id }}">click to open</span>
+    <span class="chat-status-pill" id="weekChatStatusPill-{{ wc_id }}">
+      <span class="chat-status-dot" aria-hidden="true"></span>
+      <span class="chat-status" id="weekChatStatus-{{ wc_id }}">click to open</span>
+    </span>
     <span class="chat-summary-caret"><i class="fas fa-chevron-down"></i></span>
   </summary>
   <div class="chat-body">
@@ -90,6 +93,7 @@
 
   const detailsEl = document.querySelector(`details.week-chat[data-week-key="${WC_ID}"]`);
   const statusEl = document.getElementById(`weekChatStatus-${WC_ID}`);
+  const statusPillEl = document.getElementById(`weekChatStatusPill-${WC_ID}`);
   const noteEl = document.getElementById(`weekChatNote-${WC_ID}`);
   const noteTextEl = document.getElementById(`weekChatNoteText-${WC_ID}`);
   const messagesEl = document.getElementById(`weekChatMessages-${WC_ID}`);
@@ -99,8 +103,8 @@
 
   function setStatus(text, tone) {
     statusEl.textContent = text;
-    statusEl.classList.remove('is-live', 'is-preview', 'is-error');
-    if (tone) statusEl.classList.add(tone);
+    statusPillEl.classList.remove('is-live', 'is-preview', 'is-error');
+    if (tone) statusPillEl.classList.add(tone);
   }
 
   function showNote(text) {
