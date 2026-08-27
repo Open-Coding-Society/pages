@@ -1,0 +1,85 @@
+{% assign data = site.data.ocs_communications_infograph %}
+
+<div class="ocs-communications-infograph">
+  <!-- Header Section -->
+  <div class="ocs-communications-header">
+    <div class="ocs-communications-badge">Open Coding Society — Design-Based Research Capstone</div>
+    <h1 class="ocs-communications-title">{{ data.Title }}</h1>
+    <p class="ocs-communications-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Project Cards -->
+  {% for topic in data.Topics %}
+  <div class="ocs-communications-card">
+    <div class="ocs-communications-card-grid">
+
+      <!-- Left: Visual & Status -->
+      <div class="ocs-communications-visual">
+        <a href="{{ topic.link }}" class="ocs-communications-image-link" target="_blank" rel="noopener">
+          <div class="ocs-communications-image" style="display:flex;align-items:center;justify-content:center;min-height:180px;font-size:3rem;background:{{ topic.gradient }};">
+            <span aria-hidden="true">{{ topic.emoji }}</span>
+          </div>
+          <div class="ocs-communications-overlay">
+            <span>View on GitHub</span>
+          </div>
+        </a>
+        <div class="ocs-communications-status">{{ topic.status }}</div>
+        <div class="ocs-communications-team">
+          <span class="ocs-communications-team-label">Team</span>
+          <span class="ocs-communications-team-name">{{ topic.team | join: ", " }}</span>
+        </div>
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="ocs-communications-content">
+        <h2 class="ocs-communications-project-title">{{ topic.title }}</h2>
+        <p class="ocs-communications-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="ocs-communications-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="ocs-communications-keypoint">
+            <span class="ocs-communications-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="ocs-communications-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="ocs-communications-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: Description & Impact -->
+      <div class="ocs-communications-details">
+        <h3 class="ocs-communications-section-title">About</h3>
+        <p class="ocs-communications-about">{{ topic.description }}</p>
+
+        <h3 class="ocs-communications-section-title">Impact</h3>
+        <div class="ocs-communications-impact-list">
+          {% for item in topic.impact %}
+          <div class="ocs-communications-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ topic.link }}" class="ocs-communications-btn" target="_blank" rel="noopener">View Team Issue →</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Footer links -->
+  <div class="ocs-communications-card">
+    <h3 class="ocs-communications-section-title" style="margin-top:0;">More on this project</h3>
+    <div class="ocs-communications-tech-stack">
+      <a href="https://github.com/orgs/UGRC-CSA/projects/1" target="_blank" rel="noopener" class="ocs-communications-tech-tag" style="text-decoration:none;">📌 Sprint board</a>
+      <a href="https://github.com/UGRC-CSA/Pages/issues/1" target="_blank" rel="noopener" class="ocs-communications-tech-tag" style="text-decoration:none;">📋 Background &amp; context</a>
+      <a href="https://github.com/UGRC-CSA/Pages/issues/28" target="_blank" rel="noopener" class="ocs-communications-tech-tag" style="text-decoration:none;">📝 Sprint summary</a>
+      <a href="https://github.com/UGRC-CSA/Pages/issues/25" target="_blank" rel="noopener" class="ocs-communications-tech-tag" style="text-decoration:none;">🗨️ Chat verification writeup</a>
+      <a href="https://github.com/UGRC-CSA/Pages/pull/24" target="_blank" rel="noopener" class="ocs-communications-tech-tag" style="text-decoration:none;">🔀 Chat feature PR</a>
+      <a href="https://github.com/UGRC-CSA/Pages/issues/27" target="_blank" rel="noopener" class="ocs-communications-tech-tag" style="text-decoration:none;">🧩 DM technical design</a>
+    </div>
+  </div>
+</div>
