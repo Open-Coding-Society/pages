@@ -568,12 +568,19 @@ show_reading_time: false
             },
             body: JSON.stringify(signupDataJava)
         })
-        .then(response => {
+        .then(async response => {
+            console.log("Spring status:", response.status);
+            console.log("Spring URL:", response.url);
+            console.log("Spring content-type:", response.headers.get("content-type"));
+
+            const raw = await response.text();
+            console.log("Spring raw response:", raw);
+
             if (response.ok) {
                 updateBackendStatus('spring', 'success');
-                return response.json();
+                return JSON.parse(raw);
             } else {
-                throw new Error(`Spring: ${response.status}`);
+                throw new Error(`Spring: ${response.status}: ${raw}`);
             }
         })
         .catch(error => {
