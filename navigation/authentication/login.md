@@ -562,10 +562,8 @@ show_reading_time: false
 
         // Spring Backend Request
         const springPromise = fetch(`${javaURI}/api/person/create`, {
+            ...fetchOptions,
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
             body: JSON.stringify(signupDataJava)
         })
         .then(async response => {
