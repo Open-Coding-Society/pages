@@ -122,6 +122,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
   if (!container) return;
   
   const initialLang = "{{ include.language }}";
+  const autostart = "{{ include.autostart | default: 'false' }}" === "true";
   const defaultCode = JSON.parse(container.dataset.defaultCode || "\"\"");
   const editorHeight = "{{ include.height }}";
   const storageKey = container.dataset.storageKey;
@@ -231,5 +232,12 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
 
   // Keyboard shortcut
   runner.bindShortcut(runCode);
+
+  if (autostart) {
+    // Wait one tick so the editor/language mode are fully initialized.
+    setTimeout(() => {
+      runCode();
+    }, 0);
+  }
 })();
 </script>
