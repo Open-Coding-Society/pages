@@ -82,6 +82,11 @@ Examples:
 
 Runner JavaScript hooks should keep existing action classes (for example `runBtn`, `pauseBtn`, `stopBtn`) in addition to the grammar classes.
 
+### Behavior Hook Convention
+- Prefer `data-hook` attributes for JavaScript targeting (for example `data-hook="run"`, `data-hook="copy"`, `data-hook="stop"`).
+- Keep visual semantics in classes (`utility`, `run`, `copy`, etc.).
+- Legacy hook classes (`runBtn`, `copyBtn`, etc.) are fallback-only during migration and can be removed after consumers are updated.
+
 ## Drag and Drop Variant
 
 Use the drag and drop variant for activities that match a source choice to a destination. The same interaction must work by dragging or by selecting the source and destination buttons.
