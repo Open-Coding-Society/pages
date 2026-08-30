@@ -78,15 +78,29 @@ sections:
         - "Requires strong programming, collaboration, and project workflow habits"
 ---
 
+## Mario Open House Navigation
+
+Use arrow keys or WASD to move Mario. Hover a button, or move Mario close to it, to open the full course overview beneath the top row. Press R to reset Mario and hide all details.
+
 <!-- Container for Sprite and hotspots/details -->
 <div id="game-area" style="position: relative; width: 980px; height: 680px; margin: 32px auto;">
   <!-- Sprite -->
   <p id="sprite" class="sprite"></p>
 
-  <!-- Hotspot text elements (data-driven) -->
-  {% for s in page.sections %}
-    <div id="{{s.id}}" class="hotspot" style="top: {{s.hotspot.top}}px; left: {{s.hotspot.left}}px;">{{s.label}}</div>
-  {% endfor %}
+  <!-- Top button rail (data-driven) -->
+  <div id="mario-nav-bar" class="mario-nav-bar" aria-label="Course navigation buttons">
+    {% assign tones = "alert-green,alert-yellow,alert-red,alert-green" | split: "," %}
+    {% for s in page.sections %}
+      <button
+        id="{{s.id}}"
+        type="button"
+        class="hotspot ocs__btn medium {{tones[forloop.index0]}} fill mario-nav-btn"
+        data-index="{{forloop.index0}}"
+      >
+        {{s.label}}
+      </button>
+    {% endfor %}
+  </div>
 
   <!-- Detail sections (data-driven) -->
   {% for s in page.sections %}
@@ -119,38 +133,41 @@ sections:
   background-image: url('{{page.sprite.image}}');
   background-repeat: no-repeat;
   position: absolute;
-  top: 520px;
-  left: 64px;
+  top: 28px;
+  left: 36px;
   background-position: 0px 0px;
   z-index: 5;
   transform: scale({{page.sprite.scale}});
   transform-origin: top left;
 }
 .hotspot {
-  position: absolute;
+  position: relative;
   width: 180px;
-  height: 52px;
-  font-weight: bold;
-  color: #0f172a;
-  background: linear-gradient(180deg, #f8fafc, #dbeafe);
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 2px solid rgba(30, 64, 175, 0.3);
+  min-height: 48px;
   z-index: 4;
-  font-size: 1.05rem;
-  letter-spacing: 0.03em;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.25);
-  text-align: center;
-  display: flex;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.mario-nav-bar {
+  position: absolute;
+  top: 18px;
+  left: 12px;
+  right: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 12px;
   align-items: center;
-  justify-content: center;
-  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  justify-items: center;
+  z-index: 4;
+}
+
+.mario-nav-btn {
+  width: min(180px, 95%);
 }
 .hotspot:hover,
 .hotspot.active {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(30, 64, 175, 0.38);
-  background: linear-gradient(180deg, #bfdbfe, #93c5fd);
+  transform: translateY(-2px) scale(1.01);
+  filter: brightness(1.1);
 }
 .detail-section {
   position: absolute;
@@ -185,6 +202,11 @@ sections:
   #game-area {
     height: 760px;
   }
+
+  .mario-nav-bar {
+    grid-template-columns: repeat(2, minmax(130px, 1fr));
+  }
+
   .hotspot {
     width: 42vw;
     max-width: 170px;
@@ -214,8 +236,8 @@ const hotspots = [
 class Sprite {
   constructor(sprite_data, hotspots) {
     this.tID = null;
-    this.positionX = 64;
-    this.positionY = 520;
+    this.positionX = 36;
+    this.positionY = 28;
     this.currentSpeed = 0;
     this.spriteElement = document.getElementById("sprite");
     this.pixelsWidth = sprite_data.pixelWidth;
@@ -229,6 +251,20 @@ class Sprite {
     this.hotspots = hotspots;
     this.activeSection = null;
     this.currentAnim = 'Rest';
+    this.bounds = {
+      minX: 12,
+      maxX: 880,
+      minY: 12,
+      maxY: 110,
+    };
+  }
+
+  setBounds(bounds) {
+    this.bounds = bounds;
+    this.positionX = Math.max(bounds.minX, Math.min(bounds.maxX, this.positionX));
+    this.positionY = Math.max(bounds.minY, Math.min(bounds.maxY, this.positionY));
+    this.spriteElement.style.left = `${this.positionX}px`;
+    this.spriteElement.style.top = `${this.positionY}px`;
   }
 
   animate(animName, speed) {
@@ -243,6 +279,11 @@ class Sprite {
       this.spriteElement.style.backgroundPosition = `-${col}px -${row}px`;
       this.positionX += speed * this.direction.x;
       this.positionY += speed * this.direction.y;
+
+      // Keep Mario in the top interaction lane near the button rail.
+      this.positionX = Math.max(this.bounds.minX, Math.min(this.bounds.maxX, this.positionX));
+      this.positionY = Math.max(this.bounds.minY, Math.min(this.bounds.maxY, this.positionY));
+
       this.spriteElement.style.left = `${this.positionX}px`;
       this.spriteElement.style.top = `${this.positionY}px`;
       frame = (frame + 1) % obj.frames;
@@ -312,10 +353,10 @@ class Sprite {
 
   reset() {
     this.stopAnimate();
-    this.positionX = 64;
-    this.positionY = 520;
-    this.spriteElement.style.left = `64px`;
-    this.spriteElement.style.top = `520px`;
+    this.positionX = this.bounds.minX + 20;
+    this.positionY = this.bounds.minY + 10;
+    this.spriteElement.style.left = `${this.positionX}px`;
+    this.spriteElement.style.top = `${this.positionY}px`;
     for (const h of this.hotspots) {
       const sectionEl = document.getElementById(h.section);
       const hotspotEl = document.getElementById(h.id);
@@ -332,29 +373,39 @@ const sprite = new Sprite(sprite_data, hotspots);
 
 function layoutHotspots() {
   const gameArea = document.getElementById("game-area");
+  const navBar = document.getElementById("mario-nav-bar");
   const width = gameArea.clientWidth;
   const columns = width < 760 ? 2 : 4;
   const rowGap = 12;
-  const startTop = 20;
+  const topPadding = 18;
+  const sidePadding = 12;
 
-  hotspots.forEach((h, idx) => {
-    const hotspotEl = document.getElementById(h.id);
-    const row = Math.floor(idx / columns);
-    const col = idx % columns;
-    const slotWidth = width / columns;
-    const buttonWidth = hotspotEl.offsetWidth || 180;
-    const left = Math.max(12, Math.round(col * slotWidth + (slotWidth - buttonWidth) / 2));
-    const top = startTop + row * (hotspotEl.offsetHeight + rowGap);
-    hotspotEl.style.left = `${left}px`;
-    hotspotEl.style.top = `${top}px`;
-  });
+  navBar.style.gridTemplateColumns = `repeat(${columns}, minmax(130px, 1fr))`;
+  navBar.style.left = `${sidePadding}px`;
+  navBar.style.right = `${sidePadding}px`;
+  navBar.style.top = `${topPadding}px`;
+
+  const sampleButton = document.getElementById(hotspots[0].id);
+  const buttonHeight = sampleButton ? sampleButton.offsetHeight : 52;
 
   const rows = Math.ceil(hotspots.length / columns);
-  const detailTop = startTop + rows * (52 + rowGap) + 12;
+  const detailTop = topPadding + rows * (buttonHeight + rowGap) + 22;
   for (const h of hotspots) {
     const sectionEl = document.getElementById(h.section);
     sectionEl.style.top = `${detailTop}px`;
   }
+
+  const spriteWidth = sprite_data.pixelWidth * sprite_data.scale;
+  const spriteHeight = sprite_data.pixelHeight * sprite_data.scale;
+  const maxX = Math.max(sidePadding, width - spriteWidth - sidePadding);
+  const maxY = Math.max(topPadding, detailTop - spriteHeight - 10);
+
+  sprite.setBounds({
+    minX: sidePadding,
+    maxX,
+    minY: topPadding,
+    maxY,
+  });
 }
 
 // Key press/release controls
@@ -419,10 +470,3 @@ window.addEventListener("resize", () => {
 });
 </script>
 
-## Mario Open House Navigation
-
-Use arrow keys or WASD to move Mario. Hover a button, or move Mario close to it, to open the full course overview beneath the top row. Press R to reset Mario and hide all details.
-
----
-
-This view combines the playful index3 movement with richer home-legacy class messaging for open house walkthroughs.
