@@ -36,15 +36,30 @@
   }
 
   .mario-nav-bar {
-    @include inline-container(grid, 12px);
+    @include inline-container(flex, 12px);
     position: absolute;
     top: 18px;
     left: 12px;
     right: 12px;
-    grid-template-columns: repeat(4, minmax(140px, 1fr));
     align-items: center;
-    justify-items: center;
+    justify-content: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 2px 8px;
     z-index: 4;
+  }
+
+  .mario-lane {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    right: 10px;
+    height: 82px;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.2);
+    border: 1px dashed rgba(147, 197, 253, 0.25);
+    pointer-events: none;
+    z-index: 2;
   }
 
   .hotspot {
@@ -62,7 +77,8 @@
   }
 
   .mario-nav-btn {
-    width: min(180px, 95%);
+    width: 170px;
+    flex: 0 0 auto;
   }
 
   .detail-section {
@@ -106,9 +122,9 @@
     border-radius: 16px;
 
     .mario-nav-bar {
-      grid-template-columns: repeat(2, minmax(130px, 1fr));
       left: 8px;
       right: 8px;
+      justify-content: flex-start;
     }
 
     .hotspot {
@@ -136,8 +152,8 @@
     }
 
     .hotspot {
-      width: min(46vw, 160px);
-      min-width: 118px;
+      width: 152px;
+      min-width: 152px;
       min-height: 44px;
       font-size: 0.88rem;
     }

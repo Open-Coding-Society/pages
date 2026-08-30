@@ -91,6 +91,9 @@ Use arrow keys or WASD to move Mario. Hover a button, or move Mario close to it,
   <!-- Sprite -->
   <p id="sprite" class="sprite"></p>
 
+  <!-- Mario movement lane (visual + bounds anchor) -->
+  <div id="mario-lane" class="mario-lane" aria-hidden="true"></div>
+
   <!-- Top button rail (data-driven) -->
   <div id="mario-nav-bar" class="mario-nav-bar" aria-label="Course navigation buttons">
     {% assign tones = "alert-green,alert-yellow,alert-red,alert-green" | split: "," %}
@@ -163,6 +166,17 @@ class Sprite {
     this.positionY = Math.max(bounds.minY, Math.min(bounds.maxY, this.positionY));
     this.spriteElement.style.left = `${this.positionX}px`;
     this.spriteElement.style.top = `${this.positionY}px`;
+    this.checkHotspots();
+  }
+
+  jumpTo(x, y) {
+    this.positionX = Math.max(this.bounds.minX, Math.min(this.bounds.maxX, x));
+    this.positionY = Math.max(this.bounds.minY, Math.min(this.bounds.maxY, y));
+    this.spriteElement.style.left = `${this.positionX}px`;
+    this.spriteElement.style.top = `${this.positionY}px`;
+    this.stopAnimate();
+    this.startResting();
+    this.checkHotspots();
   }
 
   animate(animName, speed) {
@@ -216,25 +230,18 @@ class Sprite {
 
   checkHotspots() {
     let activeHotspot = null;
-    // Sprite is visually scaled down, so collision box must be scaled too.
+    const spriteRect = this.spriteElement.getBoundingClientRect();
     for (const h of this.hotspots) {
       const el = document.getElementById(h.id);
       const sectionEl = document.getElementById(h.section);
-      const hx = el.offsetLeft;
-      const hy = el.offsetTop;
-      const hw = el.offsetWidth;
-      const hh = el.offsetHeight;
-      const mx = this.positionX;
-      const my = this.positionY;
-      const mw = this.spriteElement.offsetWidth * this.scale;
-      const mh = this.spriteElement.offsetHeight * this.scale;
+      const buttonRect = el.getBoundingClientRect();
       const expandX = 42;
       const expandY = 20;
       if (
-        mx < hx + hw + expandX &&
-        mx + mw > hx - expandX &&
-        my < hy + hh + expandY &&
-        my + mh > hy - expandY
+        spriteRect.left < buttonRect.right + expandX &&
+        spriteRect.right > buttonRect.left - expandX &&
+        spriteRect.top < buttonRect.bottom + expandY &&
+        spriteRect.bottom > buttonRect.top - expandY
       ) {
         activeHotspot = h;
         sectionEl.style.display = 'block';
@@ -272,31 +279,33 @@ const sprite = new Sprite(sprite_data, hotspots);
 function layoutHotspots() {
   const gameArea = document.getElementById("game-area");
   const navBar = document.getElementById("mario-nav-bar");
+  const lane = document.getElementById("mario-lane");
   const width = gameArea.clientWidth;
-  const columns = width < 760 ? 2 : 4;
-  const rowGap = 12;
   const topPadding = 18;
   const sidePadding = 12;
 
-  navBar.style.gridTemplateColumns = `repeat(${columns}, minmax(130px, 1fr))`;
   navBar.style.left = `${sidePadding}px`;
   navBar.style.right = `${sidePadding}px`;
   navBar.style.top = `${topPadding}px`;
 
-  const sampleButton = document.getElementById(hotspots[0].id);
-  const buttonHeight = sampleButton ? sampleButton.offsetHeight : 52;
-
-  const rows = Math.ceil(hotspots.length / columns);
-  const detailTop = topPadding + rows * (buttonHeight + rowGap) + 22;
+  const navRect = navBar.getBoundingClientRect();
+  const gameRect = gameArea.getBoundingClientRect();
+  const navBottomInGame = navRect.bottom - gameRect.top;
+  const detailTop = navBottomInGame + 16;
   for (const h of hotspots) {
     const sectionEl = document.getElementById(h.section);
     sectionEl.style.top = `${detailTop}px`;
   }
 
+  lane.style.left = `${sidePadding - 2}px`;
+  lane.style.right = `${sidePadding - 2}px`;
+  lane.style.top = `${topPadding - 6}px`;
+  lane.style.height = `${Math.max(72, navBottomInGame - topPadding + 14)}px`;
+
   const spriteWidth = sprite_data.pixelWidth * sprite_data.scale;
   const spriteHeight = sprite_data.pixelHeight * sprite_data.scale;
   const maxX = Math.max(sidePadding, width - spriteWidth - sidePadding);
-  const maxY = Math.max(topPadding, detailTop - spriteHeight - 10);
+  const maxY = Math.max(topPadding, detailTop - spriteHeight - 12);
 
   sprite.setBounds({
     minX: sidePadding,
@@ -357,6 +366,19 @@ for (const h of hotspots) {
   });
 }
 
+const gameAreaEl = document.getElementById("game-area");
+gameAreaEl.addEventListener("pointerdown", (event) => {
+  if (event.target.closest(".hotspot")) {
+    return;
+  }
+  const gameRect = gameAreaEl.getBoundingClientRect();
+  const spriteWidth = sprite_data.pixelWidth * sprite_data.scale;
+  const spriteHeight = sprite_data.pixelHeight * sprite_data.scale;
+  const targetX = event.clientX - gameRect.left - spriteWidth / 2;
+  const targetY = event.clientY - gameRect.top - spriteHeight / 2;
+  sprite.jumpTo(targetX, targetY);
+});
+
 // On page load, sprite rests
 window.addEventListener("DOMContentLoaded", () => {
   layoutHotspots();
@@ -367,4 +389,6 @@ window.addEventListener("resize", () => {
   layoutHotspots();
 });
 </script>
+Tap inside the lane on mobile to move Mario directly to your touch point.
+<!-- end -->
 
