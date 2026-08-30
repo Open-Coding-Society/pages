@@ -88,8 +88,7 @@
       white-space: nowrap;
     }
     
-    .ocs__btn.utility,
-    .ocs__btn.control {
+    .ocs__btn.utility {
       flex: 0 0 auto;
     }
 
@@ -114,14 +113,7 @@
     @media (max-width: 768px) {
       gap: 0.4rem;
 
-      .runBtn,
-      .pauseBtn,
-      .stopBtn,
-      .fullscreenBtn,
-      .resetBtn,
-      .copyBtn,
-      .saveBtn,
-      .clearStorageBtn {
+      .ocs__btn.utility {
         flex: 0 0 auto;
       }
 

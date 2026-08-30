@@ -127,8 +127,8 @@ date: 2025-10-21
   <!-- Editor (stacked vertically with output) -->
   <section class="card">
     <div class="toolbar">
-      <button id="run" class="btn">Run</button>
-      <button id="reset" class="btn secondary">Reset</button>
+      <button class="btn" data-hook="run">Run</button>
+      <button class="btn secondary" data-hook="reset">Reset</button>
       <span class="muted">Language: JavaScript (ES2020)</span>
       <span class="muted" style="margin-left:auto;">Sandbox: iframe</span>
     </div>
@@ -175,8 +175,8 @@ wire.getWireInfo();
     <div style="margin-top:12px; display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
       <div class="muted">Editor: Plain textarea. Paste code and Run. The iframe sandbox prevents access to parent.</div>
       <div style="display:flex; gap:8px;">
-        <button id="example1" class="btn" style="background:var(--ok);">Example: sum()</button>
-        <button id="example2" class="btn" style="background:var(--danger);">Error demo</button>
+        <button class="btn" data-hook="example-1" style="background:var(--ok);">Example: sum()</button>
+        <button class="btn" data-hook="example-2" style="background:var(--danger);">Error demo</button>
       </div>
     </div>
   </section>
@@ -239,22 +239,22 @@ wire.getWireInfo();
     }
 
     // controls
-    const runBtn = document.getElementById('run');
-    const resetBtn = document.getElementById('reset');
+    const runButton = document.querySelector('[data-hook="run"]');
+    const resetButton = document.querySelector('[data-hook="reset"]');
     const codeArea = document.getElementById('code');
-    const ex1 = document.getElementById('example1');
-    const ex2 = document.getElementById('example2');
+    const exampleOneButton = document.querySelector('[data-hook="example-1"]');
+    const exampleTwoButton = document.querySelector('[data-hook="example-2"]');
 
-    runBtn.addEventListener('click', ()=> runCode(codeArea.value));
-    resetBtn.addEventListener('click', ()=>{
+    runButton.addEventListener('click', ()=> runCode(codeArea.value));
+    resetButton.addEventListener('click', ()=>{
       codeArea.value = "// Fresh code - try the exercises!\\n";
       consoleEl.innerHTML = '';
       makeIframe();
     });
-    ex1.addEventListener('click', ()=>{
+    exampleOneButton.addEventListener('click', ()=>{
       codeArea.value = "function sum(a,b){ return a+b; }\\nconsole.log('sum(10,7)=', sum(10,7));";
     });
-    ex2.addEventListener('click', ()=>{
+    exampleTwoButton.addEventListener('click', ()=>{
       codeArea.value = "console.log('this will throw');\\nthrow new Error('demo failure');";
     });
 

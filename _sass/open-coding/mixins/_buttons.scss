@@ -93,9 +93,12 @@
  * @param {Number} $spacing - Margin left spacing (default: 8px)
  *
  * @example
- *   .runBtn {
+ *   .ocs__btn.utility.run {
  *     @include emphasized-icon-button;
  *   }
+ *
+ * Behavior hooks should use HTML attributes such as data-hook="run"
+ * rather than JS-specific class names.
  */
 @mixin emphasized-icon-button($size: 38px, $spacing: 8px) {
   @include icon-button($size, $spacing);
