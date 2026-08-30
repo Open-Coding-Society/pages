@@ -76,6 +76,7 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
   const defaultCode = `{{ include.code }}`.trim();
   const editorHeight = "{{ include.editor_height }}";
   const canvasHeight = "{{ include.height }}";
+  const autostart = "{{ include.autostart | default: 'false' }}" === "true";
   const levelClasses = `{{ include.levels }}`.trim().split(',').map(s => s.trim()).filter(Boolean);
   const storageKey = container.dataset.storageKey;
 
@@ -197,6 +198,15 @@ import { BaseRunner, GameExecutor } from '{{ site.baseurl }}/assets/js/pages/run
 
   // Keyboard shortcuts (only if editor exists)
   runner.bindShortcut(runGame);
+
+  if (autostart) {
+    // Defer by one tick so DOM/layout/controls are fully attached before boot.
+    setTimeout(() => {
+      runGame().catch((error) => {
+        console.error('Game runner {{ include.runner_id }} autostart failed:', error);
+      });
+    }, 0);
+  }
 
 })();
 </script>
