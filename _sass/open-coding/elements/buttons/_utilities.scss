@@ -61,9 +61,7 @@
 // - .ocs__btn.utility.stop
 // - .ocs__btn.utility.fullscreen
 // - .ocs__btn.utility.copy
-// Backward-compatible alias retained: .ocs__btn.control.*
-.ocs__btn.utility,
-.ocs__btn.control {
+.ocs__btn.utility {
     width: 44px;
     min-width: 44px;
     height: 44px;
@@ -84,8 +82,7 @@
     }
 }
 
-.ocs__btn.utility.run,
-.ocs__btn.control.run {
+.ocs__btn.utility.run {
     background: var(--pref-accent-color);
     border-color: var(--pref-accent-color);
     color: var(--pref-bg-color);
@@ -95,8 +92,7 @@
     }
 }
 
-.ocs__btn.utility.pause,
-.ocs__btn.control.pause {
+.ocs__btn.utility.pause {
     background: var(--warn);
     border-color: var(--warn);
     color: #000;
@@ -106,8 +102,7 @@
     }
 }
 
-.ocs__btn.utility.stop,
-.ocs__btn.control.stop {
+.ocs__btn.utility.stop {
     background: var(--red);
     border-color: var(--red);
     color: #fff;
@@ -118,66 +113,47 @@
 }
 
 .ocs__btn.utility.fullscreen,
-.ocs__btn.control.fullscreen,
 .ocs__btn.utility.copy,
-.ocs__btn.control.copy,
 .ocs__btn.utility.save,
-.ocs__btn.control.save,
 .ocs__btn.utility.clear,
-.ocs__btn.control.clear,
 .ocs__btn.utility.reset,
-.ocs__btn.control.reset,
-.ocs__btn.utility.copyOutput,
-.ocs__btn.control.copyOutput {
+.ocs__btn.utility.copyOutput {
     background: var(--pref-bg-color);
     border-color: var(--ui-border);
     color: var(--pref-text-color);
 }
 
-.ocs__btn.utility.fullscreen::before,
-.ocs__btn.control.fullscreen::before {
+.ocs__btn.utility.fullscreen::before {
     content: '⛶';
 }
 
-.ocs__btn.utility.copy::before,
-.ocs__btn.control.copy::before,
-.ocs__btn.control.copyBtn::before {
+.ocs__btn.utility.copy::before {
     content: '📋';
 }
 
-.ocs__btn.utility.save::before,
-.ocs__btn.control.save::before,
-.ocs__btn.control.saveBtn::before {
+.ocs__btn.utility.save::before {
     content: '💾';
 }
 
-.ocs__btn.utility.clear::before,
-.ocs__btn.control.clear::before,
-.ocs__btn.control.clearStorageBtn::before {
+.ocs__btn.utility.clear::before {
     content: '🗑';
 }
 
-.ocs__btn.utility.reset::before,
-.ocs__btn.control.reset::before,
-.ocs__btn.control.resetBtn::before {
+.ocs__btn.utility.reset::before {
     content: '↻';
 }
 
-.ocs__btn.utility.copyOutput::before,
-.ocs__btn.control.copyOutput::before,
-.ocs__btn.control.copyOutputBtn::before {
+.ocs__btn.utility.copyOutput::before {
     content: '⎘';
 }
 
-.ocs__btn.utility:disabled,
-.ocs__btn.control:disabled {
+.ocs__btn.utility:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
-    .ocs__btn.utility,
-    .ocs__btn.control {
+    .ocs__btn.utility {
         width: 40px;
         min-width: 40px;
         height: 40px;
