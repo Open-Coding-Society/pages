@@ -58,39 +58,6 @@
     min-width: 120px;
   }
 
-  // Game-specific buttons - using element classes for semantic colors
-  .pauseBtn,
-  .stopBtn,
-  .resetBtn {
-    @include icon-button(38px, 0);
-  }
-
-  // Pause button - warning color (yellow) for attention
-  .pauseBtn {
-    @extend .warning-button;
-
-    &:disabled {
-      background: var(--pref-bg-color) !important;
-      border-color: var(--ui-border) !important;
-      color: var(--pref-text-color) !important;
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
-  // Stop button - danger color (red) for critical action
-  .stopBtn {
-    @extend .danger-button;
-
-    &:disabled {
-      background: var(--pref-bg-color) !important;
-      border-color: var(--ui-border) !important;
-      color: var(--pref-text-color) !important;
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-
   // Game status indicator
   .game-status {
     font-weight: 500;
@@ -121,31 +88,9 @@
       white-space: nowrap;
     }
     
-    .runBtn,
-    .pauseBtn,
-    .stopBtn,
-    .fullscreenBtn,
-    .resetBtn,
-    .copyBtn,
-    .saveBtn,
-    .clearStorageBtn {
-      @include text-button;
-      width: 44px;
-      min-width: 44px;
-      height: 44px;
-      padding: 0;
-      font-size: 1.05rem;
-      line-height: 1;
-    }
-
-    .runBtn {
-      @include emphasized-icon-button(38px, 0);
-      width: 44px;
-      min-width: 44px;
-      height: 44px;
-      padding: 0;
-      font-size: 1.05rem;
-      line-height: 1;
+    .ocs__btn.utility,
+    .ocs__btn.control {
+      flex: 0 0 auto;
     }
 
     .levelSelect {
@@ -178,11 +123,6 @@
       .saveBtn,
       .clearStorageBtn {
         flex: 0 0 auto;
-        width: 40px;
-        min-width: 40px;
-        height: 40px;
-        padding: 0;
-        font-size: 1rem;
       }
 
       .engineVersionSelect,

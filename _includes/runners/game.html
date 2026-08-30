@@ -7,10 +7,10 @@
   {% include runners/fragments/challenge-box.html challenge=include.challenge %}
 
   {% capture game_runner_top_controls %}
-      <button type="button" class="runBtn" title="Start Game">▶</button>
-      <button type="button" class="pauseBtn" title="Pause Game">⏸</button>
-      <button type="button" class="stopBtn" title="Stop Game">■</button>
-      <button type="button" class="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+      <button type="button" class="ocs__btn utility run runBtn" title="Start Game" aria-label="Start Game"></button>
+      <button type="button" class="ocs__btn utility pause pauseBtn" title="Pause Game" aria-label="Pause Game"></button>
+      <button type="button" class="ocs__btn utility stop stopBtn" title="Stop Game" aria-label="Stop Game"></button>
+      <button type="button" class="ocs__btn utility fullscreen fullscreenBtn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
       <select class="engineVersionSelect" title="Select Game Engine Version">
         <option value="GameEnginev1">Engine v1</option>
         <option value="GameEnginev1.1" selected>Engine v1.1</option>
@@ -20,9 +20,9 @@
       </select>
   {% endcapture %}
   {% capture game_runner_bottom_actions %}
-      <button type="button" class="copyBtn" title="Copy Code">📋 Copy</button>
-      <button type="button" class="saveBtn" title="Save Code">💾 Save</button>
-      <button type="button" class="clearStorageBtn" title="Clear Storage">🗑️ Clear</button>
+      <button type="button" class="ocs__btn utility copy copyBtn" title="Copy Code" aria-label="Copy Code"></button>
+      <button type="button" class="ocs__btn utility save saveBtn" title="Save Code" aria-label="Save Code"></button>
+      <button type="button" class="ocs__btn utility clear clearStorageBtn" title="Clear Storage" aria-label="Clear Storage"></button>
   {% endcapture %}
   {% capture game_runner_bottom_controls %}
     {% include runners/fragments/editor-stats.html extra_controls=game_runner_bottom_actions %}
@@ -34,10 +34,10 @@
   {% else %}
   <!-- Compact controls for hide_edit mode -->
   <div class="compact-controls">
-    <button type="button" class="runBtn" title="Start Game">▶</button>
-    <button type="button" class="pauseBtn" title="Pause Game">⏸</button>
-    <button type="button" class="stopBtn" title="Stop Game">■</button>
-    <button type="button" class="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+    <button type="button" class="ocs__btn utility run runBtn" title="Start Game" aria-label="Start Game"></button>
+    <button type="button" class="ocs__btn utility pause pauseBtn" title="Pause Game" aria-label="Pause Game"></button>
+    <button type="button" class="ocs__btn utility stop stopBtn" title="Stop Game" aria-label="Stop Game"></button>
+    <button type="button" class="ocs__btn utility fullscreen fullscreenBtn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen"></button>
     <select class="engineVersionSelect" title="Select Game Engine Version">
       <option value="GameEnginev1">Engine v1</option>
       <option value="GameEnginev1.1" selected>Engine v1.1</option>
