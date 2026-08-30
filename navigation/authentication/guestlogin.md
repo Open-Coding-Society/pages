@@ -271,7 +271,6 @@ show_reading_time: false
     window.javaLogin = function () {
     const loginURL = `${javaURI}/authenticate`;
     const databaseURL = `${javaURI}/api/person/get`;
-    const signupURL = `${javaURI}/api/person/create`;
     const userCredentials = JSON.stringify({
         uid: document.getElementById("uid").value,
         password: document.getElementById("password").value,
@@ -306,54 +305,8 @@ show_reading_time: false
         })
         .catch(error => {
             console.error("Login failed:", error.message);
-            // If login fails, attempt account creation
-            if (error.message === "Invalid login") {
-                // alert("Login for Spring failed. Creating a new Java account...");
-                        const signupData = JSON.stringify({
-                            uid: document.getElementById("uid").value,
-                            password: document.getElementById("password").value
-                        });
-                const signupOptions = {
-                    ...fetchOptions,
-                    method: "POST",
-                    body: signupData,
-                };
-                fetch(signupURL, signupOptions)
-                    .then(signupResponse => {
-                        if (!signupResponse.ok) {
-                            throw new Error("Account creation failed!");
-                        }
-                        return signupResponse.json();
-                    })
-                    .then(signupResult => {
-                        console.log("Account creation successful!", signupResult);
-                        // alert("Account Creation Successful. Logging you into Flask/Spring!");
-                        // Retry login after account creation
-                        return fetch(loginURL, loginOptions);
-                    })
-                    .then(newLoginResponse => {
-                        if (!newLoginResponse.ok) {
-                            throw new Error("Login failed after account creation");
-                        }
-                        console.log("Login successful after account creation!");
-                        // Fetch database after successful login
-                        return fetch(databaseURL, fetchOptions);
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Spring server response: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("Java database response:", data);
-                    })
-                    .catch(newLoginError => {
-                        console.error("Error after account creation:", newLoginError.message);
-                    });
-            } else {
-                console.log("Logged in!");
-            }
+            // Spring login is optional for guest flow; avoid auto-create fallback.
+            console.warn("Spring login unavailable; continuing with Flask auth flow.");
         });
 };
     // Function to fetch and display Python data
@@ -373,7 +326,7 @@ show_reading_time: false
                 document.getElementById("message").textContent = `Error: ${error.message}`;
             });
     }  
-    window.signup = function () {
+    window.signup = async function () {
         const signupButton = document.querySelector(".signup-card button");
         // Disable the button and change its color
         signupButton.disabled = true;
@@ -392,50 +345,38 @@ show_reading_time: false
         console.log("Sending this data to Flask (Guest):", JSON.stringify(data, null, 2));
         console.log("Request URL:", `${pythonURI}/api/user/guest`);
 
-        // Flask Backend Request - GUEST endpoint
-        const flaskPromise = fetch(`${pythonURI}/api/user/guest`, {
+        const flaskRequest = {
+            ...fetchOptions,
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
             body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (response.ok) {
-                updateBackendStatus('flask', 'success');
-                return response.json();
-            } else {
-                return response.text().then(errorText => {
-                    console.log("Flask error details:", errorText);
-                    throw new Error(`Flask: ${response.status} - ${errorText}`);
-                });
+        };
+
+        try {
+            // Flask Backend Request - GUEST endpoint (blocking)
+            const response = await fetch(`${pythonURI}/api/user/guest`, flaskRequest);
+            const raw = await response.text();
+
+            if (!response.ok) {
+                console.log("Flask error details:", raw);
+                throw new Error(`Flask: ${response.status} - ${raw}`);
             }
-        })
-        .catch(error => {
+
+            updateBackendStatus('flask', 'success');
+            try {
+                const parsed = raw ? JSON.parse(raw) : {};
+                console.log("Flask result:", parsed);
+            } catch (_) {
+                console.log("Flask result (non-JSON):", raw);
+            }
+        } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
-            throw error;
-        });
-
-        // Spring Backend is DISABLED for guest accounts
-        // Creating a resolved promise to maintain the Promise.allSettled pattern
-        const springPromise = Promise.resolve({ status: 'disabled', reason: 'Spring backend disabled for guest accounts' });
-
-        // Handle Flask request (Spring is disabled)
-        Promise.allSettled([flaskPromise, springPromise])
-            .then(results => {
-                const [flaskResult, springResult] = results;
-
-                console.log("Flask result:", flaskResult);
-                console.log("Spring result (disabled):", springResult);
-
-                // Update overall status after completion
-                setTimeout(updateOverallStatus, 500);
-
-                // Re-enable button
-                signupButton.disabled = false;
-                signupButton.classList.remove("disabled");
-            });
+        } finally {
+            // Spring is intentionally disabled in guest mode; reflect final overall state.
+            setTimeout(updateOverallStatus, 500);
+            signupButton.disabled = false;
+            signupButton.classList.remove("disabled");
+        }
     }
     function javaDatabase() {
         const URL = `${javaURI}/api/person/get`;
