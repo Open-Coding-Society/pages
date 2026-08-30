@@ -1,7 +1,6 @@
 ---
 layout: post 
 title: Gamified Navigation
-permalink: /index3
 sprite:
   image: /images/mario_animation.png
   pixelWidth: 256
