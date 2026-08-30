@@ -19,10 +19,10 @@
   {% endif %}
 
   {% capture code_runner_top_controls %}
-      <button type="button" class="ocs__btn utility run runBtn" title="Run" aria-label="Run"></button>
-      <button type="button" class="ocs__btn utility copy copyBtn" title="Copy Code" aria-label="Copy Code"></button>
-      <button type="button" class="ocs__btn utility save saveBtn" title="Save Code" aria-label="Save Code"></button>
-      <button type="button" class="ocs__btn utility clear clearStorageBtn" title="Clear Storage" aria-label="Clear Storage"></button>
+      <button type="button" class="ocs__btn utility run runBtn" data-hook="run" title="Run" aria-label="Run"></button>
+      <button type="button" class="ocs__btn utility copy copyBtn" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
+      <button type="button" class="ocs__btn utility save saveBtn" data-hook="save" title="Save Code" aria-label="Save Code"></button>
+      <button type="button" class="ocs__btn utility clear clearStorageBtn" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
       <select class="languageSelect">
         <option value="python">Python</option>
         <option value="java">Java</option>
@@ -47,7 +47,7 @@
   <div class="output-container">
     <div class="control-panel">
       <span>Output</span>
-      <button type="button" class="ocs__btn utility copyOutput copyOutputBtn" title="Copy Output" aria-label="Copy Output"></button>
+      <button type="button" class="ocs__btn utility copyOutput copyOutputBtn" data-hook="copy-output" title="Copy Output" aria-label="Copy Output"></button>
     </div>
     <div class="output-content">Click "Run" in code control panel to see output ...</div>
     <div class="control-panel">
@@ -216,7 +216,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     }
   });
 
-  codeExecutor.bindCopyOutput(container.querySelector('.copyOutputBtn'));
+  codeExecutor.bindCopyOutput(container.querySelector('[data-hook="copy-output"]') || container.querySelector('.copyOutputBtn'));
 
   // Run button logic
   function runCode() {
@@ -228,7 +228,7 @@ import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api
     return codeExecutor.run();
   }
 
-  runner.bindButton('.runBtn', runCode);
+  runner.bindButton('.runBtn', runCode, 'run');
 
   // Keyboard shortcut
   runner.bindShortcut(runCode);
