@@ -54,8 +54,11 @@ Real pair example (Cookie Clicker):
 - <!-- UI_RUNNER: How to Play panel | panel: cookie_intro_game, slot: left, layout: row, ratio: 20-80, gap: 1rem -->
 - // GAME_RUNNER: Cookie Clicker Mini Game with large cookie | hide_edit: true, panel: cookie_intro_game, slot: right, layout: row, ratio: 20-80, gap: 1rem, width: 100%, height: 520px
 
-Game-runner specific options:
+Runner options:
 - autostart: true|false  Auto-runs the game when the runner initializes. Default: false.
+
+Game-runner specific options:
+- hide_edit, width, height, editor_height
 
 Notes on CodeFence and MermaidGraph:
 - Plain markdown code fences and Mermaid markdown are not panel-aware by default.
@@ -252,7 +255,7 @@ class CodeRunner:
 
     def liquid_lines(self, code_fence_lines: list[str], code_runner_count: int) -> list[str]:
         """Render Jekyll Liquid captures/includes for embedding the code runner widget."""
-        return [
+        lines = [
             '',
             '{% capture challenge' + str(code_runner_count) + ' %}',
             self.challenge,
@@ -272,9 +275,13 @@ class CodeRunner:
             '   challenge=challenge' + str(code_runner_count),
             '   code=code' + str(code_runner_count),
             '   source=source' + str(code_runner_count),
-            '%}',
-            '',
         ]
+
+        if self.options.get('autostart') or self.options.get('auto_start'):
+            lines.append('   autostart="true"')
+
+        lines.extend(['%}', ''])
+        return lines
 
 
 @dataclass

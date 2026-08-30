@@ -34,6 +34,7 @@ import { BaseRunner, UiExecutor } from '{{ site.baseurl }}/assets/js/pages/runne
   if (!container) return;
   
   const defaultCode = `{{ include.code }}`.trim();
+  const autostart = "{{ include.autostart | default: 'false' }}" === "true";
   const editorHeight = "{{ include.height }}";
   const outputHeight = "{{ include.output_height }}";
   const storageKey = container.dataset.storageKey;
@@ -96,5 +97,12 @@ import { BaseRunner, UiExecutor } from '{{ site.baseurl }}/assets/js/pages/runne
 
   // Keyboard shortcut
   runner.bindShortcut(runCode);
+
+  if (autostart) {
+    // Defer to next tick so output container is present before execution.
+    setTimeout(() => {
+      runCode();
+    }, 0);
+  }
 })();
 </script>
