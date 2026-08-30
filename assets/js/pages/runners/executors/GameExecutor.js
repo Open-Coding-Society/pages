@@ -224,7 +224,7 @@ export class GameExecutor {
       if (this.runBtn) this.runBtn.disabled = true;
       if (this.pauseBtn) {
         this.pauseBtn.disabled = false;
-        this.pauseBtn.textContent = '⏸ Pause';
+        this.pauseBtn.textContent = '⏸';
         this.pauseBtn.title = 'Pause Game';
       }
       if (this.stopBtn) this.stopBtn.disabled = false;
@@ -518,7 +518,7 @@ export class GameExecutor {
 
       // Update button text
       if (this.fullscreenBtn) {
-        this.fullscreenBtn.textContent = '⛶ Minimize';
+        this.fullscreenBtn.textContent = '⛶';
         this.fullscreenBtn.title = 'Exit Fullscreen';
       }
 
@@ -556,7 +556,7 @@ export class GameExecutor {
 
       // Update button text
       if (this.fullscreenBtn) {
-        this.fullscreenBtn.textContent = '⛶ Fullscreen';
+        this.fullscreenBtn.textContent = '⛶';
         this.fullscreenBtn.title = 'Enter Fullscreen';
       }
 
