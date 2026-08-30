@@ -53,3 +53,137 @@
         }
     }
 }
+
+// Runner control grammar (shared across CODE/UI/GAME runners)
+// Usage examples:
+// - .ocs__btn.utility.run
+// - .ocs__btn.utility.pause
+// - .ocs__btn.utility.stop
+// - .ocs__btn.utility.fullscreen
+// - .ocs__btn.utility.copy
+// Backward-compatible alias retained: .ocs__btn.control.*
+.ocs__btn.utility,
+.ocs__btn.control {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    margin-left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0;
+    line-height: 1;
+    font-weight: 700;
+
+    &::before {
+        display: inline-block;
+        font-size: 1.05rem;
+        line-height: 1;
+    }
+}
+
+.ocs__btn.utility.run,
+.ocs__btn.control.run {
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+
+    &::before {
+        content: '▶';
+    }
+}
+
+.ocs__btn.utility.pause,
+.ocs__btn.control.pause {
+    background: var(--warn);
+    border-color: var(--warn);
+    color: #000;
+
+    &::before {
+        content: '⏸';
+    }
+}
+
+.ocs__btn.utility.stop,
+.ocs__btn.control.stop {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+
+    &::before {
+        content: '■';
+    }
+}
+
+.ocs__btn.utility.fullscreen,
+.ocs__btn.control.fullscreen,
+.ocs__btn.utility.copy,
+.ocs__btn.control.copy,
+.ocs__btn.utility.save,
+.ocs__btn.control.save,
+.ocs__btn.utility.clear,
+.ocs__btn.control.clear,
+.ocs__btn.utility.reset,
+.ocs__btn.control.reset,
+.ocs__btn.utility.copyOutput,
+.ocs__btn.control.copyOutput {
+    background: var(--pref-bg-color);
+    border-color: var(--ui-border);
+    color: var(--pref-text-color);
+}
+
+.ocs__btn.utility.fullscreen::before,
+.ocs__btn.control.fullscreen::before {
+    content: '⛶';
+}
+
+.ocs__btn.utility.copy::before,
+.ocs__btn.control.copy::before,
+.ocs__btn.control.copyBtn::before {
+    content: '📋';
+}
+
+.ocs__btn.utility.save::before,
+.ocs__btn.control.save::before,
+.ocs__btn.control.saveBtn::before {
+    content: '💾';
+}
+
+.ocs__btn.utility.clear::before,
+.ocs__btn.control.clear::before,
+.ocs__btn.control.clearStorageBtn::before {
+    content: '🗑';
+}
+
+.ocs__btn.utility.reset::before,
+.ocs__btn.control.reset::before,
+.ocs__btn.control.resetBtn::before {
+    content: '↻';
+}
+
+.ocs__btn.utility.copyOutput::before,
+.ocs__btn.control.copyOutput::before,
+.ocs__btn.control.copyOutputBtn::before {
+    content: '⎘';
+}
+
+.ocs__btn.utility:disabled,
+.ocs__btn.control:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .ocs__btn.utility,
+    .ocs__btn.control {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+
+        &::before {
+            font-size: 1rem;
+        }
+    }
+}

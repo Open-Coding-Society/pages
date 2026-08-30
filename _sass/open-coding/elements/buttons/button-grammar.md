@@ -55,6 +55,33 @@ Legacy aliases still compile:
 
 New code should prefer utility grammar above.
 
+## Runner Control Grammar
+
+Use these classes for standardized controls in CODE_RUNNER, UI_RUNNER, and GAME_RUNNER.
+
+### Runner Structure
+- `ocs__btn utility` base for square runner controls
+
+### Semantic Actions
+- `run`
+- `pause`
+- `stop`
+- `fullscreen`
+- `copy`
+- `save`
+- `clear`
+- `reset`
+- `copyOutput`
+
+Examples:
+- `ocs__btn utility run`
+- `ocs__btn utility pause`
+- `ocs__btn utility stop`
+- `ocs__btn utility fullscreen`
+- `ocs__btn utility copy`
+
+Runner JavaScript hooks should keep existing action classes (for example `runBtn`, `pauseBtn`, `stopBtn`) in addition to the grammar classes.
+
 ## Drag and Drop Variant
 
 Use the drag and drop variant for activities that match a source choice to a destination. The same interaction must work by dragging or by selecting the source and destination buttons.
