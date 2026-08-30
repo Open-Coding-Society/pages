@@ -80,10 +80,14 @@ sections:
 
 ## Mario Open House Navigation
 
-Use arrow keys or WASD to move Mario. Hover a button, or move Mario close to it, to open the full course overview beneath the top row. Press R to reset Mario and hide all details.
+Use arrow keys or WASD to move Mario. Hover a button, or move Mario close to it, to open the full course overview beneath the top row. Press R to reset Mario and home.
 
 <!-- Container for Sprite and hotspots/details -->
-<div id="game-area" style="position: relative; width: 980px; height: 680px; margin: 32px auto;">
+<div
+  id="game-area"
+  class="mario-open-house"
+  style="--mario-sprite-image: url('{{page.sprite.image}}'); --mario-sprite-width: {{page.sprite.pixelWidth}}px; --mario-sprite-height: {{page.sprite.pixelHeight}}px; --mario-sprite-scale: {{page.sprite.scale}};"
+>
   <!-- Sprite -->
   <p id="sprite" class="sprite"></p>
 
@@ -115,112 +119,6 @@ Use arrow keys or WASD to move Mario. Hover a button, or move Mario close to it,
     </div>
   {% endfor %}
 </div>
-
-<style>
-#game-area {
-  position: relative;
-  width: min(980px, 96vw);
-  height: 680px;
-  margin: 32px auto;
-  background: linear-gradient(145deg, #0f172a, #13213f 46%, #1f3b73 100%);
-  border-radius: 20px;
-  box-shadow: 0 10px 36px rgba(10, 25, 51, 0.45);
-  overflow: hidden;
-}
-.sprite {
-  width: {{page.sprite.pixelWidth}}px;
-  height: {{page.sprite.pixelHeight}}px;
-  background-image: url('{{page.sprite.image}}');
-  background-repeat: no-repeat;
-  position: absolute;
-  top: 28px;
-  left: 36px;
-  background-position: 0px 0px;
-  z-index: 5;
-  transform: scale({{page.sprite.scale}});
-  transform-origin: top left;
-}
-.hotspot {
-  position: relative;
-  width: 180px;
-  min-height: 48px;
-  z-index: 4;
-  transition: transform 120ms ease, filter 120ms ease;
-}
-
-.mario-nav-bar {
-  position: absolute;
-  top: 18px;
-  left: 12px;
-  right: 12px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(140px, 1fr));
-  gap: 12px;
-  align-items: center;
-  justify-items: center;
-  z-index: 4;
-}
-
-.mario-nav-btn {
-  width: min(180px, 95%);
-}
-.hotspot:hover,
-.hotspot.active {
-  transform: translateY(-2px) scale(1.01);
-  filter: brightness(1.1);
-}
-.detail-section {
-  position: absolute;
-  display: none;
-  top: 96px;
-  left: 40px;
-  right: 40px;
-  border: 2px solid rgba(147, 197, 253, 0.6);
-  padding: 20px 22px;
-  background: rgba(15, 23, 42, 0.88);
-  color: #dbeafe;
-  min-height: 270px;
-  border-radius: 14px;
-  z-index: 3;
-  backdrop-filter: blur(3px);
-}
-.detail-section h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  color: #eff6ff;
-}
-.detail-section p {
-  margin-bottom: 10px;
-  line-height: 1.45;
-}
-.detail-section ul {
-  margin: 0;
-  padding-left: 20px;
-}
-
-@media (max-width: 900px) {
-  #game-area {
-    height: 760px;
-  }
-
-  .mario-nav-bar {
-    grid-template-columns: repeat(2, minmax(130px, 1fr));
-  }
-
-  .hotspot {
-    width: 42vw;
-    max-width: 170px;
-    min-width: 130px;
-    font-size: 0.95rem;
-  }
-  .detail-section {
-    top: 164px;
-    min-height: 340px;
-    left: 16px;
-    right: 16px;
-  }
-}
-</style>
 
 <script>
 // Sprite data: animation frames, pixel size, scale
