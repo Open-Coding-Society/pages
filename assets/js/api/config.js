@@ -23,7 +23,7 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
 
 // Shared across the signup, login, and password-reset OAuth flows (login.md,
 // support.md) so the client_id only needs updating in one place.
-export const GOOGLE_CLIENT_ID = "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com";
+export const GOOGLE_CLIENT_ID = "{{ site.google_client_id }}";
 
 export var javaWebSocketURI;
 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {

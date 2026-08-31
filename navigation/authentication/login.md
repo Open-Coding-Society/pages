@@ -52,7 +52,7 @@ show_reading_time: false
                 step and sign up now -- your account will await administrator approval either way.
             </p>
             <div id="g_id_onload"
-                 data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
+                 data-client_id="{{ site.google_client_id }}"
                  data-callback="handleGoogleSignIn"
                  data-auto_prompt="false">
             </div>
