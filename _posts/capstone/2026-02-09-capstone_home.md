@@ -333,6 +333,19 @@ Below are the capstone infographic pages created by student groups. Click an ima
      </div>
 
 
+   <!-- Communication System -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">
+           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - Course-Site Chat and Messaging" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
+           <p class="text-sm text-gray-700">Class discussion moved out of Slack and onto the course site, next to the work it is about. Class-wide announcements and per-week chat already ship; per-assignment threads, 1:1 direct messages, and teacher moderation are still to build.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Akhil, Samarth, Akshaj, Tarun, Perry, Syowns, Leon</p>
+       </div>
+   </div>
+
+
    <!-- Educators Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url capstone/2026-02-06-educators-capstone %}">

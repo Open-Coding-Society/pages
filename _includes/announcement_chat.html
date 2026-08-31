@@ -1,0 +1,492 @@
+<!-- Class Announcement Chat: always-open WebSocket chat for the whole course. -->
+<!-- One group per course, e.g. "csa-announcements", "csp-announcements". -->
+<!-- Reuses the same STOMP/SockJS backend as _includes/lesson_chat.html and -->
+<!-- _includes/group_dashboard.html (Open-Coding-Society/spring's /api/groups + -->
+<!-- /ws-chat). The group is created automatically on first use if it doesn't -->
+<!-- exist yet, so no manual DB seeding is required. -->
+<!-- -->
+<!-- Signed-out visitors still get the full UI: the chat drops into a local -->
+<!-- "preview" mode backed by localStorage, matching _includes/week_chat.html, -->
+<!-- so the feature is visible and testable without a login. -->
+
+<section id="announcementChat" class="announcement-chat" data-course="{{ page.course }}" aria-labelledby="announcementChatTitle">
+  <div class="chat-header">
+    <div class="chat-heading">
+      <span class="chat-badge" aria-hidden="true"><i class="fas fa-bullhorn"></i></span>
+      <div class="chat-heading-text">
+        <h2 class="chat-title" id="announcementChatTitle">{{ page.course | upcase }} Announcements</h2>
+        <p class="chat-subtitle">Class-wide chat for this course — announcements, questions, anything that isn't week-specific.</p>
+      </div>
+    </div>
+    <span class="chat-status-pill" id="announcementChatStatusPill">
+      <span class="chat-status-dot" aria-hidden="true"></span>
+      <span class="chat-status" id="announcementChatStatus">loading…</span>
+    </span>
+  </div>
+
+  <div class="chat-body">
+    <p class="chat-preview-note" id="announcementChatNote" hidden>
+      <i class="fas fa-flask" aria-hidden="true"></i><span id="announcementChatNoteText"></span>
+    </p>
+    <div class="chat-messages" id="announcementChatMessages" role="log" aria-live="polite">
+      <div class="chat-empty" id="announcementChatEmpty">
+        <i class="fas fa-bullhorn" aria-hidden="true"></i>
+        <p class="chat-empty-title">No announcements yet</p>
+        <span class="chat-empty-hint">Class-wide messages will appear here.</span>
+      </div>
+    </div>
+    <form class="chat-form" id="announcementChatForm" autocomplete="off">
+      <input class="chat-input" id="announcementChatInput" type="text" placeholder="Message the class…" maxlength="2000" disabled>
+      <button class="chat-send" id="announcementChatSend" type="submit" disabled>
+        <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
+      </button>
+    </form>
+  </div>
+</section>
+
+<script type="module">
+  import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+  const COURSE = {{ page.course | jsonify }};
+  const GROUP_NAME = `${COURSE}-announcements`;
+  const CHAT_SOCKET_PORT = 8589;
+  const PREVIEW_KEY = `ocs-chat-preview:${GROUP_NAME}`;
+  const PREVIEW_LIMIT = 100;
+
+  const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
+  const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
+
+  // Shared with the per-week chats: load the chat libraries once per page,
+  // and only when a chat actually needs a live connection.
+  function loadScriptOnce(src) {
+    window.__ocsChatScripts = window.__ocsChatScripts || {};
+    if (!window.__ocsChatScripts[src]) {
+      window.__ocsChatScripts[src] = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = resolve;
+        el.onerror = () => reject(new Error(`failed to load ${src}`));
+        document.head.appendChild(el);
+      });
+    }
+    return window.__ocsChatScripts[src];
+  }
+
+  async function loadChatLibraries() {
+    await loadScriptOnce(SOCKJS_SRC);
+    await loadScriptOnce(STOMP_SRC);
+  }
+
+  function buildChatSocketEndpoint() {
+    const uri = new URL(javaURI);
+    if (uri.hostname === 'localhost' || uri.hostname === '127.0.0.1') {
+      return `${uri.protocol}//${uri.hostname}:${CHAT_SOCKET_PORT}/ws-chat`;
+    }
+    return javaURI + '/ws-chat';
+  }
+
+  const state = {
+    backboneGroupId: null,
+    stompClient: null,
+    subscription: null,
+    connected: false,
+    initialized: false,
+    mode: 'live', // 'live' once connected to the backend, 'preview' when local-only
+    currentUserDisplayName: 'You',
+    seenKeys: new Set(),
+    // Cursors used to group the log by day and by consecutive sender
+    lastDayKey: null,
+    lastSender: null,
+    lastTime: 0,
+  };
+
+  const statusEl = document.getElementById('announcementChatStatus');
+  const statusPillEl = document.getElementById('announcementChatStatusPill');
+  const noteEl = document.getElementById('announcementChatNote');
+  const noteTextEl = document.getElementById('announcementChatNoteText');
+  const messagesEl = document.getElementById('announcementChatMessages');
+  const inputEl = document.getElementById('announcementChatInput');
+  const sendBtn = document.getElementById('announcementChatSend');
+  const formEl = document.getElementById('announcementChatForm');
+
+  function setStatus(text, tone) {
+    statusEl.textContent = text;
+    statusPillEl.classList.remove('is-live', 'is-preview', 'is-error');
+    if (tone) statusPillEl.classList.add(tone);
+  }
+
+  function showNote(text) {
+    noteTextEl.textContent = text;
+    noteEl.hidden = false;
+  }
+
+  function setComposerEnabled(enabled) {
+    inputEl.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+  }
+
+  function parseDate(isoString) {
+    if (!isoString) return null;
+    const date = new Date(isoString);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+  function dayKey(date) {
+    return String(startOfDay(date));
+  }
+
+  // "Today" / "Yesterday" / "Mon, Aug 24" — the separator between day groups.
+  function dayLabel(date) {
+    const diff = Math.round((startOfDay(new Date()) - startOfDay(date)) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function initialsFor(name) {
+    const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  // Stable per-sender tint so the same person keeps the same avatar color.
+  function tintFor(name) {
+    const text = String(name || '');
+    let hash = 0;
+    for (let i = 0; i < text.length; i += 1) hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+    return `tint-${(hash % 5) + 1}`;
+  }
+
+  function clearEmpty() {
+    const empty = document.getElementById('announcementChatEmpty');
+    if (empty) empty.remove();
+  }
+
+  function appendMessage({ sender, message, date }) {
+    clearEmpty();
+
+    const isSelf = sender === state.currentUserDisplayName;
+    const who = isSelf ? 'You' : (sender || 'Unknown');
+    const when = parseDate(date);
+
+    // Keep the log pinned to the bottom only if the reader is already there,
+    // so scrolling back through history isn't yanked away by a new message.
+    const wasAtBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 40;
+
+    let continued;
+    if (when) {
+      const key = dayKey(when);
+      if (key !== state.lastDayKey) {
+        const separator = document.createElement('div');
+        separator.className = 'chat-day';
+        separator.setAttribute('role', 'separator');
+        separator.textContent = dayLabel(when);
+        messagesEl.appendChild(separator);
+        state.lastDayKey = key;
+        state.lastSender = null;
+      }
+      continued = who === state.lastSender && (when.getTime() - state.lastTime) < 5 * 60 * 1000;
+      state.lastTime = when.getTime();
+    } else {
+      continued = who === state.lastSender;
+    }
+
+    const row = document.createElement('div');
+    row.className = ['chat-msg', isSelf ? 'is-self' : '', continued ? 'is-continued' : '']
+      .filter(Boolean).join(' ');
+
+    const avatar = document.createElement('span');
+    avatar.className = ['chat-avatar', isSelf ? '' : tintFor(who)].filter(Boolean).join(' ');
+    avatar.textContent = initialsFor(isSelf ? (state.currentUserDisplayName || 'You') : who);
+    avatar.setAttribute('aria-hidden', 'true');
+
+    const main = document.createElement('div');
+    main.className = 'chat-msg-main';
+
+    const meta = document.createElement('div');
+    meta.className = 'chat-msg-meta';
+    const senderEl = document.createElement('span');
+    senderEl.className = 'chat-msg-sender';
+    senderEl.textContent = who;
+    meta.appendChild(senderEl);
+    if (when) {
+      const timeEl = document.createElement('span');
+      timeEl.className = 'chat-msg-time';
+      timeEl.textContent = formatTime(when);
+      meta.appendChild(timeEl);
+    }
+
+    const body = document.createElement('span');
+    body.className = 'chat-msg-body';
+    body.textContent = message;
+
+    main.append(meta, body);
+    row.append(avatar, main);
+    messagesEl.appendChild(row);
+
+    state.lastSender = who;
+    if (wasAtBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function appendSystem(text) {
+    clearEmpty();
+    const el = document.createElement('p');
+    el.className = 'chat-system';
+    el.textContent = text;
+    messagesEl.appendChild(el);
+    state.lastSender = null;
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function eventKey(event) {
+    return [event?.sender || '', event?.date || '', event?.message || ''].join('|');
+  }
+
+  /* ── Local preview mode ─────────────────────────────────────────────
+     Used when nobody is signed in (or the backbone is unreachable) so the
+     announcements panel stays visible and usable. Messages are kept in
+     localStorage for this browser only. */
+
+  function readPreviewMessages() {
+    try {
+      const raw = window.localStorage.getItem(PREVIEW_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn('Announcement chat: preview history unavailable', err);
+      return [];
+    }
+  }
+
+  function writePreviewMessage(entry) {
+    try {
+      const messages = readPreviewMessages();
+      messages.push(entry);
+      window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(messages.slice(-PREVIEW_LIMIT)));
+    } catch (err) {
+      console.warn('Announcement chat: could not save preview message', err);
+    }
+  }
+
+  function enterPreviewMode(reason) {
+    state.mode = 'preview';
+    state.currentUserDisplayName = 'You';
+    setStatus('preview', 'is-preview');
+    showNote(`${reason} This is a local preview — messages stay in this browser and are not sent to the class.`);
+
+    readPreviewMessages().forEach((msg) => {
+      const key = eventKey(msg);
+      if (state.seenKeys.has(key)) return;
+      state.seenKeys.add(key);
+      appendMessage(msg);
+    });
+
+    setComposerEnabled(true);
+  }
+
+  async function resolveCurrentUser() {
+    try {
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (!res.ok) { console.warn('Announcement chat: /api/id HTTP', res.status); return false; }
+      const user = await res.json();
+      const name = user?.name || user?.uid || user?.github;
+      if (!name) return false;
+      state.currentUserDisplayName = name;
+      return true;
+    } catch (err) {
+      console.warn('Announcement chat: user lookup failed', err);
+      return false;
+    }
+  }
+
+  async function createGroup() {
+    const res = await fetch(`${javaURI}/api/groups`, {
+      ...fetchOptions,
+      method: 'POST',
+      body: JSON.stringify({ name: GROUP_NAME, period: '', course: COURSE, memberIds: [] }),
+    });
+    if (res.status === 201) {
+      const body = await res.json();
+      return Number(body?.id) || null;
+    }
+    // 409 = someone else created it a moment ago; fall through to re-search.
+    return null;
+  }
+
+  async function resolveBackboneGroup() {
+    const cacheKey = `__announcementChatGroupId_${COURSE}`;
+    if (window[cacheKey]) { state.backboneGroupId = window[cacheKey]; return true; }
+
+    const url = `${javaURI}/api/groups/search?name=${encodeURIComponent(GROUP_NAME)}`;
+    let res;
+    try { res = await fetch(url, fetchOptions); }
+    catch (err) { console.warn('Announcement chat: group lookup network error', err); return false; }
+    if (!res.ok) { console.warn('Announcement chat: group lookup HTTP', res.status); return false; }
+
+    let body;
+    try { body = await res.json(); }
+    catch (err) { console.warn('Announcement chat: group lookup non-JSON response', err); return false; }
+
+    let match = Array.isArray(body) ? body.find((g) => (g?.name || '') === GROUP_NAME) : body;
+
+    if (!match) {
+      const createdId = await createGroup();
+      if (createdId) {
+        state.backboneGroupId = createdId;
+        window[cacheKey] = createdId;
+        return true;
+      }
+      // Someone else beat us to creating it — re-search once.
+      try {
+        const retryRes = await fetch(url, fetchOptions);
+        if (retryRes.ok) {
+          const retryBody = await retryRes.json();
+          match = Array.isArray(retryBody) ? retryBody.find((g) => (g?.name || '') === GROUP_NAME) : retryBody;
+        }
+      } catch (err) { /* ignore, handled below */ }
+    }
+
+    const id = Number(match?.id);
+    if (!id) { console.warn('Announcement chat: could not resolve or create group', GROUP_NAME); return false; }
+    state.backboneGroupId = id;
+    window[cacheKey] = id;
+    return true;
+  }
+
+  async function loadHistory() {
+    if (!state.backboneGroupId) return;
+    try {
+      const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, fetchOptions);
+      if (!res.ok) { console.warn('Announcement chat: history HTTP', res.status); return; }
+      const messages = await res.json();
+      (messages || []).forEach((msg) => {
+        const key = eventKey({ sender: msg.name, date: msg.date, message: msg.message });
+        if (state.seenKeys.has(key)) return;
+        state.seenKeys.add(key);
+        appendMessage({ sender: msg.name, message: msg.message, date: msg.date });
+      });
+    } catch (err) {
+      console.warn('Announcement chat: history load failed', err);
+    }
+  }
+
+  function handleIncoming(event) {
+    if (!event || event.context !== 'sendMessageServer') return;
+    const key = eventKey(event);
+    if (state.seenKeys.has(key)) return;
+    state.seenKeys.add(key);
+    appendMessage({ sender: event.sender, message: event.message, date: event.date });
+  }
+
+  function connect() {
+    return new Promise((resolve) => {
+      if (state.connected) return resolve(true);
+      if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') { return resolve(false); }
+      setStatus('connecting…');
+      const socket = new SockJS(buildChatSocketEndpoint());
+      const client = Stomp.over(socket);
+      client.debug = null;
+      state.stompClient = client;
+
+      client.connect({}, () => {
+        state.connected = true;
+        setStatus('connected', 'is-live');
+        state.subscription = client.subscribe(`/topic/group/${state.backboneGroupId}`, (frame) => {
+          try { handleIncoming(JSON.parse(frame.body)); }
+          catch (err) { console.warn('Announcement chat: bad frame', err); }
+        });
+        resolve(true);
+      }, (err) => {
+        console.warn('Announcement chat: connection failed', err);
+        state.connected = false;
+        resolve(false);
+      });
+
+      socket.onclose = () => {
+        if (!state.connected) return;
+        state.connected = false;
+        setStatus('disconnected', 'is-error');
+        setComposerEnabled(false);
+      };
+    });
+  }
+
+  function sendMessage(text) {
+    const date = new Date().toISOString();
+
+    if (state.mode === 'preview') {
+      const entry = { sender: state.currentUserDisplayName || 'You', message: text, date };
+      state.seenKeys.add(eventKey(entry));
+      writePreviewMessage(entry);
+      appendMessage(entry);
+      return true;
+    }
+
+    if (!state.connected || !state.stompClient || !state.backboneGroupId) return false;
+    const payload = {
+      context: 'sendMessage',
+      groupId: state.backboneGroupId,
+      sender: state.currentUserDisplayName || 'anonymous',
+      message: text,
+      image: null,
+      date,
+    };
+    try { state.stompClient.send('/app/groups.chat', {}, JSON.stringify(payload)); return true; }
+    catch (err) { console.error('Announcement chat: send failed', err); return false; }
+  }
+
+  async function init() {
+    if (state.initialized) return;
+    state.initialized = true;
+    setStatus('loading…');
+
+    const signedIn = await resolveCurrentUser();
+    if (!signedIn) {
+      enterPreviewMode('You are not signed in.');
+      return;
+    }
+
+    const ok = await resolveBackboneGroup();
+    if (!ok) {
+      enterPreviewMode('The class chat service is unreachable.');
+      return;
+    }
+
+    await loadHistory();
+
+    try { await loadChatLibraries(); }
+    catch (err) { console.warn('Announcement chat: library load failed', err); }
+
+    const connected = await connect();
+    if (connected) {
+      state.mode = 'live';
+      setComposerEnabled(true);
+    } else {
+      appendSystem('Live updates are unavailable right now.');
+      enterPreviewMode('The class chat service is unreachable.');
+    }
+  }
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = inputEl.value.trim();
+    if (!text) return;
+    if (sendMessage(text)) inputEl.value = '';
+  });
+
+  window.addEventListener('beforeunload', () => {
+    try {
+      if (state.subscription) state.subscription.unsubscribe();
+      if (state.stompClient && state.connected) state.stompClient.disconnect();
+    } catch (_) { /* ignore */ }
+  });
+
+  init();
+</script>
