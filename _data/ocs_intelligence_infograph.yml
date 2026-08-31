@@ -1,0 +1,40 @@
+# OCS Intelligence Capstone Infographic
+Title: "OCS Intelligence"
+Description: "Build shared AI infrastructure for Open Coding Society so every student can experiment, learn, and create with a capable language model regardless of their ability to pay for a subscription."
+
+Topics:
+  - title: "Host & Serve an LLM"
+    subtitle: "Turn specialized OCS hardware into a dependable inference service for programming and agentic workflows."
+    visualTitle: "Open Inference Stack"
+    stack:
+      - "Model"
+      - "Kernels & Runtime"
+      - "Inference Engine"
+      - "Node Configuration"
+      - "Distributed Serving"
+      - "Scheduler & Networking"
+      - "Autoscaling & Observability"
+      - "Reliability & Cost Optimization"
+    keyPoints:
+      - "Profile the model and inference workload against OCS's unique hardware constraints."
+      - "Optimize beyond standard tooling such as FlashAttention and vLLM for the actual workload and use case."
+      - "Build scheduling, networking, autoscaling, observability, and reliability around the inference engine."
+      - "Expose a stable interface that students can use directly or connect to their existing agent harnesses."
+      - "Support delegated programming tasks as a local subagent under a larger orchestrating model."
+    description: "Running a model is only the first step. Serving useful inference means engineering the full path from model and kernels to routing, capacity management, monitoring, failure recovery, and sustainable cost. Even mature components still require workload-specific tuning, and the available OCS hardware makes model placement and performance optimization a meaningful systems problem."
+    candidateModel: "Qwen3.8 27B is a strong open-weight candidate to evaluate for capable programming and agentic work. Its size and performance make it useful to students while creating a realistic inference-engineering challenge."
+    tech:
+      - "Qwen3.8 27B"
+      - "FlashAttention"
+      - "vLLM"
+      - "Distributed Inference"
+      - "Observability"
+    impact:
+      - "Reduce dependence on paid AI subscriptions for experimentation and development."
+      - "Give more students comparable opportunities to practice AI-assisted programming."
+      - "Create a shared service that can plug into multiple tools, agents, and learning workflows."
+      - "Turn real hardware constraints into hands-on experience with modern inference engineering."
+    status: "Research & Prototyping"
+    audience: "OCS Students and Builders"
+    link: "https://artificialanalysis.ai/models/qwen3-8-27b"
+    linkLabel: "View model analysis"
