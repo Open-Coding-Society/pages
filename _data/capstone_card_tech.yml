@@ -155,3 +155,10 @@
   - "JWT Cookie Auth"
   - "Jekyll Includes / Vanilla JS"
   - "localStorage"
+
+"OCS Intelligence":
+  - "Qwen3.8 27B"
+  - "FlashAttention"
+  - "vLLM"
+  - "Distributed Inference"
+  - "Observability"
