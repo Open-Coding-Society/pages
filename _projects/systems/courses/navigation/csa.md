@@ -7,6 +7,7 @@ units: "1,2,3,4,5,6,7,8,9"
 search_exclude: true
 course: csa
 permalink: /navigation/courses/csa/
+announcements: false
 certificates:
   - title: Java Mastery Path
     completed_tasks: 5
