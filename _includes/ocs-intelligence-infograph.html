@@ -1,0 +1,71 @@
+{% assign data = site.data.ocs_intelligence_infograph %}
+
+<div class="ocs-intelligence-infograph">
+  <div class="ocs-intelligence-header">
+    <div class="ocs-intelligence-badge">Design-Based Research Capstone</div>
+    <h1 class="ocs-intelligence-title">{{ data.Title }}</h1>
+    <p class="ocs-intelligence-description">{{ data.Description }}</p>
+  </div>
+
+  {% for topic in data.Topics %}
+  <div class="ocs-intelligence-card">
+    <div class="ocs-intelligence-card-grid">
+      <div class="ocs-intelligence-visual">
+        <h2 class="ocs-intelligence-project-title">{{ topic.visualTitle }}</h2>
+        <div class="ocs-intelligence-impact-list">
+          {% for layer in topic.stack %}
+          <div class="ocs-intelligence-impact-item">{{ layer }}</div>
+          {% endfor %}
+        </div>
+        <div class="ocs-intelligence-status">{{ topic.status }}</div>
+        <div class="ocs-intelligence-team">
+          <span class="ocs-intelligence-team-label">Primary Audience</span>
+          <span class="ocs-intelligence-team-name">{{ topic.audience }}</span>
+        </div>
+      </div>
+
+      <div class="ocs-intelligence-content">
+        <h2 class="ocs-intelligence-project-title">{{ topic.title }}</h2>
+        <p class="ocs-intelligence-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="ocs-intelligence-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="ocs-intelligence-keypoint">
+            <span class="ocs-intelligence-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="ocs-intelligence-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="ocs-intelligence-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="ocs-intelligence-details">
+        <h3 class="ocs-intelligence-section-title">Why this is challenging</h3>
+        <p class="ocs-intelligence-about">{{ topic.description }}</p>
+
+        <h3 class="ocs-intelligence-section-title">Candidate model</h3>
+        <p class="ocs-intelligence-about">{{ topic.candidateModel }}</p>
+
+        <h3 class="ocs-intelligence-section-title">Impact</h3>
+        <div class="ocs-intelligence-impact-list">
+          {% for item in topic.impact %}
+          <div class="ocs-intelligence-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a
+          href="{{ topic.link }}"
+          class="ocs-intelligence-btn"
+          target="_blank"
+          rel="noopener noreferrer"
+        >{{ topic.linkLabel }}</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
