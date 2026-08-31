@@ -296,6 +296,15 @@ show_reading_time: false
             document.getElementById('reset-message').textContent = '✅ Password updated! Redirecting to login...';
             resetUidValue = null;
             resetTokenValue = null;
+
+            // Best-effort: if this browser happens to be holding a stale Spring MVC
+            // session/cookie for this account (e.g. an admin portal tab logged in as this
+            // same uid), explicitly log it out so those cookies get cleared too. The
+            // account's sessions are already force-expired server-side regardless of
+            // whether this call succeeds -- this is just belt-and-suspenders for the one
+            // browser that's actually here right now.
+            fetch(`${javaURI}/logout`, { ...fetchOptions, method: 'POST' }).catch(() => {});
+
             setTimeout(() => {
                 window.location.href = '{{site.baseurl}}/login';
             }, 1500);
