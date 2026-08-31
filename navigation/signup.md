@@ -7,6 +7,8 @@ search_exclude: true
 
 {% include nav/homejava.html %}
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
   .login-container {
       display: flex;
@@ -34,7 +36,7 @@ search_exclude: true
 <div id="login-container">
   <div class="signup-card">
     <h1 id="signupTitle">Sign Up</h1>
-    <form id="signupForm" onsubmit="signup(); return false;">
+    <form id="signupForm" onsubmit="beginGoogleSignup(); return false;">
       <p>
         <label>
           Name:
@@ -44,7 +46,8 @@ search_exclude: true
       <p>
         <label>
           Github Id:
-          <input type="text" name="signupUid" id="signupUid" required>
+          <input type="text" name="signupUid" id="signupUid" aria-describedby="githubIdMessage" required>
+          <span id="githubIdMessage" aria-live="polite"></span>
         </label>
       </p>
       <p>
@@ -70,12 +73,66 @@ search_exclude: true
       </p>
       <p id="signupMessage" style="color: green;"></p>
     </form>
+    <div id="oauthVerification" style="display: none; text-align: center;">
+      <h2>Google Account Verification</h2>
+      <p>Sign in with any Google account. Poway USD student accounts receive immediate access; other accounts will await administrator approval.</p>
+      <div id="g_id_onload"
+           data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
+           data-callback="handleStandaloneGoogleSignIn"
+           data-auto_prompt="false"></div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_blue"></div>
+      <button type="button" class="medium" onclick="showStandaloneSignupForm()">Back to form</button>
+    </div>
   </div>
 </div>
 
 <script type="module">
   import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
   import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+  const studentIdAsGithubIdPattern = /^\d{7}$/;
+  const githubIdInput = document.getElementById('signupUid');
+  const githubIdMessage = document.getElementById('githubIdMessage');
+
+  function validateGithubId() {
+    const isStudentId = studentIdAsGithubIdPattern.test(githubIdInput.value.trim());
+    const message = isStudentId ? 'Enter your GitHub ID, not your 7-digit student ID.' : '';
+    githubIdInput.setCustomValidity(message);
+    githubIdMessage.innerText = message;
+    return !isStudentId;
+  }
+
+  githubIdInput.addEventListener('input', validateGithubId);
+
+  let signupIdToken = null;
+  let verifiedGoogleEmail = null;
+
+  window.beginGoogleSignup = function() {
+    if (!validateGithubId()) {
+      githubIdInput.reportValidity();
+      githubIdInput.focus();
+      return;
+    }
+    if (!document.getElementById('signupForm').checkValidity()) {
+      document.getElementById('signupForm').reportValidity();
+      return;
+    }
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('oauthVerification').style.display = 'block';
+  };
+
+  window.showStandaloneSignupForm = function() {
+    document.getElementById('oauthVerification').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'block';
+  };
+
+  window.handleStandaloneGoogleSignIn = function(response) {
+    const payload = JSON.parse(atob(response.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    signupIdToken = response.credential;
+    verifiedGoogleEmail = payload.email;
+    document.getElementById('signupMessage').innerText = `Google account selected: ${verifiedGoogleEmail}`;
+    window.signup();
+  };
 
   // Sign up function to handle form submission
   window.signup = function() {
@@ -89,11 +146,12 @@ search_exclude: true
       body: JSON.stringify({
         uid: document.getElementById("signupUid").value,
         sid: document.getElementById("sid").value,
-        email: document.getElementById("signupUid").value + "@gmail.com",
+        email: verifiedGoogleEmail,
         dob: "11-01-2024",  // Static date for now, you can modify this
         name: document.getElementById("name").value,
         password: document.getElementById("signupPassword").value,
         kasmServerNeeded: document.getElementById("kasmNeeded").checked,
+        idToken: signupIdToken,
       })
     };
 
@@ -107,7 +165,7 @@ search_exclude: true
       body: JSON.stringify({
         uid: document.getElementById("signupUid").value,
         sid: document.getElementById("sid").value,
-        email: document.getElementById("signupUid").value + "@gmail.com",
+        email: verifiedGoogleEmail,
         dob: "11-01-2024",  // Static date for now, you can modify this
         name: document.getElementById("name").value,
         password: document.getElementById("signupPassword").value,

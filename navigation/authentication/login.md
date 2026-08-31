@@ -35,10 +35,10 @@ show_reading_time: false
         <hr>
         <!-- Google OAuth Section (initially hidden) -->
         <div id="oauth-verification" style="display: none; text-align: center; margin-bottom: 2rem;">
-            <h3 style="color: #6366f1; margin-bottom: 1rem;">🎓 School Email Verification</h3>
+            <h3 style="color: #6366f1; margin-bottom: 1rem;">Google Account Verification</h3>
             <p style="margin-bottom: 1.5rem; color: #d1d5db;">
-                Please sign in with your school Google account to verify you're a Poway USD student or teacher.
-                <br><strong>You must use an email ending in @stu.powayusd.com or @powayusd.com</strong>
+                Sign in with any Google account. Poway USD student accounts receive immediate access;
+                other accounts will await administrator approval.
             </p>
             <div id="g_id_onload"
                  data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
@@ -66,7 +66,8 @@ show_reading_time: false
                 <input type="text" id="name" placeholder="Name" required>
             </div>
             <div class="form-group">
-                <input type="text" id="signupUid" placeholder="GitHub ID" required>
+                <input type="text" id="signupUid" placeholder="GitHub ID" aria-describedby="github-id-validation-message" required>
+                <div id="github-id-validation-message" class="validation-message error" aria-live="polite"></div>
             </div>
             <div class="form-group">
                 <input type="text" id="signupSid" placeholder="Student ID" required>
@@ -127,7 +128,23 @@ show_reading_time: false
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
+    let signupIdToken = null;
     let validationTimeout = null;
+
+    const STUDENT_ID_AS_GITHUB_ID_PATTERN = /^\d{7}$/;
+
+    function validateGithubId() {
+        const githubIdField = document.getElementById('signupUid');
+        const messageDiv = document.getElementById('github-id-validation-message');
+        const isStudentId = STUDENT_ID_AS_GITHUB_ID_PATTERN.test(githubIdField.value.trim());
+        const message = isStudentId ? 'Enter your GitHub ID, not your 7-digit student ID.' : '';
+
+        githubIdField.setCustomValidity(message);
+        messageDiv.textContent = message;
+        return !isStudentId;
+    }
+
+    document.getElementById('signupUid').addEventListener('input', validateGithubId);
 
     // Password validation with debouncing (1.5 second delay)
     function validatePasswordsDebounced() {
@@ -182,6 +199,12 @@ show_reading_time: false
     function validateSignupForm() {
         const password = document.getElementById('signupPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!validateGithubId()) {
+            document.getElementById('signupUid').reportValidity();
+            document.getElementById('signupUid').focus();
+            return false;
+        }
 
         if (password !== confirmPassword) {
             alert('Passwords do not match. Please try again.');
@@ -307,12 +330,10 @@ show_reading_time: false
         try {
             const userInfo = parseJwt(response.credential);
             const email = userInfo.email;
-            if (!email.endsWith('@stu.powayusd.com') && !email.endsWith('@powayusd.com')) {
-                showOAuthStatus('❌ You must use your school email address ending with @stu.powayusd.com or @powayusd.com', true);
-                return;
-            }
             verifiedSchoolEmail = email;
-            showOAuthStatus(`✅ School email verified: ${email}`);
+            signupIdToken = response.credential;
+            signupFormData.email = email;
+            showOAuthStatus(`✅ Google account selected: ${email}`);
 
             setTimeout(() => {
                 document.getElementById('oauth-verification').style.display = 'none';
@@ -526,6 +547,7 @@ show_reading_time: false
             name: data.name,
             password: data.password,
             kasmServerNeeded: data.kasm_server_needed,
+            idToken: signupIdToken,
         };
 
         if (verifiedSchoolEmail) {
