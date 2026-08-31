@@ -35,7 +35,7 @@ web_dev_layers: &web_dev_layers |
 course:
   code: CSP
   title: "CSP - Computer Science Principles"
-  subtitle: "Projects, Principles"
+  subtitle: "Code, Principles, Projects"
   mission: "AP Computer Science Principles (CSP 1, CSP 2, DS 1) incorporates College Board curriculum through Project-base learning. Teams, Data, Coding, Computer Systems, and Networks are utilized to build community serving projects and engage client in discussions about solutions."
   progression_key: 10
   learning_journey:
