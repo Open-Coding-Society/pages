@@ -494,7 +494,6 @@
       </table>
     </div>
     <div class="rp-callout rp-callout-note">
-      <span class="rp-callout-icon">ℹ️</span>
       <span>This adds one more presence state to the model below: a student who opts out of face scanning still gets correct device-based tracking (<span class="rp-code">DEVICE_ONLY_NO_CONSENT</span>), distinct from a student whose camera signal is simply missing/failed.</span>
     </div>
   </div>
@@ -652,15 +651,12 @@ Computer unlinked"]</pre>
       </table>
     </div>
     <div class="rp-callout rp-callout-note">
-      <span class="rp-callout-icon">📶</span>
       <span><strong style="color:var(--rp-text);">Read range and orientation:</strong> at 20–26dBm with the whip antenna above, expect a 2–4m read range — enough for a single door-table setup. The whip radiates in a ring perpendicular to its body, so tags read best held <strong style="color:var(--rp-text);">parallel</strong> to the antenna, not pointed at its tip; this needs to be part of the test protocol, not just the hardware spec.</span>
     </div>
     <div class="rp-callout rp-callout-open">
-      <span class="rp-callout-icon">⚠️</span>
       <span><strong style="color:var(--rp-text);">Open problem — computer-in-bag orientation:</strong> when the tagged laptop is inside a closed backpack, there's no guarantee the tag faces the reader, and read reliability drops sharply if it doesn't. Not yet solved — options to test: multiple reader antennas at different angles around the door, a standardized "tag pocket" location in the bag, or accepting a lower catch rate and relying on the camera signal to cover the gap.</span>
     </div>
     <div class="rp-callout rp-callout-note">
-      <span class="rp-callout-icon">📐</span>
       <span><strong style="color:var(--rp-text);">Scaling to the full room:</strong> the whip antenna above is sized for a single door-table test, not whole-room coverage. Covering the full classroom will need a larger/higher-gain antenna (or multiple antennas) and a real packaging/enclosure plan — flagged by the teacher as the next hardware step once the door-table rig is validated.</span>
     </div>
   </div>
