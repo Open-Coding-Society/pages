@@ -1,0 +1,160 @@
+// Mentor project view (/mentor).
+//
+// An industry mentor is attached to a small number of capstone projects and sees
+// only those. Layout is a project list beside the selected project's chat; it
+// collapses to a single column on narrow screens.
+
+.mentor-page {
+  max-width: 1100px;
+  margin: 2rem auto;
+}
+
+.mentor-state {
+  padding: 2rem 0;
+  text-align: center;
+  color: $text-muted;
+}
+
+.mentor-state--denied {
+  color: $warn;
+}
+
+.mentor-layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 280px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 700px) {
+  .mentor-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mentor-projects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mentor-project {
+  width: 100%;
+  text-align: left;
+  display: block;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid $surface;
+  border-radius: 8px;
+  background: $bg-2;
+  color: $text;
+  cursor: pointer;
+  font: inherit;
+
+  &:hover {
+    border-color: $accent;
+  }
+
+  &[aria-current="true"] {
+    border-color: $accent;
+    background: $bg-3;
+  }
+}
+
+.mentor-project__name {
+  font-weight: 600;
+  display: block;
+}
+
+.mentor-project__meta {
+  color: $text-muted;
+  font-size: 0.85rem;
+}
+
+.mentor-panel {
+  border: 1px solid $surface;
+  border-radius: 8px;
+  background: $bg-2;
+  padding: 1rem;
+}
+
+.mentor-panel__title {
+  margin: 0 0 0.25rem;
+}
+
+.mentor-panel__meta {
+  color: $text-muted;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.mentor-members {
+  color: $text-muted;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.mentor-chat {
+  height: 340px;
+  overflow-y: auto;
+  border: 1px solid $surface;
+  border-radius: 6px;
+  padding: 0.75rem;
+  background: $bg-1;
+}
+
+.mentor-msg {
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+
+.mentor-msg__sender {
+  font-weight: 600;
+  color: $accent;
+}
+
+.mentor-msg__date {
+  color: $text-muted;
+  font-size: 0.75rem;
+  margin-left: 0.4rem;
+}
+
+.mentor-compose {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.mentor-compose__input {
+  flex: 1;
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid $surface;
+  background: $bg-3;
+  color: $text;
+}
+
+.mentor-compose__send {
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 6px;
+  background: $accent-700;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: $accent-700-hover;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.mentor-status {
+  color: $text-muted;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}

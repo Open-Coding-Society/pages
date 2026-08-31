@@ -5,6 +5,7 @@
         <td id="profileLink"></td>
         <td id="studentToolkitLink"></td>
         <td id="teacherToolkitLink"></td>
+        <td id="mentorLink"></td>
         <td id="signupLink"></td>
         <td id="loginLink"></td>
         <td id="logoutLink"></td>
@@ -24,6 +25,7 @@
                 const profileLink = document.getElementById('profileLink');
                 const studentToolkitLink = document.getElementById('studentToolkitLink');
                 const teacherToolkitLink = document.getElementById('teacherToolkitLink');
+                const mentorLink = document.getElementById('mentorLink');
 
                 if (data) { // User is authenticated
                     // Hide signup and login links
@@ -34,10 +36,21 @@
                     calendarLink.innerHTML = `<a href="{{site.baseurl}}/student/calendar">Calendar</a>`;
                     profileLink.innerHTML = `<a href="{{site.baseurl}}/profile">Profile</a>`;
                     studentToolkitLink.innerHTML = `<a href="{{site.baseurl}}/student">Student Toolkit</a>`;
+                    // Spring is the source of truth for roles: Flask's /api/id returns a
+                    // single role string and cannot express "student who is also a mentor".
+                    const roles = Array.isArray(data.roles) ? data.roles.map(r => r.name) : [];
+
                     // Check for teacher role to display "Teacher Toolkit"
-                    const isTeacher = data.roles.some(role => role.name === 'ROLE_TEACHER');
+                    const isTeacher = roles.includes('ROLE_TEACHER');
                     if (isTeacher) {
                         teacherToolkitLink.innerHTML = `<a href="{{site.baseurl}}/teacher">Teacher Toolkit</a>`;
+                    }
+
+                    // Mentors get a link to just the capstone projects they are attached to.
+                    if (roles.includes('ROLE_MENTOR')) {
+                        mentorLink.innerHTML = `<a href="{{site.baseurl}}/mentor">My Projects</a>`;
+                    } else {
+                        mentorLink.style.display = 'none';
                     }
 
                     // Display logout link
@@ -52,6 +65,7 @@
                     profileLink.style.display = 'none';
                     studentToolkitLink.style.display = 'none';
                     teacherToolkitLink.style.display = 'none';
+                    mentorLink.style.display = 'none';
                     logoutLink.style.display = 'none';
                 }
             })

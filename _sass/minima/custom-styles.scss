@@ -13,6 +13,9 @@
 // All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
 @import "capstone/infograph";
 
+// Mentor capstone project view (/mentor)
+@import "mentor";
+
 // RPN Calculator Lesson Interactives
 @import "nighthawk/rpn-interactive";
 
