@@ -1,0 +1,332 @@
+{% assign data = site.data.toolchain-trail-capstone %}
+
+<style>
+.toolchain-trail-infograph {
+  --trail-ink: #f7f4ea;
+  --trail-muted: rgba(247, 244, 234, 0.72);
+  --trail-line: rgba(247, 244, 234, 0.16);
+  --trail-panel: rgba(255, 255, 255, 0.06);
+  --trail-accent: #f2b84b;
+  --trail-accent-2: #6fc7b2;
+}
+.toolchain-trail-logo {
+  display: block;
+  width: auto;
+  max-width: min(180px, 50vw);
+  height: 96px;
+  object-fit: contain;
+  margin: 0 auto 1rem;
+}
+.toolchain-trail-overview,
+.toolchain-trail-section,
+.toolchain-trail-route {
+  max-width: 1100px;
+  margin: 1rem auto 0;
+  padding: 1.25rem;
+  background: var(--trail-panel);
+  border: 1px solid var(--trail-line);
+  border-radius: 16px;
+  text-align: left;
+}
+.toolchain-trail-overview {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.25rem;
+  align-items: center;
+}
+.toolchain-trail-overview p {
+  margin: 0;
+  color: var(--trail-muted);
+  line-height: 1.55;
+}
+.toolchain-trail-kicker {
+  color: var(--trail-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.toolchain-trail-stat {
+  min-width: 100px;
+  padding: 0.8rem;
+  border-left: 2px solid var(--trail-accent);
+  color: var(--trail-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.toolchain-trail-stat strong {
+  display: block;
+  color: var(--trail-accent);
+  font-size: 1.7rem;
+  line-height: 1;
+}
+.toolchain-trail-section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+.toolchain-trail-section-grid > .toolchain-trail-section {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+.toolchain-trail-section-grid > article {
+  height: 100%;
+}
+.toolchain-trail-section h2,
+.toolchain-trail-section h3 {
+  margin: 0 0 0.75rem;
+}
+.toolchain-trail-section h2 {
+  color: var(--trail-ink);
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+.toolchain-trail-section p {
+  color: var(--trail-muted);
+  line-height: 1.65;
+}
+.toolchain-trail-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--trail-muted);
+  line-height: 1.65;
+}
+.toolchain-trail-details {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--trail-line);
+  padding-top: 0.75rem;
+}
+.toolchain-trail-details summary {
+  cursor: pointer;
+  color: var(--trail-accent-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.toolchain-trail-details p,
+.toolchain-trail-details .toolchain-trail-list {
+  margin-bottom: 0;
+}
+.toolchain-trail-station,
+.toolchain-trail-state {
+  position: relative;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--trail-line);
+  border-radius: 12px;
+}
+.toolchain-trail-station::before {
+  content: "";
+  display: block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-bottom: 0.8rem;
+  background: var(--trail-accent);
+  border: 3px solid rgba(242, 184, 75, 0.2);
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+.toolchain-trail-station:last-child::before {
+  background: var(--trail-accent-2);
+  border-color: rgba(111, 199, 178, 0.2);
+}
+.toolchain-trail-station h3,
+.toolchain-trail-state h3 {
+  font-size: 1rem;
+}
+.toolchain-trail-station p,
+.toolchain-trail-state p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.toolchain-trail-route {
+  overflow: hidden;
+}
+.toolchain-trail-route-line {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(90px, 1fr));
+  gap: 0.5rem;
+  position: relative;
+}
+.toolchain-trail-route-line::before {
+  content: "";
+  position: absolute;
+  top: 1.05rem;
+  left: 4%;
+  right: 4%;
+  border-top: 2px dashed var(--trail-line);
+}
+.toolchain-trail-route-stop {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+.toolchain-trail-route-stop span {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin: 0 auto 0.55rem;
+  background: #171b22;
+  border: 2px solid var(--trail-accent);
+  border-radius: 50%;
+  color: var(--trail-accent);
+  font-weight: 800;
+}
+.toolchain-trail-route-stop:last-child span {
+  border-color: var(--trail-accent-2);
+  color: var(--trail-accent-2);
+}
+.toolchain-trail-route-stop strong {
+  display: block;
+  color: var(--trail-ink);
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+.toolchain-trail-route-stop small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--trail-muted);
+  font-size: 0.7rem;
+}
+.toolchain-trail-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.toolchain-trail-tag-list li {
+  padding: 0.45rem 0.7rem;
+  background: rgba(111, 199, 178, 0.12);
+  border: 1px solid rgba(111, 199, 178, 0.25);
+  border-radius: 999px;
+  color: var(--trail-ink);
+  font-size: 0.82rem;
+}
+.toolchain-trail-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.toolchain-trail-flow li {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+@media (max-width: 700px) {
+  .toolchain-trail-overview { grid-template-columns: 1fr; }
+  .toolchain-trail-stat { border-left: 0; border-top: 2px solid var(--trail-accent); }
+  .toolchain-trail-route-line { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .toolchain-trail-route-line::before { display: none; }
+}
+</style>
+
+<div class="toolchain-trail-infograph">
+  <div class="toolchain-trail-header">
+    <img src="{{ '/images/' | append: data.Logo | relative_url }}" alt="{{ data.Title }} logo" class="toolchain-trail-logo">
+    <span class="toolchain-trail-badge">{{ data.Badge }}</span>
+    <h1 class="toolchain-trail-title">{{ data.Title }}</h1>
+  </div>
+
+  <div class="toolchain-trail-overview">
+    <div>
+      <span class="toolchain-trail-kicker">Level 2 / Environment Quest</span>
+      <p>{{ data.Overview }}</p>
+    </div>
+    <div class="toolchain-trail-stat"><strong>{{ data.Stations.size | minus: 1 }}</strong>core stations</div>
+  </div>
+
+  <div class="toolchain-trail-section">
+    <h2>Project Stages</h2>
+    <div class="toolchain-trail-section-grid">
+      {% for stage in data.Stages %}
+      <article class="toolchain-trail-state">
+        <span class="toolchain-trail-kicker">Stage 0{{ forloop.index }}</span>
+        <h3>{{ stage.title | remove: "Stage 1: " | remove: "Stage 2: " }}</h3>
+        <details class="toolchain-trail-details">
+          <summary>View stage details</summary>
+          <p>{{ stage.description }}</p>
+          <ul class="toolchain-trail-list">
+            {% for point in stage.points %}<li>{{ point }}</li>{% endfor %}
+          </ul>
+        </details>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="toolchain-trail-route">
+    <h2>Toolchain Trail Stations</h2>
+    <div class="toolchain-trail-route-line">
+      {% assign station_count = data.Stations.size | minus: 1 %}
+      {% for station in data.Stations %}
+      <div class="toolchain-trail-route-stop">
+        <span>{% if station.gated %}★{% else %}{{ forloop.index }}{% endif %}</span>
+        <strong>{{ station.name }}</strong>
+        <small>{% if station.gated %}Final gate{% else %}Station {{ forloop.index }}{% endif %}</small>
+      </div>
+      {% endfor %}
+    </div>
+    <details class="toolchain-trail-details">
+      <summary>View station purposes</summary>
+      <div class="toolchain-trail-section-grid">
+        {% for station in data.Stations %}
+        <article class="toolchain-trail-station">
+          <h3>{{ station.name }}{% if station.gated %} <span>(Gated)</span>{% endif %}</h3>
+          <p>{{ station.purpose }}</p>
+        </article>
+        {% endfor %}
+      </div>
+    </details>
+  </div>
+
+  <section class="toolchain-trail-section">
+    <h2>Map Structure</h2>
+    <details class="toolchain-trail-details">
+      <summary>Explore the map plan</summary>
+      <ul class="toolchain-trail-list">
+      {% for item in data.MapStructure %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+    </details>
+  </section>
+
+  <div class="toolchain-trail-section">
+    <h2>Building States</h2>
+    <div class="toolchain-trail-section-grid">
+      {% for state in data.BuildingStates %}
+      <article class="toolchain-trail-state">
+        <h3>{{ state.name }}</h3>
+        <p>{{ state.description }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="toolchain-trail-section">
+    <h2>NPC Feedback</h2>
+    <p>{{ data.NPCFeedback }}</p>
+  </div>
+
+  <div class="toolchain-trail-section-grid">
+    <section class="toolchain-trail-section">
+      <h2>Required Assets</h2>
+      <ul class="toolchain-trail-tag-list">
+        {% for asset in data.RequiredAssets %}<li>{{ asset }}</li>{% endfor %}
+      </ul>
+    </section>
+    <section class="toolchain-trail-section">
+      <h2>Overall Goal</h2>
+      <p>{{ data.OverallGoal }}</p>
+      <h3>System Flow</h3>
+      <ul class="toolchain-trail-flow">
+        {% for step in data.SystemFlow %}<li>{{ step }}</li>{% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
