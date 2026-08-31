@@ -61,7 +61,7 @@ web_dev_layers: &web_dev_layers |
 course:
   code: CSA
   title: "CSA - Computer Science A"
-  subtitle: "Code, Architecture"
+  subtitle: "Systems, Architecture"
   mission: "AP Computer Science A (CSA 1, CSA 2, DS 2) is an in-depth course focusing on programming, algorithms, and data structures. Students prepare for AP exam by architecting and building systems, focusing on code quality, becoming an algorithmic problem solver, establishing fluency in JavaScript, Java and OOP."
   progression_key: 15
   learning_journey:

@@ -1,0 +1,81 @@
+Title: "OCS Communications"
+Description: "A communications platform for Open Coding Society: class-wide announcements, per-week discussion threads, and private direct messages, all running on one real-time backend. What started as three separate Sprint 1 tasks — host the Spring app, add chat to the CSA course page, build messaging — is really one product: give every OCS course a live communications layer instead of a static page."
+
+Topics:
+  - title: "EC2 / AWS Infra + Groups Page"
+    subtitle: "The backend OCS Communications runs on"
+    emoji: "🖥️"
+    gradient: "linear-gradient(135deg, #1e3a8a, #3b82f6)"
+    link: "https://github.com/UGRC-CSA/Pages/issues/2"
+    status: "In Progress"
+    team:
+      - "Sathwik"
+      - "Akhil (org Scrum Master)"
+      - "Skandan"
+    keyPoints:
+      - "AWS EC2 provisioning with a hardened security group and least-privilege IAM role"
+      - "CI/CD deploy pipeline: GitHub Actions to EC2 on every push to main"
+      - "Containerized, resource-limited sandbox for student code execution"
+      - "Groups management page kept working as chat-backed groups get created automatically"
+    tech:
+      - "Spring Boot"
+      - "AWS EC2"
+      - "Docker"
+      - "GitHub Actions"
+      - "nginx"
+      - "SQLite"
+    description: "Every piece of OCS Communications — announcements, week threads, DMs — is one Spring application away from actually being reachable. Right now it only runs locally; this team gets it onto a real, hosted deployment. Scope also covers the pre-existing Groups admin page, since the chat feature now auto-creates rows in the same table it manages."
+    impact:
+      - "Moves the whole platform from 'works on my machine' to a real hosted deployment"
+      - "Groups admin page stays a reliable surface as automated group creation scales up"
+
+  - title: "Class & Week Chat"
+    subtitle: "OCS Communications, shipped: live on the CSA course page"
+    emoji: "💬"
+    gradient: "linear-gradient(135deg, #065f46, #10b981)"
+    link: "https://github.com/UGRC-CSA/Pages/issues/3"
+    status: "Shipped"
+    team:
+      - "Samarth (Scrum Master)"
+      - "Akshaj"
+      - "Tarun"
+    keyPoints:
+      - "Class-wide announcement channel at the top of every course page"
+      - "Isolated per-week discussion thread inside each sprint week card"
+      - "Channels auto-created on first use — no manual database seeding required"
+      - "Verified end-to-end against a real local Spring instance, not mocked"
+    tech:
+      - "Jekyll"
+      - "STOMP over WebSocket"
+      - "SockJS"
+      - "Spring Boot"
+      - "JWT auth"
+    description: "The first real piece of OCS Communications, merged and live (PR #24): real-time channels built on the STOMP/SockJS backend — one announcement channel per course, one isolated thread per week — so students talk without leaving the lesson page. Actively being refined by Akhil since merge."
+    impact:
+      - "Answers a request that surfaced independently across multiple students' individual Sprint 1 live reviews: keep interaction in the lesson flow instead of a separate tab"
+      - "The channel/message protocol the DMs team is extending rather than reinventing"
+
+  - title: "Direct Messages"
+    subtitle: "OCS Communications, next: private 1:1 conversations"
+    emoji: "✉️"
+    gradient: "linear-gradient(135deg, #7c2d12, #f97316)"
+    link: "https://github.com/UGRC-CSA/Pages/issues/4"
+    status: "Design Complete"
+    team:
+      - "Perry (Scrum Master)"
+      - "Syowns"
+      - "Leon"
+    keyPoints:
+      - "New backend domain (mvc/directmessages), not a repurposed group channel"
+      - "Access control enforced at the database query layer — non-negotiable for a private feature"
+      - "Reuses the existing /ws-chat STOMP broker under a new /topic/dm/{id} namespace"
+      - "Sender identity resolved from the authenticated session, not a client-supplied string"
+    tech:
+      - "Spring Boot"
+      - "JPA / Hibernate"
+      - "STOMP over WebSocket"
+      - "JWT auth"
+    description: "The private half of OCS Communications, sitting next to the open-by-design class channels. Full technical design (issue #27) covers the entity model, REST surface, and the one hard requirement: only the two participants in a conversation can ever read it."
+    impact:
+      - "Completes the platform: broadcast (announcements), group (week threads), and private (DMs)"
+      - "Establishes the query-time access-control pattern future private features can follow"

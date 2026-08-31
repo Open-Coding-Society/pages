@@ -47,10 +47,73 @@ Example:
 - `ocs__btn medium alert-red fill`
 
 ## Compatibility Notes
-Legacy aliases still compile:
-- `ocs__btn--alert-red`
-- `ocs__btn--alert-yellow`
-- `ocs__btn--alert-green`
-- `ocs__btn--alert-fill`
-
+Legacy `ocs__btn--*` modifier aliases still compile.
 New code should prefer utility grammar above.
+
+## Runner Control Grammar
+
+Use these classes for standardized controls in CODE_RUNNER, UI_RUNNER, and GAME_RUNNER.
+
+### Runner Structure
+- `ocs__btn utility` base for square runner controls
+
+### Semantic Actions
+- `run`
+- `pause`
+- `stop`
+- `fullscreen`
+- `copy`
+- `save`
+- `clear`
+- `reset`
+- `copyOutput`
+
+Examples:
+- `ocs__btn utility run`
+- `ocs__btn utility pause`
+- `ocs__btn utility stop`
+- `ocs__btn utility fullscreen`
+- `ocs__btn utility copy`
+
+### Behavior Hook Convention
+- Prefer `data-hook` attributes for JavaScript targeting (for example `data-hook="run"`, `data-hook="copy"`, `data-hook="stop"`).
+- Keep visual semantics in classes (`utility`, `run`, `copy`, etc.).
+
+## Drag and Drop Variant
+
+Use the drag and drop variant for activities that match a source choice to a destination. The same interaction must work by dragging or by selecting the source and destination buttons.
+
+### Structure
+
+- `ocs__dnd`: activity wrapper and shared color scope
+- `ocs__dnd-header`: title and reset-control row
+- `ocs__dnd-status`: live feedback; use `role="status"` and `aria-live="polite"`
+- `ocs__dnd-progress`: optional progress or score text
+- `ocs__dnd-layout`: responsive panel layout
+- `ocs__dnd-panel`: source or destination group
+- `ocs__dnd-panel-title`: panel heading
+
+### Controls
+
+- `ocs__drag-btn`: source button; add `draggable="true"` and `aria-pressed="false"`
+- `ocs__drop-btn`: destination button
+- `ocs__dnd-reset`: resets the activity
+- `ocs__dnd-input`: optional labeled text input
+
+### States
+
+- `is-selected`: the source is selected and waiting for a destination
+- `is-over`: a dragged source is over a destination
+- `is-filled`: the destination accepted its matching source
+- `disabled` attribute: the source or destination has already been completed
+
+JavaScript must keep `aria-pressed` synchronized with `is-selected`, announce results through `ocs__dnd-status`, and provide the click-based path for keyboard and touch users.
+
+```html
+<button class="ocs__drag-btn" type="button" draggable="true" aria-pressed="false">
+    CPU
+</button>
+<button class="ocs__drop-btn" type="button">
+    CPU socket
+</button>
+```

@@ -1,0 +1,239 @@
+/**
+ * Drag and Drop Buttons
+ * Reusable classes for drag-source / drop-target button pairs used by
+ * assembly, matching, and sorting activities (see the PC Assembly Bench).
+ *
+ * Colors come straight from root-color-map.scss - single source of truth.
+ * To recolor these buttons, change the palette in _sass/user-colors.scss or
+ * swap which $variable a rule below uses.
+ *
+ * Sizing comes from the $dnd-sizes map below, mirroring the $sizes token
+ * pattern in _tokens.scss.
+ *
+ * Markup contract:
+ *   .ocs__dnd                     board wrapper
+ *     .ocs__dnd-header            title / controls row
+ *     .ocs__dnd-status            aria-live status line
+ *     .ocs__dnd-progress          secondary progress line
+ *     .ocs__dnd-layout            responsive two panel grid
+ *       .ocs__dnd-panel           a tray or a target area
+ *         .ocs__dnd-panel-title   panel heading
+ *         .ocs__drag-btn          draggable source button  (draggable="true")
+ *         .ocs__drop-btn          drop target button
+ *
+ * State classes (toggle from JS, no inline styles needed):
+ *   .is-selected  source picked, waiting for a destination
+ *   .is-over      pointer is dragging over this drop target
+ *   .is-filled    drop target accepted its correct item
+ *   [disabled]    consumed source or completed target
+ *
+ * Size classes:
+ *   .ocs__dnd--small | --medium | --large      resize a whole board
+ *   .ocs__drag-btn--small etc.                 resize one control
+ */
+
+@import "../../../root-color-map";
+
+// ===========================
+// Size Tokens
+// ===========================
+// control padding, control font size, control radius,
+// panel padding, board padding, grid gap, min column width
+
+$dnd-sizes: (
+    small: (8px, 14px, 6px, 10px, 12px, 12px, 180px),
+    medium: (11px, 16px, 8px, 14px, 18px, 18px, 240px),
+    large: (15px, 18px, 10px, 20px, 24px, 24px, 320px)
+);
+
+@mixin dnd-size($controlPadding, $controlFont, $controlRadius, $panelPadding, $boardPadding, $gap, $minColumn) {
+    --dnd-control-padding: #{$controlPadding};
+    --dnd-control-font: #{$controlFont};
+    --dnd-radius: #{$controlRadius};
+    --dnd-panel-padding: #{$panelPadding};
+    --dnd-board-padding: #{$boardPadding};
+    --dnd-gap: #{$gap};
+    --dnd-min-column: #{$minColumn};
+}
+
+// Only the control-level tokens, for sizing a single button.
+@mixin dnd-control-size($controlPadding, $controlFont, $controlRadius, $panelPadding, $boardPadding, $gap, $minColumn) {
+    --dnd-control-padding: #{$controlPadding};
+    --dnd-control-font: #{$controlFont};
+    --dnd-radius: #{$controlRadius};
+}
+
+// ===========================
+// Default Size
+// ===========================
+// Boards and buttons are medium unless a size class below says otherwise.
+// Colors are not published this way - rules name the palette variables from
+// root-color-map.scss directly.
+
+:root {
+    @include dnd-size(map-get($dnd-sizes, medium)...);
+}
+
+// ===========================
+// Size Modifiers
+// ===========================
+
+@each $name, $values in $dnd-sizes {
+    .ocs__dnd--#{$name} {
+        @include dnd-size($values...);
+    }
+
+    .ocs__drag-btn--#{$name},
+    .ocs__drop-btn--#{$name} {
+        @include dnd-control-size($values...);
+    }
+}
+
+// ===========================
+// Board
+// ===========================
+
+.ocs__dnd {
+    color: $text;
+    background: $background;
+    border: 1px solid $gray4;
+    border-radius: calc(var(--dnd-radius) + 4px);
+    padding: var(--dnd-board-padding);
+    font-family: system-ui, sans-serif;
+}
+
+.ocs__dnd-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.ocs__dnd-status {
+    font-weight: 700;
+    min-height: 24px;
+}
+
+.ocs__dnd-progress {
+    color: $lightBlue1;
+}
+
+.ocs__dnd-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--dnd-min-column), 1fr));
+    gap: var(--dnd-gap);
+    margin-top: 14px;
+}
+
+.ocs__dnd-panel {
+    background: $bg-1;
+    border: 1px solid $gray4;
+    border-radius: calc(var(--dnd-radius) + 2px);
+    padding: var(--dnd-panel-padding);
+}
+
+.ocs__dnd-panel-title {
+    margin-top: 0;
+}
+
+// ===========================
+// Supporting controls
+// ===========================
+
+.ocs__dnd-input {
+    display: block;
+    width: min(100%, 320px);
+    box-sizing: border-box;
+    margin-top: 6px;
+    padding: var(--dnd-control-padding);
+    border: 1px solid $gray4;
+    border-radius: var(--dnd-radius);
+    background: $bg-1;
+    color: $white2;
+    font-size: var(--dnd-control-font);
+}
+
+.ocs__dnd-reset {
+    padding: var(--dnd-control-padding) calc(var(--dnd-control-padding) * 1.4);
+    border: 1px solid $accent;
+    border-radius: var(--dnd-radius);
+    background: $blue1;
+    color: $white1;
+    font-size: var(--dnd-control-font);
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: mix($black1, $blue1, 15%);
+    }
+}
+
+// ===========================
+// Drag sources and drop targets
+// ===========================
+
+.ocs__drag-btn,
+.ocs__drop-btn {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 8px 0;
+    padding: var(--dnd-control-padding);
+    border: 1px solid $blue;
+    border-radius: var(--dnd-radius);
+    background: $gray5;
+    color: $white2;
+    font-size: var(--dnd-control-font);
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.2s, border-color 0.2s, outline-color 0.2s, opacity 0.2s;
+
+    &:hover:not([disabled]) {
+        background: mix($white1, $gray5, 15%);
+    }
+
+    &:focus-visible {
+        outline: 3px solid $accent;
+        outline-offset: 2px;
+    }
+
+    &[disabled] {
+        cursor: default;
+    }
+}
+
+.ocs__drag-btn {
+    cursor: grab;
+
+    &:active:not([disabled]) {
+        cursor: grabbing;
+    }
+
+    // picked up, waiting on a destination
+    &.is-selected {
+        outline: 3px solid $warn;
+    }
+
+    // already installed / consumed
+    &[disabled] {
+        opacity: 0.35;
+        cursor: default;
+    }
+}
+
+.ocs__drop-btn {
+    // a drag is hovering this target
+    &.is-over {
+        border-color: $warn;
+        background: mix($white1, $gray5, 22%);
+    }
+
+    // correct item landed here
+    &.is-filled,
+    &.is-filled[disabled] {
+        border-color: $green;
+        background: $green-bg;
+        opacity: 1;
+    }
+}

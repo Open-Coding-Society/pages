@@ -77,8 +77,8 @@ Download and install [VS Code](https://code.visualstudio.com/download) for Mac.
 ```bash
 mkdir opencs
 cd opencs
-git clone https://github.com/Open-Coding-Society/student.git
-cd student/
+git clone https://github.com/Open-Coding-Society/portfolio.git
+cd portfolio/
 ./scripts/activate_macos.sh
 ./scripts/activate.sh # prompts for Git UID and Personal Email
 ./scripts/venv.sh
@@ -106,7 +106,7 @@ Open a new MacOS "terminal"
 Each time you open a new Terminal to work, run:
 
 ```bash
-cd opencs/student
+cd opencs/portfolio
 source venv/bin/activate # activate Python virtual environment
 code .
 ```

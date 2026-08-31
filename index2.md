@@ -3,7 +3,6 @@ layout: post
 title: Portfolio Home 2
 hide: true
 show_reading_time: false
-permaklink: /home2
 ---
 
 Hi! My name is [Your Full Name]
@@ -96,3 +95,135 @@ Hi! My name is [Your Full Name]
 </div>
 
 <br>
+
+### Drag and Drop Buttons
+
+> Use `ocs__drag-btn` for draggable choices and `ocs__drop-btn` for their destinations. Drag a part onto a slot, or select both buttons with a mouse or keyboard. The complete class contract is documented in `_sass/open-coding/elements/buttons/button-grammar.md`.
+
+<section class="ocs__dnd" id="dnd-demo">
+    <div class="ocs__dnd-header">
+        <h4 class="ocs__dnd-panel-title">Mini Assembly Bench</h4>
+        <button type="button" class="ocs__dnd-reset" data-dnd-reset>Reset</button>
+    </div>
+    <p class="ocs__dnd-status" role="status" aria-live="polite">Drag a part to its slot.</p>
+    <div class="ocs__dnd-layout">
+        <div class="ocs__dnd-panel">
+            <h4 class="ocs__dnd-panel-title">Parts tray</h4>
+            <button type="button" class="ocs__drag-btn" draggable="true" data-part="CPU" aria-pressed="false">CPU</button>
+            <button type="button" class="ocs__drag-btn" draggable="true" data-part="RAM" aria-pressed="false">RAM</button>
+            <button type="button" class="ocs__drag-btn" draggable="true" data-part="GPU" aria-pressed="false">Graphics card</button>
+        </div>
+        <div class="ocs__dnd-panel">
+            <h4 class="ocs__dnd-panel-title">Connection points</h4>
+            <button type="button" class="ocs__drop-btn" data-slot="CPU" data-label="CPU socket">CPU socket</button>
+            <button type="button" class="ocs__drop-btn" data-slot="RAM" data-label="RAM slots">RAM slots</button>
+            <button type="button" class="ocs__drop-btn" data-slot="GPU" data-label="PCIe slot">PCIe slot</button>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+  const board = document.getElementById('dnd-demo');
+  const status = board.querySelector('.ocs__dnd-status');
+  const parts = Array.from(board.querySelectorAll('.ocs__drag-btn'));
+  const slots = Array.from(board.querySelectorAll('.ocs__drop-btn'));
+  let selected = null;
+
+  function select(part) {
+    selected = part;
+    parts.forEach(function(other) {
+      const isSelected = other === part;
+      other.classList.toggle('is-selected', isSelected);
+      other.setAttribute('aria-pressed', String(isSelected));
+    });
+    status.textContent = part.textContent + ' selected. Choose its slot.';
+  }
+
+  function place(part, slot) {
+    if (part === null || part === undefined || part.disabled || slot.disabled) {
+      status.textContent = 'Choose an available part first.';
+      return;
+    }
+    if (part.dataset.part !== slot.dataset.slot) {
+      status.textContent = 'Incorrect. ' + part.textContent + ' does not belong in ' + slot.textContent + '.';
+      return;
+    }
+    part.disabled = true;
+    part.draggable = false;
+    part.classList.remove('is-selected');
+    part.setAttribute('aria-pressed', 'false');
+    slot.disabled = true;
+    slot.classList.add('is-filled');
+    slot.textContent = '✓ ' + part.textContent + ' → ' + slot.dataset.label;
+    selected = null;
+    status.textContent = 'Installed ' + part.textContent + '.';
+  }
+
+  parts.forEach(function(part) {
+    part.addEventListener('click', function() { select(part); });
+    part.addEventListener('dragstart', function(event) {
+      select(part);
+      event.dataTransfer.setData('text/plain', part.dataset.part);
+      event.dataTransfer.effectAllowed = 'move';
+    });
+  });
+
+  slots.forEach(function(slot) {
+    slot.addEventListener('click', function() { place(selected, slot); });
+    slot.addEventListener('dragover', function(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      slot.classList.add('is-over');
+    });
+    slot.addEventListener('dragleave', function() { slot.classList.remove('is-over'); });
+    slot.addEventListener('drop', function(event) {
+      event.preventDefault();
+      slot.classList.remove('is-over');
+      const partId = event.dataTransfer.getData('text/plain');
+      const draggedPart = parts.find(function(part) {
+        return part.dataset.part === partId;
+      });
+      place(draggedPart, slot);
+    });
+  });
+
+  board.querySelector('[data-dnd-reset]').addEventListener('click', function() {
+    selected = null;
+    parts.forEach(function(part) {
+      part.disabled = false;
+      part.draggable = true;
+      part.classList.remove('is-selected');
+      part.setAttribute('aria-pressed', 'false');
+    });
+    slots.forEach(function(slot) {
+      slot.disabled = false;
+      slot.textContent = slot.dataset.label;
+      slot.classList.remove('is-filled', 'is-over');
+    });
+    status.textContent = 'Drag a part to its slot.';
+  });
+})();
+</script>
+
+#### Size Classes
+
+> The same classes at three scales. Put `ocs__dnd--small`, `--medium`, or `--large` on the board to resize everything inside it, or the same suffix on a single `ocs__drag-btn` / `ocs__drop-btn`.
+
+<div class="ocs__dnd-layout">
+    <div class="ocs__dnd ocs__dnd--small">
+        <p class="ocs__dnd-progress">ocs__dnd--small</p>
+        <button type="button" class="ocs__drag-btn" draggable="true">CPU</button>
+        <button type="button" class="ocs__drop-btn is-filled" disabled>✓ CPU socket</button>
+    </div>
+    <div class="ocs__dnd ocs__dnd--medium">
+        <p class="ocs__dnd-progress">ocs__dnd--medium</p>
+        <button type="button" class="ocs__drag-btn is-selected" draggable="true">CPU</button>
+        <button type="button" class="ocs__drop-btn is-over">CPU socket</button>
+    </div>
+    <div class="ocs__dnd ocs__dnd--large">
+        <p class="ocs__dnd-progress">ocs__dnd--large</p>
+        <button type="button" class="ocs__drag-btn" draggable="true">CPU</button>
+        <button type="button" class="ocs__drop-btn">CPU socket</button>
+    </div>
+</div>
