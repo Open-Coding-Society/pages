@@ -98,13 +98,23 @@ git clone https://github.com/<your-username>/pages.git
 cd pages
 ```
 
-To keep your repository updated with changes from the source project, add `upstream` and merge updates:
+Add Open Coding Society as an `upstream` remote once, then periodically merge updates. This help you keep up with dynamic character of a portfolio project.
 
 ```bash
+#  In your repository, do this once
 git remote add upstream https://github.com/open-coding-society/pages.git
+git remote -v # verify sucess
+
+# first sync for template-created repos (run once if you see unrelated histories)
 git fetch upstream
-git checkout main
+# if fetch fails, remove and try again with correct location: get remote remove upstream
+
+# this part is the downstream update, work through best option
 git merge upstream/main
+git merge upstream/main --allow-unrelated-histories
+git merge upstream/main --allow-unrelated-histories -X theirs # destructive resolve
+
+# resolve conflicts, for instance VSCode will have them in Version Control secton with Continue button 
 ```
 
 #### Windows WSL and/or Ubuntu or Kali Users
@@ -115,21 +125,16 @@ git merge upstream/main
 
 - Execute the script: `./scripts/activate_macos.sh`
 
-#### Kasm Cloud Desktop Users
+#### Setup connection to GitHub
 
-- Execute the script: `./scripts/activate_github.sh`
+- Execute the script: `./scripts/activate.sh`
 
-## Run Server on localhost
+#### Prep project to serve on localhost
 
-To preview the project you will need to "make" the project.
-
-### Bundle install
-
-The very first time you clone run project you will need to run this Ruby command as the final part of your setup.
-
-```bash
-bundle install
-```
+- Execute the script: `./scripts/venv.sh`
+- Source the virtual environment: `source venv/bin/activate`
+- Build localhost server:  `make`
+- Look for and click on server line output, perhaps `Server address: http://localhost:4500/portfolio/`.  The Port and baseurl may change.```
 
 ### Jupyter Kernels
 
