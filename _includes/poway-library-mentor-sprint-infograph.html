@@ -486,7 +486,7 @@
     <div class="ment-ig-badge">Design-Based Research Capstone · CSA</div>
     <h1>OCS Mentor Role</h1>
     <p class="ment-ig-sprint-label">Roles &amp; Permissions Sprint</p>
-    <p class="ment-ig-hero-sub">Adding ROLE_MENTOR to the OCS platform — a scoped permission tier for industry mentors helping CSA students with capstone projects, with Google-verified signup and a dedicated project dashboard.</p>
+    <p class="ment-ig-hero-sub">Adding ROLE_MENTOR to the OCS platform: a scoped permission tier for industry mentors helping CSA students with capstone projects, with Google-verified signup and a dedicated project dashboard.</p>
     <div class="ment-ig-hero-meta">
       <span class="ment-ig-status-live">Live &amp; Deployed</span>
       <span>Team: Shayan Bhatti &nbsp;·&nbsp; Arnav Pallapotu &nbsp;·&nbsp; Tanay Paranjpe</span>
@@ -542,28 +542,28 @@
           <div class="ment-ig-section-label">What we built this sprint</div>
           <ul class="ment-ig-keypoints">
             <li>
-              <span class="ment-ig-check">✓</span>
-              <span><strong>ROLE_MENTOR</strong> added to Spring Security — a dedicated tier between ROLE_TEACHER and ROLE_ADMIN, seeded in ModelInit and enforced across all API routes</span>
+              <span class="ment-ig-check"></span>
+              <span><strong>ROLE_MENTOR</strong> added to Spring Security: a dedicated tier between ROLE_TEACHER and ROLE_ADMIN, seeded in ModelInit and enforced across all API routes</span>
             </li>
             <li>
-              <span class="ment-ig-check">✓</span>
-              <span><strong>Google OAuth mentor signup</strong> — PUSD emails get immediate access; others await admin approval. Google Sign-In inline with the existing form</span>
+              <span class="ment-ig-check"></span>
+              <span><strong>Google OAuth mentor signup</strong>: PUSD emails get immediate access; others await admin approval. Google Sign-In inline with the existing form</span>
             </li>
             <li>
-              <span class="ment-ig-check">✓</span>
-              <span><strong>Mentor project dashboard</strong> (/mentor) — shows only assigned capstone groups (scoped server-side), with real-time team chat via SockJS/STOMP</span>
+              <span class="ment-ig-check"></span>
+              <span><strong>Mentor project dashboard</strong> (/mentor): shows only assigned capstone groups (scoped server-side), with real-time team chat via SockJS/STOMP</span>
             </li>
             <li>
-              <span class="ment-ig-check">✓</span>
-              <span><strong>"My Projects" nav link</strong> — appears automatically when the logged-in user holds ROLE_MENTOR, following the same pattern as ROLE_TEACHER</span>
+              <span class="ment-ig-check"></span>
+              <span><strong>"My Projects" nav link</strong>: appears automatically when the logged-in user holds ROLE_MENTOR, following the same pattern as ROLE_TEACHER</span>
             </li>
             <li>
-              <span class="ment-ig-check">✓</span>
-              <span><strong>OAuth + Student ID password reset</strong> — verified wizard on /support; JWT invalidated on change; reset ticket creation rate-limited</span>
+              <span class="ment-ig-check"></span>
+              <span><strong>OAuth + Student ID password reset</strong>: verified wizard on /support; JWT invalidated on change; reset ticket creation rate-limited</span>
             </li>
             <li>
-              <span class="ment-ig-check">✓</span>
-              <span><strong>GitHub ID validation</strong> — blocks 7-digit student IDs entered as GitHub usernames at signup, with live inline error feedback</span>
+              <span class="ment-ig-check"></span>
+              <span><strong>GitHub ID validation</strong>: blocks 7-digit student IDs entered as GitHub usernames at signup, with live inline error feedback</span>
             </li>
           </ul>
 
@@ -584,17 +584,17 @@
         <!-- Right -->
         <div class="ment-ig-right">
           <div class="ment-ig-section-label">About This Sprint</div>
-          <p class="ment-ig-about">Industry professionals and parent volunteers are now coming into the CSA classroom to mentor student capstone teams. The platform previously had no role for this — mentors either got full teacher access or nothing. This sprint adds ROLE_MENTOR end-to-end: backend security config, frontend nav gating, a Google-verified signup path so mentors don't need a PUSD account, and a scoped project view showing only the teams they're assigned to.</p>
+          <p class="ment-ig-about">Industry professionals and parent volunteers are now coming into the CSA classroom to mentor student capstone teams. The platform previously had no role for this: mentors either got full teacher access or nothing. This sprint adds ROLE_MENTOR end-to-end: backend security config, frontend nav gating, a Google-verified signup path so mentors don't need a PUSD account, and a scoped project view showing only the teams they're assigned to.</p>
 
           <div class="ment-ig-section-label">Impact</div>
           <ul class="ment-ig-impact-list">
             <li class="ment-ig-impact-item">
               <span class="ment-ig-impact-dot"></span>
-              <span>Mentors can join the platform without a school account — verified by Google OAuth instead</span>
+              <span>Mentors can join the platform without a school account: verified by Google OAuth instead</span>
             </li>
             <li class="ment-ig-impact-item">
               <span class="ment-ig-impact-dot"></span>
-              <span>Mentor access is scoped server-side — they see only their assigned projects, nothing else</span>
+              <span>Mentor access is scoped server-side: they see only their assigned projects, nothing else</span>
             </li>
             <li class="ment-ig-impact-item">
               <span class="ment-ig-impact-dot"></span>
@@ -674,57 +674,48 @@
       <div class="ment-ig-features-grid">
 
         <div class="ment-ig-feature-card highlight">
-          <span class="ment-ig-feature-icon">🔑</span>
           <h3 class="ment-ig-feature-title">ROLE_MENTOR (Spring Security)</h3>
-          <p class="ment-ig-feature-desc">New role seeded in ModelInit and wired through Spring Security's filter chain. Mentor-specific routes return 403 to any other role — the server, not the browser, decides what a mentor may see.</p>
+          <p class="ment-ig-feature-desc">New role seeded in ModelInit and wired through Spring Security's filter chain. Mentor-specific routes return 403 to any other role: the server, not the browser, decides what a mentor may see.</p>
         </div>
 
         <div class="ment-ig-feature-card highlight">
-          <span class="ment-ig-feature-icon">🗂️</span>
           <h3 class="ment-ig-feature-title">Mentor Project Dashboard</h3>
           <p class="ment-ig-feature-desc">/mentor lists only the capstone groups a mentor is assigned to (GET /api/groups scoped server-side). Clicking a project opens the group chat using the same SockJS/STOMP pattern as lesson chat.</p>
         </div>
 
         <div class="ment-ig-feature-card highlight">
-          <span class="ment-ig-feature-icon">🔒</span>
           <h3 class="ment-ig-feature-title">Google OAuth Mentor Signup</h3>
           <p class="ment-ig-feature-desc">Signup triggers Google account verification before submitting. PUSD student emails get immediate access; all others wait for admin approval. Google Sign-In added inline with the existing form.</p>
         </div>
 
         <div class="ment-ig-feature-card">
-          <span class="ment-ig-feature-icon">🔗</span>
           <h3 class="ment-ig-feature-title">"My Projects" Nav Link</h3>
           <p class="ment-ig-feature-desc">nav/homejava.html shows "My Projects" when the account holds ROLE_MENTOR. The roles check was also hardened to guard against a null roles array that would previously throw at login.</p>
         </div>
 
         <div class="ment-ig-feature-card">
-          <span class="ment-ig-feature-icon">🛠️</span>
           <h3 class="ment-ig-feature-title">OAuth + Student ID Password Reset</h3>
           <p class="ment-ig-feature-desc">/support hosts a step-by-step reset wizard: verify Google account, confirm student ID, set new password. JWT tokens invalidated immediately on change. Reset ticket creation is rate-limited.</p>
         </div>
 
         <div class="ment-ig-feature-card">
-          <span class="ment-ig-feature-icon">✅</span>
           <h3 class="ment-ig-feature-title">GitHub ID Validation</h3>
-          <p class="ment-ig-feature-desc">Inline validation rejects 7-digit numbers entered as GitHub usernames. Pattern check fires on every keystroke with an aria-live error span — no form submission needed to catch the mistake.</p>
+          <p class="ment-ig-feature-desc">Inline validation rejects 7-digit numbers entered as GitHub usernames. Pattern check fires on every keystroke with an aria-live error span: no form submission needed to catch the mistake.</p>
         </div>
 
         <div class="ment-ig-feature-card">
-          <span class="ment-ig-feature-icon">🔐</span>
           <h3 class="ment-ig-feature-title">Password Complexity Enforcement</h3>
-          <p class="ment-ig-feature-desc">Reset wizard now enforces complexity rules before accepting a new password. Matches the requirements already in place at signup — one consistent policy across all credential flows.</p>
+          <p class="ment-ig-feature-desc">Reset wizard now enforces complexity rules before accepting a new password. Matches the requirements already in place at signup: one consistent policy across all credential flows.</p>
         </div>
 
         <div class="ment-ig-feature-card">
-          <span class="ment-ig-feature-icon">📋</span>
           <h3 class="ment-ig-feature-title">Support &amp; Troubleshooting Pages</h3>
           <p class="ment-ig-feature-desc">/support replaces the old buried submenu with a dedicated top-level tab. A separate troubleshooting setup guide was added for common student environment issues, linked directly from nav.</p>
         </div>
 
         <div class="ment-ig-feature-card">
-          <span class="ment-ig-feature-icon">💬</span>
           <h3 class="ment-ig-feature-title">Real-Time Team Chat</h3>
-          <p class="ment-ig-feature-desc">Mentor project view reuses the SockJS/STOMP WebSocket pattern from lesson_chat.html. Mentors send and receive messages in their assigned group's existing channel — no new infrastructure needed.</p>
+          <p class="ment-ig-feature-desc">Mentor project view reuses the SockJS/STOMP WebSocket pattern from lesson_chat.html. Mentors send and receive messages in their assigned group's existing channel: no new infrastructure needed.</p>
         </div>
 
       </div>
@@ -737,44 +728,38 @@
 
         <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
-          <span class="ment-ig-feature-icon">⬆️</span>
           <h3 class="ment-ig-feature-title">Admin Role Promotion UI</h3>
           <p class="ment-ig-feature-desc">Admin-facing interface to approve pending mentor accounts and promote users from Student → Mentor or Mentor → Admin directly from the person management table, without needing API access.</p>
         </div>
 
         <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
-          <span class="ment-ig-feature-icon">📊</span>
           <h3 class="ment-ig-feature-title">Mentor Activity Dashboard</h3>
-          <p class="ment-ig-feature-desc">Summary view for mentors showing recent messages, session dates, and student milestone progress across all assigned projects — giving context before each visit without asking the teacher.</p>
+          <p class="ment-ig-feature-desc">Summary view for mentors showing recent messages, session dates, and student milestone progress across all assigned projects: giving context before each visit without asking the teacher.</p>
         </div>
 
         <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
-          <span class="ment-ig-feature-icon">📅</span>
           <h3 class="ment-ig-feature-title">Mentor Visit Scheduling</h3>
           <p class="ment-ig-feature-desc">Calendar integration letting mentors book their own classroom visit slots. Blocks appear on the shared class calendar and trigger an email reminder to the student team 24 hours before.</p>
         </div>
 
         <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
-          <span class="ment-ig-feature-icon">📧</span>
           <h3 class="ment-ig-feature-title">Mentor Approval Notifications</h3>
-          <p class="ment-ig-feature-desc">When an admin approves a pending mentor account, the platform automatically emails onboarding instructions and a /mentor link — removing the manual follow-up that currently falls on the teacher.</p>
+          <p class="ment-ig-feature-desc">When an admin approves a pending mentor account, the platform automatically emails onboarding instructions and a /mentor link: removing the manual follow-up that currently falls on the teacher.</p>
         </div>
 
         <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
-          <span class="ment-ig-feature-icon">🌐</span>
           <h3 class="ment-ig-feature-title">Public Mentor Directory</h3>
           <p class="ment-ig-feature-desc">A browsable page listing active OCS mentors with their subject expertise and availability. Students and parents can request a mentor match directly, expanding the pipeline beyond word-of-mouth.</p>
         </div>
 
         <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
-          <span class="ment-ig-feature-icon">📝</span>
           <h3 class="ment-ig-feature-title">Mentor Session Notes</h3>
-          <p class="ment-ig-feature-desc">Mentors can log structured notes after each visit — goals covered, blockers, next steps. Notes are visible to the teacher but not other students, creating a lightweight mentorship record per team.</p>
+          <p class="ment-ig-feature-desc">Mentors can log structured notes after each visit: goals covered, blockers, next steps. Notes are visible to the teacher but not other students, creating a lightweight mentorship record per team.</p>
         </div>
 
       </div>
