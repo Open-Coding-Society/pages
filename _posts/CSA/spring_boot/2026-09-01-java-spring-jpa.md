@@ -3,8 +3,8 @@ layout: post
 title: Java Persistent API (JPA)
 description: Define the JPA layer.  The JPA enables frontend to query backend and returns a list.
 permalink: /java/spring/jpa/
+courses: {'csa': {'week': 3}}
 categories: ['Java Spring']
-menu: nav/java_spring.html
 ---
 
 ## Java Persistence API (JPA)

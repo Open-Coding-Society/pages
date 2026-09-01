@@ -4,7 +4,7 @@ title: Plain Old Java Objects (POJO)
 description: Define a POJO, essentially an class with @Entity properties that enables it to be used with Spring Boot in the process of making a database.
 permalink: /java/spring/pojo/
 categories: ['Java Spring']
-menu: nav/java_spring.html
+courses: {'csa': {'week': 3}}
 ---
 
 ### POJO Review
