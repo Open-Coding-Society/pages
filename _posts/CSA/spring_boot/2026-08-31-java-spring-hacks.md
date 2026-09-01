@@ -46,7 +46,7 @@ You have two deployment patterns (your team will use one for N@tM):
 - **API Endpoints:** `/api/data/*` — RESTful endpoints returning JSON
 - **Frontend:** Static GitHub Pages (HTML/CSS/JavaScript) in your portfolio repo
 - **Connection:** Fetch calls from frontend to `/api` backend via `config.js` proxy
-- **Security (Order 2):** CORS configuration allows cross-origin requests; stateless API
+- **Security (Order 1):** Processed first; CORS configuration allows cross-origin requests; stateless API
 - **Why:** Mirrors your Flask + GitHub Pages experience; leverages your portfolio repo
 - **Best for:** Showcase projects, portfolios, public-facing applications, decoupled frontend/backend
 
@@ -56,7 +56,7 @@ You have two deployment patterns (your team will use one for N@tM):
 - **MVC Endpoints:** `/mvc/data/*` — Controller routing serving HTML pages
 - **Frontend:** Admin pages served directly by Spring Boot (Thymeleaf templates)
 - **Connection:** HTML forms POST to `/mvc` endpoints; responses rendered server-side
-- **Security (Order 1):** Traditional session-based auth, CSRF tokens, same-origin only
+- **Security (Order 2):** Processed after the `/api` chain; traditional session-based auth, CSRF tokens, same-origin only
 - **Why:** Simpler deployment; single JAR artifact; built-in CSRF protection; tighter security
 - **Best for:** Internal tools, admin dashboards, CRUD applications, monolithic architecture
 
@@ -366,7 +366,7 @@ Your portfolio website fetches data from your Spring `/api` backend.
 | **Endpoints** | `/api/data/*` — 5 REST endpoints returning JSON | `/mvc/data/*` — MVC endpoints serving HTML |
 | **Controller** | `@RestController` with `@CrossOrigin` | `@Controller` returning template names |
 | **HTTP Testing** | Postman collection (automated testing) | Browser workflow (manual testing) |
-| **Security Chain** | Order 2 (Lower) — Stateless, CORS-based | Order 1 (Higher) — Session-based, CSRF tokens |
+| **Security Chain** | Order 1 (First) — Stateless, CORS-based | Order 2 (After `/api`) — Session-based, CSRF tokens |
 | **Frontend** | GitHub Pages (separate) calls `/api` endpoints | Thymeleaf templates served by Spring (integrated) |
 | **Read/Update Ops** | JavaScript fetch calls to `/api/data` | HTML forms POST to `/mvc/data` |
 | **Blog Documentation** | 5 posts: POJO, Database, API, GitHub Pages Frontend, Architecture | 5 posts: POJO, Database, MVC Architecture, Templates, Security |
@@ -420,7 +420,7 @@ This is where your architectural choice matters most. The security chain (Order 
 
 ### REST API Architecture (`/api` - Option A)
 
-**Security Chain (Order 2 - Lower precedence):**
+**Security Chain (Order 1 - Processed first, before `MvcSecurityConfig`):**
 
 - Stateless authentication (no sessions)
 - CORS validation for cross-origin requests
@@ -442,7 +442,7 @@ GitHub Pages receives JSON and renders
 
 ### MVC Architecture (`/mvc` - Option B)
 
-**Security Chain (Order 1 - Higher precedence):**
+**Security Chain (Order 2 - Processed after the `/api` chain):**
 
 - Session-based authentication (HttpSession)
 - CSRF token validation (same-origin only)
@@ -519,8 +519,8 @@ A: This is foundational to your architecture choice:
 - **`/mvc` endpoints** (Option B): Stateful session-based, return HTML, CSRF tokens required, frontend is same Spring app
 - Choose one based on whether you want separation of concerns (REST) or monolithic integration (MVC)
 
-**Q: Why does Option B use Order(1) security and Option A uses Order(2)?**  
-A: Spring Security evaluates filter chains in order. Session-based security (MVC) needs higher precedence (Order 1) to intercept early. Stateless API security (REST) is lower precedence (Order 2) because it doesn't manage sessions. This is automatic if you use `@Controller` vs `@RestController`.
+**Q: Why does Option A use Order(1) security and Option B use Order(2)?**  
+A: Spring Security evaluates filter chains in order. The `/api` filter chain is processed first with `Order(1)`, before `MvcSecurityConfig`; the MVC filter chain then handles `/mvc` requests with `Order(2)`. The `securityMatcher` path rules and `@Order` determine the chain, not `@Controller` versus `@RestController`.
 
 **Q: Do I need CSRF tokens in Option A (/api)?**  
 A: No. CSRF (Cross-Site Request Forgery) only applies to browser cookies. Your `/api` endpoints are stateless, so CSRF is not a threat. GitHub Pages fetch calls don't send session cookies automatically.
