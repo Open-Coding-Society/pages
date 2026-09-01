@@ -1,0 +1,189 @@
+<!-- Week Chat: collapsible chat scoped to a single sprint week. -->
+<!-- One thread per (course, week), e.g. "csa-week-0", "csa-week-1". -->
+<!-- Include from sprint-week-card.html, which has `index` (week number) and -->
+<!-- `unitKey` (e.g. "Sprint1") in scope. -->
+<!-- -->
+<!-- Storage is localStorage only for now: no login, no REST call, no -->
+<!-- STOMP/SockJS connection. Messages stay in this browser and are clearly -->
+<!-- labelled as such. The backend (Open-Coding-Society/spring's /api/groups + -->
+<!-- /ws-chat) gets wired back up once it is deployed. -->
+{% assign wc_id = unitKey | append: '-' | append: index %}
+
+<details class="week-chat" data-week-key="{{ wc_id }}">
+  <summary class="chat-summary">
+    <span class="chat-summary-icon"><i class="fas fa-comments"></i></span>
+    <span class="chat-summary-title">Week {{ index }} Chat</span>
+    <span class="chat-status-pill" id="weekChatStatusPill-{{ wc_id }}">
+      <span class="chat-status-dot" aria-hidden="true"></span>
+      <span class="chat-status" id="weekChatStatus-{{ wc_id }}">click to open</span>
+    </span>
+    <span class="chat-summary-caret"><i class="fas fa-chevron-down"></i></span>
+  </summary>
+  <div class="chat-body">
+    <p class="chat-preview-note" id="weekChatNote-{{ wc_id }}" hidden>
+      <i class="fas fa-flask"></i><span id="weekChatNoteText-{{ wc_id }}"></span>
+    </p>
+    <div class="chat-messages" id="weekChatMessages-{{ wc_id }}" aria-live="polite">
+      <p class="chat-empty" id="weekChatEmpty-{{ wc_id }}">No messages yet.</p>
+    </div>
+    <form class="chat-form" id="weekChatForm-{{ wc_id }}" autocomplete="off">
+      <input class="chat-input" id="weekChatInput-{{ wc_id }}" type="text" placeholder="Ask a question about Week {{ index }}…" maxlength="2000" disabled>
+      <button class="chat-send" id="weekChatSend-{{ wc_id }}" type="submit" disabled>
+        <i class="fas fa-paper-plane"></i><span>Send</span>
+      </button>
+    </form>
+  </div>
+</details>
+
+<script type="module">
+  const COURSE = {{ page.course | jsonify }};
+  const WEEK_INDEX = {{ index | jsonify }};
+  const WC_ID = {{ wc_id | jsonify }};
+  const GROUP_NAME = `${COURSE}-week-${WEEK_INDEX}`;
+  const PREVIEW_KEY = `ocs-chat-preview:${GROUP_NAME}`;
+  const PREVIEW_LIMIT = 100;
+
+  const state = {
+    initialized: false,
+    currentUserDisplayName: 'You',
+    seenKeys: new Set(),
+  };
+
+  const detailsEl = document.querySelector(`details.week-chat[data-week-key="${WC_ID}"]`);
+  const statusEl = document.getElementById(`weekChatStatus-${WC_ID}`);
+  const statusPillEl = document.getElementById(`weekChatStatusPill-${WC_ID}`);
+  const noteEl = document.getElementById(`weekChatNote-${WC_ID}`);
+  const noteTextEl = document.getElementById(`weekChatNoteText-${WC_ID}`);
+  const messagesEl = document.getElementById(`weekChatMessages-${WC_ID}`);
+  const inputEl = document.getElementById(`weekChatInput-${WC_ID}`);
+  const sendBtn = document.getElementById(`weekChatSend-${WC_ID}`);
+  const formEl = document.getElementById(`weekChatForm-${WC_ID}`);
+
+  function setStatus(text, tone) {
+    statusEl.textContent = text;
+    statusPillEl.classList.remove('is-live', 'is-preview', 'is-error');
+    if (tone) statusPillEl.classList.add(tone);
+  }
+
+  function showNote(text) {
+    noteTextEl.textContent = text;
+    noteEl.hidden = false;
+  }
+
+  function setComposerEnabled(enabled) {
+    inputEl.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+  }
+
+  function formatTimestamp(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+
+  function clearEmpty() {
+    const empty = document.getElementById(`weekChatEmpty-${WC_ID}`);
+    if (empty) empty.remove();
+  }
+
+  function appendMessage({ sender, message, date }) {
+    clearEmpty();
+    const who = sender === state.currentUserDisplayName ? 'You' : (sender || 'Unknown');
+    const when = formatTimestamp(date);
+
+    const line = document.createElement('div');
+    line.className = who === 'You' ? 'chat-msg is-self' : 'chat-msg';
+
+    const meta = document.createElement('div');
+    meta.className = 'chat-msg-meta';
+    const senderEl = document.createElement('span');
+    senderEl.className = 'chat-msg-sender';
+    senderEl.textContent = who;
+    meta.appendChild(senderEl);
+    if (when) {
+      const timeEl = document.createElement('span');
+      timeEl.className = 'chat-msg-time';
+      timeEl.textContent = when;
+      meta.appendChild(timeEl);
+    }
+
+    const body = document.createElement('span');
+    body.className = 'chat-msg-body';
+    body.textContent = message;
+
+    line.append(meta, body);
+    messagesEl.appendChild(line);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function eventKey(event) {
+    return [event?.sender || '', event?.date || '', event?.message || ''].join('|');
+  }
+
+  /* ── Local storage ──────────────────────────────────────────────────
+     The only store this chat has for now. Messages are kept in
+     localStorage for this browser only, one bucket per (course, week). */
+
+  function readStoredMessages() {
+    try {
+      const raw = window.localStorage.getItem(PREVIEW_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn('Week chat: local history unavailable', err);
+      return [];
+    }
+  }
+
+  function writeStoredMessage(entry) {
+    try {
+      const messages = readStoredMessages();
+      messages.push(entry);
+      window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(messages.slice(-PREVIEW_LIMIT)));
+    } catch (err) {
+      console.warn('Week chat: could not save message', err);
+    }
+  }
+
+  function sendMessage(text) {
+    const entry = {
+      sender: state.currentUserDisplayName || 'You',
+      message: text,
+      date: new Date().toISOString(),
+    };
+    state.seenKeys.add(eventKey(entry));
+    writeStoredMessage(entry);
+    appendMessage(entry);
+    return true;
+  }
+
+  function initOnce() {
+    if (state.initialized) return;
+    state.initialized = true;
+
+    setStatus('local', 'is-preview');
+    showNote('This is a local preview — messages stay in this browser and are not sent to the class.');
+
+    readStoredMessages().forEach((msg) => {
+      const key = eventKey(msg);
+      if (state.seenKeys.has(key)) return;
+      state.seenKeys.add(key);
+      appendMessage(msg);
+    });
+
+    setComposerEnabled(true);
+    inputEl.focus();
+  }
+
+  detailsEl.addEventListener('toggle', () => {
+    if (detailsEl.open) initOnce();
+  });
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = inputEl.value.trim();
+    if (!text) return;
+    if (sendMessage(text)) inputEl.value = '';
+  });
+</script>

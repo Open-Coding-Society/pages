@@ -107,8 +107,19 @@ export class BaseRunner {
     ButtonFeedback.flash(button, temporaryLabel, duration);
   }
 
-  bindButton(selector, handler) {
-    const button = this.container.querySelector(selector);
+  getHookElement(hookName, fallbackSelector = '') {
+    if (!hookName) {
+      return fallbackSelector ? this.container.querySelector(fallbackSelector) : null;
+    }
+    const byHook = this.container.querySelector(`[data-hook="${hookName}"]`);
+    if (byHook) {
+      return byHook;
+    }
+    return fallbackSelector ? this.container.querySelector(fallbackSelector) : null;
+  }
+
+  bindButton(selector, handler, hookName = '') {
+    const button = this.getHookElement(hookName, selector);
     if (!button) {
       return null;
     }
@@ -133,7 +144,7 @@ export class BaseRunner {
     copyFeedback = '✔ Copied',
     feedbackDuration = 2000,
   } = {}) {
-    const clearBtn = this.container.querySelector('.clearStorageBtn');
+    const clearBtn = this.getHookElement('clear', '.clearStorageBtn');
     if (clearBtn) {
       clearBtn.addEventListener('click', () => {
         this.clearStorage();
@@ -145,7 +156,7 @@ export class BaseRunner {
       });
     }
 
-    const saveBtn = this.container.querySelector('.saveBtn');
+    const saveBtn = this.getHookElement('save', '.saveBtn');
     if (saveBtn) {
       saveBtn.addEventListener('click', () => {
         this.saveToStorage();
@@ -156,7 +167,7 @@ export class BaseRunner {
       });
     }
 
-    const copyBtn = this.container.querySelector('.copyBtn');
+    const copyBtn = this.getHookElement('copy', '.copyBtn');
     if (copyBtn) {
       copyBtn.addEventListener('click', () => {
         const code = this.getValue();

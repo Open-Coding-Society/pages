@@ -1,0 +1,177 @@
+/**
+ * Mario Open House Form Styles
+ * Reusable top-rail button + detail panel layout for open house navigation.
+ */
+
+@import "../mixins/container";
+@import "../mixins/panel";
+
+.mario-open-house {
+  @include main-container(1.5rem);
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  min-height: 700px;
+  margin: 1.25rem auto;
+  padding: 0;
+  box-sizing: border-box;
+  background: linear-gradient(145deg, #0f172a, #13213f 46%, #1f3b73 100%);
+  border-radius: 20px;
+  box-shadow: 0 10px 36px rgba(10, 25, 51, 0.45);
+  overflow: hidden;
+
+  .sprite {
+    width: var(--mario-sprite-width, 256px);
+    height: var(--mario-sprite-height, 256px);
+    background-image: var(--mario-sprite-image);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    position: absolute;
+    top: 28px;
+    left: 36px;
+    z-index: 5;
+    transform: scale(var(--mario-sprite-scale, 0.25));
+    transform-origin: top left;
+    pointer-events: none;
+  }
+
+  .mario-nav-bar {
+    @include inline-container(flex, 12px);
+    position: absolute;
+    top: 18px;
+    left: 12px;
+    right: 12px;
+    align-items: center;
+    justify-content: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 2px 8px;
+    z-index: 4;
+  }
+
+  .mario-lane {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    right: 10px;
+    height: 82px;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.2);
+    border: 1px dashed rgba(147, 197, 253, 0.25);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .hotspot {
+    position: relative;
+    width: 180px;
+    min-height: 48px;
+    z-index: 4;
+    transition: transform 120ms ease, filter 120ms ease;
+
+    &:hover,
+    &.active {
+      transform: translateY(-2px) scale(1.01);
+      filter: brightness(1.1);
+    }
+  }
+
+  .mario-nav-btn {
+    width: 170px;
+    flex: 0 0 auto;
+  }
+
+  .detail-section {
+    @include info-panel(1.1rem 1.2rem, 2px, 0);
+    position: absolute;
+    display: none;
+    top: 96px;
+    left: 40px;
+    right: 40px;
+    min-height: 270px;
+    z-index: 3;
+    border-color: rgba(147, 197, 253, 0.7);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.88);
+    color: #dbeafe;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      color: #eff6ff;
+    }
+
+    p {
+      margin-bottom: 0.65rem;
+      line-height: 1.45;
+      color: #dbeafe;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .mario-open-house {
+    min-height: 760px;
+    border-radius: 16px;
+
+    .mario-nav-bar {
+      left: 8px;
+      right: 8px;
+      justify-content: flex-start;
+    }
+
+    .hotspot {
+      width: min(44vw, 170px);
+      min-width: 130px;
+      font-size: 0.95rem;
+    }
+
+    .detail-section {
+      top: 164px;
+      min-height: 360px;
+      left: 12px;
+      right: 12px;
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .mario-open-house {
+    min-height: 820px;
+    margin: 0.75rem auto;
+
+    .mario-nav-bar {
+      gap: 8px;
+    }
+
+    .hotspot {
+      width: 152px;
+      min-width: 152px;
+      min-height: 44px;
+      font-size: 0.88rem;
+    }
+
+    .detail-section {
+      left: 8px;
+      right: 8px;
+      min-height: 430px;
+      padding: 0.9rem;
+
+      h3 {
+        font-size: 1rem;
+      }
+
+      p,
+      li {
+        font-size: 0.92rem;
+      }
+    }
+  }
+}

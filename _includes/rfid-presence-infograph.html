@@ -1,0 +1,690 @@
+{% assign data = site.data.rfid_presence_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --rp-bg: #0f0f12;
+  --rp-card: #16161a;
+  --rp-card-border: #2a2a2e;
+  --rp-text: #e4e4e7;
+  --rp-text-muted: #a1a1aa;
+  --rp-accent: #3b82f6;
+  --rp-accent-soft: rgba(59, 130, 246, 0.15);
+  --rp-success: #22c55e;
+  --rp-success-soft: rgba(34, 197, 94, 0.12);
+  --rp-tag: #27272a;
+  --rp-gradient-start: #3b82f6;
+  --rp-gradient-end: #06b6d4;
+  --rp-purple: #a855f7;
+  --rp-amber: #f59e0b;
+  --rp-amber-soft: rgba(245, 158, 11, 0.12);
+  --rp-red: #ef4444;
+  --rp-red-soft: rgba(239, 68, 68, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+.rp-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--rp-text);
+}
+
+/* ── Header ── */
+.rp-header {
+  text-align: center;
+  margin-bottom: 2.75rem;
+}
+
+.rp-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 9999px;
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  margin-bottom: 1rem;
+}
+
+.rp-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--rp-gradient-start), var(--rp-gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.rp-description {
+  font-size: 1.0625rem;
+  color: var(--rp-text-muted);
+  line-height: 1.7;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ── Flow Diagram ── */
+.rp-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 2rem 0 2.75rem;
+}
+
+.rp-flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.1rem;
+  background: var(--rp-card);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.75rem;
+  min-width: 110px;
+  text-align: center;
+  position: relative;
+}
+
+.rp-flow-node-icon { font-size: 1.4rem; }
+
+.rp-flow-node-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rp-text);
+  line-height: 1.3;
+}
+
+.rp-flow-node-sub {
+  font-size: 0.62rem;
+  color: var(--rp-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.rp-flow-arrow {
+  font-size: 1rem;
+  color: var(--rp-accent);
+  padding: 0 0.2rem;
+  flex-shrink: 0;
+}
+
+.rp-flow-node.active {
+  border-color: var(--rp-accent);
+  background: var(--rp-accent-soft);
+}
+
+.rp-flow-node.active .rp-flow-node-label { color: var(--rp-accent); }
+
+/* ── Section Label ── */
+.rp-section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rp-text-muted);
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rp-card-border);
+}
+
+/* ── Generic Card ── */
+.rp-card {
+  background: var(--rp-card);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.rp-card h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rp-text);
+  margin: 0 0 1rem;
+}
+
+/* ── Research question ── */
+.rp-question {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--rp-text);
+  border-left: 3px solid var(--rp-accent);
+  padding: 0.25rem 0 0.25rem 1.1rem;
+  margin: 0 0 1.25rem;
+}
+
+/* ── Checklist ── */
+.rp-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rp-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  font-size: 0.9rem;
+  color: var(--rp-text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  line-height: 1.5;
+}
+
+.rp-checklist li:last-child { border-bottom: none; }
+
+.rp-checklist .rp-box {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 0.3rem;
+  border: 1.5px solid var(--rp-card-border);
+  margin-top: 0.15rem;
+}
+
+.rp-checklist li.open .rp-box {
+  border-color: var(--rp-amber);
+}
+
+/* ── Tables ── */
+.rp-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.rp-table th {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rp-text-muted);
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--rp-card-border);
+  white-space: nowrap;
+}
+
+.rp-table td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--rp-text-muted);
+  line-height: 1.55;
+  vertical-align: top;
+}
+
+.rp-table tr:last-child td { border-bottom: none; }
+
+.rp-table td:first-child, .rp-table td.rp-cell-strong {
+  color: var(--rp-text);
+  font-weight: 600;
+}
+
+.rp-table a { color: var(--rp-accent); text-decoration: none; }
+.rp-table a:hover { text-decoration: underline; }
+
+.rp-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8em;
+  background: var(--rp-tag);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.35rem;
+}
+
+/* State pill used inside the presence-state table */
+.rp-pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.rp-pill-good { background: var(--rp-success-soft); color: var(--rp-success); border: 1px solid rgba(34,197,94,0.3); }
+.rp-pill-warn { background: var(--rp-amber-soft); color: var(--rp-amber); border: 1px solid rgba(245,158,11,0.3); }
+.rp-pill-bad  { background: var(--rp-red-soft); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.rp-pill-neutral { background: var(--rp-tag); color: var(--rp-text-muted); border: 1px solid var(--rp-card-border); }
+
+/* ── Mermaid card ── */
+.rp-diagram {
+  background: rgba(255,255,255,0.015);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+
+.rp-diagram .mermaid { display: flex; justify-content: center; }
+
+/* ── Callout ── */
+.rp-callout {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--rp-text-muted);
+  margin-top: 0.85rem;
+}
+
+.rp-callout-icon { flex-shrink: 0; font-size: 1.05rem; }
+
+.rp-callout-open {
+  background: var(--rp-amber-soft);
+  border: 1px solid rgba(245,158,11,0.3);
+}
+
+.rp-callout-note {
+  background: var(--rp-tag);
+  border: 1px solid var(--rp-card-border);
+}
+
+/* ── Entity list ── */
+.rp-entity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+
+.rp-entity-list li {
+  background: var(--rp-tag);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--rp-text-muted);
+  line-height: 1.5;
+}
+
+.rp-entity-list strong { color: var(--rp-text); }
+
+/* ── Footer ── */
+.rp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.1rem 1.5rem;
+  border-top: 1px solid var(--rp-card-border);
+  background: rgba(255,255,255,0.015);
+  border-radius: 1rem;
+  border: 1px solid var(--rp-card-border);
+  margin-top: 1rem;
+}
+
+.rp-team { display: flex; flex-direction: column; gap: 0.1rem; }
+
+.rp-team-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rp-text-muted);
+}
+
+.rp-team-name { font-size: 0.85rem; font-weight: 600; color: var(--rp-text); }
+
+.rp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: var(--rp-amber-soft);
+  color: var(--rp-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.rp-status::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rp-amber);
+  animation: rp-pulse 2s infinite;
+}
+
+@keyframes rp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.rp-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.45rem;
+  background: var(--rp-accent);
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.rp-btn:hover { background: #2563eb; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .rp-title { font-size: 1.6rem; }
+  .rp-flow { gap: 0.2rem; }
+  .rp-flow-node { min-width: 78px; padding: 0.55rem 0.7rem; }
+  .rp-flow-node-label { font-size: 0.62rem; }
+  .rp-table { font-size: 0.78rem; }
+}
+</style>
+
+<div class="rp-container">
+
+  <!-- Header -->
+  <div class="rp-header">
+    <div class="rp-badge">Design-Based Research Capstone · Revised Proposal</div>
+    <h1 class="rp-title">{{ data.Title }}</h1>
+    <p class="rp-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- System flow at a glance -->
+  <div class="rp-flow">
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">Bell Schedule</span>
+      <span class="rp-flow-node-sub">Attendance Window</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">Registration</span>
+      <span class="rp-flow-node-sub">Student + Tag + Cam</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">RFID / Camera</span>
+      <span class="rp-flow-node-sub">Device + Person</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node active">
+      <span class="rp-flow-node-label">Correlation Engine</span>
+      <span class="rp-flow-node-sub">Intelligence</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">Presence State</span>
+      <span class="rp-flow-node-sub">Attendance</span>
+    </div>
+  </div>
+
+  <!-- Research Question -->
+  <div class="rp-section-label">Research Question</div>
+  <div class="rp-card">
+    <p class="rp-question">Can a low-cost Raspberry Pi–based UHF RFID system, using tamper-evident computer-mounted tags and front/back doorway detection, reliably establish classroom device presence and contribute to student presence determination when correlated with an existing camera-spatial system and class registration/bell-schedule data?</p>
+    <h3 style="margin-top:1.5rem;">Acceptance / Test Cases</h3>
+    <ul class="rp-checklist">
+      <li class="open"><span class="rp-box"></span><span>60×40 ft trial room, two-door layout (front + back), UHF reader(s) positioned to distinguish entry side</span></li>
+      <li class="open"><span class="rp-box"></span><span>Per-period expected enrollment is known and used (e.g. Period 2 = 28 vs Period 5 = 34)</span></li>
+      <li class="open"><span class="rp-box"></span><span>Bathroom / temporary-exit scenario: device stays in room, student leaves and returns, correctly resolved as temporary absence, not "left early"</span></li>
+      <li class="open"><span class="rp-box"></span><span>Tamper scenario: tag physically removed from device → tag reports invalid/tampered rather than silently going unread</span></li>
+      <li class="open"><span class="rp-box"></span><span>Tag lifecycle: a tag can be re-registered to a new device/student, and the old tag is retired without losing historical attendance data</span></li>
+      <li class="open"><span class="rp-box"></span><span>Reads outside the bell-schedule attendance window are logged but excluded from attendance calculations</span></li>
+      <li class="open"><span class="rp-box"></span><span>Opt-out flow: a student who declines face scanning still gets correct device-only presence tracking, with no false anomaly/tamper flags</span></li>
+      <li class="open"><span class="rp-box"></span><span>Bag-orientation test: a tagged laptop inside a closed backpack reads reliably at the door regardless of which way the tag happens to be facing (currently unresolved — see Hardware section)</span></li>
+    </ul>
+  </div>
+
+  <!-- Design decisions -->
+  <div class="rp-section-label">Design Decisions &amp; Rationale</div>
+  <div class="rp-card">
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Design feature</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Tag mounted on the student's <strong>computer</strong></td><td>A laptop is less likely than a wearable badge to be left in a backpack/locker — it's the more reliable proxy for "this student is in the building."</td></tr>
+          <tr><td>RFID reading = <strong>device presence only</strong></td><td>A laptop can sit in the room while the student steps out (bathroom, etc). Device presence and student presence are different signals that must be tracked separately.</td></tr>
+          <tr><td>Camera (existing face-scanning system from Rohan) = <strong>required correlation input</strong></td><td>Student presence can only be established by combining RFID (device) with camera (person), not from RFID alone.</td></tr>
+          <tr><td>Expanded presence <strong>state machine</strong></td><td>Correlating two signals produces states beyond a simple binary, e.g. device present + student temporarily absent.</td></tr>
+          <tr><td>Reads only counted inside a bell-schedule-defined <strong>attendance window</strong></td><td>Prevents a tag being read hours later (e.g. hallway walk-through) from being misread as attendance.</td></tr>
+          <tr><td><strong>Per-period expected enrollment</strong> (e.g. Period 2 = 28, Period 5 = 34)</td><td>Presence has to be evaluated against the correct expected population for that period, not a global student list.</td></tr>
+          <tr><td>Tag has a <strong>lifecycle</strong>: registration → active → tampered/lost → reissued/retired</td><td>Tags will be lost, damaged, or reassigned; the system needs an explicit process for that, not just a static mapping.</td></tr>
+          <tr><td><strong>Tamper-evident</strong> tag (antenna breaks on removal)</td><td>Prevents a student handing their tag to someone else or moving it between devices to game the system.</td></tr>
+          <tr><td><strong>UHF RFID</strong> (865–928MHz), meter-range doorway/room detection</td><td>Tags live on laptops sitting somewhere in the room, not badges tapped against a reader — needs multi-meter read range, which only UHF provides.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Privacy / governance -->
+  <div class="rp-section-label">Privacy, Scope &amp; Governance</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Set by the teacher in the room-approval discussion:</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Decision</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Face scanning is opt-in</td><td>A student can decline by simply not scanning their face. Presence for that student is then based on the RFID (device) signal alone — this is a policy choice, not a system failure, so it must not be flagged as anomalous.</td></tr>
+          <tr><td>Anti-spoofing already validated</td><td>The face system (Rohan's) has already been tested against photo-based spoofing attempts.</td></tr>
+          <tr><td>Scope: this CS classroom only, for now</td><td>No wider rollout is being planned or implied at this stage.</td></tr>
+          <tr><td>Fully open project</td><td>Implementation will be shared with anyone who asks — nothing about the design is treated as confidential.</td></tr>
+          <tr><td>Security review path: mentors, not school IT</td><td>Given the single-room scope and open-sharing policy, security review is mentor-led rather than a formal school IT process.</td></tr>
+          <tr><td>Hack/penetration testing uses only the team's own data</td><td>No testing is done against real student data beyond what the team itself provides.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rp-callout rp-callout-note">
+      <span>This adds one more presence state to the model below: a student who opts out of face scanning still gets correct device-based tracking (<span class="rp-code">DEVICE_ONLY_NO_CONSENT</span>), distinct from a student whose camera signal is simply missing/failed.</span>
+    </div>
+  </div>
+
+  <!-- System architecture -->
+  <div class="rp-section-label">System Architecture</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    BS[Bell Schedule] --> CP[Class / Period]
+    CP --> REG["Registration:
+Student + Face + Computer + RFID Tag"]
+    REG --> RFID["RFID System
+Front door / Back door / Room"]
+    REG --> CAM["Camera System
+Spatial presence, Rohan's face system"]
+    RFID --> CORR[Correlation / Intelligence Engine]
+    CAM --> CORR
+    CP -. expected enrollment .-> CORR
+    BS -. attendance window .-> CORR
+    CORR --> PRES[Attendance / Presence State]</pre>
+    </div>
+  </div>
+
+  <!-- Attendance window logic -->
+  <div class="rp-section-label">Attendance Window Logic</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 0.25rem;">The bell schedule doesn't just define start/end times for tardy math — it defines a <strong style="color:var(--rp-text);">window</strong> during which reads count as attendance at all.</p>
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">sequenceDiagram
+    participant Bell as Bell Schedule
+    participant Win as Attendance Window
+    participant Door as Door Sensors (RFID)
+    participant Cam as Camera System
+    participant Eng as Correlation Engine
+
+    Bell->>Win: Period starts -> window opens
+    loop While window is open
+        Door->>Eng: tag read (device event)
+        Cam->>Eng: face/spatial event (student event)
+        Eng->>Eng: correlate device + student signals
+    end
+    Bell->>Win: Period ends -> window closes
+    Note over Eng: Any tag/camera event outside the window is logged but NOT counted as attendance</pre>
+    </div>
+  </div>
+
+  <!-- Presence state model -->
+  <div class="rp-section-label">Presence State Model</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Two independent signals (device via RFID, student via camera) get correlated into one of these states per student per period:</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>State</th><th>Device (RFID)</th><th>Student (Camera)</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="rp-pill rp-pill-good">PRESENT</span></td><td>seen</td><td>seen</td><td>Normal attendance</td></tr>
+          <tr><td><span class="rp-pill rp-pill-warn">TARDY</span></td><td>first seen after window open + grace period</td><td>seen</td><td>Arrived late</td></tr>
+          <tr><td><span class="rp-pill rp-pill-neutral">DEVICE_ONLY_NO_CONSENT</span></td><td>seen</td><td>opted out</td><td>Student declined face scanning by policy — presence is based on the device signal alone, not flagged as anomalous or incomplete</td></tr>
+          <tr><td><span class="rp-pill rp-pill-warn">DEVICE_PRESENT_STUDENT_AWAY</span></td><td>seen</td><td>not currently seen</td><td>Bathroom / temporary-exit scenario — not counted as absent or left-early</td></tr>
+          <tr><td><span class="rp-pill rp-pill-bad">LEFT_EARLY</span></td><td>seen, then both signals stop before window close</td><td>stopped before window close</td><td>Exited before period ended</td></tr>
+          <tr><td><span class="rp-pill rp-pill-warn">DEVICE_ABSENT_STUDENT_PRESENT</span></td><td>not seen</td><td>seen</td><td>Student present without their registered device — flag for manual review (forgot laptop, borrowed one, or tag failure)</td></tr>
+          <tr><td><span class="rp-pill rp-pill-bad">ABSENT</span></td><td>not seen</td><td>not seen</td><td>No signal at all during the window</td></tr>
+          <tr><td><span class="rp-pill rp-pill-bad">TAMPER_DETECTED</span></td><td>tag reports tamper/invalid</td><td>—</td><td>Tag physically compromised — exclude from attendance, flag for tag reissue</td></tr>
+          <tr><td><span class="rp-pill rp-pill-neutral">IGNORED_OUT_OF_WINDOW</span></td><td>seen</td><td>—</td><td>Read occurred outside the attendance window — logged, not counted</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Registration & tag lifecycle -->
+  <div class="rp-section-label">Registration &amp; Tag Lifecycle</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    A[New student enrolled] --> B["Registration:
+capture Face ID,
+assign Computer,
+issue RFID Tag"]
+    B --> C[Tag: ACTIVE]
+    C -->|Tag lost or damaged| D[Tag: RETIRED]
+    C -->|Tamper signal received| E[Tag: TAMPERED]
+    D --> F[Reissue new tag]
+    E --> F
+    F --> C
+    C -->|Student unenrolled/graduated| G["Tag: RETIRED
+Computer unlinked"]</pre>
+    </div>
+    <h3 style="margin-top:1.5rem;">Data the system needs to persist</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">(no code yet — this is the entity list, not a schema)</p>
+    <ul class="rp-entity-list">
+      <li><strong>Students</strong> — id, name, enrolled periods</li>
+      <li><strong>Periods</strong> — id, name, start time, end time, expected enrollment</li>
+      <li><strong>Computers</strong> — id, assigned student</li>
+      <li><strong>RFID Tags</strong> — UID, linked computer, status (active/tampered/retired), issue date</li>
+      <li><strong>Registrations</strong> — student ↔ face ID ↔ computer ↔ tag (the 4-way binding)</li>
+      <li><strong>Doors</strong> — id, room, side (front/back)</li>
+      <li><strong>RFID Events</strong> — tag UID, door, timestamp</li>
+      <li><strong>Camera Events</strong> — student (via face match), timestamp, spatial zone (stub — interface into Rohan's existing system)</li>
+      <li><strong>Attendance Windows</strong> — derived per period from the bell schedule</li>
+      <li><strong>Presence Records</strong> — computed state per student per period (the output of the correlation engine)</li>
+    </ul>
+  </div>
+
+  <!-- Hardware / BOM -->
+  <div class="rp-section-label">Hardware / Bill of Materials</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Room and door-table setup are confirmed; hardware itself is not purchased yet. Teacher supplied concrete RF specs for the initial door-table test rig below.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Item</th><th>Spec</th><th>Notes</th><th>Link</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Rainy UHF Pi HAT (Complete Kit)</td>
+            <td>865–870MHz (EU) / 915–928MHz (US), up to 200 tags/sec, 18–26dBm adjustable power, EPC Gen2V2 / ISO 18000-63, Cortex-M4 (ThinkMagic M6e Nano)</td>
+            <td>The kit our teacher linked. Compatible with Pi 3/4/5/Zero/Zero 2W. Check current price/stock on the page.</td>
+            <td><a href="https://shop.sb-components.co.uk/products/rainy-uhf-pi-hat-complete-kit" target="_blank" rel="noopener">shop.sb-components.co.uk</a></td>
+          </tr>
+          <tr>
+            <td>Raspberry Pi 4 Kit with UHF HAT</td>
+            <td>Bundles a Pi 4 with the HAT above</td>
+            <td>Simpler single order if we don't already have a spare Pi</td>
+            <td><a href="https://shop.sb-components.co.uk/products/raspberry-pi-4-kit-with-uhf-hat" target="_blank" rel="noopener">shop.sb-components.co.uk</a></td>
+          </tr>
+          <tr>
+            <td>U.FL (IPEX) to SMA female bulkhead pigtail cable</td>
+            <td>RG178, ~10–15cm — kept short to avoid signal loss at 900MHz</td>
+            <td>~$5 for a pair. Adapts the HAT's onboard U.FL connector to a standard SMA test antenna.</td>
+            <td><a href="https://www.amazon.com/Custom-Cables-Group-LLC-Bulkhead/dp/B01CWJ5JS4" target="_blank" rel="noopener">Amazon</a></td>
+          </tr>
+          <tr>
+            <td>Test antenna: 5dBi 900MHz omnidirectional whip, SMA male</td>
+            <td>868/915MHz, ~$7–15</td>
+            <td>Starting antenna for the door-table setup. Set reader output power to 20–26dBm — below that, range drops under 1m.</td>
+            <td><a href="https://us.amazon.com/NOYITO-900MHz-Antenna-Omnidirectional-Connector/dp/B07HLKKHCM" target="_blank" rel="noopener">Amazon</a></td>
+          </tr>
+          <tr>
+            <td>Tamper-evident UHF tag (self-destructive antenna)</td>
+            <td>Antenna breaks on removal, ~$0.10/tag</td>
+            <td>Matches the tamper-proof requirement directly</td>
+            <td><a href="https://www.rfidtagworld.com/products/Self-destructive-tag/Tamper-UHF-Tag/Tamper-UHF-Tag_4910.html" target="_blank" rel="noopener">rfidtagworld.com</a></td>
+          </tr>
+          <tr>
+            <td>On-metal UHF tag (anti-metal, pack of 10)</td>
+            <td>ISO18000-6C, EPC Class1 Gen2, waterproof</td>
+            <td>Confirmed good by teacher for laptop-lid mounting — standard UHF tags detune badly near metal.</td>
+            <td><a href="https://www.amazon.com/Metal-ISO18000-6C-Class1-Waterproof-Outdoor/dp/B079NM6GDN" target="_blank" rel="noopener">Amazon</a></td>
+          </tr>
+          <tr>
+            <td>Standard adhesive UHF inlay tag, Alien H3 chip (pack of 100)</td>
+            <td>ISO18000-6C, long range, ~$0.15–0.25/tag at this quantity</td>
+            <td>Teacher recommends Alien H3 or Impinj Monza 4/5 chips — larger inlays hit 3–4m range; micro/button tags drop to 1–2m. Use on non-metal mount points (plastic bezel/underside).</td>
+            <td><a href="https://www.amazon.com/AZ9662-ISO18000-6C-Range-73-5x21-2mm-Adhesive/dp/B01LYBKMYM" target="_blank" rel="noopener">Amazon</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rp-callout rp-callout-note">
+      <span><strong style="color:var(--rp-text);">Read range and orientation:</strong> at 20–26dBm with the whip antenna above, expect a 2–4m read range — enough for a single door-table setup. The whip radiates in a ring perpendicular to its body, so tags read best held <strong style="color:var(--rp-text);">parallel</strong> to the antenna, not pointed at its tip; this needs to be part of the test protocol, not just the hardware spec.</span>
+    </div>
+    <div class="rp-callout rp-callout-open">
+      <span><strong style="color:var(--rp-text);">Open problem — computer-in-bag orientation:</strong> when the tagged laptop is inside a closed backpack, there's no guarantee the tag faces the reader, and read reliability drops sharply if it doesn't. Not yet solved — options to test: multiple reader antennas at different angles around the door, a standardized "tag pocket" location in the bag, or accepting a lower catch rate and relying on the camera signal to cover the gap.</span>
+    </div>
+    <div class="rp-callout rp-callout-note">
+      <span><strong style="color:var(--rp-text);">Scaling to the full room:</strong> the whip antenna above is sized for a single door-table test, not whole-room coverage. Covering the full classroom will need a larger/higher-gain antenna (or multiple antennas) and a real packaging/enclosure plan — flagged by the teacher as the next hardware step once the door-table rig is validated.</span>
+    </div>
+  </div>
+
+  <!-- Dependencies / open questions -->
+  <div class="rp-section-label">Dependencies &amp; Open Questions</div>
+  <div class="rp-card">
+    <ul class="rp-checklist">
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Camera system interface:</strong> what does Rohan's face-scanning system expose (API? event stream? file?) — needed to define the Camera Events integration contract, including how it reports a student who has opted out.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Budget/approval:</strong> hardware purchase (HAT, cable, antenna, tags) still needs sign-off.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Bag-orientation reliability:</strong> no confirmed mitigation yet for tag orientation inside a closed backpack — see Hardware section.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Tag mounting standard:</strong> decide on a single mounting spot on the laptop (e.g., underside near a plastic vent) so tag type (on-metal vs standard) can be standardized across all devices.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Room measurements:</strong> get actual dimensions/door layout of the confirmed classroom to size the eventual full-room antenna upgrade.</span></li>
+    </ul>
+  </div>
+
+  <!-- Footer: team -->
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Proposal Stage</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>

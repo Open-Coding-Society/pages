@@ -524,17 +524,18 @@ class RobotLogicLevel {
       marginTop: '12px',
     });
 
-    const runBtn = document.createElement('button');
-    runBtn.textContent = 'Run';
-    runBtn.dataset.action = 'run';
-    this.styleButton(runBtn, '#2ea66a');
-    runBtn.addEventListener('click', () => this.run());
-    controls.appendChild(runBtn);
+    const runButton = document.createElement('button');
+    runButton.textContent = 'Run';
+    runButton.dataset.action = 'run';
+    this.styleButton(runButton, '#2ea66a');
+    runButton.addEventListener('click', () => this.run());
+    controls.appendChild(runButton);
 
-    const resetBtn = document.createElement('button');
-    resetBtn.textContent = 'Reset';
-    this.styleButton(resetBtn, '#b7474a');
-    resetBtn.addEventListener('click', () => {
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset';
+    resetButton.dataset.action = 'reset';
+    this.styleButton(resetButton, '#b7474a');
+    resetButton.addEventListener('click', () => {
       this.executing = false;
       this.program.length = 0;
       this.resetRobot();
@@ -542,7 +543,7 @@ class RobotLogicLevel {
       this.draw();
       this.setStatus('idle', 'Program cleared.');
     });
-    controls.appendChild(resetBtn);
+    controls.appendChild(resetButton);
 
     panel.body.appendChild(controls);
     this.renderProgram();

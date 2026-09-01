@@ -1,0 +1,11 @@
+# RFID + Camera-Correlated Classroom Presence System — Infographic
+Title: "RFID + Camera-Correlated Classroom Presence System"
+Description: "A low-cost Raspberry Pi UHF RFID system that tracks laptop (device) presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period."
+
+Team:
+  - "Ruta Sirdeshmukh"
+  - "Vibha Mandayam"
+  - "Kush Shah"
+
+Repo: "https://github.com/vibha1019/crowpi-attendance"
+Year: "2026-2027"

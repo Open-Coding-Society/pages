@@ -2814,3 +2814,491 @@
     }
   }
 }
+
+/* ============================= */
+/*      COURSE / WEEK CHAT       */
+/* ============================= */
+/* Shared styling for the class announcement panel at the top of a sprint page
+   and the per-week chat inside every week card. Uses the same tokens as the
+   surrounding timeline cards ($bg-3 borders, $accent headings, $text-muted
+   secondary text) so the chats read as part of the page, not bolted on. */
+
+.announcement-chat,
+.week-chat {
+  color: $text;
+  font-family: var(--pref-font-family);
+
+  /* Connection state, shown as a pill beside the title */
+  .chat-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border: 1px solid $bg-3;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .chat-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $text-muted;
+    flex-shrink: 0;
+  }
+
+  .chat-status {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: $text-muted;
+    white-space: nowrap;
+  }
+
+  .chat-status-pill.is-live {
+    border-color: rgba($green, 0.4);
+    .chat-status-dot { background: $green; }
+    .chat-status { color: $green; }
+  }
+
+  .chat-status-pill.is-preview {
+    border-color: rgba($warn, 0.4);
+    .chat-status-dot { background: $warn; }
+    .chat-status { color: $warn; }
+  }
+
+  .chat-status-pill.is-error {
+    border-color: rgba($red, 0.4);
+    .chat-status-dot { background: $red; }
+    .chat-status { color: $red; }
+  }
+
+  /* Banner shown when the chat is running locally (signed out / backend down) */
+  .chat-preview-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    padding: 8px 12px;
+    border: 1px solid rgba($warn, 0.35);
+    background: rgba($warn, 0.08);
+    border-radius: 6px;
+    color: $warn;
+    font-size: 12px;
+    line-height: 1.45;
+
+    i {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    &[hidden] { display: none; }
+  }
+
+  .chat-messages {
+    overflow-y: auto;
+    padding: 10px;
+    margin: 0 0 12px 0;
+    border: 1px solid $bg-3;
+    border-radius: 8px;
+    background: rgba($bg-0, 0.25);
+    scrollbar-width: thin;
+    scrollbar-color: $bg-3 transparent;
+
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-thumb {
+      background: $bg-3;
+      border-radius: 4px;
+    }
+  }
+
+  .chat-system {
+    margin: 8px 0;
+    color: $text-muted;
+    font-size: 12px;
+    font-style: italic;
+    text-align: center;
+  }
+
+  .chat-msg-sender {
+    color: $accent;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .chat-msg-time {
+    color: $text-muted;
+    font-size: 11px;
+  }
+
+  .chat-msg-body {
+    display: block;
+    color: $text;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .chat-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .chat-input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    padding: 8px 12px;
+    border: 1px solid $bg-3;
+    border-radius: 6px;
+    background: var(--pref-bg-color);
+    color: $text;
+    font-family: var(--pref-font-family);
+    font-size: 13px;
+    transition: border-color 0.2s;
+
+    &::placeholder { color: $text-muted; }
+
+    &:focus {
+      outline: none;
+      border-color: $accent;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+
+  .chat-send {
+    @include text-button;
+    gap: 6px;
+    flex-shrink: 0;
+    border-color: $accent;
+    color: $accent;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+}
+
+/* ── Class announcement panel (top of the sprint page) ────────────────
+   Laid out as a proper panel: a titled header strip, a day-separated and
+   sender-grouped message log that grows with its content, then a composer
+   fenced off by its own rule. */
+.announcement-chat {
+  margin: 24px 0;
+  border: 1px solid $bg-3;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: var(--border-hover-color, $bg-3); }
+
+  .chat-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid $bg-3;
+    background: rgba($text, 0.02);
+  }
+
+  .chat-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .chat-badge {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid rgba($accent, 0.35);
+    background: rgba($accent, 0.1);
+    color: $accent;
+    font-size: 15px;
+  }
+
+  .chat-title {
+    margin: 0;
+    padding: 0;
+    /* The global h2 rule adds a rule-line; the header already has one. */
+    border-bottom: none;
+    color: var(--pref-accent-color);
+    font-size: 1.05rem;
+    line-height: 1.3;
+  }
+
+  .chat-subtitle {
+    margin: 2px 0 0 0;
+    color: $text-muted;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .chat-body {
+    padding: 14px 16px;
+  }
+
+  .chat-messages {
+    min-height: 8em;
+    max-height: 24em;
+    padding: 12px;
+    margin-bottom: 0;
+  }
+
+  /* Day separator between messages posted on different days */
+  .chat-day {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0 10px;
+    color: $text-muted;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    &:first-child { margin-top: 0; }
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: $bg-3;
+    }
+  }
+
+  /* One message row: avatar in the gutter, sender/time/body stacked beside it */
+  .chat-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 4px 0;
+
+    /* Runs of messages from the same person collapse into one block */
+    &.is-continued {
+      margin-top: -4px;
+
+      .chat-avatar { visibility: hidden; }
+      .chat-msg-meta { display: none; }
+    }
+  }
+
+  .chat-avatar {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: $bg-0;
+    background: $text-muted;
+    user-select: none;
+
+    /* Deterministic per-sender tint, drawn from the site palette so the log
+       stays scannable without introducing off-theme colors. $accent is
+       reserved for the reader's own avatar, so it is not in this set. */
+    &.tint-1 { background: $teal; }
+    &.tint-2 { background: $green; }
+    &.tint-3 { background: $orange; }
+    &.tint-4 { background: $blue; }
+    &.tint-5 { background: $validation-focus-color; }
+  }
+
+  .chat-msg-main {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .chat-msg-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 1px;
+  }
+
+  .chat-msg.is-self {
+    .chat-msg-sender { color: $text; }
+    .chat-avatar { background: $accent; }
+  }
+
+  /* Empty state — centered, so an empty log doesn't read as a broken box */
+  .chat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 7em;
+    padding: 12px;
+    text-align: center;
+
+    i {
+      color: $text-muted;
+      font-size: 20px;
+      opacity: 0.6;
+      margin-bottom: 2px;
+    }
+
+    .chat-empty-title {
+      margin: 0;
+      color: $text;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .chat-empty-hint {
+      color: $text-muted;
+      font-size: 12px;
+    }
+  }
+
+  .chat-form {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid $bg-3;
+  }
+}
+
+/* ── Per-week chat (inside each week card) ────────────────────────── */
+.week-chat {
+  margin-top: 16px;
+  border: 1px solid $bg-3;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+
+  &[open] { border-color: rgba($accent, 0.4); }
+
+  .chat-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    list-style: none;
+    color: $text;
+    font-size: 13px;
+    transition: background 0.2s;
+
+    &::-webkit-details-marker { display: none; }
+
+    &:hover { background: rgba($text, 0.05); }
+
+    &:focus-visible {
+      outline: 2px solid $accent;
+      outline-offset: -2px;
+    }
+  }
+
+  .chat-summary-icon {
+    color: $accent;
+    font-size: 13px;
+  }
+
+  .chat-summary-title {
+    font-weight: 600;
+    color: $text;
+  }
+
+  .chat-status-pill { margin-left: 4px; }
+
+  .chat-summary-caret {
+    margin-left: auto;
+    color: $text-muted;
+    font-size: 11px;
+    transition: transform 0.2s;
+  }
+
+  &[open] .chat-summary-caret { transform: rotate(180deg); }
+
+  .chat-body {
+    padding: 12px;
+    border-top: 1px solid $bg-3;
+  }
+
+  .chat-messages { height: 14em; }
+
+  .chat-empty {
+    margin: 0;
+    padding: 4px 0;
+    color: $text-muted;
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* Compact bubbles — this widget is small and lives inside a week card */
+  .chat-msg {
+    margin: 0 0 8px 0;
+    padding: 8px 10px;
+    border: 1px solid $bg-3;
+    border-radius: 8px;
+    background: rgba($text, 0.03);
+    line-height: 1.45;
+    word-break: break-word;
+
+    &:last-child { margin-bottom: 0; }
+
+    &.is-self {
+      border-color: rgba($accent, 0.35);
+      background: rgba($accent, 0.08);
+    }
+  }
+
+  .chat-msg-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .announcement-chat {
+    .chat-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .chat-body { padding: 12px; }
+
+    .chat-messages { max-height: 18em; }
+
+    .chat-avatar {
+      width: 24px;
+      height: 24px;
+      font-size: 10px;
+    }
+  }
+
+  .week-chat {
+    .chat-messages { height: 12em; }
+
+    .chat-send span { display: none; }
+  }
+
+  .announcement-chat,
+  .week-chat {
+    .chat-send span { display: none; }
+  }
+}

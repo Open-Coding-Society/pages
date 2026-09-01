@@ -47,13 +47,37 @@ Example:
 - `ocs__btn medium alert-red fill`
 
 ## Compatibility Notes
-Legacy aliases still compile:
-- `ocs__btn--alert-red`
-- `ocs__btn--alert-yellow`
-- `ocs__btn--alert-green`
-- `ocs__btn--alert-fill`
-
+Legacy `ocs__btn--*` modifier aliases still compile.
 New code should prefer utility grammar above.
+
+## Runner Control Grammar
+
+Use these classes for standardized controls in CODE_RUNNER, UI_RUNNER, and GAME_RUNNER.
+
+### Runner Structure
+- `ocs__btn utility` base for square runner controls
+
+### Semantic Actions
+- `run`
+- `pause`
+- `stop`
+- `fullscreen`
+- `copy`
+- `save`
+- `clear`
+- `reset`
+- `copyOutput`
+
+Examples:
+- `ocs__btn utility run`
+- `ocs__btn utility pause`
+- `ocs__btn utility stop`
+- `ocs__btn utility fullscreen`
+- `ocs__btn utility copy`
+
+### Behavior Hook Convention
+- Prefer `data-hook` attributes for JavaScript targeting (for example `data-hook="run"`, `data-hook="copy"`, `data-hook="stop"`).
+- Keep visual semantics in classes (`utility`, `run`, `copy`, etc.).
 
 ## Drag and Drop Variant
 

@@ -146,3 +146,19 @@
   - "Gemini AI Grading"
   - "Jekyll / Liquid"
   - "JavaScript (Vanilla)"
+
+"Communication System":
+  - "Spring Boot / Java"
+  - "STOMP over SockJS"
+  - "REST /api/groups & /api/dm"
+  - "JPA + Amazon S3"
+  - "JWT Cookie Auth"
+  - "Jekyll Includes / Vanilla JS"
+  - "localStorage"
+
+"OCS Intelligence":
+  - "Qwen3.8 27B"
+  - "FlashAttention"
+  - "vLLM"
+  - "Distributed Inference"
+  - "Observability"
