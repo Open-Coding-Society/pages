@@ -62,16 +62,3 @@ The subject of this article is Jokes, likes (haha)  and dislike (boohoo).   User
     |    Objects      | 
     +-----------------+
 ```
-
-<table>
-    <tr>
-        <td><a href="{{site.baseurl}}/java/spring/anatomy">Anatomy</a></td>
-        <td><a href="{{site.baseurl}}/java/spring/jokes">Jokes</a></td>
-        <td><a href="{{site.baseurl}}/java/spring/intro">Intro</a></td>
-        <td><a href="{{site.baseurl}}/java/spring/ui">UI</a></td>
-        <td><a href="{{site.baseurl}}/java/spring/api">API</a></td>
-        <td><a href="{{site.baseurl}}/java/spring/jpa">JPA</a></td>
-        <td><a href="{{site.baseurl}}/java/spring/pojo">POJO</a></td>
-        <td><a href="{{site.baseurl}}/java/spring/hacks">Hacks</a></td>
-    </tr>
-</table>
