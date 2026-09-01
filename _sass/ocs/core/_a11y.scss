@@ -1,0 +1,118 @@
+// =============================================================================
+// OCS DESIGN SYSTEM — ACCESSIBILITY PRIMITIVES
+// =============================================================================
+// The existing codebase ships no visible keyboard focus style, no reduced-motion
+// handling, and no screen-reader-only utility. All three are required by the
+// "WCAG 2.1 AA" claim the design system makes about itself, so they live here
+// and are imported before any component.
+// =============================================================================
+
+@use "functions" as fn;
+
+// -----------------------------------------------------------------------------
+// FOCUS
+// -----------------------------------------------------------------------------
+// :focus-visible only — a mouse click should not draw a ring, but every
+// keyboard tab stop must. The ring is two-tone so it stays visible on both a
+// dark surface and a coloured button.
+@mixin focus-ring($offset: 2px) {
+  outline: 2px solid var(--ocs-accent);
+  outline-offset: $offset;
+  // Second ring in the surface colour guarantees separation when the element
+  // sits directly on an accent-coloured parent.
+  box-shadow: 0 0 0 #{$offset} var(--ocs-surface-base);
+}
+
+@mixin focusable($offset: 2px) {
+  &:focus { outline: none; }
+  &:focus-visible { @include focus-ring($offset); }
+}
+
+// -----------------------------------------------------------------------------
+// SCREEN-READER-ONLY
+// -----------------------------------------------------------------------------
+// Namespaced. A bare `.sr-only` would collide with Bootstrap, which the sibling
+// Spring app loads from a CDN.
+.ocs-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// Visible again on focus — for skip links.
+.ocs-sr-only--focusable:focus-visible {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
+// -----------------------------------------------------------------------------
+// SKIP LINK
+// -----------------------------------------------------------------------------
+.ocs-skip-link {
+  position: absolute;
+  top: fn.space(2);
+  left: fn.space(2);
+  z-index: fn.z(toast);
+  padding: fn.space(2) fn.space(4);
+  border-radius: var(--ocs-radius-md);
+  background: var(--ocs-accent);
+  color: var(--ocs-accent-contrast);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--ocs-duration-fast) var(--ocs-ease);
+
+  &:focus-visible {
+    transform: translateY(0);
+    @include focus-ring;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// REDUCED MOTION
+// -----------------------------------------------------------------------------
+// Scoped to OCS components only. A global `*` reset here would reach into
+// unrelated page scripts (the platformer game, the stack-clicker) that depend
+// on their own animations.
+@media (prefers-reduced-motion: reduce) {
+  [class*="ocs-"],
+  [class*="ocs-"]::before,
+  [class*="ocs-"]::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// FORCED COLORS (Windows High Contrast)
+// -----------------------------------------------------------------------------
+// Custom properties are ignored in forced-colors mode, so borders that were
+// carrying meaning must be restored from system colours.
+@media (forced-colors: active) {
+  .ocs-btn,
+  .ocs-input,
+  .ocs-select,
+  .ocs-textarea,
+  .ocs-card,
+  .ocs-alert {
+    border: 1px solid ButtonBorder;
+  }
+
+  .ocs-btn:focus-visible,
+  .ocs-input:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}

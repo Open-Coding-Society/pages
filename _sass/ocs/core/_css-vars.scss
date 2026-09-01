@@ -1,0 +1,209 @@
+// =============================================================================
+// OCS DESIGN SYSTEM — CSS CUSTOM PROPERTIES + RUNTIME THEME BRIDGE
+// =============================================================================
+// Emits every token as a `--ocs-*` custom property, then bridges to the theming
+// contract that already exists in this repo.
+//
+// WHY A BRIDGE EXISTS
+// -------------------
+// `_sass/open-coding/user-preferences.scss:3-22` already defines a runtime
+// theme contract on :root, and a JS preferences panel rewrites it live. The
+// most-consumed variable in the whole codebase is `--pref-accent-color`
+// (177 usages across _sass). Any new system that ignores it would be
+// overridden on every themed page, because that file applies its rules with
+// `!important` under `.user-theme-active` (user-preferences.scss:25-31).
+//
+// So the rule is:
+//   * By DEFAULT, OCS renders in its own contrast-verified coral palette.
+//   * When `.user-theme-active` is present, OCS re-points its interactive
+//     accent and surfaces at the user's chosen `--pref-*` values.
+//
+// CONTRAST CAVEAT
+// ---------------
+// Inside `.user-theme-active` the AA guarantees documented in _tokens.scss no
+// longer hold, because the user can pick any accent. That is inherent to
+// user-chosen theming. Brand marks keep the fixed coral so identity survives.
+// =============================================================================
+
+@use "sass:map";
+@use "tokens" as t;
+@use "functions" as fn;
+
+:root {
+  // --- surfaces ---------------------------------------------------------
+  --ocs-surface-base:     #{fn.surface(base)};
+  --ocs-surface-raised:   #{fn.surface(raised)};
+  --ocs-surface-elevated: #{fn.surface(elevated)};
+  --ocs-surface-overlay:  #{fn.surface(overlay)};
+
+  // --- text -------------------------------------------------------------
+  --ocs-text:           #{fn.text(primary)};
+  --ocs-text-secondary: #{fn.text(secondary)};
+  --ocs-text-muted:     #{fn.text(muted)};
+  --ocs-text-inverse:   #{fn.text(inverse)};
+
+  // --- brand (identity — deliberately NOT themeable) --------------------
+  @each $step, $value in t.$coral {
+    --ocs-coral-#{$step}: #{$value};
+  }
+  --ocs-brand:        #{fn.semantic(brand, fg)};
+  --ocs-brand-border: #{fn.semantic(brand, border)};
+  --ocs-brand-bg:     #{fn.semantic(brand, bg)};
+
+  // --- neutrals ---------------------------------------------------------
+  @each $step, $value in t.$neutral {
+    --ocs-neutral-#{$step}: #{$value};
+  }
+
+  // --- semantic roles ---------------------------------------------------
+  @each $role, $parts in t.$semantic {
+    --ocs-#{$role}:        #{map.get($parts, fg)};
+    --ocs-#{$role}-border: #{map.get($parts, border)};
+    --ocs-#{$role}-bg:     #{map.get($parts, bg)};
+  }
+
+  // --- interactive accent ----------------------------------------------
+  // Components reference this (not --ocs-brand) so a user theme can retarget
+  // interaction colour without disturbing brand marks.
+  --ocs-accent:         var(--ocs-brand);
+  --ocs-accent-border:  var(--ocs-brand-border);
+  --ocs-accent-bg:      var(--ocs-brand-bg);
+  // Declared literally in EVERY context, never as var(--ocs-text-inverse).
+  // A var() inside a custom property is substituted where the property is
+  // DECLARED, not where it is used -- so an indirection written here would
+  // resolve against :root and never pick up the .ocs-light override.
+  --ocs-accent-contrast: #{fn.text(inverse)};   // #121212 on coral #EA706E = 5.09:1
+
+  // --- borders ----------------------------------------------------------
+  // NOTE: the pre-existing `--ui-border: rgba(255,255,255,0.06)`
+  // (user-preferences.scss:15) measures well under the 3:1 WCAG requirement
+  // for UI component boundaries. These replacements are opaque and testable.
+  --ocs-border:        #{fn.neutral(800)};
+  --ocs-border-strong: #{fn.neutral(700)};
+  --ocs-border-subtle: #{fn.neutral(900)};
+
+  // --- radius -----------------------------------------------------------
+  @each $key, $value in t.$radius {
+    --ocs-radius-#{$key}: #{$value};
+  }
+
+  // --- spacing ----------------------------------------------------------
+  @each $key, $value in t.$space {
+    --ocs-space-#{$key}: #{$value};
+  }
+
+  // --- typography -------------------------------------------------------
+  // Falls back through --pref-font-family so a user font choice is honoured
+  // even outside .user-theme-active.
+  --ocs-font-sans: var(--pref-font-family, #{fn.font(sans)});
+  --ocs-font-mono: #{fn.font(mono)};
+
+  // --- elevation --------------------------------------------------------
+  --ocs-shadow-sm: #{fn.shadow(sm)};
+  --ocs-shadow-md: #{fn.shadow(md)};
+  --ocs-shadow-lg: #{fn.shadow(lg)};
+  --ocs-shadow-xl: #{fn.shadow(xl)};
+
+  // --- motion -----------------------------------------------------------
+  --ocs-duration-fast: #{fn.duration(fast)};
+  --ocs-duration-base: #{fn.duration(base)};
+  --ocs-duration-slow: #{fn.duration(slow)};
+  --ocs-ease:          #{fn.easing(standard)};
+
+  // --- focus ring -------------------------------------------------------
+  --ocs-focus-ring: 0 0 0 2px var(--ocs-surface-base), 0 0 0 4px var(--ocs-accent);
+}
+
+// -----------------------------------------------------------------------------
+// RUNTIME THEME BRIDGE
+// -----------------------------------------------------------------------------
+// Active only when the existing preferences engine has flagged the page.
+// Interactive accent and surfaces follow the user; brand marks do not.
+// color-mix() has to be feature-gated. A custom property whose value is invalid
+// at computed-value time does NOT fall back to the :root literal - it becomes the
+// guaranteed-invalid value, and every var() reading it collapses to transparent.
+// Measured: a themed surface rendered rgba(0,0,0,0) instead of #1C1C1E.
+// Gating the whole override means an unsupporting browser simply keeps the
+// contrast-verified :root palette, which is the correct degradation.
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  .user-theme-active {
+    --ocs-accent:        var(--pref-accent-color, var(--ocs-brand));
+    --ocs-accent-border: var(--pref-accent-color, var(--ocs-brand-border));
+    // 8%, not 18%. The accent is ALSO the text colour on this tint, so a
+    // stronger mix eats its own headroom: at 18% the current sidenav item
+    // measured 4.08:1 against the default #3b82f6 accent. 8% gives 4.67:1
+    // and the tint is still visible.
+    --ocs-accent-bg:     color-mix(in srgb, var(--pref-accent-color, #{fn.semantic(brand, fg)}) 8%, var(--pref-bg-color, #{fn.surface(base)}));
+
+    --ocs-surface-base:     var(--pref-bg-color, #{fn.surface(base)});
+    --ocs-surface-raised:   color-mix(in srgb, var(--pref-bg-color, #{fn.surface(base)}) 94%, var(--pref-text-color, #{fn.text(primary)}) 6%);
+    --ocs-surface-elevated: color-mix(in srgb, var(--pref-bg-color, #{fn.surface(base)}) 88%, var(--pref-text-color, #{fn.text(primary)}) 12%);
+
+    --ocs-text:           var(--pref-text-color, #{fn.text(primary)});
+    --ocs-text-secondary: color-mix(in srgb, var(--pref-text-color, #{fn.text(primary)}) 88%, transparent);
+    --ocs-text-muted:     color-mix(in srgb, var(--pref-text-color, #{fn.text(primary)}) 64%, var(--pref-bg-color, #{fn.surface(base)}));
+
+    --ocs-border:        color-mix(in srgb, var(--pref-text-color, #{fn.text(primary)}) 22%, var(--pref-bg-color, #{fn.surface(base)}));
+    --ocs-border-strong: color-mix(in srgb, var(--pref-text-color, #{fn.text(primary)}) 34%, var(--pref-bg-color, #{fn.surface(base)}));
+    --ocs-border-subtle: color-mix(in srgb, var(--pref-text-color, #{fn.text(primary)}) 12%, var(--pref-bg-color, #{fn.surface(base)}));
+  }
+}
+
+// -----------------------------------------------------------------------------
+// OPTIONAL LIGHT SURFACE SET
+// -----------------------------------------------------------------------------
+// Opt-in only. The OCS site is dark by default, so this is never applied
+// automatically — a page adds `.ocs-light` to a wrapper to invert locally.
+// Foreground values are re-solved for light backgrounds. NOTE: tools/contrast.py
+// gates only the three DARK surfaces. Light mode is gated by
+// tools/build-contrast-harness.py, which measures what actually paints in
+// all three theme contexts. Pointing this comment at contrast.py was a
+// dangling reference -- exactly the orphaned-generator pattern this system
+// exists to remove.
+.ocs-light {
+  --ocs-surface-base:     #FFFFFF;
+  --ocs-surface-raised:   #{fn.neutral(50)};
+  --ocs-surface-elevated: #{fn.neutral(100)};
+  --ocs-surface-overlay:  rgba(0, 0, 0, 0.45);
+
+  --ocs-text:           #121212;
+  --ocs-text-secondary: #{fn.neutral(800)};
+  // neutral-700, not 600: #6F6F74 measures 3.98:1 on the elevated light
+  // surface and fails AA. #59595D measures 5.55:1 there.
+  --ocs-text-muted:     #{fn.neutral(700)};
+  --ocs-text-inverse:   #FFFFFF;
+
+  --ocs-border:        #{fn.neutral(200)};
+  --ocs-border-strong: #{fn.neutral(300)};
+  --ocs-border-subtle: #{fn.neutral(100)};
+
+  // FULL semantic triplets, re-solved for light surfaces against the hardest
+  // one (#E5E5E9 elevated). Declaring only the `fg` third -- as this block
+  // originally did -- left every alert and badge carrying its DARK tint on a
+  // light page. Measured before the fix: alert body copy 1.44:1,
+  // badge--warning 1.78:1. Regenerate with tools/light-tokens.py.
+  --ocs-brand:        #AE4042;
+  --ocs-brand-border: #DF6564;
+  --ocs-brand-bg:     #FFEDEB;
+  --ocs-info:        #005ED9;
+  --ocs-info-border: #007AFF;
+  --ocs-info-bg:     #EDF0FF;
+  --ocs-success:        #007617;
+  --ocs-success-border: #00A237;
+  --ocs-success-bg:     #E8FCE8;
+  --ocs-warning:        #9B5300;
+  --ocs-warning-border: #CD7600;
+  --ocs-warning-bg:     #FFEEDB;
+  --ocs-danger:        #CA121B;
+  // #CA121B, not #FF453A: the solid danger button fills with this token and
+  // white-on-#FF453A measures 3.41:1. #CA121B gives white 5.81:1 and still
+  // clears the 3:1 UI threshold on the raised surface at 5.25:1.
+  --ocs-danger-border: #CA121B;
+  --ocs-danger-bg:     #FFEDE6;
+
+  --ocs-accent:          #AE4042;
+  --ocs-accent-border:   #DF6564;
+  --ocs-accent-bg:       #FFEDEB;
+  --ocs-accent-contrast: #FFFFFF;   // on accent #AE4042 = 5.81:1
+}
+

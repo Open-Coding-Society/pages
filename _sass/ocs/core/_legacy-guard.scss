@@ -1,0 +1,58 @@
+// =============================================================================
+// OCS DESIGN SYSTEM — LEGACY SPECIFICITY GUARD
+// =============================================================================
+// THE PROBLEM
+//
+// `_sass/open-coding/user-preferences.scss:166` declares:
+//
+//     .user-theme-active {
+//       input, select, textarea, button {
+//         background-color: var(--panel);
+//         border: 1px solid var(--pref-accent-color);
+//       }
+//     }
+//
+// which compiles to `.user-theme-active button` — specificity (0,1,1).
+// A plain `.ocs-btn` is (0,1,0). Legacy wins, with no `!important` involved.
+//
+// MEASURED CONSEQUENCE (Chrome, <body class="user-theme-active">):
+//
+//     .ocs-btn--primary   background rgb(11,18,32)   colour rgb(18,18,18)
+//                         contrast ratio 1.00:1  — completely invisible
+//
+// The button only appeared on hover, because `.ocs-btn:hover:not(:disabled)
+// :not([aria-disabled="true"])` is (0,4,0) and does outrank the legacy rule.
+//
+// WHY THE CUSTOM-PROPERTY BRIDGE DID NOT SAVE US
+//
+// core/_css-vars.scss re-points `--ocs-*` under `.user-theme-active`, but a
+// custom property only decides the VALUE of a declaration that actually wins
+// the cascade. Here the legacy `background-color` declaration wins outright,
+// so our `background: var(--btn-bg)` never applies at all. No amount of token
+// bridging fixes a selector-weight loss.
+//
+// WHY NOT @layer
+//
+// Backwards for this case. Unlayered styles beat layered ones, and the legacy
+// sheet is unlayered. Putting this system in a layer would make it lose harder.
+//
+// THE FIX
+//
+// Self-chain the block class to reach (0,2,0), which outranks (0,1,1) on class
+// count. This is the smallest escalation that wins — deliberately not
+// `!important`, so page authors can still override with a single extra class.
+//
+// Apply ONLY to components that legacy targets by element selector:
+// button, input, select, textarea.
+// =============================================================================
+
+// Emits the current block a second time, chained to itself.
+//
+//   .ocs-btn { @include outrank-legacy { background: red; } }
+//   -> .ocs-btn.ocs-btn { background: red; }
+//
+@mixin outrank-legacy {
+  &#{&} {
+    @content;
+  }
+}

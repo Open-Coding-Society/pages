@@ -1,0 +1,380 @@
+/*!
+ * OCS Design System -- GENERATED FILE, DO NOT EDIT
+ *
+ * Source:    _sass/ocs/
+ * Generator: _sass/ocs/tools/build.sh
+ * Rebuild:   bash _sass/ocs/tools/build.sh
+ *
+ * Hand-edits here are destroyed on the next build. Change the SCSS instead.
+ */
+:root {
+  --ocs-surface-base: #121212;
+  --ocs-surface-raised: #1C1C1E;
+  --ocs-surface-elevated: #2C2C2E;
+  --ocs-surface-overlay: rgba(0, 0, 0, 0.72);
+  --ocs-text: #FFFFFF;
+  --ocs-text-secondary: #E1E1E6;
+  --ocs-text-muted: #949498;
+  --ocs-text-inverse: #121212;
+  --ocs-coral-50: #FFD7D1;
+  --ocs-coral-100: #FFC8C2;
+  --ocs-coral-200: #FFAFAA;
+  --ocs-coral-300: #FF9490;
+  --ocs-coral-400: #F27A77;
+  --ocs-coral-500: #E06665;
+  --ocs-coral-600: #BA4C4C;
+  --ocs-coral-700: #9C3739;
+  --ocs-coral-800: #7F2228;
+  --ocs-coral-900: #630C17;
+  --ocs-brand: #EA706E;
+  --ocs-brand-border: #E06665;
+  --ocs-brand-bg: #3B2827;
+  --ocs-neutral-50: #F3F3F8;
+  --ocs-neutral-100: #E5E5E9;
+  --ocs-neutral-200: #CECED3;
+  --ocs-neutral-300: #B6B6BA;
+  --ocs-neutral-400: #9D9DA2;
+  --ocs-neutral-500: #8E8E93;
+  --ocs-neutral-600: #6F6F74;
+  --ocs-neutral-700: #59595D;
+  --ocs-neutral-800: #444448;
+  --ocs-neutral-900: #303033;
+  --ocs-brand: #EA706E;
+  --ocs-brand-border: #E06665;
+  --ocs-brand-bg: #3B2827;
+  --ocs-info: #5293FF;
+  --ocs-info-border: #007AFF;
+  --ocs-info-bg: #272B3F;
+  --ocs-success: #34C759;
+  --ocs-success-border: #34C759;
+  --ocs-success-bg: #283929;
+  --ocs-warning: #FF9F0A;
+  --ocs-warning-border: #FF9F0A;
+  --ocs-warning-bg: #423220;
+  --ocs-danger: #FF5E4D;
+  --ocs-danger-border: #FF453A;
+  --ocs-danger-bg: #412520;
+  --ocs-accent: var(--ocs-brand);
+  --ocs-accent-border: var(--ocs-brand-border);
+  --ocs-accent-bg: var(--ocs-brand-bg);
+  --ocs-accent-contrast: #121212;
+  --ocs-border: #444448;
+  --ocs-border-strong: #59595D;
+  --ocs-border-subtle: #303033;
+  --ocs-radius-none: 0;
+  --ocs-radius-sm: 4px;
+  --ocs-radius-md: 6px;
+  --ocs-radius-lg: 10px;
+  --ocs-radius-xl: 14px;
+  --ocs-radius-full: 999px;
+  --ocs-space-0: 0;
+  --ocs-space-1: 0.25rem;
+  --ocs-space-2: 0.5rem;
+  --ocs-space-3: 0.75rem;
+  --ocs-space-4: 1rem;
+  --ocs-space-5: 1.25rem;
+  --ocs-space-6: 1.5rem;
+  --ocs-space-8: 2rem;
+  --ocs-space-10: 2.5rem;
+  --ocs-space-12: 3rem;
+  --ocs-space-16: 4rem;
+  --ocs-font-sans: var(--pref-font-family, Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif);
+  --ocs-font-mono: Menlo, Monaco, Consolas, Roboto Mono, Ubuntu Mono, Liberation Mono, Courier New, monospace;
+  --ocs-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --ocs-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --ocs-shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --ocs-shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --ocs-duration-fast: 120ms;
+  --ocs-duration-base: 180ms;
+  --ocs-duration-slow: 280ms;
+  --ocs-ease: cubic-bezier(0.2, 0, 0, 1);
+  --ocs-focus-ring: 0 0 0 2px var(--ocs-surface-base), 0 0 0 4px var(--ocs-accent);
+}
+
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  .user-theme-active {
+    --ocs-accent: var(--pref-accent-color, var(--ocs-brand));
+    --ocs-accent-border: var(--pref-accent-color, var(--ocs-brand-border));
+    --ocs-accent-bg: color-mix(in srgb, var(--pref-accent-color, #EA706E) 8%, var(--pref-bg-color, #121212));
+    --ocs-surface-base: var(--pref-bg-color, #121212);
+    --ocs-surface-raised: color-mix(in srgb, var(--pref-bg-color, #121212) 94%, var(--pref-text-color, #FFFFFF) 6%);
+    --ocs-surface-elevated: color-mix(in srgb, var(--pref-bg-color, #121212) 88%, var(--pref-text-color, #FFFFFF) 12%);
+    --ocs-text: var(--pref-text-color, #FFFFFF);
+    --ocs-text-secondary: color-mix(in srgb, var(--pref-text-color, #FFFFFF) 88%, transparent);
+    --ocs-text-muted: color-mix(in srgb, var(--pref-text-color, #FFFFFF) 64%, var(--pref-bg-color, #121212));
+    --ocs-border: color-mix(in srgb, var(--pref-text-color, #FFFFFF) 22%, var(--pref-bg-color, #121212));
+    --ocs-border-strong: color-mix(in srgb, var(--pref-text-color, #FFFFFF) 34%, var(--pref-bg-color, #121212));
+    --ocs-border-subtle: color-mix(in srgb, var(--pref-text-color, #FFFFFF) 12%, var(--pref-bg-color, #121212));
+  }
+}
+.ocs-light {
+  --ocs-surface-base: #FFFFFF;
+  --ocs-surface-raised: #F3F3F8;
+  --ocs-surface-elevated: #E5E5E9;
+  --ocs-surface-overlay: rgba(0, 0, 0, 0.45);
+  --ocs-text: #121212;
+  --ocs-text-secondary: #444448;
+  --ocs-text-muted: #59595D;
+  --ocs-text-inverse: #FFFFFF;
+  --ocs-border: #CECED3;
+  --ocs-border-strong: #B6B6BA;
+  --ocs-border-subtle: #E5E5E9;
+  --ocs-brand: #AE4042;
+  --ocs-brand-border: #DF6564;
+  --ocs-brand-bg: #FFEDEB;
+  --ocs-info: #005ED9;
+  --ocs-info-border: #007AFF;
+  --ocs-info-bg: #EDF0FF;
+  --ocs-success: #007617;
+  --ocs-success-border: #00A237;
+  --ocs-success-bg: #E8FCE8;
+  --ocs-warning: #9B5300;
+  --ocs-warning-border: #CD7600;
+  --ocs-warning-bg: #FFEEDB;
+  --ocs-danger: #CA121B;
+  --ocs-danger-border: #CA121B;
+  --ocs-danger-bg: #FFEDE6;
+  --ocs-accent: #AE4042;
+  --ocs-accent-border: #DF6564;
+  --ocs-accent-bg: #FFEDEB;
+  --ocs-accent-contrast: #FFFFFF;
+}
+
+.ocs-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.ocs-sr-only--focusable:focus-visible {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
+.ocs-skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10001;
+  padding: 0.5rem 1rem;
+  border-radius: var(--ocs-radius-md);
+  background: var(--ocs-accent);
+  color: var(--ocs-accent-contrast);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--ocs-duration-fast) var(--ocs-ease);
+}
+.ocs-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--ocs-accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ocs-surface-base);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*=ocs-],
+  [class*=ocs-]::before,
+  [class*=ocs-]::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (forced-colors: active) {
+  .ocs-btn,
+  .ocs-input,
+  .ocs-select,
+  .ocs-textarea,
+  .ocs-card,
+  .ocs-alert {
+    border: 1px solid ButtonBorder;
+  }
+  .ocs-btn:focus-visible,
+  .ocs-input:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}
+.ocs-btn {
+  --btn-bg: var(--ocs-accent);
+  --btn-fg: var(--ocs-accent-contrast);
+  --btn-border: transparent;
+  --btn-bg-hover: color-mix(in srgb, var(--ocs-accent) 86%, #fff);
+  --btn-bg-active: color-mix(in srgb, var(--ocs-accent) 78%, #000);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.25rem;
+  padding-inline: 1rem;
+  border: 1px solid var(--btn-border);
+  border-radius: var(--ocs-radius-md);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+}
+.ocs-btn.ocs-btn {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid var(--btn-border);
+}
+.ocs-btn {
+  font-family: var(--ocs-font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--ocs-duration-fast) var(--ocs-ease), border-color var(--ocs-duration-fast) var(--ocs-ease), color var(--ocs-duration-fast) var(--ocs-ease);
+}
+.ocs-btn:focus {
+  outline: none;
+}
+.ocs-btn:focus-visible {
+  outline: 2px solid var(--ocs-accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--ocs-surface-base);
+}
+.ocs-btn:hover:not(:disabled):not([aria-disabled=true]) {
+  background: var(--btn-bg-hover);
+}
+.ocs-btn:active:not(:disabled):not([aria-disabled=true]) {
+  background: var(--btn-bg-active);
+}
+.ocs-btn:disabled, .ocs-btn[aria-disabled=true] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.ocs-btn svg,
+.ocs-btn .ocs-btn__icon {
+  flex: 0 0 auto;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+.ocs-btn--primary {
+  --btn-bg: var(--ocs-accent);
+  --btn-fg: var(--ocs-accent-contrast);
+  --btn-border: transparent;
+}
+.ocs-btn--secondary {
+  --btn-bg: transparent;
+  --btn-fg: var(--ocs-accent);
+  --btn-border: var(--ocs-accent-border);
+  --btn-bg-hover: var(--ocs-accent-bg);
+  --btn-bg-active: color-mix(in srgb, var(--ocs-accent-bg) 70%, #000);
+}
+.ocs-btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--ocs-text-secondary);
+  --btn-border: transparent;
+  --btn-bg-hover: var(--ocs-surface-elevated);
+  --btn-bg-active: var(--ocs-surface-raised);
+}
+.ocs-btn--ghost:hover:not(:disabled) {
+  color: var(--ocs-text);
+}
+.ocs-btn--danger {
+  --btn-bg: var(--ocs-danger-border);
+  --btn-fg: var(--ocs-text-inverse);
+  --btn-border: transparent;
+  --btn-bg-hover: color-mix(in srgb, var(--ocs-danger-border) 86%, #fff);
+  --btn-bg-active: color-mix(in srgb, var(--ocs-danger-border) 78%, #000);
+}
+.ocs-btn--sm {
+  height: 1.75rem;
+  padding-inline: 0.75rem;
+  font-size: 0.8125rem;
+  border-radius: var(--ocs-radius-sm);
+}
+.ocs-btn--lg {
+  height: 2.75rem;
+  padding-inline: 1.5rem;
+  font-size: 1rem;
+  border-radius: var(--ocs-radius-lg);
+}
+.ocs-btn--icon {
+  width: 2.25rem;
+  padding-inline: 0;
+}
+.ocs-btn--icon.ocs-btn--sm {
+  width: 1.75rem;
+}
+.ocs-btn--icon.ocs-btn--lg {
+  width: 2.75rem;
+}
+.ocs-btn--pill {
+  border-radius: var(--ocs-radius-full);
+}
+.ocs-btn--block {
+  display: flex;
+  width: 100%;
+}
+.ocs-btn[aria-busy=true] {
+  cursor: progress;
+  pointer-events: none;
+}
+.ocs-btn[aria-busy=true]::after {
+  content: "";
+  width: 0.875em;
+  height: 0.875em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: ocs-spin 0.6s linear infinite;
+}
+
+@media (pointer: coarse) {
+  .ocs-btn {
+    position: relative;
+  }
+  .ocs-btn::before {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
+@keyframes ocs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.ocs-btn-group {
+  display: inline-flex;
+}
+.ocs-btn-group .ocs-btn {
+  border-radius: 0;
+}
+.ocs-btn-group .ocs-btn:first-child {
+  border-start-start-radius: var(--ocs-radius-md);
+  border-end-start-radius: var(--ocs-radius-md);
+}
+.ocs-btn-group .ocs-btn:last-child {
+  border-start-end-radius: var(--ocs-radius-md);
+  border-end-end-radius: var(--ocs-radius-md);
+}
+.ocs-btn-group .ocs-btn:not(:first-child) {
+  margin-inline-start: -1px;
+}
+.ocs-btn-group .ocs-btn:focus-visible {
+  z-index: 1;
+}
