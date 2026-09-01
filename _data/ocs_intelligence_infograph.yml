@@ -2,6 +2,8 @@
 Title: "OCS Intelligence"
 Description: "Build shared AI infrastructure for Open Coding Society so every student can experiment, learn, and create with a capable language model regardless of their ability to pay for a subscription."
 
+Year: "2026-2027"
+
 Topics:
   - title: "Host & Serve an LLM"
     subtitle: "Turn specialized OCS hardware into a dependable inference service for programming and agentic workflows."
