@@ -2,7 +2,7 @@
 microblog: true
 toc: false
 layout: post
-title: Submissions Capstone
+title: OCS Submissions
 description: An umbrella capstone tracking three AP CSA groups' work on the assignment/submission system — assignment creator permissions, submission analytics, and AI grading.
 permalink: /capstone/submissions/
 courses: {'csa': {'week': 25}}
