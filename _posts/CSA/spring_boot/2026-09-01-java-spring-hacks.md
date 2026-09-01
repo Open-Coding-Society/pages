@@ -3,8 +3,8 @@ layout: post
 title: Java Spring Hacks
 description: A POJO is basis of the Spring framework, but also it is basis of Java and the AP CSA exam.
 permalink: /java/spring/hacks/
+courses: {'csa': {'week': 3}}
 categories: ['Java Spring']
-menu: nav/java_spring.html
 ---
 
 ## Hacks

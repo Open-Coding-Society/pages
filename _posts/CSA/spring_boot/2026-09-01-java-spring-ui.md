@@ -3,8 +3,8 @@ layout: post
 title: Frontend UI
 description: Fetching data from the Spring Boot backend API
 permalink: /java/spring/ui/
+courses: {'csa': {'week': 3}}
 categories: ['Java Spring']
-menu: nav/java_spring.html
 ---
 
 ### JavaScript Frontend UI
