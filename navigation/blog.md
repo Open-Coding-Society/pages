@@ -6,7 +6,7 @@ search_exclude: true
 permalink: /navigation/blogs/
 ---
 
-## Course Objectives
+## Course Objective
 
 - Review your course regularly to align with Sprint Objectives
 - Each section organizes content into focused sprints with specific timelines
