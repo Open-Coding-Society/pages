@@ -1,84 +1,65 @@
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
-
-  :root {
-    --fopl-green:      #023b0f;
-    --fopl-green-mid:  #0d5c1e;
-    --fopl-green-lite: #1a7a2e;
-    --fopl-green-pale: #e8f5eb;
-    --fopl-gold:       #c8a030;
-    --fopl-white:      #ffffff;
-    --fopl-bg:         #f4f8f4;
-    --fopl-text:       #1a1a1a;
-    --fopl-border:     rgba(2, 59, 15, 0.18);
-    --fopl-shadow:     0 2px 12px rgba(2, 59, 15, 0.12);
-  }
-
   .ment-ig *,
   .ment-ig *::before,
   .ment-ig *::after { box-sizing: border-box; }
 
   .ment-ig {
-    font-family: 'Lato', sans-serif;
-    color: #1a1a1a !important;
-    background: #f4f8f4;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #fff;
+    background: #000;
     width: 100vw;
     position: relative;
     left: 50%;
     margin-left: -50vw;
-    padding-bottom: 3rem;
+    padding-bottom: 4rem;
   }
 
   /* ── Hero ── */
   .ment-ig-hero {
-    background: #023b0f;
-    color: #fff !important;
     text-align: center;
-    padding: 56px 24px 48px;
-    border-bottom: 3px solid #c8a030;
+    padding: 64px 24px 52px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   .ment-ig-badge {
     display: inline-block;
-    padding: 5px 14px;
+    padding: 6px 18px;
     border-radius: 999px;
-    border: 1px solid rgba(200,160,48,0.6);
-    background: rgba(200,160,48,0.12);
-    color: #c8a030 !important;
+    border: 1px solid rgba(76,175,239,0.5);
+    background: rgba(76,175,239,0.1);
+    color: #4CAFEF;
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
 
   .ment-ig-hero h1 {
-    font-family: 'Cabin', sans-serif;
-    font-size: 2.4rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     margin: 0 0 6px;
-    color: #fff !important;
+    color: #fff;
     border: none;
-    text-transform: uppercase;
   }
 
   .ment-ig-sprint-label {
-    font-family: 'Cabin', sans-serif;
     font-size: 1rem;
     font-weight: 600;
-    color: #c8a030 !important;
+    color: #4CAFEF;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin: 0 0 14px;
+    margin: 0 0 16px;
   }
 
   .ment-ig-hero-sub {
     font-size: 1rem;
-    color: rgba(255,255,255,0.75) !important;
+    color: rgba(255,255,255,0.65);
     max-width: 640px;
-    margin: 0 auto 24px;
-    line-height: 1.6;
+    margin: 0 auto 28px;
+    line-height: 1.65;
   }
 
   .ment-ig-hero-meta {
@@ -88,18 +69,18 @@
     gap: 1.5rem;
     flex-wrap: wrap;
     font-size: 0.82rem;
-    color: rgba(255,255,255,0.7) !important;
+    color: rgba(255,255,255,0.55);
   }
 
   .ment-ig-status-live {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: 999px;
-    background: rgba(200,160,48,0.15);
-    border: 1px solid rgba(200,160,48,0.5);
-    color: #c8a030 !important;
+    background: rgba(76,175,239,0.12);
+    border: 1px solid rgba(76,175,239,0.4);
+    color: #4CAFEF;
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -110,15 +91,15 @@
     display: inline-block;
     width: 7px; height: 7px;
     border-radius: 50%;
-    background: #5dde7a;
-    box-shadow: 0 0 6px #5dde7a;
+    background: #4CAFEF;
+    box-shadow: 0 0 6px #4CAFEF;
   }
 
   /* ── Content Wrapper ── */
   .ment-ig-inner {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 32px;
   }
 
   /* ── Stats Row ── */
@@ -126,7 +107,7 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    margin-top: 2.5rem;
+    margin-top: 3rem;
   }
 
   @media (max-width: 720px) {
@@ -134,68 +115,69 @@
   }
 
   .ment-ig-stat {
-    background: #023b0f;
-    border-radius: 6px;
-    padding: 20px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 24px 16px;
     text-align: center;
   }
 
   .ment-ig-stat-value {
-    font-family: 'Cabin', sans-serif;
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 2.2rem;
+    font-weight: 800;
     display: block;
     line-height: 1;
-    margin-bottom: 6px;
-    color: #c8a030 !important;
+    margin-bottom: 8px;
+    color: #4CAFEF;
   }
 
   .ment-ig-stat-label {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    line-height: 1.35;
-    color: rgba(255,255,255,0.75) !important;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.55);
   }
 
   /* ── Main Card ── */
   .ment-ig-card {
-    background: #ffffff;
-    border: 1px solid rgba(2,59,15,0.18);
-    border-top: 4px solid #023b0f;
-    border-radius: 6px;
-    box-shadow: var(--fopl-shadow);
-    margin-top: 2.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    margin-top: 3rem;
     overflow: hidden;
   }
 
   .ment-ig-card-grid {
     display: grid;
-    grid-template-columns: 220px 1fr 1fr;
+    grid-template-columns: 240px 1fr 1fr;
   }
 
-  @media (max-width: 860px) {
+  @media (max-width: 900px) {
     .ment-ig-card-grid { grid-template-columns: 1fr; }
   }
 
+  /* Left visual column */
   .ment-ig-visual {
-    background: #023b0f;
-    padding: 28px 20px;
+    background: rgba(255,255,255,0.04);
+    border-right: 1px solid rgba(255,255,255,0.08);
+    padding: 32px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
   }
 
   .ment-ig-role-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    background: rgba(200,160,48,0.18);
-    border: 1px solid rgba(200,160,48,0.6);
-    color: #c8a030 !important;
+    background: rgba(76,175,239,0.15);
+    border: 1px solid rgba(76,175,239,0.5);
+    color: #4CAFEF;
     border-radius: 999px;
-    padding: 6px 14px;
+    padding: 8px 16px;
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -204,9 +186,9 @@
 
   .ment-ig-team {
     text-align: center;
-    color: rgba(255,255,255,0.85) !important;
-    font-size: 0.8rem;
-    line-height: 1.6;
+    color: rgba(255,255,255,0.65);
+    font-size: 0.82rem;
+    line-height: 1.7;
   }
 
   .ment-ig-team-label {
@@ -215,7 +197,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    opacity: 0.6;
+    color: rgba(255,255,255,0.4);
     margin-bottom: 4px;
   }
 
@@ -229,41 +211,52 @@
   .ment-ig-link-btn {
     display: block;
     text-align: center;
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 9px 12px;
+    border-radius: 999px;
     font-size: 0.78rem;
     font-weight: 700;
     text-decoration: none;
     letter-spacing: 0.04em;
-    transition: background 0.18s;
+    transition: background 0.18s, transform 0.18s;
   }
 
-  .ment-ig-link-btn.primary { background: #c8a030; color: #1a1a1a !important; }
-  .ment-ig-link-btn.primary:hover { background: #e0b63a; }
+  .ment-ig-link-btn:hover { transform: translateY(-1px); }
+
+  .ment-ig-link-btn.primary {
+    background: #007ACC;
+    color: #fff;
+  }
+  .ment-ig-link-btn.primary:hover { background: #0090ee; }
+
   .ment-ig-link-btn.secondary {
-    background: rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.9) !important;
-    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.12);
   }
-  .ment-ig-link-btn.secondary:hover { background: rgba(255,255,255,0.18); }
+  .ment-ig-link-btn.secondary:hover { background: rgba(255,255,255,0.15); }
 
+  /* Center & Right columns */
   .ment-ig-center {
-    padding: 28px 24px;
-    border-right: 1px solid rgba(2,59,15,0.18);
+    padding: 32px 28px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .ment-ig-right {
+    padding: 32px 28px;
   }
 
   .ment-ig-project-title {
-    font-family: 'Cabin', sans-serif;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #023b0f !important;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
     margin: 0 0 4px;
+    letter-spacing: -0.01em;
   }
 
   .ment-ig-subtitle {
-    font-size: 0.85rem;
-    color: #4a5a4a !important;
-    margin: 0 0 18px;
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.5);
+    margin: 0 0 22px;
     font-style: italic;
   }
 
@@ -272,23 +265,23 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #023b0f !important;
-    border-bottom: 2px solid #e8f5eb;
-    padding-bottom: 4px;
-    margin: 0 0 12px;
+    color: #4CAFEF;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 6px;
+    margin: 0 0 14px;
   }
 
-  .ment-ig-keypoints { list-style: none; padding: 0; margin: 0 0 20px; }
+  .ment-ig-keypoints { list-style: none; padding: 0; margin: 0 0 24px; }
 
   .ment-ig-keypoints li {
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    font-size: 0.85rem;
-    line-height: 1.55;
-    color: #1a1a1a !important;
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(2,59,15,0.10);
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.8);
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
   }
 
   .ment-ig-keypoints li:last-child { border-bottom: none; }
@@ -296,141 +289,125 @@
   .ment-ig-check {
     flex-shrink: 0;
     width: 18px; height: 18px;
-    background: #023b0f;
-    color: #fff !important;
-    border-radius: 50%;
+    background: rgba(76,175,239,0.2);
+    color: #4CAFEF;
+    border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem; font-weight: 900;
-    margin-top: 1px;
+    font-size: 0.65rem; font-weight: 900;
+    margin-top: 2px;
   }
 
   .ment-ig-tech-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
 
   .ment-ig-tech-tag {
-    padding: 3px 10px;
-    background: #e8f5eb;
-    color: #023b0f !important;
-    border: 1px solid rgba(2,59,15,0.2);
-    border-radius: 3px;
-    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
-
-  .ment-ig-right { padding: 28px 24px; }
 
   .ment-ig-about {
-    font-size: 0.88rem; line-height: 1.65;
-    color: #1a1a1a !important; margin: 0 0 22px;
+    font-size: 0.88rem; line-height: 1.7;
+    color: rgba(255,255,255,0.65); margin: 0 0 22px;
   }
 
-  .ment-ig-impact-list { list-style: none; padding: 0; margin: 0; }
+  .ment-ig-impact-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 
   .ment-ig-impact-item {
     display: flex; gap: 10px; align-items: flex-start;
     font-size: 0.84rem; line-height: 1.5;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(2,59,15,0.10);
-    color: #1a1a1a !important;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
   }
-
-  .ment-ig-impact-item:last-child { border-bottom: none; }
 
   .ment-ig-impact-dot {
     flex-shrink: 0; width: 6px; height: 6px;
-    border-radius: 50%; background: #c8a030; margin-top: 7px;
+    border-radius: 50%; background: #4CAFEF; margin-top: 7px;
   }
 
   /* ── Role Diagram ── */
   .ment-ig-role-diagram {
-    background: #fff;
-    border: 1px solid rgba(2,59,15,0.18);
-    border-top: 4px solid #c8a030;
-    border-radius: 6px;
-    padding: 28px 24px;
-    margin-top: 2.5rem;
-    box-shadow: var(--fopl-shadow);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-top: 3px solid #4CAFEF;
+    border-radius: 24px;
+    padding: 32px 28px;
+    margin-top: 3rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   }
 
   .ment-ig-role-diagram h2 {
-    font-family: 'Cabin', sans-serif;
-    font-size: 1.1rem; font-weight: 700;
-    color: #023b0f !important;
+    font-size: 1.1rem; font-weight: 800;
+    color: #fff;
     text-transform: uppercase; letter-spacing: 0.06em;
-    margin: 0 0 20px; padding-bottom: 8px;
-    border-bottom: 3px solid #c8a030;
+    margin: 0 0 24px; padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   .ment-ig-roles-row {
-    display: flex; gap: 16px; align-items: stretch; flex-wrap: wrap;
+    display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap;
   }
 
   .ment-ig-role-box {
-    flex: 1; min-width: 180px;
-    border-radius: 6px; padding: 18px 16px;
-  }
-
-  .ment-ig-role-box.student {
-    background: #f0f4f0; border: 1px solid rgba(2,59,15,0.2);
-  }
-
-  .ment-ig-role-box.teacher {
-    background: #e8f5eb; border: 1px solid rgba(2,59,15,0.3);
+    flex: 1; min-width: 160px;
+    border-radius: 16px; padding: 18px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
   }
 
   .ment-ig-role-box.mentor {
-    background: #fffdf0; border: 2px solid #c8a030; position: relative;
+    background: rgba(76,175,239,0.08);
+    border: 1.5px solid rgba(76,175,239,0.5);
+    position: relative;
   }
 
   .ment-ig-role-box.mentor::after {
     content: 'NEW';
     position: absolute; top: -10px; right: 12px;
-    background: #c8a030; color: #1a1a1a !important;
+    background: #4CAFEF; color: #000;
     font-size: 0.62rem; font-weight: 900; letter-spacing: 0.1em;
-    padding: 2px 7px; border-radius: 3px;
-  }
-
-  .ment-ig-role-box.admin {
-    background: #023b0f; border: 1px solid #023b0f;
+    padding: 2px 7px; border-radius: 4px;
   }
 
   .ment-ig-role-title {
-    font-family: 'Cabin', sans-serif;
-    font-size: 0.85rem; font-weight: 700;
+    font-size: 0.82rem; font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.07em;
-    margin: 0 0 10px;
+    margin: 0 0 10px; color: #fff;
   }
 
-  .ment-ig-role-box.student .ment-ig-role-title { color: #023b0f !important; }
-  .ment-ig-role-box.teacher .ment-ig-role-title { color: #023b0f !important; }
-  .ment-ig-role-box.mentor .ment-ig-role-title  { color: #c8a030 !important; }
-  .ment-ig-role-box.admin  .ment-ig-role-title  { color: #c8a030 !important; }
+  .ment-ig-role-box.mentor .ment-ig-role-title { color: #4CAFEF; }
 
   .ment-ig-role-perms {
     list-style: none; padding: 0; margin: 0;
-    font-size: 0.8rem; line-height: 1.7;
+    font-size: 0.78rem; line-height: 1.8;
+    color: rgba(255,255,255,0.6);
   }
 
-  .ment-ig-role-box.student .ment-ig-role-perms { color: #2a4a2a !important; }
-  .ment-ig-role-box.teacher .ment-ig-role-perms { color: #023b0f !important; }
-  .ment-ig-role-box.mentor  .ment-ig-role-perms { color: #4a3a00 !important; }
-  .ment-ig-role-box.admin   .ment-ig-role-perms { color: rgba(255,255,255,0.85) !important; }
+  .ment-ig-role-box.mentor .ment-ig-role-perms { color: rgba(76,175,239,0.85); }
 
   .ment-ig-role-arrow {
     display: flex; align-items: center;
-    color: #c8a030 !important;
-    font-size: 1.5rem; font-weight: 900;
+    color: rgba(255,255,255,0.25);
+    font-size: 1.2rem;
     flex-shrink: 0; padding: 0 4px; align-self: center;
   }
 
   /* ── Features Section ── */
-  .ment-ig-features-section { margin-top: 2.5rem; }
+  .ment-ig-features-section { margin-top: 3rem; }
 
   .ment-ig-section-header {
-    font-family: 'Cabin', sans-serif;
-    font-size: 1.1rem; font-weight: 700;
-    color: #023b0f !important;
+    font-size: 1.1rem; font-weight: 800;
+    color: #fff;
     text-transform: uppercase; letter-spacing: 0.06em;
-    margin: 0 0 1rem; padding-bottom: 8px;
-    border-bottom: 3px solid #023b0f;
+    margin: 0 0 1.25rem; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
   }
 
   .ment-ig-features-grid {
@@ -439,57 +416,67 @@
     gap: 16px;
   }
 
-  @media (max-width: 720px) { .ment-ig-features-grid { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 480px) { .ment-ig-features-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .ment-ig-features-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 500px) { .ment-ig-features-grid { grid-template-columns: 1fr; } }
 
   .ment-ig-feature-card {
-    background: #ffffff;
-    border: 1px solid rgba(2,59,15,0.18);
-    border-radius: 6px; padding: 18px 16px;
-    box-shadow: 0 2px 12px rgba(2,59,15,0.08);
-    transition: border-color 0.18s, box-shadow 0.18s;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 22px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   }
 
   .ment-ig-feature-card:hover {
-    border-color: #0d5c1e !important;
-    box-shadow: 0 4px 16px rgba(2,59,15,0.16);
+    border-color: rgba(76,175,239,0.4);
+    box-shadow: 0 8px 28px rgba(76,175,239,0.08);
+    transform: translateY(-2px);
   }
 
-  .ment-ig-feature-card.highlight { border-left: 4px solid #c8a030; }
+  .ment-ig-feature-card.highlight {
+    border-left: 3px solid #4CAFEF;
+    background: rgba(76,175,239,0.05);
+  }
 
-  .ment-ig-feature-icon { font-size: 1.6rem; margin-bottom: 8px; display: block; }
+  .ment-ig-feature-icon { font-size: 1.6rem; margin-bottom: 10px; display: block; }
 
   .ment-ig-feature-title {
-    font-family: 'Cabin', sans-serif;
-    font-size: 0.9rem; font-weight: 700;
-    color: #023b0f !important;
-    margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: 0.88rem; font-weight: 800;
+    color: #fff;
+    margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.04em;
   }
 
   .ment-ig-feature-desc {
-    font-size: 0.82rem; line-height: 1.5;
-    color: #1a1a1a !important; margin: 0;
+    font-size: 0.82rem; line-height: 1.6;
+    color: rgba(255,255,255,0.6); margin: 0;
   }
 
   .ment-ig-planned-badge {
     display: inline-block;
-    font-size: 0.68rem; font-weight: 700;
+    font-size: 0.65rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.1em;
-    color: #c8a030 !important; background: #fdf8ec;
-    border: 1px solid #c8a030; border-radius: 3px;
-    padding: 2px 8px; margin-bottom: 8px;
+    color: #4CAFEF;
+    background: rgba(76,175,239,0.1);
+    border: 1px solid rgba(76,175,239,0.35);
+    border-radius: 4px;
+    padding: 2px 8px; margin-bottom: 10px;
   }
 
   /* ── Footer ── */
   .ment-ig-footer {
-    background: #023b0f;
-    color: rgba(255,255,255,0.85) !important;
-    text-align: center; padding: 24px;
-    margin-top: 2.5rem; font-size: 0.85rem;
+    background: rgba(255,255,255,0.04);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.55);
+    text-align: center; padding: 28px;
+    margin-top: 3rem; font-size: 0.85rem;
   }
 
-  .ment-ig-footer a { color: #c8a030 !important; text-decoration: underline; }
-  .ment-ig-footer a:hover { color: #e0c050 !important; }
+  .ment-ig-footer a { color: #4CAFEF; text-decoration: underline; }
+  .ment-ig-footer a:hover { color: #7dcfff; }
+
+  /* hide default post header */
+  .post-header { display: none !important; }
 </style>
 
 <div class="ment-ig">
@@ -513,19 +500,19 @@
     <div class="ment-ig-stats">
       <div class="ment-ig-stat">
         <span class="ment-ig-stat-value">4</span>
-        <span class="ment-ig-stat-label">Roles in the system (Student, Teacher, Mentor, Admin)</span>
+        <span class="ment-ig-stat-label">Roles (Student, Teacher, Mentor, Admin)</span>
       </div>
       <div class="ment-ig-stat">
         <span class="ment-ig-stat-value">3</span>
-        <span class="ment-ig-stat-label">New pages shipped (mentor, support, troubleshooting)</span>
+        <span class="ment-ig-stat-label">New pages shipped this sprint</span>
       </div>
       <div class="ment-ig-stat">
         <span class="ment-ig-stat-value">2</span>
-        <span class="ment-ig-stat-label">Auth flows added (Google OAuth signup + verified reset)</span>
+        <span class="ment-ig-stat-label">Auth flows added (OAuth signup + verified reset)</span>
       </div>
       <div class="ment-ig-stat">
         <span class="ment-ig-stat-value">2</span>
-        <span class="ment-ig-stat-label">Full-stack repos (prodpages + CSA-Admin-OCS-spring)</span>
+        <span class="ment-ig-stat-label">Full-stack repos (prodpages + spring)</span>
       </div>
     </div>
 
@@ -560,23 +547,23 @@
             </li>
             <li>
               <span class="ment-ig-check">✓</span>
-              <span><strong>Mentor signup with Google OAuth</strong> — signup requires Google account verification; PUSD student accounts get immediate access, others await admin approval</span>
+              <span><strong>Google OAuth mentor signup</strong> — PUSD emails get immediate access; others await admin approval. Google Sign-In inline with the existing form</span>
             </li>
             <li>
               <span class="ment-ig-check">✓</span>
-              <span><strong>Mentor project dashboard</strong> (/mentor) — shows only the capstone projects a mentor is assigned to (scoped server-side), with real-time team chat via SockJS/STOMP WebSockets</span>
+              <span><strong>Mentor project dashboard</strong> (/mentor) — shows only assigned capstone groups (scoped server-side), with real-time team chat via SockJS/STOMP</span>
             </li>
             <li>
               <span class="ment-ig-check">✓</span>
-              <span><strong>"My Projects" nav link</strong> — appears in the navbar automatically when the logged-in user holds ROLE_MENTOR, following the same pattern as ROLE_TEACHER</span>
+              <span><strong>"My Projects" nav link</strong> — appears automatically when the logged-in user holds ROLE_MENTOR, following the same pattern as ROLE_TEACHER</span>
             </li>
             <li>
               <span class="ment-ig-check">✓</span>
-              <span><strong>OAuth + Student ID password reset</strong> — verified reset wizard on /support; JWT invalidated on password change; rate-limiting on reset tickets</span>
+              <span><strong>OAuth + Student ID password reset</strong> — verified wizard on /support; JWT invalidated on change; reset ticket creation rate-limited</span>
             </li>
             <li>
               <span class="ment-ig-check">✓</span>
-              <span><strong>GitHub ID validation</strong> — blocks 7-digit student IDs entered as GitHub usernames during signup, with live inline error feedback</span>
+              <span><strong>GitHub ID validation</strong> — blocks 7-digit student IDs entered as GitHub usernames at signup, with live inline error feedback</span>
             </li>
           </ul>
 
@@ -611,7 +598,7 @@
             </li>
             <li class="ment-ig-impact-item">
               <span class="ment-ig-impact-dot"></span>
-              <span>Real-time team chat lets mentors communicate with student teams between visits</span>
+              <span>Real-time chat lets mentors communicate with student teams between visits</span>
             </li>
             <li class="ment-ig-impact-item">
               <span class="ment-ig-impact-dot"></span>
@@ -632,7 +619,7 @@
       <h2>Role &amp; Permission Hierarchy</h2>
       <div class="ment-ig-roles-row">
 
-        <div class="ment-ig-role-box student">
+        <div class="ment-ig-role-box">
           <div class="ment-ig-role-title">Student</div>
           <ul class="ment-ig-role-perms">
             <li>View own grades</li>
@@ -644,7 +631,7 @@
 
         <div class="ment-ig-role-arrow">→</div>
 
-        <div class="ment-ig-role-box teacher">
+        <div class="ment-ig-role-box">
           <div class="ment-ig-role-title">Teacher</div>
           <ul class="ment-ig-role-perms">
             <li>All Student perms</li>
@@ -668,7 +655,7 @@
 
         <div class="ment-ig-role-arrow">→</div>
 
-        <div class="ment-ig-role-box admin">
+        <div class="ment-ig-role-box">
           <div class="ment-ig-role-title">Admin</div>
           <ul class="ment-ig-role-perms">
             <li>All role management</li>
@@ -695,49 +682,49 @@
         <div class="ment-ig-feature-card highlight">
           <span class="ment-ig-feature-icon">🗂️</span>
           <h3 class="ment-ig-feature-title">Mentor Project Dashboard</h3>
-          <p class="ment-ig-feature-desc">/mentor page lists only the capstone groups a mentor is assigned to (GET /api/groups scoped server-side). Clicking a project opens the existing group chat using the same SockJS/STOMP pattern as lesson chat.</p>
+          <p class="ment-ig-feature-desc">/mentor lists only the capstone groups a mentor is assigned to (GET /api/groups scoped server-side). Clicking a project opens the group chat using the same SockJS/STOMP pattern as lesson chat.</p>
         </div>
 
         <div class="ment-ig-feature-card highlight">
           <span class="ment-ig-feature-icon">🔒</span>
           <h3 class="ment-ig-feature-title">Google OAuth Mentor Signup</h3>
-          <p class="ment-ig-feature-desc">Signup triggers Google account verification before submitting. PUSD student emails get immediate access; all others wait for admin approval. Adds a Google Sign-In button inline with the existing form — no separate flow.</p>
+          <p class="ment-ig-feature-desc">Signup triggers Google account verification before submitting. PUSD student emails get immediate access; all others wait for admin approval. Google Sign-In added inline with the existing form.</p>
         </div>
 
         <div class="ment-ig-feature-card">
           <span class="ment-ig-feature-icon">🔗</span>
           <h3 class="ment-ig-feature-title">"My Projects" Nav Link</h3>
-          <p class="ment-ig-feature-desc">nav/homejava.html now shows a "My Projects" link when the account holds ROLE_MENTOR. The roles check was also hardened to guard against a null/missing roles array that would previously throw at login.</p>
+          <p class="ment-ig-feature-desc">nav/homejava.html shows "My Projects" when the account holds ROLE_MENTOR. The roles check was also hardened to guard against a null roles array that would previously throw at login.</p>
         </div>
 
         <div class="ment-ig-feature-card">
           <span class="ment-ig-feature-icon">🛠️</span>
           <h3 class="ment-ig-feature-title">OAuth + Student ID Password Reset</h3>
-          <p class="ment-ig-feature-desc">/support hosts a step-by-step reset wizard: verify Google account, confirm student ID, then set a new password. JWT tokens are invalidated immediately on change. Reset ticket creation is rate-limited to prevent abuse.</p>
+          <p class="ment-ig-feature-desc">/support hosts a step-by-step reset wizard: verify Google account, confirm student ID, set new password. JWT tokens invalidated immediately on change. Reset ticket creation is rate-limited.</p>
         </div>
 
         <div class="ment-ig-feature-card">
           <span class="ment-ig-feature-icon">✅</span>
           <h3 class="ment-ig-feature-title">GitHub ID Validation</h3>
-          <p class="ment-ig-feature-desc">Inline validation on the signup form rejects 7-digit numbers entered as GitHub usernames. Pattern check fires on every keystroke with an aria-live error span — no form submission needed to catch the mistake.</p>
+          <p class="ment-ig-feature-desc">Inline validation rejects 7-digit numbers entered as GitHub usernames. Pattern check fires on every keystroke with an aria-live error span — no form submission needed to catch the mistake.</p>
         </div>
 
         <div class="ment-ig-feature-card">
           <span class="ment-ig-feature-icon">🔐</span>
           <h3 class="ment-ig-feature-title">Password Complexity Enforcement</h3>
-          <p class="ment-ig-feature-desc">Reset wizard now enforces complexity rules before accepting a new password. Matches the requirements already in place at signup so there's one consistent policy across all credential flows.</p>
+          <p class="ment-ig-feature-desc">Reset wizard now enforces complexity rules before accepting a new password. Matches the requirements already in place at signup — one consistent policy across all credential flows.</p>
         </div>
 
         <div class="ment-ig-feature-card">
           <span class="ment-ig-feature-icon">📋</span>
           <h3 class="ment-ig-feature-title">Support &amp; Troubleshooting Pages</h3>
-          <p class="ment-ig-feature-desc">/support replaces the old buried submenu with a dedicated top-level tab. Separate troubleshooting setup guide added for common student environment issues, linked directly from the nav.</p>
+          <p class="ment-ig-feature-desc">/support replaces the old buried submenu with a dedicated top-level tab. A separate troubleshooting setup guide was added for common student environment issues, linked directly from nav.</p>
         </div>
 
         <div class="ment-ig-feature-card">
           <span class="ment-ig-feature-icon">💬</span>
           <h3 class="ment-ig-feature-title">Real-Time Team Chat</h3>
-          <p class="ment-ig-feature-desc">Mentor project view reuses the SockJS/STOMP WebSocket pattern from lesson_chat.html. Mentors send and receive messages in their assigned group's existing channel — no new chat infrastructure needed.</p>
+          <p class="ment-ig-feature-desc">Mentor project view reuses the SockJS/STOMP WebSocket pattern from lesson_chat.html. Mentors send and receive messages in their assigned group's existing channel — no new infrastructure needed.</p>
         </div>
 
       </div>
@@ -745,49 +732,49 @@
 
     <!-- Future Goals -->
     <div class="ment-ig-features-section">
-      <h2 class="ment-ig-section-header" style="border-bottom-color:#c8a030;color:#023b0f !important;">Future Goals</h2>
+      <h2 class="ment-ig-section-header" style="border-bottom-color:rgba(76,175,239,0.3);color:#4CAFEF;">Future Goals</h2>
       <div class="ment-ig-features-grid">
 
-        <div class="ment-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
           <span class="ment-ig-feature-icon">⬆️</span>
           <h3 class="ment-ig-feature-title">Admin Role Promotion UI</h3>
-          <p class="ment-ig-feature-desc">An admin-facing interface to approve pending mentor accounts and promote users from Student → Mentor or Mentor → Admin directly from the person management table, without needing API access.</p>
+          <p class="ment-ig-feature-desc">Admin-facing interface to approve pending mentor accounts and promote users from Student → Mentor or Mentor → Admin directly from the person management table, without needing API access.</p>
         </div>
 
-        <div class="ment-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
           <span class="ment-ig-feature-icon">📊</span>
           <h3 class="ment-ig-feature-title">Mentor Activity Dashboard</h3>
-          <p class="ment-ig-feature-desc">A summary view for mentors showing their recent messages, session dates, and student milestone progress across all assigned projects — giving context before each visit without asking the teacher.</p>
+          <p class="ment-ig-feature-desc">Summary view for mentors showing recent messages, session dates, and student milestone progress across all assigned projects — giving context before each visit without asking the teacher.</p>
         </div>
 
-        <div class="ment-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
           <span class="ment-ig-feature-icon">📅</span>
           <h3 class="ment-ig-feature-title">Mentor Visit Scheduling</h3>
           <p class="ment-ig-feature-desc">Calendar integration letting mentors book their own classroom visit slots. Blocks appear on the shared class calendar and trigger an email reminder to the student team 24 hours before.</p>
         </div>
 
-        <div class="ment-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
           <span class="ment-ig-feature-icon">📧</span>
           <h3 class="ment-ig-feature-title">Mentor Approval Notifications</h3>
-          <p class="ment-ig-feature-desc">When an admin approves a pending mentor account, the platform automatically emails onboarding instructions and a link to /mentor — removing the manual follow-up that currently falls on the teacher.</p>
+          <p class="ment-ig-feature-desc">When an admin approves a pending mentor account, the platform automatically emails onboarding instructions and a /mentor link — removing the manual follow-up that currently falls on the teacher.</p>
         </div>
 
-        <div class="ment-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
           <span class="ment-ig-feature-icon">🌐</span>
           <h3 class="ment-ig-feature-title">Public Mentor Directory</h3>
-          <p class="ment-ig-feature-desc">A browsable page listing active OCS mentors with their subject expertise and availability. Students and parents can request a mentor match directly, expanding the mentor pipeline beyond word-of-mouth.</p>
+          <p class="ment-ig-feature-desc">A browsable page listing active OCS mentors with their subject expertise and availability. Students and parents can request a mentor match directly, expanding the pipeline beyond word-of-mouth.</p>
         </div>
 
-        <div class="ment-ig-feature-card" style="border-left:4px solid #c8a030;">
+        <div class="ment-ig-feature-card" style="border-left:3px solid rgba(76,175,239,0.5);">
           <span class="ment-ig-planned-badge">Planned</span>
           <span class="ment-ig-feature-icon">📝</span>
           <h3 class="ment-ig-feature-title">Mentor Session Notes</h3>
-          <p class="ment-ig-feature-desc">Mentors can log structured notes after each visit (goals covered, blockers, next steps). Notes are visible to the teacher but not other students — creating a lightweight mentorship record per capstone team.</p>
+          <p class="ment-ig-feature-desc">Mentors can log structured notes after each visit — goals covered, blockers, next steps. Notes are visible to the teacher but not other students, creating a lightweight mentorship record per team.</p>
         </div>
 
       </div>
