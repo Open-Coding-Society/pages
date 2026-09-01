@@ -1138,8 +1138,40 @@ active_tab: profile
             const data = await response.json();
             currentUserClasses = data.class || [];
             renderClasses(currentUserClasses);
+            await syncClassGroupMemberships(currentUserClasses);
         } catch (error) {
             console.error('Error loading classes:', error);
+        }
+    }
+
+    // Keep the four course-group memberships aligned with the saved profile classes.
+    async function syncClassGroupMemberships(classes) {
+        const response = await fetch(`${javaURI}/api/groups/class-memberships`, {
+            ...fetchOptions,
+            method: 'PUT',
+            body: JSON.stringify({ classes })
+        });
+
+        if (!response.ok) {
+            let message = 'Failed to update course group membership';
+            try {
+                const error = await response.json();
+                if (error.error) message = error.error;
+            } catch (parseError) {
+                console.error('Unable to read group membership error:', parseError);
+            }
+            throw new Error(message);
+        }
+
+        return response.json();
+    }
+
+    async function syncClassGroupsAfterSave(classes) {
+        try {
+            await syncClassGroupMemberships(classes);
+        } catch (error) {
+            console.error('Class saved but group membership sync failed:', error);
+            alert(`Your class selection was saved, but group membership could not be updated: ${error.message}`);
         }
     }
 
@@ -1202,6 +1234,7 @@ active_tab: profile
             const data = await response.json();
             currentUserClasses = data.class || [];
             renderClasses(currentUserClasses);
+            await syncClassGroupsAfterSave(currentUserClasses);
             checkForChanges();
         } catch (error) {
             console.error('Error adding class:', error);
@@ -1231,6 +1264,7 @@ active_tab: profile
             const data = await response.json();
             currentUserClasses = data.class || [];
             renderClasses(currentUserClasses);
+            await syncClassGroupsAfterSave(currentUserClasses);
             checkForChanges();
         } catch (error) {
             console.error('Error removing class:', error);
@@ -1254,6 +1288,7 @@ active_tab: profile
             const data = await response.json();
             currentUserClasses = data.class || [];
             renderClasses(currentUserClasses);
+            await syncClassGroupsAfterSave(currentUserClasses);
             checkForChanges();
         } catch (error) {
             console.error('Error updating class:', error);
