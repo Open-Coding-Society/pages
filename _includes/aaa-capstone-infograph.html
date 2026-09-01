@@ -1,0 +1,386 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+.aaa-cap {
+  --ink: #0b0e11;
+  --surface: #14181c;
+  --surface-raised: #191e23;
+  --hairline: #262c31;
+  --signal: #37d67a;
+  --signal-soft: rgba(55, 214, 122, 0.12);
+  --deny: #4a5158;
+  --problem: #e2685a;
+  --problem-soft: rgba(226, 104, 90, 0.1);
+  --paper: #eeeae1;
+  --text: #d8dbdd;
+  --text-muted: #868d94;
+
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--sans);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem 3rem;
+  max-width: 860px;
+  margin: 0 auto;
+  border: 1px solid var(--hairline);
+}
+
+.aaa-cap * { box-sizing: border-box; }
+
+.aaa-cap .crumb {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: 1.75rem;
+  display: inline-block;
+}
+.aaa-cap .crumb:hover { color: var(--paper); }
+.aaa-cap .crumb b { color: var(--signal); font-weight: 600; }
+
+.aaa-cap .hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.25rem;
+}
+
+.aaa-cap h1 {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.6rem;
+  color: var(--paper);
+}
+
+.aaa-cap .copy-block {
+  margin-bottom: 2rem;
+}
+
+.aaa-cap .copy-block .eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.aaa-cap .copy-block p {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.65;
+  max-width: 62ch;
+  margin: 0 0 0.75rem;
+}
+.aaa-cap .copy-block p:last-child { margin-bottom: 0; }
+
+.aaa-cap .copy-block.is-problem {
+  border-left: 3px solid var(--problem);
+  background: var(--problem-soft);
+  border-radius: 0 0.6rem 0.6rem 0;
+  padding: 1rem 1.25rem;
+}
+.aaa-cap .copy-block.is-problem .eyebrow { color: var(--problem); }
+
+.aaa-cap .status-chip {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--signal);
+  background: var(--signal-soft);
+  border: 1px solid rgba(55, 214, 122, 0.35);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.aaa-cap .status-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--signal);
+  animation: aaa-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes aaa-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(55,214,122,0.5); }
+  50% { opacity: 0.55; box-shadow: 0 0 0 4px rgba(55,214,122,0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aaa-cap .status-chip .dot { animation: none; }
+}
+
+.aaa-cap .team-line {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 2.25rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--hairline);
+}
+.aaa-cap .team-line strong { color: var(--text); font-weight: 500; }
+
+.aaa-cap .matrix-label {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.9rem;
+}
+
+.aaa-cap .matrix-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--hairline);
+  border-radius: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.aaa-cap table.matrix {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.aaa-cap table.matrix th, .aaa-cap table.matrix td {
+  padding: 0.7rem 0.85rem;
+  text-align: center;
+  border-bottom: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+
+.aaa-cap table.matrix th {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  background: var(--surface-raised);
+}
+
+.aaa-cap table.matrix td:first-child, .aaa-cap table.matrix th:first-child {
+  text-align: left;
+  color: var(--text);
+  font-weight: 500;
+  background: var(--surface);
+  position: sticky;
+  left: 0;
+}
+
+.aaa-cap table.matrix tbody tr:last-child td { border-bottom: none; }
+
+.aaa-cap .allow { color: var(--signal); font-size: 1rem; }
+.aaa-cap .deny { color: var(--deny); font-size: 1rem; }
+
+.aaa-cap .matrix-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 2.25rem;
+}
+.aaa-cap .matrix-note .allow, .aaa-cap .matrix-note .deny { font-size: 0.78rem; }
+
+.aaa-cap .two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 640px) {
+  .aaa-cap .two-col { grid-template-columns: 1fr; }
+  .aaa-cap .hero { flex-direction: column; }
+}
+
+.aaa-cap .panel h3 {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 0.85rem;
+}
+
+.aaa-cap .panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aaa-cap .panel li {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.55;
+  padding: 0.35rem 0 0.35rem 1.1rem;
+  position: relative;
+}
+
+.aaa-cap .panel li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--text-muted);
+}
+
+.aaa-cap .footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.aaa-cap .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.aaa-cap .tag {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  border: 1px solid var(--hairline);
+  border-radius: 0.375rem;
+  padding: 0.3rem 0.55rem;
+}
+
+.aaa-cap .learn-more {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--paper);
+  text-decoration: none;
+  border-bottom: 1px solid var(--signal);
+  padding-bottom: 1px;
+}
+</style>
+
+<div class="aaa-cap">
+
+  <a href="/capstone/submissions/" class="crumb">OCS SUBMISSIONS &rsaquo; <b>AAA</b></a>
+
+  <div class="copy-block is-problem">
+    <p class="eyebrow">The problem</p>
+    <p>Only teachers and admins could make an assignment on this site. If a student wanted to run their own — for a club, a study group, or a peer project — they had no way to do it without asking an adult to create it and hand over control.</p>
+  </div>
+
+  <div class="hero">
+    <div>
+      <h1>Assignment Creator Permissions</h1>
+    </div>
+    <span class="status-chip"><span class="dot"></span>IN DEVELOPMENT</span>
+  </div>
+
+  <div class="copy-block">
+    <p class="eyebrow">Our goal</p>
+    <p>Let any student make their own assignment right on the website, and let that student manage it — grade it, edit it, add helpers — without ever needing to become a teacher or admin.</p>
+  </div>
+
+  <p class="team-line"><strong>Team</strong> &middot; Aneesh Deevi, Aditya Srivastava, Aaryav Lal</p>
+
+  <p class="matrix-label">Who can do what</p>
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Student</th>
+          <th>Peer Grader</th>
+          <th>Creator</th>
+          <th>Teacher</th>
+          <th>Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>View &amp; submit your own work</td>
+          <td class="allow">●</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+        </tr>
+        <tr>
+          <td>Suggest a grade (if assigned)</td>
+          <td class="deny">○</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+        </tr>
+        <tr>
+          <td>Give the final grade</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+        </tr>
+        <tr>
+          <td>Edit assignment details</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+        </tr>
+        <tr>
+          <td>Add or remove a co-creator</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="allow">●*</td><td class="deny">○</td><td class="allow">●</td>
+        </tr>
+        <tr>
+          <td>Delete the assignment</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="matrix-note">* A creator can't remove the assignment's last remaining creator — only an admin can do that, so an assignment is never left without an owner.</p>
+
+  <div class="copy-block">
+    <p class="eyebrow">What we changed</p>
+    <p>At first, our new "create an assignment" tool was stricter than the way teachers had always made one: it only allowed a few assignment types, one due-date format, and a cap on points. That wasn't fair, since teachers never had those limits — so we removed them. A student can now pick any type, any due date, and any point value, just like a teacher always could.</p>
+    <p>We also noticed the "All Submissions" tab only showed up for teachers and admins. We changed it so a student who creates an assignment sees that tab too — but only for the assignments they made, never anyone else's.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <h3>What shipped</h3>
+      <ul>
+        <li>Any signed-in student can create an assignment and becomes its owner</li>
+        <li>An owner can add other students as co-creators of the same assignment</li>
+        <li>Assignments made this way accept any type, due date, and point value — same as the older teacher-only workflow</li>
+        <li>The older "assignment: true" frontmatter workflow still runs untouched</li>
+        <li>The submissions page shows a creator a scoped "All Submissions" view of just their own assignments</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Why it's safe</h3>
+      <ul>
+        <li>Every rule in the table above is enforced on the server, not just hidden in the UI</li>
+        <li>Permission is re-checked at the moment of the edit, closing a gap where access revoked mid-request could slip through</li>
+        <li>Requests are checked against where they came from, blocking forged calls from outside the site</li>
+        <li>19 automated tests cover this, including one that tries to break it on purpose with two things happening at once</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-row">
+    <div class="tags">
+      <span class="tag">Java</span>
+      <span class="tag">Spring Boot</span>
+      <span class="tag">Spring Security</span>
+      <span class="tag">JPA / Hibernate</span>
+      <span class="tag">SQLite</span>
+    </div>
+    <a href="https://github.com/AAApages/AAAspring" class="learn-more" target="_blank" rel="noopener">Source →</a>
+  </div>
+
+</div>

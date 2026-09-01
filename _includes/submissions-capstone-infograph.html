@@ -1,0 +1,149 @@
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+.sub-cap {
+  --ink: #0b0e11;
+  --surface: #14181c;
+  --hairline: #262c31;
+  --signal: #37d67a;
+  --paper: #eeeae1;
+  --text: #d8dbdd;
+  --text-muted: #868d94;
+
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--sans);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2rem 2.75rem;
+  max-width: 860px;
+  margin: 0 auto;
+  border: 1px solid var(--hairline);
+}
+
+.sub-cap * { box-sizing: border-box; }
+
+.sub-cap .crumb {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-bottom: 1.75rem;
+  display: inline-block;
+}
+.sub-cap .crumb:hover { color: var(--paper); }
+.sub-cap .crumb b { color: var(--paper); font-weight: 600; }
+
+.sub-cap h1 {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 4.5vw, 2.5rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 1.75rem;
+  color: var(--paper);
+}
+
+.sub-cap .board-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 0.25rem 0.6rem;
+}
+
+.sub-cap .board {
+  border: 1px solid var(--hairline);
+  border-radius: 0.85rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.sub-cap .row {
+  padding: 1.15rem 1.25rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+}
+.sub-cap .row:last-child { border-bottom: none; }
+
+.sub-cap .row h3 {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--paper);
+  margin: 0 0 0.3rem;
+}
+
+.sub-cap .row .team {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+}
+
+.sub-cap .row p.desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 0.5rem;
+}
+
+.sub-cap .row .link {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--paper);
+  text-decoration: none;
+  border-bottom: 1px solid var(--signal);
+  white-space: nowrap;
+}
+
+.sub-cap .footnote {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+  padding: 0 0.25rem;
+}
+</style>
+
+<div class="sub-cap">
+
+  <a href="/capstone/" class="crumb">OCS CAPSTONES &rsaquo; <b>SUBMISSIONS</b></a>
+
+  <h1>Submissions</h1>
+
+  <p class="board-label">Sub-projects</p>
+
+  <div class="board">
+
+    <div class="row">
+      <h3>Assignment Creator Permissions</h3>
+      <p class="team">Aneesh Deevi &middot; Aditya Srivastava &middot; Aaryav Lal</p>
+      <p class="desc">Lets any signed-in student create and manage their own assignment, without needing a teacher or admin role.</p>
+      <a href="/capstone/AAA/" class="link">View project →</a>
+    </div>
+
+    <div class="row">
+      <h3>Submission Analytics</h3>
+      <p class="team">Team not yet assigned</p>
+      <p class="desc">Placeholder — this group's capstone work hasn't been submitted yet. This row will fill in once it's ready.</p>
+    </div>
+
+    <div class="row">
+      <h3>AI Grading</h3>
+      <p class="team">Team not yet assigned</p>
+      <p class="desc">Placeholder — this group's capstone work hasn't been submitted yet. This row will fill in once it's ready.</p>
+    </div>
+
+  </div>
+
+  <p class="footnote">Each sub-project keeps its own detail page.</p>
+
+</div>

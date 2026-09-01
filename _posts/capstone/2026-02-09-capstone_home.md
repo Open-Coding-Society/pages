@@ -306,6 +306,19 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
+   <!-- Submissions Capstone (umbrella issue: AAA, Submission Analytics, AI Grading) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url capstone/2026-08-31-submissions-capstone %}">
+           <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #06b6d4, #0f172a);">SUB</div>
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">Submissions Capstone</a></h3>
+           <p class="text-sm text-gray-700">Umbrella capstone covering three groups' work on the assignment/submission system: assignment creator permissions, submission analytics, and AI grading.</p>
+           <p class="text-xs text-gray-500 mt-2">Groups: Assignment Creator Permissions, Submission Analytics, AI Grading</p>
+       </div>
+   </div>
+
+
    <!-- Big Six & Code Hub -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url capstone/2026-03-04-big6-capstone %}">
