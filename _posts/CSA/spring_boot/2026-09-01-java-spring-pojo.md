@@ -1,35 +1,35 @@
 ---
 layout: post
 title: Plain Old Java Objects (POJO)
-description: Define a POJO, essentially an class with @Entity properties that enables it to be used with Spring Boot in the process of making a database.
+description: A short reference for defining a Spring data object and JPA entity.
 permalink: /java/spring/pojo/
 categories: ['Java Spring']
-courses: {'csa': {'week': 3}}
+courses: {'csa': {'week': 4}}
 ---
 
-### POJO Review
+## POJO and Entity
 
-> This code fragment shows power of Spring and Annotations to define a Model.  Using Spring, a little bit of POJO code, the Developer is enabling persistent data storage of a table in a database. It is left to student to search up each annotation for personal clarification beyond the comments below.
+Your data object begins as a Java class. Adding JPA annotations makes it persistable; Lombok removes routine accessor, mutator, and constructor code.
 
 ```java
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import javax.persistence.*;
-
-@Data  // Annotations to simplify writing code (ie constructors, setters)
-@NoArgsConstructor  // Builds zero argument constructor
-@AllArgsConstructor // Builds constructor for all agurments
-@Entity // Annotation to simplify creating an entity, which is a lightweight persistence domain object. Typically, an entity represents a table in a relational database, and each entity instance corresponds to a row in that table.
-public class Jokes {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class Data {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;  // Unique identifier
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(unique=true)
-    private String joke;  // The Joke
-
-    private int haha;  // Store joke likes
-    private int boohoo;  // Store joke jeers
+    private String name;
 }
 ```
+
+- `@Entity` maps the class to a database table.
+- `@Id` and `@GeneratedValue` define the primary key.
+- `@Data` generates getters, setters, `equals`, `hashCode`, and `toString`.
+
+Choose fields and relationships that model your own system object, then continue with the repository and controller references in [Java Spring Hacks]({{ site.baseurl }}/java/spring/hacks/).
+
+- [Project Lombok features](https://projectlombok.org/features/)
+- [Jakarta Persistence API](https://jakarta.ee/specifications/persistence/)

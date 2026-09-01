@@ -4,7 +4,7 @@ assignment: true
 title: Java Spring Hacks - Sprint 1 Final
 description: Full-stack project using Spring Boot API, JPA, and POJO backed by your OCS system ideation. Individual project, team integration.
 permalink: /java/spring/hacks/
-courses: {'csa': {'week': 4}}
+courses: {'csa': {'week': 3}}
 categories: ['Java Spring']
 ---
 
