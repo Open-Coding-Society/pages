@@ -9,7 +9,7 @@ description: Design-Based Research (DBR) capstone projects solving real-world pr
 courses: {'csse': {'week': 25}}
 type: capstone
 categories: Capstone
-permalink: /capstone/toolchain-trail-legacy/
+permalink: /capstone/
 sticky_rank: 1
 ---
 
