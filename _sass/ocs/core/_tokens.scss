@@ -1,0 +1,232 @@
+// =============================================================================
+// OCS DESIGN SYSTEM — DESIGN TOKENS
+// =============================================================================
+// The single source of truth for every value in the system.
+//
+// Every colour in this file was generated perceptually (CIELAB even lightness
+// steps) from the real OCS brand anchors and then verified against WCAG 2.1.
+// Do not hand-tweak a value here without re-running tools/contrast.py.
+//
+// Brand anchor  #E06665  sampled from assets/images/ocs-logo.png. It is the
+//                        exact RGB of 45,600 of the 92,903 non-transparent
+//                        pixels — 49.1% at alpha>0, or 57.8% of the fully
+//                        opaque ones. State the threshold; the bare figure
+//                        "55.2%" quoted earlier matched neither.
+// Palette anchors #007AFF / #34C759 / #FF9F0A / #FF453A come from
+//                        _sass/user-colors.scss (Apple system colours).
+//
+// Contrast contract, measured against the three dark surfaces
+// (#121212 base, #1C1C1E surface, #2C2C2E elevated):
+//   *-fg      >= 4.60:1 on ALL three surfaces  (WCAG AA normal text)
+//   *-border  >= 3.00:1 on surface             (WCAG AA UI component)
+//   *-fg on *-bg >= 4.60:1                     (text on its own tint)
+//   *-bg vs raised surface >= 1.18:1           (the tint is actually visible)
+//
+// Tints are deliberately LOW CHROMA (18% of the anchor's a/b in CIELAB) and
+// dark. A saturated tint reads as a solid colour block rather than a hint, and
+// the darker it is the more headroom the foreground has.
+// =============================================================================
+
+@use "sass:map";
+
+// -----------------------------------------------------------------------------
+// 1. NEUTRAL RAMP
+// -----------------------------------------------------------------------------
+// Perceptually even (L* 96 -> 20), anchored on #8E8E93 (Apple systemGray).
+// Monotonic: verified.
+$neutral: (
+  50:  #F3F3F8,   // L* 96.0
+  100: #E5E5E9,   // L* 91.0
+  200: #CECED3,   // L* 82.9
+  300: #B6B6BA,   // L* 74.2
+  400: #9D9DA2,   // L* 64.9
+  500: #8E8E93,   // L* 59.2  <- anchor
+  600: #6F6F74,   // L* 47.0
+  700: #59595D,   // L* 37.9
+  800: #444448,   // L* 29.0
+  900: #303033,   // L* 20.0
+);
+
+// -----------------------------------------------------------------------------
+// 2. BRAND RAMP (coral)
+// -----------------------------------------------------------------------------
+// Anchored on the logo colour #E06665 at its natural lightness step (500).
+// Monotonic: verified.
+$coral: (
+  50:  #FFD7D1,
+  100: #FFC8C2,
+  200: #FFAFAA,
+  300: #FF9490,
+  400: #F27A77,
+  500: #E06665,   // <- OCS logo coral
+  600: #BA4C4C,
+  700: #9C3739,
+  800: #7F2228,
+  900: #630C17,
+);
+
+// -----------------------------------------------------------------------------
+// 3. SURFACES
+// -----------------------------------------------------------------------------
+// Three elevation levels. `elevated` is the hardest background to sit text on,
+// so every foreground token is solved against it.
+$surface: (
+  base:     #121212,
+  raised:   #1C1C1E,
+  elevated: #2C2C2E,
+  overlay:  rgba(0, 0, 0, 0.72),
+);
+
+// -----------------------------------------------------------------------------
+// 4. SEMANTIC TRIPLETS
+// -----------------------------------------------------------------------------
+// Each role ships three values doing three different jobs:
+//   fg      text / icon colour            AA >= 4.5:1 on every surface
+//   border  outlines, rules, focus rings  >= 3:1 on raised surface
+//   bg      subtle tint block             its own fg passes AA on it
+//
+// Measured ratios are in the trailing comment as: fg@elevated / fg@bg
+$semantic: (
+  brand: (
+    fg:     #EA706E,   // 4.67 / 4.64
+    border: #E06665,
+    bg:     #3B2827,
+  ),
+  info: (
+    fg:     #5293FF,   // 4.63 / 4.64
+    border: #007AFF,
+    bg:     #272B3F,
+  ),
+  success: (
+    fg:     #34C759,   // 6.28 / 5.54
+    border: #34C759,
+    bg:     #283929,
+  ),
+  warning: (
+    fg:     #FF9F0A,   // 6.78 / 5.98
+    border: #FF9F0A,
+    bg:     #423220,
+  ),
+  danger: (
+    fg:     #FF5E4D,   // 4.62 / 4.61
+    border: #FF453A,
+    bg:     #412520,
+  ),
+);
+
+// -----------------------------------------------------------------------------
+// 5. TEXT
+// -----------------------------------------------------------------------------
+// `muted` is #949498 rather than the raw Apple #8E8E93 because #8E8E93 measures
+// 4.27:1 on the elevated surface and fails AA. #949498 measures 4.61:1.
+$text: (
+  primary:   #FFFFFF,   // 18.73 on base
+  secondary: #E1E1E6,   // 14.38 on base
+  muted:     #949498,   //  4.61 on elevated  (raised from #8E8E93, which failed)
+  inverse:   #121212,
+);
+
+// -----------------------------------------------------------------------------
+// 6. SPACING — 4px base grid
+// -----------------------------------------------------------------------------
+$space: (
+  0:  0,
+  1:  0.25rem,   //  4px
+  2:  0.5rem,    //  8px
+  3:  0.75rem,   // 12px
+  4:  1rem,      // 16px
+  5:  1.25rem,   // 20px
+  6:  1.5rem,    // 24px
+  8:  2rem,      // 32px
+  10: 2.5rem,    // 40px
+  12: 3rem,      // 48px
+  16: 4rem,      // 64px
+);
+
+// -----------------------------------------------------------------------------
+// 7. RADIUS
+// -----------------------------------------------------------------------------
+$radius: (
+  none: 0,
+  sm:   4px,
+  md:   6px,
+  lg:   10px,
+  xl:   14px,
+  full: 999px,
+);
+
+// -----------------------------------------------------------------------------
+// 8. TYPOGRAPHY
+// -----------------------------------------------------------------------------
+// The font stack mirrors --pref-font-family from
+// _sass/open-coding/user-preferences.scss:6 so a user theme swap stays coherent.
+$font: (
+  sans: (Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif),
+  mono: ("Menlo", "Monaco", "Consolas", "Roboto Mono", "Ubuntu Mono", "Liberation Mono", "Courier New", monospace),
+);
+
+// size / line-height / letter-spacing / weight
+$type: (
+  display: (3rem,     1.1,  -0.02em, 700),   // 48px
+  h1:      (2rem,     1.2,  -0.02em, 600),   // 32px
+  h2:      (1.5rem,   1.3,  -0.01em, 600),   // 24px
+  h3:      (1.25rem,  1.4,   0,      600),   // 20px
+  h4:      (1rem,     1.5,   0,      600),   // 16px
+  body:    (1rem,     1.6,   0,      400),   // 16px
+  small:   (0.875rem, 1.5,   0,      400),   // 14px
+  code:    (0.875rem, 1.5,   0,      400),   // 14px
+);
+
+// -----------------------------------------------------------------------------
+// 9. ELEVATION
+// -----------------------------------------------------------------------------
+$shadow: (
+  none: none,
+  sm:   (0 1px 2px rgba(0, 0, 0, 0.30)),
+  md:   (0 4px 12px rgba(0, 0, 0, 0.35)),
+  lg:   (0 10px 30px rgba(0, 0, 0, 0.45)),
+  xl:   (0 20px 50px rgba(0, 0, 0, 0.55)),
+);
+
+// -----------------------------------------------------------------------------
+// 10. Z-INDEX
+// -----------------------------------------------------------------------------
+// Matches the scale already used in _sass/open-coding/mixins/_variables.scss
+// so the new system cannot fight the old one at the same layer.
+$z: (
+  base:           1,
+  dropdown:       100,
+  sticky:         500,
+  fixed:          1000,
+  modal-backdrop: 9999,
+  modal:          10000,
+  toast:          10001,
+  // Highest: a tooltip describing a control inside a modal or a toast has to
+  // clear both of them.
+  tooltip:        10002,
+);
+
+// -----------------------------------------------------------------------------
+// 11. MOTION
+// -----------------------------------------------------------------------------
+$duration: (
+  fast: 120ms,
+  base: 180ms,
+  slow: 280ms,
+);
+
+$easing: (
+  standard: cubic-bezier(0.2, 0, 0, 1),
+  enter:    cubic-bezier(0, 0, 0, 1),
+  exit:     cubic-bezier(0.3, 0, 1, 1),
+);
+
+// -----------------------------------------------------------------------------
+// 12. BREAKPOINTS
+// -----------------------------------------------------------------------------
+// Same values as mixins/_variables.scss:47-49 — deliberately not re-invented.
+$breakpoint: (
+  mobile:  768px,
+  tablet:  1024px,
+  desktop: 1440px,
+);

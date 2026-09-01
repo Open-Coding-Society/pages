@@ -1,0 +1,55 @@
+// =============================================================================
+// OCS DESIGN SYSTEM — TOKEN ACCESSORS
+// =============================================================================
+// Typed getters over the token maps. Using these instead of reaching into the
+// maps directly means a typo fails the BUILD with a useful message rather than
+// silently emitting `null` into the stylesheet.
+//
+//   @use "../core/functions" as fn;
+//   color: fn.text(muted);
+//   padding: fn.space(3) fn.space(4);
+// =============================================================================
+
+@use "sass:map";
+@use "sass:list";
+@use "sass:meta";
+@use "tokens" as t;
+
+// Shared lookup with a loud failure mode.
+@function _get($map, $key, $label) {
+  @if not map.has-key($map, $key) {
+    @error "OCS: unknown #{$label} token `#{$key}`. Valid: #{map.keys($map)}.";
+  }
+  @return map.get($map, $key);
+}
+
+@function neutral($step)  { @return _get(t.$neutral, $step, "neutral"); }
+@function coral($step)    { @return _get(t.$coral,   $step, "coral"); }
+@function surface($key)   { @return _get(t.$surface, $key, "surface"); }
+@function text($key)      { @return _get(t.$text,    $key, "text"); }
+@function space($key)     { @return _get(t.$space,   $key, "space"); }
+@function radius($key)    { @return _get(t.$radius,  $key, "radius"); }
+@function shadow($key)    { @return _get(t.$shadow,  $key, "shadow"); }
+@function z($key)         { @return _get(t.$z,       $key, "z-index"); }
+@function duration($key)  { @return _get(t.$duration,$key, "duration"); }
+@function easing($key)    { @return _get(t.$easing,  $key, "easing"); }
+@function font($key)      { @return _get(t.$font,    $key, "font"); }
+@function breakpoint($key){ @return _get(t.$breakpoint, $key, "breakpoint"); }
+
+// Semantic triplets: role is brand|info|success|warning|danger,
+// part is fg|border|bg.
+@function semantic($role, $part: fg) {
+  $entry: _get(t.$semantic, $role, "semantic role");
+  @return _get($entry, $part, "semantic part `#{$role}`");
+}
+
+// Typography: returns one field of a type step.
+// field is size|line|tracking|weight.
+@function typo($step, $field: size) {
+  $entry: _get(t.$type, $step, "type step");
+  $index: map.get((size: 1, line: 2, tracking: 3, weight: 4), $field);
+  @if $index == null {
+    @error "OCS: unknown type field `#{$field}`. Valid: size, line, tracking, weight.";
+  }
+  @return list.nth($entry, $index);
+}
