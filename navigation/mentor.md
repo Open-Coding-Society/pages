@@ -7,7 +7,8 @@ show_reading_time: false
 menu: nav/homejava.html
 ---
 
-{% include nav/homejava.html %}
+<!-- The nav comes from the `menu:` front matter above, which _layouts/post.html renders.
+     Including it here as well rendered two navbars with duplicate element ids. -->
 
 <div class="mentor-page">
   <div id="mentor-loading" class="mentor-state">Loading your projects…</div>
