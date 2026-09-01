@@ -27,6 +27,7 @@ By the end of this assignment, you will:
 **Your assignment starts with ONE question:** *What data object from your ideation could be useful to OCS or your team?*
 
 Examples:
+
 - A **User** with profile, roles, permissions, and activity tracking
 - A **Project** with metadata, timeline, team assignments, and status
 - A **Resource** (course, tool, template) with categories, versions, and usage metrics
@@ -39,21 +40,30 @@ This object becomes your **POJO** → your **JPA Entity** → your **API endpoin
 
 You have two deployment patterns (your team will use one for N@tM):
 
-#### **Option A: Spring Boot API + GitHub Pages Frontend**
+#### **Option A: Spring Boot REST API + GitHub Pages Frontend**
+
 - **Backend:** Spring Boot running on `localhost:8585` with SQLite database
+- **API Endpoints:** `/api/data/*` — RESTful endpoints returning JSON
 - **Frontend:** Static GitHub Pages (HTML/CSS/JavaScript) in your portfolio repo
-- **Connection:** API calls from frontend to backend via `config.js` proxy
+- **Connection:** Fetch calls from frontend to `/api` backend via `config.js` proxy
+- **Security (Order 2):** CORS configuration allows cross-origin requests; stateless API
 - **Why:** Mirrors your Flask + GitHub Pages experience; leverages your portfolio repo
-- **Best for:** Showcase projects, portfolios, public-facing applications
+- **Best for:** Showcase projects, portfolios, public-facing applications, decoupled frontend/backend
 
-#### **Option B: Spring Boot API + Thymeleaf Admin Dashboard**
+#### **Option B: Spring Boot MVC + Thymeleaf Admin Dashboard**
+
 - **Backend:** Spring Boot with embedded Thymeleaf templates (server-side rendering)
-- **Frontend:** Admin pages served directly by Spring Boot
-- **Connection:** Forms POST to Spring endpoints; responses rendered server-side
-- **Why:** Simpler deployment; single JAR artifact; built-in CSRF protection
-- **Best for:** Internal tools, admin dashboards, CRUD applications
+- **MVC Endpoints:** `/mvc/data/*` — Controller routing serving HTML pages
+- **Frontend:** Admin pages served directly by Spring Boot (Thymeleaf templates)
+- **Connection:** HTML forms POST to `/mvc` endpoints; responses rendered server-side
+- **Security (Order 1):** Traditional session-based auth, CSRF tokens, same-origin only
+- **Why:** Simpler deployment; single JAR artifact; built-in CSRF protection; tighter security
+- **Best for:** Internal tools, admin dashboards, CRUD applications, monolithic architecture
 
-**Both options use the same POJO → JPA → API architecture.** The difference is frontend delivery.
+**Critical distinction:** Both use the same POJO → JPA architecture, but the endpoint prefix and security chain differ:
+
+- **Option A (`/api`):** Stateless REST, CORS-enabled, frontend/backend separation
+- **Option B (`/mvc`):** Stateful MVC, session-based, server-rendered HTML
 
 <table>
     <tr>
@@ -141,117 +151,173 @@ rm /volumes/sqlite.db
 
 ---
 
-### Phase 3: REST API Endpoint
+### Phase 3: Backend Endpoints (API or MVC)
 
-**Objective:** Expose your data object via HTTP endpoints using Spring Boot REST controller.
+**Objective:** Expose your data object via HTTP endpoints using Spring Boot controllers.
 
-**Your API will follow this pattern:**
+**Choose your endpoint pattern based on your architecture choice:**
+
+#### **If Option A (GitHub Pages Frontend):** Build `/api` REST Endpoints
+
+```text
+GET    /api/data              → Retrieve all data objects (JSON)
+GET    /api/data/{id}         → Retrieve one data object (JSON)
+POST   /api/data              → Create new data object (JSON request/response)
+PUT    /api/data/{id}         → Update existing data object (JSON)
+DELETE /api/data/{id}         → Delete data object
 ```
-GET    /api/data/{id}           → Retrieve one data object
-GET    /api/data               → Retrieve all data objects  
-POST   /api/data               → Create new data object
-PUT    /api/data/{id}          → Update existing data object
-DELETE /api/data/{id}          → Delete data object
+
+- Return JSON responses only
+- Use `@RestController` and `@CrossOrigin` for CORS support
+- Stateless (no session required)
+
+#### **If Option B (Thymeleaf Frontend):** Build `/mvc` MVC Endpoints
+
+```text
+GET    /mvc/data              → Display list of all data objects (HTML)
+GET    /mvc/data/{id}         → Display one data object details (HTML)
+GET    /mvc/data/new          → Display creation form (HTML)
+POST   /mvc/data              → Process form submission, create data object
+GET    /mvc/data/{id}/edit    → Display edit form (HTML)
+POST   /mvc/data/{id}         → Process form submission, update data object
+POST   /mvc/data/{id}/delete  → Delete data object
 ```
+
+- Return HTML responses (rendered Thymeleaf templates)
+- Use `@Controller` (not `@RestController`)
+- Session-based with CSRF tokens in forms
+- Redirect after POST (POST-Redirect-GET pattern)
 
 **Tasks:**
 
+#### **If Option A (REST API):**
+
 1. **Build REST Controller** (`@RestController`)
    - Create `DataController` (replace "Data" with your entity name)
-   - Define endpoints for GET, POST, PUT (minimum required)
-   - Use `@GetMapping`, `@PostMapping`, `@PutMapping` annotations
+   - Annotate with `@RestController` and `@CrossOrigin` (for GitHub Pages CORS)
+   - Define endpoints with `@GetMapping`, `@PostMapping`, `@PutMapping`, `@DeleteMapping`
    - Return JSON responses with proper HTTP status codes (200, 201, 404, 500)
+   - Example: `@RestController @CrossOrigin @RequestMapping("/api/data")`
 
 2. **Build JPA Repository** (extend `JpaRepository`)
-   - Create a repository interface for your OCS entity
+   - Create a repository interface for your data entity
    - Extend `JpaRepository<YourEntity, Long>`
    - Add custom query methods if needed (e.g., `findByName(String name)`)
    - Leverage Spring Data JPA to handle common CRUD operations
 
 3. **Test with Postman**
    - [Postman API Testing Guide](https://www.geeksforgeeks.org/basics-of-api-testing-using-postman/)
-   - Create requests for each endpoint (GET all, GET by ID, POST, PUT)
-   - Use `localhost:8585` as your base URL
+   - Create requests for each endpoint (GET all, GET by ID, POST, PUT, DELETE)
+   - Use `localhost:8585/api/data` as your base URL
    - **Save your Postman collection** — this is part of your deliverable
    - Include example JSON payloads and responses
 
-4. **Blog deliverable: "REST API & Testing"**
-   - Document each endpoint (URL, method, parameters, response)
-   - Show Postman request/response screenshots for each operation
-   - Explain the controller code: how `@GetMapping`, `@PostMapping` work
+#### **If Option B (MVC with Thymeleaf):**
+
+1. **Build MVC Controller** (`@Controller`)
+   - Create `DataController` (replace "Data" with your entity name)
+   - Annotate with `@Controller` (NOT `@RestController`)
+   - Define endpoints with `@GetMapping` and `@PostMapping`
+   - Return template names (Thymeleaf will render HTML)
+   - Example: `@Controller @RequestMapping("/mvc/data")`
+
+2. **Build JPA Repository** (extend `JpaRepository`)
+   - Create a repository interface for your data entity
+   - Extend `JpaRepository<YourEntity, Long>`
+   - Add custom query methods if needed
+   - Inject into controller with `@Autowired`
+
+3. **Build Thymeleaf Templates** (`src/main/resources/templates/data/`)
+   - Create templates: `list.html`, `detail.html`, `form.html`
+   - Use Thymeleaf expressions: `th:value="${data.name}"`, `th:each`, `th:if`
+   - Include CSRF token in forms: `<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />`
+   - Use forms to submit POST requests to `/mvc/data` endpoints
+
+4. **Test with Browser**
+   - Navigate to `localhost:8585/mvc/data`
+   - Click through list → detail → edit form → delete
+   - Verify form submissions work and redirect properly
+   - Check browser DevTools for CSRF tokens in form data
+
+5. **Blog deliverable: "Backend Implementation & Testing"**
+
+   - Document your chosen endpoint pattern (`/api` or `/mvc`)
+   - Explain controller code: request mapping, method signatures, return types
+   - **For REST API:** Show Postman screenshots for each endpoint
+   - **For MVC:** Show browser screenshots of form workflows
    - Explain the repository: how Spring Data JPA auto-generates queries
-   - Share your Postman collection (export as JSON)
-   - Discuss error handling: What happens when you request a non-existent ID?
+   - Discuss error handling: What happens on edge cases?
+   - Compare REST vs MVC: Why did you choose your option?
 
 ---
 
-### Phase 4: Frontend Implementation (Choose One)
+### Phase 4: Frontend Implementation
 
-**You now connect your frontend to the Spring Boot API from Phase 3.**
+**The frontend differs based on your architecture choice from Phase 3.**
 
-#### **Option A: GitHub Pages Frontend (Recommended for Portfolio)**
+#### **Option A: GitHub Pages Frontend (Additional Work)**
 
-Your portfolio website calls your Spring Backend.
+Your portfolio website fetches data from your Spring `/api` backend.
 
 **Tasks:**
 
-1. **Create frontend form** in your GitHub Pages portfolio repo
-   - HTML form or button interface for your OCS object
+1. **Create frontend page** in your GitHub Pages portfolio repo
+   - HTML form or interface for your data object
    - "Minimal typing" philosophy — mostly buttons and dropdowns
-   - Form should support:
+   - Page should support:
      - **Read:** Display list of all objects, view details of one object
-     - **Create/Update:** Form to add or modify an OCS object
-     - Fetch data from API on page load
-     - Submit form to API via `fetch()` or axios
+     - **Create/Update:** Form to add or modify data
+     - Fetch data from `/api/data` endpoint on page load
+     - Submit form to `/api/data` endpoints via `fetch()` or axios
 
 2. **Use config.js for backend URL**
-   - Define your Spring API URL in a central config file
+   - Define your Spring API URL in a central config file:
+
+     ```javascript
+     const API_BASE_URL = "http://localhost:8585/api/data";
+     ```
+
    - This allows easy migration: change one line when team deploys backend
 
 3. **Implement Read & Update operations**
-   - **Read:** `GET /api/ocs` → fetch all; `GET /api/ocs/{id}` → fetch one
-   - **Update:** `PUT /api/ocs/{id}` → update existing
+   - **Read:** `GET /api/data` → fetch all; `GET /api/data/{id}` → fetch one
+   - **Create:** `POST /api/data` → submit form data
+   - **Update:** `PUT /api/data/{id}` → update existing object
    - Handle async responses (promise chains or async/await)
    - Display results in your page (table, list, card layout)
-   - Show errors gracefully
+   - Show errors gracefully to user
 
-4. **Blog deliverable: "Full-Stack GitHub Pages Frontend"**
+4. **Blog deliverable: "GitHub Pages Frontend Integration"**
    - Screenshot your frontend interface
-   - Explain how frontend calls the API (fetch vs. axios)
-   - Show your `config.js` setup
-   - Demonstrate the flow: click button → API call → display response
+   - Explain how frontend calls the `/api` endpoints (fetch vs. axios)
+   - Show your `config.js` setup and why it matters
+   - Demonstrate the flow: click button → fetch call → display response
    - Link to your GitHub Pages frontend
-   - Discuss CORS considerations (if applicable)
+   - Discuss CORS: How does GitHub Pages frontend talk to Spring backend?
 
-#### **Option B: Thymeleaf Admin Dashboard**
+#### **Option B: Thymeleaf MVC (Already Complete)**
 
-Your Spring Boot application serves both API and admin pages.
+**You already built your frontend in Phase 3!** The Thymeleaf templates ARE your frontend.
 
-**Tasks:**
+**Tasks for Phase 4 (Blog Only):**
 
-1. **Create Thymeleaf templates** in `src/main/resources/templates`
-   - HTML forms for CRUD operations on your OCS object
-   - Thymeleaf variable bindings: `th:value="${object.name}"`, `th:each`, etc.
-   - Form actions POST to your Spring endpoints
-
-2. **Create admin controller** (`@Controller`) separate from REST controller
-   - Render Thymeleaf templates for GET requests
-   - Redirect after POST/PUT (POST-Redirect-GET pattern)
-   - Pass model data to templates
-
-3. **Implement Read & Update pages**
-   - **List page:** Display all OCS objects in a table
-   - **Detail page:** Show one OCS object's details
-   - **Form page:** Create/edit OCS object with form submission
-   - Add delete button (confirm before deleting)
-
-4. **Blog deliverable: "Full-Stack Thymeleaf Admin Dashboard"**
-   - Screenshot admin pages
-   - Show Thymeleaf template code and explain bindings
-   - Explain controller logic (routing, model binding)
-   - Demonstrate CRUD operations in action
-   - Discuss server-side rendering advantages
-   - Link to deployed admin dashboard
+1. **Blog deliverable: "Full-Stack MVC Application"**
+   - Document your complete architecture: POJO → JPA → MVC Controller → Thymeleaf Templates
+   - Show screenshots of each page:
+     - List view (`/mvc/data`): Display all data objects in table
+     - Detail view (`/mvc/data/{id}`): Show one object's full details
+     - Edit form (`/mvc/data/{id}/edit`): Form for updating
+     - Confirmation/success messages after POST submissions
+   - Explain your controller code:
+     - How `@Controller` routes requests differently from `@RestController`
+     - Model binding: How data flows from controller → template
+     - Redirect pattern: Why `POST /mvc/data` redirects to `GET /mvc/data`
+   - Explain your Thymeleaf templates:
+     - Variable expressions (`th:value`, `th:text`, `th:each`)
+     - CSRF token handling: Why it's required and how it works
+     - Form structure: How Thymeleaf forms POST to your controller
+   - Compare MVC vs REST API: Why you chose the monolithic approach
+   - Discuss security: How server-side rendering provides CSRF protection automatically
 
 ---
 
@@ -292,17 +358,18 @@ Your Spring Boot application serves both API and admin pages.
 
 ## Technical Requirements Summary
 
-| Requirement | Details |
-|---|---|
-| **POJO** | Represents your data object; includes Lombok annotations |
-| **JPA Entity** | Mapped to SQLite table; auto-created by Spring |
-| **Repository** | Extends `JpaRepository<T, Long>` for CRUD operations |
-| **REST Controller** | At least 5 endpoints: GET all, GET by ID, POST, PUT, DELETE |
-| **HTTP Testing** | Postman collection with example requests/responses |
-| **Frontend** | GitHub Pages form (Option A) OR Thymeleaf dashboard (Option B) |
-| **Read/Update Ops** | Fetch data from API and update database via API |
-| **Blog Documentation** | 4 posts minimum: POJO, Database, API, Frontend |
-| **Portfolio Evidence** | Links to code repo, Postman collection, blog posts, deployed frontend |
+| Requirement | Option A (REST API) | Option B (MVC) |
+|---|---|---|
+| **POJO** | Represents your data object; includes Lombok annotations | (same) |
+| **JPA Entity** | Mapped to SQLite table; auto-created by Spring | (same) |
+| **Repository** | Extends `JpaRepository<T, Long>` for CRUD operations | (same) |
+| **Endpoints** | `/api/data/*` — 5 REST endpoints returning JSON | `/mvc/data/*` — MVC endpoints serving HTML |
+| **Controller** | `@RestController` with `@CrossOrigin` | `@Controller` returning template names |
+| **HTTP Testing** | Postman collection (automated testing) | Browser workflow (manual testing) |
+| **Security Chain** | Order 2 (Lower) — Stateless, CORS-based | Order 1 (Higher) — Session-based, CSRF tokens |
+| **Frontend** | GitHub Pages (separate) calls `/api` endpoints | Thymeleaf templates served by Spring (integrated) |
+| **Read/Update Ops** | JavaScript fetch calls to `/api/data` | HTML forms POST to `/mvc/data` |
+| **Blog Documentation** | 5 posts: POJO, Database, API, GitHub Pages Frontend, Architecture | 5 posts: POJO, Database, MVC Architecture, Templates, Security |
 
 ---
 
@@ -347,6 +414,66 @@ You've already done this with **Flask + GitHub Pages**. Spring is the enterprise
 
 ---
 
+## Architecture Deep Dive: API vs MVC Security
+
+This is where your architectural choice matters most. The security chain (Order 1 vs Order 2) fundamentally changes how your application works.
+
+### REST API Architecture (`/api` - Option A)
+
+**Security Chain (Order 2 - Lower precedence):**
+
+- Stateless authentication (no sessions)
+- CORS validation for cross-origin requests
+- Often: Bearer token or API key authentication
+- No CSRF tokens (stateless = CSRF not applicable)
+
+**Flow:**
+
+```text
+GitHub Pages (https://yourname.github.io)
+   ↓ fetch("http://localhost:8585/api/data")
+Spring @RestController (@CrossOrigin)
+   ↓ CORS check: origin allowed?
+   ↓ Return JSON response
+GitHub Pages receives JSON and renders
+```
+
+**Benefit:** Clean separation; your frontend and backend are independent microservices. Easy for team to split work: frontend dev vs backend dev.
+
+### MVC Architecture (`/mvc` - Option B)
+
+**Security Chain (Order 1 - Higher precedence):**
+
+- Session-based authentication (HttpSession)
+- CSRF token validation (same-origin only)
+- Form-based login/logout
+- Tighter coupling of frontend & backend
+
+**Flow:**
+
+```text
+Browser → GET /mvc/data
+   ↓ Spring Session created (JSESSIONID cookie)
+Spring @Controller renders Thymeleaf template
+   ↓ Thymeleaf inserts CSRF token in form
+Browser displays HTML form with CSRF token
+   ↓ User submits form (POST /mvc/data)
+Spring validates CSRF token
+   ↓ Process form, update database
+Spring redirects to GET /mvc/data (fresh list)
+Browser displays updated page
+```
+
+**Benefit:** Everything in one JAR; automatic CSRF protection; simpler deployment. Better for admin dashboards where UI and logic are tightly coupled.
+
+### Why This Matters for Your Project
+
+- **Choose Option A if:** You want your portfolio frontend independent (show separation of concerns to employers/AP CS graders)
+- **Choose Option B if:** You want to show monolithic, server-side rendering skills (traditional web app pattern)
+- **Team's decision:** Will influence whether they later layer Thymeleaf UI over your `/api` endpoints (common pattern)
+
+---
+
 ## Grading Criteria
 
 | Criterion | Excellent | Proficient | Developing |
@@ -378,11 +505,28 @@ A: SQLite is required for this assignment (easier to inspect and debug). Once yo
 
 **Q: I'm deploying Option A (GitHub Pages). How do I handle CORS?**  
 A: Your Spring backend must allow cross-origin requests. Add:
+
 ```java
 @RestController
 @CrossOrigin(origins = "https://your-github-pages-url.com")
 public class YourController { ... }
 ```
+
+**Q: What's the difference between `/api` and `/mvc` endpoints?**  
+A: This is foundational to your architecture choice:
+
+- **`/api` endpoints** (Option A): Stateless REST, return JSON, no CSRF tokens needed, frontend is separate (GitHub Pages)
+- **`/mvc` endpoints** (Option B): Stateful session-based, return HTML, CSRF tokens required, frontend is same Spring app
+- Choose one based on whether you want separation of concerns (REST) or monolithic integration (MVC)
+
+**Q: Why does Option B use Order(1) security and Option A uses Order(2)?**  
+A: Spring Security evaluates filter chains in order. Session-based security (MVC) needs higher precedence (Order 1) to intercept early. Stateless API security (REST) is lower precedence (Order 2) because it doesn't manage sessions. This is automatic if you use `@Controller` vs `@RestController`.
+
+**Q: Do I need CSRF tokens in Option A (/api)?**  
+A: No. CSRF (Cross-Site Request Forgery) only applies to browser cookies. Your `/api` endpoints are stateless, so CSRF is not a threat. GitHub Pages fetch calls don't send session cookies automatically.
+
+**Q: Can I add Thymeleaf templates to an Option A REST API?**  
+A: Yes, but that's not this assignment. This gives you a preview of what the team might do later: Layer a Thymeleaf `/mvc` UI on top of your stateless `/api` backend. Both endpoints would work simultaneously.
 
 ---
 
