@@ -24,8 +24,8 @@ For the scored assignment and its required implementation choices, return to [Ja
 
 ### Reference Example
 
-The Jokes example shows Spring in action, this requires an account and login as it records data.
+The Jokes example shows the same data flow with a small, existing object:
 
-[Open the Jokes runtime](https://pages.opencodingsociety.com/java/spring/jokes). It requires an account and login because it records data.
-
-![Java Jokes]({{site.baseurl}}/images/java_jokes.png)
+- [Jokes runtime](https://pages.opencodingsociety.com/java/spring/jokes)
+- [Jokes frontend source](https://github.com/Open-Coding-Society/pages/blob/main/hacks/api-usage/jokes_spring.md)
+- [Jokes backend files](https://github.com/Open-Coding-Society/spring/tree/master/src/main/java/com/open/spring/mvc/jokes)
