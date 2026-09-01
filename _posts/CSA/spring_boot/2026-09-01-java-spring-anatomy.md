@@ -2,12 +2,13 @@
 layout: post
 title: Anatomy of a Spring Boot Project
 description: A discussion of key elements in a Java Spring Boot backend project.  This includes preparing a project for deployment.
-categories: ['Java Spring']
 permalink: /java/spring/anatomy
-menu: nav/java_spring.html
-courses: {'csa': {'week': 2}}
+courses: {'csa': {'week': 3}}
+categories: ['Java Spring']
 type: coding 
 ---
+
+
 
 ## Highlights of a Spring Web Application
 

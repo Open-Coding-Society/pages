@@ -2,22 +2,23 @@
 layout: post
 title: Introduction Java Spring Framework
 description: Introduction to API, JPA, ORM, POJOs in Java Spring Framework
-categories: [Java Spring]
 permalink: /java/spring/intro/
-menu: nav/java_spring.html
+courses: {'csa': {'week': 3}}
+categories: [Java Spring]
 ---
 
 ## Introduction
 
 APIs build programmatic interactions between applications, people, and businesses.  They are designed around sharing data and executing pre-defined processes.  Spring Boot and Spring Data JPA reduce time for development; developers implement POJOs and JPA access layers; Spring hanldes the rest.  
 
-An API allows you to request and receive data from the system. A POJO is the foundation for making an Entity that is turned into a Database.  The Java Persistent API (JPA) allows the database to be queried and updated.    
+An API allows you to request and receive data from the system. A POJO is the foundation for making an Entity that is turned into a Database.  The Java Persistent API (JPA) allows the database to be queried and updated. 
 
 The subject of this article is Jokes, likes (haha)  and dislike (boohoo).   User clicks haha or boohoo and updates counters.
 
 [Runtime](https://pages.opencodingsociety.com/java/spring/jokes)
 
 [Back-end Java Spring Files](https://github.com/open-coding-society/spring_2025/tree/master/src/main/java/com/nighthawk/spring_portfolio/mvc/jokes)
+
 - Jokes.java - contains POJO which defines Model
 - JokesApiControler.java - contains APIs and Control, which respond to View actions
 - JokesJpaRepository.java - contains CRUD and data acess queries
@@ -61,3 +62,16 @@ The subject of this article is Jokes, likes (haha)  and dislike (boohoo).   User
     |    Objects      | 
     +-----------------+
 ```
+
+<table>
+    <tr>
+        <td><a href="{{site.baseurl}}/java/spring/anatomy">Anatomy</a></td>
+        <td><a href="{{site.baseurl}}/java/spring/jokes">Jokes</a></td>
+        <td><a href="{{site.baseurl}}/java/spring/intro">Intro</a></td>
+        <td><a href="{{site.baseurl}}/java/spring/ui">UI</a></td>
+        <td><a href="{{site.baseurl}}/java/spring/api">API</a></td>
+        <td><a href="{{site.baseurl}}/java/spring/jpa">JPA</a></td>
+        <td><a href="{{site.baseurl}}/java/spring/pojo">POJO</a></td>
+        <td><a href="{{site.baseurl}}/java/spring/hacks">Hacks</a></td>
+    </tr>
+</table>

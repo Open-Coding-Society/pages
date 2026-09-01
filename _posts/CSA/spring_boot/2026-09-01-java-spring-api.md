@@ -3,8 +3,8 @@ layout: post
 title: API Controller
 description: Creating an API request and response to the Spring Boot application.
 permalink: /java/spring/api/
+courses: {'csa': {'week': 3}}
 categories: ['Java Spring']
-menu: nav/java_spring.html
 ---
 
 ## API Controller (JokesApiController)
