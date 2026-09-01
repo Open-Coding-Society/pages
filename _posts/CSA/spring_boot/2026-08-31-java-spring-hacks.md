@@ -12,6 +12,21 @@ categories: ['Java Spring']
 
 This assignment is your **individual ideation phase** for the Trimester 1 N@tM final project, due at the end of Sprint 1. You will design and build a full-stack application centered on a **data-driven object** that could enhance your OCS system. This is both an individual learning experience in Spring Boot architecture AND a potential foundation for your team's N@tM deliverable. **For this round, you maintain your own template and portfolio**; OCS integration may happen later if your ideation is selected and refined for adoption.
 
+### Remember the Jokes Example
+
+You just saw the Jokes application. Your project follows the same path with a system object of your own:
+
+```text
+Jokes entity -> JokesJpaRepository -> JokesApiController -> endpoint -> UI
+Your entity  -> YourRepository      -> YourController      -> endpoint -> UI
+```
+
+- [View the Jokes runtime](https://pages.opencodingsociety.com/java/spring/jokes)
+- [View the Jokes frontend source](https://github.com/Open-Coding-Society/pages/blob/main/hacks/api-usage/jokes_spring.md): fetches `/api/jokes/`, renders rows, and sends button updates.
+- [View `Jokes.java`](https://github.com/Open-Coding-Society/spring/blob/master/src/main/java/com/open/spring/mvc/jokes/Jokes.java): the entity and database fields.
+- [View `JokesJpaRepository.java`](https://github.com/Open-Coding-Society/spring/blob/master/src/main/java/com/open/spring/mvc/jokes/JokesJpaRepository.java): the JPA data access layer.
+- [View `JokesApiController.java`](https://github.com/Open-Coding-Society/spring/blob/master/src/main/java/com/open/spring/mvc/jokes/JokesApiController.java): the `/api/jokes` endpoints.
+
 ### Learning Objectives & Requirements
 
 By the end of this assignment, you will:
