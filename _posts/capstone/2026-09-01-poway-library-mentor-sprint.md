@@ -7,9 +7,3 @@ permalink: /capstone/mentor-sprint/
 ---
 
 {% include poway-library-mentor-sprint-infograph.html %}
-
-<p style="text-align:center; margin-top: 1rem;">
-  <a href="https://github.com/Boolean-Boyz" target="_blank" rel="noopener noreferrer">
-    Boolean-Boyz GitHub Organization
-  </a>
-</p>

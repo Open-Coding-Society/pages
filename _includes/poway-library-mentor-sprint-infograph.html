@@ -17,13 +17,15 @@
   /* ── Hero ── */
   .ment-ig-hero {
     text-align: center;
-    padding: 36px 24px 30px;
-    background: rgba(255,255,255,0.04);
+    padding: 40px 24px 32px;
+    background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(76,175,239,0.1), transparent 70%), rgba(255,255,255,0.04);
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   .ment-ig-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     padding: 5px 14px;
     border-radius: 999px;
     border: 1px solid rgba(76,175,239,0.5);
@@ -33,33 +35,55 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.09em;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+  }
+
+  .ment-ig-badge::before {
+    content: '';
+    display: inline-block;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #4CAFEF;
+    box-shadow: 0 0 5px #4CAFEF;
   }
 
   .ment-ig-hero h1 {
-    font-size: 1.9rem;
+    font-size: 2rem;
     font-weight: 800;
     letter-spacing: -0.01em;
-    margin: 0 0 4px;
+    margin: 0 0 6px;
     color: #fff;
     border: none;
   }
 
   .ment-ig-sprint-label {
-    font-size: 0.82rem;
+    display: inline-block;
+    font-size: 0.78rem;
     font-weight: 600;
     color: #4CAFEF;
     text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin: 0 0 12px;
+    letter-spacing: 0.09em;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    position: relative;
+  }
+
+  .ment-ig-sprint-label::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 28px; height: 2px;
+    border-radius: 2px;
+    background: rgba(76,175,239,0.5);
   }
 
   .ment-ig-hero-sub {
     font-size: 0.9rem;
-    color: rgba(255,255,255,0.65);
-    max-width: 600px;
+    color: rgba(255,255,255,0.7);
+    max-width: 560px;
     margin: 0 auto 18px;
-    line-height: 1.55;
+    line-height: 1.6;
   }
 
   .ment-ig-hero-meta {
