@@ -39,6 +39,36 @@
   color: var(--trail-muted);
   line-height: 1.55;
 }
+.toolchain-trail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+.toolchain-trail-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--trail-accent);
+  border-radius: 6px;
+  color: var(--trail-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.toolchain-trail-action:hover {
+  background: var(--trail-accent);
+  color: #171b22;
+  transform: translateY(-1px);
+}
+.toolchain-trail-action--secondary {
+  border-color: var(--trail-accent-2);
+}
+.toolchain-trail-action--secondary:hover {
+  background: var(--trail-accent-2);
+}
 .toolchain-trail-kicker {
   color: var(--trail-accent);
   font-size: 0.75rem;
@@ -219,11 +249,79 @@
   background: rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
+.toolchain-trail-state-progress {
+  display: grid;
+  gap: 0;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.toolchain-trail-state-step {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  column-gap: 1rem;
+  align-items: stretch;
+}
+.toolchain-trail-state-marker {
+  display: grid;
+  grid-template-rows: 2.75rem 1fr;
+  justify-items: center;
+}
+.toolchain-trail-state-marker span {
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border: 2px solid var(--trail-accent);
+  border-radius: 50%;
+  background: #171b22;
+  color: var(--trail-accent);
+  font-weight: 800;
+}
+.toolchain-trail-state-step:not(:last-child) .toolchain-trail-state-marker::after {
+  content: "↓";
+  display: grid;
+  place-items: center;
+  width: 2px;
+  min-height: 2rem;
+  background: var(--trail-line);
+  color: var(--trail-accent);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.toolchain-trail-state-step:nth-child(2) .toolchain-trail-state-marker span { border-color: #6fc7b2; color: #6fc7b2; }
+.toolchain-trail-state-step:nth-child(3) .toolchain-trail-state-marker span { border-color: #f2b84b; color: #f2b84b; }
+.toolchain-trail-state-step:nth-child(4) .toolchain-trail-state-marker span { border-color: #7ddf8a; color: #7ddf8a; }
+.toolchain-trail-state-card {
+  margin-bottom: 1rem;
+}
+.toolchain-trail-feedback-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr);
+  gap: 1rem;
+  align-items: start;
+}
+.toolchain-trail-feedback-copy {
+  margin-top: 0;
+}
+.toolchain-trail-feedback-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.toolchain-trail-feedback-list li {
+  padding-left: 1rem;
+  border-left: 2px solid var(--trail-accent-2);
+  color: var(--trail-muted);
+  line-height: 1.45;
+}
 @media (max-width: 700px) {
   .toolchain-trail-overview { grid-template-columns: 1fr; }
   .toolchain-trail-stat { border-left: 0; border-top: 2px solid var(--trail-accent); }
   .toolchain-trail-route-line { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   .toolchain-trail-route-line::before { display: none; }
+  .toolchain-trail-feedback-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -238,6 +336,10 @@
     <div>
       <span class="toolchain-trail-kicker">Level 2 / Environment Quest</span>
       <p>{{ data.Overview }}</p>
+      <div class="toolchain-trail-actions">
+        <a class="toolchain-trail-action" href="https://github.com/orgs/the7blueprints/projects/3" target="_blank" rel="noopener noreferrer">Planning Board</a>
+        <a class="toolchain-trail-action toolchain-trail-action--secondary" href="https://github.com/the7blueprints/blueprints_pages" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+      </div>
     </div>
     <div class="toolchain-trail-stat"><strong>{{ data.Stations.size | minus: 1 }}</strong>core stations</div>
   </div>
@@ -298,35 +400,39 @@
 
   <div class="toolchain-trail-section">
     <h2>Building States</h2>
-    <div class="toolchain-trail-section-grid">
+    <p>Each station makes its progress visible as students move from setup to verified completion.</p>
+    <div class="toolchain-trail-state-progress">
       {% for state in data.BuildingStates %}
-      <article class="toolchain-trail-state">
-        <h3>{{ state.name }}</h3>
-        <p>{{ state.description }}</p>
-      </article>
+      <div class="toolchain-trail-state-step">
+        <div class="toolchain-trail-state-marker"><span>{{ forloop.index }}</span></div>
+        <article class="toolchain-trail-state toolchain-trail-state-card">
+          <span class="toolchain-trail-kicker">State 0{{ forloop.index }}</span>
+          <h3>{{ state.name }}</h3>
+          <p>{{ state.description }}</p>
+        </article>
+      </div>
       {% endfor %}
     </div>
   </div>
 
   <div class="toolchain-trail-section">
-    <h2>NPC Feedback</h2>
-    <p>{{ data.NPCFeedback }}</p>
-  </div>
-
-  <div class="toolchain-trail-section-grid">
-    <section class="toolchain-trail-section">
-      <h2>Required Assets</h2>
-      <ul class="toolchain-trail-tag-list">
-        {% for asset in data.RequiredAssets %}<li>{{ asset }}</li>{% endfor %}
-      </ul>
-    </section>
-    <section class="toolchain-trail-section">
-      <h2>Overall Goal</h2>
-      <p>{{ data.OverallGoal }}</p>
-      <h3>System Flow</h3>
-      <ul class="toolchain-trail-flow">
-        {% for step in data.SystemFlow %}<li>{{ step }}</li>{% endfor %}
-      </ul>
-    </section>
+    <h2>NPC Feedback &amp; Completion</h2>
+    <div class="toolchain-trail-feedback-grid">
+      <div>
+        <p class="toolchain-trail-feedback-copy">{{ data.NPCFeedback }}</p>
+        <h3>What the feedback confirms</h3>
+        <ul class="toolchain-trail-feedback-list">
+          {% for step in data.SystemFlow %}<li>{{ step }}</li>{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3>Feedback assets</h3>
+        <ul class="toolchain-trail-tag-list">
+          {% for asset in data.RequiredAssets %}<li>{{ asset }}</li>{% endfor %}
+        </ul>
+        <h3>Why it matters</h3>
+        <p>{{ data.OverallGoal }}</p>
+      </div>
+    </div>
   </div>
 </div>
