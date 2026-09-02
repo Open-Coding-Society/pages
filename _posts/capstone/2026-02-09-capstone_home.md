@@ -316,6 +316,19 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
+   <!-- Jarvis Classroom Object Detection -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
+       <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
+           <img src="{{ '/images/' | append: site.data.jarvis_infograph.Image | relative_url }}" alt="{{ site.data.jarvis_infograph.Title }}" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">{{ site.data.jarvis_infograph.Title }}</a></h3>
+           <p class="text-sm text-gray-700">{{ site.data.jarvis_infograph.Description }}</p>
+           <p class="text-xs text-gray-500 mt-2">Team: {{ site.data.jarvis_infograph.Team | join: ", " }}</p>
+       </div>
+   </div>
+
+
    <!-- RFID + Camera-Correlated Classroom Presence -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">

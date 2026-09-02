@@ -1,0 +1,13 @@
+# Jarvis Classroom Object Understanding — Infographic
+Title: "Camera Setup & Object Detection"
+Description: A setup of cameras that will take in live footage of the classroom and accordingly segment and detect objects and people to then be recorded. Such data will be used to account for important hardware and for keeping track of the people in the room.
+Image: "capstone/jarvis.jpg"
+
+Team:
+  - "Arnav Mittal"
+  - "Shriya Paladagu"
+  - "Soni Dhenuva"
+  - "Xavier Thompson"
+
+Repo: "https://github.com/Arnav210/Jarvis3000"
+Year: "2026-2027"
