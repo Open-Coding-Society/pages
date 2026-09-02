@@ -291,7 +291,6 @@
     <div>
       <h1>Assignment Creator Permissions</h1>
     </div>
-    <span class="status-chip"><span class="dot"></span>IN DEVELOPMENT</span>
   </div>
 
   <div class="copy-block">
@@ -308,47 +307,40 @@
         <tr>
           <th>Action</th>
           <th>Student</th>
-          <th>Peer Grader</th>
+          <th>AI Grader</th>
           <th>Creator</th>
-          <th>Teacher</th>
           <th>Admin</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>View &amp; submit your own work</td>
-          <td class="allow">●</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+          <td class="allow">●</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
         </tr>
         <tr>
           <td>Suggest a grade (if assigned)</td>
-          <td class="deny">○</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+          <td class="deny">○</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
         </tr>
         <tr>
           <td>Give the final grade</td>
-          <td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td>
         </tr>
         <tr>
           <td>Edit assignment details</td>
-          <td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td><td class="allow">●</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td>
         </tr>
         <tr>
           <td>Add or remove a co-creator</td>
-          <td class="deny">○</td><td class="deny">○</td><td class="allow">●*</td><td class="deny">○</td><td class="allow">●</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="allow">●*</td><td class="allow">●</td>
         </tr>
         <tr>
           <td>Delete the assignment</td>
-          <td class="deny">○</td><td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td>
+          <td class="deny">○</td><td class="deny">○</td><td class="allow">●</td><td class="allow">●</td>
         </tr>
       </tbody>
     </table>
   </div>
   <p class="matrix-note">* A creator can't remove the assignment's last remaining creator — only an admin can do that, so an assignment is never left without an owner.</p>
-
-  <div class="copy-block">
-    <p class="eyebrow">What we changed</p>
-    <p>At first, our new "create an assignment" tool was stricter than the way teachers had always made one: it only allowed a few assignment types, one due-date format, and a cap on points. That wasn't fair, since teachers never had those limits — so we removed them. A student can now pick any type, any due date, and any point value, just like a teacher always could.</p>
-    <p>We also noticed the "All Submissions" tab only showed up for teachers and admins. We changed it so a student who creates an assignment sees that tab too — but only for the assignments they made, never anyone else's.</p>
-  </div>
 
   <div class="two-col">
     <div class="panel">
@@ -367,9 +359,14 @@
         <li>Every rule in the table above is enforced on the server, not just hidden in the UI</li>
         <li>Permission is re-checked at the moment of the edit, closing a gap where access revoked mid-request could slip through</li>
         <li>Requests are checked against where they came from, blocking forged calls from outside the site</li>
-        <li>19 automated tests cover this, including one that tries to break it on purpose with two things happening at once</li>
+        <li>Automated tests cover this, including one that tries to break it on purpose with two things happening at once</li>
       </ul>
     </div>
+  </div>
+
+  <div class="copy-block">
+    <p class="eyebrow">What's next</p>
+    <p>A planned category for assignments left without a creator (e.g. after account deletion), visible only to admins — not yet implemented.</p>
   </div>
 
   <div class="footer-row">
