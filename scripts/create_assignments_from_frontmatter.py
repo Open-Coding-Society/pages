@@ -131,7 +131,7 @@ def create_assignment(
     return resp
 
 
-def create_assignment_full(session: requests.Session, base_url: str, name: str, atype: str, description: str, points: float, dueDate: str):
+def create_assignment_full(session: requests.Session, base_url: str, name: str, atype: str, description: str, points: float, dueDate: str, assignmentType: str):
     # This calls the admin/teacher create endpoint which requires role privileges
     payload = {
         "name": name,
@@ -139,6 +139,8 @@ def create_assignment_full(session: requests.Session, base_url: str, name: str, 
         "description": description,
         "points": str(points),
         "dueDate": dueDate,
+        "assignmentType": assignmentType,
+        
     }
     resp = session.post(f"{base_url}/api/assignments/create", data=payload, timeout=30)
     return resp
