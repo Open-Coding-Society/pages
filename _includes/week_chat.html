@@ -25,6 +25,15 @@
     <p class="chat-preview-note" id="weekChatNote-{{ wc_id }}" hidden>
       <i class="fas fa-flask"></i><span id="weekChatNoteText-{{ wc_id }}"></span>
     </p>
+    <div class="chat-publish-banner" id="weekChatPublishBanner-{{ wc_id }}" hidden>
+      <div class="chat-publish-banner-text">
+        <i class="fas fa-box-archive" aria-hidden="true"></i>
+        <span id="weekChatPublishBannerText-{{ wc_id }}"></span>
+      </div>
+      <button type="button" class="chat-publish-btn" id="weekChatPublishBtn-{{ wc_id }}">
+        <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i><span>Publish</span>
+      </button>
+    </div>
     <div class="chat-messages" id="weekChatMessages-{{ wc_id }}" aria-live="polite">
       <p class="chat-empty" id="weekChatEmpty-{{ wc_id }}">No messages yet.</p>
     </div>
@@ -47,6 +56,10 @@
   const CHAT_SOCKET_PORT = 8589;
   const PREVIEW_KEY = `ocs-chat-preview:${GROUP_NAME}`;
   const PREVIEW_LIMIT = 100;
+  const PUBLISHED_KEY = `ocs-chat-published:${GROUP_NAME}`;
+  const PUBLISHED_LIMIT = 500;
+  const URL_RE = /https?:\/\/[^\s<>()]+/g;
+  const linkPreviewCache = new Map();
 
   const SOCKJS_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js';
   const STOMP_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js';
@@ -100,6 +113,9 @@
   const inputEl = document.getElementById(`weekChatInput-${WC_ID}`);
   const sendBtn = document.getElementById(`weekChatSend-${WC_ID}`);
   const formEl = document.getElementById(`weekChatForm-${WC_ID}`);
+  const publishBannerEl = document.getElementById(`weekChatPublishBanner-${WC_ID}`);
+  const publishBannerTextEl = document.getElementById(`weekChatPublishBannerText-${WC_ID}`);
+  const publishBtn = document.getElementById(`weekChatPublishBtn-${WC_ID}`);
 
   function setStatus(text, tone) {
     statusEl.textContent = text;
@@ -152,11 +168,95 @@
 
     const body = document.createElement('span');
     body.className = 'chat-msg-body';
-    body.textContent = message;
+    renderMessageBody(body, message);
 
     line.append(meta, body);
     messagesEl.appendChild(line);
     messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    const previewUrl = firstUrlIn(message);
+    if (previewUrl) attachLinkPreview(previewUrl, line);
+  }
+
+  /* ── Link rendering + Slack-style unfurl ──────────────────────────────
+     URLs in a message become real links, and the first one gets a preview
+     card (title/description/thumbnail) fetched server-side via
+     /api/link-preview — the browser can't read another site's Open Graph
+     tags itself (CORS), so this always goes through the backend. */
+
+  function firstUrlIn(text) {
+    const match = String(text || '').match(URL_RE);
+    return match ? match[0] : null;
+  }
+
+  function renderMessageBody(container, text) {
+    const value = String(text || '');
+    const urls = value.match(URL_RE) || [];
+    const parts = value.split(URL_RE);
+    parts.forEach((part, i) => {
+      if (part) container.appendChild(document.createTextNode(part));
+      if (urls[i]) {
+        const a = document.createElement('a');
+        a.href = urls[i];
+        a.textContent = urls[i];
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        container.appendChild(a);
+      }
+    });
+  }
+
+  async function attachLinkPreview(url, afterEl) {
+    try {
+      let preview = linkPreviewCache.get(url);
+      if (!preview) {
+        const res = await fetch(`${javaURI}/api/link-preview?url=${encodeURIComponent(url)}`, fetchOptions);
+        if (!res.ok) return;
+        preview = await res.json();
+        linkPreviewCache.set(url, preview);
+      }
+      if (!preview || !preview.title || !afterEl.isConnected) return;
+
+      const card = document.createElement('a');
+      card.className = 'chat-link-preview';
+      card.href = preview.url || url;
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'chat-link-preview-thumb';
+      if (preview.image) {
+        const img = document.createElement('img');
+        img.src = preview.image;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.onerror = () => { img.remove(); thumb.innerHTML = '<i class="fas fa-link" aria-hidden="true"></i>'; };
+        thumb.appendChild(img);
+      } else {
+        thumb.innerHTML = '<i class="fas fa-link" aria-hidden="true"></i>';
+      }
+
+      const previewBody = document.createElement('div');
+      previewBody.className = 'chat-link-preview-body';
+      const siteEl = document.createElement('span');
+      siteEl.className = 'chat-link-preview-site';
+      siteEl.textContent = preview.siteName || new URL(preview.url || url).hostname;
+      const titleEl = document.createElement('span');
+      titleEl.className = 'chat-link-preview-title';
+      titleEl.textContent = preview.title;
+      previewBody.append(siteEl, titleEl);
+      if (preview.description) {
+        const descEl = document.createElement('span');
+        descEl.className = 'chat-link-preview-desc';
+        descEl.textContent = preview.description;
+        previewBody.appendChild(descEl);
+      }
+
+      card.append(thumb, previewBody);
+      afterEl.appendChild(card);
+    } catch (err) {
+      console.warn('Week chat: link preview failed', err);
+    }
   }
 
   function appendSystem(text) {
@@ -197,6 +297,106 @@
       console.warn('Week chat: could not save preview message', err);
     }
   }
+
+  /* ── Publishing a local backup into the live chat ─────────────────────
+     Opt-in only: signed-in users who still have preview-mode messages
+     saved from before this chat was connected to the backend (e.g. from
+     the window when this widget ran localStorage-only) can push them into
+     the real, shared chat. Never runs automatically. */
+
+  function archivePublishedMessages(sentEntries) {
+    try {
+      const raw = window.localStorage.getItem(PUBLISHED_KEY);
+      const existing = raw ? JSON.parse(raw) : [];
+      const archive = Array.isArray(existing) ? existing : [];
+      window.localStorage.setItem(PUBLISHED_KEY, JSON.stringify([...archive, ...sentEntries].slice(-PUBLISHED_LIMIT)));
+    } catch (err) {
+      console.warn('Week chat: could not archive published messages', err);
+    }
+  }
+
+  function removeFromPreview(sentEntries) {
+    const sentKeys = new Set(sentEntries.map(eventKey));
+    const remaining = readPreviewMessages().filter((msg) => !sentKeys.has(eventKey(msg)));
+    try {
+      if (remaining.length) window.localStorage.setItem(PREVIEW_KEY, JSON.stringify(remaining));
+      else window.localStorage.removeItem(PREVIEW_KEY);
+    } catch (err) {
+      console.warn('Week chat: could not update local backup after publish', err);
+    }
+  }
+
+  // Publishing goes over REST, not the STOMP send path sendMessage() uses:
+  // /api/groups/** is enforced server-side by Spring Security (auth required),
+  // where the STOMP /app/groups.chat path currently has no server-side auth
+  // at all. REST still broadcasts live to everyone connected — it flows
+  // through the same GroupChatRealtimeService.publishMessage() either way.
+  async function sendLiveMessage(sender, text, date) {
+    if (!state.backboneGroupId) return false;
+    try {
+      const res = await fetch(`${javaURI}/api/groups/chat/${state.backboneGroupId}/messages`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ name: sender, message: text, date, image: null }),
+      });
+      return res.ok;
+    } catch (err) {
+      console.error('Week chat: publish send failed', err);
+      return false;
+    }
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  function updatePublishBanner() {
+    const pending = readPreviewMessages();
+    const eligible = state.mode === 'live' && pending.length > 0;
+    publishBannerEl.hidden = !eligible;
+    if (eligible) {
+      publishBannerTextEl.textContent =
+        `Found ${pending.length} message${pending.length === 1 ? '' : 's'} saved locally from before this chat was connected.`;
+    }
+  }
+
+  async function publishLocalBackup() {
+    const pending = readPreviewMessages();
+    if (!pending.length || state.mode !== 'live') return;
+
+    const ok = window.confirm(
+      `Publish ${pending.length} message${pending.length === 1 ? '' : 's'} from your local backup to the live class chat, `
+      + `as ${state.currentUserDisplayName}, with their original timestamps? Everyone in the class will see them. This can't be undone.`
+    );
+    if (!ok) return;
+
+    publishBtn.disabled = true;
+    const sent = [];
+    for (const entry of pending) {
+      if (!(await sendLiveMessage(state.currentUserDisplayName, entry.message, entry.date))) break;
+      sent.push(entry);
+      await delay(120);
+    }
+
+    if (sent.length) {
+      archivePublishedMessages(sent);
+      removeFromPreview(sent);
+    }
+
+    // Don't call updatePublishBanner() here — it would re-hide the banner the
+    // instant a full batch succeeds (no pending messages left), hiding this
+    // confirmation with it. It's shown again on next load only if something
+    // is still pending.
+    const failedCount = pending.length - sent.length;
+    publishBannerEl.hidden = false;
+    publishBannerTextEl.textContent = failedCount > 0
+      ? `Published ${sent.length} of ${pending.length} — ${failedCount} failed. Try again to resend the rest.`
+      : `Published ${sent.length} message${sent.length === 1 ? '' : 's'}.`;
+    publishBtn.disabled = false;
+    publishBtn.hidden = failedCount === 0;
+  }
+
+  publishBtn.addEventListener('click', publishLocalBackup);
 
   function enterPreviewMode(reason) {
     state.mode = 'preview';
@@ -391,6 +591,7 @@
       state.mode = 'live';
       setComposerEnabled(true);
       inputEl.focus();
+      updatePublishBanner();
     } else {
       appendSystem('Live updates are unavailable right now.');
       enterPreviewMode('The class chat service is unreachable.');
