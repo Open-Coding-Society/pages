@@ -38,7 +38,7 @@ show_reading_time: false
                 <br><strong>You must use an email ending in @stu.powayusd.com or @powayusd.com</strong>
             </p>
             <div id="g_id_onload"
-                 data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
+                 data-client_id="{{ site.google_client_id }}"
                  data-callback="handleGoogleSignIn"
                  data-auto_prompt="false">
             </div>
@@ -111,12 +111,11 @@ show_reading_time: false
 </div>
 
 <script type="module">
-    import { login, pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
     let validationTimeout = null;
-    const GOOGLE_CLIENT_ID = "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com";
 
     // Password validation with debouncing (1.5 second delay)
     function validatePasswordsDebounced() {
