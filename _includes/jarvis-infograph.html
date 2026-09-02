@@ -1,0 +1,694 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --rp-bg: #0f0f12;
+  --rp-card: #16161a;
+  --rp-card-border: #2a2a2e;
+  --rp-text: #e4e4e7;
+  --rp-text-muted: #a1a1aa;
+  --rp-accent: #3b82f6;
+  --rp-accent-soft: rgba(59, 130, 246, 0.15);
+  --rp-success: #22c55e;
+  --rp-success-soft: rgba(34, 197, 94, 0.12);
+  --rp-tag: #27272a;
+  --rp-gradient-start: #3b82f6;
+  --rp-gradient-end: #06b6d4;
+  --rp-purple: #a855f7;
+  --rp-amber: #f59e0b;
+  --rp-amber-soft: rgba(245, 158, 11, 0.12);
+  --rp-red: #ef4444;
+  --rp-red-soft: rgba(239, 68, 68, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+.rp-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--rp-text);
+}
+
+/* ── Header ── */
+.rp-header {
+  text-align: center;
+  margin-bottom: 2.75rem;
+}
+
+.rp-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 9999px;
+  background: var(--rp-accent-soft);
+  color: var(--rp-accent);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  margin-bottom: 1rem;
+}
+
+.rp-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--rp-gradient-start), var(--rp-gradient-end));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.rp-description {
+  font-size: 1.0625rem;
+  color: var(--rp-text-muted);
+  line-height: 1.7;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* ── Flow Diagram ── */
+.rp-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 2rem 0 2.75rem;
+}
+
+.rp-flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.1rem;
+  background: var(--rp-card);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.75rem;
+  min-width: 110px;
+  text-align: center;
+  position: relative;
+}
+
+.rp-flow-node-icon { font-size: 1.4rem; }
+
+.rp-flow-node-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rp-text);
+  line-height: 1.3;
+}
+
+.rp-flow-node-sub {
+  font-size: 0.62rem;
+  color: var(--rp-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.rp-flow-arrow {
+  font-size: 1rem;
+  color: var(--rp-accent);
+  padding: 0 0.2rem;
+  flex-shrink: 0;
+}
+
+.rp-flow-node.active {
+  border-color: var(--rp-accent);
+  background: var(--rp-accent-soft);
+}
+
+.rp-flow-node.active .rp-flow-node-label { color: var(--rp-accent); }
+
+/* ── Section Label ── */
+.rp-section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rp-text-muted);
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rp-card-border);
+}
+
+/* ── Generic Card ── */
+.rp-card {
+  background: var(--rp-card);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.rp-card h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rp-text);
+  margin: 0 0 1rem;
+}
+
+/* ── Research question ── */
+.rp-question {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--rp-text);
+  border-left: 3px solid var(--rp-accent);
+  padding: 0.25rem 0 0.25rem 1.1rem;
+  margin: 0 0 1.25rem;
+}
+
+/* ── Checklist ── */
+.rp-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rp-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  font-size: 0.9rem;
+  color: var(--rp-text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  line-height: 1.5;
+}
+
+.rp-checklist li:last-child { border-bottom: none; }
+
+.rp-checklist .rp-box {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 0.3rem;
+  border: 1.5px solid var(--rp-card-border);
+  margin-top: 0.15rem;
+}
+
+.rp-checklist li.open .rp-box {
+  border-color: var(--rp-amber);
+}
+
+/* ── Tables ── */
+.rp-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.rp-table th {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--rp-text-muted);
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--rp-card-border);
+  white-space: nowrap;
+}
+
+.rp-table td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--rp-text-muted);
+  line-height: 1.55;
+  vertical-align: top;
+}
+
+.rp-table tr:last-child td { border-bottom: none; }
+
+.rp-table td:first-child, .rp-table td.rp-cell-strong {
+  color: var(--rp-text);
+  font-weight: 600;
+}
+
+.rp-table a { color: var(--rp-accent); text-decoration: none; }
+.rp-table a:hover { text-decoration: underline; }
+
+.rp-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8em;
+  background: var(--rp-tag);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.35rem;
+}
+
+/* State pill used inside the presence-state table */
+.rp-pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.rp-pill-good { background: var(--rp-success-soft); color: var(--rp-success); border: 1px solid rgba(34,197,94,0.3); }
+.rp-pill-warn { background: var(--rp-amber-soft); color: var(--rp-amber); border: 1px solid rgba(245,158,11,0.3); }
+.rp-pill-bad  { background: var(--rp-red-soft); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.rp-pill-neutral { background: var(--rp-tag); color: var(--rp-text-muted); border: 1px solid var(--rp-card-border); }
+
+/* ── Mermaid card ── */
+.rp-diagram {
+  background: rgba(255,255,255,0.015);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+
+.rp-diagram .mermaid { display: flex; justify-content: center; }
+
+/* ── Callout ── */
+.rp-callout {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 0.6rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--rp-text-muted);
+  margin-top: 0.85rem;
+}
+
+.rp-callout-icon { flex-shrink: 0; font-size: 1.05rem; }
+
+.rp-callout-open {
+  background: var(--rp-amber-soft);
+  border: 1px solid rgba(245,158,11,0.3);
+}
+
+.rp-callout-note {
+  background: var(--rp-tag);
+  border: 1px solid var(--rp-card-border);
+}
+
+/* ── Entity list ── */
+.rp-entity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+
+.rp-entity-list li {
+  background: var(--rp-tag);
+  border: 1px solid var(--rp-card-border);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--rp-text-muted);
+  line-height: 1.5;
+}
+
+.rp-entity-list strong { color: var(--rp-text); }
+
+/* ── Footer ── */
+.rp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.1rem 1.5rem;
+  border-top: 1px solid var(--rp-card-border);
+  background: rgba(255,255,255,0.015);
+  border-radius: 1rem;
+  border: 1px solid var(--rp-card-border);
+  margin-top: 1rem;
+}
+
+.rp-team { display: flex; flex-direction: column; gap: 0.1rem; }
+
+.rp-team-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--rp-text-muted);
+}
+
+.rp-team-name { font-size: 0.85rem; font-weight: 600; color: var(--rp-text); }
+
+.rp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: var(--rp-amber-soft);
+  color: var(--rp-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.rp-status::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rp-amber);
+  animation: rp-pulse 2s infinite;
+}
+
+@keyframes rp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.rp-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.45rem;
+  background: var(--rp-accent);
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.rp-btn:hover { background: #2563eb; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .rp-title { font-size: 1.6rem; }
+  .rp-flow { gap: 0.2rem; }
+  .rp-flow-node { min-width: 78px; padding: 0.55rem 0.7rem; }
+  .rp-flow-node-label { font-size: 0.62rem; }
+  .rp-table { font-size: 0.78rem; }
+}
+</style>
+
+<div class="rp-container">
+
+  <!-- Header -->
+  <div class="rp-header">
+    <div class="rp-badge">Design-Based Research Capstone · Jarvis Project Proposal · {{ data.Year }}</div>
+    <h1 class="rp-title">{{ data.Title }}</h1>
+    <p class="rp-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- System flow at a glance -->
+  <div class="rp-flow">
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">Camera Capture</span>
+      <span class="rp-flow-node-sub">Timestamped Images</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">Preprocessing</span>
+      <span class="rp-flow-node-sub">OpenCV / Frame Prep</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">YOLO</span>
+      <span class="rp-flow-node-sub">Object Recognition</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node active">
+      <span class="rp-flow-node-label">SAM 3</span>
+      <span class="rp-flow-node-sub">Precise Segmentation</span>
+    </div>
+    <span class="rp-flow-arrow">→</span>
+    <div class="rp-flow-node">
+      <span class="rp-flow-node-label">Room Model</span>
+      <span class="rp-flow-node-sub">Identity + Location</span>
+    </div>
+  </div>
+
+  <!-- Research Question -->
+  <div class="rp-section-label">Research Question</div>
+  <div class="rp-card">
+    <p class="rp-question">Can Jarvis use a low-cost, multi-camera computer-vision pipeline—combining timestamped classroom images, YOLO object recognition, and SAM 3 segmentation—to reliably identify classroom objects, determine where they are located, and track meaningful changes over time, while establishing a foundation for later material recognition?</p>
+    <h3 style="margin-top:1.5rem;">Acceptance / Test Cases</h3>
+    <ul class="rp-checklist">
+      <li class="open"><span class="rp-box"></span><span>Capture timestamped images from the classroom camera system at a configurable interval, beginning with one image every 10 seconds</span></li>
+      <li class="open"><span class="rp-box"></span><span>Receive images from cameras on opposite sides of the room, including footage transferred from a second Linux computer to the main processing computer</span></li>
+      <li class="open"><span class="rp-box"></span><span>Use YOLO to detect supported classroom object classes and record a confidence score for every prediction</span></li>
+      <li class="open"><span class="rp-box"></span><span>Evaluate the first model on six core classes: chair, table/desk, laptop, backpack, bottle, and book</span></li>
+      <li class="open"><span class="rp-box"></span><span>Reach at least 80% correct object classifications on a held-out, manually labeled set of classroom images</span></li>
+      <li class="open"><span class="rp-box"></span><span>Use SAM 3 to refine YOLO detections into usable object masks without treating segmentation itself as recognition</span></li>
+      <li class="open"><span class="rp-box"></span><span>Record each detected object's camera, timestamp, label, confidence, mask, and estimated location in the room</span></li>
+      <li class="open"><span class="rp-box"></span><span>Match repeated observations across frames so Jarvis can distinguish a continuing object from a new, removed, or moved object</span></li>
+      <li class="open"><span class="rp-box"></span><span>Reach at least 80% correct object-state decisions across held-out new, continuing, moved, missing, and occluded-object test scenarios</span></li>
+      <li class="open"><span class="rp-box"></span><span>Handle partial occlusion, overlapping objects, missed detections, and conflicting camera observations without immediately reporting a false room change</span></li>
+      <li class="open"><span class="rp-box"></span><span>Make captured and processed results remotely inspectable while preserving the original images for debugging and evaluation</span></li>
+    </ul>
+  </div>
+
+  <!-- Design decisions -->
+  <div class="rp-section-label">Design Decisions &amp; Rationale</div>
+  <div class="rp-card">
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Design feature</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Use <strong>two cameras on opposite sides</strong> of the room</td><td>A second viewpoint reduces blind spots and gives Jarvis another observation when an object is blocked or unclear in one camera.</td></tr>
+          <tr><td>Capture <strong>timestamped still images</strong> instead of processing continuous 4K video</td><td>Periodic frames reduce storage and CPU demand while preserving the time information needed to compare changes.</td></tr>
+          <tr><td>Begin at a <strong>10-second capture interval</strong></td><td>This is frequent enough for initial room-change experiments and can be adjusted after measuring processing time and missed events.</td></tr>
+          <tr><td>Use <strong>YOLO for object recognition first</strong></td><td>The first version focuses on reliable object classes, bounding boxes, and confidence scores. Material recognition remains a later extension after the object pipeline works.</td></tr>
+          <tr><td>Start with <strong>six core classroom classes</strong></td><td>Chair, table/desk, laptop, backpack, bottle, and book provide a manageable first dataset while testing fixed furniture, portable equipment, and small objects.</td></tr>
+          <tr><td>Use <strong>SAM 3 for segmentation</strong></td><td>SAM 3 supplies precise object masks, separating the pixels belonging to an object from its background; it does not replace the recognition model.</td></tr>
+          <tr><td>Defer <strong>material classification</strong></td><td>Material labels such as wood, metal, plastic, glass, and fabric require separate training or classification work and are outside the first implementation milestone.</td></tr>
+          <tr><td>Use <strong>OpenCV for image handling</strong></td><td>OpenCV can load frames, resize or normalize them, crop detected regions, draw results, compare frames, and save processed outputs.</td></tr>
+          <tr><td>Keep <strong>recognition confidence</strong> separate from tracking confidence</td><td>Jarvis may be confident that an object persisted across frames even when its exact class is uncertain, or vice versa.</td></tr>
+          <tr><td>Require <strong>multiple observations</strong> before declaring a change</td><td>A single missed detection should not immediately cause Jarvis to report that an object disappeared or moved.</td></tr>
+          <tr><td>Use an <strong>80% first-prototype success threshold</strong></td><td>Jarvis must correctly classify at least 80% of objects and correctly determine at least 80% of tested object states on held-out, manually labeled scenes.</td></tr>
+          <tr><td>Process on a <strong>main Linux computer</strong></td><td>Central processing keeps the room model and saved results together while a second Linux computer can capture and transfer images from the remote camera.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Privacy / governance -->
+  <div class="rp-section-label">Privacy, Scope &amp; Governance</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Jarvis is designed to understand classroom objects, not identify or monitor individual people:</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Decision</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>No identity recognition</td><td>Jarvis does not use face recognition, names, student IDs, biometric enrollment, or any other method to determine who a person is.</td></tr>
+          <tr><td>Generic person detection only</td><td>A person may be represented only as the class <span class="rp-code">person</span>, allowing Jarvis to recognize that a classroom object may be temporarily blocked from view.</td></tr>
+          <tr><td>No persistent person tracking</td><td>Person detections are not assigned lasting identities and are not included in the classroom object inventory or movement history.</td></tr>
+          <tr><td>Object-focused outputs</td><td>Saved detections, masks, and change events focus on classroom objects; people are treated as temporary occluders rather than subjects of analysis.</td></tr>
+          <tr><td>Local prototype scope</td><td>The first version runs on the project's Linux computers for testing in the selected classroom rather than serving as a school-wide surveillance system.</td></tr>
+          <tr><td>Controlled evaluation</td><td>Initial accuracy testing should use team-controlled scenes and objects, with classroom testing conducted only under the permission rules established for the project.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rp-callout rp-callout-note">
+      <span>A generic person mask may explain why a previously confirmed object is temporarily invisible. In that case, Jarvis should prefer <span class="rp-code">OCCLUDED</span> over immediately changing the object to <span class="rp-code">MISSING</span>.</span>
+    </div>
+  </div>
+
+  <!-- System architecture -->
+  <div class="rp-section-label">System Architecture</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    C1["Camera 1
+Main Linux computer"] --> CAP["FFmpeg capture
+Timestamped frame"]
+    C2["Camera 2
+Second Linux computer"] --> TX["Secure transfer
+SSH / Tailscale"]
+    TX --> CAP
+    CAP --> CV["OpenCV
+Load and preprocess"]
+    CV --> YOLO["YOLO
+Class + box + confidence"]
+    YOLO --> SAM["SAM 3
+Pixel-level object mask"]
+    SAM --> FUSE["Multi-camera matching
+and temporal tracking"]
+    FUSE --> ROOM["Room model
+Identity + location + history"]</pre>
+    </div>
+  </div>
+
+  <!-- Capture and processing loop -->
+  <div class="rp-section-label">Capture &amp; Processing Logic</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through YOLO and SAM 3, and compares the result with recent observations before changing the room model.</p>
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">sequenceDiagram
+    participant Cam as Classroom Cameras
+    participant Cap as FFmpeg Capture
+    participant AI as YOLO + SAM 3
+    participant Track as Tracking Logic
+    participant Room as Room Model
+
+    loop At each configured interval
+        Cam->>Cap: provide current frame
+        Cap->>Cap: save original with camera ID + timestamp
+        Cap->>AI: submit frame for inference
+        AI->>Track: classes + confidence + boxes + masks
+        Track->>Track: compare with recent observations
+        Track->>Room: confirm new, moved, continuing, or missing objects
+    end
+    Note over Track: One weak or missed detection does not immediately change the room model</pre>
+    </div>
+  </div>
+
+  <!-- Object state model -->
+  <div class="rp-section-label">Object Observation State Model</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Jarvis converts raw detections into stable states so that a single uncertain frame does not create a false report:</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>State</th><th>Evidence</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="rp-pill rp-pill-neutral">CANDIDATE</span></td><td>One new detection</td><td>Possible object awaiting confirmation from another frame or camera</td></tr>
+          <tr><td><span class="rp-pill rp-pill-good">CONFIRMED</span></td><td>Repeated compatible detections</td><td>Object is accepted into the current room model</td></tr>
+          <tr><td><span class="rp-pill rp-pill-good">CONTINUING</span></td><td>Class and position remain compatible</td><td>The same tracked object is still present</td></tr>
+          <tr><td><span class="rp-pill rp-pill-warn">MOVED</span></td><td>Same object class and track, significantly different location</td><td>Jarvis records a location-change event</td></tr>
+          <tr><td><span class="rp-pill rp-pill-warn">UNCERTAIN</span></td><td>Low confidence or conflicting class predictions</td><td>Observation is saved but does not immediately overwrite a confirmed label</td></tr>
+          <tr><td><span class="rp-pill rp-pill-neutral">OCCLUDED</span></td><td>Temporarily missing from one view but supported by recent history or another camera</td><td>Object remains in the room model during a short evidence gap</td></tr>
+          <tr><td><span class="rp-pill rp-pill-bad">MISSING</span></td><td>Absent across enough consecutive observations</td><td>Previously confirmed object is treated as removed or no longer visible</td></tr>
+          <tr><td><span class="rp-pill rp-pill-warn">CAMERA_CONFLICT</span></td><td>Camera observations cannot be matched consistently</td><td>Flag for review instead of counting two views as two separate objects</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Detection and tracking lifecycle -->
+  <div class="rp-section-label">Detection &amp; Tracking Lifecycle</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    A[YOLO detection] --> B["SAM 3 mask
+and observation record"]
+    B --> C{Matches an existing track?}
+    C -->|Yes| D[Update object history]
+    C -->|No| E[Create candidate track]
+    E -->|Repeated evidence| F[Confirm object]
+    E -->|Not repeated| G[Expire candidate]
+    D -->|Position changed| H[Record moved event]
+    D -->|Evidence disappears| I[Mark occluded]
+    I -->|Still absent after threshold| J[Mark missing]</pre>
+    </div>
+    <h3 style="margin-top:1.5rem;">Data the system needs to persist</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">This is the current entity list, not a final database schema.</p>
+    <ul class="rp-entity-list">
+      <li><strong>Cameras</strong> — id, device name, host computer, viewpoint, resolution, status</li>
+      <li><strong>Frames</strong> — id, camera, capture timestamp, original-file path, processing status</li>
+      <li><strong>YOLO Classes</strong> — class id, object label, and training-version metadata</li>
+      <li><strong>Detections</strong> — frame, class, confidence, bounding box, model version</li>
+      <li><strong>Segmentation Masks</strong> — detection, mask-file path or encoded mask, SAM 3 model version</li>
+      <li><strong>Object Tracks</strong> — persistent object id, current class, state, first seen, last seen</li>
+      <li><strong>Locations / Zones</strong> — camera-relative coordinates and eventual room-relative position</li>
+      <li><strong>Observations</strong> — track, frame, camera, position, confidence, mask, timestamp</li>
+      <li><strong>Change Events</strong> — new, moved, missing, reappeared, or camera-conflict event</li>
+      <li><strong>Model Runs</strong> — configuration, thresholds, processing time, errors, and output version</li>
+    </ul>
+  </div>
+
+  <!-- Hardware / BOM -->
+  <div class="rp-section-label">Hardware / Bill of Materials</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">The current prototype uses one tested Logitech BRIO connected to a Linux computer. The target design adds a second camera and Linux capture computer on the opposite side of the room.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Item</th><th>Status</th><th>Purpose / Notes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Logitech BRIO 4K webcam</td>
+            <td><span class="rp-pill rp-pill-good">CURRENT</span></td>
+            <td>Primary classroom camera; already accessible on Linux through a <span class="rp-code">/dev/video*</span> device and tested with FFmpeg/ffplay.</td>
+          </tr>
+          <tr>
+            <td>Main Linux computer</td>
+            <td><span class="rp-pill rp-pill-good">CURRENT</span></td>
+            <td>Captures images, stores the central footage directory, runs the Python pipeline, and performs YOLO/SAM 3 inference.</td>
+          </tr>
+          <tr>
+            <td>Second Logitech BRIO camera</td>
+            <td><span class="rp-pill rp-pill-warn">PLANNED</span></td>
+            <td>Adds the opposite-side viewpoint needed to reduce blind spots and test multi-camera matching.</td>
+          </tr>
+          <tr>
+            <td>Second Linux capture computer</td>
+            <td><span class="rp-pill rp-pill-warn">PLANNED</span></td>
+            <td>Connects to the remote camera and transfers timestamped frames to the main machine over the network.</td>
+          </tr>
+          <tr>
+            <td>Camera mounts</td>
+            <td><span class="rp-pill rp-pill-warn">PLANNED</span></td>
+            <td>Position the cameras high enough to view classroom surfaces while keeping both viewpoints stable for calibration.</td>
+          </tr>
+          <tr>
+            <td>USB extension or active USB cable</td>
+            <td><span class="rp-pill rp-pill-warn">AS NEEDED</span></td>
+            <td>Provides enough cable length for elevated mounting; an active extension may be required if the run exceeds reliable passive USB distance.</td>
+          </tr>
+          <tr>
+            <td>Local network / Tailscale connection</td>
+            <td><span class="rp-pill rp-pill-good">TESTED</span></td>
+            <td>Supports remote SSH access, camera troubleshooting, and transfer between computers even when they are on different networks.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rp-callout rp-callout-note">
+      <span><strong style="color:var(--rp-text);">Current processing constraint:</strong> the tested Linux system has no NVIDIA GPU available, so SAM 3 currently runs on the CPU. Image resolution, capture interval, and model configuration must be benchmarked before promising near-real-time processing.</span>
+    </div>
+    <div class="rp-callout rp-callout-open">
+      <span><strong style="color:var(--rp-text);">Open problem — camera placement:</strong> camera height, angle, overlap, lighting, and cable routes still need to be tested in the actual room. Moving either camera after calibration may reduce location and cross-camera matching accuracy.</span>
+    </div>
+    <div class="rp-callout rp-callout-note">
+      <span><strong style="color:var(--rp-text);">Prototype sequence:</strong> validate capture, YOLO recognition, SAM 3 masks, and temporal tracking with the current single camera first. Add the second viewpoint only after the one-camera pipeline produces measurable results.</span>
+    </div>
+  </div>
+
+  <!-- Dependencies / open questions -->
+  <div class="rp-section-label">Dependencies &amp; Open Questions</div>
+  <div class="rp-card">
+    <ul class="rp-checklist">
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Dataset and annotation:</strong> collect representative classroom images for chair, table/desk, laptop, backpack, bottle, and book, then define a consistent YOLO annotation and train/validation/test split.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">CPU performance:</strong> benchmark YOLO and SAM 3 at several resolutions to determine whether the 10-second capture interval is sustainable on the main Linux computer.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Tracking thresholds:</strong> define how many matching or missing frames are required to confirm an object, movement, occlusion, or removal.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Camera calibration:</strong> establish how observations from opposite viewpoints map into shared classroom locations without counting the same object twice.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Second-camera hardware:</strong> confirm the second BRIO, Linux capture computer, mount, cable route, and reliable automatic file-transfer method.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Image retention:</strong> decide how long original frames, annotated outputs, and masks are kept and who may access them.</span></li>
+      <li class="open"><span class="rp-box"></span><span><strong style="color:var(--rp-text);">Material extension:</strong> after object recognition is reliable, evaluate a separate material-classification stage for wood, metal, plastic, glass, fabric, and other useful categories.</span></li>
+    </ul>
+  </div>
+
+  <!-- Footer: team -->
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Prototype Stage</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>
