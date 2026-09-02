@@ -1,0 +1,19 @@
+// =============================================================================
+// OCS DESIGN SYSTEM — PUBLIC ENTRY POINT
+// =============================================================================
+//   @use "ocs";                       // everything
+//   @use "ocs/core/functions" as fn;  // tokens only, no CSS emitted
+//
+// Load order matters: tokens -> css custom properties -> a11y -> components.
+//
+// This is the first slice: the token layer and the button. The remaining
+// fourteen components follow in a later pull request so each stays reviewable.
+// =============================================================================
+
+@forward "core/tokens";
+@forward "core/functions";
+
+@use "core/css-vars";
+@use "core/a11y";
+
+@use "components/button";

@@ -1,0 +1,224 @@
+// =============================================================================
+// OCS BUTTON
+// =============================================================================
+// GRAMMAR
+//   base      .ocs-btn
+//   variant   --primary (default) | --secondary | --ghost | --danger
+//   size      --sm | --md (default) | --lg
+//   shape     --icon | --pill | --block
+//
+//   <button class="ocs-btn ocs-btn--primary ocs-btn--lg">Save</button>
+//   <button class="ocs-btn ocs-btn--ghost ocs-btn--icon" aria-label="Edit">…</button>
+//
+// Write modifiers in the order variant -> size -> shape. Modifiers are scoped
+// to the block (`.ocs-btn--sm`, never a bare `.sm`) so nothing leaks into the
+// global namespace. The legacy `.ocs__btn` grammar still works — see
+// ../compat/_legacy.scss.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+@use "../core/legacy-guard" as guard;
+
+.ocs-btn {
+  // --- per-instance knobs, overridable by modifiers --------------------
+  --btn-bg: var(--ocs-accent);
+  --btn-fg: var(--ocs-accent-contrast);
+  --btn-border: transparent;
+  --btn-bg-hover: color-mix(in srgb, var(--ocs-accent) 86%, #fff);
+  --btn-bg-active: color-mix(in srgb, var(--ocs-accent) 78%, #000);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: fn.space(2);
+
+  height: 2.25rem;                 // 36px
+  padding-inline: fn.space(4);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--ocs-radius-md);
+
+  // Base values, then re-asserted at (0,2,0) below so they outrank
+  // `.user-theme-active button` (0,1,1). See core/_legacy-guard.scss.
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+
+  @include guard.outrank-legacy {
+    background: var(--btn-bg);
+    color: var(--btn-fg);
+    border: 1px solid var(--btn-border);
+  }
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--ocs-duration-fast) var(--ocs-ease),
+    border-color     var(--ocs-duration-fast) var(--ocs-ease),
+    color            var(--ocs-duration-fast) var(--ocs-ease);
+
+  @include a11y.focusable;
+
+  &:hover:not(:disabled):not([aria-disabled="true"]) {
+    background: var(--btn-bg-hover);
+  }
+
+  &:active:not(:disabled):not([aria-disabled="true"]) {
+    background: var(--btn-bg-active);
+  }
+
+  &:disabled,
+  &[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Icons inherit text colour and never shrink.
+  svg,
+  .ocs-btn__icon {
+    flex: 0 0 auto;
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+  }
+
+  // --- variants ---------------------------------------------------------
+  &--primary {
+    --btn-bg: var(--ocs-accent);
+    --btn-fg: var(--ocs-accent-contrast);
+    --btn-border: transparent;
+  }
+
+  &--secondary {
+    --btn-bg: transparent;
+    --btn-fg: var(--ocs-accent);
+    --btn-border: var(--ocs-accent-border);
+    --btn-bg-hover: var(--ocs-accent-bg);
+    --btn-bg-active: color-mix(in srgb, var(--ocs-accent-bg) 70%, #000);
+  }
+
+  &--ghost {
+    --btn-bg: transparent;
+    --btn-fg: var(--ocs-text-secondary);
+    --btn-border: transparent;
+    --btn-bg-hover: var(--ocs-surface-elevated);
+    --btn-bg-active: var(--ocs-surface-raised);
+
+    &:hover:not(:disabled) { color: var(--ocs-text); }
+  }
+
+  &--danger {
+    --btn-bg: var(--ocs-danger-border);
+    // Dark text, not white. White on #FF453A measures 3.41:1 and fails AA;
+    // #121212 on the same red measures 5.50:1. Keeps the red vivid and matches
+    // how --primary already works.
+    --btn-fg: var(--ocs-text-inverse);
+    --btn-border: transparent;
+    --btn-bg-hover: color-mix(in srgb, var(--ocs-danger-border) 86%, #fff);
+    --btn-bg-active: color-mix(in srgb, var(--ocs-danger-border) 78%, #000);
+  }
+
+  // --- sizes ------------------------------------------------------------
+  &--sm {
+    height: 1.75rem;               // 28px
+    padding-inline: fn.space(3);
+    font-size: 0.8125rem;          // 13px
+    border-radius: var(--ocs-radius-sm);
+  }
+
+  &--lg {
+    height: 2.75rem;               // 44px — also the mobile touch target
+    padding-inline: fn.space(6);
+    font-size: fn.typo(body, size);
+    border-radius: var(--ocs-radius-lg);
+  }
+
+  // --- shapes -----------------------------------------------------------
+  // Square. Requires an accessible name: aria-label or .ocs-sr-only text.
+  &--icon {
+    width: 2.25rem;
+    padding-inline: 0;
+
+    &.ocs-btn--sm { width: 1.75rem; }
+    &.ocs-btn--lg { width: 2.75rem; }
+  }
+
+  &--pill { border-radius: var(--ocs-radius-full); }
+
+  &--block {
+    display: flex;
+    width: 100%;
+  }
+
+  // --- busy -------------------------------------------------------------
+  &[aria-busy="true"] {
+    cursor: progress;
+    pointer-events: none;
+
+    &::after {
+      content: "";
+      width: 0.875em;
+      height: 0.875em;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: ocs-spin 0.6s linear infinite;
+    }
+  }
+}
+
+// Touch targets: anything below 44px gets padded out on coarse pointers,
+// without changing the visual box.
+@media (pointer: coarse) {
+  .ocs-btn {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+@keyframes ocs-spin {
+  to { transform: rotate(360deg); }
+}
+
+// -----------------------------------------------------------------------------
+// BUTTON GROUP
+// -----------------------------------------------------------------------------
+.ocs-btn-group {
+  display: inline-flex;
+
+  .ocs-btn {
+    border-radius: 0;
+
+    &:first-child {
+      border-start-start-radius: var(--ocs-radius-md);
+      border-end-start-radius: var(--ocs-radius-md);
+    }
+
+    &:last-child {
+      border-start-end-radius: var(--ocs-radius-md);
+      border-end-end-radius: var(--ocs-radius-md);
+    }
+
+    &:not(:first-child) { margin-inline-start: -1px; }
+
+    // Keep the focused button's ring above its neighbours.
+    &:focus-visible { z-index: 1; }
+  }
+}
