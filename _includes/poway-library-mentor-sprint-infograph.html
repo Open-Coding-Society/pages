@@ -17,49 +17,49 @@
   /* ── Hero ── */
   .ment-ig-hero {
     text-align: center;
-    padding: 64px 24px 52px;
+    padding: 36px 24px 30px;
     background: rgba(255,255,255,0.04);
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
 
   .ment-ig-badge {
     display: inline-block;
-    padding: 6px 18px;
+    padding: 5px 14px;
     border-radius: 999px;
     border: 1px solid rgba(76,175,239,0.5);
     background: rgba(76,175,239,0.1);
     color: #4CAFEF;
-    font-size: 0.72rem;
+    font-size: 0.66rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 16px;
+    letter-spacing: 0.09em;
+    margin-bottom: 12px;
   }
 
   .ment-ig-hero h1 {
-    font-size: 2.8rem;
+    font-size: 1.9rem;
     font-weight: 800;
-    letter-spacing: -0.02em;
-    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+    margin: 0 0 4px;
     color: #fff;
     border: none;
   }
 
   .ment-ig-sprint-label {
-    font-size: 1rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: #4CAFEF;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin: 0 0 16px;
+    letter-spacing: 0.07em;
+    margin: 0 0 12px;
   }
 
   .ment-ig-hero-sub {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: rgba(255,255,255,0.65);
-    max-width: 640px;
-    margin: 0 auto 28px;
-    line-height: 1.65;
+    max-width: 600px;
+    margin: 0 auto 18px;
+    line-height: 1.55;
   }
 
   .ment-ig-hero-meta {
@@ -68,7 +68,7 @@
     align-items: center;
     gap: 1.5rem;
     flex-wrap: wrap;
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     color: rgba(255,255,255,0.55);
   }
 
@@ -362,35 +362,17 @@
     border: 1px solid rgba(255,255,255,0.1);
   }
 
-  .ment-ig-role-box.mentor {
-    background: rgba(76,175,239,0.08);
-    border: 1.5px solid rgba(76,175,239,0.5);
-    position: relative;
-  }
-
-  .ment-ig-role-box.mentor::after {
-    content: 'NEW';
-    position: absolute; top: -10px; right: 12px;
-    background: #4CAFEF; color: #000;
-    font-size: 0.62rem; font-weight: 900; letter-spacing: 0.1em;
-    padding: 2px 7px; border-radius: 4px;
-  }
-
   .ment-ig-role-title {
     font-size: 0.82rem; font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.07em;
     margin: 0 0 10px; color: #fff;
   }
 
-  .ment-ig-role-box.mentor .ment-ig-role-title { color: #4CAFEF; }
-
   .ment-ig-role-perms {
     list-style: none; padding: 0; margin: 0;
     font-size: 0.78rem; line-height: 1.8;
     color: rgba(255,255,255,0.6);
   }
-
-  .ment-ig-role-box.mentor .ment-ig-role-perms { color: rgba(76,175,239,0.85); }
 
   .ment-ig-role-arrow {
     display: flex; align-items: center;
@@ -498,7 +480,7 @@
     <div class="ment-ig-stats">
       <div class="ment-ig-stat">
         <span class="ment-ig-stat-value">4</span>
-        <span class="ment-ig-stat-label">Roles (Student, Teacher, Mentor, Admin)</span>
+        <span class="ment-ig-stat-label">Roles (Follower, Student, Teacher, Mentor)</span>
       </div>
       <div class="ment-ig-stat">
         <span class="ment-ig-stat-value">3</span>
@@ -609,10 +591,22 @@
       </div>
     </div>
 
-    <!-- Role Diagram -->
+    <!-- Roles and Permissions -->
     <div class="ment-ig-role-diagram">
-      <h2>Role &amp; Permission Hierarchy</h2>
+      <h2>Roles &amp; Permissions</h2>
       <div class="ment-ig-roles-row">
+
+        <div class="ment-ig-role-box">
+          <div class="ment-ig-role-title">Follower</div>
+          <ul class="ment-ig-role-perms">
+            <li>Comment on microblog posts</li>
+            <li>Follow class discussions</li>
+            <li>No assignment access</li>
+            <li>No grade access</li>
+          </ul>
+        </div>
+
+        <div class="ment-ig-role-arrow">→</div>
 
         <div class="ment-ig-role-box">
           <div class="ment-ig-role-title">Student</div>
@@ -630,33 +624,21 @@
           <div class="ment-ig-role-title">Teacher</div>
           <ul class="ment-ig-role-perms">
             <li>All Student perms</li>
-            <li>View all grades</li>
-            <li>Grade assignments</li>
-            <li>Manage groups</li>
-          </ul>
-        </div>
-
-        <div class="ment-ig-role-arrow">→</div>
-
-        <div class="ment-ig-role-box mentor">
-          <div class="ment-ig-role-title">Mentor</div>
-          <ul class="ment-ig-role-perms">
-            <li>View assigned projects only</li>
-            <li>Chat with project teams</li>
-            <li>Google OAuth signup</li>
-            <li>No grade access</li>
+            <li>Grade assignments &amp; manage groups</li>
+            <li>Approve &amp; assign mentors</li>
+            <li>Full platform administration</li>
           </ul>
         </div>
 
         <div class="ment-ig-role-arrow">→</div>
 
         <div class="ment-ig-role-box">
-          <div class="ment-ig-role-title">Admin</div>
+          <div class="ment-ig-role-title">Mentor</div>
           <ul class="ment-ig-role-perms">
-            <li>All role management</li>
-            <li>Approve mentor accounts</li>
-            <li>Assign mentors to projects</li>
-            <li>Full platform access</li>
+            <li>View assigned projects only</li>
+            <li>Chat with project teams</li>
+            <li>Google OAuth signup</li>
+            <li>No grade access</li>
           </ul>
         </div>
 
