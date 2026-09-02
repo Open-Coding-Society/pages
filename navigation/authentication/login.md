@@ -33,12 +33,23 @@ show_reading_time: false
     <div class="signup-card">
         <h1 id="signupTitle">Sign Up</h1>
         <hr>
+        <div class="form-group">
+            <label for="signupRole" style="display: block; margin-bottom: 0.25rem;">I am a:</label>
+            <select id="signupRole">
+                <option value="student" selected>Student</option>
+                <option value="mentor">Mentor</option>
+            </select>
+        </div>
         <!-- Google OAuth Section (initially hidden) -->
         <div id="oauth-verification" style="display: none; text-align: center; margin-bottom: 2rem;">
             <h3 style="color: #6366f1; margin-bottom: 1rem;">Google Account Verification</h3>
-            <p style="margin-bottom: 1.5rem; color: #d1d5db;">
+            <p id="oauth-copy-student" style="margin-bottom: 1.5rem; color: #d1d5db;">
                 Sign in with any Google account. Poway USD student accounts receive immediate access;
                 other accounts will await administrator approval.
+            </p>
+            <p id="oauth-copy-mentor" style="display: none; margin-bottom: 1.5rem; color: #d1d5db;">
+                Optionally verify a business email address for faster admin review, or skip this
+                step and sign up now -- your account will await administrator approval either way.
             </p>
             <div id="g_id_onload"
                  data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
@@ -54,6 +65,11 @@ show_reading_time: false
                  data-logo_alignment="left"
                  style="margin-bottom: 1rem;">
             </div>
+            <button type="button" id="skip-mentor-oauth" class="large secondary" onclick="skipMentorOAuth()"
+                    style="display: none; background-color: #6b7280; margin-bottom: 1rem;">
+                Skip — verify later
+            </button>
+            <br>
             <button type="button" class="large secondary" onclick="showSignupForm()" 
                     style="background-color: #6b7280;">
                 ← Back to Form
@@ -69,10 +85,10 @@ show_reading_time: false
                 <input type="text" id="signupUid" placeholder="GitHub ID" aria-describedby="github-id-validation-message" required>
                 <div id="github-id-validation-message" class="validation-message error" aria-live="polite"></div>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="signupSidGroup">
                 <input type="text" id="signupSid" placeholder="Student ID" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="signupSchoolGroup">
                 <select id="signupSchool" required>
                     <option value="" disabled selected>Select Your High School</option>
                     <option value="Abraxas High School">Abraxas</option>
@@ -145,6 +161,31 @@ show_reading_time: false
     }
 
     document.getElementById('signupUid').addEventListener('input', validateGithubId);
+
+    // Mentor signup drops the Student ID / school requirement and makes the OAuth step
+    // optional (see skipMentorOAuth) instead of the mandatory school-email verification
+    // students go through. A hidden-but-required field still blocks form submission, so
+    // the required attribute has to come off, not just the visual display.
+    function updateSignupModeUI() {
+        const isMentor = document.getElementById('signupRole').value === 'mentor';
+        const sidGroup = document.getElementById('signupSidGroup');
+        const schoolGroup = document.getElementById('signupSchoolGroup');
+        const sidField = document.getElementById('signupSid');
+        const schoolField = document.getElementById('signupSchool');
+        const emailField = document.getElementById('signupEmail');
+
+        sidGroup.style.display = isMentor ? 'none' : '';
+        schoolGroup.style.display = isMentor ? 'none' : '';
+        sidField.required = !isMentor;
+        schoolField.required = !isMentor;
+        emailField.placeholder = isMentor ? 'Email' : 'Personal (not school) Email';
+
+        document.getElementById('oauth-copy-student').style.display = isMentor ? 'none' : '';
+        document.getElementById('oauth-copy-mentor').style.display = isMentor ? '' : 'none';
+        document.getElementById('skip-mentor-oauth').style.display = isMentor ? 'inline-block' : 'none';
+    }
+
+    document.getElementById('signupRole').addEventListener('change', updateSignupModeUI);
 
     // Password validation with debouncing (1.5 second delay)
     function validatePasswordsDebounced() {
@@ -292,17 +333,20 @@ show_reading_time: false
         }
 
         // Store form data
+        const role = document.getElementById("signupRole").value;
         signupFormData = {
+            role: role,
             name: document.getElementById("name").value,
             uid: document.getElementById("signupUid").value,
-            sid: document.getElementById("signupSid").value,
-            school: document.getElementById("signupSchool").value,
+            sid: role === 'mentor' ? '' : document.getElementById("signupSid").value,
+            school: role === 'mentor' ? '' : document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
             kasm_server_needed: document.getElementById("kasmNeeded").checked,
         };
 
-        // Show OAuth verification
+        // Show OAuth verification (mandatory for students, optional -- via the Skip
+        // button -- for mentors; see updateSignupModeUI)
         showOAuthVerification();
     }
 
@@ -315,6 +359,17 @@ show_reading_time: false
         document.getElementById('oauth-verification').style.display = 'none';
         document.getElementById('signupForm').style.display = 'block';
         clearOAuthStatus();
+    }
+
+    // Mentor-only: skips the optional business-email verification step and signs up
+    // immediately with no idToken. Spring's /api/person/create only accepts a
+    // no-idToken signup when accountType is exactly "mentor" (see signup() below) --
+    // the account lands in ROLE_PENDING either way, this just skips the extra step.
+    window.skipMentorOAuth = function() {
+        signupIdToken = null;
+        document.getElementById('oauth-verification').style.display = 'none';
+        document.getElementById('signupForm').style.display = 'block';
+        signup();
     }
 
     function clearOAuthStatus() {
@@ -363,6 +418,8 @@ show_reading_time: false
 
     // Initialize password validation when page loads
     window.addEventListener('load', function() {
+        updateSignupModeUI();
+
         const passwordField = document.getElementById('signupPassword');
         const confirmPasswordField = document.getElementById('confirmPassword');
 
@@ -530,6 +587,7 @@ show_reading_time: false
         document.getElementById('overallStatus').classList.add('hidden');
 
         const data = signupFormData && Object.keys(signupFormData).length > 0 ? signupFormData : {
+            role: document.getElementById("signupRole").value,
             name: document.getElementById("name").value,
             uid: document.getElementById("signupUid").value,
             sid: document.getElementById("signupSid").value,
@@ -548,6 +606,9 @@ show_reading_time: false
             password: data.password,
             kasmServerNeeded: data.kasm_server_needed,
             idToken: signupIdToken,
+            // "mentor" opts into Spring's no-idToken mentor signup path; anything else
+            // (including this being absent) keeps the existing mandatory-OAuth behavior.
+            accountType: data.role,
         };
 
         if (verifiedSchoolEmail) {
