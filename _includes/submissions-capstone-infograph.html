@@ -66,14 +66,15 @@
   margin-bottom: 1rem;
 }
 
-.sub-cap .row {
+.sub-cap .sub-row {
+  display: block;
   padding: 1.15rem 1.25rem;
   background: var(--surface);
   border-bottom: 1px solid var(--hairline);
 }
-.sub-cap .row:last-child { border-bottom: none; }
+.sub-cap .sub-row:last-child { border-bottom: none; }
 
-.sub-cap .row h3 {
+.sub-cap .sub-row h3 {
   font-family: var(--mono);
   font-size: 0.95rem;
   font-weight: 600;
@@ -81,21 +82,21 @@
   margin: 0 0 0.3rem;
 }
 
-.sub-cap .row .team {
+.sub-cap .sub-row .team {
   font-family: var(--mono);
   font-size: 0.72rem;
   color: var(--text-muted);
   margin: 0 0 0.5rem;
 }
 
-.sub-cap .row p.desc {
+.sub-cap .sub-row p.desc {
   font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.55;
   margin: 0 0 0.5rem;
 }
 
-.sub-cap .row .link {
+.sub-cap .sub-row .link {
   font-family: var(--mono);
   font-size: 0.78rem;
   font-weight: 600;
@@ -103,13 +104,6 @@
   text-decoration: none;
   border-bottom: 1px solid var(--signal);
   white-space: nowrap;
-}
-
-.sub-cap .footnote {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin: 0;
-  padding: 0 0.25rem;
 }
 </style>
 
@@ -123,28 +117,27 @@
 
   <div class="board">
 
-    <div class="row">
+    <div class="sub-row">
       <h3>Assignment Creator Permissions</h3>
       <p class="team">Aneesh Deevi &middot; Aditya Srivastava &middot; Aaryav Lal</p>
       <p class="desc">Lets any signed-in student create and manage their own assignment, without needing a teacher or admin role.</p>
       <a href="{{ '/capstone/AAA/' | relative_url }}" class="link">View project →</a>
     </div>
 
-    <div class="row">
+    <div class="sub-row">
       <h3>Submission Analytics</h3>
       <p class="team">Katherine &middot; Jacob &middot; Bridget</p>
       <p class="desc">Reworks the OCS and GitHub analytics pages to better reflect progress and improvement, and adds self-assessment categories for grading and a fuller picture of each student.</p>
       <a href="{{ '/capstone/analytics_selfassessment/' | relative_url }}" class="link">View project →</a>
     </div>
 
-    <div class="row">
+    <div class="sub-row">
       <h3>AI Grading</h3>
-      <p class="team">Team not yet assigned</p>
-      <p class="desc">Placeholder — this group's capstone work hasn't been submitted yet. This row will fill in once it's ready.</p>
+      <p class="team">Nicolas Diaz &middot; William Windle &middot; Rishabh Jha</p>
+      <p class="desc">An AI-graded pipeline (Gemini API) for MC, FRQ, and GitHub Issue submissions, moving scores and feedback out of a spreadsheet and into a database admins can browse.</p>
+      <a href="{{ '/capstone/work-submission-grading/' | relative_url }}" class="link">View project →</a>
     </div>
 
   </div>
-
-  <p class="footnote">Each sub-project keeps its own detail page.</p>
 
 </div>
