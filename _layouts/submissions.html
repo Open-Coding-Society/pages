@@ -1083,8 +1083,18 @@ active_tab: submissions
         return allSubmissions.filter(submission => !submission.aiSummary).slice(0, MAX_SUMMARY_BATCH_ITEMS);
     }
 
+    // Kept well under nginx's default 1MB request-body cap (which production is
+    // still running until the size-limit PR ships) so batches with file
+    // attachments don't get rejected outright. Tracks the running total across
+    // the whole batch, not just one file at a time, since it's the combined
+    // multipart request that gets measured -- one file under the limit plus
+    // another under the limit can still add up to a rejected request.
+    const MAX_BATCH_FILE_BYTES = 800 * 1024;
+
     async function buildSummaryFormData(batch) {
         const formData = new FormData();
+        let totalFileBytes = 0;
+        const skippedForSize = [];
 
         for (let i = 0; i < batch.length; i++) {
             const submission = batch[i];
@@ -1106,8 +1116,21 @@ active_tab: submissions
                     try {
                         const fileResponse = await fetch(downloadUrl, fetchOptions);
                         if (fileResponse.ok) {
-                            const blob = await fileResponse.blob();
-                            formData.append(`file_${i}`, blob, filename);
+                            const declaredSize = Number(fileResponse.headers.get('Content-Length')) || 0;
+
+                            if (declaredSize && totalFileBytes + declaredSize > MAX_BATCH_FILE_BYTES) {
+                                console.warn(`Skipping file for submission ${submission.id}: would push batch over the size budget (${declaredSize} bytes)`);
+                                skippedForSize.push(submission.id);
+                            } else {
+                                const blob = await fileResponse.blob();
+                                if (totalFileBytes + blob.size > MAX_BATCH_FILE_BYTES) {
+                                    console.warn(`Skipping file for submission ${submission.id}: would push batch over the size budget (${blob.size} bytes)`);
+                                    skippedForSize.push(submission.id);
+                                } else {
+                                    formData.append(`file_${i}`, blob, filename);
+                                    totalFileBytes += blob.size;
+                                }
+                            }
                         }
                     } catch (fileError) {
                         console.warn(`Could not fetch file for submission ${submission.id}:`, fileError);
@@ -1123,11 +1146,11 @@ active_tab: submissions
             }
         }
 
-        return formData;
+        return { formData, skippedForSize };
     }
 
     async function summarizeOneBatch(batch) {
-        const formData = await buildSummaryFormData(batch);
+        const { formData, skippedForSize } = await buildSummaryFormData(batch);
 
         const response = await fetch(summarizeUrl, {
             method: 'POST',
@@ -1179,7 +1202,7 @@ active_tab: submissions
             }
         }
 
-        return savedCount;
+        return { savedCount, skippedForSize };
     }
 
     async function runSummarizeBatch() {
@@ -1196,6 +1219,7 @@ active_tab: submissions
         let batchNum = 0;
         let totalSaved = 0;
         let totalAttempted = 0;
+        let totalSkippedForSize = 0;
 
         const rerender = () => {
             displayAllSubmissions();
@@ -1215,16 +1239,21 @@ active_tab: submissions
                     `(${totalAttempted + 1}-${totalAttempted + batch.length} of ${totalToProcess})...`
                 );
 
-                totalSaved += await summarizeOneBatch(batch);
+                const result = await summarizeOneBatch(batch);
+                totalSaved += result.savedCount;
+                totalSkippedForSize += result.skippedForSize.length;
                 totalAttempted += batch.length;
                 rerender();
             }
 
             const failedCount = totalAttempted - totalSaved;
+            const skippedNote = totalSkippedForSize > 0
+                ? ` (${totalSkippedForSize} file${totalSkippedForSize === 1 ? '' : 's'} skipped for size — too large to include in a batch right now.)`
+                : '';
             if (failedCount > 0) {
-                setSummarizeStatus(`Summarized ${totalSaved}/${totalAttempted}. ${failedCount} could not be saved — try again.`, 'error');
+                setSummarizeStatus(`Summarized ${totalSaved}/${totalAttempted}. ${failedCount} could not be saved — try again.${skippedNote}`, 'error');
             } else {
-                setSummarizeStatus(`Summarized all ${totalSaved} submission${totalSaved === 1 ? '' : 's'}.`, 'success');
+                setSummarizeStatus(`Summarized all ${totalSaved} submission${totalSaved === 1 ? '' : 's'}.${skippedNote}`, skippedNote ? 'info' : 'success');
             }
         } catch (error) {
             console.error('Error summarizing submissions:', error);
