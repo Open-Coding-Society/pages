@@ -53,9 +53,6 @@ You own the copy. Edit it freely - there is no package to fight with.
 | `--ocs-brand` | `#EA706E` |
 | `--ocs-brand-border` | `#E06665` |
 | `--ocs-brand-bg` | `#3B2827` |
-| `--ocs-brand` | `#EA706E` |
-| `--ocs-brand-border` | `#E06665` |
-| `--ocs-brand-bg` | `#3B2827` |
 | `--ocs-info` | `#5293FF` |
 | `--ocs-info-border` | `#007AFF` |
 | `--ocs-info-bg` | `#272B3F` |

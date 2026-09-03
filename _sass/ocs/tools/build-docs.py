@@ -16,7 +16,13 @@ if not CSS.exists():
 
 css = CSS.read_text()
 root_block = re.search(r':root\s*\{(.*?)\n\}', css, re.S)
-tokens = re.findall(r'(--ocs-[a-z0-9-]+)\s*:\s*([^;]+);', root_block.group(1))
+_decls = re.findall(r'(--ocs-[a-z0-9-]+)\s*:\s*([^;]+);', root_block.group(1))
+# A token can be declared more than once in :root. CSS takes the last one, so
+# collapse to that rather than listing the same token twice in the table.
+_last = {}
+for _k, _v in _decls:
+    _last[_k] = _v
+tokens = list(_last.items())
 
 GROUPS = [
     ('Semantic colour', lambda k: any(k.startswith('--ocs-' + r) for r in
