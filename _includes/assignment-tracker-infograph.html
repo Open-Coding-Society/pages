@@ -1,69 +1,75 @@
 {% assign data = site.data.assignment_tracker_infograph %}
 
-<div class="dd-infograph">
-  <!-- Header Section -->
-  <div class="dd-header">
-    <div class="dd-badge">OCS Gradebook System</div>
-    <h1 class="dd-title">{{ data.Title }}</h1>
-    <p class="dd-description">{{ data.Description }}</p>
+<div style="width:100%;box-sizing:border-box;background:#000;color:#f0f0f0;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:2rem 1rem;">
+
+  <!-- Header -->
+  <div style="text-align:center;margin-bottom:2.5rem;">
+    <span style="display:inline-block;background:rgba(76,175,239,0.15);color:#4CAFEF;border:1px solid rgba(76,175,239,0.4);border-radius:20px;padding:0.3rem 1rem;font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;">OCS Gradebook System</span>
+    <h1 style="font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;color:#fff;margin:0 0 0.75rem;">{{ data.Title }}</h1>
+    <p style="color:#aaa;font-size:0.95rem;max-width:680px;margin:0 auto;line-height:1.6;word-wrap:break-word;">{{ data.Description }}</p>
   </div>
 
   <!-- Feature Cards -->
   {% for topic in data.Features %}
-  <div class="dd-card">
-    <div class="dd-card-grid">
+  <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;margin-bottom:1.25rem;overflow:hidden;">
 
-      <!-- Left: Status -->
-      <div class="dd-visual">
-        <div class="dd-feature-icon">
-          <svg class="dd-icon" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-            {{ topic.icon }}
-          </svg>
-        </div>
-        <div class="dd-status">{{ topic.status }}</div>
-        <div class="dd-team">
-          <span class="dd-team-label">Endpoints</span>
-          <span class="dd-team-name">{{ topic.endpoints | join: " / " }}</span>
-        </div>
+    <!-- Card Header -->
+    <div style="display:flex;align-items:center;gap:0.75rem;padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(76,175,239,0.06);">
+      <div style="width:36px;height:36px;flex-shrink:0;background:rgba(76,175,239,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+        <svg style="width:18px;height:18px;color:#4CAFEF;" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          {{ topic.icon }}
+        </svg>
       </div>
+      <div style="min-width:0;flex:1;">
+        <h2 style="margin:0;font-size:1rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ topic.title }}</h2>
+        <p style="margin:0;font-size:0.78rem;color:#aaa;">{{ topic.subtitle }}</p>
+      </div>
+      <span style="flex-shrink:0;background:rgba(40,167,69,0.15);color:#4ade80;border:1px solid rgba(40,167,69,0.3);border-radius:12px;padding:0.2rem 0.7rem;font-size:0.72rem;font-weight:600;">{{ topic.status }}</span>
+    </div>
 
-      <!-- Center: Key Points -->
-      <div class="dd-content">
-        <h2 class="dd-project-title">{{ topic.title }}</h2>
-        <p class="dd-subtitle">{{ topic.subtitle }}</p>
+    <!-- Card Body -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-width:0;">
 
-        <div class="dd-keypoints">
-          {% for point in topic.keyPoints %}
-          <div class="dd-keypoint">
-            <span class="dd-check">✓</span>
-            <span>{{ point }}</span>
-          </div>
-          {% endfor %}
+      <!-- Left: Key Points + Tech -->
+      <div style="padding:1.25rem;border-right:1px solid rgba(255,255,255,0.08);min-width:0;">
+        <p style="margin:0 0 0.75rem;font-size:0.72rem;font-weight:600;color:#4CAFEF;text-transform:uppercase;letter-spacing:0.06em;">Key Points</p>
+        {% for point in topic.keyPoints %}
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.4rem;align-items:flex-start;">
+          <span style="color:#4ade80;font-size:0.8rem;flex-shrink:0;margin-top:1px;">✓</span>
+          <span style="font-size:0.82rem;color:#d0d0d0;line-height:1.4;word-wrap:break-word;min-width:0;">{{ point }}</span>
         </div>
+        {% endfor %}
 
-        <div class="dd-tech-stack">
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1rem;">
           {% for tech in topic.tech %}
-          <span class="dd-tech-tag">{{ tech }}</span>
+          <span style="background:rgba(76,175,239,0.1);color:#4CAFEF;border:1px solid rgba(76,175,239,0.25);border-radius:6px;padding:0.2rem 0.55rem;font-size:0.72rem;font-weight:500;">{{ tech }}</span>
           {% endfor %}
         </div>
       </div>
 
-      <!-- Right: Description & Impact -->
-      <div class="dd-details">
-        <h3 class="dd-section-title">About</h3>
-        <p class="dd-about">{{ topic.description }}</p>
+      <!-- Right: About + Security + Endpoints -->
+      <div style="padding:1.25rem;min-width:0;">
+        <p style="margin:0 0 0.4rem;font-size:0.72rem;font-weight:600;color:#4CAFEF;text-transform:uppercase;letter-spacing:0.06em;">About</p>
+        <p style="margin:0 0 1rem;font-size:0.82rem;color:#d0d0d0;line-height:1.5;word-wrap:break-word;">{{ topic.description }}</p>
 
-        <h3 class="dd-section-title">Security</h3>
-        <div class="dd-impact-list">
-          {% for item in topic.security %}
-          <div class="dd-impact-item">{{ item }}</div>
-          {% endfor %}
+        <p style="margin:0 0 0.4rem;font-size:0.72rem;font-weight:600;color:#4CAFEF;text-transform:uppercase;letter-spacing:0.06em;">Security</p>
+        {% for item in topic.security %}
+        <div style="display:flex;gap:0.5rem;margin-bottom:0.35rem;align-items:flex-start;">
+          <span style="color:#007ACC;flex-shrink:0;font-size:0.8rem;margin-top:1px;">▸</span>
+          <span style="font-size:0.8rem;color:#d0d0d0;line-height:1.4;word-wrap:break-word;min-width:0;">{{ item }}</span>
         </div>
+        {% endfor %}
 
-        <a href="{{ site.baseurl }}{{ topic.link }}" class="dd-btn">View in Dashboard</a>
+        <p style="margin:1rem 0 0.4rem;font-size:0.72rem;font-weight:600;color:#4CAFEF;text-transform:uppercase;letter-spacing:0.06em;">Endpoints</p>
+        {% for ep in topic.endpoints %}
+        <div style="font-family:monospace;font-size:0.72rem;color:#aaa;background:rgba(255,255,255,0.04);border-radius:4px;padding:0.2rem 0.4rem;margin-bottom:0.25rem;word-break:break-all;">{{ ep }}</div>
+        {% endfor %}
+
+        <a href="{{ site.baseurl }}{{ topic.link }}" style="display:inline-block;margin-top:1rem;background:#007ACC;color:#fff;border-radius:8px;padding:0.4rem 1rem;font-size:0.8rem;font-weight:600;text-decoration:none;">View Dashboard</a>
       </div>
 
     </div>
   </div>
   {% endfor %}
+
 </div>
