@@ -317,7 +317,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
 
    <!-- Submissions Capstone (umbrella issue: AAA, Submission Analytics, AI Grading) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2025-2026">
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-31-submissions-capstone %}">
            <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #06b6d4, #0f172a);">SUB</div>
        </a>
