@@ -100,6 +100,12 @@ FORM: An accessible game setup sheet crossed with a transit-style route map; the
         </div>
       </div>
     </div>
+    <div class="agm-contract" aria-label="Frontend integration contract">
+      <span>Guided UI</span><i aria-hidden="true">→</i>
+      <span>State + validation adapter</span><i aria-hidden="true">→</i>
+      <span>Inherited game data</span><i aria-hidden="true">→</i>
+      <span>Engine preview ↔ save flow</span>
+    </div>
   </section>
 
   <section class="agm-team agm-reveal" aria-labelledby="agm-team-title">
@@ -204,6 +210,16 @@ FORM: An accessible game setup sheet crossed with a transit-style route map; the
         <li><span>03</span>Specific validation and safe corrupted-draft recovery</li>
         <li><span>04</span>Start, pause, reset, exit, save, and restore</li>
       </ul>
+    </div>
+    <div class="agm-csp-evidence">
+      <div>
+        <h3>Collaboration history</h3>
+        <p>Every work session adds an issue comment: <strong>Goal → Built → Evidence → Test result → Feedback → Next revision.</strong> Commits, teammate reviews, Kanban movement, and the correcting change preserve the full iteration story.</p>
+      </div>
+      <div>
+        <h3>Function and purpose</h3>
+        <p><strong>Inputs:</strong> game and accessibility choices. <strong>Events:</strong> navigate, validate, preview, save, restore. <strong>Outputs:</strong> feedback and configured gameplay. <strong>Data:</strong> one builder-state object and an accessibility-options list.</p>
+      </div>
     </div>
     <div class="agm-portfolio">
       <h3>Evidence each teammate leaves behind</h3>
