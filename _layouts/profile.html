@@ -23,8 +23,8 @@ active_tab: profile
                     value="" onchange="checkForChanges()" autocomplete="off">
             </div>
 
-            <!-- User ID -->
-            <div>
+            <!-- User ID (hidden from view; still used internally by save/load logic) -->
+            <div class="hidden">
                 <label for="uidChangeInput" class="block text-sm font-medium text-gray-300 mb-1">User
                     ID</label>
                 <input type="text" id="uidChangeInput" name="userId"
@@ -37,6 +37,24 @@ active_tab: profile
                 <label for="emailChangeInput" class="block text-sm font-medium text-gray-300 mb-1">Email
                     Address</label>
                 <input type="email" id="emailChangeInput" name="new-email"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="" onchange="checkForChanges()" autocomplete="off">
+            </div>
+
+            <!-- Business Email -->
+            <div>
+                <label for="businessEmailChangeInput" class="block text-sm font-medium text-gray-300 mb-1">Business
+                    Email</label>
+                <input type="email" id="businessEmailChangeInput" name="business-email"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value="" onchange="checkForChanges()" autocomplete="off">
+            </div>
+
+            <!-- Phone Number -->
+            <div>
+                <label for="phoneChangeInput" class="block text-sm font-medium text-gray-300 mb-1">Phone
+                    Number</label>
+                <input type="tel" id="phoneChangeInput" name="phone"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     value="" onchange="checkForChanges()" autocomplete="off">
             </div>
@@ -64,8 +82,8 @@ active_tab: profile
         </div>
     </div>
 
-    <!-- School Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <!-- School Section (hidden from view; fields still used internally by save/load logic) -->
+    <div class="hidden bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <h2 class="text-xl font-semibold mb-6">School Information</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -97,8 +115,8 @@ active_tab: profile
         </div>
     </div>
 
-    <!-- Classes Section -->
-    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+    <!-- Classes Section (hidden from view; logic still runs internally) -->
+    <div class="hidden bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Classes</h2>
             <button type="button" id="addClassBtn"
