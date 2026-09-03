@@ -4,10 +4,8 @@
 //   @use "ocs";                       // everything
 //   @use "ocs/core/functions" as fn;  // tokens only, no CSS emitted
 //
-// Load order matters: tokens -> css custom properties -> a11y -> components.
-//
-// This is the first slice: the token layer and the button. The remaining
-// fourteen components follow in a later pull request so each stays reviewable.
+// Load order matters: tokens -> css custom properties -> a11y -> components
+// -> utilities -> compat. Compat is last so its @extend targets exist.
 // =============================================================================
 
 @forward "core/tokens";
@@ -17,3 +15,21 @@
 @use "core/a11y";
 
 @use "components/button";
+@use "components/field";
+@use "components/card";
+@use "components/alert";
+@use "components/badge";
+@use "components/table";
+@use "components/modal";
+@use "components/nav";
+@use "components/toast";
+@use "components/progress";
+@use "components/menu";
+@use "components/avatar";
+@use "components/skeleton";
+@use "components/code";
+@use "components/tooltip";
+
+@use "utilities/layout";
+
+@use "compat/legacy";

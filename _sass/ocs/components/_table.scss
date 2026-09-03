@@ -1,0 +1,155 @@
+// =============================================================================
+// OCS TABLE
+// =============================================================================
+// GRAMMAR
+//   .ocs-table-wrap     scroll container — REQUIRED around every table
+//   .ocs-table          the <table>
+//   modifiers  --striped | --compact | --bordered
+//
+//   <div class="ocs-table-wrap" tabindex="0" role="region" aria-label="Projects">
+//     <table class="ocs-table"> … </table>
+//   </div>
+//
+// The wrapper carries tabindex="0" so a keyboard user can scroll a wide table.
+// Without it, overflow content is unreachable without a mouse.
+// Use <th scope="col"> / <th scope="row"> — the styling assumes it.
+// =============================================================================
+
+@use "../core/functions" as fn;
+
+.ocs-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--ocs-border);
+  border-radius: var(--ocs-radius-lg);
+  // Momentum scrolling on iOS.
+  -webkit-overflow-scrolling: touch;
+
+  &:focus-visible {
+    outline: 2px solid var(--ocs-accent);
+    outline-offset: -2px;
+  }
+}
+
+.ocs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ocs-surface-raised);
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  line-height: fn.typo(small, line);
+  color: var(--ocs-text-secondary);
+
+  caption {
+    padding: fn.space(3) fn.space(4);
+    text-align: start;
+    font-weight: 600;
+    color: var(--ocs-text);
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+
+    padding: fn.space(3) fn.space(4);
+    border-block-end: 1px solid var(--ocs-border);
+    background: var(--ocs-surface-elevated);
+
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: start;
+    white-space: nowrap;
+    color: var(--ocs-text-muted);
+  }
+
+  tbody td,
+  tbody th {
+    padding: fn.space(3) fn.space(4);
+    border-block-end: 1px solid var(--ocs-border-subtle);
+    text-align: start;
+    font-weight: 400;
+  }
+
+  tbody tr:last-child > * { border-block-end: 0; }
+
+  tbody tr:hover { background: var(--ocs-surface-elevated); }
+
+  // Numeric columns: opt in with class="ocs-table__num".
+  &__num {
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // --- modifiers --------------------------------------------------------
+  &--striped tbody tr:nth-child(odd) {
+    background: color-mix(in srgb, var(--ocs-surface-elevated) 45%, transparent);
+  }
+
+  &--compact {
+    thead th,
+    tbody td,
+    tbody th { padding: fn.space(2) fn.space(3); }
+  }
+
+  &--bordered {
+    th, td { border-inline-end: 1px solid var(--ocs-border-subtle); }
+    th:last-child, td:last-child { border-inline-end: 0; }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// PAGINATION
+// -----------------------------------------------------------------------------
+// Wrap in <nav aria-label="Pagination">. Mark the current page with
+// aria-current="page".
+.ocs-pagination {
+  display: flex;
+  align-items: center;
+  gap: fn.space(1);
+  list-style: none;
+  margin: 0;
+  padding: fn.space(3) fn.space(4);
+
+  li { display: flex; }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding-inline: fn.space(2);
+
+    border: 1px solid transparent;
+    border-radius: var(--ocs-radius-sm);
+    background: transparent;
+    color: var(--ocs-text-secondary);
+
+    font-size: fn.typo(small, size);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover { background: var(--ocs-surface-elevated); }
+
+    &:focus { outline: none; }
+    &:focus-visible {
+      outline: 2px solid var(--ocs-accent);
+      outline-offset: 2px;
+    }
+
+    &[aria-current="page"] {
+      border-color: var(--ocs-accent-border);
+      color: var(--ocs-accent);
+      font-weight: 600;
+    }
+
+    &[aria-disabled="true"] {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+  }
+}

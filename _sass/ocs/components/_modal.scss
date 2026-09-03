@@ -1,0 +1,139 @@
+// =============================================================================
+// OCS MODAL
+// =============================================================================
+// Built on the native <dialog> element, so focus trapping, Escape-to-close,
+// inert background and the top layer are all handled by the browser instead of
+// by hand-written JS.
+//
+//   <dialog class="ocs-modal" id="confirm">
+//     <form method="dialog" class="ocs-modal__panel">
+//       <header class="ocs-modal__header">
+//         <h2 class="ocs-modal__title">Delete project?</h2>
+//         <button class="ocs-modal__close" value="cancel" aria-label="Close">×</button>
+//       </header>
+//       <div class="ocs-modal__body">…</div>
+//       <footer class="ocs-modal__footer">
+//         <button class="ocs-btn ocs-btn--ghost" value="cancel">Cancel</button>
+//         <button class="ocs-btn ocs-btn--danger" value="confirm">Delete</button>
+//       </footer>
+//     </form>
+//   </dialog>
+//
+// Open it with dialog.showModal() — NOT the `open` attribute, which renders
+// non-modally and skips the focus trap.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+
+.ocs-modal {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ocs-text);
+
+  // <dialog> defaults to max 80% of the viewport; widen it and let the panel
+  // decide.
+  max-width: min(32rem, calc(100vw - #{fn.space(8)}));
+  max-height: calc(100dvh - #{fn.space(8)});
+  overflow: visible;
+
+  &::backdrop {
+    background: var(--ocs-surface-overlay);
+    backdrop-filter: blur(2px);
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - #{fn.space(8)});
+
+    border: 1px solid var(--ocs-border);
+    border-radius: var(--ocs-radius-xl);
+    background: var(--ocs-surface-raised);
+    box-shadow: var(--ocs-shadow-xl);
+    overflow: hidden;
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: fn.space(4);
+    padding: fn.space(5) fn.space(5) fn.space(4);
+  }
+
+  &__title {
+    margin: 0;
+    font-family: var(--ocs-font-sans);
+    font-size: fn.typo(h3, size);
+    font-weight: fn.typo(h3, weight);
+    line-height: fn.typo(h3, line);
+    color: var(--ocs-text);
+  }
+
+  &__close {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+
+    border: 0;
+    border-radius: var(--ocs-radius-sm);
+    background: transparent;
+    color: var(--ocs-text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+
+    @include a11y.focusable(1px);
+
+    &:hover {
+      background: var(--ocs-surface-elevated);
+      color: var(--ocs-text);
+    }
+  }
+
+  &__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0 fn.space(5) fn.space(5);
+
+    font-size: fn.typo(small, size);
+    line-height: fn.typo(body, line);
+    color: var(--ocs-text-secondary);
+
+    > :first-child { margin-block-start: 0; }
+    > :last-child  { margin-block-end: 0; }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: fn.space(2);
+    padding: fn.space(4) fn.space(5);
+    border-block-start: 1px solid var(--ocs-border-subtle);
+    background: var(--ocs-surface-base);
+  }
+
+  // Destructive confirmations get a danger-tinted header rule.
+  &--danger .ocs-modal__header { border-block-end: 2px solid var(--ocs-danger-border); }
+
+  &--wide { max-width: min(48rem, calc(100vw - #{fn.space(8)})); }
+}
+
+// Entry animation, suppressed under prefers-reduced-motion by core/a11y.
+@media (prefers-reduced-motion: no-preference) {
+  .ocs-modal[open] .ocs-modal__panel {
+    animation: ocs-modal-in var(--ocs-duration-base) var(--ocs-ease);
+  }
+}
+
+@keyframes ocs-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}

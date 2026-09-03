@@ -1,0 +1,47 @@
+// =============================================================================
+// OCS SKELETON
+// =============================================================================
+//   <div class="ocs-skeleton" style="height:1rem" role="status">
+//     <span class="ocs-sr-only">Loading</span>
+//   </div>
+//
+// The shimmer is suppressed under prefers-reduced-motion by core/a11y, which
+// leaves a static block -- still a valid loading affordance.
+// =============================================================================
+
+@use "../core/functions" as fn;
+
+.ocs-skeleton {
+  display: block;
+  border-radius: var(--ocs-radius-sm);
+  background: var(--ocs-surface-elevated);
+  // A skeleton with no content would otherwise collapse.
+  min-height: 0.75rem;
+
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--ocs-text) 6%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: ocs-shimmer 1.3s linear infinite;
+
+  &--text {
+    height: 0.75rem;
+    margin-block: 0.25rem;
+    border-radius: var(--ocs-radius-full);
+  }
+
+  // Ragged last line reads as a paragraph rather than a block.
+  &--text:last-child { width: 65%; }
+
+  &--circle { border-radius: var(--ocs-radius-full); aspect-ratio: 1; }
+  &--card   { height: 8rem; border-radius: var(--ocs-radius-lg); }
+}
+
+@keyframes ocs-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}

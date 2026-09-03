@@ -1,0 +1,61 @@
+// =============================================================================
+// OCS TOOLTIP
+// =============================================================================
+//   <button class="ocs-btn ocs-btn--icon" aria-describedby="tip-1">…</button>
+//   <span class="ocs-tooltip" id="tip-1" role="tooltip">Delete project</span>
+//
+// A tooltip SUPPLEMENTS an accessible name, it never replaces one. If the
+// control has no visible text it still needs aria-label; the tooltip is
+// referenced with aria-describedby so it is announced as description.
+//
+// CSS-only tooltips driven by :hover cannot satisfy WCAG 1.4.13 (dismissable,
+// hoverable, persistent), so this shows on focus-within too and stays
+// pointer-interactive.
+// =============================================================================
+
+@use "../core/functions" as fn;
+
+.ocs-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.ocs-tooltip {
+  position: absolute;
+  inset-block-end: calc(100% + #{fn.space(2)});
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  z-index: fn.z(tooltip);
+
+  width: max-content;
+  max-width: 16rem;
+  padding: fn.space(2) fn.space(3);
+
+  border: 1px solid var(--ocs-border);
+  border-radius: var(--ocs-radius-md);
+  background: var(--ocs-surface-elevated);
+  box-shadow: var(--ocs-shadow-md);
+  color: var(--ocs-text);
+
+  font-family: var(--ocs-font-sans);
+  font-size: 0.75rem;
+  line-height: 1.4;
+
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ocs-duration-fast) var(--ocs-ease),
+    visibility var(--ocs-duration-fast) var(--ocs-ease);
+
+  // WCAG 1.4.13: the tooltip itself must be hoverable without vanishing.
+  .ocs-tooltip-wrap:hover &,
+  .ocs-tooltip-wrap:focus-within & {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &--below {
+    inset-block-end: auto;
+    inset-block-start: calc(100% + #{fn.space(2)});
+  }
+}
