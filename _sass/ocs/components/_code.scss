@@ -1,0 +1,139 @@
+// =============================================================================
+// OCS CODE
+// =============================================================================
+// The component OCS uses more than any other.
+//
+//   <figure class="ocs-code">
+//     <figcaption class="ocs-code__head">
+//       <span class="ocs-code__lang">Java</span>
+//       <button class="ocs-btn ocs-btn--ghost ocs-btn--sm">Copy</button>
+//     </figcaption>
+//     <pre class="ocs-code__body" tabindex="0"><code>…</code></pre>
+//   </figure>
+//
+// `tabindex="0"` on the <pre> is required, not optional: a scrollable code
+// block is unreachable by keyboard without it.
+//
+// Inline code is `.ocs-code-inline` -- deliberately NOT a bare `code` selector,
+// which would fight the existing base/_typography.scss rules that already
+// style `pre, code` with !important.
+// =============================================================================
+
+@use "../core/functions" as fn;
+
+.ocs-code {
+  margin: 0 0 fn.space(4);
+  border: 1px solid var(--ocs-border);
+  border-radius: var(--ocs-radius-lg);
+  background: var(--ocs-surface-base);
+  overflow: hidden;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: fn.space(3);
+
+    padding: fn.space(2) fn.space(3);
+    border-block-end: 1px solid var(--ocs-border-subtle);
+    background: var(--ocs-surface-raised);
+  }
+
+  &__lang {
+    font-family: var(--ocs-font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ocs-text-muted);
+  }
+
+  &__body {
+    margin: 0;
+    padding: fn.space(4);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    font-family: var(--ocs-font-mono);
+    font-size: fn.typo(code, size);
+    line-height: 1.6;
+    color: var(--ocs-text-secondary);
+    // Long lines scroll; they must not wrap and destroy the indentation.
+    white-space: pre;
+    tab-size: 2;
+
+    &:focus-visible {
+      outline: 2px solid var(--ocs-accent);
+      outline-offset: -2px;
+    }
+
+    code {
+      // Neutralise any inherited chip styling from the surrounding page.
+      display: block;
+      padding: 0;
+      background: none;
+      border: 0;
+      font: inherit;
+      color: inherit;
+    }
+  }
+
+  // Opt-in line numbers, drawn with a counter so they cannot be selected
+  // or copied along with the code.
+  &--numbered .ocs-code__body code {
+    counter-reset: ocs-line;
+
+    .ocs-code__line::before {
+      counter-increment: ocs-line;
+      content: counter(ocs-line);
+      display: inline-block;
+      width: 2.5ch;
+      margin-inline-end: fn.space(4);
+      text-align: end;
+      color: var(--ocs-text-muted);
+      user-select: none;
+    }
+  }
+
+  // Highlight a range being discussed in prose. Prefixed like everything
+  // else -- a bare `.line` would be exactly the kind of generic global this
+  // system exists to remove.
+  .ocs-code__line--highlight {
+    display: block;
+    margin-inline: calc(#{fn.space(4)} * -1);
+    padding-inline: fn.space(4);
+    border-inline-start: 2px solid var(--ocs-accent);
+    background: var(--ocs-accent-bg);
+  }
+}
+
+.ocs-code-inline {
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--ocs-border-subtle);
+  border-radius: var(--ocs-radius-sm);
+  background: var(--ocs-surface-elevated);
+
+  font-family: var(--ocs-font-mono);
+  font-size: 0.875em;
+  color: var(--ocs-brand);
+  // Keep an inline code span from stretching the line box.
+  line-height: inherit;
+}
+
+// Keyboard key.
+.ocs-kbd {
+  display: inline-flex;
+  align-items: center;
+  min-width: 1.5em;
+  padding: 0.15em 0.4em;
+
+  border: 1px solid var(--ocs-border-strong);
+  border-block-end-width: 2px;
+  border-radius: var(--ocs-radius-sm);
+  background: var(--ocs-surface-elevated);
+
+  font-family: var(--ocs-font-mono);
+  font-size: 0.75em;
+  line-height: 1;
+  color: var(--ocs-text-secondary);
+}

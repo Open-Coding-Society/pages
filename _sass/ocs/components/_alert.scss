@@ -1,0 +1,95 @@
+// =============================================================================
+// OCS ALERT
+// =============================================================================
+// GRAMMAR
+//   .ocs-alert  +  --info | --success | --warning | --danger
+//   .ocs-alert__icon | __content | __title | __close
+//
+//   <div class="ocs-alert ocs-alert--danger" role="alert">…</div>
+//
+// Use role="alert" for errors that appear after an action, role="status" for
+// passive info. Colour alone never carries the meaning — every alert takes an
+// icon and a text title.
+// =============================================================================
+
+@use "sass:map";
+@use "../core/tokens" as t;
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+
+.ocs-alert {
+  --alert-fg: var(--ocs-info);
+  --alert-border: var(--ocs-info-border);
+  --alert-bg: var(--ocs-info-bg);
+
+  display: flex;
+  align-items: flex-start;
+  gap: fn.space(3);
+
+  padding: fn.space(3) fn.space(4);
+  border: 1px solid var(--alert-border);
+  // Heavier inline-start edge so the role reads at a glance.
+  border-inline-start-width: 3px;
+  border-radius: var(--ocs-radius-md);
+
+  background: var(--alert-bg);
+  color: var(--ocs-text);
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  line-height: fn.typo(body, line);
+
+  &__icon {
+    flex: 0 0 auto;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-block-start: 0.0625rem;
+    color: var(--alert-fg);
+    fill: currentColor;
+  }
+
+  &__content { flex: 1 1 auto; min-width: 0; }
+
+  &__title {
+    margin: 0 0 fn.space(1);
+    font-size: fn.typo(small, size);
+    font-weight: 600;
+    color: var(--alert-fg);
+  }
+
+  &__content > p {
+    margin: 0;
+    color: var(--ocs-text-secondary);
+  }
+
+  &__close {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+
+    border: 0;
+    border-radius: var(--ocs-radius-sm);
+    background: transparent;
+    color: var(--ocs-text-muted);
+    cursor: pointer;
+
+    @include a11y.focusable(1px);
+
+    &:hover { color: var(--ocs-text); }
+
+    svg { flex: 0 0 auto; width: 0.875em; height: 0.875em; fill: currentColor; }
+  }
+
+  // --- roles ------------------------------------------------------------
+  @each $role in (info, success, warning, danger) {
+    &--#{$role} {
+      --alert-fg: var(--ocs-#{$role});
+      --alert-border: var(--ocs-#{$role}-border);
+      --alert-bg: var(--ocs-#{$role}-bg);
+    }
+  }
+}
