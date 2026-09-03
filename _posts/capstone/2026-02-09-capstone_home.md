@@ -78,17 +78,17 @@ sticky_rank: 1
 
 <div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
  <div class="flex flex-wrap gap-2">
-   <button id="show-all" type="button" aria-pressed="true" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
-   <button id="show-csa" type="button" aria-pressed="false" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
-   <button id="show-csp" type="button" aria-pressed="false" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
-   <button id="show-csh" type="button" aria-pressed="false" class="px-3 py-1 bg-blue-200 rounded mr-2">CSH</button>
+   <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
+   <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
+   <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
+   <button id="show-csh" class="px-3 py-1 bg-blue-200 rounded mr-2">CSH</button>
    <a href="{% post_url 2026-06-01-README-capstone %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
      <span class="mr-2">📄</span>README
    </a>
    <a href="/capstone/games/" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-indigo-500 rounded text-sm text-white hover:bg-indigo-500 font-semibold" title="Browse all OCS Games">
      <span class="mr-2">🎮</span>Games Directory
    </a>
-   <select id="year-select" aria-label="School year" class="ml-4 px-2 py-1 rounded border border-gray-300 bg-white text-sm">
+   <select id="year-select" class="ml-4 px-2 py-1 rounded border border-gray-300 bg-white text-sm">
      <option value="2026-2027" selected>2026/2027</option>
      <option value="2025-2026">2025/2026</option>
    </select>
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 }
   function getTotalProjects(){
-  return cards.filter(card => matchesType(card) && matchesYear(card)).length;
+  return cards.length;
 }
   function applyFilters(){
     let count = 0;
@@ -203,9 +203,6 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   function setTypeFilter(type){
     currentType = type;
-    ['all', 'csa', 'csp', 'csh'].forEach(filter=>{
-      document.getElementById(`show-${filter}`)?.setAttribute('aria-pressed', String(filter.toUpperCase() === type || filter === type));
-    });
     applyFilters();
   }
   document.getElementById('show-all')?.addEventListener('click', ()=> setTypeFilter('all'));
@@ -320,16 +317,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
 
 
    <!-- UESL Accessible Game Maker 2.0 (CSP, 2026/2027) -->
-   <div class="capstone-item capstone-item--uesl-next CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
-       <a class="capstone-item--uesl-next__mark" href="{{ '/capstone/uesl-game-maker/' | relative_url }}">
-           <img src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation logo — shield with game controller" />
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
+       <a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">
+           <img src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation logo — shield with game controller" class="w-28 h-28 object-cover rounded" />
        </a>
-       <div class="capstone-item--uesl-next__content">
-           <span class="capstone-item--uesl-next__status">2026/2027 · Active sprint</span>
-           <h3><a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">UESL Accessible Game Maker 2.0</a></h3>
-           <p>Extending UESL’s working Game Maker with a six-step guided creation path, accessible preview, and resilient local drafts.</p>
-           <p class="capstone-item--uesl-next__team"><strong>Ishan</strong> · Scrum Master/Developer &nbsp; <strong>Rohan</strong> · Technologist/Developer #1 &nbsp; <strong>Adhvay</strong> · Technologist/Developer #2</p>
-           <span class="capstone-item--uesl-next__route" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">UESL Accessible Game Maker 2.0</a></h3>
+           <p class="text-sm text-gray-700">A guided, accessible creation experience extending UESL’s existing Game Maker.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Ishan, Rohan, Adhvay</p>
        </div>
    </div>
 
