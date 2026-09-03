@@ -909,8 +909,7 @@
   line-height: 1.55;
 }
 
-.agm-page :focus-visible,
-.capstone-item--uesl-next :focus-visible {
+.agm-page :focus-visible {
   outline: 3px solid var(--agm-lime, #b8ef72);
   outline-offset: 3px;
 }
@@ -942,128 +941,6 @@
 @keyframes agm-panel-change {
   from { opacity: 0.45; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-/* Featured 2026/2027 card on the capstone index. */
-#capstone-grid > .capstone-item--uesl-next {
-  --agm-card-cyan: #56d7ff;
-  position: relative;
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: 132px minmax(0, 1fr);
-  gap: clamp(1rem, 3vw, 2rem);
-  align-items: center;
-  min-height: 220px;
-  overflow: hidden;
-  border: 1px solid rgba(86, 215, 255, 0.42);
-  border-radius: 16px;
-  padding: clamp(1.25rem, 3vw, 2.1rem);
-  background:
-    radial-gradient(circle at 7% 40%, rgba(169, 145, 255, 0.18), transparent 15rem),
-    #081a27;
-  color: #f7fbff;
-}
-
-#capstone-grid > .capstone-item--uesl-next:hover {
-  border-color: rgba(86, 215, 255, 0.75);
-  box-shadow: 0 12px 32px rgba(2, 13, 21, 0.32);
-}
-
-.capstone-item--uesl-next__mark {
-  display: grid;
-  width: 120px;
-  height: 120px;
-  place-items: center;
-  border: 1px solid rgba(169, 145, 255, 0.55);
-  border-radius: 50%;
-  background: rgba(5, 14, 25, 0.72);
-}
-
-#capstone-grid > .capstone-item--uesl-next .capstone-item--uesl-next__mark img {
-  width: 88px;
-  height: 88px;
-  object-fit: contain;
-}
-
-.capstone-item--uesl-next__content {
-  min-width: 0;
-  padding-right: 3.4rem;
-}
-
-.capstone-item--uesl-next__status {
-  display: inline-block;
-  margin-bottom: 0.65rem;
-  color: #b8ef72;
-  font-size: 0.69rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-#capstone-grid > .capstone-item--uesl-next h3 {
-  margin: 0;
-  font-size: clamp(1.45rem, 3vw, 2.2rem);
-  font-weight: 820;
-  letter-spacing: -0.025em;
-  line-height: 1.08;
-}
-
-#capstone-grid > .capstone-item--uesl-next h3 a {
-  color: var(--agm-card-cyan);
-  text-decoration: none;
-}
-
-#capstone-grid > .capstone-item--uesl-next p {
-  max-width: 74ch;
-  margin: 0.8rem 0 0;
-  color: #c3d5df;
-  font-size: 0.92rem;
-  line-height: 1.55;
-}
-
-#capstone-grid > .capstone-item--uesl-next .capstone-item--uesl-next__team {
-  color: #93aebb;
-  font-size: 0.76rem;
-}
-
-.capstone-item--uesl-next__team strong {
-  color: #f7fbff;
-}
-
-.capstone-item--uesl-next__route {
-  position: relative;
-  display: flex;
-  width: min(100%, 390px);
-  align-items: center;
-  margin-top: 1.15rem;
-}
-
-.capstone-item--uesl-next__route i {
-  position: relative;
-  display: block;
-  width: 9px;
-  height: 9px;
-  flex: 0 0 9px;
-  border: 2px solid var(--agm-card-cyan);
-  border-radius: 50%;
-  background: #081a27;
-}
-
-.capstone-item--uesl-next__route i + i {
-  margin-left: calc((100% - 54px) / 5);
-}
-
-.capstone-item--uesl-next__route::before {
-  position: absolute;
-  right: 0;
-  left: 0;
-  height: 1px;
-  background: linear-gradient(90deg, var(--agm-card-cyan), #a991ff);
-  content: "";
-}
-
-.capstone-item--uesl-next__route i {
-  z-index: 1;
 }
 
 @media (max-width: 900px) {
@@ -1146,28 +1023,6 @@
     display: none;
   }
 
-  #capstone-grid > .capstone-item--uesl-next {
-    grid-template-columns: 78px minmax(0, 1fr);
-    min-height: 0;
-  }
-
-  .capstone-item--uesl-next__mark {
-    width: 72px;
-    height: 72px;
-  }
-
-  #capstone-grid > .capstone-item--uesl-next .capstone-item--uesl-next__mark img {
-    width: 56px;
-    height: 56px;
-  }
-
-  .capstone-item--uesl-next__content {
-    padding-right: 2rem;
-  }
-
-  .capstone-item--uesl-next__route {
-    display: none;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1192,27 +1047,12 @@
     font-size: 0.72rem;
   }
 
-  #capstone-grid > .capstone-item--uesl-next {
-    grid-template-columns: 1fr;
-  }
-
-  .capstone-item--uesl-next__mark {
-    width: 64px;
-    height: 64px;
-  }
-
-  #capstone-grid > .capstone-item--uesl-next .capstone-item--uesl-next__mark img {
-    width: 50px;
-    height: 50px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .agm-page *,
   .agm-page *::before,
-  .agm-page *::after,
-  .capstone-item--uesl-next,
-  .capstone-item--uesl-next * {
+  .agm-page *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
