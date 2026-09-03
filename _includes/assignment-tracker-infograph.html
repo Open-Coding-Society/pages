@@ -1,43 +1,509 @@
 {% assign data = site.data.assignment_tracker_infograph %}
 
-<div style="width:100%;box-sizing:border-box;background:#000;color:#f0f0f0;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:2rem 1rem;">
+<style>
+  .ocs-ig *, .ocs-ig *::before, .ocs-ig *::after { box-sizing: border-box; }
 
-  <!-- Header -->
-  <div style="text-align:center;margin-bottom:2rem;">
-    <span style="display:inline-block;background:rgba(76,175,239,0.15);color:#4CAFEF;border:1px solid rgba(76,175,239,0.4);border-radius:20px;padding:0.25rem 1rem;font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;">OCS Gradebook System</span>
-    <h1 style="font-size:clamp(1.4rem,3.5vw,2rem);font-weight:700;color:#fff;margin:0 0 0.5rem;">{{ data.Title }}</h1>
-  </div>
+  .ocs-ig {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+    background: #000;
+    color: #f0f0f0;
+    padding-bottom: 3rem;
+  }
 
-  <!-- Feature Cards -->
-  {% for topic in data.Features %}
-  <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;margin-bottom:1rem;overflow:hidden;">
+  .post-header { display: none !important; }
 
-    <!-- Card Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.85rem 1.1rem;border-bottom:1px solid rgba(255,255,255,0.08);">
-      <div style="min-width:0;">
-        <h2 style="margin:0;font-size:0.95rem;font-weight:600;color:#fff;">{{ topic.title }}</h2>
-        <p style="margin:0;font-size:0.76rem;color:#888;">{{ topic.subtitle }}</p>
+  .ocs-ig-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── Top ─────────────────────────────────────────────────── */
+  .ocs-ig-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 1.5rem 0;
+    flex-wrap: wrap;
+  }
+
+  .ocs-ig-top-logo {
+    width: 64px; height: 64px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+    border: 2px solid rgba(76,175,239,0.3);
+  }
+
+  .ocs-ig-top-text h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 4px;
+    border: none;
+  }
+
+  .ocs-ig-top-text p {
+    font-size: 0.88rem;
+    color: #aaa;
+    margin: 0 0 6px;
+    line-height: 1.5;
+  }
+
+  .ocs-ig-top-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: #888;
+  }
+
+  .ocs-ig-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(76,175,239,0.4);
+    background: rgba(76,175,239,0.08);
+    color: #4CAFEF;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .ocs-ig-status-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: #4ade80;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .ocs-ig-status-live::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 5px #4ade80;
+  }
+
+  /* ── Main card ───────────────────────────────────────────── */
+  .ocs-ig-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-top: 4px solid #4CAFEF;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    margin-top: 1.5rem;
+    overflow: hidden;
+  }
+
+  .ocs-ig-card-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+  }
+
+  @media (max-width: 860px) { .ocs-ig-card-grid { grid-template-columns: 1fr; } }
+
+  .ocs-ig-visual {
+    background: rgba(76,175,239,0.05);
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .ocs-ig-img {
+    width: 120px; height: 120px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid rgba(76,175,239,0.3);
+  }
+
+  .ocs-ig-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: #4ade80;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+
+  .ocs-ig-status-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 5px #4ade80;
+  }
+
+  .ocs-ig-team {
+    text-align: center;
+    color: #aaa;
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+
+  .ocs-ig-team-label {
+    display: block;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+    margin-bottom: 3px;
+  }
+
+  .ocs-ig-links { display: flex; flex-direction: column; gap: 7px; width: 100%; }
+
+  .ocs-ig-link-btn {
+    display: block;
+    text-align: center;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: rgba(76,175,239,0.08);
+    color: #4CAFEF;
+    border: 1px solid rgba(76,175,239,0.25);
+  }
+
+  .ocs-ig-link-btn:hover { background: rgba(76,175,239,0.18); }
+
+  .ocs-ig-center {
+    padding: 24px;
+    border-right: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .ocs-ig-right { padding: 24px; }
+
+  .ocs-ig-project-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 3px;
+    border: none;
+  }
+
+  .ocs-ig-subtitle {
+    font-size: 0.83rem;
+    color: #888;
+    margin: 0 0 14px;
+    font-style: italic;
+  }
+
+  .ocs-ig-section-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #4CAFEF;
+    border-bottom: 1px solid rgba(76,175,239,0.2);
+    padding-bottom: 3px;
+    margin: 0 0 10px;
+  }
+
+  .ocs-ig-keypoints { list-style: none; padding: 0; margin: 0 0 16px; }
+
+  .ocs-ig-keypoints li {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 0.83rem;
+    line-height: 1.5;
+    color: #d0d0d0;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .ocs-ig-keypoints li:last-child { border-bottom: none; }
+
+  .ocs-ig-check {
+    flex-shrink: 0;
+    width: 16px; height: 16px;
+    background: #4CAFEF;
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 900;
+    margin-top: 2px;
+  }
+
+  .ocs-ig-tech-stack { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .ocs-ig-tech-tag {
+    padding: 2px 8px;
+    background: rgba(76,175,239,0.08);
+    color: #4CAFEF;
+    border: 1px solid rgba(76,175,239,0.2);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+
+  .ocs-ig-impact-list { list-style: none; padding: 0; margin: 0; }
+
+  .ocs-ig-impact-item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    color: #d0d0d0;
+  }
+
+  .ocs-ig-impact-item:last-child { border-bottom: none; }
+
+  .ocs-ig-impact-dot {
+    flex-shrink: 0;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #4CAFEF;
+    margin-top: 7px;
+  }
+
+  /* ── Section header ──────────────────────────────────────── */
+  .ocs-ig-section-header {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 2rem 0 1rem;
+    border: none;
+    border-left: 4px solid #4CAFEF;
+    padding: 2px 0 2px 14px;
+  }
+
+  /* ── Features grid ───────────────────────────────────────── */
+  .ocs-ig-features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(80px, auto);
+    gap: 10px;
+  }
+
+  @media (max-width: 860px) { .ocs-ig-features-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .ocs-ig-features-grid { grid-template-columns: 1fr; } }
+
+  .ocs-ig-feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(76,175,239,0.2);
+    border-top: 3px solid #4CAFEF;
+    border-radius: 6px;
+    padding: 12px;
+    height: 100%;
+  }
+
+  .ocs-ig-feature-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .ocs-ig-feature-desc {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #aaa;
+    margin: 0;
+  }
+
+  /* ── Planned badge ───────────────────────────────────────── */
+  .ocs-ig-planned-badge {
+    display: inline-block;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #007ACC;
+    background: rgba(0,122,204,0.1);
+    border: 1px solid rgba(0,122,204,0.4);
+    border-radius: 3px;
+    padding: 2px 7px;
+    margin-bottom: 7px;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────── */
+  .ocs-ig-footer {
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    color: #888;
+    text-align: center;
+    padding: 20px 24px;
+    margin-top: 2.5rem;
+    font-size: 0.82rem;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+  }
+
+  .ocs-ig-footer a { color: #4CAFEF; text-decoration: none; }
+  .ocs-ig-footer a:hover { color: #fff; }
+</style>
+
+<div class="ocs-ig">
+  <div class="ocs-ig-inner">
+
+    <!-- Top: logo + title + meta -->
+    <div class="ocs-ig-top">
+      <img src="/images/chudsgroupiccapstone.png" alt="Los Chuds" class="ocs-ig-top-logo">
+      <div class="ocs-ig-top-text">
+        <h2>{{ data.Title }}</h2>
+        <p>{{ data.Description }}</p>
+        <div class="ocs-ig-top-meta">
+          <span class="ocs-ig-status-live">Production Ready</span>
+          <span class="ocs-ig-badge">CSA Capstone · Spring Boot + Jekyll</span>
+          <span>Team: Los Chuds · Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P</span>
+        </div>
       </div>
-      <span style="flex-shrink:0;background:rgba(40,167,69,0.15);color:#4ade80;border:1px solid rgba(40,167,69,0.3);border-radius:10px;padding:0.15rem 0.6rem;font-size:0.7rem;font-weight:600;">{{ topic.status }}</span>
     </div>
 
-    <!-- Key Points + Tech -->
-    <div style="padding:0.85rem 1.1rem;">
-      {% for point in topic.keyPoints limit:3 %}
-      <div style="display:flex;gap:0.5rem;margin-bottom:0.35rem;align-items:flex-start;">
-        <span style="color:#4CAFEF;flex-shrink:0;font-size:0.8rem;">✓</span>
-        <span style="font-size:0.82rem;color:#ccc;line-height:1.4;word-wrap:break-word;min-width:0;">{{ point }}</span>
+    <!-- Main card: first feature expanded -->
+    {% assign f0 = data.Features[0] %}
+    <div class="ocs-ig-card">
+      <div class="ocs-ig-card-grid">
+
+        <!-- Left -->
+        <div class="ocs-ig-visual">
+          <img src="/images/chudsgroupiccapstone.png" alt="Los Chuds" class="ocs-ig-img">
+          <div class="ocs-ig-status-tag">Production Ready</div>
+          <div class="ocs-ig-team">
+            <span class="ocs-ig-team-label">Team</span>
+            Los Chuds
+          </div>
+          <div class="ocs-ig-links">
+            <a href="/assignments" class="ocs-ig-link-btn">Assignments</a>
+            <a href="/submissions" class="ocs-ig-link-btn">Submissions</a>
+            <a href="/student/view-grades" class="ocs-ig-link-btn">Grade Viewer</a>
+            <a href="/student/submissions" class="ocs-ig-link-btn">My Submissions</a>
+          </div>
+        </div>
+
+        <!-- Center: key points -->
+        <div class="ocs-ig-center">
+          <h2 class="ocs-ig-project-title">{{ f0.title }}</h2>
+          <p class="ocs-ig-subtitle">{{ f0.subtitle }}</p>
+          <div class="ocs-ig-section-label">Key Points</div>
+          <ul class="ocs-ig-keypoints">
+            {% for point in f0.keyPoints %}
+            <li><span class="ocs-ig-check">✓</span><span>{{ point }}</span></li>
+            {% endfor %}
+          </ul>
+          <div class="ocs-ig-tech-stack">
+            {% for tech in f0.tech %}
+            <span class="ocs-ig-tech-tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Right: security + endpoints -->
+        <div class="ocs-ig-right">
+          <div class="ocs-ig-section-label">Security</div>
+          <ul class="ocs-ig-impact-list" style="margin-bottom:14px;">
+            {% for item in f0.security %}
+            <li class="ocs-ig-impact-item">
+              <span class="ocs-ig-impact-dot"></span>
+              <span>{{ item }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          <div class="ocs-ig-section-label">Endpoints</div>
+          <ul class="ocs-ig-impact-list">
+            {% for ep in f0.endpoints %}
+            <li class="ocs-ig-impact-item">
+              <span class="ocs-ig-impact-dot" style="background:#007ACC;"></span>
+              <span style="font-family:monospace;font-size:0.75rem;word-break:break-all;">{{ ep }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live Features grid -->
+    <h2 class="ocs-ig-section-header">Live Features</h2>
+    <div class="ocs-ig-features-grid">
+      {% for topic in data.Features %}
+      <div class="ocs-ig-feature-card">
+        <h3 class="ocs-ig-feature-title">{{ topic.title }}</h3>
+        <p class="ocs-ig-feature-desc">{{ topic.subtitle }}</p>
+        <ul style="list-style:none;padding:0;margin:8px 0 0;">
+          {% for point in topic.keyPoints limit:3 %}
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>{{ point }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
+          {% for tech in topic.tech %}
+          <span class="ocs-ig-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
       </div>
       {% endfor %}
+    </div>
 
-      <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.75rem;">
-        {% for tech in topic.tech %}
-        <span style="background:rgba(76,175,239,0.1);color:#4CAFEF;border:1px solid rgba(76,175,239,0.25);border-radius:6px;padding:0.15rem 0.5rem;font-size:0.7rem;">{{ tech }}</span>
-        {% endfor %}
+    <!-- Planned Features -->
+    <h2 class="ocs-ig-section-header" style="border-left-color:#007ACC;">Planned Features</h2>
+    <div class="ocs-ig-features-grid">
+      <div class="ocs-ig-feature-card" style="border-top-color:#007ACC;">
+        <span class="ocs-ig-planned-badge">Planned</span>
+        <h3 class="ocs-ig-feature-title">Bulk Grading</h3>
+        <p class="ocs-ig-feature-desc">Grade multiple submissions at once with shared or per-row score overrides.</p>
+      </div>
+      <div class="ocs-ig-feature-card" style="border-top-color:#007ACC;">
+        <span class="ocs-ig-planned-badge">Planned</span>
+        <h3 class="ocs-ig-feature-title">Email Notifications</h3>
+        <p class="ocs-ig-feature-desc">Alert students when submissions are graded, returned, or flagged late.</p>
+      </div>
+      <div class="ocs-ig-feature-card" style="border-top-color:#007ACC;">
+        <span class="ocs-ig-planned-badge">Planned</span>
+        <h3 class="ocs-ig-feature-title">Analytics Dashboard</h3>
+        <p class="ocs-ig-feature-desc">Class-wide grade distribution, late rates, and per-assignment completion charts.</p>
+      </div>
+      <div class="ocs-ig-feature-card" style="border-top-color:#007ACC;">
+        <span class="ocs-ig-planned-badge">Planned</span>
+        <h3 class="ocs-ig-feature-title">Notebook Auto-Submit</h3>
+        <p class="ocs-ig-feature-desc">Extend auto-creation to Jupyter notebooks without a manual conversion step.</p>
       </div>
     </div>
 
   </div>
-  {% endfor %}
+</div>
 
+<div class="ocs-ig-footer">
+  <strong>Los Chuds · OCS Assignment Tracker Capstone</strong><br>
+  <a href="https://github.com/Open-Coding-Society/pages" target="_blank" rel="noopener">Frontend Repo</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Open-Coding-Society/spring" target="_blank" rel="noopener">Backend Repo</a>
+  &nbsp;·&nbsp;
+  Open Coding Society
 </div>
