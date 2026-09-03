@@ -116,6 +116,52 @@
   border-bottom: 1px solid var(--signal);
   white-space: nowrap;
 }
+
+.sub-cap .grading-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 0.25rem 0.6rem;
+}
+
+.sub-cap .grading-img {
+  border: 1px solid var(--hairline);
+  border-radius: 0.85rem;
+  overflow: hidden;
+  margin: 0 0 1.75rem;
+  max-width: 320px;
+}
+.sub-cap .grading-img img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sub-cap .plan-block {
+  margin-bottom: 1.5rem;
+}
+.sub-cap .plan-block:last-child { margin-bottom: 0; }
+
+.sub-cap .plan-block h3 {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--paper);
+  margin: 0 0 0.5rem;
+}
+
+.sub-cap .plan-block p {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 68ch;
+}
+
+.sub-cap .plan-block strong { color: var(--paper); }
 </style>
 
 <div class="sub-cap">
@@ -151,6 +197,27 @@
       <a href="{{ '/capstone/work-submission-grading/' | relative_url }}" class="link">View project →</a>
     </div>
 
+  </div>
+
+  <p class="grading-label">Grading requirements</p>
+
+  <div class="grading-img">
+    <img src="{{ '/images/capstone/submissions-grading-rubric.jpg' | relative_url }}" alt="Handwritten grading rubric: 0% no plan, 55% no plan/no code, 80% sucky code/great plan, ~88-90% good code/good plan, 92% great code/great plan">
+  </div>
+
+  <div class="plan-block">
+    <h3>Assignment Creator Permissions</h3>
+    <p>The plan is the permission matrix on the project page itself: who can do what, enforced server-side, re-checked at edit time, and covered by a concurrency test. Because both the plan and the shipped code are complete and documented, this sub-project is closer to Great Code / Great Plan than the Good/Good tier we're using as our floor.</p>
+  </div>
+
+  <div class="plan-block">
+    <h3>Submission Analytics</h3>
+    <p>The plan is the six analytics features scoped on the project page, split cleanly into what's live and what's tracked as open GitHub issues (API integration, heatmap caching, form validation, and more). Six of six features are already live, with the remaining work named and tracked rather than left vague &mdash; a documented plan is what keeps this at Good Code / Good Plan while those issues close out.</p>
+  </div>
+
+  <div class="plan-block">
+    <h3>AI Grading</h3>
+    <p>No code has been written yet, so the plan is doing all the work here: submission types, grading flow, and storage design are fully written out on the project page, and it's explicitly labeled a planning-stage proposal rather than something claiming to be further along than it is. That's the difference between landing at 0% (no plan) and having a real shot at Good Plan once the build catches up.</p>
   </div>
 
 </div>
