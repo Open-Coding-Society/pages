@@ -49,6 +49,14 @@
   color: inherit;
 }
 
+.agm-page h1,
+.agm-page h2,
+.agm-page h3 {
+  border-bottom: 0;
+  padding-bottom: 0;
+  text-shadow: none;
+}
+
 .agm-hero,
 .agm-context,
 .agm-storyboard,
