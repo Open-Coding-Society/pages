@@ -9,9 +9,8 @@
   <div id="lessonChatMessages" aria-live="polite" style="height:18em;overflow-y:auto;border:1px solid;padding:.5em;margin:.5em 0">
     <p id="lessonChatEmpty"><em>No messages yet.</em></p>
   </div>
-  <form id="lessonChatForm" autocomplete="off" style="display:flex;gap:.5em">
-    <input id="lessonChatInput" type="text" placeholder="Message this lesson…" maxlength="2000" disabled style="flex:1">
-    <button id="lessonChatSend" type="submit" disabled>Send</button>
+  <form id="lessonChatForm" class="chat-form chat-form--rich" autocomplete="off" style="display:flex;gap:.5em;align-items:stretch">
+    <button id="lessonChatSend" class="chat-send" type="submit" disabled>Send</button>
   </form>
 </details>
 
@@ -20,6 +19,7 @@
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { createRichComposer, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
 
   const LESSON_KEY = {{ page.url | jsonify }};
   const LESSON_MARKER = `[[lesson:${LESSON_KEY}]]`;
@@ -47,9 +47,20 @@
   const detailsEl = document.getElementById('lessonChat');
   const statusEl = document.getElementById('lessonChatStatus');
   const messagesEl = document.getElementById('lessonChatMessages');
-  const inputEl = document.getElementById('lessonChatInput');
   const sendBtn = document.getElementById('lessonChatSend');
   const formEl = document.getElementById('lessonChatForm');
+
+  const composer = createRichComposer({
+    placeholder: 'Message this lesson…',
+    maxLength: 2000,
+    onSubmit: submitMessage,
+  });
+  formEl.insertBefore(composer.element, sendBtn);
+
+  function submitMessage() {
+    if (composer.isEmpty() || composer.isOverLimit()) return;
+    if (sendMessage(composer.getHTML())) composer.clear();
+  }
 
   function setStatus(text) {
     statusEl.textContent = text;
@@ -74,7 +85,9 @@
     const line = document.createElement('p');
     const strong = document.createElement('strong');
     strong.textContent = who;
-    line.append(strong, document.createTextNode(when ? ` · ${when}: ` : ': '), document.createTextNode(message));
+    const body = document.createElement('span');
+    renderRichMessage(body, message);
+    line.append(strong, document.createTextNode(when ? ` · ${when}: ` : ': '), body);
     messagesEl.appendChild(line);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -216,7 +229,7 @@
         if (!state.connected) return;
         state.connected = false;
         setStatus('disconnected');
-        inputEl.disabled = true;
+        composer.setEnabled(false);
         sendBtn.disabled = true;
       };
     });
@@ -256,9 +269,9 @@
     await loadHistory();
     const connected = await connect();
     if (connected) {
-      inputEl.disabled = false;
+      composer.setEnabled(true);
       sendBtn.disabled = false;
-      inputEl.focus();
+      composer.focus();
     }
   }
 
@@ -268,11 +281,7 @@
 
   formEl.addEventListener('submit', (e) => {
     e.preventDefault();
-    const text = inputEl.value.trim();
-    if (!text) return;
-    if (sendMessage(text)) {
-      inputEl.value = '';
-    }
+    submitMessage();
   });
 
   window.addEventListener('beforeunload', () => {

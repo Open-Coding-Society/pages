@@ -3426,3 +3426,200 @@
     .chat-send span { display: none; }
   }
 }
+
+/* ============================= */
+/*     RICH-TEXT COMPOSER        */
+/* ============================= */
+/* Slack-style formatting bar + contenteditable input, built by
+   assets/js/chat/rich-text.js and dropped into every chat form in place of
+   the old single-line <input>. Rendered-message formatting (bold, lists,
+   font/size spans) is styled at the bottom so it applies wherever a message
+   is shown, including the lesson chat, which is outside .announcement-chat. */
+
+.chat-form.chat-form--rich {
+  align-items: stretch;
+
+  .chat-send {
+    align-self: stretch;
+    height: auto;
+  }
+}
+
+.rt-composer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $bg-3;
+  border-radius: 6px;
+  background: var(--pref-bg-color);
+  transition: border-color 0.2s;
+
+  &:focus-within { border-color: $accent; }
+}
+
+.rt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px;
+  border-bottom: 1px solid $bg-3;
+}
+
+.rt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: $text;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover { background: rgba($text, 0.08); }
+
+  &:focus-visible {
+    outline: none;
+    border-color: $accent;
+  }
+
+  &.is-active {
+    background: rgba($accent, 0.18);
+    color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.rt-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 3px;
+  background: $bg-3;
+}
+
+.rt-select {
+  height: 28px;
+  padding: 0 4px;
+  border: 1px solid $bg-3;
+  border-radius: 4px;
+  background: var(--pref-bg-color);
+  color: $text;
+  font-family: var(--pref-font-family);
+  font-size: 12px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+    border-color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.rt-editor {
+  min-height: 38px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px 12px;
+  color: $text;
+  font-family: var(--pref-font-family);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  cursor: text;
+  scrollbar-width: thin;
+  scrollbar-color: $bg-3 transparent;
+
+  &:focus { outline: none; }
+
+  &.is-empty::before {
+    content: attr(data-placeholder);
+    color: $text-muted;
+    pointer-events: none;
+  }
+
+  &.is-over-limit { box-shadow: inset 0 0 0 1px $red; }
+
+  &.is-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  p { margin: 0; }
+
+  ul, ol {
+    margin: 4px 0;
+    padding-left: 1.6em;
+  }
+}
+
+.rt-emoji-panel {
+  position: fixed;
+  z-index: 1000;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  width: 300px;
+  max-height: 240px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid $bg-3;
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  scrollbar-width: thin;
+  scrollbar-color: $bg-3 transparent;
+}
+
+.rt-emoji {
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+  cursor: pointer;
+
+  &:hover { background: rgba($text, 0.12); }
+}
+
+@media (max-width: 768px) {
+  .rt-toolbar { gap: 1px; }
+  .rt-btn { min-width: 32px; height: 32px; }
+  .rt-select { height: 32px; }
+}
+
+/* ── Formatting inside a rendered message ─────────────────────────────
+   These classes ride on <span>s the composer emits; keep them global so a
+   message reads the same in the announcement panel, a week card, and the
+   lesson chat. */
+.rt-font-serif { font-family: Georgia, 'Times New Roman', serif; }
+.rt-font-mono  { font-family: 'SF Mono', 'Consolas', 'Menlo', monospace; }
+.rt-size-sm { font-size: 0.82em; }
+.rt-size-lg { font-size: 1.3em; }
+.rt-size-xl { font-size: 1.7em; }
+
+.chat-msg-body {
+  ul, ol {
+    margin: 4px 0;
+    padding-left: 1.5em;
+  }
+
+  li { margin: 1px 0; }
+}
