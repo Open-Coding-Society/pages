@@ -698,7 +698,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">Los Chuds</a></h3>
-           <p class="text-sm text-gray-700">Complete ecosystem for managing assignment submissions, grading, and file delivery — with automatic CI-driven assignment sync, role-gated review dashboards, and secure JWT-authenticated APIs.</p>
+           <p class="text-sm text-gray-700">Developing an easy way for mentors to access Open Coding Society, featuring Google OAuth-verified signup, a scoped capstone project dashboard, real-time team chat, and role-based permissions between students and admins.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Los Chuds (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
        </div>
    </div>
