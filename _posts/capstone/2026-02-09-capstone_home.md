@@ -697,7 +697,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <img src="/images/backendboyzgcpiccc.png" alt="Backend Boyz - OCS Assignment Tracker" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">Los Chuds</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">Backend Boyz</a></h3>
            <p class="text-sm text-gray-700">Developing an easy way for mentors to access Open Coding Society, featuring Google OAuth-verified signup, a scoped capstone project dashboard, real-time team chat, and role-based permissions between students and admins.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Backend Boyz (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
        </div>
