@@ -1,427 +1,279 @@
-{% assign data = site.data.analytics_selfassessment %}
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --wp-bg: #0f0f12;
-  --wp-card: #16161a;
-  --wp-card-border: #2a2a2e;
-  --wp-text: #e4e4e7;
-  --wp-text-muted: #a1a1aa;
-  --wp-accent: #3b82f6;
-  --wp-accent-soft: rgba(59, 130, 246, 0.15);
-  --wp-success: #22c55e;
-  --wp-tag: #27272a;
-  --wp-gradient-start: #3b82f6;
-  --wp-gradient-end: #06b6d4;
-  --wp-purple: #a855f7;
-  --wp-purple-soft: rgba(168, 85, 247, 0.12);
-  --wp-amber: #f59e0b;
-  --wp-amber-soft: rgba(245, 158, 11, 0.12);
-}
+.ao {
+  --bg: #0f0f12;
+  --card: #16161a;
+  --border: #2a2a2e;
+  --text: #e4e4e7;
+  --muted: #a1a1aa;
+  --accent: #3b82f6;
+  --accent-soft: rgba(59, 130, 246, 0.14);
+  --cyan: #06b6d4;
+  --purple: #a855f7;
+  --amber: #f59e0b;
+  --green: #22c55e;
 
-* { box-sizing: border-box; }
-
-.wp-container {
   max-width: 820px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
   font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-  color: var(--wp-text);
+  color: var(--text);
 }
+
+.ao * { box-sizing: border-box; }
 
 /* -- Header -- */
-.wp-header {
-  text-align: center;
-  margin-bottom: 2.75rem;
-}
+.ao-header { text-align: center; margin-bottom: 2.25rem; }
 
-.wp-badge {
+.ao-badge {
   display: inline-block;
   padding: 0.35rem 1rem;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   border-radius: 9999px;
-  background: var(--wp-accent-soft);
-  color: var(--wp-accent);
+  background: var(--accent-soft);
+  color: var(--accent);
   border: 1px solid rgba(59, 130, 246, 0.3);
   margin-bottom: 1rem;
 }
 
-.wp-title {
-  font-size: 2.25rem;
+.ao-title {
+  font-size: 2.15rem;
   font-weight: 700;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.65rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--wp-gradient-start), var(--wp-gradient-end));
+  background: linear-gradient(135deg, var(--accent), var(--cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.wp-description {
-  font-size: 1.0625rem;
-  color: var(--wp-text-muted);
-  line-height: 1.7;
-  max-width: 640px;
+.ao-lede {
+  font-size: 1.02rem;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 620px;
   margin: 0 auto;
 }
 
-.wp-team-credit {
+.ao-team {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
-  color: var(--wp-text-muted);
+  font-size: 0.78rem;
+  color: var(--muted);
   margin: 0.85rem 0 0;
 }
 
-/* -- Level Flow Diagram -- */
-.wp-flow {
+/* -- Level flow (shared capstone nav) -- */
+.ao-nav {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0;
-  margin: 2rem 0 2.75rem;
-}
-
-.wp-flow-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 0.4rem;
-  padding: 0.75rem 1.1rem;
-  background: var(--wp-card);
-  border: 1px solid var(--wp-card-border);
-  border-radius: 0.75rem;
-  min-width: 120px;
+  margin: 1.75rem 0 0.5rem;
+}
+
+.ao-nav-node {
+  padding: 0.55rem 0.9rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
   text-align: center;
-  position: relative;
+  min-width: 110px;
 }
 
-.wp-flow-node-icon {
-  font-size: 1.5rem;
+.ao-nav-node-label { font-size: 0.74rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+.ao-nav-node-sub { font-size: 0.62rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+.ao-nav-node.active { border-color: var(--accent); background: var(--accent-soft); }
+.ao-nav-node.active .ao-nav-node-label { color: var(--accent); }
+
+.ao-nav-arrow { color: var(--accent); font-size: 0.9rem; flex-shrink: 0; }
+
+@media (max-width: 620px) {
+  .ao-nav-node { min-width: 74px; padding: 0.45rem 0.6rem; }
+  .ao-nav-node-label { font-size: 0.64rem; }
 }
 
-.wp-flow-node-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--wp-text);
-  line-height: 1.3;
-}
-
-.wp-flow-node-sub {
-  font-size: 0.65rem;
-  color: var(--wp-text-muted);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.wp-flow-arrow {
-  font-size: 1rem;
-  color: var(--wp-accent);
-  padding: 0 0.25rem;
-  flex-shrink: 0;
-}
-
-.wp-flow-node.active {
-  border-color: var(--wp-accent);
-  background: var(--wp-accent-soft);
-}
-
-.wp-flow-node.active .wp-flow-node-label {
-  color: var(--wp-accent);
-}
-
-/* -- Section Label -- */
-.wp-section-label {
-  font-size: 0.75rem;
+/* -- Section label -- */
+.ao-label {
+  font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--wp-text-muted);
-  margin: 2.5rem 0 1rem;
+  color: var(--muted);
+  margin: 2.5rem 0 1.1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--wp-card-border);
+  border-bottom: 1px solid var(--border);
 }
 
-/* -- Project Card -- */
-.wp-card {
-  background: var(--wp-card);
-  border: 1px solid var(--wp-card-border);
-  border-radius: 1rem;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
+/* -- Goal grid -- */
+.ao-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.ao-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  padding: 1.35rem 1.4rem;
   transition: border-color 0.2s;
 }
 
-.wp-card:hover {
-  border-color: rgba(59,130,246,0.4);
-}
+.ao-card:hover { border-color: rgba(59, 130, 246, 0.45); }
 
-.wp-card-header {
-  padding: 1.75rem 1.75rem 0;
+.ao-card-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 0.9rem;
 }
 
-.wp-card-title-group {
-  flex: 1;
-}
+.ao-card-icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
 
-.wp-card-icon {
-  font-size: 2rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.wp-card-title {
-  font-size: 1.375rem;
+.ao-card-title {
+  font-size: 1.05rem;
   font-weight: 700;
-  margin: 0 0 0.2rem;
+  margin: 0 0 0.15rem;
   letter-spacing: -0.01em;
 }
 
-.wp-card-subtitle {
-  font-size: 0.9375rem;
-  color: var(--wp-accent);
+.ao-card-sub {
+  font-size: 0.82rem;
+  color: var(--accent);
   margin: 0;
+  line-height: 1.4;
 }
 
-.wp-card-body {
-  padding: 1.25rem 1.75rem 1.75rem;
-}
-
-/* Key points */
-.wp-keypoints {
+.ao-points {
   list-style: none;
   padding: 0;
-  margin: 0 0 1.25rem;
+  margin: 0 0 0.95rem;
 }
 
-.wp-keypoints li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.45rem 0;
-  font-size: 0.9375rem;
-  color: var(--wp-text);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+.ao-points li {
+  position: relative;
+  padding: 0.28rem 0 0.28rem 1rem;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--text);
 }
 
-.wp-keypoints li:last-child {
-  border-bottom: none;
-}
-
-.wp-check {
-  color: var(--wp-success);
-  font-weight: bold;
-  flex-shrink: 0;
-  margin-top: 0.1rem;
-}
-
-/* Tech tags */
-.wp-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1.25rem;
-}
-
-.wp-tag {
-  padding: 0.3rem 0.6rem;
-  font-size: 0.72rem;
-  font-family: 'JetBrains Mono', monospace;
-  background: var(--wp-tag);
-  color: var(--wp-text-muted);
-  border-radius: 0.35rem;
-  border: 1px solid var(--wp-card-border);
-}
-
-/* About + Impact two-col */
-.wp-two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  padding: 0 1.75rem 1.75rem;
-  border-top: 1px solid var(--wp-card-border);
-  padding-top: 1.25rem;
-}
-
-.wp-two-col h4 {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--wp-text-muted);
-  margin: 0 0 0.6rem;
-}
-
-.wp-two-col p {
-  font-size: 0.9rem;
-  color: var(--wp-text-muted);
-  line-height: 1.65;
-  margin: 0;
-}
-
-.wp-impact-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.wp-impact-list li {
-  padding: 0.35rem 0;
-  font-size: 0.9rem;
-  color: var(--wp-text-muted);
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.wp-impact-list li::before {
-  content: "-";
-  color: var(--wp-accent);
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-/* Card footer: team + link */
-.wp-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding: 1rem 1.75rem;
-  border-top: 1px solid var(--wp-card-border);
-  background: rgba(255,255,255,0.015);
-}
-
-.wp-team {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.wp-team-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--wp-text-muted);
-}
-
-.wp-team-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--wp-text);
-}
-
-.wp-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.28rem 0.65rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  border-radius: 9999px;
-  background: rgba(34, 197, 94, 0.12);
-  color: var(--wp-success);
-  border: 1px solid rgba(34, 197, 94, 0.25);
-}
-
-.wp-status::before {
-  content: '';
-  display: inline-block;
+.ao-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72rem;
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--wp-success);
-  animation: wp-pulse 2s infinite;
+  background: var(--accent);
 }
 
-@keyframes wp-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+.ao-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.ao-tag {
+  padding: 0.22rem 0.5rem;
+  font-size: 0.68rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: #27272a;
+  color: var(--muted);
+  border-radius: 0.3rem;
+  border: 1px solid var(--border);
 }
 
-.wp-btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.45rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: 0.45rem;
-  background: var(--wp-accent);
-  color: #fff;
-  transition: background 0.2s;
-}
-
-.wp-btn:hover {
-  background: #2563eb;
-}
-
-/* -- Key Learnings Card -- */
-.wp-learnings {
-  background: var(--wp-card);
-  border: 1px solid var(--wp-card-border);
+/* -- Data flow pipeline -- */
+.ao-flow {
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 1rem;
-  padding: 1.5rem 1.75rem;
-  margin-bottom: 1.5rem;
+  padding: 1.5rem 1.5rem 1.6rem;
 }
 
-.wp-learnings h3 {
-  font-size: 0.875rem;
-  font-weight: 600;
+.ao-flow-intro {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+.ao-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  gap: 0.9rem;
+  padding-bottom: 1.4rem;
+}
+
+.ao-stage:last-child { padding-bottom: 0; }
+
+/* connector line */
+.ao-stage:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 1.1rem;
+  top: 2.2rem;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(var(--accent), rgba(59, 130, 246, 0.15));
+}
+
+.ao-stage-num {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.ao-stage-name {
+  font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--wp-text);
-  margin: 0 0 1rem;
+  margin: 0.35rem 0 0.4rem;
 }
 
-.wp-learnings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.75rem;
-}
-
-.wp-learning-item {
-  background: var(--wp-tag);
-  border: 1px solid var(--wp-card-border);
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-}
-
-.wp-learning-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--wp-accent);
-  margin-bottom: 0.3rem;
-}
-
-.wp-learning-desc {
-  font-size: 0.8125rem;
-  color: var(--wp-text-muted);
+.ao-stage-detail {
+  font-size: 0.85rem;
+  color: var(--muted);
   line-height: 1.55;
+  margin: 0;
 }
 
-/* -- Issues Section -- */
-.wp-issues {
-  background: var(--wp-card);
-  border: 1px solid var(--wp-card-border);
+.ao-stage-detail b { color: var(--text); font-weight: 600; }
+
+.ao-stage:last-child .ao-stage-num {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: var(--green);
+}
+
+/* -- Issues -- */
+.ao-issues {
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 1rem;
-  padding: 1.5rem 1.75rem;
-  margin-bottom: 1.5rem;
+  padding: 1.4rem 1.5rem;
 }
 
-.wp-issues-header {
+.ao-issues-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -430,540 +282,409 @@
   gap: 0.5rem;
 }
 
-.wp-issues-header h3 {
-  font-size: 0.875rem;
+.ao-issues-head h3 {
+  font-size: 0.82rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--wp-text);
   margin: 0;
 }
 
-.wp-issues-count {
-  font-size: 0.72rem;
+.ao-issues-count {
+  font-size: 0.7rem;
   font-family: 'JetBrains Mono', monospace;
-  color: var(--wp-text-muted);
-  background: var(--wp-tag);
-  border: 1px solid var(--wp-card-border);
+  color: var(--muted);
+  background: #27272a;
+  border: 1px solid var(--border);
   border-radius: 9999px;
   padding: 0.2rem 0.6rem;
 }
 
-.wp-issue-item {
+.ao-issue {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--wp-tag);
-  border: 1px solid var(--wp-card-border);
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  background: #27272a;
+  border: 1px solid var(--border);
   border-radius: 0.5rem;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.5rem;
   text-decoration: none;
   transition: border-color 0.2s, background 0.2s;
 }
 
-.wp-issue-item:hover {
-  border-color: var(--wp-accent);
-  background: var(--wp-accent-soft);
-}
+.ao-issue:last-child { margin-bottom: 0; }
+.ao-issue:hover { border-color: var(--accent); background: var(--accent-soft); }
 
-.wp-issue-item:last-child {
-  margin-bottom: 0;
-}
-
-.wp-issue-icon {
+.ao-issue-dot {
   flex-shrink: 0;
-  width: 1.1rem;
-  height: 1.1rem;
-  margin-top: 0.1rem;
-  color: var(--wp-success);
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 2px solid var(--green);
 }
 
-.wp-issue-body {
-  flex: 1;
-  min-width: 0;
-}
+.ao-issue-body { flex: 1; min-width: 0; }
 
-.wp-issue-title {
-  font-size: 0.9rem;
+.ao-issue-title {
+  font-size: 0.86rem;
   font-weight: 600;
-  color: var(--wp-text);
-  margin-bottom: 0.2rem;
+  color: var(--text);
 }
 
-.wp-issue-meta {
-  font-size: 0.75rem;
-  color: var(--wp-text-muted);
+.ao-issue-meta {
+  font-size: 0.72rem;
+  color: var(--muted);
   font-family: 'JetBrains Mono', monospace;
 }
 
-.wp-issue-label {
+.ao-issue-label {
   display: inline-block;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.65rem;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.62rem;
   font-weight: 600;
   border-radius: 9999px;
-  margin-left: 0.5rem;
+  margin-left: 0.4rem;
   vertical-align: middle;
 }
 
-.wp-issue-label-bug {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+.ao-lbl-feature { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+.ao-lbl-enhancement { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.ao-lbl-proposal { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+
+/* -- Takeaways -- */
+.ao-takeaways {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
 }
 
-.wp-issue-label-enhancement {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+.ao-takeaway {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.9rem 1rem;
 }
 
-.wp-issue-label-feature {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+.ao-takeaway-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
 }
 
-.wp-issue-label-research {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.wp-issue-label-proposal {
-  background: rgba(6, 182, 212, 0.15);
-  color: #22d3ee;
-  border: 1px solid rgba(6, 182, 212, 0.3);
+.ao-takeaway-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 /* -- Responsive -- */
-@media (max-width: 600px) {
-  .wp-two-col { grid-template-columns: 1fr; }
-  .wp-title { font-size: 1.75rem; }
-  .wp-flow { gap: 0.25rem; }
-  .wp-flow-node { min-width: 80px; padding: 0.6rem 0.75rem; }
-  .wp-flow-node-label { font-size: 0.65rem; }
+@media (max-width: 620px) {
+  .ao-grid { grid-template-columns: 1fr; }
+  .ao-title { font-size: 1.7rem; }
 }
 </style>
 
-<div class="wp-container">
+<div class="ao">
 
   <!-- Header -->
-  <div class="wp-header">
-    <div class="wp-badge">Design-Based Research Capstone</div>
-    <h1 class="wp-title">Assessment Observatory</h1>
-    <p class="wp-description">Altering the OCS and GitHub Analytics page to better reflect progress and improvement, and adding self-assessment categories to assist with grading and a more comprehensive overview of each student.</p>
-    <p class="wp-team-credit">Team &middot; Katherine, Jacob, Bridget</p>
+  <div class="ao-header">
+    <div class="ao-badge">Design-Based Research Capstone</div>
+    <h1 class="ao-title">Assessment Observatory</h1>
+    <p class="ao-lede">Reworking the OCS and GitHub analytics pages so they show real progress and improvement, plus new self-assessment categories that give a fuller picture of each student for grading.</p>
+    <p class="ao-team">Team &middot; Katherine, Jacob, Bridget</p>
   </div>
 
-  <!-- Level Flow -->
-  <div class="wp-flow">
-    <div class="wp-flow-node">
-      <span class="wp-flow-node-label">Identity Forge</span>
-      <span class="wp-flow-node-sub">Persona Hall</span>
+  <!-- Level flow (shared capstone nav) -->
+  <div class="ao-nav">
+    <div class="ao-nav-node">
+      <div class="ao-nav-node-label">Identity Forge</div>
+      <div class="ao-nav-node-sub">Persona Hall</div>
     </div>
-    <span class="wp-flow-arrow">&rarr;</span>
-    <div class="wp-flow-node">
-      <span class="wp-flow-node-label">Wayfinding World</span>
-      <span class="wp-flow-node-sub">Hub</span>
+    <span class="ao-nav-arrow">&rarr;</span>
+    <div class="ao-nav-node">
+      <div class="ao-nav-node-label">Wayfinding World</div>
+      <div class="ao-nav-node-sub">Hub</div>
     </div>
-    <span class="wp-flow-arrow">&rarr;</span>
-    <div class="wp-flow-node">
-      <span class="wp-flow-node-label">Mission Tools</span>
-      <span class="wp-flow-node-sub">Sprint + Code Hub</span>
+    <span class="ao-nav-arrow">&rarr;</span>
+    <div class="ao-nav-node">
+      <div class="ao-nav-node-label">Mission Tools</div>
+      <div class="ao-nav-node-sub">Sprint + Code Hub</div>
     </div>
-    <span class="wp-flow-arrow">&rarr;</span>
-    <div class="wp-flow-node active">
-      <span class="wp-flow-node-label">Assessment Observatory</span>
-      <span class="wp-flow-node-sub">Analytics</span>
+    <span class="ao-nav-arrow">&rarr;</span>
+    <div class="ao-nav-node active">
+      <div class="ao-nav-node-label">Assessment Observatory</div>
+      <div class="ao-nav-node-sub">Analytics</div>
     </div>
   </div>
 
-  <!-- Project Cards -->
-  <div class="wp-section-label">Self-Assessment &amp; Growth</div>
+  <!-- Self-Assessment goals -->
+  <div class="ao-label">Self-Assessment &amp; Growth</div>
+  <div class="ao-grid">
 
-  <!-- Student Self-Assessment -->
-  <div class="wp-card">
-    <div class="wp-card-header">
-      <div class="wp-card-title-group">
-        <h2 class="wp-card-title">Student Self-Assessment</h2>
-        <p class="wp-card-subtitle">Reflection and growth tracking through the sprint.</p>
+    <div class="ao-card">
+      <div class="ao-card-head">
+        <span class="ao-card-icon">&#127919;</span>
+        <div>
+          <h2 class="ao-card-title">Student Self-Assessment</h2>
+          <p class="ao-card-sub">Structured reflection each sprint.</p>
+        </div>
       </div>
-      <span class="wp-card-icon">&#127919;</span>
-    </div>
-    <div class="wp-card-body">
-      <ul class="wp-keypoints">
-        <li><span class="wp-check">&check;</span><span>Quantitative ratings across key skill areas (4:1 ratio)</span></li>
-        <li><span class="wp-check">&check;</span><span>Qualitative reflection space for context and nuance</span></li>
-        <li><span class="wp-check">&check;</span><span>Assessment categories: Organization, Technical Sense, Communication, Collaboration</span></li>
-        <li><span class="wp-check">&check;</span><span>Quick, efficient forms that encourage honest reflection</span></li>
+      <ul class="ao-points">
+        <li>Quick slider ratings paired with a short written reflection (4:1 quantitative-to-qualitative)</li>
+        <li>Four categories: Organization, Technical Sense, Communication, Collaboration</li>
+        <li>Sets a baseline to measure growth against later</li>
       </ul>
-      <div class="wp-tags">
-        <span class="wp-tag">Forms</span>
-        <span class="wp-tag">Self-Reflection</span>
-        <span class="wp-tag">Slider UI</span>
-        <span class="wp-tag">Database</span>
+      <div class="ao-tags">
+        <span class="ao-tag">Forms</span>
+        <span class="ao-tag">Slider UI</span>
+        <span class="ao-tag">Database</span>
       </div>
     </div>
-    <div class="wp-two-col">
-      <div>
-        <h4>About</h4>
-        <p>Gives students a structured way to evaluate their own development throughout a sprint or trimester. Sliders for quantitative self-rating keep completion time low, while text fields allow students to explain their thinking and build metacognitive awareness.</p>
-      </div>
-      <div>
-        <h4>Impact</h4>
-        <ul class="wp-impact-list">
-          <li>Encourages metacognition and intentional skill development</li>
-          <li>Provides teachers with students' self-perception data</li>
-          <li>Creates baseline for identifying growth over time</li>
-        </ul>
-      </div>
-    </div>
-    <div class="wp-card-footer">
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <span class="wp-status">Live</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Peer / Teacher Assessment -->
-  <div class="wp-card">
-    <div class="wp-card-header">
-      <div class="wp-card-title-group">
-        <h2 class="wp-card-title">Peer &amp; Teacher Assessment</h2>
-        <p class="wp-card-subtitle">Compare self-perception with external feedback.</p>
+    <div class="ao-card">
+      <div class="ao-card-head">
+        <span class="ao-card-icon">&#128101;</span>
+        <div>
+          <h2 class="ao-card-title">Peer &amp; Teacher Assessment</h2>
+          <p class="ao-card-sub">Self-perception vs. outside view.</p>
+        </div>
       </div>
-      <span class="wp-card-icon">&#128101;</span>
-    </div>
-    <div class="wp-card-body">
-      <ul class="wp-keypoints">
-        <li><span class="wp-check">&check;</span><span>Display student self-assessment alongside teacher/peer scores</span></li>
-        <li><span class="wp-check">&check;</span><span>Highlight areas where perceptions differ meaningfully</span></li>
-        <li><span class="wp-check">&check;</span><span>Side-by-side comparison view for each skill area</span></li>
-        <li><span class="wp-check">&check;</span><span>Actionable feedback highlighting growth opportunities</span></li>
+      <ul class="ao-points">
+        <li>Self scores shown side-by-side with teacher and peer scores per skill</li>
+        <li>Flags the skill areas where perceptions differ the most</li>
+        <li>Turns the perception gap into targeted mentoring conversations</li>
       </ul>
-      <div class="wp-tags">
-        <span class="wp-tag">Comparative Analysis</span>
-        <span class="wp-tag">Feedback UI</span>
-        <span class="wp-tag">Data Alignment</span>
-        <span class="wp-tag">Charts</span>
+      <div class="ao-tags">
+        <span class="ao-tag">Comparative Analysis</span>
+        <span class="ao-tag">Feedback UI</span>
+        <span class="ao-tag">Charts</span>
       </div>
     </div>
-    <div class="wp-two-col">
-      <div>
-        <h4>About</h4>
-        <p>Surfaces the relationship between how students see themselves and how others perceive them. This perspective gap&mdash;when managed constructively&mdash;becomes a powerful teaching moment and driver of growth.</p>
-      </div>
-      <div>
-        <h4>Impact</h4>
-        <ul class="wp-impact-list">
-          <li>Students gain awareness of blind spots in self-perception</li>
-          <li>Teachers identify students with low self-confidence despite strong work</li>
-          <li>Creates opportunities for targeted mentoring conversations</li>
-        </ul>
-      </div>
-    </div>
-    <div class="wp-card-footer">
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <span class="wp-status">Live</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Growth Tracking -->
-  <div class="wp-card">
-    <div class="wp-card-header">
-      <div class="wp-card-title-group">
-        <h2 class="wp-card-title">Growth Tracking Over Time</h2>
-        <p class="wp-card-subtitle">Visualize skill development across sprints and trimesters.</p>
+    <div class="ao-card">
+      <div class="ao-card-head">
+        <span class="ao-card-icon">&#128200;</span>
+        <div>
+          <h2 class="ao-card-title">Growth Tracking Over Time</h2>
+          <p class="ao-card-sub">Skill development across trimesters.</p>
+        </div>
       </div>
-      <span class="wp-card-icon">&#128200;</span>
-    </div>
-    <div class="wp-card-body">
-      <ul class="wp-keypoints">
-        <li><span class="wp-check">&check;</span><span>Temporal visualization of self-assessment rating changes</span></li>
-        <li><span class="wp-check">&check;</span><span>Show improvement or shift in individual skill areas</span></li>
-        <li><span class="wp-check">&check;</span><span>Cross-reference student self-reported growth with peer/teacher feedback</span></li>
-        <li><span class="wp-check">&check;</span><span>Trendlines and growth indicators for easy interpretation</span></li>
+      <ul class="ao-points">
+        <li>Trendlines showing how each skill rating shifts sprint to sprint</li>
+        <li>Cross-references self-reported growth with peer and teacher feedback</li>
+        <li>Makes progress visible that a single snapshot would miss</li>
       </ul>
-      <div class="wp-tags">
-        <span class="wp-tag">Time-Series Data</span>
-        <span class="wp-tag">Trendlines</span>
-        <span class="wp-tag">D3.js</span>
-        <span class="wp-tag">Portfolio View</span>
+      <div class="ao-tags">
+        <span class="ao-tag">Time-Series</span>
+        <span class="ao-tag">Trendlines</span>
+        <span class="ao-tag">D3.js</span>
       </div>
     </div>
-    <div class="wp-two-col">
-      <div>
-        <h4>About</h4>
-        <p>Extends assessment beyond a single sprint by tracking how students develop over an entire trimester or year. Students see their own arc of growth; teachers identify which interventions worked and which students need different support strategies.</p>
-      </div>
-      <div>
-        <h4>Impact</h4>
-        <ul class="wp-impact-list">
-          <li>Demonstrates growth that might be invisible in single snapshots</li>
-          <li>Builds student confidence through tangible evidence of improvement</li>
-          <li>Enables teachers to adjust strategies based on historical data</li>
-        </ul>
-      </div>
-    </div>
-    <div class="wp-card-footer">
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <span class="wp-status">Live</span>
-      </div>
-    </div>
+
   </div>
 
-  <!-- Analytics Section -->
-  <div class="wp-section-label">Analytics &amp; Data Visualization</div>
+  <!-- Analytics goals -->
+  <div class="ao-label">Analytics &amp; Data Visualization</div>
+  <div class="ao-grid">
 
-  <!-- GitHub Contribution Tracking -->
-  <div class="wp-card">
-    <div class="wp-card-header">
-      <div class="wp-card-title-group">
-        <h2 class="wp-card-title">GitHub Contribution Tracking</h2>
-        <p class="wp-card-subtitle">Track individual contributions within team projects.</p>
+    <div class="ao-card">
+      <div class="ao-card-head">
+        <span class="ao-card-icon">&#128202;</span>
+        <div>
+          <h2 class="ao-card-title">GitHub Contribution Tracking</h2>
+          <p class="ao-card-sub">Who did what, and when.</p>
+        </div>
       </div>
-      <span class="wp-card-icon">&#128202;</span>
-    </div>
-    <div class="wp-card-body">
-      <ul class="wp-keypoints">
-        <li><span class="wp-check">&check;</span><span>Display commits and activity across time</span></li>
-        <li><span class="wp-check">&check;</span><span>Commit/activity heatmap showing periods of higher activity</span></li>
-        <li><span class="wp-check">&check;</span><span>Show individual contributions within group projects</span></li>
-        <li><span class="wp-check">&check;</span><span>Help teachers identify work distribution across teams</span></li>
+      <ul class="ao-points">
+        <li>Commit and activity heatmap across the project timeline</li>
+        <li>Isolates each student's contribution within a group repo</li>
+        <li>Helps teachers see how work is distributed across a team</li>
       </ul>
-      <div class="wp-tags">
-        <span class="wp-tag">GitHub API</span>
-        <span class="wp-tag">Heatmap</span>
-        <span class="wp-tag">Analytics</span>
-        <span class="wp-tag">React</span>
+      <div class="ao-tags">
+        <span class="ao-tag">GitHub API</span>
+        <span class="ao-tag">Heatmap</span>
+        <span class="ao-tag">React</span>
       </div>
     </div>
-    <div class="wp-two-col">
-      <div>
-        <h4>About</h4>
-        <p>Provides real-time visibility into how individual students contribute to collaborative projects. The heatmap visualization makes it easy to spot who is active when, and the timeline view shows progression through a project lifecycle.</p>
-      </div>
-      <div>
-        <h4>Impact</h4>
-        <ul class="wp-impact-list">
-          <li>Teachers gain actionable insight into team dynamics</li>
-          <li>Students become aware of their own contribution patterns</li>
-          <li>Identifies students who may need additional support</li>
-        </ul>
-      </div>
-    </div>
-    <div class="wp-card-footer">
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <span class="wp-status">Live</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Content-Specific Analytics -->
-  <div class="wp-card">
-    <div class="wp-card-header">
-      <div class="wp-card-title-group">
-        <h2 class="wp-card-title">Content-Specific Analytics</h2>
-        <p class="wp-card-subtitle">Track progress across college board, projects, and sprints.</p>
+    <div class="ao-card">
+      <div class="ao-card-head">
+        <span class="ao-card-icon">&#128201;</span>
+        <div>
+          <h2 class="ao-card-title">Content-Specific Analytics</h2>
+          <p class="ao-card-sub">Metrics that match the work.</p>
+        </div>
       </div>
-      <span class="wp-card-icon">&#128201;</span>
-    </div>
-    <div class="wp-card-body">
-      <ul class="wp-keypoints">
-        <li><span class="wp-check">&check;</span><span>College Board progress tracking with unit-by-unit breakdown</span></li>
-        <li><span class="wp-check">&check;</span><span>Project and sprint progress analytics</span></li>
-        <li><span class="wp-check">&check;</span><span>GitHub activity insights beyond general website usage</span></li>
-        <li><span class="wp-check">&check;</span><span>Contextual metrics relevant to each work type</span></li>
+      <ul class="ao-points">
+        <li>College Board progress broken down unit by unit</li>
+        <li>Separate progress views for projects and sprints</li>
+        <li>Replaces generic page-view stats with context that matters</li>
       </ul>
-      <div class="wp-tags">
-        <span class="wp-tag">OCS Integration</span>
-        <span class="wp-tag">Progress Metrics</span>
-        <span class="wp-tag">Data Aggregation</span>
-        <span class="wp-tag">Dashboard</span>
+      <div class="ao-tags">
+        <span class="ao-tag">OCS Integration</span>
+        <span class="ao-tag">Progress Metrics</span>
+        <span class="ao-tag">Dashboard</span>
       </div>
     </div>
-    <div class="wp-two-col">
-      <div>
-        <h4>About</h4>
-        <p>Replaces generic website analytics with content-aware metrics that matter to educational outcomes. Students and teachers see progress in the specific context of their work&mdash;whether that's College Board units, project milestones, or sprint cycles.</p>
-      </div>
-      <div>
-        <h4>Impact</h4>
-        <ul class="wp-impact-list">
-          <li>Focuses attention on meaningful progress indicators</li>
-          <li>Reduces cognitive load with contextually relevant data</li>
-          <li>Teachers can intervene at the right moments</li>
-        </ul>
-      </div>
-    </div>
-    <div class="wp-card-footer">
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <span class="wp-status">Live</span>
-      </div>
-    </div>
-  </div>
 
-  <!-- Progress Visualization -->
-  <div class="wp-card">
-    <div class="wp-card-header">
-      <div class="wp-card-title-group">
-        <h2 class="wp-card-title">Progress Visualization</h2>
-        <p class="wp-card-subtitle">Make progress understandable at a glance.</p>
+    <div class="ao-card">
+      <div class="ao-card-head">
+        <span class="ao-card-icon">&#128293;</span>
+        <div>
+          <h2 class="ao-card-title">Progress Visualization</h2>
+          <p class="ao-card-sub">Progress readable at a glance.</p>
+        </div>
       </div>
-      <span class="wp-card-icon">&#128293;</span>
-    </div>
-    <div class="wp-card-body">
-      <ul class="wp-keypoints">
-        <li><span class="wp-check">&check;</span><span>Relative bar charts for unit and project completion</span></li>
-        <li><span class="wp-check">&check;</span><span>Sprint progress visualization over time</span></li>
-        <li><span class="wp-check">&check;</span><span>Pie charts showing work distribution and contributions</span></li>
-        <li><span class="wp-check">&check;</span><span>Visual comparisons across students and teams</span></li>
+      <ul class="ao-points">
+        <li>Relative bar charts for unit and project completion</li>
+        <li>Pie charts for work distribution and contribution share</li>
+        <li>Side-by-side comparisons across students and teams</li>
       </ul>
-      <div class="wp-tags">
-        <span class="wp-tag">D3.js</span>
-        <span class="wp-tag">Charts</span>
-        <span class="wp-tag">Data Visualization</span>
-        <span class="wp-tag">SVG</span>
+      <div class="ao-tags">
+        <span class="ao-tag">D3.js</span>
+        <span class="ao-tag">SVG</span>
+        <span class="ao-tag">Charts</span>
       </div>
     </div>
-    <div class="wp-two-col">
+
+  </div>
+
+  <!-- Data flow pipeline -->
+  <div class="ao-label">How the Data Travels</div>
+  <div class="ao-flow">
+    <p class="ao-flow-intro">Every metric on this page follows the same path &mdash; from raw activity in five source systems to a chart a student or teacher can act on.</p>
+
+    <div class="ao-stage">
+      <div class="ao-stage-num">1</div>
       <div>
-        <h4>About</h4>
-        <p>Transforms raw metrics into intuitive visualizations that communicate progress instantly. Charts update dynamically as students complete work, providing real-time feedback without requiring data interpretation.</p>
-      </div>
-      <div>
-        <h4>Impact</h4>
-        <ul class="wp-impact-list">
-          <li>Makes achievement tangible and motivating for students</li>
-          <li>Accelerates teacher understanding of class-wide progress</li>
-          <li>Enables quick identification of struggling students</li>
-        </ul>
+        <p class="ao-stage-name">Sources</p>
+        <p class="ao-stage-detail"><b>GitHub</b> commits &amp; pull requests &middot; <b>OCS</b> site activity &middot; <b>College Board</b> unit progress &middot; <b>Self-assessment</b> form submissions &middot; <b>Peer &amp; teacher</b> reviews</p>
       </div>
     </div>
-    <div class="wp-card-footer">
-      <div style="display:flex;align-items:center;gap:1rem;">
-        <span class="wp-status">Live</span>
+
+    <div class="ao-stage">
+      <div class="ao-stage-num">2</div>
+      <div>
+        <p class="ao-stage-name">Collection</p>
+        <p class="ao-stage-detail">GitHub GraphQL API (batched and cached to stay under rate limits) &middot; form endpoints write directly to the database &middot; OCS progress pulled through the existing integration</p>
+      </div>
+    </div>
+
+    <div class="ao-stage">
+      <div class="ao-stage-num">3</div>
+      <div>
+        <p class="ao-stage-name">Processing &amp; Aggregation</p>
+        <p class="ao-stage-detail">Normalize every source to a common schema &middot; pre-compute monthly summaries at write time &middot; align self scores against peer / teacher scores for the same skill and period</p>
+      </div>
+    </div>
+
+    <div class="ao-stage">
+      <div class="ao-stage-num">4</div>
+      <div>
+        <p class="ao-stage-name">Storage</p>
+        <p class="ao-stage-detail">Numeric ratings (0&ndash;5) stored apart from reflection text &middot; every record time-stamped so trend history can be rebuilt on demand</p>
+      </div>
+    </div>
+
+    <div class="ao-stage">
+      <div class="ao-stage-num">5</div>
+      <div>
+        <p class="ao-stage-name">Visualization</p>
+        <p class="ao-stage-detail">Activity heatmaps &middot; completion bar &amp; pie charts &middot; growth trendlines &middot; self-vs-peer perception-gap comparison</p>
+      </div>
+    </div>
+
+    <div class="ao-stage">
+      <div class="ao-stage-num">&#10003;</div>
+      <div>
+        <p class="ao-stage-name">Audiences</p>
+        <p class="ao-stage-detail"><b>Students</b> get self-awareness and concrete evidence of growth &middot; <b>Teachers</b> get earlier signals for support, insight into team dynamics, and richer context for grading</p>
       </div>
     </div>
   </div>
 
-  <!-- Open Issues -->
-  <div class="wp-section-label">Open Issues</div>
-  <div class="wp-issues">
-    <div class="wp-issues-header">
+  <!-- Open issues -->
+  <div class="ao-label">Open Issues</div>
+  <div class="ao-issues">
+    <div class="ao-issues-head">
       <h3>Tracked on GitHub</h3>
-      <span class="wp-issues-count">6 issues</span>
+      <span class="ao-issues-count">6 issues</span>
     </div>
 
-    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/1" target="_blank" class="wp-issue-item">
-      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
-        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
-      </svg>
-      <div class="wp-issue-body">
-        <div class="wp-issue-title">
-          GitHub API Integration and Performance Optimization
-          <span class="wp-issue-label wp-issue-label-feature">feature</span>
-        </div>
-        <div class="wp-issue-meta">#1 &middot; Analytics Optimization</div>
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/1" target="_blank" class="ao-issue">
+      <span class="ao-issue-dot"></span>
+      <div class="ao-issue-body">
+        <div class="ao-issue-title">GitHub API Integration &amp; Performance Optimization<span class="ao-issue-label ao-lbl-feature">feature</span></div>
+        <div class="ao-issue-meta">#1 &middot; Analytics Optimization</div>
       </div>
     </a>
 
-    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/2" target="_blank" class="wp-issue-item">
-      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
-        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
-      </svg>
-      <div class="wp-issue-body">
-        <div class="wp-issue-title">
-          Heatmap Component and Data Caching Strategy
-          <span class="wp-issue-label wp-issue-label-enhancement">enhancement</span>
-        </div>
-        <div class="wp-issue-meta">#2 &middot; Component Development</div>
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/2" target="_blank" class="ao-issue">
+      <span class="ao-issue-dot"></span>
+      <div class="ao-issue-body">
+        <div class="ao-issue-title">Heatmap Component &amp; Data Caching Strategy<span class="ao-issue-label ao-lbl-enhancement">enhancement</span></div>
+        <div class="ao-issue-meta">#2 &middot; Component Development</div>
       </div>
     </a>
 
-    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/3" target="_blank" class="wp-issue-item">
-      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
-        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
-      </svg>
-      <div class="wp-issue-body">
-        <div class="wp-issue-title">
-          Self-Assessment Form Validation and Storage
-          <span class="wp-issue-label wp-issue-label-feature">feature</span>
-        </div>
-        <div class="wp-issue-meta">#3 &middot; Form Infrastructure</div>
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/3" target="_blank" class="ao-issue">
+      <span class="ao-issue-dot"></span>
+      <div class="ao-issue-body">
+        <div class="ao-issue-title">Self-Assessment Form Validation &amp; Storage<span class="ao-issue-label ao-lbl-feature">feature</span></div>
+        <div class="ao-issue-meta">#3 &middot; Form Infrastructure</div>
       </div>
     </a>
 
-    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/4" target="_blank" class="wp-issue-item">
-      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
-        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
-      </svg>
-      <div class="wp-issue-body">
-        <div class="wp-issue-title">
-          Perception Gap Visualization Implementation
-          <span class="wp-issue-label wp-issue-label-enhancement">enhancement</span>
-        </div>
-        <div class="wp-issue-meta">#4 &middot; Dashboard UI</div>
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/4" target="_blank" class="ao-issue">
+      <span class="ao-issue-dot"></span>
+      <div class="ao-issue-body">
+        <div class="ao-issue-title">Perception Gap Visualization Implementation<span class="ao-issue-label ao-lbl-enhancement">enhancement</span></div>
+        <div class="ao-issue-meta">#4 &middot; Dashboard UI</div>
       </div>
     </a>
 
-    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/5" target="_blank" class="wp-issue-item">
-      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
-        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
-      </svg>
-      <div class="wp-issue-body">
-        <div class="wp-issue-title">
-          Temporal Growth Visualization and Trendline Calculation
-          <span class="wp-issue-label wp-issue-label-feature">feature</span>
-        </div>
-        <div class="wp-issue-meta">#5 &middot; Time-Series Analytics</div>
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/5" target="_blank" class="ao-issue">
+      <span class="ao-issue-dot"></span>
+      <div class="ao-issue-body">
+        <div class="ao-issue-title">Temporal Growth Visualization &amp; Trendline Calculation<span class="ao-issue-label ao-lbl-feature">feature</span></div>
+        <div class="ao-issue-meta">#5 &middot; Time-Series Analytics</div>
       </div>
     </a>
 
-    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/6" target="_blank" class="wp-issue-item">
-      <svg class="wp-issue-icon" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
-        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"/>
-      </svg>
-      <div class="wp-issue-body">
-        <div class="wp-issue-title">
-          Teacher Dashboard and Bulk Export Features
-          <span class="wp-issue-label wp-issue-label-proposal">proposal</span>
-        </div>
-        <div class="wp-issue-meta">#6 &middot; Admin Tools</div>
+    <a href="https://github.com/blackstar3092/wayfinding_pages/issues/6" target="_blank" class="ao-issue">
+      <span class="ao-issue-dot"></span>
+      <div class="ao-issue-body">
+        <div class="ao-issue-title">Teacher Dashboard &amp; Bulk Export Features<span class="ao-issue-label ao-lbl-proposal">proposal</span></div>
+        <div class="ao-issue-meta">#6 &middot; Admin Tools</div>
       </div>
     </a>
   </div>
 
-  <!-- Key Learnings -->
-  <div class="wp-section-label">Key Engineering Takeaways</div>
-  <div class="wp-learnings">
-    <div class="wp-learnings-grid">
-      <div class="wp-learning-item">
-        <div class="wp-learning-title">GitHub API Rate Limiting</div>
-        <div class="wp-learning-desc">Unauthenticated requests are limited to 60/hour. Using GraphQL queries and caching dramatically reduces request count compared to REST polling.</div>
-      </div>
-      <div class="wp-learning-item">
-        <div class="wp-learning-title">Canvas Heatmaps vs SVG</div>
-        <div class="wp-learning-desc">Canvas renders faster for large datasets, but SVG allows interactive tooltips. Hybrid approach: render base heatmap in Canvas, overlay interactive layer in SVG.</div>
-      </div>
-      <div class="wp-learning-item">
-        <div class="wp-learning-title">Assessment Data Validation</div>
-        <div class="wp-learning-desc">Store quantitative ratings (0-5) separately from qualitative text. Validates slider values on submit, not on input change, to avoid lag on range inputs.</div>
-      </div>
-      <div class="wp-learning-item">
-        <div class="wp-learning-title">Time-Series Aggregation</div>
-        <div class="wp-learning-desc">Pre-aggregate monthly summaries at write time, not query time. Cuts trendline calculation from seconds to milliseconds when viewing multi-year growth.</div>
-      </div>
+  <!-- Takeaways -->
+  <!--    
+
+  <div class="ao-label">Key Engineering Takeaways</div>
+  <div class="ao-takeaways">
+    <div class="ao-takeaway">
+      <div class="ao-takeaway-title">GitHub API Rate Limiting</div>
+      <div class="ao-takeaway-desc">Unauthenticated requests cap at 60/hour. Batched GraphQL queries plus caching cut request volume far below REST polling.</div>
+    </div>
+    <div class="ao-takeaway">
+      <div class="ao-takeaway-title">Canvas Heatmaps vs. SVG</div>
+      <div class="ao-takeaway-desc">Canvas draws large datasets faster; SVG keeps tooltips interactive. Hybrid: Canvas base layer, SVG overlay.</div>
+    </div>
+    <div class="ao-takeaway">
+      <div class="ao-takeaway-title">Assessment Data Validation</div>
+      <div class="ao-takeaway-desc">Store ratings (0&ndash;5) separately from text, and validate slider values on submit rather than on every input change.</div>
+    </div>
+    <div class="ao-takeaway">
+      <div class="ao-takeaway-title">Time-Series Aggregation</div>
+      <div class="ao-takeaway-desc">Pre-aggregate monthly summaries at write time. Multi-year trendline calculation drops from seconds to milliseconds.</div>
     </div>
   </div>
+  
+  -->
 
 </div>
