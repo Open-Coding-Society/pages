@@ -791,7 +791,8 @@ Check if this is a course lesson and determine which course context to use
         body: new URLSearchParams({
           name: PAGE_TITLE || {{ page.title | jsonify }},
           contentUrl: CURRENT_LESSON_ID,
-          description: {{ page.description | default: "" | jsonify }}
+          description: {{ page.description | default: "" | jsonify }},
+          assignmentType: {{ page.assignment_submission_type | default: "File" | jsonify }}
         })
       });
       
