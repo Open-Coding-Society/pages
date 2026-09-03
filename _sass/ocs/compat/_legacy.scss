@@ -1,0 +1,96 @@
+// =============================================================================
+// OCS COMPAT LAYER
+// =============================================================================
+// Keeps the PREVIOUS public class grammar working while pages migrate.
+// Documented in _sass/open-coding/elements/buttons/button-grammar.md:
+//
+//   old                              new
+//   .ocs__btn                    ->  .ocs-btn
+//   .ocs__btn.small|medium|large ->  .ocs-btn--sm|--md|--lg
+//   .ocs__btn.alert-red|…        ->  .ocs-btn--danger etc.
+//   .ocs__btn.fill               ->  solid variant
+//   .ocs__btn.pill               ->  .ocs-btn--pill
+//   .ocs__btn--icon              ->  .ocs-btn--icon
+//   .ocs__links                  ->  .ocs-cluster
+//
+// IMPORTANT: this file intentionally does NOT emit the bare global classes
+// `.small`, `.medium`, `.large`, `.row`, `.column`, `.button`, `.primary`,
+// `.secondary` that the old _utilities.scss and variant-calculator.scss
+// produced. Those 15 unprefixed selectors are the collision source this system
+// exists to remove; they are only honoured here when already scoped to a
+// button. Delete this file once no page references the old grammar.
+// =============================================================================
+
+@use "../core/functions" as fn;
+// Required so the @extend targets below resolve — @extend only reaches
+// selectors in this module and the modules it @uses. This does not duplicate
+// the button CSS; @use is idempotent.
+@use "../components/button";
+
+.ocs__btn {
+  // Inherit everything by matching the new base.
+  @extend .ocs-btn;
+
+  // Old default was an outlined accent button, not a solid one.
+  --btn-bg: transparent;
+  --btn-fg: var(--ocs-accent);
+  --btn-border: var(--ocs-accent-border);
+  --btn-bg-hover: var(--ocs-accent-bg);
+
+  // --- sizes, only when scoped to the button ---------------------------
+  &.small  { @extend .ocs-btn--sm; }
+  &.medium { /* default height already matches */ }
+  &.large  { @extend .ocs-btn--lg; }
+
+  // --- tones ------------------------------------------------------------
+  &.alert-red,
+  &--alert-red {
+    --btn-fg: var(--ocs-danger);
+    --btn-border: var(--ocs-danger-border);
+    --btn-bg-hover: var(--ocs-danger-bg);
+  }
+
+  &.alert-yellow,
+  &--alert-yellow {
+    --btn-fg: var(--ocs-warning);
+    --btn-border: var(--ocs-warning-border);
+    --btn-bg-hover: var(--ocs-warning-bg);
+  }
+
+  &.alert-green,
+  &--alert-green {
+    --btn-fg: var(--ocs-success);
+    --btn-border: var(--ocs-success-border);
+    --btn-bg-hover: var(--ocs-success-bg);
+  }
+
+  // --- modifiers --------------------------------------------------------
+  &.fill,
+  &--alert-fill {
+    --btn-bg: var(--btn-bg-hover);
+  }
+
+  &.pill { border-radius: var(--ocs-radius-full); }
+
+  &--icon { @extend .ocs-btn--icon; }
+}
+
+.ocs__btn-icon {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  img, svg { width: 100%; height: 100%; display: block; fill: currentColor; }
+}
+
+.ocs__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: fn.space(3);
+
+  &--wide { gap: fn.space(4); }
+}

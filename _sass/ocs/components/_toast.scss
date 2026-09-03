@@ -1,0 +1,110 @@
+// =============================================================================
+// OCS TOAST
+// =============================================================================
+//   <div class="ocs-toast-region" role="region" aria-label="Notifications">
+//     <div class="ocs-toast ocs-toast--success" role="status">…</div>
+//   </div>
+//
+// role="status" (polite) for ordinary confirmations; role="alert" (assertive)
+// only for failures — assertive interrupts whatever the user is reading.
+// Toasts that auto-dismiss must stay long enough to read: WCAG 2.2.1 asks for
+// a way to extend, so pause the timer on hover and focus in JS.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+
+.ocs-toast-region {
+  position: fixed;
+  inset-block-end: fn.space(4);
+  inset-inline-end: fn.space(4);
+  z-index: fn.z(toast);
+
+  display: flex;
+  flex-direction: column;
+  gap: fn.space(2);
+
+  width: min(24rem, calc(100vw - #{fn.space(8)}));
+  // The region spans the corner but must not block clicks where it is empty.
+  pointer-events: none;
+
+  > * { pointer-events: auto; }
+}
+
+.ocs-toast {
+  --toast-fg: var(--ocs-info);
+  --toast-border: var(--ocs-info-border);
+
+  display: flex;
+  align-items: flex-start;
+  gap: fn.space(3);
+
+  padding: fn.space(3) fn.space(4);
+  border: 1px solid var(--ocs-border);
+  border-inline-start: 3px solid var(--toast-border);
+  border-radius: var(--ocs-radius-md);
+
+  background: var(--ocs-surface-elevated);
+  box-shadow: var(--ocs-shadow-lg);
+  color: var(--ocs-text);
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  line-height: fn.typo(small, line);
+
+  &__icon {
+    flex: 0 0 auto;
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--toast-fg);
+    fill: currentColor;
+  }
+
+  &__content { flex: 1 1 auto; min-width: 0; }
+
+  &__title {
+    margin: 0 0 fn.space(1);
+    font-weight: 600;
+    color: var(--toast-fg);
+  }
+
+  &__content > p {
+    margin: 0;
+    color: var(--ocs-text-secondary);
+  }
+
+  &__close {
+    flex: 0 0 auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+
+    border: 0;
+    border-radius: var(--ocs-radius-sm);
+    background: transparent;
+    color: var(--ocs-text-muted);
+    cursor: pointer;
+
+    @include a11y.focusable(1px);
+
+    &:hover { color: var(--ocs-text); }
+
+    svg { flex: 0 0 auto; width: 0.875em; height: 0.875em; fill: currentColor; }
+  }
+
+  @each $role in (info, success, warning, danger) {
+    &--#{$role} {
+      --toast-fg: var(--ocs-#{$role});
+      --toast-border: var(--ocs-#{$role}-border);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ocs-toast { animation: ocs-toast-in var(--ocs-duration-base) var(--ocs-ease); }
+}
+
+@keyframes ocs-toast-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: none; }
+}

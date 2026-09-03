@@ -1,0 +1,135 @@
+// =============================================================================
+// OCS CARD
+// =============================================================================
+// GRAMMAR
+//   .ocs-card                 container
+//   .ocs-card__header         optional header row
+//   .ocs-card__title          heading
+//   .ocs-card__body           content
+//   .ocs-card__footer         actions row
+//   modifiers  --interactive | --flush | --stat
+//
+// `--interactive` is for a card that is ITSELF a link or button. Do not put it
+// on a div containing a link — that produces a click target with no role.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+
+.ocs-card {
+  display: flex;
+  flex-direction: column;
+
+  border: 1px solid var(--ocs-border);
+  border-radius: var(--ocs-radius-lg);
+  background: var(--ocs-surface-raised);
+  color: var(--ocs-text);
+
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: fn.space(3);
+    padding: fn.space(4);
+    border-block-end: 1px solid var(--ocs-border-subtle);
+  }
+
+  &__title {
+    margin: 0;
+    font-family: var(--ocs-font-sans);
+    font-size: fn.typo(h4, size);
+    font-weight: fn.typo(h4, weight);
+    line-height: fn.typo(h4, line);
+    color: var(--ocs-text);
+  }
+
+  &__subtitle {
+    margin: fn.space(1) 0 0;
+    font-size: fn.typo(small, size);
+    line-height: fn.typo(small, line);
+    color: var(--ocs-text-muted);
+  }
+
+  &__body {
+    flex: 1 1 auto;
+    padding: fn.space(4);
+    font-size: fn.typo(small, size);
+    line-height: fn.typo(body, line);
+    color: var(--ocs-text-secondary);
+
+    > :first-child { margin-block-start: 0; }
+    > :last-child  { margin-block-end: 0; }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: fn.space(2);
+    padding: fn.space(4);
+    border-block-start: 1px solid var(--ocs-border-subtle);
+  }
+
+  &__media {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  // --- modifiers --------------------------------------------------------
+  &--flush {
+    .ocs-card__header,
+    .ocs-card__body,
+    .ocs-card__footer { padding-inline: 0; }
+  }
+
+  &--interactive {
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      border-color var(--ocs-duration-fast) var(--ocs-ease),
+      background-color var(--ocs-duration-fast) var(--ocs-ease);
+
+    @include a11y.focusable;
+
+    &:hover {
+      border-color: var(--ocs-accent-border);
+      background: var(--ocs-surface-elevated);
+    }
+  }
+
+  // Big-number stat card.
+  &--stat {
+    padding: fn.space(4);
+    gap: fn.space(1);
+  }
+
+  &__stat-value {
+    font-family: var(--ocs-font-sans);
+    font-size: fn.typo(h1, size);
+    font-weight: fn.typo(h1, weight);
+    line-height: 1.1;
+    letter-spacing: fn.typo(h1, tracking);
+    color: var(--ocs-text);
+    // Tabular figures stop the number jittering as it updates.
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ocs-text-muted);
+  }
+}
+
+// Responsive card grid. auto-fit + minmax means no breakpoint list to maintain.
+.ocs-card-grid {
+  display: grid;
+  gap: fn.space(4);
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+}

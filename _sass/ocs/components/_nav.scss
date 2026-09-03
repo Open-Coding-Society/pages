@@ -1,0 +1,246 @@
+// =============================================================================
+// OCS NAVIGATION
+// =============================================================================
+// GRAMMAR
+//   .ocs-topbar        site header
+//   .ocs-sidenav       vertical section nav
+//   .ocs-breadcrumb    trail
+//   .ocs-tabs          tab strip
+//
+// Every nav landmark needs its own aria-label when a page has more than one,
+// e.g. <nav class="ocs-sidenav" aria-label="Documentation">.
+// The current item is marked with aria-current — the CSS keys off that
+// attribute rather than an .active class, so state cannot drift from semantics.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+
+// -----------------------------------------------------------------------------
+// TOPBAR
+// -----------------------------------------------------------------------------
+.ocs-topbar {
+  display: flex;
+  align-items: center;
+  gap: fn.space(4);
+
+  height: 3.5rem;
+  padding-inline: fn.space(4);
+  border-block-end: 1px solid var(--ocs-border);
+  background: var(--ocs-surface-raised);
+
+  &__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: fn.space(2);
+    margin-inline-end: fn.space(2);
+    // A long organisation name must never wrap -- wrapping breaks the fixed
+    // bar height and pushes the mark out of alignment.
+    flex: 0 0 auto;
+    white-space: nowrap;
+
+    font-family: var(--ocs-font-sans);
+    font-size: fn.typo(h4, size);
+    font-weight: 700;
+    color: var(--ocs-text);
+    text-decoration: none;
+
+    @include a11y.focusable;
+
+    img, svg { flex: 0 0 auto; height: 1.75rem; width: auto; }
+
+    // Wrap the wordmark in .ocs-topbar__brand-text to have it drop away on
+    // narrow screens while the mark itself stays.
+    &-text { @media (max-width: 640px) { display: none; } }
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: fn.space(1);
+    // Let the trailing actions sit at the far end.
+    margin-inline-end: auto;
+    // Too many links for the width scroll rather than wrap or overflow.
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    height: 2rem;
+    padding-inline: fn.space(3);
+
+    border-radius: var(--ocs-radius-md);
+    color: var(--ocs-text-secondary);
+
+    font-size: fn.typo(small, size);
+    font-weight: 500;
+    text-decoration: none;
+
+    @include a11y.focusable;
+
+    &:hover {
+      background: var(--ocs-surface-elevated);
+      color: var(--ocs-text);
+    }
+
+    &[aria-current] {
+      color: var(--ocs-accent);
+      font-weight: 600;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: fn.space(2);
+    flex: 0 0 auto;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SIDE NAV
+// -----------------------------------------------------------------------------
+.ocs-sidenav {
+  display: flex;
+  flex-direction: column;
+  gap: fn.space(1);
+  padding: fn.space(3);
+
+  &__section {
+    margin-block-start: fn.space(4);
+    padding-inline: fn.space(3);
+    padding-block-end: fn.space(1);
+
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ocs-text-muted);
+
+    &:first-child { margin-block-start: 0; }
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: fn.space(3);
+
+    padding: fn.space(2) fn.space(3);
+    // Reserve the indicator width on every item so text never shifts when the
+    // current item changes.
+    border-inline-start: 2px solid transparent;
+    border-radius: var(--ocs-radius-md);
+
+    color: var(--ocs-text-secondary);
+    font-size: fn.typo(small, size);
+    text-decoration: none;
+
+    @include a11y.focusable;
+
+    &:hover {
+      background: var(--ocs-surface-elevated);
+      color: var(--ocs-text);
+    }
+
+    &[aria-current] {
+      border-inline-start-color: var(--ocs-accent);
+      background: var(--ocs-accent-bg);
+      color: var(--ocs-accent);
+      font-weight: 600;
+    }
+
+    svg, .ocs-sidenav__icon {
+      flex: 0 0 auto;
+      width: 1rem;
+      height: 1rem;
+      fill: currentColor;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// BREADCRUMB
+// -----------------------------------------------------------------------------
+.ocs-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: fn.space(2);
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  font-size: fn.typo(small, size);
+  color: var(--ocs-text-muted);
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: fn.space(2);
+  }
+
+  // Separator is generated content so it is not announced by screen readers.
+  li:not(:last-child)::after {
+    content: "/";
+    color: var(--ocs-border-strong);
+  }
+
+  a {
+    color: var(--ocs-text-secondary);
+    text-decoration: none;
+    border-radius: var(--ocs-radius-sm);
+
+    @include a11y.focusable(2px);
+
+    &:hover {
+      color: var(--ocs-accent);
+      text-decoration: underline;
+    }
+  }
+
+  [aria-current="page"] { color: var(--ocs-text); font-weight: 500; }
+}
+
+// -----------------------------------------------------------------------------
+// TABS
+// -----------------------------------------------------------------------------
+// Needs role="tablist" / role="tab" / aria-selected wiring in the markup.
+.ocs-tabs {
+  display: flex;
+  gap: fn.space(1);
+  border-block-end: 1px solid var(--ocs-border);
+
+  &__tab {
+    padding: fn.space(2) fn.space(4);
+    // Sit the tab on top of the container border.
+    margin-block-end: -1px;
+
+    border: 0;
+    border-block-end: 2px solid transparent;
+    background: transparent;
+    color: var(--ocs-text-muted);
+
+    font-family: var(--ocs-font-sans);
+    font-size: fn.typo(small, size);
+    font-weight: 500;
+    cursor: pointer;
+
+    @include a11y.focusable(-2px);
+
+    &:hover { color: var(--ocs-text); }
+
+    &[aria-selected="true"] {
+      border-block-end-color: var(--ocs-accent);
+      color: var(--ocs-accent);
+      font-weight: 600;
+    }
+  }
+}

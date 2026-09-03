@@ -1,0 +1,358 @@
+// =============================================================================
+// OCS FORM FIELDS
+// =============================================================================
+// GRAMMAR
+//   .ocs-field                wrapper (label + control + help/error)
+//   .ocs-label                the <label>
+//   .ocs-input                text-like <input>
+//   .ocs-select               <select>
+//   .ocs-textarea             <textarea>
+//   .ocs-check                checkbox / radio row
+//   .ocs-switch               toggle
+//   .ocs-help                 helper text
+//   .ocs-error                validation message
+//
+//   <div class="ocs-field">
+//     <label class="ocs-label" for="email">Email</label>
+//     <input class="ocs-input" id="email" type="email" aria-describedby="email-help">
+//     <p class="ocs-help" id="email-help">We never share this.</p>
+//   </div>
+//
+// Invalid state is driven by `aria-invalid="true"`, not a CSS class, so the
+// visual state and the accessibility tree can never disagree.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+@use "../core/legacy-guard" as guard;
+
+// -----------------------------------------------------------------------------
+// WRAPPER
+// -----------------------------------------------------------------------------
+.ocs-field {
+  display: flex;
+  flex-direction: column;
+  gap: fn.space(2);
+  margin-block-end: fn.space(4);
+
+  &--inline {
+    flex-direction: row;
+    align-items: center;
+    gap: fn.space(3);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// LABEL
+// -----------------------------------------------------------------------------
+.ocs-label {
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  font-weight: 600;
+  line-height: fn.typo(small, line);
+  color: var(--ocs-text-secondary);
+
+  // Marks a required field. The asterisk is decorative — the control still
+  // needs the `required` attribute for assistive tech.
+  &--required::after {
+    content: " *";
+    color: var(--ocs-danger);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SHARED CONTROL SURFACE
+// -----------------------------------------------------------------------------
+@mixin control-base {
+  width: 100%;
+  min-height: 2.25rem;
+  padding: fn.space(2) fn.space(3);
+
+  border: 1px solid var(--ocs-border);
+  border-radius: var(--ocs-radius-md);
+  background: var(--ocs-surface-raised);
+  color: var(--ocs-text);
+
+  // Re-asserted at (0,2,0) to outrank `.user-theme-active input, select,
+  // textarea` (0,1,1). See core/_legacy-guard.scss.
+  @include guard.outrank-legacy {
+    border: 1px solid var(--ocs-border);
+    background: var(--ocs-surface-raised);
+    color: var(--ocs-text);
+  }
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  line-height: fn.typo(small, line);
+
+  transition:
+    border-color var(--ocs-duration-fast) var(--ocs-ease),
+    background-color var(--ocs-duration-fast) var(--ocs-ease);
+
+  &::placeholder {
+    color: var(--ocs-text-muted);
+    opacity: 1;                     // Firefox dims placeholders by default
+  }
+
+  &:hover:not(:disabled) { border-color: var(--ocs-border-strong); }
+
+  &:focus { outline: none; }
+
+  &:focus-visible {
+    border-color: var(--ocs-accent);
+    @include a11y.focus-ring(1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--ocs-surface-base);
+  }
+
+  &[aria-invalid="true"] {
+    border-color: var(--ocs-danger-border);
+
+    &:focus-visible {
+      outline-color: var(--ocs-danger-border);
+    }
+  }
+
+  &[readonly] {
+    background: var(--ocs-surface-base);
+    color: var(--ocs-text-secondary);
+  }
+}
+
+.ocs-input { @include control-base; }
+
+.ocs-textarea {
+  @include control-base;
+  min-height: 5rem;
+  resize: vertical;
+  line-height: fn.typo(body, line);
+}
+
+// -----------------------------------------------------------------------------
+// SELECT
+// -----------------------------------------------------------------------------
+// Custom chevron drawn as an inline SVG data URI so it inherits no external
+// asset. `currentColor` is not valid inside a data URI, so the stroke is the
+// literal muted token value; keep it in sync with $text.muted in _tokens.scss.
+.ocs-select {
+  @include control-base;
+
+  appearance: none;
+  padding-inline-end: fn.space(8);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%23949498' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right fn.space(3) center;
+  background-size: 12px 8px;
+  cursor: pointer;
+
+  // The dropdown list itself is OS-rendered; force readable colours.
+  option {
+    background: var(--ocs-surface-elevated);
+    color: var(--ocs-text);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// CHECKBOX + RADIO
+// -----------------------------------------------------------------------------
+.ocs-check {
+  display: flex;
+  align-items: flex-start;
+  gap: fn.space(2);
+  cursor: pointer;
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  line-height: fn.typo(small, line);
+  color: var(--ocs-text-secondary);
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    flex: 0 0 auto;
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    // Optically centre the box against the first line of label text.
+    margin-block-start: 0.125rem;
+
+    border: 1px solid var(--ocs-border-strong);
+    background: var(--ocs-surface-raised);
+    cursor: pointer;
+
+    transition:
+      background-color var(--ocs-duration-fast) var(--ocs-ease),
+      border-color var(--ocs-duration-fast) var(--ocs-ease);
+
+    &:hover:not(:disabled) { border-color: var(--ocs-accent); }
+
+    &:checked {
+      background-color: var(--ocs-accent);
+      border-color: var(--ocs-accent);
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    &:focus { outline: none; }
+    &:focus-visible { @include a11y.focus-ring(2px); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  input[type="checkbox"] {
+    border-radius: var(--ocs-radius-sm);
+
+    &:checked {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10'%3E%3Cpath d='M1 5 4.5 8.5 11 1.5' fill='none' stroke='%23121212' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 10px 8px;
+    }
+
+    &:indeterminate {
+      background-color: var(--ocs-accent);
+      border-color: var(--ocs-accent);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='2' viewBox='0 0 10 2'%3E%3Cpath d='M1 1h8' fill='none' stroke='%23121212' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-size: 8px 2px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
+
+  input[type="radio"] {
+    border-radius: var(--ocs-radius-full);
+
+    &:checked {
+      // Inner dot via a radial gradient — avoids a pseudo-element on a
+      // replaced element, which is unreliable across engines.
+      background-image: radial-gradient(
+        circle,
+        var(--ocs-surface-base) 0 3px,
+        transparent 3.5px
+      );
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// SWITCH
+// -----------------------------------------------------------------------------
+// A real checkbox with role="switch". Never a bare <div> — the control must be
+// focusable and announce its state.
+.ocs-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: fn.space(3);
+  cursor: pointer;
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(small, size);
+  color: var(--ocs-text-secondary);
+
+  input[type="checkbox"] {
+    appearance: none;
+    position: relative;
+    flex: 0 0 auto;
+    width: 2.25rem;
+    height: 1.25rem;
+    margin: 0;
+
+    border: 1px solid var(--ocs-border-strong);
+    border-radius: var(--ocs-radius-full);
+    background: var(--ocs-surface-elevated);
+    cursor: pointer;
+    transition:
+      background-color var(--ocs-duration-base) var(--ocs-ease),
+      border-color var(--ocs-duration-base) var(--ocs-ease);
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-start: 2px;
+      width: 0.875rem;
+      height: 0.875rem;
+      border-radius: 50%;
+      background: var(--ocs-text-secondary);
+      transform: translateY(-50%);
+      transition:
+        transform var(--ocs-duration-base) var(--ocs-ease),
+        background-color var(--ocs-duration-base) var(--ocs-ease);
+    }
+
+    &:checked {
+      background: var(--ocs-accent);
+      border-color: var(--ocs-accent);
+
+      &::after {
+        background: var(--ocs-surface-base);
+        transform: translate(1rem, -50%);
+      }
+    }
+
+    &:focus { outline: none; }
+    &:focus-visible { @include a11y.focus-ring(2px); }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// HELP + ERROR
+// -----------------------------------------------------------------------------
+.ocs-help {
+  margin: 0;
+  font-family: var(--ocs-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ocs-text-muted);
+}
+
+// Pair with aria-describedby on the control and role="alert" if it appears
+// after submission.
+.ocs-error {
+  display: flex;
+  align-items: center;
+  gap: fn.space(2);
+  margin: 0;
+
+  font-family: var(--ocs-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ocs-danger);
+
+  // An inline SVG with only a viewBox has no intrinsic size and will stretch
+  // to fill the flex line. Pin it.
+  svg {
+    flex: 0 0 auto;
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// FIELDSET
+// -----------------------------------------------------------------------------
+.ocs-fieldset {
+  margin: 0 0 fn.space(6);
+  padding: fn.space(4);
+  border: 1px solid var(--ocs-border);
+  border-radius: var(--ocs-radius-lg);
+
+  > legend {
+    padding-inline: fn.space(2);
+    font-family: var(--ocs-font-sans);
+    font-size: fn.typo(small, size);
+    font-weight: 600;
+    color: var(--ocs-text);
+  }
+}

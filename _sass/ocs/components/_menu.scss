@@ -1,0 +1,149 @@
+// =============================================================================
+// OCS MENU (dropdown)
+// =============================================================================
+// Built on the popover API so the menu escapes overflow:hidden ancestors and
+// lands in the top layer, with light-dismiss handled by the browser.
+//
+//   <button class="ocs-btn ocs-btn--secondary" popovertarget="menu-1">Actions</button>
+//   <div class="ocs-menu" id="menu-1" popover role="menu">
+//     <button class="ocs-menu__item" role="menuitem">Rename</button>
+//     <hr class="ocs-menu__sep">
+//     <button class="ocs-menu__item ocs-menu__item--danger" role="menuitem">Delete</button>
+//   </div>
+//
+// Anchor positioning uses `position-anchor` where supported and falls back to
+// centring; `@supports` guards it so older engines still get a usable menu.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+
+.ocs-menu {
+  // Reset the UA popover box.
+  margin: 0;
+  padding: fn.space(1);
+  border: 1px solid var(--ocs-border);
+  border-radius: var(--ocs-radius-lg);
+
+  background: var(--ocs-surface-elevated);
+  box-shadow: var(--ocs-shadow-lg);
+  color: var(--ocs-text);
+
+  min-width: 11rem;
+  max-height: min(20rem, 60vh);
+  overflow-y: auto;
+
+  &:popover-open {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  // Browsers without the popover API ignore the attribute entirely, so nothing
+  // hides the menu and it sits in the page permanently visible (measured 43px
+  // tall with the trigger untouched). Hide it and let ocs.js drive
+  // [data-ocs-open] instead, which closeMenu() already sets.
+  @supports not selector(:popover-open) {
+    & { display: none; }
+
+    &[data-ocs-open] {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      position: absolute;
+      z-index: fn.z(dropdown);
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: fn.space(2);
+    width: 100%;
+
+    padding: fn.space(2) fn.space(3);
+    border: 0;
+    border-radius: var(--ocs-radius-sm);
+    background: transparent;
+    color: var(--ocs-text-secondary);
+
+    font-family: var(--ocs-font-sans);
+    font-size: fn.typo(small, size);
+    text-align: start;
+    cursor: pointer;
+
+    @include a11y.focusable(-2px);
+
+    &:hover:not(:disabled) {
+      background: var(--ocs-surface-raised);
+      color: var(--ocs-text);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &--danger {
+      color: var(--ocs-danger);
+
+      &:hover:not(:disabled) {
+        background: var(--ocs-danger-bg);
+        color: var(--ocs-danger);
+      }
+    }
+
+    // Trailing shortcut hint.
+    kbd {
+      margin-inline-start: auto;
+      font-family: var(--ocs-font-mono);
+      font-size: 0.6875rem;
+      color: var(--ocs-text-muted);
+    }
+
+    svg { flex: 0 0 auto; width: 1em; height: 1em; fill: currentColor; }
+  }
+
+  &__sep {
+    height: 1px;
+    margin: fn.space(1) 0;
+    border: 0;
+    background: var(--ocs-border-subtle);
+  }
+
+  &__label {
+    padding: fn.space(2) fn.space(3) fn.space(1);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ocs-text-muted);
+  }
+}
+
+// Anchor the menu under its trigger where the engine supports it.
+// Anchor names must be UNIQUE per trigger/menu pair. A single shared name makes
+// every menu on the page resolve to the LAST trigger in tree order -- measured at
+// 385px away from its own trigger with two menus present. ocs.js assigns
+// anchor-name / position-anchor per pair; this block only carries the geometry.
+@supports (anchor-name: --a) {
+
+  .ocs-menu:popover-open {
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(left);
+    margin-block-start: fn.space(1);
+    position-try-fallbacks: flip-block, flip-inline;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ocs-menu:popover-open {
+    animation: ocs-menu-in var(--ocs-duration-fast) var(--ocs-ease);
+  }
+}
+
+@keyframes ocs-menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
+}
