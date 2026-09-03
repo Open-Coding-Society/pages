@@ -1,0 +1,96 @@
+{% assign data = site.data.rfid_presence_infograph %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="rp-container">
+  <nav class="rp-nav">
+    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
+    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
+  </nav>
+
+  <div class="rp-header">
+    <div class="rp-badge">Design-Based Research Capstone. Phase 1 Prototype</div>
+    <h1 class="rp-title">{{ data.Title }}</h1>
+    <p class="rp-description">{{ data.Description }}</p>
+  </div>
+
+  <div class="rp-section-label">Problem Statement</div>
+  <div class="rp-card">
+    <p style="font-size:0.95rem;line-height:1.75;color:var(--rp-text-muted);margin:0;">
+      Traditional classroom attendance systems typically rely on a single observation or event to determine whether a student is present. However, attendance does not necessarily represent sustained presence or the amount of time a student is available to participate in classroom learning and work. Many factors can affect the amount of time a student spends in the classroom, including tardiness, restroom breaks, counseling visits, excused absences, and other departures.
+    </p>
+    <p style="font-size:0.95rem;line-height:1.75;color:var(--rp-text-muted);margin:1rem 0 0;">
+      This project investigates how multiple independent presence signals can be correlated with classroom schedules and enrollment data to create a more accurate model of student presence over time. The resulting system will explore whether presence analytics can distinguish between attendance and actual time available for classroom engagement, providing students and educators with meaningful data about an individual's instructional access during the school day.
+    </p>
+  </div>
+
+  <div class="rp-section-label">Research Question</div>
+  <div class="rp-card">
+    <p class="rp-question" style="margin:0;">Can a low-cost Raspberry Pi based UHF RFID system, using tamper-evident computer-mounted tags and doorway detection, reliably establish classroom device presence and contribute to student presence determination when correlated with an existing camera-spatial technology and class registration and bell-schedule data?</p>
+  </div>
+
+  <div class="rp-section-label">System Architecture</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 0.25rem;">Two independent event sources, RFID and camera, feed a correlation engine that is also aware of the bell schedule and per-period enrollment.</p>
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    BS[Bell Schedule] --> CP[Class / Period]
+    CP --> REG["Registration:
+Student + Face + Computer + RFID Tag"]
+    REG --> RFID["RFID System
+Front door / Back door / Room"]
+    REG --> CAM["Camera System
+Spatial presence, face-scanning system"]
+    RFID --> CORR[Correlation / Intelligence Engine]
+    CAM --> CORR
+    CP -. expected enrollment .-> CORR
+    BS -. attendance window .-> CORR
+    CORR --> PRES[Attendance / Presence State]</pre>
+    </div>
+    <div class="rp-callout rp-callout-note" style="margin-top:1rem;">
+      This is the target architecture the team is building toward across four phases; the current prototype implements the leftmost slice of it. Full detail, including the presence-state machine and data model, is on the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page. Design rationale and a literature review of comparable systems, confirming this approach against prior work, is on the <a href="/capstone/rfid-presence/summary/" style="color:var(--rp-accent);">Project Summary</a> page.
+    </div>
+  </div>
+
+  <div class="rp-section-label">Explore the Project</div>
+  <div class="rp-hub-grid">
+    <a href="/capstone/rfid-presence/summary/" class="rp-hub-card">
+      <span class="rp-hub-card-title">Project Summary</span>
+      <span class="rp-hub-card-desc">Design rationale, privacy and governance decisions, and how this compares to existing systems. A quick read for mentors.</span>
+      <span class="rp-hub-card-arrow">Read the summary</span>
+    </a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-hub-card">
+      <span class="rp-hub-card-title">Technical Detail &amp; Flow</span>
+      <span class="rp-hub-card-desc">System architecture, diagrams, the presence-state machine, data model, and attendance-window logic.</span>
+      <span class="rp-hub-card-arrow">See the architecture</span>
+    </a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-hub-card">
+      <span class="rp-hub-card-title">Development Phases</span>
+      <span class="rp-hub-card-desc">Phase 1 contact-tap prototype through Phase 4 fully contactless, room-scale detection. What's built and what's next.</span>
+      <span class="rp-hub-card-arrow">View the roadmap</span>
+    </a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-hub-card">
+      <span class="rp-hub-card-title">Funding &amp; Budget</span>
+      <span class="rp-hub-card-desc">Bill of materials, cost estimates, and what's being asked for at each phase.</span>
+      <span class="rp-hub-card-arrow">See the budget</span>
+    </a>
+  </div>
+
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Phase 1. Working Prototype</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>

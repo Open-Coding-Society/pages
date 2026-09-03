@@ -1,0 +1,156 @@
+{% assign data = site.data.rfid_presence_infograph %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="rp-container">
+  <nav class="rp-nav">
+    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
+    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
+  </nav>
+
+  <div class="rp-header">
+    <div class="rp-badge">Development Phases</div>
+    <h1 class="rp-page-title" style="font-size:2rem;">From Contact-Tap Prototype to Contactless Presence</h1>
+    <p class="rp-description">The hardest part of this project, antennas that reliably detect presence without a tap, is deliberately last. The build is staged so each phase produces something usable and testable on its own.</p>
+  </div>
+
+  <div class="rp-callout rp-callout-draft">
+    <strong style="color:var(--rp-text);">Phase 1 below reflects the current working prototype.</strong> Phases 2 through 4 are the team's current draft roadmap toward the design described on the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page, and are still being finalized with the team and mentors. Treat scope and timing as provisional, not committed.
+  </div>
+
+  <div class="rp-section-label">Roadmap</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    P1["Phase 1
+Contact-Tap Prototype
+current"] --> P2["Phase 2
+Classroom Pilot
+Hardened Tap System"]
+    P2 --> P3["Phase 3
+UHF Doorway Transition
+Single Door, Contactless"]
+    P3 --> P4["Phase 4
+Full Room-Scale
+Contactless Presence"]
+    style P1 fill:#3b82f622,stroke:#3b82f6
+    style P4 fill:#a855f722,stroke:#a855f7</pre>
+    </div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="rp-phase current">
+    <div class="rp-phase-rail">
+      <div class="rp-phase-num">1</div>
+      <div class="rp-phase-line"></div>
+    </div>
+    <div class="rp-phase-body">
+      <div class="rp-phase-head">
+        <span class="rp-phase-title">Contact-Tap Prototype</span>
+        <span class="rp-pill rp-pill-good">Current, Working</span>
+      </div>
+      <div class="rp-card">
+        <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Prove the core read, log, and dashboard loop end to end, cheaply, before investing in UHF hardware or camera integration.</p>
+        <ul class="rp-checklist">
+          <li class="done"><span class="rp-box"></span><span>CrowPi board with one scan pad, 13.56MHz MIFARE Classic tags, four demo tags</span></li>
+          <li class="done"><span class="rp-box"></span><span>Basic Flask backend logging reads to SQLite</span></li>
+          <li class="done"><span class="rp-box"></span><span>Rough dashboard showing scan events</span></li>
+        </ul>
+        <div class="rp-callout rp-callout-note">
+          Contact-based (tap), single reader, no camera correlation yet. This validates the concept, not the target hardware.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="rp-phase draft">
+    <div class="rp-phase-rail">
+      <div class="rp-phase-num">2</div>
+      <div class="rp-phase-line"></div>
+    </div>
+    <div class="rp-phase-body">
+      <div class="rp-phase-head">
+        <span class="rp-phase-title">Classroom Pilot (Hardened Tap System)</span>
+        <span class="rp-pill rp-pill-draft">Draft</span>
+      </div>
+      <div class="rp-card">
+        <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Take the same tap-based approach from a demo to something a real class could use for a full period, still without UHF or camera correlation.</p>
+        <ul class="rp-checklist">
+          <li class="open"><span class="rp-box"></span><span>Register real student tags (20 or more) and decide on a physical tag format: keychain, sticker, or lanyard card</span></li>
+          <li class="open"><span class="rp-box"></span><span>Replace the rough dashboard with a production frontend (roster and admin views)</span></li>
+          <li class="open"><span class="rp-box"></span><span>Move off the Flask dev server to a production-grade deployment</span></li>
+          <li class="open"><span class="rp-box"></span><span>Migrate SQLite to a proper database with a backup strategy</span></li>
+          <li class="open"><span class="rp-box"></span><span>Add authentication and authorization for admin functions and a teacher-facing tag registration UI</span></li>
+          <li class="open"><span class="rp-box"></span><span>Run full-period tests, not just a two-minute demo, and validate attendance states with educator feedback</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="rp-phase draft">
+    <div class="rp-phase-rail">
+      <div class="rp-phase-num">3</div>
+      <div class="rp-phase-line"></div>
+    </div>
+    <div class="rp-phase-body">
+      <div class="rp-phase-head">
+        <span class="rp-phase-title">UHF Doorway Transition (Single Door, Contactless)</span>
+        <span class="rp-pill rp-pill-draft">Draft</span>
+      </div>
+      <div class="rp-card">
+        <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Swap the tap pad for the harder problem: reading tags at a distance, without a deliberate scan action. This is the door-table validation rig: one door, UHF range, tags mounted on laptops instead of held to a pad.</p>
+        <ul class="rp-checklist">
+          <li class="open"><span class="rp-box"></span><span>Deploy the UHF Pi HAT and antenna on a single door-table rig; see <a href="/capstone/rfid-presence/funding/" style="color:var(--rp-accent);">Funding</a> for hardware</span></li>
+          <li class="open"><span class="rp-box"></span><span>Switch to tamper-evident, on-metal or long-range UHF tags mounted on laptops</span></li>
+          <li class="open"><span class="rp-box"></span><span>Validate 2 to 4 meter read range and orientation behavior in the real trial room</span></li>
+          <li class="open"><span class="rp-box"></span><span>Investigate the bag-orientation problem, where a tag sits inside a closed backpack; see <a href="/capstone/rfid-presence/summary/" style="color:var(--rp-accent);">Project Summary</a></span></li>
+          <li class="open"><span class="rp-box"></span><span>Introduce the tag lifecycle: active, tampered or lost, reissued or retired</span></li>
+          <li class="open"><span class="rp-box"></span><span>Begin camera-system integration by defining the Camera Events contract with the face-scanning system</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="rp-phase draft">
+    <div class="rp-phase-rail">
+      <div class="rp-phase-num">4</div>
+    </div>
+    <div class="rp-phase-body">
+      <div class="rp-phase-head">
+        <span class="rp-phase-title">Full Room-Scale Contactless Presence</span>
+        <span class="rp-pill rp-pill-draft">Draft, Most Advanced</span>
+      </div>
+      <div class="rp-card">
+        <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">The target state: front- and back-door UHF detection that distinguishes entry side, full RFID and camera correlation, and the complete presence-state machine running live in the trial classroom.</p>
+        <ul class="rp-checklist">
+          <li class="open"><span class="rp-box"></span><span>Front and back door UHF readers, positioned to distinguish entry side, sized for the full 60 by 40 foot trial room</span></li>
+          <li class="open"><span class="rp-box"></span><span>Higher-gain or multiple antennas and a real packaging and enclosure plan for whole-room coverage</span></li>
+          <li class="open"><span class="rp-box"></span><span>A live correlation engine running the full presence-state model: present, tardy, stepped out, left early, opted out, tamper, and so on</span></li>
+          <li class="open"><span class="rp-box"></span><span>Per-period expected enrollment and bell-schedule-bound attendance windows enforced in production</span></li>
+          <li class="open"><span class="rp-box"></span><span>All acceptance and test cases from the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page validated in the live room</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Phase 1. Working Prototype</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>

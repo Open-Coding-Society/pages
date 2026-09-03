@@ -1,0 +1,342 @@
+{% assign data = site.data.rfid_presence_infograph %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="rp-container">
+  <nav class="rp-nav">
+    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
+    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
+  </nav>
+
+  <div class="rp-header">
+    <div class="rp-badge">Project Summary, For Mentors</div>
+    <h1 class="rp-page-title" style="font-size:2rem;">Classroom Presence System</h1>
+    <p class="rp-description">The idea, why it's designed this way, where it stands today, and how it compares to what already exists. See the <a href="/capstone/rfid-presence/" style="color:var(--rp-accent);">Overview</a> page for the problem statement and research question.</p>
+  </div>
+
+  <div class="rp-section-label">The Idea, in One Paragraph</div>
+  <div class="rp-card">
+    <p class="rp-question">
+      Mount a tamper-evident RFID tag on each student's own laptop, not a wearable badge, since laptops are far less likely to be left in a locker, and read it at the classroom door. That tells us the <strong>device</strong> is present. Separately, an existing face-scanning camera system (built by a teammate on another OCS project) tells us the <strong>student</strong> is present. Neither signal alone is trustworthy attendance: a laptop can sit in the room while its owner is in the bathroom, and a face can be recognized without the device belonging to that class period. Correlating the two against the bell schedule and per-period roster produces a real presence determination.
+    </p>
+  </div>
+
+  <div class="rp-section-label">Why It's Designed This Way</div>
+  <div class="rp-card">
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Decision</th><th>In plain terms</th></tr></thead>
+        <tbody>
+          <tr><td>Tag on the <strong>laptop</strong>, not a badge</td><td>Students carry laptops to every class and rarely leave them behind. A badge is far easier to forget or leave in a bag.</td></tr>
+          <tr><td>RFID + camera, not RFID alone</td><td>RFID proves the device is in the room. Camera proves the person is. Both are needed to know the student is actually present.</td></tr>
+          <tr><td>Tamper-evident tags</td><td>The tag's antenna physically breaks if peeled off, so a student can't hand their tag to a friend to fake attendance.</td></tr>
+          <tr><td>Attendance counted only in a bell-schedule window</td><td>A tag read in the hallway an hour later doesn't get mistaken for attendance in that period.</td></tr>
+          <tr><td>States beyond present/absent (for example "stepped out")</td><td>Real classrooms have bathroom breaks and late arrivals. A binary present/absent flag would misreport both as absences.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rp-callout rp-callout-note" style="margin-top:1rem;">
+      The full technical rationale, state model, and data schema are on the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page.
+    </div>
+  </div>
+
+  <div class="rp-section-label">Privacy, Scope &amp; Governance</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Set by the teacher in the room-approval discussion. These are the boundaries mentors should know the project operates inside.</p>
+    <ul class="rp-checklist">
+      <li class="done"><span class="rp-box"></span><span>Face scanning is opt-in. A student can decline and still get correct device-only presence tracking. That is a policy choice, not a system failure.</span></li>
+      <li class="done"><span class="rp-box"></span><span>Scope is one CS classroom, for now. No wider rollout is planned or implied at this stage.</span></li>
+      <li class="done"><span class="rp-box"></span><span>The project is fully open. Implementation is shared with anyone who asks, and nothing is treated as confidential.</span></li>
+      <li class="done"><span class="rp-box"></span><span>Security review is mentor-led rather than a formal school-IT process, given the single-room scope and open-sharing policy.</span></li>
+      <li class="done"><span class="rp-box"></span><span>Testing uses only the team's own data. No real student data is used beyond what the team itself provides.</span></li>
+    </ul>
+  </div>
+
+  <div class="rp-section-label">Where It Stands Today</div>
+  <div class="rp-card">
+    <p style="font-size:0.9rem;line-height:1.7;color:var(--rp-text-muted);margin:0 0 1rem;">
+      We're in <strong style="color:var(--rp-text);">Phase 1</strong>: a working contact-tap prototype on a CrowPi board, with one scan pad, four demo tags, a Flask backend, and a rough dashboard. It proves the core read, log, and display loop end to end. It does not yet include the camera correlation, UHF doorway detection, or tamper-evident tags described above. Those arrive in later phases, moving from proving the concept works to proving it works contactlessly, at classroom scale.
+    </p>
+    <div class="rp-callout rp-callout-note">
+      The full four-phase roadmap, including what's built versus still needed, is on the <a href="/capstone/rfid-presence/phases/" style="color:var(--rp-accent);">Phases</a> page.
+    </div>
+  </div>
+
+  <div class="rp-section-label">Prior Research &amp; Comparable Systems</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">A survey of academic work, related patents, commercial products, and regulatory sources reviewed before finalizing this design &mdash; covering classroom attendance systems directly, and the underlying RF, sensor-fusion, and UX questions the design depends on (on-body tag reliability, antenna diversity, tag co-location interference, clock synchronization, and audible read confirmation). This is a September 2026 research snapshot, not a formal literature review or patent-clearance search; a proper IP-clearance pass should happen before any claim of novelty is made publicly.</p>
+
+    <h3>Academic literature</h3>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Paper</th><th>What it does</th><th>How this project differs</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://www.researchgate.net/publication/357706883_In-Classroom_Faculty_Attendance_Monitoring_System_based_on_Ultra_High_Frequency_UHF_Radio_Frequency_Identification_RFID_with_Captured_Image_Cross-verification_Mechanism" target="_blank" rel="noopener">In-Classroom Faculty Attendance Monitoring System Based on UHF RFID with Captured Image Cross-verification</a></td>
+            <td>The closest prior work found: UHF RFID reads paired with a captured image for cross-verification.</td>
+            <td>Targets faculty, with a single-signal cross-check at read time. This project models device and person as two continuously tracked signals over a full period (bathroom breaks, tardies, opt-outs), with a bell-schedule-bound attendance window and tag lifecycle handling the paper doesn't cover.</td>
+          </tr>
+          <tr>
+            <td><a href="https://arxiv.org/abs/2604.22697" target="_blank" rel="noopener">RFID-Based Non-Biometric Classroom Attendance System: Proxy Attendance Detection via Weight Sensor Integration</a></td>
+            <td>Adds weight sensors to catch "buddy punching," where one student taps a friend's tag, without biometrics.</td>
+            <td>Addresses the same proxy-attendance concern this project handles with tamper-evident tags (antenna breaks on removal), using a different mechanism worth comparing tradeoffs against.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.researchgate.net/publication/308537776_The_Possibility_of_Using_RFID_System_to_Automate_and_Integrate_the_Attendance_of_Professors_and_Students_in_the_Classroom" target="_blank" rel="noopener">The Possibility of Using RFID System to Automate and Integrate the Attendance of Professors and Students in the Classroom</a></td>
+            <td>General single-signal RFID-tap attendance automation.</td>
+            <td>No second signal to verify the person, and no presence-state model beyond present/absent.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.researchgate.net/publication/374245505_An_RFID-based_smart_school_attendance_and_monitoring_system" target="_blank" rel="noopener">An RFID-Based Smart School Attendance and Monitoring System</a></td>
+            <td>General-purpose RFID school attendance and monitoring.</td>
+            <td>Same gap: RFID only, with no device/person distinction.</td>
+          </tr>
+          <tr>
+            <td><a href="https://ieeexplore.ieee.org/document/8974778" target="_blank" rel="noopener">Online Classroom Attendance System Based on RFID Technology and Cloud Computing</a></td>
+            <td>Cloud-hosted RFID attendance pipeline.</td>
+            <td>Solves the infrastructure and scale problem, not the trust problem this project targets.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Related patents</h3>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Patent</th><th>What it covers</th><th>How this project differs</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://patents.google.com/patent/KR101710200B1/en" target="_blank" rel="noopener">KR101710200B1, Automatic Attendance System Using Face Recognition (Korea)</a></td>
+            <td>An RFID tag on a student ID is read at a classroom terminal, which also captures a face photo; both are sent to a server with timestamp, device ID, and student number.</td>
+            <td>Conceptually the closest patent found, combining RFID and face recognition. This project's tag lives on the student's own laptop rather than an ID card, is tamper-evident, has an explicit issue/tamper/retire lifecycle, and feeds a period-aware, multi-state presence model rather than a single logged read event. We are not claiming novelty over RFID plus face recognition as a general combination; the difference is in the presence-state modeling, governance layer, and phased hardware rollout.</td>
+          </tr>
+          <tr>
+            <td><a href="https://patents.google.com/patent/US7095324B2/en" target="_blank" rel="noopener">US7095324B2, Tamper Evident Smart Label with RF Transponder (Intermec)</a></td>
+            <td>An RF transponder label with propagation cuts in the antenna trace that sever on peel-removal, permanently disabling the tag's read response.</td>
+            <td>Direct prior art for the laptop tag's tamper-evident requirement. Our tag lifecycle treats a severed antenna as a state transition (ACTIVE&nbsp;&rarr;&nbsp;TAMPERED) feeding the presence model, rather than just a disabled label.</td>
+          </tr>
+          <tr>
+            <td><a href="https://patents.google.com/patent/US10565488B2/en" target="_blank" rel="noopener">US10565488B2, RFID Tag with Anti-Tamper Assembly (Intermec)</a></td>
+            <td>A capacitive-sensing tamper design: a break-away structure changes the tag's capacitance on removal, which a microcontroller detects to disable the tag.</td>
+            <td>A second, mechanically different tamper-evident approach (capacitive vs. severed-trace) worth evaluating for the on-metal laptop tag, where a simple frangible trace may be harder to route.</td>
+          </tr>
+          <tr>
+            <td><a href="https://patents.google.com/patent/US9202091B2/en" target="_blank" rel="noopener">US9202091B2, RFID Reader with Camera, Video, and/or Audio Capture Device</a></td>
+            <td>An RFID reader that triggers a facial-recognition image capture at the moment a badge is read, at a single fixed reader point.</td>
+            <td>Prior art for pairing an RFID read with a camera capture generally. This project separates the two into independent, continuously-running signal streams (device and person) correlated after the fact, rather than one signal triggering the other at a single instant — needed because the camera and RFID reader are not colocated at one point in this design.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Sensor-fusion &amp; occupancy-sensing research</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">Work validating the general approach of combining RFID with another sensing modality, beyond classroom attendance specifically, plus broader surveys of how occupancy sensing is done in buildings generally.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://arpa-e.energy.gov/programs-and-initiatives/search-all-projects/rfid-sensor-network-human-presence-sensing" target="_blank" rel="noopener">RFID Sensor Network for Human Presence Sensing (ARPA-E / University of Colorado Boulder)</a></td>
+            <td>Combines an RFID sensor network with privacy-preserving microphones and low-resolution cameras for occupancy detection. Direct precedent for RFID plus visual-signal fusion at a systems level.</td>
+          </tr>
+          <tr>
+            <td><a href="https://arxiv.org/pdf/2302.02952" target="_blank" rel="noopener">Fusion of Radio and Camera Sensor Data for Accurate Indoor Positioning</a></td>
+            <td>Fusion algorithms that incorporate radio data into camera-based occupancy map frameworks. Relevant technique reference for the correlation engine.</td>
+          </tr>
+          <tr>
+            <td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11014381/" target="_blank" rel="noopener">Fundamentals, Algorithms, and Technologies of Occupancy Detection for Smart Buildings Using IoT Sensors</a></td>
+            <td>Survey comparing PIR, acoustic, camera, HVAC, and WiFi/BLE occupancy-sensing modalities with a comparative analysis and sensor-fusion recommendation. Places RFID+camera in the broader landscape of occupancy-sensing options and why single-modality approaches generally underperform fused ones.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.researchgate.net/publication/382221603" target="_blank" rel="noopener">A Review of Occupancy Sensing Technologies and Approaches in Smart Buildings</a> (2025)</td>
+            <td>Recent comprehensive review comparing occupancy-sensing methods and sensor types across building types. Used to check this project's approach against current best practice rather than only classroom-attendance-specific literature.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Commercial products</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">Vendors already selling RFID attendance to schools, as a baseline for what off-the-shelf already covers.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Vendor</th><th>What it offers</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://vmedulife.com/blog/academic-planning/rfid-student-attendance-system-the-future-of-smart-attendance-tracking-vmedulife/" target="_blank" rel="noopener">vmedulife</a></td><td>RFID student attendance automation for schools, colleges, and universities.</td></tr>
+          <tr><td><a href="https://www.campus365.io/rfid-attendance/" target="_blank" rel="noopener">Campus 365</a></td><td>RFID attendance via ID cards or uniform-attached tags at checkpoints, deployed in hundreds of schools.</td></tr>
+          <tr><td><a href="https://edunexttechnologies.com/rfid-student-attendance.php" target="_blank" rel="noopener">Edunext Technologies</a></td><td>Cost-effective RFID school attendance.</td></tr>
+          <tr><td><a href="https://www.astiinfotech.com/rfid-attendance-management/" target="_blank" rel="noopener">ASTI Infotech (TRAKOM)</a></td><td>RFID-based digital attendance marking.</td></tr>
+          <tr><td><a href="https://www.cirfid.com/applications/rfid-time-attendance-system" target="_blank" rel="noopener">Cirfid</a></td><td>RFID time-and-attendance system.</td></tr>
+          <tr><td><a href="https://www.atlasrfidstore.com/rfid-insider/tracking-attendance-with-uhf-rfid/" target="_blank" rel="noopener">atlasRFIDstore, Tracking Attendance with UHF RFID</a></td><td>Vendor technical reference on UHF hardware for attendance tracking, useful as a hardware baseline rather than a full product.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rp-callout rp-callout-note" style="margin-top:1rem;">
+      None of the commercial products above appear to publicly describe combining RFID with camera-based person verification, a tamper-evident laptop-mounted device-presence model, or bell-schedule-bound attendance windows. That combination is this project's specific contribution.
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Read reliability: bag orientation, on-body carry &amp; antenna diversity</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">The team flagged an open problem: a tagged laptop inside a closed backpack has no guaranteed orientation toward the reader, and UHF read reliability drops off-axis. The same physics is a bigger problem for a tag carried on the body (e.g. a phone in a pocket), since human tissue absorbs strongly at UHF. It turns out to be a known, actively studied RFID engineering problem rather than something specific to this project's design — and the standard mitigation (surrounding the doorway with multiple antennas instead of relying on one) is the same technique retail and library security gates already use.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://www.researchgate.net/publication/224684636_3D_Antenna_for_UHF_RFID_Tags_with_Eliminated_Read-Orientation_Sensitivity" target="_blank" rel="noopener">3D Antenna for UHF RFID Tags with Eliminated Read-Orientation Sensitivity</a></td>
+            <td>A near-omnidirectional tag antenna designed specifically to eliminate orientation sensitivity. A candidate mitigation worth evaluating for Phase 3/4 instead of, or alongside, multiple reader antennas.</td>
+          </tr>
+          <tr>
+            <td><a href="https://doi.org/10.3390/electronics15122744" target="_blank" rel="noopener">Enhancement of RFID Reliability in Cabinet Environments Using Dual-Band Operation</a></td>
+            <td>Addresses read reliability in enclosed, RF-hostile spaces, analogous to a closed backpack.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.academia.edu/99474548/Study_of_Material_Interference_in_a_RFID_Tag_Reading" target="_blank" rel="noopener">Study of Material Interference in RFID Tag Reading</a></td>
+            <td>Confirms metal and material detuning as a primary driver of read failure, which informs the on-metal tag choice already in the bill of materials.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.beontag.com/blog/rfid-read-range/" target="_blank" rel="noopener">RFID Read Range: What Really Affects It</a></td>
+            <td>Practical vendor reference on the factors (power, polarization, orientation, material) behind the read-range numbers used in the <a href="/capstone/rfid-presence/funding/" style="color:var(--rp-accent);">Funding</a> page bill of materials.</td>
+          </tr>
+          <tr>
+            <td><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/mop.27610" target="_blank" rel="noopener">Card-Type Slot Antenna for UHF RFID Tag Close to the Chest of a Human Body</a></td>
+            <td>Measures on-body vs. free-space read range for a card-format UHF tag near the torso using a human-body phantom. The closest real analogue found to a phone tag carried in a pocket — quantifies how much body absorption degrades a card-format tag's range.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.researchgate.net/publication/371305582_Effect_of_Human_Body_to_the_Read_Range_of_Radio_Frequency_Identification_Devices_Worn_in_Close_Proximity" target="_blank" rel="noopener">Effect of Human Body to the Read Range of RFID Devices Worn in Close Proximity</a></td>
+            <td>Directly compares free-space vs. on-body read range and shows it diminishes substantially when worn, proposing a metamaterial mitigation. Further evidence that any future on-body (phone) tag is a fundamentally harder RF problem than the laptop tag.</td>
+          </tr>
+          <tr>
+            <td><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5539847/" target="_blank" rel="noopener">Multiport Circular Polarized RFID-Tag Antenna for UHF Sensor Applications</a></td>
+            <td>Peer-reviewed confirmation that circular polarization is the standard choice for dock-door, portal, and gate RFID deployments specifically because tag orientation is unpredictable as objects or people pass through, and linear-polarization mismatch causes 20&ndash;30&nbsp;dB of loss. Directly supports designing the classroom doorway as a multi-antenna, circularly-polarized portal rather than a single reader antenna.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Tag co-location interference</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">If a second, personal-device tag is ever added alongside the laptop tag, both could end up in the same backpack. Whether they'd interfere with each other isn't something to assume either way &mdash; it's a measurable, previously-studied RF effect.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://ieeexplore.ieee.org/document/4619089/" target="_blank" rel="noopener">Effect of Antenna Mutual Coupling on the UHF Passive RFID Tag Detection</a></td>
+            <td>Studies how the spacing and orientation of closely-spaced tag antennas reduces backscatter and detection range &mdash; the general phenomenon behind two tags in one bag degrading each other's reads.</td>
+          </tr>
+          <tr>
+            <td><a href="https://ieeexplore.ieee.org/document/9158443/" target="_blank" rel="noopener">RF-Mirror: Mitigating Mutual Coupling Interference in Two-Tag Array Labeled RFID Systems</a></td>
+            <td>Models and mitigates RSSI/phase distortion specifically from mutual coupling between two co-located tags on the same object &mdash; directly on point if a laptop tag and a personal-device tag end up sharing a bag, with a quantified impact rather than a hand-wavy concern.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Phone-based / BLE attendance &mdash; why RFID instead of an app</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">A student's own phone could in principle provide presence data without any new tag at all, via Bluetooth Low Energy (BLE) beacons and an app. This has been tried in the classroom-attendance literature, and comparing against it clarifies why this project uses a dedicated RFID tag instead.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://ieeexplore.ieee.org/document/7350708/" target="_blank" rel="noopener">Student Attendance Management System with Bluetooth Low Energy Beacon and Android Devices</a></td>
+            <td>BLE beacons plus an Android app for classroom attendance &mdash; one of the earlier peer-reviewed implementations of this approach.</td>
+          </tr>
+          <tr>
+            <td><a href="https://ieeexplore.ieee.org/document/7848166/" target="_blank" rel="noopener">Smart Attendance Management Using Bluetooth Low Energy and Android</a></td>
+            <td>A second, independent BLE-plus-app attendance implementation, useful for triangulating the common failure modes of this approach.</td>
+          </tr>
+          <tr>
+            <td><a href="https://dl.acm.org/doi/10.1145/3702163.3702422" target="_blank" rel="noopener">A Prototype to Enhance Academic Attendance Using BLE Beacons</a> (2024)</td>
+            <td>A recent (2024) BLE-beacon attendance prototype, showing the approach is still being actively tried rather than an abandoned dead end.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="rp-callout rp-callout-note" style="margin-top:1rem;">
+      <span>All three BLE approaches above depend on the student running an app and keeping Bluetooth and location permissions on &mdash; a policy and compliance dependency this project avoids by using a passive RFID tag, which requires no app, no permissions, and no student action beyond carrying the tagged device. The tradeoff is that RFID needs dedicated reader hardware at the doorway, where BLE reuses infrastructure the student already carries.</span>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Audible read confirmation &mdash; precedent</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">The team has discussed giving students an audible tone at the doorway on a successful read, so they get positive proof their crossing was registered rather than trusting a silent background scan. This is not a new idea in RFID systems generally.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://patents.google.com/patent/US20060208859A1/en" target="_blank" rel="noopener">US20060208859A1, System and Method for RFID Reader Operation</a></td>
+            <td>Explicit prior art for an audible beep tone on every RFID read, with a configurable tone/volume and a distinct completion beep &mdash; close precedent for a doorway confirmation tone.</td>
+          </tr>
+          <tr>
+            <td><a href="https://patents.google.com/patent/WO2000077700A1/en" target="_blank" rel="noopener">WO2000077700A1, Feedback System and Method for Reading of RFID Tags</a></td>
+            <td>A second patent describing an audible beep specifically as read-confirmation feedback to the person carrying the tag.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.bibliotheca.com/en-gb/rfid-in-libraries-technology-that-helps-extend-impact/" target="_blank" rel="noopener">RFID in Libraries</a> (Bibliotheca, vendor reference)</td>
+            <td>Real-world deployment precedent: library RFID self-checkout and security gates use audible alerts for successful reads and improperly-checked-out items. Flagged as a vendor reference, not peer-reviewed, but directly on point as an existing UX pattern at a walk-through gate.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Regulatory basis &mdash; FCC Part 15.247</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">The door portal's power budget is governed by federal rule, not a tuning choice, so it's worth citing the primary regulatory text rather than a vendor's paraphrase of it.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Source</th><th>What it says</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://www.law.cornell.edu/cfr/text/47/15.247" target="_blank" rel="noopener">47 CFR &sect; 15.247</a> (Cornell Legal Information Institute mirror of the FCC rule)</td>
+            <td>Sets a 1&nbsp;W maximum peak conducted output power for UHF systems in the 902&ndash;928&nbsp;MHz band (&sect;15.247(b)(2)&ndash;(3)), and requires conducted power to be reduced dB-for-dB for any directional antenna gain above 6&nbsp;dBi (&sect;15.247(b)(4)). The commonly quoted "4&nbsp;W EIRP" ceiling is the <em>derived</em> maximum under that 6&nbsp;dBi allowance (1&nbsp;W &times; ~4x from 6&nbsp;dBi gain), not a number stated directly in the rule &mdash; worth being precise about when citing it.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Clock synchronization for multi-sensor correlation</h3>
+    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">Correlating RFID and camera events depends entirely on both event streams' timestamps agreeing. A Raspberry Pi has no battery-backed clock by default, so this isn't a hypothetical concern.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://arxiv.org/abs/1806.02474" target="_blank" rel="noopener">A System for Clock Synchronization in an Internet of Things</a></td>
+            <td>Documents IoT clock drift "on the order of seconds over relatively short time periods" under plain SNTP, and proposes an improved scheme &mdash; real measured evidence that NTP alone can be insufficient for correlating timestamped events across low-cost devices.</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.sciencedirect.com/science/article/pii/S2666307423000219" target="_blank" rel="noopener">Clock Synchronization in Industrial IoT and Potential Works in Precision Time Protocol: Review, Challenges and Future Directions</a></td>
+            <td>Surveys why NTP/SNTP is inadequate for resource-constrained IoT nodes and reviews PTP (hardware-assisted, sub-microsecond) as the higher-end alternative, while noting its cost and complexity &mdash; useful context for why a low-cost battery-backed RTC, not full PTP, is the pragmatic choice for a Raspberry-Pi-based classroom system.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">How this project differs, in summary</h3>
+    <ul class="rp-checklist">
+      <li class="done"><span class="rp-box"></span><span>The tag is mounted on the student's own laptop, not a badge or ID card. It is a device-presence proxy, not a person-presence proxy.</span></li>
+      <li class="done"><span class="rp-box"></span><span>Tags are tamper-evident, with an explicit issue, active, tampered/lost, and reissued/retired lifecycle.</span></li>
+      <li class="done"><span class="rp-box"></span><span>Presence is a multi-state model (tardy, stepped out, left early, opted out, tamper) rather than a binary present/absent flag.</span></li>
+      <li class="done"><span class="rp-box"></span><span>Attendance counts only inside a bell-schedule-bound window, evaluated against per-period expected enrollment.</span></li>
+      <li class="done"><span class="rp-box"></span><span>The camera signal carries an explicit opt-in governance model, built in from the start rather than added later.</span></li>
+      <li class="done"><span class="rp-box"></span><span>The hardware rollout is deliberately phased: contact-tap prototype first, contactless room-scale detection last, rather than building the hardest hardware problem up front.</span></li>
+      <li class="done"><span class="rp-box"></span><span>The doorway is designed as a multi-antenna, circularly-polarized portal from the start &mdash; the same antenna-diversity technique library and retail security gates use &mdash; rather than a single reader antenna, because tag orientation at a walk-through point is inherently unpredictable.</span></li>
+      <li class="done"><span class="rp-box"></span><span>An audible read-confirmation tone at the doorway is being evaluated so a student has positive proof their crossing registered, rather than trusting a silent background scan &mdash; a pattern with real precedent in RFID reader hardware and library systems, but not common in the classroom-attendance literature surveyed above.</span></li>
+    </ul>
+  </div>
+
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Phase 1. Working Prototype</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>
