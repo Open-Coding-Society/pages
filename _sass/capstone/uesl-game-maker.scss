@@ -573,6 +573,29 @@
   animation: agm-panel-change 340ms var(--agm-ease) both;
 }
 
+.agm-contract {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+  margin-top: 1rem;
+  color: var(--agm-muted);
+  font-size: 0.75rem;
+}
+
+.agm-contract span {
+  border: 1px solid var(--agm-line);
+  border-radius: 8px;
+  padding: 0.52rem 0.7rem;
+  background: rgba(13, 32, 48, 0.7);
+  font-weight: 690;
+}
+
+.agm-contract i {
+  color: var(--agm-cyan);
+  font-style: normal;
+}
+
 .agm-team-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -818,6 +841,38 @@
   border-top: 1px solid var(--agm-line);
 }
 
+.agm-csp-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2rem;
+  border-block: 1px solid var(--agm-line);
+}
+
+.agm-csp-evidence > div {
+  padding: 1.4rem 1.5rem;
+}
+
+.agm-csp-evidence > div + div {
+  border-left: 1px solid var(--agm-line);
+}
+
+.agm-csp-evidence h3 {
+  margin: 0;
+  color: var(--agm-ink);
+  font-size: 1rem;
+}
+
+.agm-csp-evidence p {
+  margin: 0.7rem 0 0;
+  color: var(--agm-muted);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.agm-csp-evidence strong {
+  color: var(--agm-ink);
+}
+
 .agm-portfolio h3 {
   font-size: 1rem;
 }
@@ -1043,6 +1098,7 @@
 
   .agm-context-grid,
   .agm-sprint-grid,
+  .agm-csp-evidence,
   .agm-evidence-grid,
   .agm-step-panel {
     grid-template-columns: 1fr;
@@ -1054,6 +1110,7 @@
   }
 
   .agm-context-grid > div + div,
+  .agm-csp-evidence > div + div,
   .agm-week + .agm-week {
     border-top: 1px solid var(--agm-line);
     border-left: 0;
@@ -1082,6 +1139,10 @@
   }
 
   .agm-kanban i {
+    display: none;
+  }
+
+  .agm-contract i {
     display: none;
   }
 
