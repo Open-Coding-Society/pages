@@ -7,6 +7,7 @@ description: A low-cost Raspberry Pi UHF RFID system that tracks device presence
 permalink: /capstone/rfid-presence/
 sticky_rank: 1
 year: "2026-2027"
+rp_active: hub
 ---
 
-{% include rfid-presence-infograph.html %}
+{% include rfid-presence-hub.html %}
