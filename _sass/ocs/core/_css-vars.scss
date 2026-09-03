@@ -46,9 +46,9 @@
   @each $step, $value in t.$coral {
     --ocs-coral-#{$step}: #{$value};
   }
-  --ocs-brand:        #{fn.semantic(brand, fg)};
-  --ocs-brand-border: #{fn.semantic(brand, border)};
-  --ocs-brand-bg:     #{fn.semantic(brand, bg)};
+  // brand is a role in $semantic, so the @each below already emits these three.
+  // Declaring them here too produced duplicate :root entries and a second place
+  // for the values to drift.
 
   // --- neutrals ---------------------------------------------------------
   @each $step, $value in t.$neutral {
