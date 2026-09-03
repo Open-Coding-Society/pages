@@ -316,6 +316,21 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
+   <!-- UESL Accessible Game Maker 2.0 (CSP, 2026/2027) -->
+   <div class="capstone-item capstone-item--uesl-next CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
+       <a class="capstone-item--uesl-next__mark" href="{{ '/capstone/uesl-game-maker/' | relative_url }}">
+           <img src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation logo — shield with game controller" />
+       </a>
+       <div class="capstone-item--uesl-next__content">
+           <span class="capstone-item--uesl-next__status">2026/2027 · Active sprint</span>
+           <h3><a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">UESL Accessible Game Maker 2.0</a></h3>
+           <p>Extending UESL’s working Game Maker with a six-step guided creation path, accessible preview, and resilient local drafts.</p>
+           <p class="capstone-item--uesl-next__team"><strong>Ishan</strong> · Scrum Master/Developer &nbsp; <strong>Rohan</strong> · Technologist/Developer #1 &nbsp; <strong>Adhvay</strong> · Technologist/Developer #2</p>
+           <span class="capstone-item--uesl-next__route" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+       </div>
+   </div>
+
+
    <!-- Jarvis Classroom Object Detection -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
        <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
