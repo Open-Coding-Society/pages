@@ -690,6 +690,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
        </div>
    </div>
+
+   <!-- OCS Assignment Tracker (CSA) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
+           <div class="w-28 h-28 flex items-center justify-center text-white text-sm font-bold rounded" style="background: linear-gradient(135deg, #4CAFEF, #007ACC);">Assignments</div>
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">OCS Assignment Tracker</a></h3>
+           <p class="text-sm text-gray-700">Complete ecosystem for managing assignment submissions, grading, and file delivery — with automatic CI-driven assignment sync, role-gated review dashboards, and secure JWT-authenticated APIs.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Chuds (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
+       </div>
+   </div>
 </div>
 
 <!-- Edit Capstone Modal -->
