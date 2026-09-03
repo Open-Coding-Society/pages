@@ -342,14 +342,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
 
-   <!-- RFID + Camera-Correlated Classroom Presence -->
+   <!-- Classroom Presence System -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">
            <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">RFID</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">RFID + Camera-Correlated Classroom Presence</a></h3>
-           <p class="text-sm text-gray-700">A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.</p>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">Classroom Presence System</a></h3>
+           <p class="text-sm text-gray-700">A low-cost, tap-free system that detects student entrance, presence, and exit, using RFID device signals correlated with an existing camera-spatial technology.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ruta Sirdeshmukh, Vibha Mandayam, Kush Shah</p>
        </div>
    </div>

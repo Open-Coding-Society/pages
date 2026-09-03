@@ -2,11 +2,12 @@
 microblog: true
 toc: false
 layout: post
-title: RFID + Camera-Correlated Classroom Presence Capstone
-description: A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.
+title: Classroom Presence System Capstone
+description: A low-cost, tap-free system that detects student entrance, presence, and exit, using RFID device signals correlated with an existing camera-spatial technology.
 permalink: /capstone/rfid-presence/
 sticky_rank: 1
 year: "2026-2027"
+rp_active: hub
 ---
 
-{% include rfid-presence-infograph.html %}
+{% include rfid-presence-hub.html %}
