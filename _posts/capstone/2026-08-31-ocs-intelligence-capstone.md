@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: OCS Intelligence LLM
-description: Build shared open-weight LLM infrastructure on OCS hardware so students can code without a paid subscription.
+description: 
 permalink: /capstone/ocs-intelligence/
 sticky_rank: 1
 year: "2026-2027"

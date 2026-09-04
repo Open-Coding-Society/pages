@@ -1,234 +1,61 @@
 {% assign data = site.data.ocs_intelligence_infograph %}
-
-<style>
-.ocs-intelligence-infograph .ocs-intelligence-question {
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-split,
-.ocs-intelligence-infograph .ocs-intelligence-facts {
-  display: grid;
-  gap: 1.25rem;
-  margin-top: 1.25rem;
-  align-items: stretch;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-split {
-  grid-template-columns: 1fr 1fr;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-facts {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-split .ocs-intelligence-visual,
-.ocs-intelligence-infograph .ocs-intelligence-facts .ocs-intelligence-visual {
-  width: 100%;
-  height: 100%;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-team .ocs-intelligence-about {
-  margin: 0.35rem 0 0;
-  text-align: center;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-diagram {
-  margin: 1rem 0 1.25rem;
-  padding: 1.25rem;
-  overflow-x: auto;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-diagram .mermaid {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-diagram .mermaid,
-.ocs-intelligence-infograph .ocs-intelligence-diagram .mermaid * {
-  box-sizing: content-box;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-figure {
-  margin: 0;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-figure img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.35);
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-figure figcaption {
-  margin-top: 0.55rem;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.9rem;
-  line-height: 1.45;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-figure a {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table-wrap {
-  overflow-x: auto;
-  margin-top: 1rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table th,
-.ocs-intelligence-infograph .ocs-intelligence-table td {
-  text-align: left;
-  padding: 0.9rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  vertical-align: top;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table th {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table td {
-  color: rgba(255, 255, 255, 0.75);
-  line-height: 1.5;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table td:first-child {
-  font-weight: 600;
-  min-width: 12rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table td:nth-child(2) {
-  white-space: nowrap;
-  width: 8rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table a {
-  text-decoration: none;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table a:hover {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table tr:last-child td {
-  border-bottom: none;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-table .ocs-intelligence-tech-tag {
-  display: inline-block;
-  margin: 0;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.85rem;
-  margin: 1.25rem 0 0;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-stat {
-  padding: 1rem 0.75rem;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-stat-value {
-  display: block;
-  font-size: 1.7rem;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-stat-label {
-  display: block;
-  margin-top: 0.35rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-gpu-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.45rem;
-  width: 100%;
-  margin: 0.75rem 0 0.5rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-gpu {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-card-grid + .ocs-intelligence-stats {
-  margin-top: 1.75rem;
-}
-
-.ocs-intelligence-infograph .ocs-intelligence-card-grid + .ocs-intelligence-stats + .ocs-intelligence-section-title {
-  margin-top: 1.75rem;
-}
-
-@media (max-width: 900px) {
-  .ocs-intelligence-infograph .ocs-intelligence-facts {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .ocs-intelligence-infograph .ocs-intelligence-split {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 520px) {
-  .ocs-intelligence-infograph .ocs-intelligence-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .ocs-intelligence-infograph .ocs-intelligence-gpu-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-</style>
+{% assign topic = data.Topics[0] %}
+{% assign gift = data.donation %}
 
 <div class="ocs-intelligence-infograph">
   <div class="ocs-intelligence-header">
     <div class="ocs-intelligence-badge">Design-Based Research Capstone</div>
     <h1 class="ocs-intelligence-title">{{ data.Title }}</h1>
     <p class="ocs-intelligence-description">{{ data.Description }}</p>
+  </div>
+
+  {% include ocs-intelligence-nav.html %}
+
+  <div class="ocs-intelligence-card ocs-intelligence-gift">
+    <p class="ocs-intelligence-gift-kicker">{{ gift.kicker }}</p>
+    <h3 class="ocs-intelligence-section-title">{{ gift.title }}</h3>
+    <p class="ocs-intelligence-about ocs-intelligence-lead">{{ gift.body }}</p>
+    <p class="ocs-intelligence-cost-line">{{ gift.costLine }}</p>
+    <div class="ocs-intelligence-stats">
+      {% for stat in data.inventory %}
+      <div class="ocs-intelligence-stat">
+        <span class="ocs-intelligence-stat-value">{{ stat.value }}</span>
+        <span class="ocs-intelligence-stat-label">{{ stat.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">How this works</h3>
+    <p class="ocs-intelligence-about">Two pictures: the path from gift to classroom service, and how a student actually reaches it.</p>
+    <div class="ocs-intelligence-diagram-stack">
+      <div class="ocs-intelligence-diagram-block">
+        <h4 class="ocs-intelligence-diagram-title">From donation to two phases</h4>
+        <div class="ocs-intelligence-diagram">
+          <pre class="mermaid">flowchart LR
+    A[Donated 8x GTX 1070 rack] --> B[Phase 1]
+    B --> C[Phase 2]
+    B --> B1[Build rack]
+    B --> B2[Ollama and llama.cpp]
+    B --> B3[Stream and keys]
+    C --> C1[Deploy service]
+    C --> C2[Monitor under load]
+    C --> C3[Every student gets in]</pre>
+        </div>
+      </div>
+      <div class="ocs-intelligence-diagram-block">
+        <h4 class="ocs-intelligence-diagram-title">How a student reaches the model</h4>
+        <div class="ocs-intelligence-diagram">
+          <pre class="mermaid">flowchart TD
+    A[Student harness on another network] --> B[Issued key]
+    B --> C[Live stream]
+    C --> D[Production rack - Team 1]
+    D --> E[Shared open model]
+    D --> F[~5 concurrent users]</pre>
+        </div>
+      </div>
+    </div>
   </div>
 
   {% for item in data.researchQuestions %}
@@ -245,6 +72,21 @@
     </div>
   </div>
   {% endfor %}
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Two phases, one promise</h3>
+    <p class="ocs-intelligence-about">The tabs are the implementation path. First the gift becomes a live service. Then that service has to survive a class.</p>
+    <div class="ocs-intelligence-phase-grid">
+      {% for stage in data.stages %}
+      <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-phase-card">
+        <span class="ocs-intelligence-status">{{ stage.navKicker }} · {{ stage.status }}</span>
+        <h2 class="ocs-intelligence-project-title">{{ stage.title }}</h2>
+        <p class="ocs-intelligence-about">{{ stage.summary }}</p>
+        <span class="ocs-intelligence-phase-cta">Open this phase</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
 
   <div class="ocs-intelligence-card">
     <h3 class="ocs-intelligence-section-title">Team split</h3>
@@ -265,29 +107,28 @@
     <h3 class="ocs-intelligence-section-title">Justification</h3>
     <div class="ocs-intelligence-diagram">
       <pre class="mermaid">flowchart TD
-    A[Paid subscriptions] --> B[Set up GPUs]
-    B --> C[Host models locally]
+    A[Paid subscriptions] --> B[Donated GPU rack]
+    B --> C[Host open models locally]
     C --> D[Electricity only]
-    D --> E[API, tunnel, auth]
-    E --> F[Connect a harness]
-    F --> G[Harness to API to rig]</pre>
+    D --> E[Stream, keys, harness]
+    E --> F[Student on another network]
+    F --> G[Same chance to code with a model]</pre>
     </div>
     <p class="ocs-intelligence-about">{{ data.harnesses }}</p>
   </div>
 
-  {% for topic in data.Topics %}
   <div class="ocs-intelligence-card">
     <div class="ocs-intelligence-card-grid">
       <div class="ocs-intelligence-visual">
         <h2 class="ocs-intelligence-project-title">{{ topic.visualTitle }}</h2>
         <div class="ocs-intelligence-impact-list">
-          {% for layer in topic.stack %}
-          <div class="ocs-intelligence-impact-item">{{ layer }}</div>
+          {% for stage in data.stages %}
+          <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-impact-item ocs-intelligence-stack-link">{{ stage.navLabel }}</a>
           {% endfor %}
         </div>
         <div class="ocs-intelligence-status">{{ topic.status }}</div>
         <div class="ocs-intelligence-team">
-          <span class="ocs-intelligence-team-label">Primary Audience</span>
+          <span class="ocs-intelligence-team-label">Primary audience</span>
           <span class="ocs-intelligence-team-name">{{ topic.audience }}</span>
         </div>
       </div>
@@ -316,7 +157,7 @@
         <h3 class="ocs-intelligence-section-title">Why this is important</h3>
         <p class="ocs-intelligence-about">{{ topic.description }}</p>
 
-        <h3 class="ocs-intelligence-section-title">Models under review</h3>
+        <h3 class="ocs-intelligence-section-title">Goal</h3>
         <p class="ocs-intelligence-about">{{ topic.candidateModel }}</p>
 
         <h3 class="ocs-intelligence-section-title">Impact</h3>
@@ -335,19 +176,10 @@
       </div>
     </div>
   </div>
-  {% endfor %}
 
   <div class="ocs-intelligence-card">
     <h3 class="ocs-intelligence-section-title">Two rigs</h3>
-    <p class="ocs-intelligence-about">Same GPU kit on both machines. Roles and storage differ. Rig 1 is production. Rig 2 is the testing and experiment rig.</p>
-    <div class="ocs-intelligence-stats">
-      {% for stat in data.inventory %}
-      <div class="ocs-intelligence-stat">
-        <span class="ocs-intelligence-stat-value">{{ stat.value }}</span>
-        <span class="ocs-intelligence-stat-label">{{ stat.label }}</span>
-      </div>
-      {% endfor %}
-    </div>
+    <p class="ocs-intelligence-about">The donated production rack is the student-facing gift. A second box holds experiments so the class path stays calm.</p>
     <div class="ocs-intelligence-split">
       {% for rig in data.rigs %}
       <div class="ocs-intelligence-visual">
@@ -367,80 +199,8 @@
     </div>
   </div>
 
-  {% assign rig2 = data.rig2 %}
   <div class="ocs-intelligence-card">
-    <div class="ocs-intelligence-card-grid">
-      <div class="ocs-intelligence-visual">
-        <h2 class="ocs-intelligence-project-title">{{ rig2.visualTitle }}</h2>
-        <div class="ocs-intelligence-gpu-grid" aria-hidden="true">
-          {% for i in (1..8) %}
-          <div class="ocs-intelligence-gpu">GPU {{ i }}</div>
-          {% endfor %}
-        </div>
-        <p class="ocs-intelligence-about">8GB each. 64GB total.</p>
-        <div class="ocs-intelligence-status">{{ rig2.status }}</div>
-        <div class="ocs-intelligence-team">
-          <span class="ocs-intelligence-team-label">{{ rig2.teamLabel }}</span>
-          <span class="ocs-intelligence-team-name">{{ rig2.team }}</span>
-        </div>
-      </div>
-
-      <div class="ocs-intelligence-content">
-        <h2 class="ocs-intelligence-project-title">{{ rig2.title }}</h2>
-        <p class="ocs-intelligence-subtitle">{{ rig2.subtitle }}</p>
-
-        <div class="ocs-intelligence-keypoints">
-          {% for point in rig2.keyPoints %}
-          <div class="ocs-intelligence-keypoint">
-            <span class="ocs-intelligence-check">✓</span>
-            <span>{{ point }}</span>
-          </div>
-          {% endfor %}
-        </div>
-
-        <div class="ocs-intelligence-tech-stack">
-          {% for tech in rig2.tech %}
-          <span class="ocs-intelligence-tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
-      </div>
-
-      <div class="ocs-intelligence-details">
-        <h3 class="ocs-intelligence-section-title">About</h3>
-        <p class="ocs-intelligence-about">{{ rig2.description }}</p>
-
-        <h3 class="ocs-intelligence-section-title">What students get</h3>
-        <div class="ocs-intelligence-impact-list">
-          {% for item in rig2.impact %}
-          <div class="ocs-intelligence-impact-item">{{ item }}</div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-
-    <div class="ocs-intelligence-stats">
-      {% for stat in rig2.stats %}
-      <div class="ocs-intelligence-stat">
-        <span class="ocs-intelligence-stat-value">{{ stat.value }}</span>
-        <span class="ocs-intelligence-stat-label">{{ stat.label }}</span>
-      </div>
-      {% endfor %}
-    </div>
-
-    <h3 class="ocs-intelligence-section-title">Build path</h3>
-    <div class="ocs-intelligence-facts">
-      {% for step in rig2.steps %}
-      <div class="ocs-intelligence-visual">
-        <div class="ocs-intelligence-status">Step {{ forloop.index }}</div>
-        <span class="ocs-intelligence-team-name">{{ step.title }}</span>
-        <p class="ocs-intelligence-about">{{ step.detail }}</p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Model evidence</h3>
+    <h3 class="ocs-intelligence-section-title">Capability we want in the room</h3>
     <p class="ocs-intelligence-about">{{ data.chartsIntro }}</p>
     <div class="ocs-intelligence-split">
       {% for chart in data.charts %}
@@ -452,33 +212,6 @@
         </figcaption>
       </figure>
       {% endfor %}
-    </div>
-  </div>
-
-  <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Literature review</h3>
-    <p class="ocs-intelligence-about">Papers and resources that shape how we host, serve, and measure open LLMs on OCS hardware.</p>
-    <div class="ocs-intelligence-table-wrap">
-      <table class="ocs-intelligence-table">
-        <thead>
-          <tr>
-            <th scope="col">Resource</th>
-            <th scope="col">Type</th>
-            <th scope="col">What it means</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in data.literature %}
-          <tr>
-            <td>
-              <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
-            </td>
-            <td><span class="ocs-intelligence-tech-tag">{{ item.type }}</span></td>
-            <td>{{ item.description }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
     </div>
   </div>
 </div>
