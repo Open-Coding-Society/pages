@@ -21,7 +21,9 @@ export async function setUserData() {
         uidInput.value = uid ? uid : "Failed to load UID. Are you logged in?";
         emailInput.value = email ? email : "Failed to load email. Are you logged in?";
         sidInput.value = sid ? sid : "Failed to load SID. Are you logged in?";
-        kasmCheckbox.checked = kasm;
+        // Absent for mentors -- profile.html removes the toggle entirely once it learns
+        // the signed-in user's roles, and that removal races this fetch.
+        if (kasmCheckbox) kasmCheckbox.checked = kasm;
         
         // Set school dropdown value
         if (schoolSelect && school) {

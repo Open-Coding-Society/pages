@@ -1053,19 +1053,22 @@ active_tab: profile
             console.error('addClassBtn not found!'); // ADD THIS
         }
 
-        // Set up toggle switch
+        // Set up toggle switch -- absent for mentors, see the role check that removes
+        // #kasmToggleContainer earlier in the page.
         const toggle = document.querySelector('#kasmChangeInput');
         const toggleDot = document.querySelector('.dot');
 
-        toggle.addEventListener('change', function () {
-            if (this.checked) {
-                toggleDot.classList.add('translate-x-3');
-                toggle.classList.add('bg-blue-600');
-            } else {
-                toggleDot.classList.remove('translate-x-3');
-                toggle.classList.remove('bg-blue-600');
-            }
-        });
+        if (toggle) {
+            toggle.addEventListener('change', function () {
+                if (this.checked) {
+                    toggleDot.classList.add('translate-x-3');
+                    toggle.classList.add('bg-blue-600');
+                } else {
+                    toggleDot.classList.remove('translate-x-3');
+                    toggle.classList.remove('bg-blue-600');
+                }
+            });
+        }
     });
 
     // Save original form values
