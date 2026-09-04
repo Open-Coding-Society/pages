@@ -459,6 +459,13 @@
 
 .rp-phase-hero-meta { display: flex; flex-direction: column; gap: 0.4rem; }
 
+.rp-phase-hero-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
 .rp-phase-hero-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -538,9 +545,9 @@
   font-size: 0.72rem;
   font-weight: 600;
   border-radius: 9999px;
-  background: var(--rp-amber-soft);
-  color: var(--rp-amber);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: var(--rp-success-soft);
+  color: var(--rp-success);
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .rp-status::before {
@@ -549,7 +556,7 @@
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--rp-amber);
+  background: var(--rp-success);
 }
 
 .rp-btn {

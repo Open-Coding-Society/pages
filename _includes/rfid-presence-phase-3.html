@@ -17,11 +17,13 @@
   <div class="rp-phase-hero draft">
     <div class="rp-phase-hero-num">3</div>
     <div class="rp-phase-hero-meta">
-      <span class="rp-pill rp-pill-draft">Draft</span>
-      <span class="rp-phase-hero-title">UHF Doorway Transition — Single Door, Contactless</span>
+      <div class="rp-phase-hero-title-row">
+        <span class="rp-phase-hero-title">UHF Doorway Transition: Single Door, Contactless</span>
+        <span class="rp-pill rp-pill-draft">Draft</span>
+      </div>
     </div>
   </div>
-  <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">Swap the tap pad for the harder problem: reading tags at a distance, without a deliberate scan action. This is the door-table validation rig — one door, UHF range, tags mounted on laptops instead of held to a pad.</p>
+  <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">Swap the tap pad for the harder problem: reading tags at a distance, without a deliberate scan action. This is the door-table validation rig: one door, UHF range, tags mounted on laptops instead of held to a pad.</p>
 
   <div class="rp-section-label">The Door-Table Rig</div>
   <div class="rp-card">
@@ -68,11 +70,11 @@ integration"]</pre>
   <div class="rp-phase-pager">
     <a href="/capstone/rfid-presence/phases/phase-2/" class="rp-phase-pager-link">
       <span class="rp-phase-pager-label">Previous</span>
-      <span class="rp-phase-pager-title">&larr; Phase 2 — Classroom Pilot</span>
+      <span class="rp-phase-pager-title">&larr; Phase 2: Classroom Pilot</span>
     </a>
     <a href="/capstone/rfid-presence/phases/phase-4/" class="rp-phase-pager-link next">
       <span class="rp-phase-pager-label">Next</span>
-      <span class="rp-phase-pager-title">Phase 4 — Full Room-Scale Presence &rarr;</span>
+      <span class="rp-phase-pager-title">Phase 4: Full Room-Scale Presence &rarr;</span>
     </a>
   </div>
 
@@ -82,7 +84,6 @@ integration"]</pre>
         <span class="rp-team-label">Project Team</span>
         <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
       </div>
-      <span class="rp-status">Phase 1. Working Prototype</span>
     </div>
     {% if data.Repo %}
     <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
