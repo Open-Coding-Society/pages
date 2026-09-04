@@ -2,6 +2,7 @@
 # All data sourced directly from _data/*_infograph.yml files.
 # Projects without a real tech array are omitted (no tooltip > wrong tooltip).
 
+
 "Assignment Resources Platform":
   - "Spring Boot 3.5 / Java 21"
   - "Jekyll + Static JS"
