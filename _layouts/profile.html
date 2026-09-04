@@ -41,8 +41,9 @@ active_tab: profile
                     value="" onchange="checkForChanges()" autocomplete="off">
             </div>
 
-            <!-- Kasm Server Toggle -->
-            <div class="flex items-center">
+            <!-- Kasm Server Toggle: removed outright for mentors (see the role check in the
+                 script below) rather than just left unchecked -- mentors have no use for it. -->
+            <div class="flex items-center" id="kasmToggleContainer">
                 <label for="kasmChangeInput" class="flex items-center cursor-pointer">
                     <div class="relative">
                         <input type="checkbox" id="kasmChangeInput" class="sr-only" onchange="checkForChanges()">
@@ -235,6 +236,16 @@ active_tab: profile
                 // Cache user identity for reuse in join/leave operations
                 currentPersonId = personData.id;
                 currentUid = personData.uid;
+
+                // Mentors have no use for Kasm servers -- drop the toggle entirely rather
+                // than just leaving it unchecked. Checked against Spring's roles (not
+                // Flask's /api/id, which only ever carries a single role string), same as
+                // the mentor dashboard's own access check.
+                const roles = Array.isArray(personData.roles) ? personData.roles.map(r => r.name) : [];
+                if (roles.includes('ROLE_MENTOR')) {
+                    const kasmToggle = document.getElementById('kasmToggleContainer');
+                    if (kasmToggle) kasmToggle.remove();
+                }
 
                 if (!currentPersonId || !currentUid) {
                     return null;
