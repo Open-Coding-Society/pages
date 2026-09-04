@@ -111,7 +111,7 @@ show_reading_time: false
                 <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
                 <div id="password-validation-message" class="validation-message"></div>
             </div>
-            <p>
+            <p id="kasmNeededGroup">
                 <label class="switch">
                     <span class="toggle">
                         <input type="checkbox" name="kasmNeeded" id="kasmNeeded">
