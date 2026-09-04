@@ -1,0 +1,92 @@
+{% assign data = site.data.rfid_presence_infograph %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="rp-container">
+  <nav class="rp-nav">
+    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
+    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
+  </nav>
+
+  <a href="/capstone/rfid-presence/phases/" class="rp-phase-crumb">&larr; All Phases</a>
+
+  <div class="rp-phase-hero draft">
+    <div class="rp-phase-hero-num">4</div>
+    <div class="rp-phase-hero-meta">
+      <span class="rp-pill rp-pill-draft">Draft, Most Advanced</span>
+      <span class="rp-phase-hero-title">Full Room-Scale Contactless Presence</span>
+    </div>
+  </div>
+  <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">The target state: front- and back-door UHF detection that distinguishes entry side, full RFID and camera correlation, and the complete presence-state machine running live in the trial classroom.</p>
+
+  <div class="rp-section-label">Target Architecture</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    FD["Front door
+UHF reader"] --> CORR
+    BD["Back door
+UHF reader"] --> CORR
+    CAM["Camera system
+identity"] --> CORR
+    BS["Bell schedule
+attendance window"] -.-> CORR
+    CP["Per-period
+expected enrollment"] -.-> CORR
+    CORR["Correlation Engine"] --> PRES["Full presence-state model
+present, tardy, stepped out,
+left early, opted out, tamper"]</pre>
+    </div>
+  </div>
+
+  <div class="rp-section-label">What's Being Built</div>
+  <div class="rp-card">
+    <ul class="rp-entity-list">
+      <li><strong>Doors</strong>: front and back UHF readers, positioned to distinguish entry side</li>
+      <li><strong>Coverage</strong>: higher-gain or multiple antennas, sized for the full 60&times;40 ft trial room</li>
+      <li><strong>Packaging</strong>: a real enclosure plan for whole-room hardware</li>
+      <li><strong>Correlation engine</strong>: live, running the full presence-state model</li>
+      <li><strong>Enforcement</strong>: per-period expected enrollment and bell-schedule-bound attendance windows in production</li>
+    </ul>
+    <div class="rp-callout rp-callout-note">
+      <span>All acceptance and test cases from the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page get validated live in this phase.</span>
+    </div>
+  </div>
+
+  <div class="rp-section-label">Acceptance Criteria</div>
+  <div class="rp-card">
+    <ul class="rp-checklist">
+      <li class="open"><span class="rp-box"></span><span>Front and back door UHF readers, positioned to distinguish entry side, sized for the full 60 by 40 foot trial room</span></li>
+      <li class="open"><span class="rp-box"></span><span>Higher-gain or multiple antennas and a real packaging and enclosure plan for whole-room coverage</span></li>
+      <li class="open"><span class="rp-box"></span><span>A live correlation engine running the full presence-state model: present, tardy, stepped out, left early, opted out, tamper, and so on</span></li>
+      <li class="open"><span class="rp-box"></span><span>Per-period expected enrollment and bell-schedule-bound attendance windows enforced in production</span></li>
+      <li class="open"><span class="rp-box"></span><span>All acceptance and test cases from the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page validated in the live room</span></li>
+    </ul>
+  </div>
+
+  <div class="rp-phase-pager">
+    <a href="/capstone/rfid-presence/phases/phase-3/" class="rp-phase-pager-link">
+      <span class="rp-phase-pager-label">Previous</span>
+      <span class="rp-phase-pager-title">&larr; Phase 3 — UHF Doorway Transition</span>
+    </a>
+    <span></span>
+  </div>
+
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Phase 1. Working Prototype</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>
