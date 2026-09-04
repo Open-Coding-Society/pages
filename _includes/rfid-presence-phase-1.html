@@ -1,0 +1,85 @@
+{% assign data = site.data.rfid_presence_infograph %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="rp-container">
+  <nav class="rp-nav">
+    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
+    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
+  </nav>
+
+  <a href="/capstone/rfid-presence/phases/" class="rp-phase-crumb">&larr; All Phases</a>
+
+  <div class="rp-phase-hero current">
+    <div class="rp-phase-hero-num">1</div>
+    <div class="rp-phase-hero-meta">
+      <span class="rp-pill rp-pill-good">Current, Working</span>
+      <span class="rp-phase-hero-title">Contact-Tap Prototype</span>
+    </div>
+  </div>
+  <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">Prove the core read, log, and dashboard loop end to end, cheaply, before investing in UHF hardware or camera integration.</p>
+
+  <div class="rp-section-label">How It Works Today</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    S["Student taps
+their card"] --> R["CrowPi scan pad
+13.56MHz MIFARE"]
+    R --> F["Flask backend
+logs UID + timestamp"]
+    F --> DB[(SQLite)]
+    DB --> D["Dashboard
+shows scan events"]</pre>
+    </div>
+  </div>
+
+  <div class="rp-section-label">What's Running</div>
+  <div class="rp-card">
+    <ul class="rp-entity-list">
+      <li><strong>Reader</strong>: CrowPi board, one scan pad</li>
+      <li><strong>Tags</strong>: 13.56MHz MIFARE Classic, four demo tags</li>
+      <li><strong>Backend</strong>: Flask dev server</li>
+      <li><strong>Database</strong>: SQLite</li>
+      <li><strong>Frontend</strong>: rough scan-event dashboard</li>
+    </ul>
+    <div class="rp-callout rp-callout-note">
+      <span>Contact-based (tap), single reader, no camera correlation yet. This validates the concept, not the target hardware described on the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page.</span>
+    </div>
+  </div>
+
+  <div class="rp-section-label">Acceptance Criteria</div>
+  <div class="rp-card">
+    <ul class="rp-checklist">
+      <li class="done"><span class="rp-box"></span><span>CrowPi board with one scan pad, 13.56MHz MIFARE Classic tags, four demo tags</span></li>
+      <li class="done"><span class="rp-box"></span><span>Basic Flask backend logging reads to SQLite</span></li>
+      <li class="done"><span class="rp-box"></span><span>Rough dashboard showing scan events</span></li>
+    </ul>
+  </div>
+
+  <div class="rp-phase-pager">
+    <span></span>
+    <a href="/capstone/rfid-presence/phases/phase-2/" class="rp-phase-pager-link next">
+      <span class="rp-phase-pager-label">Next</span>
+      <span class="rp-phase-pager-title">Phase 2 — Classroom Pilot &rarr;</span>
+    </a>
+  </div>
+
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Phase 1. Working Prototype</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>
