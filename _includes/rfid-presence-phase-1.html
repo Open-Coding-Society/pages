@@ -17,8 +17,10 @@
   <div class="rp-phase-hero current">
     <div class="rp-phase-hero-num">1</div>
     <div class="rp-phase-hero-meta">
-      <span class="rp-pill rp-pill-good">Current, Working</span>
-      <span class="rp-phase-hero-title">Contact-Tap Prototype</span>
+      <div class="rp-phase-hero-title-row">
+        <span class="rp-phase-hero-title">Contact-Tap Prototype</span>
+        <span class="rp-pill rp-pill-good">Current, Working</span>
+      </div>
     </div>
   </div>
   <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">Prove the core read, log, and dashboard loop end to end, cheaply, before investing in UHF hardware or camera integration.</p>
@@ -65,7 +67,7 @@ shows scan events"]</pre>
     <span></span>
     <a href="/capstone/rfid-presence/phases/phase-2/" class="rp-phase-pager-link next">
       <span class="rp-phase-pager-label">Next</span>
-      <span class="rp-phase-pager-title">Phase 2 — Classroom Pilot &rarr;</span>
+      <span class="rp-phase-pager-title">Phase 2: Classroom Pilot &rarr;</span>
     </a>
   </div>
 
@@ -75,7 +77,6 @@ shows scan events"]</pre>
         <span class="rp-team-label">Project Team</span>
         <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
       </div>
-      <span class="rp-status">Phase 1. Working Prototype</span>
     </div>
     {% if data.Repo %}
     <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
