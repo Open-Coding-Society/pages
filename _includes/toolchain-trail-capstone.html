@@ -17,6 +17,17 @@
   object-fit: contain;
   margin: 0 auto 1rem;
 }
+.toolchain-trail-header-team {
+  margin: 0.65rem auto 0;
+  max-width: 760px;
+  color: var(--trail-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-align: center;
+}
+.toolchain-trail-header-team strong {
+  color: var(--trail-accent-2);
+}
 .toolchain-trail-overview,
 .toolchain-trail-section,
 .toolchain-trail-route {
@@ -38,6 +49,12 @@
   margin: 0;
   color: var(--trail-muted);
   line-height: 1.55;
+}
+.toolchain-trail-team {
+  margin-top: 1rem;
+}
+.toolchain-trail-team strong {
+  color: var(--trail-ink);
 }
 .toolchain-trail-actions {
   display: flex;
@@ -330,12 +347,14 @@
     <img src="{{ '/images/' | append: data.Logo | relative_url }}" alt="{{ data.Title }} logo" class="toolchain-trail-logo">
     <span class="toolchain-trail-badge">{{ data.Badge }}</span>
     <h1 class="toolchain-trail-title">{{ data.Title }}</h1>
+    <p class="toolchain-trail-header-team"><strong>{{ data.TeamName }}</strong><br>{{ data.Team | join: ", " }}</p>
   </div>
 
   <div class="toolchain-trail-overview">
     <div>
       <span class="toolchain-trail-kicker">Level 2 / Environment Quest</span>
       <p>{{ data.Overview }}</p>
+      <p class="toolchain-trail-team"><strong>Team:</strong> {{ data.Team | join: ", " }}</p>
       <div class="toolchain-trail-actions">
         <a class="toolchain-trail-action" href="https://github.com/orgs/the7blueprints/projects/3" target="_blank" rel="noopener noreferrer">Planning Board</a>
         <a class="toolchain-trail-action toolchain-trail-action--secondary" href="https://github.com/the7blueprints/blueprints_pages" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
