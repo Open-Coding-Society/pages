@@ -1,52 +1,58 @@
 # OCS Intelligence LLM Capstone Infographic
 Title: "OCS Intelligence LLM"
-Description: "Build shared open-weight LLM infrastructure on OCS hardware so students can code without a paid subscription."
+Description: "Reduce dependence on paid AI subscriptions enabling student development and growth."
 
 Year: "2026-2027"
 
+donation:
+  kicker: ""
+  title: "Eight GTX 1070s, donated to OCS"
+  body: "This capstone starts with generosity. OCS was donated a GPU rig with eight GTX 1070s — enough local compute to host open-weight models for students who cannot, or should not have to, pay for a frontier subscription. The work is not to buy intelligence. It is to turn a gifted machine into a classroom service: assembled, served, and reachable from the networks students already use."
+  costLine: "After the gift, the only ongoing cost is electricity."
+
 researchQuestions:
-  - label: "Question 1"
-    question: "How do we host capable open LLMs so OCS students can code with them, without a paid subscription?"
+  - label: "Research question 1"
+    question: "How do we turn donated GPU hardware into a shared open LLM that OCS students can actually code with — without a paid subscription?"
     facts:
       - label: "Problem"
-        text: "LLM subscriptions are expensive. Not everyone in OCS can use frontier models."
-      - label: "Goal"
-        text: "Cut paid AI subscriptions for school work."
-      - label: "Solution"
-        text: "Host open-weight models locally. The only ongoing cost is electricity."
-  - label: "Question 2"
-    question: "How do we host and serve open LLMs so the stack stays fast, reliable, and stable for real users?"
+        text: "Capable models sit behind monthly fees. Coursework then depends on who can pay, not on who is in the class."
+      - label: "Gift"
+        text: "A donated rack with 8× GTX 1070s lets OCS host open-weight models locally instead of renting them."
+      - label: "Aim"
+        text: "Stand the rack up, run inference, and stream answers to student harnesses on other networks — with keys, not hope."
+  - label: "Research question 2"
+    question: "Once the service exists, how do we keep it fair, visible, and usable when many students need it at once?"
     facts:
-      - label: "Performance"
-        text: "Keep TTFT low and tokens per second high enough for a class."
-      - label: "Reliability"
-        text: "The API, tunnel, and GPUs stay up and recover when something fails."
-      - label: "Stability"
-        text: "Share load across 8 GPUs so the server does not OOM or stall."
+      - label: "Fairness"
+        text: "Every OCS student should be able to reach the same service, not a lucky few on the same LAN."
+      - label: "Load"
+        text: "A small class wave — about five people at once — should not empty VRAM, crash the API, or drag token speed to a crawl."
+      - label: "Trust"
+        text: "Deployment and monitoring prove the promise: it works as intended, and it is still there when the room fills up."
 
-harnesses: "Harnesses: OpenRouter, Pi, or Claude Code."
+harnesses: "Students connect from tools they already use — OpenRouter, Pi, or Claude Code — over a live stream, not a one-off laptop demo."
 
 teams:
   - name: "Team 1"
     members: "Nikhil, Adi & Mihir"
-    role: "Production inference and API on Rig 1"
+    role: "Production inference on the donated rack — Ollama and llama.cpp, plus the path students use to reach it."
   - name: "Team 2"
     members: "Yash Squared & Anvay"
-    role: "Testing and experiments on Rig 2"
+    role: "Testing and experiments on Rig 2 so production stays stable while ideas get tried."
 
 inventory:
-  - value: "16x"
-    label: "GTX 1070"
-  - value: "8"
-    label: "GPUs per rig"
+  - value: "8×"
+    label: "GTX 1070 on the donated rig"
   - value: "64GB"
-    label: "VRAM per rig"
-  - value: "3"
-    label: "SSDs split by role"
+    label: "VRAM on that box"
+  - value: "Electricity"
+    label: "Only ongoing cost"
+  - value: "~5"
+    label: "Concurrent users to hold"
 
 rigs:
   - name: "Rig 1"
-    role: "Production LLM serving"
+    role: "Donated production rack — host models and stream them to students"
     team: "Team 1"
     members: "Nikhil, Adi & Mihir"
     storage: "860 EVO 250GB + SanDisk 480GB"
@@ -57,30 +63,30 @@ rigs:
     team: "Team 2"
     members: "Yash Squared & Anvay"
     storage: "Samsung M.2 250GB"
-    stack: "PyTorch / JupyterHub"
+    stack: "Shared experiments"
     status: "Experiment"
 
 rig2:
   title: "Rig 2: Testing and Experiment Rig"
-  subtitle: "Shared multi-GPU node for model tests, training, and student experiments."
+  subtitle: "A second box so experiments do not take the donated production rack offline."
   visualTitle: "8x GTX 1070"
   status: "Experiment"
   teamLabel: "Team 2"
   team: "Yash Squared & Anvay"
   audience: "OCS students and teams"
-  description: "Rig 2 is the testing and experiment box. Students try models, train, and validate work here before it is treated as production. Team 2 is building it."
+  description: "Rig 2 is where models and ideas get tried before they are treated as the student-facing service. Team 2 is building that safety net."
   keyPoints:
-    - "8x GTX 1070, 64GB VRAM for distributed training"
+    - "Same class of GPUs, used for tests rather than live class traffic"
     - "OS on the Samsung M.2 250GB"
-    - "JupyterHub and SSH with per-user GPU limits"
+    - "Shared access with limits so one experiment does not own the box"
   tech:
-    - "PyTorch"
-    - "CUDA"
+    - "Shared GPUs"
+    - "Student experiments"
     - "JupyterHub"
     - "SSH"
   impact:
-    - "Students can train without buying GPUs."
-    - "Per-user limits keep one job from taking the whole box."
+    - "Students can try ideas without buying cards."
+    - "Production stays the thing people depend on."
   stats:
     - value: "8x"
       label: "GTX 1070"
@@ -90,17 +96,17 @@ rig2:
       label: "M.2 OS"
   steps:
     - title: "Assemble"
-      detail: "Install 8 GPUs. Mount the Samsung M.2. Check PCIe and power."
+      detail: "Install the GPUs. Mount the Samsung M.2. Check power and slots."
     - title: "Provision"
-      detail: "Install the OS, CUDA, and PyTorch for multi-GPU work."
+      detail: "Install the OS and the software students need to experiment."
     - title: "Share"
-      detail: "Open JupyterHub and SSH. Cap GPU memory per user."
+      detail: "Open access with per-user limits so the box stays usable."
 
-chartsIntro: "We are evaluating several open models. The charts below show how a candidate LLM compares on intelligence and coding work."
+chartsIntro: "We look at public scores to ask a human question: can an open model be good enough for student coding that nobody in the room needs a paid seat?"
 charts:
   - image: "capstone/qwen38-27b-intelligence-index.png"
     alt: "Artificial Analysis Intelligence Index. A candidate LLM xhigh scores 52, tied with GPT-5.6 Luna max."
-    caption: "A candidate LLM scores 52. Same as GPT-5.6 Luna (max)."
+    caption: "A candidate open model scores 52. Same as GPT-5.6 Luna (max)."
     source: "https://artificialanalysis.ai/models/qwen3-8-27b"
     sourceLabel: "Artificial Analysis"
   - image: "capstone/qwen38-27b-scicode.png"
@@ -171,40 +177,112 @@ literature:
     url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/4"
     description: "GitHub issue that tracks literature, metrics, and serving goals for this project."
 
-Topics:
-  - title: "Host & Serve an LLM"
-    subtitle: "Turn OCS hardware into a dependable inference service for coding and agent workflows."
-    visualTitle: "Open Inference Stack"
-    stack:
-      - "Model"
-      - "Kernels & Runtime"
-      - "Inference Engine"
-      - "Node Configuration"
-      - "Distributed Serving"
-      - "Scheduler & Networking"
-      - "Autoscaling & Observability"
-      - "Reliability & Cost Optimization"
-    keyPoints:
-      - "Profile candidate models against OCS hardware."
-      - "Tune past FlashAttention and vLLM for this workload."
-      - "Add scheduling, networking, autoscaling, and monitoring."
-      - "Expose a stable API students can point a harness at."
-      - "Support local models as subagents under a larger orchestrator."
-    description: "Paid LLM subscriptions lock capable models behind a price tag. Hosting open models on OCS hardware gives every student in OCS classes the same free access, so coursework does not depend on who can afford a subscription."
-    candidateModel: "We are comparing open models that fit our hardware. A capable LLM is the target for coding work on this stack."
+stages:
+  - slug: phase-1
+    title: "Phase 1 — Build the rack, run inference, open the stream"
+    navLabel: "Phase 1: Rack, inference & access"
+    navKicker: "Phase 1"
+    status: "In progress"
+    summary: "Physically stand up the donated GPU rack, put Ollama and llama.cpp in production, and stream answers to student harnesses on other networks — with keys."
+    workstreams:
+      - title: "Physically build the GPU rack"
+        detail: "Take the donated 8× GTX 1070 rig from hardware to a machine that stays powered, cooled, and ready to host a model for the class."
+      - title: "Inference engineering"
+        detail: "Run open-weight models in production with Ollama and llama.cpp so students get useful answers, not a lab curiosity."
+      - title: "Websocket and live stream"
+        detail: "Let users send requests through their harnesses from separate networks. The session should feel live — a stream — not a demo that only works in the same room."
+      - title: "Auth and keys"
+        detail: "Issuing and managing keys is part of access. A shared brain without a front door is not a school service."
+    doneWhen:
+      - "A student on another network can send a request through their harness and get a streamed reply."
+      - "Keys can be issued and managed so access is intentional."
+      - "About five people can use it at once without OOM, a hard crash, or token speed falling to a crawl."
+    impact:
+      - "The donated rack becomes a public good inside OCS, not a closet of unused cards."
+      - "Coursework can assume a capable model without assuming a credit card."
+      - "Electricity is the bill. The subscription is the thing we stop needing."
+    goals:
+      - "Assemble the donated 8× GTX 1070 production rack."
+      - "Serve open models with Ollama and llama.cpp (Nikhil, Adi, Mihir)."
+      - "Stream to harnesses across networks, with key issuance and management."
+      - "Hold about five concurrent users without OOM or a crawl."
+    literatureTitles:
+      - "Baseten Inference Engineering"
+      - "Orca"
+      - "LLM Model Card"
+    showDonation: true
+    showResearchQuestion: 1
+    showJustification: true
+    showRigs: true
     tech:
-      - "Open-weight LLMs"
+      - "Donated 8× GTX 1070"
       - "Ollama / llama.cpp"
-      - "FlashAttention"
-      - "vLLM"
-      - "Distributed Inference"
-      - "Observability"
+      - "Live stream"
+      - "Keys & auth"
+
+  - slug: phase-2
+    title: "Phase 2 — Deploy, watch, and make sure the class can get in"
+    navLabel: "Phase 2: Deploy, monitor & access"
+    navKicker: "Phase 2"
+    status: "Next"
+    summary: "Put the service in front of real students, watch it under load, and keep it reachable so access is a class right — not a lucky connection."
+    workstreams:
+      - title: "Deployment"
+        detail: "Treat the rack as a service the school can point at — not a one-team experiment that vanishes after a demo."
+      - title: "Monitoring"
+        detail: "Notice when answers stall, when memory gets tight, or when the stream drops, before a whole class feels it."
+      - title: "Many people at once"
+        detail: "Classroom use is the test. The service should remain usable when several students are mid-assignment together."
+      - title: "Every student has a path in"
+        detail: "Access is the impact. If some students still need a paid tool because they cannot reach OCS Intelligence, the question is unfinished."
+    doneWhen:
+      - "The live service is the one students are told to use, not a screenshot of a local run."
+      - "We can see whether it is healthy when more than one person is on it."
+      - "Getting a key and reaching the stream is a normal student step, not a favor."
+    impact:
+      - "A full period can share one donated brain instead of sixteen private subscriptions."
+      - "Teachers can assign AI-supported work without asking who paid this month."
+      - "OCS keeps the cost story simple: hardware was given; we pay to keep the lights on."
+    goals:
+      - "Deploy the Phase 1 service as the student-facing path."
+      - "Watch it closely enough to know it still works when several people use it."
+      - "Make sure every OCS student can get access — not only the team that built the rack."
+    literatureTitles:
+      - "TTFT, TPS, ITL"
+      - "OCS Intelligence issue #4"
+    showResearchQuestion: 2
+    tech:
+      - "Deployment"
+      - "Monitoring"
+      - "Classroom access"
+      - "Shared fairness"
+
+Topics:
+  - title: "A shared mind for the class"
+    subtitle: "Turn a donated GPU rack into a dependable companion for coding — then keep the door open when the class shows up."
+    visualTitle: "Two implementation phases"
+    stack:
+      - "Phase 1: Rack, inference, stream"
+      - "Phase 2: Deploy, monitor, include everyone"
+    keyPoints:
+      - "The hardware was given. The work is to make it a service."
+      - "Phase 1 puts models on the rack and streams them to harnesses with keys."
+      - "Phase 2 proves that service under real student use."
+      - "Nobody should need a paid subscription for the same chance to think with a model."
+      - "The meter that remains is electricity."
+    description: "Paid LLM seats split a classroom. This capstone answers with a gift and a duty: host open models on a donated 8× GTX 1070 rig, let students reach them from their own networks, and keep that promise when many people are on at once. The research is not “can GPUs run a model.” It is “can OCS give every student the same intelligence without charging them for it.”"
+    candidateModel: "We still compare open models that can live on this hardware. The target is a coding companion good enough that a subscription is optional, not required."
+    tech:
+      - "Donated GPU rack"
+      - "Open-weight LLMs"
+      - "Student harnesses"
+      - "Electricity-only cost"
     impact:
       - "Cut paid AI subscriptions for school work."
       - "Give more students the same chance to use a capable model."
-      - "Plug one shared service into many tools and agents."
-      - "Learn inference engineering on real hardware limits."
-    status: "Research & Prototyping"
-    audience: "OCS Students and Builders"
+      - "Honor the donation by putting the machine in front of the class."
+      - "Learn what it takes to keep a shared service kind under load."
+    status: "Phase 1 in progress"
+    audience: "OCS students — every student, not only the builders"
     link: "https://artificialanalysis.ai/models/qwen3-8-27b"
     linkLabel: "View candidate benchmarks"

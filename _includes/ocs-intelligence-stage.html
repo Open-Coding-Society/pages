@@ -1,0 +1,194 @@
+{% assign data = site.data.ocs_intelligence_infograph %}
+{% assign stage_slug = page.ocs_stage %}
+{% assign stage = nil %}
+{% for s in data.stages %}
+  {% if s.slug == stage_slug %}
+    {% assign stage = s %}
+  {% endif %}
+{% endfor %}
+
+{% unless stage %}
+  <p>Phase not found.</p>
+{% else %}
+<div class="ocs-intelligence-infograph">
+  <div class="ocs-intelligence-header">
+    <div class="ocs-intelligence-badge">{{ stage.navKicker }} of 2 · Implementation</div>
+    <h1 class="ocs-intelligence-title">{{ stage.title }}</h1>
+    <p class="ocs-intelligence-description">{{ stage.summary }}</p>
+    <div class="ocs-intelligence-status ocs-intelligence-stage-status">{{ stage.status }}</div>
+  </div>
+
+  {% include ocs-intelligence-nav.html %}
+
+  {% if stage.showDonation %}
+  {% assign gift = data.donation %}
+  <div class="ocs-intelligence-card ocs-intelligence-gift">
+    <p class="ocs-intelligence-gift-kicker">{{ gift.kicker }}</p>
+    <h3 class="ocs-intelligence-section-title">{{ gift.title }}</h3>
+    <p class="ocs-intelligence-about">{{ gift.body }}</p>
+    <p class="ocs-intelligence-cost-line">{{ gift.costLine }}</p>
+  </div>
+  {% endif %}
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">What this phase is for</h3>
+    <div class="ocs-intelligence-keypoints">
+      {% for goal in stage.goals %}
+      <div class="ocs-intelligence-keypoint">
+        <span class="ocs-intelligence-check">✓</span>
+        <span>{{ goal }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% if stage.tech %}
+    <div class="ocs-intelligence-tech-stack">
+      {% for tech in stage.tech %}
+      <span class="ocs-intelligence-tech-tag">{{ tech }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  {% if stage.workstreams %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">How the work shows up</h3>
+    <div class="ocs-intelligence-facts">
+      {% for item in stage.workstreams %}
+      <div class="ocs-intelligence-visual">
+        <span class="ocs-intelligence-team-label">{{ item.title }}</span>
+        <p class="ocs-intelligence-about">{{ item.detail }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stage.doneWhen %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Done when</h3>
+    <div class="ocs-intelligence-keypoints">
+      {% for item in stage.doneWhen %}
+      <div class="ocs-intelligence-keypoint">
+        <span class="ocs-intelligence-check">→</span>
+        <span>{{ item }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stage.showResearchQuestion %}
+  {% assign rq_index = stage.showResearchQuestion | minus: 1 %}
+  {% assign item = data.researchQuestions[rq_index] %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">{{ item.label }}</h3>
+    <p class="ocs-intelligence-question">{{ item.question }}</p>
+    <div class="ocs-intelligence-facts">
+      {% for fact in item.facts %}
+      <div class="ocs-intelligence-visual">
+        <span class="ocs-intelligence-team-label">{{ fact.label }}</span>
+        <span class="ocs-intelligence-team-name">{{ fact.text }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stage.showJustification %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Why electricity is the whole bill</h3>
+    <div class="ocs-intelligence-diagram">
+      <pre class="mermaid">flowchart TD
+    A[Paid subscriptions] --> B[Donated GPU rack]
+    B --> C[Host open models locally]
+    C --> D[Electricity only]
+    D --> E[Stream, keys, harness]
+    E --> F[Student on another network]
+    F --> G[Same chance to code with a model]</pre>
+    </div>
+    <p class="ocs-intelligence-about">{{ data.harnesses }}</p>
+  </div>
+  {% endif %}
+
+  {% if stage.impact %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">If this phase works</h3>
+    <div class="ocs-intelligence-impact-list">
+      {% for item in stage.impact %}
+      <div class="ocs-intelligence-impact-item">{{ item }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stage.showInventory %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">What we were given to work with</h3>
+    <div class="ocs-intelligence-stats">
+      {% for stat in data.inventory %}
+      <div class="ocs-intelligence-stat">
+        <span class="ocs-intelligence-stat-value">{{ stat.value }}</span>
+        <span class="ocs-intelligence-stat-label">{{ stat.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stage.showRigs %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Who carries the donated rack</h3>
+    <p class="ocs-intelligence-about">Team 1 puts the gifted production box in front of students. Team 2 keeps experiments off that path.</p>
+    <div class="ocs-intelligence-split">
+      {% for rig in data.rigs %}
+      <div class="ocs-intelligence-visual">
+        <div class="ocs-intelligence-status">{{ rig.status }}</div>
+        <h2 class="ocs-intelligence-project-title">{{ rig.name }}</h2>
+        <p class="ocs-intelligence-subtitle">{{ rig.role }}</p>
+        <div class="ocs-intelligence-team">
+          <span class="ocs-intelligence-team-label">{{ rig.team }}</span>
+          <span class="ocs-intelligence-team-name">{{ rig.members }}</span>
+        </div>
+        <div class="ocs-intelligence-tech-stack">
+          <span class="ocs-intelligence-tech-tag">{{ rig.storage }}</span>
+          <span class="ocs-intelligence-tech-tag">{{ rig.stack }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stage.literatureTitles.size > 0 %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Literature</h3>
+    <div class="ocs-intelligence-table-wrap">
+      <table class="ocs-intelligence-table">
+        <thead>
+          <tr>
+            <th scope="col">Resource</th>
+            <th scope="col">Type</th>
+            <th scope="col">What it means</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lit_title in stage.literatureTitles %}
+            {% for item in data.literature %}
+              {% if item.title == lit_title %}
+          <tr>
+            <td>
+              <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+            </td>
+            <td><span class="ocs-intelligence-tech-tag">{{ item.type }}</span></td>
+            <td>{{ item.description }}</td>
+          </tr>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endunless %}
