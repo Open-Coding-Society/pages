@@ -448,7 +448,7 @@
     <!-- Live Features grid -->
     <h2 class="ocs-ig-section-header">Live Features</h2>
     <div class="ocs-ig-features-grid">
-      {% for topic in data.Features %}
+      {% for topic in data.Features offset:1 %}
       <div class="ocs-ig-feature-card">
         <h3 class="ocs-ig-feature-title">{{ topic.title }}</h3>
         <p class="ocs-ig-feature-desc">{{ topic.subtitle }}</p>
