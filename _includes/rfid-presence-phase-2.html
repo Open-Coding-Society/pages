@@ -1,0 +1,92 @@
+{% assign data = site.data.rfid_presence_infograph %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="rp-container">
+  <nav class="rp-nav">
+    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
+    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
+  </nav>
+
+  <a href="/capstone/rfid-presence/phases/" class="rp-phase-crumb">&larr; All Phases</a>
+
+  <div class="rp-phase-hero draft">
+    <div class="rp-phase-hero-num">2</div>
+    <div class="rp-phase-hero-meta">
+      <div class="rp-phase-hero-title-row">
+        <span class="rp-phase-hero-title">Classroom Pilot: Hardened Tap System</span>
+        <span class="rp-pill rp-pill-draft">Draft</span>
+      </div>
+    </div>
+  </div>
+  <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">Take the same tap-based approach from a demo to something a real class could use for a full period, still without UHF or camera correlation.</p>
+
+  <div class="rp-section-label">The Card Format</div>
+  <div class="rp-card">
+    <p class="rp-question">Instead of a separate RFID tag on a keychain or lanyard, each student is issued one card from a standard deck of playing cards, with an RFID sticker adhered to its face. It is cheap, easy to hand out and collect at the door like dealing a hand, hard to lose track of because it is just "your card," and needs no new object type to manufacture or replace.</p>
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    D["Standard deck
+of playing cards"] --> ST["RFID sticker
+applied to each card"]
+    ST --> C["Card assigned
+to one student"]
+    C --> R["Tap at the
+CrowPi reader"]
+    R --> BE["Production backend
++ roster admin UI"]</pre>
+    </div>
+  </div>
+
+  <div class="rp-section-label">What's Being Built</div>
+  <div class="rp-card">
+    <ul class="rp-entity-list">
+      <li><strong>Cards</strong>: standard playing-card deck, one RFID sticker per card</li>
+      <li><strong>Registration</strong>: 20+ student cards, each mapped to a student</li>
+      <li><strong>Frontend</strong>: production roster and admin views, replacing the rough dashboard</li>
+      <li><strong>Backend</strong>: production-grade deployment, off the Flask dev server</li>
+      <li><strong>Database</strong>: migrated off SQLite, with a backup strategy</li>
+      <li><strong>Access control</strong>: authentication for admin functions and card registration</li>
+    </ul>
+  </div>
+
+  <div class="rp-section-label">Acceptance Criteria</div>
+  <div class="rp-card">
+    <ul class="rp-checklist">
+      <li class="open"><span class="rp-box"></span><span>Register at least 20 student cards: apply one RFID sticker to each playing card and assign it to a student</span></li>
+      <li class="open"><span class="rp-box"></span><span>Replace the rough dashboard with a production frontend (roster and admin views)</span></li>
+      <li class="open"><span class="rp-box"></span><span>Move off the Flask dev server to a production-grade deployment</span></li>
+      <li class="open"><span class="rp-box"></span><span>Migrate SQLite to a proper database with a backup strategy</span></li>
+      <li class="open"><span class="rp-box"></span><span>Add authentication and authorization for admin functions and a teacher-facing card registration UI</span></li>
+      <li class="open"><span class="rp-box"></span><span>Run full-period tests, not just a two-minute demo, and validate attendance states with educator feedback</span></li>
+    </ul>
+  </div>
+
+  <div class="rp-phase-pager">
+    <a href="/capstone/rfid-presence/phases/phase-1/" class="rp-phase-pager-link">
+      <span class="rp-phase-pager-label">Previous</span>
+      <span class="rp-phase-pager-title">&larr; Phase 1: Contact-Tap Prototype</span>
+    </a>
+    <a href="/capstone/rfid-presence/phases/phase-3/" class="rp-phase-pager-link next">
+      <span class="rp-phase-pager-label">Next</span>
+      <span class="rp-phase-pager-title">Phase 3: UHF Doorway Transition &rarr;</span>
+    </a>
+  </div>
+
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>
