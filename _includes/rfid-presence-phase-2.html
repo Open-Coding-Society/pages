@@ -17,11 +17,13 @@
   <div class="rp-phase-hero draft">
     <div class="rp-phase-hero-num">2</div>
     <div class="rp-phase-hero-meta">
-      <span class="rp-pill rp-pill-draft">Draft</span>
-      <span class="rp-phase-hero-title">Classroom Pilot — Hardened Tap System</span>
+      <div class="rp-phase-hero-title-row">
+        <span class="rp-phase-hero-title">Classroom Pilot: Hardened Tap System</span>
+        <span class="rp-pill rp-pill-draft">Draft</span>
+      </div>
     </div>
   </div>
-  <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">Take the same tap-based approach from a demo to something a real class could use for a full period — still without UHF or camera correlation.</p>
+  <p class="rp-description" style="margin:0 0 2rem;text-align:left;max-width:100%;">Take the same tap-based approach from a demo to something a real class could use for a full period, still without UHF or camera correlation.</p>
 
   <div class="rp-section-label">The Card Format</div>
   <div class="rp-card">
@@ -67,11 +69,11 @@ CrowPi reader"]
   <div class="rp-phase-pager">
     <a href="/capstone/rfid-presence/phases/phase-1/" class="rp-phase-pager-link">
       <span class="rp-phase-pager-label">Previous</span>
-      <span class="rp-phase-pager-title">&larr; Phase 1 — Contact-Tap Prototype</span>
+      <span class="rp-phase-pager-title">&larr; Phase 1: Contact-Tap Prototype</span>
     </a>
     <a href="/capstone/rfid-presence/phases/phase-3/" class="rp-phase-pager-link next">
       <span class="rp-phase-pager-label">Next</span>
-      <span class="rp-phase-pager-title">Phase 3 — UHF Doorway Transition &rarr;</span>
+      <span class="rp-phase-pager-title">Phase 3: UHF Doorway Transition &rarr;</span>
     </a>
   </div>
 
@@ -81,7 +83,6 @@ CrowPi reader"]
         <span class="rp-team-label">Project Team</span>
         <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
       </div>
-      <span class="rp-status">Phase 1. Working Prototype</span>
     </div>
     {% if data.Repo %}
     <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
