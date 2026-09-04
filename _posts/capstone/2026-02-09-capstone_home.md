@@ -702,6 +702,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Backend Boyz (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
        </div>
    </div>
+
+   <!-- OCS Security (CSA) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+       <a href="{% post_url capstone/2026-09-03-cccs-security %}">
+           <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
+           <p class="text-sm text-gray-700">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
+       </div>
+   </div>
 </div>
 
 <!-- Edit Capstone Modal -->
