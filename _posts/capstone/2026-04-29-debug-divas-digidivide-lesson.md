@@ -2,6 +2,7 @@
 toc: false
 layout: post
 title: Digital Divide Interactive learning 
+description: Four interactive mini-games based on the Connection Games skit that teach the Digital Divide, letting students master the concepts and earn their grade.
 permalink: /digidivide/
 ---
 

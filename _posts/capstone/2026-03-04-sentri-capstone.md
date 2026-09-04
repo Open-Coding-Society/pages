@@ -2,6 +2,7 @@
 microblog: true
 toc: false
 title: "Sentri: The AI-Driven Recovery Ecosystem"
+description: An AI-driven recovery ecosystem that matches people to the right recovery program, helps them find and schedule meetings, and tracks their mood and progress over time.
 permalink: /capstone/sentri/
 ---
 
