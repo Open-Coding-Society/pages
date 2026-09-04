@@ -1,0 +1,95 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Research Area 4 · Spatial Modeling</div>
+    <h1 class="jv-page-title">Research 4: Tracking &amp; Room State Model</h1>
+    <p class="jv-description">Tracking physical assets across time, reconciling multi-camera viewpoint observations, handling occlusion, and detecting genuine room change events.</p>
+  </div>
+
+  <!-- Research Question -->
+  <div class="jv-section-label">Research Question 4</div>
+  <div class="jv-card">
+    <p class="jv-question">How effectively can multi-camera observation fusion and temporal smoothing distinguish true physical movements and removals from transient occlusions and noise, maintaining 80%+ state accuracy?</p>
+    <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span>Correlate object observations across sequential 10-second frames using spatial IoU and feature proximity</span></li>
+      <li class="open"><span class="jv-box"></span><span>Correctly classify object states across five test scenarios: NEW, CONTINUING, MOVED, OCCLUDED, and MISSING</span></li>
+      <li class="open"><span class="jv-box"></span><span>Achieve at least 80% correct object-state decisions on held-out multi-frame validation sequences</span></li>
+      <li class="open"><span class="jv-box"></span><span>Prevent transient person occlusions from immediately triggering false MISSING or MOVED state alerts</span></li>
+      <li class="open"><span class="jv-box"></span><span>Fuse observations from Camera 1 and Camera 2 into a unified room coordinate space without duplicate ghost entries</span></li>
+    </ul>
+  </div>
+
+  <!-- State Model Flowchart -->
+  <div class="jv-section-label">Lifecycle &amp; Transition Architecture</div>
+  <div class="jv-card">
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    DET[New Observation] --> CAND[CANDIDATE]
+    CAND -->|Confirmed in N frames| CONF[CONFIRMED]
+    CAND -->|No confirmation| EXP[EXPIRED]
+    CONF -->|Static location| CONT[CONTINUING]
+    CONF -->|Delta pos > threshold| MOVED[MOVED]
+    CONF -->|Temporary lost view| OCC[OCCLUDED]
+    OCC -->|Re-detected| CONT
+    OCC -->|Absent > M frames| MISS[MISSING]</pre>
+    </div>
+  </div>
+
+  <!-- Multi-Camera Fusion Details -->
+  <div class="jv-section-label">Multi-Camera Matching Logic</div>
+  <div class="jv-card">
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead><tr><th>Scenario</th><th>Camera 1 View</th><th>Camera 2 View</th><th>System Resolution</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Clear Visibility</td>
+            <td>Detected (<span class="jv-code">Chair #4</span>)</td>
+            <td>Detected (<span class="jv-code">Chair #4</span>)</td>
+            <td><span class="jv-pill jv-pill-good">CONFIRMED</span> (Merged spatial coordinates)</td>
+          </tr>
+          <tr>
+            <td>Single-Side Occlusion</td>
+            <td>Blocked by student</td>
+            <td>Clear view</td>
+            <td><span class="jv-pill jv-pill-neutral">OCCLUDED (Cam 1) / CONTINUING (Cam 2)</span></td>
+          </tr>
+          <tr>
+            <td>Viewpoint Disagreement</td>
+            <td>Class: Laptop</td>
+            <td>Class: Book</td>
+            <td><span class="jv-pill jv-pill-warn">UNCERTAIN</span> (Higher confidence score preferred)</td>
+          </tr>
+          <tr>
+            <td>Object Relocated</td>
+            <td>New position detected</td>
+            <td>New position confirmed</td>
+            <td><span class="jv-pill jv-pill-warn">MOVED</span> (Logged with timestamp &amp; path delta)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Next Milestones -->
+  <div class="jv-section-label">Open Questions &amp; Next Steps</div>
+  <div class="jv-card">
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Homography Matrix:</strong> Calibrate homography transforms to map pixel coordinates from both cameras into real-world floor grid units.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Threshold Tuning:</strong> Empirically calibrate confirmation frame count ($N=3$) and missing eviction window ($M=6$).</span></li>
+    </ul>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>
