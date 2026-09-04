@@ -448,50 +448,59 @@
     <!-- Live Features grid -->
     <h2 class="ocs-ig-section-header">Live Features</h2>
     <div class="ocs-ig-features-grid">
-      {% for topic in data.Features offset:1 %}
-      <div class="ocs-ig-feature-card">
-        <h3 class="ocs-ig-feature-title">{{ topic.title }}</h3>
-        <p class="ocs-ig-feature-desc">{{ topic.subtitle }}</p>
-        <ul style="list-style:none;padding:0;margin:8px 0 0;">
-          {% for point in topic.keyPoints limit:3 %}
-          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-            <span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>{{ point }}</span>
-          </li>
-          {% endfor %}
-        </ul>
-        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
-          {% for tech in topic.tech %}
-          <span class="ocs-ig-tech-tag">{{ tech }}</span>
-          {% endfor %}
-        </div>
-      </div>
-      {% endfor %}
-
-      <div class="ocs-ig-feature-card">
-        <h3 class="ocs-ig-feature-title">Support Page</h3>
-        <p class="ocs-ig-feature-desc">Role-scoped ticket submission, status tracking, and admin resolution dashboard</p>
-        <ul style="list-style:none;padding:0;margin:8px 0 0;">
-          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Mentors and students submit tickets from within OCS</span></li>
-          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Admin review panel with status updates and resolution notes</span></li>
-          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Role-gated — only authenticated users can open tickets</span></li>
-        </ul>
-        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
-          <span class="ocs-ig-tech-tag">Spring REST</span><span class="ocs-ig-tech-tag">JWT Auth</span><span class="ocs-ig-tech-tag">Role-Based UI</span>
-        </div>
-      </div>
 
       <div class="ocs-ig-feature-card">
         <h3 class="ocs-ig-feature-title">Password Reset</h3>
         <p class="ocs-ig-feature-desc">OAuth + student ID verified reset flow with rate-limited tickets and JWT invalidation</p>
         <ul style="list-style:none;padding:0;margin:8px 0 0;">
           <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Reset ticket issued after Google OAuth + GitHub ID verification</span></li>
-          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Per-IP rate limiting blocks brute-force ticket requests</span></li>
-          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>All active JWTs invalidated immediately on password change</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Per-IP rate limiting blocks brute-force requests</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>All active JWTs invalidated on password change</span></li>
         </ul>
         <div class="ocs-ig-tech-stack" style="margin-top:8px;">
-          <span class="ocs-ig-tech-tag">Google OAuth2</span><span class="ocs-ig-tech-tag">JWT Invalidation</span><span class="ocs-ig-tech-tag">Rate Limiting</span>
+          <span class="ocs-ig-tech-tag">Google OAuth2</span><span class="ocs-ig-tech-tag">JWT</span><span class="ocs-ig-tech-tag">Rate Limiting</span>
         </div>
       </div>
+
+      <div class="ocs-ig-feature-card">
+        <h3 class="ocs-ig-feature-title">Mentor Role & Verification</h3>
+        <p class="ocs-ig-feature-desc">ROLE_MENTOR added to Spring Security between teacher and admin with scoped dashboard access</p>
+        <ul style="list-style:none;padding:0;margin:8px 0 0;">
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>New role between ROLE_TEACHER and ROLE_ADMIN</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>GitHub student ID validated before account activates</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Scoped capstone dashboard — mentors see only their groups</span></li>
+        </ul>
+        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
+          <span class="ocs-ig-tech-tag">Spring Security</span><span class="ocs-ig-tech-tag">GitHub API</span><span class="ocs-ig-tech-tag">JWT</span>
+        </div>
+      </div>
+
+      <div class="ocs-ig-feature-card">
+        <h3 class="ocs-ig-feature-title">Mentor Login</h3>
+        <p class="ocs-ig-feature-desc">Google OAuth signup — PUSD emails get immediate access, others await admin approval</p>
+        <ul style="list-style:none;padding:0;margin:8px 0 0;">
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Sign in via Google — no separate password needed</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>PUSD domain auto-approved, external emails admin-reviewed</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Real-time team chat per capstone group via WebSocket</span></li>
+        </ul>
+        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
+          <span class="ocs-ig-tech-tag">Google OAuth2</span><span class="ocs-ig-tech-tag">SockJS</span><span class="ocs-ig-tech-tag">STOMP</span>
+        </div>
+      </div>
+
+      <div class="ocs-ig-feature-card">
+        <h3 class="ocs-ig-feature-title">General Security</h3>
+        <p class="ocs-ig-feature-desc">Password complexity enforced on frontend and backend — bypassing the UI still gets rejected</p>
+        <ul style="list-style:none;padding:0;margin:8px 0 0;">
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Password complexity required at account creation</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Spring and Flask both reject weak passwords on direct API calls</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Plaintext password sync blocked over non-TLS connections</span></li>
+        </ul>
+        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
+          <span class="ocs-ig-tech-tag">Spring Boot</span><span class="ocs-ig-tech-tag">Flask</span><span class="ocs-ig-tech-tag">TLS</span>
+        </div>
+      </div>
+
     </div>
 
     <!-- Planned Features -->
