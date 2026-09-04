@@ -385,7 +385,6 @@
     </div>
 
     <!-- Main card: first feature expanded -->
-    {% assign f0 = data.Features[0] %}
     <div class="ocs-ig-card">
       <div class="ocs-ig-card-grid">
 
@@ -404,42 +403,42 @@
           </div>
         </div>
 
-        <!-- Center: key points -->
+        <!-- Center: Mentor Auth key points -->
         <div class="ocs-ig-center">
-          <h2 class="ocs-ig-project-title">{{ f0.title }}</h2>
-          <p class="ocs-ig-subtitle">{{ f0.subtitle }}</p>
+          <h2 class="ocs-ig-project-title">Mentor Auth</h2>
+          <p class="ocs-ig-subtitle">Google OAuth-verified signup with role-based access between student and admin</p>
           <div class="ocs-ig-section-label">Key Points</div>
           <ul class="ocs-ig-keypoints">
-            {% for point in f0.keyPoints %}
-            <li><span class="ocs-ig-check">✓</span><span>{{ point }}</span></li>
-            {% endfor %}
+            <li><span class="ocs-ig-check">✓</span><span>ROLE_MENTOR added to Spring Security between ROLE_TEACHER and ROLE_ADMIN</span></li>
+            <li><span class="ocs-ig-check">✓</span><span>Google OAuth signup — PUSD emails get immediate access, others await admin approval</span></li>
+            <li><span class="ocs-ig-check">✓</span><span>GitHub student ID validated before mentor account is activated</span></li>
+            <li><span class="ocs-ig-check">✓</span><span>Scoped capstone project dashboard visible only to mentors and above</span></li>
+            <li><span class="ocs-ig-check">✓</span><span>Real-time team chat via SockJS/STOMP WebSocket per capstone group</span></li>
           </ul>
           <div class="ocs-ig-tech-stack">
-            {% for tech in f0.tech %}
-            <span class="ocs-ig-tech-tag">{{ tech }}</span>
-            {% endfor %}
+            <span class="ocs-ig-tech-tag">Spring Security</span>
+            <span class="ocs-ig-tech-tag">Google OAuth2</span>
+            <span class="ocs-ig-tech-tag">SockJS / STOMP</span>
+            <span class="ocs-ig-tech-tag">JWT</span>
+            <span class="ocs-ig-tech-tag">GitHub API</span>
           </div>
         </div>
 
-        <!-- Right: security + endpoints -->
+        <!-- Right: security from spring commits -->
         <div class="ocs-ig-right">
           <div class="ocs-ig-section-label">Security</div>
           <ul class="ocs-ig-impact-list" style="margin-bottom:14px;">
-            {% for item in f0.security %}
-            <li class="ocs-ig-impact-item">
-              <span class="ocs-ig-impact-dot"></span>
-              <span>{{ item }}</span>
-            </li>
-            {% endfor %}
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot"></span><span>JWTs invalidated immediately on password change — no stale tokens</span></li>
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot"></span><span>Reset tickets rate-limited per IP to block brute-force abuse</span></li>
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot"></span><span>POST /mvc/person/reset/ticket is permitAll — fixed auth requirement that blocked unauthenticated resets</span></li>
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot"></span><span>Plaintext password sync to Flask refused over non-loopback, non-TLS URIs</span></li>
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot"></span><span>OAuth + student ID double-verification before password reset is issued</span></li>
           </ul>
           <div class="ocs-ig-section-label">Endpoints</div>
           <ul class="ocs-ig-impact-list">
-            {% for ep in f0.endpoints %}
-            <li class="ocs-ig-impact-item">
-              <span class="ocs-ig-impact-dot" style="background:#007ACC;"></span>
-              <span style="font-family:monospace;font-size:0.75rem;word-break:break-all;">{{ ep }}</span>
-            </li>
-            {% endfor %}
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot" style="background:#007ACC;"></span><span style="font-family:monospace;font-size:0.75rem;">POST /api/authenticate/mentor</span></li>
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot" style="background:#007ACC;"></span><span style="font-family:monospace;font-size:0.75rem;">POST /mvc/person/reset/ticket</span></li>
+            <li class="ocs-ig-impact-item"><span class="ocs-ig-impact-dot" style="background:#007ACC;"></span><span style="font-family:monospace;font-size:0.75rem;">GET /api/person/mentor/projects</span></li>
           </ul>
         </div>
 
