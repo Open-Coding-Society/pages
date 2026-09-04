@@ -1,7 +1,7 @@
 ---
 layout: post
 assignment: true
-assignment_submission_type: "link"
+assignment_submission_type: "file"
 courses: {'csa': {'week': 0}}
 title: Home Page Game Feedback
 description: >
