@@ -180,6 +180,14 @@ show_reading_time: false
         schoolField.required = !isMentor;
         emailField.placeholder = isMentor ? 'Email' : 'Personal (not school) Email';
 
+        // Mentors have no use for Kasm servers. Hidden (not required), same as sid/school
+        // above -- the checkbox stays unchecked while hidden, so no extra guard is needed
+        // where its .checked value gets read further down.
+        const kasmGroup = document.getElementById('kasmNeededGroup');
+        const kasmField = document.getElementById('kasmNeeded');
+        kasmGroup.style.display = isMentor ? 'none' : '';
+        if (isMentor) kasmField.checked = false;
+
         document.getElementById('oauth-copy-student').style.display = isMentor ? 'none' : '';
         document.getElementById('oauth-copy-mentor').style.display = isMentor ? '' : 'none';
         document.getElementById('skip-mentor-oauth').style.display = isMentor ? 'inline-block' : 'none';
