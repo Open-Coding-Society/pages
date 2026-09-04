@@ -1,0 +1,514 @@
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Open Coding Society capstone page documenting security improvements across the frontend, Flask backend, Spring backend, and Docker code runners."
+  />
+  <title>Hardening Open Coding Society</title>
+
+  <style>
+   :root {
+      --bg: #0b0b0b;
+      --surface: #141414;
+      --surface-raised: #1b1b1b;
+      --text: #f2f2f2;
+      --muted: #b0b0b0;
+      --border: #333333;
+      --accent: #f2f2f2;
+      --accent-soft: #222222;
+      --success: #bdbdbd;
+      --success-soft: #222222;
+      --warning: #c8c8c8;
+      --warning-soft: #222222;
+      --planned: #999999;
+      --planned-soft: #202020;
+      --code: #090909;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.025), transparent 35%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  code {
+    padding: 2px 6px;
+    border-radius: 0;
+    background: #101010;
+    color: #d0d0d0;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.9em;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .page {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto;
+  }
+  
+  .eyebrow {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .lead {
+    max-width: 780px;
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+
+  .hero-note {
+    margin-top: 28px;
+    padding: 18px 20px;
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    border-radius: 0;
+    font-weight: 600;
+  }
+
+  .section-intro {
+    max-width: 780px;
+    margin: 0 0 28px;
+    color: var(--muted);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0;
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .card h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  .card:hover {
+    border-color: #3a3a3a;
+    background: var(--surface-raised);
+  }
+
+  .card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 0;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .complete {
+    color: var(--success);
+    background: var(--success-soft);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .working {
+    color: var(--warning);
+    background: var(--warning-soft);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .planned {
+    color: var(--planned);
+    background: var(--planned-soft);
+    border: 1px solid var(--border);
+  }
+
+  .roadmap {
+    display: grid;
+    gap: 12px;
+  }
+
+  .roadmap-item {
+    display: grid;
+    grid-template-columns: 150px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0;
+  }
+
+  .roadmap-item strong {
+    font-size: 0.95rem;
+  }
+
+  .roadmap-item span.description {
+    color: var(--muted);
+    font-size: 0.94rem;
+  }
+
+  .architecture {
+    margin-top: 24px;
+    padding: 24px;
+    background: var(--code);
+    color: #d0d0d0;
+    border-radius: 0;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    white-space: pre;
+  }
+
+  .points {
+    padding-left: 20px;
+    margin-bottom: 0;
+  }
+
+  .points li {
+    margin-bottom: 8px;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .summary .card {
+    box-shadow: none;
+  }
+
+  .summary .points {
+    margin-top: 28px;
+  }
+
+  footer {
+    padding: 28px 0 48px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 760px) {
+    header {
+      padding-top: 48px;
+    }
+
+    .grid,
+    .summary {
+      grid-template-columns: 1fr;
+    }
+
+    .roadmap-item {
+      grid-template-columns: 1fr;
+    }
+  }
+
+    /* Status colors: intentionally retained while the rest of the page stays black/gray. */
+    .status.complete,
+    .status--complete {
+      color: #7ddf8a;
+      border-color: rgba(125, 223, 138, 0.28);
+      background: rgba(125, 223, 138, 0.10);
+    }
+
+    .status.working,
+    .status--working {
+      color: #f2b84b;
+      border-color: rgba(242, 184, 75, 0.28);
+      background: rgba(242, 184, 75, 0.10);
+    }
+
+    .status.future,
+    .status--future {
+      color: #a8a8a8;
+      border-color: rgba(168, 168, 168, 0.24);
+      background: rgba(168, 168, 168, 0.08);
+    }
+
+    [data-status="complete"] {
+      color: #7ddf8a;
+      border-color: rgba(125, 223, 138, 0.28);
+      background: rgba(125, 223, 138, 0.10);
+    }
+    [data-status="in-progress"] {
+      color: #f2b84b;
+      border-color: rgba(242, 184, 75, 0.28);
+      background: rgba(242, 184, 75, 0.10);
+    }
+    [data-status="future"] {
+      color: #a8a8a8;
+      border-color: rgba(168, 168, 168, 0.24);
+      background: rgba(168, 168, 168, 0.08);
+    }
+</style>
+</head>
+<body>
+  <main class="page">
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p class="section-intro">
+        Open Coding Society accepts user input and supports code execution, so security
+        needs to be enforced across multiple layers. Our capstone focuses on reducing
+        the attack surface of the platform and preventing users from bypassing security
+        protections by sending requests directly to backend APIs.
+      </p>
+
+      <div class="grid">
+        <article class="card">
+          <h3>Defense in Depth</h3>
+          <p>
+            Security checks should not exist only in the frontend. Rules that matter
+            for security must also be enforced by Flask, Spring, and the surrounding infrastructure.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Isolation</h3>
+          <p>
+            Untrusted code should not run inside the same environment as the main application.
+            Dedicated code-runner containers create an additional security boundary.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="roadmap">
+      <h2>Security Roadmap</h2>
+      <p class="section-intro">
+        Current progress across the main areas of the project.
+      </p>
+
+      <div class="roadmap">
+        <div class="roadmap-item">
+          <strong>Frontend</strong>
+          <span class="description">Password complexity requirements on account creation</span>
+          <span class="status complete">Complete</span>
+        </div>
+
+        <div class="roadmap-item">
+          <strong>Flask</strong>
+          <span class="description">Flask backend password validation</span>
+          <span class="status complete">Complete</span>
+        </div>
+
+        <div class="roadmap-item">
+          <strong>Spring</strong>
+          <span class="description">Spring backend password validation</span>
+          <span class="status complete">Complete</span>
+        </div>
+
+        <div class="roadmap-item">
+          <strong>Flask Runner</strong>
+          <span class="description">Run requested Python code in a dedicated Docker container</span>
+          <span class="status working">Mostly Complete</span>
+        </div>
+
+        <div class="roadmap-item">
+          <strong>Spring Runner</strong>
+          <span class="description">Run requested Java code in a dedicated Docker container</span>
+          <span class="status working">In Progress</span>
+        </div>
+
+        <div class="roadmap-item">
+          <strong>Infrastructure</strong>
+          <span class="description">Production/testing configuration and stronger sandboxing</span>
+          <span class="status planned">Planned</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="passwords">
+      <h2>Password Security</h2>
+      <p class="section-intro">
+        Password complexity is now enforced both where the user interacts with the site
+        and where account creation is actually processed.
+      </p>
+
+      <div class="grid">
+        <article class="card">
+          <span class="status complete">Complete</span>
+          <h3 style="margin-top: 16px;">Frontend Validation</h3>
+          <p>
+            OCS Pages prevents users from creating an account with a password that does
+            not meet the required password complexity rules.
+          </p>
+          <p>
+            This gives immediate feedback and reduces invalid requests before they ever reach the backend.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="status complete">Complete</span>
+          <h3 style="margin-top: 16px;">Backend Enforcement</h3>
+          <p>
+            Both Spring and Flask reject account-creation requests containing passwords
+            that do not meet the required complexity.
+          </p>
+          <p>
+            This prevents someone from bypassing the Pages frontend and sending a direct
+            API request with an invalid password.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="runners">
+      <h2>Code Runner Isolation</h2>
+      <p class="section-intro">
+        The next major security improvement is separating command execution from the main
+        backend containers so that untrusted code does not run in the same environment as the application.
+      </p>
+
+      <div class="grid">
+        <article class="card">
+          <span class="status working">Mostly Complete</span>
+          <h3 style="margin-top: 16px;">Flask Code Runner</h3>
+          <p>
+            Flask has mostly been migrated to a dedicated code-runner Docker container.
+            Commands are executed in this isolated environment instead of directly inside the main Flask container.
+          </p>
+          <p>
+            Current work is focused on smaller configuration improvements, including
+            allowing more code-runner settings to be controlled through <code>.env</code>.
+          </p>
+        </article>
+
+        <article class="card">
+          <span class="status working">In Progress</span>
+          <h3 style="margin-top: 16px;">Spring Code Runner</h3>
+          <p>
+            A new Docker container has been created for Spring to connect to and use for Java execution.
+          </p>
+          <p>
+            The current task is fixing the Spring API controller so that it correctly
+            sends Java source code and request data to the new container and returns the execution result.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="future">
+      <h2>Future Work</h2>
+      <p class="section-intro">
+        Container separation is an important first step, but additional configuration
+        and hardening can further reduce risk.
+      </p>
+
+      <div class="grid">
+        <article class="card">
+          <span class="status planned">Planned</span>
+          <h3 style="margin-top: 16px;">Production vs. Testing</h3>
+          <p>
+            Add separate Spring backend configurations so testing and development
+            settings are not accidentally used in production.
+          </p>
+          <ul class="points">
+            <li>Separate environment-specific settings</li>
+            <li>Control endpoints and services by environment</li>
+            <li>Reduce production debugging exposure</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="status planned">Planned</span>
+          <h3 style="margin-top: 16px;">Container Hardening</h3>
+          <p>
+            Add stronger restrictions around the code-runner containers and continue
+            treating submitted code as untrusted.
+          </p>
+          <ul class="points">
+            <li>CPU and memory limits</li>
+            <li>Filesystem restrictions</li>
+            <li>Network restrictions</li>
+            <li>Non-root execution</li>
+            <li>Reduced Linux capabilities</li>
+            <li>Execution timeouts</li>
+            <li>Additional sandboxing tools</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+    <section>
+      <h2>Project Summary</h2>
+
+      <div class="summary">
+        <article class="card">
+          <span class="status complete">Completed</span>
+          <ul class="points">
+            <li>Frontend password complexity</li>
+            <li>Flask password enforcement</li>
+            <li>Spring password enforcement</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="status working">Working On</span>
+          <ul class="points">
+            <li>Flask runner configuration</li>
+            <li>Spring Java runner integration</li>
+            <li>Spring API controller fixes</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="status planned">Future</span>
+          <ul class="points">
+            <li>Production/testing configuration</li>
+            <li>Stricter Docker settings</li>
+            <li>Additional sandboxing</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="page">
+      Open Coding Society · Security Capstone
+    </div>
+  </footer>
+
+</body>
+</html>
