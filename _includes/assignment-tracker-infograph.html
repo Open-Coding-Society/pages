@@ -468,6 +468,35 @@
       {% endfor %}
     </div>
 
+    <!-- Support & Password Reset cards -->
+    {% assign f1 = data.Features[1] %}{% assign f2 = data.Features[2] %}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      <div class="ocs-ig-feature-card">
+        <h3 class="ocs-ig-feature-title">Support Page</h3>
+        <p class="ocs-ig-feature-desc">Dedicated help center for mentor and student issues — role-scoped ticket submission, status tracking, and admin resolution dashboard</p>
+        <ul style="list-style:none;padding:0;margin:8px 0 0;">
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Mentors and students submit tickets from within OCS</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Admin review panel with status updates and resolution notes</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Role-gated — only authenticated users can open tickets</span></li>
+        </ul>
+        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
+          <span class="ocs-ig-tech-tag">Spring REST</span><span class="ocs-ig-tech-tag">JWT Auth</span><span class="ocs-ig-tech-tag">Role-Based UI</span>
+        </div>
+      </div>
+      <div class="ocs-ig-feature-card">
+        <h3 class="ocs-ig-feature-title">Password Reset</h3>
+        <p class="ocs-ig-feature-desc">OAuth + student ID verified reset flow with rate-limited tickets and immediate JWT invalidation on change</p>
+        <ul style="list-style:none;padding:0;margin:8px 0 0;">
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Reset ticket issued after Google OAuth + GitHub ID verification</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>Per-IP rate limiting blocks brute-force ticket requests</span></li>
+          <li style="display:flex;gap:6px;font-size:0.7rem;color:#ccc;padding:3px 0;"><span style="color:#4CAFEF;flex-shrink:0;">✓</span><span>All active JWTs invalidated immediately on password change</span></li>
+        </ul>
+        <div class="ocs-ig-tech-stack" style="margin-top:8px;">
+          <span class="ocs-ig-tech-tag">Google OAuth2</span><span class="ocs-ig-tech-tag">JWT Invalidation</span><span class="ocs-ig-tech-tag">Rate Limiting</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Planned Features -->
     <h2 class="ocs-ig-section-header" style="border-left-color:#007ACC;">Planned Features</h2>
     <div class="ocs-ig-features-grid">
