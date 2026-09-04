@@ -1,0 +1,95 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Design-Based Research Capstone · Jarvis Project Proposal · {{ data.Year }}</div>
+    <h1 class="jv-title">{{ data.Title }}</h1>
+    <p class="jv-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- System flow at a glance -->
+  <div class="jv-flow">
+    <div class="jv-flow-node">
+      <span class="jv-flow-node-label">Camera Capture</span>
+      <span class="jv-flow-node-sub">Timestamped Images</span>
+    </div>
+    <span class="jv-flow-arrow">→</span>
+    <div class="jv-flow-node">
+      <span class="jv-flow-node-label">Preprocessing</span>
+      <span class="jv-flow-node-sub">OpenCV / Frame Prep</span>
+    </div>
+    <span class="jv-flow-arrow">→</span>
+    <div class="jv-flow-node">
+      <span class="jv-flow-node-label">YOLO</span>
+      <span class="jv-flow-node-sub">Object Recognition</span>
+    </div>
+    <span class="jv-flow-arrow">→</span>
+    <div class="jv-flow-node active">
+      <span class="jv-flow-node-label">SAM 3</span>
+      <span class="jv-flow-node-sub">Precise Segmentation</span>
+    </div>
+    <span class="jv-flow-arrow">→</span>
+    <div class="jv-flow-node">
+      <span class="jv-flow-node-label">Room Model</span>
+      <span class="jv-flow-node-sub">Identity + Location</span>
+    </div>
+  </div>
+
+  <!-- Problem Statement -->
+  <div class="jv-section-label">Problem Statement</div>
+  <div class="jv-card">
+    <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
+      Managing and tracking classroom equipment, furniture arrangements, and shared physical assets in real-time is often manual, error-prone, and disconnected from active learning environments. Traditional computer vision applications in schools frequently focus on intrusive biometric identity scanning rather than ambient physical space awareness.
+    </p>
+    <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:1rem 0 0;">
+      Jarvis addresses this challenge by deploying a privacy-respecting, multi-camera spatial perception pipeline. By combining high-definition periodic frame captures, YOLO-based bounding box detection, and SAM 3 pixel-level segmentation, the system maintains a persistent spatial model of the classroom without biometric identification.
+    </p>
+  </div>
+
+  <!-- Core Research Question -->
+  <div class="jv-section-label">Core Research Question</div>
+  <div class="jv-card">
+    <p class="jv-question">Can Jarvis use a low-cost, multi-camera computer-vision pipeline—combining timestamped classroom images, YOLO object recognition, and SAM 3 segmentation—to reliably identify classroom objects, determine where they are located, and track meaningful changes over time, while establishing a foundation for later material recognition?</p>
+  </div>
+
+  <!-- Hub Navigation Grid -->
+  <div class="jv-section-label">Explore the Project</div>
+  <div class="jv-hub-grid">
+    <a href="/capstone/jarvis/technical/" class="jv-hub-card">
+      <span class="jv-hub-card-title">Technical Detail &amp; Flow</span>
+      <span class="jv-hub-card-desc">Full system architecture, capture and processing loops, observation state machine, data models, and privacy design.</span>
+      <span class="jv-hub-card-arrow">View Technical Architecture</span>
+    </a>
+    <a href="/capstone/jarvis/research-1/" class="jv-hub-card">
+      <span class="jv-hub-card-title">Research 1: Camera &amp; Hardware</span>
+      <span class="jv-hub-card-desc">Multi-camera capture setup, network sync between Linux nodes, calibration, and bill of materials.</span>
+      <span class="jv-hub-card-arrow">Explore Research 1</span>
+    </a>
+    <a href="/capstone/jarvis/research-2/" class="jv-hub-card">
+      <span class="jv-hub-card-title">Research 2: YOLO Object Recognition</span>
+      <span class="jv-hub-card-desc">Core classroom object detection, dataset annotation, confidence metrics, and baseline testing.</span>
+      <span class="jv-hub-card-arrow">Explore Research 2</span>
+    </a>
+    <a href="/capstone/jarvis/research-3/" class="jv-hub-card">
+      <span class="jv-hub-card-title">Research 3: SAM 3 Segmentation</span>
+      <span class="jv-hub-card-desc">Pixel-precise mask generation, bounding box refinement, and CPU performance optimization.</span>
+      <span class="jv-hub-card-arrow">Explore Research 3</span>
+    </a>
+    <a href="/capstone/jarvis/research-4/" class="jv-hub-card">
+      <span class="jv-hub-card-title">Research 4: Spatial Tracking &amp; Room Model</span>
+      <span class="jv-hub-card-desc">Temporal object tracking across frames, multi-camera fusion, and state change event management.</span>
+      <span class="jv-hub-card-arrow">Explore Research 4</span>
+    </a>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>

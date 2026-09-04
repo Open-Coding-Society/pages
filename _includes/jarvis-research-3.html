@@ -1,0 +1,76 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Research Area 3 · Instance Segmentation</div>
+    <h1 class="jv-page-title">Research 3: SAM 3 Segmentation</h1>
+    <p class="jv-description">Refining coarse bounding boxes into pixel-accurate segmentation masks, separating foreground objects from cluttered classroom backgrounds.</p>
+  </div>
+
+  <!-- Research Question -->
+  <div class="jv-section-label">Research Question 3</div>
+  <div class="jv-card">
+    <p class="jv-question">How effectively can SAM 3 convert bounding box detection prompts into precise pixel masks under CPU-bound execution without exceeding the target 10-second processing cycle?</p>
+    <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span>Pass YOLO bounding box coordinates as prompt boxes to SAM 3 to generate binary pixel masks</span></li>
+      <li class="open"><span class="jv-box"></span><span>Isolate foreground object boundaries cleanly from complex textured backgrounds (e.g., desk grain, floor tiles)</span></li>
+      <li class="open"><span class="jv-box"></span><span>Produce encoded binary mask representations for lightweight storage and downstream spatial comparison</span></li>
+      <li class="open"><span class="jv-box"></span><span>Benchmark CPU inference time across frame resolutions (720p, 1080p, 4K) to preserve latency bounds</span></li>
+      <li class="open"><span class="jv-box"></span><span>Validate mask stability across sequential captures for stationary classroom furniture</span></li>
+    </ul>
+  </div>
+
+  <!-- Performance & Compute Analysis -->
+  <div class="jv-section-label">Compute Constraints &amp; Optimization</div>
+  <div class="jv-card">
+    <div class="jv-callout jv-callout-note" style="margin-top:0;">
+      <span><strong style="color:var(--jv-text);">Current Hardware Constraint:</strong> The primary Linux host runs inference on a multi-core CPU without a dedicated NVIDIA GPU. Efficient prompt-based inference and resolution scaling are essential to maintain the 10-second capture loop.</span>
+    </div>
+    <div class="jv-table-wrap" style="margin-top:1rem;">
+      <table class="jv-table">
+        <thead><tr><th>Resolution Tier</th><th>Inference Latency (Est.)</th><th>Segmentation Fidelity</th><th>Viability</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>720p (1280×720)</td>
+            <td>1.8s – 2.5s</td>
+            <td>Good for large furniture; minor boundary blur on pens/bottles</td>
+            <td><span class="jv-pill jv-pill-good">RECOMMENDED</span></td>
+          </tr>
+          <tr>
+            <td>1080p (1920×1080)</td>
+            <td>4.2s – 6.0s</td>
+            <td>High fidelity for all 6 target classes</td>
+            <td><span class="jv-pill jv-pill-good">FEASIBLE</span></td>
+          </tr>
+          <tr>
+            <td>4K (3840×2160)</td>
+            <td>14.0s+ (exceeds budget)</td>
+            <td>Pixel-perfect boundaries</td>
+            <td><span class="jv-pill jv-pill-bad">TOO SLOW (CPU)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Next Milestones -->
+  <div class="jv-section-label">Open Questions &amp; Next Steps</div>
+  <div class="jv-card">
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Quantization &amp; ONNX:</strong> Evaluate int8 quantization or ONNX Runtime CPU acceleration to reduce segmentation latency.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Prompt Refinement:</strong> Add positive/negative centroid point prompts to prevent mask leakage between adjacent desks.</span></li>
+    </ul>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>

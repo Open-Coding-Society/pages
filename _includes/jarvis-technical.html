@@ -1,0 +1,168 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Technical Specification · Architecture &amp; Lifecycle</div>
+    <h1 class="jv-page-title">Technical Detail &amp; System Flow</h1>
+    <p class="jv-description">In-depth technical architecture, state machines, capture loops, data schemas, and privacy governance models underpinning the Jarvis classroom perception pipeline.</p>
+  </div>
+
+  <!-- System architecture -->
+  <div class="jv-section-label">System Architecture</div>
+  <div class="jv-card">
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    C1["Camera 1
+Main Linux computer"] --> CAP["FFmpeg capture
+Timestamped frame"]
+    C2["Camera 2
+Second Linux computer"] --> TX["Secure transfer
+SSH / Tailscale"]
+    TX --> CAP
+    CAP --> CV["OpenCV
+Load and preprocess"]
+    CV --> YOLO["YOLO
+Class + box + confidence"]
+    YOLO --> SAM["SAM 3
+Pixel-level object mask"]
+    SAM --> FUSE["Multi-camera matching
+and temporal tracking"]
+    FUSE --> ROOM["Room model
+Identity + location + history"]</pre>
+    </div>
+  </div>
+
+  <!-- Capture and processing loop -->
+  <div class="jv-section-label">Capture &amp; Processing Logic</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through YOLO and SAM 3, and compares the result with recent observations before changing the room model.</p>
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">sequenceDiagram
+    participant Cam as Classroom Cameras
+    participant Cap as FFmpeg Capture
+    participant AI as YOLO + SAM 3
+    participant Track as Tracking Logic
+    participant Room as Room Model
+
+    loop At each configured interval
+        Cam->>Cap: provide current frame
+        Cap->>Cap: save original with camera ID + timestamp
+        Cap->>AI: submit frame for inference
+        AI->>Track: classes + confidence + boxes + masks
+        Track->>Track: compare with recent observations
+        Track->>Room: confirm new, moved, continuing, or missing objects
+    end
+    Note over Track: One weak or missed detection does not immediately change the room model</pre>
+    </div>
+  </div>
+
+  <!-- Object state model -->
+  <div class="jv-section-label">Object Observation State Model</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Jarvis converts raw detections into stable states so that a single uncertain frame does not create a false report:</p>
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead><tr><th>State</th><th>Evidence</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="jv-pill jv-pill-neutral">CANDIDATE</span></td><td>One new detection</td><td>Possible object awaiting confirmation from another frame or camera</td></tr>
+          <tr><td><span class="jv-pill jv-pill-good">CONFIRMED</span></td><td>Repeated compatible detections</td><td>Object is accepted into the current room model</td></tr>
+          <tr><td><span class="jv-pill jv-pill-good">CONTINUING</span></td><td>Class and position remain compatible</td><td>The same tracked object is still present</td></tr>
+          <tr><td><span class="jv-pill jv-pill-warn">MOVED</span></td><td>Same object class and track, significantly different location</td><td>Jarvis records a location-change event</td></tr>
+          <tr><td><span class="jv-pill jv-pill-warn">UNCERTAIN</span></td><td>Low confidence or conflicting class predictions</td><td>Observation is saved but does not immediately overwrite a confirmed label</td></tr>
+          <tr><td><span class="jv-pill jv-pill-neutral">OCCLUDED</span></td><td>Temporarily missing from one view but supported by recent history or another camera</td><td>Object remains in the room model during a short evidence gap</td></tr>
+          <tr><td><span class="jv-pill jv-pill-bad">MISSING</span></td><td>Absent across enough consecutive observations</td><td>Previously confirmed object is treated as removed or no longer visible</td></tr>
+          <tr><td><span class="jv-pill jv-pill-warn">CAMERA_CONFLICT</span></td><td>Camera observations cannot be matched consistently</td><td>Flag for review instead of counting two views as two separate objects</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Detection and tracking lifecycle -->
+  <div class="jv-section-label">Detection &amp; Tracking Lifecycle</div>
+  <div class="jv-card">
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    A[YOLO detection] --> B["SAM 3 mask
+and observation record"]
+    B --> C{Matches an existing track?}
+    C -->|Yes| D[Update object history]
+    C -->|No| E[Create candidate track]
+    E -->|Repeated evidence| F[Confirm object]
+    E -->|Not repeated| G[Expire candidate]
+    D -->|Position changed| H[Record moved event]
+    D -->|Evidence disappears| I[Mark occluded]
+    I -->|Still absent after threshold| J[Mark missing]</pre>
+    </div>
+    <h3 style="margin-top:1.5rem;">Data the system needs to persist</h3>
+    <p style="font-size:0.8125rem;color:var(--jv-text-muted);margin:-0.5rem 0 1rem;">This is the current entity list, not a final database schema.</p>
+    <ul class="jv-entity-list">
+      <li><strong>Cameras</strong> — id, device name, host computer, viewpoint, resolution, status</li>
+      <li><strong>Frames</strong> — id, camera, capture timestamp, original-file path, processing status</li>
+      <li><strong>YOLO Classes</strong> — class id, object label, and training-version metadata</li>
+      <li><strong>Detections</strong> — frame, class, confidence, bounding box, model version</li>
+      <li><strong>Segmentation Masks</strong> — detection, mask-file path or encoded mask, SAM 3 model version</li>
+      <li><strong>Object Tracks</strong> — persistent object id, current class, state, first seen, last seen</li>
+      <li><strong>Locations / Zones</strong> — camera-relative coordinates and eventual room-relative position</li>
+      <li><strong>Observations</strong> — track, frame, camera, position, confidence, mask, timestamp</li>
+      <li><strong>Change Events</strong> — new, moved, missing, reappeared, or camera-conflict event</li>
+      <li><strong>Model Runs</strong> — configuration, thresholds, processing time, errors, and output version</li>
+    </ul>
+  </div>
+
+  <!-- Design decisions -->
+  <div class="jv-section-label">Design Decisions &amp; Rationale</div>
+  <div class="jv-card">
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead><tr><th>Design feature</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Use <strong>two cameras on opposite sides</strong> of the room</td><td>A second viewpoint reduces blind spots and gives Jarvis another observation when an object is blocked or unclear in one camera.</td></tr>
+          <tr><td>Capture <strong>timestamped still images</strong> instead of processing continuous 4K video</td><td>Periodic frames reduce storage and CPU demand while preserving the time information needed to compare changes.</td></tr>
+          <tr><td>Begin at a <strong>10-second capture interval</strong></td><td>This is frequent enough for initial room-change experiments and can be adjusted after measuring processing time and missed events.</td></tr>
+          <tr><td>Use <strong>YOLO for object recognition first</strong></td><td>The first version focuses on reliable object classes, bounding boxes, and confidence scores. Material recognition remains a later extension after the object pipeline works.</td></tr>
+          <tr><td>Start with <strong>six core classroom classes</strong></td><td>Chair, table/desk, laptop, backpack, bottle, and book provide a manageable first dataset while testing fixed furniture, portable equipment, and small objects.</td></tr>
+          <tr><td>Use <strong>SAM 3 for segmentation</strong></td><td>SAM 3 supplies precise object masks, separating the pixels belonging to an object from its background; it does not replace the recognition model.</td></tr>
+          <tr><td>Defer <strong>material classification</strong></td><td>Material labels such as wood, metal, plastic, glass, and fabric require separate training or classification work and are outside the first implementation milestone.</td></tr>
+          <tr><td>Use <strong>OpenCV for image handling</strong></td><td>OpenCV can load frames, resize or normalize them, crop detected regions, draw results, compare frames, and save processed outputs.</td></tr>
+          <tr><td>Keep <strong>recognition confidence</strong> separate from tracking confidence</td><td>Jarvis may be confident that an object persisted across frames even when its exact class is uncertain, or vice versa.</td></tr>
+          <tr><td>Require <strong>multiple observations</strong> before declaring a change</td><td>A single missed detection should not immediately cause Jarvis to report that an object disappeared or moved.</td></tr>
+          <tr><td>Use an <strong>80% first-prototype success threshold</strong></td><td>Jarvis must correctly classify at least 80% of objects and correctly determine at least 80% of tested object states on held-out, manually labeled scenes.</td></tr>
+          <tr><td>Process on a <strong>main Linux computer</strong></td><td>Central processing keeps the room model and saved results together while a second Linux computer can capture and transfer images from the remote camera.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Privacy / governance -->
+  <div class="jv-section-label">Privacy, Scope &amp; Governance</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Jarvis is designed to understand classroom objects, not identify or monitor individual people:</p>
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead><tr><th>Decision</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>No identity recognition</td><td>Jarvis does not use face recognition, names, student IDs, biometric enrollment, or any other method to determine who a person is.</td></tr>
+          <tr><td>Generic person detection only</td><td>A person may be represented only as the class <span class="jv-code">person</span>, allowing Jarvis to recognize that a classroom object may be temporarily blocked from view.</td></tr>
+          <tr><td>No persistent person tracking</td><td>Person detections are not assigned lasting identities and are not included in the classroom object inventory or movement history.</td></tr>
+          <tr><td>Object-focused outputs</td><td>Saved detections, masks, and change events focus on classroom objects; people are treated as temporary occluders rather than subjects of analysis.</td></tr>
+          <tr><td>Local prototype scope</td><td>The first version runs on the project's Linux computers for testing in the selected classroom rather than serving as a school-wide surveillance system.</td></tr>
+          <tr><td>Controlled evaluation</td><td>Initial accuracy testing should use team-controlled scenes and objects, with classroom testing conducted only under the permission rules established for the project.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="jv-callout jv-callout-note">
+      <span>A generic person mask may explain why a previously confirmed object is temporarily invisible. In that case, Jarvis should prefer <span class="jv-code">OCCLUDED</span> over immediately changing the object to <span class="jv-code">MISSING</span>.</span>
+    </div>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>

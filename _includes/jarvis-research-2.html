@@ -1,0 +1,86 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Research Area 2 · Object Detection</div>
+    <h1 class="jv-page-title">Research 2: YOLO Object Recognition</h1>
+    <p class="jv-description">Evaluating bounding-box object classification, confidence estimation, classroom dataset curation, and baseline detection accuracy.</p>
+  </div>
+
+  <!-- Research Question -->
+  <div class="jv-section-label">Research Question 2</div>
+  <div class="jv-card">
+    <p class="jv-question">Can a YOLO-based detector achieve at least 80% classification accuracy on core classroom object classes under varying angles, distances, and ambient lighting conditions?</p>
+    <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span>Train and evaluate YOLO on six core classroom classes: chair, table/desk, laptop, backpack, bottle, and book</span></li>
+      <li class="open"><span class="jv-box"></span><span>Achieve at least 80% precision and recall on a held-out, manually annotated classroom test dataset</span></li>
+      <li class="open"><span class="jv-box"></span><span>Output normalized bounding box coordinates and calibrated confidence scores for each detected object</span></li>
+      <li class="open"><span class="jv-box"></span><span>Filter transient false-positive detections with adaptive confidence thresholding</span></li>
+      <li class="open"><span class="jv-box"></span><span>Separate classification uncertainty from spatial tracking uncertainty in downstream records</span></li>
+    </ul>
+  </div>
+
+  <!-- Target Classes & Scope -->
+  <div class="jv-section-label">Classroom Detection Scope</div>
+  <div class="jv-card">
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead><tr><th>Target Class</th><th>Category</th><th>Detection Challenges</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Chair</td>
+            <td>Furniture (Fixed/Movable)</td>
+            <td>Complex wireframes, overlapping stacks, and varied orientation angles.</td>
+          </tr>
+          <tr>
+            <td>Table / Desk</td>
+            <td>Furniture (Fixed)</td>
+            <td>Large planar surfaces, edge occlusions caused by resting laptops and backpacks.</td>
+          </tr>
+          <tr>
+            <td>Laptop</td>
+            <td>Equipment (Portable)</td>
+            <td>Open vs. closed state geometry differences, screen reflection glares.</td>
+          </tr>
+          <tr>
+            <td>Backpack</td>
+            <td>Personal Asset (Portable)</td>
+            <td>Deformable shape, varied textures and colors, placement on chairs or floor.</td>
+          </tr>
+          <tr>
+            <td>Bottle / Mug</td>
+            <td>Small Object</td>
+            <td>Specular reflections on stainless steel/clear plastic, partial hand occlusions.</td>
+          </tr>
+          <tr>
+            <td>Book / Binder</td>
+            <td>Small Object</td>
+            <td>Flat profiles when lying down, easily confused with paper stacks or laptops.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Dataset & Annotation -->
+  <div class="jv-section-label">Dataset &amp; Evaluation Strategy</div>
+  <div class="jv-card">
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Annotation Split:</strong> Establish a clean 70/15/15 train/validation/test split on high-resolution classroom images.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Data Augmentation:</strong> Apply brightness, contrast jitter, perspective warping, and cut-out transforms to simulate classroom clutter.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Future Extension:</strong> Material classification (wood, metal, polymer, glass) to be integrated as a secondary classifier head once object localization stabilizes.</span></li>
+    </ul>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>
