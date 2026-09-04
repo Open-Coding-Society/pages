@@ -594,6 +594,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
         </div>
     </div>
+
+   <!-- Integra (CSP 26-27) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-03-04-sentri-capstone %}">
+           <img src="/images/capstone/sentri.png" alt="Sentri" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-sentri-capstone %}">Integra</a></h3>
+           <p class="text-sm text-gray-700">An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
+       </div>
+   </div>
    
    <!-- Friends of the Poway Library  (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
