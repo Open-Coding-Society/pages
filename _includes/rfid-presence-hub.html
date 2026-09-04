@@ -18,19 +18,34 @@
     <p class="rp-description">{{ data.Description }}</p>
   </div>
 
-  <div class="rp-section-label">Problem Statement</div>
+  <div class="rp-section-label">Overview</div>
   <div class="rp-card">
-    <p style="font-size:0.95rem;line-height:1.75;color:var(--rp-text-muted);margin:0;">
-      Traditional classroom attendance systems typically rely on a single observation or event to determine whether a student is present. However, attendance does not necessarily represent sustained presence or the amount of time a student is available to participate in classroom learning and work. Many factors can affect the amount of time a student spends in the classroom, including tardiness, restroom breaks, counseling visits, excused absences, and other departures.
-    </p>
-    <p style="font-size:0.95rem;line-height:1.75;color:var(--rp-text-muted);margin:1rem 0 0;">
-      This project investigates how multiple independent presence signals can be correlated with classroom schedules and enrollment data to create a more accurate model of student presence over time. The resulting system will explore whether presence analytics can distinguish between attendance and actual time available for classroom engagement, providing students and educators with meaningful data about an individual's instructional access during the school day.
-    </p>
-  </div>
-
-  <div class="rp-section-label">Research Question</div>
-  <div class="rp-card">
-    <p class="rp-question" style="margin:0;">Can a low-cost Raspberry Pi based UHF RFID system, using tamper-evident computer-mounted tags and doorway detection, reliably establish classroom device presence and contribute to student presence determination when correlated with an existing camera-spatial technology and class registration and bell-schedule data?</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <tbody>
+          <tr>
+            <td>The Problem</td>
+            <td>Attendance rarely reflects sustained presence. Tardiness, restroom breaks, counseling visits, and early departures all get flattened into a single present/absent mark, hiding how much instructional time a student actually gets.</td>
+          </tr>
+          <tr>
+            <td>Our Approach</td>
+            <td>Correlate multiple independent presence signals &mdash; device via RFID, person via camera &mdash; against the bell schedule and per-period enrollment to build a continuous presence model, not just a single daily checkmark.</td>
+          </tr>
+          <tr>
+            <td>Research Question</td>
+            <td>Can a low-cost Raspberry Pi&ndash;based UHF RFID system, using tamper-evident computer-mounted tags and doorway detection, reliably establish classroom device presence and contribute to student presence determination when correlated with an existing camera-spatial technology and class registration/bell-schedule data?</td>
+          </tr>
+          <tr>
+            <td>Current Phase</td>
+            <td>Phase&nbsp;1 &mdash; contact-tap prototype, working end to end. See <a href="/capstone/rfid-presence/phases/" style="color:var(--rp-accent);">Phases</a> for the full roadmap.</td>
+          </tr>
+          <tr>
+            <td>Signals Correlated</td>
+            <td>RFID (device presence) + Camera (person identity), reconciled against Bell Schedule (attendance window) and Registration (per-period roster).</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="rp-section-label">System Architecture</div>
