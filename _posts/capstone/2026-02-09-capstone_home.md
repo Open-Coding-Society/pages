@@ -88,7 +88,8 @@ sticky_rank: 1
      <span class="mr-2">🎮</span>Games Directory
    </a>
    <select id="year-select" class="ml-4 px-2 py-1 rounded border border-gray-300 bg-white text-sm">
-     <option value="2025-2026" selected>2025/2026</option>
+     <option value="2026-202y" selected>2026/2027</option>
+     <option value="2025-2026">2025/2026</option>
    </select>
  </div>
  <div class="flex flex-col items-start sm:items-end">
