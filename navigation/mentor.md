@@ -5,6 +5,7 @@ permalink: /mentor
 search_exclude: true
 show_reading_time: false
 menu: nav/homejava.html
+microblog: True
 ---
 
 <!-- The nav comes from the `menu:` front matter above, which _layouts/post.html renders.
