@@ -81,6 +81,7 @@ sticky_rank: 1
    <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
    <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
    <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
+  <button id="show-csh" class="px-3 py-1 bg-blue-200 rounded mr-2">CSH</button>
    <a href="{% post_url 2026-06-01-README-capstone %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
      <span class="mr-2">📄</span>README
    </a>
@@ -88,7 +89,7 @@ sticky_rank: 1
      <span class="mr-2">🎮</span>Games Directory
    </a>
    <select id="year-select" class="ml-4 px-2 py-1 rounded border border-gray-300 bg-white text-sm">
-     <option value="2026-202y" selected>2026/2027</option>
+     <option value="2026-2027" selected>2026/2027</option>
      <option value="2025-2026">2025/2026</option>
    </select>
  </div>
@@ -118,6 +119,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const status = document.getElementById('search-status');
   let currentType = 'all';
   let currentQuery = '';
+  const yearSelect = document.getElementById('year-select');
+  let currentYear = yearSelect ? yearSelect.value : '';
 
   const linkMap = {
     "Oasis": {
@@ -169,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function normalize(text){ return text.toLowerCase().trim(); }
   function matchesType(card){ return currentType === 'all' || card.classList.contains(currentType); }
+  function matchesYear(card){ return !currentYear || (card.dataset.year || '2025-2026') === currentYear; }
   function matchesSearch(card){
     const text = normalize(card.textContent);
     return !currentQuery || text.includes(currentQuery);
@@ -191,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function applyFilters(){
     let count = 0;
     cards.forEach(card=>{
-      const visible = matchesType(card) && matchesSearch(card);
+      const visible = matchesType(card) && matchesSearch(card) && matchesYear(card);
       card.style.display = visible ? '' : 'none';
       if(visible) count++;
     });
@@ -204,6 +208,11 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('show-all')?.addEventListener('click', ()=> setTypeFilter('all'));
   document.getElementById('show-csa')?.addEventListener('click', ()=> setTypeFilter('CSA'));
   document.getElementById('show-csp')?.addEventListener('click', ()=> setTypeFilter('CSP'));
+  document.getElementById('show-csh')?.addEventListener('click', ()=> setTypeFilter('CSH'));
+  yearSelect?.addEventListener('change', event=>{
+    currentYear = event.target.value;
+    applyFilters();
+  });
   function closeAllPopups(){
     document.querySelectorAll('.capstone-popup').forEach(el=>el.classList.add('hidden'));
   }
@@ -305,6 +314,19 @@ document.addEventListener('DOMContentLoaded', function(){
 Below are the capstone infographic pages created by student groups. Click an image or title to open the full infographic and project page.
 
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
+
+
+   <!-- RFID + Camera-Correlated Classroom Presence -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
+     <a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">
+       <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">RFID</div>
+     </a>
+     <div>
+       <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">RFID + Camera-Correlated Classroom Presence</a></h3>
+       <p class="text-sm text-gray-700">A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.</p>
+       <p class="text-xs text-gray-500 mt-2">Team: Ruta Sirdeshmukh, Vibha Mandayam, Kush Shah</p>
+     </div>
+   </div>
 
 
    <!-- Big Six & Code Hub -->
@@ -705,7 +727,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- OCS Assignment Tracker (CSA) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
            <img src="/images/backendboyzgcpiccc.png" alt="Backend Boyz - OCS Assignment Tracker" class="w-28 h-28 object-cover rounded" />
        </a>
@@ -717,7 +739,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
    <!-- OCS Security (CSA) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-cccs-security %}">
            <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="w-28 h-28 object-cover rounded" />
        </a>
