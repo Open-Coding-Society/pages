@@ -1,0 +1,95 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Research Area 1 · Hardware &amp; Acquisition</div>
+    <h1 class="jv-page-title">Research 1: Camera Setup &amp; Hardware Pipeline</h1>
+    <p class="jv-description">Investigating multi-viewpoint optical coverage, synchronized frame capture, network transfer across Linux host nodes, and hardware bill of materials.</p>
+  </div>
+
+  <!-- Research Question -->
+  <div class="jv-section-label">Research Question 1</div>
+  <div class="jv-card">
+    <p class="jv-question">How reliably can timestamped frames from opposing viewpoints across two networked Linux nodes be synchronized and transferred at configurable intervals without frame drops, latency spikes, or timestamp drift?</p>
+    <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span>Capture timestamped still frames from the primary Logitech BRIO camera via FFmpeg at a 10-second interval</span></li>
+      <li class="open"><span class="jv-box"></span><span>Receive frames from a secondary camera on the opposite wall transferred over SSH/Tailscale from a second Linux computer</span></li>
+      <li class="open"><span class="jv-box"></span><span>Preserve original timestamped raw captures in a local storage archive for downstream evaluation and replay</span></li>
+      <li class="open"><span class="jv-box"></span><span>Maintain frame timestamp synchronization within ±500ms between opposite viewpoint nodes</span></li>
+      <li class="open"><span class="jv-box"></span><span>Ensure continuous remote diagnostics and camera device monitoring without interrupting live capture</span></li>
+    </ul>
+  </div>
+
+  <!-- Hardware / BOM -->
+  <div class="jv-section-label">Bill of Materials &amp; Hardware Status</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">The current testbed uses one Logitech BRIO connected to a primary Linux machine. The target multi-view setup introduces a second camera node.</p>
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead><tr><th>Item</th><th>Status</th><th>Purpose / Notes</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Logitech BRIO 4K webcam</td>
+            <td><span class="jv-pill jv-pill-good">CURRENT</span></td>
+            <td>Primary classroom camera; accessible on Linux through <span class="jv-code">/dev/video*</span> and validated with FFmpeg/ffplay.</td>
+          </tr>
+          <tr>
+            <td>Main Linux computer</td>
+            <td><span class="jv-pill jv-pill-good">CURRENT</span></td>
+            <td>Captures primary stream, stores centralized frame archive, and executes the Python processing pipeline.</td>
+          </tr>
+          <tr>
+            <td>Second Logitech BRIO camera</td>
+            <td><span class="jv-pill jv-pill-warn">PLANNED</span></td>
+            <td>Opposite-side viewpoint to eliminate occlusion zones and evaluate multi-camera triangulation.</td>
+          </tr>
+          <tr>
+            <td>Second Linux capture computer</td>
+            <td><span class="jv-pill jv-pill-warn">PLANNED</span></td>
+            <td>Dedicated secondary edge node for remote camera ingest and automated frame transmission.</td>
+          </tr>
+          <tr>
+            <td>Camera mounts &amp; rigging</td>
+            <td><span class="jv-pill jv-pill-warn">PLANNED</span></td>
+            <td>Elevated wall mounts to stabilize perspective angles for consistent spatial calibration.</td>
+          </tr>
+          <tr>
+            <td>Active USB 3.0 extension cabling</td>
+            <td><span class="jv-pill jv-pill-warn">AS NEEDED</span></td>
+            <td>Maintains signal integrity over extended cable lengths from elevated mounting positions to host machines.</td>
+          </tr>
+          <tr>
+            <td>Tailscale / Local mesh connection</td>
+            <td><span class="jv-pill jv-pill-good">TESTED</span></td>
+            <td>Secure inter-node peer communication and remote monitoring across isolated subnets.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="jv-callout jv-callout-note">
+      <span><strong style="color:var(--jv-text);">Camera Placement Rationale:</strong> Mounting two cameras on opposing diagonal corners maximizes surface visibility across desks while providing redundant observations when students or chairs block a single line of sight.</span>
+    </div>
+  </div>
+
+  <!-- Dependencies & Open Issues -->
+  <div class="jv-section-label">Open Issues &amp; Next Milestones</div>
+  <div class="jv-card">
+    <ul class="jv-checklist">
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Mounting &amp; Calibration:</strong> Finalize non-invasive mounting fixtures and measure lens distortion across wide-angle FOV settings.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Lighting Variations:</strong> Evaluate sensor auto-exposure adjustments during morning sunlight vs. artificial overhead fluorescent lighting.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Storage Retention:</strong> Establish automated rolling pruning policies for raw frame archives to prevent disk exhaustion.</span></li>
+    </ul>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>
