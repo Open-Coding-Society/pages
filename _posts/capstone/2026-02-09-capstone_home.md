@@ -388,7 +388,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
          <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">OCS Intelligence: Agentic Inference Infrastructure</a></h3>
-         <p class="text-sm text-gray-700">A shared open-weight LLM inference service that gives OCS students access to capable AI development tools without requiring paid subscriptions.</p>
+         <p class="text-sm text-gray-700">A shared open-weight LLM inference service that gives OCS students access to capable engineering and development tools without requiring paid subscriptions.</p>
          <p class="text-xs text-gray-500 mt-2">Team: Nikhil Maturi, Adi Katre, Mihir Bapat, Yash Parikh, Anvay Vahia, Yash Patil</p>
        </div>
      </div>
