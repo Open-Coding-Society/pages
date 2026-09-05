@@ -401,7 +401,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
          <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-toolchain-trail %}">Toolchain Trail</a></h3>
-         <p class="text-sm text-gray-700">Toolchain Trail is the second level of the project and builds upon the foundation established in Level 1, Identity Forge. Its purpose is to guide students through setting up and verifying a complete development environment across macOS, Windows/WSL, and Linux.</p>
+         <p class="text-sm text-gray-700">{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
 
