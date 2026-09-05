@@ -24,6 +24,12 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
+    {% if page.microblog %}
+      <div class="micro-actions-wrapper">
+        {% include microblog_foundation.html %}
+      </div>
+    {% endif %}
+
     <div class="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased mt-[53px] theme-inner">
 
         <!-- Sidebar -->
