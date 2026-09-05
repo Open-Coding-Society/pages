@@ -480,11 +480,13 @@ bundle-install:
 	fi
 
 # Start Jekyll server (no auto-watch, we control rebuilds manually)
-# Supports optional _config.local.yml override for local settings (e.g. baseurl)
+# Supports optional _config.local.yml override for local settings (e.g. baseurl,
+# google_client_id -- see scripts/generate_local_config_override.sh and .env.example)
 jekyll-serve: bundle-install
 	@touch /tmp/.notebook_watch_marker
 	@rm -f /tmp/.jekyll_rebuild_trigger
-	bundle exec jekyll serve -H $(HOST) -P $(PORT) --no-watch > $(LOG_FILE) 2>&1 &
+	@./scripts/generate_local_config_override.sh
+	bundle exec jekyll serve -H $(HOST) -P $(PORT) --no-watch --config _config.yml,_config.local.yml > $(LOG_FILE) 2>&1 &
 	@make wait-for-server
 
 # Common server wait logic
