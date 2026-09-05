@@ -47,7 +47,7 @@
   <div class="jv-section-label">Problem Statement</div>
   <div class="jv-card">
     <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
-      Managing and tracking classroom equipment, furniture arrangements, and shared physical assets in real-time is often manual, error-prone, and disconnected from active learning environments. Traditional computer vision applications in schools frequently focus on intrusive biometric identity scanning rather than ambient physical space awareness.
+      Physical environments contain both persistent objects and dynamic objects whose expected presence changes over time. Some objects are expected to remain consistently present, while others are expected to appear, move, and leave according to schedules and planned activities. Reliably maintaining an understanding of an environment therefore requires more than detecting what is currently visible; a system must establish expectations about what should be present at a given time, compare those expectations with observed conditions, and identify meaningful changes in presence and location over time. 
     </p>
     <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:1rem 0 0;">
       Jarvis addresses this challenge by deploying a privacy-respecting, multi-camera spatial perception pipeline. By combining high-definition periodic frame captures, YOLO-based bounding box detection, and SAM 3 pixel-level segmentation, the system maintains a persistent spatial model of the classroom without biometric identification.
@@ -57,7 +57,7 @@
   <!-- Core Research Question -->
   <div class="jv-section-label">Core Research Question</div>
   <div class="jv-card">
-    <p class="jv-question">Can Jarvis use a low-cost, multi-camera computer-vision pipeline—combining timestamped classroom images, YOLO object recognition, and SAM 3 segmentation—to reliably identify classroom objects, determine where they are located, and track meaningful changes over time, while establishing a foundation for later material recognition?</p>
+    <p class="jv-question">Can a low-cost, multi-camera computer-vision system, using timestamped observations, object recognition, segmentation, temporal tracking, and classroom schedule data, reliably maintain a time-aware classroom model by determining whether expected fixed objects, people, and dynamic equipment are present and by detecting meaningful changes in their locations over time?</p>
   </div>
 
   <!-- Hub Navigation Grid -->
