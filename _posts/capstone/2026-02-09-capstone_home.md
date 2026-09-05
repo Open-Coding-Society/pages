@@ -329,6 +329,19 @@ Below are the capstone infographic pages created by student groups. Click an ima
    </div>
 
 
+     <!-- Jarvis Classroom Object Detection -->
+     <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
+       <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
+         <img src="{{ '/images/' | append: site.data.jarvis_infograph.Image | relative_url }}" alt="{{ site.data.jarvis_infograph.Title }}" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">{{ site.data.jarvis_infograph.Title }}</a></h3>
+         <p class="text-sm text-gray-700">{{ site.data.jarvis_infograph.Description }}</p>
+         <p class="text-xs text-gray-500 mt-2">Team: {{ site.data.jarvis_infograph.Team | join: ", " }}</p>
+       </div>
+     </div>
+
+
    <!-- Big Six & Code Hub -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url capstone/2026-03-04-big6-capstone %}">
@@ -366,6 +379,19 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Nithika Vivek, Eshika Pallpotu, Saanvi Dogra</p>
        </div>
    </div>
+
+
+     <!-- OCS Intelligence -->
+     <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">
+         <img src="/images/capstone/ocs-intelligence.png" alt="OCS Intelligence - Shared AI Infrastructure for Students" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">OCS Intelligence</a></h3>
+         <p class="text-sm text-gray-700">A shared open-weight LLM inference service that gives OCS students access to capable AI development tools without requiring paid subscriptions.</p>
+         <p class="text-xs text-gray-500 mt-2">Team: Nikhil Maturi, Adi Katre, Mihir Bapat, Yash Parikh, Anvay Vahia, Yash Patil</p>
+       </div>
+     </div>
 
 
    <!-- Hunger Heroes -->
