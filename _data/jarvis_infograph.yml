@@ -1,6 +1,6 @@
 # Jarvis Classroom Object Understanding — Infographic
-Title: "Camera Setup & Object Detection"
-Description: "A time-aware camera system that detects and tracks expected fixed and dynamic objects in the classroom based on scheduled activities"
+Title: "Jarvis3000"
+Description: "A system that captures live classroom footage and object & segmentation detection to identify and track people and hardware"
 Image: "capstone/jarvis.jpg"
 
 Team:
