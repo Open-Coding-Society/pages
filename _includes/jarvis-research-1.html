@@ -22,7 +22,7 @@
     <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
     <ul class="jv-checklist">
       <li class="open"><span class="jv-box"></span><span>Capture timestamped still frames from the primary Logitech BRIO camera via FFmpeg at a 10-second interval</span></li>
-      <li class="open"><span class="jv-box"></span><span>Receive frames from a secondary camera on the opposite wall transferred over SSH/Tailscale from a second Linux computer</span></li>
+      <li class="open"><span class="jv-box"></span><span>Receive frames from a secondary camera on the opposite wall transferred over SSH/NetBird from a second Linux computer</span></li>
       <li class="open"><span class="jv-box"></span><span>Preserve original timestamped raw captures in a local storage archive for downstream evaluation and replay</span></li>
       <li class="open"><span class="jv-box"></span><span>Maintain frame timestamp synchronization within ±500ms between opposite viewpoint nodes</span></li>
       <li class="open"><span class="jv-box"></span><span>Ensure continuous remote diagnostics and camera device monitoring without interrupting live capture</span></li>
@@ -68,7 +68,7 @@
             <td>Maintains signal integrity over extended cable lengths from elevated mounting positions to host machines.</td>
           </tr>
           <tr>
-            <td>Tailscale / Local mesh connection</td>
+            <td>NetBird / Local mesh connection</td>
             <td><span class="jv-pill jv-pill-good">TESTED</span></td>
             <td>Secure inter-node peer communication and remote monitoring across isolated subnets.</td>
           </tr>
