@@ -64,27 +64,6 @@ Identity + location + history"]</pre>
     </div>
   </div>
 
-  <!-- Object state model -->
-  <div class="jv-section-label">Object Observation State Model</div>
-  <div class="jv-card">
-    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Jarvis converts raw detections into stable states so that a single uncertain frame does not create a false report:</p>
-    <div class="jv-table-wrap">
-      <table class="jv-table">
-        <thead><tr><th>State</th><th>Evidence</th><th>Meaning</th></tr></thead>
-        <tbody>
-          <tr><td><span class="jv-pill jv-pill-neutral">CANDIDATE</span></td><td>One new detection</td><td>Possible object awaiting confirmation from another frame or camera</td></tr>
-          <tr><td><span class="jv-pill jv-pill-good">CONFIRMED</span></td><td>Repeated compatible detections</td><td>Object is accepted into the current room model</td></tr>
-          <tr><td><span class="jv-pill jv-pill-good">CONTINUING</span></td><td>Class and position remain compatible</td><td>The same tracked object is still present</td></tr>
-          <tr><td><span class="jv-pill jv-pill-warn">MOVED</span></td><td>Same object class and track, significantly different location</td><td>Jarvis records a location-change event</td></tr>
-          <tr><td><span class="jv-pill jv-pill-warn">UNCERTAIN</span></td><td>Low confidence or conflicting class predictions</td><td>Observation is saved but does not immediately overwrite a confirmed label</td></tr>
-          <tr><td><span class="jv-pill jv-pill-neutral">OCCLUDED</span></td><td>Temporarily missing from one view but supported by recent history or another camera</td><td>Object remains in the room model during a short evidence gap</td></tr>
-          <tr><td><span class="jv-pill jv-pill-bad">MISSING</span></td><td>Absent across enough consecutive observations</td><td>Previously confirmed object is treated as removed or no longer visible</td></tr>
-          <tr><td><span class="jv-pill jv-pill-warn">CAMERA_CONFLICT</span></td><td>Camera observations cannot be matched consistently</td><td>Flag for review instead of counting two views as two separate objects</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
   <!-- Detection and tracking lifecycle -->
   <div class="jv-section-label">Detection &amp; Tracking Lifecycle</div>
   <div class="jv-card">
@@ -120,24 +99,67 @@ and observation record"]
   <!-- Design decisions -->
   <div class="jv-section-label">Design Decisions &amp; Rationale</div>
   <div class="jv-card">
-    <div class="jv-table-wrap">
-      <table class="jv-table">
-        <thead><tr><th>Design feature</th><th>Why</th></tr></thead>
-        <tbody>
-          <tr><td>Use <strong>two cameras on opposite sides</strong> of the room</td><td>A second viewpoint reduces blind spots and gives Jarvis another observation when an object is blocked or unclear in one camera.</td></tr>
-          <tr><td>Capture <strong>timestamped still images</strong> instead of processing continuous 4K video</td><td>Periodic frames reduce storage and CPU demand while preserving the time information needed to compare changes.</td></tr>
-          <tr><td>Begin at a <strong>10-second capture interval</strong></td><td>This is frequent enough for initial room-change experiments and can be adjusted after measuring processing time and missed events.</td></tr>
-          <tr><td>Use <strong>YOLO for object recognition first</strong></td><td>The first version focuses on reliable object classes, bounding boxes, and confidence scores. Material recognition remains a later extension after the object pipeline works.</td></tr>
-          <tr><td>Start with <strong>six core classroom classes</strong></td><td>Chair, table/desk, laptop, backpack, bottle, and book provide a manageable first dataset while testing fixed furniture, portable equipment, and small objects.</td></tr>
-          <tr><td>Use <strong>SAM 3 for segmentation</strong></td><td>SAM 3 supplies precise object masks, separating the pixels belonging to an object from its background; it does not replace the recognition model.</td></tr>
-          <tr><td>Defer <strong>material classification</strong></td><td>Material labels such as wood, metal, plastic, glass, and fabric require separate training or classification work and are outside the first implementation milestone.</td></tr>
-          <tr><td>Use <strong>OpenCV for image handling</strong></td><td>OpenCV can load frames, resize or normalize them, crop detected regions, draw results, compare frames, and save processed outputs.</td></tr>
-          <tr><td>Keep <strong>recognition confidence</strong> separate from tracking confidence</td><td>Jarvis may be confident that an object persisted across frames even when its exact class is uncertain, or vice versa.</td></tr>
-          <tr><td>Require <strong>multiple observations</strong> before declaring a change</td><td>A single missed detection should not immediately cause Jarvis to report that an object disappeared or moved.</td></tr>
-          <tr><td>Use an <strong>80% first-prototype success threshold</strong></td><td>Jarvis must correctly classify at least 80% of objects and correctly determine at least 80% of tested object states on held-out, manually labeled scenes.</td></tr>
-          <tr><td>Process on a <strong>main Linux computer</strong></td><td>Central processing keeps the room model and saved results together while a second Linux computer can capture and transfer images from the remote camera.</td></tr>
-        </tbody>
-      </table>
+    <div class="jv-decision-grid">
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">📷</span>
+        <span class="jv-decision-title">Two cameras, opposite sides</span>
+        <p class="jv-decision-why">Fewer blind spots, backup view.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🖼️</span>
+        <span class="jv-decision-title">Still frames, not video</span>
+        <p class="jv-decision-why">Less storage and CPU load.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">⏱️</span>
+        <span class="jv-decision-title">10-second interval</span>
+        <p class="jv-decision-why">Frequent enough, easy to tune.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🎯</span>
+        <span class="jv-decision-title">YOLO before materials</span>
+        <p class="jv-decision-why">Objects first, materials later.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🪑</span>
+        <span class="jv-decision-title">Six core classes</span>
+        <p class="jv-decision-why">Small, manageable first dataset.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">✂️</span>
+        <span class="jv-decision-title">SAM 3 for masks</span>
+        <p class="jv-decision-why">Precise pixels, not new labels.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🧵</span>
+        <span class="jv-decision-title">Material ID deferred</span>
+        <p class="jv-decision-why">Separate task, later milestone.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🧰</span>
+        <span class="jv-decision-title">OpenCV pipeline</span>
+        <p class="jv-decision-why">Load, crop, compare, save frames.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🎚️</span>
+        <span class="jv-decision-title">Class confidence ≠ track confidence</span>
+        <p class="jv-decision-why">Doubt in one doesn't mean doubt in the other.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🔁</span>
+        <span class="jv-decision-title">Multiple observations required</span>
+        <p class="jv-decision-why">One miss doesn't mean a change.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">✅</span>
+        <span class="jv-decision-title">80% success threshold</span>
+        <p class="jv-decision-why">Clear, testable bar for v1.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🖥️</span>
+        <span class="jv-decision-title">Central processing</span>
+        <p class="jv-decision-why">One machine, one room model.</p>
+      </div>
     </div>
   </div>
 
@@ -160,6 +182,119 @@ and observation record"]
     </div>
     <div class="jv-callout jv-callout-note">
       <span>A generic person mask may explain why a previously confirmed object is temporarily invisible. In that case, Jarvis should prefer <span class="jv-code">OCCLUDED</span> over immediately changing the object to <span class="jv-code">MISSING</span>.</span>
+    </div>
+  </div>
+
+  <!-- People Occupancy Tracking -->
+  <div class="jv-section-label">People Occupancy Tracking</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Generic <span class="jv-code">person</span> detections are counted, not identified, to produce a room occupancy number and flag presence at unexpected hours.</p>
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    A["Person detections
+per camera, per frame"] --> B["De-duplicate across
+overlapping views"]
+    B --> C["Room occupancy
+count"]
+    C --> D{"Matches bell
+schedule?"}
+    D -->|Yes| E["Normal presence"]
+    D -->|No| F["Flag odd-hour
+occupancy"]</pre>
+    </div>
+    <div class="jv-diagram" style="margin-top:1rem;">
+      <div class="jv-occupancy-chart">
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">0</span><div class="jv-occupancy-bar-fill" style="height:1%;"></div><span class="jv-occupancy-bar-label">8a</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">32</span><div class="jv-occupancy-bar-fill" style="height:80%;"></div><span class="jv-occupancy-bar-label">9a</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">38</span><div class="jv-occupancy-bar-fill" style="height:95%;"></div><span class="jv-occupancy-bar-label">11a</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">40</span><div class="jv-occupancy-bar-fill" style="height:100%;"></div><span class="jv-occupancy-bar-label">1p</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">34</span><div class="jv-occupancy-bar-fill" style="height:85%;"></div><span class="jv-occupancy-bar-label">3p</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">30</span><div class="jv-occupancy-bar-fill" style="height:75%;"></div><span class="jv-occupancy-bar-label">3:35p</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">4</span><div class="jv-occupancy-bar-fill" style="height:10%;background:var(--jv-amber);"></div><span class="jv-occupancy-bar-label">4p</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">2</span><div class="jv-occupancy-bar-fill" style="height:5%;background:var(--jv-amber);"></div><span class="jv-occupancy-bar-label">6p</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">1</span><div class="jv-occupancy-bar-fill" style="height:3%;background:var(--jv-amber);"></div><span class="jv-occupancy-bar-label">8p</span></div>
+        <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">0</span><div class="jv-occupancy-bar-fill" style="height:1%;background:var(--jv-red);"></div><span class="jv-occupancy-bar-label">9p+</span></div>
+      </div>
+    </div>
+    <div class="jv-callout jv-callout-note">
+      <span>Counts only, no identity &mdash; consistent with the privacy design above.</span>
+    </div>
+  </div>
+
+  <!-- Hardware / Bill of Materials -->
+  <div class="jv-section-label">Hardware / Bill of Materials</div>
+  <div class="jv-card">
+    <div class="jv-bom-grid">
+      <div class="jv-bom-card">
+        <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/brio-webcam.png" alt="Logitech BRIO webcam"></div>
+        <span class="jv-bom-title">Logitech BRIO 4K webcam</span>
+        <div class="jv-bom-meta"><span class="jv-pill jv-pill-good">CURRENT</span><span class="jv-bom-cost">Owned</span></div>
+        <p class="jv-bom-note">Primary classroom camera.</p>
+      </div>
+      <div class="jv-bom-card">
+        <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/linux-computer.png" alt="Linux mini PC"></div>
+        <span class="jv-bom-title">Main Linux computer</span>
+        <div class="jv-bom-meta"><span class="jv-pill jv-pill-good">CURRENT</span><span class="jv-bom-cost">Owned</span></div>
+        <p class="jv-bom-note">Runs capture + YOLO/SAM 3.</p>
+      </div>
+      <div class="jv-bom-card">
+        <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/brio-webcam.png" alt="Second Logitech BRIO webcam"></div>
+        <span class="jv-bom-title">Second BRIO camera</span>
+        <div class="jv-bom-meta"><span class="jv-pill jv-pill-warn">PLANNED</span><span class="jv-bom-cost">~$199</span></div>
+        <p class="jv-bom-note">Opposite-side viewpoint.</p>
+      </div>
+      <div class="jv-bom-card">
+        <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/linux-computer.png" alt="Second Linux mini PC"></div>
+        <span class="jv-bom-title">Second Linux computer</span>
+        <div class="jv-bom-meta"><span class="jv-pill jv-pill-warn">PLANNED</span><span class="jv-bom-cost">TBD</span></div>
+        <p class="jv-bom-note">Captures + transfers 2nd feed.</p>
+      </div>
+      <div class="jv-bom-card">
+        <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/camera-mount.jpg" alt="Camera mount"></div>
+        <span class="jv-bom-title">Camera mounts</span>
+        <div class="jv-bom-meta"><span class="jv-pill jv-pill-warn">PLANNED</span><span class="jv-bom-cost">~$15&ndash;25 ea</span></div>
+        <p class="jv-bom-note">Stable elevated placement.</p>
+      </div>
+      <div class="jv-bom-card">
+        <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/usb-cable.jpg" alt="USB extension cable"></div>
+        <span class="jv-bom-title">USB extension cable</span>
+        <div class="jv-bom-meta"><span class="jv-pill jv-pill-neutral">AS NEEDED</span><span class="jv-bom-cost">~$10&ndash;20</span></div>
+        <p class="jv-bom-note">Reaches elevated mounts.</p>
+      </div>
+      <div class="jv-bom-card">
+        <div class="jv-bom-thumb"><img src="/images/capstone/jarvis-bom/tailscale-logo.svg" alt="Tailscale logo"></div>
+        <span class="jv-bom-title">Tailscale / network</span>
+        <div class="jv-bom-meta"><span class="jv-pill jv-pill-good">TESTED</span><span class="jv-bom-cost">Free tier</span></div>
+        <p class="jv-bom-note">Cross-network SSH + transfer.</p>
+      </div>
+    </div>
+    <div class="jv-callout jv-callout-note">
+      <span>Costs are rough estimates; camera mount and Linux computer photos are representative, not the exact model.</span>
+    </div>
+    <div class="jv-callout jv-callout-open">
+      <span><strong style="color:var(--jv-text);">Open problem:</strong> camera height, angle, overlap, and cable routing still need on-site testing.</span>
+    </div>
+  </div>
+
+  <!-- In-Depth Timeline -->
+  <div class="jv-section-label">In-Depth Timeline</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Build schedule through end of November. First two weeks are camera research only, no recognition work.</p>
+    <div class="jv-timeline-bar">
+      <div class="jv-timeline-seg" style="flex:14 1 0%;background:var(--jv-accent);">Phase 1</div>
+      <div class="jv-timeline-seg" style="flex:49 1 0%;background:var(--jv-amber);">Phase 2</div>
+      <div class="jv-timeline-seg" style="flex:23 1 0%;background:var(--jv-purple);">Phase 3</div>
+    </div>
+    <div class="jv-timeline-dates">
+      <span>Sep 5</span><span>Sep 19</span><span>Nov 7</span><span>Nov 30</span>
+    </div>
+    <div class="jv-timeline-legend">
+      <div class="jv-timeline-legend-item"><span class="jv-timeline-legend-dot" style="background:var(--jv-accent);"></span>Phase 1 &middot; Camera research</div>
+      <div class="jv-timeline-legend-item"><span class="jv-timeline-legend-dot" style="background:var(--jv-amber);"></span>Phase 2 &middot; Recognition &amp; segmentation</div>
+      <div class="jv-timeline-legend-item"><span class="jv-timeline-legend-dot" style="background:var(--jv-purple);"></span>Phase 3 &middot; Tracking &amp; room model</div>
+    </div>
+    <div class="jv-callout jv-callout-note">
+      <span>Dates track the <a href="/capstone/jarvis/" style="color:var(--jv-accent);">Project Phases</a> on the Overview tab and may shift with CPU benchmarking results.</span>
     </div>
   </div>
 

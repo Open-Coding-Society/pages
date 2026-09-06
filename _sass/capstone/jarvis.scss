@@ -326,6 +326,169 @@
 
 .jv-diagram .mermaid { display: flex; justify-content: center; }
 
+/* ── Flow node photo (real hardware images inside a jv-flow node) ── */
+.jv-flow-node-photo {
+  width: 64px;
+  height: 64px;
+  border-radius: 0.5rem;
+  background: #f4f4f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.jv-flow-node-photo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  padding: 0.3rem;
+}
+
+.jv-flow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.jv-flow-row + .jv-flow-row { margin-top: 0.5rem; }
+
+.jv-flow-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--jv-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin: 0.35rem 0;
+}
+
+/* ── Decision Cards (icon + short why, replaces long tables) ── */
+.jv-decision-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.jv-decision-card {
+  background: var(--jv-tag);
+  border: 1px solid var(--jv-card-border);
+  border-radius: 0.65rem;
+  padding: 0.85rem 1rem;
+}
+
+.jv-decision-icon { font-size: 1.3rem; display: block; margin-bottom: 0.4rem; }
+
+.jv-decision-title {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--jv-text);
+  margin-bottom: 0.25rem;
+  line-height: 1.35;
+}
+
+.jv-decision-why {
+  font-size: 0.78rem;
+  color: var(--jv-text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── Segmented Timeline Bar (replaces mermaid gantt) ── */
+.jv-timeline-bar {
+  display: flex;
+  height: 44px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--jv-card-border);
+}
+
+.jv-timeline-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 0.4rem;
+}
+
+.jv-timeline-dates {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: var(--jv-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 0.4rem;
+}
+
+.jv-timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.jv-timeline-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--jv-text-muted);
+}
+
+.jv-timeline-legend-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* ── Occupancy Bar Chart (replaces mermaid xychart-beta) ── */
+.jv-occupancy-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 140px;
+  padding: 0 0.25rem;
+}
+
+.jv-occupancy-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 0.35rem;
+}
+
+.jv-occupancy-bar-value {
+  font-size: 0.62rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--jv-text-muted);
+}
+
+.jv-occupancy-bar-fill {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: var(--jv-accent);
+}
+
+.jv-occupancy-bar-label {
+  font-size: 0.62rem;
+  color: var(--jv-text-muted);
+  white-space: nowrap;
+}
+
 /* ── Callouts ── */
 .jv-callout {
   padding: 0.9rem 1.1rem;
@@ -417,6 +580,68 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--jv-accent);
+}
+
+/* ── Bill of Materials (image cards) ── */
+.jv-bom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.jv-bom-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--jv-tag);
+  border: 1px solid var(--jv-card-border);
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+}
+
+.jv-bom-thumb {
+  height: 110px;
+  background: #f4f4f5;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.jv-bom-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  padding: 0.6rem;
+}
+
+.jv-bom-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--jv-text);
+  line-height: 1.3;
+}
+
+.jv-bom-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.jv-bom-cost {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--jv-text-muted);
+}
+
+.jv-bom-note {
+  font-size: 0.78rem;
+  color: var(--jv-text-muted);
+  line-height: 1.45;
+  margin: 0;
 }
 
 /* ── Footer ── */
