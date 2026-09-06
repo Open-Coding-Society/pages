@@ -51,6 +51,30 @@
     </p>
   </div>
 
+  
+  <!-- System architecture -->
+  <div class="jv-section-label">System Architecture</div>
+  <div class="jv-card">
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    C1["Camera 1
+Main Linux computer"] --> CAP["FFmpeg capture
+Timestamped frame"]
+    C2["Camera 2
+Second Linux computer"] --> TX["Secure transfer
+SSH / Tailscale"]
+    TX --> CAP
+    CAP --> CV["OpenCV
+Load and preprocess"]
+    CV --> SAM["SAM 3
+Pixel-level object mask"]
+    SAM --> FUSE["Multi-camera matching
+and temporal tracking"]
+    FUSE --> ROOM["Room model
+Identity + location + history"]</pre>
+    </div>
+  </div>
+
   <!-- Core Research Question -->
   <div class="jv-section-label">Core Research Question</div>
   <div class="jv-card">
@@ -141,8 +165,8 @@ Nov 2026"]
   <div class="jv-hub-grid">
     <a href="/capstone/jarvis/technical/" class="jv-hub-card">
       <span class="jv-hub-card-title">Technical Detail &amp; Flow</span>
-      <span class="jv-hub-card-desc">Full system architecture, capture and processing loops, observation state machine, data models, and privacy design.</span>
-      <span class="jv-hub-card-arrow">View Technical Architecture</span>
+      <span class="jv-hub-card-desc">Capture and processing loops, observation state machine, data models, and privacy design.</span>
+      <span class="jv-hub-card-arrow">View Technical Detail</span>
     </a>
     <a href="/capstone/jarvis/research-1/" class="jv-hub-card">
       <span class="jv-hub-card-title">Research 1: Camera &amp; Hardware</span>
