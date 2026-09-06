@@ -10,74 +10,64 @@
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Research Area 2 · Object Detection</div>
-    <h1 class="jv-page-title">Research 2: YOLO Object Recognition</h1>
-    <p class="jv-description">Evaluating bounding-box object classification, confidence estimation, classroom dataset curation, and baseline detection accuracy.</p>
+    <div class="jv-badge">Research Area 2 · Instance Segmentation</div>
+    <h1 class="jv-page-title">Research 2: SAM 3 Segmentation</h1>
+    <p class="jv-description">Refining coarse bounding boxes into pixel-accurate segmentation masks, separating foreground objects from cluttered classroom backgrounds.</p>
   </div>
 
   <!-- Research Question -->
   <div class="jv-section-label">Research Question 2</div>
   <div class="jv-card">
-    <p class="jv-question">Can a YOLO-based detector achieve at least 80% classification accuracy on core classroom object classes under varying angles, distances, and ambient lighting conditions?</p>
+    <p class="jv-question">How effectively can SAM 3 convert bounding box detection prompts into precise pixel masks under CPU-bound execution without exceeding the target 10-second processing cycle?</p>
     <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
     <ul class="jv-checklist">
-      <li class="open"><span class="jv-box"></span><span>Train and evaluate YOLO on six core classroom classes: chair, table/desk, laptop, backpack, bottle, and book</span></li>
-      <li class="open"><span class="jv-box"></span><span>Achieve at least 80% precision and recall on a held-out, manually annotated classroom test dataset</span></li>
-      <li class="open"><span class="jv-box"></span><span>Output normalized bounding box coordinates and calibrated confidence scores for each detected object</span></li>
-      <li class="open"><span class="jv-box"></span><span>Filter transient false-positive detections with adaptive confidence thresholding</span></li>
-      <li class="open"><span class="jv-box"></span><span>Separate classification uncertainty from spatial tracking uncertainty in downstream records</span></li>
+      <li class="open"><span class="jv-box"></span><span>Pass YOLO bounding box coordinates as prompt boxes to SAM 3 to generate binary pixel masks</span></li>
+      <li class="open"><span class="jv-box"></span><span>Isolate foreground object boundaries cleanly from complex textured backgrounds (e.g., desk grain, floor tiles)</span></li>
+      <li class="open"><span class="jv-box"></span><span>Produce encoded binary mask representations for lightweight storage and downstream spatial comparison</span></li>
+      <li class="open"><span class="jv-box"></span><span>Benchmark CPU inference time across frame resolutions (720p, 1080p, 4K) to preserve latency bounds</span></li>
+      <li class="open"><span class="jv-box"></span><span>Validate mask stability across sequential captures for stationary classroom furniture</span></li>
     </ul>
   </div>
 
-  <!-- Target Classes & Scope -->
-  <div class="jv-section-label">Classroom Detection Scope</div>
+  <!-- Performance & Compute Analysis -->
+  <div class="jv-section-label">Compute Constraints &amp; Optimization</div>
   <div class="jv-card">
-    <div class="jv-table-wrap">
+    <div class="jv-callout jv-callout-note" style="margin-top:0;">
+      <span><strong style="color:var(--jv-text);">Current Hardware Constraint:</strong> The primary Linux host runs inference on a multi-core CPU without a dedicated NVIDIA GPU. Efficient prompt-based inference and resolution scaling are essential to maintain the 10-second capture loop.</span>
+    </div>
+    <div class="jv-table-wrap" style="margin-top:1rem;">
       <table class="jv-table">
-        <thead><tr><th>Target Class</th><th>Category</th><th>Detection Challenges</th></tr></thead>
+        <thead><tr><th>Resolution Tier</th><th>Inference Latency (Est.)</th><th>Segmentation Fidelity</th><th>Viability</th></tr></thead>
         <tbody>
           <tr>
-            <td>Chair</td>
-            <td>Furniture (Fixed/Movable)</td>
-            <td>Complex wireframes, overlapping stacks, and varied orientation angles.</td>
+            <td>720p (1280×720)</td>
+            <td>1.8s – 2.5s</td>
+            <td>Good for large furniture; minor boundary blur on pens/bottles</td>
+            <td><span class="jv-pill jv-pill-good">RECOMMENDED</span></td>
           </tr>
           <tr>
-            <td>Table / Desk</td>
-            <td>Furniture (Fixed)</td>
-            <td>Large planar surfaces, edge occlusions caused by resting laptops and backpacks.</td>
+            <td>1080p (1920×1080)</td>
+            <td>4.2s – 6.0s</td>
+            <td>High fidelity for all 6 target classes</td>
+            <td><span class="jv-pill jv-pill-good">FEASIBLE</span></td>
           </tr>
           <tr>
-            <td>Laptop</td>
-            <td>Equipment (Portable)</td>
-            <td>Open vs. closed state geometry differences, screen reflection glares.</td>
-          </tr>
-          <tr>
-            <td>Backpack</td>
-            <td>Personal Asset (Portable)</td>
-            <td>Deformable shape, varied textures and colors, placement on chairs or floor.</td>
-          </tr>
-          <tr>
-            <td>Bottle / Mug</td>
-            <td>Small Object</td>
-            <td>Specular reflections on stainless steel/clear plastic, partial hand occlusions.</td>
-          </tr>
-          <tr>
-            <td>Book / Binder</td>
-            <td>Small Object</td>
-            <td>Flat profiles when lying down, easily confused with paper stacks or laptops.</td>
+            <td>4K (3840×2160)</td>
+            <td>14.0s+ (exceeds budget)</td>
+            <td>Pixel-perfect boundaries</td>
+            <td><span class="jv-pill jv-pill-bad">TOO SLOW (CPU)</span></td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Dataset & Annotation -->
-  <div class="jv-section-label">Dataset &amp; Evaluation Strategy</div>
+  <!-- Next Milestones -->
+  <div class="jv-section-label">Open Questions &amp; Next Steps</div>
   <div class="jv-card">
     <ul class="jv-checklist">
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Annotation Split:</strong> Establish a clean 70/15/15 train/validation/test split on high-resolution classroom images.</span></li>
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Data Augmentation:</strong> Apply brightness, contrast jitter, perspective warping, and cut-out transforms to simulate classroom clutter.</span></li>
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Future Extension:</strong> Material classification (wood, metal, polymer, glass) to be integrated as a secondary classifier head once object localization stabilizes.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Quantization &amp; ONNX:</strong> Evaluate int8 quantization or ONNX Runtime CPU acceleration to reduce segmentation latency.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Prompt Refinement:</strong> Add positive/negative centroid point prompts to prevent mask leakage between adjacent desks.</span></li>
     </ul>
   </div>
 
