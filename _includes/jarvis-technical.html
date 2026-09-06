@@ -12,32 +12,7 @@
   <div class="jv-header">
     <div class="jv-badge">Technical Specification · Architecture &amp; Lifecycle</div>
     <h1 class="jv-page-title">Technical Detail &amp; System Flow</h1>
-    <p class="jv-description">In-depth technical architecture, state machines, capture loops, data schemas, and privacy governance models underpinning the Jarvis classroom perception pipeline.</p>
-  </div>
-
-  <!-- System architecture -->
-  <div class="jv-section-label">System Architecture</div>
-  <div class="jv-card">
-    <div class="jv-diagram">
-      <pre class="mermaid" style="margin:0;">flowchart TD
-    C1["Camera 1
-Main Linux computer"] --> CAP["FFmpeg capture
-Timestamped frame"]
-    C2["Camera 2
-Second Linux computer"] --> TX["Secure transfer
-SSH / Tailscale"]
-    TX --> CAP
-    CAP --> CV["OpenCV
-Load and preprocess"]
-    CV --> YOLO["YOLO
-Class + box + confidence"]
-    YOLO --> SAM["SAM 3
-Pixel-level object mask"]
-    SAM --> FUSE["Multi-camera matching
-and temporal tracking"]
-    FUSE --> ROOM["Room model
-Identity + location + history"]</pre>
-    </div>
+    <p class="jv-description">In-depth state machines, capture loops, data schemas, and privacy governance models underpinning the Jarvis classroom perception pipeline.</p>
   </div>
 
   <!-- Capture and processing loop -->
