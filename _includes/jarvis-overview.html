@@ -22,16 +22,6 @@
       <span class="jv-flow-node-sub">Timestamped Images</span>
     </div>
     <span class="jv-flow-arrow">→</span>
-    <div class="jv-flow-node">
-      <span class="jv-flow-node-label">Preprocessing</span>
-      <span class="jv-flow-node-sub">OpenCV / Frame Prep</span>
-    </div>
-    <span class="jv-flow-arrow">→</span>
-    <div class="jv-flow-node">
-      <span class="jv-flow-node-label">YOLO</span>
-      <span class="jv-flow-node-sub">Object Recognition</span>
-    </div>
-    <span class="jv-flow-arrow">→</span>
     <div class="jv-flow-node active">
       <span class="jv-flow-node-label">SAM 3</span>
       <span class="jv-flow-node-sub">Precise Segmentation</span>
@@ -63,10 +53,8 @@ Timestamped frame"]
     C2["Camera 2
 Second Linux computer"] --> TX["SSH / NetBird"]
     TX --> CAP
-    CAP --> CV["OpenCV
-Load and preprocess"]
-    CV --> SAM["SAM 3
-Pixel-level object mask"]
+    CAP --> SAM["SAM 3
+Object segmentation"]
     SAM --> FUSE["Multi-camera matching
 and temporal tracking"]
     FUSE --> ROOM["Room model
