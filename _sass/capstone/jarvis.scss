@@ -398,6 +398,61 @@
   margin: 0;
 }
 
+/* ── Paper / Patent / Source Cards ── */
+.jv-paper-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.jv-paper-card {
+  background: var(--jv-tag);
+  border: 1px solid var(--jv-card-border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.jv-paper-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--jv-accent);
+  text-decoration: none;
+  line-height: 1.35;
+}
+
+.jv-paper-title:hover { text-decoration: underline; }
+
+.jv-paper-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--jv-text-muted);
+  background: var(--jv-card);
+  border: 1px solid var(--jv-card-border);
+  border-radius: 0.3rem;
+  padding: 0.1rem 0.4rem;
+  display: inline-block;
+  width: fit-content;
+}
+
+.jv-paper-bullets {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.jv-paper-bullets li {
+  font-size: 0.78rem;
+  color: var(--jv-text-muted);
+  line-height: 1.45;
+}
+
+.jv-paper-bullets li::marker { color: var(--jv-accent); }
+
 /* ── Segmented Timeline Bar (replaces mermaid gantt) ── */
 .jv-timeline-bar {
   display: flex;
