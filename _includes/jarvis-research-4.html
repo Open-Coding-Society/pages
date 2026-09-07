@@ -1,0 +1,212 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Research Area 4 · Visual Memory &amp; Scene Comparison</div>
+    <h1 class="jv-page-title">Research 4: Visual Memory &amp; Scene Comparison</h1>
+    <p class="jv-description">Investigating interval-based change detection, structural gradient matching for illumination/shadow invariance, and lightweight edge-AI vs. cloud-dependent architectures.</p>
+  </div>
+
+  <!-- Research Question -->
+  <div class="jv-section-label">Research Question 4</div>
+  <div class="jv-card">
+    <p class="jv-question">How can an AI camera system spot real changes in a room (like a moved or missing object) every 10 seconds without being fooled by shadows or light changes?</p>
+    <div style="margin-top:1.25rem;text-align:center;">
+      <img src="https://github.com/user-attachments/assets/d326d254-c8b8-48c3-976f-8248f82aba0a" alt="Visual Memory Scene Comparison" style="max-width:100%;border-radius:0.75rem;border:1px solid var(--jv-card-border);display:block;margin:0 auto;">
+    </div>
+  </div>
+
+  <!-- Problem Statement & Architecture -->
+  <div class="jv-section-label">Specific Problem Statement &amp; Strategy</div>
+  <div class="jv-card">
+    <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0 0 1.25rem;">
+      Conventional security cameras often produce false alarms from shifting sunlight, moving shadows, and transient ambient motion, while struggling to reliably detect permanent, meaningful changes in physical room state (such as moved, missing, or newly introduced equipment).
+    </p>
+    
+    <div class="jv-decision-grid">
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🖥️</span>
+        <span class="jv-decision-title">Edge Compute</span>
+        <p class="jv-decision-why">Local Mac mini / Linux host processing eliminates recurring cloud compute and API subscription costs.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">📹</span>
+        <span class="jv-decision-title">1080p Dual Cameras</span>
+        <p class="jv-decision-why">Two synchronized 1080p cameras provide cross-viewpoint redundancy and eliminate single-camera blind spots.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">⏱️</span>
+        <span class="jv-decision-title">10–15s Check Interval</span>
+        <p class="jv-decision-why">Captures static frame pairs periodically instead of streaming 4K continuously, minimizing CPU and thermal load.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-icon">🗑️</span>
+        <span class="jv-decision-title">Prune Static Frames</span>
+        <p class="jv-decision-why">If algorithmic comparison reveals no significant visual delta against the baseline, prior static frames are purged locally.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;text-align:center;">
+      <img src="https://github.com/user-attachments/assets/d439a430-e279-484f-8de3-f2482d47c8fc" alt="Storage and Capture Strategy" style="max-width:100%;border-radius:0.75rem;border:1px solid var(--jv-card-border);display:block;margin:0 auto;">
+    </div>
+  </div>
+
+  <!-- Academic Literature -->
+  <div class="jv-section-label">Scholarly Research &amp; Academic Baseline</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Analysis of recent peer-reviewed change-detection architectures and visual memory frameworks:</p>
+    
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead>
+          <tr>
+            <th>Source / Paper</th>
+            <th>Core Mechanism</th>
+            <th>Key Difference &amp; Jarvis Edge Gap</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="https://doi.org/10.1080/10095020.2026.2684859" target="_blank" rel="noopener">
+                <strong>Lu, Zhou, &amp; Chen (2026)</strong>
+              </a>
+              <br><span style="font-size:0.75rem;color:var(--jv-text-muted);">GCN-Mamba Remote Sensing Change Detection</span>
+            </td>
+            <td>Combines Graph Convolutional Networks (GCN) and Mamba state-space models with local-global feature aggregation to evaluate frame pairs and filter lighting shifts.</td>
+            <td>Designed for high-altitude top-down satellite imagery with massive cloud compute. Jarvis adapts local-global feature aggregation for ground-level 1080p indoor perspectives on local edge hardware.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://arxiv.org/abs/2603.10722" target="_blank" rel="noopener">
+                <strong>Traffic Vision Group (2026)</strong>
+              </a>
+              <br><span style="font-size:0.75rem;color:var(--jv-text-muted);">UAV Traffic Scene Understanding with TRM</span>
+            </td>
+            <td>Employs a Traffic Regulation Memory (TRM) module to track spatial states over time and discard redundant visual noise without continuous raw video streaming.</td>
+            <td>Targets aerial drone traffic with heavy multi-modal cloud processing. Jarvis applies interval visual memory to a lightweight edge setup (Mac mini / Linux) optimized for indoor spaces.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="jv-callout jv-callout-note" style="margin-top:1rem;">
+      <strong style="color:var(--jv-text);">Consolidated Synthesis:</strong> Academic research confirms that feature-aggregation models coupled with persistent visual memory reliably isolate genuine structural changes from lighting noise. Jarvis fills the gap by packaging these principles into a standalone, edge-based framework operating at discrete 10-second intervals.
+    </div>
+
+    <div style="margin-top:1.25rem;text-align:center;">
+      <img src="https://github.com/user-attachments/assets/e24f9cfa-8044-4c0e-b9ef-d401240da591" alt="Academic Literature Synthesis" style="max-width:100%;border-radius:0.75rem;border:1px solid var(--jv-card-border);display:block;margin:0 auto;">
+    </div>
+  </div>
+
+  <!-- Patent Research -->
+  <div class="jv-section-label">Patent Research &amp; Prior IP</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Patented machine vision techniques addressing illumination invariance and background subtraction:</p>
+
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead>
+          <tr>
+            <th>Patent Reference</th>
+            <th>Patented Innovation</th>
+            <th>Relevance &amp; Implementation Tradeoff</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="https://patents.google.com/patent/US7062093B2/en" target="_blank" rel="noopener">
+                <strong>US7062093B2</strong>
+              </a>
+              <br><span style="font-size:0.75rem;color:var(--jv-text-muted);">Steger (2006) · Illumination &amp; Shadow Invariance</span>
+            </td>
+            <td>Utilizes structural gradient shapes and edge-based matching rather than raw pixel intensities, achieving invariance against dynamic shadows, contrast reversals, and lighting switches.</td>
+            <td>Provides the exact mathematical basis to prevent shadow false alarms. However, full-frame continuous gradient matching is computationally heavy; Jarvis bounds edge-matching to detected object regions.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://patents.google.com/patent/US6678413B1/en" target="_blank" rel="noopener">
+                <strong>US6678413B1</strong>
+              </a>
+              <br><span style="font-size:0.75rem;color:var(--jv-text-muted);">Liang et al. (2004) · Object Tracking &amp; State Monitoring</span>
+            </td>
+            <td>Couples video capture with automated background subtraction to establish a baseline model and register displaced or missing assets over time.</td>
+            <td>Directly aligns with Jarvis's missing-asset tracking goal. Unlike Liang's continuous high-frame-rate approach, Jarvis executes baseline subtraction at 10-second intervals to minimize storage.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:1.25rem;text-align:center;">
+      <img src="https://github.com/user-attachments/assets/a7bed001-61b5-48a4-b430-62498630d2ad" alt="Patent US7062093B2 Illumination Invariance Diagram" style="max-width:100%;border-radius:0.75rem;border:1px solid var(--jv-card-border);display:block;margin:0 auto;">
+    </div>
+  </div>
+
+  <!-- Commercial Product Research -->
+  <div class="jv-section-label">Commercial Products &amp; Competitive Analysis</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1.25rem;">Evaluation of existing consumer and enterprise camera systems:</p>
+
+    <div class="jv-table-wrap">
+      <table class="jv-table">
+        <thead>
+          <tr>
+            <th>Commercial System</th>
+            <th>Core Features</th>
+            <th>Key Limitations</th>
+            <th>How Jarvis Improves</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <a href="https://ring.com/products/stick-up-security-camera-elite-poe" target="_blank" rel="noopener">
+                <strong>Ring Stick Up Camera</strong>
+              </a>
+              <br><span style="font-size:0.75rem;color:var(--jv-text-muted);">Smart Home Security</span>
+            </td>
+            <td>HD streaming, motion triggers, and periodic "Snapshot Capture" intervals uploaded to the cloud.</td>
+            <td>Cloud lock-in, recurring subscription fees, storage bloat, and naive pixel-motion triggers that lack semantic object understanding.</td>
+            <td><strong>100% Local &amp; Private:</strong> Jarvis processes frames on-device, drops redundant static captures, and evaluates semantic changes without subscription fees.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://www.cctvcamerapros.com/ai-security-camera-missing-object-detection" target="_blank" rel="noopener">
+                <strong>Viewtron AI Camera &amp; NVR</strong>
+              </a>
+              <br><span style="font-size:0.75rem;color:var(--jv-text-muted);">Commercial NVR Security</span>
+            </td>
+            <td>Configurable "Missing Object" polygon boundary zones with integrated NVR alert hardware.</td>
+            <td>Bulky proprietary NVR hardware, heavy multi-cable wiring, continuous stream processing, and high deployment cost.</td>
+            <td><strong>Lightweight Edge Setup:</strong> Jarvis replaces bulky NVR appliances with a standalone edge machine executing interval checks every 10 seconds.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1rem;margin-top:1.5rem;">
+      <div style="text-align:center;background:var(--jv-tag);border:1px solid var(--jv-card-border);border-radius:0.75rem;padding:1rem;">
+        <img src="https://github.com/user-attachments/assets/539837bd-2b18-4cf9-b401-4f1bda732f7c" alt="Ring Camera Teardown" style="max-height:180px;max-width:100%;object-fit:contain;border-radius:0.5rem;display:block;margin:0 auto 0.75rem;">
+        <span style="font-size:0.78rem;font-weight:700;color:var(--jv-text);">Ring Stick Up Camera</span>
+        <p style="font-size:0.72rem;color:var(--jv-text-muted);margin:0.25rem 0 0;">Cloud-dependent snapshot model</p>
+      </div>
+      <div style="text-align:center;background:var(--jv-tag);border:1px solid var(--jv-card-border);border-radius:0.75rem;padding:1rem;">
+        <img src="https://github.com/user-attachments/assets/57becc2e-f964-4768-b843-592838c38dc3" alt="Viewtron AI NVR System" style="max-height:180px;max-width:100%;object-fit:contain;border-radius:0.5rem;display:block;margin:0 auto 0.75rem;">
+        <span style="font-size:0.78rem;font-weight:700;color:var(--jv-text);">Viewtron AI NVR System</span>
+        <p style="font-size:0.72rem;color:var(--jv-text-muted);margin:0.25rem 0 0;">Bulky commercial NVR appliance</p>
+      </div>
+    </div>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>
