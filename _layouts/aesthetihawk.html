@@ -67,4 +67,22 @@
     // tmport handlelogout from external file and attach to window for onclick usage
     import { handleLogout } from '{{site.baseurl}}/assets/js/api/logout.js';
     window.handleLogout = handleLogout;
+
+    // Swap in the reduced mentor sidebar for signed-in ROLE_MENTOR users; everyone
+    // else (including logged-out visitors) keeps the normal OCS sidebar untouched.
+    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    (async function () {
+        try {
+            const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
+            if (!res.ok) return;
+            const person = await res.json();
+            const roles = Array.isArray(person.roles) ? person.roles.map(r => r.name) : [];
+            if (roles.includes('ROLE_MENTOR')) {
+                document.getElementById('sidebar-role-default').style.display = 'none';
+                document.getElementById('sidebar-role-mentor').style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Mentor sidebar role check failed', err);
+        }
+    })();
 </script>

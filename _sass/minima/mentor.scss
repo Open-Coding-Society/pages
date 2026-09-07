@@ -32,6 +32,18 @@
   }
 }
 
+.mentor-discover-link {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $accent;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .mentor-projects {
   list-style: none;
   margin: 0;

@@ -1,0 +1,31 @@
+<ul class="flex flex-col py-4 space-y-1">
+  {% for section in include.data %}
+    <li class="px-5">
+      <div class="flex flex-row items-center h-8">
+        <div class="text-sm font-light tracking-wide text-neutral-500">{{ section.section }}</div>
+      </div>
+    </li>
+
+    {% assign current = page.active_tab | default: "" | strip %}
+    {% for item in section.items %}
+      {% assign item_id = item.id | strip %}
+      <li>
+        <a id="sidebar-{{ include.prefix }}{{ item_id }}" href="{{ site.baseurl }}{{ item.url }}"
+           class="nav-item relative flex flex-row items-center h-11 focus:outline-none pr-6 border-l-4
+           {% if current == item_id %}
+             bg-neutral-700 text-neutral-50 border-indigo-500
+           {% else %}
+             text-neutral-600 border-transparent hover:text-neutral-50 hover:border-indigo-500
+           {% endif %}">
+          <span class="inline-flex justify-center items-center ml-4">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+              {{ item.icon }}
+            </svg>
+          </span>
+          <span class="ml-2 text-sm tracking-wide truncate">{{ item.title }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  {% endfor %}
+</ul>

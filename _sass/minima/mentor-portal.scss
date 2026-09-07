@@ -1,0 +1,647 @@
+// Mentor Portal project discovery (/projects).
+//
+// A Tinder-inspired (but not dating-app-styled) swipe deck mentors use to browse
+// capstone projects looking for a mentor. Built with plain CSS transitions/transforms —
+// no animation or gesture library is installed in this repo, so the drag/leave/gallery
+// motion here is all hand-rolled to match the vanilla-JS pattern used elsewhere.
+//
+// NOTE: entry is currently a public "Mentor" button (see .mp-state--landing below)
+// rather than a real ROLE_MENTOR check — see the TEMP comment in projects.md.
+
+.mp-page {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+// ---- Gate / landing state -------------------------------------------------
+
+.mp-state {
+  max-width: 30rem;
+  margin: 4rem auto;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  border-radius: 1.25rem;
+  background: $bg-2;
+  border: 1px solid $bg-3;
+  color: $text-muted;
+}
+
+.mp-state__icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  color: $accent;
+}
+
+.mp-state__title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: $text;
+  margin-bottom: 0.5rem;
+}
+
+.mp-state--landing {
+  max-width: 34rem;
+  padding: 3.5rem 2.5rem;
+  background: linear-gradient(160deg, $bg-2, $bg-1);
+}
+
+.mp-state--landing .mp-state__title {
+  font-size: 1.75rem;
+  background: linear-gradient(90deg, $text, $accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+// ---- Hero header ------------------------------------------------------------
+
+.mp-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid $bg-3;
+}
+
+.mp-hero__title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, $text, $accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 0.35rem;
+}
+
+.mp-hero__subtitle {
+  color: $text-muted;
+  max-width: 42rem;
+}
+
+.mp-stats {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mp-stat {
+  min-width: 6rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.85rem;
+  background: $bg-2;
+  border: 1px solid $bg-3;
+  text-align: center;
+}
+
+.mp-stat__value {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: $text;
+}
+
+.mp-stat__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $text-muted;
+}
+
+.mp-stat--interested .mp-stat__value { color: $green; }
+.mp-stat--skipped .mp-stat__value { color: $text-muted; }
+
+// ---- Stage / deck -------------------------------------------------------
+
+.mp-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1rem 1rem;
+}
+
+.mp-stage::before {
+  content: "";
+  position: absolute;
+  inset: -2rem 10% auto 10%;
+  height: 22rem;
+  background: radial-gradient(closest-side, rgba(76, 175, 239, 0.18), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mp-deck {
+  position: relative;
+  width: 100%;
+  max-width: 34rem;
+  min-height: 38rem;
+  z-index: 1;
+}
+
+.mp-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: $bg-2;
+  border: 1px solid $bg-3;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  touch-action: pan-y;
+  user-select: none;
+  transition: transform 0.35s cubic-bezier(.2, .8, .2, 1), opacity 0.35s ease;
+  will-change: transform;
+}
+
+.mp-card--dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+.mp-card--leaving-right {
+  transform: translate(150%, -8%) rotate(24deg) !important;
+  opacity: 0;
+}
+
+.mp-card--leaving-left {
+  transform: translate(-150%, -8%) rotate(-24deg) !important;
+  opacity: 0;
+}
+
+.mp-card--entering {
+  opacity: 0;
+  transform: scale(0.96) translateY(12px);
+}
+
+// ---- Gallery --------------------------------------------------------------
+
+.mp-gallery {
+  position: relative;
+  flex: 0 0 58%;
+  background: $bg-1;
+  overflow: hidden;
+}
+
+.mp-gallery__track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.mp-gallery__slide {
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.mp-gallery__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+.mp-gallery__zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 34%;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.mp-gallery__zone--prev { left: 0; }
+.mp-gallery__zone--next { right: 0; }
+
+.mp-gallery__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.mp-gallery:hover .mp-gallery__arrow { opacity: 1; }
+.mp-gallery__arrow:hover { background: rgba(0, 0, 0, 0.7); }
+.mp-gallery__arrow--prev { left: 0.6rem; }
+.mp-gallery__arrow--next { right: 0.6rem; }
+
+.mp-gallery__counter {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  z-index: 2;
+}
+
+.mp-gallery__dots {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.35rem;
+  z-index: 2;
+}
+
+.mp-gallery__dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background 0.15s ease, width 0.15s ease;
+}
+
+.mp-gallery__dot--active {
+  background: #fff;
+  width: 1.1rem;
+  border-radius: 999px;
+}
+
+// Fallback panel shown when a project has no images.
+.mp-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 40%),
+    linear-gradient(135deg, $accent-700, $accent);
+  overflow: hidden;
+}
+
+.mp-fallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 18px 18px;
+  opacity: 0.5;
+}
+
+.mp-fallback__initial {
+  position: relative;
+  font-size: 5.5rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+// ---- Card body --------------------------------------------------------------
+
+.mp-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1.75rem 1.75rem;
+  min-height: 0;
+}
+
+.mp-card__pill {
+  align-self: flex-start;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(76, 175, 239, 0.16);
+  color: $accent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.7rem;
+}
+
+.mp-card__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 0.6rem;
+}
+
+.mp-card__title a {
+  color: $text;
+}
+
+.mp-card__title a:hover {
+  color: $accent;
+  text-decoration: underline;
+}
+
+.mp-card__desc {
+  flex: 1;
+  overflow-y: auto;
+  color: $text-muted;
+  line-height: 1.6;
+  padding-right: 0.25rem;
+}
+
+.mp-card__footer {
+  margin-top: 0.9rem;
+}
+
+.mp-btn--sm {
+  font-size: 0.82rem;
+  padding: 0.45rem 0.95rem;
+}
+
+.mp-btn--lg {
+  font-size: 1rem;
+  padding: 0.85rem 2.1rem;
+  margin-top: 1.5rem;
+}
+
+// ---- Swipe stamps -----------------------------------------------------------
+
+.mp-stamp {
+  position: absolute;
+  top: 1.75rem;
+  padding: 0.4rem 1rem;
+  border: 3px solid;
+  border-radius: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.mp-stamp--interested {
+  left: 1.5rem;
+  color: $green;
+  border-color: $green;
+  transform: rotate(-12deg);
+}
+
+.mp-stamp--skip {
+  right: 1.5rem;
+  color: $red;
+  border-color: $red;
+  transform: rotate(12deg);
+}
+
+// ---- Action row -------------------------------------------------------------
+
+.mp-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.mp-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  border: 1px solid $bg-3;
+  background: $bg-2;
+  color: $text;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.mp-action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.mp-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mp-action-btn--skip:hover { border-color: $red; color: $red; }
+.mp-action-btn--back { width: 2.75rem; height: 2.75rem; opacity: 0.75; }
+.mp-action-btn--back:hover { opacity: 1; }
+
+.mp-action-btn--interested {
+  width: 4.25rem;
+  height: 4.25rem;
+  background: $green;
+  border-color: $green;
+  color: #0c2016;
+}
+
+.mp-action-btn--interested:hover {
+  background: lighten(#4ADE80, 6%);
+}
+
+.mp-action-btn--interested:disabled {
+  background: $bg-3;
+  color: $text-muted;
+}
+
+.mp-progress {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: $text-muted;
+  font-size: 0.85rem;
+}
+
+.mp-progress__bar {
+  width: 100%;
+  max-width: 20rem;
+  height: 0.3rem;
+  border-radius: 999px;
+  background: $bg-3;
+  overflow: hidden;
+}
+
+.mp-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, $accent-700, $accent);
+  transition: width 0.25s ease;
+}
+
+.mp-browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: $text-muted;
+  font-size: 0.85rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mp-browse-btn:hover { color: $accent; }
+
+// ---- Empty / end-of-stack panel ---------------------------------------------
+
+.mp-end {
+  max-width: 26rem;
+  margin: 2rem auto;
+  padding: 3rem 2rem;
+  text-align: center;
+  border-radius: 1.25rem;
+  background: $bg-2;
+  border: 1px dashed $bg-3;
+  color: $text-muted;
+}
+
+.mp-end__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: $text;
+  margin-bottom: 0.5rem;
+}
+
+.mp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.mp-btn--primary {
+  background: $accent-700;
+  color: #fff;
+}
+
+.mp-btn--primary:hover { background: $accent-700-hover; }
+
+.mp-btn--ghost {
+  background: $bg-2;
+  border-color: $bg-3;
+  color: $text;
+}
+
+.mp-btn--ghost:hover { border-color: $accent; color: $accent; }
+
+// ---- Browse-all overlay ------------------------------------------------------
+
+.mp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4vh 1rem;
+  z-index: 50;
+}
+
+.mp-overlay__panel {
+  width: 100%;
+  max-width: 46rem;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: $bg-2;
+  border: 1px solid $bg-3;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+}
+
+.mp-overlay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.mp-overlay__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.mp-overlay__close {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.mp-overlay__close:hover { color: $text; }
+
+.mp-overlay__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.85rem;
+}
+
+.mp-overlay__item {
+  text-align: left;
+  border: 1px solid $bg-3;
+  background: $bg-1;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.mp-overlay__item:hover { border-color: $accent; }
+
+.mp-overlay__thumb {
+  width: 100%;
+  height: 5rem;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(135deg, $accent-700, $accent);
+}
+
+.mp-overlay__item-title {
+  display: block;
+  padding: 0.5rem 0.65rem 0.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.mp-overlay__badge {
+  display: inline-block;
+  margin: 0 0.65rem 0.6rem;
+  font-size: 0.68rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+
+.mp-overlay__badge--interested { background: rgba(74, 222, 128, 0.18); color: $green; }
+.mp-overlay__badge--skipped { background: $bg-3; color: $text-muted; }
+
+@media (max-width: 640px) {
+  .mp-hero { align-items: flex-start; }
+  .mp-deck { min-height: 34rem; }
+  .mp-gallery { flex-basis: 50%; }
+}

@@ -25,6 +25,7 @@ microblog: True
 
   <div id="mentor-ui" class="mentor-layout" style="display:none;">
     <nav aria-label="Your capstone projects">
+      <a href="{{site.baseurl}}/projects" class="mentor-discover-link">Discover new projects to mentor &rarr;</a>
       <ul id="mentor-projects" class="mentor-projects"></ul>
     </nav>
 
