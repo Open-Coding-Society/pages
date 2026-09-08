@@ -207,8 +207,10 @@
   }
 }
 
+// Same weight as the transition rule above (a row that is a link or a
+// button), so this one wins when motion is reduced.
 @media (prefers-reduced-motion: reduce) {
-  .ocs-agenda__item { transition: none; }
+  .ocs-agenda__item:is(a, button) { transition: none; }
 }
 
 // On a phone the tail wraps under the title rather than squeezing it.

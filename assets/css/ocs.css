@@ -2147,7 +2147,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ocs-agenda__item {
+  .ocs-agenda__item:is(a, button) {
     transition: none;
   }
 }
