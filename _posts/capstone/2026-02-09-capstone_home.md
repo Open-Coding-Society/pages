@@ -704,6 +704,17 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-sm text-gray-700">An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
        </div>
+          <!-- SFI Foundation (26/27) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-03-04-greppers-capstone %}">
+           <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-3xl font-bold rounded">SFI</div>
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-greppers-capstone %}">SFI Foundation</a></h3>
+           <p class="text-sm text-gray-700">SFI Foundation web modernization — ML-powered spec search, QR-based manufacturer verification, and a mobile-first UI redesign for motorsports safety certification.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Ishan Jha, Ishan Khandelwal, Vayun Shekhar, Ruhaan Bansal, Arya Zargar, Deyar Raissadat</p>
+       </div>
+   </div>
    </div>
    
    <!-- Friends of the Poway Library  (CSP) -->
