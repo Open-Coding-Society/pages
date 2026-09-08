@@ -323,7 +323,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">UESL Accessible Game Maker 2.0</a></h3>
-           <p class="text-sm text-gray-700">A guided, accessible creation experience extending UESL’s existing Game Maker.</p>
+           <p class="text-sm text-gray-700">An accessible game creation platform with guided building, live themes, comfort profiles, playable previews, draft recovery, and validated export.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ishan, Rohan, Adhvay</p>
        </div>
    </div>
