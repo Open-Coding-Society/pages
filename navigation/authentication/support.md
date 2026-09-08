@@ -62,7 +62,7 @@ show_reading_time: false
 </div>
 
 <script type="module">
-    import { javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { javaURI, pythonURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
 
     // ---- Support topic navigation ----
     window.openSupportTopic = function(topic) {
@@ -280,14 +280,33 @@ show_reading_time: false
             return;
         }
 
-        fetch(`${javaURI}/mvc/person/reset/oauth/complete`, {
+        // Flask is the system of record for identity, so it goes first and owns this
+        // write -- it verifies the same resetToken's HMAC itself (no network call to
+        // Spring involved). Spring is only synced afterward, once Flask has actually
+        // succeeded, matching how a logged-in password change already syncs both
+        // backends separately from the frontend (see profile.html) rather than one
+        // backend pushing to the other.
+        fetch(`${pythonURI}/api/reset-password`, {
             ...fetchOptions,
             method: 'POST',
             body: JSON.stringify({ uid: resetUidValue, resetToken: resetTokenValue, newPassword: password }),
         })
         .then(res => {
             if (!res.ok) {
-                throw new Error('reset-failed');
+                throw new Error('flask-reset-failed');
+            }
+            return fetch(`${javaURI}/mvc/person/reset/oauth/complete`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({ uid: resetUidValue, resetToken: resetTokenValue, newPassword: password }),
+            });
+        })
+        .then(res => {
+            if (!res.ok) {
+                // Flask (the authoritative side) already succeeded and the resetToken is
+                // now spent either way, so this is a sync gap, not a failed reset -- tell
+                // the user it worked; Spring's copy falls behind until their next reset.
+                console.error('Spring password sync failed after a successful Flask reset');
             }
             document.getElementById('reset-message').style.color = 'green';
             document.getElementById('reset-message').textContent = '✅ Password updated! Redirecting to login...';
