@@ -7,7 +7,6 @@ title: JavaScript OOP Coder
 description: >
   A guided sequence of hands-on and learning tasks to help you build foundation in JavaScript and the frameworks that power our course.
 author: John Mortensen
-courses: {'csse': {'week': 4} }
 type: hacks
 canonical_id: onboarding-adventure
 permalink: /hacks

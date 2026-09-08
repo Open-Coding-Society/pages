@@ -1,0 +1,219 @@
+{% assign data = site.data.jarvis_infograph %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="jv-container">
+
+  {% include jarvis-nav.html %}
+
+  <!-- Header -->
+  <div class="jv-header">
+    <div class="jv-badge">Research Area 3 · Computer Vision · Spatial Awareness · Classroom Safety</div>
+    <h1 class="jv-page-title">Multi-Camera Spatial Perception &amp; Distance Estimation</h1>
+    <p class="jv-description">Two Logitech BRIO 4K cameras, mounted on opposite sides of the room.</p>
+    <p style="font-size:0.8rem;color:var(--jv-text-muted);margin-top:0.5rem;">Individual research by <strong style="color:var(--jv-text);">Sonika Dhenuva Konda</strong></p>
+  </div>
+
+  <!-- Problem Statement -->
+  <div class="jv-section-label">Problem Statement</div>
+  <div class="jv-card">
+    <p style="font-size:0.9rem;line-height:1.7;color:var(--jv-text-muted);margin:0;">People and equipment constantly move around a busy classroom. A standard camera can see what's in the room, but not how far away it is or where it sits in 3D. Two wide-spaced cameras, fused with depth models and geometry, can fix that.</p>
+  </div>
+
+  <!-- Research Question -->
+  <div class="jv-section-label">Research Question</div>
+  <div class="jv-card">
+    <p class="jv-question">How can a setup of two wide-spaced 4K cameras combine separate 2D video feeds using deep learning models and geometry to accurately measure real-world distances and build a continuous 3D spatial map of a classroom?</p>
+  </div>
+
+  <!-- Pipeline diagram -->
+  <div class="jv-section-label">Pipeline</div>
+  <div class="jv-card">
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    C1["Camera 1, BRIO
+Wall A"] --> FM["SuperPoint + LightGlue
+Cross-view matching"]
+    C2["Camera 2, BRIO
+Wall B"] --> FM
+    C1 --> DA["Depth Anything V2
+Per-frame depth map"]
+    C2 --> DA
+    FM --> GEO["OpenCV + NumPy
+Calibration + 3D projection"]
+    DA --> GEO
+    GEO --> SCALE["ZoeDepth
+Metric scale, m / ft"]
+    SCALE --> CLOUD["Open3D
+Point cloud / room map"]
+    C1 --> YOLO["YOLOv8
+Object boxes"]
+    C2 --> YOLO
+    YOLO --> CLOUD</pre>
+    </div>
+  </div>
+
+  <!-- Equipment, Libraries, AI Models -->
+  <div class="jv-section-label">Equipment, Libraries &amp; AI Models</div>
+  <div class="jv-card">
+    <div class="jv-decision-grid">
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">2× Logitech BRIO 4K</span>
+        <p class="jv-decision-why">USB 3.0, opposite walls, facing inward.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">OpenCV</span>
+        <p class="jv-decision-why">Calibration, distortion fix, 3D projection.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">PyTorch</span>
+        <p class="jv-decision-why">Runs the deep learning models on GPU.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">NumPy</span>
+        <p class="jv-decision-why">Linear algebra for coordinate rotation.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Open3D</span>
+        <p class="jv-decision-why">Renders the room as a point cloud.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Depth Anything V2</span>
+        <p class="jv-decision-why">Dense depth map from a single frame.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">SuperPoint + LightGlue</span>
+        <p class="jv-decision-why">Keypoints matched across wide baselines.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">YOLOv8</span>
+        <p class="jv-decision-why">Boxes people/objects before distancing.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Research: depth-sensing approaches -->
+  <div class="jv-section-label">Background: How Machines Sense Depth</div>
+  <div class="jv-card">
+    <div class="jv-decision-grid">
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Stereo Vision (chosen)</span>
+        <p class="jv-decision-why">Cheap, standard RGB webcams; needs calibration + good light.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">dToF / LiDAR</span>
+        <p class="jv-decision-why">Very accurate; too costly, hurt by sunlight.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Indirect ToF</span>
+        <p class="jv-decision-why">Fast full-frame depth; whiteboards cause interference.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Structured Light</span>
+        <p class="jv-decision-why">Great up close; range drops off past 3&ndash;5m.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Academic Research Papers -->
+  <div class="jv-section-label">Academic Research Papers</div>
+  <div class="jv-card">
+    <div class="jv-paper-grid">
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://arxiv.org/abs/2406.09414" target="_blank" rel="noopener">Depth Anything V2</a>
+        <span class="jv-paper-meta">Yang et al. · arXiv:2406.09414</span>
+        <ul class="jv-paper-bullets">
+          <li>Foundation model for single-image (monocular) depth estimation.</li>
+          <li>Trained on millions of synthetic and pseudo-labeled images.</li>
+          <li>Generates a dense depth map from just one frame.</li>
+          <li>Fills in depth on plain classroom walls where matching alone fails.</li>
+        </ul>
+      </div>
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://arxiv.org/abs/2306.13643" target="_blank" rel="noopener">LightGlue: Local Feature Matching at Light Speed</a>
+        <span class="jv-paper-meta">Lindenberger et al. · ICCV 2023 · arXiv:2306.13643</span>
+        <ul class="jv-paper-bullets">
+          <li>Neural network that matches keypoints between two images.</li>
+          <li>Faster and more accurate than its predecessor, SuperGlue.</li>
+          <li>Adaptive: less compute on easy pairs, more on hard ones.</li>
+          <li>Built for exactly this project's wide-baseline, opposite-wall pair.</li>
+        </ul>
+      </div>
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://arxiv.org/abs/2302.12288" target="_blank" rel="noopener">ZoeDepth: Combining Relative and Metric Depth</a>
+        <span class="jv-paper-meta">Bhat et al. · arXiv:2302.12288</span>
+        <ul class="jv-paper-bullets">
+          <li>Adds a metric prediction head onto a relative-depth model.</li>
+          <li>Outputs real distances in meters, not just relative ordering.</li>
+          <li>Zero-shot transfer across different scenes.</li>
+          <li>Used here to scale outputs into real classroom feet/meters.</li>
+        </ul>
+      </div>
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://www.cs.cornell.edu/~asaxena/learningdepth/saxena_ijcv07_learningdepth.pdf" target="_blank" rel="noopener">3-D Depth Reconstruction from a Single Still Image</a>
+        <span class="jv-paper-meta">Saxena, Chung &amp; Ng · IJCV</span>
+        <ul class="jv-paper-bullets">
+          <li>Early work using single-image cues: shading, texture, perspective lines.</li>
+          <li>Combines those cues with multi-camera stereo geometry.</li>
+          <li>Shows the combination beats either method alone.</li>
+          <li>Basis for pairing an AI depth model with physical camera geometry here.</li>
+        </ul>
+      </div>
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://arxiv.org/abs/2210.02009" target="_blank" rel="noopener">Multi-Camera Collaborative Depth Prediction via Consistent Structure Estimation</a>
+        <span class="jv-paper-meta">Xu et al. · arXiv:2210.02009</span>
+        <ul class="jv-paper-bullets">
+          <li>Multiple overlapping cameras share depth information.</li>
+          <li>Depth built as a weighted combination of a shared "depth basis."</li>
+          <li>Works even without large overlap between camera views.</li>
+          <li>Blueprint for merging the two BRIO feeds into one coordinate space.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patent Reference -->
+  <div class="jv-section-label">Patent Reference</div>
+  <div class="jv-card">
+    <div class="jv-paper-grid">
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://patents.google.com/patent/US11321876B2" target="_blank" rel="noopener">Non-rigid Stereo Vision Camera System</a>
+        <span class="jv-paper-meta">US Patent 11,321,876 B2 · PCT/US2021/12294</span>
+        <ul class="jv-paper-bullets">
+          <li>Stereo vision that keeps working when cameras aren't on a rigid mount.</li>
+          <li>Autocalibration corrects fast (vibration) and slow (thermal) shifts over time.</li>
+          <li>Supports wide baselines, over 2 meters apart.</li>
+          <li>Directly applies since the two BRIOs sit on opposite walls, not a fixed bar.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Online Sources -->
+  <div class="jv-section-label">Online Sources</div>
+  <div class="jv-card">
+    <div class="jv-paper-grid">
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://www.e-consystems.com/blog/camera/technology/the-ultimate-guide-to-depth-perception-and-3d-imaging-technologies/" target="_blank" rel="noopener">e-con Systems: Depth Perception &amp; 3D Imaging</a>
+        <span class="jv-paper-meta">e-con Systems Technology Blog</span>
+        <ul class="jv-paper-bullets">
+          <li>Compares active sensors (LiDAR, ToF) against passive vision (stereo).</li>
+          <li>Background for the depth-sensing comparison above.</li>
+        </ul>
+      </div>
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://docs.opencv.org/3.4/dc/dbb/tutorial_py_calibration.html" target="_blank" rel="noopener">OpenCV Camera Calibration Docs</a>
+        <span class="jv-paper-meta">OpenCV Official Documentation</span>
+        <ul class="jv-paper-bullets">
+          <li>Reference for <span class="jv-code">cv2.calibrateCamera()</span> and lens-distortion correction.</li>
+          <li>Basis for the calibration step in the pipeline diagram.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  {% include jarvis-footer.html %}
+
+</div>

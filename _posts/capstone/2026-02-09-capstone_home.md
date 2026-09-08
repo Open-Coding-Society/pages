@@ -81,6 +81,7 @@ sticky_rank: 1
    <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
    <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
    <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
+  <button id="show-csh" class="px-3 py-1 bg-blue-200 rounded mr-2">CSH</button>
    <a href="{% post_url 2026-06-01-README-capstone %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
      <span class="mr-2">📄</span>README
    </a>
@@ -118,6 +119,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const status = document.getElementById('search-status');
   let currentType = 'all';
   let currentQuery = '';
+  const yearSelect = document.getElementById('year-select');
+  let currentYear = yearSelect ? yearSelect.value : '';
 
   const linkMap = {
     "Oasis": {
@@ -169,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function normalize(text){ return text.toLowerCase().trim(); }
   function matchesType(card){ return currentType === 'all' || card.classList.contains(currentType); }
+  function matchesYear(card){ return !currentYear || (card.dataset.year || '2025-2026') === currentYear; }
   function matchesSearch(card){
     const text = normalize(card.textContent);
     return !currentQuery || text.includes(currentQuery);
@@ -191,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function applyFilters(){
     let count = 0;
     cards.forEach(card=>{
-      const visible = matchesType(card) && matchesSearch(card);
+      const visible = matchesType(card) && matchesSearch(card) && matchesYear(card);
       card.style.display = visible ? '' : 'none';
       if(visible) count++;
     });
@@ -204,6 +208,11 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('show-all')?.addEventListener('click', ()=> setTypeFilter('all'));
   document.getElementById('show-csa')?.addEventListener('click', ()=> setTypeFilter('CSA'));
   document.getElementById('show-csp')?.addEventListener('click', ()=> setTypeFilter('CSP'));
+  document.getElementById('show-csh')?.addEventListener('click', ()=> setTypeFilter('CSH'));
+  yearSelect?.addEventListener('change', event=>{
+    currentYear = event.target.value;
+    applyFilters();
+  });
   function closeAllPopups(){
     document.querySelectorAll('.capstone-popup').forEach(el=>el.classList.add('hidden'));
   }
@@ -307,6 +316,32 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
+   <!-- RFID + Camera-Correlated Classroom Presence -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
+     <a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">
+       <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">RFID</div>
+     </a>
+     <div>
+       <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">RFID + Camera-Correlated Classroom Presence</a></h3>
+       <p class="text-sm text-gray-700">A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.</p>
+       <p class="text-xs text-gray-500 mt-2">Team: Ruta Sirdeshmukh, Vibha Mandayam, Kush Shah</p>
+     </div>
+   </div>
+
+
+     <!-- Jarvis Classroom Object Detection -->
+     <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
+       <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
+         <img src="{{ '/images/' | append: site.data.jarvis_infograph.Image | relative_url }}" alt="{{ site.data.jarvis_infograph.Title }}" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">{{ site.data.jarvis_infograph.Title }}</a></h3>
+         <p class="text-sm text-gray-700">{{ site.data.jarvis_infograph.Description }}</p>
+         <p class="text-xs text-gray-500 mt-2">Team: {{ site.data.jarvis_infograph.Team | join: ", " }}</p>
+       </div>
+     </div>
+
+
    <!-- Big Six & Code Hub -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url capstone/2026-03-04-big6-capstone %}">
@@ -333,19 +368,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
      </div>
 
 
-   <!-- Communication System -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
-       <a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">
-           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - Course-Site Chat and Messaging" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
-           <p class="text-sm text-gray-700">Class discussion moved out of Slack and onto the course site, next to the work it is about. Class-wide announcements and per-week chat already ship; per-assignment threads, 1:1 direct messages, and teacher moderation are still to build.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Akhil, Samarth, Akshaj, Tarun, Perry, Syowns, Leon</p>
-       </div>
-   </div>
-
-
    <!-- Educators Capstone -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
        <a href="{% post_url capstone/2026-02-06-educators-capstone %}">
@@ -355,6 +377,31 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-educators-capstone %}">Educators</a></h3>
            <p class="text-sm text-gray-700">An educational platform that helps CS newcomers build mental models for temporal problem-solving in software development.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Nithika Vivek, Eshika Pallpotu, Saanvi Dogra</p>
+       </div>
+   </div>
+
+
+     <!-- OCS Intelligence LLM -->
+     <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">
+         <img src="/images/capstone/ocs-intelligence.png" alt="OCS Intelligence LLM - Shared AI Infrastructure for Students" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">OCS Intelligence LLM</a></h3>
+         <p class="text-sm text-gray-700">A generously donated 8× GTX 1070 rack becomes a shared open-weight LLM for OCS: live access from student harnesses, every student in mind, electricity as the only ongoing cost.</p>
+         <p class="text-xs text-gray-500 mt-2">Team: Nikhil Maturi, Adi Katre, Mihir Bapat, Yash Parikh, Anvay Vahia, Yash Patil</p>
+       </div>
+     </div>
+
+
+   <!-- Toolchain Trail -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-08-28-toolchain-trail %}">
+         <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-toolchain-trail %}">Toolchain Trail</a></h3>
+         <p class="text-sm text-gray-700">{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
 
@@ -608,6 +655,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
         </div>
     </div>
+
+   <!-- Integra (CSP 26-27) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-03-04-sentri-capstone %}">
+           <img src="/images/capstone/sentri.png" alt="Sentri" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-sentri-capstone %}">Integra</a></h3>
+           <p class="text-sm text-gray-700">An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
+       </div>
+   </div>
    
    <!-- Friends of the Poway Library  (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
@@ -702,6 +761,30 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Safe Passage Heals - Media Management Tools and Interactive Recovery Simulation</a></h3>
            <p class="text-sm text-gray-700">A system of interactive web tools for Safe Passage Heals — centralizing community events through dynamic media management and an interactive simulation of the domestic violence recovery process.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
+       </div>
+   </div>
+
+   <!-- OCS Assignment Tracker (CSA) -->
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
+           <img src="/images/backendboyzgcpiccc.png" alt="Backend Boyz - OCS Assignment Tracker" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">Backend Boyz</a></h3>
+           <p class="text-sm text-gray-700">Developing an easy way for mentors to access Open Coding Society, featuring Google OAuth-verified signup, a scoped capstone project dashboard, real-time team chat, and role-based permissions between students and admins.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Backend Boyz (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
+       </div>
+   </div>
+
+   <!-- OCS Security (CSA) -->
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-09-03-cccs-security %}">
+           <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
+           <p class="text-sm text-gray-700">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
        </div>
    </div>
 </div>

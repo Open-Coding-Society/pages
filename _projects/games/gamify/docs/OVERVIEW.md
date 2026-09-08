@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Adventure Game - Overview
-description: README starting documentation for the adventure game 
+title: Gamify - Overview
+description: OVERVIEW starting documentation for this sample RPG game 
 category: Gamify
 breadcrumb: true
 permalink: /gamify/overview
@@ -13,7 +13,7 @@ Project-friendly project organization for the introductory gamify experience.
 
 ```text
 _projects/gamify/
-├── notebook.src.ipynb
+├── index.ipynb
 ├── levels/
 │   ├── GameLevelWater.js
 │   ├── GameLevelDesert.js
@@ -41,18 +41,6 @@ make dev
 ```
 
 This is the main build-and-test loop for development. It starts Jekyll and the registered project watchers so edits are copied, converted, and regenerated automatically.
-
-Before using live regeneration with make dev, install fswatch:
-
-```bash
-# macOS
-brew install fswatch
-
-# Ubuntu/Debian
-sudo apt install fswatch
-```
-
-Without fswatch, the project watcher falls back to manual rebuild instructions instead of auto-regeneration.
 
 Validate this project after make dev when you want to force a full re-copy of distributed files.
 
@@ -149,7 +137,7 @@ _posts/projects/gamify/
 
 ## Notes
 
-This README is the baseline introduction to the build system concepts. Real-world, deeper references belong in the cs-pathway docs.
+This OVERVIEW is the baseline introduction to the build system concepts. Real-world, deeper references belong in the cs-pathway docs.
 
 For an example of lightweight team documentation, see the sample GameLevelWater write-up:
 

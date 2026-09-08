@@ -2,6 +2,7 @@
 # All data sourced directly from _data/*_infograph.yml files.
 # Projects without a real tech array are omitted (no tooltip > wrong tooltip).
 
+
 "Assignment Resources Platform":
   - "Spring Boot 3.5 / Java 21"
   - "Jekyll + Static JS"
@@ -147,11 +148,9 @@
   - "Jekyll / Liquid"
   - "JavaScript (Vanilla)"
 
-"Communication System":
-  - "Spring Boot / Java"
-  - "STOMP over SockJS"
-  - "REST /api/groups & /api/dm"
-  - "JPA + Amazon S3"
-  - "JWT Cookie Auth"
-  - "Jekyll Includes / Vanilla JS"
-  - "localStorage"
+"OCS Intelligence LLM":
+  - "LLM"
+  - "FlashAttention"
+  - "vLLM"
+  - "Distributed Inference"
+  - "Observability"

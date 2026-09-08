@@ -1,0 +1,12 @@
+<div class="jv-footer">
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div class="jv-team">
+      <span class="jv-team-label">Project Team</span>
+      <span class="jv-team-name">{{ data.Team | join: ", " }}</span>
+    </div>
+    <span class="jv-status">Prototype Stage</span>
+  </div>
+  {% if data.Repo %}
+  <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="jv-btn">View Repo</a>
+  {% endif %}
+</div>

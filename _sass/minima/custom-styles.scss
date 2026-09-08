@@ -13,6 +13,15 @@
 // All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
 @import "capstone/infograph";
 
+// Classroom Presence System capstone project styles
+@import "capstone/rfid-presence";
+
+// Jarvis Camera Setup & Object Detection capstone project styles
+@import "capstone/jarvis";
+
+// UESL Accessible Game Maker 2.0 capstone feature
+@import "capstone/uesl-game-maker";
+
 // RPN Calculator Lesson Interactives
 @import "nighthawk/rpn-interactive";
 
