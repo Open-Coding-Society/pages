@@ -15,10 +15,30 @@
     <p class="ocs-intelligence-gift-kicker">{{ data.problemStatement.kicker }}</p>
     <h3 class="ocs-intelligence-section-title">{{ data.problemStatement.title }}</h3>
     <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.problemStatement.body }}</p>
-    <figure class="ocs-intelligence-figure">
-      <img src="{{ site.baseurl }}/images/{{ data.problemStatement.image }}" alt="{{ data.problemStatement.imageAlt }}">
-      <figcaption>{{ data.problemStatement.imageCaption }}</figcaption>
-    </figure>
+    <div class="ocs-intelligence-diagram" role="img" aria-label="Comparison: a paid AI subscription serves one seat, versus OCS Intelligence LLM which serves every student off donated hardware.">
+      <svg viewBox="0 0 640 210" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:inherit;">
+        <rect x="8" y="8" width="270" height="194" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.14)"/>
+        <text x="143" y="38" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">Paid subscription</text>
+        <rect x="113" y="58" width="36" height="26" rx="4" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/>
+        <path d="M120 58 v-10 a11 11 0 0 1 22 0 v10" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="2"/>
+        <circle cx="131" cy="70" r="3" fill="rgba(255,255,255,0.65)"/>
+        <text x="143" y="115" text-anchor="middle" fill="#fff" font-size="20" font-weight="800">~$20/mo</text>
+        <text x="143" y="140" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="12">one seat</text>
+        <text x="143" y="178" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="12">Can't pay? No help.</text>
+
+        <text x="320" y="112" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="22">→</text>
+
+        <rect x="362" y="8" width="270" height="194" rx="14" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.28)"/>
+        <text x="497" y="38" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">OCS Intelligence LLM</text>
+        <rect x="463" y="55" width="10" height="34" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <rect x="478" y="55" width="10" height="34" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <rect x="493" y="55" width="10" height="34" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <rect x="508" y="55" width="10" height="34" rx="2" fill="rgba(255,255,255,0.65)"/>
+        <text x="497" y="115" text-anchor="middle" fill="#fff" font-size="20" font-weight="800">Electricity</text>
+        <text x="497" y="140" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="12">every student</text>
+        <text x="497" y="178" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="12">Donated GPUs, shared.</text>
+      </svg>
+    </div>
   </div>
 
   <div class="ocs-intelligence-card ocs-intelligence-gift">
