@@ -4,24 +4,38 @@ Description: "Reduce dependence on paid AI subscriptions enabling student develo
 
 Year: "2026-2027"
 
+problemStatement:
+  kicker: "The problem"
+  title: "Capable AI help is rationed by who can pay"
+  body: "The strongest coding assistants live behind a monthly subscription. A student whose family can afford that seat gets a tireless tutor and pair programmer; a student who can't gets the same assignment and a worse starting point. That gap has nothing to do with effort or ability — it tracks a credit card. OCS Intelligence LLM exists to make the help available in class independent of who can pay for it."
+  image: "capstone/ocs-intelligence.png"
+  imageAlt: "An AI tutor pointing at a classroom screen while a student looks on."
+  imageCaption: "The goal: every OCS student gets an AI coding partner in the room, not just the ones who can afford one."
+
 donation:
   kicker: ""
   title: "Eight GTX 1070s, donated to OCS"
   body: "This capstone starts with generosity. OCS was donated a GPU rig with eight GTX 1070s — enough local compute to host open-weight models for students who cannot, or should not have to, pay for a frontier subscription. The work is not to buy intelligence. It is to turn a gifted machine into a classroom service: assembled, served, and reachable from the networks students already use."
   costLine: "After the gift, the only ongoing cost is electricity."
 
+researchQuestionsNote: "These are living questions, not a fixed spec. As Phase 0 research turns up better serving tricks or a stronger candidate model, and as Phase 1/2 surface real load numbers, the questions below get revised rather than treated as settled on day one."
+
 researchQuestions:
   - label: "Research question 1"
+    priority: "Primary — answer first, everything else depends on it"
     question: "How do we turn donated GPU hardware into a shared open LLM that OCS students can actually code with — without a paid subscription?"
+    endpoint: "Answered when a student on another network can send a request through their harness and get a streamed reply, with keys issued and managed, without picking one specific model forever."
     facts:
       - label: "Problem"
         text: "Capable models sit behind monthly fees. Coursework then depends on who can pay, not on who is in the class."
       - label: "Gift"
         text: "A donated rack with 8× GTX 1070s lets OCS host open-weight models locally instead of renting them."
       - label: "Aim"
-        text: "Stand the rack up, run inference, and stream answers to student harnesses on other networks — with keys, not hope."
+        text: "Stand the rack up, run inference with Ollama and llama.cpp, and stream answers to student harnesses on other networks — with keys, not hope."
   - label: "Research question 2"
+    priority: "Secondary — only answerable once RQ1's service exists"
     question: "Once the service exists, how do we keep it fair, visible, and usable when many students need it at once?"
+    endpoint: "Answered when ~5 concurrent users hold steady without OOM, a hard crash, or token speed falling to a crawl, and every OCS student — not just the builders — can get a key."
     facts:
       - label: "Fairness"
         text: "Every OCS student should be able to reach the same service, not a lucky few on the same LAN."
@@ -31,6 +45,16 @@ researchQuestions:
         text: "Deployment and monitoring prove the promise: it works as intended, and it is still there when the room fills up."
 
 harnesses: "Students connect from tools they already use — OpenRouter, Pi, or Claude Code — over a live stream, not a one-off laptop demo."
+
+communication:
+  kicker: "Staying accountable"
+  title: "How we keep mentors in the loop"
+  body: "Progress is written down as it happens, not summarized right before grading. Anyone mentoring this capstone can follow it without asking for a status meeting."
+  channels:
+    - label: "Microblog posts"
+      text: "Dated write-ups under this capstone (the Phase 1/Phase 2 pages themselves) log what shipped, what broke, and what changed about the research questions."
+    - label: "GitHub issues"
+      text: "Literature, metrics, and serving goals live in Open-Coding-Society/OCS-Intelligence issue #4, updated as the questions evolve."
 
 teams:
   - name: "Team 1"
@@ -119,11 +143,11 @@ literature:
   - title: "Speculative Decoding"
     type: "Paper"
     url: "https://arxiv.org/pdf/2211.17192"
-    description: "A small model drafts tokens. The serving model accepts or rejects them. Goal: 60+ tokens per second."
+    description: "A small draft model proposes tokens that the serving model accepts or rejects, aiming for 60+ tokens per second."
   - title: "YaRN"
     type: "Paper"
     url: "https://arxiv.org/pdf/2309.00071"
-    description: "Extends a model's context window past its training length."
+    description: "YaRN (Yet Another RoPE extensioN method) extends a model's context window past its training length."
   - title: "LLM Model Card"
     type: "Model card"
     url: "https://huggingface.co/Qwen/Qwen3.8-27B"
@@ -163,7 +187,7 @@ literature:
   - title: "GPTQ"
     type: "Paper"
     url: "https://arxiv.org/pdf/2210.17323"
-    description: "Post-training quantization for GPT-style models. Another way to shrink models for our GPUs."
+    description: "Post-training quantization for GPT-style models — another way to shrink models for our GPUs."
   - title: "Baseten Inference Engineering"
     type: "Book"
     url: "https://www.baseten.co/inference-engineering/"
@@ -171,13 +195,51 @@ literature:
   - title: "TTFT, TPS, ITL"
     type: "Metrics"
     url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/4"
-    description: "Time to first token, tokens per second, and inter-token latency. These are the numbers we track."
+    description: "Time to first token, tokens per second, and inter-token latency — the numbers we track to know the service still feels fast under load."
   - title: "OCS Intelligence issue #4"
     type: "Tracker"
     url: "https://github.com/Open-Coding-Society/OCS-Intelligence/issues/4"
     description: "GitHub issue that tracks literature, metrics, and serving goals for this project."
 
 stages:
+  - slug: phase-0
+    title: "Phase 0 — Define the problem, pick a direction"
+    navLabel: "Phase 0: Problem & research"
+    navKicker: "Phase 0"
+    status: "Ongoing — research questions still evolving"
+    summary: "Name the problem without jumping to a solution, read the serving literature, and pick a candidate model class — before any hardware work locks in an approach."
+    workstreams:
+      - title: "Problem framing"
+        detail: "Write down what's actually broken (paid AI access gates coursework) before deciding how to fix it, so the hardware work in Phase 1 answers a real question instead of just being a fun build."
+      - title: "Literature review"
+        detail: "Read the serving, quantization, and scheduling papers that make consumer GPUs behave like a shared production service, and keep the reading list current as the project runs."
+      - title: "Candidate model search"
+        detail: "Compare open-weight models against public benchmarks for coding ability and footprint, and stay ready to swap in a better one — no single model is the final answer."
+    doneWhen:
+      - "The problem statement and both research questions are written down and reviewable on their own, with no hardware details required to understand them."
+      - "At least one candidate open model is picked to prototype with, with a documented reason and an explicit plan to re-evaluate it."
+      - "The literature list has enough coverage of serving, quantization, and scheduling to justify the Phase 1 approach."
+    impact:
+      - "Phase 1 starts from a reasoned choice, not a guess."
+      - "Mentors can see the reasoning, not just the finished rack."
+    goals:
+      - "Write the problem statement and both research questions."
+      - "Review the serving/quantization/scheduling literature (see table below)."
+      - "Pick a first candidate model to prototype with, without committing to it long-term."
+    priorities:
+      - priority: "P0"
+        text: "Problem statement and research questions written and reviewable."
+      - priority: "P0"
+        text: "First candidate model chosen, with a stated reason and a re-evaluation plan."
+      - priority: "P1"
+        text: "Literature list broad enough to justify the serving approach used in Phase 1."
+    showAllResearchQuestions: true
+    showAllLiterature: true
+    tech:
+      - "Literature review"
+      - "Benchmark comparison"
+      - "Problem framing"
+
   - slug: phase-1
     title: "Phase 1 — Build the rack, run inference, open the stream"
     navLabel: "Phase 1: Rack, inference & access"
@@ -210,6 +272,28 @@ stages:
       - "Baseten Inference Engineering"
       - "Orca"
       - "LLM Model Card"
+    apiEndpoints:
+      - method: "POST"
+        path: "/api/generate"
+        engine: "Ollama"
+        text: "One-shot completion against whichever model is currently loaded."
+      - method: "POST"
+        path: "/api/chat"
+        engine: "Ollama"
+        text: "Multi-turn chat endpoint, used by student harnesses that keep conversation history."
+      - method: "POST"
+        path: "/v1/chat/completions"
+        engine: "llama.cpp server"
+        text: "OpenAI-compatible endpoint so existing tools (OpenRouter-style clients, Claude Code, Pi) can point at the rack with a config change, not a rewrite."
+    priorities:
+      - priority: "P0"
+        text: "A student on another network can send a request through their harness and get a streamed reply."
+      - priority: "P0"
+        text: "Keys can be issued and revoked so access is intentional, not an open port."
+      - priority: "P1"
+        text: "Hold about five concurrent users without OOM or a crawl."
+      - priority: "P2"
+        text: "Physically build and cable the rack so it stays powered and cooled unattended."
     showDonation: true
     showResearchQuestion: 1
     showJustification: true
@@ -234,7 +318,7 @@ stages:
       - title: "Many people at once"
         detail: "Classroom use is the test. The service should remain usable when several students are mid-assignment together."
       - title: "Every student has a path in"
-        detail: "Access is the impact. If some students still need a paid tool because they cannot reach OCS Intelligence, the question is unfinished."
+        detail: "Access is the impact. If some students still need a paid tool because they cannot reach OCS Intelligence LLM, the question is unfinished."
     doneWhen:
       - "The live service is the one students are told to use, not a screenshot of a local run."
       - "We can see whether it is healthy when more than one person is on it."
@@ -250,6 +334,13 @@ stages:
     literatureTitles:
       - "TTFT, TPS, ITL"
       - "OCS Intelligence issue #4"
+    priorities:
+      - priority: "P0"
+        text: "The live service is the one students are told to use, not a screenshot of a local run."
+      - priority: "P0"
+        text: "Every OCS student can get a key — not only the team that built the rack."
+      - priority: "P1"
+        text: "Dashboards or logs show whether the service is healthy when more than one person is on it."
     showResearchQuestion: 2
     tech:
       - "Deployment"
@@ -260,29 +351,32 @@ stages:
 Topics:
   - title: "A shared mind for the class"
     subtitle: "Turn a donated GPU rack into a dependable companion for coding — then keep the door open when the class shows up."
-    visualTitle: "Two implementation phases"
+    visualTitle: "Three implementation phases"
     stack:
+      - "Phase 0: Problem framing, literature, candidate model"
       - "Phase 1: Rack, inference, stream"
       - "Phase 2: Deploy, monitor, include everyone"
     keyPoints:
+      - "Phase 0 names the problem and picks a direction before any hardware is touched."
       - "The hardware was given. The work is to make it a service."
       - "Phase 1 puts models on the rack and streams them to harnesses with keys."
       - "Phase 2 proves that service under real student use."
       - "Nobody should need a paid subscription for the same chance to think with a model."
       - "The meter that remains is electricity."
-    description: "Paid LLM seats split a classroom. This capstone answers with a gift and a duty: host open models on a donated 8× GTX 1070 rig, let students reach them from their own networks, and keep that promise when many people are on at once. The research is not “can GPUs run a model.” It is “can OCS give every student the same intelligence without charging them for it.”"
-    candidateModel: "We still compare open models that can live on this hardware. The target is a coding companion good enough that a subscription is optional, not required."
+    description: "The hard part isn't turning on a GPU — it's turning eight second-hand GTX 1070s (8GB VRAM each, no NVLink) into something that behaves like one reliable service. Model weights that don't fit on a single card, a KV cache that grows with every concurrent student, and a class of ~25 people hitting it in the same ten minutes all compete for the same limited memory. The research question is whether consumer-grade, donated hardware can be engineered around those limits well enough that nobody in the room notices the difference from a paid API."
+    candidateModel: "We are not locking into one model. Candidates get re-evaluated as better open weights ship — the target is whichever coding companion fits this hardware and stays good enough that a subscription is optional, not required."
     tech:
       - "Donated GPU rack"
       - "Open-weight LLMs"
       - "Student harnesses"
       - "Electricity-only cost"
     impact:
+      - "Give every student core AI-coding services — chat, autocomplete, code review — the same things a Copilot-style subscription sells, at electricity cost instead of a monthly fee."
       - "Cut paid AI subscriptions for school work."
       - "Give more students the same chance to use a capable model."
       - "Honor the donation by putting the machine in front of the class."
       - "Learn what it takes to keep a shared service kind under load."
-    status: "Phase 1 in progress"
+    status: "Phase 0 research underway"
     audience: "OCS students — every student, not only the builders"
     link: "https://artificialanalysis.ai/models/qwen3-8-27b"
     linkLabel: "View candidate benchmarks"
