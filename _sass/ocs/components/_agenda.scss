@@ -1,0 +1,222 @@
+// =============================================================================
+// OCS AGENDA
+// =============================================================================
+// A list grouped by day. Each day has a heading row, then the rows that
+// belong to it. Built for the teaching weeks on the calendar, and reusable for
+// anything ordered by date: issues by due date, submissions by deadline.
+//
+// GRAMMAR
+//   .ocs-agenda              the list. Use <ol> or <div>.
+//   .ocs-agenda__day         one day: heading + its rows
+//   .ocs-agenda__heading     the heading row
+//   .ocs-agenda__date        "Tue 22 Sep"
+//   .ocs-agenda__note        "non-student day", "sprint start" — optional
+//   .ocs-agenda__items       the rows under a heading
+//   .ocs-agenda__item        one row. May be an <a> or a <button>.
+//   .ocs-agenda__lead        left column: a time, a badge, or nothing
+//   .ocs-agenda__body        title + meta
+//   .ocs-agenda__title       the row's title
+//   .ocs-agenda__meta        one line under the title: team, presenters
+//   .ocs-agenda__tail        right column: a badge or a small action
+//
+//   modifiers on .ocs-agenda__day    --today
+//   modifiers on .ocs-agenda__item   --muted (a checkpoint, not a lesson)
+//                                    --mine  (the viewer teaches this one)
+//   modifiers on .ocs-agenda         --compact
+//
+//   <ol class="ocs-agenda">
+//     <li class="ocs-agenda__day ocs-agenda__day--today">
+//       <div class="ocs-agenda__heading">
+//         <span class="ocs-agenda__date">Tue 22 Sep</span>
+//         <span class="ocs-agenda__note">Week 6</span>
+//       </div>
+//       <ul class="ocs-agenda__items">
+//         <li><a class="ocs-agenda__item" href="…">
+//           <span class="ocs-agenda__lead"><span class="ocs-badge">P2</span></span>
+//           <span class="ocs-agenda__body">
+//             <span class="ocs-agenda__title">Chat and WebSockets</span>
+//             <span class="ocs-agenda__meta">UGRC · Samarth, Akshaj, Tarun</span>
+//           </span>
+//           <span class="ocs-agenda__tail"><span class="ocs-badge ocs-badge--success">Lesson</span></span>
+//         </a></li>
+//       </ul>
+//     </li>
+//   </ol>
+//
+// Today is marked twice: an accent rule beside the heading and the word in the
+// note, so the mark survives without colour. A row that is a link gets the
+// same hover and focus treatment as a menu item, so it reads as clickable.
+// =============================================================================
+
+@use "../core/functions" as fn;
+@use "../core/a11y" as a11y;
+
+.ocs-agenda {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  font-family: var(--ocs-font-sans);
+  color: var(--ocs-text);
+
+  // ---------------------------------------------------------------------------
+  // A day
+  // ---------------------------------------------------------------------------
+  &__day {
+    position: relative;
+    margin: 0;
+    padding: 0 0 fn.space(4);
+    list-style: none;
+
+    & + & { padding-top: fn.space(1); }
+  }
+
+  &__heading {
+    display: flex;
+    align-items: baseline;
+    gap: fn.space(3);
+    padding: fn.space(2) 0;
+    border-block-end: 1px solid var(--ocs-border-subtle);
+  }
+
+  &__date {
+    color: var(--ocs-text);
+    font-size: fn.typo(small);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  &__note {
+    color: var(--ocs-text-muted);
+    font-size: fn.typo(small);
+  }
+
+  // Today: an accent rule beside the heading, and the note says so too.
+  &__day--today {
+    .ocs-agenda__heading {
+      padding-inline-start: fn.space(3);
+      border-inline-start: 3px solid var(--ocs-accent);
+    }
+    .ocs-agenda__date { color: var(--ocs-accent); }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Rows
+  // ---------------------------------------------------------------------------
+  &__items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    > li { margin: 0; padding: 0; list-style: none; }
+  }
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: fn.space(3);
+    width: 100%;
+    padding: fn.space(3) fn.space(2);
+    border: 0;
+    border-block-end: 1px solid var(--ocs-border-subtle);
+    border-radius: 0;
+    background: transparent;
+
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    text-decoration: none;
+
+    // Only rows that go somewhere get the pointer and the hover.
+    &:is(a, button) {
+      cursor: pointer;
+      transition: background fn.duration(fast) fn.easing(standard);
+
+      &:hover { background: var(--ocs-surface-raised); }
+
+      &:focus         { outline: none; }
+      &:focus-visible { @include a11y.focus-ring(-2px); }
+    }
+  }
+
+  &__lead {
+    flex: 0 0 auto;
+    min-width: 2.5rem;
+    padding-top: 0.125rem;
+    color: var(--ocs-text-muted);
+    font-family: var(--ocs-font-mono);
+    font-size: fn.typo(small);
+    font-variant-numeric: tabular-nums;
+  }
+
+  // Zero basis, so on a narrow screen the body shrinks beside the lead
+  // rather than wrapping under it.
+  &__body {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
+
+  &__title {
+    display: block;
+    color: var(--ocs-text);
+    font-size: fn.typo(body);
+    font-weight: 600;
+    line-height: fn.typo(body, line);
+    overflow-wrap: anywhere;
+  }
+
+  &__meta {
+    display: block;
+    margin-top: fn.space(1);
+    color: var(--ocs-text-muted);
+    font-size: fn.typo(small);
+    line-height: fn.typo(small, line);
+  }
+
+  &__tail {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: fn.space(2);
+    padding-top: 0.125rem;
+  }
+
+  // A checkpoint: everyone's row, not a lesson. Quieter, not hidden.
+  &__item--muted {
+    .ocs-agenda__title { color: var(--ocs-text-secondary); font-weight: 500; }
+  }
+
+  // The viewer teaches this one. An accent bar, and the badge in the tail
+  // should say "You teach" so the bar is never the only signal.
+  &__item--mine {
+    padding-inline-start: calc(#{fn.space(2)} - 3px);
+    border-inline-start: 3px solid var(--ocs-accent);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Compact — inside a week card or a sidebar
+  // ---------------------------------------------------------------------------
+  &--compact {
+    .ocs-agenda__day     { padding-bottom: fn.space(2); }
+    .ocs-agenda__heading { padding: fn.space(1) 0; }
+    .ocs-agenda__item    { padding: fn.space(2) fn.space(1); gap: fn.space(2); }
+    .ocs-agenda__title   { font-size: fn.typo(small); line-height: fn.typo(small, line); }
+    .ocs-agenda__meta    { margin-top: 0; }
+    .ocs-agenda__lead    { min-width: 2rem; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocs-agenda__item { transition: none; }
+}
+
+// On a phone the tail wraps under the title rather than squeezing it.
+@media (max-width: fn.breakpoint(mobile)) {
+  .ocs-agenda__item { flex-wrap: wrap; }
+  .ocs-agenda__tail {
+    flex-basis: 100%;
+    padding-inline-start: calc(2.5rem + #{fn.space(3)});
+    padding-top: 0;
+  }
+}

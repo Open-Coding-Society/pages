@@ -244,6 +244,95 @@ Set the width from your own data.
 <div class="ocs-progress"><div class="ocs-progress__bar" style="width:68%"></div></div>
 ```
 
+### Agenda
+
+A list grouped by day. Today gets an accent rule beside its heading. A row that links somewhere gets a hover; a row that does not, does not.
+
+<div class="ds-demo"><ol class="ocs-agenda ocs-agenda--compact" style="width:100%;max-width:34rem">
+  <li class="ocs-agenda__day ocs-agenda__day--today">
+    <div class="ocs-agenda__heading"><span class="ocs-agenda__date">Tue 22 Sep</span><span class="ocs-agenda__note">Today · Week 6</span></div>
+    <ul class="ocs-agenda__items">
+      <li><a class="ocs-agenda__item ocs-agenda__item--mine" href="#agenda">
+        <span class="ocs-agenda__lead"><span class="ocs-badge">P2</span></span>
+        <span class="ocs-agenda__body"><span class="ocs-agenda__title">Chat and WebSockets</span><span class="ocs-agenda__meta">UGRC · Samarth, Akshaj, Tarun</span></span>
+        <span class="ocs-agenda__tail"><span class="ocs-badge ocs-badge--success">You teach</span></span>
+      </a></li>
+    </ul>
+  </li>
+  <li class="ocs-agenda__day">
+    <div class="ocs-agenda__heading"><span class="ocs-agenda__date">Wed 23 Sep</span></div>
+    <ul class="ocs-agenda__items">
+      <li><div class="ocs-agenda__item ocs-agenda__item--muted">
+        <span class="ocs-agenda__lead">All</span>
+        <span class="ocs-agenda__body"><span class="ocs-agenda__title">Create HW and Grading Stats</span></span>
+      </div></li>
+      <li><a class="ocs-agenda__item" href="#agenda">
+        <span class="ocs-agenda__lead"><span class="ocs-badge">P2</span></span>
+        <span class="ocs-agenda__body"><span class="ocs-agenda__title">API, MVC, and security systems</span><span class="ocs-agenda__meta">UGRC · Sathwik, Akhil, Skandan</span></span>
+      </a></li>
+    </ul>
+  </li>
+</ol></div>
+
+```html
+<ol class="ocs-agenda">
+  <li class="ocs-agenda__day ocs-agenda__day--today">
+    <div class="ocs-agenda__heading">
+      <span class="ocs-agenda__date">Tue 22 Sep</span>
+      <span class="ocs-agenda__note">Today · Week 6</span>
+    </div>
+    <ul class="ocs-agenda__items">
+      <li><a class="ocs-agenda__item ocs-agenda__item--mine" href="…">
+        <span class="ocs-agenda__lead"><span class="ocs-badge">P2</span></span>
+        <span class="ocs-agenda__body">
+          <span class="ocs-agenda__title">Chat and WebSockets</span>
+          <span class="ocs-agenda__meta">UGRC · Samarth, Akshaj, Tarun</span>
+        </span>
+        <span class="ocs-agenda__tail"><span class="ocs-badge ocs-badge--success">You teach</span></span>
+      </a></li>
+    </ul>
+  </li>
+</ol>
+```
+
+### Key / value
+
+Label and value rows for a details view. It is a `<dl>`, so a screen reader reads each label with its value. Keys share one column; on a phone each pair stacks.
+
+<div class="ds-demo"><dl class="ocs-kv ocs-kv--divided" style="width:100%;max-width:28rem">
+  <div class="ocs-kv__row"><dt class="ocs-kv__key">Day</dt><dd class="ocs-kv__value">Tue 22 Sep</dd></div>
+  <div class="ocs-kv__row"><dt class="ocs-kv__key">Period</dt><dd class="ocs-kv__value"><span class="ocs-badge">P2</span></dd></div>
+  <div class="ocs-kv__row"><dt class="ocs-kv__key">Team</dt><dd class="ocs-kv__value">UGRC</dd></div>
+  <div class="ocs-kv__row"><dt class="ocs-kv__key">Homework due</dt><dd class="ocs-kv__value">Thu 24 Sep, 8:35 AM</dd></div>
+</dl></div>
+
+```html
+<dl class="ocs-kv ocs-kv--divided">
+  <div class="ocs-kv__row"><dt class="ocs-kv__key">Day</dt><dd class="ocs-kv__value">Tue 22 Sep</dd></div>
+  <div class="ocs-kv__row"><dt class="ocs-kv__key">Period</dt><dd class="ocs-kv__value"><span class="ocs-badge">P2</span></dd></div>
+</dl>
+```
+
+### Empty state
+
+What a region shows when it has nothing to show: a title, one sentence, one action. Give it `role="status"` when it replaces a list that was loading.
+
+<div class="ds-demo"><div class="ocs-empty ocs-empty--compact" role="status" style="width:100%;max-width:28rem">
+  <div class="ocs-empty__icon" aria-hidden="true"><i class="fas fa-calendar"></i></div>
+  <p class="ocs-empty__title">No lessons for your class yet</p>
+  <p class="ocs-empty__text">Pick your class on your profile page to see your period's lessons.</p>
+  <a class="ocs-btn ocs-btn--sm ocs-empty__action" href="#empty-state">Open profile</a>
+</div></div>
+
+```html
+<div class="ocs-empty" role="status">
+  <div class="ocs-empty__icon" aria-hidden="true"><i class="fas fa-calendar"></i></div>
+  <p class="ocs-empty__title">No lessons for your class yet</p>
+  <p class="ocs-empty__text">Pick your class on your profile page to see your period's lessons.</p>
+  <a class="ocs-btn ocs-btn--sm ocs-empty__action" href="/profile">Open profile</a>
+</div>
+```
+
 ## Checks
 
 Two scripts guard the colours:

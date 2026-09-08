@@ -1,0 +1,118 @@
+// =============================================================================
+// OCS KEY / VALUE
+// =============================================================================
+// Label / value rows for a details view: Day, Period, Team, Teachers. A
+// <dl> so a screen reader announces each label with its value. Built for the
+// lesson panel on the calendar; fits any "facts about one thing" box, such as
+// a group's detail or a submission's summary.
+//
+// GRAMMAR
+//   .ocs-kv            the <dl>
+//   .ocs-kv__row       one label + value pair (a <div> wrapping dt + dd)
+//   .ocs-kv__key       the <dt>
+//   .ocs-kv__value     the <dd>
+//
+//   modifiers  --divided  (a hairline between rows)
+//              --compact  (tighter rows, smaller text)
+//              --stacked  (label above value at every width, not only on phones)
+//
+//   <dl class="ocs-kv">
+//     <div class="ocs-kv__row">
+//       <dt class="ocs-kv__key">Day</dt>
+//       <dd class="ocs-kv__value">Tue 22 Sep</dd>
+//     </div>
+//   </dl>
+//
+// Keys share one column width so the values line up. Below the mobile
+// breakpoint each row stacks: key above value.
+// =============================================================================
+
+@use "../core/functions" as fn;
+
+.ocs-kv {
+  --kv-key-width: 8rem;
+
+  display: grid;
+  grid-template-columns: minmax(auto, var(--kv-key-width)) 1fr;
+  column-gap: fn.space(4);
+  row-gap: 0;
+  margin: 0;
+
+  font-family: var(--ocs-font-sans);
+  font-size: fn.typo(body);
+  line-height: fn.typo(body, line);
+
+  &__row {
+    display: contents;
+  }
+
+  &__key,
+  &__value {
+    margin: 0;
+    padding: fn.space(2) 0;
+    min-width: 0;
+  }
+
+  &__key {
+    color: var(--ocs-text-muted);
+    font-size: fn.typo(small);
+    font-weight: 500;
+    line-height: fn.typo(body, line);   // sits on the value's baseline
+    letter-spacing: 0.01em;
+  }
+
+  &__value {
+    color: var(--ocs-text);
+    overflow-wrap: anywhere;
+
+    a {
+      color: var(--ocs-info);
+      text-decoration: underline;
+      text-underline-offset: 0.125em;
+    }
+
+    // Small things that often sit in a value.
+    .ocs-badge, .ocs-avatar-stack { vertical-align: middle; }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Variants
+  // ---------------------------------------------------------------------------
+  &--divided {
+    .ocs-kv__key,
+    .ocs-kv__value { border-block-end: 1px solid var(--ocs-border-subtle); }
+
+    // No rule under the last pair.
+    .ocs-kv__row:last-child .ocs-kv__key,
+    .ocs-kv__row:last-child .ocs-kv__value { border-block-end: 0; }
+  }
+
+  &--compact {
+    font-size: fn.typo(small);
+    line-height: fn.typo(small, line);
+
+    .ocs-kv__key,
+    .ocs-kv__value { padding: fn.space(1) 0; }
+    .ocs-kv__key   { line-height: fn.typo(small, line); }
+  }
+
+  &--stacked {
+    grid-template-columns: 1fr;
+
+    .ocs-kv__key   { padding-bottom: 0; }
+    .ocs-kv__value { padding-top: fn.space(1); }
+  }
+}
+
+// On a phone every list stacks. The key keeps its muted style so the pair
+// still reads as label then value.
+@media (max-width: fn.breakpoint(mobile)) {
+  .ocs-kv {
+    grid-template-columns: 1fr;
+
+    &__key   { padding-bottom: 0; }
+    &__value { padding-top: fn.space(1); }
+
+    &--divided .ocs-kv__key { border-block-end: 0; }
+  }
+}

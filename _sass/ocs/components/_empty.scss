@@ -1,0 +1,111 @@
+// =============================================================================
+// OCS EMPTY STATE
+// =============================================================================
+// What a region shows when it has nothing to show. A title that names the
+// situation, one sentence that says why or what to do, and at most one
+// action. Built for "no lessons for your class yet" on the calendar; fits any
+// list that can be empty: submissions, issues, threads.
+//
+// GRAMMAR
+//   .ocs-empty           the box. Give it role="status" when it replaces a
+//                        list that was loading, so the change is announced.
+//   .ocs-empty__icon     optional, decorative — aria-hidden="true"
+//   .ocs-empty__title    one line, states the situation
+//   .ocs-empty__text     one sentence, plain words
+//   .ocs-empty__action   an .ocs-btn (usually --sm). One, not three.
+//
+//   modifiers  --compact  (less height, smaller icon; inside a card)
+//              --inline   (left-aligned, no box; inside a table cell or a panel)
+//
+//   <div class="ocs-empty" role="status">
+//     <div class="ocs-empty__icon" aria-hidden="true"><i class="fas fa-calendar"></i></div>
+//     <p class="ocs-empty__title">No lessons for your class yet</p>
+//     <p class="ocs-empty__text">Pick your class on your profile page to see your period's lessons.</p>
+//     <a class="ocs-btn ocs-btn--sm ocs-empty__action" href="/profile">Open profile</a>
+//   </div>
+//
+// The title is a <p>, not a heading, so it never joins the page outline.
+// =============================================================================
+
+@use "../core/functions" as fn;
+
+.ocs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: fn.space(2);
+  min-height: 12rem;
+  padding: fn.space(8) fn.space(6);
+
+  border: 1px solid var(--ocs-border);
+  border-radius: fn.radius(xl);
+  background: var(--ocs-surface-raised);
+
+  color: var(--ocs-text-secondary);
+  font-family: var(--ocs-font-sans);
+  text-align: center;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: fn.space(2);
+
+    border-radius: fn.radius(full);
+    background: var(--ocs-surface-elevated);
+    color: var(--ocs-text-muted);
+    font-size: 1.25rem;
+
+    svg { width: 1.25rem; height: 1.25rem; }
+  }
+
+  &__title {
+    margin: 0;
+    color: var(--ocs-text);
+    font-size: fn.typo(body);
+    font-weight: 600;
+    line-height: fn.typo(body, line);
+  }
+
+  &__text {
+    max-width: 36ch;
+    margin: 0;
+    color: var(--ocs-text-muted);
+    font-size: fn.typo(small);
+    line-height: fn.typo(small, line);
+  }
+
+  &__action {
+    margin-top: fn.space(3);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Variants
+  // ---------------------------------------------------------------------------
+  &--compact {
+    min-height: 0;
+    padding: fn.space(5) fn.space(4);
+
+    .ocs-empty__icon   { width: 2.25rem; height: 2.25rem; font-size: 1rem; margin-bottom: 0; }
+    .ocs-empty__action { margin-top: fn.space(2); }
+  }
+
+  &--inline {
+    display: block;
+    min-height: 0;
+    padding: fn.space(3) 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    text-align: start;
+
+    .ocs-empty__icon { display: none; }
+    .ocs-empty__title,
+    .ocs-empty__text { display: inline; }
+    .ocs-empty__text::before { content: " "; }
+    .ocs-empty__action { display: inline-flex; margin: 0 0 0 fn.space(3); }
+  }
+}
