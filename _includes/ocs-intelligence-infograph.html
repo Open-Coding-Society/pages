@@ -11,6 +11,16 @@
 
   {% include ocs-intelligence-nav.html %}
 
+  <div class="ocs-intelligence-card">
+    <p class="ocs-intelligence-gift-kicker">{{ data.problemStatement.kicker }}</p>
+    <h3 class="ocs-intelligence-section-title">{{ data.problemStatement.title }}</h3>
+    <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.problemStatement.body }}</p>
+    <figure class="ocs-intelligence-figure">
+      <img src="{{ site.baseurl }}/images/{{ data.problemStatement.image }}" alt="{{ data.problemStatement.imageAlt }}">
+      <figcaption>{{ data.problemStatement.imageCaption }}</figcaption>
+    </figure>
+  </div>
+
   <div class="ocs-intelligence-card ocs-intelligence-gift">
     <p class="ocs-intelligence-gift-kicker">{{ gift.kicker }}</p>
     <h3 class="ocs-intelligence-section-title">{{ gift.title }}</h3>
@@ -31,11 +41,15 @@
     <p class="ocs-intelligence-about">Two pictures: the path from gift to classroom service, and how a student actually reaches it.</p>
     <div class="ocs-intelligence-diagram-stack">
       <div class="ocs-intelligence-diagram-block">
-        <h4 class="ocs-intelligence-diagram-title">From donation to two phases</h4>
+        <h4 class="ocs-intelligence-diagram-title">From donation to three phases</h4>
         <div class="ocs-intelligence-diagram">
           <pre class="mermaid">flowchart LR
-    A[Donated 8x GTX 1070 rack] --> B[Phase 1]
+    A[Donated 8x GTX 1070 rack] --> P0[Phase 0]
+    P0 --> B[Phase 1]
     B --> C[Phase 2]
+    P0 --> P01[Problem and research questions]
+    P0 --> P02[Literature review]
+    P0 --> P03[Pick a candidate model]
     B --> B1[Build rack]
     B --> B2[Ollama and llama.cpp]
     B --> B3[Stream and keys]
@@ -58,9 +72,11 @@
     </div>
   </div>
 
+  <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.researchQuestionsNote }}</p>
+
   {% for item in data.researchQuestions %}
   <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">{{ item.label }}</h3>
+    <h3 class="ocs-intelligence-section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
     <p class="ocs-intelligence-question">{{ item.question }}</p>
     <div class="ocs-intelligence-facts">
       {% for fact in item.facts %}
@@ -70,12 +86,15 @@
       </div>
       {% endfor %}
     </div>
+    {% if item.endpoint %}
+    <p class="ocs-intelligence-about"><strong>Research endpoint:</strong> {{ item.endpoint }}</p>
+    {% endif %}
   </div>
   {% endfor %}
 
   <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">Two phases, one promise</h3>
-    <p class="ocs-intelligence-about">The tabs are the implementation path. First the gift becomes a live service. Then that service has to survive a class.</p>
+    <h3 class="ocs-intelligence-section-title">Three phases, one promise</h3>
+    <p class="ocs-intelligence-about">The tabs are the implementation path. First we name the problem and pick a direction. Then the gift becomes a live service. Then that service has to survive a class.</p>
     <div class="ocs-intelligence-phase-grid">
       {% for stage in data.stages %}
       <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-phase-card">
@@ -98,6 +117,20 @@
           <span class="ocs-intelligence-team-name">{{ team.members }}</span>
           <p class="ocs-intelligence-about">{{ team.role }}</p>
         </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <p class="ocs-intelligence-gift-kicker">{{ data.communication.kicker }}</p>
+    <h3 class="ocs-intelligence-section-title">{{ data.communication.title }}</h3>
+    <p class="ocs-intelligence-about">{{ data.communication.body }}</p>
+    <div class="ocs-intelligence-facts">
+      {% for channel in data.communication.channels %}
+      <div class="ocs-intelligence-visual">
+        <span class="ocs-intelligence-team-label">{{ channel.label }}</span>
+        <p class="ocs-intelligence-about">{{ channel.text }}</p>
       </div>
       {% endfor %}
     </div>
@@ -154,7 +187,7 @@
       </div>
 
       <div class="ocs-intelligence-details">
-        <h3 class="ocs-intelligence-section-title">Why this is important</h3>
+        <h3 class="ocs-intelligence-section-title">Why this is challenging</h3>
         <p class="ocs-intelligence-about">{{ topic.description }}</p>
 
         <h3 class="ocs-intelligence-section-title">Goal</h3>

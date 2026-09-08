@@ -253,7 +253,7 @@
 
 .ocs-intelligence-infograph .ocs-intelligence-stage-nav {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.75rem;
   margin-bottom: 2rem;
   padding-bottom: 1.25rem;
@@ -338,7 +338,7 @@
 
 .ocs-intelligence-infograph .ocs-intelligence-phase-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
   margin-top: 1.25rem;
 }
@@ -402,7 +402,7 @@
 }
 </style>
 
-<nav class="ocs-intelligence-stage-nav" aria-label="OCS Intelligence implementation phases">
+<nav class="ocs-intelligence-stage-nav" aria-label="OCS Intelligence LLM implementation phases">
   <a
     href="{{ site.baseurl }}{{ overview_url }}"
     class="ocs-intelligence-stage-nav-link{% if current_stage == '' %} is-active{% endif %}"
