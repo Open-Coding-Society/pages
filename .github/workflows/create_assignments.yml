@@ -8,6 +8,10 @@ on:
 
 jobs:
   create-assignments:
+    # Only the main site has the pages-bot secrets. On a fork this job
+    # fails on every push and would create production rows if a fork ever
+    # added the secrets. Skip it everywhere except Open-Coding-Society/pages.
+    if: github.repository == 'Open-Coding-Society/pages'
     runs-on: ubuntu-latest
 
     steps:
