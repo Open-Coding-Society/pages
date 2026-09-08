@@ -7,15 +7,12 @@ Year: "2026-2027"
 problemStatement:
   kicker: "The problem"
   title: "Capable AI help is rationed by who can pay"
-  body: "The strongest coding assistants live behind a monthly subscription. A student whose family can afford that seat gets a tireless tutor and pair programmer; a student who can't gets the same assignment and a worse starting point. That gap has nothing to do with effort or ability — it tracks a credit card. OCS Intelligence LLM exists to make the help available in class independent of who can pay for it."
-  image: "capstone/ocs-intelligence.png"
-  imageAlt: "An AI tutor pointing at a classroom screen while a student looks on."
-  imageCaption: "The goal: every OCS student gets an AI coding partner in the room, not just the ones who can afford one."
+  body: "The strongest coding assistants live behind a monthly subscription. A student whose family can afford that seat gets a tireless tutor and pair programmer; a student who can't gets the same assignment and a worse starting point. That gap has nothing to do with effort or ability — it tracks a credit card."
 
 donation:
   kicker: ""
   title: "Eight GTX 1070s, donated to OCS"
-  body: "This capstone starts with generosity. OCS was donated a GPU rig with eight GTX 1070s — enough local compute to host open-weight models for students who cannot, or should not have to, pay for a frontier subscription. The work is not to buy intelligence. It is to turn a gifted machine into a classroom service: assembled, served, and reachable from the networks students already use."
+  body: "This capstone starts with generosity. OCS was donated a GPU rig with eight GTX 1070s — enough local compute to host open-weight models instead of renting them. The work is not to buy intelligence. It is to turn a gifted machine into a classroom service: assembled, served, and reachable from the networks students already use."
   costLine: "After the gift, the only ongoing cost is electricity."
 
 researchQuestionsNote: "These are living questions, not a fixed spec. As Phase 0 research turns up better serving tricks or a stronger candidate model, and as Phase 1/2 surface real load numbers, the questions below get revised rather than treated as settled on day one."
@@ -26,8 +23,8 @@ researchQuestions:
     question: "How do we turn donated GPU hardware into a shared open LLM that OCS students can actually code with — without a paid subscription?"
     endpoint: "Answered when a student on another network can send a request through their harness and get a streamed reply, with keys issued and managed, without picking one specific model forever."
     facts:
-      - label: "Problem"
-        text: "Capable models sit behind monthly fees. Coursework then depends on who can pay, not on who is in the class."
+      - label: "Stakes"
+        text: "Coursework shouldn't depend on who can afford a subscription."
       - label: "Gift"
         text: "A donated rack with 8× GTX 1070s lets OCS host open-weight models locally instead of renting them."
       - label: "Aim"
@@ -371,8 +368,7 @@ Topics:
       - "Student harnesses"
       - "Electricity-only cost"
     impact:
-      - "Give every student core AI-coding services — chat, autocomplete, code review — the same things a Copilot-style subscription sells, at electricity cost instead of a monthly fee."
-      - "Cut paid AI subscriptions for school work."
+      - "Cut paid AI subscriptions for school work by giving every student core coding help — chat, autocomplete, review — at electricity cost instead of a monthly fee."
       - "Give more students the same chance to use a capable model."
       - "Honor the donation by putting the machine in front of the class."
       - "Learn what it takes to keep a shared service kind under load."
