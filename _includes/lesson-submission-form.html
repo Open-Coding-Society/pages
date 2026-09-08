@@ -4,23 +4,15 @@
   Includes both link and file submission options
 {% endcomment %}
 
+{% assign submission_type = page.assignment_submission_type | default: "file" | downcase %}
 <div class="assignment-submission">
   <h3>
     <i class="fas fa-upload assignment-submission-icon"></i>
     Submit Assignment
   </h3>
 
-  <div class="submission-options">
-    <button class="submission-tab" onclick="switchSubmissionType('link')" type="button">
-      <i class="fas fa-link"></i> Link Submission
-    </button>
-    <button class="submission-tab" onclick="switchSubmissionType('file')" type="button">
-      <i class="fas fa-file-upload"></i> File Upload
-    </button>
-  </div>
-
-  <!-- Link Submission Form -->
-  <form class="submission-form" id="link-form">
+  {% if submission_type == "link" %}
+  <form class="submission-form active" id="link-form">
     <div class="form-group">
       <label for="submission-link">Submission Link</label>
       <input type="url" id="submission-link" placeholder="https://..." required>
@@ -34,9 +26,8 @@
       Submit Link
     </button>
   </form>
-
-  <!-- File Upload Form -->
-  <form class="submission-form hidden" id="file-form">
+  {% else %}
+  <form class="submission-form active" id="file-form">
     <div class="form-group">
       <label>Upload Files</label>
       <div class="file-upload-area" id="file-upload-area">
@@ -58,6 +49,7 @@
       Submit Files
     </button>
   </form>
+  {% endif %}
 
   <div class="submission-status" id="submission-status"></div>
 </div>
