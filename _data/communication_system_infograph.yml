@@ -33,7 +33,7 @@ Topics:
     status: "Shipped"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
       - "Tarun"
 
   - title: "Per-Week Chat"
@@ -66,7 +66,7 @@ Topics:
     status: "Shipped"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
       - "Tarun"
 
   - title: "Assignment Threads"
@@ -93,7 +93,7 @@ Topics:
     status: "Planned"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
       - "Tarun"
 
   - title: "Direct Messages"
@@ -130,7 +130,7 @@ Topics:
     status: "Designed — Not Built"
     team:
       - "Perry"
-      - "Syowns"
+      - "Syown"
       - "Leon"
 
   - title: "Teacher Moderation"
@@ -152,10 +152,17 @@ Topics:
     status: "Planned"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
       - "Tarun"
 
 Sections:
+  - title: "Team"
+    subtitle: "Who owns what, straight off the UGRC-CSA sprint board"
+    items:
+      - "Announcements, per-week chat, assignment threads, and teacher moderation — Samarth, Akshajh, Tarun"
+      - "Direct messages, from the #27 design through the conversation list and the Spring side — Perry, Syown, Leon"
+      - "EC2 provisioning, CI/CD, HTTPS on a real domain, and monitoring — Sathwik, Akhil, Skandan"
+
   - title: "Why Not Stay on Slack"
     subtitle: "The case for moving discussion onto the course site"
     items:
@@ -169,8 +176,8 @@ Sections:
     items:
       - "EC2 and infra (Sathwik, Akhil, Skandan). The Spring backend only runs locally and on the maintainers' deploy, and chat is only as real as the backend behind it. Issues #5–#10 cover provisioning, CI/CD, HTTPS on a real domain, and monitoring."
       - "Issue #26 covers the Groups admin page, where chat-created rows now sit beside roster groups with nothing to tell them apart."
-      - "CSA page and chat (Samarth, Akshaj, Tarun). Issue #11 owns the page, #13 polishes and extends the widgets, #15 QAs them across every course and week."
-      - "DMs (Perry, Syowns, Leon). Issue #17 is the design, answered by #27; #19 is the conversation list and thread UI; #21 is the Spring side."
+      - "CSA page and chat (Samarth, Akshajh, Tarun). Issue #11 owns the page, #13 polishes and extends the widgets, #15 QAs them across every course and week."
+      - "DMs (Perry, Syown, Leon). Issue #17 is the design, answered by #27; #19 is the conversation list and thread UI; #21 is the Spring side."
       - "One gap worth repeating: group chat history lives in S3. Without credentials in the deploy environment, send and receive work but scrollback comes back empty. That's already true of lesson_chat.html, but it does block a real Slack migration."
 
 Links:

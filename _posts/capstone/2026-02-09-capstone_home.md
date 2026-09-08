@@ -167,6 +167,11 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/greppers/",
       frontendUrl: "http://sfifoundation.opencodingsociety.com",
       backendUrl: "https://greppers-be.opencodingsociety.com/"
+    },
+    "Communication System": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/communication-system/",
+      frontendUrl: "https://github.com/UGRC-CSA/Pages",
+      backendUrl: "https://github.com/Open-Coding-Society/spring"
     }
   };
 
@@ -785,6 +790,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
            <p class="text-sm text-gray-700">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
+       </div>
+   </div>
+
+   <!-- Communication System (CSA) -->
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">
+           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - class announcement chat on the CSA course page" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
+           <p class="text-sm text-gray-700">Moving class discussion out of Slack and onto the course site — class-wide announcements and per-week chat already ship, with per-assignment threads, 1:1 direct messages, and teacher moderation still to build.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>
 </div>
