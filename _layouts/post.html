@@ -849,10 +849,17 @@ Check if this is a course lesson and determine which course context to use
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
+        // Send the same identity the deploy script sends
+        // (scripts/create_assignments_from_frontmatter.py): the permalink
+        // without its leading slash, plus points and dueDate from the
+        // frontmatter. The server matches an existing row by the exact
+        // contentUrl, so a slash here made a second row for the same page.
         body: new URLSearchParams({
           name: PAGE_TITLE || {{ page.title | jsonify }},
-          contentUrl: CURRENT_LESSON_ID,
-          description: {{ page.description | default: "" | jsonify }}
+          contentUrl: CURRENT_LESSON_ID.replace(/^\//, ''),
+          description: {{ page.description | default: "" | jsonify }},
+          {% if page.points %}points: {{ page.points | jsonify }},{% endif %}
+          {% if page.dueDate %}dueDate: {{ page.dueDate | jsonify }},{% endif %}
         })
       });
       
