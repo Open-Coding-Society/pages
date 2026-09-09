@@ -1,0 +1,336 @@
+<style>
+.sfi27-page {
+  --sfi-navy: #0b1f4d;
+  --sfi-blue: #2449a8;
+  --sfi-blue-2: #315fc8;
+  --sfi-ink: #15213a;
+  --sfi-muted: #59657c;
+  --sfi-line: #dce3f0;
+  --sfi-soft: #f4f7fd;
+  --sfi-white: #ffffff;
+  max-width: 1160px;
+  margin: 0 auto;
+  color: var(--sfi-ink);
+  font-family: inherit;
+}
+.sfi27-page *, .sfi27-page *::before, .sfi27-page *::after { box-sizing: border-box; }
+.sfi27-section { padding: 4.5rem 1.5rem; border-bottom: 1px solid var(--sfi-line); }
+.sfi27-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, .75fr);
+  gap: 2rem;
+  align-items: stretch;
+  padding-top: 3.25rem;
+}
+.sfi27-eyebrow, .sfi27-kicker {
+  margin: 0 0 .8rem;
+  color: var(--sfi-blue);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.sfi27-brand { display: flex; align-items: center; gap: 1.25rem; }
+.sfi27-logo {
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  border-radius: 18px;
+  box-shadow: 0 14px 32px rgba(17, 40, 94, .14);
+  flex: 0 0 auto;
+}
+.sfi27-page h1 {
+  margin: 0;
+  font-size: clamp(2.15rem, 5vw, 4.2rem);
+  line-height: .98;
+  letter-spacing: -.045em;
+  color: var(--sfi-navy);
+}
+.sfi27-subtitle {
+  max-width: 760px;
+  margin: 1.2rem 0 0;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.65;
+  color: var(--sfi-muted);
+}
+.sfi27-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.6rem; }
+.sfi27-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 46px;
+  padding: .78rem 1rem;
+  border: 1px solid var(--sfi-blue);
+  border-radius: 10px;
+  font-weight: 750;
+  text-decoration: none !important;
+}
+.sfi27-action--primary { background: var(--sfi-blue); color: white !important; }
+.sfi27-action--secondary { background: white; color: var(--sfi-navy) !important; }
+.sfi27-action:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(23, 55, 130, .14); }
+.sfi27-hero-card {
+  background: linear-gradient(145deg, var(--sfi-navy), #173a86);
+  color: white;
+  border-radius: 22px;
+  padding: 2rem;
+  box-shadow: 0 20px 48px rgba(8, 28, 72, .2);
+}
+.sfi27-hero-card .sfi27-kicker { color: #adc5ff; }
+.sfi27-hero-card h2 { margin: 0; color: white; font-size: 1.7rem; line-height: 1.18; }
+.sfi27-hero-card p { color: #dbe5ff; line-height: 1.65; }
+.sfi27-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin-top: 1.5rem; }
+.sfi27-mini {
+  padding: .8rem;
+  border-radius: 12px;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.13);
+  font-size: .82rem;
+  font-weight: 700;
+}
+.sfi27-heading { max-width: 780px; margin-bottom: 2rem; }
+.sfi27-heading h2 {
+  margin: 0 0 .8rem;
+  color: var(--sfi-navy);
+  font-size: clamp(1.75rem, 3vw, 2.55rem);
+  letter-spacing: -.025em;
+}
+.sfi27-heading p { margin: 0; color: var(--sfi-muted); font-size: 1.05rem; line-height: 1.7; }
+.sfi27-two, .sfi27-three, .sfi27-four { display: grid; gap: 1rem; }
+.sfi27-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sfi27-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sfi27-four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sfi27-card {
+  background: white;
+  border: 1px solid var(--sfi-line);
+  border-radius: 18px;
+  padding: 1.45rem;
+  box-shadow: 0 8px 28px rgba(18, 45, 101, .06);
+}
+.sfi27-card h3 { margin: .35rem 0 .65rem; color: var(--sfi-navy); font-size: 1.08rem; }
+.sfi27-card p { margin: 0; color: var(--sfi-muted); line-height: 1.65; }
+.sfi27-num {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #e8efff;
+  color: var(--sfi-blue);
+  font-size: .78rem;
+  font-weight: 900;
+}
+.sfi27-soft { background: var(--sfi-soft); }
+.sfi27-dark {
+  background: #09162f;
+  color: white;
+  border-radius: 24px;
+  margin: 2.2rem 1.5rem;
+  border-bottom: 0;
+}
+.sfi27-dark .sfi27-kicker { color: #91afff; }
+.sfi27-dark .sfi27-heading h2, .sfi27-dark h3 { color: white; }
+.sfi27-dark .sfi27-heading p, .sfi27-dark p { color: #c9d5ed; }
+.sfi27-flow { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: .75rem; align-items: center; }
+.sfi27-flow-node {
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+}
+.sfi27-flow-node strong { color: white; }
+.sfi27-flow-node span { margin-top: .35rem; color: #b9c8e5; font-size: .85rem; line-height: 1.45; }
+.sfi27-tech-tag {
+  display: inline-block;
+  margin: .22rem .22rem .22rem 0;
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  background: #edf2ff;
+  color: #18377f;
+  font-size: .76rem;
+  font-weight: 750;
+}
+.sfi27-roadmap { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.sfi27-phase { border-left: 4px solid var(--sfi-blue); }
+.sfi27-phase small { color: var(--sfi-blue); font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+.sfi27-team { display: grid; grid-template-columns: 1.1fr .9fr; gap: 2rem; align-items: start; }
+.sfi27-members { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; }
+.sfi27-member { padding: .8rem 1rem; border: 1px solid rgba(255,255,255,.13); border-radius: 12px; background: rgba(255,255,255,.055); color: white; font-weight: 700; }
+.sfi27-note {
+  margin-top: 1.25rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid #cfd9ed;
+  border-radius: 12px;
+  background: #f8faff;
+  color: #48566f;
+  font-size: .9rem;
+  line-height: 1.6;
+}
+@media (max-width: 850px) {
+  .sfi27-hero, .sfi27-team, .sfi27-two, .sfi27-three, .sfi27-four, .sfi27-roadmap, .sfi27-flow { grid-template-columns: 1fr; }
+  .sfi27-dark { margin-left: 0; margin-right: 0; border-radius: 0; }
+}
+@media (max-width: 560px) {
+  .sfi27-section { padding: 3rem 1rem; }
+  .sfi27-brand { align-items: flex-start; flex-direction: column; }
+  .sfi27-logo { width: 78px; height: 78px; }
+  .sfi27-mini-grid, .sfi27-members { grid-template-columns: 1fr; }
+  .sfi27-action { width: 100%; }
+}
+</style>
+
+<div class="sfi27-page">
+  <section class="sfi27-section sfi27-hero">
+    <div>
+      <p class="sfi27-eyebrow">2026–2027 CSP Capstone · In Development</p>
+      <div class="sfi27-brand">
+        <img class="sfi27-logo" src="{{ '/images/capstone/sfi-foundation-2026-27.png' | relative_url }}" alt="SFI Foundation project logo" />
+        <div>
+          <h1>SFI Foundation 2026–27</h1>
+          <p class="sfi27-subtitle">A continuation of our motorsports safety modernization prototype—making SFI standards easier to search, understand, personalize, and maintain.</p>
+        </div>
+      </div>
+      <div class="sfi27-actions">
+        <a class="sfi27-action sfi27-action--primary" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Frontend Repository ↗</a>
+        <a class="sfi27-action sfi27-action--secondary" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Backend Repository ↗</a>
+      </div>
+    </div>
+
+    <aside class="sfi27-hero-card">
+      <p class="sfi27-kicker">Why this matters</p>
+      <h2>Safety information should be easier to find before it is needed.</h2>
+      <p>Our direction is a student-built interface around searchable standards, assisted discovery, personal equipment tracking, and staff-oriented management workflows.</p>
+      <div class="sfi27-mini-grid">
+        <div class="sfi27-mini">Searchable standards</div>
+        <div class="sfi27-mini">ML-assisted matching</div>
+        <div class="sfi27-mini">Equipment detection</div>
+        <div class="sfi27-mini">Personal gear tracking</div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="sfi27-section">
+    <div class="sfi27-heading">
+      <p class="sfi27-kicker">Problem → Direction</p>
+      <h2>Turn a large standards library into a clearer workflow.</h2>
+      <p>The project is not trying to replace official SFI documentation. It explores how software can make that information easier to discover and organize while keeping the official standards and PDFs as the source of truth.</p>
+    </div>
+    <div class="sfi27-two">
+      <article class="sfi27-card">
+        <h3>Current challenge</h3>
+        <p>Users can face dense lists, unfamiliar specification numbers, and multiple documents when trying to determine which safety standard applies to a piece of equipment.</p>
+      </article>
+      <article class="sfi27-card">
+        <h3>Project direction</h3>
+        <p>Combine structured spec data, plain-language search, ML suggestions, gear tracking, and guided tools into one consistent frontend backed by a Flask API.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="sfi27-section sfi27-soft">
+    <div class="sfi27-heading">
+      <p class="sfi27-kicker">Core Experience</p>
+      <h2>A four-step path from question to useful safety information.</h2>
+    </div>
+    <div class="sfi27-four">
+      <article class="sfi27-card"><span class="sfi27-num">01</span><h3>Search standards</h3><p>Browse categories or search specification records in plain language instead of relying only on exact spec numbers.</p></article>
+      <article class="sfi27-card"><span class="sfi27-num">02</span><h3>Describe a part</h3><p>A TF-IDF + LinearSVC classifier can suggest likely specification matches from a free-text equipment description.</p></article>
+      <article class="sfi27-card"><span class="sfi27-num">03</span><h3>Inspect equipment</h3><p>Browser-side TensorFlow.js models explore image and camera-based equipment recognition as an assistive discovery tool.</p></article>
+      <article class="sfi27-card"><span class="sfi27-num">04</span><h3>Track and revisit</h3><p>Users can organize personal gear, revisit certification information, and ask the site chatbot questions about the available spec data.</p></article>
+    </div>
+  </section>
+
+  <section class="sfi27-section sfi27-dark">
+    <div class="sfi27-heading">
+      <p class="sfi27-kicker">System Flow</p>
+      <h2>Frontend, API, data, and assisted discovery working together.</h2>
+      <p>The capstone intentionally spans both the browser experience and backend services so the team can iterate on a complete full-stack workflow.</p>
+    </div>
+    <div class="sfi27-flow">
+      <div class="sfi27-flow-node"><strong>Jekyll + JavaScript</strong><span>Search UI, detector, My Gear, auth views, chatbot and responsive pages.</span></div>
+      <div class="sfi27-flow-node"><strong>Flask API</strong><span>Authentication, SFI spec endpoints, classifier, chatbot and gear operations.</span></div>
+      <div class="sfi27-flow-node"><strong>SQLAlchemy + SQLite</strong><span>Structured specification records and user-linked prototype data.</span></div>
+      <div class="sfi27-flow-node"><strong>ML + AI helpers</strong><span>LinearSVC matching, TensorFlow.js detection, and Gemini-assisted questions.</span></div>
+    </div>
+  </section>
+
+  <section class="sfi27-section">
+    <div class="sfi27-heading">
+      <p class="sfi27-kicker">Engineering Destination</p>
+      <h2>Six connected areas we are developing and refining.</h2>
+    </div>
+    <div class="sfi27-three">
+      <article class="sfi27-card"><h3>Standards Search</h3><p>Structured categories, statistics, fuzzy discovery, metadata, and links back to official specification documents.</p></article>
+      <article class="sfi27-card"><h3>Spec Classifier</h3><p>ML-assisted matching for users who know what a part does but do not yet know the relevant specification number.</p></article>
+      <article class="sfi27-card"><h3>Equipment Detector</h3><p>A browser-first experiment using camera or uploaded images to suggest likely motorsports equipment categories.</p></article>
+      <article class="sfi27-card"><h3>My Gear</h3><p>Personal equipment records designed to help users keep important safety gear information organized in one place.</p></article>
+      <article class="sfi27-card"><h3>AI Assistant</h3><p>A Gemini-backed chatbot that can answer questions using compact SFI specification context supplied by the backend.</p></article>
+      <article class="sfi27-card"><h3>Staff Tools</h3><p>Administrative workflows for users, groups, permissions, gear review, and specification maintenance are the next major integration area.</p></article>
+    </div>
+  </section>
+
+  <section class="sfi27-section sfi27-soft">
+    <div class="sfi27-heading">
+      <p class="sfi27-kicker">Technical Plan</p>
+      <h2>A practical stack for a full-stack CSP capstone.</h2>
+    </div>
+    <div class="sfi27-three">
+      <article class="sfi27-card"><h3>Frontend</h3><p>Jekyll and JavaScript for static content plus interactive client-side features.</p><div><span class="sfi27-tech-tag">Jekyll</span><span class="sfi27-tech-tag">JavaScript</span><span class="sfi27-tech-tag">TensorFlow.js</span></div></article>
+      <article class="sfi27-card"><h3>Backend + Data</h3><p>Python Flask APIs with SQLAlchemy persistence and a SQLite development database.</p><div><span class="sfi27-tech-tag">Python</span><span class="sfi27-tech-tag">Flask</span><span class="sfi27-tech-tag">SQLAlchemy</span><span class="sfi27-tech-tag">SQLite</span></div></article>
+      <article class="sfi27-card"><h3>Assisted Discovery</h3><p>Traditional text classification and API-backed generative assistance used for different parts of the experience.</p><div><span class="sfi27-tech-tag">TF-IDF</span><span class="sfi27-tech-tag">LinearSVC</span><span class="sfi27-tech-tag">Gemini API</span></div></article>
+    </div>
+  </section>
+
+  <section class="sfi27-section">
+    <div class="sfi27-heading">
+      <p class="sfi27-kicker">Research & Validation</p>
+      <h2>We want to measure whether the experience is actually easier to use.</h2>
+      <p>Validation is centered on realistic tasks rather than visual polish alone.</p>
+    </div>
+    <div class="sfi27-two">
+      <article class="sfi27-card"><h3>Discovery tests</h3><p>Can a user find a relevant standard by category, keyword, typo-tolerant search, or a plain-language description of a part?</p></article>
+      <article class="sfi27-card"><h3>Integration tests</h3><p>Do frontend flows behave consistently with the local/deployed API, authentication state, saved gear data, and classifier responses?</p></article>
+    </div>
+  </section>
+
+  <section class="sfi27-section">
+    <div class="sfi27-heading">
+      <p class="sfi27-kicker">Roadmap</p>
+      <h2>Build on the prototype instead of starting over.</h2>
+    </div>
+    <div class="sfi27-roadmap">
+      <article class="sfi27-card sfi27-phase"><small>Foundation</small><h3>Existing prototype</h3><p>Modern SFI pages, spec search, browser detector, classifier, authentication integration, gear tracking, and chatbot foundations.</p></article>
+      <article class="sfi27-card sfi27-phase"><small>Current iteration</small><h3>Stabilize the full stack</h3><p>Improve local setup, data paths, API consistency, responsive UI, role behavior, and the reliability of the main user journeys.</p></article>
+      <article class="sfi27-card sfi27-phase"><small>Next</small><h3>Deeper staff + document workflows</h3><p>Finish permission-aware admin tools, expand testing, and investigate secure PDF ingestion/search without losing critical safety detail.</p></article>
+    </div>
+    <div class="sfi27-note"><strong>Prototype disclaimer:</strong> This is a student capstone and not an official SFI Foundation product, certification tool, or replacement for official SFI standards, labels, requirements, or PDF documents.</div>
+  </section>
+
+  <section class="sfi27-section sfi27-dark">
+    <div class="sfi27-team">
+      <div>
+        <p class="sfi27-kicker">Team</p>
+        <div class="sfi27-heading">
+          <h2>SFI Foundation 2026–27</h2>
+          <p>Six students continuing the prototype across frontend, backend, data, ML, user experience, and product validation.</p>
+        </div>
+        <div class="sfi27-actions">
+          <a class="sfi27-action sfi27-action--secondary" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Frontend ↗</a>
+          <a class="sfi27-action sfi27-action--secondary" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Backend ↗</a>
+        </div>
+      </div>
+      <div class="sfi27-members">
+        <div class="sfi27-member">Ruhaan Bansal</div>
+        <div class="sfi27-member">Arya Taghavi Zargar</div>
+        <div class="sfi27-member">Deyar Raissadat</div>
+        <div class="sfi27-member">Ishan Jha</div>
+        <div class="sfi27-member">Ishan Khandelwal</div>
+        <div class="sfi27-member">Vayun Shekhar</div>
+      </div>
+    </div>
+  </section>
+</div>
