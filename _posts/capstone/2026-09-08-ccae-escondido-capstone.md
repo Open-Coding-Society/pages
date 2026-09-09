@@ -8,7 +8,6 @@ permalink: /capstone/ccae/
 
 > The Escondido Arts has sophisticated elements which will be good to learn as we progrss toward our journey of ideation and improvement.  They have strength in Events and Ticket sales, lacking in personalization and informaation navigation.
 
-
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">Strengths vs Improvement</div>
 
@@ -43,6 +42,6 @@ permalink: /capstone/ccae/
     </div>
 </div>
 
-**See our UI patterns:**
+**Powered by OCS grids and buttons**
 
 [Buttons]({{site.baseurl}}/index2) | [Grids]({{site.baseurl}}/index4)
