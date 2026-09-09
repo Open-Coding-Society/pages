@@ -932,6 +932,18 @@ document.addEventListener('DOMContentLoaded', function(){
            <p>Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>
+
+    <!-- Poway Scripps Rotary Club (CSP) -->
+    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+        <a href="#">
+            <img src="TBD" alt="Poway Scripps Rotary Club" class="w-28 h-28 object-cover rounded" />
+        </a>
+        <div>
+            <h3 class="text-lg font-semibold"><a href="#">Poway Scripps Rotary Club</a></h3>
+            <p class="text-sm text-gray-700">Helping the Poway Scripps Rotary Club Improve Their Website</p>
+            <p class="text-xs text-gray-500 mt-2">Team: Samarth H, Rigved G, Rohan S</p>
+        </div>
+    </div>
 </div>
 
 <!-- Edit Capstone Modal -->
