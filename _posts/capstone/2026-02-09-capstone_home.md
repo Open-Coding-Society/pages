@@ -801,17 +801,29 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- OCS Security (CSA) -->
-  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
-       <a href="{% post_url capstone/2026-09-03-cccs-security %}">
-           <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
-           <p class="text-sm text-gray-700">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
-       </div>
-   </div>
+    <!-- OCS Security (CSA) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+        <a href="{% post_url capstone/2026-09-03-cccs-security %}">
+            <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="w-28 h-28 object-cover rounded" />
+        </a>
+        <div>
+            <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
+            <p class="text-sm text-gray-700">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
+            <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
+        </div>
+    </div>
+
+    <!-- Poway Scripps Rotary Club (CSP) -->
+    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+        <a href="#">
+            <img src="TBD" alt="Poway Scripps Rotary Club" class="w-28 h-28 object-cover rounded" />
+        </a>
+        <div>
+            <h3 class="text-lg font-semibold"><a href="#">Poway Scripps Rotary Club</a></h3>
+            <p class="text-sm text-gray-700">Helping the Poway Scripps Rotary Club Improve Their Website</p>
+            <p class="text-xs text-gray-500 mt-2">Team: Samarth H, Rigved G, Rohan S</p>
+        </div>
+    </div>
 </div>
 
 <!-- Edit Capstone Modal -->
