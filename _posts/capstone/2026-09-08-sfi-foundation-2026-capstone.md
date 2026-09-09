@@ -28,14 +28,34 @@ permalink: /capstone/sfi-foundation/
     </div>
 </div>
 
+<br>
+
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Frontend Repository ↗</a>
-    <a class="ocs__btn iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Backend Repository ↗</a>
+    <a class="ocs__btn ocs__btn--icon alert-green iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">
+        <span class="ocs__btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+        </span>
+        <span>Frontend Repository</span>
+    </a>
+    <a class="ocs__btn ocs__btn--icon alert-yellow iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">
+        <span class="ocs__btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+        </span>
+        <span>Backend Repository</span>
+    </a>
 </div>
+
+<br>
 
 ---
 
 ## Core experience
+
+> Four connected parts of the user journey, from finding a standard to returning to saved gear later.
 
 <div class="ocs__grid ocs__grid--card">
     <div class="ocs__grid-cell ocs__grid-cell--accent">
@@ -59,6 +79,8 @@ permalink: /capstone/sfi-foundation/
     </div>
 </div>
 
+<br>
+
 ---
 
 ## From problem to product direction
@@ -77,9 +99,13 @@ permalink: /capstone/sfi-foundation/
     </div>
 </div>
 
+<br>
+
 ---
 
 ## System flow
+
+> A simple view of how the browser, API, data layer, and assisted-discovery tools work together.
 
 <div class="ocs__grid ocs__grid--standard cols-4">
     <div class="ocs__grid-cell ocs__grid-cell--header">One connected full-stack workflow</div>
@@ -107,6 +133,8 @@ permalink: /capstone/sfi-foundation/
 
 > The goal is a single workflow where the browser experience and backend services can evolve together instead of feeling like separate demos.
 
+<br>
+
 ---
 
 ## Technical foundation
@@ -133,22 +161,61 @@ permalink: /capstone/sfi-foundation/
     </div>
 </div>
 
+<br>
+
+<div class="ocs__links ocs__links--wide">
+    <a class="ocs__btn pill alert-green fill" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend ↗</a>
+    <a class="ocs__btn pill alert-yellow fill" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Explore Backend ↗</a>
+</div>
+
+<br>
+
 ---
 
 ## Team
 
+> Two Scrum Masters guide project coordination while four technologists/developers build and refine the product experience.
+
+### Scrum Masters
+
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Project Leadership</div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Ruhaan Bansal</strong>
+        <p>Scrum Master</p>
+    </div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Ishan Jha</strong>
+        <p>Scrum Master</p>
+    </div>
+</div>
+
+<br>
+
+### Technologists / Developers
+
 <div class="ocs__grid ocs__grid--card">
-    <div class="ocs__grid-cell"><strong>Ruhaan Bansal</strong></div>
-    <div class="ocs__grid-cell"><strong>Arya Taghavi Zargar</strong></div>
-    <div class="ocs__grid-cell"><strong>Deyar Raissadat</strong></div>
-    <div class="ocs__grid-cell"><strong>Ishan Jha</strong></div>
-    <div class="ocs__grid-cell"><strong>Ishan Khandelwal</strong></div>
-    <div class="ocs__grid-cell"><strong>Vayun Shekhar</strong></div>
+    <div class="ocs__grid-cell">
+        <strong>Arya Taghavi Zargar</strong>
+        <p>Technologist / Developer</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Deyar Raissadat</strong>
+        <p>Technologist / Developer</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Ishan Khandelwal</strong>
+        <p>Technologist / Developer</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Vayun Shekhar</strong>
+        <p>Technologist / Developer</p>
+    </div>
 </div>
 
-<div class="ocs__links">
-    <a class="ocs__btn small iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend</a>
-    <a class="ocs__btn small iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Explore Backend</a>
-</div>
+<br>
 
-<!-- GitHub Pages rebuild trigger -->
+<div class="ocs__links ocs__links--wide">
+    <a class="ocs__btn large iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">View Frontend Repository</a>
+    <a class="ocs__btn large iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">View Backend Repository</a>
+</div>
