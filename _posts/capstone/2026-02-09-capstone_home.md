@@ -890,6 +890,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
        </div>
    </div>
+
+   <!-- My Good Brain (CSP 26-27) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+       <a href="{{ '/capstone/mygoodbrain/' | relative_url }}">
+           <img src="{{ '/images/capstone/my_good_brain.png' | relative_url }}" alt="My Good Brain logo" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/mygoodbrain/' | relative_url }}">My Good Brain</a></h3>
+           <p class="text-sm text-gray-700">An interactive hub bridging psychology, neuroscience, and art to support youth mental and emotional wellness </p>
+           <p class="text-xs text-gray-500 mt-2">Team: Rashi Gaurav, Aashni Katari, Kelervia Fang</p>
+       </div>
+   </div>
 </div>
 
 <!-- Edit Capstone Modal -->
