@@ -150,3 +150,5 @@ permalink: /capstone/sfi-foundation/
     <a class="ocs__btn small iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend</a>
     <a class="ocs__btn small iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Explore Backend</a>
 </div>
+
+<!-- GitHub Pages rebuild trigger -->
