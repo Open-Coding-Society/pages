@@ -3,7 +3,6 @@ layout: post
 title: Portfolio Home 4
 hide: true
 show_reading_time: false
-permaklink: /home4
 ---
 
 Hi! My name is [Your Full Name]
