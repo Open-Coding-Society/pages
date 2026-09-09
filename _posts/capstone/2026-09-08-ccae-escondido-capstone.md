@@ -15,6 +15,9 @@ permalink: /capstone/ccae/
     <a class="ocs__btn" href="https://artcenter.org/events/">
         Events Page
     </a>
+    <a class="ocs__btn" href="https://www.ccaemuseum.org/">
+        Museum
+    </a>
     <a class="ocs__btn" href="https://artcenter.org/about/">
         About Page
     </a>
