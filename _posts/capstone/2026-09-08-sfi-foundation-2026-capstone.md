@@ -164,8 +164,8 @@ permalink: /capstone/sfi-foundation/
 <br>
 
 <div class="ocs__links ocs__links--wide">
-    <a class="ocs__btn pill alert-green fill" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend ↗</a>
-    <a class="ocs__btn pill alert-yellow fill" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Explore Backend ↗</a>
+    <a class="ocs__btn alert-green iridescent" href="https://github.com/ruhaanb622/SFI-Frontend" target="_blank" rel="noreferrer noopener">Explore Frontend ↗</a>
+    <a class="ocs__btn alert-yellow iridescent" href="https://github.com/ruhaanb622/SFI-Backend" target="_blank" rel="noreferrer noopener">Explore Backend ↗</a>
 </div>
 
 <br>
