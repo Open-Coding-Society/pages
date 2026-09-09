@@ -316,6 +316,32 @@ Below are the capstone infographic pages created by student groups. Click an ima
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
+   <!-- Submissions Capstone (umbrella issue: AAA, Submission Analytics, AI Grading) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-08-31-submissions-capstone %}">
+           <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #06b6d4, #0f172a);">SUB</div>
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Submissions</a></h3>
+           <p class="text-sm text-gray-700">Umbrella capstone covering three groups' work on the assignment/submission system: assignment creator permissions, submission analytics, and AI grading.</p>
+           <p class="text-xs text-gray-500 mt-2">Groups: Assignment Creator Permissions, Submission Analytics, AI Grading</p>
+       </div>
+   </div>
+
+
+   <!-- UESL Accessible Game Maker 2.0 (CSP, 2026/2027) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
+       <a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">
+           <img src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation logo — shield with game controller" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">UESL Accessible Game Maker 2.0</a></h3>
+           <p class="text-sm text-gray-700">An accessible game creation platform guiding participants through templates, live themes, and IDD-focused comfort profiles before keyboard-friendly playtesting. Versioned state validates choices, restores browser drafts, and exports engine-ready configurations for UESL’s advanced editor and GameEnginev1.2.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Ishan, Rohan, Adhvay</p>
+       </div>
+   </div>
+
+
    <!-- RFID + Camera-Correlated Classroom Presence -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
      <a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">
@@ -740,17 +766,29 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-  <!-- FOPS -->
- <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
-       <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
-           <img src="/images/capstone/fops.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
-           <p class="text-sm text-gray-700"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
-           <p class="text-xs text-gray-500 mt-2">Team: Nitya, Vivian, Virginia</p>
-       </div>
-   </div>
+  <!-- FOPS (2025-2026) -->
+ <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2025-2026">
+        <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
+            <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="w-28 h-28 object-cover rounded" />
+        </a>
+        <div>
+            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
+            <p class="text-sm text-gray-700"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
+            <p class="text-xs text-gray-500 mt-2">Team: Nitya, Vivian, Virginia</p>
+        </div>
+    </div>
+
+  <!-- FOPS (2026-2027) -->
+ <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+        <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
+            <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="w-28 h-28 object-cover rounded" />
+        </a>
+        <div>
+            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
+            <p class="text-sm text-gray-700"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
+            <p class="text-xs text-gray-500 mt-2">Team: Nitya, Vivian, Virginia</p>
+        </div>
+    </div>
 
  <!-- Dynamic Event Calendar (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
@@ -761,6 +799,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Safe Passage Heals - Media Management Tools and Interactive Recovery Simulation</a></h3>
            <p class="text-sm text-gray-700">A system of interactive web tools for Safe Passage Heals — centralizing community events through dynamic media management and an interactive simulation of the domestic violence recovery process.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
+       </div>
+   </div>
+   
+   <!-- California Center For The Performing Arts Escondido (CSP, 2026/2027) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
+           <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="w-28 h-28 object-contain rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">California Center For The Performing Arts Escondido</a></h3>
+           <p class="text-sm text-gray-700">This capstone project involves refurbishing the California Center For The Performing Arts Escondido website to be more streamlined, organized, and less busy. It will also overhaul the search feature to be more intelligent, introduce a dynamic and artistic design, and will replace generic walls of text with something more interactive.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Mateo, Tristan, and Yue (Barbara)</p>
        </div>
    </div>
 

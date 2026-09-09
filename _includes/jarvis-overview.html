@@ -23,6 +23,11 @@
     </div>
     <span class="jv-flow-arrow">→</span>
     <div class="jv-flow-node active">
+      <span class="jv-flow-node-label">YOLO</span>
+      <span class="jv-flow-node-sub">Object Detection</span>
+    </div>
+    <span class="jv-flow-arrow">→</span>
+    <div class="jv-flow-node">
       <span class="jv-flow-node-label">SAM 3</span>
       <span class="jv-flow-node-sub">Precise Segmentation</span>
     </div>
@@ -41,7 +46,6 @@
     </p>
   </div>
 
-  
   <!-- System architecture -->
   <div class="jv-section-label">System Architecture</div>
   <div class="jv-card">
@@ -53,7 +57,9 @@ Timestamped frame"]
     C2["Camera 2
 Second Linux computer"] --> TX["SSH / NetBird"]
     TX --> CAP
-    CAP --> SAM["SAM 3
+    CAP --> YOLO["YOLO
+Object detection"]
+    YOLO --> SAM["SAM 3
 Object segmentation"]
     SAM --> FUSE["Multi-camera matching
 and temporal tracking"]
@@ -81,7 +87,7 @@ Identity + location + history"]</pre>
       <div class="jv-flow-node active">
         <div class="jv-flow-node-photo"><img src="/images/capstone/jarvis-bom/mac-mini.jpg" alt="Main Linux computer"></div>
         <span class="jv-flow-node-label">Main Linux Computer</span>
-        <span class="jv-flow-node-sub">Capture + SAM 3</span>
+        <span class="jv-flow-node-sub">Capture + YOLO + SAM 3</span>
       </div>
       <span class="jv-flow-arrow">→</span>
       <div class="jv-flow-node">
@@ -160,8 +166,8 @@ Nov 2026"]
       <span class="jv-hub-card-arrow">Explore Research 1</span>
     </a>
     <a href="/capstone/jarvis/research-2/" class="jv-hub-card">
-      <span class="jv-hub-card-title">Research 2: SAM 3 Segmentation</span>
-      <span class="jv-hub-card-desc">Pixel-precise mask generation, bounding box refinement, and CPU performance optimization.</span>
+      <span class="jv-hub-card-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</span>
+      <span class="jv-hub-card-desc">Object classification, confidence scoring, bounding-box localization, and pixel-precise mask generation for classroom objects.</span>
       <span class="jv-hub-card-arrow">Explore Research 2</span>
     </a>
     <a href="/capstone/jarvis/research-3/" class="jv-hub-card">

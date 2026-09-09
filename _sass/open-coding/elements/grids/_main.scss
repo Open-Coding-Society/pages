@@ -1,0 +1,219 @@
+// Grid element classes — follows the same pattern as elements/buttons/
+//
+// Variants:
+//   .ocs__grid--standard     3-col fixed, touch-friendly (use .cols-2 / .cols-4)
+//   .ocs__grid--card         auto-fill card grid
+//   .ocs__grid--calculator   4-col keypad grid
+//   .ocs__grid--color        each cell reveals a distinct color on hover
+//   .ocs__grid--holographic  all cells continuously rainbow-cycle (staggered wave)
+//   .ocs__grid--gallery      auto-fill square tile grid
+//
+// Cell modifiers (standard / card / calculator):
+//   .ocs__grid-cell--header  spans all columns, accent tinted
+//   .ocs__grid-cell--wide    spans 2 columns
+//   .ocs__grid-cell--accent  accent tinted background
+//   .ocs__grid-cell--muted   subtle alternate background
+
+@import "../../mixins/grid";
+
+// ===========================
+// Base
+// ===========================
+
+.ocs__grid {
+  width: 100%;
+}
+
+.ocs__grid-cell {
+  background: var(--panel);
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  color: var(--pref-text-color);
+
+  &--header {
+    grid-column: 1 / -1;
+    font-size: $text-xl;
+    font-weight: 600;
+    padding: $spacing-sm $spacing-lg;
+    background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+    border-color: var(--pref-accent-color);
+  }
+
+  &--wide  { grid-column: span 2; }
+  &--accent {
+    background: color-mix(in srgb, var(--pref-accent-color) 15%, var(--panel));
+    border-color: var(--pref-accent-color);
+  }
+  &--muted {
+    background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
+    color: color-mix(in srgb, var(--pref-text-color) 70%, transparent);
+  }
+}
+
+// ===========================
+// Standard Grid
+// ===========================
+
+.ocs__grid--standard {
+  @include standard-grid(3);
+
+  &.cols-2 { @include standard-grid(2); }
+  &.cols-4 { @include standard-grid(4); }
+
+  // Touch-responsive hover — plain &:hover (same pattern as buttons)
+  .ocs__grid-cell {
+    transition: background $transition-base ease,
+                border-color $transition-base ease,
+                transform $transition-base ease,
+                box-shadow $transition-base ease;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--panel-mid);
+      border-color: var(--pref-accent-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+}
+
+// ===========================
+// Card Grid
+// ===========================
+
+.ocs__grid--card {
+  @include card-grid;
+
+  .ocs__grid-cell {
+    @include grid-card-cell;
+  }
+}
+
+// ===========================
+// Calculator-Style Grid
+// ===========================
+
+.ocs__grid--calculator {
+  @include calculator-grid;
+  width: fit-content;
+  padding: $spacing-md;
+  background: var(--panel);
+  border: 1px solid var(--ui-border);
+  border-radius: $radius-xl;
+
+  .ocs__grid-cell {
+    @include grid-key-cell;
+    min-width: 60px;
+
+    &--accent { @include grid-key-cell--accent; }
+    &--muted  { @include grid-key-cell--muted; }
+
+    &--wide {
+      grid-column: span 2;
+      aspect-ratio: auto;
+      padding: 0 $spacing-lg;
+    }
+  }
+}
+
+// ===========================
+// Color Grid
+// ===========================
+// Each nth-child gets its own hover color via a SCSS @for loop that evaluates
+// hsl() at compile time — same approach as runner buttons using darken($color).
+// No CSS custom properties needed; Sass writes the hex color directly.
+
+$ocs-color-grid-hues: 0, 40, 70, 120, 160, 200, 240, 280, 320;
+
+.ocs__grid--color {
+  @include standard-grid(3);
+
+  .ocs__grid-cell {
+    transition: background $transition-slow ease,
+                border-color $transition-slow ease,
+                color $transition-slow ease,
+                transform $transition-base ease,
+                box-shadow $transition-base ease;
+    cursor: pointer;
+  }
+
+  @for $i from 1 through length($ocs-color-grid-hues) {
+    .ocs__grid-cell:nth-child(#{$i}) {
+      &:hover, &:active {
+        background: hsl(nth($ocs-color-grid-hues, $i), 68%, 38%);
+        border-color: hsl(nth($ocs-color-grid-hues, $i), 85%, 60%);
+        color: #fff;
+        transform: scale(1.05);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+}
+
+// ===========================
+// Holographic Grid
+// ===========================
+// Mirrors the iridescent button approach: a vivid base color with a continuous
+// filter animation. filter: hue-rotate(360deg) cycles the base color through
+// the full rainbow. Negative animation-delay staggers each cell so a wave of
+// color flows across the grid over time.
+// White text and rgba shadows are hue-neutral, so they remain legible.
+
+@keyframes ocs-holo-rotate {
+  from { filter: hue-rotate(0deg)   brightness(1.05); }
+  to   { filter: hue-rotate(360deg) brightness(1.05); }
+}
+
+.ocs__grid--holographic {
+  @include standard-grid(3);
+
+  .ocs__grid-cell {
+    background: hsl(0, 85%, 45%);          // vivid red — hue-rotate cycles the hue
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+    animation: ocs-holo-rotate 4s linear infinite;
+    transition: transform $transition-fast ease;
+    cursor: default;
+
+    &:hover  { transform: scale(1.06); }
+    &:active { transform: scale(0.96); }
+  }
+
+  // Stagger cells so each starts at a different phase in the 4 s cycle.
+  // 12 cells × (4s / 12) = 0.333 s offset per cell → full rainbow visible at once.
+  @for $i from 1 through 12 {
+    .ocs__grid-cell:nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * -0.333}s;
+    }
+  }
+}
+
+// ===========================
+// Gallery Grid
+// ===========================
+
+.ocs__grid--gallery {
+  @include gallery-grid;
+
+  .ocs__grid-cell {
+    @include gallery-cell;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pref-text-color);
+    padding: 0;
+
+    &--wide {
+      grid-column: span 2;
+      aspect-ratio: 2 / 1;
+    }
+  }
+}

@@ -1,0 +1,357 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --wsg-bg: #0f0f12;
+  --wsg-card: #16161a;
+  --wsg-border: #2a2a2e;
+  --wsg-text: #e4e4e7;
+  --wsg-muted: #a1a1aa;
+  --wsg-accent: #8b5cf6;
+  --wsg-accent-soft: rgba(139, 92, 246, 0.1);
+  --wsg-amber: #f59e0b;
+  --wsg-amber-soft: rgba(245, 158, 11, 0.1);
+  --wsg-cyan: #22d3ee;
+}
+
+.wsg-root * { box-sizing: border-box; }
+
+.wsg-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 1.75rem 0 2rem;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  color: var(--wsg-text);
+  line-height: 1.6;
+}
+
+/* Header */
+.wsg-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wsg-accent);
+  margin-bottom: 0.6rem;
+  padding: 0.25rem 0.65rem;
+  background: var(--wsg-accent-soft);
+  border-radius: 9999px;
+}
+
+.wsg-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+  color: var(--wsg-text);
+}
+
+.wsg-description {
+  font-size: 0.95rem;
+  color: var(--wsg-muted);
+  margin: 0 0 0.5rem;
+  max-width: 660px;
+}
+
+.wsg-meta {
+  font-size: 0.8125rem;
+  color: var(--wsg-muted);
+}
+
+.wsg-meta strong { color: var(--wsg-text); }
+
+/* Status strip: the empty / to-be-continued sections, kept to one line */
+.wsg-status-strip {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin: 1.25rem 0 2rem;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--wsg-border);
+  border-radius: 0.6rem;
+  font-size: 0.8125rem;
+  color: var(--wsg-muted);
+}
+
+.wsg-status-strip .wsg-status-icon { flex-shrink: 0; opacity: 0.6; }
+.wsg-status-strip strong { color: var(--wsg-text); font-weight: 600; }
+
+/* Section headings */
+.wsg-h2 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin: 0 0 1rem;
+  color: var(--wsg-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wsg-h2::before {
+  content: "";
+  width: 4px;
+  height: 1.3rem;
+  background: var(--wsg-accent);
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.wsg-h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  color: var(--wsg-text);
+}
+
+.wsg-container p {
+  font-size: 0.9rem;
+  color: var(--wsg-muted);
+  margin: 0 0 0.75rem;
+}
+.wsg-container p:last-child { margin-bottom: 0; }
+
+.wsg-container ul, .wsg-container ol {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.wsg-container li strong, .wsg-container p strong { color: var(--wsg-text); }
+
+.wsg-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--wsg-border);
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.35rem;
+}
+
+/* Block: the primary visual unit &mdash; colored left rail + card body */
+.wsg-block {
+  background: var(--wsg-card);
+  border: 1px solid var(--wsg-border);
+  border-left: 3px solid var(--wsg-accent);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.wsg-block.wsg-block-amber { border-left-color: var(--wsg-amber); }
+
+/* Table */
+.wsg-table-wrap { overflow-x: auto; margin: 0 0 0.75rem; }
+
+.wsg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8625rem;
+}
+
+.wsg-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--wsg-accent);
+  padding: 0.5rem 0.7rem;
+  background: var(--wsg-accent-soft);
+  white-space: nowrap;
+}
+.wsg-table th:first-child { border-radius: 0.4rem 0 0 0.4rem; }
+.wsg-table th:last-child { border-radius: 0 0.4rem 0.4rem 0; }
+
+.wsg-table td {
+  padding: 0.6rem 0.7rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: var(--wsg-muted);
+  vertical-align: top;
+}
+
+.wsg-table tr:last-child td { border-bottom: none; }
+.wsg-table td:first-child {
+  color: var(--wsg-text);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.wsg-table .wsg-icon { margin-right: 0.4rem; }
+
+/* Reference images &mdash; big, stacked, real captions */
+.wsg-refs { margin: 0; }
+
+.wsg-ref { display: block; margin-bottom: 1.5rem; }
+.wsg-ref:last-child { margin-bottom: 0; }
+
+.wsg-ref-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--wsg-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.wsg-ref a { display: block; }
+
+.wsg-ref img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.6rem;
+  border: 1px solid var(--wsg-border);
+  display: block;
+}
+
+.wsg-ref-caption {
+  font-size: 0.8rem;
+  color: var(--wsg-muted);
+  margin-top: 0.5rem;
+}
+
+/* Requirements list */
+.wsg-req-list { display: flex; flex-direction: column; gap: 0.7rem; }
+
+.wsg-req-item {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--wsg-muted);
+}
+
+.wsg-req-icon {
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: var(--wsg-amber-soft);
+  color: var(--wsg-amber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-top: 0.05rem;
+}
+
+/* Footer */
+.wsg-footer {
+  margin-top: 1.75rem;
+  padding: 0.9rem 1.25rem;
+  border-radius: 0.6rem;
+  background: var(--wsg-card);
+  border: 1px solid var(--wsg-border);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--wsg-muted);
+}
+
+.wsg-footer strong { color: var(--wsg-text); }
+
+.wsg-badge-amber {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  background: var(--wsg-amber-soft);
+  color: var(--wsg-amber);
+}
+
+@media (max-width: 560px) {
+  .wsg-title { font-size: 1.45rem; }
+}
+</style>
+
+<div class="wsg-root">
+<div class="wsg-container">
+
+  <div class="wsg-eyebrow">Capstone Proposal &middot; Planning Stage</div>
+  <h1 class="wsg-title">{{ page.title }}</h1>
+  <p class="wsg-description">{{ page.description }}</p>
+  <p class="wsg-meta"><strong>Team:</strong> {{ page.team | join: ", " }} &middot; {{ page.year }}</p>
+
+  <div class="wsg-status-strip">
+    <span class="wsg-status-icon">&#128679;</span>
+    <span><strong>Research Question, Design Decisions, System Architecture, and Progress</strong> are still to be continued &mdash; nothing above this line has been built yet.</span>
+  </div>
+
+  <h2 class="wsg-h2">What We Plan To Do</h2>
+
+  <div class="wsg-block">
+    <p>AI feedback on game submissions currently lives in a spreadsheet: someone pastes in the submission, the AI grades it, and the result gets typed back in as a row. We plan to replace that with a real database, and add two new submission types (FRQ and GitHub Issue) alongside the existing MC type, all graded through the <strong>Gemini API</strong>.</p>
+  </div>
+
+  <div class="wsg-block">
+    <h3 class="wsg-h3">Reference material from the planning issue</h3>
+    <div class="wsg-refs">
+      <div class="wsg-ref">
+        <div class="wsg-ref-label">1 &middot; The spreadsheet this replaces</div>
+        <a href="https://github.com/user-attachments/assets/7c18eeeb-69d3-4970-89f7-12cda90a127e" target="_blank" rel="noopener">
+          <img src="https://github.com/user-attachments/assets/7c18eeeb-69d3-4970-89f7-12cda90a127e" alt="Current feedback spreadsheet">
+        </a>
+        <p class="wsg-ref-caption">Current game-submission feedback spreadsheet &mdash; student, AI grade, and AI feedback columns are what the new database needs to hold.</p>
+      </div>
+      <div class="wsg-ref">
+        <div class="wsg-ref-label">2 &middot; The system this builds on</div>
+        <a href="https://github.com/user-attachments/assets/bbc478e7-3d92-4a7e-8aa9-44564dda44f1" target="_blank" rel="noopener">
+          <img src="https://github.com/user-attachments/assets/bbc478e7-3d92-4a7e-8aa9-44564dda44f1" alt="Current MC/FRQ submission system">
+        </a>
+        <p class="wsg-ref-caption">The existing frontmatter-driven MC/FRQ submission system that GitHub Issue submissions will be added alongside.</p>
+      </div>
+      <div class="wsg-ref">
+        <div class="wsg-ref-label">3 &middot; The rubric the AI will follow</div>
+        <a href="https://github.com/user-attachments/assets/e1f552ce-4e07-43e7-9245-3a51109b93ec" target="_blank" rel="noopener">
+          <img src="https://github.com/user-attachments/assets/e1f552ce-4e07-43e7-9245-3a51109b93ec" alt="Grading rubric reference">
+        </a>
+        <p class="wsg-ref-caption">Grading definitions from the spreadsheet &mdash; the basis for the AI grader's rubric.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wsg-block">
+    <h3 class="wsg-h3">Submission types</h3>
+    <div class="wsg-table-wrap">
+      <table class="wsg-table">
+        <thead><tr><th>Type</th><th>How it's graded</th></tr></thead>
+        <tbody>
+          <tr><td><span class="wsg-icon">&#128204;</span>MC</td><td>Selected answers, checked against an answer key by Gemini.</td></tr>
+          <tr><td><span class="wsg-icon">&#9997;&#65039;</span>FRQ</td><td>Written free response, graded by Gemini against a rubric.</td></tr>
+          <tr><td><span class="wsg-icon">&#128279;</span>GitHub Issue</td><td>Link to a public issue, scraped and sent to Gemini for a dynamic review &mdash; for more complex tasks.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Types are defined through frontmatter, the same pattern the site already uses. For GitHub Issue submissions: the link must be publicly viewable, it's checked for validity/access first, then formatted and sent to the grader. A GitHub API token will be used when available; <span class="wsg-code">Gists</span> may hold submission content where needed.</p>
+  </div>
+
+  <div class="wsg-block">
+    <h3 class="wsg-h3">Storing results</h3>
+    <p>Every graded submission &mdash; student, type, AI score, AI feedback, rubric version, and timestamp &mdash; gets written to the database instead of a spreadsheet row, so admins can browse submissions directly rather than maintaining a sheet by hand.</p>
+  </div>
+
+  <div class="wsg-block wsg-block-amber">
+    <h3 class="wsg-h3">Teacher requirements</h3>
+    <div class="wsg-req-list">
+      <div class="wsg-req-item"><span class="wsg-req-icon">!</span><span>Every AI-generated comment <strong>must</strong> include a clearly marked "AI" disclosure tag.</span></div>
+      <div class="wsg-req-item"><span class="wsg-req-icon">!</span><span>A GitHub Issue documenting exactly how the grader is implemented must be finalized alongside the build.</span></div>
+      <div class="wsg-req-item"><span class="wsg-req-icon">!</span><span>Both <strong>batch grading</strong> and <strong>individual grading</strong> need to be supported.</span></div>
+    </div>
+  </div>
+
+  <div class="wsg-footer">
+    <span><strong>Team:</strong> {{ page.team | join: ", " }}</span>
+    <span class="wsg-badge-amber">Planning Stage</span>
+  </div>
+
+</div>
+</div>
