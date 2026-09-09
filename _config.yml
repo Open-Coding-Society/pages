@@ -64,7 +64,11 @@ exclude:
 # sass:
 #   quiet_deps: true
 #   silence_deprecations: [import]
-incremental: true
+# Disabled: incremental builds have repeatedly served stale HTML from `_site`
+# after edits (Jekyll's dependency tracking misses some Liquid/include changes),
+# which looks like a real regression until you trace it back to the build, not
+# the source. Full rebuilds are slightly slower but always correct.
+incremental: false
 encoding: utf-8
 
 remote_theme: jekyll/minima

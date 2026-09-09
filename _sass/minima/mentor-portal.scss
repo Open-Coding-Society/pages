@@ -9,8 +9,20 @@
 // rather than a real ROLE_MENTOR check — see the TEMP comment in projects.md.
 
 .mp-page {
-  max-width: 1120px;
+  max-width: 1360px;
   margin: 0 auto;
+  position: relative;
+}
+
+.mp-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(76, 175, 239, 0.07) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: linear-gradient(to bottom, black, transparent 92%);
 }
 
 // ---- Gate / landing state -------------------------------------------------
@@ -67,8 +79,33 @@
   border-bottom: 1px solid $bg-3;
 }
 
+.mp-hero__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(76, 175, 239, 0.12);
+  border: 1px solid rgba(76, 175, 239, 0.3);
+  color: $accent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+
+.mp-hero__kicker::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: $green;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
+}
+
 .mp-hero__title {
-  font-size: 2.25rem;
+  font-size: 2.75rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   background: linear-gradient(90deg, $text, $accent);
@@ -115,6 +152,158 @@
 .mp-stat--interested .mp-stat__value { color: $green; }
 .mp-stat--skipped .mp-stat__value { color: $text-muted; }
 
+.mp-stat--interested {
+  position: relative;
+  cursor: pointer;
+}
+
+.mp-stat-popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  width: 17rem;
+  max-height: 18rem;
+  overflow-y: auto;
+  background: $bg-1;
+  border: 1px solid $bg-3;
+  border-radius: 0.85rem;
+  padding: 0.6rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  z-index: 20;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}
+
+.mp-stat--interested:hover .mp-stat-popover,
+.mp-stat--interested:focus-within .mp-stat-popover,
+.mp-stat--interested.mp-stat--open .mp-stat-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+// ---- Two-column layout: deck + side rail -----------------------------------
+
+.mp-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .mp-layout {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+}
+
+.mp-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1100px) {
+  .mp-rail {
+    position: sticky;
+    top: 5rem;
+  }
+}
+
+.mp-rail__card {
+  border-radius: 1.15rem;
+  background: $bg-2;
+  border: 1px solid $bg-3;
+  padding: 1.25rem;
+}
+
+.mp-rail__title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $text-muted;
+  margin-bottom: 0.9rem;
+}
+
+.mp-shortlist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.mp-shortlist__empty {
+  font-size: 0.85rem;
+  color: $text-muted;
+  line-height: 1.5;
+}
+
+.mp-shortlist__item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem;
+  border-radius: 0.7rem;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.mp-shortlist__item:hover { background: $bg-3; }
+
+.mp-shortlist__thumb {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.55rem;
+  object-fit: cover;
+  background: linear-gradient(135deg, $accent-700, $accent);
+}
+
+.mp-shortlist__title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mp-tips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  font-size: 0.82rem;
+  color: $text-muted;
+}
+
+.mp-tips li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.mp-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.35rem;
+  border-radius: 0.4rem;
+  background: $bg-3;
+  border: 1px solid $bg-1;
+  color: $text;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 // ---- Stage / deck -------------------------------------------------------
 
 .mp-stage {
@@ -128,9 +317,11 @@
 .mp-stage::before {
   content: "";
   position: absolute;
-  inset: -2rem 10% auto 10%;
-  height: 22rem;
-  background: radial-gradient(closest-side, rgba(76, 175, 239, 0.18), transparent 70%);
+  inset: -2rem 5% auto 5%;
+  height: 24rem;
+  background:
+    radial-gradient(closest-side at 30% 0%, rgba(76, 175, 239, 0.2), transparent 65%),
+    radial-gradient(closest-side at 75% 20%, rgba(0, 122, 204, 0.14), transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -138,14 +329,37 @@
 .mp-deck {
   position: relative;
   width: 100%;
-  max-width: 34rem;
-  min-height: 38rem;
+  max-width: 38rem;
+  min-height: 42rem;
   z-index: 1;
+  margin: 0 auto;
+}
+
+.mp-card-ghost {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.5rem;
+  background: $bg-2;
+  border: 1px solid $bg-3;
+  pointer-events: none;
+}
+
+.mp-card-ghost--1 {
+  transform: scale(0.97) translateY(0.7rem) rotate(-2deg);
+  opacity: 0.85;
+  z-index: 0;
+}
+
+.mp-card-ghost--2 {
+  transform: scale(0.93) translateY(1.4rem) rotate(2.5deg);
+  opacity: 0.55;
+  z-index: -1;
 }
 
 .mp-card {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   background: $bg-2;
@@ -314,6 +528,13 @@
   text-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
 }
 
+// A little variety across cards without images, still on-brand (blue-forward).
+.mp-fallback--1 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, $accent-700, $accent); }
+.mp-fallback--2 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, #0f4c75, $teal); }
+.mp-fallback--3 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, #1b1f3b, $blue); }
+.mp-fallback--4 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, $accent-700, #38b2ac); }
+.mp-fallback--5 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, #263159, $accent); }
+
 // ---- Card body --------------------------------------------------------------
 
 .mp-card__body {
@@ -464,6 +685,37 @@
   color: $text-muted;
 }
 
+.mp-confirm {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 0.9rem;
+  background: $bg-2;
+  border: 1px solid $accent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: center;
+  animation: mp-confirm-in 0.25s ease;
+}
+
+@keyframes mp-confirm-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mp-confirm__text {
+  font-size: 0.88rem;
+  color: $text-muted;
+}
+
+.mp-confirm__text strong { color: $text; }
+
+.mp-confirm__actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
 .mp-progress {
   margin-top: 1.25rem;
   display: flex;
@@ -585,6 +837,29 @@
   font-weight: 700;
 }
 
+.mp-overlay__search {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  margin-bottom: 1rem;
+  border-radius: 0.65rem;
+  background: $bg-1;
+  border: 1px solid $bg-3;
+  color: $text;
+  font-size: 0.88rem;
+}
+
+.mp-overlay__search:focus {
+  outline: none;
+  border-color: $accent;
+}
+
+.mp-overlay__empty {
+  color: $text-muted;
+  font-size: 0.85rem;
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
 .mp-overlay__close {
   background: none;
   border: none;
@@ -642,6 +917,7 @@
 
 @media (max-width: 640px) {
   .mp-hero { align-items: flex-start; }
+  .mp-hero__title { font-size: 2rem; }
   .mp-deck { min-height: 34rem; }
   .mp-gallery { flex-basis: 50%; }
 }

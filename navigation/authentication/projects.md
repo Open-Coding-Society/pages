@@ -30,6 +30,7 @@ microblog: true
 
     <div class="mp-hero">
       <div>
+        <span class="mp-hero__kicker">Live &middot; Capstone Season</span>
         <h1 class="mp-hero__title">Mentor Portal</h1>
         <p class="mp-hero__subtitle">Swipe through Capstone projects looking for a mentor.
           Skip the ones that aren't a fit, and mark the ones you'd like to support &mdash;
@@ -40,9 +41,12 @@ microblog: true
           <span class="mp-stat__value" id="mp-stat-total">0</span>
           <span class="mp-stat__label">Open</span>
         </div>
-        <div class="mp-stat mp-stat--interested">
+        <div class="mp-stat mp-stat--interested" id="mp-stat-interested-wrap" tabindex="0">
           <span class="mp-stat__value" id="mp-stat-interested">0</span>
           <span class="mp-stat__label">Interested</span>
+          <div class="mp-stat-popover" id="mp-interested-popover">
+            <p class="mp-shortlist__empty">Projects you mark Interested will show up here.</p>
+          </div>
         </div>
         <div class="mp-stat mp-stat--skipped">
           <span class="mp-stat__value" id="mp-stat-skipped">0</span>
@@ -57,38 +61,69 @@ microblog: true
     </div>
 
     <div id="mp-browser" style="display:none;">
-      <div class="mp-stage">
-        <div class="mp-deck" id="mp-deck"></div>
-      </div>
+      <div class="mp-layout">
+        <div class="mp-main">
+          <div class="mp-stage">
+            <div class="mp-deck" id="mp-deck"></div>
+          </div>
 
-      <div class="mp-actions">
-        <button id="mp-back-btn" type="button" class="mp-action-btn mp-action-btn--back" aria-label="Back to previous project" title="Back">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-          </svg>
-        </button>
-        <button id="mp-skip-btn" type="button" class="mp-action-btn mp-action-btn--skip" aria-label="Skip this project" title="Skip">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-        <button id="mp-interested-btn" type="button" class="mp-action-btn mp-action-btn--interested" aria-label="I'm interested in mentoring this project" title="Interested">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-          </svg>
-        </button>
-      </div>
+          <div class="mp-actions">
+            <button id="mp-back-btn" type="button" class="mp-action-btn mp-action-btn--back" aria-label="Back to previous project" title="Back">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <button id="mp-skip-btn" type="button" class="mp-action-btn mp-action-btn--skip" aria-label="Skip this project" title="Skip">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+            <button id="mp-interested-btn" type="button" class="mp-action-btn mp-action-btn--interested" aria-label="I'm interested in mentoring this project" title="Interested">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+              </svg>
+            </button>
+          </div>
 
-      <div class="mp-progress">
-        <span id="mp-progress-text">1 / 1</span>
-        <div class="mp-progress__bar"><div class="mp-progress__fill" id="mp-progress-fill" style="width:0%;"></div></div>
-        <button id="mp-browse-open" type="button" class="mp-browse-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
-          </svg>
-          Browse all projects
-        </button>
-        <p class="sm:hidden" style="font-size:0.75rem;opacity:0.7;">Swipe left to skip, right if you're interested</p>
+          <div id="mp-confirm-popup" class="mp-confirm" style="display:none;">
+            <div class="mp-confirm__text">
+              Marked interested in <strong id="mp-confirm-title"></strong>. Apply now, or keep it in your shortlist for later.
+            </div>
+            <div class="mp-confirm__actions">
+              <button id="mp-confirm-apply" type="button" class="mp-btn mp-btn--primary mp-btn--sm">Apply now</button>
+              <button id="mp-confirm-dismiss" type="button" class="mp-btn mp-btn--ghost mp-btn--sm">Maybe later</button>
+            </div>
+          </div>
+
+          <div class="mp-progress">
+            <span id="mp-progress-text">1 / 1</span>
+            <div class="mp-progress__bar"><div class="mp-progress__fill" id="mp-progress-fill" style="width:0%;"></div></div>
+            <button id="mp-browse-open" type="button" class="mp-browse-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
+              </svg>
+              Browse all projects
+            </button>
+            <p class="sm:hidden" style="font-size:0.75rem;opacity:0.7;">Swipe left to skip, right if you're interested</p>
+          </div>
+        </div>
+
+        <aside class="mp-rail">
+          <div class="mp-rail__card">
+            <div class="mp-rail__title">Your Shortlist</div>
+            <div id="mp-shortlist" class="mp-shortlist">
+              <p class="mp-shortlist__empty">Projects you mark Interested will show up here.</p>
+            </div>
+          </div>
+          <div class="mp-rail__card">
+            <div class="mp-rail__title">Shortcuts</div>
+            <ul class="mp-tips">
+              <li><span class="mp-kbd">&larr;</span> Skip</li>
+              <li><span class="mp-kbd">&rarr;</span> Interested</li>
+              <li><span class="mp-kbd">&#8942;</span> Drag the card either way</li>
+            </ul>
+          </div>
+        </aside>
       </div>
     </div>
 
@@ -106,6 +141,7 @@ microblog: true
         <span class="mp-overlay__title">All projects</span>
         <button id="mp-overlay-close" type="button" class="mp-overlay__close" aria-label="Close">&times;</button>
       </div>
+      <input id="mp-overlay-search" type="text" class="mp-overlay__search" placeholder="Search projects by name&hellip;">
       <div id="mp-overlay-grid" class="mp-overlay__grid"></div>
     </div>
   </div>
@@ -130,6 +166,8 @@ microblog: true
 </script>
 
 <script type="module">
+  import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
   const APPLIED_KEY = 'ocsMentorApplications';
   const SKIPPED_KEY = 'ocsMentorSkipped';
 
@@ -144,8 +182,37 @@ microblog: true
   }
   const getAppliedIds = () => getIdSet(APPLIED_KEY);
   const getSkippedIds = () => getIdSet(SKIPPED_KEY);
-  const markApplied = (id) => addToIdSet(APPLIED_KEY, id);
   const markSkipped = (id) => addToIdSet(SKIPPED_KEY, id);
+
+  // "Interested" (the shortlist) is persisted to the mentor's account on the
+  // Spring backend so it follows them across browsers/devices, not just this
+  // one. localStorage is kept only as an instant-paint cache for before the
+  // network round trip resolves (or if the request fails / not logged in).
+  function markApplied(id) { addToIdSet(APPLIED_KEY, id); }
+
+  async function loadInterestsFromServer() {
+    try {
+      const res = await fetch(`${javaURI}/api/mentor/interests`, fetchOptions);
+      if (!res.ok) return null;
+      const rows = await res.json();
+      return Array.isArray(rows) ? rows.map(r => String(r.projectUrl)) : [];
+    } catch (err) {
+      console.error('Mentor Portal: could not load saved interests', err);
+      return null;
+    }
+  }
+
+  async function pushInterestToServer(url, title) {
+    try {
+      await fetch(`${javaURI}/api/mentor/interests`, {
+        ...fetchOptions,
+        method: 'POST',
+        body: JSON.stringify({ url, title }),
+      });
+    } catch (err) {
+      console.error('Mentor Portal: could not save interest to your account', err);
+    }
+  }
 
   function esc(s) {
     return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -201,9 +268,18 @@ microblog: true
     return t ? t.charAt(0).toUpperCase() : '?';
   }
 
+  // Picks one of 5 on-brand gradient variants per title, so a run of
+  // no-image projects doesn't render as identical blue tiles.
+  function fallbackVariant(title) {
+    const s = String(title || '');
+    let hash = 0;
+    for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+    return (hash % 5) + 1;
+  }
+
   function galleryHtml(images, title) {
     if (!Array.isArray(images) || images.length === 0) {
-      return `<div class="mp-gallery"><div class="mp-fallback"><span class="mp-fallback__initial">${esc(initials(title))}</span></div></div>`;
+      return `<div class="mp-gallery"><div class="mp-fallback mp-fallback--${fallbackVariant(title)}"><span class="mp-fallback__initial">${esc(initials(title))}</span></div></div>`;
     }
     const multi = images.length > 1;
     const slides = images.map((src, i) =>
@@ -251,10 +327,38 @@ microblog: true
       b.addEventListener('click', (e) => { e.stopPropagation(); next(); }));
   }
 
+  function shortlistThumbHtml(p) {
+    if (Array.isArray(p.images) && p.images.length) {
+      return `<img class="mp-shortlist__thumb" src="${esc(p.images[0])}" alt="" loading="lazy">`;
+    }
+    return `<div class="mp-shortlist__thumb"></div>`;
+  }
+
+  function renderShortlist() {
+    const applied = getAppliedIds();
+    const shortlisted = projects.filter(p => applied.has(String(p.url)));
+    const html = !shortlisted.length
+      ? `<p class="mp-shortlist__empty">Projects you mark Interested will show up here.</p>`
+      : shortlisted.map(p => `
+          <a class="mp-shortlist__item" href="${esc(p.url)}">
+            ${shortlistThumbHtml(p)}
+            <span class="mp-shortlist__title">${esc(p.title)}</span>
+          </a>
+        `).join('');
+    // Same content in two places: the always-visible side rail, and a
+    // popover under the "Interested" stat (hover it any time to jump to
+    // a project you've shortlisted, even on screens too narrow for the rail).
+    const railEl = el('mp-shortlist');
+    if (railEl) railEl.innerHTML = html;
+    const popoverEl = el('mp-interested-popover');
+    if (popoverEl) popoverEl.innerHTML = html;
+  }
+
   function updateStats() {
     statTotal.textContent = String(projects.length);
     statInterested.textContent = String(getAppliedIds().size);
     statSkipped.textContent = String(getSkippedIds().size);
+    renderShortlist();
   }
 
   function renderCardContent() {
@@ -276,7 +380,7 @@ microblog: true
     cardRoot.querySelectorAll('.mp-stamp').forEach(s => { s.style.opacity = 0; });
 
     interestedBtn.disabled = applied;
-    interestedBtn.title = applied ? 'Invite already sent' : 'Interested — apply to mentor this project';
+    interestedBtn.title = applied ? 'Already in your shortlist' : "I'm interested in mentoring this project";
     backBtn.disabled = index === 0;
 
     progressText.textContent = `${index + 1} / ${projects.length}`;
@@ -299,22 +403,59 @@ microblog: true
     updateStats();
   }
 
+  let confirmTimer = null;
+
+  function showConfirmPopup(p) {
+    clearTimeout(confirmTimer);
+    el('mp-confirm-title').textContent = p.title;
+    el('mp-confirm-popup').style.display = 'flex';
+    confirmTimer = setTimeout(hideConfirmPopup, 8000);
+  }
+
+  function hideConfirmPopup() {
+    clearTimeout(confirmTimer);
+    el('mp-confirm-popup').style.display = 'none';
+  }
+
   function handleInterested() {
     const p = projects[index];
     if (!p || getAppliedIds().has(String(p.url))) return;
+
+    markApplied(p.url);
+    pushInterestToServer(p.url, p.title);
+    notify(`Interested in ${p.title}`, true);
+
     cardRoot.classList.remove('mp-card--dragging');
     cardRoot.classList.add('mp-card--leaving-right');
     setTimeout(() => {
-      markApplied(p.url);
-      const params = new URLSearchParams({ id: String(p.url), title: p.title });
-      window.location.href = `{{site.baseurl}}/projects/invite-pending?${params.toString()}`;
+      if (index + 1 >= projects.length) {
+        index = projects.length;
+        showEndOfStack();
+      } else {
+        index++;
+        showCard();
+      }
+      showConfirmPopup(p);
     }, 300);
+  }
+
+  function notify(text, accent) {
+    if (typeof Toastify !== 'function') return;
+    Toastify({
+      text,
+      duration: 2200,
+      gravity: 'top',
+      position: 'right',
+      style: { background: accent ? 'linear-gradient(90deg,#007ACC,#4CAFEF)' : '#2A2D2D' },
+    }).showToast();
   }
 
   function handleSkip() {
     const p = projects[index];
     if (!p) return;
+    hideConfirmPopup();
     markSkipped(p.url);
+    notify(`Skipped ${p.title}`, false);
     cardRoot.classList.remove('mp-card--dragging');
     cardRoot.classList.add('mp-card--leaving-left');
     setTimeout(() => {
@@ -330,6 +471,7 @@ microblog: true
 
   function handleBack() {
     if (index === 0) return;
+    hideConfirmPopup();
     cardRoot.classList.remove('mp-card--dragging');
     cardRoot.style.transform = '';
     index--;
@@ -397,10 +539,20 @@ microblog: true
     return `<div class="mp-overlay__thumb"></div>`;
   }
 
-  function openOverlay() {
+  function renderOverlayGrid(filterText) {
     const applied = getAppliedIds();
     const skipped = getSkippedIds();
-    el('mp-overlay-grid').innerHTML = projects.map((p, i) => {
+    const q = String(filterText || '').trim().toLowerCase();
+    const rows = projects
+      .map((p, i) => ({ p, i }))
+      .filter(({ p }) => !q || p.title.toLowerCase().includes(q));
+
+    if (!rows.length) {
+      el('mp-overlay-grid').innerHTML = `<div class="mp-overlay__empty">No projects match &ldquo;${esc(filterText)}&rdquo;.</div>`;
+      return;
+    }
+
+    el('mp-overlay-grid').innerHTML = rows.map(({ p, i }) => {
       const isApplied = applied.has(String(p.url));
       const isSkipped = skipped.has(String(p.url));
       const badge = isApplied
@@ -416,6 +568,7 @@ microblog: true
     }).join('');
     el('mp-overlay-grid').querySelectorAll('.mp-overlay__item').forEach(btn => {
       btn.addEventListener('click', () => {
+        hideConfirmPopup();
         index = Number(btn.dataset.index);
         closeOverlay();
         browserEl.style.display = 'block';
@@ -423,7 +576,13 @@ microblog: true
         showCard();
       });
     });
+  }
+
+  function openOverlay() {
+    el('mp-overlay-search').value = '';
+    renderOverlayGrid('');
     el('mp-overlay').style.display = 'flex';
+    el('mp-overlay-search').focus();
   }
 
   function closeOverlay() {
@@ -434,6 +593,8 @@ microblog: true
 
   function initDeck() {
     deckEl.innerHTML = `
+      <div class="mp-card-ghost mp-card-ghost--2"></div>
+      <div class="mp-card-ghost mp-card-ghost--1"></div>
       <div class="mp-card" id="mp-card">
         <span class="mp-stamp mp-stamp--interested">Interested</span>
         <span class="mp-stamp mp-stamp--skip">Skip</span>
@@ -451,6 +612,7 @@ microblog: true
     skipBtn.addEventListener('click', handleSkip);
     interestedBtn.addEventListener('click', handleInterested);
     el('mp-restart-btn').addEventListener('click', () => {
+      hideConfirmPopup();
       index = 0;
       endEl.style.display = 'none';
       browserEl.style.display = 'block';
@@ -459,6 +621,24 @@ microblog: true
     el('mp-browse-open').addEventListener('click', openOverlay);
     el('mp-overlay-close').addEventListener('click', closeOverlay);
     el('mp-overlay').addEventListener('click', (e) => { if (e.target.id === 'mp-overlay') closeOverlay(); });
+    el('mp-overlay-search').addEventListener('input', (e) => renderOverlayGrid(e.target.value));
+
+    el('mp-confirm-dismiss').addEventListener('click', hideConfirmPopup);
+    el('mp-confirm-apply').addEventListener('click', () => {
+      // Placeholder for now -- the real apply/notify-the-team flow is a
+      // separate decision to be wired up later.
+      notify('Got it — we’ll follow up about applying soon.', true);
+      hideConfirmPopup();
+    });
+
+    // "Interested" stat: hover (desktop) or click/tap (touch) to preview the
+    // shortlist without needing the side rail, which is hidden on narrow screens.
+    const interestedStatWrap = el('mp-stat-interested-wrap');
+    interestedStatWrap.addEventListener('click', (e) => {
+      e.stopPropagation();
+      interestedStatWrap.classList.toggle('mp-stat--open');
+    });
+    document.addEventListener('click', () => interestedStatWrap.classList.remove('mp-stat--open'));
 
     document.addEventListener('keydown', (e) => {
       if (el('mp-overlay').style.display === 'flex') {
@@ -471,7 +651,7 @@ microblog: true
     });
   }
 
-  function init() {
+  async function init() {
     if (initialized) return;
     initialized = true;
 
@@ -482,6 +662,16 @@ microblog: true
       projects = [];
     }
     updateStats();
+
+    // Reconcile the shortlist with whatever's actually saved to the mentor's
+    // account. If the request fails (offline, or not really logged in --
+    // remember the "Mentor" button above is a public bypass, not real auth)
+    // this just falls back to whatever was already cached in localStorage.
+    const serverUrls = await loadInterestsFromServer();
+    if (serverUrls) {
+      localStorage.setItem(APPLIED_KEY, JSON.stringify(serverUrls));
+      updateStats();
+    }
 
     if (!projects.length) {
       emptyEl.style.display = 'block';

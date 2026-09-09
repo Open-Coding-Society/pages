@@ -72,17 +72,23 @@
     // else (including logged-out visitors) keeps the normal OCS sidebar untouched.
     import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     (async function () {
+        const defaultEl = document.getElementById('sidebar-role-default');
+        const mentorEl = document.getElementById('sidebar-role-mentor');
+        function applySidebar(isMentor) {
+            defaultEl.style.display = isMentor ? 'none' : 'block';
+            mentorEl.style.display = isMentor ? 'block' : 'none';
+            try { localStorage.setItem('ocsMentorSidebar', isMentor ? 'mentor' : 'default'); }
+            catch (e) { /* localStorage unavailable */ }
+        }
         try {
             const res = await fetch(`${javaURI}/api/person/get`, fetchOptions);
-            if (!res.ok) return;
+            if (!res.ok) { applySidebar(false); return; }
             const person = await res.json();
             const roles = Array.isArray(person.roles) ? person.roles.map(r => r.name) : [];
-            if (roles.includes('ROLE_MENTOR')) {
-                document.getElementById('sidebar-role-default').style.display = 'none';
-                document.getElementById('sidebar-role-mentor').style.display = 'block';
-            }
+            applySidebar(roles.includes('ROLE_MENTOR'));
         } catch (err) {
             console.error('Mentor sidebar role check failed', err);
+            applySidebar(false);
         }
     })();
 </script>

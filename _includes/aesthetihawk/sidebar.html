@@ -7,3 +7,14 @@
 <div id="sidebar-role-mentor" style="display:none;">
   {% include aesthetihawk/sidebar-list.html data=site.data.aesthetihawk_sidebar_mentor prefix="mentor-" %}
 </div>
+<script>
+  // Apply the last-known role synchronously, before first paint, so navigating
+  // between pages doesn't flash the default sidebar for a moment on every click
+  // while the real /api/person/get check (in the layout, below) re-verifies it.
+  try {
+    if (localStorage.getItem('ocsMentorSidebar') === 'mentor') {
+      document.getElementById('sidebar-role-default').style.display = 'none';
+      document.getElementById('sidebar-role-mentor').style.display = 'block';
+    }
+  } catch (e) { /* localStorage unavailable; default sidebar stays visible */ }
+</script>
