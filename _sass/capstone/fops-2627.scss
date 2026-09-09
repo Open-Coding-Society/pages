@@ -1,0 +1,182 @@
+// Friends of Poway Seniors — 2026-2027 Capstone Styles
+// Scoped under .fops27 (all elements use the f27- prefix)
+// See _posts/capstone/2026-09-09-fops-2026-2027-capstone.md
+
+.fops27 {
+  // ── Color tokens ──────────────────────────────────────────────
+  // Light values first; dark overrides below. Nothing outside this
+  // block sets a color, so a theme switch only touches these lines.
+  --f27-ink: #17231a;
+  --f27-muted: #55665b;
+  --f27-surface: #ffffff;
+  --f27-raised: #f3f7f3;
+  --f27-line: #d5e0d7;
+  --f27-green: #2f7d4f;
+  --f27-gold: #a9791f;
+  --f27-radius: 10px;
+  --f27-gap: 1rem;
+
+  color: var(--f27-ink);
+
+  // ── Lead paragraph ────────────────────────────────────────────
+  .f27-lead {
+    border-left: 4px solid var(--f27-green);
+    background: var(--f27-raised);
+    border-radius: 0 var(--f27-radius) var(--f27-radius) 0;
+    padding: 1rem 1.25rem;
+    margin: 0 0 1.75rem;
+    font-size: 1.02rem;
+    line-height: 1.6;
+  }
+
+  // ── Section headings ──────────────────────────────────────────
+  .f27-heading {
+    font-size: 1.35rem;
+    margin: 2rem 0 0.35rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--f27-line);
+  }
+
+  .f27-sub {
+    color: var(--f27-muted);
+    margin: 0 0 1rem;
+    font-size: 0.92rem;
+  }
+
+  // ── Card grids ────────────────────────────────────────────────
+  .f27-grid {
+    display: grid;
+    gap: var(--f27-gap);
+    margin-bottom: 1.75rem;
+  }
+
+  .f27-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .f27-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  .f27-card {
+    background: var(--f27-surface);
+    border: 1px solid var(--f27-line);
+    border-top: 3px solid var(--f27-line);
+    border-radius: var(--f27-radius);
+    padding: 1rem 1.1rem;
+
+    strong {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 1.02rem;
+    }
+
+    p {
+      margin: 0 0 0.75rem;
+      font-size: 0.93rem;
+      line-height: 1.55;
+      color: var(--f27-muted);
+    }
+
+    p:last-child { margin-bottom: 0; }
+  }
+
+  // Strength vs problem, distinguished by border and label colour
+  .f27-card--strong { border-top-color: var(--f27-green); }
+  .f27-card--fix    { border-top-color: var(--f27-gold); }
+
+  .f27-card--strong strong { color: var(--f27-green); }
+  .f27-card--fix strong    { color: var(--f27-gold); }
+
+  // ── Phase cards ───────────────────────────────────────────────
+  .f27-owner {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.15rem 0.55rem;
+    border: 1px solid var(--f27-line);
+    border-radius: 999px;
+    font-size: 0.76rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--f27-muted);
+  }
+
+  // ── Tables ────────────────────────────────────────────────────
+  // Wide tables scroll inside their own box so the page never does.
+  .f27-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1.75rem;
+  }
+
+  table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+
+    th, td {
+      text-align: left;
+      padding: 0.6rem 0.7rem;
+      border-bottom: 1px solid var(--f27-line);
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--f27-raised);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: none; }
+  }
+
+  // ── Callout ───────────────────────────────────────────────────
+  .f27-note {
+    border: 1px solid var(--f27-line);
+    border-left: 4px solid var(--f27-gold);
+    border-radius: 0 var(--f27-radius) var(--f27-radius) 0;
+    background: var(--f27-raised);
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.75rem;
+    font-size: 0.93rem;
+    line-height: 1.55;
+  }
+
+  // ── Footer links ──────────────────────────────────────────────
+  .f27-links {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--f27-line);
+    font-size: 0.9rem;
+    color: var(--f27-muted);
+  }
+
+  // ── Responsive ────────────────────────────────────────────────
+  @media (max-width: 900px) {
+    .f27-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 700px) {
+    .f27-grid--2,
+    .f27-grid--3 { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 500px) {
+    --f27-gap: 0.75rem;
+
+    .f27-lead { padding: 0.85rem 1rem; font-size: 0.96rem; }
+    .f27-card { padding: 0.85rem 0.9rem; }
+    .f27-heading { font-size: 1.15rem; }
+    table { font-size: 0.86rem; }
+  }
+}
+
+// ── Dark theme ──────────────────────────────────────────────────
+// Only the tokens are redefined; no component rule is repeated.
+@media (prefers-color-scheme: dark) {
+  .fops27 {
+    --f27-ink: #e8efe9;
+    --f27-muted: #a2b3a7;
+    --f27-surface: #17201a;
+    --f27-raised: #1d2820;
+    --f27-line: #2c3a30;
+    --f27-green: #6fd08c;
+    --f27-gold: #e0b45a;
+  }
+}
