@@ -855,8 +855,8 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
    
-   <!-- California Center For The Performing Arts Escondido (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <!-- California Center For The Performing Arts Escondido (CSP, 2026/2027) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
            <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="w-28 h-28 object-contain rounded" />
        </a>
