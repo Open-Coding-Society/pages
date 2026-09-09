@@ -24,6 +24,13 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
+    <!-- Shown near the top of every aesthetihawk page once a signed-in
+         ROLE_MENTOR user is confirmed (see the role-check script below);
+         hidden for everyone else. -->
+    <div id="mentor-badge" class="mentor-badge" style="display:none;">
+        <span class="mentor-badge__dot"></span> Mentor
+    </div>
+
     {% if page.microblog %}
       <div class="micro-actions-wrapper">
         {% include microblog_foundation.html %}
@@ -74,9 +81,11 @@
     (async function () {
         const defaultEl = document.getElementById('sidebar-role-default');
         const mentorEl = document.getElementById('sidebar-role-mentor');
+        const badgeEl = document.getElementById('mentor-badge');
         function applySidebar(isMentor) {
             defaultEl.style.display = isMentor ? 'none' : 'block';
             mentorEl.style.display = isMentor ? 'block' : 'none';
+            badgeEl.style.display = isMentor ? 'flex' : 'none';
             try { localStorage.setItem('ocsMentorSidebar', isMentor ? 'mentor' : 'default'); }
             catch (e) { /* localStorage unavailable */ }
         }

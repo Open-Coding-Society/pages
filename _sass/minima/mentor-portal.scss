@@ -1,9 +1,15 @@
 // Mentor Portal project discovery (/projects).
 //
-// A Tinder-inspired (but not dating-app-styled) swipe deck mentors use to browse
-// capstone projects looking for a mentor. Built with plain CSS transitions/transforms —
-// no animation or gesture library is installed in this repo, so the drag/leave/gallery
-// motion here is all hand-rolled to match the vanilla-JS pattern used elsewhere.
+// A coverflow-style carousel mentors rotate through to browse capstone
+// projects looking for a mentor, plus a detail panel for whichever project
+// is centered. Built with plain CSS transitions/transforms — no animation
+// library is installed in this repo, so the motion here is hand-rolled to
+// match the vanilla-JS pattern used elsewhere.
+//
+// Visual language matches the rest of the site's dashboard pages rather than
+// generic gradients/glows: flat panels distinguished by the $bg-1/2/3 steps,
+// thin borders, tinted rgba() backgrounds for status-y badges (same recipe
+// as _sass/open-coding/elements/status-indicators), ~8-10px radius.
 //
 // NOTE: entry is currently a public "Mentor" button (see .mp-state--landing below)
 // rather than a real ROLE_MENTOR check — see the TEMP comment in projects.md.
@@ -11,18 +17,6 @@
 .mp-page {
   max-width: 1360px;
   margin: 0 auto;
-  position: relative;
-}
-
-.mp-page::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: radial-gradient(rgba(76, 175, 239, 0.07) 1px, transparent 1px);
-  background-size: 26px 26px;
-  mask-image: linear-gradient(to bottom, black, transparent 92%);
 }
 
 // ---- Gate / landing state -------------------------------------------------
@@ -32,12 +26,12 @@
   margin: 4rem auto;
   padding: 2.5rem 2rem;
   text-align: center;
-  border-radius: 1.25rem;
+  border-radius: 10px;
   background: $bg-2;
   border: 1px solid $bg-3;
   color: $text-muted;
 }
-
+x 
 .mp-state__icon {
   width: 3rem;
   height: 3rem;
@@ -47,7 +41,7 @@
 
 .mp-state__title {
   font-size: 1.35rem;
-  font-weight: 800;
+  font-weight: 700;
   color: $text;
   margin-bottom: 0.5rem;
 }
@@ -55,15 +49,11 @@
 .mp-state--landing {
   max-width: 34rem;
   padding: 3.5rem 2.5rem;
-  background: linear-gradient(160deg, $bg-2, $bg-1);
 }
 
 .mp-state--landing .mp-state__title {
-  font-size: 1.75rem;
-  background: linear-gradient(90deg, $text, $accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-size: 1.6rem;
+  color: $accent;
 }
 
 // ---- Hero header ------------------------------------------------------------
@@ -79,39 +69,11 @@
   border-bottom: 1px solid $bg-3;
 }
 
-.mp-hero__kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(76, 175, 239, 0.12);
-  border: 1px solid rgba(76, 175, 239, 0.3);
-  color: $accent;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.75rem;
-}
-
-.mp-hero__kicker::before {
-  content: "";
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 999px;
-  background: $green;
-  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
-}
-
 .mp-hero__title {
-  font-size: 2.75rem;
-  font-weight: 800;
+  font-size: 2.25rem;
+  font-weight: 700;
   letter-spacing: -0.01em;
-  background: linear-gradient(90deg, $text, $accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: $text;
   margin-bottom: 0.35rem;
 }
 
@@ -129,16 +91,16 @@
 .mp-stat {
   min-width: 6rem;
   padding: 0.6rem 1rem;
-  border-radius: 0.85rem;
-  background: $bg-2;
-  border: 1px solid $bg-3;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
 }
 
 .mp-stat__value {
   display: block;
   font-size: 1.35rem;
-  font-weight: 800;
+  font-weight: 700;
   color: $text;
 }
 
@@ -149,7 +111,12 @@
   color: $text-muted;
 }
 
-.mp-stat--interested .mp-stat__value { color: $green; }
+.mp-stat--interested {
+  background: rgba(40, 167, 69, 0.12);
+  border-color: rgba(40, 167, 69, 0.3);
+}
+.mp-stat--interested .mp-stat__value { color: $success-green; }
+
 .mp-stat--skipped .mp-stat__value { color: $text-muted; }
 
 .mp-stat--interested {
@@ -167,15 +134,13 @@
   overflow-y: auto;
   background: $bg-1;
   border: 1px solid $bg-3;
-  border-radius: 0.85rem;
+  border-radius: 10px;
   padding: 0.6rem;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   z-index: 20;
   text-align: left;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-4px);
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  transition: opacity 0.15s ease, visibility 0.15s;
 }
 
 .mp-stat--interested:hover .mp-stat-popover,
@@ -183,7 +148,6 @@
 .mp-stat--interested.mp-stat--open .mp-stat-popover {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
 }
 
 // ---- Two-column layout: deck + side rail -----------------------------------
@@ -215,7 +179,7 @@
 }
 
 .mp-rail__card {
-  border-radius: 1.15rem;
+  border-radius: 10px;
   background: $bg-2;
   border: 1px solid $bg-3;
   padding: 1.25rem;
@@ -247,7 +211,7 @@
   align-items: center;
   gap: 0.7rem;
   padding: 0.4rem;
-  border-radius: 0.7rem;
+  border-radius: 8px;
   text-decoration: none;
   transition: background 0.15s ease;
 }
@@ -258,9 +222,9 @@
   flex: 0 0 2.5rem;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 0.55rem;
+  border-radius: 6px;
   object-fit: cover;
-  background: linear-gradient(135deg, $accent-700, $accent);
+  background: $bg-3;
 }
 
 .mp-shortlist__title {
@@ -296,7 +260,7 @@
   min-width: 1.6rem;
   height: 1.6rem;
   padding: 0 0.35rem;
-  border-radius: 0.4rem;
+  border-radius: 6px;
   background: $bg-3;
   border: 1px solid $bg-1;
   color: $text;
@@ -304,100 +268,145 @@
   font-weight: 700;
 }
 
-// ---- Stage / deck -------------------------------------------------------
+// ---- Stage: carousel + detail panel -----------------------------------
 
 .mp-stage {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2.5rem 1rem 1rem;
+  padding: 1.5rem 1rem 0;
 }
 
-.mp-stage::before {
-  content: "";
-  position: absolute;
-  inset: -2rem 5% auto 5%;
-  height: 24rem;
-  background:
-    radial-gradient(closest-side at 30% 0%, rgba(76, 175, 239, 0.2), transparent 65%),
-    radial-gradient(closest-side at 75% 20%, rgba(0, 122, 204, 0.14), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
+// ---- Carousel ---------------------------------------------------------
 
-.mp-deck {
+.mp-carousel-stage {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   width: 100%;
-  max-width: 38rem;
-  min-height: 42rem;
-  z-index: 1;
+  max-width: 42rem;
   margin: 0 auto;
 }
 
-.mp-card-ghost {
+.mp-carousel {
+  position: relative;
+  flex: 1;
+  height: 11.5rem;
+  overflow: hidden;
+}
+
+.mp-carousel__track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.mp-carousel__slide {
   position: absolute;
-  inset: 0;
-  border-radius: 1.5rem;
+  left: 50%;
+  top: 50%;
+  width: 8.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.45s cubic-bezier(.2, .8, .2, 1), opacity 0.45s ease;
+}
+
+.mp-carousel__art {
+  display: block;
+  width: 100%;
+  height: 6.75rem;
+  border-radius: 10px;
+  overflow: hidden;
   background: $bg-2;
-  border: 1px solid $bg-3;
+  border: 2px solid $bg-3;
+  transition: border-color 0.3s ease;
+}
+
+.mp-carousel__slide.is-active .mp-carousel__art {
+  border-color: $accent;
+}
+
+.mp-carousel__art .mp-fallback__initial { font-size: 2rem; }
+
+.mp-carousel__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
   pointer-events: none;
 }
 
-.mp-card-ghost--1 {
-  transform: scale(0.97) translateY(0.7rem) rotate(-2deg);
-  opacity: 0.85;
-  z-index: 0;
+.mp-carousel__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: $text-muted;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.3s ease;
 }
 
-.mp-card-ghost--2 {
-  transform: scale(0.93) translateY(1.4rem) rotate(2.5deg);
-  opacity: 0.55;
-  z-index: -1;
+.mp-carousel__slide.is-active .mp-carousel__title {
+  color: $text;
+  font-weight: 700;
 }
 
-.mp-card {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
+.mp-carousel-arrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  border: 1px solid $bg-3;
+  background: $bg-2;
+  color: $text;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.mp-carousel-arrow:hover {
+  border-color: $accent;
+  color: $accent;
+}
+
+// ---- Detail panel (the centered project's full content) ---------------
+
+.mp-detail {
+  position: relative;
+  width: 100%;
+  max-width: 38rem;
+  margin: 1.75rem auto 0;
   display: flex;
   flex-direction: column;
   background: $bg-2;
   border: 1px solid $bg-3;
-  border-radius: 1.5rem;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
-  touch-action: pan-y;
-  user-select: none;
-  transition: transform 0.35s cubic-bezier(.2, .8, .2, 1), opacity 0.35s ease;
-  will-change: transform;
-}
-
-.mp-card--dragging {
-  transition: none;
-  cursor: grabbing;
-}
-
-.mp-card--leaving-right {
-  transform: translate(150%, -8%) rotate(24deg) !important;
+  min-height: 30rem;
   opacity: 0;
 }
 
-.mp-card--leaving-left {
-  transform: translate(-150%, -8%) rotate(-24deg) !important;
-  opacity: 0;
-}
-
-.mp-card--entering {
-  opacity: 0;
-  transform: scale(0.96) translateY(12px);
+.mp-detail.mp-detail--fade {
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
 // ---- Gallery --------------------------------------------------------------
 
 .mp-gallery {
   position: relative;
-  flex: 0 0 58%;
+  flex: 0 0 20rem;
   background: $bg-1;
   overflow: hidden;
 }
@@ -497,7 +506,8 @@
   border-radius: 999px;
 }
 
-// Fallback panel shown when a project has no images.
+// Fallback panel shown when a project has no images. Flat tinted colors
+// (same recipe as the status-indicator badges), no gradients/textures.
 .mp-fallback {
   width: 100%;
   height: 100%;
@@ -505,35 +515,21 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 40%),
-    linear-gradient(135deg, $accent-700, $accent);
-  overflow: hidden;
-}
-
-.mp-fallback::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
-  background-size: 18px 18px;
-  opacity: 0.5;
+  background: rgba(76, 175, 239, 0.14);
 }
 
 .mp-fallback__initial {
-  position: relative;
   font-size: 5.5rem;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+  color: $accent;
 }
 
-// A little variety across cards without images, still on-brand (blue-forward).
-.mp-fallback--1 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, $accent-700, $accent); }
-.mp-fallback--2 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, #0f4c75, $teal); }
-.mp-fallback--3 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, #1b1f3b, $blue); }
-.mp-fallback--4 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, $accent-700, #38b2ac); }
-.mp-fallback--5 { background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, #263159, $accent); }
+// A little variety across cards without images, still on-brand.
+.mp-fallback--1 { background: rgba(76, 175, 239, 0.14); .mp-fallback__initial { color: $accent; } }
+.mp-fallback--2 { background: rgba(56, 178, 172, 0.14); .mp-fallback__initial { color: $teal; } }
+.mp-fallback--3 { background: rgba(49, 130, 206, 0.14); .mp-fallback__initial { color: $blue; } }
+.mp-fallback--4 { background: rgba(40, 167, 69, 0.14); .mp-fallback__initial { color: $success-green; } }
+.mp-fallback--5 { background: rgba(0, 122, 204, 0.16); .mp-fallback__initial { color: $accent-700; } }
 
 // ---- Card body --------------------------------------------------------------
 
@@ -547,9 +543,10 @@
 
 .mp-card__pill {
   align-self: flex-start;
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  background: rgba(76, 175, 239, 0.16);
+  padding: 0.25rem 0.7rem;
+  border-radius: 8px;
+  background: rgba(76, 175, 239, 0.14);
+  border: 1px solid rgba(76, 175, 239, 0.3);
   color: $accent;
   font-size: 0.72rem;
   font-weight: 700;
@@ -560,7 +557,7 @@
 
 .mp-card__title {
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.25;
   margin-bottom: 0.6rem;
 }
@@ -597,42 +594,10 @@
   margin-top: 1.5rem;
 }
 
-// ---- Swipe stamps -----------------------------------------------------------
-
-.mp-stamp {
-  position: absolute;
-  top: 1.75rem;
-  padding: 0.4rem 1rem;
-  border: 3px solid;
-  border-radius: 0.6rem;
-  font-size: 1.15rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  opacity: 0;
-  z-index: 3;
-  pointer-events: none;
-}
-
-.mp-stamp--interested {
-  left: 1.5rem;
-  color: $green;
-  border-color: $green;
-  transform: rotate(-12deg);
-}
-
-.mp-stamp--skip {
-  right: 1.5rem;
-  color: $red;
-  border-color: $red;
-  transform: rotate(12deg);
-}
-
 // ---- Action row -------------------------------------------------------------
 
 .mp-actions {
   position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -651,57 +616,45 @@
   background: $bg-2;
   color: $text;
   cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
-}
-
-.mp-action-btn:hover {
-  transform: translateY(-2px);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .mp-action-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
-  transform: none;
 }
 
 .mp-action-btn--skip:hover { border-color: $red; color: $red; }
-.mp-action-btn--back { width: 2.75rem; height: 2.75rem; opacity: 0.75; }
-.mp-action-btn--back:hover { opacity: 1; }
 
 .mp-action-btn--interested {
   width: 4.25rem;
   height: 4.25rem;
-  background: $green;
-  border-color: $green;
-  color: #0c2016;
+  background: rgba(40, 167, 69, 0.2);
+  border-color: rgba(40, 167, 69, 0.4);
+  color: $success-green;
 }
 
 .mp-action-btn--interested:hover {
-  background: lighten(#4ADE80, 6%);
+  background: rgba(40, 167, 69, 0.32);
 }
 
 .mp-action-btn--interested:disabled {
   background: $bg-3;
+  border-color: $bg-3;
   color: $text-muted;
 }
 
 .mp-confirm {
   margin-top: 1.25rem;
   padding: 0.9rem 1.2rem;
-  border-radius: 0.9rem;
-  background: $bg-2;
-  border: 1px solid $accent;
+  border-radius: 10px;
+  background: rgba(76, 175, 239, 0.1);
+  border: 1px solid rgba(76, 175, 239, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.65rem;
   text-align: center;
-  animation: mp-confirm-in 0.25s ease;
-}
-
-@keyframes mp-confirm-in {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .mp-confirm__text {
@@ -737,7 +690,7 @@
 
 .mp-progress__fill {
   height: 100%;
-  background: linear-gradient(90deg, $accent-700, $accent);
+  background: $accent;
   transition: width 0.25s ease;
 }
 
@@ -754,14 +707,14 @@
 
 .mp-browse-btn:hover { color: $accent; }
 
-// ---- Empty / end-of-stack panel ---------------------------------------------
+// ---- Empty panel ---------------------------------------------
 
 .mp-end {
   max-width: 26rem;
   margin: 2rem auto;
   padding: 3rem 2rem;
   text-align: center;
-  border-radius: 1.25rem;
+  border-radius: 10px;
   background: $bg-2;
   border: 1px dashed $bg-3;
   color: $text-muted;
@@ -779,7 +732,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.65rem 1.4rem;
-  border-radius: 0.7rem;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
@@ -821,7 +774,7 @@
   overflow-y: auto;
   background: $bg-2;
   border: 1px solid $bg-3;
-  border-radius: 1.25rem;
+  border-radius: 10px;
   padding: 1.5rem;
 }
 
@@ -841,7 +794,7 @@
   width: 100%;
   padding: 0.55rem 0.85rem;
   margin-bottom: 1rem;
-  border-radius: 0.65rem;
+  border-radius: 8px;
   background: $bg-1;
   border: 1px solid $bg-3;
   color: $text;
@@ -881,7 +834,7 @@
   text-align: left;
   border: 1px solid $bg-3;
   background: $bg-1;
-  border-radius: 0.85rem;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.15s ease;
@@ -894,7 +847,7 @@
   height: 5rem;
   object-fit: cover;
   display: block;
-  background: linear-gradient(135deg, $accent-700, $accent);
+  background: $bg-3;
 }
 
 .mp-overlay__item-title {
@@ -912,12 +865,14 @@
   border-radius: 999px;
 }
 
-.mp-overlay__badge--interested { background: rgba(74, 222, 128, 0.18); color: $green; }
+.mp-overlay__badge--interested { background: rgba(40, 167, 69, 0.2); color: $success-green; }
 .mp-overlay__badge--skipped { background: $bg-3; color: $text-muted; }
 
 @media (max-width: 640px) {
   .mp-hero { align-items: flex-start; }
-  .mp-hero__title { font-size: 2rem; }
-  .mp-deck { min-height: 34rem; }
-  .mp-gallery { flex-basis: 50%; }
+  .mp-hero__title { font-size: 1.85rem; }
+  .mp-carousel__slide { width: 6.5rem; }
+  .mp-carousel__art { height: 5rem; }
+  .mp-detail { min-height: 26rem; }
+  .mp-gallery { flex: 0 0 14rem; }
 }

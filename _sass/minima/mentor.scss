@@ -9,6 +9,41 @@
   margin: 2rem auto;
 }
 
+// Sitewide "you're signed in as a mentor" indicator on every aesthetihawk
+// page (see _layouts/aesthetihawk.html), not just the mentor-specific pages.
+.mentor-badge {
+  position: fixed;
+  top: 63px;
+  right: 1.25rem;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  background: rgba(76, 175, 239, 0.14);
+  border: 1px solid rgba(76, 175, 239, 0.3);
+  color: $accent;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.mentor-badge__dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: $success-green;
+}
+
+@media (max-width: 640px) {
+  .mentor-badge {
+    top: auto;
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
 .mentor-state {
   padding: 2rem 0;
   text-align: center;

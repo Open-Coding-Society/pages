@@ -21,8 +21,8 @@ microblog: true
       <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
     </svg>
     <div class="mp-state__title">Mentor Portal</div>
-    <p>Discover Capstone projects looking for a mentor. Swipe through the ones that catch
-      your eye, skip the rest, and apply to support the teams you're interested in.</p>
+    <p>Discover Capstone projects looking for a mentor. Rotate through the carousel to
+      browse them, and apply to support the teams you're interested in.</p>
     <button id="mp-enter-btn" type="button" class="mp-btn mp-btn--primary mp-btn--lg">Mentor</button>
   </div>
 
@@ -30,11 +30,10 @@ microblog: true
 
     <div class="mp-hero">
       <div>
-        <span class="mp-hero__kicker">Live &middot; Capstone Season</span>
         <h1 class="mp-hero__title">Mentor Portal</h1>
-        <p class="mp-hero__subtitle">Swipe through Capstone projects looking for a mentor.
-          Skip the ones that aren't a fit, and mark the ones you'd like to support &mdash;
-          open a project any time to read the full write-up first.</p>
+        <p class="mp-hero__subtitle">Browse Capstone projects looking for a mentor with the
+          carousel below. Mark the ones you'd like to support &mdash; open a project any
+          time to read the full write-up first.</p>
       </div>
       <div class="mp-stats">
         <div class="mp-stat">
@@ -64,15 +63,26 @@ microblog: true
       <div class="mp-layout">
         <div class="mp-main">
           <div class="mp-stage">
-            <div class="mp-deck" id="mp-deck"></div>
+            <div class="mp-carousel-stage">
+              <button id="mp-carousel-prev" type="button" class="mp-carousel-arrow mp-carousel-arrow--prev" aria-label="Previous project">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+              </button>
+              <div class="mp-carousel" id="mp-carousel">
+                <div class="mp-carousel__track" id="mp-carousel-track"></div>
+              </div>
+              <button id="mp-carousel-next" type="button" class="mp-carousel-arrow mp-carousel-arrow--next" aria-label="Next project">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="mp-detail" id="mp-detail"></div>
           </div>
 
           <div class="mp-actions">
-            <button id="mp-back-btn" type="button" class="mp-action-btn mp-action-btn--back" aria-label="Back to previous project" title="Back">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-              </svg>
-            </button>
             <button id="mp-skip-btn" type="button" class="mp-action-btn mp-action-btn--skip" aria-label="Skip this project" title="Skip">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -104,7 +114,7 @@ microblog: true
               </svg>
               Browse all projects
             </button>
-            <p class="sm:hidden" style="font-size:0.75rem;opacity:0.7;">Swipe left to skip, right if you're interested</p>
+            <p class="sm:hidden" style="font-size:0.75rem;opacity:0.7;">Use the arrows or click a project to rotate the carousel</p>
           </div>
         </div>
 
@@ -118,19 +128,13 @@ microblog: true
           <div class="mp-rail__card">
             <div class="mp-rail__title">Shortcuts</div>
             <ul class="mp-tips">
-              <li><span class="mp-kbd">&larr;</span> Skip</li>
-              <li><span class="mp-kbd">&rarr;</span> Interested</li>
-              <li><span class="mp-kbd">&#8942;</span> Drag the card either way</li>
+              <li><span class="mp-kbd">&larr;</span> Previous project</li>
+              <li><span class="mp-kbd">&rarr;</span> Next project</li>
+              <li>Click any project in the carousel to jump to it</li>
             </ul>
           </div>
         </aside>
       </div>
-    </div>
-
-    <div id="mp-end-stack" class="mp-end" style="display:none;">
-      <div class="mp-end__title">You've reviewed every project</div>
-      <p>Nice work &mdash; check back later for new Capstone projects, or start over below.</p>
-      <button id="mp-restart-btn" type="button" class="mp-btn mp-btn--primary">Start over</button>
     </div>
 
   </div>
@@ -246,11 +250,10 @@ microblog: true
   let projects = [];
   let index = 0;
 
-  const deckEl = el('mp-deck');
   const browserEl = el('mp-browser');
   const emptyEl = el('mp-empty');
-  const endEl = el('mp-end-stack');
-  const backBtn = el('mp-back-btn');
+  const carouselTrackEl = el('mp-carousel-track');
+  const detailEl = el('mp-detail');
   const skipBtn = el('mp-skip-btn');
   const interestedBtn = el('mp-interested-btn');
   const progressText = el('mp-progress-text');
@@ -259,8 +262,6 @@ microblog: true
   const statInterested = el('mp-stat-interested');
   const statSkipped = el('mp-stat-skipped');
 
-  let cardRoot = null;
-  let contentEl = null;
   let initialized = false;
 
   function initials(title) {
@@ -361,11 +362,12 @@ microblog: true
     renderShortlist();
   }
 
-  function renderCardContent() {
+  function renderDetail() {
     const p = projects[index];
     const applied = getAppliedIds().has(String(p.url));
 
-    contentEl.innerHTML = `
+    detailEl.classList.remove('mp-detail--fade');
+    detailEl.innerHTML = `
       ${galleryHtml(p.images, p.title)}
       <div class="mp-card__body">
         <span class="mp-card__pill">Capstone</span>
@@ -376,31 +378,42 @@ microblog: true
         </div>
       </div>
     `;
-    wireGallery(contentEl);
-    cardRoot.querySelectorAll('.mp-stamp').forEach(s => { s.style.opacity = 0; });
+    wireGallery(detailEl);
+    void detailEl.offsetWidth;
+    detailEl.classList.add('mp-detail--fade');
 
     interestedBtn.disabled = applied;
     interestedBtn.title = applied ? 'Already in your shortlist' : "I'm interested in mentoring this project";
-    backBtn.disabled = index === 0;
 
     progressText.textContent = `${index + 1} / ${projects.length}`;
     progressFill.style.width = `${projects.length > 1 ? (index / (projects.length - 1)) * 100 : 100}%`;
     updateStats();
   }
 
-  function showCard() {
-    renderCardContent();
-    cardRoot.classList.remove('mp-card--leaving-left', 'mp-card--leaving-right', 'mp-card--dragging');
-    cardRoot.style.transform = '';
-    cardRoot.classList.add('mp-card--entering');
-    void cardRoot.offsetWidth;
-    requestAnimationFrame(() => cardRoot.classList.remove('mp-card--entering'));
+  // Absolute-positioned "coverflow" layout: every slide's transform is a
+  // function of its distance from the active index, so navigating just
+  // recomputes these and the CSS transition animates the whole rotation.
+  function layoutCarousel() {
+    const slides = carouselTrackEl.querySelectorAll('.mp-carousel__slide');
+    const spacing = 108;
+    slides.forEach((slide, i) => {
+      const offset = i - index;
+      const abs = Math.abs(offset);
+      const scale = offset === 0 ? 1 : Math.max(0.55, 1 - abs * 0.16);
+      const opacity = abs > 4 ? 0 : Math.max(0, 1 - abs * 0.28);
+      slide.style.transform = `translate(-50%, -50%) translateX(${offset * spacing}px) scale(${scale})`;
+      slide.style.opacity = String(opacity);
+      slide.style.zIndex = String(100 - abs);
+      slide.style.pointerEvents = abs > 4 ? 'none' : 'auto';
+      slide.classList.toggle('is-active', offset === 0);
+    });
   }
 
-  function showEndOfStack() {
-    browserEl.style.display = 'none';
-    endEl.style.display = 'block';
-    updateStats();
+  function goTo(newIndex) {
+    const count = projects.length;
+    index = ((newIndex % count) + count) % count; // loop both directions
+    layoutCarousel();
+    renderDetail();
   }
 
   let confirmTimer = null;
@@ -424,19 +437,8 @@ microblog: true
     markApplied(p.url);
     pushInterestToServer(p.url, p.title);
     notify(`Interested in ${p.title}`, true);
-
-    cardRoot.classList.remove('mp-card--dragging');
-    cardRoot.classList.add('mp-card--leaving-right');
-    setTimeout(() => {
-      if (index + 1 >= projects.length) {
-        index = projects.length;
-        showEndOfStack();
-      } else {
-        index++;
-        showCard();
-      }
-      showConfirmPopup(p);
-    }, 300);
+    showConfirmPopup(p);
+    goTo(index + 1);
   }
 
   function notify(text, accent) {
@@ -446,7 +448,7 @@ microblog: true
       duration: 2200,
       gravity: 'top',
       position: 'right',
-      style: { background: accent ? 'linear-gradient(90deg,#007ACC,#4CAFEF)' : '#2A2D2D' },
+      style: { background: accent ? '#007ACC' : '#2A2D2D' },
     }).showToast();
   }
 
@@ -456,78 +458,7 @@ microblog: true
     hideConfirmPopup();
     markSkipped(p.url);
     notify(`Skipped ${p.title}`, false);
-    cardRoot.classList.remove('mp-card--dragging');
-    cardRoot.classList.add('mp-card--leaving-left');
-    setTimeout(() => {
-      if (index + 1 >= projects.length) {
-        index = projects.length;
-        showEndOfStack();
-      } else {
-        index++;
-        showCard();
-      }
-    }, 300);
-  }
-
-  function handleBack() {
-    if (index === 0) return;
-    hideConfirmPopup();
-    cardRoot.classList.remove('mp-card--dragging');
-    cardRoot.style.transform = '';
-    index--;
-    showCard();
-  }
-
-  // ---- Drag-to-swipe ------------------------------------------------------
-
-  let drag = null;
-
-  function onPointerMove(e) {
-    if (!drag) return;
-    const dx = e.clientX - drag.startX;
-    const dy = e.clientY - drag.startY;
-    if (!drag.moved && Math.hypot(dx, dy) > 10) {
-      drag.moved = true;
-      drag.card.classList.add('mp-card--dragging');
-    }
-    if (drag.moved) {
-      e.preventDefault();
-      drag.dx = dx;
-      drag.card.style.transform = `translate(${dx}px, ${dy * 0.15}px) rotate(${dx / 14}deg)`;
-      const interestedStamp = drag.card.querySelector('.mp-stamp--interested');
-      const skipStamp = drag.card.querySelector('.mp-stamp--skip');
-      if (interestedStamp) interestedStamp.style.opacity = String(Math.max(0, Math.min(1, dx / 110)));
-      if (skipStamp) skipStamp.style.opacity = String(Math.max(0, Math.min(1, -dx / 110)));
-    }
-  }
-
-  function onPointerUp() {
-    document.removeEventListener('pointermove', onPointerMove);
-    if (!drag) return;
-    const { card, moved, dx = 0 } = drag;
-    drag = null;
-    if (!moved) return;
-
-    const THRESHOLD = 110;
-    const p = projects[index];
-    const applied = p && getAppliedIds().has(String(p.url));
-
-    if (dx > THRESHOLD && !applied) {
-      handleInterested();
-    } else if (dx < -THRESHOLD) {
-      handleSkip();
-    } else {
-      card.classList.remove('mp-card--dragging');
-      card.style.transform = '';
-      card.querySelectorAll('.mp-stamp').forEach(s => { s.style.opacity = 0; });
-    }
-  }
-
-  function onPointerDown(e) {
-    if (e.button !== undefined && e.button !== 0) return;
-    drag = { startX: e.clientX, startY: e.clientY, moved: false, card: cardRoot };
-    document.addEventListener('pointermove', onPointerMove);
-    document.addEventListener('pointerup', onPointerUp, { once: true });
+    goTo(index + 1);
   }
 
   // ---- Browse-all overlay ---------------------------------------------------
@@ -569,11 +500,8 @@ microblog: true
     el('mp-overlay-grid').querySelectorAll('.mp-overlay__item').forEach(btn => {
       btn.addEventListener('click', () => {
         hideConfirmPopup();
-        index = Number(btn.dataset.index);
         closeOverlay();
-        browserEl.style.display = 'block';
-        endEl.style.display = 'none';
-        showCard();
+        goTo(Number(btn.dataset.index));
       });
     });
   }
@@ -591,33 +519,39 @@ microblog: true
 
   // ---- Init ---------------------------------------------------------------
 
-  function initDeck() {
-    deckEl.innerHTML = `
-      <div class="mp-card-ghost mp-card-ghost--2"></div>
-      <div class="mp-card-ghost mp-card-ghost--1"></div>
-      <div class="mp-card" id="mp-card">
-        <span class="mp-stamp mp-stamp--interested">Interested</span>
-        <span class="mp-stamp mp-stamp--skip">Skip</span>
-        <div class="mp-card__content"></div>
-      </div>
+  function carouselSlideHtml(p, i) {
+    const art = (Array.isArray(p.images) && p.images.length)
+      ? `<img class="mp-carousel__img" src="${esc(p.images[0])}" alt="" loading="lazy">`
+      : `<div class="mp-fallback mp-fallback--${fallbackVariant(p.title)}"><span class="mp-fallback__initial">${esc(initials(p.title))}</span></div>`;
+    return `
+      <button type="button" class="mp-carousel__slide" data-index="${i}" aria-label="${esc(p.title)}">
+        <span class="mp-carousel__art">${art}</span>
+        <span class="mp-carousel__title">${esc(p.title)}</span>
+      </button>
     `;
-    cardRoot = el('mp-card');
-    contentEl = cardRoot.querySelector('.mp-card__content');
-    cardRoot.addEventListener('pointerdown', onPointerDown);
+  }
+
+  function initCarousel() {
+    carouselTrackEl.innerHTML = projects.map((p, i) => carouselSlideHtml(p, i)).join('');
+    carouselTrackEl.querySelectorAll('.mp-carousel__slide').forEach(slide => {
+      slide.addEventListener('click', () => {
+        const i = Number(slide.dataset.index);
+        if (i === index) {
+          window.location.href = projects[i].url;
+        } else {
+          hideConfirmPopup();
+          goTo(i);
+        }
+      });
+    });
 
     browserEl.style.display = 'block';
-    showCard();
+    goTo(index);
 
-    backBtn.addEventListener('click', handleBack);
+    el('mp-carousel-prev').addEventListener('click', () => { hideConfirmPopup(); goTo(index - 1); });
+    el('mp-carousel-next').addEventListener('click', () => { hideConfirmPopup(); goTo(index + 1); });
     skipBtn.addEventListener('click', handleSkip);
     interestedBtn.addEventListener('click', handleInterested);
-    el('mp-restart-btn').addEventListener('click', () => {
-      hideConfirmPopup();
-      index = 0;
-      endEl.style.display = 'none';
-      browserEl.style.display = 'block';
-      showCard();
-    });
     el('mp-browse-open').addEventListener('click', openOverlay);
     el('mp-overlay-close').addEventListener('click', closeOverlay);
     el('mp-overlay').addEventListener('click', (e) => { if (e.target.id === 'mp-overlay') closeOverlay(); });
@@ -646,8 +580,8 @@ microblog: true
         return;
       }
       if (browserEl.style.display === 'none') return;
-      if (e.key === 'ArrowRight' && !interestedBtn.disabled) interestedBtn.click();
-      if (e.key === 'ArrowLeft') skipBtn.click();
+      if (e.key === 'ArrowRight') { hideConfirmPopup(); goTo(index + 1); }
+      if (e.key === 'ArrowLeft') { hideConfirmPopup(); goTo(index - 1); }
     });
   }
 
@@ -677,6 +611,6 @@ microblog: true
       emptyEl.style.display = 'block';
       return;
     }
-    initDeck();
+    initCarousel();
   }
 </script>
