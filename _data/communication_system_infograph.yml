@@ -1,6 +1,6 @@
 # Communication System Capstone Infographic
 Title: "Communication System"
-Description: "Class discussion is moving out of Slack and into the course site, next to the work it is about. Class-wide announcements and per-week chat already ship; still to build are a thread on every assignment and 1:1 direct messages."
+Description: "Class discussion is moving out of Slack and into the course site, next to the work it is about. Class-wide announcements, per-week chat, and a rich-text composer with emoji already ship; still to build are a thread on every assignment, 1:1 direct messages, GIFs in the composer, and Slack-style emoji reactions."
 
 Topics:
   - title: "Class Announcements"
@@ -33,7 +33,7 @@ Topics:
     status: "Shipped"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
       - "Tarun"
 
   - title: "Per-Week Chat"
@@ -66,7 +66,7 @@ Topics:
     status: "Shipped"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
       - "Tarun"
 
   - title: "Assignment Threads"
@@ -93,7 +93,41 @@ Topics:
     status: "Planned"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
+      - "Tarun"
+
+  - title: "GIFs and Slack-Parity Messaging"
+    phase: "Slack Parity"
+    link: "https://github.com/UGRC-CSA/Pages/issues/13"
+    linkLabel: "Follow Issue #13"
+    subtitle: "GIFs in the composer, and the Slack habits people still leave the site for"
+    keyPoints:
+      - "The shared composer already ships bold, italic, underline, strikethrough, lists, font and size controls, and a 90-emoji picker (PR #36)"
+      - "Emoji today are inserted into the message body — reacting to somebody else's posted message is the piece that does not exist yet"
+      - "GIFs are not supported at all: the composer accepts text and formatting and nothing else"
+      - "Planned: a GIF picker in the composer toolbar, sitting beside the emoji button it already has"
+      - "Planned: emoji reactions on a posted message, with a per-emoji count and the list of who reacted"
+      - "The chat payload already carries an `image` field that is null on every message sent today, so an attachment has a slot to ride on"
+      - "Slack-style link previews already ship, so the renderer can already draw a card underneath a message"
+      - "Every message renders through the shared sanitiser in rich-text.js, so any new embed gets allow-listed there rather than passed through raw"
+      - "Reaction counts are the one piece that needs real backend work — they are per-message state, not another field on the message"
+    tech:
+      - "assets/js/chat/rich-text.js (shared composer)"
+      - "image field on the group chat payload"
+      - "Shared message sanitiser"
+      - "Link preview renderer"
+      - "GIF search API (not yet chosen)"
+      - "Reaction counts on the Spring side"
+    description: "Rich text and emoji insertion landed in PR #36, which covers the writing half of Slack parity. What is left is the part people reach back to Slack for: dropping a GIF into a message, and reacting to somebody else's message instead of replying to it. GIFs can ride the image field the chat payload already carries and render through the same allow-listed sanitiser as everything else, which keeps the message model and the security story unchanged. Reactions are the piece that genuinely needs backend work, since a count of who reacted with what is per-message state rather than another field on the message."
+    impact:
+      - "Closes the gap that still sends people to Slack for anything more expressive than formatted text"
+      - "Reactions collapse a run of \"ok\", \"got it\", \"+1\" replies into a single tap, which keeps a class thread readable"
+      - "GIFs reuse the existing image field, so the message model does not have to change to carry them"
+      - "New embeds go through the sanitiser that already exists, so the security review stays in one place"
+    status: "Planned"
+    team:
+      - "Samarth"
+      - "Akshajh"
       - "Tarun"
 
   - title: "Direct Messages"
@@ -130,7 +164,7 @@ Topics:
     status: "Designed — Not Built"
     team:
       - "Perry"
-      - "Syowns"
+      - "Syown"
       - "Leon"
 
   - title: "Teacher Moderation"
@@ -152,10 +186,17 @@ Topics:
     status: "Planned"
     team:
       - "Samarth"
-      - "Akshaj"
+      - "Akshajh"
       - "Tarun"
 
 Sections:
+  - title: "Team"
+    subtitle: "Who owns what, straight off the UGRC-CSA sprint board"
+    items:
+      - "Announcements, per-week chat, assignment threads, and teacher moderation — Samarth, Akshajh, Tarun"
+      - "Direct messages, from the #27 design through the conversation list and the Spring side — Perry, Syown, Leon"
+      - "EC2 provisioning, CI/CD, HTTPS on a real domain, and monitoring — Sathwik, Akhil, Skandan"
+
   - title: "Why Not Stay on Slack"
     subtitle: "The case for moving discussion onto the course site"
     items:
@@ -169,8 +210,8 @@ Sections:
     items:
       - "EC2 and infra (Sathwik, Akhil, Skandan). The Spring backend only runs locally and on the maintainers' deploy, and chat is only as real as the backend behind it. Issues #5–#10 cover provisioning, CI/CD, HTTPS on a real domain, and monitoring."
       - "Issue #26 covers the Groups admin page, where chat-created rows now sit beside roster groups with nothing to tell them apart."
-      - "CSA page and chat (Samarth, Akshaj, Tarun). Issue #11 owns the page, #13 polishes and extends the widgets, #15 QAs them across every course and week."
-      - "DMs (Perry, Syowns, Leon). Issue #17 is the design, answered by #27; #19 is the conversation list and thread UI; #21 is the Spring side."
+      - "CSA page and chat (Samarth, Akshajh, Tarun). Issue #11 owns the page, #13 polishes and extends the widgets, #15 QAs them across every course and week."
+      - "DMs (Perry, Syown, Leon). Issue #17 is the design, answered by #27; #19 is the conversation list and thread UI; #21 is the Spring side."
       - "One gap worth repeating: group chat history lives in S3. Without credentials in the deploy environment, send and receive work but scrollback comes back empty. That's already true of lesson_chat.html, but it does block a real Slack migration."
 
 Links:
