@@ -319,14 +319,14 @@ Below are the capstone infographic pages created by student groups. Click an ima
    <!-- SFI Foundation 2026–27 (CSP) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP"
         data-year="2026-2027"
-        data-page-url="https://github.com/ruhaanb622/SFI-Frontend"
+        data-page-url="{{ '/capstone/sfi-foundation/' | relative_url }}"
         data-frontend-url="https://github.com/ruhaanb622/SFI-Frontend"
         data-backend-url="https://github.com/ruhaanb622/SFI-Backend">
-       <a href="https://github.com/ruhaanb622/SFI-Frontend">
+       <a href="{{ '/capstone/sfi-foundation/' | relative_url }}">
            <img src="{{ '/images/capstone/sfi-foundation-2026-27.png' | relative_url }}" alt="SFI Foundation 2026–27" class="w-28 h-28 object-cover rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="https://github.com/ruhaanb622/SFI-Frontend">SFI Foundation 2026–27</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/sfi-foundation/' | relative_url }}">SFI Foundation 2026–27</a></h3>
            <p class="text-sm text-gray-700">A CSP capstone continuing the SFI Foundation modernization prototype with searchable safety standards, ML-assisted spec matching, browser-based equipment detection, personal gear tracking, and staff management tools.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Ruhaan Bansal, Arya Taghavi Zargar, Deyar Raissadat, Ishan Jha, Ishan Khandelwal, Vayun Shekhar</p>
        </div>
