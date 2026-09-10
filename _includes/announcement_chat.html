@@ -36,7 +36,6 @@
       </div>
     </div>
     <form class="chat-form" id="announcementChatForm" autocomplete="off">
-      <input class="chat-input" id="announcementChatInput" type="text" placeholder="Message the class…" maxlength="2000" disabled>
       <button class="chat-send" id="announcementChatSend" type="submit" disabled>
         <i class="fas fa-paper-plane" aria-hidden="true"></i><span>Send</span>
       </button>
@@ -46,6 +45,7 @@
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { createRichComposer, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
 
   const COURSE = {{ page.course | jsonify }};
   const GROUP_NAME = `${COURSE}-announcements`;
@@ -105,9 +105,16 @@
   const noteEl = document.getElementById('announcementChatNote');
   const noteTextEl = document.getElementById('announcementChatNoteText');
   const messagesEl = document.getElementById('announcementChatMessages');
-  const inputEl = document.getElementById('announcementChatInput');
   const sendBtn = document.getElementById('announcementChatSend');
   const formEl = document.getElementById('announcementChatForm');
+
+  const composer = createRichComposer({
+    placeholder: 'Message the class…',
+    maxLength: 2000,
+    onSubmit: submitMessage,
+  });
+  formEl.classList.add('chat-form--rich');
+  formEl.insertBefore(composer.element, sendBtn);
 
   function setStatus(text, tone) {
     statusEl.textContent = text;
@@ -121,8 +128,13 @@
   }
 
   function setComposerEnabled(enabled) {
-    inputEl.disabled = !enabled;
+    composer.setEnabled(enabled);
     sendBtn.disabled = !enabled;
+  }
+
+  function submitMessage() {
+    if (composer.isEmpty() || composer.isOverLimit()) return;
+    if (sendMessage(composer.getHTML())) composer.clear();
   }
 
   function parseDate(isoString) {
@@ -225,7 +237,7 @@
 
     const body = document.createElement('span');
     body.className = 'chat-msg-body';
-    body.textContent = message;
+    renderRichMessage(body, message);
 
     main.append(meta, body);
     row.append(avatar, main);
@@ -476,9 +488,7 @@
 
   formEl.addEventListener('submit', (e) => {
     e.preventDefault();
-    const text = inputEl.value.trim();
-    if (!text) return;
-    if (sendMessage(text)) inputEl.value = '';
+    submitMessage();
   });
 
   window.addEventListener('beforeunload', () => {

@@ -29,7 +29,6 @@
       <p class="chat-empty" id="weekChatEmpty-{{ wc_id }}">No messages yet.</p>
     </div>
     <form class="chat-form" id="weekChatForm-{{ wc_id }}" autocomplete="off">
-      <input class="chat-input" id="weekChatInput-{{ wc_id }}" type="text" placeholder="Ask a question about Week {{ index }}…" maxlength="2000" disabled>
       <button class="chat-send" id="weekChatSend-{{ wc_id }}" type="submit" disabled>
         <i class="fas fa-paper-plane"></i><span>Send</span>
       </button>
@@ -39,6 +38,7 @@
 
 <script type="module">
   import { javaURI, pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+  import { createRichComposer, renderRichMessage } from '{{site.baseurl}}/assets/js/chat/rich-text.js';
 
   const COURSE = {{ page.course | jsonify }};
   const WEEK_INDEX = {{ index | jsonify }};
@@ -97,9 +97,16 @@
   const noteEl = document.getElementById(`weekChatNote-${WC_ID}`);
   const noteTextEl = document.getElementById(`weekChatNoteText-${WC_ID}`);
   const messagesEl = document.getElementById(`weekChatMessages-${WC_ID}`);
-  const inputEl = document.getElementById(`weekChatInput-${WC_ID}`);
   const sendBtn = document.getElementById(`weekChatSend-${WC_ID}`);
   const formEl = document.getElementById(`weekChatForm-${WC_ID}`);
+
+  const composer = createRichComposer({
+    placeholder: `Ask a question about Week ${WEEK_INDEX}…`,
+    maxLength: 2000,
+    onSubmit: submitMessage,
+  });
+  formEl.classList.add('chat-form--rich');
+  formEl.insertBefore(composer.element, sendBtn);
 
   function setStatus(text, tone) {
     statusEl.textContent = text;
@@ -113,8 +120,13 @@
   }
 
   function setComposerEnabled(enabled) {
-    inputEl.disabled = !enabled;
+    composer.setEnabled(enabled);
     sendBtn.disabled = !enabled;
+  }
+
+  function submitMessage() {
+    if (composer.isEmpty() || composer.isOverLimit()) return;
+    if (sendMessage(composer.getHTML())) composer.clear();
   }
 
   function formatTimestamp(isoString) {
@@ -152,7 +164,7 @@
 
     const body = document.createElement('span');
     body.className = 'chat-msg-body';
-    body.textContent = message;
+    renderRichMessage(body, message);
 
     line.append(meta, body);
     messagesEl.appendChild(line);
@@ -212,7 +224,7 @@
     });
 
     setComposerEnabled(true);
-    inputEl.focus();
+    composer.focus();
   }
 
   async function resolveCurrentUser() {
@@ -390,7 +402,7 @@
     if (connected) {
       state.mode = 'live';
       setComposerEnabled(true);
-      inputEl.focus();
+      composer.focus();
     } else {
       appendSystem('Live updates are unavailable right now.');
       enterPreviewMode('The class chat service is unreachable.');
@@ -403,9 +415,7 @@
 
   formEl.addEventListener('submit', (e) => {
     e.preventDefault();
-    const text = inputEl.value.trim();
-    if (!text) return;
-    if (sendMessage(text)) inputEl.value = '';
+    submitMessage();
   });
 
   window.addEventListener('beforeunload', () => {
