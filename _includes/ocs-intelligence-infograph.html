@@ -34,7 +34,7 @@
         <rect x="478" y="55" width="10" height="34" rx="2" fill="rgba(255,255,255,0.65)"/>
         <rect x="493" y="55" width="10" height="34" rx="2" fill="rgba(255,255,255,0.65)"/>
         <rect x="508" y="55" width="10" height="34" rx="2" fill="rgba(255,255,255,0.65)"/>
-        <text x="497" y="115" text-anchor="middle" fill="#fff" font-size="20" font-weight="800">Electricity</text>
+        <text x="497" y="115" text-anchor="middle" fill="#fff" font-size="20" font-weight="800">Shared compute</text>
         <text x="497" y="140" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="12">every student</text>
         <text x="497" y="178" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="12">Donated GPUs, shared.</text>
       </svg>
@@ -82,15 +82,37 @@
         <h4 class="ocs-intelligence-diagram-title">How a student reaches the model</h4>
         <div class="ocs-intelligence-diagram">
           <pre class="mermaid">flowchart TD
-    A[Student harness on another network] --> B[Issued key]
-    B --> C[Live stream]
-    C --> D[Production rack - Team 1]
-    D --> E[Shared open model]
-    D --> F[~5 concurrent users]</pre>
+    A[Student at school or home] --> B[Authenticated OCS API]
+    B --> C[Broker and request queue]
+    C --> D[Mini prepares session context]
+    D --> E[GPU worker generates answer]
+    E --> F[Stream returned to student]</pre>
         </div>
       </div>
     </div>
   </div>
+
+  <section aria-labelledby="ocs-implementation-title">
+    <div class="ocs-intelligence-card">
+      <h2 id="ocs-implementation-title" class="ocs-intelligence-section-title">{{ data.implementation.title }}</h2>
+      <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.implementation.introduction }}</p>
+      <div class="ocs-intelligence-diagram">
+        <pre class="mermaid">{{ data.implementation.diagram | escape }}</pre>
+      </div>
+    </div>
+    {% for section in data.implementation.sections %}
+    <div class="ocs-intelligence-card">
+      <h3 class="ocs-intelligence-section-title">{{ section.title }}</h3>
+      <p class="ocs-intelligence-about">{{ section.body }}</p>
+      <ul class="ocs-intelligence-about">
+        {% for step in section.steps %}
+        <li>{{ step }}</li>
+        {% endfor %}
+      </ul>
+      <p class="ocs-intelligence-about"><strong>How we will verify it:</strong> {{ section.evidence }}</p>
+    </div>
+    {% endfor %}
+  </section>
 
   <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.researchQuestionsNote }}</p>
 
@@ -162,7 +184,7 @@
       <pre class="mermaid">flowchart TD
     A[Paid subscriptions] --> B[Donated GPU rack]
     B --> C[Host open models locally]
-    C --> D[Electricity only]
+    C --> D[Shared operating costs]
     D --> E[Stream, keys, harness]
     E --> F[Student on another network]
     F --> G[Same chance to code with a model]</pre>
