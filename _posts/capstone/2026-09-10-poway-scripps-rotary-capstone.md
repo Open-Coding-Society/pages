@@ -10,39 +10,27 @@ categories: [Capstone]
 permalink: /capstone/poway-scripps-rotary/
 ---
 
-> Helping the Poway Scripps Rotary Club improve their website — cleaner UI, galleries instead of long sheets of images, and improved navbar and search features. This is a student capstone, not an official Rotary International product or a replacement for the official club site.
+> Helping the Poway Scripps Rotary Club improve their website. This means cleaner UI, galleries instead of long sheets of images, and improved navbar and search features. This is a student capstone, not an official Rotary International product or a replacement for the official club site.
 
-<div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+<div class="ocs__grid ocs__grid--color cols-2" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">Core Experience</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Browse Content</strong>
         <p>Browse club pages and categories or search site content in plain language instead of scrolling through long sheets of content.</p>
-        <a class="ocs__btn small iridescent" href="#">
-            Frontend Repo
-        </a>
     </div>
     <div class="ocs__grid-cell">
         <strong>View Galleries</strong>
         <p>Photo galleries organize club images into browsable collections instead of long sheets of images.</p>
-        <a class="ocs__btn small iridescent" href="#">
-            Backend Repo
-        </a>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Navigate Easily</strong>
         <p>An improved navbar guides visitors to events, galleries, membership, and contact pages across responsive layouts.</p>
-        <a class="ocs__btn small iridescent" href="#">
-            Detector Code
-        </a>
     </div>
     <div class="ocs__grid-cell">
         <strong>Search and Revisit</strong>
         <p>Users search site content, revisit events and galleries, and find how to get involved with the club.</p>
-        <a class="ocs__btn small iridescent" href="#">
-            My Gear API
-        </a>
     </div>
 </div>
 
@@ -55,11 +43,11 @@ permalink: /capstone/poway-scripps-rotary/
     </div>
     <div class="ocs__grid-cell">
         <strong>Project Direction</strong>
-        <p>Combine cleaner UI, organized galleries, an improved navbar, and plain-language search into one consistent frontend backed by a Flask API.</p>
+        <p>Combine cleaner UI, organized galleries, an improved navbar, and plain-language search into one consistent frontend, possibly backed by a backend (flask API?).</p>
     </div>
 </div>
 
-<div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+<div class="ocs__grid ocs__grid--holographic cols-2" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">Technical Plan</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
@@ -83,20 +71,20 @@ permalink: /capstone/poway-scripps-rotary/
 
 > The capstone spans the browser experience and backend services so the team can iterate on a complete full-stack workflow.
 
-<div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
-    <div class="ocs__grid-cell ocs__grid-cell--header">System Flow</div>
+<div class="ocs__grid ocs__grid--card cols-2" style="margin-bottom: 1.5rem;">
+    <div class="ocs__grid-cell ocs__grid-cell--header">System Flow (Planned)</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Jekyll + JavaScript</strong>
         <p>Cleaner UI, galleries, navbar, search, and contact views across responsive pages.</p>
     </div>
     <div class="ocs__grid-cell">
-        <strong>Flask API</strong>
+        <strong>(Possibly) Flask API</strong>
         <p>Content, gallery, search, and contact endpoints.</p>
     </div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
-        <strong>SQLAlchemy + SQLite</strong>
+        <strong>(Possibly) SQLAlchemy + SQLite</strong>
         <p>Structured content records and user-linked prototype data.</p>
     </div>
     <div class="ocs__grid-cell">
