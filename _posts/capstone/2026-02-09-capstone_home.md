@@ -318,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
        <!--Oncology and Kids Cancer Association (CSP, 2026/2027) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
-           <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="w-28 h-28 object-contain rounded" />
+       <a href="{% post_url 2026-09-08-oak-cancer-capstone %}">
+           <img src="/images/capstone/acs_logo.png" alt="Cal Center For Arts Escondido Logo" class="w-28 h-28 object-contain rounded" />
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-08--capstone %}">Oncology and Kids Cancer Association</a></h3>
