@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: Oncology and Kids
-permalink: /capstone/oak/
+permalink: /pages/capstone/oak/
 ---
 
 > This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text, people of all ages will be able to easily navigate, learn, and play through these new and advanced modules.
