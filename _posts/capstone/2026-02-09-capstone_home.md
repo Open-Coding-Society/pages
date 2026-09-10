@@ -895,12 +895,13 @@ Below are the capstone infographic pages created by student groups. Click an ima
     </div>
 
     <!-- Poway Scripps Rotary Club (CSP) -->
-    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
-        <a href="#">
+    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027"
+        data-page-url="{{ '/capstone/poway-scripps-rotary/' | relative_url }}">
+        <a href="{{ '/capstone/poway-scripps-rotary/' | relative_url }}">
             <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Rotary_International_Logo.svg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Poway Scripps Rotary Club" class="w-28 h-28 object-cover rounded" />
         </a>
         <div>
-            <h3 class="text-lg font-semibold"><a href="https://github.com/orgs/CompSciWizards/projects/2">Poway Scripps Rotary Club</a></h3>
+            <h3 class="text-lg font-semibold"><a href="{{ '/capstone/poway-scripps-rotary/' | relative_url }}">Poway Scripps Rotary Club</a></h3>
             <p class="text-sm text-gray-700">Helping the Poway Scripps Rotary Club Improve Their Website. We plan to add cleaner UI, galaries instead of long sheets of images, and improve navbar and search feachures.</p>
             <p class="text-xs text-gray-500 mt-2">Team: Samarth H, Rigved G, Rohan S</p>
         </div>
