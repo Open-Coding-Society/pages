@@ -60,6 +60,3 @@ categories: Capstone
     </div>
 </div>
 
-**Powered by OCS grids and buttons**
-
-[Buttons]({{ site.baseurl }}/index2) | [Grids]({{ site.baseurl }}/index4)
