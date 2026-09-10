@@ -6,7 +6,7 @@ title: Oncology and Kids
 permalink: /capstone/oak/
 ---
 
-> The Escondido Arts has sophisticated elements which will be good to learn as we progrss toward our journey of ideation and improvement.  They have strength in Events and Ticket sales, lacking in personalization and informaation navigation.
+> This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text, people of all ages will be able to easily navigate, learn, and play through these new and advanced modules.
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">Strengths vs Improvement</div>
