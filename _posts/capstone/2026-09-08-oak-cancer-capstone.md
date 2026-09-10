@@ -58,4 +58,6 @@ permalink: /capstone/oak/
 
 **Powered by OCS grids and buttons**
 
+[Open project]({{ site.baseurl }}/capstone/oak/)
+
 [Buttons]({{site.baseurl}}/index2) | [Grids]({{site.baseurl}}/index4)
