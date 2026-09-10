@@ -13,14 +13,6 @@
   const choiceOne = panel?.querySelector('[data-agm-choice-one]');
   const choiceTwo = panel?.querySelector('[data-agm-choice-two]');
 
-  function restartPanelMotion() {
-    if (!panel) return;
-    panel.classList.remove('is-changing');
-    window.requestAnimationFrame(function () {
-      panel.classList.add('is-changing');
-    });
-  }
-
   function selectStep(nextTab, moveFocus) {
     if (!nextTab || !panel) return;
 
@@ -38,7 +30,6 @@
     choiceOne.textContent = nextTab.dataset.stepChoiceOne;
     choiceTwo.textContent = nextTab.dataset.stepChoiceTwo;
 
-    restartPanelMotion();
     if (moveFocus) nextTab.focus();
   }
 
@@ -59,35 +50,4 @@
       selectStep(tabs[nextIndex], true);
     });
   });
-
-  function initializeRevealMotion() {
-    const sections = Array.from(page.querySelectorAll('.agm-reveal'));
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion || !('IntersectionObserver' in window)) {
-      sections.forEach(function (section) { section.classList.add('is-visible'); });
-      return;
-    }
-
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    sections.forEach(function (section) {
-      if (section.getBoundingClientRect().top < viewportHeight * 0.92) {
-        section.classList.add('is-visible');
-      }
-    });
-    page.classList.add('agm-motion-ready');
-
-    const observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
-
-    sections.forEach(function (section) {
-      if (!section.classList.contains('is-visible')) observer.observe(section);
-    });
-  }
-
-  initializeRevealMotion();
 })();
