@@ -835,6 +835,22 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
+  <!-- Shoreline Project Outreach (CSP, 2026/2027) -->
+<div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+    <a href="{{ '/capstone/shoreline-project-outreach/ideation.html' | relative_url }}">
+        <img src="https://nkasse12.github.io/shoreline-group-project/images/logo1.jpeg"
+             alt="Shoreline Community Services logo"
+             class="w-28 h-28 object-contain rounded" />
+    </a>
+    <div>
+        <h3 class="text-lg font-semibold">
+            <a href="{{ '/capstone/shoreline-project-outreach/ideation.html' | relative_url }}">Shoreline Project Outreach</a>
+        </h3>
+        <p class="text-sm text-gray-700">Extending Shoreline Community Services' outreach through smarter volunteer coordination and easier giving, this capstone project bridges technology and grassroots community care in San Diego.</p>
+        <p class="text-xs text-gray-500 mt-2">Team: Vanshika Keswani, Nitya Kasse, Hsu-Cheng Lin</p>
+    </div>
+</div>
+  
    <!-- OCS Assignment Tracker (CSA) -->
   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
