@@ -25,21 +25,12 @@ sticky_rank: 1
 <h2>Design-Based Research (DBR) Capstone Projects</h2>
 
 <style>
-#capstone-grid > div {
-  min-height: 10rem;
-  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
-}
-#capstone-grid > div a img {
+.capstone-card-image {
+  width: 7rem;
   height: 7rem;
-  width: auto;
   max-width: 7rem;
   object-fit: contain;
   display: block;
-}
-#capstone-grid > div:hover {
-  border-color: color-mix(in srgb, var(--pref-accent-color) 45%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pref-accent-color) 22%, transparent), 0 6px 18px rgba(0,0,0,0.2);
-  transform: translateY(-2px);
 }
 
 /* Tech stack tooltip */
@@ -61,7 +52,7 @@ sticky_rank: 1
   min-width: 160px;
   max-width: 280px;
 }
-#capstone-grid > div:hover .capstone-tech-tooltip {
+.capstone-item:hover .capstone-tech-tooltip {
   opacity: 1;
 }
 .capstone-tech-tt-tag {
@@ -272,7 +263,8 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   cards.forEach(card=>{
-    card.classList.add('relative');
+    card.classList.add('ocs__grid-cell', 'relative');
+    card.querySelector('a > img')?.classList.add('capstone-card-image');
     const titleAnchor = card.querySelector('h3 a');
     if(titleAnchor){
       const cardTitle = titleAnchor.textContent.trim();
@@ -333,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
+<div id="capstone-grid" class="ocs__grid ocs__grid--standard cols-2 my-6">
 
 
    <!-- SFI Foundation 2026–27 (CSP) -->
@@ -1172,12 +1164,12 @@ document.addEventListener('DOMContentLoaded', function(){
     var grid=document.getElementById('capstone-grid'); if(!grid)return;
     var href='/capstone/view/?id='+encodeURIComponent(p.id);
     var imgHtml=p.imageUrl
-      ? '<img src="'+p.imageUrl+'" alt="'+esc(p.title)+'" class="w-28 h-28 object-cover rounded">'
+      ? '<img src="'+p.imageUrl+'" alt="'+esc(p.title)+'" class="capstone-card-image rounded">'
       : '<div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded">'+esc((p.title||'?').slice(0,3).toUpperCase())+'</div>';
     var team=Array.isArray(p.teamMembers)?p.teamMembers.join(', '):String(p.teamMembers||'');
     var course=(p.courseCode||'CSA').toUpperCase();
     var div=document.createElement('div');
-    div.className='flex items-start space-x-4 p-4 border rounded-lg capstone-item relative '+course;
+    div.className='ocs__grid-cell flex items-start space-x-4 capstone-item relative '+course;
     div.innerHTML='<a href="'+esc(href)+'">'+imgHtml+'</a><div><h3 class="text-lg font-semibold"><a href="'+esc(href)+'">'+esc(p.title)+'</a></h3><p class="text-sm text-gray-700">'+esc(p.description||'')+'</p><p class="text-xs text-gray-500 mt-2">Team: '+esc(team)+'</p></div>';
     grid.prepend(div);
     div.scrollIntoView({behavior:'smooth',block:'nearest'});
