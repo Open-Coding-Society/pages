@@ -12,6 +12,7 @@
   padding: 1.2rem;
   color: var(--sd2-text);
   font-family: "Exo 2", "Segoe UI", sans-serif;
+  overflow-x: clip;
 }
 
 .sd2-page * {
@@ -122,6 +123,14 @@
 .sd2-page li {
   color: var(--sd2-muted);
   line-height: 1.56;
+  overflow-wrap: anywhere;
+}
+
+.sd2-page h1,
+.sd2-page h2,
+.sd2-page h3,
+.sd2-btn {
+  overflow-wrap: anywhere;
 }
 
 .sd2-page ul,
@@ -156,6 +165,11 @@
 }
 
 .sd2-row > div {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  text-align: center;
   padding: 0.7rem 0.75rem;
   border-top: 1px solid rgba(72, 217, 255, 0.15);
 }
@@ -202,6 +216,41 @@
 }
 
 @media (max-width: 600px) {
+  .sd2-page {
+    padding: 0.75rem;
+  }
+
+  .sd2-hero,
+  .sd2-panel {
+    border-radius: 14px;
+  }
+
+  .sd2-hero,
+  .sd2-panel {
+    padding: 0.95rem;
+  }
+
+  .sd2-kicker {
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+  }
+
+  .sd2-hero h1 {
+    font-size: clamp(1.45rem, 7vw, 2rem);
+  }
+
+  .sd2-page h2 {
+    font-size: 1.12rem;
+  }
+
+  .sd2-cta-row {
+    flex-direction: column;
+  }
+
+  .sd2-btn {
+    width: 100%;
+  }
+
   .sd2-row {
     grid-template-columns: 1fr;
   }
