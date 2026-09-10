@@ -755,7 +755,7 @@ document.addEventListener('DOMContentLoaded', function(){
            <img src="/images/capstone/sentri.png" alt="Sentri" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-04-sentri-capstone %}">Integra</a></h3>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-09-09-integra-capstone %}">Integra</a></h3>
            <p class="capstone-item__description">An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
            <p class="capstone-item__team">Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
        </div>
