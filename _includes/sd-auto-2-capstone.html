@@ -1,0 +1,94 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;800&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+
+<article class="sd2-page" data-sd2-page>
+  <header class="sd2-hero">
+    <p class="sd2-kicker">2026/2027 • CSP • Macro Cosmos Extension</p>
+    <h1>SD Auto <span>2.0</span></h1>
+    <p class="sd2-subtitle">Macro Cosmos - Route Decision &amp; Smart Commute Planner</p>
+    <p class="sd2-summary">We are building onto the old SD Auto website, not replacing it. SD Auto 2.0 adds a transparent decision layer that uses existing traffic and hazard data to recommend and explain route choices.</p>
+    <div class="sd2-cta-row" aria-label="Project links">
+      <a class="sd2-btn sd2-btn--primary" href="https://macro-cosmos.netlify.app/about/" target="_blank" rel="noopener noreferrer">Go to the current SD Auto App</a>
+      <a class="sd2-btn" href="https://yimingyin1213.github.io/Team-Portfolio/capstone/ideation-original/" target="_blank" rel="noopener noreferrer">Go to ideation page</a>
+    </div>
+  </header>
+
+  <section class="sd2-panel">
+    <h2>Selection</h2>
+    <p>We propose a <strong>Safety-Aware Route Decision Engine</strong> for Macro Cosmos users, building on the existing route finder and daily routine features.</p>
+    <ul>
+      <li><strong>Idea 1: Safety Score Routing</strong> - score and compare routes using real crash data and hazard reports, instead of returning one unexplained best route.</li>
+      <li><strong>Idea 2: Smart Commute Planner</strong> - replace the current hour-based routine table with an arrive-by/leave-by calculator that accounts for live conditions.</li>
+    </ul>
+    <p>A commuter can pick Fastest, Safest, or Balanced routing, see multiple route options with a real safety score, and save a commute like School, arrive 8:35 AM that calculates when to leave using current conditions.</p>
+    <blockquote>
+      One-sentence pitch: Turn Macro Cosmos from a tool that displays traffic and hazard data into one that actually uses that data to make and explain routing decisions.
+    </blockquote>
+  </section>
+
+  <section class="sd2-grid-2">
+    <article class="sd2-panel">
+      <h2>Why We Are Interested</h2>
+      <p>Our team is interested in transportation, local infrastructure, and practical software people use every day. Macro Cosmos already has a route finder, hazard reports, and live traffic data, but these systems are not fully connected yet. SD Auto 2.0 focuses on that connection so existing data can drive a meaningful decision.</p>
+    </article>
+    <article class="sd2-panel">
+      <h2>User and Problem</h2>
+      <p><strong>Primary user:</strong> A San Diego commuter, including students, parents, and daily drivers.</p>
+      <p><strong>Problem:</strong> The current route finder returns a single route with no explanation, and daily routine storage is hour-based rather than condition-aware.</p>
+      <p><strong>Need:</strong> Safety and traffic data must measurably influence recommendations, and the planner should compute a real departure time.</p>
+    </article>
+  </section>
+
+  <section class="sd2-panel">
+    <h2>Why This Direction</h2>
+    <div class="sd2-table" role="table" aria-label="Project justification">
+      <div class="sd2-row sd2-row--head" role="row">
+        <div role="columnheader">Criterion</div>
+        <div role="columnheader">Justification</div>
+      </div>
+      <div class="sd2-row" role="row"><div role="cell">Stakeholder value</div><div role="cell">Useful for regular drivers in San Diego by connecting safety data to daily routing choices.</div></div>
+      <div class="sd2-row" role="row"><div role="cell">Team interest</div><div role="cell">Matches our transportation focus and algorithm-centered system design goals.</div></div>
+      <div class="sd2-row" role="row"><div role="cell">Technical learning</div><div role="cell">Includes real datasets, scoring formulas, route comparison logic, conditionals, and time calculations.</div></div>
+      <div class="sd2-row" role="row"><div role="cell">Feasibility</div><div role="cell">Builds incrementally on existing Macro Cosmos route and hazard infrastructure.</div></div>
+      <div class="sd2-row" role="row"><div role="cell">Safety</div><div role="cell">Adds transparent informational safety signals without replacing official routing.</div></div>
+      <div class="sd2-row" role="row"><div role="cell">Originality</div><div role="cell">Moves from separate traffic/hazard displays to data-driven recommendation logic.</div></div>
+    </div>
+  </section>
+
+  <section class="sd2-panel">
+    <h2>Proposed User Flow</h2>
+    <ol class="sd2-flow">
+      <li><strong>Enter trip:</strong> User inputs origin and destination and selects Fastest, Safest, or Balanced.</li>
+      <li><strong>Compare routes:</strong> The app shows 2-3 route options with time, distance, and Safety Score.</li>
+      <li><strong>See why:</strong> A concise explanation states why the recommended route wins.</li>
+      <li><strong>Save as commute:</strong> User can save a trip with target arrival time.</li>
+      <li><strong>Get leave-by time:</strong> On return visits, the app calculates when to leave using live conditions.</li>
+      <li><strong>Confirm hazards:</strong> Users mark reports active or cleared, and old reports expire automatically.</li>
+    </ol>
+  </section>
+
+  <section class="sd2-grid-2">
+    <article class="sd2-panel">
+      <h2>Phased Plan</h2>
+      <h3>Phase 1 - Foundation</h3>
+      <p>Run the existing codebase, verify upstream alignment, audit real implementation status, and clean the San Diego crash and hazard dataset.</p>
+      <h3>Phase 2 - Core Algorithm</h3>
+      <p>Build the Safety Score formula and Fastest/Safest/Balanced weighting in backend route responses.</p>
+      <h3>Phase 3 - Decision Layer</h3>
+      <p>Ship multi-route comparison, route rationale text, and arrive-by to leave-by planning flow.</p>
+      <h3>Phase 4 - Refinement</h3>
+      <p>Add hazard confirmation and expiration, polish UX, complete end-to-end tests, and prepare the demo.</p>
+    </article>
+
+    <article class="sd2-panel">
+      <h2>Later Scope</h2>
+      <ul>
+        <li>Mode-specific scoring for driving, biking, and walking.</li>
+        <li>User-adjustable safety preference such as max extra minutes for safer routes.</li>
+        <li>Saved places with default routing preferences.</li>
+      </ul>
+      <p class="sd2-team"><strong>Team:</strong> Yiming, Noor, Luke</p>
+    </article>
+  </section>
+</article>
