@@ -5,7 +5,7 @@ description: Start using Flask API's with Frontend or Postman.
 permalink: /flask-debug-walk
 toc: True
 type: ccc
-courses: {'csp': {'week': 9}}
+courses: {'csp': {'week': 14}}
 ---
 
 ## Run Frontend (pages or flocker_frontend)

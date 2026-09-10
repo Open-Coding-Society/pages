@@ -3,7 +3,6 @@ layout: post
 title: "Mission 1 — Build the Base Database"
 description: "Learn database fundamentals through hands-on SQLite construction"
 permalink: /digital-famine/cybersecurity-game/submodule_1
-categories: [CSP, Submodule, Database]
 tags: [sql, database, fundamentals, sqlite]
 author: "Cybersecurity Team"
 date: 2025-10-24

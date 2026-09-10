@@ -1,0 +1,177 @@
+// pixel-submit-widget.scss
+// All styles for the pixel-art homework delivery widget.
+// The Google Font <link> lives in gist-export-button.html (preconnect + load).
+
+@keyframes pswGlow {
+  0%, 100% { box-shadow: 0 0 0 2px #5C4A1E, 0 0 20px rgba(200, 160, 50, 0.2); }
+  50%       { box-shadow: 0 0 0 2px #8A7A3E, 0 0 30px rgba(200, 160, 50, 0.4); }
+}
+
+@keyframes pswBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+#pixel-submit-widget {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  background: #1a1208;
+  border: 3px solid #5C4A1E;
+  max-width: 520px;
+  margin: 30px auto;
+  overflow: hidden;
+  animation: pswGlow 3s ease-in-out infinite;
+  box-sizing: border-box;
+
+  * { font-family: inherit; }
+
+  // ── Canvas elements ──────────────────────────────────────────────
+  canvas {
+    image-rendering: pixelated;
+    display: block;
+  }
+
+  // ── Title bar ────────────────────────────────────────────────────
+  .psw-titlebar {
+    background: linear-gradient(180deg, #3a2a0e, #2a1e08);
+    border-bottom: 3px solid #5C4A1E;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &-icon { font-size: 14px; }
+
+    &-text {
+      color: #FFD700;
+      font-size: 8px;
+      letter-spacing: 2px;
+      flex: 1;
+    }
+  }
+
+  // ── Two-panel layout ─────────────────────────────────────────────
+  .psw-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 2px solid #2a1e08;
+  }
+
+  .psw-panel {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    &-left { border-right: 2px solid #2a1e08; }
+  }
+
+  .psw-step-label {
+    color: #C8A830;
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+
+  // ── Buttons ──────────────────────────────────────────────────────
+  .psw-btn {
+    font-family: inherit;
+    font-size: 9px;
+    color: #fff;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0 14px;
+    height: 34px;
+    min-width: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+    clip-path: polygon(
+      2px 0%, calc(100% - 2px) 0%, 100% 2px,
+      100% calc(100% - 2px), calc(100% - 2px) 100%,
+      2px 100%, 0% calc(100% - 2px), 0% 2px
+    );
+    transition: transform 0.05s, box-shadow 0.05s;
+    user-select: none;
+
+    &:active   { transform: translateY(3px); }
+
+    &:disabled {
+      background: #2a2a2a !important;
+      color: #666 !important;
+      cursor: not-allowed;
+      box-shadow: none !important;
+    }
+
+    &-gold {
+      background: #C8880A;
+      box-shadow: 0 4px 0 #7a5006, inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 0 14px #C8880A88;
+
+      &:hover:not(:disabled) { background: #E89A18; }
+      &.done { background: #555; box-shadow: none; }
+    }
+
+    &-blue {
+      background: #1E4D8C;
+      box-shadow: 0 4px 0 #0d2347, inset 0 2px 0 rgba(255, 255, 255, 0.2), 0 0 14px #1E4D8C88;
+
+      &:hover:not(:disabled) { background: #2a5ea0; }
+    }
+  }
+
+  // ── URL row ──────────────────────────────────────────────────────
+  .psw-url-row {
+    padding: 12px 16px 8px;
+    border-bottom: 2px solid #2a1e08;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .psw-url-arrow { color: #5C4A1E; font-size: 8px; }
+
+  .psw-url-input {
+    flex: 1;
+    background: #0e0a04;
+    border: 2px solid #3a2a0e;
+    color: #C8A830;
+    font-family: inherit;
+    font-size: 7px;
+    padding: 8px 10px;
+    outline: none;
+    caret-color: #FFD700;
+    box-sizing: border-box;
+
+    &:focus        { border-color: #C8880A; }
+    &::placeholder { color: #3a2a0e; }
+  }
+
+  // ── Dialog box ───────────────────────────────────────────────────
+  .psw-dialog {
+    min-height: 42px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .psw-dialog-icon    { color: #FFD700; font-size: 12px; flex-shrink: 0; }
+  .psw-dialog-text    { color: #C8A830; font-size: 7px; line-height: 1.9; }
+  .psw-dialog-muted   { color: #5C4A1E; }
+  .psw-dialog-success { color: #00FF88; }
+
+  .psw-cursor { animation: pswBlink 1s step-end infinite; }
+}
+
+// ── Light-theme softening ─────────────────────────────────────────
+// Pixel art is intentionally dark — keep its own palette intact.
+// Only soften the outer glow so it doesn't look jarring on light pages.
+@media (prefers-color-scheme: light) {
+  #pixel-submit-widget {
+    animation: none;
+    box-shadow: 0 0 0 3px #5C4A1E, 0 4px 24px rgba(92, 74, 30, 0.3);
+  }
+}

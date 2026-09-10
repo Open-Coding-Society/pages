@@ -21,12 +21,8 @@ export async function fetchPosts(pagePath) {
         const param = encodeURIComponent(pagePath);
         apiUrl += `?pagePath=${param}`;
     }
-    const options = {
-        ...fetchOptions,
-        method: 'GET',
-    };
     try {
-        const response = await fetch(apiUrl, options);
+        const response = await fetch(apiUrl, fetchOptions);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -115,12 +111,8 @@ export async function createReply(replyData) {
  */
 export async function fetchReplies(postId) {
     const apiUrl = pythonURI + `/api/microblog/reply?postId=${postId}`;
-    const options = {
-        ...fetchOptions,
-        method: 'GET',
-    };
     try {
-        const response = await fetch(apiUrl, options);
+        const response = await fetch(apiUrl, fetchOptions);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

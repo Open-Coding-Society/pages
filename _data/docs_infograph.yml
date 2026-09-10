@@ -7,9 +7,9 @@ Topics:
     alt: "Calendar"
     keyPoints:
       - <a href = "https://pages.opencodingsociety.com/student/calendar" target = "_blank">Calendar</a>
-      - Slack-Calendar Integration
+      - Assignment-Calendar Integration
     subtitle: "Event & Assignment Organizer"
-    description: "This page helps teachers and students stay organized by parsing both announcements sent in Slack, the project's main communication platform, amd pulling assignments from the OCS assignments feature."
+    description: "This page helps teachers and students stay organized by parsing assignment announcements and pulling assignments from the OCS assignments feature."
   - title: "Queue"
     image: "/docs/queue.png"
     link: "/docs/queue"

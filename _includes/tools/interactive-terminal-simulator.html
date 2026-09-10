@@ -1,0 +1,470 @@
+{% assign terminal_id = include.id | default: 'terminal-simulator' %}
+{% assign input_id = terminal_id | append: '-input' %}
+
+<style>
+  /* WSL-like terminal theme for simulator widgets. */
+  .terminal-sim {
+    background: #0e0e0e;
+    color: #eaeaea;
+    padding: 12px;
+    border-radius: 8px;
+    height: 250px;
+    overflow-y: auto;
+    font-family: "Cascadia Mono", "Ubuntu Mono", "Fira Code", monospace;
+    font-size: 14px;
+    line-height: 1.35;
+    border: 1px solid #333;
+  }
+
+  .terminal-sim .line {
+    margin: 0 0 4px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .terminal-sim .line-welcome {
+    color: #8be9fd;
+  }
+
+  .terminal-sim .line-command {
+    color: #ffffff;
+  }
+
+  .terminal-sim .line-output {
+    color: #eaeaea;
+  }
+
+  .terminal-sim .line-error {
+    color: #ff6b81;
+  }
+
+  .terminal-sim .line-path {
+    color: #5fa8ff;
+  }
+
+  .terminal-sim .prompt-user {
+    color: #50fa7b;
+  }
+
+  .terminal-sim .prompt-path {
+    color: #5fa8ff;
+  }
+
+  .terminal-sim .prompt-command {
+    color: #ffffff;
+  }
+
+  .terminal-sim-input {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #111;
+    color: #f2f2f2;
+    font-family: "Cascadia Mono", "Ubuntu Mono", "Fira Code", monospace;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .terminal-sim-input:focus {
+    border-color: #5a5a5a;
+  }
+</style>
+
+<div id="{{ terminal_id }}" class="terminal-sim"></div>
+
+<input id="{{ input_id }}" class="terminal-sim-input" placeholder="Type a command (example: help)" />
+
+<script>
+(function () {
+  // Locate the terminal output container and the text input for this include instance.
+  // IDs are generated from include parameters so multiple simulators can coexist on one page.
+  const terminal = document.getElementById("{{ terminal_id }}");
+  const input = document.getElementById("{{ input_id }}");
+
+  // If either element is missing, do nothing to avoid runtime errors.
+  if (!terminal || !input) {
+    return;
+  }
+
+  // User-facing messages: single source of truth for all error/usage text.
+  // Centralizing strings here makes it easier to update wording, add localization, or debug user feedback.
+  const MESSAGES = {
+    MKDIR_USAGE: "Usage: mkdir <folder>",
+    MKDIR_EXISTS: (name) => "mkdir: cannot create directory '" + name + "': File exists",
+    TOUCH_USAGE: "Usage: touch <file>",
+    CAT_NOTFOUND: (file) => "cat: " + file + ": No such file",
+    ECHO_USAGE: "Usage: echo <text> > <file>",
+    ECHO_SYNTAX: "Usage: echo <text> > <file> or echo <text> >> <file>",
+    ECHO_ISDIR: (name) => name + ": Is a directory",
+    GIT_USAGE: "Usage: git clone <url>",
+    GIT_EXISTS: (name) => "fatal: destination path '" + name + "' already exists and is not an empty directory.",
+    GIT_CLONE_MSG: (name) => "Cloning into '" + name + "'...\nremote: Simulated clone complete.",
+    CD_NOTFOUND: "Directory not found",
+    UNKNOWN_CMD: "Unknown command (type 'help')"
+  };
+
+  // In-memory simulator state.
+  // - `path` tracks the current working directory as segments relative to `/home`.
+  // - `fs` is a tiny mock filesystem tree with directories and files.
+  // Nothing here touches the real browser or host file system.
+  const state = {
+    path: ["home"],
+    fs: {
+      "/home": {
+        type: "dir",
+        children: {
+          documents: { type: "dir", children: { "notes.txt": { type: "file", content: "Remember to run ./scripts/activate.sh" } } },
+          downloads: { type: "dir", children: { "image.png": { type: "file", content: "<binary file>" } } }
+        }
+      }
+    }
+  };
+
+  // Returns a shell-style working directory string, for example: /home/documents.
+  function getCurrentDirectoryPath() {
+    return "/" + state.path.join("/");
+  }
+
+  // Resolves the current directory node by walking from `/home` through each path segment.
+  // Returns `null` if traversal fails (invalid path or non-directory segment).
+  function getCurrentNode() {
+    let currentNode = state.fs["/home"];
+
+    for (let index = 1; index < state.path.length; index += 1) {
+      const segment = state.path[index];
+
+      if (!currentNode || !currentNode.children) {
+        return null;
+      }
+
+      currentNode = currentNode.children[segment];
+      if (!currentNode) {
+        return null;
+      }
+    }
+
+    return currentNode;
+  }
+
+  // Lists visible names (files + folders) in the current directory.
+  function listCurrentNames() {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !currentNode.children) {
+      return [];
+    }
+
+    return Object.keys(currentNode.children);
+  }
+
+  // Converts /home/... into ~/... for a more familiar Linux prompt display.
+  function getPromptPath() {
+    return getCurrentDirectoryPath().replace("/home", "~");
+  }
+
+  // Returns an output role so lines can be themed similarly to a real terminal.
+  function classifyOutput(text) {
+    if (!text) {
+      return "output";
+    }
+
+    if (text === "~" || text.indexOf("/home") === 0 || text.indexOf("~/") === 0) {
+      return "path";
+    }
+
+    const normalized = text.toLowerCase();
+    if (
+      normalized.indexOf("usage:") !== -1 ||
+      normalized.indexOf("unknown command") !== -1 ||
+      normalized.indexOf("not found") !== -1 ||
+      normalized.indexOf("fatal:") !== -1 ||
+      normalized.indexOf("is a directory") !== -1 ||
+      normalized.indexOf("no such file") !== -1 ||
+      normalized.indexOf("file exists") !== -1
+    ) {
+      return "error";
+    }
+
+    return "output";
+  }
+
+  // Appends one line with role-based class styling and keeps scroll pinned to newest line.
+  // `textContent` keeps output safe by rendering all text literally.
+  function print(text, role) {
+    const line = document.createElement("p");
+    const lineRole = role ? role : classifyOutput(text);
+    line.className = "line line-" + lineRole;
+    line.textContent = text;
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  // Renders command input as a themed prompt with separated color zones:
+  // - `user@wsl` in green
+  // - current directory in blue
+  // - command text in white
+  function printCommandLine(command) {
+    const line = document.createElement("p");
+    line.className = "line line-command";
+
+    const user = document.createElement("span");
+    user.className = "prompt-user";
+    user.textContent = "user@wsl";
+
+    const path = document.createElement("span");
+    path.className = "prompt-path";
+    path.textContent = ":" + getPromptPath();
+
+    const symbol = document.createElement("span");
+    symbol.textContent = "$ ";
+
+    const typed = document.createElement("span");
+    typed.className = "prompt-command";
+    typed.textContent = command;
+
+    line.appendChild(user);
+    line.appendChild(path);
+    line.appendChild(symbol);
+    line.appendChild(typed);
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  // Creates a folder in the current directory.
+  // Mirrors basic shell behavior with simple usage/existence errors.
+  // Uses MESSAGES.MKDIR_USAGE and MESSAGES.MKDIR_EXISTS for consistency.
+  function createDirectory(name) {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !name) {
+      return MESSAGES.MKDIR_USAGE;
+    }
+
+    if (currentNode.children[name]) {
+      return MESSAGES.MKDIR_EXISTS(name);
+    }
+
+    currentNode.children[name] = { type: "dir", children: {} };
+    return null;
+  }
+
+  // Creates an empty file if it does not exist (`touch` behavior).
+  // Existing files are left unchanged.
+  // Uses MESSAGES.TOUCH_USAGE for consistent error reporting.
+  function createFile(name) {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !name) {
+      return MESSAGES.TOUCH_USAGE;
+    }
+
+    if (!currentNode.children[name]) {
+      currentNode.children[name] = { type: "file", content: "" };
+    }
+
+    return null;
+  }
+
+  // Writes text to a file.
+  // - If `shouldAppend` is false, this behaves like `>` (overwrite).
+  // - If `shouldAppend` is true, this behaves like `>>` (append).
+  // Missing files are created automatically for convenience.
+  // Uses MESSAGES.ECHO_USAGE and MESSAGES.ECHO_ISDIR for error feedback.
+  function writeFile(name, text, shouldAppend) {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !name) {
+      return MESSAGES.ECHO_USAGE;
+    }
+
+    if (!currentNode.children[name]) {
+      currentNode.children[name] = { type: "file", content: "" };
+    }
+
+    if (currentNode.children[name].type !== "file") {
+      return MESSAGES.ECHO_ISDIR(name);
+    }
+
+    if (shouldAppend) {
+      currentNode.children[name].content = (currentNode.children[name].content || "") + text;
+    } else {
+      currentNode.children[name].content = text;
+    }
+
+    return null;
+  }
+
+  // Creates a fake repository folder from a `git clone` URL.
+  // This intentionally simulates only a tiny subset of clone behavior.
+  // Uses MESSAGES.GIT_USAGE, MESSAGES.GIT_EXISTS, and MESSAGES.GIT_CLONE_MSG.
+  function mockClone(url) {
+    if (!url) {
+      return MESSAGES.GIT_USAGE;
+    }
+
+    // Infer repository name from URL tail and strip optional `.git` suffix.
+    const rawTail = url.split("/").pop();
+    const tail = rawTail || "repository";
+    const withoutGitSuffix = tail.replace(/\.git$/, "");
+    const repositoryName = withoutGitSuffix || "repository";
+
+    const currentNode = getCurrentNode();
+    if (!currentNode || currentNode.children[repositoryName]) {
+      return MESSAGES.GIT_EXISTS(repositoryName);
+    }
+
+    // Create a tiny starter tree so learners can inspect realistic-looking files.
+    currentNode.children[repositoryName] = {
+      type: "dir",
+      children: {
+        README: { type: "file", content: "# " + repositoryName + "\nMock repository created in simulator." },
+        scripts: { type: "dir", children: { "activate.sh": { type: "file", content: "echo Activating environment..." } } }
+      }
+    };
+    return MESSAGES.GIT_CLONE_MSG(repositoryName);
+  }
+
+  // Reads and prints a file in the current directory.
+  // Uses MESSAGES.CAT_NOTFOUND for consistent error reporting.
+  function readFile(fileName) {
+    const currentNode = getCurrentNode();
+    if (!currentNode || !currentNode.children) {
+      return MESSAGES.CAT_NOTFOUND(fileName);
+    }
+
+    const target = currentNode.children[fileName];
+    if (!target || target.type !== "file") {
+      return MESSAGES.CAT_NOTFOUND(fileName);
+    }
+
+    return target.content || "";
+  }
+
+  // Parses `echo ... > file` / `echo ... >> file` and delegates to writeFile.
+  // Uses MESSAGES.ECHO_SYNTAX for consistent error reporting when parse fails.
+  function echoToFile(expression) {
+    // Group meaning: 1 = text payload, 2 = operator (> or >>), 3 = filename.
+    const match = expression.match(/^(.+?)\s*(>>|>)\s*(\S+)$/);
+    if (!match) {
+      return MESSAGES.ECHO_SYNTAX;
+    }
+
+    let text = match[1].trim();
+
+    // Strip matching single/double quotes so users can include spaces naturally.
+    if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+      text = text.slice(1, -1);
+    }
+
+    return writeFile(match[3], text, match[2] === ">>");
+  }
+
+  // Single source of truth for the user-visible command list.
+  // This keeps `help` output consistent as commands evolve.
+  const commandSpecs = [
+    "ls",
+    "cd <folder>",
+    "cd ..",
+    "mkdir <folder>",
+    "touch <file>",
+    "cat <file>",
+    "echo <text> > <file>",
+    "echo <text> >> <file>",
+    "git clone <url>",
+    "clear",
+    "pwd",
+    "help"
+  ];
+  const helpText = "Commands: " + commandSpecs.join(", ");
+
+  // Exact command handlers are defined once (instead of recreated per command execution).
+  const exactHandlers = {
+    help: () => helpText,
+    ls: () => {
+      const currentNames = listCurrentNames();
+      if (currentNames.length === 0) {
+        return "Empty";
+      }
+      return currentNames.join("  ");
+    },
+    clear: () => {
+      terminal.innerHTML = "";
+      return null;
+    },
+    pwd: () => getCurrentDirectoryPath()
+  };
+
+  // Prefix handlers are ordered; first prefix match wins.
+  // Each handler receives only the argument portion after the prefix.
+  // Uses MESSAGES.CD_NOTFOUND for consistent directory error reporting.
+  const prefixHandlers = [
+    {
+      prefix: "cd ",
+      run: (arg) => {
+        // Supports one-segment navigation and `..` to move up one level.
+        if (arg === "..") {
+          if (state.path.length > 1) {
+            state.path.pop();
+          }
+          return null;
+        }
+
+        const currentNode = getCurrentNode();
+        if (!currentNode || !currentNode.children[arg] || currentNode.children[arg].type !== "dir") {
+          return MESSAGES.CD_NOTFOUND;
+        }
+
+        state.path.push(arg);
+        return null;
+      }
+    },
+    { prefix: "mkdir ", run: createDirectory },
+    { prefix: "touch ", run: createFile },
+    { prefix: "cat ", run: readFile },
+    { prefix: "echo ", run: echoToFile },
+    { prefix: "git clone ", run: mockClone }
+  ];
+
+  // Three-stage command dispatcher: exact match → prefix match → fallback error.
+  // Uses MESSAGES.UNKNOWN_CMD for generic unsupported command errors.
+  function runCommand(command) {
+    // Stage 1: exact command matches.
+    if (Object.prototype.hasOwnProperty.call(exactHandlers, command)) {
+      return exactHandlers[command]();
+    }
+
+    // Stage 2: prefix command matches.
+    for (const handler of prefixHandlers) {
+      if (command.startsWith(handler.prefix)) {
+        return handler.run(command.slice(handler.prefix.length).trim());
+      }
+    }
+
+    // Stage 3: fallback for unsupported commands.
+    return MESSAGES.UNKNOWN_CMD;
+  }
+
+  // Initial greeting line to orient learners.
+  print("Welcome! Type help to begin.", "welcome");
+
+  // Main input loop: run command when Enter is pressed, print command + result.
+  input.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") {
+      return;
+    }
+
+    const command = e.target.value.trim();
+
+    // Print a themed prompt line before executing the command.
+    printCommandLine(command);
+
+    const result = runCommand(command);
+    if (result) {
+      const lines = String(result).split("\n");
+      for (const line of lines) {
+        print(line);
+      }
+    }
+
+    e.target.value = "";
+  });
+})();
+</script>

@@ -1,0 +1,270 @@
+// Calculator Button Variant (legacy "hacks button" styles)
+// Originally created for calculator-specific sizing, colors, and responsive layout.
+
+// STYLING PREFERNCES for SITE
+// mixin used as a template for buttons
+@mixin button {
+    width: auto;
+    height: auto;
+    border-radius: 10px;
+    background-color: #21807c;
+    border: 3px solid black;
+    font-size: 1.5em;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    grid-column: span 1;
+    grid-row: span 1;
+
+    // Creates smooth animation effect
+    transition: all 0.5s;
+  }
+
+  /* define class for redifined button */
+  .button {
+    @include button;
+  }
+
+   /* darkens the background color on hover to create a selecting effect */
+  .button:hover {
+    background-color: #373737;
+  }
+
+  /* "row style" is flexible size and aligns pictures in center */
+  .row {
+    align-items: center;
+    display: flex;
+  }
+
+  /* "column style" is one-third of the width with padding */
+  .column {
+    flex: 16.66%;
+    padding: 3px;
+  }
+
+// ==========================================
+// MODERN RESPONSIVE CALCULATOR STYLING
+// ==========================================
+
+/* Animation container */
+#animation {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Calculator container - modern grid layout */
+.calculator-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 20px;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto repeat(5, 1fr);
+  gap: 12px;
+}
+
+/* Output display */
+.calculator-output {
+  grid-column: span 4;
+  background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  color: #fff;
+  text-align: right;
+  border: none;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  word-break: break-all;
+  overflow: hidden;
+}
+
+/* Base button mixin for calculator */
+@mixin calc-button {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: none;
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.15s ease;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Number buttons */
+.calculator-number {
+  @include calc-button;
+  background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+  color: #fff;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  &:hover {
+    background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+    transform: translateY(-2px);
+    box-shadow:
+      0 6px 12px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Zero button spans 2 columns */
+  &.zero {
+    grid-column: span 2;
+    aspect-ratio: auto;
+    padding: 0 2rem;
+  }
+}
+
+/* Operation buttons (+, -, *, /) */
+.calculator-operation {
+  @include calc-button;
+  background: linear-gradient(145deg, #ff9500, #e68a00);
+  color: #fff;
+  box-shadow:
+    0 4px 6px rgba(255, 149, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    background: linear-gradient(145deg, #ffaa33, #ff9500);
+    transform: translateY(-2px);
+    box-shadow:
+      0 6px 12px rgba(255, 149, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Clear button */
+.calculator-clear {
+  @include calc-button;
+  background: linear-gradient(145deg, #636366, #48484a);
+  color: #fff;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  font-size: clamp(1rem, 3vw, 1.2rem);
+
+  &:hover {
+    background: linear-gradient(145deg, #737377, #58585a);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Special operation buttons (sqrt, %) */
+.calculator-special {
+  @include calc-button;
+  background: linear-gradient(145deg, #636366, #48484a);
+  color: #fff;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  &:hover {
+    background: linear-gradient(145deg, #737377, #58585a);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Equals button */
+.calculator-equals {
+  @include calc-button;
+  background: linear-gradient(145deg, #34c759, #28a745);
+  color: #fff;
+  box-shadow:
+    0 4px 6px rgba(52, 199, 89, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    background: linear-gradient(145deg, #4cd964, #34c759);
+    transform: translateY(-2px);
+    box-shadow:
+      0 6px 12px rgba(52, 199, 89, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 480px) {
+  .calculator-container {
+    max-width: 100%;
+    padding: 1rem;
+    gap: 8px;
+    border-radius: 16px;
+  }
+
+  .calculator-output {
+    min-height: 60px;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .calculator-container {
+    max-width: 350px;
+  }
+}
+
+@media (min-width: 769px) {
+  .calculator-container {
+    max-width: 400px;
+  }
+
+  .calculator-number,
+  .calculator-operation,
+  .calculator-clear,
+  .calculator-special,
+  .calculator-equals {
+    min-height: 70px;
+  }
+}
+
+/* Disable canvas filter if present */
+canvas {
+  filter: none;
+}

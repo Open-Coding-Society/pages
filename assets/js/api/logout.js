@@ -17,10 +17,9 @@ export async function handleLogout() {
 
     // logout from java backend
     try {
-        await fetch(javaURI + '/my/logout', {
+        await fetch(javaURI + '/api/logout', {
             ...fetchOptions,
             method: 'POST',
-            credentials: 'include'
         });
     } catch (e) {
         // log error but continue

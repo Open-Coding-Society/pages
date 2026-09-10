@@ -6,7 +6,6 @@ permalink: /cs-portfolio-quest/analytics/submodule_1/
 parent: "Analytics/Admin"
 team: "Curators"
 submodule: 1
-categories: [CSP, Submodule, Analytics/Admin]
 tags: [analytics, submodule, curators]
 author: "Curators Team: Nikhil, Rohan, Pranav, Shriya, Samhita, Adi"
 date: 2025-10-22
@@ -314,13 +313,7 @@ microblog: true
 
   async function getCredentials() {
         try {
-            const res = await fetch(`${pythonURI}/api/id`, {
-                ...fetchOptions,
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            });
+            const res = await fetch(`${pythonURI}/api/id`, fetchOptions );
 
             if (res.ok) {
                 const data = await res.json();
@@ -338,13 +331,7 @@ microblog: true
   async function getLessonData() {
       const username = await getCredentials();
       try {
-          const res = await fetch(`${javaURI}/api/stats`, {
-              ...fetchOptions,
-              method: "GET",
-              headers: {
-                  "Content-Type": "application/json"
-              },
-          });
+          const res = await fetch(`${javaURI}/api/stats`, fetchOptions );
 
           if (!res.ok) {
               console.log(`Request failed with status ${res.status}`);

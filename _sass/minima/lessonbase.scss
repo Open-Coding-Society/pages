@@ -1,27 +1,6 @@
-// =======================
-// :art: Theme Variables
-// =======================
-$bg-0: #000;
-$bg-1: #1F2020;
-$bg-2: #1F1F1F;
-$bg-3: #2A2D2D;
-$panel: #2B2B2B;
-$surface: #333;
-$text: #F0F0F0;
-$text-muted: #aaa;
-$accent: #4CAFEF;
-$accent-700: #007ACC;
-$accent-700-hover: #005FA3;
-$green: #4ADE80;
-$green-bg: #2D5A3D;
-$warn: #FBBF24;
-$warn-bg: #5A3D2D;
-$popup-bg: #222;
-$teal: #38B2AC;
-$orange: #ED8936;
-$blue: #3182CE;
-$red: #E53E3E;
-$success-green: #28A745;
+// Centralized theme variables
+@import "root-color-map";
+
 // Breakpoints
 $bp-md: 768px;
 // =======================

@@ -65,7 +65,7 @@ layout: opencs
         const tinkleURL = javaURI + `/api/tinkle/${personName}`;
         console.log(tinkleURL);
         
-        fetch(tinkleURL, { ...fetchOptions, credentials: 'include' })
+        fetch(tinkleURL, fetchOptions)
             .then(response => {
                 if (response.status !== 200) {
                     console.error("HTTP status code: " + response.status);
@@ -97,7 +97,7 @@ layout: opencs
         const personButton = document.getElementById("fetch_person");
         const URL = javaURI + '/api/person/get';
         
-        fetch(URL, { ...fetchOptions, credentials: 'include' })
+        fetch(URL, fetchOptions)
             .then(response => {
                 if (response.status !== 200) {
                     console.error("HTTP status code: " + response.status);

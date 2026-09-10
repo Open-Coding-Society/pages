@@ -1,0 +1,64 @@
+/**
+ * Container Mixins
+ * Reusable container patterns for grouping and organizing content
+ */
+
+/**
+ * Main Container
+ * Top-level wrapper for a complete lesson/activity section
+ *
+ * @param {Number} $margin-bottom - Bottom margin (default: 2rem)
+ *
+ * @example
+ *   .code-runner-container {
+ *     @include main-container;
+ *   }
+ *
+ *   .lesson-container {
+ *     @include main-container(3rem);
+ *   }
+ */
+@mixin main-container($margin-bottom: 2rem) {
+  margin-bottom: $margin-bottom;
+}
+
+/**
+ * Sub Container
+ * Groups related elements with subtle border and styling
+ *
+ * @param {Number} $margin-bottom - Bottom margin (default: 20px)
+ *
+ * @example
+ *   .editor-container {
+ *     @include sub-container;
+ *   }
+ *
+ *   .output-container {
+ *     @include sub-container(15px);
+ *   }
+ */
+@mixin sub-container($margin-bottom: 20px) {
+  margin-bottom: $margin-bottom;
+}
+
+/**
+ * Inline Container
+ * Lightweight container for inline grouping without heavy styling
+ *
+ * @param {String} $display - Display type (default: flex)
+ * @param {Number} $gap - Gap between items (default: 1rem)
+ *
+ * @example
+ *   .button-group {
+ *     @include inline-container;
+ *   }
+ *
+ *   .toolbar {
+ *     @include inline-container(flex, 0.5rem);
+ *   }
+ */
+@mixin inline-container($display: flex, $gap: 1rem) {
+  display: $display;
+  gap: $gap;
+  align-items: center;
+}

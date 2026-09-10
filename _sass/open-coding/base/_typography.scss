@@ -1,0 +1,32 @@
+/**
+ * Base Typography Styles
+ * Override default code and text formatting with user preferences
+ */
+
+/** Code formatting - override hardcoded dark background */
+pre, code {
+  font-family: "Menlo", "Inconsolata", "Consolas", "Roboto Mono", "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
+  background-color: var(--panel) !important;
+  color: var(--pref-text-color) !important;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+pre {
+  padding: 1rem;
+  border: 1px solid var(--ui-border);
+  overflow-x: auto;
+  
+  code {
+    background-color: transparent !important;
+    padding: 0;
+  }
+}
+
+/** Inline code in markdown */
+p code,
+li code,
+td code {
+  background-color: var(--panel) !important;
+  color: var(--pref-text-color) !important;
+}

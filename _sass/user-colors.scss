@@ -30,3 +30,21 @@ $white3: rgba(225, 225, 230, 1);
 // TEST: Add a custom color
 $my-custom-cat: #02375a;
 $my-custom-dog: #cafff3;
+
+// =============================================================================
+// GAME UI COLORS (Theme-aware, overridden by user preferences in JS)
+// =============================================================================
+// These defaults are used when no user theme is active. When a user selects
+// a theme in the preferences panel, these are dynamically derived from their
+// chosen background/text/accent colors via ThemePreferencesEngine.
+
+$game-panel-bg: rgba(13, 13, 26, 0.92);
+$game-accent: #4ecca3;
+$game-text: #e0e0e0;
+$game-muted: #c7f2d4;
+$game-surface-alt: #1a1a2e;
+$game-surface-contrast: #0d0d1a;
+$game-overlay: rgba(13, 13, 26, 0.72);
+$game-panel-selected-bg: #2a2a4a;
+$game-selected-border: #7effff;
+$game-score-accent: #f59e0b;

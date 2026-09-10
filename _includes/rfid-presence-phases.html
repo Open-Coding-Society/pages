@@ -1,0 +1,86 @@
+{% assign data = site.data.rfid_presence_infograph %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<div class="rp-container">
+  <nav class="rp-nav">
+    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
+    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
+    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
+    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
+    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
+  </nav>
+
+  <div class="rp-header">
+    <div class="rp-badge">Development Phases</div>
+    <h1 class="rp-page-title" style="font-size:2rem;">From Contact-Tap Prototype to Contactless Presence</h1>
+    <p class="rp-description">The hardest part of this project, antennas that reliably detect presence without a tap, is deliberately last. The build is staged so each phase produces something usable and testable on its own.</p>
+  </div>
+
+  <div class="rp-callout rp-callout-draft">
+    <strong style="color:var(--rp-text);">Phase 1 reflects the current working prototype.</strong> Phases 2 through 4 are the team's current draft roadmap toward the design described on the <a href="/capstone/rfid-presence/technical/" style="color:var(--rp-accent);">Technical Detail</a> page, and are still being finalized with the team and mentors. Treat scope and timing as provisional, not committed.
+  </div>
+
+  <div class="rp-section-label">Roadmap</div>
+  <div class="rp-card">
+    <div class="rp-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart LR
+    P1["Phase 1
+Contact-Tap Prototype
+current"] --> P2["Phase 2
+Classroom Pilot
+Hardened Tap System"]
+    P2 --> P3["Phase 3
+UHF Doorway Transition
+Single Door, Contactless"]
+    P3 --> P4["Phase 4
+Full Room-Scale
+Contactless Presence"]
+    style P1 fill:#3b82f622,stroke:#3b82f6
+    style P4 fill:#a855f722,stroke:#a855f7</pre>
+    </div>
+  </div>
+
+  <div class="rp-section-label">Explore Each Phase</div>
+  <div class="rp-hub-grid">
+    <a href="/capstone/rfid-presence/phases/phase-1/" class="rp-hub-card">
+      <span class="rp-pill rp-pill-good" style="width:fit-content;">Current, Working</span>
+      <span class="rp-hub-card-title">Phase 1: Contact-Tap Prototype</span>
+      <span class="rp-hub-card-desc">A CrowPi board, one scan pad, and a Flask + SQLite backend proving the core read-log-display loop.</span>
+      <span class="rp-hub-card-arrow">View Phase 1 &rarr;</span>
+    </a>
+    <a href="/capstone/rfid-presence/phases/phase-2/" class="rp-hub-card">
+      <span class="rp-pill rp-pill-draft" style="width:fit-content;">Draft</span>
+      <span class="rp-hub-card-title">Phase 2: Classroom Pilot</span>
+      <span class="rp-hub-card-desc">A deck of RFID-stickered playing cards, one per student, plus a production backend and admin dashboard.</span>
+      <span class="rp-hub-card-arrow">View Phase 2 &rarr;</span>
+    </a>
+    <a href="/capstone/rfid-presence/phases/phase-3/" class="rp-hub-card">
+      <span class="rp-pill rp-pill-draft" style="width:fit-content;">Draft</span>
+      <span class="rp-hub-card-title">Phase 3: UHF Doorway Transition</span>
+      <span class="rp-hub-card-desc">Contactless UHF reads at a single-door test rig, laptop-mounted tags, and the start of camera integration.</span>
+      <span class="rp-hub-card-arrow">View Phase 3 &rarr;</span>
+    </a>
+    <a href="/capstone/rfid-presence/phases/phase-4/" class="rp-hub-card">
+      <span class="rp-pill rp-pill-draft" style="width:fit-content;">Draft, Most Advanced</span>
+      <span class="rp-hub-card-title">Phase 4: Full Room-Scale Presence</span>
+      <span class="rp-hub-card-desc">Front and back door UHF detection, full RFID and camera correlation, and the complete presence-state machine.</span>
+      <span class="rp-hub-card-arrow">View Phase 4 &rarr;</span>
+    </a>
+  </div>
+
+  <div class="rp-footer">
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div class="rp-team">
+        <span class="rp-team-label">Project Team</span>
+        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
+      </div>
+      <span class="rp-status">Phase 1. Working Prototype</span>
+    </div>
+    {% if data.Repo %}
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    {% endif %}
+  </div>
+
+</div>

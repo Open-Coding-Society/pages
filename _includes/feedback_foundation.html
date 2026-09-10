@@ -1,0 +1,285 @@
+<!-- Feedback Button + Modal -->
+<style>
+
+  #feedback-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border: none;
+    border-radius: 9999px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 6px;
+    transition: background-color 0.2s ease-in-out;
+    z-index: 1000;
+  }
+
+  #feedback-modal {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    border-radius: 16px;
+    padding: 20px;
+    width: 320px;
+    max-width: 90vw;
+    box-shadow: 0 10px 30px;
+    border: 1px solid;
+    z-index: 1000;
+    animation: slideIn 0.2s ease-out;
+    box-sizing: border-box;
+  }
+
+  #feedback-modal h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+    border-bottom: 1px solid;
+    padding-bottom: 8px;
+  }
+
+  #feedback-modal textarea,
+  #feedback-modal input {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid;
+    box-sizing: border-box;
+  }
+
+  #feedback-modal textarea:focus,
+  #feedback-modal input:focus {
+    outline: none;
+  }
+
+  #feedback-modal button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+    font-weight: 500;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  #feedback-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  #feedback-success,
+  #feedback-error {
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  #feedback-success {
+    color: var(--success-green, #10b981);
+  }
+
+  #feedback-error {
+    color: var(--warn, #ef4444);
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  #feedback-modal select {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid var(--ui-border, #6b7280);
+    box-sizing: border-box;
+    appearance: none;
+  }
+
+  #feedback-modal select:focus {
+    outline: none;
+    border-color: var(--pref-accent-color, #3b82f6);
+  }
+
+</style>
+
+<!-- Feedback Button & Modal -->
+<button id="feedback-btn">Issue ⁇</button>
+
+<div id="feedback-modal">
+  <div id="feedback-modal-close">✕</div>
+  <h4>Submit Feedback</h4>
+  <select id="feedback-type" required>
+    <option value="">Select Inquiry Type</option>
+    <option value="Bug">Bug</option>
+    <option value="Feature Request">Feature Request</option>
+    <option value="Hacks">Hacks</option>
+    <option value="Inquiry">Inquiry</option>
+    <option value="Other">Other</option>
+  </select>
+  <!-- Hidden hack category field - auto-populated based on current page -->
+  <input type="hidden" id="feedback-hack-category" />
+  <input type="text" id="feedback-title" placeholder="Title" required />
+  <textarea id="feedback-body" rows="4" placeholder="Your request..." required></textarea>
+  <button id="feedback-submit">Submit</button>
+  <div id="feedback-success" style="display:none;">✅ Thanks for your feedback!</div>
+  <div id="feedback-error" style="display:none;">⚠️ Something went wrong.</div>
+</div>
+
+<script type="module">
+  import { javaURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+  import { pythonURI } from '{{ site.baseurl }}/assets/js/api/config.js';
+
+  const btn = document.getElementById("feedback-btn");
+  const modal = document.getElementById("feedback-modal");
+  const closeBtn = document.getElementById("feedback-modal-close");
+  const submitBtn = document.getElementById("feedback-submit");
+  const successMsg = document.getElementById("feedback-success");
+  const errorMsg = document.getElementById("feedback-error");
+  const hackCategoryField = document.getElementById("feedback-hack-category");
+  const titleField = document.getElementById("feedback-title");
+
+  // Get page data from Jekyll
+  const pagePermalink = {{ page.permalink | jsonify }};
+  const pageUrl = {{ page.url | jsonify }};
+  const pageTitle = {{ page.title | jsonify }};
+  
+  // Function to detect current hack/page dynamically from Jekyll variables
+  function detectCurrentHack() {
+    // Use page.permalink or page.url, preferring permalink
+    const path = pagePermalink || pageUrl || window.location.pathname;
+    const pathParts = path.split('/').filter(p => p);
+    
+    // Build category from path parts (e.g., /hacks/snake -> 'snake', /cs-portfolio-quest/frontend -> 'cs-portfolio-quest-frontend')
+    let category = '';
+    if (pathParts.length > 0) {
+      // Join path parts with hyphens, but handle special cases
+      category = pathParts.join('-');
+      
+      // Clean up common patterns
+      category = category
+        .replace(/^hacks-/, '') // Remove leading 'hacks-' if present
+        .replace(/-game$/, '') // Remove trailing '-game'
+        .replace(/-lesson$/, '') // Remove trailing '-lesson'
+        .replace(/rock[_-]paper[_-]scissor/, 'rock-paper-scissors') // Normalize variations
+        .toLowerCase();
+    }
+    
+    // Generate title from page title or path
+    let title = '';
+    if (pageTitle && pageTitle !== 'Open Coding Society' && pageTitle !== '') {
+      title = `${pageTitle} Feedback`;
+    } else if (pathParts.length > 0) {
+      // Fallback: generate title from path
+      const lastPart = pathParts[pathParts.length - 1];
+      const formattedTitle = lastPart
+        .split(/[-_]/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      title = `${formattedTitle} Feedback`;
+    }
+    
+    return { category, title };
+  }
+
+  // Auto-populate hack category on page load (hidden field)
+  (function() {
+    const hackInfo = detectCurrentHack();
+    if (hackInfo.category) {
+      hackCategoryField.value = hackInfo.category;
+    }
+  })();
+
+  // Auto-populate fields when modal opens
+  btn.onclick = () => {
+    const hackInfo = detectCurrentHack();
+    
+    // Ensure hack category is set (hidden field)
+    if (hackInfo.category) {
+      hackCategoryField.value = hackInfo.category;
+    }
+    
+    // Auto-fill title if empty (user can still edit it)
+    if (hackInfo.title && !titleField.value.trim()) {
+      titleField.value = hackInfo.title;
+    }
+    
+    modal.style.display = "block";
+    successMsg.style.display = "none";
+    errorMsg.style.display = "none";
+  };
+
+  closeBtn.onclick = () => {
+    modal.style.display = "none";
+  };
+
+  submitBtn.onclick = async () => {
+    const title = document.getElementById("feedback-title").value.trim();
+    const body = document.getElementById("feedback-body").value.trim();
+    const type = document.getElementById("feedback-type").value;
+    const hackCategory = document.getElementById("feedback-hack-category").value;
+
+    if (!title || !body || !type) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    const githubUsername = window.user?.uid || "Anonymous"; // fallback if not logged in
+    
+    // Build payload with optional hack category
+    const payload = { 
+      title, 
+      body, 
+      type, 
+      uid: githubUsername 
+    };
+    
+    // Only include hack_category if it's selected
+    if (hackCategory) {
+      payload.hack_category = hackCategory;
+    }
+    
+    console.log("Payload:", payload);
+    
+    try {
+      const res = await fetch(`${pythonURI}/api/feedback/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        successMsg.style.display = "block";
+        errorMsg.style.display = "none";
+        document.getElementById("feedback-title").value = "";
+        document.getElementById("feedback-body").value = "";
+        document.getElementById("feedback-type").value = "";
+        // Don't clear hack category - let it persist for next submission
+      } else {
+        throw new Error();
+      }
+    } catch (err) {
+      successMsg.style.display = "none";
+      errorMsg.style.display = "block";
+    }
+  };
+</script>
+

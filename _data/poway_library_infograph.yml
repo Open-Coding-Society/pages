@@ -1,0 +1,37 @@
+# Friends of the Poway Library Capstone Infographic
+Title: "Friends of the Poway Library"
+Description: "A prototype redesign of the Friends of the Poway Library website, built to better serve their community."
+
+Topics:
+  - title: "Friends of the Poway Library"
+    subtitle: "Rebuilding the Friends of the Poway Library website to make it modern, functional, and community-facing. Our goal is to give visitors a reason to return, with a live bookstore catalog, events, and interactive games."
+    link: "/capstone/poway-library/"
+    image: "capstone/poway_library.png"
+    alt: "Friends of the Poway Library capstone project"
+    status: "Prototype"
+    team:
+      - "Shayan Bhatti"
+      - "Arnav Pallapotu"
+      - "Tanay Paranjpe"
+    before:
+      - "No way to browse bookstore inventory online"
+      - "Events required visiting the county library site"
+      - "No way to donate directly through the site"
+      - "No games or interactive features to engage visitors"
+    after:
+      - "Full bookstore catalog with search and filtering"
+      - "Events calendar embedded directly on the site"
+      - "Donation flow in progress so supporters can give online"
+      - "Six library-themed games with profiles and leaderboards"
+      - "Clean, modern site that actually reflects the organization"
+    keyPoints:
+      - "Browse and search the bookstore catalog before you walk in"
+      - "See upcoming library events without ever leaving the site"
+      - "Read past newsletters and stay connected to the community"
+      - "Explore the library's history through an interactive timeline"
+      - "Six games that make the library fun and worth coming back to"
+    impact:
+      - "Bookstore catalog online means visitors can plan purchases before they arrive"
+      - "Events live on the site so the community stays informed in one place"
+      - "Six games give people a real reason to return to the site"
+      - "A donation flow will let supporters contribute directly for the first time"

@@ -21,13 +21,16 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -43,6 +46,26 @@ jobs:
           source venv/bin/activate  # Activate the virtual environment
           pip install -r requirements.txt  # Install Python packages
 
+      - name: Build registered projects
+        run: |
+          make build-registered-projects  # Distribute all registered project files to Jekyll locations
+          make build-registered-docs  # Distribute all registered documentation files to Jekyll locations  
+
+      - name: Verify registered docs output
+        run: |
+          if [ -d "_posts/projects" ]; then
+            DOC_COUNT=$(find _posts/projects -type f -name '*.md' | wc -l | tr -d ' ')
+            echo "Registered project docs found: ${DOC_COUNT}"
+            if [ "${DOC_COUNT}" -gt 0 ]; then
+              echo "Sample generated docs:"
+              find _posts/projects -type f -name '*.md' | sort | head -20
+            else
+              echo "No markdown docs found under _posts/projects"
+            fi
+          else
+            echo "_posts/projects directory not found"
+          fi
+
       - name: Execute notebook conversion script
         run: |
           source venv/bin/activate  # Activate virtual environment
@@ -57,11 +80,40 @@ jobs:
           else
             echo "No DOCX files found, skipping conversion"
           fi
+
+      - name: Split multi-course files
+        run: |
+          source venv/bin/activate  # Activate virtual environment
+          python scripts/split_multi_course_files.py  # Run course splitting
+      - name: Compute and apply baseurl
+        run: |
+          REPO="${{ github.repository }}"
+          OWNER=$(echo "$REPO" | cut -d'/' -f1)
+          NAME=$(echo "$REPO" | cut -d'/' -f2)
+
+          if [[ "$NAME" == "$OWNER.github.io" ]]; then
+            BASEURL=""
+          elif [[ "${{ github.repository }}" = "Open-Coding-Society/pages" ]]; then
+            BASEURL=""
+          else
+            BASEURL="/$NAME"
+          fi
+
+          echo "baseurl: \"$BASEURL\"" > _config.override.yml
+
+      - name: Generate dynamic SASS imports
+        run: |
+          source venv/bin/activate
+          python scripts/generate_sass_imports.py
+
       - name: Build with Jekyll
         run: |
-          bundle exec jekyll build  # Build your Jekyll site
+          bundle exec jekyll build --config _config.yml,_config.override.yml
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
 
   # Deployment job
   deploy:
@@ -73,4 +125,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

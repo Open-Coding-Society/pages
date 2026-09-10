@@ -1,0 +1,22 @@
+Title: "CareLink ACS Support Hub"
+Description: "A patient-centric resource hub developed for the American Cancer Society that utilizes algorithmic filtering to connect families with vital support services."
+Topics:
+  - title: "CareLink"
+    subtitle: "Bridging the gap between diagnosis and support."
+    link: "/capstone/carelink/"
+    image: "carelink-icon.png" # You can add an image to /images/ later
+    alt: "CareLink Logo"
+    status: "RESEARCH & PROTOTYPING PHASE"
+    team: ["Project Lead Name", "Team Member"]
+    keyPoints:
+      - "Dynamic Resource Finder: Filter local ACS services by category."
+      - "Screening Scheduler: Intelligent reminders based on risk factors."
+      - "Data Abstraction: Centralized database of transportation partners."
+      - "Algorithmic Sorting: Prioritizes results based on urgency."
+      - "Privacy Focused: Local storage for personal health logs."
+    tech: ["JavaScript", "Python", "Data Abstraction", "Algorithms"]
+    description: "CareLink is a digital tool designed to simplify the search for oncology support. Unlike generic search engines, CareLink provides a curated interface for ACS resources. Design research highlighted that patients often feel overwhelmed; CareLink uses conditional logic to deliver only relevant options, maintaining low anxiety."
+    impact:
+      - "Positive, data-driven approach to health equity."
+      - "Reduces information overload for patients."
+      - "Increases awareness of local ACS programs."

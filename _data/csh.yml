@@ -1,0 +1,246 @@
+# CSH course meta data
+course:
+  code: CSH
+  title: "CSH - Computer Science Honors"
+  subtitle: "Honors, Capstone, Research"
+  mission: "Computer Science \"H\" is a 2-trimester, senior-only interdisciplinary honors course serving as the Pathway Capstone. Students complete a research, design, and coding thesis culminating in a presentation to sponsoring professionals."
+  progression_key: 20
+  learning_journey:
+    - "Capstone Project Planning"
+    - "Research & Problem Definition"
+    - "Stakeholder Engagement"
+    - "System Design & Prototyping"
+    - "Technical Documentation"
+    - "Public Presentation"
+  zone_title: "CSH Zone - Computer Science Honors"
+
+Sprint1:
+  title: "Problem Discovery & Justification"
+  edp_phases: "Phases 1-2: Define Problem, Generate Concepts"
+  description: >
+    Engineering Design Process: Phases 1-2 — Define Problem, Generate Concepts.
+    Part 1, Iteration 1: Foundation & Proof of Concept. Teams form, define a
+    validated engineering problem, and initialize the Agile/project-management
+    practices (Kanban board, portfolio, IP research) that carry through the
+    Capstone. Sprint closes with a finished PRD and a signed mentor agreement.
+  help: "/navigation/sprint1-help"
+  start: 0
+  end: 4
+  0:
+    theme: "Team Formation & Agile Initialization"
+    goals:
+      - "Form Teams of 2-3 (Wayfinding Game + Tooling)"
+      - "Draft Preliminary Abstract"
+      - "Initialize GitHub Repo / Kanban Board (Projects or Jira)"
+  1:
+    theme: "Instructional Problem & Requirements Analysis"
+    goals:
+      - "Instructional Problem, Current & Desired State KSAs"
+      - "Gap Analysis + Research Questions"
+      - "Team Norms & Technical Ownership Roles"
+  2:
+    theme: "Literature Review, Design Specs & Peer Review"
+    goals:
+      - "Review 3+ Existing Commercial/Open-Source/Academic Solutions"
+      - "Product Requirements Document (PRD) w/ Quantified Metrics"
+      - "Patent & Open-Source License Search (MIT, GPL, Apache)"
+      - "Peer Review: Trade Problem Statement + PRD with Another Team"
+  3:
+    theme: "Mentor Engagement & Feasibility Review"
+    goals:
+      - "Present PRD to Industry Mentor for Feasibility Feedback"
+      - "Signed Mentor Agreement Form"
+      - "Initialize Engineering Portfolio"
+  4:
+    theme: "Retrospective and Assessment"
+    goals:
+      - "Reflect on Sprint"
+      - "Self-Assessment"
+      - "Peer and Teacher Feedback"
+      - "Set Future Knowledge Goals"
+Sprint2:
+  title: "System Architecture & MVP Construction"
+  edp_phases: "Phases 3-4: Develop Solution, Construct and Test"
+  description: >
+    Engineering Design Process: Phases 3-4 — Develop Solution, Construct and Test.
+    Covers PLTW Elements D-G. Sketch and weigh competing architecture designs,
+    map APIs/data flow/CAD before building, audit feasibility and Bill of
+    Materials, then build a working Minimum Viable Product and log its first
+    test results against the Sprint 1 PRD targets. First mentor design review
+    happens early in this sprint.
+  help: "/navigation/sprint2-help"
+  start: 5
+  end: 8
+  5:
+    theme: "Element D: Design Concept Generation, Analysis & Selection"
+    goals:
+      - "Sketch 3+ Competing Design Concepts"
+      - "Score Concepts in a Decision/Design Matrix"
+      - "Concept Testing (Paper Prototype, Wireframe, or Spike)"
+      - "First Mentor Meeting: Present Concepts for Design Feedback"
+  6:
+    theme: "Element E: Application of STEM Principles & Practices"
+    goals:
+      - "Justify Design with Math/Science/CS Principles"
+      - "Technical Drawing / CAD / System Architecture Diagram"
+      - "Material List, Tool Selection & Tool Safety"
+  7:
+    theme: "Element F: Consideration of Design Viability"
+    goals:
+      - "Assess Cost, Manufacturability & Technical Feasibility"
+      - "Vendor & Material Cost Sourcing / Bill of Materials Audit"
+      - "Prototype Timeline for Build & Test"
+  8:
+    theme: "Element G: Construction of a Testable Prototype"
+    goals:
+      - "Mock-up / Concept Model"
+      - "Prototype Build (Assembly) Procedure"
+      - "Preliminary Design Review"
+      - "Build Working MVP + Log First Test Results vs. Sprint 1 PRD"
+Sprint3:
+  title: "Alpha Evaluation & Trimester 1 Defense"
+  edp_phases: "Phases 5-6: Evaluate Solution, Present Solution"
+  description: >
+    Engineering Design Process: Phases 5-6 — Evaluate Solution, Present Solution.
+    Covers PLTW Elements H-M. Demo the MVP to your industry mentor and target
+    users for structured feedback, run a post-mortem on technical debt and
+    bugs, finalize the Sprint 1-3 engineering portfolio, and defend the Alpha
+    prototype at the Night at the Museum (N@tM) showcase. Second mentor
+    prototype review happens early in this sprint.
+  help: "/navigation/sprint3-help"
+  start: 9
+  end: 12
+  9:
+    theme: "Elements H+I: Prototype Testing, Data Collection & Analysis"
+    goals:
+      - "Second Mentor Meeting: Demo Prototype for Feasibility Feedback"
+      - "Define Testing Criteria & Testing Procedure"
+      - "Run Physical Testing & Record Data"
+      - "Critical Design Review → Redesign, Refine & Re-test"
+  10:
+    theme: "Element J: Documentation of External Evaluation"
+    goals:
+      - "Demo Prototype to Target Users / External Stakeholders"
+      - "Collect & Document Structured External Feedback"
+      - "Update Multimedia Display with Evaluation Findings"
+  11:
+    theme: "Element K: Reflection on the Design Project"
+    goals:
+      - "Post-Mortem on Technical Debt & Bugs"
+      - "Individual + Team Reflection on Trimester 1"
+      - "Finalize Sprint 1-3 Engineering Portfolio"
+  12:
+    theme: "Elements L+M: Recommendations & N@tM Portfolio Defense"
+    goals:
+      - "Element L: Draft Recommendations for Next Design Iteration"
+      - "Element M: Finalize Electronic Portfolio & Multimedia Display"
+      - "Element M: Night at the Museum (N@tM) — Defend Alpha to Judging Panel"
+Sprint4:
+  title: "Failure Analysis & Architectural Redesign"
+  edp_phases: "Phases 1-2 (Iteration 2): Define Problem, Generate Concepts"
+  description: >
+    Engineering Design Process: Phases 1-2, second pass — Define Problem,
+    Generate Concepts, revisited in light of Trimester 1 results. Revisits
+    PLTW Elements A-C. Log Trimester 1 failures and pivots in a
+    version-controlled changelog, build an FMEA risk matrix with your mentor,
+    root-cause the Sprint 3 issues, and revise the PRD to stricter,
+    industry-grade specifications.
+  start: 13
+  end: 16
+  13:
+    theme: "Element A (Iteration 2): Redefine & Rejustify the Problem"
+    goals:
+      - "Log Trimester 1 Failures & Pivots in a Version-Controlled Changelog"
+      - "Root-Cause Analysis of N@tM Panel & Sprint 3 Issues"
+      - "Revise Problem Statement with Post-Alpha Evidence"
+  14:
+    theme: "Element B (Iteration 2): Analyze Your Own Prior Attempt"
+    goals:
+      - "Build an FMEA Risk Matrix with Your Mentor"
+      - "Document & Analyze Your Trimester 1 Prototype as the 'Previous Solution'"
+      - "Rank Failure Modes by Severity, Occurrence & Detection"
+  15:
+    theme: "Element C (Iteration 2): Justify Revised Design Requirements"
+    goals:
+      - "Revise PRD to Stricter, Industry-Grade Quantified Specs"
+      - "Justify Each Spec Change Against FMEA + Mentor/User Feedback"
+      - "Peer Review the Revised PRD with Another Team"
+  16:
+    theme: "Sprint 4 Retrospective & Team Realignment"
+    goals:
+      - "Reflect on Redesign Decisions"
+      - "Reset Team Norms & Technical Ownership for the Build Phase"
+      - "Set Knowledge Goals for Sprint 5"
+Sprint5:
+  title: "High-Fidelity Engineering & Stress Testing"
+  edp_phases: "Phases 3-4 (Iteration 2): Develop Solution, Construct and Test"
+  description: >
+    Engineering Design Process: Phases 3-4, second pass — Develop Solution,
+    Construct and Test, at production fidelity. Revisits PLTW Elements D-G.
+    Build the Beta prototype with production-grade practices, fully integrate
+    all sub-systems, cost out manufacturing/hosting at scale, and run
+    edge-case, load, and regulatory-compliance testing with comparative data
+    analysis against Prototype 1.
+  start: 17
+  end: 20
+  17:
+    theme: "Element D (Iteration 2): Beta Design Concepts"
+    goals:
+      - "Generate Production-Fidelity Design/Architecture Options"
+      - "Decision Matrix v2 Against Revised PRD"
+      - "Select & Justify the Beta Design"
+  18:
+    theme: "Element E (Iteration 2): Production-Fidelity STEM Application"
+    goals:
+      - "Full Sub-System Integration Plan"
+      - "Updated Technical Drawings / CAD / Architecture Diagrams"
+      - "Apply Advanced STEM Principles at Production Fidelity"
+  19:
+    theme: "Element F (Iteration 2): Viability at Scale"
+    goals:
+      - "Cost Out Manufacturing / Hosting at Scale"
+      - "Regulatory & Compliance Considerations"
+      - "Revised Timeline for Beta Build & Test"
+  20:
+    theme: "Element G (Iteration 2): Construction of the Beta Prototype"
+    goals:
+      - "Build Production-Grade Beta Prototype"
+      - "Fully Integrate All Sub-Systems"
+      - "Log Beta Build Results vs. Revised PRD"
+Sprint6:
+  title: "Validation, Deployment & Capstone Defense"
+  edp_phases: "Phases 5-6 (Iteration 2): Evaluate Solution, Present Solution"
+  description: >
+    Engineering Design Process: Phases 5-6, second pass — Evaluate Solution,
+    Present Solution, for the Capstone's final defense. Revisits PLTW
+    Elements H-L. Run user acceptance testing with external participants,
+    write the final engineering assessment and future roadmap, package the
+    technical portfolio (repo, docs, testing logs), and deliver the
+    venture-style Capstone expo defense to an external panel. Revisits PLTW
+    Elements H-M.
+  start: 21
+  end: 24
+  21:
+    theme: "Elements H+I (Iteration 2): Edge-Case & Comparative Testing"
+    goals:
+      - "Edge-Case, Load & Regulatory-Compliance Testing"
+      - "Record Data Against Revised PRD Targets"
+      - "Comparative Data Analysis: Beta vs. Alpha Prototype"
+  22:
+    theme: "Element J (Iteration 2): External Evaluation (UAT)"
+    goals:
+      - "Run User Acceptance Testing with External Participants"
+      - "Document External/Mentor Evaluation of the Beta"
+      - "Redesign & Refine Based on UAT Findings"
+  23:
+    theme: "Element K (Iteration 2): Final Reflection"
+    goals:
+      - "Write the Final Engineering Assessment"
+      - "Draft the Future Roadmap Beyond Capstone"
+      - "Individual + Team Reflection Across Both Iterations"
+  24:
+    theme: "Elements L+M (Iteration 2): Final Recommendations & Capstone Defense"
+    goals:
+      - "Element L: Final Designer's Recommendations Across Both Iterations"
+      - "Element M: Package Final Technical Portfolio (Repo, Docs, Testing Logs)"
+      - "Element M: Deliver Venture-Style Capstone Defense to Judging Panel"

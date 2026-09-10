@@ -6,7 +6,6 @@ permalink: /cs-portfolio-quest/backend/submodule_4/
 parent: "Backend Development"
 team: "Encrypters"
 submodule: 4
-categories: [CSP, Submodule, Backend]
 tags: [backend, submodule, encrypters]
 author: "Encrypters Team"
 date: 2025-10-21

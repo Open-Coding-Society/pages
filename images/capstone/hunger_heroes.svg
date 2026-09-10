@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b35"/>
+      <stop offset="100%" style="stop-color:#f7931e"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e0e0e0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" rx="20" fill="url(#bg)"/>
+  
+  <!-- Plate -->
+  <ellipse cx="200" cy="160" rx="90" ry="50" fill="url(#plate)" opacity="0.95"/>
+  <ellipse cx="200" cy="160" rx="70" ry="38" fill="#f5f5f5"/>
+  
+  <!-- Food items -->
+  <circle cx="180" cy="150" r="18" fill="#4CAF50"/> <!-- Green veggie -->
+  <circle cx="220" cy="155" r="15" fill="#FF5722"/> <!-- Tomato -->
+  <ellipse cx="200" cy="170" rx="25" ry="12" fill="#8D6E63"/> <!-- Bread -->
+  
+  <!-- Heart -->
+  <path d="M200 100 C180 80, 150 90, 150 110 C150 130, 180 150, 200 170 C220 150, 250 130, 250 110 C250 90, 220 80, 200 100" fill="#e53935" opacity="0.9"/>
+  
+  <!-- Arrows (sharing) -->
+  <path d="M100 200 L80 180 L80 190 L50 190 L50 210 L80 210 L80 220 Z" fill="#fff" opacity="0.8"/>
+  <path d="M300 200 L320 180 L320 190 L350 190 L350 210 L320 210 L320 220 Z" fill="#fff" opacity="0.8"/>
+  
+  <!-- Text -->
+  <text x="200" y="260" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#fff" text-anchor="middle">HUNGER HEROES</text>
+  <text x="200" y="280" font-family="Arial, sans-serif" font-size="12" fill="#fff" text-anchor="middle" opacity="0.9">Fighting Food Insecurity</text>
+</svg>

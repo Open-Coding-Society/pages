@@ -1,0 +1,118 @@
+/**
+ * Design System Variables
+ * Centralized spacing, sizing, and breakpoint constants
+ * Use these throughout SCSS files for consistency
+ */
+
+// ===========================
+// Spacing Scale
+// ===========================
+$spacing-xl: 30px;
+$spacing-lg: 20px;
+$spacing-md: 15px;
+$spacing-sm: 12px;
+$spacing-xs: 10px;
+$spacing-xxs: 8px;
+$spacing-xxxs: 6px;
+
+// ===========================
+// Border Radius Scale
+// ===========================
+$radius-xl: 16px;
+$radius-lg: 12px;
+$radius-md: 10px;
+$radius-sm: 8px;
+$radius-xs: 6px;
+$radius-xxs: 4px;
+
+// ===========================
+// Font Size Scale
+// ===========================
+// Desktop sizes
+$text-xxl: 22px;
+$text-xl: 18px;
+$text-lg: 16px;
+$text-md: 14px;
+$text-sm: 12px;
+$text-xs: 10px;
+$text-xxs: 9px;
+
+// Mobile scale factor
+$mobile-text-scale: 0.8;
+
+// ===========================
+// Responsive Breakpoints
+// ===========================
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 1024px;
+$breakpoint-desktop: 1440px;
+
+// ===========================
+// Z-Index Scale
+// ===========================
+$z-base: 1;
+$z-dropdown: 100;
+$z-sticky: 500;
+$z-fixed: 1000;
+$z-modal-backdrop: 9999;
+$z-modal: 10000;
+$z-tooltip: 10001;
+
+// ===========================
+// Transition Speeds
+// ===========================
+$transition-fast: 0.15s;
+$transition-base: 0.2s;
+$transition-slow: 0.3s;
+
+// ===========================
+// Shadow Presets
+// ===========================
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.3);
+$shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+// ===========================
+// Helper Mixins
+// ===========================
+
+/**
+ * Responsive text with automatic mobile scaling
+ * @param {Number} $size - Desktop font size
+ * @param {Number} $scale - Mobile scale factor (default: 0.8)
+ */
+@mixin responsive-text($size, $scale: $mobile-text-scale) {
+  font-size: $size;
+  
+  @media (max-width: $breakpoint-mobile) {
+    font-size: $size * $scale;
+  }
+}
+
+/**
+ * Responsive padding with automatic mobile scaling
+ * @param {Number} $padding - Desktop padding
+ * @param {Number} $reduction - Amount to reduce on mobile (default: 4px)
+ */
+@mixin responsive-padding($padding, $reduction: 4px) {
+  padding: $padding;
+  
+  @media (max-width: $breakpoint-mobile) {
+    padding: $padding - $reduction;
+  }
+}
+
+/**
+ * Responsive spacing (padding or margin) with automatic mobile scaling
+ * @param {String} $property - 'padding' or 'margin'
+ * @param {Number} $spacing - Desktop spacing value
+ * @param {Number} $reduction - Amount to reduce on mobile (default: 4px)
+ */
+@mixin responsive-spacing($property, $spacing, $reduction: 4px) {
+  #{$property}: $spacing;
+  
+  @media (max-width: $breakpoint-mobile) {
+    #{$property}: $spacing - $reduction;
+  }
+}

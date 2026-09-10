@@ -1,0 +1,307 @@
+/**
+ * Game Runner Styles
+ * Interactive game development environment with GameEngine integration
+ */
+
+@import "runner-base";
+@import "../mixins/panel";
+
+.game-runner-container {
+  @include runner-base;
+  width: var(--gr-panel-width, 100%);
+  max-width: 100%;
+
+  // Game output area - contained canvas for educational use
+  .game-output {
+    // Layout & Dimensions
+    overflow: hidden;
+    position: relative;
+    
+    // Spacing
+    padding: 0;
+    
+    // Colors & Styling
+    background: #000; // Black background for game
+    color: $panel-text;
+    
+    // Game container styling
+    .gameContainer {
+      width: 100%;
+      height: var(--gr-canvas-height, 580px);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      // Only style the main canvas, not character canvases
+      > canvas#gameCanvas {
+        display: block;
+        border: none;
+        background: transparent;
+      }
+      
+      // Reset styles for all game-generated canvases
+      canvas {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+    }
+  }
+
+  // Level selector dropdown
+  .levelSelect {
+    @include select-control();
+    min-width: 120px;
+  }
+
+  // Game status indicator
+  .game-status {
+    font-weight: 500;
+    
+    .status-text {
+      color: var(--pref-accent-color);
+      font-weight: 600;
+    }
+  }
+
+  // Compact controls for hide_edit mode (mini-game experiences)
+  .compact-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 12px;
+    background: var(--pref-bg-color);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+
+    button,
+    select {
+      margin-left: 0;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+    
+    .ocs__btn.utility {
+      flex: 0 0 auto;
+    }
+
+    .levelSelect {
+      @include select-control();
+      min-width: 120px;
+      max-width: 200px;
+      height: 36px;
+      font-size: 0.95rem;
+      padding: 0.3rem 0.45rem;
+    }
+
+    .engineVersionSelect {
+      @include select-control();
+      min-width: 110px;
+      max-width: 170px;
+      height: 36px;
+      font-size: 0.95rem;
+      padding: 0.3rem 0.45rem;
+    }
+
+    @media (max-width: 768px) {
+      gap: 0.4rem;
+
+      .ocs__btn.utility {
+        flex: 0 0 auto;
+      }
+
+      .engineVersionSelect,
+      .levelSelect {
+        flex: 1 1 calc(50% - 0.4rem);
+        min-width: 130px;
+        max-width: none;
+        height: 34px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .engineVersionSelect,
+      .levelSelect {
+        flex-basis: calc(50% - 0.3rem);
+        min-width: 0;
+      }
+    }
+  }
+
+  // Hide-editor mode - cleaner experience for mini-games
+  &.hide-editor {
+    // Remove challenge box
+    .challenge-box {
+      display: none;
+    }
+    
+    // Make game output more prominent
+    .game-output {
+      border-radius: 8px;
+      border: 2px solid var(--pref-accent-color);
+    }
+  }
+}
+
+/* ========================================
+   Fullscreen Game Mode Styles
+   ======================================== */
+
+.game-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.fullscreen-control-header {
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+
+  &.collapsed {
+    padding: 0.5rem 1.5rem;
+  }
+}
+
+.fullscreen-collapse-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: var(--pref-text-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  position: absolute;
+  left: 1.5rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+  }
+}
+
+.fullscreen-title {
+  color: var(--pref-text-color);
+  font-weight: 600;
+  font-size: 1rem;
+  position: absolute;
+  left: 4rem;
+}
+
+.fullscreen-controls-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  padding-left: 12rem;
+
+  &.collapsed {
+    display: none;
+  }
+
+  button {
+    background: var(--pref-accent-color);
+    border: none;
+    color: var(--pref-text-color);
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.05rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.2);
+      transform: scale(1.05);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  select {
+    background: var(--pref-accent-color);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--pref-text-color);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      filter: brightness(1.2);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    option {
+      background: var(--pref-bg-color);
+      color: var(--pref-text-color);
+    }
+  }
+
+  @media (max-width: 900px) {
+    padding-left: 0;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+
+    button,
+    select {
+      flex: 1 1 calc(50% - 0.5rem);
+      min-width: 0;
+    }
+
+    button {
+      min-width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    button,
+    select {
+      flex-basis: 100%;
+    }
+  }
+}

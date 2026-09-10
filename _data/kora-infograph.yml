@@ -1,0 +1,36 @@
+Title: "Kora Capstone"
+Description: "An AI-native property maintenance operating system that automates tenant requests, triages problems, matches vendors, and keeps operations moving without manual coordination."
+
+Topics:
+  - title: "Kora"
+    image: "capstone/kora_logo.png"
+    link: "/capstone/kora/"
+    alt: "Kora — Autonomous Property Maintenance OS"
+    keyPoints:
+      - "AI-powered triage for maintenance requests using text and image inputs"
+      - "Smart vendor matching based on trade, ZIP code, reliability, and response time"
+      - "Automated SMS dispatch with natural-language response parsing"
+      - "End-to-end maintenance workflow automation from intake to completion"
+      - "Real-time dashboards for tracking jobs, SLAs, and portfolio activity"
+      - "Property-level isolation for secure multi-tenant operations"
+    subtitle: "Autonomous Property Maintenance, Powered by AI"
+    description: "Kora is an AI-native platform designed to automate the full maintenance lifecycle in property management. It transforms unstructured tenant requests, photos, messages, and invoices into structured maintenance actions. Using intelligent triage, vendor matching, SMS dispatch, and workflow orchestration, Kora reduces the need for manual coordination while improving speed, visibility, and operational consistency. Built as an operations backbone rather than just a dashboard, Kora helps property managers and institutional owners scale maintenance workflows efficiently across portfolios."
+    tech:
+      - "TypeScript"
+      - "NestJS API"
+      - "Next.js Frontend"
+      - "PostgreSQL + Prisma"
+      - "BullMQ + Redis"
+      - "OpenAI Integration"
+      - "Twilio SMS"
+      - "Event-Driven Architecture"
+    impact:
+      - "Reduces maintenance coordination overhead through automation"
+      - "Speeds up issue resolution with AI-driven triage and dispatch"
+      - "Improves vendor response efficiency and job matching accuracy"
+      - "Enables 24/7 operations without depending on manual intervention"
+      - "Supports scalable, enterprise-grade property management workflows"
+    status: "In Development"
+    team:
+      - "Manas"
+      - "Akshay"

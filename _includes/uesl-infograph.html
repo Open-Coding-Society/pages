@@ -1,0 +1,36 @@
+{% assign data = site.data.uesl_infograph %}
+
+<div class="uesl-infograph">
+
+  {% for topic in data.Topics %}
+
+  <!-- ── Problems Being Solved ──────────────────────── -->
+  <div class="uesl-section-card">
+    <div class="uesl-section-label">Problems Being Solved</div>
+    <div class="uesl-problems-grid">
+      {% for problem in topic.problems %}
+      <div class="uesl-problem-item">
+        <span class="uesl-problem-num">0{{ forloop.index }}</span>
+        <p>{{ problem }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- ── Key Tech That Solves Problems ──────────────── -->
+  <div class="uesl-section-card">
+    <div class="uesl-section-label">Key Tech &amp; How It Helps</div>
+    <div class="uesl-tech-table">
+      {% for t in topic.tech %}
+      <div class="uesl-tech-row">
+        <span class="uesl-tech-tag">{{ t.name }}</span>
+        <span class="uesl-tech-arrow">→</span>
+        <span class="uesl-tech-solve">{{ t.solves }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% endfor %}
+
+</div>

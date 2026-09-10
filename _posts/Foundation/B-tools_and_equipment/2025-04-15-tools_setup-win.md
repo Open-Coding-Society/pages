@@ -25,9 +25,8 @@ flowchart TD
     B["📁 Linux Commands<br>mkdir, cd, ls"]
     C["📁 Clone Project<br>git clone https://<your-repo>"]
     D["🛠️ Activate Tools<br>Ruby, Python, Git"]
-    E["🔄 SDLC<br>code → make → test → commit"]
 
-    A --> A1 --> A2 --> B --> C --> D --> E
+    A --> A1 --> A2 --> B --> C --> D
 ```
 
 ## Shell Commands
@@ -64,7 +63,7 @@ flowchart TD
 
 ### WSL common commands
 
-- `wsl --help`, `wsl -l -o`, `wsl -l -v`, `wsl --shutdown`, `wsl --uregister`
+- `wsl --help`, `wsl -l -o`, `wsl -l -v`, `wsl --shutdown`, `wsl --unregister`
 
 ### WSL install
 
@@ -74,7 +73,7 @@ flowchart TD
    wsl --install -d Ubuntu-24.04
    ```
 
-2. Setup a username and password when prompted. On password you will be typing but will not see respones.
+2. Setup a username and password when prompted. On password you will be typing but will not see responses.
 
 3. At the conclusion of the install you will receive a WSL Ubuntu prompt.  For now we will exit WSL.
 
@@ -110,8 +109,8 @@ Run these commands to set up your Ubuntu developer tools for the first time.
 mkdir opencs
 cd opencs
 git config --global credential.helper "/mnt/c/Program\ Files/Git/mingw64/bin/git-credential-manager.exe"
-git clone https://github.com/Open-Coding-Society/student.git
-cd student/
+git clone https://github.com/Open-Coding-Society/portfolio.git
+cd portfolio/
 ./scripts/activate_ubuntu.sh # prompts for your recently created WSL Ubuntu password
 ./scripts/activate.sh # prompts for Git UID and Personal Email
 ./scripts/venv.sh
@@ -136,14 +135,56 @@ git config --global --list
 
 Open Terminal by right clicking on Terminal in Taskbar and selecting Ubuntu 24.04
 
-Each time you open a new terminal session, run these commands to activate your environment and start working on the student project in VS Code.
+Each time you open a new Terminal to work, run:
 
 ```bash
-cd opencs/student
+cd opencs/portfolio
 source venv/bin/activate
 code .
 ```
 
 ---
 
-{% include slim_sidebar.html %}
+## 💻 Interactive Terminal Practice
+
+Now that you’ve learned about Windows tools and file systems, try using a simulated terminal.
+
+This is a safe environment where you can practice basic commands.
+
+### Try these commands:
+
+* `ls` → list files/folders
+* `cd <folder>` → move into a folder
+* `cd ..` → go back
+* `mkdir <folder>` → create a folder
+* `touch <file>` → create a file
+* `cat <file>` → view file contents
+* `echo "text" > <file>` → write content into a file
+* `echo "text" >> <file>` → append content to a file
+* `git clone <url>` → mock clone a repo
+* `clear` → clear terminal output
+* `pwd` → show current path
+* `help` → show commands
+
+---
+
+### Terminal:
+
+{% include tools/interactive-terminal-simulator.html id="windows-tools-terminal" %}
+
+### Game Terminal:
+
+This version is a training mission that teaches real terminal commands.
+
+Try this flow:
+
+* `mission` → get current objective
+* `hint` → get help if stuck
+* `progress` → show completed missions
+* `status` → view rank and current directory
+
+To win, complete missions using actual commands like `pwd`, `ls`, `mkdir`, `cd`, `touch`, `echo`, and `cat`.
+
+{% include tools/interactive-terminal-simulator-game.html id="windows-tools-terminal-game" %}
+
+---

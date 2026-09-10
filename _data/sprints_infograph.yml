@@ -1,9 +1,9 @@
 # course illustrations
 Title: "Agile Project Workflow"
-Description: "This sprint-based approach guides students through the process of researching, designing, building, and refining a product. Each week builds on the last, combining technical development with collaboration and reflection."
+Description: "This sprint-based approach guides students through the process of researching, designing, building, and refining a product. Each phase builds on the previous one, combining technical development with collaboration and reflection."
 
 Topics:
-  - title: "Week 1: Discover & Design"
+  - title: "Phase 1: Discover & Design"
     image: "/sprints/week1_discover.png"
     link: "/sprints/week1"
     alt: "Empathy and Design Thinking"
@@ -15,7 +15,7 @@ Topics:
       - "Low-Fi Prototypes"
     description: "Start by understanding your users. Conduct empathy research, define your Point of View (POV), and frame 'How Might We' (HMW) questions. Organize ideas visually with PinUps, build your Kanban board, and prototype using tools like Canva or draw.io."
 
-  - title: "Week 2: Build & Develop"
+  - title: "Phase 2: Build & Develop"
     image: "/sprints/week2_build.png"
     link: "/sprints/week2"
     alt: "Coding and Feature Building"
@@ -27,7 +27,7 @@ Topics:
       - "Cohort Scrum Standups"
     description: "Translate prototypes into real features using GitHub, VSCode, and endpoint testing tools. Scrum Masters lead daily standups to sync teams, identify blockers, and promote node-to-node collaboration."
 
-  - title: "Week 3: Integrate & Extend"
+  - title: "Phase 3: Integrate & Extend"
     image: "/sprints/week3_integrate.png"
     link: "/sprints/week3"
     alt: "Frontend-Backend Integration"
@@ -39,7 +39,7 @@ Topics:
       - "Collaborate on Issues"
     description: "Combine everyone’s work into a unified product. Use GitHub Issues, Pull Requests, and Burndown Charts to manage discoveries and new tasks. Teams collaborate tightly to integrate systems and prepare for final testing."
 
-  - title: "Week 4: Test, Refine & Demo"
+  - title: "Phase 4: Test, Refine & Demo"
     image: "/sprints/week4_demo.png"
     link: "/sprints/week4"
     alt: "Testing and Demo"

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Robot Logic Game — Test Page</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #11162a;
+      color: #f2f2f2;
+      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    h1 { margin-top: 0; }
+    .card {
+      background: #1d2230;
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 20px;
+      border: 1px solid #2c3347;
+    }
+    button.launch {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      background: #2ea66a;
+      color: white;
+      cursor: pointer;
+    }
+    button.launch:hover { background: #38c07c; }
+    code, kbd {
+      background: #0f1524;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    ul { padding-left: 20px; line-height: 1.7; }
+    .level-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #2c3347;
+      gap: 16px;
+    }
+    .level-row:last-child { border-bottom: none; }
+    .level-row .info { flex: 1; }
+    .level-row .title {
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .level-row .title .num {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: #4f9dff;
+      color: #0f1524;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      font-size: 12px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .level-row .meta {
+      opacity: 0.7;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .level-row .stars {
+      display: flex;
+      gap: 2px;
+      margin-top: 6px;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+    .level-row .stars .filled { color: #ffd84a; }
+    .level-row .stars .empty  { color: #3a4466; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Robot Logic Game — Dev Test</h1>
+    <p>Pick a level below to launch it in a fullscreen overlay. Press <kbd>✕</kbd> in the corner to return.</p>
+
+    <div class="card" id="levelList"></div>
+
+    <div class="card">
+      <h3 style="margin-top:0">How to play</h3>
+      <ul>
+        <li>Drag blocks from the <em>Blocks</em> panel into the <em>Program</em> panel.</li>
+        <li>Drag program blocks up or down to reorder them — drop into a Repeat or If body to nest.</li>
+        <li>Click <code>✕</code> on a program block to remove it.</li>
+        <li>Press <strong>Run</strong> to execute your program.</li>
+        <li>Press <strong>Reset</strong> to clear your program and move the robot back to start.</li>
+      </ul>
+      <p style="margin-bottom:0;opacity:0.6;font-size:12px;">
+        Stars are saved on this device.
+        <a href="#" id="resetProgress" style="color:#ff6b73;text-decoration:none;">Reset progress</a>
+      </p>
+    </div>
+  </main>
+
+  <script type="module">
+    import RobotLogicLevel from './levels/RobotLogicLevel.js';
+    import { levelConfigs } from './levels/levelConfigs.js';
+    import { getLevelStars, clearProgress } from './levels/progress.js';
+
+    const list = document.getElementById('levelList');
+
+    function renderStars(count) {
+      const wrap = document.createElement('div');
+      wrap.className = 'stars';
+      for (let i = 0; i < 3; i++) {
+        const s = document.createElement('span');
+        s.textContent = '★';
+        s.className = i < count ? 'filled' : 'empty';
+        wrap.appendChild(s);
+      }
+      return wrap;
+    }
+
+    function refreshList() {
+      list.innerHTML = '';
+      levelConfigs.forEach((cfg, index) => {
+        const row = document.createElement('div');
+        row.className = 'level-row';
+
+        const info = document.createElement('div');
+        info.className = 'info';
+
+        const title = document.createElement('div');
+        title.className = 'title';
+        title.innerHTML = `<span class="num">${cfg.id}</span>${cfg.name}`;
+        info.appendChild(title);
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.textContent = cfg.blurb;
+        info.appendChild(meta);
+
+        info.appendChild(renderStars(getLevelStars(cfg.id)));
+
+        const btn = document.createElement('button');
+        btn.className = 'launch';
+        btn.textContent = 'Launch';
+        btn.addEventListener('click', () => launchLevel(index));
+
+        row.appendChild(info);
+        row.appendChild(btn);
+        list.appendChild(row);
+      });
+    }
+
+    function launchLevel(index) {
+      const cfg = levelConfigs[index];
+      if (!cfg) return;
+      const level = new RobotLogicLevel(cfg);
+      level.onExit = () => refreshList();
+      if (index + 1 < levelConfigs.length) {
+        level.onContinue = () => launchLevel(index + 1);
+      }
+      level.start();
+    }
+
+    document.getElementById('resetProgress')?.addEventListener('click', () => {
+      if (confirm('Clear all star progress? This cannot be undone.')) {
+        clearProgress();
+        refreshList();
+      }
+    });
+
+    refreshList();
+  </script>
+</body>
+</html>

@@ -1,0 +1,657 @@
+// FRQ 2019 Q3 — Interactive Lesson Styles
+// Follows rpn-interactive.scss patterns exactly.
+// Uses project theme variables & mixins. No hard-coded colors.
+
+@import "open-coding/mixins/buttons";
+@import "open-coding/mixins/panel";
+@import "open-coding/mixins/container";
+@import "open-coding/mixins/variables";
+
+// ===========================
+// Shared animation
+// ===========================
+@keyframes frqSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes frqPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes frqShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+
+// ===========================
+// Local reusable patterns
+// ===========================
+
+// Card wrapper used by every interactive section
+@mixin frq-card {
+  @include main-container;
+  max-width: 740px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+// Accent-colored header bar shared across all cards
+@mixin frq-card-header {
+  background: var(--pref-accent-color);
+  padding: $spacing-lg;
+
+  h3 {
+    margin: 0;
+    color: var(--pref-bg-color);
+    font-weight: 600;
+    @include responsive-text($text-xl);
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: var(--pref-bg-color);
+    opacity: 0.85;
+    @include responsive-text($text-md);
+  }
+}
+
+// Body region beneath the header
+@mixin frq-card-body {
+  background: var(--pref-bg-color);
+  border: 1px solid var(--ui-border);
+  border-top: none;
+  padding: $spacing-xl;
+  border-radius: 0 0 $radius-lg $radius-lg;
+}
+
+// Feedback block (correct / incorrect)
+@mixin frq-feedback {
+  display: none;
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  border-radius: $radius-xs;
+  @include responsive-text($text-sm);
+  line-height: 1.5;
+  color: var(--pref-text-color);
+
+  &--correct {
+    display: block;
+    background: rgba($green, 0.1);
+    border-left: 4px solid $green;
+    animation: frqSlideDown $transition-slow ease;
+  }
+
+  &--incorrect {
+    display: block;
+    background: rgba($red, 0.1);
+    border-left: 4px solid $red;
+    animation: frqShake 0.4s ease;
+  }
+}
+
+// MCQ-style option button
+@mixin frq-option-btn {
+  @include base-button;
+  text-align: left;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  font-family: $mono-font;
+  transition: all $transition-base;
+
+  &--correct {
+    border-color: $green !important;
+    background: rgba($green, 0.1) !important;
+  }
+
+  &--incorrect {
+    border-color: $red !important;
+    background: rgba($red, 0.1) !important;
+  }
+
+  &--disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+// ===========================
+// 1. Popcorn Hack (MCQ Cards)
+// ===========================
+.frq-popcorn {
+  @include frq-card;
+
+  &__header { @include frq-card-header; }
+  &__body   { @include frq-card-body; }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__option { @include frq-option-btn; }
+
+  // Two-column card layout variant
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md;
+
+    @media (max-width: $breakpoint-mobile) { grid-template-columns: 1fr; }
+  }
+
+  &__grid-card {
+    background: var(--panel-mid);
+    border: 2px solid var(--ui-border);
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    code { color: var(--pref-text-color); @include responsive-text($text-sm); }
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: var(--pref-accent-color);
+      box-shadow: $shadow-md;
+    }
+
+    &--correct {
+      border-color: $green !important;
+      background: rgba($green, 0.1) !important;
+    }
+
+    &--incorrect {
+      border-color: $red !important;
+      background: rgba($red, 0.1) !important;
+    }
+  }
+
+  &__feedback { @include frq-feedback; }
+}
+
+// ===========================
+// 2. Drag & Drop Ordering
+// ===========================
+.frq-dragdrop {
+  max-width: 740px;
+  margin: $spacing-lg auto $spacing-xl;
+  background: var(--pref-accent-color);
+  padding: 3px;
+  border-radius: $radius-xl;
+
+  &__inner {
+    background: var(--pref-bg-color);
+    border-radius: calc(#{$radius-xl} - 2px);
+    padding: $spacing-xl;
+  }
+
+  &__title {
+    color: var(--pref-text-color);
+    text-align: center;
+    margin-bottom: $spacing-xxxs;
+    @include responsive-text($text-xxl);
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: $spacing-lg;
+    @include responsive-text($text-md);
+  }
+
+  &__area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-lg;
+
+    @media (max-width: $breakpoint-mobile) { grid-template-columns: 1fr; }
+  }
+
+  &__column {
+    background: var(--panel-mid);
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    border: 2px solid var(--ui-border);
+
+    h4 {
+      color: var(--pref-accent-color);
+      margin: 0 0 $spacing-sm;
+      @include responsive-text($text-md);
+      font-weight: 600;
+    }
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xxs;
+  }
+
+  &__item {
+    background: var(--pref-bg-color);
+    padding: $spacing-xs $spacing-md;
+    border-radius: $radius-sm;
+    border: 2px solid var(--pref-accent-color);
+    cursor: grab;
+    transition: all $transition-slow ease;
+    user-select: none;
+    color: var(--pref-text-color);
+    font-family: $mono-font;
+    @include responsive-text($text-md);
+    text-align: center;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+
+    &.dragging { opacity: 0.4; cursor: grabbing; }
+  }
+
+  &__slot {
+    margin-bottom: $spacing-xs;
+
+    .slot-label {
+      font-weight: bold;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      @include responsive-text($text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  &__dropzone {
+    background: var(--pref-bg-color);
+    padding: $spacing-xs $spacing-md;
+    border-radius: $radius-sm;
+    border: 2px dashed var(--ui-border);
+    min-height: 42px;
+    transition: all $transition-slow ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pref-text-color);
+    font-family: $mono-font;
+    @include responsive-text($text-md);
+
+    .placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+      @include responsive-text($text-sm);
+    }
+
+    &.drag-over {
+      background: rgba(0, 0, 0, 0.15);
+      border-color: var(--pref-accent-color);
+      border-style: solid;
+    }
+
+    &.filled {
+      border-style: solid;
+      border-color: var(--pref-accent-color);
+    }
+  }
+
+  &__controls {
+    @include inline-container(flex, $spacing-sm);
+    justify-content: center;
+    margin-bottom: $spacing-md;
+    flex-wrap: wrap;
+  }
+
+  &__btn {
+    @include text-button;
+    padding: $spacing-xs $spacing-xl;
+    font-weight: 600;
+
+    &--check {
+      background: $green;
+      border-color: $green;
+      color: var(--pref-bg-color);
+      &:hover { opacity: 0.85; }
+    }
+
+    &--reset {
+      background: $orange;
+      border-color: $orange;
+      color: var(--pref-bg-color);
+      &:hover { opacity: 0.85; }
+    }
+  }
+
+  &__feedback { @include frq-feedback; }
+}
+
+// ===========================
+// 3. Interactive Visualizer
+// ===========================
+.frq-viz {
+  @include frq-card;
+
+  &__header { @include frq-card-header; }
+  &__body   { @include frq-card-body; }
+
+  &__controls {
+    @include inline-container(flex, $spacing-xs);
+    justify-content: center;
+    margin-bottom: $spacing-lg;
+    flex-wrap: wrap;
+  }
+
+  &__input {
+    @include base-button;
+    padding: $spacing-xxs $spacing-sm;
+    border-radius: $radius-xs;
+    font-family: $mono-font;
+    min-width: 200px;
+  }
+
+  &__step-btn {
+    @include text-button;
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+    font-weight: 600;
+
+    &--secondary {
+      background: var(--panel-mid);
+      border-color: var(--ui-border);
+      color: var(--pref-text-color);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  &__display {
+    display: flex;
+    gap: $spacing-lg;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  &__token-stream {
+    flex: 1;
+    min-width: 200px;
+
+    h5 {
+      color: var(--text-muted);
+      @include responsive-text($text-xs);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 $spacing-xxs;
+    }
+  }
+
+  &__token {
+    display: inline-block;
+    padding: $spacing-xxxs $spacing-sm;
+    margin: 3px;
+    border-radius: $radius-xxs;
+    font-family: $mono-font;
+    @include responsive-text($text-md);
+    background: var(--panel-mid);
+    color: var(--pref-text-color);
+    border: 1px solid var(--ui-border);
+    transition: all $transition-slow;
+
+    &--open {
+      background: var(--pref-accent-color);
+      border-color: var(--pref-accent-color);
+      color: var(--pref-bg-color);
+    }
+
+    &--close {
+      background: $orange;
+      border-color: $orange;
+      color: var(--pref-bg-color);
+    }
+
+    &--text {
+      opacity: 0.5;
+    }
+
+    &--active {
+      transform: scale(1.15);
+      box-shadow: $shadow-md;
+    }
+
+    &--processed { opacity: 0.3; }
+  }
+
+  &__counter {
+    min-width: 140px;
+    text-align: center;
+
+    h5 {
+      color: var(--text-muted);
+      @include responsive-text($text-xs);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 $spacing-xxs;
+    }
+  }
+
+  &__counter-bar {
+    background: var(--panel-mid);
+    border: 2px solid var(--pref-accent-color);
+    border-radius: $radius-sm;
+    padding: $spacing-md;
+
+    .counter-value {
+      color: var(--pref-text-color);
+      font-family: $mono-font;
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .counter-label {
+      color: var(--text-muted);
+      @include responsive-text($text-xs);
+      margin-top: $spacing-xxxs;
+    }
+  }
+
+  &__narration {
+    margin-top: $spacing-md;
+    padding: $spacing-sm;
+    background: var(--panel-mid);
+    border-radius: $radius-sm;
+    border-left: 3px solid var(--pref-accent-color);
+    color: var(--text-muted);
+    @include responsive-text($text-md);
+    line-height: 1.5;
+    min-height: 40px;
+
+    strong { color: var(--pref-accent-color); }
+    code {
+      background: var(--pref-bg-color);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: var(--pref-text-color);
+    }
+  }
+}
+
+// ===========================
+// 4. Knowledge Check Quiz
+// ===========================
+.frq-quiz {
+  @include frq-card;
+  border: 1px solid var(--ui-border);
+
+  &__header { @include frq-card-header; }
+  &__body   { padding: $spacing-xl; }
+
+  &__question {
+    @include info-panel($spacing-lg, 1px, $spacing-xl);
+    box-shadow: none;
+
+    .q-number {
+      color: var(--pref-accent-color);
+      font-weight: 700;
+      @include responsive-text($text-sm);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: $spacing-xxs;
+    }
+
+    .q-text {
+      color: var(--pref-text-color);
+      @include responsive-text($text-md);
+      line-height: 1.5;
+      margin-bottom: $spacing-md;
+    }
+  }
+
+  &__choices {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xxs;
+  }
+
+  &__choice  { @include frq-option-btn; }
+  &__explanation { @include frq-feedback; }
+
+  &__score {
+    text-align: center;
+    padding: $spacing-lg;
+    background: var(--panel-mid);
+    border-radius: $radius-md;
+    margin-top: $spacing-xs;
+
+    &--hidden { display: none; }
+
+    .score-label { color: var(--text-muted); @include responsive-text($text-md); margin-bottom: 5px; }
+    .score-value { color: var(--pref-text-color); font-size: 32px; font-weight: 700; }
+
+    .score-bar {
+      margin-top: $spacing-xs;
+      height: 8px;
+      background: var(--ui-border);
+      border-radius: $radius-xxs;
+      overflow: hidden;
+
+      .score-fill {
+        height: 100%;
+        background: var(--pref-accent-color);
+        border-radius: $radius-xxs;
+        transition: width 0.5s ease;
+      }
+    }
+  }
+}
+
+// ===========================
+// 5. Game Engine Canvas
+// ===========================
+.frq-game {
+  @include frq-card;
+
+  &__header { @include frq-card-header; }
+  &__body   { @include frq-card-body; }
+
+  &__canvas-wrap {
+    border: 2px solid var(--pref-accent-color);
+    border-radius: $radius-sm;
+    overflow: hidden;
+    margin-bottom: $spacing-md;
+    background: var(--pref-bg-color);
+
+    canvas {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  &__status {
+    @include inline-container(flex, $spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .status-item {
+      background: var(--panel-mid);
+      padding: $spacing-xxs $spacing-sm;
+      border-radius: $radius-xs;
+      border: 1px solid var(--ui-border);
+      color: var(--pref-text-color);
+      @include responsive-text($text-sm);
+      font-family: $mono-font;
+
+      .status-label { color: var(--text-muted); }
+      .status-value { font-weight: 700; color: var(--pref-accent-color); }
+    }
+  }
+}
+
+// ===========================
+// 6. Info / Concept Cards
+// ===========================
+.frq-info {
+  @include frq-card;
+  border: 1px solid var(--ui-border);
+
+  &__header { @include frq-card-header; }
+  &__body   { @include frq-card-body; }
+
+  &__step {
+    margin-bottom: $spacing-md;
+    padding: $spacing-sm;
+    background: var(--panel-mid);
+    border-radius: $radius-xs;
+    animation: frqSlideDown $transition-slow ease;
+
+    .step-label {
+      color: var(--pref-accent-color);
+      font-weight: 700;
+      @include responsive-text($text-md);
+      margin-bottom: $spacing-xxxs;
+    }
+
+    .step-detail {
+      color: var(--text-muted);
+      @include responsive-text($text-sm);
+      line-height: 1.6;
+
+      code {
+        background: var(--pref-bg-color);
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: var(--pref-text-color);
+      }
+    }
+  }
+
+  &__key-point {
+    @include info-panel($spacing-md, 0, 0);
+    border: none;
+    border-left: 4px solid $teal;
+    margin-top: $spacing-md;
+    box-shadow: none;
+
+    .key-title {
+      color: $teal;
+      font-weight: 700;
+      @include responsive-text($text-md);
+      margin-bottom: $spacing-xs;
+    }
+
+    .key-detail {
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+  }
+}

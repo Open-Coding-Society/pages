@@ -1,0 +1,1095 @@
+<style>
+  main.page-content > .wrapper {
+    width: min(88vw, 1400px) !important;
+    max-width: min(88vw, 1400px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .psc-root {
+    --ink: #e8f0fe;
+    --deep: #060b1a;
+    --card: rgba(8, 14, 38, 0.92);
+    --accent: #4f8ef7;
+    --accent2: #7c5cfc;
+    --mint: #34d399;
+    --gold: #fbbf24;
+    --danger: #f87171;
+    --border: rgba(79, 142, 247, 0.22);
+    --code-bg: #0d1a2e;
+    --code-text: #a5d8ff;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at top left, rgba(79,142,247,0.18) 0%, transparent 30%),
+      radial-gradient(circle at bottom right, rgba(124,92,252,0.18) 0%, transparent 30%),
+      linear-gradient(160deg, #020714 0%, #080e22 50%, #0d1230 100%);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .psc-root * { box-sizing: border-box; }
+
+  /* ── Typography ── */
+  .psc-hero-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    background: linear-gradient(120deg, #a5d8ff, #4f8ef7 40%, #7c5cfc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.15;
+  }
+  .psc-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #c7dcff;
+    border-left: 4px solid var(--accent);
+    padding-left: 0.75rem;
+    margin-bottom: 1.25rem;
+    margin-top: 0;
+  }
+  .psc-body { color: #b8cef5; line-height: 1.75; margin: 0 0 1rem; }
+
+  /* ── Cards ── */
+  .psc-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem 1.75rem;
+    backdrop-filter: blur(8px);
+  }
+  .psc-badge {
+    display: inline-block;
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .badge-blue  { background: rgba(79,142,247,0.22); color: #90c4ff; border: 1px solid rgba(79,142,247,0.4); }
+  .badge-purple{ background: rgba(124,92,252,0.22); color: #c4b5fd; border: 1px solid rgba(124,92,252,0.4); }
+  .badge-mint  { background: rgba(52,211,153,0.18); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.4); }
+  .badge-gold  { background: rgba(251,191,36,0.18); color: #fde68a; border: 1px solid rgba(251,191,36,0.4); }
+
+  /* ── Code blocks ── */
+  .psc-code {
+    background: var(--code-bg);
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    font-size: 0.88rem;
+    color: var(--code-text);
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .psc-kw  { color: #79b8ff; font-weight: 600; }
+  .psc-op  { color: #f97583; }
+  .psc-num { color: #79e6aa; }
+  .psc-str { color: #ffab70; }
+  .psc-cmt { color: #6a8098; font-style: italic; }
+  .psc-var { color: #e1c4ff; }
+
+  /* ── Glossary grid ── */
+  .psc-glossary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .psc-term-card {
+    background: rgba(12,20,48,0.88);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .psc-term-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .psc-term-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #a5d8ff;
+    margin-bottom: 0.4rem;
+  }
+  .psc-term-def { font-size: 0.85rem; color: #8aacd4; line-height: 1.6; }
+  .psc-term-ex  { font-family: 'Fira Code', monospace; font-size: 0.78rem; color: #79e6aa;
+                  background: rgba(0,0,0,0.35); border-radius: 6px; padding: 0.25rem 0.5rem;
+                  display: inline-block; margin-top: 0.4rem; }
+
+  /* ── Steps ── */
+  .psc-steps { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1rem; }
+  .psc-step {
+    display: flex;
+    gap: 1.1rem;
+    align-items: flex-start;
+    background: rgba(12,20,48,0.75);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+  }
+  .psc-step-num {
+    flex-shrink: 0;
+    width: 2.2rem; height: 2.2rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.95rem; color: #fff;
+    box-shadow: 0 4px 12px rgba(79,142,247,0.35);
+  }
+  .psc-step-body { flex: 1; }
+  .psc-step-title { font-weight: 700; color: #c7dcff; margin-bottom: 0.35rem; font-size: 0.97rem; }
+  .psc-step-text  { font-size: 0.87rem; color: #8aacd4; line-height: 1.65; }
+
+  /* ── Concept rows ── */
+  .psc-concept {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 700px) { .psc-concept { grid-template-columns: 1fr; } }
+  .psc-concept-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #4f8ef7;
+    margin-bottom: 0.4rem;
+  }
+
+  /* ── Presenter bullet panel ── */
+  .psc-presenter {
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.28);
+    border-radius: 14px;
+    padding: 1.4rem 1.75rem;
+    margin-bottom: 2rem;
+  }
+  .psc-presenter summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: #fde68a;
+    font-size: 1rem;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .psc-presenter summary::before { content: '▶'; font-size: 0.75rem; transition: transform 0.2s; }
+  .psc-presenter[open] summary::before { transform: rotate(90deg); }
+  .psc-presenter ul { margin: 1rem 0 0; padding-left: 1.4rem; }
+  .psc-presenter li { color: #fde68a; font-size: 0.9rem; line-height: 1.9; }
+  .psc-presenter li::marker { color: #f59e0b; }
+
+  /* ── Divider ── */
+  .psc-divider {
+    border: none;
+    border-top: 1px solid rgba(79,142,247,0.18);
+    margin: 2.5rem 0;
+  }
+
+  /* ═══════════════════════════════════════════
+     DRAG & DROP GAME
+  ═══════════════════════════════════════════ */
+  .psc-game-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .psc-game-title {
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+    font-weight: 800;
+    background: linear-gradient(120deg, #34d399, #4f8ef7 55%, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .psc-score-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .psc-score-pill {
+    background: rgba(12,20,48,0.9);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.35rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #90c4ff;
+  }
+  .psc-score-pill span { color: #fff; font-weight: 800; }
+
+  /* challenge card */
+  .psc-challenge {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.6rem 1.75rem;
+    margin-bottom: 1.75rem;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+  .psc-challenge.solved   { border-color: var(--mint); }
+  .psc-challenge.mistaken { border-color: var(--danger); }
+
+  .psc-ch-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .psc-ch-num {
+    width: 2rem; height: 2rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #34d399, #059669);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem; color: #fff;
+    flex-shrink: 0;
+  }
+  .psc-ch-title  { font-weight: 700; color: #c7dcff; font-size: 1rem; }
+  .psc-ch-status { margin-left: auto; font-size: 1.3rem; }
+
+  /* objectives */
+  .psc-objectives {
+    background: rgba(52,211,153,0.07);
+    border: 1px solid rgba(52,211,153,0.22);
+    border-radius: 10px;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.1rem;
+  }
+  .psc-objectives-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+                          text-transform: uppercase; color: #34d399; margin-bottom: 0.4rem; }
+  .psc-objectives ul { margin: 0; padding-left: 1.2rem; }
+  .psc-objectives li { font-size: 0.85rem; color: #6ee7b7; line-height: 1.7; }
+
+  /* code area with drop zone */
+  .psc-code-area {
+    background: var(--code-bg);
+    border: 1px solid rgba(79,142,247,0.22);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    font-size: 0.87rem;
+    line-height: 2;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+  .psc-code-line { white-space: nowrap; }
+  .psc-drop-zone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    height: 1.7rem;
+    border: 2px dashed rgba(79,142,247,0.55);
+    border-radius: 6px;
+    padding: 0 0.5rem;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: rgba(79,142,247,0.07);
+    font-size: 0.82rem;
+    color: #4f8ef7;
+    font-style: italic;
+    position: relative;
+  }
+  .psc-drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(79,142,247,0.2);
+  }
+  .psc-drop-zone.correct {
+    border-color: var(--mint);
+    background: rgba(52,211,153,0.15);
+    color: var(--mint);
+    font-style: normal;
+    font-weight: 700;
+    cursor: default;
+  }
+  .psc-drop-zone.wrong {
+    border-color: var(--danger);
+    background: rgba(248,113,113,0.15);
+    animation: shake 0.35s ease;
+  }
+  @keyframes shake {
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-5px); }
+    75%{ transform:translateX(5px); }
+  }
+
+  /* code bank */
+  .psc-bank-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+                    text-transform: uppercase; color: #7c5cfc; margin-bottom: 0.5rem; }
+  .psc-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .psc-token {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.85rem;
+    background: rgba(124,92,252,0.18);
+    border: 1px solid rgba(124,92,252,0.45);
+    border-radius: 8px;
+    font-family: 'Fira Code', Consolas, monospace;
+    font-size: 0.84rem;
+    color: #c4b5fd;
+    cursor: grab;
+    user-select: none;
+    transition: background 0.15s, transform 0.15s, opacity 0.15s;
+  }
+  .psc-token:hover  { background: rgba(124,92,252,0.32); transform: translateY(-1px); }
+  .psc-token:active { cursor: grabbing; transform: scale(0.96); }
+  .psc-token.used   { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+
+  /* feedback toast */
+  .psc-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    z-index: 9999;
+    pointer-events: none;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+  }
+  .psc-toast.show { opacity: 1; transform: translateY(0); }
+  .psc-toast.good { background: rgba(52,211,153,0.9); color: #052e16; }
+  .psc-toast.bad  { background: rgba(248,113,113,0.9); color: #3b0000; }
+
+  /* complete banner */
+  .psc-complete {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.35);
+    border-radius: 16px;
+    margin-top: 1rem;
+    display: none;
+  }
+  .psc-complete.show { display: block; }
+  .psc-complete-title {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(120deg, #34d399, #4f8ef7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* reset button */
+  .psc-reset-btn {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #4f8ef7, #7c5cfc);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .psc-reset-btn:hover { opacity: 0.85; }
+</style>
+
+<div class="psc-root">
+  <div style="max-width:1100px; margin:0 auto;">
+
+    <!-- ════════ HERO ════════ -->
+    <div style="text-align:center; margin-bottom:2.5rem; padding-top:1rem;">
+      <div class="psc-badge badge-blue" style="margin-bottom:0.9rem;">AP Computer Science Principles</div>
+      <h1 class="psc-hero-title">Read It. Understand It.<br>Solve It with Pseudocode.</h1>
+      <p class="psc-body" style="max-width:680px; margin:1rem auto 0; font-size:1rem;">
+        A complete guide to AP CSP's official pseudocode — from decoding symbols to writing logic.
+        Master the reference sheet, then prove it with an interactive fill-in-the-blank challenge.
+      </p>
+    </div>
+
+    <!-- ════════ PRESENTER BULLETS ════════ -->
+    <details class="psc-presenter">
+      <summary>Presentation Talking Points</summary>
+      <ul>
+        <li><strong>What is pseudocode?</strong> — It's a plain-English-like way to describe algorithms without worrying about syntax errors. AP CSP uses its own standardized version.</li>
+        <li><strong>Why does it matter on the exam?</strong> — Every MCQ algorithm question and the Create Task rubric uses this exact notation. Reading it fluently is a tested skill.</li>
+        <li><strong>Assignment (<code>←</code>) is not equality</strong> — It means "evaluate the right side and store the result in the variable on the left." A common trap question.</li>
+        <li><strong>The three pillars of all programs:</strong> Sequence (order matters), Selection (IF/ELSE decisions), Iteration (REPEAT loops).</li>
+        <li><strong>Lists start at index 1</strong> — Unlike Python or JavaScript. Out-of-bounds access terminates the program — watch for that in tricky MCQs.</li>
+        <li><strong>MOD is remainder, not division</strong> — 17 MOD 5 = 2. Classic use: check if a number is even with <code>n MOD 2 = 0</code>.</li>
+        <li><strong>REPEAT UNTIL stops <em>when</em> the condition becomes true</strong> — The opposite of a while-loop mental model. Easy to misread under pressure.</li>
+        <li><strong>Procedures can RETURN values</strong> — The return value can be stored in a variable. A procedure without RETURN is like a void function.</li>
+        <li><strong>How to read any pseudocode problem:</strong> (1) Find the variables, (2) Trace the loop, (3) Check the condition, (4) Track what gets returned or displayed.</li>
+        <li><strong>The drag-and-drop game at the end</strong> uses real exam-style problems. Each blank tests one concept — try to predict the answer before dragging.</li>
+      </ul>
+    </details>
+
+    <!-- ════════ SECTION 1: What is Pseudocode ════════ -->
+    <div class="psc-card" style="margin-bottom:2rem;">
+      <h2 class="psc-section-title">What Is Pseudocode?</h2>
+      <p class="psc-body">
+        <strong style="color:#a5d8ff;">Pseudocode</strong> is a human-readable description of an algorithm — it looks like code, but it's designed to communicate <em>logic</em>, not run on a machine.
+        AP CSP uses a <strong>standardized pseudocode</strong> that appears on your exam reference sheet. Every question involving algorithms, programs, and robots uses this exact notation, so learning to read it fluently is one of the highest-leverage skills you can build before exam day.
+      </p>
+      <p class="psc-body">
+        Think of it as a bridge: it's more precise than plain English, but less picky than real code. You'll never get a syntax error for a missing semicolon — but you <em>will</em> get a wrong answer if you misread a <code>←</code> as an <code>=</code>.
+      </p>
+    </div>
+
+    <!-- ════════ SECTION 2: Key Terms ════════ -->
+    <div class="psc-card" style="margin-bottom:2rem;">
+      <h2 class="psc-section-title">Key Terms Glossary</h2>
+      <p class="psc-body" style="margin-bottom:0.5rem;">Every term below appears directly in AP CSP exam problems. Hover over a card to highlight it.</p>
+      <div class="psc-glossary">
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Algorithm</div>
+          <div class="psc-term-def">A finite, step-by-step set of instructions that solves a problem or accomplishes a task. Every program is an algorithm.</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Variable</div>
+          <div class="psc-term-def">A named storage location that holds a value. The value can be read or overwritten at any point in the program.</div>
+          <div class="psc-term-ex">score ← 0</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Assignment ( ← )</div>
+          <div class="psc-term-def">Evaluates the expression on the right and stores a copy of the result into the variable on the left. It is NOT a test for equality.</div>
+          <div class="psc-term-ex">x ← x + 1</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Sequence</div>
+          <div class="psc-term-def">Instructions that execute one after another, in top-to-bottom order. The foundation of all programs.</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Selection</div>
+          <div class="psc-term-def">A decision point in the program. Uses IF or IF/ELSE to choose which block of code runs based on a Boolean condition.</div>
+          <div class="psc-term-ex">IF (x > 0) { ... }</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Iteration</div>
+          <div class="psc-term-def">Repeating a block of code. AP CSP has two forms: REPEAT n TIMES (fixed count) and REPEAT UNTIL (condition-based).</div>
+          <div class="psc-term-ex">REPEAT 5 TIMES { ... }</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Boolean</div>
+          <div class="psc-term-def">A value that is either <strong>true</strong> or <strong>false</strong>. All conditions in IF and REPEAT UNTIL evaluate to a Boolean.</div>
+          <div class="psc-term-ex">a > b  →  true or false</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">MOD (Remainder)</div>
+          <div class="psc-term-def">Returns the remainder after integer division. Same precedence as * and /. Commonly used to check even/odd or wrap around.</div>
+          <div class="psc-term-ex">17 MOD 5  →  2</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">List</div>
+          <div class="psc-term-def">An ordered collection of values accessed by index. AP CSP lists start at index 1 — not 0. Going out of bounds terminates the program.</div>
+          <div class="psc-term-ex">aList[1]  ← first item</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Procedure</div>
+          <div class="psc-term-def">A named, reusable block of code. It can accept parameters (inputs) and optionally RETURN a value. Reduces repetition through abstraction.</div>
+          <div class="psc-term-ex">PROCEDURE add(a, b) { ... }</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">Parameter</div>
+          <div class="psc-term-def">A variable inside a procedure definition that receives the value of an argument when the procedure is called.</div>
+          <div class="psc-term-ex">procName(param1, param2)</div>
+        </div>
+
+        <div class="psc-term-card">
+          <div class="psc-term-name">RETURN</div>
+          <div class="psc-term-def">Immediately exits the procedure and sends back a value to the caller. Execution of the procedure stops at RETURN.</div>
+          <div class="psc-term-ex">RETURN(result)</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════ SECTION 3: Step-by-Step Walkthrough ════════ -->
+    <div class="psc-card" style="margin-bottom:2rem;">
+      <h2 class="psc-section-title">Step-by-Step: How to Read Any Pseudocode Problem</h2>
+      <p class="psc-body">When you encounter pseudocode on the exam, follow these steps in order. Don't jump ahead — trace the code like the computer would.</p>
+      <div class="psc-steps">
+
+        <div class="psc-step">
+          <div class="psc-step-num">1</div>
+          <div class="psc-step-body">
+            <div class="psc-step-title">Identify all variables and their starting values</div>
+            <div class="psc-step-text">Find every <code>←</code> statement above the main logic. Write each variable name and its initial value on scratch paper. You can't trace a program you haven't initialized.</div>
+          </div>
+        </div>
+
+        <div class="psc-step">
+          <div class="psc-step-num">2</div>
+          <div class="psc-step-body">
+            <div class="psc-step-title">Read top to bottom — sequence matters</div>
+            <div class="psc-step-text">AP CSP pseudocode executes line by line, top to bottom, unless a loop or conditional changes the flow. Never assume two lines run at the same time.</div>
+          </div>
+        </div>
+
+        <div class="psc-step">
+          <div class="psc-step-num">3</div>
+          <div class="psc-step-body">
+            <div class="psc-step-title">Evaluate conditions as true or false — never skip them</div>
+            <div class="psc-step-text">When you hit an <code>IF</code> or <code>REPEAT UNTIL</code>, substitute real values into the condition and decide: true or false? Only then decide which branch executes or whether the loop continues.</div>
+          </div>
+        </div>
+
+        <div class="psc-step">
+          <div class="psc-step-num">4</div>
+          <div class="psc-step-body">
+            <div class="psc-step-title">Trace loops iteration by iteration</div>
+            <div class="psc-step-text">For every loop iteration, update all variables and re-check the condition. Keep a table: one column per variable, one row per iteration. This prevents the most common tracing mistakes.</div>
+          </div>
+        </div>
+
+        <div class="psc-step">
+          <div class="psc-step-num">5</div>
+          <div class="psc-step-body">
+            <div class="psc-step-title">Track what gets DISPLAYED or RETURNED</div>
+            <div class="psc-step-text">The exam question usually asks what the program outputs or returns. Circle every <code>DISPLAY</code> and <code>RETURN</code> as you trace so you don't miss any output.</div>
+          </div>
+        </div>
+
+        <div class="psc-step">
+          <div class="psc-step-num">6</div>
+          <div class="psc-step-body">
+            <div class="psc-step-title">Watch the index when using lists</div>
+            <div class="psc-step-text">AP CSP lists start at <strong>index 1</strong>. If a loop runs from 1 to LENGTH(aList), that's correct. If it tries to access index 0 or index LENGTH+1, the program <em>terminates with an error</em>.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════ SECTION 4: Each Concept Explained ════════ -->
+    <div class="psc-card" style="margin-bottom:2rem;">
+      <h2 class="psc-section-title">Pseudocode Concepts in Detail</h2>
+
+      <!-- Assignment -->
+      <p class="psc-body" style="margin-top:0;"><span class="psc-badge badge-blue">Assignment &amp; Display</span></p>
+      <div class="psc-concept">
+        <div>
+          <div class="psc-concept-label">What it looks like</div>
+          <div class="psc-code"><span class="psc-var">score</span> <span class="psc-op">←</span> <span class="psc-num">0</span>
+<span class="psc-var">score</span> <span class="psc-op">←</span> <span class="psc-var">score</span> <span class="psc-op">+</span> <span class="psc-num">10</span>
+<span class="psc-kw">DISPLAY</span>(<span class="psc-var">score</span>)</div>
+        </div>
+        <div>
+          <div class="psc-concept-label">What happens</div>
+          <div class="psc-step-text" style="font-size:0.88rem; color:#8aacd4; line-height:1.75;">
+            Line 1: <code>score</code> is created and set to <code>0</code>.<br>
+            Line 2: The right side (<code>score + 10</code> = <code>10</code>) is computed first, then stored back into <code>score</code>. Variable is now <code>10</code>.<br>
+            Line 3: Outputs <code>10</code> followed by a space.
+          </div>
+        </div>
+      </div>
+
+      <hr class="psc-divider" style="margin:1.5rem 0;">
+
+      <!-- Selection -->
+      <p class="psc-body"><span class="psc-badge badge-purple">Selection — IF / ELSE</span></p>
+      <div class="psc-concept">
+        <div>
+          <div class="psc-concept-label">What it looks like</div>
+          <div class="psc-code"><span class="psc-kw">IF</span> (<span class="psc-var">grade</span> <span class="psc-op">≥</span> <span class="psc-num">90</span>)
+{
+  <span class="psc-kw">DISPLAY</span>(<span class="psc-str">"A"</span>)
+}
+<span class="psc-kw">ELSE</span>
+{
+  <span class="psc-kw">DISPLAY</span>(<span class="psc-str">"Not an A"</span>)
+}</div>
+        </div>
+        <div>
+          <div class="psc-concept-label">What happens</div>
+          <div class="psc-step-text" style="font-size:0.88rem; color:#8aacd4; line-height:1.75;">
+            The condition <code>grade ≥ 90</code> is tested. If <strong>true</strong>, only the first block runs. If <strong>false</strong>, only the ELSE block runs. Exactly one branch always executes. <br><br>
+            <strong style="color:#c4b5fd;">Exam trap:</strong> An IF without ELSE does nothing when the condition is false — it doesn't crash.
+          </div>
+        </div>
+      </div>
+
+      <hr class="psc-divider" style="margin:1.5rem 0;">
+
+      <!-- Iteration -->
+      <p class="psc-body"><span class="psc-badge badge-mint">Iteration — REPEAT</span></p>
+      <div class="psc-concept">
+        <div>
+          <div class="psc-concept-label">Two forms</div>
+          <div class="psc-code"><span class="psc-cmt">-- Runs exactly 3 times --</span>
+<span class="psc-kw">REPEAT</span> <span class="psc-num">3</span> <span class="psc-kw">TIMES</span>
+{
+  <span class="psc-kw">DISPLAY</span>(<span class="psc-str">"hello"</span>)
+}
+
+<span class="psc-cmt">-- Runs UNTIL count hits 0 --</span>
+<span class="psc-var">count</span> <span class="psc-op">←</span> <span class="psc-num">3</span>
+<span class="psc-kw">REPEAT UNTIL</span> (<span class="psc-var">count</span> <span class="psc-op">=</span> <span class="psc-num">0</span>)
+{
+  <span class="psc-kw">DISPLAY</span>(<span class="psc-var">count</span>)
+  <span class="psc-var">count</span> <span class="psc-op">←</span> <span class="psc-var">count</span> <span class="psc-op">-</span> <span class="psc-num">1</span>
+}</div>
+        </div>
+        <div>
+          <div class="psc-concept-label">Key distinction</div>
+          <div class="psc-step-text" style="font-size:0.88rem; color:#8aacd4; line-height:1.75;">
+            <strong style="color:#6ee7b7;">REPEAT n TIMES</strong> — runs the block exactly n times. No condition to evaluate.<br><br>
+            <strong style="color:#6ee7b7;">REPEAT UNTIL(condition)</strong> — checks the condition <em>before</em> each iteration. Stops when the condition becomes <strong>true</strong>.<br><br>
+            <strong style="color:#f87171;">Common mistake:</strong> Students confuse this with "repeat WHILE false." Remember: it stops <em>when</em> the condition is true, not while it's false.
+          </div>
+        </div>
+      </div>
+
+      <hr class="psc-divider" style="margin:1.5rem 0;">
+
+      <!-- Lists -->
+      <p class="psc-body"><span class="psc-badge badge-gold">Lists &amp; FOR EACH</span></p>
+      <div class="psc-concept">
+        <div>
+          <div class="psc-concept-label">What it looks like</div>
+          <div class="psc-code"><span class="psc-var">nums</span> <span class="psc-op">←</span> [<span class="psc-num">10</span>, <span class="psc-num">20</span>, <span class="psc-num">30</span>]
+<span class="psc-var">total</span> <span class="psc-op">←</span> <span class="psc-num">0</span>
+
+<span class="psc-kw">FOR EACH</span> <span class="psc-var">item</span> <span class="psc-kw">IN</span> <span class="psc-var">nums</span>
+{
+  <span class="psc-var">total</span> <span class="psc-op">←</span> <span class="psc-var">total</span> <span class="psc-op">+</span> <span class="psc-var">item</span>
+}
+<span class="psc-kw">DISPLAY</span>(<span class="psc-var">total</span>)
+<span class="psc-cmt">-- Displays 60 --</span></div>
+        </div>
+        <div>
+          <div class="psc-concept-label">List rules to memorize</div>
+          <div class="psc-step-text" style="font-size:0.88rem; color:#8aacd4; line-height:1.75;">
+            • Lists start at <strong style="color:#fde68a;">index 1</strong>, not 0.<br>
+            • <code>aList[1]</code> is the first element.<br>
+            • <code>LENGTH(aList)</code> returns the count.<br>
+            • <code>APPEND(aList, val)</code> adds to the end.<br>
+            • <code>INSERT(aList, i, val)</code> shifts items right.<br>
+            • <code>REMOVE(aList, i)</code> shifts items left.<br><br>
+            <strong style="color:#fde68a;">FOR EACH</strong> visits every element in order — you don't need to manage an index variable.
+          </div>
+        </div>
+      </div>
+
+      <hr class="psc-divider" style="margin:1.5rem 0;">
+
+      <!-- Procedures -->
+      <p class="psc-badge badge-blue">Procedures</p>
+      <div class="psc-concept" style="margin-top:0.75rem;">
+        <div>
+          <div class="psc-concept-label">What it looks like</div>
+          <div class="psc-code"><span class="psc-kw">PROCEDURE</span> <span class="psc-var">isEven</span>(<span class="psc-var">n</span>)
+{
+  <span class="psc-kw">IF</span> (<span class="psc-var">n</span> <span class="psc-kw">MOD</span> <span class="psc-num">2</span> <span class="psc-op">=</span> <span class="psc-num">0</span>)
+  {
+    <span class="psc-kw">RETURN</span>(<span class="psc-kw">true</span>)
+  }
+  <span class="psc-kw">ELSE</span>
+  {
+    <span class="psc-kw">RETURN</span>(<span class="psc-kw">false</span>)
+  }
+}
+
+<span class="psc-var">result</span> <span class="psc-op">←</span> <span class="psc-var">isEven</span>(<span class="psc-num">4</span>)
+<span class="psc-cmt">-- result is true --</span></div>
+        </div>
+        <div>
+          <div class="psc-concept-label">How it works</div>
+          <div class="psc-step-text" style="font-size:0.88rem; color:#8aacd4; line-height:1.75;">
+            1. <code>isEven(4)</code> is called — the value <code>4</code> is copied into parameter <code>n</code>.<br>
+            2. <code>4 MOD 2 = 0</code> → <strong>true</strong>.<br>
+            3. <code>RETURN(true)</code> immediately exits the procedure.<br>
+            4. The returned value <code>true</code> is stored in <code>result</code>.<br><br>
+            <strong style="color:#90c4ff;">No RETURN?</strong> The procedure runs its block and exits without sending back a value — like a void function.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ SECTION 5: GAME ════════ -->
+    <hr class="psc-divider">
+
+    <div class="psc-game-header">
+      <div class="psc-badge badge-mint" style="margin-bottom:0.75rem;">Interactive Challenge</div>
+      <div class="psc-game-title">Drag-and-Drop Code Bank</div>
+      <p class="psc-body" style="max-width:580px; margin:0.6rem auto 0; font-size:0.9rem;">
+        Each challenge below has a missing code block marked with a drop zone.
+        Drag the correct token from the code bank into the blank. Read the objectives first — they tell you exactly what the code should do.
+      </p>
+      <div class="psc-score-bar">
+        <div class="psc-score-pill">Solved: <span id="psc-solved">0</span> / 4</div>
+        <div class="psc-score-pill">Attempts: <span id="psc-attempts">0</span></div>
+      </div>
+    </div>
+
+    <!-- ── Challenge 1 ── -->
+    <div class="psc-challenge" id="ch1" data-answer="num">
+      <div class="psc-ch-header">
+        <div class="psc-ch-num">1</div>
+        <div class="psc-ch-title">Sum of a List</div>
+        <div class="psc-ch-status" id="ch1-status"></div>
+      </div>
+      <div class="psc-objectives">
+        <div class="psc-objectives-label">Objectives</div>
+        <ul>
+          <li>Start with a running total of 0</li>
+          <li>Visit each number in <code>numList</code> one at a time</li>
+          <li>Add each number to the running total</li>
+          <li>Display the final sum after the loop ends</li>
+        </ul>
+      </div>
+      <div class="psc-code-area">
+<span style="color:#e1c4ff;">total</span> <span style="color:#f97583;">←</span> <span style="color:#79e6aa;">0</span>
+<span style="color:#79b8ff;">FOR EACH</span> <span style="color:#e1c4ff;">num</span> <span style="color:#79b8ff;">IN</span> <span style="color:#e1c4ff;">numList</span>
+{
+  <span style="color:#e1c4ff;">total</span> <span style="color:#f97583;">←</span> <span style="color:#e1c4ff;">total</span> <span style="color:#f97583;">+</span> <span class="psc-drop-zone" id="dz-ch1" data-challenge="ch1" ondragover="pscDragOver(event)" ondragleave="pscDragLeave(event)" ondrop="pscDrop(event)">drag here</span>
+}
+<span style="color:#79b8ff;">DISPLAY</span>(<span style="color:#e1c4ff;">total</span>)</div>
+      <div class="psc-bank-label">Code Bank</div>
+      <div class="psc-bank" id="bank-ch1">
+        <div class="psc-token" draggable="true" data-value="numList" data-challenge="ch1" ondragstart="pscDragStart(event)">numList</div>
+        <div class="psc-token" draggable="true" data-value="num"     data-challenge="ch1" ondragstart="pscDragStart(event)">num</div>
+        <div class="psc-token" draggable="true" data-value="total"   data-challenge="ch1" ondragstart="pscDragStart(event)">total</div>
+        <div class="psc-token" draggable="true" data-value="0"       data-challenge="ch1" ondragstart="pscDragStart(event)">0</div>
+      </div>
+    </div>
+
+    <!-- ── Challenge 2 ── -->
+    <div class="psc-challenge" id="ch2" data-answer="item">
+      <div class="psc-ch-header">
+        <div class="psc-ch-num">2</div>
+        <div class="psc-ch-title">Find the Maximum</div>
+        <div class="psc-ch-status" id="ch2-status"></div>
+      </div>
+      <div class="psc-objectives">
+        <div class="psc-objectives-label">Objectives</div>
+        <ul>
+          <li>Assume the first element is the largest to start</li>
+          <li>Visit every element in <code>aList</code> using FOR EACH</li>
+          <li>If the current element is greater than the current max, update max</li>
+          <li>Return the maximum value found</li>
+        </ul>
+      </div>
+      <div class="psc-code-area">
+<span style="color:#79b8ff;">PROCEDURE</span> <span style="color:#e1c4ff;">findMax</span>(<span style="color:#e1c4ff;">aList</span>)
+{
+  <span style="color:#e1c4ff;">max</span> <span style="color:#f97583;">←</span> <span style="color:#e1c4ff;">aList</span>[<span style="color:#79e6aa;">1</span>]
+  <span style="color:#79b8ff;">FOR EACH</span> <span style="color:#e1c4ff;">item</span> <span style="color:#79b8ff;">IN</span> <span style="color:#e1c4ff;">aList</span>
+  {
+    <span style="color:#79b8ff;">IF</span> (<span class="psc-drop-zone" id="dz-ch2" data-challenge="ch2" ondragover="pscDragOver(event)" ondragleave="pscDragLeave(event)" ondrop="pscDrop(event)">drag here</span> <span style="color:#f97583;">&gt;</span> <span style="color:#e1c4ff;">max</span>)
+    {
+      <span style="color:#e1c4ff;">max</span> <span style="color:#f97583;">←</span> <span style="color:#e1c4ff;">item</span>
+    }
+  }
+  <span style="color:#79b8ff;">RETURN</span>(<span style="color:#e1c4ff;">max</span>)
+}</div>
+      <div class="psc-bank-label">Code Bank</div>
+      <div class="psc-bank" id="bank-ch2">
+        <div class="psc-token" draggable="true" data-value="max"    data-challenge="ch2" ondragstart="pscDragStart(event)">max</div>
+        <div class="psc-token" draggable="true" data-value="aList"  data-challenge="ch2" ondragstart="pscDragStart(event)">aList</div>
+        <div class="psc-token" draggable="true" data-value="item"   data-challenge="ch2" ondragstart="pscDragStart(event)">item</div>
+        <div class="psc-token" draggable="true" data-value="LENGTH" data-challenge="ch2" ondragstart="pscDragStart(event)">LENGTH</div>
+      </div>
+    </div>
+
+    <!-- ── Challenge 3 ── -->
+    <div class="psc-challenge" id="ch3" data-answer="2">
+      <div class="psc-ch-header">
+        <div class="psc-ch-num">3</div>
+        <div class="psc-ch-title">Even Number Check</div>
+        <div class="psc-ch-status" id="ch3-status"></div>
+      </div>
+      <div class="psc-objectives">
+        <div class="psc-objectives-label">Objectives</div>
+        <ul>
+          <li>Accept a number <code>n</code> as a parameter</li>
+          <li>Use the MOD operator to test divisibility</li>
+          <li>A number is even when dividing by this value leaves remainder 0</li>
+          <li>Return true if even, false otherwise</li>
+        </ul>
+      </div>
+      <div class="psc-code-area">
+<span style="color:#79b8ff;">PROCEDURE</span> <span style="color:#e1c4ff;">isEven</span>(<span style="color:#e1c4ff;">n</span>)
+{
+  <span style="color:#79b8ff;">IF</span> (<span style="color:#e1c4ff;">n</span> <span style="color:#79b8ff;">MOD</span> <span class="psc-drop-zone" id="dz-ch3" data-challenge="ch3" ondragover="pscDragOver(event)" ondragleave="pscDragLeave(event)" ondrop="pscDrop(event)">drag here</span> <span style="color:#f97583;">=</span> <span style="color:#79e6aa;">0</span>)
+  {
+    <span style="color:#79b8ff;">RETURN</span>(<span style="color:#79b8ff;">true</span>)
+  }
+  <span style="color:#79b8ff;">ELSE</span>
+  {
+    <span style="color:#79b8ff;">RETURN</span>(<span style="color:#79b8ff;">false</span>)
+  }
+}</div>
+      <div class="psc-bank-label">Code Bank</div>
+      <div class="psc-bank" id="bank-ch3">
+        <div class="psc-token" draggable="true" data-value="n" data-challenge="ch3" ondragstart="pscDragStart(event)">n</div>
+        <div class="psc-token" draggable="true" data-value="0" data-challenge="ch3" ondragstart="pscDragStart(event)">0</div>
+        <div class="psc-token" draggable="true" data-value="2" data-challenge="ch3" ondragstart="pscDragStart(event)">2</div>
+        <div class="psc-token" draggable="true" data-value="1" data-challenge="ch3" ondragstart="pscDragStart(event)">1</div>
+      </div>
+    </div>
+
+    <!-- ── Challenge 4 ── -->
+    <div class="psc-challenge" id="ch4" data-answer="count">
+      <div class="psc-ch-header">
+        <div class="psc-ch-num">4</div>
+        <div class="psc-ch-title">Countdown Loop</div>
+        <div class="psc-ch-status" id="ch4-status"></div>
+      </div>
+      <div class="psc-objectives">
+        <div class="psc-objectives-label">Objectives</div>
+        <ul>
+          <li>Start a counter at 5</li>
+          <li>Display the counter value each iteration</li>
+          <li>Decrease the counter by 1 each time</li>
+          <li>Stop the loop when this variable reaches 0</li>
+        </ul>
+      </div>
+      <div class="psc-code-area">
+<span style="color:#e1c4ff;">count</span> <span style="color:#f97583;">←</span> <span style="color:#79e6aa;">5</span>
+<span style="color:#79b8ff;">REPEAT UNTIL</span> (<span class="psc-drop-zone" id="dz-ch4" data-challenge="ch4" ondragover="pscDragOver(event)" ondragleave="pscDragLeave(event)" ondrop="pscDrop(event)">drag here</span> <span style="color:#f97583;">=</span> <span style="color:#79e6aa;">0</span>)
+{
+  <span style="color:#79b8ff;">DISPLAY</span>(<span style="color:#e1c4ff;">count</span>)
+  <span style="color:#e1c4ff;">count</span> <span style="color:#f97583;">←</span> <span style="color:#e1c4ff;">count</span> <span style="color:#f97583;">-</span> <span style="color:#79e6aa;">1</span>
+}</div>
+      <div class="psc-bank-label">Code Bank</div>
+      <div class="psc-bank" id="bank-ch4">
+        <div class="psc-token" draggable="true" data-value="5"     data-challenge="ch4" ondragstart="pscDragStart(event)">5</div>
+        <div class="psc-token" draggable="true" data-value="0"     data-challenge="ch4" ondragstart="pscDragStart(event)">0</div>
+        <div class="psc-token" draggable="true" data-value="count" data-challenge="ch4" ondragstart="pscDragStart(event)">count</div>
+        <div class="psc-token" draggable="true" data-value="1"     data-challenge="ch4" ondragstart="pscDragStart(event)">1</div>
+      </div>
+    </div>
+
+    <!-- Complete banner -->
+    <div class="psc-complete" id="psc-complete">
+      <div class="psc-complete-title">All Challenges Complete!</div>
+      <p style="color:#6ee7b7; margin-top:0.5rem;">You filled in all four blanks correctly. You can read AP CSP pseudocode.</p>
+      <button class="psc-reset-btn" onclick="pscReset()">Play Again</button>
+    </div>
+
+  </div><!-- /max-width -->
+</div><!-- /psc-root -->
+
+<!-- toast -->
+<div class="psc-toast" id="psc-toast"></div>
+
+<script>
+(function () {
+  let solvedCount  = 0;
+  let attemptCount = 0;
+  let draggingValue    = null;
+  let draggingChallenge = null;
+
+  /* ── drag events ── */
+  window.pscDragStart = function (e) {
+    draggingValue     = e.target.dataset.value;
+    draggingChallenge = e.target.dataset.challenge;
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
+  window.pscDragOver = function (e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  };
+
+  window.pscDragLeave = function (e) {
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  window.pscDrop = function (e) {
+    e.preventDefault();
+    const zone = e.currentTarget;
+    zone.classList.remove('drag-over');
+
+    // already solved
+    if (zone.classList.contains('correct')) return;
+    // wrong challenge bank (optional guard)
+    if (draggingChallenge !== zone.dataset.challenge) {
+      showToast('Drop tokens from this challenge\'s code bank!', 'bad');
+      return;
+    }
+
+    attemptCount++;
+    document.getElementById('psc-attempts').textContent = attemptCount;
+
+    const challengeEl = document.getElementById(zone.dataset.challenge);
+    const answer      = challengeEl.dataset.answer;
+
+    if (draggingValue === answer) {
+      // correct
+      zone.textContent = draggingValue;
+      zone.classList.add('correct');
+      challengeEl.classList.add('solved');
+      document.getElementById(zone.dataset.challenge + '-status').textContent = '✓';
+
+      // mark token used
+      const usedTokens = document.querySelectorAll(
+        '#bank-' + zone.dataset.challenge + ' [data-value="' + draggingValue + '"]'
+      );
+      usedTokens.forEach(t => t.classList.add('used'));
+
+      solvedCount++;
+      document.getElementById('psc-solved').textContent = solvedCount;
+      showToast('Correct!', 'good');
+
+      if (solvedCount === 4) {
+        document.getElementById('psc-complete').classList.add('show');
+      }
+    } else {
+      // wrong
+      zone.classList.add('wrong');
+      challengeEl.classList.add('mistaken');
+      showToast('Not quite — think about what the objective asks for.', 'bad');
+      setTimeout(() => {
+        zone.classList.remove('wrong');
+        challengeEl.classList.remove('mistaken');
+      }, 600);
+    }
+  };
+
+  /* ── toast ── */
+  function showToast (msg, type) {
+    const t = document.getElementById('psc-toast');
+    t.textContent = msg;
+    t.className   = 'psc-toast ' + type;
+    // force reflow
+    void t.offsetWidth;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  /* ── reset ── */
+  window.pscReset = function () {
+    solvedCount  = 0;
+    attemptCount = 0;
+    document.getElementById('psc-solved').textContent   = '0';
+    document.getElementById('psc-attempts').textContent = '0';
+    document.getElementById('psc-complete').classList.remove('show');
+
+    ['ch1','ch2','ch3','ch4'].forEach(id => {
+      const ch = document.getElementById(id);
+      ch.classList.remove('solved','mistaken');
+      document.getElementById(id + '-status').textContent = '';
+
+      const dz = document.getElementById('dz-' + id);
+      dz.textContent = 'drag here';
+      dz.classList.remove('correct','wrong');
+
+      document.querySelectorAll('#bank-' + id + ' .psc-token').forEach(t => {
+        t.classList.remove('used');
+      });
+    });
+  };
+
+  /* ── touch support (mobile) ── */
+  let touchToken = null;
+  let ghostEl    = null;
+
+  document.addEventListener('touchstart', function (e) {
+    const token = e.target.closest('.psc-token');
+    if (!token || token.classList.contains('used')) return;
+    touchToken = token;
+    draggingValue     = token.dataset.value;
+    draggingChallenge = token.dataset.challenge;
+
+    ghostEl = token.cloneNode(true);
+    ghostEl.style.cssText = 'position:fixed;opacity:0.85;pointer-events:none;z-index:9999;transform:scale(1.05);transition:none;';
+    document.body.appendChild(ghostEl);
+    moveGhost(e.touches[0]);
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function (e) {
+    if (!touchToken) return;
+    e.preventDefault();
+    moveGhost(e.touches[0]);
+
+    // highlight drop zones under finger
+    document.querySelectorAll('.psc-drop-zone').forEach(dz => dz.classList.remove('drag-over'));
+    const el = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+    if (el && el.classList.contains('psc-drop-zone')) el.classList.add('drag-over');
+  }, { passive: false });
+
+  document.addEventListener('touchend', function (e) {
+    if (!touchToken) return;
+    if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+
+    document.querySelectorAll('.psc-drop-zone').forEach(dz => dz.classList.remove('drag-over'));
+
+    const touch = e.changedTouches[0];
+    const el    = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (el && el.classList.contains('psc-drop-zone')) {
+      // simulate drop
+      el.dispatchEvent(new CustomEvent('psc-touch-drop', { bubbles: false }));
+      handleDrop(el);
+    }
+    touchToken = null;
+    draggingValue = null;
+    draggingChallenge = null;
+  });
+
+  function moveGhost (touch) {
+    if (!ghostEl) return;
+    ghostEl.style.left = (touch.clientX - 40) + 'px';
+    ghostEl.style.top  = (touch.clientY - 16) + 'px';
+  }
+
+  function handleDrop (zone) {
+    if (zone.classList.contains('correct')) return;
+    if (draggingChallenge !== zone.dataset.challenge) {
+      showToast('Drop tokens from this challenge\'s code bank!', 'bad');
+      return;
+    }
+    attemptCount++;
+    document.getElementById('psc-attempts').textContent = attemptCount;
+
+    const challengeEl = document.getElementById(zone.dataset.challenge);
+    const answer      = challengeEl.dataset.answer;
+
+    if (draggingValue === answer) {
+      zone.textContent = draggingValue;
+      zone.classList.add('correct');
+      challengeEl.classList.add('solved');
+      document.getElementById(zone.dataset.challenge + '-status').textContent = '✓';
+      document.querySelectorAll('#bank-' + zone.dataset.challenge + ' [data-value="' + draggingValue + '"]')
+        .forEach(t => t.classList.add('used'));
+      solvedCount++;
+      document.getElementById('psc-solved').textContent = solvedCount;
+      showToast('Correct!', 'good');
+      if (solvedCount === 4) document.getElementById('psc-complete').classList.add('show');
+    } else {
+      zone.classList.add('wrong');
+      challengeEl.classList.add('mistaken');
+      showToast('Not quite — think about what the objective asks for.', 'bad');
+      setTimeout(() => {
+        zone.classList.remove('wrong');
+        challengeEl.classList.remove('mistaken');
+      }, 600);
+    }
+  }
+})();
+</script>

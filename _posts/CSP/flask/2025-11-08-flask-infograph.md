@@ -11,6 +11,7 @@ categories: [Python Flask]
 permalink: /python/flask
 sticky_rank: 2
 show_reading_time: False
+canonical_id: python-flask
 ---
 
 <!-- Infographic - this depends on page.infoGraph frontmatter being set -->

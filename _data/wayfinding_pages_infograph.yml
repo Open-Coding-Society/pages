@@ -1,0 +1,38 @@
+# Wayfinding Pages Capstone Infographic
+Title: "Wayfinding Pages Capstone"
+Description: "A platform made to find your personality and connect you with others who share differing traits to form unique CS groups."
+
+Topics:
+  - title: "Wayfinding Pages"
+    image: "capstone/wayfinding_logo.png"
+    link: "/capstone/wayfinding/"
+    alt: "Wayfinding Pages - Sorting Groups Based on your Persona"
+    keyPoints:
+      - "GitHub-integrated social analytics tracking"
+      - "Persona-based team formation algorithm"
+      - "Spring Boot backend with REST API"
+      - "Interactive collaboration dashboard"
+      - "Dynamic persona evolution over sprints"
+      - "Real-time team health signals and metrics"
+    subtitle: "Making Collaboration Visible in CS Education"
+    description: "A system that transforms social collaboration from subjective evaluation into measurable, visible signals. Tracks student interactions across GitHub Issues, PRs, and comments to surface active navigators and reliable collaborators. Uses persona-based matching (organizer, debugger, communicator, builder) to form balanced teams that encourage diverse working styles. Students can evolve their personas over time, creating a visible record of how collaboration styles adapt and improve throughout the semester."
+    tech:
+      - "Spring Boot Backend"
+      - "RESTful API Design"
+      - "GitHub API Integration"
+      - "React/JavaScript Frontend"
+      - "PostgreSQL Database"
+      - "Team Formation Algorithms"
+    impact:
+      - "Makes collaboration measurable, not subjective"
+      - "Encourages intentional teamwork patterns"
+      - "Surfaces social learning as a core CS skill"
+      - "Reduces teacher guesswork in team dynamics"
+      - "Helps students self-diagnose team health"
+    status: "In Development"
+    team:
+      - "Ruta"
+      - "Vibha"
+      - "Risha"
+
+  

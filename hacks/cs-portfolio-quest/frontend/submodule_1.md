@@ -6,7 +6,6 @@ permalink: /cs-portfolio-quest/frontend/submodule_1/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 1
-categories: [CSP, Submodule, Frontend]
 tags: [frontend, purpose, fundamentals]
 author: "Creators Team"
 date: 2025-10-21

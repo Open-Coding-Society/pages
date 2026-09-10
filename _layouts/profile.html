@@ -8,7 +8,6 @@ active_tab: profile
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/css/aesthetihawk/shake.css">
 </head>
 
-
 <form id="profileSettingsForm">
     <!-- Personal Information Section -->
     <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
@@ -59,11 +58,8 @@ active_tab: profile
 
             <!-- Password Change -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-300 mb-1">New
-                    Password</label>
-                <input type="password" id="password" name="password"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Enter new password" onchange="checkForChanges()" autocomplete="new-password">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <a href="{{ site.baseurl }}/support?topic=reset" class="text-sm text-indigo-400 hover:text-indigo-300 inline-block">Forgot your password?</a>
             </div>
         </div>
     </div>
@@ -96,7 +92,7 @@ active_tab: profile
                     ID (7 digits)</label>
                 <input type="text" id="sidChangeInput" name="studentId"
                     class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value="" maxlength="7" pattern="\d{7}" onchange="checkForChanges()" autocomplete="off">
+                    value="" onchange="checkForChanges()" autocomplete="off">
             </div>
         </div>
     </div>
@@ -106,43 +102,194 @@ active_tab: profile
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Classes</h2>
             <button type="button" id="addClassBtn"
-                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none"
-                onclick="addClass()">
+                class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 focus:outline-none">
                 Add Class
             </button>
         </div>
 
         <div id="classesContainer">
-            <!-- Classes will be added here dynamically -->
-            <div class="class-entry mb-4 p-4 border rounded-lg border-neutral-700 border">
-                <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                    <div class="flex-grow mb-2 md:mb-0">
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Class
-                            Name</label>
-                        <input type="text"
-                            class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            value="Computer Science" onchange="checkForChanges()">
+            <!-- Classes will be loaded here dynamically -->
+            <p class="text-gray-400 text-center py-4">Loading classes...</p>
+        </div>
+    </div>
+
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Select Your Persona</h2>
+
+        <div id="personaSelectionContainer">
+            <p class="text-gray-400 text-center py-4">Loading personas...</p>
+        </div>
+    </div>
+
+
+    <div class="bg-neutral-800 rounded-lg shadow-md p-6 mb-6 border-neutral-700 border">
+        <h2 class="text-xl font-semibold mb-6">Facial Registration</h2>
+        <div id="facialRegistrationContainer" class="space-y-4">
+            <p class="text-gray-400 text-sm">Register your face to use the Bathroom Pass system. Your data will be
+                stored securely and used only for identification.</p>
+
+            <div id="webcamOverlay"
+                class="hidden fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4">
+                <div
+                    class="relative w-full max-w-md bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-700 shadow-2xl">
+                    <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+                        <h3 class="font-semibold text-gray-200">Face Scanner</h3>
+                        <button type="button" onclick="closeScanner()" class="text-gray-500 hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
-                    <div class="w-full md:w-1/3">
-                        <label class="block text-sm font-medium text-gray-300 mb-1">Year</label>
-                        <select
-                            class="class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            onchange="checkForChanges()">
-                            <option>2025</option>
-                            <option>2026</option>
-                            <option>2027</option>
-                            <option>2028</option>
-                        </select>
+                    <div class="relative aspect-video bg-black flex items-center justify-center">
+                        <video id="webcamControl" class="w-full h-full object-cover" autoplay playsinline></video>
+                        <canvas id="captureCanvas" class="hidden"></canvas>
+                        <!-- Scanner Effect -->
+                        <div class="absolute inset-0 border-2 border-indigo-500/30 pointer-events-none">
+                            <div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-indigo-500"></div>
+                            <div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-indigo-500"></div>
+                            <div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-indigo-500"></div>
+                            <div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col items-center gap-4">
+                        <button type="button" id="captureFaceBtn" onclick="captureAndSaveFace()"
+                            class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Capture Face
+                        </button>
+                        <p id="scannerStatus" class="text-sm text-gray-400"></p>
                     </div>
                 </div>
-                <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium"
-                    onclick="removeClass(this)">
-                    Remove
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="openScanner()"
+                    class="px-6 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 rounded-lg transition-all flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Start Face Registration
                 </button>
+                <div id="registrationIndicator" class="flex items-center gap-2 text-sm text-gray-500">
+                    <div id="regStatusDot" class="w-2 h-2 rounded-full bg-gray-600"></div>
+                    <span id="regStatusText">Checking registration...</span>
+                </div>
             </div>
         </div>
     </div>
 </form>
+
+<script type="module">
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+    /**
+     * API Request Chaining Implementation
+     * ==================================
+     * This script demonstrates chaining API requests where:
+     * 1. First fetch user identity from Java backend (required for all subsequent calls)
+     * 2. Then chain to fetch user's groups using the personId from step 1
+     * 
+     * Benefits:
+     * - Proper dependency management (can't fetch groups without personId)
+     * - Single cached personId reused for join/leave operations
+     * - Clear error propagation through the chain
+     */
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Module-level cache for current user data - fetched once, reused throughout
+        let currentPersonId = null;
+        let currentUid = null;
+        let userGroupIds = new Set(); // Track user's group IDs for O(1) lookup
+
+        /**
+         * CHAINED API PATTERN:
+         * Step 1: Fetch user identity -> Step 2: Use personId to fetch groups
+         * 
+         * This uses .then() chaining to demonstrate the pattern where
+         * each subsequent request depends on data from the previous one.
+         */
+        fetch(`${javaURI}/api/person/get`, fetchOptions)
+            .then(response => {
+                // Handle authentication errors
+                if (response.status === 401) {
+                    return null; // Stop the chain
+                }
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch user: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(personData => {
+                if (!personData) return null; // Chain was stopped
+
+                // Cache user identity for reuse in join/leave operations
+                currentPersonId = personData.id;
+                currentUid = personData.uid;
+
+                if (!currentPersonId || !currentUid) {
+                    return null;
+                }
+
+                // CHAIN: Now fetch groups using the personId we just obtained
+                // This request DEPENDS on having currentPersonId from the previous call
+                return fetch(`${javaURI}/api/groups/person/${currentPersonId}`, fetchOptions);
+            })
+
+            .then(groupResp => {
+                if (!groupResp) return null; // Chain was stopped
+
+                // Handle group fetch response
+                if (groupResp.ok) {
+                    return groupResp.json();
+                } else if (groupResp.status === 404) {
+                    // Fallback: endpoint not available, try fetching all groups
+                    console.warn('Person groups endpoint not available, using fallback');
+                    return fetch(`${javaURI}/api/groups`, fetchOptions)
+                        .then(fallbackResp => {
+                            if (!fallbackResp.ok) return [];
+                            return fallbackResp.json().then(allGroups => {
+                                // Filter client-side (less efficient fallback)
+                                return (Array.isArray(allGroups) ? allGroups : []).filter(group =>
+                                    Array.isArray(group.members) && group.members.some(m => m.uid === currentUid)
+                                );
+                            });
+                        });
+                }
+                throw new Error('Failed to fetch group data');
+            })
+            .then(userGroups => {
+                if (!userGroups) return; // Chain was stopped
+
+                const groups = Array.isArray(userGroups) ? userGroups : [];
+
+                // Build a Set of user's group IDs for O(1) lookup during search
+                groups.forEach(group => userGroupIds.add(group.id));
+
+                if (groups.length > 0) {
+                    // Group display logic removed
+                } else {
+                    // No groups message removed
+                }
+
+                // Set up search functionality (uses cached personId)
+                // setupGroupSearch function removed
+            })
+            .catch(error => {
+                console.error("Error in API chain:", error);
+                // Group error handling removed
+            });
+    });
+</script>
 
 <div class="flex justify-between items-center mb-8">
     <button id="saveChangesBtn" disabled
@@ -151,7 +298,6 @@ active_tab: profile
         Save Changes
     </button>
 </div>
-
 
 <!-- toasts -->
 <script type="module">
@@ -174,16 +320,569 @@ active_tab: profile
         });
     });
 </script>
-
 <script type="module">
-    import { javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
-    import { pythonURI } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { pythonURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+
+
+    async function loadPersonas() {
+        const container = document.getElementById('personaSelectionContainer');
+
+        try {
+            // Fetch all available personas
+            const personasResp = await fetch(`${pythonURI}/api/persona`, fetchOptions);
+            if (!personasResp.ok) throw new Error('Failed to load personas');
+            const personas = await personasResp.json();
+
+            console.log('📦 All personas loaded:', personas);
+
+            // Get user's personas
+            const userPersonasResp = await fetch(`${pythonURI}/api/user/personas`, fetchOptions);
+
+            let selectedPersonas = {};
+            let totalSelected = 0;
+
+            if (!userPersonasResp.ok) {
+                console.log('⚠️ No personas found for user or not authenticated');
+                showPersonaSelectionCards(personas, {});
+                return;
+            }
+
+            const userPersonasData = await userPersonasResp.json();
+            console.log('👤 User personas data:', userPersonasData);
+
+            selectedPersonas = userPersonasData.personas || {};
+            totalSelected = userPersonasData.total_selected || 0;
+
+            console.log('✅ Selected personas:', selectedPersonas);
+            console.log('📊 Total selected:', totalSelected);
+
+            // Store globally
+            window.allPersonasData = personas;
+            window.selectedPersonasData = selectedPersonas;
+
+            // If user has selected all 4 categories, show the completed view
+            if (totalSelected === 4) {
+                console.log('🎉 All 4 selected! Showing completed view');
+                showCompletedPersonas(selectedPersonas, personas);
+            } else {
+                console.log('📝 Showing selection interface (', totalSelected, '/4 selected)');
+                // Show selection interface - hide completed categories
+                showPersonaSelectionCards(personas, selectedPersonas);
+            }
+
+        } catch (error) {
+            console.error('❌ Error loading personas:', error);
+            container.innerHTML = `
+                <p class="text-red-400 text-center py-4">Error loading personas. Please try again later.</p>
+                <p class="text-gray-500 text-center text-sm">${error.message}</p>
+            `;
+        }
+    }
+    function editProfile() {
+        console.log('📝 Edit profile clicked - showing all categories');
+
+        if (window.allPersonasData && window.selectedPersonasData) {
+            showPersonaSelectionCards(window.allPersonasData, window.selectedPersonasData, true); // Pass true to force show all
+        } else {
+            loadPersonas();
+        }
+    }
+    function showPersonaSelectionCards(allPersonas, selectedPersonas, forceShowAll = false) {
+        const container = document.getElementById('personaSelectionContainer');
+
+        console.log('🎨 Rendering selection cards');
+        console.log('Total personas:', allPersonas.length);
+        console.log('Selected:', selectedPersonas);
+        console.log('Force show all:', forceShowAll);
+
+        if (allPersonas.length === 0) {
+            container.innerHTML = `
+                <p class="text-gray-400 text-center py-4">No personas available.</p>
+            `;
+            return;
+        }
+
+        // Group personas by category
+        const grouped = allPersonas.reduce((acc, persona) => {
+            const category = persona.category || 'other';
+            if (!acc[category]) acc[category] = [];
+            acc[category].push(persona);
+            return acc;
+        }, {});
+
+        console.log('📂 Grouped by category:', grouped);
+
+        const categoryLabels = {
+            'student': 'Student Archetype',
+            'social': 'Social Interest',
+            'achievement': 'Achievement Oriented',
+            'fantasy': 'Fantasy Persona'
+        };
+
+        const categoryDescriptions = {
+            'student': 'How you approach learning and teamwork',
+            'social': 'Your hobbies and social interests',
+            'achievement': 'What drives and motivates you',
+            'fantasy': 'Your aspirational superpower'
+        };
+
+        const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
+        const totalSelected = Object.keys(selectedPersonas).length;
+
+        container.innerHTML = `
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-semibold text-gray-100">Persona Profile</h2>
+                <div class="mt-4 flex justify-center gap-2">
+                    ${categoryOrder.map(cat => `
+                        <div class="w-3 h-3 rounded-full ${selectedPersonas[cat] ? 'bg-indigo-500' : 'bg-gray-700'}"></div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="space-y-8">
+                ${categoryOrder.map(category => {
+            const personas = grouped[category] || [];
+            const selectedInCategory = selectedPersonas[category];
+
+            // CHANGED: Only hide if NOT forcing show all AND category is selected
+            if (!forceShowAll && selectedInCategory) {
+                console.log(`✓ Category ${category} already selected, hiding it`);
+                return '';
+            }
+
+            // Show the selection grid
+            console.log(`🎯 Showing selection grid for ${category}`);
+
+            return `
+                        <div class="mb-8" id="category-${category}">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-300 flex items-center gap-2">
+                                        ${selectedInCategory ? '✓' : '○'} ${categoryLabels[category]}
+                                        ${selectedInCategory ? '<span class="text-sm text-green-400 ml-2">(Currently selected)</span>' : ''}
+                                    </h3>
+                                    <p class="text-sm text-gray-500">${categoryDescriptions[category]}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="category-grid-${category}">
+                                ${personas.map(persona => {
+                const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+                const description = persona.bio_map?.description || 'No description';
+                const isCurrentlySelected = selectedInCategory && selectedInCategory.persona_id === persona.id;
+
+                return `
+                                        <div 
+                                            id="persona-card-${persona.id}"
+                                            class="flex flex-col p-4 ${isCurrentlySelected ? 'bg-indigo-900 border-indigo-400' : 'bg-neutral-800 hover:bg-neutral-700'} border ${isCurrentlySelected ? 'border-indigo-400' : 'border-gray-700 hover:border-indigo-500'} rounded-lg cursor-pointer transition-all group h-full relative"
+                                            onclick="selectPersona(${persona.id}, '${category}')">
+                                            
+                                            <div class="loading-overlay hidden absolute inset-0 bg-black/70 rounded-lg flex items-center justify-center z-10">
+                                                <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            </div>
+                                            
+                                            ${isCurrentlySelected ? '<div class="absolute top-2 right-2 bg-indigo-500 text-white rounded-full p-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div>' : ''}
+                                            
+                                            <h4 class="font-semibold ${isCurrentlySelected ? 'text-indigo-200' : 'text-gray-200 group-hover:text-indigo-300'} mb-2">
+                                                ${title}
+                                            </h4>
+                                            <p class="text-sm text-gray-400 flex-1 line-clamp-3">${description}</p>
+                                            
+                                            <div class="mt-3 flex justify-end">
+                                                <svg class="w-6 h-6 text-gray-600 group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    `;
+            }).join('')}
+                            </div>
+                        </div>
+                    `;
+        }).join('')}
+            </div>
+        `;
+    }
+    function showCompletedPersonas(selectedPersonas, allPersonas) {
+        const container = document.getElementById('personaSelectionContainer');
+
+        const categoryLabels = {
+            'student': 'Student Archetype',
+            'social': 'Social Interest',
+            'achievement': 'Achievement Oriented',
+            'fantasy': 'Fantasy Persona'
+        };
+
+        const categoryEmojis = {
+            'student': '📚',
+            'social': '🎉',
+            'achievement': '🏆',
+            'fantasy': '✨'
+        };
+
+        const categoryOrder = ['student', 'social', 'achievement', 'fantasy'];
+
+        container.innerHTML = `
+            <div class="max-w-7xl mx-auto">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-100 mb-2">Your Persona Profile</h2>
+                        <p class="text-gray-400">These personas represent your personality and preferences</p>
+                    </div>
+                    <button 
+                        onclick="editProfile()"
+                        class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Change Personas
+                    </button>
+                </div>
+                <!-- Skill Snapshot Panel -->
+        <div id="skillSnapshotPanel" class="bg-neutral-800 border border-indigo-500/40 rounded-xl p-6 mb-6">
+            <div class="flex items-center justify-between mb-5">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-100">Log Your Skills for This Project</h3>
+                    <p class="text-sm text-gray-400 mt-0.5">This saves a snapshot to your Skill Passport</p>
+                </div>
+                <button 
+                    onclick="document.getElementById('skillSnapshotPanel').classList.toggle('hidden')"
+                    class="text-xs text-gray-500 hover:text-gray-300 transition">
+                    collapse
+                </button>
+            </div>
+        
+            <!-- Project Name -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Project Name</label>
+                <input 
+                    type="text" 
+                    id="snapshotProjectName"
+                    placeholder="e.g. Web App Sprint 1"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+            </div>
+            
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+    
+            <!-- Coding Ability -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Coding Ability</label>
+                    <span id="codingAbilityVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="codingAbility"
+                    oninput="document.getElementById('codingAbilityVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Beginner</span>
+                    <span>Expert</span>
+                </div>
+            </div>
+    
+            <!-- Collaboration -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Collaboration</label>
+                    <span id="collaborationVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="collaboration"
+                    oninput="document.getElementById('collaborationVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Solo</span>
+                    <span>Team player</span>
+                </div>
+            </div>
+    
+            <!-- Problem Solving -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Problem Solving</label>
+                    <span id="problemSolvingVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="problemSolving"
+                    oninput="document.getElementById('problemSolvingVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Developing</span>
+                    <span>Advanced</span>
+                </div>
+            </div>
+    
+            <!-- Initiative -->
+            <div>
+                <div class="flex justify-between mb-1">
+                    <label class="text-sm font-medium text-gray-300">Initiative</label>
+                    <span id="initiativeVal" class="text-sm text-indigo-400 font-semibold">3</span>
+                </div>
+                <input 
+                    type="range" min="1" max="6" value="3" 
+                    id="initiative"
+                    oninput="document.getElementById('initiativeVal').textContent = this.value"
+                    class="w-full accent-indigo-500"
+                />
+                <div class="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>Passive</span>
+                    <span>Self-starter</span>
+                </div>
+            </div>
+    
+        </div>
+    
+        <!-- Submit -->
+        <div class="flex items-center gap-4">
+            <button 
+                onclick="submitSkillSnapshot()"
+                class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
+                Save Snapshot
+            </button>
+            <span id="snapshotStatus" class="text-sm text-gray-400"></span>
+        </div>
+    </div>
+                <!-- 2x2 Grid of Selected Personas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${categoryOrder.map(category => {
+            const personaData = selectedPersonas[category];
+            if (!personaData) return '';
+
+            const persona = allPersonas.find(p => p.id === personaData.persona_id);
+            if (!persona) return '';
+
+            const title = persona.bio_map?.title || persona.alias || 'Unnamed';
+            const description = persona.bio_map?.description || 'No description';
+            const empathyMap = persona.empathy_map || {};
+
+            return `
+                        <div class="bg-neutral-800 border border-indigo-500/30 rounded-xl p-4 hover:border-indigo-500 transition">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-9 h-9 bg-indigo-600 rounded-full flex items-center justify-center text-base flex-shrink-0">
+                                    ${categoryEmojis[category]}
+                                </div>
+                                <div>
+                                    <span class="text-xs font-medium text-indigo-400 uppercase">${categoryLabels[category]}</span>
+                                    <h3 class="text-sm font-bold text-gray-100">${title}</h3>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 line-clamp-2 leading-relaxed">${description}</p>
+                        </div>
+                    `;
+        }).join('')}
+                </div>
+            </div>
+        `;
+    }
+    async function selectPersona(personaId, category) {
+        console.log('🎯 SELECT PERSONA CALLED');
+        console.log('   Persona ID:', personaId);
+        console.log('   Category:', category);
+
+        // Show loading state on the clicked card
+        const card = document.getElementById(`persona-card-${personaId}`);
+        if (card) {
+            card.style.position = 'relative';
+            const overlay = card.querySelector('.loading-overlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                console.log('   ✅ Loading overlay shown');
+            }
+            card.style.pointerEvents = 'none';
+        }
+
+        try {
+            const url = `${pythonURI}/api/user/persona`;
+            const body = { persona_id: personaId };
+
+            console.log('📤 Making POST request');
+            console.log('   URL:', url);
+            console.log('   Body:', body);
+
+            const response = await fetch(url, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+
+            console.log('📥 Response received');
+            console.log('   Status:', response.status);
+            console.log('   OK:', response.ok);
+
+            const responseData = await response.json();
+            console.log('   Response Data:', responseData);
+
+            if (!response.ok) {
+                throw new Error(responseData.message || `Server error: ${response.status}`);
+            }
+
+            console.log('✅ Selection successful!');
+
+            // Show success animation
+            if (card) {
+                const overlay = card.querySelector('.loading-overlay');
+                if (overlay) {
+                    overlay.innerHTML = `
+                        <svg class="h-12 w-12 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    `;
+                    console.log('   ✅ Success checkmark shown');
+                }
+            }
+
+            // Wait a moment then reload
+            console.log('   ⏳ Waiting 600ms before reload...');
+            setTimeout(() => {
+                console.log('   🔄 Reloading personas...');
+                loadPersonas();
+            }, 600);
+
+        } catch (error) {
+            console.error('❌ ERROR in selectPersona:', error);
+
+            // Hide loading overlay and restore interactivity
+            if (card) {
+                const overlay = card.querySelector('.loading-overlay');
+                if (overlay) {
+                    overlay.classList.add('hidden');
+                }
+                card.style.pointerEvents = 'auto';
+            }
+
+            // Show error message
+            const categorySection = document.getElementById(`category-${category}`);
+            if (categorySection) {
+                const existingError = categorySection.querySelector('.error-message');
+                if (existingError) existingError.remove();
+
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message bg-red-900/30 border border-red-500 rounded-lg p-4 mb-4 flex items-start gap-3';
+                errorDiv.innerHTML = `
+                    <svg class="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="flex-1">
+                        <h4 class="text-red-400 font-semibold mb-1">Selection Failed</h4>
+                        <p class="text-red-300 text-sm">${error.message}</p>
+                    </div>
+                    <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                `;
+                categorySection.insertBefore(errorDiv, categorySection.querySelector(`#category-grid-${category}`));
+
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+        }
+    }
+    async function submitSkillSnapshot() {
+        const projectName = document.getElementById('snapshotProjectName')?.value?.trim();
+        const codingAbility = parseInt(document.getElementById('codingAbility')?.value);
+        const collaboration = parseInt(document.getElementById('collaboration')?.value);
+        const problemSolving = parseInt(document.getElementById('problemSolving')?.value);
+        const initiative = parseInt(document.getElementById('initiative')?.value);
+        const statusEl = document.getElementById('snapshotStatus');
+
+        if (!projectName) {
+            statusEl.textContent = 'Please enter a project name.';
+            statusEl.classList.add('text-red-400');
+            statusEl.classList.remove('text-green-400', 'text-gray-400');
+            return;
+        }
+
+        statusEl.textContent = 'Saving...';
+        statusEl.classList.remove('text-red-400', 'text-green-400');
+        statusEl.classList.add('text-gray-400');
+
+        try {
+            const response = await fetch(`${pythonURI}/api/user/skill-snapshot`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    project_name: projectName,
+                    coding_ability: codingAbility,
+                    collaboration: collaboration,
+                    problem_solving: problemSolving,
+                    initiative: initiative
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.message || 'Failed to save snapshot');
+            }
+
+            statusEl.textContent = 'Snapshot saved!';
+            statusEl.classList.add('text-green-400');
+            statusEl.classList.remove('text-red-400', 'text-gray-400');
+
+            // reset form
+            document.getElementById('snapshotProjectName').value = '';
+            ['codingAbility', 'collaboration', 'problemSolving', 'initiative'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 3;
+            });
+            ['codingAbility', 'collaboration', 'problemSolving', 'initiative'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '3';
+            });
+
+            // use existing toast if available
+            if (window.showToast) {
+                showToast({
+                    message: 'Skill snapshot saved to your Passport.',
+                    icon: `<svg class="size-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>`,
+                    duration: 3000
+                });
+            }
+
+            setTimeout(() => {
+                statusEl.textContent = '';
+            }, 3000);
+
+        } catch (error) {
+            console.error('Snapshot error:', error);
+            statusEl.textContent = error.message || 'Something went wrong.';
+            statusEl.classList.add('text-red-400');
+            statusEl.classList.remove('text-green-400', 'text-gray-400');
+        }
+    }
+
+    window.submitSkillSnapshot = submitSkillSnapshot;
+
+    // Make functions globally accessible
+    window.loadPersonas = loadPersonas;
+    window.selectPersona = selectPersona;
+    window.editProfile = editProfile;
+    window.showPersonaSelectionCards = showPersonaSelectionCards;
+    window.showCompletedPersonas = showCompletedPersonas;
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPersonas();
+    });
+</script>
+<script type="module">
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     import { putUpdate, postUpdate, deleteData, logoutUserJava } from "{{site.baseurl}}/assets/js/api/profile.js";
 
     // external functions
     import { getUserData } from '{{site.baseurl}}/assets/js/aesthetihawk/profile/getUserData.js';
     import { setUserData } from '{{site.baseurl}}/assets/js/aesthetihawk/profile/setUserData.js';
-
 
     // this runs on page load
     document.addEventListener("DOMContentLoaded", async () => {
@@ -207,7 +906,7 @@ active_tab: profile
         const changePfpBox = document.getElementById('change-pfp');
         console.log("Change pfp button clicked");
         if (changePfpBox) {
-            changePfpBox.style.visibility = 'visible'; // Make the modal visible
+            changePfpBox.style.visibility = 'visible';
         } else {
             console.error('Change PFP modal not found in the DOM.');
         }
@@ -230,17 +929,11 @@ active_tab: profile
         }
     };
 
-
     window.getUserData = getUserData; // get the data
     window.setUserData = setUserData; // setting the user data to display
-    document.addEventListener("DOMContentLoaded", async () => {
-        try {
-            await window.setUserData();
-        } catch (error) {
-            console.error("Error initializing user data:", error.message);
-        }
-    });
-
+    // NOTE: Removed duplicate DOMContentLoaded listener that called setUserData()
+    // setUserData() is already called once at line ~427, calling it twice causes
+    // redundant API requests. This is an example of optimizing by removing duplicate calls.
 
     window.changeClass = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page
@@ -250,7 +943,6 @@ active_tab: profile
         const classDisplayedInfo = document.getElementById("classDisplayedInfo");
         classDisplayedInfo.textContent = classInput + " " + classInputYear;
     }
-
 
     window.changeProfilePicture = async function (event) {
         event.preventDefault(); // Prevent the form from refreshing the page
@@ -314,18 +1006,41 @@ active_tab: profile
     }
 </script>
 
-<script>
+<script type="module">
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
     // Store original form values
     let originalValues = {};
     let formChanged = false;
+    let currentUserClasses = []; // ADD THIS LINE
 
     // how long toast stays (ms)
     const toastDuration = 10000;
 
     // Initialize the form
     document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOMContentLoaded fired'); // ADD THIS
+
         // Store original values
         saveOriginalValues();
+
+        // Load user classes
+        loadUserClasses();
+
+        const form = document.getElementById('profileSettingsForm');
+        form.addEventListener('input', checkForChanges);
+        form.addEventListener('change', checkForChanges);
+
+        // Attach event listener to Add Class button
+        const addClassBtn = document.getElementById('addClassBtn');
+        console.log('Add Class Button:', addClassBtn); // ADD THIS
+        if (addClassBtn) {
+            addClassBtn.addEventListener('click', function () {
+                console.log('Add Class button clicked!'); // ADD THIS
+                addClass();
+            });
+        } else {
+            console.error('addClassBtn not found!'); // ADD THIS
+        }
 
         // Set up toggle switch
         const toggle = document.querySelector('#kasmChangeInput');
@@ -338,13 +1053,6 @@ active_tab: profile
             } else {
                 toggleDot.classList.remove('translate-x-3');
                 toggle.classList.remove('bg-blue-600');
-            }
-        });
-
-        // Set up beforeunload event
-        window.addEventListener('beforeunload', function (e) {
-            if (formChanged) {
-                showUnsavedChangesAlert();
             }
         });
     });
@@ -369,7 +1077,7 @@ active_tab: profile
         classEntries.forEach((entry, index) => {
             originalValues.classEntries[index] = {
                 name: entry.querySelector('.class-name').value,
-                year: entry.querySelector('.class-year').value
+                //year: entry.querySelector('.class-year').value
             };
         });
     }
@@ -382,14 +1090,17 @@ active_tab: profile
 
         formChanged = false;
 
-        // Check standard inputs
+        // Check standard inputs - only compare if they have original values
         inputs.forEach(input => {
+            // Skip if this input doesn't have an id
+            if (!input.id) return;
+
             if (input.type === 'checkbox') {
-                if (originalValues[input.id] !== input.checked) {
+                if (originalValues[input.id] !== undefined && originalValues[input.id] !== input.checked) {
                     formChanged = true;
                 }
-            } else if (input.id && originalValues[input.id] !== undefined) {
-                if (originalValues[input.id] !== input.value) {
+            } else {
+                if (originalValues[input.id] !== undefined && originalValues[input.id] !== input.value) {
                     formChanged = true;
                 }
             }
@@ -397,19 +1108,8 @@ active_tab: profile
 
         // Check class entries
         const classEntries = document.querySelectorAll('.class-entry');
-        if (classEntries.length !== originalValues.classEntries.length) {
+        if (classEntries.length !== (originalValues.classEntries?.length || 0)) {
             formChanged = true;
-        } else {
-            classEntries.forEach((entry, index) => {
-                const name = entry.querySelector('.class-name').value;
-                const year = entry.querySelector('.class-year').value;
-
-                if (index >= originalValues.classEntries.length ||
-                    originalValues.classEntries[index].name !== name ||
-                    originalValues.classEntries[index].year !== year) {
-                    formChanged = true;
-                }
-            });
         }
 
         // Update save button
@@ -424,55 +1124,222 @@ active_tab: profile
         }
     }
 
-    // Add new class
-    function addClass() {
+    async function loadUserClasses() {
+        try {
+            const response = await fetch(`${pythonURI}/api/user/class`, fetchOptions);
+            if (!response.ok) {
+                console.error('Failed to load classes');
+                return;
+            }
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+            await syncClassGroupMemberships(currentUserClasses);
+        } catch (error) {
+            console.error('Error loading classes:', error);
+        }
+    }
+
+    // Keep the four course-group memberships aligned with the saved profile classes.
+    async function syncClassGroupMemberships(classes) {
+        const response = await fetch(`${javaURI}/api/groups/class-memberships`, {
+            ...fetchOptions,
+            method: 'PUT',
+            body: JSON.stringify({ classes })
+        });
+
+        if (!response.ok) {
+            let message = 'Failed to update course group membership';
+            try {
+                const error = await response.json();
+                if (error.error) message = error.error;
+            } catch (parseError) {
+                console.error('Unable to read group membership error:', parseError);
+            }
+            throw new Error(message);
+        }
+
+        return response.json();
+    }
+
+    async function syncClassGroupsAfterSave(classes) {
+        try {
+            await syncClassGroupMemberships(classes);
+        } catch (error) {
+            console.error('Class saved but group membership sync failed:', error);
+            alert(`Your class selection was saved, but group membership could not be updated: ${error.message}`);
+        }
+    }
+
+    // Render classes in the UI
+    function renderClasses(classes) {
         const container = document.getElementById('classesContainer');
-        const classEntry = document.createElement('div');
-        classEntry.className = 'class-entry mb-4 p-4 border border-gray-700 rounded-lg';
 
-        classEntry.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
-                        <div class="flex-grow mb-2 md:mb-0">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Class Name</label>
-                            <input type="text" 
-                                class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                                placeholder="Enter class name" onchange="checkForChanges()">
-                        </div>
-                        <div class="w-full md:w-1/3">
-                            <label class="block text-sm font-medium text-neutral-300 mb-1">Year</label>
-                            <select class="class-year w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="checkForChanges()">
-                                <option>2025</option>
-                                <option>2026</option>
-                                <option>2027</option>
-                                <option>2028</option>
-                            </select>
-                        </div>
+        if (!container) return;
+
+        if (!classes || classes.length === 0) {
+            container.innerHTML = `
+                <p class="text-gray-400 text-center py-4">No classes added yet. Click "Add Class" to get started.</p>
+            `;
+            return;
+        }
+
+        container.innerHTML = classes.map((classAbbr, index) => `
+            <div class="class-entry mb-4 p-4 border rounded-lg border-neutral-700" data-index="${index}">
+                <div class="flex flex-col md:flex-row md:space-x-4 mb-2">
+                    <div class="flex-grow mb-2 md:mb-0">
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Class Name</label>
+                        <select class="class-name w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" onchange="updateClassInAPI(${index}, this.value)">
+                            <option value="CSSE" ${classAbbr === 'CSSE' ? 'selected' : ''}>Computer Science and Software Engineering</option>
+                            <option value="CSP" ${classAbbr === 'CSP' ? 'selected' : ''}>Computer Science Principles</option>
+                            <option value="CSA" ${classAbbr === 'CSA' ? 'selected' : ''}>Computer Science A</option>
+                            <option value="CSH" ${classAbbr === 'CSH' ? 'selected' : ''}>Computer Science Honors</option>
+                        </select>
                     </div>
-                    <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium" onclick="removeClass(this)">
-                        Remove
-                    </button>
-                `;
-
-        container.appendChild(classEntry);
-        checkForChanges();
+                </div>
+                <button type="button" class="text-red-500 hover:text-red-700 text-sm font-medium" onclick="removeClass(this)">
+                    Remove
+                </button>
+            </div>
+        `).join('');
     }
 
-    // Remove class
-    function removeClass(button) {
-        const classEntry = button.closest('.class-entry');
-        classEntry.remove();
-        checkForChanges();
+    // Add new class
+    async function addClass() {
+        // Determine which class to add
+        let newClass = 'CSP';
+        if (currentUserClasses.includes('CSP')) {
+            if (!currentUserClasses.includes('CSSE')) newClass = 'CSSE';
+            else if (!currentUserClasses.includes('CSA')) newClass = 'CSA';
+            else if (!currentUserClasses.includes('CSH')) newClass = 'CSH';
+            else {
+                alert('All available classes have been added.');
+                return;
+            }
+        }
+
+        try {
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({ class: newClass })
+            });
+
+            if (!response.ok) throw new Error('Failed to add class');
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+            await syncClassGroupsAfterSave(currentUserClasses);
+            checkForChanges();
+        } catch (error) {
+            console.error('Error adding class:', error);
+            alert('Error adding class. Please try again.');
+        }
     }
 
-    // show toast, auto-hide, allow manual close
-    function showUnsavedChangesAlert() {
-        const saveButton = document.getElementById('saveChangesBtn');
+    // Remove a class
+    async function removeClass(button) {
+        const entry = button.closest('.class-entry');
+        const index = parseInt(entry.dataset.index);
+        const classToRemove = currentUserClasses[index];
 
-        // trigger reflow so shake always retriggers
-        saveButton.classList.remove('shake-animation');
-        void saveButton.offsetWidth;
-        saveButton.classList.add('shake-animation');
+        try {
+            // Use POST with action parameter instead of DELETE
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'remove',
+                    class: classToRemove
+                })
+            });
 
+            if (!response.ok) throw new Error('Failed to remove class');
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+            await syncClassGroupsAfterSave(currentUserClasses);
+            checkForChanges();
+        } catch (error) {
+            console.error('Error removing class:', error);
+            alert('Error removing class. Please try again.');
+        }
+    }
+
+    async function updateClassInAPI(index, newClass) {
+        const updatedClasses = [...currentUserClasses];
+        updatedClasses[index] = newClass;
+
+        try {
+            const response = await fetch(`${pythonURI}/api/user/class`, {
+                ...fetchOptions,
+                method: 'PUT',
+                body: JSON.stringify({ class: updatedClasses })
+            });
+
+            if (!response.ok) throw new Error('Failed to update class');
+
+            const data = await response.json();
+            currentUserClasses = data.class || [];
+            renderClasses(currentUserClasses);
+            await syncClassGroupsAfterSave(currentUserClasses);
+            checkForChanges();
+        } catch (error) {
+            console.error('Error updating class:', error);
+            alert('Error updating class. Please try again.');
+            renderClasses(currentUserClasses); // Revert on error
+        }
+    }
+
+    // Fetch grade prediction from academic grade predictor API
+    async function fetchGradePrediction() {
+        const uidInput = document.getElementById("uidChangeInput");
+        const uid = uidInput.value.trim();
+
+        if (!uid) {
+            console.error('User ID is required to fetch grade prediction');
+            alert('Please ensure your User ID is set before fetching grade prediction.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${pythonURI}/api/grade-prediction/${uid}`, fetchOptions);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch grade prediction: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Grade Prediction Data:', data);
+
+            // Process and display the grade prediction data
+            if (data && data.prediction) {
+                displayGradePrediction(data);
+            } else {
+                console.warn('No prediction data available');
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Error fetching grade prediction:', error.message);
+            alert(`Error fetching grade prediction: ${error.message}`);
+            return null;
+        }
+    }
+
+    // Display grade prediction results
+    function displayGradePrediction(data) {
+        console.log('Displaying grade prediction:', data);
+
+        // You can add UI elements here to display the prediction
+        // For now, just log to console
+        if (data.prediction) {
+            console.log(`Predicted Grade: ${data.prediction.grade}`);
+            console.log(`Confidence: ${data.prediction.confidence || 'N/A'}`);
+            console.log(`Prediction Details:`, data.prediction);
+        }
     }
 
     // save all changes in one go
@@ -482,7 +1349,6 @@ active_tab: profile
         const uidInput = document.getElementById("uidChangeInput");
         const emailInput = document.getElementById("emailChangeInput");
         const sidInput = document.getElementById("sidChangeInput");
-        const passwordInput = document.getElementById("password");
         const kasmInput = document.getElementById("kasmChangeInput");
         const schoolInput = document.getElementById("schoolChangeInput");
 
@@ -491,14 +1357,13 @@ active_tab: profile
         const uid = uidInput.value.trim();
         const email = emailInput.value.trim();
         const sid = sidInput.value.trim();
-        const password = passwordInput.value.trim();
         const kasmServerNeeded = kasmInput ? kasmInput.checked : undefined;
         const school = schoolInput.value;
 
         // get class info
         const classEntries = Array.from(document.querySelectorAll('.class-entry')).map(entry => ({
             name: entry.querySelector('.class-name').value,
-            year: entry.querySelector('.class-year').value
+            //year: entry.querySelector('.class-year').value
         }));
 
         // import api helpers
@@ -587,26 +1452,6 @@ active_tab: profile
             }
         }
 
-        // save password (both backends, logs out)
-        if (password) {
-            try {
-                await Promise.all([
-                    putUpdate({
-                        URL: pythonURI + "/api/user",
-                        body: { password },
-                        message: 'password-message'
-                    }),
-                    postUpdate({
-                        URL: javaURI + "/api/person/update",
-                        body: { password }
-                    })
-                ]);
-                needsLogout = true;
-            } catch (e) {
-                console.error("error saving password:", e.message);
-            }
-        }
-
         // save kasm server status (both backends)
         if (
             typeof kasmServerNeeded !== "undefined" &&
@@ -676,10 +1521,141 @@ active_tab: profile
 
         // handle reload or logout if needed
         if (needsLogout) {
-            alert("you updated your github id or password, so you will be logged out. remember your new credentials!");
+            alert("you updated your github id, so you will be logged out. remember your new credentials!");
             window.location.href = '{{site.baseurl}}';
         } else if (needsReload) {
             window.location.reload();
         }
     }
+    window.loadUserClasses = loadUserClasses;
+    window.addClass = addClass;
+    window.removeClass = removeClass;
+    window.updateClassInAPI = updateClassInAPI;
+    window.saveChanges = saveChanges;
+    window.checkForChanges = checkForChanges;
+    window.fetchGradePrediction = fetchGradePrediction;
+    window.displayGradePrediction = displayGradePrediction;
+
+    // --- Facial Registration Logic ---
+    let scannerStream = null;
+
+    async function openScanner() {
+        const overlay = document.getElementById('webcamOverlay');
+        const video = document.getElementById('webcamControl');
+        const status = document.getElementById('scannerStatus');
+
+        overlay.classList.remove('hidden');
+        status.textContent = "Requesting camera access...";
+
+        try {
+            scannerStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = scannerStream;
+            status.textContent = "Camera active. Center your face.";
+        } catch (err) {
+            console.error("Camera error:", err);
+            status.textContent = "Error: Could not access camera.";
+        }
+    }
+
+    function closeScanner() {
+        const overlay = document.getElementById('webcamOverlay');
+        const video = document.getElementById('webcamControl');
+
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+        video.srcObject = null;
+        overlay.classList.add('hidden');
+    }
+
+    async function captureAndSaveFace() {
+        if (!window.currentUid) {
+            alert("No user ID found. Please refresh the page.");
+            return;
+        }
+
+        const video = document.getElementById('webcamControl');
+        const canvas = document.getElementById('captureCanvas');
+        const status = document.getElementById('scannerStatus');
+        const captureBtn = document.getElementById('captureFaceBtn');
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL('image/jpeg');
+        const base64Image = imageData.split(',')[1];
+
+        status.textContent = "Registering face...";
+        captureBtn.disabled = true;
+
+        try {
+            console.log("Starting face registration with Spring...");
+            console.log("Image payload length:", base64Image.length);
+
+            // Persist in Spring (used for bathroom pass identification)
+            const springResp = await fetch(`${javaURI}/api/face/register`, {
+                ...fetchOptions,
+                method: 'POST',
+                body: JSON.stringify({
+                    faceData: base64Image
+                })
+            });
+
+            console.log("Spring update response status:", springResp.status);
+            const springData = await springResp.json();
+            console.log("Spring update response data:", springData);
+
+            if (!springResp.ok) throw new Error("Spring persistence failed");
+
+            status.textContent = "Registration successful!";
+            updateRegistrationStatus(true);
+            setTimeout(closeScanner, 1500);
+
+            if (window.showToast) {
+                showToast({
+                    message: "Facial registration complete!",
+                    icon: `<svg class="size-5 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg>`,
+                    duration: 3000
+                });
+            }
+        } catch (err) {
+            console.error("Face registration error:", err);
+            status.textContent = "Registration failed. Try again.";
+        } finally {
+
+            captureBtn.disabled = false;
+        }
+    }
+
+    function updateRegistrationStatus(isRegistered) {
+        const dot = document.getElementById('regStatusDot');
+        const text = document.getElementById('regStatusText');
+        if (isRegistered) {
+            dot.classList.remove('bg-gray-600');
+            dot.classList.add('bg-green-500');
+            text.textContent = "Face Registered";
+        } else {
+            dot.classList.remove('bg-green-500');
+            dot.classList.add('bg-gray-600');
+            text.textContent = "Not Registered";
+        }
+    }
+
+    // Export functions to window
+    window.openScanner = openScanner;
+    window.closeScanner = closeScanner;
+    window.captureAndSaveFace = captureAndSaveFace;
+
+    // Check registration on load
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch(`${javaURI}/api/person/get`, fetchOptions)
+            .then(res => res.json())
+            .then(data => {
+                window.currentUid = data.uid;
+                updateRegistrationStatus(!!data.faceData);
+            })
+            .catch(console.error);
+    });
 </script>

@@ -1,0 +1,128 @@
+.pause-overlay {
+  position: absolute;
+  inset: 0; 
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 2000;
+}
+
+.pause-panel {
+  background: #111;
+  color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  min-width: 260px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.pause-title {
+  margin: 0 0 12px 0;
+  font-size: 1.4rem;
+}
+
+.pause-btn {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: #222;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.pause-btn:hover { background: #2a2a2a; }
+.pause-btn:active { transform: translateY(1px); }
+.pause-btn.resume { background: linear-gradient(180deg,#3a8ef7,#1266d8); border: none; }
+.pause-btn.restart { background: linear-gradient(180deg,#e86b6b,#d43b3b); border: none; }
+.pause-btn.exit { background: linear-gradient(180deg,#666,#444); border: none; }
+
+/* Top control bar (Settings/Leaderboard) */
+.pause-button-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pause-button-bar .pause-btn {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Dropdown for Save/Skip controls */
+.pause-controls-dropdown {
+  position: fixed;
+  top: 100px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 10px;
+  display: none;
+  gap: 10px;
+  z-index: 9998;
+}
+
+.pause-controls-dropdown.is-open {
+  display: flex;
+}
+
+.pause-controls-dropdown .pause-btn {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+/* Top counter showing levels completed */
+.pause-counter-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.pause-counter-label {
+  color: #bbb;
+  font-size: 0.9rem;
+}
+.pause-counter-number {
+  background: linear-gradient(180deg,#ffd166,#f7b733);
+  color: #111;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  min-width: 40px;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+/* Stats area inside the panel */
+.pause-stats {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 8px 0 12px 0;
+}
+.pause-stat {
+  background: rgba(255,255,255,0.04);
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #ddd;
+  font-size: 0.95rem;
+}
+
+/* Make skip and exit buttons sit together */
+.pause-btn.skip-level, .pause-btn.exit { width: 48%; display: inline-block; }
+.pause-panel .pause-btn.skip-level { margin-right: 4%; }

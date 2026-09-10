@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stack Clicker Mini Lesson</title>
+  <link rel="stylesheet" href="./stack-clicker.css">
+</head>
+<body class="stack-clicker-page">
+  <main class="app">
+    <section class="panel hero">
+      <h1>Stack Clicker</h1>
+      <p class="subtitle">Learn stack behavior by building and draining call frames.</p>
+
+      <div class="clicker-stage" id="clickerStage" aria-label="Stack click arena">
+        <div class="burst-layer" id="burstLayer" aria-hidden="true"></div>
+        <button id="pushBtn" class="push-btn" type="button" aria-label="Push Function Call">
+          <img class="push-btn-image" src="./images/box-button.png" alt="" aria-hidden="true">
+          <span class="push-btn-label">Push Function Call</span>
+        </button>
+      </div>
+
+      <div class="meter-wrap" id="meterWrap">
+        <p class="label">Stack Fill</p>
+        <div class="meter-shell">
+          <div class="meter">
+            <div class="meter-fill" id="meterFill"></div>
+          </div>
+          <div class="steam-layer" id="steamLayer" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <p class="tip" id="tipText">Tip: Each click simulates pushing function frames onto the call stack.</p>
+    </section>
+
+    <section class="panel upgrades">
+      <h2>Upgrades</h2>
+      <div class="upgrade-tabs" role="tablist" aria-label="Upgrade categories">
+        <button type="button" id="tabMainUpgrades" class="upgrade-tab active" role="tab" aria-selected="true" aria-controls="upgradeList">Main Stack</button>
+        <button type="button" id="tabMultiplierUpgrades" class="upgrade-tab" role="tab" aria-selected="false" aria-controls="upgradeList">Multipliers</button>
+      </div>
+      <div id="upgradeList" class="upgrade-list"></div>
+    </section>
+
+    <section class="panel lesson-log">
+      <h2>Lesson Log</h2>
+      <ul id="logList"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="./stack-clicker.js"></script>
+</body>
+</html>

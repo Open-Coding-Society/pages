@@ -1,0 +1,399 @@
+hero:
+  eyebrow: "Debug Mission"
+  title: "Bug Hunt: Identify and Correct Errors"
+  subtitle: "Move fast: spot the bug, fix the code, and clear four short rounds before the system crashes."
+  stats:
+    - label: "Rounds"
+      value: "4"
+    - label: "Goal"
+      value: "Find + Fix"
+
+directions:
+  - title: "Predict"
+    text: "Say what the code should do before you change anything."
+  - title: "Test"
+    text: "Use one simple test case so you can see the bug clearly."
+  - title: "Fix"
+    text: "Change one thing at a time instead of rewriting everything."
+  - title: "Re-check"
+    text: "Run the checker again to confirm the bug is really gone."
+
+error_types:
+  title: "Quick Guide To Error Types"
+  intro: "Beginners usually see the same few bug types again and again. Start by asking: does the code fail to run, or does it run and give the wrong answer?"
+  cards:
+    - title: "Syntax Error"
+      summary: "The code cannot run because Python does not understand the way it is written."
+      fix: "Check punctuation, missing quotes, missing colons, or bad indentation."
+    - title: "Logic Error"
+      summary: "The code runs, but the answer is wrong because the steps are wrong."
+      fix: "Compare the result to a test case and change the step that makes the wrong choice."
+    - title: "Input Error"
+      summary: "The code is given the wrong kind of value or a value it was not expecting."
+      fix: "Check what the function receives and make sure it matches what the code needs."
+    - title: "Name Error"
+      summary: "The code tries to use a variable or function name that does not exist."
+      fix: "Check spelling and make sure the name was created before it is used."
+
+debug_tip:
+  title: "Fast Beginner Strategy"
+  text: "If the code runs but the result is wrong, start by looking for a logic error. Use one small test case, trace each step, and find the first place where the code does something different from what you expected."
+
+levels:
+  - id: "alphabet"
+    badge: "Level 1"
+    title: "Alphabet Tracker"
+    story: "The tracker should report a letter's position in the alphabet for a human reader."
+    prompt: "Edit the code so the test case returns the correct position."
+    test_case: "Test case: d should return 4"
+    run_command: "find_letter_position(\"d\")"
+    buggy_result: "3"
+    expected_result: "4"
+    buggy_code: |
+          def find_letter_position(letter):
+            alphabet_list = list("abcdefghijklmnopqrstuvwxyz")
+            for index, current_letter in enumerate(alphabet_list):
+              if current_letter == letter:
+                return index
+    bug_options:
+      - id: "alphabet-syntax"
+        label: "Syntax error"
+        correct: false
+      - id: "alphabet-logic"
+        label: "Logic error"
+        correct: true
+      - id: "alphabet-input"
+        label: "Input error"
+        correct: false
+    hints:
+      - "Python list positions start at 0."
+      - "Humans usually say a is 1st, not 0th."
+      - "You can fix this by changing the loop count or the return value."
+    type_explanation: "This is a logic error because the code runs, but it gives the wrong answer for a human-friendly position."
+    fix_explanation: "The loop is finding the correct letter, but the number starts at 0 instead of 1. Fix the counting, not the whole function."
+    canonical_solution: |
+      def find_letter_position(letter):
+        alphabet_list = list("abcdefghijklmnopqrstuvwxyz")
+        for index, current_letter in enumerate(alphabet_list, start=1):
+          if current_letter == letter:
+            return index
+    solution_checks:
+      - all:
+          - "enumerate(alphabet_list, start=1)"
+          - "return index"
+      - all:
+          - "enumerate(alphabet_list)"
+          - "return index + 1"
+    success_message: "Tracker repaired. The alphabet signal is back online."
+
+  - id: "odds"
+    badge: "Level 2"
+    title: "Odd Number Generator"
+    story: "The generator should return odd numbers from 1 to 9, but something in the code is blocking the mission."
+    prompt: "Find the bug and fix the function so it produces [1, 3, 5, 7, 9]."
+    test_case: "Target output: [1, 3, 5, 7, 9]"
+    run_command: "make_odd_numbers()"
+    buggy_result: "SyntaxError: expected ':' after function definition"
+    expected_result: "[1, 3, 5, 7, 9]"
+    buggy_code: |
+      def make_odd_numbers()
+              odds = []
+              i = 1
+
+              while i < 10:
+                      odds.append(i)
+                      i += 2
+
+              return odds
+    bug_options:
+      - id: "odds-syntax"
+        label: "Syntax error"
+        correct: true
+      - id: "odds-logic"
+        label: "Logic error"
+        correct: false
+      - id: "odds-name"
+        label: "Name error"
+        correct: false
+    hints:
+      - "Start at the very first line of the function."
+      - "Function definitions in Python need a colon at the end."
+      - "Once syntax is fixed, this code should generate odd numbers correctly."
+    type_explanation: "This is a syntax error because Python cannot parse the function definition line as written."
+    fix_explanation: "The algorithm is already set up for odd numbers. The main fix is adding the missing colon so Python can run the function."
+    canonical_solution: |
+      def make_odd_numbers():
+              odds = []
+              i = 1
+
+              while i < 10:
+                      odds.append(i)
+                      i += 2
+
+              return odds
+    solution_checks:
+      - all:
+          - "def make_odd_numbers():"
+          - "i = 1"
+          - "i += 2"
+          - "return odds"
+    success_message: "Generator repaired. The power grid is stable again."
+
+  - id: "average-input"
+    badge: "Level 3"
+    title: "Average Score Stabilizer"
+    story: "The function should return the class average, but one test case causes a failure."
+    prompt: "Find and fix the bug so this function works for all given tests."
+    test_case: "Test case: [] should return 0"
+    run_command: "average_score([])"
+    buggy_result: "ZeroDivisionError: division by zero"
+    expected_result: "0"
+    buggy_code: |
+      def average_score(scores):
+              total = sum(scores)
+              return total / len(scores)
+    bug_options:
+      - id: "average-syntax"
+        label: "Syntax error"
+        correct: false
+      - id: "average-input"
+        label: "Input error"
+        correct: true
+      - id: "average-name"
+        label: "Name error"
+        correct: false
+    hints:
+      - "The formula is fine for normal lists."
+      - "What is len(scores) when the input is empty?"
+      - "Add a guard clause before dividing."
+    type_explanation: "This is an input error because the function receives an empty list, and the current code does not handle that valid-but-edge input."
+    fix_explanation: "Keep the average logic, but first handle empty input so the function avoids dividing by zero."
+    canonical_solution: |
+      def average_score(scores):
+              if len(scores) == 0:
+                      return 0
+              total = sum(scores)
+              return total / len(scores)
+    solution_checks:
+      - all:
+          - "if len(scores) == 0"
+          - "return 0"
+          - "return total / len(scores)"
+    success_message: "Input guard repaired. The score monitor now handles edge cases safely."
+
+  - id: "name-fix"
+    badge: "Level 4"
+    title: "Greeting Repair Drone"
+    story: "The function should greet the person by name, but the current version fails the mission check."
+    prompt: "Find and fix the bug so the function returns the correct greeting."
+    test_case: "Test case: make_greeting() should return Hello, Ava!"
+    run_command: "make_greeting()"
+    buggy_result: "NameError: name 'student_name' is not defined"
+    expected_result: "Hello, Ava!"
+    buggy_code: |
+      def make_greeting():
+              name = "Ava"
+              message = "Hello, " + student_name + "!"
+              return message
+    bug_options:
+      - id: "name-syntax"
+        label: "Syntax error"
+        correct: false
+      - id: "name-logic"
+        label: "Logic error"
+        correct: false
+      - id: "name-variable"
+        label: "Name error"
+        correct: true
+    hints:
+      - "The variable name is already set to \"Ava\" in the function."
+      - "Use the same variable name inside the function body."
+      - "The undefined name is the bug."
+    type_explanation: "This is a name error because the code references a name that was never defined in this function."
+    fix_explanation: "Use the function parameter name consistently when building the greeting string."
+    canonical_solution: |
+      def make_greeting():
+              name = "Ava"
+              message = "Hello, " + name + "!"
+              return message
+    solution_checks:
+      - all:
+          - "def make_greeting():"
+          - "name = \"Ava\""
+          - "+ name +"
+          - "return message"
+    success_message: "Name repair complete. The greeting drone is online."
+
+closing:
+  title: "Victory Check"
+  prompt: "When all levels are green, you win."
+
+example_questions_title: "Example Multiple Choice Questions"
+
+example_questions:
+  - id: "q1-conditionals"
+    title: "Question 1 - Logic Error (Conditionals)"
+    code: |
+      IF (num > 0)
+      {
+        DISPLAY("Positive")
+      }
+      ELSE IF (num < 0)
+      {
+        DISPLAY("Negative")
+      }
+      ELSE
+      {
+        DISPLAY("Positive")
+      }
+    prompt: "What is the issue?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The program will crash when num = 0"
+      - id: "B"
+        text: "The program incorrectly labels 0 as positive"
+      - id: "C"
+        text: "The condition num > 0 is invalid"
+      - id: "D"
+        text: "There is no issue"
+
+  - id: "q2-off-by-one"
+    title: "Question 2 - Off-by-One Error (Loops)"
+    code: |
+      FOR i ← 1 TO LENGTH(list)
+      {
+        DISPLAY(list[i])
+      }
+    prompt: "Assume lists are indexed starting at 0. What is the problem?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The loop runs too many times"
+      - id: "B"
+        text: "The loop skips the first element"
+      - id: "C"
+        text: "The loop skips the last element"
+      - id: "D"
+        text: "The loop causes a syntax error"
+
+  - id: "q3-variable-update"
+    title: "Question 3 - Incorrect Variable Update"
+    code: |
+      total ← 0
+      FOR EACH item IN numbers
+      {
+        total ← item
+      }
+      DISPLAY(total)
+    prompt: "What does this code do incorrectly?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "It adds all numbers incorrectly"
+      - id: "B"
+        text: "It only stores the last value instead of the sum"
+      - id: "C"
+        text: "It creates an infinite loop"
+      - id: "D"
+        text: "It causes a runtime error"
+
+  - id: "q4-boolean-logic"
+    title: "Question 4 - Boolean Logic Error"
+    code: |
+      IF (score > 70 OR score < 90)
+      {
+        DISPLAY("Pass")
+      }
+      ELSE
+      {
+        DISPLAY("Fail")
+      }
+    prompt: "What is the issue?"
+    answer: "A"
+    options:
+      - id: "A"
+        text: "The condition is always true"
+      - id: "B"
+        text: "The condition is always false"
+      - id: "C"
+        text: "The program will crash"
+      - id: "D"
+        text: "The logic correctly checks for passing scores"
+
+  - id: "q5-list-index"
+    title: "Question 5 - List Index Error"
+    code: |
+      myList ← [10, 20, 30, 40]
+      DISPLAY(myList[4])
+    prompt: "What happens?"
+    answer: "C"
+    options:
+      - id: "A"
+        text: "Displays 40"
+      - id: "B"
+        text: "Displays 30"
+      - id: "C"
+        text: "Causes an error due to invalid index"
+      - id: "D"
+        text: "Displays 0"
+
+  - id: "q6-missing-initialization"
+    title: "Question 6 - Missing Initialization"
+    code: |
+      FOR i ← 1 TO 5
+      {
+        sum ← sum + i
+      }
+      DISPLAY(sum)
+    prompt: "What is the issue?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The loop runs too many times"
+      - id: "B"
+        text: "sum is never initialized"
+      - id: "C"
+        text: "The loop syntax is invalid"
+      - id: "D"
+        text: "The program outputs 15 correctly"
+
+  - id: "q7-infinite-loop"
+    title: "Question 7 - Infinite Loop"
+    code: |
+      i ← 1
+      WHILE (i < 10)
+      {
+        DISPLAY(i)
+      }
+    prompt: "What is the issue?"
+    answer: "C"
+    options:
+      - id: "A"
+        text: "The loop never runs"
+      - id: "B"
+        text: "The loop runs exactly 10 times"
+      - id: "C"
+        text: "The loop is infinite"
+      - id: "D"
+        text: "The loop skips values"
+
+  - id: "q8-function-return"
+    title: "Question 8 - Function Return Issue"
+    code: |
+      PROCEDURE add(a, b)
+      {
+        result ← a + b
+      }
+      DISPLAY(add(3, 4))
+    prompt: "What is the issue?"
+    answer: "B"
+    options:
+      - id: "A"
+        text: "The function returns the wrong value"
+      - id: "B"
+        text: "The function does not return anything"
+      - id: "C"
+        text: "The function has invalid syntax"
+      - id: "D"
+        text: "The function causes a crash"

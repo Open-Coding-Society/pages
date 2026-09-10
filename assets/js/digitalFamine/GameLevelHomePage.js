@@ -1,10 +1,9 @@
 // To build GameLevels, each contains GameObjects from below imports
-import GameEnvBackground from '/assets/js/adventureGame/GameEngine/GameEnvBackground.js';
-import Player from '/assets/js/adventureGame/GameEngine/Player.js';
-import Npc from '/assets/js/adventureGame/GameEngine/Npc.js';
-import GameControl from '/assets/js/adventureGame/GameEngine/GameControl.js';
-import DialogueSystem from '/assets/js/adventureGame/DialogueSystem.js';
-import { initPlanetNavigation } from '/assets/js/digitalFamine/planetNavigation.js';
+import GameEnvBackground from '../GameEnginev1.5/GameEnvBackground.js';
+import Player from '../GameEnginev1.5/Player.js';
+import Npc from '../GameEnginev1.5/Npc.js';
+import DialogueSystem from '../GameEnginev2/features/DialogueSystem.js';
+import { initPlanetNavigation } from './planetNavigation.js';
 
 class GameLevelHomePage {
   constructor(gameEnv) {

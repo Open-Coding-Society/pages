@@ -1,8 +1,10 @@
 # Introduction
 
+Founded and maintained by John Mortensen.
+
 Open Coding Society `Pages` is a project designed to support students in their Computer Science and Software Engineering education. It offers a wide range of resources including tech talks, code examples, and educational blogs.
 
-This GitHub Pages repository can be customized by the blogger to support computer science learning as the student works through the pathways of using Javascript, Python/Flask, Java/Spring. It is intended to support course work for Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), and AP Computer Science 'A' (APCSA, or CSA).
+This GitHub Pages repository can be customized by the blogger to support computer science learning as the student works through the pathways of using Javascript, Python/Flask, Java/Spring. It is intended to support course work for Computer Science and Software Engineering (CSSE), AP Computer Science Principles (APCSP or CSP), AP Computer Science 'A' (APCSA or CSA), and Computer Science Honors (CSH).
 
 "Open Coding Society's instructional model is grounded in **Connectivism**, recognizing that learning happens through diverse networks of people, platforms, and AI. OCS is refining `pages` using **Merrill's structure**, deepening learning through **Fink**, ensuring access via **UDL**, and supporting our classroom through **Agile and Design Thinking ceremonies**, with a touch of **Gagné** to focus each classroom day. OCS wants to create projects that support learning for today's digital, open, and connected world."
 
@@ -34,6 +36,7 @@ The Apache license has its roots in Fastpages.  Thus, it carries that license fo
 - **Code Examples**: Provides practical coding examples in JavaScript, including a platformer game, and frontend code for user databases using Python and Java backends.
 - **Educational Blogs**: Offers instructional content on various topics such as developer tools setup, deployment on AWS, SQL databases, machine learning, and data structures. It utilizes Jupyter Notebooks for interactive lessons and coding challenges, often referred to as `hacks`.
 - **Tools and Integrations**: Features GitHub actions for blog publishing, Utterances for blog commenting, local development support via Makefile and scripts, and styling with the Minima Theme and SASS. It also includes an Agile Toolkit to assist in Student Teaching, Assignment Tracking, Live Reviews, and more.
+- **Keyboard Shortcuts**: Pages supports keyboard shortcuts using `Alt+Shift+key` (e.g. `Alt+Shift+C` for calendar, `Alt+Shift+H` for home, `Alt+Shift+S` for student toolkit). Press `Alt+Shift+?` to see all shortcuts. These use a non-conflicting modifier so browser defaults (copy, save, print, etc.) are unaffected.
 
 ### Contributions
 
@@ -83,38 +86,55 @@ Comprehensive start. A topic-by-topic guide to getting this project running is p
 
 Quick start.  A quick start below is a reminder, but is dependent on your knowledge.  Only follow this instruction if you need a refresher.  Always default to the comprehensive start if any problem occurs.
 
-#### Clone Repo
+#### Create From Template, Then Clone
 
-Run these commands to obtain the project, then locate into the project directory with the terminal, install an extensive set of tools, and make.
+Use **GitHub "Use this template"** on this repository and create your own repository named `pages`.
+Keeping the repository name as `pages` avoids `site.baseurl` mismatch problems.
+
+Then clone your own repository and enter the project root (not the scripts folder):
 
 ```bash
-git clone <this-repo> # git clone https://github.com/open-coding-society/pages.git 
-cd <repo-dir>/scripts # cd pages 
+git clone https://github.com/<your-username>/pages.git
+cd pages
 ```
 
-#### Windows WSL and/or Ubuntu Users
+Add Open Coding Society as an `upstream` remote once, then periodically merge updates. This help you keep up with dynamic character of a portfolio project.
 
-- Execute the script: `./activate_ubuntu.sh`
+```bash
+#  In your repository, do this once
+git remote add upstream https://github.com/open-coding-society/pages.git
+git remote -v # verify sucess
+
+# first sync for template-created repos (run once if you see unrelated histories)
+git fetch upstream
+# if fetch fails, remove and try again with correct location: get remote remove upstream
+
+# this part is the downstream update, work through best option
+git merge upstream/main
+git merge upstream/main --allow-unrelated-histories
+git merge upstream/main --allow-unrelated-histories -X theirs # destructive resolve
+
+# resolve conflicts, for instance VSCode will have them in Version Control secton with Continue button 
+```
+
+#### Windows WSL and/or Ubuntu or Kali Users
+
+- Execute the script: `./scripts/activate_ubuntu.sh` or `./scripts/activate_kali.sh`
 
 #### macOS Users
 
-- Execute the script: `./activate_macos.sh`
+- Execute the script: `./scripts/activate_macos.sh`
 
-#### Kasm Cloud Desktop Users
+#### Setup connection to GitHub
 
-- Execute the script: `./activate_github.sh`
+- Execute the script: `./scripts/activate.sh`
 
-## Run Server on localhost
+#### Prep project to serve on localhost
 
-To preview the project you will need to "make" the project.
-
-### Bundle install
-
-The very first time you clone run project you will need to run this Ruby command as the final part of your setup.
-
-```bash
-bundle install
-```
+- Execute the script: `./scripts/venv.sh`
+- Source the virtual environment: `source venv/bin/activate`
+- Build localhost server:  `make`
+- Look for and click on server line output, perhaps `Server address: http://localhost:4500/portfolio/`.  The Port and baseurl may change.```
 
 ### Jupyter Kernels
 
@@ -192,6 +212,12 @@ Start the server, this is the best choice for initial and iterative development.
   ```bash
   make
   ```
+
+For easier build failure logging, run:
+
+```bash
+python _projects/make-helper/run_make.py
+```
 
 ### Load web application into the Browser
 
@@ -327,13 +353,13 @@ In the front matter, you can also define things like a title and description for
 
 - The courses will tell us which menu item it will be under, in this case, the `csa` menu, and the `week` tells it what row (week) it will appear under that menu.
 
-## 🌐 Open Coding Society: Instructional Framework
+## Open Coding Society: Instructional Framework
 
 A flexible, inclusive, and modern teaching model grounded in **Connectivism**, with structured learning through **Merrill**, **Fink**, **UDL**, **Agile**, and select **Gagné** elements. This framework prepares learners to thrive in collaborative, networked, AI-augmented environments.
 
 ---
 
-### 🌐 Guiding Philosophy: Connectivism
+### Guiding Philosophy: Connectivism
 
 > “Learning is a process of connecting specialized nodes or information sources.” – George Siemens
 
@@ -345,7 +371,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 - **Decision-making** (what to learn, when to seek help, what tools to use) is a critical skill
 - **Diverse collaboration** and **community contribution** are essential for relevant, authentic learning
 
-#### 🌐 Connectivist Practices in OCS education
+#### Connectivist Practices in OCS education
 
 - Promote **open collaboration** via GitHub, blogs, scrum-team projects and cross-class projects
 - Encourage learners to **curate, remix, and build upon** knowledge from global networks
@@ -356,7 +382,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 
 ---
 
-### 🧱 Instructional Core: Merrill’s First Principles of Instruction
+### Instructional Core: Merrill’s First Principles of Instruction
 
 > “Make instruction Effective, Efficient, Engaging.”
 
@@ -368,7 +394,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 
 ---
 
-### 🌱 Learning Depth: Fink’s Significant Learning
+### Learning Depth: Fink’s Significant Learning
 
 > Emphasize holistic, transformative learning.  These words and associated actions help learners become assets to the Connectivist landscape. 
 
@@ -382,7 +408,7 @@ OCS is grounded in a **Connectivist philosophy**, recognizing that:
 
 ---
 
-### ♿️ Access & Inclusion: Universal Design for Learning (UDL)
+### Access & Inclusion: Universal Design for Learning (UDL)
 
 > Proactively reduce barriers and support diverse learners. OCS maintains social and coding platforms that support UDL thinking (GitHub, YouTube, LinkedIn, X)
 
@@ -394,17 +420,17 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 
 ---
 
-### 🧭 Structure & Ceremonies: Agile + Design Thinking + Gagné (selective)
+### Structure & Ceremonies: Agile + Design Thinking + Gagné (selective)
 
 > Use classroom **ceremonies** for rhythm, reflection, and real-world alignment.
 
-#### 🎯 Gagné Elements (selective use)
+#### Gagné Elements (selective use)
 
 - **Gain Attention** – Start with prompts, demos, tech news, or student input
 - **Set Objectives** – Clarify sprint, lesson, or project goals
 - **Reflection** – Use reflections and live reviews at the end of lessons/sprints
 
-#### 🧠 Agile & Design Thinking Ceremonies
+#### Agile & Design Thinking Ceremonies
 
 - **Empathy** – Interviews, personas, build "Point of View" and “How Might We…” prompts
 - **Ideation** – Brainstorms, sticky notes, sketches, synthesize
@@ -418,7 +444,7 @@ UDL is not a method but a **design lens** to make learning **accessible and mean
 
 ---
 
-## 🔁 Summary of Learning Philosophies
+## Summary of Learning Philosophies
 
 | Layer | Model | Role |
 |-------|-------|------|

@@ -1,0 +1,80 @@
+[
+  {
+    "name": "Group 1",
+    "period": "1",
+    "members": [
+      "Ava Thompson",
+      "Liam Rodriguez",
+      "Sophia Bennett",
+      "Ethan Collins",
+      "Mia Patterson",
+      "Noah Greene"
+    ],
+    "class" : "CSA"
+  },
+  {
+    "name": "Group 2",
+    "period": "2",
+    "members": [
+      "Oliver Hayes",
+      "Isabella Cruz",
+      "James Foster",
+      "Charlotte Rivera",
+      "Benjamin Reed",
+      "Harper Sullivan"
+    ],
+    "class" : "CSP"
+  },
+  {
+    "name": "Group 3",
+    "period": "3",
+    "members": [
+      "Elijah Cooper",
+      "Amelia Brooks",
+      "Lucas Morgan",
+      "Evelyn Price",
+      "Henry Bailey",
+      "Abigail Torres"
+    ],
+    "class" : "CSSE"
+  },
+  {
+    "name": "Group 4",
+    "period": "4",
+    "members": [
+      "Alexander Gray",
+      "Scarlett Holmes",
+      "William Ortiz",
+      "Emily Chambers",
+      "Michael Barrett",
+      "Victoria Shaw"
+    ],
+    "class" : "CSP"
+  },
+  {
+    "name": "Group 5",
+    "period": "5",
+    "members": [
+      "Daniela Avanzani",
+      "Yoonchae Jeung",
+      "Manon Bannerman",
+      "Sophia Laforteza",
+      "Megan Skiendiel",
+      "Lara Rajagopalan"
+    ],
+    "class" : "CSA"
+  },
+  {
+    "name": "Group 6",
+    "period": "5",
+    "members": [
+      "Daniela",
+      "Yoonchae",
+      "Manon",
+      "Sophia",
+      "Megan",
+      "Lara"
+    ],
+    "class" : "CSA"
+  }
+]

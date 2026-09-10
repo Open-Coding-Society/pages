@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="dsa-logo-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a12;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#12122a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dsa-logo-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4a853;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8c875;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="150" cy="150" r="148" fill="url(#dsa-logo-bg)" stroke="url(#dsa-logo-gold)" stroke-width="2"/>
+  <circle cx="150" cy="150" r="130" fill="none" stroke="#d4a853" stroke-width="0.5" opacity="0.3"/>
+  <!-- Shield shape -->
+  <path d="M150 70 L200 100 L200 170 L150 210 L100 170 L100 100 Z" fill="rgba(212,168,83,0.1)" stroke="#d4a853" stroke-width="2"/>
+  <!-- Star badge -->
+  <polygon points="150,100 156,118 175,118 160,128 166,146 150,136 134,146 140,128 125,118 144,118" fill="#d4a853" opacity="0.8"/>
+  <!-- DSA text -->
+  <text x="150" y="180" font-family="Arial, sans-serif" font-size="22" font-weight="800" text-anchor="middle" fill="url(#dsa-logo-gold)">DSA</text>
+  <text x="150" y="198" font-family="Arial, sans-serif" font-size="8" font-weight="400" text-anchor="middle" fill="#9aa3b0" letter-spacing="1">SAN DIEGO COUNTY</text>
+  <text x="150" y="240" font-family="Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#d4a853">Website Redesign</text>
+  <text x="150" y="258" font-family="Arial, sans-serif" font-size="8" font-weight="500" text-anchor="middle" fill="#4a90d9">TheSprinters</text>
+</svg>

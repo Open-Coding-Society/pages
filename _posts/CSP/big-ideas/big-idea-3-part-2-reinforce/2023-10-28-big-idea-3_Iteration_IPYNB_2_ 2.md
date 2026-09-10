@@ -6,7 +6,6 @@ title: Iteration
 description: Team Teach for Period 4 iteration
 type: collab
 author: Marcus, Ameer, Kayden, Hao
-categories: ['Python']
 ---
 
 ## What is Iteration?

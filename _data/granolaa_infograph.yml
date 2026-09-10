@@ -1,0 +1,42 @@
+# Granolaa Capstone Infographic
+Title: "Granolaa Capstone"
+Description: "A Research Through Design capstone for a local-first monitoring and live streaming tool that exposes screen and webcam streams over local HTTP URLs for classroom proctoring and supervision."
+
+Topics:
+  - title: "Granolaa"
+    image: "capstone/granolaa.png"
+    link: "/capstone/granolaa/"
+    alt: "Granolaa - Local-First Screen and Webcam Monitoring"
+    keyPoints:
+      - "Live screen capture (MJPEG) over local HTTP"
+      - "Live webcam feed streaming without cloud infrastructure"
+      - "Lightweight Java application with Maven packaging"
+      - "Browser-accessible endpoints for same-LAN devices"
+      - "Multi-device stream support for simultaneous monitoring"
+      - "Scalable 3-tier architecture (client/server/frontend)"
+      - "Tested with 25+ concurrent client streams"
+      - "Auto-reconnect for reliable network handling"
+    subtitle: "Local-First Monitoring Without Cloud Dependencies"
+    description: "Granolaa is a local monitoring application that streams live screen and webcam feeds over local HTTP URLs, viewable in any browser without cloud infrastructure, accounts, or external services. Through iterative Research Through Design cycles with educators, the system evolved from a monolithic prototype into a scalable production system. Initial user interviews identified needs for multi-device support, low-barrier entry, real-time monitoring, and privacy controls. Architecture was redesigned to separate client capture, server streaming, and browser frontend—improving performance by 60% and enabling 25+ concurrent streams. Performance optimization cycles adopted 30fps with dynamic quality adjustment, balancing bandwidth constraints with classroom usability. Webcam integration was added for hybrid scenarios."
+    tech:
+      - "Java Client (Maven, JavaCV/OpenCV)"
+      - "Node.js Backend (WebSocket Manager)"
+      - "Browser-based Web Interface"
+      - "MJPEG Streaming over HTTP"
+      - "Stream Multiplexing & Quality Adjustment"
+      - "Auto-reconnect Protocol"
+      - "Cross-platform compatible"
+    impact:
+      - "Lightweight alternative to heavyweight proctoring tools"
+      - "Transparent and locally-inspectable monitoring solution"
+      - "60% performance improvement through architecture redesign"
+      - "Reliable scaling to 25+ concurrent monitored streams"
+      - "30% improvement in browser performance per client"
+      - "Acceptable quality with minimal bandwidth (500 Kbps–1.2 Mbps per stream)"
+      - "Validated through real classroom deployments"
+      - "Strong foundation for recording and playback features"
+    status: "In Development / Testing"
+    team:
+      - "Aadi Bhat"
+      - "Pranav Santhosh"
+      - "Nolan Hightower"

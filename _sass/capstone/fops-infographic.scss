@@ -1,0 +1,408 @@
+// Friends of Poway Seniors Infographic Styles
+// Color Variables
+$fops-green: #5aab64;
+$fops-green-light: #243d27;
+$fops-gold: #c4993a;
+$fops-dark: #0f1f11;
+$fops-mid: #a8c4ab;
+$fops-bg: #152418;
+$fops-white: #e8f2e9;
+$fops-border: #2a4030;
+$fops-card-bg: #1c3320;
+$fops-highlight: rgba(196, 153, 58, 0.15);
+
+.fops-infographic {
+  max-width: 1000px;
+  margin: 2rem auto;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: $fops-white;
+  
+  // Header Section
+  .infographic-header {
+    background: linear-gradient(135deg, $fops-dark 0%, darken($fops-dark, 3%) 100%);
+    border: 1px solid $fops-border;
+    border-radius: 24px 24px 0 0;
+    padding: 2.5rem 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba($fops-gold, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      background: rgba($fops-gold, 0.15);
+      border: 1px solid rgba($fops-gold, 0.3);
+      color: $fops-gold;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .infographic-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      color: $fops-white;
+    }
+    
+    .infographic-description {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: $fops-mid;
+      max-width: 700px;
+    }
+  }
+  
+  // Topic Card
+  .topic-card {
+    background: $fops-card-bg;
+    border: 1px solid $fops-border;
+    border-top: none;
+    padding: 2.5rem;
+    
+    .topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+      
+      @media (max-width: 700px) {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+    
+    .topic-left {
+      .image-wrapper {
+        background: $fops-bg;
+        border: 1px solid $fops-border;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        
+        .topic-image {
+          max-width: 100%;
+          height: auto;
+          max-height: 120px;
+          object-fit: contain;
+        }
+      }
+      
+      .topic-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+        color: $fops-white;
+      }
+      
+      .topic-subtitle {
+        font-size: 0.9rem;
+        color: $fops-mid;
+        margin-bottom: 1.2rem;
+      }
+      
+      .view-plan-btn {
+        display: inline-block;
+        background: transparent;
+        border: 1px solid $fops-gold;
+        color: $fops-gold;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.5rem 1.2rem;
+        border-radius: 30px;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background: $fops-gold;
+          color: $fops-dark;
+        }
+      }
+    }
+    
+    .topic-right {
+      .topic-description {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: $fops-white;
+        opacity: 0.9;
+      }
+    }
+    
+    // Section Titles
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      color: $fops-gold;
+      letter-spacing: -0.01em;
+    }
+    
+    // Key Points Grid
+    .key-points-section {
+      margin-bottom: 2.5rem;
+    }
+    
+    .points-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.8rem;
+      
+      .point-card {
+        background: rgba($fops-bg, 0.5);
+        border: 1px solid $fops-border;
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.7rem;
+        transition: transform 0.2s;
+        
+        &:hover {
+          transform: translateX(4px);
+          background: rgba($fops-bg, 0.8);
+        }
+        
+        .point-icon {
+          color: $fops-green;
+          font-weight: 700;
+          flex-shrink: 0;
+        }
+        
+        .point-text {
+          font-size: 0.9rem;
+          line-height: 1.4;
+          color: $fops-white;
+        }
+      }
+    }
+    
+    // Features & Impact Grid
+    .features-impact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      
+      @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+    
+    .tech-section {
+      .tech-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        
+        .tech-tag {
+          background: rgba($fops-bg, 0.6);
+          border: 1px solid $fops-border;
+          color: $fops-mid;
+          font-size: 0.75rem;
+          padding: 0.3rem 0.9rem;
+          border-radius: 30px;
+        }
+      }
+    }
+    
+    .impact-section {
+      .impact-list {
+        list-style: none;
+        padding: 0;
+        
+        li {
+          font-size: 0.85rem;
+          line-height: 1.5;
+          margin-bottom: 0.7rem;
+          padding-left: 1.2rem;
+          position: relative;
+          color: $fops-white;
+          opacity: 0.9;
+          
+          &::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: $fops-gold;
+          }
+        }
+      }
+    }
+    
+    // Team Footer
+    .team-footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid $fops-border;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      
+      .team-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: $fops-mid;
+      }
+      
+      .team-members {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+        
+        .team-member {
+          font-size: 0.9rem;
+          color: $fops-white;
+          position: relative;
+          
+          &:not(:last-child)::after {
+            content: ',';
+            margin-right: 0.5rem;
+            color: $fops-mid;
+          }
+        }
+      }
+    }
+  }
+  
+  // Feature Spotlight (Meal Tracker)
+  .feature-spotlight {
+    background: linear-gradient(135deg, $fops-green-light 0%, darken($fops-green-light, 5%) 100%);
+    border: 1px solid $fops-border;
+    border-radius: 0 0 24px 24px;
+    padding: 2rem 2.5rem;
+    
+    .feature-badge {
+      display: inline-block;
+      background: $fops-gold;
+      color: $fops-dark;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.8rem;
+      border-radius: 100px;
+      margin-bottom: 1rem;
+    }
+    
+    h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $fops-white;
+      margin-bottom: 0.8rem;
+    }
+    
+    p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: $fops-mid;
+      margin-bottom: 1.5rem;
+      max-width: 700px;
+    }
+    
+    .tracker-preview {
+      background: rgba($fops-bg, 0.5);
+      border: 1px solid $fops-border;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      
+      @media (max-width: 500px) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .tracker-day {
+        .day-label {
+          display: block;
+          font-size: 0.7rem;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: $fops-gold;
+          margin-bottom: 0.8rem;
+        }
+        
+        .meal-item {
+          display: flex;
+          justify-content: space-between;
+          padding: 0.4rem 0;
+          border-bottom: 1px dashed $fops-border;
+          
+          .meal-name {
+            font-size: 0.85rem;
+            color: $fops-mid;
+          }
+          
+          .meal-value {
+            font-size: 0.85rem;
+            color: $fops-white;
+            font-weight: 500;
+          }
+        }
+      }
+      
+      .tracker-stats {
+        background: rgba($fops-bg, 0.7);
+        border-radius: 12px;
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        
+        .stat {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          
+          .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: $fops-gold;
+          }
+          
+          .stat-label {
+            font-size: 0.8rem;
+            color: $fops-mid;
+          }
+        }
+      }
+    }
+    
+    .spotlight-note {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: $fops-mid;
+      background: rgba($fops-bg, 0.3);
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+  }
+}

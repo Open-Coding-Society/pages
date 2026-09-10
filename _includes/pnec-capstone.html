@@ -1,0 +1,492 @@
+{% comment %}
+  PNEC showcase, DEDICATED include for /capstone/powaynec/ only.
+  Self-contained and fully scoped under `.pnec-cap` so it cannot affect
+  the rest of the Open Coding Society site, and so the shared
+  `powaynec-infograph.html` / `powaynec_infograph.yml` (still used by
+  /capstone/powaynec-showcase/) are left untouched. Images resolve from
+  /images/capstone/pnec/<name>; missing ones degrade to a labelled
+  placeholder automatically (no broken-image icons).
+{% endcomment %}
+
+<div class="pnec-cap">
+
+  <!-- Hero -->
+  <header class="pnec-cap-hero">
+    <div class="pnec-cap-hero-text">
+      <span class="pnec-cap-eyebrow">A digital home for Poway Neighborhood Emergency Corps</span>
+      <h1 class="pnec-cap-h1">A preparedness platform<br>Poway can actually use</h1>
+      <p class="pnec-cap-lede">
+        We rebuilt the PNEC site into a working platform. Residents see today's risk
+        for Poway, ask a chatbot anything they're unsure about, find their block and
+        coordinator on a map, and volunteers can edit any page themselves without
+        writing code.
+      </p>
+      <div class="pnec-cap-cta">
+        <a class="pnec-cap-btn pnec-cap-btn--primary" href="https://pnec.opencodingsociety.com" target="_blank" rel="noopener">View the live site →</a>
+        <a class="pnec-cap-btn" href="#pnec-cap-benefits">What it delivers</a>
+      </div>
+      <ul class="pnec-cap-team" aria-label="Project team">
+        <li>Aneesh Deevi</li><li>Ethan Patel</li><li>Samarth Vaka</li>
+      </ul>
+    </div>
+    <div class="pnec-cap-hero-logo">
+      <img src="{{ site.baseurl }}/images/capstone/powaynec-logo-white.png"
+           alt="Poway Neighborhood Emergency Corps logo"
+           onerror="this.closest('.pnec-cap-hero-logo').classList.add('is-empty')">
+    </div>
+  </header>
+
+  <!-- What this means for Poway (positive, benefits-forward) -->
+  <section class="pnec-cap-section" id="pnec-cap-benefits">
+    <h2 class="pnec-cap-h2">What this means for Poway</h2>
+    <div class="pnec-cap-grid pnec-cap-grid--3">
+      <div class="pnec-cap-prob">
+        <span class="pnec-cap-prob-no">For residents</span>
+        <h3>Ready before they ask</h3>
+        <p>Residents see Poway's wildfire, flood, and heat risk the moment the page
+           loads. Anything else, they ask the chatbot.</p>
+      </div>
+      <div class="pnec-cap-prob">
+        <span class="pnec-cap-prob-no">For neighborhoods</span>
+        <h3>Connected to their block</h3>
+        <p>Every household can find its coordinator, nearest fire station, and
+           evacuation route on one map.</p>
+      </div>
+      <div class="pnec-cap-prob">
+        <span class="pnec-cap-prob-no">For PNEC</span>
+        <h3>Owned by the corps</h3>
+        <p>Volunteers update the site themselves. Hosting is free. Easy to extend
+           when PNEC needs something new.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- What Poway gets now -->
+  <section class="pnec-cap-section">
+    <h2 class="pnec-cap-h2">What Poway gets now</h2>
+
+    <article class="pnec-cap-feature">
+      <div class="pnec-cap-feature-body">
+        <span class="pnec-cap-tag">Connects every household</span>
+        <h3>Find Your Neighborhood</h3>
+        <p>A map of every Poway neighborhood. Click one and you get the block
+           coordinator, the nearest fire station, and the evacuation route for that
+           area.</p>
+        <a class="pnec-cap-link" href="https://pnec.opencodingsociety.com/pages/find-your-neighborhood.html" target="_blank" rel="noopener">Find a neighborhood →</a>
+      </div>
+      <figure class="pnec-cap-figure" data-shot="Interactive Poway neighborhood map">
+        <img src="{{ site.baseurl }}/images/capstone/pnec/map.png" alt="Interactive Poway neighborhood map with a neighborhood detail panel"
+             loading="lazy" onerror="this.closest('.pnec-cap-figure').classList.add('is-empty')">
+      </figure>
+    </article>
+
+    <article class="pnec-cap-feature pnec-cap-feature--rev">
+      <div class="pnec-cap-feature-body">
+        <span class="pnec-cap-tag">Answers, any time</span>
+        <h3>Helper Bot</h3>
+        <p>A chatbot that answers prep questions like what goes in a 72-hour kit or
+           how to evacuate. It pulls from PNEC's own FAQs so the answers stay
+           accurate.</p>
+        <a class="pnec-cap-link" href="https://pnec.opencodingsociety.com/#chatbot-trigger-btn" target="_blank" rel="noopener">Ask it a question →</a>
+      </div>
+      <figure class="pnec-cap-figure" data-shot="Helper Bot answering a preparedness question">
+        <img src="{{ site.baseurl }}/images/capstone/pnec/chatbot.png" alt="Helper Bot answering a Poway preparedness question"
+             loading="lazy" onerror="this.closest('.pnec-cap-figure').classList.add('is-empty')">
+      </figure>
+    </article>
+
+    <article class="pnec-cap-feature">
+      <div class="pnec-cap-feature-body">
+        <span class="pnec-cap-tag">Live, on the homepage</span>
+        <h3>Risk Watch</h3>
+        <p><strong>Wildfire</strong>, <strong>flood</strong>, and
+           <strong>extreme heat</strong> risk for Poway, shown on the homepage. Pulls
+           from live weather and AQI data. No login, no download.</p>
+        <a class="pnec-cap-link" href="https://pnec.opencodingsociety.com/#pnec-risk-title" target="_blank" rel="noopener">See it live →</a>
+      </div>
+      <figure class="pnec-cap-figure" data-shot="Risk Watch, homepage risk panel">
+        <img src="{{ site.baseurl }}/images/capstone/pnec/risk-watch.png" alt="Risk Watch panel showing wildfire, flood and extreme heat scores for Poway"
+             loading="lazy" onerror="this.closest('.pnec-cap-figure').classList.add('is-empty')">
+      </figure>
+    </article>
+
+    <article class="pnec-cap-feature pnec-cap-feature--rev">
+      <div class="pnec-cap-feature-body">
+        <span class="pnec-cap-tag">Built to grow</span>
+        <h3>Member accounts and roles</h3>
+        <p>Accounts for <strong>residents</strong>, <strong>volunteers</strong>, and
+           <strong>admins</strong>, each with their own dashboard. PNEC can actually
+           run things from the site, not just publish to it.</p>
+        <a class="pnec-cap-link" href="https://pnec.opencodingsociety.com/pages/register.html" target="_blank" rel="noopener">See the member portal →</a>
+      </div>
+      <figure class="pnec-cap-figure" data-shot="Secure member sign-in">
+        <img src="{{ site.baseurl }}/images/capstone/pnec/dashboard.png" alt="Secure member sign-in for residents, volunteers and admins"
+             loading="lazy" onerror="this.closest('.pnec-cap-figure').classList.add('is-empty')">
+      </figure>
+    </article>
+
+    <article class="pnec-cap-feature">
+      <div class="pnec-cap-feature-body">
+        <span class="pnec-cap-tag">Run by volunteers, no developer</span>
+        <h3>Edit and publish in minutes</h3>
+        <p>Volunteers can edit any page from the browser. The editor uses AI to turn
+           a plain request like "change this date" into the actual code change, then
+           commits it. No coder needed to push an event update.</p>
+        <a class="pnec-cap-link" href="https://pnec.opencodingsociety.com/pages/admin-editor.html" target="_blank" rel="noopener">See the editor →</a>
+      </div>
+      <figure class="pnec-cap-figure" data-shot="The live theme editor volunteers use">
+        <img src="{{ site.baseurl }}/images/capstone/pnec/theme-editor.png" alt="The live theme editor volunteers use to update the site"
+             loading="lazy" onerror="this.closest('.pnec-cap-figure').classList.add('is-empty')">
+      </figure>
+    </article>
+  </section>
+
+  <!-- ===== HANDOFF: for the next APCSP team taking over PNEC ===== -->
+  <section class="pnec-cap-section pnec-cap-handoff" id="pnec-cap-handoff">
+    <h2 class="pnec-cap-h2">For the next team taking over PNEC</h2>
+
+    <div class="pnec-cap-links">
+      <a class="pnec-cap-btn pnec-cap-btn--primary" href="https://pnec.opencodingsociety.com" target="_blank" rel="noopener">Live site</a>
+      <a class="pnec-cap-btn pnec-cap-handoff-btn" href="https://github.com/whitelunarium/Beasts_FrontEnd" target="_blank" rel="noopener">Frontend repo</a>
+      <a class="pnec-cap-btn pnec-cap-handoff-btn" href="https://github.com/whitelunarium/Beasts_Flask" target="_blank" rel="noopener">Backend repo</a>
+    </div>
+
+    <!-- 1. What was done -->
+    <div class="pnec-cap-handoff-block">
+      <h3 class="pnec-cap-handoff-h3">1. What was done</h3>
+      <p class="pnec-cap-handoff-p">Everything below is on the live site right now. Look at the code before you touch it.</p>
+      <ul class="pnec-cap-done-list">
+        <li><strong>Risk Watch.</strong> Pulls wildfire, flood, and heat risk for Poway from Open-Meteo plus an AQI feed. Cached for 30 min so we don't hammer the APIs.</li>
+        <li><strong>Helper Bot.</strong> Gemini chatbot, proxied through the Flask backend so the API key stays off the frontend. Uses PNEC's actual FAQ data as context.</li>
+        <li><strong>Find Your Neighborhood.</strong> Leaflet map with all 60+ Poway neighborhoods. Each one shows a coordinator, the nearest fire station, and evac guidance.</li>
+        <li><strong>Member accounts.</strong> Four roles: resident, coordinator, staff, admin. Login uses session cookies and bearer tokens, with IP-level rate limiting and lockout after failed attempts.</li>
+        <li><strong>Live Theme Editor.</strong> Lets approved volunteers edit Jekyll pages from the browser. Groq turns their request into the edit, then the backend commits it to the frontend repo using the GitHub API.</li>
+      </ul>
+    </div>
+
+    <!-- 2. What was said -->
+    <div class="pnec-cap-handoff-block">
+      <h3 class="pnec-cap-handoff-h3">2. What was said <span class="pnec-cap-handoff-sub">Feedback from the CTE Expo and N@tM</span></h3>
+      <ol class="pnec-cap-said-list">
+        <li>
+          <strong>Add wind to Risk Watch.</strong>
+          Right now it shows fire, flood, and heat. Santa Ana wind events are a big deal in Poway and should be on the panel too.
+        </li>
+        <li>
+          <strong>Lock down the chatbot.</strong>
+          Audit Helper Bot for prompt injection and data leaks. It shouldn't be able to reveal internal info or make up emergency advice.
+        </li>
+        <li>
+          <strong>Address lookup for Find Your Neighborhood.</strong>
+          Right now people have to know which neighborhood they're in. Let them type an address and have the page jump straight to the right block and coordinator.
+        </li>
+        <li>
+          <strong>Coordinator email.</strong>
+          Coordinators need to actually email the residents on their block, not just see a contact card.
+        </li>
+        <li>
+          <strong>Mobile Device accessibility.</strong>
+          The ability to run the website and have proper aspect ratios on a mobile device such as an IPhone would improve the website.
+        </li>
+        <li>
+          <strong>Improve Live Theme Editor.</strong>
+          An easier to use theme editor would be an improvement for the website.
+        </li>
+        <li>
+          <strong>Neighborhood Coordinators.</strong>
+          More options for them and things that they can do that would improve their role in PNEC as a neighborhood coordinator role.
+        </li>
+      </ol>
+    </div>
+
+    <!-- 3. What needs to come next -->
+    <div class="pnec-cap-handoff-block">
+      <h3 class="pnec-cap-handoff-h3">3. What needs to come next</h3>
+      <ol class="pnec-cap-next-list">
+        <li>Implement and <strong>test</strong> the improvements: wind, chatbot safety, address lookup, coordinator email, live theme editor fixes, neighborhood coordinator uses.</li>
+        <li>Meet with the PNEC team about the website.</li>
+        <li>Work with the nonproft to try to implement your website version on their live site.</li>
+      </ol>
+    </div>
+
+  </section>
+
+  <!-- Close -->
+  <section class="pnec-cap-section pnec-cap-closing">
+    <h2 class="pnec-cap-h2">Ready for Poway</h2>
+    <div class="pnec-cap-cta">
+      <a class="pnec-cap-btn pnec-cap-btn--primary" href="https://pnec.opencodingsociety.com" target="_blank" rel="noopener">View the live site →</a>
+    </div>
+    <figure class="pnec-cap-qr" aria-label="Scan to visit the live PNEC site">
+      <img src="{{ site.baseurl }}/images/capstone/pnec/pnec-qr.png"
+           alt="QR code linking to the live PNEC site"
+           loading="lazy">
+      <figcaption>Scan to open the live site on your phone</figcaption>
+    </figure>
+  </section>
+
+</div>
+
+<style>
+/* Everything is scoped under .pnec-cap so it CANNOT affect the rest of
+   the Open Coding Society site. !important is used only to defeat the
+   site theme's .post-content defaults inside this block. */
+.pnec-cap{
+  --pn-ink:#0a1628; --pn-green:#0e3b21; --pn-green2:#145a32;
+  --pn-accent:#1e8449; --pn-cream:#fbf8f1; --pn-line:#e3decd;
+  --pn-surface:#ffffff;
+  font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  color:var(--pn-ink); line-height:1.6; max-width:1100px;
+  margin:8px auto 40px;
+  /* Own light "case-study" surface so the component is readable on the
+     OCS dark site theme (and stays correct if that theme changes). */
+  background:var(--pn-surface);
+  border:1px solid var(--pn-line);
+  border-radius:22px;
+  padding:34px 40px 52px;
+  box-shadow:0 18px 50px rgba(0,0,0,.28);
+}
+.pnec-cap *{box-sizing:border-box;}
+@media (max-width:820px){ .pnec-cap{ padding:22px 18px 36px; border-radius:16px; } }
+.pnec-cap h1,.pnec-cap h2,.pnec-cap h3{color:var(--pn-green)!important;line-height:1.15;margin:0;}
+.pnec-cap p{margin:0;color:var(--pn-ink)!important;}
+.pnec-cap a{text-decoration:none;}
+
+/* Hero */
+.pnec-cap-hero{
+  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:32px;align-items:center;
+  background:linear-gradient(135deg,var(--pn-green) 0%,var(--pn-green2) 60%,var(--pn-accent) 100%);
+  border-radius:20px;padding:44px 40px;color:var(--pn-cream);margin-bottom:48px;
+}
+.pnec-cap-hero h1,.pnec-cap-hero p{color:var(--pn-cream)!important;}
+.pnec-cap-eyebrow{display:inline-block;font-size:.74rem;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:#d4efdf!important;margin-bottom:14px;}
+.pnec-cap-h1{font-size:clamp(2rem,4.6vw,3.1rem);font-weight:900;letter-spacing:-.02em;color:var(--pn-cream)!important;}
+.pnec-cap-lede{font-size:1.02rem;margin-top:16px!important;max-width:62ch;}
+.pnec-cap-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;}
+.pnec-cap-btn{display:inline-block;padding:11px 20px;border-radius:10px;font-weight:800;
+  font-size:.92rem;border:1.5px solid rgba(255,255,255,.55);color:var(--pn-cream)!important;
+  transition:transform .12s ease,background .15s ease;}
+.pnec-cap-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.14);}
+.pnec-cap-btn--primary{background:var(--pn-cream);color:var(--pn-green)!important;border-color:var(--pn-cream);}
+.pnec-cap-btn--primary:hover{background:#fff;}
+.pnec-cap-team{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;}
+.pnec-cap-team li{font-size:.8rem;font-weight:700;background:rgba(255,255,255,.16);
+  color:var(--pn-cream)!important;padding:5px 12px;border-radius:999px;}
+.pnec-cap-hero-logo{display:flex;justify-content:center;align-items:center;}
+.pnec-cap-hero-logo img{max-width:100%;height:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.3));}
+.pnec-cap-hero-logo.is-empty{min-height:120px;border:1.5px dashed rgba(255,255,255,.5);
+  border-radius:14px;}
+.pnec-cap-hero-logo.is-empty img{display:none;}
+
+/* Sections */
+.pnec-cap-section{margin:0 0 56px;}
+.pnec-cap-h2{font-size:clamp(1.4rem,2.8vw,2rem);font-weight:900;letter-spacing:-.01em;
+  padding-bottom:10px;border-bottom:2px solid var(--pn-line);margin-bottom:28px!important;}
+
+/* Problem + CS grids */
+.pnec-cap-grid{display:grid;gap:18px;}
+.pnec-cap-grid--3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.pnec-cap-prob,.pnec-cap-cs{background:var(--pn-cream);border:1px solid var(--pn-line);
+  border-radius:14px;padding:22px;}
+.pnec-cap-prob-no{font-size:.74rem;font-weight:900;color:var(--pn-accent)!important;letter-spacing:.08em;text-transform:uppercase;}
+.pnec-cap-prob h3,.pnec-cap-cs h3{font-size:1.06rem;font-weight:800;margin:8px 0 6px!important;}
+.pnec-cap-prob p,.pnec-cap-cs p{font-size:.92rem;}
+
+/* Feature rows */
+.pnec-cap-feature{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
+  gap:30px;align-items:center;padding:26px 0;border-bottom:1px solid var(--pn-line);}
+.pnec-cap-feature:last-child{border-bottom:0;}
+.pnec-cap-feature--rev .pnec-cap-feature-body{order:2;}
+.pnec-cap-tag{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--pn-accent)!important;background:#eaf5ee;
+  padding:5px 11px;border-radius:999px;margin-bottom:12px;}
+.pnec-cap-feature-body h3{font-size:1.5rem;font-weight:900;margin-bottom:10px!important;}
+.pnec-cap-feature-body p{font-size:.98rem;}
+.pnec-cap-link{display:inline-block;margin-top:14px;font-weight:800;font-size:.92rem;
+  color:var(--pn-accent)!important;border-bottom:2px solid currentColor;padding-bottom:1px;}
+.pnec-cap-figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--pn-line);
+  background:var(--pn-cream);}
+.pnec-cap-figure img{display:block;width:100%;height:auto;}
+.pnec-cap-figure.is-empty{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
+  border-style:dashed;border-color:var(--pn-accent);background:repeating-linear-gradient(
+  45deg,#f3f7f3,#f3f7f3 14px,#eef4ee 14px,#eef4ee 28px);}
+.pnec-cap-figure.is-empty img{display:none;}
+.pnec-cap-figure.is-empty::after{content:"📷  " attr(data-shot);
+  color:var(--pn-green2);font-weight:700;font-size:.9rem;text-align:center;padding:18px;}
+
+/* Architecture */
+.pnec-cap-arch{display:flex;flex-wrap:wrap;align-items:stretch;justify-content:center;gap:14px;}
+.pnec-cap-arch-node{flex:1 1 240px;background:var(--pn-green);color:var(--pn-cream);
+  border-radius:14px;padding:20px;text-align:center;}
+.pnec-cap-arch-node strong{display:block;font-size:1.1rem;margin:6px 0 6px;color:var(--pn-cream)!important;}
+.pnec-cap-arch-node small{opacity:.85;font-size:.82rem;}
+.pnec-cap-arch-k{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#a9d8bd!important;}
+.pnec-cap-arch-arrow{display:flex;align-items:center;font-weight:800;color:var(--pn-accent)!important;font-size:.85rem;}
+
+/* Closing */
+.pnec-cap-closing{background:var(--pn-cream);border:1px solid var(--pn-line);
+  border-radius:18px;padding:34px 32px;text-align:center;}
+.pnec-cap-closing .pnec-cap-lede{color:var(--pn-ink)!important;margin:0 auto!important;max-width:70ch;}
+.pnec-cap-closing .pnec-cap-cta{justify-content:center;}
+.pnec-cap-closing .pnec-cap-btn--primary{background:var(--pn-green);color:var(--pn-cream)!important;border-color:var(--pn-green);}
+
+/* QR code (closing section) */
+.pnec-cap-qr{margin:26px auto 0;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.pnec-cap-qr img{width:180px;height:180px;background:#fff;padding:10px;
+  border:1px solid var(--pn-line);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.12);}
+.pnec-cap-qr figcaption{font-size:.85rem;font-weight:700;color:var(--pn-green2)!important;
+  letter-spacing:.02em;}
+
+@media (max-width:820px){
+  .pnec-cap-hero{grid-template-columns:1fr;text-align:center;padding:34px 22px;}
+  .pnec-cap-hero-logo{order:-1;}
+  .pnec-cap-cta,.pnec-cap-team{justify-content:center;}
+  .pnec-cap-grid--3{grid-template-columns:1fr;}
+  .pnec-cap-feature{grid-template-columns:1fr;gap:18px;}
+  .pnec-cap-feature--rev .pnec-cap-feature-body{order:0;}
+  .pnec-cap-arch-arrow{transform:rotate(90deg);}
+}
+
+/* ===== Handoff section (for the next APCSP team) ===== */
+.pnec-cap-handoff{
+  background:linear-gradient(135deg,#fbf8f1 0%,#f1ead9 100%);
+  border:1px solid var(--pn-line);
+  border-radius:18px;
+  padding:34px 32px;
+}
+.pnec-cap-handoff-lede{
+  font-size:1rem!important;
+  max-width:78ch;
+  margin:0 0 22px!important;
+  color:var(--pn-ink)!important;
+}
+.pnec-cap-links{
+  display:flex;flex-wrap:wrap;gap:10px;margin:0 0 26px;
+}
+.pnec-cap-handoff-btn{
+  color:var(--pn-green)!important;
+  border-color:var(--pn-green);
+}
+.pnec-cap-handoff-block{
+  background:#fff;
+  border:1px solid var(--pn-line);
+  border-radius:14px;
+  padding:22px 24px;
+  margin:0 0 16px;
+}
+.pnec-cap-handoff-h3{
+  font-size:1.25rem;
+  font-weight:900;
+  margin:0 0 6px!important;
+  color:var(--pn-green)!important;
+}
+.pnec-cap-handoff-sub{
+  display:block;
+  font-size:.72rem;
+  font-weight:800;
+  color:var(--pn-accent)!important;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-top:4px;
+}
+.pnec-cap-handoff-p{
+  font-size:.95rem!important;
+  margin:8px 0 14px!important;
+  color:var(--pn-ink)!important;
+}
+.pnec-cap-handoff-h4{
+  font-size:.78rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--pn-accent)!important;
+  margin:18px 0 8px;
+}
+.pnec-cap-done-list,
+.pnec-cap-said-list,
+.pnec-cap-next-list{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+.pnec-cap-done-list li,
+.pnec-cap-said-list li,
+.pnec-cap-next-list li{
+  font-size:.95rem;
+  padding:10px 0 10px 30px;
+  border-bottom:1px dashed var(--pn-line);
+  position:relative;
+  color:var(--pn-ink)!important;
+  line-height:1.55;
+}
+.pnec-cap-done-list li:last-child,
+.pnec-cap-said-list li:last-child,
+.pnec-cap-next-list li:last-child{
+  border-bottom:0;
+}
+.pnec-cap-done-list li::before{
+  content:"\2713";
+  position:absolute;left:4px;top:10px;
+  color:var(--pn-accent);
+  font-weight:900;
+  font-size:1rem;
+}
+.pnec-cap-said-list{counter-reset:said-counter;}
+.pnec-cap-said-list li{
+  counter-increment:said-counter;
+  padding-left:38px;
+}
+.pnec-cap-said-list li::before{
+  content:counter(said-counter);
+  position:absolute;left:0;top:10px;
+  color:#fff;
+  background:var(--pn-accent);
+  font-weight:900;
+  font-size:.78rem;
+  width:22px;height:22px;
+  border-radius:50%;
+  text-align:center;
+  line-height:22px;
+}
+.pnec-cap-next-list{counter-reset:next-counter;}
+.pnec-cap-next-list li{
+  counter-increment:next-counter;
+  padding-left:30px;
+}
+.pnec-cap-next-list li::before{
+  content:counter(next-counter)".";
+  position:absolute;left:4px;top:10px;
+  color:var(--pn-green);
+  font-weight:900;
+}
+.pnec-cap-contacts{
+  margin-top:8px;
+  padding:22px 24px;
+  background:var(--pn-green);
+  color:var(--pn-cream);
+  border-radius:14px;
+}
+.pnec-cap-contacts .pnec-cap-handoff-h3,
+.pnec-cap-contacts .pnec-cap-contacts-h{
+  color:var(--pn-cream)!important;
+  margin-bottom:12px!important;
+}
+.pnec-cap-contacts ul{
+  list-style:none;padding:0;margin:0;
+}
+.pnec-cap-contacts li{
+  font-size:.95rem;
+  padding:8px 0;
+  border-bottom:1px solid rgba(251,248,241,.16);
+  color:var(--pn-cream)!important;
+}
+.pnec-cap-contacts li:last-child{border-bottom:0;}
+.pnec-cap-contacts strong{color:#d4efdf!important;}
+
+@media (max-width:820px){
+  .pnec-cap-handoff{padding:24px 18px;}
+  .pnec-cap-handoff-block{padding:18px 16px;}
+  .pnec-cap-contacts{padding:18px 16px;}
+}
+</style>

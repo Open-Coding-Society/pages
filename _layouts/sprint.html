@@ -1,116 +1,53 @@
 ---
-layout: post 
+layout: post
 ---
-
-{% comment %} 
-Setup course data
-{% endcomment %}
 
 {% assign shared = site.data.cs %}
 {% assign course = site.data[page.course] %}
 {% assign units = page.units | split: ',' %}
-
-{% comment %} 
-Load all posts
-{% endcomment %}
 {% assign posts = null | compact %}
-{% assign posts = posts | concat:site.posts | concat:site.pages %}
+{% assign posts = posts | concat: site.posts | concat: site.pages %}
 
-{% comment %} 
-Iterate through Course Units
-{% endcomment %}
-{% for unit in units %}
-  {% comment %} 
-  Extract unit data for the Sprint
-  {% endcomment %}
-  {% assign unitKey = "Sprint" | append: unit %}
-  {% assign unitData = course[unitKey] %}
-  {% assign courseUnit = course[unitKey] %}
-  {% assign start = unitData.start %}
-  {% assign end = unitData.end %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="{{ '/assets/js/help-video.js' | relative_url }}"></script>
 
-  {% comment %} 
-  Override unit data with shared unit data if available, ie common between courses
-  {% endcomment %}
-  {% if courseUnit.shared %}
-    {% assign unitData = shared[courseUnit.shared] %}
-  {% endif %}
+<div class="timeline-page">
+<div class="timeline-header">
+  <h1>Course Timeline</h1>
+</div>
 
-  {% comment %} 
-  Heading content for the Sprint
-  {% endcomment %}
-  <h2>{{ unitKey }}: {{ unitData.title }}</h2>
-  <h3>Weeks: {{ start }} - {{ end }}</h3>
-  <p>{{ unitData.description }}</p>
+{% include announcement_chat.html %}
 
-  {% comment %} 
-  Text based illustration for Sprint objectives
-  {% endcomment %}
-  {% if unitData.illustration %}
-    <details>
-      <summary>Textual Illustration of Goals</summary>
-      <pre>
-        <p>{{ unitData.illustration }}</p>
-      </pre>
-    </details>
-    <br/>
-  {% endif %}
+<div class="timeline-container">
+  {% for unit in units %}
+    {% assign unitKey = "Sprint" | append: unit %}
+    {% assign unitData = course[unitKey] %}
+    {% assign courseUnit = course[unitKey] %}
+    {% assign start = unitData.start %}
+    {% assign end = unitData.end %}
+    {% assign helpUrl = unitData.help %}
 
-  {% comment %} 
-  Mermaid based illustration for Sprint objectives
-  {% endcomment %}
-  {% if unitData.mermaid_figure %}
-    <details>
-      <summary>Grapical Illustration of Goals</summary>
-      <div class="mermaid">
-        {{ unitData.mermaid_figure }}
-      </div>
-    </details>
-    <br/>
-  {% endif %}
+    {% if courseUnit.shared %}
+      {% assign unitData = shared[courseUnit.shared] %}
+    {% endif %}
 
-  {% comment %} 
-  Column Headings for Articles, ie Blogs
-  {% endcomment %}
-  <table>
-    <tr>
-      <th>Title</th>
-      <th>Type</th>
-    </tr>
+    {% include sprint-card.html %}
+  {% endfor %}
+</div>
 
-    {% comment %} 
-    Generate a table of posts for the current Sprint
-    {% endcomment %}
+<!-- Modals for sprint page -->
+{% include sprint-modals.html %}
 
-    {% for index in (start..end) %}
-      {% comment %}
-      Locate posts in the matching weeks of Sprint
-      {% endcomment %}
-      {% assign entries = null | compact %}
-      {% for post in posts %}
-        {% if post.courses[page.course] %}
-          {% assign week = post.courses[page.course].week | plus: 0 %}
-          {% if week == index %}
-            {% assign entry = post.title | append: "||" | append: post.url | append: "||" | append: post.type %}
-            {% assign entries = entries | push: entry %}
-          {% endif %}
-        {% endif %}
-      {% endfor %}
+<!-- Include calendar sync modals and functionality -->
+{% include calendar.html %}
 
-      {% comment %}
-      Render the located posts 
-      {% endcomment %}
-      {% for entry in entries %}
-        {% assign parts = entry | split: "||" %}
-        <tr>
-          <td>
-            <a href="{{ site.baseurl }}{{ parts[1] }}">{{ parts[0] }}</a>
-          </td>
-          <td>
-            {{ parts[2] }}
-          </td>
-        </tr>
-      {% endfor %}
-    {% endfor %}
-  </table>
-{% endfor %}
+<!-- Embed course skill library as application/json (avoid problematic Liquid default with {} ) -->
+<script id="course-skill-lib-json" type="application/json">
+  {{ course | jsonify }}
+</script>
+
+<script src="{{site.baseurl}}/assets/js/projects/courses/courses.js"></script>
+</div>
+<!-- End .timeline-page -->

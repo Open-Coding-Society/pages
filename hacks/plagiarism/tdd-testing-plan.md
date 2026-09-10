@@ -1,9 +1,13 @@
 ---
 layout: post
-title: Plagiarism TDD plan
+comments: true
+courses: {'csp': {'week': 9}}
+categories: [English]
+layout: post
+title: Plagiarism TDD plan and ceremony (Sample)
 description: In the Plagiarism Prevention Quest we will use Test-Driven Development (TDD) and enable a Feedback Plan,  Ceremony to introduce a "Quest sytle" project.  Student will have similar Test ceremony at N@tM for their projects.
-author: John Mortensen
 permalink: /plagiarism/tdd-plan
+author: John Mortensen
 breadcrumb: True
 ---
 

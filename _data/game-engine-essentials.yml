@@ -1,0 +1,41 @@
+# course illustrations
+Title: "GameEngine Essentials"
+Description: "This is an essentials overview of the OCS GameEngine, featuring the essential objects, capabilities, and components of the engine."
+
+Topics:
+  - title: "Variables"
+    image: "/gamify/lessons/variables.png"
+    alt: "VariablesBackground"
+    link: /game/essentials/variables/csse
+    keyPoints:
+      - "let, const"
+      - "Primitive Types"
+      - "Reference Types"
+      - "DOM Manipulation"
+    subtitle: "Variables and Data Types"
+    description: "Learn about the different variables and data types in JavaScript. Explore DOM manipulation with JavaScript."
+
+
+  - title: "Background"
+    image: "/gamify/lessons/background.jpg"
+    alt: "Background"
+    link: /game/essentials/backgrounds
+    keyPoints:
+      - "Game Environment"
+      - "Theme and Style"
+      - "Parallax Scrolling"
+      - "Layering"
+    subtitle: "Theme and Style"
+    description: "The background of a game establishes its theme and style, creating the foundation for the player's experience. This is your opportunity to get creative and make your game stand out."
+  
+  - title: "Character"
+    image: "/gamify/lessons/character.png"
+    alt: "Character"
+    link: /game/essentials/characters
+    keyPoints:
+      - "Movement"
+      - "Animation"
+      - "Keyboard/Touch Inputs"
+      - "Collision Detection"
+    subtitle: "Characters and Animation"
+    description: "Characters are the heart of the game, driving the story, interactions, and adventures. They bring the game world to life and engage the player through their roles and actions."

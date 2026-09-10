@@ -1,0 +1,696 @@
+{% assign data = site.data.sip_infograph %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap');
+
+  .sip {
+    --gold: #c9a84c;
+    --gold-light: rgba(201,168,76,0.12);
+    --text: #e8e4dc;
+    --muted: #9a9490;
+    --rule: #2e2b28;
+    --bg: #141210;
+    --card-bg: #1c1916;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--text);
+    background: var(--bg);
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 28px 80px;
+  }
+
+  /* ── Header ── */
+  .sip-header {
+    padding: 64px 0 48px;
+    border-bottom: 1px solid var(--rule);
+    text-align: center;
+  }
+
+  .sip-header-image {
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 6px;
+    margin: 0 auto 28px;
+  }
+
+  .sip-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 400;
+    line-height: 1.15;
+    margin: 0 0 28px;
+    color: #fff;
+  }
+
+  .sip-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    justify-content: center;
+  }
+
+  .sip-link-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--rule);
+    padding: 9px 18px;
+    border-radius: 2px;
+    transition: border-color .2s, color .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .sip-link-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .sip-link-icon {
+    width: 14px;
+    height: 14px;
+    opacity: .6;
+    flex-shrink: 0;
+  }
+
+  /* ── Cards ── */
+  .sip-card {
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 36px;
+    margin-top: 24px;
+  }
+
+  .sip-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .sip-status {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 2px;
+    background: var(--gold-light);
+    color: var(--gold);
+  }
+
+  .sip-team-names { font-size: 12px; color: var(--muted); }
+
+  .sip-project-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    margin: 0 0 4px;
+    line-height: 1.2;
+    color: #fff;
+  }
+
+  .sip-subtitle {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin: 0 0 24px;
+  }
+
+  /* Image */
+  .sip-image-link {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-bottom: 28px;
+    height: 200px;
+  }
+
+  .sip-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: transform .4s ease;
+  }
+  .sip-image-link:hover .sip-image { transform: scale(1.02); }
+
+  .sip-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .22s;
+  }
+  .sip-overlay span {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .sip-image-link:hover .sip-overlay { opacity: 1; }
+
+  /* Section label */
+  .sip-section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* About */
+  .sip-about {
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+
+  /* Programs grid */
+  .sip-programs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .sip-prog {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: border-color .2s;
+    display: block;
+  }
+  .sip-prog:hover { border-color: var(--gold); }
+
+  .sip-prog-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sip-prog-arrow {
+    font-size: 11px;
+    opacity: .4;
+    transition: opacity .2s;
+  }
+  .sip-prog:hover .sip-prog-arrow { opacity: 1; color: var(--gold); }
+
+  .sip-prog-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Tech stack tags */
+  .sip-tech-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 26px; }
+  .sip-tech-tag {
+    font-size: 11px;
+    font-weight: 400;
+    padding: 3px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--muted);
+  }
+
+  /* Sprint changes */
+  .sip-changes { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+  .sip-change {
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid var(--gold);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .sip-change-title {
+    font-size: 12.5px;
+    font-weight: 500;
+    margin: 0 0 5px;
+    color: var(--text);
+  }
+
+  .sip-change-desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* CTA */
+  .sip-btn {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--bg);
+    background: var(--gold);
+    padding: 9px 20px;
+    border-radius: 2px;
+    transition: background .2s;
+  }
+  .sip-btn:hover { background: var(--gold); color: var(--bg); }
+  .sip-prog-links {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .sip-prog-link {
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 3px 9px;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    transition: border-color .2s, color .2s;
+  }
+
+  .sip-prog-link:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .sip-prog-link--new {
+    border-color: rgba(201,168,76,0.3);
+    color: var(--gold);
+  }
+
+  .sip-prog-link--new:hover {
+    border-color: var(--gold);
+    background: var(--gold-light);
+  }
+
+  /* ── Contact Row ── */
+  .sip-contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .sip-contact-btn {
+    font-size: 11.5px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    padding: 7px 14px;
+    border-radius: 2px;
+    transition: border-color .2s, color .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .sip-contact-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .sip-contact-icon {
+    width: 13px;
+    height: 13px;
+    opacity: .55;
+    flex-shrink: 0;
+  }
+
+  /* ── Future Ideas ── */
+  .sip-future-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 6px;
+    padding: 36px;
+    margin-top: 24px;
+  }
+
+  .sip-future-idea {
+    padding: 16px 18px;
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .sip-future-idea:last-child { margin-bottom: 0; }
+
+  .sip-future-idea-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .sip-future-num {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    color: var(--gold);
+    background: var(--gold-light);
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+
+  .sip-future-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .sip-future-desc {
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* ── Documentation ── */
+  .sip-doc-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    font-weight: 400;
+    text-decoration: none;
+    color: var(--muted);
+    padding: 10px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: rgba(255,255,255,0.02);
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .sip-doc-link:hover {
+    border-color: var(--gold);
+    color: var(--text);
+    background: var(--gold-light);
+  }
+</style>
+
+<div class="sip">
+
+  <!-- ── Header ── -->
+  <div class="sip-header">
+    {% if data.HeaderImage %}
+    <img src="{{ site.baseurl }}/images/{{ data.HeaderImage }}" alt="{{ data.Title }}" class="sip-header-image">
+    {% endif %}
+    <h1 class="sip-title">{{ data.Title }}</h1>
+    <div class="sip-links">
+      <a href="https://sip.opencodingsociety.com/" class="sip-link-btn" target="_blank" rel="noopener">
+        <svg class="sip-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <path d="M8 1.5C6 4 5 6 5 8s1 4 3 6.5M8 1.5C10 4 11 6 11 8s-1 4-3 6.5M1.5 8h13"/>
+        </svg>
+        Live Site (prototype)
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages" class="sip-link-btn" target="_blank" rel="noopener">
+        <svg class="sip-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="12" height="12" rx="2"/>
+          <path d="M5 6h6M5 9h4"/>
+        </svg>
+        Site Code (pages)
+      </a>
+      <a href="https://sipoway.opencodingsociety.com/" class="sip-link-btn" target="_blank" rel="noopener">
+        <svg class="sip-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="2" width="12" height="12" rx="2"/>
+          <path d="M5 5l2 3-2 3M9 11h2"/>
+        </svg>
+        Admin Database (server)
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarriorflask" class="sip-link-btn" target="_blank" rel="noopener">
+        <svg class="sip-link-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2a4 4 0 0 0-1.27 7.79c.2.04.27-.09.27-.19v-.7c-1.11.24-1.34-.54-1.34-.54-.18-.46-.44-.58-.44-.58-.36-.25.03-.24.03-.24.4.03.61.41.61.41.35.6.92.43 1.15.33.04-.26.14-.43.25-.53-.88-.1-1.8-.44-1.8-1.96 0-.43.15-.79.41-1.06-.04-.1-.18-.5.04-.05 0 0 .34-.11 1.1.41a3.8 3.8 0 0 1 2 0c.76-.52 1.1-.41 1.1-.41.22.55.08.95.04 1.05.26.27.41.63.41 1.06 0 1.52-.93 1.86-1.81 1.96.14.12.27.37.27.75v1.1c0 .1.07.23.27.19A4 4 0 0 0 6 2z"/>
+        </svg>
+        Server Code (Flask)
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Who They Are (merged with Programs) ── -->
+  <div class="sip-card">
+    <h2 class="sip-project-title">Who They Are</h2>
+    <p class="sip-subtitle">A Global Volunteer Organization with Local Roots</p>
+
+    <a href="https://www.sipoway.com/" class="sip-image-link" target="_blank" rel="noopener">
+      <img src="{{ site.baseurl }}/images/sip/sip_overview.jpg" alt="Soroptimist International of Poway" class="sip-image">
+      <div class="sip-overlay"><span>Visit sipoway.com</span></div>
+    </a>
+
+    <p class="sip-section-label">About</p>
+    <p class="sip-about">501(c)(3) nonprofit chartered in Poway in 1971, part of a global network active in 118+ countries. Members — working moms, educators, retirees, and business owners — volunteer their time to empower women and girls through education and economic opportunity. Funded by donations and an annual Celebration of Courage fundraiser.</p>
+
+    <p class="sip-section-label">Programs (Click the buttons below to learn more)</p>
+    <div class="sip-programs-grid">
+      <div class="sip-prog">
+        <p class="sip-prog-name">Transitional Housing</p>
+        <p class="sip-prog-desc">Connects women leaving crisis situations to stable housing resources.</p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/transitional-housing" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/transitional-housing/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Live Your Dream</p>
+        <p class="sip-prog-desc">Cash grants for women supporting families while pursuing education.</p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/live-your-dream" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/live-your-dream/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Dream It, Be It</p>
+        <p class="sip-prog-desc">Career mentors visit schools to broaden girls' professional horizons.</p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/dream-it-be-it" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/dreamit-beit/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">STAT!</p>
+        <p class="sip-prog-desc">Anti-trafficking awareness and advocacy program.</p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/stat-1" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/stat/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Abraxas Scholarship</p>
+        <p class="sip-prog-desc">Annual financial award for Abraxas High School students.</p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/abraxas" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/abraxas-scholarship/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+      <div class="sip-prog">
+        <p class="sip-prog-name">Colegio La Esperanza</p>
+        <p class="sip-prog-desc">Supports an elementary school in Baja California, Mexico.</p>
+        <div class="sip-prog-links">
+          <a href="https://www.sipoway.com/colegio-la-esperanza" target="_blank" rel="noopener" class="sip-prog-link">Original ↗</a>
+          <a href="https://sip.opencodingsociety.com/sip/colegio-la-esparanza/" target="_blank" rel="noopener" class="sip-prog-link sip-prog-link--new">Redesign ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://www.sipoway.com/" class="sip-btn" target="_blank" rel="noopener">Visit Original Site</a>
+
+    <!-- ── Contact ── -->
+    <p class="sip-section-label" style="margin-top:28px;">Contact &amp; Social</p>
+    <div class="sip-contact-row">
+      <a href="https://www.instagram.com/soroptimistpoway/" class="sip-contact-btn" target="_blank" rel="noopener">
+        <!-- Instagram icon -->
+        <svg class="sip-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="2" width="20" height="20" rx="5"/>
+          <circle cx="12" cy="12" r="5"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        @soroptimistpoway
+      </a>
+      <a href="https://www.facebook.com/sipoway" class="sip-contact-btn" target="_blank" rel="noopener">
+        <!-- Facebook icon -->
+        <svg class="sip-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+        </svg>
+        facebook.com/sipoway
+      </a>
+      <a href="mailto:SIPoway@Soroptimist.net" class="sip-contact-btn">
+        <!-- Email icon -->
+        <svg class="sip-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M2 7l10 7 10-7"/>
+        </svg>
+        SIPoway@Soroptimist.net
+      </a>
+    </div>
+  </div>
+
+  <!-- ── What We Built ── -->
+  <div class="sip-card">
+    <div class="sip-meta-row">
+      <span class="sip-team-names">Anishka Sanghvi · Michelle Ji · Krishna Visvanath · West Stefany</span>
+    </div>
+    <h2 class="sip-project-title">What We Built</h2>
+    <p class="sip-subtitle">Changes Across the Site</p>
+
+    <a href="https://sip.opencodingsociety.com/" class="sip-image-link" target="_blank" rel="noopener">
+      <img src="{{ site.baseurl }}/images/sip/sip_improvements.jpg" alt="SIP Improvements" class="sip-image">
+      <div class="sip-overlay"><span>View prototype site</span></div>
+    </a>
+
+    <p class="sip-section-label">Changes Made (Click on the blue headers to view)</p>
+    <div class="sip-changes">
+      <div class="sip-change">
+        <p class="sip-change-title"><a href="https://sip.opencodingsociety.com/sip/blog">Blog &amp; Team Page</a></p>
+        <p class="sip-change-desc">Members can now create and share blog posts with images, making it easy to share stories and updates with the community.</p>
+      </div>
+      <div class="sip-change">
+        <p class="sip-change-title"><a href="https://sip.opencodingsociety.com/sip/garden">Community Garden</a></p>
+        <p class="sip-change-desc">Choose a sprite to represent yourself in the community garden, which saves your choice and shows everyone's sprites when you visit. A real-time chat system — built with WebSockets — lets users send and receive messages instantly, fostering conversation and community right in the garden. Donors are rewarded with the ability to place a new emoji in the garden, giving supporters a visible, lasting mark in the shared space and creating an ongoing incentive to give.</p>
+      </div>
+      <div class="sip-change">
+        <p class="sip-change-title"><a href="https://sip.opencodingsociety.com/sip/contact">Contact Page</a></p>
+        <p class="sip-change-desc">The contact form saves your messages securely, allowing us to respond to your inquiries and requests for those who want to get involved or help. It also displays a calendar with upcoming events.</p>
+      </div>
+      <div class="sip-change">
+        <p class="sip-change-title"><a href="https://sip.opencodingsociety.com/sip/persona">Program Finder</a></p>
+        <p class="sip-change-desc">The program finder uses engaging interactive tools like sliders, bucket toss, and card sorting to help you discover the best program match based on your needs and priorities.</p>
+      </div>
+      <div class="sip-change">
+        <p class="sip-change-title"><a href="https://sip.opencodingsociety.com/">Program Cards</a></p>
+        <p class="sip-change-desc">Program cards on the home page now feature concise descriptions, making it easier to quickly understand and choose the right program.</p>
+      </div>
+      <div class="sip-change">
+        <p class="sip-change-title"><a href="https://sipoway.opencodingsociety.com/" target="_blank" rel="noopener">Admin Panel</a></p>
+        <p class="sip-change-desc">An admin panel has been added to allow for easier management and updates of program information. It also allows admins to approve user requests to become a volunteer.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Documentation ── -->
+  <div class="sip-card">
+    <h2 class="sip-project-title">Documentation</h2>
+    <p class="sip-subtitle">Planning & Feedback from Mr. John Mortensen</p>
+
+    <p class="sip-section-label">GitHub Issues</p>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/19" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Capstone Feedback & Future Work Plan
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/18" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Capstone Development & UX Priorities
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/16" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Capstone Presentation Feedback & UI Refinements
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/15" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Capstone Feedback & Future Enhancements
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/14" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Sprint Progress & Feature Updates
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/12" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        System Feedback & Enhancement Ideas
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/11" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Blog System Requirements
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+      <a href="https://github.com/cspcodewarriors/codewarrior-pages/issues/1" class="sip-doc-link" target="_blank" rel="noopener">
+        <svg style="width:13px;height:13px;flex-shrink:0;opacity:.5;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="8" cy="8" r="6.5"/>
+          <circle cx="8" cy="8" r="2.5" fill="currentColor" stroke="none"/>
+        </svg>
+        SIP Website Improvement Plan
+        <span style="margin-left:auto;font-size:10px;opacity:.4;">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Future Ideas ── -->
+  <div class="sip-future-card">
+    <h2 class="sip-project-title">Future Ideas</h2>
+    <p class="sip-subtitle">What's Next on the Roadmap</p>
+
+    <div style="margin-top: 20px;">
+
+      <div class="sip-future-idea">
+        <div class="sip-future-idea-header">
+          <span class="sip-future-num">01</span>
+          <p class="sip-future-title">Social Media Embeds on the Blog Page</p>
+        </div>
+        <p class="sip-future-desc">Since SIP Poway is very active on both Instagram and Facebook, embedding live feeds directly into the blog page of the prototype would let visitors see the latest posts and updates without leaving the site — keeping the community informed and the page feeling fresh at all times.</p>
+      </div>
+
+      <div class="sip-future-idea">
+        <div class="sip-future-idea-header">
+          <span class="sip-future-num">02</span>
+          <p class="sip-future-title">Program-Specific Private Chat Channels</p>
+        </div>
+        <p class="sip-future-desc">Expanding the Community Garden's WebSocket chat into dedicated private channels for each program (e.g. Live Your Dream, STAT!, Transitional Housing) would let users connect with others who share their specific interests and circumstances — building deeper, more meaningful peer communities around each cause.</p>
+      </div>
+
+      <div class="sip-future-idea">
+        <div class="sip-future-idea-header">
+          <span class="sip-future-num">03</span>
+          <p class="sip-future-title">Donation Rewards in the Community Garden</p>
+        </div>
+        <p class="sip-future-desc">To encourage ongoing giving, donors would unlock the ability to permanently place a new emoji or sprite into the shared garden — turning each donation into a visible, lasting contribution to the community space. Tiered rewards (e.g. a flower for $10, a tree for $50) would give supporters both recognition and a reason to keep coming back.</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>

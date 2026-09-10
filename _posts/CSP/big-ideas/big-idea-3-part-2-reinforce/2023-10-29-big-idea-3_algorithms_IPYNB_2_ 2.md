@@ -5,7 +5,6 @@ layout: post
 title: Developing Algorithms
 description: College Board Big Idea 3, Idea 9, Developing Algorithms
 author: Imaad, Anika, Tanay, Ananya
-categories: ['Python']
 ---
 
 Lets start off with the basics. 

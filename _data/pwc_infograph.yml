@@ -1,0 +1,73 @@
+# Poway Woman's Club Capstone Infographic
+Title: "Poway Woman's Club — Website Refurbishment"
+Description: "We're a group of passionate students making the Poway Woman's Club website more personalized and usable — messaging to foster community, groups and events to surface what matters to each member, and profiles to make the experience your own."
+
+Status: "In Development"
+
+Team:
+  - name: "Evan S"
+    role: "Full-Stack / Backend"
+    bio: "Built the interactive front-page game, groups system, admin panel backend APIs, and blogging system, plus other backend and management contributions."
+  - name: "Maya D"
+    role: "Deployment / Frontend"
+    bio: "Deployed the site and built the friends and login system, messaging system, and user interaction flows."
+  - name: "Cyrus Z"
+    role: "Frontend / Integrations"
+    bio: "Built the events system and calendar, Google-based login APIs, customizable profile elements, and an ML system that helps users connect."
+
+About:
+  who: "Three students partnering with the Poway Woman's Club — a 501(c)(3) nonprofit founded in 1960."
+  what: "Rebuilding the club's website with member portals, an event calendar, live messaging, and an admin dashboard."
+  why: "Six decades of scholarships, art exhibits, and youth programs deserve a site that's as welcoming as the club itself."
+
+Features:
+  - title: "Login System with Google Authorization"
+    description: "Secure sign-in with local accounts or one-click Google authorization."
+    image: "capstone/pwc-login-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/login.html"
+  - title: "Friends & Live Messaging"
+    description: "Connect with other members and chat in real time between meetings."
+    image: "capstone/pwc-messaging-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/social/"
+  - title: "Groups System"
+    description: "Join groups to filter your calendar and see only the events that matter to you."
+    image: "capstone/pwc-groups-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/social/"
+  - title: "Event Calendar & RSVP"
+    description: "Browse upcoming events and RSVP directly from your dashboard."
+    image: "capstone/pwc-events-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/social/"
+  - title: "Blog Posting"
+    description: "Members publish posts to share updates, stories, and club news."
+    image: "capstone/pwc-blog-view.gif"
+    url: "https://poway-women-s-club.github.io/pwc/navigation/social/"
+  - title: "Admin Dashboard"
+    description: "One control center for club leaders — fix problems without touching code."
+    image: "capstone/pwc-admin-view.gif"
+    url: "https://pwc-flask.opencodingsociety.com/"
+    bullets:
+      - "Manage members and roles"
+      - "Create and edit events"
+      - "Moderate groups and content"
+      - "View site analytics"
+
+Tech:
+  - "Responsive Frontend"
+  - "User Auth & Profiles"
+  - "Event Calendar"
+  - "Live Messaging"
+  - "Admin Dashboard"
+  - "Blog Engine"
+
+Impact:
+  - "First-time visitors immediately see the club's mission"
+  - "Members stay connected between meetings"
+  - "Administrators manage everything without touching code"
+
+Link: "/capstone/poway-womans-club/"
+SiteUrl: "https://poway-women-s-club.github.io/pwc/"
+Repos:
+  frontend: "https://github.com/Poway-Women-s-Club/pwc"
+  backend: "https://github.com/Poway-Women-s-Club/pwc-flask"
+Logo: "capstone/pwc_logo.png"
+Alt: "Poway Woman's Club — Website Refurbishment Capstone"

@@ -1,0 +1,172 @@
+<!-- ============================= -->
+<!--   SELECTIVE SYNC MODAL        -->
+<!-- ============================= -->
+<div id="selective-sync-modal" class="calendar-action-modal">
+  <div class="calendar-action-modal-content">
+    <div class="calendar-action-modal-header">
+      <h2><i class="fas fa-calendar-plus"></i> Sync to Calendar</h2>
+      <button id="close-selective-sync-modal" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="calendar-action-modal-body">
+      <!-- Sprint Info -->
+      <div class="sync-modal-sprint-info">
+        <span class="sync-modal-sprint-name" id="sync-modal-sprint-name"></span>
+        <span class="sync-modal-date-range" id="sync-modal-date-range"></span>
+      </div>
+      
+      <!-- Warnings Section -->
+      <div id="sync-warnings-container" class="sync-warnings-container hidden"></div>
+      
+      <!-- Quick Actions -->
+      <div class="sync-quick-actions">
+        <button type="button" class="quick-action-btn" id="sync-select-all"><i class="fas fa-check-double"></i> Select All</button>
+        <button type="button" class="quick-action-btn" id="sync-deselect-all"><i class="fas fa-square"></i> Deselect All</button>
+        <button type="button" class="quick-action-btn" id="sync-select-formative"><i class="fas fa-book"></i> Formative Only</button>
+        <button type="button" class="quick-action-btn" id="sync-select-summative"><i class="fas fa-clipboard-check"></i> Summative Only</button>
+      </div>
+      
+      <!-- Bulk Priority Setter -->
+      <div class="sync-bulk-priority">
+        <span class="bulk-priority-label">Set all priorities to:</span>
+        <button type="button" class="bulk-priority-btn p0" data-priority="P0">P0</button>
+        <button type="button" class="bulk-priority-btn p1" data-priority="P1">P1</button>
+        <button type="button" class="bulk-priority-btn p2" data-priority="P2">P2</button>
+        <button type="button" class="bulk-priority-btn p3" data-priority="P3">P3</button>
+      </div>
+      
+      <!-- Week Selection List -->
+      <div class="sync-week-list" id="sync-week-list">
+        <!-- Dynamically populated -->
+      </div>
+      
+      <!-- Summary -->
+      <div class="sync-summary" id="sync-summary">
+        <span class="sync-summary-count"><span id="sync-selected-count">0</span> items selected</span>
+      </div>
+    </div>
+    
+    <div class="calendar-action-modal-footer">
+      <button type="button" class="modal-btn secondary" id="cancel-selective-sync">Cancel</button>
+      <button type="button" class="modal-btn export-blue" id="export-ics-sync"><i class="fas fa-download"></i> Export</button>
+      <button type="button" class="modal-btn export-blue" id="update-ics-file"><i class="fas fa-save"></i> Update</button>
+      <button type="button" class="modal-btn info" id="preview-sync-changes"><i class="fas fa-eye"></i> Preview</button>
+      <button type="button" class="modal-btn primary" id="confirm-selective-sync"><i class="fas fa-sync"></i> Sync</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--   SELECTIVE REMOVE MODAL      -->
+<!-- ============================= -->
+<div id="selective-remove-modal" class="calendar-action-modal">
+  <div class="calendar-action-modal-content remove-modal">
+    <div class="calendar-action-modal-header">
+      <h2><i class="fas fa-calendar-minus"></i> Remove from Calendar</h2>
+      <button id="close-selective-remove-modal" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="calendar-action-modal-body">
+      <!-- Sprint Info -->
+      <div class="sync-modal-sprint-info">
+        <span class="sync-modal-sprint-name" id="remove-modal-sprint-name"></span>
+        <span class="sync-modal-date-range" id="remove-modal-date-range"></span>
+      </div>
+      
+      <!-- Quick Actions -->
+      <div class="sync-quick-actions">
+        <button type="button" class="quick-action-btn" id="remove-select-all"><i class="fas fa-check-double"></i> Select All</button>
+        <button type="button" class="quick-action-btn" id="remove-deselect-all"><i class="fas fa-square"></i> Deselect All</button>
+        <button type="button" class="quick-action-btn" id="remove-select-formative"><i class="fas fa-book"></i> Formative Only</button>
+        <button type="button" class="quick-action-btn" id="remove-select-summative"><i class="fas fa-clipboard-check"></i> Summative Only</button>
+      </div>
+      
+      <!-- Week Selection List -->
+      <div class="sync-week-list" id="remove-week-list">
+        <!-- Dynamically populated -->
+      </div>
+      
+      <!-- Summary -->
+      <div class="sync-summary remove-summary" id="remove-summary">
+        <span class="sync-summary-count"><span id="remove-selected-count">0</span> items selected for removal</span>
+      </div>
+    </div>
+    
+    <div class="calendar-action-modal-footer">
+      <button type="button" class="modal-btn secondary" id="cancel-selective-remove">Cancel</button>
+      <button type="button" class="modal-btn danger" id="confirm-selective-remove"><i class="fas fa-trash-alt"></i> Remove Selected</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= -->
+<!--   CALENDAR PREVIEW MODAL       -->
+<!-- ============================= -->
+<div id="calendar-preview-modal" class="calendar-action-modal">
+  <div class="calendar-action-modal-content preview-modal">
+    <div class="calendar-action-modal-header">
+      <h2><i class="fas fa-eye"></i> Preview Calendar Changes</h2>
+      <button id="close-preview-modal" class="close-btn">&times;</button>
+    </div>
+    
+    <div class="calendar-action-modal-body">
+      <div class="preview-comparison">
+        <div class="preview-column current">
+          <h3><i class="fas fa-calendar"></i> Current Calendar</h3>
+          <div id="current-events-list" class="preview-events-list">
+            <div class="preview-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+          </div>
+        </div>
+        
+        <div class="preview-column changes">
+          <h3><i class="fas fa-arrow-right"></i> Proposed Changes</h3>
+          <div id="proposed-changes-list" class="preview-events-list"></div>
+        </div>
+      </div>
+      
+      <div class="preview-summary">
+        <div class="summary-item add"><i class="fas fa-plus-circle"></i> <span id="add-count">0</span> to add</div>
+        <div class="summary-item update"><i class="fas fa-sync-alt"></i> <span id="update-count">0</span> to update</div>
+      </div>
+    </div>
+    
+    <div class="calendar-action-modal-footer">
+      <button type="button" class="modal-btn secondary" id="preview-back">Back to Selection</button>
+      <button type="button" class="modal-btn primary" id="preview-confirm"><i class="fas fa-check"></i> Confirm & Sync</button>
+    </div>
+  </div>
+</div>
+
+<!-- Embed school calendar as application/json to avoid Liquid template lint errors -->
+{% assign calendar = site.data.school_calendar %}
+<script id="school-calendar-json" type="application/json">
+{
+  "schoolYear": {{ calendar.school_year | jsonify }},
+  "firstDay": {{ calendar.first_day | jsonify }},
+  "lastDay": {{ calendar.last_day | jsonify }},
+  "weeks": {
+    {% for week in calendar.weeks %}
+    "{{ week[0] }}": {
+      "monday": {{ week[1].monday | jsonify }},
+      "friday": {{ week[1].friday | jsonify }},
+      "tuesday": {{ week[1].tuesday | default: nil | jsonify }},
+      "holidays": {{ week[1].holidays | default: nil | jsonify }},
+      "holidayAdjustment": {{ week[1].holiday_adjustment | default: nil | jsonify }},
+      "skipWeek": {{ week[1].skip_week | default: false | jsonify }},
+      "theme": {{ week[1].theme | default: nil | jsonify }},
+      "notes": {{ week[1].notes | default: nil | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  }
+}
+</script>
+
+<script>
+  var SITE_BASEURL = '{{ site.baseurl }}';
+</script>
+<!-- SRP Modules: loaded in dependency order -->
+<script src="{{ site.baseurl }}/assets/js/projects/calendar/CalendarData.js"></script>
+<script src="{{ site.baseurl }}/assets/js/projects/calendar/EventBuilder.js"></script>
+<script src="{{ site.baseurl }}/assets/js/projects/calendar/CalendarApi.js"></script>
+<script src="{{ site.baseurl }}/assets/js/projects/calendar/CalendarUI.js"></script>
+<script src="{{ site.baseurl }}/assets/js/projects/calendar/calendar.js"></script>

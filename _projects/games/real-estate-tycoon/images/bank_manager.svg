@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- First National Bank Manager - grey suit, glasses, serious banker -->
+  <ellipse cx="32" cy="62" rx="13" ry="3" fill="#000" opacity="0.22"/>
+  <!-- Legs - dark grey pinstripe -->
+  <rect x="22" y="46" width="9" height="14" rx="2" fill="#1c1c1c"/>
+  <rect x="33" y="46" width="9" height="14" rx="2" fill="#1c1c1c"/>
+  <!-- Pinstripes -->
+  <line x1="25" y1="46" x2="25" y2="60" stroke="#3a3a3a" stroke-width="1" opacity="0.6"/>
+  <line x1="36" y1="46" x2="36" y2="60" stroke="#3a3a3a" stroke-width="1" opacity="0.6"/>
+  <!-- Shoes -->
+  <ellipse cx="26" cy="60" rx="7" ry="3" fill="#0a0a0a"/>
+  <ellipse cx="38" cy="60" rx="7" ry="3" fill="#0a0a0a"/>
+  <!-- Suit - classic grey -->
+  <rect x="18" y="28" width="28" height="20" rx="3" fill="#455a64"/>
+  <!-- White shirt -->
+  <rect x="28" y="28" width="8" height="16" fill="#fafafa"/>
+  <!-- Tie - green banker tie -->
+  <polygon points="30.5,29 33.5,29 33,41 32,43 31,41" fill="#2e7d32"/>
+  <rect x="31" y="34" width="2" height="3" fill="#1b5e20"/>
+  <!-- Lapels -->
+  <polygon points="28,28 18,33 18,28" fill="#37474f"/>
+  <polygon points="36,28 46,33 46,28" fill="#37474f"/>
+  <!-- Pinstripe lines on suit -->
+  <line x1="22" y1="28" x2="22" y2="46" stroke="#546e7a" stroke-width="0.8" opacity="0.5"/>
+  <line x1="26" y1="28" x2="26" y2="46" stroke="#546e7a" stroke-width="0.8" opacity="0.5"/>
+  <line x1="38" y1="28" x2="38" y2="46" stroke="#546e7a" stroke-width="0.8" opacity="0.5"/>
+  <line x1="42" y1="28" x2="42" y2="46" stroke="#546e7a" stroke-width="0.8" opacity="0.5"/>
+  <!-- Belt buckle -->
+  <rect x="18" y="46" width="28" height="3" fill="#1c1c1c"/>
+  <rect x="29" y="46" width="6" height="3" fill="#9e9e9e"/>
+  <!-- Left arm -->
+  <rect x="8" y="28" width="10" height="5" rx="2" fill="#455a64"/>
+  <ellipse cx="11" cy="35" rx="4" ry="3.5" fill="#FFCC80"/>
+  <!-- Right arm + money bag -->
+  <rect x="46" y="28" width="10" height="5" rx="2" fill="#455a64"/>
+  <!-- Money bag -->
+  <circle cx="55" cy="40" r="8" fill="#ffd700"/>
+  <path d="M51 35 Q55 31 59 35" stroke="#ffd700" stroke-width="3" fill="none"/>
+  <text x="55" y="43" fill="#4e3500" font-size="9" text-anchor="middle" font-family="Arial" font-weight="bold">$</text>
+  <!-- Neck -->
+  <rect x="28" y="23" width="8" height="7" fill="#FFCC80"/>
+  <!-- Head -->
+  <circle cx="32" cy="16" r="13" fill="#FFCC80"/>
+  <!-- Hair - thinning, professional grey -->
+  <ellipse cx="32" cy="6" rx="11" ry="5" fill="#5a5a5a"/>
+  <ellipse cx="32" cy="8" rx="12" ry="5" fill="#6a6a6a"/>
+  <!-- Receding hairline front -->
+  <ellipse cx="32" cy="11" rx="7" ry="2" fill="#FFCC80"/>
+  <!-- Ears -->
+  <ellipse cx="19" cy="16" rx="3" ry="4" fill="#f0b870"/>
+  <ellipse cx="45" cy="16" rx="3" ry="4" fill="#f0b870"/>
+  <!-- Round banker glasses -->
+  <circle cx="26.5" cy="16" r="4.5" fill="none" stroke="#3e2723" stroke-width="1.8"/>
+  <circle cx="37.5" cy="16" r="4.5" fill="none" stroke="#3e2723" stroke-width="1.8"/>
+  <line x1="31" y1="16" x2="33" y2="16" stroke="#3e2723" stroke-width="1.8"/>
+  <line x1="22" y1="15" x2="18" y2="14" stroke="#3e2723" stroke-width="1.5"/>
+  <line x1="42" y1="15" x2="46" y2="14" stroke="#3e2723" stroke-width="1.5"/>
+  <!-- Eyes behind glasses -->
+  <circle cx="26.5" cy="16" r="2" fill="#2c1a00"/>
+  <circle cx="37.5" cy="16" r="2" fill="#2c1a00"/>
+  <circle cx="27.2" cy="15.3" r="0.8" fill="#fff"/>
+  <circle cx="38.2" cy="15.3" r="0.8" fill="#fff"/>
+  <!-- Eyebrows - stern -->
+  <rect x="22" y="10" width="9" height="2" rx="1" fill="#5a5a5a"/>
+  <rect x="33" y="10" width="9" height="2" rx="1" fill="#5a5a5a"/>
+  <!-- Thin serious mouth -->
+  <path d="M27 22 Q32 24 37 22" stroke="#9e7050" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Mustache -->
+  <path d="M27.5 20 Q30 22 32 21 Q34 22 36.5 20" stroke="#5a5a5a" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

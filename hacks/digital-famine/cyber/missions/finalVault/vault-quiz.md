@@ -3,7 +3,6 @@ layout: post
 title: "Final Sequence — The Vault"
 description: "Unlock the Sacred Vault — Finish the quiz, assemble the three code fragments, authenticate, and retrieve the Sacred Page."
 permalink: /digital-famine/cybersecurity-game/vault-quiz
-categories: [CSP, Submodule, Vault]
 tags: [vault, final, mission, security]
 author: Arnav Pallapotu, Sathwik Kintada
 date: 2025-10-26

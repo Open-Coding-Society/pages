@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <linearGradient id="dsa-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a12;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#12122a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dsa-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4a853;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8c875;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="150" cy="150" r="148" fill="url(#dsa-bg)" stroke="url(#dsa-gold)" stroke-width="2"/>
+  <circle cx="150" cy="150" r="130" fill="none" stroke="#d4a853" stroke-width="0.5" opacity="0.3"/>
+  <!-- Dashboard grid -->
+  <rect x="75" y="85" width="65" height="50" rx="6" fill="none" stroke="#d4a853" stroke-width="2"/>
+  <rect x="160" y="85" width="65" height="50" rx="6" fill="none" stroke="#4a90d9" stroke-width="2"/>
+  <rect x="75" y="150" width="65" height="50" rx="6" fill="none" stroke="#4a90d9" stroke-width="2"/>
+  <rect x="160" y="150" width="65" height="50" rx="6" fill="none" stroke="#d4a853" stroke-width="2"/>
+  <!-- Tile icons -->
+  <text x="107" y="117" font-size="20" text-anchor="middle" fill="#d4a853">📋</text>
+  <text x="192" y="117" font-size="20" text-anchor="middle" fill="#4a90d9">🎫</text>
+  <text x="107" y="182" font-size="20" text-anchor="middle" fill="#4a90d9">📄</text>
+  <text x="192" y="182" font-size="20" text-anchor="middle" fill="#d4a853">🛒</text>
+  <!-- Title -->
+  <text x="150" y="230" font-family="Arial, sans-serif" font-size="16" font-weight="800" text-anchor="middle" fill="url(#dsa-gold)">Member Dashboard</text>
+  <text x="150" y="250" font-family="Arial, sans-serif" font-size="8" font-weight="400" text-anchor="middle" fill="#9aa3b0" letter-spacing="2">MAIN FEATURE</text>
+  <text x="150" y="272" font-family="Arial, sans-serif" font-size="7" font-weight="500" text-anchor="middle" fill="#d4a853" opacity="0.8" letter-spacing="1">DSA WEBSITE REDESIGN</text>
+</svg>

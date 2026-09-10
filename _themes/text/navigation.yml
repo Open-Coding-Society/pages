@@ -1,13 +1,16 @@
 header:
   - titles:
       en: CSSE
-    url: /navigation/section/csse/
+    url: /navigation/courses/csse/
   - titles:
       en: CSP
-    url: /navigation/section/csp/
+    url: /navigation/courses/csp/
   - titles:
       en: CSA
-    url: /navigation/section/csa/
+    url: /navigation/courses/csa/
+  - titles:
+      en: CSH
+    url: /navigation/courses/csh/
   - titles:
       en: Blog
     url: /navigation/blogs/

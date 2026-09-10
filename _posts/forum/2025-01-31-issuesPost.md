@@ -159,7 +159,6 @@ title: Issues Post
                     fetch(`${javaURI}/forum/issue/post`, {
                         ...fetchOptions,
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ title, context, author })
                     })
                     .then(response => response.text())
@@ -176,7 +175,6 @@ title: Issues Post
                 fetch(`${javaURI}/forum/issue/post`, {
                     ...fetchOptions,
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ title, context, author })
                 })
                 .then(response => response.text())

@@ -70,49 +70,19 @@ $status-indicator-success-color: #28a745;
 // COLORS.SCSS
 // -----------------------------------------------------------------------------
 
-$background: #121212;
-$black1: rgba(0, 0, 0, 1);
-$blue1: #007aff;
-$blueShadow1: #2196f3;
-$gradient1: linear-gradient(120deg, #1e1e1e 45%, #2a2a2a);
-$gray1: rgba(142, 142, 147, 1);
-$gray2: rgba(99, 99, 102, 1);
-$gray3: rgba(72, 72, 74, 1);
-$gray4: rgba(58, 58, 60, 1);
-$gray5: rgba(44, 44, 46, 1);
-$gray6: rgba(28, 28, 30, 1);
-$green1: #34c759;
-$lightBlue1: rgba(75, 186, 255, 1);
-$white1: rgba(255, 255, 255, 1);
-$white2: rgba(white, 0.87);
-$white3: rgba(225, 225, 230, 1);
+// NOTE: Primary user-editable palette has been moved to `_sass/user-colors.scss`.
+// This file should only import the user colors so designers can edit the
+// palette in one place. Keep other component-level variables above.
 
 // PLATFORMER-GAME.SCSS
 // -----------------------------------------------------------------------------
 
 $dt-leaderboard: #e85252;
 
-// USER-COLORS.SCSS
-// -----------------------------------------------------------------------------
 
-$background: #121212;
-$black1: rgba(0, 0, 0, 1);
-$blue1: #007aff;
-$blueShadow1: #2196f3;
-$gradient1: linear-gradient(120deg, #1e1e1e 45%, #2a2a2a);
-$gray1: rgba(142, 142, 147, 1);
-$gray2: rgba(99, 99, 102, 1);
-$gray3: rgba(72, 72, 74, 1);
-$gray4: rgba(58, 58, 60, 1);
-$gray5: rgba(44, 44, 46, 1);
-$gray6: rgba(28, 28, 30, 1);
-$green1: #34c759;
-$lightBlue1: rgba(75, 186, 255, 1);
-$my-custom-cat: #02375a;
-$my-custom-dog: #cafff3;
-$white1: rgba(255, 255, 255, 1);
-$white2: rgba(white, 0.87);
-$white3: rgba(225, 225, 230, 1);
+// User-editable colors are extracted to a separate file so designers can
+// modify them without touching the auto-generated master color map.
+@import "user-colors";
 
 // =============================================================================
 // CSS CUSTOM PROPERTIES
@@ -180,4 +150,16 @@ $white3: rgba(225, 225, 230, 1);
   --white1: #{$white1};
   --white2: #{$white2};
   --white3: #{$white3};
+
+  // Game UI theme tokens (overridden by user preferences when theme is active)
+  --ocs-game-panel-bg: #{$game-panel-bg};
+  --ocs-game-accent: #{$game-accent};
+  --ocs-game-text: #{$game-text};
+  --ocs-game-muted: #{$game-muted};
+  --ocs-game-surface-alt: #{$game-surface-alt};
+  --ocs-game-surface-contrast: #{$game-surface-contrast};
+  --ocs-game-overlay: #{$game-overlay};
+  --ocs-game-panel-selected-bg: #{$game-panel-selected-bg};
+  --ocs-game-selected-border: #{$game-selected-border};
+  --ocs-game-score-accent: #{$game-score-accent};
 }

@@ -118,15 +118,15 @@ function showCard(index) {
 function updateNavButtons() {
   if (!window.flashcardsData) return;
   
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
+  const prevButton = document.getElementById('prev-btn');
+  const nextButton = document.getElementById('next-btn');
   
-  if (prevBtn) {
-    prevBtn.disabled = window.flashcardsData.currentIndex <= 1;
+  if (prevButton) {
+    prevButton.disabled = window.flashcardsData.currentIndex <= 1;
   }
   
-  if (nextBtn) {
-    nextBtn.disabled = window.flashcardsData.currentIndex >= window.flashcardsData.totalCards;
+  if (nextButton) {
+    nextButton.disabled = window.flashcardsData.currentIndex >= window.flashcardsData.totalCards;
   }
 }
 
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
 (function () {
   const bar = document.getElementById("lesson-progress");
   const text = document.getElementById("progress-text");
-  const resetBtn = document.getElementById("reset-progress");
+  const resetButton = document.getElementById("reset-progress");
   if (!bar || !text) return;
 
   // Get total lessons from config, default to 6
@@ -294,8 +294,8 @@ document.addEventListener('DOMContentLoaded', function() {
   bar.style.width = percent + "%";
   text.textContent = percent + "% complete";
 
-  if (resetBtn) {
-    resetBtn.onclick = () => {
+  if (resetButton) {
+    resetButton.onclick = () => {
       if (confirm("Reset all progress and time data?")) {
         localStorage.removeItem(key);
         localStorage.removeItem("lesson-badges");
@@ -388,12 +388,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // -------------------- SANDBOX --------------------
 (function () {
-  const runBtn = document.getElementById("run-sandbox");
+  const runButton = document.getElementById("run-sandbox");
   const codeBox = document.getElementById("sandbox-code");
   const output = document.getElementById("sandbox-output");
-  if (!runBtn || !codeBox || !output) return;
+  if (!runButton || !codeBox || !output) return;
 
-  runBtn.addEventListener("click", () => {
+  runButton.addEventListener("click", () => {
     try {
       const result = eval(codeBox.value);
       output.textContent = String(result ?? "✅ Code ran successfully.");
@@ -405,16 +405,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // -------------------- QUIZ / REFLECTION --------------------
 (function () {
-  const saveBtn = document.getElementById("save-reflection");
+  const saveButton = document.getElementById("save-reflection");
   const box = document.getElementById("reflection-box");
   const status = document.getElementById("reflection-status");
-  if (!saveBtn || !box || !status) return;
+  if (!saveButton || !box || !status) return;
 
   const lessonKey = window.location.pathname.split("/").pop() || "lesson";
   const refKey = "reflection-" + lessonKey;
   box.value = localStorage.getItem(refKey) || "";
 
-  saveBtn.addEventListener("click", () => {
+  saveButton.addEventListener("click", () => {
     localStorage.setItem(refKey, box.value);
     status.textContent = "Saved!";
     setTimeout(() => (status.textContent = ""), 1500);

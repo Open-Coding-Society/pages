@@ -1,5 +1,8 @@
 ---
 ---
+
+// ^^ Do not remove the above front matter, it is required for Jekyll processing
+
 export const baseurl = "{{ site.baseurl }}";
 
 export var pythonURI;
@@ -16,6 +19,17 @@ if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         javaURI = "http://localhost:8585";
 } else {
     javaURI = "https://spring.opencodingsociety.com";
+}
+
+// Shared across the signup, login, and password-reset OAuth flows (login.md,
+// support.md) so the client_id only needs updating in one place.
+export const GOOGLE_CLIENT_ID = "{{ site.google_client_id }}";
+
+export var javaWebSocketURI;
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    javaWebSocketURI = "http://localhost:8589";
+} else {
+    javaWebSocketURI = "https://spring.opencodingsociety.com:8589";
 }
 
 export const fetchOptions = {

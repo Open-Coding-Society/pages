@@ -1,0 +1,117 @@
+Title: "Assignment Resource Management System"
+Description: "Complete ecosystem for managing assignment submissions, grading, and file delivery. Covers automatic assignment creation from frontmatter, URL/file submissions, a role-gated review dashboard, and a student grade viewer — all secured by JWT and server-side role enforcement."
+
+Features:
+  - title: "Automatic Assignment Creation"
+    subtitle: "CI-driven assignment sync from page frontmatter"
+    status: "Production Ready"
+    endpoints:
+      - "POST /api/assignments/auto-create"
+      - "GET /api/assignments/debug"
+    icon: |
+      <path d="M12 4v16m8-8H4"/>
+    keyPoints:
+      - "GitHub Actions workflow scans all pages with assignment: true frontmatter"
+      - "Auto-POSTs to backend on every push — idempotent, no duplicates"
+      - "Supports assignment_name override frontmatter for custom names"
+      - "Works for both .md posts and .ipynb notebooks after conversion"
+      - "Script: scripts/create_assignments_from_frontmatter.py"
+    tech:
+      - "GitHub Actions"
+      - "Python Script"
+      - "Spring REST"
+      - "Idempotent POST"
+    description: "Every page with assignment: true in its frontmatter is automatically registered as an assignment in the Spring backend on each push. The workflow resolves the assignment name from frontmatter (assignment_name field) and POSTs to /api/assignments/auto-create, which handles deduplication. IPython notebooks are converted to markdown posts first, making all notebook-based lessons submittable."
+    security:
+      - "Bot credentials stored as GitHub Actions secrets"
+      - "Server-side deduplication prevents duplicate assignments"
+      - "No manual assignment creation needed — reduces admin error"
+    link: "/assignments"
+
+  - title: "Student Submission Interface"
+    subtitle: "URL and file upload submissions from any lesson page"
+    status: "Production Ready"
+    endpoints:
+      - "POST /api/submissions/submit/{assignmentId}"
+      - "GET /api/person/uid/{uid}"
+      - "GET /api/assignments/debug"
+    icon: |
+      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    keyPoints:
+      - "Inline submission widget embedded in every post/lesson layout"
+      - "Supports URL link submissions and file uploads (multipart)"
+      - "assignment_name frontmatter auto-resolves to assignment ID"
+      - "Late detection: compares submission time to assignment dueDate"
+      - "Group submission toggle — submits on behalf of a selected group"
+    tech:
+      - "post.html Layout"
+      - "Spring Multipart"
+      - "JWT Auth"
+      - "FormData API"
+    description: "Every lesson or blog post with assignment: true gets an embedded submission form via the post.html layout. Students submit a URL or upload a file — the frontend resolves the assignment ID from the page's frontmatter assignment_name field, attaches the student's identity via /api/person/uid, and POSTs to Spring. Late status is computed client-side against the stored due date."
+    security:
+      - "JWT credentials included on all mutation requests"
+      - "Assignment ID resolved server-side — client cannot spoof a different assignment"
+      - "File uploads validated for MIME type and extension server-side"
+    link: "/student/submissions"
+
+  - title: "Submissions Dashboard"
+    subtitle: "Role-gated review, grading, edit, and delete"
+    status: "Production Ready"
+    endpoints:
+      - "GET /api/assignment-submission-view/list"
+      - "GET /api/assignment-submission-view/user-info"
+      - "PUT /api/submissions/{id}"
+      - "POST /api/submissions/grade/{id}"
+      - "DELETE /api/submissions/{id}"
+    icon: |
+      <path d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+    keyPoints:
+      - "My Submissions tab: student sees only their own submissions"
+      - "All Submissions tab: admin/teacher sees all with filter by name, assignment, status"
+      - "Inline grade input per row for admins — saves via POST /api/submissions/grade/{id}"
+      - "Edit modal: students can update URL/notes/comment; admins also set grade, feedback, isLate"
+      - "Delete button (admin only) with confirmation — hard-deletes the record"
+      - "File submissions show filename + Download file link via /api/files/download/{uid}/{file}"
+      - "renderContent() handles URL links, file uploads, and plain text uniformly"
+      - "Status badges: Pending Review / Graded / Late"
+    tech:
+      - "Tailwind CSS"
+      - "Tab Switcher"
+      - "Role-Based UI"
+      - "Modal Edit"
+    description: "Centralized submissions dashboard at /submissions. The backend returns only the current user's submissions to non-admins; admins receive all submissions. CyberLord09 built the initial layout and edit modal; Hypernova101 added file download support; illuminati1618 added the Submission content column, renderContent helper, and synergy grade display."
+    security:
+      - "Server-side role check in AssignmentSubmissionViewController — students cannot request other users' submissions"
+      - "Edit modal: grade/feedback/isLate fields hidden from non-admins in HTML and guarded in saveSubmissionEdit()"
+      - "Delete endpoint requires ADMIN or TEACHER role server-side"
+      - "isLate can only be set by admins — students cannot clear a late flag"
+    link: "/submissions"
+
+  - title: "Student Grade Viewer"
+    subtitle: "Per-student view of grades, feedback, and status"
+    status: "Production Ready"
+    endpoints:
+      - "GET /api/assignment-submission-view/user-info"
+      - "GET /api/person/uid/{uid}"
+      - "GET /api/assignment-submission-view/list"
+    icon: |
+      <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+    keyPoints:
+      - "Resolves current user via user-info → person/uid to get userId"
+      - "Fetches submission list and filters to current student's submitterId"
+      - "Columns: Assignment, Grade, Feedback, Status badge"
+      - "Status badge: Graded (blue) / Late (red) / Pending Review (amber)"
+      - "Average grade row appended at the bottom of the table"
+      - "Grade sourced from AssignmentSubmission.grade — set by teacher on /submissions"
+    tech:
+      - "Jekyll Post"
+      - "Spring API"
+      - "Status Badges"
+      - "Module Imports"
+    description: "The grade viewer at /student/view-grades was refactored by illuminati1618 to pull grades directly from AssignmentSubmission records via the unified list endpoint, replacing the old platform-wide grade scan. Feedback and Status columns were added so students see teacher comments and whether submissions are pending/graded/late in a single table."
+    security:
+      - "Backend filters list to current user's submissions — no cross-user data leakage"
+      - "JWT required; unauthenticated requests get a 401 error message in the table"
+      - "No admin-only data exposed — grade/feedback only shown, not editable"
+    link: "/student/view-grades"

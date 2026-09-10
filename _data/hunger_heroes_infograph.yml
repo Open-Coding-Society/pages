@@ -1,0 +1,44 @@
+Title: "Hunger Heroes Capstone"
+Description: "A design-research capstone for a web platform that mitigates food insecurity by connecting surplus food providers with local recipients, integrating automated safety-focused workflows and smart traceability systems."
+
+Topics:
+  - title: "Hunger Heroes"
+    image: "capstone/hunger_heroes.svg"
+    link: "/capstone/hunger-heroes"
+    alt: "Hunger Heroes - Food Redistribution & Safety Platform"
+    keyPoints:
+      - "Persistent, role-based platform interfaces for distinct Donor and Recipient workflows"
+      - "Real-time surplus food matching with multi-criteria search and proximity filtering"
+      - "Automated safety data collection capturing storage types, handling rules, and expiries"
+      - "Dynamic allergen and dietary restriction tagging to ensure safe recipient choices"
+      - "Smart inventory traceability via an automated, scannable Barcode Label System"
+      - "Pre-acceptance safety wizard guiding donors through critical health compliance steps"
+      - "<a href='https://github.com/Ahaanv19/hunger_heroes/issues/46' target='_blank'>Project Overview (Issue #46)</a>"
+      - "<a href='https://github.com/Ahaanv19/hunger_heroes/issues/52' target='_blank'>Overall Research (Issue #52)</a>"
+    subtitle: "Connecting Surplus Supply to Community Demand Safely"
+    description: "Hunger Heroes is a web-based ecosystem engineered to combat food waste and insecurity simultaneously. The platform provides a seamless, friction-free interface where businesses and individuals can safely offload fresh surplus items. By enforcing compliance at the point of entry through data-driven forms and instantly rendering scannable tracking barcodes, the solution addresses the historical challenges of quality control and logistics fragmentation in local food redistribution networks."
+    videos:
+      - title: "Label Creation Process"
+        path: "/images/capstone/hunger_heroes_label_creation.mp4"
+      - title: "Donate Hub Walkthrough"
+        path: "/images/capstone/hunger_heroes_donate_hub.mp4"
+    tech:
+      - "HTML5 / SCSS / JavaScript Frontend"
+      - "Python Backend Core"
+      - "Shell Scripting Automation"
+      - "Makefile Deployment Architecture"
+      - "Secure Profile Authentication"
+      - "Barcode Generation APIs"
+    impact:
+      - "Positive, community-centric solution to food waste and local poverty with minimal friction"
+      - "Measurable reduction in standard operational windows for local surplus distribution"
+      - "Guaranteed food transparency for shelters and individuals via physical-to-digital labeling"
+      - "Establishes structured, repeatable safety frameworks for local commercial food donors"
+      - "Supports UN Sustainable Development Goal 2: Zero Hunger"
+    status: "Research & Testing Phase"
+    team:
+      - "Ahaan"
+      - "Arnav"
+      - "Shaurya"
+
+  

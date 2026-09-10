@@ -19,9 +19,26 @@ title: Open Coding
 description: "Class of 2026"
 owner_name: Open Coding Society 
 github_username: open-coding-society 
-github_repo: "pages" 
-baseurl: "" 
+github_repo: "pages"
+baseurl: ""
 future: true
+# Single source of truth for the Google OAuth client id -- assets/js/api/config.js's
+# GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id both pull from this at
+# build time via Liquid, so the two can never drift out of sync with each other again.
+google_client_id: "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
+
+# Exclude from Jekyll watch - these are processed by our conversion scripts
+# This prevents double-regeneration when saving notebooks/docx files
+exclude:
+# Jekyll defaults
+  - vendor
+# Custom excludes
+  - Makefile
+  - _notebooks
+  - _docx
+  - _projects
+  - venv
+# Note: / auto-excluded by Jekyll (underscore prefix)
 
 
 # Build settings
@@ -48,6 +65,7 @@ future: true
 #   quiet_deps: true
 #   silence_deprecations: [import]
 incremental: true
+encoding: utf-8
 
 remote_theme: jekyll/minima
 plugins:
@@ -113,4 +131,5 @@ minima:
     - { platform: youtube, user_url: "https://www.youtube.com/@OpenCodingSociety" } 
   nav_pages:
     - navigation/blog.md
+    - navigation/courses.md
     - navigation/search.md

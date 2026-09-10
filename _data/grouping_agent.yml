@@ -1,0 +1,110 @@
+# _data/grouping_agent_sample.yml
+# Sample dataset for a frontend-only grouping agent.
+# - people: roster + current personas
+# - outcomes: historical group outcomes (student + teacher ratings)
+
+people:
+  - id: u1
+    name: Ava
+    personas:
+      student: 3
+      social: 2
+      achievement: 5
+      fantasy: 1
+
+  - id: u2
+    name: Noah
+    personas:
+      student: 1
+      social: 4
+      achievement: 2
+      fantasy: 6
+
+  - id: u3
+    name: Mia
+    personas:
+      student: 4
+      social: 1
+      achievement: 3
+      fantasy: 2
+
+  - id: u4
+    name: Ethan
+    personas:
+      student: 2
+      social: 3
+      achievement: 1
+      fantasy: 5
+
+  - id: u5
+    name: Sophia
+    personas:
+      student: 5
+      social: 6
+      achievement: 4
+      fantasy: 3
+
+  - id: u6
+    name: Liam
+    personas:
+      student: 2
+      social: 2
+      achievement: 3
+      fantasy: 4
+
+outcomes:
+  - id: run_0001
+    task:
+      type: CSA_FRQ
+      difficulty: 3
+    group:
+      members: [u1, u2, u3, u4]
+      personas_snapshot:
+        u1: { student: 3, social: 2, achievement: 5, fantasy: 1 }
+        u2: { student: 1, social: 4, achievement: 2, fantasy: 6 }
+        u3: { student: 4, social: 1, achievement: 3, fantasy: 2 }
+        u4: { student: 2, social: 3, achievement: 1, fantasy: 5 }
+    student_assessment:
+      worked: true
+      avg_rating_1to5: 4
+      notes: "Everyone contributed, good communication."
+    teacher_assessment:
+      worked_rating_1to5: 4
+      notes: "Solid solution, minor edge cases missed."
+
+  - id: run_0002
+    task:
+      type: WEB_APP
+      difficulty: 4
+    group:
+      members: [u1, u5, u6]
+      personas_snapshot:
+        u1: { student: 3, social: 2, achievement: 5, fantasy: 1 }
+        u5: { student: 5, social: 6, achievement: 4, fantasy: 3 }
+        u6: { student: 2, social: 2, achievement: 3, fantasy: 4 }
+    student_assessment:
+      worked: false
+      avg_rating_1to5: 2
+      notes: "Conflicts and unclear roles."
+    teacher_assessment:
+      worked_rating_1to5: 2
+      notes: "Incomplete features and weak testing."
+
+  - id: run_0003
+    task:
+      type: DATA_SCI
+      difficulty: 2
+    group:
+      members: [u2, u3, u5, u6]
+      personas_snapshot:
+        u2: { student: 1, social: 4, achievement: 2, fantasy: 6 }
+        u3: { student: 4, social: 1, achievement: 3, fantasy: 2 }
+        u5: { student: 5, social: 6, achievement: 4, fantasy: 3 }
+        u6: { student: 2, social: 2, achievement: 3, fantasy: 4 }
+    student_assessment:
+      worked: true
+      avg_rating_1to5: 5
+      notes: "Great division of labor, fast progress."
+    teacher_assessment:
+      worked_rating_1to5: 5
+      notes: "Excellent analysis and clear writeup."

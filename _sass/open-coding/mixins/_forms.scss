@@ -1,0 +1,443 @@
+/**
+ * Form Mixins
+ * Reusable form patterns for modals, widgets, and interactive components
+ * All media queries are embedded in mixins for consistency
+ */
+
+/**
+ * Modal Container
+ * Centered container for modal content with responsive padding
+ *
+ * @param {Number} $min-width - Minimum width (default: 300px)
+ * @param {Number} $max-width - Maximum width (default: 400px)
+ * @param {Number} $padding - Inner padding (default: 24px)
+ *
+ * @example
+ *   .my-modal-content {
+ *     @include modal-container;
+ *   }
+ */
+@mixin modal-container($min-width: 300px, $max-width: 400px, $padding: 24px) {
+  background: var(--panel, #000);
+  border: 1px solid var(--pref-accent-color, #FFF);
+  border-radius: 12px;
+  padding: $padding;
+  min-width: $min-width;
+  max-width: $max-width;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  font-family: var(--pref-font-family, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+
+  @media (max-width: 768px) {
+    min-width: $min-width - 20px;
+    padding: $padding - 4px;
+  }
+}
+
+/**
+ * Widget Container
+ * Fixed/floating container for widgets like leaderboards
+ *
+ * @param {Number} $width - Container width (default: 350px)
+ * @param {Number} $border-width - Border width (default: 2px)
+ *
+ * @example
+ *   .my-widget {
+ *     @include widget-container;
+ *   }
+ */
+@mixin widget-container($width: 350px, $border-width: 2px) {
+  width: $width;
+  background: var(--panel, #1a1a1a);
+  border: $border-width solid var(--ui-border, #333);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  font-family: var(--pref-font-family, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  z-index: 1000;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: $width;
+  }
+}
+
+/**
+ * Header Bar
+ * Common header for modals and widgets
+ *
+ * @param {Number} $padding - Inner padding (default: 16px)
+ * @param {Number} $font-size - Font size (default: 20px)
+ *
+ * @example
+ *   .my-header {
+ *     @include header-bar;
+ *   }
+ */
+@mixin header-bar($padding: 16px, $font-size: 20px) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $padding;
+  color: var(--pref-text-color, white);
+  font-size: $font-size;
+  font-weight: 700;
+  background: var(--panel-mid, #2d2d2d);
+  border-bottom: 2px solid var(--ui-border, #444);
+
+  @media (max-width: 768px) {
+    font-size: $font-size - 2px;
+    padding: $padding - 4px;
+  }
+}
+
+/**
+ * Form Group
+ * Label and input pair with consistent styling
+ *
+ * @param {Number} $margin-bottom - Space between groups (default: 16px)
+ *
+ * @example
+ *   .form-group {
+ *     @include form-group;
+ *   }
+ */
+@mixin form-group($margin-bottom: 16px) {
+  margin-bottom: $margin-bottom;
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-muted, #ccc);
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--ui-border, #333);
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: var(--panel-mid, #2d2d2d);
+    color: var(--pref-text-color, #fff);
+    transition: border-color 0.2s;
+    font-family: var(--pref-font-family, inherit);
+
+    &:focus {
+      outline: none;
+      border-color: var(--pref-accent-color, #4a9eff);
+    }
+
+    &::placeholder {
+      color: var(--text-muted, #888);
+    }
+  }
+}
+
+/**
+ * Submit Button
+ * Primary action button with responsive sizing
+ *
+ * @param {Number} $padding - Inner padding (default: 12px)
+ *
+ * @example
+ *   .submit-btn {
+ *     @include submit-button;
+ *   }
+ */
+@mixin submit-button($padding: 12px) {
+  width: 100%;
+  padding: $padding;
+  background: var(--pref-accent-color, #4a9eff);
+  color: var(--panel, #1a1a1a);
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--pref-accent-color, #5aafff);
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    padding: $padding + 2px;
+    font-size: 15px;
+  }
+}
+
+/**
+ * Content Area
+ * Scrollable content area with max height
+ *
+ * @param {Number} $max-height - Maximum height (default: 400px)
+ *
+ * @example
+ *   .content-area {
+ *     @include content-area;
+ *   }
+ */
+@mixin content-area($max-height: 400px) {
+  background: var(--panel, #1a1a1a);
+  max-height: $max-height;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    max-height: $max-height - 100px;
+  }
+}
+
+/**
+ * Button Container
+ * Flex container for button groups
+ *
+ * @param {String} $direction - Flex direction (default: column)
+ * @param {Number} $gap - Gap between items (default: 10px)
+ *
+ * @example
+ *   .button-group {
+ *     @include button-container;
+ *   }
+ */
+@mixin button-container($direction: column, $gap: 10px) {
+  display: flex;
+  flex-direction: $direction;
+  gap: $gap;
+}
+
+/**
+ * Action Button
+ * Full-width button for modals/forms
+ *
+ * @param {Number} $padding - Inner padding (default: 12px 16px)
+ *
+ * @example
+ *   .action-btn {
+ *     @include action-button;
+ *   }
+ */
+@mixin action-button($padding-v: 12px, $padding-h: 16px) {
+  width: 100%;
+  padding: $padding-v $padding-h;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    padding: ($padding-v + 2px) $padding-h;
+    font-size: 14px;
+  }
+}
+
+/**
+ * Table Styles
+ * Themed table with alternating rows
+ *
+ * @example
+ *   .my-table {
+ *     @include themed-table;
+ *   }
+ */
+@mixin themed-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 12px 8px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--ui-border, #333);
+
+    @media (max-width: 768px) {
+      padding: 10px 6px;
+      font-size: 13px;
+    }
+  }
+
+  th {
+    color: var(--text-muted, #aaa);
+    font-weight: 600;
+    background: var(--panel-mid, #252525);
+    text-align: left;
+  }
+
+  td {
+    color: var(--pref-text-color, #ddd);
+  }
+
+  tbody tr {
+    background: var(--panel, #1a1a1a);
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--panel-mid, rgba(255, 255, 255, 0.05));
+    }
+
+    &:nth-child(even) {
+      background: var(--ui-bg, rgba(0, 0, 0, 0.06));
+    }
+
+    &:nth-child(even):hover {
+      background: var(--panel-mid, rgba(255, 255, 255, 0.05));
+    }
+  }
+}
+
+// ===========================
+// Game-Specific Modal Mixins
+// ===========================
+
+/**
+ * Game Modal Content
+ * Modal styling optimized for game interfaces with backdrop blur and gradients
+ *
+ * @param {Color} $border-color - Border accent color (default: var(--pref-accent-color))
+ * @param {Number} $max-width - Maximum width (default: 600px)
+ * @param {Number} $padding - Inner padding (default: 30px)
+ *
+ * @example
+ *   #cheatsModal .modal-content {
+ *     @include game-modal-content;
+ *   }
+ */
+@mixin game-modal-content($border-color: var(--pref-accent-color), $max-width: 600px, $padding: 30px) {
+  background: var(--panel, rgba(18, 18, 18, 0.95));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid $border-color;
+  border-radius: 15px;
+  padding: $padding;
+  max-width: $max-width;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  font-family: var(--pref-font-family, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  color: var(--pref-text-color, #ddd);
+  position: relative;
+  animation: modalSlideIn 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: $padding - 10px;
+    max-width: 95%;
+    border-radius: 12px;
+  }
+}
+
+/**
+ * Game Modal Header
+ * Header section for game modals with gradient accents
+ *
+ * @param {Color} $accent-color - Accent color for gradient (default: var(--pref-accent-color))
+ * @param {Number} $padding-bottom - Bottom spacing (default: 20px)
+ *
+ * @example
+ *   .modal-header {
+ *     @include game-modal-header;
+ *   }
+ */
+@mixin game-modal-header($accent-color: var(--pref-accent-color), $padding-bottom: 20px) {
+  margin-bottom: $padding-bottom;
+  padding-bottom: 15px;
+  border-bottom: 2px solid $accent-color;
+  background: linear-gradient(90deg, 
+    rgba($accent-color, 0.1) 0%, 
+    rgba($accent-color, 0.05) 100%
+  );
+  border-radius: 8px 8px 0 0;
+
+  h2 {
+    margin: 0;
+    color: $accent-color;
+    font-size: 28px;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      font-size: 22px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: $padding-bottom - 5px;
+    padding-bottom: 10px;
+  }
+}
+
+/**
+ * Game Modal Body
+ * Content area for game modals with auto-scrolling
+ *
+ * @param {Number} $max-height - Maximum height before scrolling (default: 400px)
+ * @param {Number} $padding - Inner padding (default: 20px)
+ *
+ * @example
+ *   .modal-body {
+ *     @include game-modal-body;
+ *   }
+ */
+@mixin game-modal-body($max-height: 400px, $padding: 20px) {
+  max-height: $max-height;
+  overflow-y: auto;
+  padding: $padding;
+  color: var(--pref-text-color, #ddd);
+  line-height: 1.6;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--panel-mid, rgba(255, 255, 255, 0.05));
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--pref-accent-color, #888);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--pref-selection-color, #555);
+    }
+  }
+
+  @media (max-width: 768px) {
+    max-height: 300px;
+    padding: $padding - 5px;
+  }
+}
+
+/**
+ * Game Modal Animation Keyframes
+ * Slide-in animation for game modals
+ */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

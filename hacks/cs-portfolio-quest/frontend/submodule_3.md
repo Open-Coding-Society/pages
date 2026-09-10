@@ -8,7 +8,6 @@ team: "Creators"
 submodule: 3
 microblog: True
 breadcrumb: True
-categories: [CSP, Submodule, Frontend]
 tags: [css, styling, fundamentals]
 author: "Creators Team"
 date: 2025-10-21

@@ -1,0 +1,165 @@
+// Generic size classes used across UI controls.
+@each $name, $values in $sizes {
+    .#{$name} {
+        @include button-style($values...);
+    }
+}
+
+// Button-scoped size utilities override base text-button sizing.
+@each $name, $values in $sizes {
+    .ocs__btn.#{$name} {
+        height: nth($values, 1);
+        padding: nth($values, 2) nth($values, 3);
+        border-radius: nth($values, 4);
+        border-style: solid;
+        border-width: 1px;
+        font-size: nth($values, 5);
+        line-height: nth($values, 6);
+        letter-spacing: nth($values, 7);
+    }
+}
+
+.ocs__btn.pill {
+    border: none;
+    border-radius: 999px;
+}
+
+@each $name, $tone in $ocs-alert-buttons {
+    .ocs__btn.alert-#{$name} {
+        --ocs-btn-tone: #{$tone};
+        background: transparent;
+        border-width: 2px;
+        border-color: $tone;
+        color: $tone;
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: transparent;
+            border-color: $tone;
+            color: $tone;
+        }
+    }
+
+    .ocs__btn.alert-#{$name}.fill {
+        background: color-mix(in srgb, $tone 20%, var(--pref-bg-color));
+
+        &:hover,
+        &:focus,
+        &:active {
+            background: color-mix(in srgb, $tone 30%, var(--pref-bg-color));
+            border-color: $tone;
+            color: $tone;
+        }
+    }
+}
+
+// Runner control grammar (shared across CODE/UI/GAME runners)
+// Usage examples:
+// - .ocs__btn.utility.run
+// - .ocs__btn.utility.pause
+// - .ocs__btn.utility.stop
+// - .ocs__btn.utility.fullscreen
+// - .ocs__btn.utility.copy
+.ocs__btn.utility {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    margin-left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0;
+    line-height: 1;
+    font-weight: 700;
+
+    &::before {
+        display: inline-block;
+        font-size: 1.05rem;
+        line-height: 1;
+    }
+}
+
+.ocs__btn.utility.run {
+    background: var(--pref-accent-color);
+    border-color: var(--pref-accent-color);
+    color: var(--pref-bg-color);
+
+    &::before {
+        content: '▶';
+    }
+}
+
+.ocs__btn.utility.pause {
+    background: var(--warn);
+    border-color: var(--warn);
+    color: #000;
+
+    &::before {
+        content: '⏸';
+    }
+}
+
+.ocs__btn.utility.stop {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+
+    &::before {
+        content: '■';
+    }
+}
+
+.ocs__btn.utility.fullscreen,
+.ocs__btn.utility.copy,
+.ocs__btn.utility.save,
+.ocs__btn.utility.clear,
+.ocs__btn.utility.reset,
+.ocs__btn.utility.copyOutput {
+    background: var(--pref-bg-color);
+    border-color: var(--ui-border);
+    color: var(--pref-text-color);
+}
+
+.ocs__btn.utility.fullscreen::before {
+    content: '⛶';
+}
+
+.ocs__btn.utility.copy::before {
+    content: '📋';
+}
+
+.ocs__btn.utility.save::before {
+    content: '💾';
+}
+
+.ocs__btn.utility.clear::before {
+    content: '🗑';
+}
+
+.ocs__btn.utility.reset::before {
+    content: '↻';
+}
+
+.ocs__btn.utility.copyOutput::before {
+    content: '⎘';
+}
+
+.ocs__btn.utility:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .ocs__btn.utility {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+
+        &::before {
+            font-size: 1rem;
+        }
+    }
+}

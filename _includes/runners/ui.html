@@ -1,0 +1,108 @@
+<!-- Reusable UI Runner Component -->
+<div class="ui-runner-container" id="ui-runner-{{ include.runner_id }}" data-storage-key="{{ page.permalink | replace: '/', '_' }}_{{ include.runner_id }}">
+  {% include runners/fragments/challenge-box.html challenge=include.challenge %}
+
+  {% capture ui_runner_top_controls %}
+      <button type="button" class="ocs__btn utility run" data-hook="run" title="Run" aria-label="Run"></button>
+      <button type="button" class="ocs__btn utility stop" data-hook="stop" title="Stop" aria-label="Stop"></button>
+      <button type="button" class="ocs__btn utility copy" data-hook="copy" title="Copy Code" aria-label="Copy Code"></button>
+      <button type="button" class="ocs__btn utility save" data-hook="save" title="Save Code" aria-label="Save Code"></button>
+      <button type="button" class="ocs__btn utility clear" data-hook="clear" title="Clear Storage" aria-label="Clear Storage"></button>
+  {% endcapture %}
+  {% capture ui_runner_bottom_controls %}
+    {% include runners/fragments/editor-stats.html %}
+  {% endcapture %}
+  {% include runners/fragments/editor-container.html
+     top_controls=ui_runner_top_controls
+     bottom_controls=ui_runner_bottom_controls
+  %}
+
+  <div class="output-container">
+    <div class="control-panel">
+      <span>UI Output</span>
+      <button type="button" class="ocs__btn utility reset" data-hook="reset" title="Reset" aria-label="Reset"></button>
+    </div>
+    <div class="ui-output" id="ui-output-{{ include.runner_id }}"></div>
+  </div>
+</div>
+
+<script type="module">
+import { BaseRunner, UiExecutor } from '{{ site.baseurl }}/assets/js/pages/runners/index.js';
+
+(function() {
+  const container = document.getElementById('ui-runner-{{ include.runner_id }}');
+  if (!container) return;
+  
+  const defaultCode = `{{ include.code }}`.trim();
+  const autostart = "{{ include.autostart | default: 'false' }}" === "true";
+  const editorHeight = "{{ include.height }}";
+  const outputHeight = "{{ include.output_height }}";
+  const storageKey = container.dataset.storageKey;
+  const runner = new BaseRunner(container, { storageKey });
+
+  const editor = runner.initializeEditor({
+    defaultCode,
+    editorHeight,
+    fallbackCode: "// Write your JavaScript code here",
+    codeMirrorOptions: {
+      lineNumbers: true,
+      mode: "javascript",
+      theme: "darcula",
+      indentUnit: 2,
+      tabSize: 4,
+      styleSelectedText: true
+    }
+  });
+
+  if (outputHeight) {
+    runner.applyScopedStyle(`#ui-output-{{ include.runner_id }} { min-height: ${outputHeight}; max-height: ${outputHeight}; height: ${outputHeight}; }`);
+  }
+
+  const uiOutput = container.querySelector('.ui-output');
+  const uiExecutor = new UiExecutor({
+    editor,
+    outputElement: uiOutput,
+  });
+
+  runner.bindEditorButtons({
+    resetValue: defaultCode || "// Write your JavaScript code here",
+    onClear: () => {
+      stopExecution();
+    },
+    saveFeedback: '✔',
+    copyFeedback: '✔'
+  });
+
+  // Stop execution
+  function stopExecution() {
+    uiExecutor.stop();
+  }
+
+  // Reset button
+  container.querySelector('[data-hook="reset"]').onclick = () => {
+    stopExecution();
+  };
+
+  // Stop button
+  container.querySelector('[data-hook="stop"]').onclick = () => {
+    stopExecution();
+  };
+
+  // Run button logic
+  function runCode() {
+    return uiExecutor.run();
+  }
+
+  runner.bindButton('', runCode, 'run');
+
+  // Keyboard shortcut
+  runner.bindShortcut(runCode);
+
+  if (autostart) {
+    // Defer to next tick so output container is present before execution.
+    setTimeout(() => {
+      runCode();
+    }, 0);
+  }
+})();
+</script>

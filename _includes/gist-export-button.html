@@ -1,0 +1,40 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<div id="pixel-submit-widget"
+  data-gist-description="Exported AP CSA FRQs / Challenges from Open Coding Society"
+>
+
+  <!-- ── Title bar ── -->
+  <div class="psw-titlebar">
+    <span class="psw-titlebar-text">HOMEWORK DELIVERY</span>
+  </div>
+
+  <!-- ── Two panels ── -->
+  <div class="psw-panels">
+
+    <div class="psw-panel psw-panel-left">
+      <div class="psw-step-label">STEP 1</div>
+      <canvas id="psw-scroll-canvas" width="138" height="96"></canvas>
+      <button id="psw-export-btn" class="psw-btn psw-btn-gold">✦ EXPORT</button>
+    </div>
+
+    <div class="psw-panel psw-panel-right">
+      <div class="psw-step-label">STEP 2</div>
+      <canvas id="psw-carrier-canvas" width="180" height="138"></canvas>
+      <button id="psw-commit-btn" class="psw-btn psw-btn-blue" disabled>✉ COMMIT</button>
+    </div>
+
+  </div>
+
+  <!-- ── Dialog box ── -->
+  <div class="psw-dialog">
+    <span id="psw-dialog-icon" class="psw-dialog-icon">✉</span>
+    <span id="psw-dialog-text" class="psw-dialog-text psw-dialog-muted">
+      Export your solutions, then commit to submit...
+    </span>
+  </div>
+
+</div>
+
+<script type="module" src="{{ '/assets/js/gist-export-button.js' | relative_url }}"></script>

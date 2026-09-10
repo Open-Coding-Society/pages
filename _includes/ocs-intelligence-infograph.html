@@ -1,0 +1,217 @@
+{% assign data = site.data.ocs_intelligence_infograph %}
+{% assign topic = data.Topics[0] %}
+{% assign gift = data.donation %}
+
+<div class="ocs-intelligence-infograph">
+  <div class="ocs-intelligence-header">
+    <div class="ocs-intelligence-badge">Design-Based Research Capstone</div>
+    <h1 class="ocs-intelligence-title">{{ data.Title }}</h1>
+    <p class="ocs-intelligence-description">{{ data.Description }}</p>
+  </div>
+
+  {% include ocs-intelligence-nav.html %}
+
+  <div class="ocs-intelligence-card ocs-intelligence-gift">
+    <p class="ocs-intelligence-gift-kicker">{{ gift.kicker }}</p>
+    <h3 class="ocs-intelligence-section-title">{{ gift.title }}</h3>
+    <p class="ocs-intelligence-about ocs-intelligence-lead">{{ gift.body }}</p>
+    <p class="ocs-intelligence-cost-line">{{ gift.costLine }}</p>
+    <div class="ocs-intelligence-stats">
+      {% for stat in data.inventory %}
+      <div class="ocs-intelligence-stat">
+        <span class="ocs-intelligence-stat-value">{{ stat.value }}</span>
+        <span class="ocs-intelligence-stat-label">{{ stat.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">How this works</h3>
+    <p class="ocs-intelligence-about">Two pictures: the path from gift to classroom service, and how a student actually reaches it.</p>
+    <div class="ocs-intelligence-diagram-stack">
+      <div class="ocs-intelligence-diagram-block">
+        <h4 class="ocs-intelligence-diagram-title">From donation to two phases</h4>
+        <div class="ocs-intelligence-diagram">
+          <pre class="mermaid">flowchart LR
+    A[Donated 8x GTX 1070 rack] --> B[Phase 1]
+    B --> C[Phase 2]
+    B --> B1[Build rack]
+    B --> B2[Ollama and llama.cpp]
+    B --> B3[Stream and keys]
+    C --> C1[Deploy service]
+    C --> C2[Monitor under load]
+    C --> C3[Every student gets in]</pre>
+        </div>
+      </div>
+      <div class="ocs-intelligence-diagram-block">
+        <h4 class="ocs-intelligence-diagram-title">How a student reaches the model</h4>
+        <div class="ocs-intelligence-diagram">
+          <pre class="mermaid">flowchart TD
+    A[Student harness on another network] --> B[Issued key]
+    B --> C[Live stream]
+    C --> D[Production rack - Team 1]
+    D --> E[Shared open model]
+    D --> F[~5 concurrent users]</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% for item in data.researchQuestions %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">{{ item.label }}</h3>
+    <p class="ocs-intelligence-question">{{ item.question }}</p>
+    <div class="ocs-intelligence-facts">
+      {% for fact in item.facts %}
+      <div class="ocs-intelligence-visual">
+        <span class="ocs-intelligence-team-label">{{ fact.label }}</span>
+        <span class="ocs-intelligence-team-name">{{ fact.text }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Two phases, one promise</h3>
+    <p class="ocs-intelligence-about">The tabs are the implementation path. First the gift becomes a live service. Then that service has to survive a class.</p>
+    <div class="ocs-intelligence-phase-grid">
+      {% for stage in data.stages %}
+      <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-phase-card">
+        <span class="ocs-intelligence-status">{{ stage.navKicker }} · {{ stage.status }}</span>
+        <h2 class="ocs-intelligence-project-title">{{ stage.title }}</h2>
+        <p class="ocs-intelligence-about">{{ stage.summary }}</p>
+        <span class="ocs-intelligence-phase-cta">Open this phase</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Team split</h3>
+    <div class="ocs-intelligence-split">
+      {% for team in data.teams %}
+      <div class="ocs-intelligence-visual">
+        <div class="ocs-intelligence-status">{{ team.name }}</div>
+        <div class="ocs-intelligence-team">
+          <span class="ocs-intelligence-team-name">{{ team.members }}</span>
+          <p class="ocs-intelligence-about">{{ team.role }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Justification</h3>
+    <div class="ocs-intelligence-diagram">
+      <pre class="mermaid">flowchart TD
+    A[Paid subscriptions] --> B[Donated GPU rack]
+    B --> C[Host open models locally]
+    C --> D[Electricity only]
+    D --> E[Stream, keys, harness]
+    E --> F[Student on another network]
+    F --> G[Same chance to code with a model]</pre>
+    </div>
+    <p class="ocs-intelligence-about">{{ data.harnesses }}</p>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <div class="ocs-intelligence-card-grid">
+      <div class="ocs-intelligence-visual">
+        <h2 class="ocs-intelligence-project-title">{{ topic.visualTitle }}</h2>
+        <div class="ocs-intelligence-impact-list">
+          {% for stage in data.stages %}
+          <a href="{{ site.baseurl }}/capstone/ocs-intelligence/{{ stage.slug }}/" class="ocs-intelligence-impact-item ocs-intelligence-stack-link">{{ stage.navLabel }}</a>
+          {% endfor %}
+        </div>
+        <div class="ocs-intelligence-status">{{ topic.status }}</div>
+        <div class="ocs-intelligence-team">
+          <span class="ocs-intelligence-team-label">Primary audience</span>
+          <span class="ocs-intelligence-team-name">{{ topic.audience }}</span>
+        </div>
+      </div>
+
+      <div class="ocs-intelligence-content">
+        <h2 class="ocs-intelligence-project-title">{{ topic.title }}</h2>
+        <p class="ocs-intelligence-subtitle">{{ topic.subtitle }}</p>
+
+        <div class="ocs-intelligence-keypoints">
+          {% for point in topic.keyPoints %}
+          <div class="ocs-intelligence-keypoint">
+            <span class="ocs-intelligence-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="ocs-intelligence-tech-stack">
+          {% for tech in topic.tech %}
+          <span class="ocs-intelligence-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="ocs-intelligence-details">
+        <h3 class="ocs-intelligence-section-title">Why this is important</h3>
+        <p class="ocs-intelligence-about">{{ topic.description }}</p>
+
+        <h3 class="ocs-intelligence-section-title">Goal</h3>
+        <p class="ocs-intelligence-about">{{ topic.candidateModel }}</p>
+
+        <h3 class="ocs-intelligence-section-title">Impact</h3>
+        <div class="ocs-intelligence-impact-list">
+          {% for item in topic.impact %}
+          <div class="ocs-intelligence-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a
+          href="{{ topic.link }}"
+          class="ocs-intelligence-btn"
+          target="_blank"
+          rel="noopener noreferrer"
+        >{{ topic.linkLabel }}</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Two rigs</h3>
+    <p class="ocs-intelligence-about">The donated production rack is the student-facing gift. A second box holds experiments so the class path stays calm.</p>
+    <div class="ocs-intelligence-split">
+      {% for rig in data.rigs %}
+      <div class="ocs-intelligence-visual">
+        <div class="ocs-intelligence-status">{{ rig.status }}</div>
+        <h2 class="ocs-intelligence-project-title">{{ rig.name }}</h2>
+        <p class="ocs-intelligence-subtitle">{{ rig.role }}</p>
+        <div class="ocs-intelligence-team">
+          <span class="ocs-intelligence-team-label">{{ rig.team }}</span>
+          <span class="ocs-intelligence-team-name">{{ rig.members }}</span>
+        </div>
+        <div class="ocs-intelligence-tech-stack">
+          <span class="ocs-intelligence-tech-tag">{{ rig.storage }}</span>
+          <span class="ocs-intelligence-tech-tag">{{ rig.stack }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Capability we want in the room</h3>
+    <p class="ocs-intelligence-about">{{ data.chartsIntro }}</p>
+    <div class="ocs-intelligence-split">
+      {% for chart in data.charts %}
+      <figure class="ocs-intelligence-figure">
+        <img src="{{ site.baseurl }}/images/{{ chart.image }}" alt="{{ chart.alt }}">
+        <figcaption>
+          {{ chart.caption }}
+          Source: <a href="{{ chart.source }}" target="_blank" rel="noopener noreferrer">{{ chart.sourceLabel }}</a>.
+        </figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</div>

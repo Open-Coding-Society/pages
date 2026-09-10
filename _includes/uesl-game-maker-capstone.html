@@ -1,0 +1,240 @@
+<!--
+THESIS: Make the sprint understandable as one guided route from idea to playable game, not a generic project dashboard.
+OWN-WORLD: UESL navy, controller cyan, ultraviolet, warm white, and lime readiness signals arranged as tactile console panels and a continuous route line.
+STORY: Visitors see why the inherited editor needs a guided mode, explore the six decisions, verify equal role-based ownership, and open the live planning evidence.
+FIRST VIEWPORT: A compact promise and two honest project links sit beside a six-stop route that makes “one decision at a time” visible before any supporting detail.
+FORM: An accessible game setup sheet crossed with a transit-style route map; the route is the memorable interaction and the established capstone visual system remains intact around it.
+-->
+
+<article class="agm-page" data-agm-page>
+  <header class="agm-hero agm-reveal">
+    <div class="agm-hero-copy">
+      <div class="agm-kicker">
+        <span>2026/2027</span>
+        <span>CSP Frontend Sprint</span>
+        <span>2 weeks</span>
+      </div>
+      <img class="agm-mark" src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation">
+      <h1>Accessible Game Maker <span>2.0</span></h1>
+      <p class="agm-lede">Build a playable game by making one clear choice at a time.</p>
+      <p class="agm-summary">We are extending UESL’s working Game Maker with a guided frontend path for participants who may find a full editor overwhelming. The engine, accessibility tools, and save system stay; the creation experience becomes calmer and clearer.</p>
+      <div class="agm-actions" aria-label="Project links">
+        <a class="agm-action agm-action--primary" href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/1" target="_blank" rel="noopener noreferrer">
+          Open sprint plan <span aria-hidden="true">↗</span>
+        </a>
+        <a class="agm-action" href="https://github.com/Malware-Madness/MalwareMadness" target="_blank" rel="noopener noreferrer">
+          View inherited project <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="agm-route" aria-label="Six-step guided creation route">
+      <div class="agm-route-heading">
+        <span>Guided mode</span>
+        <strong>One decision at a time</strong>
+      </div>
+      <ol>
+        <li><span>01</span><strong>Start</strong><small>Create or restore</small></li>
+        <li><span>02</span><strong>Choose</strong><small>Name + template</small></li>
+        <li><span>03</span><strong>Customize</strong><small>Theme + challenge</small></li>
+        <li><span>04</span><strong>Access</strong><small>Preset + override</small></li>
+        <li><span>05</span><strong>Preview</strong><small>Play + adjust</small></li>
+        <li><span>06</span><strong>Save</strong><small>Review + restore</small></li>
+      </ol>
+      <p class="agm-route-note"><span aria-hidden="true">●</span> Sprint target: one complete, testable path</p>
+    </div>
+  </header>
+
+  <section class="agm-context agm-reveal" aria-labelledby="agm-why-title">
+    <div class="agm-section-heading">
+      <p>Why this matters</p>
+      <h2 id="agm-why-title">Keep the power. Reduce the pressure.</h2>
+    </div>
+    <div class="agm-context-grid">
+      <div>
+        <h3>Inherited and working</h3>
+        <p>UESL already has a drag-and-drop editor, Canvas game engine, accessibility settings, preview controls, and local/account saves.</p>
+      </div>
+      <div>
+        <h3>Focused user problem</h3>
+        <p>First-time participants can face too many technical choices at once, making it difficult to reach a confident first playable result.</p>
+      </div>
+      <div>
+        <h3>Frontend sprint vision</h3>
+        <p>Add a six-step guided mode that reuses the existing systems and keeps the advanced editor available for users who want it.</p>
+      </div>
+    </div>
+    <p class="agm-scope"><strong>Out of scope:</strong> multiplayer, AI generation, uploads, accounts, public publishing, new backend systems, or rebuilding the inherited editor.</p>
+  </section>
+
+  <section class="agm-storyboard agm-reveal" aria-labelledby="agm-story-title">
+    <div class="agm-section-heading agm-section-heading--split">
+      <div>
+        <p>Interactive storyboard</p>
+        <h2 id="agm-story-title">Six screens. One source of truth.</h2>
+      </div>
+      <span class="agm-try-note">Select a step to inspect the planned interaction.</span>
+    </div>
+
+    <div class="agm-storyboard-shell">
+      <div class="agm-step-tabs" role="tablist" aria-label="Game Maker storyboard steps">
+        <button id="agm-step-1" type="button" role="tab" aria-selected="true" aria-controls="agm-step-panel" tabindex="0" data-step-title="Start" data-step-copy="Begin a new game or restore a browser draft without entering the full editor." data-step-proof="Clear entry choice; restored work is labeled before continuing." data-step-choice-one="Create a new game" data-step-choice-two="Restore my draft"><span>01</span>Start</button>
+        <button id="agm-step-2" type="button" role="tab" aria-selected="false" aria-controls="agm-step-panel" tabindex="-1" data-step-title="Choose" data-step-copy="Name the game and select the one supported template for this sprint." data-step-proof="Required fields explain the correction without erasing valid choices." data-step-choice-one="Platform runner" data-step-choice-two="Name your game"><span>02</span>Choose</button>
+        <button id="agm-step-3" type="button" role="tab" aria-selected="false" aria-controls="agm-step-panel" tabindex="-1" data-step-title="Customize" data-step-copy="Choose a visual theme, challenge level, and game speed through large controls." data-step-proof="Back and Continue preserve every valid selection." data-step-choice-one="Midnight theme" data-step-choice-two="Friendly challenge"><span>03</span>Customize</button>
+        <button id="agm-step-4" type="button" role="tab" aria-selected="false" aria-controls="agm-step-panel" tabindex="-1" data-step-title="Accessibility" data-step-copy="Apply a calm preset, then override individual contrast, motion, control-size, or speed settings." data-step-proof="At least three settings must visibly change the real preview." data-step-choice-one="Calm preset" data-step-choice-two="Large controls"><span>04</span>Accessibility</button>
+        <button id="agm-step-5" type="button" role="tab" aria-selected="false" aria-controls="agm-step-panel" tabindex="-1" data-step-title="Preview" data-step-copy="Start, pause, reset, and exit one proven GameEnginev1.2 template." data-step-proof="A preview failure returns safely to the builder without losing work." data-step-choice-one="Start preview" data-step-choice-two="Pause or reset"><span>05</span>Preview</button>
+        <button id="agm-step-6" type="button" role="tab" aria-selected="false" aria-controls="agm-step-panel" tabindex="-1" data-step-title="Save" data-step-copy="Review the configuration, edit a choice, and save a compatible local draft." data-step-proof="Refresh, restore, and corrupted-data recovery are repeatably tested." data-step-choice-one="Review choices" data-step-choice-two="Save browser draft"><span>06</span>Save</button>
+      </div>
+
+      <div id="agm-step-panel" class="agm-step-panel" role="tabpanel" aria-labelledby="agm-step-1" aria-live="polite" tabindex="0">
+        <div class="agm-step-screen" aria-hidden="true">
+          <span class="agm-window-dot"></span><span class="agm-window-dot"></span><span class="agm-window-dot"></span>
+          <div class="agm-screen-choice agm-screen-choice--active" data-agm-choice-one>Create a new game</div>
+          <div class="agm-screen-choice" data-agm-choice-two>Restore my draft</div>
+        </div>
+        <div class="agm-step-copy">
+          <span class="agm-step-count">Step <b data-agm-step-number>01</b> of 06</span>
+          <h3 data-agm-step-title>Start</h3>
+          <p data-agm-step-copy>Begin a new game or restore a browser draft without entering the full editor.</p>
+          <div class="agm-proof"><span aria-hidden="true">✓</span><p><strong>Done when</strong><br><span data-agm-step-proof>Clear entry choice; restored work is labeled before continuing.</span></p></div>
+        </div>
+      </div>
+    </div>
+    <div class="agm-contract" aria-label="Frontend integration contract">
+      <span>Guided UI</span><i aria-hidden="true">→</i>
+      <span>State + validation adapter</span><i aria-hidden="true">→</i>
+      <span>Inherited game data</span><i aria-hidden="true">→</i>
+      <span>Engine preview ↔ save flow</span>
+    </div>
+  </section>
+
+  <section class="agm-team agm-reveal" aria-labelledby="agm-team-title">
+    <div class="agm-section-heading agm-section-heading--split">
+      <div>
+        <p>Equal ownership</p>
+        <h2 id="agm-team-title">Three role-aligned vertical slices</h2>
+      </div>
+      <span>Each member owns code, testing, review, revision, and evidence.</span>
+    </div>
+
+    <div class="agm-team-grid">
+      <article class="agm-person">
+        <div class="agm-person-head"><span>Developer #1</span><a href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/2" target="_blank" rel="noopener noreferrer">Issue #2 ↗</a></div>
+        <h3>Rohan</h3>
+        <p class="agm-person-mission">Guided builder UI and interaction flow</p>
+        <ul>
+          <li>Build six responsive states with semantic navigation.</li>
+          <li>Connect UI events to the shared state contract.</li>
+          <li>Test focus order, back navigation, mobile, and 200% zoom.</li>
+        </ul>
+        <p class="agm-done"><strong>Done:</strong> the full flow preserves choices and never relies on color alone.</p>
+      </article>
+
+      <article class="agm-person agm-person--lead">
+        <div class="agm-person-head"><span>Scrum Master + Developer</span><a href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/3" target="_blank" rel="noopener noreferrer">Issue #3 ↗</a></div>
+        <h3>Ishan</h3>
+        <p class="agm-person-mission">Accessible preview and honest sprint flow</p>
+        <ul>
+          <li>Build preset controls and a stable playable preview.</li>
+          <li>Run standups, unblock dependencies, and keep Kanban truthful.</li>
+          <li>Lead formative/summative reviews and the retrospective.</li>
+        </ul>
+        <p class="agm-done"><strong>Done:</strong> three settings affect the preview and every gate has verified evidence.</p>
+      </article>
+
+      <article class="agm-person">
+        <div class="agm-person-head"><span>Developer #2</span><a href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/4" target="_blank" rel="noopener noreferrer">Issue #4 ↗</a></div>
+        <h3>Adhvay</h3>
+        <p class="agm-person-mission">Configuration, validation, and drafts</p>
+        <ul>
+          <li>Define the guided-state adapter and error contract.</li>
+          <li>Build the parameterized configuration procedure.</li>
+          <li>Test valid, missing, conflicting, and corrupted data.</li>
+        </ul>
+        <p class="agm-done"><strong>Done:</strong> input becomes a compatible preview configuration and valid work survives refresh.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="agm-sprint agm-reveal" aria-labelledby="agm-sprint-title">
+    <div class="agm-section-heading">
+      <p>Planning and iteration</p>
+      <h2 id="agm-sprint-title">Small merges. Visible evidence. Demo-ready main.</h2>
+    </div>
+    <div class="agm-sprint-grid">
+      <div class="agm-week">
+        <span>Week 1</span>
+        <h3>Prove the vertical path</h3>
+        <ol>
+          <li>Audit reuse points and approve the shared contract.</li>
+          <li>Build three isolated first prototypes.</li>
+          <li>Integrate Start → Accessibility → Preview.</li>
+          <li>Capture teacher/peer feedback in a review ticket.</li>
+        </ol>
+      </div>
+      <div class="agm-week">
+        <span>Week 2</span>
+        <h3>Revise, deploy, verify</h3>
+        <ol>
+          <li>Correct weak interactions and contract gaps.</li>
+          <li>Complete save/restore and preview recovery.</li>
+          <li>Run mobile, keyboard, zoom, and boundary tests.</li>
+          <li>Deploy, teammate-verify, demo, and reflect.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="agm-kanban" aria-label="Kanban workflow">
+      <span>Backlog</span><i aria-hidden="true">→</i>
+      <span>In progress</span><i aria-hidden="true">→</i>
+      <span>Code complete</span><i aria-hidden="true">→</i>
+      <span>Deployed</span><i aria-hidden="true">→</i>
+      <span>Verified</span>
+    </div>
+    <p class="agm-management">One main task per person. Every PR links its issue, lists tests, receives a teammate review, and records the feedback-driven revision before verification.</p>
+  </section>
+
+  <section class="agm-evidence agm-reveal" aria-labelledby="agm-evidence-title">
+    <div class="agm-section-heading">
+      <p>Testing and portfolio readiness</p>
+      <h2 id="agm-evidence-title">The demo is the acceptance test.</h2>
+    </div>
+    <div class="agm-evidence-grid">
+      <div class="agm-demo-path">
+        <span>Final demo path</span>
+        <p>Create a named game <b>→</b> apply a calm, high-contrast preset <b>→</b> override one setting <b>→</b> preview <b>→</b> save <b>→</b> refresh <b>→</b> restore.</p>
+      </div>
+      <ul class="agm-checks">
+        <li><span>01</span>Keyboard, visible focus, reduced motion, 200% zoom</li>
+        <li><span>02</span>Phone and desktop without clipping or page overflow</li>
+        <li><span>03</span>Specific validation and safe corrupted-draft recovery</li>
+        <li><span>04</span>Start, pause, reset, exit, save, and restore</li>
+      </ul>
+    </div>
+    <div class="agm-csp-evidence">
+      <div>
+        <h3>Collaboration history</h3>
+        <p>Every work session adds an issue comment: <strong>Goal → Built → Evidence → Test result → Feedback → Next revision.</strong> Commits, teammate reviews, Kanban movement, and the correcting change preserve the full iteration story.</p>
+      </div>
+      <div>
+        <h3>Function and purpose</h3>
+        <p><strong>Inputs:</strong> game and accessibility choices. <strong>Events:</strong> navigate, validate, preview, save, restore. <strong>Outputs:</strong> feedback and configured gameplay. <strong>Data:</strong> one builder-state object and an accessibility-options list.</p>
+      </div>
+    </div>
+    <div class="agm-portfolio">
+      <h3>Evidence each teammate leaves behind</h3>
+      <p>Individual issue and Kanban history · storyboard or prototype · meaningful commits and PR · review given and received · failed attempt plus correction · personal procedure/function · input/event/output/data explanation · repeatable tests · 1–2 minute live explanation.</p>
+    </div>
+  </section>
+
+  <footer class="agm-footer agm-reveal">
+    <div>
+      <span>Big Issue</span>
+      <h2>One clear path to a playable game.</h2>
+      <p>The source of truth for scope, ownership, acceptance criteria, and iteration evidence lives in GitHub.</p>
+    </div>
+    <a class="agm-action agm-action--primary" href="https://github.com/RazorCrest00/uesl-accessible-game-maker/issues/1" target="_blank" rel="noopener noreferrer">View team plan <span aria-hidden="true">↗</span></a>
+  </footer>
+</article>
+
+<script src="{{ '/assets/js/uesl-game-maker-capstone.js' | relative_url }}" defer></script>

@@ -8,7 +8,6 @@ permalink: /cs-portfolio-quest/frontend/submodule_4/
 parent: "Frontend Development"
 team: "Creators"
 submodule: 4
-categories: [CSP, Submodule, Frontend]
 tags: [javascript, events, handling]
 author: "Creators Team"
 date: 2025-10-21

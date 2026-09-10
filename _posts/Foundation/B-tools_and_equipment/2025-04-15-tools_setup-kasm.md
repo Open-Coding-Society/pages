@@ -23,14 +23,23 @@ flowchart TD
     B["> Linux Commands<br>mkdir, cd, ls"]
     C["📁 Clone Project<br>git clone https://<your-repo>"]
     D["🛠️ Activate Tools<br>Ruby, Python, Git"]
-    E["🔄 SDLC<br>code->make->test->commit"]
 
-    A --> B --> C --> D --> E
+    A --> B --> C --> D
 ```
 
 ## Shell Commands
 
 * KASM (Linux): `ls`, `pwd`, `mkdir`, `cd`, `git`, `cat`
+
+```
+ls: lists all the files and directories in current directory
+pwd: Tells you the current directory you're in and its path
+mkdir [directory]: Makes a new directory
+cd [path]: Changes into a new directory
+cat [file]: Views contents of a file 
+```
+
+> NOTE: Think of directories as folders
 
 ## Version Control Commands
 
@@ -94,7 +103,3 @@ cd opencs/student
 source venv/bin/activate # activate Python virtual environment
 code .
 ```
-
----
-
-{% include slim_sidebar.html %}

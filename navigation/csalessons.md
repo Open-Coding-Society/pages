@@ -5,7 +5,7 @@ title: Computer Science A Lessons 25-26
 description: >
   A guided sequence of hands-on and learning tasks to help you master the frameworks that power our course.
 author: Pranav Santhosh (Curators)
-courses: {'csse': {'week': 38}, 'csp': {'week': 38}, 'csa': {'week': 38}}
+courses: {'csa': {'week': 38}}
 type: hacks
 permalink: /navigation/csa-lessons/
 lxdData:

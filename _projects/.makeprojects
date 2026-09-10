@@ -1,0 +1,62 @@
+# Project Auto-Registration
+# List enabled projects (one per line)
+# Supports both flat and nested structures:
+#   - Flat: <project-name>
+#   - Nested: <category>/<project-name>
+# Projects with :dev suffix are auto-built in dev mode
+#
+# Format: <project-path> or <project-path>:dev
+# Example: games/cs-pathway:dev
+
+# === NESTED STRUCTURE (organized by category) ===
+# Games
+games/real-estate-tycoon
+games/voidstriker
+games/spline-barriers
+# games/characters        # removed: directory does not exist
+games/collisions-mechanic
+games/cs-pathway:dev
+# games/enemy-death       # removed: directory does not exist
+games/escape-the-tower
+games/pirate-hunt
+games/gamify
+games/mansionGame
+# games/mansionGame-old
+games/local-storage
+games/kirby-minigames
+# main                    # removed: directory does not exist
+# games/multiplayer       # removed: directory does not exist
+games/ocean-adventure
+games/tag-game-multiplayer
+# games/ocean             # removed: directory does not exist
+games/peppa-pig
+games/platformer
+games/red-riding
+games/teamtestgame
+games/transitions
+games/nod-game
+games/gategame
+games/heist-exe
+games/castle-game
+games/astronaut-platformer-game
+games/fortuneFinders
+
+
+# Lessons
+lessons/ap-frq-simulator
+lessons/cpt-concepts
+lessons/game-lessons
+lessons/parallelAndComputinglesson
+lessons/robot-logic-game
+
+# Systems
+systems/test-project
+systems/student-management-groups
+systems/ai-ab-engine
+systems/auto-generator
+systems/auto-generator-ui
+systems/scraper
+systems/calendar
+systems/courses:dev
+
+# === FLAT STRUCTURE (legacy/uncategorized) ===

@@ -1,6 +1,7 @@
 HOST ?= localhost
 PORT ?= 4500
 LOG_FILE = /tmp/jekyll$(PORT).log
+PYTHON := venv/bin/python3
 
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
@@ -9,37 +10,118 @@ NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
 DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
 
-default: serve-current
-	@echo "Terminal logging starting, watching server for regeneration..."
-	@(tail -f $(LOG_FILE) | awk '/Server address:/ { serverReady=1 } \
-	serverReady && /^ *Regenerating:/ { regenerate=1 } \
-	regenerate { \
-		if (/^[[:blank:]]*$$/) { regenerate=0 } \
-		else { \
-			print; \
-			if ($$0 ~ /_notebooks\/.*\.ipynb/ || $$0 ~ /_docx\/.*\.docx/) { \
-				system("make convert &") \
-			} else if ($$0 ~ /_docx\/.*\/_config\.yml/) { \
-				match($$0, /_docx\/.*\/_config\.yml/); \
-				configFile = substr($$0, RSTART, RLENGTH); \
-				system("make convert-docx-config CONFIG_FILE=\"" configFile "\" &") \
-			} \
-		} \
-	}') 2>/dev/null &
-	@for ((COUNTER = 0; ; COUNTER++)); do \
-		if grep -q "Server address:" $(LOG_FILE); then \
-			echo "Server started in $$COUNTER seconds"; \
-			break; \
+###########################################
+# Project Selection Logic
+###########################################
+
+PROJECT_FILE := _projects/.makeprojects
+
+# All registered projects (strip comments/blank lines, ignore metadata)
+ALL_PROJECTS := $(shell grep -v '^\#' $(PROJECT_FILE) 2>/dev/null | grep -v '^$$' | cut -d: -f1)
+
+# Projects tagged for dev (format: name:dev) - filter comments first!
+DEV_PROJECTS := $(shell grep -v '^\#' $(PROJECT_FILE) 2>/dev/null | grep -v '^$$' | grep ':dev' | cut -d: -f1)
+
+# Known top-level targets (add to this if needed)
+KNOWN_TARGETS := \
+	default dev serve build clean stop reload refresh help \
+	serve-minima serve-cayman serve-yat serve-so-simple serve-hydejack \
+	build-minima build-cayman build-yat build-so-simple \
+	convert convert-docx convert-docx-config convert-single convert-registered-notebooks \
+	watch-notebooks watch-projects watch-files bundle-install jekyll-serve \
+	build-registered-projects build-registered-docs build-dev-projects \
+	watch-registered-projects clean-registered-projects watch-dev-projects \
+	list-projects split-courses clean-courses use-minima use-cayman use-yat \
+	use-so-simple use-hydejack watch-rebuild
+
+###########################################
+# Capture ORIGINAL CLI Goals
+###########################################
+
+ifeq ($(MAKELEVEL),0)
+  ORIGINAL_GOALS := $(MAKECMDGOALS)
+else
+  ORIGINAL_GOALS :=
+endif
+
+# Extract extra project names from ORIGINAL goals
+EXTRA_PROJECTS_RAW = $(filter-out $(KNOWN_TARGETS),$(ORIGINAL_GOALS))
+
+# Validate extras (LAZY evaluation so order works)
+VALID_EXTRA_PROJECTS = $(filter $(ALL_PROJECTS),$(EXTRA_PROJECTS_RAW))
+INVALID_EXTRA_PROJECTS = $(filter-out $(ALL_PROJECTS),$(EXTRA_PROJECTS_RAW))
+
+# Warn only at top-level make
+ifeq ($(MAKELEVEL),0)
+ifneq ($(INVALID_EXTRA_PROJECTS),)
+$(warning ⚠ Unknown project(s): $(INVALID_EXTRA_PROJECTS))
+endif
+endif
+
+# Final dev project set
+ACTIVE_DEV_PROJECTS = $(sort $(DEV_PROJECTS) $(VALID_EXTRA_PROJECTS))
+
+###########################################
+# Project Runner
+###########################################
+
+define run_projects
+	@for proj in $(1); do \
+		if [ -d "_projects/$$proj" ]; then \
+			if [ ! -f "_projects/$$proj/Makefile" ]; then \
+				echo "📋 Generating Makefile for $$proj (from template)"; \
+				cp "_projects/_template/Makefile" "_projects/$$proj/Makefile"; \
+			fi; \
+			echo "$(2): $$proj"; \
+			$(MAKE) -C "_projects/$$proj" $(3) 2>/dev/null || echo "  ⚠️  Failed: $$proj"; \
+		else \
+			echo "⚠️  Project directory not found: $$proj"; \
 		fi; \
-		if [ $$COUNTER -eq 120 ]; then \
-			echo "Server timed out after $$COUNTER seconds."; \
-			echo "Review errors from $(LOG_FILE)."; \
-			cat $(LOG_FILE); \
-			exit 1; \
+	done
+endef
+
+default: serve-current
+	@touch /tmp/.notebook_watch_marker
+	@make watch-rebuild &
+	@make watch-notebooks &
+	@make watch-projects &
+	@make watch-files &
+	@echo "Server running in background on http://localhost:$(PORT)"
+	@echo "  View logs: tail -f $(LOG_FILE)"
+	@echo "  Stop: make stop"
+
+# File watcher - monitors log for file changes and triggers conversion
+watch-files:
+	@echo "Watching for file changes (auto-convert on save)..."
+	@(tail -f $(LOG_FILE) | while read line; do \
+		if echo "$$line" | grep -q "Regenerating:"; then \
+			echo "$$line"; \
+			echo $$(date +%s) > /tmp/.jekyll_regenerating; \
+		elif echo "$$line" | grep -q "\.\.\.done in"; then \
+			rm -f /tmp/.jekyll_regenerating; \
+			echo "  ✓ $$line"; \
+		elif echo "$$line" | grep -q "_notebooks/.*\.ipynb"; then \
+			echo "$$line"; \
+			notebook=$$(echo "$$line" | grep -o '_notebooks/[^[:space:]]*\.ipynb'); \
+			make convert-single NOTEBOOK_FILE="$$notebook" & \
+		elif echo "$$line" | grep -q "_docx/.*\.docx"; then \
+			echo "$$line"; \
+			docx=$$(echo "$$line" | grep -o '_docx/[^[:space:]]*\.docx'); \
+			make convert-docx-single DOCX_FILE="$$docx" & \
+		fi; \
+	done) 2>/dev/null & \
+	sleep 2; \
+	while true; do \
+		if [ -f /tmp/.jekyll_regenerating ]; then \
+			START=$$(cat /tmp/.jekyll_regenerating); \
+			NOW=$$(date +%s); \
+			ELAPSED=$$((NOW - START)); \
+			if [ $$((ELAPSED % 10)) -eq 0 ] && [ $$ELAPSED -gt 0 ]; then \
+				echo "  Still regenerating... ($$ELAPSED seconds elapsed)"; \
+			fi; \
 		fi; \
 		sleep 1; \
 	done
-	@sed '$$d' $(LOG_FILE)
 
 use-minima:
 	@echo "Switching to Minima theme..."
@@ -48,7 +130,7 @@ use-minima:
 	@cp _themes/minima/opencs.html _layouts/opencs.html
 	@cp _themes/minima/page.html _layouts/page.html
 	@cp _themes/minima/post.html _layouts/post.html
-	@python3 scripts/update_color_map.py minima || echo "⚠ Color map update failed, continuing..."
+	@$(PYTHON) scripts/update_color_map.py minima || echo "⚠ Color map update failed, continuing..."
 	@echo "✓ Minima theme activated"
 
 use-cayman:
@@ -58,7 +140,7 @@ use-cayman:
 	@cp _themes/cayman/opencs.html _layouts/opencs.html
 	@cp _themes/cayman/page.html _layouts/page.html
 	@cp _themes/cayman/post.html _layouts/post.html
-	@python3 scripts/update_color_map.py cayman || echo "⚠ Color map update failed, continuing..."
+	@$(PYTHON) scripts/update_color_map.py cayman || echo "⚠ Color map update failed, continuing..."
 	@echo "✓ Cayman theme activated"
 
 use-hydejack:
@@ -68,7 +150,7 @@ use-hydejack:
 	@cp _themes/hydejack/opencs.html _layouts/opencs.html
 	@cp _themes/hydejack/page.html _layouts/page.html
 	@cp _themes/hydejack/post.html _layouts/post.html
-	@python3 scripts/update_color_map.py hydejack || echo "⚠ Color map update failed, continuing..."
+	@$(PYTHON) scripts/update_color_map.py hydejack || echo "⚠ Color map update failed, continuing..."
 	@echo "✓ Hydejack theme activated"
 
 use-so-simple:
@@ -107,27 +189,69 @@ serve-so-simple: use-so-simple clean
 serve-yat: use-yat clean
 	@make serve-current
 
-# General serve target (uses whatever is in _config.yml/Gemfile)
-serve-current: stop convert
-	@echo "Starting server with current config/Gemfile..."
-	@@nohup bundle install && bundle exec jekyll serve -H $(HOST) -P $(PORT) > $(LOG_FILE) 2>&1 & \
-		PID=$$!; \
-		echo "Server PID: $$PID"
-	@@until [ -f $(LOG_FILE) ]; do sleep 1; done
-	@for ((COUNTER = 0; ; COUNTER++)); do \
-		if grep -q "Server address:" $(LOG_FILE); then \
-			echo "Server started in $$COUNTER seconds"; \
-			grep "Server address:" $(LOG_FILE); \
-			break; \
+###########################################
+# Project Targets
+###########################################
+
+# Generate Makefiles for all registered projects
+generate-makefiles:
+	@echo "Generating Makefiles for registered projects..."
+	@for proj in $(ALL_PROJECTS); do \
+		if [ -d "_projects/$$proj" ]; then \
+			if [ ! -f "_projects/$$proj/Makefile" ]; then \
+				echo "📋 Generating Makefile for $$proj"; \
+				cp "_projects/_template/Makefile" "_projects/$$proj/Makefile"; \
+			else \
+				echo "✓ Makefile exists for $$proj"; \
+			fi; \
+		else \
+			echo "⚠️  Project directory not found: $$proj"; \
 		fi; \
-		if [ $$COUNTER -eq 120 ]; then \
-			echo "Server timed out after $$COUNTER seconds."; \
-			echo "Review errors from $(LOG_FILE)."; \
-			cat $(LOG_FILE); \
-			exit 1; \
-		fi; \
-		sleep 1; \
 	done
+
+# Build all registered projects (game assets, not docs)
+build-registered-projects:
+	$(call run_projects,$(ALL_PROJECTS),Building,build)
+	@echo "Generating dynamic SASS imports..."
+	@$(PYTHON) scripts/generate_sass_imports.py
+
+build-dev-projects:
+	@echo "Active DEV Projects: $(ACTIVE_DEV_PROJECTS)"
+	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Building,build)
+	@echo "Generating dynamic SASS imports..."
+	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
+
+# Convert notebooks for dev projects only (dev mode initial build)
+convert-registered-notebooks:
+	@if [ -f _projects/.makeprojects ]; then \
+		for proj in $(ACTIVE_DEV_PROJECTS); do \
+			proj_name=$$(basename $$proj); \
+			if [ -d "_notebooks/projects/$$proj_name" ]; then \
+				find "_notebooks/projects/$$proj_name" -name '*.ipynb' 2>/dev/null | while read notebook; do \
+					make convert-single NOTEBOOK_FILE="$$notebook" 2>&1; \
+				done; \
+			fi; \
+		done; \
+	fi
+
+# Build documentation for all registered projects (serve mode only)
+build-registered-docs:
+	$(call run_projects,$(ALL_PROJECTS),Docs,docs)
+
+# Watch all registered projects for changes (dev mode)
+watch-registered-projects:
+	$(call run_projects,$(ALL_PROJECTS),Watching,watch)
+
+watch-dev-projects:
+	$(call run_projects,$(ACTIVE_DEV_PROJECTS),Watching,watch)
+
+# Clean all registered project distributions
+clean-registered-projects:
+	$(call run_projects,$(ALL_PROJECTS),Cleaning,clean)
+	$(call run_projects,$(ALL_PROJECTS),Cleaning docs,docs-clean)
+
+# General serve target (uses whatever is in _config.yml/Gemfile)
+serve-current: stop build-registered-projects convert split-courses build-registered-docs jekyll-serve
 
 # Build with selected theme
 build-minima: use-minima build-current
@@ -136,8 +260,10 @@ build-cayman: use-cayman build-current
 build-so-simple: use-so-simple build-current
 build-yat: use-yat build-current
 
-build-current: clean
+build-current: clean convert split-courses
 	@bundle install
+	@echo "Generating dynamic SASS imports..."
+	@$(PYTHON) scripts/generate_sass_imports.py 2>&1 || echo "⚠️  SASS import generation failed"
 	@bundle exec jekyll clean
 	@bundle exec jekyll build
 
@@ -145,16 +271,34 @@ build-current: clean
 serve: serve-current
 build: build-current
 
+# Multi-course file splitting
+split-courses:
+	@echo " ------ Splitting multi-course files... -------"
+	@python3 scripts/split_multi_course_files.py
+
+clean-courses:
+	@echo "🧹Cleaning course-specific files..."
+	@python3 scripts/split_multi_course_files.py clean
+
 # Notebook and DOCX conversion
 convert: $(MARKDOWN_FILES) convert-docx
 $(DESTINATION_DIRECTORY)/%_IPYNB_2_.md: _notebooks/%.ipynb
 	@mkdir -p $(@D)
-	@python3 -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+	@$(PYTHON) -c "from scripts.convert_notebooks import convert_notebooks; convert_notebooks()"
+
+# Single notebook conversion (faster for development)
+convert-single:
+	@if [ -z "$(NOTEBOOK_FILE)" ]; then \
+		echo "Error: NOTEBOOK_FILE variable not set"; \
+		exit 1; \
+	fi
+	@echo "Converting: $(NOTEBOOK_FILE)"
+	@$(PYTHON) scripts/convert_notebooks.py "$(NOTEBOOK_FILE)"
 
 # DOCX conversion
 convert-docx:
 	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
-		python3 scripts/convert_docx.py; \
+		$(PYTHON) scripts/convert_docx.py; \
 	else \
 		echo "No DOCX files found in _docx directory"; \
 	fi
@@ -164,9 +308,9 @@ convert-docx-config:
 	@if [ -d "_docx" ] && [ "$(shell ls -A _docx 2>/dev/null)" ]; then \
 		if [ -n "$(CONFIG_FILE)" ]; then \
 			echo "🔧 Config file changed: $(CONFIG_FILE)"; \
-			python3 scripts/convert_docx.py --config-changed "$(CONFIG_FILE)"; \
+			$(PYTHON) scripts/convert_docx.py --config-changed "$(CONFIG_FILE)"; \
 		else \
-			python3 scripts/convert_docx.py; \
+			$(PYTHON) scripts/convert_docx.py; \
 		fi; \
 	else \
 		echo "No DOCX files found in _docx directory"; \
@@ -182,21 +326,6 @@ clean-docx:
 	@rm -f docx-index.md 2>/dev/null || true
 	@echo "DOCX cleanup complete"
 
-# Color mapping
-update-colors:
-	@echo "Updating local color map..."
-	@python3 scripts/update_color_map.py
-	@echo "Color map updated successfully"
-	@echo "Generated files:"
-	@echo "   - _sass/root-color-map.scss"
-	@echo "   - local-color-usage-report.md"
-	@echo "   - colors.json"
-
-# Update colors and preview
-update-colors-preview: update-colors
-	@echo "Starting server to preview color changes..."
-	@make serve-current
-
 clean: stop
 	@echo "Cleaning converted IPYNB files..."
 	@find _posts -type f -name '*_IPYNB_2_.md' -exec rm {} +
@@ -204,6 +333,10 @@ clean: stop
 	@find _posts -type f -name '*_GithubIssue_.md' -exec rm {} +
 	@echo "Cleaning converted DOCX files..."
 	@find _posts -type f -name '*_DOCX_.md' -exec rm {} + 2>/dev/null || true
+	@echo "Cleaning course-specific files..."
+	@make clean-courses || true
+	@echo "Cleaning project distributions..."
+	@make clean-registered-projects
 	@echo "Cleaning extracted DOCX images..."
 	@rm -rf images/docx/*.png images/docx/*.jpg images/docx/*.jpeg images/docx/*.gif 2>/dev/null || true
 	@echo "Cleaning DOCX index page..."
@@ -214,13 +347,23 @@ clean: stop
 	done
 	@echo "Removing _site directory..."
 	@rm -rf _site
+	@echo "Cleaning auto-generated Makefiles..."
+	@find _projects -name "Makefile" ! -path "*/_template/*" -type f -exec rm {} +
 
 stop:
 	@echo "Stopping server..."
 	@@lsof -ti :$(PORT) | xargs kill >/dev/null 2>&1 || true
 	@echo "Stopping logging process..."
 	@@ps aux | awk -v log_file=$(LOG_FILE) '$$0 ~ "tail -f " log_file { print $$2 }' | xargs kill >/dev/null 2>&1 || true
-	@rm -f $(LOG_FILE)
+	@echo "Stopping notebook watcher..."
+	@@ps aux | grep "watch-rebuild" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "watch-notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "watch-projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@@ps aux | grep "find _notebooks" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@echo "Stopping project watchers..."
+	@@ps aux | grep "make -C _projects" | grep -v grep | awk '{print $$2}' | xargs kill >/dev/null 2>&1 || true
+	@rm -f $(LOG_FILE) /tmp/.notebook_watch_marker /tmp/.project_watch_marker /tmp/.jekyll_regenerating /tmp/.jekyll_rebuild_trigger /tmp/.jekyll_rebuild_done /tmp/.jekyll_rebuild_log
+	@rm -f /tmp/.project_*_marker 2>/dev/null || true
 
 reload:
 	@make stop
@@ -230,6 +373,154 @@ refresh:
 	@make stop
 	@make clean
 	@make
+
+# Debounced Jekyll rebuild - waits for changes to settle, then rebuilds once
+watch-rebuild:
+	@echo "Watching for rebuild triggers (debounced)..."
+	@LAST_TRIGGER=0; \
+	while true; do \
+		if [ -f /tmp/.jekyll_rebuild_trigger ]; then \
+			TRIGGER_TIME=$$(stat -f %m /tmp/.jekyll_rebuild_trigger 2>/dev/null || stat -c %Y /tmp/.jekyll_rebuild_trigger); \
+			if [ $$TRIGGER_TIME -gt $$LAST_TRIGGER ]; then \
+				echo "Changes detected, waiting for more changes to settle..."; \
+				sleep 3; \
+				NEW_TRIGGER=$$(stat -f %m /tmp/.jekyll_rebuild_trigger 2>/dev/null || stat -c %Y /tmp/.jekyll_rebuild_trigger); \
+				if [ $$NEW_TRIGGER -eq $$TRIGGER_TIME ]; then \
+					echo "🔨Rebuilding Jekyll site..."; \
+					START=$$(date +%s); \
+					rm -f /tmp/.jekyll_rebuild_done; \
+					(bundle exec jekyll build --incremental > /tmp/.jekyll_rebuild_log 2>&1; touch /tmp/.jekyll_rebuild_done) & \
+					REBUILD_PID=$$!; \
+					COUNTER=0; \
+					while [ ! -f /tmp/.jekyll_rebuild_done ]; do \
+						sleep 1; \
+						COUNTER=$$((COUNTER + 1)); \
+						if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
+							echo "  Still rebuilding... ($$COUNTER seconds elapsed)"; \
+						fi; \
+					done; \
+					END=$$(date +%s); \
+					DURATION=$$((END - START)); \
+					tail -1 /tmp/.jekyll_rebuild_log; \
+					echo "✓ Rebuild complete in $${DURATION}s"; \
+					LAST_TRIGGER=$$NEW_TRIGGER; \
+				fi; \
+			fi; \
+		fi; \
+		sleep 1; \
+	done
+
+# Development mode: clean start, no conversion, converts files on save
+# Runs in background - use 'make stop' to stop, 'tail -f /tmp/jekyll4500.log' to view logs
+dev: stop clean
+	@echo "DEV Projects: $(ACTIVE_DEV_PROJECTS)"
+	@$(MAKE) generate-makefiles
+	@$(MAKE) build-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
+	@$(MAKE) convert-registered-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
+	@$(MAKE) jekyll-serve ORIGINAL_GOALS="$(ORIGINAL_GOALS)"
+	@echo "Initializing watch markers..."
+	@touch /tmp/.notebook_watch_marker /tmp/.project_watch_marker
+	@sleep 1
+	@$(MAKE) watch-rebuild ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
+	@$(MAKE) watch-notebooks ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
+	@$(MAKE) watch-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
+	@$(MAKE) watch-files ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
+	@$(MAKE) watch-dev-projects ORIGINAL_GOALS="$(ORIGINAL_GOALS)" &
+	@echo "Dev server running in background on http://localhost:$(PORT)"
+	@echo "  View logs: tail -f $(LOG_FILE)"
+	@echo "  Stop: make stop"
+
+# Watch notebooks directory for changes (since Jekyll excludes _notebooks)
+# Converts immediately (async), Jekyll serve handles regeneration batching
+# Excludes _notebooks/projects/* (handled by project-specific watchers)
+watch-notebooks:
+	@echo "Watching _notebooks for changes..."
+	@while true; do \
+		find _notebooks -name '*.ipynb' -newer /tmp/.notebook_watch_marker -print 2>/dev/null | \
+			grep -v "_notebooks/projects/" | while read notebook; do \
+			echo "Notebook changed: $$notebook"; \
+			make convert-single NOTEBOOK_FILE="$$notebook"; \
+			touch /tmp/.jekyll_rebuild_trigger; \
+		done; \
+		touch /tmp/.notebook_watch_marker; \
+		sleep 2; \
+	done
+
+watch-projects:
+	@echo "Watching _projects for changes..."
+	@while true; do \
+		find _projects -type f -newer /tmp/.project_watch_marker 2>/dev/null | \
+			grep -v "/Makefile$$" | while read file; do \
+			echo "Project file changed: $$file"; \
+			proj=$$(echo "$$file" | cut -d/ -f2); \
+			if [ -d "_projects/$$proj" ]; then \
+				if [ ! -f "_projects/$$proj/Makefile" ]; then \
+					echo "📋 Generating Makefile for $$proj (from template)"; \
+					cp "_projects/_template/Makefile" "_projects/$$proj/Makefile"; \
+				fi; \
+				make -C "_projects/$$proj" build; \
+				proj_name=$$(basename $$proj); \
+				if [ -d "_notebooks/projects/$$proj_name" ]; then \
+					find "_notebooks/projects/$$proj_name" -name '*.ipynb' -newer /tmp/.project_watch_marker 2>/dev/null | while read notebook; do \
+						make convert-single NOTEBOOK_FILE="$$notebook" 2>&1; \
+					done; \
+				fi; \
+				touch /tmp/.jekyll_rebuild_trigger; \
+			fi; \
+		done; \
+		touch /tmp/.project_watch_marker; \
+		sleep 2; \
+	done
+
+# Bundle install (dependency for jekyll-serve)
+bundle-install:
+	@if [ ! -f .bundle/install_marker ] || [ Gemfile -nt .bundle/install_marker ] || [ Gemfile.lock -nt .bundle/install_marker ]; then \
+		bundle install; \
+		mkdir -p .bundle && touch .bundle/install_marker; \
+	fi
+
+# Start Jekyll server (no auto-watch, we control rebuilds manually)
+# Supports optional _config.local.yml override for local settings (e.g. baseurl)
+jekyll-serve: bundle-install
+	@touch /tmp/.notebook_watch_marker
+	@rm -f /tmp/.jekyll_rebuild_trigger
+	bundle exec jekyll serve -H $(HOST) -P $(PORT) --no-watch > $(LOG_FILE) 2>&1 &
+	@make wait-for-server
+
+# Common server wait logic
+wait-for-server:
+	@until [ -f $(LOG_FILE) ]; do sleep 1; done
+	@for ((COUNTER = 0; ; COUNTER++)); do \
+		if grep -q "Server address:" $(LOG_FILE); then \
+			echo "Server started in $$COUNTER seconds"; \
+			grep "Server address:" $(LOG_FILE); \
+			break; \
+		fi; \
+		if [ $$COUNTER -eq 300 ]; then \
+			echo "Server timed out after $$COUNTER seconds."; \
+			echo "Review errors from $(LOG_FILE)."; \
+			cat $(LOG_FILE); \
+			exit 1; \
+		fi; \
+		if [ $$COUNTER -gt 5 ] && grep -E -qi "\bfatal\b|\bexception\b" $(LOG_FILE); then \
+			echo "Fatal error detected during startup!"; \
+			cat $(LOG_FILE); \
+			exit 1; \
+		fi; \
+		if [ $$((COUNTER % 10)) -eq 0 ] && [ $$COUNTER -gt 0 ]; then \
+			echo "Still starting... ($$COUNTER seconds elapsed)"; \
+		fi; \
+		sleep 1; \
+	done
+
+# Single DOCX file conversion (for dev mode)
+convert-docx-single:
+	@if [ -z "$(DOCX_FILE)" ]; then \
+		echo "Error: DOCX_FILE variable not set"; \
+		exit 1; \
+	fi
+	@echo "Converting: $(DOCX_FILE)"
+	@$(PYTHON) scripts/convert_docx.py --single "$(DOCX_FILE)" 2>/dev/null || $(PYTHON) scripts/convert_docx.py
 
 docx-only: convert-docx
 	@echo "DOCX conversion complete - ready for preview"
@@ -256,26 +547,29 @@ help:
 	@echo "  make build-so-simple   - Switch to So Simple and build"
 	@echo "  make build-yat      - Switch to Yat and build"
 	@echo ""
-	@echo "Color Mapping Commands:"
-	@echo "  make update-colors         - Update local color map"
-	@echo "  make update-colors-preview - Update colors and start server"
 	@echo ""
-	@echo "Server Commands:"
-	@echo "  make serve          - Serve with current config"
-	@echo "  make build          - Build with current config"
-	@echo "  make stop           - Stop server and logging"
-	@echo "  make reload         - Stop and restart server"
-	@echo "  make refresh        - Stop, clean, and restart server"
+	@echo "Core Commands:"
+	@echo "  make              - Full conversion, serve, and watch for file changes (auto-convert on save)"
+	@echo "  make dev          - Fast dev mode (auto-detect :dev projects)"
+	@echo "  make dev <proj>   - Dev mode + include additional project(s), replace <proj> with project: make dev gamify"
+	@echo "  make dev p1 p2    - Include multiple projects"
+	@echo "  make serve        - Convert and serve (no auto-convert watching)"
+	@echo "  make build        - Convert and build _site/ for deployment (no server)"
+	@echo "  make stop         - Stop server and logging"
+	@echo "  make reload       - Stop and restart server"
+	@echo "  make refresh      - Stop, clean, and restart server"
 	@echo ""
 	@echo "Conversion Commands:"
 	@echo "  make convert        - Convert notebooks and DOCX files"
 	@echo "  make convert-docx   - Convert DOCX files only"
+	@echo "  make split-courses  - Split multi-course files automatically"
 	@echo "  make docx-only      - Convert DOCX and prepare for preview"
 	@echo "  make preview-docx   - Clean, convert DOCX, and serve"
 	@echo ""
 	@echo "Cleanup Commands:"
 	@echo "  make clean          - Remove all generated files"
 	@echo "  make clean-docx     - Remove DOCX-generated files only"
+	@echo "  make clean-courses  - Remove course-specific split files only"
 	@echo ""
 	@echo "Diagnostic Commands:"
 	@echo "  make convert-check  - Check notebooks for conversion warnings"
@@ -285,9 +579,50 @@ help:
 convert-check:
 	@echo "Running conversion diagnostics..."
 	@echo "Checking for notebook conversion warnings or errors..."
-	@python3 scripts/check_conversion_warnings.py
+	@$(PYTHON) scripts/check_conversion_warnings.py
 
 convert-fix:
 	@echo "Running conversion fixes..."
 	@echo "️Fixing notebooks with known warnings or errors..."
-	@python3 scripts/check_conversion_warnings.py --fix
+	@$(PYTHON) scripts/check_conversion_warnings.py --fix
+
+###########################################
+# Project Auto-Registration
+###########################################
+
+# Projects are registered in _projects/.makeprojects (one per line)
+# Each project must have: _projects/<name>/Makefile with generic targets: build, clean, docs, watch
+# Main Makefile calls projects via: make -C _projects/<name> <target>
+
+# List all registered projects
+list-projects:
+	@echo "Registered Projects:"
+	@if [ -f _projects/.makeprojects ]; then \
+		grep -v '^\#' _projects/.makeprojects | grep -v '^$$' | while read proj; do \
+			if [ -f "_projects/$$proj/Makefile" ]; then \
+				echo "  ✅ $$proj (active)"; \
+			else \
+				echo "  ⚠️  $$proj (missing Makefile)"; \
+			fi; \
+		done; \
+	else \
+		echo "  No _projects/.makeprojects file found"; \
+	fi
+	@echo ""
+	@echo "Available projects (in _projects/ directory):"
+	@ls -d _projects/*/ 2>/dev/null | sed 's|_projects/||' | sed 's|/||' | while read proj; do \
+		if grep -q "^$$proj$$" _projects/.makeprojects 2>/dev/null; then \
+			echo "  • $$proj (registered)"; \
+		else \
+			echo "  • $$proj (not registered)"; \
+		fi; \
+	done || echo "  None found"
+
+.PHONY: list-projects build-registered-projects convert-registered-notebooks build-registered-docs watch-registered-projects clean-registered-projects
+
+###########################################
+# Allow unknown targets (project selectors)
+###########################################
+
+%:
+	@:

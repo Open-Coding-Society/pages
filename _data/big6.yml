@@ -1,0 +1,66 @@
+# Big Six & Code Hub Capstone Infographic
+Title: "Big Six & Code Hub"
+Description: "Two connected projects — The Big Six is a suite of six interactive CS lessons covering the full stack, and Code Hub is the RPG game level that brings three of those lessons to life through hands-on terminals and arcade quiz games."
+
+Topics:
+  - title: "The Big Six"
+    image: "capstone/backend.png"
+    link: "/bigsix"
+    alt: "The Big Six — Interactive CS Learning Modules by Open Coding Society"
+    keyPoints:
+      - "C1: Build visually compelling blogs and projects with HTML, CSS, and JavaScript"
+      - "C2: Learn full-stack integration with Flask, Spring, and real database structures"
+      - "C3: Visualize and collate data from diverse sources for ML-ready representation"
+      - "C4: Write about CS projects for resumes in both technical and non-technical terms"
+      - "C5: Prompt AI tools to accelerate frontend, backend, data, and resume work"
+      - "C6: Integrate all modules and earn a verifiable Open Coding Society certificate"
+    subtitle: "From First Commit to Career-Ready — One Module at a Time"
+    description: "Six fully interactive lessons covering the real pillars of software development. Every lesson uses live editors and playgrounds — students write code and see output, not just read static text. Covers Frontend, Backend, Data Visualization, Resume Building, AI Usage, and Analytics."
+    tech:
+      - "HTML / CSS / JavaScript (C1)"
+      - "Flask + Spring + Databases (C2)"
+      - "Data Visualization + ML Collation (C3)"
+      - "Resume Writing + Blogging (C4)"
+      - "ChatGPT + Claude Prompting / Vibe Coding (C5)"
+      - "Analytics + Certificate Integration (C6)"
+    impact:
+      - "Gives students a complete mental model of frontend and backend development"
+      - "Bridges technical skills with career communication — resume writing and blogging"
+      - "Teaches responsible and effective AI usage across all project layers"
+      - "Provides a verifiable mastery certificate upon completing all six modules"
+      - "Interactive, hands-on modules build real portfolio artifacts at every level"
+    status: "Live"
+    team:
+      - "Alex"
+      - "Travis"
+
+  - title: "Code Hub"
+    image: "projects/cs-pathway/bg-codehub/tech_hub_rpg_map.png"
+    link: "/capstone/"
+    alt: "Code Hub — Interactive CS Learning Game by Open Coding Society"
+    keyPoints:
+      - "Frontend Terminal: Markdown converter, CSS playground, and Markdown Decoder challenge game"
+      - "Backend Terminal: Live REST API simulator (GET/POST/PUT/DELETE) and API Architect challenge"
+      - "Dataviz Terminal: Filtering, pagination, JPQL query builder, and Query Quest challenge game"
+      - "Space Invaders: Shoot wrong answers, let correct ones pass — one arcade game per terminal"
+      - "Progressive unlock system: complete each challenge to open the next terminal"
+      - "LocalStorage-based progress — your unlocks persist between sessions"
+    subtitle: "Frontend → Backend → Dataviz — Master each terminal to unlock the next"
+    description: "An RPG game level inside the CS Pathway where students walk up to three robot terminals. Each terminal teaches a core CS discipline — Markdown & CSS, REST APIs, and data filtering — with interactive tools and a Space Invaders quiz that gates progression to the next terminal. Complete all three challenges to earn the Code Hub Mastered badge."
+    tech:
+      - "Markdown + HTML + CSS (Frontend Terminal)"
+      - "REST API — GET / POST / PUT / DELETE (Backend Terminal)"
+      - "Filtering + Pagination + JPQL (Dataviz Terminal)"
+      - "Canvas Space Invaders (3 challenge games)"
+      - "LocalStorage progress persistence"
+      - "CS Pathway RPG integration"
+    impact:
+      - "Teaches Markdown, CSS, REST APIs, and data querying in a hands-on game environment"
+      - "Progressive unlock system ensures students master each topic before advancing"
+      - "Arcade-style quiz games make assessment engaging rather than passive"
+      - "LocalStorage persistence means students can return and continue where they left off"
+      - "Integrated into the CS Pathway RPG — learning feels like playing, not testing"
+    status: "Live"
+    team:
+      - "Alex"
+      - "Travis"

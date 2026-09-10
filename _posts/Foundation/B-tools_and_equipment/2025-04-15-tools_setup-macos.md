@@ -22,9 +22,8 @@ flowchart TD
     B["> Linux Commands<br>mkdir, cd, ls"]
     C["📁 Clone Project<br>git clone https://<your-repo>"]
     D["🛠️ Activate Tools<br>Ruby, Python, Git"]
-    E["🔄 SDLC<br>code->make->test->commit"]
 
-    A --> B --> C --> D --> E
+    A --> B --> C --> D 
 ```
 
 ## Shell Commands
@@ -32,6 +31,16 @@ flowchart TD
 You’ll use standard Unix shell commands:
 
 - MacOS: `ls`, `pwd`, `mkdir`, `cd`, `git`, `cat`
+
+```
+ls: lists all the files and directories in current directory
+pwd: Tells you the current directory you're in and its path
+mkdir [directory]: Makes a new directory
+cd [path]: Changes into a new directory
+cat [file]: Views contents of a file 
+```
+
+> NOTE: Think of directories as folders
 
 ## Version Control Commands
 
@@ -68,8 +77,8 @@ Download and install [VS Code](https://code.visualstudio.com/download) for Mac.
 ```bash
 mkdir opencs
 cd opencs
-git clone https://github.com/Open-Coding-Society/student.git
-cd student/
+git clone https://github.com/Open-Coding-Society/portfolio.git
+cd portfolio/
 ./scripts/activate_macos.sh
 ./scripts/activate.sh # prompts for Git UID and Personal Email
 ./scripts/venv.sh
@@ -97,11 +106,7 @@ Open a new MacOS "terminal"
 Each time you open a new Terminal to work, run:
 
 ```bash
-cd opencs/student
+cd opencs/portfolio
 source venv/bin/activate # activate Python virtual environment
 code .
 ```
-
----
-
-{% include slim_sidebar.html %}

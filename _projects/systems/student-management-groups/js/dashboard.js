@@ -1,0 +1,884 @@
+import { javaURI, pythonURI, fetchOptions } from '/assets/js/api/config.js';
+
+  // ---------------------------------------------
+  // CONFIG: Constants + error catalog
+  // ---------------------------------------------
+  const MEMBER_ANALYTICS_PAGE_SIZE = 5;
+  const MEMBER_ANALYTICS_COLUMN_COUNT = 8;
+
+  // ---------------------------------------------
+  // STATE (module-level)
+  // ---------------------------------------------
+  let activeDashboardGroup = null;
+  let memberAnalyticsCurrentPage = 1;
+  const memberAnalyticsCache = new Map();
+  const memberSummaryCache = new Map();
+
+  /**
+   * ═══════════════════════════════════════════════════════════════════════════
+   * ERROR HANDLING SYSTEM OVERVIEW
+   * ═══════════════════════════════════════════════════════════════════════════
+   * 
+   * Architecture Pattern: Centralized error configuration with typed errors
+   * 
+   * COMPONENTS:
+   * -----------
+   * 1. ERROR_TYPES (Enumeration)
+   *    - Defines error type constants as strings
+   *    - Single source of truth for all error type references
+   *    - Used throughout codebase for consistency
+   * 
+   * 2. ERROR_HANDLERS (Configuration Map)
+   *    - Maps error types to handler configurations
+   *    - Each handler contains: message, userMessage, color
+   *    - Supports static strings and dynamic functions
+   * 
+   * 3. createFetchError() (Error Factory)
+   *    - Creates typed Error objects with metadata
+   *    - Attaches type and status properties to Error
+   *    - Uses ERROR_HANDLERS for descriptive messages
+   * 
+   * 4. showError() (UI Renderer)
+   *    - Displays user-facing error messages in DOM
+   *    - Retrieves configuration from ERROR_HANDLERS
+   *    - Applies appropriate color styling
+   * 
+   */
+
+  /**
+   * ERROR_TYPES - Enumeration of all error type constants
+   * =====================================================
+   */
+  const ERROR_TYPES = {
+    AUTHENTICATION_REQUIRED: 'AUTHENTICATION_REQUIRED',
+    PERMISSION_DENIED: 'PERMISSION_DENIED',
+    INVALID_GROUP: 'INVALID_GROUP',
+    HTTP_ERROR: 'HTTP_ERROR',
+    NETWORK: 'NETWORK',
+    UNKNOWN: 'UNKNOWN'
+  };
+
+  /**
+   * ERROR_HANDLERS - Map of error configurations
+   * ============================================
+   */
+  const ERROR_HANDLERS = {
+    [ERROR_TYPES.AUTHENTICATION_REQUIRED]: {
+      message: 'Authentication required',
+      userMessage: 'Please sign in to view the group dashboard.',
+      color: 'text-gray-400'
+    },
+    [ERROR_TYPES.PERMISSION_DENIED]: {
+      message: 'User lacks permission to access this resource',
+      userMessage: 'You do not have permission to view this group. Contact your teacher.',
+      color: 'text-yellow-400'
+    },
+    [ERROR_TYPES.INVALID_GROUP]: {
+      message: 'Group not found',
+      userMessage: 'Group not found. Please select a valid group.',
+      color: 'text-red-400'
+    },
+    [ERROR_TYPES.HTTP_ERROR]: {
+      message: (status) => `HTTP error: ${status}`,
+      userMessage: (status) => `Server error (${status}). Please try again.`,
+      color: 'text-red-400'
+    },
+    [ERROR_TYPES.NETWORK]: {
+      message: 'Network request failed',
+      userMessage: 'Network request failed. Check your connection.',
+      color: 'text-red-400'
+    },
+    [ERROR_TYPES.UNKNOWN]: {
+      message: 'Unknown error',
+      userMessage: 'An unexpected error occurred. Please refresh the page.',
+      color: 'text-red-400'
+    }
+  };
+
+ 
+  /**
+   * createFetchError - Create structured error object for fetch operations
+   * ======================================================================
+   * 
+   * Purpose: Generate standardized Error objects with type and status metadata.
+   * Uses ERROR_HANDLERS to provide meaningful error messages for debugging.
+   * 
+   * @param {string} errorType - Error type from ERROR_TYPES enum
+   * @param {number} [status] - Optional HTTP status code
+   * @returns {Error} Error object with type and status properties
+   * 
+   * Return Structure:
+   *   {
+   *     message: string,        // From ERROR_HANDLERS[errorType].message
+   *     type: string,          // errorType parameter
+   *     status: number | undefined  // HTTP status if provided
+   *   }
+   * 
+   */
+  function createFetchError(errorType, status) {
+    const handler = ERROR_HANDLERS[errorType] || ERROR_HANDLERS[ERROR_TYPES.UNKNOWN];
+    const message = typeof handler.message === 'function' 
+      ? handler.message(status) 
+      : handler.message;
+    const error = new Error(message);
+    error.type = errorType;
+    if (status !== undefined) error.status = status;
+    return error;
+  }
+
+  /**
+   * showError - Display error message in UI container
+   * =================================================
+   * 
+   * Purpose: Render user-facing error messages with appropriate styling.
+   * Retrieves error configuration from ERROR_HANDLERS and injects HTML into container.
+   * 
+   * @param {HTMLElement} containerEl - DOM element to display error in
+   * @param {string} errorType - Error type from ERROR_TYPES enum
+   * @param {number} [status] - Optional HTTP status code for dynamic messages
+   * 
+   * Usage Examples:
+   *   showError(element, ERROR_TYPES.AUTHENTICATION_REQUIRED);
+   *   showError(element, ERROR_TYPES.HTTP_ERROR, 500);
+   *   showError(element, ERROR_TYPES.PERMISSION_DENIED, 403);
+   * 
+   * HTML Output:
+   *   <p class="text-red-400 text-center">Error message here</p>
+   */
+  function showError(containerEl, errorType, status) {
+    if (!containerEl) return;
+    const handler = ERROR_HANDLERS[errorType] || ERROR_HANDLERS[ERROR_TYPES.UNKNOWN];
+    const message = typeof handler.userMessage === 'function' 
+      ? handler.userMessage(status) 
+      : handler.userMessage;
+    const color = handler.color || 'text-red-400';
+    containerEl.innerHTML = `<p class="${color} text-center">${message}</p>`;
+  }
+
+  // ---------------------------------------------
+  // UTILITIES
+  // ---------------------------------------------
+  /**
+   * ═══════════════════════════════════════════════════════════════════════════
+   * fetchJson - Fetch JSON data with standardized error handling
+   * ═══════════════════════════════════════════════════════════════════════════
+   * 
+   * Purpose: Wrapper for fetch API with automatic error categorization and throwing.
+   * Converts HTTP status codes into typed error objects for consistent handling.
+   * 
+   * @param {string} url - API endpoint URL
+   * @param {object} options - Fetch options (method, headers, body, etc.)
+   * @returns {Promise<object>} Parsed JSON response
+   * @throws {Error} Typed error with type and status properties
+   * 
+   * Behavior:
+   *   1. Execute fetch request
+   *   2. Check response.ok status
+   *   3. If not ok, categorize by status code
+   *   4. Throw typed error via createFetchError()
+   *   5. If ok, parse and return JSON
+   * 
+   * Usage:
+   *   const data = await fetchJson('/api/groups', fetchOptions);
+   * 
+   */
+  async function fetchJson(url, options) {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw createFetchError(ERROR_TYPES.AUTHENTICATION_REQUIRED, 401);
+      }
+      if (response.status === 403) {
+        throw createFetchError(ERROR_TYPES.PERMISSION_DENIED, 403);
+      }
+      throw createFetchError(ERROR_TYPES.HTTP_ERROR, response.status);
+    }
+    return response.json();
+  }
+
+  /**
+   * Extract query parameter from URL
+   * @param {string} name - Parameter name to retrieve
+   * @returns {string|null} Parameter value or null if not found
+   */
+  function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
+  /**
+   * Format numeric value as percentage string
+   * @param {number} value - Numeric value to format
+   * @returns {string} Formatted percentage (e.g., "75.5%")
+   */
+  function formatPercent(value) {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue)) return '0.0%';
+    return `${numericValue.toFixed(1)}%`;
+  }
+
+  /**
+   * Extract initials from full name
+   * @param {string} name - Full name to extract initials from
+   * @returns {string} Up to 2 uppercase initials (e.g., "JD")
+   */
+  function getInitials(name) {
+    if (!name) return '??';
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
+  /**
+   * Get consistent avatar background color for user ID
+   * @param {number} id - User ID to generate color for
+   * @returns {string} Tailwind CSS background color class
+   */
+  function getAvatarColor(id) {
+    const colors = [
+      'bg-indigo-600',
+      'bg-purple-600',
+      'bg-orange-600',
+      'bg-teal-600',
+      'bg-pink-600',
+      'bg-blue-600',
+      'bg-green-600',
+      'bg-red-600',
+      'bg-yellow-600'
+    ];
+    return colors[id % colors.length];
+  }
+
+  // ---------------------------------------------
+  // DATA FETCHING (single responsibility per function)
+  // ---------------------------------------------
+  async function fetchGroupByName(groupName) {
+    const encoded = encodeURIComponent(groupName);
+    const url = `${javaURI}/api/groups/search?name=${encoded}`;
+    const groups = await fetchJson(url, fetchOptions);
+
+    if (!groups) throw createFetchError(ERROR_TYPES.INVALID_GROUP);
+
+    if (Array.isArray(groups)) {
+      const found = groups.find(g => g.name?.toLowerCase() === groupName.toLowerCase());
+      return found || groups[0];
+    }
+
+    return groups;
+  }
+
+  async function fetchGroupChatAnalytics(personId) {
+    try {
+      const url = `${javaURI}/api/groups/chat/analytics/${personId}`;
+      return await fetchJson(url, fetchOptions);
+    } catch (error) {
+      if (error.type === ERROR_TYPES.HTTP_ERROR && error.status === 404) {
+        return null; // no analytics yet
+      }
+      throw error;
+    }
+  }
+
+  async function fetchGroupMessages(groupId) {
+    const url = `${javaURI}/api/groups/chat/${groupId}/messages`;
+    return await fetchJson(url, fetchOptions);
+  }
+
+  async function fetchMemberSummary(personId) {
+    try {
+      const url = `${javaURI}/api/ocs-analytics/admin/user/${personId}/summary`;
+      return await fetchJson(url, fetchOptions);
+    } catch (error) {
+      if (error.type === ERROR_TYPES.HTTP_ERROR && [401, 403, 404].includes(error.status)) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  // ---------------------------------------------
+  // CACHE KEYS (pure functions)
+  // ---------------------------------------------
+  function memberAnalyticsCacheKey(groupId, personId) {
+    return `${groupId}:${personId}`;
+  }
+
+  function memberSummaryCacheKey(personId) {
+    return `${personId}`;
+  }
+
+  // ---------------------------------------------
+  // PAGINATION
+  // ---------------------------------------------
+  function getPageRange(total, page) {
+    if (total === 0) return { start: 0, end: 0 };
+    const start = (page - 1) * MEMBER_ANALYTICS_PAGE_SIZE + 1;
+    const end = Math.min(page * MEMBER_ANALYTICS_PAGE_SIZE, total);
+    return { start, end };
+  }
+
+  function updatePaginationControls(totalMembers, page) {
+    const info = document.getElementById('memberAnalyticsPaginationInfo');
+    const prevButton = document.getElementById('memberAnalyticsPrevButton');
+    const nextButton = document.getElementById('memberAnalyticsNextButton');
+    const totalPages = Math.max(1, Math.ceil(totalMembers / MEMBER_ANALYTICS_PAGE_SIZE));
+    const { start, end } = getPageRange(totalMembers, page);
+
+    info.textContent = `Showing ${start}-${end} of ${totalMembers}`;
+    prevButton.disabled = page <= 1 || totalMembers === 0;
+    nextButton.disabled = page >= totalPages || totalMembers === 0;
+  }
+
+  // ---------------------------------------------
+  // RENDERING
+  // ---------------------------------------------
+  function renderMemberRows(members) {
+    const tbody = document.getElementById('memberAnalyticsBody');
+
+    if (!members.length) {
+      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = members
+      .map(({ member, analytics, summary }) => {
+        const initials = getInitials(member.name || member.uid);
+        const color = getAvatarColor(member.id);
+
+        return `
+          <tr class="border-b border-neutral-700/50 hover:bg-neutral-700/30">
+            <td class="py-3 pr-4 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 ${color} rounded-full flex items-center justify-center text-white text-xs font-medium">${initials}</div>
+                <span>${member.name || member.uid}</span>
+              </div>
+            </td>
+            <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesSent}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${analytics.messagesWithImages}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${summary.totalTimeFormatted}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${summary.totalLessonsCompleted}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${summary.totalCodeExecutions}</td>
+            <td class="py-3 pr-4 whitespace-nowrap">${formatPercent(summary.interactionPercentage)}</td>
+            <td class="py-3 whitespace-nowrap">${formatPercent(summary.averageScrollDepth)}</td>
+          </tr>
+        `;
+      })
+      .join('');
+  }
+
+  // ---------------------------------------------
+  // DATA TRANSFORMATIONS
+  // ---------------------------------------------
+  function normalizeMemberSummary(rawSummary) {
+    const empty = {
+      totalTimeFormatted: '0m',
+      totalLessonsViewed: 0,
+      totalLessonsCompleted: 0,
+      totalCodeExecutions: 0,
+      interactionPercentage: 0,
+      averageScrollDepth: 0
+    };
+    if (!rawSummary) return empty;
+
+    return {
+      totalTimeFormatted: rawSummary.totalTimeFormatted || empty.totalTimeFormatted,
+      totalLessonsViewed: rawSummary.totalLessonsViewed ?? empty.totalLessonsViewed,
+      totalLessonsCompleted: rawSummary.totalLessonsCompleted ?? empty.totalLessonsCompleted,
+      totalCodeExecutions: rawSummary.totalCodeExecutions ?? empty.totalCodeExecutions,
+      interactionPercentage: rawSummary.interactionPercentage ?? empty.interactionPercentage,
+      averageScrollDepth: rawSummary.averageScrollDepth ?? empty.averageScrollDepth
+    };
+  }
+
+  function normalizeMemberAnalytics(rawAnalytics, groupId) {
+    const empty = { messagesSent: 0, messagesWithImages: 0, sharedFilesCount: 0 };
+    if (!rawAnalytics) return empty;
+
+    const groupData = rawAnalytics.groupAnalytics?.find(g => g.groupId === groupId);
+    return {
+      messagesSent: groupData?.messagesSent ?? 0,
+      messagesWithImages: groupData?.messagesWithImages ?? 0,
+      sharedFilesCount: groupData?.sharedFilesCount ?? 0
+    };
+  }
+
+  // ---------------------------------------------
+  // DATA LOADING
+  // ---------------------------------------------
+  async function loadDashboardSummaryStats(group) {
+    const totalFilesEl = document.getElementById('statTotalFiles');
+    const totalMessagesEl = document.getElementById('statTotalMessages');
+
+    totalFilesEl.textContent = '0';
+    totalMessagesEl.textContent = '0';
+
+    const analyticsPromise = fetchGroupChatAnalytics(group.members?.[0]?.id);
+    const messagesPromise = fetchGroupMessages(group.id);
+
+    const [analytics, messages] = await Promise.all([analyticsPromise, messagesPromise]);
+
+    const normalizedAnalytics = normalizeMemberAnalytics(analytics, group.id);
+    totalFilesEl.textContent = normalizedAnalytics.sharedFilesCount || 0;
+
+    totalMessagesEl.textContent = Array.isArray(messages) ? messages.length : 0;
+  }
+
+  async function loadMemberAnalyticsPage(page) {
+    if (!activeDashboardGroup) return;
+
+    const members = activeDashboardGroup.members || [];
+    const totalMembers = members.length;
+    const totalPages = Math.max(1, Math.ceil(totalMembers / MEMBER_ANALYTICS_PAGE_SIZE));
+    const safePage = Math.min(Math.max(page, 1), totalPages);
+
+    memberAnalyticsCurrentPage = safePage;
+    updatePaginationControls(totalMembers, safePage);
+
+    if (totalMembers === 0) {
+      renderMemberRows([]);
+      return;
+    }
+
+    const tbody = document.getElementById('memberAnalyticsBody');
+    tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-gray-400">Loading analytics...</td></tr>`;
+
+    const startIndex = (safePage - 1) * MEMBER_ANALYTICS_PAGE_SIZE;
+    const pageMembers = members.slice(startIndex, startIndex + MEMBER_ANALYTICS_PAGE_SIZE);
+
+    try {
+      const membersWithAnalytics = await Promise.all(
+        pageMembers.map(async member => {
+          const analyticsKey = memberAnalyticsCacheKey(activeDashboardGroup.id, member.id);
+          const summaryKey = memberSummaryCacheKey(member.id);
+
+          let analytics = memberAnalyticsCache.get(analyticsKey);
+          let summary = memberSummaryCache.get(summaryKey);
+
+          if (!analytics || !summary) {
+            const [rawAnalytics, rawSummary] = await Promise.all([
+              analytics ? Promise.resolve(analytics) : fetchGroupChatAnalytics(member.id),
+              summary ? Promise.resolve(summary) : fetchMemberSummary(member.id)
+            ]);
+
+            analytics = normalizeMemberAnalytics(rawAnalytics, activeDashboardGroup.id);
+            summary = normalizeMemberSummary(rawSummary);
+
+            memberAnalyticsCache.set(analyticsKey, analytics);
+            memberSummaryCache.set(summaryKey, summary);
+          }
+
+          return { member, analytics, summary };
+        })
+      );
+
+      renderMemberRows(membersWithAnalytics);
+      updatePaginationControls(totalMembers, safePage);
+    } catch (error) {
+      console.error('Failed to load member analytics page:', error);
+      const tbody = document.getElementById('memberAnalyticsBody');
+      tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="text-center py-4 text-red-400">Unable to load analytics data</td></tr>`;
+    }
+  }
+
+  // ---------------------------------------------
+  // RELATIONSHIP GRAPH LOGIC (SRP conformant)
+  // ---------------------------------------------
+  
+  function calculateFriendshipScore(memberA, memberB, analyticsA, analyticsB) {
+    if (!analyticsA || !analyticsB) return 0;
+    
+    // Find shared groups
+    const groupsA = analyticsA.groupAnalytics || [];
+    const groupsB = analyticsB.groupAnalytics || [];
+    
+    let sharedGroupsCount = 0;
+    let interactionScore = 0;
+    
+    const groupsBMap = new Map(groupsB.map(g => [g.groupId, g]));
+    
+    for (const gA of groupsA) {
+      const gB = groupsBMap.get(gA.groupId);
+      if (gB) {
+        sharedGroupsCount++;
+        // interaction is based on active messaging in shared groups
+        const msgA = gA.messagesSent || 0;
+        const msgB = gB.messagesSent || 0;
+        interactionScore += Math.min(msgA, msgB) * 0.5;
+      }
+    }
+    
+    if (sharedGroupsCount === 0) return 0;
+    return (sharedGroupsCount * 10) + interactionScore;
+  }
+
+  function getColorForNode(id) {
+    const colors = ['#4f46e5', '#9333ea', '#ea580c', '#0d9488', '#db2777', '#2563eb', '#16a34a', '#dc2626', '#ca8a04'];
+    return colors[id % colors.length];
+  }
+
+  function buildRelationshipGraphData(membersWithAnalytics) {
+    const nodes = [];
+    const edges = [];
+    
+    // Build Nodes
+    membersWithAnalytics.forEach(({member, analytics}) => {
+      nodes.push({
+        id: member.id,
+        label: member.name || member.uid,
+        groupCount: analytics?.groupAnalytics?.length || 0,
+        color: getColorForNode(member.id),
+        value: (analytics?.groupAnalytics?.reduce((acc, g) => acc + (g.messagesSent || 0), 0) || 0) + 1
+      });
+    });
+    
+    // Build Edges
+    for (let i = 0; i < membersWithAnalytics.length; i++) {
+      for (let j = i + 1; j < membersWithAnalytics.length; j++) {
+        const memberA = membersWithAnalytics[i];
+        const memberB = membersWithAnalytics[j];
+        
+        const score = calculateFriendshipScore(memberA.member, memberB.member, memberA.analytics, memberB.analytics);
+        
+        if (score > 0) {
+          edges.push({
+            source: memberA.member.id,
+            target: memberB.member.id,
+            weight: score
+          });
+        }
+      }
+    }
+    
+    return { nodes, edges };
+  }
+
+  function renderRelationshipGraph(nodes, edges) {
+    if (typeof d3 === 'undefined') {
+      console.warn('D3.js library not loaded');
+      return;
+    }
+    
+    const container = document.getElementById('relationshipGraphContainer');
+    const width = container.clientWidth || 800;
+    const height = container.clientHeight || 400;
+    
+    // Clear previous SVG
+    d3.select('#relationshipGraphContainer svg').remove();
+    
+    const svg = d3.select('#relationshipGraphContainer')
+      .append('svg')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox', [0, 0, width, height]);
+      
+    const g = svg.append('g');
+    
+    // Add Zoom
+    const zoom = d3.zoom()
+      .scaleExtent([0.1, 4])
+      .on('zoom', (event) => {
+        g.attr('transform', event.transform);
+      });
+      
+    svg.call(zoom);
+    
+    // Zoom controls
+    document.getElementById('graphZoomInButton').onclick = () => svg.transition().call(zoom.scaleBy, 1.2);
+    document.getElementById('graphZoomOutButton').onclick = () => svg.transition().call(zoom.scaleBy, 0.8);
+    document.getElementById('graphResetButton').onclick = () => svg.transition().call(zoom.transform, d3.zoomIdentity);
+
+    if (nodes.length === 0) return;
+
+    const graphSimulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(edges).id(d => d.id).distance(150))
+        .force("charge", d3.forceManyBody().strength(-400))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(d => Math.sqrt(d.value) * 3 + 20));
+
+    const link = g.append("g")
+        .attr("stroke", "#525252")
+        .attr("stroke-opacity", 0.6)
+      .selectAll("line")
+      .data(edges)
+      .join("line")
+        .attr("stroke-width", d => Math.min(Math.sqrt(d.weight), 8));
+
+    const drag = simulation => {
+      function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+      }
+      function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+      function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+      }
+      return d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended);
+    };
+
+    const node = g.append("g")
+        .attr("stroke", "#262626")
+        .attr("stroke-width", 1.5)
+      .selectAll("circle")
+      .data(nodes)
+      .join("circle")
+        .attr("r", d => Math.min(Math.max(Math.sqrt(d.value) * 3 + 8, 12), 30))
+        .attr("fill", d => d.color)
+        .call(drag(graphSimulation));
+
+    node.append("title")
+        .text(d => `${d.label}\nShared Groups: ${d.groupCount}\nActivity Score: ${Math.round(d.value)}`);
+
+    const label = g.append("g")
+      .selectAll("text")
+      .data(nodes)
+      .join("text")
+        .attr("class", "text-[10px] fill-gray-300 font-medium pointer-events-none")
+        .attr("dx", 15)
+        .attr("dy", ".35em")
+        .text(d => d.label);
+
+    graphSimulation.on("tick", () => {
+      link
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+      node
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
+          
+      label
+          .attr("x", d => d.x)
+          .attr("y", d => d.y);
+    });
+  }
+
+  function generateAndRenderRecommendations(currentUserId, nodes, edges) {
+    const listContainer = document.getElementById('recommendedFriendsList');
+    
+    // Find edges connected to current user
+    const userEdges = edges.filter(e => {
+        const sourceId = typeof e.source === 'object' ? e.source.id : e.source;
+        const targetId = typeof e.target === 'object' ? e.target.id : e.target;
+        return sourceId === currentUserId || targetId === currentUserId;
+    });
+    
+    if (userEdges.length === 0) {
+      listContainer.innerHTML = '<div class="text-center text-gray-500 text-sm py-8">Join more groups or interact more to get recommendations!</div>';
+      return;
+    }
+    
+    // Sort edges by weight descending
+    userEdges.sort((a, b) => b.weight - a.weight);
+    
+    // Take top 5
+    const topEdges = userEdges.slice(0, 5);
+    
+    listContainer.innerHTML = topEdges.map(e => {
+      const sourceId = typeof e.source === 'object' ? e.source.id : e.source;
+      const targetId = typeof e.target === 'object' ? e.target.id : e.target;
+      
+      const friendId = sourceId === currentUserId ? targetId : sourceId;
+      const friendNode = nodes.find(n => n.id === friendId);
+      
+      if (!friendNode) return '';
+      
+      const initials = getInitials(friendNode.label);
+      const colorClass = getAvatarColor(friendNode.id);
+      
+      return `
+        <div class="flex items-center gap-3 p-2 hover:bg-neutral-600/50 rounded-lg transition-colors border border-transparent hover:border-neutral-600">
+          <div class="w-10 h-10 ${colorClass} rounded-full flex items-center justify-center text-white text-sm font-medium shrink-0 shadow-inner">
+            ${initials}
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-sm font-medium truncate">${friendNode.label}</p>
+            <p class="text-gray-400 text-xs truncate">Connection Score: ${Math.round(e.weight)}</p>
+          </div>
+          <button class="px-3 py-1 bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white rounded text-xs font-medium transition-colors" title="Start Chat">
+            Connect
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function getCurrentUserId() {
+    try {
+      const res = await fetch(`${pythonURI}/api/id`, fetchOptions);
+      if (res.ok) {
+        const user = await res.json();
+        return user.id;
+      }
+    } catch (e) {
+      console.warn('Could not fetch current user ID for graph recommendations');
+    }
+    return null;
+  }
+
+  async function loadRelationshipGraph(group) {
+    if (!group || !group.members || group.members.length === 0) {
+      document.getElementById('relationshipGraphEmptyState').textContent = 'No grouping data to display.';
+      return;
+    }
+    
+    try {
+      const membersWithAnalytics = [];
+      const batchSize = 10; // Batch requests to prevent rate limiting
+      
+      for (let i = 0; i < group.members.length; i += batchSize) {
+        const batch = group.members.slice(i, i + batchSize);
+        const batchResults = await Promise.all(batch.map(async (member) => {
+          try {
+            const rawAnalytics = await fetchGroupChatAnalytics(member.id);
+            return { member, analytics: rawAnalytics };
+          } catch (e) {
+             return { member, analytics: null };
+          }
+        }));
+        membersWithAnalytics.push(...batchResults);
+      }
+      
+      const graphData = buildRelationshipGraphData(membersWithAnalytics.filter(m => m.analytics));
+      
+      document.getElementById('relationshipGraphEmptyState').classList.add('hidden');
+      renderRelationshipGraph(graphData.nodes, graphData.edges);
+      
+      const currentUserId = await getCurrentUserId();
+      // If we could determine the current user, generate recommendations specifically for them
+      // Alternatively, just pick the first member if we are debugging/testing
+      const referenceId = currentUserId || group.members[0].id;
+      
+      generateAndRenderRecommendations(referenceId, graphData.nodes, graphData.edges);
+      
+    } catch (err) {
+      console.error('Error loading relationship graph', err);
+      document.getElementById('relationshipGraphEmptyState').textContent = 'Failed to load user connections.';
+    }
+  }
+
+  // ---------------------------------------------
+  // PAGE INITIALIZATION / ORCHESTRATOR
+  // ---------------------------------------------
+  
+  /**
+   * Redirect user back to groups list page
+   * Used when no group parameter is provided in URL
+   */
+  function redirectToGroupsList() {
+    window.location.href = '/student/groups';
+  }
+
+  /**
+   * Update dashboard header with group information
+   * Sets group name, page title, metadata text, and member count
+   */
+  function updateDashboardHeader(group) {
+    const memberCount = (group.members || []).length;
+
+    document.getElementById('dashboardGroupName').textContent = group.name;
+    document.title = `${group.name} - Dashboard`;
+
+    document.getElementById('dashboardGroupMeta').textContent =
+      `Period ${group.period || 'N/A'} · ${group.course || 'N/A'} · ${memberCount} member${memberCount !== 1 ? 's' : ''}`;
+
+    document.getElementById('statTotalMembers').textContent = memberCount;
+  }
+
+  /**
+   * Main orchestrator function - loads and initializes entire dashboard
+   * Steps:
+   *   1. Extract and validate group name from URL
+   *   2. Fetch group data from API
+   *   3. Update header and set active group
+   *   4. Load summary stats and member analytics in parallel
+   *   5. Store group data globally for other scripts
+   *   6. Handle errors with user-friendly messages
+   */
+  async function loadGroupDashboard() {
+    // Step 1: Get group name from URL query parameter
+    const rawGroupName = getQueryParam('group');
+    if (!rawGroupName) {
+      redirectToGroupsList();
+      return;
+    }
+
+    // Step 2: Decode and normalize group name (replace hyphens with spaces)
+    const groupName = decodeURIComponent(rawGroupName).replace(/-/g, ' ');
+
+    try {
+      // Step 3: Fetch group data from backend
+      const group = await fetchGroupByName(groupName);
+
+      // Step 4: Validate group exists
+      if (!group || !group.id) {
+        throw createFetchError(ERROR_TYPES.INVALID_GROUP);
+      }
+
+      // Step 5: Set active group and reset pagination
+      activeDashboardGroup = group;
+      memberAnalyticsCurrentPage = 1;
+
+      // Step 6: Update page header with group info
+      updateDashboardHeader(group);
+
+      // Step 7: Handle empty group case
+      const tbody = document.getElementById('memberAnalyticsBody');
+      if (!group.members || group.members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${MEMBER_ANALYTICS_COLUMN_COUNT}" class="py-8 text-center text-gray-400">No members in this group</td></tr>`;
+        document.getElementById('statTotalMessages').textContent = 0;
+        document.getElementById('statTotalFiles').textContent = 0;
+        return;
+      }
+
+      // Step 8: Load summary stats, member analytics, and relationship graph in parallel
+      await Promise.all([
+         loadDashboardSummaryStats(group), 
+         loadMemberAnalyticsPage(1),
+         loadRelationshipGraph(group)
+      ]);
+
+      // Step 9: Store group data globally for other dashboard components
+      window.currentDashboardGroupId = group.id;
+      window.currentGroupData = group;
+
+      // Step 10: Load shared files if available
+      if (typeof window.fetchDashboardSharedFiles === 'function') {
+        await window.fetchDashboardSharedFiles();
+      }
+    } catch (error) {
+      // Step 11: Display error message to user
+      console.error('Failed to load group dashboard:', error);
+      showError(document.getElementById('dashboardGroupMeta'), error.type, error.status);
+    }
+  }
+
+  /**
+   * Navigate to previous page of member analytics
+   */
+  window.previousMemberAnalyticsPage = function () {
+    loadMemberAnalyticsPage(memberAnalyticsCurrentPage - 1);
+  };
+
+  /**
+   * Navigate to next page of member analytics
+   */
+  window.nextMemberAnalyticsPage = function () {
+    loadMemberAnalyticsPage(memberAnalyticsCurrentPage + 1);
+  };
+
+  // Entry point: Load dashboard when page is ready
+  document.addEventListener('DOMContentLoaded', loadGroupDashboard);

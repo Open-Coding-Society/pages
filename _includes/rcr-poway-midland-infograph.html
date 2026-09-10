@@ -1,0 +1,173 @@
+{% assign data = site.data.rcr_poway_midland_infograph %}
+
+<div class="rcr-pmr-infograph">
+
+  <!-- Page Header -->
+  <div class="rcr-pmr-header">
+    <div class="rcr-pmr-badge">Design-Based Research Capstone</div>
+    <h1 class="rcr-pmr-title">{{ data.Title }}</h1>
+    <p class="rcr-pmr-description">{{ data.Description }}</p>
+  </div>
+
+  <!-- Part 1 Label -->
+  <div class="rcr-section-label">
+    <span class="rcr-section-label-text part1">Part 1 — What We Built: New Features vs. Original PMRR Website</span>
+  </div>
+
+  <!-- Feature Cards -->
+  {% for feature in data.Features %}
+  <div class="rcr-pmr-card">
+    <div class="rcr-pmr-card-grid">
+
+      <!-- Left: Image & Status -->
+      <div class="rcr-pmr-visual">
+        <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-image-link">
+          <img src="{{ feature.image | relative_url }}" alt="{{ feature.alt }}">
+          <div class="rcr-pmr-overlay"><span>View Feature</span></div>
+        </a>
+        <div class="rcr-pmr-status">{{ feature.status }}</div>
+        <div class="rcr-pmr-team">
+          <span class="rcr-pmr-team-label">Project Leads</span>
+          <span class="rcr-pmr-team-name">{{ feature.team | join: ", " }}</span>
+        </div>
+        {% if feature.reflection %}
+        <div class="rcr-pmr-feature-reflection">
+          <span>❗️Comments from CTE: </span> {{ feature.reflection }}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Center: Key Points -->
+      <div class="rcr-pmr-content">
+        <h2 class="rcr-pmr-project-title">{{ feature.title }}</h2>
+        <p class="rcr-pmr-subtitle">{{ feature.subtitle }}</p>
+        <div class="rcr-pmr-keypoints">
+          {% for point in feature.keyPoints %}
+          <div class="rcr-pmr-keypoint">
+            <span class="rcr-pmr-check">✓</span>
+            <span>{{ point }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="rcr-pmr-tech-stack">
+          {% for tech in feature.tech %}
+          <span class="rcr-pmr-tech-tag">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Right: About & Impact -->
+      <div class="rcr-pmr-details">
+        <div class="rcr-pmr-section-title">Before (Original Site)</div>
+        <p class="rcr-pmr-current">{{ feature.current }}</p>
+
+        <div class="rcr-pmr-section-title">What We Built</div>
+        <p class="rcr-pmr-purpose">{{ feature.purpose }}</p>
+
+        <div class="rcr-pmr-section-title">Impact</div>
+        <div class="rcr-pmr-impact-list">
+          {% for item in feature.impact %}
+          <div class="rcr-pmr-impact-item">{{ item }}</div>
+          {% endfor %}
+        </div>
+
+        <a href="{{ site.baseurl }}{{ feature.link }}" class="rcr-pmr-btn">View Feature →</a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- GitHub Review Link -->
+  <div style="text-align: center; margin-top: 32px;">
+    <a href="https://github.com/Rishabh-da-best/RCR-Dominators-Frontend-/issues/12" class="rcr-pmr-btn">
+      ↗ Our review of CTE Expo on GitHub
+    </a>
+  </div>
+
+<!-- Team Reflection Summary -->
+<div class="rcr-pmr-reflection-summary">
+  <div class="rcr-reflection-grid">
+    <div class="rcr-reflection-card">
+      <h3>👍 What Went Well</h3>
+      <ul>
+        {% for item in data.TeamReflection.whatWentWell %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="rcr-reflection-card">
+      <h3>📝 What Needs Improvement</h3>
+      <ul>
+        {% for item in data.TeamReflection.whatNeedsImprovement %}
+        <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="rcr-reflection-card">
+      <h3>💬 Key Feedback Received</h3>
+      <ul>
+        {% for lesson in data.LessonsLearned %}
+        <li><strong>{{ lesson.source }}:</strong> 
+          {% for point in lesson.points %}
+            {{ point }}{% unless forloop.last %}; {% endunless %}
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Future Plan -->
+<div class="rcr-reflection-card">
+  <h3>📋 Future Plan for Our Website</h3>
+  <ul>
+    {% for item in data.FuturePlan %}
+    <li>
+      {% if item contains "Remove" %}
+        ❌ {{ item }}
+      {% elsif item contains "Add" or item contains "Regularly" %}
+        ✅ {{ item }}
+      {% else %}
+        {{ item }}
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<!-- Conclusion -->
+<div class="rcr-reflection-card">
+  <h3>🎯 Conclusion</h3>
+  <p>{{ data.Conclusion }}</p>
+</div>
+
+  <!-- Part 2 Label -->
+  <div class="rcr-section-label" style="margin-top: 56px;">
+    <span class="rcr-section-label-text part2">Part 2 — With Partnership: What We Could Build Together</span>
+  </div>
+
+  <!-- Future Features -->
+  <div class="rcr-pmr-future-section">
+    <div class="rcr-pmr-future-header">
+      <div class="rcr-pmr-future-badge">Requires PMRR Collaboration</div>
+      <h2>Next-Phase Features</h2>
+      <p>These features are technically ready for development. Each requires access to PMRR hardware, data, or operational coordination that a formal partnership would provide.</p>
+    </div>
+    <div class="rcr-pmr-future-grid">
+      {% for item in data.FutureFeatures %}
+      <div class="rcr-pmr-future-card">
+        <div class="rcr-pmr-future-icon">{{ item.icon }}</div>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.description }}</p>
+        <div class="rcr-pmr-future-needs">Requires: {{ item.needs }}</div>
+        {% if item.reflection %}
+        <div class="rcr-future-reflection">❗️Comments from CTE:  {{ item.reflection }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>

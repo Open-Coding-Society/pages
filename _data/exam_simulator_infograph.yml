@@ -1,0 +1,52 @@
+title: AP CSA Exam Simulator — Section II Free Response
+subtitle: Timed Free-Response Practice Environment
+badge: CSA Capstone Project
+status: Live
+
+description: >
+  A browser-based AP Computer Science A Section II (Free Response) exam simulator.
+  Students choose from 19 official College Board FRQ sets (2005–2025, excluding 2012
+  and 2020) or upload a custom PDF, then write Java solutions in integrated code
+  editors under authentic timed conditions — 90 minutes for 2020+ exams, 105 minutes
+  for pre-2020 exams. After submission, responses can be graded by Gemini AI.
+
+about: >
+  The simulator replicates the real AP CSA Free-Response testing experience entirely
+  in the browser. A split-pane layout shows the FRQ PDF on the left and a CodeMirror
+  Java editor on the right. Students navigate freely between all four questions, flag
+  questions for review, and access the official AP CSA Java Quick Reference sheet via
+  a slide-out drawer. The countdown timer turns yellow at 10 minutes remaining and
+  red at 5 minutes, auto-submitting when time expires. After submission, a review
+  screen summarizes time used, questions answered, and character counts, with the
+  option to download responses as a text file or grade them via the Gemini AI backend.
+
+team:
+  - Kush Shah
+
+features:
+  - 19 preset FRQ PDFs (2005–2025, excluding 2012 and 2020) with auto-detected time limits
+  - Split-pane layout with zoomable PDF viewer and CodeMirror Java editors
+  - Timed exam with yellow warning at 10 min and red alert at 5 min remaining
+  - Free navigation between all 4 FRQs with question flagging
+  - Slide-out AP CSA Java Quick Reference sheet drawer
+  - AI-powered grading via Gemini backend (requires login)
+  - Response download as text file and detailed review screen
+  - Custom PDF upload with drag-and-drop and automatic year detection
+
+tech:
+  - PDF.js
+  - CodeMirror
+  - Spring Boot Backend
+  - Gemini AI Grading
+  - Jekyll / Liquid
+  - JavaScript (Vanilla)
+
+impact:
+  - Authentic timed AP exam practice without printed materials
+  - Instant AI feedback helps students identify gaps before the real exam
+  - Covers 19 official College Board FRQ sets spanning two decades
+  - Accessible from any browser with no installation or setup
+
+links:
+  project: /csa/exam-simulator
+  source: https://github.com/Open-Coding-Society/pages

@@ -25,6 +25,9 @@ show_reading_time: false
                 <button type="submit" class="large primary submit-button">Login</button>
             </p>
             <p id="message" style="color: red;"></p>
+            <p style="text-align: center;">
+                <a href="{{site.baseurl}}/support?topic=reset">Forgot your password?</a>
+            </p>
         </form>
     </div>
     <div class="signup-card">
@@ -38,7 +41,7 @@ show_reading_time: false
                 <br><strong>You must use an email ending in @stu.powayusd.com or @powayusd.com</strong>
             </p>
             <div id="g_id_onload"
-                 data-client_id="65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com"
+                 data-client_id="{{ site.google_client_id }}"
                  data-callback="handleGoogleSignIn"
                  data-auto_prompt="false">
             </div>
@@ -92,15 +95,6 @@ show_reading_time: false
                 <div id="password-validation-message" class="validation-message"></div>
             </div>
             <p>
-                <label class="switch">
-                    <span class="toggle">
-                        <input type="checkbox" name="kasmNeeded" id="kasmNeeded">
-                        <span class="slider"></span>
-                    </span>
-                    <span class="label-text">Kasm Server Needed</span>
-                </label>
-            </p>
-            <p>
                 <button type="submit" class="large primary submit-button">Sign Up</button>
             </p>
             <!-- Backend Status Display -->
@@ -120,12 +114,11 @@ show_reading_time: false
 </div>
 
 <script type="module">
-    import { login, pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import { login, pythonURI, javaURI, fetchOptions, GOOGLE_CLIENT_ID } from '{{site.baseurl}}/assets/js/api/config.js';
 
     let signupFormData = {};
     let verifiedSchoolEmail = null;
     let validationTimeout = null;
-    const GOOGLE_CLIENT_ID = "65827797404-ccjleg7jg4g2an8ddpmhnlca4ii2gk8q.apps.googleusercontent.com";
 
     // Password validation with debouncing (1.5 second delay)
     function validatePasswordsDebounced() {
@@ -136,7 +129,7 @@ show_reading_time: false
 
         // Set new timeout for 1.5 seconds
         validationTimeout = setTimeout(() => {
-            validatePasswords();
+            validateForm();
         }, 1500);
     }
 
@@ -274,7 +267,8 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasm_server_needed: document.getElementById("kasmNeeded").checked,
+            kasmServerNeeded: false,
+            kasm_server_needed: false,
         };
 
         // Show OAuth verification
@@ -359,14 +353,26 @@ show_reading_time: false
 
     // Function to handle both Python and Java login simultaneously
     window.loginBoth = function () {
-    javaLogin();  // Call Java login
-    pythonLogin();
-};
+        // Wrap both logins in Promises and only redirect after both finish
+        let javaPromise = new Promise((resolve) => {
+            window.javaLogin(resolve);
+        });
+        let pythonPromise = new Promise((resolve) => {
+            window.pythonLogin(resolve);
+        });
+        Promise.allSettled([javaPromise, pythonPromise]).then(() => {
+            // Only redirect after both have completed (success or fail)
+            window.location.href = '{{site.baseurl}}/profile';
+        });
+    };
     // Function to handle Python login
-    window.pythonLogin = function () {
+    window.pythonLogin = function (done) {
         const options = {
             URL: `${pythonURI}/api/authenticate`,
-            callback: pythonDatabase,
+            callback: function() {
+                pythonDatabase();
+                if (done) done();
+            },
             message: "message",
             method: "POST",
             cache: "no-cache",
@@ -376,119 +382,63 @@ show_reading_time: false
             }
         };
         login(options);
+        // If login() is not async, call done() immediately
+        // if (done) done();
     }
     // Function to handle Java login
-    window.javaLogin = function () {
-    const loginURL = `${javaURI}/authenticate`;
-    const databaseURL = `${javaURI}/api/person/get`;
-    const signupURL = `${javaURI}/api/person/create`;
-    const userCredentials = JSON.stringify({
-        uid: document.getElementById("uid").value,
-        password: document.getElementById("password").value,
-    });
-    const loginOptions = {
-        ...fetchOptions,
-        method: "POST",
-        body: userCredentials,
-    };
-    console.log("Attempting Java login...");
-    fetch(loginURL, loginOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Invalid login");
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Login successful!", data);
-            window.location.href = '{{site.baseurl}}/profile';
-            // Fetch database after login success using fetchOptions
-            return fetch(databaseURL, fetchOptions);
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Spring server response: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Java database response:", data);
-        })
-        .catch(error => {
-            console.error("Login failed:", error.message);
-            // If login fails, attempt account creation
-            if (error.message === "Invalid login") {
-                // alert("Login for Spring failed. Creating a new Java account...");
-                const signupData = JSON.stringify({
-                    uid: document.getElementById("uid").value,
-                    sid: "0000000",
-                    email: document.getElementById("uid").value + "@gmail.com",
-                    dob: "11-01-2024", // Static date, can be modified
-                    name: document.getElementById("uid").value,
-                    password: document.getElementById("password").value,
-                    kasmServerNeeded: false,
-                });
-                const signupOptions = {
-                    ...fetchOptions,
-                    method: "POST",
-                    body: signupData,
-                };
-                fetch(signupURL, signupOptions)
-                    .then(signupResponse => {
-                        if (!signupResponse.ok) {
-                            throw new Error("Account creation failed!");
-                        }
-                        return signupResponse.json();
-                    })
-                    .then(signupResult => {
-                        console.log("Account creation successful!", signupResult);
-                        // alert("Account Creation Successful. Logging you into Flask/Spring!");
-                        // Retry login after account creation
-                        return fetch(loginURL, loginOptions);
-                    })
-                    .then(newLoginResponse => {
-                        if (!newLoginResponse.ok) {
-                            throw new Error("Login failed after account creation");
-                        }
-                        console.log("Login successful after account creation!");
-                        // Fetch database after successful login
-                        return fetch(databaseURL, fetchOptions);
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Spring server response: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log("Java database response:", data);
-                    })
-                    .catch(newLoginError => {
-                        console.error("Error after account creation:", newLoginError.message);
-                    });
-            } else {
-                console.log("Logged in!");
-            }
+    window.javaLogin = function (done) {
+        const loginURL = `${javaURI}/authenticate`;
+        const databaseURL = `${javaURI}/api/person/get`;
+        const userCredentials = JSON.stringify({
+            uid: document.getElementById("uid").value,
+            password: document.getElementById("password").value,
         });
-};
-    // Function to fetch and display Python data
-    function pythonDatabase() {
-        const URL = `${pythonURI}/api/id`;
-        fetch(URL, fetchOptions)
+        const loginOptions = {
+            ...fetchOptions,
+            method: "POST",
+            body: userCredentials,
+        };
+        console.log("Attempting Java login...");
+        fetch(loginURL, loginOptions)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Flask server response: ${response.status}`);
+                    throw new Error("Invalid login");
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log("Login successful!", data);
+                // Do not redirect here
+                // Fetch database after login success using fetchOptions
+                return fetch(databaseURL, fetchOptions);
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Spring server response: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
-                window.location.href = '{{site.baseurl}}/profile';
+                console.log("Java database response:", data);
+                if (done) done();
             })
             .catch(error => {
-                document.getElementById("message").textContent = `Error: ${error.message}`;
+                console.error("Login failed:", error.message);
+                // Spring login is optional for this dual-backend flow.
+                console.warn("Spring login unavailable; continuing with Flask auth flow.");
+                if (done) done();
             });
+    };
+    // Function to fetch and display Python data
+    function pythonDatabase() {
+        // Skip the /api/id fetch due to CORS restrictions with credentials mode.
+        // The user is already authenticated (token in cookie), so just redirect to profile.
+        console.log("Authentication successful, redirecting to profile...");
+        setTimeout(() => {
+            window.location.href = '{{site.baseurl}}/profile';
+        }, 1000);
     }  
-    window.signup = function () {
+    window.signup = async function () {
         const signupButton = document.querySelector(".signup-card button");
         // Disable the button and change its color
         signupButton.disabled = true;
@@ -505,17 +455,8 @@ show_reading_time: false
             school: document.getElementById("signupSchool").value,
             email: document.getElementById("signupEmail").value,
             password: document.getElementById("signupPassword").value,
-            kasm_server_needed: document.getElementById("kasmNeeded").checked,
-        };
-
-        const signupDataJava = {
-            uid: data.uid,
-            sid: data.sid,
-            email: data.email,
-            dob: "11-01-2024",
-            name: data.name,
-            password: data.password,
-            kasmServerNeeded: data.kasm_server_needed,
+            kasmServerNeeded: false,
+            kasm_server_needed: false,
         };
 
         if (verifiedSchoolEmail) {
@@ -525,68 +466,63 @@ show_reading_time: false
         console.log("Sending this data to Flask:", JSON.stringify(data, null, 2));
         console.log("Request URL:", `${pythonURI}/api/user`);
 
-        // Flask Backend Request
-        const flaskPromise = fetch(`${pythonURI}/api/user`, {
+        const flaskRequest = {
+            ...fetchOptions,
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
             body: JSON.stringify(data)
-        })
-        .then(response => {
-            if (response.ok) {
-                updateBackendStatus('flask', 'success');
-                return response.json();
-            } else {
-                return response.text().then(errorText => {
-                    console.log("Flask error details:", errorText);
-                    throw new Error(`Flask: ${response.status} - ${errorText}`);
-                });
+        };
+
+        const springRequest = {
+            ...fetchOptions,
+            method: "POST",
+            body: JSON.stringify(data)
+        };
+
+        try {
+            // Flask is the blocking source of truth for auth/signup.
+            const flaskResponse = await fetch(`${pythonURI}/api/user`, flaskRequest);
+            const flaskRaw = await flaskResponse.text();
+
+            let flaskData;
+            try {
+                flaskData = flaskRaw ? JSON.parse(flaskRaw) : {};
+            } catch (_) {
+                flaskData = { message: flaskRaw };
             }
-        })
-        .catch(error => {
+
+            if (!flaskResponse.ok || flaskData.success === false) {
+                const flaskMessage = flaskData.message || flaskRaw || `Flask signup failed (${flaskResponse.status})`;
+                throw new Error(flaskMessage);
+            }
+
+            updateBackendStatus('flask', 'success');
+
+            // Spring is best-effort; do not block signup success on this path.
+            fetch(`${javaURI}/api/person/create`, springRequest)
+                .then(async (springResponse) => {
+                    const springRaw = await springResponse.text();
+                    if (springResponse.ok) {
+                        updateBackendStatus('spring', 'success');
+                    } else {
+                        console.warn("Spring signup failed:", springResponse.status, springRaw);
+                        updateBackendStatus('spring', 'error');
+                    }
+                    setTimeout(updateOverallStatus, 500);
+                })
+                .catch((springError) => {
+                    console.warn("Spring signup error:", springError.message);
+                    updateBackendStatus('spring', 'error');
+                    setTimeout(updateOverallStatus, 500);
+                });
+        } catch (error) {
             console.error("Flask signup error:", error);
             updateBackendStatus('flask', 'error');
-            throw error;
-        });
-
-        // Spring Backend Request
-        const springPromise = fetch(`${javaURI}/api/person/create`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(signupDataJava)
-        })
-        .then(response => {
-            if (response.ok) {
-                updateBackendStatus('spring', 'success');
-                return response.json();
-            } else {
-                throw new Error(`Spring: ${response.status}`);
-            }
-        })
-        .catch(error => {
-            console.error("Spring signup error:", error);
             updateBackendStatus('spring', 'error');
-            throw error;
-        });
-
-        // Handle both requests
-        Promise.allSettled([flaskPromise, springPromise])
-            .then(results => {
-                const [flaskResult, springResult] = results;
-
-                console.log("Flask result:", flaskResult);
-                console.log("Spring result:", springResult);
-
-                // Update overall status after both complete
-                setTimeout(updateOverallStatus, 500);
-
-                // Re-enable button
-                signupButton.disabled = false;
-                signupButton.classList.remove("disabled");
-            });
+            setTimeout(updateOverallStatus, 500);
+        } finally {
+            signupButton.disabled = false;
+            signupButton.classList.remove("disabled");
+        }
     }
     function javaDatabase() {
         const URL = `${javaURI}/api/person/get`;

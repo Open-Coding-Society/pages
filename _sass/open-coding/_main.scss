@@ -1,21 +1,44 @@
 @import 'root-color-map.scss';
+@import "mixins/variables";
+@import "base/typography";
 @import "bathroom";
 @import "blogs";
-@import "calendar";
+@import "projects/all";  // Auto-generated project imports
 @import "chatbot";
+@import "forms/code-runner";
+@import "forms/ui-runner";
+@import "forms/game-runner";
+@import "forms/container-panel";
+@import "forms/pause-modal";
+@import "forms/leaderboard";
+@import "forms/game-engine";
+@import "forms/game-builder";
+@import "forms/game-dialogue-system";
+@import "forms/home-gamified";
+@import "forms/mario-open-house";
 @import "hacks";
 @import "hacks_lxd";
 @import "hallpass";
 @import "microblog";
+@import "grading";
 @import "navbar";
 @import "platformer-game";
 @import "quiz";
 @import "rps_lesson";
 @import "search";
+@import "stack-clicker";
+@import "user-preferences";
 // aesthetihawk stuff
 @import "materials/main.scss";
 @import "elements/main.scss";
 @import "natm-2025-tri1.scss";
+@import "timeline";
+@import "lesson-player";
+@import "documentation";
+@import "api-documentation";
+@import "migration-runbook";
+@import "open-coding/pixel-submit-widget";
+@import "open-coding/grading_modules";
 
 
 html,

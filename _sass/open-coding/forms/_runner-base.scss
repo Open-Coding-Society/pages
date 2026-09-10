@@ -1,0 +1,60 @@
+/**
+ * Runner Base Styles
+ * Shared styles for code-runner and ui-runner
+ */
+
+@import "../mixins/buttons";
+@import "../mixins/panel";
+@import "../mixins/container";
+
+@mixin runner-base {
+  @include main-container;
+
+  // Code challenge box styling
+  .challenge-box {
+    @include info-panel;
+  }
+
+  // Editor container
+  .editor-container {
+    @include sub-container;
+  }
+
+  // Code editor styling
+  .CodeMirror {
+    @include input-panel;
+  }
+
+  .CodeMirror-gutters {
+    background: var(--pref-bg-color);
+    border: 1px solid var(--ui-border);
+  }
+
+  // CodeMirror selection highlighting - use CodeMirror's proper API
+  // When styleSelectedText: true is enabled, CodeMirror adds .CodeMirror-selectedtext
+  .CodeMirror-selectedtext {
+    background: var(--pref-accent-color, #3b82f6) !important;
+    color: #ffffff !important;
+  }
+
+  // Output section
+  .output-container {
+    @include sub-container;
+  }
+
+  // Control panel (top and bottom bars)
+  .control-panel {
+    @include control-panel;
+  }
+
+  // Emphasized run button
+  .ocs__btn.utility.run {
+    @include emphasized-icon-button;
+  }
+
+  // Common icon buttons
+  .ocs__btn.utility.copy,
+  .ocs__btn.utility.clear {
+    @include icon-button(38px, 0);
+  }
+}

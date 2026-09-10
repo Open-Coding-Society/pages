@@ -1,0 +1,42 @@
+# Module Illustrations
+Title: "Applying Object-Based Game Mechanics"
+Description: "This module introduces the OCS GameEngine and its core mechanics using GameBuilder. Learners explore key objects—Backgrounds, Players, NPCs, and Barriers—while developing foundational understanding of object properties, interactions, and system behavior. This transition from semantic/syntax lessons to applied object-based mechanics prepares students to design and implement their own interactive games within the GameEngine environment."
+
+Topics:
+  - title: "GameEngine Briefing"
+    image: "/gamify/lessons/game-engine-intro.png"
+    link: /game/guide/intro
+    alt: "GameEngine Mechanics Overview"
+    keyPoints:
+      - "Game Objects"
+      - "Game Loop"
+      - "Properties and Updates"
+      - "Interactions and Reactions"
+    subtitle: "Engine Architecture and Mechanics"
+    description: "<strong>The GameEngine is where students apply object-based mechanics in a larger system.</strong> This guide introduces the core architecture of the GameEngine, including the game loop, object lifecycle, interactions, and reaction behaviors. It provides a system-level overview of how objects update, respond, and interact within the engine runtime environment."
+
+  - title: "GameBuilder Visual Interface"
+    image: "/gamify/lessons/gamebuilder.png"
+    link: /gamebuilder
+    alt: "GameBuilder Interface"
+    keyPoints:
+      - "Visual Design"
+      - "Backgrounds and Characters"
+      - "Objects and Interactions"
+      - "Properties and Tuning"
+    subtitle: "Interactive Game Creation Tool"
+    description: "<strong>GameBuilder is the interactive environment that reduces cognitive load when implementing object-based mechanics.</strong> GameBuilder provides a visual interface for configuring game assets and object properties. Learners select assets, generate structured game code, incrementally refine mechanics, and test the game in real time to observe system behavior—all without manual syntax coding."
+  
+  - title: "Logistics and Submission Guide"
+    image: "/gamify/lessons/github-kanban.png"
+    link: /game/guide/logistics
+    alt: "Logistics and Submission Guide"
+    keyPoints:
+      - "Team Repository and Files"
+      - "Issue Tracking and Kanban"
+      - "Individual and Team Commits"
+      - "Instructor Fork Repository"
+      - "Selective Pull Requests"
+    subtitle: "Structured Development and Assessment Workflow"
+    description: "<strong>GitHub serves as the instructional management and assessment tracking tool.</strong> Students develop their game within a shared team repository used throughout the 12-week course. Daily commits, feature development, and asset updates occur within their primary team repository. Selective Pull Requests are submitted to an instructor's fork repository to support structured, instructor-directed integration and assessment of GameBuilder files and assets."
+ 
