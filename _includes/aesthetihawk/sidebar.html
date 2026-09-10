@@ -16,7 +16,11 @@
       document.getElementById('sidebar-role-default').style.display = 'none';
       document.getElementById('sidebar-role-mentor').style.display = 'block';
       const badge = document.getElementById('mentor-badge');
-      if (badge) badge.style.display = 'flex';
+      if (badge) {
+        badge.style.display = 'flex';
+        document.body.classList.add('mentor-bar-active');
+        document.documentElement.style.setProperty('--mentor-bar-h', badge.offsetHeight + 'px');
+      }
     }
   } catch (e) { /* localStorage unavailable; default sidebar stays visible */ }
 </script>

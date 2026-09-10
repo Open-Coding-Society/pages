@@ -24,11 +24,12 @@
     <!-- navbar -->
     {%- include aesthetihawk/header-shared.html -%}
 
-    <!-- Shown near the top of every aesthetihawk page once a signed-in
-         ROLE_MENTOR user is confirmed (see the role-check script below);
-         hidden for everyone else. -->
+    <!-- Full-width bar shown right under the header on every aesthetihawk page
+         once a signed-in ROLE_MENTOR user is confirmed (see the role-check
+         script below); hidden entirely for everyone else, students included. -->
     <div id="mentor-badge" class="mentor-badge" style="display:none;">
-        <span class="mentor-badge__dot"></span> Mentor
+        <span class="mentor-badge__dot"></span>
+        You're signed in as a <strong>Mentor</strong> &mdash; showing mentor tools instead of student tools
     </div>
 
     {% if page.microblog %}
@@ -86,6 +87,13 @@
             defaultEl.style.display = isMentor ? 'none' : 'block';
             mentorEl.style.display = isMentor ? 'block' : 'none';
             badgeEl.style.display = isMentor ? 'flex' : 'none';
+            // The bar takes up real height, so push the fixed sidebar and the
+            // main content wrapper down by exactly that much (see the
+            // .mentor-bar-active rules in mentor.scss).
+            document.body.classList.toggle('mentor-bar-active', isMentor);
+            if (isMentor) {
+                document.documentElement.style.setProperty('--mentor-bar-h', badgeEl.offsetHeight + 'px');
+            }
             try { localStorage.setItem('ocsMentorSidebar', isMentor ? 'mentor' : 'default'); }
             catch (e) { /* localStorage unavailable */ }
         }

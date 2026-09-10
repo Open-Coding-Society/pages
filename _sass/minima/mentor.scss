@@ -9,39 +9,60 @@
   margin: 2rem auto;
 }
 
-// Sitewide "you're signed in as a mentor" indicator on every aesthetihawk
-// page (see _layouts/aesthetihawk.html), not just the mentor-specific pages.
+// Sitewide "you're signed in as a mentor" bar on every aesthetihawk page
+// (see _layouts/aesthetihawk.html), not just the mentor-specific pages.
+// Full-width and right under the header, so it's impossible to miss --
+// hidden entirely for anyone without ROLE_MENTOR, students included.
 .mentor-badge {
   position: fixed;
-  top: 63px;
-  right: 1.25rem;
+  top: 53px;
+  left: 0;
+  right: 0;
   z-index: 30;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.85rem;
-  border-radius: 8px;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
   background: rgba(76, 175, 239, 0.14);
-  border: 1px solid rgba(76, 175, 239, 0.3);
+  border-bottom: 1px solid rgba(76, 175, 239, 0.3);
   color: $accent;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.mentor-badge strong {
+  color: $text;
 }
 
 .mentor-badge__dot {
-  width: 0.45rem;
-  height: 0.45rem;
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 999px;
   background: $success-green;
 }
 
 @media (max-width: 640px) {
   .mentor-badge {
-    top: auto;
-    bottom: 1rem;
-    right: 1rem;
+    font-size: 0.78rem;
+    padding: 0.5rem 0.75rem;
   }
+}
+
+// Push the fixed sidebar and the main content wrapper down by the bar's
+// actual height (set as --mentor-bar-h by the JS that shows the bar), so
+// nothing sits underneath it. !important beats the Tailwind CDN utility
+// classes (top-[53px] / mt-[53px]) those elements also carry.
+:root { --mentor-bar-h: 0px; }
+
+body.mentor-bar-active .theme-inner {
+  margin-top: calc(53px + var(--mentor-bar-h)) !important;
+}
+
+body.mentor-bar-active .lesson-sidebar {
+  top: calc(53px + var(--mentor-bar-h)) !important;
 }
 
 .mentor-state {
