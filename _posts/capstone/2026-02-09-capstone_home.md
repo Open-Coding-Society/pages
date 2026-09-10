@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function(){
            <img src="/images/capstone/acs_logo.png" alt="Cal Center For Arts Escondido Logo" class="w-28 h-28 object-contain rounded" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-08-capstone %}">Oncology and Kids Cancer Association</a></h3>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-08-oak-cancer-capstone %}">Oncology and Kids Cancer Association</a></h3>
            <p class="text-sm text-gray-700">This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text people of all ages will be able to easily navigate, learn, and play through these new and advanced modules.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Salma, Isha, Aashi, and Emily</p>
        </div>
