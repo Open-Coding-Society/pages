@@ -6,7 +6,6 @@ tailwind: True
 infoGraph: capstone_infograph
 title: Capstone Projects
 description: Design-Based Research (DBR) capstone projects solving real-world problems through iterative design, implementation, and analysis. Each project features ML, database work, and advanced data structures (e.g., graphs). Projects must be deployed and accessible through this infographic.
-courses: {'csse': {'week': 25}}
 type: capstone
 categories: Capstone
 permalink: /capstone/
@@ -38,8 +37,8 @@ sticky_rank: 1
   display: block;
 }
 #capstone-grid > div:hover {
-  border-color: rgba(59,130,246,0.45);
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.22), 0 6px 18px rgba(0,0,0,0.2);
+  border-color: color-mix(in srgb, var(--pref-accent-color) 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pref-accent-color) 22%, transparent), 0 6px 18px rgba(0,0,0,0.2);
   transform: translateY(-2px);
 }
 
@@ -76,27 +75,28 @@ sticky_rank: 1
 }
 </style>
 
-<div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
- <div class="flex flex-wrap gap-2">
-   <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
-   <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
-   <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
-  <button id="show-csh" class="px-3 py-1 bg-blue-200 rounded mr-2">CSH</button>
-   <a href="{% post_url 2026-06-01-README-capstone %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
-     <span class="mr-2">📄</span>README
-   </a>
-   <a href="/capstone/games/" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-indigo-500 rounded text-sm text-white hover:bg-indigo-500 font-semibold" title="Browse all OCS Games">
-     <span class="mr-2">🎮</span>Games Directory
-   </a>
-   <select id="year-select" class="ml-4 px-2 py-1 rounded border border-gray-300 bg-white text-sm">
-     <option value="2026-2027" selected>2026/2027</option>
-     <option value="2025-2026">2025/2026</option>
-   </select>
- </div>
- <div class="flex flex-col items-start sm:items-end">
-   <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="w-full min-w-[240px] rounded-lg border border-gray-300 bg-white/90 px-4 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-   <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
- </div>
+<div class="ocs__grid" style="margin-bottom: 0.9rem;">
+  <div class="ocs__grid-cell">
+    <div class="ocs__links ocs__links--wide">
+      <button id="show-all" type="button" class="ocs__btn capstone-filter-btn alert-green fill" aria-pressed="true">All</button>
+      <button id="show-csa" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSA</button>
+      <button id="show-csp" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSP</button>
+      <button id="show-csh" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSH</button>
+      <select id="year-select" class="nc-select" aria-label="Filter projects by school year" style="max-width: 14rem;">
+        <option value="2026-2027" selected>2026/2027</option>
+        <option value="2025-2026">2025/2026</option>
+      </select>
+      <a href="{% post_url 2026-06-01-README-capstone %}" class="ocs__btn" title="Open Capstone Home Documentation">📄 README</a>
+      <a href="/capstone/games/" class="ocs__btn alert-green fill" title="Browse all OCS Games">🎮 Games Directory</a>
+    </div>
+  </div>
+</div>
+
+<div class="ocs__grid">
+  <div class="ocs__grid-cell">
+    <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="nc-input" />
+    <p id="search-status" class="text-xs text-gray-500" style="margin: 0.25rem 0 0;">Showing all projects.</p>
+  </div>
 </div>
 
 
@@ -117,6 +117,12 @@ document.addEventListener('DOMContentLoaded', function(){
   const cards = Array.from(document.querySelectorAll('#capstone-grid > div'));
   const searchInput = document.getElementById('project-search');
   const status = document.getElementById('search-status');
+  const typeButtons = {
+    all: document.getElementById('show-all'),
+    CSA: document.getElementById('show-csa'),
+    CSP: document.getElementById('show-csp'),
+    CSH: document.getElementById('show-csh')
+  };
   let currentType = 'all';
   let currentQuery = '';
   const yearSelect = document.getElementById('year-select');
@@ -206,8 +212,18 @@ document.addEventListener('DOMContentLoaded', function(){
     });
     updateStatus(count);
   }
+  function updateTypeButtons(){
+    Object.entries(typeButtons).forEach(([type, button])=>{
+      if(!button) return;
+      const active = type === currentType;
+      button.classList.toggle('alert-green', active);
+      button.classList.toggle('fill', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  }
   function setTypeFilter(type){
     currentType = type;
+    updateTypeButtons();
     applyFilters();
   }
   document.getElementById('show-all')?.addEventListener('click', ()=> setTypeFilter('all'));
@@ -312,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function(){
     currentQuery = normalize(event.target.value);
     applyFilters();
   });
+  updateTypeButtons();
   applyFilters();
 });
 </script>
