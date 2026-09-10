@@ -167,6 +167,11 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/greppers/",
       frontendUrl: "http://sfifoundation.opencodingsociety.com",
       backendUrl: "https://greppers-be.opencodingsociety.com/"
+    },
+    "Communication System": {
+      pageUrl: "https://pages.opencodingsociety.com/capstone/communication-system/",
+      frontendUrl: "https://github.com/UGRC-CSA/Pages",
+      backendUrl: "https://github.com/Open-Coding-Society/spring"
     }
   };
 
@@ -863,6 +868,18 @@ Below are the capstone infographic pages created by student groups. Click an ima
            <h3 class="text-lg font-semibold"><a href="{{ '/capstone/mygoodbrain/' | relative_url }}">My Good Brain</a></h3>
            <p class="text-sm text-gray-700">An interactive hub bridging psychology, neuroscience, and art to support youth mental and emotional wellness </p>
            <p class="text-xs text-gray-500 mt-2">Team: Rashi Gaurav, Aashni Katari, Kelervia Fang</p>
+       </div>
+   </div>
+
+   <!-- Communication System (CSA) -->
+  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+       <a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">
+           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - class announcement chat on the CSA course page" class="w-28 h-28 object-cover rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
+           <p class="text-sm text-gray-700">Moving class discussion out of Slack and onto the course site — class-wide announcements, per-week chat, and a rich-text composer with emoji already ship, with per-assignment threads, 1:1 direct messages, GIFs, Slack-style emoji reactions, and teacher moderation still to build.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>
 </div>

@@ -154,3 +154,11 @@
   - "vLLM"
   - "Distributed Inference"
   - "Observability"
+
+"Communication System":
+  - "Spring Boot / Java"
+  - "STOMP over SockJS"
+  - "REST at /api/groups"
+  - "JWT Cookie Auth"
+  - "JPA + S3 message store"
+  - "Jekyll Includes"
