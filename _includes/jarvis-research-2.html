@@ -10,65 +10,177 @@
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Research Area 2 · Instance Segmentation</div>
-    <h1 class="jv-page-title">Research 2: SAM 3 Segmentation</h1>
-    <p class="jv-description">Refining coarse bounding boxes into pixel-accurate segmentation masks, separating foreground objects from cluttered classroom backgrounds.</p>
+    <div class="jv-badge">Research Area 2 · Object Detection &amp; Instance Segmentation</div>
+    <h1 class="jv-page-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</h1>
+    <p class="jv-description">Converting classroom images into structured object detections, then refining each bounding box into a pixel-level segmentation mask for tracking, inventory, and scene comparison.</p>
+    <p style="font-size:0.8rem;color:var(--jv-text-muted);margin-top:0.5rem;">Individual research by <strong style="color:var(--jv-text);">Shriya Paladugu</strong></p>
+  </div>
+
+  <!-- Problem Statement -->
+  <div class="jv-section-label">Problem Statement</div>
+  <div class="jv-card">
+    <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
+      A classroom is a constantly changing environment where people and equipment enter, leave, or move locations. A camera records pixels, but raw images alone do not tell the system what objects are present or where each object appears. The project therefore needs a computer-vision pipeline that identifies classroom objects, records their confidence scores and image locations, and separates them from the surrounding background.
+    </p>
   </div>
 
   <!-- Research Question -->
   <div class="jv-section-label">Research Question 2</div>
   <div class="jv-card">
-    <p class="jv-question">How effectively can SAM 3 convert bounding box detection prompts into precise pixel masks under CPU-bound execution without exceeding the target 10-second processing cycle?</p>
-    <h3 style="margin-top:1.5rem;">Acceptance &amp; Test Cases</h3>
+    <p class="jv-question">How accurately and efficiently can a locally executed YOLO and SAM 3 pipeline detect, classify, locate, and segment important classroom objects under changing lighting, viewing angles, distance, and partial occlusion while remaining within the target 10-second processing cycle?</p>
+  </div>
+
+  <!-- Role in the Full System -->
+  <div class="jv-section-label">Role in the Full System</div>
+  <div class="jv-card">
+    <div class="jv-diagram">
+      <pre class="mermaid" style="margin:0;">flowchart TD
+    CAP["Camera capture\nTimestamped frame"] --> PRE["OpenCV / FFmpeg\nResize + preprocessing"]
+    PRE --> YOLO["YOLO\nClass + confidence + box"]
+    YOLO --> SAM["SAM 3\nPixel-level mask"]
+    SAM --> OUT["Structured observation\nDetection + mask + timestamp"]
+    OUT --> TRACK["Tracking / inventory /\nscene comparison"]</pre>
+    </div>
+    <div class="jv-callout jv-callout-note">
+      <span><strong style="color:var(--jv-text);">Why both models?</strong> YOLO identifies what an object is and provides its bounding box. SAM 3 uses that box as a prompt to trace the object's more precise pixel boundary. The segmentation mask can then support spatial comparison and object-state tracking.</span>
+    </div>
+  </div>
+
+  <!-- Target Classes -->
+  <div class="jv-section-label">Initial Target Object Classes</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">The initial prototype will evaluate six common classroom classes that can support people counting and basic equipment inventory.</p>
+    <div class="jv-decision-grid">
+      <div class="jv-decision-card"><span class="jv-decision-title">Person</span><p class="jv-decision-why">Supports occupancy counting without facial recognition.</p></div>
+      <div class="jv-decision-card"><span class="jv-decision-title">Laptop</span><p class="jv-decision-why">Represents portable classroom hardware.</p></div>
+      <div class="jv-decision-card"><span class="jv-decision-title">Backpack</span><p class="jv-decision-why">Tests detection of personal items and partial occlusion.</p></div>
+      <div class="jv-decision-card"><span class="jv-decision-title">Chair</span><p class="jv-decision-why">Provides a frequent, repeated furniture class.</p></div>
+      <div class="jv-decision-card"><span class="jv-decision-title">Bottle</span><p class="jv-decision-why">Tests small-object detection at different distances.</p></div>
+      <div class="jv-decision-card"><span class="jv-decision-title">Keyboard</span><p class="jv-decision-why">Tests recognition of specialized desk equipment.</p></div>
+    </div>
+  </div>
+
+  <!-- Structured Output -->
+  <div class="jv-section-label">Detection Output</div>
+  <div class="jv-card">
+    <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Instead of passing only raw images to later components, the pipeline creates a structured observation for every detected object.</p>
+    <pre class="jv-code" style="display:block;white-space:pre-wrap;overflow-x:auto;padding:1rem;margin:0;">{
+  "timestamp": "2026-09-07T10:15:20.000Z",
+  "camera_id": "camera_1",
+  "class": "laptop",
+  "confidence": 0.94,
+  "bounding_box": [120, 80, 420, 350],
+  "mask_reference": "camera_1_20260907_101520_laptop_01"
+}</pre>
+    <div class="jv-callout jv-callout-note">
+      <span><strong style="color:var(--jv-text);">Important limitation:</strong> A detection such as “laptop” identifies an object category, not a specific physical device such as “Laptop #3.” Persistent identity must be added later through temporal tracking, cross-camera matching, visual features, or an external identifier.</span>
+    </div>
+  </div>
+
+  <!-- Model Decisions -->
+  <div class="jv-section-label">Model Selection &amp; Technical Rationale</div>
+  <div class="jv-card">
+    <div class="jv-decision-grid">
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">YOLO Object Detection</span>
+        <p class="jv-decision-why">Recognizes multiple objects in one frame and returns a class label, confidence score, and bounding box for each detection.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Pretrained First</span>
+        <p class="jv-decision-why">Allows early testing on common objects before collecting a large custom dataset.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Custom Fine-Tuning</span>
+        <p class="jv-decision-why">Can be introduced if pretrained classes do not recognize specialized classroom equipment reliably.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">SAM 3 Refinement</span>
+        <p class="jv-decision-why">Uses YOLO boxes as prompts and produces masks that preserve object shape more precisely than rectangles.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Local Processing</span>
+        <p class="jv-decision-why">Keeps classroom data on the Linux host and avoids continuous cloud upload.</p>
+      </div>
+      <div class="jv-decision-card">
+        <span class="jv-decision-title">Resolution Scaling</span>
+        <p class="jv-decision-why">Compares 720p and 1080p inputs to balance small-object detail against CPU latency.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why Object Detection -->
+<div class="jv-section-label">Why YOLO Instead of Image Classification?</div>
+<div class="jv-card">
+  <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
+    A standard image-classification model can predict that a classroom image contains a laptop, but it does not identify every separate laptop or show where each one is located. YOLO performs both classification and localization, allowing the system to detect multiple objects in one frame and return an individual class label, confidence score, and bounding box for each object. This makes YOLO more suitable for classroom inventory, people counting, tracking, and scene comparison.
+  </p>
+</div>
+
+  <!-- Acceptance Tests -->
+  <div class="jv-section-label">Acceptance Criteria &amp; Test Cases</div>
+  <div class="jv-card">
     <ul class="jv-checklist">
-      <li class="open"><span class="jv-box"></span><span>Pass YOLO bounding box coordinates as prompt boxes to SAM 3 to generate binary pixel masks</span></li>
-      <li class="open"><span class="jv-box"></span><span>Isolate foreground object boundaries cleanly from complex textured backgrounds (e.g., desk grain, floor tiles)</span></li>
-      <li class="open"><span class="jv-box"></span><span>Produce encoded binary mask representations for lightweight storage and downstream spatial comparison</span></li>
-      <li class="open"><span class="jv-box"></span><span>Benchmark CPU inference time across frame resolutions (720p, 1080p, 4K) to preserve latency bounds</span></li>
-      <li class="open"><span class="jv-box"></span><span>Validate mask stability across sequential captures for stationary classroom furniture</span></li>
+      <li class="open"><span class="jv-box"></span><span>Capture a timestamped classroom frame and return a class label, confidence score, and bounding box for every accepted YOLO detection</span></li>
+      <li class="open"><span class="jv-box"></span><span>Evaluate all six target classes using a separate held-out test set that was not used for training</span></li>
+      <li class="open"><span class="jv-box"></span><span>Reach the project target of at least 80% correct-class detections on the held-out images and also report per-class precision, recall, and mAP50</span></li>
+      <li class="open"><span class="jv-box"></span><span>Compare detection performance under bright light, reduced light, distance, unusual viewing angles, and partial occlusion</span></li>
+      <li class="open"><span class="jv-box"></span><span>Pass YOLO bounding boxes to SAM 3 as prompt boxes and generate a binary mask for each selected object</span></li>
+      <li class="open"><span class="jv-box"></span><span>Measure mask quality using Intersection over Union on a manually labeled validation sample</span></li>
+      <li class="open"><span class="jv-box"></span><span>Measure end-to-end YOLO + SAM latency at 720p and 1080p on the actual Linux host</span></li>
+      <li class="open"><span class="jv-box"></span><span>Complete one capture-and-processing cycle within 10 seconds, or document the optimization needed to reach that target</span></li>
     </ul>
   </div>
 
-  <!-- Performance & Compute Analysis -->
-  <div class="jv-section-label">Compute Constraints &amp; Optimization</div>
+  <!-- Compute Plan -->
+  <div class="jv-section-label">Compute Constraints &amp; Benchmark Plan</div>
   <div class="jv-card">
     <div class="jv-callout jv-callout-note" style="margin-top:0;">
-      <span><strong style="color:var(--jv-text);">Current Hardware Constraint:</strong> The primary Linux host runs inference on a multi-core CPU without a dedicated NVIDIA GPU. Efficient prompt-based inference and resolution scaling are essential to maintain the 10-second capture loop.</span>
+      <span><strong style="color:var(--jv-text);">Current constraint:</strong> The primary Linux host does not have a dedicated NVIDIA GPU. All latency values must therefore be measured on the actual project hardware rather than treated as guaranteed model performance.</span>
     </div>
     <div class="jv-table-wrap" style="margin-top:1rem;">
       <table class="jv-table">
-        <thead><tr><th>Resolution Tier</th><th>Inference Latency (Est.)</th><th>Segmentation Fidelity</th><th>Viability</th></tr></thead>
+        <thead><tr><th>Resolution</th><th>What Will Be Measured</th><th>Expected Tradeoff</th><th>Status</th></tr></thead>
         <tbody>
-          <tr>
-            <td>720p (1280×720)</td>
-            <td>1.8s – 2.5s</td>
-            <td>Good for large furniture; minor boundary blur on pens/bottles</td>
-            <td><span class="jv-pill jv-pill-good">RECOMMENDED</span></td>
-          </tr>
-          <tr>
-            <td>1080p (1920×1080)</td>
-            <td>4.2s – 6.0s</td>
-            <td>High fidelity for all 6 target classes</td>
-            <td><span class="jv-pill jv-pill-good">FEASIBLE</span></td>
-          </tr>
-          <tr>
-            <td>4K (3840×2160)</td>
-            <td>14.0s+ (exceeds budget)</td>
-            <td>Pixel-perfect boundaries</td>
-            <td><span class="jv-pill jv-pill-bad">TOO SLOW (CPU)</span></td>
-          </tr>
+          <tr><td>720p (1280×720)</td><td>YOLO latency, SAM latency, total cycle time, class metrics, mask IoU</td><td>Faster processing but reduced detail for small or distant objects</td><td><span class="jv-pill jv-pill-warn">TO TEST</span></td></tr>
+          <tr><td>1080p (1920×1080)</td><td>YOLO latency, SAM latency, total cycle time, class metrics, mask IoU</td><td>More object detail with increased CPU and memory demand</td><td><span class="jv-pill jv-pill-warn">TO TEST</span></td></tr>
+          <tr><td>4K (3840×2160)</td><td>Optional comparison if lower resolutions cannot preserve required detail</td><td>Highest input detail but likely to exceed the CPU time budget</td><td><span class="jv-pill jv-pill-neutral">OPTIONAL</span></td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Next Milestones -->
+  <!-- Risks and Next Steps -->
   <div class="jv-section-label">Open Questions &amp; Next Steps</div>
   <div class="jv-card">
     <ul class="jv-checklist">
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Quantization &amp; ONNX:</strong> Evaluate int8 quantization or ONNX Runtime CPU acceleration to reduce segmentation latency.</span></li>
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Prompt Refinement:</strong> Add positive/negative centroid point prompts to prevent mask leakage between adjacent desks.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Baseline Test:</strong> Determine which target classes are already supported reliably by the pretrained YOLO model.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Dataset:</strong> Collect representative classroom images across both camera viewpoints and split them into training, validation, and held-out test sets.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Fine-Tuning:</strong> Train a custom model only for classes that do not meet the required detection performance.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Prompt Refinement:</strong> Test box prompts and optional positive/negative points when adjacent objects cause SAM mask leakage.</span></li>
+      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Optimization:</strong> Evaluate lower input resolution, model-size selection, ONNX Runtime, and quantization if the local pipeline exceeds 10 seconds.</span></li>
     </ul>
+  </div>
+
+  <!-- Sources -->
+  <div class="jv-section-label">Technical Sources</div>
+  <div class="jv-card">
+    <div class="jv-paper-grid">
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://docs.ultralytics.com/tasks/detect/" target="_blank" rel="noopener">Ultralytics Object Detection Documentation</a>
+        <span class="jv-paper-meta">Ultralytics · Official Documentation</span>
+        <ul class="jv-paper-bullets"><li>Explains object classes, confidence scores, bounding boxes, inference, training, and evaluation.</li><li>Supports the choice of YOLO as the first computer-vision stage.</li></ul>
+      </div>
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://www.tensorflow.org/hub/tutorials/object_detection" target="_blank" rel="noopener">TensorFlow Object Detection Tutorial</a>
+        <span class="jv-paper-meta">TensorFlow · Official Documentation</span>
+        <ul class="jv-paper-bullets"><li>Demonstrates pretrained object detectors and the tradeoff between speed and accuracy.</li><li>Provides background for comparing object-detection approaches.</li></ul>
+      </div>
+      <div class="jv-paper-card">
+        <a class="jv-paper-title" href="https://developers.google.com/edge/litert/libraries/modify/object_detection" target="_blank" rel="noopener">Google AI Edge Object Detection</a>
+        <span class="jv-paper-meta">Google AI Edge · Official Documentation</span>
+        <ul class="jv-paper-bullets"><li>Describes transfer learning and lightweight local deployment.</li><li>Supports possible custom training for specialized classroom classes.</li></ul>
+      </div>
+    </div>
   </div>
 
   {% include jarvis-footer.html %}
