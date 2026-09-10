@@ -6,7 +6,6 @@ tailwind: True
 infoGraph: capstone_infograph
 title: Capstone Projects
 description: Design-Based Research (DBR) capstone projects solving real-world problems through iterative design, implementation, and analysis. Each project features ML, database work, and advanced data structures (e.g., graphs). Projects must be deployed and accessible through this infographic.
-courses: {'csse': {'week': 25}}
 type: capstone
 categories: Capstone
 permalink: /capstone/
@@ -26,21 +25,52 @@ sticky_rank: 1
 <h2>Design-Based Research (DBR) Capstone Projects</h2>
 
 <style>
-#capstone-grid > div {
-  min-height: 10rem;
-  transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+.capstone-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
 }
-#capstone-grid > div a img {
-  height: 7rem;
-  width: auto;
-  max-width: 7rem;
-  object-fit: contain;
-  display: block;
+
+.capstone-card-placeholder {
+  background: #1e3a8a;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
-#capstone-grid > div:hover {
-  border-color: rgba(59,130,246,0.45);
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.22), 0 6px 18px rgba(0,0,0,0.2);
-  transform: translateY(-2px);
+
+.capstone-card-placeholder--large {
+  font-size: 1.875rem;
+}
+
+.capstone-item > a {
+  flex: 0 0 auto;
+}
+
+.capstone-item > a > :first-child:not(img) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.capstone-item > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.capstone-item__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.capstone-item__description {
+  color: color-mix(in srgb, var(--pref-text-color) 78%, transparent);
+  font-size: 0.875rem;
+}
+
+.capstone-item__team {
+  margin-top: 0.5rem;
+  color: color-mix(in srgb, var(--pref-text-color) 64%, transparent);
+  font-size: 0.75rem;
 }
 
 /* Tech stack tooltip */
@@ -62,7 +92,7 @@ sticky_rank: 1
   min-width: 160px;
   max-width: 280px;
 }
-#capstone-grid > div:hover .capstone-tech-tooltip {
+.capstone-item:hover .capstone-tech-tooltip {
   opacity: 1;
 }
 .capstone-tech-tt-tag {
@@ -76,27 +106,28 @@ sticky_rank: 1
 }
 </style>
 
-<div class="mb-4 grid gap-4 md:grid-cols-[minmax(max-content,1fr)_minmax(0,420px)] md:items-center">
- <div class="flex flex-wrap gap-2">
-   <button id="show-all" class="px-3 py-1 bg-gray-200 rounded mr-2">All</button>
-   <button id="show-csa" class="px-3 py-1 bg-blue-200 rounded mr-2">CSA</button>
-   <button id="show-csp" class="px-3 py-1 bg-blue-200 rounded mr-2">CSP</button>
-  <button id="show-csh" class="px-3 py-1 bg-blue-200 rounded mr-2">CSH</button>
-   <a href="{% post_url 2026-06-01-README-capstone %}" class="inline-flex items-center px-3 py-1 bg-white border border-gray-300 rounded text-sm text-slate-900 hover:bg-gray-100" title="Open Capstone Home Documentation">
-     <span class="mr-2">📄</span>README
-   </a>
-   <a href="/capstone/games/" class="inline-flex items-center px-3 py-1 bg-indigo-600 border border-indigo-500 rounded text-sm text-white hover:bg-indigo-500 font-semibold" title="Browse all OCS Games">
-     <span class="mr-2">🎮</span>Games Directory
-   </a>
-   <select id="year-select" class="ml-4 px-2 py-1 rounded border border-gray-300 bg-white text-sm">
-     <option value="2026-2027" selected>2026/2027</option>
-     <option value="2025-2026">2025/2026</option>
-   </select>
- </div>
- <div class="flex flex-col items-start sm:items-end">
-   <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="w-full min-w-[240px] rounded-lg border border-gray-300 bg-white/90 px-4 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-300" />
-   <p id="search-status" class="mt-2 text-xs text-gray-500">Showing all projects.</p>
- </div>
+<div class="ocs__grid" style="margin-bottom: 0.9rem;">
+  <div class="ocs__grid-cell">
+    <div class="ocs__links ocs__links--wide">
+      <button id="show-all" type="button" class="ocs__btn capstone-filter-btn alert-green fill" aria-pressed="true">All</button>
+      <button id="show-csa" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSA</button>
+      <button id="show-csp" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSP</button>
+      <button id="show-csh" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSH</button>
+      <select id="year-select" class="nc-select" aria-label="Filter projects by school year" style="max-width: 14rem;">
+        <option value="2026-2027" selected>2026/2027</option>
+        <option value="2025-2026">2025/2026</option>
+      </select>
+      <a href="{% post_url 2026-06-01-README-capstone %}" class="ocs__btn" title="Open Capstone Home Documentation">📄 README</a>
+      <a href="/capstone/games/" class="ocs__btn alert-green fill" title="Browse all OCS Games">🎮 Games Directory</a>
+    </div>
+  </div>
+</div>
+
+<div class="ocs__grid">
+  <div class="ocs__grid-cell">
+    <input id="project-search" type="search" placeholder="Search projects, descriptions, or team members" class="nc-input" />
+    <p id="search-status" class="text-xs text-gray-500" style="margin: 0.25rem 0 0;">Showing all projects.</p>
+  </div>
 </div>
 
 
@@ -117,6 +148,12 @@ document.addEventListener('DOMContentLoaded', function(){
   const cards = Array.from(document.querySelectorAll('#capstone-grid > div'));
   const searchInput = document.getElementById('project-search');
   const status = document.getElementById('search-status');
+  const typeButtons = {
+    all: document.getElementById('show-all'),
+    CSA: document.getElementById('show-csa'),
+    CSP: document.getElementById('show-csp'),
+    CSH: document.getElementById('show-csh')
+  };
   let currentType = 'all';
   let currentQuery = '';
   const yearSelect = document.getElementById('year-select');
@@ -206,8 +243,18 @@ document.addEventListener('DOMContentLoaded', function(){
     });
     updateStatus(count);
   }
+  function updateTypeButtons(){
+    Object.entries(typeButtons).forEach(([type, button])=>{
+      if(!button) return;
+      const active = type === currentType;
+      button.classList.toggle('alert-green', active);
+      button.classList.toggle('fill', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  }
   function setTypeFilter(type){
     currentType = type;
+    updateTypeButtons();
     applyFilters();
   }
   document.getElementById('show-all')?.addEventListener('click', ()=> setTypeFilter('all'));
@@ -256,7 +303,8 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   cards.forEach(card=>{
-    card.classList.add('relative');
+    card.classList.add('ocs__grid-cell', 'relative');
+    card.querySelector('a > img')?.classList.add('ocs__image-frame--card');
     const titleAnchor = card.querySelector('h3 a');
     if(titleAnchor){
       const cardTitle = titleAnchor.textContent.trim();
@@ -312,586 +360,584 @@ document.addEventListener('DOMContentLoaded', function(){
     currentQuery = normalize(event.target.value);
     applyFilters();
   });
+  updateTypeButtons();
   applyFilters();
 });
 </script>
 
-Below are the capstone infographic pages created by student groups. Click an image or title to open the full infographic and project page.
-
-<div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
-
+<div id="capstone-grid" class="ocs__grid ocs__grid--standard">
 
    <!-- SFI Foundation 2026–27 (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP"
+   <div class="ocs__grid-cell  capstone-item CSP"
         data-year="2026-2027"
         data-page-url="{{ '/capstone/sfi-foundation/' | relative_url }}"
         data-frontend-url="https://github.com/ruhaanb622/SFI-Frontend"
         data-backend-url="https://github.com/ruhaanb622/SFI-Backend">
        <a href="{{ '/capstone/sfi-foundation/' | relative_url }}">
-           <img src="{{ '/images/capstone/sfi-foundation-2026-27.png' | relative_url }}" alt="SFI Foundation 2026–27" class="w-28 h-28 object-cover rounded" />
+           <img src="{{ '/images/capstone/sfi-foundation-2026-27.png' | relative_url }}" alt="SFI Foundation 2026–27" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/sfi-foundation/' | relative_url }}">SFI Foundation 2026–27</a></h3>
-           <p class="text-sm text-gray-700">A CSP capstone continuing the SFI Foundation modernization prototype with searchable safety standards, ML-assisted spec matching, browser-based equipment detection, personal gear tracking, and staff management tools.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Ruhaan Bansal, Arya Taghavi Zargar, Deyar Raissadat, Ishan Jha, Ishan Khandelwal, Vayun Shekhar</p>
+           <h3 class="capstone-item__title"><a href="{{ '/capstone/sfi-foundation/' | relative_url }}">SFI Foundation 2026–27</a></h3>
+           <p class="capstone-item__description">A CSP capstone continuing the SFI Foundation modernization prototype with searchable safety standards, ML-assisted spec matching, browser-based equipment detection, personal gear tracking, and staff management tools.</p>
+           <p class="capstone-item__team">Team: Ruhaan Bansal, Arya Taghavi Zargar, Deyar Raissadat, Ishan Jha, Ishan Khandelwal, Vayun Shekhar</p>
        </div>
    </div>
   
    <!-- Submissions Capstone (umbrella issue: AAA, Submission Analytics, AI Grading) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+   <div class="ocs__grid-cell  capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-31-submissions-capstone %}">
-           <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #06b6d4, #0f172a);">SUB</div>
+           <div class="ocs__image-frame ocs__image-frame--card capstone-card-placeholder" style="background: linear-gradient(135deg, #06b6d4, #0f172a);">SUB</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Submissions</a></h3>
-           <p class="text-sm text-gray-700">Umbrella capstone covering three groups' work on the assignment/submission system: assignment creator permissions, submission analytics, and AI grading.</p>
-           <p class="text-xs text-gray-500 mt-2">Groups: Assignment Creator Permissions, Submission Analytics, AI Grading</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-08-31-submissions-capstone %}">OCS Submissions</a></h3>
+           <p class="capstone-item__description">Umbrella capstone covering three groups' work on the assignment/submission system: assignment creator permissions, submission analytics, and AI grading.</p>
+           <p class="capstone-item__team">Groups: Assignment Creator Permissions, Submission Analytics, AI Grading</p>
        </div>
    </div>
 
 
    <!-- UESL Accessible Game Maker 2.0 (CSP, 2026/2027) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
+   <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
        <a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">
-           <img src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation logo — shield with game controller" class="w-28 h-28 object-cover rounded" />
+           <img src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation logo — shield with game controller" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">UESL Accessible Game Maker 2.0</a></h3>
-           <p class="text-sm text-gray-700">An accessible game creation platform guiding participants through templates, live themes, and IDD-focused comfort profiles before keyboard-friendly playtesting. Versioned state validates choices, restores browser drafts, and exports engine-ready configurations for UESL’s advanced editor and GameEnginev1.2.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Ishan, Rohan, Adhvay</p>
+           <h3 class="capstone-item__title"><a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">UESL Accessible Game Maker 2.0</a></h3>
+           <p class="capstone-item__description">An accessible game creation platform guiding participants through templates, live themes, and IDD-focused comfort profiles before keyboard-friendly playtesting. Versioned state validates choices, restores browser drafts, and exports engine-ready configurations for UESL’s advanced editor and GameEnginev1.2.</p>
+           <p class="capstone-item__team">Team: Ishan, Rohan, Adhvay</p>
        </div>
    </div>
 
 
    <!-- RFID + Camera-Correlated Classroom Presence -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
+   <div class="ocs__grid-cell  capstone-item CSH" data-year="2026-2027">
      <a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">
-       <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">RFID</div>
+       <div class="ocs__image-frame ocs__image-frame--card capstone-card-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">RFID</div>
      </a>
      <div>
-       <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">RFID + Camera-Correlated Classroom Presence</a></h3>
-       <p class="text-sm text-gray-700">A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.</p>
-       <p class="text-xs text-gray-500 mt-2">Team: Ruta Sirdeshmukh, Vibha Mandayam, Kush Shah</p>
+       <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-08-28-rfid-presence-capstone %}">RFID + Camera-Correlated Classroom Presence</a></h3>
+       <p class="capstone-item__description">A low-cost Raspberry Pi UHF RFID system that tracks device presence at the doorway and correlates it with an existing face-scanning camera system to determine true student presence, period by period.</p>
+       <p class="capstone-item__team">Team: Ruta Sirdeshmukh, Vibha Mandayam, Kush Shah</p>
      </div>
    </div>
 
 
      <!-- Jarvis Classroom Object Detection -->
-     <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
+     <div class="ocs__grid-cell  capstone-item CSH" data-year="{{ site.data.jarvis_infograph.Year }}" data-frontend-url="{{ site.data.jarvis_infograph.Repo }}">
        <a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">
-         <img src="{{ '/images/' | append: site.data.jarvis_infograph.Image | relative_url }}" alt="{{ site.data.jarvis_infograph.Title }}" class="w-28 h-28 object-cover rounded" />
+         <img src="{{ '/images/' | append: site.data.jarvis_infograph.Image | relative_url }}" alt="{{ site.data.jarvis_infograph.Title }}" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">{{ site.data.jarvis_infograph.Title }}</a></h3>
-         <p class="text-sm text-gray-700">{{ site.data.jarvis_infograph.Description }}</p>
-         <p class="text-xs text-gray-500 mt-2">Team: {{ site.data.jarvis_infograph.Team | join: ", " }}</p>
+         <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-09-01-jarvis-capstone %}">{{ site.data.jarvis_infograph.Title }}</a></h3>
+         <p class="capstone-item__description">{{ site.data.jarvis_infograph.Description }}</p>
+         <p class="capstone-item__team">Team: {{ site.data.jarvis_infograph.Team | join: ", " }}</p>
        </div>
      </div>
 
 
    <!-- Big Six & Code Hub -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-03-04-big6-capstone %}">
-           <img src="/images/capstone/backend.png" alt="Big Six & Code Hub — Interactive CS Learning Modules" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/backend.png" alt="Big Six & Code Hub — Interactive CS Learning Modules" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-03-04-big6-capstone %}">Big Six & Code Hub</a></h3>
-           <p class="text-sm text-gray-700">The Big Six is a suite of six interactive CS lessons (Frontend, Backend, Data Visualization, Resume, AI, Analytics). Code Hub is the RPG game level where students walk up to three robot terminals — each teaching a core discipline — with a Space Invaders quiz gating progression to the next terminal.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Alex, Travis</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-03-04-big6-capstone %}">Big Six & Code Hub</a></h3>
+           <p class="capstone-item__description">The Big Six is a suite of six interactive CS lessons (Frontend, Backend, Data Visualization, Resume, AI, Analytics). Code Hub is the RPG game level where students walk up to three robot terminals — each teaching a core discipline — with a Space Invaders quiz gating progression to the next terminal.</p>
+           <p class="capstone-item__team">Team: Alex, Travis</p>
        </div>
    </div>
 
 
    <!-- Assignment Resources Platform -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">
-         <img src="/images/capstone/database_defenders.png" alt="Assignment Resources Platform - Assignment-scoped File & URL Resources" class="w-28 h-28 object-cover rounded" />
+         <img src="/images/capstone/database_defenders.png" alt="Assignment Resources Platform - Assignment-scoped File & URL Resources" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">Assignment Resources Platform</a></h3>
-         <p class="text-sm text-gray-700">A full-stack assignment resource platform with assignment-scoped URL/file uploads, uploader metadata, auditing, and secure download links — integrated with spring-tracking assignment APIs.</p>
-         <p class="text-xs text-gray-500 mt-2">Team: Anvay Vahia, Mihir Bapat, Yash Parikh</p>
+         <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-02-06-slack-messaging-capstone %}">Assignment Resources Platform</a></h3>
+         <p class="capstone-item__description">A full-stack assignment resource platform with assignment-scoped URL/file uploads, uploader metadata, auditing, and secure download links — integrated with spring-tracking assignment APIs.</p>
+         <p class="capstone-item__team">Team: Anvay Vahia, Mihir Bapat, Yash Parikh</p>
        </div>
      </div>
 
 
    <!-- Educators Capstone -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-02-06-educators-capstone %}">
-           <img src="/images/capstone/educators_icon.png" alt="Educators - Temporal Wayfinding for CS Learning" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/educators_icon.png" alt="Educators - Temporal Wayfinding for CS Learning" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-educators-capstone %}">Educators</a></h3>
-           <p class="text-sm text-gray-700">An educational platform that helps CS newcomers build mental models for temporal problem-solving in software development.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Nithika Vivek, Eshika Pallpotu, Saanvi Dogra</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-02-06-educators-capstone %}">Educators</a></h3>
+           <p class="capstone-item__description">An educational platform that helps CS newcomers build mental models for temporal problem-solving in software development.</p>
+           <p class="capstone-item__team">Team: Nithika Vivek, Eshika Pallpotu, Saanvi Dogra</p>
        </div>
    </div>
 
 
      <!-- OCS Intelligence LLM -->
-     <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSH" data-year="2026-2027">
+     <div class="ocs__grid-cell  capstone-item CSH" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">
-         <img src="/images/capstone/ocs-intelligence.png" alt="OCS Intelligence LLM - Shared AI Infrastructure for Students" class="w-28 h-28 object-cover rounded" />
+         <img src="/images/capstone/ocs-intelligence.png" alt="OCS Intelligence LLM - Shared AI Infrastructure for Students" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">OCS Intelligence LLM</a></h3>
-         <p class="text-sm text-gray-700">A generously donated 8× GTX 1070 rack becomes a shared open-weight LLM for OCS: live access from student harnesses, every student in mind, electricity as the only ongoing cost.</p>
-         <p class="text-xs text-gray-500 mt-2">Team: Nikhil Maturi, Adi Katre, Mihir Bapat, Yash Parikh, Anvay Vahia, Yash Patil</p>
+         <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-08-31-ocs-intelligence-capstone %}">OCS Intelligence LLM</a></h3>
+         <p class="capstone-item__description">A generously donated 8× GTX 1070 rack becomes a shared open-weight LLM for OCS: live access from student harnesses, every student in mind, electricity as the only ongoing cost.</p>
+         <p class="capstone-item__team">Team: Nikhil Maturi, Adi Katre, Mihir Bapat, Yash Parikh, Anvay Vahia, Yash Patil</p>
        </div>
      </div>
 
 
    <!-- Toolchain Trail -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+   <div class="ocs__grid-cell  capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-28-toolchain-trail %}">
-         <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="w-28 h-28 object-cover rounded" />
+         <img src="{{ '/images/' | append: site.data.toolchain-trail-capstone.Logo | relative_url }}" alt="{{ site.data.toolchain-trail-capstone.Title }} logo" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-         <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-28-toolchain-trail %}">Toolchain Trail</a></h3>
-         <p class="text-sm text-gray-700">{{ site.data.toolchain-trail-capstone.Overview }}</p>
+         <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-08-28-toolchain-trail %}">Toolchain Trail</a></h3>
+         <p class="capstone-item__description">{{ site.data.toolchain-trail-capstone.Overview }}</p>
        </div>
    </div>
 
 
    <!-- Hunger Heroes -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-02-06-hunger-heroes-capstone %}">
-           <img src="/images/capstone/hunger_heroes.svg" alt="Hunger Heroes - Food Redistribution Platform" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/hunger_heroes.svg" alt="Hunger Heroes - Food Redistribution Platform" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-hunger-heroes-capstone %}">Hunger Heroes</a></h3>
-           <p class="text-sm text-gray-700">A community-driven platform connecting restaurants, grocery stores, and individuals with excess fresh food to local shelters, food banks, and families in need.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Ahaan, Shaurya, Arnav</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-02-06-hunger-heroes-capstone %}">Hunger Heroes</a></h3>
+           <p class="capstone-item__description">A community-driven platform connecting restaurants, grocery stores, and individuals with excess fresh food to local shelters, food banks, and families in need.</p>
+           <p class="capstone-item__team">Team: Ahaan, Shaurya, Arnav</p>
        </div>
    </div>
 
 
    <!-- Quant Game -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-02-06-quant-game-capstone %}">
-           <img src="/images/capstone/quant-trading-game.png" alt="Quantitative Trading Bot capstone infographic preview image" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/quant-trading-game.png" alt="Quantitative Trading Bot capstone infographic preview image" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-06-quant-game-capstone %}">Quantitative Trading Bot</a></h3>
-           <p class="text-sm text-gray-700">We are developing a quantitative trading bot that predicts short-term stock movement using market indicators and real-time financial news sentiment.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Anvay, Sai, Aashray</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-02-06-quant-game-capstone %}">Quantitative Trading Bot</a></h3>
+           <p class="capstone-item__description">We are developing a quantitative trading bot that predicts short-term stock movement using market indicators and real-time financial news sentiment.</p>
+           <p class="capstone-item__team">Team: Anvay, Sai, Aashray</p>
        </div>
    </div>
 
 
    <!-- Bud-E -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-02-08-bud-e-capstone %}">
-           <img src="/images/capstone/bud_e.png" alt="Bud-E - Productivity Gamification Through Virtual Pet" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/bud_e.png" alt="Bud-E - Productivity Gamification Through Virtual Pet" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-08-bud-e-capstone %}">Bud-E</a></h3>
-           <p class="text-sm text-gray-700">Bud-E is a browser extension that gamifies productivity through a persistent virtual pet that grows when users stay focused on whitelisted websites and degrades when they navigate to distracting sites.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aadi Bhat, Pranav Santhosh, Nolan Hightower</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-02-08-bud-e-capstone %}">Bud-E</a></h3>
+           <p class="capstone-item__description">Bud-E is a browser extension that gamifies productivity through a persistent virtual pet that grows when users stay focused on whitelisted websites and degrades when they navigate to distracting sites.</p>
+           <p class="capstone-item__team">Team: Aadi Bhat, Pranav Santhosh, Nolan Hightower</p>
        </div>
    </div>
 
 
    <!-- Granolaa -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-02-08-granolaa-capstone %}">
-           <img src="/images/capstone/granolaa.png" alt="Granolaa - Local-First Screen and Webcam Monitoring" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/granolaa.png" alt="Granolaa - Local-First Screen and Webcam Monitoring" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-08-granolaa-capstone %}">Granolaa</a></h3>
-           <p class="text-sm text-gray-700">Granolaa is a local monitoring application that streams live screen and webcam feeds over local HTTP URLs, viewable in any browser without cloud infrastructure.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aadi Bhat, Pranav Santhosh, Nolan Hightower</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-02-08-granolaa-capstone %}">Granolaa</a></h3>
+           <p class="capstone-item__description">Granolaa is a local monitoring application that streams live screen and webcam feeds over local HTTP URLs, viewable in any browser without cloud infrastructure.</p>
+           <p class="capstone-item__team">Team: Aadi Bhat, Pranav Santhosh, Nolan Hightower</p>
        </div>
    </div>
 
 
    <!-- Wayfinding Pages -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-02-08-wayfinding-pages-capstone %}">
-           <img src="/images/capstone/wayfinding_logo.png" alt="Wayfinding Pages - Sorting Groups Based on your Persona" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/wayfinding_logo.png" alt="Wayfinding Pages - Sorting Groups Based on your Persona" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-02-08-wayfinding-pages-capstone %}">Wayfinding Pages</a></h3>
-           <p class="text-sm text-gray-700">A system that transforms social collaboration from subjective evaluation into measurable, visible signals for team formation and persona-based matching.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Ruta, Vibha, Risha</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-02-08-wayfinding-pages-capstone %}">Wayfinding Pages</a></h3>
+           <p class="capstone-item__description">A system that transforms social collaboration from subjective evaluation into measurable, visible signals for team formation and persona-based matching.</p>
+           <p class="capstone-item__team">Team: Ruta, Vibha, Risha</p>
        </div>
    </div>
 
    <!-- Greppers -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-04-greppers-capstone %}">
-           <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-3xl font-bold rounded">SFI</div>
+           <div class="ocs__image-frame ocs__image-frame--card capstone-card-placeholder capstone-card-placeholder--large">SFI</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-greppers-capstone %}">SFI Foundation</a></h3>
-           <p class="text-sm text-gray-700">SFI Foundation web modernization — ML-powered spec search, QR-based manufacturer verification, and a mobile-first UI redesign for motorsports safety certification.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aditya Srivastava, Dhyan Soni, Aaryav Lal</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-04-greppers-capstone %}">SFI Foundation</a></h3>
+           <p class="capstone-item__description">SFI Foundation web modernization — ML-powered spec search, QR-based manufacturer verification, and a mobile-first UI redesign for motorsports safety certification.</p>
+           <p class="capstone-item__team">Team: Aditya Srivastava, Dhyan Soni, Aaryav Lal</p>
        </div>
    </div>
 
 
   <!-- Oasis Capstone -->
-  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+  <div class="ocs__grid-cell  capstone-item CSA">
       <a href="{% post_url 2026-03-04-oasis-community-capstone %}">
-          <img src="/images/capstone/oasis-logo.png" alt="Oasis Capstone" class="w-28 h-28 object-cover rounded" />
+          <img src="/images/capstone/oasis-logo.png" alt="Oasis Capstone" class="ocs__image-frame ocs__image-frame--card" />
       </a>
       <div>
-          <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-oasis-community-capstone %}">Oasis</a></h3>
-          <p class="text-sm text-gray-700">A community building game focused on growing individual relationships and creating a community from that. This project is in relation to the non profit San Diego Oasis</p>
-          <p class="text-xs text-gray-500 mt-2">Team: Spencer, Nora</p>
+          <h3 class="capstone-item__title"><a href="{% post_url 2026-03-04-oasis-community-capstone %}">Oasis</a></h3>
+          <p class="capstone-item__description">A community building game focused on growing individual relationships and creating a community from that. This project is in relation to the non profit San Diego Oasis</p>
+          <p class="capstone-item__team">Team: Spencer, Nora</p>
       </div>
   </div>
 
 
   <!-- Kora Capstone -->
-  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+  <div class="ocs__grid-cell  capstone-item CSA">
       <a href="{% post_url 2026-02-06-kora-capstone %}">
-          <img src="/images/capstone/kora.png" alt="Kora Capstone" class="w-28 h-28 object-cover rounded" />
+          <img src="/images/capstone/kora.png" alt="Kora Capstone" class="ocs__image-frame ocs__image-frame--card" />
       </a>
       <div>
-          <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-kora-capstone %}">Kora Capstone</a></h3>
-          <p class="text-sm text-gray-700">An AI-native property maintenance operating system that automates tenant requests, triages problems, matches vendors, and keeps operations moving without manual coordination.</p>
-          <p class="text-xs text-gray-500 mt-2">Team: Manas, Akshay</p>
+          <h3 class="capstone-item__title"><a href="{% post_url 2026-02-06-kora-capstone %}">Kora Capstone</a></h3>
+          <p class="capstone-item__description">An AI-native property maintenance operating system that automates tenant requests, triages problems, matches vendors, and keeps operations moving without manual coordination.</p>
+          <p class="capstone-item__team">Team: Manas, Akshay</p>
       </div>
   </div>
 
 
    <!-- Pirna Pages -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url 2026-02-13-pirna-capstone %}">
-           <img src="/images/capstone/pirna_logo.png" alt="AutoTriage - Triage project" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/pirna_logo.png" alt="AutoTriage - Triage project" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-13-pirna-capstone %}">Pirna</a></h3>
-           <p class="text-sm text-gray-700">Improve group-level communication and engagement on OCS through an integrated messaging system, while generating practical design principles for scalable, analytics-informed collaborative tools in educational platforms.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Nikhil, Rohan, Adi</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-02-13-pirna-capstone %}">Pirna</a></h3>
+           <p class="capstone-item__description">Improve group-level communication and engagement on OCS through an integrated messaging system, while generating practical design principles for scalable, analytics-informed collaborative tools in educational platforms.</p>
+           <p class="capstone-item__team">Team: Nikhil, Rohan, Adi</p>
        </div>
    </div>
 
    <!-- AP CSA Exam Simulator -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url capstone/2026-05-19-exam-simulator-capstone %}">
-           <div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #4CAFEF, #667eea);">FRQ</div>
+           <div class="ocs__image-frame ocs__image-frame--card capstone-card-placeholder" style="background: linear-gradient(135deg, #4CAFEF, #667eea);">FRQ</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-05-19-exam-simulator-capstone %}">AP CSA Exam Simulator</a></h3>
-           <p class="text-sm text-gray-700">A timed AP CSA Section II (Free Response) exam simulator with 19 official FRQ sets (2005–2025), integrated Java code editors, 90–105 min timed sessions, and AI-powered Gemini grading.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Kush Shah</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-05-19-exam-simulator-capstone %}">AP CSA Exam Simulator</a></h3>
+           <p class="capstone-item__description">A timed AP CSA Section II (Free Response) exam simulator with 19 official FRQ sets (2005–2025), integrated Java code editors, 90–105 min timed sessions, and AI-powered Gemini grading.</p>
+           <p class="capstone-item__team">Team: Kush Shah</p>
        </div>
    </div>
 
    <!-- Poway Symphonic Orchestra Capstone -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{{ '/capstone/powayorchestra/' | relative_url }}">
-           <div class="w-28 h-28 overflow-hidden rounded bg-white">
-               <img src="{{ '/images/pso_logo.png' | relative_url }}" alt="Poway Symphony Orchestra logo" class="w-full h-full object-cover scale-125" />
+         <div class="ocs__image-frame ocs__image-frame--cover ocs__image-frame--card">
+           <img src="{{ '/images/pso_logo.png' | relative_url }}" alt="Poway Symphony Orchestra logo" />
            </div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/powayorchestra/' | relative_url }}">Poway Symphony Orchestra</a></h3>
-           <p class="text-sm text-gray-700">A design-based research capstone focused on improving the orchestra's digital presence through accessible navigation, stronger storytelling, responsive design, and clearer paths to attend, support, and explore performances.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Wi-Fighters (Meryl, Kailyn, Hope, Laya)</p>
+           <h3 class="capstone-item__title"><a href="{{ '/capstone/powayorchestra/' | relative_url }}">Poway Symphony Orchestra</a></h3>
+           <p class="capstone-item__description">A design-based research capstone focused on improving the orchestra's digital presence through accessible navigation, stronger storytelling, responsive design, and clearer paths to attend, support, and explore performances.</p>
+           <p class="capstone-item__team">Team: Wi-Fighters (Meryl, Kailyn, Hope, Laya)</p>
        </div>
    </div>
 
    <!-- Poway NEC -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-06-powaynec-capstone %}">
-           <img src="/images/capstone/powaynec-logo-white.png" alt="Poway NEC logo" class="w-56 h-32 object-contain rounded bg-emerald-950 p-2" />
+           <img src="/images/capstone/powaynec-logo-white.png" alt="Poway NEC logo" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
-           <p class="text-sm text-gray-700">Poway NEC capstone updates for preparedness access, including live risk information, emergency learning games, a chatbot, and account tools for volunteer coordination.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aneesh, Ethan, Samarth</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
+           <p class="capstone-item__description">Poway NEC capstone updates for preparedness access, including live risk information, emergency learning games, a chatbot, and account tools for volunteer coordination.</p>
+           <p class="capstone-item__team">Team: Aneesh, Ethan, Samarth</p>
        </div>
    </div>
 
    <!-- HawkHub -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA">
+   <div class="ocs__grid-cell  capstone-item CSA">
        <a href="{% post_url 2026-02-06-hawkhub %}">
-           <img src="/images/capstone/hawkhub.png" alt="HawkHub" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/hawkhub.png" alt="HawkHub" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-02-06-hawkhub %}">HawkHub</a></h3>
-           <p class="text-sm text-gray-700">A club management and community platform designed to streamline student-led club operations, engagement tracking, and leadership development.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Avika, Soni, Samhita</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-02-06-hawkhub %}">HawkHub</a></h3>
+           <p class="capstone-item__description">A club management and community platform designed to streamline student-led club operations, engagement tracking, and leadership development.</p>
+           <p class="capstone-item__team">Team: Avika, Soni, Samhita</p>
        </div>
    </div>
    
    <!-- Doing Exceptional Deeds -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-09-doing-exceptional-deeds %}">
-           <img src="/images/capstone/doing_exceptional_deeds.png" alt="Doing Exceptional Deeds - D.A.D. Non-profit Extension" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/doing_exceptional_deeds.png" alt="Doing Exceptional Deeds - D.A.D. Non-profit Extension" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-doing-exceptional-deeds %}">Doing Exceptional Deeds</a></h3>
-           <p class="text-sm text-gray-700">An extension for the Doing Exceptional Deeds non-profit website, uplifting individuals and strengthening communities through education-first programs.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: William Windle, Ethan Wong, Nicolas Diaz</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-09-doing-exceptional-deeds %}">Doing Exceptional Deeds</a></h3>
+           <p class="capstone-item__description">An extension for the Doing Exceptional Deeds non-profit website, uplifting individuals and strengthening communities through education-first programs.</p>
+           <p class="capstone-item__team">Team: William Windle, Ethan Wong, Nicolas Diaz</p>
        </div>
    </div>
                                     
    <!-- ACS Cancer Infograph (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-05-acs-cancer-infograph %}">
-           <img src="/images/capstone/acs_logo.png" alt="ACS Cancer Infograph — Interactive Body Map for Cancer Information" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/acs_logo.png" alt="ACS Cancer Infograph — Interactive Body Map for Cancer Information" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-acs-cancer-infograph %}">ACS Cancer Infograph</a></h3>
-           <p class="text-sm text-gray-700">Interactive human-body diagram consolidating ACS cancer information into one visual interface, letting users navigate by body region.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aashika, Anwita, Varada</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-05-acs-cancer-infograph %}">ACS Cancer Infograph</a></h3>
+           <p class="capstone-item__description">Interactive human-body diagram consolidating ACS cancer information into one visual interface, letting users navigate by body region.</p>
+           <p class="capstone-item__team">Team: Aashika, Anwita, Varada</p>
        </div>
    </div>
 
 
    <!-- Poway Woman's Club Capstone (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-09-poway-womans-club %}">
-           <img src="/images/capstone/pwc_logo.png" alt="Poway Woman's Club — Website Refurbishment" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/pwc_logo.png" alt="Poway Woman's Club — Website Refurbishment" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-womans-club %}">Poway Woman's Club</a></h3>
-           <p class="text-sm text-gray-700">Modernizing a 65-year-old community nonprofit's web presence with member portals, online payments, and a fresh UI — while preserving the heart of the original site.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Evan S, Maya D, Cyrus Z</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-09-poway-womans-club %}">Poway Woman's Club</a></h3>
+           <p class="capstone-item__description">Modernizing a 65-year-old community nonprofit's web presence with member portals, online payments, and a fresh UI — while preserving the heart of the original site.</p>
+           <p class="capstone-item__team">Team: Evan S, Maya D, Cyrus Z</p>
        </div>
    </div>
 
    <!-- UESL Foundation Capstone (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-05-uesl-capstone %}">
-           <img src="/images/capstone/uesl_foundation.svg" alt="Unified Esports League Foundation logo — shield with game controller" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/uesl_foundation.svg" alt="Unified Esports League Foundation logo — shield with game controller" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-05-uesl-capstone %}">UESL Foundation</a></h3>
-           <p class="text-sm text-gray-700">Built an AI chatbot, accessible game engine with 8 IDD-friendly modes, and a social platform to extend UESL's reach for individuals with intellectual and developmental disabilities across San Diego.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Sathwik Kintada, Rudra B Joshi, Darshan</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-05-uesl-capstone %}">UESL Foundation</a></h3>
+           <p class="capstone-item__description">Built an AI chatbot, accessible game engine with 8 IDD-friendly modes, and a social platform to extend UESL's reach for individuals with intellectual and developmental disabilities across San Diego.</p>
+           <p class="capstone-item__team">Team: Sathwik Kintada, Rudra B Joshi, Darshan</p>
        </div>
    </div>
 
    <!-- DeFlock SD Capstone (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-06-deflock-sd %}">
-           <img src="/images/capstone/deflock-sd.png" alt="DeFlock SD - Fighting Mass Surveillance" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/deflock-sd.png" alt="DeFlock SD - Fighting Mass Surveillance" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-deflock-sd %}">DeFlock SD</a></h3>
-           <p class="text-sm text-gray-700">Crowdsourced map and tools to document ALPR surveillance in San Diego and support community resistance.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: TheFlockers (Adhav, Lucas, Perry)</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-06-deflock-sd %}">DeFlock SD</a></h3>
+           <p class="capstone-item__description">Crowdsourced map and tools to document ALPR surveillance in San Diego and support community resistance.</p>
+           <p class="capstone-item__team">Team: TheFlockers (Adhav, Lucas, Perry)</p>
        </div>
    </div>
 
    <!-- Soroptimist International of Poway (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-08-sip-infograph %}">
-           <img src="/images/sip/sip_logo.png" alt="Soroptimist International of Poway - Site Analysis" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/sip/sip_logo.png" alt="Soroptimist International of Poway - Site Analysis" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-sip-infograph %}">Soroptimist International of Poway</a></h3>
-           <p class="text-sm text-gray-700">We analyzed sipoway.com to document the organization's programs and recommend UI improvements that help donors, volunteers, and program applicants take action.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-08-sip-infograph %}">Soroptimist International of Poway</a></h3>
+           <p class="capstone-item__description">We analyzed sipoway.com to document the organization's programs and recommend UI improvements that help donors, volunteers, and program applicants take action.</p>
+           <p class="capstone-item__team">Team: Anishka Sanghvi, Michelle Ji, Krishna Visvanath</p>
        </div>
    </div>
 
    <!-- Sentri (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-04-sentri-capstone %}">
-           <img src="/images/capstone/sentri.png" alt="Sentri" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/sentri.png" alt="Sentri" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-sentri-capstone %}">Sentri</a></h3>
-           <p class="text-sm text-gray-700">A comprehensive recovery ecosystem for the Poway Recovery Center that utilizes an intelligent guide to match users with specialized support programs, provides personalized meeting schedules, and tracks long-term sobriety milestones through a secure, high-fidelity user profile/dashboard</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-04-sentri-capstone %}">Sentri</a></h3>
+           <p class="capstone-item__description">A comprehensive recovery ecosystem for the Poway Recovery Center that utilizes an intelligent guide to match users with specialized support programs, provides personalized meeting schedules, and tracks long-term sobriety milestones through a secure, high-fidelity user profile/dashboard</p>
+           <p class="capstone-item__team">Team: Lilian Wu, Anika Marathe, Jaynee Chauhan</p>
         </div>
     </div>
 
    <!-- Integra (CSP 26-27) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+   <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
        <a href="{% post_url 2026-03-04-sentri-capstone %}">
-           <img src="/images/capstone/sentri.png" alt="Sentri" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/sentri.png" alt="Sentri" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-04-sentri-capstone %}">Integra</a></h3>
-           <p class="text-sm text-gray-700">An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-04-sentri-capstone %}">Integra</a></h3>
+           <p class="capstone-item__description">An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
+           <p class="capstone-item__team">Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
        </div>
    </div>
    
    <!-- Friends of the Poway Library  (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-09-poway-library %}">
-           <img src="/images/capstone/poway_library.png" alt="Friends of the Poway Library" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/poway_library.png" alt="Friends of the Poway Library" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
-           <p class="text-sm text-gray-700">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, and donation flow.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-09-poway-library %}">Friends of the Poway Library</a></h3>
+           <p class="capstone-item__description">Rebuilding the Friends of the Poway Library website with a live events calendar, volunteer portal, and donation flow.</p>
+           <p class="capstone-item__team">Team: Shayan Bhatti, Arnav Pallapotu, Tanay Paranjpe</p>
        </div>
    </div>
 
    <!-- DSA Website Redesign (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">
-           <img src="/images/capstone/dsa_redesign.svg" alt="DSA Website Redesign — Deputy Sheriffs' Association of San Diego County" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/dsa_redesign.svg" alt="DSA Website Redesign — Deputy Sheriffs' Association of San Diego County" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">DSA Website Redesign</a></h3>
-           <p class="text-sm text-gray-700">Redesign proposal for the Deputy Sheriffs' Association of San Diego County website — interactive dashboard, smart FAQ hub, and mega menu navigation.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: TheSprinters (Akhil, Neil, Moiz)</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-09-dsa-website-redesign-blog %}">DSA Website Redesign</a></h3>
+           <p class="capstone-item__description">Redesign proposal for the Deputy Sheriffs' Association of San Diego County website — interactive dashboard, smart FAQ hub, and mega menu navigation.</p>
+           <p class="capstone-item__team">Team: TheSprinters (Akhil, Neil, Moiz)</p>
        </div>
    </div>
 
    <!-- D.A.D. Website Redesign (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">
-           <img src="/images/capstone/dad_redesign.svg" alt="D.A.D. Website Redesign — Doing Exceptional Deeds Nonprofit" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/dad_redesign.svg" alt="D.A.D. Website Redesign — Doing Exceptional Deeds Nonprofit" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">D.A.D. Website Redesign</a></h3>
-           <p class="text-sm text-gray-700">Redesign proposal for the Doing Exceptional Deeds nonprofit — impact-driven homepage, donation flow with impact visualization, and dedicated program pages with registration.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: TheSprinters (Akhil, Neil, Moiz)</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-09-dad-website-redesign-blog %}">D.A.D. Website Redesign</a></h3>
+           <p class="capstone-item__description">Redesign proposal for the Doing Exceptional Deeds nonprofit — impact-driven homepage, donation flow with impact visualization, and dedicated program pages with registration.</p>
+           <p class="capstone-item__team">Team: TheSprinters (Akhil, Neil, Moiz)</p>
        </div>
    </div>
 
    <!-- RCR: Poway-Midland Railroad Project -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">
-           <img src="https://static.vecteezy.com/system/resources/previews/034/949/404/non_2x/simple-steam-train-icon-illustration-design-steam-locomotive-symbol-template-vector.jpg" alt="RCR Poway-Midland Railroad Digital Experience" class="w-28 h-28 object-cover rounded" />
+           <img src="https://static.vecteezy.com/system/resources/previews/034/949/404/non_2x/simple-steam-train-icon-illustration-design-steam-locomotive-symbol-template-vector.jpg" alt="RCR Poway-Midland Railroad Digital Experience" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">RCR: Poway-Midland Railroad</a></h3>
-           <p class="text-sm text-gray-700">Modernizing the Poway-Midland Railroad website with an accounts system, interactive features, real-time train schedules, virtual tours, GPS tracking, and volunteer management tools.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Rebecca, Cyrus, Rishabh</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-06-rcr-poway-midland-capstone %}">RCR: Poway-Midland Railroad</a></h3>
+           <p class="capstone-item__description">Modernizing the Poway-Midland Railroad website with an accounts system, interactive features, real-time train schedules, virtual tours, GPS tracking, and volunteer management tools.</p>
+           <p class="capstone-item__team">Team: Rebecca, Cyrus, Rishabh</p>
        </div>
    </div>
 
     <!-- Poway Veteran's Organization-->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
     <a href="{% post_url 2026-03-06-pvo-redesign-infographic %}">
-        <img src="/images/capstone/poway-veterans-logo.png" alt="Poway Veterans Organization" class="w-28 h-28 object-cover rounded" />
+        <img src="/images/capstone/poway-veterans-logo.png" alt="Poway Veterans Organization" class="ocs__image-frame ocs__image-frame--card" />
     </a>
     <div>
-        <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-06-pvo-redesign-infographic %}">Poway Veterans Organization</a></h3>
-        <p class="text-sm text-gray-700">A guided 'Need Help? Start Here' pathway for the Poway Veterans Organization — simplified assistance application, document checklist, and urgent resource directory for veterans and families.</p>
-        <p class="text-xs text-gray-500 mt-2">Team: API Pirates (Alice, Brandon, Aryan)</p>
+        <h3 class="capstone-item__title"><a href="{% post_url 2026-03-06-pvo-redesign-infographic %}">Poway Veterans Organization</a></h3>
+        <p class="capstone-item__description">A guided 'Need Help? Start Here' pathway for the Poway Veterans Organization — simplified assistance application, document checklist, and urgent resource directory for veterans and families.</p>
+        <p class="capstone-item__team">Team: API Pirates (Alice, Brandon, Aryan)</p>
     </div>
 
 </div>
   <!-- SD Auto (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-04-15-sd-auto-capstone %}">
-           <div class="w-28 h-28 flex items-center justify-center bg-blue-600 text-white text-2xl font-bold rounded" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">SD Auto</div>
+           <div class="ocs__image-frame ocs__image-frame--card capstone-card-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">SD Auto</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-04-15-sd-auto-capstone %}">SD Auto</a></h3>
-           <p class="text-sm text-gray-700">A full-stack intelligent routing platform that enhances daily commutes in San Diego through real-time traffic data, community hazard reporting, and AI-driven route optimization.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Ahaan, Arnav</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-04-15-sd-auto-capstone %}">SD Auto</a></h3>
+           <p class="capstone-item__description">A full-stack intelligent routing platform that enhances daily commutes in San Diego through real-time traffic data, community hazard reporting, and AI-driven route optimization.</p>
+           <p class="capstone-item__team">Team: Ahaan, Arnav</p>
        </div>
    </div>
 
   <!-- FOPS (2025-2026) -->
- <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2025-2026">
+ <div class="ocs__grid-cell  capstone-item CSP" data-year="2025-2026">
         <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
-            <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="w-28 h-28 object-cover rounded" />
+            <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="ocs__image-frame ocs__image-frame--card" />
         </a>
         <div>
-            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
-            <p class="text-sm text-gray-700"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
-            <p class="text-xs text-gray-500 mt-2">Team: Nitya, Vivian, Virginia</p>
+            <h3 class="capstone-item__title"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
+            <p class="capstone-item__description"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
+            <p class="capstone-item__team">Team: Nitya, Vivian, Virginia</p>
         </div>
     </div>
 
   <!-- FOPS (2026-2027) -->
- <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+ <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
         <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
-            <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="w-28 h-28 object-cover rounded" />
+            <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="ocs__image-frame ocs__image-frame--card" />
         </a>
         <div>
-            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
-            <p class="text-sm text-gray-700"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
-            <p class="text-xs text-gray-500 mt-2">Team: Nitya, Vivian, Virginia</p>
+            <h3 class="capstone-item__title"><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
+            <p class="capstone-item__description"> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
+            <p class="capstone-item__team">Team: Nitya, Vivian, Virginia</p>
         </div>
     </div>
 
  <!-- Dynamic Event Calendar (CSP) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP">
+   <div class="ocs__grid-cell  capstone-item CSP">
        <a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">
-           <img src="/images/capstone/sph.png" alt="Safe Passage Heals" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/sph.png" alt="Safe Passage Heals" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Safe Passage Heals - Media Management Tools and Interactive Recovery Simulation</a></h3>
-           <p class="text-sm text-gray-700">A system of interactive web tools for Safe Passage Heals — centralizing community events through dynamic media management and an interactive simulation of the domestic violence recovery process.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">Safe Passage Heals - Media Management Tools and Interactive Recovery Simulation</a></h3>
+           <p class="capstone-item__description">A system of interactive web tools for Safe Passage Heals — centralizing community events through dynamic media management and an interactive simulation of the domestic violence recovery process.</p>
+           <p class="capstone-item__team">Team: Ruchika Kench, Akshara Shankar, Avantika Chittari</p>
        </div>
    </div>
    
    <!-- California Center For The Performing Arts Escondido (CSP, 2026/2027) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+   <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
-           <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="w-28 h-28 object-contain rounded" />
+           <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">California Center For The Performing Arts Escondido</a></h3>
-           <p class="text-sm text-gray-700">This capstone project involves refurbishing the California Center For The Performing Arts Escondido website to be more streamlined, organized, and less busy. It will also overhaul the search feature to be more intelligent, introduce a dynamic and artistic design, and will replace generic walls of text with something more interactive.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Mateo, Tristan, and Yue (Barbara)</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">California Center For The Performing Arts Escondido</a></h3>
+           <p class="capstone-item__description">This capstone project involves refurbishing the California Center For The Performing Arts Escondido website to be more streamlined, organized, and less busy. It will also overhaul the search feature to be more intelligent, introduce a dynamic and artistic design, and will replace generic walls of text with something more interactive.</p>
+           <p class="capstone-item__team">Team: Mateo, Tristan, and Yue (Barbara)</p>
        </div>
    </div>
 
    <!-- San Diego Lab Rats (CSP, 2026/2027) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+   <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-10-sdlabrats-capstone %}">
-           <img src="/images/capstone/sdlabrats.png" alt="San Diego Lab Rats Logo" class="w-28 h-28 object-contain rounded" />
+           <img src="/images/capstone/sdlabrats.png" alt="San Diego Lab Rats Logo" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-10-sdlabrats-capstone %}">San Diego Lab Rats</a></h3>
-           <p class="text-sm text-gray-700">This capstone project restructures the San Diego Lab Rats website around the parent deciding whether to enroll. It gives every piece of content one home instead of repeating the same blocks across pages, cuts the menu down so nothing leads to the same place twice, and rebuilds the layout with one shared style layer so the site holds its shape at any width.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aryan M, Pranay K, Raymond L</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-09-10-sdlabrats-capstone %}">San Diego Lab Rats</a></h3>
+           <p class="capstone-item__description">This capstone project restructures the San Diego Lab Rats website around the parent deciding whether to enroll. It removes the content that currently repeats across three separate blocks, gives each program its own comparable page, and pulls charter school funding and scholarships out of hiding so the families who need them can actually find them.</p>
+           <p class="capstone-item__team">Team: Aryan M, Pranay K, Raymond L</p>
        </div>
    </div>
 
    <!-- OCS Assignment Tracker (CSA) -->
-  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+  <div class="ocs__grid-cell  capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
-           <img src="/images/backendboyzgcpiccc.png" alt="Backend Boyz - OCS Assignment Tracker" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/backendboyzgcpiccc.png" alt="Backend Boyz - OCS Assignment Tracker" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">Backend Boyz</a></h3>
-           <p class="text-sm text-gray-700">Developing an easy way for mentors to access Open Coding Society, featuring Google OAuth-verified signup, a scoped capstone project dashboard, real-time team chat, and role-based permissions between students and admins.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Backend Boyz (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-09-03-chuds-capstone %}">Backend Boyz</a></h3>
+           <p class="capstone-item__description">Developing an easy way for mentors to access Open Coding Society, featuring Google OAuth-verified signup, a scoped capstone project dashboard, real-time team chat, and role-based permissions between students and admins.</p>
+           <p class="capstone-item__team">Team: Backend Boyz (Shayan B, Darshan S, Rudra J, Dhyan S, Harrish A, Lucas M, Zhengli L, Jacob C, Arnav P)</p>
        </div>
    </div>
 
    <!-- OCS Security (CSA) -->
-  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+  <div class="ocs__grid-cell  capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-cccs-security %}">
-           <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
-           <p class="text-sm text-gray-700">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
+           <p class="capstone-item__description">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
+           <p class="capstone-item__team">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
        </div>
    </div>
 
    <!-- My Good Brain (CSP 26-27) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
-       <a href="{{ '/capstone/mygoodbrain/' | relative_url }}">
-           <img src="{{ '/images/capstone/my_good_brain.png' | relative_url }}" alt="My Good Brain logo" class="w-28 h-28 object-cover rounded" />
+   <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-09-goodbrain %}">
+           <img src="{{ '/images/capstone/my_good_brain.png' | relative_url }}" alt="My Good Brain logo" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/mygoodbrain/' | relative_url }}">My Good Brain</a></h3>
-           <p class="text-sm text-gray-700">An interactive hub bridging psychology, neuroscience, and art to support youth mental and emotional wellness </p>
-           <p class="text-xs text-gray-500 mt-2">Team: Rashi Gaurav, Aashni Katari, Kelervia Fang</p>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-09-09-goodbrain %}">My Good Brain</a></h3>
+           <p class="capstone-item__description">An interactive hub bridging psychology, neuroscience, and art to support youth mental and emotional wellness </p>
+           <p class="capstone-item__team">Team: Rashi Gaurav, Aashni Katari, Kelervia Fang</p>
        </div>
    </div>
 
    <!-- Communication System (CSA) -->
-  <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
+  <div class="ocs__grid-cell  capstone-item CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">
-           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - class announcement chat on the CSA course page" class="w-28 h-28 object-cover rounded" />
+           <img src="/images/csa-chat/announcement-chat.png" alt="Communication System - class announcement chat on the CSA course page" class="ocs__image-frame ocs__image-frame--card" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
-           <p class="text-sm text-gray-700">Moving class discussion out of Slack and onto the course site — class-wide announcements, per-week chat, and a rich-text composer with emoji already ship, with per-assignment threads, 1:1 direct messages, GIFs, Slack-style emoji reactions, and teacher moderation still to build.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
+           <h3 class="capstone-item__title"><a href="{% post_url capstone/2026-08-27-communication-system-capstone %}">Communication System</a></h3>
+           <p class="capstone-item__description">Moving class discussion out of Slack and onto the course site — class-wide announcements, per-week chat, and a rich-text composer with emoji already ship, with per-assignment threads, 1:1 direct messages, GIFs, Slack-style emoji reactions, and teacher moderation still to build.</p>
+           <p class="capstone-item__team">Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>
 </div>
@@ -1107,13 +1153,13 @@ Below are the capstone infographic pages created by student groups. Click an ima
     var grid=document.getElementById('capstone-grid'); if(!grid)return;
     var href='/capstone/view/?id='+encodeURIComponent(p.id);
     var imgHtml=p.imageUrl
-      ? '<img src="'+p.imageUrl+'" alt="'+esc(p.title)+'" class="w-28 h-28 object-cover rounded">'
-      : '<div class="w-28 h-28 flex items-center justify-center bg-blue-900 text-white text-2xl font-bold rounded">'+esc((p.title||'?').slice(0,3).toUpperCase())+'</div>';
+      ? '<img src="'+p.imageUrl+'" alt="'+esc(p.title)+'" class="ocs__image-frame ocs__image-frame--card">'
+      : '<div class="ocs__image-frame ocs__image-frame--card capstone-card-placeholder">'+esc((p.title||'?').slice(0,3).toUpperCase())+'</div>';
     var team=Array.isArray(p.teamMembers)?p.teamMembers.join(', '):String(p.teamMembers||'');
     var course=(p.courseCode||'CSA').toUpperCase();
     var div=document.createElement('div');
-    div.className='flex items-start space-x-4 p-4 border rounded-lg capstone-item relative '+course;
-    div.innerHTML='<a href="'+esc(href)+'">'+imgHtml+'</a><div><h3 class="text-lg font-semibold"><a href="'+esc(href)+'">'+esc(p.title)+'</a></h3><p class="text-sm text-gray-700">'+esc(p.description||'')+'</p><p class="text-xs text-gray-500 mt-2">Team: '+esc(team)+'</p></div>';
+    div.className='ocs__grid-cell  capstone-item relative '+course;
+    div.innerHTML='<a href="'+esc(href)+'">'+imgHtml+'</a><div><h3 class="capstone-item__title"><a href="'+esc(href)+'">'+esc(p.title)+'</a></h3><p class="capstone-item__description">'+esc(p.description||'')+'</p><p class="capstone-item__team">Team: '+esc(team)+'</p></div>';
     grid.prepend(div);
     div.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
