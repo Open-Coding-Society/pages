@@ -835,30 +835,6 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </div>
    </div>
 
-   <!-- San Diego Senior Games (CSP, 2026/2027) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-10-sdseniorgames-capstone %}">
-           <img src="/images/capstone/sdseniorgames.png" alt="San Diego Senior Games Logo" class="w-28 h-28 object-contain rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-10-sdseniorgames-capstone %}">San Diego Senior Games</a></h3>
-           <p class="text-sm text-gray-700">This capstone project reorganizes the San Diego Senior Games website around the person actually trying to register. It gives every one of the seventeen sports its own page with dates, brackets, and fees in one place, smooths the handoff to the outside registration platform, and rebuilds the type, contrast, and tap targets for an audience of athletes aged 50 and over.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aryan M, Pranay K, Raymond L</p>
-       </div>
-   </div>
-
-   <!-- Advancing STEM (CSP, 2026/2027) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-10-advancingstem-capstone %}">
-           <img src="/images/capstone/advancingstem.png" alt="Advancing STEM Logo" class="w-28 h-28 object-contain rounded" />
-       </a>
-       <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-10-advancingstem-capstone %}">Advancing STEM</a></h3>
-           <p class="text-sm text-gray-700">This capstone project rebuilds the Advancing Science, Technology and Art website so it shows what the nonprofit actually does. It moves the proof to the front, gives competitions, mentoring, camps, and outreach their own pages, makes the nine countries they work in visible, and turns a wall of sponsor logos into a page that makes the case for the next sponsor.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Aryan M, Pranay K, Raymond L</p>
-       </div>
-   </div>
-
    <!-- San Diego Lab Rats (CSP, 2026/2027) -->
    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-10-sdlabrats-capstone %}">
@@ -866,7 +842,7 @@ Below are the capstone infographic pages created by student groups. Click an ima
        </a>
        <div>
            <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-10-sdlabrats-capstone %}">San Diego Lab Rats</a></h3>
-           <p class="text-sm text-gray-700">This capstone project restructures the San Diego Lab Rats website around the parent deciding whether to enroll. It removes the content that currently repeats across three separate blocks, gives each program its own comparable page, and pulls charter school funding and scholarships out of hiding so the families who need them can actually find them.</p>
+           <p class="text-sm text-gray-700">This capstone project restructures the San Diego Lab Rats website around the parent deciding whether to enroll. It gives every piece of content one home instead of repeating the same blocks across pages, cuts the menu down so nothing leads to the same place twice, and rebuilds the layout with one shared style layer so the site holds its shape at any width.</p>
            <p class="text-xs text-gray-500 mt-2">Team: Aryan M, Pranay K, Raymond L</p>
        </div>
    </div>
