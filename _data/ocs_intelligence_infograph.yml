@@ -13,7 +13,7 @@ donation:
   kicker: ""
   title: "Eight GTX 1070s, donated to OCS"
   body: "This capstone starts with generosity. OCS was donated a GPU rig with eight GTX 1070s — enough local compute to host open-weight models instead of renting them. The work is not to buy intelligence. It is to turn a gifted machine into a classroom service: assembled, served, and reachable from the networks students already use."
-  costLine: "After the gift, the only ongoing cost is electricity."
+  costLine: "Donated hardware reduces purchase costs. The proposed hybrid service also needs a budget for electricity, cloud services, storage, networking, and maintenance."
 
 researchQuestionsNote: "These are living questions, not a fixed spec. As Phase 0 research turns up better serving tricks or a stronger candidate model, and as Phase 1/2 surface real load numbers, the questions below get revised rather than treated as settled on day one."
 
@@ -67,7 +67,7 @@ inventory:
   - value: "64GB"
     label: "VRAM on that box"
   - value: "Electricity"
-    label: "Only ongoing cost"
+    label: "Lab operating cost"
   - value: "~5"
     label: "Concurrent users to hold"
 
@@ -259,7 +259,7 @@ stages:
     impact:
       - "The donated rack becomes a public good inside OCS, not a closet of unused cards."
       - "Coursework can assume a capable model without assuming a credit card."
-      - "Electricity is the bill. The subscription is the thing we stop needing."
+      - "Track operating costs while reducing dependence on individual subscriptions."
     goals:
       - "Assemble the donated 8× GTX 1070 production rack."
       - "Serve open models with Ollama and llama.cpp (Nikhil, Adi, Mihir)."
@@ -323,7 +323,7 @@ stages:
     impact:
       - "A full period can share one donated brain instead of sixteen private subscriptions."
       - "Teachers can assign AI-supported work without asking who paid this month."
-      - "OCS keeps the cost story simple: hardware was given; we pay to keep the lights on."
+      - "OCS tracks lab and cloud operating costs against the value of shared student access."
     goals:
       - "Deploy the Phase 1 service as the student-facing path."
       - "Watch it closely enough to know it still works when several people use it."
@@ -359,16 +359,16 @@ Topics:
       - "Phase 1 puts models on the rack and streams them to harnesses with keys."
       - "Phase 2 proves that service under real student use."
       - "Nobody should need a paid subscription for the same chance to think with a model."
-      - "The meter that remains is electricity."
+      - "Measure electricity and cloud costs as part of the shared-service design."
     description: "The hard part isn't turning on a GPU — it's turning eight second-hand GTX 1070s (8GB VRAM each, no NVLink) into something that behaves like one reliable service. Model weights that don't fit on a single card, a KV cache that grows with every concurrent student, and a class of ~25 people hitting it in the same ten minutes all compete for the same limited memory. The research question is whether consumer-grade, donated hardware can be engineered around those limits well enough that nobody in the room notices the difference from a paid API."
     candidateModel: "We are not locking into one model. Candidates get re-evaluated as better open weights ship — the target is whichever coding companion fits this hardware and stays good enough that a subscription is optional, not required."
     tech:
       - "Donated GPU rack"
       - "Open-weight LLMs"
       - "Student harnesses"
-      - "Electricity-only cost"
+      - "Shared operating costs"
     impact:
-      - "Cut paid AI subscriptions for school work by giving every student core coding help — chat, autocomplete, review — at electricity cost instead of a monthly fee."
+      - "Cut paid AI subscriptions for school work by giving every student core coding help — chat, autocomplete, review — through shared infrastructure with measured operating costs."
       - "Give more students the same chance to use a capable model."
       - "Honor the donation by putting the machine in front of the class."
       - "Learn what it takes to keep a shared service kind under load."
@@ -376,3 +376,66 @@ Topics:
     audience: "OCS students — every student, not only the builders"
     link: "https://artificialanalysis.ai/models/qwen3-8-27b"
     linkLabel: "View candidate benchmarks"
+
+implementation:
+  title: "Teacher’s vision: a shared OCS AI compute service"
+  introduction: "Our proposed implementation separates the public student service from the physical compute lab. AWS hosts identity, the API, the broker, and durable records; Mac Minis prepare student sessions and context; GPU rigs run inference. This is a build and research plan, not a claim that the infrastructure is already deployed."
+  diagram: |
+    flowchart TD
+      A[Student at school or home] -->|HTTPS| B[Proposed OCS AI endpoint]
+      B --> C[AWS EC2: NGINX and authenticated Python API]
+      C --> D[OCS broker and scheduler]
+      D --> E[RDS: durable sessions and project records]
+      D --> F[Redis: queue, assignments and worker health]
+      D -->|NetBird private overlay| G[Mac Mini session and context workers]
+      G -->|Private inference requests| H[Rig 1: production GPU workers]
+      G -->|Isolated test jobs| I[Rig 2: development GPU workers]
+  sections:
+    - title: "1. Give students one secure entry point"
+      body: "If an OCS endpoint is provisioned, students will use HTTPS at the proposed ai.opencodingsociety.com address. NGINX will forward requests to an authenticated Python API on EC2. The API will verify the student’s role and project access, enforce request-size and usage limits, and stream responses. Students will not need NetBird installed for this public HTTPS path; the cloud service and lab machines will join the private overlay. Before that endpoint exists, we will pilot with enrolled NetBird clients."
+      steps:
+        - "Define a request containing session_id, project_id, files, question, and context. Validate ownership and payload limits before accepting a job; never trust a client-supplied session ID alone."
+        - "Keep Redis, databases, worker APIs, and inference ports private. Allow only the service-to-service connections each role requires, with authenticated internal requests."
+        - "Test access from school and home, including unauthorized requests and revoked access. Record whether each NetBird connection is direct or relayed, alongside latency, throughput, and reconnect behavior."
+      evidence: "A student can submit an authorized coding question from both networks and receive a streamed answer; another student cannot read that session. Compare direct and relay paths rather than treating relay use itself as a failure."
+    - title: "2. Build the broker and separate three kinds of state"
+      body: "We will start with a FastAPI broker and Redis-backed queue. The broker will track sessions, register workers, and schedule work in two steps: assign a healthy Mini to prepare context, then reserve a compatible GPU worker for inference. A local broker on a designated Mini can support the first lab prototype; the proposed cloud deployment moves the control plane to EC2."
+      steps:
+        - "RDS holds durable session ownership, conversation history, project references, and request status. Define retention and access rules for student content."
+        - "Redis holds active Mini and GPU registries, queue entries, current assignments, and expiring reservation leases. Durable request IDs let us reconcile unfinished work after a restart."
+        - "Mini caches hold disposable context and recent project files. Recover a session from durable records when a Mini disappears; never make its local cache the only copy."
+        - "Expose job states such as queued, preparing, generating, complete, and failed. Return a job ID so a client can reconnect and check status without silently submitting duplicate work."
+      evidence: "Restart a Mini, Redis, and the broker separately. Verify that session ownership survives, unfinished jobs are reconciled, and temporary worker state can be rebuilt."
+    - title: "3. Turn Mac Minis into session and context workers"
+      body: "The teacher’s target is up to 30 converted Minis, split into production and development pools of roughly 10–15 each, subject to hardware inventory. We will prove the worker design on one Linux Mini first, then expand. Each node will run NetBird, a containerized Mini agent, bounded session/project caches, and monitoring."
+      steps:
+        - "Have each agent register its identity and capacity, then send periodic heartbeats. Expire stale registrations so new sessions only reach healthy workers."
+        - "Prefer the healthy Mini already serving a session to reuse cached context. Assign new sessions using available capacity and queue depth."
+        - "Prepare a bounded prompt from authorized project files and recent conversation state, submit inference, and forward the result stream. Set cache size limits and expiration times."
+        - "On worker loss, release expired leases and rebuild context on another Mini. Surface interrupted generation to the client; retry only within a bounded policy tied to the original request ID."
+      evidence: "Disconnect an assigned Mini during a request. Show that it stops receiving work, the student retains their session, and a replacement worker can continue with recovered context."
+    - title: "4. Schedule GPU inference around the hardware we have"
+      body: "We will prototype with llama.cpp and llama-server using quantized GGUF coding and general-purpose model candidates. The GTX 1070 software environment is a research constraint: validate and pin the Linux, NVIDIA driver, CUDA toolkit, llama.cpp revision, and model checksums on the actual rig before rollout. We will not assume a current vLLM or PyTorch package supports these cards."
+      steps:
+        - "Start with one small model and one GPU worker. Measure model loading, memory use, answer quality, and streaming before increasing concurrency."
+        - "Register each GPU worker’s health, loaded model, available memory, and active reservations. Prefer an idle compatible worker with the requested model already loaded."
+        - "Use independent single-GPU workers as the baseline. Treat total rig VRAM as distributed memory, not one automatically pooled allocation."
+        - "When all compatible workers are busy, use a bounded queue with per-student fairness, timeouts, cancellation, and a clear busy response. Reserve capacity atomically to prevent competing Minis from overbooking a GPU."
+        - "Evaluate grouped GPUs only after the baseline works. Compare the same workload against single-GPU allocation and record communication overhead, latency, throughput, and memory limits."
+      evidence: "Publish a reproducible environment manifest and benchmark results. Choose models and allocation strategies from measured coding usefulness and performance, not aggregate VRAM or model size alone."
+    - title: "5. Keep experiments separate and rehearse recovery"
+      body: "The target topology uses two rigs with eight GTX 1070s each: Rig 1 for production and Rig 2 for development, each paired with its own Mini pool. Team 1 will own the production inference path; Team 2 will validate candidates and failure experiments on Rig 2. Both teams will agree on the broker/worker contract before connecting the pools."
+      steps:
+        - "Separate production and test queues, credentials, and worker registrations so experiments cannot take classroom capacity by accident."
+        - "Promote only a tested software/model configuration. Keep the previous configuration available for rollback."
+        - "Rehearse taking Rig 1 offline: pause admissions or show a maintenance state, drain work when possible, reconcile interrupted requests, and explicitly promote a validated Rig 2 worker pool."
+        - "Track queue wait, time to first token, inter-token latency, tokens per second, errors, GPU memory, and worker availability. Keep student code and secrets out of routine logs."
+      evidence: "Run an initial five-student load test and a planned rig outage. Report recovery time, failed requests, p50/p95 latency, and whether session history survives. Five users is a first test target, not a proven capacity claim."
+    - title: "How we will deliver this through the existing phases"
+      body: "We will build one complete request path before scaling to the full hardware pool. Each phase will end with a demonstration and recorded evidence that mentors can review."
+      steps:
+        - "Phase 0 — Inventory both rigs and Minis; validate a Pascal-compatible inference environment; compare NetBird paths; select the first model and agree on latency, quality, and recovery targets."
+        - "Phase 1 — Demonstrate one client → broker → Mini → GPU → streamed response. Add authentication, durable session records, queue states, and worker heartbeats; then add a second worker to demonstrate routing."
+        - "Phase 2 — Provision the approved HTTPS entry point and cloud control plane, expand the production/test pools, benchmark classroom load, and rehearse Mini failure, broker restart, rig promotion, and rollback."
+        - "Document compute, electricity, cloud hosting, database, storage, networking, and maintenance costs. Reusing donated hardware reduces purchase costs but does not make the proposed hybrid service electricity-only."
+      evidence: "Maintain a benchmark matrix and issue checklist for each phase. The central research question is whether this heterogeneous pool can deliver secure, reliable, low-latency coding help for distributed students at a sustainable operating cost."
