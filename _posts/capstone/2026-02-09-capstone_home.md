@@ -311,6 +311,17 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+       <!--Oncology and Kids Cancer Association (CSP, 2026/2027) -->
+   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">
+           <img src="/images/capstone/ccae.jpeg" alt="Cal Center For Arts Escondido Logo" class="w-28 h-28 object-contain rounded" />
+       </a>
+       <div>
+           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-08-oak-cancer-capstone %}">Oncology and Kids Cancer Association</a></h3>
+           <p class="text-sm text-gray-700">This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text, people of all ages will be able to easily navigate, learn, and play through these new and advanced modules.</p>
+           <p class="text-xs text-gray-500 mt-2">Team: Salma, Isha, Aashi, and Emily</p>
+       </div>
+   </div>
 
    <!-- UESL Accessible Game Maker 2.0 (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
