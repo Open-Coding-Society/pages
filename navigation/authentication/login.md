@@ -152,6 +152,18 @@ show_reading_time: false
     function validateGithubId() {
         const githubIdField = document.getElementById('signupUid');
         const messageDiv = document.getElementById('github-id-validation-message');
+
+        // This check only makes sense for students, who might mistakenly type their
+        // 7-digit student ID into what's asking for a GitHub username. Mentors don't
+        // have a student ID to confuse it with, and aren't necessarily asked for a
+        // GitHub account at all (see updateSignupModeUI) -- so skip it for them.
+        const isMentor = document.getElementById('signupRole').value === 'mentor';
+        if (isMentor) {
+            githubIdField.setCustomValidity('');
+            messageDiv.textContent = '';
+            return true;
+        }
+
         const isStudentId = STUDENT_ID_AS_GITHUB_ID_PATTERN.test(githubIdField.value.trim());
         const message = isStudentId ? 'Enter your GitHub ID, not your 7-digit student ID.' : '';
 
@@ -179,6 +191,15 @@ show_reading_time: false
         sidField.required = !isMentor;
         schoolField.required = !isMentor;
         emailField.placeholder = isMentor ? 'Email' : 'Personal (not school) Email';
+
+        // "GitHub ID" is a student-signup concept (matches their GitHub Classroom
+        // handle); a mentor has no reason to have or know one. The field is still
+        // required -- it's their login username either way -- just relabeled, and
+        // re-validated immediately so a leftover "not your student ID" message from
+        // switching modes doesn't linger.
+        const uidField = document.getElementById('signupUid');
+        uidField.placeholder = isMentor ? 'Username' : 'GitHub ID';
+        validateGithubId();
 
         // Mentors have no use for Kasm servers. Hidden (not required), same as sid/school
         // above -- the checkbox stays unchecked while hidden, so no extra guard is needed

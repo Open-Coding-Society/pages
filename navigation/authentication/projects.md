@@ -218,6 +218,55 @@ microblog: true
     }
   }
 
+  // Marking a project "Interested" (above) only saves it to the mentor's own
+  // shortlist. Actually applying to mentor a specific project is a second,
+  // separate approval -- it requires a real ROLE_MENTOR account and goes
+  // through an admin/teacher review queue (capstone/read.html on the backend),
+  // exactly like becoming a mentor in the first place does. This map resolves
+  // a project's url (all we have client-side) to the numeric capstone id the
+  // /api/capstones/{id}/apply endpoint needs.
+  let capstoneIdByUrl = {};
+
+  async function loadCapstoneIds() {
+    try {
+      const res = await fetch(`${javaURI}/api/capstones`, fetchOptions);
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (!Array.isArray(rows)) return;
+      capstoneIdByUrl = {};
+      rows.forEach(row => { capstoneIdByUrl[String(row.url)] = row.id; });
+    } catch (err) {
+      console.error('Mentor Portal: could not load capstone project ids', err);
+    }
+  }
+
+  async function submitApplication(url, title) {
+    const capstoneId = capstoneIdByUrl[String(url)];
+    if (!capstoneId) {
+      notify("Can't apply yet — this project hasn't synced to the backend.", false);
+      return;
+    }
+    try {
+      const res = await fetch(`${javaURI}/api/capstones/${capstoneId}/apply`, {
+        ...fetchOptions,
+        method: 'POST',
+      });
+      const text = await res.text();
+      if (res.status === 403) {
+        notify('You need to be an approved mentor to apply — sign up as a mentor and wait for admin approval.', false);
+      } else if (res.status === 409) {
+        notify(text || "You're already a mentor on this project.", false);
+      } else if (res.ok) {
+        notify(`Applied to mentor ${title} — an admin will review it.`, true);
+      } else {
+        notify("Couldn't submit that application. Try again in a bit.", false);
+      }
+    } catch (err) {
+      console.error('Mentor Portal: apply request failed', err);
+      notify("Couldn't reach the server to apply. Try again in a bit.", false);
+    }
+  }
+
   function esc(s) {
     return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
@@ -417,9 +466,11 @@ microblog: true
   }
 
   let confirmTimer = null;
+  let confirmProject = null;
 
   function showConfirmPopup(p) {
     clearTimeout(confirmTimer);
+    confirmProject = p;
     el('mp-confirm-title').textContent = p.title;
     el('mp-confirm-popup').style.display = 'flex';
     confirmTimer = setTimeout(hideConfirmPopup, 8000);
@@ -559,9 +610,7 @@ microblog: true
 
     el('mp-confirm-dismiss').addEventListener('click', hideConfirmPopup);
     el('mp-confirm-apply').addEventListener('click', () => {
-      // Placeholder for now -- the real apply/notify-the-team flow is a
-      // separate decision to be wired up later.
-      notify('Got it — we’ll follow up about applying soon.', true);
+      if (confirmProject) submitApplication(confirmProject.url, confirmProject.title);
       hideConfirmPopup();
     });
 
@@ -606,6 +655,7 @@ microblog: true
       localStorage.setItem(APPLIED_KEY, JSON.stringify(serverUrls));
       updateStats();
     }
+    loadCapstoneIds();
 
     if (!projects.length) {
       emptyEl.style.display = 'block';
