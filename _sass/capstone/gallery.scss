@@ -1,0 +1,35 @@
+// Keep gallery content inside the shared OCS grid cells at narrow widths.
+#capstone-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  > .capstone-item {
+    min-width: 0;
+    overflow-wrap: anywhere;
+
+    > a,
+    > div {
+      max-width: 100%;
+    }
+  }
+
+  .capstone-popup {
+    max-width: calc(100% - #{$spacing-sm * 2});
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .capstone-card-placeholder {
+      font-size: $text-lg;
+    }
+
+    > .capstone-item {
+      flex-direction: column;
+
+      // Text uses the full padded width instead of a narrow strip beside a logo.
+      > div:not(.capstone-popup):not(.capstone-tech-tooltip) {
+        width: 100%;
+      }
+    }
+  }
+}

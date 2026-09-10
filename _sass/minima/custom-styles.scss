@@ -13,6 +13,9 @@
 // All individual capstone infograph SCSS has been unified into one file to provide a consistent B/W theme.
 @import "capstone/infograph";
 
+// Responsive layout for the capstone project gallery
+@import "capstone/gallery";
+
 // Classroom Presence System capstone project styles
 @import "capstone/rfid-presence";
 
