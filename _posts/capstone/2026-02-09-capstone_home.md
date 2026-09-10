@@ -333,8 +333,6 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-Click an image or title to open the full project description.
-
 <div id="capstone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 my-6">
 
 
