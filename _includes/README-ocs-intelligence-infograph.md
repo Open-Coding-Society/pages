@@ -27,6 +27,16 @@ are generic renderers — loops over `data.stages`, `data.researchQuestions`,
 `data.literature`, etc. Only touch the `.html` files when you need a new
 *kind* of section (a new card shape), not to change wording.
 
+## Teacher’s implementation vision
+
+The overview’s `implementation` YAML object contains the proposed hybrid
+architecture: `title`, `introduction`, a Mermaid `diagram`, and `sections`.
+Each section has `title`, `body`, `steps`, and `evidence` (the verification
+criteria). Keep deployment plans distinct from demonstrated capabilities;
+hardware counts are targets until inventoried, and software versions need
+validation on the actual GPUs. This section maps delivery to the existing
+three phases without adding new phase pages.
+
 ## How a post picks which content it shows
 
 - The overview post (`ocs-intelligence-capstone.md`) includes
