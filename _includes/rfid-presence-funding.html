@@ -24,10 +24,48 @@
       <table class="rp-table">
         <thead><tr><th>Phase</th><th>Funding status</th><th>What it needs</th></tr></thead>
         <tbody>
-          <tr><td>Phase 1, Contact-Tap Prototype</td><td><span class="rp-pill rp-pill-good">No new funding needed</span></td><td>Runs on the CrowPi board and demo tags the team already has.</td></tr>
-          <tr><td>Phase 2, Classroom Pilot</td><td><span class="rp-pill rp-pill-warn">Small ask</span></td><td>Real MIFARE Classic tags for the full class (20 or more units), low unit cost, same tag family as the demo tags. No new reader hardware.</td></tr>
+          <tr><td>Phase 1, Contact-Tap Prototype</td><td><span class="rp-pill rp-pill-good">No new funding needed</span></td><td>Runs on the CrowPi board and demo tags the team already has; see Phase 1 bill of materials below for the tag SKU.</td></tr>
+          <tr><td>Phase 2, Classroom Pilot</td><td><span class="rp-pill rp-pill-warn">Small ask</span></td><td>Adhesive RFID stickers for the full class (20 or more units), applied one per playing card, same MIFARE Classic 1K family as the demo tags. No new reader hardware; see Phase 2 bill of materials below.</td></tr>
           <tr><td>Phase 3, UHF Doorway Transition</td><td><span class="rp-pill rp-pill-bad">Main ask, see bill of materials below</span></td><td>UHF Pi HAT, antenna, cable, and tamper-evident, on-metal, and UHF tags for a single door-table rig.</td></tr>
           <tr><td>Phase 4, Full Room-Scale</td><td><span class="rp-pill rp-pill-neutral">Future ask, quantities to be determined</span></td><td>A second reader and antenna set for the back door, plus higher-gain antennas and enclosures for full-room coverage. Sizing depends on the confirmed classroom's dimensions; see open questions below.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rp-section-label">Phase 1 Bill of Materials</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Already covered by hardware the team has on hand. Listed here for reference and as the SKU to re-order from if more demo tags are needed, or to scale up for Phase 2.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Item</th><th>Spec</th><th>Est. cost</th><th>Notes</th><th>Link</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>MIFARE Classic 1K keychain RFID fob (pack of 10)</td>
+            <td>ISO14443A, 13.56MHz, S50 chip, ABS+PC keychain fob, roughly 40&times;30&times;3mm</td>
+            <td>$7.99 per 10-pack ($0.80/tag)</td>
+            <td>The demo tags currently used with the CrowPi reader in Phase 1. Same MIFARE Classic 1K family Phase 2's real student tags will need, so this is also the reference SKU for scaling that order up.</td>
+            <td><a href="https://www.amazon.com/dp/B0F9FC5133" target="_blank" rel="noopener">Amazon</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rp-section-label">Phase 2 Bill of Materials</div>
+  <div class="rp-card">
+    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Adhesive stickers to apply one per playing card, one per student. Same MIFARE Classic 1K chip as the Phase 1 demo tags, so no reader changes are needed.</p>
+    <div class="rp-table-wrap">
+      <table class="rp-table">
+        <thead><tr><th>Item</th><th>Spec</th><th>Est. cost</th><th>Notes</th><th>Link</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>MIFARE Classic 1K round adhesive NFC/RFID sticker (pack of 40)</td>
+            <td>ISO14443A, 13.56MHz, 1K byte memory, 1 inch (25mm) round, self-adhesive</td>
+            <td>$7.97 per 40-pack (about $0.20/tag)</td>
+            <td>Same chip family as the Phase 1 keychain tags, so it works with the existing CrowPi reader unchanged. Small enough to apply directly to a playing card face. One 40-pack comfortably covers a 20 to 34 student class with spares for misprints or reissues.</td>
+            <td><a href="https://www.amazon.com/Adhesive-Stickers-Self-Adhesive-Commercial-Proximity/dp/B0G1M659Q7" target="_blank" rel="noopener">Amazon</a></td>
+          </tr>
         </tbody>
       </table>
     </div>
