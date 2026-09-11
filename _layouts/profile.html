@@ -58,11 +58,8 @@ active_tab: profile
 
             <!-- Password Change -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-300 mb-1">New
-                    Password</label>
-                <input type="password" id="password" name="password"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Enter new password" onchange="checkForChanges()" autocomplete="new-password">
+                <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <a href="{{ site.baseurl }}/support?topic=reset" class="text-sm text-indigo-400 hover:text-indigo-300 inline-block">Forgot your password?</a>
             </div>
         </div>
     </div>
@@ -1352,7 +1349,6 @@ active_tab: profile
         const uidInput = document.getElementById("uidChangeInput");
         const emailInput = document.getElementById("emailChangeInput");
         const sidInput = document.getElementById("sidChangeInput");
-        const passwordInput = document.getElementById("password");
         const kasmInput = document.getElementById("kasmChangeInput");
         const schoolInput = document.getElementById("schoolChangeInput");
 
@@ -1361,7 +1357,6 @@ active_tab: profile
         const uid = uidInput.value.trim();
         const email = emailInput.value.trim();
         const sid = sidInput.value.trim();
-        const password = passwordInput.value.trim();
         const kasmServerNeeded = kasmInput ? kasmInput.checked : undefined;
         const school = schoolInput.value;
 
@@ -1457,26 +1452,6 @@ active_tab: profile
             }
         }
 
-        // save password (both backends, logs out)
-        if (password) {
-            try {
-                await Promise.all([
-                    putUpdate({
-                        URL: pythonURI + "/api/user",
-                        body: { password },
-                        message: 'password-message'
-                    }),
-                    postUpdate({
-                        URL: javaURI + "/api/person/update",
-                        body: { password }
-                    })
-                ]);
-                needsLogout = true;
-            } catch (e) {
-                console.error("error saving password:", e.message);
-            }
-        }
-
         // save kasm server status (both backends)
         if (
             typeof kasmServerNeeded !== "undefined" &&
@@ -1546,7 +1521,7 @@ active_tab: profile
 
         // handle reload or logout if needed
         if (needsLogout) {
-            alert("you updated your github id or password, so you will be logged out. remember your new credentials!");
+            alert("you updated your github id, so you will be logged out. remember your new credentials!");
             window.location.href = '{{site.baseurl}}';
         } else if (needsReload) {
             window.location.reload();
