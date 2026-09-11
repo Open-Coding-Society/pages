@@ -799,6 +799,18 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+   <!-- Poway Neighborhood Emergency Corps (CSP 2026-2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-11-pnec-capstone %}">
+           <img src="{{ '/images/capstone/powaynec-logo-white.png' | relative_url }}" alt="Poway Neighborhood Emergency Corps logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-09-11-pnec-capstone %}">Poway Neighborhood Emergency Corps 2026–2027</a></h3>
+           <p>Continuing the PNEC project with proposed household preparedness, volunteer coordination, and community information tools.</p>
+           <p>Team: Samanvi, Joan, Ainsley</p>
+       </div>
+   </div>
+
  <!-- Dynamic Event Calendar (CSP) -->
    <div class="ocs__grid-cell CSP">
        <a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">
