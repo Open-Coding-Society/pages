@@ -17,7 +17,7 @@ permalink: /capstone/shoreline-volunteer/
 
 ---
 
-<div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
+<div class="ocs__grid ocs__grid--card" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center;">How We Are Going to Change the Website</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
@@ -86,7 +86,7 @@ permalink: /capstone/shoreline-volunteer/
 
 ---
 
-<div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+<div class="ocs__grid ocs__grid--card" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center;">Teammates/Collaborators</div>
     <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
         <strong>Nitya Hamsini Kasse</strong>
