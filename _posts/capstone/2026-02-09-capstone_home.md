@@ -806,7 +806,7 @@ document.addEventListener('DOMContentLoaded', function(){
        </a>
        <div>
            <h3><a href="{% post_url 2026-09-11-pnec-capstone %}">Poway Neighborhood Emergency Corps 2026–2027</a></h3>
-           <p>Continuing the PNEC project with proposed improvements to mobile access, neighborhood lookup, and volunteer tools.</p>
+           <p>Continuing the PNEC project with proposed household preparedness, volunteer coordination, and community information tools.</p>
            <p>Team: Samanvi, Joan, Ainsley</p>
        </div>
    </div>
