@@ -5,12 +5,12 @@ layout: post
 title: Shoreline Community Services, Volunteer Page
 permalink: /capstone/shoreline-volunteer/
 ---
-> Shoreline Community Services has strong programs and a clear mission, but the volunteer page undersells them. There is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.
+<blockquote style="color: #1B3A57; border-left: 4px solid #145DA0;">Shoreline Community Services has strong programs and a clear mission, but the volunteer page undersells them. There is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.</blockquote>
 
-## Shoreline Community Services, Volunteer Page 2026-27
+<h2 style="color: #1B3A57;">Shoreline Community Services, Volunteer Page 2026-27</h2>
 
 <div style="text-align: center; margin-bottom: 1.5rem;">
-    <a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git">
+    <a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git" style="background-color: #145DA0; border-color: #145DA0; color: #ffffff;">
         Github Repository
     </a>
 </div>
@@ -18,9 +18,9 @@ permalink: /capstone/shoreline-volunteer/
 ---
 
 <div class="ocs__grid ocs__grid--card" style="margin-bottom: 1.5rem;">
-    <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center;">How We Are Going to Change the Website</div>
+    <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center; background-color: #145DA0; border-color: #145DA0; color: #ffffff;">How We Are Going to Change the Website</div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
+    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
         <strong>Homelessness Hotspot</strong>
         <ul>
             <li>Selecting the "volunteer" option shows a homelessness hotspot map.</li>
@@ -29,7 +29,7 @@ permalink: /capstone/shoreline-volunteer/
             <li>Automates the volunteer process - instead of a human physically having to contact a volunteer about location and time, the computer can do it for the volunteer on its own.</li>
         </ul>
     </div>
-    <div class="ocs__grid-cell" style="text-align: center;">
+    <div class="ocs__grid-cell" style="text-align: center; background-color: #EAF4FB; border-color: #145DA0; color: #1B3A57;">
         <strong>Volunteer Shift Calendar</strong>
         <ul>
             <li>Volunteers can see which shift slots have already been taken instead of being contacted by a team member.</li>
@@ -37,7 +37,7 @@ permalink: /capstone/shoreline-volunteer/
         </ul>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
+    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
         <strong>Donations Page</strong>
         <p>Currently, the only way to donate is through an Instagram link in their bio.</p>
         <ul>
@@ -47,7 +47,7 @@ permalink: /capstone/shoreline-volunteer/
             <li>This makes donors want to contribute more to the cause.</li>
         </ul>
     </div>
-    <div class="ocs__grid-cell" style="text-align: center;">
+    <div class="ocs__grid-cell" style="text-align: center; background-color: #EAF4FB; border-color: #145DA0; color: #1B3A57;">
         <strong>Needs Right Now Page</strong>
         <p>Money doesn't have to be the only thing people can donate.</p>
         <ul>
@@ -58,7 +58,7 @@ permalink: /capstone/shoreline-volunteer/
         </ul>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
+    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
         <strong>Service Navigation</strong>
         <ul>
             <li>A homeless person visiting the website can click a "Need Help?" button.</li>
@@ -66,7 +66,7 @@ permalink: /capstone/shoreline-volunteer/
             <li>For extra support, they can scroll down to find the outreach team's contact information with detailed instructions on how to contact them.</li>
         </ul>
     </div>
-    <div class="ocs__grid-cell" style="text-align: center;">
+    <div class="ocs__grid-cell" style="text-align: center; background-color: #EAF4FB; border-color: #145DA0; color: #1B3A57;">
         <strong>Dashboard (Impact Made)</strong>
         <ul>
             <li>A dashboard shows stats on how much impact was made over a time interval the viewer can select (Last 30 days, Last week, and so on).</li>
@@ -76,7 +76,7 @@ permalink: /capstone/shoreline-volunteer/
     </div>
 </div>
 
-<div style="text-align: center;">
+<div style="text-align: center; color: #1B3A57;">
 
 *Homelessness Hotspot and Volunteer Shift Calendar can go together to create one combined idea.*
 
@@ -87,22 +87,22 @@ permalink: /capstone/shoreline-volunteer/
 ---
 
 <div class="ocs__grid ocs__grid--card" style="margin-bottom: 1.5rem;">
-    <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center;">Teammates/Collaborators</div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
+    <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center; background-color: #145DA0; border-color: #145DA0; color: #ffffff;">Teammates/Collaborators</div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
         <strong>Nitya Hamsini Kasse</strong>
         <p>Technologist/Developer</p>
-        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/nkasse12">
+        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/nkasse12" style="background-color: #145DA0; border-color: #145DA0; color: #ffffff;">
             GitHub
         </a>
     </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
+    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
         <strong>Vanshika Keswani</strong>
         <p>Technologist/Developer</p>
-        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/vanshikak210">
+        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/vanshikak210" style="background-color: #145DA0; border-color: #145DA0; color: #ffffff;">
             GitHub
         </a>
     </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center;">
+    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
         <strong>Hsu-Cheng Lin</strong>
         <p>Technologist/Developer</p>
     </div>
