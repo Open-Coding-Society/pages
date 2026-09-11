@@ -77,10 +77,20 @@ comments: false
             const person = await personResp.json();
             const userId = person.id;
 
-            // Step 3: fetch all submissions (backend filters to current user when not admin)
-            const listResp = await fetch(`${javaURI}/api/assignment-submission-view/list`, fetchOptions);
+            // Step 3: fetch submissions and assignment totals
+            const [listResp, assignmentsResp] = await Promise.all([
+              fetch(`${javaURI}/api/assignment-submission-view/list`, fetchOptions),
+              fetch(`${javaURI}/api/assignments/debug`, fetchOptions)
+            ]);
             if (!listResp.ok) throw new Error(`Could not get submissions: ${listResp.status}`);
+            if (!assignmentsResp.ok) throw new Error(`Could not get assignments: ${assignmentsResp.status}`);
             const submissions = await listResp.json();
+            const assignments = await assignmentsResp.json();
+            const pointsByName = new Map(
+              (Array.isArray(assignments) ? assignments : [])
+                .filter(assignment => assignment.name && assignment.points != null)
+                .map(assignment => [assignment.name, Number(assignment.points)])
+            );
 
             // Step 4: keep only this user's submissions
             const mine = (Array.isArray(submissions) ? submissions : [])
@@ -94,8 +104,9 @@ comments: false
             // Step 5: render rows
             tableBody.innerHTML = '';
             mine.forEach(submission => {
+              const assignmentPoints = pointsByName.get(submission.assignmentName);
                 const gradeDisplay = submission.grade != null
-                    ? `<span style="font-weight:600;color:rgb(134,239,172);">${submission.grade}/100</span>`
+                ? `<span style="font-weight:600;color:rgb(134,239,172);">${submission.grade}${assignmentPoints != null ? `/${assignmentPoints}` : ''}</span>`
                     : '<em style="color:#6b7280">—</em>';
                 const feedbackDisplay = submission.feedback
                     ? escapeHtml(submission.feedback)
@@ -111,14 +122,17 @@ comments: false
                 tableBody.appendChild(row);
             });
 
-            // Step 6: average row over graded submissions only
-            const graded = mine.filter(s => s.grade != null);
+            // Step 6: summarize graded submissions using their actual assignment totals
+            const graded = mine
+              .map(submission => ({ submission, points: pointsByName.get(submission.assignmentName) }))
+              .filter(({ submission, points }) => submission.grade != null && points != null);
             if (graded.length > 0) {
-                const avg = (graded.reduce((sum, s) => sum + s.grade, 0) / graded.length).toFixed(2);
+              const earned = graded.reduce((sum, { submission }) => sum + Number(submission.grade), 0);
+              const possible = graded.reduce((sum, { points }) => sum + points, 0);
                 const avgRow = document.createElement('tr');
                 avgRow.innerHTML = `
                     <td class="border border-neutral-600 px-4 py-2 font-bold">Average (${graded.length} graded)</td>
-                    <td class="border border-neutral-600 px-4 py-2 font-bold" style="color:rgb(134,239,172);">${avg}/100</td>
+                <td class="border border-neutral-600 px-4 py-2 font-bold" style="color:rgb(134,239,172);">${earned.toFixed(2)}/${possible}</td>
                     <td class="border border-neutral-600 px-4 py-2" colspan="2"></td>
                 `;
                 tableBody.appendChild(avgRow);

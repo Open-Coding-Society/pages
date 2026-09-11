@@ -144,7 +144,7 @@ active_tab: submissions
                     </label>
 
                     <label class="edit-field-label" for="edit-grade">Grade</label>
-                    <input type="number" id="edit-grade" class="edit-input" min="0" max="100" step="0.5" placeholder="0–100">
+                    <input type="number" id="edit-grade" class="edit-input" min="0" step="0.5" placeholder="Points">
 
                     <label class="edit-field-label" for="edit-feedback">Feedback</label>
                     <textarea id="edit-feedback" class="edit-textarea" rows="3" placeholder="Provide feedback for the student"></textarea>
@@ -516,6 +516,8 @@ active_tab: submissions
     const MAX_SUMMARY_BATCH_ITEMS = 10;
 
     let allSubmissions = [];
+    let assignmentPointsById = new Map();
+    let assignmentPointsByName = new Map();
     let isAdmin = false;
     let currentUserId = null;
     let currentUsername = '';
@@ -578,7 +580,10 @@ active_tab: submissions
     async function loadSubmissions() {
         try {
             console.log('Fetching submissions from:', apiUrl);
-            const response = await fetch(apiUrl, fetchOptions);
+            const [response, assignmentsResponse] = await Promise.all([
+                fetch(apiUrl, fetchOptions),
+                fetch(`${javaURI}/api/assignments/debug`, fetchOptions)
+            ]);
 
             console.log('Response status:', response.status, 'ok:', response.ok);
 
@@ -600,6 +605,10 @@ active_tab: submissions
                 throw new Error(`Failed to fetch submissions: ${errorMsg}`);
             }
 
+            if (!assignmentsResponse.ok) {
+                throw new Error(`Failed to fetch assignments: HTTP ${assignmentsResponse.status}`);
+            }
+
             // Parse response as JSON
             let data;
             try {
@@ -612,6 +621,17 @@ active_tab: submissions
 
             // Handle both array and null responses
             allSubmissions = Array.isArray(data) ? data : [];
+            const assignments = await assignmentsResponse.json();
+            assignmentPointsById = new Map(
+                (Array.isArray(assignments) ? assignments : [])
+                    .filter(assignment => assignment.id != null && assignment.points != null)
+                    .map(assignment => [String(assignment.id), Number(assignment.points)])
+            );
+            assignmentPointsByName = new Map(
+                (Array.isArray(assignments) ? assignments : [])
+                    .filter(assignment => assignment.name && assignment.points != null)
+                    .map(assignment => [assignment.name, Number(assignment.points)])
+            );
             console.log('Set allSubmissions to', allSubmissions.length, 'items');
 
             displayUserSubmissions();
@@ -627,6 +647,14 @@ active_tab: submissions
 
             showErrorMessage(`Error loading submissions: ${error.message}`);
         }
+    }
+
+    function getAssignmentPoints(submission) {
+        const assignmentId = submission.assignmentId ?? submission.assignment?.id;
+        if (assignmentId != null && assignmentPointsById.has(String(assignmentId))) {
+            return assignmentPointsById.get(String(assignmentId));
+        }
+        return assignmentPointsByName.get(submission.assignmentName);
     }
 
     function renderContent(content) {
@@ -774,7 +802,17 @@ active_tab: submissions
             const adminFields = document.getElementById('edit-admin-fields');
             const gradeInput = document.getElementById('edit-grade');
             const feedbackInput = document.getElementById('edit-feedback');
+            const assignmentPoints = getAssignmentPoints(submission);
             if (gradeInput) gradeInput.value = submission.grade != null ? String(submission.grade) : '';
+            if (gradeInput) {
+                if (assignmentPoints != null) {
+                    gradeInput.max = String(assignmentPoints);
+                    gradeInput.placeholder = `0–${assignmentPoints}`;
+                } else {
+                    gradeInput.removeAttribute('max');
+                    gradeInput.placeholder = 'Points';
+                }
+            }
             if (feedbackInput) feedbackInput.value = submission.feedback || '';
             if (adminFields) {
                 if (isAdmin) {
@@ -950,8 +988,9 @@ active_tab: submissions
                     <tbody>
                         ${mySubmissions.map((submission, idx) => {
                             try {
+                                const assignmentPoints = getAssignmentPoints(submission);
                                 const gradeDisplay = submission.grade != null
-                                    ? `<span class="grade-display">${submission.grade}/100</span>`
+                                    ? `<span class="grade-display">${submission.grade}${assignmentPoints != null ? `/${assignmentPoints}` : ''}</span>`
                                     : '<em style="color:#6b7280">Not graded</em>';
                                 return `
                                     <tr>
@@ -1013,6 +1052,7 @@ active_tab: submissions
                         ${allSubmissions.map((submission, idx) => {
                             try {
                                 const gradeVal = submission.grade != null ? submission.grade : '';
+                                const assignmentPoints = getAssignmentPoints(submission);
                                 const feedbackVal = submission.feedback != null ? submission.feedback : '';
                                 return `
                                     <tr id="sub-row-${idx}">
@@ -1023,11 +1063,11 @@ active_tab: submissions
                                         <td>
                                             <div style="display:flex;align-items:center;gap:6px;">
                                                 <input
-                                                    type="number" min="0" max="100" step="0.5"
+                                                    type="number" min="0" ${assignmentPoints != null ? `max="${assignmentPoints}"` : ''} step="0.5"
                                                     value="${escapeHtml(String(gradeVal))}"
                                                     id="grade-input-${idx}"
                                                     style="width:70px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;"
-                                                    placeholder="0–100"
+                                                    placeholder="${assignmentPoints != null ? `0–${assignmentPoints}` : 'Points'}"
                                                 >
                                             </div>
                                         </td>
@@ -1292,9 +1332,11 @@ active_tab: submissions
         const status = document.getElementById(`grade-status-${idx}`);
         const feedbackInput = document.getElementById(`feedback-input-${idx}`);
         const gradeValue = parseFloat(input.value);
+        const submission = allSubmissions.find(current => String(current.id) === String(submissionId));
+        const assignmentPoints = submission ? getAssignmentPoints(submission) : null;
 
-        if (isNaN(gradeValue) || gradeValue < 0 || gradeValue > 100) {
-            status.textContent = '⚠ Enter 0–100';
+        if (isNaN(gradeValue) || gradeValue < 0 || (assignmentPoints != null && gradeValue > assignmentPoints)) {
+            status.textContent = `⚠ Enter 0–${assignmentPoints != null ? assignmentPoints : 'valid points'}`;
             status.style.color = '#f59e0b';
             return;
         }
@@ -1481,6 +1523,7 @@ active_tab: submissions
                 <tbody>
                     ${filtered.map((submission, idx) => {
                         const gradeVal = submission.grade != null ? submission.grade : '';
+                        const assignmentPoints = getAssignmentPoints(submission);
                         const feedbackVal = submission.feedback != null ? submission.feedback : '';
                         return `
                         <tr>
@@ -1490,11 +1533,11 @@ active_tab: submissions
                             <td>${getStatusBadge(submission)}</td>
                             <td>
                                 <div style="display:flex;align-items:center;gap:6px;">
-                                    <input type="number" min="0" max="100" step="0.5"
+                                    <input type="number" min="0" ${assignmentPoints != null ? `max="${assignmentPoints}"` : ''} step="0.5"
                                         value="${escapeHtml(String(gradeVal))}"
                                         id="grade-input-${idx}"
                                         style="width:70px;padding:4px 6px;border-radius:4px;border:1px solid #4b5563;background:#1f2937;color:#f9fafb;font-size:0.85rem;"
-                                        placeholder="0–100">
+                                        placeholder="${assignmentPoints != null ? `0–${assignmentPoints}` : 'Points'}">
                                 </div>
                             </td>
                             <td>
