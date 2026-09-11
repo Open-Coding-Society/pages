@@ -15,7 +15,7 @@ donation:
   body: "This capstone starts with generosity. OCS was donated a GPU rig with eight GTX 1070s — enough local compute to host open-weight models instead of renting them. The work is not to buy intelligence. It is to turn a gifted machine into a classroom service: assembled, served, and reachable from the networks students already use."
   costLine: "Donated hardware reduces purchase costs. The proposed hybrid service also needs a budget for electricity, cloud services, storage, networking, and maintenance."
 
-researchQuestionsNote: "These are living questions, not a fixed spec. As Phase 0 research turns up better serving tricks or a stronger candidate model, and as Phase 1/2 surface real load numbers, the questions below get revised rather than treated as settled on day one."
+researchQuestionsNote: "Living questions, not a fixed spec — revised as each phase turns up real numbers."
 
 researchQuestions:
   - label: "Research question 1"
