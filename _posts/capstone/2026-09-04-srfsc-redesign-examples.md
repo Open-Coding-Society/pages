@@ -533,96 +533,10 @@ courses: { csp: {week: 25} }
   }
 </script>
 
-## How this matches the redesign ideas
+## A clearer redesign direction
 
-This mockup is designed to implement the key concepts from the ideation work:
+This mockup keeps the same local mission but makes the page easier to scan, easier to trust, and easier to act on.
 
-- Cleaner hero section with a direct emergency message
-- Strong call-to-action buttons for volunteering and donating
-- More obvious program grouping instead of a crowded homepage
-- Clear community impact messaging
-- Better use of cards and content blocks to organize information
-- A more polished and trustworthy nonprofit look
-
-## Example improvements this mockup reflects
-
-1. Simplify the homepage hierarchy
-2. Put the mission first
-3. Make volunteering and donating obvious
-4. Give each section a purpose and a visual weight
-5. Present local impact and urgency clearly
-6. Make the site feel community-driven, reliable, and action-focused
-
-This is a strong starting point for a final site redesign because it keeps the emotional mission while making the structure much easier to navigate.
-
-<div class="srfsc-pitch">
-  <div class="srfsc-pitch-hero">
-    <div class="srfsc-pitch-kicker">Redesign Summary</div>
-    <h2>Key improvements at a glance</h2>
-    <p>These focused changes can significantly enhance the website's effectiveness in communication and engagement.</p>
-  </div>
-
-  <div class="srfsc-pitch-grid">
-    <div class="srfsc-pitch-card" data-search="cleaner hero section emergency message">
-      <div class="srfsc-pitch-number">01</div>
-      <h3>Cleaner hero section</h3>
-      <p>Streamlined design with a direct emergency message for immediate impact.</p>
-    </div>
-
-    <div class="srfsc-pitch-card" data-search="strong call-to-action buttons volunteering donating">
-      <div class="srfsc-pitch-number">02</div>
-      <h3>Strong call-to-action buttons</h3>
-      <p>Prominent buttons for volunteering and donating to increase engagement.</p>
-    </div>
-
-    <div class="srfsc-pitch-card" data-search="obvious program grouping homepage">
-      <div class="srfsc-pitch-number">03</div>
-      <h3>Obvious program grouping</h3>
-      <p>Clearer organization of programs instead of a crowded homepage.</p>
-    </div>
-
-    <div class="srfsc-pitch-card" data-search="community impact messaging">
-      <div class="srfsc-pitch-number">04</div>
-      <h3>Community impact messaging</h3>
-      <p>Emphasizes the difference we make together, right at the forefront.</p>
-    </div>
-
-    <div class="srfsc-pitch-card" data-search="better use of cards content blocks">
-      <div class="srfsc-pitch-number">05</div>
-      <h3>Better use of cards and content blocks</h3>
-      <p>Organizes information effectively, making it easier to navigate.</p>
-    </div>
-
-    <div class="srfsc-pitch-card" data-search="polished trustworthy nonprofit look">
-      <div class="srfsc-pitch-number">06</div>
-      <h3>A more polished and trustworthy look</h3>
-      <p>Professional design that enhances credibility and encourages action.</p>
-    </div>
-  </div>
-
-  <div class="srfsc-before-after">
-    <div class="srfsc-pitch-panel before">
-      <div class="srfsc-panel-label">Before</div>
-      <ul>
-        <li>Overly complex hero section</li>
-        <li>Weak call-to-action visibility</li>
-        <li>Programs not clearly grouped</li>
-        <li>Impact of donations not highlighted</li>
-        <li>Information densely packed</li>
-        <li>Lack of professional polish</li>
-      </ul>
-    </div>
-
-    <div class="srfsc-pitch-panel after">
-      <div class="srfsc-panel-label">After</div>
-      <ul>
-        <li>Cleaner, focused hero with emergency info</li>
-        <li>Strong, clear buttons for action</li>
-        <li>Logical grouping of programs and services</li>
-        <li>Community impact and urgency upfront</li>
-        <li>Well-organized, digestible information</li>
-        <li>Polished, trustworthy nonprofit appearance</li>
-      </ul>
-    </div>
-  </div>
-</div>
+- stronger hero message
+- more visible volunteer and donation calls-to-action
+- clearer program grouping and community impact
