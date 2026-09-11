@@ -1,0 +1,622 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;800&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+
+<style>
+.sd2-page {
+  --sd2-bg: #050a16;
+  --sd2-panel: rgba(10, 20, 44, 0.86);
+  --sd2-line: rgba(72, 217, 255, 0.26);
+  --sd2-text: #dbeaff;
+  --sd2-muted: #9eb6d7;
+  --sd2-cyan: #5ce7ff;
+  --sd2-iris: #8f9dff;
+  --sd2-lime: #86f5b3;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  color: var(--sd2-text);
+  font-family: "Exo 2", "Segoe UI", sans-serif;
+  overflow-x: clip;
+}
+
+.sd2-page * {
+  box-sizing: border-box;
+}
+
+.sd2-page h1,
+.sd2-page h2,
+.sd2-page h3,
+.sd2-page p,
+.sd2-page li {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: manual;
+}
+
+.sd2-page h2,
+.sd2-page h3,
+.sd2-hero h1 {
+  font-family: "Orbitron", "Exo 2", sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.sd2-page h2 {
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+  font-size: 1.3rem;
+}
+
+.sd2-page h3 {
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  color: var(--sd2-cyan);
+}
+
+.sd2-page p,
+.sd2-page li {
+  color: var(--sd2-muted);
+  line-height: 1.56;
+}
+
+.sd2-page ul,
+.sd2-page ol {
+  padding-left: 1.2rem;
+}
+
+.sd2-page blockquote {
+  margin: 1rem 0 0;
+  border-left: 3px solid var(--sd2-cyan);
+  padding: 0.5rem 0.8rem;
+  background: rgba(6, 14, 30, 0.64);
+  color: var(--sd2-text);
+}
+
+.sd2-hero,
+.sd2-panel {
+  border: 1px solid var(--sd2-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(92, 231, 255, 0.16), transparent 45%),
+    radial-gradient(circle at 95% 5%, rgba(143, 157, 255, 0.13), transparent 34%),
+    var(--sd2-panel);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3);
+}
+
+.sd2-hero {
+  padding: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.sd2-hero-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(220px, 0.95fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.sd2-hero-copy {
+  min-width: 0;
+}
+
+.sd2-hero h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4.8vw, 3rem);
+}
+
+.sd2-hero h1 span {
+  color: var(--sd2-cyan);
+}
+
+.sd2-kicker {
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sd2-cyan);
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.sd2-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--sd2-lime);
+  font-weight: 700;
+}
+
+.sd2-summary {
+  margin: 0.9rem 0 0;
+  color: var(--sd2-muted);
+  max-width: 78ch;
+  line-height: 1.55;
+}
+
+.sd2-cta-row {
+  margin-top: 1rem;
+}
+
+.sd2-resource-links {
+  margin: 0 0 1rem;
+}
+
+.sd2-logo-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+}
+
+.sd2-logo-panel img {
+  display: block;
+  width: 12rem;
+  height: 12rem;
+  max-width: 12rem;
+  object-fit: contain;
+}
+
+.sd2-logo-mark {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 12rem;
+  height: 12rem;
+  max-width: 12rem;
+  padding: 0.45rem;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  box-shadow:
+    0 0 0 2px rgba(44, 130, 255, 0.9),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+.sd2-logo-mark-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 1.05rem 1rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #3b82f6, #22c1dc);
+}
+
+.sd2-logo-wordmark {
+  display: block;
+  font-family: "Exo 2", "Segoe UI", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.sd2-logo-wordmark + .sd2-logo-wordmark {
+  margin-top: 0.9rem;
+}
+
+.sd2-logo-wordmark span {
+  color: #ffffff;
+}
+
+.sd2-logo-caption {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.sd2-btn {
+  min-height: 44px;
+  text-align: center;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
+  color: var(--sd2-text) !important;
+  transition: transform 160ms ease;
+}
+
+.sd2-btn:hover {
+  transform: translateY(-1px);
+}
+
+.sd2-panel {
+  padding: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.sd2-section-grid {
+  margin-bottom: 1rem;
+}
+
+.sd2-section-grid .sd2-panel {
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.sd2-grid-2 {
+  margin-bottom: 1rem;
+}
+
+.sd2-grid-2 .sd2-panel {
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.sd2-table {
+  border: 1px solid var(--sd2-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.sd2-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 0;
+}
+
+.sd2-row > div {
+  padding: 0.7rem 0.75rem;
+  border-top: 1px solid rgba(72, 217, 255, 0.15);
+}
+
+.sd2-row > div:first-child {
+  border-right: 1px solid rgba(72, 217, 255, 0.15);
+  color: var(--sd2-text);
+  font-weight: 700;
+}
+
+.sd2-row--head > div {
+  border-top: 0;
+  background: rgba(92, 231, 255, 0.1);
+  color: var(--sd2-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.74rem;
+}
+
+.sd2-flow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.sd2-flow li {
+  border: 1px solid rgba(143, 157, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(4, 11, 28, 0.8);
+  padding: 0.64rem 0.78rem;
+}
+
+.sd2-pillars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sd2-pillars li {
+  padding: 0.85rem 0.9rem;
+  border: 1px solid rgba(92, 231, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(4, 11, 28, 0.72);
+}
+
+.sd2-pillar-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--sd2-cyan);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sd2-stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.sd2-mini-card {
+  padding: 0.9rem;
+  border: 1px solid rgba(143, 157, 255, 0.24);
+  border-radius: 12px;
+  background: rgba(4, 11, 28, 0.72);
+}
+
+.sd2-mini-card h3,
+.sd2-mini-card p {
+  margin: 0;
+}
+
+.sd2-mini-card p {
+  margin-top: 0.45rem;
+}
+
+.sd2-journey {
+  counter-reset: sd2-journey;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sd2-journey li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid rgba(92, 231, 255, 0.18);
+  border-radius: 12px;
+  background: rgba(4, 11, 28, 0.72);
+}
+
+.sd2-journey li::before {
+  counter-increment: sd2-journey;
+  content: counter(sd2-journey, decimal-leading-zero);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(92, 231, 255, 0.35);
+  color: var(--sd2-cyan);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.sd2-link-grid {
+  margin-bottom: 1rem;
+}
+
+.sd2-link-grid .ocs__grid-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sd2-link-grid .ocs__btn {
+  width: 100%;
+}
+
+.sd2-team {
+  margin-top: 1rem;
+  color: var(--sd2-text);
+}
+
+@media (max-width: 600px) {
+  .sd2-page {
+    padding: 0.75rem;
+    font-size: 0.98rem;
+  }
+
+  .sd2-page h2 {
+    font-size: 1.12rem;
+  }
+
+  .sd2-page p,
+  .sd2-page li,
+  .sd2-page blockquote,
+  .sd2-btn {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .sd2-page p,
+  .sd2-page li {
+    line-height: 1.62;
+  }
+
+  .sd2-page ul,
+  .sd2-page ol {
+    padding-left: 1rem;
+  }
+
+  .sd2-hero,
+  .sd2-panel {
+    border-radius: 14px;
+    padding: 0.95rem;
+  }
+
+  .sd2-kicker {
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+  }
+
+  .sd2-subtitle {
+    line-height: 1.4;
+  }
+
+  .sd2-summary {
+    max-width: none;
+  }
+
+  .sd2-hero h1 {
+    font-size: clamp(1.45rem, 7vw, 2rem);
+    line-height: 1.08;
+  }
+
+  .sd2-cta-row a {
+    width: 100%;
+  }
+
+  .sd2-hero-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sd2-logo-panel {
+    justify-self: start;
+  }
+
+  .sd2-journey li {
+    grid-template-columns: 1fr;
+  }
+
+  .sd2-journey li::before {
+    margin-bottom: 0.25rem;
+  }
+
+  .sd2-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sd2-row > div:first-child {
+    border-right: 0;
+    border-bottom: 1px solid rgba(72, 217, 255, 0.15);
+  }
+}
+</style>
+
+<article class="sd2-page" data-sd2-page>
+  <header class="sd2-hero">
+    <div class="sd2-hero-shell">
+      <div class="sd2-hero-copy">
+        <p class="sd2-kicker">2026/2027 • CSP • Macro Cosmos Extension</p>
+        <h1>SD Auto <span>2.0</span></h1>
+        <p class="sd2-subtitle">Macro Cosmos - Route Decision &amp; Smart Commute Planner</p>
+        <p class="sd2-summary">We are building onto the old SD Auto website, not replacing it. SD Auto 2.0 adds a transparent decision layer that uses existing traffic and hazard data to recommend and explain route choices.</p>
+        <div class="ocs__links ocs__links--wide sd2-cta-row" aria-label="Project links">
+          <a class="ocs__btn alert-green iridescent sd2-btn" href="https://macro-cosmos.netlify.app/about/" target="_blank" rel="noopener noreferrer">Go to the current SD Auto App</a>
+          <a class="ocs__btn iridescent sd2-btn" href="https://yimingyin1213.github.io/Team-Portfolio/capstone/ideation-original/" target="_blank" rel="noopener noreferrer">Go to ideation page</a>
+        </div>
+      </div>
+      <div class="sd2-logo-panel" aria-label="SD Auto logo panel">
+        <div class="sd2-logo-mark" role="img" aria-label="SD Auto logo">
+          <div class="sd2-logo-mark-inner">
+            <span class="sd2-logo-wordmark">SD</span>
+            <span class="sd2-logo-wordmark">Auto <span>2.0</span></span>
+            <span class="sd2-logo-caption">Smart commute routing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="ocs__grid ocs__grid--standard cols-2 sd2-section-grid">
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Selection</h2>
+      <p>We propose a <strong>Safety-Aware Route Decision Engine</strong> for Macro Cosmos users, building on the existing route finder and daily routine features.</p>
+      <blockquote>
+        One-sentence pitch: Turn Macro Cosmos from a tool that displays traffic and hazard data into one that actually uses that data to make and explain routing decisions.
+      </blockquote>
+    </article>
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Project Focus</h2>
+      <ul class="sd2-pillars">
+        <li>
+          <span class="sd2-pillar-label">Idea 1</span>
+          <strong>Safety Score Routing</strong> - score and compare routes using real crash data and hazard reports, instead of returning one unexplained best route.
+        </li>
+        <li>
+          <span class="sd2-pillar-label">Idea 2</span>
+          <strong>Smart Commute Planner</strong> - replace the current hour-based routine table with an arrive-by/leave-by calculator that accounts for live conditions.
+        </li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="ocs__grid ocs__grid--standard cols-2 sd2-grid-2">
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Why We Are Interested</h2>
+      <p>Our team is interested in transportation, local infrastructure, and practical software people use every day. Macro Cosmos already has a route finder, hazard reports, and live traffic data, but these systems are not fully connected yet. SD Auto 2.0 focuses on that connection so existing data can drive a meaningful decision.</p>
+    </article>
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>User and Problem</h2>
+      <p><strong>Primary user:</strong> A San Diego commuter, including students, parents, and daily drivers.</p>
+      <p><strong>Problem:</strong> The current route finder returns a single route with no explanation, and daily routine storage is hour-based rather than condition-aware.</p>
+      <p><strong>Need:</strong> Safety and traffic data must measurably influence recommendations, and the planner should compute a real departure time.</p>
+    </article>
+  </section>
+
+  <section class="ocs__grid ocs__grid--standard cols-2 sd2-link-grid" aria-label="Repository links">
+    <div class="ocs__grid-cell sd2-panel">
+      <a class="ocs__btn alert-green iridescent sd2-btn" href="https://github.com/YimingYin1213/SD-Auto-Frontend" target="_blank" rel="noopener noreferrer">Frontend Repository</a>
+    </div>
+    <div class="ocs__grid-cell sd2-panel">
+      <a class="ocs__btn alert-yellow iridescent sd2-btn" href="https://github.com/Ahaanv19/SD_Auto_Backend" target="_blank" rel="noopener noreferrer">Backend Repository</a>
+    </div>
+  </section>
+
+  <section class="ocs__grid ocs__grid--standard cols-2 sd2-section-grid">
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Why This Direction</h2>
+      <div class="sd2-table" role="table" aria-label="Project justification">
+        <div class="sd2-row sd2-row--head" role="row">
+          <div role="columnheader">Criterion</div>
+          <div role="columnheader">Justification</div>
+        </div>
+        <div class="sd2-row" role="row"><div role="cell">Stakeholder value</div><div role="cell">Useful for regular drivers in San Diego by connecting safety data to daily routing choices.</div></div>
+        <div class="sd2-row" role="row"><div role="cell">Team interest</div><div role="cell">Matches our transportation focus and algorithm-centered system design goals.</div></div>
+        <div class="sd2-row" role="row"><div role="cell">Technical learning</div><div role="cell">Includes real datasets, scoring formulas, route comparison logic, conditionals, and time calculations.</div></div>
+      </div>
+    </article>
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Direction Fit</h2>
+      <div class="sd2-stack">
+        <div class="sd2-mini-card">
+          <h3>Feasibility</h3>
+          <p>Builds incrementally on existing Macro Cosmos route and hazard infrastructure.</p>
+        </div>
+        <div class="sd2-mini-card">
+          <h3>Safety</h3>
+          <p>Adds transparent informational safety signals without replacing official routing.</p>
+        </div>
+        <div class="sd2-mini-card">
+          <h3>Originality</h3>
+          <p>Moves from separate traffic and hazard displays to data-driven recommendation logic.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="ocs__grid ocs__grid--standard cols-2 sd2-section-grid">
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Proposed User Flow</h2>
+      <ol class="sd2-journey">
+        <li><div><strong>Enter trip:</strong> User inputs origin and destination and selects Fastest, Safest, or Balanced.</div></li>
+        <li><div><strong>Compare routes:</strong> The app shows 2-3 route options with time, distance, and Safety Score.</div></li>
+        <li><div><strong>See why:</strong> A concise explanation states why the recommended route wins.</div></li>
+      </ol>
+    </article>
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Commute Loop</h2>
+      <ol class="sd2-journey" start="4">
+        <li><div><strong>Save as commute:</strong> User can save a trip with target arrival time.</div></li>
+        <li><div><strong>Get leave-by time:</strong> On return visits, the app calculates when to leave using live conditions.</div></li>
+        <li><div><strong>Confirm hazards:</strong> Users mark reports active or cleared, and old reports expire automatically.</div></li>
+      </ol>
+    </article>
+  </section>
+
+  <section class="ocs__grid ocs__grid--standard cols-2 sd2-grid-2">
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Phased Plan</h2>
+      <h3>Phase 1 - Foundation</h3>
+      <p>Run the existing codebase, verify upstream alignment, audit real implementation status, and clean the San Diego crash and hazard dataset.</p>
+      <h3>Phase 2 - Core Algorithm</h3>
+      <p>Build the Safety Score formula and Fastest/Safest/Balanced weighting in backend route responses.</p>
+      <h3>Phase 3 - Decision Layer</h3>
+      <p>Ship multi-route comparison, route rationale text, and arrive-by to leave-by planning flow.</p>
+      <h3>Phase 4 - Refinement</h3>
+      <p>Add hazard confirmation and expiration, polish UX, complete end-to-end tests, and prepare the demo.</p>
+    </article>
+
+    <article class="ocs__grid-cell sd2-panel">
+      <h2>Later Scope</h2>
+      <ul>
+        <li>Mode-specific scoring for driving, biking, and walking.</li>
+        <li>User-adjustable safety preference such as max extra minutes for safer routes.</li>
+        <li>Saved places with default routing preferences.</li>
+      </ul>
+      <p class="sd2-team"><strong>Team:</strong> Yiming, Noor, Luke</p>
+    </article>
+  </section>
+</article>
