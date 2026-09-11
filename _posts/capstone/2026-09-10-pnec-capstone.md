@@ -3,7 +3,7 @@ microblog: true
 toc: false
 layout: post
 title: Poway Neighborhood Emergency Corps
-description: Continuing and expanding the Poway Neighborhood Emergency Corps (PNEC) platform for 2026/2027 — personalized preparedness checklists, an interactive quiz, volunteer coordination, and multilingual support on top of the existing Risk Watch, Helper Bot, and neighborhood map.
+description: Continuing and expanding the Poway Neighborhood Emergency Corps (PNEC) platform for 2026/2027 year — personalized preparedness checklists, an interactive quiz, volunteer coordination, and multilingual support on top of the existing Risk Watch, Helper Bot, and neighborhood map.
 permalink: /capstone/powayneighborhoodem/
 ---
 > PNEC is a preparedness platform built for a real community organization in Poway. The previous team turned a static page into a working platform with Risk Watch, a Helper Bot, and neighborhood mapping — our job is to extend it with tools that turn information into action.
