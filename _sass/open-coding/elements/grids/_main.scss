@@ -31,45 +31,6 @@
   padding: $spacing-md;
   color: var(--pref-text-color);
 
-  &--project {
-    .ocs__thumbnail-link {
-      display: flex;
-      align-items: flex-start;
-      gap: $spacing-md;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .ocs__thumbnail-link h3 {
-      margin: 0;
-      min-width: 0;
-      font-size: $text-lg;
-      font-weight: 600;
-      overflow-wrap: anywhere;
-    }
-
-    .ocs__card-treatment {
-      margin: $spacing-sm 0 0;
-      color: var(--pref-text-color);
-      font-size: $text-sm;
-      font-weight: 600;
-      opacity: 0.7;
-    }
-
-    .ocs__card-description,
-    .ocs__card-team {
-      margin-top: $spacing-sm;
-      color: var(--pref-text-color);
-      font-size: $text-sm;
-      opacity: 0.85;
-    }
-
-    .ocs__card-team {
-      font-size: $text-xs;
-      opacity: 0.65;
-    }
-  }
-
   &--header {
     grid-column: 1 / -1;
     font-size: $text-xl;
@@ -87,12 +48,6 @@
   &--muted {
     background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
     color: color-mix(in srgb, var(--pref-text-color) 70%, transparent);
-  }
-}
-
-@media (max-width: $breakpoint-mobile) {
-  .ocs__grid-cell--project .ocs__thumbnail-link {
-    gap: $spacing-sm;
   }
 }
 
@@ -136,6 +91,49 @@
 
   .ocs__grid-cell {
     @include grid-card-cell;
+  }
+
+  .ocs__thumbnail-link {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    color: inherit;
+    text-decoration: none;
+
+    h3 {
+      margin: 0;
+      min-width: 0;
+      font-size: $text-lg;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .ocs__card-treatment {
+    margin: $spacing-sm 0 0;
+    color: var(--pref-text-color);
+    font-size: $text-sm;
+    font-weight: 600;
+    opacity: 0.7;
+  }
+
+  .ocs__card-description,
+  .ocs__card-team {
+    margin-top: $spacing-sm;
+    color: var(--pref-text-color);
+    font-size: $text-sm;
+    opacity: 0.85;
+  }
+
+  .ocs__card-team {
+    font-size: $text-xs;
+    opacity: 0.65;
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .ocs__grid--card .ocs__thumbnail-link {
+    gap: $spacing-sm;
   }
 }
 
