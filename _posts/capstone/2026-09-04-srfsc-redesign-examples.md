@@ -343,35 +343,27 @@ courses: { csp: {week: 25} }
   .srfsc-demo .srfsc-pitch-card h3,
   .srfsc-demo .srfsc-pitch-card p,
   .srfsc-demo .srfsc-pitch-panel li,
+  .srfsc-demo .srfsc-pitch-panel ul,
   .srfsc-demo .srfsc-feature-header h3,
   .srfsc-demo .srfsc-pitch-hero h2,
-  .srfsc-demo .srfsc-pitch-hero p {
-    color: #112420;
+  .srfsc-demo .srfsc-pitch-hero p,
+  .srfsc-demo .srfsc-pitch-kicker,
+  .srfsc-demo .srfsc-kicker,
+  .srfsc-demo .srfsc-hero-box h3,
+  .srfsc-demo .srfsc-hero-box p,
+  .srfsc-demo .srfsc-hero-box strong,
+  .srfsc-demo .srfsc-news-content .tag,
+  .srfsc-demo .srfsc-brand,
+  .srfsc-demo .srfsc-nav a,
+  .srfsc-demo .srfsc-btn {
+    color: #000000;
   }
 
-  .srfsc-demo .srfsc-pitch-panel,
-  .srfsc-demo .srfsc-pitch-card,
-  .srfsc-demo .srfsc-feature-card,
-  .srfsc-demo .srfsc-news-item,
-  .srfsc-demo .ocs__grid-cell {
-    color: #112420;
-  }
-
-  .srfsc-demo .srfsc-pitch-panel .srfsc-panel-label {
-    color: #173b2f;
-  }
-
-  .srfsc-demo .srfsc-pitch-panel.after .srfsc-panel-label {
-    color: #173b2f;
-  }
-
-  .srfsc-demo .srfsc-pitch-hero,
-  .srfsc-demo .srfsc-pitch-hero * {
-    color: #fff;
-  }
-
-  .srfsc-demo .srfsc-pitch-hero p {
-    color: rgba(255,255,255,0.85);
+  .srfsc-demo .srfsc-topbar,
+  .srfsc-demo .srfsc-topbar a,
+  .srfsc-demo .srfsc-hero,
+  .srfsc-demo .srfsc-hero * {
+    color: #ffffff;
   }
 </style>
 
