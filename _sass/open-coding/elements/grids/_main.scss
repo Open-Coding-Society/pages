@@ -13,6 +13,10 @@
 //   .ocs__grid-cell--wide    spans 2 columns
 //   .ocs__grid-cell--accent  accent tinted background
 //   .ocs__grid-cell--muted   subtle alternate background
+//   .ocs__grid-cell--blue    soft blue tinted background
+//   .ocs__grid-cell--beige   soft beige tinted background
+//   .ocs__grid-cell--green   soft green tinted background
+//   .ocs__grid-cell--yellow  soft yellow tinted background
 
 @import "../../mixins/grid";
 
@@ -48,6 +52,23 @@
   &--muted {
     background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
     color: color-mix(in srgb, var(--pref-text-color) 70%, transparent);
+  }
+
+  &--blue {
+    background: color-mix(in srgb, #4A8FD9 16%, var(--panel));
+    border-color: color-mix(in srgb, #4A8FD9 45%, var(--panel));
+  }
+  &--beige {
+    background: color-mix(in srgb, #C9A876 18%, var(--panel));
+    border-color: color-mix(in srgb, #C9A876 45%, var(--panel));
+  }
+  &--green {
+    background: color-mix(in srgb, #4CAF6D 16%, var(--panel));
+    border-color: color-mix(in srgb, #4CAF6D 45%, var(--panel));
+  }
+  &--yellow {
+    background: color-mix(in srgb, #D9B93E 18%, var(--panel));
+    border-color: color-mix(in srgb, #D9B93E 45%, var(--panel));
   }
 }
 
@@ -95,6 +116,35 @@
 
   .ocs__grid-cell {
     @include grid-card-cell;
+
+    &--header {
+      background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+      border-color: var(--pref-accent-color);
+    }
+    &--accent {
+      background: color-mix(in srgb, var(--pref-accent-color) 15%, var(--panel));
+      border-color: var(--pref-accent-color);
+    }
+    &--muted {
+      background: color-mix(in srgb, var(--pref-text-color) 4%, var(--panel));
+      color: color-mix(in srgb, var(--pref-text-color) 70%, transparent);
+    }
+    &--blue {
+      background: color-mix(in srgb, #4A8FD9 16%, var(--panel));
+      border-color: color-mix(in srgb, #4A8FD9 45%, var(--panel));
+    }
+    &--beige {
+      background: color-mix(in srgb, #C9A876 18%, var(--panel));
+      border-color: color-mix(in srgb, #C9A876 45%, var(--panel));
+    }
+    &--green {
+      background: color-mix(in srgb, #4CAF6D 16%, var(--panel));
+      border-color: color-mix(in srgb, #4CAF6D 45%, var(--panel));
+    }
+    &--yellow {
+      background: color-mix(in srgb, #D9B93E 18%, var(--panel));
+      border-color: color-mix(in srgb, #D9B93E 45%, var(--panel));
+    }
   }
 
   .ocs__thumbnail-link {
