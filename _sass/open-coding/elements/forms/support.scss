@@ -1,0 +1,148 @@
+// Support page styles: topic accordion list and the OAuth password-reset wizard
+// (navigation/support.md). Moved out of that page's inline <style> block for
+// maintainability/theming consistency with the rest of this SCSS tree.
+
+@import "../../materials/main.scss";
+
+.support-topics-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.support-topic-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.support-topic-item {
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: 6px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.support-topic-item:hover {
+    background-color: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.support-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.support-group {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.support-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1.1rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+.support-group-header:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+.support-group-label {
+    font-family: 'Courier New', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+}
+.support-group-arrow {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+.support-group.open .support-group-arrow {
+    transform: rotate(90deg);
+}
+.support-group-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+}
+.support-group.open .support-group-content {
+    max-height: 700px;
+}
+.support-group-content .support-topic-list {
+    padding: 0 1.1rem 1.1rem 1.1rem;
+}
+.support-group-content .support-topic-item {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.support-back-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+#support-reset-wizard {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: 3rem 1.5rem;
+    justify-content: center;
+}
+#support-reset-wizard.active {
+    display: flex;
+    animation: supportFadeIn 0.4s ease;
+}
+.support-wizard-inner {
+    width: 100%;
+    max-width: 480px;
+}
+
+.support-step { display: none; opacity: 0; }
+.support-step.active { display: block; animation: supportStepIn 0.4s ease forwards; }
+.support-step.leaving { display: block; animation: supportStepOut 0.25s ease forwards; }
+// Modifier for the OAuth sign-in step specifically (was an inline style on that one div)
+.support-step-centered { text-align: center; margin-bottom: 1.5rem; }
+
+.support-oauth-hint {
+    margin-bottom: 1rem;
+    color: #d1d5db;
+}
+.support-g-signin-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+.support-oauth-status {
+    margin-top: 1rem;
+}
+.support-ticket-row {
+    display: none;
+    margin-top: 1rem;
+}
+.support-reset-message {
+    color: red;
+}
+
+@keyframes supportFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes supportStepIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes supportStepOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-16px); }
+}
