@@ -282,6 +282,24 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+  
+   <!-- Poway Veterans Organization 2026–27 (CSP) -->
+   <div class="ocs__grid-cell CSP"
+        data-year="2026-2027"
+        data-page-url="{{ '/capstone/pvo/' | relative_url }}"
+        data-frontend-url="https://github.com/api-pirates-p4/PVO-Frontend"
+        data-backend-url="https://github.com/api-pirates-p4/PVO-Backend">
+       <a href="{{ '/capstone/pvo/' | relative_url }}">
+           <img src="{{ '/images/capstone/poway-veterans-logo.png' | relative_url }}" alt="Poway Veterans Organization 2026–27" class="ocs__image-frame ocs__image-frame--card" />
+       </a>
+       <div>
+           <h3><a href="{{ '/capstone/pvo/' | relative_url }}">Poway Veterans Organization 2026–27</a></h3>
+           <p>A CSP capstone continuing the PVO redesign with guided veteran assistance, streamlined volunteer onboarding, an AI support chatbot, and accessibility-first improvements including adjustable reading and display tools.</p>
+           <p>Team: Pranav, Aadi, Will</p>
+        </div>
+   </div>
+  
+  
    <!-- Friends of the Poway Library 2026–27 (CSP) -->
    <div class="ocs__grid-cell CSP"
         data-year="2026-2027"
