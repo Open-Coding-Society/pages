@@ -282,6 +282,7 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+  
    <!-- Poway Veterans Organization 2026–27 (CSP) -->
    <div class="ocs__grid-cell CSP"
         data-year="2026-2027"
@@ -295,6 +296,23 @@ document.addEventListener('DOMContentLoaded', function(){
            <h3><a href="{{ '/capstone/pvo/' | relative_url }}">Poway Veterans Organization 2026–27</a></h3>
            <p>A CSP capstone continuing the PVO redesign with guided veteran assistance, streamlined volunteer onboarding, an AI support chatbot, and accessibility-first improvements including adjustable reading and display tools.</p>
            <p>Team: Pranav, Aadi, Will</p>
+        </div>
+   </div>
+  
+  
+   <!-- Friends of the Poway Library 2026–27 (CSP) -->
+   <div class="ocs__grid-cell CSP"
+        data-year="2026-2027"
+        data-page-url="{{ '/capstone/poway-library-2026-27/' | relative_url }}"
+        data-frontend-url="https://github.com/Boolean-Boyz/bb-pages"
+        data-backend-url="https://github.com/Boolean-Boyz/bb-flask">
+       <a href="{{ '/capstone/poway-library-2026-27/' | relative_url }}">
+           <img src="{{ '/images/capstone/poway_library.png' | relative_url }}" alt="Friends of the Poway Library 2026–27" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{{ '/capstone/poway-library-2026-27/' | relative_url }}">Friends of the Poway Library 2026–27</a></h3>
+           <p>A CSP capstone continuing the previous Friends of the Poway Library prototype with a searchable bookstore catalog, events and newsletters, volunteer and donation pathways, community history, profiles, and library-themed games.</p>
+           <p>Team: Arjun Ganesh — Scrum Master; Nathan Trieu — Developer 1; Raadin Ansari — Developer 2</p>
        </div>
    </div>
   
@@ -791,30 +809,6 @@ document.addEventListener('DOMContentLoaded', function(){
            <h3><a href="{% post_url 2026-09-08-ccae-escondido-capstone %}">California Center For The Performing Arts Escondido</a></h3>
            <p>This capstone project involves refurbishing the California Center For The Performing Arts Escondido website to be more streamlined, organized, and less busy. It will also overhaul the search feature to be more intelligent, introduce a dynamic and artistic design, and will replace generic walls of text with something more interactive.</p>
            <p>Team: Mateo, Tristan, and Yue (Barbara)</p>
-       </div>
-   </div>
-
-   <!-- San Diego Senior Games (CSP, 2026/2027) -->
-   <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-10-sdseniorgames-capstone %}">
-           <img src="/images/capstone/sdseniorgames.png" alt="San Diego Senior Games Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
-       </a>
-       <div>
-           <h3><a href="{% post_url 2026-09-10-sdseniorgames-capstone %}">San Diego Senior Games</a></h3>
-           <p>This capstone project reorganizes the San Diego Senior Games website around the person actually trying to register. It gives every one of the seventeen sports its own page with dates, brackets, and fees in one place, smooths the handoff to the outside registration platform, and rebuilds the type, contrast, and tap targets for an audience of athletes aged 50 and over.</p>
-           <p>Team: Aryan M, Pranay K, Raymond L</p>
-       </div>
-   </div>
-
-   <!-- Advancing STEM (CSP, 2026/2027) -->
-   <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-10-advancingstem-capstone %}">
-           <img src="/images/capstone/advancingstem.png" alt="Advancing STEM Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
-       </a>
-       <div>
-           <h3><a href="{% post_url 2026-09-10-advancingstem-capstone %}">Advancing STEM</a></h3>
-           <p>This capstone project rebuilds the Advancing Science, Technology and Art website so it shows what the nonprofit actually does. It moves the proof to the front, gives competitions, mentoring, camps, and outreach their own pages, makes the nine countries they work in visible, and turns a wall of sponsor logos into a page that makes the case for the next sponsor.</p>
-           <p>Team: Aryan M, Pranay K, Raymond L</p>
        </div>
    </div>
 
