@@ -5,7 +5,7 @@ layout: post
 tailwind: True
 infoGraph: capstone_infograph
 title: Capstone Projects
-description: Design-Based Research (DBR) capstone projects solving real-world problems through iterative design, implementation, and analysis. Each project features ML, database work, and advanced data structures (e.g., graphs). Projects must be deployed and accessible through this infographic.
+description: Explore student-led capstone projects, their real-world problems, technical solutions, teams, and project resources.
 type: capstone
 categories: Capstone
 permalink: /capstone/
@@ -18,11 +18,6 @@ sticky_rank: 1
   <button id="editCapstoneFab" class="new-capstone-fab" title="Edit capstone" aria-label="Edit capstone" style="bottom: 100px;">✎</button>
   <button id="ncFab" class="new-capstone-fab" title="Create new capstone" aria-label="Create new capstone">+</button>
 </div>
-
-## Capstone Infographics Home
-
-
-<h2>Design-Based Research (DBR) Capstone Projects</h2>
 
 <div class="ocs__grid" style="margin-bottom: 0.9rem;">
   <div class="ocs__grid-cell">
@@ -122,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function(){
       pageUrl: "https://pages.opencodingsociety.com/capstone/communication-system/",
       frontendUrl: "https://github.com/UGRC-CSA/Pages",
       backendUrl: "https://github.com/Open-Coding-Society/spring"
-    }
+    },
     "Oncology and Kids Cancer Foundation": {
       pageUrl: "https://pages.opencodingsociety.com/capstone/oak/",
       frontendUrl: "https://github.com/undergroundrapclub/portfolio",
@@ -316,15 +311,16 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
-       <!--Oncology and Kids Cancer Association (CSP, 2026/2027) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027">
+       <!-- Oncology and Kids Cancer Association (CSP, 2026/2027) -->
+       <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/oak/' | relative_url }}">
        <a href="{% post_url 2026-09-08-oak-cancer-capstone %}">
-           <img src="/images/capstone/oak.png" alt="Cancer foundation logo" class="w-28 h-28 object-contain rounded" />
+           <img src="/images/capstone/oak.png" alt="Oncology and Kids Cancer Foundation" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{% post_url 2026-09-08-oak-cancer-capstone %}">Oncology and Kids Cancer Association</a></h3>
-           <p class="text-sm text-gray-700">This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text people of all ages will be able to easily navigate learn, and play through these new and advanced modules.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Salma, Isha, Aashi, and Emily</p>
+           <h3><a href="{% post_url 2026-09-08-oak-cancer-capstone %}">Oncology and Kids Cancer Association</a></h3>
+           <p>CSP</p>
+           <p>This capstone project aims to connect and educate both cancer families and cancer patients. We aim to create a platform where people can learn more about cancer on a biological level through interactive learning modules, as well as connect cancer patients through interactive multiplayer games. Rather than cancer websites having long strings of text, people of all ages will be able to easily navigate, learn, and play through these new and advanced modules.</p>
+           <p>Team: Salma, Isha, Aashi, and Emily</p>
        </div>
    </div>
 
