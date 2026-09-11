@@ -835,6 +835,18 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+   <!-- Shoreline Community Services, Volunteer Page (CSP, 2026/2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">
+           <img src="/images/capstone/shoreline-cs.jpeg" alt="Shoreline Community Services Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-09-11-shoreline-volunteer-capstone %}">Shoreline Community Services, Volunteer Page</a></h3>
+           <p>This capstone project redesigns the Shoreline Community Services volunteer page with a homelessness hotspot map paired with a live volunteer shift calendar, a real donations page, a needs-right-now page for physical donations, service navigation for unhoused visitors, and an impact dashboard.</p>
+           <p>Team: Nitya Hamsini Kasse, Vanshika Keswani, Hsu-Cheng Lin</p>
+       </div>
+   </div>
+
    <!-- San Diego Lab Rats (CSP, 2026/2027) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
        <a href="{% post_url 2026-09-10-sdlabrats-capstone %}">
