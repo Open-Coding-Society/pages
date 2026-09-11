@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function(){
    </div>
 
    <!-- UESL Accessible Game Maker 2.0 (CSP, 2026/2027) -->
-   <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}" data-frontend-url="https://github.com/RazorCrest00/uesl-accessible-game-maker">
+   <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/uesl-game-maker/' | relative_url }}">
        <a href="{{ '/capstone/uesl-game-maker/' | relative_url }}">
            <img src="{{ '/images/capstone/uesl_foundation.svg' | relative_url }}" alt="UESL Foundation logo — shield with game controller" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
