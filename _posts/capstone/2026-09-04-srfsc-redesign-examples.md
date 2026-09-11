@@ -10,6 +10,15 @@ year: "2026-2027"
 courses: { csp: {week: 25} }
 ---
 
+<style>
+  @media (max-width: 640px) {
+    .ocs__grid.cols-2,
+    .ocs__grid.cols-3 {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+
 > The SRFSC homepage can be more direct and action-focused. The strongest example is to make the mission, volunteer path, and urgent neighborhood context visible immediately.
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
