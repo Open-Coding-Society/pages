@@ -28,8 +28,22 @@ img.ocs__image-frame {
     object-fit: cover;
 }
 
+.ocs__image-frame--thumbnail {
+    width: 7rem;
+    height: 7rem;
+    max-width: 7rem;
+    flex: 0 0 7rem;
+}
+
 @media (max-width: $breakpoint-mobile) {
     .ocs__image-frame {
         padding: $spacing-xxs;
+    }
+
+    .ocs__image-frame--thumbnail {
+        width: 4.5rem;
+        height: 4.5rem;
+        max-width: 4.5rem;
+        flex-basis: 4.5rem;
     }
 }
