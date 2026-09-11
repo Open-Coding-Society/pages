@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function(){
        <div>
            <h3 class="capstone-item__title"><a href="{{ '/capstone/poway-library-2026-27/' | relative_url }}">Friends of the Poway Library 2026–27</a></h3>
            <p class="capstone-item__description">A CSP capstone continuing the previous Friends of the Poway Library prototype with a searchable bookstore catalog, events and newsletters, volunteer and donation pathways, community history, profiles, and library-themed games.</p>
-           <p class="capstone-item__team">Project handoff: continuing the 2025–26 Boolean-Boyz prototype</p>
+           <p class="capstone-item__team">Team: Arjun Ganesh — Scrum Master; Nathan Trieu — Developer 1; Raadin Ansari — Developer 2</p>
        </div>
    </div>
   
