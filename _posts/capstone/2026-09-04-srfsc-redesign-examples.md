@@ -13,6 +13,20 @@ courses: { csp: {week: 25} }
 <style>
   .srfsc-demo {
     margin: 2rem 0;
+    color: #111111;
+  }
+
+  .srfsc-demo *,
+  .srfsc-demo h1,
+  .srfsc-demo h2,
+  .srfsc-demo h3,
+  .srfsc-demo h4,
+  .srfsc-demo p,
+  .srfsc-demo li,
+  .srfsc-demo strong,
+  .srfsc-demo span,
+  .srfsc-demo a {
+    color: #111111;
   }
 
   .srfsc-demo .ocs__grid {
@@ -318,24 +332,42 @@ courses: { csp: {week: 25} }
   .srfsc-demo strong,
   .srfsc-demo span,
   .srfsc-demo a {
-    color: #112420;
+    color: #111111;
   }
 
   .srfsc-demo .srfsc-topbar,
+  .srfsc-demo .srfsc-topbar *,
   .srfsc-demo .srfsc-hero,
-  .srfsc-demo .srfsc-hero * {
-    color: #fff;
+  .srfsc-demo .srfsc-hero *,
+  .srfsc-demo .srfsc-pitch-hero,
+  .srfsc-demo .srfsc-pitch-hero *,
+  .srfsc-demo .srfsc-hero-box *,
+  .srfsc-demo .srfsc-kicker,
+  .srfsc-demo .srfsc-pitch-kicker {
+    color: #ffffff;
   }
 
+  .srfsc-demo .srfsc-pitch-hero p,
+  .srfsc-demo .srfsc-hero p,
+  .srfsc-demo .srfsc-hero-box p,
+  .srfsc-demo .srfsc-hero-box strong,
+  .srfsc-demo .srfsc-hero-box h3,
+  .srfsc-demo .srfsc-pitch-hero h2,
+  .srfsc-demo .srfsc-pitch-hero .srfsc-pitch-kicker,
   .srfsc-demo .srfsc-topbar a,
-  .srfsc-demo .srfsc-hero a {
-    color: #fff;
+  .srfsc-demo .srfsc-nav a,
+  .srfsc-demo .srfsc-brand,
+  .srfsc-demo .srfsc-btn,
+  .srfsc-demo .srfsc-cta-row .srfsc-btn {
+    color: #ffffff;
   }
 
-  .srfsc-demo .ocs__grid-cell h3,
-  .srfsc-demo .ocs__grid-cell h4,
-  .srfsc-demo .ocs__grid-cell p,
-  .srfsc-demo .ocs__grid-cell li,
+  .srfsc-demo .srfsc-card h3,
+  .srfsc-demo .srfsc-card p,
+  .srfsc-demo .srfsc-panel h3,
+  .srfsc-demo .srfsc-panel li,
+  .srfsc-demo .srfsc-alert strong,
+  .srfsc-demo .srfsc-alert p,
   .srfsc-demo .srfsc-news-content h4,
   .srfsc-demo .srfsc-news-content p,
   .srfsc-demo .srfsc-feature-card h4,
@@ -345,25 +377,12 @@ courses: { csp: {week: 25} }
   .srfsc-demo .srfsc-pitch-panel li,
   .srfsc-demo .srfsc-pitch-panel ul,
   .srfsc-demo .srfsc-feature-header h3,
-  .srfsc-demo .srfsc-pitch-hero h2,
-  .srfsc-demo .srfsc-pitch-hero p,
-  .srfsc-demo .srfsc-pitch-kicker,
-  .srfsc-demo .srfsc-kicker,
-  .srfsc-demo .srfsc-hero-box h3,
-  .srfsc-demo .srfsc-hero-box p,
-  .srfsc-demo .srfsc-hero-box strong,
-  .srfsc-demo .srfsc-news-content .tag,
-  .srfsc-demo .srfsc-brand,
-  .srfsc-demo .srfsc-nav a,
-  .srfsc-demo .srfsc-btn {
-    color: #000000;
-  }
-
-  .srfsc-demo .srfsc-topbar,
-  .srfsc-demo .srfsc-topbar a,
-  .srfsc-demo .srfsc-hero,
-  .srfsc-demo .srfsc-hero * {
-    color: #ffffff;
+  .srfsc-demo .srfsc-pitch-panel .srfsc-panel-label,
+  .srfsc-demo .srfsc-before-after,
+  .srfsc-demo .srfsc-before-after *,
+  .srfsc-demo .srfsc-feature-wrap,
+  .srfsc-demo .srfsc-feature-wrap * {
+    color: #111111;
   }
 </style>
 
