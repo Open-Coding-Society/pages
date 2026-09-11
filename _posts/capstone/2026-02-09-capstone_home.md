@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function(){
         data-frontend-url="https://github.com/api-pirates-p4/PVO-Frontend"
         data-backend-url="https://github.com/api-pirates-p4/PVO-Backend">
        <a href="{{ '/capstone/pvo/' | relative_url }}">
-           <img src="{{ '/images/capstone/poway-veterans-logo.png' | relative_url }}" alt="Poway Veterans Organization 2026–27" class="ocs__image-frame ocs__image-frame--card" />
+           <img src="{{ '/images/capstone/poway-veterans-logo.png' | relative_url }}" alt="Poway Veterans Organization 2026–27" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
            <h3><a href="{{ '/capstone/pvo/' | relative_url }}">Poway Veterans Organization 2026–27</a></h3>
