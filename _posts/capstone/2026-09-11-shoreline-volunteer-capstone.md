@@ -2,12 +2,13 @@
 microblog: true
 toc: false
 layout: post
-title: Shoreline Community Services, Volunteer Page
+title: Shoreline Community Services, Volunteer Page 2026-2027
 permalink: /capstone/shoreline-volunteer/
+year: "2026-2027"
 ---
 > Shoreline Community Services has strong programs and a clear mission, but the volunteer page undersells them. There is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.
 
-## Shoreline Community Services, Volunteer Page 2026-27
+## Shoreline Community Services, Volunteer Page (CSP-2026-27)
 
 <div style="text-align: center; margin-bottom: 1.5rem;">
     <a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git">
