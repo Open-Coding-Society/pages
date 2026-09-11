@@ -4,7 +4,7 @@ toc: false
 layout: post
 title: SRFSC Website Redesign Examples
 description: Visual mockup examples showing how the Scripps Ranch Fire Safe Council website could be redesigned for clarity, urgency, and action.
-permalink: /capstone/srfsc-redesign-examples/
+permalink: /capstone/srfsc
 author: Krish Kelageri, Jasan Boprai, Shourya Patel
 year: "2026-2027"
 courses: { csp: {week: 25} }
