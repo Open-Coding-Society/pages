@@ -12,7 +12,7 @@ permalink: /capstone/ccae/
     /* Global Wrapper */
     .ccae-wrapper {
         font-family: 'Space Grotesk', sans-serif;
-        color: #d1d5db;
+        color: #d9dde2;
         line-height: 1.7;
         font-size: 1.1rem;
         position: relative;
