@@ -331,6 +331,48 @@ courses: { csp: {week: 25} }
   .srfsc-demo .srfsc-hero a {
     color: #fff;
   }
+
+  .srfsc-demo .ocs__grid-cell h3,
+  .srfsc-demo .ocs__grid-cell h4,
+  .srfsc-demo .ocs__grid-cell p,
+  .srfsc-demo .ocs__grid-cell li,
+  .srfsc-demo .srfsc-news-content h4,
+  .srfsc-demo .srfsc-news-content p,
+  .srfsc-demo .srfsc-feature-card h4,
+  .srfsc-demo .srfsc-feature-card p,
+  .srfsc-demo .srfsc-pitch-card h3,
+  .srfsc-demo .srfsc-pitch-card p,
+  .srfsc-demo .srfsc-pitch-panel li,
+  .srfsc-demo .srfsc-feature-header h3,
+  .srfsc-demo .srfsc-pitch-hero h2,
+  .srfsc-demo .srfsc-pitch-hero p {
+    color: #112420;
+  }
+
+  .srfsc-demo .srfsc-pitch-panel,
+  .srfsc-demo .srfsc-pitch-card,
+  .srfsc-demo .srfsc-feature-card,
+  .srfsc-demo .srfsc-news-item,
+  .srfsc-demo .ocs__grid-cell {
+    color: #112420;
+  }
+
+  .srfsc-demo .srfsc-pitch-panel .srfsc-panel-label {
+    color: #173b2f;
+  }
+
+  .srfsc-demo .srfsc-pitch-panel.after .srfsc-panel-label {
+    color: #173b2f;
+  }
+
+  .srfsc-demo .srfsc-pitch-hero,
+  .srfsc-demo .srfsc-pitch-hero * {
+    color: #fff;
+  }
+
+  .srfsc-demo .srfsc-pitch-hero p {
+    color: rgba(255,255,255,0.85);
+  }
 </style>
 
 <div class="srfsc-demo">
