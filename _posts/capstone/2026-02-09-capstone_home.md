@@ -682,17 +682,17 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
-   <!-- Poway NEC (CSP, 2026/2027 continuation) -->
-   <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-09-10-pnec-capstone %}">
-           <img src="/images/capstone/powaynec-logo-white.png" alt="Poway NEC logo" class="ocs__image-frame capstone-card-image" />
-       </a>
-       <div>
-           <h3 class="capstone-item__title"><a href="{% post_url 2026-09-10-pnec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
-           <p class="capstone-item__description">Continuing the PNEC preparedness platform with personalized checklists, an interactive preparedness quiz, volunteer coordination, and multilingual support.</p>
-           <p class="capstone-item__team">Team: Joan Kim, Samanvi Yachareni, Ainsley Albert</p>
-       </div>
-   </div>
+<!-- Poway NEC (CSP, 2026/2027 continuation) -->
+<div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
+    <a href="{{ '/capstone/powayneighborhoodem/' | relative_url }}">
+        <img src="/images/capstone/powaynec-logo-white.png" alt="Poway NEC logo" class="ocs__image-frame capstone-card-image" />
+    </a>
+    <div>
+        <h3 class="capstone-item__title"><a href="{{ '/capstone/powayneighborhoodem/' | relative_url }}">Poway Neighborhood Emergency Corps</a></h3>
+        <p class="capstone-item__description">Continuing the PNEC preparedness platform with personalized checklists, an interactive preparedness quiz, volunteer coordination, and multilingual support.</p>
+        <p class="capstone-item__team">Team: [your team members]</p>
+    </div>
+</div>
 
    <!-- HawkHub -->
    <div class="ocs__grid-cell  capstone-item CSA">
