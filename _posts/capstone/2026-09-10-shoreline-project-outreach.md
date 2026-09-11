@@ -11,7 +11,7 @@ categories: Capstone
 
 > Shoreline Community Services supports unsheltered individuals and families in San Diego's Central Beach Area. Our project adds clearer ways to volunteer, donate, and find community needs.
 
-<div class="ocs__grid ocs__grid--standard cols-2">
+<div class="ocs__grid ocs__grid--card">
     <div class="ocs__grid-cell ocs__grid-cell--header">Shoreline Project Outreach</div>
 
     <div class="ocs__grid-cell ocs__grid-cell--accent">
