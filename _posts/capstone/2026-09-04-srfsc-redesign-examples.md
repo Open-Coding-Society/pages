@@ -308,6 +308,29 @@ courses: { csp: {week: 25} }
       grid-template-columns: 1fr;
     }
   }
+
+  .srfsc-demo,
+  .srfsc-demo p,
+  .srfsc-demo h2,
+  .srfsc-demo h3,
+  .srfsc-demo h4,
+  .srfsc-demo li,
+  .srfsc-demo strong,
+  .srfsc-demo span,
+  .srfsc-demo a {
+    color: #112420;
+  }
+
+  .srfsc-demo .srfsc-topbar,
+  .srfsc-demo .srfsc-hero,
+  .srfsc-demo .srfsc-hero * {
+    color: #fff;
+  }
+
+  .srfsc-demo .srfsc-topbar a,
+  .srfsc-demo .srfsc-hero a {
+    color: #fff;
+  }
 </style>
 
 <div class="srfsc-demo">
