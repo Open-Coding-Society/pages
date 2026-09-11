@@ -23,9 +23,9 @@ sticky_rank: 1
   <div class="ocs__grid-cell">
     <div class="ocs__links ocs__links--wide">
       <button id="show-all" type="button" class="ocs__btn capstone-filter-btn alert-green fill" aria-pressed="true">All</button>
+      <button id="show-csh" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSH</button>
       <button id="show-csa" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSA</button>
       <button id="show-csp" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSP</button>
-      <button id="show-csh" type="button" class="ocs__btn capstone-filter-btn" aria-pressed="false">CSH</button>
       <select id="year-select" class="nc-select" aria-label="Filter projects by school year" style="max-width: 14rem;">
         <option value="2026-2027" selected>2026/2027</option>
         <option value="2025-2026">2025/2026</option>
