@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<div id="capstone-grid" class="ocs__grid ocs__grid--card">
+<div id="capstone-grid" class="ocs__grid ocs__grid--card cols-3">
 
    <!-- SFI Foundation 2026–27 (CSP) -->
    <div class="ocs__grid-cell CSP"
