@@ -95,7 +95,6 @@ courses: { csp: {week: 25} }
     margin: 1.5rem 0;
     padding: 0.5rem 0;
     border-radius: 12px;
-    background: #f7faf6;
     border: 1px solid rgba(23, 59, 47, 0.08);
   }
 
