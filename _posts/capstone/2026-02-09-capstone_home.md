@@ -676,9 +676,21 @@ document.addEventListener('DOMContentLoaded', function(){
            <img src="/images/capstone/powaynec-logo-white.png" alt="Poway NEC logo" class="ocs__image-frame capstone-card-image" />
        </a>
        <div>
-           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-03-06-powaynec-capstone %}">Poway Neighborhood EmergencyCorps</a></h3>
            <p class="capstone-item__description">Poway NEC capstone updates for preparedness access, including live risk information, emergency learning games, a chatbot, and account tools for volunteer coordination.</p>
            <p class="capstone-item__team">Team: Aneesh, Ethan, Samarth</p>
+       </div>
+   </div>
+
+   <!-- Poway NEC (CSP, 2026/2027 continuation) -->
+   <div class="ocs__grid-cell  capstone-item CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-10-pnec-capstone %}">
+           <img src="/images/capstone/powaynec-logo-white.png" alt="Poway NEC logo" class="ocs__image-frame capstone-card-image" />
+       </a>
+       <div>
+           <h3 class="capstone-item__title"><a href="{% post_url 2026-09-10-pnec-capstone %}">Poway Neighborhood Emergency Corps</a></h3>
+           <p class="capstone-item__description">Continuing the PNEC preparedness platform with personalized checklists, an interactive preparedness quiz, volunteer coordination, and multilingual support.</p>
+           <p class="capstone-item__team">Team: Joan Kim, Samanvi Yachareni, Ainsley Albert</p>
        </div>
    </div>
 
