@@ -88,6 +88,24 @@ courses: { csp: {week: 25} }
 
 > A stronger homepage should feel calm, urgent, and clear at the same time: the message is important, the next step is obvious, and the local community feels included.
 
+```mermaid
+flowchart LR
+    A[Visitor lands on page] --> B{Understand the risk?}
+    B -->|Yes| C[Read mission + local context]
+    B -->|No| D[Improve hero message]
+    C --> E[See call-to-action buttons]
+    D --> E
+    E --> F[Volunteer or donate]
+    E --> G[Learn more about programs]
+    F --> H[Community action grows]
+    G --> H
+
+    style A fill:#173b2f,color:#ffffff,stroke:#173b2f
+    style C fill:#2f6d4c,color:#ffffff,stroke:#2f6d4c
+    style E fill:#d8572a,color:#ffffff,stroke:#d8572a
+    style H fill:#49615b,color:#ffffff,stroke:#49615b
+```
+
 **Powered by OCS grids and buttons**
 
 [Buttons]({{site.baseurl}}/index2) | [Grids]({{site.baseurl}}/index4)
