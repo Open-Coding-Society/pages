@@ -12,7 +12,7 @@
 {% else %}
 <div class="ocs-intelligence-infograph">
   <div class="ocs-intelligence-header">
-    <div class="ocs-intelligence-badge">{{ stage.navKicker }} of 2 · Implementation</div>
+    <div class="ocs-intelligence-badge">{{ stage.navKicker }} of {{ data.stages | size }} · Implementation</div>
     <h1 class="ocs-intelligence-title">{{ stage.title }}</h1>
     <p class="ocs-intelligence-description">{{ stage.summary }}</p>
     <div class="ocs-intelligence-status ocs-intelligence-stage-status">{{ stage.status }}</div>
@@ -77,11 +77,11 @@
   </div>
   {% endif %}
 
-  {% if stage.showResearchQuestion %}
-  {% assign rq_index = stage.showResearchQuestion | minus: 1 %}
-  {% assign item = data.researchQuestions[rq_index] %}
+  {% if stage.showAllResearchQuestions %}
+  <p class="ocs-intelligence-about ocs-intelligence-lead">{{ data.researchQuestionsNote }}</p>
+  {% for item in data.researchQuestions %}
   <div class="ocs-intelligence-card">
-    <h3 class="ocs-intelligence-section-title">{{ item.label }}</h3>
+    <h3 class="ocs-intelligence-section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
     <p class="ocs-intelligence-question">{{ item.question }}</p>
     <div class="ocs-intelligence-facts">
       {% for fact in item.facts %}
@@ -90,6 +90,69 @@
         <span class="ocs-intelligence-team-name">{{ fact.text }}</span>
       </div>
       {% endfor %}
+    </div>
+    {% if item.endpoint %}
+    <p class="ocs-intelligence-about"><strong>Research endpoint:</strong> {{ item.endpoint }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% elsif stage.showResearchQuestion %}
+  {% assign rq_index = stage.showResearchQuestion | minus: 1 %}
+  {% assign item = data.researchQuestions[rq_index] %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">{{ item.label }}{% if item.priority %} · {{ item.priority }}{% endif %}</h3>
+    <p class="ocs-intelligence-question">{{ item.question }}</p>
+    <div class="ocs-intelligence-facts">
+      {% for fact in item.facts %}
+      <div class="ocs-intelligence-visual">
+        <span class="ocs-intelligence-team-label">{{ fact.label }}</span>
+        <span class="ocs-intelligence-team-name">{{ fact.text }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% if item.endpoint %}
+    <p class="ocs-intelligence-about"><strong>Research endpoint:</strong> {{ item.endpoint }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if stage.priorities %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Priorities for this phase</h3>
+    <div class="ocs-intelligence-facts">
+      {% for item in stage.priorities %}
+      <div class="ocs-intelligence-visual">
+        <span class="ocs-intelligence-team-label">{{ item.priority }}</span>
+        <span class="ocs-intelligence-team-name">{{ item.text }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stage.apiEndpoints %}
+  <div class="ocs-intelligence-card">
+    <h3 class="ocs-intelligence-section-title">Serving endpoints</h3>
+    <p class="ocs-intelligence-about">The literal endpoints student harnesses talk to once a model is loaded on the rack.</p>
+    <div class="ocs-intelligence-table-wrap">
+      <table class="ocs-intelligence-table">
+        <thead>
+          <tr>
+            <th scope="col">Endpoint</th>
+            <th scope="col">Engine</th>
+            <th scope="col">What it's for</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ep in stage.apiEndpoints %}
+          <tr>
+            <td>{{ ep.method }} {{ ep.path }}</td>
+            <td><span class="ocs-intelligence-tech-tag">{{ ep.engine }}</span></td>
+            <td>{{ ep.text }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
   {% endif %}
@@ -159,7 +222,7 @@
   </div>
   {% endif %}
 
-  {% if stage.literatureTitles.size > 0 %}
+  {% if stage.showAllLiterature or stage.literatureTitles.size > 0 %}
   <div class="ocs-intelligence-card">
     <h3 class="ocs-intelligence-section-title">Literature</h3>
     <div class="ocs-intelligence-table-wrap">
@@ -172,9 +235,8 @@
           </tr>
         </thead>
         <tbody>
-          {% for lit_title in stage.literatureTitles %}
+          {% if stage.showAllLiterature %}
             {% for item in data.literature %}
-              {% if item.title == lit_title %}
           <tr>
             <td>
               <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
@@ -182,9 +244,22 @@
             <td><span class="ocs-intelligence-tech-tag">{{ item.type }}</span></td>
             <td>{{ item.description }}</td>
           </tr>
-              {% endif %}
             {% endfor %}
-          {% endfor %}
+          {% else %}
+            {% for lit_title in stage.literatureTitles %}
+              {% for item in data.literature %}
+                {% if item.title == lit_title %}
+          <tr>
+            <td>
+              <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a>
+            </td>
+            <td><span class="ocs-intelligence-tech-tag">{{ item.type }}</span></td>
+            <td>{{ item.description }}</td>
+          </tr>
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          {% endif %}
         </tbody>
       </table>
     </div>
