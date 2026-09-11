@@ -847,6 +847,17 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-10-poway-scripps-rotary-capstone %}">
+           <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Rotary_International_Logo.svg" alt="Rotary International Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-09-10-poway-scripps-rotary-capstone %}">Poway Rotary Club</a></h3>
+           <p>Helping the Poway Scripps Rotary Club improve their website. With better organization, search feachures, and UI, we're helping the non-profit club manage the many activities they do to help others.</p>
+           <p>Team: Samarth H, Rigved G, Rohan S</p>
+       </div>
+   </div>
+
    <!-- OCS Assignment Tracker (CSA) -->
   <div class="ocs__grid-cell CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
@@ -894,30 +905,6 @@ document.addEventListener('DOMContentLoaded', function(){
            <p>Team: Akhil, Syown, Leon, Perry, Skandan, Sathwik, Akshajh, Tarun, Samarth</p>
        </div>
    </div>
-    <!-- OCS Security (CSA) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSA" data-year="2026-2027">
-        <a href="{% post_url capstone/2026-09-03-cccs-security %}">
-            <img src="/images/capstone/cccs-security-logo.png" alt="CCCS Security" class="w-28 h-28 object-cover rounded" />
-        </a>
-        <div>
-            <h3 class="text-lg font-semibold"><a href="{% post_url capstone/2026-09-03-cccs-security %}">OCS Security</a></h3>
-            <p class="text-sm text-gray-700">These security fixes ensure that new users must create complex passwords to prevent unauthorized access, and ensure code runners execute in individual containers to prevent malicious RCEs from accessing sensitive information.</p>
-            <p class="text-xs text-gray-500 mt-2">Team: Lucas Masterson, Jacob Chou, Zhengji Li</p>
-        </div>
-    </div>
-
-    <!-- Poway Scripps Rotary Club (CSP) -->
-    <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027"
-        data-page-url="{{ '/capstone/poway-scripps-rotary/' | relative_url }}">
-        <a href="{{ '/capstone/poway-scripps-rotary/' | relative_url }}">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Rotary_International_Logo.svg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Poway Scripps Rotary Club" class="w-28 h-28 object-cover rounded" />
-        </a>
-        <div>
-            <h3 class="text-lg font-semibold"><a href="{{ '/capstone/poway-scripps-rotary/' | relative_url }}">Poway Scripps Rotary Club</a></h3>
-            <p class="text-sm text-gray-700">Helping the Poway Scripps Rotary Club Improve Their Website. We plan to add cleaner UI, galaries instead of long sheets of images, and improve navbar and search feachures.</p>
-            <p class="text-xs text-gray-500 mt-2">Team: Samarth H, Rigved G, Rohan S</p>
-        </div>
-    </div>
 </div>
 
 <!-- Edit Capstone Modal -->
