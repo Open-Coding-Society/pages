@@ -67,6 +67,7 @@ Split logic into clear layers:
 ### Sources vs Generated Files
 
 * Sources live in [notebook sources](_notebooks/) and [docx sources](_docx/); converted Markdown is written to [generated posts](_posts/) (generated, do not hand-edit).
+* `_posts/capstone/` also contains authored Markdown (see PR #1450). Check for a Notebook/DOCX source before editing. New overview pages should reuse `ocs__grid`, `ocs__links`, and `ocs__btn` rather than copying a previous team's one-off styles.
 * Course-split outputs (`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`) are generated; never edit them. See [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py).
 * Conversion behavior is defined in [scripts/convert_notebooks.py](scripts/convert_notebooks.py) and [scripts/convert_docx.py](scripts/convert_docx.py).
 
