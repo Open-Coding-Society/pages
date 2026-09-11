@@ -756,14 +756,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <!-- Poway Neighborhood Emergency Corps (CSP 2026-2027) -->
 <div class="ocs__grid-cell CSP" data-year="2026-2027">
-    <a href="{% post_url 2026-03-06-powaynec-capstone %}">
+    <a href="{% post_url 2026-09-11-pnec-capstone %}">
         <div class="capstone-card-placeholder">
             PNEC
         </div>
     </a>
     <div>
         <h3>
-            <a href="{% post_url 2026-03-06-powaynec-capstone %}">
+            <a href="{% post_url 2026-09-11-pnec-capstone %}">
                 Poway Neighborhood Emergency Corps
             </a>
         </h3>
