@@ -774,15 +774,15 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 
-  <!-- FOPS (2026-2027) -->
+   <!-- FOPS (2026-2027) -->
  <div class="ocs__grid-cell CSP" data-year="2026-2027">
-        <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
+        <a href="{% post_url 2026-09-09-fops-2026-2027-capstone %}">
             <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="ocs__image-frame ocs__image-frame--thumbnail" />
         </a>
         <div>
-            <h3><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
-            <p> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
-            <p>Team: Nitya, Vivian, Virginia</p>
+            <h3><a href="{% post_url 2026-09-09-fops-2026-2027-capstone %}">Friends of Poway Seniors</a></h3>
+            <p>Extending the Friends of Poway Seniors site with scam-defense practice games, digital and multiplayer bingo, and seated movement games — built for an audience of older adults.</p>
+            <p>Team: Triple T (Chetan Tiduwar, Aaditya Prem, Kashyap Tubati)</p>
         </div>
     </div>
 
