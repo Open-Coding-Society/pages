@@ -63,11 +63,30 @@ courses: { csp: {week: 25} }
     </div>
 </div>
 
+<div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+    <div class="ocs__grid-cell ocs__grid-cell--header">What the page should emphasize</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Urgency</strong>
+        <p>Use a direct wildfire-risk message early so visitors understand why this matters immediately.</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Action</strong>
+        <p>Volunteer, donate, and join events should be visible in one glance instead of buried in navigation.</p>
+    </div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Trust</strong>
+        <p>Neighborhood impact, local partnerships, and clear communication make the council feel credible and active.</p>
+    </div>
+</div>
+
 <div style="margin-top: 1rem; margin-bottom: 1.5rem;">
     <a class="ocs__btn alert-red fill small" href="https://www.srfsc.org/" target="_blank" rel="noopener noreferrer">
         Visit the original page
     </a>
 </div>
+
+> A stronger homepage should feel calm, urgent, and clear at the same time: the message is important, the next step is obvious, and the local community feels included.
 
 **Powered by OCS grids and buttons**
 
