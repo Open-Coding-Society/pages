@@ -110,13 +110,21 @@
 .ocs__grid--card {
   @include card-grid;
 
-  @media (max-width: $breakpoint-mobile) {
-    grid-template-columns: 1fr;
-  }
-
   .ocs__grid-cell {
     @include grid-card-cell;
+    @include card-grid-cell-size;
+    text-align: center;
 
+    @media (max-width: $breakpoint-mobile) {
+      flex-basis: 100%;
+      max-width: 100%;
+    }
+
+    &--header,
+    &--wide {
+      flex-basis: 100%;
+      max-width: 100%;
+    }
     &--header {
       background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
       border-color: var(--pref-accent-color);

@@ -44,9 +44,21 @@
  * @param {Number} $gap      - Gap (default: $spacing-lg)
  */
 @mixin card-grid($min-cell: 200px, $gap: $spacing-lg) {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax($min-cell, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: $gap;
+}
+
+/**
+ * Card Grid Cell Sizing — grows to fill full rows, caps on very wide
+ * screens, and centers naturally on a short last row (flexbox handles
+ * this; CSS Grid's auto-fill cannot, since its column tracks are shared
+ * across every row).
+ */
+@mixin card-grid-cell-size($min-cell: 200px, $max-cell: 320px) {
+  flex: 1 1 $min-cell;
+  max-width: $max-cell;
 }
 
 /**
