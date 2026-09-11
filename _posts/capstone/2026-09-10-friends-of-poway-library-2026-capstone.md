@@ -186,8 +186,30 @@ permalink: /capstone/poway-library-2026-27/
 
 > The 2026–27 capstone starts from the work and documentation created by the previous student team.
 
+### 2026–27 team
+
 <div class="ocs__grid ocs__grid--standard cols-2">
-    <div class="ocs__grid-cell ocs__grid-cell--header">2025–26 prototype team</div>
+    <div class="ocs__grid-cell ocs__grid-cell--header">Current project team</div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Arjun Ganesh</strong>
+        <p>Scrum Master</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Nathan Trieu</strong>
+        <p>Developer 1</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Raadin Ansari</strong>
+        <p>Developer 2</p>
+    </div>
+</div>
+
+<br>
+
+### 2025–26 prototype team
+
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Original project contributors</div>
     <div class="ocs__grid-cell ocs__grid-cell--accent"><strong>Shayan Bhatti</strong></div>
     <div class="ocs__grid-cell ocs__grid-cell--accent"><strong>Arnav Pallapotu</strong></div>
     <div class="ocs__grid-cell ocs__grid-cell--accent"><strong>Tanay Paranjpe</strong></div>
