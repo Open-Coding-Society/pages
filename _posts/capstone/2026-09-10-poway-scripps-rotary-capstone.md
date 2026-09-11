@@ -94,8 +94,7 @@ permalink: /capstone/poway-scripps-rotary/
 </div>
 
 <p style="display:flex;flex-wrap:wrap;gap:.7rem;margin-bottom:1.5rem;">
-    <a class="glowOnHover" style="padding:.65rem 1.15rem;text-decoration:none;display:inline-block;" href="#">Frontend Repository ↗</a>
-    <a class="glowOnHover" style="padding:.65rem 1.15rem;text-decoration:none;display:inline-block;" href="#">Backend Repository ↗</a>
+    <a class="glowOnHover" style="padding:.65rem 1.15rem;text-decoration:none;display:inline-block;" href="https://powayscrippsrotary.org/">The Current Site ↗</a>
 </p>
 
 **Scrum Master:** Samarth Hande
