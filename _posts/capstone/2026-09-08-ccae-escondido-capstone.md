@@ -7,9 +7,7 @@ permalink: /capstone/ccae/
 ---
 > The Escondido Arts has sophisticated elements which will be good to learn as we progrss toward our journey of ideation and improvement.  They have strength in Events and Ticket sales, lacking in personalization and information navigation.
 
-<a class="ocs__btn large" href="https://github.com/tristan-chiu0/CCAE-FE">
-    Github Repository
-</a>
+## California Center For The Arts, Escondido 2026-27
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header"> Project Summary</div>
@@ -26,6 +24,12 @@ permalink: /capstone/ccae/
         <p>This capstone project aims to refurbish the California Center For The Performing Arts Escondido website to be more streamlined, organized, and less busy. It will overhaul the search feature to be more intelligent, fix any visual bugs, introduce a dynamic and artistic design, and will replace generic walls of text with something more interactive. </p>
     </div>
 </div>
+
+<a class="ocs__btn large" href="https://github.com/tristan-chiu0/CCAE-FE" style="margin-bottom: 1.5rem;">
+    Github Repository
+</a>
+
+---
 
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">Strengths vs Improvement For Website</div>
@@ -84,7 +88,32 @@ permalink: /capstone/ccae/
     </div>
 </div>
 
-Team: Mateo Amador, Tristan Chiu, Yue (Barbara) Zhao 
+---
+
+<div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Teammates/Collaborators</div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Mateo Amador</strong>
+        <p>Technologist/Developer</p>
+        <a class="ocs__btn alert-green iridescent fill small" href="https://avg11235.opencodingsociety.com/">
+            Portfolio
+        </a>
+    </div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Tristan Chiu</strong>
+        <p>Technologist/Developer</p>
+        <a class="ocs__btn alert-green iridescent fill small" href="https://tristan-chiu0.github.io/portfolio/">
+            Portfolio
+        </a>
+    </div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Yue Barbara Zhao</strong>
+        <p>Technologist/Developer</p>
+        <a class="ocs__btn alert-green iridescent fill small" href="https://3rii0.github.io/portfolio/">
+            Portfolio
+        </a>
+    </div>
+</div>
 
 **Powered by OCS grids and buttons**
 
