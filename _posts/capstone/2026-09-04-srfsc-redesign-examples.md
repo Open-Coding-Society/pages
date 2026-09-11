@@ -100,15 +100,21 @@ courses: { csp: {week: 25} }
   }
 
   .srfsc-mermaid-wrap .mermaid {
-    min-width: 520px;
+    width: 100%;
+    min-width: 0;
     display: flex;
     justify-content: center;
   }
 
   .srfsc-mermaid-wrap .mermaid svg {
-    max-width: 100%;
+    width: 100%;
+    max-width: 620px;
     height: auto;
     display: block;
+  }
+
+  .srfsc-mermaid-mobile {
+    display: none;
   }
 
   @media (max-width: 640px) {
@@ -116,20 +122,50 @@ courses: { csp: {week: 25} }
       margin-left: -0.25rem;
       margin-right: -0.25rem;
     }
+
+    .srfsc-mermaid-desktop {
+      display: none;
+    }
+
+    .srfsc-mermaid-mobile {
+      display: flex;
+    }
+
+    .srfsc-mermaid-wrap .mermaid svg {
+      max-width: 320px;
+    }
   }
 </style>
 
 <div class="srfsc-mermaid-wrap">
-  <div class="mermaid">
+  <div class="mermaid srfsc-mermaid-desktop">
     flowchart LR
-        A[Visitor lands on page] --> B{Understand the risk?}
-        B -->|Yes| C[Read mission + local context]
-        B -->|No| D[Improve hero message]
-        C --> E[See call-to-action buttons]
+        A[Visit] --> B{Risk?}
+        B -->|Yes| C[Mission]
+        B -->|No| D[Hero]
+        C --> E[Actions]
         D --> E
-        E --> F[Volunteer or donate]
-        E --> G[Learn more about programs]
-        F --> H[Community action grows]
+        E --> F[Volunteer]
+        E --> G[Programs]
+        F --> H[Impact]
+        G --> H
+
+        style A fill:#173b2f,color:#ffffff,stroke:#173b2f
+        style C fill:#2f6d4c,color:#ffffff,stroke:#2f6d4c
+        style E fill:#d8572a,color:#ffffff,stroke:#d8572a
+        style H fill:#49615b,color:#ffffff,stroke:#49615b
+  </div>
+
+  <div class="mermaid srfsc-mermaid-mobile">
+    flowchart TB
+        A[Visit] --> B{Risk?}
+        B -->|Yes| C[Mission]
+        B -->|No| D[Hero]
+        C --> E[Actions]
+        D --> E
+        E --> F[Volunteer]
+        E --> G[Programs]
+        F --> H[Impact]
         G --> H
 
         style A fill:#173b2f,color:#ffffff,stroke:#173b2f
