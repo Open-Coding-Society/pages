@@ -281,6 +281,22 @@ document.addEventListener('DOMContentLoaded', function(){
            <p>Team: Ruhaan Bansal, Arya Taghavi Zargar, Deyar Raissadat, Ishan Jha, Ishan Khandelwal, Vayun Shekhar</p>
        </div>
    </div>
+
+   <!-- Friends of the Poway Library 2026–27 (CSP) -->
+   <div class="ocs__grid-cell capstone-item CSP"
+        data-year="2026-2027"
+        data-page-url="{{ '/capstone/poway-library-2026-27/' | relative_url }}"
+        data-frontend-url="https://github.com/Boolean-Boyz/bb-pages"
+        data-backend-url="https://github.com/Boolean-Boyz/bb-flask">
+       <a href="{{ '/capstone/poway-library-2026-27/' | relative_url }}">
+           <img src="{{ '/images/capstone/poway_library.png' | relative_url }}" alt="Friends of the Poway Library 2026–27" class="ocs__image-frame ocs__image-frame--card" />
+       </a>
+       <div>
+           <h3 class="capstone-item__title"><a href="{{ '/capstone/poway-library-2026-27/' | relative_url }}">Friends of the Poway Library 2026–27</a></h3>
+           <p class="capstone-item__description">A CSP capstone continuing the previous Friends of the Poway Library prototype with a searchable bookstore catalog, events and newsletters, volunteer and donation pathways, community history, profiles, and library-themed games.</p>
+           <p class="capstone-item__team">Team: Arjun Ganesh — Scrum Master; Nathan Trieu — Developer 1; Raadin Ansari — Developer 2</p>
+       </div>
+   </div>
   
    <!-- Submissions Capstone (umbrella issue: AAA, Submission Analytics, AI Grading) -->
    <div class="ocs__grid-cell CSA" data-year="2026-2027">
