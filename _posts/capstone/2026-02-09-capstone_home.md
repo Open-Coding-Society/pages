@@ -787,17 +787,17 @@ document.addEventListener('DOMContentLoaded', function(){
     </div>
 
 
-    <!-- San Diego Rescue Mission (2026-2027) -->
-<div class="ocs__grid-cell CSP" data-year="2026-2027">
-    <a href="{% post_url 2026-09-10-sdrm-capstone %}">
-        <img src="/images/capstone/sdrm.png" alt="San Diego Rescue Mission" class="ocs__image-frame ocs__image-frame--thumbnail" />
-    </a>
-    <div>
-        <h3><a href="{% post_url 2026-09-10-sdrm-capstone %}">San Diego Rescue Mission</a></h3>
-        <p>This capstone project modernizes the San Diego Rescue Mission website with improved navigation, a filterable Get Help Now page, clearer donation impact information, volunteer availability filters, and site-wide search to help residents, donors, and volunteers find what they need.</p>
-        <p>Team: Aarav, Ryden</p>
-    </div>
-</div>
+   <!-- San Diego Rescue Mission (2026-2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/sdrm/' | relative_url }}">
+       <a href="{% post_url 2026-09-10-sdrm-capstone %}">
+           <img src="/images/capstone/sdrm.png" alt="San Diego Rescue Mission" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-09-10-sdrm-capstone %}">San Diego Rescue Mission</a></h3>
+           <p>This capstone project modernizes the San Diego Rescue Mission website with improved navigation, a filterable Get Help Now page, clearer donation impact information, volunteer availability filters, and site-wide search to help residents, donors, and volunteers find what they need.</p>
+           <p>Team: Aarav, Ryden</p>
+       </div>
+   </div>
 
  <!-- Dynamic Event Calendar (CSP) -->
    <div class="ocs__grid-cell CSP">
