@@ -17,6 +17,24 @@ courses: { csp: {week: 25} }
       grid-template-columns: 1fr !important;
     }
   }
+
+  .srfsc-mermaid-desktop {
+    display: block;
+  }
+
+  .srfsc-mermaid-mobile {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .srfsc-mermaid-desktop {
+      display: none;
+    }
+
+    .srfsc-mermaid-mobile {
+      display: block;
+    }
+  }
 </style>
 
 > The SRFSC homepage can be more direct and action-focused. The strongest example is to make the mission, volunteer path, and urgent neighborhood context visible immediately.
@@ -119,10 +137,21 @@ courses: { csp: {week: 25} }
     display: block;
   }
 
+  .srfsc-mermaid-desktop {
+    display: block;
+  }
+
+  .srfsc-mermaid-mobile {
+    display: none;
+  }
+
   @media (max-width: 640px) {
-    .srfsc-mermaid-wrap {
-      margin-left: -0.25rem;
-      margin-right: -0.25rem;
+    .srfsc-mermaid-desktop {
+      display: none;
+    }
+
+    .srfsc-mermaid-mobile {
+      display: block;
     }
 
     .srfsc-mermaid-wrap .mermaid svg {
@@ -132,8 +161,26 @@ courses: { csp: {week: 25} }
 </style>
 
 <div class="srfsc-mermaid-wrap">
-  <div class="mermaid">
+  <div class="mermaid srfsc-mermaid-desktop">
     flowchart LR
+        A[Visitor lands on page] --> B{Understand the risk?}
+        B -->|Yes| C[Read mission + local context]
+        B -->|No| D[Improve hero message]
+        C --> E[See call-to-action buttons]
+        D --> E
+        E --> F[Volunteer or donate]
+        E --> G[Learn more about programs]
+        F --> H[Community action grows]
+        G --> H
+
+        style A fill:#173b2f,color:#ffffff,stroke:#173b2f
+        style C fill:#2f6d4c,color:#ffffff,stroke:#2f6d4c
+        style E fill:#d8572a,color:#ffffff,stroke:#d8572a
+        style H fill:#49615b,color:#ffffff,stroke:#49615b
+  </div>
+
+  <div class="mermaid srfsc-mermaid-mobile">
+    flowchart TB
         A[Visitor lands on page] --> B{Understand the risk?}
         B -->|Yes| C[Read mission + local context]
         B -->|No| D[Improve hero message]
