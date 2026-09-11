@@ -72,8 +72,6 @@ while preserving all critical instructions. The agent must still communicate wit
 * 多课程拆分文件（`*_csp.md`/`*_csa.md`/`*_csse.md`/`*_content.md`）为生成物，禁止手改；规则见 [scripts/split_multi_course_files.py](scripts/split_multi_course_files.py)。
 * Notebook/DOCX 转换规则见 [scripts/convert_notebooks.py](scripts/convert_notebooks.py) 与 [scripts/convert_docx.py](scripts/convert_docx.py)。
 
-* **手写 Capstone 页面：** `_posts/capstone/` 也包含手写 Markdown（见 PR #1450）；确认没有 Notebook/DOCX 源后可直接编辑。新概览页复用 `ocs__grid`、`ocs__links` 和 `ocs__btn`，不要复制旧团队的一次性样式。
-
 ### 项目注册与样式
 
 * 新项目遵循 [_projects/REGISTRATION.md](_projects/REGISTRATION.md) 注册/构建约定；架构示例见 [_projects/ARCHITECTURE.md](_projects/ARCHITECTURE.md)。
