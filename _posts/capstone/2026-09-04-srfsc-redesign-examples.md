@@ -46,6 +46,29 @@ courses: { csp: {week: 25} }
     </div>
 </div>
 
+<div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Key Opportunities</div>
+
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Priority First</strong>
+        <p>Lead with wildfire preparedness, hazard reduction, and neighborhood action.</p>
+    </div>
+    <div class="ocs__grid-cell">
+        <strong>Shared Visibility</strong>
+        <p>Keep local news, volunteering, and donations in a single clear path.</p>
+    </div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Clearer Identity</strong>
+        <p>Use a stronger brand palette and cleaner structure to feel current and trustworthy.</p>
+    </div>
+</div>
+
+<div style="margin-top: 1rem; margin-bottom: 1.5rem;">
+    <a class="ocs__btn alert-red fill small" href="https://www.srfsc.org/" target="_blank" rel="noopener noreferrer">
+        Visit the original page
+    </a>
+</div>
+
 **Powered by OCS grids and buttons**
 
 [Buttons]({{site.baseurl}}/index2) | [Grids]({{site.baseurl}}/index4)
