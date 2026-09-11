@@ -690,7 +690,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <div>
         <h3 class="capstone-item__title"><a href="{{ '/capstone/powayneighborhoodem/' | relative_url }}">Poway Neighborhood Emergency Corps</a></h3>
         <p class="capstone-item__description">Continuing the PNEC preparedness platform with personalized checklists, an interactive preparedness quiz, volunteer coordination, and multilingual support.</p>
-        <p class="capstone-item__team">Team: [your team members]</p>
+        <p class="capstone-item__team">Team: Joan Kim, Samanvi Yachareni, Ainsley Albert</p>
     </div>
 </div>
 
