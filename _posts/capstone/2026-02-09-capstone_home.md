@@ -754,6 +754,26 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 
+<!-- Poway Neighborhood Emergency Corps (CSP 2026-2027) -->
+<div class="ocs__grid-cell CSP" data-year="2026-2027">
+    <a href="{% post_url 2026-03-06-powaynec-capstone %}">
+        <div class="capstone-card-placeholder">
+            PNEC
+        </div>
+    </a>
+    <div>
+        <h3>
+            <a href="{% post_url 2026-03-06-powaynec-capstone %}">
+                Poway Neighborhood Emergency Corps
+            </a>
+        </h3>
+        <p>
+            A modern emergency preparedness platform for the Poway Neighborhood Emergency Corps, featuring local risk information, a preparedness assistant, an interactive neighborhood map, and tools to help volunteers stay informed and prepared.
+        </p>
+        <p>Team: Samanvi, Joan, Ainsley</p>
+    </div>
+</div>
+
  <!-- Dynamic Event Calendar (CSP) -->
    <div class="ocs__grid-cell CSP">
        <a href="{% post_url 2026-03-08-Flask-and-Furious-capstone %}">
