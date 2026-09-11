@@ -11,45 +11,52 @@ categories: Capstone
 
 > Shoreline Community Services supports unsheltered individuals and families in San Diego's Central Beach Area. Our project adds clearer ways to volunteer, donate, and find community needs.
 
-#### Shoreline Project Outreach
+<div class="ocs__grid ocs__grid--standard cols-2">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Shoreline Project Outreach</div>
 
-**Project Direction**
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Project Direction</strong>
+        <p>Extend Shoreline's existing community care with practical digital tools for volunteers, donors, and people looking for support.</p>
+        <a class="ocs__btn alert-green fill small" href="https://shorelinecs.org/" target="_blank" rel="noopener noreferrer">Visit Shoreline</a>
+    </div>
 
-Extend Shoreline's existing community care with practical digital tools for volunteers, donors, and people looking for support.
+    <div class="ocs__grid-cell">
+        <strong>Team</strong>
+        <p>Vanshika Keswani, Nitya Kasse, and Hsu-Cheng Lin.</p>
+        <a class="ocs__btn alert-yellow fill small" href="https://github.com/nkasse12/shoreline-group-project" target="_blank" rel="noopener noreferrer">Project Repository</a>
+    </div>
 
-<a class="ocs__btn alert-green fill small" href="https://shorelinecs.org/" target="_blank" rel="noopener noreferrer">Visit Shoreline</a>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Volunteer Hotspot Map</strong>
+        <p>Show areas with greater need so volunteers can make informed decisions about where to help.</p>
+        <a class="ocs__btn alert-green fill small" href="https://nkasse12.github.io/shoreline-group-project/ideation.html" target="_blank" rel="noopener noreferrer">View Ideation</a>
+    </div>
 
-**Team**
+    <div class="ocs__grid-cell">
+        <strong>Volunteer Shift Calendar</strong>
+        <p>Help volunteers see open shifts and reduce the back-and-forth work required to coordinate outreach.</p>
+    </div>
 
-Vanshika Keswani, Nitya Kasse, and Hsu-Cheng Lin.
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Donations Page</strong>
+        <p>Make giving easier by explaining what different donation amounts can provide for Shoreline programs.</p>
+    </div>
 
-<a class="ocs__btn alert-yellow fill small" href="https://github.com/nkasse12/shoreline-group-project" target="_blank" rel="noopener noreferrer">Project Repository</a>
+    <div class="ocs__grid-cell">
+        <strong>Needs Right Now</strong>
+        <p>Show which items are currently needed so people can contribute supplies as well as money.</p>
+    </div>
 
-**Volunteer Hotspot Map**
+    <div class="ocs__grid-cell ocs__grid-cell--header">Research and Future Direction</div>
 
-Show areas with greater need so volunteers can make informed decisions about where to help.
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
+        <strong>Service Navigation</strong>
+        <p>Guide people toward nearby shelters, Compass Stations, outreach teams, and other support resources.</p>
+    </div>
 
-<a class="ocs__btn alert-green fill small" href="https://nkasse12.github.io/shoreline-group-project/ideation.html" target="_blank" rel="noopener noreferrer">View Ideation</a>
-
-**Volunteer Shift Calendar**
-
-Help volunteers see open shifts and reduce the back-and-forth work required to coordinate outreach.
-
-**Donations Page**
-
-Make giving easier by explaining what different donation amounts can provide for Shoreline programs.
-
-**Needs Right Now**
-
-Show which items are currently needed so people can contribute supplies as well as money.
-
-#### Research and Future Direction
-
-**Service Navigation**
-
-Guide people toward nearby shelters, Compass Stations, outreach teams, and other support resources.
-
-**Impact Dashboard**
-
-Present community impact over time with understandable statistics about people served, volunteers, and donations.
+    <div class="ocs__grid-cell">
+        <strong>Impact Dashboard</strong>
+        <p>Present community impact over time with understandable statistics about people served, volunteers, and donations.</p>
+    </div>
+</div>
 
