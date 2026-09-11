@@ -89,6 +89,10 @@
 .ocs__grid--card {
   @include card-grid;
 
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+  }
+
   .ocs__grid-cell {
     @include grid-card-cell;
   }
