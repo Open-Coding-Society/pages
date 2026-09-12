@@ -46,12 +46,12 @@ rp_active: summary
   <div class="ocs__card">
     <h3 class="ocs__section-title">Privacy, Scope &amp; Governance</h3>
     <p class="rfid-presence-about">Set by the teacher in the room-approval discussion. These are the boundaries mentors should know the project operates inside.</p>
-    <ul class="rfid-presence-checklist">
-      <li class="done"><span class="rfid-presence-box"></span><span>Face scanning is opt-in. A student can decline and still get correct device-only presence tracking. That is a policy choice, not a system failure.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Scope is one CS classroom, for now. No wider rollout is planned or implied at this stage.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>The project is fully open. Implementation is shared with anyone who asks, and nothing is treated as confidential.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Security review is mentor-led rather than a formal school-IT process, given the single-room scope and open-sharing policy.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Testing uses only the team's own data. No real student data is used beyond what the team itself provides.</span></li>
+    <ul class="ocs__checklist">
+      <li class="done"><span class="ocs__checklist-box"></span><span>Face scanning is opt-in. A student can decline and still get correct device-only presence tracking. That is a policy choice, not a system failure.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Scope is one CS classroom, for now. No wider rollout is planned or implied at this stage.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>The project is fully open. Implementation is shared with anyone who asks, and nothing is treated as confidential.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Security review is mentor-led rather than a formal school-IT process, given the single-room scope and open-sharing policy.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Testing uses only the team's own data. No real student data is used beyond what the team itself provides.</span></li>
     </ul>
   </div>
 
@@ -311,15 +311,15 @@ rp_active: summary
     </div>
 
     <h3 class="ocs__section-title" style="margin-top:1.5rem;">How this project differs, in summary</h3>
-    <ul class="rfid-presence-checklist">
-      <li class="done"><span class="rfid-presence-box"></span><span>The tag is mounted on the student's own laptop, not a badge or ID card. It is a device-presence proxy, not a person-presence proxy.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Tags are tamper-evident, with an explicit issue, active, tampered/lost, and reissued/retired lifecycle.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Presence is a multi-state model (tardy, stepped out, left early, opted out, tamper) rather than a binary present/absent flag.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Attendance counts only inside a bell-schedule-bound window, evaluated against per-period expected enrollment.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>The camera signal carries an explicit opt-in governance model, built in from the start rather than added later.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>The hardware rollout is deliberately phased: contact-tap prototype first, contactless room-scale detection last, rather than building the hardest hardware problem up front.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>The doorway is designed as a multi-antenna, circularly-polarized portal from the start (the same antenna-diversity technique library and retail security gates use) rather than a single reader antenna, because tag orientation at a walk-through point is inherently unpredictable.</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>An audible read-confirmation tone at the doorway is being evaluated so a student has positive proof their crossing registered, rather than trusting a silent background scan, a pattern with real precedent in RFID reader hardware and library systems but not common in the classroom-attendance literature surveyed above.</span></li>
+    <ul class="ocs__checklist">
+      <li class="done"><span class="ocs__checklist-box"></span><span>The tag is mounted on the student's own laptop, not a badge or ID card. It is a device-presence proxy, not a person-presence proxy.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Tags are tamper-evident, with an explicit issue, active, tampered/lost, and reissued/retired lifecycle.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Presence is a multi-state model (tardy, stepped out, left early, opted out, tamper) rather than a binary present/absent flag.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Attendance counts only inside a bell-schedule-bound window, evaluated against per-period expected enrollment.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>The camera signal carries an explicit opt-in governance model, built in from the start rather than added later.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>The hardware rollout is deliberately phased: contact-tap prototype first, contactless room-scale detection last, rather than building the hardest hardware problem up front.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>The doorway is designed as a multi-antenna, circularly-polarized portal from the start (the same antenna-diversity technique library and retail security gates use) rather than a single reader antenna, because tag orientation at a walk-through point is inherently unpredictable.</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>An audible read-confirmation tone at the doorway is being evaluated so a student has positive proof their crossing registered, rather than trusting a silent background scan, a pattern with real precedent in RFID reader hardware and library systems but not common in the classroom-attendance literature surveyed above.</span></li>
     </ul>
   </div>
 

@@ -119,15 +119,15 @@
   <!-- Acceptance Tests -->
   <div class="jv-section-label">Acceptance Criteria &amp; Test Cases</div>
   <div class="jv-card">
-    <ul class="jv-checklist">
-      <li class="open"><span class="jv-box"></span><span>Capture a timestamped classroom frame and return a class label, confidence score, and bounding box for every accepted YOLO detection</span></li>
-      <li class="open"><span class="jv-box"></span><span>Evaluate all six target classes using a separate held-out test set that was not used for training</span></li>
-      <li class="open"><span class="jv-box"></span><span>Reach the project target of at least 80% correct-class detections on the held-out images and also report per-class precision, recall, and mAP50</span></li>
-      <li class="open"><span class="jv-box"></span><span>Compare detection performance under bright light, reduced light, distance, unusual viewing angles, and partial occlusion</span></li>
-      <li class="open"><span class="jv-box"></span><span>Pass YOLO bounding boxes to SAM 3 as prompt boxes and generate a binary mask for each selected object</span></li>
-      <li class="open"><span class="jv-box"></span><span>Measure mask quality using Intersection over Union on a manually labeled validation sample</span></li>
-      <li class="open"><span class="jv-box"></span><span>Measure end-to-end YOLO + SAM latency at 720p and 1080p on the actual Linux host</span></li>
-      <li class="open"><span class="jv-box"></span><span>Complete one capture-and-processing cycle within 10 seconds, or document the optimization needed to reach that target</span></li>
+    <ul class="ocs__checklist">
+      <li class="open"><span class="ocs__checklist-box"></span><span>Capture a timestamped classroom frame and return a class label, confidence score, and bounding box for every accepted YOLO detection</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Evaluate all six target classes using a separate held-out test set that was not used for training</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Reach the project target of at least 80% correct-class detections on the held-out images and also report per-class precision, recall, and mAP50</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Compare detection performance under bright light, reduced light, distance, unusual viewing angles, and partial occlusion</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Pass YOLO bounding boxes to SAM 3 as prompt boxes and generate a binary mask for each selected object</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Measure mask quality using Intersection over Union on a manually labeled validation sample</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Measure end-to-end YOLO + SAM latency at 720p and 1080p on the actual Linux host</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Complete one capture-and-processing cycle within 10 seconds, or document the optimization needed to reach that target</span></li>
     </ul>
   </div>
 
@@ -152,12 +152,12 @@
   <!-- Risks and Next Steps -->
   <div class="jv-section-label">Open Questions &amp; Next Steps</div>
   <div class="jv-card">
-    <ul class="jv-checklist">
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Baseline Test:</strong> Determine which target classes are already supported reliably by the pretrained YOLO model.</span></li>
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Dataset:</strong> Collect representative classroom images across both camera viewpoints and split them into training, validation, and held-out test sets.</span></li>
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Fine-Tuning:</strong> Train a custom model only for classes that do not meet the required detection performance.</span></li>
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Prompt Refinement:</strong> Test box prompts and optional positive/negative points when adjacent objects cause SAM mask leakage.</span></li>
-      <li class="open"><span class="jv-box"></span><span><strong style="color:var(--jv-text);">Optimization:</strong> Evaluate lower input resolution, model-size selection, ONNX Runtime, and quantization if the local pipeline exceeds 10 seconds.</span></li>
+    <ul class="ocs__checklist">
+      <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Baseline Test:</strong> Determine which target classes are already supported reliably by the pretrained YOLO model.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Dataset:</strong> Collect representative classroom images across both camera viewpoints and split them into training, validation, and held-out test sets.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Fine-Tuning:</strong> Train a custom model only for classes that do not meet the required detection performance.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Prompt Refinement:</strong> Test box prompts and optional positive/negative points when adjacent objects cause SAM mask leakage.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span><strong style="color:var(--jv-text);">Optimization:</strong> Evaluate lower input resolution, model-size selection, ONNX Runtime, and quantization if the local pipeline exceeds 10 seconds.</span></li>
     </ul>
   </div>
 

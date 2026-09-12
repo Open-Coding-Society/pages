@@ -1,0 +1,38 @@
+// Shared acceptance and test-case checklist element.
+
+.ocs__checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ocs__checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--ui-border);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.ocs__checklist li:last-child { border-bottom: none; }
+
+.ocs__checklist-box {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.15rem;
+  border: 1.5px solid var(--ui-border);
+  border-radius: 0.3rem;
+}
+
+.ocs__checklist li.open .ocs__checklist-box {
+  border-color: var(--pref-accent-color);
+}
+
+.ocs__checklist li.done .ocs__checklist-box {
+  border-color: var(--pref-accent-color);
+  background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+}
