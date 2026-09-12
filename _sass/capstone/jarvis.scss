@@ -27,61 +27,6 @@
 
 /* ── Header ── */
 .jv-header {
-  text-align: center;
-  margin-bottom: 2.75rem;
-}
-
-.jv-badge {
-  display: inline-block;
-  padding: 0.35rem 1rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  border-radius: 9999px;
-  background: var(--jv-accent-soft);
-  color: var(--jv-accent);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  margin-bottom: 1rem;
-}
-
-.jv-title {
-  font-size: 2.1rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-  letter-spacing: -0.02em;
-  color: var(--jv-accent);
-}
-
-.jv-page-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin: 0 0 0.75rem;
-  letter-spacing: -0.01em;
-  color: var(--jv-text);
-}
-
-.jv-description {
-  font-size: 1.0625rem;
-  color: var(--jv-text-muted);
-  line-height: 1.7;
-  max-width: 680px;
-  margin: 0 auto;
-}
-
-/* ── System Flow Diagram ── */
-.jv-flow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0;
-  margin: 2rem 0 2.75rem;
-}
-
-.jv-flow-node {
-  display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 0.4rem;
   padding: 0.75rem 1.1rem;
@@ -697,5 +642,4 @@
   .jv-flow { gap: 0.2rem; }
   .jv-flow-node { min-width: 78px; padding: 0.55rem 0.7rem; }
   .jv-flow-node-label { font-size: 0.62rem; }
-  .jv-table { font-size: 0.78rem; }
 }
