@@ -680,11 +680,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
    <!-- Integra (CSP 26-27) -->
    <div class="ocs__grid-cell CSP" data-year="2026-2027">
-       <a href="{% post_url 2026-03-04-sentri-capstone %}">
+       <a href="{% post_url 2026-09-09-integra-capstone %}">
            <img src="/images/capstone/sentri.png" alt="Sentri" class="ocs__image-frame ocs__image-frame--thumbnail" />
        </a>
        <div>
-           <h3><a href="{% post_url 2026-03-04-sentri-capstone %}">Integra</a></h3>
+           <h3><a href="{% post_url 2026-09-09-integra-capstone %}">Integra</a></h3>
            <p>An AI-driven recovery ecosystem for the Poway Recovery Center that provides users with access to specialized support programs and meeting schedules at the center while also tracking long-term sobriety milestones through a secure, high-fidelity user profile/dashboard.</p>
            <p>Team: Adya Shipekar, Anika Seksaria, Jailene Tang</p>
        </div>
@@ -774,15 +774,15 @@ document.addEventListener('DOMContentLoaded', function(){
         </div>
     </div>
 
-  <!-- FOPS (2026-2027) -->
+   <!-- FOPS (2026-2027) -->
  <div class="ocs__grid-cell CSP" data-year="2026-2027">
-        <a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">
+        <a href="{% post_url 2026-09-09-fops-2026-2027-capstone %}">
             <img src="/images/capstone/fops.png" alt="Friends of Poway Seniors" class="ocs__image-frame ocs__image-frame--thumbnail" />
         </a>
         <div>
-            <h3><a href="{% post_url 2026-03-09-friends-of-poway-seniors-capstone %}">Friends of Poway Seniors</a></h3>
-            <p> This refurbished site transforms Friends of Poway Seniors into a clean, intuitive hub with interactive Bingo, AI chatbot ML-powered event predictor, and volunteer signup—all accessible from one unified interface. With simplified navigation and prominent donation buttons, the platform makes it easy for elderly users and caregivers to access essential services while honoring the organization's mission. </p>
-            <p>Team: Nitya, Vivian, Virginia</p>
+            <h3><a href="{% post_url 2026-09-09-fops-2026-2027-capstone %}">Friends of Poway Seniors</a></h3>
+            <p>Extending the Friends of Poway Seniors site with scam-defense practice games, digital and multiplayer bingo, and seated movement games — built for an audience of older adults.</p>
+            <p>Team: Triple T (Chetan Tiduwar, Aaditya Prem, Kashyap Tubati)</p>
         </div>
     </div>
 
@@ -796,6 +796,18 @@ document.addEventListener('DOMContentLoaded', function(){
            <h3><a href="{% post_url 2026-09-10-sdrm-capstone %}">San Diego Rescue Mission</a></h3>
            <p>This capstone project modernizes the San Diego Rescue Mission website with improved navigation, a filterable Get Help Now page, clearer donation impact information, volunteer availability filters, and site-wide search to help residents, donors, and volunteers find what they need.</p>
            <p>Team: Aarav, Ryden</p>
+       </div>
+   </div>
+
+   <!-- Poway Neighborhood Emergency Corps (CSP 2026-2027) -->
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-11-pnec-capstone %}">
+           <img src="{{ '/images/capstone/powaynec-logo-white.png' | relative_url }}" alt="Poway Neighborhood Emergency Corps logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-09-11-pnec-capstone %}">Poway Neighborhood Emergency Corps 2026–2027</a></h3>
+           <p>Continuing the PNEC project with proposed household preparedness, volunteer coordination, and community information tools.</p>
+           <p>Team: Samanvi, Joan, Ainsley</p>
        </div>
    </div>
 
