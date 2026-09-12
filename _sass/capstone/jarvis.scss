@@ -162,44 +162,6 @@
   margin: 0 0 1.25rem;
 }
 
-/* ── Checklist ── */
-.jv-checklist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.jv-checklist li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.55rem 0;
-  font-size: 0.9rem;
-  color: var(--jv-text-muted);
-  border-bottom: 1px solid var(--ui-border);
-  line-height: 1.5;
-}
-
-.jv-checklist li:last-child { border-bottom: none; }
-
-.jv-checklist .jv-box {
-  flex-shrink: 0;
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 0.3rem;
-  border: 1.5px solid var(--jv-card-border);
-  margin-top: 0.15rem;
-}
-
-.jv-checklist li.open .jv-box {
-  border-color: var(--jv-amber);
-}
-
-.jv-checklist li.done .jv-box {
-  border-color: var(--jv-success);
-  background: var(--jv-success-soft);
-}
-
 /* ── Tables ── */
 .jv-table-wrap {
   overflow-x: auto;
