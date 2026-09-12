@@ -9,7 +9,9 @@ year: "2026-2027"
 rp_active: phases
 ---
 
+
 {% assign data = site.data.rfid_presence_infograph %}
+<!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
   <a href="/capstone/rfid-presence/phases/" class="ocs__phase-crumb">&larr; All Phases</a>
 
@@ -75,3 +77,4 @@ shows scan events"]</pre>
     {% endif %}
   </div>
 </div>
+<!-- markdownlint-enable MD033 MD010 MD012 -->

@@ -10,6 +10,7 @@ rp_active: technical
 ---
 
 {% assign data = site.data.rfid_presence_infograph %}
+<!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
     <div class="ocs__badge">Technical Detail &amp; Flow</div>
@@ -162,3 +163,4 @@ Computer unlinked"]</pre>
     {% endif %}
   </div>
 </div>
+<!-- markdownlint-enable MD033 MD010 MD012 -->
