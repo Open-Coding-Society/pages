@@ -8,6 +8,8 @@ permalink: /capstone/rfid-presence/phases/phase-4/
 year: "2026-2027"
 rp_active: phases
 ---
+
+<!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
 <a href="/capstone/rfid-presence/phases/" class="ocs__phase-crumb">&#8592; All Phases</a>
 <div class="rfid-presence-header">
@@ -90,3 +92,4 @@ left early, opted out, tamper"]
   <span class="ocs__team-name">{{ data.Team | join: ", " }}</span>
 </div>{% if data.Repo %}
 <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>{% endif %}</div></div>
+<!-- markdownlint-enable MD033 MD010 MD012 -->

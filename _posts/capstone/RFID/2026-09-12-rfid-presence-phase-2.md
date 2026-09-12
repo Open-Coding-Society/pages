@@ -9,7 +9,9 @@ year: "2026-2027"
 rp_active: phases
 ---
 
+
 {% assign data = site.data.rfid_presence_infograph %}
+<!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
 	<a href="/capstone/rfid-presence/phases/" class="ocs__phase-crumb">&larr; All Phases</a>
 	<div class="rfid-presence-header">
@@ -67,3 +69,4 @@ CrowPi reader"]
 		{% if data.Repo %}<a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>{% endif %}
 	</div>
 </div>
+<!-- markdownlint-enable MD033 MD010 MD012 -->
