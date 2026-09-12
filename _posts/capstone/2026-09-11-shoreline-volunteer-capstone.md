@@ -9,6 +9,15 @@ permalink: /capstone/shoreline-volunteer/
 .shoreline-capstone-card .ocs__grid {
     justify-content: center;
 }
+.shoreline-capstone-card .ocs__grid--card {
+    grid-template-columns: repeat(3, minmax(200px, 240px));
+    justify-content: center;
+}
+@media (max-width: 700px) {
+    .shoreline-capstone-card .ocs__grid--card {
+        grid-template-columns: minmax(200px, 240px);
+    }
+}
 .shoreline-capstone-card .ocs__grid-cell:not(.ocs__grid-cell--header) {
     aspect-ratio: 1;
     display: flex;
