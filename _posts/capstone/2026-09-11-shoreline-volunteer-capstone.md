@@ -7,15 +7,15 @@ permalink: /capstone/shoreline-volunteer/
 year: "2026-2027"
 ---
 <style>
-.shoreline-blue   { background: #DCEBFC; border-color: #3B82F6; color: #1E3A8A; }
-.shoreline-green  { background: #D7F5E3; border-color: #22C55E; color: #14532D; }
-.shoreline-yellow { background: #FDECC8; border-color: #F4B400; color: #5C4813; }
+.shoreline-blue   { background: #DCEBFC !important; border-color: #3B82F6 !important; color: #1E3A8A !important; }
+.shoreline-green  { background: #D7F5E3 !important; border-color: #22C55E !important; color: #14532D !important; }
+.shoreline-yellow { background: #FDECC8 !important; border-color: #F4B400 !important; color: #5C4813 !important; }
 .shoreline-blue strong, .shoreline-blue p, .shoreline-blue li,
 .shoreline-green strong, .shoreline-green p, .shoreline-green li,
 .shoreline-yellow strong, .shoreline-yellow p, .shoreline-yellow li {
-    color: inherit;
+    color: inherit !important;
 }
-.shoreline-header-blue { background: #3B82F6; border-color: #3B82F6; color: #ffffff; }
+.shoreline-header-blue { background: #3B82F6 !important; border-color: #3B82F6 !important; color: #ffffff !important; }
 </style>
 
 <blockquote>Shoreline Community Services has strong programs and a clear mission, but the volunteer page undersells them. There is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.</blockquote>
