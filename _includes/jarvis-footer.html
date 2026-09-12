@@ -1,11 +1,9 @@
-<div class="ocs__card">
-  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-    <div class="ocs__team">
-      <span class="ocs__team-label">Project Team</span>
-      <span class="ocs__team-name">{{ data.Team | join: ", " }}</span>
-    </div>
-    <span class="ocs__status">Prototype Stage</span>
+<div class="ocs__card ocs__capstone-footer">
+  <div class="ocs__team">
+    <span class="ocs__team-label">Project Team</span>
+    <span class="ocs__team-name">{{ data.Team | join: ", " }}</span>
   </div>
+  <span class="ocs__status">Prototype Stage</span>
   {% if data.Repo %}
   <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>
   {% endif %}

@@ -27,18 +27,34 @@
 
 /* ── Header ── */
 .jv-header {
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.75rem 1.1rem;
-  background: var(--jv-card);
-  border: 1px solid var(--jv-card-border);
-  border-radius: 0.75rem;
-  min-width: 110px;
   text-align: center;
-  position: relative;
+  margin-bottom: 2.75rem;
+}
+
+.jv-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 2rem 0 2.75rem;
 }
 
 .jv-flow-node-icon { font-size: 1.4rem; }
+
+.jv-flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 110px;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid var(--jv-card-border);
+  border-radius: 0.75rem;
+  background: var(--jv-card);
+  position: relative;
+  text-align: center;
+}
 
 .jv-flow-node-label {
   font-size: 0.75rem;
@@ -110,7 +126,7 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0;
+  gap: 0.5rem;
 }
 
 .jv-flow-row + .jv-flow-row { margin-top: 0.5rem; }
@@ -124,6 +140,12 @@
   color: var(--jv-text-muted);
   font-family: 'JetBrains Mono', monospace;
   margin: 0.35rem 0;
+}
+
+@media (max-width: 640px) {
+  .jv-flow-row { gap: 0.2rem; }
+  .jv-flow-node { min-width: 78px; padding: 0.55rem 0.7rem; }
+  .jv-flow-node-label { font-size: 0.62rem; }
 }
 
 /* ── Decision Cards (icon + short why, replaces long tables) ── */
@@ -216,6 +238,7 @@
 /* ── Segmented Timeline Bar (replaces mermaid gantt) ── */
 .jv-timeline-bar {
   display: flex;
+  width: 100%;
   height: 44px;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -233,6 +256,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0 0.4rem;
+  text-align: center;
 }
 
 .jv-timeline-dates {
@@ -249,6 +273,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.85rem;
+  line-height: 1.4;
 }
 
 .jv-timeline-legend-item {
@@ -369,7 +394,4 @@
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .jv-title { font-size: 1.6rem; }
-  .jv-flow { gap: 0.2rem; }
-  .jv-flow-node { min-width: 78px; padding: 0.55rem 0.7rem; }
-  .jv-flow-node-label { font-size: 0.62rem; }
 }
