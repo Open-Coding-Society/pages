@@ -1,6 +1,12 @@
 // Shared capstone document primitives.
 // Project pages keep a scoped root class for composition and content-specific states.
 
+.ocs__capstone-nav {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--ui-border);
+}
+
 .ocs__card {
   background: var(--panel);
   border: 1px solid var(--ui-border);
