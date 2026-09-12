@@ -5,6 +5,8 @@ hide: true
 show_reading_time: false
 ---
 
+<!-- markdownlint-disable MD033 MD046 -->
+
 Hi! My name is [Your Full Name]
 
 ## Learning Grids
@@ -200,3 +202,5 @@ Hi! My name is [Your Full Name]
 </div>
 
 <br>
+
+<!-- markdownlint-enable MD033 MD046 -->
