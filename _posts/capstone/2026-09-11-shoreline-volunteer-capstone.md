@@ -10,10 +10,14 @@ year: "2026-2027"
 .shoreline-blue   { background: #DCEBFC !important; border-color: #3B82F6 !important; color: #1E3A8A !important; }
 .shoreline-green  { background: #D7F5E3 !important; border-color: #22C55E !important; color: #14532D !important; }
 .shoreline-yellow { background: #FDECC8 !important; border-color: #F4B400 !important; color: #5C4813 !important; }
-.shoreline-blue strong, .shoreline-blue p, .shoreline-blue li,
-.shoreline-green strong, .shoreline-green p, .shoreline-green li,
-.shoreline-yellow strong, .shoreline-yellow p, .shoreline-yellow li {
-    color: inherit !important;
+.shoreline-blue strong, .shoreline-blue p, .shoreline-blue li, .shoreline-blue ul, .shoreline-blue ol {
+    color: #1E3A8A !important;
+}
+.shoreline-green strong, .shoreline-green p, .shoreline-green li, .shoreline-green ul, .shoreline-green ol {
+    color: #14532D !important;
+}
+.shoreline-yellow strong, .shoreline-yellow p, .shoreline-yellow li, .shoreline-yellow ul, .shoreline-yellow ol {
+    color: #5C4813 !important;
 }
 .shoreline-header-blue { background: #3B82F6 !important; border-color: #3B82F6 !important; color: #ffffff !important; }
 </style>
