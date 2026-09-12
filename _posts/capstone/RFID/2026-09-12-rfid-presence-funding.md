@@ -8,6 +8,8 @@ permalink: /capstone/rfid-presence/funding/
 year: "2026-2027"
 rp_active: funding
 ---
+
+<!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="rfid-presence-infograph">
 <div class="rfid-presence-header">
   <div class="ocs__badge">Funding &amp; Budget</div>
@@ -223,3 +225,4 @@ rp_active: funding
 </div>
 <div class="ocs__status">Phase 1, Working Prototype</div>{% if data.Repo %}
 <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>{% endif %}</div></div>
+<!-- markdownlint-enable MD033 MD010 MD012 -->
