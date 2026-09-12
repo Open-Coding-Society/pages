@@ -16,7 +16,7 @@
   <div class="rfid-presence-card">
     <h3 class="rfid-presence-section-title">Why It's Designed This Way</h3>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Decision</th><th>In plain terms</th></tr></thead>
         <tbody>
           <tr><td>Tag on the <strong>laptop</strong>, not a badge</td><td>Students carry laptops to every class and rarely leave them behind. A badge is far easier to forget or leave in a bag.</td></tr>
@@ -58,7 +58,7 @@
 
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Academic literature</h3>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Paper</th><th>What it does</th><th>How this project differs</th></tr></thead>
         <tbody>
           <tr>
@@ -92,7 +92,7 @@
 
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Related patents</h3>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Patent</th><th>What it covers</th><th>How this project differs</th></tr></thead>
         <tbody>
           <tr>
@@ -122,7 +122,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Sensor-fusion &amp; occupancy-sensing research</h3>
     <p class="rfid-presence-about">Work validating the general approach of combining RFID with another sensing modality, beyond classroom attendance specifically, plus broader surveys of how occupancy sensing is done in buildings generally.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
         <tbody>
           <tr>
@@ -148,7 +148,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Commercial products</h3>
     <p class="rfid-presence-about">Vendors already selling RFID attendance to schools, as a baseline for what off-the-shelf already covers.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Vendor</th><th>What it offers</th></tr></thead>
         <tbody>
           <tr><td><a href="https://vmedulife.com/blog/academic-planning/rfid-student-attendance-system-the-future-of-smart-attendance-tracking-vmedulife/" target="_blank" rel="noopener">vmedulife</a></td><td>RFID student attendance automation for schools, colleges, and universities.</td></tr>
@@ -167,7 +167,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Read reliability: bag orientation, on-body carry &amp; antenna diversity</h3>
     <p class="rfid-presence-about">The team flagged an open problem: a tagged laptop inside a closed backpack has no guaranteed orientation toward the reader, and UHF read reliability drops off-axis. The same physics is a bigger problem for a tag carried on the body (e.g. a phone in a pocket), since human tissue absorbs strongly at UHF. It turns out to be a known, actively studied RFID engineering problem rather than something specific to this project's design, and the standard mitigation (surrounding the doorway with multiple antennas instead of relying on one) is the same technique retail and library security gates already use.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
         <tbody>
           <tr>
@@ -205,7 +205,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Tag co-location interference</h3>
     <p class="rfid-presence-about">If a second, personal-device tag is ever added alongside the laptop tag, both could end up in the same backpack. Whether they'd interfere with each other isn't something to assume either way; it's a measurable, previously-studied RF effect.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
         <tbody>
           <tr>
@@ -223,7 +223,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Phone-based / BLE attendance: why RFID instead of an app</h3>
     <p class="rfid-presence-about">A student's own phone could in principle provide presence data without any new tag at all, via Bluetooth Low Energy (BLE) beacons and an app. This has been tried in the classroom-attendance literature, and comparing against it clarifies why this project uses a dedicated RFID tag instead.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
         <tbody>
           <tr>
@@ -248,7 +248,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Audible read confirmation: precedent</h3>
     <p class="rfid-presence-about">The team has discussed giving students an audible tone at the doorway on a successful read, so they get positive proof their crossing was registered rather than trusting a silent background scan. This is not a new idea in RFID systems generally.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
         <tbody>
           <tr>
@@ -270,7 +270,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Regulatory basis: FCC Part 15.247</h3>
     <p class="rfid-presence-about">The door portal's power budget is governed by federal rule, not a tuning choice, so it's worth citing the primary regulatory text rather than a vendor's paraphrase of it.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Source</th><th>What it says</th></tr></thead>
         <tbody>
           <tr>
@@ -284,7 +284,7 @@
     <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Clock synchronization for multi-sensor correlation</h3>
     <p class="rfid-presence-about">Correlating RFID and camera events depends entirely on both event streams' timestamps agreeing. A Raspberry Pi has no battery-backed clock by default, so this isn't a hypothetical concern.</p>
     <div class="rfid-presence-table-wrap">
-      <table class="rfid-presence-table">
+      <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Work</th><th>Relevance</th></tr></thead>
         <tbody>
           <tr>
