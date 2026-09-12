@@ -1,28 +1,18 @@
 {% assign data = site.data.rfid_presence_infograph %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<div class="rp-container">
-  <nav class="rp-nav">
-    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
-    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
-    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
-    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
-    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
-  </nav>
-
-  <div class="rp-header">
-    <div class="rp-badge">Technical Detail &amp; Flow</div>
-    <h1 class="rp-page-title" style="font-size:2rem;">System Architecture &amp; Data Flow</h1>
-    <p class="rp-description">How the RFID and camera signals get correlated into an attendance record, for readers who want the mechanism and not just the pitch.</p>
+<div class="rfid-presence-infograph">
+  <div class="rfid-presence-header">
+    <div class="rfid-presence-badge">Technical Detail &amp; Flow</div>
+    <h1 class="rfid-presence-title">System Architecture &amp; Data Flow</h1>
+    <p class="rfid-presence-description">How the RFID and camera signals get correlated into an attendance record, for readers who want the mechanism and not just the pitch.</p>
   </div>
 
-  <div class="rp-section-label">System Architecture</div>
-  <div class="rp-card">
-    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 0.25rem;">Two independent event sources, RFID and camera, feed a correlation engine that is also aware of the bell schedule and per-period enrollment.</p>
-    <div class="rp-diagram">
-      <pre class="mermaid" style="margin:0;">flowchart TD
+  {% include rfid-presence-nav.html %}
+
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">System Architecture</h3>
+    <p class="rfid-presence-about">Two independent event sources, RFID and camera, feed a correlation engine that is also aware of the bell schedule and per-period enrollment.</p>
+    <div class="rfid-presence-diagram">
+      <pre class="mermaid">flowchart TD
     BS[Bell Schedule] --> CP[Class / Period]
     CP --> REG["Registration:
 Student + Face + Computer + RFID Tag"]
@@ -38,11 +28,11 @@ Spatial presence, face-scanning system"]
     </div>
   </div>
 
-  <div class="rp-section-label">Attendance Window Logic</div>
-  <div class="rp-card">
-    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 0.25rem;">The bell schedule doesn't just define start and end times for tardy math. It defines a <strong style="color:var(--rp-text);">window</strong> during which reads count as attendance at all.</p>
-    <div class="rp-diagram">
-      <pre class="mermaid" style="margin:0;">sequenceDiagram
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Attendance Window Logic</h3>
+    <p class="rfid-presence-about">The bell schedule doesn't just define start and end times for tardy math. It defines a <strong>window</strong> during which reads count as attendance at all.</p>
+    <div class="rfid-presence-diagram">
+      <pre class="mermaid">sequenceDiagram
     participant Bell as Bell Schedule
     participant Win as Attendance Window
     participant Door as Door Sensors (RFID)
@@ -60,11 +50,11 @@ Spatial presence, face-scanning system"]
     </div>
   </div>
 
-  <div class="rp-section-label">Presence State Model</div>
-  <div class="rp-card">
-    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Two independent signals, device via RFID and student via camera, get correlated into one of these states per student per period.</p>
-    <div class="rp-diagram">
-      <pre class="mermaid" style="margin:0;">stateDiagram-v2
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Presence State Model</h3>
+    <p class="rfid-presence-about">Two independent signals, device via RFID and student via camera, get correlated into one of these states per student per period.</p>
+    <div class="rfid-presence-diagram">
+      <pre class="mermaid">stateDiagram-v2
     [*] --> ABSENT
     ABSENT --> PRESENT: device + student seen in window
     ABSENT --> TARDY: first seen after grace period
@@ -77,28 +67,28 @@ Spatial presence, face-scanning system"]
     [*] --> TAMPER_DETECTED: tag reports tamper
     [*] --> IGNORED_OUT_OF_WINDOW: read outside attendance window</pre>
     </div>
-    <div class="rp-table-wrap" style="margin-top:1rem;">
-      <table class="rp-table">
+    <div class="rfid-presence-table-wrap">
+      <table class="rfid-presence-table">
         <thead><tr><th>State</th><th>Device (RFID)</th><th>Student (Camera)</th><th>Meaning</th></tr></thead>
         <tbody>
-          <tr><td><span class="rp-pill rp-pill-good">PRESENT</span></td><td>seen</td><td>seen</td><td>Normal attendance</td></tr>
-          <tr><td><span class="rp-pill rp-pill-warn">TARDY</span></td><td>first seen after window open plus grace period</td><td>seen</td><td>Arrived late</td></tr>
-          <tr><td><span class="rp-pill rp-pill-neutral">DEVICE_ONLY_NO_CONSENT</span></td><td>seen</td><td>opted out</td><td>Student declined face scanning by policy. Presence is based on the device signal alone and is not flagged as anomalous or incomplete.</td></tr>
-          <tr><td><span class="rp-pill rp-pill-warn">DEVICE_PRESENT_STUDENT_AWAY</span></td><td>seen</td><td>not currently seen</td><td>Bathroom or temporary-exit scenario. Not counted as absent or left early.</td></tr>
-          <tr><td><span class="rp-pill rp-pill-bad">LEFT_EARLY</span></td><td>seen, then both signals stop before window close</td><td>stopped before window close</td><td>Exited before period ended</td></tr>
-          <tr><td><span class="rp-pill rp-pill-warn">DEVICE_ABSENT_STUDENT_PRESENT</span></td><td>not seen</td><td>seen</td><td>Student present without their registered device. Flagged for manual review (forgot laptop, borrowed one, or tag failure).</td></tr>
-          <tr><td><span class="rp-pill rp-pill-bad">ABSENT</span></td><td>not seen</td><td>not seen</td><td>No signal at all during the window</td></tr>
-          <tr><td><span class="rp-pill rp-pill-bad">TAMPER_DETECTED</span></td><td>tag reports tamper/invalid</td><td>n/a</td><td>Tag physically compromised. Excluded from attendance and flagged for tag reissue.</td></tr>
-          <tr><td><span class="rp-pill rp-pill-neutral">IGNORED_OUT_OF_WINDOW</span></td><td>seen</td><td>n/a</td><td>Read occurred outside the attendance window. Logged, not counted.</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-good">PRESENT</span></td><td>seen</td><td>seen</td><td>Normal attendance</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-warn">TARDY</span></td><td>first seen after window open plus grace period</td><td>seen</td><td>Arrived late</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-neutral">DEVICE_ONLY_NO_CONSENT</span></td><td>seen</td><td>opted out</td><td>Student declined face scanning by policy. Presence is based on the device signal alone and is not flagged as anomalous or incomplete.</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-warn">DEVICE_PRESENT_STUDENT_AWAY</span></td><td>seen</td><td>not currently seen</td><td>Bathroom or temporary-exit scenario. Not counted as absent or left early.</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-bad">LEFT_EARLY</span></td><td>seen, then both signals stop before window close</td><td>stopped before window close</td><td>Exited before period ended</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-warn">DEVICE_ABSENT_STUDENT_PRESENT</span></td><td>not seen</td><td>seen</td><td>Student present without their registered device. Flagged for manual review (forgot laptop, borrowed one, or tag failure).</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-bad">ABSENT</span></td><td>not seen</td><td>not seen</td><td>No signal at all during the window</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-bad">TAMPER_DETECTED</span></td><td>tag reports tamper/invalid</td><td>n/a</td><td>Tag physically compromised. Excluded from attendance and flagged for tag reissue.</td></tr>
+          <tr><td><span class="rfid-presence-pill rfid-presence-pill-neutral">IGNORED_OUT_OF_WINDOW</span></td><td>seen</td><td>n/a</td><td>Read occurred outside the attendance window. Logged, not counted.</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="rp-section-label">Registration &amp; Tag Lifecycle</div>
-  <div class="rp-card">
-    <div class="rp-diagram">
-      <pre class="mermaid" style="margin:0;">flowchart LR
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Registration &amp; Tag Lifecycle</h3>
+    <div class="rfid-presence-diagram">
+      <pre class="mermaid">flowchart LR
     A[New student enrolled] --> B["Registration:
 capture Face ID,
 assign Computer,
@@ -112,9 +102,9 @@ issue RFID Tag"]
     C -->|Student unenrolled/graduated| G["Tag: RETIRED
 Computer unlinked"]</pre>
     </div>
-    <h3 style="margin-top:1.5rem;">Data the system needs to persist</h3>
-    <p style="font-size:0.8125rem;color:var(--rp-text-muted);margin:-0.5rem 0 1rem;">No code yet for the full model. This is the entity list, not a schema.</p>
-    <ul class="rp-entity-list">
+    <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Data the system needs to persist</h3>
+    <p class="rfid-presence-about">No code yet for the full model. This is the entity list, not a schema.</p>
+    <ul class="rfid-presence-entity-list">
       <li><strong>Students</strong>: id, name, enrolled periods</li>
       <li><strong>Periods</strong>: id, name, start time, end time, expected enrollment</li>
       <li><strong>Computers</strong>: id, assigned student</li>
@@ -128,39 +118,36 @@ Computer unlinked"]</pre>
     </ul>
   </div>
 
-  <div class="rp-section-label">Current Software Stack (Phase 1)</div>
-  <div class="rp-card">
-    <ul class="rp-entity-list">
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Current Software Stack (Phase 1)</h3>
+    <ul class="rfid-presence-entity-list">
       <li><strong>Reader board</strong>: CrowPi, single scan pad, 13.56MHz MIFARE Classic tags. Contact-tap, not the UHF doorway design above.</li>
       <li><strong>Backend</strong>: Flask dev server. Production deployment and migration off the dev server is a Phase 2 item.</li>
       <li><strong>Database</strong>: SQLite. Migrating to a production database with a backup strategy is a Phase 2 item.</li>
       <li><strong>Frontend</strong>: rough dashboard, being replaced with a roster and admin view in Phase 2.</li>
     </ul>
-    <div class="rp-callout rp-callout-note">
-      The full RFID and camera architecture above is the <strong style="color:var(--rp-text);">target design</strong> the team is building toward. The current running system implements only the leftmost slice of it: RFID read, log, dashboard, with no camera correlation yet. See <a href="/capstone/rfid-presence/phases/" style="color:var(--rp-accent);">Phases</a> for how the gap closes.
+    <div class="rfid-presence-callout">
+      The full RFID and camera architecture above is the <strong>target design</strong> the team is building toward. The current running system implements only the leftmost slice of it: RFID read, log, dashboard, with no camera correlation yet. See <a href="/capstone/rfid-presence/phases/">Phases</a> for how the gap closes.
     </div>
   </div>
 
-  <div class="rp-section-label">Open Technical Questions</div>
-  <div class="rp-card">
-    <ul class="rp-checklist">
-      <li class="open"><span class="rp-box"></span><span>Bag-orientation reliability: a tagged laptop inside a closed backpack has no guaranteed tag-to-reader orientation, and UHF read reliability drops off-axis. Not yet solved. See <a href="/capstone/rfid-presence/summary/" style="color:var(--rp-accent);">Project Summary</a> for candidate antenna designs that address this directly.</span></li>
-      <li class="open"><span class="rp-box"></span><span>Camera system interface: what the face-scanning system exposes (API, event stream, or file) still needs to be defined, including how it reports a student who has opted out.</span></li>
-      <li class="open"><span class="rp-box"></span><span>Tag mounting standard: a single mounting spot on the laptop (for example, the underside near a plastic vent) so tag type (on-metal versus standard) can be standardized across devices.</span></li>
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Open Technical Questions</h3>
+    <ul class="rfid-presence-checklist">
+      <li class="open"><span class="rfid-presence-box"></span><span>Bag-orientation reliability: a tagged laptop inside a closed backpack has no guaranteed tag-to-reader orientation, and UHF read reliability drops off-axis. Not yet solved. See <a href="/capstone/rfid-presence/summary/">Project Summary</a> for candidate antenna designs that address this directly.</span></li>
+      <li class="open"><span class="rfid-presence-box"></span><span>Camera system interface: what the face-scanning system exposes (API, event stream, or file) still needs to be defined, including how it reports a student who has opted out.</span></li>
+      <li class="open"><span class="rfid-presence-box"></span><span>Tag mounting standard: a single mounting spot on the laptop (for example, the underside near a plastic vent) so tag type (on-metal versus standard) can be standardized across devices.</span></li>
     </ul>
   </div>
 
-  <div class="rp-footer">
-    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-      <div class="rp-team">
-        <span class="rp-team-label">Project Team</span>
-        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
-      </div>
-      <span class="rp-status">Phase 1. Working Prototype</span>
+  <div class="rfid-presence-card">
+    <div class="rfid-presence-team">
+      <span class="rfid-presence-team-label">Project Team</span>
+      <span class="rfid-presence-team-name">{{ data.Team | join: ", " }}</span>
     </div>
+    <div class="rfid-presence-status">Phase 1, Working Prototype</div>
     {% if data.Repo %}
-    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rfid-presence-btn">View Repo</a>
     {% endif %}
   </div>
-
 </div>
