@@ -10,9 +10,9 @@
 
   <!-- Header -->
   <div class="jv-header">
-    <div class="jv-badge">Design-Based Research Capstone · Jarvis Project Proposal · {{ data.Year }}</div>
+    <div class="ocs__badge">Design-Based Research Capstone · Jarvis Project Proposal · {{ data.Year }}</div>
     <h1 class="jv-title">{{ data.Title }}</h1>
-    <p class="jv-description">{{ data.Description }}</p>
+    <p class="ocs__description">{{ data.Description }}</p>
   </div>
 
   <!-- System flow at a glance -->
@@ -39,17 +39,17 @@
   </div>
 
   <!-- Problem Statement -->
-  <div class="jv-section-label">Problem Statement</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Problem Statement</h2>
+  <div class="ocs__card">
     <p style="font-size:0.95rem;line-height:1.75;color:var(--jv-text-muted);margin:0;">
       Classrooms change throughout the day. Our computer science classroom is no exception. People come and go, and hardware can be moved, misplaced, or left behind. This makes it difficult to know whether the room is as expected at any given time. Missing or out-of-place items can go unnoticed, causing confusion, wasted time, or the loss of expensive equipment.
     </p>
   </div>
 
   <!-- System architecture -->
-  <div class="jv-section-label">System Architecture</div>
-  <div class="jv-card">
-    <div class="jv-diagram">
+  <h2 class="ocs__section-title">System Architecture</h2>
+  <div class="ocs__card">
+    <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart TD
     C1["Camera 1
 Main Linux computer"] --> CAP["FFmpeg capture
@@ -69,14 +69,14 @@ Identity + location + history"]</pre>
   </div>
 
   <!-- Core Research Question -->
-  <div class="jv-section-label">Core Research Question</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Core Research Question</h2>
+  <div class="ocs__card">
     <p class="jv-question">Can a time-aware multi-camera system using object detection, segmentation, tracking, and schedule data reliably identify expected classroom objects and people and detect anomalies in their status, presence, or location?</p>
   </div>
 
   <!-- Hardware Layout -->
-  <div class="jv-section-label">Hardware Layout</div>
-  <div class="jv-card">
+  <h2 class="ocs__section-title">Hardware Layout</h2>
+  <div class="ocs__card">
     <div class="jv-flow-row">
       <div class="jv-flow-node">
         <div class="jv-flow-node-photo"><img src="/images/capstone/jarvis-bom/brio-webcam.png" alt="Camera 1"></div>
@@ -115,9 +115,9 @@ Identity + location + history"]</pre>
   </div>
 
   <!-- Project Phases -->
-  <div class="jv-section-label">Project Phases</div>
-  <div class="jv-card">
-    <div class="jv-diagram">
+  <h2 class="ocs__section-title">Project Phases</h2>
+  <div class="ocs__card">
+    <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart LR
     P1["Phase 1
 Camera Research &amp; Capture
@@ -130,55 +130,55 @@ Nov 2026"]
     style P1 fill:#3b82f622,stroke:#3b82f6
     style P3 fill:#a855f722,stroke:#a855f7</pre>
     </div>
-    <div class="jv-hub-grid" style="margin-top:1.25rem;">
-      <div class="jv-hub-card">
+    <div class="ocs__hub-grid" style="margin-top:1.25rem;">
+      <div class="ocs__hub-card">
         <span class="jv-pill jv-pill-good" style="width:fit-content;margin-bottom:0.6rem;">In Progress</span>
-        <span class="jv-hub-card-title">Phase 1: Camera Research &amp; Capture Foundations</span>
-        <span class="jv-hub-card-desc">Test and calibrate the existing Logitech BRIO + Linux capture pipeline, benchmark FFmpeg/OpenCV at the 10-second capture interval, and begin collecting classroom images for the six core object classes.</span>
+        <span class="ocs__hub-card-title">Phase 1: Camera Research &amp; Capture Foundations</span>
+        <p>Test and calibrate the existing Logitech BRIO + Linux capture pipeline, benchmark FFmpeg/OpenCV at the 10-second capture interval, and begin collecting classroom images for the six core object classes.</p>
       </div>
-      <div class="jv-hub-card">
+      <div class="ocs__hub-card">
         <span class="jv-pill jv-pill-warn" style="width:fit-content;margin-bottom:0.6rem;">Planned</span>
-        <span class="jv-hub-card-title">Phase 2: Object Recognition &amp; Segmentation</span>
-        <span class="jv-hub-card-desc">Annotate the dataset, train and evaluate YOLO on the six core classroom classes, and integrate SAM 3 segmentation, targeting the 80% classification threshold on held-out images.</span>
+        <span class="ocs__hub-card-title">Phase 2: Object Recognition &amp; Segmentation</span>
+        <p>Annotate the dataset, train and evaluate YOLO on the six core classroom classes, and integrate SAM 3 segmentation, targeting the 80% classification threshold on held-out images.</p>
       </div>
-      <div class="jv-hub-card">
+      <div class="ocs__hub-card">
         <span class="jv-pill jv-pill-neutral" style="width:fit-content;margin-bottom:0.6rem;">Planned</span>
-        <span class="jv-hub-card-title">Phase 3: Multi-Camera Tracking &amp; Room Model</span>
-        <span class="jv-hub-card-desc">Bring the second camera and Linux node online, implement multi-camera matching and the object observation state machine, and validate the room model against the 80% object-state accuracy target.</span>
+        <span class="ocs__hub-card-title">Phase 3: Multi-Camera Tracking &amp; Room Model</span>
+        <p>Bring the second camera and Linux node online, implement multi-camera matching and the object observation state machine, and validate the room model against the 80% object-state accuracy target.</p>
       </div>
     </div>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout">
       <span>See the <a href="/capstone/jarvis/technical/" style="color:var(--jv-accent);">In-Depth Timeline</a> on the Technical Detail page for the week-by-week build schedule. Treat scope and dates as the team's current target, not a fixed commitment.</span>
     </div>
   </div>
 
   <!-- Hub Navigation Grid -->
-  <div class="jv-section-label">Explore the Project</div>
-  <div class="jv-hub-grid">
-    <a href="/capstone/jarvis/technical/" class="jv-hub-card">
-      <span class="jv-hub-card-title">Technical Detail &amp; Flow</span>
-      <span class="jv-hub-card-desc">Capture and processing loops, observation state machine, data models, and privacy design.</span>
-      <span class="jv-hub-card-arrow">View Technical Detail</span>
+  <h2 class="ocs__section-title">Explore the Project</h2>
+  <div class="ocs__hub-grid">
+    <a href="/capstone/jarvis/technical/" class="ocs__hub-card">
+      <span class="ocs__hub-card-title">Technical Detail &amp; Flow</span>
+      <p>Capture and processing loops, observation state machine, data models, and privacy design.</p>
+      <span>View Technical Detail</span>
     </a>
-    <a href="/capstone/jarvis/research-1/" class="jv-hub-card">
-      <span class="jv-hub-card-title">Research 1: Camera &amp; Hardware</span>
-      <span class="jv-hub-card-desc">Multi-camera capture setup, network sync between Linux nodes, calibration, and bill of materials.</span>
-      <span class="jv-hub-card-arrow">Explore Research 1</span>
+    <a href="/capstone/jarvis/research-1/" class="ocs__hub-card">
+      <span class="ocs__hub-card-title">Research 1: Camera &amp; Hardware</span>
+      <p>Multi-camera capture setup, network sync between Linux nodes, calibration, and bill of materials.</p>
+      <span>Explore Research 1</span>
     </a>
-    <a href="/capstone/jarvis/research-2/" class="jv-hub-card">
-      <span class="jv-hub-card-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</span>
-      <span class="jv-hub-card-desc">Object classification, confidence scoring, bounding-box localization, and pixel-precise mask generation for classroom objects.</span>
-      <span class="jv-hub-card-arrow">Explore Research 2</span>
+    <a href="/capstone/jarvis/research-2/" class="ocs__hub-card">
+      <span class="ocs__hub-card-title">Research 2: YOLO Object Detection &amp; SAM 3 Segmentation</span>
+      <p>Object classification, confidence scoring, bounding-box localization, and pixel-precise mask generation for classroom objects.</p>
+      <span>Explore Research 2</span>
     </a>
-    <a href="/capstone/jarvis/research-3/" class="jv-hub-card">
-      <span class="jv-hub-card-title">Research 3: Spatial Perception &amp; Distance Estimation</span>
-      <span class="jv-hub-card-desc">Depth models, cross-view feature matching, and 3D point-cloud mapping across two wide-spaced cameras.</span>
-      <span class="jv-hub-card-arrow">Explore Research 3</span>
+    <a href="/capstone/jarvis/research-3/" class="ocs__hub-card">
+      <span class="ocs__hub-card-title">Research 3: Spatial Perception &amp; Distance Estimation</span>
+      <p>Depth models, cross-view feature matching, and 3D point-cloud mapping across two wide-spaced cameras.</p>
+      <span>Explore Research 3</span>
     </a>
-    <a href="/capstone/jarvis/research-4/" class="jv-hub-card">
-      <span class="jv-hub-card-title">Research 4: Visual Memory &amp; Scene Comparison</span>
-      <span class="jv-hub-card-desc">Shadow/light invariance, edge background subtraction, patent reviews, and commercial product comparisons.</span>
-      <span class="jv-hub-card-arrow">Explore Research 4</span>
+    <a href="/capstone/jarvis/research-4/" class="ocs__hub-card">
+      <span class="ocs__hub-card-title">Research 4: Visual Memory &amp; Scene Comparison</span>
+      <p>Shadow/light invariance, edge background subtraction, patent reviews, and commercial product comparisons.</p>
+      <span>Explore Research 4</span>
     </a>
   </div>
 

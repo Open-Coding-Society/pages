@@ -19,8 +19,9 @@
   letter-spacing: 0.06em;
 }
 
-// Outrank the generic infograph [class$="-title"] rule for card headings.
-.ocs__card > h3.ocs__section-title {
+// Outrank generic page typography for compact capstone section headings.
+.ocs__card > h3.ocs__section-title,
+.jv-container > h2.ocs__section-title {
   font-size: 0.875rem;
 }
 
