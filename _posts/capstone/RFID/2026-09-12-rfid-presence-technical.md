@@ -144,10 +144,10 @@ Computer unlinked"]</pre>
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">Open Technical Questions</h3>
-    <ul class="rfid-presence-checklist">
-      <li class="open"><span class="rfid-presence-box"></span><span>Bag-orientation reliability: a tagged laptop inside a closed backpack has no guaranteed tag-to-reader orientation, and UHF read reliability drops off-axis. Not yet solved. See <a href="/capstone/rfid-presence/summary/">Project Summary</a> for candidate antenna designs that address this directly.</span></li>
-      <li class="open"><span class="rfid-presence-box"></span><span>Camera system interface: what the face-scanning system exposes (API, event stream, or file) still needs to be defined, including how it reports a student who has opted out.</span></li>
-      <li class="open"><span class="rfid-presence-box"></span><span>Tag mounting standard: a single mounting spot on the laptop (for example, the underside near a plastic vent) so tag type (on-metal versus standard) can be standardized across devices.</span></li>
+    <ul class="ocs__checklist">
+      <li class="open"><span class="ocs__checklist-box"></span><span>Bag-orientation reliability: a tagged laptop inside a closed backpack has no guaranteed tag-to-reader orientation, and UHF read reliability drops off-axis. Not yet solved. See <a href="/capstone/rfid-presence/summary/">Project Summary</a> for candidate antenna designs that address this directly.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Camera system interface: what the face-scanning system exposes (API, event stream, or file) still needs to be defined, including how it reports a student who has opted out.</span></li>
+      <li class="open"><span class="ocs__checklist-box"></span><span>Tag mounting standard: a single mounting spot on the laptop (for example, the underside near a plastic vent) so tag type (on-metal versus standard) can be standardized across devices.</span></li>
     </ul>
   </div>
 

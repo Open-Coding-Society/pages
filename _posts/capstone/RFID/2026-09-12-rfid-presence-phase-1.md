@@ -53,10 +53,10 @@ shows scan events"]</pre>
 
   <div class="ocs__card">
     <h3 class="ocs__section-title">Acceptance Criteria</h3>
-    <ul class="rfid-presence-checklist">
-      <li class="done"><span class="rfid-presence-box"></span><span>CrowPi board with one scan pad, 13.56MHz MIFARE Classic tags, 10 demo tags</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Basic Flask backend logging reads to SQLite</span></li>
-      <li class="done"><span class="rfid-presence-box"></span><span>Rough dashboard showing scan events</span></li>
+    <ul class="ocs__checklist">
+      <li class="done"><span class="ocs__checklist-box"></span><span>CrowPi board with one scan pad, 13.56MHz MIFARE Classic tags, 10 demo tags</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Basic Flask backend logging reads to SQLite</span></li>
+      <li class="done"><span class="ocs__checklist-box"></span><span>Rough dashboard showing scan events</span></li>
     </ul>
   </div>
 

@@ -49,13 +49,13 @@ CrowPi reader"]
 	</div>
 	<div class="ocs__card">
 		<h3 class="ocs__section-title">Acceptance Criteria</h3>
-		<ul class="rfid-presence-checklist">
-			<li class="open"><span class="rfid-presence-box"></span><span>Register at least 20 student cards: apply one RFID sticker to each playing card and assign it to a student</span></li>
-			<li class="open"><span class="rfid-presence-box"></span><span>Replace the rough dashboard with a production frontend (roster and admin views)</span></li>
-			<li class="open"><span class="rfid-presence-box"></span><span>Move off the Flask dev server to a production-grade deployment</span></li>
-			<li class="open"><span class="rfid-presence-box"></span><span>Migrate SQLite to a proper database with a backup strategy</span></li>
-			<li class="open"><span class="rfid-presence-box"></span><span>Add authentication and authorization for admin functions and a teacher-facing card registration UI</span></li>
-			<li class="open"><span class="rfid-presence-box"></span><span>Run full-period tests, not just a two-minute demo, and validate attendance states with educator feedback</span></li>
+		<ul class="ocs__checklist">
+			<li class="open"><span class="ocs__checklist-box"></span><span>Register at least 20 student cards: apply one RFID sticker to each playing card and assign it to a student</span></li>
+			<li class="open"><span class="ocs__checklist-box"></span><span>Replace the rough dashboard with a production frontend (roster and admin views)</span></li>
+			<li class="open"><span class="ocs__checklist-box"></span><span>Move off the Flask dev server to a production-grade deployment</span></li>
+			<li class="open"><span class="ocs__checklist-box"></span><span>Migrate SQLite to a proper database with a backup strategy</span></li>
+			<li class="open"><span class="ocs__checklist-box"></span><span>Add authentication and authorization for admin functions and a teacher-facing card registration UI</span></li>
+			<li class="open"><span class="ocs__checklist-box"></span><span>Run full-period tests, not just a two-minute demo, and validate attendance states with educator feedback</span></li>
 		</ul>
 	</div>
 	<div class="ocs__pager">

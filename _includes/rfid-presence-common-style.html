@@ -73,36 +73,6 @@
 .rfid-presence-infograph .rfid-presence-pill-bad { border-color: var(--rp-accent); background: var(--rp-accent-soft); color: var(--rp-accent); }
 .rfid-presence-infograph .rfid-presence-pill-neutral { border-color: var(--rp-border-strong); background: var(--rp-surface); color: var(--rp-text-muted); }
 
-.rfid-presence-infograph .rfid-presence-checklist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.rfid-presence-infograph .rfid-presence-checklist li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.55rem 0;
-  border-bottom: 1px solid var(--rp-card-border);
-  line-height: 1.5;
-  color: var(--rp-text-muted);
-}
-
-.rfid-presence-infograph .rfid-presence-checklist li:last-child { border-bottom: none; }
-
-.rfid-presence-infograph .rfid-presence-checklist .rfid-presence-box {
-  flex-shrink: 0;
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 0.3rem;
-  border: 1.5px solid var(--rp-border-strong);
-  margin-top: 0.15rem;
-}
-
-.rfid-presence-infograph .rfid-presence-checklist li.done .rfid-presence-box { border-color: var(--rp-success); background: var(--rp-success-soft); }
-.rfid-presence-infograph .rfid-presence-checklist li.open .rfid-presence-box { border-color: var(--rp-warning); }
-
 .rfid-presence-infograph .rfid-presence-stage-nav {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
