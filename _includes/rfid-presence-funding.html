@@ -1,15 +1,15 @@
 {% assign data = site.data.rfid_presence_infograph %}
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
-    <div class="rfid-presence-badge">Funding &amp; Budget</div>
+    <div class="ocs__badge">Funding &amp; Budget</div>
     <h1 class="rfid-presence-title">Bill of Materials &amp; Funding Ask</h1>
-    <p class="rfid-presence-description">What's already covered, what the next phase needs, and the itemized hardware behind it.</p>
+    <p class="ocs__description">What's already covered, what the next phase needs, and the itemized hardware behind it.</p>
   </div>
 
   {% include rfid-presence-nav.html %}
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Funding Need by Phase</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Funding Need by Phase</h3>
     <div class="rfid-presence-table-wrap">
       <table class="ocs__table rfid-presence-table">
         <thead><tr><th>Phase</th><th>Funding status</th><th>What it needs</th></tr></thead>
@@ -23,8 +23,8 @@
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Phase 1 Bill of Materials</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Phase 1 Bill of Materials</h3>
     <p class="rfid-presence-about">Already covered by hardware the team has on hand. Listed here for reference and as the SKU to re-order from if more demo tags are needed, or to scale up for Phase 2.</p>
     <div class="rfid-presence-table-wrap">
       <table class="ocs__table rfid-presence-table">
@@ -42,8 +42,8 @@
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Phase 2 Bill of Materials</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Phase 2 Bill of Materials</h3>
     <p class="rfid-presence-about">Adhesive stickers to apply one per playing card, one per student. Same MIFARE Classic 1K chip as the Phase 1 demo tags, so no reader changes are needed.</p>
     <div class="rfid-presence-table-wrap">
       <table class="ocs__table rfid-presence-table">
@@ -61,8 +61,8 @@
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Phase 3 Bill of Materials</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Phase 3 Bill of Materials</h3>
     <p class="rfid-presence-about">Room and door-table setup are confirmed; hardware itself is not purchased yet. The teacher supplied concrete RF specs for the initial door-table test rig below.</p>
     <div class="rfid-presence-table-wrap">
       <table class="ocs__table rfid-presence-table">
@@ -120,13 +120,13 @@
         </tbody>
       </table>
     </div>
-    <div class="rfid-presence-callout">
+    <div class="ocs__callout">
       <strong>Rough Phase 3 estimate:</strong> the items with confirmed pricing above total roughly <strong>$30 to $50</strong> (cable, test antenna, and a small batch of tamper and Alien H3 tags). The Pi/HAT kit and on-metal tag pack prices still need to be pulled from their current listings before a full ask total can be finalized.
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Open Budget Questions</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Open Budget Questions</h3>
     <ul class="rfid-presence-checklist">
       <li class="open"><span class="rfid-presence-box"></span><span>Sign-off: Phase 3 hardware purchase (HAT, cable, antenna, tags) still needs approval.</span></li>
       <li class="open"><span class="rfid-presence-box"></span><span>Room measurements: actual dimensions and door layout of the confirmed classroom are needed to size the Phase 4 full-room antenna upgrade and produce a real cost estimate for that phase.</span></li>
@@ -134,14 +134,14 @@
     </ul>
   </div>
 
-  <div class="rfid-presence-card">
-    <div class="rfid-presence-team">
-      <span class="rfid-presence-team-label">Project Team</span>
-      <span class="rfid-presence-team-name">{{ data.Team | join: ", " }}</span>
+  <div class="ocs__card">
+    <div class="ocs__team">
+      <span class="ocs__team-label">Project Team</span>
+      <span class="ocs__team-name">{{ data.Team | join: ", " }}</span>
     </div>
-    <div class="rfid-presence-status">Phase 1, Working Prototype</div>
+    <div class="ocs__status">Phase 1, Working Prototype</div>
     {% if data.Repo %}
-    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rfid-presence-btn">View Repo</a>
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>
     {% endif %}
   </div>
 </div>

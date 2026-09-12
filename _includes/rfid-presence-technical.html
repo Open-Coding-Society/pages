@@ -1,17 +1,17 @@
 {% assign data = site.data.rfid_presence_infograph %}
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
-    <div class="rfid-presence-badge">Technical Detail &amp; Flow</div>
+    <div class="ocs__badge">Technical Detail &amp; Flow</div>
     <h1 class="rfid-presence-title">System Architecture &amp; Data Flow</h1>
-    <p class="rfid-presence-description">How the RFID and camera signals get correlated into an attendance record, for readers who want the mechanism and not just the pitch.</p>
+    <p class="ocs__description">How the RFID and camera signals get correlated into an attendance record, for readers who want the mechanism and not just the pitch.</p>
   </div>
 
   {% include rfid-presence-nav.html %}
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">System Architecture</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">System Architecture</h3>
     <p class="rfid-presence-about">Two independent event sources, RFID and camera, feed a correlation engine that is also aware of the bell schedule and per-period enrollment.</p>
-    <div class="rfid-presence-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid">flowchart TD
     BS[Bell Schedule] --> CP[Class / Period]
     CP --> REG["Registration:
@@ -28,10 +28,10 @@ Spatial presence, face-scanning system"]
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Attendance Window Logic</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Attendance Window Logic</h3>
     <p class="rfid-presence-about">The bell schedule doesn't just define start and end times for tardy math. It defines a <strong>window</strong> during which reads count as attendance at all.</p>
-    <div class="rfid-presence-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid">sequenceDiagram
     participant Bell as Bell Schedule
     participant Win as Attendance Window
@@ -50,10 +50,10 @@ Spatial presence, face-scanning system"]
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Presence State Model</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Presence State Model</h3>
     <p class="rfid-presence-about">Two independent signals, device via RFID and student via camera, get correlated into one of these states per student per period.</p>
-    <div class="rfid-presence-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid">stateDiagram-v2
     [*] --> ABSENT
     ABSENT --> PRESENT: device + student seen in window
@@ -85,9 +85,9 @@ Spatial presence, face-scanning system"]
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Registration &amp; Tag Lifecycle</h3>
-    <div class="rfid-presence-diagram">
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Registration &amp; Tag Lifecycle</h3>
+    <div class="ocs__diagram">
       <pre class="mermaid">flowchart LR
     A[New student enrolled] --> B["Registration:
 capture Face ID,
@@ -102,9 +102,9 @@ issue RFID Tag"]
     C -->|Student unenrolled/graduated| G["Tag: RETIRED
 Computer unlinked"]</pre>
     </div>
-    <h3 class="rfid-presence-section-title" style="margin-top:1.5rem;">Data the system needs to persist</h3>
+    <h3 class="ocs__section-title" style="margin-top:1.5rem;">Data the system needs to persist</h3>
     <p class="rfid-presence-about">No code yet for the full model. This is the entity list, not a schema.</p>
-    <ul class="rfid-presence-entity-list">
+    <ul class="ocs__entity-list">
       <li><strong>Students</strong>: id, name, enrolled periods</li>
       <li><strong>Periods</strong>: id, name, start time, end time, expected enrollment</li>
       <li><strong>Computers</strong>: id, assigned student</li>
@@ -118,21 +118,21 @@ Computer unlinked"]</pre>
     </ul>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Current Software Stack (Phase 1)</h3>
-    <ul class="rfid-presence-entity-list">
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Current Software Stack (Phase 1)</h3>
+    <ul class="ocs__entity-list">
       <li><strong>Reader board</strong>: CrowPi, single scan pad, 13.56MHz MIFARE Classic tags. Contact-tap, not the UHF doorway design above.</li>
       <li><strong>Backend</strong>: Flask dev server. Production deployment and migration off the dev server is a Phase 2 item.</li>
       <li><strong>Database</strong>: SQLite. Migrating to a production database with a backup strategy is a Phase 2 item.</li>
       <li><strong>Frontend</strong>: rough dashboard, being replaced with a roster and admin view in Phase 2.</li>
     </ul>
-    <div class="rfid-presence-callout">
+    <div class="ocs__callout">
       The full RFID and camera architecture above is the <strong>target design</strong> the team is building toward. The current running system implements only the leftmost slice of it: RFID read, log, dashboard, with no camera correlation yet. See <a href="/capstone/rfid-presence/phases/">Phases</a> for how the gap closes.
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Open Technical Questions</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Open Technical Questions</h3>
     <ul class="rfid-presence-checklist">
       <li class="open"><span class="rfid-presence-box"></span><span>Bag-orientation reliability: a tagged laptop inside a closed backpack has no guaranteed tag-to-reader orientation, and UHF read reliability drops off-axis. Not yet solved. See <a href="/capstone/rfid-presence/summary/">Project Summary</a> for candidate antenna designs that address this directly.</span></li>
       <li class="open"><span class="rfid-presence-box"></span><span>Camera system interface: what the face-scanning system exposes (API, event stream, or file) still needs to be defined, including how it reports a student who has opted out.</span></li>
@@ -140,14 +140,14 @@ Computer unlinked"]</pre>
     </ul>
   </div>
 
-  <div class="rfid-presence-card">
-    <div class="rfid-presence-team">
-      <span class="rfid-presence-team-label">Project Team</span>
-      <span class="rfid-presence-team-name">{{ data.Team | join: ", " }}</span>
+  <div class="ocs__card">
+    <div class="ocs__team">
+      <span class="ocs__team-label">Project Team</span>
+      <span class="ocs__team-name">{{ data.Team | join: ", " }}</span>
     </div>
-    <div class="rfid-presence-status">Phase 1, Working Prototype</div>
+    <div class="ocs__status">Phase 1, Working Prototype</div>
     {% if data.Repo %}
-    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rfid-presence-btn">View Repo</a>
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>
     {% endif %}
   </div>
 </div>

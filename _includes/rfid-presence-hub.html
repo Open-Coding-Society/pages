@@ -1,15 +1,15 @@
 {% assign data = site.data.rfid_presence_infograph %}
 <div class="rfid-presence-infograph">
   <div class="rfid-presence-header">
-    <div class="rfid-presence-badge">Design-Based Research Capstone</div>
+    <div class="ocs__badge">Design-Based Research Capstone</div>
     <h1 class="rfid-presence-title">{{ data.Title }}</h1>
-    <p class="rfid-presence-description">{{ data.Description }}</p>
+    <p class="ocs__description">{{ data.Description }}</p>
   </div>
 
   {% include rfid-presence-nav.html %}
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Overview</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Overview</h3>
     <div class="rfid-presence-table-wrap">
       <table class="ocs__table rfid-presence-table">
         <tbody>
@@ -38,10 +38,10 @@
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">System Architecture</h3>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">System Architecture</h3>
     <p class="rfid-presence-about">Two independent event sources, RFID and camera, feed a correlation engine that is also aware of the bell schedule and per-period enrollment.</p>
-    <div class="rfid-presence-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid">flowchart TD
     BS[Bell Schedule] --> CP[Class / Period]
     CP --> REG["Registration:
@@ -56,41 +56,41 @@ Spatial presence, face-scanning system"]
     BS -. attendance window .-> CORR
     CORR --> PRES[Attendance / Presence State]</pre>
     </div>
-    <div class="rfid-presence-callout">
+    <div class="ocs__callout">
       This is the target architecture the team is building toward across four phases; the current prototype implements the leftmost slice of it. Full detail, including the presence-state machine and data model, is on the <a href="/capstone/rfid-presence/technical/">Technical Detail</a> page. Design rationale and a literature review of comparable systems, confirming this approach against prior work, is on the <a href="/capstone/rfid-presence/summary/">Project Summary</a> page.
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <h3 class="rfid-presence-section-title">Explore the Project</h3>
-    <div class="rfid-presence-hub-grid">
-      <a href="/capstone/rfid-presence/summary/" class="rfid-presence-hub-card">
-        <span class="rfid-presence-project-title">Project Summary</span>
+  <div class="ocs__card">
+    <h3 class="ocs__section-title">Explore the Project</h3>
+    <div class="ocs__hub-grid">
+      <a href="/capstone/rfid-presence/summary/" class="ocs__hub-card">
+        <span class="ocs__hub-card-title">Project Summary</span>
         <p>Design rationale, privacy and governance decisions, and how this compares to existing systems. A quick read for mentors.</p>
       </a>
-      <a href="/capstone/rfid-presence/technical/" class="rfid-presence-hub-card">
-        <span class="rfid-presence-project-title">Technical Detail &amp; Flow</span>
+      <a href="/capstone/rfid-presence/technical/" class="ocs__hub-card">
+        <span class="ocs__hub-card-title">Technical Detail &amp; Flow</span>
         <p>System architecture, diagrams, the presence-state machine, data model, and attendance-window logic.</p>
       </a>
-      <a href="/capstone/rfid-presence/phases/" class="rfid-presence-hub-card">
-        <span class="rfid-presence-project-title">Development Phases</span>
+      <a href="/capstone/rfid-presence/phases/" class="ocs__hub-card">
+        <span class="ocs__hub-card-title">Development Phases</span>
         <p>Phase 1 contact-tap prototype through Phase 4 fully contactless, room-scale detection. What's built and what's next.</p>
       </a>
-      <a href="/capstone/rfid-presence/funding/" class="rfid-presence-hub-card">
-        <span class="rfid-presence-project-title">Funding &amp; Budget</span>
+      <a href="/capstone/rfid-presence/funding/" class="ocs__hub-card">
+        <span class="ocs__hub-card-title">Funding &amp; Budget</span>
         <p>Bill of materials, cost estimates, and what's being asked for at each phase.</p>
       </a>
     </div>
   </div>
 
-  <div class="rfid-presence-card">
-    <div class="rfid-presence-team">
-      <span class="rfid-presence-team-label">Project Team</span>
-      <span class="rfid-presence-team-name">{{ data.Team | join: ", " }}</span>
+  <div class="ocs__card">
+    <div class="ocs__team">
+      <span class="ocs__team-label">Project Team</span>
+      <span class="ocs__team-name">{{ data.Team | join: ", " }}</span>
     </div>
-    <div class="rfid-presence-status">Phase 1, Working Prototype</div>
+    <div class="ocs__status">Phase 1, Working Prototype</div>
     {% if data.Repo %}
-    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rfid-presence-btn">View Repo</a>
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="ocs__btn accent fill">View Repo</a>
     {% endif %}
   </div>
 </div>
