@@ -16,6 +16,15 @@
   color: var(--pref-text-color);
 }
 
+.ocs__capstone-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 .ocs__section-title {
   margin: 0 0 1rem;
   color: var(--pref-text-color);
