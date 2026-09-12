@@ -30,7 +30,7 @@ rp_active: technical
   <div class="jv-section-label">Capture &amp; Processing Logic</div>
   <div class="jv-card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 0.25rem;">Each capture cycle creates a timestamped observation. Jarvis preserves the original frame, processes it through YOLO and SAM 3, and compares the result with recent observations before changing the room model.</p>
-    <div class="jv-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">sequenceDiagram
     participant Cam as Classroom Cameras
     participant Cap as FFmpeg Capture
@@ -53,7 +53,7 @@ rp_active: technical
   <!-- Detection and tracking lifecycle -->
   <div class="jv-section-label">Detection &amp; Tracking Lifecycle</div>
   <div class="jv-card">
-    <div class="jv-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart LR
     A[YOLO detection] --> B["SAM 3 mask
 and observation record"]
@@ -68,7 +68,7 @@ and observation record"]
     </div>
     <h3 style="margin-top:1.5rem;">Data the system needs to persist</h3>
     <p style="font-size:0.8125rem;color:var(--jv-text-muted);margin:-0.5rem 0 1rem;">This is the current entity list, not a final database schema.</p>
-    <ul class="jv-entity-list">
+    <ul class="ocs__entity-list">
       <li><strong>Cameras</strong> — id, device name, host computer, viewpoint, resolution, status</li>
       <li><strong>Frames</strong> — id, camera, capture timestamp, original-file path, processing status</li>
       <li><strong>YOLO Classes</strong> — class id, object label, and training-version metadata</li>
@@ -154,7 +154,7 @@ and observation record"]
         </tbody>
       </table>
     </div>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout ocs__callout">
       <span>A generic person mask may explain why a previously confirmed object is temporarily invisible. In that case, Jarvis should prefer <span class="jv-code">OCCLUDED</span> over immediately changing the object to <span class="jv-code">MISSING</span>.</span>
     </div>
   </div>
@@ -163,7 +163,7 @@ and observation record"]
   <div class="jv-section-label">People Occupancy Tracking</div>
   <div class="jv-card">
     <p style="font-size:0.875rem;color:var(--jv-text-muted);margin:0 0 1rem;">Generic <span class="jv-code">person</span> detections are counted, not identified, to produce a room occupancy number and flag presence at unexpected hours.</p>
-    <div class="jv-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart LR
     A["Person detections
 per camera, per frame"] --> B["De-duplicate across
@@ -176,7 +176,7 @@ schedule?"}
     D -->|No| F["Flag odd-hour
 occupancy"]</pre>
     </div>
-    <div class="jv-diagram" style="margin-top:1rem;">
+    <div class="ocs__diagram" style="margin-top:1rem;">
       <div class="jv-occupancy-chart">
         <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">0</span><div class="jv-occupancy-bar-fill" style="height:1%;"></div><span class="jv-occupancy-bar-label">8a</span></div>
         <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">32</span><div class="jv-occupancy-bar-fill" style="height:80%;"></div><span class="jv-occupancy-bar-label">9a</span></div>
@@ -190,7 +190,7 @@ occupancy"]</pre>
         <div class="jv-occupancy-bar"><span class="jv-occupancy-bar-value">0</span><div class="jv-occupancy-bar-fill" style="height:1%;background:var(--jv-red);"></div><span class="jv-occupancy-bar-label">9p+</span></div>
       </div>
     </div>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout ocs__callout">
       <span>Counts only, no identity &mdash; consistent with the privacy design above.</span>
     </div>
   </div>
@@ -242,10 +242,10 @@ occupancy"]</pre>
         <p class="jv-bom-note">Cross-network SSH + transfer.</p>
       </div>
     </div>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout ocs__callout">
       <span>Costs are rough estimates; camera mount and Linux computer photos are representative, not the exact model.</span>
     </div>
-    <div class="jv-callout jv-callout-open">
+    <div class="ocs__callout ocs__callout">
       <span><strong style="color:var(--jv-text);">Open problem:</strong> camera height, angle, overlap, and cable routing still need on-site testing.</span>
     </div>
   </div>
@@ -267,7 +267,7 @@ occupancy"]</pre>
       <div class="jv-timeline-legend-item"><span class="jv-timeline-legend-dot" style="background:var(--jv-amber);"></span>Phase 2 &middot; Recognition &amp; segmentation</div>
       <div class="jv-timeline-legend-item"><span class="jv-timeline-legend-dot" style="background:var(--jv-purple);"></span>Phase 3 &middot; Tracking &amp; room model</div>
     </div>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout ocs__callout">
       <span>Dates track the <a href="/capstone/jarvis/" style="color:var(--jv-accent);">Project Phases</a> on the Overview tab and may shift with CPU benchmarking results.</span>
     </div>
   </div>

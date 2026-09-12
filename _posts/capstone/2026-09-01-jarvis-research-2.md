@@ -44,7 +44,7 @@ rp_active: research-2
   <!-- Role in the Full System -->
   <div class="jv-section-label">Role in the Full System</div>
   <div class="jv-card">
-    <div class="jv-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart TD
     CAP["Camera capture\nTimestamped frame"] --> PRE["OpenCV / FFmpeg\nResize + preprocessing"]
     PRE --> YOLO["YOLO\nClass + confidence + box"]
@@ -52,7 +52,7 @@ rp_active: research-2
     SAM --> OUT["Structured observation\nDetection + mask + timestamp"]
     OUT --> TRACK["Tracking / inventory /\nscene comparison"]</pre>
     </div>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout ocs__callout">
       <span><strong style="color:var(--jv-text);">Why both models?</strong> YOLO identifies what an object is and provides its bounding box. SAM 3 uses that box as a prompt to trace the object's more precise pixel boundary. The segmentation mask can then support spatial comparison and object-state tracking.</span>
     </div>
   </div>
@@ -83,7 +83,7 @@ rp_active: research-2
   "bounding_box": [120, 80, 420, 350],
   "mask_reference": "camera_1_20260907_101520_laptop_01"
 }</pre>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout ocs__callout">
       <span><strong style="color:var(--jv-text);">Important limitation:</strong> A detection such as “laptop” identifies an object category, not a specific physical device such as “Laptop #3.” Persistent identity must be added later through temporal tracking, cross-camera matching, visual features, or an external identifier.</span>
     </div>
   </div>
@@ -145,7 +145,7 @@ rp_active: research-2
   <!-- Compute Plan -->
   <div class="jv-section-label">Compute Constraints &amp; Benchmark Plan</div>
   <div class="jv-card">
-    <div class="jv-callout jv-callout-note" style="margin-top:0;">
+    <div class="ocs__callout ocs__callout" style="margin-top:0;">
       <span><strong style="color:var(--jv-text);">Current constraint:</strong> The primary Linux host does not have a dedicated NVIDIA GPU. All latency values must therefore be measured on the actual project hardware rather than treated as guaranteed model performance.</span>
     </div>
     <div class="ocs__table-wrap" style="margin-top:1rem;">

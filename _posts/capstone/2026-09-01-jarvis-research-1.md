@@ -86,7 +86,7 @@ rp_active: research-1
         </tbody>
       </table>
     </div>
-    <div class="jv-callout jv-callout-note">
+    <div class="ocs__callout ocs__callout">
       <span><strong style="color:var(--jv-text);">Camera Placement Rationale:</strong> Mounting two cameras on opposing diagonal corners maximizes surface visibility across desks while providing redundant observations when students or chairs block a single line of sight.</span>
     </div>
   </div>
