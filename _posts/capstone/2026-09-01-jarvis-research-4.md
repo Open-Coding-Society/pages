@@ -109,7 +109,7 @@ rp_active: research-4
       </table>
     </div>
 
-    <div class="jv-callout jv-callout-note" style="margin-top:1rem;">
+    <div class="ocs__callout ocs__callout" style="margin-top:1rem;">
       <strong style="color:var(--jv-text);">Consolidated Synthesis:</strong> Academic research confirms that feature-aggregation models coupled with persistent visual memory reliably isolate genuine structural changes from lighting noise. Jarvis fills the gap by packaging these principles into a standalone, edge-based framework operating at discrete 10-second intervals.
     </div>
 

@@ -42,7 +42,7 @@ rp_active: research-3
   <!-- Pipeline diagram -->
   <div class="jv-section-label">Pipeline</div>
   <div class="jv-card">
-    <div class="jv-diagram">
+    <div class="ocs__diagram">
       <pre class="mermaid" style="margin:0;">flowchart TD
     C1["Camera 1, BRIO
 Wall A"] --> FM["SuperPoint + LightGlue
