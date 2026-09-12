@@ -1,43 +1,33 @@
 {% assign data = site.data.rfid_presence_infograph %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<div class="rp-container">
-  <nav class="rp-nav">
-    <a href="/capstone/rfid-presence/" class="rp-nav-link{% if page.rp_active == 'hub' %} active{% endif %}">Overview</a>
-    <a href="/capstone/rfid-presence/summary/" class="rp-nav-link{% if page.rp_active == 'summary' %} active{% endif %}">Project Summary</a>
-    <a href="/capstone/rfid-presence/technical/" class="rp-nav-link{% if page.rp_active == 'technical' %} active{% endif %}">Technical Detail</a>
-    <a href="/capstone/rfid-presence/phases/" class="rp-nav-link{% if page.rp_active == 'phases' %} active{% endif %}">Phases</a>
-    <a href="/capstone/rfid-presence/funding/" class="rp-nav-link{% if page.rp_active == 'funding' %} active{% endif %}">Funding</a>
-  </nav>
-
-  <div class="rp-header">
-    <div class="rp-badge">Funding &amp; Budget</div>
-    <h1 class="rp-page-title" style="font-size:2rem;">Bill of Materials &amp; Funding Ask</h1>
-    <p class="rp-description">What's already covered, what the next phase needs, and the itemized hardware behind it.</p>
+<div class="rfid-presence-infograph">
+  <div class="rfid-presence-header">
+    <div class="rfid-presence-badge">Funding &amp; Budget</div>
+    <h1 class="rfid-presence-title">Bill of Materials &amp; Funding Ask</h1>
+    <p class="rfid-presence-description">What's already covered, what the next phase needs, and the itemized hardware behind it.</p>
   </div>
 
-  <div class="rp-section-label">Funding Need by Phase</div>
-  <div class="rp-card">
-    <div class="rp-table-wrap">
-      <table class="rp-table">
+  {% include rfid-presence-nav.html %}
+
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Funding Need by Phase</h3>
+    <div class="rfid-presence-table-wrap">
+      <table class="rfid-presence-table">
         <thead><tr><th>Phase</th><th>Funding status</th><th>What it needs</th></tr></thead>
         <tbody>
-          <tr><td>Phase 1, Contact-Tap Prototype</td><td><span class="rp-pill rp-pill-good">No new funding needed</span></td><td>Runs on the CrowPi board and demo tags the team already has; see Phase 1 bill of materials below for the tag SKU.</td></tr>
-          <tr><td>Phase 2, Classroom Pilot</td><td><span class="rp-pill rp-pill-warn">Small ask</span></td><td>Adhesive RFID stickers for the full class (20 or more units), applied one per playing card, same MIFARE Classic 1K family as the demo tags. No new reader hardware; see Phase 2 bill of materials below.</td></tr>
-          <tr><td>Phase 3, UHF Doorway Transition</td><td><span class="rp-pill rp-pill-bad">Main ask, see bill of materials below</span></td><td>UHF Pi HAT, antenna, cable, and tamper-evident, on-metal, and UHF tags for a single door-table rig.</td></tr>
-          <tr><td>Phase 4, Full Room-Scale</td><td><span class="rp-pill rp-pill-neutral">Future ask, quantities to be determined</span></td><td>A second reader and antenna set for the back door, plus higher-gain antennas and enclosures for full-room coverage. Sizing depends on the confirmed classroom's dimensions; see open questions below.</td></tr>
+          <tr><td>Phase 1, Contact-Tap Prototype</td><td><span class="rfid-presence-pill rfid-presence-pill-good">No new funding needed</span></td><td>Runs on the CrowPi board and demo tags the team already has; see Phase 1 bill of materials below for the tag SKU.</td></tr>
+          <tr><td>Phase 2, Classroom Pilot</td><td><span class="rfid-presence-pill rfid-presence-pill-warn">Small ask</span></td><td>Adhesive RFID stickers for the full class (20 or more units), applied one per playing card, same MIFARE Classic 1K family as the demo tags. No new reader hardware; see Phase 2 bill of materials below.</td></tr>
+          <tr><td>Phase 3, UHF Doorway Transition</td><td><span class="rfid-presence-pill rfid-presence-pill-bad">Main ask, see bill of materials below</span></td><td>UHF Pi HAT, antenna, cable, and tamper-evident, on-metal, and UHF tags for a single door-table rig.</td></tr>
+          <tr><td>Phase 4, Full Room-Scale</td><td><span class="rfid-presence-pill rfid-presence-pill-neutral">Future ask, quantities to be determined</span></td><td>A second reader and antenna set for the back door, plus higher-gain antennas and enclosures for full-room coverage. Sizing depends on the confirmed classroom's dimensions; see open questions below.</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <div class="rp-section-label">Phase 1 Bill of Materials</div>
-  <div class="rp-card">
-    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Already covered by hardware the team has on hand. Listed here for reference and as the SKU to re-order from if more demo tags are needed, or to scale up for Phase 2.</p>
-    <div class="rp-table-wrap">
-      <table class="rp-table">
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Phase 1 Bill of Materials</h3>
+    <p class="rfid-presence-about">Already covered by hardware the team has on hand. Listed here for reference and as the SKU to re-order from if more demo tags are needed, or to scale up for Phase 2.</p>
+    <div class="rfid-presence-table-wrap">
+      <table class="rfid-presence-table">
         <thead><tr><th>Item</th><th>Spec</th><th>Est. cost</th><th>Notes</th><th>Link</th></tr></thead>
         <tbody>
           <tr>
@@ -52,11 +42,11 @@
     </div>
   </div>
 
-  <div class="rp-section-label">Phase 2 Bill of Materials</div>
-  <div class="rp-card">
-    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Adhesive stickers to apply one per playing card, one per student. Same MIFARE Classic 1K chip as the Phase 1 demo tags, so no reader changes are needed.</p>
-    <div class="rp-table-wrap">
-      <table class="rp-table">
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Phase 2 Bill of Materials</h3>
+    <p class="rfid-presence-about">Adhesive stickers to apply one per playing card, one per student. Same MIFARE Classic 1K chip as the Phase 1 demo tags, so no reader changes are needed.</p>
+    <div class="rfid-presence-table-wrap">
+      <table class="rfid-presence-table">
         <thead><tr><th>Item</th><th>Spec</th><th>Est. cost</th><th>Notes</th><th>Link</th></tr></thead>
         <tbody>
           <tr>
@@ -71,24 +61,24 @@
     </div>
   </div>
 
-  <div class="rp-section-label">Phase 3 Bill of Materials</div>
-  <div class="rp-card">
-    <p style="font-size:0.875rem;color:var(--rp-text-muted);margin:0 0 1rem;">Room and door-table setup are confirmed; hardware itself is not purchased yet. The teacher supplied concrete RF specs for the initial door-table test rig below.</p>
-    <div class="rp-table-wrap">
-      <table class="rp-table">
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Phase 3 Bill of Materials</h3>
+    <p class="rfid-presence-about">Room and door-table setup are confirmed; hardware itself is not purchased yet. The teacher supplied concrete RF specs for the initial door-table test rig below.</p>
+    <div class="rfid-presence-table-wrap">
+      <table class="rfid-presence-table">
         <thead><tr><th>Item</th><th>Spec</th><th>Est. cost</th><th>Notes</th><th>Link</th></tr></thead>
         <tbody>
           <tr>
             <td>Rainy UHF Pi HAT (Complete Kit)</td>
             <td>865 to 870MHz (EU) or 915 to 928MHz (US), up to 200 tags/sec, 18 to 26dBm adjustable power, EPC Gen2V2 / ISO 18000-63, Cortex-M4 (ThinkMagic M6e Nano)</td>
-            <td><span class="rp-code">To be confirmed, check listing</span></td>
+            <td>To be confirmed, check listing</td>
             <td>The kit our teacher linked. Compatible with Pi 3/4/5/Zero/Zero 2W.</td>
             <td><a href="https://shop.sb-components.co.uk/products/rainy-uhf-pi-hat-complete-kit" target="_blank" rel="noopener">shop.sb-components.co.uk</a></td>
           </tr>
           <tr>
             <td>Raspberry Pi 4 Kit with UHF HAT</td>
             <td>Bundles a Pi 4 with the HAT above</td>
-            <td><span class="rp-code">To be confirmed, check listing</span></td>
+            <td>To be confirmed, check listing</td>
             <td>Simpler single order if we don't already have a spare Pi.</td>
             <td><a href="https://shop.sb-components.co.uk/products/raspberry-pi-4-kit-with-uhf-hat" target="_blank" rel="noopener">shop.sb-components.co.uk</a></td>
           </tr>
@@ -116,7 +106,7 @@
           <tr>
             <td>On-metal UHF tag (anti-metal, pack of 10)</td>
             <td>ISO18000-6C, EPC Class1 Gen2, waterproof</td>
-            <td><span class="rp-code">To be confirmed, check listing</span></td>
+            <td>To be confirmed, check listing</td>
             <td>Confirmed good by teacher for laptop-lid mounting; standard UHF tags detune badly near metal.</td>
             <td><a href="https://www.amazon.com/Metal-ISO18000-6C-Class1-Waterproof-Outdoor/dp/B079NM6GDN" target="_blank" rel="noopener">Amazon</a></td>
           </tr>
@@ -130,31 +120,28 @@
         </tbody>
       </table>
     </div>
-    <div class="rp-callout rp-callout-note" style="margin-top:1rem;">
-      <strong style="color:var(--rp-text);">Rough Phase 3 estimate:</strong> the items with confirmed pricing above total roughly <strong style="color:var(--rp-text);">$30 to $50</strong> (cable, test antenna, and a small batch of tamper and Alien H3 tags). The Pi/HAT kit and on-metal tag pack prices still need to be pulled from their current listings before a full ask total can be finalized.
+    <div class="rfid-presence-callout">
+      <strong>Rough Phase 3 estimate:</strong> the items with confirmed pricing above total roughly <strong>$30 to $50</strong> (cable, test antenna, and a small batch of tamper and Alien H3 tags). The Pi/HAT kit and on-metal tag pack prices still need to be pulled from their current listings before a full ask total can be finalized.
     </div>
   </div>
 
-  <div class="rp-section-label">Open Budget Questions</div>
-  <div class="rp-card">
-    <ul class="rp-checklist">
-      <li class="open"><span class="rp-box"></span><span>Sign-off: Phase 3 hardware purchase (HAT, cable, antenna, tags) still needs approval.</span></li>
-      <li class="open"><span class="rp-box"></span><span>Room measurements: actual dimensions and door layout of the confirmed classroom are needed to size the Phase 4 full-room antenna upgrade and produce a real cost estimate for that phase.</span></li>
-      <li class="open"><span class="rp-box"></span><span>Confirmed Pi/HAT and on-metal-tag pricing: current listing prices need to be pulled to finalize the Phase 3 total.</span></li>
+  <div class="rfid-presence-card">
+    <h3 class="rfid-presence-section-title">Open Budget Questions</h3>
+    <ul class="rfid-presence-checklist">
+      <li class="open"><span class="rfid-presence-box"></span><span>Sign-off: Phase 3 hardware purchase (HAT, cable, antenna, tags) still needs approval.</span></li>
+      <li class="open"><span class="rfid-presence-box"></span><span>Room measurements: actual dimensions and door layout of the confirmed classroom are needed to size the Phase 4 full-room antenna upgrade and produce a real cost estimate for that phase.</span></li>
+      <li class="open"><span class="rfid-presence-box"></span><span>Confirmed Pi/HAT and on-metal-tag pricing: current listing prices need to be pulled to finalize the Phase 3 total.</span></li>
     </ul>
   </div>
 
-  <div class="rp-footer">
-    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-      <div class="rp-team">
-        <span class="rp-team-label">Project Team</span>
-        <span class="rp-team-name">{{ data.Team | join: ", " }}</span>
-      </div>
-      <span class="rp-status">Phase 1. Working Prototype</span>
+  <div class="rfid-presence-card">
+    <div class="rfid-presence-team">
+      <span class="rfid-presence-team-label">Project Team</span>
+      <span class="rfid-presence-team-name">{{ data.Team | join: ", " }}</span>
     </div>
+    <div class="rfid-presence-status">Phase 1, Working Prototype</div>
     {% if data.Repo %}
-    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rp-btn">View Repo</a>
+    <a href="{{ data.Repo }}" target="_blank" rel="noopener" class="rfid-presence-btn">View Repo</a>
     {% endif %}
   </div>
-
 </div>
