@@ -25,42 +25,6 @@
   --jv-font-family: var(--pref-font-family);
 }
 
-/* ── Navigation ── */
-.jv-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--jv-card-border);
-}
-
-.jv-nav-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-decoration: none;
-  color: var(--jv-text-muted);
-  background: var(--jv-tag);
-  border: 1px solid var(--jv-card-border);
-  border-radius: 9999px;
-  transition: all 0.15s ease;
-}
-
-.jv-nav-link:hover {
-  color: var(--jv-text);
-  border-color: rgba(59, 130, 246, 0.4);
-}
-
-.jv-nav-link.active {
-  color: var(--jv-bg);
-  background: var(--jv-accent);
-  border-color: var(--jv-accent);
-}
-
 /* ── Header ── */
 .jv-header {
   text-align: center;
