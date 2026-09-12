@@ -106,6 +106,70 @@ ocs__container
     </div>
 </div>
 
+## Example 3: Nonprofit Capstone Hub
+
+> A useful hub gives people context before navigation: a few meaningful signals, clear filters, and cards that explain the next step.
+
+<div class="ocs__container" style="margin-bottom: 1.5rem;">
+    <div class="ocs__capstone-nav">
+        <div class="ocs__links ocs__links--wide">
+            <a class="ocs__btn pill accent fill" href="#hub-overview">Hub</a>
+            <a class="ocs__btn pill" href="#programs">Programs</a>
+            <a class="ocs__btn pill" href="#get-involved">Get Involved</a>
+            <a class="ocs__btn pill" href="#impact">Impact</a>
+        </div>
+    </div>
+
+    <div class="ocs__badge">Community Organization</div>
+    <h1 id="hub-overview">Scripps Ranch Fire Safe Council</h1>
+    <p class="ocs__description">A nonprofit hub that helps neighbors understand local wildfire risk, find programs, and choose a practical way to help.</p>
+
+    <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
+        <div class="ocs__grid-cell ocs__grid-cell--accent"><strong>12</strong><br>Active programs</div>
+        <div class="ocs__grid-cell"><strong>4</strong><br>Upcoming events</div>
+        <div class="ocs__grid-cell"><strong>3</strong><br>Ways to volunteer</div>
+    </div>
+
+    <div class="ocs__card" id="programs">
+        <h2 class="ocs__section-title">Find a starting point</h2>
+        <div class="ocs__links" style="margin-bottom: 1rem;">
+            <a class="ocs__btn pill accent fill" href="#programs">All</a>
+            <a class="ocs__btn pill" href="#programs">Prepare</a>
+            <a class="ocs__btn pill" href="#programs">Volunteer</a>
+            <a class="ocs__btn pill" href="#programs">Learn</a>
+        </div>
+        <div class="ocs__grid ocs__grid--card">
+            <div class="ocs__grid-cell">
+                <h3>Prepare Your Home</h3>
+                <p>Practical home-hardening steps, local guidance, and a clear first action.</p>
+                <span class="ocs__status-pill ocs__status-pill--good">Start here</span>
+            </div>
+            <div class="ocs__grid-cell">
+                <h3>Join a Workday</h3>
+                <p>See upcoming neighborhood fuel-reduction events and sign up for a role.</p>
+                <a class="ocs__btn accent fill" href="#get-involved">See events</a>
+            </div>
+            <div class="ocs__grid-cell">
+                <h3>Learn the Risk</h3>
+                <p>Understand local wildfire conditions through short explainers and updates.</p>
+                <span class="ocs__status-pill ocs__status-pill--neutral">Explore</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ocs__card" id="get-involved">
+        <h2 class="ocs__section-title">Make the next action obvious</h2>
+        <div class="ocs__callout">
+            Visitors should not have to guess whether to donate, volunteer, attend an event, or prepare their home. Give each path a short explanation and one clear action.
+        </div>
+        <div class="ocs__links" style="margin-top: 1rem;">
+            <a class="ocs__btn accent fill" href="#impact">Donate</a>
+            <a class="ocs__btn" href="#programs">Volunteer</a>
+            <a class="ocs__btn" href="#programs">View events</a>
+        </div>
+    </div>
+</div>
+
 ## Rules of Thumb
 
 - Start with `ocs__container` for page width and typography.
