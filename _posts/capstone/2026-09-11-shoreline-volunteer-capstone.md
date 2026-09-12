@@ -6,22 +6,23 @@ title: Shoreline Community Services, Volunteer Page 2026-2027
 permalink: /capstone/shoreline-volunteer/
 year: "2026-2027"
 ---
-<blockquote style="color: #1B3A57; border-left: 4px solid #145DA0;">Shoreline Community Services has strong programs and a clear mission, but the volunteer page undersells them. There is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.</blockquote>
+<blockquote>Shoreline Community Services has strong programs and a clear mission, but the volunteer page undersells them. There is opportunity to guide volunteers with real scheduling, real forms, and a clearer picture of where help is needed most.</blockquote>
 
-<h2 style="color: #1B3A57;">Shoreline Community Services, Volunteer Page (CSP-2026-27)</h2>
+## Shoreline Community Services, Volunteer Page (CSP-2026-27)
 
-<div style="text-align: center; margin-bottom: 1.5rem;">
-    <a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git" style="background-color: #145DA0; border-color: #145DA0; color: #ffffff;">
-        Github Repository
-    </a>
-</div>
+<a class="ocs__btn large" href="https://github.com/vanshikak210/shorelineproject.git">
+    Github Repository
+</a>
+<a class="ocs__btn large alert-green fill" href="https://shorelinecs.org/">
+    Shoreline Community Services Website
+</a>
 
 ---
 
-<div class="ocs__grid ocs__grid--card" style="margin-bottom: 1.5rem;">
-    <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center; background-color: #145DA0; border-color: #145DA0; color: #ffffff;">How We Are Going to Change the Website</div>
+<div class="ocs__grid ocs__grid--card">
+    <div class="ocs__grid-cell ocs__grid-cell--header">How We Are Going to Change the Website</div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Homelessness Hotspot</strong>
         <ul>
             <li>Selecting the "volunteer" option shows a homelessness hotspot map.</li>
@@ -30,7 +31,7 @@ year: "2026-2027"
             <li>Automates the volunteer process - instead of a human physically having to contact a volunteer about location and time, the computer can do it for the volunteer on its own.</li>
         </ul>
     </div>
-    <div class="ocs__grid-cell" style="text-align: center; background-color: #EAF4FB; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell ocs__grid-cell--muted">
         <strong>Volunteer Shift Calendar</strong>
         <ul>
             <li>Volunteers can see which shift slots have already been taken instead of being contacted by a team member.</li>
@@ -38,7 +39,7 @@ year: "2026-2027"
         </ul>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell">
         <strong>Donations Page</strong>
         <p>Currently, the only way to donate is through an Instagram link in their bio.</p>
         <ul>
@@ -48,7 +49,7 @@ year: "2026-2027"
             <li>This makes donors want to contribute more to the cause.</li>
         </ul>
     </div>
-    <div class="ocs__grid-cell" style="text-align: center; background-color: #EAF4FB; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Needs Right Now Page</strong>
         <p>Money doesn't have to be the only thing people can donate.</p>
         <ul>
@@ -59,7 +60,7 @@ year: "2026-2027"
         </ul>
     </div>
 
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell ocs__grid-cell--muted">
         <strong>Service Navigation</strong>
         <ul>
             <li>A homeless person visiting the website can click a "Need Help?" button.</li>
@@ -67,7 +68,7 @@ year: "2026-2027"
             <li>For extra support, they can scroll down to find the outreach team's contact information with detailed instructions on how to contact them.</li>
         </ul>
     </div>
-    <div class="ocs__grid-cell" style="text-align: center; background-color: #EAF4FB; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell">
         <strong>Dashboard (Impact Made)</strong>
         <ul>
             <li>A dashboard shows stats on how much impact was made over a time interval the viewer can select (Last 30 days, Last week, and so on).</li>
@@ -77,35 +78,30 @@ year: "2026-2027"
     </div>
 </div>
 
-<div style="text-align: center; color: #1B3A57;">
-
 *Homelessness Hotspot and Volunteer Shift Calendar can go together to create one combined idea.*
 
 *Donations Page and Needs Right Now Page can go together to create one combined idea (Needs Right Now can be a part of the donations page).*
 
-</div>
-
 ---
 
-<div class="ocs__grid ocs__grid--card" style="margin-bottom: 1.5rem;">
-    <div class="ocs__grid-cell ocs__grid-cell--header" style="text-align: center; background-color: #145DA0; border-color: #145DA0; color: #ffffff;">Teammates/Collaborators</div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
+<div class="ocs__grid ocs__grid--card">
+    <div class="ocs__grid-cell ocs__grid-cell--header">Teammates/Collaborators</div>
+    <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Nitya Hamsini Kasse</strong>
         <p>Technologist/Developer</p>
-        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/nkasse12" style="background-color: #145DA0; border-color: #145DA0; color: #ffffff;">
+        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/nkasse12">
             GitHub
         </a>
     </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell ocs__grid-cell--muted">
         <strong>Vanshika Keswani</strong>
         <p>Technologist/Developer</p>
-        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/vanshikak210" style="background-color: #145DA0; border-color: #145DA0; color: #ffffff;">
+        <a class="ocs__btn alert-green iridescent fill small" href="https://github.com/vanshikak210">
             GitHub
         </a>
     </div>
-    <div class="ocs__grid-cell ocs__grid-cell--accent" style="text-align: center; background-color: #D6E9F8; border-color: #145DA0; color: #1B3A57;">
+    <div class="ocs__grid-cell">
         <strong>Hsu-Cheng Lin</strong>
         <p>Technologist/Developer</p>
     </div>
 </div>
-
