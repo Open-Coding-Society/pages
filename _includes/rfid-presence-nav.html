@@ -1,4 +1,13 @@
 <style>
+.rfid-presence-infograph {
+  --rp-surface: color-mix(in srgb, var(--rp-text) 6%, var(--rp-bg));
+  --rp-surface-strong: color-mix(in srgb, var(--rp-text) 12%, var(--rp-bg));
+  --rp-border-strong: color-mix(in srgb, var(--rp-text) 18%, transparent);
+  --rp-success: var(--rp-accent);
+  --rp-warning: var(--rp-accent);
+  --rp-danger: var(--rp-accent);
+}
+
 .rfid-presence-infograph .rfid-presence-question {
   font-size: 1.05rem;
   line-height: 1.7;
@@ -9,8 +18,8 @@
   margin: 1rem 0 1.25rem;
   padding: 1.25rem;
   overflow-x: auto;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-card-border);
   border-radius: 12px;
 }
 
@@ -35,7 +44,7 @@
 .rfid-presence-infograph .rfid-presence-table td {
   text-align: left;
   padding: 0.9rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid var(--rp-card-border);
   vertical-align: top;
 }
 
@@ -44,11 +53,11 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--rp-text-muted);
 }
 
 .rfid-presence-infograph .rfid-presence-table td {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--rp-text-muted);
   line-height: 1.5;
 }
 
@@ -64,15 +73,15 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
+  border: 1px solid var(--rp-border-strong);
+  background: var(--rp-surface-strong);
+  color: var(--rp-text);
 }
 
-.rfid-presence-infograph .rfid-presence-pill-good    { border-color: rgba(34, 197, 94, 0.5); background: rgba(34, 197, 94, 0.15); color: #4ade80; }
-.rfid-presence-infograph .rfid-presence-pill-warn    { border-color: rgba(245, 158, 11, 0.5); background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-.rfid-presence-infograph .rfid-presence-pill-bad     { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.15); color: #f87171; }
-.rfid-presence-infograph .rfid-presence-pill-neutral { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.75); }
+.rfid-presence-infograph .rfid-presence-pill-good,
+.rfid-presence-infograph .rfid-presence-pill-warn,
+.rfid-presence-infograph .rfid-presence-pill-bad { border-color: var(--rp-accent); background: var(--rp-accent-soft); color: var(--rp-accent); }
+.rfid-presence-infograph .rfid-presence-pill-neutral { border-color: var(--rp-border-strong); background: var(--rp-surface); color: var(--rp-text-muted); }
 
 .rfid-presence-infograph .rfid-presence-checklist {
   list-style: none;
@@ -85,9 +94,9 @@
   align-items: flex-start;
   gap: 0.65rem;
   padding: 0.55rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--rp-card-border);
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--rp-text-muted);
 }
 
 .rfid-presence-infograph .rfid-presence-checklist li:last-child { border-bottom: none; }
@@ -97,12 +106,12 @@
   width: 1.1rem;
   height: 1.1rem;
   border-radius: 0.3rem;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border: 1.5px solid var(--rp-border-strong);
   margin-top: 0.15rem;
 }
 
-.rfid-presence-infograph .rfid-presence-checklist li.done .rfid-presence-box { border-color: #4ade80; background: rgba(34, 197, 94, 0.2); }
-.rfid-presence-infograph .rfid-presence-checklist li.open .rfid-presence-box { border-color: #fbbf24; }
+.rfid-presence-infograph .rfid-presence-checklist li.done .rfid-presence-box { border-color: var(--rp-success); background: var(--rp-success-soft); }
+.rfid-presence-infograph .rfid-presence-checklist li.open .rfid-presence-box { border-color: var(--rp-warning); }
 
 .rfid-presence-infograph .rfid-presence-callout {
   margin-top: 1rem;
@@ -110,12 +119,12 @@
   border-radius: 12px;
   font-size: 0.9rem;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--rp-text-muted);
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-card-border);
 }
 
-.rfid-presence-infograph .rfid-presence-callout a { color: #ffffff; }
+.rfid-presence-infograph .rfid-presence-callout a { color: var(--rp-accent); }
 
 .rfid-presence-infograph .rfid-presence-entity-list {
   list-style: none;
@@ -127,16 +136,16 @@
 }
 
 .rfid-presence-infograph .rfid-presence-entity-list li {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-card-border);
   border-radius: 0.5rem;
   padding: 0.6rem 0.85rem;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--rp-text-muted);
   line-height: 1.5;
 }
 
-.rfid-presence-infograph .rfid-presence-entity-list strong { color: #ffffff; }
+.rfid-presence-infograph .rfid-presence-entity-list strong { color: var(--rp-text); }
 
 .rfid-presence-infograph .rfid-presence-hub-grid {
   display: grid;
@@ -149,21 +158,21 @@
   display: block;
   padding: 1.5rem;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--rp-border-strong);
+  background: var(--rp-surface);
   color: inherit;
   text-decoration: none;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .rfid-presence-infograph .rfid-presence-hub-card:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: var(--rp-surface-strong);
+  border-color: var(--rp-accent);
   transform: translateY(-2px);
 }
 
-.rfid-presence-infograph .rfid-presence-hub-card .rfid-presence-project-title { margin: 0.25rem 0 0.5rem; font-size: 1.2rem; font-weight: 800; color: #ffffff; }
-.rfid-presence-infograph .rfid-presence-hub-card p { color: rgba(255, 255, 255, 0.75); margin: 0; }
+.rfid-presence-infograph .rfid-presence-hub-card .rfid-presence-project-title { margin: 0.25rem 0 0.5rem; font-size: 1.2rem; font-weight: 800; color: var(--rp-text); }
+.rfid-presence-infograph .rfid-presence-hub-card p { color: var(--rp-text-muted); margin: 0; }
 
 .rfid-presence-infograph .rfid-presence-stage-nav {
   display: grid;
@@ -171,37 +180,18 @@
   gap: 0.75rem;
   margin-bottom: 2rem;
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid var(--rp-card-border);
 }
-
-.rfid-presence-infograph .rfid-presence-stage-nav-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 0.75rem 0.5rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-decoration: none;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.rfid-presence-infograph .rfid-presence-stage-nav-link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.24); }
-.rfid-presence-infograph .rfid-presence-stage-nav-link.is-active { color: #ffffff; background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.32); }
 
 .rfid-presence-infograph .rfid-presence-phase-crumb {
   display: inline-block;
   margin-bottom: 1.25rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--rp-text-muted);
   text-decoration: none;
 }
-.rfid-presence-infograph .rfid-presence-phase-crumb:hover { color: #ffffff; text-decoration: underline; }
+.rfid-presence-infograph .rfid-presence-phase-crumb:hover { color: var(--rp-accent); text-decoration: underline; }
 
 .rfid-presence-infograph .rfid-presence-pager {
   display: grid;
@@ -214,13 +204,13 @@
   display: block;
   padding: 1rem 1.25rem;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--rp-border-strong);
+  background: var(--rp-surface);
+  color: var(--rp-text-muted);
   text-decoration: none;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
-.rfid-presence-infograph .rfid-presence-pager-link:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.28); color: #ffffff; }
+.rfid-presence-infograph .rfid-presence-pager-link:hover { background: var(--rp-surface-strong); border-color: var(--rp-accent); color: var(--rp-text); }
 .rfid-presence-infograph .rfid-presence-pager-link.next { text-align: right; }
 
 @media (max-width: 900px) {
@@ -240,9 +230,9 @@
 </style>
 
 <nav class="rfid-presence-stage-nav" aria-label="RFID Presence navigation">
-  <a href="/capstone/rfid-presence/" class="rfid-presence-stage-nav-link{% if page.rp_active == 'hub' %} is-active{% endif %}"{% if page.rp_active == 'hub' %} aria-current="page"{% endif %}>Overview</a>
-  <a href="/capstone/rfid-presence/summary/" class="rfid-presence-stage-nav-link{% if page.rp_active == 'summary' %} is-active{% endif %}"{% if page.rp_active == 'summary' %} aria-current="page"{% endif %}>Project Summary</a>
-  <a href="/capstone/rfid-presence/technical/" class="rfid-presence-stage-nav-link{% if page.rp_active == 'technical' %} is-active{% endif %}"{% if page.rp_active == 'technical' %} aria-current="page"{% endif %}>Technical Detail</a>
-  <a href="/capstone/rfid-presence/phases/" class="rfid-presence-stage-nav-link{% if page.rp_active == 'phases' %} is-active{% endif %}"{% if page.rp_active == 'phases' %} aria-current="page"{% endif %}>Phases</a>
-  <a href="/capstone/rfid-presence/funding/" class="rfid-presence-stage-nav-link{% if page.rp_active == 'funding' %} is-active{% endif %}"{% if page.rp_active == 'funding' %} aria-current="page"{% endif %}>Funding</a>
+  <a href="/capstone/rfid-presence/" class="ocs__btn pill{% if page.rp_active == 'hub' %} alert-green fill{% endif %}"{% if page.rp_active == 'hub' %} aria-current="page"{% endif %}>Overview</a>
+  <a href="/capstone/rfid-presence/summary/" class="ocs__btn pill{% if page.rp_active == 'summary' %} alert-green fill{% endif %}"{% if page.rp_active == 'summary' %} aria-current="page"{% endif %}>Project Summary</a>
+  <a href="/capstone/rfid-presence/technical/" class="ocs__btn pill{% if page.rp_active == 'technical' %} alert-green fill{% endif %}"{% if page.rp_active == 'technical' %} aria-current="page"{% endif %}>Technical Detail</a>
+  <a href="/capstone/rfid-presence/phases/" class="ocs__btn pill{% if page.rp_active == 'phases' %} alert-green fill{% endif %}"{% if page.rp_active == 'phases' %} aria-current="page"{% endif %}>Phases</a>
+  <a href="/capstone/rfid-presence/funding/" class="ocs__btn pill{% if page.rp_active == 'funding' %} alert-green fill{% endif %}"{% if page.rp_active == 'funding' %} aria-current="page"{% endif %}>Funding</a>
 </nav>

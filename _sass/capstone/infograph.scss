@@ -1,15 +1,19 @@
 // Centralized Capstone Infograph Styles
 // This file replaces the per-project infograph SCSS files.
-// It provides a simple, black-and-white theme for all capstone infographics.
+// Shared infograph surfaces follow the active user preference theme.
 
 // Color palette
-$infograph-bg: #000000;
-$infograph-foreground: #ffffff;
-$infograph-muted: rgba(255, 255, 255, 0.75);
-$infograph-border: rgba(255, 255, 255, 0.12);
-$infograph-card: rgba(255, 255, 255, 0.05);
-$infograph-btn-bg: rgba(255, 255, 255, 0.08);
-$infograph-btn-hover: rgba(255, 255, 255, 0.18);
+$infograph-bg: var(--pref-bg-color, #000000);
+$infograph-foreground: var(--pref-text-color, #ffffff);
+$infograph-muted: var(--text-muted, rgba(255, 255, 255, 0.75));
+$infograph-border: var(--ui-border, rgba(255, 255, 255, 0.12));
+$infograph-card: var(--ui-bg, rgba(255, 255, 255, 0.05));
+$infograph-btn-bg: color-mix(in srgb, var(--pref-accent-color, #3b82f6) 12%, var(--pref-bg-color, #000000));
+$infograph-surface: color-mix(in srgb, var(--pref-text-color, #ffffff) 6%, var(--pref-bg-color, #000000));
+$infograph-surface-strong: color-mix(in srgb, var(--pref-text-color, #ffffff) 12%, var(--pref-bg-color, #000000));
+$infograph-btn-hover: color-mix(in srgb, var(--pref-accent-color, #3b82f6) 18%, var(--pref-bg-color, #000000));
+$infograph-shadow: color-mix(in srgb, var(--pref-text-color, #ffffff) 20%, transparent);
+$infograph-overlay: color-mix(in srgb, var(--pref-bg-color, #000000) 50%, transparent);
 
 // Base layout for any infograph container (matches any class ending in "-infograph")
 [class$="-infograph"],
@@ -22,7 +26,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   width: min(100%, 1800px);
   margin: 0 auto;
   padding: 3rem 3rem;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--pref-font-family, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   color: $infograph-foreground;
   background-color: $infograph-bg;
 }
@@ -48,7 +52,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 [class$="-infograph"] [class$="-header"] {
   text-align: center;
   padding: 3rem 2rem;
-  background: rgba(255, 255, 255, 0.06);
+  background: $infograph-surface;
   border-radius: 24px;
   margin-bottom: 2rem;
   border: 1px solid $infograph-border;
@@ -56,7 +60,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 [class$="-infograph"] [class$="-badge"] {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.12);
+  background: $infograph-surface-strong;
   color: $infograph-foreground;
   padding: 0.5rem 1.5rem;
   border-radius: 50px;
@@ -90,7 +94,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   padding: 2.5rem;
   margin-bottom: 2rem;
   border: 1px solid $infograph-border;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px $infograph-shadow;
 }
 
 [class$="-infograph"] [class$="-card-grid"] {
@@ -137,9 +141,9 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: $infograph-surface;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid $infograph-border;
 }
 
 [class$="-infograph"] [class$="-image-link"] {
@@ -147,7 +151,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   display: block;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px $infograph-shadow;
   width: 100%;
 }
 
@@ -165,7 +169,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 [class$="-infograph"] [class$="-overlay"] {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: $infograph-overlay;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,7 +188,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 }
 
 [class$="-infograph"] [class$="-status"] {
-  background: rgba(255, 255, 255, 0.12);
+  background: $infograph-surface-strong;
   color: $infograph-foreground;
   padding: 0.5rem 1.2rem;
   border-radius: 20px;
@@ -220,9 +224,9 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: $infograph-surface;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid $infograph-border;
 }
 
 [class$="-infograph"] [class$="-project-title"] {
@@ -249,7 +253,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-  background: rgba(255, 255, 255, 0.12);
+  background: $infograph-surface-strong;
   border-radius: 8px;
   font-weight: 700;
 }
@@ -263,7 +267,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 [class$="-infograph"] [class$="-tech-tag"] {
   padding: 0.45rem 0.9rem;
-  background: rgba(255, 255, 255, 0.12);
+  background: $infograph-surface-strong;
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -275,9 +279,9 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: $infograph-surface;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid $infograph-border;
 }
 
 [class$="-infograph"] [class$="-section-title"] {
@@ -299,9 +303,9 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 [class$="-infograph"] [class$="-impact-item"] {
   padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: $infograph-surface;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid $infograph-border;
   color: $infograph-muted;
 }
 
@@ -312,9 +316,9 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 }
 
 [class$="-infograph"] [class$="-video-item"] {
-  background: rgba(255, 255, 255, 0.05);
+  background: $infograph-surface;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid $infograph-border;
   padding: 1rem;
   overflow: hidden;
 }
@@ -330,7 +334,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   width: 100%;
   height: auto;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.3);
+  background: $infograph-overlay;
   display: block;
 }
 
@@ -341,7 +345,7 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
   padding: 0.85rem 1.2rem;
   margin-top: 1.5rem;
   background: $infograph-btn-bg;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--pref-accent-color, #3b82f6);
   border-radius: 999px;
   color: $infograph-foreground;
   font-weight: 700;
@@ -352,6 +356,6 @@ $infograph-btn-hover: rgba(255, 255, 255, 0.18);
 
 [class$="-infograph"] [class$="-btn"]:hover {
   background: $infograph-btn-hover;
-  border-color: rgba(255, 255, 255, 0.28);
+  border-color: var(--pref-accent-color, #3b82f6);
   transform: translateY(-1px);
 }
