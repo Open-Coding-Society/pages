@@ -3,9 +3,6 @@
 This directory contains reusable Sass grammar for the Open Coding Society site.
 Use these elements for new reusable UI before creating a project-specific style.
 
-The examples are demonstrated in [`index2.md`](../../index2.md) for buttons and
-interactive controls and [`index4.md`](../../index4.md) for grids.
-
 ## Start with OCS grammar
 
 OCS grammar is intended to help you build interesting pages with zero custom
@@ -13,8 +10,9 @@ CSS. Start with the existing classes and composition patterns. Add project CSS
 only for an exceptional visual or interaction that the shared grammar cannot
 express yet.
 
-The examples are demonstrated in [`index2.md`](pages.opencodingsociety/index2.md) for buttons and
-interactive controls and [`index4.md`](pages.opencodingsociety/index4.md) for grids.
+The examples are demonstrated in [`index2.md`](../../index2.md) for buttons,
+[`index4.md`](../../index4.md) for grids, and [`index5.md`](../../index5.md) for
+container composition.
 
 ## Composition relationship
 
@@ -23,7 +21,9 @@ Think of the grammar as a page composition hierarchy:
 ```text
 ocs__container
 ├── ocs__capstone-nav or ocs__links
-├── ocs__section-title
+├── ocs__badge
+├── h1 page heading
+├── ocs__description
 ├── ocs__card
 │   ├── ocs__description, ocs__callout, or ocs__entity-list
 │   ├── ocs__grid
@@ -41,7 +41,9 @@ the grid. Images belong inside the card or grid cell that explains them. Buttons
 belong beside the content they act on, while navigation buttons belong in an
 `ocs__links` group or a capstone navigation wrapper.
 
-Example composition:
+Example composition, also demonstrated live in [`index5.md`](../../index5.md).
+This is the sensible default for a project or nonprofit hub; use a different
+composition only when the content requires it:
 
 ```html
 <div class="ocs__container">
