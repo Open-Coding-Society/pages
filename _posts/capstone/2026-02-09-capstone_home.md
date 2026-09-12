@@ -860,6 +860,17 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
 
+   <div class="ocs__grid-cell CSP" data-year="2026-2027">
+       <a href="{% post_url 2026-09-10-poway-scripps-rotary-capstone %}">
+           <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Rotary_International_Logo.svg" alt="Rotary International Logo" class="ocs__image-frame ocs__image-frame--thumbnail" />
+       </a>
+       <div>
+           <h3><a href="{% post_url 2026-09-10-poway-scripps-rotary-capstone %}">Poway Rotary Club</a></h3>
+           <p>Helping the Poway Scripps Rotary Club improve their website. With better organization, search feachures, and UI, we're helping the non-profit club manage the many activities they do to help others.</p>
+           <p>Team: Samarth H, Rigved G, Rohan S</p>
+       </div>
+   </div>
+
    <!-- OCS Assignment Tracker (CSA) -->
   <div class="ocs__grid-cell CSA" data-year="2026-2027">
        <a href="{% post_url capstone/2026-09-03-chuds-capstone %}">
