@@ -2,24 +2,27 @@
 // Scoped under .jv-container (all elements use the jv- prefix)
 // See _posts/capstone/2026-09-01-jarvis-capstone.md and its sibling pages
 
-:root {
-  --jv-bg: #0f0f12;
-  --jv-card: #16161a;
-  --jv-card-border: #2a2a2e;
-  --jv-text: #e4e4e7;
-  --jv-text-muted: #a1a1aa;
-  --jv-accent: #3b82f6;
-  --jv-accent-soft: rgba(59, 130, 246, 0.15);
-  --jv-success: #22c55e;
-  --jv-success-soft: rgba(34, 197, 94, 0.12);
-  --jv-tag: #27272a;
-  --jv-gradient-start: #3b82f6;
-  --jv-gradient-end: #06b6d4;
-  --jv-purple: #a855f7;
-  --jv-amber: #f59e0b;
-  --jv-amber-soft: rgba(245, 158, 11, 0.12);
-  --jv-red: #ef4444;
-  --jv-red-soft: rgba(239, 68, 68, 0.12);
+.jv-container {
+  --jv-bg: var(--pref-bg-color);
+  --jv-card: var(--pref-bg-color);
+  --jv-card-border: var(--ui-border);
+  --jv-text: var(--pref-text-color);
+  --jv-text-muted: var(--text-muted);
+  --jv-accent: var(--pref-accent-color);
+  --jv-accent-soft: color-mix(in srgb, var(--pref-accent-color) 15%, transparent);
+  --jv-success: var(--pref-accent-color);
+  --jv-success-soft: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
+  --jv-tag: var(--ui-bg);
+  --jv-purple: var(--pref-accent-color);
+  --jv-amber: var(--pref-accent-color);
+  --jv-amber-soft: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
+  --jv-red: var(--pref-accent-color);
+  --jv-red-soft: color-mix(in srgb, var(--pref-accent-color) 12%, transparent);
+  --jv-surface: color-mix(in srgb, var(--pref-text-color) 6%, var(--pref-bg-color));
+  --jv-surface-strong: color-mix(in srgb, var(--pref-text-color) 12%, var(--pref-bg-color));
+  --jv-overlay: color-mix(in srgb, var(--pref-bg-color) 50%, transparent);
+  --jv-shadow: color-mix(in srgb, var(--pref-text-color) 20%, transparent);
+  --jv-font-family: var(--pref-font-family);
 }
 
 .jv-container * { box-sizing: border-box; }
@@ -28,7 +31,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-family: var(--jv-font-family);
   color: var(--jv-text);
 }
 
@@ -93,10 +96,7 @@
   font-weight: 700;
   margin: 0 0 0.75rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--jv-gradient-start), var(--jv-gradient-end));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--jv-accent);
 }
 
 .jv-page-title {
