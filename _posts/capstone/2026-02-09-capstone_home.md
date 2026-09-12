@@ -314,15 +314,15 @@ document.addEventListener('DOMContentLoaded', function(){
        </div>
    </div>
   
-   <!-- SRFSC Website Redesign Examples (CSP, 2026/2027) -->
-   <div class="flex items-start space-x-4 p-4 border rounded-lg capstone-item CSP" data-year="2026-2027" data-page-url="{{ '/capstone/srfsc/' | relative_url }}">
+     <!-- SRFSC Website Redesign Examples (CSP, 2026/2027) -->
+     <div class="ocs__grid-cell CSP" data-year="2026-2027" data-page-url="{{ '/capstone/srfsc/' | relative_url }}">
        <a href="{{ '/capstone/srfsc/' | relative_url }}">
-           <div class="w-28 h-28 flex items-center justify-center text-white text-xl font-bold rounded" style="background: linear-gradient(135deg, #0f766e, #14532d);">SRFSC</div>
+         <div class="ocs__image-frame ocs__image-frame--thumbnail capstone-card-placeholder">SRFSC</div>
        </a>
        <div>
-           <h3 class="text-lg font-semibold"><a href="{{ '/capstone/srfsc/' | relative_url }}">SRFSC Website Redesign Examples</a></h3>
-           <p class="text-sm text-gray-700">Visual mockup examples showing how the Scripps Ranch Fire Safe Council website could be redesigned for clarity, urgency, and action.</p>
-           <p class="text-xs text-gray-500 mt-2">Team: Krish Kelageri, Jasan Boprai, Shourya Patel</p>
+         <h3><a href="{{ '/capstone/srfsc/' | relative_url }}">SRFSC Website Redesign Examples</a></h3>
+         <p>Visual mockup examples showing how the Scripps Ranch Fire Safe Council website could be redesigned for clarity, urgency, and action.</p>
+         <p>Team: Krish Kelageri, Jasan Boprai, Shourya Patel</p>
        </div>
    </div>
 
