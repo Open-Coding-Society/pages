@@ -14,7 +14,6 @@ year: "2026-2027"
 <!-- markdownlint-disable MD033 MD010 MD012 -->
 <div class="ocs__grid ocs__grid--standard cols-2" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">Strengths vs Improvement</div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Clear Mission Messaging</strong>
         <p>Visitors should understand the wildfire risk and the council’s role before exploring the rest of the page.</p>
@@ -29,7 +28,6 @@ year: "2026-2027"
             Join Us
         </a>
     </div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Community Trust</strong>
         <p>Local context, impact stories, and partner credibility make the council feel more established and reliable.</p>
@@ -48,7 +46,6 @@ year: "2026-2027"
 
 <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">Key Opportunities</div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Priority First</strong>
         <p>Lead with wildfire preparedness, hazard reduction, and neighborhood action.</p>
@@ -65,7 +62,6 @@ year: "2026-2027"
 
 <div class="ocs__grid ocs__grid--standard cols-3" style="margin-bottom: 1.5rem;">
     <div class="ocs__grid-cell ocs__grid-cell--header">What the page should emphasize</div>
-
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Urgency</strong>
         <p>Use a direct wildfire-risk message early so visitors understand why this matters immediately.</p>
