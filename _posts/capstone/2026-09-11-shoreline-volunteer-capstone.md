@@ -10,21 +10,21 @@ permalink: /capstone/shoreline-volunteer/
     justify-content: center;
 }
 .shoreline-capstone-card .ocs__grid--card {
-    grid-template-columns: repeat(3, minmax(200px, 240px));
+    grid-template-columns: repeat(3, 1fr);
     justify-content: center;
 }
 @media (max-width: 700px) {
     .shoreline-capstone-card .ocs__grid--card {
-        grid-template-columns: minmax(200px, 240px);
+        grid-template-columns: 1fr;
     }
 }
 .shoreline-capstone-card .ocs__grid-cell:not(.ocs__grid-cell--header) {
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     text-align: center;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+.shoreline-capstone-card .ocs__grid-cell:not(.ocs__grid-cell--header) strong {
+    font-size: 1rem;
 }
 .shoreline-capstone-card .ocs__grid--card .ocs__grid-cell:not(.ocs__grid-cell--header) {
     background: var(--panel);
