@@ -1,0 +1,31 @@
+// Shared compact status pill element.
+
+.ocs__status-pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--ui-border);
+  border-radius: 9999px;
+  color: var(--pref-text-color);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ocs__status-pill--good {
+  background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+  border-color: var(--pref-accent-color);
+  color: var(--pref-accent-color);
+}
+
+.ocs__status-pill--warn,
+.ocs__status-pill--bad {
+  background: color-mix(in srgb, var(--pref-accent-color) 12%, var(--panel));
+  border-color: var(--pref-accent-color);
+  color: var(--pref-accent-color);
+}
+
+.ocs__status-pill--neutral {
+  background: var(--ui-bg);
+  color: var(--text-muted);
+}

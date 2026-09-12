@@ -171,23 +171,6 @@
   padding: 0.05rem 0.35rem;
 }
 
-/* ── Status Pills ── */
-.jv-pill {
-  display: inline-block;
-  padding: 0.15rem 0.55rem;
-  font-size: 0.72rem;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 600;
-  border-radius: 9999px;
-  white-space: nowrap;
-}
-
-.jv-pill-good { background: var(--jv-success-soft); color: var(--jv-success); border: 1px solid rgba(34,197,94,0.3); }
-.jv-pill-warn { background: var(--jv-amber-soft); color: var(--jv-amber); border: 1px solid rgba(245,158,11,0.3); }
-.jv-pill-bad  { background: var(--jv-red-soft); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-.jv-pill-neutral { background: var(--jv-tag); color: var(--jv-text-muted); border: 1px solid var(--jv-card-border); }
-.jv-pill-draft { background: var(--jv-amber-soft); color: var(--jv-amber); border: 1px solid rgba(245,158,11,0.3); }
-
 /* ── Diagrams ── */
 .jv-diagram {
   background: rgba(255,255,255,0.015);
