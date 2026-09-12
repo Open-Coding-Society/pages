@@ -1,8 +1,8 @@
 // Jarvis Camera Setup & Object Detection Capstone Styles
-// Scoped under .jv-container (all elements use the jv- prefix)
+// Jarvis-specific components; shared layout uses .ocs__container.
 // See _posts/capstone/2026-09-01-jarvis-capstone.md and its sibling pages
 
-.jv-container {
+.ocs__container {
   --jv-bg: var(--pref-bg-color);
   --jv-card: var(--pref-bg-color);
   --jv-card-border: var(--ui-border);
@@ -23,16 +23,6 @@
   --jv-overlay: color-mix(in srgb, var(--pref-bg-color) 50%, transparent);
   --jv-shadow: color-mix(in srgb, var(--pref-text-color) 20%, transparent);
   --jv-font-family: var(--pref-font-family);
-}
-
-.jv-container * { box-sizing: border-box; }
-
-.jv-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  font-family: var(--jv-font-family);
-  color: var(--jv-text);
 }
 
 /* ── Navigation ── */
