@@ -30,7 +30,7 @@ class LocalColorMapper:
         # Files to check for existing variables
         color_files = [
             self.scss_dir / 'open-coding' / 'materials' / 'colors.scss',
-            self.scss_dir / 'user-colors.scss'
+            self.scss_dir / 'open-coding' / 'theme' / 'legacy' / 'user-colors.scss'
         ]
         
         total_vars = 0
@@ -367,7 +367,7 @@ class LocalColorMapper:
         
         return report
     
-    def run(self, output_file='_sass/root-color-map.scss'):
+    def run(self, output_file='_sass/open-coding/theme/legacy/root-color-map.scss'):
         """Run the full color extraction and map generation"""
         print("🎨 Creating Local Root Color Map\n")
         print("=" * 50)
@@ -401,7 +401,7 @@ class LocalColorMapper:
         
         print("\n" + "=" * 50)
         print("🎉 Done! Next steps:")
-        print("   1. Review the generated color map: _sass/root-color-map.scss")
+        print("   1. Review the generated color map: _sass/open-coding/theme/legacy/root-color-map.scss")
         print("   2. Check the usage report: local-color-usage-report.md")
         print("   3. Optionally refactor SCSS files to use the new variables")
         print("   4. Test your site to ensure colors are correct")

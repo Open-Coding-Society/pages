@@ -3,9 +3,6 @@
  * Reusable classes for drag-source / drop-target button pairs used by
  * assembly, matching, and sorting activities (see the PC Assembly Bench).
  *
- * Colors come straight from root-color-map.scss - single source of truth.
- * To recolor these buttons, change the palette in _sass/user-colors.scss or
- * swap which $variable a rule below uses.
  *
  * Sizing comes from the $dnd-sizes map below, mirroring the $sizes token
  * pattern in _tokens.scss.
@@ -68,7 +65,7 @@ $dnd-sizes: (
 // ===========================
 // Boards and buttons are medium unless a size class below says otherwise.
 // Colors are not published this way - rules name the palette variables from
-// root-color-map.scss directly.
+// the generated theme/legacy/root-color-map.scss directly.
 
 :root {
     @include dnd-size(map-get($dnd-sizes, medium)...);
