@@ -7,35 +7,7 @@ description: Visual mockup examples showing how the Scripps Ranch Fire Safe Coun
 permalink: /capstone/srfsc
 author: Krish Kelageri, Jasan Boprai, Shourya Patel
 year: "2026-2027"
-courses: { csp: {week: 25} }
 ---
-
-<style>
-  @media (max-width: 640px) {
-    .ocs__grid.cols-2,
-    .ocs__grid.cols-3 {
-      grid-template-columns: 1fr !important;
-    }
-  }
-
-  .srfsc-mermaid-desktop {
-    display: block;
-  }
-
-  .srfsc-mermaid-mobile {
-    display: none;
-  }
-
-  @media (max-width: 640px) {
-    .srfsc-mermaid-desktop {
-      display: none;
-    }
-
-    .srfsc-mermaid-mobile {
-      display: block;
-    }
-  }
-</style>
 
 > The SRFSC homepage can be more direct and action-focused. The strongest example is to make the mission, volunteer path, and urgent neighborhood context visible immediately.
 
@@ -45,14 +17,14 @@ courses: { csp: {week: 25} }
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Clear Mission Messaging</strong>
         <p>Visitors should understand the wildfire risk and the council’s role before exploring the rest of the page.</p>
-        <a class="ocs__btn alert-green fill small" href="{{ site.baseurl }}/capstone/srfsc-redesign-examples/#mission">
+        <a class="ocs__btn alert-green fill small" href="{{ site.baseurl }}/capstone/srfsc/#mission">
             View Example
         </a>
     </div>
     <div class="ocs__grid-cell">
         <strong>Volunteer Path</strong>
         <p>Action buttons are easy to find and connect users directly to volunteering and donations.</p>
-        <a class="ocs__btn alert-yellow fill small" href="{{ site.baseurl }}/capstone/srfsc-redesign-examples/#actions">
+        <a class="ocs__btn alert-yellow fill small" href="{{ site.baseurl }}/capstone/srfsc/#actions">
             Join Us
         </a>
     </div>
@@ -60,14 +32,14 @@ courses: { csp: {week: 25} }
     <div class="ocs__grid-cell ocs__grid-cell--accent">
         <strong>Community Trust</strong>
         <p>Local context, impact stories, and partner credibility make the council feel more established and reliable.</p>
-        <a class="ocs__btn alert-green fill small" href="{{ site.baseurl }}/capstone/srfsc-redesign-examples/#updates">
+        <a class="ocs__btn alert-green fill small" href="{{ site.baseurl }}/capstone/srfsc/#updates">
             Updates
         </a>
     </div>
     <div class="ocs__grid-cell">
         <strong>Program Clarity</strong>
         <p>Grouping fuel reduction, home hardening, and education into clear sections reduces friction and confusion.</p>
-        <a class="ocs__btn alert-yellow fill small" href="{{ site.baseurl }}/capstone/srfsc-redesign-examples/#programs">
+        <a class="ocs__btn alert-yellow fill small" href="{{ site.baseurl }}/capstone/srfsc/#programs">
             Program View
         </a>
     </div>
@@ -136,51 +108,11 @@ courses: { csp: {week: 25} }
     height: auto;
     display: block;
   }
-
-  .srfsc-mermaid-desktop {
-    display: block;
-  }
-
-  .srfsc-mermaid-mobile {
-    display: none;
-  }
-
-  @media (max-width: 640px) {
-    .srfsc-mermaid-desktop {
-      display: none;
-    }
-
-    .srfsc-mermaid-mobile {
-      display: block;
-    }
-
-    .srfsc-mermaid-wrap .mermaid svg {
-      max-width: 100%;
-    }
-  }
 </style>
 
 <div class="srfsc-mermaid-wrap">
-  <div class="mermaid srfsc-mermaid-desktop">
-    flowchart LR
-        A[Visitor lands on page] --> B{Understand the risk?}
-        B -->|Yes| C[Read mission + local context]
-        B -->|No| D[Improve hero message]
-        C --> E[See call-to-action buttons]
-        D --> E
-        E --> F[Volunteer or donate]
-        E --> G[Learn more about programs]
-        F --> H[Community action grows]
-        G --> H
-
-        style A fill:#173b2f,color:#ffffff,stroke:#173b2f
-        style C fill:#2f6d4c,color:#ffffff,stroke:#2f6d4c
-        style E fill:#d8572a,color:#ffffff,stroke:#d8572a
-        style H fill:#49615b,color:#ffffff,stroke:#49615b
-  </div>
-
-  <div class="mermaid srfsc-mermaid-mobile">
-    flowchart TB
+  <div class="mermaid">
+    flowchart TD
         A[Visitor lands on page] --> B{Understand the risk?}
         B -->|Yes| C[Read mission + local context]
         B -->|No| D[Improve hero message]
