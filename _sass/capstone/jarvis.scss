@@ -66,7 +66,7 @@
 }
 
 .jv-nav-link.active {
-  color: #ffffff;
+  color: var(--jv-bg);
   background: var(--jv-accent);
   border-color: var(--jv-accent);
 }
@@ -222,7 +222,7 @@
   padding: 0.55rem 0;
   font-size: 0.9rem;
   color: var(--jv-text-muted);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--ui-border);
   line-height: 1.5;
 }
 
@@ -272,13 +272,26 @@
 
 .jv-table td {
   padding: 0.75rem 0.85rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid var(--ui-border);
   color: var(--jv-text-muted);
   line-height: 1.55;
   vertical-align: top;
 }
 
 .jv-table tr:last-child td { border-bottom: none; }
+
+.jv-table tbody tr {
+  background: var(--jv-card);
+
+  &:nth-child(even) {
+    background: color-mix(in srgb, var(--jv-text) 4%, var(--jv-card));
+  }
+
+  &:hover,
+  &:nth-child(even):hover {
+    background: color-mix(in srgb, var(--jv-accent) 10%, var(--jv-card));
+  }
+}
 
 .jv-table td:first-child, .jv-table td.jv-cell-strong {
   color: var(--jv-text);

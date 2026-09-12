@@ -1,11 +1,16 @@
 <style>
 .rfid-presence-infograph {
+  --rp-bg: var(--pref-bg-color);
+  --rp-card-border: var(--ui-border);
+  --rp-text: var(--pref-text-color);
+  --rp-text-muted: var(--text-muted);
+  --rp-accent: var(--pref-accent-color);
+  --rp-accent-soft: color-mix(in srgb, var(--pref-accent-color) 15%, transparent);
   --rp-surface: color-mix(in srgb, var(--rp-text) 6%, var(--rp-bg));
   --rp-surface-strong: color-mix(in srgb, var(--rp-text) 12%, var(--rp-bg));
   --rp-border-strong: color-mix(in srgb, var(--rp-text) 18%, transparent);
   --rp-success: var(--rp-accent);
   --rp-warning: var(--rp-accent);
-  --rp-danger: var(--rp-accent);
 }
 
 .rfid-presence-infograph .rfid-presence-question {
@@ -105,6 +110,19 @@
   margin-bottom: 2rem;
   padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--rp-card-border);
+}
+
+.rfid-presence-infograph .rfid-presence-stage-nav .ocs__btn.pill:not(.accent) {
+  background: var(--rp-surface) !important;
+  border: 1px solid var(--rp-border-strong) !important;
+  color: var(--rp-text-muted) !important;
+}
+
+.rfid-presence-infograph .rfid-presence-stage-nav .ocs__btn.pill:not(.accent):hover,
+.rfid-presence-infograph .rfid-presence-stage-nav .ocs__btn.pill:not(.accent):focus-visible {
+  background: var(--rp-surface-strong) !important;
+  border-color: var(--rp-accent) !important;
+  color: var(--rp-text) !important;
 }
 
 @media (max-width: 900px) {

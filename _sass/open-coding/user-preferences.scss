@@ -150,6 +150,14 @@
     fill: currentColor !important;
   }
 
+  /* Selected capstone navigation uses the page background for contrast. */
+  .jv-nav-link.active,
+  .ocs__btn.accent.fill {
+    color: var(--pref-bg-color) !important;
+    background-color: var(--pref-accent-color) !important;
+    border-color: var(--pref-accent-color) !important;
+  }
+
   /* Force text color for readability */
   p, span, div, li, td, th, label, h1, h2, h3, h4, h5, h6, small {
     color: var(--pref-text-color) !important;
