@@ -158,6 +158,11 @@
   font-weight: 800;
 }
 
+// Keep navigation-card labels below the generic infograph hero-title scale.
+.ocs__hub-card > .ocs__hub-card-title {
+  font-size: 1.2rem;
+}
+
 .ocs__hub-card p { margin: 0; color: var(--text-muted); }
 
 .ocs__phase-crumb {
