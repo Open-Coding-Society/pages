@@ -1,0 +1,21 @@
+{% assign games = site.posts | where: "game_directory", true | where_exp: "game", "game.exclude_from_games != true" | sort: "game_order" %}
+
+{% if games.size > 0 %}
+<div class="ocs__container games-directory">
+  <h2 class="ocs__section-title">{{ site.games_directory.title | default: "Games &amp; Interactive Projects" }}</h2>
+  <p class="ocs__description">{{ site.games_directory.description | default: "Explore playable projects and lessons built with the Open Coding Society game systems." }}</p>
+  <div class="ocs__grid ocs__grid--card">
+    {% for game in games %}
+    <article class="ocs__grid-cell games-directory__card">
+      {% if game.image %}
+      <img class="ocs__image-frame ocs__image-frame--thumbnail" src="{{ game.image | relative_url }}" alt="{{ game.title }}">
+      {% endif %}
+      <h3>{{ game.title }}</h3>
+      {% if game.game_category %}<span class="ocs__status-pill ocs__status-pill--neutral">{{ game.game_category }}</span>{% endif %}
+      {% if game.description %}<p>{{ game.description }}</p>{% endif %}
+      <a class="ocs__btn accent fill" href="{{ game.url | relative_url }}">Open project</a>
+    </article>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

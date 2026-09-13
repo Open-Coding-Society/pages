@@ -30,8 +30,6 @@ sticky_rank: 1
         <option value="2026-2027" selected>2026/2027</option>
         <option value="2025-2026">2025/2026</option>
       </select>
-      <a href="{% post_url 2026-06-01-README-capstone %}" class="ocs__btn" title="Open Capstone Home Documentation">📄 README</a>
-      <a href="/capstone/games/" class="ocs__btn alert-green fill" title="Browse all OCS Games">🎮 Games Directory</a>
     </div>
   </div>
 </div>

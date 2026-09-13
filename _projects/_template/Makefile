@@ -8,6 +8,7 @@
 
 # Project paths (relative to workspace root)
 DATE_OF_CREATION = 2026-04-15
+NAVIGATION_DATE = 2026-09-12
 PROJECT_SRC = $(CURDIR)
 PROJECT_NAME = $(notdir $(PROJECT_SRC))
 NOTEBOOK_FILENAME = $(DATE_OF_CREATION)-$(PROJECT_NAME).ipynb
@@ -30,6 +31,7 @@ SASS_DEST = $(WORKSPACE_ROOT)/_sass/projects/$(PROJECT_NAME)
 IMAGES_DEST = $(WORKSPACE_ROOT)/images/projects/$(PROJECT_NAME)
 NOTEBOOK_DEST = $(WORKSPACE_ROOT)/_notebooks/projects/$(PROJECT_NAME)
 DOCS_DEST = $(WORKSPACE_ROOT)/_posts/projects/$(PROJECT_NAME)
+INCLUDES_DEST = $(WORKSPACE_ROOT)/_includes/projects/$(PROJECT_NAME)
 
 ###########################################
 # Build Targets
@@ -46,14 +48,22 @@ build: index
 # Copy DOCS, JS, SASS, and more assets
 assets:
 	@if [ -d "navigation" ]; then \
-		mkdir -p $(DOCS_DEST); \
+		mkdir -p $(DOCS_DEST) $(INCLUDES_DEST) $(NOTEBOOK_DEST); \
 		for file in navigation/*.md; do \
- 	       [ -f "$$file" ] || continue; \
- 	       filename=$$(basename "$$file"); \
-			cp "$$file" "$(DOCS_DEST)/$(DATE_OF_CREATION)-$$filename"; \
+			[ -f "$$file" ] || continue; \
+			filename=$$(basename "$$file"); \
+			cp "$$file" "$(DOCS_DEST)/$(NAVIGATION_DATE)-$$filename"; \
+		done; \
+		for file in navigation/*.html; do \
+			[ -f "$$file" ] || continue; \
+			cp "$$file" "$(INCLUDES_DEST)/$$(basename "$$file")"; \
+		done; \
+		for file in navigation/*.ipynb; do \
+			[ -f "$$file" ] || continue; \
+			filename=$$(basename "$$file"); \
+			cp "$$file" "$(NOTEBOOK_DEST)/$(NAVIGATION_DATE)-$$filename"; \
 		done; \
 	fi
-	@if [ -d "navigation" ]; then mkdir -p $(NAV_DEST); cp navigation/*.md $(NAV_DEST)/ 2>/dev/null || true; fi
 	@if [ -d "levels" ]; then mkdir -p $(JS_DEST)/levels; cp levels/*.js $(JS_DEST)/levels/ 2>/dev/null || true; fi
 	@if [ -d "model" ]; then mkdir -p $(JS_DEST)/model; cp model/*.js $(JS_DEST)/model/ 2>/dev/null || true; fi
 	@if [ -d "services" ]; then mkdir -p $(JS_DEST)/services; cp services/*.js $(JS_DEST)/services/ 2>/dev/null || true; fi
@@ -108,6 +118,7 @@ clean:
 	@rm -rf $(SASS_DEST)
 	@rm -rf $(IMAGES_DEST)
 	@rm -rf $(DOCS_DEST)
+	@rm -rf $(INCLUDES_DEST)
 	@touch /tmp/.jekyll_rebuild_trigger 2>/dev/null || true
 	@echo "✓ Distribution cleaned (source files preserved in _projects/$(PROJECT_NAME))"
 

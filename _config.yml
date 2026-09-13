@@ -32,6 +32,11 @@ future: true
 # GOOGLE_CLIENT_ID and login.md's #g_id_onload data-client_id pull the same
 # google_client_id key via Liquid -- one source of truth, just never a committed one.
 
+# Shared games catalog labels. Placement stays page-controlled via the include.
+games_directory:
+  title: "Games & Interactive Projects"
+  description: "Explore playable projects and lessons built with the Open Coding Society game systems."
+
 # Exclude from Jekyll watch - these are processed by our conversion scripts
 # This prevents double-regeneration when saving notebooks/docx files
 exclude:
