@@ -1,9 +1,26 @@
 {% assign games = site.posts | where: "game_directory", true | where_exp: "game", "game.exclude_from_games != true" | sort: "game_order" %}
 
 {% if games.size > 0 %}
-  <div class="ocs__grid ocs__grid--card">
+  {% assign game_topics = games | map: "game_category" | uniq | sort %}
+  <div class="games-directory__search">
+    <input type="text" class="js-games-search-input games-directory__search-input" placeholder="Search games..." autocomplete="off" aria-label="Search games">
+    {% if game_topics.size > 0 %}
+    <div class="games-directory__topics">
+      {% for topic in game_topics %}
+        {% if topic %}
+        <button type="button" class="js-games-topic-filter ocs__status-pill ocs__status-pill--neutral" data-topic="{{ topic }}">{{ topic }}</button>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="ocs__grid ocs__grid--card js-games-grid">
     {% for game in games %}
-    <article class="ocs__grid-cell games-directory__card">
+    <article class="ocs__grid-cell games-directory__card js-games-card"
+              data-title="{{ game.title | escape }}"
+              data-topic="{{ game.game_category | escape }}"
+              data-description="{{ game.description | escape }}">
       {% assign game_image = game.image %}
       {% unless game_image %}
         {% assign project_path = game.path | split: '/' %}
@@ -20,4 +37,6 @@
     </article>
     {% endfor %}
   </div>
+  <p class="js-games-empty games-directory__empty" hidden>No games match your search.</p>
+  <script src="{{ '/assets/js/games-directory-search.js' | relative_url }}"></script>
 {% endif %}
